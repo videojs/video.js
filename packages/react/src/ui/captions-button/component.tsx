@@ -1,3 +1,5 @@
+'use client';
+
 import { CaptionsButtonCore, CaptionsButtonDataAttrs } from '@videojs/core';
 import { selectTextTrack } from '@videojs/core/dom';
 

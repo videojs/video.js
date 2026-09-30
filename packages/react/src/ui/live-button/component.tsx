@@ -1,3 +1,5 @@
+'use client';
+
 import { LiveButtonCore, LiveButtonDataAttrs, type LiveButtonMediaState } from '@videojs/core';
 import { logMissingFeature, selectBuffer, selectLive, selectTime } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';

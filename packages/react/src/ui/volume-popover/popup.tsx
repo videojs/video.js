@@ -1,3 +1,5 @@
+'use client';
+
 import { VolumePopoverDataAttrs } from '@videojs/core';
 import { getStateDataAttrs } from '@videojs/core/dom';
 import { forwardRef } from 'react';

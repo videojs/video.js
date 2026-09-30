@@ -1,3 +1,5 @@
+'use client';
+
 import { BufferingIndicatorCore, BufferingIndicatorDataAttrs } from '@videojs/core';
 import { logMissingFeature, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';

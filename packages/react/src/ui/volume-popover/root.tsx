@@ -1,3 +1,5 @@
+'use client';
+
 import { VolumePopoverCore } from '@videojs/core';
 import { selectVolume } from '@videojs/core/dom';
 import type { MediaVolumeState } from '@videojs/media';

@@ -1,3 +1,5 @@
+'use client';
+
 import type { TooltipGroupCore } from '@videojs/core';
 import { createContext, useContext } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { type PosterImageLoadState, type PosterState } from '@videojs/core';
 import { createContext, type ProviderProps, useContext } from 'react';
 

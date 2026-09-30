@@ -1,3 +1,5 @@
+'use client';
+
 import { type RefObject, useLayoutEffect, useReducer, useRef } from 'react';
 
 import type { AddLocaleRoot } from './context';

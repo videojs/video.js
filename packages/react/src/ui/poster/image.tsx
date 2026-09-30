@@ -1,3 +1,5 @@
+'use client';
+
 import type { PosterCore, PosterImageLoadState } from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';

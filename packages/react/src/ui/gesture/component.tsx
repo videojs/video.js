@@ -1,3 +1,5 @@
+'use client';
+
 import type { GestureProps as CoreGestureProps } from '@videojs/core';
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import {

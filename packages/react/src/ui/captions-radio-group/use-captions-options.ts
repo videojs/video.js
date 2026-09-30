@@ -1,3 +1,5 @@
+'use client';
+
 import { CaptionsRadioGroupCore, type CaptionsRadioGroupOption } from '@videojs/core';
 import { selectTextTrack } from '@videojs/core/dom';
 

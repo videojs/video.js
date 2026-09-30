@@ -1,3 +1,5 @@
+'use client';
+
 import { FullscreenButtonCore, FullscreenButtonDataAttrs } from '@videojs/core';
 import { selectFullscreen } from '@videojs/core/dom';
 

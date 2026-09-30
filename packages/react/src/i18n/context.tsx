@@ -1,3 +1,5 @@
+'use client';
+
 import {
   createTranslator,
   DEFAULT_LOCALE,

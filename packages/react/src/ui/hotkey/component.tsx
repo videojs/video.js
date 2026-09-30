@@ -1,3 +1,5 @@
+'use client';
+
 import type { HotkeyProps as CoreHotkeyProps } from '@videojs/core';
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import { createHotkey, isHotkeyToggleAction, resolveHotkeyAction } from '@videojs/core/dom';

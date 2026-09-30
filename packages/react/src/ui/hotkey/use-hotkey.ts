@@ -1,3 +1,5 @@
+'use client';
+
 import type { InputAction } from '@videojs/core';
 import { createHotkey, isHotkeyToggleAction } from '@videojs/core/dom';
 import { useEffect } from 'react';

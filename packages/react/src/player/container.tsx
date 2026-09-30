@@ -1,3 +1,5 @@
+'use client';
+
 import { ContainerCore, ContainerDataAttrs, SKIN_HELP_TEXT, SKIN_HELP_URL } from '@videojs/core';
 import {
   createPopupGroup,

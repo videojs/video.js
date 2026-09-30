@@ -1,3 +1,5 @@
+'use client';
+
 import { SeekButtonCore, SeekButtonDataAttrs } from '@videojs/core';
 import { selectTime } from '@videojs/core/dom';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import type { RadioOption, RadioOptionsState } from '@videojs/core';
 import { logMissingFeature } from '@videojs/core/dom';
 import { type Text, type TextParams, translateText } from '@videojs/core/i18n';

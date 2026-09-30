@@ -1,3 +1,5 @@
+'use client';
+
 import type { InputActionEvent, MediaSnapshot } from '@videojs/core';
 import { getMediaSnapshot, subscribeToInputActions } from '@videojs/core/dom';
 import { useEffect } from 'react';

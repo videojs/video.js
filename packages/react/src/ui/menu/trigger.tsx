@@ -1,3 +1,5 @@
+'use client';
+
 import type { MenuCore, MenuOptionState, MenuState } from '@videojs/core';
 import { isMenuNavigationKey } from '@videojs/core/dom';
 import { isInteractiveActivation } from '@videojs/utils/dom';

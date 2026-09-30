@@ -1,3 +1,5 @@
+'use client';
+
 import { isFunction } from '@videojs/utils/predicate';
 import type { Ref, RefCallback } from 'react';
 import { useCallback } from 'react';

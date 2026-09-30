@@ -1,3 +1,5 @@
+'use client';
+
 import { MenuContentDataAttrs, type MenuState } from '@videojs/core';
 import { isMenuNavigationKey } from '@videojs/core/dom';
 import { forwardRef, useCallback, useLayoutEffect, useRef } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { PosterCore, PosterDataAttrs, type PosterImageLoadState } from '@videojs/core';
 import { logMissingFeature, selectMetadata, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';

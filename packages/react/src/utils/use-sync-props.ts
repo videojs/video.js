@@ -1,3 +1,5 @@
+'use client';
+
 import { isUndefined } from '@videojs/utils/predicate';
 import { useRef } from 'react';
 

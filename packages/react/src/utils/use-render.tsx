@@ -1,3 +1,5 @@
+'use client';
+
 import { getStateDataAttrs, type StateAttrMap } from '@videojs/core/dom';
 import { isFunction, isObject } from '@videojs/utils/predicate';
 import { resolveClassName } from '@videojs/utils/style';

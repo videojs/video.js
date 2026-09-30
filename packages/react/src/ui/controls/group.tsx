@@ -1,3 +1,5 @@
+'use client';
+
 import type { ControlsCore } from '@videojs/core';
 import type { ForwardedRef, ReactNode } from 'react';
 import { forwardRef } from 'react';

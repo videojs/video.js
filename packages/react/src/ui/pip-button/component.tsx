@@ -1,3 +1,5 @@
+'use client';
+
 import { PiPButtonCore, PiPButtonDataAttrs } from '@videojs/core';
 import { selectPiP } from '@videojs/core/dom';
 

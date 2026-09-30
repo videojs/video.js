@@ -1,3 +1,5 @@
+'use client';
+
 import type { Locale } from '@videojs/core/i18n';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 

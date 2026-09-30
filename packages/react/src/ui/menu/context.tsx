@@ -1,3 +1,5 @@
+'use client';
+
 import type { MenuCore, MenuOptionState, MenuState } from '@videojs/core';
 import type { MediaContainer, MenuApi, MenuPopupApi, PositioningBoundary } from '@videojs/core/dom';
 import { createContext, useContext, useLayoutEffect, useState } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { type AudioTrackRadioGroupCore, AudioTrackRadioGroupDataAttrs, type MenuOptionState } from '@videojs/core';
 import { getStateDataAttrs } from '@videojs/core/dom';
 import { isFunction } from '@videojs/utils/predicate';

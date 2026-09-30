@@ -1,3 +1,5 @@
+'use client';
+
 import type { SliderInput, SliderState } from '@videojs/core';
 import {
   createSlider,

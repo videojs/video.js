@@ -1,3 +1,5 @@
+'use client';
+
 import type { ControlsState, StateAttrMap } from '@videojs/core';
 import { createContext, useContext } from 'react';
 

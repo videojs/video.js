@@ -1,3 +1,5 @@
+'use client';
+
 import type { IndicatorLifecycleState, InputActionEvent, MediaSnapshot } from '@videojs/core';
 import type { State as StoreState } from '@videojs/store';
 import { useState, useSyncExternalStore } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { MenuPopupDataAttrs, type MenuState } from '@videojs/core';
 import { createMenuPopup, getRootPositionOptions, MenuPositioningCSSVars } from '@videojs/core/dom';
 import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';

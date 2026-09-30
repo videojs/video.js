@@ -1,3 +1,5 @@
+'use client';
+
 import type { SliderState } from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { identity } from '@videojs/utils/function';
 
 import type { State } from '../../core/state';

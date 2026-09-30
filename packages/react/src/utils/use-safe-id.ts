@@ -1,3 +1,5 @@
+'use client';
+
 import { useId } from 'react';
 
 const UNSAFE_CHARS = /[^a-zA-Z0-9_-]/g;

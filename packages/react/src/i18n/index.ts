@@ -1,5 +1,3 @@
-'use client';
-
 export type { FlatTranslations, Locale, TranslationParams, Translations, Translator } from '@videojs/core/i18n';
 
 export {

@@ -1,3 +1,5 @@
+'use client';
+
 import type { SliderPreviewProps as CoreSliderPreviewProps, SliderState } from '@videojs/core';
 import { getSliderPreviewStyle } from '@videojs/core/dom';
 import { observeResize } from '@videojs/utils/dom';

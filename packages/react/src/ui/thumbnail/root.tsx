@@ -1,3 +1,5 @@
+'use client';
+
 import { mapCuesToThumbnails, ThumbnailCore, ThumbnailDataAttrs } from '@videojs/core';
 import { createThumbnail, selectFullscreen, selectTextTrack } from '@videojs/core/dom';
 import type { CSSProperties, ForwardedRef } from 'react';

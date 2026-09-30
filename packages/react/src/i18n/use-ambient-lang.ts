@@ -1,3 +1,5 @@
+'use client';
+
 import type { Locale } from '@videojs/core/i18n';
 import { nearestLang, resolveLangAttr, subscribeAmbientLang } from '@videojs/utils/dom';
 import { useSyncExternalStore } from 'react';

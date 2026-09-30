@@ -1,3 +1,5 @@
+'use client';
+
 import { identity, noop } from '@videojs/utils/function';
 
 import type { AnyStore, InferStoreState } from '../../core/store';

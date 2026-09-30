@@ -1,3 +1,5 @@
+'use client';
+
 import type { EngineAdapter } from '@videojs/media';
 import type { RefCallback } from 'react';
 import { useCallback, useLayoutEffect, useRef } from 'react';

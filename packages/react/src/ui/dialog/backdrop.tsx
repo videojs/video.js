@@ -1,3 +1,5 @@
+'use client';
+
 import type { DialogCore } from '@videojs/core';
 import { forwardRef } from 'react';
 

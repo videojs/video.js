@@ -1,3 +1,5 @@
+'use client';
+
 import { type ButtonActivationSource, createButton, type UIEvent } from '@videojs/core/dom';
 import type { ComponentPropsWithRef, Ref } from 'react';
 import { useCallback } from 'react';

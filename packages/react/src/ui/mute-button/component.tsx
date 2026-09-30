@@ -1,3 +1,5 @@
+'use client';
+
 import { MuteButtonCore, MuteButtonDataAttrs } from '@videojs/core';
 import { selectVolume } from '@videojs/core/dom';
 

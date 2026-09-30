@@ -1,3 +1,5 @@
+'use client';
+
 import { ErrorDialogCore, ErrorDialogDataAttrs } from '@videojs/core';
 import { selectError } from '@videojs/core/dom';
 import type { ReactNode } from 'react';

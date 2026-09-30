@@ -1,5 +1,3 @@
-'use client';
-
 export type { BuiltInIndicatorStatus, IndicatorStatus, InputAction, InputIndicatorLabels } from '@videojs/core';
 export * from './constants';
 // Core

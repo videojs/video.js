@@ -1,3 +1,5 @@
+'use client';
+
 import { addMediaExtension, HTMLMediaAdapter, type HTMLMediaTargetLike, type MediaExtension } from '@videojs/media/dom';
 import { useEffect, useState } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import type { ThumbnailCore } from '@videojs/core';
 import { forwardRef, type ForwardedRef } from 'react';
 

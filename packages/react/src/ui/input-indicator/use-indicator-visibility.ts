@@ -1,3 +1,5 @@
+'use client';
+
 import type { IndicatorVisibilityHandle } from '@videojs/core';
 import { getIndicatorVisibilityCoordinator } from '@videojs/core/dom';
 import { useCallback, useEffect, useRef, useState } from 'react';

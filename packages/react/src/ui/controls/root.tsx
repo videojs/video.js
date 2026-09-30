@@ -1,3 +1,5 @@
+'use client';
+
 import { ControlsCore, ControlsDataAttrs, type ControlsProps } from '@videojs/core';
 import { logMissingFeature, selectControls } from '@videojs/core/dom';
 import type { ReactNode } from 'react';

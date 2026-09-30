@@ -1,3 +1,5 @@
+'use client';
+
 import type { VolumePopoverCore } from '@videojs/core';
 import { createContext, useContext } from 'react';
 

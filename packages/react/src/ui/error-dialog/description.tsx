@@ -1,3 +1,5 @@
+'use client';
+
 import { type DialogCore, resolveErrorDialogDescription } from '@videojs/core';
 import { translateText } from '@videojs/core/i18n';
 import { forwardRef, type ReactNode } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { TimeCore, TimeDataAttrs } from '@videojs/core';
 import { logMissingFeature, selectBuffer, selectTime } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';

@@ -1,3 +1,5 @@
+'use client';
+
 import { type PopoverProps as CorePopoverProps, PopoverCore, PopoverDataAttrs } from '@videojs/core';
 import {
   createPopover,

@@ -1,3 +1,5 @@
+'use client';
+
 import { TooltipCSSVars, type TooltipState } from '@videojs/core';
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 

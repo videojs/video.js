@@ -1,3 +1,5 @@
+'use client';
+
 import { AlertDialogCore, AlertDialogDataAttrs, type AlertDialogProps } from '@videojs/core';
 import type { ReactNode } from 'react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { createStatusAnnouncerLabels, StatusAnnouncerCore } from '@videojs/core';
 import { shouldAnnounceStatusChange, subscribeToStatusAnnouncer } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';

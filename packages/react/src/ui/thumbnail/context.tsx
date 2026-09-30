@@ -1,3 +1,5 @@
+'use client';
+
 import type { ThumbnailCore, ThumbnailState } from '@videojs/core';
 import { createContext, type CSSProperties, type ProviderProps, type RefCallback, useContext } from 'react';
 

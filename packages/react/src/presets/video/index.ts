@@ -1,6 +1,4 @@
 /** General-purpose video player preset with full playback controls. */
-'use client';
-
 export { videoFeatures } from '@videojs/core/dom';
 export { Video, type VideoProps } from '@/media/video';
 export * from './minimal-skin';

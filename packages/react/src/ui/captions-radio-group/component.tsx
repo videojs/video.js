@@ -1,3 +1,5 @@
+'use client';
+
 import { type CaptionsRadioGroupCore, CaptionsRadioGroupDataAttrs, type MenuOptionState } from '@videojs/core';
 import { getStateDataAttrs } from '@videojs/core/dom';
 import { isFunction } from '@videojs/utils/predicate';

@@ -1,3 +1,5 @@
+'use client';
+
 import { onI18nRegistryChange } from '@videojs/core/i18n';
 import { useEffect, useReducer } from 'react';
 

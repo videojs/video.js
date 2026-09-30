@@ -1,3 +1,5 @@
+'use client';
+
 import { TooltipGroupCore, type TooltipGroupProps } from '@videojs/core';
 import type { ReactNode } from 'react';
 import { useState } from 'react';

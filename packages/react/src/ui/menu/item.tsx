@@ -1,3 +1,5 @@
+'use client';
+
 import type { MenuState } from '@videojs/core';
 import { completeMenuItemSelection } from '@videojs/core/dom';
 import { forwardRef, useCallback, useEffect, useRef } from 'react';

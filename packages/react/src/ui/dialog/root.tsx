@@ -1,3 +1,5 @@
+'use client';
+
 import { DialogCore, type DialogProps } from '@videojs/core';
 import type { ReactNode } from 'react';
 
