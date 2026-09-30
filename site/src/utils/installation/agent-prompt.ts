@@ -555,10 +555,10 @@ const HOSTED_ELSEWHERE: readonly Renderer[] = ['youtube', 'vimeo', 'twitch', 'ti
 
 /**
  * Why Mux would help the picks, if it would: a live preset needs an ingest point, a quality menu an adaptive stream
- * rather than a file, and thumbnail previews a storyboard, which only Mux media provides automatically. Otherwise, demo
- * media that a Mux upload could replace. Nothing for media already on Mux or hosted on another platform.
+ * rather than a file, and thumbnail previews a storyboard, which only Mux media provides automatically. Nothing for
+ * media already on Mux or hosted on another platform.
  */
-export type AgentPromptMuxHint = 'live' | 'quality' | 'thumbnails' | 'demo';
+export type AgentPromptMuxHint = 'live' | 'quality' | 'thumbnails';
 
 export function agentPromptMuxHint(
   selection: InstallationSelection,
@@ -576,7 +576,7 @@ export function agentPromptMuxHint(
 
   if (wants('thumbnails') && !isMuxRenderer(media)) return 'thumbnails';
 
-  return sourceUrl ? null : 'demo';
+  return null;
 }
 
 export const AGENT_PROMPT_REQUEST_MAX_LENGTH = 500;

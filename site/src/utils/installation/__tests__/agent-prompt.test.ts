@@ -401,10 +401,10 @@ describe('agentPromptMuxHint', () => {
     expect(agentPromptMuxHint(select({ media: 'hls' }), ['thumbnails'])).toBe('thumbnails');
   });
 
-  it('offers replacing the demo, and nothing once the media is on Mux or another platform', () => {
-    expect(agentPromptMuxHint(select({}), [])).toBe('demo');
+  it('says nothing when no pick needs Mux, or once the media is on Mux or another platform', () => {
+    expect(agentPromptMuxHint(select({}), [])).toBeNull();
     // A quality menu works with the demo HLS stream.
-    expect(agentPromptMuxHint(select({ media: 'hls' }), ['quality'])).toBe('demo');
+    expect(agentPromptMuxHint(select({ media: 'hls' }), ['quality'])).toBeNull();
     expect(
       agentPromptMuxHint(select({ media: 'mux-video', sourceUrl: 'https://stream.mux.com/abc.m3u8' }), ['thumbnails'])
     ).toBeNull();

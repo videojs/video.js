@@ -178,7 +178,7 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
     items: group.items.filter((example) => agentPromptExampleFits(example, target.method)),
   }));
 
-  // A picked example stays undoable until the reader changes what it set, so Undo never overwrites their own edits.
+  // A picked example's setup line stays until the reader changes what it set.
   const applied =
     picked &&
     agentPromptPlayerPicksEqual(picked.applied, picks) &&
@@ -186,22 +186,16 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
       ? picked
       : null;
 
-  // An example sets up its player, so the command, the features, and the guide's own pickers follow it. Undo returns
-  // the player picks and features to what they were before the first of several examples in a row, and clears the
-  // request the example filled in.
+  // An example sets up its player, so the command, the features, and the guide's own pickers follow it.
   const pickExample = (example: AgentPromptRequestExample) => {
     const next = agentPromptExamplePicks(example, picks);
 
-    promptExample.set({
-      example,
-      applied: next,
-      replaced: applied?.replaced ?? { picks: agentPromptPlayerPicks(picks), features },
-    });
+    promptExample.set({ example, applied: next });
     updateInstallationSelection(next);
     promptFeatures.set(example.features ?? []);
   };
 
-  // A suggestion that sets a generic stream can move it to Mux, which keeps the suggestion undoable.
+  // A suggestion that sets a generic stream can move it to Mux, keeping its setup line.
   const hostExampleOnMux =
     applied && (applied.applied.media === 'hls' || applied.applied.media === 'dash')
       ? () => {
@@ -211,19 +205,6 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
           updateInstallationSelection(next);
         }
       : null;
-
-  // One Mux offer at a time: while the suggestion offers Mux hosting, the line about the demo waits.
-  const needsMux = agentPromptMuxHint(selection, features);
-  const muxHint = hostExampleOnMux && needsMux === 'demo' ? null : needsMux;
-
-  const undoExample = () => {
-    if (!applied) return;
-
-    updateInstallationSelection(applied.replaced.picks);
-    promptFeatures.set(applied.replaced.features);
-    promptRequest.set('');
-    promptExample.set(null);
-  };
 
   const reset = () => {
     resetAgentPrompt();
@@ -237,9 +218,13 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
       ref={cardRef}
     >
       <PromptIntent
+        media={selection.media}
         sourceUrl={selection.sourceUrl ?? ''}
-        useCase={selection.useCase}
         supportedRenderers={agentPromptMediaChoices(selection)}
+        // Another kind of media can't play the reader's URL, so switching to one goes back to its demo.
+        onMediaChange={(next) =>
+          updateInstallationSelection(next === picks.media ? { media: next } : { media: next, sourceUrl: '' })
+        }
         skin={selection.useCase === 'background-video' ? null : skinToFlag(selection.skin)}
         includeNoSkin={agentPromptSkinChoices(selection).includes('none')}
         agent={agent}
@@ -256,7 +241,6 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
             summary: agentPromptExampleSummary(applied.example, applied.applied),
           }
         }
-        onUndoExample={undoExample}
         onHostExampleOnMux={hostExampleOnMux}
         features={features}
         availableFeatures={agentPromptFeaturesFor(selection.useCase)}
@@ -269,7 +253,7 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
             ),
           })
         }
-        muxHint={muxHint}
+        muxHint={agentPromptMuxHint(selection, features)}
       />
       {/* The prompt is dark in both color schemes, so it takes the dark theme tokens. */}
       <div className="dark bg-soot text-manila-light relative">

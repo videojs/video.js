@@ -66,16 +66,15 @@ onMount(promptFeatures, () =>
 export const promptRequest = atom<string>('');
 
 /**
- * A suggested request the reader picked: the picks it applied, so a later change of the reader's shows it no longer
- * applies, and what it replaced, so the pick can be undone.
+ * A suggested request the reader picked, with the picks it applied, so a later change of the reader's shows it no
+ * longer applies.
  */
 interface PickedAgentPromptExample {
   example: AgentPromptRequestExample;
   applied: AgentPromptPlayerPicks;
-  replaced: { picks: AgentPromptPlayerPicks; features: readonly AgentPromptFeature[] };
 }
 
-/** The last suggested request the reader picked, or `null` once it is undone or the prompt is reset. */
+/** The last suggested request the reader picked, or `null` once the prompt is reset. */
 export const promptExample = atom<PickedAgentPromptExample | null>(null);
 
 /**

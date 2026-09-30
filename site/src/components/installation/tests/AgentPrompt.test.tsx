@@ -2,14 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import {
-  promptExample,
-  promptFeatures,
-  promptGoal,
-  promptRequest,
-  resetAgentPrompt,
-  skillAgent,
-} from '@/stores/agentPrompt';
+import { promptFeatures, promptGoal, promptRequest, resetAgentPrompt, skillAgent } from '@/stores/agentPrompt';
 import {
   extensions,
   framework,
@@ -61,6 +54,11 @@ async function copyPrompt(): Promise<string> {
 /** Show the answers beyond the request, which wait under More options. */
 async function openOptions(user = userEvent.setup()): Promise<void> {
   await user.click(screen.getByRole('button', { name: /^More options/ }));
+}
+
+/** The line that says what a picked suggestion set up, if one shows. */
+function setupLine(): HTMLElement | null {
+  return screen.queryByText((_, element) => element?.tagName === 'P' && element.textContent.startsWith('Set up for'));
 }
 
 /** The `agents init` command as the prompt shows it. */
@@ -146,12 +144,12 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     // Only the request asks for an answer; the rest shows its defaults under More options.
     expect(screen.queryByRole('combobox', { name: 'Goal' })).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'More options: Add a player, Demo video, Default look, Any agent' })
+      screen.getByRole('button', { name: 'More options: Add a player, HTML5 Video demo, Default look, Any agent' })
     ).toHaveAttribute('aria-expanded', 'false');
 
     await openOptions();
 
-    expect(screen.getByRole('button', { name: 'Media: Demo video' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Media: HTML5 Video demo' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Look: Default' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Agent' })).toHaveTextContent('Any agent');
   });
@@ -175,12 +173,36 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     render(<AgentPrompt route="react" framework="react" />);
     await openOptions(user);
-    await user.click(screen.getByRole('button', { name: 'Media: Demo video' }));
+    await user.click(screen.getByRole('button', { name: 'Media: HTML5 Video demo' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Paste a media URL…' }, RENDER_WAIT));
     await user.click(await screen.findByLabelText('Paste a media URL to detect its source type', {}, RENDER_WAIT));
     await user.paste(url);
 
     expect(screen.getByText('Mux upload')).toBeInTheDocument();
     expect(initCommand()).toBe(`\`npx @videojs/cli agents init --skin default --media youtube --source-url '${url}'\``);
+  });
+
+  it("picks the media from a menu of the preset's sources, going back to its demo", async () => {
+    const user = userEvent.setup();
+
+    act(() => {
+      media.set('hls');
+      sourceUrl.set('https://example.com/stream.m3u8');
+    });
+    render(<AgentPrompt route="react" framework="react" />);
+    await openOptions(user);
+    await user.click(screen.getByRole('button', { name: 'Media: example.com/stream.m3u8' }));
+
+    expect(await screen.findByRole('menuitemradio', { name: 'HLS' }, RENDER_WAIT)).toBeChecked();
+    expect(screen.getByText('Platforms')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('menuitemradio', { name: 'Vimeo' }));
+
+    expect(media.get()).toBe('vimeo');
+    // A Vimeo player can't play the HLS URL, so the command names the demo instead.
+    expect(sourceUrl.get()).toBe('');
+    expect(initCommand()).toBe('`npx @videojs/cli agents init --skin default --media vimeo --source-url demo`');
+    expect(screen.getByRole('button', { name: 'Media: Vimeo demo' })).toBeInTheDocument();
   });
 
   it('takes the look from the skin cards', async () => {
@@ -288,7 +310,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(useCase.get()).toBe('default-audio');
     expect(initCommand()).toBe('`npx @videojs/cli agents init --preset audio --skin default --source-url demo`');
     expect(promptFeatures.get()).toEqual(['user-preferences']);
-    expect(screen.getByRole('button', { name: 'Media: Demo audio' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Media: HTML5 Audio demo' })).toBeInTheDocument();
   });
 
   it('only fills the request with typed text', async () => {
@@ -391,24 +413,21 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
   });
 
-  it('offers a Mux upload in place of the demo, opening the media dialog', async () => {
+  it('says a quality menu needs an adaptive stream when the media is a file, offering a Mux upload', async () => {
     const user = userEvent.setup();
 
     render(<AgentPrompt route="react" framework="react" />);
 
-    expect(screen.getByText('Using demo video.', { exact: false })).toBeInTheDocument();
+    // Nothing to say about Mux until a pick needs it.
+    expect(screen.queryByRole('button', { name: 'Upload to Mux' })).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Upload your own to Mux' }));
-
-    expect(await screen.findByText('Mux upload', {}, RENDER_WAIT)).toBeVisible();
-  });
-
-  it('says a quality menu needs an adaptive stream when the media is a file', () => {
     act(() => promptFeatures.set(['quality']));
-    render(<AgentPrompt route="react" framework="react" />);
 
     expect(screen.getByText('Quality menus need an adaptive stream.', { exact: false })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Upload to Mux' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Upload to Mux' }));
+
+    expect(await screen.findByText('Mux upload', {}, RENDER_WAIT)).toBeVisible();
   });
 
   it('turns viewer analytics on and off for Mux media', async () => {
@@ -427,7 +446,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(initCommand()).toContain('--extensions none');
   });
 
-  it("moves a suggestion's stream to Mux, keeping it undoable", async () => {
+  it("moves a suggestion's stream to Mux, keeping its setup line", async () => {
     const user = userEvent.setup();
 
     render(<AgentPrompt route="react" framework="react" />);
@@ -437,9 +456,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     expect(media.get()).toBe('mux-video');
     expect(initCommand()).toContain('--media mux-video');
-    expect(screen.getByRole('button', { name: 'Undo Course lessons' }).closest('p')).toHaveTextContent(
-      'Set up for Course lessons: Mux, Mux Data,'
-    );
+    expect(setupLine()).toHaveTextContent('Set up for Course lessons: Mux, Mux Data,');
     expect(screen.queryByRole('button', { name: 'Host on Mux instead' })).not.toBeInTheDocument();
     expect(await copyPrompt()).toContain('use the Mux MCP server if it is connected');
   });
@@ -471,18 +488,18 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(promptFeatures.get()).toEqual(['autoplay']);
   });
 
-  it('stops offering to undo an example once the reader changes what it set', async () => {
+  it('drops the setup line once the reader changes what the suggestion set', async () => {
     const user = userEvent.setup();
 
     render(<AgentPrompt route="react" framework="react" />);
     await user.click(screen.getByRole('combobox', { name: /What are you building/ }));
     await user.click(await screen.findByRole('option', { name: /^Podcast/ }, RENDER_WAIT));
 
-    expect(screen.getByRole('button', { name: 'Undo Podcast' })).toBeInTheDocument();
+    expect(setupLine()).toHaveTextContent('Set up for Podcast');
 
     act(() => skin.set('minimal-audio'));
 
-    expect(screen.queryByRole('button', { name: 'Undo Podcast' })).not.toBeInTheDocument();
+    expect(setupLine()).toBeNull();
   });
 
   it("marks a terminal command's copy on the menu, not the prompt's copy button", async () => {
@@ -508,13 +525,9 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.getByText("Couldn't copy the prompt")).toBeInTheDocument();
   });
 
-  it('says what a suggested request set up, and undoes it back to the choices before the first pick', async () => {
+  it('says what a suggested request set up, and replaces it with the next pick', async () => {
     const user = userEvent.setup();
 
-    act(() => {
-      skin.set('minimal-video');
-      promptFeatures.set(['autoplay']);
-    });
     render(<AgentPrompt route="react" framework="react" />);
 
     const field = screen.getByRole('combobox', { name: /What are you building/ });
@@ -522,7 +535,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(field);
     await user.click(await screen.findByRole('option', { name: /Video library/ }, RENDER_WAIT));
 
-    expect(screen.getByRole('button', { name: 'Undo Video library' }).closest('p')).toHaveTextContent(
+    expect(setupLine()).toHaveTextContent(
       'Set up for Video library: HLS, Google Cast, Captions, Quality menu, and Keyboard shortcuts.'
     );
 
@@ -531,16 +544,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(await screen.findByRole('option', { name: /^Podcast/ }, RENDER_WAIT));
 
     expect(useCase.get()).toBe('default-audio');
-
-    await user.click(screen.getByRole('button', { name: 'Undo Podcast' }));
-
-    expect(useCase.get()).toBe('default-video');
-    expect(skin.get()).toBe('minimal-video');
-    expect(media.get()).toBe('html5-video');
-    expect(extensions.get()).toEqual([]);
-    expect(promptFeatures.get()).toEqual(['autoplay']);
-    expect(promptRequest.get()).toBe('');
-    expect(promptExample.get()).toBeNull();
+    expect(setupLine()).toHaveTextContent('Set up for Podcast: Audio player and User preferences.');
     expect(screen.queryByRole('button', { name: /^Undo/ })).not.toBeInTheDocument();
   });
 });

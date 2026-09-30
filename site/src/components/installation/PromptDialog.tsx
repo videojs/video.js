@@ -28,16 +28,23 @@ interface Props<BodyProps extends object> {
   bodyProps: BodyProps;
   /** Keep the content mounted while the dialog is closed, so work such as an upload keeps going. */
   keepMounted?: boolean;
-  /** Open the dialog from elsewhere, such as a link that offers an upload. */
+  /** Open the dialog from elsewhere, such as a menu item or a link that offers an upload. */
   actionsRef?: Ref<PromptDialogActions>;
+  /** Render the form control that opens the dialog; without it, only `actionsRef` does. */
+  showTrigger?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Where focus goes on closing, when something other than the trigger opened the dialog. */
   finalFocus?: RefObject<HTMLElement | null> | undefined;
 }
 
 export interface PromptDialogActions {
-  /** Open the dialog once its content is in place, as a click on the trigger does. */
-  open: () => void;
+  /**
+   * Open the dialog once its content is in place, as a click on the trigger does, focusing `focusSelector` if given
+   * instead of the dialog's own.
+   */
+  open: (focusSelector?: string) => void;
+  /** Start loading the content, such as when the reader points at something that opens the dialog. */
+  preload: () => void;
 }
 
 /** A choice that needs more room than a select, such as cards with a preview, opened in a dialog from a form control. */
@@ -53,6 +60,7 @@ export default function PromptDialog<BodyProps extends object>({
   bodyProps,
   keepMounted = false,
   actionsRef,
+  showTrigger = true,
   onOpenChange,
   finalFocus,
 }: Props<BodyProps>) {
@@ -61,6 +69,7 @@ export default function PromptDialog<BodyProps extends object>({
   const [loadFailed, setLoadFailed] = useState(false);
   const loading = useRef<Promise<void> | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const focusOverride = useRef<string | undefined>(undefined);
 
   function load(): Promise<void> {
     if (loading.current) return loading.current;
@@ -88,7 +97,8 @@ export default function PromptDialog<BodyProps extends object>({
     onOpenChange?.(next);
   }
 
-  function show() {
+  function show(focus?: string) {
+    focusOverride.current = focus;
     load().then(
       () => setOpen(true),
       () => {
@@ -98,7 +108,7 @@ export default function PromptDialog<BodyProps extends object>({
     );
   }
 
-  useImperativeHandle(actionsRef, () => ({ open: show }));
+  useImperativeHandle(actionsRef, () => ({ open: show, preload }));
 
   return (
     <Dialog.Root
@@ -108,27 +118,31 @@ export default function PromptDialog<BodyProps extends object>({
         else setOpen(false);
       }}
     >
-      <Dialog.Trigger
-        aria-label={`${name}: ${value.label}`}
-        title={value.label}
-        className={className}
-        onPointerEnter={preload}
-        onPointerDown={preload}
-        onFocus={preload}
-      >
-        <span aria-hidden="true" className="inline-flex size-4 shrink-0 items-center justify-center">
-          {value.icon}
-        </span>
-        <span className="min-w-0 flex-1 truncate text-left">{value.label}</span>
-        {/* An edit mark rather than a chevron: the choice opens a dialog, not a list. */}
-        <Pen className="text-muted size-3.5 shrink-0" aria-hidden="true" />
-      </Dialog.Trigger>
+      {showTrigger && (
+        <Dialog.Trigger
+          aria-label={`${name}: ${value.label}`}
+          title={value.label}
+          className={className}
+          onPointerEnter={preload}
+          onPointerDown={preload}
+          onFocus={preload}
+        >
+          <span aria-hidden="true" className="inline-flex size-4 shrink-0 items-center justify-center">
+            {value.icon}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-left">{value.label}</span>
+          {/* An edit mark rather than a chevron: the choice opens a dialog, not a list. */}
+          <Pen className="text-muted size-3.5 shrink-0" aria-hidden="true" />
+        </Dialog.Trigger>
+      )}
       <Dialog.Portal keepMounted={keepMounted && Body !== null}>
         <Dialog.Backdrop className="bg-faded-black/40 starting-style:opacity-0 ending-style:opacity-0 fixed inset-0 z-50 transition-opacity duration-150 motion-reduce:transition-none" />
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
           <Dialog.Popup
             ref={popupRef}
-            initialFocus={() => popupRef.current?.querySelector<HTMLElement>(focusSelector) ?? true}
+            initialFocus={() =>
+              popupRef.current?.querySelector<HTMLElement>(focusOverride.current ?? focusSelector) ?? true
+            }
             {...(finalFocus && { finalFocus })}
             className={clsx(
               'corner-squircle border-line bg-surface-raised dark:bg-soot relative w-full rounded-xl border p-6 shadow-lg',

@@ -2,12 +2,11 @@ import { Autocomplete } from '@base-ui/react/autocomplete';
 import { Collapsible } from '@base-ui/react/collapsible';
 import { Menu } from '@base-ui/react/menu';
 import {
-  getInstallationPreset,
+  getInstallationRenderer,
   SKILL_AGENTS,
   type Renderer,
   type SkillAgent,
   type SkinFlag,
-  type UseCase,
 } from '@videojs/installation';
 import clsx from 'clsx';
 import { useId, useRef, useState, type ReactNode } from 'react';
@@ -16,11 +15,17 @@ import ArrowRight from '@/assets/icons/arrow-right.svg?react';
 import Check from '@/assets/icons/check.svg?react';
 import ChevronDown from '@/assets/icons/chevron-down.svg?react';
 import ChevronRight from '@/assets/icons/chevron-right.svg?react';
+import CloudUpload from '@/assets/icons/cloud-upload.svg?react';
 import Film from '@/assets/icons/film.svg?react';
 import LinkIcon from '@/assets/icons/link.svg?react';
 import Paintbrush from '@/assets/icons/paintbrush.svg?react';
 import Puzzle from '@/assets/icons/puzzle.svg?react';
-import { MENU_GROUP_LABEL_CLASS, MENU_ITEM_CLASS, MENU_POPUP_CLASS } from '@/components/menuClasses';
+import {
+  MENU_GROUP_LABEL_CLASS,
+  MENU_ITEM_CLASS,
+  MENU_POPUP_CLASS,
+  MENU_SEPARATOR_CLASS,
+} from '@/components/menuClasses';
 import { Select } from '@/components/Select';
 import {
   AGENT_PROMPT_FEATURE_DEFINITIONS,
@@ -38,7 +43,16 @@ import { twMerge } from '@/utils/twMerge';
 
 import PromptDialog, { type PromptDialogActions } from './PromptDialog';
 import PromptMuxHint from './PromptMuxHint';
-import { ANY_AGENT, INLINE_BUTTON_CLASS, mediaLabel, presentSkin, SKILL_AGENT_OPTIONS } from './promptPresentation';
+import {
+  ANY_AGENT,
+  INLINE_BUTTON_CLASS,
+  MEDIA_MARK_SLOT_CLASS,
+  MediaMark,
+  mediaGroups,
+  mediaLabel,
+  presentSkin,
+  SKILL_AGENT_OPTIONS,
+} from './promptPresentation';
 
 // The uploader and the player preview are heavy and most readers never open their dialogs, so they load on demand.
 const loadMediaSourceDialogBody = () => import('./MediaSourceDialogBody');
@@ -73,6 +87,9 @@ const TRIGGER_CLASS = clsx(
 
 const LABEL_CLASS = 'text-p4 font-semibold select-none';
 
+/** Where the media dialog puts focus when it opens for an upload: the uploader's own button. */
+const UPLOAD_FOCUS = '[data-mux-uploader-panel] button';
+
 /** What Mux Data is to a reader: a feature of the player, rather than an extension to install. */
 const ANALYTICS_LABEL = 'Viewer analytics';
 
@@ -92,11 +109,12 @@ function Field({ label, className, children }: { label: string; className?: stri
 }
 
 interface Props {
-  /** The reader's media URL, or empty for the demo, and the preset that names the demo. */
+  /** The media, and the reader's URL for it, or empty for its demo. */
+  media: Renderer;
   sourceUrl: string;
-  useCase: UseCase;
-  /** The media the page can play, which a pasted URL may pick from. */
+  /** The media the page can play for the preset, which the menu offers and a pasted URL may pick from. */
   supportedRenderers: readonly Renderer[];
+  onMediaChange: (media: Renderer) => void;
   /** The look, or `null` for a preset with one purpose-built skin. */
   skin: SkinFlag | null;
   includeNoSkin: boolean;
@@ -109,9 +127,8 @@ interface Props {
   /** Suggestions for the request, each of which sets up its player when picked. */
   examples: readonly AgentPromptRequestExampleGroup[];
   onExamplePick: (example: AgentPromptRequestExample) => void;
-  /** The suggestion the reader last picked and what it set up, until they undo it. */
+  /** The suggestion the reader last picked and what it set up, while that setup still applies. */
   pickedExample: { label: string; summary: string } | null;
-  onUndoExample: () => void;
   /** Move the picked suggestion's stream to Mux, or `null` where it would not help. */
   onHostExampleOnMux: (() => void) | null;
   features: readonly AgentPromptFeature[];
@@ -133,9 +150,10 @@ interface Props {
  * prose column's full width.
  */
 export default function PromptIntent({
+  media,
   sourceUrl,
-  useCase,
   supportedRenderers,
+  onMediaChange,
   skin,
   includeNoSkin,
   agent,
@@ -147,7 +165,6 @@ export default function PromptIntent({
   examples,
   onExamplePick,
   pickedExample,
-  onUndoExample,
   onHostExampleOnMux,
   features,
   availableFeatures,
@@ -176,8 +193,9 @@ export default function PromptIntent({
   // empty one would do for nothing.
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
-  // The media dialog also opens from the Mux line, and then returns focus there.
+  // The media menu opens the URL and upload dialog, and so does the Mux line, which then gets focus back.
   const mediaDialog = useRef<PromptDialogActions>(null);
+  const mediaTriggerRef = useRef<HTMLButtonElement>(null);
   const [mediaOpenedFromHint, setMediaOpenedFromHint] = useState(false);
   const uploadRef = useRef<HTMLButtonElement>(null);
   const featureLabels = [
@@ -188,7 +206,7 @@ export default function PromptIntent({
   const summary = [
     AGENT_PROMPT_GOAL_DEFINITIONS[goal].label,
     featureLabels.length > 0 ? `${featureLabels.length} ${featureLabels.length === 1 ? 'feature' : 'features'}` : null,
-    mediaLabel(sourceUrl, useCase),
+    mediaLabel(media, sourceUrl),
     skin ? `${presentSkin(skin).label} look` : null,
     agentLabel,
   ].filter((part) => part !== null);
@@ -265,14 +283,6 @@ export default function PromptIntent({
             <span>
               Set up for <span className="font-semibold">{pickedExample.label}</span>: {pickedExample.summary}.
             </span>
-            <button
-              type="button"
-              aria-label={`Undo ${pickedExample.label}`}
-              onClick={onUndoExample}
-              className={INLINE_BUTTON_CLASS}
-            >
-              Undo
-            </button>
             {onHostExampleOnMux && (
               <button type="button" onClick={onHostExampleOnMux} className={INLINE_BUTTON_CLASS}>
                 Host on Mux instead
@@ -283,11 +293,10 @@ export default function PromptIntent({
         {muxHint && (
           <PromptMuxHint
             hint={muxHint}
-            mediaType={getInstallationPreset(useCase).mediaType}
             uploadRef={uploadRef}
             onUpload={() => {
               setMediaOpenedFromHint(true);
-              mediaDialog.current?.open();
+              mediaDialog.current?.open(UPLOAD_FOCUS);
             }}
           />
         )}
@@ -296,7 +305,7 @@ export default function PromptIntent({
         </span>
       </div>
       <Collapsible.Root open={optionsOpen} onOpenChange={setOptionsOpen}>
-        <Collapsible.Trigger className="group text-p4 focus-visible:outline-gold -mx-1 flex max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-md px-1 py-0.5 select-none focus-visible:outline-2 focus-visible:outline-offset-1">
+        <Collapsible.Trigger className="group text-p4 focus-visible:outline-gold -mx-1 flex max-w-full min-w-0 cursor-pointer items-center gap-1.5 rounded-md px-1 py-1 select-none focus-visible:outline-2 focus-visible:outline-offset-1">
           <ChevronRight
             className="text-muted size-4 shrink-0 transition-transform duration-150 group-data-[panel-open]:rotate-90 motion-reduce:transition-none"
             aria-hidden="true"
@@ -377,10 +386,70 @@ export default function PromptIntent({
               label="Media"
               className={clsx('@prose:order-2', skin ? '@prose:col-span-2' : '@xl:col-span-2 @prose:col-span-3')}
             >
+              <Menu.Root modal={false}>
+                <Menu.Trigger
+                  ref={mediaTriggerRef}
+                  aria-label={`Media: ${mediaLabel(media, sourceUrl)}`}
+                  className={TRIGGER_CLASS}
+                  onPointerEnter={() => mediaDialog.current?.preload()}
+                >
+                  <span aria-hidden="true" className={MEDIA_MARK_SLOT_CLASS}>
+                    <MediaMark renderer={media} />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-left">{mediaLabel(media, sourceUrl)}</span>
+                  <ChevronDown className="text-muted size-4 shrink-0" aria-hidden="true" />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner side="bottom" align="start" sideOffset={6} className="z-40 outline-none">
+                    <Menu.Popup
+                      className={clsx(MENU_POPUP_CLASS, 'scrollbar-thin-visible min-w-64 overflow-y-auto')}
+                      style={{ maxHeight: 'min(var(--available-height), 28rem)' }}
+                    >
+                      <Menu.RadioGroup value={media} onValueChange={(next: Renderer) => onMediaChange(next)}>
+                        {mediaGroups(supportedRenderers).map((group) => (
+                          <Menu.Group key={group.label}>
+                            <Menu.GroupLabel className={MENU_GROUP_LABEL_CLASS}>{group.label}</Menu.GroupLabel>
+                            {group.renderers.map((renderer) => (
+                              <Menu.RadioItem
+                                key={renderer}
+                                value={renderer}
+                                closeOnClick
+                                className={twMerge(MENU_ITEM_CLASS, 'relative pr-8')}
+                              >
+                                <span aria-hidden="true" className={MEDIA_MARK_SLOT_CLASS}>
+                                  <MediaMark renderer={renderer} />
+                                </span>
+                                {getInstallationRenderer(renderer).label}
+                                <Menu.RadioItemIndicator className="absolute right-2 inline-flex items-center">
+                                  <Check className="size-4" />
+                                </Menu.RadioItemIndicator>
+                              </Menu.RadioItem>
+                            ))}
+                          </Menu.Group>
+                        ))}
+                      </Menu.RadioGroup>
+                      <Menu.Separator className={MENU_SEPARATOR_CLASS} />
+                      <Menu.Item className={MENU_ITEM_CLASS} onClick={() => mediaDialog.current?.open()}>
+                        <span aria-hidden="true" className={MEDIA_MARK_SLOT_CLASS}>
+                          <LinkIcon className="size-4" />
+                        </span>
+                        Paste a media URL…
+                      </Menu.Item>
+                      <Menu.Item className={MENU_ITEM_CLASS} onClick={() => mediaDialog.current?.open(UPLOAD_FOCUS)}>
+                        <span aria-hidden="true" className={MEDIA_MARK_SLOT_CLASS}>
+                          <CloudUpload className="size-4" />
+                        </span>
+                        Upload to Mux…
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+              {/* A pasted URL or a Mux upload needs room, so it takes a dialog rather than the menu. */}
               <PromptDialog
                 name="Media"
-                value={{ label: mediaLabel(sourceUrl, useCase), icon: <LinkIcon className="size-4" /> }}
-                className={TRIGGER_CLASS}
+                value={{ label: mediaLabel(media, sourceUrl), icon: <MediaMark renderer={media} /> }}
+                showTrigger={false}
                 title="Choose your media"
                 description="Paste a media URL or upload a video to Mux. Without one, the agent uses the demo media."
                 focusSelector='input[type="url"]'
@@ -391,7 +460,7 @@ export default function PromptIntent({
                 onOpenChange={(open) => {
                   if (!open) setMediaOpenedFromHint(false);
                 }}
-                finalFocus={mediaOpenedFromHint ? uploadRef : undefined}
+                finalFocus={mediaOpenedFromHint ? uploadRef : mediaTriggerRef}
               />
             </Field>
             {skin && (
