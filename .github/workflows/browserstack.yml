@@ -1,0 +1,78 @@
+name: BrowserStack
+
+on:
+  pull_request:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browserstack-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compatibility:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+      BROWSERSTACK_LOCAL_IDENTIFIER: videojs-${{ github.run_id }}-${{ github.run_attempt }}
+      BROWSERSTACK_BUILD: ${{ github.ref_name }}-${{ github.sha }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Check BrowserStack credentials
+        run: |
+          if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
+            echo '::error::Configure the BROWSER_STACK_USERNAME and BROWSER_STACK_ACCESS_KEY repository secrets.'
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare player pages
+        run: pnpm exec vp run '@videojs/e2e#prepare:player'
+
+      - name: Setup BrowserStack Local
+        id: local
+        uses: browserstack/github-actions/setup-local@v1.0.6
+        with:
+          local-testing: start
+          local-identifier: ${{ env.BROWSERSTACK_LOCAL_IDENTIFIER }}
+
+      - name: Run compatibility tests
+        run: pnpm -F @videojs/e2e test:browserstack
+
+      - name: Stop BrowserStack Local
+        if: always() && steps.local.outcome == 'success'
+        uses: browserstack/github-actions/setup-local@v1.0.6
+        with:
+          local-testing: stop
+          local-identifier: ${{ env.BROWSERSTACK_LOCAL_IDENTIFIER }}
+
+      - name: Upload reports and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browserstack-results
+          path: |
+            apps/e2e/playwright-report/browserstack/
+            apps/e2e/test-results/browserstack/
+          retention-days: 14
