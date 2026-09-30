@@ -1,0 +1,50 @@
+---
+import { installationCommand, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
+
+import AgentPrompt from '@/components/AgentPrompt.astro';
+import { DEFAULT_FRAMEWORK, resolveDocsFramework } from '@/types/docs';
+
+interface Props {
+  source: 'video-js-8' | 'media-chrome' | 'mux-player' | 'plyr';
+}
+
+const { source } = Astro.props;
+const names = {
+  'video-js-8': 'Video.js 8',
+  'media-chrome': 'Media Chrome',
+  'mux-player': 'Mux Player',
+  plyr: 'Plyr',
+};
+const framework = resolveDocsFramework(Astro.params.framework) ?? DEFAULT_FRAMEWORK;
+const packageName = framework === 'react' ? '@videojs/react' : '@videojs/html';
+const installationTarget =
+  framework === 'react'
+    ? `Use ${packageName}.`
+    : `Use ${packageName} or its CDN bundles for a page without a build step.`;
+const guide = `https://videojs.org/docs/framework/${framework}/guides/migrate-from-${source}`;
+const docsIndex = `node_modules/${packageName}/docs/llms.txt`;
+const onlineDocsIndex = `https://videojs.org/docs/framework/${framework}/llms.txt`;
+const init = installationCommand({ framework, project: 'existing' });
+const prompt = `Migrate this project's ${names[source]} player to Video.js v10 for ${framework === 'react' ? 'React' : 'HTML'}. ${installationTarget}
+
+Run \`${skillsCommand()}\` to get the Video.js skill installation instructions. Follow the printed steps for your agent. If they require a session reload, reload the session and continue with this prompt. If you can't run commands, use the installation instructions at ${SKILLS_REPOSITORY_URL}. Use the skill throughout this migration.
+
+Read the migration guide at ${guide}, including its Known gaps section. Inspect the existing player and list its media URLs, source formats, tracks, options, custom controls, event handlers, and integrations. Compare that list with the known gaps and report unsupported requirements before changing code. Keep the existing media URLs and required behavior throughout the migration.
+
+For installation guidance, read ${onlineDocsIndex} and follow its link to the installation guide. Keep using that online index for a CDN installation.
+
+From the application root, run \`${installationCommand()}\` without flags to list installation options and their accepted values.
+
+Choose values for these options:
+- --media and --source-url: the existing content and playback requirements.
+- --method: the installation method.
+- --preset, --skin, and --extensions: the player UI and integrations.
+
+Add those options to \`${init}\` and run the command to print the installation plan. Follow any version-mismatch notice. Both CLI commands print instructions without changing project files. Use the printed plan to install Video.js and configure the player.
+
+After installing a package, switch to ${docsIndex} for documentation matching its version.
+
+Implement the migration. Then verify playback, captions, controls, and any analytics integration on every browser the project supports.`;
+---
+
+<AgentPrompt prompt={prompt} />

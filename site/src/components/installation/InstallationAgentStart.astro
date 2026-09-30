@@ -1,8 +1,7 @@
 ---
 import { installationCommand, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
 
-import CopyButton from '@/components/CopyButton';
-import P from '@/components/typography/P.astro';
+import AgentPrompt from '@/components/AgentPrompt.astro';
 import { INSTALLATION_ROUTES, isInstallationRouteSegment } from '@/utils/installation/routes';
 
 const route = Astro.params.framework;
@@ -21,25 +20,4 @@ const installationPrompt = route === 'shadcn'
 const prompt = `Install the Video.js skill: run \`${skillsCommand()}\` and follow the steps for the agent you are running in. If you can't run commands, follow the install instructions at ${SKILLS_REPOSITORY_URL} instead. Then use the Video.js skill when you work on video or audio in this project. ${installationPrompt}`;
 ---
 
-<P>Paste this prompt into your coding agent:</P>
-
-<div
-  class="mx-auto my-6 max-w-3xl overflow-hidden rounded-xl corner-squircle border border-line bg-surface shadow-xs"
-  data-agent-prompt-card
->
-  <pre class="m-0 overflow-x-auto whitespace-pre-wrap bg-soot p-5"><code
-      class="font-mono text-code leading-relaxed text-manila-light"
-      data-agent-prompt>{prompt}</code
-    ></pre>
-  <div class="flex justify-end border-t border-line bg-surface-raised p-3" data-llms-ignore>
-    <CopyButton
-      client:idle
-      copyFrom={{ container: '[data-agent-prompt-card]', target: '[data-agent-prompt]' }}
-      className="inline-flex h-9 cursor-pointer items-center rounded-lg corner-squircle border border-line bg-surface px-3 text-p3 font-semibold shadow-xs select-none intent:border-line-strong intent:bg-hover focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold disabled:cursor-wait"
-      copied="Copied"
-      copiedCheck
-    >
-      Copy prompt
-    </CopyButton>
-  </div>
-</div>
+<AgentPrompt prompt={prompt} />

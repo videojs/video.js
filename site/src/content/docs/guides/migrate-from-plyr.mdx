@@ -6,30 +6,29 @@ description: Move an existing Plyr integration to Video.js v10, mapping Plyr opt
 import Aside from '@/components/Aside.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import MigrationAgentStart from '@/components/docs/MigrationAgentStart.astro';
 
-Video.js v10 is not a drop-in replacement for Plyr. Plyr wraps one media element with a constructor and options object. Video.js composes a player, media component, and skin in markup, then exposes behavior through <DocsLink slug="guides/features">player state</DocsLink>.
+Replace Plyr's constructor and options object with a Video.js player, media component, and skin. Read playback and UI state through <DocsLink slug="guides/features">player state</DocsLink>.
 
-Start with the Minimal skin, move media settings into markup, and replace calls to the Plyr instance with native media APIs or Video.js state actions.
+Start with the Minimal skin, move media settings into markup, and replace calls to the Plyr instance with native media APIs or Video.js store actions.
+
+## AI Quickstart
+
+<MigrationAgentStart source="plyr" />
 
 ## What changes
 
-<FrameworkCase frameworks={["react"]}>
-- **The player becomes three pieces.** Player state, the media component, and the skin are separate, so you can replace one without wrapping or forking the others.
-- **Streaming behavior becomes player state.** HLS, DASH, and Mux integrations expose renditions, tracks, and live state to the UI instead of leaving that wiring to application code.
-- **React uses native components and hooks.** `@videojs/react` owns its lifecycle instead of wrapping an imperative constructor around framework-owned DOM.
-- **The UI is composable.** Buttons, sliders, menus, gestures, and hotkeys are individual accessible components. Start with the Minimal or Default skin, then [add its source to your project](#edit-skin-source) when you need to change the structure.
-- **Remote playback is built in.** The video skins include AirPlay and Cast controls. Follow <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink> to add the Google Cast extension.
-</FrameworkCase>
+- **Player, media, and skin are separate.** Put source settings on the media, poster metadata on the player, and controls in the skin.
+- **HLS and DASH need a streaming media component.** Keep the playback engine your app requires; see [Streaming](#streaming).
+- **Controls are composed in a skin.** To migrate Plyr's `controls`, hotkeys, or gestures, [edit skin source](#edit-skin-source).
+- **Casting needs setup.** The video skins include AirPlay and Cast buttons. The Cast button needs the Google Cast extension. Follow <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>.
 
-<FrameworkCase frameworks={["html"]}>
-- **The player becomes three pieces.** Player state, the media component, and the skin are separate, so you can replace one without wrapping or forking the others.
-- **Streaming behavior becomes player state.** HLS, DASH, and Mux integrations expose renditions, tracks, and live state to the UI instead of leaving that wiring to application code.
-- **The UI is composable.** Buttons, sliders, menus, gestures, and hotkeys are individual accessible components. Start with the Minimal or Default skin, then [add its source to your project](#edit-skin-source) when you need to change the structure.
-- **Remote playback is built in.** The video skins include AirPlay and Cast controls. Follow <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink> to add the Google Cast extension.
+<FrameworkCase frameworks={["react"]}>
+Use `@videojs/react` components and hooks to replace the Plyr constructor and disposal effect.
 </FrameworkCase>
 
 <Aside type="note">
-Video.js v10 is still moving toward GA. Features like ads, playlists, preference persistence, and cue-point APIs are active areas, so check [Known gaps](#known-gaps) when those features matter to your migration.
+Check [Known gaps](#known-gaps) before replacing your player, especially if your app uses ads, persisted preferences, source-based quality selection, or fullscreen fallback. Keep your existing media URLs and track files when adapting the examples.
 </Aside>
 
 ## Basic migration
@@ -59,13 +58,13 @@ The Minimal skin is the closest built-in starting point for this migration.
 
 <FrameworkCase frameworks={["html"]}>
 
-The easiest path is the CDN:
+For an HTML page without a bundler, load the CDN preset:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/video-minimal.js"></script>
 
 <video-player poster="/path/to/poster.jpg">
-  <video-minimal-skin>
+  <video-minimal-skin style="aspect-ratio: 16 / 9">
     <video src="/path/to/video.mp4" playsinline>
       <track kind="captions" label="English" src="/path/to/captions/en.vtt" srclang="en" default />
       <track kind="metadata" label="thumbnails" src="/path/to/storyboard.vtt" default />
@@ -74,7 +73,11 @@ The easiest path is the CDN:
 </video-player>
 ```
 
-If you prefer not to use the CDN, you can use the individual modules:
+For a bundler installation, install the HTML package and import the player and skin:
+
+```bash
+npm install @videojs/html
+```
 
 ```js
 import '@videojs/html/video/player';
@@ -83,9 +86,10 @@ import '@videojs/html/video/minimal-skin';
 
 ### Notes
 
-- The skin attaches its styles automatically to its shadow root.
-- The poster moves from `data-poster` on the media to `poster` on `<video-player>`. The skin reads that value and controls how the poster appears. For more advanced control (like supplying your own image element), see <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
-- There's also a default skin with a modern, frosted appearance that some may prefer. Try it by removing the `-minimal` suffix from the script `src` if you're using the CDN, or the `minimal-` prefix from the imports.
+- The skin adds its styles to its own shadow root. You do not link a stylesheet.
+- Remove `controls` from the media so the browser's native controls do not appear beside the skin's controls.
+- The poster moves from `data-poster` on the media to `poster` on `<video-player>`. The skin reads that value and controls how the poster appears. To supply your own image element, see <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
+- To use the Default skin, change `<video-minimal-skin>` to `<video-skin>`. From the CDN, load `video.js` instead of `video-minimal.js`. With a bundler, replace the Minimal skin import with `@videojs/html/video/skin`.
 
 </FrameworkCase>
 
@@ -105,17 +109,13 @@ Then create a reusable player component in your app:
 import '@videojs/react/video/minimal-skin.css';
 import { MinimalVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
 
-interface AppVideoPlayerProps {
-  origin: string;
-}
-
-export function AppVideoPlayer({ origin }: AppVideoPlayerProps) {
+export function AppVideoPlayer() {
   return (
-    <VideoPlayer poster={`${origin}/poster.jpg`}>
-      <MinimalVideoSkin className="app-video-player">
-        <Video src={`${origin}/video.mp4`} playsInline>
-          <track kind="captions" label="English" src={`${origin}/captions/en.vtt`} srclang="en" default />
-          <track kind="metadata" label="thumbnails" src={`${origin}/storyboard.vtt`} default />
+    <VideoPlayer poster="/path/to/poster.jpg">
+      <MinimalVideoSkin className="app-video-player" style={{ aspectRatio: '16 / 9' }}>
+        <Video src="/path/to/video.mp4" playsInline>
+          <track kind="captions" label="English" src="/path/to/captions/en.vtt" srcLang="en" default />
+          <track kind="metadata" label="thumbnails" src="/path/to/storyboard.vtt" default />
         </Video>
       </MinimalVideoSkin>
     </VideoPlayer>
@@ -125,61 +125,65 @@ export function AppVideoPlayer({ origin }: AppVideoPlayerProps) {
 
 ### Notes
 
-- `@videojs/react/video` is a <DocsLink slug="guides/presets">preset</DocsLink>: a player, a skin, and a media element that already fit together. `VideoPlayer` is the piece that owns the state, built from the standard set of <DocsLink slug="guides/features">features</DocsLink> for video.
-- The poster URL is metadata on `VideoPlayer`. The skin reads that metadata and controls how the poster appears. To replace the rendered image, pass `renderPoster` to the skin — see <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
-- This example assumes all your files for a given asset live in the same path, using consistent filenames. This will almost certainly need adjusting for your implementation.
-- If `origin` points somewhere other than your page's origin, add `crossOrigin="anonymous"` to `<Video>` and serve those files with CORS headers. A cross-origin thumbnail track only loads when the media element is CORS-enabled. See <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink>.
-- There's also a default skin with a modern, frosted appearance that some may prefer. Try it by switching the CSS import filename to `skin.css` and the `MinimalVideoSkin` import and usage to `VideoSkin`.
+- `@videojs/react/video` is a <DocsLink slug="guides/presets">preset</DocsLink>: a player, a skin, and a media element that already fit together. `VideoPlayer` owns the player state and uses the standard set of <DocsLink slug="guides/features">features</DocsLink> for video.
+- The poster URL is metadata on `VideoPlayer`. The skin reads that metadata and controls how the poster appears. To replace the rendered image, pass `renderPoster` to the skin. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
+- To use the Default skin, import `skin.css` and replace `MinimalVideoSkin` with `VideoSkin` in the import and JSX.
 
 </FrameworkCase>
+
+If caption or thumbnail tracks come from a different origin than the page, set `crossorigin="anonymous"` on the media (`crossOrigin="anonymous"` in React). Also serve the media and track files with CORS headers that allow your page's origin. See <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink>.
 
 ## Map common features
 
 ### Streaming
 
-If you're using HLS or DASH to stream your media, you're in luck; we have prebuilt <DocsLink slug="guides/media-sources">media components</DocsLink> you can slot in with much improved integration over Plyr implementations.
+For HLS or DASH, replace the native video component with a <DocsLink slug="guides/media-sources">media component</DocsLink> for that format. Check that the component's engine supports your stream before you choose it.
 
 #### HLS
 
+If your Plyr integration uses hls.js, keep it by using the hls.js video component. The installation CLI's `--media hls` option selects this component.
+
+The SPF <DocsLink slug="reference/components/hls-video">HLS video</DocsLink> component is an alternative for fMP4/CMAF streams. It does not support MPEG-TS segments, raw ADTS AAC, or whole-segment AES-128 encryption. It supports DRM through `source.drm`. Verify your license configuration and browser support with the engine you choose before switching.
+
 <FrameworkCase frameworks={["html"]}>
 
-Replace `<video>` with `<hls-video>`. If you're using the CDN, add an additional script:
+Replace `<video>` with `<hlsjs-video>`. If you're using the CDN, add an additional script:
 
 ```html
-<script type="module" src="{{VJS10_CDN_BASE}}/media/hls-video.js"></script>
+<script type="module" src="{{VJS10_CDN_BASE}}/media/hlsjs-video.js"></script>
 ```
 
-For a package-manager installation, install SPF and add its façade import:
+For a bundler installation, install the adapter package and add the media import:
 
 ```bash
-npm install @videojs/html @videojs/spf
+npm install @videojs/html @videojs/hlsjs-video
 ```
 
 ```js
-import '@videojs/html/media/hls-video';
+import '@videojs/html/media/hlsjs-video';
 ```
 
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
 
-Replace `<Video>` with `<HlsVideo>` and add the import:
+Install the adapter, import `HlsJsVideo`, and use it in place of `Video`:
 
 ```bash
-npm install @videojs/react @videojs/spf
+npm install @videojs/react @videojs/hlsjs-video
 ```
 
 ```js
-import { HlsVideo } from '@videojs/react/media/hls-video';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
 ```
 
 </FrameworkCase>
 
-Set the `src` to the URL for the m3u8 manifest.
+Set `src` to your `.m3u8` manifest URL.
 
 #### DASH
 
-Very similar to HLS in that we have a drop-in component.
+Use the DASH media component for an unprotected DASH source. For DRM-protected DASH, use <DocsLink slug="reference/components/shaka-video">Shaka video</DocsLink> and configure `source.drm`; the dash.js component has no DRM configuration input. See <DocsLink slug="guides/migrate-from-video-js-8" anchor="drm">the DRM migration example</DocsLink>.
 
 <FrameworkCase frameworks={["html"]}>
 
@@ -189,7 +193,7 @@ Replace `<video>` with `<dash-video>`. If you're using the CDN, add an additiona
 <script type="module" src="{{VJS10_CDN_BASE}}/media/dash-video.js"></script>
 ```
 
-For a package-manager installation, install dash.js and add its façade import:
+For a package-manager installation, install the DASH adapter package and add the media import:
 
 ```bash
 npm install @videojs/html @videojs/dash-video
@@ -203,7 +207,7 @@ import '@videojs/html/media/dash-video';
 
 <FrameworkCase frameworks={["react"]}>
 
-Replace `<Video>` with `<DashVideo>` and update your import:
+Install the adapter, import `DashVideo`, and use it in place of `Video`:
 
 ```bash
 npm install @videojs/react @videojs/dash-video
@@ -215,15 +219,21 @@ import { DashVideo } from '@videojs/react/media/dash-video';
 
 </FrameworkCase>
 
-Set the `src` to the URL for the mpd manifest.
+Set `src` to your `.mpd` manifest URL.
 
 ### Vimeo
 
-Vimeo is supported through a prebuilt component.
+Use the Vimeo media component for your existing Vimeo source.
 
 <FrameworkCase frameworks={["html"]}>
 
-Replace `<video>` with `<vimeo-video>` and add the module import:
+Replace `<video>` with `<vimeo-video>`. For a CDN installation, add the media script:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/media/vimeo-video.js"></script>
+```
+
+For a bundler installation, install the adapter package and add the module import:
 
 ```bash
 npm install @videojs/html @videojs/vimeo-video
@@ -237,7 +247,7 @@ import '@videojs/html/media/vimeo-video';
 
 <FrameworkCase frameworks={["react"]}>
 
-Replace `<Video>` with `<VimeoVideo>` and add the import:
+Install the adapter, import `VimeoVideo`, and use it in place of `Video`:
 
 ```bash
 npm install @videojs/react @videojs/vimeo-video
@@ -253,11 +263,21 @@ Set the `src` to the URL for the Vimeo video, for example `https://vimeo.com/769
 
 ### YouTube
 
-YouTube is supported through a first-class media component.
+Use the YouTube media component for your existing YouTube source.
 
 <FrameworkCase frameworks={["html"]}>
 
-Replace `<video>` with `<youtube-video>` and add the module import:
+Replace `<video>` with `<youtube-video>`. For a CDN installation, add the media script:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/media/youtube-video.js"></script>
+```
+
+For a bundler installation, install the adapter package and add the module import:
+
+```bash
+npm install @videojs/html @videojs/youtube-video
+```
 
 ```js
 import '@videojs/html/media/youtube-video';
@@ -275,7 +295,11 @@ import '@videojs/html/media/youtube-video';
 
 <FrameworkCase frameworks={["react"]}>
 
-Replace `<Video>` with `<YouTubeVideo>` and add the import:
+Install the adapter, import `YouTubeVideo`, and use it in place of `Video`:
+
+```bash
+npm install @videojs/react @videojs/youtube-video
+```
 
 ```js
 import { YouTubeVideo } from '@videojs/react/media/youtube-video';
@@ -291,19 +315,15 @@ import { YouTubeVideo } from '@videojs/react/media/youtube-video';
 
 </FrameworkCase>
 
-The component accepts YouTube watch, short, embed, Shorts, live, playlist, and privacy-enhanced URLs, as well as raw 11-character video IDs.
+The component accepts YouTube watch, `youtu.be` short-link, embed, Shorts, live, playlist, and privacy-enhanced (`youtube-nocookie.com`) URLs, as well as raw 11-character video IDs.
 
 ### Internationalization
 
-Video.js v10 ships with English labels by default and includes locale packs for:
-
-`ar`, `az`, `bg`, `bn`, `bs`, `ca`, `cs`, `cy`, `da`, `de`, `el`, `es`, `et`, `eu`, `fa`, `fi`, `fr`, `gd`, `gl`, `he`, `hi`, `hr`, `hu`, `id`, `it`, `ja`, `ko`, `lt`, `lv`, `mr`, `nb`, `ne`, `nl`, `nn`, `oc`, `pl`, `pt-BR`, `pt-PT`, `ro`, `ru`, `sk`, `sl`, `sr`, `sv`, `te`, `th`, `tr`, `uk`, `vi`, `zh-CN`, and `zh-TW`.
-
-The shorthand tags `pt` and `zh` are also available as aliases. See <DocsLink slug="guides/internationalization">Internationalize the player</DocsLink> for the full picture.
+Video.js defaults to English. To migrate Plyr's `i18n` strings, register translation overrides or pass them to a provider. For shipped locales and language selection, follow <DocsLink slug="guides/internationalization">Internationalize the player</DocsLink>.
 
 <FrameworkCase frameworks={["html"]}>
 
-For CDN users:
+To select a locale, wrap the player in `<media-i18n>` and set `lang` to your locale tag, such as `lang="ja"`. The CDN preset registers this element. With a bundler, import `@videojs/html/i18n` to register it. For English overrides from the CDN:
 
 ```html
 <script type="module">
@@ -329,13 +349,13 @@ For CDN users:
 </video-player>
 ```
 
-For package users, same idea but import from `@videojs/html/i18n`.
+With a bundler, import `registerI18n` from `@videojs/html/i18n`.
 
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
 
-Use the React provider when you want scoped overrides:
+Wrap the skin in `I18nProvider` to select a locale and scope string overrides. The example overrides English; set `locale` to the language your app uses:
 
 ```tsx
 'use client';
@@ -372,36 +392,36 @@ export function MyPlayer() {
 
 ## Configuration
 
-Plyr uses an object to set configuration options whereas Video.js v10 uses a component structure and attributes instead. We're using a composition model rather than a configuration model. This reduces bundle size and only includes functionality you actually require.
-
-Here's a matrix for configuration options in Plyr and how each maps to Video.js v10:
+Move media options to attributes or props. For controls and interactions, use a skin or [edit its installed source](#edit-skin-source). Where the table says to edit local skin source, it means those installed files:
 
 | Plyr option | Video.js v10 |
 |---|---|
-| `controls` | The <DocsLink slug="guides/skins">skins</DocsLink> include the common controls, laid out in a familiar way that users would expect. Not every Plyr control ships in every skin—the video skins do not include `rewind` and `fast-forward` buttons, for example. To change which controls appear, or to customize the skin beyond basic colors, [add the skin source to your project](#edit-skin-source) and change controls, layout, styles, or icons. |
-| `rewind`, `fast-forward`, `seekTime` | The audio skins include 10-second skip buttons; the video skins do not. [Add the skin source to your project](#edit-skin-source), then add a <DocsLink slug="reference/components/seek-button">seek button</DocsLink>, which skips by its `seconds` value (default `30`; negative values seek backward). |
-| `settings` | Included automatically in the skins when quality, speed, audio tracks, or captions are available. |
-| `autoplay`, `muted`, `loop`, `playsinline`, `preload` | These are attributes on your media (e.g. `<video>`) component. |
+| `controls` | Choose a <DocsLink slug="guides/skins">skin</DocsLink> with the controls you need, or edit local skin source. Video skins do not include `rewind` or `fast-forward` buttons. |
+| `rewind`, `fast-forward`, `seekTime` | The audio skins include 10-second skip buttons; the video skins do not. In local skin source, add a <DocsLink slug="reference/components/seek-button">seek button</DocsLink>, which skips by its `seconds` value (default `30`; negative values seek backward). |
+| `settings` | The skins show a settings menu automatically when quality, speed, audio tracks, or captions are available. |
+| `autoplay`, `muted`, `loop`, `playsinline`, `preload` | Set these on the media. For video-backed React media, use `autoPlay` and `playsInline`; the other names stay the same. YouTube and Vimeo use `autoplay`. |
 | `poster` / `data-poster` | Set `poster` on the player. See [Basic migration](#basic-migration). |
 | `ratio` | Set `aspect-ratio` in CSS on the skin component. |
-| `hideControls` | Preset skins auto-hide controls based on activity. `hideControls: false` maps to `visibility="always"` on the controls component in a custom or installed skin layout; the delay is currently not configurable. |
-| `clickToPlay` | Preset video skins include click and tap gestures. [Add the skin source to your project](#edit-skin-source) to remove or change them. |
-| `keyboard` | Preset video skins include common hotkeys. [Add the skin source to your project](#edit-skin-source) to remove or change them. |
-| `tooltips` | Preset skins include tooltips for common controls. [Add the skin source to your project](#edit-skin-source) to customize them. |
+| `hideControls` | Preset skins hide controls after inactivity. For `hideControls: false`, set `visibility="always"` on the controls component in a custom layout or installed skin source. The hide delay is not configurable yet. |
+| `clickToPlay` | Preset video skins include click and tap gestures. Edit local skin source to remove or change them. |
+| `keyboard` | Preset video skins include common hotkeys. Edit local skin source to remove or change them. For `keyboard.global: true`, set `target="document"` on the hotkey components. |
+| `tooltips` | Preset skins include tooltips for common controls. Edit local skin source to customize them. |
 | `captions` | Add `<track kind="captions">` or `<track kind="subtitles">`; preset skins show captions controls when tracks are available. |
 | `previewThumbnails` | Add `<track kind="metadata" label="thumbnails">`; preset video skins show slider thumbnails when thumbnail cues are available. |
-| `quality` | Works when the media provider exposes renditions. Plain MP4 source arrays do not currently become a quality menu automatically. |
-| `speed` | Included in the preset settings menu when playback rates are available. |
-| `fullscreen` | Native fullscreen is supported; Plyr's full-window fallback is not a matching feature. |
+| `quality` | The quality menu appears when the media exposes renditions, such as HLS or DASH. Plain MP4 source arrays do not currently become a quality menu automatically. |
+| `speed` | The preset settings menu uses a fixed rate list; `speed.options` does not carry over. See [Known gaps](#known-gaps). |
+| `fullscreen` | Native fullscreen is supported. Video.js has no equivalent of Plyr's full-window fallback. |
 | `provider: 'vimeo'` | Use the Vimeo media component inside the player skin as shown in [Vimeo](#vimeo) above. |
 | `provider: 'youtube'` | Use the YouTube media component inside the player skin as shown in [YouTube](#youtube) above. |
-| `storage` | Unsupported at this time. |
-| `i18n` | The most common languages are available by default but you can also provide custom translations, if required. See [Internationalization](#internationalization) above for more info. |
+| `storage` | Persist preferences in your app; see <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink>. |
+| `i18n` | English is the default. Select a locale with an i18n provider or provide custom translations. See [Internationalization](#internationalization). |
 | `ads` | Unsupported at this time. |
+
+When enabling captions without a previous selection in this player instance, `toggleSubtitles()` prefers a track matching `navigator.language`, then falls back to the first available caption or subtitle track. For an authored track that should show on load, add `default`. See <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>.
 
 ## Customize the controls
 
-Plyr's `controls` option chooses which controls appear. Video.js skins come with their own control set and layout. Keep the skin when that UI fits your player. To remove, reorder, or restyle its controls, [add the skin source to your project](#edit-skin-source) and edit it. Adding a child to a skin does not place it inside the control bar.
+Plyr's `controls` option chooses which controls appear. Video.js skins come with their own control set and layout. Keep the skin when that UI fits your player. To remove, reorder, or restyle its controls, [add the skin source to your project](#edit-skin-source) and edit it. A component you add as a child of a packaged skin does not appear in its control bar.
 
 If your app already has a custom control bar, build it from individual <DocsLink slug="guides/ui-components">UI components</DocsLink>. Video.js handles the media action, accessible name, and state. You add the visible contents, layout, and CSS.
 
@@ -410,30 +430,34 @@ Individual HTML buttons include no text, icon, or finished styling. Add your own
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Individual React buttons do not include visible content. Use their `render` props to add an icon or text and style the element you return. Add the files for a ready-made skin when you need to change its control set or layout.
+Individual React buttons do not include visible content. Use their `render` props to add an icon or text and style the element you return. Add a ready-made skin's source to your project when you need to change its controls or layout.
 </FrameworkCase>
 
 ## Use the imperative API
 
-Control everything through the player's store. Every Plyr call has a matching store action, so one mental model covers playback, volume, fullscreen, and captions alike:
+Use <DocsLink slug="reference/api/player-store">store actions</DocsLink> for playback, seeking, volume, fullscreen, and captions:
 
-| Plyr | Video.js v10 store action |
+| Plyr | Video.js v10 |
 |---|---|
 | `player.play()`, `player.pause()` | `play()`, `pause()` |
 | `player.currentTime = 10` | `seek(10)` |
-| `player.volume = 0.5` | `setVolume(0.5)` |
+| `player.volume = 0.5` | `setVolume(0.5)`, which also unmutes |
 | `player.muted = true` | `setMuted(true)` |
 | `player.speed = 1.5` | `setPlaybackRate(1.5)` |
 | `player.fullscreen.enter()`, `player.fullscreen.exit()` | `requestFullscreen()`, `exitFullscreen()` |
 | `player.fullscreen.toggle()` | `isFullscreen ? exitFullscreen() : requestFullscreen()` |
 | `player.toggleCaptions()` | `toggleSubtitles()` |
 
+Plyr's [volume setter](https://github.com/sampotts/plyr/blob/v3.8.4/src/js/plyr.js#L507-L542) unmutes for values above zero, as `setVolume` does. Set `media.volume` directly only when you intend to preserve mute state.
+
+If the volume is `0`, `setMuted(false)` also sets it to `0.25`. To unmute and keep a zero volume, set `media.muted` directly.
+
 <FrameworkCase frameworks={["react"]}>
-You can still script the media element directly when you want to. Plyr routed calls through its wrapper because the wrapper had to know about every change; Video.js derives player state from the native media events, so `video.play()` or `video.currentTime = 10` keeps every control in sync. The media element is also the way to change content: set `src` on the media component to swap sources, and replace the component when the media type changes, such as moving from `Video` to `HlsVideo`. The player UI follows the attached media.
+Native media methods and properties also update player state through media events. To change content, set `src` on the media component. If the new source needs a different playback engine, replace the component, such as moving from `Video` to `HlsJsVideo`. The player UI follows the attached media.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-You can still script the media element directly when you want to. Plyr routed calls through its wrapper because the wrapper had to know about every change; Video.js derives player state from the native media events, so `video.play()` or `video.currentTime = 10` keeps every control in sync. The media element is also the way to change content: set `src` on the media component to swap sources, and replace the component when the media type changes, such as moving from `<video>` to `<hls-video>`. The player UI follows the attached media.
+Native media methods and properties also update player state through media events. To change content, set `src` on the media component. If the new source needs a different playback engine, replace the element, such as moving from `<video>` to `<hlsjs-video>`. The player UI follows the attached media.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -462,24 +486,60 @@ export function AppVideoPlayer() {
 
 The same hook selects actions: `usePlayer((state) => state.play)` returns a function you can call from your own UI.
 
-When you need the element itself, put a `ref` on the media component; its value is the rendered `HTMLVideoElement`, so `ref.current.play()` works the way Plyr's underlying element did. For the Video.js media object, call `useMedia` from a component inside the player; media that wrap a playback engine expose it there through the `engine` escape hatch.
+For video-backed media, a `ref` points to the rendered `HTMLVideoElement`. YouTube and Vimeo refs point to an `HTMLIFrameElement`. To call media methods on those embeds, use `useMedia()` from a component inside the player.
+
+`useMedia()` returns the Video.js media object. If that object exposes an `engine` property, use it to access the playback engine.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The store's actions live on the player element's `store`: query `<video-player>` and call `player.store.play()`. Your media element is also a plain child in your markup, so you can query and drive it directly. To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
+Call store actions after the player is defined and media is attached:
+
+```html
+<button id="toggle-playback" type="button">Toggle playback</button>
+
+<script type="module">
+  await customElements.whenDefined('video-player');
+  const player = document.querySelector('video-player');
+
+  document.querySelector('#toggle-playback').addEventListener('click', () => {
+    if (!player.store.target) return;
+
+    if (player.store.paused) {
+      player.store.play();
+    } else {
+      player.store.pause();
+    }
+  });
+</script>
+```
+
+To keep a custom element in sync with player state, use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>:
 
 ```js
 import { PlayerController, playerContext, ReactiveElement, selectTime } from '@videojs/html';
 
 class MyElapsed extends ReactiveElement {
   #time = new PlayerController(this, playerContext, selectTime);
+
+  update(changed) {
+    super.update(changed);
+    this.textContent = `Elapsed: ${(this.#time.value?.currentTime ?? 0).toFixed(1)} s`;
+  }
 }
+
+customElements.define('my-elapsed', MyElapsed);
+```
+
+Render it inside your existing `<video-player>` so it can read that player's state:
+
+```html
+<my-elapsed></my-elapsed>
 ```
 </FrameworkCase>
 
 ## Rewrite styles
 
-Video.js v10 skins offer similar color customization via CSS custom properties. [Add the skin source to your project](#edit-skin-source) when you need deeper control over layout, control structure, icons, or interaction styling.
+Like Plyr, Video.js skins let you customize colors with CSS custom properties. [Add the skin source to your project](#edit-skin-source) when you need deeper control over layout, control structure, icons, or interaction styling.
 
 ```css
 /* Plyr */
@@ -506,20 +566,21 @@ video-player {
 ```
 </FrameworkCase>
 
-`--media-accent-color` reaches the sliders, active buttons, and accent surfaces, so it's the closest match for Plyr's `--plyr-color-main`. Video.js picks a readable text color to sit on top of it; set `--media-accent-text-color` to choose that yourself. `--media-border-radius` and `--media-scale-unit` cover rounding and control sizing. See <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> for the full list.
+`--media-accent-color` reaches the sliders, active buttons, and accent surfaces, so it's the closest match for Plyr's `--plyr-color-main`. Video.js picks a readable text color for content on the accent color. To choose that text color yourself, set `--media-accent-text-color`. `--media-border-radius` and `--media-scale-unit` cover rounding and control sizing. See <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> for the full list.
 
 ## Edit skin source
 
-For changes to controls, layout, or icons, add the skin source to your project. Its components and styles become local files. <DocsLink slug="guides/customize-skins" anchor="style-skin-source">Customize skins</DocsLink> covers the setup and available skins.
+For changes to controls, layout, or icons, add the skin source to your project. Its TypeScript components and styles become local files that need a build step. A CDN-only page must add a build step before it can use this source. <DocsLink slug="guides/customize-skins" anchor="style-skin-source">Customize skins</DocsLink> covers the setup and available skins.
 
 ## Known gaps
 
 - Plyr's `ads` option has no built-in equivalent.
-- Plyr's `storage` option has no built-in equivalent for persisted volume, captions language, muted state, speed, or quality. Player setting persistence is tracked in [#944](https://github.com/videojs/v10/issues/944); subtitle language preference is tracked in [#1423](https://github.com/videojs/v10/issues/1423).
-- Plyr's full-window fullscreen fallback has no matching Video.js feature. This was designed as a fallback when the Fullscreen API wasn't supported, but given [browser support for fullscreen is around 96%](https://caniuse.com/fullscreen), it's unlikely to be required.
-- Plain MP4 source arrays with `size` metadata do not automatically create a quality menu. Use Mux, HLS, or DASH for adaptive quality when possible. A simpler source-driven quality menu may be considered later.
-- Preset skins segment the time slider and show chapter titles when the media includes a default `<track kind="chapters">`. Dedicated cue-point APIs are not complete yet; see [#1442](https://github.com/videojs/v10/issues/1442).
-- The controls auto-hide delay is not configurable yet ([#1728](https://github.com/videojs/v10/issues/1728)). Disabling auto-hide is possible with `visibility="always"` on the controls component, but not from a preset skin's attributes.
+- Plyr's `storage` option has no built-in equivalent for persisted volume, captions language, muted state, speed, or quality. Player setting persistence is tracked in [#944](https://github.com/videojs/v10/issues/944). For application-managed persistence, follow <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink>.
+- Playback rates are fixed at `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, and `2`. Plyr's `speed.options` has no equivalent yet ([#1404](https://github.com/videojs/v10/issues/1404)).
+- Plyr's full-window fullscreen fallback has no matching Video.js feature. Test fullscreen on your supported browsers; see <DocsLink slug="guides/browser-support">Browser support</DocsLink>.
+- Plain MP4 source arrays with `size` metadata do not automatically create a quality menu. Use Mux, HLS, or DASH for adaptive quality when possible.
+- Preset skins segment the time slider and show chapter titles when the media includes a default `<track kind="chapters">`. Cue points are not implemented yet; see [#1442](https://github.com/videojs/v10/issues/1442).
+- The controls auto-hide delay is not configurable yet ([#1728](https://github.com/videojs/v10/issues/1728)). To disable auto-hide, set `visibility="always"` on the controls component in a custom layout or installed skin source. Packaged skins do not expose this setting.
 - Native controls are not automatically removed when custom controls load; see [#1160](https://github.com/videojs/v10/issues/1160).
 
 ## Related guides
