@@ -2,14 +2,17 @@ import { describe, expect, it } from 'vitest';
 
 import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
+  agentPromptAnalytics,
   agentPromptCommand,
   agentPromptDetectSentence,
   agentPromptExampleFits,
+  agentPromptExampleSummary,
   agentPromptExamplePicks,
   agentPromptFeaturesFor,
   agentPromptLeftOut,
   agentPromptMarkdown,
   agentPromptMediaChoices,
+  agentPromptMuxHint,
   agentPromptPlayerPicksEqual,
   agentPromptOpenUrl,
   agentPromptSelection,
@@ -26,6 +29,10 @@ import {
   type AgentPromptTask,
 } from '../agent-prompt';
 import { DEFAULT_SELECTION, type InstallationUiSelection } from '../url-state';
+
+/** What a prompt for Mux media adds, pointing the agent at Mux's MCP server. */
+const MUX_MCP_SENTENCE =
+  'For Mux tasks such as uploading videos, creating live streams, or finding playback IDs, use the Mux MCP server if it is connected, or point me to https://www.mux.com/docs/integrations/mcp-server to set it up.';
 
 /** A task with nothing beyond installing the skill. */
 const SKILL_ONLY_TASK: AgentPromptTask = { goal: 'skill', request: '', features: [] };
@@ -150,7 +157,7 @@ describe('agentPromptText', () => {
 
   it('writes each step as a paragraph with its command in backticks', () => {
     expect(agentPromptText(mux(), { agent: null }, SKILL_ONLY_TASK)).toBe(
-      "1. Install the Video.js skill: `npx @videojs/cli agents skills`. Run it and follow the steps for the agent you are running in. If you can't run commands, follow the install instructions at https://github.com/videojs/skills instead. Then use the Video.js skill when you work on video or audio in this project.\n\n2. When you install Video.js, use these choices: `npx @videojs/cli agents init --skin default --media mux-video --source-url demo --extensions 'google-cast,mux-data'`. Run it to print version-matched instructions for these choices without changing files. The command detects the package manager, framework, app setup, and installation method from the project and explains how to choose the starting point and preset, so follow its output for those. If a choice conflicts with the project, ask me before changing it."
+      "1. Install the Video.js skill: `npx @videojs/cli agents skills`. Run it and follow the steps for the agent you are running in. If you can't run commands, follow the install instructions at https://github.com/videojs/skills instead. Then use the Video.js skill when you work on video or audio in this project.\n\n2. When you install Video.js, use these choices: `npx @videojs/cli agents init --skin default --media mux-video --source-url demo --extensions 'google-cast,mux-data'`. Run it to print version-matched instructions for these choices without changing files. The command detects the package manager, framework, app setup, and installation method from the project and explains how to choose the starting point and preset, so follow its output for those. For Mux tasks such as uploading videos, creating live streams, or finding playback IDs, use the Mux MCP server if it is connected, or point me to https://www.mux.com/docs/integrations/mcp-server to set it up. If a choice conflicts with the project, ask me before changing it."
     );
   });
 
@@ -173,7 +180,7 @@ describe('agentPromptText', () => {
     // The features are a list inside the second step, indented to its text.
     expect(text).toContain(
       [
-        "Here is what I'm building: A product page trailer.",
+        `Here is what I'm building: A product page trailer. ${MUX_MCP_SENTENCE}`,
         '',
         '   Include the following features:',
         '',
@@ -345,27 +352,73 @@ describe('agentPromptExamplePicks', () => {
       extensions: [],
       sourceUrl: '',
     });
-    expect(agentPromptExamplePicks(example('Movie streaming'), demo)).toMatchObject({
-      media: 'dash',
+    expect(agentPromptExamplePicks(example('Video library'), demo)).toMatchObject({
+      media: 'hls',
       extensions: ['google-cast'],
     });
     expect(agentPromptExamplePicks(example('Mux'), demo)).toMatchObject({ extensions: ['mux-data'] });
-    expect(agentPromptExamplePicks(example('Product pages'), demo)).toMatchObject({ skin: 'minimal-video' });
+    expect(agentPromptExamplePicks(example('Community clips'), demo)).toMatchObject({ skin: 'minimal-video' });
   });
 
   it("keeps the reader's media URL unless the example names other media or a preset it cannot play in", () => {
     const own = { media: 'mux-video', sourceUrl: 'https://stream.mux.com/abc.m3u8' } as const;
 
-    expect(agentPromptExamplePicks(example('Global training'), own)).toMatchObject(own);
+    expect(agentPromptExamplePicks(example('Product videos'), own)).toMatchObject(own);
+    // An example that names the same media keeps the URL too.
+    expect(agentPromptExamplePicks(example('Mux'), own)).toMatchObject(own);
     expect(agentPromptExamplePicks(example('YouTube videos'), own)).toMatchObject({ media: 'youtube', sourceUrl: '' });
     expect(agentPromptExamplePicks(example('Podcast'), own)).toMatchObject({ media: 'html5-audio', sourceUrl: '' });
   });
 });
 
+describe('agentPromptExampleSummary', () => {
+  it('names what an example set, with the extensions its media installs by default', () => {
+    const demo = { media: 'html5-video', sourceUrl: '' } as const;
+    const summary = (label: string) =>
+      agentPromptExampleSummary(example(label), agentPromptExamplePicks(example(label), demo));
+
+    expect(summary('Mux')).toBe('Mux, Mux Data, Quality menu, and Thumbnail previews');
+    expect(summary('Live radio')).toBe('Live Audio player, Mux, and Mux Data');
+    expect(summary('Video library')).toBe('HLS, Google Cast, Captions, Quality menu, and Keyboard shortcuts');
+  });
+});
+
 describe('agentPromptExampleFits', () => {
   it('leaves out examples an installation method cannot build', () => {
-    expect(agentPromptExampleFits(example('Hero background'), 'shadcn')).toBe(false);
-    expect(agentPromptExampleFits(example('Hero background'), 'cdn')).toBe(true);
+    expect(agentPromptExampleFits(example('Homepage background'), 'shadcn')).toBe(false);
+    expect(agentPromptExampleFits(example('Homepage background'), 'cdn')).toBe(true);
     expect(agentPromptExampleFits(example('Podcast'), 'shadcn')).toBe(true);
+  });
+});
+
+describe('agentPromptMuxHint', () => {
+  const select = (overrides: Partial<InstallationUiSelection>) =>
+    agentPromptSelection({ method: 'packaged', framework: 'react' }, picks(overrides));
+
+  it('says why Mux would help: an ingest point, an adaptive stream, or a storyboard', () => {
+    expect(agentPromptMuxHint(select({ useCase: 'live-video', media: 'hls' }), [])).toBe('live');
+    expect(agentPromptMuxHint(select({}), ['quality'])).toBe('quality');
+    expect(agentPromptMuxHint(select({ media: 'hls' }), ['thumbnails'])).toBe('thumbnails');
+  });
+
+  it('offers replacing the demo, and nothing once the media is on Mux or another platform', () => {
+    expect(agentPromptMuxHint(select({}), [])).toBe('demo');
+    // A quality menu works with the demo HLS stream.
+    expect(agentPromptMuxHint(select({ media: 'hls' }), ['quality'])).toBe('demo');
+    expect(
+      agentPromptMuxHint(select({ media: 'mux-video', sourceUrl: 'https://stream.mux.com/abc.m3u8' }), ['thumbnails'])
+    ).toBeNull();
+    expect(agentPromptMuxHint(select({ media: 'youtube' }), ['quality'])).toBeNull();
+  });
+});
+
+describe('agentPromptAnalytics', () => {
+  it('reports Mux Data for Mux media, and nothing for media it is not offered for', () => {
+    const select = (overrides: Partial<InstallationUiSelection>) =>
+      agentPromptSelection({ method: 'packaged', framework: 'react' }, picks(overrides));
+
+    expect(agentPromptAnalytics(select({ media: 'mux-video', extensions: ['mux-data'] }))).toBe(true);
+    expect(agentPromptAnalytics(select({ media: 'mux-video', extensions: [] }))).toBe(false);
+    expect(agentPromptAnalytics(select({ media: 'hls' }))).toBeNull();
   });
 });

@@ -258,7 +258,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     expect(promptRequest.get()).toBe('Lesson videos for an online course');
     expect(await copyPrompt()).toContain(
-      "Here is what I'm building: Lesson videos for an online course.\n\n   Include the following features:\n\n   - Captions: `captions.md`\n   - A quality menu: `quality.md`\n   - Thumbnail previews: `thumbnails.md`\n\n"
+      "Here is what I'm building: Lesson videos for an online course.\n\n   Include the following features:\n\n   - Captions: `captions.md`\n   - A quality menu: `quality.md`\n   - Keyboard shortcuts: `keyboard-shortcuts.md`\n   - Translated labels: `internationalization.md`\n\n"
     );
   });
 
@@ -273,8 +273,8 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(await screen.findByRole('option', { name: /Course lessons/ }, RENDER_WAIT));
 
     expect(initCommand()).toBe('`npx @videojs/cli agents init --skin default --media hls --source-url demo`');
-    expect(promptFeatures.get()).toEqual(['captions', 'quality', 'thumbnails']);
-    expect(screen.getByRole('button', { name: /^More options/ })).toHaveTextContent('3 features');
+    expect(promptFeatures.get()).toEqual(['captions', 'quality', 'keyboard-shortcuts', 'internationalization']);
+    expect(screen.getByRole('button', { name: /^More options/ })).toHaveTextContent('4 features');
 
     await openOptions(user);
 
@@ -309,8 +309,8 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.type(screen.getByRole('combobox', { name: /What are you building/ }), 'tiktok');
 
     // Your own clips like TikTok's, and TikTok's own videos, side by side.
-    expect(await screen.findByRole('option', { name: /Vertical clips/ }, RENDER_WAIT)).toHaveTextContent(
-      'Vertical clips with touch controls for phones'
+    expect(await screen.findByRole('option', { name: /Community clips/ }, RENDER_WAIT)).toHaveTextContent(
+      'Vertical clips shared by members of a community site'
     );
     expect(screen.getByRole('option', { name: /TikTok video/ })).toBeInTheDocument();
   });
@@ -391,6 +391,59 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
   });
 
+  it('offers a Mux upload in place of the demo, opening the media dialog', async () => {
+    const user = userEvent.setup();
+
+    render(<AgentPrompt route="react" framework="react" />);
+
+    expect(screen.getByText('Using demo video.', { exact: false })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Upload your own to Mux' }));
+
+    expect(await screen.findByText('Mux upload', {}, RENDER_WAIT)).toBeVisible();
+  });
+
+  it('says a quality menu needs an adaptive stream when the media is a file', () => {
+    act(() => promptFeatures.set(['quality']));
+    render(<AgentPrompt route="react" framework="react" />);
+
+    expect(screen.getByText('Quality menus need an adaptive stream.', { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload to Mux' })).toBeInTheDocument();
+  });
+
+  it('turns viewer analytics on and off for Mux media', async () => {
+    const user = userEvent.setup();
+
+    act(() => {
+      media.set('mux-video');
+      extensions.set(['mux-data']);
+    });
+    render(<AgentPrompt route="react" framework="react" />);
+    await openOptions(user);
+    await user.click(screen.getByRole('button', { name: 'Features' }));
+    await user.click(await screen.findByRole('menuitemcheckbox', { name: 'Viewer analytics (Mux Data)' }, RENDER_WAIT));
+
+    expect(extensions.get()).toEqual([]);
+    expect(initCommand()).toContain('--extensions none');
+  });
+
+  it("moves a suggestion's stream to Mux, keeping it undoable", async () => {
+    const user = userEvent.setup();
+
+    render(<AgentPrompt route="react" framework="react" />);
+    await user.click(screen.getByRole('combobox', { name: /What are you building/ }));
+    await user.click(await screen.findByRole('option', { name: /Course lessons/ }, RENDER_WAIT));
+    await user.click(screen.getByRole('button', { name: 'Host on Mux instead' }));
+
+    expect(media.get()).toBe('mux-video');
+    expect(initCommand()).toContain('--media mux-video');
+    expect(screen.getByRole('button', { name: 'Undo Course lessons' }).closest('p')).toHaveTextContent(
+      'Set up for Course lessons: Mux, Mux Data,'
+    );
+    expect(screen.queryByRole('button', { name: 'Host on Mux instead' })).not.toBeInTheDocument();
+    expect(await copyPrompt()).toContain('use the Mux MCP server if it is connected');
+  });
+
   it('resets only the player choices, leaving the guide choices the prompt leaves to the CLI', async () => {
     const user = userEvent.setup();
 
@@ -467,10 +520,10 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     const field = screen.getByRole('combobox', { name: /What are you building/ });
 
     await user.click(field);
-    await user.click(await screen.findByRole('option', { name: /Movie streaming/ }, RENDER_WAIT));
+    await user.click(await screen.findByRole('option', { name: /Video library/ }, RENDER_WAIT));
 
-    expect(screen.getByRole('button', { name: 'Undo Movie streaming' }).closest('p')).toHaveTextContent(
-      'Set up for Movie streaming: DASH, Google Cast, Captions, and Thumbnail previews.'
+    expect(screen.getByRole('button', { name: 'Undo Video library' }).closest('p')).toHaveTextContent(
+      'Set up for Video library: HLS, Google Cast, Captions, Quality menu, and Keyboard shortcuts.'
     );
 
     await user.clear(field);

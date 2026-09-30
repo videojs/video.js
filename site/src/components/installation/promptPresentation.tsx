@@ -18,6 +18,10 @@ import SkinIcon from './SkinIcon';
 
 const ICON_CLASS = 'size-4';
 
+/** A text button or link inside a line of the form, such as Undo. */
+export const INLINE_BUTTON_CLASS =
+  'decoration-line-strong intent:decoration-current focus-visible:outline-gold cursor-pointer rounded-sm font-semibold underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-1';
+
 /** A choice as the form shows it. */
 export interface PromptOption {
   label: string;

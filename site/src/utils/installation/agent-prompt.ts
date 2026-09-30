@@ -11,6 +11,7 @@ import {
   installationCompatibility,
   installationExtensionsFor,
   installationReproduceInput,
+  isMuxRenderer,
   rendererSupportsCdn,
   resolveInstallationSelection,
   serializeInstallationExtensions,
@@ -54,6 +55,9 @@ export interface AgentPromptTarget {
  */
 const PACKAGE_GUIDES_DIRECTORY = 'node_modules/@videojs/<react|html>/docs/guides/';
 
+/** Where Mux documents its MCP server, which lets a coding agent upload videos, run live streams, and query Mux Data. */
+export const MUX_MCP_DOCS_URL = 'https://www.mux.com/docs/integrations/mcp-server';
+
 /**
  * The prompt's prose in the order the page shows it: two numbered steps, each introducing a command. Copied, it is
  * Markdown: the steps are paragraphs, and the features the reader asks for are a list inside the second. Each command
@@ -68,6 +72,7 @@ export const AGENT_PROMPT_TEXT = {
   beforeFeatures: 'Include the following features:',
   featureGuides: `Each feature's guide is in \`${PACKAGE_GUIDES_DIRECTORY}\`, for whichever player package the project uses.`,
   conflicts: 'If a choice conflicts with the project, ask me before changing it.',
+  muxMcp: `For Mux tasks such as uploading videos, creating live streams, or finding playback IDs, use the Mux MCP server if it is connected, or point me to ${MUX_MCP_DOCS_URL} to set it up.`,
 } as const;
 
 /** The skill instructions with the plain `agents skills` command, for readers such as agents that cannot pick. */
@@ -326,98 +331,97 @@ export interface AgentPromptRequestExampleGroup {
 }
 
 /**
- * Suggestions for the request field. Each describes a product in a reader's words and sets up the player it needs.
- * Platforms appear by name only where the content is hosted on them.
+ * Suggestions for the request field, the most common first. Each describes a product in a reader's words and sets up
+ * the player it needs. Platforms appear by name only where the content is hosted on them, and thumbnail previews only
+ * where the media provides storyboards, which today is Mux.
  */
 export const AGENT_PROMPT_REQUEST_EXAMPLES: readonly AgentPromptRequestExampleGroup[] = [
   {
     label: 'Your media',
     items: [
       {
-        label: 'Product demo',
-        request: 'A product demo video on a landing page',
-        keywords: ['saas', 'marketing', 'landing', 'loom'],
+        label: 'Product videos',
+        request: 'Short product videos for a store or landing page',
+        keywords: ['demo', 'shop', 'ecommerce', 'shopify', 'marketing', 'mp4', 'self hosted', 'cdn'],
         features: ['poster'],
       },
       {
+        label: 'Course lessons',
+        request: 'Lesson videos for an online course',
+        keywords: [
+          'udemy',
+          'coursera',
+          'lms',
+          'video course',
+          'a11y',
+          'wcag',
+          'screen reader',
+          'keyboard',
+          'translations',
+          'languages',
+          'localization',
+          'i18n',
+          'multilingual',
+          'subtitles',
+        ],
+        media: 'hls',
+        features: ['captions', 'quality', 'keyboard-shortcuts', 'internationalization'],
+      },
+      {
         label: 'Podcast',
-        request: 'A podcast player with speed controls and skip buttons',
-        keywords: ['apple podcasts', 'overcast', 'episode'],
+        request: 'A podcast site with an episode archive',
+        keywords: ['apple podcasts', 'overcast', 'audio player', 'mp3', 'episode'],
         useCase: 'default-audio',
         features: ['user-preferences'],
       },
       {
         label: 'Live event',
-        request: 'A live event stream with a jump-to-live button',
-        keywords: ['webinar', 'conference', 'livestream', 'youtube live'],
+        request: 'A live event stream for a conference site',
+        keywords: ['webinar', 'livestream', 'live stream', 'broadcast'],
         useCase: 'live-video',
         features: ['captions'],
       },
       {
-        label: 'Hero background',
-        request: 'A muted, looping background video behind a homepage hero',
-        keywords: ['hero', 'ambient', 'banner', 'loop'],
+        label: 'Homepage background',
+        request: 'A homepage hero with video behind the headline',
+        keywords: ['hero', 'ambient', 'banner', 'background video'],
         useCase: 'background-video',
         features: ['poster'],
       },
       {
-        label: 'Live radio',
-        request: 'A 24/7 live radio station',
-        keywords: ['radio', 'station', 'live audio', 'mux'],
-        useCase: 'live-audio',
-      },
-      {
-        label: 'Course lessons',
-        request: 'Lesson videos for an online course',
-        keywords: ['masterclass', 'udemy', 'coursera', 'lms', 'hls'],
-        media: 'hls',
-        features: ['captions', 'quality', 'thumbnails'],
-      },
-      {
-        label: 'Movie streaming',
-        request: 'A movie library with several audio languages, cast to the TV',
-        keywords: ['netflix', 'apple tv', 'disney', 'hulu', 'prime video', 'ott', 'dash', 'chromecast'],
-        media: 'dash',
-        extensions: ['google-cast'],
-        features: ['captions', 'thumbnails'],
-      },
-      {
-        label: 'Product pages',
-        request: 'Short product videos on store pages',
-        keywords: ['shop', 'ecommerce', 'shopify'],
-        minimal: true,
-        features: ['poster'],
-      },
-      {
-        label: 'Vertical clips',
-        request: 'Vertical clips with touch controls for phones',
-        keywords: ['tiktok', 'reels', 'instagram', 'shorts'],
+        label: 'Community clips',
+        request: 'Vertical clips shared by members of a community site',
+        keywords: ['uploads', 'ugc', 'user generated content', 'reels', 'shorts', 'tiktok', 'phones'],
         minimal: true,
         features: ['autoplay'],
       },
       {
+        label: 'Video library',
+        request: 'A library of movies and shows for a streaming site',
+        keywords: ['netflix', 'disney', 'hulu', 'ott', 'chromecast', 'a11y', 'wcag', 'screen reader', 'keyboard'],
+        media: 'hls',
+        extensions: ['google-cast'],
+        features: ['captions', 'quality', 'keyboard-shortcuts'],
+      },
+      {
+        label: 'Live radio',
+        request: 'A live radio station hosted on Mux',
+        keywords: ['radio', 'station', 'live audio', 'internet radio'],
+        useCase: 'live-audio',
+        media: 'mux-audio',
+      },
+      {
         label: 'Mux',
         request: 'Videos hosted on Mux, with analytics included',
-        keywords: ['uploads', 'ugc', 'mux data', 'analytics'],
+        keywords: ['uploads', 'ugc', 'mux data', 'analytics', 'adaptive streaming'],
         media: 'mux-video',
+        features: ['quality', 'thumbnails'],
       },
       {
         label: 'Cloudflare Stream',
         request: 'Videos hosted on Cloudflare Stream',
-        keywords: ['cloudflare'],
+        keywords: ['cloudflare', 'video hosting'],
         media: 'cloudflare',
-      },
-      {
-        label: 'Global training',
-        request: 'Training videos for teams in many countries',
-        keywords: ['i18n', 'localization', 'languages', 'subtitles'],
-        features: ['captions', 'internationalization'],
-      },
-      {
-        label: 'Accessible player',
-        request: 'A video player that works with a keyboard and screen readers',
-        keywords: ['a11y', 'wcag', 'screen reader'],
-        features: ['captions', 'keyboard-shortcuts'],
       },
     ],
   },
@@ -427,31 +431,31 @@ export const AGENT_PROMPT_REQUEST_EXAMPLES: readonly AgentPromptRequestExampleGr
       {
         label: 'YouTube videos',
         request: 'YouTube videos in a player styled to match the brand',
-        keywords: ['youtube'],
+        keywords: ['youtube', 'tutorials', 'branded player'],
         media: 'youtube',
       },
       {
         label: 'Vimeo portfolio',
         request: 'A studio portfolio of Vimeo videos',
-        keywords: ['vimeo'],
+        keywords: ['vimeo', 'showcase', 'studio'],
         media: 'vimeo',
       },
       {
         label: 'Twitch channel',
         request: 'A Twitch channel embedded on a community site',
-        keywords: ['twitch', 'streamer'],
+        keywords: ['twitch', 'streamer', 'gaming'],
         media: 'twitch',
       },
       {
         label: 'TikTok video',
         request: 'A TikTok video embedded on a campaign page',
-        keywords: ['tiktok'],
+        keywords: ['tiktok', 'social video', 'campaign'],
         media: 'tiktok',
       },
       {
         label: 'Spotify single',
-        request: "A band's new Spotify single on its website",
-        keywords: ['spotify', 'music', 'band'],
+        request: "A band's Spotify single alongside tour dates",
+        keywords: ['spotify', 'music', 'band', 'song'],
         useCase: 'default-audio',
         media: 'spotify',
       },
@@ -502,7 +506,7 @@ export function agentPromptPlayerPicksEqual(a: AgentPromptPlayerPicks, b: AgentP
 
 /**
  * The player picks an example sets up, replacing the preset, look, media, and extensions. The reader's media URL stays
- * when the example names no media and the URL's media plays in its preset.
+ * when its media is the one the example names, or, for an example that names none, plays in the example's preset.
  */
 export function agentPromptExamplePicks(
   example: AgentPromptRequestExample,
@@ -510,7 +514,8 @@ export function agentPromptExamplePicks(
 ): AgentPromptPlayerPicks {
   const useCase = example.useCase ?? 'default-video';
   const renderers: readonly Renderer[] = getInstallationPreset(useCase).renderers;
-  const keepsSource = !example.media && current.sourceUrl !== '' && renderers.includes(current.media);
+  const keepsSource =
+    current.sourceUrl !== '' && (example.media ? example.media === current.media : renderers.includes(current.media));
   const { skin, media } = fitSelectionToPreset(
     useCase,
     example.minimal ? 'minimal-video' : 'video',
@@ -524,15 +529,54 @@ export function agentPromptExamplePicks(
   return { useCase, skin, media, extensions, sourceUrl: keepsSource ? current.sourceUrl : '' };
 }
 
-/** What an example sets up, in the form's words, so the reader sees what picking it changed. */
-export function agentPromptExampleSummary(example: AgentPromptRequestExample): string {
+/**
+ * What an example set up, in the form's words, so the reader sees what picking it changed. The extensions are the ones
+ * the picks install, including the media's defaults, such as Mux Data with Mux.
+ */
+export function agentPromptExampleSummary(example: AgentPromptRequestExample, applied: AgentPromptPlayerPicks): string {
   return formatList([
     ...(example.useCase ? [`${getInstallationPreset(example.useCase).label} player`] : []),
-    ...(example.media ? [getInstallationRenderer(example.media).label] : []),
+    ...(example.media ? [getInstallationRenderer(applied.media).label] : []),
     ...(example.minimal ? ['Minimal look'] : []),
-    ...(example.extensions ?? []).map((extension) => INSTALLATION_EXTENSION_DEFINITIONS[extension].label),
+    ...applied.extensions.map((extension) => INSTALLATION_EXTENSION_DEFINITIONS[extension].label),
     ...(example.features ?? []).map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
   ]);
+}
+
+/** Whether Mux Data measures viewers, or `null` for media it is not offered for. */
+export function agentPromptAnalytics({ useCase, skin, media, extensions }: InstallationSelection): boolean | null {
+  if (!installationExtensionsFor(useCase, skin, media).includes('mux-data')) return null;
+
+  return extensions.includes('mux-data');
+}
+
+/** Media hosted on another platform, which a Mux upload would not replace. */
+const HOSTED_ELSEWHERE: readonly Renderer[] = ['youtube', 'vimeo', 'twitch', 'tiktok', 'cloudflare', 'spotify'];
+
+/**
+ * Why Mux would help the picks, if it would: a live preset needs an ingest point, a quality menu an adaptive stream
+ * rather than a file, and thumbnail previews a storyboard, which only Mux media provides automatically. Otherwise, demo
+ * media that a Mux upload could replace. Nothing for media already on Mux or hosted on another platform.
+ */
+export type AgentPromptMuxHint = 'live' | 'quality' | 'thumbnails' | 'demo';
+
+export function agentPromptMuxHint(
+  selection: InstallationSelection,
+  features: readonly AgentPromptFeature[]
+): AgentPromptMuxHint | null {
+  const { media, sourceUrl, useCase } = selection;
+  if (HOSTED_ELSEWHERE.includes(media) || (isMuxRenderer(media) && sourceUrl)) return null;
+
+  const available = agentPromptFeaturesFor(useCase);
+  const wants = (feature: AgentPromptFeature) => features.includes(feature) && available.includes(feature);
+
+  if (getInstallationPreset(useCase).live && !sourceUrl) return 'live';
+
+  if (wants('quality') && media === 'html5-video') return 'quality';
+
+  if (wants('thumbnails') && !isMuxRenderer(media)) return 'thumbnails';
+
+  return sourceUrl ? null : 'demo';
 }
 
 export const AGENT_PROMPT_REQUEST_MAX_LENGTH = 500;
@@ -757,6 +801,7 @@ export function agentPromptView(
           text.afterCommand,
           agentPromptDetectSentence(leftOut),
           ...sentences,
+          isMuxRenderer(selection.media) ? text.muxMcp : null,
           features.length > 0 ? null : text.conflicts,
         ]),
       },

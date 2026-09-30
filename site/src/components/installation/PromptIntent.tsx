@@ -1,9 +1,16 @@
 import { Autocomplete } from '@base-ui/react/autocomplete';
 import { Collapsible } from '@base-ui/react/collapsible';
 import { Menu } from '@base-ui/react/menu';
-import { SKILL_AGENTS, type Renderer, type SkillAgent, type SkinFlag, type UseCase } from '@videojs/installation';
+import {
+  getInstallationPreset,
+  SKILL_AGENTS,
+  type Renderer,
+  type SkillAgent,
+  type SkinFlag,
+  type UseCase,
+} from '@videojs/installation';
 import clsx from 'clsx';
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 
 import ArrowRight from '@/assets/icons/arrow-right.svg?react';
 import Check from '@/assets/icons/check.svg?react';
@@ -23,13 +30,15 @@ import {
   AGENT_PROMPT_REQUEST_MAX_LENGTH,
   type AgentPromptFeature,
   type AgentPromptGoal,
+  type AgentPromptMuxHint,
   type AgentPromptRequestExample,
   type AgentPromptRequestExampleGroup,
 } from '@/utils/installation/agent-prompt';
 import { twMerge } from '@/utils/twMerge';
 
-import PromptDialog from './PromptDialog';
-import { ANY_AGENT, mediaLabel, presentSkin, SKILL_AGENT_OPTIONS } from './promptPresentation';
+import PromptDialog, { type PromptDialogActions } from './PromptDialog';
+import PromptMuxHint from './PromptMuxHint';
+import { ANY_AGENT, INLINE_BUTTON_CLASS, mediaLabel, presentSkin, SKILL_AGENT_OPTIONS } from './promptPresentation';
 
 // The uploader and the player preview are heavy and most readers never open their dialogs, so they load on demand.
 const loadMediaSourceDialogBody = () => import('./MediaSourceDialogBody');
@@ -63,6 +72,9 @@ const TRIGGER_CLASS = clsx(
 );
 
 const LABEL_CLASS = 'text-p4 font-semibold select-none';
+
+/** What Mux Data is to a reader: a feature of the player, rather than an extension to install. */
+const ANALYTICS_LABEL = 'Viewer analytics';
 
 /**
  * One labelled control. The label is only visible text: each control names itself, as the site's select and a dialog
@@ -100,10 +112,17 @@ interface Props {
   /** The suggestion the reader last picked and what it set up, until they undo it. */
   pickedExample: { label: string; summary: string } | null;
   onUndoExample: () => void;
+  /** Move the picked suggestion's stream to Mux, or `null` where it would not help. */
+  onHostExampleOnMux: (() => void) | null;
   features: readonly AgentPromptFeature[];
   /** The features the picked preset can use. */
   availableFeatures: readonly AgentPromptFeature[];
   onFeaturesChange: (features: AgentPromptFeature[]) => void;
+  /** Whether Mux Data measures viewers, or `null` for media it cannot. */
+  analytics: boolean | null;
+  onAnalyticsChange: (analytics: boolean) => void;
+  /** Why Mux would help the picks, if it would. */
+  muxHint: AgentPromptMuxHint | null;
 }
 
 /**
@@ -129,9 +148,13 @@ export default function PromptIntent({
   onExamplePick,
   pickedExample,
   onUndoExample,
+  onHostExampleOnMux,
   features,
   availableFeatures,
   onFeaturesChange,
+  analytics,
+  onAnalyticsChange,
+  muxHint,
 }: Props) {
   const requestId = useId();
   const chosen = availableFeatures.filter((feature) => features.includes(feature));
@@ -153,10 +176,18 @@ export default function PromptIntent({
   // empty one would do for nothing.
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  // The media dialog also opens from the Mux line, and then returns focus there.
+  const mediaDialog = useRef<PromptDialogActions>(null);
+  const [mediaOpenedFromHint, setMediaOpenedFromHint] = useState(false);
+  const uploadRef = useRef<HTMLButtonElement>(null);
+  const featureLabels = [
+    ...chosen.map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
+    ...(analytics ? [ANALYTICS_LABEL] : []),
+  ];
   const agentLabel = SKILL_AGENT_OPTIONS.find((option) => option.value === (agent ?? ANY_AGENT))?.label ?? null;
   const summary = [
     AGENT_PROMPT_GOAL_DEFINITIONS[goal].label,
-    chosen.length > 0 ? `${chosen.length} ${chosen.length === 1 ? 'feature' : 'features'}` : null,
+    featureLabels.length > 0 ? `${featureLabels.length} ${featureLabels.length === 1 ? 'feature' : 'features'}` : null,
     mediaLabel(sourceUrl, useCase),
     skin ? `${presentSkin(skin).label} look` : null,
     agentLabel,
@@ -238,11 +269,27 @@ export default function PromptIntent({
               type="button"
               aria-label={`Undo ${pickedExample.label}`}
               onClick={onUndoExample}
-              className="decoration-line-strong intent:decoration-current focus-visible:outline-gold cursor-pointer rounded-sm font-semibold underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-1"
+              className={INLINE_BUTTON_CLASS}
             >
               Undo
             </button>
+            {onHostExampleOnMux && (
+              <button type="button" onClick={onHostExampleOnMux} className={INLINE_BUTTON_CLASS}>
+                Host on Mux instead
+              </button>
+            )}
           </p>
+        )}
+        {muxHint && (
+          <PromptMuxHint
+            hint={muxHint}
+            mediaType={getInstallationPreset(useCase).mediaType}
+            uploadRef={uploadRef}
+            onUpload={() => {
+              setMediaOpenedFromHint(true);
+              mediaDialog.current?.open();
+            }}
+          />
         )}
         <span aria-live="polite" className="sr-only">
           {pickedExample ? `Set up for ${pickedExample.label}: ${pickedExample.summary}.` : ''}
@@ -277,14 +324,12 @@ export default function PromptIntent({
                 }}
               />
             </Field>
-            {availableFeatures.length > 0 && (
+            {(availableFeatures.length > 0 || analytics !== null) && (
               <Field label="Features">
                 <Menu.Root modal={false}>
                   <Menu.Trigger aria-label="Features" className={TRIGGER_CLASS}>
                     <span className="min-w-0 flex-1 truncate text-left">
-                      {chosen.length > 0
-                        ? chosen.map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label).join(', ')
-                        : 'None'}
+                      {featureLabels.length > 0 ? featureLabels.join(', ') : 'None'}
                     </span>
                     <ChevronDown className="text-muted size-4 shrink-0" aria-hidden="true" />
                   </Menu.Trigger>
@@ -307,6 +352,21 @@ export default function PromptIntent({
                             </Menu.CheckboxItem>
                           ))}
                         </Menu.Group>
+                        {analytics !== null && (
+                          <Menu.Group>
+                            <Menu.GroupLabel className={MENU_GROUP_LABEL_CLASS}>Measure</Menu.GroupLabel>
+                            <Menu.CheckboxItem
+                              checked={analytics}
+                              onCheckedChange={onAnalyticsChange}
+                              className={twMerge(MENU_ITEM_CLASS, 'relative pr-8')}
+                            >
+                              {ANALYTICS_LABEL} (Mux Data)
+                              <Menu.CheckboxItemIndicator className="absolute right-2 inline-flex items-center">
+                                <Check className="size-4" />
+                              </Menu.CheckboxItemIndicator>
+                            </Menu.CheckboxItem>
+                          </Menu.Group>
+                        )}
                       </Menu.Popup>
                     </Menu.Positioner>
                   </Menu.Portal>
@@ -327,6 +387,11 @@ export default function PromptIntent({
                 loadBody={loadMediaSourceDialogBody}
                 bodyProps={{ supportedRenderers }}
                 keepMounted
+                actionsRef={mediaDialog}
+                onOpenChange={(open) => {
+                  if (!open) setMediaOpenedFromHint(false);
+                }}
+                finalFocus={mediaOpenedFromHint ? uploadRef : undefined}
               />
             </Field>
             {skin && (

@@ -79,17 +79,9 @@ The default presets work well for general website playback. The live presets sui
   <UseCasePicker client:idle />
 </ContentWidth>
 
-<ContentWidth margins="lg">
-  <SkinPickerSection />
-</ContentWidth>
-
-<ContentWidth margins="lg">
-  <InstallationPreview client:visible={{ rootMargin: "200px" }} />
-</ContentWidth>
-
 ## Choose your media
 
-Video.js plays plain files, adaptive streams, and embeds from hosting services, and switching between them is a one-line change. Paste a URL to detect the type, pick one directly, or upload a video to Mux.
+Video.js plays plain files, adaptive streams, and embeds from hosting services, and switching between them is a one-line change. Paste a URL to detect the type, pick one directly, or upload a video to Mux. Mux is optional hosting that gives any video an adaptive stream, thumbnail previews, and viewer analytics.
 
 <ContentWidth margins="lg">
   <MediaSourcePicker client:idle />
@@ -100,6 +92,14 @@ Video.js plays plain files, adaptive streams, and embeds from hosting services, 
 This guide uses <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> for broad compatibility. For a smaller bundle, use <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> when its supported feature set fits your stream.
 </Aside>
 </MediaSourceCase>
+
+<ContentWidth margins="lg">
+  <SkinPickerSection />
+</ContentWidth>
+
+<ContentWidth margins="lg">
+  <InstallationPreview client:visible={{ rootMargin: "200px" }} />
+</ContentWidth>
 
 ## Choose your extensions
 

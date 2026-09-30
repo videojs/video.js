@@ -1,6 +1,6 @@
 import { Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { useRef, useState, type ComponentType } from 'react';
+import { useImperativeHandle, useRef, useState, type ComponentType, type Ref, type RefObject } from 'react';
 
 import Pen from '@/assets/icons/pen.svg?react';
 import X from '@/assets/icons/x.svg?react';
@@ -28,6 +28,16 @@ interface Props<BodyProps extends object> {
   bodyProps: BodyProps;
   /** Keep the content mounted while the dialog is closed, so work such as an upload keeps going. */
   keepMounted?: boolean;
+  /** Open the dialog from elsewhere, such as a link that offers an upload. */
+  actionsRef?: Ref<PromptDialogActions>;
+  onOpenChange?: (open: boolean) => void;
+  /** Where focus goes on closing, when something other than the trigger opened the dialog. */
+  finalFocus?: RefObject<HTMLElement | null> | undefined;
+}
+
+export interface PromptDialogActions {
+  /** Open the dialog once its content is in place, as a click on the trigger does. */
+  open: () => void;
 }
 
 /** A choice that needs more room than a select, such as cards with a preview, opened in a dialog from a form control. */
@@ -42,8 +52,11 @@ export default function PromptDialog<BodyProps extends object>({
   loadBody,
   bodyProps,
   keepMounted = false,
+  actionsRef,
+  onOpenChange,
+  finalFocus,
 }: Props<BodyProps>) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const [Body, setBody] = useState<ComponentType<BodyProps> | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const loading = useRef<Promise<void> | null>(null);
@@ -70,21 +83,29 @@ export default function PromptDialog<BodyProps extends object>({
     load().catch(() => {});
   }
 
+  function setOpen(next: boolean) {
+    setOpenState(next);
+    onOpenChange?.(next);
+  }
+
+  function show() {
+    load().then(
+      () => setOpen(true),
+      () => {
+        setLoadFailed(true);
+        setOpen(true);
+      }
+    );
+  }
+
+  useImperativeHandle(actionsRef, () => ({ open: show }));
+
   return (
     <Dialog.Root
       open={open}
       onOpenChange={(next) => {
-        if (!next) {
-          setOpen(false);
-          return;
-        }
-
-        const show = () => setOpen(true);
-
-        load().then(show, () => {
-          setLoadFailed(true);
-          show();
-        });
+        if (next) show();
+        else setOpen(false);
       }}
     >
       <Dialog.Trigger
@@ -108,6 +129,7 @@ export default function PromptDialog<BodyProps extends object>({
           <Dialog.Popup
             ref={popupRef}
             initialFocus={() => popupRef.current?.querySelector<HTMLElement>(focusSelector) ?? true}
+            {...(finalFocus && { finalFocus })}
             className={clsx(
               'corner-squircle border-line bg-surface-raised dark:bg-soot relative w-full rounded-xl border p-6 shadow-lg',
               'transition duration-150 ease-out starting-style:scale-95 starting-style:opacity-0 ending-style:scale-95 ending-style:opacity-0',

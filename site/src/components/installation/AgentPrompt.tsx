@@ -1,4 +1,9 @@
-import { skinToFlag, sourceFrameworkFor, type InstallationFramework } from '@videojs/installation';
+import {
+  INSTALLATION_EXTENSIONS,
+  skinToFlag,
+  sourceFrameworkFor,
+  type InstallationFramework,
+} from '@videojs/installation';
 import clsx from 'clsx';
 import { Fragment, useRef, type ClipboardEvent, type ReactNode } from 'react';
 
@@ -17,6 +22,7 @@ import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
   AGENT_PROMPT_SEPARATORS,
   AGENT_PROMPT_TEXT,
+  agentPromptAnalytics,
   agentPromptDefaultPicks,
   agentPromptExampleFits,
   agentPromptExamplePicks,
@@ -24,6 +30,7 @@ import {
   agentPromptFeaturesFor,
   agentPromptMarkdown,
   agentPromptMediaChoices,
+  agentPromptMuxHint,
   agentPromptPlayerPicks,
   agentPromptPlayerPicksEqual,
   agentPromptSelection,
@@ -194,6 +201,21 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
     promptFeatures.set(example.features ?? []);
   };
 
+  // A suggestion that sets a generic stream can move it to Mux, which keeps the suggestion undoable.
+  const hostExampleOnMux =
+    applied && (applied.applied.media === 'hls' || applied.applied.media === 'dash')
+      ? () => {
+          const next = agentPromptExamplePicks({ ...applied.example, media: 'mux-video' }, picks);
+
+          promptExample.set({ ...applied, applied: next });
+          updateInstallationSelection(next);
+        }
+      : null;
+
+  // One Mux offer at a time: while the suggestion offers Mux hosting, the line about the demo waits.
+  const needsMux = agentPromptMuxHint(selection, features);
+  const muxHint = hostExampleOnMux && needsMux === 'demo' ? null : needsMux;
+
   const undoExample = () => {
     if (!applied) return;
 
@@ -228,11 +250,26 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
         onRequestChange={(next) => promptRequest.set(next)}
         examples={examples}
         onExamplePick={pickExample}
-        pickedExample={applied && { label: applied.example.label, summary: agentPromptExampleSummary(applied.example) }}
+        pickedExample={
+          applied && {
+            label: applied.example.label,
+            summary: agentPromptExampleSummary(applied.example, applied.applied),
+          }
+        }
         onUndoExample={undoExample}
+        onHostExampleOnMux={hostExampleOnMux}
         features={features}
         availableFeatures={agentPromptFeaturesFor(selection.useCase)}
         onFeaturesChange={(next) => promptFeatures.set(next)}
+        analytics={agentPromptAnalytics(selection)}
+        onAnalyticsChange={(on) =>
+          updateInstallationSelection({
+            extensions: INSTALLATION_EXTENSIONS.filter((extension) =>
+              extension === 'mux-data' ? on : picks.extensions.includes(extension)
+            ),
+          })
+        }
+        muxHint={muxHint}
       />
       {/* The prompt is dark in both color schemes, so it takes the dark theme tokens. */}
       <div className="dark bg-soot text-manila-light relative">

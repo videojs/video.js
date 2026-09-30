@@ -69,20 +69,20 @@ Choose the ready-made player that is closest to what you are building. The Shadc
   <UseCasePicker client:idle includeBackground={false} />
 </ContentWidth>
 
+## Choose your media
+
+Choose what the player will play, or upload a video to Mux. Mux is optional hosting that gives any video an adaptive stream, thumbnail previews, and viewer analytics. If that source needs a playback adapter, the installation steps include it.
+
+<ContentWidth margins="lg">
+  <MediaSourcePicker client:idle />
+</ContentWidth>
+
 <ContentWidth margins="lg">
   <SkinPickerSection includeNoSkin={false} source />
 </ContentWidth>
 
 <ContentWidth margins="lg">
   <InstallationPreview client:visible={{ rootMargin: "200px" }} />
-</ContentWidth>
-
-## Choose your media
-
-Choose what the player will play. If that source needs a playback adapter, the installation steps include it.
-
-<ContentWidth margins="lg">
-  <MediaSourcePicker client:idle />
 </ContentWidth>
 
 ## Choose your extensions
