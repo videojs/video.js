@@ -8,6 +8,10 @@ import DocsLink from '@/components/docs/DocsLink.astro';
 import CustomUiNote from '@/components/docs/CustomUiNote.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import StyleCase from '@/components/docs/StyleCase.astro';
+import ServerCode from '@/components/Code/ServerCode.astro';
+import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs';
+import captionsMenuTsx from '@/components/docs/demos/text-tracks/react/css/CaptionsMenu.tsx?raw';
+import captionsVtt from '../../../../public/docs/demos/text-tracks/captions.vtt?raw';
 
 {/* React demos */}
 import BasicUsageDemoReact from '@/components/docs/demos/text-tracks/react/css/BasicUsage';
@@ -32,11 +36,14 @@ Add WebVTT tracks as `<track>` children of the media element, and give users a <
 Add WebVTT tracks as `<track>` children of the media element, and give users a <DocsLink slug="reference/components/captions-button">`<media-captions-button>`</DocsLink> to toggle them.
 </FrameworkCase>
 
+The `<track>` loads `/docs/demos/text-tracks/captions.vtt`, shown in the `captions.vtt` tab. Host a WebVTT file for your video and point `src` at its URL.
+
 <FrameworkCase frameworks={["react"]}>
   <StyleCase styles={["css"]}>
     <Demo files={[
       { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
       { title: "App.css", code: basicUsageReactCss, lang: "css" },
+      { title: "captions.vtt", code: captionsVtt, lang: "text" },
     ]}>
       <BasicUsageDemoReact client:idle />
     </Demo>
@@ -49,6 +56,7 @@ Add WebVTT tracks as `<track>` children of the media element, and give users a <
       { title: "index.html", code: basicUsageHtml, lang: "html" },
       { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
       { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+      { title: "captions.vtt", code: captionsVtt, lang: "text" },
     ]}>
       <BasicUsageDemoHtml />
     </Demo>
@@ -61,7 +69,7 @@ The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsL
 
 - `textTrackList` holds every track with its `id`, `kind`, `label`, `language`, and `mode`.
 - `subtitlesShowing` is `true` when any caption or subtitle track is showing.
-- `toggleSubtitles(forceShow?)` hides every caption and subtitle track, or shows one: the last track shown, a track matching the browser language, or the first track.
+- `toggleSubtitles(forceShow?)` hides captions if a caption or subtitle track is showing. Otherwise it shows one track, chosen in this order: the last track shown, a track matching the browser language, then the first available track. Pass `true` or `false` to force captions on or off.
 - `selectSubtitlesTrack(id)` shows one track and disables the rest; pass `null` to disable all.
 
 Tracks don't have to come from `<track>` elements: tracks that streaming media exposes (for example in-manifest HLS captions) appear in `textTrackList` the same way.
@@ -75,7 +83,7 @@ The browser renders the cues. Style them with the `::cue` pseudo-element.
 - Cues load asynchronously. A track appears in `textTrackList` before its cues are parsed, so cue-driven UI fills in when the track finishes loading.
 - Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossOrigin` on the media element.
 - Track selection UIs identify tracks by `label` and `language`; give every track both.
-- `default` on a `<track>` makes the browser show it initially.
+- `default` on a `<track>` marks it as the preferred initial track. The browser's caption preferences can select another track.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -83,7 +91,7 @@ The browser renders the cues. Style them with the `::cue` pseudo-element.
 - Cues load asynchronously. A track appears in `textTrackList` before its cues are parsed, so cue-driven UI fills in when the track finishes loading.
 - Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossorigin` on the media element.
 - Track selection UIs identify tracks by `label` and `language`; give every track both.
-- `default` on a `<track>` makes the browser show it initially.
+- `default` on a `<track>` marks it as the preferred initial track. The browser's caption preferences can select another track.
 </FrameworkCase>
 
 ## Common variations
@@ -94,38 +102,46 @@ For multiple languages, render a menu instead of a toggle.
 
 <FrameworkCase frameworks={["react"]}>
 
-`useCaptionsOptions` provides the option list (including "Off"), the selected value, and availability:
+Add a `<track>` for each language, then render `CaptionsMenu` inside `Container`. `useCaptionsOptions` returns an "Off" option, one option per caption or subtitle track, and the current selection. `Menu.Content` must sit inside `Menu.Popup`, which positions it against the trigger:
 
-```tsx
-import { Menu, useCaptionsOptions } from '@videojs/react';
+<TabsRoot client:idle>
+  <TabsList client:idle label="Captions menu source">
+    <Tab client:idle value="captions-menu" initial>CaptionsMenu.tsx</Tab>
+  </TabsList>
+  <TabsPanel client:idle value="captions-menu" initial>
+    <ServerCode code={captionsMenuTsx} lang="tsx" />
+  </TabsPanel>
+</TabsRoot>
 
-function CaptionsMenu() {
-  const captions = useCaptionsOptions();
-  if (captions?.state.availability !== 'available') return null;
-
-  return (
-    <Menu.Root side="top" align="end">
-      <Menu.Trigger render={<button type="button" />}>Captions</Menu.Trigger>
-      <Menu.Content>
-        <Menu.RadioGroup value={captions.value} onValueChange={captions.setValue} aria-label="Captions">
-          {captions.options.map((option) => (
-            <Menu.RadioItem key={option.value} value={option.value} disabled={option.disabled}>
-              {option.label}
-            </Menu.RadioItem>
-          ))}
-        </Menu.RadioGroup>
-      </Menu.Content>
-    </Menu.Root>
-  );
-}
-```
-
-See the <DocsLink slug="reference/components/captions-radio-group">CaptionsRadioGroup</DocsLink> reference for the complete pattern.
+To show the selected track in the trigger, use the <DocsLink slug="reference/components/captions-radio-group">CaptionsRadioGroup</DocsLink> parts.
 
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Use <DocsLink slug="reference/components/captions-radio-group">`<media-captions-radio-group>`</DocsLink> inside a menu or popover for explicit track selection.
+Replace the Captions button in the primary example with a menu containing <DocsLink slug="reference/components/captions-radio-group">`<media-captions-radio-group>`</DocsLink>. Keep the player, container, and track setup, and add these imports:
+
+```html
+<button type="button" commandfor="captions-menu">Captions</button>
+<media-menu id="captions-menu" side="top" align="end">
+  <media-menu-content>
+    <media-captions-radio-group label="Captions">
+      <template>
+        <media-menu-radio-item>
+          <span data-part="label"></span>
+          <media-menu-item-indicator>✓</media-menu-item-indicator>
+        </media-menu-radio-item>
+      </template>
+    </media-captions-radio-group>
+  </media-menu-content>
+</media-menu>
+<script type="module">
+  import '@videojs/html/ui/menu';
+  import '@videojs/html/ui/menu-content';
+  import '@videojs/html/ui/menu-radio-item';
+  import '@videojs/html/ui/menu-item-indicator';
+  import '@videojs/html/ui/captions-radio-group';
+</script>
+```
 
 </FrameworkCase>
 
@@ -157,9 +173,21 @@ The track file is served from another origin without CORS headers. Serve it with
 The track file is served from another origin without CORS headers. Serve it with `Access-Control-Allow-Origin` and set `crossorigin` on the media element.
 </FrameworkCase>
 
-### The selection menu is empty
+<FrameworkCase frameworks={["react"]}>
+
+### The captions menu doesn't render
 
 The media has no caption or subtitle tracks, so captions availability is `'unavailable'`. For streaming sources, confirm the manifest actually declares text tracks.
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+### The captions menu is empty
+
+The radio group hides when there are no caption or subtitle tracks, but the example's plain Captions button still renders. Hide or disable that trigger while `textTrackList` contains no caption or subtitle entries. For streaming sources, confirm the manifest actually declares text tracks.
+
+</FrameworkCase>
 
 ## Related components
 

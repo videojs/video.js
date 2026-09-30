@@ -80,14 +80,14 @@ export default function App() {
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-The examples use <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> for broad compatibility, but any streaming media component works here, including the smaller <DocsLink slug="reference/components/hls-video">`HlsVideo`</DocsLink>. Use `HlsVideo` when its supported feature set fits your stream.
+The examples use <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink>. The smaller <DocsLink slug="reference/components/hls-video">`HlsVideo`</DocsLink> also reports live state; use it when its supported feature set fits your stream.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The examples use <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> for broad compatibility, but any streaming media component works here, including the smaller <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink>. Use `<hls-video>` when its supported feature set fits your stream.
+The examples use <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>. The smaller <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> also reports live state; use it when its supported feature set fits your stream.
 </FrameworkCase>
 
-The `liveVideoFeatures` bundle mirrors <DocsLink slug="guides/features">`videoFeatures`</DocsLink> but adds the live feature and drops playback rate (not meaningful for live), quality selection, and audio-track selection. The live presets also ship skins without a time slider, duration display, or current-time display.
+The `liveVideoFeatures` bundle starts from <DocsLink slug="guides/features">`videoFeatures`</DocsLink>, adds the live feature, and omits playback rate, quality selection, and audio-track selection. The live presets also ship skins without a time slider, duration display, or current-time display.
 
 Both bundles are plain arrays, so extending one is a spread:
 
@@ -107,8 +107,12 @@ const { Player } = createPlayer({ features: [...liveVideoFeatures, streamTypeFea
 import { createPlayer, streamTypeFeature } from '@videojs/html';
 import { liveVideoFeatures } from '@videojs/html/live-video';
 
-const { ProviderMixin } = createPlayer({ features: [...liveVideoFeatures, streamTypeFeature] });
+const { PlayerElement } = createPlayer({ features: [...liveVideoFeatures, streamTypeFeature] });
+
+customElements.define('custom-live-player', PlayerElement);
 ```
+
+Use `<custom-live-player>` in place of `<live-video-player>` for this configuration.
 
 </FrameworkCase>
 
@@ -119,35 +123,35 @@ Two features describe liveness:
 - The <DocsLink slug="reference/api/feature-stream-type">stream type feature</DocsLink> reports `streamType`: `'live'`, `'on-demand'`, or `'unknown'`. Streaming media derives it from manifest metadata; plain media elements fall back to duration-based detection. `liveVideoFeatures` does not include it; add `streamTypeFeature` to the player's features when you need `streamType`.
 - The <DocsLink slug="reference/api/feature-live">live feature</DocsLink> reports two values:
   - `liveEdgeStart` is where "live" begins on the timeline. When the playhead is at or past this time, the viewer is watching live; behind it, they're watching earlier moments of the stream.
-  - `targetLiveWindow` is how far back the stream lets viewers rewind. `0` means a plain live stream that stays at the edge. `Infinity` means full DVR: rewind as far as the recording goes. `NaN` means the stream isn't live, or the player doesn't know yet.
+  - `targetLiveWindow` describes the kind of live window: `0` for a sliding window, `Infinity` for an event with playback history, and `NaN` for on-demand or unknown content. Read `seekable` to find the actual times viewers can rewind to.
 
-The <DocsLink slug="reference/api/feature-time">time feature</DocsLink> adjusts for live playback: `duration` reports the live edge (the end of the seekable range) and keeps growing as the stream continues.
+The <DocsLink slug="reference/api/feature-time">time feature</DocsLink> replaces an infinite media duration with the end of the seekable range. That end advances as new segments become available; the start can also advance as old segments expire.
 
 <FrameworkCase frameworks={["react"]}>
-LiveButton reads this state: it renders as an active "go to live" control while playback is behind the edge, seeks to the edge on activation, and goes inactive at the edge. Until the media reports a `seekable` range — before metadata loads, or for non-live media — the button is disabled (`data-disabled`) because there is no edge to seek to. Custom live UIs should treat "behind the edge" and "actionable" as separate states.
+LiveButton treats playback as live when the playhead is no more than five seconds behind `liveEdgeStart`. If `liveEdgeStart` is unknown, the button uses the last ten seconds of the seekable range instead. When playback is farther behind, activating the button seeks to the seekable end. The button is disabled (`data-disabled`) when the media is not live or has no finite seekable end. At the edge, it is inactive (`aria-disabled="true"`).
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<media-live-button>` reads this state: it renders as an active "go to live" control while playback is behind the edge, seeks to the edge on activation, and goes inactive at the edge. Until the media reports a `seekable` range — before metadata loads, or for non-live media — the button is disabled (`data-disabled`) because there is no edge to seek to. Custom live UIs should treat "behind the edge" and "actionable" as separate states.
+`<media-live-button>` treats playback as live when the playhead is no more than five seconds behind `liveEdgeStart`. If `liveEdgeStart` is unknown, the button uses the last ten seconds of the seekable range instead. When playback is farther behind, activating the button seeks to the seekable end. The button is disabled (`data-disabled`) when the media is not live or has no finite seekable end. At the edge, it is inactive (`aria-disabled="true"`).
 </FrameworkCase>
 
 ## Availability and constraints
 
-- `liveEdgeStart` and `targetLiveWindow` come from media that implements the live capability — the hls.js-based media elements. With plain media elements, stream type falls back to duration-based detection and `liveEdgeStart` stays `NaN`.
+- `liveEdgeStart` and `targetLiveWindow` require media that implements the live capability. Examples include <DocsLink slug="reference/components/hlsjs-video">hls.js video</DocsLink>, <DocsLink slug="reference/components/hls-video">SPF HLS video</DocsLink>, <DocsLink slug="reference/components/native-hls-video">native HLS video</DocsLink>, and <DocsLink slug="reference/components/shaka-video">Shaka video</DocsLink>. Native HLS video requires browser HLS support. A plain `<video>` can report a live `streamType` from its duration, but its live-window values stay `NaN`.
 - Live playback drifts behind the edge when the network stalls or the tab is backgrounded. Always give users a path back to the edge.
-- Seeking makes sense only for DVR streams (`targetLiveWindow` of `Infinity`). For standard-latency streams, omit the time slider.
-- Playback rate control isn't meaningful for live; `liveVideoFeatures` omits it.
+- Both sliding live windows and growing event histories can support seeking. Check `seekable` for the available range. The built-in time slider starts at zero, so use it only while the seekable history starts at zero; a moving start requires a custom slider.
+- `liveVideoFeatures` omits playback rate control. Add it explicitly if your DVR UI needs it.
 
 ## Common variations
 
 ### DVR: let users scrub back
 
 <FrameworkCase frameworks={["react"]}>
-For streams with a DVR window, give users a <DocsLink slug="reference/components/time-slider">TimeSlider</DocsLink>. The live preset skins don't include one, so add it to your custom UI or <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the live skin source to your project</DocsLink>. The slider tracks the sliding window automatically because `duration` follows the live edge.
+For a live event whose seekable history starts at zero, add a <DocsLink slug="reference/components/time-slider">TimeSlider</DocsLink> to your custom UI or <DocsLink slug="guides/customize-skins" anchor="style-skin-source">customized live skin</DocsLink>. Its maximum follows the seekable end. For a sliding window whose start moves forward, build a slider from the current `seekable` start and end; the built-in slider would include expired times.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-For streams with a DVR window, give users a <DocsLink slug="reference/components/time-slider">`<media-time-slider>`</DocsLink>. The live preset skins don't include one, so add it to your custom UI or <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the live skin source to your project</DocsLink>. The slider tracks the sliding window automatically because `duration` follows the live edge.
+For a live event whose seekable history starts at zero, add a <DocsLink slug="reference/components/time-slider">`<media-time-slider>`</DocsLink> to your custom UI or <DocsLink slug="guides/customize-skins" anchor="style-skin-source">customized live skin</DocsLink>. Its maximum follows the seekable end. For a sliding window whose start moves forward, build a slider from the current `seekable` start and end; the built-in slider would include expired times.
 </FrameworkCase>
 
 ### Switch UI by stream type
@@ -187,7 +191,41 @@ export default function App() {
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-`<media-live-button>` selects from the live, time, and buffer features and reflects live state. To swap larger parts of the UI on `streamType`, build a provider with <DocsLink slug="reference/api/html-create-player">createPlayer</DocsLink> and add `streamTypeFeature` to its features (`<live-video-player>` uses `liveVideoFeatures`, which does not include it), then read `streamType` from the player store through the <DocsLink slug="reference/api/player-controller">player controller</DocsLink>.
+`<media-live-button>` already reflects live state. To show a whole group of controls only for live streams, compose a custom player and subscribe to its store:
+
+```html
+<stream-type-player>
+  <media-container>
+    <hlsjs-video src="https://your-stream.example.com/live.m3u8" autoplay muted playsinline></hlsjs-video>
+    <div id="live-controls" hidden>
+      <media-live-button></media-live-button>
+    </div>
+  </media-container>
+</stream-type-player>
+<script type="module">
+  import { createPlayer, selectStreamType, streamTypeFeature } from '@videojs/html';
+  import { liveVideoFeatures } from '@videojs/html/live-video';
+  import '@videojs/html/media/hlsjs-video';
+  import '@videojs/html/ui/container';
+  import '@videojs/html/ui/live-button';
+
+  const { PlayerElement } = createPlayer({
+    features: [...liveVideoFeatures, streamTypeFeature],
+  });
+  customElements.define('stream-type-player', PlayerElement);
+
+  const player = document.querySelector('stream-type-player');
+  const store = player.store;
+  const controls = document.querySelector('#live-controls');
+  const update = () => {
+    controls.hidden = selectStreamType(store.state)?.streamType !== 'live';
+  };
+
+  const unsubscribe = store.subscribe(update);
+  update();
+  // Call unsubscribe() when this player is removed.
+</script>
+```
 
 </FrameworkCase>
 
@@ -196,11 +234,11 @@ export default function App() {
 ### The live badge never activates
 
 <FrameworkCase frameworks={["react"]}>
-`streamType` isn't `'live'`. Confirm the player's features include `streamTypeFeature` (`liveVideoFeatures` does not include it, so `streamType` reads as `undefined`), the source is a live manifest, and it plays through a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>.
+LiveButton reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`streamType` isn't `'live'`. Confirm the player's features include `streamTypeFeature` (`liveVideoFeatures` does not include it, so `streamType` reads as `undefined`), the source is a live manifest, and it plays through a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>.
+`<media-live-button>` reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
 </FrameworkCase>
 
 ### Playback keeps falling behind the edge
@@ -215,7 +253,7 @@ Network throughput can't sustain the stream, or the tab was backgrounded. `<medi
 
 ### The time slider behaves oddly on a live stream
 
-Standard-latency live streams have no meaningful seek range. Show the slider only for DVR streams (`targetLiveWindow` of `Infinity`).
+Compare the slider's range with `seekable`. The built-in slider always starts at zero. Once a sliding window moves past zero, the slider's range includes expired history. Use a custom slider that follows both range bounds, or keep the live button without a timeline.
 
 ## Related components
 

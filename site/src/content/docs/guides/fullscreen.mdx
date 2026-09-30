@@ -25,11 +25,11 @@ import basicUsageHtmlTs from '@/components/docs/demos/fullscreen-button/html/css
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Add a <DocsLink slug="reference/components/fullscreen-button">FullscreenButton</DocsLink> inside the player container. It requests fullscreen on the container, so everything inside it — controls, captions, overlays — stays visible in the fullscreen presentation.
+Add a <DocsLink slug="reference/components/fullscreen-button">FullscreenButton</DocsLink> inside the player container. When element fullscreen is supported, it presents the whole container, including controls, captions, and overlays. On iPhone Safari, it uses the native video presentation instead.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Add a <DocsLink slug="reference/components/fullscreen-button">`<media-fullscreen-button>`</DocsLink> inside the player container. It requests fullscreen on the container, so everything inside it — controls, captions, overlays — stays visible in the fullscreen presentation.
+Add a <DocsLink slug="reference/components/fullscreen-button">`<media-fullscreen-button>`</DocsLink> inside the player container. When element fullscreen is supported, it presents the whole container, including controls, captions, and overlays. On iPhone Safari, it uses the native video presentation instead.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -61,11 +61,13 @@ The <DocsLink slug="reference/api/feature-fullscreen">fullscreen feature</DocsLi
 
 - `isFullscreen` is `true` while the player is fullscreen, from any path — your button, native controls, or the platform presentation.
 - `fullscreenAvailability` is `'available'`, `'unavailable'`, or `'unsupported'`. It starts as `'unavailable'`, then settles to `'available'` or `'unsupported'` when the feature attaches to a media element.
-- `requestFullscreen()` and `exitFullscreen()` change the presentation. Requests target the player container when the Fullscreen API is available, falling back to the media element's native presentation otherwise.
+- `requestFullscreen()` and `exitFullscreen()` change the presentation. When the Fullscreen API is available, requests target the player container. Otherwise they fall back to the media element's native presentation.
 
 Fullscreen and picture-in-picture are exclusive: requesting fullscreen exits an active picture-in-picture presentation first.
 
-Style fullscreen state through the container's `:fullscreen` pseudo-class, or through the `fullscreen` state in components.
+Style fullscreen state through the container's `:fullscreen` pseudo-class, the button's `data-fullscreen` attribute, or `isFullscreen` in player state.
+
+The built-in button hides when `fullscreenAvailability` is not `'available'`. Use the same check for custom controls and handle rejected requests. When the attached media has no supported fullscreen method, the action resolves without changing the presentation.
 
 ## Availability and constraints
 
@@ -82,10 +84,10 @@ Style fullscreen state through the container's `:fullscreen` pseudo-class, or th
 
 Add `orientationLockFeature` to lock screen orientation while the player is fullscreen. It isn't part of `videoFeatures`, so the preset `VideoPlayer` doesn't include it. It locks to `landscape` by default and unlocks on exit.
 
-Because the feature list changes, build the player yourself with <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> — the escape hatch for custom feature sets:
+The preset has a fixed feature list, so build the player yourself with <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink>:
 
 ```tsx
-import { Container, createPlayer, orientationLockFeature } from '@videojs/react';
+import { Container, createPlayer, FullscreenButton, orientationLockFeature } from '@videojs/react';
 import { Video, videoFeatures } from '@videojs/react/video';
 
 const { Player } = createPlayer({
@@ -97,6 +99,7 @@ export default function App() {
     <Player>
       <Container>
         <Video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" muted playsInline />
+        <FullscreenButton>Fullscreen</FullscreenButton>
       </Container>
     </Player>
   );
@@ -108,7 +111,28 @@ export default function App() {
 
 Add `orientationLockFeature` to lock screen orientation while the player is fullscreen. It isn't part of `videoFeatures`, so the preset `<video-player>` doesn't include it. It locks to `landscape` by default and unlocks on exit.
 
-Compose a player with `orientationLockFeature` in its feature list through <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink>; the prebuilt `<video-player>` element doesn't include it.
+Register a custom player tag with <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink>:
+
+```html
+<orientation-player>
+  <media-container>
+    <video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" muted playsinline></video>
+    <media-fullscreen-button>Fullscreen</media-fullscreen-button>
+  </media-container>
+</orientation-player>
+<script type="module">
+  import { createPlayer, orientationLockFeature } from '@videojs/html';
+  import { videoFeatures } from '@videojs/html/video';
+  import '@videojs/html/ui/container';
+  import '@videojs/html/ui/fullscreen-button';
+
+  const { PlayerElement } = createPlayer({
+    features: [...videoFeatures, orientationLockFeature],
+  });
+
+  customElements.define('orientation-player', PlayerElement);
+</script>
+```
 
 </FrameworkCase>
 
@@ -124,7 +148,7 @@ To lock to something other than `landscape`, set the `orientation-lock-type` att
 
 <FrameworkCase frameworks={["react"]}>
 
-Use the `Gesture` component — the default skins ship this exact binding. Keep the button as the accessible path; gestures are a pointer-only shortcut.
+Use the `Gesture` component — the packaged skins ship this exact binding. Keep the button as the accessible path; gestures are a pointer-only shortcut.
 
 ```tsx
 import { Gesture } from '@videojs/react';
@@ -135,7 +159,7 @@ import { Gesture } from '@videojs/react';
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Use the `<media-gesture>` element — the default skins ship this exact binding. Keep the button as the accessible path; gestures are a pointer-only shortcut.
+Use the `<media-gesture>` element — the packaged skins ship this exact binding. Keep the button as the accessible path; gestures are a pointer-only shortcut.
 
 ```html
 <media-gesture type="doubletap" action="toggleFullscreen" region="center"></media-gesture>
@@ -146,13 +170,17 @@ Use the `<media-gesture>` element — the default skins ship this exact binding.
 
 </FrameworkCase>
 
-`region="center"` keeps the gesture off the left and right thirds, which the default skins reserve for double-tap seeking. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink> for the full gesture surface.
+With left, center, and right double-tap bindings for the same pointer type, `region="center"` covers the middle third, as in the on-demand video skins. A center-only double-tap binding covers the whole surface. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink> for region behavior.
 
 ## Troubleshooting
 
+### The fullscreen button doesn't render
+
+The button hides while `fullscreenAvailability` is `'unavailable'` or `'unsupported'`. Wait for media attachment, check browser support, and confirm that an embedding iframe permits fullscreen with `allow="fullscreen"`.
+
 ### The fullscreen request is rejected
 
-The request didn't come from a user gesture, fullscreen is unsupported, or an embedding iframe lacks `allow="fullscreen"`.
+Call the action directly from a click handler and check that an embedding iframe permits fullscreen with `allow="fullscreen"`. Handle the returned promise's rejection. To detect unsupported fullscreen, check `fullscreenAvailability`; an unsupported request can resolve without entering fullscreen.
 
 ### Custom controls disappear in fullscreen on iPhone
 

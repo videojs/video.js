@@ -59,18 +59,18 @@ Wrap your control UI in <DocsLink slug="reference/components/controls">`<media-c
 
 The <DocsLink slug="reference/api/feature-controls">controls feature</DocsLink> tracks activity on the player container:
 
-- `userActive` is `true` while the user interacts — pointer movement, keyboard input, or focus — and flips to `false` after two seconds of inactivity.
+- `userActive` becomes `true` on pointer movement, keyboard input, or focus entry. It becomes `false` after two seconds without another activity event, or when the mouse leaves the container.
 - `controlsVisible` derives from activity and playback: controls stay visible while paused or while a remote playback session is connecting or connected, regardless of idle state.
-- `toggleControls(forceShow?)` flips visibility for custom triggers, or shows (`true`) or hides (`false`) the controls. Hiding counts as going idle, so controls stay visible while paused or casting.
+- `toggleControls(forceShow?)` marks the user inactive when controls are visible, and shows them otherwise. Pass `true` to show controls or `false` to mark the user inactive. Paused playback, a remote session, or an open menu can keep controls visible even when the user is inactive.
 
-On touch devices, a tap on the media toggles the controls instead of relying on pointer movement, and mid-gesture movement doesn't flicker visibility.
+On touch devices, pointer movement does not show controls. A tap on the media toggles them, and movement during a gesture does not make them flicker.
 
-The feature needs the player container for activity tracking; without a container it stays inactive and warns in development.
+The feature needs the player container for activity tracking. Without one, it keeps its initial active and visible state and warns in development.
 
 ## Availability and constraints
 
 - Activity tracking listens on the player container, so controls placed outside it don't keep the player "active" — put control UI inside the container.
-- Keyboard focus counts as activity: controls stay reachable for keyboard and assistive-technology users while focus is inside them.
+- Focus entry restarts the idle timer; holding focus alone does not keep controls visible. The example uses `:has(:focus-visible)` to keep controls visible while they contain keyboard focus. Focus from a mouse click does not hold them open.
 - Touch and mouse behave differently by design — mouse movement shows controls, touch requires a tap. Test both.
 - The idle delay is fixed at two seconds.
 
@@ -79,11 +79,11 @@ The feature needs the player container for activity tracking; without a containe
 ### Always-visible controls
 
 <FrameworkCase frameworks={["react"]}>
-Set `visibility="always"` on <DocsLink slug="reference/components/controls">Controls</DocsLink>. The controls stay visible and report the user as active while the feature keeps tracking activity for anything else that needs it. The packaged audio skins use this mode.
+Set `visibility="always"` on <DocsLink slug="reference/components/controls">Controls</DocsLink>. This keeps the UI visible. When the controls feature is present, `userActive` still follows its activity tracking. The packaged audio skins use this mode.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Set `visibility="always"` on <DocsLink slug="reference/components/controls">`<media-controls>`</DocsLink>. The controls stay visible and report the user as active while the feature keeps tracking activity for anything else that needs it. The packaged audio skins use this mode.
+Set `visibility="always"` on <DocsLink slug="reference/components/controls">`<media-controls>`</DocsLink>. This keeps the UI visible. When the controls feature is present, `userActive` still follows its activity tracking. The packaged audio skins use this mode.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -104,13 +104,28 @@ Set `visibility="always"` on <DocsLink slug="reference/components/controls">`<me
 
 ### Custom show/hide styling
 
-Controls hide by state, so you own the transition. Style the visible and hidden states in CSS — fade, slide, or scale — driven by the component's rendered state rather than re-implementing the idle timer.
+Style the visible and hidden states in CSS with a fade, slide, or scale, using the component's `data-visible` attribute. The controls feature handles the idle timer.
+
+Keep controls with keyboard focus visible in your hiding rule:
+
+```css
+.media-controls:not([data-visible]):not(:has(:focus-visible)) {
+  opacity: 0;
+}
+```
 
 ## Troubleshooting
 
 ### Controls never hide
 
-The media is paused (controls intentionally stay visible), a remote playback session is active, an open menu or popover holds a controls lock, or something keeps triggering activity — for example a focused element inside the container receiving repeated events.
+Check for these causes:
+
+- The media is paused. Controls stay visible by design.
+- A remote playback session is active.
+- An open menu or popover holds a controls lock.
+- Something keeps triggering activity, such as a focused element inside the container that receives repeated events.
+
+With the `:has(:focus-visible)` CSS rule above, keyboard focus keeps the controls visible even after activity becomes idle. Move focus out of the controls to let them hide.
 
 ### Controls don't come back on touch
 
@@ -118,7 +133,7 @@ A tap on the media toggles controls. If a custom overlay covers the media and sw
 
 ### Controls flicker on Android while tapping
 
-Use the skin gestures (`tap` with the `toggleControls` action) rather than adding your own tap handlers next to the built-in behavior; competing handlers invert each other. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink>.
+Use the skin gestures (`tap` with the `toggleControls` action). When two handlers both toggle controls, one shows them and the other hides them again. Remove extra tap handlers that duplicate the built-in behavior. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink>.
 
 ## Related components
 

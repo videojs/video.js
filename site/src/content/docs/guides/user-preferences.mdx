@@ -1,12 +1,16 @@
 ---
 title: 'Remember user preferences'
-description: 'Persist volume, caption, and quality preferences across sessions by subscribing to player state.'
+description: 'Save volume and caption preferences, restore them after loading, and adapt the pattern for quality selection.'
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import ServerCode from '@/components/Code/ServerCode.astro';
+import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs';
+import volumePersistenceTsx from '@/components/docs/demos/user-preferences/react/VolumePersistence.tsx?raw';
+import captionsPersistenceTsx from '@/components/docs/demos/user-preferences/react/CaptionsPersistence.tsx?raw';
 
-The player doesn't persist preferences itself today. Player state gives you everything needed to wire persistence to the storage you choose — local storage, your backend, or per-profile settings.
+Save preferences from player state to local storage or your backend. Video.js leaves storage and per-profile settings to your application.
 
 ## Recommended approach
 
@@ -14,76 +18,14 @@ Subscribe to the state you want to remember, write it to storage when it changes
 
 <FrameworkCase frameworks={["react"]}>
 
-```tsx
-import { useEffect, useRef, useState } from 'react';
-import { Container } from '@videojs/react';
-import { usePlayer, Video, VideoPlayer } from '@videojs/react/video';
-
-const STORAGE_KEY = 'player:volume';
-
-// Local storage can be unavailable (private modes), so guard reads and writes.
-function readSaved() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
-  } catch {
-    return null;
-  }
-}
-
-function save(prefs: { volume: number; muted: boolean }) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
-  } catch {
-    // Storage unavailable; skip persistence.
-  }
-}
-
-function VolumePersistence() {
-  const store = usePlayer();
-  const { volume, muted } = usePlayer((s) => ({ volume: s.volume, muted: s.muted }));
-  // Read the saved value once, before the save effect below can write.
-  const [saved] = useState(readSaved);
-  const restored = useRef(false);
-
-  // Save on change, once the restore has run.
-  useEffect(() => {
-    if (!restored.current) return;
-    save({ volume, muted });
-  }, [volume, muted]);
-
-  // Restore once the store attaches to the media; actions throw before that.
-  useEffect(() => {
-    const restore = () => {
-      if (!store.target) return false;
-      if (saved) {
-        store.setVolume(saved.volume);
-        // setVolume above zero unmutes, so apply the saved mute afterwards.
-        if (saved.muted) store.setMuted(true);
-      }
-      restored.current = true;
-      return true;
-    };
-    if (restore()) return;
-    const unsubscribe = store.subscribe(() => {
-      if (restore()) unsubscribe();
-    });
-    return unsubscribe;
-  }, [store, saved]);
-
-  return null;
-}
-
-export default function App() {
-  return (
-    <VideoPlayer>
-      <Container>
-        <Video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" playsInline />
-        <VolumePersistence />
-      </Container>
-    </VideoPlayer>
-  );
-}
-```
+<TabsRoot client:idle>
+  <TabsList client:idle label="Volume persistence source">
+    <Tab client:idle value="volume-persistence" initial>VolumePersistence.tsx</Tab>
+  </TabsList>
+  <TabsPanel client:idle value="volume-persistence" initial>
+    <ServerCode code={volumePersistenceTsx} lang="tsx" />
+  </TabsPanel>
+</TabsRoot>
 
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
@@ -96,16 +38,18 @@ export default function App() {
 </video-player>
 <script type="module">
   import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
   import { selectVolume } from '@videojs/html';
 
   const STORAGE_KEY = 'player:volume';
   const player = document.querySelector('video-player');
   const store = player.store;
 
-  // Local storage can be unavailable (private modes), so guard reads and writes.
+  // Guard storage access so playback still works when storage is blocked.
   function readSaved() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+      return Number.isFinite(value?.volume) && typeof value?.muted === 'boolean' ? value : null;
     } catch {
       return null;
     }
@@ -126,7 +70,7 @@ export default function App() {
       if (!store.target) return false;
       const v = selectVolume(store.state);
       v?.setVolume(saved.volume);
-      // setVolume above zero unmutes, so apply the saved mute afterwards.
+      // Apply saved mute after setVolume, which unmutes above zero.
       if (saved.muted) v?.setMuted(true);
       return true;
     };
@@ -154,8 +98,8 @@ export default function App() {
 
 <FrameworkCase frameworks={["react"]}>
 - Player state is the single source of truth: it already reflects every change, whatever caused it — your UI, keyboard shortcuts, native controls, or scripts.
-- `store.subscribe(callback)` fires on any state change. Notifications are batched per microtask, so rapid changes (a volume drag) produce one callback per tick, which keeps storage writes cheap. There is no per-key subscription on the store: read the state and diff the slice you care about.
-- `usePlayer(selector)` re-renders only when the selected value changes; pairing it with an effect is the idiomatic save path.
+- `store.subscribe(callback)` fires on any state change. The store batches notifications per microtask, so changes made in the same tick produce one callback. There is no per-key subscription on the store: read the state and diff the slice you care about.
+- `usePlayer(selector)` re-renders only when the selected value changes. To save a value, select it with `usePlayer` and write it to storage in an effect.
 - Feature selectors exported by `@videojs/react` (`selectVolume`, `selectTextTrack`, `selectQuality`, and the rest) read a feature's slice from any store, returning `undefined` when the feature isn't present.
 - Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media element, so state and UI stay consistent.
 - Actions need an attached media target: calling one before the store attaches throws. Check `store.target` and defer the restore until it is set, as the examples do.
@@ -163,7 +107,7 @@ export default function App() {
 
 <FrameworkCase frameworks={["html"]}>
 - Player state is the single source of truth: it already reflects every change, whatever caused it — your UI, keyboard shortcuts, native controls, or scripts.
-- `store.subscribe(callback)` fires on any state change. Notifications are batched per microtask, so rapid changes (a volume drag) produce one callback per tick, which keeps storage writes cheap. There is no per-key subscription on the store: read the state and diff the slice you care about.
+- `store.subscribe(callback)` fires on any state change. The store batches notifications per microtask, so changes made in the same tick produce one callback. There is no per-key subscription on the store: read the state and diff the slice you care about.
 - Feature selectors exported by `@videojs/html` (`selectVolume`, `selectTextTrack`, `selectQuality`, and the rest) read a feature's slice from any store, returning `undefined` when the feature isn't present.
 - Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media element, so state and UI stay consistent.
 - Actions need an attached media target: calling one before the store attaches throws. Check `store.target` and defer the restore until it is set, as the examples do.
@@ -171,60 +115,61 @@ export default function App() {
 
 ## Availability and constraints
 
-- Nothing persists by default: volume resets to the media element's value, captions to the track markup, quality to automatic, on every load.
-- `setVolume` clamps to 0–1 and unmutes when setting a value above zero; restore volume first, then toggle `muted` back on when the saved preference is muted, as the examples do. Skip the toggle when the saved volume is zero: the player treats volume zero as muted, so toggling would unmute and raise the volume. Don't compare against store state right after calling an action: notifications batch per microtask, so that state is still stale.
-- Restore track and quality selections after the media exposes them: track and rendition lists arrive when the media loads, not at player creation. Subscribe and apply when the saved entry appears in the list.
-- Programmatic volume control is unavailable on some platforms (after attach, iOS Safari reports `volumeAvailability: 'unsupported'`); volume persistence quietly does nothing there.
+- Video.js does not write preferences to storage. Initial values come from the media element, track markup, and playback engine.
+- `setVolume` clamps to 0–1 and unmutes above zero. Restore volume first, then call `setMuted(true)` if the saved preference is muted. Calling `setMuted(false)` at zero raises the volume to 0.25.
+- The volume examples leave autoplay off. For muted autoplay, defer volume restoration until a user action: restoring a positive volume unmutes the media and can interrupt autoplay, even if you immediately mute it again.
+- `setVolume` and `setMuted` update `store.state` immediately. A React hook's selected value updates on the next render.
+- Track and rendition lists arrive when the media loads, not when the player is created. Subscribe and restore a saved selection when its entry appears in the list.
+- On iOS Safari, `volumeAvailability` is `'unsupported'` after attachment. Restoring the volume level has no effect there; mute can still be restored.
 - Local storage is per-origin and can be unavailable (private modes, embedded contexts); guard reads and writes accordingly.
 
 ## Common variations
 
 ### Persist caption preference
 
-Save the showing track's `language` (not its generated id, which can change between sources), or `'off'` when the user turns captions off. Restoring is two phases: while the media loads, assert the saved preference whenever the track modes drift from it, because browsers can auto-enable a track of their own during loading. Once the media can play (`canPlay`), treat every change as the user's choice and save it. A restore that re-runs forever would keep overriding the user; one that runs only once can get overridden by the browser.
+Save the showing track's `language` because track ids can change between sources. Save `'off'` when captions are off. Restore once when the first caption or subtitle list arrives, then save later selection changes. Do not wait for `canPlay`. With limited preloading, `canPlay` can stay `false` until playback starts. Repeated restoration would override a selection the user already made.
+
+If the saved language is absent from that first list, leave the stored preference intact until the selection changes. This example does not retry restoration when more tracks arrive; adapt the initial loading step if your engine exposes languages in several batches. Browser selection changes after restoration are saved just like user changes.
 
 <FrameworkCase frameworks={["react"]}>
 
-```tsx
-function CaptionsPersistence() {
-  const store = usePlayer();
-  const { tracks, canPlay } = usePlayer((s) => ({ tracks: s.textTrackList, canPlay: s.canPlay }));
-  const [saved] = useState(() => localStorage.getItem('player:captions'));
-  const restored = useRef(false);
+`CaptionsPersistence` imports `usePlayer` from `VolumePersistence.tsx` above. Render `<CaptionsPersistence />` next to `<VolumePersistence />` inside `Container`. Add a `<track>` with `label` and `srcLang` for each language to `Video`, as in <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>. Remount `CaptionsPersistence` when changing sources, using a key derived from the source URL, so restoration runs again.
 
-  useEffect(() => {
-    const subtitles = tracks.filter((t) => t.kind === 'captions' || t.kind === 'subtitles');
-    if (!subtitles.length) return;
+Omit `default` from these tracks when persisting caption preferences. A default track can turn on after restoration, causing this example to save its language over a stored `'off'` preference.
 
-    // Restore phase: assert the saved preference until the media can play.
-    if (!restored.current) {
-      const desired = saved === 'off' ? undefined : subtitles.find((t) => t.language === saved);
-      if (saved && (desired || saved === 'off')) {
-        const applied = subtitles.every((t) => (t.mode === 'showing') === (t.id === desired?.id));
-        if (!applied) {
-          store.selectSubtitlesTrack(desired?.id ?? null);
-          return;
-        }
-      }
-      if (!canPlay) return;
-      restored.current = true;
-    }
-
-    // Save phase: the showing track's language, or 'off'.
-    const showing = subtitles.find((t) => t.mode === 'showing');
-    localStorage.setItem('player:captions', showing ? showing.language : 'off');
-  }, [store, tracks, canPlay, saved]);
-
-  return null;
-}
-```
+<TabsRoot client:idle>
+  <TabsList client:idle label="Captions persistence source">
+    <Tab client:idle value="captions-persistence" initial>CaptionsPersistence.tsx</Tab>
+  </TabsList>
+  <TabsPanel client:idle value="captions-persistence" initial>
+    <ServerCode code={captionsPersistenceTsx} lang="tsx" />
+  </TabsPanel>
+</TabsRoot>
 
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Apply the same pattern with `selectTextTrack(store.state)` inside `store.subscribe`: until `canPlay` is true, re-apply the saved preference by passing the matching track's `id` (or `null`) to `selectSubtitlesTrack` whenever the modes drift; afterward, save the showing track's `language`, or `'off'` when none is showing, on every change.
+Apply the same pattern in a store subscription:
+
+1. Inside `store.subscribe`, read the track state with `selectTextTrack(store.state)`.
+2. When the first caption or subtitle list arrives, record the current selection and mark restoration complete. If the saved language is present, call `selectSubtitlesTrack` with that track's `id`. If the saved value is `'off'`, pass `null`. Do not save during this first pass.
+3. After that, save selection changes. If the saved language was absent from the first list, keep the stored preference until the selection changes.
+4. Guard `localStorage` reads and writes, and restart restoration for each new source.
+
+Omit `default` from the tracks when persisting caption preferences. A default track can turn on after restoration, causing the subscription to save its language over a stored `'off'` preference.
 
 </FrameworkCase>
+
+### Remember a quality selection
+
+Adapt the same restore-then-save pattern to the <DocsLink slug="reference/api/feature-quality">quality feature</DocsLink>:
+
+1. Save `'auto'` or the resolution of the selected entry in `videoRenditionList`. Read `selected`; `activeVideoRendition` can change during automatic playback and does not identify a manual preference.
+2. Wait for the next source's rendition list, then match the saved resolution to an entry. Rendition ids belong to that source, so do not reuse a saved id across sources.
+3. Call `selectVideoRendition` with the matching entry's id, or `'auto'` if no match exists. Every entry in `videoRenditionList` has an id; use it directly.
+4. Do not save until restoration finishes; otherwise the source's default selection overwrites the saved choice. After that, save each change the user makes.
+
+To remember a data-saving limit while preserving automatic switching, persist `maxAutoResolution` and pass it on the next source. It needs the hls.js engine; native HLS playback ignores it. See <DocsLink slug="guides/media-sources" anchor="options-videojs-normalizes">Options Video.js normalizes</DocsLink>.
 
 ### Persist to your backend
 

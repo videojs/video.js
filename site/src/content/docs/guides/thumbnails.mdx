@@ -40,34 +40,19 @@ With <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, t
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Add a `kind="metadata"` track labeled `thumbnails` whose cues reference storyboard images, then put a slider thumbnail inside the <DocsLink slug="reference/components/time-slider">TimeSlider</DocsLink>. Scrubbing shows the frame under the pointer. The slider thumbnail reads the pointer time from the slider, so you never pass `time`; it otherwise accepts the same props as the standalone <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink>.
+Add a `<track kind="metadata" label="thumbnails" default>` whose cues reference storyboard images. Then put a slider thumbnail inside the <DocsLink slug="reference/components/time-slider">TimeSlider</DocsLink>. Scrubbing shows the frame under the pointer. The slider thumbnail reads the pointer time from the slider, so you never pass `time`; it otherwise accepts the same props as the standalone <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Add a `kind="metadata"` track labeled `thumbnails` whose cues reference storyboard images, then put a slider thumbnail inside the <DocsLink slug="reference/components/time-slider">`<media-time-slider>`</DocsLink>. Scrubbing shows the frame under the pointer. The slider thumbnail reads the pointer time from the slider, so you never pass `time`; it otherwise accepts the same attributes as the standalone <DocsLink slug="reference/components/thumbnail">`<media-thumbnail>`</DocsLink>.
+Add a `<track kind="metadata" label="thumbnails" default>` whose cues reference storyboard images. Then put a slider thumbnail inside the <DocsLink slug="reference/components/time-slider">`<media-time-slider>`</DocsLink>. Scrubbing shows the frame under the pointer. The slider thumbnail reads the pointer time from the slider, so you never pass `time`; it otherwise accepts the same attributes as the standalone <DocsLink slug="reference/components/thumbnail">`<media-thumbnail>`</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Compose `Slider.Thumbnail.Root` around `Slider.Thumbnail.Image`, and put image settings such as `crossOrigin`, `loading`, and `fetchPriority` on the image part. Inside a packaged skin, pass `renderThumbnail` to draw the image yourself; the skin still supplies `src` and sizing:
-
-```tsx
-<VideoSkin renderThumbnail={<img alt="" loading="lazy" fetchPriority="low" />} />
-```
+Compose `Slider.Thumbnail.Root` around `Slider.Thumbnail.Image`, and put image settings such as `crossOrigin`, `loading`, and `fetchPriority` on the image part.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<media-slider-thumbnail>` draws its own image unless you supply an `<img>` child; set `crossorigin`, `loading`, or `fetchpriority` on the element itself, or on the image you supply. Inside a packaged skin, an `<img slot="thumbnail">` replaces the image the skin carries, so those attributes go on it:
-
-```html
-<video-player>
-  <video-skin>
-    <video src="video.mp4" crossorigin="anonymous">
-      <track kind="metadata" label="thumbnails" src="storyboard.vtt" default />
-    </video>
-    <img slot="thumbnail" alt="" loading="lazy" fetchpriority="low" />
-  </video-skin>
-</video-player>
-```
+`<media-slider-thumbnail>` draws its own image unless you supply an `<img>` child. Set `crossorigin`, `loading`, or `fetchpriority` on the element itself or on that image.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -133,6 +118,37 @@ storyboard.jpg#xywh=256,0,256,160
 - Cross-origin storyboards need CORS headers, and `crossorigin` on the media element for the track to load.
 - Cues load asynchronously. The track appears before its cues are parsed, so previews fill in when the track finishes loading.
 - Storyboard images download on demand; oversized sprite sheets hurt seek-preview responsiveness more than they help quality.
+</FrameworkCase>
+
+## Common variations
+
+### Customize the skin's thumbnail image
+
+<FrameworkCase frameworks={["react"]}>
+Inside a packaged skin, pass `renderThumbnail` to draw the image yourself; the skin still supplies `src` and sizing:
+
+```tsx
+<VideoSkin renderThumbnail={<img alt="" loading="lazy" fetchPriority="low" />} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Inside a packaged skin, an `<img slot="thumbnail">` replaces the image the skin carries, so image attributes go on it:
+
+```html
+<video-player>
+  <video-skin>
+    <video src="video.mp4" crossorigin="anonymous">
+      <track kind="metadata" label="thumbnails" src="storyboard.vtt" default />
+    </video>
+    <img slot="thumbnail" alt="" loading="lazy" fetchpriority="low" />
+  </video-skin>
+</video-player>
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/video/skin';
+</script>
+```
 </FrameworkCase>
 
 ## Troubleshooting

@@ -90,10 +90,11 @@ Selecting "Auto" keeps adaptive bitrate switching active: the engine picks the b
 
 ## Availability and constraints
 
+- The live preset omits `qualityFeature` and cannot accept extra features. To add a quality menu to a live player, use `createPlayer` with `[...liveVideoFeatures, qualityFeature]`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink> for custom player setup.
 - Quality availability is `'unavailable'` for media that doesn't offer a choice — progressive files, streams before the manifest loads, and single-rendition streams. Render quality UI conditionally on that value.
-- Renditions come from the streaming engine, so the list depends on what the manifest declares. A single-rendition stream offers no meaningful selection, so availability stays `'unavailable'`.
+- Renditions come from the streaming engine, so the list depends on what the manifest declares.
 - Pinning a high rendition on a slow connection causes buffering: the engine can no longer step down. Keep "Auto" the default.
-- Rendition lists change on source change; selection resets with them.
+- Loading a new source replaces the rendition list and resets the selection.
 
 ## Common variations
 
@@ -101,36 +102,42 @@ Selecting "Auto" keeps adaptive bitrate switching active: the engine picks the b
 
 If you don't want to expose manual selection, do nothing: adaptive selection is on by default and needs no UI.
 
-### Cap or pin quality programmatically
+### Pin quality programmatically
+
+Call `selectVideoRendition` to hold one rendition until the user selects "Auto". To limit resolution while keeping automatic switching, set `maxAutoResolution` on the source. It needs the hls.js engine; native HLS playback ignores it. See <DocsLink slug="guides/media-sources" anchor="options-videojs-normalizes">Options Video.js normalizes</DocsLink>.
 
 <FrameworkCase frameworks={["react"]}>
 
 ```tsx
-import { Container } from '@videojs/react';
+import { Container, createPlayer, useQualityOptions } from '@videojs/react';
 import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
-import { usePlayer, VideoPlayer } from '@videojs/react/video';
+import { videoFeatures } from '@videojs/react/video';
+
+const { Player, usePlayer } = createPlayer({ features: videoFeatures });
 
 function PinLowestRendition() {
   const store = usePlayer();
   const renditions = usePlayer((s) => s.videoRenditionList);
+  const quality = useQualityOptions();
 
   const lowest = [...renditions].sort((a, b) => (a.height ?? 0) - (b.height ?? 0))[0];
+  if (quality?.state.availability !== 'available' || !lowest) return null;
 
   return (
-    <button type="button" onClick={() => lowest && store.selectVideoRendition(lowest.id)}>
-      Data saver
+    <button type="button" onClick={() => store.selectVideoRendition(lowest.id)}>
+      Use lowest quality
     </button>
   );
 }
 
 export default function App() {
   return (
-    <VideoPlayer>
+    <Player>
       <Container>
         <HlsJsVideo src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8" muted playsInline />
         <PinLowestRendition />
       </Container>
-    </VideoPlayer>
+    </Player>
   );
 }
 ```
@@ -138,13 +145,49 @@ export default function App() {
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Access the player store through the <DocsLink slug="reference/api/player-controller">player controller</DocsLink> and call `selectVideoRendition` with a rendition `id` from `videoRenditionList`, or `'auto'` to restore adaptive selection.
+Add a button inside the primary example's container:
+
+```html
+<button type="button" id="lowest-quality" disabled>Use lowest quality</button>
+```
+
+Read the current list from the player store and use the rendition's `id`. Pass `'auto'` to restore adaptive selection:
+
+```ts
+import '@videojs/html/video/player';
+import { selectQuality } from '@videojs/html';
+
+const player = document.querySelector('video-player');
+if (!player) throw new Error('Missing video-player');
+
+const store = player.store;
+const button = document.querySelector<HTMLButtonElement>('#lowest-quality')!;
+let lowestValue: string | undefined;
+
+function updateButton() {
+  const renditions = selectQuality(store.state)?.videoRenditionList ?? [];
+  const lowest = [...renditions].sort((a, b) => (a.height ?? 0) - (b.height ?? 0))[0];
+
+  lowestValue = lowest?.id;
+  button.disabled = renditions.length < 2;
+}
+
+button.addEventListener('click', () => {
+  if (lowestValue !== undefined) selectQuality(store.state)?.selectVideoRendition(lowestValue);
+});
+
+const unsubscribe = store.subscribe(updateButton);
+updateButton();
+// Call unsubscribe() when this player is removed.
+```
 
 </FrameworkCase>
 
 ## Troubleshooting
 
 ### The quality menu doesn't render
+
+Confirm that the player includes `qualityFeature`. The live preset omits it; compose a custom player as described above.
 
 <FrameworkCase frameworks={["react"]}>
 Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media element doesn't support renditions. Use a streaming media element such as <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>.

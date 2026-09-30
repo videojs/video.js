@@ -33,21 +33,25 @@ Creates radio items from the player text track state and selects the showing cap
 
 <FrameworkCase frameworks={["react"]}>
   ```tsx
-  <CaptionsRadioGroup.Root>
-    <Menu.Trigger>
-      <CaptionsRadioGroup.Value />
-    </Menu.Trigger>
-    <Menu.Content>
-      <CaptionsRadioGroup.Options
-        renderItem={(props, item) => (
-          <Menu.RadioItem {...props}>
-            {item.label}
-            <Menu.ItemIndicator checked={item.checked} />
-          </Menu.RadioItem>
-        )}
-      />
-    </Menu.Content>
-  </CaptionsRadioGroup.Root>
+  <Menu.Root>
+    <CaptionsRadioGroup.Root>
+      <Menu.Trigger>
+        <CaptionsRadioGroup.Value />
+      </Menu.Trigger>
+      <Menu.Popup>
+        <Menu.Content>
+          <CaptionsRadioGroup.Options
+            renderItem={(props, item) => (
+              <Menu.RadioItem {...props}>
+                {item.label}
+                <Menu.ItemIndicator checked={item.checked} />
+              </Menu.RadioItem>
+            )}
+          />
+        </Menu.Content>
+      </Menu.Popup>
+    </CaptionsRadioGroup.Root>
+  </Menu.Root>
   ```
 </FrameworkCase>
 

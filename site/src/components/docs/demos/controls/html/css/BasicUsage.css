@@ -27,7 +27,7 @@
 }
 
 .controls-backdrop:not([data-visible]),
-.media-controls:not([data-visible]) {
+.media-controls:not([data-visible]):not(:has(:focus-visible)) {
   opacity: 0;
 }
 

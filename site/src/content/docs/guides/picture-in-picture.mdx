@@ -25,11 +25,11 @@ import basicUsageHtmlTs from '@/components/docs/demos/pip-button/html/css/BasicU
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Add a <DocsLink slug="reference/components/pip-button">PiPButton</DocsLink>. It requests and exits picture-in-picture, reflects the current state, and renders nothing when picture-in-picture is unsupported.
+Add a <DocsLink slug="reference/components/pip-button">PiPButton</DocsLink>. It requests and exits picture-in-picture, reflects the current state, and stays hidden until picture-in-picture is available.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Add a <DocsLink slug="reference/components/pip-button">`<media-pip-button>`</DocsLink>. It requests and exits picture-in-picture, reflects the current state, and renders nothing when picture-in-picture is unsupported.
+Add a <DocsLink slug="reference/components/pip-button">`<media-pip-button>`</DocsLink>. It requests and exits picture-in-picture, reflects the current state, and stays hidden until picture-in-picture is available.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -61,18 +61,20 @@ The <DocsLink slug="reference/api/feature-pip">picture-in-picture feature</DocsL
 
 `isPictureInPicture` is `true` while the video is in a floating window. It tracks every way in and out — your button, the native controls, or a control the browser adds on its own.
 
-`pictureInPictureAvailability` answers "can I offer this?" It starts as `'unavailable'`. Once the feature attaches to a media element, it settles to `'available'` or `'unsupported'`.
+`pictureInPictureAvailability` starts as `'unavailable'`. It becomes `'available'` when the media supports picture-in-picture and has loaded metadata, or `'unsupported'` when the browser or media has no supported route. Loading a new source returns it to `'unavailable'` until metadata loads.
 
-`requestPictureInPicture()` and `exitPictureInPicture()` change the presentation. If the browser blocks a request, the returned promise rejects. In a browser with no picture-in-picture API, the actions resolve without changing anything.
+`requestPictureInPicture()` and `exitPictureInPicture()` change the presentation. Handle rejected promises when the browser blocks a request. An entry request before metadata loads rejects with `InvalidStateError`. Without a supported API, the request resolves without opening a window.
 
 Picture-in-picture and fullscreen are exclusive: requesting one exits the other first.
 
 ## Availability and constraints
 
+If a Safari standalone web app exposes the standard Picture-in-Picture API, Video.js still reports picture-in-picture as `'unsupported'`. The built-in button hides in that case. Check `pictureInPictureAvailability` in installed web apps as well as browser tabs.
+
 <FrameworkCase frameworks={["react"]}>
 - Show picture-in-picture controls only when `pictureInPictureAvailability` is `'available'`. PiPButton handles this for you.
 - Requests must come from a user gesture; browsers reject requests outside one.
-- Firefox 153 (July 2026) added the programmatic picture-in-picture API. Earlier versions, including Firefox ESR 140, report `'unsupported'` even though they offer their own built-in picture-in-picture toggle to users.
+- [Firefox 153](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/153) (July 2026) added the programmatic picture-in-picture API on desktop. On earlier desktop versions, including Firefox ESR 140, `pictureInPictureAvailability` is `'unsupported'`, even though Firefox shows users its own picture-in-picture toggle. Check `pictureInPictureAvailability` rather than inferring support from the browser version.
 - On iOS, picture-in-picture is supported on iPhone and iPad through the WebKit presentation mode; the player handles this path for you.
 - The browser owns the floating window: its size, position, and built-in controls aren't yours to style.
 - The user can close the window or return the video at any time. React to `isPictureInPicture` instead of assuming your button is the only entry and exit.
@@ -81,7 +83,7 @@ Picture-in-picture and fullscreen are exclusive: requesting one exits the other 
 <FrameworkCase frameworks={["html"]}>
 - Show picture-in-picture controls only when `pictureInPictureAvailability` is `'available'`. `<media-pip-button>` handles this for you.
 - Requests must come from a user gesture; browsers reject requests outside one.
-- Firefox 153 (July 2026) added the programmatic picture-in-picture API. Earlier versions, including Firefox ESR 140, report `'unsupported'` even though they offer their own built-in picture-in-picture toggle to users.
+- [Firefox 153](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/153) (July 2026) added the programmatic picture-in-picture API on desktop. On earlier desktop versions, including Firefox ESR 140, `pictureInPictureAvailability` is `'unsupported'`, even though Firefox shows users its own picture-in-picture toggle. Check `pictureInPictureAvailability` rather than inferring support from the browser version.
 - On iOS, picture-in-picture is supported on iPhone and iPad through the WebKit presentation mode; the player handles this path for you.
 - The browser owns the floating window: its size, position, and built-in controls aren't yours to style.
 - The user can close the window or return the video at any time. React to `isPictureInPicture` instead of assuming your button is the only entry and exit.
@@ -89,25 +91,28 @@ Picture-in-picture and fullscreen are exclusive: requesting one exits the other 
 
 ## Common variations
 
-### Request picture-in-picture from app logic
+### Open picture-in-picture from your own button
 
-Enter picture-in-picture when the user scrolls the player out of view or navigates within your app. This still requires a recent user gesture in most browsers, so tie it to an interaction:
+Call `requestPictureInPicture()` directly in your button's click handler so the browser treats the request as a user gesture. The action exits fullscreen first, then uses the standard Picture-in-Picture API or Safari's presentation mode:
 
 <FrameworkCase frameworks={["react"]}>
 
 ```tsx
-import { Container } from '@videojs/react';
-import { usePlayer, Video, VideoPlayer } from '@videojs/react/video';
+import { Container, createPlayer, selectPiP } from '@videojs/react';
+import { Video, videoFeatures } from '@videojs/react/video';
+
+const { Player, usePlayer } = createPlayer({ features: videoFeatures });
 
 function WatchElsewhereButton() {
-  const store = usePlayer();
+  const pip = usePlayer(selectPiP);
+  if (pip?.pictureInPictureAvailability !== 'available') return null;
 
   return (
     <button
       type="button"
       onClick={() => {
-        store.requestPictureInPicture().catch(() => {
-          // Rejected: no video data yet, or blocked by the browser.
+        pip.requestPictureInPicture().catch(() => {
+          // Show your app's request-failed message.
         });
       }}
     >
@@ -118,12 +123,12 @@ function WatchElsewhereButton() {
 
 export default function App() {
   return (
-    <VideoPlayer>
+    <Player>
       <Container>
         <Video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4" muted playsInline />
         <WatchElsewhereButton />
       </Container>
-    </VideoPlayer>
+    </Player>
   );
 }
 ```
@@ -140,12 +145,16 @@ export default function App() {
 <button type="button" id="watch-elsewhere">Keep watching while you browse</button>
 <script type="module">
   import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
+  import { selectPiP } from '@videojs/html';
 
   document.querySelector('#watch-elsewhere').addEventListener('click', () => {
-    const video = document.querySelector('video');
-    if (typeof video.requestPictureInPicture !== 'function') return; // Unsupported.
-    video.requestPictureInPicture().catch(() => {
-      // Rejected: no video data yet, or blocked by the browser.
+    const store = document.querySelector('video-player').store;
+    const pip = selectPiP(store.state);
+    if (pip?.pictureInPictureAvailability !== 'available') return;
+
+    pip.requestPictureInPicture().catch(() => {
+      // Show your app's request-failed message.
     });
   });
 </script>
@@ -157,11 +166,11 @@ export default function App() {
 
 ### The picture-in-picture button doesn't render
 
-`pictureInPictureAvailability` is `'unsupported'` — the browser has no programmatic picture-in-picture API (Firefox before 153), or the media isn't a video.
+Check `pictureInPictureAvailability`. It is `'unavailable'` before metadata loads, and `'unsupported'` when the browser or media has no supported picture-in-picture route. Some embeds cannot enter picture-in-picture even in a browser that supports it.
 
 ### The request rejects
 
-The video has no data yet (wait for it to be ready), the call wasn't tied to a user gesture, or the browser blocked it. Handle the rejection rather than assuming entry succeeded.
+The request ran outside a user gesture, or the browser refused it. Handle the rejection. A request before metadata loads rejects with `InvalidStateError`; check `pictureInPictureAvailability` before offering your button.
 
 ### State is wrong after the user closes the floating window
 

@@ -54,16 +54,18 @@ Use <DocsLink slug="reference/components/background-video">`<background-video>`<
 ## How it works
 
 <FrameworkCase frameworks={["react"]}>
-BackgroundVideo renders the browser's `<video>` element and starts it muted, looped, autoplaying, and inline. The example puts that video and an empty-alt poster in the `.hero-visual` wrapper. The wrapper is hidden from assistive technology and ignores pointer input, so it does not act like a media player.
+BackgroundVideo renders a native `<video>` with muted, looping, inline playback. The example disables its default autoplay with `autoPlay={false}` and starts playback after checking the motion preference. The decorative wrapper contains the video and an empty-alt poster; it is hidden from assistive technology and ignores pointer input.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<background-video>` renders the browser's `<video>` element and starts it muted, looped, autoplaying, and inline. The example puts that video and an empty-alt poster in the `.hero-visual` wrapper. The wrapper is hidden from assistive technology and ignores pointer input, so it does not act like a media player.
+`<background-video>` renders a native `<video>` with muted, looping, inline playback. The example disables its default autoplay with `noautoplay` and starts playback after checking the motion preference. Its `target` property exposes the native video for `play()` and `pause()`. The decorative wrapper contains the video and an empty-alt poster; it is hidden from assistive technology and ignores pointer input.
 </FrameworkCase>
 
-The page defines the hero's size. The video fills that space with `--media-object-fit: cover`, while the poster remains visible until the video paints a frame. The reduced-motion rule hides the video and leaves the poster in place.
+The page defines the hero's size. The video fills that space with `--media-object-fit: cover`, while the poster stays behind it. The motion button pauses and hides the video, revealing the poster. It sits outside the decorative wrapper so keyboard and screen-reader users can operate it.
 
-Set the size, position, and transforms on the `.hero-visual` wrapper so the poster and video stay together.
+When `prefers-reduced-motion` is active, the script pauses playback and the CSS hides the video and motion button. CSS hiding alone does not stop playback. If the browser rejects `play()`, the example keeps the poster visible.
+
+Set size, position, and transforms on the decorative wrapper so the poster and video stay together.
 
 ## Availability and constraints
 
@@ -71,7 +73,7 @@ Set the size, position, and transforms on the `.hero-visual` wrapper so the post
 - Use a source the browser can play directly, such as MP4 or WebM.
 - Safari can play HLS URLs directly. Other browsers cannot do so reliably, so use an HLS variation below when the same `.m3u8` URL must work across browsers.
 - BackgroundVideo does not create a poster or report analytics. Keep the poster in your page and add analytics only when you need them.
-- Video.js does not apply a reduced-motion policy for you. The example stops the decoration with `prefers-reduced-motion`.
+- Provide a way to pause or hide persistent background motion. The example includes that control and follows `prefers-reduced-motion`. For the streaming variations below, stop and restart motion by mounting and unmounting the video.
 - If the video communicates information, remove `aria-hidden`, give it an accessible name and controls, and use a regular video player.
 </FrameworkCase>
 
@@ -79,7 +81,7 @@ Set the size, position, and transforms on the `.hero-visual` wrapper so the post
 - Use a source the browser can play directly, such as MP4 or WebM.
 - Safari can play HLS URLs directly. Other browsers cannot do so reliably, so use an HLS variation below when the same `.m3u8` URL must work across browsers.
 - `<background-video>` does not create a poster or report analytics. Keep the poster in your page and add analytics only when you need them.
-- Video.js does not apply a reduced-motion policy for you. The example stops the decoration with `prefers-reduced-motion`.
+- Provide a way to pause or hide persistent background motion. The example includes that control and follows `prefers-reduced-motion`. For the streaming variations below, stop and restart motion by adding and removing the element.
 - If the video communicates information, remove `aria-hidden`, give it an accessible name and controls, and use a regular video player.
 </FrameworkCase>
 
@@ -99,6 +101,16 @@ Choose a variation based on the source you already have:
 | --- | --- |
 | Cross-browser HLS with a small background-only player | <DocsLink slug="reference/components/hls-background-video">`<hls-background-video>`</DocsLink> |
 | The same background-only player for a Mux HLS URL | <DocsLink slug="reference/components/mux-background-video">`<mux-background-video>`</DocsLink> |
+</FrameworkCase>
+
+These streaming background components always autoplay. They ignore `autoPlay={false}` and `noautoplay`.
+
+<FrameworkCase frameworks={["react"]}>
+Keep the poster and motion button from the primary example. Render the streaming component only while `motionEnabled` is true, and remove the native video's `play()`/`pause()` effect. Unmounting the component stops playback; mounting it again restarts the stream.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Keep the poster and motion button from the primary example. Change `setMotion` to create and append a streaming element only when motion is enabled, and remove it when motion is disabled. Do not set `keep-alive`: removal must destroy playback. Create a new element each time motion is enabled; do not reuse the removed one. These elements expose the inner video as `video`, rather than the native background element's `target`.
 </FrameworkCase>
 
 ### Play an HLS video

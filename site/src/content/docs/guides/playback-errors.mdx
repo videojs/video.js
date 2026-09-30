@@ -14,11 +14,11 @@ Display playback failures instead of leaving a dead player, report the failure w
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Render an <DocsLink slug="reference/components/error-dialog">ErrorDialog</DocsLink> inside the player container. It reads error state, presents the failure, and dismisses cleanly. The prebuilt skins include one.
+Render an <DocsLink slug="reference/components/error-dialog">ErrorDialog</DocsLink> inside the player container. It reads error state, presents the failure, and dismisses cleanly. The packaged skins include one.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Render a <DocsLink slug="reference/components/error-dialog">`<media-error-dialog>`</DocsLink> inside the player container. It reads error state, presents the failure, and dismisses cleanly. The prebuilt skins include one.
+Render a <DocsLink slug="reference/components/error-dialog">`<media-error-dialog>`</DocsLink> inside the player container. It reads error state, presents the failure, and dismisses cleanly. The packaged skins include one.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -73,7 +73,7 @@ export default function App() {
 </script>
 ```
 
-The dialog renders its text into the child parts — a title, the error description, and a dismiss button — and fills each empty part with default copy. Write your own text inside a part to replace the default. Without the child parts, the dialog opens with nothing to show.
+The dialog shows its text through child parts: a title, the error description, and a dismiss button. Each empty part gets default copy. Write your own text inside a part to replace it. Without the child parts, the dialog opens empty.
 
 </FrameworkCase>
 
@@ -92,18 +92,26 @@ The dialog owns presentation, not recovery. Decide the next step in your applica
 - For a terminal failure, load a new or refreshed source to recover. An aborted load or an adapter-specific error may have different behavior.
 - Standard media error codes distinguish broad classes — aborted, network, decode, and source-not-supported — rather than root causes. A media adapter can report its own numeric code too.
 - Streaming engines handle recoverable segment and network failures before surfacing a terminal error. Do not layer a generic same-source retry loop on top of the engine.
-- Once the player attaches to the media element, errors land in state even before any UI renders (bad URL at mount); make sure your error surface renders regardless of playback state.
+- The feature records `error` events after attachment. An error already present on the media is not copied into state. Keep the error surface mounted regardless of playback state.
+
+<FrameworkCase frameworks={["html"]}>
+A `src` in page markup can start loading before the player script runs. To capture startup failures, omit `src` from the markup and assign it after you import the player and it attaches to the media. Check `player.store.target` to confirm attachment; if it is absent, wait for a store notification. When adopting an already loaded element, check `video.error` once and show an application message if an error is present.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Server-rendered `<Video src={...}>` can start loading before hydration and player attachment. To capture startup failures, assign the source only after attachment. Alternatively, after attachment, check the native video's `error` once through a ref and show an application message if it is already set.
+</FrameworkCase>
 
 ## Common variations
 
 ### Offer an application-specific next step
 
 <FrameworkCase frameworks={["react"]}>
-Use the error code and your product context to choose the action. A live event can link to its status page, an authenticated app can refresh an expired playback URL, and a playlist can offer the next item. Keep that action outside `ErrorDialog`; the dialog can close after your application has handled it.
+Use the error code and your product context to choose the action. A live event can link to its status page, an authenticated app can refresh an expired playback URL, and a playlist can offer the next item. Keep that action outside `ErrorDialog`; the dialog can close after your application has handled the error.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Use the error code and your product context to choose the action. A live event can link to its status page, an authenticated app can refresh an expired playback URL, and a playlist can offer the next item. Keep that action outside `<media-error-dialog>`; the dialog can close after your application has handled it.
+Use the error code and your product context to choose the action. A live event can link to its status page, an authenticated app can refresh an expired playback URL, and a playlist can offer the next item. Keep that action outside `<media-error-dialog>`; the dialog can close after your application has handled the error.
 </FrameworkCase>
 
 ### Report errors to monitoring
@@ -116,8 +124,7 @@ Place a reporter inside `VideoPlayer`, alongside the skin or your custom control
 
 ```tsx
 import { useEffect } from 'react';
-import { selectError } from '@videojs/react';
-import { usePlayer } from '@videojs/react/video';
+import { selectError, usePlayer } from '@videojs/react';
 
 function PlaybackErrorReporter({
   onError,
@@ -148,17 +155,18 @@ import { selectError } from '@videojs/html';
 const player = document.querySelector('video-player');
 if (!player) throw new Error('Missing video-player');
 
+const store = player.store;
 let previousError: { code: number; message: string } | null = null;
 
 function reportNewError() {
-  const error = selectError(player.store.state)?.error ?? null;
+  const error = selectError(store.state)?.error ?? null;
   if (error === previousError) return;
 
   previousError = error;
   if (error) console.error('Playback failed', error.code, error.message);
 }
 
-const unsubscribe = player.store.subscribe(reportNewError);
+const unsubscribe = store.subscribe(reportNewError);
 reportNewError();
 // Call unsubscribe() when this player is removed.
 ```
@@ -179,7 +187,7 @@ Not every dead player is a media error — autoplay blocking and an unset source
 
 ### A `VJS8_LEGACY_*` exception appears
 
-These codes identify Video.js 8 APIs used with the Video.js 10 `video.js` package. Look up the code in the <DocsLink slug="reference/api/error-codes">error code reference</DocsLink> for its trigger and v10 equivalent. The player `error` state covered in this guide receives media playback errors after setup.
+These codes identify Video.js 8 APIs used with the Video.js 10 `video.js` package. Look up the code in the <DocsLink slug="reference/api/error-codes">error code reference</DocsLink> for its trigger and v10 equivalent. These exceptions are separate from the player's `error` state, which receives media playback errors after setup.
 
 ### Error code says the source isn't supported
 

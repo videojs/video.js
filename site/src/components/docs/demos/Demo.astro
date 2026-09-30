@@ -1,5 +1,5 @@
 ---
-import type { BundledLanguage } from 'shiki';
+import type { BundledLanguage, SpecialLanguage } from 'shiki';
 
 import ServerCode from '@/components/Code/ServerCode.astro';
 import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs';
@@ -7,7 +7,7 @@ import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs';
 interface FileTab {
   title: string;
   code: string;
-  lang: BundledLanguage;
+  lang: BundledLanguage | SpecialLanguage;
 }
 
 interface Props {

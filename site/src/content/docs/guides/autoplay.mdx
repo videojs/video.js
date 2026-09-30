@@ -52,12 +52,12 @@ Set autoplay, muted, and inline playback on the media element, and keep a manual
 
 <FrameworkCase frameworks={["react"]}>
 
-The `autoPlay`, `muted`, and `playsInline` props on <DocsLink slug="reference/api/create-player">`Video`</DocsLink> and similar media components pass through to the underlying media element. When the media element supports them, they're applied, and playback is requested as soon as the media has enough data.
+The `autoPlay`, `muted`, and `playsInline` props on <DocsLink slug="reference/components/video">`Video`</DocsLink> and similar media components pass through to the underlying media element. The media element applies the props it supports and requests playback as soon as it has enough data.
 
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-The `autoplay`, `muted`, and `playsinline` attributes on `<video>` and similar media components pass through to the underlying media element. When the media element supports them, they're applied, and playback is requested as soon as the media has enough data.
+The `autoplay`, `muted`, and `playsinline` attributes on `<video>` and similar media components pass through to the underlying media element. The media element applies the attributes it supports and requests playback as soon as it has enough data.
 
 </FrameworkCase>
 
@@ -72,7 +72,7 @@ Calling `play()` from player state returns the native promise from the media ele
 - Muted autoplay is broadly allowed. Unmuted autoplay is blocked on first visit in most browsers; do not rely on it.
 - Without inline playback, iPhone Safari opens the video in fullscreen when playback starts.
 - Low-power mode and data-saver settings can block even muted autoplay. This is why the recommended approach keeps a manual play control.
-- Programmatic volume control is unsupported on some platforms. The <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink> exposes this as `volumeAvailability: 'available' | 'unavailable' | 'unsupported'`; iOS Safari reports `'unsupported'`, and `'unavailable'` means the feature hasn't attached to a media element yet.
+- Programmatic volume control is unsupported on some platforms. The <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink> reports support through `volumeAvailability`. It starts as `'unavailable'` before media attachment. On iOS Safari, it reports `'unsupported'`.
 - This guide applies to media components that render a video element (Video, HlsJsVideo, DashVideo, MuxVideo, and the like). Embed components (YouTube, Vimeo, TikTok, Twitch) forward autoplay to the third-party player, which applies its own autoplay rules; muted and inline behavior varies by provider.
 </FrameworkCase>
 
@@ -81,7 +81,7 @@ Calling `play()` from player state returns the native promise from the media ele
 - Muted autoplay is broadly allowed. Unmuted autoplay is blocked on first visit in most browsers; do not rely on it.
 - Without inline playback, iPhone Safari opens the video in fullscreen when playback starts.
 - Low-power mode and data-saver settings can block even muted autoplay. This is why the recommended approach keeps a manual play control.
-- Programmatic volume control is unsupported on some platforms. The <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink> exposes this as `volumeAvailability: 'available' | 'unavailable' | 'unsupported'`; iOS Safari reports `'unsupported'`, and `'unavailable'` means the feature hasn't attached to a media element yet.
+- Programmatic volume control is unsupported on some platforms. The <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink> reports support through `volumeAvailability`. It starts as `'unavailable'` before media attachment. On iOS Safari, it reports `'unsupported'`.
 - This guide applies to media components that render a video element (`<video>`, `<hlsjs-video>`, `<dash-video>`, `<mux-video>`, and the like). Embed components (YouTube, Vimeo, TikTok, Twitch) forward autoplay to the third-party player, which applies its own autoplay rules; muted and inline behavior varies by provider.
 </FrameworkCase>
 
@@ -91,49 +91,16 @@ Calling `play()` from player state returns the native promise from the media ele
 
 <FrameworkCase frameworks={["react"]}>
 
-Background video autoplays, loops, stays muted, and omits interactive controls. Use `HlsBackgroundVideo` instead of configuring these behaviors yourself: it applies them by default and streams an HLS source, picking one rendition that fits the screen for the whole session.
-
-Install the SPF adapter with the React façade:
-
-```bash
-pnpm add @videojs/react @videojs/spf
-```
-
-```tsx
-import { HlsBackgroundVideo } from '@videojs/react/media/hls-background-video';
-
-export default function Hero() {
-  return <HlsBackgroundVideo src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8" />;
-}
-```
+Use `BackgroundVideo` for an MP4 or WebM file, `HlsBackgroundVideo` for an HLS stream, or `MuxBackgroundVideo` for a complete Mux HLS URL.
 
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Background video autoplays, loops, stays muted, and omits interactive controls. Use `<hls-background-video>` instead of configuring these behaviors yourself: it applies them by default and streams an HLS source, picking one rendition that fits the screen for the whole session.
-
-Install the SPF adapter with the HTML façade:
-
-```bash
-pnpm add @videojs/html @videojs/spf
-```
-
-```html
-<hls-background-video src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"></hls-background-video>
-<script type="module">
-  import '@videojs/html/media/hls-background-video';
-</script>
-```
+Use `<background-video>` for an MP4 or WebM file, `<hls-background-video>` for an HLS stream, or `<mux-background-video>` for a complete Mux HLS URL.
 
 </FrameworkCase>
 
-<FrameworkCase frameworks={["react"]}>
-If you have a progressive MP4 or WebM file instead of an HLS stream, `BackgroundVideo` is the same component without the streaming engine. See <DocsLink slug="reference/components/background-video">BackgroundVideo</DocsLink> for opt-out props and sizing.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-If you have a progressive MP4 or WebM file instead of an HLS stream, `<background-video>` is the same component without the streaming engine. See <DocsLink slug="reference/components/background-video">`<background-video>`</DocsLink> for opt-out attributes and sizing.
-</FrameworkCase>
+These components default to muted, looping playback without player controls. Provide a separate motion control and respect reduced-motion preferences. For setup and motion controls, follow <DocsLink slug="guides/background-video">Add a background video</DocsLink>. That guide also covers streaming backgrounds, which always autoplay and need conditional mounting.
 
 ### Autoplay with sound
 
@@ -151,7 +118,7 @@ function StartPlaybackButton() {
   const store = usePlayer();
 
   return (
-    <button type="button" onClick={() => store.play()}>
+    <button type="button" onClick={() => store.play().catch(console.error)}>
       Play video
     </button>
   );
@@ -183,16 +150,17 @@ Call `play()` on the media element from a click handler:
 <button type="button" id="start">Play video</button>
 <script type="module">
   import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
 
   document.querySelector('#start').addEventListener('click', () => {
-    document.querySelector('video').play();
+    document.querySelector('video').play().catch(console.error);
   });
 </script>
 ```
 
 </FrameworkCase>
 
-Because playback starts from a user gesture, the browser allows it unmuted.
+Calling `play()` directly from the click handler lets the browser authorize unmuted playback. The promise can still reject; these examples log the rejection and leave the button available to retry. For source and decoding failures, see <DocsLink slug="guides/playback-errors">Handle playback errors</DocsLink>.
 
 ## Troubleshooting
 
@@ -222,7 +190,7 @@ Enable inline playback with the `playsinline` attribute on the media element.
 
 ### The video starts without sound
 
-Expected with muted autoplay. Let the user unmute through a <DocsLink slug="reference/components/mute-button">Mute button</DocsLink> or <DocsLink slug="reference/components/volume-slider">Volume slider</DocsLink> rather than unmuting programmatically; programmatic volume changes are unsupported on some platforms.
+Expected with muted autoplay. Give the user a <DocsLink slug="reference/components/mute-button">Mute button</DocsLink> to unmute through an explicit action. Unmuting without a user action can cause the browser to pause or block playback. A <DocsLink slug="reference/components/volume-slider">Volume slider</DocsLink> can also unmute where volume control is supported; it hides on platforms such as iOS Safari.
 
 ## Related components
 
@@ -240,5 +208,6 @@ Expected with muted autoplay. Let the user unmute through a <DocsLink slug="refe
 
 ## Related guides
 
+- <DocsLink slug="guides/background-video">Add a decorative background video</DocsLink>
 - <DocsLink slug="guides/features">Features</DocsLink>
 - <DocsLink slug="guides/browser-support">Browser support</DocsLink>

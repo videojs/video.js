@@ -14,11 +14,11 @@ Add keyboard shortcuts and pointer gestures to the player declaratively, with on
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Declare shortcuts with `Hotkey` and gestures with `Gesture` inside the player container. Each maps an input to a player action; the prebuilt skins ship a full set.
+Declare shortcuts with `Hotkey` and gestures with `Gesture` inside the player container. Each maps an input to a player action. The packaged skins include bindings suited to their player preset.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Declare shortcuts with `<media-hotkey>` and gestures with `<media-gesture>` inside the player container. Each maps an input to a player action; the prebuilt skins ship a full set.
+Declare shortcuts with `<media-hotkey>` and gestures with `<media-gesture>` inside the player container. Each maps an input to a player action. The packaged skins include bindings suited to their player preset.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -71,11 +71,9 @@ export default function App() {
 </video-player>
 <script type="module">
   import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
   import '@videojs/html/ui/hotkey';
-  import { GestureElement } from '@videojs/html';
-
-  // Gesture has no standalone define entry; register the element directly.
-  customElements.define(GestureElement.tagName, GestureElement);
+  import '@videojs/html/ui/gesture';
 </script>
 ```
 
@@ -84,41 +82,55 @@ export default function App() {
 ## How it works
 
 <FrameworkCase frameworks={["react"]}>
-- `Hotkey` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. Step actions have shared defaults and accept a custom `value`. The actions call the same feature state actions your components use.
-- `Gesture` binds pointer input — `tap` and `doubletap` — to the same actions, minus `seekToPercent` and plus `toggleControls`. Bindings are scoped by `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`) — regions split the container's width, not the rendered video's — so double-tap-left rewinds while double-tap-right skips forward.
-- `StatusAnnouncer` announces action results to screen readers, and the input indicator components render transient on-screen feedback (volume level, captions on/off) the way native players do. The prebuilt skins wire these up.
+- `Hotkey` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
+- `Gesture` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
+- `StatusAnnouncer` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
-- `<media-hotkey>` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. Step actions have shared defaults and accept a custom `value`. The actions call the same feature state actions your components use.
-- `<media-gesture>` binds pointer input — `tap` and `doubletap` — to the same actions, minus `seekToPercent` and plus `toggleControls`. Bindings are scoped by `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`) — regions split the container's width, not the rendered video's — so double-tap-left rewinds while double-tap-right skips forward.
-- `<media-status-announcer>` announces action results to screen readers, and the input indicator components render transient on-screen feedback (volume level, captions on/off) the way native players do. The prebuilt skins wire these up.
+- `<media-hotkey>` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
+- `<media-gesture>` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
+- `<media-status-announcer>` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
 
-The prebuilt skins bind the conventional set: Space and `k` toggle playback, `m` mutes, `f` fullscreens, `c` toggles captions, `i` toggles picture-in-picture, arrows seek and change volume, `j`/`l` seek in larger steps, `0`–`9` jump to a percentage, and `<`/`>` change speed.
+The on-demand video skins bind these keys:
+
+- Space and `k`: play and pause
+- `m`: mute
+- `f`: fullscreen
+- `c`: captions
+- `i`: picture-in-picture
+- Left and Right arrows, `j` and `l`: seek 10 seconds
+- Up and Down arrows: volume
+- `0`–`9`: jump to a percentage
+- `<` and `>`: speed
+
+Live video skins keep the playback, mute, volume, fullscreen, captions, and picture-in-picture shortcuts. They omit seeking and speed shortcuts.
+
+How the container splits into regions depends on which regions you bind for the same gesture type and pointer type. Left and right bindings divide the container into halves. Adding a center binding divides it into thirds. A center-only binding covers the whole container; a left-only or right-only binding covers that half. These regions use the container's width, not the rendered video's width.
 
 ## Availability and constraints
 
 - Hotkeys listen on the player container by default, so multiple players on a page don't fight over keys. Pass `target="document"` on a hotkey to make it page-wide — appropriate only when one player owns the page.
 - Typing is protected: while focus is in an editable field, single-key bindings are skipped automatically. Modifier combinations (for example `Ctrl+Shift+f`) still fire.
 - Repeatable actions (seeking, volume) fire on held keys; toggle actions don't repeat.
-- Touch tap-to-toggle-controls and tap-to-pause are mutually exclusive per pointer type — the skins pause on mouse tap and toggle controls on touch tap, matching platform conventions.
-- Gestures and the built-in touch handling coordinate through one recognizer; register gestures declaratively instead of adding raw pointer listeners next to them.
+- Use only one of `toggleControls` and `togglePaused` for tap bindings with the same pointer type. The packaged skins pause on a mouse tap and toggle controls on a touch tap, matching platform conventions.
+- Declared gestures and the built-in touch handling share one recognizer. Use the gesture components to add bindings. Extra raw pointer listeners can toggle controls twice.
 
 ## Common variations
 
 ### Customize a shortcut
 
 <FrameworkCase frameworks={["react"]}>
-Render your own `Hotkey` set instead of a skin's: every binding is just an element, so add, remove, or re-key them freely.
+For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the skin source to your project</DocsLink> and edit its `Hotkey` declarations. Adding another binding alongside the packaged skin does not replace its bindings. For a custom UI, edit your own `Hotkey` set directly.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Render your own `<media-hotkey>` set instead of a skin's: every binding is just an element, so add, remove, or re-key them freely.
+For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the skin source to your project</DocsLink> and edit its `<media-hotkey>` declarations. Adding another binding alongside the packaged skin does not replace its bindings. For a custom UI, edit your own `<media-hotkey>` set directly.
 </FrameworkCase>
 
 ### Seek step size
 
-`seekStep` takes its step from `value` — match your content: 5 seconds for short clips, 15 or 30 for long-form.
+Set the `seekStep` distance with `value`. Match it to your content: 5 seconds for short clips, 15 or 30 seconds for long-form video.
 
 ## Troubleshooting
 
@@ -128,16 +140,16 @@ Focus is outside the player container. Click the player first, or move focus int
 
 ### Double-tap seek also toggles pause
 
-Regions overlap: keep single-tap `togglePaused` on `center` only, and double-tap seek on `left` and `right`, as in the skin defaults.
+The built-in recognizer delays a matching single tap and cancels it when a double tap occurs. Check that your tap and double-tap bindings use compatible `pointer` filters. Remove separate click handlers that also toggle playback, and avoid native video controls on the same gesture surface.
 
 ### No visual feedback on keyboard actions
 
 <FrameworkCase frameworks={["react"]}>
-The input indicator components render that feedback; use a prebuilt skin or add `StatusAnnouncer` and the indicator components from the skin source to a custom UI.
+The input indicator components render that feedback; use a packaged skin or add `StatusAnnouncer` and the indicator components from the skin source to a custom UI.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The input indicator components render that feedback; use a prebuilt skin or add `<media-status-announcer>` and the indicator components from the skin source to a custom UI.
+The input indicator components render that feedback; use a packaged skin or add `<media-status-announcer>` and the indicator components from the skin source to a custom UI.
 </FrameworkCase>
 
 ## Related components
