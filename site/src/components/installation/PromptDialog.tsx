@@ -10,7 +10,7 @@ import type { PromptOption } from './promptPresentation';
 const SIZE_CLASSES = { md: 'max-w-xl', lg: 'max-w-3xl' } as const;
 
 interface Props<BodyProps extends object> {
-  /** What the choice sets, such as `Look`, which names the trigger. */
+  /** What the choice sets, such as `Skin`, which names the trigger. */
   name: string;
   value: PromptOption;
   /** Classes for the trigger, which reads like the form's other controls. */

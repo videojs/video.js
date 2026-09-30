@@ -120,7 +120,7 @@ describe('agentPromptLeftOut', () => {
   const stated = (overrides: Partial<InstallationUiSelection>) =>
     agentPromptStatedCommand(agentPromptSelection(target, picks(overrides))).options.map(({ flag }) => flag);
 
-  it('states the look and media URL, and leaves what the CLI detects or guides out', () => {
+  it('states the skin and media URL, and leaves what the CLI detects or guides out', () => {
     expect([...agentPromptLeftOut(agentPromptSelection(target, picks()))].sort()).toEqual(
       ['framework', 'media', 'method', 'packageManager', 'preset', 'project', 'styling', 'template'].sort()
     );

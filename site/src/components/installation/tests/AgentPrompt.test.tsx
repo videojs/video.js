@@ -137,20 +137,20 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('button', { name: 'Show more' })).not.toBeInTheDocument();
   });
 
-  it('shows the commands as a read-only result that states only the look and media', async () => {
+  it('shows the commands as a read-only result that states only the skin and media', async () => {
     render(<AgentPrompt route="react" framework="react" />);
 
     expect(initCommand()).toBe('`npx @videojs/cli agents init --skin default --source-url demo`');
     // Only the request asks for an answer; the rest shows its defaults under More options.
     expect(screen.queryByRole('combobox', { name: 'Goal' })).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'More options: Add a player, HTML5 Video demo, Default look, Any agent' })
+      screen.getByRole('button', { name: 'More options: Add a player, HTML5 Video demo, Default skin, Any agent' })
     ).toHaveAttribute('aria-expanded', 'false');
 
     await openOptions();
 
     expect(screen.getByRole('button', { name: 'Media: HTML5 Video demo' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Look: Default' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Skin: Default' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Agent' })).toHaveTextContent('Any agent');
   });
 
@@ -163,8 +163,8 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     act(() => useCase.set('background-video'));
 
-    // Background video has one purpose-built skin, so there is no look to choose.
-    expect(screen.queryByRole('button', { name: /^Look:/ })).not.toBeInTheDocument();
+    // Background video has one purpose-built skin, so there is no skin to choose.
+    expect(screen.queryByRole('button', { name: /^Skin:/ })).not.toBeInTheDocument();
   });
 
   it('takes the media from a pasted URL', async () => {
@@ -205,12 +205,12 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.getByRole('button', { name: 'Media: Vimeo demo' })).toBeInTheDocument();
   });
 
-  it('takes the look from the skin cards', async () => {
+  it('takes the skin from the skin cards', async () => {
     const user = userEvent.setup();
 
     render(<AgentPrompt route="react" framework="react" />);
     await openOptions(user);
-    await user.click(screen.getByRole('button', { name: 'Look: Default' }));
+    await user.click(screen.getByRole('button', { name: 'Skin: Default' }));
     await user.click(await screen.findByRole('radio', { name: /Minimal/ }, RENDER_WAIT));
 
     expect(screen.getByText('Player preview')).toBeInTheDocument();

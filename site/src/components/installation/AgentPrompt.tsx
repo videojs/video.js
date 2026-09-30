@@ -140,8 +140,8 @@ interface Props {
 
 /**
  * The AI Quickstart prompt, built from a few questions in the reader's words: the goal, what they are building, the
- * features, their media, the look, and their coding agent. The commands it shows are the result, stating only what
- * those answers decide and leaving the rest to what `agents init` detects and guides. The media and look share the
+ * features, their media, the skin, and their coding agent. The commands it shows are the result, stating only what
+ * those answers decide and leaving the rest to what `agents init` detects and guides. The media and skin share the
  * installation stores with the guide's own pickers, and a suggested request sets up the player it describes.
  */
 function AgentPrompt({ route, framework: pageFramework }: Props) {

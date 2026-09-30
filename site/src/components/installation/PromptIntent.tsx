@@ -115,7 +115,7 @@ interface Props {
   /** The media the page can play for the preset, which the menu offers and a pasted URL may pick from. */
   supportedRenderers: readonly Renderer[];
   onMediaChange: (media: Renderer) => void;
-  /** The look, or `null` for a preset with one purpose-built skin. */
+  /** The skin, or `null` for a preset with one purpose-built skin. */
   skin: SkinFlag | null;
   includeNoSkin: boolean;
   agent: SkillAgent | null;
@@ -144,7 +144,7 @@ interface Props {
 
 /**
  * The questions the prompt is built from, in the reader's words. Every answer has a default that works, so only what
- * they are building shows; the goal, features, media, look, and coding agent wait under More options, whose summary
+ * they are building shows; the goal, features, media, skin, and coding agent wait under More options, whose summary
  * shows their current values. Everything else the CLI detects from the project or guides the agent through. Opened, the
  * options stack on narrow cards, pair up in two columns on wider ones, and take three columns once the card reaches the
  * prose column's full width.
@@ -207,7 +207,7 @@ export default function PromptIntent({
     AGENT_PROMPT_GOAL_DEFINITIONS[goal].label,
     featureLabels.length > 0 ? `${featureLabels.length} ${featureLabels.length === 1 ? 'feature' : 'features'}` : null,
     mediaLabel(media, sourceUrl),
-    skin ? `${presentSkin(skin).label} look` : null,
+    skin ? `${presentSkin(skin).label} skin` : null,
     agentLabel,
   ].filter((part) => part !== null);
 
@@ -464,12 +464,12 @@ export default function PromptIntent({
               />
             </Field>
             {skin && (
-              <Field label="Look" className="@prose:order-3">
+              <Field label="Skin" className="@prose:order-3">
                 <PromptDialog
-                  name="Look"
+                  name="Skin"
                   value={presentSkin(skin)}
                   className={TRIGGER_CLASS}
-                  title="Choose the look"
+                  title="Choose your skin"
                   description="Pick how your player looks. The preview plays your media with the selected skin."
                   focusSelector='[role="radio"][aria-checked="true"]'
                   size="lg"

@@ -86,7 +86,7 @@ export const AGENT_PROMPT_SKILL_INSTRUCTIONS = [
 /**
  * Options the prompt leaves for `agents init` unless the reader chose them. The CLI detects the package manager,
  * framework, app setup, and method from the project, and its output guides the starting point, styling, preset, and
- * media. The skin and media URL are always stated, so the reader sees the look they chose and where their media goes.
+ * media. The skin and media URL are always stated, so the reader sees the skin they chose and where their media goes.
  */
 const CLI_DECIDED_OPTIONS = [
   'packageManager',
@@ -505,7 +505,7 @@ export function agentPromptPlayerPicksEqual(a: AgentPromptPlayerPicks, b: AgentP
 }
 
 /**
- * The player picks an example sets up, replacing the preset, look, media, and extensions. The reader's media URL stays
+ * The player picks an example sets up, replacing the preset, skin, media, and extensions. The reader's media URL stays
  * when its media is the one the example names, or, for an example that names none, plays in the example's preset.
  */
 export function agentPromptExamplePicks(
@@ -537,7 +537,7 @@ export function agentPromptExampleSummary(example: AgentPromptRequestExample, ap
   return formatList([
     ...(example.useCase ? [`${getInstallationPreset(example.useCase).label} player`] : []),
     ...(example.media ? [getInstallationRenderer(applied.media).label] : []),
-    ...(example.minimal ? ['Minimal look'] : []),
+    ...(example.minimal ? ['Minimal skin'] : []),
     ...applied.extensions.map((extension) => INSTALLATION_EXTENSION_DEFINITIONS[extension].label),
     ...(example.features ?? []).map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
   ]);
@@ -840,7 +840,7 @@ export function agentPromptMediaChoices({ method, useCase }: InstallationSelecti
     : renderers;
 }
 
-/** The looks the target can install: Shadcn registries always ship a skin. */
+/** The skins the target can install: Shadcn registries always ship a skin. */
 export function agentPromptSkinChoices({ method }: InstallationSelection): readonly SkinFlag[] {
   return method === 'shadcn' ? installationCompatibility.shadcn.skins : INSTALLATION_SKIN_FLAGS;
 }

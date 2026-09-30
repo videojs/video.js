@@ -48,7 +48,7 @@ export const SKILL_AGENT_OPTIONS = [
 
 const SKIN_LABELS = { default: 'Default', minimal: 'Minimal', none: 'Build my own' } satisfies Record<SkinFlag, string>;
 
-/** How the look control names a skin. */
+/** How the skin control names a skin. */
 export function presentSkin(skin: SkinFlag): PromptOption {
   return { label: SKIN_LABELS[skin], icon: <SkinIcon skin={skin} className={ICON_CLASS} /> };
 }
