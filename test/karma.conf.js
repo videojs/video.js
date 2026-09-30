@@ -27,6 +27,11 @@ module.exports = function(config) {
 
   config = generate(config, options);
 
+  if (!config.browsers || !config.browsers.length) {
+    config.browsers = ['ChromeHeadless'];
+    config.detectBrowsers.enabled = false;
+  }
+
   config.proxies = config.proxies || {};
 
   // disable warning logs for sourceset tests, by proxing to a remote host
