@@ -38,7 +38,8 @@ export const vars = {
   },
   '--media-scale-unit': {
     kind: 'public',
-    description: 'Base length used to scale fullscreen controls independently of the document root font size.',
+    description:
+      'Base length for skin spacing, icons, and text. Defaults to 16px, independent of the document root font size.',
   },
   '--media-chapter-inset-end': {
     kind: 'internal',

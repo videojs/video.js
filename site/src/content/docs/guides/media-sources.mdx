@@ -34,7 +34,7 @@ video.source = {
 ```
 </FrameworkCase>
 
-## Three tiers, three homes
+## Where source options belong
 
 The shape answers one question: does this option describe the source, or how to play it?
 
@@ -139,7 +139,7 @@ video.source = { src, engine: { hlsJs: { maxBufferLength: 60 } } }; // no-op
 ```
 </FrameworkCase>
 
-Only a change to the engine options, `preferPlayback`, or the resolved content type recreates the playback engine.
+The hls.js adapter recreates its playback engine when `source.engine`, `source.drm`, `source.preferPlayback`, or the resolved content type changes. A new URL with the same resolved type reuses the engine when those options are unchanged. dash.js and Shaka apply changes to their engine settings in place.
 
 <FrameworkCase frameworks={["html"]}>
 <Aside type="note">
@@ -157,6 +157,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 | `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
 | `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
+| `engine.shaka` | <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
 | `engine.youtube` | <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> | [YouTube player parameters](https://developer.chrome.com/docs/youtube/iframe_api_reference#Parameters) |
 | `engine.cloudflare` | <DocsLink slug="reference/components/cloudflare-video">CloudflareVideo</DocsLink> | [Stream player parameters](https://developers.cloudflare.com/stream/viewing-videos/using-the-stream-player/) |
@@ -171,6 +172,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 | `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
 | `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
+| `engine.shaka` | <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
 | `engine.youtube` | <DocsLink slug="reference/components/youtube-video">`<youtube-video>`</DocsLink> | [YouTube player parameters](https://developer.chrome.com/docs/youtube/iframe_api_reference#Parameters) |
 | `engine.cloudflare` | <DocsLink slug="reference/components/cloudflare-video">`<cloudflare-video>`</DocsLink> | [Stream player parameters](https://developers.cloudflare.com/stream/viewing-videos/using-the-stream-player/) |
@@ -209,7 +211,7 @@ video.source = {
 ```
 </FrameworkCase>
 
-dash.js takes settings on a running player, so `engine.dashJs` is applied in place and playback continues uninterrupted:
+dash.js applies `engine.dashJs` settings to the running player:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -234,6 +236,8 @@ video.source = {
 </FrameworkCase>
 
 Because `engine.dashJs` replaces rather than merges, dropping a key restores the dash.js default instead of leaving the old value behind.
+
+Shaka also applies `engine.shaka` configuration to the running player without recreating it. Dropping a key restores its default. Video.js enables `abr.restrictToElementSize` by default to limit adaptation to the player size.
 
 ### Options Video.js normalizes
 

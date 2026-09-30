@@ -13,22 +13,24 @@ Content Security Policy (CSP) limits which resources a page can load. Video.js u
 <FrameworkCase frameworks={["react"]}>
 - `media-src` must allow your media URLs.
 - `img-src` must allow any poster or thumbnail image URLs.
-- `connect-src` must allow HLS manifests, playlists, captions, and segment requests when using HLS playback.
-- `media-src blob:` is required when using the HLS player variants, which use MSE-backed playback.
-- `worker-src blob:` is required when using the `hls.js` player variants.
+- `connect-src` must allow manifests, playlists, captions, and segment requests when using HLS or DASH playback.
+- `media-src blob:` is required when your engine uses Media Source Extensions (MSE), including HLS and DASH engines.
+- `worker-src blob:` is required for hls.js workers, which are enabled by default.
 - `style-src 'unsafe-inline'` is required for some player UI.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 - `media-src` must allow your media URLs.
 - `img-src` must allow any poster or thumbnail image URLs.
-- `connect-src` must allow HLS manifests, playlists, captions, and segment requests when using HLS playback.
-- `media-src blob:` is required when using the HLS player variants, which use MSE-backed playback.
-- `worker-src blob:` is required when using the `hls.js` player variants.
+- `connect-src` must allow manifests, playlists, captions, and segment requests when using HLS or DASH playback.
+- `media-src blob:` is required when your engine uses Media Source Extensions (MSE), including HLS and DASH engines.
+- `worker-src blob:` is required for hls.js workers, which are enabled by default.
 - `style-src 'unsafe-inline'` is required for some player UI and HTML player styling behavior.
 </FrameworkCase>
 
 ## Recommended policy
+
+Start with this policy for native, HLS, and DASH playback. For embeds and Google Cast, add the provider origins below.
 
 ```http
 Content-Security-Policy:
@@ -38,11 +40,33 @@ Content-Security-Policy:
   media-src 'self' https: blob:;
   connect-src 'self' https:;
   worker-src 'self' blob:;
+  frame-src 'none';
 ```
 
-This policy assumes you bundle Video.js with your application or serve it from your own origin. If you load the player from a CDN, add that CDN's origin to `script-src`.
+This policy assumes you bundle Video.js with your application or serve it from your own origin. If you load the player from a CDN, add that CDN's origin to `script-src`. Add it to `style-src` too if you load stylesheets from that CDN.
 
-Replace broad sources such as `https:` with the exact origins your player uses. Remove sources your deployment does not need, and keep `blob:` only where your selected HLS renderer requires it.
+Replace broad sources such as `https:` with the exact origins your player uses. Remove sources your deployment does not need. Keep `media-src blob:` for engines that use MSE. Keep `worker-src blob:` for engines that create blob workers, as hls.js does by default.
+
+## Allow embeds and Google Cast
+
+Add only the origins for the providers you use. Extend `script-src` with their script origins. If a provider lists iframe origins, replace `frame-src 'none'` with those origins. A dash means the Video.js integration does not directly load that resource.
+
+| Provider | `script-src` origins | `frame-src` origins |
+| --- | --- | --- |
+| YouTube | `https://www.youtube.com` | `https://www.youtube.com` or `https://www.youtube-nocookie.com`, depending on your source URL |
+| Vimeo | — | `https://player.vimeo.com`; `https://vimeo.com` for live events |
+| Spotify | `https://open.spotify.com` | `https://open.spotify.com` |
+| TikTok | — | `https://www.tiktok.com` |
+| Twitch | — | `https://player.twitch.tv` |
+| Cloudflare | `https://embed.videodelivery.net` | `https://iframe.videodelivery.net` or your `https://customer-<code>.cloudflarestream.com` origin |
+| Google Cast | `https://www.gstatic.com` | — |
+| Wistia | `https://fast.wistia.com` and `https://fast.wistia.net` | `https://fast.wistia.com` and `https://fast.wistia.net` if the SDK falls back to an iframe |
+
+For Cloudflare, use `https://iframe.videodelivery.net` unless your source URL names a customer origin. In that case, replace `<code>` with your customer code.
+
+The Wistia SDK bundled with Video.js normally renders its player in the page and can fall back to an iframe. It loads scripts and media data from `fast.wistia.com` and `fast.wistia.net`. If you narrow `connect-src`, keep both origins.
+
+The table covers entry scripts and embed frames. Provider SDKs can request additional resources. Test your selected media under your policy, check the browser's CSP violations, and allow the exact origins those requests need.
 
 ## Related guides
 

@@ -15,15 +15,28 @@ Icons are grouped into visual sets. Each set contains the same icon names with d
 
 | Icon | React Export | HTML Export |
 | --- | --- | --- |
+| `airplay-enter` | `AirPlayEnterIcon` | `airPlayEnterIcon` |
+| `airplay-exit` | `AirPlayExitIcon` | `airPlayExitIcon` |
+| `captions-off` | `CaptionsOffIcon` | `captionsOffIcon` |
+| `captions-on` | `CaptionsOnIcon` | `captionsOnIcon` |
+| `cast-enter` | `CastEnterIcon` | `castEnterIcon` |
+| `cast-exit` | `CastExitIcon` | `castExitIcon` |
+| `check` | `CheckIcon` | `checkIcon` |
+| `chevron` | `ChevronIcon` | `chevronIcon` |
 | `fullscreen-enter` | `FullscreenEnterIcon` | `fullscreenEnterIcon` |
 | `fullscreen-exit` | `FullscreenExitIcon` | `fullscreenExitIcon` |
+| `gear` | `GearIcon` | `gearIcon` |
 | `pause` | `PauseIcon` | `pauseIcon` |
 | `pip-enter` | `PipEnterIcon` | `pipEnterIcon` |
 | `pip-exit` | `PipExitIcon` | `pipExitIcon` |
 | `play` | `PlayIcon` | `playIcon` |
+| `quality` | `QualityIcon` | `qualityIcon` |
 | `restart` | `RestartIcon` | `restartIcon` |
 | `seek` | `SeekIcon` | `seekIcon` |
+| `speech` | `SpeechIcon` | `speechIcon` |
+| `speed` | `SpeedIcon` | `speedIcon` |
 | `spinner` | `SpinnerIcon` | `spinnerIcon` |
+| `switches` | `SwitchesIcon` | `switchesIcon` |
 | `volume-high` | `VolumeHighIcon` | `volumeHighIcon` |
 | `volume-low` | `VolumeLowIcon` | `volumeLowIcon` |
 | `volume-off` | `VolumeOffIcon` | `volumeOffIcon` |

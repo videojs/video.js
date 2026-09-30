@@ -33,7 +33,7 @@ import basicUsageHtmlTs from "@/components/docs/demos/popover/html/css/BasicUsag
   ```tsx
   <Popover.Root>
     <Popover.Trigger>Open</Popover.Trigger>
-    <Popover.Popup>
+    <Popover.Popup className="popup">
       <Popover.Arrow />
       Content
     </Popover.Popup>
@@ -43,10 +43,8 @@ import basicUsageHtmlTs from "@/components/docs/demos/popover/html/css/BasicUsag
 
 <FrameworkCase frameworks={["html"]}>
   ```html
-  <media-popover>
-    <button>Open</button>
-    <div>Content</div>
-  </media-popover>
+  <button type="button" commandfor="my-popover">Open</button>
+  <media-popover id="my-popover">Content</media-popover>
   ```
 </FrameworkCase>
 
@@ -67,9 +65,11 @@ The `side` and `align` props control the preferred popup placement relative to t
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-  The `media-popover` element wraps a trigger (first child button) and
-  popup content (second child). The element manages open/close state and
-  positioning automatically.
+  `<media-popover>` is the popup. A trigger links to it through `commandfor`
+  set to the popup's `id`. If the popup has no `id`, it uses the element
+  immediately before it as the trigger. It gives the popup a generated `id`
+  and sets the trigger's `commandfor` to that value.
+  That element must not already target another popup through `commandfor`.
 </FrameworkCase>
 
 ## Styling
@@ -87,10 +87,10 @@ media-popover {
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-React renders standard DOM elements. Add a `className` to style them:
+`Popover.Popup` accepts `className`. The anatomy above uses `popup`:
 
 ```css
-.popover {
+.popup {
   --media-popover-side-offset: 8px;
   --media-popover-align-offset: 0px;
   --media-popover-boundary-offset: 8px;
@@ -102,13 +102,13 @@ Style based on open state, rendered side, and transition phases. `data-side` ref
 
 <FrameworkCase frameworks={["html"]}>
 ```css
-media-popover[data-open] .popup {
+media-popover[data-open] {
   display: block;
 }
-media-popover[data-starting-style] .popup {
+media-popover[data-starting-style] {
   opacity: 0;
 }
-media-popover[data-ending-style] .popup {
+media-popover[data-ending-style] {
   opacity: 0;
 }
 media-popover[data-side="top"] {
@@ -122,19 +122,19 @@ media-popover[data-side="bottom"] {
 
 <FrameworkCase frameworks={["react"]}>
 ```css
-.popover[data-open] .popup {
+.popup[data-open] {
   display: block;
 }
-.popover[data-starting-style] .popup {
+.popup[data-starting-style] {
   opacity: 0;
 }
-.popover[data-ending-style] .popup {
+.popup[data-ending-style] {
   opacity: 0;
 }
-.popover[data-side="top"] {
+.popup[data-side="top"] {
   transform-origin: bottom center;
 }
-.popover[data-side="bottom"] {
+.popup[data-side="bottom"] {
   transform-origin: top center;
 }
 ```
