@@ -15,7 +15,7 @@ export default styles({
         default: [
           'top-3 rounded-media-control font-medium',
           'bg-media-backdrop/25 text-media-popover-foreground surface-media after:surface-media-inset',
-          'media-opaque:bg-media-background',
+          'media-high-contrast:bg-media-background',
           'pointer-coarse:motion-media-[scale,translate,opacity]',
           'pointer-fine:motion-media-[scale,translate,filter,opacity]',
           'pointer-fine:media-transitioning:scale-media-hidden-indicator pointer-fine:media-transitioning:blur-media-hidden',
@@ -32,7 +32,7 @@ export default styles({
     content: {
       utilities: 'items-center justify-between gap-2 px-2.5 py-1',
       variants: {
-        minimal: 'media-opaque:rounded-media-control media-opaque:bg-media-background',
+        minimal: 'media-high-contrast:rounded-media-control media-high-contrast:bg-media-background',
       },
     },
   },

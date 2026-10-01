@@ -84,7 +84,7 @@ export const utilities = {
     kind: 'utility',
     description: 'Backdrop filters from the theme, for example `backdrop-filter-media-indicator`.',
   },
-  'media-opaque': { kind: 'variant', description: 'Reduced transparency or high contrast.' },
+  'media-high-contrast': { kind: 'variant', description: 'Reduced transparency or high contrast.' },
   'media-xs': { kind: 'variant', description: 'Player at or above the xs breakpoint.' },
   'media-max-xs': { kind: 'variant', description: 'Player below the xs breakpoint.' },
   'media-sm': { kind: 'variant', description: 'Player at or above the sm breakpoint.' },

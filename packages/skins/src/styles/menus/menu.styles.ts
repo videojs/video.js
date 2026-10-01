@@ -80,7 +80,7 @@ export default styles({
       utilities: ['group/menu-back-item', ...menuItem, 'mb-0.5 w-full'],
     },
     separator: {
-      utilities: 'my-1 block border-b border-media-border media-opaque:border-media-foreground/25',
+      utilities: 'my-1 block border-b border-media-border media-high-contrast:border-media-foreground/25',
       variants: { default: 'shadow-media-separator' },
     },
     hint: {

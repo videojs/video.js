@@ -110,7 +110,7 @@
 }
 
 /* Reduced transparency or high contrast. */
-@custom-variant media-opaque {
+@custom-variant media-high-contrast {
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     @slot;
   }
