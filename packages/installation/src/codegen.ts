@@ -540,12 +540,24 @@ export function generateSvelteCreateCode(
 ): SvelteCreateCode {
   const extensions = opts.extensions ?? defaultInstallationExtensions(opts.media);
   const imports = indentBlock(generateHTMLImports(opts.useCase, opts.skin, opts.media, extensions), '  ');
-  const markup = generateHTMLMarkup(opts.useCase, opts.skin, opts.media, '', extensions, '<slot />', 'stylesheet');
+  // Svelte 5 runes mode deprecates `<slot />`; the media passed between the component's tags arrives as `children`.
+  const markup = generateHTMLMarkup(
+    opts.useCase,
+    opts.skin,
+    opts.media,
+    '',
+    extensions,
+    '{@render children?.()}',
+    'stylesheet'
+  );
   const style = generateSfcPlayerStyle(opts.useCase, opts.skin);
 
   return {
     component: `<script lang="ts">
+  import type { Snippet } from 'svelte';
 ${imports}
+
+  let { children }: { children?: Snippet } = $props();
 </script>
 
 ${markup}${style ? `\n\n${style}` : ''}`,
