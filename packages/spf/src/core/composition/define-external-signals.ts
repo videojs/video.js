@@ -51,6 +51,8 @@ export function defineExternalSignals<ExternalState extends object = Empty, Exte
   ): Behavior<StateSignals<ExternalState>, ContextSignals<ExternalContext>> => ({
     stateKeys: keys.state ?? [],
     contextKeys: keys.context ?? [],
+    // Present only because `Behavior` requires a setup: declaring the keys is this behavior's whole job, and
+    // `createComposition` creates their signals without it.
     setup: () => {},
   });
 }
