@@ -2,7 +2,7 @@
 import { Font } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-import { PRODUCTION_URL, SITE_TITLE, THEME_COLORS } from '@/consts';
+import { PRERELEASE_URL, PRODUCTION_URL, SITE_TITLE, THEME_COLORS } from '@/consts';
 
 import '@/styles/globals.css';
 
@@ -86,8 +86,8 @@ const fullTitle = buildPageTitle(title, suffix);
       )
     }
 
-    {/* Analytics (production only) */}
-    {import.meta.env.PROD && <Posthog />}
+    {/* Analytics on videojs.org and the pre-release site only, so deploy previews stay out of the data */}
+    {import.meta.env.PROD && [PRODUCTION_URL.origin, PRERELEASE_URL.origin].includes(Astro.site?.origin ?? '') && <Posthog />}
 
     {/* Important stuff */}
     <slot name="priority-head" />
