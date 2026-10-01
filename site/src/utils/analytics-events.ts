@@ -6,13 +6,10 @@
  * the installation picks, is stamped on every event by `withPageContext` in `src/utils/analytics.ts`.
  */
 
-import { getInstallationPreset } from '@videojs/installation';
-
 import type { AnySupportedStyle, SupportedFramework } from '@/types/docs';
 import type { EventProperties } from '@/utils/analytics';
 import { getFrameworkPreferenceClient } from '@/utils/docs/preferences';
-import { getInstallationRouteSegment, type InstallationRouteSegment } from '@/utils/installation/routes';
-import { parseInstallationSearchForRoute, type InstallationUiSelection } from '@/utils/installation/url-state';
+import { installationContextForUrl } from '@/utils/installation/analytics-context';
 
 export const ANALYTICS_EVENTS = {
   docsPreferenceChanged: 'docs_preference_changed',
@@ -104,39 +101,10 @@ export function trackEvent<E extends AnalyticsEventName>(name: E, ...[properties
 }
 
 /**
- * The reader's installation picks as event properties, named after the guide's query parameters. Every pick is set,
- * defaults included. The source URL itself stays out; only whether one was given.
- */
-export function installationAnalyticsContext(
-  route: InstallationRouteSegment,
-  selection: InstallationUiSelection
-): EventProperties {
-  return {
-    installation_route: route,
-    installation_method: selection.installMethod,
-    installation_framework: selection.framework,
-    installation_project: selection.project,
-    installation_template: selection.template,
-    installation_preset: getInstallationPreset(selection.useCase).flag,
-    installation_skin: selection.skin,
-    installation_media: selection.media,
-    installation_extensions: selection.extensions.join(','),
-    installation_styling: selection.styling,
-    installation_custom_source: selection.sourceUrl !== '',
-  };
-}
-
-/**
  * The installation context for the current page, read from its URL the way the installation store reads it. The store
  * writes every settled pick to the URL, so an event carries the picks in place when it is sent, including a first
  * pageview sent before any picker island has loaded the store.
  */
 export function currentInstallationContext(): EventProperties {
-  const route = getInstallationRouteSegment(location.pathname);
-  if (!route) return {};
-
-  return installationAnalyticsContext(
-    route,
-    parseInstallationSearchForRoute(route, location.search, getFrameworkPreferenceClient() ?? undefined)
-  );
+  return installationContextForUrl(location.pathname, location.search, getFrameworkPreferenceClient() ?? undefined);
 }

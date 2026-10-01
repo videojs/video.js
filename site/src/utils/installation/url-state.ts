@@ -24,7 +24,7 @@ import {
   type UseCase,
 } from '@videojs/installation';
 
-import { INSTALLATION_ROUTES, type InstallationRouteSegment } from './routes';
+import { INSTALLATION_ROUTES, type InstallationRouteSegment } from './routes.ts';
 
 /**
  * The installation choices encoded in the page URL. `package-manager` controls app setup and development commands

@@ -71,6 +71,7 @@ PostHog loads only in production builds for videojs.org and the pre-release site
 - Autocaptured clicks carry `data-ph-capture-attribute-{location,cta,destination}` as event properties. Put `location` on a container (the closest ancestor wins) and `cta` or `destination` on the anchor or button. Use kebab-case and reuse existing values.
 - `src/components/typography/linkDestination.ts` classifies off-site hrefs for `destination`; `A.astro` and `renderInlineMarkdown` apply it to content links.
 - Wrap hardcoded links to Mux pages in `withMuxAttribution` from `src/utils/mux/attribution.ts` with their placement; content links get `docs-content` or `blog-content` automatically. In MDX, write links as Markdown or `<A>`, not raw `<a>`. After a build, `pnpm -F site check:link-analytics` fails on an untagged off-site or Mux link.
+- Agents read Markdown without running JavaScript, so the `agent-markdown-*` edge functions count those reads server-side through `src/utils/agent-analytics.ts`, in production only. When a Markdown route changes, update those functions' paths too.
 
 ## API references
 

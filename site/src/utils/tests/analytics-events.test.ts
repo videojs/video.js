@@ -5,12 +5,10 @@ import {
   ANALYTICS_EVENTS,
   currentInstallationContext,
   failureReason,
-  installationAnalyticsContext,
   isAgentHandoffMethod,
   reportableSearchQuery,
   trackEvent,
 } from '../analytics-events';
-import { DEFAULT_SELECTION } from '../installation/url-state';
 
 function stubPostHog(): PostHogClient {
   const posthog = { init: vi.fn(), capture: vi.fn() } satisfies PostHogClient;
@@ -78,34 +76,6 @@ describe('failureReason', () => {
   it('prefers the error code and trims a bare message', () => {
     expect(failureReason({ code: 'UNAUTHORIZED', message: 'Not signed in' })).toBe('UNAUTHORIZED');
     expect(failureReason({ message: 'x'.repeat(300) })).toHaveLength(100);
-  });
-});
-
-describe('installationAnalyticsContext', () => {
-  it('names every pick after its query parameter, defaults included', () => {
-    expect(installationAnalyticsContext('react', DEFAULT_SELECTION)).toEqual({
-      installation_route: 'react',
-      installation_method: 'pnpm',
-      installation_framework: 'react',
-      installation_project: 'existing',
-      installation_template: 'next',
-      installation_preset: expect.any(String),
-      installation_skin: 'video',
-      installation_media: 'html5-video',
-      installation_extensions: '',
-      installation_styling: null,
-      installation_custom_source: false,
-    });
-  });
-
-  it('says a source URL was given without including it', () => {
-    const context = installationAnalyticsContext('html', {
-      ...DEFAULT_SELECTION,
-      sourceUrl: 'https://secret.example.com/video.m3u8?token=abc',
-    });
-
-    expect(context.installation_custom_source).toBe(true);
-    expect(JSON.stringify(context)).not.toContain('secret.example.com');
   });
 });
 
