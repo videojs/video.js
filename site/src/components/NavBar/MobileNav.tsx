@@ -6,6 +6,7 @@ import Logo from '@/assets/logos/videojs.svg?react';
 import CompactLogo from '@/assets/logos/vjs.svg?react';
 import { AppearanceControls } from '@/components/AppearanceMenu';
 import BetaPill from '@/components/BetaPill';
+import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from '@/consts';
 
 import GetStartedLink from './GetStartedLink';
@@ -15,6 +16,7 @@ interface NavLink {
   label: string;
   matchPath: string | null;
   external?: boolean;
+  destination?: LinkDestination;
 }
 
 export interface MobileNavProps {
@@ -96,7 +98,8 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
           <div className="overflow-y-auto">
             <div className={clsx('')}>{children}</div>
             {/* Navigation links */}
-            <nav className="flex flex-col p-5">
+            {/* The popup is portaled out of the page's nav, so its links carry their own location. */}
+            <nav className="flex flex-col p-5" data-ph-capture-attribute-location="nav-mobile">
               {navLinks.map((link) => {
                 const isActive = link.matchPath && currentPath.startsWith(link.matchPath);
                 const className = clsx(
@@ -118,6 +121,7 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
                     href={link.href}
                     className={className}
                     aria-current={isActive ? 'page' : undefined}
+                    data-ph-capture-attribute-destination={link.destination}
                   >
                     {link.label} {link.external ? <ArrowUpRight className="size-4" aria-hidden="true" /> : null}
                   </a>
@@ -125,6 +129,7 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
               })}
               <a
                 href={DISCORD_INVITE_URL}
+                data-ph-capture-attribute-destination="discord"
                 className={clsx(
                   'intent:bg-hover flex items-center justify-center px-5 py-3.5 font-display uppercase font-bold text-h5 text-center border-t border-faded-black dark:border-manila-dark'
                 )}
@@ -135,6 +140,7 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
               </a>
               <a
                 href={GITHUB_REPO_URL}
+                data-ph-capture-attribute-destination="github"
                 className={clsx(
                   'intent:bg-hover flex items-center justify-center px-5 py-3.5 font-display uppercase font-bold text-h5 text-center border-t border-faded-black dark:border-manila-dark',
                   'border-b'

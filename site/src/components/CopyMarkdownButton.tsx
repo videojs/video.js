@@ -155,6 +155,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
           disabled ? 'cursor-wait' : 'cursor-pointer'
         )}
         aria-label={ariaLabel}
+        data-ph-capture-attribute-cta="copy-markdown"
       >
         {state.status === 'success' ? (
           <Check className="text-accent size-4" aria-hidden="true" />
@@ -182,6 +183,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
         <Menu.Trigger
           disabled={!isHydrated}
           aria-label="More ways to use this page"
+          data-ph-capture-attribute-cta="markdown-menu"
           className={clsx(
             segmentClass,
             '-ml-px w-8 justify-center rounded-r-lg corner-squircle data-[popup-open]:text-faded-black dark:data-[popup-open]:text-manila-light',
@@ -199,7 +201,17 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
                 'motion-reduce:transition-none'
               )}
             >
-              <Menu.Item className={itemClass} render={<a href={mdUrl} target="_blank" rel="noopener noreferrer" />}>
+              <Menu.Item
+                className={itemClass}
+                render={
+                  <a
+                    href={mdUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-ph-capture-attribute-cta="view-markdown"
+                  />
+                }
+              >
                 <Markdown className="size-4 shrink-0" aria-hidden="true" />
                 View as Markdown
               </Menu.Item>
@@ -211,6 +223,8 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
                     href={`https://chatgpt.com/?hints=search&prompt=${prompt}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-ph-capture-attribute-cta="open-in-chatgpt"
+                    data-ph-capture-attribute-destination="external"
                   />
                 }
               >
@@ -219,7 +233,15 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
               </Menu.Item>
               <Menu.Item
                 className={itemClass}
-                render={<a href={`https://claude.ai/new?q=${prompt}`} target="_blank" rel="noopener noreferrer" />}
+                render={
+                  <a
+                    href={`https://claude.ai/new?q=${prompt}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-ph-capture-attribute-cta="open-in-claude"
+                    data-ph-capture-attribute-destination="external"
+                  />
+                }
               >
                 <ClaudeLogo className="size-4 shrink-0" aria-hidden="true" />
                 Open in Claude

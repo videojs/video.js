@@ -35,6 +35,8 @@ export default function CardCheckboxGroup<T extends string = string>({
       // SAFETY: every rendered Checkbox.Root receives an option value of type T, so the group can only report T values.
       onValueChange={(newValue) => onChange(newValue as T[])}
       aria-label={ariaLabel}
+      // Every card group on the site is an installation choice.
+      data-ph-capture-attribute-location="installation-options"
       className="grid auto-rows-fr gap-3"
       style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${minColumnWidth}), 1fr))` }}
     >

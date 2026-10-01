@@ -65,6 +65,15 @@ describe('renderInlineMarkdown', () => {
     expect(result).toContain('intent:decoration-gold');
   });
 
+  it('tags off-site links with their analytics destination', () => {
+    expect(renderInlineMarkdown('[skills](https://github.com/videojs/skills)')).toContain(
+      'data-ph-capture-attribute-destination="github"'
+    );
+    expect(renderInlineMarkdown('[guide](/docs/framework/html/guides/installation)')).not.toContain(
+      'data-ph-capture-attribute-destination'
+    );
+  });
+
   it('renders unordered lists', () => {
     const result = renderInlineMarkdown('- item one\n- item two');
 

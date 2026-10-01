@@ -19,12 +19,12 @@ if (!method) throw new Error(`Unknown skill agent: ${Astro.props.agent}`);
     <>
       <P set:html={renderInlineMarkdown(step.description)} />
       {step.commands && (
-        <CodeFrame title="Terminal" lang="sh">
+        <CodeFrame title="Terminal" lang="sh" copyCta="install-agent-skill">
           <ServerCode code={step.commands.join('\n')} lang="sh" />
         </CodeFrame>
       )}
       {step.input && (
-        <CodeFrame lang="text">
+        <CodeFrame lang="text" copyCta="install-agent-skill">
           <ServerCode code={step.input} lang="text" />
         </CodeFrame>
       )}

@@ -4,8 +4,9 @@ import { useRef, useState } from 'react';
 import DialInner from '@/assets/icons/dial-inner.svg?react';
 import DialOuter from '@/assets/icons/dial-outer.svg?react';
 import GetStartedLink from '@/components/NavBar/GetStartedLink';
+import type { LinkDestination } from '@/components/typography/linkDestination';
 
-type Link = { href: string; label: string; angle: number };
+type Link = { href: string; label: string; angle: number; destination?: LinkDestination };
 
 export interface DialNavProps {
   left: [Link, Link];
@@ -55,6 +56,7 @@ export default function DialNav({ left, right }: DialNavProps) {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link)}
+              data-ph-capture-attribute-destination={link.destination}
               className={clsx(
                 'flex rounded-md corner-squircle min-w-44 items-center gap-2 px-6 py-6 text-h5 font-display-compact font-bold uppercase text-faded-black dark:text-manila-light',
                 'justify-end pr-15 -mr-12 bg-manila-50 dark:bg-black'
@@ -73,6 +75,7 @@ export default function DialNav({ left, right }: DialNavProps) {
       <DialTag
         href={left[0].href}
         onClick={(e) => handleClick(e, left[0])}
+        data-ph-capture-attribute-destination={left[0].destination}
         aria-hidden="true"
         tabIndex={-1}
         className="text-faded-black dark:text-manila-light relative z-10 h-20 w-20 shrink-0 [--fill:var(--color-manila-light)] md:h-32 md:w-32 dark:[--fill:var(--color-faded-black)]"
@@ -104,6 +107,7 @@ export default function DialNav({ left, right }: DialNavProps) {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link)}
+              data-ph-capture-attribute-destination={link.destination}
               className={clsx(
                 'flex rounded-md corner-squircle min-w-44 items-center gap-2 px-6 py-6 text-h5 font-display-compact font-bold uppercase text-faded-black dark:text-manila-light',
                 'pl-15 -ml-12 bg-manila-50 dark:bg-black'

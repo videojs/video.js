@@ -12,6 +12,7 @@ const { poster } = Astro.props;
 
 <header
   data-hero-reveal
+  data-ph-capture-attribute-location="hero"
   class="relative mx-auto mb-16 grid w-full max-w-305 grid-cols-1 px-5 pt-19 [grid-template-areas:var(--grid-template-areas)] md:mb-25 md:pt-6 md:pb-0 md:[grid-template-areas:var(--md-grid-template-areas)]"
   style="--grid-template-areas: 'title' 'description' 'video' 'mux'; --md-grid-template-areas: 'video' 'mux' 'description'"
 >
@@ -49,6 +50,7 @@ const { poster } = Astro.props;
     Video hosting sponsored by <a
       class="relative inline-flex w-11 items-center justify-center md:w-12.5"
       href={MUX_URL}
+      data-ph-capture-attribute-destination="mux"
       target="_blank"
       rel="noopener"
       aria-label="Mux"

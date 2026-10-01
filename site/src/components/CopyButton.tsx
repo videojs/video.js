@@ -14,6 +14,8 @@ export interface CopyButtonProps {
   className?: string;
   style?: React.CSSProperties;
   timeout?: number;
+  /** PostHog `cta` autocapture property for the button. */
+  cta?: string;
 }
 
 /** Read the target's text without UI chrome such as a code frame's "Show more" control. */
@@ -34,6 +36,7 @@ export default function CopyButton({
   className,
   style,
   timeout = 2000,
+  cta,
 }: CopyButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -97,6 +100,7 @@ export default function CopyButton({
         className={className}
         style={style}
         aria-label={isCopied ? 'Copied' : 'Copy to clipboard'}
+        data-ph-capture-attribute-cta={cta}
       >
         {isCopied ? copiedContent : children}
       </button>

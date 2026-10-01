@@ -1,5 +1,6 @@
 import { Marked, type MarkedExtension, type Tokens } from 'marked';
 
+import { getLinkDestination } from '@/components/typography/linkDestination';
 import { shared } from '@/components/typography/styles';
 import { twMerge } from '@/utils/twMerge';
 
@@ -60,7 +61,10 @@ const renderer: MarkedExtension['renderer'] = {
   },
 
   link({ href, tokens }) {
-    return `<a href="${href}" class="${classes.a}">${this.parser.parseInline(tokens)}</a>`;
+    const destination = getLinkDestination(href);
+    const destinationAttribute = destination ? ` data-ph-capture-attribute-destination="${destination}"` : '';
+
+    return `<a href="${href}" class="${classes.a}"${destinationAttribute}>${this.parser.parseInline(tokens)}</a>`;
   },
 
   // --- Unsupported elements — downgrade or suppress ---

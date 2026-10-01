@@ -2,6 +2,7 @@
 import type { HTMLTag, Polymorphic } from 'astro/types';
 import { twMerge } from '@/utils/twMerge';
 
+import { getLinkDestination } from './linkDestination';
 import { shared } from './styles';
 
 type Props<Tag extends HTMLTag = 'a'> = Polymorphic<{ as: Tag }> & {
@@ -9,6 +10,7 @@ type Props<Tag extends HTMLTag = 'a'> = Polymorphic<{ as: Tag }> & {
 };
 
 const { as: Tag = 'a', class: className, ...props } = Astro.props;
+const destination = Tag === 'a' ? getLinkDestination(props.href) : undefined;
 ---
 
-<Tag class={twMerge(shared.a, className)} {...props}><slot /></Tag>
+<Tag class={twMerge(shared.a, className)} data-ph-capture-attribute-destination={destination} {...props}><slot /></Tag>

@@ -9,12 +9,22 @@ const tiles = [
   {
     title: 'Community Support',
     body: 'No promises or guarantees.',
-    cta: { label: 'Submit an issue', href: `${GITHUB_REPO_URL}issues/new/choose` },
+    cta: {
+      label: 'Submit an issue',
+      href: `${GITHUB_REPO_URL}issues/new/choose`,
+      id: 'submit-issue',
+      destination: 'github',
+    },
   },
   {
     title: 'Contribute',
     body: "We're excited to help you!",
-    cta: { label: 'Check out the docs.', href: `${GITHUB_REPO_URL}blob/main/CONTRIBUTING.md` },
+    cta: {
+      label: 'Check out the docs.',
+      href: `${GITHUB_REPO_URL}blob/main/CONTRIBUTING.md`,
+      id: 'contributing-guide',
+      destination: 'github',
+    },
   },
   {
     title: 'Offer a Bounty',
@@ -27,6 +37,8 @@ const tiles = [
     cta: {
       label: 'Get in touch',
       href: MUX_SUPPORT_URL,
+      id: 'sales-contact',
+      destination: 'mux',
     },
   },
 ] as const;
@@ -40,6 +52,7 @@ const tiles = [
   <main
     id="main-content"
     class="mx-auto w-full max-w-305 px-5 pt-10 pb-20 md:pt-20"
+    data-ph-capture-attribute-location="support-page"
   >
     <header
       class="mb-12 border-y border-faded-black py-4 dark:border-manila-light"
@@ -74,6 +87,8 @@ const tiles = [
             {"href" in tile.cta ? (
               <a
                 href={tile.cta.href}
+                data-ph-capture-attribute-cta={tile.cta.id}
+                data-ph-capture-attribute-destination={tile.cta.destination}
                 target="_blank"
                 rel="noopener"
                 class="mt-5 inline-flex items-center gap-1 self-end rounded-md corner-squircle border border-manila-75 bg-manila-50 px-4 py-2.5 text-p3 dark:border-line dark:bg-warm-gray intent:bg-hover"

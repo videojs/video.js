@@ -3,6 +3,7 @@ import ArrowUpRight from '@/assets/icons/arrow-up-right.svg?react';
 import Discord from '@/assets/logos/discord.svg?react';
 import GitHub from '@/assets/logos/github.svg?react';
 import LogoMonoVersion from '@/assets/logos/videojs-mono.svg?react';
+import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL, MUX_URL } from '@/consts';
 import GetStartedLink from './NavBar/GetStartedLink';
 
@@ -10,12 +11,13 @@ type NavLink = {
   href: string;
   label: string;
   external?: boolean;
+  destination?: LinkDestination;
 };
 const navLinks: NavLink[] = [
-  { href: '/blog', label: 'Blog' },
+  { href: '/blog', label: 'Blog', destination: 'blog' },
   { href: '/changelog', label: 'Changelog' },
   { href: '/privacy', label: 'Privacy' },
-  { href: 'https://legacy.videojs.org', label: 'V8', external: true },
+  { href: 'https://legacy.videojs.org', label: 'V8', external: true, destination: 'external' },
 ];
 
 type Props = {
@@ -25,6 +27,7 @@ const { class: className } = Astro.props;
 ---
 
 <footer
+  data-ph-capture-attribute-location="footer"
   class:list={[
     "mx-auto mt-30 grid w-full max-w-305 gap-3 px-5 pb-11 md:mt-32 md:pt-0",
     className,
@@ -49,6 +52,7 @@ const { class: className } = Astro.props;
           navLinks.map((link) => (
             <a
               href={link.href}
+              data-ph-capture-attribute-destination={link.destination}
               class="flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:px-5 intent:bg-hover"
             >
               {link.label}{" "}
@@ -62,6 +66,7 @@ const { class: className } = Astro.props;
         <span class="hidden md:flex">
           <a
             href={DISCORD_INVITE_URL}
+            data-ph-capture-attribute-destination="discord"
             class="flex items-center rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:px-5 intent:bg-hover"
             aria-label="Discord"
             target="_blank"
@@ -71,6 +76,7 @@ const { class: className } = Astro.props;
           </a>
           <a
             href={GITHUB_REPO_URL}
+            data-ph-capture-attribute-destination="github"
             class="flex items-center rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:px-5 intent:bg-hover"
             aria-label="GitHub"
             target="_blank"
@@ -86,6 +92,7 @@ const { class: className } = Astro.props;
         {/* Narrow viewports: icons keep their own row below the link block */}
         <a
           href={DISCORD_INVITE_URL}
+          data-ph-capture-attribute-destination="discord"
           class="flex items-center rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:hidden intent:bg-hover"
           aria-label="Discord"
           target="_blank"
@@ -95,6 +102,7 @@ const { class: className } = Astro.props;
         </a>
         <a
           href={GITHUB_REPO_URL}
+          data-ph-capture-attribute-destination="github"
           class="flex items-center rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:hidden intent:bg-hover"
           aria-label="GitHub"
           target="_blank"
@@ -121,6 +129,7 @@ const { class: className } = Astro.props;
         <br />
         Video hosting and streaming <a
           href={MUX_URL}
+          data-ph-capture-attribute-destination="mux"
           class="underline intent:decoration-gold"
           >sponsored by Mux
         </a>

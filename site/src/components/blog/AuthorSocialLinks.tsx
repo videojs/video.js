@@ -7,6 +7,7 @@ import Linkedin from '@/assets/logos/brands/linkedin.svg?react';
 import Twitter from '@/assets/logos/brands/x-twitter.svg?react';
 
 import { Tooltip, TooltipProvider } from '../Tooltip';
+import { getLinkDestination } from '../typography/linkDestination';
 
 interface SocialLinks {
   website?: string;
@@ -70,6 +71,7 @@ export function AuthorSocialLinks({ socialLinks, className }: AuthorSocialLinksP
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${config.label} profile`}
+                  data-ph-capture-attribute-destination={getLinkDestination(url)}
                   className="intent:text-warm-gray dark:intent:text-manila-50 corner-squircle inline-flex items-center justify-center rounded-md p-2"
                 >
                   <Icon className="size-4" aria-hidden="true" />

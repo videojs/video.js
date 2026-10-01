@@ -148,6 +148,7 @@ function InstallationMethodNavClient({ currentFramework, route }: Props) {
     <nav
       aria-label="Installation method"
       data-installation-method-nav
+      data-ph-capture-attribute-location="installation-method-nav"
       data-shadcn-installation-method-nav={route === 'shadcn' ? '' : undefined}
       className="mx-auto mt-5 mb-12 grid w-full max-w-3xl auto-rows-fr gap-3 sm:grid-cols-3"
     >

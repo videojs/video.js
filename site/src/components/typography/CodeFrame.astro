@@ -9,15 +9,17 @@ import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs.tsx';
 interface Props {
   title?: string;
   lang?: string;
+  /** PostHog `cta` autocapture property for the copy button; defaults to `copy-code`. */
+  copyCta?: string;
 }
 
-const { title, lang } = Astro.props;
+const { title, lang, copyCta } = Astro.props;
 const label = title || lang || 'code';
 const value = 'code';
 ---
 
 <TabsRoot client:idle>
-  <TabsList client:idle label={`${label} code`}>
+  <TabsList client:idle label={`${label} code`} copyCta={copyCta}>
     <Tab client:idle value={value} initial>{label}</Tab>
   </TabsList>
   <TabsPanel client:idle value={value} initial>

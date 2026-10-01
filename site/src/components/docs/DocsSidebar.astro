@@ -74,7 +74,10 @@ const TAB_ICONS = {
 } satisfies Record<string, typeof BookIcon>;
 ---
 
-<div class={clsx("bg-manila-light dark:bg-faded-black", className)}>
+<div
+  class={clsx("bg-manila-light dark:bg-faded-black", className)}
+  data-ph-capture-attribute-location="docs-sidebar"
+>
   <slot />
   {
     tabs.length > 1 && (

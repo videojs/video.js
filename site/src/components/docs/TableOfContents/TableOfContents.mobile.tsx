@@ -87,6 +87,7 @@ export function TableOfContentsMobile({ headings, activeId, onNavigate, classNam
       <Popover.Trigger
         ref={triggerRef}
         aria-label="On this page"
+        data-ph-capture-attribute-location="docs-toc"
         className={clsx(
           'fixed left-0 z-20 flex min-h-6 w-6 items-center justify-start intent:text-manila-dark md:left-70 dark:intent:text-manila-dark lg:left-75',
           open ? 'text-manila-dark dark:text-manila-dark' : 'text-manila-75 dark:text-warm-gray',

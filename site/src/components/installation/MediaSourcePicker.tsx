@@ -137,7 +137,7 @@ function MediaSourcePicker({ supportedRenderers }: Props) {
   const showNoMatch = hasUrl && !sourceRenderer;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8" data-ph-capture-attribute-location="installation-options">
       <div className="flex flex-col gap-2">
         <label htmlFor="source-url-input" className="text-p3 font-semibold">
           Paste a media URL to detect its source type

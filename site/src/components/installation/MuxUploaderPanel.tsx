@@ -166,7 +166,10 @@ export default function MuxUploaderPanel() {
   }, []);
 
   return (
-    <div className="corner-squircle border-line-strong bg-surface relative isolate w-full overflow-hidden rounded-xl border border-dashed">
+    <div
+      className="corner-squircle border-line-strong bg-surface relative isolate w-full overflow-hidden rounded-xl border border-dashed"
+      data-ph-capture-attribute-location="mux-uploader"
+    >
       <MuxUploader
         // @ts-expect-error — MuxUploaderElement type not hoisted by pnpm; only used for dispatchEvent
         ref={uploaderRef}
@@ -203,6 +206,7 @@ export default function MuxUploaderPanel() {
         <MuxUploaderFileSelect muxUploader="mux-uploader">
           <button
             type="button"
+            data-ph-capture-attribute-cta="mux-select-file"
             className="bg-faded-black text-manila-light dark:bg-manila-light dark:text-faded-black text-p3 intent:bg-accent intent:text-faded-black corner-squircle inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg px-5 font-semibold shadow-sm transition select-none"
           >
             Select a file
@@ -215,6 +219,7 @@ export default function MuxUploaderPanel() {
           Powered by{' '}
           <a
             href={MUX_URL}
+            data-ph-capture-attribute-destination="mux"
             target="_blank"
             rel="noopener"
             aria-label="Mux"

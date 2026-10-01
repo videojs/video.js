@@ -8,6 +8,7 @@ import CompactLogo from '@/assets/logos/vjs.svg?react';
 import AppearanceMenu from '@/components/AppearanceMenu';
 import BetaPill from '@/components/BetaPill';
 import Search from '@/components/Search';
+import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL, VJS10_VERSION } from '@/consts';
 import GetStartedLink from './GetStartedLink';
 import MobileNav from './MobileNav';
@@ -21,10 +22,11 @@ type NavLink = {
   label: string;
   matchPath: string | null;
   external?: boolean;
+  destination?: LinkDestination;
 };
 const navLinks: NavLink[] = [
   { href: '/docs', label: 'Docs', matchPath: '/docs' },
-  { href: '/blog', label: 'Blog', matchPath: '/blog' },
+  { href: '/blog', label: 'Blog', matchPath: '/blog', destination: 'blog' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -35,6 +37,7 @@ const { class: className } = Astro.props;
 
 <nav
   aria-label="Video.js"
+  data-ph-capture-attribute-location="nav-docs"
   class:list={[
     "sticky top-(--banner-height) z-30 mx-auto flex w-full items-center justify-between border-b border-b-manila-75 bg-manila-light px-5 dark:border-line dark:bg-faded-black",
     className,
@@ -68,6 +71,7 @@ const { class: className } = Astro.props;
       otherNavLinks.map((link) => (
         <a
           href={link.href}
+          data-ph-capture-attribute-destination={link.destination}
           class:list={[
             "flex items-center rounded-md corner-squircle px-5 py-2 font-display text-h3 uppercase intent:bg-hover",
           ]}
@@ -82,6 +86,7 @@ const { class: className } = Astro.props;
     <AppearanceMenu client:idle className="self-center" />
     <a
       href={DISCORD_INVITE_URL}
+      data-ph-capture-attribute-destination="discord"
       class={clsx(
         "flex size-10 self-center items-center justify-center rounded-md corner-squircle intent:bg-hover",
       )}
@@ -93,6 +98,7 @@ const { class: className } = Astro.props;
     </a>
     <a
       href={GITHUB_REPO_URL}
+      data-ph-capture-attribute-destination="github"
       class={clsx(
         "flex size-10 self-center items-center justify-center rounded-md corner-squircle intent:bg-hover",
       )}

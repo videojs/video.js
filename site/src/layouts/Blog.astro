@@ -14,6 +14,7 @@ interface Props {
 }
 
 const { title, description, canonical, image, twitterImage } = Astro.props;
+const analyticsLocation = Astro.url.pathname.startsWith('/changelog') ? 'changelog' : 'blog';
 ---
 
 <Base
@@ -27,7 +28,11 @@ const { title, description, canonical, image, twitterImage } = Astro.props;
   <slot name="head" slot="head" />
   <div class="flex min-h-screen flex-col">
     <NavBar />
-    <main id="main-content" class="mt-10 px-6 pb-20 md:mt-20 md:px-10 md:pb-30">
+    <main
+      id="main-content"
+      class="mt-10 px-6 pb-20 md:mt-20 md:px-10 md:pb-30"
+      data-ph-capture-attribute-location={analyticsLocation}
+    >
       <slot />
     </main>
     <Footer class="mt-auto" />

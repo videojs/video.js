@@ -65,8 +65,10 @@ interface TabsListProps {
   label: string;
   children: React.ReactNode;
   variant?: TabsVariant;
+  /** PostHog `cta` autocapture property for the copy button. */
+  copyCta?: string;
 }
-export function TabsList({ label, children, variant = 'compact' }: TabsListProps) {
+export function TabsList({ label, children, variant = 'compact', copyCta = 'copy-code' }: TabsListProps) {
   return (
     <div
       className={clsx(
@@ -99,6 +101,7 @@ export function TabsList({ label, children, variant = 'compact' }: TabsListProps
             : 'intent:bg-hover'
         )}
         copied={<Check className="text-gold size-4" />}
+        cta={copyCta}
       >
         <CopyIcon className="size-4" />
       </CopyButton>

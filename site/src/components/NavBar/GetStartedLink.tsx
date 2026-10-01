@@ -15,7 +15,7 @@ export default function GetStartedLink({ children, ...props }: GetStartedLinkPro
   const href = resolveDocsHref({ slug: null, framework: isHydrated ? framework : null });
 
   return (
-    <a {...props} href={href}>
+    <a data-ph-capture-attribute-destination="docs" {...props} href={href}>
       {children}
     </a>
   );

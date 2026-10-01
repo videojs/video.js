@@ -46,6 +46,8 @@ export default function CardRadioGroup<T extends string = string>({
       // SAFETY: every rendered Radio.Root receives an option value of type T, so the group can only report one back.
       onValueChange={(newValue) => onChange(newValue as T)}
       aria-label={ariaLabel}
+      // Every card group on the site is an installation choice.
+      data-ph-capture-attribute-location="installation-options"
       className={twMerge(clsx('grid auto-rows-fr gap-3'), className)}
       style={{ gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${minColumnWidth}), 1fr))` }}
     >

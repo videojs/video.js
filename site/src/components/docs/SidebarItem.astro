@@ -1,6 +1,7 @@
 ---
 import ArrowUpRight from '@/assets/icons/arrow-up-right.svg?react';
 import ApiStabilityBadge from '@/components/docs/ApiStabilityBadge.astro';
+import { getLinkDestination } from '@/components/typography/linkDestination';
 import type { DocStability, SidebarItem as SidebarItemType, SupportedFramework } from '@/types/docs';
 import { isLink, isSection } from '@/types/docs';
 import { buildDocsUrl, isDocsGuideActive } from '@/utils/docs/routing';
@@ -85,6 +86,7 @@ const linkClass = [
       class:list={linkClass}
       style={`padding-left: calc(var(--spacing) * ${depth * 4})`}
       href={item.href}
+      data-ph-capture-attribute-destination={getLinkDestination(item.href)}
     >
       {item.devOnly ? "[Dev only] " : ""}
       <span class="min-w-0 flex-1">{item.sidebarLabel}</span>
