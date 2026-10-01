@@ -217,6 +217,7 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
     <div
       className="corner-squircle border-line bg-surface @container mx-auto my-6 max-w-3xl overflow-hidden rounded-xl border shadow-xs"
       data-agent-prompt-card
+      data-ph-capture-attribute-location="agent-prompt"
       ref={cardRef}
     >
       <PromptIntent

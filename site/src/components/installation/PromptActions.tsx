@@ -14,6 +14,7 @@ import {
   MENU_POPUP_CLASS,
   MENU_SEPARATOR_CLASS,
 } from '@/components/menuClasses';
+import { ANALYTICS_EVENTS, type AgentHandoffMethod, trackEvent } from '@/utils/analytics-events';
 import { agentPromptOpenUrl, agentPromptShellCommand, type AgentPromptCli } from '@/utils/installation/agent-prompt';
 import useIsHydrated from '@/utils/useIsHydrated';
 
@@ -38,10 +39,10 @@ const TERMINAL_COPIES: readonly { cli: AgentPromptCli; label: string; icon: Reac
   { cli: 'cursor', label: 'Copy for Cursor', icon: <CursorLogo className="size-4" /> },
 ];
 
-const OPEN_LINKS: readonly { app: OpenApp; label: string; icon: ReactNode }[] = [
-  { app: 'cursor', label: 'Open in Cursor', icon: <CursorLogo className="size-4" /> },
-  { app: 'claude', label: 'Open in Claude', icon: <ClaudeLogo className="size-4" /> },
-  { app: 'chatgpt', label: 'Open in ChatGPT', icon: <OpenAiLogo className="size-4" /> },
+const OPEN_LINKS: readonly { app: OpenApp; label: string; icon: ReactNode; method: AgentHandoffMethod }[] = [
+  { app: 'cursor', label: 'Open in Cursor', icon: <CursorLogo className="size-4" />, method: 'open-in-cursor' },
+  { app: 'claude', label: 'Open in Claude', icon: <ClaudeLogo className="size-4" />, method: 'open-in-claude' },
+  { app: 'chatgpt', label: 'Open in ChatGPT', icon: <OpenAiLogo className="size-4" />, method: 'open-in-chatgpt' },
 ];
 
 const segmentClass = clsx(
@@ -88,6 +89,16 @@ export default function PromptActions({ text }: Props) {
 
     setStatus({ target, copied });
     clearTimeout(timer.current);
+
+    // A copied prompt counts like the docs' other copied code; either copy hands the prompt to an agent.
+    if (copied && target === 'prompt') trackEvent(ANALYTICS_EVENTS.codeCopied, { block: 'agent-prompt' });
+
+    if (copied) {
+      trackEvent(ANALYTICS_EVENTS.agentHandoff, {
+        method: target === 'prompt' ? 'copy-agent-prompt' : 'copy-agent-command',
+      });
+    }
+
     timer.current = setTimeout(() => setStatus(null), COPY_STATUS_DURATION);
   }
 
@@ -103,6 +114,7 @@ export default function PromptActions({ text }: Props) {
         // The live region below announces the copy, so the name stays put for readers returning to the button.
         aria-label="Copy prompt"
         onClick={() => void copy('prompt', text)}
+        data-ph-capture-attribute-cta="copy-agent-prompt"
         className={clsx(segmentClass, 'corner-squircle cursor-pointer gap-1.5 rounded-l-lg px-3')}
       >
         {promptStatus?.copied ? (
@@ -146,6 +158,7 @@ export default function PromptActions({ text }: Props) {
                     key={cli}
                     className={MENU_ITEM_CLASS}
                     onClick={() => void copy(cli, agentPromptShellCommand(cli, text))}
+                    data-ph-capture-attribute-cta="copy-agent-command"
                   >
                     <ItemIcon>{icon}</ItemIcon>
                     {label}
@@ -155,7 +168,7 @@ export default function PromptActions({ text }: Props) {
               <Menu.Separator className={MENU_SEPARATOR_CLASS} />
               <Menu.Group>
                 <Menu.GroupLabel className={MENU_GROUP_LABEL_CLASS}>Open in an app</Menu.GroupLabel>
-                {OPEN_LINKS.map(({ app, label, icon }) => (
+                {OPEN_LINKS.map(({ app, label, icon, method }) => (
                   <Menu.LinkItem
                     key={app}
                     className={MENU_ITEM_CLASS}
@@ -163,6 +176,9 @@ export default function PromptActions({ text }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     closeOnClick
+                    onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method })}
+                    data-ph-capture-attribute-cta={method}
+                    data-ph-capture-attribute-destination="external"
                   >
                     <ItemIcon>{icon}</ItemIcon>
                     {label}

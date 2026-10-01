@@ -385,6 +385,22 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(copySelection()).toHaveBeenCalledWith('text/plain', copied);
   });
 
+  it('reports a copied prompt and a copied terminal command as agent handoffs', async () => {
+    const user = userEvent.setup();
+    const posthog = { init: vi.fn(), capture: vi.fn() };
+
+    window.posthog = posthog;
+    render(<AgentPrompt route="react" framework="react" />);
+    await user.click(screen.getByRole('button', { name: 'Copy prompt' }));
+    await user.click(screen.getByRole('button', { name: 'More prompt actions' }));
+    await user.click(await screen.findByRole('menuitem', { name: /Copy for Codex/ }, RENDER_WAIT));
+
+    expect(posthog.capture).toHaveBeenCalledWith('code_copied', { block: 'agent-prompt' });
+    expect(posthog.capture).toHaveBeenCalledWith('agent_handoff', { method: 'copy-agent-prompt' });
+    expect(posthog.capture).toHaveBeenCalledWith('agent_handoff', { method: 'copy-agent-command' });
+    delete window.posthog;
+  });
+
   it('hands the prompt to a coding agent', async () => {
     const user = userEvent.setup();
 
