@@ -158,6 +158,8 @@ const PLATFORM_VIDEO_RENDERERS = [
 ] as const satisfies readonly Renderer[];
 const PLATFORM_AUDIO_RENDERERS = ['spotify'] as const satisfies readonly Renderer[];
 
+const COMPAT_SKIN: string = 'compat';
+
 function unique<Choice extends string>(values: readonly Choice[]): Choice[] {
   return [...new Set(values)];
 }
@@ -170,7 +172,11 @@ export function installationDecisionOrderFor(
   const skinlessGuidance =
     methods.length === 1 && methods[0] === 'shadcn'
       ? ''
-      : `Use none only when the project builds its own controls${methods.includes('shadcn') ? ', which Shadcn does not support' : ''}. `;
+      : `When it builds its own design, use none and build the controls from components${methods.includes('shadcn') ? ', which Shadcn does not support' : ''}. `;
+  // The skin that trades features for broad browser support, offered once the skins include it.
+  const compatGuidance = INSTALLATION_SKIN_FLAGS.some((flag) => flag === COMPAT_SKIN)
+    ? `When the player must work in older browsers, use ${COMPAT_SKIN}, which keeps fewer features. `
+    : '';
   const methodGuidance =
     methods.length === 1
       ? methods[0] === 'packaged'
@@ -215,7 +221,7 @@ export function installationDecisionOrderFor(
     },
     {
       title: 'Choose the skin',
-      guidance: `Use default unless the request asks for a minimal, cleaner, or more subtle look, which uses neutral; both contain the same controls. ${skinlessGuidance}Ask only when those signals conflict.`,
+      guidance: `Decide whether the project applies its brand to our design or builds its own. When it applies its brand, or asks for a minimal, cleaner, or more subtle look, use neutral: an opinionated design that's easy to brand. ${skinlessGuidance}When either works or the request doesn't say, use default, the distinctly Video.js design; default and neutral contain the same controls. ${compatGuidance}Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the media',

@@ -96,7 +96,11 @@ describe('installationDecisionOrderFor', () => {
 
     expect(guidance('Choose the player')).toMatch(/^Use video unless the request signals another experience/);
     expect(guidance('Choose the player')).toContain('Ask only when those signals conflict.');
-    expect(guidance('Choose the skin')).toMatch(/^Use default unless the request asks for a minimal/);
+    expect(guidance('Choose the skin')).toMatch(
+      /^Decide whether the project applies its brand to our design or builds its own/
+    );
+    expect(guidance('Choose the skin')).toContain('use neutral');
+    expect(guidance('Choose the skin')).toContain('use default, the distinctly Video.js design');
     expect(guidance('Choose the skin')).toContain('which Shadcn does not support');
     expect(shadcn.find(({ title }) => title === 'Choose the skin')?.guidance).not.toContain('none');
   });
