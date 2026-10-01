@@ -11,10 +11,10 @@ import {
   type SvtaError,
 } from '../../../media/errors';
 import {
-  type BackgroundVideoEngineConfig,
-  type BackgroundVideoEngineContext,
-  type BackgroundVideoEngineState,
-  createBackgroundVideoEngine,
+  type EngineConfig,
+  type EngineContext,
+  type EngineState,
+  createEngine,
 } from '../../engines/hls/engine-background-video';
 import { UNPLAYABLE_SOURCE_MESSAGE } from '../../primitives/error-messages';
 import { firstFatal, type HlsVideoMediaError, hasUnsupportedFeatureCause } from '../hls-video/error-surface';
@@ -26,8 +26,8 @@ export type { HlsVideoMediaError } from '../hls-video/error-surface';
 
 /** What `new HlsBackgroundVideoAdapter(options)` accepts; see `HlsVideoAdapterOptions` for why it is typed here. */
 export interface HlsBackgroundVideoAdapterOptions {
-  /** Engine config forwarded to `createBackgroundVideoEngine`. */
-  config?: BackgroundVideoEngineConfig;
+  /** Engine config forwarded to `createEngine`. */
+  config?: EngineConfig;
 }
 
 export interface HlsBackgroundVideoAdapterProps {
@@ -35,7 +35,7 @@ export interface HlsBackgroundVideoAdapterProps {
 }
 
 export interface HlsBackgroundVideoAdapterAPI extends HlsBackgroundVideoAdapterProps {
-  readonly engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
+  readonly engine: Composition<EngineState, EngineContext>;
   readonly error: HlsVideoMediaError | null;
   attach(mediaElement: HTMLMediaElement): void;
   detach(): void;
@@ -113,8 +113,8 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       src: '',
     };
 
-    #engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
-    #config: BackgroundVideoEngineConfig;
+    #engine: Composition<EngineState, EngineContext>;
+    #config: EngineConfig;
     #error: HlsVideoMediaError | null = null;
     /**
      * The _reported_ condition currently surfaced, which is what the re-fire latch keys on. Not `#error.code`: that's
@@ -145,7 +145,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       });
     }
 
-    get engine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    get engine(): Composition<EngineState, EngineContext> {
       return this.#engine;
     }
 
@@ -286,11 +286,11 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // Private
     // -------------------------------------------------------------------------
 
-    #createEngine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    #createEngine(): Composition<EngineState, EngineContext> {
       // No selection config of its own: the engine's default rule chain already
       // narrows to the largest rendition that fits the screen, which is exactly
       // what this adapter used to hand over as a bespoke picker.
-      return createBackgroundVideoEngine(this.#config);
+      return createEngine(this.#config);
     }
 
     #cancelPendingPlay(): void {

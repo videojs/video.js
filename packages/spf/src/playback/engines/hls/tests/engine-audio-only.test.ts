@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { snapshot } from '../../../../core/signals/primitives';
 import type { Presentation } from '../../../../media/types';
-import { createHlsAudioEngine } from '../engine-audio-only';
+import { createEngine } from '../engine-audio-only';
 
 // Mock appendSegment to succeed without real MP4 data
 vi.mock('../../../../media/dom/mse/append-segment', () => ({
@@ -22,7 +22,7 @@ function unmockedFetchFallback(url: string): Promise<Response> {
   return Promise.reject(new Error(`Unmocked URL: ${url}`));
 }
 
-describe('createHlsAudioEngine', () => {
+describe('createEngine', () => {
   let originalFetch: typeof globalThis.fetch;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
@@ -55,7 +55,7 @@ describe('createHlsAudioEngine', () => {
   });
 
   it('exposes userAudioTrackSelection slot for multi-language-audio Tier 2 writes', async () => {
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const tracks = ['en', 'es'].map((language) => ({
       type: 'audio' as const,
       id: language,
@@ -97,7 +97,7 @@ describe('createHlsAudioEngine', () => {
     // (audio/aac) rendition is asserted unplayable, so it should be pruned
     // rather than selected. (If the default weren't wired, the constraint would
     // pass through and select it.)
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
 
     engine.state.presentation.set({
       id: 'pres-aac',
@@ -168,7 +168,7 @@ http://example.com/audio-seg1.m4s
 
     globalThis.fetch = mockFetch;
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('video');
 
     mediaElement.preload = 'auto';
@@ -234,7 +234,7 @@ http://example.com/audio-seg1.m4s
 
     globalThis.fetch = mockFetch;
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('video');
 
     mediaElement.preload = 'auto';
@@ -311,7 +311,7 @@ http://example.com/audio-seg1.m4s
 
     globalThis.fetch = mockFetch;
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('video');
 
     mediaElement.preload = 'auto';
@@ -399,7 +399,7 @@ http://example.com/audio-b-seg1.m4s
 
     globalThis.fetch = mockFetch;
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('audio');
 
     mediaElement.preload = 'auto';
@@ -501,7 +501,7 @@ http://example.com/audio-seg1.m4s
     // and make the fallback inert — silently disabling AirPlay.
     globalThis.fetch = mockAudioOnlyManifest();
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('audio');
 
     mediaElement.preload = 'auto';
@@ -527,7 +527,7 @@ http://example.com/audio-seg1.m4s
   });
 
   it('materializes the startPosition / loadingSuspended / disableRemotePlayback slots', () => {
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const state = snapshot(engine.state) as Record<string, unknown>;
 
     // `startPosition` + `loadingSuspended` come from setupAirPlay /
@@ -549,7 +549,7 @@ http://example.com/audio-seg1.m4s
   it('composes applyStartPosition — a startPosition command seeds the load window', async () => {
     globalThis.fetch = mockAudioOnlyManifest();
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('audio');
 
     mediaElement.preload = 'auto';
@@ -590,7 +590,7 @@ http://example.com/audio-seg1.m4s
 
     globalThis.fetch = mockAudioOnlyManifest((url) => fetchedUrls.push(url));
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('audio');
 
     mediaElement.preload = 'auto';
@@ -664,7 +664,7 @@ http://example.com/audio-seg1.m4s
 
     globalThis.fetch = mockFetch;
 
-    const engine = createHlsAudioEngine();
+    const engine = createEngine();
     const mediaElement = document.createElement('audio');
 
     mediaElement.preload = 'auto';

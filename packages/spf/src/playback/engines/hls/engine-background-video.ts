@@ -40,7 +40,7 @@ import { excludeUnplayableTracks } from '../../primitives/selection-rules';
  * The behaviors the background-video playback engine composes, in setup order. The engine's state and context types are
  * derived from this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const backgroundVideoEngineBehaviors = [
+const behaviors = [
   resolvePresentation,
   // Presentation duration
   calculatePresentationDuration,
@@ -80,19 +80,19 @@ const backgroundVideoEngineBehaviors = [
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
  */
-export type BackgroundVideoEngineState = ResolveBehaviorState<typeof backgroundVideoEngineBehaviors>;
+export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 /** Context shape for the background-video playback engine: every context key its behaviors declare. */
-export type BackgroundVideoEngineContext = ResolveBehaviorContext<typeof backgroundVideoEngineBehaviors>;
+export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
  * Configuration for the background-video engine.
  *
  * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
- * Compared to `HlsVideoEngineConfig`, audio/text/ABR/bandwidth/quality knobs are dropped: the variant subtracts the
- * behaviors that read them.
+ * Compared to the HLS video engine's `EngineConfig`, audio/text/ABR/bandwidth/quality knobs are dropped: the variant
+ * subtracts the behaviors that read them.
  */
-export interface BackgroundVideoEngineConfig {
+export interface EngineConfig {
   /**
    * Hard-constraint pre-pass handed to `selectVideoTrack`. Defaults to `[excludeUnplayableTracks,
    * reportAbsentTrackType(2011)]` — prune the renditions this environment can't decode, then report 2011 if nothing is
@@ -146,7 +146,7 @@ export interface BackgroundVideoEngineConfig {
  *
  * @example
  *   ```ts
- *   const engine = createBackgroundVideoEngine();
+ *   const engine = createEngine();
  *
  *   engine.context.mediaElement.set(videoEl);
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
@@ -154,9 +154,7 @@ export interface BackgroundVideoEngineConfig {
  *   await engine.destroy();
  *   ```;
  */
-export function createBackgroundVideoEngine(
-  config: BackgroundVideoEngineConfig = {}
-): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
   const finalConfig = {
     ...config,
     videoConstraints: config.videoConstraints ?? [
@@ -170,7 +168,7 @@ export function createBackgroundVideoEngine(
     reportUnsupportedTrackConditions: config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditions,
   };
 
-  return createComposition([...backgroundVideoEngineBehaviors], {
+  return createComposition([...behaviors], {
     config: finalConfig,
     initialState: {
       // Note: Set to true until we add preload configuration

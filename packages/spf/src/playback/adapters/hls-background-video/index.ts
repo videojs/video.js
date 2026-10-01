@@ -7,9 +7,9 @@
  * stream URL's `?max_resolution=720p`, for one, keeps the renditions it excludes out of the manifest instead of merely
  * unpicked.
  *
- * Separate from `@videojs/spf/hls`, where the engine itself ships beside the other HLS engines, for the same reason the
- * HLS Medias are: wiring an engine directly shouldn't pull an adapter in with it. Its host is local and narrow, so this
- * entry carries no `@videojs/media` dependency either.
+ * Separate from `@videojs/spf/hls/background-video`, where the engine itself ships like the other HLS engines, for the
+ * same reason the HLS Medias are: wiring an engine directly shouldn't pull an adapter in with it. Its host is local and
+ * narrow, so this entry carries no `@videojs/media` dependency either.
  *
  * Html and react expose everything here as `<mux-background-video>` / `MuxBackgroundVideo` too. Same classes, so the
  * name is a naming choice and nothing more.

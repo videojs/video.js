@@ -10,8 +10,8 @@ import '@app/styles.css';
 //   preload=auto|metadata|none  Initial preload mode
 import { SOURCE_IDS, SOURCES } from '@app/shared/sources';
 import { effect, snapshot } from '@videojs/spf';
-import type { HlsVideoEngineState } from '@videojs/spf/hls';
-import { createHlsVideoEngine, getMediaPlaylistMetadata } from '@videojs/spf/hls';
+import { getMediaPlaylistMetadata } from '@videojs/spf/hls';
+import { createEngine, type EngineState } from '@videojs/spf/hls/video';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const video = document.getElementById('video') as HTMLVideoElement;
@@ -116,15 +116,15 @@ function formatFrameRate(frameRate: { frameRateNumerator: number; frameRateDenom
   return `${Number.parseFloat(fps.toFixed(2))} fps`;
 }
 
-function getVideoTracks(presentation: HlsVideoEngineState['presentation']) {
+function getVideoTracks(presentation: EngineState['presentation']) {
   return presentation?.selectionSets?.find((s) => s.type === 'video')?.switchingSets[0]?.tracks ?? [];
 }
 
-function getAudioTracks(presentation: HlsVideoEngineState['presentation']) {
+function getAudioTracks(presentation: EngineState['presentation']) {
   return presentation?.selectionSets?.find((s) => s.type === 'audio')?.switchingSets[0]?.tracks ?? [];
 }
 
-function getTextTracks(presentation: HlsVideoEngineState['presentation']) {
+function getTextTracks(presentation: EngineState['presentation']) {
   return presentation?.selectionSets?.find((s) => s.type === 'text')?.switchingSets[0]?.tracks ?? [];
 }
 
@@ -369,7 +369,7 @@ function buildVideoTrackButtons(groups: VideoSelectionGroup[]) {
 function updateVideoTrackSelection(
   tracks: ReturnType<typeof getVideoTracks>,
   selectedVideoTrackId: string | undefined,
-  userFilter: HlsVideoEngineState['userVideoTrackSelection']
+  userFilter: EngineState['userVideoTrackSelection']
 ) {
   const isManual = userFilter !== undefined;
 
@@ -523,7 +523,7 @@ function buildAudioTrackButtons(groups: AudioSelectionGroup[]) {
 function updateAudioTrackSelection(
   tracks: ReturnType<typeof getAudioTracks>,
   selectedAudioTrackId: string | undefined,
-  userFilter: HlsVideoEngineState['userAudioTrackSelection']
+  userFilter: EngineState['userAudioTrackSelection']
 ) {
   const isPinned = userFilter !== undefined;
 
@@ -836,7 +836,7 @@ function inspectState() {
 log('=== SPF Segment Loading POC Test ===');
 log(`Stream: ${INITIAL_SRC}`);
 
-let engine: ReturnType<typeof createHlsVideoEngine>;
+let engine: ReturnType<typeof createEngine>;
 let cleanupEffects: () => void = () => {};
 
 function startEngine(src: string) {
@@ -844,7 +844,7 @@ function startEngine(src: string) {
 
   if (engine) engine.destroy();
 
-  engine = createHlsVideoEngine({ initialBandwidth: 1_000_000 });
+  engine = createEngine({ initialBandwidth: 1_000_000 });
   (window as any).engine = engine;
   (window as any).state = () => snapshot(engine.state);
   (window as any).context = () => snapshot(engine.context);

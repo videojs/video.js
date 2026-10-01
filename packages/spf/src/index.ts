@@ -2,7 +2,7 @@
  * Stream Processing Framework (SPF) for Video.js 10
  *
  * The compositional primitives: createComposition, signals, tasks, actors, reactors. Media-domain helpers and the HLS
- * playback engine live behind the `./dom` and `./hls` subpaths.
+ * playback engines live behind the `./dom`, `./hls`, and per-engine `./hls/*` subpaths.
  *
  * @packageDocumentation
  */

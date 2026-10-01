@@ -62,9 +62,7 @@ import {
  * External signals of the audio-only HLS playback engine: state written from outside the engine (by the adapter) that
  * no composed behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsAudioEngineExternalSignals = defineExternalSignals<
-  UserTrackSelectionState<'audio'> & DisableRemotePlaybackState
->()({
+const externalSignals = defineExternalSignals<UserTrackSelectionState<'audio'> & DisableRemotePlaybackState>()({
   state: ['userAudioTrackSelection', 'disableRemotePlayback'],
 });
 
@@ -72,7 +70,7 @@ const hlsAudioEngineExternalSignals = defineExternalSignals<
  * The behaviors the audio-only HLS playback engine composes, in setup order. The engine's state and context types are
  * derived from this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const hlsAudioEngineBehaviors = [
+const behaviors = [
   syncPreload,
   trackLoadTriggers,
   resolvePresentation,
@@ -151,22 +149,22 @@ const hlsAudioEngineBehaviors = [
   loadChapters,
 
   // External signals: written by the adapter, read by the behaviors above.
-  hlsAudioEngineExternalSignals,
+  externalSignals,
 ] as const;
 
 /** State shape for the audio-only HLS playback engine: every state key its behaviors and inputs declare. */
-export type HlsAudioEngineState = ResolveBehaviorState<typeof hlsAudioEngineBehaviors>;
+export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 /** Context shape for the audio-only HLS playback engine: every context key its behaviors declare. */
-export type HlsAudioEngineContext = ResolveBehaviorContext<typeof hlsAudioEngineBehaviors>;
+export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
  * Configuration for the audio-only HLS playback engine.
  *
- * Subset of `HlsVideoEngineConfig` — video-quality, bandwidth-estimator, and text-track config fields are omitted (no
- * behavior consumes them).
+ * Subset of the HLS video engine's `EngineConfig` — video-quality, bandwidth-estimator, and text-track config fields
+ * are omitted (no behavior consumes them).
  */
-export interface HlsAudioEngineConfig {
+export interface EngineConfig {
   preferredAudioLanguage?: string;
   /**
    * Codec capability probe read by `track-switching`'s `excludeUnplayableTracks` constraint. Defaults to the
@@ -222,10 +220,11 @@ export interface HlsAudioEngineConfig {
 /**
  * Create an audio-only HLS playback engine.
  *
- * Subtractive composition variant of `createHlsVideoEngine`: omits video-side behaviors (`resolveVideoTrack`,
- * `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors (`switchTextTrack`,
- * `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters (`loadChapters`)
- * stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes unchanged.
+ * Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors
+ * (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors
+ * (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters
+ * (`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes
+ * unchanged.
  *
  * Handles both truly audio-only HLS sources (no video stream-inf) and mixed-AV HLS sources where the audio rendition is
  * selected and video / subtitle renditions are ignored at composition time. The variant decision is encoded by adapter
@@ -233,7 +232,7 @@ export interface HlsAudioEngineConfig {
  *
  * @example
  *   ```ts
- *   const engine = createHlsAudioEngine({
+ *   const engine = createEngine({
  *     preferredAudioLanguage: 'en',
  *   });
  *
@@ -241,9 +240,7 @@ export interface HlsAudioEngineConfig {
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *   ```;
  */
-export function createHlsAudioEngine(
-  config: HlsAudioEngineConfig = {}
-): Composition<HlsAudioEngineState, HlsAudioEngineContext> {
+export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
   const deriveStartMediaTime = config.deriveStartMediaTime ?? deriveSharedMinStartMediaTime;
   const finalConfig = {
     ...config,
@@ -264,7 +261,7 @@ export function createHlsAudioEngine(
     audioMessagePipelines: relocationPipelinesFor('audio', deriveStartMediaTime),
   };
 
-  return createComposition([...hlsAudioEngineBehaviors], {
+  return createComposition([...behaviors], {
     config: finalConfig,
   });
 }

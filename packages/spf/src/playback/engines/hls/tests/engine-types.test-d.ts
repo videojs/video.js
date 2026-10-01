@@ -6,60 +6,40 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
 import type { AudioTrack, TextTrack, VideoTrack } from '../../../../media/types';
-import type { HlsVideoEngineContext, HlsVideoEngineState } from '../engine';
-import type { HlsAudioEngineContext, HlsAudioEngineState } from '../engine-audio-only';
-import type { BackgroundVideoEngineContext, BackgroundVideoEngineState } from '../engine-background-video';
+import type * as hlsVideo from '../engine';
+import type * as hlsAudio from '../engine-audio-only';
+import type * as hlsBackgroundVideo from '../engine-background-video';
 
 type IsOpen<T> = string extends keyof T ? true : false;
 
-describe('HlsVideoEngineState', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<HlsVideoEngineState>>().toEqualTypeOf<false>();
+describe('EngineState', () => {
+  it('is a closed set of keys in every engine', () => {
+    expectTypeOf<IsOpen<hlsVideo.EngineState>>().toEqualTypeOf<false>();
+    expectTypeOf<IsOpen<hlsAudio.EngineState>>().toEqualTypeOf<false>();
+    expectTypeOf<IsOpen<hlsBackgroundVideo.EngineState>>().toEqualTypeOf<false>();
   });
 
-  it('includes the external signals', () => {
-    expectTypeOf<HlsVideoEngineState['userVideoTrackSelection']>().toEqualTypeOf<Partial<VideoTrack> | undefined>();
-    expectTypeOf<HlsVideoEngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
-    expectTypeOf<HlsVideoEngineState['userTextTrackSelection']>().toEqualTypeOf<
+  it('includes the video engine’s external signals', () => {
+    expectTypeOf<hlsVideo.EngineState['userVideoTrackSelection']>().toEqualTypeOf<Partial<VideoTrack> | undefined>();
+    expectTypeOf<hlsVideo.EngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
+    expectTypeOf<hlsVideo.EngineState['userTextTrackSelection']>().toEqualTypeOf<
       Partial<TextTrack> | 'off' | undefined
     >();
-    expectTypeOf<HlsVideoEngineState['disableRemotePlayback']>().toEqualTypeOf<boolean | undefined>();
+    expectTypeOf<hlsVideo.EngineState['disableRemotePlayback']>().toEqualTypeOf<boolean | undefined>();
+  });
+
+  it('includes the audio engine’s external signals, and no video or text selection', () => {
+    expectTypeOf<hlsAudio.EngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
+    expectTypeOf<hlsAudio.EngineState['disableRemotePlayback']>().toEqualTypeOf<boolean | undefined>();
+    expectTypeOf<hlsAudio.EngineState>().not.toHaveProperty('userVideoTrackSelection');
+    expectTypeOf<hlsAudio.EngineState>().not.toHaveProperty('userTextTrackSelection');
   });
 });
 
-describe('HlsVideoEngineContext', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<HlsVideoEngineContext>>().toEqualTypeOf<false>();
-  });
-});
-
-describe('HlsAudioEngineState', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<HlsAudioEngineState>>().toEqualTypeOf<false>();
-  });
-
-  it('includes the external signals, and no video or text selection', () => {
-    expectTypeOf<HlsAudioEngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
-    expectTypeOf<HlsAudioEngineState['disableRemotePlayback']>().toEqualTypeOf<boolean | undefined>();
-    expectTypeOf<HlsAudioEngineState>().not.toHaveProperty('userVideoTrackSelection');
-    expectTypeOf<HlsAudioEngineState>().not.toHaveProperty('userTextTrackSelection');
-  });
-});
-
-describe('HlsAudioEngineContext', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<HlsAudioEngineContext>>().toEqualTypeOf<false>();
-  });
-});
-
-describe('BackgroundVideoEngineState', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<BackgroundVideoEngineState>>().toEqualTypeOf<false>();
-  });
-});
-
-describe('BackgroundVideoEngineContext', () => {
-  it('is a closed set of keys', () => {
-    expectTypeOf<IsOpen<BackgroundVideoEngineContext>>().toEqualTypeOf<false>();
+describe('EngineContext', () => {
+  it('is a closed set of keys in every engine', () => {
+    expectTypeOf<IsOpen<hlsVideo.EngineContext>>().toEqualTypeOf<false>();
+    expectTypeOf<IsOpen<hlsAudio.EngineContext>>().toEqualTypeOf<false>();
+    expectTypeOf<IsOpen<hlsBackgroundVideo.EngineContext>>().toEqualTypeOf<false>();
   });
 });

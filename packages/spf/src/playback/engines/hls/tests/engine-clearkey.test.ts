@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { clearKeySystem } from '../../../../media/dom/key-systems';
 import type { MaybeResolvedPresentation } from '../../../../media/types';
-import { createHlsVideoEngine } from '../engine';
+import { createEngine } from '../engine';
 
 // Full-pipeline EME coverage on the bundled Chromium, which ships no proprietary CDM but must ship Clear Key (the one
 // key system the EME spec requires). The engine plays a real cenc-encrypted fixture end to end — negotiate → attach →
@@ -29,7 +29,7 @@ function base64UrlFromHex(hex: string): string {
     .replace(/=+$/, '');
 }
 
-describe('createHlsVideoEngine (Clear Key, real EME end to end)', () => {
+describe('createEngine (Clear Key, real EME end to end)', () => {
   let realFetch: typeof globalThis.fetch;
 
   afterEach(() => {
@@ -57,7 +57,7 @@ describe('createHlsVideoEngine (Clear Key, real EME end to end)', () => {
     video.muted = true;
     document.body.append(video);
 
-    const engine = createHlsVideoEngine({
+    const engine = createEngine({
       drm: { 'org.w3.clearkey': { licenseUrl: LICENSE_URL } },
       keySystems: [clearKeySystem],
     });

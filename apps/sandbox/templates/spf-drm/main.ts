@@ -14,7 +14,7 @@
 //                                     AirPlay behavior apart from DRM's.
 import { restrictDrmSystems, SOURCES } from '@app/shared/sources';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
-import { createHlsVideoEngine } from '@videojs/spf/hls';
+import { createEngine } from '@videojs/spf/hls/video';
 
 const video = document.getElementById('video') as HTMLVideoElement;
 const statusPre = document.getElementById('status') as HTMLPreElement;
@@ -55,7 +55,7 @@ subheading.textContent = [
   .filter(Boolean)
   .join('  ·  ');
 
-const engine = createHlsVideoEngine({ drm: source.drm });
+const engine = createEngine({ drm: source.drm });
 
 // preload before mediaElement: syncPreload reads the element's attribute when
 // it first appears in context.

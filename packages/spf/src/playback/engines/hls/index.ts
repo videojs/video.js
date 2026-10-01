@@ -3,7 +3,7 @@
 // `config.keySystems` is public, so without these a consumer could neither
 // narrow the default nor reconstruct it — `[widevineKeySystem]` alone drops
 // PlayReady's and FairPlay's code from the bundle.
-// `DrmSystemsConfig` is the `drm` config shape — `createHlsVideoEngine`'s and
+// `DrmSystemsConfig` is the `drm` config shape — the HLS video engine's and
 // the structured `source.drm`'s — so a consumer building one can name it.
 export type { DrmSystemsConfig, KeySystemModule } from '../../../media/drm';
 export {
@@ -81,18 +81,11 @@ export {
   excludeRefusedKeySystems,
   preferCodecFamilies,
 } from '../../primitives/selection-rules';
-// The Medias over these engines are not here: they live behind
-// `@videojs/spf/hls-video`, `@videojs/spf/hls-audio`, and
-// `@videojs/spf/hls-background-video` so that driving an engine directly doesn't pull
-// a Media (and `@videojs/media`) in with it — and so this entry stays the
-// engines' own size budget.
-export type { HlsVideoEngineConfig, HlsVideoEngineContext, HlsVideoEngineState } from './engine';
-export { createHlsVideoEngine } from './engine';
-export type { HlsAudioEngineConfig, HlsAudioEngineContext, HlsAudioEngineState } from './engine-audio-only';
-export { createHlsAudioEngine } from './engine-audio-only';
-export type {
-  BackgroundVideoEngineConfig,
-  BackgroundVideoEngineContext,
-  BackgroundVideoEngineState,
-} from './engine-background-video';
-export { createBackgroundVideoEngine } from './engine-background-video';
+// The engines themselves are not here: each has its own entry point —
+// `@videojs/spf/hls/video`, `@videojs/spf/hls/audio`, and
+// `@videojs/spf/hls/background-video` — exporting the same names
+// (`createEngine`, `EngineState`, `EngineContext`, `EngineConfig`), so a
+// consumer pulls in only the engine it drives. This entry holds what they
+// share. The Medias over the engines live behind `@videojs/spf/hls-video`,
+// `@videojs/spf/hls-audio`, and `@videojs/spf/hls-background-video`, so
+// driving an engine directly doesn't pull a Media (and `@videojs/media`) in.
