@@ -150,7 +150,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await openOptions();
 
     expect(screen.getByRole('button', { name: 'Media: HTML5 Video demo' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Skin: Default' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Design' })).toHaveTextContent('Either works');
     expect(screen.getByRole('combobox', { name: 'Agent' })).toHaveTextContent('Any agent');
   });
 
@@ -164,7 +164,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     act(() => useCase.set('background-video'));
 
     // Background video has one purpose-built skin, so there is no skin to choose.
-    expect(screen.queryByRole('button', { name: /^Skin:/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Design' })).not.toBeInTheDocument();
   });
 
   it('takes the media from a pasted URL', async () => {
@@ -205,12 +205,30 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.getByRole('button', { name: 'Media: Vimeo demo' })).toBeInTheDocument();
   });
 
-  it('takes the skin from the skin cards', async () => {
+  it('picks the skin from how the project wants to look', async () => {
     const user = userEvent.setup();
 
     render(<AgentPrompt route="react" framework="react" />);
     await openOptions(user);
-    await user.click(screen.getByRole('button', { name: 'Skin: Default' }));
+    await user.click(screen.getByRole('combobox', { name: 'Design' }));
+    await user.click(await screen.findByRole('option', { name: 'Apply my brand to yours' }, RENDER_WAIT));
+
+    expect(initCommand()).toContain('--skin neutral');
+
+    await user.click(screen.getByRole('combobox', { name: 'Design' }));
+    await user.click(await screen.findByRole('option', { name: 'Build my own design' }, RENDER_WAIT));
+
+    expect(initCommand()).toContain('--skin none');
+    // Without a compatible skin to offer yet, there is no browser question.
+    expect(screen.queryByRole('combobox', { name: 'Browsers' })).not.toBeInTheDocument();
+  });
+
+  it('previews the skins in a dialog', async () => {
+    const user = userEvent.setup();
+
+    render(<AgentPrompt route="react" framework="react" />);
+    await openOptions(user);
+    await user.click(screen.getByRole('button', { name: 'Preview skins' }));
     await user.click(await screen.findByRole('radio', { name: /Neutral/ }, RENDER_WAIT));
 
     expect(screen.getByText('Player preview')).toBeInTheDocument();

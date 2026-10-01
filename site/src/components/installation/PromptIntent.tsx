@@ -31,9 +31,13 @@ import {
 } from '@/components/menuClasses';
 import { Select } from '@/components/Select';
 import {
+  AGENT_PROMPT_DESIGNS,
   AGENT_PROMPT_GOALS,
+  agentPromptDesignFor,
+  agentPromptDesignSkin,
   agentPromptGoalLabel,
   AGENT_PROMPT_REQUEST_MAX_LENGTH,
+  type AgentPromptDesign,
   type AgentPromptGoal,
   type AgentPromptHostingHint,
   type AgentPromptRequestExample,
@@ -99,16 +103,41 @@ const ANALYTICS_LABEL = 'Viewer analytics';
  * One labelled control. The label is only visible text: each control names itself, as the site's select and a dialog
  * trigger have no way to point at an outside label.
  */
-function Field({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
+function Field({
+  label,
+  action,
+  className,
+  children,
+}: {
+  label: string;
+  /** A control beside the label, such as a link to preview the choices. */
+  action?: ReactNode;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
     <div className={clsx('flex min-w-0 flex-col gap-1.5', className)}>
-      <span aria-hidden="true" className={LABEL_CLASS}>
-        {label}
-      </span>
+      <div className="flex items-baseline justify-between gap-2">
+        <span aria-hidden="true" className={LABEL_CLASS}>
+          {label}
+        </span>
+        {action}
+      </div>
       {children}
     </div>
   );
 }
+
+const DESIGN_LABELS = {
+  either: 'Either works',
+  brand: 'Apply my brand to yours',
+  own: 'Build my own design',
+} as const satisfies Record<AgentPromptDesign, string>;
+
+const BROWSER_OPTIONS = [
+  { value: 'modern', label: 'Modern browsers' },
+  { value: 'older', label: 'Include older browsers' },
+] as const;
 
 interface Props {
   /** The media, and the reader's URL for it, or empty for its demo. */
@@ -122,6 +151,9 @@ interface Props {
   /** The skin, or `null` for a preset with one purpose-built skin. */
   skin: SkinFlag | null;
   includeNoSkin: boolean;
+  /** The skin for older browsers, or `null` while the page has none to offer. */
+  compatSkin: SkinFlag | null;
+  onSkinChange: (skin: SkinFlag) => void;
   agent: SkillAgent | null;
   onAgentChange: (agent: SkillAgent | null) => void;
   goal: AgentPromptGoal;
@@ -162,6 +194,8 @@ export default function PromptIntent({
   onMediaChange,
   skin,
   includeNoSkin,
+  compatSkin,
+  onSkinChange,
   agent,
   onAgentChange,
   goal,
@@ -203,6 +237,12 @@ export default function PromptIntent({
   // The media menu opens the URL and upload dialog, which returns focus to the menu's trigger.
   const mediaDialog = useRef<PromptDialogActions>(null);
   const mediaTriggerRef = useRef<HTMLButtonElement>(null);
+  const skinDialog = useRef<PromptDialogActions>(null);
+  const designOptions = AGENT_PROMPT_DESIGNS.filter((design) => includeNoSkin || design !== 'own').map((design) => ({
+    value: design,
+    label: DESIGN_LABELS[design],
+    icon: presentSkin(agentPromptDesignSkin(design)).icon,
+  }));
   // A migration keeps the existing player's media and skin until the reader picks others.
   const shownMedia =
     migrating && !sourceUrl && media === supportedRenderers[0] ? 'Existing media' : mediaLabel(media, sourceUrl);
@@ -460,17 +500,53 @@ export default function PromptIntent({
               />
             </Field>
             {skin && (
-              <Field label="Skin" className="@prose:order-3">
+              <Field
+                label="Design"
+                className="@prose:order-3"
+                action={
+                  <button
+                    type="button"
+                    className={clsx(INLINE_BUTTON_CLASS, 'text-p4')}
+                    onPointerEnter={() => skinDialog.current?.preload()}
+                    onClick={() => skinDialog.current?.open()}
+                  >
+                    Preview skins
+                  </button>
+                }
+              >
+                {/* Build your own, or apply your brand to ours: the answer picks the skin. */}
+                <Select
+                  aria-label="Design"
+                  className="w-full"
+                  value={agentPromptDesignFor(skin)}
+                  options={designOptions}
+                  onChange={(next) => {
+                    if (next) onSkinChange(agentPromptDesignSkin(next));
+                  }}
+                />
                 <PromptDialog
                   name="Skin"
                   value={presentSkin(skin)}
-                  className={TRIGGER_CLASS}
+                  showTrigger={false}
                   title="Choose your skin"
                   description="Pick how your player looks. The preview plays your media with the selected skin."
                   focusSelector='[role="radio"][aria-checked="true"]'
                   size="lg"
                   loadBody={loadSkinDialogBody}
                   bodyProps={{ includeNoSkin }}
+                  actionsRef={skinDialog}
+                />
+              </Field>
+            )}
+            {skin && compatSkin && (
+              <Field label="Browsers" className="@prose:order-4">
+                {/* A player that must work in older browsers trades features for the compatible skin. */}
+                <Select
+                  aria-label="Browsers"
+                  className="w-full"
+                  value={skin === compatSkin ? 'older' : 'modern'}
+                  options={[...BROWSER_OPTIONS]}
+                  onChange={(next) => onSkinChange(next === 'older' ? compatSkin : 'default')}
                 />
               </Field>
             )}

@@ -1,6 +1,7 @@
 import {
   INSTALLATION_EXTENSIONS,
   installationFeaturesFor,
+  skinFromFlag,
   type InstallationFeature,
   skinToFlag,
   sourceFrameworkFor,
@@ -25,6 +26,7 @@ import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
   AGENT_PROMPT_STEP_SEPARATOR,
   agentPromptAnalytics,
+  agentPromptCompatSkin,
   agentPromptDefaultPicks,
   agentPromptExampleFits,
   agentPromptExamplePicks,
@@ -233,6 +235,8 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
         }
         skin={selection.useCase === 'background-video' ? null : skinToFlag(selection.skin)}
         includeNoSkin={agentPromptSkinChoices(selection).includes('none')}
+        compatSkin={agentPromptCompatSkin(selection)}
+        onSkinChange={(next) => updateInstallationSelection({ skin: skinFromFlag(next, picks.useCase) })}
         agent={agent}
         onAgentChange={(next) => skillAgent.set(next)}
         goal={goal}

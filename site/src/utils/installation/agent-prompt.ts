@@ -781,6 +781,35 @@ export function agentPromptMediaChoices({ method, useCase }: InstallationSelecti
     : renderers;
 }
 
+/**
+ * How a project wants its player to look: apply its brand to an opinionated design that's easy to brand, build its own
+ * design, or either, which keeps the distinctly Video.js design.
+ */
+export const AGENT_PROMPT_DESIGNS = ['either', 'brand', 'own'] as const;
+export type AgentPromptDesign = (typeof AGENT_PROMPT_DESIGNS)[number];
+
+const DESIGN_SKINS = { either: 'default', brand: 'neutral', own: 'none' } as const satisfies Record<
+  AgentPromptDesign,
+  SkinFlag
+>;
+
+export function agentPromptDesignSkin(design: AgentPromptDesign): SkinFlag {
+  return DESIGN_SKINS[design];
+}
+
+/** The design a skin answers, with a skin for older browsers counting as no preference. */
+export function agentPromptDesignFor(skin: SkinFlag): AgentPromptDesign {
+  return AGENT_PROMPT_DESIGNS.find((design) => DESIGN_SKINS[design] === skin) ?? 'either';
+}
+
+// The skin that trades features for broad browser support. The installation package offers it once it ships.
+const COMPAT_SKIN: string = 'compat';
+
+/** The skin for a player that must work in older browsers, or `null` while the target has none. */
+export function agentPromptCompatSkin(selection: InstallationSelection): SkinFlag | null {
+  return agentPromptSkinChoices(selection).find((skin) => skin === COMPAT_SKIN) ?? null;
+}
+
 /** The skins the target can install: Shadcn registries always ship a skin. */
 export function agentPromptSkinChoices({ method }: InstallationSelection): readonly SkinFlag[] {
   return method === 'shadcn' ? installationCompatibility.shadcn.skins : INSTALLATION_SKIN_FLAGS;

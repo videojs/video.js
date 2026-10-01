@@ -4,6 +4,9 @@ import { describe, expect, it } from 'vitest';
 import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
   agentPromptAnalytics,
+  agentPromptCompatSkin,
+  agentPromptDesignFor,
+  agentPromptDesignSkin,
   agentPromptCommand,
   agentPromptDetectSentence,
   agentPromptExampleFits,
@@ -433,5 +436,27 @@ describe('agentPromptAnalytics', () => {
     expect(agentPromptAnalytics(select({ media: 'mux-video', extensions: ['mux-data'] }))).toBe(true);
     expect(agentPromptAnalytics(select({ media: 'mux-video', extensions: [] }))).toBe(false);
     expect(agentPromptAnalytics(select({ media: 'hls' }))).toBeNull();
+  });
+});
+
+describe('agentPromptDesignSkin', () => {
+  it('answers whether to build your own design or apply your brand to ours', () => {
+    expect(agentPromptDesignSkin('own')).toBe('none');
+    expect(agentPromptDesignSkin('brand')).toBe('neutral');
+    expect(agentPromptDesignSkin('either')).toBe('default');
+  });
+});
+
+describe('agentPromptDesignFor', () => {
+  it('reads the design back from the skin', () => {
+    expect(agentPromptDesignFor('neutral')).toBe('brand');
+    expect(agentPromptDesignFor('none')).toBe('own');
+    expect(agentPromptDesignFor('default')).toBe('either');
+  });
+});
+
+describe('agentPromptCompatSkin', () => {
+  it('offers no skin for older browsers until the installation package has one', () => {
+    expect(agentPromptCompatSkin(agentPromptSelection({ method: 'packaged', framework: 'react' }, picks()))).toBeNull();
   });
 });
