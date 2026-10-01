@@ -308,6 +308,8 @@ function mergeDefaultConfig<Config extends object, Defaults extends object>(
 ): Config | (Config & Defaults) {
   if (!defaultConfig) return config;
 
+  // `defaults` resolves each defaulted key to `config`'s value when defined, else the default, so spreading it last
+  // can't override an explicit value; spreading `config` first keeps the keys `defaults` drops (those with no default).
   // SAFETY: `defaults` reads only `defaultConfig`'s keys off `config`; a key `config` lacks reads as `undefined`.
   return { ...config, ...defaults(config as Partial<Defaults>, defaultConfig) };
 }
