@@ -73,7 +73,7 @@ Primary:
 
 Secondary:
 
-- Existing engine factory + adapter as templates (`createHlsVideoEngine`
+- Existing engine factory + adapter as templates (the `hls/video` engine
   and `HlsVideoAdapterCore` — the canonical pair the variant parallels).
 - `internal/decisions/*.md` — past tactical decisions.
 
@@ -189,7 +189,7 @@ Discipline:
 
 9. **Composing variant-specific behaviors into default factory** —
    variant-specific behaviors go in the variant factory, not the
-   default `createHlsVideoEngine`. Same failure mode as
+   default `hls/video` engine. Same failure mode as
    `/implement-spf-feature`'s catalog, but more pointed here: the
    *whole point* of a use-case implementation is the variant assembly,
    so misrouting at the factory level is the canonical first-pass bug.
@@ -232,7 +232,7 @@ Discipline:
 
 16. **SPF adapter stranded at engine layer** — the implementation pass
     lands the engine variant + SPF adapter and stops there. The variant
-    is reachable via `@videojs/spf/hls` but **not consumable through
+    is reachable via its `@videojs/spf/hls/*` entry point but **not consumable through
     the existing player surface** (the `packages/html` custom elements
     + `packages/react` components + sandbox demos that real consumers
     actually use). The canonical failure shape: ship a "Phase 1
@@ -421,7 +421,7 @@ typical for use-case implementations:
 **Core SPF layer (always present):**
 
 - **Engine variant factory creation** (new) — typically the first chunk;
-  parallels `createHlsVideoEngine` shape with the composition mechanism
+  parallels the `hls/video` engine's shape with the composition mechanism
   applied (subtract / add / swap / configure).
 - **Adapter creation** (new) — parallels `HlsVideoAdapterCore` /
   `HlsVideoMixin`; reads and writes the engine's `state` / `context` directly.
@@ -516,7 +516,7 @@ Iterate per chunk:
    - **Subtractive composition / wiring** — handle inline.
    - **Config-driven** — handle inline.
    - **Engine variant factory creation** — handle inline (typically; the
-     factory shape parallels `createHlsVideoEngine`).
+     factory shape parallels the `hls/video` engine).
    - **Adapter creation** — handle inline (typically; the adapter shape
      parallels `HlsVideoAdapterCore` + `HlsVideoMixin`).
    - **New use-case-specific behavior** → route to `/create-spf-behavior`.

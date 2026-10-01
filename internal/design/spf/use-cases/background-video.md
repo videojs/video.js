@@ -26,8 +26,8 @@ is the narrower "deliver video-only despite mixed source" use case.
 ## Status
 
 Phase 1 implemented ([#1586](https://github.com/videojs/v10/issues/1586)):
-`createBackgroundVideoEngine` ships under `@videojs/spf/hls`, beside the other
-HLS engines; `HlsBackgroundVideoAdapterCore` and the host-bound
+The engine ships under `@videojs/spf/hls/background-video`, one entry point
+per HLS engine like the others; `HlsBackgroundVideoAdapterCore` and the host-bound
 `HlsBackgroundVideoAdapter` ship under `@videojs/spf/hls-background-video`; html and
 react alias them as `<mux-background-video>` / `MuxBackgroundVideo`.
 The adapter carries no client-side cap: it pins the largest rendition the
@@ -57,7 +57,7 @@ configuration. Alternative-implementation buckets surface in Phase 3.
 
 ### Subtracted
 
-From [`createHlsVideoEngine`](../../../../packages/spf/src/playback/engines/hls/engine.ts):
+From [the `hls/video` engine](../../../../packages/spf/src/playback/engines/hls/engine.ts):
 
 - `syncPreload`, `trackLoadTriggers` — no preload-state monitoring or DOM `play`/`seeking` activation; replaced by `loadActivated: true` initial state.
 - `selectAudioTrack`, `resolveAudioTrack`, `setupAudioBufferActors`, `loadAudioSegments` — no audio side.

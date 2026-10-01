@@ -25,7 +25,7 @@ bandwidth conditions).
 
 ## Status
 
-- **Composition:** not implemented in `createHlsVideoEngine`. Today
+- **Composition:** not implemented in the `hls/video` engine. Today
   [`audio-playback`](./audio-playback.md) is the single-rendition
   baseline; `setupAudioBufferActors`
   (`packages/spf/src/playback/behaviors/dom/setup-buffer-actors.ts`)

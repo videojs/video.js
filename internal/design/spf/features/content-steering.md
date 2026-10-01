@@ -22,7 +22,7 @@ policy hooks override server-advertised priorities).
 
 ## Status
 
-- **Composition:** not implemented in `createHlsVideoEngine`. Parser
+- **Composition:** not implemented in the `hls/video` engine. Parser
   doesn't recognize `EXT-X-CONTENT-STEERING` tag; no steering-manifest
   fetch behavior; no pathway-priority state slot.
 - **Definition depth:** coarse — scope from the HLS content-steering

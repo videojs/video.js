@@ -24,7 +24,7 @@ the *selection algorithm itself*.
 
 ## Status
 
-- **Composition:** not implemented in `createHlsVideoEngine`. Today
+- **Composition:** not implemented in the `hls/video` engine. Today
   `switchVideoQuality` (and the upcoming `switchAudioQuality` per
   [audio-abr](./audio-abr.md)) read only `bandwidthState` for the
   algorithm input.

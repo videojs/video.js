@@ -41,7 +41,7 @@ ambiguity reflects that split.
 ## Status
 
 - **Composition:** both sub-features are implemented in
-  `createHlsVideoEngine` and the audio-only engine. `deriveCdnPriority`
+  the `hls/video` engine and the audio-only engine. `deriveCdnPriority`
   owns the `cdnPriority` signal (manifest-ordered CDN list); the
   `preferActiveCdn` scope rule narrows candidates to the highest-priority CDN
   with surviving tracks (shared by the video + audio chains). For failover:

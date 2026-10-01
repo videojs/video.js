@@ -21,7 +21,7 @@ on it.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls/video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface and implementation
   footprint documented; the extended-preload-value mechanism is a
   forward-compatibility hook with no shipped consumer yet

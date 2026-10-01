@@ -307,7 +307,7 @@ agent or read code directly to map:
 
 - **Composition specifics.** Which engine factory composes the variant?
   Which behaviors are subtracted, added, or swapped vs the default
-  composition? Compare against `createHlsVideoEngine`'s behavior list
+  composition? Compare against the `hls/video` engine's behavior list
   in `packages/spf/src/playback/engines/hls/engine.ts` as the baseline.
 - **Constituent features grounded.** For each constituent feature
   identified at Step 1, map the specific behaviors / actors / state
