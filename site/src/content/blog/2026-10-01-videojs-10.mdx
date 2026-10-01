@@ -1,0 +1,84 @@
+---
+title: 'Video.js v10 is GA — let the migrations begin!'
+description: 'Video.js 10.0.0 is stable: a ground-up rebuild bringing together Video.js, Plyr, Vidstack, Media Chrome, and Mux Player, now with a redesigned install flow, Shadcn skin support, and an official skill for coding agents.'
+authors: [steve-heffernan]
+---
+
+Today, after a year of design, development, and testing, we're officially releasing **Video.js 10.0.0**. No more Beta and RC labels, we’re *live*.
+
+If you've been waiting for the stable release before building with v10 (and we know there are *a lot* of you), this is it. [Get started from scratch](/docs/) or migrate from v8 and other players using the guides below.
+
+I started Video.js in 2010 to help move video from Flash to the open web. Sixteen years later, the web looks very different, but parts of the player were still built around those original architecture decisions. v10 is a ground-up rebuild, not just of one player, but of five: bringing together the people and lessons behind Video.js, Plyr, Vidstack, Media Chrome, and Mux Player in one project and one incredible group of contributors.
+
+We kicked off the project with [a talk at Demuxed](https://www.youtube.com/watch?v=dR4Wmj_BIsQ), introduced the architecture in [the beta announcement](/blog/videojs-v10-beta-hello-world-again), then put it through a lot more real-world use on the way to [the release candidate](/blog/videojs-v10-release-candidate). GA is the next step: a stable release, better ways to get started, and a lot of fixes thanks to everyone who built with it.
+
+## New in v10, generally
+
+- **Smaller file sizes.** Our RC benchmarks showed a 60% reduction from Video.js v8's default bundle (which includes adaptive streaming). The composable architecture lets you leave out features you’re not using, rather than still shipping everything over the wire.
+- **Components that fit your framework.** First-class React components and patterns for React, Web components for vanilla HTML. First class TypeScript and Tailwind. State, UI, and media are separate pieces, so you can change one without rebuilding everything around it.
+- **Beautiful default skins you can use, then make your own.** The defaults got much more design attention this time. When you want to go further, you can bring the skin source into your project and work on real components, not reverse-engineer a player's output.
+- **Built for you and your coding agent.** The code, APIs, and docs are designed to be understandable whether you're writing the code yourself or getting help.
+
+v10 also works across source types and services including HLS, DASH, YouTube, Vimeo, Mux and Cloudflare Stream. 
+
+The [beta post](/blog/videojs-v10-beta-hello-world-again) goes deeper into the architecture, bundle comparisons, and UI decisions. Those are still the reasons we built it.
+
+## New since RC
+
+Much of the work between RC and GA was about making installation, customization, and everyday use better.
+
+### A better starting point
+
+We've redesigned the docs and installation experience, with clearer paths for your framework and the kind of player you're building. We've also improved CDN-hosted composition for developers who don't need a build setup.
+
+Migration guidance now includes help translating legacy Video.js v8 API usage into v10's patterns. This is a rebuild, not a drop-in update, and the docs should help you work through that difference.
+
+### Bring the skin into your project with Shadcn
+
+The beta introduced the idea of owning your player's UI. GA makes that easier with first-class [Shadcn support](/docs/framework/react/guides/installation-shadcn/).
+
+Use the Shadcn CLI to add the skin source to your project. The layout, controls, and styles become files you can edit. Move a button, change the timeline, remove a control. You don't have to wait for us to expose a configuration option for every design decision.
+
+### An official skill for coding agents
+
+We've released an official [Video.js skill](https://github.com/videojs/skills) to help coding agents use current v10 patterns and find the right documentation.
+
+You can install it with:
+
+```bash
+npx @videojs/cli agents skills
+```
+
+### Smaller things that matter
+
+We've also added title display in skins, and improved chapter presentation.
+
+Browser compatibility now extends back to Safari 16 with the new [Compat skin](/docs/framework/react/reference/components/video-compat-skin/).
+
+And we've fixed a lot of bugs and tested across a much broader range of real applications. Thanks to everyone who tried the RC and told us where it didn't work the way you expected.
+
+## Stable doesn't mean finished
+
+SPF, our new streaming engine composition framework, is responsible for some of the biggest bundle savings. It doesn't yet support ads or true low-latency live.
+
+That doesn't mean those requirements prevent you from using v10. For those use cases, you can use the HLS.js-backed `HlsJsVideo` component, currently the default for HLS. The player and streaming engine are separate choices.
+
+We'll keep working on SPF and expanding what v10 can do. GA means we're ready for you to build with it, not that we've run out of things to improve.
+
+## Getting started, or moving over
+
+Video.js remains free and open source under Apache 2.0. Start with the [installation guide](/docs/), or use the migration guide for [Video.js v8](/docs/framework/html/guides/migrate-from-video-js-8/), [Mux Player](/docs/framework/html/guides/migrate-from-mux-player/), [Media Chrome](/docs/framework/html/guides/migrate-from-media-chrome/), or [Vidstack](/docs/framework/react/guides/migrate-from-vidstack/).
+
+One important detail: v10 ships as `@videojs/react` and `@videojs/html`. The `video.js` package on npm is still v8 for now.
+
+## Thank you
+
+Thanks to the whole team and all users who gave us feedback along the way.  
+
+I'm really proud of what we’ve built. Now I'd like to see what you build with it. [Tell us how it goes](https://github.com/videojs/v10/issues).
+
+Fall back in love with your video player. ❤️
+
+Cheers!
+
+@heff
