@@ -4,6 +4,7 @@ import {
   VolumeIndicatorCore,
   VolumeIndicatorCSSVars,
   VolumeIndicatorDataAttrs,
+  type VolumeIndicatorState,
 } from '@videojs/core';
 import { createTransition } from '@videojs/core/dom';
 import type { PropertyDeclarationMap } from '@videojs/element';
@@ -13,7 +14,7 @@ import { I18nController } from '../../i18n/controller';
 import { InputIndicatorElement, type InputIndicatorOptions } from '../input-indicator/element';
 import { LiveIndicator } from '../input-indicator/live-indicator';
 
-export class VolumeIndicatorElement extends InputIndicatorElement<VolumeIndicatorCore.State> {
+export class VolumeIndicatorElement extends InputIndicatorElement<VolumeIndicatorState> {
   static readonly tagName = 'media-volume-indicator';
 
   static override properties = {
@@ -56,7 +57,7 @@ export class VolumeIndicatorElement extends InputIndicatorElement<VolumeIndicato
   }
 }
 
-function renderVolumeIndicator(element: HTMLElement, state: VolumeIndicatorCore.State): void {
+function renderVolumeIndicator(element: HTMLElement, state: VolumeIndicatorState): void {
   const fill = element.querySelector<HTMLElement>('media-volume-indicator-fill');
   const value = element.querySelector('media-volume-indicator-value');
 

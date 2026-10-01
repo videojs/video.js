@@ -1,6 +1,6 @@
 'use client';
 
-import { TimeSliderCore, TimeSliderDataAttrs } from '@videojs/core';
+import { TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps, type TimeSliderState } from '@videojs/core';
 import { getTimeSliderCSSVars, logMissingFeature, selectBuffer, selectPlayback, selectTime } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
 import { hasTimeRange } from '@videojs/media';
@@ -17,7 +17,7 @@ import { SliderProvider } from '../slider/context';
 
 const noopSeek = (): Promise<number> => Promise.resolve(0);
 
-export interface TimeSliderRootProps extends UIComponentProps<'div', TimeSliderCore.State>, TimeSliderCore.Props {
+export interface TimeSliderRootProps extends UIComponentProps<'div', TimeSliderState>, TimeSliderProps {
   onDragStart?: (() => void) | undefined;
   onDragEnd?: (() => void) | undefined;
 }
@@ -75,47 +75,46 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       return () => core.endDrag(playbackRef.current);
     }, [core]);
 
-    const { state, input, cssVars, rootRef, thumbRef, rootProps, rootStyle, thumbProps } =
-      useSlider<TimeSliderCore.State>({
-        computeState: (input) => {
-          core.setInput(input);
+    const { state, input, cssVars, rootRef, thumbRef, rootProps, rootStyle, thumbProps } = useSlider<TimeSliderState>({
+      computeState: (input) => {
+        core.setInput(input);
 
-          core.setMedia(
-            media ?? {
-              currentTime: 0,
-              duration: 0,
-              seeking: false,
-              seek: noopSeek,
-              buffered: [],
-              seekable: [],
-            }
-          );
+        core.setMedia(
+          media ?? {
+            currentTime: 0,
+            duration: 0,
+            seeking: false,
+            seek: noopSeek,
+            buffered: [],
+            seekable: [],
+          }
+        );
 
-          return core.getState();
-        },
-        getPercent: () => core.percentFromValue(time?.currentTime ?? 0),
-        getStepPercent: () => core.getStepPercent(),
-        getLargeStepPercent: () => core.getLargeStepPercent(),
-        orientation,
-        disabled: disabled || !media || !hasTimeRange(media),
-        changeThrottle,
-        adjustPercent: (rawPercent, thumbSize, trackSize) =>
-          core.adjustPercentForAlignment(rawPercent, thumbSize, trackSize),
-        getCSSVars: getTimeSliderCSSVars,
-        onValueCommit: (percent) => {
-          const media = mediaRef.current;
+        return core.getState();
+      },
+      getPercent: () => core.percentFromValue(time?.currentTime ?? 0),
+      getStepPercent: () => core.getStepPercent(),
+      getLargeStepPercent: () => core.getLargeStepPercent(),
+      orientation,
+      disabled: disabled || !media || !hasTimeRange(media),
+      changeThrottle,
+      adjustPercent: (rawPercent, thumbSize, trackSize) =>
+        core.adjustPercentForAlignment(rawPercent, thumbSize, trackSize),
+      getCSSVars: getTimeSliderCSSVars,
+      onValueCommit: (percent) => {
+        const media = mediaRef.current;
 
-          if (media) media.seek(core.rawValueFromPercent(percent));
-        },
-        onDragStart: () => {
-          core.startDrag(playbackRef.current);
-          onDragStart?.();
-        },
-        onDragEnd: () => {
-          core.endDrag(playbackRef.current);
-          onDragEnd?.();
-        },
-      });
+        if (media) media.seek(core.rawValueFromPercent(percent));
+      },
+      onDragStart: () => {
+        core.startDrag(playbackRef.current);
+        onDragStart?.();
+      },
+      onDragEnd: () => {
+        core.endDrag(playbackRef.current);
+        onDragEnd?.();
+      },
+    });
 
     if (!time) {
       if (__DEV__) logMissingFeature('TimeSlider', 'time');
@@ -134,7 +133,7 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
           thumbProps,
           stateAttrMap: TimeSliderDataAttrs,
           getAttrs: (sliderState) => {
-            const attrs = core.getAttrs(sliderState as TimeSliderCore.State);
+            const attrs = core.getAttrs(sliderState as TimeSliderState);
 
             return {
               ...attrs,
@@ -142,7 +141,7 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
               'aria-valuetext': translateText(
                 attrs['aria-valuetext'],
                 translator,
-                core.getValueTextParams(sliderState as TimeSliderCore.State)
+                core.getValueTextParams(sliderState as TimeSliderState)
               ),
             };
           },
@@ -166,5 +165,5 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
 
 export namespace TimeSliderRoot {
   export type Props = TimeSliderRootProps;
-  export type State = TimeSliderCore.State;
+  export type State = TimeSliderState;
 }

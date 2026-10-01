@@ -1,12 +1,17 @@
 'use client';
 
-import { CastButtonCore, CastButtonDataAttrs } from '@videojs/core';
+import {
+  CastButtonCore,
+  CastButtonDataAttrs,
+  type CastButtonProps as CoreCastButtonProps,
+  type CastButtonState,
+} from '@videojs/core';
 import { selectRemotePlayback } from '@videojs/core/dom';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createMediaButton } from '../create-media-button';
 
-export interface CastButtonProps extends UIComponentProps<'button', CastButtonCore.State>, CastButtonCore.Props {}
+export interface CastButtonProps extends UIComponentProps<'button', CastButtonState>, CoreCastButtonProps {}
 
 /** A button that toggles casting to a remote device. */
 export const CastButton = createMediaButton<CastButtonCore, CastButtonProps>({
@@ -20,5 +25,5 @@ export const CastButton = createMediaButton<CastButtonCore, CastButtonProps>({
 
 export namespace CastButton {
   export type Props = CastButtonProps;
-  export type State = CastButtonCore.State;
+  export type State = CastButtonState;
 }

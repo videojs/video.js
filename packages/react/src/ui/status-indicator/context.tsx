@@ -1,10 +1,10 @@
 'use client';
 
-import type { StatusIndicatorCore } from '@videojs/core';
+import type { StatusIndicatorState } from '@videojs/core';
 import { createContext, type ProviderProps, useContext } from 'react';
 
 export interface StatusIndicatorContextValue {
-  state: StatusIndicatorCore.State;
+  state: StatusIndicatorState;
 }
 
 const StatusIndicatorContext = createContext<StatusIndicatorContextValue | null>(null);

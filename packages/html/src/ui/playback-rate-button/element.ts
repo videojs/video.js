@@ -1,4 +1,4 @@
-import { PlaybackRateButtonCore, PlaybackRateButtonDataAttrs } from '@videojs/core';
+import { PlaybackRateButtonCore, PlaybackRateButtonDataAttrs, type PlaybackRateButtonState } from '@videojs/core';
 import { applyElementProps, selectPlaybackRate, type UIEvent } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import type { MediaPlaybackRateState } from '@videojs/media';
@@ -7,7 +7,7 @@ import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateButtonCore> {
+export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateButtonState, MediaPlaybackRateState> {
   static readonly tagName = 'media-playback-rate-button';
 
   static override properties = {
@@ -72,5 +72,5 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
 }
 
 export namespace PlaybackRateButtonElement {
-  export type State = PlaybackRateButtonCore.State;
+  export type State = PlaybackRateButtonState;
 }

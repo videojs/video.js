@@ -1,6 +1,6 @@
 'use client';
 
-import { type DialogCore, getErrorDialogTitleText } from '@videojs/core';
+import { getErrorDialogTitleText, type DialogState } from '@videojs/core';
 import { translateText } from '@videojs/core/i18n';
 import { forwardRef, type ReactNode } from 'react';
 
@@ -9,7 +9,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from '../dialog/context';
 
-export interface ErrorDialogTitleProps extends UIComponentProps<'h2', DialogCore.State> {}
+export interface ErrorDialogTitleProps extends UIComponentProps<'h2', DialogState> {}
 
 /** Renders the localized error dialog heading, or authored children when provided. */
 export const ErrorDialogTitle = forwardRef<HTMLHeadingElement, ErrorDialogTitleProps>(function ErrorDialogTitle(
@@ -34,5 +34,5 @@ export const ErrorDialogTitle = forwardRef<HTMLHeadingElement, ErrorDialogTitleP
 
 export namespace ErrorDialogTitle {
   export type Props = ErrorDialogTitleProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

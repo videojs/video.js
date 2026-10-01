@@ -1,4 +1,4 @@
-import { VolumeSliderCore, VolumeSliderDataAttrs } from '@videojs/core';
+import { VolumeSliderCore, VolumeSliderDataAttrs, type VolumeSliderProps } from '@videojs/core';
 import {
   applyElementProps,
   applyStateDataAttrs,
@@ -37,7 +37,7 @@ export class VolumeSliderElement extends UIElement {
     orientation: { type: String },
     disabled: { type: Boolean },
     thumbAlignment: { type: String, attribute: 'thumb-alignment' },
-  } satisfies PropertyDeclarationMap<Exclude<keyof VolumeSliderCore.Props, 'value' | 'min' | 'max'>>;
+  } satisfies PropertyDeclarationMap<Exclude<keyof VolumeSliderProps, 'value' | 'min' | 'max'>>;
 
   label: Text | string = '';
   step = VolumeSliderCore.defaultProps.step;

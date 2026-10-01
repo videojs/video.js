@@ -4,6 +4,8 @@ import {
   ThumbnailDataAttrs,
   type ThumbnailImage,
   type ThumbnailResizeResult,
+  type ThumbnailImageProps,
+  type ThumbnailProps,
 } from '@videojs/core';
 import type { ThumbnailApi } from '@videojs/core/dom';
 import { applyElementProps, applyStateDataAttrs, createThumbnail, selectTextTrack } from '@videojs/core/dom';
@@ -62,12 +64,12 @@ export class ThumbnailElement extends UIElement {
     crossOrigin: { type: String, attribute: 'crossorigin' },
     loading: { type: String },
     fetchPriority: { type: String, attribute: 'fetchpriority' },
-  } satisfies PropertyDeclarationMap<Exclude<keyof ThumbnailCore.Props, 'thumbnails'>>;
+  } satisfies PropertyDeclarationMap<Exclude<keyof (ThumbnailProps & ThumbnailImageProps), 'thumbnails'>>;
 
   time = 0;
-  crossOrigin: ThumbnailCore.Props['crossOrigin'];
-  loading: ThumbnailCore.Props['loading'];
-  fetchPriority: ThumbnailCore.Props['fetchPriority'];
+  crossOrigin: (ThumbnailProps & ThumbnailImageProps)['crossOrigin'];
+  loading: (ThumbnailProps & ThumbnailImageProps)['loading'];
+  fetchPriority: (ThumbnailProps & ThumbnailImageProps)['fetchPriority'];
 
   readonly #core = new ThumbnailCore();
   readonly #shadow = this.attachShadow({ mode: 'open' });
@@ -212,7 +214,9 @@ export class ThumbnailElement extends UIElement {
    * without a skin having to thread an attribute through. Only the `<track>` path inherits: `thumbnails` set directly
    * may point at a host that has nothing to do with the media element.
    */
-  #inheritedCrossOrigin(textTrack: MediaTextTrackState | undefined): ThumbnailCore.Props['crossOrigin'] {
+  #inheritedCrossOrigin(
+    textTrack: MediaTextTrackState | undefined
+  ): (ThumbnailProps & ThumbnailImageProps)['crossOrigin'] {
     return this.#externalThumbnails ? undefined : textTrack?.thumbnailsTrack?.crossOrigin;
   }
 

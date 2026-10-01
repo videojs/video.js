@@ -1,6 +1,8 @@
 import { MuxAudio } from '../../../media/mux-audio/hls-js';
 import { safeDefine } from '../../../registration/safe-define';
 
+export type { MuxAudioAdapter, MuxAudioAdapterProps, MuxSource } from '@videojs/mux-audio';
+
 export class MuxAudioElement extends MuxAudio {
   static readonly tagName = 'mux-audio';
 }

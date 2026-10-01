@@ -1,6 +1,6 @@
 'use client';
 
-import { TimeCore, TimeDataAttrs } from '@videojs/core';
+import { TimeCore, TimeDataAttrs, type TimeProps, type TimeState } from '@videojs/core';
 import { logMissingFeature, selectBuffer, selectTime } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
 import { durationSuffixText, elapsedSuffixText, remainingSuffixText } from '@videojs/core/i18n/text/time';
@@ -14,7 +14,7 @@ import { usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 
-export interface ValueProps extends Omit<UIComponentProps<'time', TimeCore.State>, 'children'>, TimeCore.Props {}
+export interface ValueProps extends Omit<UIComponentProps<'time', TimeState>, 'children'>, TimeProps {}
 
 /**
  * Displays a formatted time value (current, duration, or remaining).
@@ -141,5 +141,5 @@ export const Value = forwardRef(function Value(
 
 export namespace Value {
   export type Props = ValueProps;
-  export type State = TimeCore.State;
+  export type State = TimeState;
 }

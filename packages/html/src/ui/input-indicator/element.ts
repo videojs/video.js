@@ -35,6 +35,7 @@ export interface InputIndicatorOptions {
 
 export abstract class InputIndicatorElement<IndicatorState extends IndicatorLifecycleState> extends UIElement {
   protected abstract get core(): InputIndicatorCoreApi<IndicatorState>;
+  /** @internal */
   protected abstract get transition(): TransitionApi;
   protected abstract get liveIndicator(): LiveIndicator<IndicatorState>;
   protected get options(): InputIndicatorOptions {
@@ -44,6 +45,7 @@ export abstract class InputIndicatorElement<IndicatorState extends IndicatorLife
   protected abstract syncCoreProps(): void;
 
   protected readonly player = new PlayerController(this, playerContext);
+  /** @internal */
   protected readonly container = new ContextConsumer(this, {
     context: containerContext,
     callback: () => this.#reconnect(),

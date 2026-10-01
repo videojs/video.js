@@ -1,16 +1,21 @@
 'use client';
 
-import { QualityRadioGroupCore, type QualityRadioGroupOption } from '@videojs/core';
+import {
+  QualityRadioGroupCore,
+  type QualityRadioGroupOption,
+  type QualityRadioGroupProps,
+  type QualityRadioGroupState,
+} from '@videojs/core';
 import { selectQuality } from '@videojs/core/dom';
 
 import { createRadioOptionsHook, type TranslatedRadioOption } from '../hooks/create-radio-options-hook';
 
-export interface QualityOptionsProps extends QualityRadioGroupCore.Props {}
+export interface QualityOptionsProps extends QualityRadioGroupProps {}
 
 export type QualityOption = TranslatedRadioOption<QualityRadioGroupOption>;
 
 export interface QualityOptionsResult {
-  state: QualityRadioGroupCore.State;
+  state: QualityRadioGroupState;
   label: string;
   value: string;
   selectedLabel: string;

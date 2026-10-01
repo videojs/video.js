@@ -10,6 +10,14 @@ import { useMediaInstance } from '../../utils/use-media-instance';
 import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
+export type {
+  MuxAdapterAPI,
+  MuxAdapterProps,
+  MuxAudioAdapter,
+  MuxContentData,
+  MuxSourceBase,
+} from '@videojs/mux-audio/spf';
+
 // `src` and `source` come from `MuxAdapterProps`: the Mux Adapter owns both, and its
 // `source` is the structured Mux one rather than the generic engine's. Both are
 // omitted from the base rather than intersected with it — the two `source` types

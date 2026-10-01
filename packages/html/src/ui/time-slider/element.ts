@@ -1,4 +1,4 @@
-import { TimeSliderCore, TimeSliderDataAttrs } from '@videojs/core';
+import { TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps } from '@videojs/core';
 import {
   applyElementProps,
   applyStateDataAttrs,
@@ -41,7 +41,7 @@ export class TimeSliderElement extends UIElement {
     disabled: { type: Boolean },
     thumbAlignment: { type: String, attribute: 'thumb-alignment' },
     pauseOnDrag: { type: Boolean, attribute: 'pause-on-drag' },
-  } satisfies PropertyDeclarationMap<Exclude<keyof TimeSliderCore.Props, 'value' | 'min' | 'max'>>;
+  } satisfies PropertyDeclarationMap<Exclude<keyof TimeSliderProps, 'value' | 'min' | 'max'>>;
 
   label: Text | string = '';
   changeThrottle = TimeSliderCore.defaultProps.changeThrottle;

@@ -1,6 +1,6 @@
 'use client';
 
-import { type DialogCore, getErrorDialogDismissText } from '@videojs/core';
+import { getErrorDialogDismissText, type DialogState } from '@videojs/core';
 import { translateText } from '@videojs/core/i18n';
 import { forwardRef, type ReactNode, useCallback } from 'react';
 
@@ -9,7 +9,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from '../dialog/context';
 
-export interface ErrorDialogCloseProps extends UIComponentProps<'button', DialogCore.State> {}
+export interface ErrorDialogCloseProps extends UIComponentProps<'button', DialogState> {}
 
 /** Renders a localized button that closes the dialog and dismisses the player error. */
 export const ErrorDialogClose = forwardRef<HTMLButtonElement, ErrorDialogCloseProps>(function ErrorDialogClose(
@@ -41,5 +41,5 @@ export const ErrorDialogClose = forwardRef<HTMLButtonElement, ErrorDialogClosePr
 
 export namespace ErrorDialogClose {
   export type Props = ErrorDialogCloseProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

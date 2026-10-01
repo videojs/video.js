@@ -28,6 +28,7 @@ export interface TooltipOptions {
   disableHoverablePopup?: () => boolean;
   disabled?: () => boolean;
   sticky?: () => boolean;
+  /** @internal Supplied by the framework tooltip provider or group element to coordinate delays. */
   group?: () => TooltipGroupCore | undefined;
   popupGroup?: () => PopupGroup | undefined;
 }

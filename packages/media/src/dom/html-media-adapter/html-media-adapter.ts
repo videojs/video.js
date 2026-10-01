@@ -1,5 +1,3 @@
-import type { EventListenerFor, EventType, QueriedElement } from '@videojs/utils/dom';
-
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/constants';
 import {
   type EventLike,
@@ -10,6 +8,20 @@ import {
   type TextTrackKind,
   type TextTrackLike,
 } from '../../core/types';
+
+/** The element a selector matches: the tag's element type for a tag name, otherwise `E`. */
+type QueriedElement<S extends string, E extends Element> = S extends keyof HTMLElementTagNameMap
+  ? HTMLElementTagNameMap[S]
+  : E;
+
+/** An event type from `Events`, or any other event type string. */
+type EventType<Events> = (keyof Events & string) | (string & {});
+
+/** A listener typed by `Events` for known event types, and a plain DOM listener otherwise. */
+type EventListenerFor<Events, K> =
+  | ((event: K extends keyof Events ? Events[K] : Event) => void)
+  | EventListenerOrEventListenerObject
+  | null;
 
 export interface HTMLMediaTargetLike extends MediaTargetLike, EventTarget {
   querySelector<E extends Element = Element>(selectors: string): E | null;

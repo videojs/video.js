@@ -1,4 +1,4 @@
-import { TooltipGroupCore } from '@videojs/core';
+import { TooltipGroupCore, type TooltipGroupProps } from '@videojs/core';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextProvider } from '@videojs/element/context';
 
@@ -12,7 +12,7 @@ export class TooltipGroupElement extends UIElement {
     delay: { type: Number },
     closeDelay: { type: Number, attribute: 'close-delay' },
     timeout: { type: Number },
-  } satisfies PropertyDeclarationMap<keyof TooltipGroupCore.Props>;
+  } satisfies PropertyDeclarationMap<keyof TooltipGroupProps>;
 
   delay = TooltipGroupCore.defaultProps.delay;
   closeDelay = TooltipGroupCore.defaultProps.closeDelay;

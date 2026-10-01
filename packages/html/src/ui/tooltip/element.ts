@@ -5,6 +5,7 @@ import {
   TooltipCSSVars,
   TooltipDataAttrs,
   type TooltipInput,
+  type TooltipProps,
 } from '@videojs/core';
 import {
   applyElementProps,
@@ -62,7 +63,7 @@ export class TooltipElement extends UIElement {
     sticky: { type: Boolean },
     boundary: { type: String },
     trigger: { type: String },
-  } satisfies PropertyDeclarationMap<keyof TooltipCore.Props | 'boundary' | 'trigger'>;
+  } satisfies PropertyDeclarationMap<keyof TooltipProps | 'trigger'>;
 
   open = TooltipCore.defaultProps.open;
   defaultOpen = TooltipCore.defaultProps.defaultOpen;

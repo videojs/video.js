@@ -1,6 +1,11 @@
 'use client';
 
-import { BufferingIndicatorCore, BufferingIndicatorDataAttrs } from '@videojs/core';
+import {
+  BufferingIndicatorCore,
+  BufferingIndicatorDataAttrs,
+  type BufferingIndicatorProps as CoreBufferingIndicatorProps,
+  type BufferingIndicatorState,
+} from '@videojs/core';
 import { logMissingFeature, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useState, useSyncExternalStore } from 'react';
@@ -11,7 +16,7 @@ import { useDestroy } from '../../utils/use-destroy';
 import { renderElement } from '../../utils/use-render';
 
 export interface BufferingIndicatorProps
-  extends UIComponentProps<'div', BufferingIndicatorCore.State>, BufferingIndicatorCore.Props {}
+  extends UIComponentProps<'div', BufferingIndicatorState>, CoreBufferingIndicatorProps {}
 
 /**
  * Displays a buffering indicator when media is waiting for data.
@@ -72,5 +77,5 @@ export const BufferingIndicator = forwardRef(function BufferingIndicator(
 
 export namespace BufferingIndicator {
   export type Props = BufferingIndicatorProps;
-  export type State = BufferingIndicatorCore.State;
+  export type State = BufferingIndicatorState;
 }

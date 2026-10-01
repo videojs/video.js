@@ -1,6 +1,6 @@
 'use client';
 
-import { type VolumeIndicatorCore, VolumeIndicatorCSSVars } from '@videojs/core';
+import { VolumeIndicatorCSSVars, type VolumeIndicatorState } from '@videojs/core';
 import { isFunction } from '@videojs/utils/predicate';
 import type { CSSProperties, ForwardedRef } from 'react';
 import { forwardRef } from 'react';
@@ -9,7 +9,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useVolumeIndicatorContext } from './context';
 
-export interface VolumeIndicatorFillProps extends UIComponentProps<'div', VolumeIndicatorCore.State> {}
+export interface VolumeIndicatorFillProps extends UIComponentProps<'div', VolumeIndicatorState> {}
 
 export const VolumeIndicatorFill = forwardRef(function VolumeIndicatorFill(
   componentProps: VolumeIndicatorFillProps,
@@ -35,7 +35,7 @@ export namespace VolumeIndicatorFill {
 }
 
 function getVolumeIndicatorFillStyle(
-  state: VolumeIndicatorCore.State,
+  state: VolumeIndicatorState,
   style: VolumeIndicatorFillProps['style']
 ): VolumeIndicatorFillProps['style'] {
   const vars = state.fill

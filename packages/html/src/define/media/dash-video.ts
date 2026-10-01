@@ -1,6 +1,8 @@
 import { DashVideo } from '../../media/dash-video';
 import { safeDefine } from '../../registration/safe-define';
 
+export type { DashAdapter, DashAdapterProps, DashEngineConfig, DashSource } from '@videojs/dash-video';
+
 /** MPEG-DASH media element powered by dash.js and registered as `<dash-video>`. */
 export class DashVideoElement extends DashVideo {
   static readonly tagName = 'dash-video';

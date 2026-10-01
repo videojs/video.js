@@ -1,6 +1,10 @@
 'use client';
 
-import type { ThumbnailCore, ThumbnailFetchPriority } from '@videojs/core';
+import type {
+  ThumbnailFetchPriority,
+  ThumbnailImageProps as CoreThumbnailImageProps,
+  ThumbnailState,
+} from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';
 
@@ -10,15 +14,15 @@ import { renderElement } from '../../utils/use-render';
 import { useThumbnailContext } from './context';
 
 export interface ThumbnailImageProps extends Omit<
-  UIComponentProps<'img', ThumbnailCore.State>,
+  UIComponentProps<'img', ThumbnailState>,
   'crossOrigin' | 'fetchPriority' | 'loading' | 'src'
 > {
   /** CORS setting for the selected image. Leave unset to follow the media element, or pass `null` to opt out. */
-  crossOrigin?: ThumbnailCore.ImageProps['crossOrigin'];
+  crossOrigin?: CoreThumbnailImageProps['crossOrigin'];
   /** Image loading strategy. */
-  loading?: ThumbnailCore.ImageProps['loading'];
+  loading?: CoreThumbnailImageProps['loading'];
   /** Image fetch priority hint. */
-  fetchPriority?: ThumbnailCore.ImageProps['fetchPriority'];
+  fetchPriority?: CoreThumbnailImageProps['fetchPriority'];
 }
 
 /**

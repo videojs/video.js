@@ -1,13 +1,13 @@
 'use client';
 
-import type { DialogCore } from '@videojs/core';
+import type { DialogState } from '@videojs/core';
 import { forwardRef } from 'react';
 
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from './context';
 
-export interface DialogBackdropProps extends UIComponentProps<'div', DialogCore.State> {}
+export interface DialogBackdropProps extends UIComponentProps<'div', DialogState> {}
 
 /** Presentational layer behind a dialog while it is rendered, including its exit transition. */
 export const DialogBackdrop = forwardRef<HTMLDivElement, DialogBackdropProps>(function DialogBackdrop(
@@ -31,5 +31,5 @@ export const DialogBackdrop = forwardRef<HTMLDivElement, DialogBackdropProps>(fu
 
 export namespace DialogBackdrop {
   export type Props = DialogBackdropProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

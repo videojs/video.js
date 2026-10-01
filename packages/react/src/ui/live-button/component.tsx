@@ -1,6 +1,12 @@
 'use client';
 
-import { LiveButtonCore, LiveButtonDataAttrs, type LiveButtonMediaState } from '@videojs/core';
+import {
+  LiveButtonCore,
+  LiveButtonDataAttrs,
+  type LiveButtonMediaState,
+  type LiveButtonProps as CoreLiveButtonProps,
+  type LiveButtonState,
+} from '@videojs/core';
 import { logMissingFeature, selectBuffer, selectLive, selectTime } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
 import { forwardRef, type ReactNode, useLayoutEffect, useState } from 'react';
@@ -14,7 +20,7 @@ import { useOptionalTooltipContext } from '../tooltip/context';
 
 const DISPLAY_NAME = 'LiveButton';
 
-export interface LiveButtonProps extends UIComponentProps<'button', LiveButtonCore.State>, LiveButtonCore.Props {}
+export interface LiveButtonProps extends UIComponentProps<'button', LiveButtonState>, CoreLiveButtonProps {}
 
 /**
  * A button that indicates live status and seeks to the live edge when pressed. Exposes `data-live` while the stream is
@@ -112,5 +118,5 @@ LiveButton.displayName = DISPLAY_NAME;
 
 export namespace LiveButton {
   export type Props = LiveButtonProps;
-  export type State = LiveButtonCore.State;
+  export type State = LiveButtonState;
 }

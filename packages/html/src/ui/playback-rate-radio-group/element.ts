@@ -2,6 +2,7 @@ import {
   PlaybackRateRadioGroupCore,
   PlaybackRateRadioGroupDataAttrs,
   type PlaybackRateRadioGroupOption,
+  type PlaybackRateRadioGroupState,
 } from '@videojs/core';
 import { applyStateDataAttrs, logMissingFeature, selectPlaybackRate } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
@@ -54,7 +55,7 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
 
   protected override update(changed: PropertyValues): void {
     const media = this.#mediaState.value;
-    let state: PlaybackRateRadioGroupCore.State | null = null;
+    let state: PlaybackRateRadioGroupState | null = null;
 
     if (media) {
       this.#core.setProps({ formatRate: this.formatRate, disabled: this.disabled });
@@ -77,5 +78,5 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
 }
 
 export namespace PlaybackRateRadioGroupElement {
-  export type State = PlaybackRateRadioGroupCore.State;
+  export type State = PlaybackRateRadioGroupState;
 }

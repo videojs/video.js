@@ -3,6 +3,7 @@ import type { MenuApi, MenuPopupApi } from '@videojs/core/dom';
 import { createContext } from '@videojs/element/context';
 
 export interface MenuContextValue {
+  /** @internal The menu core that owns this menu; parts read `state` instead. */
   core: MenuCore;
   menu: MenuApi;
   popup: MenuPopupApi;

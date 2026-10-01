@@ -19,8 +19,10 @@ export type { MediaResolution };
 
 export { Hls };
 
-export type PlaybackType = (typeof PlaybackTypes)[keyof typeof PlaybackTypes];
-export type SourceType = (typeof ContentTypes)[keyof typeof ContentTypes];
+/** How hls.js plays a source: through Media Source Extensions, or the browser's native HLS support. */
+export type PlaybackType = 'mse' | 'native' | (string & {});
+/** A source's MIME type, such as `application/vnd.apple.mpegurl` for HLS or `video/mp4`. */
+export type SourceType = 'application/vnd.apple.mpegurl' | 'video/mp4' | (string & {});
 export type StreamType = MediaStreamType;
 
 export const PlaybackTypes = {

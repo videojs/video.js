@@ -1,6 +1,6 @@
 'use client';
 
-import { type DialogCore, resolveErrorDialogDescription } from '@videojs/core';
+import { resolveErrorDialogDescription, type DialogState } from '@videojs/core';
 import { translateText } from '@videojs/core/i18n';
 import { forwardRef, type ReactNode } from 'react';
 
@@ -10,7 +10,7 @@ import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from '../dialog/context';
 import { useErrorDialogContext } from './context';
 
-export interface ErrorDialogDescriptionProps extends UIComponentProps<'p', DialogCore.State> {}
+export interface ErrorDialogDescriptionProps extends UIComponentProps<'p', DialogState> {}
 
 /** Renders the localized playback error message, or authored children when provided. */
 export const ErrorDialogDescription = forwardRef<HTMLParagraphElement, ErrorDialogDescriptionProps>(
@@ -36,5 +36,5 @@ export const ErrorDialogDescription = forwardRef<HTMLParagraphElement, ErrorDial
 
 export namespace ErrorDialogDescription {
   export type Props = ErrorDialogDescriptionProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

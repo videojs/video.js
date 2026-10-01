@@ -114,7 +114,8 @@ export const MediaReadyState = {
   HAVE_ENOUGH_DATA: 4,
 } as const;
 
-export type MediaReadyStateValue = (typeof MediaReadyState)[keyof typeof MediaReadyState];
+/** An `HTMLMediaElement.readyState` value, from `0` (`HAVE_NOTHING`) to `4` (`HAVE_ENOUGH_DATA`). */
+export type MediaReadyStateValue = 0 | 1 | 2 | 3 | 4;
 
 export interface MediaSourceEvents {
   loadstart: EventLike;
@@ -421,21 +422,22 @@ export interface MediaPictureInPictureCapability {
 // Stream type
 // ----------------------------------------
 
-/**
- * Canonical values for {@link MediaStreamType}.
- *
- * - `ON_DEMAND` — a finite-duration asset (VOD). Scrubbing is generally supported across the full timeline.
- * - `LIVE` — a live or DVR stream. The seekable window may slide as new segments are published, and `duration` is
- *   typically `Infinity`.
- * - `UNKNOWN` — the stream type has not been determined yet (no source, or metadata has not loaded).
- */
+/** Named values of {@link MediaStreamType}. */
 export const MediaStreamTypes = {
   ON_DEMAND: 'on-demand',
   LIVE: 'live',
   UNKNOWN: 'unknown',
 } as const;
 
-export type MediaStreamType = (typeof MediaStreamTypes)[keyof typeof MediaStreamTypes];
+/**
+ * How a stream is delivered.
+ *
+ * - `on-demand` — a finite-duration asset (VOD). Scrubbing is generally supported across the full timeline.
+ * - `live` — a live or DVR stream. The seekable window may slide as new segments are published, and `duration` is
+ *   typically `Infinity`.
+ * - `unknown` — the stream type has not been determined yet (no source, or metadata has not loaded).
+ */
+export type MediaStreamType = 'on-demand' | 'live' | 'unknown';
 
 export interface MediaStreamTypeEvents {
   streamtypechange: EventLike;

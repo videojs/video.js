@@ -1,12 +1,17 @@
 'use client';
 
-import { PiPButtonCore, PiPButtonDataAttrs } from '@videojs/core';
+import {
+  PiPButtonCore,
+  PiPButtonDataAttrs,
+  type PiPButtonProps as CorePiPButtonProps,
+  type PiPButtonState,
+} from '@videojs/core';
 import { selectPiP } from '@videojs/core/dom';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createMediaButton } from '../create-media-button';
 
-export interface PiPButtonProps extends UIComponentProps<'button', PiPButtonCore.State>, PiPButtonCore.Props {}
+export interface PiPButtonProps extends UIComponentProps<'button', PiPButtonState>, CorePiPButtonProps {}
 
 /** A button that toggles picture-in-picture. */
 export const PiPButton = createMediaButton<PiPButtonCore, PiPButtonProps>({
@@ -21,5 +26,5 @@ export const PiPButton = createMediaButton<PiPButtonCore, PiPButtonProps>({
 
 export namespace PiPButton {
   export type Props = PiPButtonProps;
-  export type State = PiPButtonCore.State;
+  export type State = PiPButtonState;
 }

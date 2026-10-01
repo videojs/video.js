@@ -1,4 +1,4 @@
-import { TimeCore, TimeDataAttrs, type TimeType } from '@videojs/core';
+import { TimeCore, TimeDataAttrs, type TimeType, type TimeProps, type TimeState } from '@videojs/core';
 import { applyElementProps, applyStateDataAttrs, logMissingFeature, selectBuffer, selectTime } from '@videojs/core/dom';
 import { type Text, translateText } from '@videojs/core/i18n';
 import { durationSuffixText, elapsedSuffixText, remainingSuffixText } from '@videojs/core/i18n/text/time';
@@ -21,7 +21,7 @@ export class TimeElement extends UIElement {
     negativeSign: { type: String, attribute: 'negative-sign' },
     label: { type: String },
     toggle: { type: Boolean },
-  } satisfies PropertyDeclarationMap<keyof TimeCore.Props>;
+  } satisfies PropertyDeclarationMap<keyof TimeProps>;
 
   type: TimeType = TimeCore.defaultProps.type;
   negativeSign = TimeCore.defaultProps.negativeSign;
@@ -117,7 +117,7 @@ export class TimeElement extends UIElement {
     applyStateDataAttrs(this, state, TimeDataAttrs);
   }
 
-  #getLabelParams(state: TimeCore.State): { duration: string } | undefined {
+  #getLabelParams(state: TimeState): { duration: string } | undefined {
     const params = this.#core.getLabelParams(state);
     if (!params) return undefined;
 

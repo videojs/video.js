@@ -8,7 +8,7 @@ import styles from '../../define/audio/neutral-skin.css?inline';
 /** Packaged Neutral audio UI registered as `<audio-neutral-skin>`. */
 export class NeutralAudioSkinElement extends SkinElement {
   static readonly tagName = 'audio-neutral-skin';
-  static styles = createShadowStyle(styles);
+  static styles: CSSStyleSheet | string = createShadowStyle(styles);
   static template = template;
 }
 

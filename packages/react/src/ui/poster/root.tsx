@@ -1,6 +1,6 @@
 'use client';
 
-import { PosterCore, PosterDataAttrs, type PosterImageLoadState } from '@videojs/core';
+import { PosterCore, PosterDataAttrs, type PosterImageLoadState, type PosterState } from '@videojs/core';
 import { logMissingFeature, selectMetadata, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useState } from 'react';
@@ -10,7 +10,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { PosterProvider } from './context';
 
-export interface PosterRootProps extends UIComponentProps<'div', PosterCore.State> {}
+export interface PosterRootProps extends UIComponentProps<'div', PosterState> {}
 
 /**
  * Manages poster visibility and image loading state.
@@ -68,5 +68,5 @@ export const PosterRoot = forwardRef(function PosterRoot(
 
 export namespace PosterRoot {
   export type Props = PosterRootProps;
-  export type State = PosterCore.State;
+  export type State = PosterState;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { getSeekIndicatorDisplayValue, type SeekIndicatorCore } from '@videojs/core';
+import { getSeekIndicatorDisplayValue, type SeekIndicatorState } from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';
 
@@ -8,7 +8,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useSeekIndicatorContext } from './context';
 
-export interface SeekIndicatorValueProps extends UIComponentProps<'div', SeekIndicatorCore.State> {}
+export interface SeekIndicatorValueProps extends UIComponentProps<'div', SeekIndicatorState> {}
 
 export const SeekIndicatorValue = forwardRef(function SeekIndicatorValue(
   componentProps: SeekIndicatorValueProps,

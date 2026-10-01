@@ -1,4 +1,11 @@
-import { DialogCore, DialogDataAttrs, type DialogInput, type DialogState, type StateAttrMap } from '@videojs/core';
+import {
+  DialogCore,
+  DialogDataAttrs,
+  type DialogInput,
+  type DialogState,
+  type StateAttrMap,
+  type DialogProps,
+} from '@videojs/core';
 import {
   applyElementProps,
   applyStateDataAttrs,
@@ -17,7 +24,9 @@ import { dialogContext } from './context';
 let idCounter = 0;
 
 export interface DialogElementBaseOptions {
+  /** @internal */
   core?: DialogCore;
+  /** @internal */
   stateAttrMap?: StateAttrMap<DialogState>;
   idPrefix?: string;
   bindTrigger?: boolean;
@@ -28,7 +37,7 @@ export class DialogElementBase extends UIElement {
     open: { type: Boolean },
     defaultOpen: { type: Boolean, attribute: 'default-open' },
     closeOnEscape: { type: Boolean, attribute: 'close-on-escape' },
-  } satisfies PropertyDeclarationMap<keyof DialogCore.Props>;
+  } satisfies PropertyDeclarationMap<keyof DialogProps>;
 
   open = DialogCore.defaultProps.open;
   defaultOpen = DialogCore.defaultProps.defaultOpen;

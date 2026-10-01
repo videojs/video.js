@@ -17,7 +17,7 @@ import type {
   MediaVolumeState,
 } from '@videojs/media';
 import type { AnySlice, InferSliceSourceState, Slice, Store, UnionSliceState } from '@videojs/store';
-import type { CamelCase, Simplify, UnionToIntersection } from '@videojs/utils/types';
+import type { CamelCase } from '@videojs/utils/types';
 
 import type { metadataFeature } from './store/features/metadata';
 
@@ -113,13 +113,18 @@ type HtmlPropertyKey<Key, Entry> = Entry extends { html: { attribute: infer Attr
   ? CamelCase<Attribute>
   : Key;
 
+/** Merge a union of per-feature config objects into one flat object type. */
+type MergedConfig<Union> = (Union extends any ? (config: Union) => void : never) extends (config: infer Merged) => void
+  ? { [Key in keyof Merged]: Merged[Key] } & {}
+  : never;
+
 export type UnionPlayerConfig<Features extends readonly AnyPlayerFeature[]> = Features extends readonly []
   ? object
-  : Simplify<UnionToIntersection<InferPlayerFeatureConfig<Features[number]>>>;
+  : MergedConfig<InferPlayerFeatureConfig<Features[number]>>;
 
 export type UnionPlayerHtmlConfig<Features extends readonly AnyPlayerFeature[]> = Features extends readonly []
   ? object
-  : Simplify<UnionToIntersection<InferPlayerFeatureHtmlConfig<Features[number]>>>;
+  : MergedConfig<InferPlayerFeatureHtmlConfig<Features[number]>>;
 
 declare const PLAYER_CONFIG: unique symbol;
 declare const PLAYER_HTML_CONFIG: unique symbol;

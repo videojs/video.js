@@ -1,15 +1,15 @@
 'use client';
 
-import type { DialogCore } from '@videojs/core';
+import type { DialogState } from '@videojs/core';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createContextPart } from '../create-context-part';
 import { useDialogContext } from './context';
 
-export interface DialogTitleProps extends UIComponentProps<'h2', DialogCore.State> {}
+export interface DialogTitleProps extends UIComponentProps<'h2', DialogState> {}
 
 /** Renders the heading that labels the dialog. */
-export const DialogTitle = createContextPart<DialogTitleProps, DialogCore.State>({
+export const DialogTitle = createContextPart<DialogTitleProps, DialogState>({
   displayName: 'DialogTitle',
   tag: 'h2',
   useContext: useDialogContext,
@@ -18,5 +18,5 @@ export const DialogTitle = createContextPart<DialogTitleProps, DialogCore.State>
 
 export namespace DialogTitle {
   export type Props = DialogTitleProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

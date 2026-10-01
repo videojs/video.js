@@ -1,6 +1,6 @@
 'use client';
 
-import { type AudioTrackRadioGroupCore, AudioTrackRadioGroupDataAttrs, type MenuOptionState } from '@videojs/core';
+import { AudioTrackRadioGroupDataAttrs, type MenuOptionState, type AudioTrackRadioGroupState } from '@videojs/core';
 import { getStateDataAttrs } from '@videojs/core/dom';
 import { isFunction } from '@videojs/utils/predicate';
 import type { ReactElement, ReactNode } from 'react';
@@ -33,7 +33,7 @@ export interface AudioTrackRadioGroupRootProps extends AudioTrackOptionsProps {
 }
 
 export interface AudioTrackRadioGroupOptionsProps extends Omit<
-  UIComponentProps<'div', AudioTrackRadioGroupCore.State>,
+  UIComponentProps<'div', AudioTrackRadioGroupState>,
   'children'
 > {
   /** Render one consumer-owned menu radio item for every audio track. */
@@ -152,7 +152,7 @@ export namespace AudioTrackRadioGroupValue {
 
 export namespace AudioTrackRadioGroupOptions {
   export type Props = AudioTrackRadioGroupOptionsProps;
-  export type State = AudioTrackRadioGroupCore.State;
+  export type State = AudioTrackRadioGroupState;
   export type ItemProps = AudioTrackRadioGroupItemProps;
   export type ItemState = AudioTrackRadioGroupItemState;
 }

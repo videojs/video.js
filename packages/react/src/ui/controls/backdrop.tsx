@@ -1,13 +1,13 @@
 'use client';
 
-import type { ControlsCore } from '@videojs/core';
+import type { ControlsState } from '@videojs/core';
 import { forwardRef } from 'react';
 
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useControlsContext } from './context';
 
-export interface ControlsBackdropProps extends UIComponentProps<'div', ControlsCore.State> {}
+export interface ControlsBackdropProps extends UIComponentProps<'div', ControlsState> {}
 
 /**
  * Presentational layer behind player controls. Renders a `<div>` with the controls state data attributes so skins can
@@ -33,5 +33,5 @@ export const ControlsBackdrop = forwardRef<HTMLDivElement, ControlsBackdropProps
 
 export namespace ControlsBackdrop {
   export type Props = ControlsBackdropProps;
-  export type State = ControlsCore.State;
+  export type State = ControlsState;
 }

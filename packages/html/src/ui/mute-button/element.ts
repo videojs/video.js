@@ -1,4 +1,4 @@
-import { MuteButtonCore, MuteButtonDataAttrs } from '@videojs/core';
+import { MuteButtonCore, MuteButtonDataAttrs, type MuteButtonState } from '@videojs/core';
 import { selectVolume } from '@videojs/core/dom';
 import type { MediaVolumeState } from '@videojs/media';
 
@@ -6,7 +6,7 @@ import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class MuteButtonElement extends MediaButtonElement<MuteButtonCore> {
+export class MuteButtonElement extends MediaButtonElement<MuteButtonState, MediaVolumeState> {
   static readonly tagName = 'media-mute-button';
 
   protected readonly core = new MuteButtonCore();

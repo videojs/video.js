@@ -1,6 +1,6 @@
 'use client';
 
-import { SliderCore, SliderDataAttrs } from '@videojs/core';
+import { SliderCore, SliderDataAttrs, type SliderProps, type SliderState } from '@videojs/core';
 import { getSliderCSSVars } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
 import type { ForwardedRef } from 'react';
@@ -12,7 +12,7 @@ import { renderElement } from '../../utils/use-render';
 import { useSlider } from '../hooks/use-slider';
 import { SliderProvider } from './context';
 
-export interface SliderRootProps extends UIComponentProps<'div', SliderCore.State>, SliderCore.Props {
+export interface SliderRootProps extends UIComponentProps<'div', SliderState>, SliderProps {
   onValueChange?: ((value: number) => void) | undefined;
   onValueCommit?: ((value: number) => void) | undefined;
   onDragStart?: (() => void) | undefined;
@@ -110,5 +110,5 @@ export const SliderRoot = forwardRef(function SliderRoot(
 
 export namespace SliderRoot {
   export type Props = SliderRootProps;
-  export type State = SliderCore.State;
+  export type State = SliderState;
 }

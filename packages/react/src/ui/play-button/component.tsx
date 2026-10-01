@@ -1,12 +1,17 @@
 'use client';
 
-import { PlayButtonCore, PlayButtonDataAttrs } from '@videojs/core';
+import {
+  PlayButtonCore,
+  PlayButtonDataAttrs,
+  type PlayButtonProps as CorePlayButtonProps,
+  type PlayButtonState,
+} from '@videojs/core';
 import { selectPlayback } from '@videojs/core/dom';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createMediaButton } from '../create-media-button';
 
-export interface PlayButtonProps extends UIComponentProps<'button', PlayButtonCore.State>, PlayButtonCore.Props {}
+export interface PlayButtonProps extends UIComponentProps<'button', PlayButtonState>, CorePlayButtonProps {}
 
 /**
  * A button that toggles playback.
@@ -35,5 +40,5 @@ export const PlayButton = createMediaButton<PlayButtonCore, PlayButtonProps>({
 
 export namespace PlayButton {
   export type Props = PlayButtonProps;
-  export type State = PlayButtonCore.State;
+  export type State = PlayButtonState;
 }

@@ -1,4 +1,4 @@
-import { PiPButtonCore, PiPButtonDataAttrs } from '@videojs/core';
+import { PiPButtonCore, PiPButtonDataAttrs, type PiPButtonState } from '@videojs/core';
 import { selectPiP } from '@videojs/core/dom';
 import type { MediaPictureInPictureState } from '@videojs/media';
 
@@ -6,7 +6,7 @@ import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class PiPButtonElement extends MediaButtonElement<PiPButtonCore> {
+export class PiPButtonElement extends MediaButtonElement<PiPButtonState, MediaPictureInPictureState> {
   static readonly tagName = 'media-pip-button';
 
   protected readonly core = new PiPButtonCore();

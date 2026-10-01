@@ -1,13 +1,13 @@
 'use client';
 
-import type { DialogCore } from '@videojs/core';
+import type { DialogState } from '@videojs/core';
 import { forwardRef, useCallback } from 'react';
 
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from './context';
 
-export interface DialogPopupProps extends UIComponentProps<'div', DialogCore.State> {}
+export interface DialogPopupProps extends UIComponentProps<'div', DialogState> {}
 
 /** Renders the modal dialog while it is open. */
 export const DialogPopup = forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
@@ -34,5 +34,5 @@ export const DialogPopup = forwardRef<HTMLDivElement, DialogPopupProps>(function
 
 export namespace DialogPopup {
   export type Props = DialogPopupProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

@@ -1,4 +1,4 @@
-import { LiveButtonCore, LiveButtonDataAttrs, type LiveButtonMediaState } from '@videojs/core';
+import { LiveButtonCore, LiveButtonDataAttrs, type LiveButtonMediaState, type LiveButtonState } from '@videojs/core';
 import {
   applyElementProps,
   applyStateDataAttrs,
@@ -36,6 +36,7 @@ export class LiveButtonElement extends UIElement {
   disabled = false;
   label: Text | string = '';
 
+  /** @internal */
   protected readonly core = new LiveButtonCore();
 
   protected readonly live = new PlayerController(this, playerContext, selectLive);
@@ -43,7 +44,7 @@ export class LiveButtonElement extends UIElement {
   protected readonly buffer = new PlayerController(this, playerContext, selectBuffer);
   readonly #i18n = new I18nController(this, i18nContext);
 
-  get $state(): State<LiveButtonCore.State> {
+  get $state(): State<LiveButtonState> {
     return this.core.state;
   }
 

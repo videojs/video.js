@@ -1,10 +1,11 @@
 import {
   createInputIndicatorLabels,
+  type DeriveCustomStatus,
   getStatusIndicatorDisplayValue,
   type InputAction,
   StatusIndicatorCore,
   StatusIndicatorDataAttrs,
-  type DeriveCustomStatus,
+  type StatusIndicatorState,
 } from '@videojs/core';
 import { createTransition } from '@videojs/core/dom';
 import type { PropertyDeclarationMap } from '@videojs/element';
@@ -14,7 +15,7 @@ import { I18nController } from '../../i18n/controller';
 import { InputIndicatorElement, type InputIndicatorOptions } from '../input-indicator/element';
 import { LiveIndicator } from '../input-indicator/live-indicator';
 
-export class StatusIndicatorElement extends InputIndicatorElement<StatusIndicatorCore.State> {
+export class StatusIndicatorElement extends InputIndicatorElement<StatusIndicatorState> {
   static readonly tagName = 'media-status-indicator';
 
   static override properties = {
@@ -79,7 +80,7 @@ function parseActions(actions: string | undefined): readonly InputAction[] | und
   return actions?.split(/[\s,]+/).filter(Boolean) as readonly InputAction[] | undefined;
 }
 
-function renderStatusIndicator(element: HTMLElement, state: StatusIndicatorCore.State): void {
+function renderStatusIndicator(element: HTMLElement, state: StatusIndicatorState): void {
   const value = element.querySelector('media-status-indicator-value');
   if (!value) return;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { type MenuOptionState, type PlaybackRateRadioGroupCore, PlaybackRateRadioGroupDataAttrs } from '@videojs/core';
+import { type MenuOptionState, PlaybackRateRadioGroupDataAttrs, type PlaybackRateRadioGroupState } from '@videojs/core';
 import { getStateDataAttrs } from '@videojs/core/dom';
 import { isFunction } from '@videojs/utils/predicate';
 import type { ReactElement, ReactNode } from 'react';
@@ -33,7 +33,7 @@ export interface PlaybackRateRadioGroupRootProps extends PlaybackRateOptionsProp
 }
 
 export interface PlaybackRateRadioGroupOptionsProps extends Omit<
-  UIComponentProps<'div', PlaybackRateRadioGroupCore.State>,
+  UIComponentProps<'div', PlaybackRateRadioGroupState>,
   'children'
 > {
   /** Render one consumer-owned menu radio item for every playback rate. */
@@ -154,7 +154,7 @@ export namespace PlaybackRateRadioGroupValue {
 
 export namespace PlaybackRateRadioGroupOptions {
   export type Props = PlaybackRateRadioGroupOptionsProps;
-  export type State = PlaybackRateRadioGroupCore.State;
+  export type State = PlaybackRateRadioGroupState;
   export type ItemProps = PlaybackRateRadioGroupItemProps;
   export type ItemState = PlaybackRateRadioGroupItemState;
 }

@@ -1,4 +1,4 @@
-import { SeekButtonCore, SeekButtonDataAttrs } from '@videojs/core';
+import { SeekButtonCore, SeekButtonDataAttrs, type SeekButtonState } from '@videojs/core';
 import { selectTime } from '@videojs/core/dom';
 import type { PropertyDeclarationMap } from '@videojs/element';
 import type { MediaTimeState } from '@videojs/media';
@@ -7,7 +7,7 @@ import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class SeekButtonElement extends MediaButtonElement<SeekButtonCore> {
+export class SeekButtonElement extends MediaButtonElement<SeekButtonState, MediaTimeState> {
   static readonly tagName = 'media-seek-button';
 
   static override properties: PropertyDeclarationMap = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { MenuCore, type MenuOptionState, resolveMenuOptionState } from '@videojs/core';
+import { MenuCore, type MenuOptionState, resolveMenuOptionState, type MenuProps } from '@videojs/core';
 import {
   createMenu,
   createTransition,
@@ -21,7 +21,7 @@ import { useOptionalControlsContext } from '../controls/context';
 import { usePositionedState } from '../hooks/use-positioned-state';
 import { MenuContextProvider, useOptionalMenuContext } from './context';
 
-export interface MenuRootProps extends Omit<MenuCore.Props, 'boundary'> {
+export interface MenuRootProps extends Omit<MenuProps, 'boundary'> {
   /** Boundary used to constrain the root menu popup size. */
   boundary?: PositioningBoundary;
   /** Called when the menu open state changes (fires immediately, before animations). */

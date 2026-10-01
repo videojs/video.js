@@ -1,4 +1,4 @@
-import { CaptionsButtonCore, CaptionsButtonDataAttrs } from '@videojs/core';
+import { CaptionsButtonCore, CaptionsButtonDataAttrs, type CaptionsButtonState } from '@videojs/core';
 import { applyElementProps, selectTextTrack, type UIEvent } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import type { MediaTextTrackState } from '@videojs/media';
@@ -13,7 +13,7 @@ function getCaptionTrackCount(state: MediaTextTrackState): number {
   return state.textTrackList.filter(isCaptionOrSubtitleTrack).length;
 }
 
-export class CaptionsButtonElement extends MediaButtonElement<CaptionsButtonCore> {
+export class CaptionsButtonElement extends MediaButtonElement<CaptionsButtonState, MediaTextTrackState> {
   static readonly tagName = 'media-captions-button';
 
   static override properties = {
@@ -102,5 +102,5 @@ export class CaptionsButtonElement extends MediaButtonElement<CaptionsButtonCore
 }
 
 export namespace CaptionsButtonElement {
-  export type State = CaptionsButtonCore.State;
+  export type State = CaptionsButtonState;
 }

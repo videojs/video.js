@@ -1,6 +1,6 @@
 'use client';
 
-import { TitleCore, TitleDataAttrs } from '@videojs/core';
+import { TitleCore, TitleDataAttrs, type TitleState } from '@videojs/core';
 import { logMissingFeature, selectControls, selectMetadata } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useState } from 'react';
@@ -9,7 +9,7 @@ import { usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 
-export interface TitleProps extends Omit<UIComponentProps<'div', TitleCore.State>, 'children'> {}
+export interface TitleProps extends Omit<UIComponentProps<'div', TitleState>, 'children'> {}
 
 /**
  * Displays the resolved content title. Renders nothing when no title resolves.
@@ -52,5 +52,5 @@ export const Title = forwardRef(function Title(componentProps: TitleProps, forwa
 
 export namespace Title {
   export type Props = TitleProps;
-  export type State = TitleCore.State;
+  export type State = TitleState;
 }

@@ -10,6 +10,8 @@ import { useMediaInstance } from '../../utils/use-media-instance';
 import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
+export type { MuxAudioAdapter, MuxAudioAdapterProps, MuxSource } from '@videojs/mux-audio';
+
 // `source` comes from `MuxAudioAdapterProps` only: `MuxSource` extends `HlsSource` with
 // Mux identity fields, so the narrower type has to win.
 export interface MuxAudioProps

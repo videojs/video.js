@@ -128,7 +128,6 @@ export interface MediaStreamTypeState {
    * Components use this to show live-specific UI (for example, a live indicator or a "jump to live edge" button) or
    * hide the time display.
    *
-   * @see {@link MediaStreamTypes} for the canonical string values.
    * @see https://github.com/video-dev/media-ui-extensions/blob/main/proposals/0010-stream-type.md
    */
   streamType: MediaStreamType;

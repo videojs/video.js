@@ -2,6 +2,7 @@ import {
   AudioTrackRadioGroupCore,
   AudioTrackRadioGroupDataAttrs,
   type AudioTrackRadioGroupOption,
+  type AudioTrackRadioGroupState,
 } from '@videojs/core';
 import { applyStateDataAttrs, logMissingFeature, selectAudioTrack } from '@videojs/core/dom';
 import { type Text, translateText } from '@videojs/core/i18n';
@@ -56,7 +57,7 @@ export class AudioTrackRadioGroupElement extends MenuRadioGroupElement {
 
   protected override update(changed: PropertyValues): void {
     const media = this.#mediaState.value;
-    let state: AudioTrackRadioGroupCore.State | null = null;
+    let state: AudioTrackRadioGroupState | null = null;
 
     if (media) {
       this.#core.setProps({ formatTrack: this.formatTrack, disabled: this.disabled, label: this.label });
@@ -77,5 +78,5 @@ export class AudioTrackRadioGroupElement extends MenuRadioGroupElement {
 }
 
 export namespace AudioTrackRadioGroupElement {
-  export type State = AudioTrackRadioGroupCore.State;
+  export type State = AudioTrackRadioGroupState;
 }

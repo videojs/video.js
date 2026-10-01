@@ -1,16 +1,21 @@
 'use client';
 
-import { AudioTrackRadioGroupCore, type AudioTrackRadioGroupOption } from '@videojs/core';
+import {
+  AudioTrackRadioGroupCore,
+  type AudioTrackRadioGroupOption,
+  type AudioTrackRadioGroupProps,
+  type AudioTrackRadioGroupState,
+} from '@videojs/core';
 import { selectAudioTrack } from '@videojs/core/dom';
 
 import { createRadioOptionsHook, type TranslatedRadioOption } from '../hooks/create-radio-options-hook';
 
-export interface AudioTrackOptionsProps extends AudioTrackRadioGroupCore.Props {}
+export interface AudioTrackOptionsProps extends AudioTrackRadioGroupProps {}
 
 export type AudioTrackOption = TranslatedRadioOption<AudioTrackRadioGroupOption>;
 
 export interface AudioTrackOptionsResult {
-  state: AudioTrackRadioGroupCore.State;
+  state: AudioTrackRadioGroupState;
   label: string;
   value: string;
   selectedLabel: string;

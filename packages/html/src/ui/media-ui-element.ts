@@ -1,4 +1,4 @@
-import type { InferComponentState, InferMediaState, MediaUIComponent, StateAttrMap } from '@videojs/core';
+import type { MediaUIComponent, StateAttrMap } from '@videojs/core';
 import { applyElementProps, applyStateDataAttrs, logMissingFeature } from '@videojs/core/dom';
 import { isText, translateText } from '@videojs/core/i18n';
 import type { PropertyValues } from '@videojs/element';
@@ -9,13 +9,24 @@ import { I18nController } from '../i18n/controller';
 import type { PlayerController } from '../player/controller';
 import { UIElement } from './ui-element';
 
-/** Abstract base for HTML custom elements that display media state with data attributes. */
-export abstract class MediaUIElement<Core extends MediaUIComponent> extends UIElement {
+/** The core a media UI element drives: it reads `MediaState` and computes `ComponentState`. */
+type MediaUICore<ComponentState extends object, MediaState> = MediaUIComponent<object, ComponentState> & {
+  setMedia(media: MediaState): void;
+};
+
+/**
+ * Abstract base for HTML custom elements that display media state with data attributes. `ComponentState` is the state
+ * the element reflects to data attributes, and `MediaState` is the player state it reads.
+ */
+export abstract class MediaUIElement<
+  ComponentState extends object = object,
+  MediaState extends object = object,
+> extends UIElement {
   readonly #i18n = new I18nController(this, i18nContext);
 
-  protected abstract readonly core: Core;
-  protected abstract readonly stateAttrMap: StateAttrMap<InferComponentState<Core>>;
-  protected abstract readonly mediaState: PlayerController<any, InferMediaState<Core> | undefined>;
+  protected abstract readonly core: MediaUICore<ComponentState, MediaState>;
+  protected abstract readonly stateAttrMap: StateAttrMap<ComponentState>;
+  protected abstract readonly mediaState: PlayerController<any, MediaState | undefined>;
 
   override connectedCallback(): void {
     super.connectedCallback();

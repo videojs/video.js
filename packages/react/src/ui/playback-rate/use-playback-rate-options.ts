@@ -1,21 +1,22 @@
 'use client';
 
 import {
-  type PlaybackRateRadioGroupCore,
   PlaybackRateRadioGroupCore as PlaybackRateRadioGroupCoreClass,
   type PlaybackRateRadioGroupOption,
+  type PlaybackRateRadioGroupProps,
+  type PlaybackRateRadioGroupState,
 } from '@videojs/core';
 import { selectPlaybackRate } from '@videojs/core/dom';
 import { useCallback } from 'react';
 
 import { createRadioOptionsHook, type TranslatedRadioOption } from '../hooks/create-radio-options-hook';
 
-export interface PlaybackRateOptionsProps extends PlaybackRateRadioGroupCore.Props {}
+export interface PlaybackRateOptionsProps extends PlaybackRateRadioGroupProps {}
 
 export type PlaybackRateOption = TranslatedRadioOption<PlaybackRateRadioGroupOption>;
 
 export interface PlaybackRateOptionsResult {
-  state: PlaybackRateRadioGroupCore.State;
+  state: PlaybackRateRadioGroupState;
   label: string;
   rate: number;
   value: string;

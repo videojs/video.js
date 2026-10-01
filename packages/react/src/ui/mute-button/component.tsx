@@ -1,12 +1,17 @@
 'use client';
 
-import { MuteButtonCore, MuteButtonDataAttrs } from '@videojs/core';
+import {
+  MuteButtonCore,
+  MuteButtonDataAttrs,
+  type MuteButtonProps as CoreMuteButtonProps,
+  type MuteButtonState,
+} from '@videojs/core';
 import { selectVolume } from '@videojs/core/dom';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createMediaButton } from '../create-media-button';
 
-export interface MuteButtonProps extends UIComponentProps<'button', MuteButtonCore.State>, MuteButtonCore.Props {}
+export interface MuteButtonProps extends UIComponentProps<'button', MuteButtonState>, CoreMuteButtonProps {}
 
 /** A button that toggles mute state. */
 export const MuteButton = createMediaButton<MuteButtonCore, MuteButtonProps>({
@@ -21,5 +26,5 @@ export const MuteButton = createMediaButton<MuteButtonCore, MuteButtonProps>({
 
 export namespace MuteButton {
   export type Props = MuteButtonProps;
-  export type State = MuteButtonCore.State;
+  export type State = MuteButtonState;
 }

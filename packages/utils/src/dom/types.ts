@@ -13,14 +13,3 @@ export interface CustomElement extends HTMLElement, CustomElementCallbacks {}
 export interface CustomElementConstructor {
   new (): CustomElement;
 }
-
-export type QueriedElement<S extends string, E extends Element> = S extends keyof HTMLElementTagNameMap
-  ? HTMLElementTagNameMap[S]
-  : E;
-
-export type EventType<Events> = (keyof Events & string) | (string & {});
-
-export type EventListenerFor<Events, K> =
-  | ((event: K extends keyof Events ? Events[K] : Event) => void)
-  | EventListenerOrEventListenerObject
-  | null;

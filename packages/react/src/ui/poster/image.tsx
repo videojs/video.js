@@ -1,6 +1,6 @@
 'use client';
 
-import type { PosterCore, PosterImageLoadState } from '@videojs/core';
+import type { PosterImageLoadState, PosterState } from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';
 
@@ -10,7 +10,7 @@ import { useLatestRef } from '../../utils/use-latest-ref';
 import { renderElement } from '../../utils/use-render';
 import { usePosterContext } from './context';
 
-export interface PosterImageProps extends UIComponentProps<'img', PosterCore.State> {}
+export interface PosterImageProps extends UIComponentProps<'img', PosterState> {}
 
 /** The source currently requested from the image, and how it is faring. */
 interface ImageRequest {

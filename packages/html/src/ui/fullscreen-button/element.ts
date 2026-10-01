@@ -1,4 +1,4 @@
-import { FullscreenButtonCore, FullscreenButtonDataAttrs } from '@videojs/core';
+import { FullscreenButtonCore, FullscreenButtonDataAttrs, type FullscreenButtonState } from '@videojs/core';
 import { type ButtonActivationSource, selectFullscreen, type UIEvent } from '@videojs/core/dom';
 import { ContextConsumer } from '@videojs/element/context';
 import type { MediaFullscreenState } from '@videojs/media';
@@ -7,7 +7,7 @@ import { containerContext, playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class FullscreenButtonElement extends MediaButtonElement<FullscreenButtonCore> {
+export class FullscreenButtonElement extends MediaButtonElement<FullscreenButtonState, MediaFullscreenState> {
   static readonly tagName = 'media-fullscreen-button';
 
   protected readonly core = new FullscreenButtonCore();

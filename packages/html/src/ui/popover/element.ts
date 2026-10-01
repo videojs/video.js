@@ -35,7 +35,7 @@ export class PopoverElement extends UIElement {
     delay: { type: Number },
     closeDelay: { type: Number, attribute: 'close-delay' },
     boundary: { type: String },
-  } satisfies PropertyDeclarationMap<keyof PopoverCore.Props | 'boundary'>;
+  } satisfies PropertyDeclarationMap<keyof PopoverProps>;
 
   open = PopoverCore.defaultProps.open;
   defaultOpen = PopoverCore.defaultProps.defaultOpen;

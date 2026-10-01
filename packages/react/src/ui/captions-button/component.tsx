@@ -1,13 +1,17 @@
 'use client';
 
-import { CaptionsButtonCore, CaptionsButtonDataAttrs } from '@videojs/core';
+import {
+  CaptionsButtonCore,
+  CaptionsButtonDataAttrs,
+  type CaptionsButtonProps as CoreCaptionsButtonProps,
+  type CaptionsButtonState,
+} from '@videojs/core';
 import { selectTextTrack } from '@videojs/core/dom';
 
 import type { UIComponentProps } from '../../utils/types';
 import { createMediaButton } from '../create-media-button';
 
-export interface CaptionsButtonProps
-  extends UIComponentProps<'button', CaptionsButtonCore.State>, CaptionsButtonCore.Props {}
+export interface CaptionsButtonProps extends UIComponentProps<'button', CaptionsButtonState>, CoreCaptionsButtonProps {}
 
 /** A button that toggles captions. */
 export const CaptionsButton = createMediaButton<CaptionsButtonCore, CaptionsButtonProps>({
@@ -22,5 +26,5 @@ export const CaptionsButton = createMediaButton<CaptionsButtonCore, CaptionsButt
 
 export namespace CaptionsButton {
   export type Props = CaptionsButtonProps;
-  export type State = CaptionsButtonCore.State;
+  export type State = CaptionsButtonState;
 }

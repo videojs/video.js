@@ -1,13 +1,13 @@
 'use client';
 
-import type { DialogCore } from '@videojs/core';
+import type { DialogState } from '@videojs/core';
 import { forwardRef, useCallback } from 'react';
 
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useDialogContext } from './context';
 
-export interface DialogCloseProps extends UIComponentProps<'button', DialogCore.State> {}
+export interface DialogCloseProps extends UIComponentProps<'button', DialogState> {}
 
 /** Renders a button that closes the dialog. */
 export const DialogClose = forwardRef<HTMLButtonElement, DialogCloseProps>(function DialogClose(
@@ -34,5 +34,5 @@ export const DialogClose = forwardRef<HTMLButtonElement, DialogCloseProps>(funct
 
 export namespace DialogClose {
   export type Props = DialogCloseProps;
-  export type State = DialogCore.State;
+  export type State = DialogState;
 }

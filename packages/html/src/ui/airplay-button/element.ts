@@ -1,4 +1,4 @@
-import { AirPlayButtonCore, AirPlayButtonDataAttrs } from '@videojs/core';
+import { AirPlayButtonCore, AirPlayButtonDataAttrs, type AirPlayButtonState } from '@videojs/core';
 import { selectRemotePlayback } from '@videojs/core/dom';
 import type { MediaRemotePlaybackState } from '@videojs/media';
 
@@ -6,7 +6,7 @@ import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MediaButtonElement } from '../media-button-element';
 
-export class AirPlayButtonElement extends MediaButtonElement<AirPlayButtonCore> {
+export class AirPlayButtonElement extends MediaButtonElement<AirPlayButtonState, MediaRemotePlaybackState> {
   static readonly tagName = 'media-airplay-button';
 
   protected readonly core = new AirPlayButtonCore();

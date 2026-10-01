@@ -1,7 +1,6 @@
 import type { Media } from '@videojs/media/dom';
 import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/hls-background-video';
-import { type CustomElement, namedNodeMapToObject } from '@videojs/utils/dom';
-import type { Constructor } from '@videojs/utils/types';
+import { namedNodeMapToObject } from '@videojs/utils/dom';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 import { getTemplateHTML } from '../background-video/template';
@@ -9,9 +8,16 @@ import { getTemplateHTML } from '../background-video/template';
 const HTMLElementBase = globalThis.HTMLElement ?? class {};
 
 // `MediaAttachMixin` is typed as returning its base, so its `disconnectedCallback`
-// isn't visible for `super` to reach. `CustomElement` declares the lifecycle
-// callbacks this element overrides.
-const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as Constructor<CustomElement>;
+// isn't visible for `super` to reach. `LifecycleElement` declares the lifecycle
+// callbacks this element overrides; method syntax lets a subclass override them.
+interface LifecycleElement extends HTMLElement {
+  connectedCallback?(): void;
+  disconnectedCallback?(): void;
+  adoptedCallback?(): void;
+  attributeChangedCallback?(name: string, oldValue: string | null, newValue: string | null): void;
+}
+
+const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as new () => LifecycleElement;
 
 /**
  * A muted, looping, chrome-less video over the SPF background-video engine.

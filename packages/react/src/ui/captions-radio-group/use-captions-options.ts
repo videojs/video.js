@@ -1,16 +1,21 @@
 'use client';
 
-import { CaptionsRadioGroupCore, type CaptionsRadioGroupOption } from '@videojs/core';
+import {
+  CaptionsRadioGroupCore,
+  type CaptionsRadioGroupOption,
+  type CaptionsRadioGroupProps,
+  type CaptionsRadioGroupState,
+} from '@videojs/core';
 import { selectTextTrack } from '@videojs/core/dom';
 
 import { createRadioOptionsHook, type TranslatedRadioOption } from '../hooks/create-radio-options-hook';
 
-export interface CaptionsOptionsProps extends CaptionsRadioGroupCore.Props {}
+export interface CaptionsOptionsProps extends CaptionsRadioGroupProps {}
 
 export type CaptionsOption = TranslatedRadioOption<CaptionsRadioGroupOption>;
 
 export interface CaptionsOptionsResult {
-  state: CaptionsRadioGroupCore.State;
+  state: CaptionsRadioGroupState;
   label: string;
   value: string;
   selectedLabel: string;

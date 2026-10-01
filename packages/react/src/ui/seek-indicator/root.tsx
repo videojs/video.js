@@ -1,6 +1,11 @@
 'use client';
 
-import { SeekIndicatorCore, SeekIndicatorDataAttrs } from '@videojs/core';
+import {
+  SeekIndicatorCore,
+  SeekIndicatorDataAttrs,
+  type SeekIndicatorProps,
+  type SeekIndicatorState,
+} from '@videojs/core';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';
 
@@ -11,7 +16,7 @@ import { useInputIndicatorRoot } from '../input-indicator/use-input-indicator-ro
 import { SeekIndicatorProvider } from './context';
 
 export interface SeekIndicatorRootProps
-  extends UIComponentProps<'div', SeekIndicatorCore.State>, Omit<SeekIndicatorCore.Props, 'locale'> {}
+  extends UIComponentProps<'div', SeekIndicatorState>, Omit<SeekIndicatorProps, 'locale'> {}
 
 export const SeekIndicatorRoot = forwardRef(function SeekIndicatorRoot(
   componentProps: SeekIndicatorRootProps,
@@ -40,5 +45,5 @@ export const SeekIndicatorRoot = forwardRef(function SeekIndicatorRoot(
 
 export namespace SeekIndicatorRoot {
   export type Props = SeekIndicatorRootProps;
-  export type State = SeekIndicatorCore.State;
+  export type State = SeekIndicatorState;
 }

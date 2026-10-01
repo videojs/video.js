@@ -1,4 +1,9 @@
-import { QualityRadioGroupCore, QualityRadioGroupDataAttrs, type QualityRadioGroupOption } from '@videojs/core';
+import {
+  QualityRadioGroupCore,
+  QualityRadioGroupDataAttrs,
+  type QualityRadioGroupOption,
+  type QualityRadioGroupState,
+} from '@videojs/core';
 import { applyStateDataAttrs, logMissingFeature, selectQuality } from '@videojs/core/dom';
 import { type Text, translateText } from '@videojs/core/i18n';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
@@ -56,7 +61,7 @@ export class QualityRadioGroupElement extends MenuRadioGroupElement {
 
   protected override update(changed: PropertyValues): void {
     const media = this.#mediaState.value;
-    let state: QualityRadioGroupCore.State | null = null;
+    let state: QualityRadioGroupState | null = null;
 
     if (media) {
       this.#core.setProps({ formatRendition: this.formatRendition, disabled: this.disabled, label: this.label });
@@ -101,5 +106,5 @@ export class QualityRadioGroupElement extends MenuRadioGroupElement {
 }
 
 export namespace QualityRadioGroupElement {
-  export type State = QualityRadioGroupCore.State;
+  export type State = QualityRadioGroupState;
 }
