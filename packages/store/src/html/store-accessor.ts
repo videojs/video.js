@@ -8,6 +8,7 @@ import { isStore } from '../core/store';
 
 export type StoreSource<Store extends AnyStore> = Store | Context<unknown, Store>;
 
+/** @internal */
 export type StoreAccessorHost = ReactiveControllerHost & HTMLElement;
 
 /**
@@ -29,6 +30,8 @@ export type StoreAccessorHost = ReactiveControllerHost & HTMLElement;
  *   const accessor = new StoreAccessor(host, context, (s) => console.log('available', s));
  *   accessor.value; // null until context provides store
  *   ```
+ *
+ * @internal
  */
 export class StoreAccessor<Store extends AnyStore> implements ReactiveController {
   readonly #onAvailable: (store: Store) => void;

@@ -110,6 +110,13 @@ describe('createSelector', () => {
 
   // Runtimes such as Cloudflare Workers throw when I/O-bound objects are created during
   // module evaluation. See https://github.com/videojs/v10/issues/2041.
+  it('accepts only slices from defineSlice', () => {
+    const literal = { state: () => ({ volume: 1 }) };
+
+    // @ts-expect-error -- a slice is opaque, so a literal with slice members is not one.
+    expect(createSelector(literal)({ volume: 0.5 })).toEqual({ volume: 0.5 });
+  });
+
   it('does not construct an AbortController on module evaluation', async () => {
     let constructed = 0;
 

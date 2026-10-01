@@ -1,7 +1,9 @@
 import { anyAbortSignal } from '@videojs/utils/events';
 
+/** @internal */
 export type SignalKey = PropertyKey;
 
+/** @internal */
 export class AbortControllerRegistry {
   // Created on first read. Runtimes such as Cloudflare Workers forbid constructing I/O-bound
   // objects during module evaluation, and registries can be created at module scope.

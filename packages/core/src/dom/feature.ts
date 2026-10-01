@@ -43,10 +43,13 @@ export function definePlayerFeature<State>(
 ): PlayerFeature<State> {
   const preserved = Object.values(definition.config ?? {}).map((entry) => entry.state);
 
-  return {
+  const feature: SliceConfig<PlayerTarget, State> & { config?: PlayerFeatureConfig } = {
     ...definition,
     ...(preserved.length > 0 ? { preserve: preserved } : {}),
-  } as PlayerFeature<State>;
+  };
+
+  // SAFETY: the slice brand is type-only, so a config is already a feature at runtime.
+  return feature as PlayerFeature<State>;
 }
 
 /**

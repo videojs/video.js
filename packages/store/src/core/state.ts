@@ -14,6 +14,7 @@ export interface State<T> {
   subscribe(callback: StateChange, options?: SubscribeOptions): () => void;
 }
 
+/** @internal */
 export interface WritableState<T> extends State<T> {
   patch: (partial: Partial<T>) => void;
   replace: (next: T) => void;
@@ -30,6 +31,7 @@ function scheduleFlush(): void {
 
 const pendingContainers = new Set<StateContainer<any>>();
 
+/** @internal */
 export function flush(): void {
   isFlushScheduled = false;
 
@@ -119,10 +121,12 @@ class StateContainer<T> implements WritableState<T> {
   }
 }
 
+/** @internal */
 export function createState<T>(initial: T): WritableState<T> {
   return new StateContainer(initial);
 }
 
+/** @internal */
 export function isState(value: unknown): value is State<object> {
   return value instanceof StateContainer;
 }

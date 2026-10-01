@@ -7,13 +7,16 @@ import type { UnknownState } from './state';
 // Attach
 // ----------------------------------------
 
+/** @internal */
 export type Attach<Target, State> = (ctx: AttachContext<Target, State>) => void;
 
+/** @internal */
 export interface AttachStore {
   readonly state: UnknownState;
   subscribe: (callback: () => void) => () => void;
 }
 
+/** @internal */
 export interface AttachContext<Target, State> {
   target: Target;
   signal: AbortSignal;
@@ -27,6 +30,7 @@ export interface AttachContext<Target, State> {
 // State Context
 // ----------------------------------------
 
+/** @internal */
 export interface StateContext<Target> {
   /** Returns the current target. Throws if not attached. */
   target: () => Target;
@@ -50,13 +54,21 @@ export interface StateContext<Target> {
 // Derived Context
 // ----------------------------------------
 
-/** Read-only inputs available while an eager derived formula is evaluated. */
+/**
+ * Read-only inputs available while an eager derived formula is evaluated.
+ *
+ * @internal
+ */
 export interface DerivedContext<State> {
   /** Returns the immutable slice state before derived values. */
   get: () => Readonly<State>;
 }
 
-/** Formula map used to produce public derived state. */
+/**
+ * Formula map used to produce public derived state.
+ *
+ * @internal
+ */
 export type DerivedDefinition<State, Derived> = {
   [Key in keyof Derived]: (ctx: DerivedContext<State>) => Derived[Key];
 };
@@ -65,18 +77,48 @@ export type DerivedDefinition<State, Derived> = {
 // Slice
 // ----------------------------------------
 
-export interface SliceConfig<Target, State, Derived = object> {
-  /** Debug label. Used as `displayName` on selectors created from this slice. */
+declare const SLICE_BRAND: unique symbol;
+
+/**
+ * A slice of store state: the source state, derived values, and attach behavior a store builds from it. Player features
+ * are slices.
+ *
+ * Opaque outside the store: pass a slice to `createSelector`, not its members. Every member is internal, so how a slice
+ * is written can change without breaking code that only selects from one.
+ */
+export interface Slice<Target, State, Derived = object> {
+  /** @internal Type-only brand. Slices come from `defineSlice`, never from a literal. */
+  readonly [SLICE_BRAND]: true;
+  /**
+   * Debug label. Used as `displayName` on selectors created from this slice.
+   *
+   * @internal
+   */
   name?: string;
+  /** @internal */
   state: (ctx: StateContext<Target>) => State;
-  /** Source-state keys whose current values survive detach. */
+  /**
+   * Source-state keys whose current values survive detach.
+   *
+   * @internal
+   */
   preserve?: readonly PropertyKey[];
-  /** Formulas evaluated from slice state before publication. */
+  /**
+   * Formulas evaluated from slice state before publication.
+   *
+   * @internal
+   */
   derived?: DerivedDefinition<State, Derived>;
+  /** @internal */
   attach?: (ctx: AttachContext<Target, State>) => void;
 }
 
-export type Slice<Target, State, Derived = object> = SliceConfig<Target, State, Derived>;
+/**
+ * What `defineSlice` turns into a {@link Slice}.
+ *
+ * @internal
+ */
+export type SliceConfig<Target, State, Derived = object> = Omit<Slice<Target, State, Derived>, typeof SLICE_BRAND>;
 
 export type AnySlice<Target = any> = Slice<Target, any, object>;
 
@@ -90,6 +132,7 @@ type DerivedValues<Definitions extends Record<string, (...args: any[]) => unknow
   [Key in keyof Definitions]: ReturnType<Definitions[Key]>;
 };
 
+/** @internal */
 export interface SliceFactory<Target> {
   <State, const Definitions extends DerivedFunctions<State>>(
     config: Omit<SliceConfig<Target, State, DerivedValues<Definitions>>, 'derived'> & {
@@ -99,19 +142,24 @@ export interface SliceFactory<Target> {
   <State>(config: Omit<SliceConfig<Target, State>, 'derived'> & { derived?: never }): Slice<Target, State>;
 }
 
+/** @internal */
 export function defineSlice<Target>(): SliceFactory<Target> {
-  return ((config: SliceConfig<Target, unknown, unknown>) => config) as SliceFactory<Target>;
+  // SAFETY: the brand is type-only, so a config is already a slice at runtime.
+  return ((config: SliceConfig<Target, unknown, unknown>) =>
+    config as Slice<Target, unknown, unknown>) as SliceFactory<Target>;
 }
 
 // ----------------------------------------
 // Inference
 // ----------------------------------------
 
+/** @internal */
 export type InferSliceTarget<S> = S extends Slice<infer Target, any, any> ? Target : never;
 
 /** Infer from the state factory so intersections with feature metadata preserve exact source state. */
 export type InferSliceSourceState<S> = S extends { state: (...args: any[]) => infer State } ? State : never;
 
+/** @internal */
 export type InferSliceDerivedState<S> = S extends Slice<any, any, infer Derived> ? Derived : never;
 
 export type PublicSourceState<State> = Pick<State, Extract<keyof State, string>>;
@@ -123,11 +171,13 @@ type IntersectSlices<Slices extends readonly AnySlice[], Value> = Slices extends
   ? object
   : Simplify<UnionToIntersection<Value>>;
 
+/** @internal */
 export type UnionSliceSourceState<Slices extends readonly AnySlice[]> = IntersectSlices<
   Slices,
   InferSliceSourceState<Slices[number]>
 >;
 
+/** @internal */
 export type UnionSliceDerivedState<Slices extends readonly AnySlice[]> = IntersectSlices<
   Slices,
   InferSliceDerivedState<Slices[number]>

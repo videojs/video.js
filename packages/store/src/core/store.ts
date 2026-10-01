@@ -9,7 +9,7 @@ import type {
   InferSliceDerivedState,
   InferSliceSourceState,
   InferSliceState,
-  Slice,
+  SliceConfig,
   StateContext,
 } from './slice';
 import type { StateChange, State as StateContainer, SubscribeOptions, UnknownState, WritableState } from './state';
@@ -18,16 +18,19 @@ import { createState } from './state';
 const STORE_SYMBOL = Symbol.for('@videojs/store');
 const hasOwnProp = Object.prototype.hasOwnProperty;
 
+/** @internal */
 export interface StoreOptions<Target, State> extends StoreCallbacks<Target, State> {}
 
+/** @internal */
 export interface StoreFactory<Target> {
   <S extends AnySlice<Target>>(
     slice: S,
     options?: StoreOptions<Target, InferSliceState<S>>
   ): Store<Target, InferSliceState<S>>;
-  <State>(slice: Slice<Target, State>, options?: StoreOptions<Target, State>): Store<Target, State>;
+  <State>(slice: SliceConfig<Target, State>, options?: StoreOptions<Target, State>): Store<Target, State>;
 }
 
+/** @internal */
 export function createStore<Target = unknown>(): StoreFactory<Target> {
   return (<S extends AnySlice<Target>>(
     slice: S,
@@ -303,6 +306,7 @@ function patchSource<State>(current: Readonly<State>, partial: Partial<State>): 
   return changed ? { next: Object.freeze(next) } : null;
 }
 
+/** @internal */
 export function isStore(value: unknown): value is AnyStore {
   return isObject(value) && STORE_SYMBOL in value;
 }
@@ -328,6 +332,7 @@ export type AnyStore<Target = any> = BaseStore<Target, object>;
 
 export type UnknownStore<Target = unknown> = Store<Target, UnknownState>;
 
+/** @internal */
 export type InferStoreTarget<S extends AnyStore> = S extends { readonly target: (infer Target) | null }
   ? Target
   : never;

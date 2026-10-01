@@ -6,6 +6,7 @@ import type {
   InferSliceSourceState,
   InferSliceTarget,
   Slice,
+  SliceConfig,
   StateContext,
   UnionSliceDerivedState,
   UnionSliceSourceState,
@@ -20,12 +21,14 @@ type CombinedTarget<Slices extends readonly AnySlice[]> = Slices extends readonl
  *
  * @param slices - The slices to combine.
  * @returns A new slice that represents the combination of the input slices.
+ * @internal
  */
 export function combine<const Slices extends readonly AnySlice[]>(
   ...slices: Slices
 ): Slice<CombinedTarget<Slices>, UnionSliceSourceState<Slices>, UnionSliceDerivedState<Slices>> {
   type SourceState = UnionSliceSourceState<Slices>;
   type Target = CombinedTarget<Slices>;
+  type Combined = Slice<Target, SourceState, UnionSliceDerivedState<Slices>>;
 
   const derivedDefinitions = slices.map((slice) => slice.derived ?? {});
 
@@ -33,7 +36,7 @@ export function combine<const Slices extends readonly AnySlice[]>(
     warnDuplicates('derived', derivedDefinitions);
   }
 
-  return {
+  const combined: SliceConfig<Target, SourceState, UnionSliceDerivedState<Slices>> = {
     state: (ctx: StateContext<Target>) => {
       const states = slices.map((slice) => slice.state(ctx));
 
@@ -59,6 +62,9 @@ export function combine<const Slices extends readonly AnySlice[]>(
       }
     },
   };
+
+  // SAFETY: the brand is type-only, so a config is already a slice at runtime.
+  return combined as Combined;
 }
 
 function warnDuplicates(namespace: string, objects: readonly object[]): void {
