@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/mux-video@10.0.0-rc.4...@videojs/mux-video@10.0.0-rc.5) (2026-10-01)
+
+
+### Miscellaneous Chores
+
+* **@videojs/mux-video:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/hlsjs-video bumped to 10.0.0-rc.5
+    * @videojs/media bumped to 10.0.0-rc.5
+    * @videojs/spf bumped to 10.0.0-rc.5
+    * @videojs/utils bumped to 10.0.0-rc.5
+
 ## [10.0.0-rc.4](https://github.com/videojs/v10/compare/@videojs/mux-video@10.0.0-rc.3...@videojs/mux-video@10.0.0-rc.4) (2026-09-26)
 
 

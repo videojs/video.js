@@ -1,6 +1,6 @@
 {
   "name": "@videojs/installation",
-  "version": "10.0.0-rc.4",
+  "version": "10.0.0-rc.5",
   "private": true,
   "description": "Shared Video.js installation schema and instruction renderer",
   "license": "Apache-2.0",

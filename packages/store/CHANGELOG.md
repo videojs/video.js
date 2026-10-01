@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/store@10.0.0-rc.4...@videojs/store@10.0.0-rc.5) (2026-10-01)
+
+
+### Bug Fixes
+
+* **react:** declare client boundaries per module ([#3079](https://github.com/videojs/v10/issues/3079)) ([39ff910](https://github.com/videojs/v10/commit/39ff910d50567037850ba6f11c2c8883dd7974bb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.0.0-rc.5
+  * devDependencies
+    * @videojs/element bumped to 10.0.0-rc.5
+  * peerDependencies
+    * @videojs/element bumped to 10.0.0-rc.5
+
 ## [10.0.0-rc.4](https://github.com/videojs/v10/compare/@videojs/store@10.0.0-rc.3...@videojs/store@10.0.0-rc.4) (2026-09-26)
 
 

@@ -1,5 +1,82 @@
 # Changelog
 
+## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/html@10.0.0-rc.4...@videojs/html@10.0.0-rc.5) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **packages:** rename the minimal skin to neutral ([#3092](https://github.com/videojs/v10/issues/3092))
+* **packages:** attach extensions at the player ([#2880](https://github.com/videojs/v10/issues/2880))
+* **media:** tidy text track state ([#3057](https://github.com/videojs/v10/issues/3057))
+* **core:** align player store API ([#3012](https://github.com/videojs/v10/issues/3012))
+
+### Features
+
+* **core:** add deriveCustomStatus to display custom actions ([#3064](https://github.com/videojs/v10/issues/3064)) ([5b4ed5e](https://github.com/videojs/v10/commit/5b4ed5e323f48b0f674f0c5640ee41c527f10f81))
+* **media:** add resolveAdapterType and resolveMimeType ([#3024](https://github.com/videojs/v10/issues/3024)) ([a77010c](https://github.com/videojs/v10/commit/a77010c77ff4971a9f7f1c43d5c24c20ee67d505))
+* **packages:** export a per-package VERSION from core, html, and react ([#3078](https://github.com/videojs/v10/issues/3078)) ([bd8f072](https://github.com/videojs/v10/commit/bd8f072a6591079b64baf20b18af52a415195b97))
+* **packages:** support chrome 111, firefox 121, and safari 16.4 ([#2951](https://github.com/videojs/v10/issues/2951)) ([710df96](https://github.com/videojs/v10/commit/710df96fc1bb5aceca96fa831082d61fd83af3c3))
+* **skin:** add compat skin ([#3026](https://github.com/videojs/v10/issues/3026)) ([5d419de](https://github.com/videojs/v10/commit/5d419de6980310364c36ffe6bc131573ac8b785d))
+
+
+### Bug Fixes
+
+* **core:** preserve submenu exit transitions ([#3025](https://github.com/videojs/v10/issues/3025)) ([89c1c58](https://github.com/videojs/v10/commit/89c1c5803d152025e88f34e0d1782bbd52632d67))
+* **packages:** name Video.js 10 in npm descriptions and keywords ([#2995](https://github.com/videojs/v10/issues/2995)) ([8fda9a3](https://github.com/videojs/v10/commit/8fda9a36bede5cf92d446e25e56a96625cd60bc9))
+
+
+### Code Refactoring
+
+* **core:** align player store API ([#3012](https://github.com/videojs/v10/issues/3012)) ([d1f57f8](https://github.com/videojs/v10/commit/d1f57f8ea733d10247b8e9bd9f8b5577e52ed66b))
+* **media:** tidy text track state ([#3057](https://github.com/videojs/v10/issues/3057)) ([614b77d](https://github.com/videojs/v10/commit/614b77dce7d9a3ed60baa1b0e2af854c8c8d865b))
+* **packages:** attach extensions at the player ([#2880](https://github.com/videojs/v10/issues/2880)) ([9b6675e](https://github.com/videojs/v10/commit/9b6675e3cfe50e3b54f4d4d07a563a4fdc712291))
+* **packages:** rename the minimal skin to neutral ([#3092](https://github.com/videojs/v10/issues/3092)) ([1d1eafc](https://github.com/videojs/v10/commit/1d1eafc022f78135a292035bc58fdb4befb6401e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.0.0-rc.5
+    * @videojs/element bumped to 10.0.0-rc.5
+    * @videojs/media bumped to 10.0.0-rc.5
+    * @videojs/native-hls-video bumped to 10.0.0-rc.5
+    * @videojs/spf bumped to 10.0.0-rc.5
+    * @videojs/store bumped to 10.0.0-rc.5
+    * @videojs/utils bumped to 10.0.0-rc.5
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.0.0-rc.5
+    * @videojs/dash-video bumped to 10.0.0-rc.5
+    * @videojs/google-cast bumped to 10.0.0-rc.5
+    * @videojs/hlsjs-video bumped to 10.0.0-rc.5
+    * @videojs/icons bumped to 10.0.0-rc.5
+    * @videojs/mux-audio bumped to 10.0.0-rc.5
+    * @videojs/mux-data bumped to 10.0.0-rc.5
+    * @videojs/mux-video bumped to 10.0.0-rc.5
+    * @videojs/shaka-video bumped to 10.0.0-rc.5
+    * @videojs/skins bumped to 10.0.0-rc.5
+    * @videojs/spotify-audio bumped to 10.0.0-rc.5
+    * @videojs/tiktok-video bumped to 10.0.0-rc.5
+    * @videojs/twitch-video bumped to 10.0.0-rc.5
+    * @videojs/vimeo-video bumped to 10.0.0-rc.5
+    * @videojs/wistia-video bumped to 10.0.0-rc.5
+    * @videojs/youtube-video bumped to 10.0.0-rc.5
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.0.0-rc.5
+    * @videojs/dash-video bumped to 10.0.0-rc.5
+    * @videojs/google-cast bumped to 10.0.0-rc.5
+    * @videojs/hlsjs-video bumped to 10.0.0-rc.5
+    * @videojs/mux-audio bumped to 10.0.0-rc.5
+    * @videojs/mux-data bumped to 10.0.0-rc.5
+    * @videojs/mux-video bumped to 10.0.0-rc.5
+    * @videojs/shaka-video bumped to 10.0.0-rc.5
+    * @videojs/spotify-audio bumped to 10.0.0-rc.5
+    * @videojs/tiktok-video bumped to 10.0.0-rc.5
+    * @videojs/twitch-video bumped to 10.0.0-rc.5
+    * @videojs/vimeo-video bumped to 10.0.0-rc.5
+    * @videojs/wistia-video bumped to 10.0.0-rc.5
+    * @videojs/youtube-video bumped to 10.0.0-rc.5
+
 ## [10.0.0-rc.4](https://github.com/videojs/v10/compare/@videojs/html@10.0.0-rc.3...@videojs/html@10.0.0-rc.4) (2026-09-26)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/element@10.0.0-rc.4...@videojs/element@10.0.0-rc.5) (2026-10-01)
+
+
+### Features
+
+* **skin:** add compat skin ([#3026](https://github.com/videojs/v10/issues/3026)) ([5d419de](https://github.com/videojs/v10/commit/5d419de6980310364c36ffe6bc131573ac8b785d))
+
 ## [10.0.0-rc.4](https://github.com/videojs/v10/compare/@videojs/element@10.0.0-rc.3...@videojs/element@10.0.0-rc.4) (2026-09-26)
 
 

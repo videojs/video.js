@@ -1,6 +1,6 @@
 {
   "name": "@videojs/tiktok-video",
-  "version": "10.0.0-rc.4",
+  "version": "10.0.0-rc.5",
   "description": "TikTok embed playback adapter for Video.js",
   "keywords": [
     "embed",

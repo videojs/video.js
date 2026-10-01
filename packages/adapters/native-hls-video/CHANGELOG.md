@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/native-hls-video@10.0.0-rc.4...@videojs/native-hls-video@10.0.0-rc.5) (2026-10-01)
+
+
+### Bug Fixes
+
+* **native-hls:** honour SERVER-CONTROL hold-back when deriving the live edge ([#3027](https://github.com/videojs/v10/issues/3027)) ([56fc71e](https://github.com/videojs/v10/commit/56fc71e087937dcf99075288f4081cdbb47632d6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.0.0-rc.5
+    * @videojs/utils bumped to 10.0.0-rc.5
+
 ## [10.0.0-rc.4](https://github.com/videojs/v10/compare/@videojs/native-hls-video@10.0.0-rc.3...@videojs/native-hls-video@10.0.0-rc.4) (2026-09-26)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@videojs/store",
-  "version": "10.0.0-rc.4",
+  "version": "10.0.0-rc.5",
   "description": "Reactive state management for external systems.",
   "keywords": [
     "media",

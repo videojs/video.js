@@ -1,6 +1,6 @@
 {
   "name": "@videojs/media",
-  "version": "10.0.0-rc.4",
+  "version": "10.0.0-rc.5",
   "description": "Engine-neutral media contracts and browser hosts for Video.js",
   "keywords": [
     "media",

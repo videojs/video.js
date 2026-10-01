@@ -1,6 +1,6 @@
 {
   "name": "@videojs/spotify-audio",
-  "version": "10.0.0-rc.4",
+  "version": "10.0.0-rc.5",
   "description": "Spotify embed playback adapter for Video.js",
   "keywords": [
     "audio",
