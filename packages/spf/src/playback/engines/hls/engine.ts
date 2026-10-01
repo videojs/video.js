@@ -2,9 +2,12 @@ import {
   type Composition,
   type ContextSignals,
   createComposition,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
   type StateSignals,
 } from '../../../core/composition/create-composition';
-import { makeShareSignals, type ShareSignalsConfig } from '../../../core/composition/share-signals';
+import { declareInputs } from '../../../core/composition/declare-inputs';
+import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import type { Reschedule } from '../../../core/tasks/task';
 import type { QualityConfig } from '../../../media/abr/quality-selection';
@@ -20,33 +23,20 @@ import {
   removeAllSubtitlesTracksFromMedia,
 } from '../../../media/dom/text/text-track-slots';
 import type { DrmSystemsConfig, DrmSystemsConfigFor, KeySystemId, KeySystemModule } from '../../../media/drm';
-import type { SvtaError } from '../../../media/errors';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
 import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../../media/hls/reload-policy';
-import type {
-  AudioTrack,
-  CanPlayTrack,
-  MaybeResolvedPresentation,
-  MediaContainerData,
-  ResolvedTrack,
-  TextTrack,
-  VideoTrack,
-} from '../../../media/types';
+import type { CanPlayTrack, ResolvedTrack } from '../../../media/types';
 import type { GetCdnId } from '../../../media/utils/cdn';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { BandwidthConfig, BandwidthState } from '../../../network/bandwidth-estimator';
+import type { BandwidthConfig } from '../../../network/bandwidth-estimator';
 import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
-import type { SegmentLoaderActor } from '../../actors/dom/segment-loader';
-import type { SourceBufferActor } from '../../actors/dom/source-buffer';
-import type { TextTracksActor } from '../../actors/dom/text-tracks';
-import type { TextTrackSegmentLoaderActor } from '../../actors/text-track-segment-loader';
 import {
   calculatePresentationDuration,
   type PresentationDurationResolver,
 } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors } from '../../behaviors/collect-errors';
 import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
-import { setupAirPlay } from '../../behaviors/dom/airplay';
+import { type RemotePlaybackInputs, setupAirPlay } from '../../behaviors/dom/airplay';
 import { applyStartPosition } from '../../behaviors/dom/apply-start-position';
 import { endOfStream } from '../../behaviors/dom/end-of-stream';
 import { exchangeLicenses } from '../../behaviors/dom/exchange-licenses';
@@ -63,7 +53,7 @@ import { syncLiveSeekableRange } from '../../behaviors/dom/sync-live-seekable-ra
 import { syncTextTracks } from '../../behaviors/dom/sync-text-tracks';
 import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
 import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
-import { type PlayerResolution, trackPlayerResolution } from '../../behaviors/dom/track-player-resolution';
+import { trackPlayerResolution } from '../../behaviors/dom/track-player-resolution';
 import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
 // `video/audio/textMessagePipelines` finalConfig entries, the `mediaContainerData`
@@ -85,6 +75,7 @@ import {
   type SwitchAudioTrackConfig,
   type SwitchTextTrackConfig,
   type SwitchVideoTrackConfig,
+  type UserTrackSelectionInputs,
   switchAudioTrack,
   switchTextTrack,
   switchVideoTrack,
@@ -102,116 +93,160 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
 // ============================================================================
 
 /**
- * State shape for the HLS playback engine.
- *
- * This is the union of all state required by the behaviors composed into the HLS engine. Each behavior declares its own
- * state interface; this type satisfies all of them.
+ * State the HLS playback engine reads but no composed behavior declares: the consumer's track selections and
+ * remote-playback opt-out, written through the adapter.
  */
-export interface HlsVideoEngineState {
-  /**
-   * The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates
-   * the rest.
-   */
-  presentation?: MaybeResolvedPresentation;
-  preload?: 'auto' | 'metadata' | 'none';
-  selectedVideoTrackId?: string;
-  selectedAudioTrackId?: string;
-  selectedTextTrackId?: string;
-  bandwidthState?: BandwidthState;
-  // Non-zero-PTS relocation (spike): transient per-track container data owned by
-  // `establishStartMediaTime`. Remove with the composed reactor.
-  mediaContainerData?: Record<string, MediaContainerData>;
-  userVideoTrackSelection?: Partial<VideoTrack>;
-  /**
-   * Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track
-   * shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. `selectAudioTrack` reads this and re-picks when it
-   * changes. Multi-language-audio Tier 2 programmatic-write path.
-   */
-  userAudioTrackSelection?: Partial<AudioTrack>;
-  /**
-   * Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A
-   * language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the
-   * engine's `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via
-   * `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference).
-   */
-  userTextTrackSelection?: Partial<TextTrack> | 'off';
-  /**
-   * The CDNs the source is served from (track-URL origins), in manifest priority order — most-preferred first (mirrors
-   * HLS content steering's `PATHWAY-PRIORITY`). Owned by `deriveCdnPriority`, read by `track-switching`'s
-   * `preferActiveCdn` scope, which narrows to the highest-priority CDN with surviving tracks so video / audio / text
-   * stay on one host. Only meaningful for redundant-stream sources; a single-CDN source has one entry.
-   */
-  cdnPriority?: string[];
-  /**
-   * CDN ids (origins) currently in failover cooldown — written by the CDN monitor when a host fails too often, read by
-   * `track-switching`'s `excludeFailedCdns` hard constraint, which prunes their tracks so the active-CDN scope falls to
-   * the next CDN in `cdnPriority`. Empty / absent means all CDNs are eligible.
-   */
-  failedCdns?: string[];
-  /**
-   * Conditions reported during playback, in the order encountered — appended by whichever behavior detects one
-   * (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is
-   * decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`.
-   */
-  errors?: SvtaError[];
-  currentTime?: number;
-  /**
-   * The player element's rendered pixel dimensions, or `undefined` where there is nothing to measure. Written by
-   * `trackPlayerResolution`, read by the `playerResolutionCap` selection rule — which treats `undefined` as "don't
-   * cap".
-   */
-  playerResolution?: PlayerResolution;
-  loadActivated?: boolean;
-  /**
-   * One-shot command: start the current source at this position (presentation-timeline seconds). Written by consumers
-   * or by `setupAirPlay`'s session-end snapshot; consumed (cleared) by `applyStartPosition` once the element seeks. See
-   * `behaviors/dom/apply-start-position.ts`.
-   */
-  startPosition?: number;
-  /**
-   * Intent-level loading policy: initiate no new loading work while `true`. Written by `setupAirPlay` (the only
-   * behavior declaring the key) while a remote-playback session owns presentation; observed by the `loadXSegments`
-   * dispatchers (park in `'dormant'`) and by `setupMediaSource` (a pending rebuild waits). See
-   * `SegmentLoadingState['loadingSuspended']`.
-   */
-  loadingSuspended?: boolean;
-  /**
-   * Segment-load gate, owned by `setupMediaKeys`: `true` while an encrypted source's MediaKeys aren't attached yet; the
-   * `loadXSegments` dispatchers park on it. Never set for clear sources. See
-   * `SegmentLoadingState['segmentLoadingBlocked']`.
-   */
-  segmentLoadingBlocked?: boolean;
-  /**
-   * The key system negotiation settled on for the current source, owned by `setupMediaKeys`. Read by
-   * `exchangeLicenses`. Never set for clear sources. See `MediaKeysState['negotiatedKeySystem']`.
-   */
-  negotiatedKeySystem?: string;
-  /**
-   * Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL
-   * property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the
-   * element's remote playback disabled. Distinct from the underlying `<video>.disableRemotePlayback`, which stays
-   * programmatically managed (ManagedMediaSource / AirPlay).
-   */
-  disableRemotePlayback?: boolean;
-}
+const hlsVideoEngineInputs = declareInputs<UserTrackSelectionInputs & RemotePlaybackInputs>()([
+  'userVideoTrackSelection',
+  'userAudioTrackSelection',
+  'userTextTrackSelection',
+  'disableRemotePlayback',
+]);
 
 /**
- * Context shape for the HLS playback engine.
- *
- * Platform objects and actor references managed by HLS behaviors.
+ * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
+ * this list, so adding or removing a behavior changes them with no separate type to update.
  */
-export interface HlsVideoEngineContext {
-  mediaElement?: HTMLMediaElement | undefined;
-  mediaSource?: MediaSource;
-  /** The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. */
-  mediaKeys?: MediaKeys;
-  videoBufferActor?: SourceBufferActor;
-  audioBufferActor?: SourceBufferActor;
-  videoSegmentLoaderActor?: SegmentLoaderActor;
-  audioSegmentLoaderActor?: SegmentLoaderActor;
-  textTracksActor?: TextTracksActor;
-  textTrackSegmentLoaderActor?: TextTrackSegmentLoaderActor;
-}
+const hlsVideoEngineBehaviors = [
+  syncPreload,
+  trackLoadTriggers,
+  resolvePresentation,
+
+  // Session-level CDN priority for redundant-stream sources. Owns
+  // `cdnPriority`; `track-switching`'s preferActiveCdn scope reads it so
+  // every type stays on one CDN. No-op for single-CDN sources.
+  //
+  // Placed before switch* so `cdnPriority` is set before the first pick —
+  // but this ordering is only *mildly* load-bearing, not required for
+  // correctness. Selection is reactive: a late `cdnPriority` re-fires the
+  // pick and converges on the same result (see the late-arrival test in
+  // track-switching.test.ts). Order affects only a transient, and only for
+  // an *asymmetric* manifest (a type listing a non-primary CDN first):
+  // composing this after switch* would let that type fire one wasted
+  // media-playlist fetch to the wrong CDN before correcting. Symmetric
+  // redundant streams (the norm) never hit it — the first-listed CDN is
+  // already the primary we'd pick anyway.
+  deriveCdnPriority,
+
+  // CDN failover cooldown: owns the expiry half of failover — watches
+  // `failedCdns` (tripped directly by track resolution on a failed
+  // media-playlist fetch) and removes each CDN once its cooldown lapses.
+  setupFailoverMonitor,
+
+  // Owns `errors` and its per-source lifecycle. Composed before the
+  // behaviors that report into it so the slot exists when they first run;
+  // reporting no-ops if it isn't composed at all.
+  collectErrors,
+
+  // Resolve selected tracks (fetch media playlists). Composed before the
+  // switch* slot owners; selection is reactive, so a resolve* re-fires once
+  // its switch* sets the id (same convergence for all three types).
+  resolveVideoTrack,
+  resolveAudioTrack,
+  resolveTextTrack,
+
+  // Presentation duration
+  calculatePresentationDuration,
+
+  // MSE setup. Video cluster is registered first so that, when both
+  // per-type variants flip to `'buffer-ready'` on the shared gate's
+  // monitor evaluation, `addSourceBuffer(video)` runs before
+  // `addSourceBuffer(audio)` — see the Firefox `mozHasAudio` invariant
+  // in setup-buffer-actors.ts.
+  setupMediaSource,
+  updateMediaSourceDuration,
+
+  // EME for encrypted sources (no-op for clear ones). Composed right after
+  // MSE setup and — load-bearing — before the `load*Segments` dispatchers,
+  // so the `segmentLoadingBlocked` gate is up before their first dispatch of
+  // encrypted segments.
+  //
+  // `exchangeLicenses` precedes the negotiation it consumes, also
+  // load-bearing: `createComposition` calls cleanups in registration order,
+  // and the sessions it opens must close before `setupMediaKeys` detaches
+  // the MediaKeys they belong to. Setup order costs nothing in return — its
+  // precondition is reactive on `context.mediaKeys`.
+  //
+  // `setupAirPlayFairPlay` sits ahead of `setupMediaKeys` for the same
+  // reason. Both react to the AirPlay session's falling edge — one
+  // releasing the receiver's MediaKeys, the other negotiating MSE's afresh
+  // — and registration order is what puts the detach before the attach.
+  exchangeLicenses,
+  setupAirPlayFairPlay,
+  setupMediaKeys,
+
+  // ── Non-zero-PTS relocation (spike) ──────────────────────────────────
+  // Establishes per-track `startMediaTime` and publishes the relocating
+  // segment-loader pipelines to context. MUST precede `setup*BufferActors`
+  // so the pipelines are published before the loaders read them. Remove this
+  // one line (+ the import, the `mediaContainerData`/`*MessagePipelines`
+  // slots including `textMessagePipelines`, and the `deriveStartMediaTime`
+  // config) to drop relocation and test the Tier-0 baseline / bundle size.
+  establishStartMediaTime,
+  // ─────────────────────────────────────────────────────────────────────
+
+  setupVideoBufferActors,
+  setupAudioBufferActors,
+
+  // AirPlay/MSE bridge (WebKit only; no-op elsewhere).
+  setupAirPlay,
+
+  // Playback tracking
+  trackCurrentTime,
+  // After trackCurrentTime: the one-shot currentTime seed must land after
+  // the mirror's attach-time sync (see apply-start-position.ts).
+  applyStartPosition,
+
+  // Ordering isn't load-bearing — selection is reactive, so a measurement
+  // that lands after the first pick just re-fires it.
+  trackPlayerResolution,
+  switchVideoTrack,
+  switchAudioTrack,
+  // Mid-stream audio-buffer flush on language switch is handled in
+  // `segment-loader`'s `planTasks` (predicate: language differs from
+  // the previously-buffered track) — not in switchAudioTrack itself.
+
+  // Text selection: resolves `userTextTrackSelection` intent (incl. 'off',
+  // or the configured preferred-language / DEFAULT-track policy) against the
+  // failed-CDN-pruned, active-CDN-scoped text renditions. Optional selection
+  // (captions are opt-in), so it can resolve to none.
+  switchTextTrack,
+
+  // Segment loading
+  loadVideoSegments,
+  loadAudioSegments,
+
+  // Live: declare the seekable window, then command the live-edge start
+  // position + keep the playhead in-window. No-op for complete playlists
+  // (VoD / ended). `seekToLiveEdge` commands `state.startPosition`;
+  // `applyStartPosition` (composed above) performs the seek.
+  syncLiveSeekableRange,
+  seekToLiveEdge,
+
+  // End of stream coordination
+  endOfStream,
+  // Force native `ended` when Chrome freezes the playhead a few frames short of a
+  // skewed-A/V end after `endOfStream` (audio-clock stall). Inert otherwise.
+  recoverEndStall,
+
+  // Text tracks
+  syncTextTracks,
+  setupTextTrackActors,
+  loadTextTrackSegments,
+  // Apple JSON chapters (`EXT-X-SESSION-DATA`, `com.apple.hls.chapters`) →
+  // a hidden `chapters` track per language, the preferred subtitle
+  // language leading. Cues live on the element; no state signal.
+  loadChapters,
+
+  // Consumer inputs: written through the adapter, read by the behaviors above.
+  hlsVideoEngineInputs,
+] as const;
+
+/** State shape for the HLS playback engine: every state key its behaviors declare. */
+export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
+
+/** Context shape for the HLS playback engine: every context key its behaviors declare. */
+export type HlsVideoEngineContext = ResolveBehaviorContext<typeof hlsVideoEngineBehaviors>;
 
 /**
  * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
@@ -400,19 +435,7 @@ export interface HlsVideoEngineConfig<
 // HLS Playback Engine
 // ============================================================================
 
-/**
- * Generic `shareSignals` instantiated against the HLS engine's full state and context — captures composition signal
- * refs into the consumer's `onSignalsReady` callback at setup time, and materializes input slots that no composed
- * behavior produces: `user*TrackSelection` (track-switching only reads them). `failedCdns` is owned by
- * `setupFailoverMonitor`, so it's already materialized and reachable on the `onSignalsReady` refs without being listed
- * here.
- */
-const shareSignals = makeShareSignals<HlsVideoEngineState, HlsVideoEngineContext>([
-  'userVideoTrackSelection',
-  'userAudioTrackSelection',
-  'userTextTrackSelection',
-  'disableRemotePlayback',
-]);
+const shareSignals = makeShareSignalsFor<typeof hlsVideoEngineBehaviors>();
 
 /**
  * Create an HLS playback engine.
@@ -500,158 +523,23 @@ export function createHlsVideoEngine<const KeySystems extends readonly KeySystem
     reschedule: config.reschedule ?? delayedReschedule(mediaPlaylistReloadDelay),
   };
 
-  return createComposition(
-    [
-      syncPreload,
-      trackLoadTriggers,
-      resolvePresentation,
-
-      // Session-level CDN priority for redundant-stream sources. Owns
-      // `cdnPriority`; `track-switching`'s preferActiveCdn scope reads it so
-      // every type stays on one CDN. No-op for single-CDN sources.
-      //
-      // Placed before switch* so `cdnPriority` is set before the first pick —
-      // but this ordering is only *mildly* load-bearing, not required for
-      // correctness. Selection is reactive: a late `cdnPriority` re-fires the
-      // pick and converges on the same result (see the late-arrival test in
-      // track-switching.test.ts). Order affects only a transient, and only for
-      // an *asymmetric* manifest (a type listing a non-primary CDN first):
-      // composing this after switch* would let that type fire one wasted
-      // media-playlist fetch to the wrong CDN before correcting. Symmetric
-      // redundant streams (the norm) never hit it — the first-listed CDN is
-      // already the primary we'd pick anyway.
-      deriveCdnPriority,
-
-      // CDN failover cooldown: owns the expiry half of failover — watches
-      // `failedCdns` (tripped directly by track resolution on a failed
-      // media-playlist fetch) and removes each CDN once its cooldown lapses.
-      setupFailoverMonitor,
-
-      // Owns `errors` and its per-source lifecycle. Composed before the
-      // behaviors that report into it so the slot exists when they first run;
-      // reporting no-ops if it isn't composed at all.
-      collectErrors,
-
-      // Resolve selected tracks (fetch media playlists). Composed before the
-      // switch* slot owners; selection is reactive, so a resolve* re-fires once
-      // its switch* sets the id (same convergence for all three types).
-      resolveVideoTrack,
-      resolveAudioTrack,
-      resolveTextTrack,
-
-      // Presentation duration
-      calculatePresentationDuration,
-
-      // MSE setup. Video cluster is registered first so that, when both
-      // per-type variants flip to `'buffer-ready'` on the shared gate's
-      // monitor evaluation, `addSourceBuffer(video)` runs before
-      // `addSourceBuffer(audio)` — see the Firefox `mozHasAudio` invariant
-      // in setup-buffer-actors.ts.
-      setupMediaSource,
-      updateMediaSourceDuration,
-
-      // EME for encrypted sources (no-op for clear ones). Composed right after
-      // MSE setup and — load-bearing — before the `load*Segments` dispatchers,
-      // so the `segmentLoadingBlocked` gate is up before their first dispatch of
-      // encrypted segments.
-      //
-      // `exchangeLicenses` precedes the negotiation it consumes, also
-      // load-bearing: `createComposition` calls cleanups in registration order,
-      // and the sessions it opens must close before `setupMediaKeys` detaches
-      // the MediaKeys they belong to. Setup order costs nothing in return — its
-      // precondition is reactive on `context.mediaKeys`.
-      //
-      // `setupAirPlayFairPlay` sits ahead of `setupMediaKeys` for the same
-      // reason. Both react to the AirPlay session's falling edge — one
-      // releasing the receiver's MediaKeys, the other negotiating MSE's afresh
-      // — and registration order is what puts the detach before the attach.
-      exchangeLicenses,
-      setupAirPlayFairPlay,
-      setupMediaKeys,
-
-      // ── Non-zero-PTS relocation (spike) ──────────────────────────────────
-      // Establishes per-track `startMediaTime` and publishes the relocating
-      // segment-loader pipelines to context. MUST precede `setup*BufferActors`
-      // so the pipelines are published before the loaders read them. Remove this
-      // one line (+ the import, the `mediaContainerData`/`*MessagePipelines`
-      // slots including `textMessagePipelines`, and the `deriveStartMediaTime`
-      // config) to drop relocation and test the Tier-0 baseline / bundle size.
-      establishStartMediaTime,
-      // ─────────────────────────────────────────────────────────────────────
-
-      setupVideoBufferActors,
-      setupAudioBufferActors,
-
-      // AirPlay/MSE bridge (WebKit only; no-op elsewhere).
-      setupAirPlay,
-
-      // Playback tracking
-      trackCurrentTime,
-      // After trackCurrentTime: the one-shot currentTime seed must land after
-      // the mirror's attach-time sync (see apply-start-position.ts).
-      applyStartPosition,
-
-      // Ordering isn't load-bearing — selection is reactive, so a measurement
-      // that lands after the first pick just re-fires it.
-      trackPlayerResolution,
-      switchVideoTrack,
-      switchAudioTrack,
-      // Mid-stream audio-buffer flush on language switch is handled in
-      // `segment-loader`'s `planTasks` (predicate: language differs from
-      // the previously-buffered track) — not in switchAudioTrack itself.
-
-      // Text selection: resolves `userTextTrackSelection` intent (incl. 'off',
-      // or the configured preferred-language / DEFAULT-track policy) against the
-      // failed-CDN-pruned, active-CDN-scoped text renditions. Optional selection
-      // (captions are opt-in), so it can resolve to none.
-      switchTextTrack,
-
-      // Segment loading
-      loadVideoSegments,
-      loadAudioSegments,
-
-      // Live: declare the seekable window, then command the live-edge start
-      // position + keep the playhead in-window. No-op for complete playlists
-      // (VoD / ended). `seekToLiveEdge` commands `state.startPosition`;
-      // `applyStartPosition` (composed above) performs the seek.
-      syncLiveSeekableRange,
-      seekToLiveEdge,
-
-      // End of stream coordination
-      endOfStream,
-      // Force native `ended` when Chrome freezes the playhead a few frames short of a
-      // skewed-A/V end after `endOfStream` (audio-clock stall). Inert otherwise.
-      recoverEndStall,
-
-      // Text tracks
-      syncTextTracks,
-      setupTextTrackActors,
-      loadTextTrackSegments,
-      // Apple JSON chapters (`EXT-X-SESSION-DATA`, `com.apple.hls.chapters`) →
-      // a hidden `chapters` track per language, the preferred subtitle
-      // language leading. Cues live on the element; no state signal.
-      loadChapters,
-
-      // Behavior whose sole purpose is to use a callback to allow for signal writing from the outside (e.g. an adapter)
-      // NOTE: While not required, adding at the end since behaviors are setup in order, so this increases the likelihood
-      // that initial signal setup will have occurred before shareSignals' callback is invoked. (CJP)
-      shareSignals,
-    ],
-    {
-      config: finalConfig,
-      // Seed bandwidthState so switchVideoTrack fires on initial subscribe
-      // with the `initialBandwidth` fallback rather than waiting for the
-      // first chunk. The empty sample buffer means `getBandwidthEstimate`
-      // returns the configured initial bandwidth until real samples land.
-      initialState: {
-        bandwidthState: {
-          fastEstimate: 0,
-          fastTotalWeight: 0,
-          slowEstimate: 0,
-          slowTotalWeight: 0,
-          bytesSampled: 0,
-        },
+  // `shareSignals`: behavior whose sole purpose is to use a callback to allow for signal writing from the outside (e.g.
+  // an adapter). NOTE: While not required, adding at the end since behaviors are setup in order, so this increases the
+  // likelihood that initial signal setup will have occurred before shareSignals' callback is invoked. (CJP)
+  return createComposition([...hlsVideoEngineBehaviors, shareSignals], {
+    config: finalConfig,
+    // Seed bandwidthState so switchVideoTrack fires on initial subscribe
+    // with the `initialBandwidth` fallback rather than waiting for the
+    // first chunk. The empty sample buffer means `getBandwidthEstimate`
+    // returns the configured initial bandwidth until real samples land.
+    initialState: {
+      bandwidthState: {
+        fastEstimate: 0,
+        fastTotalWeight: 0,
+        slowEstimate: 0,
+        slowTotalWeight: 0,
+        bytesSampled: 0,
       },
-    }
-  );
+    },
+  });
 }

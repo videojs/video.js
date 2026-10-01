@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { signal } from '../../signals/primitives';
-import type { ContextSignals, StateSignals } from '../create-composition';
-import { makeShareSignals } from '../share-signals';
+import { type ContextSignals, createComposition, type StateSignals } from '../create-composition';
+import { makeShareSignals, makeShareSignalsFor } from '../share-signals';
 
 interface State {
   count?: number;
@@ -57,6 +57,37 @@ describe('makeShareSignals', () => {
 
   it('declares no stateKeys or contextKeys (passthrough behavior)', () => {
     const shareSignals = makeShareSignals<State, Context>();
+
+    expect(shareSignals.stateKeys).toEqual([]);
+    expect(shareSignals.contextKeys).toEqual([]);
+  });
+});
+
+describe('makeShareSignalsFor', () => {
+  it('passes the composition refs of the behaviors it follows to onSignalsReady', async () => {
+    const counter = {
+      stateKeys: ['count'] as const,
+      contextKeys: ['element'] as const,
+      setup: (_deps: { state: StateSignals<State>; context: ContextSignals<Context> }) => {},
+    };
+    const behaviors = [counter] as const;
+    let captured: { state: StateSignals<{ count: number | undefined }> } | undefined;
+
+    const composition = createComposition([...behaviors, makeShareSignalsFor<typeof behaviors>()], {
+      config: {
+        onSignalsReady: (signals) => {
+          captured = signals;
+        },
+      },
+    });
+
+    expect(captured?.state.count).toBe(composition.state.count);
+
+    await composition.destroy();
+  });
+
+  it('declares no stateKeys or contextKeys (passthrough behavior)', () => {
+    const shareSignals = makeShareSignalsFor<[]>();
 
     expect(shareSignals.stateKeys).toEqual([]);
     expect(shareSignals.contextKeys).toEqual([]);

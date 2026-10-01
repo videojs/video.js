@@ -62,6 +62,17 @@ import type { SegmentLoadingState } from './load-segments';
  */
 const REMOTE_INACTIVE_SETTLE_MS = 1000;
 
+/**
+ * Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL
+ * property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's
+ * remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays
+ * programmatically managed (ManagedMediaSource / AirPlay). An input: the adapter writes it whether or not
+ * `setupAirPlay` is composed.
+ */
+export interface RemotePlaybackInputs {
+  disableRemotePlayback?: boolean;
+}
+
 type AirPlayFsmState = 'preconditions-unmet' | 'airplay-capable';
 
 function deriveState(

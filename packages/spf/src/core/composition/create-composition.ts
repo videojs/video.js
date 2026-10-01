@@ -84,7 +84,7 @@ export interface Behavior<
 // =============================================================================
 
 /** A behavior with an unconstrained setup — used as a generic bound. */
-type AnyBehavior = {
+export type AnyBehavior = {
   stateKeys: readonly PropertyKey[];
   contextKeys: readonly PropertyKey[];
   setup: (deps: any) => BehaviorCleanup;
@@ -351,7 +351,7 @@ export function createComposition<const Behaviors extends readonly AnyBehavior[]
  * won't satisfy the phantom field requirement, so TS surfaces the failure at the call site with a descriptive message.
  * When exhaustive, the tag is `Empty` and adds no constraint.
  */
-type ExhaustiveKeys<Keys extends readonly PropertyKey[], Slot extends object, Name extends string> = [
+export type ExhaustiveKeys<Keys extends readonly PropertyKey[], Slot extends object, Name extends string> = [
   keyof Slot,
 ] extends [Keys[number]]
   ? Empty

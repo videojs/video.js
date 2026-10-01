@@ -2,17 +2,16 @@ import {
   type Composition,
   type ContextSignals,
   createComposition,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
   type StateSignals,
 } from '../../../core/composition/create-composition';
-import { makeShareSignals, type ShareSignalsConfig } from '../../../core/composition/share-signals';
+import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
 import { canPlayTrack } from '../../../media/dom/capabilities';
-import type { ScreenResolution } from '../../../media/dom/screen';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK, type SvtaError } from '../../../media/errors';
+import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import type { CanPlayTrack, MaybeResolvedPresentation } from '../../../media/types';
+import type { CanPlayTrack } from '../../../media/types';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { SegmentLoaderActor } from '../../actors/dom/segment-loader';
-import type { SourceBufferActor } from '../../actors/dom/source-buffer';
 import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors, reportAbsentTrackType } from '../../behaviors/collect-errors';
 import { endOfStream } from '../../behaviors/dom/end-of-stream';
@@ -41,45 +40,53 @@ import { excludeUnplayableTracks } from '../../primitives/selection-rules';
 // ============================================================================
 
 /**
- * State shape for the background-video playback engine.
- *
- * Mostly narrower than `HlsVideoEngineState`: audio/text track slots are absent because their selection/resolution
- * behaviors are subtracted. `bandwidthState` is present because `setupVideoBufferActors` declares it and
- * `loadVideoSegments` samples into it (wasted work in this variant — a Phase 3 alt-impl will skip sampling).
- *
- * `screenResolution` is the one slot this variant has and the HLS video engine doesn't, because the screen-size cap is
- * being built here first. It generalizes — the cap is a selection rule both engines can compose — so expect the slot to
- * appear there too rather than staying variant-specific.
+ * The behaviors the background-video playback engine composes, in setup order. The engine's state and context types are
+ * derived from this list, so adding or removing a behavior changes them with no separate type to update.
  */
-export interface BackgroundVideoEngineState {
-  /**
-   * The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates
-   * the rest.
-   */
-  presentation?: MaybeResolvedPresentation;
-  preload?: 'auto' | 'metadata' | 'none';
-  selectedVideoTrackId?: string;
-  loadActivated?: boolean;
-  /**
-   * The screen's pixel dimensions, or `undefined` where there is none to read. Written by `trackScreenResolution`, read
-   * by the `screenResolutionCap` selection rule — which treats `undefined` as "don't cap".
-   */
-  screenResolution?: ScreenResolution;
-  /**
-   * Conditions reported while this source is loaded — the per-rendition causes `resolveVideoTrack` reports and the
-   * verdict `selectVideoTrack` reports when the constraints prune every rendition. Owned and cleared per source by
-   * `collectErrors`; the adapter derives which are fatal.
-   */
-  errors?: SvtaError[];
-}
+const backgroundVideoEngineBehaviors = [
+  resolvePresentation,
+  // Presentation duration
+  calculatePresentationDuration,
 
-/** Context shape for the background-video engine. */
-export interface BackgroundVideoEngineContext {
-  mediaElement?: HTMLMediaElement | undefined;
-  mediaSource?: MediaSource;
-  videoBufferActor?: SourceBufferActor;
-  videoSegmentLoaderActor?: SegmentLoaderActor;
-}
+  // Owns `errors` and its per-source lifecycle; reporters append into it.
+  collectErrors,
+
+  // Track selection - pinned single-rendition pick on presentation resolve,
+  // unpinned again if the constraint pre-pass later prunes every rendition
+  // (which is how a container relabel reaches a pick already made).
+  selectVideoTrack,
+  // Resolve selected video track (fetch its media playlist)
+  resolveVideoTrack,
+  // Segment loading — video-only.
+  loadVideoSegments,
+
+  // MSE setup — video-only.
+  setupMediaSource,
+  updateMediaSourceDuration,
+  setupVideoBufferActors,
+
+  // Playback tracking
+  trackCurrentTime,
+
+  // Environment tracking — the signal source for a screen-size rendition
+  // cap. Independent of the presentation, so it sits outside the
+  // resolve/select/load sequence above.
+  trackScreenResolution,
+
+  // End of stream coordination
+  endOfStream,
+] as const;
+
+/**
+ * State shape for the background-video playback engine: every state key its behaviors declare.
+ *
+ * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
+ * wasted work in this variant, since nothing ranks by bandwidth.
+ */
+export type BackgroundVideoEngineState = ResolveBehaviorState<typeof backgroundVideoEngineBehaviors>;
+
+/** Context shape for the background-video playback engine: every context key its behaviors declare. */
+export type BackgroundVideoEngineContext = ResolveBehaviorContext<typeof backgroundVideoEngineBehaviors>;
 
 /**
  * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
@@ -135,7 +142,7 @@ export interface BackgroundVideoEngineConfig extends ShareSignalsConfig<
 // Background-video playback engine
 // ============================================================================
 
-const shareSignals = makeShareSignals<BackgroundVideoEngineState, BackgroundVideoEngineContext>();
+const shareSignals = makeShareSignalsFor<typeof backgroundVideoEngineBehaviors>();
 
 /**
  * Create a background-video playback engine.
@@ -185,51 +192,11 @@ export function createBackgroundVideoEngine(
     reportUnsupportedTrackConditions: config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditions,
   };
 
-  return createComposition(
-    [
-      resolvePresentation,
-      // Presentation duration
-      calculatePresentationDuration,
-
-      // Owns `errors` and its per-source lifecycle; reporters append into it.
-      collectErrors,
-
-      // Track selection - pinned single-rendition pick on presentation resolve,
-      // unpinned again if the constraint pre-pass later prunes every rendition
-      // (which is how a container relabel reaches a pick already made).
-      selectVideoTrack,
-      // Resolve selected video track (fetch its media playlist)
-      resolveVideoTrack,
-      // Segment loading — video-only.
-      loadVideoSegments,
-
-      // MSE setup — video-only.
-      setupMediaSource,
-      updateMediaSourceDuration,
-      setupVideoBufferActors,
-
-      // Playback tracking
-      trackCurrentTime,
-
-      // Environment tracking — the signal source for a screen-size rendition
-      // cap. Independent of the presentation, so it sits outside the
-      // resolve/select/load sequence above.
-      trackScreenResolution,
-
-      // End of stream coordination
-      endOfStream,
-
-      // Behavior whose sole purpose is to expose signal refs via a callback
-      // (e.g. to an adapter). Listed last so initial signal setup has run
-      // before the callback fires.
-      shareSignals,
-    ],
-    {
-      config: finalConfig,
-      initialState: {
-        // Note: Set to true until we add preload configuration
-        loadActivated: true,
-      },
-    }
-  );
+  return createComposition([...backgroundVideoEngineBehaviors, shareSignals], {
+    config: finalConfig,
+    initialState: {
+      // Note: Set to true until we add preload configuration
+      loadActivated: true,
+    },
+  });
 }

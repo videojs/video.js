@@ -1,4 +1,11 @@
-import type { Behavior, ContextSignals, StateSignals } from './create-composition';
+import type {
+  AnyBehavior,
+  Behavior,
+  ContextSignals,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+  StateSignals,
+} from './create-composition';
 
 /**
  * Config consumed by the `shareSignals` behavior.
@@ -42,4 +49,24 @@ export function makeShareSignals<S extends object, C extends object>(
       config.onSignalsReady?.({ state, context });
     },
   };
+}
+
+/**
+ * `makeShareSignals` typed by the behaviors it is composed after, rather than by hand-written state and context types.
+ *
+ * The callback receives the state and context those behaviors resolve to. Declares no keys of its own; declare consumer
+ * inputs with `declareInputs` and include that behavior in `Behaviors`.
+ *
+ * @example
+ *   ```ts
+ *   const behaviors = [resolvePresentation, switchAudioTrack, inputs] as const;
+ *   createComposition([...behaviors, makeShareSignalsFor<typeof behaviors>()], { config });
+ *   ```;
+ */
+export function makeShareSignalsFor<Behaviors extends readonly AnyBehavior[]>(): Behavior<
+  StateSignals<ResolveBehaviorState<Behaviors>>,
+  ContextSignals<ResolveBehaviorContext<Behaviors>>,
+  ShareSignalsConfig<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>>
+> {
+  return makeShareSignals<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>>();
 }
