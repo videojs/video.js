@@ -62,7 +62,6 @@ jobs:
             1. Ensure title prefix:
             - Every issue title must start with a type prefix. If the prefix is missing or wrong, fix the title. Preserve the rest of the title as-is.
             - Use Title Case for the description after the prefix (e.g., "Bug: Playback Stalls on iOS Safari").
-            - Exception: If the issue body contains `<!-- e2e-failure -->`, preserve its existing Conventional Commits title unchanged.
             - Prefixes:
               - `Feature:` — New capability or behavior
               - `Bug:` — Something broken or not working as expected
