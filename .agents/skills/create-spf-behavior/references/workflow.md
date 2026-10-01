@@ -130,7 +130,7 @@ Per `conventions/signals.md`:
 
 ### Step 3 — Choose composition placement
 
-- **Always-on or variant-specific?** Composed into `createHlsVideoEngine`
+- **Always-on or variant-specific?** Composed into the `hls/video` engine
   (always-on), or into a variant factory (`createAudioOnlyHlsEngine`,
   etc.)?
 - **Position in the composition order?** Per `packages/spf/docs/hls-engine.md`,

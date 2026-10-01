@@ -44,8 +44,8 @@ distinct motivations.
 
 ## Status
 
-- **Composition:** implemented for **VOD** in `createHlsVideoEngine` and
-  `createHlsAudioEngine` on `feat/spf-non-zero-pts-relocation` (draft
+- **Composition:** implemented for **VOD** in the `hls/video` engine and
+  the `hls/audio` engine on `feat/spf-non-zero-pts-relocation` (draft
   PR #1847). The `establishStartMediaTime` reactor + the `relocation-pipelines`
   primitive discover each track's decode-time origin (`tfdt`/`mdhd`, matched by
   `track_id`) and relocate via `SourceBuffer.timestampOffset = −startMediaTime`.

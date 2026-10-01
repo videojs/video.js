@@ -22,10 +22,10 @@ other consumer-side reasons.
 ## Status
 
 - **Composition:** the **screen-size cap** is implemented and composed
-  by `createBackgroundVideoEngine`, whose default rule chain is
+  by the `hls/background-video` engine, whose default rule chain is
   `[screenResolutionCap, preferHighestResolution]` — narrow to the
   renditions that fit the screen, then take the largest. Not composed
-  by `createHlsVideoEngine`, where `selectQuality` still operates over
+  by the `hls/video` engine, where `selectQuality` still operates over
   all video tracks with no narrowing beyond `userVideoTrackSelection`.
   The config-driven caps (max-height, max-bitrate, max-FPS), the
   player-element cap, and the cap floor are all unimplemented.
@@ -104,7 +104,7 @@ was a decision rather than a detail:
 | `preferHighestResolution` | `packages/spf/src/playback/behaviors/select-tracks.ts` | The ranker composed behind it — a sort, so the chain's head is the largest surviving rendition |
 | `tracksUnderPixelArea` / `byDescendingResolution` | `packages/spf/src/media/primitives/select-tracks.ts` | The geometry the two rules are built from: one filter, one comparator |
 | `applyRules` / `applyConstraints` | `packages/spf/src/playback/primitives/selection-rules.ts` | The composers. `applyRules` supplies the fall-through and the head-is-the-pick semantics the cap relies on |
-| `createBackgroundVideoEngine` | `packages/spf/src/playback/engines/hls/engine-background-video.ts` | Composes `trackScreenResolution` and the default chain |
+| `createEngine` | `packages/spf/src/playback/engines/hls/engine-background-video.ts` (`@videojs/spf/hls/background-video`) | Composes `trackScreenResolution` and the default chain |
 
 `screenResolutionCap`, `preferHighestResolution`, and `SelectTrackRule`
 are exported from `@videojs/spf/hls`, so a consumer can pass
@@ -115,8 +115,8 @@ rule alongside it, rather than only replacing the chain wholesale.
 
 | Option | Where | Effect |
 |---|---|---|
-| `videoRules` | `BackgroundVideoEngineConfig` | Replaces the default chain. Omit for `[screenResolutionCap, preferHighestResolution]` |
-| `useDevicePixelRatio` | `BackgroundVideoEngineConfig`, read by `trackScreenResolution` | Whether the screen is measured in device pixels (default `true`) or CSS pixels. ⚠️ Chromium and Gecko fold page zoom into `devicePixelRatio`, so with this on, zooming moves the cap; WebKit does not |
+| `videoRules` | `EngineConfig` (`hls/background-video`) | Replaces the default chain. Omit for `[screenResolutionCap, preferHighestResolution]` |
+| `useDevicePixelRatio` | `EngineConfig` (`hls/background-video`), read by `trackScreenResolution` | Whether the screen is measured in device pixels (default `true`) or CSS pixels. ⚠️ Chromium and Gecko fold page zoom into `devicePixelRatio`, so with this on, zooming moves the cap; WebKit does not |
 
 There is no cap-value config option. The cap is derived from a measured
 screen rather than configured, which is what distinguishes this phase
@@ -254,7 +254,7 @@ Things this feature probably forces decisions on, not just additions:
 ## Related features
 
 - **[video-abr](./video-abr.md)** — the consumer for the caps that have
-  yet to land in `createHlsVideoEngine`. Its ranker is what a cap
+  yet to land in the `hls/video` engine. Its ranker is what a cap
   narrows *for*: the cap decides which renditions are admissible and the
   ranker picks within them. `userVideoTrackSelection` is the existing
   constraint+filter precedent.

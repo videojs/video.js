@@ -21,7 +21,7 @@ in-place path against regression.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls/video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface, cleanup contract,
   and validation test all in place
 - **Cleanup contract** (load-bearing): every behavior that gates on

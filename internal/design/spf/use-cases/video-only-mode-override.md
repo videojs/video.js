@@ -32,7 +32,7 @@ for product context.
 
 - **Composition:** not implemented. The use case requires a parallel
   engine-factory + adapter pair, neither of which exists today.
-  `createHlsVideoEngine` composes the full video + audio pipeline; this
+  The `hls/video` engine composes the full video + audio pipeline; this
   variant would compose a subset.
 - **Definition depth:** coarse — variant shape sketched, engine-factory and
   adapter shapes named at the level of "parallel siblings to the existing
@@ -85,7 +85,7 @@ identically across both source shapes; what differs is the
 
 | Phase | What |
 |---|---|
-| **1 — Basic functionality** | Parallel engine-factory + adapter pair. The engine factory (`createHlsVideoOnlyEngine` or similar — mirroring the audio-axis sibling's `createHlsAudioEngine`) composes the video-side subset of `createHlsVideoEngine`'s behavior list, subtracting audio-side behaviors entirely. The adapter (`HlsVideoOnlyMediaElement` or similar) wraps that engine. Includes empirical verification of Firefox `mozHasAudio` behavior under subtractive-audio composition — both for genuinely-no-audio sources and for mixed-source manifests with audio subtractively-composed-out (the latter behavior is less established and may differ from the former) |
+| **1 — Basic functionality** | Parallel engine-factory + adapter pair. The engine module (an `hls/video-only` entry point or similar — mirroring the audio-axis sibling's `hls/audio`) composes the video-side subset of the `hls/video` engine's behavior list, subtracting audio-side behaviors entirely. The adapter (`HlsVideoOnlyMediaElement` or similar) wraps that engine. Includes empirical verification of Firefox `mozHasAudio` behavior under subtractive-audio composition — both for genuinely-no-audio sources and for mixed-source manifests with audio subtractively-composed-out (the latter behavior is less established and may differ from the former) |
 | **2 — Features/functionality relevant to the use case** | Compose constituent feature behaviors as they land: [`subtitles`](../features/subtitles.md) for muted-video + captions a11y delivery pattern (a canonical video-only consumption shape). [`multi-language-audio`](../features/multi-language-audio.md) is *not* relevant here (audio subtracted), and Phase 2's "audio-abr-equivalent" doesn't apply on the video axis (video-abr is already Phase 1 baseline) |
 | **3 — Optimizations** | Alternative default configurations for video-only delivery: possibly muted-by-default playback (browser autoplay policies often allow muted-autoplay), GPU/thermal-aware quality caps when the consumer surface is known low-attention (ambient/background video), simpler `endOfStream` paths (single SourceBuffer to coordinate). Per [`README.md` § Implementation note](./README.md#implementation-note-customizing-behaviors-for-use-cases), the Path-A vs Path-B judgment applies for any behavior whose Phase 3 customization significantly diverges from the default |
 
@@ -95,7 +95,7 @@ Phase 1 is subtractive-only; Phases 2 and 3 surface the other mechanisms.
 
 ### Behaviors subtracted (Phase 1)
 
-From `createHlsVideoEngine`'s composition, omit:
+From the `hls/video` engine's composition, omit:
 
 - `selectAudioTrack` — no audio rendition selection
 - `resolveAudioTrack` — no audio media playlist fetch
@@ -242,7 +242,7 @@ implementation pass landed the shared-factory pattern (see that doc's
 ## Open questions
 
 - **Empirical verification of video-only tolerance.** Does the current
-  `createHlsVideoEngine` handle video-only manifests cleanly, or does
+  `hls/video` engine handle video-only manifests cleanly, or does
   `setupAudioBufferActors` / `loadAudioSegments` fail or no-op
   inconsistently when `presentation.audioTracks` is empty? Test fixture
   work needed before scoping the variant implementation in detail. Phase

@@ -24,7 +24,7 @@ the parallel sibling `[5.1-surround-selection]`.
 
 ## Status
 
-- **Composition:** not implemented in `createHlsVideoEngine`. Today
+- **Composition:** not implemented in the `hls/video` engine. Today
   `selectQuality` operates over all `presentation.videoTracks` with
   no codec-aware filtering. The parser already extracts the `CODECS`
   attribute onto `Track.codecs[]` (`parse-multivariant.ts`), and

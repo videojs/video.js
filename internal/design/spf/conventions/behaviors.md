@@ -447,7 +447,7 @@ export interface ResolvePresentationConfig {
 }
 
 // In the engine — optional, defaulted in finalConfig
-interface HlsVideoEngineConfig {
+interface EngineConfig {
   parsePresentation?: ParsePresentation;
   // ...
 }
@@ -461,7 +461,7 @@ const finalConfig = {
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.
 
-**Worked example**: `resolvePresentation.parsePresentation` (required) + `HlsVideoEngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
+**Worked example**: `resolvePresentation.parsePresentation` (required) + the `hls/video` engine's `EngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
 
 ### Cleanup contract
 
