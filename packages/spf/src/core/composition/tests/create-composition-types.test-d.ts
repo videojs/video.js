@@ -957,3 +957,26 @@ describe('createComposition', () => {
     expectTypeOf<typeof map>().toEqualTypeOf<{}>();
   });
 });
+
+describe('ConfigWithDefaults', () => {
+  const needsInterval = {
+    stateKeys: [],
+    contextKeys: [],
+    setup: (_deps: { config: { interval: number; label?: string } }) => {},
+  };
+
+  it('makes a required key optional when defaultConfig covers it', () => {
+    createComposition([needsInterval], { defaultConfig: { interval: 250 }, config: {} });
+    createComposition([needsInterval], { defaultConfig: { interval: 250 }, config: { label: 'a' } });
+  });
+
+  it('keeps a required key required when defaultConfig does not cover it', () => {
+    // @ts-expect-error — `interval` is required and has no default
+    createComposition([needsInterval], { defaultConfig: { label: 'a' }, config: {} });
+  });
+
+  it('rejects a default of the wrong type', () => {
+    // @ts-expect-error — `interval` is a number
+    createComposition([needsInterval], { defaultConfig: { interval: '250' }, config: {} });
+  });
+});

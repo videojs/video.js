@@ -1,5 +1,3 @@
-import { defaults } from '@videojs/utils/object';
-
 import {
   type Composition,
   createComposition,
@@ -188,9 +186,5 @@ export const initialState = {
  *   ```;
  */
 export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
-  return createComposition([...behaviors], {
-    // Overrides from `config`, defaults for every key it leaves `undefined`.
-    config: { ...config, ...defaults(config, defaultConfig) },
-    initialState,
-  });
+  return createComposition([...behaviors], { defaultConfig, config, initialState });
 }
