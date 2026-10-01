@@ -75,7 +75,7 @@ below).
 
 | Phase | What |
 |---|---|
-| **1 — Basic functionality** *(implemented)* | Parallel engine-factory + adapter pair. `createHlsAudioEngine` composes the audio-side subset of `createHlsVideoEngine`'s behavior list, subtracting video-side and text-track behaviors entirely (Phase 1 ships without subtitle support). `HlsAudioAdapterCore` wraps the engine with the same `shareSignals`-based pattern as `HlsVideoAdapterCore`. See *Implementation surface* below |
+| **1 — Basic functionality** *(implemented)* | Parallel engine-factory + adapter pair. `createHlsAudioEngine` composes the audio-side subset of `createHlsVideoEngine`'s behavior list, subtracting video-side and text-track behaviors entirely (Phase 1 ships without subtitle support). `HlsAudioAdapterCore` wraps the engine with the same pattern as `HlsVideoAdapterCore`. See *Implementation surface* below |
 | **2 — Features/functionality relevant to the use case** | Compose constituent feature behaviors as they land: [`audio-abr`](../features/audio-abr.md) when implemented (multi-bitrate audio support in the variant), [`multi-language-audio`](../features/multi-language-audio.md) when implemented (language selection within the variant). Both are additive — the variant gains capability as the constituent features get built |
 | **3 — Optimizations** | Alternative default configurations for the audio-only delivery context: shorter forward-buffer targets (audio is lower-bandwidth; less ahead-buffering needed), possibly different `preload` defaults. The Path-A (update existing behavior's defaults) vs Path-B (audio-only-specific buffer-management behavior) judgment call applies — see [`README.md` § Implementation note](./README.md#implementation-note-customizing-behaviors-for-use-cases) |
 
@@ -140,7 +140,7 @@ Phase 1 baseline:
 - **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** —
   used with an alternative adapter shape. The variant ships its own
   `HlsAudioAdapterCore`-style adapter parallel to
-  `HlsVideoAdapterCore`. The `shareSignals` mechanism + mixin pattern compose
+  `HlsVideoAdapterCore`. The mixin pattern composes
   unchanged; the consumer-facing API differs.
 - **[`mse-mms-pipeline`](../features/mse-mms-pipeline.md)** — used as-is.
   `MediaSource` + `endOfStream` gate compose unchanged across variants (per the
@@ -285,7 +285,6 @@ parallel to the existing `hls-video` pair.
 | `HlsAudioEngineState` | `engine-audio-only.ts` | Trimmed state — no `selectedVideoTrackId` / `selectedTextTrackId` / `userVideoTrackSelection` / `bandwidthState` |
 | `HlsAudioEngineContext` | `engine-audio-only.ts` | Trimmed context — no video buffer / video segment loader / text-track actor slots |
 | `HlsAudioEngineConfig` | `engine-audio-only.ts` | Trimmed config — no video-quality, bandwidth, or text-track fields |
-| `HlsAudioEngineSignals` | `engine-audio-only.ts` | `onSignalsReady` callback type |
 
 **SPF — adapter** (`packages/spf/src/playback/engines/hls/`):
 
@@ -329,7 +328,7 @@ Public re-export: `@videojs/react/media/hls-audio`.
 `resolvePresentation`, `resolveAudioTrack`, `calculatePresentationDuration`,
 `setupMediaSource`, `updateMediaSourceDuration`, `setupAudioBufferActors`,
 `trackCurrentTime`, `switchAudioTrack`, `loadAudioSegments`, `endOfStream`,
-`shareSignals`. (Phase 1 composed `selectAudioTrack`; `switchAudioTrack`
+and a `declareInputs` behavior for the consumer inputs. (Phase 1 composed `selectAudioTrack`; `switchAudioTrack`
 replaced it when [`multi-language-audio`](../features/multi-language-audio.md)
 Tier 2 landed.)
 

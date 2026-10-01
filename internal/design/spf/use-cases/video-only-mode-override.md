@@ -141,8 +141,8 @@ Phase 1 baseline:
 - **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** —
   used with an alternative adapter shape. The variant ships its own
   `HlsVideoOnlyMediaElement`-style adapter parallel to
-  `HlsVideoAdapterCore`. The `shareSignals` mechanism + mixin pattern
-  compose unchanged.
+  `HlsVideoAdapterCore`. The mixin pattern
+  composes unchanged.
 - **[`mse-mms-pipeline`](../features/mse-mms-pipeline.md)** — used as-is.
   `MediaSource` + `endOfStream` gate compose unchanged across variants. The
   **Firefox `mozHasAudio` invariant** documented in this feature is more

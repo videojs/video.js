@@ -75,7 +75,7 @@ Anti-patterns:
 
 ### D — Simplicity
 
-**Decision criterion:** is this code more elaborate than the problem requires? Can existing primitives (Reactor, Task + Runner, Signal, Actor, `shareSignals`) replace ad-hoc machinery?
+**Decision criterion:** is this code more elaborate than the problem requires? Can existing primitives (Reactor, Task + Runner, Signal, Actor) replace ad-hoc machinery?
 
 Simplicity is about **objective** complexity reduction — fewer moving parts for the same behavior. This is distinct from C (which is about conformance) and from E (which is about size in compiled output): code can be small but elaborate, or large but trivial.
 

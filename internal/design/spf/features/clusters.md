@@ -110,7 +110,7 @@ Engine instantiation, source loading lifecycle, and per-source identity resets. 
 
 **Docs.** `preload-modes`, `source-replacement`, `engine-adapter-integration`.
 
-**Foundational primitives.** `state.presentation` as the source-identity slot; resolved/unresolved routing in `resolvePresentation` as the cleanup-cascade driver; the per-presentation-gated behavior cleanup contract (state-exit detaches DOM / destroys actors / aborts in-flight fetches); `shareSignals` for the external write surface.
+**Foundational primitives.** `state.presentation` as the source-identity slot; resolved/unresolved routing in `resolvePresentation` as the cleanup-cascade driver; the per-presentation-gated behavior cleanup contract (state-exit detaches DOM / destroys actors / aborts in-flight fetches); the composition's own `state` / `context` as the external write surface, with `declareInputs` for keys no behavior declares.
 
 **Common cross-cluster touchpoints.** Every other cluster. Track & variant registry, MSE / Buffer management, and Presentation modeling all gate on resolved presentation; their setup behaviors tear down via the resolved/unresolved cascade. Time normalization survives across resets (`currentTime` DOM-side mirror via `trackCurrentTime`). Manifest reload loop is presentation re-resolution under live conditions — a special case of the same cascade.
 
@@ -286,7 +286,7 @@ Two or more behaviors write to the same state slot from different decision domai
 
 **Signals.** A `selected*TrackId` or similar slot named on more than one behavior's writer list; a "default + user-action" pattern; orthogonal-by-design coordination.
 
-**Where it shows up.** Formerly `selectedTextTrackId` (default-on-load via `selectTextTrack` + DOM user-action via `syncTextTracks`) — since resolved to a single-writer output of `switchTextTrack`, with the dual-input relocated to the `userTextTrackSelection` *intent* slot (DOM `change` bridge + consumer via `shareSignals`). That's the canonical resolution of this pattern: route differing inputs to a shared intent slot and let one owner derive the resolved slot, rather than co-writing the resolved slot. Proposed `selectedAudioTrackId` for multi-language audio (default + programmatic write).
+**Where it shows up.** Formerly `selectedTextTrackId` (default-on-load via `selectTextTrack` + DOM user-action via `syncTextTracks`) — since resolved to a single-writer output of `switchTextTrack`, with the dual-input relocated to the `userTextTrackSelection` *intent* slot (DOM `change` bridge + consumer through the adapter). That's the canonical resolution of this pattern: route differing inputs to a shared intent slot and let one owner derive the resolved slot, rather than co-writing the resolved slot. Proposed `selectedAudioTrackId` for multi-language audio (default + programmatic write).
 
 **Skill action when this pattern is suspected.** Characterize the existing writer(s) and the proposed writer along three axes: (1) decision domain (config vs DOM vs intent vs derived), (2) trigger (one-shot transition vs ongoing reactive), (3) cost (cheap write vs side-effect-heavy write — e.g., audio writes trigger flush + re-resolve + replan). If the proposed writer doesn't share decision domain or cost with the existing pattern, the multi-writer convention may not transfer cleanly.
 
