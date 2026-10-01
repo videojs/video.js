@@ -532,7 +532,7 @@ http://example.com/audio-seg1.m4s
 
     // `startPosition` + `loadingSuspended` come from setupAirPlay /
     // applyStartPosition declaring them; `disableRemotePlayback` is a
-    // consumer input declared with declareInputs.
+    // consumer input declared with makeExternalInputs.
     expect('startPosition' in state).toBe(true);
     expect('loadingSuspended' in state).toBe(true);
     expect('disableRemotePlayback' in state).toBe(true);

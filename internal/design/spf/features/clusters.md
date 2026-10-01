@@ -110,7 +110,7 @@ Engine instantiation, source loading lifecycle, and per-source identity resets. 
 
 **Docs.** `preload-modes`, `source-replacement`, `engine-adapter-integration`.
 
-**Foundational primitives.** `state.presentation` as the source-identity slot; resolved/unresolved routing in `resolvePresentation` as the cleanup-cascade driver; the per-presentation-gated behavior cleanup contract (state-exit detaches DOM / destroys actors / aborts in-flight fetches); the composition's own `state` / `context` as the external write surface, with `declareInputs` for keys no behavior declares.
+**Foundational primitives.** `state.presentation` as the source-identity slot; resolved/unresolved routing in `resolvePresentation` as the cleanup-cascade driver; the per-presentation-gated behavior cleanup contract (state-exit detaches DOM / destroys actors / aborts in-flight fetches); the composition's own `state` / `context` as the external write surface, with `makeExternalInputs` for keys no behavior declares.
 
 **Common cross-cluster touchpoints.** Every other cluster. Track & variant registry, MSE / Buffer management, and Presentation modeling all gate on resolved presentation; their setup behaviors tear down via the resolved/unresolved cascade. Time normalization survives across resets (`currentTime` DOM-side mirror via `trackCurrentTime`). Manifest reload loop is presentation re-resolution under live conditions — a special case of the same cascade.
 

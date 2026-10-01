@@ -328,7 +328,7 @@ Public re-export: `@videojs/react/media/hls-audio`.
 `resolvePresentation`, `resolveAudioTrack`, `calculatePresentationDuration`,
 `setupMediaSource`, `updateMediaSourceDuration`, `setupAudioBufferActors`,
 `trackCurrentTime`, `switchAudioTrack`, `loadAudioSegments`, `endOfStream`,
-and a `declareInputs` behavior for the consumer inputs. (Phase 1 composed `selectAudioTrack`; `switchAudioTrack`
+and a `makeExternalInputs` behavior for the external inputs. (Phase 1 composed `selectAudioTrack`; `switchAudioTrack`
 replaced it when [`multi-language-audio`](../features/multi-language-audio.md)
 Tier 2 landed.)
 

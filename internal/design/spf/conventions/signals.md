@@ -71,11 +71,11 @@ Use `initialState` / `initialContext` for **constants** and **shaped initial val
 
 When something outside the composition needs to drive composition state (an adapter, a sandbox harness, an engine consumer), it writes through the `state` and `context` signal maps that `createComposition` returns. Every behavior receives these same signal objects, so an external write reaches every behavior that reads the key.
 
-A key the consumer writes but no behavior declares still has to exist in the composition. `user*TrackSelection` is the example: the selection rules only read it, and read it optionally. Declare such keys as inputs with `declareInputs`, composed like any other behavior:
+A key the consumer writes but no behavior declares still has to exist in the composition. `user*TrackSelection` is the example: the selection rules only read it, and read it optionally. Declare such keys as external inputs with `makeExternalInputs`, composed like any other behavior:
 
 ```ts
-const inputs = declareInputs<{ userChoice?: string }>()(['userChoice']);
-const composition = createComposition([...otherBehaviors, inputs], { config });
+const externalInputs = makeExternalInputs<{ userChoice?: string }>()({ state: ['userChoice'] });
+const composition = createComposition([...otherBehaviors, externalInputs], { config });
 
 // elsewhere — drive composition state from outside
 composition.context.mediaElement.set(element);

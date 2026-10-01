@@ -7,8 +7,8 @@ definition: sketched
 # Engine-adapter integration
 
 The engine's external-driving contract: the composition an engine
-returns exposes its `state` and `context` signal maps, `declareInputs`
-declares the keys a consumer writes but no behavior declares, and
+returns exposes its `state` and `context` signal maps, `makeExternalInputs`
+declares the external inputs, keys the adapter writes but no behavior declares, and
 `HlsVideoMixin` is the canonical adapter that maps a WHATWG
 HTMLMediaElement-shaped API onto those signals. The
 *audience* for this feature is adapter authors and contributors who
@@ -40,8 +40,8 @@ as the engine's own size budget: splitting the adapters out took it from
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD); consumer inputs
-  declared with `declareInputs`, the last entry in the behavior list
+- **Composition:** `createHlsVideoEngine` (HLS VoD); external inputs
+  declared with `makeExternalInputs`, the last entry in the behavior list
 - **Definition depth:** sketched — capability surface and the
   adapter-rationale open question both documented
 
@@ -49,7 +49,7 @@ as the engine's own size budget: splitting the adapters out took it from
 
 | Phase | What | Notes |
 |---|---|---|
-| Engine signals on the returned composition | `createComposition` returns the same `state` / `context` signal maps every behavior receives, and the engine returns that composition. `declareInputs<Inputs>()(keys)` declares the consumer inputs (`user*TrackSelection`, `disableRemotePlayback`) | Read/write intent is expressed at the use site. Previously a `shareSignals` behavior, composed last, handed these same signal objects to an `onSignalsReady` callback |
+| Engine signals on the returned composition | `createComposition` returns the same `state` / `context` signal maps every behavior receives, and the engine returns that composition. `makeExternalInputs<ExternalState>()({ state })` declares the external inputs (`user*TrackSelection`, `disableRemotePlayback`) | Read/write intent is expressed at the use site. Previously a `shareSignals` behavior, composed last, handed these same signal objects to an `onSignalsReady` callback |
 | Mixin adapter pattern | `HlsVideoMixin` is the canonical consumer: function-of-base-class structure (mix into any base), holds the engine and drives its `state` / `context`, exposes a WHATWG HTMLMediaElement-shaped API mapping each setter/method to engine writes | Downstream use: `class HlsVideoAdapter extends HlsVideoMixin(HTMLVideoAdapter) {}` in `packages/spf/src/playback/adapters/hls-video/` |
 | Media element binding | `attach(el)` writes `context.mediaElement`; `detach()` clears it. **Engine persists across attach/detach cycles** — only `src` reassignment or explicit `destroy()` tears it down | Re-attach to a different element is supported. The engine is the durable state holder; `mediaElement` is a context slot |
 | Source assignment via in-place recycling | Adapter's `set src` overwrites `state.presentation` on its single recycled engine (`{ url }`, or `undefined` for empty src). Media element + engine-wide preload persist; no engine recreation, no signal re-capture | Drives the engine's in-place source-replacement cascade — see [source-replacement.md](./source-replacement.md). (The adapter previously destroyed + recreated the engine per assignment.) |
@@ -86,13 +86,13 @@ inputs, and the engine's state and context types are derived from that
 list:
 
 ```ts
-const hlsVideoEngineInputs = declareInputs<UserTrackSelectionInputs & RemotePlaybackInputs>()([
-  'userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback',
-]);
+const hlsVideoEngineExternalInputs = makeExternalInputs<UserTrackSelectionState & DisableRemotePlaybackState>()({
+  state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
+});
 
 const hlsVideoEngineBehaviors = [
   // ... all other behaviors ...
-  hlsVideoEngineInputs,
+  hlsVideoEngineExternalInputs,
 ] as const;
 
 export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
@@ -106,7 +106,7 @@ return createComposition([...hlsVideoEngineBehaviors], { config, initialState })
 
 | Export | File | Role |
 |---|---|---|
-| `declareInputs<Inputs>()(keys)` | `packages/spf/src/core/composition/declare-inputs.ts` | Generic behavior factory. Declares the input keys, checked complete against `Inputs`; its setup does nothing |
+| `makeExternalInputs<ExternalState, ExternalContext>()({ state, context })` | `packages/spf/src/core/composition/make-external-inputs.ts` | Generic behavior factory. Declares the external state and context keys, checked complete against the two shapes; its setup does nothing |
 
 **Canonical adapter:**
 
@@ -156,7 +156,7 @@ each `set src`).
   - `packages/spf/src/playback/engines/hls/tests/engine.test.ts`
     → "allows patching state and owners from outside" — direct
     engine-level write surface (bypasses the mixin)
-  - `packages/spf/src/core/composition/tests/declare-inputs.test.ts`
+  - `packages/spf/src/core/composition/tests/make-external-inputs.test.ts`
     — the inputs behavior itself
 - **Downstream usage:**
   - `packages/spf/src/playback/adapters/hls-video/adapter.ts` —

@@ -4,7 +4,7 @@ import {
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
-import { declareInputs } from '../../../core/composition/declare-inputs';
+import { makeExternalInputs } from '../../../core/composition/make-external-inputs';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import type { Reschedule } from '../../../core/tasks/task';
 import type { QualityConfig } from '../../../media/abr/quality-selection';
@@ -33,7 +33,7 @@ import {
 } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors } from '../../behaviors/collect-errors';
 import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
-import { type RemotePlaybackInputs, setupAirPlay } from '../../behaviors/dom/airplay';
+import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
 import { applyStartPosition } from '../../behaviors/dom/apply-start-position';
 import { endOfStream } from '../../behaviors/dom/end-of-stream';
 import { exchangeLicenses } from '../../behaviors/dom/exchange-licenses';
@@ -72,7 +72,7 @@ import {
   type SwitchAudioTrackConfig,
   type SwitchTextTrackConfig,
   type SwitchVideoTrackConfig,
-  type UserTrackSelectionInputs,
+  type UserTrackSelectionState,
   switchAudioTrack,
   switchTextTrack,
   switchVideoTrack,
@@ -90,15 +90,12 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
 // ============================================================================
 
 /**
- * State the HLS playback engine reads but no composed behavior declares: the consumer's track selections and
- * remote-playback opt-out, written through the adapter.
+ * External inputs of the HLS playback engine: state written from outside the engine (by the adapter) that no composed
+ * behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsVideoEngineInputs = declareInputs<UserTrackSelectionInputs & RemotePlaybackInputs>()([
-  'userVideoTrackSelection',
-  'userAudioTrackSelection',
-  'userTextTrackSelection',
-  'disableRemotePlayback',
-]);
+const hlsVideoEngineExternalInputs = makeExternalInputs<UserTrackSelectionState & DisableRemotePlaybackState>()({
+  state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
+});
 
 /**
  * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
@@ -235,8 +232,8 @@ const hlsVideoEngineBehaviors = [
   // language leading. Cues live on the element; no state signal.
   loadChapters,
 
-  // Consumer inputs: written through the adapter, read by the behaviors above.
-  hlsVideoEngineInputs,
+  // External inputs: written by the adapter, read by the behaviors above.
+  hlsVideoEngineExternalInputs,
 ] as const;
 
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
