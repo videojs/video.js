@@ -25,7 +25,7 @@ The audit prompt during refactor: "If an engine wanted to swap this value, would
 
 ## Engine config as the single source of truth
 
-Tunables come from one place: the engine config object passed to `createComposition({ config })`. The composition framework distributes the same config to every behavior; each variant reads its slice.
+Tunables come from one place: the engine config passed to `createComposition`, as `config` over the engine's exported `defaultConfig`. The composition framework distributes the same config to every behavior; each variant reads its slice.
 
 ```ts
 const engine = createEngine({ // from '@videojs/spf/hls/video'

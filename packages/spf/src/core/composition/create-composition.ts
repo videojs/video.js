@@ -1,3 +1,5 @@
+import { defaults } from '@videojs/utils/object';
+
 import { type ReadonlySignal, type Signal, signal } from '../signals/primitives';
 
 /**
@@ -216,9 +218,26 @@ export interface Composition<S extends object, C extends object> {
  * Composition derives the state and context signal maps from each behavior's declared `stateKeys` / `contextKeys`;
  * `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.
  */
-export interface CompositionOptions<S extends object, C extends object, Cfg extends object> {
-  /** Static configuration passed to every behavior. */
-  config?: Cfg;
+/**
+ * `Cfg` with every key `Defaults` covers made optional: a default fills it when the caller leaves it out or passes
+ * `undefined`. Keys `Defaults` doesn't cover keep the behaviors' own requirements.
+ */
+export type ConfigWithDefaults<Cfg extends object, Defaults extends object> = Omit<Cfg, keyof Defaults> &
+  Partial<Pick<Cfg, Extract<keyof Defaults, keyof Cfg>>>;
+
+export interface CompositionOptions<
+  S extends object,
+  C extends object,
+  Cfg extends object,
+  Defaults extends Partial<Cfg> = Empty,
+> {
+  /**
+   * Default configuration. Each key fills the same key of `config` when `config` leaves it out or sets it to
+   * `undefined`. The merge is shallow: a nested sub-config in `config` replaces the default's whole.
+   */
+  defaultConfig?: Defaults;
+  /** Static configuration passed to every behavior, over `defaultConfig`. */
+  config?: ConfigWithDefaults<Cfg, Defaults>;
   /** Initial values for state signals — any subset of `keyof S`. */
   initialState?: Partial<S>;
   /** Initial values for context signals — any subset of `keyof C`. */
@@ -279,12 +298,30 @@ function buildSignalMap<S extends object>(
   };
 }
 
-export function createComposition<const Behaviors extends readonly AnyBehavior[]>(
+/**
+ * `config` over `defaultConfig`: every key of `config`, plus each default whose key `config` leaves out or sets to
+ * `undefined`. Without defaults, `config` passes through as the same object.
+ */
+function mergeDefaultConfig<Config extends object, Defaults extends object>(
+  config: Config,
+  defaultConfig: Defaults | undefined
+): Config | (Config & Defaults) {
+  if (!defaultConfig) return config;
+
+  // SAFETY: `defaults` reads only `defaultConfig`'s keys off `config`; a key `config` lacks reads as `undefined`.
+  return { ...config, ...defaults(config as Partial<Defaults>, defaultConfig) };
+}
+
+export function createComposition<
+  const Behaviors extends readonly AnyBehavior[],
+  Defaults extends Partial<ResolveBehaviorConfig<Behaviors>> = Empty,
+>(
   behaviors: ValidateComposition<Behaviors>,
   options?: CompositionOptions<
     ResolveBehaviorState<Behaviors>,
     ResolveBehaviorContext<Behaviors>,
-    ResolveBehaviorConfig<Behaviors>
+    ResolveBehaviorConfig<Behaviors>,
+    Defaults
   >
 ): Composition<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>> {
   type S = ResolveBehaviorState<Behaviors>;
@@ -308,7 +345,8 @@ export function createComposition<const Behaviors extends readonly AnyBehavior[]
   const deps: BehaviorDeps<StateSignals<S>, ContextSignals<C>, Cfg> = {
     state,
     context,
-    config: (options?.config ?? {}) as Cfg,
+    // SAFETY: `ConfigWithDefaults` types `config` as `Cfg` minus the keys `defaultConfig` fills, so the merge is `Cfg`.
+    config: mergeDefaultConfig(options?.config ?? {}, options?.defaultConfig) as Cfg,
   };
   const cleanups = validBehaviors.map((behavior) => behavior.setup(deps));
 

@@ -326,6 +326,59 @@ describe('createComposition', () => {
       expect(received).toEqual({});
     });
   });
+
+  describe('defaultConfig', () => {
+    interface Cfg {
+      interval: number;
+      label?: string;
+      extra?: string;
+    }
+
+    function captureComposedConfig(options: Parameters<typeof createComposition>[1]) {
+      let received: Cfg | undefined;
+      const captureConfig: Behavior<StateSignals<State>, ContextSignals<Context>, Cfg> = {
+        stateKeys: [],
+        contextKeys: [],
+        setup: ({ config }) => {
+          received = config;
+        },
+      };
+
+      createComposition([captureConfig], options as never);
+
+      return received;
+    }
+
+    it('fills every key config leaves out', () => {
+      expect(captureComposedConfig({ defaultConfig: { interval: 250, label: 'a' }, config: {} })).toEqual({
+        interval: 250,
+        label: 'a',
+      });
+    });
+
+    it('lets config override a default', () => {
+      expect(captureComposedConfig({ defaultConfig: { interval: 250 }, config: { interval: 500 } })).toEqual({
+        interval: 500,
+      });
+    });
+
+    it('fills a key config sets to undefined', () => {
+      expect(captureComposedConfig({ defaultConfig: { interval: 250 }, config: { interval: undefined } })).toEqual({
+        interval: 250,
+      });
+    });
+
+    it('keeps config keys the defaults do not cover', () => {
+      expect(captureComposedConfig({ defaultConfig: { interval: 250 }, config: { extra: 'x' } })).toEqual({
+        interval: 250,
+        extra: 'x',
+      });
+    });
+
+    it('uses the defaults alone when config is omitted', () => {
+      expect(captureComposedConfig({ defaultConfig: { interval: 250 } })).toEqual({ interval: 250 });
+    });
+  });
 });
 
 describe('defineBehavior', () => {
