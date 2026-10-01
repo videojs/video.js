@@ -7,6 +7,7 @@ import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
+import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 // `src` and `source` come from `MuxAdapterProps`: the Mux Adapter owns both, and its
@@ -17,14 +18,18 @@ export interface MuxAudioProps
   extends
     Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof HlsAudioAdapterProps | keyof MuxAdapterProps>,
     Partial<Omit<HlsAudioAdapterProps, 'src' | 'source'>>,
-    Partial<MuxAdapterProps> {
+    Partial<MuxAdapterProps>,
+    MediaRefProps<HTMLAudioElement> {
   children?: ReactNode;
 }
 
-export const MuxAudio = forwardRef<HTMLAudioElement, MuxAudioProps>(function MuxAudio({ children, ...props }, ref) {
+export const MuxAudio = forwardRef<HTMLAudioElement, MuxAudioProps>(function MuxAudio(
+  { children, mediaRef, ...props },
+  ref
+) {
   const media = useMediaInstance(MuxAudioAdapter);
   const attachRef = useAttachMedia(media);
-  const composedRef = useComposedRefs(attachRef, ref);
+  const composedRef = useComposedRefs(attachRef, ref, mediaRef);
   const htmlProps = useSyncProps(media, props, MuxAudioAdapter.defaultProps);
 
   return (

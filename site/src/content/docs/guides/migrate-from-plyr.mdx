@@ -486,7 +486,7 @@ export function AppVideoPlayer() {
 
 The same hook selects actions: `usePlayer((state) => state.play)` returns a function you can call from your own UI.
 
-For video-backed media, a `ref` points to the rendered `HTMLVideoElement`. YouTube and Vimeo refs point to an `HTMLIFrameElement`. To call media methods on those embeds, use `useMedia()` from a component inside the player.
+For video-backed media, a `ref` points to the rendered `HTMLVideoElement`. YouTube and Vimeo refs point to an `HTMLIFrameElement`. To call media methods on those embeds, pass a `mediaRef`, which receives the playback adapter, or call `useMedia()` from a component inside the player.
 
 `useMedia()` returns the Video.js media object. If that object exposes an `engine` property, use it to access the playback engine.
 </FrameworkCase>

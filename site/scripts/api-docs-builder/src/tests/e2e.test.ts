@@ -2026,6 +2026,12 @@ describe('Media element pipeline (end-to-end)', () => {
       expect(react!.props.streamType.default).toBe("'unknown'");
       expect(react!.props.engine).toBeUndefined();
     });
+
+    it('records a DOM global mediaRef type without an import module', () => {
+      const react = findElement('ComplexVideo')!.reference.platforms.react;
+
+      expect(react!.mediaRef).toEqual({ type: 'HTMLVideoElement' });
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────
@@ -2068,6 +2074,12 @@ describe('Media element pipeline (end-to-end)', () => {
 
       expect(react).toMatchObject({ target: 'iframe', acceptsNativeProps: false });
       expect(Object.keys(react!.props).sort()).toEqual(['autoplay', 'source', 'src']);
+    });
+
+    it('records the mediaRef type and the module it is imported from', () => {
+      const react = findElement('EmbedVideo')!.reference.platforms.react;
+
+      expect(react!.mediaRef).toEqual({ type: 'EmbedHost', module: '../../../../media/src/dom/embed' });
     });
 
     it('extracts engine options by following the source property type', () => {
@@ -2168,6 +2180,7 @@ describe('Media element pipeline (end-to-end)', () => {
       const react = findElement('ExtendingVideo')!.reference.platforms.react;
 
       expect(react).toMatchObject({ target: 'video', acceptsNativeProps: true });
+      expect(react!.mediaRef).toBeUndefined();
       expect(Object.keys(react!.props).sort()).toEqual([
         'config',
         'debug',

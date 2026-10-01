@@ -6,6 +6,7 @@ import { forwardRef, useEffect, useRef, type VideoHTMLAttributes } from 'react';
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
+import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 // `src` is the only prop the Media owns, taken from the adapter rather than
@@ -13,7 +14,8 @@ import { useSyncProps } from '../../utils/use-sync-props';
 export interface HlsBackgroundVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsBackgroundVideoAdapterProps>,
-    Partial<HlsBackgroundVideoAdapterProps> {}
+    Partial<HlsBackgroundVideoAdapterProps>,
+    MediaRefProps<HTMLVideoElement> {}
 
 /**
  * A muted, looping, chrome-less video over the SPF background-video engine — the React counterpart to
@@ -35,13 +37,13 @@ export interface HlsBackgroundVideoProps
  * `MuxBackgroundVideo` is this same component under the name the package it replaces used — an alias, not a variant.
  */
 export const HlsBackgroundVideo = forwardRef<HTMLVideoElement, HlsBackgroundVideoProps>(function HlsBackgroundVideo(
-  { children, ...props },
+  { children, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(HlsBackgroundVideoAdapter);
   const videoRef = useRef<HTMLVideoElement>(null);
   const attachRef = useAttachMedia(media);
-  const composedRef = useComposedRefs(attachRef, videoRef, ref);
+  const composedRef = useComposedRefs(attachRef, videoRef, ref, mediaRef);
   const htmlProps = useSyncProps(media, props, HlsBackgroundVideoAdapter.defaultProps);
 
   // Re-fired on the element rather than handed to `onError` directly, so React's

@@ -192,7 +192,7 @@ Move native media settings onto the media component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-The React prop names in this table apply to video-backed media such as `Video` and `HlsJsVideo`. The YouTube and Vimeo components use `autoplay` instead of `autoPlay`. Their refs point to iframes. Call their media methods through `useMedia()` inside the player.
+The React prop names in this table apply to video-backed media such as `Video` and `HlsJsVideo`. The YouTube and Vimeo components use `autoplay` instead of `autoPlay`. Their refs point to iframes. Call their media methods through `mediaRef`, which receives the playback adapter, or through `useMedia()` inside the player.
 
 | Video.js 8 | Video.js v10 |
 |---|---|
@@ -632,7 +632,7 @@ Every item the table labels "the player's" is a property of the player element's
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-For video-backed media, a `ref` points to the rendered `HTMLVideoElement`. YouTube and Vimeo refs point to an `HTMLIFrameElement`. To call media methods on those embeds, use `useMedia()` from a component inside the player.
+For video-backed media, a `ref` points to the rendered `HTMLVideoElement`. YouTube and Vimeo refs point to an `HTMLIFrameElement`. To call media methods on those embeds, pass a `mediaRef`, which receives the playback adapter, or call `useMedia()` from a component inside the player.
 
 `useMedia()` returns the Video.js media object. If that object exposes an `engine` property, use it to access the playback engine.
 

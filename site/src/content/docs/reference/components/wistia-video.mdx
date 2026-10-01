@@ -83,6 +83,10 @@ video.source = {
 - `loop`, `muted`, `autoplay`, `poster`, and `preload` are translated to Wistia's option names. Wistia always plays inline, so `playsInline` has no additional effect.
 - Changing the media ID loads a new Wistia player. Changing only player options keeps the current player and playback session.
 
+<FrameworkCase frameworks={["react"]}>
+`ref` and `mediaRef` both resolve to the rendered `<wistia-player>`. Video.js adapts that element in place, so it is the playback object as well: call `play()` or set `currentTime` on it directly.
+</FrameworkCase>
+
 ## Examples
 
 ### Basic Usage

@@ -474,6 +474,21 @@ The embeds take a URL, a bare ID, or one of Vidstack's shorthands as `src`:
 - **`youtube/ID` plays from the privacy-enhanced host,** `youtube-nocookie.com`, as it did in Vidstack.
 - **`vimeo/ID?hash=HASH` still plays an unlisted video.** In a full Vimeo URL, give the hash as `?h=HASH` or as the last path segment.
 
+<FrameworkCase frameworks={["react"]}>
+A `ref` on `YouTubeVideo` or `VimeoVideo` is the `<iframe>`, which can't play or seek. Where you called methods on Vidstack's YouTube or Vimeo provider, pass `mediaRef` to get the adapter that drives the embed:
+
+```tsx
+import type { YouTubeAdapter } from '@videojs/youtube-video';
+
+const mediaRef = useRef<YouTubeAdapter>(null);
+
+<YouTubeVideo mediaRef={mediaRef} src="youtube/aqz-KE-bpKQ" />
+
+// In an event handler
+if (mediaRef.current) mediaRef.current.currentTime = 30;
+```
+</FrameworkCase>
+
 Vidstack fetched a poster for embeds automatically. Video.js doesn't ([#3049](https://github.com/videojs/v10/issues/3049)); set `poster` on the player if you want your own image before playback.
 
 <Aside type="caution" title="Embed privacy defaults changed">
@@ -942,7 +957,7 @@ The <DocsLink slug="reference/api/player-store">player store reference</DocsLink
 | `useMediaState('paused', playerRef)`, outside the player | Render `VideoPlayer` higher, around the component that reads state |
 | `useMediaRemote()` | `usePlayer((state) => state.seek)`, or any other action |
 | `useMediaPlayer()` | `usePlayer()` for state and actions, `useContainer()` for the element |
-| `useMediaProvider()` | `useMedia()` |
+| `useMediaProvider()` | `useMedia()` inside the player, or `mediaRef` on the media component |
 | `player.subscribe(callback)` | `usePlayer().subscribe(callback)`, reading values off the store inside |
 
 ```tsx
@@ -1030,6 +1045,19 @@ Vidstack's remote control dispatched request events that the player satisfied. V
 The store has no toggles apart from `toggleSubtitles()` and `toggleControls()`, so call the pair you need, as in `paused ? play() : pause()`. Hotkeys and gestures keep the toggle names, so `togglePaused` still works as their action.
 
 Vidstack methods took an optional trigger event as their last argument. Video.js actions don't, so wrap them in a handler, as in `onClick={() => seek(30)}`. Passing an action straight to `onClick` would hand it the click event.
+
+<FrameworkCase frameworks={["react"]}>
+Where you called `play()` or set `currentTime` through a `MediaPlayerInstance` ref, pass `mediaRef` to the media component instead. It receives the element for `Video`, `HlsJsVideo`, and other `<video>`-backed media, and the playback adapter for embeds:
+
+```tsx
+const mediaRef = useRef<HTMLVideoElement>(null);
+
+<HlsJsVideo mediaRef={mediaRef} src="https://example.com/stream.m3u8" />
+
+// In an event handler
+mediaRef.current?.play();
+```
+</FrameworkCase>
 
 State keys follow the same pattern. The common renames:
 

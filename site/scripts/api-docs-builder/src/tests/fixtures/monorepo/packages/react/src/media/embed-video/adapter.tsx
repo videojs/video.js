@@ -1,6 +1,10 @@
 import { EmbedHost } from '../../../../media/src/dom/embed';
 
-interface EmbedVideoProps extends Partial<typeof EmbedHost.defaultProps> {}
+interface MediaRefProps<Media> {
+  mediaRef?: Media;
+}
+
+interface EmbedVideoProps extends Partial<typeof EmbedHost.defaultProps>, MediaRefProps<EmbedHost> {}
 
 declare function forwardRef<Ref, Props>(render: (props: Props, ref: Ref) => unknown): unknown;
 declare function useSyncProps(target: object, props: object, defaults: object): object;

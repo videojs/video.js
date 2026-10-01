@@ -11,7 +11,12 @@ interface VideoHTMLAttributes<Element> {
   element?: Element;
 }
 
-interface ComplexVideoProps extends VideoHTMLAttributes<HTMLVideoElement>, Partial<typeof ComplexHost.defaultProps> {}
+interface MediaRefProps<Media> {
+  mediaRef?: Media;
+}
+
+interface ComplexVideoProps
+  extends VideoHTMLAttributes<HTMLVideoElement>, Partial<typeof ComplexHost.defaultProps>, MediaRefProps<HTMLVideoElement> {}
 
 declare function forwardRef<Ref, Props>(render: (props: Props, ref: Ref) => unknown): unknown;
 declare function useSyncProps(target: object, props: object, defaults: object): object;

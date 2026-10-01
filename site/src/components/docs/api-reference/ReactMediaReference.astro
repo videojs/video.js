@@ -1,9 +1,13 @@
 ---
+import ServerCode from '@/components/Code/ServerCode.astro';
 import A from '@/components/typography/A.astro';
+import CodeFrame from '@/components/typography/CodeFrame.astro';
 import H3 from '@/components/typography/H3Markdown.astro';
+import H4 from '@/components/typography/H4Markdown.astro';
 import MarkdownCode from '@/components/typography/MarkdownCode.astro';
 import P from '@/components/typography/P.astro';
 import type { EngineOptionDef, ReactMediaReference } from '@/types/media-reference';
+import type { MediaReferenceRef } from '@/utils/mediaReferenceModel';
 import ApiEngineOptionsSection from './ApiEngineOptionsSection.astro';
 import MediaHostPropsTable from './MediaHostPropsTable.astro';
 
@@ -17,15 +21,18 @@ interface Props {
   media: string;
   data: ReactMediaReference;
   sections: Section[];
+  refs: MediaReferenceRef[];
   engines: { key: string; id: string; title: string }[];
   engineOptions: Record<string, EngineOptionDef[]>;
   engineProse: Record<string, string>;
 }
 
-const { media, data, sections, engines, engineOptions, engineProse } = Astro.props;
+const { media, data, sections, refs, engines, engineOptions, engineProse } = Astro.props;
 const propsSection = sections.find((section) => section.key === 'props');
 const engineSection = sections.find((section) => section.key === 'engineOptions');
-const refSection = sections.find((section) => section.key === 'ref');
+const refsSection = sections.find((section) => section.key === 'refs');
+const refEntry = refs.find((entry) => entry.key === 'ref');
+const mediaRefEntry = refs.find((entry) => entry.key === 'mediaRef');
 const eventsSection = sections.find((section) => section.key === 'events');
 const hasVideoJsProps = Object.keys(data.props).length > 0;
 
@@ -33,6 +40,20 @@ const targetTag = `<${data.target}>`;
 const nativeInterface =
   data.target === 'video' ? 'HTMLVideoElement' : data.target === 'audio' ? 'HTMLAudioElement' : 'HTMLIFrameElement';
 const mdnApiUrl = `https://developer.mozilla.org/en-US/docs/Web/API/${nativeInterface}`;
+
+// Embeds hand out the adapter that drives the iframe; native media hand out the element `ref` already resolves to.
+const mediaRef = data.mediaRef;
+const mediaRefIsAdapter = Boolean(mediaRef && mediaRef.type !== nativeInterface);
+const refExample = [`const ref = useRef<${nativeInterface}>(null);`, '', `<${media} ref={ref} />`].join('\n');
+const mediaRefExample = mediaRef
+  ? [
+      ...(mediaRef.module ? [`import type { ${mediaRef.type} } from '${mediaRef.module}';`, ''] : []),
+      `const mediaRef = useRef<${mediaRef.type}>(null);`,
+      '',
+      `<${media} mediaRef={mediaRef} />`,
+      ...(mediaRefIsAdapter ? ['', '// In an event handler', 'mediaRef.current?.play();'] : []),
+    ].join('\n')
+  : undefined;
 ---
 
 {
@@ -80,17 +101,57 @@ const mdnApiUrl = `https://developer.mozilla.org/en-US/docs/Web/API/${nativeInte
 }
 
 {
-  refSection && (
+  refsSection && (
     <>
-      <H3 id={refSection.id}>{refSection.title}</H3>
-      <P>
-        Forwards its ref to the rendered{" "}
-        <MarkdownCode>{targetTag}</MarkdownCode>. The ref is an{" "}
-        <A href={mdnApiUrl}>{nativeInterface}</A>
-        {data.target === "iframe"
-          ? ". Control playback with the component props and player APIs rather than the iframe ref."
-          : " and exposes its complete native property and method API."}
-      </P>
+      <H3 id={refsSection.id}>{refsSection.title}</H3>
+      {refEntry && (
+        <>
+          <H4 id={refEntry.id}>
+            <MarkdownCode>{refEntry.title}</MarkdownCode>
+          </H4>
+          <P>
+            Forwards to the rendered <MarkdownCode>{targetTag}</MarkdownCode>,
+            an <A href={mdnApiUrl}>{nativeInterface}</A>
+            {data.target !== "iframe"
+              ? " with its complete native property and method API."
+              : mediaRefEntry
+                ? <>. The iframe cannot play or seek; use{" "}<A href={`#${mediaRefEntry.id}`}><MarkdownCode>mediaRef</MarkdownCode></A>{" "}for playback.</>
+                : ". Control playback with the component props and player APIs rather than the iframe ref."}
+          </P>
+          <CodeFrame lang="tsx">
+            <ServerCode code={refExample} lang="tsx" />
+          </CodeFrame>
+        </>
+      )}
+      {mediaRefEntry && mediaRef && (
+        <>
+          <H4 id={mediaRefEntry.id}>
+            <MarkdownCode>{mediaRefEntry.title}</MarkdownCode>
+          </H4>
+          {mediaRefIsAdapter ? (
+            <P>
+              Receives the <MarkdownCode>{mediaRef.type}</MarkdownCode> that
+              drives the embed, which exposes media methods and properties such
+              as <MarkdownCode>play()</MarkdownCode> and{" "}
+              <MarkdownCode>currentTime</MarkdownCode>. It is set once the
+              adapter has attached to the iframe, so its{" "}
+              <MarkdownCode>target</MarkdownCode> is already that iframe, and
+              it is cleared when the iframe unmounts.
+            </P>
+          ) : (
+            <P>
+              Receives the same <MarkdownCode>{nativeInterface}</MarkdownCode>{" "}
+              as <MarkdownCode>ref</MarkdownCode>. Embed components hand their
+              playback adapter to <MarkdownCode>mediaRef</MarkdownCode>{" "}
+              instead, so code that works with several media components can
+              read the playback object from one prop.
+            </P>
+          )}
+          <CodeFrame lang="tsx">
+            <ServerCode code={mediaRefExample!} lang="tsx" />
+          </CodeFrame>
+        </>
+      )}
     </>
   )
 }
@@ -102,9 +163,19 @@ const mdnApiUrl = `https://developer.mozilla.org/en-US/docs/Web/API/${nativeInte
       <P>
         Handle standard media events with React event props such as{" "}
         <MarkdownCode>onPlay</MarkdownCode> and{" "}
-        <MarkdownCode>onTimeUpdate</MarkdownCode>. For native events without a
-        React prop, attach a listener through the ref with{" "}
-        <MarkdownCode>addEventListener</MarkdownCode>.
+        <MarkdownCode>onTimeUpdate</MarkdownCode>.{" "}
+        {mediaRefIsAdapter ? (
+          <>
+            The adapter dispatches them, not the iframe. For events without a
+            React prop, call <MarkdownCode>addEventListener</MarkdownCode> on
+            the adapter from <MarkdownCode>mediaRef</MarkdownCode>.
+          </>
+        ) : (
+          <>
+            For native events without a React prop, attach a listener through
+            the ref with <MarkdownCode>addEventListener</MarkdownCode>.
+          </>
+        )}
       </P>
     </>
   )

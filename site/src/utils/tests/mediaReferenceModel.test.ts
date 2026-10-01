@@ -81,7 +81,7 @@ describe('createMediaReferenceModel', () => {
     expect(model.platforms.react!.sections.map((section) => section.key)).toEqual([
       'props',
       'engineOptions',
-      'ref',
+      'refs',
       'events',
     ]);
   });
@@ -105,10 +105,24 @@ describe('createMediaReferenceModel', () => {
     ]);
   });
 
-  it('uses React-specific props and ref sections', () => {
+  it('uses React-specific props and refs sections', () => {
     const model = createMediaReferenceModel('HlsJsVideo', makeRef())!;
 
-    expect(model.platforms.react!.sections.map((section) => section.key)).toEqual(['props', 'ref', 'events']);
+    expect(model.platforms.react!.sections.map((section) => section.key)).toEqual(['props', 'refs', 'events']);
+  });
+
+  it('lists mediaRef under refs only when the component accepts one', () => {
+    const withoutMediaRef = createMediaReferenceModel('HlsJsVideo', makeRef())!;
+    const ref = makeRef();
+
+    ref.platforms.react!.mediaRef = { type: 'HTMLVideoElement' };
+    const withMediaRef = createMediaReferenceModel('HlsJsVideo', ref)!;
+
+    expect(withoutMediaRef.platforms.react!.refs.map((entry) => entry.key)).toEqual(['ref']);
+    expect(withMediaRef.platforms.react!.refs).toEqual([
+      { key: 'ref', id: 'ref', title: 'ref' },
+      { key: 'mediaRef', id: 'media-ref', title: 'mediaRef' },
+    ]);
   });
 
   it('keeps the React props section when only standard native props are accepted', () => {
@@ -208,5 +222,16 @@ describe('buildMediaReferenceTocHeadings', () => {
       slug: 'engine-options-hlsjs',
       frameworks: ['html'],
     });
+  });
+
+  it('nests ref and mediaRef under the React refs heading', () => {
+    const ref = makeRef();
+
+    ref.platforms.react!.mediaRef = { type: 'HTMLVideoElement' };
+    const headings = buildMediaReferenceTocHeadings(createMediaReferenceModel('HlsJsVideo', ref));
+    const react = headings.filter((heading) => heading.frameworks?.includes('react')).map((heading) => heading.slug);
+
+    expect(react).toEqual(['props', 'refs', 'ref', 'media-ref', 'events']);
+    expect(headings).toContainEqual({ depth: 4, text: 'mediaRef', slug: 'media-ref', frameworks: ['react'] });
   });
 });

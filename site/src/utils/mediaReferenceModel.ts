@@ -12,13 +12,20 @@ type MediaReferenceSectionKey =
   | 'events'
   | 'cssCustomProperties'
   | 'props'
-  | 'ref';
+  | 'refs';
 
 export interface MediaReferenceSection {
   key: MediaReferenceSectionKey;
   title: string;
   id: string;
   depth: number;
+}
+
+/** One React ref a media component accepts, rendered as a child of the Refs section. */
+export interface MediaReferenceRef {
+  key: 'ref' | 'mediaRef';
+  id: string;
+  title: string;
 }
 
 export interface MediaReferenceEngine {
@@ -38,7 +45,7 @@ export interface MediaReferenceModel {
   heading: { id: string; depth: number; text: string };
   platforms: {
     html: MediaPlatformModel<HtmlMediaReference>;
-    react?: MediaPlatformModel<ReactMediaReference>;
+    react?: MediaPlatformModel<ReactMediaReference> & { refs: MediaReferenceRef[] };
   };
   data: MediaReference;
 }
@@ -108,9 +115,9 @@ const REACT_SUBSECTIONS: readonly MediaSubsectionDefinition<ReactMediaReference>
   },
   createEngineOptionsSubsection<ReactMediaReference>(),
   {
-    key: 'ref',
-    title: 'Ref',
-    id: 'ref',
+    key: 'refs',
+    title: 'Refs',
+    id: 'refs',
     isEmpty: () => false,
   },
   {
@@ -153,6 +160,14 @@ function createEngines(ref: MediaReference): MediaReferenceEngine[] {
   }));
 }
 
+/** `ref` always forwards to the rendered element; `mediaRef` appears only where the component accepts one. */
+function createRefs(react: ReactMediaReference): MediaReferenceRef[] {
+  return [
+    { key: 'ref', id: 'ref', title: 'ref' },
+    ...(react.mediaRef ? [{ key: 'mediaRef' as const, id: 'media-ref', title: 'mediaRef' }] : []),
+  ];
+}
+
 export function createMediaReferenceModel(mediaName: string, ref: MediaReference | null): MediaReferenceModel | null {
   if (!ref) return null;
 
@@ -168,6 +183,7 @@ export function createMediaReferenceModel(mediaName: string, ref: MediaReference
     platforms.react = {
       sections: createSections(REACT_SUBSECTIONS, ref.platforms.react, ref),
       data: ref.platforms.react,
+      refs: createRefs(ref.platforms.react),
     };
   }
 
@@ -213,6 +229,17 @@ export function buildMediaReferenceTocHeadings(model: MediaReferenceModel | null
             depth: section.depth + 1,
             text: engine.title,
             slug: engine.id,
+            frameworks: [framework],
+          });
+        }
+      }
+
+      if (section.key === 'refs') {
+        for (const entry of model.platforms.react?.refs ?? []) {
+          headings.push({
+            depth: section.depth + 1,
+            text: entry.title,
+            slug: entry.id,
             frameworks: [framework],
           });
         }

@@ -66,6 +66,7 @@ The element also fires an `error` event when `error` becomes fatal. The inner vi
 | `src` | HLS manifest URL |
 | `onError` | Fires on the rendered `<video>` when SPF reports a fatal source error |
 | `ref` | Ref to the rendered native `<video>` element |
+| `mediaRef` | Ref that receives the same `<video>` element as `ref` |
 
 `onError` receives an `error` event dispatched on the rendered `<video>`. The video's own `error` can remain `null` because SPF, rather than the browser, rejected the source.
 </FrameworkCase>

@@ -63,6 +63,17 @@ describe('Video', () => {
 
       expect(ref.current).toBeInstanceOf(HTMLVideoElement);
     });
+
+    it('hands the element itself to mediaRef', () => {
+      const ref = createRef<HTMLVideoElement>();
+      const mediaRef = createRef<HTMLVideoElement>();
+
+      const { container } = render(<Video ref={ref} mediaRef={mediaRef} />);
+
+      expect(mediaRef.current).toBeInstanceOf(HTMLVideoElement);
+      expect(mediaRef.current).toBe(ref.current);
+      expect(container.querySelector('video')?.hasAttribute('mediaref')).toBe(false);
+    });
   });
 
   describe('with Provider', () => {

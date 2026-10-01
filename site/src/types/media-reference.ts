@@ -45,6 +45,8 @@ const ReactMediaReferenceSchema = z.object({
   target: MediaTargetTagSchema,
   acceptsNativeProps: z.boolean(),
   props: z.record(z.string(), HostPropertyDefSchema),
+  /** What `mediaRef` receives, and the module that exports that type when it is not a DOM global. */
+  mediaRef: z.object({ type: z.string(), module: z.string().optional() }).optional(),
 });
 
 export const MediaReferenceSchema = z.object({
