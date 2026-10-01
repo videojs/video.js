@@ -12,9 +12,9 @@ export interface SkinCatalogEntry {
   readonly live: boolean;
   /** Human-readable label such as `Default Live Video`. */
   readonly label: string;
-  /** Theme-neutral component exported by the authored skin module, such as `VideoSkin`. */
+  /** Theme-independent component exported by the authored skin module, such as `VideoSkin`. */
   readonly exportName: string;
-  /** Public React component name in `@videojs/react`, such as `MinimalVideoSkin`. */
+  /** Public React component name in `@videojs/react`, such as `NeutralVideoSkin`. */
   readonly component: string;
   /** Custom element tag names for the packaged CSS skin and the registry-installed Tailwind skin. */
   readonly tags: { readonly css: string; readonly tailwind: string };
@@ -27,8 +27,8 @@ export interface SkinCatalogEntry {
 function describe(name: SkinName): SkinCatalogEntry {
   const style = skinStyles[name];
   const preset = skinPreset(name);
-  const minimal = style.theme === 'minimal';
-  const cssTag = minimal ? `${preset}-minimal-skin` : `${preset}-skin`;
+  const neutral = style.theme === 'neutral';
+  const cssTag = neutral ? `${preset}-neutral-skin` : `${preset}-skin`;
 
   return {
     name,
@@ -38,7 +38,7 @@ function describe(name: SkinName): SkinCatalogEntry {
     live: preset.startsWith('live-'),
     label: `${pascalCase(style.theme)} ${preset.split('-').map(pascalCase).join(' ')}`,
     exportName: `${pascalCase(preset)}Skin`,
-    component: `${minimal ? 'Minimal' : ''}${pascalCase(preset)}Skin`,
+    component: `${neutral ? 'Neutral' : ''}${pascalCase(preset)}Skin`,
     tags: { css: cssTag, tailwind: `${cssTag}-tailwind` },
     registryItem: preset,
     directory: skinDirectory(name),

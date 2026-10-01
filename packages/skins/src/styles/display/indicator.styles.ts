@@ -21,7 +21,7 @@ export default styles({
           'pointer-fine:media-transitioning:scale-media-hidden-indicator pointer-fine:media-transitioning:blur-media-hidden',
           'data-ending-style:translate-y-media-hidden-indicator-offset',
         ],
-        minimal: [
+        neutral: [
           'inset-x-0 top-0 flex justify-center pt-3 pb-32 bg-(image:--media-indicator-gradient) text-shadow-media',
           'pointer-fine:motion-media-[translate,filter,opacity] pointer-coarse:motion-media-[translate,opacity]',
           'pointer-fine:media-transitioning:blur-media-hidden',
@@ -32,7 +32,7 @@ export default styles({
     content: {
       utilities: 'items-center justify-between gap-2 px-2.5 py-1',
       variants: {
-        minimal: 'media-high-contrast:rounded-media-control media-high-contrast:bg-media-background',
+        neutral: 'media-high-contrast:rounded-media-control media-high-contrast:bg-media-background',
       },
     },
   },

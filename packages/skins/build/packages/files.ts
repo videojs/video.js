@@ -1,4 +1,4 @@
-import type { Dirent } from 'node:fs';
+import { type Dirent, globSync } from 'node:fs';
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, posix, resolve } from 'node:path';
 
@@ -8,7 +8,10 @@ export interface GeneratedPackageFile {
   readonly content: string;
 }
 
-/** Synchronize generated framework inputs and remove stale files from their explicitly owned roots. */
+/**
+ * Synchronize generated framework inputs and remove stale files from their owned roots. An owned path is a file, a
+ * directory, or a glob of files.
+ */
 export async function syncGeneratedFiles(
   workspaceDir: string,
   files: readonly GeneratedPackageFile[],
@@ -18,6 +21,12 @@ export async function syncGeneratedFiles(
   const existing = new Set<string>();
 
   for (const path of ownedPaths) {
+    if (path.includes('*')) {
+      for (const file of globSync(path, { cwd: workspaceDir })) existing.add(file.replaceAll('\\', '/'));
+
+      continue;
+    }
+
     const filename = resolve(workspaceDir, path);
     const entries = await readdir(filename, { withFileTypes: true }).catch((): Dirent[] | undefined => undefined);
 

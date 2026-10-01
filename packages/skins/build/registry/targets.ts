@@ -6,13 +6,13 @@ export type RegistryTarget =
   | {
       readonly framework: 'react';
       readonly styling: 'css' | 'tailwind';
-      readonly theme: 'default' | 'minimal';
+      readonly theme: 'default' | 'neutral';
       readonly output: string;
     }
   | {
       readonly framework: 'html';
       readonly styling: 'css';
-      readonly theme: 'default' | 'minimal';
+      readonly theme: 'default' | 'neutral';
       readonly output: string;
     };
 
@@ -23,11 +23,11 @@ export const registryPaths = {
 
 export const registryTargets = [
   { framework: 'react', styling: 'tailwind', theme: 'default', output: 'r/react' },
-  { framework: 'react', styling: 'tailwind', theme: 'minimal', output: 'r/react/minimal' },
+  { framework: 'react', styling: 'tailwind', theme: 'neutral', output: 'r/react/neutral' },
   { framework: 'react', styling: 'css', theme: 'default', output: 'r/react/css' },
-  { framework: 'react', styling: 'css', theme: 'minimal', output: 'r/react/css/minimal' },
+  { framework: 'react', styling: 'css', theme: 'neutral', output: 'r/react/css/neutral' },
   { framework: 'html', styling: 'css', theme: 'default', output: 'r/html' },
-  { framework: 'html', styling: 'css', theme: 'minimal', output: 'r/html/minimal' },
+  { framework: 'html', styling: 'css', theme: 'neutral', output: 'r/html/neutral' },
 ] as const satisfies readonly RegistryTarget[];
 
 export const packageRequirements = {

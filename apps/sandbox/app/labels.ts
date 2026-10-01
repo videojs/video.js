@@ -14,7 +14,7 @@ export const STYLING_LABELS: Record<Styling, string> = {
 
 export const SKIN_LABELS: Record<Skin, string> = {
   default: 'Default',
-  minimal: 'Minimal',
+  neutral: 'Neutral',
 };
 
 export const SKIN_SOURCE_LABELS: Record<SkinSource, string> = {
@@ -23,7 +23,7 @@ export const SKIN_SOURCE_LABELS: Record<SkinSource, string> = {
   authored: 'Authored source',
 };
 
-/** The source as a phrase inside a sentence, such as `Minimal · Tailwind · from the registry`. */
+/** The source as a phrase inside a sentence, such as `Neutral · Tailwind · from the registry`. */
 export const SKIN_SOURCE_PHRASES: Record<SkinSource, string> = {
   package: 'from the package',
   registry: 'from the registry',
@@ -34,7 +34,7 @@ export const COMPARE_LABELS: Record<CompareMode, string> = {
   off: 'Off',
   styling: 'CSS vs Tailwind',
   skins: 'Skin sources',
-  skin: 'Default vs Minimal',
+  skin: 'Default vs Neutral',
   platform: 'HTML vs React',
 };
 

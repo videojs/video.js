@@ -445,7 +445,7 @@ function scanHtmlDirectory(scanDir: string): { skins: PresetSkinDef[]; mediaElem
 
   const files = fs
     .readdirSync(scanDir)
-    .filter((f) => f.endsWith('.ts') && !isTailwindFile(f) && f !== 'ui.ts' && f !== 'minimal-ui.ts');
+    .filter((f) => f.endsWith('.ts') && !isTailwindFile(f) && f !== 'ui.ts' && f !== 'neutral-ui.ts');
 
   for (const file of files) {
     const filePath = path.join(scanDir, file);

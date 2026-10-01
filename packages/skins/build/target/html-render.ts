@@ -16,7 +16,7 @@ export function iconImports(module: GraphModule): ReadonlyMap<string, string> {
   const imports = new Map<string, string>();
 
   for (const reference of module.imports) {
-    if (!/^@videojs\/html\/icons(?:\/minimal)?$/.test(reference.specifier)) continue;
+    if (!/^@videojs\/html\/icons(?:\/neutral)?$/.test(reference.specifier)) continue;
 
     for (const { imported, local } of reference.bindings) {
       if (imported !== 'registerIcons') imports.set(local, imported);

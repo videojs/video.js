@@ -30,17 +30,17 @@ describe('useCase', () => {
 
   it('fits the skin and media to the new preset from the store values', () => {
     useCase.set('default-video');
-    skin.set('minimal-video');
+    skin.set('neutral-video');
     media.set('youtube');
 
     useCase.set('default-audio');
 
-    expect(skin.get()).toBe('minimal-audio');
+    expect(skin.get()).toBe('neutral-audio');
     expect(media.get()).toBe('html5-audio');
 
     useCase.set('live-video');
 
-    expect(skin.get()).toBe('minimal-video');
+    expect(skin.get()).toBe('neutral-video');
     expect(media.get()).toBe('hls');
   });
 
@@ -65,12 +65,12 @@ describe('useCase', () => {
   it('replaces stale picks when a client navigation has a different URL', () => {
     syncInstallationSelectionFromUrl(
       new URL(
-        'https://videojs.org/docs/guides/installation/react?preset=audio&skin=minimal&media=spotify&package-manager=pnpm&source-url=track'
+        'https://videojs.org/docs/guides/installation/react?preset=audio&skin=neutral&media=spotify&package-manager=pnpm&source-url=track'
       )
     );
 
     expect(useCase.get()).toBe('default-audio');
-    expect(skin.get()).toBe('minimal-audio');
+    expect(skin.get()).toBe('neutral-audio');
     expect(media.get()).toBe('spotify');
     expect(installMethod.get()).toBe('pnpm');
     expect(sourceUrl.get()).toBe('track');

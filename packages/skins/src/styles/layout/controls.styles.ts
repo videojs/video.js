@@ -24,7 +24,7 @@ export default styles({
       utilities: [],
       variants: {
         default: 'media-max-lg:hidden',
-        minimal: 'media-max-xs:hidden',
+        neutral: 'media-max-xs:hidden',
       },
     },
     root: {
@@ -48,7 +48,7 @@ export default styles({
           'media-lg:pointer-fine:not-data-visible:blur-media-hidden',
           'media-lg:not-data-visible:duration-media-controls',
         ],
-        minimal: [
+        neutral: [
           'absolute inset-x-0.5 bottom-0.5 z-30 flex items-center rtl:flex-row-reverse gap-x-2 rounded-media-controls bg-transparent p-1 media-high-contrast:bg-media-background',
           'transition-[filter,opacity,translate]',
           'not-data-visible:pointer-events-none not-data-visible:opacity-0',

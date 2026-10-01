@@ -2,4 +2,4 @@
 export { audioFeatures } from '@videojs/core/dom';
 export { AudioPlayerElement, PlayerController } from './player';
 export { AudioSkinElement } from './skin';
-export { MinimalAudioSkinElement } from './minimal-skin';
+export { NeutralAudioSkinElement } from './neutral-skin';

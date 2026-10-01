@@ -18,7 +18,7 @@ export default styles({
         'data-[side=right]:[--media-popup-translate-x-distance:calc(var(--media-popup-translate-distance)*-1)]',
       ],
       variants: {
-        minimal: 'data-starting-style:filter-none',
+        neutral: 'data-starting-style:filter-none',
       },
     },
     safeArea: {
@@ -40,7 +40,7 @@ export default styles({
       shadowHost: true,
       utilities: 'bg-media-popover text-media-popover-foreground surface-media after:surface-media-inset',
       variants: {
-        minimal: 'after:hidden',
+        neutral: 'after:hidden',
       },
     },
   },

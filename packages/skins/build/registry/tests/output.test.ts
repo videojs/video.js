@@ -8,17 +8,17 @@ import { describe, expect, it } from 'vite-plus/test';
 const packageDir = resolve(import.meta.dirname, '../../..');
 const registryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react'),
-  minimal: resolve(packageDir, 'dist/registry/source/r/react/minimal'),
+  neutral: resolve(packageDir, 'dist/registry/source/r/react/neutral'),
 } as const;
 const cssRegistryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react/css'),
-  minimal: resolve(packageDir, 'dist/registry/source/r/react/css/minimal'),
+  neutral: resolve(packageDir, 'dist/registry/source/r/react/css/neutral'),
 } as const;
 
 describe('React registry output', () => {
   const registries = {
     default: readRegistryItems(registryDirs.default),
-    minimal: readRegistryItems(registryDirs.minimal),
+    neutral: readRegistryItems(registryDirs.neutral),
   } as const;
 
   it('keeps the Video Skin installation notes concise', () => {
@@ -31,7 +31,7 @@ describe('React registry output', () => {
   });
 
   it('marks every public module root as a client entry', () => {
-    for (const theme of ['default', 'minimal'] as const) {
+    for (const theme of ['default', 'neutral'] as const) {
       const items = registries[theme];
       const missing = [...items.values()]
         .filter((item) => item.meta?.public)
@@ -44,16 +44,16 @@ describe('React registry output', () => {
 
   it('keeps project utilities, component styles, and skin-owned modules in stable boundaries', () => {
     const defaultItems = registries.default;
-    const minimalItems = registries.minimal;
+    const neutralItems = registries.neutral;
     const helper = defaultItems.get('_resolve-class-name');
     const defaultPlayButton = readItemRoot(registryDirs.default, defaultItems.get('play-button')!);
-    const minimalPlayButton = readItemRoot(registryDirs.minimal, minimalItems.get('play-button')!);
+    const neutralPlayButton = readItemRoot(registryDirs.neutral, neutralItems.get('play-button')!);
     const defaultButton = readItemRoot(registryDirs.default, defaultItems.get('button')!);
-    const minimalButton = readItemRoot(registryDirs.minimal, minimalItems.get('button')!);
+    const neutralButton = readItemRoot(registryDirs.neutral, neutralItems.get('button')!);
     const defaultSkin = readItemRoot(registryDirs.default, defaultItems.get('video')!);
-    const minimalSkin = readItemRoot(registryDirs.minimal, minimalItems.get('video')!);
+    const neutralSkin = readItemRoot(registryDirs.neutral, neutralItems.get('video')!);
     const defaultTargets = defaultItems.get('video')?.files?.map((file) => file.target) ?? [];
-    const minimalTargets = minimalItems.get('video')?.files?.map((file) => file.target) ?? [];
+    const neutralTargets = neutralItems.get('video')?.files?.map((file) => file.target) ?? [];
     const defaultStyleTargets = [
       '@components/videojs/styles/audio/base.css',
       '@components/videojs/styles/audio/theme.css',
@@ -64,29 +64,29 @@ describe('React registry output', () => {
       '@components/videojs/styles/video/captions.css',
       '@components/videojs/styles/video/theme.css',
     ];
-    const minimalStyleTargets = [
+    const neutralStyleTargets = [
       '@components/videojs/styles/audio/base.css',
-      '@components/videojs/styles/audio/minimal.css',
+      '@components/videojs/styles/audio/neutral.css',
       '@components/videojs/styles/audio/theme.css',
       '@components/videojs/styles/base.css',
-      '@components/videojs/styles/themes/minimal.css',
+      '@components/videojs/styles/themes/neutral.css',
       '@components/videojs/styles/themes/preferences.css',
       '@components/videojs/styles/themes/theme.css',
       '@components/videojs/styles/video/base.css',
       '@components/videojs/styles/video/captions.css',
-      '@components/videojs/styles/video/minimal.css',
+      '@components/videojs/styles/video/neutral.css',
       '@components/videojs/styles/video/theme.css',
     ];
-    const minimalComponentStyleTargets = minimalStyleTargets.filter(
-      (style) => !style.endsWith('/audio/minimal.css') && !style.endsWith('/video/minimal.css')
+    const neutralComponentStyleTargets = neutralStyleTargets.filter(
+      (style) => !style.endsWith('/audio/neutral.css') && !style.endsWith('/video/neutral.css')
     );
-    const minimalAudioStyleTargets = [
-      ...minimalComponentStyleTargets,
-      '@components/videojs/styles/audio/minimal.css',
+    const neutralAudioStyleTargets = [
+      ...neutralComponentStyleTargets,
+      '@components/videojs/styles/audio/neutral.css',
     ].sort();
-    const minimalVideoStyleTargets = [
-      ...minimalComponentStyleTargets,
-      '@components/videojs/styles/video/minimal.css',
+    const neutralVideoStyleTargets = [
+      ...neutralComponentStyleTargets,
+      '@components/videojs/styles/video/neutral.css',
     ].sort();
 
     expect(helper?.files?.map((file) => file.target)).toEqual(['@lib/resolve-class-name.ts']);
@@ -99,25 +99,25 @@ describe('React registry output', () => {
       '../styles/video/captions.css',
       '../styles/video/theme.css',
     ]);
-    expect(styleImports(minimalPlayButton)).toEqual([
-      '../styles/themes/minimal.css',
+    expect(styleImports(neutralPlayButton)).toEqual([
+      '../styles/themes/neutral.css',
       '../styles/base.css',
       '../styles/audio/theme.css',
       '../styles/video/captions.css',
       '../styles/video/theme.css',
     ]);
     expect(defaultPlayButton).toContain(`from '@videojs/react/icons';`);
-    expect(defaultPlayButton).not.toContain(`@videojs/react/icons/minimal`);
-    expect(minimalPlayButton).toContain(`from '@videojs/react/icons/minimal';`);
+    expect(defaultPlayButton).not.toContain(`@videojs/react/icons/neutral`);
+    expect(neutralPlayButton).toContain(`from '@videojs/react/icons/neutral';`);
     expect(defaultButton).not.toContain('corner-shape:squircle');
-    expect(minimalButton).toContain('corner-shape:squircle');
+    expect(neutralButton).toContain('corner-shape:squircle');
     expect(defaultSkin).toContain(`import '../styles/video/base.css';`);
     expect(defaultSkin).toContain('export function VideoSkin');
     expect(defaultSkin).toContain('data-theme="default"');
-    expect(minimalSkin).toContain(`import '../styles/video/minimal.css';`);
-    expect(minimalSkin).toContain('export function VideoSkin');
-    expect(minimalSkin).toContain('data-theme="minimal"');
-    expect(defaultTargets).toEqual(minimalTargets);
+    expect(neutralSkin).toContain(`import '../styles/video/neutral.css';`);
+    expect(neutralSkin).toContain('export function VideoSkin');
+    expect(neutralSkin).toContain('data-theme="neutral"');
+    expect(defaultTargets).toEqual(neutralTargets);
     expect(defaultTargets).toContain('@components/videojs/video/skin.tsx');
     expect(defaultTargets).toContain('@components/videojs/video/behaviors/hotkeys.tsx');
     expect(defaultTargets).toContain('@components/videojs/video/display/status-indicators.tsx');
@@ -126,11 +126,11 @@ describe('React registry output', () => {
     expect(defaultTargets.some((target) => target?.includes('/skins/') === true)).toBe(false);
     expect(defaultTargets.some((target) => target?.includes('/components/') === true)).toBe(false);
     expect(styleTargets(defaultItems, 'play-button')).toEqual(defaultStyleTargets);
-    expect(styleTargets(minimalItems, 'play-button')).toEqual(minimalComponentStyleTargets);
+    expect(styleTargets(neutralItems, 'play-button')).toEqual(neutralComponentStyleTargets);
     expect(styleTargets(defaultItems, 'video')).toEqual(defaultStyleTargets);
-    expect(styleTargets(minimalItems, 'video')).toEqual(minimalVideoStyleTargets);
+    expect(styleTargets(neutralItems, 'video')).toEqual(neutralVideoStyleTargets);
     expect(styleTargets(defaultItems, 'audio')).toEqual(defaultStyleTargets);
-    expect(styleTargets(minimalItems, 'audio')).toEqual(minimalAudioStyleTargets);
+    expect(styleTargets(neutralItems, 'audio')).toEqual(neutralAudioStyleTargets);
   });
 
   it('publishes the same public names from each theme catalog', () => {
@@ -140,10 +140,10 @@ describe('React registry output', () => {
         .map((item) => item.name)
         .sort();
 
-    expect(publicNames(registries.minimal)).toEqual(publicNames(registries.default));
+    expect(publicNames(registries.neutral)).toEqual(publicNames(registries.default));
     expect(publicNames(registries.default)).toContain('video');
-    expect(publicNames(registries.default)).not.toContain('video-minimal');
-    expect([...registries.default.keys()].some((name) => name.endsWith('-minimal'))).toBe(false);
+    expect(publicNames(registries.default)).not.toContain('video-neutral');
+    expect([...registries.default.keys()].some((name) => name.endsWith('-neutral'))).toBe(false);
   });
 
   it('publishes component categories that match the UI taxonomy', () => {
@@ -184,13 +184,13 @@ describe('React registry output', () => {
   });
 
   it('imports the preset theme before each React CSS skin stylesheet', () => {
-    for (const theme of ['default', 'minimal'] as const) {
+    for (const theme of ['default', 'neutral'] as const) {
       const items = readRegistryItems(cssRegistryDirs[theme]);
 
       for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
         const source = readItemRoot(cssRegistryDirs[theme], items.get(preset)!);
         const media = preset.endsWith('audio') ? 'audio' : 'video';
-        const base = `../styles/${media}/${theme === 'minimal' ? 'minimal' : 'base'}.css`;
+        const base = `../styles/${media}/${theme === 'neutral' ? 'neutral' : 'base'}.css`;
 
         expect(source.indexOf(base), `${theme}/${preset}`).toBeGreaterThanOrEqual(0);
         expect(source.indexOf(base), `${theme}/${preset}`).toBeLessThan(source.indexOf('./skin.css'));
@@ -198,14 +198,14 @@ describe('React registry output', () => {
     }
   });
 
-  it('composes Minimal media styles from theme and preset entries', () => {
+  it('composes Neutral media styles from theme and preset entries', () => {
     for (const media of ['audio', 'video'] as const) {
       const source = readFileSync(
-        resolve(cssRegistryDirs.minimal, `support/files/_style-${media}-minimal/styles/${media}/minimal.css`),
+        resolve(cssRegistryDirs.neutral, `support/files/_style-${media}-neutral/styles/${media}/neutral.css`),
         'utf8'
       );
 
-      expect(cssImports(source).sort()).toEqual(['../themes/minimal.css', './base.css'].sort());
+      expect(cssImports(source).sort()).toEqual(['../themes/neutral.css', './base.css'].sort());
     }
   });
 
@@ -225,7 +225,7 @@ describe('React registry output', () => {
 
     expect(longest).toBeLessThanOrEqual(300);
 
-    for (const theme of ['default', 'minimal'] as const) {
+    for (const theme of ['default', 'neutral'] as const) {
       const items = registries[theme];
       const registryDir = registryDirs[theme];
 

@@ -60,8 +60,8 @@ packages/html/src/internal/skins/
 packages/react/src/internal/skins/
 packages/react/src/presets/*/skin.tsx
 packages/react/src/presets/*/skin.css
-packages/react/src/presets/*/minimal-skin.tsx
-packages/react/src/presets/*/minimal-skin.css
+packages/react/src/presets/*/neutral-skin.tsx
+packages/react/src/presets/*/neutral-skin.css
 
 # -------------------------
 # Merge & Patch Backups

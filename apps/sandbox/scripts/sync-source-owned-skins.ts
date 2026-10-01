@@ -53,9 +53,9 @@ const installs = [
     globalStyles: true,
   },
   {
-    catalog: 'react/minimal',
-    destination: 'react-tailwind-minimal',
-    alias: '@registry-react-tailwind-minimal',
+    catalog: 'react/neutral',
+    destination: 'react-tailwind-neutral',
+    alias: '@registry-react-tailwind-neutral',
     globalStyles: false,
   },
   {
@@ -65,13 +65,13 @@ const installs = [
     globalStyles: false,
   },
   {
-    catalog: 'react/css/minimal',
-    destination: 'react-css-minimal',
-    alias: '@registry-react-css-minimal',
+    catalog: 'react/css/neutral',
+    destination: 'react-css-neutral',
+    alias: '@registry-react-css-neutral',
     globalStyles: false,
   },
   { catalog: 'html', destination: 'html-default', alias: '@registry-html-default', globalStyles: false },
-  { catalog: 'html/minimal', destination: 'html-minimal', alias: '@registry-html-minimal', globalStyles: false },
+  { catalog: 'html/neutral', destination: 'html-neutral', alias: '@registry-html-neutral', globalStyles: false },
 ] as const;
 
 await rm(generatedDir, { recursive: true, force: true });

@@ -184,13 +184,13 @@ export function skinFromFlag(flag: SkinFlag, useCase: UseCase): Skin {
 
   const suffix = getInstallationPreset(useCase).mediaType;
 
-  return flag === 'minimal' ? `minimal-${suffix}` : suffix;
+  return flag === 'neutral' ? `neutral-${suffix}` : suffix;
 }
 
 export function skinToFlag(skin: Skin): SkinFlag {
   if (skin === 'none') return 'none';
 
-  return skin.startsWith('minimal-') ? 'minimal' : 'default';
+  return skin.startsWith('neutral-') ? 'neutral' : 'default';
 }
 
 /** Keep a skin tier and media choice valid when the selected preset changes. */
@@ -504,7 +504,7 @@ export function resolveInstallationSelection(
         field: 'skin',
         value: skinFlag,
         message: 'Shadcn installs editable skin source, so the `none` skin is not available.',
-        hint: `Use ${syntax.options(['skin', 'default'])} or ${syntax.options(['skin', 'minimal'])}, or ${syntax.options(['method', 'packaged'])} for a skinless player.`,
+        hint: `Use ${syntax.options(['skin', 'default'])} or ${syntax.options(['skin', 'neutral'])}, or ${syntax.options(['method', 'packaged'])} for a skinless player.`,
       });
     }
 

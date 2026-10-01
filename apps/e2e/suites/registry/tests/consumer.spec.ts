@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-const visualProjects = new Set(['next-react-tailwind', 'next-react-tailwind-minimal']);
+const visualProjects = new Set(['next-react-tailwind', 'next-react-tailwind-neutral']);
 
 for (const preset of ['video', 'audio'] as const) {
   test(`installs a styled ${preset} player with an attached media element`, async ({ page }, testInfo) => {
     const errors: string[] = [];
     const theme = testInfo.project.metadata.theme;
-    if (theme !== 'default' && theme !== 'minimal') throw new Error(`Unknown registry theme: ${String(theme)}.`);
+    if (theme !== 'default' && theme !== 'neutral') throw new Error(`Unknown registry theme: ${String(theme)}.`);
 
     page.on('console', (message) => {
       if (message.type() === 'error') errors.push(message.text());
@@ -26,7 +26,7 @@ for (const preset of ['video', 'audio'] as const) {
     await expect(media).toBeAttached();
     await expect(skin).toHaveCSS('position', 'relative');
     await expect(skin).toHaveCSS('display', 'block');
-    await expect(skin).toHaveCSS('border-radius', theme === 'minimal' ? '12px' : '28px');
+    await expect(skin).toHaveCSS('border-radius', theme === 'neutral' ? '12px' : '28px');
 
     const themeStyles = await skin.evaluate((element) => {
       const style = getComputedStyle(element);

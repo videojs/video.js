@@ -12,7 +12,7 @@ export default styles({
         'relative z-20 flex items-center rtl:flex-row-reverse rounded-media-controls bg-media-controls text-media-controls-foreground text-shadow-media',
       variants: {
         default: 'p-0.5 media-lg:p-1 surface-media after:surface-media-inset',
-        minimal: 'gap-2 p-1 shadow-media-hairline',
+        neutral: 'gap-2 p-1 shadow-media-hairline',
       },
     },
     start: {

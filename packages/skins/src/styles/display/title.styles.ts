@@ -20,7 +20,7 @@ export default styles({
           'transition-[filter,opacity,scale,translate]',
           'not-data-visible:scale-media-hidden',
         ],
-        minimal: [
+        neutral: [
           'font-normal px-4',
           'transition-[filter,opacity,translate]',
           'not-data-visible:-translate-y-[min(var(--media-hidden-offset),var(--media-control-size))]',

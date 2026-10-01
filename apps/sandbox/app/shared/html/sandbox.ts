@@ -35,7 +35,7 @@ export interface HtmlSandboxContext {
   readonly live: boolean;
   /** The player element for this render, such as `video-player` or `live-audio-player`. */
   readonly playerTag: string;
-  /** The skin element the shell selected and the runtime registered, such as `video-skin` or `audio-minimal-skin`. */
+  /** The skin element the shell selected and the runtime registered, such as `video-skin` or `audio-neutral-skin`. */
   readonly skinTag: string;
   /** The source's poster URL, safe to interpolate into an attribute, or empty when it has none. */
   readonly poster: string;

@@ -17,8 +17,8 @@ describe('generateCdnCode', () => {
   });
 
   it('includes hls media bundle when renderer is hls', () => {
-    expect(generateCdnCode('default-video', 'minimal-video', 'hls', manifest)).toEqual(
-      `<script type="module" src="${CDN_BASE}/video-minimal.js"></script>
+    expect(generateCdnCode('default-video', 'neutral-video', 'hls', manifest)).toEqual(
+      `<script type="module" src="${CDN_BASE}/video-neutral.js"></script>
 <script type="module" src="${CDN_BASE}/media/hlsjs-video.js"></script>`
     );
   });
@@ -83,9 +83,9 @@ describe('generateCdnCode', () => {
     );
   });
 
-  it('generates the minimal live video CDN tag', () => {
-    expect(generateCdnCode('live-video', 'minimal-video', 'mux-video', manifest)).toEqual(
-      `<script type="module" src="${CDN_BASE}/live-video-minimal.js"></script>
+  it('generates the neutral live video CDN tag', () => {
+    expect(generateCdnCode('live-video', 'neutral-video', 'mux-video', manifest)).toEqual(
+      `<script type="module" src="${CDN_BASE}/live-video-neutral.js"></script>
 <script type="module" src="${CDN_BASE}/media/mux-video.js"></script>
 <script type="module" src="${CDN_BASE}/extensions/mux-data.js"></script>`
     );
@@ -105,7 +105,7 @@ describe('generateCdnCode', () => {
 <script type="module" src="${CDN_BASE}/media/mux-audio.js"></script>
 <script type="module" src="${CDN_BASE}/extensions/mux-data.js"></script>`
     );
-    expect(generateCdnCode('live-audio', 'minimal-audio', 'mux-audio', manifest)).toContain('/live-audio-minimal.js');
+    expect(generateCdnCode('live-audio', 'neutral-audio', 'mux-audio', manifest)).toContain('/live-audio-neutral.js');
     expect(generateCdnCode('live-audio', 'none', 'mux-audio', manifest)).toContain('/live-audio-player.js');
   });
 });

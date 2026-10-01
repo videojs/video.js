@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vite-plus/test';
 const distRoot = resolve(import.meta.dirname, '../../dist');
 
 describe('generated icon modules', () => {
-  it.each(['default', 'minimal'])('builds constrained VJSC components for the %s family', async (family) => {
+  it.each(['default', 'neutral'])('builds constrained VJSC components for the %s family', async (family) => {
     const [source, types] = await Promise.all([
       readFile(resolve(distRoot, 'vjsc', family, 'index.js'), 'utf8'),
       readFile(resolve(distRoot, 'vjsc', family, 'index.d.ts'), 'utf8'),
@@ -20,7 +20,7 @@ describe('generated icon modules', () => {
     expect(types).toContain(`export declare const PlayIcon: Component<EmptyProps>;`);
   });
 
-  it.each(['default', 'minimal'])('builds ref-forwarding React components for the %s family', async (family) => {
+  it.each(['default', 'neutral'])('builds ref-forwarding React components for the %s family', async (family) => {
     const [source, types, files] = await Promise.all([
       readFile(resolve(distRoot, 'react', family, 'play.js'), 'utf8'),
       readFile(resolve(distRoot, 'react', family, 'play.d.ts'), 'utf8'),
@@ -65,13 +65,13 @@ describe('generated icon modules', () => {
     const [base, root, family, icons] = await Promise.all([
       readFile(resolve(distRoot, 'element/base.js'), 'utf8'),
       readFile(resolve(distRoot, 'element/index.js'), 'utf8'),
-      readFile(resolve(distRoot, 'element/minimal/index.js'), 'utf8'),
-      readFile(resolve(distRoot, 'element/minimal/icons.js'), 'utf8'),
+      readFile(resolve(distRoot, 'element/neutral/index.js'), 'utf8'),
+      readFile(resolve(distRoot, 'element/neutral/icons.js'), 'utf8'),
     ]);
 
     expect(base).toContain('export class MediaIconElement extends HTMLElement');
-    expect(root).toContain(`registerLoader?.("minimal"`);
-    expect(family).toContain(`register?.("minimal", icons)`);
+    expect(root).toContain(`registerLoader?.("neutral"`);
+    expect(family).toContain(`register?.("neutral", icons)`);
     expect(icons).toContain('aria-hidden=\\"true\\"');
     expect(existsSync(resolve(distRoot, 'rolldown'))).toBe(false);
   });

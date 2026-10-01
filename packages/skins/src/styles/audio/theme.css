@@ -37,7 +37,7 @@
     }
   }
 
-  .media-skin:is([data-preset="audio"], [data-preset="live-audio"])[data-theme="minimal"] {
+  .media-skin:is([data-preset="audio"], [data-preset="live-audio"])[data-theme="neutral"] {
     --media-controls: var(--media-background);
     --media-popover: var(--media-background);
     --media-controls-radius: calc(var(--media-spacing) * 3.5);

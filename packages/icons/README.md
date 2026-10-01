@@ -9,7 +9,7 @@ Icons are grouped into visual sets. Each set contains the same icon names with d
 | Set | Description |
 | --- | --- |
 | `default` | Standard icon set used by the default skin |
-| `minimal` | Simplified icon set used by the minimal skin |
+| `neutral` | Simplified icon set used by the neutral skin |
 
 ### Available Icons
 
@@ -62,7 +62,7 @@ function Controls() {
 Import from a specific icon set:
 
 ```tsx
-import { PlayIcon } from '@videojs/react/icons/minimal';
+import { PlayIcon } from '@videojs/react/icons/neutral';
 ```
 
 ### HTML
@@ -78,7 +78,7 @@ button.innerHTML = playIcon;
 Import from a specific icon set:
 
 ```ts
-import { playIcon } from '@videojs/html/icons/minimal';
+import { playIcon } from '@videojs/html/icons/neutral';
 ```
 
 Register the `<media-icon>` custom element separately when you want HTML skins to render icons lazily:
@@ -90,7 +90,7 @@ import '@videojs/html/icons/element';
 Import a specific element icon set when eager family registration is preferred:
 
 ```ts
-import '@videojs/html/icons/element/minimal';
+import '@videojs/html/icons/element/neutral';
 ```
 
 ## Styling

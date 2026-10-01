@@ -77,7 +77,7 @@ function readParams() {
     styling: readOption(STYLINGS, params.get('styling'), 'css'),
     skins: readSkins(params.get('skins'), platform),
     media,
-    skin: (params.get('skin') ?? 'default') as 'default' | 'minimal',
+    skin: (params.get('skin') ?? 'default') as 'default' | 'neutral',
     // An explicit `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: (params.get('source') ?? MEDIA[media].entrySource ?? DEFAULT_SOURCE) as SourceId,
     autoplay: params.get('autoplay') === '1',

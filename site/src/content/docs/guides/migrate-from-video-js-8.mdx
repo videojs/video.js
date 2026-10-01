@@ -78,7 +78,7 @@ Apply these changes to your existing markup:
 - **Move the poster URL to the player.** Set `poster` on `<video-player>`. The skin controls how the poster appears. To supply your own image element, see <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 - **Keep your existing tracks.** Captions and subtitles remain native tracks; the skin supplies their controls.
 
-For the Minimal skin, replace `<video-skin>` with `<video-minimal-skin>`. Load `video-minimal.js` from the CDN, or replace the bundler skin import with `@videojs/html/video/minimal-skin`.
+For the Neutral skin, replace `<video-skin>` with `<video-neutral-skin>`. Load `video-neutral.js` from the CDN, or replace the bundler skin import with `@videojs/html/video/neutral-skin`.
 
 </FrameworkCase>
 
@@ -146,7 +146,7 @@ Apply these changes to your existing component:
 - **No `controls` prop.** The skin provides the controls. Render a skin to show controls. Leave it out for a player with no UI.
 - **Move the poster URL to the player.** Pass `poster` to `VideoPlayer`. The skin controls how the poster appears.
 
-Use `'use client'` at the client boundary in frameworks with React Server Components. For a smaller control layout, replace `VideoSkin` with `MinimalVideoSkin` and import `minimal-skin.css`.
+Use `'use client'` at the client boundary in frameworks with React Server Components. For a smaller control layout, replace `VideoSkin` with `NeutralVideoSkin` and import `neutral-skin.css`.
 
 </FrameworkCase>
 
@@ -384,7 +384,7 @@ In v8, you customized the player with options, `addChild`, component subclasses,
 
 ### Level 1: pick a skin
 
-The Default skin groups settings in a menu. The Minimal skin has a compact layout like v8's control bar. Both bring controls, tooltips, captions, keyboard shortcuts, touch gestures, and a settings menu that appears when there's something to put in it. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+The Default skin groups settings in a menu. The Neutral skin has a compact layout like v8's control bar. Both bring controls, tooltips, captions, keyboard shortcuts, touch gestures, and a settings menu that appears when there's something to put in it. See <DocsLink slug="guides/skins">Skins</DocsLink>.
 
 Both include AirPlay and Cast buttons. Follow <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink> to add the Google Cast extension.
 
@@ -793,7 +793,7 @@ Check these limitations against your required features:
 - The controls auto-hide delay isn't configurable, so arbitrary `inactivityTimeout` values have no equivalent ([#1728](https://github.com/videojs/v10/issues/1728)). For `inactivityTimeout: 0`, set `visibility="always"` on the controls component in a custom layout or installed skin source.
 - No full-window fullscreen fallback. Test fullscreen on your supported browsers; see <DocsLink slug="guides/browser-support">Browser support</DocsLink>.
 - Multiple `<source>` elements with `size` metadata don't become a quality menu. Use HLS or DASH for adaptive quality.
-- The Default and Minimal skins are available. Runtime theme switching is not supported.
+- The Default and Neutral skins are available. Runtime theme switching is not supported.
 - Native controls are not automatically removed when custom controls load ([#1160](https://github.com/videojs/v10/issues/1160)).
 - Debug mode has no equivalent yet ([#1406](https://github.com/videojs/v10/issues/1406)).
 

@@ -4,6 +4,6 @@
  */
 export { liveVideoFeatures } from '@videojs/core/dom';
 export { Video, type VideoProps } from '@/media/video';
-export * from './minimal-skin';
+export * from './neutral-skin';
 export { LiveVideoPlayer, type LiveVideoPlayerProps, usePlayer } from './player';
 export * from './skin';

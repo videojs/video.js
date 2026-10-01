@@ -1,6 +1,6 @@
 # BrowserStack compatibility checks
 
-Run the packaged HTML and React video, minimal video, and audio pages at the Chrome, Edge, Firefox, and Safari minimums resolved from the root browserslist. Desktop Safari coverage uses WebKit. The checks cover CSS fallbacks, closed popovers, playback, seeking, and opening menus. Playback failure is a test failure, including missing H.264 support.
+Run the packaged HTML and React video, neutral video, and audio pages at the Chrome, Edge, Firefox, and Safari minimums resolved from the root browserslist. Desktop Safari coverage uses WebKit. The checks cover CSS fallbacks, closed popovers, playback, seeking, and opening menus. Playback failure is a test failure, including missing H.264 support.
 
 This suite replaces the previous Docker floor job and its pinned Playwright clients. BrowserStack's desktop WebKit is still an engine approximation, not actual Safari. The iOS project runs Safari on a real device selected from BrowserStack's device API. BrowserStack selects iOS by major version, so the browserslist minimum is rounded up to the next whole major: iOS 17 for the current 16.4 minimum. This keeps real-device coverage within the supported range, while desktop WebKit retains the 16.4 minimum check. Selection uses a stable ordering of matching iPhones and fails if no matching device is available; the user-agent assertion verifies the selected major version. The suite does not currently verify captions or fullscreen.
 

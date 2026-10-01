@@ -16,7 +16,7 @@ export default styles({
       ],
       variants: {
         default: 'data-ending-style:duration-media-slower',
-        minimal: 'data-ending-style:duration-media-instant',
+        neutral: 'data-ending-style:duration-media-instant',
       },
     },
     popup: {
@@ -31,12 +31,12 @@ export default styles({
           'p-3',
           'data-ending-style:duration-media-slower',
         ],
-        minimal: ['p-4', 'data-ending-style:duration-media-instant'],
+        neutral: ['p-4', 'data-ending-style:duration-media-instant'],
       },
     },
     content: {
       utilities: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
-      variants: { default: 'px-2 pt-2 pb-1.5', minimal: 'py-1.5' },
+      variants: { default: 'px-2 pt-2 pb-1.5', neutral: 'py-1.5' },
     },
     title: {
       utilities: 'm-0 text-media-lg font-semibold leading-tight',

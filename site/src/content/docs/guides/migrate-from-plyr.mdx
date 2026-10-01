@@ -10,7 +10,7 @@ import MigrationAgentStart from '@/components/docs/MigrationAgentStart.astro';
 
 Replace Plyr's constructor and options object with a Video.js player, media component, and skin. Read playback and UI state through <DocsLink slug="guides/features">player state</DocsLink>.
 
-Start with the Minimal skin, move media settings into markup, and replace calls to the Plyr instance with native media APIs or Video.js store actions.
+Start with the Neutral skin, move media settings into markup, and replace calls to the Plyr instance with native media APIs or Video.js store actions.
 
 ## AI Quickstart
 
@@ -54,22 +54,22 @@ const player = new Plyr('#player', {
 </script>
 ```
 
-The Minimal skin is the closest built-in starting point for this migration.
+The Neutral skin is the closest built-in starting point for this migration.
 
 <FrameworkCase frameworks={["html"]}>
 
 For an HTML page without a bundler, load the CDN preset:
 
 ```html
-<script type="module" src="{{VJS10_CDN_BASE}}/video-minimal.js"></script>
+<script type="module" src="{{VJS10_CDN_BASE}}/video-neutral.js"></script>
 
 <video-player poster="/path/to/poster.jpg">
-  <video-minimal-skin style="aspect-ratio: 16 / 9">
+  <video-neutral-skin style="aspect-ratio: 16 / 9">
     <video src="/path/to/video.mp4" playsinline>
       <track kind="captions" label="English" src="/path/to/captions/en.vtt" srclang="en" default />
       <track kind="metadata" label="thumbnails" src="/path/to/storyboard.vtt" default />
     </video>
-  </video-minimal-skin>
+  </video-neutral-skin>
 </video-player>
 ```
 
@@ -81,7 +81,7 @@ npm install @videojs/html
 
 ```js
 import '@videojs/html/video/player';
-import '@videojs/html/video/minimal-skin';
+import '@videojs/html/video/neutral-skin';
 ```
 
 ### Notes
@@ -89,7 +89,7 @@ import '@videojs/html/video/minimal-skin';
 - The skin adds its styles to its own shadow root. You do not link a stylesheet.
 - Remove `controls` from the media so the browser's native controls do not appear beside the skin's controls.
 - The poster moves from `data-poster` on the media to `poster` on `<video-player>`. The skin reads that value and controls how the poster appears. To supply your own image element, see <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
-- To use the Default skin, change `<video-minimal-skin>` to `<video-skin>`. From the CDN, load `video.js` instead of `video-minimal.js`. With a bundler, replace the Minimal skin import with `@videojs/html/video/skin`.
+- To use the Default skin, change `<video-neutral-skin>` to `<video-skin>`. From the CDN, load `video.js` instead of `video-neutral.js`. With a bundler, replace the Neutral skin import with `@videojs/html/video/skin`.
 
 </FrameworkCase>
 
@@ -106,18 +106,18 @@ Then create a reusable player component in your app:
 ```tsx
 'use client';
 
-import '@videojs/react/video/minimal-skin.css';
-import { MinimalVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
+import '@videojs/react/video/neutral-skin.css';
+import { NeutralVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
 
 export function AppVideoPlayer() {
   return (
     <VideoPlayer poster="/path/to/poster.jpg">
-      <MinimalVideoSkin className="app-video-player" style={{ aspectRatio: '16 / 9' }}>
+      <NeutralVideoSkin className="app-video-player" style={{ aspectRatio: '16 / 9' }}>
         <Video src="/path/to/video.mp4" playsInline>
           <track kind="captions" label="English" src="/path/to/captions/en.vtt" srcLang="en" default />
           <track kind="metadata" label="thumbnails" src="/path/to/storyboard.vtt" default />
         </Video>
-      </MinimalVideoSkin>
+      </NeutralVideoSkin>
     </VideoPlayer>
   );
 }
@@ -127,7 +127,7 @@ export function AppVideoPlayer() {
 
 - `@videojs/react/video` is a <DocsLink slug="guides/presets">preset</DocsLink>: a player, a skin, and a media element that already fit together. `VideoPlayer` owns the player state and uses the standard set of <DocsLink slug="guides/features">features</DocsLink> for video.
 - The poster URL is metadata on `VideoPlayer`. The skin reads that metadata and controls how the poster appears. To replace the rendered image, pass `renderPoster` to the skin. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
-- To use the Default skin, import `skin.css` and replace `MinimalVideoSkin` with `VideoSkin` in the import and JSX.
+- To use the Default skin, import `skin.css` and replace `NeutralVideoSkin` with `VideoSkin` in the import and JSX.
 
 </FrameworkCase>
 
@@ -285,9 +285,9 @@ import '@videojs/html/media/youtube-video';
 
 ```html
 <video-player>
-  <video-minimal-skin>
+  <video-neutral-skin>
     <youtube-video src="https://youtu.be/aqz-KE-bpKQ" playsinline></youtube-video>
-  </video-minimal-skin>
+  </video-neutral-skin>
 </video-player>
 ```
 
@@ -307,9 +307,9 @@ import { YouTubeVideo } from '@videojs/react/media/youtube-video';
 
 ```jsx
 <VideoPlayer>
-  <MinimalVideoSkin>
+  <NeutralVideoSkin>
     <YouTubeVideo src="https://youtu.be/aqz-KE-bpKQ" playsInline />
-  </MinimalVideoSkin>
+  </NeutralVideoSkin>
 </VideoPlayer>
 ```
 
@@ -340,12 +340,12 @@ To select a locale, wrap the player in `<media-i18n>` and set `lang` to your loc
   });
 </script>
 
-<script type="module" src="{{VJS10_CDN_BASE}}/video-minimal.js"></script>
+<script type="module" src="{{VJS10_CDN_BASE}}/video-neutral.js"></script>
 
 <video-player>
-  <video-minimal-skin>
+  <video-neutral-skin>
     <video src="/video.mp4" playsinline></video>
-  </video-minimal-skin>
+  </video-neutral-skin>
 </video-player>
 ```
 
@@ -360,9 +360,9 @@ Wrap the skin in `I18nProvider` to select a locale and scope string overrides. T
 ```tsx
 'use client';
 
-import '@videojs/react/video/minimal-skin.css';
+import '@videojs/react/video/neutral-skin.css';
 import { I18nProvider } from '@videojs/react/i18n';
-import { MinimalVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
+import { NeutralVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
 
 export function MyPlayer() {
   return (
@@ -379,9 +379,9 @@ export function MyPlayer() {
           },
         }}
       >
-        <MinimalVideoSkin>
+        <NeutralVideoSkin>
           <Video src="/video.mp4" playsInline />
-        </MinimalVideoSkin>
+        </NeutralVideoSkin>
       </I18nProvider>
     </VideoPlayer>
   );
@@ -464,8 +464,8 @@ Native media methods and properties also update player state through media event
 Import the preset's <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> hook and call it from a descendant of `VideoPlayer`. The component that creates `VideoPlayer` cannot also consume its context, so put store access in a child component:
 
 ```tsx
-import '@videojs/react/video/minimal-skin.css';
-import { MinimalVideoSkin, usePlayer, Video, VideoPlayer } from '@videojs/react/video';
+import '@videojs/react/video/neutral-skin.css';
+import { NeutralVideoSkin, usePlayer, Video, VideoPlayer } from '@videojs/react/video';
 
 function CurrentTime() {
   const currentTime = usePlayer((state) => state.currentTime);
@@ -475,10 +475,10 @@ function CurrentTime() {
 export function AppVideoPlayer() {
   return (
     <VideoPlayer>
-      <MinimalVideoSkin>
+      <NeutralVideoSkin>
         <Video src="/video.mp4" playsInline />
         <CurrentTime />
-      </MinimalVideoSkin>
+      </NeutralVideoSkin>
     </VideoPlayer>
   );
 }

@@ -8,7 +8,7 @@
  * Run: `pnpm --dir apps/e2e generate-pages`
  */
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -154,19 +154,19 @@ interface PageDef {
   resource: string;
   category?: 'cdn' | 'captions' | 'background' | 'background-preset' | 'source-html' | 'source-react';
   /** The packaged skin theme; the default skin unless set. */
-  skin?: 'minimal';
+  skin?: 'neutral';
 }
 
 type SkinTheme = NonNullable<PageDef['skin']> | 'default';
 
 /** The custom element a packaged HTML skin registers. */
 function htmlSkinTag(media: 'video' | 'audio', skin: SkinTheme): string {
-  return skin === 'minimal' ? `${media}-minimal-skin` : `${media}-skin`;
+  return skin === 'neutral' ? `${media}-neutral-skin` : `${media}-skin`;
 }
 
-/** The entry a packaged skin ships under for both frameworks, as `video/skin` or `video/minimal-skin`. */
+/** The entry a packaged skin ships under for both frameworks, as `video/skin` or `video/neutral-skin`. */
 function skinEntry(media: 'video' | 'audio', skin: SkinTheme): string {
-  return skin === 'minimal' ? `${media}/minimal-skin` : `${media}/skin`;
+  return skin === 'neutral' ? `${media}/neutral-skin` : `${media}/skin`;
 }
 
 // ---------------------------------------------------------------------------
@@ -249,12 +249,12 @@ function reactVideoPage(media: string, resource: string, config: MediaTypeConfig
   if (!reactMedia) throw new Error(`No React component mapping for media type: ${media}`);
 
   const isDefaultVideo = media === 'video';
-  const Skin = skin === 'minimal' ? 'MinimalVideoSkin' : 'VideoSkin';
+  const Skin = skin === 'neutral' ? 'NeutralVideoSkin' : 'VideoSkin';
   const skinImport =
-    skin === 'minimal' ? `\nimport { MinimalVideoSkin } from '@videojs/react/video/minimal-skin';` : '';
+    skin === 'neutral' ? `\nimport { NeutralVideoSkin } from '@videojs/react/video/neutral-skin';` : '';
   const mediaImport = isDefaultVideo
-    ? `import { Video, VideoPlayer${skin === 'minimal' ? '' : ', VideoSkin'} } from '@videojs/react/video';${skinImport}`
-    : `import { ${reactMedia.component} } from '${reactMedia.importPath}';\nimport { VideoPlayer${skin === 'minimal' ? '' : ', VideoSkin'} } from '@videojs/react/video';${skinImport}`;
+    ? `import { Video, VideoPlayer${skin === 'neutral' ? '' : ', VideoSkin'} } from '@videojs/react/video';${skinImport}`
+    : `import { ${reactMedia.component} } from '${reactMedia.importPath}';\nimport { VideoPlayer${skin === 'neutral' ? '' : ', VideoSkin'} } from '@videojs/react/video';${skinImport}`;
 
   const posterProp = config.hasPoster && resourceHasPoster(resource) ? ` poster={MEDIA.${resource}.poster}` : '';
   const storyboardTrack = config.hasStoryboard
@@ -286,12 +286,12 @@ function reactAudioPage(media: string, resource: string, skin: SkinTheme): strin
   if (!reactMedia) throw new Error(`No React component mapping for media type: ${media}`);
 
   const isDefaultAudio = media === 'audio';
-  const Skin = skin === 'minimal' ? 'MinimalAudioSkin' : 'AudioSkin';
+  const Skin = skin === 'neutral' ? 'NeutralAudioSkin' : 'AudioSkin';
   const skinImport =
-    skin === 'minimal' ? `\nimport { MinimalAudioSkin } from '@videojs/react/audio/minimal-skin';` : '';
+    skin === 'neutral' ? `\nimport { NeutralAudioSkin } from '@videojs/react/audio/neutral-skin';` : '';
   const mediaImport = isDefaultAudio
-    ? `import { Audio, AudioPlayer${skin === 'minimal' ? '' : ', AudioSkin'} } from '@videojs/react/audio';${skinImport}`
-    : `import { ${reactMedia.component} } from '${reactMedia.importPath}';\nimport { AudioPlayer${skin === 'minimal' ? '' : ', AudioSkin'} } from '@videojs/react/audio';${skinImport}`;
+    ? `import { Audio, AudioPlayer${skin === 'neutral' ? '' : ', AudioSkin'} } from '@videojs/react/audio';${skinImport}`
+    : `import { ${reactMedia.component} } from '${reactMedia.importPath}';\nimport { AudioPlayer${skin === 'neutral' ? '' : ', AudioSkin'} } from '@videojs/react/audio';${skinImport}`;
 
   return `${mediaImport}
 import '@videojs/react/${skinEntry('audio', skin)}.css';
@@ -607,38 +607,38 @@ const PAGES: PageDef[] = [
   // React Audio
   { name: 'React Audio MP4', path: 'react-audio-mp4', framework: 'react', media: 'audio', resource: 'mp4' },
 
-  // Minimal skins, for the layout snapshots
+  // Neutral skins, for the layout snapshots
   {
-    name: 'HTML Video Minimal MP4',
-    path: 'html-video-minimal-mp4',
+    name: 'HTML Video Neutral MP4',
+    path: 'html-video-neutral-mp4',
     framework: 'html',
     media: 'video',
     resource: 'mp4',
-    skin: 'minimal',
+    skin: 'neutral',
   },
   {
-    name: 'React Video Minimal MP4',
-    path: 'react-video-minimal-mp4',
+    name: 'React Video Neutral MP4',
+    path: 'react-video-neutral-mp4',
     framework: 'react',
     media: 'video',
     resource: 'mp4',
-    skin: 'minimal',
+    skin: 'neutral',
   },
   {
-    name: 'HTML Audio Minimal MP4',
-    path: 'html-audio-minimal-mp4',
+    name: 'HTML Audio Neutral MP4',
+    path: 'html-audio-neutral-mp4',
     framework: 'html',
     media: 'audio',
     resource: 'mp4',
-    skin: 'minimal',
+    skin: 'neutral',
   },
   {
-    name: 'React Audio Minimal MP4',
-    path: 'react-audio-minimal-mp4',
+    name: 'React Audio Neutral MP4',
+    path: 'react-audio-neutral-mp4',
     framework: 'react',
     media: 'audio',
     resource: 'mp4',
-    skin: 'minimal',
+    skin: 'neutral',
   },
 
   // CDN
@@ -808,7 +808,9 @@ ${list(source)}
 
 console.log('[generate-pages] Generating Vite test pages...');
 
-if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
+// The pages directory is wholly generated; clearing it drops pages whose names changed.
+rmSync(OUT_DIR, { recursive: true, force: true });
+mkdirSync(OUT_DIR, { recursive: true });
 
 let count = 0;
 

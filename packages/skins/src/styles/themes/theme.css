@@ -1,7 +1,7 @@
 @layer base.theme, base.preset, base.preferences;
 
 @layer base.theme {
-  /* Default theme tokens. Minimal selectors, preset adaptations, and preferences override these. */
+  /* Default theme tokens. Neutral selectors, preset adaptations, and preferences override these. */
   .media-skin {
     /* Colors. */
     --media-background: oklch(0 0 0);

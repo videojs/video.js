@@ -2,22 +2,22 @@ import type { Skin } from '../../types';
 
 const videoStylesheets = {
   default: new URL('@videojs/html/video/skin.css', import.meta.url).href,
-  minimal: new URL('@videojs/html/video/minimal-skin.css', import.meta.url).href,
+  neutral: new URL('@videojs/html/video/neutral-skin.css', import.meta.url).href,
 } satisfies Record<Skin, string>;
 
 const liveVideoStylesheets = {
   default: new URL('@videojs/html/live-video/skin.css', import.meta.url).href,
-  minimal: new URL('@videojs/html/live-video/minimal-skin.css', import.meta.url).href,
+  neutral: new URL('@videojs/html/live-video/neutral-skin.css', import.meta.url).href,
 } satisfies Record<Skin, string>;
 
 const audioStylesheets = {
   default: new URL('@videojs/html/audio/skin.css', import.meta.url).href,
-  minimal: new URL('@videojs/html/audio/minimal-skin.css', import.meta.url).href,
+  neutral: new URL('@videojs/html/audio/neutral-skin.css', import.meta.url).href,
 } satisfies Record<Skin, string>;
 
 const liveAudioStylesheets = {
   default: new URL('@videojs/html/live-audio/skin.css', import.meta.url).href,
-  minimal: new URL('@videojs/html/live-audio/minimal-skin.css', import.meta.url).href,
+  neutral: new URL('@videojs/html/live-audio/neutral-skin.css', import.meta.url).href,
 } satisfies Record<Skin, string>;
 
 const loading = new Map<string, { href: string; promise: Promise<void> }>();

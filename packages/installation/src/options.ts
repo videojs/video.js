@@ -197,7 +197,7 @@ export function installationDecisionOrderFor(
     },
     {
       title: 'Choose the skin',
-      guidance: `Use default unless the request asks for a minimal, cleaner, or more subtle look, which uses minimal; both contain the same controls. ${skinlessGuidance}Ask only when those signals conflict.`,
+      guidance: `Use default unless the request asks for a minimal, cleaner, or more subtle look, which uses neutral; both contain the same controls. ${skinlessGuidance}Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the media',
@@ -278,7 +278,7 @@ export function installationOptionDefinitionsFor(
     optionDefinition('skin', {
       values: shadcnOnly ? installationCompatibility.shadcn.skins : INSTALLATION_SKIN_FLAGS,
       default: 'default',
-      description: 'The visual skin. Minimal has cleaner surfaces and the same controls as Default.',
+      description: 'The visual skin. Neutral has cleaner surfaces and the same controls as Default.',
       appliesWhen: `${syntax.options(['preset'])} is not background-video`,
     }),
     optionDefinition('media', {

@@ -15,7 +15,7 @@ export interface SkinMeta extends ComponentMeta {
 /** Build-time styling identity of one skin: its CSS scope, theme, and preset. Keyed by skin name in `skinStyles`. */
 export interface SkinStyle {
   readonly scope: string;
-  readonly theme: 'default' | 'minimal';
+  readonly theme: 'default' | 'neutral';
   readonly preset: 'video' | 'audio' | 'live-video' | 'live-audio';
 }
 
@@ -33,9 +33,9 @@ export const skinStyles = {
     theme: 'default',
     preset: 'video',
   },
-  'minimal-video': {
-    scope: '.media-skin[data-theme="minimal"][data-preset="video"]',
-    theme: 'minimal',
+  'neutral-video': {
+    scope: '.media-skin[data-theme="neutral"][data-preset="video"]',
+    theme: 'neutral',
     preset: 'video',
   },
   'default-live-video': {
@@ -43,9 +43,9 @@ export const skinStyles = {
     theme: 'default',
     preset: 'live-video',
   },
-  'minimal-live-video': {
-    scope: '.media-skin[data-theme="minimal"][data-preset="live-video"]',
-    theme: 'minimal',
+  'neutral-live-video': {
+    scope: '.media-skin[data-theme="neutral"][data-preset="live-video"]',
+    theme: 'neutral',
     preset: 'live-video',
   },
   'default-live-audio': {
@@ -53,9 +53,9 @@ export const skinStyles = {
     theme: 'default',
     preset: 'live-audio',
   },
-  'minimal-live-audio': {
-    scope: '.media-skin[data-theme="minimal"][data-preset="live-audio"]',
-    theme: 'minimal',
+  'neutral-live-audio': {
+    scope: '.media-skin[data-theme="neutral"][data-preset="live-audio"]',
+    theme: 'neutral',
     preset: 'live-audio',
   },
   'default-audio': {
@@ -63,9 +63,9 @@ export const skinStyles = {
     theme: 'default',
     preset: 'audio',
   },
-  'minimal-audio': {
-    scope: '.media-skin[data-theme="minimal"][data-preset="audio"]',
-    theme: 'minimal',
+  'neutral-audio': {
+    scope: '.media-skin[data-theme="neutral"][data-preset="audio"]',
+    theme: 'neutral',
     preset: 'audio',
   },
 } as const satisfies Record<string, SkinStyle>;

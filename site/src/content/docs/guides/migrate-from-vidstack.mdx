@@ -82,7 +82,7 @@ Note the nesting. A Vidstack layout sits *next to* `<media-provider>`; a Video.j
 |---|---|
 | Player | Player, which only holds state, plus the skin's container |
 | Provider | Media, and its playback **engine** |
-| Layout (Default, Plyr) | Skin (Default, Minimal) |
+| Layout (Default, Plyr) | Skin (Default, Neutral) |
 | Video or audio layout, matched by view type | The video or audio **preset**, chosen when you import it |
 | Default Theme | Skin source you add to your project |
 | Slots | Editing skin source |
@@ -230,7 +230,7 @@ In Vue, list the exact Video.js tags in `isCustomElement` instead of Vidstack's 
 
 </FrameworkCase>
 
-If you used the Plyr Layout, start from the Minimal skin instead. It's the closer match to a classic control bar, and <DocsLink slug="guides/migrate-from-plyr">Migrate from Plyr</DocsLink> maps the Plyr options that layout mirrored.
+If you used the Plyr Layout, start from the Neutral skin instead. It's the closer match to a classic control bar, and <DocsLink slug="guides/migrate-from-plyr">Migrate from Plyr</DocsLink> maps the Plyr options that layout mirrored.
 
 <FrameworkCase frameworks={["html"]}>
 `VidstackPlayer.create()` has no equivalent factory. Write the markup, or build the same elements from script and move your existing `<video>` inside them:
@@ -579,7 +579,7 @@ Vidstack rendered the audio and video layouts side by side and matched one at ru
 | `DefaultVideoLayout` | `VideoSkin` from `@videojs/react/video` |
 | `DefaultVideoLayout` playing a live stream | `LiveVideoSkin` from `@videojs/react/live-video` |
 | `DefaultAudioLayout` | `AudioSkin` from `@videojs/react/audio` |
-| `PlyrLayout` | `MinimalVideoSkin` or `MinimalAudioSkin` |
+| `PlyrLayout` | `NeutralVideoSkin` or `NeutralAudioSkin` |
 | A custom layout with no controls | `BackgroundVideoSkin` from `@videojs/react/background` |
 </FrameworkCase>
 
@@ -589,7 +589,7 @@ Vidstack rendered the audio and video layouts side by side and matched one at ru
 | `<media-video-layout>` | `<video-skin>` from `@videojs/html/video/skin` |
 | `<media-video-layout>` playing a live stream | `<live-video-skin>` from `@videojs/html/live-video/skin` |
 | `<media-audio-layout>` | `<audio-skin>` from `@videojs/html/audio/skin` |
-| `<media-plyr-layout>` | `<video-minimal-skin>` or `<audio-minimal-skin>` |
+| `<media-plyr-layout>` | `<video-neutral-skin>` or `<audio-neutral-skin>` |
 | A custom layout with no controls | `<background-video-skin>` from `@videojs/html/background/skin` |
 </FrameworkCase>
 
@@ -657,7 +657,7 @@ Vidstack customization climbed from layout props, through CSS variables and slot
 
 #### Level 1: pick a skin
 
-Choose Default or Minimal for video, audio, live video, or live audio. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+Choose Default or Neutral for video, audio, live video, or live audio. See <DocsLink slug="guides/skins">Skins</DocsLink>.
 
 #### Level 2: restyle it
 
@@ -778,7 +778,7 @@ Vidstack's `colorScheme` toggled light and dark classes on the layout. Video.js 
 ### Icons
 
 <FrameworkCase frameworks={["react"]}>
-`@vidstack/react/icons` becomes `@videojs/react/icons`, with a smaller set of 25 icons in Default and Minimal families. Icons take standard SVG props; there's no `size` prop. Several names changed:
+`@vidstack/react/icons` becomes `@videojs/react/icons`, with a smaller set of 25 icons in Default and Neutral families. Icons take standard SVG props; there's no `size` prop. Several names changed:
 
 | Vidstack | Video.js 10 |
 |---|---|
@@ -794,7 +794,7 @@ Vidstack's `colorScheme` toggled light and dark classes on the layout. Video.js 
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<media-icon type="…">` becomes `<media-icon name="…">`, registered by `@videojs/html/icons/element`, with a smaller set of 25 icons. Add `family="minimal"` for the Minimal set. Several names changed:
+`<media-icon type="…">` becomes `<media-icon name="…">`, registered by `@videojs/html/icons/element`, with a smaller set of 25 icons. Add `family="neutral"` for the Neutral set. Several names changed:
 
 | Vidstack `type` | Video.js 10 `name` |
 |---|---|

@@ -4,6 +4,6 @@
  */
 export { liveAudioFeatures } from '@videojs/core/dom';
 export { Audio, type AudioProps } from '@/media/audio';
-export * from './minimal-skin';
+export * from './neutral-skin';
 export { LiveAudioPlayer, type LiveAudioPlayerProps, usePlayer } from './player';
 export * from './skin';

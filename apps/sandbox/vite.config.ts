@@ -344,19 +344,19 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
           replacement: resolve(__dirname, 'app/_generated/registry/react-tailwind-default'),
         },
         {
-          find: '@registry-react-tailwind-minimal',
-          replacement: resolve(__dirname, 'app/_generated/registry/react-tailwind-minimal'),
+          find: '@registry-react-tailwind-neutral',
+          replacement: resolve(__dirname, 'app/_generated/registry/react-tailwind-neutral'),
         },
         {
           find: '@registry-react-css-default',
           replacement: resolve(__dirname, 'app/_generated/registry/react-css-default'),
         },
         {
-          find: '@registry-react-css-minimal',
-          replacement: resolve(__dirname, 'app/_generated/registry/react-css-minimal'),
+          find: '@registry-react-css-neutral',
+          replacement: resolve(__dirname, 'app/_generated/registry/react-css-neutral'),
         },
         { find: '@registry-html-default', replacement: resolve(__dirname, 'app/_generated/registry/html-default') },
-        { find: '@registry-html-minimal', replacement: resolve(__dirname, 'app/_generated/registry/html-minimal') },
+        { find: '@registry-html-neutral', replacement: resolve(__dirname, 'app/_generated/registry/html-neutral') },
         { find: '@app', replacement: resolve(__dirname, 'app') },
         { find: '@videojs/cdn/i18n', replacement: cdnI18nRegistry },
         ...(existsSync(cdnSandboxMainTemplate)

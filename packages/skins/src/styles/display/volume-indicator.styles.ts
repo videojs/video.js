@@ -2,7 +2,7 @@ import { styles } from 'vjsc/styles';
 
 const iconVariants = {
   default: 'mix-blend-difference',
-  minimal: 'col-start-1 row-start-1 drop-shadow-media-icon',
+  neutral: 'col-start-1 row-start-1 drop-shadow-media-icon',
 } as const;
 
 export default styles({
@@ -26,7 +26,7 @@ export default styles({
           '[background-image:linear-gradient(currentColor,currentColor)]',
           '[background-size:var(--media-volume-fill,0%)_100%] transition-[background-size] duration-media-slow ease-linear',
         ],
-        minimal: [
+        neutral: [
           'grid w-[min(80%,14rem)] grid-cols-[auto_minmax(0,1fr)_auto] [transform:translateX(0)]',
           'before:col-start-2 before:row-start-1 before:h-0.75 before:w-full before:rounded-media-pill',
           'before:bg-current/20 before:shadow-[0_1px_0_var(--media-shadow-subtle-current-color)]',
@@ -39,7 +39,7 @@ export default styles({
     },
     value: {
       utilities: [],
-      variants: { default: 'ml-auto mix-blend-difference', minimal: 'col-start-3 row-start-1' },
+      variants: { default: 'ml-auto mix-blend-difference', neutral: 'col-start-3 row-start-1' },
     },
     highIcon: {
       utilities: 'hidden shrink-0 group-data-[level=high]/volume-status:block',

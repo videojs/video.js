@@ -373,7 +373,7 @@ for (const variant of CASES) {
     expect(await tooltipSurfaceContract(tailwind.root, tailwindTooltip)).toEqual(cssContract);
   });
 
-  if (variant.skin === 'minimal-video') {
+  if (variant.skin === 'neutral-video') {
     test(`${variant.framework} ${variant.skin} keeps the expanded volume mask in sync`, async ({ page }) => {
       for (const width of WIDTHS) {
         const { css, tailwind } = await openVariants(page, variant, width);
@@ -563,7 +563,7 @@ for (const variant of CASES) {
 
   test(`${variant.framework} ${variant.skin} keeps fullscreen scaling in sync`, async ({ page }, testInfo) => {
     const name = `${variant.framework}-${variant.skin}-fullscreen.png`;
-    const media = variant.skin === 'minimal-video' ? 'hls-3' : 'mp4-1';
+    const media = variant.skin === 'neutral-video' ? 'hls-3' : 'mp4-1';
 
     await page.setViewportSize({ width: 1280, height: 720 });
 
@@ -573,7 +573,7 @@ for (const variant of CASES) {
     expect(cssContract.previewValueBottomInPreviewHeights).toBe(variant.skin === 'default-video' ? 11.5 : 6);
 
     const reference = await captureRendering(css.root, name);
-    const cssPreview = variant.skin === 'minimal-video' ? await fullscreenPreviewContract(css.root) : null;
+    const cssPreview = variant.skin === 'neutral-video' ? await fullscreenPreviewContract(css.root) : null;
     const cssMenu = await fullscreenSpeedMenuContract(css.root);
 
     await exitFullscreen(page);
@@ -583,7 +583,7 @@ for (const variant of CASES) {
     expect(tailwindContract).toEqual(cssContract);
     await expectSameRendering(testInfo, reference, tailwind.root);
 
-    const tailwindPreview = variant.skin === 'minimal-video' ? await fullscreenPreviewContract(tailwind.root) : null;
+    const tailwindPreview = variant.skin === 'neutral-video' ? await fullscreenPreviewContract(tailwind.root) : null;
     const tailwindMenu = await fullscreenSpeedMenuContract(tailwind.root);
 
     expectFullscreenPreviewParity(tailwindPreview, cssPreview);
@@ -600,8 +600,8 @@ for (const variant of CASES) {
   });
 }
 
-test('minimal fullscreen geometry scales through the large breakpoints', async ({ page }) => {
-  const variant: SkinCase = { framework: 'react', skin: 'minimal-video' };
+test('neutral fullscreen geometry scales through the large breakpoints', async ({ page }) => {
+  const variant: SkinCase = { framework: 'react', skin: 'neutral-video' };
 
   for (const [viewportWidth, scale] of [
     [1536, 1.5],
@@ -632,7 +632,7 @@ test('minimal fullscreen geometry scales through the large breakpoints', async (
   }
 });
 
-for (const skin of ['default-video', 'minimal-video'] as const) {
+for (const skin of ['default-video', 'neutral-video'] as const) {
   for (const preference of ['reduced-transparency', 'contrast-more', 'forced-colors'] as const) {
     test(`react ${skin} keeps CSS and Tailwind ${preference} surfaces in sync`, async ({ page }, testInfo) => {
       await emulatePreference(page, preference);
@@ -2419,7 +2419,7 @@ async function waitForOwnAnimations(element: Locator) {
 }
 
 async function muteTooltipContract(root: Locator, skin: SkinCase['skin']) {
-  if (skin !== 'minimal-video') return null;
+  if (skin !== 'neutral-video') return null;
 
   const tooltip = await openTooltip(root, 'Mute');
 

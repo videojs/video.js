@@ -8,13 +8,13 @@ const workspaceDir = resolve(import.meta.dirname, '../../../../..');
 const outputRoot = resolve(workspaceDir, 'packages/html/src/internal/skins');
 const skins = [
   'default-video',
-  'minimal-video',
+  'neutral-video',
   'default-audio',
-  'minimal-audio',
+  'neutral-audio',
   'default-live-video',
-  'minimal-live-video',
+  'neutral-live-video',
   'default-live-audio',
-  'minimal-live-audio',
+  'neutral-live-audio',
 ] as const;
 
 describe('generated HTML package skins', () => {

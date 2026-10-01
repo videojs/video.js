@@ -27,14 +27,14 @@ describe('registryNamespaceUrl', () => {
     expect(registryNamespaceUrl('react', 'tailwind')).toBe('https://shadcn.videojs.org/r/react/{name}.json');
     expect(registryNamespaceUrl('react', 'css')).toBe('https://shadcn.videojs.org/r/react/css/{name}.json');
     expect(registryNamespaceUrl('html', 'css')).toBe('https://shadcn.videojs.org/r/html/{name}.json');
-    expect(registryNamespaceUrl('react', 'tailwind', 'minimal')).toBe(
-      'https://shadcn.videojs.org/r/react/minimal/{name}.json'
+    expect(registryNamespaceUrl('react', 'tailwind', 'neutral')).toBe(
+      'https://shadcn.videojs.org/r/react/neutral/{name}.json'
     );
-    expect(registryNamespaceUrl('react', 'css', 'minimal')).toBe(
-      'https://shadcn.videojs.org/r/react/css/minimal/{name}.json'
+    expect(registryNamespaceUrl('react', 'css', 'neutral')).toBe(
+      'https://shadcn.videojs.org/r/react/css/neutral/{name}.json'
     );
-    expect(registryNamespaceUrl('html', 'css', 'minimal')).toBe(
-      'https://shadcn.videojs.org/r/html/minimal/{name}.json'
+    expect(registryNamespaceUrl('html', 'css', 'neutral')).toBe(
+      'https://shadcn.videojs.org/r/html/neutral/{name}.json'
     );
   });
 });
@@ -66,8 +66,8 @@ describe('shadcnAddCommand', () => {
 
 describe('shadcnRegistryAddCommand', () => {
   it('sets the selected catalog through the Shadcn CLI', () => {
-    expect(shadcnRegistryAddCommand('pnpm', 'react', 'css', 'minimal')).toBe(
-      'pnpm dlx shadcn@latest registry add @videojs=https://shadcn.videojs.org/r/react/css/minimal/{name}.json'
+    expect(shadcnRegistryAddCommand('pnpm', 'react', 'css', 'neutral')).toBe(
+      'pnpm dlx shadcn@latest registry add @videojs=https://shadcn.videojs.org/r/react/css/neutral/{name}.json'
     );
     expect(shadcnRegistryAddCommand('npm', 'html', 'css')).toBe(
       'npx shadcn@latest registry add @videojs=https://shadcn.videojs.org/r/html/{name}.json'
@@ -175,13 +175,13 @@ describe('registrySkinSelection', () => {
       item: 'video',
       theme: 'default',
     });
-    expect(registrySkinSelection({ useCase: 'default-video', skin: 'minimal-video' })).toEqual({
+    expect(registrySkinSelection({ useCase: 'default-video', skin: 'neutral-video' })).toEqual({
       item: 'video',
-      theme: 'minimal',
+      theme: 'neutral',
     });
-    expect(registrySkinSelection({ useCase: 'live-audio', skin: 'minimal-audio' })).toEqual({
+    expect(registrySkinSelection({ useCase: 'live-audio', skin: 'neutral-audio' })).toEqual({
       item: 'live-audio',
-      theme: 'minimal',
+      theme: 'neutral',
     });
   });
 
@@ -204,7 +204,7 @@ describe('REGISTRY_SKINS', () => {
       'live-audio',
       'live-audio',
     ]);
-    expect(REGISTRY_SKINS.find((skin) => skin.item === 'video' && skin.theme === 'minimal')?.directory).toBe(
+    expect(REGISTRY_SKINS.find((skin) => skin.item === 'video' && skin.theme === 'neutral')?.directory).toBe(
       'components/videojs/video'
     );
   });

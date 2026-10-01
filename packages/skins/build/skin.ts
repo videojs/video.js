@@ -5,9 +5,9 @@ export const skinPresets = ['audio', 'live-audio', 'live-video', 'video'] as con
 export type SkinPreset = (typeof skinPresets)[number];
 export type SkinTheme = SkinStyle['theme'];
 
-/** Resolve the public preset shared by a default or Minimal Skin. */
+/** Resolve the public preset shared by a default or Neutral Skin. */
 export function skinPreset(name: SkinName): SkinPreset {
-  const preset = name.replace(/^(?:default|minimal)-/, '');
+  const preset = name.replace(/^(?:default|neutral)-/, '');
   if (!isSkinPreset(preset)) throw new Error(`Unsupported Skin preset: \`${name}\`.`);
 
   return preset;
@@ -25,18 +25,18 @@ export function skinDirectory(name: SkinName): string {
   return skinPreset(name);
 }
 
-/** Runtime stylesheet entry carrying the shared, preset, and optional Minimal tokens relative to `src/styles`. */
+/** Runtime stylesheet entry carrying the shared, preset, and optional Neutral tokens relative to `src/styles`. */
 export function skinBaseStylesheet(preset: SkinPreset, theme: SkinTheme = 'default'): string {
   const media = skinMedia(preset);
 
-  return `${media}/${theme === 'minimal' ? 'minimal' : 'base'}.css`;
+  return `${media}/${theme === 'neutral' ? 'neutral' : 'base'}.css`;
 }
 
 /** Registry style item that owns one skin's exact stylesheet dependency closure. */
 export function skinStyleItemName(preset: SkinPreset, theme: SkinTheme): string {
   const media = skinMedia(preset);
 
-  return `_style-${media}${theme === 'minimal' ? '-minimal' : ''}`;
+  return `_style-${media}${theme === 'neutral' ? '-neutral' : ''}`;
 }
 
 export function isSkinPreset(value: string): value is SkinPreset {

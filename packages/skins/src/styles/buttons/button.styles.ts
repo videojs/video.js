@@ -19,7 +19,7 @@ export default styles({
         'aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
       ],
       variants: {
-        minimal: 'supports-[corner-shape:squircle]:rounded-2xl',
+        neutral: 'supports-[corner-shape:squircle]:rounded-2xl',
       },
     },
     iconBase: {

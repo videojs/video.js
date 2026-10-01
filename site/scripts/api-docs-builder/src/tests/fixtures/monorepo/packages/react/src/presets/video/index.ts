@@ -6,6 +6,6 @@
  */
 export { videoFeatures } from '../../../../core/src/dom/store/features/presets';
 export { Video } from '../../media/video';
-export { MinimalVideoSkin } from './minimal-skin';
+export { NeutralVideoSkin } from './neutral-skin';
 export { VideoSkin } from './skin';
 export { VideoSkinTailwind } from './skin.tailwind';

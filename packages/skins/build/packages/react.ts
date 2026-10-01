@@ -4,7 +4,7 @@ import { bundleStyles, relativeImport, rewriteImports, stripStyleImports } from 
 import type { SkinModuleMeta } from '../../src/meta.ts';
 import { skinCatalogEntry } from '../catalog.ts';
 import { skinClassNameMergeImport } from '../imports.ts';
-import { skinBaseStylesheet, skinPresets, skinSourceDirectory } from '../skin.ts';
+import { skinBaseStylesheet, skinSourceDirectory } from '../skin.ts';
 import { type SkinRoot, skinRoots } from '../variants.ts';
 import type { GeneratedPackageFile } from './files.ts';
 import { addCopiedFiles, addGenerated, generatedFiles } from './utils.ts';
@@ -66,7 +66,7 @@ export async function createReactPackageSkins(
   for (const skin of skins) {
     const publicRoot = `${packageRoot}/presets/${skin.preset}`;
     const entry = skinCatalogEntry(skin.root.meta.name);
-    const publicName = skin.theme === 'minimal' ? 'minimal-skin' : 'skin';
+    const publicName = skin.theme === 'neutral' ? 'neutral-skin' : 'skin';
     const component = entry.component;
     const generatedComponent = entry.exportName;
     const generatedRoot = destinations.get(skin.root.id)!;
@@ -103,18 +103,8 @@ export async function createReactPackageSkins(
 }
 
 export function reactPackageSkinOwnedPaths(): string[] {
-  const publicPaths = skinPresets.flatMap((preset) =>
-    ['skin.tsx', 'skin.css', 'minimal-skin.tsx', 'minimal-skin.css'].map(
-      (filename) => `${packageRoot}/presets/${preset}/${filename}`
-    )
-  );
-
-  return [
-    internalRoot,
-    ...publicPaths,
-    `${packageRoot}/presets/background/skin.tsx`,
-    `${packageRoot}/presets/background/skin.css`,
-  ];
+  // Every preset skin wrapper and stylesheet is generated, so a renamed theme's old outputs are removed too.
+  return [internalRoot, `${packageRoot}/presets/*/*skin.tsx`, `${packageRoot}/presets/*/*skin.css`];
 }
 
 function reactModulePath(
@@ -136,7 +126,7 @@ function reactModulePath(
 /**
  * Source paths whose generated module can be emitted once for every skin. A shared module resolves its imports through
  * one skin, so its own source must be identical across skins and every module it imports must be shared as well;
- * otherwise a minimal skin would import the default skin's copy of, say, an icon-bearing button.
+ * otherwise a neutral skin would import the default skin's copy of, say, an icon-bearing button.
  */
 function collectSharedSourcePaths(skins: readonly SkinRoot[]): ReadonlySet<string> {
   const variants = new Map<string, Set<string>>();
@@ -185,7 +175,7 @@ function reactFrameworkImport(specifier: string): string | undefined {
 
   if (specifier === '@videojs/react/icons') return `${packageRoot}/icons/index.ts`;
 
-  if (specifier === '@videojs/react/icons/minimal') return `${packageRoot}/icons/minimal/index.ts`;
+  if (specifier === '@videojs/react/icons/neutral') return `${packageRoot}/icons/neutral/index.ts`;
 
   return undefined;
 }

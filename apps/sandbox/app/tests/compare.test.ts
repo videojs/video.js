@@ -39,7 +39,7 @@ describe('comparePanels', () => {
   it('labels the skin panels', () => {
     expect(comparePanels(react, 'skin').map((panel) => [panel.id, panel.label, panel.skin])).toEqual([
       ['default', 'Default', 'default'],
-      ['minimal', 'Minimal', 'minimal'],
+      ['neutral', 'Neutral', 'neutral'],
     ]);
   });
 });
@@ -63,13 +63,13 @@ describe('summarizeSelection', () => {
       summarizeSelection({
         platform: 'react',
         media: 'mux-video-spf',
-        skin: 'minimal',
+        skin: 'neutral',
         styling: 'tailwind',
         skins: 'registry',
         width: 672,
         source: 'mp4-1',
       })
-    ).toBe('React · Mux Video (SPF) · Minimal · Tailwind · from the registry · 672px · MP4 - Dancing Dude');
+    ).toBe('React · Mux Video (SPF) · Neutral · Tailwind · from the registry · 672px · MP4 - Dancing Dude');
   });
 
   it('leaves the skin out for a background media', () => {

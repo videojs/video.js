@@ -56,7 +56,7 @@ const SKIN_ICONS = {
 
 const THEME_ICONS = {
   default: <SkinPreview skin="video" className="size-4" />,
-  minimal: <SkinPreview skin="minimal-video" className="size-4" />,
+  neutral: <SkinPreview skin="neutral-video" className="size-4" />,
 } satisfies Record<RegistryTheme, ReactNode>;
 
 interface Props {
@@ -126,10 +126,10 @@ function RegistryCatalogSelects({ defaultSkin, defaultTheme, framework, installa
 
     const useCase = preset === 'video' ? 'default-video' : preset === 'audio' ? 'default-audio' : preset;
     const skin =
-      nextTheme === 'minimal'
+      nextTheme === 'neutral'
         ? preset === 'audio' || preset === 'live-audio'
-          ? 'minimal-audio'
-          : 'minimal-video'
+          ? 'neutral-audio'
+          : 'neutral-video'
         : preset === 'audio' || preset === 'live-audio'
           ? 'audio'
           : 'video';

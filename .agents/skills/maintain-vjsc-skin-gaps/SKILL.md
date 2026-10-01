@@ -17,7 +17,7 @@ Do not use this workflow for documentation-only edits or generated-output change
 
 ## Workflow
 
-1. Describe the observable published behavior and identify the affected Default or Minimal skin.
+1. Describe the observable published behavior and identify the affected Default or Neutral skin.
 2. Inspect the equivalent source component, style rule, and generated HTML and React output. Similar names or classes are not evidence of parity.
 3. If the change implements parity, verify all affected targets and CSS or Tailwind outputs, then remove any obsolete gap.
 4. Otherwise, add or update one entry in `packages/skins/src/gaps.md` with `Source`, `Gap`, `Affected`, and `Recommendation` fields. Use the PR or commit when known; otherwise cite the relevant source or test.
@@ -34,7 +34,7 @@ Output: Add or update this entry in `packages/skins/src/gaps.md`:
 
 - Source: `caf179b83` / #2281
 - Gap: VJSC menus are directional, but control regions do not preserve legacy control order under `dir="rtl"`.
-- Affected: Default and Minimal; HTML and React; CSS and Tailwind.
+- Affected: Default and Neutral; HTML and React; CSS and Tailwind.
 - Recommendation: Add directional layout rules and VJSC matrix coverage.
 ```
 

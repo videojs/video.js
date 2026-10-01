@@ -72,7 +72,7 @@ for (const target of PAGES) {
       expect(probe.scrim).toContain('gradient');
       expect(probe.frameBorder).not.toBe('rgb(255, 0, 0)');
 
-      if (!target.path.includes('minimal')) expect(probe.surfaceBlur).toContain('blur');
+      if (!target.path.includes('neutral')) expect(probe.surfaceBlur).toContain('blur');
     }
 
     // Unsupported H.264 or rejected playback must fail here.

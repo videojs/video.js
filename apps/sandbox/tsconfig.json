@@ -26,11 +26,11 @@
     "paths": {
       "@app/*": ["./app/*"],
       "@registry-react-tailwind-default/*": ["./app/_generated/registry/react-tailwind-default/*"],
-      "@registry-react-tailwind-minimal/*": ["./app/_generated/registry/react-tailwind-minimal/*"],
+      "@registry-react-tailwind-neutral/*": ["./app/_generated/registry/react-tailwind-neutral/*"],
       "@registry-react-css-default/*": ["./app/_generated/registry/react-css-default/*"],
-      "@registry-react-css-minimal/*": ["./app/_generated/registry/react-css-minimal/*"],
+      "@registry-react-css-neutral/*": ["./app/_generated/registry/react-css-neutral/*"],
       "@registry-html-default/*": ["./app/_generated/registry/html-default/*"],
-      "@registry-html-minimal/*": ["./app/_generated/registry/html-minimal/*"]
+      "@registry-html-neutral/*": ["./app/_generated/registry/html-neutral/*"]
     }
   },
   "include": ["app", "src", "templates", "scripts", "types"],

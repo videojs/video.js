@@ -305,7 +305,7 @@ export function hasTailwindSkin(media: MediaId, platform: Platform): boolean {
   return platform !== 'cdn' && player !== 'background' && embed !== true;
 }
 
-/** The background skin is one element with no default or minimal variant to choose between. */
+/** The background skin is one element with no default or neutral variant to choose between. */
 export function hasSkinChoice(media: MediaId): boolean {
   return MEDIA[media].player !== 'background';
 }

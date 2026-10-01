@@ -61,7 +61,7 @@ describe('initializeDocsLinks', () => {
     window.history.replaceState(
       null,
       '',
-      '/docs/guides/installation/html?preset=audio&skin=minimal&media=spotify&package-manager=yarn&template=astro'
+      '/docs/guides/installation/html?preset=audio&skin=neutral&media=spotify&package-manager=yarn&template=astro'
     );
     syncInstallationSelectionFromUrl();
     document.body.innerHTML = `
@@ -79,7 +79,7 @@ describe('initializeDocsLinks', () => {
     await vi.waitFor(() =>
       expect(Object.fromEntries(new URLSearchParams(link.search))).toEqual({
         preset: 'audio',
-        skin: 'minimal',
+        skin: 'neutral',
         media: 'spotify',
         'package-manager': 'yarn',
         template: 'astro',

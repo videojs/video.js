@@ -307,11 +307,11 @@ describe('generateHTMLUsageCode', () => {
     expect(result.imports).toContain("import '@videojs/html/extensions/mux-data'");
   });
 
-  it('uses minimal skin tag', () => {
-    const result = generateHTMLUsageCode({ ...baseHTML, skin: 'minimal-video' });
+  it('uses neutral skin tag', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, skin: 'neutral-video' });
 
-    expect(result.html).toContain('<video-minimal-skin style=');
-    expect(result.imports).toContain("import '@videojs/html/video/minimal-skin'");
+    expect(result.html).toContain('<video-neutral-skin style=');
+    expect(result.imports).toContain("import '@videojs/html/video/neutral-skin'");
   });
 
   it('omits skin tag and skin import when skin is none', () => {
@@ -353,16 +353,16 @@ describe('generateHTMLUsageCode', () => {
     expect(result.imports).toContain("import '@videojs/html/media/hlsjs-video'");
   });
 
-  it('uses the minimal live video skin tag', () => {
+  it('uses the neutral live video skin tag', () => {
     const result = generateHTMLUsageCode({
       ...baseHTML,
       useCase: 'live-video',
-      skin: 'minimal-video',
+      skin: 'neutral-video',
       media: 'hls',
     });
 
-    expect(result.html).toContain('<live-video-minimal-skin style=');
-    expect(result.imports).toContain("import '@videojs/html/live-video/minimal-skin'");
+    expect(result.html).toContain('<live-video-neutral-skin style=');
+    expect(result.imports).toContain("import '@videojs/html/live-video/neutral-skin'");
   });
 
   it('omits the skin for a headless live video player', () => {
@@ -627,12 +627,12 @@ describe('generateReactCreateCode', () => {
     expect(code).not.toContain('playsInline');
   });
 
-  it('uses minimal skin component', () => {
-    const result = generateReactCreateCode({ ...baseReact, skin: 'minimal-video' });
+  it('uses neutral skin component', () => {
+    const result = generateReactCreateCode({ ...baseReact, skin: 'neutral-video' });
     const code = result['app/page.tsx'];
 
-    expect(code).toContain('<MinimalVideoSkin style=');
-    expect(code).toContain("import '@videojs/react/video/minimal-skin.css'");
+    expect(code).toContain('<NeutralVideoSkin style=');
+    expect(code).toContain("import '@videojs/react/video/neutral-skin.css'");
   });
 
   it('omits skin component and CSS import when skin is none', () => {
@@ -662,17 +662,17 @@ describe('generateReactCreateCode', () => {
     expect(code).toContain('playsInline />');
   });
 
-  it('uses the minimal live video skin component', () => {
+  it('uses the neutral live video skin component', () => {
     const result = generateReactCreateCode({
       ...baseReact,
       useCase: 'live-video',
-      skin: 'minimal-video',
+      skin: 'neutral-video',
       media: 'hls',
     });
     const code = result['app/page.tsx'];
 
-    expect(code).toContain('<MinimalLiveVideoSkin style=');
-    expect(code).toContain("import '@videojs/react/live-video/minimal-skin.css'");
+    expect(code).toContain('<NeutralLiveVideoSkin style=');
+    expect(code).toContain("import '@videojs/react/live-video/neutral-skin.css'");
   });
 
   it('omits the skin for a headless live video player', () => {
@@ -704,15 +704,15 @@ describe('generateReactCreateCode', () => {
     expect(code).toContain('<MuxData />');
   });
 
-  it('uses the minimal live audio skin component', () => {
+  it('uses the neutral live audio skin component', () => {
     const result = generateReactCreateCode({
       ...baseReact,
       useCase: 'live-audio',
-      skin: 'minimal-audio',
+      skin: 'neutral-audio',
       media: 'mux-audio',
     });
 
-    expect(result['app/page.tsx']).toContain('<MinimalLiveAudioSkin>');
+    expect(result['app/page.tsx']).toContain('<NeutralLiveAudioSkin>');
   });
 
   it('uses background video components', () => {
@@ -800,11 +800,11 @@ describe('source installation code', () => {
     expect(source).toContain(`src={${JSON.stringify(sourceUrl)}}`);
   });
 
-  it('keeps the local component name stable when the Minimal catalog is selected', () => {
-    const code = generateSourceReactCreateCode({ ...baseReact, skin: 'minimal-video' })['app/page.tsx'];
+  it('keeps the local component name stable when the Neutral catalog is selected', () => {
+    const code = generateSourceReactCreateCode({ ...baseReact, skin: 'neutral-video' })['app/page.tsx'];
 
     expect(code).toContain("import { VideoSkin } from '@/components/videojs/video/skin'");
-    expect(code).not.toContain('MinimalVideoSkin');
+    expect(code).not.toContain('NeutralVideoSkin');
   });
 
   it('shows the exact HTML skin file, media markup, and registrations to edit', () => {
@@ -852,17 +852,17 @@ describe('getRendererComponent', () => {
 describe('getSkinTag', () => {
   it('follows the preset and skin tier', () => {
     expect(getSkinTag('default-video', 'video')).toBe('video-skin');
-    expect(getSkinTag('live-audio', 'minimal-audio')).toBe('live-audio-minimal-skin');
+    expect(getSkinTag('live-audio', 'neutral-audio')).toBe('live-audio-neutral-skin');
   });
 
   it('always uses the background skin for background video', () => {
-    expect(getSkinTag('background-video', 'minimal-video')).toBe('background-video-skin');
+    expect(getSkinTag('background-video', 'neutral-video')).toBe('background-video-skin');
   });
 });
 
 describe('getSkinComponent', () => {
   it('follows the preset and skin tier', () => {
     expect(getSkinComponent('default-audio', 'audio')).toBe('AudioSkin');
-    expect(getSkinComponent('live-video', 'minimal-video')).toBe('MinimalLiveVideoSkin');
+    expect(getSkinComponent('live-video', 'neutral-video')).toBe('NeutralLiveVideoSkin');
   });
 });

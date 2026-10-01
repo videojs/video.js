@@ -5,13 +5,13 @@ import { DEFAULT_SELECTION } from '../url-state';
 
 describe('resolveInstallationMethodUrl', () => {
   it('carries shared choices and the selected framework into Shadcn', () => {
-    const current = new URL('https://videojs.org/docs/guides/installation/html?preset=audio&skin=minimal');
+    const current = new URL('https://videojs.org/docs/guides/installation/html?preset=audio&skin=neutral');
     const result = resolveInstallationMethodUrl(current, '/docs/guides/installation/shadcn', 'shadcn');
 
     expect(result.pathname).toBe('/docs/guides/installation/shadcn');
     expect(result.searchParams.get('framework')).toBe('html');
     expect(result.searchParams.get('preset')).toBe('audio');
-    expect(result.searchParams.get('skin')).toBe('minimal');
+    expect(result.searchParams.get('skin')).toBe('neutral');
   });
 
   it('carries the React route into Shadcn when the destination names no framework', () => {
@@ -50,12 +50,12 @@ describe('resolveInstallationMethodUrl', () => {
   });
 
   it('returns from CDN to packaged HTML with the shared choices', () => {
-    const current = new URL('https://videojs.org/docs/guides/installation/cdn?preset=audio&skin=minimal');
+    const current = new URL('https://videojs.org/docs/guides/installation/cdn?preset=audio&skin=neutral');
     const result = resolveInstallationMethodUrl(current, '/docs/guides/installation/html', 'packaged');
 
     expect(result.pathname).toBe('/docs/guides/installation/html');
     expect(result.searchParams.get('preset')).toBe('audio');
-    expect(result.searchParams.get('skin')).toBe('minimal');
+    expect(result.searchParams.get('skin')).toBe('neutral');
   });
 
   it('uses choices already written into the card destination', () => {
@@ -114,11 +114,11 @@ describe('resolveInstallationMethodHref', () => {
       current,
       '/docs/guides/installation/html',
       'packaged',
-      { ...DEFAULT_SELECTION, useCase: 'default-audio', skin: 'minimal-audio', media: 'html5-audio' },
+      { ...DEFAULT_SELECTION, useCase: 'default-audio', skin: 'neutral-audio', media: 'html5-audio' },
       'html'
     );
 
-    expect(result).toBe('/docs/guides/installation/html?preset=audio&skin=minimal');
+    expect(result).toBe('/docs/guides/installation/html?preset=audio&skin=neutral');
   });
 
   it('drops the package manager for an existing CDN page', () => {
@@ -127,13 +127,13 @@ describe('resolveInstallationMethodHref', () => {
       ...DEFAULT_SELECTION,
       installMethod: 'bun',
       useCase: 'default-audio',
-      skin: 'minimal-audio',
+      skin: 'neutral-audio',
       media: 'html5-audio',
       sourceUrl: 'https://example.com/audio.mp3',
     });
 
     expect(result).toBe(
-      '/docs/guides/installation/cdn?preset=audio&skin=minimal&source-url=https%3A%2F%2Fexample.com%2Faudio.mp3'
+      '/docs/guides/installation/cdn?preset=audio&skin=neutral&source-url=https%3A%2F%2Fexample.com%2Faudio.mp3'
     );
   });
 });

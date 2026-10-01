@@ -16,12 +16,12 @@ describe('parseInstallationSearch', () => {
   });
 
   it('reads the CLI vocabulary', () => {
-    expect(parseInstallationSearch('?preset=live-video&skin=minimal&media=hls&package-manager=npm')).toEqual({
+    expect(parseInstallationSearch('?preset=live-video&skin=neutral&media=hls&package-manager=npm')).toEqual({
       framework: 'react',
       template: 'next',
       project: 'existing',
       useCase: 'live-video',
-      skin: 'minimal-video',
+      skin: 'neutral-video',
       media: 'hls',
       extensions: [],
       sourceUrl: '',
@@ -32,7 +32,7 @@ describe('parseInstallationSearch', () => {
 
   it('maps the skin tier onto the audio skins for audio presets', () => {
     expect(parseInstallationSearch('?preset=audio').skin).toBe('audio');
-    expect(parseInstallationSearch('?preset=audio&skin=minimal').skin).toBe('minimal-audio');
+    expect(parseInstallationSearch('?preset=audio&skin=neutral').skin).toBe('neutral-audio');
     expect(parseInstallationSearch('?preset=audio&skin=none').skin).toBe('none');
   });
 
@@ -123,14 +123,14 @@ describe('serializeInstallationSearch', () => {
         template: 'next',
         project: 'existing',
         useCase: 'live-video',
-        skin: 'minimal-video',
+        skin: 'neutral-video',
         media: 'hls',
         extensions: [],
         sourceUrl: '',
         installMethod: 'pnpm',
         styling: null,
       })
-    ).toBe('?preset=live-video&skin=minimal');
+    ).toBe('?preset=live-video&skin=neutral');
   });
 
   it('round-trips through parse', () => {
@@ -183,7 +183,7 @@ describe('serializeInstallationSearch', () => {
   });
 
   it('omits the hidden skin choice for background video', () => {
-    const background = parseInstallationSearch('?preset=background-video&skin=minimal&media=background-video');
+    const background = parseInstallationSearch('?preset=background-video&skin=neutral&media=background-video');
 
     expect(serializeInstallationSearch(background)).toBe('?preset=background-video');
   });
@@ -244,10 +244,10 @@ describe('serializeInstallationSearchForRoute', () => {
 describe('parseInstallationSearchForRoute on the Shadcn guide', () => {
   it('fits unsupported choices to the player shown by the page', () => {
     expect(
-      parseInstallationSearchForRoute('shadcn', '?preset=background-video&skin=minimal&media=background-video')
+      parseInstallationSearchForRoute('shadcn', '?preset=background-video&skin=neutral&media=background-video')
     ).toMatchObject({
       useCase: 'default-video',
-      skin: 'minimal-video',
+      skin: 'neutral-video',
       media: 'html5-video',
     });
     expect(parseInstallationSearchForRoute('shadcn', '?preset=audio&skin=none&media=spotify')).toMatchObject({

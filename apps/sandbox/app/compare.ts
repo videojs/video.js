@@ -106,7 +106,7 @@ export function comparePanels(selection: SkinSelection, compare: CompareMode): r
       return [current, other].map((value) => panel(value, SKIN_SOURCE_LABELS[value], platform, styling, value, skin));
     }
     case 'skin':
-      return (['default', 'minimal'] as const).map((value) =>
+      return (['default', 'neutral'] as const).map((value) =>
         panel(value, SKIN_LABELS[value], platform, styling, skins, value)
       );
     case 'platform':

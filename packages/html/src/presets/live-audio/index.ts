@@ -5,4 +5,4 @@
 export { liveAudioFeatures } from '@videojs/core/dom';
 export { LiveAudioPlayerElement, PlayerController } from './player';
 export { LiveAudioSkinElement } from './skin';
-export { MinimalLiveAudioSkinElement } from './minimal-skin';
+export { NeutralLiveAudioSkinElement } from './neutral-skin';

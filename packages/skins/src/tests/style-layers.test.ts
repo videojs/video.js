@@ -8,7 +8,7 @@ const layerOrder = '@layer base.theme, base.preset, base.preferences;';
 const tokenStyles = [
   'base.css',
   'themes/theme.css',
-  'themes/minimal.css',
+  'themes/neutral.css',
   'themes/preferences.css',
   'audio/theme.css',
   'video/theme.css',
@@ -27,7 +27,7 @@ describe('style token layers', () => {
 
   it('places media preset adaptations after theme tokens', () => {
     expect(readStyle('themes/theme.css')).toContain('@layer base.theme {');
-    expect(readStyle('themes/minimal.css')).toContain('@layer base.theme {');
+    expect(readStyle('themes/neutral.css')).toContain('@layer base.theme {');
     expect(readStyle('audio/theme.css')).toContain('@layer base.preset {');
     expect(readStyle('video/theme.css')).toContain('@layer base.preset {');
     expect(readStyle('themes/preferences.css')).toContain('@layer base.preferences {');

@@ -12,13 +12,13 @@ export default styles({
       ],
       variants: {
         default: 'px-2.5',
-        minimal: ['px-2', 'shadow-media-tooltip!'],
+        neutral: ['px-2', 'shadow-media-tooltip!'],
       },
     },
     shortcut: {
       utilities:
         'min-w-[1.5em] rounded-[--spacing(1)] bg-media-muted p-[0.1em] text-center text-media-sm [font-family:inherit] font-semibold leading-tight',
-      variants: { minimal: '-me-1' },
+      variants: { neutral: '-me-1' },
     },
   },
 });

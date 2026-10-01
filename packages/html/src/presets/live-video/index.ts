@@ -5,4 +5,4 @@
 export { liveVideoFeatures } from '@videojs/core/dom';
 export { LiveVideoPlayerElement, PlayerController } from './player';
 export { LiveVideoSkinElement } from './skin';
-export { MinimalLiveVideoSkinElement } from './minimal-skin';
+export { NeutralLiveVideoSkinElement } from './neutral-skin';

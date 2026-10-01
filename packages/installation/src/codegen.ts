@@ -62,9 +62,9 @@ function escapeHTMLAttribute(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
-/** Skin module basename within a preset group: `skin` or `minimal-skin`. */
-function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'minimal-skin' {
-  return skin === 'minimal-video' || skin === 'minimal-audio' ? 'minimal-skin' : 'skin';
+/** Skin module basename within a preset group: `skin` or `neutral-skin`. */
+function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'neutral-skin' {
+  return skin === 'neutral-video' || skin === 'neutral-audio' ? 'neutral-skin' : 'skin';
 }
 
 /** Packages a source install still needs after the registry item installs the core React or HTML package. */
@@ -178,7 +178,7 @@ export function getSkinTag(useCase: UseCase, skin: Exclude<Skin, 'none'>): strin
 
   if (useCase === 'background-video') return `${prefix}-skin`;
 
-  return getSkinFile(skin) === 'minimal-skin' ? `${prefix}-minimal-skin` : `${prefix}-skin`;
+  return getSkinFile(skin) === 'neutral-skin' ? `${prefix}-neutral-skin` : `${prefix}-skin`;
 }
 
 function generateMediaMarkup(
@@ -576,7 +576,7 @@ export function getRendererComponent(renderer: Renderer): string {
 export function getSkinComponent(useCase: UseCase, skin: Exclude<Skin, 'none'>): string {
   const name = `${getInstallationPreset(useCase).componentPrefix}Skin`;
 
-  return getSkinFile(skin) === 'minimal-skin' ? `Minimal${name}` : name;
+  return getSkinFile(skin) === 'neutral-skin' ? `Neutral${name}` : name;
 }
 
 function getPresetPlayer(useCase: UseCase): string {
@@ -707,7 +707,7 @@ export function generateSourceReactCreateCode(
   const playerComponent = getPresetPlayer(useCase);
   const rendererComponent = getRendererComponent(renderer);
   const source = resolveInstallationSourceUrl(opts.sourceUrl, renderer, useCase);
-  // A registry theme changes the source behind the stable item name. Both the Default and Minimal catalogs export the
+  // A registry theme changes the source behind the stable item name. Both the Default and Neutral catalogs export the
   // same local component (`VideoSkin`, `AudioSkin`, and so on).
   const skinComponent = `${preset.componentPrefix}Skin`;
   const rendererProps = isVideoLikeRenderer(renderer)

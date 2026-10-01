@@ -12,7 +12,7 @@ const reactTarget = '?style=css&target=react&skin=default-video&theme=default';
 const defaultSkinUrl = `/../src/skins/default/video/skin.tsx${reactTarget}`;
 const defaultControlsUrl = `/../src/skins/default/video/layout/controls.tsx${reactTarget}`;
 const htmlContainerUrl =
-  '/../src/components/layout/container.tsx?style=tailwind&target=html&skin=minimal-video&theme=minimal';
+  '/../src/components/layout/container.tsx?style=tailwind&target=html&skin=neutral-video&theme=neutral';
 const playButtonUrl = `/../src/components/buttons/play-button.tsx${reactTarget}`;
 const settingsMenuUrl = `/../src/components/menus/settings-menu.tsx${reactTarget}`;
 const reactCaptionsMenuUrl =
@@ -30,8 +30,8 @@ const htmlTimeSliderUrl =
   '/../src/components/sliders/time-slider.tsx?style=tailwind&target=html&skin=default-video&theme=default';
 const reactTimeSliderUrl =
   '/../src/components/sliders/time-slider.tsx?style=tailwind&target=react&skin=default-video&theme=default';
-const minimalControlsUrl =
-  '/../src/skins/minimal/video/layout/controls.tsx?style=tailwind&target=react&skin=minimal-video&theme=minimal';
+const neutralControlsUrl =
+  '/../src/skins/neutral/video/layout/controls.tsx?style=tailwind&target=react&skin=neutral-video&theme=neutral';
 const buttonStyles = resolve(packageDir, 'src/styles/buttons/button.styles.ts');
 const controlsStyles = resolve(packageDir, 'src/skins/default/video/layout/controls.styles.ts');
 const designStyles = resolve(packageDir, 'src/styles/base.css');
@@ -40,13 +40,13 @@ const vjscPlayButton = resolve(packageDir, 'src/components/buttons/play-button.t
 const frameworks = ['react', 'html'] as const;
 const skins = [
   'default-video',
-  'minimal-video',
+  'neutral-video',
   'default-live-video',
-  'minimal-live-video',
+  'neutral-live-video',
   'default-live-audio',
-  'minimal-live-audio',
+  'neutral-live-audio',
   'default-audio',
-  'minimal-audio',
+  'neutral-audio',
 ] as const;
 const skinContracts = {
   'default-video': {
@@ -55,9 +55,9 @@ const skinContracts = {
     preset: 'video',
     stylesheet: 'video/controls.css',
   },
-  'minimal-video': {
+  'neutral-video': {
     exportName: 'VideoSkin',
-    theme: 'minimal',
+    theme: 'neutral',
     preset: 'video',
     stylesheet: 'video/controls.css',
   },
@@ -67,9 +67,9 @@ const skinContracts = {
     preset: 'live-video',
     stylesheet: 'live-video/controls.css',
   },
-  'minimal-live-video': {
+  'neutral-live-video': {
     exportName: 'LiveVideoSkin',
-    theme: 'minimal',
+    theme: 'neutral',
     preset: 'live-video',
     stylesheet: 'live-video/controls.css',
   },
@@ -80,9 +80,9 @@ const skinContracts = {
     preset: 'live-audio',
     stylesheet: 'audio/controls.css',
   },
-  'minimal-live-audio': {
+  'neutral-live-audio': {
     exportName: 'LiveAudioSkin',
-    theme: 'minimal',
+    theme: 'neutral',
     preset: 'live-audio',
     stylesheet: 'audio/controls.css',
   },
@@ -92,9 +92,9 @@ const skinContracts = {
     preset: 'audio',
     stylesheet: 'audio/controls.css',
   },
-  'minimal-audio': {
+  'neutral-audio': {
     exportName: 'AudioSkin',
-    theme: 'minimal',
+    theme: 'neutral',
     preset: 'audio',
     stylesheet: 'audio/controls.css',
   },
@@ -141,7 +141,7 @@ describe('Skins Vite workflow', () => {
   }, 30_000);
 
   it('reports VJSC style diagnostics through the Vite logger', async () => {
-    await server.transformRequest(`${minimalControlsUrl}&diagnostics=1`);
+    await server.transformRequest(`${neutralControlsUrl}&diagnostics=1`);
     const warnings = [...warn.mock.calls, ...warnOnce.mock.calls].flat().join('\n');
 
     expect(warnings).toContain('[VJSC_STYLE_COMPLEX_SELECTOR]');
@@ -362,8 +362,8 @@ describe('Skins Vite workflow', () => {
   }, 30_000);
 
   it('serves optimized icon families with the authored element runtime', async () => {
-    const resolved = await server.pluginContainer.resolveId('@videojs/icons/element/minimal');
-    if (!resolved) throw new Error('Expected the source icon plugin to resolve the minimal family.');
+    const resolved = await server.pluginContainer.resolveId('@videojs/icons/element/neutral');
+    if (!resolved) throw new Error('Expected the source icon plugin to resolve the neutral family.');
 
     const loaded = await server.pluginContainer.load(resolved.id);
     const source = isString(loaded) ? loaded : loaded?.code;

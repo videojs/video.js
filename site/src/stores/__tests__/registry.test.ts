@@ -108,7 +108,7 @@ describe('selectRegistryFramework', () => {
 
   it('initializes registry choices from the destination of a client navigation', () => {
     registrySkin.set('video');
-    registryTheme.set('minimal');
+    registryTheme.set('neutral');
     const to = new URL('https://videojs.org/docs/guides/installation/shadcn?framework=html&template=astro&styling=css');
 
     document.dispatchEvent(Object.assign(new Event('astro:before-swap'), { to }));

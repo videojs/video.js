@@ -27,7 +27,7 @@ type NavbarProps = {
   optionsId: string;
 };
 
-const SKIN_OPTIONS: readonly Skin[] = ['default', 'minimal'] satisfies readonly (typeof SKINS)[number][];
+const SKIN_OPTIONS: readonly Skin[] = ['default', 'neutral'] satisfies readonly (typeof SKINS)[number][];
 
 /** What plays: the platform, the media, and its source. The skin controls sit in the preview's header below. */
 export function Navbar({

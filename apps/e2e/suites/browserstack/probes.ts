@@ -6,8 +6,8 @@ interface Page {
 export const PAGES: readonly Page[] = [
   { path: '/pages/html-video-mp4.html', preset: 'video' },
   { path: '/pages/react-video-mp4.html', preset: 'video' },
-  { path: '/pages/html-video-minimal-mp4.html', preset: 'video' },
-  { path: '/pages/react-video-minimal-mp4.html', preset: 'video' },
+  { path: '/pages/html-video-neutral-mp4.html', preset: 'video' },
+  { path: '/pages/react-video-neutral-mp4.html', preset: 'video' },
   { path: '/pages/html-audio-mp4.html', preset: 'audio' },
   { path: '/pages/react-audio-mp4.html', preset: 'audio' },
 ];
@@ -48,7 +48,7 @@ export function readProbe(query: typeof deepQuery): Probe | null {
   const surfaces: Element[] = [];
   const blurRoots: (Document | ShadowRoot)[] = [document];
 
-  // The default skin blurs the whole bar and the minimal skin its control groups, so accept any controls surface.
+  // The default skin blurs the whole bar and the neutral skin its control groups, so accept any controls surface.
   for (let index = 0; index < blurRoots.length; index++) {
     for (const element of blurRoots[index]!.querySelectorAll('*')) {
       if (element.shadowRoot) blurRoots.push(element.shadowRoot);

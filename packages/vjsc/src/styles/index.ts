@@ -7,7 +7,7 @@ export { type StyleDefinition, type StyleRule, type StyleValue, styles } from '.
  * ```ts
  * declare module 'vjsc/styles' {
  *   interface StyleVariants {
- *     minimal: true;
+ *     neutral: true;
  *   }
  * }
  * ```

@@ -36,7 +36,7 @@ describe('createReactPackageSkins', () => {
       `import { cn } from '@videojs/utils/style'`
     );
     expect(files.get('packages/react/src/internal/skins/default-video/components/themed.tsx')).toContain('default');
-    expect(files.get('packages/react/src/internal/skins/minimal-video/components/themed.tsx')).toContain('minimal');
+    expect(files.get('packages/react/src/internal/skins/neutral-video/components/themed.tsx')).toContain('neutral');
   });
 
   it('generates a module per skin when its source is shared but a dependency is not', async () => {
@@ -52,7 +52,7 @@ describe('createReactPackageSkins', () => {
 
     // `label.tsx` reads the same in every skin, but it imports the themed module, which differs per skin.
     expect(files.has('packages/react/src/internal/skins/shared/components/label.tsx')).toBe(false);
-    expect(files.get('packages/react/src/internal/skins/minimal-video/components/label.tsx')).toContain(
+    expect(files.get('packages/react/src/internal/skins/neutral-video/components/label.tsx')).toContain(
       "from './themed'"
     );
     expect(files.get('packages/react/src/internal/skins/default-video/components/label.tsx')).toContain(
@@ -64,7 +64,7 @@ describe('createReactPackageSkins', () => {
 function fixtureGraph(root: string): Graph<SkinModuleMeta> {
   const modules = new Map();
 
-  for (const theme of ['default', 'minimal'] as const) {
+  for (const theme of ['default', 'neutral'] as const) {
     for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
       const skin = `${theme}-${preset}` as const;
       const rootId = `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx?skin=${skin}&style=css&target=react`;

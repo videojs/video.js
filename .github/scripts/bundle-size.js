@@ -82,10 +82,10 @@ const UI_PARTS = new Set([
 const PRESET_CONFIGS = [
   { label: '/video (default)', preset: 'video', skin: 'skin', hls: false },
   { label: '/video (default + hls)', preset: 'video', skin: 'skin', hls: true },
-  { label: '/video (minimal)', preset: 'video', skin: 'minimal-skin', hls: false },
-  { label: '/video (minimal + hls)', preset: 'video', skin: 'minimal-skin', hls: true },
+  { label: '/video (neutral)', preset: 'video', skin: 'neutral-skin', hls: false },
+  { label: '/video (neutral + hls)', preset: 'video', skin: 'neutral-skin', hls: true },
   { label: '/audio (default)', preset: 'audio', skin: 'skin', hls: false },
-  { label: '/audio (minimal)', preset: 'audio', skin: 'minimal-skin', hls: false },
+  { label: '/audio (neutral)', preset: 'audio', skin: 'neutral-skin', hls: false },
   { label: '/background', preset: 'background', skin: 'skin', hls: false },
 ];
 
@@ -99,10 +99,10 @@ const PRESET_CONFIGS = [
 const PRESET_EXPORTS = {
   html: {
     'video/skin': { path: 'define/video/skin.js', name: 'VideoSkinElement' },
-    'video/minimal-skin': { path: 'define/video/minimal-skin.js', name: 'MinimalVideoSkinElement' },
+    'video/neutral-skin': { path: 'define/video/neutral-skin.js', name: 'NeutralVideoSkinElement' },
     'video/player': { path: 'define/video/player.js', name: 'VideoPlayerElement' },
     'audio/skin': { path: 'define/audio/skin.js', name: 'AudioSkinElement' },
-    'audio/minimal-skin': { path: 'define/audio/minimal-skin.js', name: 'MinimalAudioSkinElement' },
+    'audio/neutral-skin': { path: 'define/audio/neutral-skin.js', name: 'NeutralAudioSkinElement' },
     'audio/player': { path: 'define/audio/player.js', name: 'AudioPlayerElement' },
     'background/skin': { path: 'define/background/skin.js', name: 'BackgroundVideoSkinElement' },
     'background/player': { path: 'define/background/player.js', name: 'BackgroundVideoPlayerElement' },
@@ -110,10 +110,10 @@ const PRESET_EXPORTS = {
   },
   react: {
     'video/skin': { path: 'presets/video/skin.js', name: 'VideoSkin' },
-    'video/minimal-skin': { path: 'presets/video/minimal-skin.js', name: 'MinimalVideoSkin' },
+    'video/neutral-skin': { path: 'presets/video/neutral-skin.js', name: 'NeutralVideoSkin' },
     'video/media': { path: 'media/video.js', name: 'Video' },
     'audio/skin': { path: 'presets/audio/skin.js', name: 'AudioSkin' },
-    'audio/minimal-skin': { path: 'presets/audio/minimal-skin.js', name: 'MinimalAudioSkin' },
+    'audio/neutral-skin': { path: 'presets/audio/neutral-skin.js', name: 'NeutralAudioSkin' },
     'audio/media': { path: 'media/audio.js', name: 'Audio' },
     'background/skin': { path: 'presets/background/skin.js', name: 'BackgroundVideoSkin' },
     'background/media': { path: 'media/background-video/index.js', name: 'BackgroundVideo' },

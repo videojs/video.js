@@ -8,21 +8,21 @@ const SANDBOX_BASE = process.env.SANDBOX_URL ?? 'http://localhost:5299';
 // install (CSS), and the registry's two React catalogs.
 const CASES = [
   { platform: 'html', skin: 'default', styling: 'css', skins: 'package' },
-  { platform: 'html', skin: 'minimal', styling: 'css', skins: 'package' },
+  { platform: 'html', skin: 'neutral', styling: 'css', skins: 'package' },
   { platform: 'html', skin: 'default', styling: 'css', skins: 'registry' },
-  { platform: 'html', skin: 'minimal', styling: 'css', skins: 'registry' },
+  { platform: 'html', skin: 'neutral', styling: 'css', skins: 'registry' },
   { platform: 'react', skin: 'default', styling: 'css', skins: 'package' },
-  { platform: 'react', skin: 'minimal', styling: 'css', skins: 'package' },
+  { platform: 'react', skin: 'neutral', styling: 'css', skins: 'package' },
   { platform: 'react', skin: 'default', styling: 'css', skins: 'registry' },
-  { platform: 'react', skin: 'minimal', styling: 'css', skins: 'registry' },
+  { platform: 'react', skin: 'neutral', styling: 'css', skins: 'registry' },
   { platform: 'react', skin: 'default', styling: 'tailwind', skins: 'registry' },
-  { platform: 'react', skin: 'minimal', styling: 'tailwind', skins: 'registry' },
+  { platform: 'react', skin: 'neutral', styling: 'tailwind', skins: 'registry' },
 ] as const;
 const HTML_REGISTRY_ERROR_CASES = [
   { media: 'video', skin: 'default' },
-  { media: 'video', skin: 'minimal' },
+  { media: 'video', skin: 'neutral' },
   { media: 'audio', skin: 'default' },
-  { media: 'audio', skin: 'minimal' },
+  { media: 'audio', skin: 'neutral' },
 ] as const;
 
 test.use({ trace: 'off' });
@@ -49,7 +49,7 @@ for (const { platform, skin, styling, skins } of CASES) {
 
     // The package's element hosts the skin's custom properties; every other install puts them on the container.
     const host =
-      platform === 'html' && skins === 'package' ? page.locator('video-skin, video-minimal-skin').first() : root;
+      platform === 'html' && skins === 'package' ? page.locator('video-skin, video-neutral-skin').first() : root;
 
     await host.evaluate((element) => {
       element.style.setProperty('--media-accent-color', '#123456');
@@ -203,7 +203,7 @@ for (const media of ['video', 'audio'] as const) {
 }
 
 for (const media of ['video', 'audio'] as const) {
-  for (const skin of ['default', 'minimal'] as const) {
+  for (const skin of ['default', 'neutral'] as const) {
     test(`cdn ${skin} selects the live ${media} skin`, async ({ page }) => {
       const query = new URLSearchParams({
         media: `hls-${media}`,
@@ -310,7 +310,7 @@ for (const { platform, skin, styling, skins } of CASES) {
     await muteButton.hover();
     const muteTooltip = page.locator('[popover="manual"]').filter({ hasText: 'Unmute' }).first();
 
-    if (skin === 'minimal') await expect(muteTooltip).toBeVisible();
+    if (skin === 'neutral') await expect(muteTooltip).toBeVisible();
     else await expect(muteTooltip).toBeHidden();
 
     const volumeThumb = page.getByRole('slider', { name: 'Volume' }).first();
@@ -319,7 +319,7 @@ for (const { platform, skin, styling, skins } of CASES) {
     await expect(volumeThumb).toHaveCSS('opacity', '1');
     await expect(volumeThumb).toHaveCSS('scale', '1');
 
-    if (skin === 'minimal') await expect(muteTooltip).toBeVisible();
+    if (skin === 'neutral') await expect(muteTooltip).toBeVisible();
 
     await muteButton.focus();
     await page.keyboard.press('Tab');
@@ -331,11 +331,11 @@ for (const { platform, skin, styling, skins } of CASES) {
 }
 
 for (const skins of ['package', 'registry'] as const) {
-  test(`html minimal from ${skins} keeps the thumbnail inside the player`, async ({ page }) => {
+  test(`html neutral from ${skins} keeps the thumbnail inside the player`, async ({ page }) => {
     const query = new URLSearchParams({
       styling: 'css',
       skins,
-      skin: 'minimal',
+      skin: 'neutral',
       source: 'hls-1',
       autoplay: '0',
       muted: '1',

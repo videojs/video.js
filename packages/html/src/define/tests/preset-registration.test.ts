@@ -62,10 +62,10 @@ describe('preset registration boundaries', () => {
   });
 
   it.each([
-    ['video/minimal-skin', 'video-minimal-skin', () => import('../video/minimal-skin')],
-    ['audio/minimal-skin', 'audio-minimal-skin', () => import('../audio/minimal-skin')],
-    ['live-video/minimal-skin', 'live-video-minimal-skin', () => import('../live-video/minimal-skin')],
-    ['live-audio/minimal-skin', 'live-audio-minimal-skin', () => import('../live-audio/minimal-skin')],
+    ['video/neutral-skin', 'video-neutral-skin', () => import('../video/neutral-skin')],
+    ['audio/neutral-skin', 'audio-neutral-skin', () => import('../audio/neutral-skin')],
+    ['live-video/neutral-skin', 'live-video-neutral-skin', () => import('../live-video/neutral-skin')],
+    ['live-audio/neutral-skin', 'live-audio-neutral-skin', () => import('../live-audio/neutral-skin')],
   ])('%s registers its exact UI closure and skin without the player', async (entry, skinTag, load) => {
     const before = define.mock.calls.length;
 

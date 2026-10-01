@@ -39,7 +39,7 @@ describe('@videojs/html/icons', () => {
     });
   });
 
-  it('renders minimal icons from the lazy family loader', async () => {
+  it('renders neutral icons from the lazy family loader', async () => {
     const testWindow = new Window();
 
     vi.stubGlobal('window', testWindow);
@@ -47,7 +47,7 @@ describe('@videojs/html/icons', () => {
     vi.stubGlobal('customElements', testWindow.customElements);
     vi.stubGlobal('HTMLElement', testWindow.HTMLElement);
 
-    document.body.innerHTML = '<media-icon family="minimal" name="play"></media-icon>';
+    document.body.innerHTML = '<media-icon family="neutral" name="play"></media-icon>';
 
     await import('../element');
     await customElements.whenDefined('media-icon');
@@ -106,9 +106,9 @@ describe('@videojs/html/icons', () => {
     vi.stubGlobal('customElements', testWindow.customElements);
     vi.stubGlobal('HTMLElement', testWindow.HTMLElement);
 
-    document.body.innerHTML = '<media-icon family="minimal" name="play"></media-icon>';
+    document.body.innerHTML = '<media-icon family="neutral" name="play"></media-icon>';
 
-    await import('../element/minimal');
+    await import('../element/neutral');
     await customElements.whenDefined('media-icon');
 
     expect(document.querySelector('media-icon')?.innerHTML).toContain('<svg');

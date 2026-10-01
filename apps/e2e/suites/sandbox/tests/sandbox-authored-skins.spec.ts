@@ -19,7 +19,7 @@ test.use({ trace: 'off' });
 test.skip(!WORKSPACE_SKINS, 'The authored skins are only compiled inside the workspace.');
 
 for (const { platform, styling } of CASES) {
-  for (const skin of ['default', 'minimal'] as const) {
+  for (const skin of ['default', 'neutral'] as const) {
     test(`${platform} ${skin} ${styling} renders the authored skin`, async ({ page }) => {
       const errors: string[] = [];
 

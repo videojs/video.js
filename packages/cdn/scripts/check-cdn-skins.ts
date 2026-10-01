@@ -24,11 +24,11 @@ const skins = [
     scope: '.media-skin[data-theme=default][data-preset=video]',
   },
   {
-    entry: 'video-minimal',
-    generated: 'minimal-video',
-    skinTag: 'video-minimal-skin',
+    entry: 'video-neutral',
+    generated: 'neutral-video',
+    skinTag: 'video-neutral-skin',
     playerTag: 'video-player',
-    scope: '.media-skin[data-theme=minimal][data-preset=video]',
+    scope: '.media-skin[data-theme=neutral][data-preset=video]',
   },
   {
     entry: 'audio',
@@ -38,11 +38,11 @@ const skins = [
     scope: '.media-skin[data-theme=default][data-preset=audio]',
   },
   {
-    entry: 'audio-minimal',
-    generated: 'minimal-audio',
-    skinTag: 'audio-minimal-skin',
+    entry: 'audio-neutral',
+    generated: 'neutral-audio',
+    skinTag: 'audio-neutral-skin',
     playerTag: 'audio-player',
-    scope: '.media-skin[data-theme=minimal][data-preset=audio]',
+    scope: '.media-skin[data-theme=neutral][data-preset=audio]',
   },
   {
     entry: 'live-video',
@@ -52,11 +52,11 @@ const skins = [
     scope: '.media-skin[data-theme=default][data-preset=live-video]',
   },
   {
-    entry: 'live-video-minimal',
-    generated: 'minimal-live-video',
-    skinTag: 'live-video-minimal-skin',
+    entry: 'live-video-neutral',
+    generated: 'neutral-live-video',
+    skinTag: 'live-video-neutral-skin',
     playerTag: 'live-video-player',
-    scope: '.media-skin[data-theme=minimal][data-preset=live-video]',
+    scope: '.media-skin[data-theme=neutral][data-preset=live-video]',
   },
   {
     entry: 'live-audio',
@@ -66,11 +66,11 @@ const skins = [
     scope: '.media-skin[data-theme=default][data-preset=live-audio]',
   },
   {
-    entry: 'live-audio-minimal',
-    generated: 'minimal-live-audio',
-    skinTag: 'live-audio-minimal-skin',
+    entry: 'live-audio-neutral',
+    generated: 'neutral-live-audio',
+    skinTag: 'live-audio-neutral-skin',
     playerTag: 'live-audio-player',
-    scope: '.media-skin[data-theme=minimal][data-preset=live-audio]',
+    scope: '.media-skin[data-theme=neutral][data-preset=live-audio]',
   },
 ] as const;
 

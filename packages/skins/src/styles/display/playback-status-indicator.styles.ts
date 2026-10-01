@@ -7,7 +7,7 @@ const icon = [
 
 const iconVariants = {
   default: ['size-media-icon-lg'],
-  minimal: ['size-media-icon-xl'],
+  neutral: ['size-media-icon-xl'],
 } as const;
 
 export default styles({
@@ -30,7 +30,7 @@ export default styles({
       ],
       variants: {
         default: [...iconVariants.default, 'group-data-[status=play]/playback-status:translate-x-px'],
-        minimal: iconVariants.minimal,
+        neutral: iconVariants.neutral,
       },
     },
     pauseIcon: {

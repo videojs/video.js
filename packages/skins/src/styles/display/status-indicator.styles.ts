@@ -4,7 +4,7 @@ const icon = ['hidden shrink-0'] as const;
 
 const iconVariants = {
   default: ['mix-blend-difference'],
-  minimal: ['drop-shadow-media-icon'],
+  neutral: ['drop-shadow-media-icon'],
 } as const;
 
 export default styles({

@@ -90,7 +90,7 @@ const selectionQueries = INSTALLATION_QUERY_PARAMETERS.filter((query) => query !
 
 // Presets whose skin query changes nothing, so the skin section has nothing to offer.
 const presetsWithoutSkinChoice = routes.react!.presets.filter(
-  (preset) => parse('react', { preset, skin: 'minimal' }).skin === parse('react', { preset }).skin
+  (preset) => parse('react', { preset, skin: 'neutral' }).skin === parse('react', { preset }).skin
 );
 
 // Combinations whose Shadcn configuration happens during app creation or the registry step instead of its own section.

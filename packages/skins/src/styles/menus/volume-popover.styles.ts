@@ -11,7 +11,7 @@ export default styles({
         'data-[side=right]:[--media-popover-side-offset:0rem]',
       ],
       variants: {
-        minimal: [
+        neutral: [
           'data-[side=left]:rounded-none data-[side=left]:border-0 data-[side=left]:py-0 data-[side=left]:ps-16 data-[side=left]:pe-2',
           'data-[side=left]:surface-media-none! data-[side=left]:bg-linear-to-l data-[side=left]:from-media-controls data-[side=left]:from-80% data-[side=left]:to-transparent',
           'data-[side=left]:after:hidden',

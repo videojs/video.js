@@ -41,7 +41,7 @@ describe('RegistryOptionsClient', () => {
   it('uses route defaults for server markup when client selections differ', () => {
     registrySkin.set('audio');
     registryStyling.set('css');
-    registryTheme.set('minimal');
+    registryTheme.set('neutral');
 
     const catalogMarkup = renderToString(
       <RegistryOptionsClient

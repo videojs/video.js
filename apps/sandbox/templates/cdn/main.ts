@@ -162,20 +162,20 @@ async function loadCdnPlayer(skin: Skin, live: boolean) {
   switch (descriptor.player) {
     case 'video':
       if (live) {
-        if (skin === 'minimal') await import('@videojs/cdn/live-video-minimal');
+        if (skin === 'neutral') await import('@videojs/cdn/live-video-neutral');
         else await import('@videojs/cdn/live-video');
       } else {
-        if (skin === 'minimal') await import('@videojs/cdn/video-minimal');
+        if (skin === 'neutral') await import('@videojs/cdn/video-neutral');
         else await import('@videojs/cdn/video');
       }
 
       break;
     case 'audio':
       if (live) {
-        if (skin === 'minimal') await import('@videojs/cdn/live-audio-minimal');
+        if (skin === 'neutral') await import('@videojs/cdn/live-audio-neutral');
         else await import('@videojs/cdn/live-audio');
       } else {
-        if (skin === 'minimal') await import('@videojs/cdn/audio-minimal');
+        if (skin === 'neutral') await import('@videojs/cdn/audio-neutral');
         else await import('@videojs/cdn/audio');
       }
 

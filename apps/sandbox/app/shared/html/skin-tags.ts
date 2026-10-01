@@ -7,9 +7,9 @@ export function skinPreset(player: 'video' | 'audio', live: boolean): SkinPreset
   return live ? `live-${player}` : player;
 }
 
-/** The custom element the framework package registers for a skin, such as `video-minimal-skin`. */
+/** The custom element the framework package registers for a skin, such as `video-neutral-skin`. */
 export function packageSkinTag(preset: SkinPreset, skin: Skin): string {
-  return skin === 'minimal' ? `${preset}-minimal-skin` : `${preset}-skin`;
+  return skin === 'neutral' ? `${preset}-neutral-skin` : `${preset}-skin`;
 }
 
 /**

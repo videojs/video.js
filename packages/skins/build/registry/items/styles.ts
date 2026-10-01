@@ -20,11 +20,11 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
   const themes = [
     {
       ...shared,
-      name: '_style-minimal',
-      target: 'styles/themes/minimal.css',
-      files: { './styles/themes/minimal.css': 'styles/themes/minimal.css' },
-      title: 'Video.js Minimal theme',
-      description: 'Editable token overrides used only by Minimal skins.',
+      name: '_style-neutral',
+      target: 'styles/themes/neutral.css',
+      files: { './styles/themes/neutral.css': 'styles/themes/neutral.css' },
+      title: 'Video.js Neutral theme',
+      description: 'Editable token overrides used only by Neutral skins.',
     },
     {
       ...shared,
@@ -41,12 +41,12 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
     },
     {
       ...shared,
-      name: '_style-video-minimal',
-      target: 'styles/video/minimal.css',
-      files: { './styles/video/minimal.css': 'styles/video/minimal.css' },
-      title: 'Video.js Minimal video styles',
-      description: 'Minimal video stylesheet entry.',
-      registryDependencies: ['@videojs/_style-minimal', '@videojs/_style-video'],
+      name: '_style-video-neutral',
+      target: 'styles/video/neutral.css',
+      files: { './styles/video/neutral.css': 'styles/video/neutral.css' },
+      title: 'Video.js Neutral video styles',
+      description: 'Neutral video stylesheet entry.',
+      registryDependencies: ['@videojs/_style-neutral', '@videojs/_style-video'],
     },
     {
       ...shared,
@@ -62,12 +62,12 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
     },
     {
       ...shared,
-      name: '_style-audio-minimal',
-      target: 'styles/audio/minimal.css',
-      files: { './styles/audio/minimal.css': 'styles/audio/minimal.css' },
-      title: 'Video.js Minimal audio styles',
-      description: 'Minimal audio stylesheet entry.',
-      registryDependencies: ['@videojs/_style-audio', '@videojs/_style-minimal'],
+      name: '_style-audio-neutral',
+      target: 'styles/audio/neutral.css',
+      files: { './styles/audio/neutral.css': 'styles/audio/neutral.css' },
+      title: 'Video.js Neutral audio styles',
+      description: 'Neutral audio stylesheet entry.',
+      registryDependencies: ['@videojs/_style-audio', '@videojs/_style-neutral'],
     },
   ] satisfies NonNullable<RegistryStylesOptions['themes']>;
 
@@ -86,7 +86,7 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
       description: 'Editable shared media tokens, resets, preferences, and Tailwind compiler integration.',
       tailwind: target.styling === 'tailwind' ? './styles/tailwind.css' : undefined,
     },
-    themes: themes.filter(({ name }) => target.theme === 'minimal' || !name.endsWith('-minimal')),
+    themes: themes.filter(({ name }) => target.theme === 'neutral' || !name.endsWith('-neutral')),
     files: target.framework === 'react' && target.styling === 'css' ? 'styles' : undefined,
   };
 }

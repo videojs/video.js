@@ -20,7 +20,7 @@ export default styles({
       ],
       variants: {
         default: 'gap-3 px-5',
-        minimal: [
+        neutral: [
           'gap-4 px-3 backdrop-filter-none transition-[opacity,filter,scale]',
           'media-transitioning:scale-media-hidden-popup',
         ],

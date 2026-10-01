@@ -18,7 +18,7 @@ export default styles({
         'focus-visible:outline-media-ring focus-visible:outline-offset-2',
       ],
       variants: {
-        minimal:
+        neutral:
           'supports-[corner-shape:squircle]:rounded-2xl supports-[corner-shape:squircle]:[corner-shape:squircle]',
       },
     },

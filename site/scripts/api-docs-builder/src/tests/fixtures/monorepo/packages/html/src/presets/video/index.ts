@@ -6,6 +6,6 @@
  * (the native <video> is implied by the preset name).
  */
 export { videoFeatures } from '../../../../core/src/dom/store/features/presets';
-export { MinimalVideoSkinElement } from '../../define/video/minimal-skin';
+export { NeutralVideoSkinElement } from '../../define/video/neutral-skin';
 export { VideoSkinElement } from './skin';
 export { VideoSkinTailwindElement } from '../../define/video/skin.tailwind';

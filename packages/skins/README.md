@@ -9,7 +9,7 @@ Canonical VJSC skin sources and the generators that deliver them to [`@videojs/h
 Follow one skin from source to output.
 
 1. **A skin is a component tree.** [`src/skins/default/video/skin.tsx`](./src/skins/default/video/skin.tsx) composes preset parts from [`src/skins/shared/video/`](./src/skins/shared/video) with shared components such as `Container` and `Poster`. Each `<theme>/<preset>` folder owns only what differs for that skin.
-2. **Components pair markup with styles.** [`src/components/`](./src/components) holds the target-neutral UI. Every `x.tsx` sits beside an `x.styles.ts` that lists Tailwind classes per rule, with `default` and `minimal` variants where the themes differ. Skin-only overrides live beside the skin, for example [`src/skins/default/video/layout/controls.styles.ts`](./src/skins/default/video/layout/controls.styles.ts).
+2. **Components pair markup with styles.** [`src/components/`](./src/components) holds the target-independent UI. Every `x.tsx` sits beside an `x.styles.ts` that lists Tailwind classes per rule, with `default` and `neutral` variants where the themes differ. Skin-only overrides live beside the skin, for example [`src/skins/default/video/layout/controls.styles.ts`](./src/skins/default/video/layout/controls.styles.ts).
 3. **Classes resolve through tokens.** Style modules read `--media-*` tokens through Tailwind theme keys such as `duration-media-fast`, never literal values that vary per theme. Tokens are declared in [`src/styles/themes/`](./src/styles/themes) and classified in [`src/styles/vars.ts`](./src/styles/vars.ts).
 4. **The build lowers everything per target.** The [vjsc](../vjsc) compiler, configured in [`build/`](./build), turns each module into React and HTML implementations, compiles class lists into scoped CSS for the CSS targets, and emits Shadcn registry items. The build tooling and the playground consume the built `vjsc` package, so after a compiler change run `pnpm -F vjsc build` (or keep `pnpm -F vjsc dev` running) and restart the playground.
 5. **The sandbox shows the result.** `pnpm dev:sandbox` and pick **Authored source** under *Skins from* to render any skin straight from this source, on either platform and in either styling, at any width and color scheme. **Compare** puts CSS beside Tailwind (`compare=styling`) or the authored skin beside the one its framework package ships (`compare=skins`), **Direction** flips the text direction, and **Report** copies the environment details. The skin-parity suite in `apps/e2e` drives the same pages.
@@ -19,7 +19,7 @@ Follow one skin from source to output.
 | Path                                                             | Owns                                                                                                                                       |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`src/components/`](./src/components)                            | Shared UI grouped as behaviors, buttons, dialogs, display, layout, menus, and sliders.                                                     |
-| [`src/skins/`](./src/skins)                                      | Skin folders grouped by theme and preset (`default/video`, `minimal/audio`, and so on), with reused parts under `shared/`. |
+| [`src/skins/`](./src/skins)                                      | Skin folders grouped by theme and preset (`default/video`, `neutral/audio`, and so on), with reused parts under `shared/`. |
 | [`src/styles/`](./src/styles)                                    | Base resets, themes, tokens, the shared Tailwind source, and style modules grouped like the components.                                    |
 | [`src/presets/`](./src/presets)                                  | The handwritten background preset, copied into both packages as is.                                                                        |
 | [`src/meta.ts`](./src/meta.ts)                                   | Skin and component metadata for the registry. Shared parts use `defineRenderTarget` from `vjsc/components`.                              |
@@ -32,10 +32,10 @@ Follow one skin from source to output.
 [`base.css`](./src/styles/base.css) fixes the cascade: `base.theme` holds tokens and `base.preferences` overrides them, so a reduced motion, reduced transparency, or forced colors preference wins regardless of selector specificity.
 
 - [`themes/theme.css`](./src/styles/themes/theme.css) declares every default token, grouped by colors, shadows, controls, motion, popups, sliders, and frame.
-- [`themes/minimal.css`](./src/styles/themes/minimal.css) overrides tokens only for Minimal skins.
+- [`themes/neutral.css`](./src/styles/themes/neutral.css) overrides tokens only for Neutral skins.
 - [`video/theme.css`](./src/styles/video/theme.css) and [`audio/theme.css`](./src/styles/audio/theme.css) override tokens per media preset.
 - [`themes/preferences.css`](./src/styles/themes/preferences.css) collapses durations and neutralizes hidden-state values under reduced motion, and switches backdrop filters off under reduced transparency.
-- [`video/base.css`](./src/styles/video/base.css) and [`audio/base.css`](./src/styles/audio/base.css) are the default preset entries. Their adjacent `minimal.css` entries add only the Minimal token layer.
+- [`video/base.css`](./src/styles/video/base.css) and [`audio/base.css`](./src/styles/audio/base.css) are the default preset entries. Their adjacent `neutral.css` entries add only the Neutral token layer.
 - [`vars.ts`](./src/styles/vars.ts) classifies every token as public, runtime, or internal. [`utilities.ts`](./src/styles/utilities.ts) describes every shared utility, variant, and computed theme key.
 
 ## Tailwind entry files
@@ -59,7 +59,7 @@ Add a shared recipe to `tailwind.css` as a flat `@utility`, describe it in `util
 
 The normal registry E2E packs the current workspace packages so source and package changes can be tested before release. The Netlify production build additionally runs `pnpm test:e2e:registry:published` from the workspace root. That smoke test creates a fresh Next app, installs the video and audio skins through the stock Shadcn CLI, and builds them against the registry's exact npm package pins without local overrides. It is expected to pass only after those package versions have been published. To compare unreleased registry source with the newest package cut locally, run the same command with `VIDEOJS_REGISTRY_PACKAGE_TAG=latest`; production leaves that override unset.
 
-Each framework and styling has a default catalog and a `/minimal` catalog. Both publish the same item names (`video`, `audio`, `live-video`, and `live-audio`) and install to the same preset paths under `components/videojs/`. A project chooses one theme by pointing its Shadcn namespace at one catalog; the default catalog keeps the shorter URL. Shared UI always installs under `components/videojs/ui/`, while preset composition stays under its preset directory.
+Each framework and styling has a default catalog and a `/neutral` catalog. Both publish the same item names (`video`, `audio`, `live-video`, and `live-audio`) and install to the same preset paths under `components/videojs/`. A project chooses one theme by pointing its Shadcn namespace at one catalog; the default catalog keeps the shorter URL. Shared UI always installs under `components/videojs/ui/`, while preset composition stays under its preset directory.
 
 ## Commands
 

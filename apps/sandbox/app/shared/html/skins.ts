@@ -14,13 +14,13 @@ export interface HtmlSkinRequest {
 /** The framework package's skin modules, which register the custom element for each preset and skin. */
 const packageSkins = {
   'video/default': () => import('@videojs/html/video/skin'),
-  'video/minimal': () => import('@videojs/html/video/minimal-skin'),
+  'video/neutral': () => import('@videojs/html/video/neutral-skin'),
   'live-video/default': () => import('@videojs/html/live-video/skin'),
-  'live-video/minimal': () => import('@videojs/html/live-video/minimal-skin'),
+  'live-video/neutral': () => import('@videojs/html/live-video/neutral-skin'),
   'audio/default': () => import('@videojs/html/audio/skin'),
-  'audio/minimal': () => import('@videojs/html/audio/minimal-skin'),
+  'audio/neutral': () => import('@videojs/html/audio/neutral-skin'),
   'live-audio/default': () => import('@videojs/html/live-audio/skin'),
-  'live-audio/minimal': () => import('@videojs/html/live-audio/minimal-skin'),
+  'live-audio/neutral': () => import('@videojs/html/live-audio/neutral-skin'),
 } satisfies Record<`${SkinPreset}/${Skin}`, () => Promise<unknown>>;
 
 async function loadPackageSkin({ player, live, skin }: HtmlSkinRequest, preset: SkinPreset): Promise<string> {

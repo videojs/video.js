@@ -15,16 +15,16 @@ describe('HTML preset exports', () => {
     expect(define).not.toHaveBeenCalled();
     expect(video.VideoPlayerElement).toBeTypeOf('function');
     expect(video.VideoSkinElement).toBeTypeOf('function');
-    expect(video.MinimalVideoSkinElement).toBeTypeOf('function');
+    expect(video.NeutralVideoSkinElement).toBeTypeOf('function');
     expect(audio.AudioPlayerElement).toBeTypeOf('function');
     expect(audio.AudioSkinElement).toBeTypeOf('function');
-    expect(audio.MinimalAudioSkinElement).toBeTypeOf('function');
+    expect(audio.NeutralAudioSkinElement).toBeTypeOf('function');
     expect(liveVideo.LiveVideoPlayerElement).toBeTypeOf('function');
     expect(liveVideo.LiveVideoSkinElement).toBeTypeOf('function');
-    expect(liveVideo.MinimalLiveVideoSkinElement).toBeTypeOf('function');
+    expect(liveVideo.NeutralLiveVideoSkinElement).toBeTypeOf('function');
     expect(liveAudio.LiveAudioPlayerElement).toBeTypeOf('function');
     expect(liveAudio.LiveAudioSkinElement).toBeTypeOf('function');
-    expect(liveAudio.MinimalLiveAudioSkinElement).toBeTypeOf('function');
+    expect(liveAudio.NeutralLiveAudioSkinElement).toBeTypeOf('function');
     expect(background.BackgroundVideoPlayerElement).toBeTypeOf('function');
     expect(background.BackgroundVideoSkinElement).toBeTypeOf('function');
 

@@ -40,7 +40,7 @@ export type SkinRootModule = GraphModule<SkinMeta & { readonly name: SkinName }>
 const publishedSkins = Object.keys(skinStyles).filter(isSkinName);
 const representativeSkins = {
   default: 'default-video',
-  minimal: 'minimal-video',
+  neutral: 'neutral-video',
 } as const satisfies Record<SkinStyle['theme'], SkinName>;
 
 /** The variants one authored module is compiled for. Skin-owned modules compile for their skin only. */
@@ -67,7 +67,7 @@ export function parseVariant(parameters: URLSearchParams): SkinVariant | null {
   if ((target !== 'react' && target !== 'html') || (style !== 'tailwind' && style !== 'css')) return null;
 
   const theme = parameters.get('theme');
-  if (theme !== 'default' && theme !== 'minimal') return null;
+  if (theme !== 'default' && theme !== 'neutral') return null;
 
   const requested = parameters.get('skin');
   const skin = requested && isSkinName(requested) ? requested : undefined;

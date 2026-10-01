@@ -248,7 +248,7 @@ describe('resolveInstallationSelection', () => {
     for (const framework of ['react', 'html'] as const) {
       for (const preset of Object.values(INSTALLATION_PRESETS).filter(({ flag }) => flag !== 'background-video')) {
         for (const media of preset.renderers) {
-          for (const skin of ['default', 'minimal'] as const) {
+          for (const skin of ['default', 'neutral'] as const) {
             const result = resolveInstallationSelection({
               method: 'shadcn',
               framework,
@@ -293,8 +293,8 @@ describe('resolveInstallationSelection', () => {
 
 describe('fitSelectionToPreset', () => {
   it('keeps the skin tier across media types and drops incompatible media', () => {
-    expect(fitSelectionToPreset('default-audio', 'minimal-video', 'youtube')).toEqual({
-      skin: 'minimal-audio',
+    expect(fitSelectionToPreset('default-audio', 'neutral-video', 'youtube')).toEqual({
+      skin: 'neutral-audio',
       media: 'html5-audio',
     });
     expect(fitSelectionToPreset('live-video', 'none', 'mux-video')).toEqual({

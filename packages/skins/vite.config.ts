@@ -11,8 +11,8 @@ const generatedPackageOutputs = [
   { pattern: 'packages/react/src/internal/skins/**', base: 'workspace' as const },
   { pattern: 'packages/react/src/presets/*/skin.tsx', base: 'workspace' as const },
   { pattern: 'packages/react/src/presets/*/skin.css', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/minimal-skin.tsx', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/minimal-skin.css', base: 'workspace' as const },
+  { pattern: 'packages/react/src/presets/*/neutral-skin.tsx', base: 'workspace' as const },
+  { pattern: 'packages/react/src/presets/*/neutral-skin.css', base: 'workspace' as const },
 ] as const;
 
 export default defineConfig({

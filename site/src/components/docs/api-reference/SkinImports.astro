@@ -13,13 +13,13 @@ interface Props {
   preset: string;
   /** Named export from `@videojs/react/<preset>`. */
   react: string;
-  /** Whether this is the preset's minimal variant, shipped as `minimal-skin`. */
-  minimal?: boolean;
+  /** Whether this is the preset's neutral variant, shipped as `neutral-skin`. */
+  neutral?: boolean;
 }
 
-const { preset, react, minimal = false } = Astro.props;
-const module = minimal ? 'minimal-skin' : 'skin';
-const bundle = preset === 'background' ? 'background' : `${preset}${minimal ? '-minimal' : ''}`;
+const { preset, react, neutral = false } = Astro.props;
+const module = neutral ? 'neutral-skin' : 'skin';
+const bundle = preset === 'background' ? 'background' : `${preset}${neutral ? '-neutral' : ''}`;
 const cdnCode = `<script type="module" src="${VJS10_CDN_BASE}/${bundle}.js"></script>`;
 
 const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledLanguage }> = [

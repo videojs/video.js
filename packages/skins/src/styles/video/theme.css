@@ -43,7 +43,7 @@
     }
   }
 
-  .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="minimal"] {
+  .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.15));
     --media-controls-gradient: linear-gradient(
       to top,
@@ -61,7 +61,7 @@
   }
 
   @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {
-    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="minimal"] {
+    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
       --media-controls-gradient: linear-gradient(
         to top in oklab,
         oklch(from var(--media-backdrop) l c h / 0.5),
@@ -71,7 +71,7 @@
   }
 
   @supports (color: oklch(from red l c h)) {
-    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="minimal"] {
+    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
       --media-indicator-gradient: linear-gradient(
         to bottom,
         oklch(from var(--media-backdrop) l c h / 0.35),
@@ -87,7 +87,7 @@
       --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.15)));
     }
 
-    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="minimal"] {
+    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
       --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.15), rgb(255 255 255 / 0.15)));
     }
   }

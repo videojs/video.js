@@ -15,7 +15,7 @@ export default styles({
       utilities: 'bottom-[calc(100%+var(--media-slider-preview-label-offset))] tabular-nums',
       variants: {
         default: 'left-1/2',
-        minimal: '[left:var(--media-preview-left,var(--media-slider-pointer))]',
+        neutral: '[left:var(--media-preview-left,var(--media-slider-pointer))]',
       },
     },
     value: {

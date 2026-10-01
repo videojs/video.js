@@ -239,7 +239,7 @@ export const vars = {
   },
   '--media-indicator-gradient': {
     kind: 'internal',
-    description: 'Theme gradient painted behind Minimal status and volume indicators.',
+    description: 'Theme gradient painted behind Neutral status and volume indicators.',
   },
   '--media-backdrop-filter-surface': {
     kind: 'internal',

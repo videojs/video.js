@@ -10,7 +10,7 @@ import {
 describe('installationExtensionsFor', () => {
   it('offers Google Cast only for compatible adapters with a ready-made video skin', () => {
     expect(installationExtensionsFor('default-video', 'video', 'hls')).toContain('google-cast');
-    expect(installationExtensionsFor('live-video', 'minimal-video', 'dash')).toContain('google-cast');
+    expect(installationExtensionsFor('live-video', 'neutral-video', 'dash')).toContain('google-cast');
     expect(installationExtensionsFor('default-video', 'video', 'html5-video')).not.toContain('google-cast');
     expect(installationExtensionsFor('default-video', 'none', 'hls')).not.toContain('google-cast');
     expect(installationExtensionsFor('default-audio', 'audio', 'mux-audio')).not.toContain('google-cast');

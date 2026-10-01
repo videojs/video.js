@@ -138,7 +138,7 @@ describe('InstallationMethodNavClient', () => {
   it('carries HTML selections into the HTML Shadcn route', async () => {
     window.history.replaceState(null, '', '/docs/guides/installation/html?preset=audio');
     useCase.set('default-audio');
-    skin.set('minimal-audio');
+    skin.set('neutral-audio');
     media.set('html5-audio');
     template.set('vite');
     // Let the store write the picks to the URL, as it does before a reader reaches the method cards.
@@ -151,7 +151,7 @@ describe('InstallationMethodNavClient', () => {
     fireEvent.click(link);
     await Promise.resolve();
 
-    const target = '/docs/guides/installation/shadcn?preset=audio&skin=minimal&framework=html';
+    const target = '/docs/guides/installation/shadcn?preset=audio&skin=neutral&framework=html';
 
     expect(mocks.savePageScrollForNavigation).toHaveBeenCalledWith(target, '[data-installation-method-nav]');
     expect(mocks.navigate).toHaveBeenCalledWith(target, {
@@ -190,7 +190,7 @@ describe('InstallationMethodNavClient', () => {
   it('hands method navigation to Astro with the existing scroll restoration metadata', async () => {
     window.history.replaceState(null, '', '/docs/guides/installation/react?preset=audio');
     useCase.set('default-audio');
-    skin.set('minimal-audio');
+    skin.set('neutral-audio');
     media.set('html5-audio');
     const { getByRole } = render(<InstallationMethodNavClient currentFramework="react" route="react" />);
     const link = getByRole('link', { name: /Shadcn/ });
@@ -199,7 +199,7 @@ describe('InstallationMethodNavClient', () => {
     fireEvent.click(link);
     await Promise.resolve();
 
-    const target = '/docs/guides/installation/shadcn?preset=audio&skin=minimal&framework=react';
+    const target = '/docs/guides/installation/shadcn?preset=audio&skin=neutral&framework=react';
 
     expect(mocks.savePageScrollForNavigation).toHaveBeenCalledWith(target, '[data-installation-method-nav]');
     expect(mocks.navigate).toHaveBeenCalledWith(target, {

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 for (const framework of ['html', 'react']) {
-  for (const skin of ['default', 'minimal']) {
+  for (const skin of ['default', 'neutral']) {
     test(`title updates and hides when empty (${framework}, ${skin})`, async ({ page }) => {
       await page.goto(`/title.html?framework=${framework}&skin=${skin}`);
 
