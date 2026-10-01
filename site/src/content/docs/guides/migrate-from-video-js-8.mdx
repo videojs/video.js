@@ -525,9 +525,9 @@ Map v8's player-specific events separately:
 Use <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink> inside a custom element. Give it a selector for the feature you care about and it keeps your element in sync as that state changes:
 
 ```js
-import { PlayerController, playerContext, ReactiveElement, selectTime } from '@videojs/html';
+import { PlayerController, playerContext, selectTime, UIElement } from '@videojs/html';
 
-class MyElapsed extends ReactiveElement {
+class MyElapsed extends UIElement {
   #time = new PlayerController(this, playerContext, selectTime);
 
   update(changed) {
@@ -732,49 +732,38 @@ The live skins have no time slider. To preserve DVR scrubbing, add one to custom
 The live composition is deliberately narrower than the video one. It leaves out playback rate, quality, and audio-track state, so those controls don't appear in a live skin's settings menu. If you need an omitted feature on a live player, build your own player from a feature list rather than taking the preset's.
 
 <FrameworkCase frameworks={["html"]}>
-Use <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> to build a player with the features you need. Pass it a feature list, and it returns the mixins for defining your own player element.
+That's what <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> is for. Hand it a feature list and you get back a `PlayerElement` class to register as your own player element, plus a `PlayerController` bound to that player's features.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
 Use <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> to build a player with the features you need. Pass it a feature list, and it returns a `Player` component and a `usePlayer` hook. Every preset uses this same pair.
 </FrameworkCase>
 
-## Moved utilities
+## Replace v8 utilities
 
-v8 put a handful of utilities on the `videojs` global for anyone building a custom component or plugin: `videojs.time.formatTime`, `videojs.dom`, `videojs.fn.throttle`, and a few others. v10 has no `videojs` global. Import these utilities from `@videojs/utils`.
+v8 put a handful of utilities on the `videojs` global for anyone building a custom component or plugin: `videojs.time.formatTime`, `videojs.dom`, `videojs.fn.throttle`, and a few others. v10 has no global and no public replacements, so use a platform API, a short helper of your own, or a utility library you already depend on.
 
 | Video.js 8 | Video.js v10 |
 |---|---|
-| `videojs.time.formatTime(seconds, guide)` | `formatTime(seconds, guide)` from `@videojs/utils/time` |
-| a hand-rolled remaining-time or percent string | `formatTimeAsPhrase(seconds)` and `formatPercent(fraction)`, from `@videojs/utils/time` and `@videojs/utils/percent` |
-| `videojs.fn.throttle(fn, wait)` | `throttle(fn, ms)` from `@videojs/utils/function` |
-| `videojs.dom.isEl(value)` and its type-specific cousins | `isHTMLVideoElement`, `isHTMLMediaElement`, `isDocument`, and other narrowing checks from `@videojs/utils/dom` |
-| `videojs.obj.merge(a, b)` | No equivalent deep merge. Keep a deep-merge implementation if your configuration needs recursive merging. |
+| `videojs.time.formatTime(seconds, guide)` | The <DocsLink slug="reference/components/time">Time</DocsLink> component for an on-screen time display. For a string of your own, a few lines of arithmetic (below), or `Intl.DurationFormat` in browsers that support it |
+| `videojs.fn.throttle(fn, wait)` | Your own helper, or `throttle` from a utility library such as lodash |
+| `videojs.dom.isEl(value)` and its type-specific cousins | `instanceof` checks such as `value instanceof Element`, `value instanceof HTMLMediaElement`, or `value instanceof HTMLVideoElement` |
+| `videojs.obj.merge(a, b)` | Object spread (`{ ...a, ...b }`) for a shallow merge, or `merge({}, a, b)` from a utility library such as lodash for a deep one. Pass the empty object first, because lodash's `merge` mutates its first argument |
 
-For a shallow merge where `b` overrides `a`, use `{ ...a, ...b }`.
-
-Throttle timing changes: v8 drops calls within the interval and schedules no trailing call. The v10 helper invokes the latest call on the trailing edge by default; `{ leading: true }` also invokes the first call immediately. Keep the old helper if your integration depends on its exact timing.
-
-Use these utilities when extending the player. For example, the packaged skins format their time displays with `formatTime`. Use it for a custom time display to match the skins.
-
-The package is split into subpaths, so you can import only the module you need. Other than `time`, it includes `array`, `events`, `i18n`, `jwt`, `predicate`, `string`, `types`, and other subpaths for custom components or plugin replacements.
-
-Import the util function directly in a module `<script>` tag:
-
-```html
-<script type="module">
-  import { formatTime } from '{{VJS10_UTILS_CDN_BASE}}/dist/time.js';
-</script>
-```
-
-Or with a bundler:
-
-```bash
-npm install @videojs/utils
-```
+For example, a clock-style string such as `1:05` or `1:02:03`:
 
 ```js
-import { formatTime } from '@videojs/utils/time';
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return '0:00';
+
+  const total = Math.floor(Math.abs(seconds));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor(total / 60) % 60;
+  const s = String(total % 60).padStart(2, '0');
+  const time = h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
+
+  return seconds < 0 ? `-${time}` : time;
+}
 ```
 
 ## Known gaps

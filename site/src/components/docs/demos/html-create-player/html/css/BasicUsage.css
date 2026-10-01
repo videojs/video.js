@@ -6,12 +6,16 @@
   width: 100%;
 }
 
-.media-play-button {
+.demo-video-player demo-play-toggle {
   position: absolute;
   bottom: 10px;
   left: 10px;
+}
+
+.media-play-button {
   padding-block: 8px;
   padding-inline: 20px;
+  font: inherit;
   color: black;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.7);
@@ -28,10 +32,10 @@
   display: none;
 }
 
-.media-play-button[data-paused] .paused {
+.demo-video-player demo-play-toggle[data-paused] .paused {
   display: inline;
 }
 
-.media-play-button:not([data-paused]) .playing {
+.demo-video-player demo-play-toggle:not([data-paused]) .playing {
   display: inline;
 }

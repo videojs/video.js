@@ -1,11 +1,4 @@
-import {
-  applyElementProps,
-  applyStateDataAttrs,
-  createButton,
-  createPlayer,
-  selectPlayback,
-  UIElement,
-} from '@videojs/html';
+import { createPlayer, selectPlayback, UIElement } from '@videojs/html';
 import { videoFeatures } from '@videojs/html/video';
 import '@videojs/html/ui/container';
 
@@ -24,17 +17,7 @@ class PlayToggle extends UIElement {
     super.connectedCallback();
     this.#disconnect = new AbortController();
 
-    const buttonProps = createButton({
-      onActivate: () => {
-        const state = this.#player.value;
-        if (!state) return;
-
-        state.paused ? state.play() : state.pause();
-      },
-      isDisabled: () => !this.#player.value,
-    });
-
-    applyElementProps(this, buttonProps, { signal: this.#disconnect.signal });
+    this.querySelector('button')?.addEventListener('click', this.#toggle, { signal: this.#disconnect.signal });
   }
 
   override disconnectedCallback(): void {
@@ -48,8 +31,17 @@ class PlayToggle extends UIElement {
     const state = this.#player.value;
     if (!state) return;
 
-    applyStateDataAttrs(this, state, { paused: 'data-paused', ended: 'data-ended' });
+    this.toggleAttribute('data-paused', state.paused);
+    this.toggleAttribute('data-ended', state.ended);
   }
+
+  #toggle = (): void => {
+    const state = this.#player.value;
+    if (!state) return;
+
+    if (state.paused) state.play();
+    else state.pause();
+  };
 }
 
 customElements.define('demo-video-player', VideoPlayerElement);

@@ -1,12 +1,4 @@
-import {
-  applyElementProps,
-  createButton,
-  createPlayer,
-  selectPlayback,
-  selectTime,
-  selectVolume,
-  UIElement,
-} from '@videojs/html';
+import { createPlayer, selectPlayback, selectTime, selectVolume, UIElement } from '@videojs/html';
 import { videoFeatures } from '@videojs/html/video';
 import '@videojs/html/ui/container';
 
@@ -26,19 +18,13 @@ class PlayerActions extends UIElement {
     this.#disconnect = new AbortController();
     const signal = this.#disconnect.signal;
 
-    const playBtn = this.querySelector<HTMLButtonElement>('.play')!;
-    const pauseBtn = this.querySelector<HTMLButtonElement>('.pause')!;
-    const volumeBtn = this.querySelector<HTMLButtonElement>('.volume')!;
-
-    const bind = (el: HTMLElement, action: () => void) => {
-      const props = createButton({ onActivate: action, isDisabled: () => !this.#player.value });
-
-      applyElementProps(el, props, { signal });
+    const bind = (selector: string, action: () => void) => {
+      this.querySelector(selector)?.addEventListener('click', action, { signal });
     };
 
-    bind(playBtn, () => this.#player.value?.play());
-    bind(pauseBtn, () => this.#player.value?.pause());
-    bind(volumeBtn, () => this.#player.value?.setVolume(0.5));
+    bind('.play', () => this.#player.value?.play());
+    bind('.pause', () => this.#player.value?.pause());
+    bind('.volume', () => this.#player.value?.setVolume(0.5));
   }
 
   override disconnectedCallback(): void {

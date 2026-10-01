@@ -1,5 +1,5 @@
 import { createPlayer } from '@videojs/react';
-import { I18nProvider, LOCALES } from '@videojs/react/i18n';
+import { I18nProvider } from '@videojs/react/i18n';
 import { Video, VideoSkin, videoFeatures } from '@videojs/react/video';
 import { useState } from 'react';
 
@@ -7,7 +7,7 @@ import '@videojs/react/video/skin.css';
 import './Language.css';
 
 const { Player } = createPlayer({ features: videoFeatures });
-const locales = ['en', ...LOCALES] as const;
+const locales = ['en', 'es', 'fr', 'de', 'ja', 'ar'] as const;
 
 type Locale = (typeof locales)[number];
 const languageNames = new Intl.DisplayNames(['en'], { type: 'language' });
