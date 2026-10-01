@@ -1,0 +1,80 @@
+---
+title: useMedia
+description: Hook to access the media attached to the nearest Player
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import BasicUsageDemoReact from "@/components/docs/demos/use-media/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/use-media/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/use-media/react/css/BasicUsage.css?raw";
+
+`useMedia` returns the media attached to the nearest `Player`, or `null` until a media component mounts inside it.
+
+## Import
+
+```tsx
+import { useMedia } from "@videojs/react";
+```
+
+<DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> also returns `useMedia` alongside `Player` and `usePlayer`:
+
+```tsx
+const { Player, usePlayer, useMedia } = createPlayer({ features: videoFeatures });
+```
+
+Both forms are the same hook and return the same `Media | null` type. Unlike <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink>, the `createPlayer` form doesn't add typing from your features.
+
+## Usage
+
+Call `useMedia` from a component rendered inside `Player`. Calling it outside `Player` throws, because it reads the nearest `Player`'s context.
+
+```tsx title="PlayFromStart.tsx"
+import { isMediaSeekCapable, useMedia } from "@videojs/react";
+
+export function PlayFromStart() {
+  const media = useMedia();
+
+  function playFromStart() {
+    if (isMediaSeekCapable(media)) media.currentTime = 0;
+    media?.play();
+  }
+
+  return <button onClick={playFromStart}>Play from start</button>;
+}
+```
+
+The component re-renders when a different media attaches or the current one detaches, not when the media's own properties change. To render from playback state, such as `paused` or `currentTime`, select it with <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink>.
+
+## The `Media` object
+
+`Media` is the player's handle on whatever plays the content. What that handle is depends on the media component:
+
+- `Video` and `Audio` attach the rendered native `<video>` or `<audio>` element.
+- Components that front a playback engine or an embed, such as `HlsVideo`, `DashVideo`, or `YouTubeVideo`, attach an object that implements the media contract on top of that engine.
+
+Because media vary this much, the `Media` type guarantees only a `play()` method and the `addEventListener`, `removeEventListener`, and `dispatchEvent` event methods. Everything else, like pausing, seeking, volume, or text tracks, is a capability that a given media may or may not have. Narrow `Media` with the <DocsLink slug="reference/api/media-capabilities">media capability guards</DocsLink> before using those members.
+
+## Examples
+
+### Basic usage
+
+Read the attached media's source and video dimensions, narrowing with `isMediaSourceCapable` and `isMediaVideoDimensionsCapable` first.
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo
+      files={[
+        { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+        { title: "App.css", code: basicUsageReactCss, lang: "css" },
+      ]}
+    >
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<UtilReference util="useMedia" />

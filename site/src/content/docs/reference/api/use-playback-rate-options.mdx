@@ -34,7 +34,7 @@ function SpeedMenu() {
 }
 ```
 
-Options come from the player's configured playback rates. Labels default to the rate followed by a multiplication sign (e.g. `1.5×`); pass `formatRate` to customize them. `setValue` accepts an option's string value, while `setRate` accepts a number directly.
+Options come from the player's configured playback rates. Each `PlaybackRateOption` has a string `value`, its numeric `rate`, a translated `label`, and a `disabled` flag. Labels default to the rate followed by a multiplication sign (e.g. `1.5×`); pass `formatRate` to customize them. `setValue` accepts an option's string value, while `setRate` accepts a number directly.
 
 See <DocsLink slug="reference/components/playback-rate-radio-group">PlaybackRateRadioGroup</DocsLink> for the component-level pattern, and <DocsLink slug="reference/components/menu">Menu</DocsLink> for a complete settings menu example.
 

@@ -71,8 +71,8 @@ export interface PropertyDeclaration {
   readonly type?: typeof String | typeof Boolean | typeof Number;
 
   /**
-   * Indicates the attribute name to use for this property. If a string, that string is used as the attribute name. By
-   * default, the lowercased property name is used.
+   * Indicates the attribute name to use for this property. By default, the property name is used as-is, so a camelCase
+   * property needs an explicit lowercase `attribute` (such as `'content-title'`) to match an HTML attribute.
    */
   readonly attribute?: string;
 }

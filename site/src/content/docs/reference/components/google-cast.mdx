@@ -3,6 +3,8 @@ title: GoogleCast
 frameworkTitle:
   html: google-cast
 description: Options for the Google Cast extension that configures the receiver and load request
+apis:
+  - GoogleCastExtension
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
@@ -51,7 +53,7 @@ Adds the <DocsLink slug="guides/architecture">Google Cast extension</DocsLink> t
 | `stream-type` | `streamType` | Stream type reported to the receiver. Falls back to the player's stream type |
 | — | `customData` | Custom data sent to the receiver with each load request |
 
-`customData` takes an object, so it's a property only, with no matching attribute.
+`customData` takes an object, so it's a property only, with no matching attribute. Set it on the element, typed as the `GoogleCastExtension` class that `@videojs/html/extensions/google-cast` exports.
 </FrameworkCase>
 
 When the Cast `src` is an HLS playlist, Video.js detects the segment format and sets the receiver's `hlsSegmentFormat` and `hlsVideoSegmentFormat` load-request fields. The Default Media Receiver plays HLS natively, so no extra receiver setup is needed.

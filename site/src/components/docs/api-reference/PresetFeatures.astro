@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import MarkdownCode from '@/components/typography/MarkdownCode.astro';
+import P from '@/components/typography/P.astro';
+import Table from '@/components/typography/Table.astro';
+import Tbody from '@/components/typography/Tbody.astro';
+import Td from '@/components/typography/Td.astro';
+import Th from '@/components/typography/Th.astro';
+import Thead from '@/components/typography/Thead.astro';
+import Tr from '@/components/typography/Tr.astro';
+import DocsLink from '../DocsLink.astro';
+
+interface Props {
+  /** Preset name as the generated preset references name it, e.g. "video" or "live-audio". */
+  preset: string;
+}
+
+const { preset } = Astro.props;
+
+// Membership comes from the generated preset references so the table tracks the real bundle.
+const entry = (await getCollection('presetReference')).find((candidate) => candidate.data.name === preset);
+if (!entry) throw new Error(`No generated preset reference named "${preset}"`);
+
+const docs = await getCollection('docs');
+const features = entry.data.features.map((feature) => ({
+  ...feature,
+  exportName: `${feature.name}Feature`,
+  description: docs.find((doc) => doc.id === feature.slug)?.data.description,
+}));
+---
+
+{
+  features.length > 0 ? (
+    <Table>
+      <Thead>
+        <Tr>
+          <Th>Feature</Th>
+          <Th>Description</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {features.map((feature) => (
+          <Tr>
+            <Td class="align-top whitespace-nowrap">
+              {feature.hasReference ? (
+                <DocsLink slug={feature.slug}>
+                  <MarkdownCode>{feature.exportName}</MarkdownCode>
+                </DocsLink>
+              ) : (
+                <MarkdownCode>{feature.exportName}</MarkdownCode>
+              )}
+            </Td>
+            <Td class="align-top">{feature.description ?? <span class="text-muted">–</span>}</Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
+  ) : (
+    <P>
+      <MarkdownCode>{entry.data.featureBundle}</MarkdownCode> is currently empty, so the player's store holds no feature
+      state or actions.
+    </P>
+  )
+}

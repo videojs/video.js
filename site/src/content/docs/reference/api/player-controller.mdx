@@ -1,6 +1,8 @@
 ---
 title: PlayerController
 description: Reactive controller for accessing player store state in HTML custom elements
+apis:
+  - playerContext
 ---
 
 import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
@@ -29,6 +31,39 @@ import { PlayerController } from '@videojs/html/video';
 
 class PlayButtonElement extends UIElement {
   readonly #playback = new PlayerController(this, selectPlayback);
+}
+```
+
+The host must be a reactive controller host, such as a subclass of <DocsLink slug="reference/api/ui-element">`UIElement`</DocsLink>, so the controller can request updates.
+
+## Player context
+
+`playerContext` is the context every player element provides to its descendants, whether the element comes from a preset or from <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink>. `PlayerController` requests it from its host when the host connects, and the nearest ancestor player answers with its store. An element outside a player receives nothing, so `value` stays `undefined`.
+
+Pass `playerContext` to the `PlayerController` exported from `@videojs/html`:
+
+```ts
+import { PlayerController, playerContext, selectPlayback, UIElement } from "@videojs/html";
+
+class PlayButtonElement extends UIElement {
+  readonly #playback = new PlayerController(this, playerContext, selectPlayback);
+}
+```
+
+With a selector, the selector types the value. Without one, `value` is typed as the base player store, with no feature state or actions, because `playerContext` does not know the player's features. For typed access, use the `PlayerController` that `createPlayer` returns, which is already bound to its player, or pass the context `createPlayer` returns, which is the same context as `playerContext` typed for its feature set:
+
+```ts
+import { createPlayer, PlayerController, UIElement } from "@videojs/html";
+import { videoFeatures } from "@videojs/html/video";
+
+const { playerContext } = createPlayer({ features: videoFeatures });
+
+class VolumeResetElement extends UIElement {
+  readonly #store = new PlayerController(this, playerContext);
+
+  reset() {
+    this.#store.value?.setVolume(1);
+  }
 }
 ```
 

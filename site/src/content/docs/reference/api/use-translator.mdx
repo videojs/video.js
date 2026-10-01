@@ -20,7 +20,7 @@ import { useTranslator } from "@videojs/react";
 
 <FrameworkCase frameworks={["react"]}>
 
-`useTranslator` returns the translator from the nearest <DocsLink slug="reference/api/i18n-provider">`I18nProvider`</DocsLink>. Control components pass text descriptors from core `getLabel()`. Custom UI can pass an opaque key with its English fallback.
+`useTranslator` returns the `Translator` from the nearest <DocsLink slug="reference/api/i18n-provider">`I18nProvider`</DocsLink>. Control components pass text descriptors from core `getLabel()`. Custom UI can pass an opaque key with its English fallback.
 
 When no provider is mounted, the hook falls back to English registry strings so standalone demos do not throw.
 

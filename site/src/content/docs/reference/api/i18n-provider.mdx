@@ -1,6 +1,8 @@
 ---
 title: I18nProvider
 description: React provider that resolves locale and supplies a typed translator to descendants
+apis:
+  - I18nContext
 ---
 
 import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
@@ -28,6 +30,10 @@ import { I18nProvider } from '@videojs/react/i18n';
 ```
 
 Omit `locale` to inherit the nearest `lang` attribute (via `langRootRef` or `<html lang>`). English is the fallback when no non-English locale is active or no translation layer supplies a string. See <DocsLink slug="guides/internationalization">Internationalize the player</DocsLink> for merge priority, browser translation fallback, and SSR guidance.
+
+`translations` takes a partial `Translations` map in the nested shape described in <DocsLink slug="reference/api/translation-phrases">Translation phrases</DocsLink>. `onActiveLocaleChange` receives the resolved `Locale` tag.
+
+The provider supplies its translator and locale through `I18nContext`. Read them with <DocsLink slug="reference/api/use-translator">`useTranslator`</DocsLink> and <DocsLink slug="reference/api/use-locale">`useLocale`</DocsLink>, which fall back to English outside a provider. Read `I18nContext` with `useContext` only when a component needs to know whether a provider is mounted: its value is `null` without one.
 
 <UtilReference util="I18nProvider" />
 

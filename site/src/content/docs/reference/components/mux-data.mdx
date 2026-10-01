@@ -3,6 +3,8 @@ title: MuxData
 frameworkTitle:
   html: mux-data
 description: Options for the Mux Data extension that monitors playback quality
+apis:
+  - MuxDataExtension
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
@@ -59,7 +61,7 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 | `debug` | `debug` | Turns on SDK debug logging |
 | — | `MuxDataSdk` | SDK used for monitoring. Set it to `undefined` to switch monitoring off |
 
-`metadata` and `MuxDataSdk` take objects, so they're properties only, with no matching attribute.
+`metadata` and `MuxDataSdk` take objects, so they're properties only, with no matching attribute. Set them on the element, typed as the `MuxDataExtension` class that `@videojs/html/extensions/mux-data` exports.
 </FrameworkCase>
 
 Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view and starts a new one. The rest update the view in place.

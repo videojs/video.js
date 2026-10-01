@@ -1,0 +1,31 @@
+.html-ui-element-basic__container {
+  position: relative;
+}
+
+.html-ui-element-basic__container video {
+  width: 100%;
+}
+
+.html-ui-element-basic__controls {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.html-ui-element-basic__button {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: white;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+}
+
+.html-ui-element-basic__button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

@@ -1,0 +1,207 @@
+---
+title: UIElement
+description: Base class for custom elements that read player state through reactive controllers
+apis:
+  - DestroyMixin
+---
+
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import BasicUsageDemoHtml from "@/components/docs/demos/ui-element/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/ui-element/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/ui-element/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/ui-element/html/css/BasicUsage.ts?raw";
+
+`UIElement` is the base class for Video.js custom elements, and the one the built-in UI elements extend. It adds reactive properties, a batched update cycle, reactive controllers, and deferred destruction to `HTMLElement`, and renders into the light DOM: the subclass writes its own DOM in `update()`.
+
+`UIElement` extends `DestroyMixin(ReactiveElement)` from Video.js's own element base, not from Lit. Its reactive properties and update cycle follow the model of Lit's `ReactiveElement`, with the same names: `static properties`, `requestUpdate()`, `willUpdate()`, `update()`, `updated()`, `updateComplete`, and reactive controllers. It has no templates, shadow root, or `static styles`, no decorators, and no reflection of properties to attributes. `DestroyMixin` adds the [destruction](#destruction) lifecycle and the `hostDestroyed` controller hook, which Lit doesn't have.
+
+## Import
+
+```ts
+import { UIElement } from "@videojs/html";
+```
+
+## Usage
+
+Extend `UIElement`, add a <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink> for the player state the element needs, and write DOM in `update()`. The controller requests an update whenever its selected state changes.
+
+```ts
+import { PlayerController, playerContext, selectTime, UIElement, type PropertyValues } from "@videojs/html";
+
+class CurrentTimeElement extends UIElement {
+  readonly #time = new PlayerController(this, playerContext, selectTime);
+
+  protected override update(changed: PropertyValues): void {
+    super.update(changed);
+
+    const time = this.#time.value;
+    if (!time) return;
+
+    this.textContent = time.currentTime.toFixed(1);
+  }
+}
+
+customElements.define("current-time", CurrentTimeElement);
+```
+
+The element must be a descendant of a player element, such as `<video-player>`, to receive state. Until then, and when the player lacks the selected feature, `value` is `undefined`.
+
+`playerContext` is the context every player element provides to its descendants. See <DocsLink slug="reference/api/player-controller" anchor="player-context">Player context</DocsLink> for how it resolves and how it is typed. The `PlayerController` exported by a preset, or returned by <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink>, is already bound to that player's context and takes only the host and an optional selector.
+
+## Reactive properties
+
+Declare reactive properties in `static properties` and initialize them as class fields. Setting a declared property to a new value (compared with `Object.is`) schedules an update. Each declaration also observes a matching attribute.
+
+```ts
+class SeekByElement extends UIElement {
+  static override properties = {
+    seconds: { type: Number },
+    skipTo: { type: Number, attribute: "skip-to" },
+    disabled: { type: Boolean },
+  };
+
+  seconds = 10;
+  skipTo = 0;
+  disabled = false;
+}
+```
+
+A `PropertyDeclaration` has two options:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `type` | `String` | Converts the attribute value. `String` passes the value through (`null` when the attribute is removed), `Number` parses it (`null` when removed), and `Boolean` is `true` while the attribute is present. |
+| `attribute` | The property name | The observed attribute. HTML lowercases attribute names, so give camelCase properties a lowercase attribute, such as `{ attribute: "skip-to" }`. |
+
+Attributes update properties; properties do not reflect back to attributes. Set attributes yourself in `update()` when styling or accessibility depends on them.
+
+Values assigned before the element is defined, or before it connects, are replayed through the reactive accessors on first connection, so they win over the class-field defaults.
+
+A subclass of an element that already declares properties must spread the parent's declarations:
+
+```ts
+class LabeledSeekByElement extends SeekByElement {
+  static override properties = {
+    ...SeekByElement.properties,
+    icon: { type: String },
+  };
+
+  icon = "";
+}
+```
+
+## Update cycle
+
+Property changes and `requestUpdate()` calls made in the same task are batched into one update, which runs in a microtask. The first update waits until the element connects. Each update calls, in order:
+
+1. `willUpdate(changed)` — compute values derived from other properties. Changes made here join the current update.
+2. `hostUpdate()` on each controller.
+3. `update(changed)` — write the element's DOM. Property changes made here do not schedule another update.
+4. `hostUpdated()` on each controller.
+5. `firstUpdated(changed)` — once, after the first update.
+6. `updated(changed)` — after every update. Property changes made here, or in `firstUpdated`, schedule another update.
+
+`changed` is a `Map` from each changed property name to its previous value. Call `super` when overriding any of these methods.
+
+| Member | Description |
+|--------|-------------|
+| `requestUpdate(name?, oldValue?)` | Schedules an update. Call it with no arguments when the element depends on state outside its reactive properties. |
+| `updateComplete` | Promise that resolves when the pending update finishes. It resolves to `false` when that update scheduled another one. |
+| `hasUpdated` | `true` after the first update. |
+| `isUpdatePending` | `true` from when an update is scheduled until its `update()` call returns. |
+
+## Controllers
+
+A reactive controller is an object that hooks into its host element's lifecycle. Controllers such as `PlayerController` add themselves to the host when they are constructed.
+
+### ReactiveController
+
+`ReactiveController` is the interface a controller implements. Every hook is optional:
+
+| Hook | Called when |
+|------|-------------|
+| `hostConnected()` | The element connects, or immediately when the controller is added to a connected element |
+| `hostDisconnected()` | The element disconnects |
+| `hostUpdate()` | During each update, before `update()` |
+| `hostUpdated()` | During each update, after `update()` |
+| `hostDestroyed()` | The element is destroyed |
+
+### ReactiveControllerHost
+
+`ReactiveControllerHost` is the interface of the element a controller attaches to. `UIElement` implements it, so a controller whose constructor accepts a `ReactiveControllerHost` works with any `UIElement` subclass.
+
+| Member | Description |
+|--------|-------------|
+| `addController(controller)` | Adds a controller so the element calls its hooks. Calls `hostConnected()` immediately when the element is connected. |
+| `removeController(controller)` | Removes a controller. Its hooks stop being called; `hostDisconnected()` is not called. |
+| `requestUpdate()` | Schedules an update of the element. |
+| `updateComplete` | Promise that resolves when the element's pending update finishes. It resolves to `false` when that update scheduled another one. |
+
+```ts
+import type { ReactiveController, ReactiveControllerHost } from "@videojs/html";
+
+class ClockController implements ReactiveController {
+  now = Date.now();
+  readonly #host: ReactiveControllerHost;
+  #timer = 0;
+
+  constructor(host: ReactiveControllerHost) {
+    this.#host = host;
+    host.addController(this);
+  }
+
+  hostConnected(): void {
+    this.#timer = window.setInterval(() => {
+      this.now = Date.now();
+      this.#host.requestUpdate();
+    }, 1000);
+  }
+
+  hostDisconnected(): void {
+    this.#stop();
+  }
+
+  // `destroy()` can run while the element is still connected.
+  hostDestroyed(): void {
+    this.#stop();
+  }
+
+  #stop(): void {
+    window.clearInterval(this.#timer);
+  }
+}
+```
+
+## Destruction
+
+When the element disconnects, it waits two animation frames and then destroys itself if it is still disconnected. Moving the element within the document, or a framework reordering it, therefore keeps it alive. Destruction calls `hostDestroyed()` on every controller. A destroyed element stops updating and ignores later connections.
+
+| Member | Description |
+|--------|-------------|
+| `destroy()` | Destroys the element now. Calling it again has no effect. |
+| `destroyed` | `true` after destruction. |
+| `destroyCallback()` | Runs once on destruction. Override it, calling `super.destroyCallback()`, to release resources the element owns. |
+
+Add the `keep-alive` attribute to skip automatic destruction, for example when you detach an element and insert it again later. Call `destroy()` yourself when you are done with it.
+
+Release listeners and observers that the element starts on connection in `disconnectedCallback()`, calling `super.disconnectedCallback()`, because an element can connect and disconnect many times before it is destroyed.
+
+## Examples
+
+### Basic Usage
+
+A seek button with a reactive `seconds` property, set from its attribute.
+
+<StyleCase styles={["css"]}>
+  <Demo
+    files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}
+  >
+    <BasicUsageDemoHtml />
+  </Demo>
+</StyleCase>

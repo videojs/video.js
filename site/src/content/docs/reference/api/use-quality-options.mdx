@@ -34,7 +34,7 @@ function QualityMenu() {
 }
 ```
 
-The first option is always `Auto`; selecting it returns control to adaptive bitrate selection. Options carry optional `tier` and `badge` fields (e.g. `4K`, `HD`) for richer labels. Pass `formatRendition` to customize the visible rendition labels.
+The first option is always `Auto`; selecting it returns control to adaptive bitrate selection. Each `QualityOption` has a `value`, a translated `label`, a `disabled` flag, and optional `tier` and `badge` fields (e.g. `4K`, `HD`) for richer labels. Pass `formatRendition` to customize the visible rendition labels.
 
 See <DocsLink slug="reference/components/quality-radio-group">QualityRadioGroup</DocsLink> for the component-level pattern, and <DocsLink slug="reference/components/menu">Menu</DocsLink> for a complete settings menu example.
 

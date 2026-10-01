@@ -34,7 +34,7 @@ function CaptionsMenu() {
 }
 ```
 
-Option labels use the track label, then language, then kind. Pass `formatTrack` to customize the visible labels. The result also exposes `showMenu`, which is `true` when more than one caption or subtitle track is available — the same threshold <DocsLink slug="reference/components/captions-button">CaptionsButton</DocsLink> uses to open a menu instead of toggling in `menuTrigger` mode.
+Each `CaptionsOption` has a `value`, a translated `label`, and a `disabled` flag. Option labels use the track label, then language, then kind. Pass `formatTrack` to customize the visible labels. The result also exposes `showMenu`, which is `true` when more than one caption or subtitle track is available — the same threshold <DocsLink slug="reference/components/captions-button">CaptionsButton</DocsLink> uses to open a menu instead of toggling in `menuTrigger` mode.
 
 See <DocsLink slug="reference/components/captions-radio-group">CaptionsRadioGroup</DocsLink> for the component-level pattern, and <DocsLink slug="reference/components/menu">Menu</DocsLink> for a complete settings menu example.
 

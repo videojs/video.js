@@ -1,12 +1,16 @@
 import { Container, createPlayer, isMediaSourceCapable, isMediaVideoDimensionsCapable } from '@videojs/react';
 import { Video, videoFeatures } from '@videojs/react/video';
 
-const { Player, useMedia } = createPlayer({
+const { Player, useMedia, usePlayer } = createPlayer({
   features: videoFeatures,
 });
 
 function MediaInfo() {
   const media = useMedia();
+
+  // `useMedia` re-renders only when the media changes; subscribe to `canPlay` so the values below refresh once loaded.
+  usePlayer((state) => state.canPlay);
+
   if (!media) return null;
 
   return (

@@ -1,6 +1,6 @@
 # MDX Structure
 
-Structure and conventions for API reference MDX pages at `site/src/content/docs/reference/components/` (components, skins, media, extensions) and `site/src/content/docs/reference/api/` (hooks, features, controllers, factories, utilities).
+Structure and conventions for API reference MDX pages at `site/src/content/docs/reference/components/` (components, skins, media, extensions, icons) and `site/src/content/docs/reference/api/` (hooks, features, controllers, factories, utilities, and `preset-<name>` pages).
 
 ## Component Pages
 
@@ -345,22 +345,19 @@ import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
 
 ## Sidebar Entry
 
-Add to `site/src/docs.config.ts` in the appropriate section, alphabetically:
+Add to a group in `site/src/docs.config.ts` under the tab that matches the page's directory; `site/src/content/docs/writing-style/write-references.mdx` lists the groups:
 
-- **Components** — UI component reference pages
-- **Hooks & Utilities** (`frameworks: ['react']`) — React hooks and utilities
-- **Controllers & Mixins** (`frameworks: ['html']`) — HTML controllers and mixins
+- **Components** tab — `reference/components/` pages, in groups such as Layout, Skins, Media, Buttons, and Icons
+- **API** tab — `reference/api/` pages, in groups such as Player, Presets, Store, Features, and Utils
+
+Mark framework-specific entries with `frameworks: ['react']` or `frameworks: ['html']`.
 
 ```ts
 {
-  sidebarLabel: 'Components',
+  sidebarLabel: 'Buttons',
   contents: [
-    // sorted alphabetically
-    { slug: 'reference/components/buffering-indicator' },
-    { slug: 'reference/components/controls' },
-    // ...
-    { slug: 'reference/components/{name}' },  // <-- insert alphabetically
-    // ...
+    { slug: 'reference/components/play-button' },
+    { slug: 'reference/components/{name}' },  // <-- insert
   ],
 },
 ```

@@ -1,0 +1,214 @@
+---
+title: Live audio preset
+description: The live audio preset — a player, feature bundle, skins, and media for live audio streams
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/live-audio` is the preset for live audio streams. It bundles `LiveAudioPlayer`, the `liveAudioFeatures` bundle it is configured with, two skins that swap the time slider and time displays for a Live button, and the `Audio` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/live-audio` is the preset for live audio streams. It bundles the `<live-audio-player>` element, the `liveAudioFeatures` bundle it is configured with, and two skins that swap the time slider and time displays for a Live button, and plays through the browser's native `<audio>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
+</FrameworkCase>
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { Audio, LiveAudioPlayer, LiveAudioSkin } from '@videojs/react/live-audio';
+import '@videojs/react/live-audio/skin.css';
+```
+
+Each skin has its own stylesheet. Import `@videojs/react/live-audio/neutral-skin.css` instead when you use `NeutralLiveAudioSkin`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/live-audio/player';
+import '@videojs/html/live-audio/skin';
+```
+
+Import `@videojs/html/live-audio/neutral-skin` instead for the neutral skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/live-audio.js"></script>
+```
+
+`live-audio-neutral.js` registers the neutral skin instead, and `live-audio-player.js` registers `<live-audio-player>` alone.
+</FrameworkCase>
+
+## Usage
+
+Live streams are usually HLS, so this example plays through an HLS media element instead of the preset's native audio.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx title="App.tsx"
+import { HlsAudio } from '@videojs/react/media/hls-audio';
+import { LiveAudioPlayer, LiveAudioSkin } from '@videojs/react/live-audio';
+import '@videojs/react/live-audio/skin.css';
+
+export function App() {
+  return (
+    <LiveAudioPlayer>
+      <LiveAudioSkin>
+        <HlsAudio src="https://example.com/live.m3u8" />
+      </LiveAudioSkin>
+    </LiveAudioPlayer>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html title="index.html"
+<script type="module">
+  import '@videojs/html/live-audio/player';
+  import '@videojs/html/live-audio/skin';
+  import '@videojs/html/media/hls-audio';
+</script>
+
+<live-audio-player>
+  <live-audio-skin>
+    <hls-audio src="https://example.com/live.m3u8"></hls-audio>
+  </live-audio-skin>
+</live-audio-player>
+```
+</FrameworkCase>
+
+## Player
+
+<FrameworkCase frameworks={["react"]}>
+`LiveAudioPlayer` is a <DocsLink slug="reference/components/player">`Player`</DocsLink> created by <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> with `liveAudioFeatures`. It provides the player store to its descendants and renders no DOM element of its own.
+
+`LiveAudioPlayerProps` types its props:
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `ReactNode` | Content placed inside the player context: a skin, the media, and your own components. |
+| `title` | `string \| null` | The title to display. Takes precedence over the title the media reports; `null` clears your value, so the title falls back to the one the media reports. |
+| `poster` | `string \| null` | The poster to display. Takes precedence over the poster the media reports; `null` clears your value, so the poster falls back to the one the media reports. |
+
+`title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>.
+
+The preset also exports a `usePlayer` hook typed to `liveAudioFeatures`. Use it from any component inside `LiveAudioPlayer`; see <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/live-audio/player` registers `<live-audio-player>`, whose class is `LiveAudioPlayerElement`. It is a <DocsLink slug="reference/components/player">player</DocsLink> element created by <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> with `liveAudioFeatures`. It owns the player store but no layout. Put a skin or a <DocsLink slug="reference/components/player-container">`<media-container>`</DocsLink> inside it.
+
+| Attribute | Property | Description |
+| --- | --- | --- |
+| `content-title` | `contentTitle` | The title to display. Takes precedence over the title the media reports. |
+| `poster` | `poster` | The poster to display. Takes precedence over the poster the media reports. |
+| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+
+`content-title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>. The element's read-only `store` property returns its player store.
+
+The preset root also exports a `PlayerController` bound to the live audio player's store. Use it from any custom element inside `<live-audio-player>`; see <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>.
+</FrameworkCase>
+
+## Feature bundle
+
+`liveAudioFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. It is the <DocsLink slug="reference/api/preset-audio" anchor="feature-bundle">audio preset's</DocsLink> `audioFeatures` without playback rate, plus the <DocsLink slug="reference/api/feature-live">live feature</DocsLink>:
+
+<PresetFeatures preset="live-audio" />
+
+<FrameworkCase frameworks={["react"]}>
+Its type, `LiveAudioFeatures`, is the tuple of those features in order. Import it from the package root:
+
+```tsx
+import type { LiveAudioFeatures } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Its type, `LiveAudioFeatures`, is the tuple of those features in order. Import it from the package root:
+
+```ts
+import type { LiveAudioFeatures } from '@videojs/html';
+```
+</FrameworkCase>
+
+To add or remove a feature, pass your own array to `createPlayer`. The skins expect the features they render controls for.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { createPlayer, streamTypeFeature } from '@videojs/react';
+import { liveAudioFeatures } from '@videojs/react/live-audio';
+
+const { Player, usePlayer } = createPlayer({
+  features: [...liveAudioFeatures, streamTypeFeature],
+});
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { createPlayer, streamTypeFeature } from '@videojs/html';
+import { liveAudioFeatures } from '@videojs/html/live-audio';
+
+const { PlayerElement } = createPlayer({
+  features: [...liveAudioFeatures, streamTypeFeature],
+});
+
+customElements.define('my-live-audio-player', PlayerElement);
+```
+</FrameworkCase>
+
+## Skins
+
+- <DocsLink slug="reference/components/live-audio-skin">LiveAudioSkin</DocsLink> — the default skin, which swaps the time controls for a Live button.
+- <DocsLink slug="reference/components/live-audio-neutral-skin">NeutralLiveAudioSkin</DocsLink> — the visually lighter variant, closer to a classic control bar.
+
+## Media
+
+<FrameworkCase frameworks={["react"]}>
+The preset exports <DocsLink slug="reference/components/audio">`Audio`</DocsLink>, the same component as the audio preset, which renders a native `<audio>`. Most browsers need a streaming <DocsLink slug="guides/media-sources">media component</DocsLink> to play a live source, such as <DocsLink slug="reference/components/hls-audio">`HlsAudio`</DocsLink> for HLS.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The preset plays through a native <DocsLink slug="reference/components/audio">`<audio>`</DocsLink>, so it registers no media element of its own. Most browsers need a streaming <DocsLink slug="guides/media-sources">media element</DocsLink> to play a live source, such as <DocsLink slug="reference/components/hls-audio">`<hls-audio>`</DocsLink> for HLS.
+</FrameworkCase>
+
+## Exports
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/live-audio` exports:
+
+| Export | Description |
+| --- | --- |
+| `LiveAudioPlayer`, `LiveAudioPlayerProps` | The preconfigured [player](#player). |
+| `usePlayer` | The player-store hook, typed to `liveAudioFeatures`. |
+| `liveAudioFeatures` | The [feature bundle](#feature-bundle). |
+| `LiveAudioSkin`, `LiveAudioSkinProps` | The default [skin](#skins). |
+| `NeutralLiveAudioSkin`, `NeutralLiveAudioSkinProps` | The neutral [skin](#skins). |
+| `Audio`, `AudioProps` | The [media](#media) component. |
+
+Stylesheets: `@videojs/react/live-audio/skin.css` and `@videojs/react/live-audio/neutral-skin.css`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The preset root, `@videojs/html/live-audio`, has no side effects. Importing it never registers an element:
+
+| Export | Description |
+| --- | --- |
+| `LiveAudioPlayerElement` | The [player](#player) element class. |
+| `PlayerController` | The player controller, bound to the live audio player's store. |
+| `liveAudioFeatures` | The [feature bundle](#feature-bundle). |
+| `LiveAudioSkinElement` | The default [skin](#skins) element class. |
+| `NeutralLiveAudioSkinElement` | The neutral [skin](#skins) element class. |
+
+Registration entry points are side-effect-only:
+
+| Entry point | Registers |
+| --- | --- |
+| `@videojs/html/live-audio/player` | `<live-audio-player>` |
+| `@videojs/html/live-audio/skin` | `<live-audio-skin>`, `<media-container>`, and the UI elements the skin composes |
+| `@videojs/html/live-audio/neutral-skin` | `<live-audio-neutral-skin>`, `<media-container>`, and the UI elements the neutral skin composes |
+| `@videojs/html/live-audio/ui` | `<media-container>` and the UI elements of the default skin, without the skin, for a layout you write yourself |
+| `@videojs/html/live-audio/neutral-ui` | `<media-container>` and the UI elements of the neutral skin, without the skin |
+</FrameworkCase>

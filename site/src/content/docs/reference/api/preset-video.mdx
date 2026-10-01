@@ -1,0 +1,210 @@
+---
+title: Video preset
+description: The general-purpose video preset — a player, feature bundle, skins, and media for on-demand video
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/video` is the general-purpose preset for on-demand video. It bundles `VideoPlayer`, the `videoFeatures` bundle it is configured with, two skins, and the `Video` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/video` is the general-purpose preset for on-demand video. It bundles the `<video-player>` element, the `videoFeatures` bundle it is configured with, and two skins, and plays through the browser's native `<video>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+</FrameworkCase>
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
+import '@videojs/react/video/skin.css';
+```
+
+Each skin has its own stylesheet. Import `@videojs/react/video/neutral-skin.css` instead when you use `NeutralVideoSkin`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/video/player';
+import '@videojs/html/video/skin';
+```
+
+Import `@videojs/html/video/neutral-skin` instead for the neutral skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
+```
+
+`video-neutral.js` registers the neutral skin instead, and `video-player.js` registers `<video-player>` alone.
+</FrameworkCase>
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+```tsx title="App.tsx"
+import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
+import '@videojs/react/video/skin.css';
+
+export function App() {
+  return (
+    <VideoPlayer>
+      <VideoSkin>
+        <Video src="video.mp4" />
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html title="index.html"
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/video/skin';
+</script>
+
+<video-player>
+  <video-skin>
+    <video src="video.mp4"></video>
+  </video-skin>
+</video-player>
+```
+</FrameworkCase>
+
+## Player
+
+<FrameworkCase frameworks={["react"]}>
+`VideoPlayer` is a <DocsLink slug="reference/components/player">`Player`</DocsLink> created by <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> with `videoFeatures`. It provides the player store to its descendants and renders no DOM element of its own.
+
+`VideoPlayerProps` types its props:
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `ReactNode` | Content placed inside the player context: a skin, the media, and your own components. |
+| `title` | `string \| null` | The title to display. Takes precedence over the title the media reports; `null` clears your value, so the title falls back to the one the media reports. |
+| `poster` | `string \| null` | The poster to display. Takes precedence over the poster the media reports; `null` clears your value, so the poster falls back to the one the media reports. |
+
+`title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>.
+
+The preset also exports a `usePlayer` hook typed to `videoFeatures`. Use it from any component inside `VideoPlayer`; see <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/video/player` registers `<video-player>`, whose class is `VideoPlayerElement`. It is a <DocsLink slug="reference/components/player">player</DocsLink> element created by <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> with `videoFeatures`. It owns the player store but no layout. Put a skin or a <DocsLink slug="reference/components/player-container">`<media-container>`</DocsLink> inside it.
+
+| Attribute | Property | Description |
+| --- | --- | --- |
+| `content-title` | `contentTitle` | The title to display. Takes precedence over the title the media reports. |
+| `poster` | `poster` | The poster to display. Takes precedence over the poster the media reports. |
+| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+
+`content-title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>. The element's read-only `store` property returns its player store.
+
+The preset root also exports a `PlayerController` bound to the video player's store. Use it from any custom element inside `<video-player>`; see <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>.
+</FrameworkCase>
+
+## Feature bundle
+
+`videoFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with:
+
+<PresetFeatures preset="video" />
+
+<FrameworkCase frameworks={["react"]}>
+Its type, `VideoFeatures`, is the tuple of those features in order. Import it from the package root:
+
+```tsx
+import type { VideoFeatures } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Its type, `VideoFeatures`, is the tuple of those features in order. Import it from the package root:
+
+```ts
+import type { VideoFeatures } from '@videojs/html';
+```
+</FrameworkCase>
+
+To add or remove a feature, pass your own array to `createPlayer`. The skins expect the features they render controls for.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { createPlayer, orientationLockFeature } from '@videojs/react';
+import { videoFeatures } from '@videojs/react/video';
+
+const { Player, usePlayer } = createPlayer({
+  features: [...videoFeatures, orientationLockFeature],
+});
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { createPlayer, orientationLockFeature } from '@videojs/html';
+import { videoFeatures } from '@videojs/html/video';
+
+const { PlayerElement } = createPlayer({
+  features: [...videoFeatures, orientationLockFeature],
+});
+
+customElements.define('my-video-player', PlayerElement);
+```
+</FrameworkCase>
+
+## Skins
+
+- <DocsLink slug="reference/components/video-skin">VideoSkin</DocsLink> — the default skin, with the modern, frosted look.
+- <DocsLink slug="reference/components/video-neutral-skin">NeutralVideoSkin</DocsLink> — the visually lighter variant, closer to a classic control bar.
+
+## Media
+
+<FrameworkCase frameworks={["react"]}>
+The preset exports <DocsLink slug="reference/components/video">`Video`</DocsLink>, which renders a native `<video>`. Swap it for any compatible <DocsLink slug="guides/media-sources">media component</DocsLink>, such as <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> for HLS.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The preset plays through a native <DocsLink slug="reference/components/video">`<video>`</DocsLink>, so it registers no media element of its own. Swap it for any compatible <DocsLink slug="guides/media-sources">media element</DocsLink>, such as <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> for HLS.
+</FrameworkCase>
+
+## Exports
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/video` exports:
+
+| Export | Description |
+| --- | --- |
+| `VideoPlayer`, `VideoPlayerProps` | The preconfigured [player](#player). |
+| `usePlayer` | The player-store hook, typed to `videoFeatures`. |
+| `videoFeatures` | The [feature bundle](#feature-bundle). |
+| `VideoSkin`, `VideoSkinProps` | The default [skin](#skins). |
+| `NeutralVideoSkin`, `NeutralVideoSkinProps` | The neutral [skin](#skins). |
+| `Video`, `VideoProps` | The [media](#media) component. |
+
+Stylesheets: `@videojs/react/video/skin.css` and `@videojs/react/video/neutral-skin.css`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The preset root, `@videojs/html/video`, has no side effects. Importing it never registers an element:
+
+| Export | Description |
+| --- | --- |
+| `VideoPlayerElement` | The [player](#player) element class. |
+| `PlayerController` | The player controller, bound to the video player's store. |
+| `videoFeatures` | The [feature bundle](#feature-bundle). |
+| `VideoSkinElement` | The default [skin](#skins) element class. |
+| `NeutralVideoSkinElement` | The neutral [skin](#skins) element class. |
+
+Registration entry points are side-effect-only:
+
+| Entry point | Registers |
+| --- | --- |
+| `@videojs/html/video/player` | `<video-player>` |
+| `@videojs/html/video/skin` | `<video-skin>`, `<media-container>`, and the UI elements the skin composes |
+| `@videojs/html/video/neutral-skin` | `<video-neutral-skin>`, `<media-container>`, and the UI elements the neutral skin composes |
+| `@videojs/html/video/ui` | `<media-container>` and the UI elements of the default skin, without the skin, for a layout you write yourself |
+| `@videojs/html/video/neutral-ui` | `<media-container>` and the UI elements of the neutral skin, without the skin |
+</FrameworkCase>

@@ -1,0 +1,199 @@
+---
+title: Background preset
+description: The background video preset — a player, feature bundle, skin, and media for ambient video with no controls
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/background` is the preset for ambient background video with no user controls. It bundles `BackgroundVideoPlayer`, the `backgroundFeatures` bundle it is configured with, one chrome-less skin, and the `BackgroundVideo` media component, which autoplays, mutes, and loops. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/background-video">Background video</DocsLink> for building one.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/background` is the preset for ambient background video with no user controls. It bundles the `<background-video-player>` element, the `backgroundFeatures` bundle it is configured with, one chrome-less skin, and the `<background-video>` media element, which autoplays, mutes, and loops. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/background-video">Background video</DocsLink> for building one.
+</FrameworkCase>
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { BackgroundVideo, BackgroundVideoPlayer, BackgroundVideoSkin } from '@videojs/react/background';
+import '@videojs/react/background/skin.css';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/background/player';
+import '@videojs/html/background/skin';
+import '@videojs/html/background/video';
+```
+
+Or load the <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers all three:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/background.js"></script>
+```
+
+Unlike the other presets, the background preset has one bundle and no player-only bundle.
+</FrameworkCase>
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+```tsx title="App.tsx"
+import { BackgroundVideo, BackgroundVideoPlayer, BackgroundVideoSkin } from '@videojs/react/background';
+import '@videojs/react/background/skin.css';
+
+export function Hero() {
+  return (
+    <BackgroundVideoPlayer>
+      <BackgroundVideoSkin>
+        <BackgroundVideo src="hero.mp4" />
+      </BackgroundVideoSkin>
+    </BackgroundVideoPlayer>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html title="index.html"
+<script type="module">
+  import '@videojs/html/background/player';
+  import '@videojs/html/background/skin';
+  import '@videojs/html/background/video';
+</script>
+
+<background-video-player>
+  <background-video-skin>
+    <background-video src="hero.mp4"></background-video>
+  </background-video-skin>
+</background-video-player>
+```
+</FrameworkCase>
+
+## Player
+
+<FrameworkCase frameworks={["react"]}>
+`BackgroundVideoPlayer` is a <DocsLink slug="reference/components/player">`Player`</DocsLink> created by <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> with `backgroundFeatures`. It provides the player store to its descendants and renders no DOM element of its own.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `children` | `ReactNode` | Content placed inside the player context: the skin, the media, and your own components. |
+
+The bundle has no feature that takes player inputs, so `children` is the only prop. Unlike the other presets, this one exports no named props type.
+
+The preset also exports a `usePlayer` hook typed to `backgroundFeatures`. Use it from any component inside `BackgroundVideoPlayer`; see <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/background/player` registers `<background-video-player>`, whose class is `BackgroundVideoPlayerElement`. It is a <DocsLink slug="reference/components/player">player</DocsLink> element created by <DocsLink slug="reference/api/html-create-player">`createPlayer`</DocsLink> with `backgroundFeatures`. It owns the player store but no layout. Put the skin or a <DocsLink slug="reference/components/player-container">`<media-container>`</DocsLink> inside it.
+
+| Attribute | Property | Description |
+| --- | --- | --- |
+| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+
+The bundle has no feature that takes player inputs, so the element has no player-input attributes such as `content-title` or `poster`; `keep-alive` is the only attribute it reads. Its read-only `store` property returns its player store.
+
+The preset root also exports a `PlayerController` bound to the background player's store. Use it from any custom element inside `<background-video-player>`; see <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink>.
+</FrameworkCase>
+
+## Feature bundle
+
+`backgroundFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. The background media element handles autoplay, muting, and looping on its own:
+
+<PresetFeatures preset="background" />
+
+<FrameworkCase frameworks={["react"]}>
+Its type, `BackgroundFeatures`, is the matching empty tuple. Import it from the package root:
+
+```tsx
+import type { BackgroundFeatures } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Its type, `BackgroundFeatures`, is the matching empty tuple. Import it from the package root:
+
+```ts
+import type { BackgroundFeatures } from '@videojs/html';
+```
+</FrameworkCase>
+
+To add a feature, pass your own array to `createPlayer`. For example, add playback to drive a play button over the background video:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { createPlayer, playbackFeature } from '@videojs/react';
+import { backgroundFeatures } from '@videojs/react/background';
+
+const { Player, usePlayer } = createPlayer({
+  features: [...backgroundFeatures, playbackFeature],
+});
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { createPlayer, playbackFeature } from '@videojs/html';
+import { backgroundFeatures } from '@videojs/html/background';
+
+const { PlayerElement } = createPlayer({
+  features: [...backgroundFeatures, playbackFeature],
+});
+
+customElements.define('my-background-player', PlayerElement);
+```
+</FrameworkCase>
+
+## Skins
+
+- <DocsLink slug="reference/components/background-video-skin">BackgroundVideoSkin</DocsLink> — the only skin, a chrome-less surface that sizes the video and renders no controls.
+
+## Media
+
+<FrameworkCase frameworks={["react"]}>
+The preset exports <DocsLink slug="reference/components/background-video">`BackgroundVideo`</DocsLink>, which renders a native `<video>` that is muted, looped, and autoplaying by default. For HLS or Mux sources, use <DocsLink slug="reference/components/hls-background-video">`HlsBackgroundVideo`</DocsLink> or <DocsLink slug="reference/components/mux-background-video">`MuxBackgroundVideo`</DocsLink> instead.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/background/video` registers <DocsLink slug="reference/components/background-video">`<background-video>`</DocsLink>, which renders a `<video>` inside shadow DOM that is muted, looped, and autoplaying by default. It is the same registration as `@videojs/html/media/background-video`. For HLS or Mux sources, use <DocsLink slug="reference/components/hls-background-video">`<hls-background-video>`</DocsLink> or <DocsLink slug="reference/components/mux-background-video">`<mux-background-video>`</DocsLink> instead.
+</FrameworkCase>
+
+## Exports
+
+<FrameworkCase frameworks={["react"]}>
+`@videojs/react/background` exports:
+
+| Export | Description |
+| --- | --- |
+| `BackgroundVideoPlayer` | The preconfigured [player](#player). |
+| `usePlayer` | The player-store hook, typed to `backgroundFeatures`. |
+| `backgroundFeatures` | The [feature bundle](#feature-bundle). |
+| `BackgroundVideoSkin`, `BackgroundVideoSkinProps` | The [skin](#skins). |
+| `BackgroundVideo`, `BackgroundVideoProps` | The [media](#media) component. |
+
+Stylesheet: `@videojs/react/background/skin.css`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The preset root, `@videojs/html/background`, has no side effects. Importing it never registers an element:
+
+| Export | Description |
+| --- | --- |
+| `BackgroundVideoPlayerElement` | The [player](#player) element class. |
+| `PlayerController` | The player controller, bound to the background player's store. |
+| `backgroundFeatures` | The [feature bundle](#feature-bundle). |
+| `BackgroundVideoSkinElement` | The [skin](#skins) element class. |
+
+Registration entry points are side-effect-only:
+
+| Entry point | Registers |
+| --- | --- |
+| `@videojs/html/background/player` | `<background-video-player>` |
+| `@videojs/html/background/skin` | `<background-video-skin>` and `<media-container>` |
+| `@videojs/html/background/video` | `<background-video>` |
+</FrameworkCase>

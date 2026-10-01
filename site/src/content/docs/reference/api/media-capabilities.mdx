@@ -1,0 +1,458 @@
+---
+title: Media capability guards
+description: Type guards that narrow a Media object to the capabilities it supports
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+The media a player attaches is typed as `Media`, which guarantees only a `play()` method and the `addEventListener`, `removeEventListener`, and `dispatchEvent` event methods. A native `<video>` element, an engine-backed media such as `HlsVideo`, and an embed such as YouTube each support a different set of everything else. Capability guards test whether a media supports one capability and narrow its type to that capability's members.
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { isMediaSeekCapable, isMediaVolumeCapable } from "@videojs/react";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { isMediaSeekCapable, isMediaVolumeCapable } from "@videojs/html";
+```
+</FrameworkCase>
+
+Every guard on this page is a named export of the same package.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+Get the media with <DocsLink slug="reference/api/use-media">`useMedia`</DocsLink>, then narrow it before touching anything other than `play()` and the event methods:
+
+```tsx title="HalfVolumeButton.tsx"
+import { isMediaVolumeCapable, useMedia } from "@videojs/react";
+
+export function HalfVolumeButton() {
+  const media = useMedia();
+  if (!isMediaVolumeCapable(media)) return null;
+
+  return <button onClick={() => { media.volume = 0.5; }}>50% volume</button>;
+}
+```
+
+The examples below assume `media` comes from `useMedia()` in a component rendered inside `Player`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The player element's `store.target` holds the media the player attached. It's `null` until a media element inside the player registers, so read it when you need it rather than once at startup:
+
+```ts title="index.ts"
+import "@videojs/html/video/player";
+import { isMediaVolumeCapable } from "@videojs/html";
+
+const player = document.querySelector("video-player");
+
+document.querySelector("#half-volume")?.addEventListener("click", () => {
+  const media = player?.store.target?.media;
+  if (isMediaVolumeCapable(media)) media.volume = 0.5;
+});
+```
+
+The examples below assume `player` is the queried player element.
+</FrameworkCase>
+
+Each `isMedia*Capable` guard accepts any value and returns `false` for `null`, `undefined`, and other non-objects, so you can pass the media straight in without a separate null check.
+
+## Behavior
+
+A guard checks that a few members of a capability are present, then narrows to every member of that capability's contract. The table lists both.
+
+Some media, such as embeds, can't provide buffered ranges, text tracks, or remote playback, and report a shared empty placeholder in their place. `isMediaBufferCapable`, `isMediaTextTrackCapable`, and `isMediaRemotePlaybackCapable` return `false` for that placeholder.
+
+A guard describes what the media object supports, not its current state. `isMediaErrorCapable` returns `true` while `error` is `null`, and `isMediaVolumeCapable` returns `true` on platforms that ignore volume changes. For current state and availability, such as `volumeAvailability` from the <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink>, read the player's <DocsLink slug="guides/features">features</DocsLink> instead.
+
+| Guard | Checks | Narrows to |
+| --- | --- | --- |
+| `isMediaPauseCapable` | `paused`, `ended`, `pause()` | `pause()`, `paused`, `ended` |
+| `isMediaSeekCapable` | `currentTime`, `duration`, `seeking` | `currentTime`, `loop`, `duration`, `seeking` |
+| `isMediaSourceCapable` | `src`, `currentSrc`, `readyState`, `load()` | `src`, `currentSrc`, `readyState`, `preload`, `crossOrigin`, `load()`, `canPlayType()` |
+| `isMediaVolumeCapable` | `volume`, `muted` | `volume`, `muted`, `defaultMuted` |
+| `isMediaPlaybackRateCapable` | `playbackRate` | `playbackRate`, `defaultPlaybackRate` |
+| `isMediaBufferCapable` | `buffered`, `seekable`, neither an empty placeholder | `buffered`, `seekable` |
+| `isMediaErrorCapable` | `error` (`null` counts) | `error` |
+| `isMediaTextTrackCapable` | `textTracks`, not an empty placeholder | `textTracks`, `addTextTrack()` |
+| `isMediaVideoRenditionCapable` | `videoRenditions` | `videoRenditions` |
+| `isMediaAudioTrackCapable` | `audioTracks` | `audioTracks`, `addAudioTrack()`, `removeAudioTrack()` |
+| `isMediaVideoDimensionsCapable` | `videoWidth`, `videoHeight` | `videoWidth`, `videoHeight` |
+| `isMediaRemotePlaybackCapable` | `remote` is an object, not an empty placeholder | `remote`, `disableRemotePlayback` |
+| `isMediaStreamTypeCapable` | `streamType` | `streamType` |
+| `isMediaLiveCapable` | `liveEdgeStart`, `targetLiveWindow` | `liveEdgeStart`, `targetLiveWindow` |
+
+`hasMetadata` isn't a type guard: it takes a media already narrowed by `isMediaSourceCapable` and returns a boolean.
+
+## Guards
+
+### `isMediaPauseCapable`
+
+Narrows to `pause()` and the read-only `paused` and `ended` booleans.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function togglePaused() {
+  if (!isMediaPauseCapable(media)) return;
+
+  if (media.paused) media.play();
+  else media.pause();
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function togglePaused() {
+  const media = player?.store.target?.media;
+  if (!isMediaPauseCapable(media)) return;
+
+  if (media.paused) media.play();
+  else media.pause();
+}
+```
+</FrameworkCase>
+
+### `isMediaSeekCapable`
+
+Narrows to the writable `currentTime` and `loop`, and the read-only `duration` and `seeking`. All times are in seconds.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function skipForward() {
+  if (isMediaSeekCapable(media)) media.currentTime = Math.min(media.currentTime + 10, media.duration);
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function skipForward() {
+  const media = player?.store.target?.media;
+  if (isMediaSeekCapable(media)) media.currentTime = Math.min(media.currentTime + 10, media.duration);
+}
+```
+</FrameworkCase>
+
+### `isMediaSourceCapable`
+
+Narrows to the writable `src`, `preload`, and `crossOrigin`; the read-only `currentSrc` and `readyState`; and the `load()` and `canPlayType(type)` methods. `canPlayType` returns `''`, `'maybe'`, or `'probably'`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function playNext(url: string) {
+  if (!isMediaSourceCapable(media)) return;
+
+  media.src = url;
+  media.play();
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function playNext(url: string) {
+  const media = player?.store.target?.media;
+  if (!isMediaSourceCapable(media)) return;
+
+  media.src = url;
+  media.play();
+}
+```
+</FrameworkCase>
+
+### `hasMetadata`
+
+Returns `true` when the media's `readyState` is at least `HAVE_METADATA` (`1`), meaning duration and dimensions are known. It reads only `readyState`, so narrow with `isMediaSourceCapable` first.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function resumeAt(seconds: number) {
+  if (!isMediaSourceCapable(media) || !hasMetadata(media)) return;
+  if (isMediaSeekCapable(media)) media.currentTime = seconds;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function resumeAt(seconds: number) {
+  const media = player?.store.target?.media;
+  if (!isMediaSourceCapable(media) || !hasMetadata(media)) return;
+  if (isMediaSeekCapable(media)) media.currentTime = seconds;
+}
+```
+</FrameworkCase>
+
+### `isMediaVolumeCapable`
+
+Narrows to the writable `volume` (`0` to `1`), `muted`, and `defaultMuted`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function unmuteAtHalfVolume() {
+  if (!isMediaVolumeCapable(media)) return;
+
+  media.muted = false;
+  media.volume = 0.5;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function unmuteAtHalfVolume() {
+  const media = player?.store.target?.media;
+  if (!isMediaVolumeCapable(media)) return;
+
+  media.muted = false;
+  media.volume = 0.5;
+}
+```
+</FrameworkCase>
+
+### `isMediaPlaybackRateCapable`
+
+Narrows to the writable `playbackRate` and `defaultPlaybackRate`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function playFaster() {
+  if (isMediaPlaybackRateCapable(media)) media.playbackRate = 1.5;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function playFaster() {
+  const media = player?.store.target?.media;
+  if (isMediaPlaybackRateCapable(media)) media.playbackRate = 1.5;
+}
+```
+</FrameworkCase>
+
+### `isMediaBufferCapable`
+
+Narrows to the read-only `buffered` and `seekable` time ranges. Each range list has a `length` and `start(index)` and `end(index)` methods that return seconds.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function getBufferedEnd() {
+  if (!isMediaBufferCapable(media) || media.buffered.length === 0) return 0;
+
+  return media.buffered.end(media.buffered.length - 1);
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function getBufferedEnd() {
+  const media = player?.store.target?.media;
+  if (!isMediaBufferCapable(media) || media.buffered.length === 0) return 0;
+
+  return media.buffered.end(media.buffered.length - 1);
+}
+```
+</FrameworkCase>
+
+### `isMediaErrorCapable`
+
+Narrows to the read-only `error`, which is `null` or an object with a numeric `code` and a `message`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function reportError() {
+  if (isMediaErrorCapable(media) && media.error) console.error(media.error.code, media.error.message);
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function reportError() {
+  const media = player?.store.target?.media;
+  if (isMediaErrorCapable(media) && media.error) console.error(media.error.code, media.error.message);
+}
+```
+</FrameworkCase>
+
+### `isMediaTextTrackCapable`
+
+Narrows to the read-only `textTracks` list and `addTextTrack(kind, label?, language?)`. The list is iterable and indexable, and each track has `kind`, `label`, `language`, `id`, a writable `mode` (`'showing'`, `'hidden'`, or `'disabled'`), and `cues`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function showCaptions(language: string) {
+  if (!isMediaTextTrackCapable(media)) return;
+
+  for (const track of media.textTracks) {
+    if (track.kind === "captions" || track.kind === "subtitles") {
+      track.mode = track.language === language ? "showing" : "disabled";
+    }
+  }
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function showCaptions(language: string) {
+  const media = player?.store.target?.media;
+  if (!isMediaTextTrackCapable(media)) return;
+
+  for (const track of media.textTracks) {
+    if (track.kind === "captions" || track.kind === "subtitles") {
+      track.mode = track.language === language ? "showing" : "disabled";
+    }
+  }
+}
+```
+</FrameworkCase>
+
+### `isMediaVideoRenditionCapable`
+
+Narrows to the read-only `videoRenditions` list. The list is iterable and indexable, has `getRenditionById(id)`, and has a writable `selectedIndex`; `-1` means automatic selection. Each rendition has `id`, `width`, `height`, `bitrate`, `frameRate`, `codec`, and `selected`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function switchToAutomaticQuality() {
+  if (isMediaVideoRenditionCapable(media)) media.videoRenditions.selectedIndex = -1;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function switchToAutomaticQuality() {
+  const media = player?.store.target?.media;
+  if (isMediaVideoRenditionCapable(media)) media.videoRenditions.selectedIndex = -1;
+}
+```
+</FrameworkCase>
+
+### `isMediaAudioTrackCapable`
+
+Narrows to the read-only `audioTracks` list, `addAudioTrack(kind, label?, language?)`, and `removeAudioTrack(track)`. The list is iterable and indexable, and each track has `id`, `kind`, `label`, `language`, and a writable `enabled`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function selectAudioLanguage(language: string) {
+  if (!isMediaAudioTrackCapable(media)) return;
+
+  for (const track of media.audioTracks) track.enabled = track.language === language;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function selectAudioLanguage(language: string) {
+  const media = player?.store.target?.media;
+  if (!isMediaAudioTrackCapable(media)) return;
+
+  for (const track of media.audioTracks) track.enabled = track.language === language;
+}
+```
+</FrameworkCase>
+
+### `isMediaVideoDimensionsCapable`
+
+Narrows to the read-only `videoWidth` and `videoHeight`, in pixels. Both are `0` until metadata loads.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function getAspectRatio() {
+  if (!isMediaVideoDimensionsCapable(media) || !media.videoHeight) return null;
+
+  return media.videoWidth / media.videoHeight;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function getAspectRatio() {
+  const media = player?.store.target?.media;
+  if (!isMediaVideoDimensionsCapable(media) || !media.videoHeight) return null;
+
+  return media.videoWidth / media.videoHeight;
+}
+```
+</FrameworkCase>
+
+### `isMediaRemotePlaybackCapable`
+
+Narrows to the read-only `remote` object and the writable `disableRemotePlayback`. `remote` has a `state` (`'connecting'`, `'connected'`, or `'disconnected'`), `prompt()`, `watchAvailability(callback)`, and `cancelWatchAvailability(id?)`, matching the browser's [Remote Playback API](https://developer.mozilla.org/en-US/docs/Web/API/RemotePlayback).
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function castToDevice() {
+  if (isMediaRemotePlaybackCapable(media)) media.remote.prompt();
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function castToDevice() {
+  const media = player?.store.target?.media;
+  if (isMediaRemotePlaybackCapable(media)) media.remote.prompt();
+}
+```
+</FrameworkCase>
+
+Call `prompt()` from a user gesture, such as a click handler; browsers reject it otherwise.
+
+### `isMediaStreamTypeCapable`
+
+Narrows to `streamType`: `'on-demand'`, `'live'`, or `'unknown'` before the type is determined.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function isLiveStream() {
+  return isMediaStreamTypeCapable(media) && media.streamType === "live";
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function isLiveStream() {
+  const media = player?.store.target?.media;
+  return isMediaStreamTypeCapable(media) && media.streamType === "live";
+}
+```
+</FrameworkCase>
+
+### `isMediaLiveCapable`
+
+Narrows to the read-only `liveEdgeStart` and `targetLiveWindow`. Playback is at the live edge when `currentTime` is at or past `liveEdgeStart`, which is `NaN` when the stream isn't live or the value is unknown. `targetLiveWindow` is `0` for a sliding live window, `Infinity` for a live event with playback history, and `NaN` for on-demand or unknown; it isn't a duration.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+function isAtLiveEdge() {
+  if (!isMediaLiveCapable(media) || !isMediaSeekCapable(media)) return false;
+
+  return media.currentTime >= media.liveEdgeStart;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+function isAtLiveEdge() {
+  const media = player?.store.target?.media;
+  if (!isMediaLiveCapable(media) || !isMediaSeekCapable(media)) return false;
+
+  return media.currentTime >= media.liveEdgeStart;
+}
+```
+</FrameworkCase>

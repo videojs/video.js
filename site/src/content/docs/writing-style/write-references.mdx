@@ -6,7 +6,7 @@ description: How to create API reference pages for the Video.js documentation si
 import Aside from '@/components/Aside.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 
-This guide covers component references, media references, and util references (hooks, controllers, mixins) under `reference/` in the docs content. Legacy error-code pages are also under `reference/api/`; their content comes from `video.js/errors` rather than the API docs builder.
+This guide covers component references, media references, util references (hooks, controllers, mixins), and preset references under `reference/` in the docs content. Legacy error-code pages are also under `reference/api/`; their content comes from `video.js/errors` rather than the API docs builder.
 
 <Aside type="tip">
 Reference pages use the portable `write-api-reference` agent skill. Invoke `/write-api-reference play-button` in clients that expose skills as slash commands.
@@ -140,7 +140,7 @@ All demo videos use `autoplay muted playsinline loop` (React: `autoPlay muted pl
 
 ## Create the MDX reference page
 
-Create the page under `site/src/content/docs/reference/components/` for a UI, skin, media, or extension component, or under `site/src/content/docs/reference/api/` for a hook, feature, controller, factory, or utility. The file is `{name}.mdx` with this structure:
+Create the page under `site/src/content/docs/reference/components/` for a UI, skin, media, or extension component or the icon sets, or under `site/src/content/docs/reference/api/` for a hook, feature, controller, factory, utility, or preset. The file is `{name}.mdx` (`preset-{name}.mdx` for a preset) with this structure:
 
 ### Frontmatter
 
@@ -354,24 +354,46 @@ Feature reference pages document the feature modules passed to `createPlayer`. T
 
 `feature` takes the same key as `<FeatureReference>`. The component derives the export name (`playbackFeature`, importable from `@videojs/react` or `@videojs/html`) and reads the generated preset references to state which preset bundles include the feature, so membership never drifts from the build. A unit test enforces the section on every page that renders `<FeatureReference />`.
 
+## Create a preset reference page
+
+Preset reference pages, `reference/api/preset-{name}.mdx`, document one preset: its player, feature bundle, skins, and media. They are hand-authored. The sections are Import, Usage, Player, Feature bundle, Skins, Media, and Exports, and the Feature bundle section renders the bundle's membership from the generated preset references:
+
+```mdx
+<PresetFeatures preset="live-video" />
+```
+
+List the player, its props type, the feature bundle, and the bundle's type in `apis`. The <DocsLink slug="guides/presets">Presets</DocsLink> guide stays the concept page for presets and links to each reference page.
+
 ## Add to the sidebar
 
-Open `site/src/docs.config.ts` and add your page to the appropriate category under **API Reference**:
+Open `site/src/docs.config.ts` and add your page to a group in the tab that matches its directory. Top-level sections render as sidebar tabs, and each tab writes its llms files to the directory its pages share, so keep every page in its tab's directory. A page from another directory moves those files up to the shared parent.
 
+The **Components** tab holds `reference/components/` pages:
+
+- **Layout** — components that establish a player and lay out its interface
 - **Skins** — the packaged skins each preset ships. Prose-only pages today (no generated skin JSON), opening with `<SkinImports preset="..." react="..." />`
-- **UI Components** — UI component reference pages, sorted alphabetically
-- **Media Components** — media elements that handle streaming protocols and playback
+- **Media** — media elements that handle streaming protocols and playback
 - **Extensions** — extensions that add optional behavior to the player's media, such as Google Cast and Mux Data
-- **Player Features** — feature modules passed to `createPlayer`
-- **Utilities** — hooks, utilities, controllers, and mixins. Keep primary integration APIs at the top level and put lower-level implementation APIs in the single Advanced subgroup.
+- **Buttons**, **Sliders**, **Menus**, **Display**, **Dialogs**, and **Behavior** — UI components, grouped by role
+- **Icons** — the icon sets page, whose table `<IconTable />` renders from the icon exports
 
-Skins, UI Components, Media Components, Extensions, and Player Features are flat by design. Do not add nested subsections to them. Mark framework-specific entries with `frameworks: ['react']` or `frameworks: ['html']` on the entry itself.
+The **API** tab holds `reference/api/` pages:
+
+- **Player** — player factories, hooks, controllers, `UIElement`, and the media capability guards
+- **Presets** — one page per preset
+- **Store** — selectors and the store hooks and controllers
+- **Features** — feature modules passed to `createPlayer`
+- **Menu** and **Gestures** — React hooks behind the menus and gestures
+- **i18n** — translation providers, elements, hooks, and the phrase registry
+- **Utils** — lower-level building blocks for custom components
+- **Error codes** — the legacy error-code pages
+
+Groups are flat by design. Do not add nested subsections to them. Mark framework-specific entries with `frameworks: ['react']` or `frameworks: ['html']` on the entry itself.
 
 ```ts
 {
-  sidebarLabel: 'UI Components',
+  sidebarLabel: 'Buttons',
   contents: [
-    // sorted alphabetically
     { slug: 'reference/components/play-button' },
     { slug: 'reference/components/your-component' }, // add here
   ],

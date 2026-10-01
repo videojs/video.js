@@ -12,8 +12,8 @@ const HTMLElementBase = globalThis.HTMLElement ?? class {};
 /**
  * Lightweight reactive custom element base class.
  *
- * Drop-in subset of Lit's `ReactiveElement` — supports `static properties`, attribute reflection, batched async
- * updates, and reactive controllers. No Shadow DOM, no `static styles`, no decorators.
+ * Drop-in subset of Lit's `ReactiveElement` — supports `static properties`, attribute-to-property conversion, batched
+ * async updates, and reactive controllers. No Shadow DOM, no `static styles`, no decorators.
  *
  * Updates are batched using the same Promise-based scheduling as Lit: property changes enqueue a microtask, and the
  * update is gated behind `connectedCallback` so the first update only runs once the element is in the document.
@@ -296,8 +296,8 @@ export class ReactiveElement extends HTMLElementBase {
   protected willUpdate(_changed: PropertyValues): void {}
 
   /**
-   * Updates the element. This method reflects property values to attributes and can be overridden to render and keep
-   * updated element DOM. Setting properties inside this method will _not_ trigger another update.
+   * Updates the element. Override it to render and keep the element's DOM up to date; properties are not reflected to
+   * attributes. Setting properties inside this method will _not_ trigger another update.
    */
   protected update(_changed: PropertyValues): void {}
 

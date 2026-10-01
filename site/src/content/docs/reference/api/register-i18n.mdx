@@ -1,6 +1,9 @@
 ---
 title: registerI18n
 description: Register or merge translation strings for a BCP 47 locale tag in the global i18n registry
+apis:
+  - '@videojs/react/i18n/locales/*'
+  - '@videojs/html/i18n/locales/*'
 ---
 
 import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
@@ -52,6 +55,36 @@ registerI18n('es', {
   },
 });
 ```
+
+</FrameworkCase>
+
+## Built-in locale packs
+
+Each shipped pack is a module named after its locale tag. Its default export is the pack's `Translations` map. Pass it to `registerI18n` when you load a pack yourself, for example right before switching to that locale:
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { registerI18n } from '@videojs/html/i18n';
+import ja from '@videojs/html/i18n/locales/ja';
+
+registerI18n('ja', ja);
+```
+
+A side-effect import of the pack's `/register` subpath, such as `import '@videojs/html/i18n/locales/ja/register'`, does the same.
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { registerI18n } from '@videojs/react/i18n';
+import ja from '@videojs/react/i18n/locales/ja';
+
+registerI18n('ja', ja);
+```
+
+A side-effect import of the pack's `/register` subpath, such as `import '@videojs/react/i18n/locales/ja/register'`, does the same.
 
 </FrameworkCase>
 

@@ -1,6 +1,8 @@
 ---
 title: I18nController
 description: Reactive controller for consuming translator and locale values from an HTML i18n context
+apis:
+  - i18nContext
 ---
 
 import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
@@ -13,7 +15,7 @@ import { I18nController } from "@videojs/html";
 
 ## Usage
 
-Create the controller with a reactive host and an i18n context. Read the translator from `value` and the active locale from `locale`.
+Create the controller with a reactive host and an i18n context. `i18nContext` is the default context that `<media-i18n>` provides; its `I18nContextValue` holds the active `translator` and `locale`. Read the `Translator` from `value` and the active locale from `locale`.
 
 ```ts
 import { I18nController, UIElement, i18nContext } from "@videojs/html";

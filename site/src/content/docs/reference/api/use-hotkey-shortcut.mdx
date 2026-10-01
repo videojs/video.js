@@ -23,6 +23,6 @@ function PlayShortcut() {
 }
 ```
 
-The hook subscribes to registration changes. It returns empty details when the player container or action is unavailable; pass `value` for actions with value-specific registrations.
+The hook subscribes to registration changes and returns `HotkeyShortcutDetails`: `aria` for the `aria-keyshortcuts` value and `shortcut` for display text. Both are `undefined` when the player container or action is unavailable, or the action has no registered shortcut; pass `value` for actions with value-specific registrations.
 
 <UtilReference util="useHotkeyShortcut" />

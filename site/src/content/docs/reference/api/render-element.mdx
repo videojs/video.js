@@ -59,6 +59,23 @@ The `render` prop lets consumers fully customize the rendered element while pres
 />
 ```
 
+## Types
+
+The props type of every Video.js UI component builds on `UIComponentProps`, and its `render` prop takes a `RenderProp`. `@videojs/react` exports these types:
+
+```tsx
+import type { HTMLProps, RenderFunction, RenderProp, UIComponentProps } from "@videojs/react";
+```
+
+| Type | Description |
+| --- | --- |
+| `UIComponentProps<TagName, State>` | The props of the intrinsic element `TagName`, with `className` and `style` that also accept a function of `State`, plus an optional `render` prop of type `RenderProp<State>`. |
+| `RenderProp<State>` | A React element, or a `RenderFunction<HTMLProps, State>`. |
+| `RenderFunction<Props, State>` | `(props: Props, state: State) => ReactElement \| null` |
+| `HTMLProps<T>` | React's `HTMLAttributes<T>` plus an optional `ref` to `T`: the props a render function receives. `T` defaults to `any`. |
+
+A render function receives the component's merged props, including its composed `ref`, and its current state. Spread the props on the element it returns. A render element is cloned with the component's props merged into its own: event handlers are chained, class names are concatenated, styles are merged, and other props on the element win. Its `ref` is composed with the component's.
+
 ## Examples
 
 ### Basic Usage

@@ -20,7 +20,7 @@ import { useLocale } from "@videojs/react";
 
 <FrameworkCase frameworks={["react"]}>
 
-`useLocale` returns the resolved BCP 47 tag from the nearest <DocsLink slug="reference/api/i18n-provider">`I18nProvider`</DocsLink>, or `'en'` when none is mounted.
+`useLocale` returns the resolved BCP 47 tag from the nearest <DocsLink slug="reference/api/i18n-provider">`I18nProvider`</DocsLink>, or `'en'` when none is mounted. The `Locale` type autocompletes the built-in locale tags and accepts any other BCP 47 string.
 
 Use it when UI copy depends on the active locale outside the translator, for example formatting or caption language hooks.
 

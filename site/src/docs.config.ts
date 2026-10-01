@@ -287,14 +287,19 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/status-announcer' },
         ],
       },
+      {
+        sidebarLabel: 'Icons',
+        llmsDescription: 'API reference for the icon sets the skins use, available for your own controls.',
+        contents: [{ slug: 'reference/components/icons' }],
+      },
     ],
   },
   {
     sidebarLabel: 'API',
     llmsDescription: {
       react:
-        'API reference for the player factory, store, features, menus, gestures, translation tools, and utilities.',
-      html: 'API reference for the player factory, store controllers, features, translation tools, and utilities.',
+        'API reference for the player factory, presets, store, features, menus, gestures, translation tools, and utilities.',
+      html: 'API reference for the player factory, presets, store controllers, features, translation tools, and utilities.',
     },
     contents: [
       {
@@ -304,11 +309,26 @@ export const sidebar: Sidebar = [
           { slug: 'reference/api/create-player', frameworks: ['react'] },
           { slug: 'reference/api/html-create-player', sidebarLabel: 'createPlayer', frameworks: ['html'] },
           { slug: 'reference/api/player-controller', frameworks: ['html'] },
+          { slug: 'reference/api/ui-element', sidebarLabel: 'UIElement', frameworks: ['html'] },
           { slug: 'reference/api/use-player', frameworks: ['react'] },
           { slug: 'reference/api/use-optional-player', frameworks: ['react'] },
+          { slug: 'reference/api/use-media', frameworks: ['react'] },
           { slug: 'reference/api/use-container', frameworks: ['react'] },
           { slug: 'reference/api/use-optional-container', frameworks: ['react'] },
           { slug: 'reference/api/use-container-attach', frameworks: ['react'] },
+          { slug: 'reference/api/media-capabilities', sidebarLabel: 'Media capability guards' },
+        ],
+      },
+      {
+        sidebarLabel: 'Presets',
+        llmsDescription:
+          'API reference for the presets: each bundles a player, feature bundle, skins, and media for one use case.',
+        contents: [
+          { slug: 'reference/api/preset-video', sidebarLabel: 'Video' },
+          { slug: 'reference/api/preset-audio', sidebarLabel: 'Audio' },
+          { slug: 'reference/api/preset-live-video', sidebarLabel: 'Live video' },
+          { slug: 'reference/api/preset-live-audio', sidebarLabel: 'Live audio' },
+          { slug: 'reference/api/preset-background', sidebarLabel: 'Background' },
         ],
       },
       {

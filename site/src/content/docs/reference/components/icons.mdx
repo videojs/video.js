@@ -1,0 +1,188 @@
+---
+title: Icons
+description: The SVG icon sets used by the packaged skins, as React components, SVG strings, and the media-icon element
+apis:
+  - '@videojs/react/icons'
+  - '@videojs/react/icons/neutral'
+  - '@videojs/react/icons/compat'
+  - '@videojs/html/icons'
+  - '@videojs/html/icons/neutral'
+  - '@videojs/html/icons/compat'
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import IconTable from "@/components/docs/api-reference/IconTable.astro";
+
+The icons the packaged skins render. Skin source added with the <DocsLink slug="guides/installation-shadcn">Shadcn registry</DocsLink> imports its icons from these modules, and your own controls can use them too.
+
+<FrameworkCase frameworks={["react"]}>
+Each icon is a React component that renders an inline `<svg>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Each icon is available as an SVG string and by name through the `<media-icon>` element.
+</FrameworkCase>
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { PlayIcon } from "@videojs/react/icons";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Register `<media-icon>`:
+
+```ts
+import "@videojs/html/icons/element";
+```
+
+Or import SVG strings:
+
+```ts
+import { playIcon } from "@videojs/html/icons";
+```
+</FrameworkCase>
+
+## Icon sets
+
+Three sets ship with the same icon names and different designs.
+
+<FrameworkCase frameworks={["react"]}>
+
+| Set | Module | Used by |
+|-----|--------|---------|
+| Default | `@videojs/react/icons` | The default skins, such as <DocsLink slug="reference/components/video-skin">`VideoSkin`</DocsLink> |
+| Neutral | `@videojs/react/icons/neutral` | The neutral skins, such as <DocsLink slug="reference/components/video-neutral-skin">`NeutralVideoSkin`</DocsLink> |
+| Compat | `@videojs/react/icons/compat` | The compat skins, such as <DocsLink slug="reference/components/video-compat-skin">`CompatVideoSkin`</DocsLink> |
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+| Set | `family` | SVG strings | Used by |
+|-----|----------|-------------|---------|
+| Default | `default` | `@videojs/html/icons` or `@videojs/html/icons/default` | The default skins, such as <DocsLink slug="reference/components/video-skin">`<video-skin>`</DocsLink> |
+| Neutral | `neutral` | `@videojs/html/icons/neutral` | The neutral skins, such as <DocsLink slug="reference/components/video-neutral-skin">`<video-neutral-skin>`</DocsLink> |
+| Compat | `compat` | `@videojs/html/icons/compat` | The compat skins, such as <DocsLink slug="reference/components/video-compat-skin">`<video-compat-skin>`</DocsLink> |
+
+</FrameworkCase>
+
+## Available icons
+
+<IconTable />
+
+<FrameworkCase frameworks={["react"]}>
+
+## Props
+
+Icons accept `IconProps`, the standard SVG element props (`SVGProps<SVGSVGElement>`), and forward their ref to the `<svg>`. Props you pass override the defaults:
+
+| Attribute | Default |
+|-----------|---------|
+| `width`, `height` | `18` |
+| `viewBox` | `0 0 18 18` |
+| `fill` | `currentColor` |
+| `aria-hidden` | `true` |
+
+```tsx
+import { PlayButton } from "@videojs/react";
+import { PauseIcon, PlayIcon } from "@videojs/react/icons";
+
+<PlayButton
+  render={(props, state) => (
+    <button {...props}>
+      {state.paused ? <PlayIcon className="icon" /> : <PauseIcon className="icon" />}
+    </button>
+  )}
+/>
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+## Element
+
+`<media-icon>` renders a registered icon as its child `<svg>`, in the light DOM. It renders nothing when the name is not registered in the family.
+
+| Attribute | Default | Description |
+|-----------|---------|-------------|
+| `name` | — | Icon name from the [available icons](#available-icons), such as `play` |
+| `family` | `default` | Icon set to read from, such as `neutral` |
+
+```html
+<media-play-button>
+  <media-icon class="play-icon" name="play"></media-icon>
+  <media-icon class="pause-icon" name="pause" family="neutral"></media-icon>
+</media-play-button>
+```
+
+Each module below defines `<media-icon>` if it is not already defined:
+
+| Module | Registers |
+|--------|-----------|
+| `@videojs/html/icons/element` | Every set, loading each one the first time a `<media-icon>` asks for its family |
+| `@videojs/html/icons/element/default` | The default set, up front |
+| `@videojs/html/icons/element/neutral` | The neutral set, up front |
+| `@videojs/html/icons/element/compat` | The compat set, up front |
+
+## SVG strings
+
+Each icon export from `@videojs/html/icons`, `@videojs/html/icons/default`, `@videojs/html/icons/neutral`, and `@videojs/html/icons/compat` is the icon's SVG markup as a string; `@videojs/html/icons` also exports [`registerIcons`](#registericons). Importing them does not define `<media-icon>`.
+
+```ts
+import { playIcon } from "@videojs/html/icons";
+
+button.innerHTML = playIcon;
+```
+
+## `registerIcons`
+
+`registerIcons(family, icons)` registers SVG strings under icon names for `<media-icon>` and defines the element if needed. Only the icons you import ship, which is how skin source from the Shadcn registry registers its icons. Registering into an existing family adds to it, and `<media-icon>` elements already in the page update.
+
+```ts
+import { pauseIcon, playIcon, registerIcons } from "@videojs/html/icons";
+
+registerIcons("default", { play: playIcon, pause: pauseIcon });
+registerIcons("brand", { play: '<svg viewBox="0 0 18 18">…</svg>' });
+```
+
+```html
+<media-icon name="play"></media-icon>
+<media-icon name="play" family="brand"></media-icon>
+```
+
+Once a family has registered icons, `<media-icon>` renders only those for it, even when `@videojs/html/icons/element` is also imported. `registerIcons` throws when a different element is already defined as `media-icon` and does not support registration.
+
+</FrameworkCase>
+
+## Styling
+
+Icons use `fill="currentColor"`, so they take the text color of their parent. They are drawn on an 18×18 grid and render most sharply at 18px or a whole multiple, such as 36px.
+
+<FrameworkCase frameworks={["react"]}>
+```css
+.icon {
+  width: 36px;
+  height: 36px;
+  color: white;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```css
+media-icon svg {
+  width: 36px;
+  height: 36px;
+  color: white;
+}
+```
+</FrameworkCase>
+
+## Accessibility
+
+Every icon renders with `aria-hidden="true"`. Give the surrounding control its accessible name. Built-in buttons, such as the <DocsLink slug="reference/components/play-button">play button</DocsLink>, provide one automatically.

@@ -83,7 +83,27 @@ import withChaptersHtmlTs from "@/components/docs/demos/time-slider/html/css/Wit
   />
   ```
 
-  `renderChapter` receives the attributes, styles, and state for each normalized chapter range. When no chapter cues are available, it renders once as a full-width, cue-less range.
+  `renderChapter` receives the attributes, styles, and state for each normalized chapter range. When no chapter cues are available, it renders once as a full-width, cue-less range. Spread the attributes on the chapter's root element: they carry the slider's data attributes, the chapter's `data-active` and `data-highlighted` attributes, and a `style` that sets its `--media-slider-chapter-*` custom properties.
+
+  The state is a `TimeSliderChapterState`, exported from `@videojs/react`:
+
+  | Field | Type | Description |
+  | --- | --- | --- |
+  | `cue` | `MediaTextCue \| null` | The chapter cue, or `null` for a gap range. |
+  | `key` | `string` | Stable identity of the range. |
+  | `index` | `number` | Position of the range, from `0`. |
+  | `start`, `end` | `number` | Range bounds, in seconds. |
+  | `startPercent`, `endPercent` | `` `${number}%` `` | Range bounds as a percentage of the slider. |
+  | `width`, `height` | `` `${number}%` \| undefined `` | Range size along the slider's orientation; the other is `undefined`. |
+  | `orientation` | `'horizontal' \| 'vertical'` | The slider's orientation. |
+  | `highlight` | `boolean \| undefined` | Whether the range can be highlighted: `true` for a chapter, `false` for a gap range. |
+  | `fillPercent` | `number` | Fill within the range, from 0 to 100. |
+  | `bufferPercent` | `number` | Buffer within the range, from 0 to 100. |
+  | `active` | `boolean` | Playback is within the range. |
+  | `pointing` | `boolean` | The pointer is within the range. |
+  | `dragging` | `boolean` | The drag value is within the range. |
+  | `highlighted` | `boolean` | Pointer interaction highlights the range. |
+  | `interactive` | `boolean` | The range is the current interaction target. |
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
