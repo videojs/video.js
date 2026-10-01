@@ -474,7 +474,11 @@ Two more source params describe images rather than playback. `source.storyboard`
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<MuxVideo source={{ playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 } }} playsInline />
+<MuxVideo
+  source={{ playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 } }}
+  crossOrigin="anonymous"
+  playsInline
+/>
 ```
 </FrameworkCase>
 
@@ -485,11 +489,11 @@ video.source = { playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 }
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-`MuxVideo` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
+`MuxVideo` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. The track loads from a Mux image domain, so set `crossOrigin` on `MuxVideo`; without it, the browser blocks the track and no previews appear. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<mux-video>` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
+`<mux-video>` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. The track loads from a Mux image domain, so set `crossorigin` on `<mux-video>`; without it, the browser blocks the track and no previews appear. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
 </FrameworkCase>
 
 ### Mux signs DRM with a token
