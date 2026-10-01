@@ -102,7 +102,7 @@ function calculatePresentationDurationSetup({
  */
 export const calculatePresentationDuration: Behavior<
   { presentation: Signal<PresentationDurationState['presentation']> },
-  Record<string, never>,
+  {},
   PresentationDurationConfig
 > = {
   stateKeys: ['presentation'],
