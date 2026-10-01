@@ -1,0 +1,89 @@
+---
+title: 'Choose where to host your video'
+description: 'Pick video hosting that gives the player adaptive streaming, thumbnail previews, live streams, and analytics.'
+---
+
+import Aside from '@/components/Aside.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+
+Video.js plays video from wherever it lives, but where it lives decides what the player can offer. A quality menu needs an adaptive stream, thumbnail previews need a storyboard, and a live stream needs somewhere to send it. Pick hosting that provides what your player needs.
+
+## Recommended approach
+
+Host your video on [Mux](https://www.mux.com). Mux turns any upload into an adaptive HLS stream, makes a storyboard for thumbnail previews, takes live streams, and measures playback with Mux Data. The Video.js Mux media wires all of that up for you.
+
+Upload a file from the [Mux dashboard](https://dashboard.mux.com), from the uploader in the <DocsLink slug="guides/installation">installation guide</DocsLink>, or with the [Mux CLI](https://www.npmjs.com/package/@mux/cli):
+
+```sh
+npx @mux/cli login
+npx @mux/cli assets create --upload ./intro.mp4 --playback-policy public --wait --json
+```
+
+The JSON output includes the video's playback ID. Play it with the Mux media and its stream URL:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo src="https://stream.mux.com/PLAYBACK_ID.m3u8" playsInline />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" playsinline></mux-video>
+```
+</FrameworkCase>
+
+To install the Mux media with the rest of the player, run `npx @videojs/cli agents init --media mux-video --source-url https://stream.mux.com/PLAYBACK_ID.m3u8`, or pass a local file as `--source-url` and the instructions start with the upload.
+
+## How it works
+
+Hosting decides four things the player can't do on its own:
+
+- **Adaptive streaming.** An HLS or DASH stream carries the same video at several qualities, so the player switches as the connection changes and the <DocsLink slug="guides/quality">quality menu</DocsLink> has choices. A single MP4 file plays at one quality.
+- **Thumbnail previews.** <DocsLink slug="guides/thumbnails">Thumbnail previews</DocsLink> read a storyboard: preview images and a WebVTT track that maps them to times. Mux media adds the track itself; other hosting needs you to make the storyboard and add the track.
+- **Live streams.** A <DocsLink slug="guides/live-streams">live stream</DocsLink> needs an ingest point that broadcasting software such as OBS sends to, and a stream URL that viewers play.
+- **Analytics.** <DocsLink slug="reference/components/mux-data">Mux Data</DocsLink> measures startup time, rebuffering, and errors for every view. It's included with Mux media.
+
+## Availability and constraints
+
+- A live preset with Mux media needs a Mux live stream. Create one with `npx @mux/cli live create --playback-policy public`, which returns the stream key for your broadcasting software and the playback ID for the player. Keep the stream key secret.
+- Keep Mux credentials out of your code. The CLI signs in with `mux login` or reads `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET` from the environment.
+- Embeds play in the platform's own player. Video.js styles and controls them, but the platform decides the qualities, captions, and analytics they offer.
+
+## Common variations
+
+### Cloudflare Stream
+
+[Cloudflare Stream](https://www.cloudflare.com/products/cloudflare-stream/) also turns uploads into adaptive streams. Play its videos with the <DocsLink slug="reference/components/cloudflare-video">Cloudflare media</DocsLink>.
+
+### Videos already on YouTube or Vimeo
+
+Keep videos that already live on a platform there, and give them your player's look with the <DocsLink slug="reference/components/youtube-video">YouTube</DocsLink> or <DocsLink slug="reference/components/vimeo-video">Vimeo</DocsLink> media. Twitch, TikTok, and Spotify have their own media too.
+
+### Your own files
+
+Serve an MP4 from your own server, a CDN, or object storage such as Amazon S3, and play it with the <DocsLink slug="reference/components/video">Video</DocsLink> media. That's the simplest setup, with one quality and no thumbnail previews.
+
+For adaptive streaming without a hosting service, package the file as HLS yourself, for example with [FFmpeg](https://ffmpeg.org), and play the `.m3u8` with the <DocsLink slug="reference/components/hlsjs-video">hls.js media</DocsLink>. You then encode each quality, make the storyboard, and serve the segments yourself.
+
+<Aside type="tip">
+Not sure yet? Start with the Video.js demo media, which every installation uses until you have your own, and switch the source later. Changing hosting is a one-line change to the media and its URL.
+</Aside>
+
+## Troubleshooting
+
+### The quality menu has nothing to choose
+
+The source is a single file. Play an HLS or DASH stream instead, such as an upload to Mux.
+
+### Thumbnail previews don't appear
+
+The media has no storyboard track. Use Mux media, which adds one, or generate a storyboard and add the track as the <DocsLink slug="guides/thumbnails">thumbnails guide</DocsLink> shows.
+
+## Related guides
+
+- <DocsLink slug="guides/media-sources" />
+- <DocsLink slug="guides/quality" />
+- <DocsLink slug="guides/thumbnails" />
+- <DocsLink slug="guides/live-streams" />
