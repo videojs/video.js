@@ -31,9 +31,9 @@
     --media-shadow-current-color: oklch(from currentColor 0 0 0 / clamp(0, calc((l - 0.5) * 0.5), 0.15));
     --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
     --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.25);
-    --media-backdrop-filter-surface: blur(16px) saturate(150%);
+    --media-backdrop-filter-surface: blur(16px) saturate(110%);
     --media-backdrop-filter-indicator: blur(8px);
-    --media-backdrop-filter-dialog: blur(16px) saturate(150%);
+    --media-backdrop-filter-dialog: blur(16px) saturate(110%);
 
     /* Controls. */
     --media-control-corner-shape: round;
