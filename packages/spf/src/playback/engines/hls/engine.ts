@@ -1,3 +1,5 @@
+import { defaults } from '@videojs/utils/object';
+
 import {
   type Composition,
   createComposition,
@@ -53,7 +55,7 @@ import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
 import { trackPlayerResolution } from '../../behaviors/dom/track-player-resolution';
 import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
-// `video/audio/textMessagePipelines` finalConfig entries, the `mediaContainerData`
+// `video/audio/textMessagePipelines` defaultConfig entries, the `mediaContainerData`
 // state slot, and the `deriveStartMediaTime` config field to drop relocation entirely
 // (text then falls back to the plain `resolveVttSegment` resolver).
 import {
@@ -71,7 +73,9 @@ import {
   DEFAULT_VIDEO_CONSTRAINTS,
   type SwitchAudioTrackConfig,
   type SwitchTextTrackConfig,
+  type SwitchAudioTrackRule,
   type SwitchVideoTrackConfig,
+  type SwitchVideoTrackRule,
   type UserTrackSelectionState,
   switchAudioTrack,
   switchTextTrack,
@@ -418,6 +422,92 @@ export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = ty
 // HLS Playback Engine
 // ============================================================================
 
+// Typed as the runtime shapes the behaviors read, so `defaults` accepts any `EngineConfig` against them.
+const noLicenseServers: DrmSystemsConfig = {};
+const defaultKeySystems: readonly KeySystemModule[] = DEFAULT_KEY_SYSTEMS;
+const drmAwareVideoConstraints: readonly SwitchVideoTrackRule[] = [
+  ...DEFAULT_VIDEO_CONSTRAINTS,
+  excludeRefusedKeySystems,
+];
+const drmAwareAudioConstraints: readonly SwitchAudioTrackRule[] = [
+  ...DEFAULT_AUDIO_CONSTRAINTS,
+  excludeRefusedKeySystems,
+];
+
+/**
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
+ * engine config doesn't expose (`attachMediaSource`, the relocation pipelines, `gateFirstParse`,
+ * `resolveLiveLatency`).
+ */
+export const defaultConfig = {
+  // Non-zero-PTS relocation (spike): the coordination seam the reactor (model
+  // `startMediaTime`) and the loader stamps (buffer `timestampOffset`) both read from
+  // config, so they apply the SAME derive. Shared-`min` across selected A/V (subsumes
+  // per-type).
+  deriveStartMediaTime: deriveSharedMinStartMediaTime,
+  // No license servers configured is the degenerate DRM config: the DRM-aware
+  // probe and reporter refuse encrypted renditions exactly as the DRM-less
+  // `canPlayTrack` / `reportUnsupportedTrackConditions` pair does, and
+  // `setupMediaKeys` reports SVTA 4008 for an encrypted source it can't serve.
+  // Typed as the runtime shapes: the behaviors read any id, and the composition's
+  // config type is the intersection of what they declare.
+  drm: noLicenseServers,
+  keySystems: defaultKeySystems,
+  // Not in `EngineConfig`: this engine composes `setupAirPlay`, whose native
+  // fallback `<source>` requires the MSE attachment to keep sibling source
+  // alternatives part of resource selection.
+  attachMediaSource: attachMediaSourceAsSourceElement,
+  canPlayTrack: canPlayTrackWithDrm,
+  // The late half of DRM pruning, appended to each type's default pre-pass:
+  // once negotiation publishes a refusal, encrypted renditions prune and the
+  // emptied type reports its own verdict. Dropped with the rest of the DRM
+  // defaults by a composition that omits DRM.
+  videoConstraints: drmAwareVideoConstraints,
+  audioConstraints: drmAwareAudioConstraints,
+  reportUnsupportedTrackConditions: reportUnsupportedTrackConditionsWithDrm,
+  resolveTextTrackSegment: resolveVttSegment,
+  // Non-zero-PTS relocation (spike): the text pipeline rebases cues onto the
+  // relocated 0-based timeline. Remove `textMessagePipelines` to drop text relocation.
+  textMessagePipelines: relocatingTextPipelines,
+  resolveDuration: getResolvedSelectedTrackDuration,
+  parsePresentation: parseMultivariantPlaylist,
+  addSubtitlesTracksToMedia,
+  getShowingSubtitlesTrackFromMedia,
+  removeAllSubtitlesTracksFromMedia,
+  // Non-zero-PTS relocation (spike): the discover/stamp steps `establishStartMediaTime`
+  // pairs with. They apply the same `deriveStartMediaTime` seam as the reactor. Remove
+  // these two lines with the reactor.
+  videoMessagePipelines: relocationPipelinesFor('video'),
+  audioMessagePipelines: relocationPipelinesFor('audio'),
+  // Live-anchor establishment order: each non-reference track's first parse
+  // waits for the reference track to settle the wall-clock anchor question
+  // (see `gate-first-parse.ts`); pairs with the reactor's anchor stamp.
+  gateFirstParse: gateFirstParseOnAnchor,
+  // Format-neutral live-latency seam for `seekToLiveEdge` — the HLS resolver
+  // (HOLD-BACK); a DASH engine would inject `suggestedPresentationDelay`.
+  resolveLiveLatency,
+  // The resolve* loaders' RecurringRunner re-runs on this `reschedule`: the pure
+  // target-duration cadence, start-anchored + made awaitable by `delayedReschedule`.
+  // Inert for VoD (the cadence returns null once a playlist is complete), so it
+  // composes always.
+  reschedule: delayedReschedule(mediaPlaylistReloadDelay),
+};
+
+/**
+ * The state the engine starts with. Seeds `bandwidthState` so `switchVideoTrack` fires on initial subscribe with the
+ * `initialBandwidth` fallback rather than waiting for the first chunk: the empty sample buffer means
+ * `getBandwidthEstimate` returns the configured initial bandwidth until real samples land.
+ */
+export const initialState = {
+  bandwidthState: {
+    fastEstimate: 0,
+    fastTotalWeight: 0,
+    slowEstimate: 0,
+    slowTotalWeight: 0,
+    bytesSampled: 0,
+  },
+};
+
 /**
  * Create an HLS playback engine.
  *
@@ -442,78 +532,9 @@ export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = ty
 export function createEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
   config: EngineConfig<KeySystems> = {}
 ): Composition<EngineState, EngineContext> {
-  // Non-zero-PTS relocation (spike): resolve the coordination seam once so the reactor
-  // (model `startMediaTime`) and the loader stamps (buffer `timestampOffset`) apply the
-  // SAME derive. Default is shared-`min` across selected A/V (subsumes per-type).
-  const deriveStartMediaTime = config.deriveStartMediaTime ?? deriveSharedMinStartMediaTime;
-  // No license servers configured is the degenerate DRM config: the DRM-aware
-  // probe and reporter refuse encrypted renditions exactly as the DRM-less
-  // `canPlayTrack` / `reportUnsupportedTrackConditions` pair does, and
-  // `setupMediaKeys` reports SVTA 4008 for an encrypted source it can't serve.
-  // Widened back to the runtime shapes here: the behaviors read any id, and the
-  // composition's config type is the intersection of what they declare.
-  const drm: DrmSystemsConfig = config.drm ?? {};
-  const keySystems: readonly KeySystemModule[] = config.keySystems ?? DEFAULT_KEY_SYSTEMS;
-  const finalConfig = {
-    ...config,
-    deriveStartMediaTime,
-    drm,
-    keySystems,
-    // Baked (not user-overridable): this engine composes `setupAirPlay`,
-    // whose native fallback `<source>` requires the MSE attachment to keep
-    // sibling source alternatives part of resource selection.
-    attachMediaSource: attachMediaSourceAsSourceElement,
-    canPlayTrack: config.canPlayTrack ?? canPlayTrackWithDrm,
-    // The late half of DRM pruning, appended to each type's default pre-pass:
-    // once negotiation publishes a refusal, encrypted renditions prune and the
-    // emptied type reports its own verdict. Dropped with the rest of the DRM
-    // defaults by a composition that omits DRM.
-    videoConstraints: config.videoConstraints ?? [...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems],
-    audioConstraints: config.audioConstraints ?? [...DEFAULT_AUDIO_CONSTRAINTS, excludeRefusedKeySystems],
-    reportUnsupportedTrackConditions:
-      config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditionsWithDrm,
-    resolveTextTrackSegment: config.resolveTextTrackSegment ?? resolveVttSegment,
-    // Non-zero-PTS relocation (spike): the text pipeline rebases cues onto the
-    // relocated 0-based timeline. Remove `textMessagePipelines` to drop text relocation.
-    textMessagePipelines: relocatingTextPipelines,
-    resolveDuration: config.resolveDuration ?? getResolvedSelectedTrackDuration,
-    parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
-    addSubtitlesTracksToMedia: config.addSubtitlesTracksToMedia ?? addSubtitlesTracksToMedia,
-    getShowingSubtitlesTrackFromMedia: config.getShowingSubtitlesTrackFromMedia ?? getShowingSubtitlesTrackFromMedia,
-    removeAllSubtitlesTracksFromMedia: config.removeAllSubtitlesTracksFromMedia ?? removeAllSubtitlesTracksFromMedia,
-    // Non-zero-PTS relocation (spike): the discover/stamp steps `establishStartMediaTime`
-    // pairs with. They apply the same `deriveStartMediaTime` seam as the reactor. Remove
-    // these two lines with the reactor.
-    videoMessagePipelines: relocationPipelinesFor('video', deriveStartMediaTime),
-    audioMessagePipelines: relocationPipelinesFor('audio', deriveStartMediaTime),
-    // Live-anchor establishment order: each non-reference track's first parse
-    // waits for the reference track to settle the wall-clock anchor question
-    // (see `gate-first-parse.ts`); pairs with the reactor's anchor stamp.
-    gateFirstParse: gateFirstParseOnAnchor,
-    // Format-neutral live-latency seam for `seekToLiveEdge` — the HLS resolver
-    // (HOLD-BACK); a DASH engine would inject `suggestedPresentationDelay`.
-    resolveLiveLatency,
-    // The resolve* loaders' RecurringRunner re-runs on this `reschedule`: the pure
-    // target-duration cadence, start-anchored + made awaitable by `delayedReschedule`.
-    // Inert for VoD (the cadence returns null once a playlist is complete), so it
-    // composes always.
-    reschedule: config.reschedule ?? delayedReschedule(mediaPlaylistReloadDelay),
-  };
-
   return createComposition([...behaviors], {
-    config: finalConfig,
-    // Seed bandwidthState so switchVideoTrack fires on initial subscribe
-    // with the `initialBandwidth` fallback rather than waiting for the
-    // first chunk. The empty sample buffer means `getBandwidthEstimate`
-    // returns the configured initial bandwidth until real samples land.
-    initialState: {
-      bandwidthState: {
-        fastEstimate: 0,
-        fastTotalWeight: 0,
-        slowEstimate: 0,
-        slowTotalWeight: 0,
-        bytesSampled: 0,
-      },
-    },
+    // Overrides from `config`, defaults for every key it leaves `undefined`.
+    config: { ...config, ...defaults(config, defaultConfig) },
+    initialState,
   });
 }

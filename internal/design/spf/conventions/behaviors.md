@@ -437,7 +437,7 @@ A behavior's `config` fields are typically optional with sensible defaults (`def
 
 Mark the field as required on the behavior's `Config` interface and drop the `?` on the setup-fn deps' `config:`. `defineBehavior`'s `RequireIfNonEmpty<'config', Cfg>` already makes the config arg required at the behavior call site whenever `Cfg` has any keys; the new force is at the *field* level, propagated through `ResolveBehaviorConfig` so `createComposition`'s intersected `Cfg` carries the required field — typecheck forces the engine to supply it.
 
-The composing engine binds the default in its own `finalConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
+The composing engine binds the default in its exported `defaultConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
 
 ```ts
 // In the behavior — required, no default
@@ -446,17 +446,19 @@ export interface ResolvePresentationConfig {
   defaultPreload?: StandardPreload;     // optional, spec-fallback
 }
 
-// In the engine — optional, defaulted in finalConfig
+// In the engine — optional, defaulted in defaultConfig
 interface EngineConfig {
   parsePresentation?: ParsePresentation;
   // ...
 }
 
-const finalConfig = {
-  ...config,
-  parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
+export const defaultConfig = {
+  parsePresentation: parseMultivariantPlaylist,
   // ...
 };
+
+// createEngine: overrides from `config`, defaults for every key it leaves `undefined`
+createComposition([...behaviors], { config: { ...config, ...defaults(config, defaultConfig) }, initialState });
 ```
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { signal } from '../../../core/signals/primitives';
 import { initSegment, mediaSegment, trak } from '../../../media/mp4/tests/synthetic-boxes';
 import type { Cue, MaybeResolvedPresentation, MediaContainerData } from '../../../media/types';
+import type { DeriveStartMediaTime } from '../derive-start-media-time';
 import { relocatingTextPipelines, relocationPipelinesFor } from '../relocation-pipelines';
 import type { Frame, StepDeps } from '../segment-load-pipeline';
 import type { TextFrame, TextStepDeps } from '../text-segment-load-pipeline';
@@ -34,11 +35,11 @@ function makeDeps(): {
 }
 
 /**
- * The discover steps at their pipeline positions: `[fetch, discover, dispatch]`. The derive is irrelevant here (only
- * the stamp step consumes it), so a no-op suffices.
+ * The discover steps at their pipeline positions: `[fetch, discover, dispatch]`. Only the stamp step reads
+ * `deriveStartMediaTime`, so the discover steps need none.
  */
 function discoverSteps(trackType: 'video' | 'audio') {
-  const pipelines = relocationPipelinesFor(trackType, () => ({}))();
+  const pipelines = relocationPipelinesFor(trackType)();
 
   return { readInitTrackInfo: pipelines['append-init'][1]!, readSegmentOrigin: pipelines['append-segment'][1]! };
 }
@@ -95,6 +96,40 @@ describe('relocationPipelinesFor', () => {
 
     await readSegmentOrigin(segmentFrame, signalNotAborted, deps);
     expect(slot.get()?.audio?.baseMediaDecodeTime).toBeUndefined();
+  });
+});
+
+describe('relocationPipelinesFor — stamp', () => {
+  const notAborted = new AbortController().signal;
+
+  // The stamp is the third append-segment step: [fetch, readSegmentOrigin, stamp, dispatch].
+  function stampFor(config: { deriveStartMediaTime?: DeriveStartMediaTime }) {
+    const stamp = relocationPipelinesFor('video')()['append-segment'][2]!;
+    const mediaContainerData = signal<Record<string, MediaContainerData> | undefined>({
+      video: { trackId: 1, timescale: 6000, baseMediaDecodeTime: 60000, segmentStartTime: 0 },
+    });
+    const deps: StepDeps = { state: { mediaContainerData }, context: {}, config };
+    const frame = {
+      op: { type: 'append-segment', meta: { id: 's0', startTime: 0, duration: 6, trackId: 'v' } },
+    } as unknown as Frame;
+
+    return { run: () => stamp(frame, notAborted, deps), frame };
+  }
+
+  it('relocates by the deriveStartMediaTime it reads from the composition config', async () => {
+    const { run, frame } = stampFor({ deriveStartMediaTime: () => ({ video: 10 }) });
+
+    await run();
+
+    expect(frame.meta?.timestampOffset).toBe(-10);
+  });
+
+  it('leaves the append native when the config carries no deriveStartMediaTime', async () => {
+    const { run, frame } = stampFor({});
+
+    await run();
+
+    expect(frame.meta).toBeUndefined();
   });
 });
 

@@ -1,3 +1,5 @@
+import { defaults } from '@videojs/utils/object';
+
 import {
   type Composition,
   createComposition,
@@ -32,7 +34,7 @@ import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
 import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
 import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
-// `audioMessagePipelines` finalConfig entry, the `mediaContainerData` state slot,
+// `audioMessagePipelines` defaultConfig entry, the `mediaContainerData` state slot,
 // and the `deriveStartMediaTime` config field to drop relocation from audio-only.
 import {
   type DeriveStartMediaTime,
@@ -112,7 +114,7 @@ const behaviors = [
 
   // Non-zero-PTS relocation (spike): establishes per-track startMediaTime;
   // MUST precede setupAudioBufferActors. Remove this line + the import + the
-  // finalConfig/state entries to drop relocation. (Selection is optional in the
+  // defaultConfig/state entries to drop relocation. (Selection is optional in the
   // reactor, so it works with only audio in scope.)
   establishStartMediaTime,
 
@@ -218,6 +220,31 @@ export interface EngineConfig {
 // ============================================================================
 
 /**
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
+ * engine config doesn't expose (`attachMediaSource`, the relocation pipeline).
+ */
+export const defaultConfig = {
+  deriveStartMediaTime: deriveSharedMinStartMediaTime,
+  // Not in `EngineConfig`: this engine composes `setupAirPlay`, whose native
+  // fallback `<source>` requires the MSE attachment to keep sibling source
+  // alternatives part of resource selection. The helper's `video/mp4` source
+  // type is inert here — resource selection probes it with `canPlayType`,
+  // which answers `'maybe'` on an audio element too.
+  attachMediaSource: attachMediaSourceAsSourceElement,
+  canPlayTrack,
+  reportUnsupportedTrackConditions,
+  resolveDuration: getResolvedSelectedTrackDuration,
+  parsePresentation: parseMultivariantPlaylist,
+  // Non-zero-PTS relocation (spike): pair the audio loader with the relocation steps
+  // `establishStartMediaTime` derives from; same `deriveStartMediaTime` seam. Remove
+  // with the reactor.
+  audioMessagePipelines: relocationPipelinesFor('audio'),
+};
+
+/** The state the engine starts with. Nothing needs seeding; exported so every engine module has the same shape. */
+export const initialState = {};
+
+/**
  * Create an audio-only HLS playback engine.
  *
  * Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors
@@ -241,27 +268,9 @@ export interface EngineConfig {
  *   ```;
  */
 export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
-  const deriveStartMediaTime = config.deriveStartMediaTime ?? deriveSharedMinStartMediaTime;
-  const finalConfig = {
-    ...config,
-    deriveStartMediaTime,
-    // Baked (not user-overridable): this engine composes `setupAirPlay`,
-    // whose native fallback `<source>` requires the MSE attachment to keep
-    // sibling source alternatives part of resource selection. The helper's
-    // `video/mp4` source type is inert here — resource selection probes it
-    // with `canPlayType`, which answers `'maybe'` on an audio element too.
-    attachMediaSource: attachMediaSourceAsSourceElement,
-    canPlayTrack: config.canPlayTrack ?? canPlayTrack,
-    reportUnsupportedTrackConditions: config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditions,
-    resolveDuration: config.resolveDuration ?? getResolvedSelectedTrackDuration,
-    parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
-    // Non-zero-PTS relocation (spike): pair the audio loader with the relocation steps
-    // `establishStartMediaTime` derives from; same `deriveStartMediaTime` seam. Remove
-    // with the reactor.
-    audioMessagePipelines: relocationPipelinesFor('audio', deriveStartMediaTime),
-  };
-
   return createComposition([...behaviors], {
-    config: finalConfig,
+    // Overrides from `config`, defaults for every key it leaves `undefined`.
+    config: { ...config, ...defaults(config, defaultConfig) },
+    initialState,
   });
 }

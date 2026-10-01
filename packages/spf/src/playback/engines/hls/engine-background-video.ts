@@ -1,3 +1,5 @@
+import { defaults } from '@videojs/utils/object';
+
 import {
   type Composition,
   createComposition,
@@ -127,6 +129,37 @@ export interface EngineConfig {
 // Background-video playback engine
 // ============================================================================
 
+// Prune what this environment can't decode, then report 2011 if nothing is left: this engine composes only video, so a
+// source with none playable can never play.
+// SAFETY: `reportAbsentTrackType` also reads the optional `errors` state, which the config's rule type doesn't
+// declare; `collectErrors` provides it in this composition, and the rule no-ops without it.
+const videoConstraints = [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK)] as NonNullable<
+  EngineConfig['videoConstraints']
+>;
+// Narrow to the renditions that fit the screen, then take the largest.
+const videoRules: NonNullable<EngineConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
+
+/**
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
+ * engine config doesn't expose (`resolveDuration`).
+ */
+export const defaultConfig = {
+  videoConstraints,
+  videoRules,
+  parsePresentation: parseMultivariantPlaylist,
+  resolveDuration: getResolvedSelectedTrackDuration,
+  canPlayTrack,
+  reportUnsupportedTrackConditions,
+};
+
+/**
+ * The state the engine starts with. `loadActivated: true` stands in for the preload gating this engine doesn't compose,
+ * so it starts loading the moment a source is set.
+ */
+export const initialState = {
+  loadActivated: true,
+};
+
 /**
  * Create a background-video playback engine.
  *
@@ -155,24 +188,9 @@ export interface EngineConfig {
  *   ```;
  */
 export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
-  const finalConfig = {
-    ...config,
-    videoConstraints: config.videoConstraints ?? [
-      excludeUnplayableTracks,
-      reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK),
-    ],
-    videoRules: config.videoRules ?? [screenResolutionCap, preferHighestResolution],
-    parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
-    resolveDuration: getResolvedSelectedTrackDuration,
-    canPlayTrack: config.canPlayTrack ?? canPlayTrack,
-    reportUnsupportedTrackConditions: config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditions,
-  };
-
   return createComposition([...behaviors], {
-    config: finalConfig,
-    initialState: {
-      // Note: Set to true until we add preload configuration
-      loadActivated: true,
-    },
+    // Overrides from `config`, defaults for every key it leaves `undefined`.
+    config: { ...config, ...defaults(config, defaultConfig) },
+    initialState,
   });
 }
