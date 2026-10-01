@@ -1,12 +1,9 @@
 import {
   type Composition,
-  type ContextSignals,
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-  type StateSignals,
 } from '../../../core/composition/create-composition';
-import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
 import { canPlayTrack } from '../../../media/dom/capabilities';
 import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
@@ -77,32 +74,16 @@ const backgroundVideoEngineBehaviors = [
   endOfStream,
 ] as const;
 
-/** Shares the engine's signals with the adapter. */
-const shareSignals = makeShareSignalsFor<typeof backgroundVideoEngineBehaviors>()({});
-
 /**
  * State shape for the background-video playback engine: every state key its behaviors and inputs declare.
  *
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
  */
-export type BackgroundVideoEngineState = ResolveBehaviorState<
-  [...typeof backgroundVideoEngineBehaviors, typeof shareSignals]
->;
+export type BackgroundVideoEngineState = ResolveBehaviorState<typeof backgroundVideoEngineBehaviors>;
 
 /** Context shape for the background-video playback engine: every context key its behaviors declare. */
-export type BackgroundVideoEngineContext = ResolveBehaviorContext<
-  [...typeof backgroundVideoEngineBehaviors, typeof shareSignals]
->;
-
-/**
- * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
- * (writes) or observe its state (reads) without touching `composition.state` / `composition.context` directly.
- */
-export type BackgroundVideoEngineSignals = {
-  state: StateSignals<BackgroundVideoEngineState>;
-  context: ContextSignals<BackgroundVideoEngineContext>;
-};
+export type BackgroundVideoEngineContext = ResolveBehaviorContext<typeof backgroundVideoEngineBehaviors>;
 
 /**
  * Configuration for the background-video engine.
@@ -111,10 +92,7 @@ export type BackgroundVideoEngineSignals = {
  * Compared to `HlsVideoEngineConfig`, audio/text/ABR/bandwidth/quality knobs are dropped: the variant subtracts the
  * behaviors that read them.
  */
-export interface BackgroundVideoEngineConfig extends ShareSignalsConfig<
-  BackgroundVideoEngineState,
-  BackgroundVideoEngineContext
-> {
+export interface BackgroundVideoEngineConfig {
   /**
    * Hard-constraint pre-pass handed to `selectVideoTrack`. Defaults to `[excludeUnplayableTracks,
    * reportAbsentTrackType(2011)]` — prune the renditions this environment can't decode, then report 2011 if nothing is
@@ -168,15 +146,10 @@ export interface BackgroundVideoEngineConfig extends ShareSignalsConfig<
  *
  * @example
  *   ```ts
- *   let signals: BackgroundVideoEngineSignals;
- *   const engine = createBackgroundVideoEngine({
- *     onSignalsReady: (refs) => {
- *       signals = refs;
- *     },
- *   });
+ *   const engine = createBackgroundVideoEngine();
  *
- *   signals.context.mediaElement.set(videoEl);
- *   signals.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
+ *   engine.context.mediaElement.set(videoEl);
+ *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *
  *   await engine.destroy();
  *   ```;
@@ -197,7 +170,7 @@ export function createBackgroundVideoEngine(
     reportUnsupportedTrackConditions: config.reportUnsupportedTrackConditions ?? reportUnsupportedTrackConditions,
   };
 
-  return createComposition([...backgroundVideoEngineBehaviors, shareSignals], {
+  return createComposition([...backgroundVideoEngineBehaviors], {
     config: finalConfig,
     initialState: {
       // Note: Set to true until we add preload configuration

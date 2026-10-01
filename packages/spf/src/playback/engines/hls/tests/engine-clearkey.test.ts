@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { clearKeySystem } from '../../../../media/dom/key-systems';
 import type { MaybeResolvedPresentation } from '../../../../media/types';
-import { createHlsVideoEngine, type HlsVideoEngineSignals } from '../engine';
+import { createHlsVideoEngine } from '../engine';
 
 // Full-pipeline EME coverage on the bundled Chromium, which ships no proprietary CDM but must ship Clear Key (the one
 // key system the EME spec requires). The engine plays a real cenc-encrypted fixture end to end — negotiate → attach →
@@ -57,17 +57,11 @@ describe('createHlsVideoEngine (Clear Key, real EME end to end)', () => {
     video.muted = true;
     document.body.append(video);
 
-    let signals: HlsVideoEngineSignals | undefined;
     const engine = createHlsVideoEngine({
       drm: { 'org.w3.clearkey': { licenseUrl: LICENSE_URL } },
       keySystems: [clearKeySystem],
-      onSignalsReady: (refs) => {
-        signals = refs;
-      },
     });
-
-    expect(signals).toBeDefined();
-    const { state, context } = signals!;
+    const { state, context } = engine;
 
     expect(state.segmentLoadingBlocked.get()).toBeUndefined();
     expect(context.mediaKeys.get()).toBeUndefined();

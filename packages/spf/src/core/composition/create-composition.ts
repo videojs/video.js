@@ -63,8 +63,8 @@ export interface BehaviorDeps<StateMap extends AnySlotMap, ContextMap extends An
  * `createComposition`) uses them to know which signals to provide. The setup parameter type declares the _slot map_
  * (per-slot `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
  *
- * Manual `Behavior<>` literals (e.g. engine wrappers that forward keys from a wrapped behavior, or pass-through
- * behaviors like `shareSignals`) opt out of exhaustiveness — the type alias is permissive (subset). Source behaviors
+ * Manual `Behavior<>` literals (e.g. engine wrappers that forward keys from a wrapped behavior, or `declareInputs`,
+ * which checks its key list itself) opt out of exhaustiveness — the type alias is permissive (subset). Source behaviors
  * should use `defineBehavior` to get exhaustiveness enforcement at the call site.
  */
 export interface Behavior<
@@ -84,7 +84,7 @@ export interface Behavior<
 // =============================================================================
 
 /** A behavior with an unconstrained setup — used as a generic bound. */
-export type AnyBehavior = {
+type AnyBehavior = {
   stateKeys: readonly PropertyKey[];
   contextKeys: readonly PropertyKey[];
   setup: (deps: any) => BehaviorCleanup;
@@ -102,7 +102,7 @@ type DepsOf<B> = B extends { setup: (deps: infer D, ...args: any[]) => any } ? D
  */
 // see comment above
 // oxlint-disable-next-line typescript/no-empty-object-type
-export type Empty = {};
+type Empty = {};
 
 /**
  * Unwrap a signal map back to its state/context shape.

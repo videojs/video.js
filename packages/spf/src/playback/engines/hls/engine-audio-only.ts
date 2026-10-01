@@ -1,12 +1,10 @@
 import {
   type Composition,
-  type ContextSignals,
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-  type StateSignals,
 } from '../../../core/composition/create-composition';
-import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
+import { declareInputs } from '../../../core/composition/declare-inputs';
 import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
 import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
 import { canPlayTrack } from '../../../media/dom/capabilities';
@@ -59,6 +57,15 @@ import {
 // ============================================================================
 // Audio-Only HLS Engine State & Context
 // ============================================================================
+
+/**
+ * State the audio-only HLS playback engine reads but no composed behavior declares: the consumer's track selections and
+ * remote-playback opt-out, written through the adapter.
+ */
+const hlsAudioEngineInputs = declareInputs<UserTrackSelectionInputs<'audio'> & RemotePlaybackInputs>()([
+  'userAudioTrackSelection',
+  'disableRemotePlayback',
+]);
 
 /**
  * The behaviors the audio-only HLS playback engine composes, in setup order. The engine's state and context types are
@@ -141,30 +148,16 @@ const hlsAudioEngineBehaviors = [
   // tracks too, and podcast-style sources ship chapters. With no
   // `preferredSubtitleLanguage` on this config the `und` track leads.
   loadChapters,
+
+  // Consumer inputs: written through the adapter, read by the behaviors above.
+  hlsAudioEngineInputs,
 ] as const;
 
-/**
- * Shares the engine's signals with the adapter, and declares the state the audio-only HLS playback engine reads but no
- * composed behavior declares: the consumer's track selections and remote-playback opt-out, written through the
- * adapter.
- */
-const shareSignals = makeShareSignalsFor<
-  typeof hlsAudioEngineBehaviors,
-  UserTrackSelectionInputs<'audio'> & RemotePlaybackInputs
->()({
-  state: ['userAudioTrackSelection', 'disableRemotePlayback'],
-});
-
 /** State shape for the audio-only HLS playback engine: every state key its behaviors and inputs declare. */
-export type HlsAudioEngineState = ResolveBehaviorState<[...typeof hlsAudioEngineBehaviors, typeof shareSignals]>;
+export type HlsAudioEngineState = ResolveBehaviorState<typeof hlsAudioEngineBehaviors>;
 
 /** Context shape for the audio-only HLS playback engine: every context key its behaviors declare. */
-export type HlsAudioEngineContext = ResolveBehaviorContext<[...typeof hlsAudioEngineBehaviors, typeof shareSignals]>;
-
-export type HlsAudioEngineSignals = {
-  state: StateSignals<HlsAudioEngineState>;
-  context: ContextSignals<HlsAudioEngineContext>;
-};
+export type HlsAudioEngineContext = ResolveBehaviorContext<typeof hlsAudioEngineBehaviors>;
 
 /**
  * Configuration for the audio-only HLS playback engine.
@@ -172,7 +165,7 @@ export type HlsAudioEngineSignals = {
  * Subset of `HlsVideoEngineConfig` — video-quality, bandwidth-estimator, and text-track config fields are omitted (no
  * behavior consumes them).
  */
-export interface HlsAudioEngineConfig extends ShareSignalsConfig<HlsAudioEngineState, HlsAudioEngineContext> {
+export interface HlsAudioEngineConfig {
   preferredAudioLanguage?: string;
   /**
    * Codec capability probe read by `track-switching`'s `excludeUnplayableTracks` constraint. Defaults to the
@@ -239,16 +232,12 @@ export interface HlsAudioEngineConfig extends ShareSignalsConfig<HlsAudioEngineS
  *
  * @example
  *   ```ts
- *   let signals: HlsAudioEngineSignals;
  *   const engine = createHlsAudioEngine({
  *     preferredAudioLanguage: 'en',
- *     onSignalsReady: (refs) => {
- *       signals = refs;
- *     },
  *   });
  *
- *   signals.context.mediaElement.set(audioEl);
- *   signals.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
+ *   engine.context.mediaElement.set(audioEl);
+ *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *   ```;
  */
 export function createHlsAudioEngine(
@@ -274,7 +263,7 @@ export function createHlsAudioEngine(
     audioMessagePipelines: relocationPipelinesFor('audio', deriveStartMediaTime),
   };
 
-  return createComposition([...hlsAudioEngineBehaviors, shareSignals], {
+  return createComposition([...hlsAudioEngineBehaviors], {
     config: finalConfig,
   });
 }

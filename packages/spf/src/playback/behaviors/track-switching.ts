@@ -104,7 +104,7 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
 /**
  * The slots `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it
  * writes. Rule-only inputs are deliberately absent — `user*TrackSelection` and `bandwidthState` belong to whoever
- * materializes them (the embedder via `shareSignals`, the buffer-actor sampler), and each rule declares the signal it
+ * materializes them (the embedder via `declareInputs`, the buffer-actor sampler), and each rule declares the signal it
  * consults as an optional slot on its own deps map, so the behavior never assumes a rule's signal exists.
  */
 export interface TrackSwitchingState {
@@ -122,7 +122,7 @@ interface UserTrackSelections {
 
 /**
  * The user track selections a consumer writes and the track-switching rules read, per track type (all three by
- * default). No behavior declares them, so a composition declares them as inputs with `makeShareSignalsFor`.
+ * default). No behavior declares them, so a composition declares them as inputs with `declareInputs`.
  */
 export type UserTrackSelectionInputs<T extends keyof UserTrackSelections = keyof UserTrackSelections> = {
   [K in T as `user${Capitalize<K>}TrackSelection`]?: UserTrackSelections[K];
@@ -262,7 +262,7 @@ type UserSelectionKey = 'userVideoTrackSelection' | 'userAudioTrackSelection';
 // `bandwidthState` (the bandwidth ranker) — are NOT here; each rule declares
 // the signal it needs as *optional* on its own deps and reads it defensively,
 // so the behavior never assumes a rule-only signal exists. Those slots are
-// materialized by whoever owns them: `shareSignals` for the consumer-input
+// materialized by whoever owns them: `declareInputs` for the consumer-input
 // `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
 export type TrackSwitchingStateMap<S extends SelectionKey> = {
   presentation: ReadonlySignal<TrackSwitchingState['presentation']>;
@@ -307,7 +307,7 @@ interface TrackSwitchingConfig<S extends SelectionKey, T extends SwitchableTrack
 /**
  * State the user-selection filter reads: the lifecycle map plus an _optional_ user-selection slot (keyed by `U`),
  * holding a partial-track description to match against the candidates (`Partial<T>` — `{ id }`, `{ language }`, `{
- * height }`, …). The slot exists only when the composition provides it (materialized by `shareSignals`); the filter
+ * height }`, …). The slot exists only when the composition provides it (declared with `declareInputs`); the filter
  * reads it defensively and no-ops when it's absent (no user override).
  */
 type UserSelectionStateMap<
@@ -640,8 +640,8 @@ function selectChainHead<T extends SwitchableTrack>(candidates: readonly T[]): s
 /**
  * State the text terminal reads: the lifecycle map plus an _optional_ `userTextTrackSelection` — the standing user
  * intent. `Partial<TextTrack>` is an explicit pick (language-based), `'off'` is explicit no-captions, `undefined` is
- * auto (no preference). The slot exists only when the composition materializes it (`shareSignals`); the terminal reads
- * it defensively and treats absence as auto.
+ * auto (no preference). The slot exists only when the composition declares it (`declareInputs`); the terminal reads it
+ * defensively and treats absence as auto.
  *
  * Unlike `user*TrackSelection` for video/audio, this carries the `'off'` sentinel and feeds the terminal pick (not the
  * shared `filterByUserSelection`) — text is the only type whose selection is legitimately optional, so the off/auto

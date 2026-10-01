@@ -1,12 +1,10 @@
 import {
   type Composition,
-  type ContextSignals,
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-  type StateSignals,
 } from '../../../core/composition/create-composition';
-import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
+import { declareInputs } from '../../../core/composition/declare-inputs';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import type { Reschedule } from '../../../core/tasks/task';
 import type { QualityConfig } from '../../../media/abr/quality-selection';
@@ -90,6 +88,17 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
 // ============================================================================
 // HLS Engine State & Context
 // ============================================================================
+
+/**
+ * State the HLS playback engine reads but no composed behavior declares: the consumer's track selections and
+ * remote-playback opt-out, written through the adapter.
+ */
+const hlsVideoEngineInputs = declareInputs<UserTrackSelectionInputs & RemotePlaybackInputs>()([
+  'userVideoTrackSelection',
+  'userAudioTrackSelection',
+  'userTextTrackSelection',
+  'disableRemotePlayback',
+]);
 
 /**
  * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
@@ -225,42 +234,23 @@ const hlsVideoEngineBehaviors = [
   // a hidden `chapters` track per language, the preferred subtitle
   // language leading. Cues live on the element; no state signal.
   loadChapters,
+
+  // Consumer inputs: written through the adapter, read by the behaviors above.
+  hlsVideoEngineInputs,
 ] as const;
 
-/**
- * Shares the engine's signals with the adapter, and declares the state the HLS playback engine reads but no composed
- * behavior declares: the consumer's track selections and remote-playback opt-out, written through the adapter.
- */
-const shareSignals = makeShareSignalsFor<
-  typeof hlsVideoEngineBehaviors,
-  UserTrackSelectionInputs & RemotePlaybackInputs
->()({
-  state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
-});
-
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
-export type HlsVideoEngineState = ResolveBehaviorState<[...typeof hlsVideoEngineBehaviors, typeof shareSignals]>;
+export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type HlsVideoEngineContext = ResolveBehaviorContext<[...typeof hlsVideoEngineBehaviors, typeof shareSignals]>;
-
-/**
- * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
- * (writes) or observe its state (reads) without touching `composition.state` / `composition.context` directly.
- */
-export type HlsVideoEngineSignals = {
-  state: StateSignals<HlsVideoEngineState>;
-  context: ContextSignals<HlsVideoEngineContext>;
-};
+export type HlsVideoEngineContext = ResolveBehaviorContext<typeof hlsVideoEngineBehaviors>;
 
 /**
  * Configuration for the HLS playback engine.
  *
  * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
  */
-export interface HlsVideoEngineConfig<
-  KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS,
-> extends ShareSignalsConfig<HlsVideoEngineState, HlsVideoEngineContext> {
+export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
   /**
    * Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5
    * Mbps).
@@ -439,17 +429,13 @@ export interface HlsVideoEngineConfig<
  *
  * @example
  *   ```ts
- *   let signals: HlsVideoEngineSignals;
  *   const engine = createHlsVideoEngine({
  *     initialBandwidth: 2_000_000,
  *     preferredAudioLanguage: 'en',
- *     onSignalsReady: (refs) => {
- *       signals = refs;
- *     },
  *   });
  *
- *   signals.context.mediaElement.set(videoEl);
- *   signals.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
+ *   engine.context.mediaElement.set(videoEl);
+ *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *
  *   videoEl.play();
  *
@@ -517,10 +503,7 @@ export function createHlsVideoEngine<const KeySystems extends readonly KeySystem
     reschedule: config.reschedule ?? delayedReschedule(mediaPlaylistReloadDelay),
   };
 
-  // `shareSignals`: behavior whose sole purpose is to use a callback to allow for signal writing from the outside (e.g.
-  // an adapter). NOTE: While not required, adding at the end since behaviors are setup in order, so this increases the
-  // likelihood that initial signal setup will have occurred before shareSignals' callback is invoked. (CJP)
-  return createComposition([...hlsVideoEngineBehaviors, shareSignals], {
+  return createComposition([...hlsVideoEngineBehaviors], {
     config: finalConfig,
     // Seed bandwidthState so switchVideoTrack fires on initial subscribe
     // with the `initialBandwidth` fallback rather than waiting for the
