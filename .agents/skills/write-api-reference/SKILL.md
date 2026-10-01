@@ -19,7 +19,8 @@ Treat TypeScript source and the builder E2E test as the specification. Generated
 4. Run `pnpm -F site api-docs` and inspect the corresponding file under `site/src/content/generated-*-reference/`.
 5. Fix missing metadata at the TypeScript/JSDoc source or in the builder. Do not hand-edit generated JSON.
 6. Create or update the page and the matching `site/src/docs.config.ts` entry when a page is required: `site/src/content/docs/reference/components/<slug>.mdx` for components, skins, media, and extensions; `site/src/content/docs/reference/api/<slug>.mdx` for hooks, features, controllers, factories, and utilities.
-7. Verify the page for every supported framework/style combination it targets.
+7. Give extra exports a code heading or an `## Exports` table row, or list them in `apis` when neither fits, then run `pnpm -F site check:api-stability` (see the frontmatter section of `site/src/content/docs/writing-style/write-references.mdx`).
+8. Verify the page for every supported framework/style combination it targets.
 
 ## Component pages
 

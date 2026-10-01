@@ -7,6 +7,7 @@
     "clean": "rimraf --glob dist .netlify 'src/content/generated-*-reference'",
     "astro": "astro",
     "check:anchors": "tsx scripts/check-anchors.ts",
+    "check:api-stability": "tsx scripts/check-api-stability.ts",
     "check:link-analytics": "tsx scripts/check-link-analytics.ts",
     "test": "vp test run",
     "test:watch": "vp test",

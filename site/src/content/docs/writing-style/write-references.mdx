@@ -157,6 +157,37 @@ stability: unstable
 Use `frameworkTitle` to show the HTML custom element tag name when the HTML framework is selected.
 Add `stability: unstable` when an API works but its shape may still change in a minor release. The page header, the sidebar, and an explanatory note at the top of the page show the status automatically.
 
+### Which exports a page documents
+
+An export of a published package is stable when a reference page documents it or a stable export's public types refer to it. `pnpm -F site check:api-stability` enforces this: every other export must carry `@internal` in its JSDoc, or `@experimental` when only a `stability: unstable` page or an experimental export's types refer to it. `@experimental` must be earned that way: an export nothing documents or refers to can't carry it. `@deprecated` satisfies either tag, so an export can keep it after its page is removed. A page documents:
+
+- its subject: `title`, `frameworkTitle`, the `component`, `util`, `media`, `feature`, and `react` props of the reference components, and the `html` prop of `ComponentImports`
+- the subject's companion types, such as `PlayButtonProps`, `PlayButtonElement`, and `UseHotkeyOptions`, when `@videojs/react`, `@videojs/html`, or an extension package declares them. A same-named type from core or store, such as core's `MenuOptions` beside the `Menu` page, belongs to an internal building block, so it is stable only if a stable export's types refer to it
+- parts written against the subject in the page's code, such as `TimeSlider.Chapters`. The check reads a namespace export like `export * as Slider` member by member, so `Slider.Buffer` is checked as `SliderBuffer` and the page's `Slider.Buffer` covers it
+- on a feature page, the `select*` selectors its code names
+- a name that is a heading's entire text, such as ``### `isMediaPauseCapable` ``
+- names in the first column of the tables under an `## Exports` heading
+- anything listed in `apis`
+
+Use `apis` only when a page documents an export that none of the above names, and that no stable export's types already refer to. An entry is an export name, or a `@videojs/...` module: an exact entry point documents everything it exports, and a `*` pattern documents the default export of each module it matches:
+
+```yaml
+apis:
+  - I18nContext
+  - '@videojs/react/icons'
+  - '@videojs/react/i18n/locales/*'
+```
+
+The check fails on an `apis` entry that no public export or entry point matches, so a rename or removal can't leave one behind.
+
+Pages document what readers import from `@videojs/react`, `@videojs/html`, and the adapter and extension packages. `@videojs/core`, `@videojs/media`, `@videojs/utils`, and `@videojs/element` are published, but no page documents them directly: an export only they expose is internal even when a page documents a same-named export, unless a stable export's types refer to it, and a core type becomes stable when `@videojs/react` or `@videojs/html` re-exports it under a documented name.
+
+The page wins over the tag. A documented export that still carries `@internal`, or `@experimental` on a stable page, fails the check until the tag is removed; `--fix` removes it, replaces `@internal` with `@experimental` for an unstable page, and replaces an unearned `@experimental` with `@internal`. Each declaration of a merged name, and each overload signature, needs its own tag.
+
+Stability is transitive through public types. When a stable export's public surface names another export, that export is stable too, whichever package exposes it: an `extends` or `implements` clause, a public property or method, an aliased type, a function's parameters, return type, or type parameters, or a variable's declared type. `PlayButtonCore.State` counts as `PlayButtonCore`. A type no entry exports, such as a local helper interface or the `_base` constant a mixin class extends, passes its own references on: readers reach them through the export that names it. A `@videojs/utils` type alias such as `Constructor` or `MixinReturn` counts as written out where it's used: it stays internal, and its target is checked instead. Private and `@internal` members don't count. Protected members do, because they are what a subclass overrides or implements, except where a subclass redeclares an inherited one with a narrower type, as each button element does with its base's `core`. An export only experimental exports refer to is experimental and needs `@experimental`. A stable-by-reference export needs no tag and loses a contradicting one, as a documented export does. The check lists these exports under "Stable by reference" with one export that refers to each; document them over time. A stable or experimental export must also be importable from `@videojs/react`, `@videojs/html`, `@videojs/store`, or an extension package; the check fails until one of them re-exports it (an adapter's types from its `/media/*` entry) or the signature that makes it stable changes.
+
+Guides and examples don't make an export stable. The check warns when docs code imports an export that isn't, or imports from `@videojs/core`, `@videojs/utils`, or another package no page documents directly.
+
 ### Imports
 
 ```tsx
