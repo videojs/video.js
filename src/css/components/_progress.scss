@@ -178,12 +178,31 @@
   display: block;
 }
 
-.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display,
-.video-js.vjs-touch-enabled:not(.vjs-scrubbing) .vjs-progress-control .vjs-mouse-display {
+@mixin hide-mouse-display-preview {
   visibility: hidden;
   opacity: 0;
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
+}
+
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display {
+  @include hide-mouse-display-preview;
+}
+
+// iOS Safari hover is unreliable (see vjs-workinghover). Keep the persistent
+// preview hidden there unless the user is actively scrubbing.
+.video-js.vjs-touch-enabled:not(.vjs-workinghover):not(.vjs-scrubbing) .vjs-progress-control .vjs-mouse-display {
+  @include hide-mouse-display-preview;
+}
+
+// Hide the persistent seek-bar hover preview on touch-capable devices only when
+// no hover-capable pointer is available (phones/tablets). Hybrid hardware that
+// also has a mouse/trackpad still shows mouseTimeDisplay. Do not drop
+// vjs-touch-enabled; other CSS/JS depends on it. See #9224.
+@media (hover: none) {
+  .video-js.vjs-touch-enabled:not(.vjs-scrubbing) .vjs-progress-control .vjs-mouse-display {
+    @include hide-mouse-display-preview;
+  }
 }
 
 .vjs-mouse-display .vjs-time-tooltip {
