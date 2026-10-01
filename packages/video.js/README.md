@@ -6,11 +6,28 @@ Video.js 10 players don't live in this package. Install the package for your fra
 
 | Building with | Install | Docs |
 | --- | --- | --- |
-| HTML, Web Components, Vue, Svelte, or another framework | `npm install @videojs/html` | [HTML installation][html-install] |
+| HTML, Web Components, or another framework | `npm install @videojs/html` | [HTML installation][html-install] |
+| Vue or Nuxt | `npm install @videojs/html` | [Vue installation][vue-install] |
+| Svelte or SvelteKit | `npm install @videojs/html` | [Svelte installation][svelte-install] |
 | React | `npm install @videojs/react` | [React installation][react-install] |
-| A `<script>` tag, without a bundler | `@videojs/cdn` | [Install from CDN][cdn-install] |
+| A `<script>` tag, without a bundler | Nothing; load `@videojs/cdn` | [CDN installation][cdn-install] |
 
 Playback engines such as HLS and DASH are separate adapter packages. The installation guides list them.
+
+Without a bundler, load the player from jsDelivr and write the player markup:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@<version>/video.js"></script>
+
+<video-player>
+  <video-skin style="aspect-ratio: 16 / 9">
+    <video src="https://example.com/video.mp4" playsinline></video>
+  </video-skin>
+</video-player>
+```
+
+Replace `<version>` with an exact `@videojs/cdn` version in every CDN URL. A range can resolve each file to a different
+release, and their shared chunks don't match.
 
 ## AI Quickstart
 
@@ -74,9 +91,11 @@ If you need help with anything related to Video.js 10, or if you'd like to casua
 
 [package]: https://www.npmjs.com/package/video.js
 [package-badge]: https://img.shields.io/npm/v/video.js?label=video.js
-[html-install]: https://videojs.org/docs/framework/html/guides/installation
-[react-install]: https://videojs.org/docs/framework/react/guides/installation
-[cdn-install]: https://videojs.org/docs/framework/html/guides/installation-cdn
+[html-install]: https://videojs.org/docs/guides/installation/html
+[vue-install]: https://videojs.org/docs/guides/installation/vue
+[svelte-install]: https://videojs.org/docs/guides/installation/svelte
+[react-install]: https://videojs.org/docs/guides/installation/react
+[cdn-install]: https://videojs.org/docs/guides/installation/cdn
 [html-migrate]: https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8
 [react-migrate]: https://videojs.org/docs/framework/react/guides/migrate-from-video-js-8
 [v8-repo]: https://github.com/videojs/video.js
