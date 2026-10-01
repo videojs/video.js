@@ -168,3 +168,4 @@ export { VolumeIndicatorFillElement } from './ui/volume-indicator/fill';
 export { VolumeIndicatorValueElement } from './ui/volume-indicator/value';
 export { VolumePopoverElement } from './ui/volume-popover/element';
 export { VolumeSliderElement } from './ui/volume-slider/element';
+export * from './version';

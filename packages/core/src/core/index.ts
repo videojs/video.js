@@ -98,3 +98,4 @@ export * from './ui/volume-popover/data';
 export * from './ui/volume-slider/core';
 export * from './ui/volume-slider/data';
 export * from './ui/volume-slider/vars';
+export * from './version';

@@ -187,3 +187,4 @@ export {
 export { useMediaExtension } from './utils/use-media-extension';
 export { useMediaInstance } from './utils/use-media-instance';
 export { renderElement } from './utils/use-render';
+export * from './version';

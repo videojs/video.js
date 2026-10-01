@@ -16,6 +16,7 @@ import { copyCssPlugin } from '../../build/plugins/copy-css-plugin.ts';
 import { inlineTemplatePlugin } from '../../build/plugins/inline-template-plugin.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 import { LOCALES, localeAliases } from '../core/src/core/i18n/locales.ts';
+import packageJson from './package.json' with { type: 'json' };
 
 const packageDir = dirname(fileURLToPath(import.meta.url));
 const srcDir = new URL('./src', import.meta.url).pathname;
@@ -88,6 +89,11 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   // Also minifies the skins' `.css?inline` imports, which tsdown inlines into the JavaScript.
   css: { ...inlineCssConfig, minify: !isDevBuildMode(mode) },
   plugins: [copyCssPlugin({ outDir: `dist/${mode}` }), inlineTemplatePlugin({ minify: !isDevBuildMode(mode) })],
+  // `packageBuildConfig` supplies `__DEV__`; a `define` here replaces it, so restate it alongside the version.
+  define: {
+    __DEV__: mode === 'dev' ? 'true' : 'false',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
+  },
 });
 
 export default defineConfig({
@@ -106,6 +112,7 @@ export default defineConfig({
   },
   define: {
     __DEV__: 'true',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
   },
   resolve: {
     // These tests run in a simulated browser, but Vitest transforms through the SSR pipeline, where `browser`

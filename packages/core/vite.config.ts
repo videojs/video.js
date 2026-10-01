@@ -4,6 +4,7 @@ import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 import { vjscComponentSchemaPlugin } from '../vjsc/src/plugins/component-schema.ts';
+import packageJson from './package.json' with { type: 'json' };
 import { LOCALES, localeAliases } from './src/core/i18n/locales.ts';
 import en from './src/core/i18n/locales/en.ts';
 
@@ -44,6 +45,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   },
   define: {
     __DEV__: mode === 'dev' ? 'true' : 'false',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
   },
 });
 
@@ -86,6 +88,7 @@ export default defineConfig({
   },
   define: {
     __DEV__: 'true',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
   },
   test: {
     // Vitest v4 compatibility: preserve mock call history.

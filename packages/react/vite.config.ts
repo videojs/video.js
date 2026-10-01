@@ -6,6 +6,7 @@ import { copyCssPlugin } from '../../build/plugins/copy-css-plugin.ts';
 import { reactCompilerPlugin } from '../../build/react-compiler.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 import { LOCALES, localeAliases } from '../core/src/core/i18n/locales.ts';
+import packageJson from './package.json' with { type: 'json' };
 
 const srcDir = new URL('./src', import.meta.url).pathname;
 const srcAlias = { '@': srcDir };
@@ -30,6 +31,11 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   // Pack does not yet preserve exact public CSS entry filenames, so retain the
   // focused source-to-dist copy until its CSS entry support can replace it.
   plugins: [reactCompilerPlugin(), copyCssPlugin({ outDir: `dist/${mode}`, rebuild: false })],
+  // `packageBuildConfig` supplies `__DEV__`; a `define` here replaces it, so restate it alongside the version.
+  define: {
+    __DEV__: mode === 'dev' ? 'true' : 'false',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
+  },
 });
 
 export default defineConfig({
@@ -48,6 +54,7 @@ export default defineConfig({
   },
   define: {
     __DEV__: 'true',
+    __PLAYER_VERSION__: JSON.stringify(packageJson.version),
   },
   resolve: {
     alias: srcAlias,
