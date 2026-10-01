@@ -1,11 +1,14 @@
-import { SKILL_AGENTS, type SkillAgent } from '@videojs/installation';
+import {
+  installationFeaturesFor,
+  SKILL_AGENTS,
+  type InstallationFeature,
+  type SkillAgent,
+} from '@videojs/installation';
 import { atom, onMount, type WritableAtom } from 'nanostores';
 
 import { SKILL_AGENT_KEY } from '@/consts';
 import { useCase } from '@/stores/installation';
 import {
-  agentPromptFeaturesFor,
-  type AgentPromptFeature,
   type AgentPromptGoal,
   type AgentPromptPlayerPicks,
   type AgentPromptRequestExample,
@@ -49,12 +52,12 @@ export const skillAgent = rememberedAtom<SkillAgent>(SKILL_AGENT_KEY, SKILL_AGEN
 export const promptGoal = atom<AgentPromptGoal | null>(null);
 
 /** Player features the prompt asks for, each pointing the agent at its guide. */
-export const promptFeatures = atom<readonly AgentPromptFeature[]>([]);
+export const promptFeatures = atom<readonly InstallationFeature[]>([]);
 
 // A preset change drops the features it cannot use, so they neither linger unseen nor return with another preset.
 onMount(promptFeatures, () =>
   useCase.listen((next) => {
-    const available = agentPromptFeaturesFor(next);
+    const available = installationFeaturesFor(next);
     const current = promptFeatures.get();
 
     if (current.some((feature) => !available.includes(feature)))

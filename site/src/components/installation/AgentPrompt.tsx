@@ -1,5 +1,7 @@
 import {
   INSTALLATION_EXTENSIONS,
+  installationFeaturesFor,
+  type InstallationFeature,
   skinToFlag,
   sourceFrameworkFor,
   type InstallationFramework,
@@ -20,14 +22,12 @@ import {
 import { updateInstallationSelection } from '@/stores/installation';
 import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
-  AGENT_PROMPT_SEPARATORS,
-  AGENT_PROMPT_TEXT,
+  AGENT_PROMPT_STEP_SEPARATOR,
   agentPromptAnalytics,
   agentPromptDefaultPicks,
   agentPromptExampleFits,
   agentPromptExamplePicks,
   agentPromptExampleSummary,
-  agentPromptFeaturesFor,
   agentPromptMarkdown,
   agentPromptMediaChoices,
   agentPromptMuxHint,
@@ -39,7 +39,7 @@ import {
   agentPromptText,
   agentPromptView,
   defaultAgentPromptGoal,
-  type AgentPromptFeature,
+  type AgentPromptGoal,
   type AgentPromptRequestExample,
 } from '@/utils/installation/agent-prompt';
 import type { InstallationRouteSegment } from '@/utils/installation/routes';
@@ -125,7 +125,7 @@ function PromptStep({ number, children }: { number: number; children: ReactNode 
   );
 }
 
-const NO_FEATURES: readonly AgentPromptFeature[] = [];
+const NO_FEATURES: readonly InstallationFeature[] = [];
 
 /** The collapsed prompt's height, a preview of its first step, and how far past it the prompt still shows in full. */
 const COLLAPSED_HEIGHT = 140;
@@ -136,6 +136,8 @@ interface Props {
   route: InstallationRouteSegment | null;
   /** The guide's framework, or the docs framework on another page. */
   framework: InstallationFramework;
+  /** What the prompt asks for until the reader picks a goal, such as the migration a migration guide covers. */
+  goal?: AgentPromptGoal;
 }
 
 /**
@@ -144,11 +146,11 @@ interface Props {
  * those answers decide and leaving the rest to what `agents init` detects and guides. The media and skin share the
  * installation stores with the guide's own pickers, and a suggested request sets up the player it describes.
  */
-function AgentPrompt({ route, framework: pageFramework }: Props) {
+function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = defaultAgentPromptGoal(route) }: Props) {
   const picks = useInstallationSelection();
   const registryFramework = useRegistryFramework(sourceFrameworkFor(pageFramework));
   const agent = useHydratedStore(skillAgent, null);
-  const goal = useHydratedStore(promptGoal, null) ?? defaultAgentPromptGoal(route);
+  const goal = useHydratedStore(promptGoal, null) ?? pageGoal;
   const features = useHydratedStore(promptFeatures, NO_FEATURES);
   const request = useHydratedStore(promptRequest, '');
   const picked = useHydratedStore(promptExample, null);
@@ -156,7 +158,7 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
   const promptRef = useRef<HTMLDivElement>(null);
 
   const target = agentPromptTarget(route, route === 'shadcn' ? registryFramework : pageFramework);
-  const selection = agentPromptSelection(target, picks);
+  const selection = agentPromptSelection(target, picks, { goal, features });
   const view = agentPromptView(selection, { agent }, { goal, request, features });
   const text = agentPromptMarkdown(view);
   const { overflows, expanded, collapsed, expand, collapse } = useOverflowCollapse(promptRef, {
@@ -168,9 +170,9 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
   // Reset returns the answers and the player picks, the only guide choices the prompt shows.
   const defaultPlayerPicks = agentPromptPlayerPicks(agentPromptDefaultPicks(route, target.framework));
   const defaultText = agentPromptText(
-    agentPromptSelection(target, { ...picks, ...defaultPlayerPicks }),
+    agentPromptSelection(target, { ...picks, ...defaultPlayerPicks }, { goal: pageGoal, features: [] }),
     { agent },
-    { goal: defaultAgentPromptGoal(route), request: '', features: [] }
+    { goal: pageGoal, request: '', features: [] }
   );
 
   const examples = AGENT_PROMPT_REQUEST_EXAMPLES.map((group) => ({
@@ -219,6 +221,7 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
     >
       <PromptIntent
         media={selection.media}
+        migrating={selection.from !== null}
         sourceUrl={selection.sourceUrl ?? ''}
         supportedRenderers={agentPromptMediaChoices(selection)}
         // Another kind of media can't play the reader's URL, so switching to one goes back to its demo.
@@ -243,7 +246,7 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
         }
         onHostExampleOnMux={hostExampleOnMux}
         features={features}
-        availableFeatures={agentPromptFeaturesFor(selection.useCase)}
+        availableFeatures={installationFeaturesFor(selection.useCase)}
         onFeaturesChange={(next) => promptFeatures.set(next)}
         analytics={agentPromptAnalytics(selection)}
         onAnalyticsChange={(on) =>
@@ -274,32 +277,13 @@ function AgentPrompt({ route, framework: pageFramework }: Props) {
         >
           {view.steps.map(({ heading, command, prose }, index) => (
             <Fragment key={index}>
-              {index > 0 && <Copied text={AGENT_PROMPT_SEPARATORS.step} />}
+              {index > 0 && <Copied text={AGENT_PROMPT_STEP_SEPARATOR} />}
               <PromptStep number={index + 1}>
                 <p>{heading}</p> <PromptCommandBlock command={command.command} options={command.options} />
                 <Copied text="." />{' '}
                 <p>
                   <Prose text={prose} />
                 </p>
-                {index === view.steps.length - 1 && view.closing !== null && (
-                  <>
-                    <Copied text={AGENT_PROMPT_SEPARATORS.block} />
-                    <p>{AGENT_PROMPT_TEXT.beforeFeatures}</p>
-                    <Copied text={AGENT_PROMPT_SEPARATORS.block} />
-                    <ul className="marker:text-manila-light/60 -mt-1 flex list-disc flex-col gap-1 pl-5">
-                      {view.features.map((feature, item) => (
-                        <li key={feature}>
-                          <Copied text={item === 0 ? AGENT_PROMPT_SEPARATORS.item : AGENT_PROMPT_SEPARATORS.nextItem} />
-                          <Prose text={feature} />
-                        </li>
-                      ))}
-                    </ul>
-                    <Copied text={AGENT_PROMPT_SEPARATORS.block} />
-                    <p>
-                      <Prose text={view.closing} />
-                    </p>
-                  </>
-                )}
               </PromptStep>
             </Fragment>
           ))}

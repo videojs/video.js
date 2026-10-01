@@ -1,3 +1,4 @@
+import { installationFeaturesFor } from '@videojs/installation';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -8,7 +9,6 @@ import {
   agentPromptExampleFits,
   agentPromptExampleSummary,
   agentPromptExamplePicks,
-  agentPromptFeaturesFor,
   agentPromptLeftOut,
   agentPromptMarkdown,
   agentPromptMediaChoices,
@@ -22,7 +22,7 @@ import {
   agentPromptStatedCommand,
   agentPromptStepHeading,
   agentPromptTarget,
-  agentPromptTaskText,
+  agentPromptTaskSentences,
   agentPromptText,
   agentPromptView,
   type AgentPromptRequestExample,
@@ -167,30 +167,40 @@ describe('agentPromptText', () => {
     );
   });
 
-  it('introduces the installation command with the goal and follows it with the task', () => {
+  it('introduces the installation command with the goal, stating the features as a flag', () => {
+    const selection = agentPromptSelection(
+      { method: 'packaged', framework: 'react' },
+      picks({ media: 'mux-video', extensions: ['google-cast', 'mux-data'] }),
+      { goal: 'add', features: ['quality', 'captions'] }
+    );
     const text = agentPromptText(
-      mux(),
+      selection,
       { agent: null },
       { goal: 'add', request: 'A product page trailer', features: ['captions', 'quality'] }
     );
 
     expect(text).toContain(
-      'when you work on video or audio in this project.\n\n2. Add a Video.js player to this project: `npx @videojs/cli agents init'
+      "when you work on video or audio in this project.\n\n2. Add a Video.js player to this project: `npx @videojs/cli agents init --skin default --media mux-video --source-url demo --extensions 'google-cast,mux-data' --features 'captions,quality'`."
     );
-    // The features are a list inside the second step, indented to its text.
+    expect(
+      text.endsWith(
+        `Here is what I'm building: A product page trailer. ${MUX_MCP_SENTENCE} If a choice conflicts with the project, ask me before changing it.`
+      )
+    ).toBe(true);
+  });
+
+  it('migrates with --from, leaving the skin, media, and extensions to the existing player', () => {
+    const task = { goal: 'migrate-vidstack', request: '', features: [] } as const;
+    const text = agentPromptText(
+      agentPromptSelection({ method: 'packaged', framework: 'react' }, picks(), task),
+      { agent: null },
+      task
+    );
+
     expect(text).toContain(
-      [
-        `Here is what I'm building: A product page trailer. ${MUX_MCP_SENTENCE}`,
-        '',
-        '   Include the following features:',
-        '',
-        '   - Captions: `captions.md`',
-        '   - A quality menu: `quality.md`',
-        '',
-        "   Each feature's guide is in `node_modules/@videojs/<react|html>/docs/guides/`, for whichever player package the project uses. If a choice conflicts with the project, ask me before changing it.",
-      ].join('\n')
+      "2. Migrate this project's Vidstack player to Video.js 10: `npx @videojs/cli agents init --from vidstack --project existing`."
     );
-    expect(text.endsWith('before changing it.')).toBe(true);
+    expect(text).toContain('explains how to choose the preset, skin, media, media URL, and extensions');
   });
 });
 
@@ -205,36 +215,39 @@ describe('agentPromptStepHeading', () => {
   });
 });
 
-describe('agentPromptTaskText', () => {
+describe('agentPromptTaskSentences', () => {
   const task = (overrides: Partial<AgentPromptTask>): AgentPromptTask => ({ ...SKILL_ONLY_TASK, ...overrides });
 
-  it("points a migration at its guide in either player package's docs, since the CLI detects the framework", () => {
-    expect(agentPromptTaskText(task({ goal: 'migrate-plyr' }), 'default-video').sentences).toEqual([
-      'Follow the migration guide at `node_modules/@videojs/<react|html>/docs/guides/migrate-from-plyr.md`.',
+  it('points the skin goal at its guide, and leaves migrations to the command', () => {
+    expect(agentPromptTaskSentences(task({ goal: 'customize-skin' }))).toEqual([
+      'Follow the skin guide at `node_modules/@videojs/<react|html>/docs/guides/customize-skins.md`.',
     ]);
-    expect(agentPromptTaskText(task({ goal: 'skill' }), 'default-video')).toEqual({ sentences: [], features: [] });
+    expect(agentPromptTaskSentences(task({ goal: 'migrate-plyr' }))).toEqual([]);
   });
 
   it('keeps a request on one line and ends it as a sentence', () => {
-    expect(agentPromptTaskText(task({ request: '  A podcast\n  player  ' }), 'default-audio').sentences).toEqual([
+    expect(agentPromptTaskSentences(task({ request: '  A podcast\n  player  ' }))).toEqual([
       "Here is what I'm building: A podcast player.",
     ]);
-    expect(agentPromptTaskText(task({ request: 'Is this possible?' }), 'default-audio').sentences).toEqual([
+    expect(agentPromptTaskSentences(task({ request: 'Is this possible?' }))).toEqual([
       "Here is what I'm building: Is this possible?",
     ]);
   });
+});
 
-  it('lists the features the preset can use, in a fixed order, each with its guide', () => {
-    const features = task({ features: ['thumbnails', 'autoplay', 'captions'] });
+describe('agentPromptSelection', () => {
+  it('states only the features the preset can use', () => {
+    const audio = agentPromptSelection(
+      { method: 'packaged', framework: 'react' },
+      picks({ useCase: 'default-audio' }),
+      {
+        goal: 'add',
+        features: ['thumbnails', 'autoplay'],
+      }
+    );
 
-    expect(agentPromptTaskText(features, 'default-video').features).toEqual([
-      'Captions: `captions.md`',
-      'Thumbnail previews: `thumbnails.md`',
-      'Autoplay: `autoplay.md`',
-    ]);
-    expect(agentPromptTaskText(features, 'default-audio').features).toEqual(['Autoplay: `autoplay.md`']);
-    expect(agentPromptFeaturesFor('background-video')).toEqual(['poster']);
-    expect(agentPromptFeaturesFor('live-video')).not.toContain('thumbnails');
+    expect(audio.features).toEqual(['autoplay']);
+    expect(installationFeaturesFor('background-video')).toEqual(['poster']);
   });
 });
 
@@ -302,17 +315,15 @@ describe('agentPromptSkinChoices', () => {
 describe('agentPromptView', () => {
   it('holds what the copied Markdown says, step by step', () => {
     const selection = agentPromptSelection({ method: 'packaged', framework: 'react' }, picks());
-    const view = agentPromptView(selection, { agent: null }, { goal: 'add', request: '', features: ['poster'] });
+    const view = agentPromptView(selection, { agent: null }, { goal: 'add', request: '', features: [] });
 
     expect(view.steps.map(({ heading }) => heading)).toEqual([
       'Install the Video.js skill:',
       'Add a Video.js player to this project:',
     ]);
-    expect(view.features).toEqual(['A poster: `poster.md`']);
     expect(agentPromptMarkdown(view)).toBe(
-      agentPromptText(selection, { agent: null }, { goal: 'add', request: '', features: ['poster'] })
+      agentPromptText(selection, { agent: null }, { goal: 'add', request: '', features: [] })
     );
-    expect(agentPromptMarkdown(view).endsWith(`   ${view.closing}`)).toBe(true);
   });
 });
 
@@ -334,7 +345,7 @@ describe('agentPromptPlayerPicksEqual', () => {
 describe('AGENT_PROMPT_REQUEST_EXAMPLES', () => {
   it('asks only for features its preset can use', () => {
     for (const item of AGENT_PROMPT_REQUEST_EXAMPLES.flatMap((group) => group.items)) {
-      const available = agentPromptFeaturesFor(item.useCase ?? 'default-video');
+      const available = installationFeaturesFor(item.useCase ?? 'default-video');
 
       expect(item.features?.filter((feature) => !available.includes(feature)) ?? [], item.label).toEqual([]);
     }

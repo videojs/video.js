@@ -3,7 +3,10 @@ import { Collapsible } from '@base-ui/react/collapsible';
 import { Menu } from '@base-ui/react/menu';
 import {
   getInstallationRenderer,
+  INSTALLATION_FEATURE_DEFINITIONS,
+  INSTALLATION_FEATURES,
   SKILL_AGENTS,
+  type InstallationFeature,
   type Renderer,
   type SkillAgent,
   type SkinFlag,
@@ -28,12 +31,9 @@ import {
 } from '@/components/menuClasses';
 import { Select } from '@/components/Select';
 import {
-  AGENT_PROMPT_FEATURE_DEFINITIONS,
-  AGENT_PROMPT_FEATURES,
-  AGENT_PROMPT_GOAL_DEFINITIONS,
   AGENT_PROMPT_GOALS,
+  agentPromptGoalLabel,
   AGENT_PROMPT_REQUEST_MAX_LENGTH,
-  type AgentPromptFeature,
   type AgentPromptGoal,
   type AgentPromptMuxHint,
   type AgentPromptRequestExample,
@@ -65,12 +65,14 @@ const GOAL_ICONS = {
   'migrate-mux-player': <ArrowRight className="size-4" />,
   'migrate-plyr': <ArrowRight className="size-4" />,
   'migrate-media-chrome': <ArrowRight className="size-4" />,
+  'migrate-vidstack': <ArrowRight className="size-4" />,
+  'migrate-video-react': <ArrowRight className="size-4" />,
   'customize-skin': <Paintbrush className="size-4" />,
 } satisfies Record<AgentPromptGoal, ReactNode>;
 
 const GOAL_OPTIONS = AGENT_PROMPT_GOALS.map((goal) => ({
   value: goal,
-  label: AGENT_PROMPT_GOAL_DEFINITIONS[goal].label,
+  label: agentPromptGoalLabel(goal),
   icon: GOAL_ICONS[goal],
 }));
 
@@ -111,6 +113,8 @@ function Field({ label, className, children }: { label: string; className?: stri
 interface Props {
   /** The media, and the reader's URL for it, or empty for its demo. */
   media: Renderer;
+  /** Whether the prompt migrates a player, whose media and skin the agent keeps unless the reader picks others. */
+  migrating: boolean;
   sourceUrl: string;
   /** The media the page can play for the preset, which the menu offers and a pasted URL may pick from. */
   supportedRenderers: readonly Renderer[];
@@ -131,10 +135,10 @@ interface Props {
   pickedExample: { label: string; summary: string } | null;
   /** Move the picked suggestion's stream to Mux, or `null` where it would not help. */
   onHostExampleOnMux: (() => void) | null;
-  features: readonly AgentPromptFeature[];
+  features: readonly InstallationFeature[];
   /** The features the picked preset can use. */
-  availableFeatures: readonly AgentPromptFeature[];
-  onFeaturesChange: (features: AgentPromptFeature[]) => void;
+  availableFeatures: readonly InstallationFeature[];
+  onFeaturesChange: (features: InstallationFeature[]) => void;
   /** Whether Mux Data measures viewers, or `null` for media it cannot. */
   analytics: boolean | null;
   onAnalyticsChange: (analytics: boolean) => void;
@@ -151,6 +155,7 @@ interface Props {
  */
 export default function PromptIntent({
   media,
+  migrating,
   sourceUrl,
   supportedRenderers,
   onMediaChange,
@@ -181,7 +186,7 @@ export default function PromptIntent({
       example.label,
       example.request,
       ...example.keywords,
-      ...(example.features ?? []).map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
+      ...(example.features ?? []).map((feature) => INSTALLATION_FEATURE_DEFINITIONS[feature].label),
     ].some((text) => contains(text, request));
   const exampleGroups = examples
     .map((group) => ({
@@ -198,22 +203,25 @@ export default function PromptIntent({
   const mediaTriggerRef = useRef<HTMLButtonElement>(null);
   const [mediaOpenedFromHint, setMediaOpenedFromHint] = useState(false);
   const uploadRef = useRef<HTMLButtonElement>(null);
+  // A migration keeps the existing player's media and skin until the reader picks others.
+  const shownMedia =
+    migrating && !sourceUrl && media === supportedRenderers[0] ? 'Existing media' : mediaLabel(media, sourceUrl);
   const featureLabels = [
-    ...chosen.map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
+    ...chosen.map((feature) => INSTALLATION_FEATURE_DEFINITIONS[feature].label),
     ...(analytics ? [ANALYTICS_LABEL] : []),
   ];
   const agentLabel = SKILL_AGENT_OPTIONS.find((option) => option.value === (agent ?? ANY_AGENT))?.label ?? null;
   const summary = [
-    AGENT_PROMPT_GOAL_DEFINITIONS[goal].label,
+    agentPromptGoalLabel(goal),
     featureLabels.length > 0 ? `${featureLabels.length} ${featureLabels.length === 1 ? 'feature' : 'features'}` : null,
-    mediaLabel(media, sourceUrl),
-    skin ? `${presentSkin(skin).label} skin` : null,
+    shownMedia,
+    skin ? (migrating && skin === 'default' ? 'Existing skin' : `${presentSkin(skin).label} skin`) : null,
     agentLabel,
   ].filter((part) => part !== null);
 
-  const toggleFeature = (feature: AgentPromptFeature, checked: boolean) =>
+  const toggleFeature = (feature: InstallationFeature, checked: boolean) =>
     onFeaturesChange(
-      AGENT_PROMPT_FEATURES.filter((candidate) => (candidate === feature ? checked : features.includes(candidate)))
+      INSTALLATION_FEATURES.filter((candidate) => (candidate === feature ? checked : features.includes(candidate)))
     );
 
   return (
@@ -354,7 +362,7 @@ export default function PromptIntent({
                               onCheckedChange={(checked) => toggleFeature(feature, checked)}
                               className={twMerge(MENU_ITEM_CLASS, 'relative pr-8')}
                             >
-                              {AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label}
+                              {INSTALLATION_FEATURE_DEFINITIONS[feature].label}
                               <Menu.CheckboxItemIndicator className="absolute right-2 inline-flex items-center">
                                 <Check className="size-4" />
                               </Menu.CheckboxItemIndicator>
@@ -389,14 +397,14 @@ export default function PromptIntent({
               <Menu.Root modal={false}>
                 <Menu.Trigger
                   ref={mediaTriggerRef}
-                  aria-label={`Media: ${mediaLabel(media, sourceUrl)}`}
+                  aria-label={`Media: ${shownMedia}`}
                   className={TRIGGER_CLASS}
                   onPointerEnter={() => mediaDialog.current?.preload()}
                 >
                   <span aria-hidden="true" className={MEDIA_MARK_SLOT_CLASS}>
                     <MediaMark renderer={media} />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-left">{mediaLabel(media, sourceUrl)}</span>
+                  <span className="min-w-0 flex-1 truncate text-left">{shownMedia}</span>
                   <ChevronDown className="text-muted size-4 shrink-0" aria-hidden="true" />
                 </Menu.Trigger>
                 <Menu.Portal>

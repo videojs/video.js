@@ -1,5 +1,12 @@
 /** Players an installation can migrate from, each with a migration guide. */
-export const INSTALLATION_MIGRATION_SOURCES = ['video-js-8', 'mux-player', 'plyr', 'media-chrome', 'vidstack'] as const;
+export const INSTALLATION_MIGRATION_SOURCES = [
+  'video-js-8',
+  'mux-player',
+  'plyr',
+  'media-chrome',
+  'vidstack',
+  'video-react',
+] as const;
 export type InstallationMigrationSource = (typeof INSTALLATION_MIGRATION_SOURCES)[number];
 
 export const INSTALLATION_MIGRATION_NAMES = {
@@ -8,6 +15,7 @@ export const INSTALLATION_MIGRATION_NAMES = {
   plyr: 'Plyr',
   'media-chrome': 'Media Chrome',
   vidstack: 'Vidstack',
+  'video-react': 'Video-React',
 } as const satisfies Record<InstallationMigrationSource, string>;
 
 export function isInstallationMigrationSource(value: string): value is InstallationMigrationSource {

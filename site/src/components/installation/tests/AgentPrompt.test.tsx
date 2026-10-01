@@ -254,8 +254,9 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(promptGoal.get()).toBe('migrate-plyr');
     expect(promptFeatures.get()).toEqual(['captions']);
     expect(await copyPrompt()).toContain(
-      "Follow the migration guide at `node_modules/@videojs/<react|html>/docs/guides/migrate-from-plyr.md`. Here is what I'm building: A course site.\n\n   Include the following features:\n\n   - Captions: `captions.md`\n\n   Each feature's guide"
+      "2. Migrate this project's Plyr player to Video.js 10: `npx @videojs/cli agents init --from plyr --project existing --features captions`."
     );
+    expect(await copyPrompt()).toContain("Here is what I'm building: A course site. If a choice conflicts");
   });
 
   it('suggests requests from the field, narrowed by what the reader types', async () => {
@@ -280,7 +281,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     expect(promptRequest.get()).toBe('Lesson videos for an online course');
     expect(await copyPrompt()).toContain(
-      "Here is what I'm building: Lesson videos for an online course.\n\n   Include the following features:\n\n   - Captions: `captions.md`\n   - A quality menu: `quality.md`\n   - Keyboard shortcuts: `keyboard-shortcuts.md`\n   - Translated labels: `internationalization.md`\n\n"
+      "Here is what I'm building: Lesson videos for an online course. If a choice conflicts"
     );
   });
 
@@ -294,7 +295,9 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(field);
     await user.click(await screen.findByRole('option', { name: /Course lessons/ }, RENDER_WAIT));
 
-    expect(initCommand()).toBe('`npx @videojs/cli agents init --skin default --media hls --source-url demo`');
+    expect(initCommand()).toBe(
+      "`npx @videojs/cli agents init --skin default --media hls --source-url demo --features 'captions,quality,keyboard-shortcuts,internationalization'`"
+    );
     expect(promptFeatures.get()).toEqual(['captions', 'quality', 'keyboard-shortcuts', 'internationalization']);
     expect(screen.getByRole('button', { name: /^More options/ })).toHaveTextContent('4 features');
 
@@ -308,7 +311,9 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(await screen.findByRole('option', { name: /^Podcast/ }, RENDER_WAIT));
 
     expect(useCase.get()).toBe('default-audio');
-    expect(initCommand()).toBe('`npx @videojs/cli agents init --preset audio --skin default --source-url demo`');
+    expect(initCommand()).toBe(
+      '`npx @videojs/cli agents init --preset audio --skin default --source-url demo --features user-preferences`'
+    );
     expect(promptFeatures.get()).toEqual(['user-preferences']);
     expect(screen.getByRole('button', { name: 'Media: HTML5 Audio demo' })).toBeInTheDocument();
   });
@@ -348,18 +353,26 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(copySelection()).toHaveBeenCalledWith('text/plain', copied);
   });
 
-  it('copies the feature list as Markdown, the same from a text selection', async () => {
-    promptFeatures.set(['captions', 'poster']);
+  it('states the features as a flag, which the command turns into guides', async () => {
+    promptFeatures.set(['poster', 'captions']);
     render(<AgentPrompt route="react" framework="react" />);
 
     const copied = await copyPrompt();
 
-    expect(copied).toContain('\n\n   - Captions: `captions.md`\n   - A poster: `poster.md`\n\n   Each feature');
-    expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
-      '- Captions: `captions.md`',
-      '\n   - A poster: `poster.md`',
-    ]);
+    expect(initCommand()).toContain("--features 'captions,poster'");
+    expect(copied).not.toContain('captions.md');
     expect(copySelection()).toHaveBeenCalledWith('text/plain', copied);
+  });
+
+  it('starts from the migration a migration guide covers', () => {
+    render(<AgentPrompt route={null} framework="html" goal="migrate-vidstack" />);
+
+    expect(initCommand()).toBe('`npx @videojs/cli agents init --from vidstack --project existing`');
+    expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
+    // The agent keeps the existing player's media and skin.
+    expect(screen.getByRole('button', { name: /^More options/ })).toHaveTextContent(
+      'Migrate from Vidstack · Existing media · Existing skin'
+    );
   });
 
   it('copies a lone backtick in the request as it was typed', async () => {

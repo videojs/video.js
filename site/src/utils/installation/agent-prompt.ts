@@ -6,25 +6,32 @@ import {
   getInstallationRenderer,
   INSTALLATION_DEMO_SOURCE_URL,
   INSTALLATION_EXTENSION_DEFINITIONS,
+  INSTALLATION_FEATURE_DEFINITIONS,
+  INSTALLATION_MIGRATION_NAMES,
+  installationFeaturesFor,
   INSTALLATION_SKIN_FLAGS,
   installationCommandParts,
   installationCompatibility,
   installationExtensionsFor,
   installationReproduceInput,
+  isInstallationMigrationSource,
   isMuxRenderer,
   rendererSupportsCdn,
   resolveInstallationSelection,
   serializeInstallationExtensions,
+  serializeInstallationFeatures,
   SKILLS_REPOSITORY_URL,
   skillsCommand,
   skillsCommandParts,
   skinToFlag,
   type InstallationCommandParts,
   type InstallationExtension,
+  type InstallationFeature,
   type InstallationFramework,
   type InstallationInput,
   type InstallationInputKey,
   type InstallationMethod,
+  type InstallationMigrationSource,
   type InstallationSelection,
   type Renderer,
   type SkillAgent,
@@ -51,7 +58,8 @@ export interface AgentPromptTarget {
 /**
  * The guides the installed player package ships, which match the project's version where the live site documents the
  * latest release. The CLI detects the framework, so the prompt names both packages: React's, or the HTML package that
- * Vue and Svelte build on. Before the package is installed, the skill falls back to the live docs on its own.
+ * Vue and Svelte build on. Before the package is installed, the skill falls back to the live docs on its own. The
+ * command itself points at the guides for features and migrations.
  */
 const PACKAGE_GUIDES_DIRECTORY = 'node_modules/@videojs/<react|html>/docs/guides/';
 
@@ -60,8 +68,8 @@ export const MUX_MCP_DOCS_URL = 'https://www.mux.com/docs/integrations/mcp-serve
 
 /**
  * The prompt's prose in the order the page shows it: two numbered steps, each introducing a command. Copied, it is
- * Markdown: the steps are paragraphs, and the features the reader asks for are a list inside the second. Each command
- * sits in backticks, closed with a period, and backticks in the prose mark inline code.
+ * Markdown with a paragraph per step. Each command sits in backticks, closed with a period, and backticks in the prose
+ * mark inline code.
  */
 export const AGENT_PROMPT_TEXT = {
   installSkill: 'Install the Video.js skill:',
@@ -69,8 +77,6 @@ export const AGENT_PROMPT_TEXT = {
   useSkill: 'Then use the Video.js skill when you work on video or audio in this project.',
   beforeRequest: "Here is what I'm building:",
   afterCommand: 'Run it to print version-matched instructions for these choices without changing files.',
-  beforeFeatures: 'Include the following features:',
-  featureGuides: `Each feature's guide is in \`${PACKAGE_GUIDES_DIRECTORY}\`, for whichever player package the project uses.`,
   conflicts: 'If a choice conflicts with the project, ask me before changing it.',
   muxMcp: `For Mux tasks such as uploading videos, creating live streams, or finding playback IDs, use the Mux MCP server if it is connected, or point me to ${MUX_MCP_DOCS_URL} to set it up.`,
 } as const;
@@ -86,7 +92,8 @@ export const AGENT_PROMPT_SKILL_INSTRUCTIONS = [
 /**
  * Options the prompt leaves for `agents init` unless the reader chose them. The CLI detects the package manager,
  * framework, app setup, and method from the project, and its output guides the starting point, styling, preset, and
- * media. The skin and media URL are always stated, so the reader sees the skin they chose and where their media goes.
+ * media. The skin and media URL are stated, so the reader sees the skin they chose and where their media goes, except
+ * in a migration, which keeps the existing player's.
  */
 const CLI_DECIDED_OPTIONS = [
   'packageManager',
@@ -96,7 +103,10 @@ const CLI_DECIDED_OPTIONS = [
   'method',
   'styling',
   'preset',
+  'skin',
   'media',
+  'sourceUrl',
+  'extensions',
 ] as const satisfies readonly InstallationInputKey[];
 
 type CliDecidedOption = (typeof CLI_DECIDED_OPTIONS)[number];
@@ -120,10 +130,22 @@ export function agentPromptTarget(
 export function agentPromptLeftOut(selection: InstallationSelection): ReadonlySet<CliDecidedOption> {
   const leftOut = new Set<CliDecidedOption>(CLI_DECIDED_OPTIONS);
   const preset = getInstallationPreset(selection.useCase);
+  // A migration keeps the existing player's skin, media, and extensions, which the agent reads from the project.
+  const keepsExisting = selection.from !== null && !selection.sourceUrl;
 
   if (selection.useCase !== DEFAULT_SELECTION.useCase) leftOut.delete('preset');
 
   if (selection.sourceUrl || selection.media !== preset.renderers[0]) leftOut.delete('media');
+
+  // A migration has no starting point to choose: it adapts the existing project.
+  if (selection.from) leftOut.delete('project');
+
+  if (!keepsExisting || selection.skin !== DEFAULT_SELECTION.skin) leftOut.delete('skin');
+
+  if (!keepsExisting) {
+    leftOut.delete('sourceUrl');
+    leftOut.delete('extensions');
+  }
 
   return leftOut;
 }
@@ -136,7 +158,10 @@ const CLI_DECIDED_PHRASES = {
   method: 'installation method',
   styling: 'styling',
   preset: 'preset',
+  skin: 'skin',
   media: 'media',
+  sourceUrl: 'media URL',
+  extensions: 'extensions',
 } as const satisfies Record<CliDecidedOption, string>;
 
 /**
@@ -186,31 +211,32 @@ export const AGENT_PROMPT_GOALS = [
   'migrate-mux-player',
   'migrate-plyr',
   'migrate-media-chrome',
+  'migrate-vidstack',
+  'migrate-video-react',
   'customize-skin',
-] as const;
+] as const satisfies readonly ('skill' | 'add' | 'customize-skin' | `migrate-${InstallationMigrationSource}`)[];
 export type AgentPromptGoal = (typeof AGENT_PROMPT_GOALS)[number];
 
-interface GoalDefinition {
-  label: string;
-  /** The player a migration starts from. */
-  from?: string;
-  /** The guide the agent follows, by slug. */
-  guide?: string;
+/** The player a migration goal moves from, which the command takes as `--from`, or `null` for another goal. */
+export function agentPromptMigrationSource(goal: AgentPromptGoal): InstallationMigrationSource | null {
+  const source = goal.replace(/^migrate-/, '');
+
+  return goal !== source && isInstallationMigrationSource(source) ? source : null;
 }
 
-export const AGENT_PROMPT_GOAL_DEFINITIONS = {
-  skill: { label: 'Install the skill' },
-  add: { label: 'Add a player' },
-  'migrate-video-js-8': { label: 'Migrate from Video.js 8', from: 'Video.js 8', guide: 'migrate-from-video-js-8' },
-  'migrate-mux-player': { label: 'Migrate from Mux Player', from: 'Mux Player', guide: 'migrate-from-mux-player' },
-  'migrate-plyr': { label: 'Migrate from Plyr', from: 'Plyr', guide: 'migrate-from-plyr' },
-  'migrate-media-chrome': {
-    label: 'Migrate from Media Chrome',
-    from: 'Media Chrome',
-    guide: 'migrate-from-media-chrome',
-  },
-  'customize-skin': { label: 'Customize the skin', guide: 'customize-skins' },
-} as const satisfies Record<AgentPromptGoal, GoalDefinition>;
+export function agentPromptGoalLabel(goal: AgentPromptGoal): string {
+  const source = agentPromptMigrationSource(goal);
+  if (source) return `Migrate from ${INSTALLATION_MIGRATION_NAMES[source]}`;
+
+  switch (goal) {
+    case 'add':
+      return 'Add a player';
+    case 'customize-skin':
+      return 'Customize the skin';
+    default:
+      return 'Install the skill';
+  }
+}
 
 /** An installation guide's reader came to add a player; elsewhere, such as Build with AI, the skill is the point. */
 export function defaultAgentPromptGoal(route: InstallationRouteSegment | null): AgentPromptGoal {
@@ -219,8 +245,8 @@ export function defaultAgentPromptGoal(route: InstallationRouteSegment | null): 
 
 /** The prompt's second step, which introduces the `agents init` command with what the reader wants done. */
 export function agentPromptStepHeading(goal: AgentPromptGoal): string {
-  const definition: GoalDefinition = AGENT_PROMPT_GOAL_DEFINITIONS[goal];
-  if (definition.from) return `Migrate this project's ${definition.from} player to Video.js 10:`;
+  const source = agentPromptMigrationSource(goal);
+  if (source) return `Migrate this project's ${INSTALLATION_MIGRATION_NAMES[source]} player to Video.js 10:`;
 
   switch (goal) {
     case 'add':
@@ -233,73 +259,11 @@ export function agentPromptStepHeading(goal: AgentPromptGoal): string {
   }
 }
 
+/** The skin guide, for the one goal the command has no flag for. Migrations get their guide from `--from`. */
 function guideSentence(goal: AgentPromptGoal): string | null {
-  const definition: GoalDefinition = AGENT_PROMPT_GOAL_DEFINITIONS[goal];
-  if (!definition.guide) return null;
+  if (goal !== 'customize-skin') return null;
 
-  const path = `\`${PACKAGE_GUIDES_DIRECTORY}${definition.guide}.md\``;
-
-  return `Follow the ${definition.from ? 'migration' : 'skin'} guide at ${path}.`;
-}
-
-/** Player features the prompt can ask for, each with the guide that shows how. */
-export const AGENT_PROMPT_FEATURES = [
-  'captions',
-  'quality',
-  'thumbnails',
-  'poster',
-  'autoplay',
-  'keyboard-shortcuts',
-  'user-preferences',
-  'internationalization',
-] as const;
-export type AgentPromptFeature = (typeof AGENT_PROMPT_FEATURES)[number];
-
-interface FeatureDefinition {
-  label: string;
-  /** How the prompt's feature list names the feature. */
-  item: string;
-  guide: string;
-}
-
-export const AGENT_PROMPT_FEATURE_DEFINITIONS = {
-  captions: { label: 'Captions', item: 'Captions', guide: 'captions' },
-  quality: { label: 'Quality menu', item: 'A quality menu', guide: 'quality' },
-  thumbnails: { label: 'Thumbnail previews', item: 'Thumbnail previews', guide: 'thumbnails' },
-  poster: { label: 'Poster', item: 'A poster', guide: 'poster' },
-  autoplay: { label: 'Autoplay', item: 'Autoplay', guide: 'autoplay' },
-  'keyboard-shortcuts': { label: 'Keyboard shortcuts', item: 'Keyboard shortcuts', guide: 'keyboard-shortcuts' },
-  'user-preferences': {
-    label: 'User preferences',
-    item: 'Remembered volume and caption preferences',
-    guide: 'user-preferences',
-  },
-  internationalization: { label: 'Translations', item: 'Translated labels', guide: 'internationalization' },
-} as const satisfies Record<AgentPromptFeature, FeatureDefinition>;
-
-const AUDIO_FEATURES: readonly AgentPromptFeature[] = [
-  'autoplay',
-  'keyboard-shortcuts',
-  'user-preferences',
-  'internationalization',
-];
-
-/**
- * The features that fit a preset: audio has no picture for posters or thumbnails, live streams have no seek previews,
- * and background video plays without controls.
- */
-export function agentPromptFeaturesFor(useCase: UseCase): readonly AgentPromptFeature[] {
-  switch (useCase) {
-    case 'default-audio':
-    case 'live-audio':
-      return AUDIO_FEATURES;
-    case 'live-video':
-      return AGENT_PROMPT_FEATURES.filter((feature) => feature !== 'thumbnails');
-    case 'background-video':
-      return ['poster'];
-    default:
-      return AGENT_PROMPT_FEATURES;
-  }
+  return `Follow the skin guide at \`${PACKAGE_GUIDES_DIRECTORY}customize-skins.md\`.`;
 }
 
 /**
@@ -322,7 +286,7 @@ export interface AgentPromptRequestExample {
   minimal?: boolean;
   /** Extensions beyond the ones the media installs by default. */
   extensions?: readonly InstallationExtension[];
-  features?: readonly AgentPromptFeature[];
+  features?: readonly InstallationFeature[];
 }
 
 export interface AgentPromptRequestExampleGroup {
@@ -539,7 +503,7 @@ export function agentPromptExampleSummary(example: AgentPromptRequestExample, ap
     ...(example.media ? [getInstallationRenderer(applied.media).label] : []),
     ...(example.minimal ? ['Minimal skin'] : []),
     ...applied.extensions.map((extension) => INSTALLATION_EXTENSION_DEFINITIONS[extension].label),
-    ...(example.features ?? []).map((feature) => AGENT_PROMPT_FEATURE_DEFINITIONS[feature].label),
+    ...(example.features ?? []).map((feature) => INSTALLATION_FEATURE_DEFINITIONS[feature].label),
   ]);
 }
 
@@ -562,13 +526,13 @@ export type AgentPromptMuxHint = 'live' | 'quality' | 'thumbnails';
 
 export function agentPromptMuxHint(
   selection: InstallationSelection,
-  features: readonly AgentPromptFeature[]
+  features: readonly InstallationFeature[]
 ): AgentPromptMuxHint | null {
   const { media, sourceUrl, useCase } = selection;
   if (HOSTED_ELSEWHERE.includes(media) || (isMuxRenderer(media) && sourceUrl)) return null;
 
-  const available = agentPromptFeaturesFor(useCase);
-  const wants = (feature: AgentPromptFeature) => features.includes(feature) && available.includes(feature);
+  const available = installationFeaturesFor(useCase);
+  const wants = (feature: InstallationFeature) => features.includes(feature) && available.includes(feature);
 
   if (getInstallationPreset(useCase).live && !sourceUrl) return 'live';
 
@@ -590,46 +554,24 @@ function normalizeAgentPromptRequest(request: string): string {
 export interface AgentPromptTask {
   goal: AgentPromptGoal;
   request: string;
-  features: readonly AgentPromptFeature[];
+  features: readonly InstallationFeature[];
 }
 
-/** A task as the prompt words it after the installation command. */
-export interface AgentPromptTaskText {
-  /** The goal's guide and the reader's request. */
-  sentences: string[];
-  /** The features the preset can use, one list item each with its guide. */
-  features: string[];
-}
-
-export function agentPromptTaskText(task: AgentPromptTask, useCase: UseCase): AgentPromptTaskText {
+/**
+ * What the prompt says about the task after the installation command: the skin guide and the reader's request. The
+ * command states the features and a migration, and its output points at their guides.
+ */
+export function agentPromptTaskSentences(task: AgentPromptTask): string[] {
   const request = normalizeAgentPromptRequest(task.request);
-  const available = agentPromptFeaturesFor(useCase);
   const sentences = [guideSentence(task.goal)];
 
   if (request) sentences.push(`${AGENT_PROMPT_TEXT.beforeRequest} ${/[.!?]$/.test(request) ? request : `${request}.`}`);
 
-  return {
-    sentences: sentences.filter((sentence) => sentence !== null),
-    features: AGENT_PROMPT_FEATURES.filter(
-      (feature) => task.features.includes(feature) && available.includes(feature)
-    ).map((feature) => {
-      const { item, guide } = AGENT_PROMPT_FEATURE_DEFINITIONS[feature];
-
-      return `${item}: \`${guide}.md\``;
-    }),
-  };
+  return sentences.filter((sentence) => sentence !== null);
 }
 
-/**
- * The copied prompt's separators. The steps are Markdown paragraphs, and the second step's later blocks are indented to
- * its text so the feature list stays inside it.
- */
-export const AGENT_PROMPT_SEPARATORS = {
-  step: '\n\n',
-  block: '\n\n   ',
-  item: '- ',
-  nextItem: '\n   - ',
-} as const;
+/** What separates the copied prompt's steps, which are Markdown paragraphs. */
+export const AGENT_PROMPT_STEP_SEPARATOR = '\n\n';
 
 /** The coding agent the prompt installs the skill for, or `null` to list every agent's steps. */
 export interface AgentPromptSkills {
@@ -649,15 +591,27 @@ export function agentPromptSkillsCommand(skills: AgentPromptSkills): SkillsComma
  * Resolve the page's picks for one target, the way an installation guide reads its URL: a pick the target cannot use
  * falls back to its default.
  */
-export function agentPromptSelection(target: AgentPromptTarget, picks: InstallationUiSelection): InstallationSelection {
+export function agentPromptSelection(
+  target: AgentPromptTarget,
+  picks: InstallationUiSelection,
+  task: Pick<AgentPromptTask, 'goal' | 'features'> = { goal: 'add', features: [] }
+): InstallationSelection {
+  const from = agentPromptMigrationSource(task.goal);
+  const available = installationFeaturesFor(picks.useCase);
+  const features = task.features.filter((feature) => available.includes(feature));
   const input: InstallationInput = {
     ...target,
-    project: picks.project,
+    // A migration adapts the project that plays the existing player.
+    project: from ? 'existing' : picks.project,
     preset: getInstallationPreset(picks.useCase).flag,
     media: picks.media,
     extensions: serializeInstallationExtensions(picks.extensions),
     template: picks.template,
   };
+
+  if (features.length > 0) input.features = serializeInstallationFeatures(features);
+
+  if (from) input.from = from;
 
   // Background video has one purpose-built skin, so the CLI rejects a skin for it.
   if (picks.useCase !== 'background-video') input.skin = skinToFlag(picks.skin);
@@ -688,19 +642,21 @@ function agentPromptInput(selection: InstallationSelection): InstallationInput {
   return { ...installationReproduceInput(selection), sourceUrl: selection.sourceUrl || INSTALLATION_DEMO_SOURCE_URL };
 }
 
-/** The order the prompt lists options in: the project and app, how to install, then the player and its media. */
+/** The order the prompt lists options in: a migration, the project and app, how to install, then the player. */
 const OPTION_ORDER = {
-  packageManager: 0,
-  project: 1,
-  framework: 2,
-  template: 3,
-  method: 4,
-  styling: 5,
-  preset: 6,
-  skin: 7,
-  media: 8,
-  sourceUrl: 9,
-  extensions: 10,
+  from: 0,
+  packageManager: 1,
+  project: 2,
+  framework: 3,
+  template: 4,
+  method: 5,
+  styling: 6,
+  preset: 7,
+  skin: 8,
+  media: 9,
+  sourceUrl: 10,
+  extensions: 11,
+  features: 12,
 } as const satisfies Record<InstallationInputKey, number>;
 
 export function agentPromptCommand(selection: InstallationSelection): InstallationCommandParts {
@@ -758,16 +714,9 @@ export interface AgentPromptStep {
   prose: string;
 }
 
-/**
- * The prompt as both the page and the copied Markdown present it, so the two cannot drift apart. The second step can
- * end in a feature list, followed by a closing paragraph.
- */
+/** The prompt as both the page and the copied Markdown present it, so the two cannot drift apart. */
 export interface AgentPromptView {
   steps: readonly [AgentPromptStep, AgentPromptStep];
-  /** The features, one Markdown list item each. */
-  features: readonly string[];
-  /** The paragraph after the feature list, or `null` without one. */
-  closing: string | null;
 }
 
 /**
@@ -784,7 +733,6 @@ export function agentPromptView(
   const leftOut = agentPromptCommand(selection).options.flatMap(({ key }) =>
     isCliDecidedOption(key) && leftOutOptions.has(key) ? [key] : []
   );
-  const { sentences, features } = agentPromptTaskText(task, selection.useCase);
   const join = (parts: readonly (string | null)[]) => parts.filter((part) => part !== null).join(' ');
 
   return {
@@ -800,27 +748,20 @@ export function agentPromptView(
         prose: join([
           text.afterCommand,
           agentPromptDetectSentence(leftOut),
-          ...sentences,
+          ...agentPromptTaskSentences(task),
           isMuxRenderer(selection.media) ? text.muxMcp : null,
-          features.length > 0 ? null : text.conflicts,
+          text.conflicts,
         ]),
       },
     ],
-    features,
-    closing: features.length > 0 ? `${text.featureGuides} ${text.conflicts}` : null,
   };
 }
 
 /** The prompt as copied: Markdown whose steps are paragraphs, each command in backticks and closed with a period. */
-export function agentPromptMarkdown({ steps, features, closing }: AgentPromptView): string {
-  const { step, block, item, nextItem } = AGENT_PROMPT_SEPARATORS;
-  const text = steps
+export function agentPromptMarkdown({ steps }: AgentPromptView): string {
+  return steps
     .map(({ heading, command, prose }, index) => `${index + 1}. ${heading} \`${commandText(command)}\`. ${prose}`)
-    .join(step);
-
-  if (closing === null) return text;
-
-  return [text, AGENT_PROMPT_TEXT.beforeFeatures, `${item}${features.join(nextItem)}`, closing].join(block);
+    .join(AGENT_PROMPT_STEP_SEPARATOR);
 }
 
 export function agentPromptText(
