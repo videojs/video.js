@@ -558,6 +558,7 @@ describe('runAgentsInit', () => {
       'when-components-json-missing',
       'when-components-json-missing-or-nonstandard',
       'when-components-json-nonstandard',
+      'when-hosting-on-mux',
     ]);
     expect(Object.keys(json.planFormat.fields)).toContain('steps[].blocks[].longRunning');
     expect(markdown).toContain('## Plan format');
@@ -1152,6 +1153,103 @@ describe('runAgentsInit', () => {
         'npx @videojs/cli agents skills'
       );
     }
+  });
+  it('adds the requested features, each pointing at its guide in the installed package', () => {
+    const plan = JSON.parse(
+      runAgentsInit('10.0.0', ['agents', 'init', '--framework', 'react', '--features', 'thumbnails,captions', '--json'])
+        .stdout
+    );
+    const step = plan.steps.find(({ id }: { id: string }) => id === 'features');
+
+    expect(plan.reproduceCommand).toContain("--features 'captions,thumbnails'");
+    expect(plan.steps.at(-1).id).toBe('run');
+    expect(step.description).toContain('its guide in `node_modules/@videojs/react/docs/guides/` once the package');
+    expect(step.description).toContain('- Captions: `captions.md`\n- Thumbnail previews: `thumbnails.md`');
+    // Only Mux media provides a storyboard on its own.
+    expect(step.description).toContain('Thumbnail previews read a storyboard track');
+  });
+
+  it("rejects features the preset can't use", () => {
+    const result = runAgentsInit('10.0.0', [
+      'agents',
+      'init',
+      '--preset',
+      'live-video',
+      '--features',
+      'thumbnails',
+      '--json',
+    ]);
+
+    expect(result.exitCode).toBe(2);
+    expect(JSON.parse(result.stdout).errors).toEqual([
+      expect.objectContaining({
+        field: '--features',
+        value: 'thumbnails',
+        hint: expect.stringContaining('--features'),
+      }),
+    ]);
+  });
+
+  it('frames a migration with its guide, the checks before changing code, and the cleanup after', () => {
+    const plan = JSON.parse(
+      runAgentsInit('10.0.0', ['agents', 'init', '--framework', 'html', '--from', 'plyr', '--json']).stdout
+    );
+
+    expect(plan.reproduceCommand).toContain('--from plyr');
+    expect(plan.steps[0]).toMatchObject({ id: 'migrate', title: 'Migrate from Plyr' });
+    expect(plan.steps[0].description).toContain('node_modules/@videojs/html/docs/guides/migrate-from-plyr.md');
+    // Without the existing media URL, the agent reruns with it before writing the player.
+    expect(plan.steps[0].description).toContain('rerun this command with `--source-url` set to the existing media');
+    expect(plan.steps.at(-1)).toMatchObject({ id: 'finish-migration', title: 'Finish the migration' });
+
+    const new_ = runAgentsInit('10.0.0', ['agents', 'init', '--project', 'new', '--from', 'plyr', '--json']);
+
+    expect(new_.exitCode).toBe(2);
+    expect(JSON.parse(new_.stdout).errors).toEqual([expect.objectContaining({ field: '--from' })]);
+  });
+
+  it('uploads a local file with the Mux CLI before the player plays it', () => {
+    const args = ['agents', 'init', '--framework', 'react', '--media', 'mux-video', '--source-url', './intro.mp4'];
+    const plan = JSON.parse(runAgentsInit('10.0.0', [...args, '--json']).stdout);
+
+    expect(plan.steps[0].id).toBe('mux-upload');
+    expect(plan.steps[0].condition).toBeUndefined();
+    expect(plan.steps[0].blocks[0].code).toBe(
+      'npx @mux/cli assets create --upload ./intro.mp4 --playback-policy public --wait --json'
+    );
+    expect(plan.steps[0].description).toContain('npx @mux/cli login');
+    expect(plan.resolvedSourceUrl).toBe(INSTALLATION_DEMO_SOURCES.videoHls);
+    expect(plan.reproduceCommand).toContain('--source-url ./intro.mp4');
+  });
+
+  it('turns a local file away from media that is not Mux, suggesting the Mux media for the preset', () => {
+    const result = runAgentsInit('10.0.0', [
+      'agents',
+      'init',
+      '--media',
+      'hls',
+      '--source-url',
+      './intro.mp4',
+      '--json',
+    ]);
+
+    expect(result.exitCode).toBe(2);
+    expect(JSON.parse(result.stdout).errors).toEqual([
+      expect.objectContaining({ field: '--source-url', hint: 'To upload it to Mux, use --media mux-video.' }),
+    ]);
+  });
+
+  it('creates a Mux live stream first, and offers an upload for Mux demo media once the player runs', () => {
+    const live = JSON.parse(
+      runAgentsInit('10.0.0', ['agents', 'init', '--preset', 'live-video', '--media', 'mux-video', '--json']).stdout
+    );
+    const demo = JSON.parse(runAgentsInit('10.0.0', ['agents', 'init', '--media', 'mux-video', '--json']).stdout);
+
+    expect(live.steps[0].id).toBe('mux-live-stream');
+    expect(live.steps[0].blocks[0].code).toBe('npx @mux/cli live create --playback-policy public');
+    expect(live.steps[0].description).toContain('Treat the stream key as a secret');
+    expect(demo.steps.at(-1)).toMatchObject({ id: 'mux-upload', condition: 'when-hosting-on-mux' });
+    expect(demo.steps.at(-1).blocks[0].code).toContain('./your-video.mp4');
   });
 });
 

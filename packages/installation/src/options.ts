@@ -1,5 +1,7 @@
 import { INSTALLATION_DEMO_SOURCE_URL } from './defaults';
 import { GOOGLE_CAST_RENDERERS, INSTALLATION_EXTENSIONS } from './extensions';
+import { INSTALLATION_FEATURES } from './features';
+import { INSTALLATION_MIGRATION_NAMES, INSTALLATION_MIGRATION_SOURCES } from './migrations';
 import {
   CLI_OPTION_SYNTAX,
   INSTALLATION_PROJECTS,
@@ -194,6 +196,10 @@ export function installationDecisionOrderFor(
 
   return [
     {
+      title: 'Check for a migration',
+      guidance: `When the project already plays media with ${formatChoices(Object.values(INSTALLATION_MIGRATION_NAMES))}, pass ${syntax.options(['from'])} with that player, and keep its media URLs as the source.`,
+    },
+    {
       title: 'Inspect the project',
       guidance:
         'Read package.json, framework config, and lockfiles to infer the framework, app setup, and package manager. React installs @videojs/react; HTML, Vue, and Svelte install @videojs/html.',
@@ -215,6 +221,10 @@ export function installationDecisionOrderFor(
       title: 'Choose the media',
       guidance:
         'Infer the adapter from the source when possible. Mux wins for Mux playback URLs: stream.mux.com/<playback-id>.m3u8 or a bare playback ID uses mux-video, mux-audio, or mux-background-video rather than hls. Mux static renditions such as .mp4 or .m4a files use html5-video or html5-audio. Other .m3u8 URLs use hls. Choose a platform adapter only when the content is hosted there, not when the request compares itself to that platform. Without a URL, use hls or dash for a player that should cast, since the default html5-video cannot.',
+    },
+    {
+      title: 'Choose features',
+      guidance: `Pass ${syntax.options(['features'])} for what the request asks for, such as captions, a quality menu, or thumbnail previews; the plan points at each feature's guide. Leave it out when the request names none.`,
     },
     {
       title: 'Choose extensions',
@@ -303,9 +313,15 @@ export function installationOptionDefinitionsFor(
       description:
         'A comma-separated list of optional player extensions compatible with the selected player. Pass `none` when no extension is needed.',
     }),
+    optionDefinition('features', {
+      values: ['none', ...INSTALLATION_FEATURES],
+      default: 'none',
+      description:
+        'A comma-separated list of player features to add, each with the guide that shows how. Features depend on the preset: audio has no poster or thumbnails, and live streams have no thumbnails.',
+    }),
     optionDefinition('sourceUrl', {
       default: 'the Video.js demo source for the selected media (reported as defaulted)',
-      description: `The http:// or https:// media URL placed in the generated player example. Pass \`${INSTALLATION_DEMO_SOURCE_URL}\` to choose the Video.js demo source for the selected media explicitly.`,
+      description: `The http:// or https:// media URL placed in the generated player example. Pass \`${INSTALLATION_DEMO_SOURCE_URL}\` to choose the Video.js demo source for the selected media explicitly. With Mux media, a local file such as \`./intro.mp4\` adds a step that uploads it with the Mux CLI.`,
     }),
   ];
 
@@ -337,6 +353,16 @@ export function installationOptionDefinitionsFor(
       })
     );
   }
+
+  definitions.push(
+    optionDefinition('from', {
+      values: INSTALLATION_MIGRATION_SOURCES,
+      default: 'none (a new installation)',
+      description:
+        'The player an existing project migrates from. The plan adds the migration guide, the checks before changing code, and the cleanup after.',
+      appliesWhen: syntax.options(['project', 'existing']),
+    })
+  );
 
   definitions.push({
     flag: '--json',

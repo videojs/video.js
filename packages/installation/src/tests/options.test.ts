@@ -77,11 +77,13 @@ describe('installationOptionDefinitionsFor', () => {
       '--preset is not background-video',
       '--method is not cdn with --template none',
       '--method shadcn',
+      '--project existing',
     ]);
     expect(appliesWhen(installationOptionDefinitionsFor(context, QUERY_OPTION_SYNTAX))).toEqual([
       'preset is not background-video',
       'method is not cdn with template none',
       'method=shadcn',
+      'project=existing',
     ]);
   });
 });

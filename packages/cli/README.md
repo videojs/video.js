@@ -26,6 +26,22 @@ npx @videojs/cli agents init --framework html --method cdn --project existing --
 
 Add `--json` for a structured document instead of Markdown, or `--version` to print the CLI version.
 
+The plan can also cover what comes after the player:
+
+- `--features <ids>`: a comma-separated list of `captions`, `quality`, `thumbnails`, `poster`, `autoplay`,
+  `keyboard-shortcuts`, `user-preferences`, and `internationalization`. The plan points at each feature's guide in the
+  installed package.
+- `--from <player>`: `video-js-8`, `mux-player`, `plyr`, `media-chrome`, or `vidstack`. The plan starts with the
+  migration guide and the checks to make before changing code, and ends with removing the old player.
+- `--source-url ./intro.mp4` with Mux media: the plan uploads the file with the [Mux CLI](https://www.npmjs.com/package/@mux/cli)
+  first. A live preset with Mux media and no URL gets a step that creates a Mux live stream.
+
+```sh
+npx @videojs/cli agents init --framework react --features captions,quality
+npx @videojs/cli agents init --from plyr --features captions
+npx @videojs/cli agents init --media mux-video --source-url ./intro.mp4
+```
+
 Each plan ends with a command that reproduces it with every choice spelled out. When you omit `--framework`, the command
 reads the nearest `package.json`: React, Next.js, TanStack Start, and React Router projects get React instructions, Vue
 and Nuxt projects get Vue, Svelte and SvelteKit projects get Svelte, and anything else gets plain HTML. React

@@ -15,6 +15,8 @@ import {
   type InstallationOptions,
 } from './codegen';
 import { CDN_MEDIA_SUBPATHS, INSTALLATION_DEMO_SOURCE_URL, INSTALLATION_DEMO_SOURCES } from './defaults';
+import { INSTALLATION_FEATURE_DEFINITIONS } from './features';
+import { INSTALLATION_MIGRATION_NAMES, migrationGuideSlug } from './migrations';
 import {
   installationCompatibilityFor,
   installationDecisionOrderFor,
@@ -23,6 +25,7 @@ import {
   type InstallationOptionDefinition,
 } from './options';
 import { INSTALLATION_PARAMETERS, type InstallationInput, type InstallationInputKey } from './parameters';
+import { getInstallationPreset } from './presets';
 import {
   INSTALLATION_FRAMEWORKS,
   INSTALLATION_NEW_APP_DIRECTORY,
@@ -39,7 +42,7 @@ import {
   installationVueConfigFilename,
   type InstallationProjectFiles,
 } from './projects';
-import { getAdapterPackage } from './renderers';
+import { getAdapterPackage, isMuxRenderer } from './renderers';
 import {
   INSTALLATION_METHODS,
   selectionToInput,
@@ -82,6 +85,7 @@ export const INSTALLATION_STEP_CONDITIONS = {
     'Only when components.json is missing or does not use the standard https://ui.shadcn.com/schema.json schema.',
   'when-components-json-nonstandard':
     'Only when components.json exists but does not use the standard https://ui.shadcn.com/schema.json schema.',
+  'when-hosting-on-mux': 'Only to play your own media from Mux instead of the Video.js demo source.',
 } as const;
 
 export type InstallationStepCondition = keyof typeof INSTALLATION_STEP_CONDITIONS;
@@ -224,6 +228,8 @@ export function installationReproduceInput(selection: InstallationSelection): In
     sourceUrl: explicit.sourceUrl,
   };
 
+  if (selection.features.length > 0) input.features = explicit.features;
+
   if (selection.useCase !== 'background-video') input.skin = explicit.skin;
 
   if (selection.method !== 'cdn' || selection.template !== 'none') {
@@ -235,6 +241,8 @@ export function installationReproduceInput(selection: InstallationSelection): In
   if (selection.method === 'shadcn') {
     input.styling = explicit.styling;
   }
+
+  if (selection.from) input.from = selection.from;
 
   return input;
 }
@@ -433,6 +441,130 @@ function prepareAppStep(selection: InstallationSelection): InstallationStepConte
           : `Scaffold ${article} ${templateLabel} app in the intended empty app directory, then continue from that directory.`,
     blocks: [command(value)],
   };
+}
+
+const DEMO_SOURCE_URLS: readonly string[] = Object.values(INSTALLATION_DEMO_SOURCES);
+
+/**
+ * Whether the player plays the Video.js demo source rather than the reader's media. A rerun names the demo's URL
+ * instead of `demo`, so the URL counts as the demo too.
+ */
+function playsDemoSource(selection: InstallationSelection): boolean {
+  return selection.sourceFile === null && (!selection.sourceUrl || DEMO_SOURCE_URLS.includes(selection.sourceUrl));
+}
+
+/**
+ * Where a guide lives: in the installed player package, which matches its version, or on the website for a CDN page
+ * without a package. Before the package is installed, the website has the same guide for the latest release.
+ */
+function guideLocation(selection: InstallationSelection, slug: string): string {
+  const online = `https://videojs.org/docs/framework/${selection.owner}/guides/${slug}`;
+
+  if (selection.method === 'cdn') return online;
+
+  return `\`node_modules/${PLAYER_PACKAGES[selection.owner]}/docs/guides/${slug}.md\` once the package is installed, or ${online} before then`;
+}
+
+/** The migration's first step: read its guide, and inventory the existing player before changing code. */
+function migrationStep(selection: InstallationSelection): InstallationStepContent | null {
+  if (!selection.from) return null;
+
+  const name = INSTALLATION_MIGRATION_NAMES[selection.from];
+  const keepMedia = !playsDemoSource(selection)
+    ? 'Keep the existing media and required behavior throughout the migration.'
+    : `Keep the existing media and required behavior throughout the migration: rerun this command with \`--source-url\` set to the existing media, and with the preset, skin, media, and extensions that match the existing player, before following the steps below.`;
+
+  return {
+    id: 'migrate',
+    title: `Migrate from ${name}`,
+    description: [
+      `Follow the migration guide at ${guideLocation(selection, migrationGuideSlug(selection.from))}, including its Known gaps section. Before changing code:`,
+      [
+        `1. Inspect the existing ${name} player and list its media URLs, source formats, tracks, options, custom controls, event handlers, and integrations.`,
+        '2. Compare that list with the known gaps, and report anything Video.js does not support.',
+        `3. ${keepMedia}`,
+      ].join('\n'),
+    ].join('\n\n'),
+    blocks: [],
+  };
+}
+
+/** The migration's last step, once the Video.js player runs. */
+function finishMigrationStep(selection: InstallationSelection): InstallationStepContent | null {
+  if (!selection.from) return null;
+
+  return {
+    id: 'finish-migration',
+    title: 'Finish the migration',
+    description: `Remove the ${INSTALLATION_MIGRATION_NAMES[selection.from]} package, imports, and styles. Then verify playback, captions, controls, and any analytics integration on every browser the project supports.`,
+    blocks: [],
+  };
+}
+
+/** The features to add once the player is in place, each pointing at its guide. */
+function featuresStep(selection: InstallationSelection): InstallationStepContent | null {
+  if (selection.features.length === 0) return null;
+
+  const storyboard =
+    selection.features.includes('thumbnails') && !isMuxRenderer(selection.media)
+      ? 'Thumbnail previews read a storyboard track of preview images. Mux media provides one automatically; for other media, generate the storyboard on the hosting platform and add the track.'
+      : null;
+
+  const online = `https://videojs.org/docs/framework/${selection.owner}/guides`;
+  const items = selection.features.map((feature) => {
+    const { label, guide } = INSTALLATION_FEATURE_DEFINITIONS[feature];
+
+    return selection.method === 'cdn' ? `- ${label}: ${online}/${guide}` : `- ${label}: \`${guide}.md\``;
+  });
+  const intro =
+    selection.method === 'cdn'
+      ? 'Add each feature by following its guide:'
+      : `Add each feature by following its guide in \`node_modules/${PLAYER_PACKAGES[selection.owner]}/docs/guides/\` once the package is installed, or under ${online} before then:`;
+
+  return {
+    id: 'features',
+    title: 'Add the features',
+    description: [intro, items.join('\n'), storyboard].filter((paragraph) => paragraph !== null).join('\n\n'),
+    blocks: [],
+  };
+}
+
+const MUX_PLAYBACK_URL = 'https://stream.mux.com/<PLAYBACK_ID>.m3u8';
+
+const MUX_SIGN_IN =
+  'Ask the user to sign in to Mux first with `npx @mux/cli login`, which opens a browser, or to set `MUX_TOKEN_ID` and `MUX_TOKEN_SECRET` in the environment. Never print, log, or commit those credentials. If the Mux MCP server is connected, you can use it instead of the CLI.';
+
+/**
+ * Getting the reader's own media onto Mux with the Mux CLI: uploading a local file they named, creating a live stream
+ * for a live preset, or, optionally, uploading media in place of the demo source. Each ends with rerunning this command
+ * with the playback URL, so the player code plays it.
+ */
+function muxMediaStep(selection: InstallationSelection): InstallationStepContent | null {
+  if (!isMuxRenderer(selection.media) || (!selection.sourceFile && !playsDemoSource(selection))) return null;
+
+  const rerun = `Then rerun this command with \`--source-url ${MUX_PLAYBACK_URL}\`, so the player code plays it instead of the Video.js demo source.`;
+
+  if (getInstallationPreset(selection.useCase).live) {
+    return {
+      id: 'mux-live-stream',
+      title: 'Create your Mux live stream',
+      description: `${MUX_SIGN_IN}\n\nThe output includes the RTMP URL and stream key for the user's broadcasting software, and the stream's playback ID. Treat the stream key as a secret: give it to the user, and keep it out of the code and logs. ${rerun}`,
+      blocks: [command('npx @mux/cli live create --playback-policy public')],
+    };
+  }
+
+  const file = selection.sourceFile ?? './your-video.mp4';
+  const step: InstallationStepContent = {
+    id: 'mux-upload',
+    title: 'Upload your media to Mux',
+    description: `${MUX_SIGN_IN}\n\nThe JSON output includes the asset's playback ID. ${rerun}`,
+    blocks: [command(`npx @mux/cli assets create --upload ${shellQuote(file)} --playback-policy public --wait --json`)],
+  };
+
+  // Without a file to upload, the step is an option rather than part of the installation.
+  if (!selection.sourceFile) step.condition = 'when-hosting-on-mux';
+
+  return step;
 }
 
 function runAppStep(selection: InstallationSelection): InstallationStepContent | null {
@@ -835,12 +967,28 @@ export function createInstallationPlan(
     installationProjectFiles(selection.framework, selection.template, selection.useCase)
   );
 
-  const steps =
+  const installSteps =
     selection.method === 'cdn'
       ? createCdnSteps(selection)
       : selection.method === 'shadcn'
         ? createShadcnSteps(selection, packageVersion)
         : createPackagedSteps(selection, packageVersion);
+  // A named file or a live stream needs Mux before the player can play it, so that comes first; replacing the demo
+  // with an upload is optional, so it waits until the player runs.
+  const muxStep = muxMediaStep(selection);
+  const muxFirst = muxStep !== null && (selection.sourceFile !== null || muxStep.id === 'mux-live-stream');
+  const runIndex = installSteps.findIndex((step) => step.id === 'run');
+  const beforeRun = runIndex === -1 ? installSteps : installSteps.slice(0, runIndex);
+  const fromRun = runIndex === -1 ? [] : installSteps.slice(runIndex);
+  const steps = presentSteps(
+    migrationStep(selection),
+    muxFirst ? muxStep : null,
+    ...beforeRun,
+    featuresStep(selection),
+    ...fromRun,
+    muxFirst ? null : muxStep,
+    finishMigrationStep(selection)
+  );
   const docsFramework = selection.framework === 'react' ? 'react' : 'html';
 
   return {
