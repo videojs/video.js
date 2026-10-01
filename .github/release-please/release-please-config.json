@@ -1,5 +1,4 @@
 {
-  "release-as": "10.0.0",
   "tag-separator": "@",
   "include-component-in-tag": true,
   "include-v-in-tag": false,
