@@ -235,3 +235,26 @@ The player's scope can extend beyond the fullscreen target. Playlists, transcrip
 </video-player>
 ```
 </FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+## Lifecycle
+
+Video.js elements clean up after themselves when you remove them from the page:
+
+- `<video-player>` and the UI elements destroy themselves two animation frames after they're removed. Destroying the player also destroys its store.
+- Media elements such as `<hlsjs-video>` tear down their playback engine in a microtask after they're removed.
+
+Moving an element synchronously, removing it and inserting it elsewhere with no `await` in between, triggers neither. To keep an element through a longer move, add the `keep-alive` attribute:
+
+```html
+<video-player keep-alive>
+  <media-container keep-alive>
+    <hlsjs-video src="/stream.m3u8" keep-alive></hlsjs-video>
+  </media-container>
+</video-player>
+```
+
+`keep-alive` applies only to the element that carries it; descendants don't inherit it. Set it on every Video.js element in the tree you move. Packaged skins don't pass it to the controls inside them, so move a player that uses a packaged skin synchronously. An element with `keep-alive` is never destroyed automatically. When you're finished with it, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media elements, which release their engine that way. A destroyed element can't be reconnected; create a new one instead.
+
+</FrameworkCase>

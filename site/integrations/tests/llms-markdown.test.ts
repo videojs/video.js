@@ -461,6 +461,9 @@ describe('generateDocsIndex', () => {
       '> The `video.js` package on npm is still Video.js 8. Video.js 10 ships as `@videojs/html`; to move existing Video.js 8 code, read https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8.md\n'
     );
     expect(index).toContain(
+      '> Vidstack Player is in security-only maintenance. To move existing `vidstack` code, read https://videojs.org/docs/framework/html/guides/migrate-from-vidstack.md\n'
+    );
+    expect(index).toContain(
       '## Guides\n\n' +
         'Installation, migration, concepts, playback guides, customization, and tooling for Video.js.\n\n' +
         'Section index: [guides/llms.txt](https://videojs.org/docs/framework/html/guides/llms.txt). This section in one file (about 90k tokens): https://videojs.org/docs/framework/html/guides/llms-full.txt\n\n'

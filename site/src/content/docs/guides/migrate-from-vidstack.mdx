@@ -1,0 +1,1389 @@
+---
+title: Migrate from Vidstack
+description: Move a Vidstack Player integration to Video.js 10, mapping the player, providers, layouts, and media store onto composed components
+---
+
+import Aside from '@/components/Aside.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import MigrationAgentStart from '@/components/docs/MigrationAgentStart.astro';
+
+Vidstack Player gives you one `<media-player>` that holds state, picks a provider from `src`, and hosts a layout you configure with props, slots, and CSS variables.
+
+Video.js 10 grew out of the same ideas: composed, accessible components, one store per player, and state you can style against. The teams behind Vidstack, Plyr, Media Chrome, and Video.js now focus their work on Video.js. The code is new, though, and the jobs `<media-player>` did are split across smaller pieces. Most of this guide is about where each Vidstack concept moved.
+
+<Aside type="note">
+We'll merge priority security patches into Vidstack Player 1.x until January 2028. After that, Vidstack won't receive further updates. This guide covers Vidstack 1.x.
+</Aside>
+
+<Aside type="caution">
+Plan this as a rewrite of your player setup, not a find-and-replace. Many names survive, such as `media-play-button`, `data-paused`, and `--media-font-family`, but a matching name doesn't mean a matching API.
+</Aside>
+
+## AI Quickstart
+
+The [Video.js skill](https://github.com/videojs/skills) teaches coding agents how Video.js 10 is composed and points them at documentation that matches your installed version. This prompt installs it and starts the migration.
+
+<MigrationAgentStart source="vidstack" />
+
+Once Video.js is installed, the agent switches to the docs that ship with the package, which match your version, so it doesn't rely on training data that mostly describes older players. See <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink> to install the skill yourself or give your tool the docs another way.
+
+## Before you migrate
+
+Two checks save the most time.
+
+**Compare your features with [Known gaps](#known-gaps).** Saved preferences, the chapters menu, caption style settings, audio gain, clipping, and non-VTT captions have no Video.js equivalent yet. If your player depends on one of them, that shapes your timeline more than anything else in this guide.
+
+<FrameworkCase frameworks={["html"]}>
+**Remove Vidstack in the same change that adds Video.js 10.** Both libraries register `media-play-button`, `media-controls`, `media-time-slider`, and 21 other custom element names. The browser keeps whichever definition loads first, so the two can't run on the same page. Remove Vidstack's imports, CDN scripts, and stylesheets before you add Video.js.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+**Migrate one player at a time if you need to.** Neither `@vidstack/react` nor `@videojs/react` registers custom elements, so both can render in the same app while you move players across. Remove `@vidstack/react` and its stylesheets once nothing imports them. While Vidstack's player styles are loaded, they also give every `<video>` without a `width` or `height` a 16:9 box, Video.js media included.
+</FrameworkCase>
+
+## Three pieces instead of one
+
+In Vidstack, `<media-player>` does most of the work. It holds state, selects and loads a provider, acts as the box you size and take fullscreen, carries the state attributes you style against, and listens for keyboard shortcuts.
+
+Video.js 10 splits those jobs:
+
+**The player** holds state and hands it to everything inside it. It draws nothing and takes no layout. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from.
+
+**The media** plays the video. This is where Vidstack's *provider* went, except you choose it yourself: a plain `<video>` for progressive files, or a <DocsLink slug="guides/media-sources">media component</DocsLink> for HLS, DASH, YouTube, Vimeo, and Mux. There's no `<media-provider>`; the media element sits inside the skin.
+
+**The skin** is the UI, and it's where Vidstack's *layout* went. Every skin renders a container, the box that sizes the player, goes fullscreen, and receives gestures and hotkeys.
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<video-player>
+  <video-skin>
+    <video src="/video.mp4" playsinline></video>
+  </video-skin>
+</video-player>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<VideoPlayer>
+  <VideoSkin>
+    <Video src="/video.mp4" playsInline />
+  </VideoSkin>
+</VideoPlayer>
+```
+</FrameworkCase>
+
+Note the nesting. A Vidstack layout sits *next to* `<media-provider>`; a Video.js skin *wraps* the media.
+
+### Terminology
+
+| Vidstack | Video.js 10 |
+|---|---|
+| Player | Player, which only holds state, plus the skin's container |
+| Provider | Media, and its playback **engine** |
+| Layout (Default, Plyr) | Skin (Default, Minimal) |
+| Video or audio layout, matched by view type | The video or audio **preset**, chosen when you import it |
+| Default Theme | Skin source you add to your project |
+| Slots | Editing skin source |
+| Media store, media state | Player store, player state, composed from **features** |
+| Request, remote control | Action |
+| `can*` flags | Availability: `available`, `unavailable`, or `unsupported` |
+| Stream type `live:dvr` | A live preset. DVR streams report `targetLiveWindow` as `Infinity` |
+| Keyboard shortcuts | Hotkeys, one per shortcut |
+| Keyboard display | Status indicators |
+| Announcer | Status announcer |
+| Speed | Playback rate |
+| Quality | Video rendition in state; still "quality" in the UI |
+| Google Cast | Cast, through the Google Cast extension |
+| Plugins (bundler plugins) | None; imports are explicit. Behavior add-ons are **extensions** |
+
+"Remote" also changes meaning. Vidstack's remote control dispatched requests; in Video.js, remote playback means AirPlay and Cast.
+
+## Your first player
+
+<FrameworkCase frameworks={["react"]}>
+
+Here's a typical Vidstack player with the Default Layout, captions, thumbnails, and a poster:
+
+```tsx
+import '@vidstack/react/player/styles/default/theme.css';
+import '@vidstack/react/player/styles/default/layouts/video.css';
+import { MediaPlayer, MediaProvider, Poster, Track } from '@vidstack/react';
+import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
+
+export function Player() {
+  return (
+    <MediaPlayer title="Sprite Fight" src="/video.mp4" poster="/poster.jpg" playsInline>
+      <MediaProvider>
+        <Poster className="vds-poster" />
+        <Track kind="captions" src="/captions/en.vtt" lang="en" label="English" default />
+      </MediaProvider>
+      <DefaultVideoLayout thumbnails="/storyboard.vtt" icons={defaultLayoutIcons} />
+    </MediaPlayer>
+  );
+}
+```
+
+Install `@videojs/react`:
+
+```bash
+npm install @videojs/react
+```
+
+The video <DocsLink slug="guides/presets">preset</DocsLink> gives you a player, a skin, and a media component that already fit together:
+
+```tsx
+'use client';
+
+import '@videojs/react/video/skin.css';
+import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
+
+export function Player() {
+  return (
+    <VideoPlayer title="Sprite Fight" poster="/poster.jpg">
+      <VideoSkin style={{ aspectRatio: '16 / 9' }}>
+        <Video src="/video.mp4" playsInline>
+          <track kind="captions" src="/captions/en.vtt" srcLang="en" label="English" default />
+          <track kind="metadata" src="/storyboard.vtt" label="thumbnails" default />
+        </Video>
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+What changed:
+
+- **No `MediaProvider`.** `Video` is the media, and it sits inside the skin.
+- **`src` and `playsInline` moved to the media.** `title` and `poster` stay on the player, and the skin renders them.
+- **`Track` became a native `<track>`.** Use `srcLang` instead of `lang`.
+- **Thumbnails are a track.** The `thumbnails` layout prop becomes a `<track kind="metadata" label="thumbnails" default>` on the media.
+- **No `icons` prop and no theme stylesheet.** The skin ships its icons, and one stylesheet covers the whole skin.
+- **Set the aspect ratio yourself.** Vidstack's base styles gave video a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
+
+The preset entry already marks itself as client code, so this file doesn't need `'use client'` yet. Keep it in Next.js and other React Server Components setups once the file uses hooks such as `usePlayer`, or passes functions such as `renderPoster`. `VideoPlayer` takes only its config props and children. It renders no element, so it takes no `className`, `style`, or `ref`; style the skin instead.
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+Here's a typical Vidstack player with the Default Layout, captions, thumbnails, and a poster:
+
+```js
+import 'vidstack/player/styles/default/theme.css';
+import 'vidstack/player/styles/default/layouts/video.css';
+import 'vidstack/player';
+import 'vidstack/player/layouts/default';
+import 'vidstack/player/ui';
+```
+
+```html
+<media-player title="Sprite Fight" src="/video.mp4" poster="/poster.jpg" playsinline>
+  <media-provider>
+    <media-poster class="vds-poster"></media-poster>
+    <track kind="captions" src="/captions/en.vtt" srclang="en" label="English" default />
+  </media-provider>
+  <media-video-layout thumbnails="/storyboard.vtt"></media-video-layout>
+</media-player>
+```
+
+Install `@videojs/html` and register the video <DocsLink slug="guides/presets">preset</DocsLink>, a player and a skin that already fit together:
+
+```bash
+npm install @videojs/html
+```
+
+```js
+import '@videojs/html/video/player';
+import '@videojs/html/video/skin';
+```
+
+```html
+<video-player content-title="Sprite Fight" poster="/poster.jpg">
+  <video-skin style="aspect-ratio: 16 / 9">
+    <video src="/video.mp4" playsinline>
+      <track kind="captions" src="/captions/en.vtt" srclang="en" label="English" default />
+      <track kind="metadata" src="/storyboard.vtt" label="thumbnails" default />
+    </video>
+  </video-skin>
+</video-player>
+```
+
+What changed:
+
+- **No `<media-provider>`.** The `<video>` is the media, and it sits inside the skin.
+- **`src` and `playsinline` moved to the media.** `poster` stays on the player, and `title` becomes `content-title`, because `title` already means a tooltip on HTML elements.
+- **Thumbnails are a track.** The `thumbnails` layout attribute becomes a `<track kind="metadata" label="thumbnails" default>` on the media.
+- **No stylesheets and no `<media-poster>`.** The skin styles itself and renders the poster from the player.
+- **Set the aspect ratio yourself.** Vidstack's base styles gave video a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
+
+Load the bundle as a module script. From the CDN, the video preset is one script:
+
+```html
+<script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
+```
+
+Pin every Video.js CDN URL on a page to the same version; see <DocsLink slug="guides/cdn">CDN</DocsLink>.
+
+In Vue, list the exact Video.js tags in `isCustomElement` instead of Vidstack's `tag.startsWith('media-')` rule, because Video.js uses several tag families. See <DocsLink slug="guides/vue">Vue</DocsLink> and <DocsLink slug="guides/svelte">Svelte</DocsLink>.
+
+</FrameworkCase>
+
+If you used the Plyr Layout, start from the Minimal skin instead. It's the closer match to a classic control bar, and <DocsLink slug="guides/migrate-from-plyr">Migrate from Plyr</DocsLink> maps the Plyr options that layout mirrored.
+
+<FrameworkCase frameworks={["html"]}>
+`VidstackPlayer.create()` has no equivalent factory. Write the markup, or build the same elements from script and move your existing `<video>` inside them:
+
+```js
+import '@videojs/html/video/player';
+import '@videojs/html/video/skin';
+
+const video = document.querySelector('#target');
+const player = document.createElement('video-player');
+const skin = document.createElement('video-skin');
+
+player.setAttribute('content-title', 'Sprite Fight');
+player.setAttribute('poster', '/poster.jpg');
+video.removeAttribute('controls');
+
+video.replaceWith(player);
+player.append(skin);
+skin.append(video);
+```
+
+Remove `controls` yourself: Video.js doesn't turn native controls off when a skin loads ([#1160](https://github.com/videojs/v10/issues/1160)).
+</FrameworkCase>
+
+## Where your player props went
+
+`<media-player>` accepted about fifty props. In Video.js they scatter in four directions:
+
+1. **Media attributes** move to the media element, where the browser already understands them.
+2. **Player metadata**, the title and poster, stays on the player so the skin can render it.
+3. **Playback values** such as volume and current time become actions you call.
+4. **Behavior** such as live UI, shortcuts, and casting becomes a choice of preset, component, or extension.
+
+<FrameworkCase frameworks={["react"]}>
+| Vidstack `MediaPlayer` | Video.js 10 |
+|---|---|
+| `src` | `src` or `source` on the media. See [Providers become media components](#providers-become-media-components) |
+| `autoPlay`, `muted`, `loop`, `controls`, `playsInline`, `preload`, `crossOrigin` | The same props on the media. Where Vidstack took `crossOrigin` as `true`, pass `""` or `"anonymous"` |
+| `title`, `poster` | `title` and `poster` on `VideoPlayer` |
+| `aspectRatio` | CSS `aspect-ratio` on the skin |
+| `volume`, `currentTime`, `playbackRate`, `paused` | The `setVolume`, `seek`, `setPlaybackRate`, `play`, and `pause` actions. See [Drive playback](#drive-playback) |
+| `viewType` | The audio or video preset |
+| `streamType` | A live preset. See [Live streams](#live-streams) |
+| `preferNativeHLS` | `source.preferPlayback: 'native'` on `HlsJsVideo`, or `NativeHlsVideo` |
+| `fullscreenOrientation` | `orientationLockFeature` and `orientationLockType`. See [Fullscreen and orientation](#fullscreen-and-orientation) |
+| `keyShortcuts`, `keyTarget`, `keyDisabled` | Hotkeys. See [Keyboard shortcuts and gestures](#keyboard-shortcuts-and-gestures) |
+| `googleCast` | `receiver` on the Google Cast extension. See [AirPlay and Google Cast](#airplay-and-google-cast) |
+| `controlsDelay`, `hideControlsOnMouseLeave` | Not configurable. Controls hide after 2 seconds and when the pointer leaves ([#1728](https://github.com/videojs/v10/issues/1728)) |
+| `load`, `posterLoad` | No equivalent ([#3043](https://github.com/videojs/v10/issues/3043)). See [Loading](#loading) |
+| `storage` | No equivalent ([#944](https://github.com/videojs/v10/issues/944)). See <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink> |
+| `duration` | No equivalent ([#1729](https://github.com/videojs/v10/issues/1729)) |
+| `clipStartTime`, `clipEndTime` | No equivalent ([#3040](https://github.com/videojs/v10/issues/3040)) |
+| `liveEdgeTolerance`, `minLiveDVRWindow` | No equivalent ([#1730](https://github.com/videojs/v10/issues/1730)) |
+| `artist`, `artwork` | No equivalent; Video.js doesn't set Media Session metadata ([#3042](https://github.com/videojs/v10/issues/3042)) |
+| `logLevel` | No equivalent ([#1406](https://github.com/videojs/v10/issues/1406)); development builds print warnings |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Vidstack `<media-player>` | Video.js 10 |
+|---|---|
+| `src` | `src` on the media. See [Providers become media components](#providers-become-media-components) |
+| `autoplay`, `muted`, `loop`, `controls`, `playsinline`, `preload`, `crossorigin` | The same attributes on the media |
+| `title` | `content-title` on `<video-player>` |
+| `poster` | `poster` on `<video-player>` |
+| `volume`, `current-time`, `playback-rate`, `paused` | The `setVolume`, `seek`, `setPlaybackRate`, `play`, and `pause` actions. See [Drive playback](#drive-playback) |
+| `view-type` | The audio or video preset |
+| `stream-type` | A live preset. See [Live streams](#live-streams) |
+| `prefer-native-hls` | `source.preferPlayback: 'native'` on `<hlsjs-video>`, or `<native-hls-video>` |
+| `fullscreen-orientation` | `orientationLockFeature` and `orientation-lock-type`. See [Fullscreen and orientation](#fullscreen-and-orientation) |
+| `keyShortcuts`, `key-target`, `key-disabled` | Hotkeys. See [Keyboard shortcuts and gestures](#keyboard-shortcuts-and-gestures) |
+| `googleCast` | `receiver` on `<google-cast>`. See [AirPlay and Google Cast](#airplay-and-google-cast) |
+| `controls-delay`, `hide-controls-on-mouse-leave` | Not configurable. Controls hide after 2 seconds and when the pointer leaves ([#1728](https://github.com/videojs/v10/issues/1728)) |
+| `load`, `poster-load` | No equivalent ([#3043](https://github.com/videojs/v10/issues/3043)). See [Loading](#loading) |
+| `storage` | No equivalent ([#944](https://github.com/videojs/v10/issues/944)). See <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink> |
+| `duration` | No equivalent ([#1729](https://github.com/videojs/v10/issues/1729)) |
+| `clip-start-time`, `clip-end-time` | No equivalent ([#3040](https://github.com/videojs/v10/issues/3040)) |
+| `live-edge-tolerance`, `min-live-dvr-window` | No equivalent ([#1730](https://github.com/videojs/v10/issues/1730)) |
+| `artist`, `artwork` | No equivalent; Video.js doesn't set Media Session metadata ([#3042](https://github.com/videojs/v10/issues/3042)) |
+| `log-level` | No equivalent ([#1406](https://github.com/videojs/v10/issues/1406)); development builds print warnings |
+| `keep-alive` | `keep-alive` on each element you move. See [Element lifecycle](#element-lifecycle) |
+</FrameworkCase>
+
+Vidstack queued `paused`, `volume`, and the other playback props until the media could play. Video.js doesn't queue: most actions fail until the player has attached to its media, `seek()` included, which only waits for metadata once attached. Call them from event handlers.
+
+<FrameworkCase frameworks={["react"]}>
+Don't call them from a mount effect inside the player. React runs a child's effects before the player's, so the player hasn't attached yet.
+</FrameworkCase>
+
+## Providers become media components
+
+Vidstack's `<media-provider>` read `src`, guessed a type from the extension or a `HEAD` request, and loaded the matching provider. Video.js doesn't guess. You pick the media component for your source, and that choice is the playback engine choice. Swapping one for another is a component change, and the rest of the player keeps working.
+
+<FrameworkCase frameworks={["react"]}>
+| Vidstack source | Video.js 10 media | Package |
+|---|---|---|
+| MP4, WebM, and other files | `Video` from `@videojs/react/video`, or `Audio` in the audio preset | included |
+| HLS | <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink>, the closest match to Vidstack's hls.js provider | `@videojs/hlsjs-video` |
+| HLS, smaller bundle | <DocsLink slug="reference/components/hls-video">`HlsVideo`</DocsLink>, built on Video.js's own engine | included |
+| HLS, browser only | <DocsLink slug="reference/components/native-hls-video">`NativeHlsVideo`</DocsLink> | included |
+| DASH | <DocsLink slug="reference/components/dash-video">`DashVideo`</DocsLink>, or <DocsLink slug="reference/components/shaka-video">`ShakaVideo`</DocsLink> for live DASH | `@videojs/dash-video`, `@videojs/shaka-video` |
+| YouTube | <DocsLink slug="reference/components/youtube-video">`YouTubeVideo`</DocsLink> | `@videojs/youtube-video` |
+| Vimeo | <DocsLink slug="reference/components/vimeo-video">`VimeoVideo`</DocsLink> | `@videojs/vimeo-video` |
+| Remotion | No equivalent ([#3053](https://github.com/videojs/v10/issues/3053)) | |
+
+Import each media component from `@videojs/react/media/<name>`, for example `@videojs/react/media/hlsjs-video`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Vidstack source | Video.js 10 media | Package |
+|---|---|---|
+| MP4, WebM, and other files | a plain `<video>`, or `<audio>` in the audio preset | included |
+| HLS | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, the closest match to Vidstack's hls.js provider | `@videojs/hlsjs-video` |
+| HLS, smaller bundle | <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink>, built on Video.js's own engine | included |
+| HLS, browser only | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink> | included |
+| DASH | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, or <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> for live DASH | `@videojs/dash-video`, `@videojs/shaka-video` |
+| YouTube | <DocsLink slug="reference/components/youtube-video">`<youtube-video>`</DocsLink> | `@videojs/youtube-video` |
+| Vimeo | <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | `@videojs/vimeo-video` |
+| Remotion | No equivalent ([#3053](https://github.com/videojs/v10/issues/3053)) | |
+
+Register each media element with `import '@videojs/html/media/<name>'`, or load `{{VJS10_CDN_BASE}}/media/<name>.js` from the CDN, where the engine is already bundled.
+</FrameworkCase>
+
+### HLS and DASH
+
+Vidstack loaded hls.js and dash.js from jsDelivr at runtime unless you passed a `library`. Video.js media packages bundle their engine, so there's no `library` option, no `hls-lib-*` or `dash-lib-*` events, and no CDN host to allow in your Content Security Policy. dash.js also moves from version 4 to version 5; check your dash.js settings against its migration notes.
+
+Engine configuration moves from the `provider-change` event to the media's `source`:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+// Vidstack
+import { isHLSProvider, MediaPlayer, type MediaProviderAdapter } from '@vidstack/react';
+
+function onProviderChange(provider: MediaProviderAdapter | null) {
+  if (isHLSProvider(provider)) provider.config = { maxBufferLength: 60 };
+}
+
+<MediaPlayer src="/stream.m3u8" onProviderChange={onProviderChange}>
+  {/* … */}
+</MediaPlayer>
+```
+
+```bash
+npm install @videojs/hlsjs-video
+```
+
+```tsx
+// Video.js 10
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+
+<VideoPlayer>
+  <VideoSkin>
+    <HlsJsVideo source={{ src: '/stream.m3u8', engine: { hlsJs: { maxBufferLength: 60 } } }} playsInline />
+  </VideoSkin>
+</VideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```js
+// Vidstack
+import { isHLSProvider } from 'vidstack';
+
+player.addEventListener('provider-change', (event) => {
+  const provider = event.detail;
+  if (isHLSProvider(provider)) provider.config = { maxBufferLength: 60 };
+});
+```
+
+```bash
+npm install @videojs/hlsjs-video
+```
+
+```js
+// Video.js 10
+import '@videojs/html/media/hlsjs-video';
+
+const media = document.querySelector('hlsjs-video');
+media.source = { src: '/stream.m3u8', engine: { hlsJs: { maxBufferLength: 60 } } };
+```
+
+`source` is a property only; there's no `source` attribute.
+</FrameworkCase>
+
+`source` is replaced, not merged. Changing hls.js options rebuilds the engine; dash.js and Shaka apply new settings to the running one. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for the options every engine shares, such as `preferPlayback`, rendition caps, and DRM.
+
+<FrameworkCase frameworks={["react"]}>
+Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
+
+```tsx
+import { useMedia } from '@videojs/react';
+import { Hls, HlsJsAdapter } from '@videojs/hlsjs-video';
+import { useEffect } from 'react';
+
+function LevelLogger() {
+  const media = useMedia();
+  const engine = media instanceof HlsJsAdapter ? media.engine : null;
+
+  useEffect(() => {
+    if (!engine) return;
+
+    const onLevelSwitched = (_event: unknown, data: { level: number }) => console.log('level', data.level);
+    engine.on(Hls.Events.LEVEL_SWITCHED, onLevelSwitched);
+    return () => engine.off(Hls.Events.LEVEL_SWITCHED, onLevelSwitched);
+  }, [engine]);
+
+  return null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Where you used `provider.instance` or `onInstance`, read `.engine` on the media element. For hls.js's event names, import `Hls` from `@videojs/hlsjs-video`, the package you installed for `<hlsjs-video>`, which exports it for this kind of low-level access. Vidstack re-dispatched hls.js events as `hls-*` events on the player; Video.js doesn't forward engine events, so subscribe on the engine itself:
+
+```js
+import { Hls } from '@videojs/hlsjs-video';
+
+const media = document.querySelector('hlsjs-video');
+const onLevelSwitched = (_event, data) => console.log('level', data.level);
+
+// Subscribe to the current engine, and again whenever loading starts, which is when a new one appears.
+// Removing first keeps a reused engine from getting the listener twice.
+const subscribe = () => {
+  media.engine?.off(Hls.Events.LEVEL_SWITCHED, onLevelSwitched);
+  media.engine?.on(Hls.Events.LEVEL_SWITCHED, onLevelSwitched);
+};
+
+subscribe();
+media.addEventListener('loadstart', subscribe);
+```
+</FrameworkCase>
+
+`engine` is `null` while the browser's own HLS is playing. The media builds a new engine when its engine options, DRM, `preferPlayback`, or content type change; a new URL of the same type keeps the current one.
+
+Treat engine access as an escape hatch. It couples your app to one engine, so prefer player state and media events when they cover what you need.
+
+### YouTube and Vimeo
+
+The embeds take a URL, a bare ID, or one of Vidstack's shorthands as `src`:
+
+- **`youtube/ID` plays from the privacy-enhanced host,** `youtube-nocookie.com`, as it did in Vidstack.
+- **`vimeo/ID?hash=HASH` still plays an unlisted video.** In a full Vimeo URL, give the hash as `?h=HASH` or as the last path segment.
+
+Vidstack fetched a poster for embeds automatically. Video.js doesn't ([#3049](https://github.com/videojs/v10/issues/3049)); set `poster` on the player if you want your own image before playback.
+
+<Aside type="caution" title="Embed privacy defaults changed">
+Vidstack loaded YouTube from `youtube-nocookie.com` and asked Vimeo not to track viewers unless you turned cookies on. Video.js plays a YouTube URL from the standard host unless it's a `youtube-nocookie.com` URL, and sends Vimeo's `dnt` flag only when you set `source.engine.vimeo.dnt`. Keep the privacy-enhanced behavior by writing YouTube sources as `youtube/VIDEO_ID` shorthands or `youtube-nocookie.com` URLs, and adding `dnt: true` to the Vimeo engine options.
+</Aside>
+
+### Choose the media from the URL
+
+We're working on a media component that picks and loads the right engine from its source, the way `<media-provider>` did. Its API isn't settled yet; follow [#2160](https://github.com/videojs/v10/issues/2160) for progress.
+
+Until then, <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> tells you which media component plays a URL, and you render that component with the same `src`. If your app plays sources from a catalog or from user input, a switch on its result covers the common cases:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+'use client';
+
+import { resolveAdapterType } from '@videojs/react';
+import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { lazy, Suspense } from 'react';
+
+const DashVideo = lazy(() => import('@videojs/react/media/dash-video').then((m) => ({ default: m.DashVideo })));
+const HlsJsVideo = lazy(() => import('@videojs/react/media/hlsjs-video').then((m) => ({ default: m.HlsJsVideo })));
+const VimeoVideo = lazy(() => import('@videojs/react/media/vimeo-video').then((m) => ({ default: m.VimeoVideo })));
+const YouTubeVideo = lazy(() => import('@videojs/react/media/youtube-video').then((m) => ({ default: m.YouTubeVideo })));
+
+function Media({ src }: { src: string }) {
+  switch (resolveAdapterType(src)) {
+    case 'youtube':
+      return <YouTubeVideo src={src} />;
+    case 'vimeo':
+      return <VimeoVideo src={src} />;
+    case 'hls':
+      return <HlsJsVideo src={src} playsInline />;
+    case 'dash':
+      return <DashVideo src={src} playsInline />;
+    default:
+      return <Video src={src} playsInline />;
+  }
+}
+
+export function Player({ src }: { src: string }) {
+  return (
+    <VideoPlayer>
+      <VideoSkin style={{ aspectRatio: '16 / 9' }}>
+        <Suspense>
+          <Media key={src} src={src} />
+        </Suspense>
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+Each embed and streaming component loads with `React.lazy`, so the page only downloads the engine its source needs, the way Vidstack's provider loaders did. `Video` plays through the browser with no engine, so it's imported directly. When the media changes, the player detaches from the old one, resets its state, and attaches to the new one; the skin follows.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```js
+import { resolveAdapterType } from '@videojs/html';
+
+// The tag for each adapter type, and the module that registers it.
+const MEDIA = {
+  youtube: ['youtube-video', () => import('@videojs/html/media/youtube-video')],
+  vimeo: ['vimeo-video', () => import('@videojs/html/media/vimeo-video')],
+  hls: ['hlsjs-video', () => import('@videojs/html/media/hlsjs-video')],
+  dash: ['dash-video', () => import('@videojs/html/media/dash-video')],
+};
+
+let media = document.querySelector('video-skin > video');
+
+async function load(src) {
+  const [tag, register] = MEDIA[resolveAdapterType(src)] ?? ['video'];
+  await register?.();
+
+  const next = document.createElement(tag);
+  next.setAttribute('src', src);
+  next.setAttribute('playsinline', '');
+  media.replaceWith(next);
+  media = next;
+}
+```
+
+Each media module loads with `import()`, so the page only downloads the engine its source needs, the way Vidstack's provider loaders did. A plain `<video>` needs no module. When the media changes, the player detaches from the old one, resets its state, and attaches to the new one; the skin follows.
+</FrameworkCase>
+
+`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
+
+For a single source, change the media's `src` or `source` instead. The same media swaps the URL without being replaced.
+
+### Loading
+
+Vidstack waited until the player was visible before it loaded the provider (`load="visible"`), and embeds loaded lazily with preconnect hints. Video.js media starts loading as soon as it attaches, following its `preload` attribute, and embeds create their iframe right away.
+
+To defer network work, set `preload="none"` on streaming media; hls.js-backed media then waits for playback to fetch segments. For players far down a page, render or import the media when it scrolls into view with your own `IntersectionObserver`. There's no `startLoading()`; set `src` when you're ready. Follow [#3043](https://github.com/videojs/v10/issues/3043) for built-in deferred loading and [#1433](https://github.com/videojs/v10/issues/1433) for preconnect hints.
+
+## Layouts become skins
+
+Vidstack rendered the audio and video layouts side by side and matched one at runtime, then switched live controls on by stream type. Video.js gives each case its own <DocsLink slug="guides/presets">preset</DocsLink> and skin, chosen when you import it.
+
+<FrameworkCase frameworks={["react"]}>
+| Vidstack | Closest Video.js 10 skin |
+|---|---|
+| `DefaultVideoLayout` | `VideoSkin` from `@videojs/react/video` |
+| `DefaultVideoLayout` playing a live stream | `LiveVideoSkin` from `@videojs/react/live-video` |
+| `DefaultAudioLayout` | `AudioSkin` from `@videojs/react/audio` |
+| `PlyrLayout` | `MinimalVideoSkin` or `MinimalAudioSkin` |
+| A custom layout with no controls | `BackgroundVideoSkin` from `@videojs/react/background` |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Vidstack | Closest Video.js 10 skin |
+|---|---|
+| `<media-video-layout>` | `<video-skin>` from `@videojs/html/video/skin` |
+| `<media-video-layout>` playing a live stream | `<live-video-skin>` from `@videojs/html/live-video/skin` |
+| `<media-audio-layout>` | `<audio-skin>` from `@videojs/html/audio/skin` |
+| `<media-plyr-layout>` | `<video-minimal-skin>` or `<audio-minimal-skin>` |
+| A custom layout with no controls | `<background-video-skin>` from `@videojs/html/background/skin` |
+</FrameworkCase>
+
+The video skins cover the Default Layout's core controls: play, volume, time, the time slider with thumbnails and chapter segments, captions, fullscreen, picture-in-picture, AirPlay, Cast, and a settings menu with quality, audio track, playback rate, and captions. They add an error dialog and on-screen feedback for hotkeys and gestures. The Default Layout's chapters menu ([#1873](https://github.com/videojs/v10/issues/1873)), accessibility menu, audio boost ([#1135](https://github.com/videojs/v10/issues/1135)), and download button ([#3041](https://github.com/videojs/v10/issues/3041)) have no equivalent yet.
+
+### Map layout props
+
+Packaged skins take almost no props. Most layout props either move somewhere else or need you to [edit the skin source](#level-3-edit-skin-source).
+
+<FrameworkCase frameworks={["react"]}>
+| `DefaultVideoLayout` prop | Video.js 10 |
+|---|---|
+| `thumbnails` | A `<track kind="metadata" label="thumbnails" default>` on the media |
+| `translations` | <DocsLink slug="guides/internationalization">i18n</DocsLink>; see [Languages](#languages) |
+| `icons` | Built in; edit skin source to swap them |
+| `colorScheme` | CSS `color-scheme`; see [Color scheme](#color-scheme) |
+| `smallLayoutWhen` | Container queries built into the skin; see [Responsive layouts](#responsive-layouts) |
+| `slots` | Edit skin source; see [Slots become skin source](#slots-become-skin-source) |
+| `seekStep` | 10 seconds in the skin's hotkeys and gestures; edit skin source to change it |
+| `playbackRates` | A fixed list: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)) |
+| `showTooltipDelay` | 600 ms; set `delay` on tooltips in skin source |
+| `noGestures`, `noKeyboardAnimations`, `disableTimeSlider`, `menuGroup` | Edit skin source |
+| `hideQualityBitrate` | Bitrate shows only to tell apart renditions of the same size |
+| `noModal`, `menuContainer` | Not needed. Menus render in the browser's top layer |
+| `audioGains`, `noAudioGain` | No audio gain ([#1135](https://github.com/videojs/v10/issues/1135)) |
+| `download` | No equivalent ([#3041](https://github.com/videojs/v10/issues/3041)) |
+| `sliderChaptersMinWidth`, `noScrubGesture` | No equivalent |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| `<media-video-layout>` attribute | Video.js 10 |
+|---|---|
+| `thumbnails` | A `<track kind="metadata" label="thumbnails" default>` on the media |
+| `translations` | <DocsLink slug="guides/internationalization">i18n</DocsLink>; see [Languages](#languages) |
+| `custom-icons` and icon slots | Built in; edit skin source to swap them |
+| `color-scheme` | CSS `color-scheme`; see [Color scheme](#color-scheme) |
+| `small-when` | Container queries built into the skin; see [Responsive layouts](#responsive-layouts) |
+| `seek-step` | 10 seconds in the skin's hotkeys and gestures; edit skin source to change it |
+| `playback-rates` | A fixed list: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)) |
+| `no-gestures`, `no-keyboard-animations`, `disable-time-slider`, `menu-group` | Edit skin source |
+| `hide-quality-bitrate` | Bitrate shows only to tell apart renditions of the same size |
+| `no-modal`, `menu-container` | Not needed. Menus render in the browser's top layer |
+| `audio-gains`, `no-audio-gain` | No audio gain ([#1135](https://github.com/videojs/v10/issues/1135)) |
+| `download` | No equivalent ([#3041](https://github.com/videojs/v10/issues/3041)) |
+| `slider-chapters-min-width`, `no-scrub-gesture` | No equivalent |
+</FrameworkCase>
+
+### Slots become skin source
+
+<FrameworkCase frameworks={["react"]}>
+Vidstack's `slots` prop inserted, replaced, or removed controls at more than forty named slots, each with `before` and `after` positions. Video.js has no slot API for controls. Children of a packaged skin render with the media, not in the control bar. The two content overrides are `renderPoster` and `renderThumbnail`.
+
+To add, move, or remove a control, add the skin source to your project and edit it. `slots={{ afterCaptionButton: <MyButton /> }}` becomes one line in the copied layout file; `slots={{ pipButton: null }}` becomes a deleted line.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Vidstack's web component layouts only let you replace icons through slots. Video.js has no slot API for controls either. Children of a packaged skin render with the media, not in the control bar. The two content slots are `<img slot="poster">` and `<img slot="thumbnail">`.
+
+To add, move, or remove a control, add the skin source to your project and edit its markup.
+</FrameworkCase>
+
+### Customize your player
+
+Vidstack customization climbed from layout props, through CSS variables and slots, to composing your own layout. Video.js has three levels. Try them in order.
+
+#### Level 1: pick a skin
+
+Choose Default or Minimal for video, audio, live video, or live audio. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+
+#### Level 2: restyle it
+
+Packaged skins expose eight public custom properties: `--media-accent-color`, `--media-accent-text-color`, `--media-border-color`, `--media-border-radius`, `--media-font-family`, `--media-object-fit`, `--media-object-position`, and `--media-scale-unit`. That's far fewer than Vidstack's layout variables, so expect to reach Level 3 sooner. See [Map theme variables by meaning](#map-theme-variables-by-meaning) and <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink>.
+
+#### Level 3: edit skin source
+
+For changes to controls, layout, or interactions, add the skin source to your project with the <DocsLink slug="guides/installation-shadcn">Shadcn registry</DocsLink>. The components and styles become local files you own. This is where Vidstack's slots, icon overrides, and switches such as `noGestures` end up. See <DocsLink slug="guides/customize-skins" anchor="style-skin-source">Customize skins</DocsLink>.
+
+To build a layout from scratch, the way you might have composed Vidstack components with the Default Theme, compose the <DocsLink slug="guides/ui-components">UI components</DocsLink> inside a container yourself.
+
+## Rewrite your styles
+
+### State attributes
+
+<FrameworkCase frameworks={["html"]}>
+Vidstack reflected about forty state attributes onto `<media-player>`, so any descendant could style against `media-player[data-paused]`. Video.js puts state on the component it belongs to. The player renders no box, and the container only reflects `data-controls-visible`.
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `media-player[data-paused]`, `[data-ended]`, `[data-started]` | `media-play-button[data-paused]`, `[data-ended]`, `[data-started]` |
+| `[data-waiting]`, `[data-buffering]` | `media-buffering-indicator[data-visible]` |
+| `[data-controls]` | `media-container[data-controls-visible]`, `media-controls[data-visible]` |
+| `[data-fullscreen]` | `media-fullscreen-button[data-fullscreen]`, or `:fullscreen` on the container |
+| `[data-pip]` | `media-pip-button[data-pip]` |
+| `[data-muted]` | `media-mute-button[data-muted]`, plus `data-volume-level` |
+| `[data-captions]` | `media-captions-button[data-active]` |
+| `[data-live]`, `[data-live-edge]` | `media-live-button[data-live]`, `[data-live-edge]` |
+| `[data-seeking]`, `[data-preview]` | `media-time-slider[data-seeking]`, `[data-pointing]`, `[data-dragging]` |
+| `[data-can-fullscreen]`, `[data-can-pip]`, `[data-can-airplay]`, `[data-can-google-cast]` | `data-availability` on the matching button, which hides itself when unsupported |
+| `[data-airplay]`, `[data-google-cast]`, `[data-remote-state]` | `data-airplay-state` and `data-cast-state` on the buttons |
+| `[data-error]` | `media-error-dialog[data-open]` |
+| `[data-pointer="coarse"]` | `@media (pointer: coarse)` |
+| `[data-media-type]`, `[data-view-type]`, `[data-stream-type]` | The preset you chose |
+| `[data-focus]`, `[data-hocus]` | `:focus-visible`, `:hover` |
+
+These selectors apply to layouts you compose and to skin source. Packaged HTML skins render their controls in shadow DOM, so page CSS can't reach them. To show your own overlay based on state, read the state with a <DocsLink slug="reference/api/player-controller">player controller</DocsLink>; see [Read player state](#read-player-state).
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Vidstack reflected about forty state attributes onto the player's element, so any descendant could style against `[data-media-player][data-paused]`. Video.js puts state on the component it belongs to. `VideoPlayer` renders no element, and `Container` only reflects `data-controls-visible`.
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `[data-paused]`, `[data-ended]`, `[data-started]` on the player | The same attributes on `PlayButton` |
+| `[data-waiting]`, `[data-buffering]` | `data-visible` on `BufferingIndicator` |
+| `[data-controls]` | `data-controls-visible` on `Container`, `data-visible` on `Controls.Content` |
+| `[data-fullscreen]` | `data-fullscreen` on `FullscreenButton`, or `:fullscreen` on the container |
+| `[data-pip]` | `data-pip` on `PiPButton` |
+| `[data-muted]` | `data-muted` and `data-volume-level` on `MuteButton` |
+| `[data-captions]` | `data-active` on `CaptionsButton` |
+| `[data-live]`, `[data-live-edge]` | The same attributes on `LiveButton` |
+| `[data-seeking]`, `[data-preview]` | `data-seeking`, `data-pointing`, and `data-dragging` on `TimeSlider.Root` |
+| `[data-can-fullscreen]`, `[data-can-pip]`, `[data-can-airplay]`, `[data-can-google-cast]` | `data-availability` on the matching button, which renders nothing when unsupported |
+| `[data-airplay]`, `[data-google-cast]`, `[data-remote-state]` | `data-airplay-state` and `data-cast-state` on the buttons |
+| `[data-error]` | `data-open` on the error dialog |
+| `[data-pointer="coarse"]` | `@media (pointer: coarse)` |
+| `[data-media-type]`, `[data-view-type]`, `[data-stream-type]` | The preset you chose |
+| `[data-focus]`, `[data-hocus]` | `:focus-visible`, `:hover` |
+
+For your own components, you usually don't need an attribute at all. Read the value with `usePlayer`, or pass a function to `className` on a Video.js component: `className={(state) => …}`.
+</FrameworkCase>
+
+Some names mean different things now. `data-active` meant a Vidstack slider was being dragged, pointed at, or focused; in Video.js it marks active captions or the chapter that's playing. `data-orientation` was the screen orientation; now it's a slider's axis.
+
+### Map theme variables by meaning
+
+The shared `--media-` prefix is a naming convention, not a compatibility layer. Only `--media-font-family` keeps its name and meaning.
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `--media-brand`, `--video-brand`, `--audio-brand` | `--media-accent-color` |
+| `--media-font-family`, `--video-font-family`, `--audio-font-family` | `--media-font-family` |
+| `--video-border-radius`, `--audio-border-radius` | `--media-border-radius` |
+| `--video-border`, `--audio-border` | `--media-border-color`, color only |
+| `--media-button-size`, `--media-time-font-size`, and other size variables | `--media-scale-unit`, which scales spacing, icons, and text together |
+| `--media-cue-*`, `--video-captions-offset` | `::cue` styles; the browser renders captions |
+| `--media-tooltip-*`, `--media-menu-*`, `--media-slider-*`, `--media-focus-ring*`, `--video-controls-color` | No packaged equivalent; edit skin source |
+| `--slider-fill`, `--slider-pointer`, `--slider-progress` | `--media-slider-fill`, `--media-slider-pointer`, `--media-slider-buffer` |
+| `--player-width`, `--player-height` | Container queries on `media-root` |
+
+The slider variables are values the component publishes for your styles to read, not inputs you set, the same as in Vidstack. They only gained the `--media-` prefix.
+
+### Tailwind
+
+Vidstack's Tailwind plugin added state variants like `media-paused:` and `media-can-play:`. Video.js has no plugin; use Tailwind's built-in `data-*` variants on the component that carries the state. The bare `data-paused:` form needs Tailwind 4; on Tailwind 3, write `data-[paused]:`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+// Vidstack
+<PlayButton className="media-paused:bg-white" />
+
+// Video.js 10
+<PlayButton className="data-paused:bg-white" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<!-- Vidstack -->
+<media-play-button class="media-paused:bg-white"></media-play-button>
+
+<!-- Video.js 10 -->
+<media-play-button class="data-paused:bg-white"></media-play-button>
+```
+</FrameworkCase>
+
+Skin source in Tailwind defines its own `media-sm:`, `media-lg:`, and similar variants. Those are container-width breakpoints, not state. The Tailwind skin source needs Tailwind 4.3 or later, and it's available for React only; HTML skin source uses CSS ([#3055](https://github.com/videojs/v10/issues/3055)). Vidstack's plugin targeted Tailwind 3.
+
+### Responsive layouts
+
+Vidstack switched to a small layout when `smallWhen` matched the player's width or height. Video.js skins restyle one layout with container queries against a container named `media-root`, using width only. The breakpoints are fixed in packaged skins; edit them in skin source. For your own layout around the player, write your own `@container` rules.
+
+### Color scheme
+
+Vidstack's `colorScheme` toggled light and dark classes on the layout. Video.js skins read the inherited CSS `color-scheme`, so `:root { color-scheme: light dark; }` follows the system setting. The audio skins change their palette with the scheme. The video skins stay dark over video; only their border follows it ([#3054](https://github.com/videojs/v10/issues/3054)).
+
+### Icons
+
+<FrameworkCase frameworks={["react"]}>
+`@vidstack/react/icons` becomes `@videojs/react/icons`, with a smaller set of 25 icons in Default and Minimal families. Icons take standard SVG props; there's no `size` prop. Several names changed:
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `ReplayIcon` | `RestartIcon` |
+| `MuteIcon` | `VolumeOffIcon` |
+| `ClosedCaptionsIcon`, `ClosedCaptionsOnIcon` | `CaptionsOffIcon`, `CaptionsOnIcon` |
+| `FullscreenIcon` | `FullscreenEnterIcon` |
+| `PictureInPictureIcon`, `PictureInPictureExitIcon` | `PipEnterIcon`, `PipExitIcon` |
+| `ChromecastIcon` | `CastEnterIcon`, `CastExitIcon` |
+| `AirPlayIcon` | `AirPlayEnterIcon`, `AirPlayExitIcon` |
+| `SettingsIcon` | `GearIcon` |
+| `SeekForward10Icon`, `SeekBackward10Icon` | `SeekIcon`, mirrored for backward |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`<media-icon type="…">` becomes `<media-icon name="…">`, registered by `@videojs/html/icons/element`, with a smaller set of 25 icons. Add `family="minimal"` for the Minimal set. Several names changed:
+
+| Vidstack `type` | Video.js 10 `name` |
+|---|---|
+| `replay` | `restart` |
+| `mute` | `volume-off` |
+| `closed-captions`, `closed-captions-on` | `captions-off`, `captions-on` |
+| `fullscreen` | `fullscreen-enter` |
+| `picture-in-picture`, `picture-in-picture-exit` | `pip-enter`, `pip-exit` |
+| `chromecast` | `cast-enter`, `cast-exit` |
+| `airplay` | `airplay-enter`, `airplay-exit` |
+| `settings` | `gear` |
+| `seek-forward-10`, `seek-backward-10` | `seek`, mirrored for backward |
+</FrameworkCase>
+
+Icons such as `download`, `chapters`, and `accessibility` have no Video.js counterpart. Bring your own SVGs for those.
+
+## Map the components
+
+Most Vidstack components have a Video.js counterpart with the same job. What changes is how they compose.
+
+<FrameworkCase frameworks={["react"]}>
+| Vidstack | Video.js 10 |
+|---|---|
+| `MediaPlayer` | `VideoPlayer`, or `Player` from `createPlayer`, plus `Container` |
+| `MediaProvider` | The media component: `Video`, `HlsJsVideo`, `YouTubeVideo`, … |
+| `PlayButton`, `MuteButton`, `FullscreenButton`, `AirPlayButton`, `LiveButton`, `SeekButton` | Same names |
+| `CaptionButton` | `CaptionsButton` |
+| `PIPButton` | `PiPButton` |
+| `GoogleCastButton` | `CastButton` |
+| `ToggleButton` | No equivalent; build one with `useButton` |
+| `Tooltip.Root`, `Tooltip.Trigger`, `Tooltip.Content` | `Tooltip.Root`, `Tooltip.Trigger`, `Tooltip.Popup`, plus `Tooltip.Label` and `Tooltip.Shortcut` |
+| `Controls.Root`, `Controls.Group` | `Controls.Root`, `Controls.Content`, `Controls.Group` |
+| `Gesture` | `Gesture`, with different props; see [Gestures](#gestures) |
+| `MediaAnnouncer` | `StatusAnnouncer`, already in every skin |
+| `Poster` | `Poster.Root` and `Poster.Image`, reading the player's `poster` |
+| `Thumbnail.Root`, `Thumbnail.Img` | `Thumbnail.Root`, `Thumbnail.Image` |
+| `Time` with `remainder` | `Time.Value` with `type="remaining"` |
+| `Title` | `Title` |
+| `ChapterTitle` | `TimeSlider.ChapterTitle`, inside the time slider only |
+| `Track` | A native `<track>` |
+| `Captions`, `Caption.Root` | No equivalent; the browser renders captions |
+| `Slider.Root`, `Slider.Track`, `Slider.TrackFill`, `Slider.Thumb` | `Slider.Root`, `Slider.Track`, `Slider.Fill`, `Slider.Thumb` |
+| `TimeSlider.Root`, `TimeSlider.Progress`, `TimeSlider.Chapters` | `TimeSlider.Root`, `TimeSlider.Buffer`, `TimeSlider.Chapters` |
+| `TimeSlider.Thumbnail.Root`, `TimeSlider.Thumbnail.Img` | `Slider.Thumbnail.Root`, `Slider.Thumbnail.Image` |
+| `VolumeSlider.Root` | `VolumeSlider.Root`, or `VolumePopover` for a mute button that opens a slider |
+| `Slider.Steps`, `TimeSlider.Video`, `SpeedSlider`, `QualitySlider`, `AudioGainSlider` | No equivalent |
+| `Menu.Root`, `Menu.Button`, `Menu.Items` or `Menu.Content` | `Menu.Root`, `Menu.Trigger`, `Menu.Popup`, `Menu.Content` |
+| `Menu.Radio`, `RadioGroup.Root` | `Menu.RadioItem`, `Menu.RadioGroup`; radio groups work inside menus only |
+| `Menu.Portal` | Not needed; menus render in the top layer |
+| `useCaptionOptions`, `useVideoQualityOptions`, `useAudioOptions`, `usePlaybackRateOptions` | `useCaptionsOptions`, `useQualityOptions`, `useAudioTrackOptions`, `usePlaybackRateOptions` |
+| `useChapterOptions`, `useAudioGainOptions` | No equivalent |
+| Remotion components | No equivalent |
+
+**`asChild` becomes `render`.** Pass an element to merge props into it, the way `asChild` did, or a function that receives props and state:
+
+```tsx
+// Vidstack
+<Tooltip.Trigger asChild>
+  <PlayButton />
+</Tooltip.Trigger>
+
+// Video.js 10
+<Tooltip.Trigger render={<PlayButton />} />
+
+<PlayButton render={(props, state) => <button {...props}>{state.paused ? 'Play' : 'Pause'}</button>} />
+```
+
+Several roots render no element of their own: `Controls.Root`, `Tooltip.Root`, `Menu.Root`, and `Gesture` among them. Put your classes on `Controls.Content`, `Tooltip.Popup`, and `Menu.Popup`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Vidstack | Video.js 10 |
+|---|---|
+| `<media-player>` | `<video-player>` plus the skin's `<media-container>` |
+| `<media-provider>` | The media element: `<video>`, `<hlsjs-video>`, `<youtube-video>`, … |
+| `<media-play-button>`, `<media-mute-button>`, `<media-fullscreen-button>`, `<media-airplay-button>`, `<media-live-button>`, `<media-seek-button>`, `<media-pip-button>` | Same tags |
+| `<media-caption-button>` | `<media-captions-button>` |
+| `<media-google-cast-button>` | `<media-cast-button>` |
+| `<media-toggle-button>` | No equivalent; use a `<button aria-pressed>` |
+| `<media-tooltip>`, `<media-tooltip-trigger>`, `<media-tooltip-content>` | `<media-tooltip>` is the popup, linked to its button by `commandfor`; add `<media-tooltip-label>` and `<media-tooltip-shortcut>` |
+| `<media-controls>`, `<media-controls-group>` | `<media-controls>`, `<media-controls-content>`, `<media-controls-group>` |
+| `<media-gesture>` | `<media-gesture>`, with different attributes; see [Gestures](#gestures) |
+| `<media-announcer>` | `<media-status-announcer>`, already in every skin |
+| `<media-poster>` | `<media-poster>`, reading the player's `poster` |
+| `<media-thumbnail>` | `<media-thumbnail>`, fed by the thumbnails track |
+| `<media-time>` with `remainder` | `<media-time type="remaining">` |
+| `<media-title>` | `<media-title>` |
+| `<media-chapter-title>` | `<media-time-slider-chapter-title>`, inside the time slider only |
+| `<media-captions>` | No equivalent; the browser renders captions |
+| `<media-slider>` and its track, fill, and thumb `<div>`s | `<media-slider>` with `<media-slider-track>`, `<media-slider-fill>`, `<media-slider-thumb>` |
+| `<media-time-slider>`, `<media-slider-chapters>` | `<media-time-slider>`, `<media-time-slider-chapters>` |
+| `<media-slider-preview>`, `<media-slider-thumbnail>`, `<media-slider-value>` | Same tags |
+| `<media-volume-slider>` | `<media-volume-slider>`, or `<media-volume-popover>` |
+| `<media-slider-steps>`, `<media-slider-video>`, `<media-speed-slider>`, `<media-quality-slider>`, `<media-audio-gain-slider>` | No equivalent |
+| `<media-menu>`, `<media-menu-button>`, `<media-menu-items>` | A `<button commandfor>` trigger, `<media-menu>` as the popup, and `<media-menu-content>` |
+| `<media-radio-group>`, `<media-radio>` | `<media-menu-radio-group>`, `<media-menu-radio-item>`; radio groups work inside menus only |
+| `<media-menu-portal>` | Not needed; menus render in the top layer |
+| `<media-captions-radio-group>`, `<media-quality-radio-group>` | Same tags |
+| `<media-audio-radio-group>`, `<media-speed-radio-group>` | `<media-audio-track-radio-group>`, `<media-playback-rate-radio-group>` |
+| `<media-chapters-radio-group>`, `<media-audio-gain-radio-group>` | No equivalent |
+
+**Popups aren't wrappers anymore.** Vidstack's `<media-menu>` and `<media-tooltip>` wrapped a trigger and its content. In Video.js, `<media-menu>` and `<media-tooltip>` *are* the popups, and a trigger points at one by ID:
+
+```html
+<!-- Vidstack -->
+<media-tooltip>
+  <media-tooltip-trigger>
+    <media-play-button></media-play-button>
+  </media-tooltip-trigger>
+  <media-tooltip-content placement="top">Play</media-tooltip-content>
+</media-tooltip>
+
+<!-- Video.js 10 -->
+<media-play-button commandfor="play-tooltip"></media-play-button>
+<media-tooltip id="play-tooltip" side="top">
+  <media-tooltip-label></media-tooltip-label>
+</media-tooltip>
+```
+
+`<media-tooltip-label>` fills in the button's current label, such as "Play" or "Pause", unless you write your own text. Submenus become sibling `<media-menu-content>` elements opened by a `<media-menu-item commandfor>`.
+</FrameworkCase>
+
+A few behaviors changed across the board:
+
+- **Unsupported controls hide themselves.** Vidstack kept them in the DOM without `data-supported`, and you hid them with CSS. Video.js buttons expose `data-availability` and hide when the feature is unsupported.
+- **Sliders take focus on the thumb.** Keyboard control moved from the slider root to its thumb, so a slider without a thumb can't be used from the keyboard.
+- **Toggle buttons change their label instead of setting `aria-pressed`.** A play button announces "Play" or "Pause" depending on state.
+- **Placement is two props.** `placement="top center"` becomes `side="top"` and `align="center"`, and the rendered placement is reflected as `data-side` and `data-align`.
+- **No request events.** Controls call player actions directly, so there's nothing to intercept with `preventDefault()`.
+
+## Read player state
+
+Vidstack's media store becomes the player store. Two differences catch most migrations:
+
+- **State keys come from features.** Every Vidstack key always existed. In Video.js, a key exists only when its feature is part of the player, and some live in no preset.
+- **Subscriptions don't track what you read.** Vidstack's `subscribe` re-ran only when the keys you read changed. The Video.js store notifies on any change; selectors give you change-only updates.
+
+The <DocsLink slug="reference/api/player-store">player store reference</DocsLink> lists every state field and action, grouped by the feature that adds it.
+
+<FrameworkCase frameworks={["react"]}>
+| Vidstack | Video.js 10 |
+|---|---|
+| `useMediaState('paused')` | `usePlayer((state) => state.paused)` |
+| `useMediaStore()` | `usePlayer((state) => ({ currentTime: state.currentTime, duration: state.duration }))` |
+| `useMediaState('paused', playerRef)`, outside the player | Render `VideoPlayer` higher, around the component that reads state |
+| `useMediaRemote()` | `usePlayer((state) => state.seek)`, or any other action |
+| `useMediaPlayer()` | `usePlayer()` for state and actions, `useContainer()` for the element |
+| `useMediaProvider()` | `useMedia()` |
+| `player.subscribe(callback)` | `usePlayer().subscribe(callback)`, reading values off the store inside |
+
+```tsx
+// Vidstack
+import { useMediaRemote, useMediaState } from '@vidstack/react';
+
+function SkipIntro() {
+  const currentTime = useMediaState('currentTime');
+  const remote = useMediaRemote();
+  if (currentTime > 30) return null;
+  return <button onPointerUp={(event) => remote.seek(30, event.nativeEvent)}>Skip intro</button>;
+}
+```
+
+```tsx
+// Video.js 10
+import { usePlayer } from '@videojs/react/video';
+
+function SkipIntro() {
+  const currentTime = usePlayer((state) => state.currentTime);
+  const seek = usePlayer((state) => state.seek);
+  if (currentTime > 30) return null;
+  return <button onClick={() => seek(30)}>Skip intro</button>;
+}
+```
+
+`usePlayer()` with no selector returns the store without subscribing, so `const { paused } = usePlayer()` never re-renders. Always pass a selector for values you render. The preset's `usePlayer` from `@videojs/react/video` is typed to the preset's features; <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink> returns a typed pair for a custom feature list.
+
+`VideoPlayer` renders no DOM, so wrapping more of your page in it is free. That replaces the ref you passed to `useMediaState` to read state from outside the player.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The store lives on the player element as `store`. State values and actions are properties of it, and `subscribe` reports changes:
+
+```js
+// Vidstack
+const player = document.querySelector('media-player');
+
+player.subscribe(({ paused, currentTime }) => {
+  console.log(paused, currentTime);
+});
+```
+
+```js
+// Video.js 10
+const player = document.querySelector('video-player');
+const { store } = player;
+
+let lastPaused = store.paused;
+store.subscribe(() => {
+  if (store.paused === lastPaused) return;
+  lastPaused = store.paused;
+  console.log(store.paused);
+});
+```
+
+The callback receives no arguments and runs after any state change, batched once per microtask, so compare the values you care about.
+
+Inside a custom element, use a <DocsLink slug="reference/api/player-controller">player controller</DocsLink> with a selector instead. It updates your element only when the selected state changes. See <DocsLink slug="guides/build-your-own-component">Build your own UI component</DocsLink>.
+</FrameworkCase>
+
+### Drive playback
+
+Vidstack's remote control dispatched request events that the player satisfied. Video.js actions call the media directly. They aren't queued, so most fail until the player has attached to its media, `seek()` included; once attached, `seek()` waits for metadata. Their promises reject where Vidstack fired `play-fail` or `fullscreen-error`.
+
+| Vidstack | Video.js 10 action |
+|---|---|
+| `play()`, `pause()`, `togglePaused()` | `play()`, `pause()` |
+| `seek(time)` | `seek(time)` |
+| `seekToLiveEdge()` | Use `LiveButton`, or seek to the end of the last `seekable` range |
+| `changeVolume(volume)` | `setVolume(volume)`; a value above 0 also unmutes |
+| `mute()`, `unmute()`, `toggleMuted()` | `setMuted(muted)` |
+| `changePlaybackRate(rate)` | `setPlaybackRate(rate)` |
+| `enterFullscreen(target)`, `exitFullscreen()`, `toggleFullscreen()` | `requestFullscreen()`, `exitFullscreen()`; there's no target |
+| `enterPictureInPicture()`, `exitPictureInPicture()`, `togglePictureInPicture()` | `requestPictureInPicture()`, `exitPictureInPicture()` |
+| `toggleCaptions()`, `showCaptions()`, `disableCaptions()` | `toggleSubtitles()`, `toggleSubtitles(true)`, `toggleSubtitles(false)` |
+| `changeTextTrackMode(index, mode)` | `selectSubtitlesTrack(id)`, or `selectSubtitlesTrack(null)` to turn them off |
+| `changeQuality(index)`, `requestAutoQuality()` | `selectVideoRendition(id)`, `selectVideoRendition('auto')` |
+| `changeAudioTrack(index)` | `selectAudioTrack(id)` |
+| `pauseControls()`, `resumeControls()` | `requestControlsLock()`, which returns a release function |
+| `toggleControls()` | `toggleControls()` |
+| `requestAirPlay()`, `requestGoogleCast()` | `promptRemotePlayback()` |
+| `startLoading()`, `startLoadingPoster()`, `changeDuration()`, `changeClipStart()`, `changeAudioGain()`, `seeking()` | No equivalent |
+
+The store has no toggles apart from `toggleSubtitles()` and `toggleControls()`, so call the pair you need, as in `paused ? play() : pause()`. Hotkeys and gestures keep the toggle names, so `togglePaused` still works as their action.
+
+Vidstack methods took an optional trigger event as their last argument. Video.js actions don't, so wrap them in a handler, as in `onClick={() => seek(30)}`. Passing an action straight to `onClick` would hand it the click event.
+
+State keys follow the same pattern. The common renames:
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `canFullscreen`, `canPictureInPicture`, `canSetVolume` | `fullscreenAvailability`, `pictureInPictureAvailability`, `volumeAvailability` |
+| `fullscreen`, `pictureInPicture` | `isFullscreen`, `isPictureInPicture` |
+| `canAirPlay`, `canGoogleCast` | `remotePlaybackAvailability` |
+| `qualities`, `quality`, `autoQuality` | `videoRenditionList`, `activeVideoRendition`; auto is on when no rendition is `selected` |
+| `audioTracks`, `audioTrack` | `audioTrackList`, the entry with `enabled` |
+| `textTracks`, `textTrack` | `textTrackList`, the caption or subtitle entry with `mode: 'showing'`; `subtitlesShowing` says whether there is one |
+| `buffered`, `seekable` | The same names, as arrays of `[start, end]` pairs |
+| `live`, `liveEdge`, `userBehindLiveEdge` | `targetLiveWindow` and `liveEdgeStart`, in the live presets; `LiveButton` computes the live edge |
+| `streamType` | `streamType`, once you add `streamTypeFeature`; only `live`, `on-demand`, and `unknown` |
+| `playing`, `canSeek`, `autoPlayError`, `mediaType`, `viewType`, `orientation`, `pointer`, `width`, `height` | No store key |
+
+Two keys behave differently. `started` can turn off again after the media is reset or sits paused at the start, and `currentTime` follows native `timeupdate`, about four times a second, where Vidstack updated it every animation frame.
+
+### Events
+
+Vidstack fired a normalized set of events on `<media-player>`, including state-change events such as `fullscreen-change` and `controls-change`. Video.js fires no player events of its own.
+
+<FrameworkCase frameworks={["react"]}>
+Put standard media event props on the media component: `onPlay`, `onCanPlay`, `onTimeUpdate`, `onEnded`, and so on. They receive React's synthetic event on media that renders a `<video>`, and a plain `Event` on the embeds, where Vidstack's callbacks received a detail and the event. The embeds route the same prop names. For anything that isn't a media event, read the state:
+
+```tsx
+// Vidstack
+<MediaPlayer onFullscreenChange={(isFullscreen) => track(isFullscreen)} />
+
+// Video.js 10
+function FullscreenTracker() {
+  const isFullscreen = usePlayer((state) => state.isFullscreen);
+  // Unlike onFullscreenChange, this also runs once on mount.
+  useEffect(() => track(isFullscreen), [isFullscreen]);
+  return null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Listen on the media element with native event names: `canplay` for `can-play`, `loadedmetadata` for `loaded-metadata`, and so on. Media events don't bubble, so a listener on `<video-player>` won't hear them. For anything that isn't a media event, subscribe to the store and compare values, as in [Read player state](#read-player-state).
+</FrameworkCase>
+
+| Vidstack event | Video.js 10 |
+|---|---|
+| `can-play`, `loaded-metadata`, `time-update`, `duration-change`, `volume-change`, `rate-change` | `canplay`, `loadedmetadata`, `timeupdate`, `durationchange`, `volumechange`, `ratechange` on the media |
+| `fullscreen-change`, `picture-in-picture-change`, `controls-change`, `remote-playback-change` | The `isFullscreen`, `isPictureInPicture`, `controlsVisible`, and `remotePlaybackState` state |
+| `quality-change`, `audio-track-change`, `text-track-change` | The `activeVideoRendition`, `audioTrackList`, and `textTrackList` state |
+| `provider-change`, `provider-setup` | The media's `source`, and its `engine` |
+| `play-fail`, `fullscreen-error`, `picture-in-picture-error` | A rejected action promise |
+| `auto-play-fail` | No event; see [Autoplay](#autoplay) |
+| `media-*-request` | No equivalent |
+| `replay`, `end`, `destroy`, `stream-type-change`, `orientation-change` | No equivalent |
+
+Event triggers, `originEvent`, and `isOriginTrusted` have no equivalent. Check `event.isTrusted` in your own handler before calling an action if you need to know a person started it.
+
+## Captions, chapters, and thumbnails
+
+### Captions
+
+Caption `<track>` elements move from `<media-provider>` to the media. Video.js reads captions and subtitles from those tracks and from streaming manifests.
+
+The browser parses and renders the cues, so:
+
+- **Only WebVTT works.** Vidstack parsed SRT, SSA/ASS, and JSON with `type` ([#3037](https://github.com/videojs/v10/issues/3037)). Convert them to WebVTT at build time or on your server.
+- **Style captions with `::cue`.** `<media-captions>`, its `data-part` selectors, and the `--media-cue-*` variables have no equivalent ([#3038](https://github.com/videojs/v10/issues/3038)). The skins keep native captions clear of the controls in Chromium and WebKit browsers.
+- **There's no caption style menu** for viewers to pick fonts, colors, and backgrounds ([#1437](https://github.com/videojs/v10/issues/1437)). Viewers can still set caption preferences in their operating system or browser.
+- **Adding tracks from code is native.** `textTracks.add()` becomes a `<track>` element, or `addTextTrack()` and `VTTCue` on a plain `<video>`.
+
+The captions toggle picks a track differently. Vidstack restored the last track shown, then the `default` track, then the first one. Video.js restores the last track shown, then one that matches the browser's language, then the first track. See <DocsLink slug="guides/captions">Captions</DocsLink>.
+
+### Chapters
+
+A `<track kind="chapters" default>` still segments the time slider, and the chapter under the pointer shows in the preview. Vidstack's chapters menu, `ChapterTitle` outside the slider, and `useChapterOptions` have no equivalent ([#1873](https://github.com/videojs/v10/issues/1873)). To add chapters from code, use the native track APIs described under [Captions](#captions); there's no dedicated chapters API yet ([#1268](https://github.com/videojs/v10/issues/1268)). For a current-chapter label elsewhere, find the cue in the `chaptersCues` state that contains `currentTime`.
+
+### Thumbnails
+
+<FrameworkCase frameworks={["react"]}>
+The `thumbnails` layout prop and `Thumbnail`'s `src` become a track on the media, and the skin picks it up:
+
+```tsx
+<Video src="/video.mp4" crossOrigin="anonymous">
+  <track kind="metadata" label="thumbnails" src="https://cdn.example.com/storyboard.vtt" default />
+</Video>
+```
+
+`default` is required, or the cues never load. Set `crossOrigin` on the media when the storyboard comes from another origin. A cross-origin track only loads in CORS mode, and the thumbnail images load in the same mode, so their host needs CORS headers too. Vidstack also accepted JSON and Mux `storyboard.json` URLs ([#3044](https://github.com/videojs/v10/issues/3044)); fetch and convert those yourself and pass the result to the `thumbnails` prop on `Thumbnail.Root`, or use `MuxVideo`, which adds the storyboard track for you. See <DocsLink slug="guides/thumbnails">Thumbnails</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The `thumbnails` layout attribute and `<media-thumbnail src>` become a track on the media, and the skin picks it up:
+
+```html
+<video src="/video.mp4" crossorigin="anonymous">
+  <track kind="metadata" label="thumbnails" src="https://cdn.example.com/storyboard.vtt" default />
+</video>
+```
+
+`default` is required, or the cues never load. Set `crossorigin` on the media when the storyboard comes from another origin. A cross-origin track only loads in CORS mode, and the thumbnail images load in the same mode, so their host needs CORS headers too. Vidstack also accepted JSON and Mux `storyboard.json` URLs ([#3044](https://github.com/videojs/v10/issues/3044)); fetch and convert those yourself and assign the result to the `thumbnails` property on `<media-thumbnail>`, or use `<mux-video>`, which adds the storyboard track for you. See <DocsLink slug="guides/thumbnails">Thumbnails</DocsLink>.
+</FrameworkCase>
+
+## Keyboard shortcuts and gestures
+
+### Keyboard shortcuts
+
+The packaged video skins ship a default set close to Vidstack's: Space and `k` to play, `m` to mute, `f` for fullscreen, `c` for captions, `i` for picture-in-picture, arrow keys and `j`/`l` to seek and change volume, `0`–`9` to jump, and `<`/`>` for speed. They also add Home and End. The live skins leave out seeking, jumping, Home and End, and speed, and the audio skins leave out `f`, `c`, and `i`.
+
+Two defaults differ. Seeking moves 10 seconds with or without Shift, where Vidstack's Default Layout moved 10 seconds, or 20 with Shift. And the speed keys step through the fixed rate list and wrap around instead of moving by 0.25.
+
+The `keyShortcuts` prop becomes one hotkey per shortcut in a layout you compose or in skin source. Each takes a single key pattern, so `togglePaused: 'k Space'` becomes two hotkeys:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+// Vidstack
+<MediaPlayer keyShortcuts={{ togglePaused: 'k Space', seekBackward: 'ArrowLeft', seekForward: 'ArrowRight' }} />
+
+// Video.js 10, inside a Container
+<Hotkey keys="k" action="togglePaused" />
+<Hotkey keys="Space" action="togglePaused" />
+<Hotkey keys="ArrowLeft" action="seekStep" value={-5} />
+<Hotkey keys="ArrowRight" action="seekStep" value={5} />
+```
+
+Shortcuts with custom callbacks become the `useHotkey` hook: `useHotkey({ keys: 'n', onActivate: playNext })`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<!-- Video.js 10, inside a <media-container> -->
+<media-hotkey keys="k" action="togglePaused"></media-hotkey>
+<media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+<media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+<media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+```
+
+Shortcuts with custom callbacks become `createHotkey(container, { keys: 'n', onActivate: playNext })`, imported from `@videojs/html`.
+</FrameworkCase>
+
+| Vidstack action | Video.js 10 action |
+|---|---|
+| `togglePaused`, `toggleMuted`, `toggleFullscreen`, `togglePictureInPicture` | Same names |
+| `toggleCaptions` | `toggleSubtitles` |
+| `seekBackward`, `seekForward` | `seekStep` with a negative or positive `value` in seconds |
+| `volumeDown`, `volumeUp` | `volumeStep` with a negative or positive `value` |
+| `speedUp`, `slowDown` | `speedUp`, `speedDown` |
+| Digit keys | `keys="0-9"` with `seekToPercent` |
+
+`keyTarget="document"` becomes `target="document"` on each hotkey. With several players on a page, the first one registered handles the key; Vidstack sent it to the last player you used. `keyDisabled` has no player-wide switch, and packaged skins always include their hotkeys, so remove them in skin source. A tooltip's `Shortcut` part shows the key bound to its button, and buttons set `aria-keyshortcuts` from the registered hotkeys. Writing `aria-keyshortcuts` yourself no longer creates a shortcut. See <DocsLink slug="guides/keyboard-shortcuts">Keyboard shortcuts</DocsLink>.
+
+### Gestures
+
+Vidstack's gestures listened for any DOM event and took their hit area from their own box. Video.js gestures recognize taps and double taps, divide the player into regions, and can be limited to one pointer type:
+
+| Vidstack | Video.js 10 |
+|---|---|
+| `event="pointerup" action="toggle:paused"` | `type="tap" action="togglePaused" pointer="mouse"` |
+| `event="pointerup" action="toggle:controls"` | `type="tap" action="toggleControls" pointer="touch"` |
+| `event="dblpointerup" action="toggle:fullscreen"` | `type="doubletap" action="toggleFullscreen" region="center"` |
+| `event="dblpointerup" action="seek:-10"` on the left edge | `type="doubletap" action="seekStep" value="-10" region="left"` |
+| `event="dblpointerup" action="seek:10"` on the right edge | `type="doubletap" action="seekStep" value="10" region="right"` |
+| Other events, such as `mouseleave` | No equivalent |
+| `will-trigger` and `trigger` events | Use `useTapGesture` or `useDoubleTapGesture` in React, or `createTapGesture` and `createDoubleTapGesture` in HTML, and decide in the callback |
+
+The packaged video skins already bind these defaults. Vidstack's swipe-to-scrub gesture has no equivalent ([#3046](https://github.com/videojs/v10/issues/3046)).
+
+## Fullscreen and orientation
+
+Fullscreen targets the skin's container, falling back to the video element on iPhone. There's no `target` option; to take only the video fullscreen, call the native method on it yourself.
+
+Vidstack locked the screen to landscape in fullscreen by default. Video.js presets don't. Add `orientationLockFeature` to a player built with <DocsLink slug="guides/fullscreen">`createPlayer`</DocsLink> to lock it again. Turning Vidstack's fullscreen orientation off just means leaving the feature out. Vidstack's screen orientation state and `lockScreenOrientation()` have no equivalent; use `screen.orientation`.
+
+## Live streams
+
+Vidstack switched the Default Layout to live controls by `streamType`. Video.js has separate live presets, whose skins show a live button and no time slider:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import '@videojs/react/live-video/skin.css';
+import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+
+<LiveVideoPlayer>
+  <LiveVideoSkin>
+    <HlsJsVideo src="/live.m3u8" playsInline />
+  </LiveVideoSkin>
+</LiveVideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```js
+import '@videojs/html/live-video/player';
+import '@videojs/html/live-video/skin';
+import '@videojs/html/media/hlsjs-video';
+```
+
+```html
+<live-video-player>
+  <live-video-skin>
+    <hlsjs-video src="/live.m3u8" playsinline></hlsjs-video>
+  </live-video-skin>
+</live-video-player>
+```
+</FrameworkCase>
+
+- **DVR comes from the stream.** `live:dvr` becomes `targetLiveWindow === Infinity`, which the media reports for event playlists. There's no way to force DVR on a sliding window. Add a time slider in skin source to let viewers seek.
+- **The live edge moved to the live button.** `liveEdge`, `userBehindLiveEdge`, and `seekToLiveEdge()` become the live button's state and behavior. It counts playback as live within 5 seconds of the stream's live edge start, which already sits behind the seekable end by the playlist's hold-back. Vidstack counted the last `liveEdgeTolerance` seconds before the seekable end, 10 by default and configurable ([#1730](https://github.com/videojs/v10/issues/1730)).
+- **`streamType` needs a feature.** No preset includes `streamTypeFeature`; add it to a custom player when one player switches between live and on-demand UI.
+- **Live presets are narrower.** They leave out playback rate, quality, and audio-track state. Build a player from a feature list to add them back.
+
+See <DocsLink slug="guides/live-streams">Live streams</DocsLink>.
+
+## AirPlay and Google Cast
+
+The video skins include AirPlay and Cast buttons. Both call one action, `promptRemotePlayback()`, and each button shows only on the platform that supports it. Without the Google Cast extension, the Cast button uses the browser's Remote Playback API.
+
+<FrameworkCase frameworks={["react"]}>
+Vidstack's `googleCast` prop becomes the `GoogleCast` extension, placed next to the media:
+
+```tsx
+import { GoogleCast } from '@videojs/react/extensions/google-cast';
+
+<VideoPlayer>
+  <VideoSkin>
+    <HlsJsVideo src="/stream.m3u8" playsInline />
+    <GoogleCast receiver="YOUR_RECEIVER_ID" />
+  </VideoSkin>
+</VideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Vidstack's `googleCast` property becomes the `<google-cast>` extension, placed next to the media:
+
+```html
+<video-skin>
+  <hlsjs-video src="/stream.m3u8" playsinline></hlsjs-video>
+  <google-cast receiver="YOUR_RECEIVER_ID"></google-cast>
+</video-skin>
+```
+
+Register it with `import '@videojs/html/extensions/google-cast'`.
+</FrameworkCase>
+
+Only the receiver ID carries over from Vidstack's Cast options, and the Cast prompt events have no equivalent ([#3048](https://github.com/videojs/v10/issues/3048)). There's no device name or `remotePlaybackType` either ([#3047](https://github.com/videojs/v10/issues/3047)). See <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>.
+
+## Languages
+
+Vidstack layouts took a `translations` object keyed by English strings, and you supplied every language yourself. Video.js ships locale packs for around 50 languages. Wrap the player in the i18n provider and it loads the pack for the nearest `lang` attribute; without one, the controls use English. Override strings with namespaced keys:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+// Vidstack
+<DefaultVideoLayout translations={{ Play: 'Start video', Settings: 'Options' }} />
+
+// Video.js 10
+import { I18nProvider } from '@videojs/react/i18n';
+
+<I18nProvider translations={{ buttons: { play: 'Start video' }, menu: { settings: 'Options' } }}>
+  {/* … */}
+</I18nProvider>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```js
+import { registerI18n } from '@videojs/html/i18n';
+
+registerI18n('en', {
+  buttons: { play: 'Start video' },
+  menu: { settings: 'Options' },
+});
+```
+
+HTML overrides are global per locale; there's no per-player `translations`. The provider is `<media-i18n>`.
+</FrameworkCase>
+
+Strings for the chapters menu, caption styles, audio boost, and download button have no keys, because those features don't exist yet. See <DocsLink slug="guides/internationalization">Internationalize the player</DocsLink> for the full key list.
+
+## Preferences and autoplay
+
+### Saved preferences
+
+Vidstack's `storage` saved volume, mute, captions, language, playback rate, quality, audio gain, and playback position. Video.js doesn't save anything between visits yet ([#944](https://github.com/videojs/v10/issues/944)). <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink> shows how to restore and save volume and caption choices yourself.
+
+### Autoplay
+
+<FrameworkCase frameworks={["react"]}>
+Move `autoPlay` from `MediaPlayer` to the media component, along with `muted` and `playsInline`. There's no `auto-play-fail` event or `autoPlayError` state; a blocked autoplay looks like media that never started. To react to it, leave out `autoPlay`, call `play()` once the player attaches, and catch the rejection. See <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Move `autoplay` from `<media-player>` to the media element, along with `muted` and `playsinline`. There's no `auto-play-fail` event or `autoPlayError` state; a blocked autoplay looks like media that never started. To react to it, leave out `autoplay`, call `play()` once the player attaches, and catch the rejection. See <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+
+## Angular and Solid
+
+Vidstack documented Angular and Solid through its web components. Use `@videojs/html` the same way: register the elements with the same imports, and write the same markup.
+
+In Angular, add `CUSTOM_ELEMENTS_SCHEMA` to the `schemas` of the component that renders the player, and bind object values such as `source` as properties with `[source]`. In Solid, set objects with `prop:source`. Solid's JSX types don't read the element types Video.js registers, so declare the tags you use in `JSX.IntrinsicElements`, the way Vidstack's `vidstack/solid` types did. Neither framework has a dedicated installation guide yet; follow the HTML <DocsLink slug="guides/installation">installation guide</DocsLink> for the imports.
+
+## Element lifecycle
+
+Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js keeps the attribute but doesn't pass it down: set it on each element you plan to move. When you're done with them, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media elements. Packaged skins don't pass it to their controls either ([#3036](https://github.com/videojs/v10/issues/3036)), so move a player that uses one synchronously. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
+
+</FrameworkCase>
+
+## Behavior changes to check
+
+These changes don't throw errors, so test for them:
+
+- **Loading.** Media loads as soon as it attaches, not when the player scrolls into view, and embeds don't preconnect.
+- **Size.** There's no default 16:9 box; set `aspect-ratio` on the skin.
+- **Fullscreen.** Presets don't lock the screen to landscape, and media that isn't set to play inline no longer enters fullscreen when it starts on Android and iPad. iPhone Safari still plays it fullscreen natively.
+- **Controls.** They hide as soon as the pointer leaves the player during playback, where Vidstack waited for its 2-second idle delay.
+- **Hotkeys.** Shift no longer doubles the 10-second seek step, and the speed keys wrap around a fixed list.
+- **Captions.** The captions toggle prefers the browser's language over the `default` track.
+- **Embeds.** YouTube URLs and Vimeo no longer use their privacy-enhanced modes by default; `youtube/ID` shorthands still do.
+- **Time.** `currentTime` updates about four times a second instead of every frame.
+- **Live.** Playback counts as live within 5 seconds of the stream's live edge start, not 10 seconds of the seekable end, and live skins have no time slider, quality, audio track, or rate menu.
+- **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%. Vidstack's controls did the same, but setting its `volume` or `muted` properties didn't.
+- **System integration.** Nothing is saved between visits, and Video.js doesn't set Media Session metadata for lock screens and hardware keys.
+- **Tooltips.** They open after 600 ms instead of 700 ms.
+
+## Known gaps
+
+Ordered roughly by how likely each is to block a Vidstack migration. Follow [Vidstack Parity](https://github.com/videojs/v10/issues/3035) for progress.
+
+- **No automatic provider selection.** `resolveAdapterType` tells you which media component plays a URL, but you render it yourself ([#2160](https://github.com/videojs/v10/issues/2160)).
+- **Nothing persists** between visits: volume, captions, language, rate, quality, or position ([#944](https://github.com/videojs/v10/issues/944)).
+- **No caption style settings** ([#1437](https://github.com/videojs/v10/issues/1437)), no custom caption renderer ([#3038](https://github.com/videojs/v10/issues/3038)), and WebVTT only: no SRT, SSA/ASS, or JSON captions ([#3037](https://github.com/videojs/v10/issues/3037)). Audio players don't show captions ([#3039](https://github.com/videojs/v10/issues/3039)).
+- **No chapters menu** or chapter title outside the time slider ([#1873](https://github.com/videojs/v10/issues/1873)), and no dedicated API for chapters from code ([#1268](https://github.com/videojs/v10/issues/1268)). Cue points and markers aren't implemented ([#1442](https://github.com/videojs/v10/issues/1442)).
+- **Fixed playback rates**: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)). No speed or quality sliders ([#3052](https://github.com/videojs/v10/issues/3052)).
+- **No audio gain or boost** ([#1135](https://github.com/videojs/v10/issues/1135)).
+- **No load strategies.** Vidstack's media and poster loading strategies and `startLoading()` have no equivalent ([#3043](https://github.com/videojs/v10/issues/3043)), and embeds don't preconnect ([#1433](https://github.com/videojs/v10/issues/1433)).
+- **No clipping.** Vidstack's clip start and end times have no equivalent ([#3040](https://github.com/videojs/v10/issues/3040)).
+- **No download button** ([#3041](https://github.com/videojs/v10/issues/3041)).
+- **No Remotion provider** or Remotion components ([#3053](https://github.com/videojs/v10/issues/3053)).
+- **No Media Session** metadata from `title`, `artist`, and `artwork` ([#3042](https://github.com/videojs/v10/issues/3042)).
+- **Fixed timing.** The controls hide delay ([#1728](https://github.com/videojs/v10/issues/1728)) and the live edge tolerance ([#1730](https://github.com/videojs/v10/issues/1730)) aren't configurable, and there's no duration override ([#1729](https://github.com/videojs/v10/issues/1729)).
+- **No debug logging** to replace Vidstack's log level ([#1406](https://github.com/videojs/v10/issues/1406)).
+- **Fewer embed conveniences.** No automatic embed posters ([#3049](https://github.com/videojs/v10/issues/3049)), Vimeo chapters ([#3050](https://github.com/videojs/v10/issues/3050)), or Vimeo quality selection ([#3051](https://github.com/videojs/v10/issues/3051)).
+- **Less remote playback detail.** No route type or device name ([#3047](https://github.com/videojs/v10/issues/3047)), and no Cast prompt events or Cast options beyond the receiver ID ([#3048](https://github.com/videojs/v10/issues/3048)).
+- **Fewer time slider and gesture extras.** No video preview in the time slider ([#3045](https://github.com/videojs/v10/issues/3045)), JSON thumbnail storyboards ([#3044](https://github.com/videojs/v10/issues/3044)), or swipe to scrub ([#3046](https://github.com/videojs/v10/issues/3046)).
+- **No request events**, event triggers, or ways to cancel a request, by design.
+- **No light theme for video skins** ([#3054](https://github.com/videojs/v10/issues/3054)), no Plyr-style skin ([#181](https://github.com/videojs/v10/issues/181)), and no Tailwind skin source for HTML ([#3055](https://github.com/videojs/v10/issues/3055)).
+- **No ads** ([#3056](https://github.com/videojs/v10/issues/3056)), which are on the roadmap for late 2026.
+
+## See also
+
+- <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink>
+- <DocsLink slug="guides/features">Features</DocsLink> and <DocsLink slug="guides/presets">Presets</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/skins">Skins</DocsLink> and <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>
+- <DocsLink slug="guides/migrate-from-plyr">Migrate from Plyr</DocsLink>

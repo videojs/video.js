@@ -1107,6 +1107,10 @@ export function generateDocsIndex(
 
   content += `> The \`video.js\` package on npm is still Video.js 8. Video.js 10 ships as \`@videojs/${framework}\`; to move existing Video.js 8 code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-video-js-8.md\n\n`;
 
+  const vidstackPackage = framework === 'react' ? '@vidstack/react' : 'vidstack';
+
+  content += `> Vidstack Player is in security-only maintenance. To move existing \`${vidstackPackage}\` code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-vidstack.md\n\n`;
+
   content += `> Print version-matched installation options without changing files: \`npx @videojs/cli agents init\`, then pass \`--framework ${framework}\` with the other choices. Installation guide index: ${siteUrl}/docs/guides/installation.md\n\n`;
 
   // Get sidebar filtered for this framework (production only)

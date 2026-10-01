@@ -15,11 +15,11 @@ import clsx from 'clsx';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import Check from '@/assets/icons/check.svg?react';
-import ChevronDown from '@/assets/icons/chevron-down.svg?react';
 import CopyIcon from '@/assets/icons/copy.svg?react';
 import { twMerge } from '@/utils/twMerge';
 import useIsHydrated from '@/utils/useIsHydrated';
 
+import CollapsibleCode from './CollapsibleCode';
 import CopyButton from './CopyButton';
 
 export type TabsVariant = 'expanded' | 'compact';
@@ -277,20 +277,10 @@ interface TabsPanelProps {
   variant?: TabsVariant;
 }
 
-/**
- * Collapsed height for long code. Content that only slightly exceeds the cap is shown in full, since a "Show more"
- * button that reveals a couple of lines is more annoying than the extra height.
- */
-const COLLAPSED_MAX_HEIGHT = 512;
-const COLLAPSE_SLACK = 96;
-
 export function TabsPanel({ value, children, initial, className, variant = 'compact' }: TabsPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(initial);
   const [ids, setIds] = useState<{ id: string; labelledBy: string } | null>(null);
-  const [overflows, setOverflows] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const base = ref.current?.closest('[data-tabs-root]')?.getAttribute('data-tabs-id');
@@ -323,42 +313,6 @@ export function TabsPanel({ value, children, initial, className, variant = 'comp
     };
   }, [value]);
 
-  // A hidden panel has no layout, so measure once it is shown. The content's natural height decides whether the
-  // collapse affordance is needed at all.
-  useEffect(() => {
-    const content = contentRef.current;
-    if (!isActive || !content) return;
-
-    const measure = () => setOverflows(content.scrollHeight > COLLAPSED_MAX_HEIGHT + COLLAPSE_SLACK);
-
-    measure();
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(content);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [isActive]);
-
-  const collapsed = overflows && !expanded;
-
-  const onCollapse = () => {
-    setExpanded(false);
-
-    // Collapsing from the bottom of a long block would otherwise leave the reader below the frame.
-    const root = ref.current?.closest('[data-tabs-root]');
-
-    if (root && root.getBoundingClientRect().top < 0) root.scrollIntoView({ block: 'start' });
-  };
-
-  const buttonClassName = clsx(
-    'flex items-center gap-1.5 h-7 pl-2.5 pr-3 rounded-full corner-squircle text-p3 font-medium cursor-pointer select-none',
-    variant === 'compact'
-      ? 'bg-warm-gray text-manila-light border border-manila-light/15 intent:border-manila-light/30'
-      : 'bg-surface-raised border border-line intent:border-line-strong'
-  );
-
   return (
     <div
       ref={ref}
@@ -369,49 +323,15 @@ export function TabsPanel({ value, children, initial, className, variant = 'comp
       data-value={value}
       className={twMerge(clsx('relative flex-1 min-h-0'), className)}
     >
-      <div
-        ref={contentRef}
-        className={clsx('overflow-x-auto scrollbar-thin px-7 py-5', collapsed && 'overflow-y-hidden')}
-        style={collapsed ? { maxHeight: COLLAPSED_MAX_HEIGHT } : undefined}
+      {/* A hidden panel has no layout, so it's measured once it's shown. */}
+      <CollapsibleCode
+        active={Boolean(isActive)}
+        variant={variant}
+        className="scrollbar-thin overflow-x-auto px-7 py-5"
+        scrollTarget="[data-tabs-root]"
       >
         {children}
-      </div>
-      {collapsed && (
-        <div
-          className={clsx(
-            'pointer-events-none absolute inset-x-0 bottom-0 flex h-28 items-end justify-center pb-4 bg-linear-to-t to-transparent',
-            variant === 'compact' ? 'from-faded-black dark:from-soot' : 'from-manila-light dark:from-faded-black'
-          )}
-          data-copy-ignore
-          data-search-ignore
-          data-llms-ignore
-        >
-          <button
-            type="button"
-            className={clsx(buttonClassName, 'pointer-events-auto')}
-            onClick={() => setExpanded(true)}
-          >
-            <ChevronDown className="size-4" />
-            Show more
-          </button>
-        </div>
-      )}
-      {overflows && expanded && (
-        <div
-          className={clsx(
-            'flex justify-center border-t py-3',
-            variant === 'compact' ? 'border-manila-light/10 dark:border-line' : 'border-line'
-          )}
-          data-copy-ignore
-          data-search-ignore
-          data-llms-ignore
-        >
-          <button type="button" className={buttonClassName} onClick={onCollapse}>
-            <ChevronDown className="size-4 rotate-180" />
-            Show less
-          </button>
-        </div>
-      )}
+      </CollapsibleCode>
     </div>
   );
 }

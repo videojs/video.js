@@ -147,6 +147,7 @@ export const sidebar: Sidebar = [
           { slug: 'guides/migrate-from-mux-player', sidebarLabel: 'Mux Player' },
           { slug: 'guides/migrate-from-plyr', sidebarLabel: 'Plyr' },
           { slug: 'guides/migrate-from-media-chrome', sidebarLabel: 'Media Chrome' },
+          { slug: 'guides/migrate-from-vidstack', sidebarLabel: 'Vidstack' },
         ],
       },
     ],
