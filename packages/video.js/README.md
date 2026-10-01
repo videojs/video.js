@@ -46,9 +46,12 @@ Ready to move a v8 player to Video.js 10? Follow the migration guide for [HTML][
 
 ## What this package contains
 
-This package has no player and no dependencies. Importing it registers no elements and doesn't scan the page, so v8
-markup such as `<video class="video-js" data-setup="{}">` does nothing. It contains only shims, so v8 code that runs
-against Video.js 10 fails with a searchable code instead of "undefined is not a function":
+This package has no player and no dependencies. `@videojs/core` depends on it, so it appears in every `@videojs/html`
+and `@videojs/react` install, but nothing imports it, so it adds nothing to your bundle.
+
+Importing it registers no elements and doesn't scan the page, so v8 markup such as
+`<video class="video-js" data-setup="{}">` does nothing. It contains only shims, so v8 code that runs against Video.js 10
+fails with a searchable code instead of "undefined is not a function":
 
 - **The v8 module surface.** The `videojs()` default export, `registerPlugin`, `getPlugin`, `registerComponent`,
   `getComponent`, `getPlayer`, and `options` each throw a `VJS8_LEGACY_*` code that links to its error page. Development

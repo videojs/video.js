@@ -9,7 +9,7 @@
 - **React**: install `@videojs/react`.
 - **Script tag without a bundler**: load `@videojs/cdn`.
 
-Don't add `video.js` next to `@videojs/html` or `@videojs/react`. It adds no player features.
+`@videojs/html` and `@videojs/react` already install `video.js` through `@videojs/core`. Don't add it to `package.json` yourself; it adds no player features.
 
 ## Get installation instructions
 
@@ -30,7 +30,8 @@ The code means v8 code ran against `video.js@10`. Either pin `video.js@8`, or mi
 
 ## Change this package (videojs/v10 repository)
 
-- Keep it free of dependencies and side effects: no player, no element registration, and no re-exports from `@videojs/*`.
+- Keep it free of dependencies and side effects: no player, no element registration, and no re-exports from `@videojs/*`. `@videojs/core` depends on this package, so any dependency here lands in every Video.js 10 install, and an `@videojs/*` dependency would form a cycle.
+- Never import `video.js` from `@videojs/*`. The `@videojs/core` dependency exists only to install it, and must add nothing to bundles.
 - Legacy detection lives only here. Never add v8 compatibility, `VJS8_LEGACY_*` codes, or registry text to `@videojs/*` packages.
 - Stub only setup-time v8 entry points. Anything reached through a v8 player instance is unreachable once `videojs()` throws.
 - Production builds must not ship registry text. Never import `./errors/registry` from `src/videojs.ts` or `src/index.ts`; only `__DEV__` branches in `./errors/legacy-error` read it.
