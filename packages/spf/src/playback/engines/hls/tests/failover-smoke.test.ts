@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { isResolvedTrack, type MaybeResolvedPresentation } from '../../../../media/types';
-import { createHlsVideoEngine } from '../engine';
+import { createEngine } from '../engine';
 
 // Live smoke test for multi-CDN failover against a real Mux `redundant_streams`
 // source. It hits the network (the manifest + the surviving CDN are fetched for
@@ -54,7 +54,7 @@ describe.skipIf(!SMOKE)('multi-CDN failover (live smoke)', () => {
       return realFetch(input as RequestInfo, init);
     }) as typeof fetch;
 
-    const engine = createHlsVideoEngine({ failover: { cooldownMs: 4000 } });
+    const engine = createEngine({ failover: { cooldownMs: 4000 } });
 
     engine.state.presentation.set({ url: REDUNDANT_URL } as MaybeResolvedPresentation);
 

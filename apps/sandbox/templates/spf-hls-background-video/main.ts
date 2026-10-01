@@ -16,8 +16,8 @@ import '@app/styles.css';
 // URL that is already playing.
 import { SOURCES } from '@app/shared/sources';
 import { effect, snapshot } from '@videojs/spf';
-import type { BackgroundVideoEngineState } from '@videojs/spf/hls';
 import { HlsBackgroundVideoAdapterCore } from '@videojs/spf/hls-background-video';
+import type { EngineState } from '@videojs/spf/hls/background-video';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const video = document.getElementById('bg-video') as HTMLVideoElement;
@@ -53,7 +53,7 @@ for (const id of HLS_SOURCE_IDS) {
 }
 
 // ── Renditions ────────────────────────────────────────────────────────────────
-type MaybePresentation = BackgroundVideoEngineState['presentation'];
+type MaybePresentation = EngineState['presentation'];
 
 function videoTracksOf(presentation: MaybePresentation) {
   return presentation?.selectionSets?.find((s) => s.type === 'video')?.switchingSets[0]?.tracks ?? [];
