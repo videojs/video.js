@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { installationCompatibility, installationDecisionOrderFor, installationOptionDefinitionsFor } from '../options';
 import { QUERY_OPTION_SYNTAX } from '../parameters';
+import type { InstallationMethod } from '../selection';
 
 function valuesFor(
   definitions: ReturnType<typeof installationOptionDefinitionsFor>,
@@ -124,6 +125,51 @@ describe('installationDecisionOrderFor', () => {
     expect(cdn.find(({ title }) => title === 'Choose how to install')?.guidance).toContain(
       'scaffold a minimal Vite app only when no app exists'
     );
+  });
+
+  it('targets one app in a workspace with several apps', () => {
+    const decisions = installationDecisionOrderFor({ methods: ['packaged'], frameworks: ['react'] });
+    const inspect = decisions.find(({ title }) => title === 'Inspect the project')?.guidance;
+    const startingPoint = decisions.find(({ title }) => title === 'Choose the starting point')?.guidance;
+
+    expect(inspect).toContain('run the command from its directory');
+    expect(inspect).toContain('ask: "Which app should get the player: <app> or <app>?"');
+    expect(inspect).toContain('Without an answer, choose the app that serves the page the request describes');
+    expect(startingPoint).toContain('ask: "Should I add the player to the existing app or create a new one?"');
+    expect(startingPoint).toContain('Without an answer, use existing when an app exists.');
+  });
+
+  it('builds new players on Video.js 10 when the project already runs Video.js 8', () => {
+    const decisions = installationDecisionOrderFor({ methods: ['packaged'], frameworks: ['html'] });
+    const titles = decisions.map(({ title }) => title);
+    const guidance = decisions.find(({ title }) => title === 'Check for Video.js 8')?.guidance;
+
+    expect(titles.indexOf('Check for Video.js 8')).toBe(titles.indexOf('Inspect the project') + 1);
+    expect(guidance).toContain('Build new players with Video.js 10');
+    expect(guidance).toContain('leave existing Video.js 8 players unchanged');
+    expect(guidance).toContain('Without an answer, add the Video.js 10 player.');
+    expect(guidance).toContain('Tell the user the project now uses both versions');
+  });
+
+  it('explains what owning skin source gives up only when packaged modules are the alternative', () => {
+    const install = (methods: readonly InstallationMethod[]) =>
+      installationDecisionOrderFor({ methods, frameworks: ['react', 'html'] }).find(
+        ({ title }) => title === 'Choose how to install'
+      )?.guidance;
+
+    expect(install(['packaged', 'shadcn'])).toContain('upgrading Video.js does not update it');
+    expect(install(['packaged', 'shadcn'])).toContain('Without an answer, use packaged modules.');
+    expect(install(['shadcn'])).not.toContain('upgrading Video.js');
+    expect(install(['packaged'])).not.toContain('upgrading Video.js');
+  });
+
+  it('collects questions in one message and reports defaults when the agent cannot ask', () => {
+    const plan = installationDecisionOrderFor({ methods: ['packaged'], frameworks: ['react'] }).find(
+      ({ title }) => title === 'Return one explicit plan'
+    )?.guidance;
+
+    expect(plan).toContain('Put any questions from the steps above in one message');
+    expect(plan).toContain('When you cannot ask, use those defaults and report each one');
   });
 
   it('asks for every applicable option in the reader syntax', () => {

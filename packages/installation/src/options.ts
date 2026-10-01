@@ -169,6 +169,12 @@ export function installationDecisionOrderFor(
           ? 'Use packaged modules by default, or Shadcn when a React or plain HTML project should own editable skin source. CDN scripts are for plain HTML only; packaged modules need a bundler, so use CDN for an existing site without a build step. Vue and Svelte use packaged modules. CDN can use any existing HTML page or app; only scaffold a minimal Vite app when no app exists. The HTML source registry uses CSS styling.'
           : 'Use packaged modules by default, Shadcn when a plain HTML project should own editable skin source, or CDN for a plain HTML integration. Packaged modules need a bundler, so use CDN for an existing site without a build step. Vue and Svelte use packaged modules. CDN can use any existing HTML page or app; only scaffold a minimal Vite app when no app exists. The HTML source registry uses CSS styling.';
 
+  // Only a guide that offers both packaged modules and Shadcn leaves the agent to weigh owning the skin source.
+  const sourceTradeOff =
+    methods.includes('shadcn') && methods.length > 1
+      ? ' Shadcn source belongs to the project: it can be edited freely, but upgrading Video.js does not update it, so updates mean reinstalling the source and reapplying local changes, as the Customize skins guide explains. Use packaged modules unless the request asks to change controls, layout, or interactions beyond what packaged skin styling allows. When that is unclear, ask: "Do you want to edit the skin source and update it by hand, or keep the packaged skin that updates with Video.js?" Without an answer, use packaged modules.'
+      : '';
+
   const stylingDecisions: InstallationDecision[] =
     methods.includes('shadcn') && frameworks.includes('react')
       ? [
@@ -183,12 +189,17 @@ export function installationDecisionOrderFor(
     {
       title: 'Inspect the project',
       guidance:
-        'Read package.json, framework config, and lockfiles to infer the framework, app setup, and package manager. React installs @videojs/react; HTML, Vue, and Svelte install @videojs/html.',
+        'Read package.json, framework config, and lockfiles to infer the framework, app setup, and package manager. React installs @videojs/react; HTML, Vue, and Svelte install @videojs/html. In a workspace with several apps, choose the app the request names and run the command from its directory, since detection reads the package.json where it runs. When the request does not identify one app, ask: "Which app should get the player: <app> or <app>?" Without an answer, choose the app that serves the page the request describes and report that choice.',
+    },
+    {
+      title: 'Check for Video.js 8',
+      guidance:
+        'The `video.js` package, `class="video-js"`, `data-setup`, or a `videojs(...)` call means existing pages run Video.js 8. Build new players with Video.js 10, which uses separate `@videojs/*` packages, and leave existing Video.js 8 players unchanged. Migrate one only when the user asks, following the Migrate from Video.js 8 guide instead of this plan. When the request could mean replacing an existing player, ask: "Should I migrate the existing Video.js 8 player, or add a Video.js 10 player and leave it as it is?" Without an answer, add the Video.js 10 player. Tell the user the project now uses both versions and that the Video.js 8 players can be migrated later.',
     },
     {
       title: 'Choose the starting point',
       guidance:
-        'Use existing when adapting a compatible project. Use new only when the user wants a new app or the intended workspace has no app. Confirm the choice when the workspace and request do not make it clear.',
+        'Use existing when adapting a compatible project. Use new only when the user wants a new app or the intended workspace has no app. When the workspace and request do not make it clear, ask: "Should I add the player to the existing app or create a new one?" Without an answer, use existing when an app exists.',
     },
     {
       title: 'Choose the player',
@@ -209,11 +220,11 @@ export function installationDecisionOrderFor(
       guidance:
         'Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin should cast a compatible source. Use none when no extension is needed.',
     },
-    { title: 'Choose how to install', guidance: methodGuidance },
+    { title: 'Choose how to install', guidance: `${methodGuidance}${sourceTradeOff}` },
     ...stylingDecisions,
     {
       title: 'Return one explicit plan',
-      guidance: `Confirm the choices once, then pass every applicable ${syntax.noun}, including \`${syntax.options(['extensions', 'none'])}\` when no extension is needed and \`${syntax.options(['sourceUrl', INSTALLATION_DEMO_SOURCE_URL])}\` when there is no media URL yet. Check that Defaulted options says none. Adapt conditional setup steps and existing paths before changing files.`,
+      guidance: `Put any questions from the steps above in one message, each with the default you would otherwise use, and ask nothing when the signals agree. When you cannot ask, use those defaults and report each one with the result. Then pass every applicable ${syntax.noun}, including \`${syntax.options(['extensions', 'none'])}\` when no extension is needed and \`${syntax.options(['sourceUrl', INSTALLATION_DEMO_SOURCE_URL])}\` when there is no media URL yet. Check that Defaulted options says none. Adapt conditional setup steps and existing paths before changing files.`,
     },
   ];
 }
