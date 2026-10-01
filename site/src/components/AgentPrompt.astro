@@ -27,6 +27,7 @@ const { prompt } = Astro.props;
   <div class="flex justify-end border-t border-line bg-surface-raised p-3" data-llms-ignore>
     <CopyButton
       client:idle
+      analytics={{ block: 'agent-prompt' }}
       copyFrom={{ container: '[data-agent-prompt-card]', target: '[data-agent-prompt]' }}
       className="inline-flex h-9 cursor-pointer items-center rounded-lg corner-squircle border border-line bg-surface px-3 text-p3 font-semibold shadow-xs select-none intent:border-line-strong intent:bg-hover focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold disabled:cursor-wait"
       copied="Copied"

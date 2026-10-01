@@ -18,6 +18,7 @@ import {
   STYLE_LABELS,
   SUPPORTED_FRAMEWORKS,
 } from '@/types/docs';
+import { ANALYTICS_EVENTS, trackEvent } from '@/utils/analytics-events';
 import { DOCS_FRAMEWORK_NAVIGATION_INFO, savePageScrollForNavigation } from '@/utils/docs/navigation';
 import { setStylePreferenceClient, updateStyleAttribute } from '@/utils/docs/preferences';
 import { resolveFrameworkChange } from '@/utils/docs/routing';
@@ -72,6 +73,12 @@ export function Selectors({
   const handleFrameworkChange = (newFramework: SupportedFramework) => {
     if (!isValidFramework(newFramework) || newFramework === displayedFramework) return;
 
+    trackEvent(ANALYTICS_EVENTS.docsPreferenceChanged, {
+      preference: 'framework',
+      value: newFramework,
+      previous: displayedFramework,
+    });
+
     if (registryFrameworkSelection) {
       // The installation stores are already loaded on the Shadcn guide; importing them here keeps them off other pages.
       void import('@/stores/registry').then(({ selectRegistryFramework }) => {
@@ -102,6 +109,14 @@ export function Selectors({
 
   const handleStyleChange = (newStyle: AnySupportedStyle) => {
     if (!isValidStyleForFramework(currentFramework, newStyle)) return;
+
+    if (newStyle !== displayedStyle) {
+      trackEvent(ANALYTICS_EVENTS.docsPreferenceChanged, {
+        preference: 'style',
+        value: newStyle,
+        previous: displayedStyle,
+      });
+    }
 
     // Update localStorage for this framework
     setStylePreferenceClient(currentFramework, newStyle);

@@ -12,6 +12,7 @@
  */
 
 import clsx from 'clsx';
+import { kebabCase } from 'es-toolkit/string';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import Check from '@/assets/icons/check.svg?react';
@@ -90,6 +91,7 @@ export function TabsList({ label, children, variant = 'compact', copyCta = 'copy
         {children}
       </div>
       <CopyButton
+        analytics={{ block: kebabCase(label) }}
         copyFrom={{
           container: `[data-tabs-root]`,
           target: '[role="tabpanel"]:not([hidden])',

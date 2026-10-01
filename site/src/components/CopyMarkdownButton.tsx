@@ -8,6 +8,7 @@ import Copy from '@/assets/icons/copy.svg?react';
 import Markdown from '@/assets/icons/markdown.svg?react';
 import ClaudeLogo from '@/assets/logos/brands/claude.svg?react';
 import OpenAiLogo from '@/assets/logos/brands/openai.svg?react';
+import { ANALYTICS_EVENTS, trackEvent } from '@/utils/analytics-events';
 import { getInstallationRouteSegment } from '@/utils/installation/routes';
 import useIsHydrated from '@/utils/useIsHydrated';
 
@@ -121,6 +122,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
       }
 
       setState({ status: 'success' });
+      trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'copy-markdown' });
       setTimeout(() => {
         setState({ status: 'idle' });
       }, 2000);
@@ -203,6 +205,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
             >
               <Menu.Item
                 className={itemClass}
+                onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'view-markdown' })}
                 render={
                   <a
                     href={mdUrl}
@@ -218,6 +221,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
               <Menu.Separator className="bg-line my-1 h-px" />
               <Menu.Item
                 className={itemClass}
+                onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'open-in-chatgpt' })}
                 render={
                   <a
                     href={`https://chatgpt.com/?hints=search&prompt=${prompt}`}
@@ -233,6 +237,7 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
               </Menu.Item>
               <Menu.Item
                 className={itemClass}
+                onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'open-in-claude' })}
                 render={
                   <a
                     href={`https://claude.ai/new?q=${prompt}`}

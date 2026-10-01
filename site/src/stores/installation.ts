@@ -135,7 +135,7 @@ function syncMarkdownAlternate(search: string): void {
 
 /**
  * The one writer for installation URLs: replace the current entry's query with the canonical one for the picks, and
- * keep the Markdown twin link in step.
+ * keep the Markdown twin link and the analytics context in step.
  */
 function writeInstallationUrl(): void {
   urlWriteScheduled = false;

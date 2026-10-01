@@ -1,6 +1,7 @@
 import { DocSearch } from '@docsearch/react';
 import { useStore } from '@nanostores/react';
 import clsx from 'clsx';
+import { debounce } from 'es-toolkit/function';
 
 import { GITHUB_REPO_URL } from '@/consts';
 import {
@@ -11,6 +12,29 @@ import {
   DOCSEARCH_DOCS_INDEX,
 } from '@/search.config';
 import { currentFramework } from '@/stores/preferences';
+import { ANALYTICS_EVENTS, reportableSearchQuery, trackEvent } from '@/utils/analytics-events';
+
+let reportedQuery = '';
+
+// DocSearch builds this URL while rendering the no-results screen, once per keystroke. Waiting for typing to settle
+// reports the query the reader stopped on, not every prefix of it, and only if the screen still shows no results for
+// it: a longer query may have found some since.
+export const reportNoResults = debounce((input: string) => {
+  const searchInput = document.querySelector<HTMLInputElement>('.DocSearch-Input');
+  if (!document.querySelector('.DocSearch-NoResults') || searchInput?.value !== input) return;
+
+  const query = reportableSearchQuery(input);
+  if (!query || query === reportedQuery) return;
+
+  reportedQuery = query;
+  trackEvent(ANALYTICS_EVENTS.searchNoResults, { query });
+}, 1000);
+
+function missingResultsUrl({ query }: { query: string }): string {
+  reportNoResults(query);
+
+  return `${GITHUB_REPO_URL}issues/new?title=${encodeURIComponent(`Search: no results for "${query}"`)}&labels=search`;
+}
 
 interface SearchProps {
   className?: string;
@@ -48,9 +72,7 @@ export default function Search({ className }: SearchProps) {
         translations={{
           button: { buttonText: 'Search...', buttonAriaLabel: 'Search documentation' },
         }}
-        getMissingResultsUrl={({ query }) =>
-          `${GITHUB_REPO_URL}issues/new?title=${encodeURIComponent(`Search: no results for "${query}"`)}&labels=search`
-        }
+        getMissingResultsUrl={missingResultsUrl}
       />
     </div>
   );

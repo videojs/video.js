@@ -1,7 +1,14 @@
 import { useRef, useState } from 'react';
 
 import Check from '@/assets/icons/check.svg?react';
+import { ANALYTICS_EVENTS, isAgentHandoffMethod, trackEvent } from '@/utils/analytics-events';
 import useIsHydrated from '@/utils/useIsHydrated';
+
+/** What a successful copy reports. Plain data, so Astro pages can pass it to the island. */
+export interface CopyAnalytics {
+  /** A short, stable name for the copied block, such as `cdn-scripts`. */
+  block: string;
+}
 
 export interface CopyButtonProps {
   children: React.ReactNode;
@@ -14,8 +21,12 @@ export interface CopyButtonProps {
   className?: string;
   style?: React.CSSProperties;
   timeout?: number;
-  /** PostHog `cta` autocapture property for the button. */
+  /**
+   * PostHog `cta` autocapture property for the button. A handoff CTA, such as `copy-agent-prompt`, also reports an
+   * `agent_handoff` event when the copy succeeds.
+   */
   cta?: string;
+  analytics?: CopyAnalytics;
 }
 
 /** Read the target's text without UI chrome such as a code frame's "Show more" control. */
@@ -37,6 +48,7 @@ export default function CopyButton({
   style,
   timeout = 2000,
   cta,
+  analytics,
 }: CopyButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -55,6 +67,7 @@ export default function CopyButton({
   const handleCopy = async () => {
     try {
       let text = '';
+      let tab: string | undefined;
 
       if (buttonRef.current) {
         // Find the closest container
@@ -66,6 +79,12 @@ export default function CopyButton({
 
           if (target) {
             text = getCopyText(target);
+
+            // Only a real choice is worth reporting: a single-tab code frame always reads `code`. Tabs render their value
+            // as `data-value`, since their text can repeat the label for layout.
+            if (container.querySelectorAll('[role="tab"]').length > 1) {
+              tab = container.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.dataset.value;
+            }
           } else {
             console.warn(
               `CopyButton: No target found for selector "${copyFrom.target}" within container "${copyFrom.container}"`
@@ -80,6 +99,13 @@ export default function CopyButton({
 
       if (text) {
         await navigator.clipboard.writeText(text.trim());
+
+        if (analytics) {
+          trackEvent(ANALYTICS_EVENTS.codeCopied, tab ? { block: analytics.block, tab } : { block: analytics.block });
+        }
+
+        if (isAgentHandoffMethod(cta)) trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: cta });
+
         setIsCopied(true);
         setTimeout(() => {
           setIsCopied(false);

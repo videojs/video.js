@@ -11,6 +11,7 @@ import { isPlainObject, isString } from 'es-toolkit/predicate';
 import { escapeRegExp } from 'es-toolkit/string';
 
 import { DEFAULT_FRAMEWORK, getDefaultStyle, type AnySupportedStyle, type SupportedFramework } from '@/types/docs';
+import { currentInstallationContext } from '@/utils/analytics-events';
 import { getFrameworkPreferenceClient, getStylePreferenceClient } from '@/utils/docs/preferences';
 import { POSTHOG_PROJECT_KEY } from '@/utils/posthog-project';
 
@@ -34,6 +35,7 @@ export interface AnalyticsEvent {
 /** The subset of the PostHog instance the site calls. The snippet's stub queues these until the library loads. */
 export interface PostHogClient {
   init(token: string, config: PostHogConfig): void;
+  capture(event: string, properties?: EventProperties): void;
 }
 
 /** The PostHog options the site sets. */
@@ -147,9 +149,9 @@ export function getDocsContext(): DocsContext {
   return { docs_framework: framework, docs_style: style };
 }
 
-/** Properties that describe the page an event happened on. */
+/** Properties that describe the page an event happened on: the docs context, plus the picks on an installation guide. */
 function pageContext(): EventProperties {
-  return { ...getDocsContext() };
+  return { ...getDocsContext(), ...currentInstallationContext() };
 }
 
 /**

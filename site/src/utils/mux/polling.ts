@@ -31,6 +31,9 @@ export interface PollOptions {
   signal?: AbortSignal;
 }
 
+export const UPLOAD_PROCESSING_FAILED = 'Upload processing failed';
+export const ASSET_PROCESSING_FAILED = 'Asset processing failed';
+
 export type PollResult = { status: 'ready'; playbackId: string } | { status: 'error'; message: string };
 
 /**
@@ -55,7 +58,7 @@ export async function pollForPlaybackId(options: PollOptions): Promise<PollResul
     if (result.error) return { status: 'error', message: result.error.message };
 
     if (result.data?.status === 'errored') {
-      return { status: 'error', message: 'Upload processing failed' };
+      return { status: 'error', message: UPLOAD_PROCESSING_FAILED };
     }
 
     assetId = result.data?.assetId;
@@ -73,7 +76,7 @@ export async function pollForPlaybackId(options: PollOptions): Promise<PollResul
     if (result.error) return { status: 'error', message: result.error.message };
 
     if (result.data?.status === 'errored') {
-      return { status: 'error', message: 'Asset processing failed' };
+      return { status: 'error', message: ASSET_PROCESSING_FAILED };
     }
 
     if (result.data?.status === 'ready' && result.data.playbackId) {

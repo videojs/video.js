@@ -183,6 +183,16 @@ describe('withPageContext', () => {
     expect(withPageContext(event)?.properties?.docs_framework).toBe('html');
   });
 
+  it('carries the installation picks on an installation guide only', () => {
+    history.replaceState(null, '', '/docs/guides/installation/html?skin=minimal');
+
+    expect(withPageContext({ properties: {} })?.properties).toMatchObject({ installation_route: 'html' });
+
+    history.replaceState(null, '', '/docs/framework/html/guides/why-videojs');
+
+    expect(Object.keys(withPageContext({ properties: {} })?.properties ?? {})).not.toContain('installation_route');
+  });
+
   it('passes a dropped event through', () => {
     expect(withPageContext(null)).toBeNull();
   });
@@ -193,7 +203,7 @@ describe('initAnalytics', () => {
     const callbacks: (() => void)[] = [];
 
     vi.stubGlobal('requestIdleCallback', (callback: () => void) => callbacks.push(callback));
-    window.posthog = { init: vi.fn() };
+    window.posthog = { init: vi.fn(), capture: vi.fn() };
 
     initAnalytics();
 
