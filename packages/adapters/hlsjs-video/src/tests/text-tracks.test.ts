@@ -1,6 +1,8 @@
+import { HTMLVideoAdapter } from '@videojs/media/dom';
+import Hls from 'hls.js';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { removeHlsTextTracks, withPreservedTextTracks } from '../text-tracks';
+import { HlsJsTextTracksMixin, removeHlsTextTracks, withPreservedTextTracks } from '../text-tracks';
 
 /**
  * Jsdom has no text track implementation, so the media element and its tracks are stubbed with the parts the helper
@@ -187,5 +189,164 @@ describe('removeHlsTextTracks', () => {
 
   it('does nothing without a media element', () => {
     expect(() => removeHlsTextTracks(null)).not.toThrow();
+  });
+});
+
+/**
+ * Jsdom implements neither `HTMLTrackElement.track` nor a track list that dispatches events, so the mixin gets the
+ * parts it reaches for: a track object per `<track>` element, and a list it can subscribe to.
+ */
+function stubTrackSupport(video: HTMLVideoElement): () => void {
+  const tracks = new WeakMap<HTMLTrackElement, FakeTextTrack>();
+  const descriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+  Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+    configurable: true,
+    get(this: HTMLTrackElement) {
+      let track = tracks.get(this);
+
+      if (!track) {
+        track = new FakeTextTrack();
+        tracks.set(this, track);
+      }
+
+      return track;
+    },
+  });
+
+  Object.defineProperty(video, 'textTracks', {
+    configurable: true,
+    value: Object.assign(new EventTarget(), { getTrackById: () => null }),
+  });
+
+  return () => {
+    if (descriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', descriptor);
+    else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+  };
+}
+
+function fakeEngine(): Hls {
+  const listeners = new Map<string, Set<(...args: any[]) => void>>();
+
+  return {
+    subtitleTracks: [{ lang: 'de', name: 'German', type: 'SUBTITLES' }],
+    subtitleTrack: -1,
+    on(event: string, fn: (...args: any[]) => void) {
+      if (!listeners.has(event)) listeners.set(event, new Set());
+
+      listeners.get(event)!.add(fn);
+    },
+    off(event: string, fn: (...args: any[]) => void) {
+      listeners.get(event)?.delete(fn);
+    },
+    emit(event: string, ...args: any[]) {
+      for (const fn of [...(listeners.get(event) ?? [])]) fn(event, ...args);
+    },
+  } as unknown as Hls;
+}
+
+class FakeHost extends HTMLVideoAdapter {
+  engine: Hls | null;
+
+  constructor(engine: Hls | null = null) {
+    super();
+    this.engine = engine;
+  }
+}
+
+const TextTracksHost = HlsJsTextTracksMixin(FakeHost) as unknown as new (engine: Hls | null) => FakeHost;
+
+/** One `#EXT-X-MEDIA:TYPE=SUBTITLES` rendition, shaped the way hls.js reports it. */
+const SUBTITLE_TRACKS_FOUND = {
+  tracks: [{ label: 'German', kind: 'subtitles', default: false, subtitleTrack: { lang: 'de' } }],
+};
+
+function hlsTracks(video: HTMLVideoElement): NodeListOf<HTMLTrackElement> {
+  return video.querySelectorAll('track[data-removeondestroy]');
+}
+
+describe('HlsJsTextTracksMixin', () => {
+  it('keeps the tracks of the current load when MEDIA_ATTACHED arrives after the manifest', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      expect(hlsTracks(video)).toHaveLength(1);
+
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+      expect(hlsTracks(video)).toHaveLength(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it('drops the tracks of the previous load when a new manifest reports none', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      expect(hlsTracks(video)).toHaveLength(1);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+
+      expect(hlsTracks(video)).toHaveLength(0);
+    } finally {
+      restore();
+    }
+  });
+
+  it('drops the tracks when the media detaches', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      expect(hlsTracks(video)).toHaveLength(1);
+
+      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+
+      expect(hlsTracks(video)).toHaveLength(0);
+    } finally {
+      restore();
+    }
+  });
+
+  it('drops the tracks when the engine is destroyed', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      expect(hlsTracks(video)).toHaveLength(1);
+
+      (engine as any).emit(Hls.Events.DESTROYING);
+
+      expect(hlsTracks(video)).toHaveLength(0);
+    } finally {
+      restore();
+    }
   });
 });
