@@ -120,8 +120,14 @@ export type InferBehaviorState<F> = DepsOf<F> extends { state: infer M } ? Unwra
 /** Infer the context shape a behavior requires from its deps parameter. */
 export type InferBehaviorContext<F> = DepsOf<F> extends { context: infer M } ? UnwrapSignals<M> : Empty;
 
-/** Infer the config shape a behavior requires from its deps parameter. */
-export type InferBehaviorConfig<F> = DepsOf<F> extends { config: infer C extends object } ? C : Empty;
+/**
+ * The config a deps parameter declares, without the `undefined` an optional `config?:` adds. `Empty` when it declares
+ * none.
+ */
+type DeclaredConfig<CfgIn> = [Extract<CfgIn, object>] extends [never] ? Empty : Extract<CfgIn, object>;
+
+/** Infer the config shape a behavior requires from its deps parameter, whether it declares `config` or `config?`. */
+export type InferBehaviorConfig<F> = DepsOf<F> extends { config?: infer C } ? DeclaredConfig<C> : Empty;
 
 /**
  * Recursively intersect a per-behavior projection across the tuple.
@@ -430,17 +436,27 @@ type RequireIfNonEmpty<Key extends string, T extends object> = keyof T extends n
   ? { [K in Key]?: T }
   : { [K in Key]: T };
 
-type DepsForCfg<StateMap extends AnySlotMap, ContextMap extends AnySlotMap, Cfg extends object> = RequireIfNonEmpty<
+/**
+ * The `config` deps field: optional when the setup declares `config?:` (callers may omit it) or the config has no keys,
+ * required otherwise.
+ */
+type ConfigDeps<CfgIn> = undefined extends CfgIn
+  ? { config?: DeclaredConfig<CfgIn> }
+  : RequireIfNonEmpty<'config', DeclaredConfig<CfgIn>>;
+
+type DepsForCfg<StateMap extends AnySlotMap, ContextMap extends AnySlotMap, CfgIn> = RequireIfNonEmpty<
   'state',
   StateMap
 > &
   RequireIfNonEmpty<'context', ContextMap> &
-  RequireIfNonEmpty<'config', Cfg>;
+  ConfigDeps<CfgIn>;
 
 export function defineBehavior<
   StateMap extends AnySlotMap = Empty,
   ContextMap extends AnySlotMap = Empty,
-  Cfg extends object = Empty,
+  // Unconstrained so a setup's `config?: X` infers as `X | undefined` instead of failing an `object` bound and falling
+  // back to it, which silently dropped `X` from the composition's config type.
+  CfgIn = Empty,
   const SK extends readonly (keyof StateMap)[] = readonly [],
   const CK extends readonly (keyof ContextMap)[] = readonly [],
   R extends BehaviorCleanup = BehaviorCleanup,
@@ -448,13 +464,13 @@ export function defineBehavior<
   behavior: {
     stateKeys: SK;
     contextKeys: CK;
-    setup: (deps: { state: StateMap; context: ContextMap; config: Cfg }) => R;
+    setup: (deps: { state: StateMap; context: ContextMap; config: CfgIn }) => R;
   } & ExhaustiveKeys<SK, StateMap, 'state'> &
     ExhaustiveKeys<CK, ContextMap, 'context'>
 ): {
   stateKeys: SK;
   contextKeys: CK;
-  setup: (deps: DepsForCfg<StateMap, ContextMap, Cfg>) => R;
+  setup: (deps: DepsForCfg<StateMap, ContextMap, CfgIn>) => R;
 } {
   // The runtime shape is identical; the cast bridges TS's view of the
   // parameter (config required) to the return view (config optional when
@@ -462,6 +478,6 @@ export function defineBehavior<
   return behavior as unknown as {
     stateKeys: SK;
     contextKeys: CK;
-    setup: (deps: DepsForCfg<StateMap, ContextMap, Cfg>) => R;
+    setup: (deps: DepsForCfg<StateMap, ContextMap, CfgIn>) => R;
   };
 }

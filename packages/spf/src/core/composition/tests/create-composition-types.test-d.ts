@@ -189,6 +189,28 @@ describe('InferBehaviorConfig', () => {
     expectTypeOf<InferBehaviorConfig<typeof render>>().toEqualTypeOf<{ defaultText?: string }>();
     expectTypeOf<InferBehaviorConfig<typeof persist>>().toEqualTypeOf<{ saveEvery?: number }>();
   });
+
+  // A setup's `config?:` once made `defineBehavior` drop the config type, so the
+  // behavior contributed nothing to the composition's config.
+  it('extracts the config of a defineBehavior whose setup takes an optional config', () => {
+    const optionalConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }>; config?: { interval?: number } }) => {},
+    });
+
+    expectTypeOf<InferBehaviorConfig<typeof optionalConfig>>().toEqualTypeOf<{ interval?: number }>();
+  });
+
+  it('is empty for a behavior that declares no config', () => {
+    const noConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }> }) => {},
+    });
+
+    expectTypeOf<keyof InferBehaviorConfig<typeof noConfig>>().toEqualTypeOf<never>();
+  });
 });
 
 // =============================================================================
@@ -973,6 +995,18 @@ describe('ConfigWithDefaults', () => {
   it('keeps a required key required when defaultConfig does not cover it', () => {
     // @ts-expect-error — `interval` is required and has no default
     createComposition([needsInterval], { defaultConfig: { label: 'a' }, config: {} });
+  });
+
+  it('checks defaults for a behavior whose setup takes an optional config', () => {
+    const optionalConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }>; config?: { interval?: number } }) => {},
+    });
+
+    createComposition([optionalConfig], { defaultConfig: { interval: 250 } });
+    // @ts-expect-error — `interval` is a number
+    createComposition([optionalConfig], { defaultConfig: { interval: '250' } });
   });
 
   it('rejects a default of the wrong type', () => {
