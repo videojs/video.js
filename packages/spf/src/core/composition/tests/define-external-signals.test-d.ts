@@ -51,4 +51,19 @@ describe('defineExternalSignals', () => {
     // @ts-expect-error — `userOther` is not a key of `ExternalState`
     defineExternalSignals<ExternalState>()({ state: ['userChoice', 'userLimit', 'userOther'] });
   });
+
+  it('rejects a shape with an index signature', () => {
+    // @ts-expect-error — an index signature would open the composition's state to any key
+    defineExternalSignals<Record<string, string>>()({ state: ['userChoice'] });
+  });
+
+  it('rejects a shape with a required key', () => {
+    // @ts-expect-error — `userChoice` must be optional: it is unset until something outside writes it
+    defineExternalSignals<{ userChoice: string }>()({ state: ['userChoice'] });
+  });
+
+  it('rejects a context shape with a required key', () => {
+    // @ts-expect-error — `host` must be optional
+    defineExternalSignals<{}, { host: { id: string } }>()({ context: ['host'] });
+  });
 });
