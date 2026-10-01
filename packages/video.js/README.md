@@ -1,20 +1,82 @@
 # video.js
 
-The `video.js` npm package for Video.js 10: the install every Video.js 8 snippet points at.
+[![package-badge]][package]
 
-It is not published yet. The package is `private` until the v8 → v10 cutover.
+Video.js 10 players don't live in this package. Install the package for your framework:
 
-## What's here
+| Building with | Install | Docs |
+| --- | --- | --- |
+| HTML, Web Components, Vue, Svelte, or another framework | `npm install @videojs/html` | [HTML installation][html-install] |
+| React | `npm install @videojs/react` | [React installation][react-install] |
+| A `<script>` tag, without a bundler | `@videojs/cdn` | [Install from CDN][cdn-install] |
 
-- **A working player from one import.** `import 'video.js'` registers `<video-player>`, `<video-skin>`, and the i18n elements — the same set the CDN `video.js` bundle registers — and re-exports `@videojs/html`'s root. Someone arriving from a v8 snippet keeps the import, removes the `videojs()` call, and writes the three tags. This is the batteries-included entry; anything granular (other presets, media elements, individual UI elements, locales) lives in `@videojs/html`, which is what the docs use.
-- **Coded stubs for the Video.js 8 module surface** on the same root entry (`src/videojs.ts`): the `videojs()` default export, `registerPlugin` / `getPlugin`, `registerComponent` / `getComponent`, `getPlayer`, and `options`. Each throws its `VJS8_LEGACY_*` code, so a v8 snippet fails with a searchable code instead of "undefined is not a function". Patterns only reachable through a v8 player instance are not stubbed; setup goes through `videojs()` and stops there.
-- **`video.js/errors`** — the registry behind those codes (`src/errors/`): one entry per code with a one-sentence explanation, the v10 equivalent in HTML and React, the API reference URL, and the stay-on-v8 line. It is the single source for the thrown message and the reference page content. Dev builds throw the full explanation; production builds throw only the code and URL, and never import the registry text.
-- **`video.js/dist/video-js.css`** — the Video.js 8 stylesheet path, resolving to an empty file so a stale import does not fail at module resolution before `videojs()` can.
+Playback engines such as HLS and DASH are separate adapter packages. The installation guides list them.
 
-Unlike `@videojs/html`, importing this package's root has side effects: it registers custom elements. That is deliberate — it is the point of the package — and it matches the CDN bundle of the same name.
+## AI Quickstart
 
-Legacy detection lives only in this package. The `@videojs/*` packages never carry it, so they never pay for it in bundle size.
+Using an AI coding agent? Print the steps to install the [Video.js skill](https://github.com/videojs/skills), which
+teaches your agent to read the docs that match your Video.js version before writing code:
+
+```sh
+npx @videojs/cli agents skills
+```
+
+Then print version-matched installation instructions for your framework:
+
+```sh
+npx @videojs/cli agents init --framework html
+npx @videojs/cli agents init --framework react
+```
+
+Run `agents init` without flags to list every option, such as the CDN method, skins, and media sources. Neither command
+changes your project. `npx` downloads only the small `@videojs/cli` package, not a player.
+
+## Video.js 8
+
+Video.js 8 is alive and well. Brightcove maintains it as the legacy release line, with security and bug fixes. Pin the
+major version to install it:
+
+```sh
+npm install video.js@8
+```
+
+For v8 setup, releases, and issues, see the [Video.js 8 repository][v8-repo] and the [v8 docs][v8-docs].
+
+Ready to move a v8 player to Video.js 10? Follow the migration guide for [HTML][html-migrate] or [React][react-migrate].
+
+## What this package contains
+
+This package has no player and no dependencies. Importing it registers no elements and doesn't scan the page, so v8
+markup such as `<video class="video-js" data-setup="{}">` does nothing. It contains only shims, so v8 code that runs
+against Video.js 10 fails with a searchable code instead of "undefined is not a function":
+
+- **The v8 module surface.** The `videojs()` default export, `registerPlugin`, `getPlugin`, `registerComponent`,
+  `getComponent`, `getPlayer`, and `options` each throw a `VJS8_LEGACY_*` code that links to its error page. Development
+  builds add the explanation and the HTML and React equivalents; production builds throw only the code and link.
+- **`video.js/errors`.** The registry behind those codes: one entry per code with an explanation, the HTML and React
+  equivalents, and the stay-on-v8 line.
+- **`video.js/dist/video-js.css`.** The v8 stylesheet path, resolving to an empty file so a leftover import doesn't fail
+  the build.
+
+## Community
+
+If you need help with anything related to Video.js 10, or if you'd like to casually chat with other members:
+
+- [Join Discord Server][discord]
+- [See GitHub Discussions][gh-discussions]
 
 ## License
 
 [Apache-2.0](../../LICENSE)
+
+[package]: https://www.npmjs.com/package/video.js
+[package-badge]: https://img.shields.io/npm/v/video.js?label=video.js
+[html-install]: https://videojs.org/docs/framework/html/guides/installation
+[react-install]: https://videojs.org/docs/framework/react/guides/installation
+[cdn-install]: https://videojs.org/docs/framework/html/guides/installation-cdn
+[html-migrate]: https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8
+[react-migrate]: https://videojs.org/docs/framework/react/guides/migrate-from-video-js-8
+[v8-repo]: https://github.com/videojs/video.js
+[v8-docs]: https://legacy.videojs.org
+[discord]: https://discord.gg/JBqHh485uF
+[gh-discussions]: https://github.com/videojs/v10/discussions

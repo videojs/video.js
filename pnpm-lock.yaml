@@ -1326,10 +1326,6 @@ importers:
         version: 1.0.0(@opentelemetry/api@1.9.1)(@types/node@22.19.15)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.1)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
 
   packages/video.js:
-    dependencies:
-      '@videojs/html':
-        specifier: workspace:*
-        version: link:../html
     devDependencies:
       happy-dom:
         specifier: ^20.11.1

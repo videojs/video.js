@@ -44,6 +44,15 @@ describe('LEGACY_ERRORS', () => {
       expect(react, code).not.toMatch(/videojs\(/);
     }
   });
+
+  it('sends a consumer to the framework packages, not back to `video.js`', () => {
+    for (const code of LEGACY_ERROR_CODES) {
+      const { html, react } = LEGACY_ERRORS[code];
+
+      expect(html, code).not.toMatch(/'video\.js'/);
+      expect(react, code).not.toMatch(/'video\.js'/);
+    }
+  });
 });
 
 describe('LEGACY_V8_LINE', () => {
