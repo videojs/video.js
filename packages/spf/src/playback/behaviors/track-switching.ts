@@ -104,8 +104,8 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
 /**
  * The slots `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it
  * writes. Rule-only inputs are deliberately absent — `user*TrackSelection` and `bandwidthState` belong to whoever
- * materializes them (the embedder, declared with `declareInputs`; the buffer-actor sampler), and each rule declares the
- * signal it consults as an optional slot on its own deps map, so the behavior never assumes a rule's signal exists.
+ * materializes them (the embedder via `shareSignals`, the buffer-actor sampler), and each rule declares the signal it
+ * consults as an optional slot on its own deps map, so the behavior never assumes a rule's signal exists.
  */
 export interface TrackSwitchingState {
   presentation?: MaybeResolvedPresentation;
@@ -122,7 +122,7 @@ interface UserTrackSelections {
 
 /**
  * The user track selections a consumer writes and the track-switching rules read, per track type (all three by
- * default). No behavior declares them, so a composition declares them as inputs with `declareInputs`.
+ * default). No behavior declares them, so a composition declares them as inputs with `makeShareSignalsFor`.
  */
 export type UserTrackSelectionInputs<T extends keyof UserTrackSelections = keyof UserTrackSelections> = {
   [K in T as `user${Capitalize<K>}TrackSelection`]?: UserTrackSelections[K];
@@ -262,8 +262,8 @@ type UserSelectionKey = 'userVideoTrackSelection' | 'userAudioTrackSelection';
 // `bandwidthState` (the bandwidth ranker) — are NOT here; each rule declares
 // the signal it needs as *optional* on its own deps and reads it defensively,
 // so the behavior never assumes a rule-only signal exists. Those slots are
-// materialized by whoever owns them: the composition's `declareInputs` for the
-// consumer-input `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
+// materialized by whoever owns them: `shareSignals` for the consumer-input
+// `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
 export type TrackSwitchingStateMap<S extends SelectionKey> = {
   presentation: ReadonlySignal<TrackSwitchingState['presentation']>;
 } & { [P in S]: Signal<TrackSwitchingState[P]> };

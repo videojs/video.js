@@ -2,6 +2,8 @@ import type {
   AnyBehavior,
   Behavior,
   ContextSignals,
+  Empty,
+  ExhaustiveKeys,
   ResolveBehaviorContext,
   ResolveBehaviorState,
   StateSignals,
@@ -54,19 +56,48 @@ export function makeShareSignals<S extends object, C extends object>(
 /**
  * `makeShareSignals` typed by the behaviors it is composed after, rather than by hand-written state and context types.
  *
- * The callback receives the state and context those behaviors resolve to. Declares no keys of its own; declare consumer
- * inputs with `declareInputs` and include that behavior in `Behaviors`.
+ * Also declares the composition's **inputs**: state (and context) the consumer writes, typically through an adapter,
+ * that no composed behavior declares, because the behaviors that consult it only read it, and read it optionally. The
+ * behavior contributes exactly those keys to the composition, and its callback receives everything the behaviors
+ * resolve to plus the inputs.
+ *
+ * Curried so the input types are named explicitly while the key lists are inferred and checked against them: leaving
+ * out a key of `StateInputs` or `ContextInputs` is a compile error. Both default to none.
  *
  * @example
  *   ```ts
- *   const behaviors = [resolvePresentation, switchAudioTrack, inputs] as const;
- *   createComposition([...behaviors, makeShareSignalsFor<typeof behaviors>()], { config });
+ *   const behaviors = [resolvePresentation, switchAudioTrack] as const;
+ *   const shareSignals = makeShareSignalsFor<typeof behaviors, UserTrackSelectionInputs<'audio'>>()({
+ *     state: ['userAudioTrackSelection'],
+ *   });
+ *   type State = ResolveBehaviorState<[...typeof behaviors, typeof shareSignals]>; // includes the input
+ *   createComposition([...behaviors, shareSignals], { config });
  *   ```;
  */
-export function makeShareSignalsFor<Behaviors extends readonly AnyBehavior[]>(): Behavior<
-  StateSignals<ResolveBehaviorState<Behaviors>>,
-  ContextSignals<ResolveBehaviorContext<Behaviors>>,
-  ShareSignalsConfig<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>>
-> {
-  return makeShareSignals<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>>();
+export function makeShareSignalsFor<
+  Behaviors extends readonly AnyBehavior[],
+  StateInputs extends object = Empty,
+  ContextInputs extends object = Empty,
+>() {
+  type S = ResolveBehaviorState<Behaviors> & StateInputs;
+  type C = ResolveBehaviorContext<Behaviors> & ContextInputs;
+
+  return <
+    const SK extends readonly (keyof StateInputs)[] = readonly [],
+    const CK extends readonly (keyof ContextInputs)[] = readonly [],
+  >(
+    inputKeys: { state?: SK; context?: CK } & ExhaustiveKeys<SK, StateInputs, 'stateInput'> &
+      ExhaustiveKeys<CK, ContextInputs, 'contextInput'>
+  ): Behavior<StateSignals<StateInputs>, ContextSignals<ContextInputs>, ShareSignalsConfig<S, C>> => ({
+    stateKeys: inputKeys.state ?? [],
+    contextKeys: inputKeys.context ?? [],
+    setup: ({ state, context, config }) => {
+      // SAFETY: a composition hands every behavior its full state and context maps (see `createComposition`); the
+      // narrower types above declare only the inputs this behavior adds.
+      config.onSignalsReady?.({
+        state: state as StateSignals<S>,
+        context: context as ContextSignals<C>,
+      });
+    },
+  });
 }

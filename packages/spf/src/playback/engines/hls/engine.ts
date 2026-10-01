@@ -6,7 +6,6 @@ import {
   type ResolveBehaviorState,
   type StateSignals,
 } from '../../../core/composition/create-composition';
-import { declareInputs } from '../../../core/composition/declare-inputs';
 import { makeShareSignalsFor, type ShareSignalsConfig } from '../../../core/composition/share-signals';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import type { Reschedule } from '../../../core/tasks/task';
@@ -91,17 +90,6 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
 // ============================================================================
 // HLS Engine State & Context
 // ============================================================================
-
-/**
- * State the HLS playback engine reads but no composed behavior declares: the consumer's track selections and
- * remote-playback opt-out, written through the adapter.
- */
-const hlsVideoEngineInputs = declareInputs<UserTrackSelectionInputs & RemotePlaybackInputs>()([
-  'userVideoTrackSelection',
-  'userAudioTrackSelection',
-  'userTextTrackSelection',
-  'disableRemotePlayback',
-]);
 
 /**
  * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
@@ -237,16 +225,24 @@ const hlsVideoEngineBehaviors = [
   // a hidden `chapters` track per language, the preferred subtitle
   // language leading. Cues live on the element; no state signal.
   loadChapters,
-
-  // Consumer inputs: written through the adapter, read by the behaviors above.
-  hlsVideoEngineInputs,
 ] as const;
 
-/** State shape for the HLS playback engine: every state key its behaviors declare. */
-export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
+/**
+ * Shares the engine's signals with the adapter, and declares the state the HLS playback engine reads but no composed
+ * behavior declares: the consumer's track selections and remote-playback opt-out, written through the adapter.
+ */
+const shareSignals = makeShareSignalsFor<
+  typeof hlsVideoEngineBehaviors,
+  UserTrackSelectionInputs & RemotePlaybackInputs
+>()({
+  state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
+});
+
+/** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
+export type HlsVideoEngineState = ResolveBehaviorState<[...typeof hlsVideoEngineBehaviors, typeof shareSignals]>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type HlsVideoEngineContext = ResolveBehaviorContext<typeof hlsVideoEngineBehaviors>;
+export type HlsVideoEngineContext = ResolveBehaviorContext<[...typeof hlsVideoEngineBehaviors, typeof shareSignals]>;
 
 /**
  * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
@@ -434,8 +430,6 @@ export interface HlsVideoEngineConfig<
 // ============================================================================
 // HLS Playback Engine
 // ============================================================================
-
-const shareSignals = makeShareSignalsFor<typeof hlsVideoEngineBehaviors>();
 
 /**
  * Create an HLS playback engine.

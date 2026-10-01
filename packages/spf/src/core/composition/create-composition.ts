@@ -102,7 +102,7 @@ type DepsOf<B> = B extends { setup: (deps: infer D, ...args: any[]) => any } ? D
  */
 // see comment above
 // oxlint-disable-next-line typescript/no-empty-object-type
-type Empty = {};
+export type Empty = {};
 
 /**
  * Unwrap a signal map back to its state/context shape.

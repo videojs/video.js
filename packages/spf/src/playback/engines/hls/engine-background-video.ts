@@ -77,16 +77,23 @@ const backgroundVideoEngineBehaviors = [
   endOfStream,
 ] as const;
 
+/** Shares the engine's signals with the adapter. */
+const shareSignals = makeShareSignalsFor<typeof backgroundVideoEngineBehaviors>()({});
+
 /**
- * State shape for the background-video playback engine: every state key its behaviors declare.
+ * State shape for the background-video playback engine: every state key its behaviors and inputs declare.
  *
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
  */
-export type BackgroundVideoEngineState = ResolveBehaviorState<typeof backgroundVideoEngineBehaviors>;
+export type BackgroundVideoEngineState = ResolveBehaviorState<
+  [...typeof backgroundVideoEngineBehaviors, typeof shareSignals]
+>;
 
 /** Context shape for the background-video playback engine: every context key its behaviors declare. */
-export type BackgroundVideoEngineContext = ResolveBehaviorContext<typeof backgroundVideoEngineBehaviors>;
+export type BackgroundVideoEngineContext = ResolveBehaviorContext<
+  [...typeof backgroundVideoEngineBehaviors, typeof shareSignals]
+>;
 
 /**
  * The composition signal refs handed to `onSignalsReady` callers — the canonical way to drive the engine externally
@@ -141,8 +148,6 @@ export interface BackgroundVideoEngineConfig extends ShareSignalsConfig<
 // ============================================================================
 // Background-video playback engine
 // ============================================================================
-
-const shareSignals = makeShareSignalsFor<typeof backgroundVideoEngineBehaviors>();
 
 /**
  * Create a background-video playback engine.

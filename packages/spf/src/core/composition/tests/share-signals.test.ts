@@ -64,16 +64,48 @@ describe('makeShareSignals', () => {
 });
 
 describe('makeShareSignalsFor', () => {
-  it('passes the composition refs of the behaviors it follows to onSignalsReady', async () => {
-    const counter = {
-      stateKeys: ['count'] as const,
-      contextKeys: ['element'] as const,
-      setup: (_deps: { state: StateSignals<State>; context: ContextSignals<Context> }) => {},
-    };
-    const behaviors = [counter] as const;
-    let captured: { state: StateSignals<{ count: number | undefined }> } | undefined;
+  // Declares `count` and `element`; reads nothing it doesn't declare.
+  const counter = {
+    stateKeys: ['count'] as const,
+    contextKeys: ['element'] as const,
+    setup: (_deps: { state: StateSignals<State>; context: ContextSignals<Context> }) => {},
+  };
+  const behaviors = [counter] as const;
 
-    const composition = createComposition([...behaviors, makeShareSignalsFor<typeof behaviors>()], {
+  interface StateInputs {
+    userChoice?: string;
+  }
+  interface ContextInputs {
+    host?: { id: string };
+  }
+
+  it('declares the input keys, and only those', () => {
+    const shareSignals = makeShareSignalsFor<typeof behaviors, StateInputs, ContextInputs>()({
+      state: ['userChoice'],
+      context: ['host'],
+    });
+
+    expect(shareSignals.stateKeys).toEqual(['userChoice']);
+    expect(shareSignals.contextKeys).toEqual(['host']);
+  });
+
+  it('declares no keys when there are no inputs', () => {
+    const shareSignals = makeShareSignalsFor<typeof behaviors>()({});
+
+    expect(shareSignals.stateKeys).toEqual([]);
+    expect(shareSignals.contextKeys).toEqual([]);
+  });
+
+  it('passes the composition refs, inputs included, to onSignalsReady', async () => {
+    const shareSignals = makeShareSignalsFor<typeof behaviors, StateInputs, ContextInputs>()({
+      state: ['userChoice'],
+      context: ['host'],
+    });
+    let captured:
+      | Parameters<NonNullable<Parameters<typeof shareSignals.setup>[0]['config']['onSignalsReady']>>[0]
+      | undefined;
+
+    const composition = createComposition([...behaviors, shareSignals], {
       config: {
         onSignalsReady: (signals) => {
           captured = signals;
@@ -82,14 +114,13 @@ describe('makeShareSignalsFor', () => {
     });
 
     expect(captured?.state.count).toBe(composition.state.count);
+    expect(captured?.state.userChoice).toBe(composition.state.userChoice);
+    expect(captured?.context.host).toBe(composition.context.host);
+
+    captured?.state.userChoice.set('en');
+
+    expect(composition.state.userChoice.get()).toBe('en');
 
     await composition.destroy();
-  });
-
-  it('declares no stateKeys or contextKeys (passthrough behavior)', () => {
-    const shareSignals = makeShareSignalsFor<[]>();
-
-    expect(shareSignals.stateKeys).toEqual([]);
-    expect(shareSignals.contextKeys).toEqual([]);
   });
 });
