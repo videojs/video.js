@@ -1,5 +1,5 @@
 import { flush } from '@videojs/store';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { createPopupGroup } from '../group';
 import { createTestPopover } from './helpers';
@@ -8,13 +8,11 @@ function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe('createPopover', () => {
-  it('starts closed', () => {
-    const { popover } = createTestPopover();
-
-    expect(popover.input.current).toEqual({ active: false, status: 'idle' });
-  });
-
   describe('open/close', () => {
     it('can defer open changes until the owner commits them', () => {
       const { popover, onOpenChange } = createTestPopover({ deferOpenChanges: true });
@@ -80,16 +78,8 @@ describe('createPopover', () => {
 
       popover.open();
 
-      expect(popover.input.current.active).toBe(true);
-      expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'click' });
-    });
-
-    it('transitions to starting status when opening', () => {
-      const { popover } = createTestPopover();
-
-      popover.open();
-
       expect(popover.input.current).toEqual({ active: true, status: 'starting' });
+      expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'click' });
     });
 
     it('calls onOpenChange when closing', () => {
@@ -101,17 +91,8 @@ describe('createPopover', () => {
       popover.close();
 
       // active stays true until close animation completes
-      expect(popover.input.current.active).toBe(true);
-      expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'click' });
-    });
-
-    it('transitions to ending status when closing', () => {
-      const { popover } = createTestPopover();
-
-      popover.open();
-      popover.close();
-
       expect(popover.input.current).toEqual({ active: true, status: 'ending' });
+      expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'click' });
     });
 
     it('does not call onOpenChange if already open', () => {
@@ -152,14 +133,6 @@ describe('createPopover', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'imperative-action' });
     });
 
-    it('ignores imperative close while already closed', () => {
-      const { popover, onOpenChange } = createTestPopover();
-
-      popover.close('imperative-action');
-
-      expect(onOpenChange).not.toHaveBeenCalled();
-    });
-
     it('closes the previously open grouped popover when another opens', () => {
       const group = createPopupGroup();
       const first = createTestPopover({ group: () => group });
@@ -194,7 +167,12 @@ describe('createPopover', () => {
       const second = createTestPopover({ group: () => group });
 
       first.popover.open();
+      const onGroupChange = vi.fn();
+      const unsubscribe = group.subscribe(onGroupChange);
+
       first.popover.destroy();
+      expect(onGroupChange).toHaveBeenCalledOnce();
+      unsubscribe();
       first.onOpenChange.mockClear();
 
       second.popover.open();
@@ -308,8 +286,6 @@ describe('createPopover', () => {
 
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(popover.input.current.active).toBe(false);
-
-      vi.unstubAllGlobals();
     });
 
     it('does not open via focus on touch devices when openOnHover is enabled', () => {
@@ -326,8 +302,6 @@ describe('createPopover', () => {
       popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
 
       expect(onOpenChange).not.toHaveBeenCalled();
-
-      vi.unstubAllGlobals();
     });
 
     it('does not open via focus when pointer is not fine', () => {
@@ -344,8 +318,6 @@ describe('createPopover', () => {
       popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
 
       expect(onOpenChange).not.toHaveBeenCalled();
-
-      vi.unstubAllGlobals();
     });
 
     it('opens via focus when hover and fine pointer are supported', () => {
@@ -362,28 +334,6 @@ describe('createPopover', () => {
       popover.triggerProps.onFocusIn({ relatedTarget: null, preventDefault: vi.fn(), stopPropagation: vi.fn() });
 
       expect(onOpenChange).toHaveBeenCalledWith(true, { reason: 'focus' });
-
-      vi.unstubAllGlobals();
-    });
-  });
-
-  describe('element setters', () => {
-    it('sets trigger element', () => {
-      const { popover } = createTestPopover();
-      const el = document.createElement('button');
-
-      popover.setTriggerElement(el);
-      popover.setTriggerElement(null);
-      // Should not throw
-    });
-
-    it('sets and clears popup element', () => {
-      const { popover } = createTestPopover();
-      const el = document.createElement('div');
-
-      popover.setPopupElement(el);
-      popover.setPopupElement(null);
-      // Should not throw
     });
   });
 
@@ -478,7 +428,7 @@ describe('createPopover', () => {
   });
 
   describe('focusout', () => {
-    it('keeps the popover open when blur follows an inside pointerdown', () => {
+    it('keeps the popover open when blur follows an inside pointerdown', async () => {
       const { popover, onOpenChange } = createTestPopover();
       const popup = document.createElement('div');
       const child = document.createElement('button');
@@ -497,6 +447,9 @@ describe('createPopover', () => {
         preventDefault: vi.fn(),
         stopPropagation: vi.fn(),
       });
+
+      await nextFrame();
+      await nextFrame();
 
       expect(onOpenChange).not.toHaveBeenCalledWith(false, expect.anything());
 
@@ -571,21 +524,6 @@ describe('createPopover', () => {
 
       expect(onOpenChange).not.toHaveBeenCalled();
       expect(popover.input.current.active).toBe(false);
-    });
-  });
-
-  describe('subscriber notification', () => {
-    it('notifies subscribers when opened', () => {
-      const { popover } = createTestPopover();
-      const callback = vi.fn();
-
-      popover.input.subscribe(callback);
-
-      popover.open();
-      flush();
-
-      expect(callback).toHaveBeenCalled();
-      expect(popover.input.current.active).toBe(true);
     });
   });
 });

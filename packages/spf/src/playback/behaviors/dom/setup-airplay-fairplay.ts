@@ -193,6 +193,9 @@ function setupAirPlayFairPlaySetup({
           /** Non-sticky, per session: nothing here sniffs an OS, so a fixed WebKit simply stops taking this path. */
           let useLegacy = false;
 
+          /** Only requests from the reloaded resource can use the legacy CDM. */
+          let legacyReady = false;
+
           // Fetched once and shared by both paths. EME hands it to the CDM;
           // the legacy API packs it into the session's init data instead, which
           // is why it is mandatory there and merely usual here.
@@ -370,8 +373,7 @@ function setupAirPlayFairPlaySetup({
 
           /**
            * Hand the session over to the legacy API. EME has to release the element's keys before the old API can claim
-           * them, and the request it failed on is not re-issued — but `webkitneedkey` has already delivered the same
-           * key request, so the cached payload is what resumes the exchange.
+           * them, and reloading the resource supplies the fresh `webkitneedkey` payload that resumes the exchange.
            */
           const fallBackToLegacy = async (error: unknown) => {
             if (useLegacy) return;
@@ -461,6 +463,7 @@ function setupAirPlayFairPlaySetup({
             );
 
             mediaElement.load();
+            legacyReady = true;
           };
 
           const serve = async (initDataType: string, initData: Uint8Array<ArrayBuffer>) => {
@@ -486,7 +489,7 @@ function setupAirPlayFairPlaySetup({
             });
           };
 
-          // Armed from entry but inert until the handover, so the old key
+          // Armed from entry but inert until the reload completes, so the old key
           // system is never installed on a sender whose EME works. Both events
           // fire for the same key; after the reload it is this one that carries
           // the request the legacy CDM can serve.
@@ -495,7 +498,7 @@ function setupAirPlayFairPlaySetup({
             'webkitneedkey',
             (event) => {
               const { initData } = event as MediaEncryptedEvent;
-              if (!initData || !useLegacy) return;
+              if (!initData || !legacyReady) return;
 
               void serveLegacy(initData);
             },

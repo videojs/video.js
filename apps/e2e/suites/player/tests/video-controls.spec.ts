@@ -233,7 +233,8 @@ for (const { name, path } of UI_VIDEO_PAGES) {
 
       await page.mouse.move(x, y);
       await page.mouse.down();
-      await page.mouse.move(x + 1, y);
+      await page.mouse.move(box.x + box.width * 0.6, y);
+      await expect(player.timeSlider).toHaveAttribute(DATA_ATTRS.dragging, '');
       await page.mouse.up();
 
       await expect(player.timeSlider).not.toHaveAttribute(DATA_ATTRS.dragging);

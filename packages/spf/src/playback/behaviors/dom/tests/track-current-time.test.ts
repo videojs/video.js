@@ -48,23 +48,6 @@ describe('trackCurrentTime', () => {
     cleanup();
   });
 
-  it('updates currentTime on timeupdate events', async () => {
-    const mediaElement = document.createElement('video');
-
-    Object.defineProperty(mediaElement, 'currentTime', { value: 0, writable: true });
-
-    const { state, cleanup } = setupTrackCurrentTime({}, { mediaElement });
-
-    (mediaElement as any).currentTime = 10.0;
-    mediaElement.dispatchEvent(new Event('timeupdate'));
-
-    await vi.waitFor(() => {
-      expect(state.currentTime.get()).toBe(10.0);
-    });
-
-    cleanup();
-  });
-
   it('continues tracking on subsequent timeupdate events', async () => {
     const mediaElement = document.createElement('video');
 

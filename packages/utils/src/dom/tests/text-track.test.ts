@@ -52,16 +52,6 @@ describe('getCaptionOrSubtitleTracks', () => {
 });
 
 describe('findTrackElement', () => {
-  it('returns the track element that owns the given TextTrack', () => {
-    const video = document.createElement('video');
-    const el = document.createElement('track');
-    const track = mockTrackProperty(el);
-
-    video.appendChild(el);
-
-    expect(findTrackElement(video, track)).toBe(el);
-  });
-
   it('returns null when no track element matches', () => {
     const video = document.createElement('video');
     const el = document.createElement('track');

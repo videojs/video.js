@@ -22,7 +22,7 @@ import { HlsJsPreloadMixin } from './preload';
 import { HlsJsStreamTypeMixin } from './stream-type';
 import { HlsJsTextTracksMixin, withPreservedTextTracks } from './text-tracks';
 
-export const defaultHlsConfig: Partial<HlsConfig> = {
+const defaultHlsConfig: Partial<HlsConfig> = {
   backBufferLength: 30,
   renderTextTracksNatively: false,
   liveDurationInfinity: true,

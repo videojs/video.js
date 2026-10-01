@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { combine } from '../combine';
+import { StoreError } from '../errors';
 import { defineSlice } from '../slice';
 import { flush } from '../state';
 import { createStore, isStore } from '../store';
 
-describe('store', () => {
+describe('createStore', () => {
   // Mock target that mimics HTMLVideoElement
   class MockMedia extends EventTarget {
     volume = 1;
@@ -41,35 +41,60 @@ describe('store', () => {
     },
   });
 
-  const playbackSlice = defineSlice<MockMedia>()({
-    state: ({ target }) => ({
-      paused: true,
-      play() {
-        target().play();
-        target().paused = false;
-      },
-      pause() {
-        target().pause();
-        target().paused = true;
-      },
-    }),
+  it('full lifecycle: create → attach → use → detach → destroy', () => {
+    const events: string[] = [];
 
-    attach({ target, set }) {
-      set({ paused: target.paused });
-    },
+    class Target extends EventTarget {
+      value = 0;
+    }
+
+    const slice = defineSlice<Target>()({
+      state: ({ target }) => ({
+        count: 0,
+        increment() {
+          target().value++;
+          target().dispatchEvent(new Event('change'));
+          events.push('increment');
+        },
+      }),
+
+      attach({ target: t, signal, set }) {
+        events.push('attach-slice');
+        set({ count: t.value });
+
+        t.addEventListener('change', () => set({ count: t.value }), { signal });
+        signal.addEventListener('abort', () => events.push('unsubscribe'));
+      },
+    });
+
+    const store = createStore<Target>()(slice, {
+      onSetup: () => events.push('setup'),
+      onAttach: () => events.push('attach'),
+    });
+
+    expect(events).toEqual(['setup']);
+
+    const targetInstance = new Target();
+
+    targetInstance.value = 5;
+    const detach = store.attach(targetInstance);
+
+    expect(events).toEqual(['setup', 'attach-slice', 'attach']);
+    expect(store.state.count).toBe(5);
+
+    store.increment();
+    expect(store.state.count).toBe(6);
+    expect(events).toContain('increment');
+
+    detach();
+    expect(events).toContain('unsubscribe');
+    expect(store.target).toBeNull();
+
+    store.destroy();
+    expect(store.destroyed).toBe(true);
   });
 
   describe('creation', () => {
-    it('creates store with merged initial state', () => {
-      const store = createStore<MockMedia>()(combine(audioSlice, playbackSlice));
-
-      expect(store.state).toMatchObject({
-        volume: 1,
-        muted: false,
-        paused: true,
-      });
-    });
-
     it('exposes $state container matching store.state', () => {
       const store = createStore<MockMedia>()(audioSlice);
       const media = new MockMedia();
@@ -138,17 +163,6 @@ describe('store', () => {
       });
     });
 
-    it('sets up subscriptions', () => {
-      const store = createStore<MockMedia>()(audioSlice);
-
-      const media = new MockMedia();
-      const addListenerSpy = vi.spyOn(media, 'addEventListener');
-
-      store.attach(media);
-
-      expect(addListenerSpy).toHaveBeenCalledWith('volumechange', expect.any(Function));
-    });
-
     it('detach cleans up', () => {
       const store = createStore<MockMedia>()(audioSlice);
 
@@ -195,10 +209,11 @@ describe('store', () => {
       expect(media.volume).toBe(0.5);
     });
 
-    it('throws StoreError without target', () => {
+    it('throws NO_TARGET when an action needs an unattached target', () => {
       const store = createStore<MockMedia>()(audioSlice, { onError: () => {} });
 
-      expect(() => store.setVolume(0.5)).toThrow();
+      expect(() => store.setVolume(0.5)).toThrow(StoreError);
+      expect(() => store.setVolume(0.5)).toThrow(expect.objectContaining({ code: 'NO_TARGET' }));
     });
   });
 
@@ -360,8 +375,9 @@ describe('store', () => {
 
     it('does not commit source state when a derived formula throws', () => {
       const throwingSlice = defineSlice<MockMedia>()({
-        state: ({ set }) => ({
+        state: ({ set, get }) => ({
           value: 1,
+          readSourceValue: () => get().value,
           setValue: (value: number) => set({ value }),
         }),
         derived: {
@@ -383,6 +399,7 @@ describe('store', () => {
 
       expect(store.doubled).toBe(2);
       expect(store.state.value).toBe(1);
+      expect(store.readSourceValue()).toBe(1);
       expect(listener).not.toHaveBeenCalled();
     });
   });
@@ -405,7 +422,8 @@ describe('store', () => {
 
       store.destroy();
 
-      expect(() => store.attach(new MockMedia())).toThrow();
+      expect(() => store.attach(new MockMedia())).toThrow(StoreError);
+      expect(() => store.attach(new MockMedia())).toThrow(expect.objectContaining({ code: 'DESTROYED' }));
     });
   });
 
@@ -449,43 +467,99 @@ describe('store', () => {
       expect(listener).not.toHaveBeenCalled();
     });
 
-    it('calls onError for action errors', () => {
+    it('reports synchronous action errors to onError and rethrows', () => {
+      const error = new Error('action failed');
       const onError = vi.fn();
-
       const failingSlice = defineSlice<MockMedia>()({
-        state: ({ target }) => ({
-          value: 0,
+        state: () => ({
           fail() {
-            target(); // This will throw NO_TARGET
+            throw error;
           },
         }),
       });
-
       const store = createStore<MockMedia>()(failingSlice, { onError });
 
-      // No target attached, so target() will throw
-      expect(() => store.fail()).toThrow();
+      try {
+        expect(() => store.fail()).toThrow(error);
+        expect(onError).toHaveBeenCalledOnce();
+        expect(onError).toHaveBeenCalledWith({ store, error });
+      } finally {
+        store.destroy();
+      }
+    });
+
+    it('reports rejected async actions to onError once and still rejects', async () => {
+      const error = new Error('play failed');
+      const onError = vi.fn();
+      const failingSlice = defineSlice<MockMedia>()({
+        state: () => ({
+          async play() {
+            throw error;
+          },
+        }),
+      });
+      const store = createStore<MockMedia>()(failingSlice, { onError });
+
+      try {
+        await expect(store.play()).rejects.toBe(error);
+        expect(onError).toHaveBeenCalledOnce();
+        expect(onError).toHaveBeenCalledWith({ store, error });
+      } finally {
+        store.destroy();
+      }
+    });
+
+    it('leaves action failures to the caller without onError', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const failingSlice = defineSlice<MockMedia>()({
+        state: () => ({
+          fail() {
+            throw new Error('sync');
+          },
+          async play() {
+            throw new Error('async');
+          },
+        }),
+      });
+      const store = createStore<MockMedia>()(failingSlice);
+
+      try {
+        expect(() => store.fail()).toThrow('sync');
+        await expect(store.play()).rejects.toThrow('async');
+        expect(consoleError).not.toHaveBeenCalled();
+      } finally {
+        store.destroy();
+        consoleError.mockRestore();
+      }
+    });
+
+    it.each(['onSetup', 'onAttach'] as const)('reports an action error thrown inside %s once', (callback) => {
+      const error = new Error('action failed');
+      const onError = vi.fn();
+      const failingSlice = defineSlice<MockMedia>()({
+        state: () => ({
+          fail() {
+            throw error;
+          },
+        }),
+      });
+      const store = createStore<MockMedia>()(failingSlice, {
+        onError,
+        [callback]: ({ store }: { store: { fail: () => void } }) => store.fail(),
+      });
+
+      try {
+        if (callback === 'onAttach') store.attach(new MockMedia());
+
+        expect(onError).toHaveBeenCalledOnce();
+        expect(onError).toHaveBeenCalledWith({ store, error });
+      } finally {
+        store.destroy();
+      }
     });
   });
 
   describe('signals', () => {
-    it('signals.base returns AbortSignal', () => {
-      const slice = defineSlice<MockMedia>()({
-        state: ({ signals }) => ({
-          getBase: () => signals.base,
-        }),
-      });
-
-      const store = createStore<MockMedia>()(slice);
-
-      store.attach(new MockMedia());
-
-      const sig = store.getBase();
-
-      expect(sig).toBeInstanceOf(AbortSignal);
-      expect(sig.aborted).toBe(false);
-    });
-
     it('signals.base aborts on detach', () => {
       const slice = defineSlice<MockMedia>()({
         state: ({ signals }) => ({
@@ -525,41 +599,6 @@ describe('store', () => {
       expect(sig.aborted).toBe(true);
     });
 
-    it('signals.supersede() returns AbortSignal combined with base', () => {
-      const slice = defineSlice<MockMedia>()({
-        state: ({ signals }) => ({
-          supersede: (key: string) => signals.supersede(key),
-        }),
-      });
-
-      const store = createStore<MockMedia>()(slice);
-
-      store.attach(new MockMedia());
-
-      const sig = store.supersede('test');
-
-      expect(sig).toBeInstanceOf(AbortSignal);
-      expect(sig.aborted).toBe(false);
-    });
-
-    it('signals.supersede() aborts previous signal for same key', () => {
-      const slice = defineSlice<MockMedia>()({
-        state: ({ signals }) => ({
-          supersede: (key: string) => signals.supersede(key),
-        }),
-      });
-
-      const store = createStore<MockMedia>()(slice);
-
-      store.attach(new MockMedia());
-
-      const sig1 = store.supersede('seek');
-      const sig2 = store.supersede('seek');
-
-      expect(sig1.aborted).toBe(true);
-      expect(sig2.aborted).toBe(false);
-    });
-
     it('signals.supersede() aborts on detach', () => {
       const slice = defineSlice<MockMedia>()({
         state: ({ signals }) => ({
@@ -577,28 +616,6 @@ describe('store', () => {
       detach();
 
       expect(sig.aborted).toBe(true);
-    });
-
-    it('signals.clear() aborts keyed signals but not base', () => {
-      const slice = defineSlice<MockMedia>()({
-        state: ({ signals }) => ({
-          getBase: () => signals.base,
-          supersede: (key: string) => signals.supersede(key),
-          clear: () => signals.clear(),
-        }),
-      });
-
-      const store = createStore<MockMedia>()(slice);
-
-      store.attach(new MockMedia());
-
-      const base = store.getBase();
-      const keyed = store.supersede('test');
-
-      store.clear();
-
-      expect(base.aborted).toBe(false);
-      expect(keyed.aborted).toBe(true);
     });
   });
 });

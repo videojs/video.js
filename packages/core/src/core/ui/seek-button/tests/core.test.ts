@@ -24,35 +24,6 @@ function createState(overrides: Partial<SeekButtonState> = {}): SeekButtonState 
 }
 
 describe('SeekButtonCore', () => {
-  describe('setProps', () => {
-    it('uses default props', () => {
-      const core = new SeekButtonCore();
-
-      core.setMedia(createMediaState());
-      const state = core.getState();
-
-      expect(state.direction).toBe('forward');
-    });
-
-    it('accepts constructor props', () => {
-      const core = new SeekButtonCore({ seconds: -10 });
-
-      core.setMedia(createMediaState());
-      const state = core.getState();
-
-      expect(state.direction).toBe('backward');
-    });
-
-    it('accepts disabled via constructor', () => {
-      const core = new SeekButtonCore({ disabled: true });
-
-      core.setMedia(createMediaState());
-      const attrs = core.getAttrs(core.getState());
-
-      expect(attrs['aria-disabled']).toBe('true');
-    });
-  });
-
   describe('getState', () => {
     it('projects seeking from media state', () => {
       const core = new SeekButtonCore();
@@ -100,13 +71,6 @@ describe('SeekButtonCore', () => {
         key: 'seek.backward',
         text: 'Seek backward {seconds} seconds',
       });
-    });
-
-    it('uses absolute value in backward label', () => {
-      const core = new SeekButtonCore({ seconds: -30 });
-      const label = core.getLabel(createState({ direction: 'backward' }));
-
-      expect(label).toMatchObject({ key: 'seek.backward', text: 'Seek backward {seconds} seconds' });
     });
 
     it('returns custom string label', () => {

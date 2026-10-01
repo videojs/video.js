@@ -279,7 +279,8 @@ describe('createMachineActor — runner', () => {
 
     actor.send({ type: 'go' });
 
-    expect('runner' in (capturedCtx ?? {})).toBe(false);
+    expect(capturedCtx).toBeDefined();
+    expect(capturedCtx).not.toHaveProperty('runner');
 
     actor.destroy();
   });
@@ -368,6 +369,7 @@ describe('createMachineActor — runner', () => {
 
   it('onSettled generation-token: rescheduling supersedes the stale callback', async () => {
     let resolveFirst!: () => void;
+    let resolveReplacement!: () => void;
 
     const actor = createMachineActor<'idle' | 'loading', Record<string, never>, { type: 'load' }, () => SerialRunner>({
       runner: () => new SerialRunner(),
@@ -393,34 +395,35 @@ describe('createMachineActor — runner', () => {
           on: {
             load: (_, { runner }) => {
               runner.abortAll();
-              // Schedule a fast task — re-registers onSettled with the new chain.
-              // SerialRunner is serial, so the fast task is chained after the slow one.
-              runner.schedule(new Task(async () => {}));
+              runner.schedule(
+                new Task(
+                  () =>
+                    new Promise<void>((resolve) => {
+                      resolveReplacement = resolve;
+                    })
+                )
+              );
             },
           },
         },
       },
     });
 
-    // First load — enters loading with a paused slow task
-    actor.send({ type: 'load' });
-    // Wait for the task to actually start running so resolveFirst is assigned
-    await vi.waitFor(() => expect(resolveFirst).toBeDefined());
+    try {
+      actor.send({ type: 'load' });
+      await vi.waitFor(() => expect(resolveFirst).toBeDefined());
+      actor.send({ type: 'load' });
+      resolveFirst();
 
-    // Second load: aborts slow task, schedules fast task (chained after slow in SerialRunner)
-    actor.send({ type: 'load' });
+      await vi.waitFor(() => expect(resolveReplacement).toBeDefined());
+      expect(actor.snapshot.get().value).toBe('loading');
 
-    // Unblock the slow task — it completes, then the fast task runs to completion.
-    // The slow task's stale settled callback fires first (runner.settled !== settled1 → no-op).
-    // The fast task's settled callback fires second (runner.settled === settled2 → transitions).
-    resolveFirst();
-
-    await vi.waitFor(() => {
-      expect(actor.snapshot.get().value).toBe('idle');
-    });
-
-    expect(actor.snapshot.get().value).toBe('idle'); // exactly one transition, not two
-
-    actor.destroy();
+      resolveReplacement();
+      await vi.waitFor(() => expect(actor.snapshot.get().value).toBe('idle'));
+    } finally {
+      resolveFirst?.();
+      resolveReplacement?.();
+      actor.destroy();
+    }
   });
 });

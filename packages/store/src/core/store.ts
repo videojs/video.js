@@ -1,4 +1,4 @@
-import { isNull, isObject } from '@videojs/utils/predicate';
+import { isFunction, isNull, isObject, isPromise } from '@videojs/utils/predicate';
 
 import { AbortControllerRegistry } from './abort-controller-registry';
 import type { StoreCallbacks } from './config';
@@ -44,6 +44,11 @@ export function createStore<Target = unknown>(): StoreFactory<Target> {
 
     const setupAbort = new AbortController();
     const signals = new AbortControllerRegistry();
+
+    // Stable wrappers keep unchanged public snapshots from notifying subscribers.
+    const actions = new WeakMap<(...args: any[]) => any, (...args: any[]) => any>();
+    // An action error is reported where it is thrown; enclosing actions and lifecycle callbacks rethrow it unreported.
+    const reportedErrors = new WeakSet<object>();
 
     let sourceState: Readonly<SourceState>;
 
@@ -141,7 +146,38 @@ export function createStore<Target = unknown>(): StoreFactory<Target> {
         result[key] = source[key as keyof SourceState];
       }
 
-      return Object.assign(result, derived) as PublicState;
+      Object.assign(result, derived);
+
+      for (const key of Object.keys(result)) {
+        const value = result[key];
+
+        if (isFunction(value)) result[key] = wrapAction(value);
+      }
+
+      return result as PublicState;
+    }
+
+    function wrapAction(action: (...args: any[]) => any) {
+      const cached = actions.get(action);
+      if (cached) return cached;
+
+      // Callers receive action failures directly; a configured `onError` also observes them, sync or async.
+      const wrapped = function (this: unknown, ...args: unknown[]) {
+        try {
+          const result = action.apply(this, args);
+
+          if (options.onError && isPromise(result)) result.catch(reportError);
+
+          return result;
+        } catch (error) {
+          if (options.onError) reportError(error);
+
+          throw error;
+        }
+      };
+
+      actions.set(action, wrapped);
+      return wrapped;
     }
 
     function setSource(partial: Partial<SourceState>): void {
@@ -231,6 +267,12 @@ export function createStore<Target = unknown>(): StoreFactory<Target> {
     }
 
     function reportError(error: unknown): void {
+      if (isObject(error)) {
+        if (reportedErrors.has(error)) return;
+
+        reportedErrors.add(error);
+      }
+
       if (options.onError) {
         options.onError({ store, error });
       } else {

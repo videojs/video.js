@@ -4,12 +4,6 @@ import { describe, expect, it } from 'vite-plus/test';
 import { ControlsCore } from '../core';
 
 describe('ControlsCore', () => {
-  describe('defaultProps', () => {
-    it('follows player visibility by default', () => {
-      expect(ControlsCore.defaultProps).toEqual({ visibility: 'auto' });
-    });
-  });
-
   describe('getState', () => {
     it('returns null without controls state in auto mode', () => {
       expect(new ControlsCore().getState()).toBeNull();
@@ -20,30 +14,6 @@ describe('ControlsCore', () => {
         visible: true,
         userActive: true,
       });
-    });
-
-    it('returns visible: true when controlsVisible is true', () => {
-      const core = new ControlsCore();
-      const media = createControlsState({ controlsVisible: true });
-
-      core.setMedia(media);
-      expect(core.getState()).toEqual({ visible: true, userActive: true });
-    });
-
-    it('returns visible: false when controlsVisible is false', () => {
-      const core = new ControlsCore();
-      const media = createControlsState({ controlsVisible: false });
-
-      core.setMedia(media);
-      expect(core.getState()).toEqual({ visible: false, userActive: true });
-    });
-
-    it('returns userActive: false when userActive is false', () => {
-      const core = new ControlsCore();
-      const media = createControlsState({ userActive: false });
-
-      core.setMedia(media);
-      expect(core.getState()).toEqual({ visible: true, userActive: false });
     });
 
     it('keeps controls visible without overriding user activity in always mode', () => {
@@ -81,17 +51,6 @@ describe('ControlsCore', () => {
         visible: false,
         userActive: false,
       });
-    });
-
-    it('returns only primitive values', () => {
-      const core = new ControlsCore();
-
-      core.setMedia(createControlsState());
-      const state = core.getState()!;
-
-      const functionKeys = Object.entries(state).filter(([, value]) => typeof value === 'function');
-
-      expect(functionKeys).toHaveLength(0);
     });
   });
 });

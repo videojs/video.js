@@ -5,8 +5,9 @@
  * `seekable` is empty under `duration === Infinity`).
  *
  * The live window comes from `liveWindowFromState` (the shared derivation — the intersection over the selected A/V
- * tracks' windows); inert when it returns `null` (VoD / ended live). Composed _before_ `seekToLiveEdge` so the range is
- * declared before that behavior seeks the playhead into it (a seek outside `seekable` is clamped).
+ * tracks' windows); inert when it returns `null` (VoD / ended live). Clamp the start to presentation-0 and skip windows
+ * ending at or before it. Composed _before_ `seekToLiveEdge` so the range is declared before that behavior seeks the
+ * playhead into it (a seek outside `seekable` is clamped).
  *
  * Duration is owned solely by `updateMediaSourceDuration`; this behavior only declares the seekable range
  * (`setLiveSeekableRange` requires only `readyState === 'open'` per the W3C MSE spec, not a set `duration`).
@@ -52,16 +53,20 @@ function syncLiveSeekableRangeSetup({
     const liveWindow = liveWindowFromState(state);
     if (!mediaSource || !liveWindow) return;
 
+    // An earlier audio window can stand alone after video is deselected;
+    // native MSE ranges cannot start before presentation-0.
+    const start = Math.max(0, liveWindow.start);
+    if (start >= liveWindow.end) return;
+
     // Re-declared as the window slides so seekable tracks the live window
     // (the full DVR range remains seekable; seek-to-live-edge starts near the edge).
     // No readyState check, no try/catch: `setLiveSeekableRange` throws only on a
     // non-'open' readyState or an invalid range, and neither can occur here —
     // `setupMediaSource` publishes `context.mediaSource` only while open, and a
     // non-null live window means the timeline-bearing track is still `Infinity`
-    // (so `endOfStream` hasn't ended the MS); `liveWindowFromState` guarantees
-    // 0 ≤ start < end (the reference type's window starts ≥ 0, and the A/V
-    // intersection `max`-clamps a non-reference track's negative early start).
-    mediaSource.setLiveSeekableRange(liveWindow.start, liveWindow.end);
+    // (so `endOfStream` hasn't ended the MS); the clamp above ensures
+    // 0 ≤ start < end.
+    mediaSource.setLiveSeekableRange(start, liveWindow.end);
   });
 }
 

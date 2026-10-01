@@ -38,8 +38,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-/** Wait for the controller to be built, which is when it swaps the iframe out. */
-async function waitForSwap(): Promise<MockController> {
+/** Wait for the controller to be built and retargeted to the rendered iframe. */
+async function waitForController(): Promise<MockController> {
   await waitFor(() => {
     if (!MockController.instances.length) throw new Error('controller not created yet');
   });
@@ -60,9 +60,9 @@ describe('SpotifyAudio', () => {
     expect(iframe.style.display).toBe('');
   });
 
-  it('keeps the embed on the iframe the controller swapped in', async () => {
+  it('keeps the controller on the iframe React rendered', async () => {
     const { container } = render(<SpotifyAudio src={TRACK_URL} />);
-    const controller = await waitForSwap();
+    const controller = await waitForController();
 
     const iframe = container.querySelector('iframe')!;
 
@@ -71,13 +71,12 @@ describe('SpotifyAudio', () => {
     expect(iframe.style.display).toBe('none');
   });
 
-  it('unmounts without throwing after the controller replaces its iframe', async () => {
+  it('unmounts without throwing after the controller adopts the React iframe', async () => {
     const { container, unmount } = render(<SpotifyAudio src={TRACK_URL} />);
 
-    await waitForSwap();
+    await waitForController();
 
-    // React removes the node it rendered, which the swap took out of the document;
-    // unmounting throws unless the media puts that node back first.
+    // Controller cleanup leaves the rendered node for React to remove.
     expect(() => unmount()).not.toThrow();
     expect(container.querySelector('iframe')).toBe(null);
   });

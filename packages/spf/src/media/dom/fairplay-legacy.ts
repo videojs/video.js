@@ -134,8 +134,12 @@ export function openLegacyLicenseSession({
     if (signal.aborted) return;
 
     try {
+      const unwrapped = await unwrapLicense(module_, entry, license);
+
+      if (signal.aborted) return;
+
       // Synchronous, unlike EME's `MediaKeySession.update`.
-      session.update(await unwrapLicense(module_, entry, license));
+      session.update(unwrapped);
     } catch (error) {
       if (signal.aborted) return;
 

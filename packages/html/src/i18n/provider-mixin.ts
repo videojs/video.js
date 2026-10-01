@@ -127,22 +127,26 @@ export function createI18nProviderMixin({ context, loader = defaultLoader }: I18
 
         this.#lazyLayer = {};
         void (async () => {
-          const { merged, loadedTags } = await mergeLocaleOverlays(localeSnapshot, loader, findLocaleKeys);
-
-          if (seq !== this.#lazySeq) return;
-
-          if (shouldAttemptBrowserTranslation(localeSnapshot, loadedTags, merged)) {
-            const browser = await getBrowserTranslations(localeSnapshot);
+          try {
+            const { merged, loadedTags } = await mergeLocaleOverlays(localeSnapshot, loader, findLocaleKeys);
 
             if (seq !== this.#lazySeq) return;
 
-            if (Object.keys(browser).length) registerI18n(localeSnapshot, browser);
+            if (shouldAttemptBrowserTranslation(localeSnapshot, loadedTags, merged)) {
+              const browser = await getBrowserTranslations(localeSnapshot);
+
+              if (seq !== this.#lazySeq) return;
+
+              if (Object.keys(browser).length) registerI18n(localeSnapshot, browser);
+            }
+
+            if (seq !== this.#lazySeq) return;
+
+            this.#lazyLayer = merged;
+            this.requestUpdate();
+          } catch {
+            // Registry translations and English fallback still work if lazy loading fails.
           }
-
-          if (seq !== this.#lazySeq) return;
-
-          this.#lazyLayer = merged;
-          this.requestUpdate();
         })();
       }
 

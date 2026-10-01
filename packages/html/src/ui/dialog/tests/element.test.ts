@@ -77,6 +77,63 @@ describe('DialogElement', () => {
     expect(dialog.open).toBe(false);
   });
 
+  it('removes data-open attribute after close transition completes', async () => {
+    const el = createElement(DialogElement);
+
+    el.open = true;
+
+    document.body.appendChild(el);
+    await el.updateComplete;
+    expect(el.hasAttribute('data-open')).toBe(true);
+
+    el.open = false;
+    await el.updateComplete;
+
+    expect(el.hasAttribute('data-open')).toBe(true);
+    expect(el.hasAttribute('data-ending-style')).toBe(true);
+    await vi.waitFor(() => {
+      expect(el.hasAttribute('data-open')).toBe(false);
+    });
+  });
+
+  it('dispatches open-change event on close', async () => {
+    const el = createElement(DialogElement);
+
+    el.open = true;
+
+    document.body.appendChild(el);
+    await el.updateComplete;
+    flush();
+
+    const spy = vi.fn();
+
+    el.addEventListener('open-change', spy);
+
+    // Escape triggers dismiss layer → onOpenChange(false) → open-change event.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+    expect(el.open).toBe(false);
+    expect(spy).toHaveBeenCalledOnce();
+    expect((spy.mock.calls[0]![0] as CustomEvent).detail).toEqual({ open: false });
+  });
+
+  it('cleans up on disconnect', async () => {
+    const el = createElement(DialogElement);
+
+    el.open = true;
+
+    document.body.appendChild(el);
+    await el.updateComplete;
+    flush();
+
+    document.body.removeChild(el);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+    // Dialog was destroyed on disconnect, so open should still be true.
+    expect(el.open).toBe(true);
+  });
+
   it('dispatches lifecycle events', async () => {
     const dialog = createElement(DialogElement);
 

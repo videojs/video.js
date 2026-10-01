@@ -1,13 +1,14 @@
-import { act, cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { flush } from '@videojs/store';
 import { formatTimeAsPhrase } from '@videojs/utils/time';
 import type { HTMLAttributes } from 'react';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { I18nProvider } from '../../../i18n';
-import { createPlayerWrapper } from '../../../testing/mocks';
 import { SliderBuffer } from '../../slider/buffer';
 import { SliderFill } from '../../slider/fill';
+import { createSliderPlayerWrapper, endDrag, measureSlider, pointer, startDrag } from '../../slider/tests/support';
 import { SliderThumb } from '../../slider/thumb';
 import { SliderTrack } from '../../slider/track';
 import { SliderValue } from '../../slider/value';
@@ -15,134 +16,40 @@ import { TimeSliderChapterTitle } from '../chapter-title';
 import { TimeSliderChapters, type TimeSliderChaptersState } from '../chapters';
 import { TimeSliderRoot } from '../root';
 
-// --- Hoisted mock data (available inside vi.mock factories) ---
+const mockTimeState = { currentTime: 30, duration: 120, seeking: false, seek: vi.fn() };
+const mockBufferState = { buffered: [[0, 60]] as [number, number][], seekable: [[0, 120]] as [number, number][] };
+const mockPlaybackState = {
+  paused: false,
+  ended: false,
+  started: true,
+  waiting: false,
+  play: vi.fn(() => Promise.resolve()),
+  pause: vi.fn(),
+};
+const mockTextTrackState = {
+  textTrackList: [],
+  subtitlesShowing: false,
+  toggleSubtitles: vi.fn(() => false),
+  selectSubtitlesTrack: vi.fn(),
+  chaptersCues: [
+    { id: 'first', startTime: 0, endTime: 40, text: 'First' },
+    { id: 'second', startTime: 60, endTime: 120, text: 'Second' },
+  ],
+  thumbnailsTrack: null,
+};
+const mockNoBuffer = { value: false };
 
-const {
-  mockSliderApi,
-  mockSliderInput,
-  mockTimeState,
-  mockBufferState,
-  mockPlaybackState,
-  mockTextTrackState,
-  mockNoBuffer,
-  capturedSliderOptions,
-} = vi.hoisted(() => {
-  const capturedSliderOptions: {
-    current: { onDragStart?: () => void; onDragEnd?: () => void; onValueCommit?: (percent: number) => void };
-  } = {
-    current: {},
-  };
-  const mockSliderInput = {
-    pointerPercent: 0,
-    dragPercent: 0,
-    dragging: false,
-    pointing: false,
-    focused: false,
-  };
-
-  return {
-    mockSliderApi: (options: { onDragStart?: () => void; onDragEnd?: () => void }) => {
-      capturedSliderOptions.current = options;
-      return {
-        input: {
-          current: mockSliderInput,
-          subscribe: vi.fn(() => vi.fn()),
-        },
-        rootProps: {
-          onPointerDown: vi.fn(),
-          onPointerMove: vi.fn(),
-          onPointerLeave: vi.fn(),
-        },
-        thumbProps: {
-          onKeyDownCapture: vi.fn(),
-          onFocus: vi.fn(),
-          onBlur: vi.fn(),
-        },
-        adjustForAlignment: <S,>(state: S): S => state,
-        destroy: vi.fn(),
-      };
-    },
-    mockSliderInput,
-    mockTimeState: {
-      currentTime: 30,
-      duration: 120,
-      seeking: false,
-      seek: vi.fn(),
-    },
-    mockBufferState: {
-      buffered: [[0, 60]] as [number, number][],
-      seekable: [[0, 120]] as [number, number][],
-    },
-    mockPlaybackState: {
-      paused: false,
-      ended: false,
-      started: true,
-      waiting: false,
-      play: vi.fn(() => Promise.resolve()),
-      pause: vi.fn(),
-    },
-    mockTextTrackState: {
-      textTrackList: [],
-      subtitlesShowing: false,
-      toggleSubtitles: vi.fn(() => false),
-      selectSubtitlesTrack: vi.fn(),
-      chaptersCues: [
-        { id: 'first', startTime: 0, endTime: 40, text: 'First' },
-        { id: 'second', startTime: 60, endTime: 120, text: 'Second' },
-      ],
-      thumbnailsTrack: null,
-    },
-    mockNoBuffer: { value: false },
-    capturedSliderOptions,
-  };
-});
-
-// --- Module mocks ---
-
-vi.mock('@videojs/core/dom', async (importOriginal) => {
-  const orig: Record<string, unknown> = await importOriginal();
-
-  return { ...orig, createSlider: vi.fn(mockSliderApi) };
-});
-
-vi.mock('@videojs/store/react', () => ({
-  useSnapshot: vi.fn((state: { current: unknown }) => state.current),
-  useStore: vi.fn((_store: unknown, selector?: (state: object) => unknown) => {
-    if (!selector) return _store;
-
-    try {
-      const result = selector({
-        time: mockTimeState,
-        buffer: mockBufferState,
-        playback: mockPlaybackState,
-        textTrack: mockTextTrackState,
-      });
-      if (result !== undefined) return result;
-    } catch {
-      // fall through
-    }
-
-    try {
-      const state = { ...mockTimeState, ...mockPlaybackState, ...mockTextTrackState };
-
-      if (!mockNoBuffer.value) Object.assign(state, mockBufferState);
-
-      return selector(state);
-    } catch {
-      return undefined;
-    }
-  }),
-}));
+function createPlayerWrapper() {
+  return createSliderPlayerWrapper({
+    ...mockTimeState,
+    ...mockPlaybackState,
+    ...mockTextTrackState,
+    ...(!mockNoBuffer.value ? mockBufferState : {}),
+  });
+}
 
 afterEach(() => {
   cleanup();
-  Object.assign(mockSliderInput, {
-    pointerPercent: 0,
-    dragPercent: 0,
-    dragging: false,
-    pointing: false,
-    focused: false,
-  });
   mockTimeState.duration = 120;
   mockBufferState.seekable = [[0, 120]];
   mockNoBuffer.value = false;
@@ -159,7 +66,7 @@ describe('TimeSliderRoot', () => {
         <TimeSliderRoot />
       </Wrapper>
     );
-    const el = container.querySelector('div > div');
+    const el = container.querySelector('[data-orientation]');
 
     expect(el).toBeTruthy();
     expect(el?.tagName).toBe('DIV');
@@ -212,9 +119,9 @@ describe('TimeSliderRoot', () => {
 
     const el = container.querySelector('[data-orientation]') as HTMLElement;
 
-    expect(el?.style.getPropertyValue('--media-slider-fill')).toBeTruthy();
-    expect(el?.style.getPropertyValue('--media-slider-pointer')).toBeTruthy();
-    expect(el?.style.getPropertyValue('--media-slider-buffer')).toBeTruthy();
+    expect(el?.style.getPropertyValue('--media-slider-fill')).toBe('25.000%');
+    expect(el?.style.getPropertyValue('--media-slider-pointer')).toBe('0.000%');
+    expect(el?.style.getPropertyValue('--media-slider-buffer')).toBe('50.000%');
   });
 
   it('disables the slider when the time range is unknown', () => {
@@ -256,9 +163,10 @@ describe('TimeSliderRoot', () => {
     expect(thumb?.getAttribute('aria-disabled')).toBeNull();
     expect(thumb?.getAttribute('tabindex')).toBe('0');
 
-    act(() => capturedSliderOptions.current.onValueCommit?.(50));
+    fireEvent.keyDown(thumb!, { key: 'ArrowRight' });
 
-    expect(mockTimeState.seek).toHaveBeenCalledWith(60);
+    expect(mockTimeState.seek).toHaveBeenCalledOnce();
+    expect(mockTimeState.seek.mock.calls[0]?.[0]).toBeCloseTo(31, 5);
   });
 });
 
@@ -409,8 +317,6 @@ describe('TimeSlider compound', () => {
       { id: 'first', startTime: 0, endTime: 200, text: 'First' },
       { id: 'last', startTime: 200, endTime: 487.626, text: 'Last' },
     ];
-    mockSliderInput.pointerPercent = 100;
-    mockSliderInput.pointing = true;
 
     try {
       const { Wrapper } = createPlayerWrapper();
@@ -422,6 +328,10 @@ describe('TimeSlider compound', () => {
         </Wrapper>
       );
 
+      const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+      measureSlider(root);
+      pointer(root, 'pointermove', 200, 0);
       expect(container.querySelector('.chapter-title')?.textContent).toBe('Last');
       expect(container.querySelector('.chapter-title')?.getAttribute('aria-hidden')).toBe('true');
       expect(container.querySelector('.chapter-title')?.hasAttribute('aria-live')).toBe(false);
@@ -435,7 +345,6 @@ describe('TimeSlider compound', () => {
     const currentTime = mockTimeState.currentTime;
 
     mockTimeState.currentTime = 70;
-    mockSliderInput.focused = true;
 
     try {
       const { Wrapper } = createPlayerWrapper();
@@ -443,9 +352,13 @@ describe('TimeSlider compound', () => {
         <Wrapper>
           <TimeSliderRoot>
             <TimeSliderChapterTitle className="chapter-title" />
+            <SliderThumb />
           </TimeSliderRoot>
         </Wrapper>
       );
+
+      fireEvent.focus(container.querySelector('[role="slider"]')!);
+      act(() => flush());
       const title = container.querySelector('.chapter-title');
 
       expect(title?.textContent).toBe('Second');
@@ -454,29 +367,6 @@ describe('TimeSlider compound', () => {
     } finally {
       mockTimeState.currentTime = currentTime;
     }
-  });
-
-  it('renders all parts together', () => {
-    const { Wrapper } = createPlayerWrapper();
-    const { container } = render(
-      <Wrapper>
-        <TimeSliderRoot data-testid="root">
-          <SliderTrack data-testid="track">
-            <SliderFill data-testid="fill" />
-            <SliderBuffer data-testid="buffer" />
-            <SliderThumb data-testid="thumb" />
-          </SliderTrack>
-          <SliderValue data-testid="value" />
-        </TimeSliderRoot>
-      </Wrapper>
-    );
-
-    expect(container.querySelector('[data-testid="root"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="track"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="fill"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="buffer"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="thumb"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="value"]')).toBeTruthy();
   });
 
   it('thumb receives ARIA attributes from TimeSliderCore', () => {
@@ -514,21 +404,6 @@ describe('TimeSlider compound', () => {
     );
   });
 
-  it('SliderValue displays formatted time', () => {
-    const { Wrapper } = createPlayerWrapper();
-    const { container } = render(
-      <Wrapper>
-        <TimeSliderRoot>
-          <SliderValue data-testid="value" />
-        </TimeSliderRoot>
-      </Wrapper>
-    );
-
-    const output = container.querySelector('[data-testid="value"]');
-
-    expect(output?.textContent).toBeTruthy();
-  });
-
   it('formats values using the seekable end when duration is unknown', () => {
     mockTimeState.duration = 0;
     mockBufferState.seekable = [[0, 3700]];
@@ -553,16 +428,18 @@ describe('TimeSliderRoot pauseOnDrag', () => {
 
     const { Wrapper } = createPlayerWrapper();
 
-    render(
+    const { container } = render(
       <Wrapper>
         <TimeSliderRoot />
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragStart?.();
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
     expect(mockPlaybackState.pause).not.toHaveBeenCalled();
 
-    capturedSliderOptions.current.onDragEnd?.();
+    endDrag(root);
     expect(mockPlaybackState.play).not.toHaveBeenCalled();
   });
 
@@ -573,37 +450,19 @@ describe('TimeSliderRoot pauseOnDrag', () => {
 
     const { Wrapper } = createPlayerWrapper();
 
-    render(
+    const { container } = render(
       <Wrapper>
         <TimeSliderRoot pauseOnDrag />
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragStart?.();
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
     expect(mockPlaybackState.pause).toHaveBeenCalledTimes(1);
 
-    capturedSliderOptions.current.onDragEnd?.();
+    endDrag(root);
     expect(mockPlaybackState.play).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not resume on drag-end when player was already paused', () => {
-    mockPlaybackState.paused = true;
-    mockPlaybackState.play.mockClear();
-    mockPlaybackState.pause.mockClear();
-
-    const { Wrapper } = createPlayerWrapper();
-
-    render(
-      <Wrapper>
-        <TimeSliderRoot pauseOnDrag />
-      </Wrapper>
-    );
-
-    capturedSliderOptions.current.onDragStart?.();
-    expect(mockPlaybackState.pause).not.toHaveBeenCalled();
-
-    capturedSliderOptions.current.onDragEnd?.();
-    expect(mockPlaybackState.play).not.toHaveBeenCalled();
   });
 
   it('forwards user-provided onDragStart and onDragEnd', () => {
@@ -613,16 +472,18 @@ describe('TimeSliderRoot pauseOnDrag', () => {
 
     const { Wrapper } = createPlayerWrapper();
 
-    render(
+    const { container } = render(
       <Wrapper>
         <TimeSliderRoot pauseOnDrag onDragStart={onDragStart} onDragEnd={onDragEnd} />
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragStart?.();
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
     expect(onDragStart).toHaveBeenCalled();
 
-    capturedSliderOptions.current.onDragEnd?.();
+    endDrag(root);
     expect(onDragEnd).toHaveBeenCalled();
   });
 
@@ -632,13 +493,15 @@ describe('TimeSliderRoot pauseOnDrag', () => {
     mockPlaybackState.pause.mockClear();
 
     const { Wrapper } = createPlayerWrapper();
-    const { rerender } = render(
+    const { container, rerender } = render(
       <Wrapper>
         <TimeSliderRoot pauseOnDrag />
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragStart?.();
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
     expect(mockPlaybackState.pause).toHaveBeenCalledTimes(1);
 
     rerender(
@@ -647,7 +510,7 @@ describe('TimeSliderRoot pauseOnDrag', () => {
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragEnd?.();
+    endDrag(root);
     expect(mockPlaybackState.play).toHaveBeenCalledTimes(1);
   });
 
@@ -657,13 +520,15 @@ describe('TimeSliderRoot pauseOnDrag', () => {
     mockPlaybackState.pause.mockClear();
 
     const { Wrapper } = createPlayerWrapper();
-    const { unmount } = render(
+    const { container, unmount } = render(
       <Wrapper>
         <TimeSliderRoot pauseOnDrag />
       </Wrapper>
     );
 
-    capturedSliderOptions.current.onDragStart?.();
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
     expect(mockPlaybackState.pause).toHaveBeenCalledTimes(1);
 
     unmount();

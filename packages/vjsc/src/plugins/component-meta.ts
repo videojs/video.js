@@ -17,13 +17,6 @@ export interface ModuleBuildMeta {
   readonly moduleMeta?: ComponentMeta | undefined;
   /** Whether the metadata export was removed from the transformed source, so the graph can skip re-parsing. */
   readonly metaRemoved?: boolean | undefined;
-  readonly moduleSource?: string | undefined;
-  readonly moduleStyles?:
-    | {
-        readonly files: readonly string[];
-        readonly assets: readonly string[];
-      }
-    | undefined;
   readonly [key: string]: unknown;
 }
 
@@ -82,31 +75,10 @@ export function readModuleBuildMeta(meta: unknown): ModuleBuildMeta | undefined 
   if (!isPlainObject(meta)) return undefined;
 
   const moduleMeta = isComponentMeta(meta.moduleMeta) ? meta.moduleMeta : undefined;
-  const moduleSource = typeof meta.moduleSource === 'string' ? meta.moduleSource : undefined;
-  const moduleStyles = readModuleStyles(meta.moduleStyles);
   const metaRemoved = meta.metaRemoved === true ? true : undefined;
-  if (!moduleMeta && moduleSource === undefined && moduleStyles === undefined && !metaRemoved) return undefined;
+  if (!moduleMeta && !metaRemoved) return undefined;
 
-  return { ...meta, moduleMeta, moduleSource, moduleStyles, metaRemoved };
-}
-
-export function readComponentMeta(meta: unknown): ComponentMeta | undefined {
-  return readModuleBuildMeta(meta)?.moduleMeta;
-}
-
-export function readComponentSource(meta: unknown): string | undefined {
-  return readModuleBuildMeta(meta)?.moduleSource;
-}
-
-export function readModuleStyles(meta: unknown): ModuleBuildMeta['moduleStyles'] {
-  if (!isPlainObject(meta)) return undefined;
-
-  const value = isPlainObject(meta.moduleStyles) ? meta.moduleStyles : meta;
-
-  const files = readStringArray(value.files);
-  const assets = readStringArray(value.assets);
-
-  return files && assets ? { files, assets } : undefined;
+  return { ...meta, moduleMeta, metaRemoved };
 }
 
 export function mergeModuleBuildMeta(
@@ -117,10 +89,6 @@ export function mergeModuleBuildMeta(
     ...(isPlainObject(meta) ? meta : {}),
     ...update,
   };
-}
-
-function readStringArray(value: unknown): readonly string[] | undefined {
-  return Array.isArray(value) && value.every((entry) => typeof entry === 'string') ? value : undefined;
 }
 
 function findExportedMeta(ast: Program | undefined, exportName: string): ExportedMeta | undefined {

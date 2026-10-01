@@ -1,4 +1,4 @@
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, renderHook } from '@testing-library/react';
 import { type RefCallback, useCallback } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -65,14 +65,10 @@ describe('useMediaEvents', () => {
 
   it('strips media event props and returns the rest', () => {
     const media = new EventTarget();
-    const { container } = render(
-      <Harness media={media} onPlay={vi.fn()} onError={vi.fn()} id="player" data-kept="yes" />
-    );
-    const element = container.firstElementChild!;
+    const props = { onPlay: vi.fn(), onError: vi.fn(), id: 'player', 'data-kept': 'yes' };
+    const { result } = renderHook(() => useMediaEvents(props, media));
 
-    expect(element.id).toBe('player');
-    expect(element.getAttribute('data-kept')).toBe('yes');
-    expect(element.hasAttribute('onplay')).toBe(false);
+    expect(result.current.props).toEqual({ id: 'player', 'data-kept': 'yes' });
   });
 
   it('calls the latest handler without resubscribing', () => {

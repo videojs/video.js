@@ -1,8 +1,9 @@
+import { flush } from '@videojs/store';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import { ThumbnailElement } from '../../thumbnail/element';
 import { SliderElement } from '../element';
 import { SliderThumbnailElement } from '../thumbnail';
+import { measureSlider, pointer } from './support';
 
 let tagCounter = 0;
 
@@ -22,40 +23,12 @@ afterEach(() => {
 });
 
 describe('SliderThumbnailElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderThumbnailElement.tagName).toBe('media-slider-thumbnail');
-  });
-
-  it('extends ThumbnailElement', () => {
-    const el = createElement(SliderThumbnailElement);
-
-    expect(el).toBeInstanceOf(ThumbnailElement);
-  });
-
   it('draws a fallback image in its shadow root', () => {
     const el = createElement(SliderThumbnailElement);
     const img = el.shadowRoot!.querySelector('img');
 
     expect(img!.getAttribute('part')).toBe('image');
     expect(img!.getAttribute('aria-hidden')).toBe('true');
-  });
-
-  it('inherits time property from ThumbnailElement', () => {
-    const el = createElement(SliderThumbnailElement);
-
-    expect(el.time).toBe(0);
-
-    el.time = 10;
-    expect(el.time).toBe(10);
-  });
-
-  it('sets data-hidden when no thumbnails are available', async () => {
-    const el = createElement(SliderThumbnailElement);
-
-    document.body.appendChild(el);
-    await el.updateComplete;
-
-    expect(el.hasAttribute('data-hidden')).toBe(true);
   });
 
   it('reads pointerValue from slider context as time', async () => {
@@ -80,24 +53,12 @@ describe('SliderThumbnailElement', () => {
 
     // In idle state, pointerPercent=0 → pointerValue=0 → selects 'thumb-0.jpg'.
     expect(img.getAttribute('src')).toBe('thumb-0.jpg');
-  });
 
-  it('does not have data-hidden when thumbnails match', async () => {
-    const slider = createElement(SliderElement);
-    const thumbnail = createElement(SliderThumbnailElement);
-    const img = document.createElement('img');
-
-    Object.defineProperty(img, 'complete', { value: false, configurable: true });
-
-    thumbnail.thumbnails = [{ url: 'thumb.jpg', startTime: 0 }];
-    thumbnail.append(img);
-
-    slider.appendChild(thumbnail);
-    document.body.appendChild(slider);
-
+    measureSlider(slider, 100);
+    pointer(slider, 'pointermove', 40, 0);
+    flush();
     await slider.updateComplete;
     await thumbnail.updateComplete;
-
-    expect(thumbnail.hasAttribute('data-hidden')).toBe(false);
+    expect(img.getAttribute('src')).toBe('thumb-30.jpg');
   });
 });

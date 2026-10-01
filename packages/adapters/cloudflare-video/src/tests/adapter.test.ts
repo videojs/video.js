@@ -390,6 +390,18 @@ describe('CloudflareAdapter', () => {
     const iframe = document.createElement('iframe');
 
     iframe.setAttribute('src', embedSrc);
+    const readLocation = vi.fn(() => 'about:blank');
+
+    Object.defineProperty(iframe, 'contentWindow', {
+      configurable: true,
+      value: {
+        location: {
+          get href() {
+            return readLocation();
+          },
+        },
+      },
+    });
     const assigned = spyOnSrcAssignment(iframe, embedSrc);
 
     const media = new CloudflareAdapter();
@@ -398,6 +410,7 @@ describe('CloudflareAdapter', () => {
     media.attach(iframe);
     await waitForEngine(media);
 
+    expect(readLocation).toHaveBeenCalledOnce();
     expect(assigned).toEqual([]);
     media.detach();
   });
@@ -587,18 +600,21 @@ describe('CloudflareAdapter', () => {
     media.detach();
   });
 
-  it('forwards the ad lifecycle events the embed adds', async () => {
-    const media = new CloudflareAdapter();
-    const { player } = await attachAndLoad(media);
-    const adStart = vi.fn();
+  it.each(['stream-adstart', 'stream-adend', 'stream-adtimeout'])(
+    'forwards the %s ad lifecycle event',
+    async (type) => {
+      const media = new CloudflareAdapter();
+      const { player } = await attachAndLoad(media);
+      const onAd = vi.fn();
 
-    media.addEventListener('stream-adstart', adStart);
+      media.addEventListener(type, onAd);
+      player.emit(type);
 
-    player.emit('stream-adstart');
-
-    expect(adStart).toHaveBeenCalledTimes(1);
-    media.detach();
-  });
+      expect(onAd).toHaveBeenCalledOnce();
+      expect(onAd.mock.calls[0]![0].type).toBe(type);
+      media.detach();
+    }
+  );
 
   it('forwards the encrypted-media events the embed reports', async () => {
     const media = new CloudflareAdapter();

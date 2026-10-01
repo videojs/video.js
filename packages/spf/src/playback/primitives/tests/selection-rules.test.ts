@@ -20,9 +20,9 @@ describe('applyRules', () => {
   const noDeps = { state: {}, context: {}, config: {} };
 
   it('applies rules in order; the pick is the first survivor', () => {
-    const dropA: SelectionRule<{ id: string }> = (tracks) => tracks.filter((t) => t.id !== 'a');
     const reverse: SelectionRule<{ id: string }> = (tracks) => [...tracks].reverse();
-    const result = applyRules([dropA, reverse], all, noDeps);
+    const takeTwo: SelectionRule<{ id: string }> = (tracks) => tracks.slice(0, 2);
+    const result = applyRules([reverse, takeTwo], all, noDeps);
 
     expect(result.map((t) => t.id)).toEqual(['c', 'b']);
   });
@@ -111,8 +111,16 @@ describe('excludeUnplayableTracks', () => {
   const all = [track('a', 'ok.1'), track('b', 'bad.1'), track('c', 'ok.2')];
 
   it('passes everything through when the config wires no probe', () => {
-    expect(excludeUnplayableTracks(all, { state: {}, context: {}, config: {} })).toBe(all);
-    expect(excludeUnplayableTracks(all, { state: {}, context: {}, config: undefined })).toBe(all);
+    expect(excludeUnplayableTracks(all, { state: {}, context: {}, config: {} })).toEqual([
+      track('a', 'ok.1'),
+      track('b', 'bad.1'),
+      track('c', 'ok.2'),
+    ]);
+    expect(excludeUnplayableTracks(all, { state: {}, context: {}, config: undefined })).toEqual([
+      track('a', 'ok.1'),
+      track('b', 'bad.1'),
+      track('c', 'ok.2'),
+    ]);
   });
 
   it('keeps only the tracks the probe answers true for', () => {

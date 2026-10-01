@@ -14,9 +14,9 @@ import {
   generateInstallationIndex,
   generatePageFooter,
   generateRootIndex,
-  llmsIndexPaths,
   type SectionFile,
 } from '../llms-markdown';
+import { llmsIndexPaths } from '../llms-sections';
 
 const SITE_URL = 'https://videojs.org';
 const turndown = createTurndown();

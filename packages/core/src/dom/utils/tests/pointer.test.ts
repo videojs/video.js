@@ -64,7 +64,7 @@ describe('getPercentFromPointerEvent', () => {
     });
 
     it('returns 0 for zero-height vertical rect', () => {
-      expect(getPercentFromPointerEvent(pointer(0, 50), rect({ height: 0 }), 'vertical')).toBe(0);
+      expect(getPercentFromPointerEvent(pointer(0, 0), rect({ height: 0 }), 'vertical')).toBe(0);
     });
   });
 });

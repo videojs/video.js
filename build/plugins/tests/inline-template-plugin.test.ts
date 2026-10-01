@@ -227,11 +227,15 @@ describe('processTemplates (expressions)', () => {
 
 describe('minifyCssQuasis', () => {
   it('minifies simple CSS', () => {
-    const code = 'const css = /* css */ `  .foo  {  color: red;  }  `;';
+    const original = '  .foo  {  color: red;  }  ';
+    const code = `const css = /* css */ \`${original}\`;`;
     const result = transform(code);
+    const body = result.match(/`([^`]*)`/);
 
-    assert.match(result, /\.foo\s*\{/);
-    assert.match(result, /color:\s*red/);
+    assert.ok(body);
+    assert.equal(body[1], '.foo{color:red}');
+    assert.notEqual(body[1], original);
+    assert.equal(result, `const css = /* css */ \`${body[1]}\`;`);
   });
 
   it('preserves CSS expressions', () => {
@@ -261,9 +265,11 @@ describe('edge cases', () => {
 
   it('returns null when marker is not followed by a template literal', () => {
     const code = 'const marker = "/*html*/"; const x = 1;';
-    const result = transform(code);
+    const magicString = new MagicString(code);
+    const result = inlineTemplatePlugin().transform?.(code, 'test.ts', { magicString });
 
-    assert.equal(result, code);
+    assert.equal(result, null);
+    assert.equal(magicString.toString(), code);
   });
 
   it('handles multiple HTML templates in one file', () => {

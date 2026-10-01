@@ -23,14 +23,6 @@ describe('normalizeChapterCues', () => {
     expect(result[1]?.key).toContain('cue-second-');
   });
 
-  it('creates stable identity for cues without IDs', () => {
-    const chapter = cue(0, 50, 'Chapter');
-
-    expect(normalizeChapterCues([chapter], 0, 100).map(({ key }) => key)).toEqual(
-      normalizeChapterCues([chapter], 0, 100).map(({ key }) => key)
-    );
-  });
-
   it('keys cues by content, so fresh cue data keeps its keys across syncs', () => {
     // The store hands out new cue objects whenever it re-syncs (a duration
     // change re-clamps ends); the segments they render must not be rebuilt.
@@ -94,7 +86,21 @@ describe('TimeSliderChaptersCore', () => {
     const result = core.getRanges(cues, 0, 100);
 
     expect(core.getRanges(cues, 0, 100)).toBe(result);
-    expect(core.getRanges([], 0, 100)).not.toBe(result);
+    expect(core.getRanges(cues, 0, 80)).toMatchObject({
+      max: 80,
+      ranges: [
+        { start: 0, end: 50 },
+        { start: 50, end: 80 },
+      ],
+    });
+    expect(core.getRanges(cues, 10, 80)).toMatchObject({
+      max: 80,
+      ranges: [
+        { start: 10, end: 50 },
+        { start: 50, end: 80 },
+      ],
+    });
+    expect(core.getRanges([], 10, 80).ranges).toMatchObject([{ start: 10, end: 80, highlight: false }]);
   });
 
   it('finds the chapter at a value including the final endpoint', () => {

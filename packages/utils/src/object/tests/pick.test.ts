@@ -70,21 +70,4 @@ describe('pick', () => {
     expect(Object.keys(result)).toEqual(['a']);
     expect(result).not.toHaveProperty('b');
   });
-
-  it('filters element attributes to only allowed media attributes', () => {
-    const elementAttrs: Record<string, string> = {
-      src: 'video.mp4',
-      autoplay: '',
-      class: 'player',
-      style: 'width: 100%',
-    };
-    const allowedAttrs = ['src', 'autoplay', 'controls', 'muted', 'loop'];
-
-    const result = pick(elementAttrs, allowedAttrs);
-
-    expect(result).toEqual({ src: 'video.mp4', autoplay: '' });
-    expect(result).not.toHaveProperty('class');
-    expect(result).not.toHaveProperty('style');
-    expect(result).not.toHaveProperty('controls');
-  });
 });

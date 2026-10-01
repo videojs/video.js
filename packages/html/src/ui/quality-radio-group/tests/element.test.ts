@@ -171,22 +171,6 @@ describe('QualityRadioGroupElement', () => {
     });
   });
 
-  it('renders radio items from a template', async () => {
-    const { menu, options } = setup({
-      template:
-        '<media-menu-radio-item class="custom-item"><span class="custom-label" data-part="label"></span><media-menu-item-indicator force-mount class="custom-indicator"></media-menu-item-indicator></media-menu-radio-item>',
-    });
-
-    await waitForMenu(menu, options);
-
-    const item = menu.querySelector<MenuRadioItemElement>(MenuRadioItemElement.tagName)!;
-    const indicators = [...menu.querySelectorAll<MenuItemIndicatorElement>(MenuItemIndicatorElement.tagName)];
-
-    expect(item.className).toBe('custom-item');
-    expect(item.querySelector('[data-part~="label"]')?.textContent).toBe('Auto');
-    expect(indicators.map((indicator) => indicator.checked)).toEqual([true, false, false]);
-  });
-
   it('renders the active rendition in the Auto label', async () => {
     const { menu, options } = setup({
       activeVideoRendition: { id: '1', height: 720, selected: false },

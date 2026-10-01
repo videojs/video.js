@@ -33,7 +33,7 @@ describe('installationAnalyticsContext', () => {
 
 describe('installationContextForUrl', () => {
   it('reads the picks from an HTML or Markdown guide URL alike', () => {
-    const search = '?package-manager=npm&skin=minimal';
+    const search = '?package-manager=npm&skin=neutral';
 
     expect(installationContextForUrl('/docs/guides/installation/html.md', search)).toEqual(
       installationContextForUrl('/docs/guides/installation/html', search)
@@ -42,11 +42,11 @@ describe('installationContextForUrl', () => {
       installation_route: 'html',
       installation_framework: 'html',
       installation_method: 'npm',
-      installation_skin: 'minimal-video',
+      installation_skin: 'neutral-video',
     });
   });
 
   it('is empty off the installation guide', () => {
-    expect(installationContextForUrl('/docs/framework/html/guides/fullscreen.md', '?skin=minimal')).toEqual({});
+    expect(installationContextForUrl('/docs/framework/html/guides/fullscreen.md', '?skin=neutral')).toEqual({});
   });
 });

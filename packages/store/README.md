@@ -265,7 +265,7 @@ export const signalKeys = {
 
 ## Error Handling
 
-Handle errors locally via `try/catch`, or globally via `onError`:
+Handle errors locally via `try/catch`, or globally via `onError`. An action that throws or rejects always fails for its caller; when `onError` is set, it also receives that error once. Errors from `onSetup`, `onAttach`, or a slice's `attach` have no caller, so they go to `onError`, or to `console.error` without one.
 
 ```ts
 import { isStoreError } from '@videojs/store';

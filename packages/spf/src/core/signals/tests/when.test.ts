@@ -1,3 +1,4 @@
+import { Signal } from 'signal-polyfill';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../primitives';
@@ -29,8 +30,11 @@ describe('when', () => {
     const condition = vi.fn(() => ready.get());
     const settled = when(condition);
 
+    expect(Signal.subtle.hasSinks(ready)).toBe(true);
     ready.set(true);
     await settled;
+    await Promise.resolve();
+    expect(Signal.subtle.hasSinks(ready)).toBe(false);
 
     const callsWhenSettled = condition.mock.calls.length;
 

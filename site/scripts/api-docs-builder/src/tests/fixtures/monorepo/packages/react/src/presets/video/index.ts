@@ -8,4 +8,4 @@ export { videoFeatures } from '../../../../core/src/dom/store/features/presets';
 export { Video } from '../../media/video';
 export { NeutralVideoSkin } from './neutral-skin';
 export { VideoSkin } from './skin';
-export { VideoSkinTailwind } from './skin.tailwind';
+export { VideoTailwindSkin } from './skin.tailwind';

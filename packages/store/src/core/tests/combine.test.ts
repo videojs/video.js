@@ -5,7 +5,8 @@ import { defineSlice, type InferSliceTarget } from '../slice';
 import { createStore } from '../store';
 
 class MockTarget extends EventTarget {
-  value = 0;
+  value = 7;
+  label = 'attached';
 }
 
 const slice = defineSlice<MockTarget>();
@@ -21,8 +22,8 @@ describe('combine', () => {
   });
 
   it('calls attach for each slice', () => {
-    const attachA = vi.fn();
-    const attachB = vi.fn();
+    const attachA = vi.fn(({ target, set }) => set({ count: target.value }));
+    const attachB = vi.fn(({ target, set }) => set({ label: target.label }));
 
     const a = slice({ state: () => ({ count: 0 }), attach: attachA });
     const b = slice({ state: () => ({ label: '' }), attach: attachB });
@@ -33,6 +34,7 @@ describe('combine', () => {
 
     expect(attachA).toHaveBeenCalledOnce();
     expect(attachB).toHaveBeenCalledOnce();
+    expect(store.state).toMatchObject({ count: 7, label: 'attached' });
   });
 
   it('requires a target that satisfies every slice', () => {
@@ -48,6 +50,7 @@ describe('combine', () => {
   it('catches and reports attach errors via onError callback', () => {
     const error = new Error('attach failed');
     const onError = vi.fn();
+    const attachB = vi.fn();
 
     const a = slice({
       state: () => ({ count: 0 }),
@@ -55,13 +58,15 @@ describe('combine', () => {
         throw error;
       },
     });
-    const b = slice({ state: () => ({ label: '' }) });
+    const b = slice({ state: () => ({ label: '' }), attach: attachB });
 
     const store = createStore<MockTarget>()(combine(a, b), { onError });
 
     store.attach(new MockTarget());
 
-    expect(onError).toHaveBeenCalled();
+    expect(attachB).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledWith({ store, error });
   });
 
   it('warns on duplicate state keys in __DEV__ mode', () => {

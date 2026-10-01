@@ -12,7 +12,6 @@ import {
   detectPackageManager,
   detectTemplate,
   LAST_RELEASE_WITHOUT_AGENTS_INIT,
-  runAgentsCommand,
   runAgentsInit,
   runAgentsSkills,
   type AgentsInitDefaults,
@@ -1242,39 +1241,6 @@ describe('runAgentsSkills', () => {
   });
 });
 
-describe('runAgentsCommand', () => {
-  it('routes agents skills and leaves everything else to agents init', () => {
-    expect(runAgentsCommand('10.0.0', ['agents', 'skills'])).toEqual(runAgentsSkills('10.0.0', ['agents', 'skills']));
-    expect(runAgentsCommand('10.0.0', ['agents', 'init'], reactProject)).toEqual(
-      runAgentsInit('10.0.0', ['agents', 'init'], reactProject)
-    );
-  });
-
-  it('lists the commands for bare and top-level help runs', () => {
-    for (const args of [[], ['--help'], ['-h']]) {
-      const result = runAgentsCommand('10.0.0', args, reactProject);
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('- `npx @videojs/cli agents init`:');
-      expect(result.stdout).toContain('- `npx @videojs/cli agents skills`:');
-      expect(result.stdout).not.toContain('## Options');
-    }
-
-    expect(JSON.parse(runAgentsCommand('10.0.0', ['--json']).stdout)).toMatchObject({
-      kind: 'usage',
-      package: '@videojs/cli',
-      commands: [{ command: 'npx @videojs/cli agents init' }, { command: 'npx @videojs/cli agents skills' }],
-    });
-    expect(runAgentsCommand('10.0.0', ['--version']).stdout).toBe('10.0.0\n');
-  });
-
-  it('names both subcommands for an unknown one', () => {
-    expect(runAgentsCommand('10.0.0', ['agents', 'install']).stderr).toContain(
-      '- arguments "agents install": Expected `agents init` or `agents skills`.'
-    );
-  });
-});
-
 describe('detectPackageManager', () => {
   it('uses the nearest project signal before the invoking manager and says where it came from', () => {
     withTemporaryDirectory((root) => {
@@ -1400,6 +1366,11 @@ describe('detectTemplate', () => {
 });
 
 describe('compareVersions', () => {
+  it('ranks numeric prerelease identifiers below nonnumeric identifiers', () => {
+    expect(compareVersions('10.0.0-2', '10.0.0-10a')).toBe(-1);
+    expect(compareVersions('10.0.0-10a', '10.0.0-2')).toBe(1);
+  });
+
   it('orders releases and prereleases by semver precedence', () => {
     expect(compareVersions('10.0.0-rc.2', '10.0.0-rc.10')).toBe(-1);
     expect(compareVersions('10.0.0-rc.3', LAST_RELEASE_WITHOUT_AGENTS_INIT)).toBe(1);

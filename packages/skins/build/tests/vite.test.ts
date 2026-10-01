@@ -380,7 +380,7 @@ describe('Skins Vite workflow', () => {
   }, 30_000);
 
   it('does not configure Shadcn output while serving', async () => {
-    expect(server.config.plugins.some((plugin) => plugin.name === 'vjsc:shadcn')).toBe(false);
+    expect(server.config.plugins.some((plugin) => plugin.name === 'vjsc:registry')).toBe(false);
   }, 30_000);
 });
 

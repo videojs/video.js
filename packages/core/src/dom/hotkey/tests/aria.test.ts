@@ -17,7 +17,7 @@ describe('toAriaKeyShortcut', () => {
   });
 
   it('formats multiple modifiers in consistent order', () => {
-    const result = toAriaKeyShortcut(parseHotkeyPattern('Ctrl+Shift+f'));
+    const result = toAriaKeyShortcut(parseHotkeyPattern('Shift+Ctrl+f'));
 
     expect(result).toBe('Control+Shift+f');
   });

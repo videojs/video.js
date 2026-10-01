@@ -19,10 +19,15 @@ describe('supportsMediaSource', () => {
 
 describe('supportsManagedMediaSource', () => {
   it('should detect ManagedMediaSource availability', () => {
-    // Will test actual browser API
-    const result = supportsManagedMediaSource();
+    try {
+      vi.stubGlobal('ManagedMediaSource', undefined);
+      expect(supportsManagedMediaSource()).toBe(false);
 
-    expect(typeof result).toBe('boolean');
+      vi.stubGlobal('ManagedMediaSource', class extends EventTarget {});
+      expect(supportsManagedMediaSource()).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 
@@ -35,9 +40,25 @@ describe('createMediaSource', () => {
   });
 
   it('should create ManagedMediaSource when preferManaged is true and available', () => {
-    const ms = createMediaSource({ preferManaged: true });
+    class ClassicMediaSource extends EventTarget {}
+    class ManagedSource extends EventTarget {}
+    const classic = vi.fn(ClassicMediaSource);
+    const managed = vi.fn(ManagedSource);
 
-    expect(ms).toBeInstanceOf(MediaSource);
+    vi.stubGlobal('MediaSource', classic);
+    vi.stubGlobal('ManagedMediaSource', managed);
+
+    try {
+      expect(createMediaSource({ preferManaged: true })).toBeInstanceOf(ManagedSource);
+      expect(managed).toHaveBeenCalledOnce();
+      expect(classic).not.toHaveBeenCalled();
+
+      vi.stubGlobal('ManagedMediaSource', undefined);
+      expect(createMediaSource({ preferManaged: true })).toBeInstanceOf(ClassicMediaSource);
+      expect(classic).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 
@@ -103,10 +124,13 @@ describe('attachMediaSource', () => {
     expect(mediaElement.getAttribute('src')).toBeNull();
   });
 
-  it('detach skips the reset when the element has moved to another resource', () => {
+  it('detach skips the reset when the element has moved to another resource', async () => {
     const mediaElement = document.createElement('video');
     const mediaSource = createMediaSource();
     const { detach } = attachMediaSource(mediaSource, mediaElement);
+
+    await new Promise<void>((resolve) => mediaSource.addEventListener('sourceopen', () => resolve(), { once: true }));
+    expect(mediaSource.readyState).toBe('open');
 
     // Resource selection moved on (e.g. Safari switched to a native-HLS
     // fallback source for an AirPlay handoff) — resetting would rip that

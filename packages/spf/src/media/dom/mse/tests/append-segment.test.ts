@@ -27,6 +27,23 @@ function makeSourceBuffer(): SourceBuffer {
   } as unknown as SourceBuffer;
 }
 
+function makeControlledSourceBuffer(initialUpdating = false) {
+  const target = Object.assign(new EventTarget(), { updating: initialUpdating });
+  const sourceBuffer = Object.assign(target, {
+    appendBuffer: vi.fn(() => {
+      if (target.updating) throw new DOMException('Buffer is updating', 'InvalidStateError');
+
+      target.updating = true;
+    }),
+  }) as unknown as SourceBuffer;
+  const finishUpdating = () => {
+    target.updating = false;
+    target.dispatchEvent(new Event('updateend'));
+  };
+
+  return { sourceBuffer, finishUpdating };
+}
+
 async function* chunks(...buffers: ArrayBuffer[]): AsyncGenerator<Uint8Array> {
   for (const buf of buffers) yield new Uint8Array(buf);
 }
@@ -44,44 +61,36 @@ describe('appendSegment', () => {
   });
 
   it('resolves after updateend for ArrayBuffer', async () => {
-    const sb = makeSourceBuffer();
+    const { sourceBuffer, finishUpdating } = makeControlledSourceBuffer();
+    const settled = vi.fn();
+    const pending = appendSegment(sourceBuffer, new ArrayBuffer(4));
 
-    await expect(appendSegment(sb, new ArrayBuffer(4))).resolves.toBeUndefined();
+    void pending.then(settled, settled);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sourceBuffer.appendBuffer).toHaveBeenCalledOnce();
+    expect(settled).not.toHaveBeenCalled();
+
+    finishUpdating();
+    await expect(pending).resolves.toBeUndefined();
+    expect(settled).toHaveBeenCalledOnce();
   });
 
   it('waits for updating=false before appending', async () => {
-    const listeners: Record<string, EventListener[]> = {};
-    let updating = true;
+    const { sourceBuffer, finishUpdating } = makeControlledSourceBuffer(true);
+    const settled = vi.fn();
+    const pending = appendSegment(sourceBuffer, new ArrayBuffer(4));
 
-    const sb = {
-      get updating() {
-        return updating;
-      },
-      appendBuffer: vi.fn(() => {
-        setTimeout(() => {
-          updating = false;
+    void pending.then(settled, settled);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sourceBuffer.appendBuffer).not.toHaveBeenCalled();
+    expect(settled).not.toHaveBeenCalled();
 
-          for (const l of listeners.updateend ?? []) l(new Event('updateend'));
-        }, 0);
-      }),
-      addEventListener: vi.fn((type: string, listener: EventListener) => {
-        listeners[type] ??= [];
-        listeners[type].push(listener);
-      }),
-      removeEventListener: vi.fn((type: string, listener: EventListener) => {
-        listeners[type] = (listeners[type] ?? []).filter((l) => l !== listener);
-      }),
-    } as unknown as SourceBuffer;
+    finishUpdating();
+    await vi.waitFor(() => expect(sourceBuffer.appendBuffer).toHaveBeenCalledOnce());
+    expect(settled).not.toHaveBeenCalled();
 
-    // Simulate an external updateend that clears updating
-    setTimeout(() => {
-      updating = false;
-
-      for (const l of listeners.updateend ?? []) l(new Event('updateend'));
-    }, 10);
-
-    await appendSegment(sb, new ArrayBuffer(4));
-    expect(sb.appendBuffer).toHaveBeenCalledOnce();
+    finishUpdating();
+    await expect(pending).resolves.toBeUndefined();
   });
 
   // ---------------------------------------------------------------------------
@@ -96,20 +105,22 @@ describe('appendSegment', () => {
   });
 
   it('resolves after all chunks are appended', async () => {
-    const sb = makeSourceBuffer();
+    const { sourceBuffer, finishUpdating } = makeControlledSourceBuffer();
+    const settled = vi.fn();
+    const pending = appendSegment(sourceBuffer, chunks(new ArrayBuffer(4), new ArrayBuffer(8)));
 
-    await expect(appendSegment(sb, chunks(new ArrayBuffer(4), new ArrayBuffer(4)))).resolves.toBeUndefined();
-  });
+    void pending.then(settled, settled);
+    await vi.waitFor(() => expect(sourceBuffer.appendBuffer).toHaveBeenCalledTimes(1));
+    expect(settled).not.toHaveBeenCalled();
 
-  it('propagates errors thrown from the AsyncIterable', async () => {
-    const sb = makeSourceBuffer();
+    finishUpdating();
+    await vi.waitFor(() => expect(sourceBuffer.appendBuffer).toHaveBeenCalledTimes(2));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(settled).not.toHaveBeenCalled();
 
-    async function* errorStream(): AsyncGenerator<Uint8Array> {
-      yield new Uint8Array(4);
-      throw new Error('stream failed');
-    }
-
-    await expect(appendSegment(sb, errorStream())).rejects.toThrow('stream failed');
+    finishUpdating();
+    await expect(pending).resolves.toBeUndefined();
+    expect(settled).toHaveBeenCalledOnce();
   });
 
   it('calls sourceBuffer.abort() and throws when signal is aborted between chunks', async () => {

@@ -78,10 +78,20 @@ describe('renderElement', () => {
     });
 
     it('handles className function returning undefined', () => {
-      const { container } = render(<TestComponent className={(state) => (state.active ? 'active' : undefined)} />);
-      const element = container.firstElementChild;
+      function WithInternalClass() {
+        return renderElement(
+          'div',
+          { className: () => undefined },
+          {
+            state: {},
+            props: [{ className: 'internal' }],
+          }
+        );
+      }
 
-      expect(element?.className).not.toContain('active');
+      const { container } = render(<WithInternalClass />);
+
+      expect(container.firstElementChild?.className).toBe('internal');
     });
 
     it('merges className with props className', () => {
@@ -331,23 +341,6 @@ describe('renderElement', () => {
 
       expect(ref1.current).toBeInstanceOf(HTMLDivElement);
     });
-
-    it('composes ref from render element with forwarded ref', () => {
-      const CustomElement = forwardRef<HTMLSpanElement, React.ComponentPropsWithRef<'span'>>(
-        function CustomElement(props, ref) {
-          return <span ref={ref} {...props} />;
-        }
-      );
-
-      const elementRef = createRef<HTMLSpanElement>();
-      const componentRef = createRef<HTMLDivElement>();
-
-      render(<TestComponent ref={componentRef} render={<CustomElement ref={elementRef} />} />);
-
-      expect(elementRef.current).toBeInstanceOf(HTMLSpanElement);
-      expect(componentRef.current).toBeInstanceOf(HTMLSpanElement);
-      expect(elementRef.current).toBe(componentRef.current);
-    });
   });
 
   describe('props merging', () => {
@@ -483,27 +476,6 @@ describe('renderElement', () => {
       expect(element?.getAttribute('data-paused')).toBe('');
       expect(element?.hasAttribute('data-ended')).toBe(false);
       expect(element?.getAttribute('data-volume')).toBe('0.5');
-    });
-
-    it('does not expose unmapped state keys as data attributes', () => {
-      interface CamelCaseState {
-        isPaused: boolean;
-      }
-
-      const CamelCaseComponent = forwardRef(function CamelCaseComponent(
-        props: { isPaused?: boolean } & renderElement.ComponentProps<CamelCaseState>,
-        ref: ForwardedRef<HTMLDivElement>
-      ) {
-        const { className, style, render: renderProp, isPaused = false, ...elementProps } = props;
-        const state: CamelCaseState = { isPaused };
-
-        return renderElement('div', { className, style, render: renderProp }, { state, ref, props: [elementProps] });
-      });
-
-      const { container } = render(<CamelCaseComponent isPaused />);
-      const element = container.firstElementChild;
-
-      expect(element?.hasAttribute('data-ispaused')).toBe(false);
     });
 
     it('supports explicit state attribute mapping', () => {

@@ -30,30 +30,6 @@ describe('ReactiveElement', () => {
     expect(el).toBeInstanceOf(HTMLElement);
   });
 
-  it('calls connectedCallback and disconnectedCallback', () => {
-    const connected = vi.fn();
-    const disconnected = vi.fn();
-
-    class TestElement extends ReactiveElement {
-      override connectedCallback() {
-        super.connectedCallback();
-        connected();
-      }
-      override disconnectedCallback() {
-        super.disconnectedCallback();
-        disconnected();
-      }
-    }
-
-    const el = createElement(TestElement);
-
-    document.body.appendChild(el);
-    expect(connected).toHaveBeenCalledOnce();
-
-    el.remove();
-    expect(disconnected).toHaveBeenCalledOnce();
-  });
-
   it('runs willUpdate and update on first connect', async () => {
     const willUpdate = vi.fn();
     const update = vi.fn();
@@ -184,9 +160,15 @@ describe('ReactiveElement properties', () => {
     await el.updateComplete;
 
     update.mockClear();
+    const previous = el.updateComplete;
 
     el.label = 'new';
-    await el.updateComplete;
+    const completion = el.updateComplete;
+
+    expect(completion).not.toBe(previous);
+    expect(el.isUpdatePending).toBe(true);
+    expect(await completion).toBe(true);
+    expect(el.isUpdatePending).toBe(false);
 
     expect(update).toHaveBeenCalledOnce();
     const changed = update.mock.calls[0]![0] as PropertyValues;
@@ -630,25 +612,6 @@ describe('ReactiveElement updateComplete', () => {
 
     expect(result).toBe(true);
     expect(el.hasUpdated).toBe(true);
-  });
-
-  it('resolves after property-triggered update', async () => {
-    class TestElement extends ReactiveElement {
-      static override properties = {
-        label: { type: String },
-      };
-      label = '';
-    }
-
-    const el = createElement(TestElement);
-
-    document.body.appendChild(el);
-    await el.updateComplete;
-
-    el.label = 'changed';
-    const result = await el.updateComplete;
-
-    expect(result).toBe(true);
   });
 });
 

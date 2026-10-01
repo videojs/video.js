@@ -29,4 +29,11 @@ describe('scaleResolution', () => {
     expect(scaleResolution({ width: Number.NaN, height: 360 })).toBeUndefined();
     expect(scaleResolution({ width: 640, height: 360 }, Number.NaN)).toBeUndefined();
   });
+
+  it('reports nothing for an infinite scaled axis', () => {
+    expect.soft(scaleResolution({ width: Infinity, height: 360 })).toBeUndefined();
+    expect.soft(scaleResolution({ width: 640, height: Infinity })).toBeUndefined();
+    expect.soft(scaleResolution({ width: 640, height: 360 }, Infinity)).toBeUndefined();
+    expect.soft(scaleResolution({ width: Number.MAX_VALUE, height: 360 }, 2)).toBeUndefined();
+  });
 });

@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe('registerIcons', () => {
-  it('merges disjoint exact icon registrations in either module order', () => {
+  it('merges disjoint exact icon registrations', () => {
     const family = `test-exact-icons-${familyId++}`;
 
     registerIcons(family, { pause: '<svg data-icon="pause"></svg>' });

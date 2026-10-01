@@ -42,6 +42,11 @@ export class BufferingIndicatorElement extends UIElement {
     this.#disconnect = null;
   }
 
+  override destroyCallback(): void {
+    this.#core.destroy();
+    super.destroyCallback();
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed);
     this.#core.setProps(this);

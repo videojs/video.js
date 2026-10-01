@@ -61,15 +61,17 @@ describe('fetchWithRetry', () => {
 
   it('propagates a caller abort without retrying', async () => {
     const controller = new AbortController();
+    const reason = new Error('source replaced');
     const fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
-      controller.abort();
+      controller.abort(reason);
 
-      throw (init.signal as AbortSignal).reason ?? new DOMException('Aborted', 'AbortError');
+      // SAFETY: fetchWithRetry supplies its combined signal on every attempt.
+      throw (init.signal as AbortSignal).reason;
     });
 
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(fetchWithRetry('https://x', {}, controller.signal, FAST)).rejects.toThrow();
+    await expect(fetchWithRetry('https://x', {}, controller.signal, FAST)).rejects.toBe(reason);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 

@@ -34,9 +34,24 @@ describe('flushBuffer', () => {
   });
 
   it('resolves when updateend fires', async () => {
-    const sourceBuffer = makeSourceBuffer();
+    const target = Object.assign(new EventTarget(), { updating: false });
+    const sourceBuffer = Object.assign(target, {
+      remove: vi.fn(() => {
+        target.updating = true;
+      }),
+    }) as unknown as SourceBuffer;
+    const settled = vi.fn();
+    const pending = flushBuffer(sourceBuffer, 0, 10);
 
-    await expect(flushBuffer(sourceBuffer, 0, 10)).resolves.toBeUndefined();
+    void pending.then(settled, settled);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(sourceBuffer.remove).toHaveBeenCalledWith(0, 10);
+    expect(settled).not.toHaveBeenCalled();
+
+    target.updating = false;
+    target.dispatchEvent(new Event('updateend'));
+    await expect(pending).resolves.toBeUndefined();
+    expect(settled).toHaveBeenCalledOnce();
   });
 
   it('waits for SourceBuffer to finish updating before removing', async () => {

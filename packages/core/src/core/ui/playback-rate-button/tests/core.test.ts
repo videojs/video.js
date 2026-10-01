@@ -44,15 +44,6 @@ describe('PlaybackRateButtonCore', () => {
       });
     });
 
-    it('returns default label for rate 1', () => {
-      const core = new PlaybackRateButtonCore();
-
-      expect(core.getLabel(createState({ rate: 1 }))).toMatchObject({
-        key: 'playback.rate',
-        text: 'Playback rate {rate}',
-      });
-    });
-
     it('returns custom string label', () => {
       const core = new PlaybackRateButtonCore({ label: 'Speed' });
 
@@ -117,12 +108,18 @@ describe('PlaybackRateButtonCore', () => {
   });
 
   describe('cycle', () => {
-    it('advances to the next rate', () => {
+    it.each([
+      [1, 1.2],
+      [1.5, 1.7],
+      [0.3, 0.5],
+      [1.3, 1.5],
+      [0.2, 0.5],
+    ])('advances from %s to %s', (current, expected) => {
       const core = new PlaybackRateButtonCore();
-      const media = createMediaState({ playbackRate: 1 });
+      const media = createMediaState({ playbackRate: current });
 
       core.cycle(media);
-      expect(media.setPlaybackRate).toHaveBeenCalledWith(1.2);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(expected);
     });
 
     it('wraps to the first rate after the last', () => {
@@ -133,44 +130,12 @@ describe('PlaybackRateButtonCore', () => {
       expect(media.setPlaybackRate).toHaveBeenCalledWith(0.2);
     });
 
-    it('advances through the middle of the list', () => {
-      const core = new PlaybackRateButtonCore();
-      const media = createMediaState({ playbackRate: 1.5 });
-
-      core.cycle(media);
-      expect(media.setPlaybackRate).toHaveBeenCalledWith(1.7);
-    });
-
-    it('finds the first rate greater than current when not in list', () => {
-      const core = new PlaybackRateButtonCore();
-      const media = createMediaState({ playbackRate: 0.3 });
-
-      core.cycle(media);
-      expect(media.setPlaybackRate).toHaveBeenCalledWith(0.5);
-    });
-
-    it('finds the next greater rate when between list values', () => {
-      const core = new PlaybackRateButtonCore();
-      const media = createMediaState({ playbackRate: 1.3 });
-
-      core.cycle(media);
-      expect(media.setPlaybackRate).toHaveBeenCalledWith(1.5);
-    });
-
     it('wraps to first rate when current is above all rates and not in list', () => {
       const core = new PlaybackRateButtonCore();
       const media = createMediaState({ playbackRate: 3 });
 
       core.cycle(media);
       expect(media.setPlaybackRate).toHaveBeenCalledWith(0.2);
-    });
-
-    it('cycles through sub-1x rates', () => {
-      const core = new PlaybackRateButtonCore();
-      const media = createMediaState({ playbackRate: 0.2 });
-
-      core.cycle(media);
-      expect(media.setPlaybackRate).toHaveBeenCalledWith(0.5);
     });
 
     it('does nothing when menuTrigger is set', () => {

@@ -29,10 +29,10 @@ type CopyState =
  * installation guide's twin carries the picks the page shows, including the Shadcn framework before its URL is
  * normalized.
  */
-export async function markdownUrl(
-  location: Pick<Location, 'origin' | 'pathname' | 'search'> = window.location,
-  registryFramework = globalThis.document?.documentElement.dataset.registryFramework
-): Promise<string> {
+async function markdownUrl(): Promise<string> {
+  const location = window.location;
+  const registryFramework = globalThis.document?.documentElement.dataset.registryFramework;
+
   // Strip trailing slashes so `/guide/` becomes `/guide.md`, not `/guide/.md`. Astro forbids trailing slashes but
   // infrastructure may add them back.
   const pathname = location.pathname.replace(/\/+$/, '');
@@ -53,7 +53,7 @@ export async function markdownUrl(
 }
 
 /** Remove private installation input before embedding a documentation URL in a third-party assistant link. */
-export async function publicMarkdownUrl(url: string): Promise<string> {
+async function publicMarkdownUrl(url: string): Promise<string> {
   if (url === '#') return url;
 
   const { PRIVATE_INSTALLATION_QUERY_PARAMETERS } = await import('@videojs/installation');

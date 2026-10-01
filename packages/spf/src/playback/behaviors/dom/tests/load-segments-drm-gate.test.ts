@@ -162,7 +162,7 @@ describe('loadVideoSegments (encrypted-source load gate)', () => {
     destroy();
   });
 
-  it('still dispatches for a clear source — the guard is the gate, not a new precondition', async () => {
+  it('dispatches for the encrypted fixture when no behavior raises the gate', async () => {
     // Liveness control. Without it the assertion above passes for the wrong
     // reason: a harness that never dispatches proves nothing.
     const { state, dispatched, destroy } = setupComposed({ withMediaKeys: false });

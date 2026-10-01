@@ -1,6 +1,6 @@
 /**
- * Mock React VideoSkinTailwind component.
+ * Mock React VideoTailwindSkin component.
  *
  * Exercises: tailwind skin exclusion — this should NOT appear in the output.
  */
-export function VideoSkinTailwind(): void {}
+export function VideoTailwindSkin(): void {}

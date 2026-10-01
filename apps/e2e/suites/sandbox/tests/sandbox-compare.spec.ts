@@ -40,6 +40,28 @@ async function playerBox(frame: Frame) {
   return box;
 }
 
+async function markDocuments(frames: Frame[]) {
+  return Promise.all(
+    frames.map(async (frame) => {
+      await playerBox(frame);
+      await frame.waitForLoadState('load');
+
+      return frame.evaluate(() => {
+        const token = crypto.randomUUID();
+
+        document.documentElement.dataset.auditDocument = token;
+        return token;
+      });
+    })
+  );
+}
+
+async function expectDocuments(frames: Frame[], tokens: string[]) {
+  for (const [index, frame] of frames.entries()) {
+    await expect(frame.locator('html')).toHaveAttribute('data-audit-document', tokens[index]!);
+  }
+}
+
 test.describe('Sandbox compare', () => {
   for (const platform of ['html', 'react']) {
     test(`changes the ${platform} aspect ratio in both panels without reloading`, async ({ page }) => {
@@ -49,7 +71,7 @@ test.describe('Sandbox compare', () => {
       );
 
       const frames = await Promise.all([getPanelFrame(page, 'css'), getPanelFrame(page, 'tailwind')]);
-      const urls = frames.map((frame) => frame.url());
+      const tokens = await markDocuments(frames);
       const options = page.getByRole('button', { name: 'Options', exact: true });
 
       if ((await options.getAttribute('aria-expanded')) !== 'true') await options.click();
@@ -69,7 +91,7 @@ test.describe('Sandbox compare', () => {
           await expect.poll(async () => Math.round((await playerBox(frame)).height)).toBe(height);
         }
 
-        expect(frames.map((frame) => frame.url())).toEqual(urls);
+        await expectDocuments(frames, tokens);
         const ratio = new URL(page.url()).searchParams.get('ratio');
 
         expect(ratio).toBe(label === '16:9' ? null : label.toLowerCase());
@@ -77,6 +99,12 @@ test.describe('Sandbox compare', () => {
 
       await page.getByRole('combobox', { name: 'Aspect ratio', exact: true }).click();
       await page.getByRole('option', { name: '4:3', exact: true }).click();
+
+      for (const frame of frames) {
+        await expect.poll(async () => Math.round((await playerBox(frame)).height)).toBe(360);
+      }
+
+      await expectDocuments(frames, tokens);
       await page.reload();
       await expect(page.getByRole('combobox', { name: 'Aspect ratio', exact: true })).toHaveText('4:3');
 
@@ -172,15 +200,22 @@ test.describe('Sandbox compare', () => {
     test(`resizes ${layout} comparisons by keyboard and pointer without reloading players`, async ({ page }) => {
       await page.setViewportSize({ width: 1400, height: 900 });
       await page.goto(`${SANDBOX_BASE}/?platform=html&media=video&compare=platform&layout=${layout}&${QUERY}`);
-      const frame = await getPanelFrame(page, 'html');
-
-      await playerBox(frame);
+      const frames = await Promise.all([getPanelFrame(page, 'html'), getPanelFrame(page, 'react')]);
+      const tokens = await markDocuments(frames);
+      const panels = ['html', 'react'].map((id) => page.locator(`iframe[data-panel="${id}"]`));
+      const dimension = layout === 'row' ? 'width' : 'height';
+      const sizes = () => Promise.all(panels.map(async (panel) => (await panel.boundingBox())![dimension]));
+      const initialSizes = await sizes();
       const divider = page.getByRole('separator', { name: 'Resize comparison panels' });
 
       await expect(divider).toHaveAttribute('aria-orientation', layout === 'row' ? 'vertical' : 'horizontal');
       await expect(divider).toHaveAttribute('aria-valuenow', '50');
       await divider.press(layout === 'row' ? 'ArrowRight' : 'ArrowDown');
       await expect.poll(async () => Number(await divider.getAttribute('aria-valuenow'))).toBeGreaterThan(50);
+      await expect.poll(async () => (await sizes())[0]!).toBeGreaterThan(initialSizes[0]!);
+      await expect.poll(async () => (await sizes())[1]!).toBeLessThan(initialSizes[1]!);
+      await expectDocuments(frames, tokens);
+      const keyboardSizes = await sizes();
       const before = Number(await divider.getAttribute('aria-valuenow'));
       const box = await divider.boundingBox();
       if (!box) throw new Error('Expected a comparison divider.');
@@ -193,7 +228,9 @@ test.describe('Sandbox compare', () => {
       await page.mouse.move(x + (layout === 'row' ? 100 : 0), y + (layout === 'column' ? 100 : 0), { steps: 10 });
       await page.mouse.up();
       await expect.poll(async () => Number(await divider.getAttribute('aria-valuenow'))).toBeGreaterThan(before);
-      expect(await getPanelFrame(page, 'html')).toBe(frame);
+      await expect.poll(async () => (await sizes())[0]!).toBeGreaterThan(keyboardSizes[0]!);
+      await expect.poll(async () => (await sizes())[1]!).toBeLessThan(keyboardSizes[1]!);
+      await expectDocuments(frames, tokens);
     });
   }
 
@@ -226,12 +263,13 @@ test.describe('Sandbox compare', () => {
   test('auto changes the resize direction with the available preview width', async ({ page }) => {
     await page.setViewportSize({ width: 1400, height: 900 });
     await page.goto(`${SANDBOX_BASE}/?platform=html&media=video&compare=platform&${QUERY}`);
-    const frame = await getPanelFrame(page, 'html');
+    const frames = await Promise.all([getPanelFrame(page, 'html'), getPanelFrame(page, 'react')]);
+    const tokens = await markDocuments(frames);
     const divider = page.getByRole('separator', { name: 'Resize comparison panels' });
 
     await expect(divider).toHaveAttribute('aria-orientation', 'vertical');
     await page.setViewportSize({ width: 800, height: 900 });
     await expect(divider).toHaveAttribute('aria-orientation', 'horizontal');
-    expect(await getPanelFrame(page, 'html')).toBe(frame);
+    await expectDocuments(frames, tokens);
   });
 });

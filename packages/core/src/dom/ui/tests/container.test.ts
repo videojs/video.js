@@ -23,10 +23,13 @@ describe('focusContainer', () => {
     const host = document.createElement('div');
     const button = document.createElement('button');
 
+    container.tabIndex = 0;
     host.attachShadow({ mode: 'open' }).append(button);
     container.append(host);
     document.body.append(container);
     button.focus();
+
+    expect(host.shadowRoot?.activeElement).toBe(button);
 
     focusContainer(container);
 

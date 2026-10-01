@@ -33,6 +33,7 @@ describe('NativeHlsAdapter', () => {
 
     expect(event).toBeInstanceOf(ErrorEvent);
     expect(event.error).toBeInstanceOf(MediaError);
+    expect(event.error.fatal).toBe(true);
     expect(event.error.code).toBe(MediaError.MEDIA_ERR_NETWORK);
     expect(event.error.message).toBe(MediaError.defaultMessages[MediaError.MEDIA_ERR_NETWORK]);
   });

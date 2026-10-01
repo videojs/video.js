@@ -148,25 +148,15 @@ describe('TimeSliderCore', () => {
       expect(attrs['aria-valuemax']).toBe(600);
     });
 
-    it('handles zero duration', () => {
-      const core = new TimeSliderCore();
-
-      core.setInput(createInput());
-      core.setMedia(createMediaState({ currentTime: 0, duration: 0 }));
-      const state = core.getState();
-
-      expect(state.fillPercent).toBe(0);
-      expect(state.value).toBe(0);
-    });
-
     it('is disabled without a duration or seekable range', () => {
       const core = new TimeSliderCore();
 
       core.setInput(createInput());
-      core.setMedia(createMediaState({ duration: 0, seekable: [] }));
+      core.setMedia(createMediaState({ currentTime: 5, duration: 0, seekable: [] }));
       const state = core.getState();
 
       expect(state.disabled).toBe(true);
+      expect(state.fillPercent).toBe(0);
       expect(core.getAttrs(state)).toMatchObject({ 'aria-disabled': 'true', tabIndex: -1 });
       expect(core.getAttrs(state)['aria-valuetext']).toMatchObject({
         key: 'time.unknown',
@@ -248,19 +238,6 @@ describe('TimeSliderCore', () => {
   });
 
   describe('setProps', () => {
-    it('updates label', () => {
-      const core = new TimeSliderCore();
-
-      core.setProps({ label: 'Progress' });
-
-      core.setInput(createInput());
-      core.setMedia(createMediaState({ currentTime: 0, duration: 100 }));
-      const state = core.getState();
-      const attrs = core.getAttrs(state);
-
-      expect(attrs['aria-label']).toBe('Progress');
-    });
-
     it('preserves disabled across getState calls', () => {
       const core = new TimeSliderCore({ disabled: true });
 

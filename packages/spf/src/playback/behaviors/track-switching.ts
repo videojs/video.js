@@ -19,10 +19,12 @@
  * 3. **active CDN** — a soft filter on `cdnPriority` (`preferActiveCdn`): narrow to the highest-priority CDN that still
  *    has tracks; an empty match falls through. Shared by video and audio, so every type stays on one CDN
  *    (`deriveCdnPriority` owns the list). No-op for non-redundant sources.
- * 4. **player resolution** — a soft filter on `playerResolution` (`playerResolutionCap`, video only): narrow to the
+ * 4. **audio preference** — a soft filter (audio only): narrow to `preferredAudioLanguage` matches, or manifest-default
+ *    tracks when the language has no match. Keeps all matching renditions for the bandwidth ranker.
+ * 5. **player resolution** — a soft filter on `playerResolution` (`playerResolutionCap`, video only): narrow to the
  *    smallest rendition tier covering the player element, plus everything below it. No-op without a measurement. Ahead
  *    of the ranker but behind the CDN scope, so the cap chooses _within_ a host rather than between hosts.
- * 5. **ranking** — the terminal sort: `rankByBandwidth`, shared by video and audio. Fitting tracks (within the throughput
+ * 6. **ranking** — the terminal sort: `rankByBandwidth`, shared by video and audio. Fitting tracks (within the throughput
  *    threshold) first, highest bitrate first; over-throughput tracks after, least-over first. Hysteresis via boosting
  *    the current track's sort weight by `upgradeMargin`.
  *
@@ -41,20 +43,18 @@
  * engine config reaches every variant. Video and audio default to constraints `[excludeFailedCdns,
  * excludeUnplayableTracks, stickToSelectedCodecs]` then rules `[filterByUserSelection, preferCodecFamilies,
  * preferActiveCdn, rankByBandwidth]` and take the head; video inserts `playerResolutionCap` after the active-CDN scope,
- * and `switchVideoTrack` also accepts ABR tuning config, `switchAudioTrack` takes none. `switchTextTrack` differs —
- * selection is _optional_ (captions are opt-in / off-able), so it runs `[excludeFailedCdns]` + `[preferActiveCdn]` and
- * supplies a text terminal (`pickResolvedTextTrack`) that resolves standing user intent (`userTextTrackSelection`,
- * incl. `'off'`) and may yield no selection. (The active-CDN _scope_ is the sticky-pick half of multi-CDN; the
- * failed-CDN _constraint_ is the failover half — prune the cooled-down CDN, the scope falls to the next.)
+ * audio inserts its language/default preference there. `switchVideoTrack` also accepts ABR tuning config.
+ * `switchTextTrack` differs — selection is _optional_ (captions are opt-in / off-able), so it runs
+ * `[excludeFailedCdns]` + `[preferActiveCdn]` and supplies a text terminal (`pickResolvedTextTrack`) that resolves
+ * standing user intent (`userTextTrackSelection`, incl. `'off'`) and may yield no selection. (The active-CDN _scope_ is
+ * the sticky-pick half of multi-CDN; the failed-CDN _constraint_ is the failover half — prune the cooled-down CDN, the
+ * scope falls to the next.)
  *
  * When the pre-pass prunes a type that _has_ tracks to empty, the behavior clears the selection (so a now-unplayable
  * pick can't linger and stall) and reports the type's `noSupportedTrackCode`. Which constraint emptied the set is
  * deliberately not consulted — the behavior reads no constraint's state, so the chain stays composable. A type with no
  * tracks at all is left alone; that's a legitimate source shape, not a failure. The late `createSourceBuffer` check
  * stays as the structural backstop.
- *
- * Deferred: audio's preferred-language / default-track selection as standing soft-filter rules (previously the
- * empty-slot picker, dropped in the move to the rule chain).
  */
 
 import { type AnySlotMap, defineBehavior } from '../../core/composition/create-composition';
@@ -64,6 +64,7 @@ import { DEFAULT_QUALITY_CONFIG, type QualityConfig, resolutionArea } from '../.
 import { SVTA_NO_SUPPORTED_AUDIO_TRACK, SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../media/errors';
 import type { Resolution } from '../../media/primitives/resolution';
 import {
+  type AudioSelectionConfig,
   matchesPartialTrack,
   pickTextTrackFromTracks,
   smallestCoveringPixelArea,
@@ -173,23 +174,6 @@ export interface SwitchAudioTrackConfig extends TrackSwitchingSharedConfig {
 export const DEFAULT_INITIAL_BANDWIDTH = 5_000_000;
 
 // ============================================================================
-// Rule chain
-// ============================================================================
-
-// Re-exported so a consumer typing against this module's rules doesn't need a
-// second import; the definitions live in `../primitives/selection-rules` so the
-// simple `selectVideoTrack` variant can share them without pulling the ABR path
-// in with them. See that module's note.
-export type { CodecPreferenceConfig, SelectionRule, SelectionRuleDeps } from '../primitives/selection-rules';
-export {
-  applyConstraints,
-  applyRules,
-  DEFAULT_PREFERRED_CODECS,
-  excludeUnplayableTracks,
-  preferCodecFamilies,
-} from '../primitives/selection-rules';
-
-// ============================================================================
 // Specialization helper
 //
 // `setupTrackSwitching` has the same shape as a Behavior `setup` function:
@@ -246,7 +230,7 @@ type SwitchableTrack = {
  * (text: opt-in captions, explicit off) supplies its own picker that may return `undefined`; the helper writes that
  * straight through to the slot, clearing it.
  */
-export type ResolveSelection<T extends SwitchableTrack, State = unknown, Context = unknown, Config = unknown> = (
+type ResolveSelection<T extends SwitchableTrack, State = unknown, Context = unknown, Config = unknown> = (
   candidates: readonly T[],
   deps: SelectionRuleDeps<State, Context, Config>
 ) => string | undefined;
@@ -407,6 +391,28 @@ function filterByUserSelection<S extends SelectionKey, U extends UserSelectionKe
   const filter = state[key]?.get();
 
   return filter ? tracks.filter((track) => matchesPartialTrack(track, filter)) : tracks;
+}
+
+/**
+ * Audio preference — a soft filter. Prefer the configured language, then manifest-default tracks; an empty match falls
+ * through to bandwidth ranking. Keep every matching rendition so preference doesn't pin a bitrate.
+ */
+function preferAudioPolicy<
+  T extends SwitchableTrack & Pick<AudioTrack, 'language' | 'default'>,
+  State,
+  Context,
+  Config,
+>(tracks: readonly T[], { config }: SelectionRuleDeps<State, Context, Config>): readonly T[] {
+  // SAFETY: Both HLS engines declare preferredAudioLanguage as an optional string
+  // and forward their config unchanged to the rules.
+  const preferredLanguage = (config as AudioSelectionConfig | undefined)?.preferredAudioLanguage;
+
+  if (preferredLanguage) {
+    const matches = tracks.filter((track) => track.language === preferredLanguage);
+    if (matches.length) return matches;
+  }
+
+  return tracks.filter((track) => track.default === true);
 }
 
 /**
@@ -672,7 +678,7 @@ function pickResolvedTextTrack<T extends TextTrackCandidate>(
 // to its constraint and forcing the slot required, so the variants forward it
 // untyped via the rest and it lands here — absent on direct setup calls, and
 // passed straight through to the rules (which don't read it yet).
-export function setupTrackSwitching<
+function setupTrackSwitching<
   S extends SelectionKey,
   T extends SwitchableTrack,
   C extends TrackSwitchingConfig<S, T>,
@@ -858,11 +864,12 @@ export const DEFAULT_AUDIO_CONSTRAINTS: readonly SwitchAudioTrackRule[] = [
   stickToSelectedCodecs,
 ];
 
-/** Default audio chain: the video one without the player-resolution cap. */
+/** Default audio chain: user intent, codec family, active CDN, language/default preference, then bandwidth ranking. */
 export const DEFAULT_AUDIO_RULES: readonly SwitchAudioTrackRule[] = [
   filterByUserSelection,
   preferCodecFamilies,
   preferActiveCdn,
+  preferAudioPolicy,
   rankByBandwidth,
 ];
 

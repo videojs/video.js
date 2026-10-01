@@ -10,9 +10,14 @@ import {
 
 vi.mock('astro:transitions/client', () => ({ navigate: vi.fn() }));
 
+function createClientRects(...rects: DOMRect[]): DOMRectList {
+  return Object.assign(rects, { item: (index: number) => rects[index] ?? null });
+}
+
 afterEach(() => {
   document.body.replaceChildren();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 describe('navigateToHeading', () => {
@@ -73,41 +78,44 @@ describe('filterRenderedHeadings', () => {
       { depth: 2, text: 'Install the media adapter', slug: 'install-the-media-adapter' },
       { depth: 2, text: 'Add your player', slug: 'add-your-player' },
     ];
-    const renderedIds = new Set(['choose-your-media', 'add-your-player']);
 
-    expect(
-      filterRenderedHeadings(
-        headings,
-        (id) => (renderedIds.has(id) ? document.body : null),
-        () => true
-      )
-    ).toEqual([headings[0], headings[2]]);
+    for (const heading of [headings[0], headings[2]]) {
+      const element = document.createElement('h2');
+
+      element.id = heading.slug;
+      vi.spyOn(element, 'getClientRects').mockReturnValue(createClientRects(new DOMRect()));
+      document.body.append(element);
+    }
+
+    expect(filterRenderedHeadings(headings)).toEqual([headings[0], headings[2]]);
   });
 
   it('omits static anchor placeholders for conditional headings', () => {
     const heading = { depth: 2, text: 'Install the media adapter', slug: 'install-the-media-adapter' };
     const placeholder = document.createElement('span');
 
+    placeholder.id = heading.slug;
     placeholder.dataset.conditionalHeadingPlaceholder = '';
+    vi.spyOn(placeholder, 'getClientRects').mockReturnValue(createClientRects(new DOMRect()));
+    document.body.append(placeholder);
 
-    expect(
-      filterRenderedHeadings(
-        [heading],
-        () => placeholder,
-        () => true
-      )
-    ).toEqual([]);
+    expect(filterRenderedHeadings([heading])).toEqual([]);
   });
 
   it('omits headings hidden by a selected installation path', () => {
-    const heading = { depth: 2, text: 'Configure Shadcn', slug: 'configure-shadcn' };
+    const headings = [
+      { depth: 2, text: 'Configure Shadcn', slug: 'configure-shadcn' },
+      { depth: 2, text: 'Add your player', slug: 'add-your-player' },
+    ];
+    const hidden = document.createElement('h2');
+    const visible = document.createElement('h2');
 
-    expect(
-      filterRenderedHeadings(
-        [heading],
-        () => document.body,
-        () => false
-      )
-    ).toEqual([]);
+    hidden.id = headings[0].slug;
+    visible.id = headings[1].slug;
+    vi.spyOn(hidden, 'getClientRects').mockReturnValue(createClientRects());
+    vi.spyOn(visible, 'getClientRects').mockReturnValue(createClientRects(new DOMRect()));
+    document.body.append(hidden, visible);
+
+    expect(filterRenderedHeadings(headings)).toEqual([headings[1]]);
   });
 });

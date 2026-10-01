@@ -510,9 +510,11 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   // The embed reports state snapshots rather than events, so every dispatch is a diff between two of them; the early
   // returns keep it to at most one transition per update.
   #onPlaybackUpdate(data: SpotifyPlaybackState) {
-    // Later loads (`loadUri`) never re-fire `ready`, so the first update completes the load; a cleared src has no load
-    // to complete, and completing on an update from the paused embed would put the cleared state right back.
-    if (this.#src && !this.#loaded) this.#onLoaded();
+    // The embed retains the old entity after clearing, so its snapshots no longer belong to a source.
+    if (!this.#src) return;
+
+    // Later loads (`loadUri`) never re-fire `ready`, so the first update completes the load.
+    if (!this.#loaded) this.#onLoaded();
 
     if (this.#restartFromEnd(data)) return;
 

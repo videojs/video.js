@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation, Presentation } from '../../../media/types';
-import { DEFAULT_FAILOVER_MONITOR_CONFIG, setupFailoverMonitor } from '../setup-failover-monitor';
+import { setupFailoverMonitor } from '../setup-failover-monitor';
 
 const resolved = (): Presentation =>
   ({ id: 'pres-1', url: 'https://cdn-a.example.com/master.m3u8', startTime: 0, selectionSets: [] }) as Presentation;
@@ -36,7 +36,9 @@ describe('setupFailoverMonitor', () => {
     await flush();
     expect(state.failedCdns.get()).toEqual([A]);
 
-    await vi.advanceTimersByTimeAsync(1000);
+    await vi.advanceTimersByTimeAsync(999);
+    expect(state.failedCdns.get()).toEqual([A]);
+    await vi.advanceTimersByTimeAsync(1);
     expect(state.failedCdns.get()).toEqual([]);
 
     reactor.destroy();
@@ -78,10 +80,31 @@ describe('setupFailoverMonitor', () => {
     await flush();
     expect(state.failedCdns.get()).toBeUndefined();
 
+    state.presentation.set(resolved());
+    await flush();
+    await vi.advanceTimersByTimeAsync(500);
+    state.failedCdns.set([A]);
+    await flush();
+
+    await vi.advanceTimersByTimeAsync(500);
+    expect(state.failedCdns.get()).toEqual([A]);
+    await vi.advanceTimersByTimeAsync(500);
+    expect(state.failedCdns.get()).toEqual([]);
+
     reactor.destroy();
   });
 
-  it('exposes a sensible failover default', () => {
-    expect(DEFAULT_FAILOVER_MONITOR_CONFIG.cooldownMs).toBeGreaterThan(0);
+  it('expires a failed CDN after five minutes when config is omitted', async () => {
+    const state = makeState(resolved());
+    const reactor = setupFailoverMonitor.setup({ state });
+
+    state.failedCdns.set([A]);
+    await flush();
+    await vi.advanceTimersByTimeAsync(299_999);
+    expect(state.failedCdns.get()).toEqual([A]);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(state.failedCdns.get()).toEqual([]);
+
+    reactor.destroy();
   });
 });

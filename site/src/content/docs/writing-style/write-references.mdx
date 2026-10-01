@@ -271,7 +271,7 @@ If your export matches a naming convention, skip the `@public` tag.
 
 ### The slug prop
 
-The `util` prop takes the export name (`"usePlayer"`, `"PlayerController"`). If the generated JSON slug doesn't match `kebabCase(util)` -- like the HTML `createPlayer` whose slug is `html-create-player` -- pass `slug` explicitly:
+The `util` prop takes the export name (`"usePlayer"`, `"PlayerController"`). The default slug uses kebab case while preserving the `i18n` abbreviation, so `registerI18n` resolves to `register-i18n`. If the generated JSON uses a framework-specific slug, like the HTML `createPlayer` whose slug is `html-create-player`, pass `slug` explicitly:
 
 ```mdx
 <UtilReference util="createPlayer" slug="html-create-player" />

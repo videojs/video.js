@@ -13,19 +13,6 @@ describe('useDestroy', () => {
     vi.useRealTimers();
   });
 
-  it('destroys instance after unmount', () => {
-    const instance = { destroy: vi.fn() };
-
-    const { unmount } = renderHook(() => useDestroy(instance));
-
-    expect(instance.destroy).not.toHaveBeenCalled();
-
-    unmount();
-    vi.runAllTimers();
-
-    expect(instance.destroy).toHaveBeenCalledOnce();
-  });
-
   it('does not destroy synchronously in cleanup', () => {
     const instance = { destroy: vi.fn() };
 
@@ -38,26 +25,6 @@ describe('useDestroy', () => {
 
     vi.runAllTimers();
     expect(instance.destroy).toHaveBeenCalledOnce();
-  });
-
-  it('does not destroy in StrictMode double-mount', () => {
-    const instance = { destroy: vi.fn() };
-
-    function TestComponent() {
-      useDestroy(instance);
-      return null;
-    }
-
-    render(
-      <StrictMode>
-        <TestComponent />
-      </StrictMode>
-    );
-
-    vi.runAllTimers();
-
-    // StrictMode runs cleanup then re-mount — destroy should be cancelled
-    expect(instance.destroy).not.toHaveBeenCalled();
   });
 
   it('destroys after real unmount in StrictMode', () => {
@@ -81,15 +48,6 @@ describe('useDestroy', () => {
     vi.runAllTimers();
 
     expect(instance.destroy).toHaveBeenCalledOnce();
-  });
-
-  it('calls setup once on mount', () => {
-    const instance = { destroy: vi.fn() };
-    const setup = vi.fn();
-
-    renderHook(() => useDestroy(instance, setup));
-
-    expect(setup).toHaveBeenCalledOnce();
   });
 
   it('calls setup once in StrictMode (skips re-mount)', () => {

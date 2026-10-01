@@ -148,8 +148,12 @@ describe('getSlottedElement', () => {
       const host = createHostWithNamedSlot();
       const video = document.createElement('video');
 
-      video.slot = 'nonexistent';
+      video.slot = 'media';
       host.appendChild(video);
+
+      expect(getSlottedElement(host.shadowRoot!, 'media', (el) => (el instanceof HTMLVideoElement ? el : null))).toBe(
+        video
+      );
 
       const result = getSlottedElement(host.shadowRoot!, 'nonexistent', (el) =>
         el instanceof HTMLVideoElement ? el : null

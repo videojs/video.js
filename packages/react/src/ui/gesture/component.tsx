@@ -20,7 +20,7 @@ export function Gesture({ type, action, value, pointer, region, disabled }: Gest
   const container = useContainer();
 
   useEffect(() => {
-    if (!container || !type || !action || disabled) return;
+    if (!container || !type || !action) return;
 
     const resolver = resolveGestureAction(action);
     if (!resolver) return;
@@ -31,7 +31,7 @@ export function Gesture({ type, action, value, pointer, region, disabled }: Gest
       resolver({ store, value: actionValue, event });
     };
 
-    const options = { pointer, region, action, value: actionValue };
+    const options = { pointer, region, disabled, action, value: actionValue };
 
     if (type === 'doubletap') {
       return createDoubleTapGesture(container, onActivate, options);

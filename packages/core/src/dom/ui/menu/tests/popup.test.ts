@@ -56,16 +56,68 @@ describe('createMenuPopup', () => {
 
     childMenu.open();
     popup.sync();
+    expect(rootElement.getAttribute('aria-hidden')).toBe('true');
+    expect(rootElement.hasAttribute('inert')).toBe(true);
     childMenu.close();
+    popup.sync();
+    expect(childMenu.input.current.status).toBe('ending');
+    expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(true);
+
+    const records: MutationRecord[] = [];
+    const observer = new MutationObserver((mutations) => records.push(...mutations));
+
+    observer.observe(rootElement, { attributes: true, attributeOldValue: true, attributeFilter: ['data-child-open'] });
     childMenu.open();
     popup.sync();
 
     await vi.waitFor(() => expect(childMenu.input.current.status).toBe('idle'));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    records.push(...observer.takeRecords());
+    observer.disconnect();
+
+    // A removal followed by a re-add has a null oldValue on the re-add record.
+    expect(records.every((record) => record.oldValue !== null)).toBe(true);
     expect(rootElement.hasAttribute(MenuContentDataAttrs.childOpen)).toBe(true);
+    expect(childMenu.input.current.active).toBe(true);
 
     popup.destroy();
     rootMenu.destroy();
     childMenu.destroy();
+  });
+
+  it('remeasures settled open content when a DOM item is added', async () => {
+    const popupElement = document.createElement('div');
+    const content = document.createElement('div');
+    const items = document.createElement('div');
+    const { menu } = createTestMenu();
+    const popup = createMenuPopup();
+
+    items.append(document.createElement('button'));
+    content.append(items);
+    popupElement.append(content);
+    document.body.append(popupElement);
+    vi.spyOn(items, 'getBoundingClientRect').mockImplementation(
+      () => new DOMRect(0, 0, 160, items.children.length * 20)
+    );
+    Object.defineProperties(items, {
+      scrollWidth: { configurable: true, get: () => 160 },
+      scrollHeight: { configurable: true, get: () => items.children.length * 20 },
+    });
+    popup.setElement(popupElement);
+    popup.registerContent({ menu, parent: null, element: content });
+    menu.open();
+
+    await vi.waitFor(() => expect(menu.input.current.status).toBe('idle'));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    expect(popupElement.style.getPropertyValue(MenuCSSVars.height)).toBe('20px');
+
+    items.append(document.createElement('button'));
+
+    await vi.waitFor(() => expect(popupElement.style.getPropertyValue(MenuCSSVars.height)).toBe('40px'));
+    expect(menu.input.current).toEqual({ active: true, status: 'idle' });
+
+    popup.destroy();
+    menu.destroy();
   });
 
   it('includes the vertical scrollbar when sizing the popup', () => {

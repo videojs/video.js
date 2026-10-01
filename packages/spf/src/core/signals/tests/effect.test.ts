@@ -76,14 +76,17 @@ describe('effect', () => {
         if (own.get() === undefined) own.set('locked');
       });
 
-      await flush();
-      await flush();
-      const settled = runCount;
+      try {
+        expect(runCount).toBe(1);
+        expect(own.get()).toBe('locked');
 
-      await flush();
-      // No dirty dependency left behind → no phantom re-runs.
-      expect(runCount).toBe(settled);
-      stop();
+        for (let i = 0; i < 3; i++) {
+          await flush();
+          expect(runCount).toBe(1);
+        }
+      } finally {
+        stop();
+      }
     });
   });
 });

@@ -38,6 +38,11 @@ class StubWistiaPlayer extends HTMLElement implements WistiaPlayerMembers {
   playBarControl = true;
   bigPlayButton = true;
   playerColor = '';
+  providerControls = { playBar: { name: 'play-bar' }, volume: { name: 'volume' } };
+
+  get controls() {
+    return this.providerControls;
+  }
 
   cancelFullscreen = vi.fn(async () => {});
 
@@ -59,33 +64,47 @@ beforeEach(() => {
 });
 
 describe('wistiaControlProps', () => {
-  it('names every switch Wistia has no single chromeless flag for', () => {
-    expect(wistiaControlProps(false)).toEqual({
-      bigPlayButton: false,
-      controlsVisibleOnLoad: false,
-      fullscreenControl: false,
-      playBarControl: false,
-      playPauseControl: false,
-      playPauseNotifier: false,
-      settingsControl: false,
-      volumeControl: false,
+  it.each([false, true])('names every switch Wistia has no single chromeless flag for with controls=%s', (controls) => {
+    expect(wistiaControlProps(controls)).toEqual({
+      bigPlayButton: controls,
+      controlsVisibleOnLoad: controls,
+      fullscreenControl: controls,
+      playBarControl: controls,
+      playPauseControl: controls,
+      playPauseNotifier: controls,
+      settingsControl: controls,
+      volumeControl: controls,
     });
-    expect(Object.values(wistiaControlProps(true)).every(Boolean)).toBe(true);
   });
 });
 
 describe('normalizeWistiaPlayer', () => {
   it('leaves the player it normalized as the object it was', () => {
-    const player = createPlayer();
+    const player = new StubWistiaPlayer();
+    const volumechange = vi.fn();
+
+    document.body.append(player);
+    player.addEventListener('volumechange', volumechange);
 
     expect(player.localName).toBe('stub-wistia-player');
     expect(normalizeWistiaPlayer(player)).toBe(player);
+    expect(normalizeWistiaPlayer(player)).toBe(player);
+
+    player.dispatchEvent(new Event('volume-change'));
+    expect(volumechange).toHaveBeenCalledTimes(1);
   });
 
   it('does not touch controls, which Wistia already uses for something else', () => {
-    const player = createPlayer();
+    const player = new StubWistiaPlayer();
+    const controls = player.controls;
+
+    expect(controls).toEqual({ playBar: { name: 'play-bar' }, volume: { name: 'volume' } });
+    normalizeWistiaPlayer(player);
 
     // Wistia's `controls` is the player's control instances, and its internals read it.
+    expect(player.controls).toBe(controls);
+    expect(player.controls.playBar).toBe(controls.playBar);
+    expect(player.controls.volume).toBe(controls.volume);
     expect(Object.getOwnPropertyDescriptor(player, 'controls')).toBeUndefined();
   });
 

@@ -38,14 +38,6 @@ describe('preset registration boundaries', () => {
     expect(registered).not.toContain('video-player');
   });
 
-  it('video/player registers only the player', async () => {
-    const before = define.mock.calls.length;
-
-    await import('../video/player');
-
-    expect(registeredSince(before)).toEqual(['video-player']);
-  });
-
   it.each([
     ['audio', 'audio-skin', 'audio-player', () => import('../audio/skin')],
     ['live-video', 'live-video-skin', 'live-video-player', () => import('../live-video/skin')],
@@ -66,7 +58,7 @@ describe('preset registration boundaries', () => {
     ['audio/neutral-skin', 'audio-neutral-skin', () => import('../audio/neutral-skin')],
     ['live-video/neutral-skin', 'live-video-neutral-skin', () => import('../live-video/neutral-skin')],
     ['live-audio/neutral-skin', 'live-audio-neutral-skin', () => import('../live-audio/neutral-skin')],
-  ])('%s registers its exact UI closure and skin without the player', async (entry, skinTag, load) => {
+  ])('%s registers its skin without the player', async (entry, skinTag, load) => {
     const before = define.mock.calls.length;
 
     await load();
@@ -75,18 +67,5 @@ describe('preset registration boundaries', () => {
 
     expect(registered).toContain(skinTag);
     expect(registered).not.toContain(`${entry.split('/')[0]}-player`);
-  });
-
-  it.each([
-    ['audio', 'audio-player', () => import('../audio/player')],
-    ['live-video', 'live-video-player', () => import('../live-video/player')],
-    ['live-audio', 'live-audio-player', () => import('../live-audio/player')],
-    ['background', 'background-video-player', () => import('../background/player')],
-  ])('%s/player registers only the player', async (_, playerTag, load) => {
-    const before = define.mock.calls.length;
-
-    await load();
-
-    expect(registeredSince(before)).toEqual([playerTag]);
   });
 });

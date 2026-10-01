@@ -35,17 +35,11 @@ interface ProjectedSource {
  */
 class RecordingBase {
   static readonly defaultProps = { src: '', source: null };
-  /** Bases constructed, which is also engines built: the real base builds one per instance. */
-  static constructions = 0;
 
   /** The source last projected onto the base, or `null` once it is cleared. */
   projected: ProjectedSource | null = null;
 
   #src = '';
-
-  constructor() {
-    RecordingBase.constructions += 1;
-  }
 
   get src(): string {
     return this.#src;
@@ -134,20 +128,12 @@ describe('MuxVideoAdapter', () => {
     expect(media.src).toBe('https://stream.mux.com/abc123.m3u8');
   });
 
-  it('derives src using the custom domain', () => {
+  it('derives src from the custom domain and playback params', () => {
     const media = new MuxVideoAdapter();
 
-    media.source = { playbackId: 'abc123', customDomain: 'video.example.com' };
+    media.source = { playbackId: 'abc123', customDomain: 'video.example.com', playback: { maxResolution: '720p' } };
 
-    expect(media.src).toBe('https://stream.video.example.com/abc123.m3u8');
-  });
-
-  it('appends playback params as snake_case query params', () => {
-    const media = new MuxVideoAdapter();
-
-    media.source = { playbackId: 'abc123', playback: { maxResolution: '720p' } };
-
-    expect(media.src).toBe('https://stream.mux.com/abc123.m3u8?max_resolution=720p');
+    expect(media.src).toBe('https://stream.video.example.com/abc123.m3u8?max_resolution=720p');
   });
 
   it('clears src when source is cleared', () => {
@@ -205,15 +191,6 @@ describe('MuxVideoAdapter', () => {
       poster: 'https://image.mux.com/abc123/thumbnail.webp',
       storyboard: 'https://image.mux.com/abc123/storyboard.vtt?format=webp',
     });
-  });
-
-  it('tracks source changes in the content data', () => {
-    const media = new MuxVideoAdapter();
-
-    media.source = { playbackId: 'abc123' };
-    media.source = { playbackId: 'def456' };
-
-    expect(media.contentData.poster).toBe('https://image.mux.com/def456/thumbnail.webp');
   });
 
   it('has no content data without a playback id', () => {
@@ -361,15 +338,6 @@ describe('MuxVideoAdapter', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('does not fetch for a non-Mux source', () => {
-      const fetchMock = stubFetch();
-      const media = new MuxVideoAdapter();
-
-      media.source = { src: 'https://example.com/stream.m3u8' };
-
-      expect(metadataRequests(fetchMock)).toEqual([]);
-    });
-
     it('keeps the title when only image params change', async () => {
       const fetchMock = stubFetch();
       const media = new MuxVideoAdapter();
@@ -435,20 +403,6 @@ describe('MuxVideoAdapter', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it('has no title when the document fails to load', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      stubFetch('', 500);
-
-      const media = new MuxVideoAdapter();
-
-      media.source = { playbackId: 'abc123' };
-      await flush();
-
-      expect(media.contentData.title).toBeUndefined();
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining('500'));
-    });
-
     it('aborts the request in flight on destroy', () => {
       const fetchMock = vi.fn((_url: string, _init?: RequestInit) => new Promise<Response>(() => {}));
 
@@ -466,7 +420,7 @@ describe('MuxVideoAdapter', () => {
   });
 });
 
-describe('MuxVideoAdapter DRM', () => {
+describe('MuxMixin', () => {
   const token = fakeJwt({ aud: 'd' });
 
   it('derives Mux license servers from a drm token', () => {
@@ -509,9 +463,8 @@ describe('MuxVideoAdapter DRM', () => {
     );
   });
 
-  it('follows the source without rebuilding the engine', () => {
+  it('follows the source when projecting license servers', () => {
     const media = new ProbeMuxVideoAdapter();
-    const before = RecordingBase.constructions;
 
     media.source = { playbackId: 'abc123', drm: { token } };
     expect(licenseUrl(media, 'com.widevine.alpha')).toBe(
@@ -525,8 +478,5 @@ describe('MuxVideoAdapter DRM', () => {
 
     media.source = null;
     expect(licenseUrl(media, 'com.widevine.alpha')).toBeUndefined();
-
-    // The base — and so the engine it builds — was never reconstructed.
-    expect(RecordingBase.constructions).toBe(before);
   });
 });

@@ -22,11 +22,9 @@ describe('createUtilReferenceModel', () => {
 
     const model = createUtilReferenceModel('useMedia', ref);
 
-    expect(model).not.toBeNull();
+    expect(model?.isMultiOverload).toBe(false);
 
-    if (!model) return;
-
-    if (model.isMultiOverload) return;
+    if (!model || model.isMultiOverload) return;
 
     expect(model).toMatchObject({
       isMultiOverload: false,
@@ -52,13 +50,10 @@ describe('createUtilReferenceModel', () => {
 
     const model = createUtilReferenceModel('useButton', ref);
 
-    expect(model).not.toBeNull();
+    expect(model?.isMultiOverload).toBe(false);
 
-    if (!model) return;
+    if (!model || model.isMultiOverload) return;
 
-    if (model.isMultiOverload) return;
-
-    expect(model.isMultiOverload).toBe(false);
     expect(model.sections).toEqual([
       { key: 'parameters', title: 'Parameters', id: 'parameters', depth: 3 },
       { key: 'returnValue', title: 'Return Value', id: 'return-value', depth: 3 },
@@ -190,13 +185,10 @@ describe('createUtilReferenceModel', () => {
 
     const model = createUtilReferenceModel('usePlayer', ref);
 
-    expect(model).not.toBeNull();
+    expect(model?.isMultiOverload).toBe(true);
 
-    if (!model) return;
+    if (!model || !model.isMultiOverload) return;
 
-    if (!model.isMultiOverload) return;
-
-    expect(model.isMultiOverload).toBe(true);
     expect(model.overloads).toHaveLength(2);
 
     // Overload 1: no parameters, only return value
@@ -235,13 +227,10 @@ describe('createUtilReferenceModel', () => {
 
     const model = createUtilReferenceModel('createPlayer', ref);
 
-    expect(model).not.toBeNull();
+    expect(model?.isMultiOverload).toBe(true);
 
-    if (!model) return;
+    if (!model || !model.isMultiOverload) return;
 
-    if (!model.isMultiOverload) return;
-
-    expect(model.isMultiOverload).toBe(true);
     expect(model.overloads[0]).toMatchObject({
       id: 'video',
       label: 'Video',
@@ -280,11 +269,9 @@ describe('createUtilReferenceModel', () => {
 
     const model = createUtilReferenceModel('useStore', ref);
 
-    expect(model).not.toBeNull();
+    expect(model?.isMultiOverload).toBe(true);
 
-    if (!model) return;
-
-    if (!model.isMultiOverload) return;
+    if (!model || !model.isMultiOverload) return;
 
     expect(model.overloads[0]).toMatchObject({ id: 'overload-1', label: undefined });
     expect(model.overloads[1]).toMatchObject({ id: 'selector', label: 'Selector' });

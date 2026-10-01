@@ -106,16 +106,13 @@ describe('streamTypeFeature', () => {
     });
 
     it('prefers native `streamType` over duration-based fallback', () => {
-      // Build an object that has both a finite duration and a user-asserted
-      // `streamType` — the feature should trust the explicit stream type.
-      const media = Object.assign(new EventTarget(), {
-        duration: 120,
+      const media = Object.assign(createMockVideo({ duration: 120 }), {
         streamType: MediaStreamTypes.LIVE,
       });
 
       const store = createStore<PlayerTarget>()(streamTypeFeature);
 
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
+      store.attach({ media, container: null });
 
       expect(store.state.streamType).toBe(MediaStreamTypes.LIVE);
     });

@@ -9,9 +9,6 @@ import { skinBaseStylesheet } from './skin.ts';
 import { createComponentTargets } from './target/index.ts';
 import { parseVariant, type SkinVariant } from './variants.ts';
 
-/** Alias kept while callers move to `parseVariant`. */
-export const validateSkinConfig = parseVariant;
-
 export type SkinTransformConfig = SkinVariant;
 
 const stylesDir = resolve(import.meta.dirname, '../src/styles');

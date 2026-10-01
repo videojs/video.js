@@ -27,9 +27,12 @@ describe('findNearestLang', () => {
     const inner = document.createElement('div');
 
     inner.setAttribute('lang', 'fr');
+    const leaf = document.createElement('span');
+
+    inner.appendChild(leaf);
     outer.appendChild(inner);
     document.body.appendChild(outer);
-    expect(findNearestLang(inner)).toBe('fr');
+    expect(findNearestLang(leaf)).toBe('fr');
   });
 
   it('inherits from an ancestor when start has no lang', () => {

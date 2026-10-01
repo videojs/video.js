@@ -73,6 +73,7 @@ describe('watchDevicePixelRatio', () => {
     // The superseded query fired its `once` listener — a stale match can't report again.
     queries[0]?.dispatchEvent(new Event('change'));
     expect(onChange).toHaveBeenCalledTimes(1);
+    expect(queries).toHaveLength(2);
 
     controller.abort();
   });

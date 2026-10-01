@@ -4,9 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { defineComponent, defineSchema } from '../../components/definition';
 import { defineComponentTarget } from '../../target/definition';
 import { Host, jsx } from '../../target/jsx-runtime';
-import { readComponentSource } from '../component-meta';
 import { type ComponentTargetSelection, componentTargetPlugin } from '../component-target';
-import { componentSourcePlugin } from './helpers/component-source';
 
 const MODULE_ID = '\0fixture.tsx?target=react';
 
@@ -239,7 +237,9 @@ describe('componentTargetPlugin', () => {
     const commandFor = /commandfor="([^"]+)"/.exec(source)?.[1];
     const contentId = / id="([^"]+)"/.exec(source)?.[1];
 
+    expect(commandFor).toMatch(/^__vjsc-id-/);
     expect(commandFor).toBe(contentId);
+    expect(source).toContain('>Open</button>');
     expect(source).toContain('<media-optiongroup />');
     expect(source).not.toContain('OptionGroup.Root');
     expect(source).not.toContain('<$.');
@@ -355,7 +355,12 @@ describe('componentTargetPlugin', () => {
       export const play = <$.PlayButton />;
     `);
 
-    expect(source.indexOf(`'use client'`)).toBeLessThan(source.indexOf('from "@fixture/react"'));
+    const directive = source.indexOf(`'use client'`);
+    const generatedImport = source.indexOf('from "@fixture/react"');
+
+    expect(directive).toBeGreaterThanOrEqual(0);
+    expect(generatedImport).toBeGreaterThanOrEqual(0);
+    expect(directive).toBeLessThan(generatedImport);
   });
 });
 
@@ -363,11 +368,11 @@ async function transform(
   source: string,
   options: { readonly targets?: ComponentTargetSelection } = {}
 ): Promise<string> {
-  let meta: unknown;
+  let output: string | undefined;
   const inspect: Plugin = {
     name: 'fixture:inspect',
     buildEnd() {
-      meta = this.getModuleInfo(MODULE_ID)?.meta;
+      output = this.getModuleInfo(MODULE_ID)?.code ?? undefined;
     },
   };
   const bundle = await rolldown({
@@ -375,17 +380,11 @@ async function transform(
     experimental: { nativeMagicString: true },
     external: /^(?:@fixture\/|vjsc\/html-runtime\/)/,
     transform: { jsx: 'preserve' },
-    plugins: [
-      fixturePlugin(source),
-      componentTargetPlugin({ targets: options.targets ?? [reactTarget] }),
-      componentSourcePlugin(),
-      inspect,
-    ],
+    plugins: [fixturePlugin(source), componentTargetPlugin({ targets: options.targets ?? [reactTarget] }), inspect],
   });
 
   await bundle.generate({ format: 'es' });
 
-  const output = readComponentSource(meta);
   if (output === undefined) throw new Error('Fixture build did not retain editable source.');
 
   return output;

@@ -13,15 +13,6 @@ function createMediaState(overrides: Partial<MediaMetadataState> = {}): MediaMet
 
 describe('TitleCore', () => {
   describe('getState', () => {
-    it('returns the resolved content title', () => {
-      const core = new TitleCore();
-
-      const state = core.getState(createMediaState({ title: 'Sintel' }));
-
-      expect(state.title).toBe('Sintel');
-      expect(state.hidden).toBe(false);
-    });
-
     it('is hidden for the empty resolved title', () => {
       const core = new TitleCore();
 

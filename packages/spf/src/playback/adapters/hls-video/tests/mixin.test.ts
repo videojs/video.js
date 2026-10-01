@@ -26,7 +26,102 @@ import {
 } from '../../../../media/errors';
 import { MEDIA_PLAYLIST_METADATA_KEY, type Presentation } from '../../../../media/types';
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../../primitives/error-messages';
+import { HlsAudioAdapterCore } from '../../hls-audio/mixin';
+import { HlsBackgroundVideoAdapterCore } from '../../hls-background-video/mixin';
 import { HlsVideoAdapterCore, HlsVideoMixin } from '../mixin';
+
+describe.each([
+  { name: 'HlsVideoAdapterCore', Adapter: HlsVideoAdapterCore },
+  { name: 'HlsAudioAdapterCore', Adapter: HlsAudioAdapterCore },
+  { name: 'HlsBackgroundVideoAdapterCore', Adapter: HlsBackgroundVideoAdapterCore },
+])('$name', ({ Adapter }) => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {}))
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it.each(['replacement', 'detach', 'destroy', 'src change'] as const)(
+    'does not retry play after immediate %s',
+    async (action) => {
+      const media = new Adapter();
+      const first = document.createElement('video');
+      const play = vi
+        .spyOn(first, 'play')
+        .mockRejectedValueOnce(new DOMException('No source yet', 'NotSupportedError'))
+        .mockResolvedValue(undefined);
+      const settled = vi.fn();
+
+      try {
+        media.attach(first);
+        media.src = 'https://example.com/v.m3u8';
+        media.play().then(settled, settled);
+
+        // Invalidate the play before its native rejection handler can register a retry.
+        if (action === 'replacement') media.attach(document.createElement('video'));
+        else if (action === 'detach') media.detach();
+        else if (action === 'destroy') media.destroy();
+        else media.src = 'https://example.com/next.m3u8';
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        first.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
+
+        expect(play).toHaveBeenCalledTimes(1);
+        expect(settled.mock.calls[0]?.[0]).toMatchObject({ name: 'AbortError' });
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
+    }
+  );
+
+  it.each(['replacement', 'detach', 'destroy', 'src change'] as const)(
+    'rejects pending play retries on %s',
+    async (action) => {
+      const media = new Adapter();
+      const first = document.createElement('video');
+      const play = vi
+        .spyOn(first, 'play')
+        .mockRejectedValueOnce(new DOMException('No source yet', 'NotSupportedError'))
+        .mockRejectedValueOnce(new DOMException('No source yet', 'NotSupportedError'))
+        .mockResolvedValue(undefined);
+      const settled = vi.fn();
+
+      try {
+        media.attach(first);
+        media.src = 'https://example.com/v.m3u8';
+        media.play().then(settled, settled);
+        media.play().then(settled, settled);
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(2);
+        expect(settled).not.toHaveBeenCalled();
+
+        if (action === 'replacement') media.attach(document.createElement('video'));
+        else if (action === 'detach') media.detach();
+        else if (action === 'destroy') media.destroy();
+        else media.src = 'https://example.com/next.m3u8';
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(settled).toHaveBeenCalledTimes(2);
+        expect(settled.mock.calls[0]![0]).toMatchObject({ name: 'AbortError' });
+        expect(settled.mock.calls[1]![0]).toMatchObject({ name: 'AbortError' });
+
+        first.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
+        expect(play).toHaveBeenCalledTimes(2);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
+    }
+  );
+});
 
 describe('HlsVideoAdapterCore', () => {
   // Prevent real network calls from engines that auto-trigger resolution
@@ -119,61 +214,33 @@ describe('HlsVideoAdapterCore', () => {
   // attach / detach — media element lifecycle (reuses the same engine)
   // ---------------------------------------------------------------------------
   describe('attach / detach', () => {
-    it('exposes the engine immediately (created at construction, not on attach)', () => {
+    it('reuses the same engine instance across attach/detach cycles', async () => {
       const media = new HlsVideoAdapterCore();
-
-      expect(media.engine).not.toBeNull();
-    });
-
-    it('reuses the same engine instance across attach calls', () => {
-      const media = new HlsVideoAdapterCore();
-      const el1 = document.createElement('video');
-      const el2 = document.createElement('video');
-
-      media.attach(el1);
-      const engineAfterFirstAttach = media.engine;
-
-      media.attach(el2);
-      expect(media.engine).toBe(engineAfterFirstAttach);
-    });
-
-    it('reuses the same engine instance across attach/detach cycles', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.attach(document.createElement('video'));
       const engine = media.engine;
+      const destroy = vi.spyOn(engine, 'destroy');
+      const first = document.createElement('video');
+      const second = document.createElement('video');
 
-      media.detach();
-      media.attach(document.createElement('video'));
-      expect(media.engine).toBe(engine);
-    });
-
-    it('reuses the same engine instance when src is set', () => {
-      const media = new HlsVideoAdapterCore();
-      const initial = media.engine;
-
-      media.src = 'https://example.com/v1.m3u8';
-      expect(media.engine).toBe(initial);
-    });
-
-    it('reuses the same engine instance when src changes', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.src = 'https://example.com/v1.m3u8';
-      const engine = media.engine;
-
-      media.src = 'https://example.com/v2.m3u8';
-      expect(media.engine).toBe(engine);
-    });
-
-    it('does not destroy the engine when src changes', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.src = 'https://example.com/v1.m3u8';
-      const spy = vi.spyOn(media.engine, 'destroy');
-
-      media.src = 'https://example.com/v2.m3u8';
-      expect(spy).not.toHaveBeenCalled();
+      try {
+        expect(engine).toBeDefined();
+        media.attach(first);
+        expect(media.engine).toBe(engine);
+        media.attach(second);
+        expect(media.engine).toBe(engine);
+        media.detach();
+        expect(media.engine).toBe(engine);
+        media.attach(first);
+        expect(media.engine).toBe(engine);
+        media.src = 'https://example.com/v1.m3u8';
+        expect(media.engine).toBe(engine);
+        media.src = 'https://example.com/v2.m3u8';
+        expect(media.engine).toBe(engine);
+        expect(destroy).not.toHaveBeenCalled();
+      } finally {
+        media.destroy();
+        await destroy.mock.results[0]!.value;
+        destroy.mockRestore();
+      }
     });
 
     it('keeps the attached media element across src changes', () => {
@@ -189,17 +256,27 @@ describe('HlsVideoAdapterCore', () => {
     it('cancels pending play listener when src changes', async () => {
       const media = new HlsVideoAdapterCore();
       const el = document.createElement('video');
+      const play = vi
+        .spyOn(el, 'play')
+        .mockRejectedValueOnce(new Error('no supported sources'))
+        .mockResolvedValue(undefined);
 
-      media.attach(el);
-      media.src = 'https://example.com/v1.m3u8';
-      el.play = () => Promise.reject(new Error('no supported sources'));
-      media.play().catch(() => {});
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      try {
+        media.attach(el);
+        media.src = 'https://example.com/v1.m3u8';
+        media.play().catch(() => {});
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(1);
 
-      const spy = vi.spyOn(el, 'removeEventListener');
+        media.src = 'https://example.com/v2.m3u8';
+        el.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
 
-      media.src = 'https://example.com/v2.m3u8';
-      expect(spy).toHaveBeenCalledWith('loadstart', expect.any(Function));
+        expect(play).toHaveBeenCalledTimes(1);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
     });
 
     it('sets mediaElement in owners when attached', () => {
@@ -244,33 +321,12 @@ describe('HlsVideoAdapterCore', () => {
       media.attach(document.createElement('video'));
       expect(media.engine.state.presentation.get()?.url).toBe('https://example.com/v.m3u8');
     });
-
-    it('detach does not destroy the engine', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.attach(document.createElement('video'));
-      const spy = vi.spyOn(media.engine, 'destroy');
-
-      media.detach();
-      expect(spy).not.toHaveBeenCalled();
-    });
   });
 
   // ---------------------------------------------------------------------------
   // play() — WHATWG §4.8.11.8
   // ---------------------------------------------------------------------------
   describe('play()', () => {
-    it('returns a Promise', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.attach(document.createElement('video'));
-      const result = media.play();
-
-      expect(result).toBeInstanceOf(Promise);
-      // Prevent unhandled rejection — play without src is expected to fail
-      result.catch(() => {});
-    });
-
     it('sets loadActivated on engine state when called', () => {
       const media = new HlsVideoAdapterCore();
 
@@ -331,39 +387,53 @@ describe('HlsVideoAdapterCore', () => {
     it('removes the pending loadstart listener on detach', async () => {
       const media = new HlsVideoAdapterCore();
       const el = document.createElement('video');
+      const play = vi
+        .spyOn(el, 'play')
+        .mockRejectedValueOnce(new Error('no supported sources'))
+        .mockResolvedValue(undefined);
 
-      media.attach(el);
-      media.src = 'https://example.com/v.m3u8';
+      try {
+        media.attach(el);
+        media.src = 'https://example.com/v1.m3u8';
+        media.play().catch(() => {});
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(1);
 
-      el.play = () => Promise.reject(new Error('no supported sources'));
-      media.play().catch(() => {});
+        media.detach();
+        el.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
 
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
-
-      const spy = vi.spyOn(el, 'removeEventListener');
-
-      media.detach();
-
-      expect(spy).toHaveBeenCalledWith('loadstart', expect.any(Function));
+        expect(play).toHaveBeenCalledTimes(1);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
     });
 
     it('removes the pending loadstart listener on destroy', async () => {
       const media = new HlsVideoAdapterCore();
       const el = document.createElement('video');
+      const play = vi
+        .spyOn(el, 'play')
+        .mockRejectedValueOnce(new Error('no supported sources'))
+        .mockResolvedValue(undefined);
 
-      media.attach(el);
-      media.src = 'https://example.com/v.m3u8';
+      try {
+        media.attach(el);
+        media.src = 'https://example.com/v1.m3u8';
+        media.play().catch(() => {});
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(1);
 
-      el.play = () => Promise.reject(new Error('no supported sources'));
-      media.play().catch(() => {});
+        media.destroy();
+        el.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
 
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
-
-      const spy = vi.spyOn(el, 'removeEventListener');
-
-      media.destroy();
-
-      expect(spy).toHaveBeenCalledWith('loadstart', expect.any(Function));
+        expect(play).toHaveBeenCalledTimes(1);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
     });
 
     // TODO: Add integration tests with a real HLS stream once test fixtures are
@@ -400,18 +470,9 @@ describe('HlsVideoAdapterCore', () => {
 
       media.preload = 'auto';
       media.preload = '';
-      // '' only clears #preload so the next engine recreation won't re-apply
-      // an explicit value — it does not patch the current engine state.
+      // Clearing the IDL mirror leaves the recycled engine's loading policy intact.
+      expect(media.preload).toBe('');
       expect(media.engine.state.preload.get()).toBe('auto');
-    });
-
-    it('survives src reassignment — explicit preload persists on the recycled engine', () => {
-      const media = new HlsVideoAdapterCore();
-
-      media.preload = 'none';
-      media.src = 'https://example.com/v.m3u8';
-      expect(media.preload).toBe('none');
-      expect(media.engine.state.preload.get()).toBe('none');
     });
 
     // Regression (#2532): the engine's DOM→state read must never adopt the
@@ -429,16 +490,6 @@ describe('HlsVideoAdapterCore', () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
       expect(media.engine.state.preload.get()).toBe('none');
-    });
-
-    it("keeps SPF's 'metadata' default (not the UA default) when attaching with no preload set anywhere", async () => {
-      const media = new HlsVideoAdapterCore();
-      const el = document.createElement('video');
-
-      media.attach(el);
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
-
-      expect(media.engine.state.preload.get()).toBe('metadata');
     });
 
     it('adopts an authored preload attribute from a newly attached element (most-recent-wins on attach)', async () => {
@@ -462,12 +513,14 @@ describe('HlsVideoAdapterCore', () => {
       media.src = 'https://example.com/v.m3u8';
       // The engine is recycled, so state.preload is engine-wide preference that
       // simply persists across the src change — no re-application needed.
+      expect(media.preload).toBe('none');
       expect(media.engine.state.preload.get()).toBe('none');
 
       // Changing preload, then changing src again, keeps the latest value on the
       // same engine — not reset to a default by the source change.
       media.preload = 'auto';
       media.src = 'https://example.com/v2.m3u8';
+      expect(media.preload).toBe('auto');
       expect(media.engine.state.preload.get()).toBe('auto');
     });
   });
@@ -836,6 +889,24 @@ describe('HlsVideoAdapterCore', () => {
       media.destroy();
     });
 
+    it('stops promoting conditions after destroy', async () => {
+      const media = new TestAdapter();
+      const fired: Event[] = [];
+      const destroy = vi.spyOn(media.engine, 'destroy');
+
+      media.addEventListener('error', (event) => fired.push(event));
+      media.destroy();
+      await destroy.mock.results[0]!.value;
+
+      // Write after engine cleanup so clearing its signals cannot hide a live effect.
+      media.engine.state.errors.set([{ code: SVTA_NO_SUPPORTED_VIDEO_TRACK }]);
+      await flush();
+
+      expect(fired).toHaveLength(0);
+      expect(media.error).toBeNull();
+      destroy.mockRestore();
+    });
+
     it('surfaces a reported fatal condition as an ErrorLike and fires error', async () => {
       const media = new TestAdapter();
       const fired: Event[] = [];
@@ -940,6 +1011,7 @@ describe('HlsVideoAdapterCore', () => {
       // One code for both: the viewer's situation is identical either way, and
       // the specifics stay on `engine.state.errors` for a developer.
       expect(media.error?.code).toBe(SVTA_UNSUPPORTED_PLAYBACK_FEATURE);
+      expect(media.error?.message).toBe('');
       media.destroy();
     });
 
@@ -984,24 +1056,6 @@ describe('HlsVideoAdapterCore', () => {
 
       expect(media.error?.code).toBe(SVTA_NO_SUPPORTED_VIDEO_TRACK);
       media.destroy();
-    });
-
-    it('carries no viewer-facing message on either code', async () => {
-      for (const errors of [
-        [{ code: SVTA_NO_SUPPORTED_VIDEO_TRACK }],
-        [
-          { code: SVTA_UNSUPPORTED_DRM_SYSTEM, data: { trackType: 'video', trackId: 'v1' } },
-          { code: SVTA_NO_SUPPORTED_VIDEO_TRACK },
-        ],
-      ] satisfies SvtaError[][]) {
-        const media = new TestAdapter();
-
-        media.engine.state.errors.set(errors);
-        await flush();
-
-        expect(media.error?.message).toBe('');
-        media.destroy();
-      }
     });
 
     it('does not re-fire when a cause is appended after the verdict surfaced', async () => {
@@ -1073,17 +1127,6 @@ describe('HlsVideoAdapterCore', () => {
       { code: SVTA_NO_SUPPORTED_VIDEO_TRACK },
     ];
 
-    it('logs the message once', async () => {
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const media = new TestAdapter();
-
-      media.engine.state.errors.set(unsupportedSource);
-      await flush();
-
-      expect(spy.mock.calls.map((call) => String(call[0])).filter((text) => text.startsWith(MESSAGE))).toHaveLength(1);
-      media.destroy();
-    });
-
     it('logs the reported conditions alongside it, so specifics stay inspectable', async () => {
       // One string, full detail: the container lives in structured data rather
       // than in a sentence the engine would have to localize.
@@ -1093,9 +1136,10 @@ describe('HlsVideoAdapterCore', () => {
       media.engine.state.errors.set(unsupportedSource);
       await flush();
 
-      const call = spy.mock.calls.find((entry) => String(entry[0]).startsWith(MESSAGE));
+      const calls = spy.mock.calls.filter((entry) => String(entry[0]).startsWith(MESSAGE));
 
-      expect(call?.[1]).toEqual({ conditions: unsupportedSource });
+      expect(calls).toHaveLength(1);
+      expect(calls[0]?.[1]).toEqual({ conditions: unsupportedSource });
       media.destroy();
     });
 

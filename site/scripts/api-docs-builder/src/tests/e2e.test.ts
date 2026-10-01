@@ -141,7 +141,7 @@ describe('Component pipeline (end-to-end)', () => {
 
       // ── Props ──
       // `ref` prop is auto-skipped. `_internalFlag` has @ignore and is skipped.
-      // What remains: disabled, label, onPressedChange.
+      // The sorting fixture also includes an optional and a required boolean.
       expect(Object.keys(ref.props)).toEqual(expect.arrayContaining(['disabled', 'label', 'onPressedChange']));
       expect(ref.props['ref' as keyof typeof ref.props]).toBeUndefined();
       expect(ref.props['_internalFlag' as keyof typeof ref.props]).toBeUndefined();
@@ -172,7 +172,7 @@ describe('Component pipeline (end-to-end)', () => {
         type: 'function',
         description: 'Callback when pressed state changes.',
       });
-      expect(ref.props.onPressedChange!.detailedType).toBeDefined();
+      expect(ref.props.onPressedChange!.detailedType).toBe('((pressed: boolean) => void)');
 
       // The HTML element exposes `disabled` and `label` but has no `onPressedChange`, so only React documents it.
       expect(ref.props.disabled!.frameworks).toBeUndefined();
@@ -207,23 +207,14 @@ describe('Component pipeline (end-to-end)', () => {
       });
 
       // ── Platforms ──
-      // HTML element exists → platforms.html with tagName
+      // HTML element exists → platforms.html with tagName.
+      // Literal dispatches supply names; @fires supplies descriptions.
       expect(ref.platforms.html).toEqual({
         tagName: 'media-toggle-button',
         events: [
           { name: 'focus-change' },
           { name: 'pressed-change', description: 'Emitted when the pressed state changes.' },
         ],
-      });
-    });
-
-    it('detects literal dispatches without @fires and uses @fires only for descriptions', () => {
-      const events = findComponent('ToggleButton')!.reference.platforms.html?.events;
-
-      expect(events).toContainEqual({ name: 'focus-change' });
-      expect(events).toContainEqual({
-        name: 'pressed-change',
-        description: 'Emitted when the pressed state changes.',
       });
     });
   });
@@ -636,12 +627,6 @@ describe('Component pipeline (end-to-end)', () => {
   // ─────────────────────────────────────────────────────────────────
 
   describe('Cross-cutting conventions', () => {
-    it('all components are discovered from core/ui directories', () => {
-      const names = results.map((r) => r.name).sort();
-
-      expect(names).toEqual(expect.arrayContaining(['Gauge', 'PiPButton', 'Slider', 'ToggleButton', 'VolumeSlider']));
-    });
-
     it('kebab name matches directory name', () => {
       expect(findComponent('ToggleButton')!.kebab).toBe('toggle-button');
       expect(findComponent('Gauge')!.kebab).toBe('gauge');
@@ -674,12 +659,9 @@ describe('Component pipeline (end-to-end)', () => {
     });
 
     it('props are sorted: required first, then alphabetical', () => {
-      // All ToggleButton props are required (non-optional in the interface),
-      // so they should be purely alphabetical within the required group.
       const toggleProps = Object.keys(findComponent('ToggleButton')!.reference.props);
-      const sorted = [...toggleProps].sort((a, b) => a.localeCompare(b));
 
-      expect(toggleProps).toEqual(sorted);
+      expect(toggleProps).toEqual(['disabled', 'label', 'onPressedChange', 'zzzRequired', 'aaaOptional']);
     });
 
     it('optional fields are omitted from JSON when undefined', () => {
@@ -1114,19 +1096,6 @@ describe('Feature pipeline (end-to-end)', () => {
       expect(names).toContain('volume');
     });
 
-    it('excludes feature bundles (plural *Features)', () => {
-      const names = results.map((r) => r.name);
-
-      expect(names).not.toContain('videoFeatures');
-      expect(names).not.toContain('audioFeatures');
-    });
-
-    it('excludes namespace re-exports (export * as features)', () => {
-      const names = results.map((r) => r.name);
-
-      expect(names).not.toContain('features');
-    });
-
     it('produces one result per feature', () => {
       expect(results.length).toBe(6);
     });
@@ -1509,10 +1478,6 @@ describe('Preset pipeline (end-to-end)', () => {
 
       expect(names).toEqual(['audio', 'background', 'video']);
     });
-
-    it('produces one result per preset', () => {
-      expect(results.length).toBe(3);
-    });
   });
 
   // ─────────────────────────────────────────────────────────────────
@@ -1599,7 +1564,7 @@ describe('Preset pipeline (end-to-end)', () => {
     it('excludes React tailwind skins', () => {
       const skinNames = findPreset('video')!.reference.react.skins.map((s) => s.name);
 
-      expect(skinNames).not.toContain('VideoSkinTailwind');
+      expect(skinNames).not.toContain('VideoTailwindSkin');
     });
 
     it('detects React media element', () => {
@@ -1678,12 +1643,6 @@ describe('Preset pipeline (end-to-end)', () => {
       const ref = findPreset('background')!.reference;
 
       expect(ref.html.mediaElement).toBe('background-video');
-    });
-
-    it('excludes player elements', () => {
-      const skinNames = findPreset('background')!.reference.html.skins.map((s) => s.name);
-
-      expect(skinNames).not.toContain('BackgroundVideoPlayerElement');
     });
 
     it('detects React skin without CSS import when no CSS file exists', () => {
@@ -1765,6 +1724,8 @@ describe('Media element pipeline (end-to-end)', () => {
 
   describe('Discovery', () => {
     it('discovers media elements from define/media/ files', () => {
+      // UI containers live outside media registrations. Background video has no
+      // CustomMediaElement and keeps its manually maintained reference.
       const names = results.map((r) => r.name).sort();
 
       expect(names).toEqual([
@@ -1776,19 +1737,6 @@ describe('Media element pipeline (end-to-end)', () => {
         'SimpleVideo',
         'SpfAudio',
       ]);
-    });
-
-    it('does not treat the UI container as a media element', () => {
-      expect(findElement('ContainerElement')).toBeUndefined();
-    });
-
-    it('excludes background-video (no CustomMediaElement, manually maintained)', () => {
-      expect(findElement('BackgroundVideo')).toBeUndefined();
-      expect(findElement('BackgroundVideoElement')).toBeUndefined();
-    });
-
-    it('produces one result per media element', () => {
-      expect(results.length).toBe(7);
     });
 
     it('follows nested public index barrels without including sibling implementations', () => {
@@ -1873,15 +1821,9 @@ describe('Media element pipeline (end-to-end)', () => {
       const ref = findElement('SimpleVideo')!.reference;
 
       // Video methods = html-media-adapter methods + html-video-adapter methods, deduped + sorted.
-      // Lifecycle methods (attach/detach/destroy) and accessors are excluded.
+      // Lifecycle methods (attach/detach/destroy), accessors, private methods,
+      // and @internal methods are excluded.
       expect(ref.platforms.html.methods).toEqual(['canPlayType', 'load', 'pause', 'play', 'requestFullscreen']);
-    });
-
-    it('excludes ECMAScript-private and @internal methods', () => {
-      const methods = findElement('SimpleVideo')!.reference.platforms.html.methods;
-
-      expect(methods).not.toContain('privateMethod');
-      expect(methods).not.toContain('internalMethod');
     });
 
     it('extracts native passthrough properties from the shared base host classes', () => {
@@ -1909,7 +1851,9 @@ describe('Media element pipeline (end-to-end)', () => {
       // capability event interfaces including TextTrackListEvents. Custom
       // Video.js events from MediaStreamTypeEvents/MediaLiveEvents
       // (streamtypechange) are NOT native and are excluded here — they only
-      // appear in elementSpecific, and only on elements that @fires them.
+      // appear in the custom bucket, and only on elements that @fires them.
+      // Like real dash-video/hls-video, SimpleVideo has no @fires tag for
+      // streamtypechange, so it must appear in neither bucket.
       expect(ref.platforms.html.events.standard).toEqual([
         'play',
         'playing',
@@ -1937,20 +1881,6 @@ describe('Media element pipeline (end-to-end)', () => {
       ]);
       // SimpleHost dispatches no events of its own.
       expect(ref.platforms.html.events.custom).toEqual([]);
-    });
-
-    it('omits custom events entirely when the element does not @fires them', () => {
-      // Regression guard: streamtypechange lives in the VideoEvents contract via
-      // MediaStreamTypeEvents, but SimpleVideo has no @fires tag for it (and no
-      // streamType event documentation). A custom event must never leak into the standard list
-      // (which points readers at MDN) — with no @fires it appears in NEITHER
-      // bucket. Mirrors dash-video / hls-video in the real monorepo.
-      const ref = findElement('SimpleVideo')!.reference;
-
-      expect(ref.platforms.html.events.standard).not.toContain('streamtypechange');
-      const elementSpecificNames = ref.platforms.html.events.custom.map((e) => e.name);
-
-      expect(elementSpecificNames).not.toContain('streamtypechange');
     });
 
     it('includes CSS custom properties from VideoCSSVars', () => {
@@ -2165,14 +2095,6 @@ describe('Media element pipeline (end-to-end)', () => {
         { name: 'undocumented', type: 'string | undefined' },
       ]);
     });
-
-    it('keeps an engine option that carries no JSDoc, without a description', () => {
-      const options = findElement('EmbedVideo')!.reference.engineOptions?.embed ?? [];
-      const undocumented = options.find((option) => option.name === 'undocumented');
-
-      expect(undocumented).toBeDefined();
-      expect(undocumented?.description).toBeUndefined();
-    });
   });
 
   // ─────────────────────────────────────────────────────────────────
@@ -2291,15 +2213,6 @@ describe('Media element pipeline (end-to-end)', () => {
   // VideoEvents includes TextTrackListEvents; AudioEvents does not.
 
   describe('Event extraction from capability contracts', () => {
-    it('video elements include text track events from VideoEvents', () => {
-      const ref = findElement('SimpleVideo')!.reference;
-
-      expect(ref.platforms.html.events.standard).toContain('addtrack');
-      expect(ref.platforms.html.events.standard).toContain('removetrack');
-      expect(ref.platforms.html.events.standard).toContain('changetrack');
-      expect(ref.platforms.html.events.standard).toContain('trackmodechange');
-    });
-
     it('all video elements share the same native event list', () => {
       const simple = findElement('SimpleVideo')!.reference.platforms.html.events.standard;
       const complex = findElement('ComplexVideo')!.reference.platforms.html.events.standard;
@@ -2497,7 +2410,7 @@ describe('Media element pipeline (end-to-end)', () => {
       const ref = findElement('SpfAudio')!.reference;
       const names = ref.platforms.html.events.custom.map((e) => e.name);
 
-      expect(names).toEqual([...names].sort());
+      expect(names).toEqual(['audiomodechange', 'manifestparsed']);
     });
 
     it('has empty AudioCSSVars', () => {

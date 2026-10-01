@@ -32,14 +32,6 @@ describe('animationFrame', () => {
     expect(callback).toHaveBeenCalledWith(expect.any(Number));
   });
 
-  it('returns a cleanup function', () => {
-    const callback = vi.fn();
-
-    const cancel = animationFrame(callback);
-
-    expect(cancel).toBeTypeOf('function');
-  });
-
   it('cancel prevents callback from being called', async () => {
     const callback = vi.fn();
 

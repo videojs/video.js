@@ -49,15 +49,22 @@ for (const { name, path } of VISUAL_PAGES) {
 test.describe('Visual — Live Button', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/pages/html-video-mp4.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => customElements.get('video-skin'));
+    await page.addScriptTag({ type: 'module', url: '/@id/@videojs/html/live-video/skin' });
+    await page.waitForFunction(() => customElements.get('live-video-skin'));
+    await page.evaluate(() => {
+      document.getElementById('root')!.innerHTML = '<live-video-skin></live-video-skin>';
+    });
   });
 
   test('keeps the live-edge indicator colored when aria-disabled', async ({ page }) => {
     const styles = await page.evaluate(() => {
-      const container = document.querySelector('video-skin')?.shadowRoot?.querySelector('media-container');
+      const container = document.querySelector('live-video-skin')?.shadowRoot?.querySelector('media-container');
+      if (!container) throw new Error('Expected the live skin container.');
+
       const liveButton = document.createElement('button');
 
-      liveButton.className = 'media-button';
+      liveButton.className = 'media-button media-live-button';
+      liveButton.style.setProperty('--media-live-color', 'rgb(12, 123, 234)');
       liveButton.setAttribute('aria-disabled', 'true');
       liveButton.setAttribute('data-live-edge', '');
 
@@ -68,6 +75,7 @@ test.describe('Visual — Live Button', () => {
 
       container?.append(liveButton, disabledButton);
 
+      liveButton.dataset.liveColorProbe = '';
       const liveStyle = getComputedStyle(liveButton);
       const disabledStyle = getComputedStyle(disabledButton);
 
@@ -76,6 +84,14 @@ test.describe('Visual — Live Button', () => {
         disabled: { filter: disabledStyle.filter, opacity: disabledStyle.opacity },
       };
     });
+
+    await expect
+      .poll(() =>
+        page
+          .locator('[data-live-color-probe]')
+          .evaluate((button) => getComputedStyle(button, '::before').backgroundColor)
+      )
+      .toBe('rgb(12, 123, 234)');
 
     expect(styles.live).toEqual({ filter: 'none', opacity: '0.5' });
     expect(styles.disabled).toEqual({ filter: 'none', opacity: '0.5' });

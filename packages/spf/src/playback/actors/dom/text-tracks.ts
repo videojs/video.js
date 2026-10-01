@@ -1,3 +1,5 @@
+import { findTrackElement, listen } from '@videojs/utils/dom';
+
 import { createTransitionActor } from '../../../core/actors/create-transition-actor';
 import type { Cue } from '../../../media/types';
 import type { AddCuesMessage, CueSegmentMeta } from '../../primitives/text-track-messages';
@@ -28,8 +30,16 @@ function isDuplicateCue(cue: VTTCue, existing: Cue[]): boolean {
 
 /** TextTrack actor: wraps all text tracks on a media element, owns cue operations. */
 export function createTextTracksActor(mediaElement: HTMLMediaElement): TextTracksActor<VTTCue> {
-  return createTransitionActor({ loaded: {}, segments: {} } as TextTracksActorContext, (context, message) => {
+  const pending = new Set<() => void>();
+  const clearPending = (): void => {
+    for (const cleanup of pending) cleanup();
+  };
+
+  const initialContext: TextTracksActorContext = { loaded: {}, segments: {} };
+  const actor: TextTracksActor<VTTCue> = createTransitionActor(initialContext, (context, message) => {
     if (message.type === 'clear') {
+      clearPending();
+
       // Reset the cue + segment cache. DOM cleanup is the caller's job —
       // by the time we get here, `syncTextTracks` has already removed
       // the `<track>` children (and their cues) via
@@ -47,6 +57,31 @@ export function createTextTracksActor(mediaElement: HTMLMediaElement): TextTrack
     const { trackId, id: segmentId, startTime, duration } = meta;
     const textTrack = Array.from(mediaElement.textTracks).find((t) => t.id === trackId);
     if (!textTrack) return context;
+
+    const el = findTrackElement(mediaElement, textTrack);
+
+    if (el && el.readyState < HTMLTrackElement.LOADED) {
+      // Even a srcless slot clears native cues during its initial load. Wait
+      // for settlement before inserting cues or recording the segment as loaded.
+      const settle = (): void => {
+        cleanup();
+
+        if (el.parentNode !== mediaElement) return;
+
+        actor.send(message);
+      };
+
+      const unlistenLoad = listen(el, 'load', settle);
+      const unlistenError = listen(el, 'error', settle);
+      const cleanup = (): void => {
+        unlistenLoad();
+        unlistenError();
+        pending.delete(cleanup);
+      };
+
+      pending.add(cleanup);
+      return context;
+    }
 
     const existingCues = context.loaded[trackId] ?? [];
     const existingSegments = context.segments[trackId] ?? [];
@@ -70,4 +105,12 @@ export function createTextTracksActor(mediaElement: HTMLMediaElement): TextTrack
           },
     };
   });
+
+  return {
+    ...actor,
+    destroy(): void {
+      clearPending();
+      actor.destroy();
+    },
+  };
 }

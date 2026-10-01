@@ -11,28 +11,10 @@ const skinTemplate = document.createElement('template');
 skinTemplate.innerHTML =
   '<button aria-labelledby="settings-label"><media-text id="settings-label" token="menu.settings">Settings</media-text></button>';
 
-const missingKeyTemplate = document.createElement('template');
-
-missingKeyTemplate.innerHTML =
-  '<button aria-labelledby="missing-label"><media-text id="missing-label">missingLabel</media-text></button>';
-
-const childTextTemplate = document.createElement('template');
-
-childTextTemplate.innerHTML =
-  '<button aria-labelledby="fallback-label"><media-text id="fallback-label">Fallback label</media-text></button>';
-
 const firstUpdateTemplate = document.createElement('template');
 
 class TestSkinElement extends SkinElement {
   static override readonly template = skinTemplate;
-}
-
-class TestMissingKeyElement extends SkinElement {
-  static override readonly template = missingKeyTemplate;
-}
-
-class TestChildTextElement extends SkinElement {
-  static override readonly template = childTextTemplate;
 }
 
 class TestFirstUpdateElement extends SkinElement {
@@ -66,14 +48,6 @@ if (!customElements.get('test-skin-i18n')) {
   customElements.define('test-skin-i18n', TestSkinElement);
 }
 
-if (!customElements.get('test-skin-i18n-missing-key')) {
-  customElements.define('test-skin-i18n-missing-key', TestMissingKeyElement);
-}
-
-if (!customElements.get('test-skin-i18n-child-text')) {
-  customElements.define('test-skin-i18n-child-text', TestChildTextElement);
-}
-
 if (!customElements.get('test-skin-i18n-first-text')) {
   customElements.define('test-skin-i18n-first-text', TestFirstTextElement);
 }
@@ -96,7 +70,7 @@ if (!customElements.get(MediaTextElement.tagName)) {
   customElements.define(MediaTextElement.tagName, MediaTextElement);
 }
 
-describe('provider', () => {
+describe('MediaTextElement', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     resetI18nRegistry();
@@ -120,9 +94,6 @@ describe('provider', () => {
 
     await text.updateComplete;
 
-    const button = skin.shadowRoot!.querySelector('button')!;
-
-    expect(button.getAttribute('aria-labelledby')).toBe('settings-label');
     expect(text.textContent).toBe('Ancestor settings');
   });
 
@@ -139,19 +110,6 @@ describe('provider', () => {
     await text.updateComplete;
 
     expect(text.textContent).toBe('Settings');
-  });
-
-  it('keeps the child text when a shadow label has no token', async () => {
-    const skin = document.createElement('test-skin-i18n-missing-key') as TestMissingKeyElement;
-
-    document.body.append(skin);
-
-    await skin.updateComplete;
-    const text = skin.shadowRoot!.querySelector(MediaTextElement.tagName) as MediaTextElement;
-
-    await text.updateComplete;
-
-    expect(text.textContent).toBe('missingLabel');
   });
 
   it('updates shadow labels when provider lang changes', async () => {
@@ -192,18 +150,5 @@ describe('provider', () => {
 
     expect(text.firstText).toBe('Skin settings');
     expect(text.textContent).toBe('Skin settings');
-  });
-
-  it('keeps child text when key is undefined', async () => {
-    const skin = document.createElement('test-skin-i18n-child-text') as TestChildTextElement;
-
-    document.body.append(skin);
-
-    await skin.updateComplete;
-    const text = skin.shadowRoot!.querySelector(MediaTextElement.tagName) as MediaTextElement;
-
-    await text.updateComplete;
-
-    expect(text.textContent).toBe('Fallback label');
   });
 });

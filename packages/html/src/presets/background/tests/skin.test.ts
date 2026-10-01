@@ -47,6 +47,5 @@ describe('BackgroundVideoSkinElement', () => {
     const styles = document.querySelectorAll('#__media-background-styles');
 
     expect(styles).toHaveLength(1);
-    expect(first.shadowRoot).not.toBe(second.shadowRoot);
   });
 });

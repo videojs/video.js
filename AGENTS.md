@@ -86,6 +86,7 @@ Checked-in skills are direct children of `.agents/skills/`. `pnpm install` expos
 - Toolchain workflows: `configure-vite-plus`
 - Skin parity: `maintain-vjsc-skin-gaps`
 - Delivery: `investigate-issue`, `create-issue`, `review-branch`, `commit-pr`
+- Tests: `maintain-tests`
 - SPF behaviors: `create-spf-behavior`, `change-spf-behavior`
 - SPF registry: `document-spf-feature`, `document-spf-use-case`, `implement-spf-feature`, `implement-spf-use-case`
 - Agent guidance: `maintain-agent-docs`, `create-skill`

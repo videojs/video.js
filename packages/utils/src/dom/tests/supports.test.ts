@@ -4,24 +4,22 @@ import { supportsAnimationFrame, supportsConstructableStyleSheets, supportsIdleC
 
 describe('supports', () => {
   describe('supportsAnimationFrame', () => {
-    it('returns a boolean', () => {
-      const result = supportsAnimationFrame();
-
-      expect(typeof result).toBe('boolean');
-    });
-
     it('returns true in browser environment', () => {
       expect(supportsAnimationFrame()).toBe(true);
     });
   });
 
   describe('supportsIdleCallback', () => {
-    it('returns a boolean', () => {
-      const result = supportsIdleCallback();
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
 
-      // Note: requestIdleCallback may or may not be available in jsdom
-      // depending on the version, so we just check it returns a boolean
-      expect(typeof result).toBe('boolean');
+    it('detects whether the native request function is available', () => {
+      vi.stubGlobal('requestIdleCallback', vi.fn());
+      expect(supportsIdleCallback()).toBe(true);
+
+      vi.stubGlobal('requestIdleCallback', undefined);
+      expect(supportsIdleCallback()).toBe(false);
     });
   });
 

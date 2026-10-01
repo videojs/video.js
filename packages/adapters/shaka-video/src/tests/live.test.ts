@@ -11,9 +11,10 @@ function createEngine({ live = false, inProgress = false, maxSegmentDuration = 2
     inProgress,
     maxSegmentDuration,
     seekEnd,
+    loaded: false,
     isLive: vi.fn(() => engine.live),
     isInProgress: vi.fn(() => engine.inProgress),
-    getStats: vi.fn(() => ({ maxSegmentDuration: engine.maxSegmentDuration })),
+    getStats: vi.fn(() => ({ maxSegmentDuration: engine.loaded ? engine.maxSegmentDuration : Number.NaN })),
     seekRange: vi.fn(() => ({ start: 0, end: engine.seekEnd })),
     addEventListener(type: string, listener: (event: unknown) => void) {
       const typeListeners = listeners.get(type) ?? new Set();
@@ -25,6 +26,10 @@ function createEngine({ live = false, inProgress = false, maxSegmentDuration = 2
       listeners.get(type)?.delete(listener);
     },
     emit(type: string) {
+      if (type === 'loading' || type === 'unloading') engine.loaded = false;
+
+      if (type === 'loaded') engine.loaded = true;
+
       for (const listener of [...(listeners.get(type) ?? [])]) listener({ type });
     },
   };
@@ -87,8 +92,14 @@ describe('ShakaLiveMixin', () => {
     engine.emit('manifestparsed');
 
     expect(media.targetLiveWindow).toBe(0);
+    expect(media.liveEdgeStart).toBeNaN();
+    expect(onChange).toHaveBeenCalledOnce();
+
+    engine.emit('loaded');
+
+    expect(media.targetLiveWindow).toBe(0);
     expect(media.liveEdgeStart).toBe(94);
-    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledOnce();
   });
 
   it('treats an in-progress recording as a growing window', () => {
@@ -105,6 +116,8 @@ describe('ShakaLiveMixin', () => {
     const media = new ShakaLive(engine);
 
     engine.emit('manifestparsed');
+    engine.emit('loaded');
+    expect(media.liveEdgeStart).toBe(94);
 
     engine.seekEnd = 160;
 
@@ -116,6 +129,10 @@ describe('ShakaLiveMixin', () => {
     const media = new ShakaLive(engine);
 
     engine.emit('manifestparsed');
+    engine.emit('loaded');
+
+    expect(media.targetLiveWindow).toBe(0);
+    expect(media.liveEdgeStart).toBe(94);
 
     engine.emit('loading');
 

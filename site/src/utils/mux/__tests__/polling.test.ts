@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import type { AssetStatusResult, UploadStatusResult } from '../polling';
+import type { AssetStatusResult, PollResult, UploadStatusResult } from '../polling';
 import { pollForPlaybackId } from '../polling';
 
 describe('pollForPlaybackId', () => {
+  afterEach(() => vi.useRealTimers());
+
   describe('successful flow', () => {
     it('polls until assetId is available, then polls until playbackId', async () => {
       const getUploadStatus = vi
@@ -53,20 +55,44 @@ describe('pollForPlaybackId', () => {
   });
 
   describe('error handling', () => {
-    it('returns error when upload status is errored', async () => {
-      const getUploadStatus = vi
-        .fn<(id: string) => Promise<UploadStatusResult>>()
-        .mockResolvedValue({ data: { status: 'errored' } });
+    it.each(['errored', 'cancelled', 'timed_out'] as const)(
+      'stops upload polling for terminal status %s',
+      async (status) => {
+        vi.useFakeTimers();
 
-      const result = await pollForPlaybackId({
-        uploadId: 'upload-1',
-        getUploadStatus,
-        getAssetStatus: vi.fn(),
-        interval: 0,
-      });
+        const controller = new AbortController();
+        const getUploadStatus = vi
+          .fn<(id: string) => Promise<UploadStatusResult>>()
+          .mockResolvedValue({ data: { status } });
+        const getAssetStatus = vi.fn<(id: string) => Promise<AssetStatusResult>>();
+        let result: PollResult | undefined;
 
-      expect(result).toEqual({ status: 'error', message: 'Upload processing failed' });
-    });
+        const pending = pollForPlaybackId({
+          uploadId: 'upload-1',
+          getUploadStatus,
+          getAssetStatus,
+          interval: 100,
+          signal: controller.signal,
+        }).then(
+          (value) => {
+            result = value;
+          },
+          () => {}
+        );
+
+        try {
+          await vi.advanceTimersByTimeAsync(1000);
+
+          expect.soft(result).toEqual({ status: 'error', message: 'Upload processing failed' });
+          expect.soft(getUploadStatus).toHaveBeenCalledTimes(1);
+          expect(getAssetStatus).not.toHaveBeenCalled();
+        } finally {
+          controller.abort();
+          await vi.advanceTimersByTimeAsync(100);
+          await pending;
+        }
+      }
+    );
 
     it('returns error when asset status is errored', async () => {
       const getUploadStatus = vi

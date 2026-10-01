@@ -397,10 +397,14 @@ describe('generateHTMLUsageCode', () => {
     const live = generateHTMLUsageCode({ ...baseHTML, useCase: 'live-video', media: 'hls' });
     const onDemand = generateHTMLUsageCode({ ...baseHTML, media: 'hls' });
 
-    expect(live.html).toContain('.m3u8');
-    // A distinct asset from the on-demand demo, so the live player actually
-    // reports live-edge state.
-    expect(live.html).not.toEqual(onDemand.html);
+    const liveSource = live.html.match(/<hlsjs-video\s+src="([^"]+)"/);
+    const onDemandSource = onDemand.html.match(/<hlsjs-video\s+src="([^"]+)"/);
+
+    expect(liveSource).not.toBeNull();
+    expect(onDemandSource).not.toBeNull();
+    expect(liveSource?.[1]).toBe(INSTALLATION_DEMO_SOURCES.live);
+    expect(onDemandSource?.[1]).toBe(INSTALLATION_DEMO_SOURCES.videoHls);
+    expect(liveSource?.[1]).not.toBe(onDemandSource?.[1]);
   });
 });
 

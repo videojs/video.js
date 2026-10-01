@@ -1,14 +1,14 @@
 import { isShadowRoot } from './predicates';
 
 export function containsComposed(root: Element, element: Element): boolean {
-  let current: Node | null = element;
+  let current: Element | null = element;
 
   while (current) {
     if (current === root || root.contains(current)) return true;
 
     const nodeRoot = current.getRootNode();
 
-    current = isShadowRoot(nodeRoot) ? nodeRoot.host : current.parentNode;
+    current = current.assignedSlot ?? current.parentElement ?? (isShadowRoot(nodeRoot) ? nodeRoot.host : null);
   }
 
   return false;

@@ -11,24 +11,6 @@ function createMutableRef<T>(initialValue: T | null = null): MutableRefObject<T 
 }
 
 describe('composeRefs', () => {
-  it('sets value on callback ref', () => {
-    const callbackRef = vi.fn();
-    const composed = composeRefs(callbackRef);
-
-    composed('test-value');
-
-    expect(callbackRef).toHaveBeenCalledWith('test-value');
-  });
-
-  it('sets value on RefObject', () => {
-    const refObject = createMutableRef<string>();
-    const composed = composeRefs(refObject);
-
-    composed('test-value');
-
-    expect(refObject.current).toBe('test-value');
-  });
-
   it('sets value on multiple refs', () => {
     const callbackRef = vi.fn();
     const refObject = createMutableRef<string>();
@@ -49,37 +31,22 @@ describe('composeRefs', () => {
     expect(callbackRef).toHaveBeenCalledWith('test-value');
   });
 
-  it('returns cleanup function when callback ref returns one', () => {
-    const cleanup = vi.fn();
-    const callbackRef = vi.fn().mockReturnValue(cleanup);
-    const composed = composeRefs(callbackRef);
-
-    const returnedCleanup = composed('test-value') as (() => void) | void;
-
-    expect(returnedCleanup).toBeTypeOf('function');
-
-    if (typeof returnedCleanup === 'function') {
-      returnedCleanup();
-    }
-
-    expect(cleanup).toHaveBeenCalled();
-  });
-
   it('clears RefObject on cleanup', () => {
     const cleanup = vi.fn();
     const callbackRef = vi.fn().mockReturnValue(cleanup);
     const refObject = createMutableRef<string>();
     const composed = composeRefs(callbackRef, refObject);
 
-    composed('test-value');
-    expect(refObject.current).toBe('test-value');
-
     const returnedCleanup = composed('test-value') as (() => void) | void;
+
+    expect(refObject.current).toBe('test-value');
+    expect(returnedCleanup).toBeTypeOf('function');
 
     if (typeof returnedCleanup === 'function') {
       returnedCleanup();
     }
 
+    expect(cleanup).toHaveBeenCalledOnce();
     expect(refObject.current).toBeNull();
   });
 });

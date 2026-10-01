@@ -90,6 +90,32 @@ describe('MediaPlayedRangesMixin', () => {
     expect(played.end(1)).toBe(25);
   });
 
+  it('retains playback before an unpaused seek without a played read', () => {
+    const media = new FakeMedia();
+
+    try {
+      media.simulatePlay(0);
+      media.tick(5);
+      media.dispatchEvent(new Event('timeupdate'));
+
+      // Seeking reports the target time, not the last played position.
+      media.tick(20);
+      media.dispatchEvent(new Event('seeking'));
+      media.dispatchEvent(new Event('timeupdate'));
+      media.dispatchEvent(new Event('seeked'));
+      media.simulatePause(25);
+
+      const played = media.played;
+
+      expect(Array.from({ length: played.length }, (_, i) => [played.start(i), played.end(i)])).toEqual([
+        [0, 5],
+        [20, 25],
+      ]);
+    } finally {
+      media.destroy();
+    }
+  });
+
   it('commits a range on ended', () => {
     const media = new FakeMedia();
 

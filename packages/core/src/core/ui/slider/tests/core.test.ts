@@ -294,7 +294,8 @@ describe('SliderCore', () => {
     it('returns raw percent for center alignment', () => {
       const core = new SliderCore({ thumbAlignment: 'center' });
 
-      expect(core.adjustPercentForAlignment(50, 20, 200)).toBe(50);
+      expect(core.adjustPercentForAlignment(0, 20, 200)).toBe(0);
+      expect(core.adjustPercentForAlignment(100, 20, 200)).toBe(100);
     });
 
     it('returns raw percent when track size is 0', () => {
@@ -356,22 +357,6 @@ describe('SliderCore', () => {
       const core = new SliderCore({ largeStep: 10, min: 50, max: 50 });
 
       expect(core.getLargeStepPercent()).toBe(0);
-    });
-  });
-
-  describe('setProps', () => {
-    it('updates props after construction', () => {
-      const core = new SliderCore();
-
-      core.setProps({ min: 10, max: 50 });
-
-      core.setInput(createInput());
-      const state = core.getSliderState(30);
-      const attrs = core.getAttrs(state);
-
-      expect(attrs['aria-valuemin']).toBe(10);
-      expect(attrs['aria-valuemax']).toBe(50);
-      expect(state.fillPercent).toBe(50); // (30-10)/(50-10) * 100
     });
   });
 });

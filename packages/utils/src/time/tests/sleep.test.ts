@@ -25,12 +25,13 @@ describe('sleep', () => {
     const controller = new AbortController();
     const reason = new DOMException('Aborted', 'AbortError');
     const promise = sleep(100, controller.signal);
+    const rejection = expect(promise).rejects.toBe(reason);
+
+    expect(vi.getTimerCount()).toBe(1);
 
     controller.abort(reason);
-    await expect(promise).rejects.toBe(reason);
-
-    // Timer was cleared — advancing past the delay does nothing further.
-    await vi.advanceTimersByTimeAsync(200);
+    expect(vi.getTimerCount()).toBe(0);
+    await rejection;
   });
 
   it('rejects immediately when the signal is already aborted', async () => {

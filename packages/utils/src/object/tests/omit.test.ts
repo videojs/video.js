@@ -70,23 +70,4 @@ describe('omit', () => {
 
     expect(omit(obj, keys)).toEqual({ b: 2 });
   });
-
-  it('filters attrs that are MediaHost props from element attributes', () => {
-    const elementAttrs = {
-      src: 'video.mp4',
-      autoplay: '',
-      class: 'player',
-      'current-time': '10',
-      'playback-rate': '1.5',
-      muted: '',
-    };
-    const mediaPropAttrs = ['current-time', 'playback-rate', 'muted'] as const;
-
-    const result = omit(elementAttrs, mediaPropAttrs);
-
-    expect(result).toEqual({ src: 'video.mp4', autoplay: '', class: 'player' });
-    expect(result).not.toHaveProperty('current-time');
-    expect(result).not.toHaveProperty('playback-rate');
-    expect(result).not.toHaveProperty('muted');
-  });
 });

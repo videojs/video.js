@@ -44,9 +44,9 @@ describe('resolveErrorDialogDescription', () => {
   });
 
   it('returns custom message text when context is provided', () => {
-    const error = new MediaError('Custom failure', MediaError.MEDIA_ERR_NETWORK, true, 'hls');
+    const error = new MediaError('Failed to open media', MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED, true, 'hls');
 
-    expect(resolveErrorDialogDescription(error, null)).toBe('Custom failure');
+    expect(resolveErrorDialogDescription(error, null)).toBe('Failed to open media');
   });
 
   it('returns custom message text on standard codes without context', () => {
@@ -64,28 +64,16 @@ describe('resolveErrorDialogDescription', () => {
     });
   });
 
-  it('maps the engine unsupported-playback-feature code to its own copy', () => {
-    // SVTA 99001, reported by an engine that has no pipeline for the source.
-    // The engine deliberately sends no message, so the code is all there is to
-    // go on — and it must not fall through to `errors.unexpected`.
-    expect(resolveErrorDialogDescription({ code: 99001, message: '' }, null)).toMatchObject({
-      key: 'errors.unplayable',
-      text: 'This media is unsupported by the player.',
-    });
-  });
-
-  it('distinguishes an unplayable source from a browser-unsupported one', () => {
-    // Both are "can't play it", but only one is about the browser. Showing
-    // `errors.source` here would send a viewer to a different browser that
-    // behaves identically.
-    const unplayable = resolveErrorDialogDescription({ code: 99001, message: '' }, null);
-    const unsupportedSource = resolveErrorDialogDescription(
-      { code: MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED, message: '' },
-      null
-    );
-
-    expect(unplayable).not.toEqual(unsupportedSource);
-    expect(unplayable).toMatchObject({ key: 'errors.unplayable' });
+  it.each([
+    [99001, 'errors.unplayable', 'This media is unsupported by the player.'],
+    [
+      MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED,
+      'errors.source',
+      'This media could not be loaded. It may be unavailable, or your browser may not support its format.',
+    ],
+  ] as const)('resolves empty-message code %s to %s', (code, key, text) => {
+    // Engine pipeline failure needs different advice from a browser-unsupported source.
+    expect(resolveErrorDialogDescription({ code, message: '' }, null)).toMatchObject({ key, text });
   });
 
   it('falls back to cached message then generic key', () => {

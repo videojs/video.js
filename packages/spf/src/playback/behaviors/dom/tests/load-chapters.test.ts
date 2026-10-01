@@ -1,10 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../../../../core/signals/primitives';
-import { addSubtitlesTracksToMedia } from '../../../../media/dom/text/text-track-slots';
-import type { MaybeResolvedPresentation, SessionDataEntry } from '../../../../media/types';
+import {
+  addSubtitlesTracksToMedia,
+  getShowingSubtitlesTrackFromMedia,
+  removeAllSubtitlesTracksFromMedia,
+} from '../../../../media/dom/text/text-track-slots';
+import type { MaybeResolvedPresentation, SessionDataEntry, TextTrack } from '../../../../media/types';
 import { MULTIVARIANT_PLAYLIST_METADATA_KEY } from '../../../../media/types';
 import { type LoadChaptersConfig, loadChapters } from '../load-chapters';
+import { syncTextTracks } from '../sync-text-tracks';
 
 const CHAPTERS_URL = 'http://example.com/chapters.json';
 
@@ -81,6 +86,36 @@ describe('loadChapters', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+  });
+
+  it('detaches cleanly after an earlier reactor is destroyed', async () => {
+    stubFetch();
+    const first = setup({ presentation: makePresentation(), mediaElement: document.createElement('video') });
+    const mediaElement = document.createElement('video');
+    const second = setup({ presentation: makePresentation(), mediaElement });
+    const errors: unknown[] = [];
+    const onError = (event: ErrorEvent) => {
+      errors.push(event.error);
+      event.preventDefault();
+    };
+
+    window.addEventListener('error', onError);
+
+    try {
+      await settle();
+      expect(chaptersTracks(mediaElement).length).toBeGreaterThan(0);
+
+      // Disposing earlier effects reorders the shared watcher's pending queue.
+      first.reactor.destroy();
+      second.context.mediaElement.set(undefined);
+      await settle();
+
+      expect(errors).toEqual([]);
+      expect(chaptersTracks(mediaElement)).toEqual([]);
+    } finally {
+      window.removeEventListener('error', onError);
+      second.reactor.destroy();
+    }
   });
 
   it('does nothing without a media element', async () => {
@@ -274,6 +309,67 @@ describe('loadChapters', () => {
     reactor.destroy();
 
     expect(chaptersTracks(mediaElement)).toHaveLength(0);
+  });
+
+  it('recreates subtitle and chapter tracks on direct media element replacement', async () => {
+    stubFetch();
+    const first = document.createElement('video');
+    const replacement = document.createElement('video');
+    const { state, context, reactor } = setup({
+      mediaElement: first,
+      presentation: {
+        ...makePresentation(),
+        selectionSets: [
+          {
+            id: 'text',
+            type: 'text',
+            switchingSets: [
+              {
+                id: 'subs',
+                type: 'text',
+                tracks: [
+                  {
+                    id: 'subs-en',
+                    type: 'text',
+                    kind: 'subtitles',
+                    label: 'English',
+                    language: 'en',
+                    url: 'data:text/vtt,',
+                    mimeType: 'text/vtt',
+                    bandwidth: 0,
+                    groupId: 'subs',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+    const subtitles = syncTextTracks.setup({
+      state: {
+        ...state,
+        selectedTextTrackId: signal<string | undefined>('subs-en'),
+        userTextTrackSelection: signal<Partial<TextTrack> | 'off' | undefined>(undefined),
+      },
+      context: { ...context, textTracksActor: signal(undefined) },
+      config: { addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia },
+    });
+
+    try {
+      await vi.waitFor(() => expect(first.querySelectorAll('track')).toHaveLength(3));
+
+      context.mediaElement.set(replacement);
+
+      await vi.waitFor(() =>
+        expect([first.querySelectorAll('track').length, replacement.querySelectorAll('track').length]).toEqual([0, 3])
+      );
+      expect(getShowingSubtitlesTrackFromMedia(replacement)?.id).toBe('subs-en');
+      await vi.waitFor(() => expect(cuesOf(chaptersTracks(replacement)[0]!)).toHaveLength(3));
+    } finally {
+      subtitles.destroy();
+      reactor.destroy();
+    }
   });
 
   it('projects again for a new source', async () => {

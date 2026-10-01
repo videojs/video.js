@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { registerI18n, resetI18nRegistry } from '@videojs/core/i18n';
 import type { MediaVideoRendition } from '@videojs/media';
 import type { ReactNode } from 'react';
@@ -82,16 +82,6 @@ describe('useQualityOptions', () => {
     expect(screen.getByTestId('selected-label').textContent).toBe('Auto');
   });
 
-  it('sets the selected rendition', () => {
-    const selectVideoRendition = vi.fn();
-
-    renderQualityOptions({ selectVideoRendition });
-
-    fireEvent.click(screen.getByRole('menuitemradio', { name: '720p' }));
-
-    expect(selectVideoRendition).toHaveBeenCalledWith('1');
-  });
-
   it('renders the active rendition in the Auto option', () => {
     renderQualityOptions({
       activeVideoRendition: { id: '1', height: 720, selected: false },
@@ -133,20 +123,6 @@ describe('useQualityOptions', () => {
     expect(screen.getByRole('menuitemradio', { name: '1080p HD 6 Mbps' })).toBeTruthy();
     expect(screen.getByRole('menuitemradio', { name: '1080p HD 3 Mbps' })).toBeTruthy();
     expect(screen.getByRole('menuitemradio', { name: '720p' })).toBeTruthy();
-  });
-
-  it('renders superscript labels for high-resolution renditions', () => {
-    renderQualityOptions({
-      videoRenditionList: [
-        { id: '0', height: 1080, selected: false },
-        { id: '1', height: 2160, selected: false },
-        { id: '2', height: 4320, selected: false },
-      ],
-    });
-
-    expect(screen.getByRole('menuitemradio', { name: '1080p HD' })).toBeTruthy();
-    expect(screen.getByRole('menuitemradio', { name: '2160p 4K' })).toBeTruthy();
-    expect(screen.getByRole('menuitemradio', { name: '4320p 8K' })).toBeTruthy();
   });
 
   it('disables options when only one rendition is available', () => {

@@ -23,13 +23,39 @@ describe('createTemplate', () => {
 
 describe('renderTemplate', () => {
   it('deep-clones template content into a container', () => {
-    const template = createTemplate('<p>Hello</p><p>World</p>')!;
+    const html = '<p><span>Hello</span></p><p>World</p>';
+    const template = createTemplate(html)!;
+    const originalRoots = [...template.content.children];
+    const originalChild = template.content.querySelector('span')!;
     const container = document.createElement('div');
+    const secondContainer = document.createElement('div');
 
     renderTemplate(container, template);
+    renderTemplate(secondContainer, template);
 
     expect(container.children).toHaveLength(2);
-    expect(container.innerHTML).toBe('<p>Hello</p><p>World</p>');
+    expect(container.innerHTML).toBe(html);
+    expect(secondContainer.innerHTML).toBe(html);
+    expect([...template.content.children]).toEqual(originalRoots);
+    expect(template.content.querySelector('span')).toBe(originalChild);
+
+    for (const [index, original] of originalRoots.entries()) {
+      expect(template.content.children[index]).toBe(original);
+      expect(container.children[index]).not.toBe(original);
+      expect(secondContainer.children[index]).not.toBe(original);
+      expect(secondContainer.children[index]).not.toBe(container.children[index]);
+    }
+
+    const firstChild = container.querySelector('span')!;
+    const secondChild = secondContainer.querySelector('span')!;
+
+    expect(firstChild).not.toBe(originalChild);
+    expect(secondChild).not.toBe(originalChild);
+    expect(secondChild).not.toBe(firstChild);
+
+    firstChild.textContent = 'Changed';
+    expect(originalChild.textContent).toBe('Hello');
+    expect(secondChild.textContent).toBe('Hello');
   });
 
   it('appends without clearing existing content', () => {

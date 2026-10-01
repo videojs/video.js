@@ -26,6 +26,8 @@ describe('initializeTableDisclosures', () => {
     delete window.__videojsTableDisclosureController;
     window.history.replaceState(null, '', '/');
     document.body.replaceChildren();
+    window.getSelection()?.removeAllRanges();
+    vi.restoreAllMocks();
   });
 
   it('keeps expansion state and accessibility state synchronized', () => {
@@ -64,11 +66,19 @@ describe('initializeTableDisclosures', () => {
     const button = renderApiRow('Thumbnail.Root-thumbnails');
     const label = document.querySelector<HTMLElement>('td')!;
 
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: false } as Selection);
+    const selection = window.getSelection()!;
+
+    selection.selectAllChildren(label);
+
     initializeTableDisclosures();
     label.click();
 
     expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    selection.collapseToStart();
+    label.click();
+
+    expect(button).toHaveAttribute('aria-expanded', 'true');
   });
 
   it('handles rows swapped into the document after initialization', () => {

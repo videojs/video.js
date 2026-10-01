@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vite-plus/test';
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { resolveVttSegmentMetadata } from '../../../text/resolve-vtt-metadata';
-import { destroyVttResolver, resolveVttSegment, resolveVttSegmentWithMetadata } from '../resolve-vtt-segment';
+import { destroyVttResolver, resolveVttSegment } from '../resolve-vtt-segment';
 
 describe('resolveVttSegment', () => {
   beforeEach(() => {
@@ -161,14 +161,34 @@ Second
 Test
 `);
 
-    await resolveVttSegment(vttDataUrl);
+    const createElement = vi.spyOn(document, 'createElement');
 
-    destroyVttResolver();
+    try {
+      await resolveVttSegment(vttDataUrl);
 
-    const cues = await resolveVttSegment(vttDataUrl);
+      const video = createElement.mock.results.find(({ value }) => value instanceof HTMLVideoElement)!.value;
+      const track = createElement.mock.results.find(({ value }) => value instanceof HTMLTrackElement)!.value;
 
-    expect(cues).toHaveLength(1);
-    expect(cues[0]!.text).toBe('Test');
+      expect(track.parentNode).toBeNull();
+      expect(video.childElementCount).toBe(0);
+
+      createElement.mockClear();
+      destroyVttResolver();
+
+      const cues = await resolveVttSegment(vttDataUrl);
+      const nextVideo = createElement.mock.results.find(({ value }) => value instanceof HTMLVideoElement)?.value;
+      const nextTrack = createElement.mock.results.find(({ value }) => value instanceof HTMLTrackElement)!.value;
+
+      expect(createElement).toHaveBeenCalledWith('video');
+      expect(nextVideo).toBeInstanceOf(HTMLVideoElement);
+      expect(nextVideo).not.toBe(video);
+      expect(nextTrack.parentNode).toBeNull();
+      expect(cues).toHaveLength(1);
+      expect(cues[0]!.text).toBe('Test');
+    } finally {
+      createElement.mockRestore();
+      destroyVttResolver();
+    }
   });
 });
 
@@ -179,22 +199,6 @@ describe('destroyVttResolver', () => {
       destroyVttResolver();
       destroyVttResolver();
     }).not.toThrow();
-  });
-
-  it('allows parsing after destroy', async () => {
-    destroyVttResolver();
-
-    const vttDataUrl =
-      'data:text/vtt,' +
-      encodeURIComponent(`WEBVTT
-
-00:00:00.000 --> 00:00:01.000
-Test
-`);
-
-    const cues = await resolveVttSegment(vttDataUrl);
-
-    expect(cues).toHaveLength(1);
   });
 });
 
@@ -228,25 +232,5 @@ The robot.
     const metadata = await resolveVttSegmentMetadata(vttDataUrl);
 
     expect(metadata.timestampMap).toBeUndefined();
-  });
-});
-
-describe('resolveVttSegmentWithMetadata', () => {
-  it('resolves cues and header metadata together', async () => {
-    const vttDataUrl =
-      'data:text/vtt,' +
-      encodeURIComponent(`WEBVTT
-X-TIMESTAMP-MAP=MPEGTS:900000,LOCAL:00:00:00.000
-
-1
-00:00:00.008 --> 00:00:00.992
-Bip!
-`);
-
-    const { cues, metadata } = await resolveVttSegmentWithMetadata(vttDataUrl);
-
-    expect(cues).toHaveLength(1);
-    expect(cues[0]!.text).toBe('Bip!');
-    expect(metadata.timestampMap).toEqual({ mpegts: 900000, local: 0 });
   });
 });

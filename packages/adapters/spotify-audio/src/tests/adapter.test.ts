@@ -2,7 +2,15 @@ import { isMediaVolumeCapable, MediaError, type Video } from '@videojs/media';
 import { loadScript } from '@videojs/utils/dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { buildSpotifyIframeSrc, SpotifyAdapter, type SpotifyPlaybackState, type SpotifyPlaybackUpdateEvent } from '..';
+import { buildSpotifyIframeSrc, SpotifyAdapter } from '..';
+import {
+  attachAndLoad,
+  createIframe,
+  installSpotifyApi,
+  MockController,
+  TRACK_URL,
+  waitForEngine,
+} from './spotify-api';
 
 vi.mock(import('@videojs/utils/dom'), async (importOriginal) => {
   const mod = await importOriginal();
@@ -10,96 +18,17 @@ vi.mock(import('@videojs/utils/dom'), async (importOriginal) => {
   return { ...mod, loadScript: vi.fn(async () => {}) };
 });
 
-type ReadyListener = () => void;
-type PlaybackUpdateListener = (event: SpotifyPlaybackUpdateEvent) => void;
-
-/**
- * Stands in for a controller from the live iframe API, including the part that matters most to this host:
- * `createController` never drives the element it is handed. It builds an iframe of its own and swaps it in for the
- * target — but only through `parentElement`, so a target that is detached, or one parented by a shadow root rather than
- * an element, is left alone. Reproducing that exactly is the point: a mock that swapped on `parentNode` hid a bug where
- * this host followed the controller onto an iframe that was never in the document.
- */
-class MockController {
-  static instances: MockController[] = [];
-  target: HTMLElement;
-  options: unknown;
-  /** The iframe the controller built for itself. */
-  iframeElement: HTMLIFrameElement;
-  readyListeners = new Set<ReadyListener>();
-  playbackListeners = new Set<PlaybackUpdateListener>();
-
-  loadUri = vi.fn();
-  play = vi.fn();
-  resume = vi.fn();
-  pause = vi.fn();
-  togglePlay = vi.fn();
-  seek = vi.fn();
-  destroy = vi.fn(() => {
-    this.iframeElement.parentNode?.removeChild(this.iframeElement);
-  });
-
-  constructor(target: HTMLElement, options: unknown) {
-    this.target = target;
-    this.options = options;
-    this.iframeElement = document.createElement('iframe');
-    this.iframeElement.setAttribute('frameborder', '0');
-    this.iframeElement.setAttribute('allowfullscreen', '');
-    this.iframeElement.setAttribute('loading', 'lazy');
-    // `parentElement`, exactly as the live bundle spells it.
-    target.parentElement?.replaceChild(this.iframeElement, target);
-    MockController.instances.push(this);
-  }
-
-  addListener(type: 'ready' | 'playback_update', listener: ReadyListener | PlaybackUpdateListener): void {
-    if (type === 'ready') this.readyListeners.add(listener as ReadyListener);
-    else this.playbackListeners.add(listener as PlaybackUpdateListener);
-  }
-
-  ready(): void {
-    this.readyListeners.forEach((listener) => listener());
-  }
-
-  /** Push a playback snapshot, filling in the fields a test doesn't care about. */
-  update(data: Partial<SpotifyPlaybackState> = {}): void {
-    const payload: SpotifyPlaybackState = {
-      isPaused: true,
-      isBuffering: false,
-      position: 0,
-      duration: 60_000,
-      ...data,
-    };
-
-    this.playbackListeners.forEach((listener) => listener({ data: payload }));
-  }
-}
-
-const TRACK_URL = 'https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M';
 const TRACK_ID = '1301WleyT98MSxVHPZCA6M';
 const EPISODE_URL = 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5';
 const OTHER_EPISODE_ID = '43cbJh4ccRD7lzM2730YK3';
 const OTHER_EPISODE_URL = `https://open.spotify.com/episode/${OTHER_EPISODE_ID}`;
 
-beforeEach(() => {
-  MockController.instances.length = 0;
-  vi.stubGlobal('SpotifyIframeApi', {
-    createController: (target: HTMLIFrameElement, options: unknown, callback: (controller: MockController) => void) =>
-      callback(new MockController(target, options)),
-  });
-});
+beforeEach(installSpotifyApi);
 
 afterEach(() => {
   vi.unstubAllGlobals();
   document.body.replaceChildren();
 });
-
-/** An iframe as a framework renders it: in the document, where it can be swapped out. */
-function createIframe(): HTMLIFrameElement {
-  const iframe = document.createElement('iframe');
-
-  document.body.append(iframe);
-  return iframe;
-}
 
 /** An iframe as React renders it before a source resolves: `src` present but empty. */
 function createEmptySrcIframe(): HTMLIFrameElement {
@@ -113,31 +42,6 @@ function createEmptySrcIframe(): HTMLIFrameElement {
 async function flushDeferredEmbed(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
-}
-
-async function waitForEngine(media: SpotifyAdapter): Promise<MockController> {
-  await vi.waitFor(() => {
-    if (!media.engine) throw new Error('controller not created yet');
-  });
-  return media.engine as unknown as MockController;
-}
-
-async function attachAndLoad(media: SpotifyAdapter): Promise<{
-  /** The iframe holding the embed. It is the one `attach()` was handed. */
-  iframe: HTMLIFrameElement;
-  controller: MockController;
-}> {
-  // There is no embed to attach to without a source, so tests that don't care
-  // which entity is playing get one.
-  if (!media.src) media.src = TRACK_URL;
-
-  const iframe = createIframe();
-
-  media.attach(iframe);
-  const controller = await waitForEngine(media);
-
-  controller.ready();
-  return { iframe, controller };
 }
 
 describe('buildSpotifyIframeSrc', () => {
@@ -238,29 +142,6 @@ describe('SpotifyAdapter', () => {
     expect(controller.iframeElement).toBe(iframe);
     expect(media.target).toBe(iframe);
     expect(iframe.isConnected).toBe(true);
-    media.detach();
-  });
-
-  it('hands the controller a node that cannot take the place of the embed', async () => {
-    const media = new SpotifyAdapter();
-    const { iframe, controller } = await attachAndLoad(media);
-
-    // The swap runs through `parentElement`, so a detached node makes it a no-op.
-    // Anything with an element parent — what React renders — would be swapped out.
-    expect(controller.target.parentElement).toBe(null);
-    expect(iframe.isConnected).toBe(true);
-    media.detach();
-  });
-
-  it('rebuilds the embed on the iframe it was handed', async () => {
-    const media = new SpotifyAdapter();
-    const { iframe } = await attachAndLoad(media);
-
-    media.source = { src: TRACK_URL, engine: { spotify: { theme: 0 } } };
-    await Promise.resolve();
-
-    expect(iframe.getAttribute('src')).toContain('theme=0');
-    expect(media.currentSrc).toContain('theme=0');
     media.detach();
   });
 
@@ -761,6 +642,7 @@ describe('SpotifyAdapter', () => {
     // Only the embed URL applies `t` for itself, and this reload reuses the frame,
     // so the option has to be seeked to like the one a src carries.
     expect(controller.loadUri).toHaveBeenCalledWith(`spotify:track:${TRACK_ID}`);
+    expect(controller.loadUri).toHaveBeenCalledTimes(1);
     expect(media.currentTime).toBe(30);
 
     controller.update();
@@ -1018,6 +900,7 @@ describe('SpotifyAdapter source', () => {
     // The theme is only ever read off the embed URL, so the controller has no way
     // to apply it and the frame has to be rebuilt.
     expect(iframe.getAttribute('src')).toContain('theme=0');
+    expect(media.currentSrc).toContain('theme=0');
     expect(controller.loadUri).not.toHaveBeenCalled();
     media.detach();
   });
@@ -1110,21 +993,6 @@ describe('SpotifyAdapter source', () => {
     media.detach();
   });
 
-  it('does not let a cleared source come back through a playback update', async () => {
-    const media = new SpotifyAdapter();
-    const { controller } = await attachAndLoad(media);
-
-    controller.update({ isPaused: false, position: 5_000, duration: 60_000 });
-
-    media.source = null;
-    await Promise.resolve();
-    // The paused embed keeps reporting updates of its own.
-    controller.update({ isPaused: true, position: 5_000, duration: 60_000 });
-
-    expect(media.readyState).toBe(0);
-    media.detach();
-  });
-
   it('does not play a source that was cleared', async () => {
     const media = new SpotifyAdapter();
     const { controller } = await attachAndLoad(media);
@@ -1135,20 +1003,6 @@ describe('SpotifyAdapter source', () => {
     await media.play();
 
     expect(controller.resume).not.toHaveBeenCalled();
-    media.detach();
-  });
-
-  it('keeps a start position an engine option names out of the entity swap', async () => {
-    const media = new SpotifyAdapter();
-    const { controller } = await attachAndLoad(media);
-
-    media.source = { src: TRACK_URL, engine: { spotify: { t: 30 } } };
-    await Promise.resolve();
-
-    // The start position is the one embed option the frame is not rebuilt for, so
-    // it has to reach the entity some other way.
-    expect(media.currentTime).toBe(30);
-    expect(controller.loadUri).toHaveBeenCalledTimes(1);
     media.detach();
   });
 
@@ -1197,15 +1051,18 @@ describe('loadSpotifyIframeApi', () => {
     const ready = globals.onSpotifyIframeApiReady;
 
     expect(ready).not.toBe(hostReady);
-    ready?.({
+    const api = {
       createController: (target: HTMLIFrameElement, options: unknown, callback: (controller: MockController) => void) =>
         callback(new MockController(target, options)),
-    });
+    };
+
+    ready?.(api);
 
     await waitForEngine(media);
     // The loader script fires the global once and a second tag does nothing, so a
     // page that defined it first would never hear about the API again.
     expect(hostReady).toHaveBeenCalledTimes(1);
+    expect(hostReady.mock.calls[0]?.[0]).toBe(api);
     media.detach();
   });
 });

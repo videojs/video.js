@@ -35,5 +35,5 @@ export function scaleResolution(size: Resolution, scale = 1): Resolution | undef
   const width = Math.round(size.width * scale);
   const height = Math.round(size.height * scale);
 
-  return width > 0 && height > 0 ? { width, height } : undefined;
+  return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0 ? { width, height } : undefined;
 }

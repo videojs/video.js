@@ -23,14 +23,6 @@ describe('createState', () => {
       expect(state.current.volume).toBe(1);
       expect(state.current.muted).toBe(false);
     });
-
-    it('reflects changes after patch', () => {
-      const state = createTestState();
-
-      state.patch({ volume: 0.5, muted: true });
-      expect(state.current.volume).toBe(0.5);
-      expect(state.current.muted).toBe(true);
-    });
   });
 
   describe('patch', () => {

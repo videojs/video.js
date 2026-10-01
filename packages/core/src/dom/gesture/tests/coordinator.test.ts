@@ -21,6 +21,25 @@ function setup() {
   return container;
 }
 
+describe('GestureCoordinator', () => {
+  it('exposes registered binding metadata until cleanup', () => {
+    const container = setup();
+    const coordinator = getGestureCoordinator(container);
+
+    expect(coordinator.bindings).toEqual([]);
+
+    const cleanup = createDoubleTapGesture(container, vi.fn(), { action: 'seekStep', region: 'left' });
+
+    expect(coordinator.bindings).toEqual([
+      expect.objectContaining({ type: 'doubletap', action: 'seekStep', region: 'left', value: -10 }),
+    ]);
+
+    cleanup();
+
+    expect(coordinator.bindings).toEqual([]);
+  });
+});
+
 describe('GestureCoordinator.subscribe', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());

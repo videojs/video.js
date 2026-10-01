@@ -67,35 +67,17 @@ describe('TooltipCore', () => {
     });
   });
 
-  describe('transition flags', () => {
-    it('sets transitionStarting when status is starting', () => {
-      const core = new TooltipCore();
+  it.each([
+    ['starting', true, false],
+    ['ending', false, true],
+    ['idle', false, false],
+  ] as const)('derives transition flags for %s', (status, transitionStarting, transitionEnding) => {
+    const core = new TooltipCore();
 
-      core.setInput({ active: true, status: 'starting' });
-      const state = core.getState();
+    core.setInput({ active: true, status });
+    const state = core.getState();
 
-      expect(state.transitionStarting).toBe(true);
-      expect(state.transitionEnding).toBe(false);
-    });
-
-    it('sets transitionEnding when status is ending', () => {
-      const core = new TooltipCore();
-
-      core.setInput({ active: true, status: 'ending' });
-      const state = core.getState();
-
-      expect(state.transitionStarting).toBe(false);
-      expect(state.transitionEnding).toBe(true);
-    });
-
-    it('both false when status is idle', () => {
-      const core = new TooltipCore();
-
-      core.setInput(OPEN);
-      const state = core.getState();
-
-      expect(state.transitionStarting).toBe(false);
-      expect(state.transitionEnding).toBe(false);
-    });
+    expect(state.transitionStarting).toBe(transitionStarting);
+    expect(state.transitionEnding).toBe(transitionEnding);
   });
 });

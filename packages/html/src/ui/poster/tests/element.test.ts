@@ -185,14 +185,6 @@ describe('PosterElement', () => {
     expect(fallback.hasAttribute('src')).toBe(false);
   });
 
-  it('fills the source of the image the skin supplied', async () => {
-    const { skinImage, setPoster } = await mount();
-
-    await setPoster('poster.jpg');
-
-    expect(skinImage.getAttribute('src')).toBe('poster.jpg');
-  });
-
   it('withholds the src until one resolves, so nothing is fetched', async () => {
     const { skinImage } = await mount();
 

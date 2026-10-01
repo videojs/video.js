@@ -12,7 +12,7 @@ export interface ChunkedStreamIterableOptions {
  * Errors from the underlying stream propagate naturally — the reader lock is always released via `finally`.
  */
 export class ChunkedStreamIterable implements AsyncIterable<Uint8Array> {
-  readonly minChunkSize: number;
+  readonly #minChunkSize: number;
   #readableStream: ReadableStream<Uint8Array>;
 
   constructor(
@@ -20,7 +20,7 @@ export class ChunkedStreamIterable implements AsyncIterable<Uint8Array> {
     { minChunkSize = DEFAULT_MIN_CHUNK_SIZE }: ChunkedStreamIterableOptions = {}
   ) {
     this.#readableStream = readableStream;
-    this.minChunkSize = minChunkSize;
+    this.#minChunkSize = minChunkSize;
   }
 
   async *[Symbol.asyncIterator](): AsyncGenerator<Uint8Array> {
@@ -39,7 +39,7 @@ export class ChunkedStreamIterable implements AsyncIterable<Uint8Array> {
 
         pending = pending ? concat(pending, value) : value;
 
-        if (pending.length >= this.minChunkSize) {
+        if (pending.length >= this.#minChunkSize) {
           yield pending;
           pending = undefined;
         }

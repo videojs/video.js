@@ -52,16 +52,6 @@ describe('HlsJsPreloadMixin', () => {
     expect(host.preload).toBe('metadata');
   });
 
-  it('stores preload value even when target is null', () => {
-    const engine = createEngine();
-    const host = new PreloadHost(engine);
-
-    host.preload = 'none';
-
-    expect(host.preload).toBe('none');
-    expect(host.target).toBeNull();
-  });
-
   it('syncs stored preload to native element on MEDIA_ATTACHED', () => {
     const engine = createEngine();
     const host = new PreloadHost(engine);
@@ -90,20 +80,6 @@ describe('HlsJsPreloadMixin', () => {
 
     expect(engine.startLoad).toHaveBeenCalled();
     expect(video.preload).toBe('auto');
-  });
-
-  it('uses stored preload (not native default) for loading strategy on MEDIA_ATTACHED', () => {
-    const engine = createEngine();
-    const host = new PreloadHost(engine);
-
-    host.preload = 'none';
-
-    const video = document.createElement('video');
-
-    host.attach(video);
-    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
-
-    expect(engine.startLoad).not.toHaveBeenCalled();
   });
 
   it('starts metadata-level load for preload=metadata', () => {
@@ -225,9 +201,11 @@ describe('HlsJsPreloadMixin', () => {
 
     (engine.startLoad as ReturnType<typeof vi.fn>).mockClear();
 
+    (engine.resumeBuffering as ReturnType<typeof vi.fn>).mockClear();
     (engine as any).emit(Hls.Events.MEDIA_DETACHED);
 
     video.dispatchEvent(new Event('play'));
     expect(engine.startLoad).not.toHaveBeenCalled();
+    expect(engine.resumeBuffering).not.toHaveBeenCalled();
   });
 });

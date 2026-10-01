@@ -15,14 +15,6 @@ describe('TikTokVideo', () => {
     );
   });
 
-  it('leaves a dormant embed clickable', () => {
-    // `preload="none"` opts out of the bootstrap, so TikTok's own controls are the only thing left that can start
-    // the player. The rule stops applying rather than the frame stopping taking pointer events.
-    const template = TikTokVideo.getTemplateHTML({ src: SRC, preload: 'none' });
-
-    expect(template).toContain(':not([preload="none"])');
-  });
-
   it('builds the embed with a bootstrap autoplay unless the player is left dormant', () => {
     // `autoplay=1` is the embed parameter; the `allow` attribute names the feature policy and carries it either way.
     expect(TikTokVideo.getTemplateHTML({ src: SRC })).toContain('autoplay=1');

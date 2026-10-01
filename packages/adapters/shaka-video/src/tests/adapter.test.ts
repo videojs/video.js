@@ -618,14 +618,25 @@ describe('ShakaAdapter', () => {
     it('leaves shaka configuration alone when nothing was ever pinned', async () => {
       const { media, engine } = setup();
 
+      media.source = { src: MANIFEST, engine: { shaka: { abr: { enabled: false } } } };
       loadTracks(engine);
       await flush();
-      engine.configure.mockClear();
 
+      const change = vi.fn();
+
+      media.videoRenditions.addEventListener('change', change);
+      engine.configure.mockClear();
+      engine.selectVideoTrack.mockClear();
+
+      // Coalesce selection and clearing before either can pin an engine track.
+      media.videoRenditions[0]!.selected = true;
       media.videoRenditions[0]!.selected = false;
       await flush();
 
+      expect(change).toHaveBeenCalledOnce();
+      expect(engine.config.abr.enabled).toBe(false);
       expect(engine.configure).not.toHaveBeenCalled();
+      expect(engine.selectVideoTrack).not.toHaveBeenCalled();
     });
 
     it('re-pins the selected track when shaka configuration is re-applied', async () => {

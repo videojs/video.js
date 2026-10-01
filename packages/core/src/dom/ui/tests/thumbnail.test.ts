@@ -82,46 +82,41 @@ describe('createThumbnail', () => {
     });
 
     it('does nothing when called with the same URL', () => {
-      const handle = createThumbnail(createOptions());
+      const img = createMockImg();
+      const handle = createThumbnail(createOptions({ getImg: () => img }));
 
       handle.updateSrc('sprite.jpg');
       expect(handle.loading).toBe(true);
+      img.dispatchEvent(new Event('load'));
+      expect(handle.loading).toBe(false);
 
-      // Simulate load completing.
       handle.updateSrc('sprite.jpg');
-
-      // Should still be loading — same URL, no-op.
-      expect(handle.loading).toBe(true);
+      expect(handle.loading).toBe(false);
 
       handle.destroy();
     });
 
     it('resets state when URL changes to empty', () => {
-      const handle = createThumbnail(createOptions());
+      const img = createMockImg();
+      const handle = createThumbnail(createOptions({ getImg: () => img }));
 
       handle.updateSrc('sprite.jpg');
       expect(handle.loading).toBe(true);
+      handle.updateSrc(undefined);
+      expect(handle.loading).toBe(false);
+
+      handle.updateSrc('sprite.jpg');
+      img.dispatchEvent(new Event('load'));
+      expect(handle.naturalWidth).toBe(2560);
+      expect(handle.naturalHeight).toBe(1600);
+      img.dispatchEvent(new Event('error'));
+      expect(handle.error).toBe(true);
 
       handle.updateSrc(undefined);
-
       expect(handle.loading).toBe(false);
       expect(handle.error).toBe(false);
       expect(handle.naturalWidth).toBe(0);
       expect(handle.naturalHeight).toBe(0);
-
-      handle.destroy();
-    });
-
-    it('resets loading when URL changes to a different URL', () => {
-      const handle = createThumbnail(createOptions());
-
-      handle.updateSrc('sprite-1.jpg');
-      expect(handle.loading).toBe(true);
-
-      handle.updateSrc('sprite-2.jpg');
-
-      expect(handle.loading).toBe(true);
-      expect(handle.error).toBe(false);
 
       handle.destroy();
     });
@@ -526,13 +521,6 @@ describe('createThumbnail', () => {
   });
 
   describe('destroy', () => {
-    it('can be called multiple times safely', () => {
-      const handle = createThumbnail(createOptions());
-
-      handle.destroy();
-      handle.destroy();
-    });
-
     it('stops observing resizes', () => {
       const handle = createThumbnail(createOptions());
 

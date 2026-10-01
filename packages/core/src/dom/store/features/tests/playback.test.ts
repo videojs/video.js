@@ -207,20 +207,6 @@ describe('playbackFeature', () => {
   });
 
   describe('actions', () => {
-    it('play() calls play on target', async () => {
-      const video = createMockVideo({});
-
-      video.play = vi.fn().mockResolvedValue(undefined);
-
-      const store = createStore<PlayerTarget>()(playbackFeature);
-
-      store.attach({ media: video, container: null });
-
-      await store.play();
-
-      expect(video.play).toHaveBeenCalled();
-    });
-
     it('play() publishes the new state without waiting for the play event', async () => {
       const video = createMockVideo({ paused: true });
 
@@ -275,20 +261,6 @@ describe('playbackFeature', () => {
       store.pause();
 
       expect(store.state.paused).toBe(true);
-    });
-
-    it('pause() calls pause on target', () => {
-      const video = createMockVideo({});
-
-      video.pause = vi.fn();
-
-      const store = createStore<PlayerTarget>()(playbackFeature);
-
-      store.attach({ media: video, container: null });
-
-      store.pause();
-
-      expect(video.pause).toHaveBeenCalled();
     });
   });
 });

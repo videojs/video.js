@@ -178,13 +178,15 @@ describe('VolumeSliderCore', () => {
     it('rounds value in valuetext', () => {
       const core = new VolumeSliderCore();
 
+      core.setFormatLocale('en');
+
       core.setInput(createInput());
       core.setMedia(createMediaState({ volume: 0.333 }));
       const state = core.getState();
       const attrs = core.getAttrs(state);
 
-      expect(attrs['aria-valuetext']).toBe(formatPercent(0.333));
-      expect(core.getValueTextParams(state)).toEqual({ percent: formatPercent(0.333) });
+      expect(attrs['aria-valuetext']).toBe('33%');
+      expect(core.getValueTextParams(state)).toEqual({ percent: '33%' });
     });
 
     it('uses custom label', () => {
@@ -212,17 +214,18 @@ describe('VolumeSliderCore', () => {
   });
 
   describe('setProps', () => {
-    it('updates label', () => {
-      const core = new VolumeSliderCore();
+    it('preserves the wheel step independently of the pointer step', () => {
+      const core = new VolumeSliderCore({ step: 10, wheelStep: 5 });
 
-      core.setProps({ label: 'Sound' });
+      expect(core.getWheelStepPercent()).toBe(5);
 
-      core.setInput(createInput());
-      core.setMedia(createMediaState({ volume: 0.5 }));
-      const state = core.getState();
-      const attrs = core.getAttrs(state);
+      core.setProps({ step: 10, wheelStep: 2 });
 
-      expect(attrs['aria-label']).toBe('Sound');
+      expect(core.getWheelStepPercent()).toBe(2);
+
+      core.setProps({ step: 10 });
+
+      expect(core.getWheelStepPercent()).toBe(5);
     });
 
     it('respects disabled prop', () => {

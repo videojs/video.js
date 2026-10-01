@@ -1,5 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it, type MockInstance, vi } from 'vite-plus/test';
 
+import { ControlsBackdropElement } from '../../ui/controls/backdrop';
+import { ControlsContentElement } from '../../ui/controls/content';
+
 /**
  * Tests that direct UI define files register one element while preset composites register complete UI blocks.
  *
@@ -206,6 +209,8 @@ describe('composite define registration', () => {
         'media-slider-thumb',
         'media-slider-track',
         'media-slider-value',
+        'media-slider-preview',
+        'media-slider-thumbnail',
         'media-time-slider-chapters',
         'media-time-slider-chapter-title',
         // Time
@@ -230,6 +235,9 @@ describe('composite define registration', () => {
       for (const tagName of expected) {
         expect(customElements.get(tagName), `${tagName} should be registered`).toBeDefined();
       }
+
+      expect(customElements.get('media-controls-backdrop')).toBe(ControlsBackdropElement);
+      expect(customElements.get('media-controls-content')).toBe(ControlsContentElement);
     });
   });
 });

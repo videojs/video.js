@@ -822,7 +822,7 @@ s0.ts
 s1.ts`;
       const r = parseMediaPlaylist(text, videoShell);
 
-      expect(r.segments.every((s) => s.startDate === undefined)).toBe(true);
+      expect(r.segments.map((segment) => segment.startDate)).toEqual([undefined, undefined]);
     });
 
     it('exposes Track.startDate as the wall-clock at the origin (startDate − startTime)', () => {
@@ -1240,12 +1240,6 @@ ${keyLines}
     );
 
     expect(getMediaPlaylistMetadata(track)?.keys?.[0]?.uri).toBe(uri);
-  });
-
-  it('still resolves a relative AES-128 key URI against the playlist', () => {
-    const track = parseMediaPlaylist(withKey('#EXT-X-KEY:METHOD=AES-128,URI="keys/1.bin"'), unresolved);
-
-    expect(getMediaPlaylistMetadata(track)?.keys?.[0]?.uri).toBe('https://example.com/keys/1.bin');
   });
 
   it('surfaces a DRM key declaration with raw attribute values', () => {

@@ -54,29 +54,41 @@ describe('createHlsAudioEngine', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('creates engine with state, context, and destroy', () => {
+  it('exposes userAudioTrackSelection slot for multi-language-audio Tier 2 writes', async () => {
     const engine = createHlsAudioEngine();
+    const tracks = ['en', 'es'].map((language) => ({
+      type: 'audio' as const,
+      id: language,
+      language,
+      name: language,
+      groupId: 'audio',
+      default: language === 'en',
+      url: `https://example.com/${language}.m3u8`,
+      mimeType: 'audio/mp4',
+      codecs: ['mp4a.40.2'],
+      bandwidth: 128_000,
+      sampleRate: 48_000,
+      channels: 2,
+      startTime: 0,
+      duration: 60,
+      initialization: { url: 'https://example.com/init.mp4' },
+      segments: [],
+    }));
 
-    expect(engine.state).toBeDefined();
-    expect(engine.context).toBeDefined();
-    expect(typeof engine.destroy).toBe('function');
+    try {
+      engine.state.presentation.set({
+        id: 'presentation',
+        url: 'https://example.com/master.m3u8',
+        startTime: 0,
+        selectionSets: [{ id: 'audio', type: 'audio', switchingSets: [{ id: 'audio', type: 'audio', tracks }] }],
+      });
+      await vi.waitFor(() => expect(engine.state.selectedAudioTrackId.get()).toBe('en'));
 
-    engine.destroy();
-  });
-
-  it('exposes userAudioTrackSelection slot for multi-language-audio Tier 2 writes', () => {
-    const engine = createHlsAudioEngine();
-
-    // Slot exists as a signal — consumer-facing programmatic-write path
-    // for multi-language-audio.
-    expect(engine.state.userAudioTrackSelection).toBeDefined();
-    expect(typeof engine.state.userAudioTrackSelection.get).toBe('function');
-    expect(typeof engine.state.userAudioTrackSelection.set).toBe('function');
-
-    engine.state.userAudioTrackSelection.set({ language: 'es' });
-    expect(engine.state.userAudioTrackSelection.get()).toEqual({ language: 'es' });
-
-    engine.destroy();
+      engine.state.userAudioTrackSelection.set({ language: 'es' });
+      await vi.waitFor(() => expect(engine.state.selectedAudioTrackId.get()).toBe('es'));
+    } finally {
+      await engine.destroy();
+    }
   });
 
   it('wires the default canPlayTrack — prunes an undecodable (raw-AAC) audio source, making no pick', async () => {
@@ -121,20 +133,6 @@ describe('createHlsAudioEngine', () => {
     await flush();
 
     expect(engine.state.selectedAudioTrackId.get()).toBeUndefined();
-
-    engine.destroy();
-  });
-
-  it('does not seed bandwidthState (no ABR behavior subscribed at init)', () => {
-    const engine = createHlsAudioEngine();
-
-    const state = snapshot(engine.state) as Record<string, unknown>;
-
-    // bandwidthState slot may or may not exist depending on whether any
-    // composed behavior declares it; if it exists, it must not be seeded.
-    if ('bandwidthState' in state) {
-      expect(state.bandwidthState).toBeUndefined();
-    }
 
     engine.destroy();
   });
@@ -342,12 +340,6 @@ http://example.com/audio-seg1.m4s
     engine.destroy();
   });
 
-  it('cleans up on destroy', () => {
-    const engine = createHlsAudioEngine();
-
-    expect(() => engine.destroy()).not.toThrow();
-  });
-
   it('cleanly replaces source in place via state.presentation overwrite', async () => {
     // Parity with the default engine's in-place replacement test. The audio-only
     // adapter's `src` setter overwrites `state.presentation` on the *same*
@@ -445,7 +437,9 @@ http://example.com/audio-b-seg1.m4s
         expect(state.presentation?.selectionSets).toBeDefined();
         expect(state.selectedAudioTrackId).toBeDefined();
 
-        // Fresh MediaSource + buffer actor (different instances from A).
+        // Replacement must create resources before comparing their identities.
+        expect(owners.mediaSource).toBeDefined();
+        expect(owners.audioBufferActor).toBeDefined();
         expect(owners.mediaSource).not.toBe(sourceAMediaSource);
         expect(owners.audioBufferActor).not.toBe(sourceAAudioBufferActor);
       },

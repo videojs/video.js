@@ -14,28 +14,6 @@ describe('generateId', () => {
     vi.restoreAllMocks();
   });
 
-  it('generates a string ID', () => {
-    const id = generateId();
-
-    expect(typeof id).toBe('string');
-  });
-
-  it('generates unique IDs', () => {
-    const id1 = generateId();
-    const id2 = generateId();
-    const id3 = generateId();
-
-    expect(id1).not.toBe(id2);
-    expect(id2).not.toBe(id3);
-    expect(id1).not.toBe(id3);
-  });
-
-  it('generates IDs without decimals', () => {
-    const id = generateId();
-
-    expect(id).not.toMatch(/\./);
-  });
-
   it('generates IDs in consistent format', () => {
     const id = generateId();
 

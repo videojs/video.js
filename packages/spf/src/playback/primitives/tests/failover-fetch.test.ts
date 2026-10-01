@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../../media/types';
 import type { FetchText } from '../../../network/fetch';
+import { createTrackedFetch, fetchStream } from '../../../network/fetch';
 import { failoverFetch } from '../failover-fetch';
 
 const presentationWithVideo = (url: string): MaybeResolvedPresentation => ({
@@ -35,6 +36,66 @@ const reject: FetchText = async () => {
 const segment = { url: 'https://cdn-a.example.com/0.ts' };
 
 describe('failoverFetch', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each(
+    [
+      { name: 'fetchStream', baseFetch: fetchStream },
+      {
+        name: 'createTrackedFetch',
+        baseFetch: createTrackedFetch(
+          { fastEstimate: 0, slowEstimate: 0, fastTotalWeight: 0, slowTotalWeight: 0, bytesSampled: 0 },
+          () => {}
+        ),
+      },
+    ].flatMap((fetch) => ['HTTP', 'body', 'aborted body'].map((failure) => ({ ...fetch, failure })))
+  )('tracks streaming failures without tripping on abort ($name, $failure)', async ({ baseFetch, failure }) => {
+    const state = makeState(presentationWithVideo('https://cdn-a.example.com/r.m3u8?cdn=fastly'), 'v0');
+    const fetch = failoverFetch(baseFetch, state, { selectedKey: 'selectedVideoTrackId', getCdnId: byCdnParam });
+    const controller = new AbortController();
+    const error = new Error('body failed');
+    const data = new Uint8Array([1]);
+    let emitted = false;
+
+    const body = new ReadableStream<Uint8Array>(
+      {
+        pull(stream) {
+          if (emitted) {
+            if (failure === 'aborted body') controller.abort();
+
+            stream.error(error);
+          } else {
+            emitted = true;
+            stream.enqueue(data);
+          }
+        },
+      },
+      { highWaterMark: 0 }
+    );
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      failure === 'HTTP' ? new Response('upstream failed', { status: 503 }) : new Response(body)
+    );
+
+    const result = fetch(segment, { signal: controller.signal, minChunkSize: 1 });
+
+    if (failure === 'HTTP') {
+      await expect(result).rejects.toThrow('503');
+    } else {
+      const chunks: Uint8Array[] = [];
+      const consume = async () => {
+        for await (const chunk of await result) chunks.push(chunk);
+      };
+
+      await expect(consume()).rejects.toBe(error);
+      expect(chunks).toEqual([data]);
+    }
+
+    expect(state.failedCdns.get()).toEqual(failure === 'aborted body' ? undefined : ['fastly']);
+  });
+
   it('trips the selected track CDN — not the failed addressable — on a failed fetch', async () => {
     const state = makeState(presentationWithVideo('https://cdn-a.example.com/r.m3u8?cdn=fastly'), 'v0');
     const fetch = failoverFetch(reject, state, { selectedKey: 'selectedVideoTrackId', getCdnId: byCdnParam });

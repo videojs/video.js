@@ -92,11 +92,18 @@ describe('dedupedVideoTracks', () => {
 describe('dedupedAudioTracks', () => {
   it('returns the model audio tracks in order', () => {
     const tracks = dedupedAudioTracks(
-      presentationWith([], [audio({ id: 'a-en', language: 'en', name: 'English', default: true })])
+      presentationWith(
+        [],
+        [
+          audio({ id: 'c-es', language: 'es', name: 'Spanish' }),
+          audio({ id: 'a-en', language: 'en', name: 'English', default: true }),
+          audio({ id: 'b-fr', language: 'fr', name: 'French' }),
+        ]
+      )
     );
 
-    expect(tracks.map((t) => t.id)).toEqual(['a-en']);
-    expect(tracks[0]).toMatchObject({ language: 'en', name: 'English', default: true });
+    expect(tracks.map((t) => t.id)).toEqual(['c-es', 'a-en', 'b-fr']);
+    expect(tracks[1]).toMatchObject({ language: 'en', name: 'English', default: true });
   });
 
   it('dedups by language + name, collapsing multi-CDN copies (first wins)', () => {
@@ -222,7 +229,10 @@ describe('isSameVideoTrack', () => {
   it('does not match a different quality, and is false when the track is undefined', () => {
     const a = { width: 1280, height: 720, bandwidth: 3_000_000 };
 
-    expect(isSameVideoTrack(a, video({ width: 1920, height: 1080, bandwidth: 5_000_000 }) as VideoTrack)).toBe(false);
+    for (const mismatch of [{ width: 1920 }, { height: 1080 }, { bandwidth: 5_000_000 }]) {
+      expect(isSameVideoTrack(a, video({ ...a, ...mismatch }) as VideoTrack)).toBe(false);
+    }
+
     expect(isSameVideoTrack(a, undefined)).toBe(false);
   });
 });
@@ -241,6 +251,9 @@ describe('isSameAudioTrack', () => {
   it('does not match a different role, and is false when the track is undefined', () => {
     expect(
       isSameAudioTrack({ language: 'en', name: 'English' }, audio({ language: 'en', name: 'Commentary' }) as AudioTrack)
+    ).toBe(false);
+    expect(
+      isSameAudioTrack({ language: 'en', name: 'English' }, audio({ language: 'es', name: 'English' }) as AudioTrack)
     ).toBe(false);
     expect(isSameAudioTrack({ language: 'en', name: 'English' }, undefined)).toBe(false);
   });

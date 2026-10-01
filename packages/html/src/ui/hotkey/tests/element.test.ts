@@ -1,6 +1,6 @@
-import { type AnyPlayerStore, findHotkeyCoordinator } from '@videojs/core/dom';
+import { type AnyPlayerStore, createHotkey } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { containerContext, playerContext } from '../../../player/context';
 import { UIElement } from '../../ui-element';
@@ -25,12 +25,15 @@ afterEach(() => {
 });
 
 class TestHotkeyProviderElement extends UIElement {
-  readonly #store = { state: {}, subscribe: () => () => {} } as unknown as AnyPlayerStore;
+  readonly store = { state: { volume: 0.5, muted: false, setVolume: vi.fn() }, subscribe: () => () => {} };
   readonly containerProvider = new ContextProvider(this, {
     context: containerContext,
     initialValue: { container: this, registerContainer: () => () => {} },
   });
-  readonly playerProvider = new ContextProvider(this, { context: playerContext, initialValue: this.#store });
+  readonly playerProvider = new ContextProvider(this, {
+    context: playerContext,
+    initialValue: this.store as unknown as AnyPlayerStore,
+  });
 }
 
 if (!customElements.get('test-hotkey-provider')) {
@@ -60,24 +63,19 @@ describe('HotkeyElement', () => {
     expect(el.style.display).toBe('none');
   });
 
-  it('registers the default ArrowDown volume step', () => {
-    const provider = document.createElement('test-hotkey-provider');
+  it('registers the default ArrowDown volume step', async () => {
+    const provider = document.createElement('test-hotkey-provider') as TestHotkeyProviderElement;
     const el = createElement(HotkeyElement);
 
     el.keys = 'ArrowDown';
     el.action = 'volumeStep';
     provider.append(el);
     document.body.append(provider);
+    await el.updateComplete;
 
-    const coordinator = findHotkeyCoordinator(provider)!;
-    let value: number | undefined;
-
-    coordinator.subscribe((event) => {
-      value = event.value;
-    });
     provider.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
 
-    expect(value).toBe(-0.05);
+    expect(provider.store.state.setVolume).toHaveBeenCalledExactlyOnceWith(0.45);
   });
 });
 
@@ -92,7 +90,7 @@ describe('AriaKeyShortcutsController', () => {
     });
   }
 
-  it('returns undefined when no coordinator exists', () => {
+  it('returns undefined without container context', () => {
     const el = createElement(HotkeyElement);
 
     document.body.appendChild(el);
@@ -102,13 +100,26 @@ describe('AriaKeyShortcutsController', () => {
     expect(controller.value).toBeUndefined();
   });
 
-  it('connects when context is available during construction', () => {
+  it('connects when context is available during construction', async () => {
     const provider = createElement(TestContainerProviderElement);
     const el = createElement(HotkeyElement);
 
     provider.append(el);
     document.body.append(provider);
+    await el.updateComplete;
 
-    expect(() => new AriaKeyShortcutsController(el, 'togglePaused')).not.toThrow();
+    let controller!: AriaKeyShortcutsController;
+
+    expect(() => {
+      controller = new AriaKeyShortcutsController(el, 'togglePaused');
+    }).not.toThrow();
+
+    const requestUpdate = vi.spyOn(el, 'requestUpdate');
+    const cleanup = createHotkey(provider, { keys: 'k', action: 'togglePaused', onActivate: vi.fn() });
+
+    expect(requestUpdate).toHaveBeenCalledOnce();
+    expect(controller.shortcut).toBe('K');
+
+    cleanup();
   });
 });

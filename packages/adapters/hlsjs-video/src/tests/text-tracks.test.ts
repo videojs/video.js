@@ -7,7 +7,15 @@ import { removeHlsTextTracks, withPreservedTextTracks } from '../text-tracks';
  * touches: `cues` reads as `null` while a track is disabled, exactly as the spec requires.
  */
 class FakeTextTrack {
-  mode: TextTrackMode = 'disabled';
+  #mode: TextTrackMode = 'disabled';
+
+  get mode(): TextTrackMode {
+    return this.#mode;
+  }
+
+  set mode(value: TextTrackMode) {
+    this.#mode = value;
+  }
   #cues: TextTrackCue[] = [];
 
   get cues(): TextTrackCue[] | null {
@@ -69,10 +77,6 @@ function cueIds(track: FakeTextTrack): string[] {
 }
 
 describe('withPreservedTextTracks', () => {
-  it('returns the action result', () => {
-    expect(withPreservedTextTracks(fakeMedia(), () => 'loaded')).toBe('loaded');
-  });
-
   it('puts back cues the action removed from a sideloaded track', () => {
     const trackEl = fakeTrackElement({ mode: 'showing', cues: ['one', 'two'] });
 

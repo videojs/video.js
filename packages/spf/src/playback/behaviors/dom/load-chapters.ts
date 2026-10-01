@@ -7,11 +7,11 @@
  * `<track>`.
  *
  * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'loading'`), gated on a media element, a resolved
- * presentation, and a chapters entry with a URI. Entry fetches and projects, fire-once; the returned cleanup aborts an
- * in-flight fetch and removes the tracks on state exit (source unload, media element change, destroy). The document
- * leaves the last chapter open; it is written with `OPEN_CHAPTER_END` and never amended — a consumer that wants it to
- * end where the media ends clamps to the media duration on read (video.js's textTrack feature does), so nothing here
- * waits for, or chases, a duration.
+ * presentation, and a chapters entry with a URI. An element-bound effect fetches and projects; the returned cleanup
+ * aborts an in-flight fetch and removes the tracks on element replacement or state exit (source unload, destroy). The
+ * document leaves the last chapter open; it is written with `OPEN_CHAPTER_END` and never amended — a consumer that
+ * wants it to end where the media ends clamps to the media duration on read (video.js's textTrack feature does), so
+ * nothing here waits for, or chases, a duration.
  *
  * Failures are never fatal: a document that won't load or won't parse is warned about and projects nothing. An entry
  * carrying its data inline as `VALUE` is skipped — chapters are a document, not a string. Exactly one document is
@@ -28,7 +28,7 @@ import { isAbortError } from '@videojs/utils/predicate';
 import { defineBehavior } from '../../../core/composition/create-composition';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
-import { computed, type ReadonlySignal } from '../../../core/signals/primitives';
+import { computed, peek, type ReadonlySignal } from '../../../core/signals/primitives';
 import { addChaptersTracksToMedia, removeAllChaptersTracksFromMedia } from '../../../media/dom/text/chapters-tracks';
 import {
   APPLE_HLS_CHAPTERS_DATA_ID,
@@ -93,13 +93,16 @@ function loadChaptersSetup({
       'preconditions-unmet': {},
 
       loading: {
-        // Entry is auto-untracked: the presentation object can be rewritten
-        // while loading (tracks resolving, a live reload) without re-entering,
-        // and the monitor only leaves this state when a precondition drops.
-        entry: () => {
-          const mediaElement = context.mediaElement.get()!;
-          const presentation = state.presentation.get()!;
-          const uri = findChaptersDocument(presentation)!;
+        // Track element identity to abort and remove the old projection on
+        // replacement. Presentation updates within this state must not refetch.
+        effects: () => {
+          const mediaElement = context.mediaElement.get();
+          const presentation = peek(state.presentation);
+          const uri = presentation && findChaptersDocument(presentation);
+          // Disposed effects reorder the shared watcher, so this can run before
+          // the monitor leaves the state; recheck the inputs it reads.
+          if (!mediaElement || !uri) return;
+
           const controller = new AbortController();
 
           void loadChaptersDocument(uri, controller.signal).then((chapters) => {

@@ -8,10 +8,10 @@
  * `selectedTextTrackId`. So non-SPF consumers (host-page captions buttons, browser native UI, video.js store) drive
  * selection by expressing intent, not by writing the resolved id.
  *
- * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): the entry allocates the slots, applies the
- * initial selection, attaches the `change` listener, and opens a brief Chromium settling-window guard — all
- * transition-driven, fire-once on state entry, with paired cleanup on state exit. A single `effects:` mirrors
- * subsequent `selectedTextTrackId` changes into `mode`s; that's the only continuous-reactivity concern.
+ * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): an element-bound effect allocates the
+ * slots, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
+ * guard, with paired cleanup on element replacement or state exit. A separate effect mirrors subsequent
+ * `selectedTextTrackId` changes into `mode`s without reallocating the slots.
  *
  * State-exit cleanup also sends a `'clear'` message to the `TextTracksActor` so its cue+segment cache (keyed by
  * trackId) is dropped alongside the DOM `<track>` slots. The actor itself is owned by `setupTextTrackActors` and bound
@@ -60,8 +60,8 @@ export interface SyncTextTracksConfig {
    */
   getShowingSubtitlesTrackFromMedia: (mediaElement: HTMLMediaElement) => globalThis.TextTrack | undefined;
   /**
-   * Remove every SPF-owned `<track>` child from `mediaElement`. Called on state exit (source unload, behavior destroy)
-   * to evict slots.
+   * Remove every SPF-owned `<track>` child from `mediaElement`. Called on element replacement or state exit (source
+   * unload, behavior destroy) to evict slots.
    */
   removeAllSubtitlesTracksFromMedia: (mediaElement: HTMLMediaElement) => void;
 }
@@ -121,90 +121,91 @@ function syncTextTracksSetup({
       'preconditions-unmet': {},
 
       'sync-active': {
-        // Allocate slots, apply the initial selection, attach the change
-        // listener, and open the settling window — all transition-driven
-        // (fire once per state entry). Entry is auto-untracked, so `.get()`
-        // here doesn't subscribe; the returned cleanup detaches and evicts
-        // on state exit (src reset through 'preconditions-unmet') and on
-        // destroy.
-        entry: () => {
-          const mediaElement = context.mediaElement.get()!;
-          // `getTracksByType('text', ...)` returns text tracks only — the
-          // selection-set filter inside the helper ensures that — but its
-          // declared return is the wide track union. Mirror the cast
-          // pattern used by `track-switching` for the video branch.
-          const modelTextTracks = getTracksByType(state.presentation.get()!, 'text') as readonly (
-            | PartiallyResolvedTextTrack
-            | TextTrack
-          )[];
+        effects: [
+          // Track element identity so replacement detaches and evicts the old
+          // slots before provisioning the new element. Presentation updates
+          // and selection changes must not reallocate slots within this state.
+          () => {
+            const mediaElement = context.mediaElement.get();
+            const presentation = peek(state.presentation);
+            // Disposed effects reorder the shared watcher, so this can run before
+            // the monitor leaves the state; recheck the inputs it tracks.
+            if (!mediaElement || !presentation) return;
 
-          addSubtitlesTracksToMedia(mediaElement, modelTextTracks);
-          // Apply our selection synchronously so the change-event tasks
-          // these mode writes queue land in the macrotask queue *before*
-          // the settling-close `setTimeout(0)` queued below. This keeps
-          // the settling window open long enough to swallow Chromium's
-          // own auto-selection task (also scheduled in the next tick after
-          // `<track>` insertion); if the order flipped, our handler would
-          // treat Chromium's auto-pick as a user action. The `effects:`
-          // block below handles subsequent `selectedTextTrackId` changes.
-          syncTextTrackModes(mediaElement.textTracks, state.selectedTextTrackId.get());
+            // SAFETY: getTracksByType filters selection sets to text tracks;
+            // its declared return type is the wider track union.
+            const modelTextTracks = getTracksByType(presentation, 'text') as readonly (
+              | PartiallyResolvedTextTrack
+              | TextTrack
+            )[];
 
-          // Chromium re-applies its own selection across the next task tick
-          // after `<track>` insertion (default-track auto-pick, language
-          // preference). During this window, the `change` event may fire
-          // with browser-chosen modes that don't reflect a real user action;
-          // re-apply our modes silently rather than writing them back.
-          let inSettlingWindow = true;
-          const settlingTimeout = setTimeout(() => {
-            inSettlingWindow = false;
-          }, 0);
+            addSubtitlesTracksToMedia(mediaElement, modelTextTracks);
+            // Apply our selection synchronously so the change-event tasks
+            // these mode writes queue land in the macrotask queue *before*
+            // the settling-close `setTimeout(0)` queued below. This keeps
+            // the settling window open long enough to swallow Chromium's
+            // own auto-selection task (also scheduled in the next tick after
+            // `<track>` insertion); if the order flipped, our handler would
+            // treat Chromium's auto-pick as a user action. The separate
+            // effect below handles subsequent `selectedTextTrackId` changes.
+            syncTextTrackModes(mediaElement.textTracks, peek(state.selectedTextTrackId));
 
-          const onChange = (): void => {
-            if (inSettlingWindow) {
-              syncTextTrackModes(mediaElement.textTracks, state.selectedTextTrackId.get());
-              return;
-            }
+            // Chromium re-applies its own selection across the next task tick
+            // after `<track>` insertion (default-track auto-pick, language
+            // preference). During this window, the `change` event may fire
+            // with browser-chosen modes that don't reflect a real user action;
+            // re-apply our modes silently rather than writing them back.
+            let inSettlingWindow = true;
+            const settlingTimeout = setTimeout(() => {
+              inSettlingWindow = false;
+            }, 0);
 
-            const showingTrack = getShowingSubtitlesTrackFromMedia(mediaElement);
-            // `showingTrack.id` matches the SPF id we set when the slot was
-            // allocated. Empty-string ids fall through to `undefined`.
-            const showingId = showingTrack?.id || undefined;
-            // Echo guard: selectedTextTrackId is the id we last drove into the
-            // DOM (mirror / resolver correction). A change still showing it is our
-            // own echo — ignore it rather than write spurious intent.
-            if (showingId === state.selectedTextTrackId.get()) return;
+            const onChange = (): void => {
+              if (inSettlingWindow) {
+                syncTextTrackModes(mediaElement.textTracks, state.selectedTextTrackId.get());
+                return;
+              }
 
-            // Genuine user action → write intent (resolved into selectedTextTrackId
-            // by switchTextTrack), not the resolved id.
-            state.userTextTrackSelection.set(deriveTextTrackIntent(showingId, modelTextTracks));
-          };
+              const showingTrack = getShowingSubtitlesTrackFromMedia(mediaElement);
+              // `showingTrack.id` matches the SPF id we set when the slot was
+              // allocated. Empty-string ids fall through to `undefined`.
+              const showingId = showingTrack?.id || undefined;
+              // Echo guard: selectedTextTrackId is the id we last drove into the
+              // DOM (mirror / resolver correction). A change still showing it is our
+              // own echo — ignore it rather than write spurious intent.
+              if (showingId === state.selectedTextTrackId.get()) return;
 
-          const unlisten = listen(mediaElement.textTracks, 'change', onChange);
+              // Genuine user action → write intent (resolved into selectedTextTrackId
+              // by switchTextTrack), not the resolved id.
+              state.userTextTrackSelection.set(deriveTextTrackIntent(showingId, modelTextTracks));
+            };
 
-          return () => {
-            unlisten();
-            clearTimeout(settlingTimeout);
-            removeAllSubtitlesTracksFromMedia(mediaElement);
-            // Clear the TextTracksActor's cue+segment cache, which is
-            // keyed by trackId. If we don't, a subsequent presentation
-            // reusing a trackId would have `getSegmentsToLoad` treat its
-            // segments as already-buffered. The DOM cleanup above
-            // already evicted the live cues; this drops the cache that
-            // tracked them. The actor itself is owned by
-            // `setupTextTrackActors` (mediaElement-bound lifecycle), so
-            // we send rather than destroy.
-            peek(context.textTracksActor)?.send({ type: 'clear' });
-          };
-        },
+            const unlisten = listen(mediaElement.textTracks, 'change', onChange);
 
-        // Mirror selection changes into mode. The state machine handles
-        // mediaElement/presentation changes via 'preconditions-unmet'
-        // round-trips, so we peek mediaElement here.
-        effects: () => {
-          const mediaElement = peek(context.mediaElement)!;
+            return () => {
+              unlisten();
+              clearTimeout(settlingTimeout);
+              removeAllSubtitlesTracksFromMedia(mediaElement);
+              // Clear the TextTracksActor's cue+segment cache, which is
+              // keyed by trackId. If we don't, a subsequent presentation
+              // reusing a trackId would have `getSegmentsToLoad` treat its
+              // segments as already-buffered. The DOM cleanup above
+              // already evicted the live cues; this drops the cache that
+              // tracked them. The actor itself is owned by
+              // `setupTextTrackActors` (mediaElement-bound lifecycle), so
+              // we send rather than destroy.
+              peek(context.textTracksActor)?.send({ type: 'clear' });
+            };
+          },
 
-          syncTextTrackModes(mediaElement.textTracks, state.selectedTextTrackId.get());
-        },
+          // The lifecycle effect applies the initial selection on element
+          // replacement; this effect only mirrors subsequent selection changes.
+          () => {
+            const mediaElement = peek(context.mediaElement)!;
+
+            syncTextTrackModes(mediaElement.textTracks, state.selectedTextTrackId.get());
+          },
+        ],
       },
     },
   });

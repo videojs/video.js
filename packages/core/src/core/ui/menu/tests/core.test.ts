@@ -197,36 +197,6 @@ describe('MenuCore', () => {
       expect(state.isSubmenu).toBe(false);
     });
   });
-
-  describe('constructor', () => {
-    it('accepts initial props', () => {
-      const core = new MenuCore({ side: 'right', align: 'end' });
-
-      core.setInput(createInput());
-      const state = core.getState();
-
-      expect(state.side).toBe('right');
-      expect(state.align).toBe('end');
-    });
-
-    it('works without props', () => {
-      const core = new MenuCore();
-
-      core.setInput(createInput());
-      expect(() => core.getState()).not.toThrow();
-    });
-  });
-
-  describe('namespace', () => {
-    it('exports Props, State, Input types via namespace', () => {
-      // Compile-time check: ensure namespace types are accessible.
-      const _props: MenuCore.Props = {};
-      const _input: MenuCore.Input = { active: false, status: 'idle', isSubmenu: false };
-
-      expect(_props).toBeDefined();
-      expect(_input).toBeDefined();
-    });
-  });
 });
 
 describe('resolveMenuOptionState', () => {

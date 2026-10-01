@@ -61,13 +61,18 @@ describe('inline style snapshots', () => {
     const element = document.createElement('div');
 
     element.style.setProperty('min-width', '20px', 'important');
-    const snapshot = snapshotInlineStyles(element, ['minWidth', '--custom-size']);
+    // jsdom drops min-width priority; margin-left also exercises camel-case normalization and preserves priority.
+    element.style.setProperty('margin-left', '5px', 'important');
+    const snapshot = snapshotInlineStyles(element, ['minWidth', 'marginLeft', '--custom-size']);
 
     element.style.setProperty('min-width', '40px');
+    element.style.setProperty('margin-left', '10px');
     element.style.setProperty('--custom-size', '10px');
     restoreInlineStyles(element, snapshot);
 
     expect(element.style.getPropertyValue('min-width')).toBe('20px');
+    expect(element.style.getPropertyValue('margin-left')).toBe('5px');
+    expect(element.style.getPropertyPriority('margin-left')).toBe('important');
     expect(element.style.getPropertyValue('--custom-size')).toBe('');
   });
 

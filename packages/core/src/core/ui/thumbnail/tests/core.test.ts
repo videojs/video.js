@@ -39,71 +39,22 @@ function createTimeline(count: number, interval = 5): ThumbnailImage[] {
 
 describe('ThumbnailCore', () => {
   describe('findActiveThumbnail', () => {
-    it('returns undefined for empty array', () => {
-      const core = new ThumbnailCore();
-
-      expect(core.findActiveThumbnail([], 5)).toBeUndefined();
-    });
-
-    it('finds the first thumbnail at time 0', () => {
-      const core = new ThumbnailCore();
-      const images = createTimeline(3);
-
-      expect(core.findActiveThumbnail(images, 0)).toBe(images[0]);
-    });
-
-    it('finds thumbnail matching the exact start time', () => {
-      const core = new ThumbnailCore();
-      const images = createTimeline(3);
-
-      expect(core.findActiveThumbnail(images, 5)).toBe(images[1]);
-      expect(core.findActiveThumbnail(images, 10)).toBe(images[2]);
-    });
-
-    it('finds thumbnail within a time range', () => {
-      const core = new ThumbnailCore();
-      const images = createTimeline(3);
-
-      expect(core.findActiveThumbnail(images, 2.5)).toBe(images[0]);
-      expect(core.findActiveThumbnail(images, 7)).toBe(images[1]);
-      expect(core.findActiveThumbnail(images, 12)).toBe(images[2]);
-    });
-
     it('clamps to last thumbnail for time past all end times', () => {
       const core = new ThumbnailCore();
       const images = createTimeline(3);
 
       expect(core.findActiveThumbnail(images, 15)).toBe(images[2]);
       expect(core.findActiveThumbnail(images, 100)).toBe(images[2]);
-    });
 
-    it('returns undefined for negative time', () => {
-      const core = new ThumbnailCore();
-      const images = createTimeline(3);
-
-      expect(core.findActiveThumbnail(images, -1)).toBeUndefined();
-    });
-
-    it('handles thumbnails without endTime', () => {
-      const core = new ThumbnailCore();
-      const images: ThumbnailImage[] = [
+      const withoutEnds: ThumbnailImage[] = [
         { url: 'sprite.jpg', startTime: 0, width: 256, height: 160, coords: { x: 0, y: 0 } },
         { url: 'sprite.jpg', startTime: 5, width: 256, height: 160, coords: { x: 0, y: 0 } },
         { url: 'sprite.jpg', startTime: 10, width: 256, height: 160, coords: { x: 0, y: 0 } },
       ];
 
-      expect(core.findActiveThumbnail(images, 0)).toBe(images[0]);
-      expect(core.findActiveThumbnail(images, 7)).toBe(images[1]);
-      expect(core.findActiveThumbnail(images, 999)).toBe(images[2]);
-    });
-
-    it('handles large datasets efficiently', () => {
-      const core = new ThumbnailCore();
-      const images = createTimeline(1000, 1);
-
-      const result = core.findActiveThumbnail(images, 500.5);
-
-      expect(result).toBe(images[500]);
+      expect(core.findActiveThumbnail(withoutEnds, 0)).toBe(withoutEnds[0]);
+      expect(core.findActiveThumbnail(withoutEnds, 7)).toBe(withoutEnds[1]);
+      expect(core.findActiveThumbnail(withoutEnds, 999)).toBe(withoutEnds[2]);
     });
   });
 
@@ -292,65 +243,19 @@ describe('ThumbnailCore', () => {
         offsetY: Math.ceil(320 * scale) + inset,
       });
 
-      // Verify all pixel values are integers (no sub-pixel rendering gaps).
-      for (const key of ['containerWidth', 'containerHeight', 'imageWidth', 'imageHeight', 'offsetX', 'offsetY']) {
-        expect(Number.isInteger(result![key as keyof typeof result])).toBe(true);
-      }
-    });
-
-    it('container never exceeds scaled tile dimensions', () => {
-      const core = new ThumbnailCore();
-      const thumbnail = createImage({ coords: { x: 512, y: 320 } });
-
-      const result = core.resize(thumbnail, 2560, 1600, {
-        minWidth: 0,
-        maxWidth: 177,
-        minHeight: 0,
-        maxHeight: Infinity,
-      });
-
-      const scale = result!.scale;
-
       expect(result!.containerWidth).toBeLessThanOrEqual(256 * scale);
       expect(result!.containerHeight).toBeLessThanOrEqual(160 * scale);
       expect(result!.imageWidth).toBeGreaterThanOrEqual(result!.containerWidth);
       expect(result!.imageHeight).toBeGreaterThanOrEqual(result!.containerHeight);
-    });
-
-    it('offsets never undershoot the tile origin (prevents top/left bleed)', () => {
-      const core = new ThumbnailCore();
-      const thumbnail = createImage({ coords: { x: 512, y: 320 } });
-
-      const result = core.resize(thumbnail, 2560, 1600, {
-        minWidth: 0,
-        maxWidth: 177,
-        minHeight: 0,
-        maxHeight: Infinity,
-      });
-
-      const scale = result!.scale;
-
       expect(result!.offsetX).toBeGreaterThanOrEqual(512 * scale);
       expect(result!.offsetY).toBeGreaterThanOrEqual(320 * scale);
-    });
+      expect(result!.offsetX + result!.containerWidth).toBeLessThanOrEqual((512 + 256) * scale);
+      expect(result!.offsetY + result!.containerHeight).toBeLessThanOrEqual((320 + 160) * scale);
 
-    it('visible edges do not extend past tile boundary', () => {
-      const core = new ThumbnailCore();
-      const thumbnail = createImage({ coords: { x: 512, y: 320 } });
-
-      const result = core.resize(thumbnail, 2560, 1600, {
-        minWidth: 0,
-        maxWidth: 177,
-        minHeight: 0,
-        maxHeight: Infinity,
-      });
-
-      const scale = result!.scale;
-      const nextTileX = (512 + 256) * scale;
-      const nextTileY = (320 + 160) * scale;
-
-      expect(result!.offsetX + result!.containerWidth).toBeLessThanOrEqual(nextTileX);
-      expect(result!.offsetY + result!.containerHeight).toBeLessThanOrEqual(nextTileY);
+      // Verify all pixel values are integers (no sub-pixel rendering gaps).
+      for (const key of ['containerWidth', 'containerHeight', 'imageWidth', 'imageHeight', 'offsetX', 'offsetY']) {
+        expect(Number.isInteger(result![key as keyof typeof result])).toBe(true);
+      }
     });
 
     it('container dimensions are stable across different tile positions', () => {

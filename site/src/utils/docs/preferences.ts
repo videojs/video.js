@@ -7,7 +7,7 @@ import { DEFAULT_FRAMEWORK, isValidFramework, isValidStyleForFramework } from '@
 export const FRAMEWORK_COOKIE = 'vjs_docs_framework';
 
 // LocalStorage key prefix for style (per-framework, client-side only)
-export const STYLE_STORAGE_KEY_PREFIX = 'vjs_docs_style_';
+const STYLE_STORAGE_KEY_PREFIX = 'vjs_docs_style_';
 
 // Cookie options for client-side (1 year expiration)
 const COOKIE_MAX_AGE = 31536000; // 1 year in seconds

@@ -1,17 +1,16 @@
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
 import type { MediaControlsState } from '@videojs/media';
-import { createStore } from '@videojs/store';
+import { createStore, flush } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { playerContext } from '../../../player/context';
 import { UIElement } from '../../ui-element';
-import { SliderBufferElement } from '../buffer';
 import { SliderElement } from '../element';
-import { SliderFillElement } from '../fill';
 import { SliderThumbElement } from '../thumb';
 import { SliderTrackElement } from '../track';
 import { SliderValueElement } from '../value';
+import { measureSlider, pointer } from './support';
 
 // Unique tag names to avoid customElements.define collisions across tests.
 let tagCounter = 0;
@@ -54,10 +53,6 @@ afterEach(() => {
 });
 
 describe('SliderElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderElement.tagName).toBe('media-slider');
-  });
-
   it('initializes with default property values', () => {
     const slider = createElement(SliderElement);
 
@@ -102,6 +97,35 @@ describe('SliderElement', () => {
     expect(slider.hasAttribute('data-dragging')).toBe(false);
     expect(slider.hasAttribute('data-pointing')).toBe(false);
     expect(slider.hasAttribute('data-interactive')).toBe(false);
+
+    measureSlider(slider);
+    pointer(slider, 'pointermove', 50, 0);
+    flush();
+    await slider.updateComplete;
+    expect(slider.hasAttribute('data-pointing')).toBe(true);
+    expect(slider.hasAttribute('data-interactive')).toBe(true);
+
+    pointer(slider, 'pointerdown', 50);
+    pointer(slider, 'pointermove', 60);
+    flush();
+    await slider.updateComplete;
+    expect(slider.hasAttribute('data-dragging')).toBe(true);
+
+    pointer(slider, 'pointerup', 60, 0);
+    pointer(slider, 'lostpointercapture', 60, 0);
+    pointer(slider, 'pointerleave', 60, 0);
+    flush();
+    await slider.updateComplete;
+    expect(slider.hasAttribute('data-interactive')).toBe(false);
+
+    const thumb = createElement(SliderThumbElement);
+
+    slider.append(thumb);
+    await thumb.updateComplete;
+    thumb.dispatchEvent(new FocusEvent('focus'));
+    flush();
+    await slider.updateComplete;
+    expect(slider.hasAttribute('data-interactive')).toBe(true);
   });
 
   it('reflects disabled state as data-disabled', async () => {
@@ -225,28 +249,35 @@ describe('SliderElement', () => {
 
     document.body.appendChild(slider);
     await slider.updateComplete;
+    measureSlider(slider);
 
-    // Events are dispatched by the createSlider handle during interaction.
-    // We verify the element can dispatch events with the correct shape.
-    const received: CustomEvent[] = [];
+    const received: Event[] = [];
+    const record = (event: Event) => received.push(event);
 
-    slider.addEventListener('value-change', ((event: CustomEvent) => {
-      received.push(event);
-    }) as EventListener);
+    document.body.addEventListener('value-change', record);
+    document.body.addEventListener('value-commit', record);
 
-    slider.dispatchEvent(new CustomEvent('value-change', { detail: { value: 42 }, bubbles: true }));
+    try {
+      pointer(slider, 'pointerdown', 50);
+      pointer(slider, 'pointerup', 50, 0);
+      pointer(slider, 'lostpointercapture', 50, 0);
 
-    expect(received).toHaveLength(1);
-    expect(received[0]!.detail).toEqual({ value: 42 });
-    expect(received[0]!.bubbles).toBe(true);
+      expect(received.map(({ type }) => type)).toEqual(['value-change', 'value-change', 'value-commit']);
+
+      for (const event of received) {
+        expect(event).toBeInstanceOf(CustomEvent);
+        expect((event as CustomEvent).detail).toEqual({ value: 25 });
+        expect(event.bubbles).toBe(true);
+        expect(event.target).toBe(slider);
+      }
+    } finally {
+      document.body.removeEventListener('value-change', record);
+      document.body.removeEventListener('value-commit', record);
+    }
   });
 });
 
 describe('SliderThumbElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderThumbElement.tagName).toBe('media-slider-thumb');
-  });
-
   it('receives ARIA attributes from slider context', async () => {
     const slider = createElement(SliderElement);
     const thumb = createElement(SliderThumbElement);
@@ -312,10 +343,6 @@ describe('SliderThumbElement', () => {
 });
 
 describe('SliderTrackElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderTrackElement.tagName).toBe('media-slider-track');
-  });
-
   it('receives data attributes from slider context', async () => {
     const slider = createElement(SliderElement);
     const track = createElement(SliderTrackElement);
@@ -329,23 +356,11 @@ describe('SliderTrackElement', () => {
   });
 });
 
-describe('SliderFillElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderFillElement.tagName).toBe('media-slider-fill');
-  });
-});
+describe('SliderFillElement', () => {});
 
-describe('SliderBufferElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderBufferElement.tagName).toBe('media-slider-buffer');
-  });
-});
+describe('SliderBufferElement', () => {});
 
 describe('SliderValueElement', () => {
-  it('has the correct tag name', () => {
-    expect(SliderValueElement.tagName).toBe('media-slider-value');
-  });
-
   it('displays the current value from context', async () => {
     const slider = createElement(SliderElement);
     const valueEl = createElement(SliderValueElement);
@@ -363,7 +378,7 @@ describe('SliderValueElement', () => {
     const slider = createElement(SliderElement);
     const valueEl = createElement(SliderValueElement);
 
-    slider.value = 33;
+    slider.value = 33.6;
     slider.min = 0;
     slider.max = 100;
     slider.appendChild(valueEl);
@@ -371,7 +386,7 @@ describe('SliderValueElement', () => {
     await slider.updateComplete;
     await valueEl.updateComplete;
 
-    expect(valueEl.textContent).toBe('33');
+    expect(valueEl.textContent).toBe('34');
   });
 
   it('sets aria-live="off"', async () => {

@@ -104,18 +104,18 @@ describe('calculatePresentationDuration', () => {
   });
 
   it('does not write when the resolver returns undefined', async () => {
-    const state = makeState();
-    const resolveDuration: PresentationDurationResolver = () => undefined;
-
+    const original = mockPresentation();
+    const state = makeState({ presentation: original });
+    const resolveDuration = vi.fn<PresentationDurationResolver>(() => undefined);
     const cleanup = setupDuration(state, resolveDuration);
 
-    state.presentation.set(mockPresentation());
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(state.presentation.get()?.duration).toBeUndefined();
-
-    cleanup();
+    try {
+      await Promise.resolve();
+      expect(resolveDuration).toHaveBeenCalled();
+      expect(state.presentation.get()).toBe(original);
+    } finally {
+      cleanup();
+    }
   });
 
   it('does not write when the resolver returns NaN', async () => {
@@ -133,20 +133,19 @@ describe('calculatePresentationDuration', () => {
     cleanup();
   });
 
-  it('does not write when the resolver returns 0 or negative', async () => {
-    const state = makeState();
-    const resolveDuration = vi.fn<PresentationDurationResolver>().mockReturnValueOnce(0).mockReturnValueOnce(-5);
-
+  it.each([0, -5])('does not write when the resolver returns %s', async (duration) => {
+    const original = mockPresentation();
+    const state = makeState({ presentation: original });
+    const resolveDuration = vi.fn<PresentationDurationResolver>(() => duration);
     const cleanup = setupDuration(state, resolveDuration);
 
-    state.presentation.set(mockPresentation());
-    state.selectedVideoTrackId.set('video-1');
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(state.presentation.get()?.duration).toBeUndefined();
-
-    cleanup();
+    try {
+      await Promise.resolve();
+      expect(resolveDuration).toHaveBeenCalled();
+      expect(state.presentation.get()).toBe(original);
+    } finally {
+      cleanup();
+    }
   });
 
   it('does not call the resolver when duration is already set', async () => {

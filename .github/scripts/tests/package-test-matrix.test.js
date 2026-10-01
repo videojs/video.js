@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { globSync, readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   createPackageTestSelection,
@@ -85,18 +87,31 @@ describe('createPackageTestShards', () => {
 
 describe('createPackageTestSelection', () => {
   it('discovers every current package test and separates SPF for its container', () => {
+    const root = fileURLToPath(new URL('../../..', import.meta.url));
+    const workspace = readFileSync(new URL('../../../pnpm-workspace.yaml', import.meta.url), 'utf8');
+    const packagePatterns = workspace.match(/^packages:\n((?:  - .+\n)+)/m);
+    assert.ok(packagePatterns, 'Expected workspace package patterns.');
+
+    const patterns = [...packagePatterns[1].matchAll(/^  - ['"]?([^'"\n]+?)['"]?$/gm)].map((match) => match[1]);
+    const manifests = globSync(patterns.map((pattern) => `${pattern}/package.json`), { cwd: root });
+    const expected = manifests
+      .filter((path) => path.startsWith('packages/') || path === 'apps/sandbox/package.json')
+      .map((path) => JSON.parse(readFileSync(new URL(path, new URL('../../../', import.meta.url)), 'utf8')))
+      .filter((manifest) => manifest.scripts?.test)
+      .map((manifest) => manifest.name)
+      .sort();
+
+    assert.ok(expected.length > 0);
+
     const selection = createPackageTestSelection({
-      root: new URL('../../..', import.meta.url).pathname,
+      root,
       forceAll: true,
     });
     const standardPackages = selection.matrix.include.flatMap((shard) => shard.packages);
 
     assert.equal(selection.runSpf, true);
     assert.equal(selection.hasStandardTests, true);
-    assert.ok(selection.affected.includes('@videojs/spf'));
-    assert.ok(standardPackages.includes('@videojs/react'));
-    assert.ok(standardPackages.includes('@videojs/sandbox'));
-    assert.ok(!standardPackages.includes('@videojs/spf'));
-    assert.equal(new Set([...standardPackages, '@videojs/spf']).size, selection.affected.length);
+    assert.deepEqual(selection.affected, expected);
+    assert.deepEqual(standardPackages.sort(), expected.filter((name) => name !== '@videojs/spf'));
   });
 });

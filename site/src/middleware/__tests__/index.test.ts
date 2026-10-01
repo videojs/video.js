@@ -3,14 +3,12 @@
 import type { APIContext } from 'astro';
 import { getActionContext } from 'astro:actions';
 import { jwtVerify } from 'jose';
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { onRequest } from '@/middleware/index';
 import { refreshToken, seal, unseal } from '@/utils/auth';
 
 type AstroActionContext = ReturnType<typeof getActionContext>;
-
-vi.stubEnv('PROD', false);
 
 vi.mock('jose', () => ({
   jwtVerify: vi.fn(),
@@ -66,15 +64,17 @@ function createMockContext(sessionCookie?: string): APIContext {
 
 const next = vi.fn().mockResolvedValue(new Response('OK'));
 
-describe('session middleware', () => {
+describe('onRequest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('PROD', false);
 
     vi.mocked(getActionContext).mockReturnValue({ action: undefined } as AstroActionContext);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   describe('unauthenticated requests', () => {
@@ -116,6 +116,8 @@ describe('session middleware', () => {
 
       expect(unseal).toHaveBeenCalledWith('encrypted-session');
       expect(jwtVerify).toHaveBeenCalledTimes(2);
+      expect(jwtVerify).toHaveBeenNthCalledWith(1, 'valid-access-token', 'https://auth.example.com');
+      expect(jwtVerify).toHaveBeenNthCalledWith(2, 'valid-id-token', 'https://auth.example.com');
 
       expect(context.locals.user).toEqual({
         email: 'test@example.com',
@@ -290,53 +292,5 @@ describe('session middleware', () => {
       expect(context.cookies.delete).toHaveBeenCalledWith('session', { path: '/' });
       expect(next).toHaveBeenCalled();
     });
-  });
-
-  it('should verify access token with JWKS', async () => {
-    vi.mocked(unseal).mockResolvedValueOnce(mockOAuthResponse);
-    vi.mocked(jwtVerify)
-      .mockResolvedValueOnce({ payload: {} } as any)
-      .mockResolvedValueOnce({ payload: mockUserPayload } as any);
-
-    const context = createMockContext('encrypted-session');
-
-    await onRequest(context, next);
-
-    // First call should verify access token
-    expect(jwtVerify).toHaveBeenNthCalledWith(1, 'valid-access-token', 'https://auth.example.com');
-  });
-
-  it('should verify ID token with JWKS', async () => {
-    vi.mocked(unseal).mockResolvedValueOnce(mockOAuthResponse);
-    vi.mocked(jwtVerify)
-      .mockResolvedValueOnce({ payload: {} } as any)
-      .mockResolvedValueOnce({ payload: mockUserPayload } as any);
-
-    const context = createMockContext('encrypted-session');
-
-    await onRequest(context, next);
-
-    // Second call should verify ID token
-    expect(jwtVerify).toHaveBeenNthCalledWith(2, 'valid-id-token', 'https://auth.example.com');
-  });
-
-  it('should not expose sensitive token data in user object', async () => {
-    vi.mocked(unseal).mockResolvedValueOnce(mockOAuthResponse);
-    vi.mocked(jwtVerify)
-      .mockResolvedValueOnce({ payload: {} } as any)
-      .mockResolvedValueOnce({ payload: mockUserPayload } as any);
-
-    const context = createMockContext('encrypted-session');
-
-    await onRequest(context, next);
-
-    // User object should only contain safe fields
-    expect(context.locals.user).toEqual({
-      email: 'test@example.com',
-      name: 'Test User',
-    });
-
-    expect(context.locals.user).not.toHaveProperty('sub');
-    expect(context.locals.user).not.toHaveProperty('email_verified');
   });
 });

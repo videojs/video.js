@@ -88,13 +88,13 @@ describe('currentInstallationContext', () => {
     history.replaceState(
       null,
       '',
-      '/docs/guides/installation/html?skin=minimal&source-url=https%3A%2F%2Fsecret.example.com%2Fv.m3u8'
+      '/docs/guides/installation/html?skin=neutral&source-url=https%3A%2F%2Fsecret.example.com%2Fv.m3u8'
     );
 
     const context = currentInstallationContext();
 
     expect(context).toMatchObject({ installation_route: 'html', installation_custom_source: true });
-    expect(String(context.installation_skin)).toContain('minimal');
+    expect(String(context.installation_skin)).toContain('neutral');
     expect(JSON.stringify(context)).not.toContain('secret.example.com');
   });
 

@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { BandwidthState } from '../bandwidth-estimator';
-import {
-  DEFAULT_BANDWIDTH_CONFIG,
-  getBandwidthEstimate,
-  hasGoodEstimate,
-  sampleBandwidth,
-} from '../bandwidth-estimator';
+import { DEFAULT_BANDWIDTH_CONFIG, getBandwidthEstimate, sampleBandwidth } from '../bandwidth-estimator';
 
 // Helper to create initial state (O1 will do this in real usage)
 const createInitialState = (): BandwidthState => ({
@@ -41,12 +36,14 @@ describe('sampleBandwidth', () => {
     expect(state.slowTotalWeight).toBe(0);
   });
 
-  it('should filter samples below minDuration threshold', () => {
+  it.each([2, -100])('should filter samples below minDuration threshold: %s ms', (duration) => {
     let state = createInitialState();
 
     // Sample below default minDuration (5ms)
-    state = sampleBandwidth(state, 2, 100_000);
+    state = sampleBandwidth(state, duration, 100_000);
 
+    expect(state.fastEstimate).toBe(0);
+    expect(state.slowEstimate).toBe(0);
     // Bytes tracked but not sampled (likely cached response)
     expect(state.bytesSampled).toBe(100_000);
     expect(state.fastTotalWeight).toBe(0);
@@ -129,6 +126,14 @@ describe('getBandwidthEstimate', () => {
     expect(estimate).toBe(5_000_000);
   });
 
+  it('should keep startup fallback when cached samples exceed the byte threshold', () => {
+    const state = sampleBandwidth(createInitialState(), 2, 200_000);
+
+    const estimate = getBandwidthEstimate(state, 5_000_000);
+
+    expect(estimate).toBe(5_000_000);
+  });
+
   it('should return actual estimate when sufficient data', () => {
     let state = createInitialState();
 
@@ -144,23 +149,18 @@ describe('getBandwidthEstimate', () => {
     expect(estimate).toBeGreaterThan(0);
   });
 
-  it('should return minimum of fast and slow estimates', () => {
-    let state = createInitialState();
+  it.each([
+    { fastEstimate: 1_937_500, slowEstimate: 3_000_000 },
+    { fastEstimate: 3_875_000, slowEstimate: 1_500_000 },
+  ])('should return minimum of fast and slow estimates: %o', (estimates) => {
+    const state: BandwidthState = {
+      ...estimates,
+      fastTotalWeight: 10,
+      slowTotalWeight: 10,
+      bytesSampled: 200_000,
+    };
 
-    // Add initial samples at high bandwidth
-    for (let i = 0; i < 5; i++) {
-      state = sampleBandwidth(state, 1000, 50_000); // High bandwidth
-    }
-
-    // Add a low bandwidth sample
-    state = sampleBandwidth(state, 2000, 20_000); // Low bandwidth
-
-    const estimate = getBandwidthEstimate(state, 1_000_000);
-
-    // Fast EWMA should drop quickly, slow should lag
-    // min() should pick the lower (fast) one
-    // This tests the asymmetric behavior
-    expect(estimate).toBeGreaterThan(0);
+    expect(getBandwidthEstimate(state, 500_000)).toBeCloseTo(2_000_000, 5);
   });
 
   it('should use custom minTotalBytes threshold', () => {
@@ -191,103 +191,48 @@ describe('getBandwidthEstimate', () => {
     // With zero-factor correction, estimate should match actual bandwidth
     // 200KB in 1s = 1.6 Mbps
     expect(estimate).toBeCloseTo(1_600_000, -4);
-  });
-});
 
-describe('hasGoodEstimate', () => {
-  it('should return false for new estimator', () => {
-    const state = createInitialState();
+    for (let i = 0; i < 20; i++) state = sampleBandwidth(state, 1000, 200_000);
 
-    expect(hasGoodEstimate(state)).toBe(false);
-  });
-
-  it('should return false when below minTotalBytes', () => {
-    let state = createInitialState();
-
-    // Sample 50KB (below default 128KB)
-    state = sampleBandwidth(state, 1000, 50_000);
-
-    expect(hasGoodEstimate(state)).toBe(false);
-  });
-
-  it('should return true when above minTotalBytes', () => {
-    let state = createInitialState();
-
-    // Sample 200KB (above default 128KB)
-    for (let i = 0; i < 10; i++) {
-      state = sampleBandwidth(state, 1000, 20_000);
-    }
-
-    expect(hasGoodEstimate(state)).toBe(true);
-  });
-
-  it('should use custom minTotalBytes threshold', () => {
-    let state = createInitialState();
-
-    state = sampleBandwidth(state, 1000, 50_000);
-
-    const config = {
-      ...DEFAULT_BANDWIDTH_CONFIG,
-      minTotalBytes: 40_000,
-    };
-
-    expect(hasGoodEstimate(state, config)).toBe(true);
-  });
-
-  it('should require valid EWMA samples', () => {
-    let state = createInitialState();
-
-    // Manually set bytesSampled without valid EWMA samples
-    state = { ...state, bytesSampled: 200_000 };
-
-    // Should still return false (no valid EWMA samples)
-    expect(hasGoodEstimate(state)).toBe(false);
+    expect(state.fastTotalWeight).toBe(21);
+    expect(state.slowTotalWeight).toBe(21);
+    expect(getBandwidthEstimate(state, 500_000)).toBeCloseTo(1_600_000, -4);
   });
 });
 
 describe('dual EWMA behavior', () => {
-  it('should adapt down quickly when bandwidth drops', () => {
+  it.each([
+    { warmups: 5, initialBytes: 100_000, samples: 2, nextBytes: 25_000, bound: 0.7 },
+    { warmups: 8, initialBytes: 100_000, samples: 2, nextBytes: 50_000, bound: 0.8 },
+    { warmups: 10, initialBytes: 200_000, samples: 3, nextBytes: 50_000, bound: 0.6 },
+  ])('should adapt down quickly when bandwidth drops: %o', ({ warmups, initialBytes, samples, nextBytes, bound }) => {
     let state = createInitialState();
 
-    // Start with high bandwidth samples
-    for (let i = 0; i < 5; i++) {
-      state = sampleBandwidth(state, 1000, 100_000); // 800 Kbps
-    }
+    for (let i = 0; i < warmups; i++) state = sampleBandwidth(state, 1000, initialBytes);
 
     const highEstimate = getBandwidthEstimate(state, 500_000);
 
-    // Sudden drop in bandwidth
-    for (let i = 0; i < 2; i++) {
-      state = sampleBandwidth(state, 1000, 25_000); // 200 Kbps
-    }
+    for (let i = 0; i < samples; i++) state = sampleBandwidth(state, 1000, nextBytes);
 
-    const lowEstimate = getBandwidthEstimate(state, 500_000);
-
-    // Estimate should drop significantly
-    expect(lowEstimate).toBeLessThan(highEstimate * 0.7);
+    expect(getBandwidthEstimate(state, 500_000)).toBeLessThan(highEstimate * bound);
   });
 
-  it('should adapt up slowly when bandwidth rises', () => {
+  it.each([
+    { warmups: 8, initialBytes: 20_000, nextBytes: 100_000, ceiling: 800_000 },
+    { warmups: 10, initialBytes: 50_000, nextBytes: 200_000, ceiling: 1_600_000 },
+  ])('should adapt up slowly when bandwidth rises: %o', ({ warmups, initialBytes, nextBytes, ceiling }) => {
     let state = createInitialState();
 
-    // Start with low bandwidth (need enough samples to exceed minTotalBytes)
-    for (let i = 0; i < 8; i++) {
-      state = sampleBandwidth(state, 1000, 20_000); // 160 Kbps (160KB total)
-    }
+    for (let i = 0; i < warmups; i++) state = sampleBandwidth(state, 1000, initialBytes);
 
     const lowEstimate = getBandwidthEstimate(state, 500_000);
 
-    // Sudden rise in bandwidth
-    for (let i = 0; i < 3; i++) {
-      state = sampleBandwidth(state, 1000, 100_000); // 800 Kbps
-    }
+    for (let i = 0; i < 3; i++) state = sampleBandwidth(state, 1000, nextBytes);
 
     const risingEstimate = getBandwidthEstimate(state, 500_000);
 
-    // Estimate should rise, but not as dramatically as it drops
-    // (slow EWMA keeps it conservative)
     expect(risingEstimate).toBeGreaterThan(lowEstimate);
-    expect(risingEstimate).toBeLessThan(800_000); // Not fully at new level yet
+    expect(risingEstimate).toBeLessThan(ceiling);
   });
 
   it('should converge to stable value with consistent bandwidth', () => {
@@ -306,15 +251,6 @@ describe('dual EWMA behavior', () => {
 });
 
 describe('edge cases', () => {
-  it('should handle very small durations gracefully', () => {
-    let state = createInitialState();
-
-    // 1ms duration (should be filtered)
-    state = sampleBandwidth(state, 1, 100_000);
-
-    expect(state.fastTotalWeight).toBe(0);
-  });
-
   it('should handle very large downloads', () => {
     let state = createInitialState();
 
@@ -332,14 +268,5 @@ describe('edge cases', () => {
 
     expect(state.bytesSampled).toBe(0);
     expect(state.fastTotalWeight).toBe(0);
-  });
-
-  it('should handle negative values gracefully', () => {
-    let state = createInitialState();
-
-    // Should not crash or produce invalid state
-    state = sampleBandwidth(state, -100, 100_000);
-
-    expect(state.bytesSampled).toBe(100_000);
   });
 });

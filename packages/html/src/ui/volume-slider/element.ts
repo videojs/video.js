@@ -103,7 +103,7 @@ export class VolumeSliderElement extends UIElement {
       isDisabled,
       getPercent,
       getStepPercent: () => this.#core.getWheelStepPercent(),
-      onValueChange: setVolume,
+      onValueChange: (percent) => this.#volumeState.value?.setVolume(this.#core.rawValueFromPercent(percent) / 100),
     });
 
     applyElementProps(this, this.#slider.rootProps, { signal });

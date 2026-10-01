@@ -58,17 +58,6 @@ describe('tryCatch', () => {
     consoleSpy.mockRestore();
   });
 
-  it('does not throw when wrapped function throws', () => {
-    const fn = () => {
-      throw new Error('should not propagate');
-    };
-    const onError = vi.fn();
-
-    const wrapped = tryCatch(fn, onError);
-
-    expect(() => wrapped?.()).not.toThrow();
-  });
-
   it('preserves function type signature', () => {
     const fn = (name: string, age: number): string => `${name} is ${age}`;
     const wrapped = tryCatch(fn);

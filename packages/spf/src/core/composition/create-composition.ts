@@ -267,7 +267,7 @@ export interface CompositionOptions<S extends object, C extends object, Cfg exte
  *   state.label.get(); // undefined
  *   ```;
  */
-export function buildSignalMap<S extends object>(
+function buildSignalMap<S extends object>(
   keys: Iterable<PropertyKey>,
   initial: Partial<S>
 ): { [K in keyof S]-?: Signal<S[K]> } {

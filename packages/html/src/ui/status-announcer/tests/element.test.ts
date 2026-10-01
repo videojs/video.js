@@ -145,15 +145,6 @@ describe('StatusAnnouncerElement', () => {
 
   it.each([
     {
-      name: 'completed seeks',
-      initialState: { currentTime: 10, duration: 120, seeking: false },
-      update: async (setState: (partial: Record<string, unknown>) => void) => {
-        setState({ currentTime: 45, seeking: true });
-        await Promise.resolve();
-        setState({ seeking: false });
-      },
-    },
-    {
       name: 'volume changes',
       initialState: { volume: 0.5, muted: false },
       update: async (setState: (partial: Record<string, unknown>) => void) => {

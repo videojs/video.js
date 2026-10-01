@@ -144,7 +144,10 @@ export function getBandwidthEstimate(
   config: BandwidthConfig = DEFAULT_BANDWIDTH_CONFIG
 ): number {
   // Use default until we have enough samples to trust our estimate
-  if (!state || state.bytesSampled < config.minTotalBytes) {
+  if (
+    !state ||
+    !(state.bytesSampled >= config.minTotalBytes && state.fastTotalWeight > 0 && state.slowTotalWeight > 0)
+  ) {
     return defaultEstimate;
   }
 
@@ -156,23 +159,4 @@ export function getBandwidthEstimate(
   // Take the minimum - this is the key insight from Shaka Player
   // It naturally provides "down quickly, up slowly" behavior
   return Math.min(fastEstimate, slowEstimate);
-}
-
-/**
- * Check if the estimator has enough data to provide a reliable estimate.
- *
- * Requires both: - Enough total bytes sampled (minTotalBytes threshold) - At least one valid EWMA sample (totalWeight > 0)
- *
- * @example
- *   if (hasGoodEstimate(state)) {
- *     const estimate = getBandwidthEstimate(state, 5_000_000);
- *   }
- *
- * @param state - Current estimator state
- * @param config - Optional estimator configuration (uses defaults if not provided)
- * @returns True if we've sampled enough bytes to trust the estimate
- */
-export function hasGoodEstimate(state: BandwidthState, config: BandwidthConfig = DEFAULT_BANDWIDTH_CONFIG): boolean {
-  // Need enough total bytes AND at least one valid EWMA sample
-  return state.bytesSampled >= config.minTotalBytes && state.fastTotalWeight > 0 && state.slowTotalWeight > 0;
 }

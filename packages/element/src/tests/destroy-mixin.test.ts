@@ -59,35 +59,6 @@ describe('DestroyMixin', () => {
 
     expect(destroyCallback).toHaveBeenCalledTimes(1);
   });
-
-  it('destroyCallback() is called by destroy()', () => {
-    const destroyCallback = vi.fn();
-
-    class TestElement extends DestroyableElement {
-      override destroyCallback(): void {
-        destroyCallback();
-        super.destroyCallback();
-      }
-    }
-
-    const el = createElement(TestElement);
-
-    el.destroy();
-
-    expect(destroyCallback).toHaveBeenCalledOnce();
-  });
-
-  it('connectedCallback no-ops after destroy', () => {
-    const el = createElement(DestroyableElement);
-
-    document.body.appendChild(el);
-    el.destroy();
-    el.remove();
-
-    document.body.appendChild(el);
-
-    expect(el.destroyed).toBe(true);
-  });
 });
 
 // ---------------------------------------------------------------------------

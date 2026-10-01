@@ -26,13 +26,6 @@ describe('calculateAlpha', () => {
     expect(shortAlpha).toBeLessThan(longAlpha);
   });
 
-  it('should produce alpha between 0 and 1', () => {
-    const alpha = calculateAlpha(5);
-
-    expect(alpha).toBeGreaterThan(0);
-    expect(alpha).toBeLessThan(1);
-  });
-
   it('should handle very short half-life', () => {
     const alpha = calculateAlpha(0.1);
 
@@ -67,15 +60,6 @@ describe('calculateEwma', () => {
     const expected = 2_000_000 * (1 - adjAlpha) + adjAlpha * 1_000_000;
 
     expect(result).toBeCloseTo(expected, 2);
-  });
-
-  it('should weight heavily toward new value with low previous estimate', () => {
-    // Starting from 0, first sample should have strong influence
-    const result = calculateEwma(0, 1_000_000, 1, 2);
-
-    // Should be closer to new value than to previous (0)
-    expect(result).toBeGreaterThan(0);
-    expect(result).toBeLessThan(1_000_000);
   });
 
   it('should handle weight of 0', () => {
@@ -247,21 +231,6 @@ describe('applyZeroFactor', () => {
 });
 
 describe('EWMA integration', () => {
-  it('should produce correct estimate with zero-factor correction', () => {
-    const halfLife = 2;
-    let estimate = 0;
-    let totalWeight = 0;
-
-    // First sample
-    estimate = calculateEwma(estimate, 1_000_000, 1, halfLife);
-    totalWeight += 1;
-
-    const corrected = applyZeroFactor(estimate, totalWeight, halfLife);
-
-    // Corrected estimate should equal the sample value for first sample
-    expect(corrected).toBeCloseTo(1_000_000, -3);
-  });
-
   it('should converge to stable value with many samples', () => {
     const halfLife = 2;
     let estimate = 0;

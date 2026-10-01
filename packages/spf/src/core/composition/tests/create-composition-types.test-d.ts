@@ -4,7 +4,6 @@ import { type Signal, signal } from '../../signals/primitives';
 import {
   type Behavior,
   type BehaviorDeps,
-  buildSignalMap,
   type Composition,
   type ContextSignals,
   createComposition,
@@ -886,16 +885,20 @@ describe('createComposition initial-value type errors', () => {
 });
 
 // =============================================================================
-// buildSignalMap — return-type inference
+// createComposition — signal-map inference
 // =============================================================================
 
-describe('buildSignalMap', () => {
+function behavior<S extends object>(stateKeys: readonly (keyof S)[]): Behavior<StateSignals<S>> {
+  return { stateKeys, contextKeys: [], setup: () => {} };
+}
+
+describe('createComposition', () => {
   it('returns one Signal slot per key in S', () => {
     interface S {
       a?: number;
       b?: string;
     }
-    const map = buildSignalMap<S>(['a', 'b'], {});
+    const { state: map } = createComposition([behavior<S>(['a', 'b'])]);
 
     expectTypeOf<typeof map>().toEqualTypeOf<{ a: Signal<number | undefined>; b: Signal<string | undefined> }>();
   });
@@ -904,7 +907,7 @@ describe('buildSignalMap', () => {
     interface S {
       a?: number;
     }
-    const map = buildSignalMap<S>(['a'], {});
+    const { state: map } = createComposition([behavior<S>(['a'])]);
 
     // The slot is required (`-?`) but the value type retains | undefined.
     expectTypeOf<typeof map>().toEqualTypeOf<{ a: Signal<number | undefined> }>();
@@ -914,7 +917,7 @@ describe('buildSignalMap', () => {
     interface S {
       a: number;
     }
-    const map = buildSignalMap<S>(['a'], { a: 5 });
+    const { state: map } = createComposition([behavior<S>(['a'])], { initialState: { a: 5 } });
 
     expectTypeOf<typeof map>().toEqualTypeOf<{ a: Signal<number> }>();
   });
@@ -925,9 +928,9 @@ describe('buildSignalMap', () => {
       b?: string;
     }
     // No errors — partial seeds welcome.
-    buildSignalMap<S>(['a', 'b'], {});
-    buildSignalMap<S>(['a', 'b'], { a: 1 });
-    buildSignalMap<S>(['a', 'b'], { a: 1, b: 'x' });
+    createComposition([behavior<S>(['a', 'b'])], { initialState: {} });
+    createComposition([behavior<S>(['a', 'b'])], { initialState: { a: 1 } });
+    createComposition([behavior<S>(['a', 'b'])], { initialState: { a: 1, b: 'x' } });
   });
 
   it('errors when initial seeds a key not in S', () => {
@@ -935,7 +938,7 @@ describe('buildSignalMap', () => {
       a?: number;
     }
     // @ts-expect-error — 'unknown' is not a key of S
-    buildSignalMap<S>(['a'], { unknown: 1 });
+    createComposition([behavior<S>(['a'])], { initialState: { unknown: 1 } });
   });
 
   it('errors when initial seeds a key with the wrong type', () => {
@@ -943,13 +946,11 @@ describe('buildSignalMap', () => {
       a?: number;
     }
     // @ts-expect-error — 'a' must be number | undefined, not string
-    buildSignalMap<S>(['a'], { a: 'wrong' });
+    createComposition([behavior<S>(['a'])], { initialState: { a: 'wrong' } });
   });
 
   it('produces an empty map for an empty Partial<{}>', () => {
-    // empty interface intentional
-    // oxlint-disable-next-line typescript/no-empty-object-type
-    const map = buildSignalMap<{}>([], {});
+    const { state: map } = createComposition([]);
 
     // matches the Empty fallback
     // oxlint-disable-next-line typescript/no-empty-object-type

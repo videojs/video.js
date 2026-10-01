@@ -17,6 +17,8 @@ export interface ToggleButtonProps {
   ref: unknown;
   /** Callback when pressed state changes. */
   onPressedChange: (pressed: boolean) => void;
+  aaaOptional?: boolean;
+  zzzRequired: boolean;
 }
 
 export interface ToggleButtonState {

@@ -20,7 +20,7 @@ function createWrapper() {
     seeking: false,
     seek: vi.fn(),
     buffered: [],
-    seekable: [{ start: 0, end: 100 }],
+    seekable: [[0, 100]],
   }).Wrapper;
 }
 

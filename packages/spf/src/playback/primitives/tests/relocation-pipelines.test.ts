@@ -98,7 +98,7 @@ describe('relocationPipelinesFor', () => {
   });
 });
 
-describe('relocatingTextPipelines — relocateCues origin resolution', () => {
+describe('relocatingTextPipelines', () => {
   // relocateCues is the middle step: [resolveWithMetadata, relocateCues, dispatchCues].
   const relocateCues = relocatingTextPipelines<Cue>()[1]!;
   const notAborted = new AbortController().signal;
@@ -132,19 +132,26 @@ describe('relocatingTextPipelines — relocateCues origin resolution', () => {
     const c = cue(5, 6);
     const frame = { cues: [c], metadata: appleMap } as unknown as TextFrame<Cue>;
 
-    const done = relocateCues(frame, notAborted, deps);
+    let completed = false;
+    const done = Promise.resolve(relocateCues(frame, notAborted, deps)).then(() => {
+      completed = true;
+    });
 
     await Promise.resolve();
-    expect(c.startTime).toBe(5); // still waiting — NOT shifted to 15
+    expect(completed).toBe(false);
+    expect(c.startTime).toBe(5);
 
-    // Select the video track, then stamp its origin (10s, matching the map).
     state.selectedVideoTrackId.set('v');
-    state.presentation.set(presWithVideo(10));
+    await Promise.resolve();
+    expect(completed).toBe(false);
+    expect(c.startTime).toBe(5);
+
+    state.presentation.set(presWithVideo(8));
     await done;
 
-    // delta = mapCorrection(10) − startMediaTime(10) = 0 ⇒ cue unchanged.
-    expect(c.startTime).toBe(5);
-    expect(c.endTime).toBe(6);
+    expect(completed).toBe(true);
+    expect(c.startTime).toBe(7);
+    expect(c.endTime).toBe(8);
   });
 
   it('relocates a genuinely text-only source by offset 0 without hanging', async () => {

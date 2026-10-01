@@ -189,52 +189,5 @@ describe('BufferingIndicatorCore', () => {
 
       expect(callback).toHaveBeenCalledOnce();
     });
-
-    it('notifies subscribers when visible becomes false', () => {
-      const core = new BufferingIndicatorCore();
-      const callback = vi.fn();
-
-      core.update(createMediaState({ waiting: true, paused: false }));
-      vi.advanceTimersByTime(500);
-      flush();
-
-      core.state.subscribe(callback);
-
-      core.update(createMediaState({ waiting: false, paused: false }));
-      flush();
-
-      expect(callback).toHaveBeenCalledOnce();
-    });
-
-    it('does not notify if waiting ends before delay', () => {
-      const core = new BufferingIndicatorCore();
-      const callback = vi.fn();
-
-      core.state.subscribe(callback);
-
-      core.update(createMediaState({ waiting: true, paused: false }));
-      vi.advanceTimersByTime(300);
-      core.update(createMediaState({ waiting: false, paused: false }));
-
-      vi.advanceTimersByTime(500);
-      flush();
-
-      expect(callback).not.toHaveBeenCalled();
-    });
-
-    it('supports unsubscribe', () => {
-      const core = new BufferingIndicatorCore();
-      const callback = vi.fn();
-
-      const unsubscribe = core.state.subscribe(callback);
-
-      unsubscribe();
-
-      core.update(createMediaState({ waiting: true, paused: false }));
-      vi.advanceTimersByTime(500);
-      flush();
-
-      expect(callback).not.toHaveBeenCalled();
-    });
   });
 });

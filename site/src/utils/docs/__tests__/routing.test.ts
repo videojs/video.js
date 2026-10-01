@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 import type { Guide, Sidebar } from '../../../types/docs';
 import {
   buildAgnosticDocsUrl,
-  buildDocsUrl,
   getFrameworkFromDocsPath,
   getFrameworkFromDocsUrl,
   isDocsGuideActive,
@@ -153,10 +152,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('react');
-        expect(result.selectedSlug).toBeTruthy();
-        expect(result.url).toContain('/docs/framework/react/');
-        expect(result.reason).toContain('params.framework');
+        expect(result.url).toBe('/docs/framework/react/concepts/everyone');
       });
 
       it('should throw error for invalid framework param', () => {
@@ -179,8 +175,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('html');
-        expect(result.reason).toContain('preferences.framework');
+        expect(result.url).toBe('/docs/framework/html/concepts/everyone');
       });
 
       it('should use default framework when no preferences', () => {
@@ -189,8 +184,7 @@ describe('routing utilities', () => {
           params: {},
         });
 
-        expect(result.selectedFramework).toBe('react'); // DEFAULT_FRAMEWORK
-        expect(result.reason).toContain('default framework');
+        expect(result.url).toBe('/docs/guides/installation/react');
       });
 
       it('should use default framework when framework preference invalid', () => {
@@ -199,29 +193,28 @@ describe('routing utilities', () => {
           params: {},
         });
 
-        expect(result.selectedFramework).toBe('react'); // DEFAULT_FRAMEWORK
-        expect(result.reason).toContain('default framework');
+        expect(result.url).toBe('/docs/guides/installation/react');
       });
     });
 
     describe('slug selection', () => {
       it('should always select a valid slug for the framework', () => {
-        const result = resolveIndexRedirect({
+        const result = resolveIndexRedirect(
+          {
+            preferences: { framework: 'html' },
+            params: {},
+          },
+          [guideReactOnly, guideHtmlOnly]
+        );
+
+        expect(result.url).toBe('/docs/framework/html/guides/html-only');
+
+        const realSidebarResult = resolveIndexRedirect({
           preferences: { framework: 'react' },
           params: {},
         });
 
-        expect(result.selectedSlug).toBeTruthy();
-        expect(typeof result.selectedSlug).toBe('string');
-      });
-
-      it('should build correct URL', () => {
-        const result = resolveIndexRedirect({
-          preferences: { framework: 'react' },
-          params: {},
-        });
-
-        expect(result.url).toBe(buildDocsUrl('react', result.selectedSlug));
+        expect(realSidebarResult.url).toBe('/docs/guides/installation/react');
       });
     });
   });
@@ -238,10 +231,8 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedSlug).toBe('concepts/everyone');
-        expect(result.slugChanged).toBe(false);
         expect(result.shouldReplace).toBe(true);
-        expect(result.reason).toContain('kept slug');
+        expect(result.url).toBe('/docs/framework/react/concepts/everyone');
       });
 
       it('should change slug and not use replace when slug not visible in new framework', () => {
@@ -254,10 +245,8 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedSlug).not.toBe('guides/html-only');
-        expect(result.slugChanged).toBe(true);
+        expect(result.url).toBe('/docs/framework/react/concepts/everyone');
         expect(result.shouldReplace).toBe(false);
-        expect(result.reason).toContain('changed slug');
       });
 
       it('should change slug when guide inherits framework restriction from section', () => {
@@ -270,8 +259,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedSlug).not.toBe('components/html-controller');
-        expect(result.slugChanged).toBe(true);
+        expect(result.url).toBe('/docs/framework/react/concepts/everyone');
         expect(result.shouldReplace).toBe(false);
       });
     });
@@ -316,10 +304,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('react');
-        expect(result.selectedSlug).toBe('concepts/everyone');
-        expect(result.priorityLevel).toBe(1);
-        expect(result.reason).toContain('Priority 1');
+        expect(result.url).toBe('/docs/framework/react/concepts/everyone');
       });
 
       it('should use priority 1 for guide with matching framework restriction', () => {
@@ -331,8 +316,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('react');
-        expect(result.priorityLevel).toBe(1);
+        expect(result.url).toBe('/docs/framework/react/concepts/react-only');
       });
     });
 
@@ -346,10 +330,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('react');
-        expect(result.selectedSlug).toBe('concepts/react-only');
-        expect(result.priorityLevel).toBe(2);
-        expect(result.reason).toContain('Priority 2');
+        expect(result.url).toBe('/docs/framework/react/concepts/react-only');
       });
 
       it('should fall back when guide inherits framework restriction from section', () => {
@@ -361,8 +342,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedFramework).toBe('react');
-        expect(result.priorityLevel).toBe(2);
+        expect(result.url).toBe('/docs/framework/react/components/react-hook');
       });
     });
 
@@ -376,7 +356,7 @@ describe('routing utilities', () => {
           mockSidebar
         );
 
-        expect(result.selectedSlug).toBe('concepts/everyone');
+        expect(result.url).toBe('/docs/framework/html/concepts/everyone');
       });
     });
 

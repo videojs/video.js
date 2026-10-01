@@ -27,7 +27,7 @@ function makeMediaSource({
 
   return Object.create(MediaSource.prototype, {
     readyState: { value: readyState, writable: true },
-    duration: { value: duration, writable: true },
+    duration: { value: duration, writable: true, configurable: true },
     sourceBuffers: { value: sourceBuffers as unknown as SourceBufferList, writable: false },
     addEventListener: { value: target.addEventListener.bind(target) },
     removeEventListener: { value: target.removeEventListener.bind(target) },
@@ -41,24 +41,32 @@ function transitionMediaSource(mediaSource: MediaSource, readyState: MediaSource
 }
 
 function makeUpdatingSourceBuffer() {
-  const updateEndListeners: Array<() => void> = [];
-
-  const buffer = {
+  const target = Object.assign(new EventTarget(), {
     updating: true,
     buffered: { length: 0, start: () => 0, end: () => 0 } as TimeRanges,
-    addEventListener: (_event: string, handler: () => void, _options?: unknown) => {
-      updateEndListeners.push(handler);
-    },
-    removeEventListener: vi.fn(),
-  } as unknown as SourceBuffer;
-
+  });
+  const addEventListener = vi.spyOn(target, 'addEventListener');
+  const buffer = target as unknown as SourceBuffer;
   const finishUpdating = () => {
-    (buffer as unknown as { updating: boolean }).updating = false;
-
-    for (const h of updateEndListeners) h();
+    target.updating = false;
+    target.dispatchEvent(new Event('updateend'));
   };
 
-  return { buffer, finishUpdating };
+  return { buffer, finishUpdating, addEventListener };
+}
+
+function recordDurationWrites(mediaSource: MediaSource) {
+  let duration = mediaSource.duration;
+  const write = vi.fn((next: number) => {
+    if (mediaSource.readyState !== 'open' || [...mediaSource.sourceBuffers].some((buffer) => buffer.updating)) {
+      throw new DOMException('MediaSource is not ready', 'InvalidStateError');
+    }
+
+    duration = next;
+  });
+
+  Object.defineProperty(mediaSource, 'duration', { get: () => duration, set: write });
+  return write;
 }
 
 describe('updateMediaSourceDuration', () => {
@@ -78,26 +86,29 @@ describe('updateMediaSourceDuration', () => {
   });
 
   it('does not update again after initial set even if presentation duration changes', async () => {
-    // Once the MediaSource duration is set (no longer NaN), subsequent presentation
-    // duration changes must not trigger another set — doing so races with appendBuffer().
     const { state, context, reactor } = setupUpdateMediaSourceDuration();
-
     const mockMediaSource = makeMediaSource();
+    const write = recordDurationWrites(mockMediaSource);
 
-    context.mediaSource.set(mockMediaSource);
-    state.presentation.set({ duration: 60 } as Presentation);
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ duration: 60 } as Presentation);
+      await vi.waitFor(() => expect(write).toHaveBeenCalledExactlyOnceWith(60));
 
-    await vi.waitFor(() => {
+      state.presentation.set({ duration: 120 } as Presentation);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       expect(mockMediaSource.duration).toBe(60);
-    });
 
-    // Simulate presentation.duration changing (e.g. recalculated) — must not re-fire
-    state.presentation.set({ duration: 120 } as Presentation);
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(mockMediaSource.duration).toBe(60); // unchanged
-
-    reactor.destroy();
+      state.presentation.set(undefined);
+      await vi.waitFor(() => expect(reactor.snapshot.get().value).toBe('preconditions-unmet'));
+      state.presentation.set({ duration: 120 } as Presentation);
+      await vi.waitFor(() => expect(reactor.snapshot.get().value).toBe('duration-writable'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(write).toHaveBeenCalledExactlyOnceWith(60);
+      expect(mockMediaSource.duration).toBe(60);
+    } finally {
+      reactor.destroy();
+    }
   });
 
   it('waits for sourceopen before writing when MediaSource starts closed', async () => {
@@ -139,22 +150,22 @@ describe('updateMediaSourceDuration', () => {
     reactor.destroy();
   });
 
-  it('does not update when duration is invalid', () => {
+  it.each([NaN, -10])('does not update when duration is invalid (%s)', async (duration) => {
     const { state, context, reactor } = setupUpdateMediaSourceDuration();
+    const mockMediaSource = makeMediaSource();
+    const write = recordDurationWrites(mockMediaSource);
 
-    const mockMediaSource = makeMediaSource({ duration: 0 });
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ duration } as Presentation);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(write).not.toHaveBeenCalled();
 
-    context.mediaSource.set(mockMediaSource);
-
-    // Try NaN
-    state.presentation.set({ duration: NaN } as Presentation);
-    expect(mockMediaSource.duration).toBe(0); // presentation validation guard fired
-
-    // Try negative
-    state.presentation.set({ duration: -10 } as Presentation);
-    expect(mockMediaSource.duration).toBe(0);
-
-    reactor.destroy();
+      state.presentation.set({ duration: 60 } as Presentation);
+      await vi.waitFor(() => expect(write).toHaveBeenCalledExactlyOnceWith(60));
+    } finally {
+      reactor.destroy();
+    }
   });
 
   it('writes Infinity to MediaSource.duration for live', async () => {
@@ -257,75 +268,79 @@ describe('updateMediaSourceDuration', () => {
     reactor.destroy();
   });
 
-  it('does not throw when a buffer is updating at moment of set', async () => {
-    const { state, context, reactor } = setupUpdateMediaSourceDuration();
-
-    const { buffer: mockBuffer, finishUpdating } = makeUpdatingSourceBuffer();
-    const mockMediaSource = makeMediaSource({ sourceBuffers: [mockBuffer] });
-
-    context.mediaSource.set(mockMediaSource);
-    state.presentation.set({ duration: 60 } as Presentation);
-
-    // Buffer finishes immediately after state change — must not throw
-    finishUpdating();
-
-    await vi.waitFor(() => {
-      expect(mockMediaSource.duration).toBe(60);
-    });
-
-    reactor.destroy();
-  });
-
   it('defers duration set until the attached buffer finishes updating', async () => {
     const { state, context, reactor } = setupUpdateMediaSourceDuration();
+    const { buffer: mockBuffer, finishUpdating, addEventListener } = makeUpdatingSourceBuffer();
+    const mockMediaSource = makeMediaSource({ sourceBuffers: [mockBuffer] });
+    const write = recordDurationWrites(mockMediaSource);
+
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ duration: 60 } as Presentation);
+      await vi.waitFor(() =>
+        expect(addEventListener).toHaveBeenCalledWith('updateend', expect.any(Function), expect.any(Object))
+      );
+      expect(write).not.toHaveBeenCalled();
+
+      finishUpdating();
+      await vi.waitFor(() => expect(write).toHaveBeenCalledExactlyOnceWith(60));
+      expect(mockMediaSource.duration).toBe(60);
+    } finally {
+      reactor.destroy();
+    }
+  });
+
+  it('preserves a finite duration set while waiting for buffers to finish updating', async () => {
+    const { state, context, reactor } = setupUpdateMediaSourceDuration();
 
     const { buffer: mockBuffer, finishUpdating } = makeUpdatingSourceBuffer();
+    const addEventListener = vi.spyOn(mockBuffer, 'addEventListener');
     const mockMediaSource = makeMediaSource({ sourceBuffers: [mockBuffer] });
 
-    context.mediaSource.set(mockMediaSource);
-    state.presentation.set({ duration: 60 } as Presentation);
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ url: 'https://example.com/video.m3u8', duration: 60 });
 
-    // Duration must not be set while buffer is still updating
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(mockMediaSource.duration).toBeNaN();
+      await vi.waitFor(() => {
+        expect(addEventListener).toHaveBeenCalled();
+      });
 
-    // Buffer finishes — duration should now be set
-    finishUpdating();
+      mockMediaSource.duration = 42;
+      finishUpdating();
 
-    await vi.waitFor(() => {
-      expect(mockMediaSource.duration).toBe(60);
-    });
-
-    reactor.destroy();
+      // Let the resumed write settle before asserting that duration was preserved.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(mockMediaSource.duration).toBe(42);
+    } finally {
+      reactor.destroy();
+    }
   });
 
   it('defers until every attached SourceBuffer finishes updating', async () => {
     const { state, context, reactor } = setupUpdateMediaSourceDuration();
-
-    const { buffer: mockA, finishUpdating: finishA } = makeUpdatingSourceBuffer();
-    const { buffer: mockB, finishUpdating: finishB } = makeUpdatingSourceBuffer();
+    const { buffer: mockA, finishUpdating: finishA, addEventListener: listenA } = makeUpdatingSourceBuffer();
+    const { buffer: mockB, finishUpdating: finishB, addEventListener: listenB } = makeUpdatingSourceBuffer();
     const mockMediaSource = makeMediaSource({ sourceBuffers: [mockA, mockB] });
+    const write = recordDurationWrites(mockMediaSource);
 
-    context.mediaSource.set(mockMediaSource);
-    state.presentation.set({ duration: 60 } as Presentation);
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ duration: 60 } as Presentation);
+      await vi.waitFor(() => {
+        expect(listenA).toHaveBeenCalledWith('updateend', expect.any(Function), expect.any(Object));
+        expect(listenB).toHaveBeenCalledWith('updateend', expect.any(Function), expect.any(Object));
+      });
+      expect(write).not.toHaveBeenCalled();
 
-    // Neither buffer done — duration must not be set
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(mockMediaSource.duration).toBeNaN();
+      finishA();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(write).not.toHaveBeenCalled();
 
-    // Only first done — second still updating
-    finishA();
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(mockMediaSource.duration).toBeNaN();
-
-    // Second done — now duration should be set
-    finishB();
-
-    await vi.waitFor(() => {
-      expect(mockMediaSource.duration).toBe(60);
-    });
-
-    reactor.destroy();
+      finishB();
+      await vi.waitFor(() => expect(write).toHaveBeenCalledExactlyOnceWith(60));
+    } finally {
+      reactor.destroy();
+    }
   });
 
   it('composes against a single-buffer (audio-only) MediaSource', async () => {
@@ -352,47 +367,25 @@ describe('updateMediaSourceDuration', () => {
 
   it('does not throw when readyState transitions to ended during the async wait', async () => {
     const { state, context, reactor } = setupUpdateMediaSourceDuration();
-
-    // Attach an updating SourceBuffer so the task must await updateend
-    const { buffer: mockBuffer, finishUpdating } = makeUpdatingSourceBuffer();
+    const { buffer: mockBuffer, finishUpdating, addEventListener } = makeUpdatingSourceBuffer();
     const mockMediaSource = makeMediaSource({ sourceBuffers: [mockBuffer] });
+    const write = recordDurationWrites(mockMediaSource);
 
-    context.mediaSource.set(mockMediaSource);
-    state.presentation.set({ duration: 60 } as Presentation);
+    try {
+      context.mediaSource.set(mockMediaSource);
+      state.presentation.set({ duration: 60 } as Presentation);
+      await vi.waitFor(() =>
+        expect(addEventListener).toHaveBeenCalledWith('updateend', expect.any(Function), expect.any(Object))
+      );
+      expect(mockMediaSource.readyState).toBe('open');
 
-    // Simulate endOfStream() being called concurrently while the task is waiting —
-    // transitions readyState to 'ended' before the task can set duration
-    (mockMediaSource as MediaSource & { readyState: MediaSource['readyState'] }).readyState = 'ended';
-    finishUpdating();
-
-    // Should resolve without throwing, and duration should NOT be set
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(mockMediaSource.duration).toBeNaN();
-
-    reactor.destroy();
-  });
-
-  it('sets duration once on initial NaN state then ignores further state changes', async () => {
-    const { state, context, reactor } = setupUpdateMediaSourceDuration();
-
-    const mockMediaSource = makeMediaSource();
-
-    // MediaSource attached but no presentation yet — nothing happens
-    context.mediaSource.set(mockMediaSource);
-    expect(mockMediaSource.duration).toBeNaN();
-
-    // Presentation with duration arrives — initial set fires
-    state.presentation.set({ duration: 60 } as Presentation);
-
-    await vi.waitFor(() => {
-      expect(mockMediaSource.duration).toBe(60);
-    });
-
-    // Further state changes must not trigger another set
-    state.presentation.set({ duration: 90 } as Presentation);
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(mockMediaSource.duration).toBe(60); // unchanged
-
-    reactor.destroy();
+      transitionMediaSource(mockMediaSource, 'ended', 'sourceended');
+      finishUpdating();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(write).not.toHaveBeenCalled();
+      expect(mockMediaSource.duration).toBeNaN();
+    } finally {
+      reactor.destroy();
+    }
   });
 });

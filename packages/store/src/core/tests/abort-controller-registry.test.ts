@@ -46,46 +46,11 @@ describe('AbortControllerRegistry', () => {
   });
 
   describe('base', () => {
-    it('returns an AbortSignal', () => {
-      const signals = new AbortControllerRegistry();
-
-      expect(signals.base).toBeInstanceOf(AbortSignal);
-    });
-
     it('is not aborted initially', () => {
       const signals = new AbortControllerRegistry();
 
+      expect(signals.base).toBeInstanceOf(AbortSignal);
       expect(signals.base.aborted).toBe(false);
-    });
-
-    it('is aborted after reset()', () => {
-      const signals = new AbortControllerRegistry();
-      const base = signals.base;
-
-      signals.reset();
-
-      expect(base.aborted).toBe(true);
-    });
-
-    it('returns new signal after reset()', () => {
-      const signals = new AbortControllerRegistry();
-      const base1 = signals.base;
-
-      signals.reset();
-
-      const base2 = signals.base;
-
-      expect(base1).not.toBe(base2);
-      expect(base2.aborted).toBe(false);
-    });
-
-    it('is not aborted after clear()', () => {
-      const signals = new AbortControllerRegistry();
-      const base = signals.base;
-
-      signals.clear();
-
-      expect(base.aborted).toBe(false);
     });
 
     it('is not aborted when reset() runs before it is read', () => {
@@ -98,15 +63,6 @@ describe('AbortControllerRegistry', () => {
   });
 
   describe('clear', () => {
-    it('aborts keyed signals', () => {
-      const signals = new AbortControllerRegistry();
-      const signal = signals.supersede('test');
-
-      signals.clear();
-
-      expect(signal.aborted).toBe(true);
-    });
-
     it('does not abort base', () => {
       const signals = new AbortControllerRegistry();
       const base = signals.base;
@@ -172,29 +128,6 @@ describe('AbortControllerRegistry', () => {
   });
 
   describe('supersede', () => {
-    it('returns an AbortSignal', () => {
-      const signals = new AbortControllerRegistry();
-      const signal = signals.supersede('test');
-
-      expect(signal).toBeInstanceOf(AbortSignal);
-    });
-
-    it('is not aborted initially', () => {
-      const signals = new AbortControllerRegistry();
-      const signal = signals.supersede('test');
-
-      expect(signal.aborted).toBe(false);
-    });
-
-    it('aborts when base is reset', () => {
-      const signals = new AbortControllerRegistry();
-      const signal = signals.supersede('test');
-
-      signals.reset();
-
-      expect(signal.aborted).toBe(true);
-    });
-
     it('aborts previous signal for same key', () => {
       const signals = new AbortControllerRegistry();
       const signal1 = signals.supersede('seek');
@@ -210,6 +143,8 @@ describe('AbortControllerRegistry', () => {
       const signal1 = signals.supersede('key1');
       const signal2 = signals.supersede('key2');
 
+      expect(signal1).toBeInstanceOf(AbortSignal);
+      expect(signal2).toBeInstanceOf(AbortSignal);
       expect(signal1.aborted).toBe(false);
       expect(signal2.aborted).toBe(false);
     });

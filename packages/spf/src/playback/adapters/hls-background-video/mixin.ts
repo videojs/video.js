@@ -1,3 +1,4 @@
+import { onEvent } from '@videojs/utils/dom';
 import type { Constructor, MixinReturn } from '@videojs/utils/types';
 
 import type { Composition } from '../../../core/composition/create-composition';
@@ -124,8 +125,8 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     #reportedCode: number | null = null;
     #stopErrorSync: () => void;
 
-    /** Pending loadstart listener from a deferred play() retry, if any. */
-    #loadstartListener: (() => void) | null = null;
+    /** Aborting a generation cancels all retries, including ones not yet registered. */
+    #playGeneration = new AbortController();
 
     constructor(...args: any[]) {
       super(...args);
@@ -205,6 +206,10 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // -------------------------------------------------------------------------
 
     attach(mediaElement: HTMLMediaElement): void {
+      if (mediaElement !== this.#signals.context.mediaElement.get()) {
+        this.#cancelPendingPlay();
+      }
+
       super.attach?.(mediaElement);
       // The one place the fixed behavior is stated. Muted and autoplay are what
       // let it start without a gesture, loop is the defining behavior, and
@@ -257,21 +262,21 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       const mediaElement = this.#signals.context.mediaElement.get();
       if (!mediaElement) return Promise.reject(new Error('HlsBackgroundVideoAdapterCore: no media element attached'));
 
+      const { signal } = this.#playGeneration;
+
       try {
         return await mediaElement.play();
       } catch (err) {
+        signal.throwIfAborted();
+
         // If we have a pending HLS source, the rejection may be because MSE
         // hasn't attached a blob URL yet. Wait for loadstart (src assigned by
         // MSE setup) and retry once.
         if (this.src) {
-          return new Promise<void>((resolve, reject) => {
-            const listener = () => {
-              this.#loadstartListener = null;
-              mediaElement.play().then(resolve, reject);
-            };
+          return onEvent(mediaElement, 'loadstart', { signal }).then(() => {
+            signal.throwIfAborted();
 
-            this.#loadstartListener = listener;
-            mediaElement.addEventListener('loadstart', listener, { once: true });
+            return mediaElement.play();
           });
         }
 
@@ -296,12 +301,8 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     }
 
     #cancelPendingPlay(): void {
-      if (!this.#loadstartListener) return;
-
-      const mediaElement = this.#signals.context.mediaElement.get();
-
-      mediaElement?.removeEventListener('loadstart', this.#loadstartListener);
-      this.#loadstartListener = null;
+      this.#playGeneration.abort();
+      this.#playGeneration = new AbortController();
     }
   }
 

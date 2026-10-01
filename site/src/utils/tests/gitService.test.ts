@@ -1,5 +1,3 @@
-import * as path from 'node:path';
-
 import { describe, expect, it, type Mock, vi } from 'vite-plus/test';
 
 import { createGitService, type GitClient, parseLastModifiedDates } from '../gitService';
@@ -81,7 +79,7 @@ describe('createGitService', () => {
     const service = createGitService('/repo/site/src/content', createClient());
 
     await expect(
-      service.getLastModifiedDate(path.join('/repo/site/src/content/docs/how-to/../how-to/installation.mdx'))
+      service.getLastModifiedDate('/repo/site/src/content/docs/how-to/../how-to/installation.mdx')
     ).resolves.toEqual(new Date('2026-09-03T16:22:59-07:00'));
   });
 

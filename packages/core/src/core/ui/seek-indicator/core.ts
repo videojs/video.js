@@ -1,4 +1,5 @@
 import { createState } from '@videojs/store';
+import { DEFAULT_LOCALE, isDefaultLocale } from '@videojs/utils/i18n';
 
 import type { IndicatorCoreProps, IndicatorLifecycleState } from '../indicator/lifecycle';
 import { getIndicatorCloseDelay, IndicatorCloseController } from '../indicator/lifecycle';
@@ -8,6 +9,8 @@ import { formatCurrentTime, getSeekDirection, type IndicatorDirection, isSeekInd
 export interface SeekIndicatorProps extends IndicatorCoreProps {
   /** Delay in milliseconds before the indicator closes. */
   closeDelay?: number | undefined;
+  /** @internal Active i18n locale supplied by framework adapters. */
+  locale?: string | string[] | undefined;
 }
 
 export interface SeekIndicatorState extends IndicatorLifecycleState {
@@ -83,6 +86,16 @@ export class SeekIndicatorCore {
 
     const value = this.#getEffectiveSeekValue(event, snapshot, rapidRepeat);
     const seekTotal = rapidRepeat ? current.seekTotal + Math.abs(value) : Math.abs(value);
+    const label =
+      event.action === 'seekStep' && seekTotal > 0
+        ? new Intl.NumberFormat(this.#props.locale ?? DEFAULT_LOCALE, {
+            style: 'unit',
+            unit: 'second',
+            // Narrow units can fall back to Latin "s" in locales such as Persian.
+            unitDisplay: isDefaultLocale(this.#props.locale) ? 'narrow' : 'short',
+            useGrouping: false,
+          }).format(seekTotal)
+        : null;
 
     this.state.patch({
       open: true,
@@ -90,8 +103,8 @@ export class SeekIndicatorCore {
       direction,
       count: rapidRepeat ? current.count + 1 : 1,
       seekTotal,
-      value: event.action === 'seekStep' && seekTotal > 0 ? `${seekTotal}s` : null,
-      currentTime: formatCurrentTime(snapshot),
+      value: label,
+      currentTime: formatCurrentTime(snapshot, this.#props.locale),
     });
     this.#close.arm();
     return true;

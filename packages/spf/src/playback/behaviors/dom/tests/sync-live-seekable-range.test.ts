@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../../../../core/signals/primitives';
 import {
+  type AudioTrack,
   type MaybeResolvedPresentation,
   MEDIA_PLAYLIST_METADATA_KEY,
   type Presentation,
@@ -47,10 +48,16 @@ function fakeMediaSource(readyState: MediaSource['readyState'] = 'open') {
   } as unknown as MediaSource & { setLiveSeekableRange: ReturnType<typeof vi.fn> };
 }
 
-function run(opts: { presentation?: MaybeResolvedPresentation; trackId?: string; mediaSource?: MediaSource }) {
+function run(opts: {
+  presentation?: MaybeResolvedPresentation;
+  trackId?: string;
+  audioTrackId?: string;
+  mediaSource?: MediaSource;
+}) {
   const state = {
     presentation: signal<MaybeResolvedPresentation | undefined>(opts.presentation),
     selectedVideoTrackId: signal<string | undefined>(opts.trackId),
+    selectedAudioTrackId: signal<string | undefined>(opts.audioTrackId),
   };
   const context = { mediaSource: signal<MediaSource | undefined>(opts.mediaSource) };
 
@@ -58,14 +65,46 @@ function run(opts: { presentation?: MaybeResolvedPresentation; trackId?: string;
 }
 
 describe('syncLiveSeekableRange', () => {
-  it('declares the full live window as seekable', () => {
-    const ms = fakeMediaSource();
-    const cleanup = run({ presentation: makePresentation(), trackId: 'v-1', mediaSource: ms });
+  it('clamps earlier audio windows to zero and skips empty ranges', () => {
+    // Audio may precede presentation-0 and become the only selected type when
+    // capability probing deselects video. Windows ending at/before 0 are empty.
+    for (const [start, expectedRanges] of [
+      [-2, [[0, 8]]],
+      [-10, []],
+      [-12, []],
+    ] as const) {
+      const presentation = makePresentation();
+      // SAFETY: makePresentation contains one resolved video track.
+      const video = presentation.selectionSets[0]!.switchingSets[0]!.tracks[0] as VideoTrack;
+      const audio: AudioTrack = {
+        ...video,
+        type: 'audio',
+        id: 'a-1',
+        url: 'https://example.com/audio.m3u8',
+        mimeType: 'audio/mp4',
+        codecs: ['mp4a.40.2'],
+        groupId: 'audio',
+        name: 'Default',
+        sampleRate: 48_000,
+        channels: 2,
+        segments: video.segments.map((segment, i) => ({ ...segment, startTime: start + i * 2 })),
+      };
 
-    // [first.startTime, last.startTime + last.duration] = [100, 110].
-    expect(ms.setLiveSeekableRange).toHaveBeenCalledWith(100, 110);
+      presentation.selectionSets.push({
+        id: 'audio-set',
+        type: 'audio',
+        switchingSets: [{ id: 'as', type: 'audio', tracks: [audio] }],
+      });
 
-    cleanup();
+      const ms = fakeMediaSource();
+      const cleanup = run({ presentation, audioTrackId: 'a-1', mediaSource: ms });
+
+      try {
+        expect(ms.setLiveSeekableRange.mock.calls).toEqual(expectedRanges);
+      } finally {
+        cleanup();
+      }
+    }
   });
 
   it('declares only once the MediaSource is published (open)', async () => {

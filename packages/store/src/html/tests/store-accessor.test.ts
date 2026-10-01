@@ -27,19 +27,6 @@ describe('StoreAccessor', () => {
       expect(_accessor).toBeDefined();
     });
 
-    it('calls onAvailable on hostConnected', () => {
-      const { store } = createCoreTestStore();
-      const host = createTestHost();
-      const onAvailable = vi.fn();
-
-      const accessor = new StoreAccessor(host, store, onAvailable);
-
-      accessor.hostConnected();
-
-      expect(onAvailable).toHaveBeenCalledWith(store);
-      expect(onAvailable).toHaveBeenCalledTimes(1);
-    });
-
     it('calls onAvailable on each reconnect', () => {
       const { store } = createCoreTestStore();
       const host = createTestHost();
@@ -49,6 +36,7 @@ describe('StoreAccessor', () => {
 
       // First connect
       accessor.hostConnected();
+      expect(onAvailable).toHaveBeenCalledWith(store);
       expect(onAvailable).toHaveBeenCalledTimes(1);
 
       // Simulate reconnect
@@ -71,6 +59,6 @@ describe('StoreAccessor', () => {
 
     // Note: Testing actual context provider behavior requires
     // a full DOM hierarchy with a provider element, which is
-    // tested in create-store.test.ts integration tests
+    // tested in packages/html/src/player/tests/create-player.test.ts
   });
 });

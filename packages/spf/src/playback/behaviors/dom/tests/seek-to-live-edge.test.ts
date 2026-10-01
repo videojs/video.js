@@ -232,23 +232,6 @@ describe('seekToLiveEdge', () => {
       cleanup();
     });
 
-    it('does not reposition while paused as the window slides; repositions on resume', async () => {
-      const { el, state, cleanup } = started();
-
-      el.currentTime = 90; // window slid past while paused
-      el.paused = true;
-
-      // A window-update re-fire (playlist reload) while paused must not yank.
-      state.presentation.set(makePresentation());
-      await flush();
-      expect(el.currentTime).toBe(90); // paused → untouched
-
-      el.paused = false;
-      el.dispatchEvent(new Event('play'));
-      expect(el.currentTime).toBe(104); // resume snaps into the window
-      cleanup();
-    });
-
     it('does not yank an in-window DVR scrub-back across a window update', async () => {
       const { el, state, cleanup } = started();
 

@@ -11,6 +11,16 @@ describe('createShadowStyle', () => {
     const result = createShadowStyle('div { color: red; }');
 
     expect(result).toBeInstanceOf(CSSStyleSheet);
+
+    // SAFETY: The instance assertion above establishes the constructed-sheet branch.
+    const sheet = result as CSSStyleSheet;
+
+    expect(sheet.cssRules).toHaveLength(1);
+    // SAFETY: The single authored rule is a style rule for the div selector.
+    const rule = sheet.cssRules[0] as CSSStyleRule;
+
+    expect(rule.selectorText).toBe('div');
+    expect(rule.style.getPropertyValue('color')).toBe('red');
   });
 
   it('returns raw CSS string when CSSStyleSheet is unavailable', () => {
@@ -88,15 +98,26 @@ describe('applyShadowStyles', () => {
 
   it('falls back to <style> injection when styles are mixed', () => {
     const host = createHost();
+    const shadowRoot = host.shadowRoot!;
     const sheet = new CSSStyleSheet();
 
     sheet.replaceSync('div { color: red; }');
     const css = 'div { color: blue; }';
+    const adopt = vi.fn();
 
-    applyShadowStyles(host.shadowRoot!, [sheet, css]);
-    const styleEls = host.shadowRoot!.querySelectorAll('style');
+    Object.defineProperty(shadowRoot, 'adoptedStyleSheets', {
+      get: () => [],
+      set: adopt,
+      configurable: true,
+    });
 
-    expect(styleEls.length).toBe(2);
+    applyShadowStyles(shadowRoot, [sheet, css]);
+
+    expect(adopt).not.toHaveBeenCalled();
+    expect([...shadowRoot.querySelectorAll('style')].map((style) => style.textContent)).toEqual([
+      'div { color: red; }',
+      css,
+    ]);
   });
 });
 

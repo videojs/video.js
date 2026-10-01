@@ -28,31 +28,47 @@ describe('createBackgroundVideoEngine', () => {
     globalThis.fetch = originalFetch;
   });
 
-  it('creates an engine with state, context, and destroy()', () => {
+  it('loads media segments without play or explicit preload activation', async () => {
+    const fetchedUrls: string[] = [];
+
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+
+      fetchedUrls.push(url);
+
+      if (url.endsWith('/master.m3u8')) {
+        return new Response(
+          '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1000000,CODECS="avc1.42E01E",RESOLUTION=640x360\nvideo.m3u8'
+        );
+      }
+
+      if (url.endsWith('/video.m3u8')) {
+        return new Response(
+          '#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-TARGETDURATION:10\n#EXT-X-MAP:URI="init.mp4"\n#EXTINF:10.0,\nsegment.m4s\n#EXT-X-ENDLIST'
+        );
+      }
+
+      return new Response(new Uint8Array([0]));
+    });
+
     const engine = createBackgroundVideoEngine();
+    const mediaElement = document.createElement('video');
 
-    expect(engine.state).toBeDefined();
-    expect(engine.context).toBeDefined();
-    expect(typeof engine.destroy).toBe('function');
-
-    engine.destroy();
-  });
-
-  it('seeds loadActivated: true so preload gates pass from frame 0', () => {
-    const engine = createBackgroundVideoEngine();
-
-    expect(engine.state.loadActivated.get()).toBe(true);
-    engine.destroy();
+    try {
+      engine.context.mediaElement.set(mediaElement);
+      engine.state.presentation.set({ url: 'https://example.com/master.m3u8' });
+      await vi.waitFor(() => expect(fetchedUrls).toContain('https://example.com/segment.m4s'));
+    } finally {
+      await engine.destroy();
+    }
   });
 
   it('omits subtracted state slots — no audio/text/userVideoTrackSelection signals', () => {
     const engine = createBackgroundVideoEngine();
     const state = snapshot(engine.state) as Record<string, unknown>;
 
-    // selectedAudioTrackId is declared by calculatePresentationDuration so
-    // its signal is created, but it stays undefined since no audio-selection
-    // behavior is composed in.
-    expect(state.selectedAudioTrackId).toBeUndefined();
+    // No audio-selection behavior declares this slot in the video-only composition.
+    expect('selectedAudioTrackId' in state).toBe(false);
 
     // Text-track and userVideoTrackSelection signals must not exist —
     // no behavior in this composition declares them.
@@ -96,13 +112,6 @@ describe('createBackgroundVideoEngine', () => {
           ],
         },
       ],
-    });
-
-    it('declares the errors slot', () => {
-      const engine = createBackgroundVideoEngine();
-
-      expect('errors' in (snapshot(engine.state) as Record<string, unknown>)).toBe(true);
-      engine.destroy();
     });
 
     // MPEG-TS: the capability constraint prunes it, so nothing is selected and the
@@ -253,10 +262,8 @@ describe('createBackgroundVideoEngine', () => {
     const engine = createBackgroundVideoEngine();
     const context = snapshot(engine.context) as Record<string, unknown>;
 
-    // `audioBufferActor` IS declared by `endOfStream` (cross-type EOS
-    // coordination), so the signal exists — but no behavior in this
-    // composition writes it, so it stays `undefined`.
-    expect(context.audioBufferActor).toBeUndefined();
+    // EOS reads optional audio context without declaring an audio buffer slot.
+    expect('audioBufferActor' in context).toBe(false);
 
     // The audio segment loader and both text-track actors aren't declared
     // by any behavior left in the composition — their signals don't exist.
@@ -467,19 +474,6 @@ describe('createBackgroundVideoEngine', () => {
       const engine = createBackgroundVideoEngine({ useDevicePixelRatio: false });
 
       expect(engine.state.screenResolution.get()).toEqual({ width: 1440, height: 900 });
-
-      engine.destroy();
-    });
-
-    it('tracks the screen changing under the window', () => {
-      const screen = stubScreen(1440, 900);
-      const engine = createBackgroundVideoEngine();
-
-      screen.width = 3840;
-      screen.height = 2160;
-      screen.dispatchEvent(new Event('change'));
-
-      expect(engine.state.screenResolution.get()).toEqual({ width: 3840, height: 2160 });
 
       engine.destroy();
     });

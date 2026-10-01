@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { collectUnhandledRejections } from '../../tests/test-helpers';
 import { createScreenOrientationLock } from '../orientation';
 
 function stubOrientation(orientation: Partial<ScreenOrientation>) {
@@ -9,21 +10,6 @@ function stubOrientation(orientation: Partial<ScreenOrientation>) {
 describe('createScreenOrientationLock', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
-  });
-
-  it('locks the requested orientation type', async () => {
-    const orientation = {
-      lock: vi.fn(async () => {}),
-      unlock: vi.fn(),
-    };
-
-    stubOrientation(orientation);
-
-    const screenLock = createScreenOrientationLock();
-
-    await screenLock.lock('portrait');
-
-    expect(orientation.lock).toHaveBeenCalledWith('portrait');
   });
 
   it('re-locks when the requested type changes', async () => {
@@ -70,7 +56,7 @@ describe('createScreenOrientationLock', () => {
     const screenLock = createScreenOrientationLock();
 
     await expect(screenLock.lock('landscape')).resolves.toBeUndefined();
-    expect(() => screenLock.unlock()).not.toThrow();
+    screenLock.unlock();
   });
 
   it('releases orientation when unlock runs before lock settles', async () => {
@@ -196,15 +182,16 @@ describe('createScreenOrientationLock', () => {
 
     await expect(rejectedLock.lock('landscape')).resolves.toBeUndefined();
     rejectedLock.unlock();
-
     expect(orientation.unlock).not.toHaveBeenCalled();
 
     const acceptedLock = createScreenOrientationLock();
 
     orientation.lock.mockResolvedValue(undefined);
-
     await acceptedLock.lock('landscape');
 
-    expect(() => acceptedLock.unlock()).not.toThrow();
+    const reasons = await collectUnhandledRejections(() => acceptedLock.unlock());
+
+    expect(orientation.unlock).toHaveBeenCalledOnce();
+    expect(reasons).toEqual([]);
   });
 });

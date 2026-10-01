@@ -87,7 +87,8 @@ export default defineConfig({
       },
       'test:ci': {
         ...packageTestTask('pnpm run test:types && vp test run'),
-        dependsOn: ['generate'],
+        // The React target test imports `@videojs/react` exports, which skins doesn't otherwise depend on.
+        dependsOn: ['generate', '@videojs/react#build'],
       },
     },
   },

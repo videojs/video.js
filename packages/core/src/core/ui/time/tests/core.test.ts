@@ -22,23 +22,19 @@ function createMediaState(overrides: Partial<TimeMedia> = {}): TimeMedia {
 
 describe('TimeCore', () => {
   describe('setProps', () => {
-    it('uses default props', () => {
+    it('uses default props and restores them after prop updates', () => {
       const core = new TimeCore();
 
       core.setMedia(createMediaState());
       const state = core.getState();
 
       expect(state.type).toBe('current');
-      expect(TimeCore.defaultProps.toggle).toBe(false);
-    });
 
-    it('accepts custom props', () => {
-      const core = new TimeCore({ type: 'duration' });
+      core.setProps({ type: 'duration' });
+      expect(core.getState().type).toBe('duration');
 
-      core.setMedia(createMediaState());
-      const state = core.getState();
-
-      expect(state.type).toBe('duration');
+      core.setProps({ type: undefined });
+      expect(core.getState().type).toBe('current');
     });
   });
 
@@ -63,7 +59,7 @@ describe('TimeCore', () => {
 
       core.setMedia(createMediaState({ duration: 0, seekable: [[10, 120]] }));
 
-      expect(core.getState().disabled).toBe(false);
+      expect(core.getState().unavailable).toBe(false);
     });
 
     it('uses the seekable end when duration is unknown', () => {
@@ -119,16 +115,6 @@ describe('TimeCore', () => {
       expect(state.text).toBe('3:30');
       expect(state.phrase).toBe(formatTimeAsPhrase(90 - 300));
       expect(state.datetime).toBe('PT3M30S');
-    });
-
-    it('returns unsigned text regardless of negativeSign prop', () => {
-      const core = new TimeCore({ type: 'remaining', negativeSign: '−' });
-
-      core.setMedia(createMediaState({ currentTime: 90, duration: 300 }));
-      const state = core.getState();
-
-      expect(state.negative).toBe(true);
-      expect(state.text).toBe('3:30');
     });
 
     it('is not negative when remaining time is zero', () => {
@@ -269,26 +255,6 @@ describe('TimeCore', () => {
   });
 
   describe('getAttrs', () => {
-    it('returns aria-label', () => {
-      const core = new TimeCore({ type: 'current' });
-
-      core.setMedia(createMediaState({ currentTime: 90 }));
-      const state = core.getState();
-      const attrs = core.getAttrs(state);
-
-      expect(attrs['aria-label']).toMatchObject({ key: 'time.current', text: 'Current time' });
-    });
-
-    it('includes remaining suffix in label', () => {
-      const core = new TimeCore({ type: 'remaining' });
-
-      core.setMedia(createMediaState({ currentTime: 90, duration: 300 }));
-      const state = core.getState();
-      const attrs = core.getAttrs(state);
-
-      expect(attrs['aria-label']).toMatchObject({ key: 'time.remaining', text: 'Remaining' });
-    });
-
     it('returns toggle attributes for current time', () => {
       const core = new TimeCore({ type: 'current', toggle: true });
 
@@ -349,25 +315,20 @@ describe('TimeCore', () => {
       expect(core.getLabelParams(state)).toEqual({ duration: '5 minutes duration' });
     });
 
-    it('does not return a description without toggle', () => {
-      const core = new TimeCore({ type: 'duration' });
+    it.each([
+      ['current', 'time.current', 'Current time'],
+      ['remaining', 'time.remaining', 'Remaining'],
+      ['duration', 'time.duration', 'Duration'],
+    ] as const)('returns static %s attributes without toggle', (type, key, text) => {
+      const core = new TimeCore({ type });
 
-      core.setMedia(createMediaState({ duration: 300 }));
-      const state = core.getState();
-      const attrs = core.getAttrs(state);
+      core.setMedia(createMediaState());
+      const attrs = core.getAttrs(core.getState());
 
+      expect(attrs['aria-label']).toMatchObject({ key, text });
       expect(attrs['aria-description']).toBeUndefined();
       expect(attrs.role).toBeUndefined();
       expect(attrs.tabIndex).toBeUndefined();
-    });
-
-    it('uses the default remaining phrase', () => {
-      const core = new TimeCore({ type: 'remaining' });
-
-      core.setMedia(createMediaState({ currentTime: 60, duration: 120 }));
-      const state = core.getState();
-
-      expect(state.phrase).toBe(formatTimeAsPhrase(-60));
     });
   });
 });

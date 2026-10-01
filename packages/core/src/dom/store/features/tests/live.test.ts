@@ -59,56 +59,25 @@ describe('liveFeature', () => {
       expect(store.state.targetLiveWindow).toBe(Number.POSITIVE_INFINITY);
     });
 
-    it('re-reads `liveEdgeStart` on `progress`', () => {
-      const media = createLiveMedia({ liveEdgeStart: 42, targetLiveWindow: 0 });
-
+    it.each([
+      ['progress', 42, 100, 0],
+      ['durationchange', 42, 200, 0],
+      ['loadedmetadata', Number.NaN, 50, 0],
+      ['canplay', Number.NaN, 40, 0],
+      ['streamtypechange', 42, Number.NaN, 0],
+      ['emptied', 42, Number.NaN, Number.NaN],
+    ] as const)('re-reads live state on %s', (event, initial, liveEdgeStart, targetLiveWindow) => {
+      const media = createLiveMedia({ liveEdgeStart: initial, targetLiveWindow: 0 });
       const store = createStore<PlayerTarget>()(liveFeature);
 
       store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
 
-      media.liveEdgeStart = 100;
-      media.dispatchEvent(new Event('progress'));
+      media.liveEdgeStart = liveEdgeStart;
+      media.targetLiveWindow = targetLiveWindow;
+      media.dispatchEvent(new Event(event));
 
-      expect(store.state.liveEdgeStart).toBe(100);
-    });
-
-    it('re-reads `liveEdgeStart` on `durationchange`', () => {
-      const media = createLiveMedia({ liveEdgeStart: 42, targetLiveWindow: 0 });
-
-      const store = createStore<PlayerTarget>()(liveFeature);
-
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
-
-      media.liveEdgeStart = 200;
-      media.dispatchEvent(new Event('durationchange'));
-
-      expect(store.state.liveEdgeStart).toBe(200);
-    });
-
-    it('re-reads `liveEdgeStart` on `loadedmetadata`', () => {
-      const media = createLiveMedia({ liveEdgeStart: Number.NaN, targetLiveWindow: 0 });
-
-      const store = createStore<PlayerTarget>()(liveFeature);
-
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
-
-      media.liveEdgeStart = 50;
-      media.dispatchEvent(new Event('loadedmetadata'));
-
-      expect(store.state.liveEdgeStart).toBe(50);
-    });
-
-    it('re-reads `liveEdgeStart` on `canplay`', () => {
-      const media = createLiveMedia({ liveEdgeStart: Number.NaN, targetLiveWindow: 0 });
-
-      const store = createStore<PlayerTarget>()(liveFeature);
-
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
-
-      media.liveEdgeStart = 40;
-      media.dispatchEvent(new Event('canplay'));
-
-      expect(store.state.liveEdgeStart).toBe(40);
+      expect(store.state.liveEdgeStart).toBe(liveEdgeStart);
+      expect(store.state.targetLiveWindow).toBe(targetLiveWindow);
     });
 
     it('re-reads `liveEdgeStart` on `timeupdate` (tracks moving live edge)', () => {
@@ -125,34 +94,6 @@ describe('liveFeature', () => {
       media.liveEdgeStart = 44;
       media.dispatchEvent(new Event('timeupdate'));
       expect(store.state.liveEdgeStart).toBe(44);
-    });
-
-    it('re-reads `liveEdgeStart` on `streamtypechange`', () => {
-      const media = createLiveMedia({ liveEdgeStart: 42, targetLiveWindow: 0 });
-
-      const store = createStore<PlayerTarget>()(liveFeature);
-
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
-
-      media.liveEdgeStart = Number.NaN;
-      media.dispatchEvent(new Event('streamtypechange'));
-
-      expect(store.state.liveEdgeStart).toBeNaN();
-    });
-
-    it('resets on `emptied`', () => {
-      const media = createLiveMedia({ liveEdgeStart: 42, targetLiveWindow: 0 });
-
-      const store = createStore<PlayerTarget>()(liveFeature);
-
-      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
-
-      media.liveEdgeStart = Number.NaN;
-      media.targetLiveWindow = Number.NaN;
-      media.dispatchEvent(new Event('emptied'));
-
-      expect(store.state.liveEdgeStart).toBeNaN();
-      expect(store.state.targetLiveWindow).toBeNaN();
     });
   });
 });

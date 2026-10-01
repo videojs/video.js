@@ -57,12 +57,18 @@ describe('DOM layout utilities', () => {
     const element = document.createElement('div');
 
     element.style.setProperty('width', '80px', 'important');
-    setDimensions(element, { rectWidth: 160, rectHeight: 90 });
+    const measure = vi.spyOn(element, 'getBoundingClientRect').mockImplementation(() => {
+      expect(element.style.getPropertyValue('width')).toBe('max-content');
+      expect(element.style.getPropertyValue('min-width')).toBe('0px');
+
+      return new DOMRect(0, 0, 160, 90);
+    });
 
     expect(measureElement(element, { styles: { width: 'max-content', minWidth: '0px' } })).toEqual({
       width: 160,
       height: 90,
     });
+    expect(measure).toHaveBeenCalledOnce();
     expect(element.style.getPropertyValue('width')).toBe('80px');
     expect(element.style.getPropertyPriority('width')).toBe('important');
     expect(element.style.getPropertyValue('min-width')).toBe('');

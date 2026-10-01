@@ -17,15 +17,6 @@ describe('VolumeIndicatorCore', () => {
     expect(core.state.current.fill).toBe('55%');
   });
 
-  it('accumulates volume steps from sequential media snapshots', () => {
-    const core = new VolumeIndicatorCore();
-
-    core.processEvent({ action: 'volumeStep', value: 0.05 }, { volume: 0.5, muted: false });
-    core.processEvent({ action: 'volumeStep', value: 0.05 }, { volume: 0.55, muted: false });
-
-    expect(core.state.current.value).toBe('60%');
-  });
-
   it('uses snapshot volume after mute feedback showed 0%', () => {
     const core = new VolumeIndicatorCore();
 

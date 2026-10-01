@@ -260,11 +260,21 @@ describe('HlsVideoMediaTracksMixin', () => {
     engine.state.selectedVideoTrackId.set('lo');
     await flush();
 
+    const mainTrack = host.videoTracks[0];
+    const renditions = [...host.videoRenditions];
+
     // New presentation object, identical rendition set (as a live refresh does).
     engine.state.presentation.set(presentation(tracks.map((t) => ({ ...t }))));
     await flush();
 
-    // Set-equality gate means no rebuild; the reflected active state survives.
+    // A reload preserves the objects consumers already hold, as well as their state.
+    expect(host.videoTracks[0]).toBe(mainTrack);
+    expect(host.videoRenditions.length).toBe(renditions.length);
+
+    for (const [index, rendition] of renditions.entries()) {
+      expect(host.videoRenditions[index]).toBe(rendition);
+    }
+
     expect([...host.videoRenditions].map((r: any) => r.active)).toEqual([false, true]);
   });
 

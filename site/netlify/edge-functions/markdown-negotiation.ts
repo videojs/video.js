@@ -2,8 +2,6 @@ import type { Config } from '@netlify/edge-functions';
 
 import { handleMarkdown, type MarkdownContext, prefersMarkdown } from '../../src/utils/markdown-handler.ts';
 
-export { prefersMarkdown };
-
 export default async function markdownNegotiation(request: Request, context: MarkdownContext) {
   // trailing-slash.ts redirects slash URLs to the canonical page URL, which is where negotiation happens.
   if (new URL(request.url).pathname.endsWith('/')) return;

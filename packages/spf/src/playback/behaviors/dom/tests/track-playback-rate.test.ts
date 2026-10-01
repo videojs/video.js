@@ -42,21 +42,6 @@ describe('trackPlaybackRate', () => {
     cleanup();
   });
 
-  it('updates playbackRate on ratechange events', async () => {
-    const mediaElement = document.createElement('video');
-
-    const { state, cleanup } = setupTrackPlaybackRate({}, { mediaElement });
-
-    mediaElement.playbackRate = 2;
-    mediaElement.dispatchEvent(new Event('ratechange'));
-
-    await vi.waitFor(() => {
-      expect(state.playbackRate.get()).toBe(2);
-    });
-
-    cleanup();
-  });
-
   it('continues tracking on subsequent ratechange events', async () => {
     const mediaElement = document.createElement('video');
 
@@ -69,6 +54,10 @@ describe('trackPlaybackRate', () => {
     mediaElement.playbackRate = 1.5;
     mediaElement.dispatchEvent(new Event('ratechange'));
     await vi.waitFor(() => expect(state.playbackRate.get()).toBe(1.5));
+
+    mediaElement.playbackRate = 2;
+    mediaElement.dispatchEvent(new Event('ratechange'));
+    await vi.waitFor(() => expect(state.playbackRate.get()).toBe(2));
 
     cleanup();
   });
@@ -112,29 +101,6 @@ describe('trackPlaybackRate', () => {
     context.mediaElement.set(undefined);
 
     await vi.waitFor(() => expect(state.playbackRate.get()).toBe(1.5));
-
-    cleanup();
-  });
-
-  it('continues tracking correctly after context updates with unchanged mediaElement', async () => {
-    const mediaElement = document.createElement('video');
-    const ratechangeHandler = vi.fn();
-
-    mediaElement.addEventListener('ratechange', ratechangeHandler);
-
-    const { state, context, cleanup } = setupTrackPlaybackRate({}, { mediaElement });
-
-    await vi.waitFor(() => expect(state.playbackRate.get()).toBe(1));
-
-    // Re-set mediaElement to the same instance — effect may re-run but no duplicate handling
-    context.mediaElement.set(mediaElement);
-    await new Promise((resolve) => setTimeout(resolve, 30));
-
-    // ratechange should still update state exactly once
-    mediaElement.playbackRate = 2;
-    mediaElement.dispatchEvent(new Event('ratechange'));
-
-    await vi.waitFor(() => expect(state.playbackRate.get()).toBe(2));
 
     cleanup();
   });

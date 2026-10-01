@@ -17,12 +17,6 @@ function createTestLayer(overrides?: Partial<Parameters<typeof createDismissLaye
 }
 
 describe('createDismissLayer', () => {
-  it('starts closed', () => {
-    const { layer } = createTestLayer();
-
-    expect(layer.input.current).toEqual({ active: false, status: 'idle' });
-  });
-
   describe('open', () => {
     it('starts the open transition', () => {
       const { layer } = createTestLayer();
@@ -244,15 +238,6 @@ describe('createDismissLayer', () => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
       expect(onEscapeDismiss).not.toHaveBeenCalled();
-    });
-
-    it('is idempotent', () => {
-      const { layer } = createTestLayer();
-
-      layer.destroy();
-      layer.destroy();
-
-      expect(layer.signal.aborted).toBe(true);
     });
   });
 });

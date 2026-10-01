@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { StatusAnnouncerCore } from '../../../core/ui/status-announcer/core';
 import { type StatusAnnouncerStore, subscribeToStatusAnnouncer } from '../status-announcer';
@@ -6,17 +6,14 @@ import { type StatusAnnouncerStore, subscribeToStatusAnnouncer } from '../status
 describe('subscribeToStatusAnnouncer', () => {
   it('uses attach updates as the snapshot baseline', async () => {
     const core = new StatusAnnouncerCore();
-    const resetSnapshot = vi.spyOn(core, 'resetSnapshot');
     const { attach, setState, store } = createStore({ paused: true });
     const unsubscribe = subscribeToStatusAnnouncer(store, core);
 
-    expect(resetSnapshot).toHaveBeenCalledTimes(1);
+    // Place a state update between the obsolete and current baseline microtasks.
+    queueMicrotask(() => setState({ paused: false }));
 
-    attach({ paused: false });
-    expect(resetSnapshot).toHaveBeenCalledTimes(2);
+    attach({ paused: true });
     await Promise.resolve();
-
-    expect(resetSnapshot).toHaveBeenCalledTimes(2);
 
     expect(core.state.current.label).toBeNull();
 

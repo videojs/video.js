@@ -9,7 +9,7 @@ describe('getDocTitle', () => {
     id: 'components/play-button',
     collection: 'docs',
     data: {
-      title: 'PlayButton',
+      title: 'Playback control',
       description: 'A button component for playing and pausing media playback',
       type: 'reference',
       frameworkTitle: {
@@ -38,7 +38,7 @@ describe('getDocTitle', () => {
     id: 'components/mute-button',
     collection: 'docs',
     data: {
-      title: 'MuteButton',
+      title: 'Mute control',
       description: 'A button for muting audio',
       type: 'reference',
       frameworkTitle: {
@@ -58,27 +58,6 @@ describe('getDocTitle', () => {
       expect(reactTitle).toBe('PlayButton');
       expect(htmlTitle).toBe('play-button');
     });
-
-    it('should return react title for react framework', () => {
-      const result = getDocTitle(mockDocWithFrameworkTitle, 'react');
-
-      expect(result).toBe('PlayButton');
-    });
-
-    it('should return html title for html framework', () => {
-      const result = getDocTitle(mockDocWithFrameworkTitle, 'html');
-
-      expect(result).toBe('play-button');
-    });
-
-    it('should handle different titles for different frameworks', () => {
-      const reactTitle = getDocTitle(mockDocWithFrameworkTitle, 'react');
-      const htmlTitle = getDocTitle(mockDocWithFrameworkTitle, 'html');
-
-      expect(reactTitle).not.toBe(htmlTitle);
-      expect(reactTitle).toBe('PlayButton');
-      expect(htmlTitle).toBe('play-button');
-    });
   });
 
   describe('without frameworkTitle', () => {
@@ -88,13 +67,6 @@ describe('getDocTitle', () => {
 
       expect(reactTitle).toBe('Basic Concepts');
       expect(htmlTitle).toBe('Basic Concepts');
-    });
-
-    it('should return same title for both frameworks when no frameworkTitle', () => {
-      const reactTitle = getDocTitle(mockDocWithoutFrameworkTitle, 'react');
-      const htmlTitle = getDocTitle(mockDocWithoutFrameworkTitle, 'html');
-
-      expect(reactTitle).toBe(htmlTitle);
     });
   });
 
@@ -108,7 +80,7 @@ describe('getDocTitle', () => {
     it('should fall back to default title when framework not in frameworkTitle', () => {
       const htmlTitle = getDocTitle(mockDocWithPartialFrameworkTitle, 'html');
 
-      expect(htmlTitle).toBe('MuteButton'); // Falls back to default title
+      expect(htmlTitle).toBe('Mute control');
     });
   });
 

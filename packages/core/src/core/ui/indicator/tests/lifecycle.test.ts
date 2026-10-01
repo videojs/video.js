@@ -19,7 +19,7 @@ const IDLE_STATE: TestState = {
   transitionEnding: false,
 };
 
-describe('indicator-lifecycle', () => {
+describe('getRenderedIndicatorState', () => {
   it('keeps the snapshot payload while an indicator transitions out', () => {
     const snapshot: TestState = {
       ...IDLE_STATE,
@@ -37,12 +37,17 @@ describe('indicator-lifecycle', () => {
     expect(rendered.value).toBe('Paused');
     expect(rendered.transitionEnding).toBe(true);
   });
+});
 
+describe('isIndicatorPresent', () => {
   it('stays present until both logical state and transition are inactive', () => {
+    expect(isIndicatorPresent({ open: true }, { active: false })).toBe(true);
     expect(isIndicatorPresent(IDLE_STATE, { active: true })).toBe(true);
     expect(isIndicatorPresent(IDLE_STATE, { active: false })).toBe(false);
   });
+});
 
+describe('IndicatorVisibilityCoordinator', () => {
   it('closes registered indicators when another indicator is shown', () => {
     const coordinator = new IndicatorVisibilityCoordinator();
     const first = { close: vi.fn() };

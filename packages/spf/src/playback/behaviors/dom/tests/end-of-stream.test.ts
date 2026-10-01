@@ -378,32 +378,40 @@ describe('endOfStream', () => {
 
   it('aborts in-flight wait when presentation is cleared mid-flight', async () => {
     const track = makeResolvedVideoTrack(4);
-    // SourceBuffer that stays `updating` so waitForSourceBuffersReady
-    // never resolves on its own.
-    const buffer = {
+    const target = Object.assign(new EventTarget(), {
       buffered: { length: 0, start: () => 0, end: () => 0 } as TimeRanges,
       updating: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    } as unknown as SourceBuffer;
-    const mockMs = makeMediaSource({ sourceBuffers: [buffer] });
-
+    });
+    const addEventListener = vi.spyOn(target, 'addEventListener');
+    const mockMs = makeMediaSource({ sourceBuffers: [target as unknown as SourceBuffer] });
+    const actor = makeActorWithSegments(['seg-0', 'seg-1', 'seg-2', 'seg-3']);
     const { state, cleanup } = setupEndOfStream(
       { presentation: makePresentation(track) },
-      {
-        mediaSource: mockMs,
-        videoBufferActor: makeActorWithSegments(['seg-0', 'seg-1', 'seg-2', 'seg-3']),
-      }
+      { mediaSource: mockMs, videoBufferActor: actor }
     );
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(mockMs.endOfStream).not.toHaveBeenCalled();
+    try {
+      await vi.waitFor(() =>
+        expect(addEventListener).toHaveBeenCalledWith('updateend', expect.any(Function), expect.any(Object))
+      );
+      const options = addEventListener.mock.calls.find(([type]) => type === 'updateend')![2] as AddEventListenerOptions;
+      const signal = options.signal!;
 
-    state.presentation.set(undefined);
+      expect(signal.aborted).toBe(false);
+      expect(mockMs.endOfStream).not.toHaveBeenCalled();
+      state.presentation.set(undefined);
+      await vi.waitFor(() => expect(signal.aborted).toBe(true));
 
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(mockMs.endOfStream).not.toHaveBeenCalled();
-    await cleanup();
+      target.updating = false;
+      target.dispatchEvent(new Event('updateend'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(mockMs.endOfStream).not.toHaveBeenCalled();
+    } finally {
+      cleanup();
+      actor.destroy();
+      target.updating = false;
+      target.dispatchEvent(new Event('updateend'));
+    }
   });
 
   it('composes against an audio-only configuration', async () => {

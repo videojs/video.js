@@ -1,102 +1,31 @@
-import { cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { flush } from '@videojs/store';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createPlayerWrapper } from '../../../testing/mocks';
-import { SliderFill } from '../../slider/fill';
+import { createSliderPlayerWrapper as createPlayerWrapper } from '../../slider/tests/support';
 import { SliderThumb } from '../../slider/thumb';
-import { SliderTrack } from '../../slider/track';
 import { SliderValue } from '../../slider/value';
 import { VolumeSliderRoot } from '../root';
 
-// --- Hoisted mock data (available inside vi.mock factories) ---
-
-const { mockSliderApi, mockVolumeState, mutableVolume } = vi.hoisted(() => {
-  const volumeState = {
-    volume: 0.8,
-    muted: false,
-    volumeAvailability: 'available' as const,
-    setVolume: vi.fn(),
-    setMuted: vi.fn(),
-  };
-
-  return {
-    mockSliderApi: () => ({
-      input: {
-        current: {
-          pointerPercent: 0,
-          dragPercent: 0,
-          dragging: false,
-          pointing: false,
-          focused: false,
-        },
-        subscribe: vi.fn(() => vi.fn()),
-      },
-      rootProps: {
-        onPointerDown: vi.fn(),
-        onPointerMove: vi.fn(),
-        onPointerLeave: vi.fn(),
-      },
-      thumbProps: {
-        onKeyDownCapture: vi.fn(),
-        onFocus: vi.fn(),
-        onBlur: vi.fn(),
-      },
-      adjustForAlignment: <S,>(state: S): S => state,
-      destroy: vi.fn(),
-    }),
-    mockVolumeState: volumeState,
-    // Mutable holder so tests can swap between null and available volume.
-    mutableVolume: {
-      current: volumeState as
-        | (Omit<typeof volumeState, 'volumeAvailability'> & {
-            volumeAvailability: 'available' | 'unavailable' | 'unsupported';
-          })
-        | null,
-    },
-  };
-});
-
-// --- Module mocks ---
-
-vi.mock('@videojs/core/dom', async (importOriginal) => {
-  const orig: Record<string, unknown> = await importOriginal();
-
-  return { ...orig, createSlider: vi.fn(mockSliderApi) };
-});
-
-vi.mock('@videojs/store/react', () => ({
-  useSnapshot: vi.fn((state: { current: unknown }) => state.current),
-  useStore: vi.fn((_store: unknown, selector?: (state: object) => unknown) => {
-    if (!selector) return _store;
-
-    // Return the mutable volume state directly for volume selectors.
-    const vol = mutableVolume.current;
-    if (!vol) return undefined;
-
-    try {
-      const result = selector(vol);
-      if (result !== undefined) return result;
-    } catch {
-      // fall through
-    }
-
-    return undefined;
-  }),
-}));
+const mockVolumeState = {
+  volume: 0.8,
+  muted: false,
+  volumeAvailability: 'available' as const,
+  mutedAvailability: 'available' as const,
+  setVolume: vi.fn(),
+  setMuted: vi.fn(),
+};
 
 afterEach(() => {
   cleanup();
-  mutableVolume.current = mockVolumeState;
   mockVolumeState.setVolume.mockClear();
   mockVolumeState.setMuted.mockClear();
 });
 
-// --- Tests ---
-
 describe('VolumeSliderRoot', () => {
   it('renders a div element', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot />
@@ -110,7 +39,7 @@ describe('VolumeSliderRoot', () => {
   });
 
   it('forwards ref', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const ref = createRef<HTMLDivElement>();
 
     render(
@@ -123,7 +52,7 @@ describe('VolumeSliderRoot', () => {
   });
 
   it('spreads additional props', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot data-testid="vol-slider" />
@@ -134,7 +63,7 @@ describe('VolumeSliderRoot', () => {
   });
 
   it('defaults orientation to horizontal', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot />
@@ -147,8 +76,7 @@ describe('VolumeSliderRoot', () => {
   });
 
   it('does not render when volume control is unavailable', () => {
-    mutableVolume.current = { ...mockVolumeState, volumeAvailability: 'unsupported' };
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper({ ...mockVolumeState, volumeAvailability: 'unsupported' });
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot data-testid="vol-slider" />
@@ -159,7 +87,7 @@ describe('VolumeSliderRoot', () => {
   });
 
   it('sets slider CSS custom properties', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot />
@@ -168,35 +96,69 @@ describe('VolumeSliderRoot', () => {
 
     const el = container.querySelector('[data-orientation]') as HTMLElement;
 
-    expect(el?.style.getPropertyValue('--media-slider-fill')).toBeTruthy();
-    expect(el?.style.getPropertyValue('--media-slider-pointer')).toBeTruthy();
+    expect(el?.style.getPropertyValue('--media-slider-fill')).toBe('80.000%');
+    expect(el?.style.getPropertyValue('--media-slider-pointer')).toBe('0.000%');
   });
-});
 
-describe('VolumeSlider compound', () => {
-  it('renders all parts together', () => {
-    const { Wrapper } = createPlayerWrapper();
-    const { container } = render(
+  it('commits the step-rounded volume displayed while dragging', () => {
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
+    const { getByTestId, getByRole } = render(
       <Wrapper>
-        <VolumeSliderRoot data-testid="root">
-          <SliderTrack data-testid="track">
-            <SliderFill data-testid="fill" />
-            <SliderThumb data-testid="thumb" />
-          </SliderTrack>
-          <SliderValue data-testid="value" />
+        <VolumeSliderRoot step={10} data-testid="root">
+          <SliderThumb />
         </VolumeSliderRoot>
       </Wrapper>
     );
 
-    expect(container.querySelector('[data-testid="root"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="track"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="fill"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="thumb"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="value"]')).toBeTruthy();
+    const root = getByTestId('root');
+
+    root.getBoundingClientRect = () => new DOMRect(0, 0, 100, 10);
+    root.setPointerCapture = vi.fn();
+    root.releasePointerCapture = vi.fn();
+
+    const pointer = (type: string, clientX: number) => {
+      const event = new MouseEvent(type, { clientX, clientY: 5, button: 0, buttons: 1, bubbles: true });
+
+      Object.defineProperties(event, {
+        pointerId: { value: 1 },
+        pointerType: { value: 'mouse' },
+      });
+      fireEvent(root, event);
+    };
+
+    pointer('pointerdown', 20);
+    pointer('pointermove', 37);
+    act(() => flush());
+
+    expect(getByRole('slider').getAttribute('aria-valuenow')).toBe('40');
+
+    pointer('pointerup', 37);
+
+    expect(mockVolumeState.setVolume).toHaveBeenLastCalledWith(0.4);
   });
 
+  it.each([
+    { wheelStep: 5, deltaY: 120, expectedVolume: 0.75 },
+    { wheelStep: 5, deltaY: -120, expectedVolume: 0.85 },
+    { wheelStep: 2, deltaY: 120, expectedVolume: 0.78 },
+    { wheelStep: 2, deltaY: -120, expectedVolume: 0.82 },
+  ])('uses wheelStep=$wheelStep independently of step for deltaY=$deltaY', ({ wheelStep, deltaY, expectedVolume }) => {
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
+    const { getByTestId } = render(
+      <Wrapper>
+        <VolumeSliderRoot step={10} wheelStep={wheelStep} data-testid="root" />
+      </Wrapper>
+    );
+
+    fireEvent.wheel(getByTestId('root'), { deltaY });
+
+    expect(mockVolumeState.setVolume).toHaveBeenCalledExactlyOnceWith(expectedVolume);
+  });
+});
+
+describe('VolumeSlider compound', () => {
   it('thumb receives ARIA attributes from VolumeSliderCore', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot>
@@ -212,7 +174,7 @@ describe('VolumeSlider compound', () => {
   });
 
   it('SliderValue formats as percentage', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
     const { container } = render(
       <Wrapper>
         <VolumeSliderRoot>
@@ -223,7 +185,7 @@ describe('VolumeSlider compound', () => {
 
     const output = container.querySelector('[data-testid="value"]');
 
-    expect(output?.textContent).toContain('%');
+    expect(output?.textContent).toBe('80%');
   });
 });
 
@@ -247,7 +209,7 @@ describe('VolumeSliderRoot wheel handling', () => {
 
     HTMLDivElement.prototype.addEventListener = addSpy as typeof origAdd;
 
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
 
     render(
       <Wrapper>
@@ -262,7 +224,7 @@ describe('VolumeSliderRoot wheel handling', () => {
   });
 
   it('honors disabled prop changes after initial render', () => {
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper } = createPlayerWrapper(mockVolumeState);
 
     // Render with disabled=true, dispatch wheel — setVolume should not be called.
     const { container, rerender } = render(
@@ -290,10 +252,7 @@ describe('VolumeSliderRoot wheel handling', () => {
   });
 
   it('attaches wheel handling when volume appears after initial null', () => {
-    // Start with no volume — component returns null.
-    mutableVolume.current = null;
-
-    const { Wrapper } = createPlayerWrapper();
+    const { Wrapper, update } = createPlayerWrapper();
     const { container, rerender } = render(
       <Wrapper>
         <VolumeSliderRoot />
@@ -304,7 +263,7 @@ describe('VolumeSliderRoot wheel handling', () => {
     expect(container.querySelector('[data-orientation]')).toBeNull();
 
     // Simulate volume becoming available.
-    mutableVolume.current = mockVolumeState;
+    update(mockVolumeState);
     rerender(
       <Wrapper>
         <VolumeSliderRoot />

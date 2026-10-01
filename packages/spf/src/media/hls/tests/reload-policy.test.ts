@@ -46,6 +46,10 @@ describe('mediaPlaylistReloadDelay', () => {
     const slid = track({ targetDuration: 4, mediaSequence: 11, segments: 3 });
 
     expect(mediaPlaylistReloadDelay(slid, prev)).toBe(4000);
+
+    const grew = track({ targetDuration: 4, mediaSequence: 10, segments: 4 });
+
+    expect(mediaPlaylistReloadDelay(grew, prev)).toBe(4000);
   });
 
   it('falls back to 6s when the playlist carries no usable target duration', () => {

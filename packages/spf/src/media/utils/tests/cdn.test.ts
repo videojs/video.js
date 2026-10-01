@@ -57,10 +57,20 @@ describe('getOrderedCdnIds', () => {
   it('lists distinct CDNs across all track types in manifest order', () => {
     const presentation = presentationWith({
       video: ['https://cdn-a.example.com/720p.m3u8', 'https://cdn-b.example.com/720p.m3u8'],
-      audio: ['https://cdn-a.example.com/audio.m3u8', 'https://cdn-b.example.com/audio.m3u8'],
+      audio: [
+        'https://cdn-a.example.com/audio.m3u8',
+        'https://cdn-b.example.com/audio.m3u8',
+        'https://cdn-c.example.com/audio.m3u8',
+      ],
+      text: ['https://cdn-a.example.com/text.m3u8', 'https://cdn-d.example.com/text.m3u8'],
     });
 
-    expect(getOrderedCdnIds(presentation)).toEqual(['https://cdn-a.example.com', 'https://cdn-b.example.com']);
+    expect(getOrderedCdnIds(presentation)).toEqual([
+      'https://cdn-a.example.com',
+      'https://cdn-b.example.com',
+      'https://cdn-c.example.com',
+      'https://cdn-d.example.com',
+    ]);
   });
 
   it('dedupes repeated hosts, keeping first occurrence', () => {

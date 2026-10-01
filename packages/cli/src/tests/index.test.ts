@@ -39,10 +39,6 @@ describe('bin', () => {
     }
   });
 
-  it('prints version-pinned commands for this release', () => {
-    expect(run('agents', 'init')).toContain(`npx @videojs/cli@${packageJson.version} agents init`);
-  });
-
   it('defaults a plain HTML page to CDN scripts', () => {
     const page = mkdtempSync(join(tmpdir(), 'videojs-cli-'));
 
@@ -63,12 +59,67 @@ describe('bin', () => {
     }
   });
 
+  it('discovers React defaults and carries them into a selected plan', () => {
+    const project = mkdtempSync(join(tmpdir(), 'videojs-cli-'));
+
+    try {
+      writeFileSync(join(project, 'package.json'), JSON.stringify({ dependencies: { react: '^18.3.1' } }));
+
+      const discovery = spawnSync(process.execPath, [bin, 'agents', 'init', '--json'], {
+        cwd: project,
+        encoding: 'utf8',
+      });
+      const selected = spawnSync(process.execPath, [bin, 'agents', 'init', '--media', 'hls', '--json'], {
+        cwd: project,
+        encoding: 'utf8',
+      });
+
+      for (const result of [discovery, selected]) {
+        expect(result.status).toBe(0);
+        expect(result.stderr).toBe('');
+      }
+
+      const options = JSON.parse(discovery.stdout).options;
+      const framework = options.find(({ flag }: { flag: string }) => flag === '--framework');
+
+      expect(framework?.default).toBe('react (from package.json dependencies)');
+
+      const plan = JSON.parse(selected.stdout);
+
+      expect(plan.selectedOptions.framework).toBe('react');
+      expect(plan.playerPackage).toBe('@videojs/react');
+      expect(plan.defaultedOptions).toContain('framework');
+      expect(plan.defaultedOptionSources.framework).toBe('package.json dependencies');
+    } finally {
+      rmSync(project, { recursive: true, force: true });
+    }
+  });
+
   it('lists both commands for a bare or top-level help run', () => {
-    for (const output of [run(), run('--help')]) {
-      expect(output).toContain('`npx @videojs/cli agents init`');
-      expect(output).toContain('`npx @videojs/cli agents skills`');
+    for (const args of [[], ['--help'], ['-h']]) {
+      const result = runWithStderr(...args);
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(result.stdout).toContain('- `npx @videojs/cli agents init`:');
+      expect(result.stdout).toContain('- `npx @videojs/cli agents skills`:');
+      expect(result.stdout).not.toContain('## Options');
     }
 
+    const json = runWithStderr('--json');
+    const version = runWithStderr('--version');
+
+    for (const result of [json, version]) {
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+    }
+
+    expect(JSON.parse(json.stdout)).toMatchObject({
+      kind: 'usage',
+      package: '@videojs/cli',
+      commands: [{ command: 'npx @videojs/cli agents init' }, { command: 'npx @videojs/cli agents skills' }],
+    });
+    expect(version.stdout).toBe(`${packageJson.version}\n`);
     expect(run('agents', 'init')).toContain(`npx @videojs/cli@${packageJson.version} agents init`);
   });
 
@@ -119,7 +170,7 @@ describe('bin', () => {
     const result = runWithStderr('agents', 'install');
 
     expect(result.status).toBe(2);
-    expect(result.stderr).toContain('Expected `agents init` or `agents skills`.');
+    expect(result.stderr).toContain('- arguments "agents install": Expected `agents init` or `agents skills`.');
   });
 
   it('bundles the installation renderer so only Node built-ins are imported at runtime', () => {

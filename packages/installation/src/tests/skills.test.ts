@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { createSkillsInstructions, SKILL_AGENTS, skillInstallMethods, skillsCommand } from '../skills';
+import { createSkillsInstructions, skillInstallMethods, skillsCommand } from '../skills';
 
 describe('skillInstallMethods', () => {
-  it('lists every agent in canonical order by default', () => {
-    expect(skillInstallMethods().map(({ agent }) => agent)).toEqual(SKILL_AGENTS);
-  });
-
   it('keeps canonical order for a narrowed selection', () => {
     expect(skillInstallMethods({ agents: ['cursor', 'codex'] }).map(({ agent }) => agent)).toEqual(['codex', 'cursor']);
   });

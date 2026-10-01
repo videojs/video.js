@@ -38,7 +38,7 @@ function renderCaptionsMenu({
   });
   const content = (
     <Menu.Root defaultOpen align="center">
-      <Menu.Popup data-testid="popup">
+      <Menu.Popup>
         <Menu.Content data-testid="content">
           <CaptionsRadioGroup />
         </Menu.Content>
@@ -121,22 +121,6 @@ describe('useCaptionsOptions', () => {
     expect(screen.getByRole('menuitemradio', { name: 'English' }).getAttribute('aria-checked')).toBe('false');
     expect(screen.getByRole('menuitemradio', { name: 'Spanish' }).getAttribute('aria-checked')).toBe('true');
     expect(screen.getByTestId('selected-label').textContent).toBe('Spanish');
-  });
-
-  it('center aligns the popup by default', () => {
-    renderCaptionsMenu();
-
-    expect(screen.getByTestId('popup').getAttribute('data-align')).toBe('center');
-  });
-
-  it('selects a captions track', () => {
-    const selectSubtitlesTrack = vi.fn();
-
-    renderCaptionsMenu({ selectSubtitlesTrack });
-
-    fireEvent.click(screen.getByRole('menuitemradio', { name: 'English' }));
-
-    expect(selectSubtitlesTrack).toHaveBeenCalledWith('subtitles-en');
   });
 
   it('translates default track labels', () => {

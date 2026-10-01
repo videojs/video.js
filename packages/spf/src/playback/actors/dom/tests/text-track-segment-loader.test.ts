@@ -53,17 +53,7 @@ function makeResolvedTextTrack(id: string, segmentUrls: string[]): TextTrack {
   };
 }
 
-describe('TextTrackSegmentLoaderActor', () => {
-  it('can be created and destroyed without error', () => {
-    const resolveVttSegment = createResolveVttSegment();
-    const video = makeMediaElement(['track-en']);
-    const textTracksActor = createTextTracksActor(video);
-    const actor = createTextTrackSegmentLoaderActor(textTracksActor, resolveVttSegment);
-
-    actor.destroy();
-    textTracksActor.destroy();
-  });
-
+describe('createTextTrackSegmentLoaderActor', () => {
   it('does not fetch when no segments need loading', async () => {
     const resolveVttSegment = createResolveVttSegment();
     const video = makeMediaElement(['track-en']);
@@ -140,6 +130,19 @@ describe('TextTrackSegmentLoaderActor', () => {
 
     // Segments 0 and 2 succeeded; the failed segment is not recorded
     await vi.waitFor(() => expect(textTracksActor.snapshot.get().context.segments['track-en']).toHaveLength(2));
+    expect(resolveVttSegment.mock.calls).toEqual([
+      ['https://example.com/seg-0.vtt'],
+      ['https://example.com/fail.vtt'],
+      ['https://example.com/seg-2.vtt'],
+    ]);
+    expect(textTracksActor.snapshot.get().context.segments['track-en']).toEqual([
+      { id: 'seg-0', startTime: 0, duration: 10 },
+      { id: 'seg-2', startTime: 20, duration: 10 },
+    ]);
+    expect(textTracksActor.snapshot.get().context.loaded['track-en']).toMatchObject([
+      { startTime: 0, endTime: 5, text: 'Good' },
+      { startTime: 20, endTime: 25, text: 'Also good' },
+    ]);
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to load text-track segment:', expect.any(Error));
 
     consoleErrorSpy.mockRestore();

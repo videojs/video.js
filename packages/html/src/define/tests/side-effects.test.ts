@@ -49,7 +49,7 @@ describe('sideEffects', () => {
     }
   });
 
-  it('keeps the define entries and the skin stylesheets a define entry imports', () => {
+  it('keeps define and i18n entries side-effectful', () => {
     expect(isSideEffectful('./dist/default/define/video/skin.js')).toBe(true);
     expect(isSideEffectful('./dist/dev/define/ui/container.js')).toBe(true);
     expect(isSideEffectful('./dist/default/i18n/index.js')).toBe(true);

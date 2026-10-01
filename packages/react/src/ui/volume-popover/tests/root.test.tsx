@@ -1,5 +1,5 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { VolumePopover } from '..';
 import { createPlayerWrapper } from '../../../testing/mocks';
@@ -97,9 +97,12 @@ describe('VolumePopover', () => {
   it('closes an open popup when volume level controls become unavailable', async () => {
     const { Wrapper, store } = createPlayerWrapper(availableVolume);
 
+    const onOpenChange = vi.fn();
+    const onOpenChangeComplete = vi.fn();
+
     render(
       <Wrapper>
-        <VolumePopover.Root>
+        <VolumePopover.Root onOpenChange={onOpenChange} onOpenChangeComplete={onOpenChangeComplete}>
           <VolumePopover.Trigger
             render={
               <button type="button" data-testid="trigger">
@@ -115,6 +118,8 @@ describe('VolumePopover', () => {
     fireEvent.click(screen.getByTestId('trigger'));
     await waitFor(() => expect(screen.queryByTestId('popup')).not.toBeNull());
 
+    onOpenChange.mockClear();
+
     act(() => {
       store.state = { ...availableVolume, volumeAvailability: 'unsupported' };
       const subscriptions = store.subscribe.mock.calls as unknown as Array<[() => void]>;
@@ -123,8 +128,23 @@ describe('VolumePopover', () => {
     });
 
     await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'imperative-action' });
       expect(screen.queryByTestId('popup')).toBeNull();
       expect(screen.getByTestId('trigger').hasAttribute('aria-expanded')).toBe(false);
     });
+    await waitFor(() => expect(onOpenChangeComplete).toHaveBeenCalledWith(false));
+
+    act(() => {
+      store.state = availableVolume;
+      const subscriptions = store.subscribe.mock.calls as unknown as Array<[() => void]>;
+
+      for (const [notify] of subscriptions) notify();
+    });
+
+    await waitFor(() => expect(screen.getByTestId('trigger').getAttribute('aria-expanded')).toBe('false'));
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    fireEvent.click(screen.getByTestId('trigger'));
+    await waitFor(() => expect(screen.queryByTestId('popup')).not.toBeNull());
   });
 });

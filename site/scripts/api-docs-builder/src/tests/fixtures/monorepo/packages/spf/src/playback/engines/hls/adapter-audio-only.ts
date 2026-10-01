@@ -7,15 +7,15 @@
  *     the SPF adapters use, reached through the composed adapter's extends chain
  *   - `@fires`-declared events: `audiomodechange` also has a dispatch site,
  *     `manifestparsed` is dispatched from a helper the builder never scans —
- *     the @fires tag is its only source.
+ *     the `@fires` tag is its only source.
  */
 type Constructor<T = object> = new (...args: any[]) => T;
 
 /**
  * Adds SPF audio-only HLS playback to a host.
  *
- * @fires audiomodechange - Fired when the audio-only rendition changes.
  * @fires manifestparsed - Fired after the multivariant playlist is parsed.
+ * @fires audiomodechange - Fired when the audio-only rendition changes.
  */
 export const SpfAudioOnlyMixin = <Base extends Constructor>(BaseClass: Base) => {
   class SpfAudioOnly extends BaseClass {

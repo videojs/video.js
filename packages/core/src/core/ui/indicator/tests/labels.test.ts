@@ -1,8 +1,6 @@
-import { formatTimeAsPhrase } from '@videojs/utils/time';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { createTranslator, type FlatTranslations } from '../../../i18n';
-import { createStatusAnnouncerLabels } from '../../status-announcer/labels';
 import { createInputIndicatorLabels } from '../labels';
 
 describe('createInputIndicatorLabels', () => {
@@ -13,16 +11,6 @@ describe('createInputIndicatorLabels', () => {
     expect(labels.captionsOff).toBe('Sous-titres désactivés');
     expect(labels.paused).toBe('En pause');
     expect(labels.volume).toBe('Volume');
-  });
-});
-
-describe('createStatusAnnouncerLabels', () => {
-  it('maps parameterized announcement phrases', () => {
-    const labels = createStatusAnnouncerLabels(createFrenchTranslator(), 'fr');
-
-    expect(labels.volumeWithValue('80%')).toBe('Volume : 80%');
-    expect(labels.seekedTo(90)).toBe(`Position de lecture : ${formatTimeAsPhrase(90, { locale: 'fr' })}`);
-    expect(labels.playbackRate('1.5×')).toBe('Vitesse de lecture 1.5×');
   });
 });
 

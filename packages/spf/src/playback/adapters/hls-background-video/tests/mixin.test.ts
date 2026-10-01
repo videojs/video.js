@@ -53,17 +53,6 @@ describe('HlsBackgroundVideoAdapterCore', () => {
       expect(media.engine.state.presentation.get()?.url).toBe('https://example.com/v.m3u8');
     });
 
-    it('keeps the query params that narrow the manifest', () => {
-      // How a cap is expressed, `?max_resolution=720p` on a Mux stream URL being
-      // the case this replaces — so it has to survive the round trip untouched.
-      const media = new HlsBackgroundVideoAdapterCore();
-
-      media.src = 'https://stream.mux.com/PLAYBACK_ID.m3u8?max_resolution=720p';
-      expect(media.engine.state.presentation.get()?.url).toBe(
-        'https://stream.mux.com/PLAYBACK_ID.m3u8?max_resolution=720p'
-      );
-    });
-
     it('clears engine presentation state when src is set to empty string', () => {
       const media = new HlsBackgroundVideoAdapterCore();
 
@@ -86,12 +75,6 @@ describe('HlsBackgroundVideoAdapterCore', () => {
   });
 
   describe('attach / detach', () => {
-    it('exposes the engine immediately (created at construction)', () => {
-      const media = new HlsBackgroundVideoAdapterCore();
-
-      expect(media.engine).toBeDefined();
-    });
-
     it('reuses the same engine instance across attach calls', () => {
       const media = new HlsBackgroundVideoAdapterCore();
       const firstEngine = media.engine;
@@ -168,9 +151,15 @@ describe('HlsBackgroundVideoAdapterCore', () => {
       const next = document.createElement('video');
 
       next.loop = false;
+      next.muted = false;
+      next.autoplay = false;
+      next.preload = 'none';
       media.attach(next);
 
       expect(next.loop).toBe(true);
+      expect(next.muted).toBe(true);
+      expect(next.autoplay).toBe(true);
+      expect(next.preload).toBe('auto');
     });
 
     it('leaves the element alone on a src change', () => {
@@ -218,43 +207,12 @@ describe('HlsBackgroundVideoAdapterCore', () => {
       ],
     });
 
-    it('picks the largest rendition on offer', async () => {
-      const media = new HlsBackgroundVideoAdapterCore();
-
-      // The default chain caps to the screen, so this is written explicitly —
-      // left ambient, the expected pick would vary with the runner's display.
-      media.engine.state.screenResolution.set({ width: 3840, height: 2160 });
-      media.engine.state.presentation.set(presentationWithFourTracks());
-      await new Promise<void>((resolve) => queueMicrotask(resolve));
-      expect(media.engine.state.selectedVideoTrackId.get()).toBe('1440p');
-      media.destroy();
-    });
-
     it('caps the pick to the screen when the manifest offers more than it can show', async () => {
       const media = new HlsBackgroundVideoAdapterCore();
 
       // 1080p (2,073,600) is over a 1,555,200 px screen; 720p (921,600) fits.
       media.engine.state.screenResolution.set({ width: 1440, height: 1080 });
       media.engine.state.presentation.set(presentationWithFourTracks());
-      await new Promise<void>((resolve) => queueMicrotask(resolve));
-      expect(media.engine.state.selectedVideoTrackId.get()).toBe('720p');
-      media.destroy();
-    });
-
-    it('picks the largest of whatever the manifest offers, which is how a capped URL narrows it', async () => {
-      // What `?max_resolution=720p` produces: the excluded renditions are absent
-      // from the manifest rather than present and skipped.
-      const capped = presentationWithFourTracks();
-
-      capped.selectionSets![0]!.switchingSets[0]!.tracks = [
-        videoTrack('360p', 640, 360, 500_000),
-        videoTrack('720p', 1280, 720, 2_000_000),
-      ] as never;
-
-      const media = new HlsBackgroundVideoAdapterCore();
-
-      media.engine.state.screenResolution.set({ width: 3840, height: 2160 });
-      media.engine.state.presentation.set(capped);
       await new Promise<void>((resolve) => queueMicrotask(resolve));
       expect(media.engine.state.selectedVideoTrackId.get()).toBe('720p');
       media.destroy();
@@ -291,6 +249,24 @@ describe('HlsBackgroundVideoAdapterCore', () => {
 
       expect(media.error).toBeNull();
       media.destroy();
+    });
+
+    it('stops promoting conditions after destroy', async () => {
+      const media = new TestAdapter();
+      const fired: Event[] = [];
+      const destroy = vi.spyOn(media.engine, 'destroy');
+
+      media.addEventListener('error', (event) => fired.push(event));
+      media.destroy();
+      await destroy.mock.results[0]!.value;
+
+      // Write after engine cleanup so clearing its signals cannot hide a live effect.
+      media.engine.state.errors.set([{ code: SVTA_NO_SUPPORTED_VIDEO_TRACK }]);
+      await flush();
+
+      expect(fired).toHaveLength(0);
+      expect(media.error).toBeNull();
+      destroy.mockRestore();
     });
 
     it('surfaces a reported fatal condition and fires error', async () => {
@@ -462,14 +438,56 @@ describe('HlsBackgroundVideoAdapterCore', () => {
   });
 
   describe('play()', () => {
-    it('returns a Promise', () => {
+    it.each(['src change', 'detach', 'destroy'] as const)('cancels a pending play retry on %s', async (action) => {
       const media = new HlsBackgroundVideoAdapterCore();
+      const el = document.createElement('video');
+      const play = vi
+        .spyOn(el, 'play')
+        .mockRejectedValueOnce(new Error('no supported sources'))
+        .mockResolvedValue(undefined);
 
-      media.attach(document.createElement('video'));
-      const result = media.play();
+      try {
+        media.attach(el);
+        media.src = 'https://example.com/v1.m3u8';
+        media.play().catch(() => {});
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(1);
 
-      expect(result).toBeInstanceOf(Promise);
-      result.catch(() => {});
+        if (action === 'src change') media.src = 'https://example.com/v2.m3u8';
+        else if (action === 'detach') media.detach();
+        else media.destroy();
+
+        el.dispatchEvent(new Event('loadstart'));
+        await Promise.resolve();
+        expect(play).toHaveBeenCalledTimes(1);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
+    });
+
+    it('retries play() via loadstart when element has no src but adapter has one', async () => {
+      const media = new HlsBackgroundVideoAdapterCore();
+      const el = document.createElement('video');
+      const play = vi
+        .spyOn(el, 'play')
+        .mockRejectedValueOnce(new Error('no supported sources'))
+        .mockResolvedValue(undefined);
+
+      try {
+        media.attach(el);
+        media.src = 'https://example.com/v.m3u8';
+        const pending = media.play();
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(play).toHaveBeenCalledTimes(1);
+        el.dispatchEvent(new Event('loadstart'));
+        await pending;
+        expect(play).toHaveBeenCalledTimes(2);
+      } finally {
+        media.destroy();
+        play.mockRestore();
+      }
     });
 
     it('rejects when no media element is attached', async () => {

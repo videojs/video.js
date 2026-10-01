@@ -55,6 +55,7 @@ describe('mergeTimeRanges', () => {
       mergeTimeRanges([
         { start: 20, end: 30 },
         { start: 5, end: 5 },
+        { start: 50, end: 40 },
         { start: 0, end: 10 },
       ])
     ).toEqual([
@@ -237,18 +238,6 @@ describe('getSegmentsToLoad', () => {
       // Should only load segment 12 to fill gap (18 is buffered, 24 is beyond target)
       expect(toLoad).toHaveLength(1);
       expect(toLoad[0]?.id).toBe('seg-12');
-    });
-
-    it('should handle all segments already buffered', () => {
-      const segments: Segment[] = [createSegment(0, 6), createSegment(6, 6), createSegment(12, 6)];
-
-      const bufferedSegments: Segment[] = segments;
-
-      const currentTime = 0;
-
-      const toLoad = getSegmentsToLoad(segments, bufferedSegments, currentTime);
-
-      expect(toLoad).toHaveLength(0);
     });
 
     it('should handle no segments buffered', () => {

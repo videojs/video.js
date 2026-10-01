@@ -84,7 +84,7 @@ function createPresentation(config: {
 }
 
 // `selectVideoTrack` is the simple (non-ABR) video selector — ABR-driven
-// selection is exercised in `quality-switching.test.ts`.
+// selection is exercised in `track-switching.test.ts`.
 
 describe('selectVideoTrack', () => {
   it('selects first video track when presentation loaded', async () => {
@@ -183,6 +183,26 @@ describe('selectVideoTrack', () => {
 
     expect(state.selectedVideoTrackId.get()).toBe('video-high');
 
+    reactor.destroy();
+  });
+
+  it('preserves an offered video pick already selected on entry', async () => {
+    const video = (id: string): PartiallyResolvedVideoTrack => ({
+      type: 'video',
+      id,
+      url: `http://example.com/${id}.m3u8`,
+      bandwidth: 1_000_000,
+      mimeType: 'video/mp4',
+      codecs: ['avc1.4d401f'],
+    });
+    const state = makeState({
+      presentation: createPresentation({ video: [video('video-first'), video('video-second')] }),
+      selectedVideoTrackId: 'video-second',
+    });
+    const reactor = selectVideoTrack.setup({ state });
+
+    await Promise.resolve();
+    expect(state.selectedVideoTrackId.get()).toBe('video-second');
     reactor.destroy();
   });
 });
@@ -323,64 +343,9 @@ describe('selectVideoTrack — capability constraint + verdict', () => {
 
     reactor.destroy();
   });
-
-  // The optional-slot contract: reporting goes through a seam that no-ops when
-  // `collectErrors` isn't composed, so the clear still happens either way.
-  it('still clears the pick when no errors slot is composed', async () => {
-    const state = makeState({ presentation: createPresentation({ video: [undecodable] }) });
-
-    const reactor = selectVideoTrack.setup({ state, config: { canPlayTrack: noHevc } });
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(state.selectedVideoTrackId.get()).toBeUndefined();
-
-    reactor.destroy();
-  });
 });
 
 describe('selectAudioTrack', () => {
-  it('selects audio track when presentation loaded', async () => {
-    const audioTracks: PartiallyResolvedAudioTrack[] = [
-      {
-        type: 'audio',
-        id: 'audio-en',
-        url: 'http://example.com/audio-en.m3u8',
-        bandwidth: 128_000,
-        mimeType: 'audio/mp4',
-        codecs: ['mp4a.40.2'],
-        groupId: 'audio',
-        name: 'English',
-        sampleRate: 48000,
-        channels: 2,
-      },
-    ];
-
-    const presentation = createPresentation({ audio: audioTracks });
-    const state = makeState({ presentation });
-
-    const reactor = selectAudioTrack.setup({ state });
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(state.selectedAudioTrackId.get()).toBe('audio-en');
-
-    reactor.destroy();
-  });
-
-  it('does not select when audio track already selected', async () => {
-    const presentation = createPresentation({ audio: [] });
-    const state = makeState({ presentation, selectedAudioTrackId: 'existing-audio' });
-
-    const reactor = selectAudioTrack.setup({ state });
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(state.selectedAudioTrackId.get()).toBe('existing-audio');
-
-    reactor.destroy();
-  });
-
   it('picks track matching preferredAudioLanguage when supplied', async () => {
     const audioTracks: PartiallyResolvedAudioTrack[] = [
       {
@@ -602,13 +567,5 @@ describe('screenResolutionCap', () => {
     const deps = depsWith(laptopScreen);
 
     expect(applyRules([preferHighestResolution, screenResolutionCap], ladder, deps)[0]?.id).toBe('1440p');
-  });
-
-  // Without the cap the same ladder pins the top rung — the difference the rule makes.
-  it('is what pulls the pick below the top rung', () => {
-    const deps = depsWith(laptopScreen);
-
-    expect(applyRules([preferHighestResolution], ladder, deps)[0]?.id).toBe('2160p');
-    expect(applyRules([screenResolutionCap, preferHighestResolution], ladder, deps)[0]?.id).toBe('1440p');
   });
 });

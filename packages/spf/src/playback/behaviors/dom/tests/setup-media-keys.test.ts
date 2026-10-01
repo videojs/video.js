@@ -177,6 +177,9 @@ describe('setupMediaKeys', () => {
 
   it('raises the gate, negotiates in preference order, attaches, publishes, lowers the gate', async () => {
     const eme = makeFakeEme();
+    let releaseAttach!: () => void;
+
+    vi.mocked(attachMediaKeys).mockReturnValueOnce(new Promise<void>((resolve) => (releaseAttach = resolve)));
 
     vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
     const video = document.createElement('video');
@@ -188,6 +191,12 @@ describe('setupMediaKeys', () => {
     // The gate is up before any async EME work resolves.
     await vi.waitFor(() => expect(state.segmentLoadingBlocked.get()).toBe(true));
 
+    await vi.waitFor(() => expect(attachMediaKeys).toHaveBeenCalledWith(video, eme.mediaKeys));
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
+    expect(context.mediaKeys.get()).toBeUndefined();
+    expect(state.negotiatedKeySystem.get()).toBeUndefined();
+
+    releaseAttach();
     await vi.waitFor(() => expect(context.mediaKeys.get()).toBe(eme.mediaKeys));
     // Declared ∩ configured modules, in `keySystems` order (FairPlay outranks
     // Widevine in the default), over the presentation's content types and the
@@ -227,14 +236,39 @@ describe('setupMediaKeys', () => {
 
   it('fetches and applies the server certificate before publishing the negotiation', async () => {
     const eme = makeFakeEme('com.apple.fps');
+    let releaseFetch!: (certificate: Uint8Array<ArrayBuffer>) => void;
+    let releaseCertificate!: (accepted: boolean) => void;
+
+    vi.mocked(fetchServerCertificate).mockReturnValueOnce(new Promise((resolve) => (releaseFetch = resolve)));
+    vi.mocked(eme.mediaKeys.setServerCertificate).mockReturnValueOnce(
+      new Promise((resolve) => (releaseCertificate = resolve))
+    );
 
     vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
-    const { context, reactor } = setupSetupMediaKeys(
+    const { state, context, reactor } = setupSetupMediaKeys(
       { presentation: makePresentation([WIDEVINE_KEY, FAIRPLAY_KEY]) },
       { mediaElement: document.createElement('video') }
     );
 
+    await vi.waitFor(() => expect(fetchServerCertificate).toHaveBeenCalled());
+    expect(eme.mediaKeys.setServerCertificate).not.toHaveBeenCalled();
+    expect(attachMediaKeys).not.toHaveBeenCalled();
+    expect(context.mediaKeys.get()).toBeUndefined();
+    expect(state.negotiatedKeySystem.get()).toBeUndefined();
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
+
+    releaseFetch(new Uint8Array([7, 7]));
+    await vi.waitFor(() => expect(eme.mediaKeys.setServerCertificate).toHaveBeenCalled());
+    expect(attachMediaKeys).not.toHaveBeenCalled();
+    expect(context.mediaKeys.get()).toBeUndefined();
+    expect(state.negotiatedKeySystem.get()).toBeUndefined();
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
+
+    releaseCertificate(true);
     await vi.waitFor(() => expect(context.mediaKeys.get()).toBe(eme.mediaKeys));
+    expect(attachMediaKeys).toHaveBeenCalledWith(context.mediaElement.get(), eme.mediaKeys);
+    expect(state.negotiatedKeySystem.get()).toBe('com.apple.fps');
+    expect(state.segmentLoadingBlocked.get()).toBe(false);
     expect(fetchServerCertificate).toHaveBeenCalledWith(
       fairPlayKeySystem,
       DRM_CONFIG['com.apple.fps'],

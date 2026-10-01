@@ -7,12 +7,6 @@ import { I18nProvider } from '../../../i18n';
 import { createPlayerWrapper } from '../../../testing/mocks';
 import { Value } from '../value';
 
-vi.mock('@videojs/store/react', () => ({
-  useStore: vi.fn((store: { state: object }, selector?: (state: object) => unknown) =>
-    selector ? selector(store.state) : store
-  ),
-}));
-
 const buffered: MediaBufferState['buffered'] = [];
 const seekable: MediaBufferState['seekable'] = [];
 
@@ -201,6 +195,18 @@ describe('Time.Value', () => {
     expect(time.getAttribute('data-type')).toBe('remaining');
   });
 
+  it('renders a custom negative sign outside the accessible time value', () => {
+    setup({ type: 'remaining', negativeSign: '−' });
+
+    const time = screen.getByTestId('time');
+    const sign = time.querySelector('span')!;
+
+    expect(time.textContent).toBe('−3:30');
+    expect(sign.textContent).toBe('−');
+    expect(sign.getAttribute('aria-hidden')).toBe('true');
+    expect(time.lastChild?.textContent).toBe('3:30');
+  });
+
   it('starts in remaining mode when type is remaining', () => {
     setup({ toggle: true, type: 'remaining' });
 
@@ -283,7 +289,7 @@ describe('Time.Value', () => {
     expect(time.getAttribute('data-type')).toBe('duration');
   });
 
-  it('calls user event handlers before toggling', () => {
+  it('chains user event handlers with toggling', () => {
     const onClick = vi.fn();
     const onKeyDown = vi.fn();
 
@@ -292,7 +298,10 @@ describe('Time.Value', () => {
     const time = screen.getByTestId('time');
 
     fireEvent.click(time);
+    expect(time.getAttribute('data-type')).toBe('remaining');
+
     fireEvent.keyDown(time, { key: 'Enter' });
+    expect(time.getAttribute('data-type')).toBe('current');
 
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onKeyDown).toHaveBeenCalledTimes(1);
@@ -308,6 +317,9 @@ describe('Time.Value', () => {
     const time = screen.getByTestId('time');
 
     fireEvent.click(time);
+    expect(time.textContent).toBe('1:30');
+    expect(time.getAttribute('data-type')).toBe('current');
+
     fireEvent.keyDown(time, { key: 'Enter' });
 
     expect(time.textContent).toBe('1:30');

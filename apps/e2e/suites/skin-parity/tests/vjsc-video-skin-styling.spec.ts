@@ -12,6 +12,7 @@ import {
   openComparison,
   openSourceComparison,
   presetVolume,
+  releaseSliderState,
   type SkinCase,
   skinCases,
   type SkinComparison,
@@ -102,17 +103,22 @@ for (const variant of CASES) {
     const name = `${variant.framework}-${variant.skin}-button-focus.png`;
     const { css, tailwind } = await openVariants(page, variant, 800);
 
-    // Read both focus contracts before any pointer input so programmatic focus still matches `:focus-visible`.
     const cssRootFocus = await focusContract(css.root);
+    const tailwindRootFocus = await focusContract(tailwind.root);
 
-    expect(await focusContract(tailwind.root)).toEqual(cssRootFocus);
+    expectPaintedOutline(cssRootFocus);
+    expectPaintedOutline(tailwindRootFocus);
+    expect(tailwindRootFocus).toEqual(cssRootFocus);
 
     const cssButton = await focusPlayButton(css.root);
     const cssFocused = await buttonStateContract(cssButton);
     const reference = await captureRendering(css.root, name);
     const tailwindButton = await focusPlayButton(tailwind.root);
+    const tailwindFocused = await buttonStateContract(tailwindButton);
 
-    expect(await buttonStateContract(tailwindButton)).toEqual(cssFocused);
+    expectPaintedOutline(cssFocused);
+    expectPaintedOutline(tailwindFocused);
+    expect(tailwindFocused).toEqual(cssFocused);
     await expectSameRendering(testInfo, reference, tailwind.root);
 
     const cssDisabled = await disabledButtonContract(cssButton);
@@ -130,6 +136,14 @@ for (const variant of CASES) {
     const cssContract = await seekFocusContract(css.root);
     const reference = await captureRendering(css.root, name);
     const tailwindContract = await seekFocusContract(tailwind.root);
+
+    for (const contract of [cssContract, tailwindContract]) {
+      if (variant.skin === 'default-video') {
+        expect(contract.ring).toEqual({ content: 'painted', opacity: '1', scale: 'full', shadow: 'painted' });
+      } else {
+        expectPaintedOutline(contract);
+      }
+    }
 
     expect(tailwindContract).toEqual(cssContract);
     await expectSameRendering(testInfo, reference, tailwind.root);
@@ -449,6 +463,7 @@ for (const variant of CASES) {
     expect(tailwindContract).toMatchObject({
       movingRootLayers: 1,
       popupResizeMotion: true,
+      submenuMotion: true,
       submenuPersistsDuringClose: true,
     });
   });
@@ -892,6 +907,17 @@ test('reduced motion keeps CSS and Tailwind transitions in sync', async ({ page 
     contracts.push(await reducedMotionContract(root, menu, tooltipDuration));
   }
 
+  for (const contract of contracts) {
+    expect(contract.slider.progress).toEqual({
+      animations: [],
+      transitions: [
+        { property: '--media-slider-fill', duration: '0s' },
+        { property: '--media-slider-buffer', duration: '0s' },
+      ],
+      values: [60, 80],
+    });
+  }
+
   expect(contracts[1]).toEqual(contracts[0]);
   // Reduced motion collapses every duration to the instant token, except menu resize and slider fills, which stop.
   expect(contracts[0]).toMatchObject({
@@ -975,16 +1001,33 @@ async function setStableScreenshotHeight(root: Locator, width: number) {
 async function focusPlayButton(root: Locator): Promise<Locator> {
   const button = root.getByRole('button', { name: 'Play', exact: true });
 
-  await button.focus();
-  await expect(button).toBeFocused();
-  await root.page().waitForTimeout(200);
+  await keyboardFocus(button);
   return button;
 }
 
-async function focusContract(target: Locator) {
+async function keyboardFocus(target: Locator) {
   await target.focus();
+  await target.press('Tab');
+  await target.page().keyboard.press('Shift+Tab');
   await expect(target).toBeFocused();
+  expect(await target.evaluate((element) => element.matches(':focus-visible'))).toBe(true);
   await target.page().waitForTimeout(200);
+  await settleAnimations(target);
+}
+
+function expectPaintedOutline(contract: {
+  outlineColor: (number | undefined)[];
+  outlineStyle: string;
+  outlineWidth: string;
+}) {
+  expect(contract.outlineStyle).toBe('solid');
+  expect(Number.parseFloat(contract.outlineWidth)).toBeGreaterThan(0);
+  expect(contract.outlineColor[3]).toBeGreaterThan(0);
+}
+
+async function focusContract(target: Locator) {
+  await keyboardFocus(target);
+
   return target.evaluate((element) => {
     const style = getComputedStyle(element);
     const context = new OffscreenCanvas(1, 1).getContext('2d');
@@ -1061,16 +1104,21 @@ async function settleAnimations(target: Locator) {
 
 async function seekFocusContract(root: Locator) {
   const thumb = root.getByRole('slider', { name: 'Seek' });
+  const outline = await focusContract(thumb);
 
-  await thumb.focus();
-  await expect(thumb).toBeFocused();
-  await root.page().waitForTimeout(200);
-  await settleAnimations(thumb);
-
-  return thumb.evaluate((element) => {
+  const contract = await thumb.evaluate((element) => {
     const style = getComputedStyle(element);
     const after = getComputedStyle(element, '::after');
     const rect = element.getBoundingClientRect();
+    const paintedShadow = after.boxShadow.split(/,(?![^()]*\))/).some((shadow) => {
+      const transparent =
+        shadow.includes('transparent') ||
+        /rgba\([^)]*,\s*0\)/.test(shadow) ||
+        /(?:rgb|oklab|oklch)\([^)]*\/\s*0\)/.test(shadow);
+      const hasExtent = [...shadow.matchAll(/-?(?:\d*\.)?\d+px/g)].some(([value]) => Number.parseFloat(value) !== 0);
+
+      return !transparent && hasExtent;
+    });
 
     return {
       opacity: style.opacity,
@@ -1082,10 +1130,12 @@ async function seekFocusContract(root: Locator) {
         content: after.content === 'none' ? 'none' : 'painted',
         opacity: after.opacity,
         scale: after.scale === 'none' || after.scale === '1' ? 'full' : after.scale,
-        shadow: after.boxShadow === 'none' ? 'none' : 'painted',
+        shadow: paintedShadow ? 'painted' : 'none',
       },
     };
   });
+
+  return { ...outline, ...contract };
 }
 
 async function seekDragContract(root: Locator) {
@@ -2104,6 +2154,41 @@ async function reducedMotionContract(root: Locator, menu: Locator, tooltipDurati
   const thumbnailSpinner = seekSlider.locator(THUMBNAIL_SPINNER_SELECTOR);
   const thumbnailSpinnerMotion = await inspect(thumbnailSpinner);
 
+  await releaseSliderState(seekThumb, ['--media-slider-buffer']);
+
+  const progress = await seekSlider.evaluate((element) => {
+    if (!(element instanceof HTMLElement)) throw new Error('Expected a slider element.');
+
+    const properties = ['--media-slider-fill', '--media-slider-buffer'];
+    const style = getComputedStyle(element);
+    const transitionProperties = style.transitionProperty.split(',').map((value) => value.trim());
+    const durations = style.transitionDuration.split(',').map((value) => value.trim());
+    const transitions = properties.map((property) => {
+      const index = transitionProperties.indexOf(property);
+
+      return { property, duration: index < 0 ? null : durations[index % durations.length] };
+    });
+
+    for (const property of properties) element.style.setProperty(property, '0%', 'important');
+
+    element.getBoundingClientRect();
+    element.style.setProperty('--media-slider-fill', '60%', 'important');
+    element.style.setProperty('--media-slider-buffer', '80%', 'important');
+    element.getBoundingClientRect();
+
+    return {
+      animations: element
+        .getAnimations()
+        .flatMap((animation) =>
+          animation instanceof CSSTransition && properties.includes(animation.transitionProperty)
+            ? [animation.transitionProperty]
+            : []
+        ),
+      transitions,
+      values: properties.map((property) => Number.parseFloat(getComputedStyle(element).getPropertyValue(property))),
+    };
+  });
+
   const rootMotion = {
     container: await root.evaluate((element) => getComputedStyle(element).transitionDuration),
     controls: await controls.evaluate((element) => getComputedStyle(element).transitionDuration),
@@ -2113,6 +2198,7 @@ async function reducedMotionContract(root: Locator, menu: Locator, tooltipDurati
     settingsIcon: await inspect(settingsIcon),
     slider: {
       fill: await inspect(fill),
+      progress,
       preview: await inspect(preview),
       thumb: await inspect(seekThumb),
     },
@@ -2283,20 +2369,13 @@ async function settingsSubmenuMotionContract(root: Locator, name: string) {
   await expect(await rootMenuContent(menu)).toHaveAttribute('data-child-open', '');
 
   const motion = await menu.evaluate((element) => {
-    const transitionDuration = (target: Element) =>
-      Math.max(
-        ...getComputedStyle(target)
-          .transitionDuration.split(',')
-          .map((value) => Number.parseFloat(value))
-      );
     const hasPanelMotion = (target: Element) => {
-      const properties = new Set(
-        getComputedStyle(target)
-          .transitionProperty.split(',')
-          .map((value) => value.trim())
-      );
+      const style = getComputedStyle(target);
+      const properties = style.transitionProperty.split(',').map((value) => value.trim());
+      const durations = style.transitionDuration.split(',').map((value) => Number.parseFloat(value));
+      const transitions = new Map(properties.map((property, index) => [property, durations[index % durations.length]]));
 
-      return properties.has('translate') && properties.has('filter') && transitionDuration(target) === 0.25;
+      return transitions.get('translate') === 0.25 && transitions.get('filter') === 0.25;
     };
     const popupStyle = getComputedStyle(element);
     const popupProperties = popupStyle.transitionProperty.split(',').map((value) => value.trim());
@@ -2312,7 +2391,6 @@ async function settingsSubmenuMotionContract(root: Locator, name: string) {
     return {
       movingRootLayers: movingRootLayers.length,
       popupResizeMotion: popupTransition.get('width') === 0.25 && popupTransition.get('height') === 0.25,
-      rootLayerMotion: movingRootLayers.every(hasPanelMotion),
       submenuMotion: activeSubmenu ? hasPanelMotion(activeSubmenu) : false,
     };
   });

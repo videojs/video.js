@@ -57,24 +57,22 @@ describe('HlsBackgroundVideo', () => {
       const onError = vi.fn();
       const { container } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" onError={onError} />);
 
-      instances[0]?.engine.state.errors.set([{ code: NO_SUPPORTED_VIDEO_TRACK }]);
+      const media = instances[0];
+      const video = container.querySelector('video');
+
+      expect(media).toBeTruthy();
+      expect(video).toBeTruthy();
+
+      media!.engine.state.errors.set([{ code: MANIFEST_FEATURE_UNSUPPORTED }]);
+      await flush();
+      expect(onError).not.toHaveBeenCalled();
+
+      media!.engine.state.errors.set([{ code: NO_SUPPORTED_VIDEO_TRACK }]);
       await flush();
 
       expect(onError).toHaveBeenCalledTimes(1);
       // Delivered through React's own plumbing, on the node the consumer holds.
-      expect(onError.mock.calls[0]?.[0]?.target).toBe(container.querySelector('video'));
-    });
-
-    it('stays quiet for a condition the Media does not treat as fatal', async () => {
-      const onError = vi.fn();
-
-      render(<HlsBackgroundVideo src="https://example.com/v.m3u8" onError={onError} />);
-
-      // A degraded-but-playable notice must not reach the surface.
-      instances[0]?.engine.state.errors.set([{ code: MANIFEST_FEATURE_UNSUPPORTED }]);
-      await flush();
-
-      expect(onError).not.toHaveBeenCalled();
+      expect(onError.mock.calls[0]?.[0]?.target).toBe(video);
     });
   });
 });

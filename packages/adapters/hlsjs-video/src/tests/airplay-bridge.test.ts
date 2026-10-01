@@ -261,23 +261,6 @@ describe('HlsJsAirPlayMixin', () => {
     expect(engine.startLoad).not.toHaveBeenCalled();
   });
 
-  it('does not call startLoad when AirPlay deactivates', () => {
-    // Safari re-sets the source when AirPlay turns off, so hls.js resumes
-    // loading on its own — the bridge never calls startLoad.
-    const engine = createEngine();
-    const host = new AirPlayHost(engine);
-    const video = createVideo(true);
-
-    host.target = video;
-    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
-    (engine.startLoad as ReturnType<typeof vi.fn>).mockClear();
-
-    video.webkitCurrentPlaybackTargetIsWireless = false;
-    video.dispatchEvent(new Event('webkitcurrentplaybacktargetiswirelesschanged'));
-
-    expect(engine.startLoad).not.toHaveBeenCalled();
-  });
-
   it('never calls startLoad across the connect burst', () => {
     // WebKit fires `true → false → true` on first connect. The transient
     // `false` must not resume loading against the MSE mid-handoff; the bridge

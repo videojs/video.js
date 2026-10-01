@@ -9,22 +9,8 @@ describe('getStateDataAttrs', () => {
     expect(getStateDataAttrs(state)).toEqual({ 'data-paused': '' });
   });
 
-  it('ignores false values', () => {
-    const state = { paused: false };
-
-    expect(getStateDataAttrs(state)).toEqual({});
-  });
-
-  it('ignores undefined values', () => {
-    const state = { paused: undefined };
-
-    expect(getStateDataAttrs(state)).toEqual({});
-  });
-
-  it('ignores null values', () => {
-    const state = { paused: null };
-
-    expect(getStateDataAttrs(state)).toEqual({});
+  it.each([false, undefined, null, 0, ''])('ignores falsy value %s', (paused) => {
+    expect(getStateDataAttrs({ paused })).toEqual({});
   });
 
   it('converts string values to attribute', () => {
@@ -39,41 +25,15 @@ describe('getStateDataAttrs', () => {
     expect(getStateDataAttrs(state)).toEqual({ 'data-volume': '0.5' });
   });
 
-  it('ignores zero values', () => {
-    const state = { volume: 0 };
-
-    expect(getStateDataAttrs(state)).toEqual({});
-  });
-
   it('converts keys to lowercase', () => {
-    const state = { isPaused: true, currentTime: 10 };
+    const state = { isPaused: true, ended: false, currentTime: 10, waiting: true, volume: 0.8 };
 
     expect(getStateDataAttrs(state)).toEqual({
       'data-ispaused': '',
       'data-currenttime': '10',
-    });
-  });
-
-  it('handles multiple state properties', () => {
-    const state = { paused: true, ended: false, waiting: true, volume: 0.8 };
-
-    expect(getStateDataAttrs(state)).toEqual({
-      'data-paused': '',
       'data-waiting': '',
       'data-volume': '0.8',
     });
-  });
-
-  it('returns empty object for empty state', () => {
-    const state = {};
-
-    expect(getStateDataAttrs(state)).toEqual({});
-  });
-
-  it('ignores empty string values', () => {
-    const state = { label: '' };
-
-    expect(getStateDataAttrs(state)).toEqual({});
   });
 
   it('supports explicit attribute mapping', () => {
@@ -121,17 +81,6 @@ describe('applyStateDataAttrs', () => {
     expect(element.hasAttribute('data-waiting')).toBe(false);
   });
 
-  it('applies multiple attributes', () => {
-    const element = document.createElement('div');
-    const state = { paused: true, ended: true, started: true };
-
-    applyStateDataAttrs(element, state);
-
-    expect(element.getAttribute('data-paused')).toBe('');
-    expect(element.getAttribute('data-ended')).toBe('');
-    expect(element.getAttribute('data-started')).toBe('');
-  });
-
   it('removes attributes when state becomes false', () => {
     const element = document.createElement('div');
 
@@ -147,8 +96,12 @@ describe('applyStateDataAttrs', () => {
 
     applyStateDataAttrs(element, { status: 'loading' });
     expect(element.getAttribute('data-status')).toBe('loading');
-
     applyStateDataAttrs(element, { status: null });
+    expect(element.hasAttribute('data-status')).toBe(false);
+
+    applyStateDataAttrs(element, { status: 'loading' });
+    expect(element.getAttribute('data-status')).toBe('loading');
+    applyStateDataAttrs(element, { status: undefined });
     expect(element.hasAttribute('data-status')).toBe(false);
   });
 

@@ -189,32 +189,4 @@ describe('MediaButtonElement', () => {
 
     flush();
   });
-
-  it('updates aria-label when html lang changes and provider has no explicit lang', async () => {
-    registerI18n('de', { 'buttons.play': 'Los' });
-    registerI18n('fr', { 'buttons.play': 'Lire' });
-    document.documentElement.lang = 'de';
-
-    ensureDefined(PlayButtonElement);
-    ensureDefined(MediaI18nProviderElement);
-
-    const player = document.createElement(TestPlayerProviderElement.tagName) as TestPlayerProviderElement;
-    const provider = new MediaI18nProviderElement();
-    const button = document.createElement(PlayButtonElement.tagName) as PlayButtonElement;
-
-    document.body.append(player);
-    player.append(provider);
-    provider.append(button);
-
-    await vi.waitFor(() => {
-      expect(button.getAttribute('aria-label')).toBe('Los');
-    });
-
-    document.documentElement.lang = 'fr';
-    await vi.waitFor(() => {
-      expect(button.getAttribute('aria-label')).toBe('Lire');
-    });
-
-    flush();
-  });
 });

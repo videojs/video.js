@@ -4,9 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { defineComponent, defineSchema } from '../../components/definition';
 import { defineComponentTarget } from '../../target/definition';
-import { readComponentSource } from '../component-meta';
 import { renderTargetPlugin } from '../render-target';
-import { componentSourcePlugin } from './helpers/component-source';
 
 const MODULE_ID = '\0fixture.tsx?target=react';
 
@@ -102,11 +100,11 @@ describe('renderTargetPlugin', () => {
 });
 
 async function transform(source: string, target: typeof reactTarget | typeof htmlTarget): Promise<string> {
-  let meta: unknown;
+  let output: string | undefined;
   const inspect: Plugin = {
     name: 'fixture:inspect',
     buildEnd() {
-      meta = this.getModuleInfo(MODULE_ID)?.meta;
+      output = this.getModuleInfo(MODULE_ID)?.code ?? undefined;
     },
   };
   const bundle = await rolldown({
@@ -131,14 +129,12 @@ async function transform(source: string, target: typeof reactTarget | typeof htm
         },
       },
       renderTargetPlugin({ targets: [target] }),
-      componentSourcePlugin(),
       inspect,
     ],
   });
 
   await bundle.generate({ format: 'es' });
 
-  const output = readComponentSource(meta);
   if (!output) throw new Error('Fixture did not capture transformed source.');
 
   return output;

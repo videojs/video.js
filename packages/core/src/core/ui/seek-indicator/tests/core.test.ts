@@ -37,6 +37,23 @@ describe('SeekIndicatorCore', () => {
     expect(core.state.current.currentTime).toBe('0:30');
   });
 
+  it('formats current time and seek-step seconds using the active locale', () => {
+    const core = new SeekIndicatorCore();
+    const props = { closeDelay: 100, locale: 'fa' };
+    const snapshot = { currentTime: 12, duration: 120 };
+
+    core.setProps(props);
+    core.processEvent({ action: 'seekToPercent', value: 50 }, snapshot);
+
+    expect.soft(core.state.current.currentTime).toBe('۰:۱۲');
+
+    core.processEvent({ action: 'seekStep', value: 10 }, snapshot);
+
+    expect.soft(core.state.current.value).toBe('۱۰ ثانیه');
+
+    core.destroy();
+  });
+
   it('closes and resets accumulation after the configured delay', () => {
     const core = new SeekIndicatorCore();
 

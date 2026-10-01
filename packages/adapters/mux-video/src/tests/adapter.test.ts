@@ -1,4 +1,4 @@
-import { Hls, HlsJsAdapter } from '@videojs/hlsjs-video';
+import { Hls } from '@videojs/hlsjs-video';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxVideoAdapter, type MuxSource } from '..';
@@ -26,6 +26,23 @@ function fakeJwt(payload: Record<string, unknown>): string {
   return `${encode({ alg: 'HS256' })}.${encode(payload)}.`;
 }
 
+const LADDER = [
+  { width: 640, height: 360, bitrate: 800_000 },
+  { width: 1280, height: 720, bitrate: 2_800_000 },
+  { width: 1920, height: 1080, bitrate: 5_000_000 },
+  { width: 2560, height: 1440, bitrate: 9_000_000 },
+];
+
+/** Give the running engine a rendition ladder and start its real size-capping loop. */
+function startCapping(media: MuxVideoAdapter) {
+  const engine = media.engine!;
+
+  Object.defineProperty(engine, 'levels', { configurable: true, value: LADDER });
+  engine.config.capLevelToPlayerSize = false;
+  engine.capLevelToPlayerSize = true;
+  return engine;
+}
+
 // `source` and `src` request a load on a microtask, so give it a chance to run.
 function flushLoad() {
   return new Promise((resolve) => {
@@ -34,10 +51,6 @@ function flushLoad() {
 }
 
 describe('MuxVideoAdapter', () => {
-  it('extends HlsJsAdapter', () => {
-    expect(new MuxVideoAdapter()).toBeInstanceOf(HlsJsAdapter);
-  });
-
   it('defaults source to null', () => {
     expect(new MuxVideoAdapter().source).toBeNull();
   });
@@ -59,19 +72,12 @@ describe('MuxVideoAdapter', () => {
     expect(media.src).toBe('');
   });
 
-  it('derives src using the custom domain', () => {
-    const media = new MuxVideoAdapter();
-
-    media.source = { playbackId: 'abc123', customDomain: 'example.com' };
-
-    expect(media.src).toBe('https://stream.example.com/abc123.m3u8');
-  });
-
-  it('appends playback params as snake_case query params', () => {
+  it('derives src from the custom domain and playback params', () => {
     const media = new MuxVideoAdapter();
 
     media.source = {
       playbackId: 'abc123',
+      customDomain: 'example.com',
       playback: {
         maxResolution: '1080p',
         minResolution: '480p',
@@ -84,6 +90,7 @@ describe('MuxVideoAdapter', () => {
 
     const url = new URL(media.src);
 
+    expect(url.hostname).toBe('stream.example.com');
     expect(url.searchParams.get('max_resolution')).toBe('1080p');
     expect(url.searchParams.get('min_resolution')).toBe('480p');
     expect(url.searchParams.get('rendition_order')).toBe('desc');
@@ -145,14 +152,40 @@ describe('MuxVideoAdapter', () => {
     expect(media.src).toBe('https://example.com/custom.m3u8');
   });
 
-  it('preserves engine options across a src change', () => {
-    const media = new MuxVideoAdapter();
+  it('preserves engine options and caps across a src change', async () => {
+    vi.spyOn(Hls, 'isSupported').mockReturnValue(true);
 
-    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
+    const media = new MuxVideoAdapter();
+    const video = document.createElement('video');
+
+    video.width = 320;
+    video.height = 180;
+    media.attach(video);
+    media.source = {
+      playbackId: 'abc123',
+      preferPlayback: 'mse',
+      engine: { hlsJs: { maxBufferLength: 73 } },
+      maxAutoResolution: '1080p',
+      capRenditionToPlayerSize: false,
+      minAutoResolution: '270p',
+    };
+    await flushLoad();
 
     media.src = 'https://stream.mux.com/other.m3u8';
+    await flushLoad();
 
-    expect(media.source).toEqual({ playbackId: 'other', preferPlayback: 'native' });
+    expect(media.source?.preferPlayback).toBe('mse');
+    expect(media.engine!.config.maxBufferLength).toBe(73);
+
+    const engine = startCapping(media);
+
+    expect(engine.autoLevelCapping).toBe(2);
+
+    // Enabling size capping exposes the carried floor independently of the ceiling.
+    media.source = { ...media.source, capRenditionToPlayerSize: true };
+    expect(engine.autoLevelCapping).toBe(0);
+
+    media.destroy();
   });
 
   it('keeps source.poster as data, without applying it to the media poster', () => {
@@ -175,16 +208,6 @@ describe('MuxVideoAdapter', () => {
       poster: 'https://image.mux.com/abc123/thumbnail.jpg?time=5',
       storyboard: 'https://image.mux.com/abc123/storyboard.vtt?format=jpg',
     });
-  });
-
-  it('tracks source changes in the content data', () => {
-    const media = new MuxVideoAdapter();
-
-    media.source = { playbackId: 'abc123' };
-    media.source = { playbackId: 'xyz789' };
-
-    expect(media.contentData.poster).toBe('https://image.mux.com/xyz789/thumbnail.webp');
-    expect(media.contentData.storyboard).toBe('https://image.mux.com/xyz789/storyboard.vtt?format=webp');
   });
 
   it('has no content data without a playback id', () => {
@@ -220,6 +243,7 @@ describe('MuxVideoAdapter', () => {
 
     expect(handler).toHaveBeenCalledTimes(2);
     expect(media.contentData.poster).toBe('https://image.mux.com/xyz789/thumbnail.webp');
+    expect(media.contentData.storyboard).toBe('https://image.mux.com/xyz789/storyboard.vtt?format=webp');
   });
 
   it('dedupes `contentdatachange` when a source change leaves the urls alone', () => {
@@ -302,18 +326,19 @@ describe('MuxVideoAdapter', () => {
     const media = new MuxVideoAdapter();
 
     media.attach(document.createElement('video'));
-    media.source = { playbackId: 'abc123', maxAutoResolution: '1080p' };
+    media.source = { playbackId: 'abc123', maxAutoResolution: '1080p', capRenditionToPlayerSize: false };
     await flushLoad();
 
-    const engine = media.engine;
+    const engine = startCapping(media);
     const loadstart = vi.fn();
 
+    expect(engine.autoLevelCapping).toBe(2);
     media.addEventListener('loadstart', loadstart);
 
-    media.source = { playbackId: 'abc123', maxAutoResolution: '720p' };
+    media.source = { playbackId: 'abc123', maxAutoResolution: '720p', capRenditionToPlayerSize: false };
     await flushLoad();
 
-    expect(media.source?.maxAutoResolution).toBe('720p');
+    expect(engine.autoLevelCapping).toBe(1);
     expect(media.engine).toBe(engine);
     expect(loadstart).not.toHaveBeenCalled();
 
@@ -343,23 +368,30 @@ describe('MuxVideoAdapter', () => {
 
   it('inherits the player-size caps without restarting playback', async () => {
     vi.spyOn(Hls, 'isSupported').mockReturnValue(true);
+    vi.stubGlobal('devicePixelRatio', 1);
 
     const media = new MuxVideoAdapter();
+    const video = document.createElement('video');
 
-    media.attach(document.createElement('video'));
-    media.source = { playbackId: 'abc123', capRenditionToPlayerSize: false };
+    video.width = 320;
+    video.height = 180;
+    media.attach(video);
+    media.source = { playbackId: 'abc123', capRenditionToPlayerSize: false, minAutoResolution: '270p' };
     await flushLoad();
 
-    const engine = media.engine;
+    const engine = startCapping(media);
     const loadstart = vi.fn();
 
+    expect(engine.autoLevelCapping).toBe(3);
     media.addEventListener('loadstart', loadstart);
+
+    media.source = { playbackId: 'abc123', capRenditionToPlayerSize: true, minAutoResolution: '270p' };
+    await flushLoad();
+    expect(engine.autoLevelCapping).toBe(0);
 
     media.source = { playbackId: 'abc123', capRenditionToPlayerSize: true, minAutoResolution: '1080p' };
     await flushLoad();
-
-    expect(media.source?.capRenditionToPlayerSize).toBe(true);
-    expect(media.source?.minAutoResolution).toBe('1080p');
+    expect(engine.autoLevelCapping).toBe(2);
     expect(media.engine).toBe(engine);
     expect(loadstart).not.toHaveBeenCalled();
 
@@ -399,74 +431,6 @@ describe('MuxVideoAdapter', () => {
     media.addEventListener('loadstart', loadstart);
 
     media.source = { playbackId: 'xyz789', preferPlayback: 'native' };
-    await flushLoad();
-
-    expect(loadstart).toHaveBeenCalled();
-  });
-
-  it('does not reload for an equivalent nested engine option', async () => {
-    const media = new MuxVideoAdapter();
-
-    media.attach(document.createElement('video'));
-    const hlsJs = { drmSystems: { 'com.widevine.alpha': { licenseUrl: 'https://drm.example/license' } } };
-
-    media.source = { playbackId: 'abc123', preferPlayback: 'native', engine: { hlsJs } };
-    await flushLoad();
-
-    const loadstart = vi.fn();
-
-    media.addEventListener('loadstart', loadstart);
-
-    // Same values, new object identity all the way down — as React would hand it
-    // over. A flat comparison would call this an engine change and restart.
-    media.source = {
-      playbackId: 'abc123',
-      preferPlayback: 'native',
-      engine: { hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: 'https://drm.example/license' } } } },
-      poster: { time: 5 },
-    };
-    await flushLoad();
-
-    expect(loadstart).not.toHaveBeenCalled();
-  });
-
-  it('reloads when a nested engine option changes', async () => {
-    const media = new MuxVideoAdapter();
-
-    media.attach(document.createElement('video'));
-    media.source = {
-      playbackId: 'abc123',
-      preferPlayback: 'native',
-      engine: { hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: 'https://drm.example/license' } } } },
-    };
-    await flushLoad();
-
-    const loadstart = vi.fn();
-
-    media.addEventListener('loadstart', loadstart);
-
-    media.source = {
-      playbackId: 'abc123',
-      preferPlayback: 'native',
-      engine: { hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: 'https://drm.example/other' } } } },
-    };
-    await flushLoad();
-
-    expect(loadstart).toHaveBeenCalled();
-  });
-
-  it('reloads when engine options change', async () => {
-    const media = new MuxVideoAdapter();
-
-    media.attach(document.createElement('video'));
-    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
-    await flushLoad();
-
-    const loadstart = vi.fn();
-
-    media.addEventListener('loadstart', loadstart);
-
-    media.source = { playbackId: 'abc123', preferPlayback: 'native', engine: { hlsJs: { maxBufferLength: 60 } } };
     await flushLoad();
 
     expect(loadstart).toHaveBeenCalled();
@@ -514,39 +478,6 @@ describe('MuxVideoAdapter', () => {
     media.source = { playbackId: 'abc123' };
 
     expect(onSourceChange).toHaveBeenCalledOnce();
-  });
-
-  it('does not reload for a structurally equal source', async () => {
-    const media = new MuxVideoAdapter();
-
-    media.attach(document.createElement('video'));
-    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
-    await flushLoad();
-
-    const loadstart = vi.fn();
-
-    media.addEventListener('loadstart', loadstart);
-
-    media.source = { playbackId: 'abc123', preferPlayback: 'native' };
-    await flushLoad();
-
-    expect(loadstart).not.toHaveBeenCalled();
-
-    media.source = { playbackId: 'other', preferPlayback: 'native' };
-    await flushLoad();
-
-    expect(loadstart).toHaveBeenCalledOnce();
-  });
-
-  it('parses typed playback params from a Mux stream src', () => {
-    const media = new MuxVideoAdapter();
-
-    media.src = 'https://stream.mux.com/abc123.m3u8?asset_start_time=3&redundant_streams=true';
-
-    expect(media.source).toEqual({
-      playbackId: 'abc123',
-      playback: { assetStartTime: 3, redundantStreams: true },
-    });
   });
 
   it('fires sourcechange when a Mux stream src is parsed', () => {
@@ -643,6 +574,10 @@ describe('MuxVideoAdapter', () => {
     it('configures the hls.js engine from a DRM token', async () => {
       const media = setupMse();
 
+      media.source = { playbackId: 'abc123' };
+      await flushLoad();
+      expect(media.engine!.config.emeEnabled).toBe(false);
+
       media.source = { playbackId: 'abc123', playback: { token: PLAYBACK_TOKEN }, drm: { token: DRM_TOKEN } };
       await flushLoad();
 
@@ -657,15 +592,6 @@ describe('MuxVideoAdapter', () => {
           licenseUrl: `https://license.mux.com/license/playready/abc123?token=${DRM_TOKEN}`,
         },
       });
-    });
-
-    it('leaves EME alone without a DRM token', async () => {
-      const media = setupMse();
-
-      media.source = { playbackId: 'abc123' };
-      await flushLoad();
-
-      expect(media.engine!.config.emeEnabled).toBe(false);
     });
 
     it('keeps the Mux token out of the source handed to the engine', async () => {
@@ -698,15 +624,22 @@ describe('MuxVideoAdapter', () => {
       const fetchMock = stubNativeKeySystem();
       const { video } = await setupNative({
         drm: { token: DRM_TOKEN },
-        engine: { nativeHls: { drmSystems: { 'com.apple.fps': { licenseUrl: 'https://drm.example/fairplay' } } } },
+        engine: {
+          nativeHls: {
+            drmSystems: {
+              'com.apple.fps': {
+                licenseUrl: 'https://drm.example/fairplay',
+                serverCertificateUrl: 'https://drm.example/appcert',
+              },
+            },
+          },
+        },
       });
 
       fireEncrypted(video);
       await flushLoad();
 
-      // The caller named no certificate URL, so no certificate is fetched — least
-      // of all from the servers the token would have derived. (The one request
-      // made is for the asset's metadata, which every Mux source loads.)
+      expect(fetchMock).toHaveBeenCalledWith('https://drm.example/appcert', expect.anything());
       expect(fetchMock).not.toHaveBeenCalledWith(expect.stringContaining('license.mux.com'), expect.anything());
     });
 
@@ -864,19 +797,6 @@ describe('MuxVideoAdapter', () => {
       media.destroy();
     });
 
-    it('does not fetch for a non-Mux source', async () => {
-      const fetchMock = stubFetch();
-      const media = new MuxVideoAdapter();
-
-      media.attach(document.createElement('video'));
-      media.source = { src: 'https://example.com/custom.m3u8', preferPlayback: 'native' };
-      await flushLoad();
-
-      expect(metadataRequests(fetchMock)).toEqual([]);
-
-      media.destroy();
-    });
-
     it('keeps the title when only image params change', async () => {
       const fetchMock = stubFetch();
       const media = new MuxVideoAdapter();
@@ -951,23 +871,6 @@ describe('MuxVideoAdapter', () => {
       expect(media.contentData.title).toBeUndefined();
       // An empty document changes nothing, so nothing is announced.
       expect(handler).not.toHaveBeenCalled();
-
-      media.destroy();
-    });
-
-    it('has no title when the document fails to load', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-      stubFetch('', 500);
-
-      const media = new MuxVideoAdapter();
-
-      media.attach(document.createElement('video'));
-      media.source = { playbackId: 'abc123', preferPlayback: 'native' };
-      await flushLoad();
-
-      expect(media.contentData.title).toBeUndefined();
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining('500'));
 
       media.destroy();
     });

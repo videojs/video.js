@@ -17,6 +17,7 @@ function uniqueFamily(): string {
 
 afterEach(() => {
   document.body.replaceChildren();
+  vi.restoreAllMocks();
 });
 
 describe('MediaIconElement', () => {
@@ -78,5 +79,60 @@ describe('MediaIconElement', () => {
     await Promise.resolve();
 
     expect(load).not.toHaveBeenCalled();
+  });
+
+  it('does not request a load when a family has no loader', async () => {
+    const load = vi.spyOn(MediaIconElement, 'load');
+    const icon = createIcon();
+
+    icon.setAttribute('family', uniqueFamily());
+    icon.setAttribute('name', 'play');
+    document.body.append(icon);
+
+    try {
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(load).not.toHaveBeenCalled();
+      expect(icon.childNodes).toHaveLength(0);
+    } finally {
+      // Stop any pending render chain even when a broken guard fails the assertion.
+      icon.remove();
+    }
+  });
+
+  it('does not request another load when a loaded family omits the icon name', async () => {
+    const family = uniqueFamily();
+    const requestLoad = MediaIconElement.load.bind(MediaIconElement);
+    const load = vi.spyOn(MediaIconElement, 'load').mockImplementation(requestLoad);
+    const first = createIcon();
+    const missing = createIcon();
+
+    MediaIconElement.registerLoader(family, async () => ({ play: '<svg data-icon="loaded"></svg>' }));
+
+    for (const [icon, name] of [
+      [first, 'play'],
+      [missing, 'missing'],
+    ] as const) {
+      icon.setAttribute('family', family);
+      icon.setAttribute('name', name);
+      document.body.append(icon);
+    }
+
+    const requestsWhileLoading = load.mock.calls.length;
+
+    // Record unexpected retries without letting a broken guard create an endless microtask chain.
+    load.mockImplementation(() => new Promise<void>(() => {}));
+
+    try {
+      await requestLoad(family);
+      await Promise.resolve();
+
+      expect(first.querySelector('svg')?.dataset.icon).toBe('loaded');
+      expect(missing.childNodes).toHaveLength(0);
+      expect(load).toHaveBeenCalledTimes(requestsWhileLoading);
+    } finally {
+      first.remove();
+      missing.remove();
+    }
   });
 });

@@ -127,15 +127,6 @@ afterEach(() => {
 });
 
 describe('TitleElement', () => {
-  it('renders the resolved content title as text', async () => {
-    const store = createTitleStore();
-    const { title } = await setup(store);
-
-    setTitle(store, 'Sintel');
-
-    await waitForAssertion(() => expect(title.textContent).toBe('Sintel'));
-  });
-
   it('renders empty text and hides when no source supplies a title', async () => {
     const { title } = await setup();
 

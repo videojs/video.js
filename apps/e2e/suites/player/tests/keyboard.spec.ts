@@ -184,7 +184,7 @@ for (const entry of PAGES as readonly PageEntry[]) {
         const trigger = player.playbackRateButton;
         const menu = page.getByRole('menu');
         const checkedOption = menu.getByRole('menuitemradio', { checked: true });
-        const focusedOption = menu.locator('[role="menuitemradio"]:focus');
+        const options = menu.getByRole('menuitemradio');
 
         await trigger.focus();
         await page.keyboard.press('Enter');
@@ -197,13 +197,23 @@ for (const entry of PAGES as readonly PageEntry[]) {
 
         await page.keyboard.press('Space');
         await expect(checkedOption).toBeFocused();
-        await page.keyboard.press('ArrowDown');
-        await expect(focusedOption).toBeFocused();
-        const nextRate = await focusedOption.getAttribute(DATA_ATTRS.rate);
+        const checkedIndex = await options.evaluateAll((items) =>
+          items.findIndex((item) => item.getAttribute('aria-checked') === 'true')
+        );
+
+        expect(checkedIndex).toBeGreaterThanOrEqual(0);
+        const nextOption = options.nth((checkedIndex + 1) % (await options.count()));
+        const initialRate = await player.getPlaybackRate();
+        const nextRate = await nextOption.getAttribute(DATA_ATTRS.rate);
 
         expect(nextRate).not.toBeNull();
+        expect(Number(nextRate)).not.toBe(initialRate);
+        await page.keyboard.press('ArrowDown');
+        await expect(nextOption).toBeFocused();
 
         await page.keyboard.press('Enter');
+        await expect.poll(() => player.getPlaybackRate()).toBe(Number(nextRate));
+        await expect(nextOption).toHaveAttribute('aria-checked', 'true');
         await expect(trigger).toHaveAttribute(DATA_ATTRS.rate, nextRate!);
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(trigger).toBeFocused();

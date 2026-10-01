@@ -15,8 +15,6 @@ export function resolveRegion(
   containerRect: DOMRect,
   activeRegions: ReadonlySet<GestureRegion>
 ): GestureRegion | null {
-  if (activeRegions.size === 0) return null;
-
   const relativeX = clientX - containerRect.left;
   const width = containerRect.width;
   if (width === 0) return null;

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { clearKeySystem } from '../../../../media/dom/key-systems';
 import type { MaybeResolvedPresentation } from '../../../../media/types';
-import { createHlsVideoEngine } from '../engine';
+import { createHlsVideoEngine, type HlsVideoEngineSignals } from '../engine';
 
 // Full-pipeline EME coverage on the bundled Chromium, which ships no proprietary CDM but must ship Clear Key (the one
 // key system the EME spec requires). The engine plays a real cenc-encrypted fixture end to end — negotiate → attach →
@@ -57,17 +57,27 @@ describe('createHlsVideoEngine (Clear Key, real EME end to end)', () => {
     video.muted = true;
     document.body.append(video);
 
+    let signals: HlsVideoEngineSignals | undefined;
     const engine = createHlsVideoEngine({
       drm: { 'org.w3.clearkey': { licenseUrl: LICENSE_URL } },
       keySystems: [clearKeySystem],
+      onSignalsReady: (refs) => {
+        signals = refs;
+      },
     });
 
-    engine.context.mediaElement.set(video);
-    engine.state.presentation.set({ url: FIXTURE_URL } as MaybeResolvedPresentation);
+    expect(signals).toBeDefined();
+    const { state, context } = signals!;
+
+    expect(state.segmentLoadingBlocked.get()).toBeUndefined();
+    expect(context.mediaKeys.get()).toBeUndefined();
+
+    context.mediaElement.set(video);
+    state.presentation.set({ url: FIXTURE_URL } as MaybeResolvedPresentation);
 
     // Negotiation lands on Clear Key and the license exchange carries the
     // fixture's KID out and the JWK set back.
-    await vi.waitFor(() => expect(engine.state.negotiatedKeySystem.get()).toBe('org.w3.clearkey'), {
+    await vi.waitFor(() => expect(state.negotiatedKeySystem.get()).toBe('org.w3.clearkey'), {
       timeout: 10_000,
     });
     await vi.waitFor(() => expect(licenseBodies.length).toBeGreaterThan(0), { timeout: 10_000 });
@@ -81,7 +91,7 @@ describe('createHlsVideoEngine (Clear Key, real EME end to end)', () => {
       interval: 250,
     });
 
-    expect(engine.state.errors.get() ?? []).toEqual([]);
+    expect(state.errors.get() ?? []).toEqual([]);
 
     await engine.destroy();
     video.remove();

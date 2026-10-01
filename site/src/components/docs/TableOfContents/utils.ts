@@ -103,15 +103,15 @@ export function filterHeadingsForToc(headings: MarkdownHeading[]): MarkdownHeadi
 }
 
 /** Keep client-rendered conditional headings in the TOC only while their target exists on the page. */
-export function filterRenderedHeadings(
-  headings: MarkdownHeading[],
-  getElementById: (id: string) => HTMLElement | null = (id) => document.getElementById(id),
-  isVisible: (element: HTMLElement) => boolean = (element) => element.getClientRects().length > 0
-): MarkdownHeading[] {
+export function filterRenderedHeadings(headings: MarkdownHeading[]): MarkdownHeading[] {
   return headings.filter((heading) => {
-    const element = getElementById(heading.slug);
+    const element = document.getElementById(heading.slug);
 
-    return element !== null && !element.hasAttribute('data-conditional-heading-placeholder') && isVisible(element);
+    return (
+      element !== null &&
+      !element.hasAttribute('data-conditional-heading-placeholder') &&
+      element.getClientRects().length > 0
+    );
   });
 }
 

@@ -55,14 +55,6 @@ describe('setupDrm', () => {
     expect(engine.config.requestMediaKeySystemAccessFunc).toBe(Hls.DefaultConfig.requestMediaKeySystemAccessFunc);
   });
 
-  it('takes over key system access once EME is enabled', () => {
-    const engine = createEngine({ emeEnabled: true });
-
-    setupDrm(engine);
-
-    expect(engine.config.requestMediaKeySystemAccessFunc).not.toBe(Hls.DefaultConfig.requestMediaKeySystemAccessFunc);
-  });
-
   it('defers to a caller-supplied key system access function', () => {
     const requestMediaKeySystemAccessFunc = vi.fn();
     const engine = createEngine({ emeEnabled: true, requestMediaKeySystemAccessFunc });

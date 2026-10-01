@@ -44,10 +44,6 @@ describe('resolveRegion', () => {
     });
   });
 
-  it('returns null for empty regions', () => {
-    expect(resolveRegion(100, rect, new Set())).toBe(null);
-  });
-
   it('returns null for zero-width container', () => {
     const zeroRect = { left: 0, width: 0 } as DOMRect;
     const regions = new Set<GestureRegion>(['left', 'right']);

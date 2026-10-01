@@ -33,11 +33,16 @@ describe('iterateBoxes', () => {
 
 describe('iterateBoxesOfType', () => {
   it('yields only direct children of the given type', () => {
-    const data = concat(box('trak', u32(1)), box('free', u32(0)), box('trak', u32(2)));
+    const first = box('trak', u32(1));
+    const container = box('moov', box('trak', u32(3)));
+    const data = concat(first, container, box('trak', u32(2)));
     const traks = [...iterateBoxesOfType(view(data), 'trak')];
 
     expect(traks).toHaveLength(2);
-    expect(traks.every((b) => b.type === 'trak')).toBe(true);
+    expect(traks.map((b) => ({ type: b.type, start: b.start }))).toEqual([
+      { type: 'trak', start: 0 },
+      { type: 'trak', start: first.length + container.length },
+    ]);
   });
 });
 

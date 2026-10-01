@@ -145,6 +145,14 @@ describe('isEditableTarget', () => {
 });
 
 describe('isInteractiveActivation', () => {
+  it('returns true for Enter on role="button"', () => {
+    const button = document.createElement('div');
+
+    button.setAttribute('role', 'button');
+    document.body.append(button);
+    expect(isInteractiveActivation(keydown(button, { key: 'Enter' }))).toBe(true);
+    button.remove();
+  });
   it('returns true for Space on a button', () => {
     const button = document.createElement('button');
 
@@ -208,6 +216,25 @@ describe('isInteractiveActivation', () => {
 });
 
 describe('isInteractiveTarget', () => {
+  it('returns true for slider targets', () => {
+    const slider = document.createElement('div');
+
+    slider.setAttribute('role', 'slider');
+    document.body.append(slider);
+    expect(isInteractiveTarget(pointerup(slider))).toBe(true);
+    slider.remove();
+  });
+
+  it('returns true for nested targets inside marked surfaces', () => {
+    const surface = document.createElement('div');
+    const child = document.createElement('span');
+
+    surface.setAttribute('data-interactive', '');
+    surface.append(child);
+    document.body.append(surface);
+    expect(isInteractiveTarget(pointerup(child))).toBe(true);
+    surface.remove();
+  });
   it('returns true for menu item radio targets', () => {
     const item = document.createElement('div');
 

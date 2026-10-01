@@ -132,11 +132,14 @@ describe('byDescendingResolution', () => {
 
   // Anamorphic again, from the ranking side: fewer pixels loses despite more height.
   it('ranks by area rather than height', () => {
-    expect(
-      sortedIds([
-        { id: 'wide', width: 3840, height: 1714, bandwidth: 12_000_000 },
-        { id: 'uhd', width: 3840, height: 2160, bandwidth: 15_000_000 },
-      ])
-    ).toEqual(['uhd', 'wide']);
+    const taller = { id: 'taller', width: 1920, height: 1440, bandwidth: 4_000_000 };
+    const wider = { id: 'wider', width: 3840, height: 1000, bandwidth: 4_000_000 };
+
+    for (const order of [
+      [taller, wider],
+      [wider, taller],
+    ]) {
+      expect(sortedIds(order)).toEqual(['wider', 'taller']);
+    }
   });
 });

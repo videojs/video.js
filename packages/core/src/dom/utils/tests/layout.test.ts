@@ -43,10 +43,20 @@ describe('intersectDOMRects', () => {
 
 describe('getPositioningBoundaryRect', () => {
   it('returns the viewport rect without an element boundary', () => {
-    const viewportRect = createDOMRect(0, 0, 300, 200);
-    const viewportSpy = vi.spyOn(document.documentElement, 'getBoundingClientRect').mockReturnValue(viewportRect);
+    const viewportSpy = vi
+      .spyOn(document.documentElement, 'getBoundingClientRect')
+      .mockReturnValue(createDOMRect(0, 0, 300, 200));
 
-    expect(getPositioningBoundaryRect()).toBe(viewportRect);
+    expect(getPositioningBoundaryRect()).toMatchObject({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 300,
+      bottom: 200,
+      width: 300,
+      height: 200,
+    });
 
     viewportSpy.mockRestore();
   });

@@ -1,69 +1,27 @@
 import { cleanup, render } from '@testing-library/react';
 import { createRef } from 'react';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 
 import { SliderPreview } from '../preview';
 import { SliderRoot } from '../root';
+import { ResizeObserverStub } from './support';
 
-// jsdom doesn't provide ResizeObserver.
-beforeAll(() => {
-  globalThis.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  } as unknown as typeof globalThis.ResizeObserver;
-});
-
-const { mockSliderApi } = vi.hoisted(() => ({
-  mockSliderApi: () => ({
-    input: {
-      current: {
-        pointerPercent: 0,
-        dragPercent: 0,
-        dragging: false,
-        pointing: false,
-        focused: false,
-      },
-      subscribe: vi.fn(() => vi.fn()),
-    },
-    rootProps: {
-      onPointerDown: vi.fn(),
-      onPointerMove: vi.fn(),
-      onPointerLeave: vi.fn(),
-    },
-    thumbProps: {
-      onKeyDownCapture: vi.fn(),
-      onFocus: vi.fn(),
-      onBlur: vi.fn(),
-    },
-    adjustForAlignment: <S,>(state: S): S => state,
-    destroy: vi.fn(),
-  }),
-}));
-
-vi.mock('@videojs/core/dom', async (importOriginal) => {
-  const orig: Record<string, unknown> = await importOriginal();
-
-  return { ...orig, createSlider: vi.fn(mockSliderApi) };
-});
-
-vi.mock('@videojs/store/react', () => ({
-  useSnapshot: vi.fn((state: { current: unknown }) => state.current),
-  useStore: vi.fn(),
-}));
+beforeAll(() => vi.stubGlobal('ResizeObserver', ResizeObserverStub));
+afterAll(() => vi.unstubAllGlobals());
 
 afterEach(cleanup);
 
 describe('SliderPreview', () => {
   it('renders a div element inside SliderRoot context', () => {
     const { container } = render(
-      <SliderRoot>
+      <SliderRoot data-testid="root">
         <SliderPreview data-testid="preview" />
       </SliderRoot>
     );
 
     const el = container.querySelector('[data-testid="preview"]');
 
+    expect(container.querySelector('[data-testid="root"]')).toBeTruthy();
     expect(el).toBeTruthy();
     expect(el?.tagName).toBe('DIV');
   });
@@ -84,45 +42,40 @@ describe('SliderPreview', () => {
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
 
-  it('sets structural positioning styles', () => {
-    const { container } = render(
-      <SliderRoot>
-        <SliderPreview data-testid="preview" />
-      </SliderRoot>
-    );
-
-    const el = container.querySelector('[data-testid="preview"]') as HTMLElement;
-
-    expect(el.style.position).toBe('absolute');
-    expect(el.style.pointerEvents).toBe('none');
-    expect(el.style.width).toBe('max-content');
-  });
-
   it('applies clamped left style by default', () => {
-    const { container } = render(
+    const { getByTestId, rerender } = render(
       <SliderRoot>
         <SliderPreview data-testid="preview" />
       </SliderRoot>
     );
+    const preview = getByTestId('preview');
 
-    const el = container.querySelector('[data-testid="preview"]') as HTMLElement;
-
-    // Before ResizeObserver fires, width is 0 so halfWidth is 0
-    expect(el.style.left).toContain('min(');
-    expect(el.style.left).toContain('max(');
-  });
-
-  it('applies unclamped left style when overflow is visible', () => {
-    const { container } = render(
+    ResizeObserverStub.measure(preview, 120);
+    expect(preview.style.left).toBe('min(max(0px, calc(var(--media-slider-pointer) - 60px)), calc(100% - 120px))');
+    rerender(
       <SliderRoot>
         <SliderPreview data-testid="preview" overflow="visible" />
       </SliderRoot>
     );
+    expect(preview.style.left).toBe('calc(var(--media-slider-pointer) - 60px)');
+  });
 
-    const el = container.querySelector('[data-testid="preview"]') as HTMLElement;
+  it('applies unclamped left style when overflow is visible', () => {
+    const { getByTestId, rerender } = render(
+      <SliderRoot>
+        <SliderPreview data-testid="preview" overflow="visible" />
+      </SliderRoot>
+    );
+    const preview = getByTestId('preview');
 
-    expect(el.style.left).toContain('calc(var(--media-slider-pointer)');
-    expect(el.style.left).not.toContain('min(');
+    ResizeObserverStub.measure(preview, 120);
+    expect(preview.style.left).toBe('calc(var(--media-slider-pointer) - 60px)');
+    rerender(
+      <SliderRoot>
+        <SliderPreview data-testid="preview" overflow="clamp" />
+      </SliderRoot>
+    );
+    expect(preview.style.left).toBe('min(max(0px, calc(var(--media-slider-pointer) - 60px)), calc(100% - 120px))');
   });
 
   it('propagates data attributes from slider state', () => {
@@ -183,18 +136,8 @@ describe('SliderPreview', () => {
     const el = container.querySelector('[data-testid="preview"]') as HTMLElement;
 
     expect(el.style.opacity).toBe('0.5');
-  });
-
-  it('renders within compound slider with all parts', () => {
-    const { container } = render(
-      <SliderRoot data-testid="root">
-        <SliderPreview data-testid="preview">
-          <span>Time value</span>
-        </SliderPreview>
-      </SliderRoot>
-    );
-
-    expect(container.querySelector('[data-testid="root"]')).toBeTruthy();
-    expect(container.querySelector('[data-testid="preview"]')).toBeTruthy();
+    expect(el.style.position).toBe('absolute');
+    expect(el.style.pointerEvents).toBe('none');
+    expect(el.style.width).toBe('max-content');
   });
 });

@@ -27,12 +27,6 @@ afterEach(() => {
 });
 
 describe('createDialog', () => {
-  it('starts closed', () => {
-    const { dialog } = createTestDialog();
-
-    expect(dialog.input.current).toEqual({ active: false, status: 'idle' });
-  });
-
   it('opens from its trigger', () => {
     const { dialog, onOpenChange } = createTestDialog();
 
@@ -126,6 +120,10 @@ describe('createDialog', () => {
     dialog.setPopupElement(popup);
     trigger.focus();
     dialog.open();
+
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(document.activeElement).toBe(popup);
+
     dialog.close();
 
     await vi.waitFor(() => expect(dialog.input.current.active).toBe(false));
@@ -233,6 +231,7 @@ describe('createDialog', () => {
     const root = document.createElement('div');
     const popup = document.createElement('div');
 
+    popup.tabIndex = -1;
     root.append(popup);
     document.body.append(outside, root);
 

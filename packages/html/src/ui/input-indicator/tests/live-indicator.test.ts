@@ -1,10 +1,5 @@
-import {
-  getVolumeIndicatorDisplayValue,
-  type VolumeIndicatorCore,
-  VolumeIndicatorCSSVars,
-  VolumeIndicatorDataAttrs,
-} from '@videojs/core';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { type VolumeIndicatorCore, VolumeIndicatorDataAttrs } from '@videojs/core';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { LiveIndicator } from '../live-indicator';
 
@@ -24,20 +19,13 @@ describe('LiveIndicator', () => {
     `;
     document.body.append(host);
 
+    const render = vi.fn();
     const indicator = new LiveIndicator<VolumeIndicatorCore.State>({
       host,
       dataAttrs: VolumeIndicatorDataAttrs,
-      render: (element, state) => {
-        element
-          .querySelector<HTMLElement>('media-volume-indicator-fill')
-          ?.style.setProperty(VolumeIndicatorCSSVars.fill, state.fill ?? '');
-        const value = element.querySelector('media-volume-indicator-value');
-
-        if (value) value.textContent = getVolumeIndicatorDisplayValue(state);
-      },
+      render,
     });
-
-    const liveElement = indicator.render({
+    const state: VolumeIndicatorCore.State = {
       open: true,
       generation: 1,
       level: 'high',
@@ -47,18 +35,14 @@ describe('LiveIndicator', () => {
       max: false,
       transitionStarting: true,
       transitionEnding: false,
-    });
+    };
+    const liveElement = indicator.render(state);
 
+    expect(render).toHaveBeenCalledWith(host, state);
     expect(liveElement).toBe(host);
     expect(host.hidden).toBe(false);
     expect(document.body.querySelectorAll('media-volume-indicator')).toHaveLength(1);
     expect(liveElement.getAttribute('data-level')).toBe('high');
-    expect(liveElement.querySelector('media-volume-indicator-value')?.textContent).toBe('60%');
-    expect(
-      liveElement
-        .querySelector<HTMLElement>('media-volume-indicator-fill')
-        ?.style.getPropertyValue(VolumeIndicatorCSSVars.fill)
-    ).toBe('60%');
 
     indicator.remove();
     expect(host.hidden).toBe(true);

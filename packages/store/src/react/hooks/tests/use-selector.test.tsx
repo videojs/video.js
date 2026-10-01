@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { useSelector } from '../use-selector';
@@ -23,51 +23,43 @@ describe('useSelector', () => {
   });
 
   it('uses shallowEqual by default for object selectors', () => {
-    const state = { volume: 0.5, muted: false };
-    let subscriber: (() => void) | undefined;
+    let state = { volume: 0.5, muted: false };
+    let subscriber!: () => void;
+    let renderCount = 0;
+    let selected!: { vol: number };
 
     const subscribe = (cb: () => void) => {
       subscriber = cb;
-      return () => {
-        subscriber = undefined;
-      };
+      return () => {};
     };
-
     const getSnapshot = () => state;
     const selector = (s: typeof state) => ({ vol: s.volume });
 
     function TestComponent() {
-      const selected = useSelector(subscribe, getSnapshot, selector);
-
+      renderCount++;
+      selected = useSelector(subscribe, getSnapshot, selector);
       return <div data-testid="vol">{selected.vol}</div>;
     }
 
-    const { rerender } = render(<TestComponent />);
-
-    // Trigger re-render with same state (selector returns new object but shallowEqual should match)
-    subscriber?.();
-    rerender(<TestComponent />);
-
-    // shallowEqual should prevent unnecessary updates when objects are structurally equal
-    expect(screen.getByTestId('vol').textContent).toBe('0.5');
-  });
-
-  it('allows custom equality function', () => {
-    const state = { items: [1, 2, 3] };
-    const subscribe = vi.fn((_cb: () => void) => () => {});
-    const getSnapshot = () => state;
-    const selector = (s: typeof state) => s.items;
-
-    // Custom equality that always returns true
-    const alwaysEqual = () => true;
-
-    function TestComponent() {
-      const items = useSelector(subscribe, getSnapshot, selector, alwaysEqual);
-
-      return <div data-testid="count">{items.length}</div>;
-    }
-
     render(<TestComponent />);
-    expect(screen.getByTestId('count').textContent).toBe('3');
+    const initialSelection = selected;
+    const initialRenderCount = renderCount;
+
+    act(() => {
+      state = { ...state, muted: true };
+      subscriber();
+    });
+
+    expect(renderCount).toBe(initialRenderCount);
+    expect(selected).toBe(initialSelection);
+
+    act(() => {
+      state = { ...state, volume: 0.8 };
+      subscriber();
+    });
+
+    expect(renderCount).toBeGreaterThan(initialRenderCount);
+    expect(selected).not.toBe(initialSelection);
+    expect(screen.getByTestId('vol').textContent).toBe('0.8');
   });
 });

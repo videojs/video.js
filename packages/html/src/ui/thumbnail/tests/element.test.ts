@@ -89,6 +89,28 @@ describe('ThumbnailElement', () => {
     expect(thumbnail.querySelector('img')).toBeNull();
   });
 
+  it('sets data-hidden when no thumbnails are available', async () => {
+    const thumbnail = document.createElement(ThumbnailElement.tagName) as ThumbnailElement;
+
+    document.body.append(thumbnail);
+    await thumbnail.updateComplete;
+
+    expect(thumbnail.hasAttribute('data-hidden')).toBe(true);
+  });
+
+  it('does not have data-hidden when thumbnails match', async () => {
+    const thumbnail = document.createElement(ThumbnailElement.tagName) as ThumbnailElement;
+    const img = document.createElement('img');
+
+    Object.defineProperty(img, 'complete', { value: false, configurable: true });
+    thumbnail.thumbnails = [{ url: 'thumb.jpg', startTime: 0 }];
+    thumbnail.append(img);
+    document.body.append(thumbnail);
+    await thumbnail.updateComplete;
+
+    expect(thumbnail.hasAttribute('data-hidden')).toBe(false);
+  });
+
   it('uses a supplied light-DOM image in place of the fallback', async () => {
     const thumbnail = document.createElement(ThumbnailElement.tagName) as ThumbnailElement;
     const img = document.createElement('img');

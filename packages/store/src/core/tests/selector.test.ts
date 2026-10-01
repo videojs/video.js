@@ -82,21 +82,6 @@ describe('createSelector', () => {
     });
   });
 
-  it('returns stable references when state values are the same', () => {
-    const selectVolume = createSelector(volumeSlice);
-    const setVolume = () => 1;
-    const state1 = { volume: 1, muted: false, setVolume };
-    const state2 = { volume: 1, muted: false, setVolume };
-
-    const selected1 = selectVolume(state1);
-    const selected2 = selectVolume(state2);
-
-    // Different object references (new object created each call)
-    expect(selected1).not.toBe(selected2);
-    // But structurally equal (for shallowEqual comparison)
-    expect(selected1).toEqual(selected2);
-  });
-
   it('exposes displayName from slice name', () => {
     const selectVolume = createSelector(volumeSlice);
 

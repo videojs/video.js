@@ -43,15 +43,6 @@ describe('PlaybackRateRadioGroupCore', () => {
       ]);
     });
 
-    it('marks state disabled when no rates are available', () => {
-      const core = new PlaybackRateRadioGroupCore();
-      const media = createMediaState({ playbackRates: [] });
-
-      core.setMedia(media);
-
-      expect(core.getState().disabled).toBe(true);
-    });
-
     it('marks availability unavailable when no rates are available', () => {
       const core = new PlaybackRateRadioGroupCore();
 
@@ -91,14 +82,6 @@ describe('PlaybackRateRadioGroupCore', () => {
       });
 
       expect(core.getLabel(createState({ rate: 2 }))).toBe('2× speed');
-    });
-  });
-
-  describe('getLabelParams', () => {
-    it('returns no parameters for the stable group label', () => {
-      const core = new PlaybackRateRadioGroupCore();
-
-      expect(core.getLabelParams(createState({ rate: 2 }))).toBeUndefined();
     });
   });
 

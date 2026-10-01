@@ -7,7 +7,6 @@ import {
   FRAMEWORK_COOKIE,
   getFrameworkPreferenceClient,
   getPreferencesServer,
-  STYLE_STORAGE_KEY_PREFIX,
   setFrameworkPreferenceClient,
   setStylePreferenceClient,
 } from '../preferences';
@@ -124,7 +123,7 @@ describe('preferences utilities', () => {
   });
 
   describe('setFrameworkPreferenceClient', () => {
-    it('should set framework cookie', () => {
+    it.each(SUPPORTED_FRAMEWORKS)('should set framework cookie for %s', (framework) => {
       // Mock document.cookie
       const cookies: string[] = [];
 
@@ -136,10 +135,10 @@ describe('preferences utilities', () => {
         configurable: true,
       });
 
-      setFrameworkPreferenceClient(firstFramework);
+      setFrameworkPreferenceClient(framework);
 
       expect(cookies).toHaveLength(1);
-      expect(cookies[0]).toContain(`vjs_docs_framework=${firstFramework}`);
+      expect(cookies[0]).toContain(`vjs_docs_framework=${framework}`);
       expect(cookies[0]).toContain('max-age=31536000');
       expect(cookies[0]).toContain('path=/');
       expect(cookies[0]).toContain('samesite=lax');
@@ -150,25 +149,6 @@ describe('preferences utilities', () => {
         // @ts-expect-error Testing invalid input
         setFrameworkPreferenceClient('invalid-framework');
       }).toThrow('Invalid framework: invalid-framework');
-    });
-
-    it('should accept all valid frameworks', () => {
-      for (const framework of SUPPORTED_FRAMEWORKS) {
-        // Mock document.cookie
-        const cookies: string[] = [];
-
-        Object.defineProperty(document, 'cookie', {
-          get: () => cookies.join('; '),
-          set: (value: string) => {
-            cookies.push(value);
-          },
-          configurable: true,
-        });
-
-        expect(() => {
-          setFrameworkPreferenceClient(framework);
-        }).not.toThrow();
-      }
     });
 
     it('should do nothing when document is undefined (SSR)', () => {
@@ -200,7 +180,7 @@ describe('preferences utilities', () => {
 
       setStylePreferenceClient(firstFramework, 'css');
 
-      const expectedKey = STYLE_STORAGE_KEY_PREFIX + firstFramework;
+      const expectedKey = `vjs_docs_style_${firstFramework}`;
 
       expect(mockStorage[expectedKey]).toBe('css');
     });

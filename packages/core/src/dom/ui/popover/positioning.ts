@@ -6,8 +6,6 @@ import type { PopoverAlign, PopoverSide } from '../../../core/ui/popover/core';
 import { PopoverCSSVars } from '../../../core/ui/popover/vars';
 import { createDOMRect } from '../../utils/layout';
 
-export { getPositionedSide } from '@videojs/utils/dom';
-
 export interface PositioningOptions {
   side: PopoverSide;
   align: PopoverAlign;
@@ -255,7 +253,7 @@ function getAnchorPositionCSS(
  * Accepts a `cssVars` map so the same logic works for both popover (`--media-popover-*`) and tooltip
  * (`--media-tooltip-*`) namespaces.
  */
-export function getPositioningCSSVars(
+function getPositioningCSSVars(
   triggerRect: DOMRect,
   boundaryRect: DOMRect,
   opts: PositioningOptions,
@@ -297,7 +295,7 @@ export function getPositioningCSSVars(
  *
  * Offsets are resolved by the caller from CSS custom properties via `getComputedStyle()` and passed as `offsets`.
  */
-export function getManualPositionStyle(
+function getManualPositionStyle(
   triggerRect: DOMRect,
   popupRect: DOMRect,
   opts: PositioningOptions,

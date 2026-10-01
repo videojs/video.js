@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { defaultFairPlayContentId } from '../../drm';
-import { keyUriFromInitData, packInitData } from '../fairplay-legacy';
+import { keyUriFromInitData, openLegacyLicenseSession, packInitData } from '../fairplay-legacy';
+import { openLicenseSession } from '../license-sessions';
 
 /** What `webkitneedkey` delivers: a 4-byte little-endian count, then the URI as UTF-16LE. */
 function lengthPrefixedUtf16(uri: string): ArrayBuffer {
@@ -17,6 +18,70 @@ function lengthPrefixedUtf16(uri: string): ArrayBuffer {
 
 const MUX_URI = 'skd://mux?keyId=bfd7ce06e7f24ca811498a15d29b0376&playbackId=FefhWnSMzDqz5z9yxssihdRx8dV6srhYJ8301u';
 const EZDRM_URI = 'skd://fps.ezdrm.com/;b99ed9e5-c641-49d1-bfa8-43692b686ddb';
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe.each(['openLicenseSession', 'openLegacyLicenseSession'] as const)('%s', (owner) => {
+  it('does not update a closed session after an asynchronous license response transform', async () => {
+    vi.stubGlobal('fetch', async () => new Response(new Uint8Array([9])));
+    let resolveLicense!: (license: Uint8Array<ArrayBuffer>) => void;
+
+    const licenseResponse = vi.fn(() => new Promise<Uint8Array<ArrayBuffer>>((resolve) => (resolveLicense = resolve)));
+    const controller = new AbortController();
+    // SAFETY: This EventTarget is a session double; the APIs used by either owner are supplied below.
+    const session = Object.assign(new EventTarget() as MediaKeySession, {
+      generateRequest: vi.fn(async () => {}),
+      update: owner === 'openLicenseSession' ? vi.fn(async () => {}) : vi.fn(),
+      close: owner === 'openLicenseSession' ? vi.fn(async () => {}) : vi.fn(),
+      keyStatuses: new Map(),
+    });
+    const options = {
+      module: undefined,
+      entry: { licenseUrl: 'https://license.example.com/fps', licenseResponse },
+      licenseUrl: 'https://license.example.com/fps',
+      signal: controller.signal,
+      report: vi.fn(),
+    };
+
+    if (owner === 'openLicenseSession') {
+      // SAFETY: The owner only calls createSession; the returned double implements the session APIs it uses.
+      openLicenseSession({
+        ...options,
+        mediaKeys: { createSession: (): MediaKeySession => session } as MediaKeys,
+        keySystem: 'com.widevine.alpha',
+        initDataType: 'cenc',
+        initData: new Uint8Array([7]),
+      });
+    } else {
+      const video = Object.assign(document.createElement('video'), {
+        webkitKeys: { createSession: () => session },
+        webkitSetMediaKeys: vi.fn(),
+      });
+
+      openLegacyLicenseSession({
+        ...options,
+        mediaElement: video,
+        certificate: new Uint8Array([1]),
+        initData: lengthPrefixedUtf16(MUX_URI),
+      });
+    }
+
+    session.dispatchEvent(
+      Object.assign(new Event(owner === 'openLicenseSession' ? 'message' : 'webkitkeymessage'), {
+        message: new Uint8Array([3]).buffer,
+      })
+    );
+    await vi.waitFor(() => expect(licenseResponse).toHaveBeenCalledTimes(1));
+    controller.abort();
+    expect(session.close).toHaveBeenCalledTimes(1);
+
+    resolveLicense(new Uint8Array([9]));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(session.update).not.toHaveBeenCalled();
+    expect(options.report).not.toHaveBeenCalled();
+  });
+});
 
 describe('keyUriFromInitData', () => {
   it('recovers the whole URI from the length-prefixed form, scheme included', () => {

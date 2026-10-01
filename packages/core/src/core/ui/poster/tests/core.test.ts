@@ -14,22 +14,6 @@ describe('PosterCore', () => {
       expect(core.getState().visible).toBe(false);
     });
 
-    it('passes the resolved URL through untouched', () => {
-      const core = new PosterCore();
-
-      core.setMedia({ started: false, poster: 'poster.jpg' });
-
-      expect(core.getState().src).toBe('poster.jpg');
-    });
-
-    it('reports an empty src when nothing supplied a poster', () => {
-      const core = new PosterCore();
-
-      core.setMedia({ started: false, poster: '' });
-
-      expect(core.getState().src).toBe('');
-    });
-
     it('reports no load state until the binding says otherwise', () => {
       const core = new PosterCore();
 

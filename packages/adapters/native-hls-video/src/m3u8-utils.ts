@@ -32,7 +32,7 @@ export function looksLikeM3u8(src: string) {
  *
  * The presence of `#EXT-X-STREAM-INF` is conclusive — media playlists only contain `#EXTINF` segment tags.
  */
-export function isMultivariantPlaylist(playlist: string) {
+function isMultivariantPlaylist(playlist: string) {
   return playlist.includes('#EXT-X-STREAM-INF');
 }
 
@@ -40,7 +40,7 @@ export function isMultivariantPlaylist(playlist: string) {
  * Resolves the first media playlist URL referenced by a multivariant playlist, relative to `baseUrl`. Returns `null`
  * when none is found or the URL cannot be parsed.
  */
-export function resolveFirstMediaPlaylistUrl(multivariant: string, baseUrl: string): string | null {
+function resolveFirstMediaPlaylistUrl(multivariant: string, baseUrl: string): string | null {
   const lines = multivariant.split(/\r?\n/);
   const start = lines.findIndex((l) => l.startsWith('#EXT-X-STREAM-INF'));
   if (start === -1) return null;
@@ -93,7 +93,7 @@ function readAttribute(line: string, pattern: RegExp): number | undefined {
  * `TARGETDURATION * 3` otherwise. A client is not meant to play closer to the end than the declared hold-back, so a
  * declared value always wins over the multiple.
  */
-export function parseStreamInfo(playlist: string): StreamInfo {
+function parseStreamInfo(playlist: string): StreamInfo {
   const lines = playlist.split(/\r?\n/);
 
   let playlistType: string | undefined;

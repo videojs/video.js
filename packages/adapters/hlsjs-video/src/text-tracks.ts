@@ -31,11 +31,11 @@ interface TextTrackSnapshot {
  * Cues are the objects the browser parsed, so putting back the ones hls.js took restores the track without refetching
  * its resource.
  */
-export function withPreservedTextTracks<T>(media: HTMLMediaElement | null, action: () => T): T {
+export function withPreservedTextTracks(media: HTMLMediaElement | null, action: () => void): void {
   const snapshots = media ? snapshotTextTracks(media) : [];
 
   try {
-    return action();
+    action();
   } finally {
     for (const snapshot of snapshots) restoreTextTrack(snapshot);
   }

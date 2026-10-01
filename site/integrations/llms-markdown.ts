@@ -33,8 +33,6 @@ import { staticMarkdownHeaderRules } from '../src/utils/markdown-handler';
 import { outsideCodeFences } from '../src/utils/markdown-text';
 import { filterSidebarForLlms, llmsSections, sidebarSlugs } from './llms-sections';
 
-export { llmsIndexPaths } from './llms-sections';
-
 export interface PageEntry {
   pathname: string;
   title: string;

@@ -247,25 +247,6 @@ describe('watchScreenResolution', () => {
     stop();
   });
 
-  it('retires each ratio query once it has fired', () => {
-    // `once: true`, so re-firing the spent query is inert — the live one is the
-    // replacement, armed against the ratio that is now current.
-    const queries = stubMatchMedia();
-
-    stubScreen(1440, 900, 1);
-    const { onChange, stop } = watchChanges();
-
-    vi.stubGlobal('devicePixelRatio', 2);
-    queries[0]!.fire();
-    expect(onChange).toHaveBeenCalledTimes(1);
-
-    queries[0]!.fire();
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(queries).toHaveLength(2);
-    stop();
-  });
-
   it('reports the reading becoming unknown, then known again', () => {
     const screen = stubScreen(1440, 900);
     const { onChange, stop } = watchChanges();

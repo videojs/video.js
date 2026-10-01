@@ -9,6 +9,7 @@ describe('idleCallback', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('calls the callback when idle', async () => {
@@ -35,14 +36,6 @@ describe('idleCallback', () => {
         timeRemaining: expect.any(Function),
       })
     );
-  });
-
-  it('returns a cleanup function', () => {
-    const callback = vi.fn();
-
-    const cancel = idleCallback(callback);
-
-    expect(cancel).toBeTypeOf('function');
   });
 
   it('cancel prevents callback from being called', async () => {
@@ -88,12 +81,22 @@ describe('idleCallback', () => {
     expect(callback3).not.toHaveBeenCalled();
   });
 
-  it('accepts options parameter', async () => {
+  it('forwards native options and cancels the returned handle', () => {
     const callback = vi.fn();
+    const options = { timeout: 1000 };
+    const request = vi.fn<typeof requestIdleCallback>(() => 42);
+    const cancel = vi.fn();
 
-    idleCallback(callback, { timeout: 1000 });
-    await vi.runAllTimersAsync();
+    vi.stubGlobal('requestIdleCallback', request);
+    vi.stubGlobal('cancelIdleCallback', cancel);
 
-    expect(callback).toHaveBeenCalledOnce();
+    const cleanup = idleCallback(callback, options);
+
+    expect(request).toHaveBeenCalledExactlyOnceWith(callback, options);
+    expect(request.mock.calls[0]![1]).toBe(options);
+    expect(cancel).not.toHaveBeenCalled();
+
+    cleanup();
+    expect(cancel).toHaveBeenCalledExactlyOnceWith(42);
   });
 });

@@ -2,97 +2,13 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createPlayerWrapper } from '../../../testing/mocks';
 import { SliderBuffer } from '../buffer';
 import { SliderFill } from '../fill';
 import { SliderRoot } from '../root';
 import { SliderThumb } from '../thumb';
 import { SliderTrack } from '../track';
 import { SliderValue } from '../value';
-
-const { mockSliderApi, sliderOptionsRef } = vi.hoisted(() => {
-  const sliderOptionsRef: {
-    current:
-      | {
-          onPressStart?: () => void;
-          onPressEnd?: () => void;
-          onDragStart?: () => void;
-          onDragEnd?: () => void;
-        }
-      | undefined;
-  } = { current: undefined };
-
-  return {
-    sliderOptionsRef,
-    mockSliderApi: (options?: {
-      getElement?: () => HTMLElement;
-      getThumbElement?: () => HTMLElement | null;
-      adjustPercent?: (raw: number, thumb: number, track: number) => number;
-      onPressStart?: () => void;
-      onPressEnd?: () => void;
-      onDragStart?: () => void;
-      onDragEnd?: () => void;
-    }) => {
-      sliderOptionsRef.current = options;
-
-      return {
-        input: {
-          current: {
-            pointerPercent: 0,
-            dragPercent: 0,
-            dragging: false,
-            pointing: false,
-            focused: false,
-          },
-          subscribe: vi.fn(() => vi.fn()),
-        },
-        rootProps: {
-          onPointerDown: vi.fn(),
-          onPointerMove: vi.fn(),
-          onPointerLeave: vi.fn(),
-        },
-        thumbProps: {
-          onKeyDownCapture: (event: { preventDefault(): void }) => event.preventDefault(),
-          onFocus: vi.fn(),
-          onBlur: vi.fn(),
-        },
-        adjustForAlignment<
-          S extends { thumbAlignment?: string; orientation?: string; fillPercent: number; pointerPercent: number },
-        >(state: S): S {
-          if (!options?.adjustPercent || state.thumbAlignment !== 'edge') return state;
-
-          const thumbEl = options.getThumbElement?.();
-          if (!thumbEl) return state;
-
-          const rootEl = options.getElement!();
-          const isHorizontal = state.orientation === 'horizontal';
-          const thumbSize = isHorizontal ? thumbEl.offsetWidth : thumbEl.offsetHeight;
-          const trackSize = isHorizontal ? rootEl.offsetWidth : rootEl.offsetHeight;
-
-          return {
-            ...state,
-            fillPercent: options.adjustPercent(state.fillPercent, thumbSize, trackSize),
-            pointerPercent: options.adjustPercent(state.pointerPercent, thumbSize, trackSize),
-          };
-        },
-        destroy: vi.fn(),
-      };
-    },
-  };
-});
-
-vi.mock('@videojs/core/dom', async (importOriginal) => {
-  const orig: Record<string, unknown> = await importOriginal();
-
-  return { ...orig, createSlider: vi.fn(mockSliderApi) };
-});
-
-vi.mock('@videojs/store/react', () => ({
-  useSnapshot: vi.fn((state: { current: unknown }) => state.current),
-  useStore: vi.fn((store: { state: object }, selector?: (state: object) => unknown) =>
-    selector ? selector(store.state) : store
-  ),
-}));
+import { createSliderPlayerWrapper as createPlayerWrapper, measureSlider, pointer } from './support';
 
 afterEach(cleanup);
 
@@ -121,18 +37,20 @@ describe('SliderRoot', () => {
   });
 
   it('sets data-orientation attribute', () => {
-    const { container } = render(<SliderRoot orientation="horizontal" />);
-    const el = container.firstElementChild;
+    const { container, rerender } = render(<SliderRoot orientation="vertical" />);
+    const root = container.firstElementChild;
 
-    expect(el?.getAttribute('data-orientation')).toBe('horizontal');
+    expect(root?.getAttribute('data-orientation')).toBe('vertical');
+    rerender(<SliderRoot orientation="horizontal" />);
+    expect(root?.getAttribute('data-orientation')).toBe('horizontal');
   });
 
   it('sets CSS custom properties as inline styles', () => {
     const { container } = render(<SliderRoot value={50} />);
     const el = container.firstElementChild as HTMLElement;
 
-    expect(el.style.getPropertyValue('--media-slider-fill')).toBeTruthy();
-    expect(el.style.getPropertyValue('--media-slider-pointer')).toBeTruthy();
+    expect(el.style.getPropertyValue('--media-slider-fill')).toBe('50.000%');
+    expect(el.style.getPropertyValue('--media-slider-pointer')).toBe('0.000%');
   });
 
   it('holds a controls visibility lock for the duration of a press', () => {
@@ -145,28 +63,22 @@ describe('SliderRoot', () => {
       toggleControls: vi.fn(),
     });
 
-    render(<SliderRoot />, { wrapper: Wrapper });
+    const { container } = render(<SliderRoot />, { wrapper: Wrapper });
+    const root = container.firstElementChild as HTMLElement;
 
-    sliderOptionsRef.current?.onPressStart?.();
+    measureSlider(root);
+
+    pointer(root, 'pointerdown', 50);
     expect(requestControlsLock).toHaveBeenCalledTimes(1);
     expect(releaseControlsLock).not.toHaveBeenCalled();
 
-    sliderOptionsRef.current?.onPressEnd?.();
+    pointer(root, 'pointerup', 50, 0);
+    pointer(root, 'lostpointercapture', 50, 0);
     expect(releaseControlsLock).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('SliderTrack', () => {
-  it('renders inside SliderRoot context', () => {
-    const { container } = render(
-      <SliderRoot>
-        <SliderTrack data-testid="track" />
-      </SliderRoot>
-    );
-
-    expect(container.querySelector('[data-testid="track"]')).toBeTruthy();
-  });
-
   it('throws outside of SliderRoot', () => {
     expect(() => render(<SliderTrack />)).toThrow('Slider compound components must be used within a Slider.Root');
   });
@@ -185,48 +97,18 @@ describe('SliderTrack', () => {
 });
 
 describe('SliderFill', () => {
-  it('renders inside SliderRoot context', () => {
-    const { container } = render(
-      <SliderRoot>
-        <SliderFill data-testid="fill" />
-      </SliderRoot>
-    );
-
-    expect(container.querySelector('[data-testid="fill"]')).toBeTruthy();
-  });
-
   it('throws outside of SliderRoot', () => {
     expect(() => render(<SliderFill />)).toThrow('Slider compound components must be used within a Slider.Root');
   });
 });
 
 describe('SliderBuffer', () => {
-  it('renders inside SliderRoot context', () => {
-    const { container } = render(
-      <SliderRoot>
-        <SliderBuffer data-testid="buffer" />
-      </SliderRoot>
-    );
-
-    expect(container.querySelector('[data-testid="buffer"]')).toBeTruthy();
-  });
-
   it('throws outside of SliderRoot', () => {
     expect(() => render(<SliderBuffer />)).toThrow('Slider compound components must be used within a Slider.Root');
   });
 });
 
 describe('SliderThumb', () => {
-  it('renders inside SliderRoot context', () => {
-    const { container } = render(
-      <SliderRoot>
-        <SliderThumb data-testid="thumb" />
-      </SliderRoot>
-    );
-
-    expect(container.querySelector('[data-testid="thumb"]')).toBeTruthy();
-  });
-
   it('throws outside of SliderRoot', () => {
     expect(() => render(<SliderThumb />)).toThrow('Slider compound components must be used within a Slider.Root');
   });
@@ -291,14 +173,14 @@ describe('SliderValue', () => {
 
   it('displays rounded value by default', () => {
     const { container } = render(
-      <SliderRoot value={42}>
+      <SliderRoot value={42.6}>
         <SliderValue />
       </SliderRoot>
     );
 
     const output = container.querySelector('output');
 
-    expect(output?.textContent).toBe('42');
+    expect(output?.textContent).toBe('43');
   });
 
   it('accepts a custom format function', () => {
@@ -329,10 +211,23 @@ describe('SliderValue', () => {
 
 describe('thumbAlignment', () => {
   it('does not adjust CSS vars for center alignment (default)', () => {
-    const { container } = render(<SliderRoot value={0} />);
+    const { container, rerender } = render(
+      <SliderRoot value={10}>
+        <SliderThumb />
+      </SliderRoot>
+    );
     const root = container.firstElementChild as HTMLElement;
+    const thumb = root.querySelector('[role="slider"]') as HTMLElement;
 
-    expect(root.style.getPropertyValue('--media-slider-fill')).toBe('0.000%');
+    Object.defineProperty(root, 'offsetWidth', { value: 200 });
+    Object.defineProperty(thumb, 'offsetWidth', { value: 20 });
+
+    rerender(
+      <SliderRoot value={10}>
+        <SliderThumb />
+      </SliderRoot>
+    );
+    expect(root.style.getPropertyValue('--media-slider-fill')).toBe('10.000%');
   });
 
   it('adjusts CSS vars for edge alignment', () => {
@@ -358,6 +253,11 @@ describe('thumbAlignment', () => {
 
     // thumbHalf = (20/200 * 100) / 2 = 5%.  Adjusted 0% → 5%.
     expect(root.style.getPropertyValue('--media-slider-fill')).toBe('5.000%');
+    measureSlider(root);
+    pointer(root, 'pointermove', 40, 0);
+    expect(root.style.getPropertyValue('--media-slider-pointer')).toBe('23.000%');
+    pointer(root, 'pointermove', 80, 0);
+    expect(root.style.getPropertyValue('--media-slider-pointer')).toBe('41.000%');
   });
 
   it('adjusts CSS vars at max value for edge alignment', () => {

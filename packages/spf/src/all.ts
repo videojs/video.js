@@ -31,14 +31,9 @@ export { resolveUrl } from './media/hls/resolve-url';
 // =============================================================================
 
 export type { QualityConfig } from './media/abr/quality-selection';
-export { DEFAULT_QUALITY_CONFIG, selectQuality } from './media/abr/quality-selection';
+export { DEFAULT_QUALITY_CONFIG } from './media/abr/quality-selection';
 export type { BandwidthConfig, BandwidthState } from './network/bandwidth-estimator';
-export {
-  DEFAULT_BANDWIDTH_CONFIG,
-  getBandwidthEstimate,
-  hasGoodEstimate,
-  sampleBandwidth,
-} from './network/bandwidth-estimator';
+export { DEFAULT_BANDWIDTH_CONFIG, getBandwidthEstimate, sampleBandwidth } from './network/bandwidth-estimator';
 
 // =============================================================================
 // Buffer Management (P8, P9)
@@ -95,7 +90,6 @@ export {
 } from './media/dom/mse/mediasource-setup';
 export type { AddChaptersTracksOptions } from './media/dom/text/chapters-tracks';
 export { addChaptersTracksToMedia, removeAllChaptersTracksFromMedia } from './media/dom/text/chapters-tracks';
-export type { ResponseLike } from './network/fetch';
 export { fetchResolvable, getResponseText } from './network/fetch';
 
 // =============================================================================

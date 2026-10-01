@@ -362,6 +362,19 @@ for (const skins of ['package', 'registry'] as const) {
       await page.mouse.move(x, sliderBox.y + sliderBox.height / 2);
       await expect(thumbnail).toBeAttached({ timeout: 15_000 });
       await expect(thumbnail).not.toHaveAttribute('data-loading', { timeout: 15_000 });
+      await expect(async () => {
+        const loaded = await thumbnail.evaluate((element) => {
+          const image = element.shadowRoot?.querySelector('img') ?? element.querySelector('img');
+
+          return image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0;
+        });
+
+        expect(loaded).toBe(true);
+        const box = await thumbnail.boundingBox();
+
+        expect(box?.width).toBeGreaterThan(0);
+        expect(box?.height).toBeGreaterThan(0);
+      }).toPass({ timeout: 15_000 });
       await expect(thumbnail).toHaveCSS('scale', '1');
 
       const [rootBox, thumbnailBox] = await Promise.all([root.boundingBox(), thumbnail.boundingBox()]);

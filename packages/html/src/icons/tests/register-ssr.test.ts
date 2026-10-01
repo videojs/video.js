@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { registerIcons } from '..';
 
-describe('registerIcons SSR', () => {
-  it('stores exact registrations without browser globals', () => {
+describe('registerIcons', () => {
+  it('does not throw without browser globals', () => {
     expect(() => registerIcons('test-ssr-icons', { play: '<svg></svg>' })).not.toThrow();
   });
 });

@@ -10,47 +10,16 @@ function createMockEvent(): MouseEvent<HTMLButtonElement> {
 
 describe('mergeProps', () => {
   describe('event handlers', () => {
-    it('merges two event handlers', () => {
-      const handler1 = vi.fn();
-      const handler2 = vi.fn();
-
-      const merged = mergeProps<'button'>({ onClick: handler1 }, { onClick: handler2 });
-
-      merged.onClick?.(createMockEvent());
-
-      expect(handler1).toHaveBeenCalledTimes(1);
-      expect(handler2).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls handlers in right-to-left order (rightmost first)', () => {
-      const log: string[] = [];
-
-      const merged = mergeProps<'button'>(
-        { onClick: () => log.push('1') },
-        { onClick: () => log.push('2') },
-        { onClick: () => log.push('3') }
-      );
+    it.each([2, 3, 4])('calls %i handlers once in right-to-left order (rightmost first)', (count) => {
+      const log: number[] = [];
+      const handlers = Array.from({ length: count }, (_, index) => vi.fn(() => log.push(index + 1)));
+      const merged = mergeProps<'button'>(...handlers.map((onClick) => ({ onClick })));
 
       merged.onClick?.(createMockEvent());
 
-      expect(log).toEqual(['3', '2', '1']);
-    });
+      expect(log).toEqual(Array.from({ length: count }, (_, index) => count - index));
 
-    it('chains multiple event handlers', () => {
-      const handlers = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
-
-      const merged = mergeProps<'button'>(
-        { onClick: handlers[0] },
-        { onClick: handlers[1] },
-        { onClick: handlers[2] },
-        { onClick: handlers[3] }
-      );
-
-      merged.onClick?.(createMockEvent());
-
-      for (const handler of handlers) {
-        expect(handler).toHaveBeenCalledTimes(1);
-      }
+      for (const handler of handlers) expect(handler).toHaveBeenCalledOnce();
     });
 
     it('skips undefined handlers', () => {
@@ -77,16 +46,6 @@ describe('mergeProps', () => {
       expect(log).toEqual(['2', '1']);
     });
 
-    it('returns single handler if only one defined', () => {
-      const handler = vi.fn();
-
-      const merged = mergeProps<'button'>({ onClick: handler }, { title: 'test' });
-
-      merged.onClick?.(createMockEvent());
-
-      expect(handler).toHaveBeenCalledTimes(1);
-    });
-
     it('passes event to all handlers', () => {
       const handler1 = vi.fn();
       const handler2 = vi.fn();
@@ -102,12 +61,6 @@ describe('mergeProps', () => {
   });
 
   describe('className', () => {
-    it('concatenates classNames with rightmost first', () => {
-      const merged = mergeProps<'div'>({ className: 'base' }, { className: 'custom' });
-
-      expect(merged.className).toBe('custom base');
-    });
-
     it('concatenates multiple classNames', () => {
       const merged = mergeProps<'div'>({ className: 'a' }, { className: 'b' }, { className: 'c' });
 
@@ -134,18 +87,6 @@ describe('mergeProps', () => {
   });
 
   describe('style', () => {
-    it('merges style objects with rightmost winning conflicts', () => {
-      const merged = mergeProps<'div'>(
-        { style: { color: 'blue', backgroundColor: 'blue' } },
-        { style: { color: 'red' } }
-      );
-
-      expect(merged.style).toEqual({
-        color: 'red',
-        backgroundColor: 'blue',
-      });
-    });
-
     it('merges multiple style objects', () => {
       const merged = mergeProps<'div'>(
         { style: { color: 'blue' } },
@@ -195,24 +136,23 @@ describe('mergeProps', () => {
     });
 
     it('preserves non-conflicting props from all sources', () => {
-      const merged = mergeProps<'button'>({ id: 'my-id' }, { role: 'button' }, { 'aria-label': 'Click me' });
+      const merged = mergeProps<'button'>(
+        { id: 'my-id' },
+        { role: 'button' },
+        { 'aria-label': 'Click me', 'aria-pressed': true, 'aria-disabled': false }
+      );
 
       expect(merged.id).toBe('my-id');
       expect(merged.role).toBe('button');
       expect(merged['aria-label']).toBe('Click me');
+      expect(merged['aria-pressed']).toBe(true);
+      expect(merged['aria-disabled']).toBe(false);
     });
 
     it('handles boolean props', () => {
       const merged = mergeProps<'button'>({ disabled: true }, { disabled: false });
 
       expect(merged.disabled).toBe(false);
-    });
-
-    it('handles aria attributes', () => {
-      const merged = mergeProps<'button'>({ 'aria-pressed': true }, { 'aria-disabled': false });
-
-      expect(merged['aria-pressed']).toBe(true);
-      expect(merged['aria-disabled']).toBe(false);
     });
   });
 

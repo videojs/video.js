@@ -59,10 +59,14 @@ describe('CastButtonCore', () => {
       expect(state.hidden).toBe(false);
     });
 
-    it('marks disabled and hidden when unsupported', () => {
+    it.each([
+      { chrome: undefined, remotePlaybackAvailability: 'available' as const, reason: 'Chrome is absent' },
+      { chrome: {}, remotePlaybackAvailability: 'unsupported' as const, reason: 'media is unsupported' },
+    ])('marks disabled and hidden when $reason', ({ chrome, remotePlaybackAvailability }) => {
+      vi.stubGlobal('chrome', chrome);
       const core = new CastButtonCore();
 
-      core.setMedia(createMediaState({ remotePlaybackAvailability: 'unsupported' }));
+      core.setMedia(createMediaState({ remotePlaybackAvailability }));
       const state = core.getState();
 
       expect(state.availability).toBe('unsupported');

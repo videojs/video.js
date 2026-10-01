@@ -76,7 +76,7 @@ function ownOrigin(data: MediaContainerData | undefined): number | undefined {
  * the presentation's duration. Also snaps negatives to `0` — a negative origin would relocate _forward_, which is never
  * the intent.
  */
-export const NEAR_ZERO_ORIGIN_THRESHOLD = 1;
+const NEAR_ZERO_ORIGIN_THRESHOLD = 1;
 
 /** Snap a below-threshold (incl. negative) origin to `0` so it isn't relocated. */
 function thresholdOrigin(origin: number): number {

@@ -510,6 +510,8 @@ describe('setupAirPlay', () => {
     expect(state.startPosition.get()).toBe(87);
 
     video.dispatchEvent(new Event('loadedmetadata'));
+    state.startPosition.set(undefined);
+    await vi.advanceTimersByTimeAsync(0);
     // A paused receiver must come back paused — no surprise autoplay.
     expect(play).not.toHaveBeenCalled();
 

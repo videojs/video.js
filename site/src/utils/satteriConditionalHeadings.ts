@@ -2,7 +2,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { kebabCase } from 'es-toolkit/string';
 import GithubSlugger from 'github-slugger';
 import type { MdastPluginInput, MdxJsxFlowElement } from 'satteri';
 import { defineMdastPlugin } from 'satteri';
@@ -16,6 +15,7 @@ import { buildMediaReferenceTocHeadings, createMediaReferenceModel } from './med
 import { buildPlayerStoreReferenceTocHeadings, createPlayerStoreReferenceModel } from './playerStoreReferenceModel';
 import { getAstroFrontmatter, type MdastVisitorContext } from './satteriAstroData';
 import { buildUtilReferenceTocHeadings, createUtilReferenceModel } from './utilReferenceModel';
+import { utilReferenceSlug } from './utilReferenceSlug';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const COMPONENT_REF_DIR = path.resolve(__dirname, '../content/generated-component-reference');
@@ -229,7 +229,7 @@ function injectUtilReferenceHeadings(node: MdxJsxFlowElement, headings: Conditio
   if (!utilName) return;
 
   const slug = getStringAttr(node, 'slug');
-  const json = readRefJson(UTIL_REF_DIR, slug ?? kebabCase(utilName));
+  const json = readRefJson(UTIL_REF_DIR, slug ?? utilReferenceSlug(utilName));
   if (!json) return;
 
   const model = createUtilReferenceModel(utilName, json as Parameters<typeof createUtilReferenceModel>[1]);

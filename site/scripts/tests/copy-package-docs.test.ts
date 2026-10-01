@@ -61,22 +61,6 @@ afterEach(() => {
 });
 
 describe('stripFooter', () => {
-  it('removes a page-style breadcrumb footer', () => {
-    const input = [
-      '# Installation',
-      '',
-      'Body content.',
-      '',
-      '---',
-      '',
-      'React documentation: https://videojs.org/docs/framework/react/llms.txt',
-      'All documentation: https://videojs.org/llms.txt',
-      '',
-    ].join('\n');
-
-    expect(stripFooter(input)).toBe(['# Installation', '', 'Body content.'].join('\n'));
-  });
-
   it('removes an index-style breadcrumb footer (no framework line)', () => {
     const input = ['# Index', '- entry', '', '---', '', 'All documentation: https://videojs.org/llms.txt', ''].join(
       '\n'

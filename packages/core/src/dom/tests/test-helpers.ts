@@ -88,6 +88,30 @@ export async function collectUnhandledRejections(action: () => void): Promise<un
   return reasons;
 }
 
+interface ExceptionEmitter {
+  on(event: 'uncaughtException', listener: (error: unknown) => void): void;
+  off(event: 'uncaughtException', listener: (error: unknown) => void): void;
+}
+
+/** Runs an action and observes errors that Node's AbortSignal listeners report on a later tick. */
+export async function collectUncaughtExceptions(action: () => void): Promise<unknown[]> {
+  // SAFETY: tests run on Node, and core's test types omit Node's globals.
+  const { process } = globalThis as unknown as { process: ExceptionEmitter };
+  const errors: unknown[] = [];
+  const onException = (error: unknown) => errors.push(error);
+
+  process.on('uncaughtException', onException);
+
+  try {
+    action();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  } finally {
+    process.off('uncaughtException', onException);
+  }
+
+  return errors;
+}
+
 // ---------------------------------------------------------------------------
 // Mock TimeRanges
 // ---------------------------------------------------------------------------

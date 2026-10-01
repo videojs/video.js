@@ -7,6 +7,9 @@ import {
   collectPageErrors,
   emulatePreference,
   expectRenderingParity,
+  expectPopupMovement,
+  expectReducedPopupMotion,
+  failLiveManifest,
   expectSameRendering,
   normalizeErrorDialogCopy,
   openComparison,
@@ -72,9 +75,7 @@ for (const variant of CASES) {
       });
     }
 
-    for (const key of ['button', 'popover', 'tooltip'] as const) {
-      expect(contracts[1]![key], `${key}: Tailwind matches CSS`).toEqual(contracts[0]![key]);
-    }
+    expect(contracts[1]!).toEqual(contracts[0]!);
 
     expect(contracts[0]!).toMatchObject({
       nestedButtons: 0,
@@ -87,11 +88,15 @@ for (const variant of CASES) {
   });
 
   test(`${variant.framework} ${variant.skin} keeps error-dialog styling in sync`, async ({ page }) => {
-    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+    await failLiveManifest(page);
+
+    const comparison = await openVariants(page, variant, 672, { expectPlay: false });
     const contracts: Awaited<ReturnType<typeof popupContract>>[] = [];
 
     for (const panel of comparison.panels) {
       await test.step(panel.style, async () => {
+        await expect(panel.root).toHaveAttribute('data-preset', 'live-audio');
+
         const dialog = panel.root.getByRole('alertdialog');
 
         await expect(dialog).toBeVisible({ timeout: 20_000 });
@@ -105,23 +110,31 @@ for (const variant of CASES) {
   });
 
   test(`${variant.framework} ${variant.skin} removes popup movement under reduced motion`, async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-
     const comparison = await openVariants(page, variant, 672);
-
-    for (const panel of comparison.panels) {
-      const mute = panel.root.getByRole('button', { name: /mute/i });
-
-      await mute.hover();
+    const readPopup = async (panel: SkinPanel) => {
+      await panel.root.getByRole('button', { name: /mute/i }).hover();
 
       const volume = panel.root.getByRole('slider', { name: /volume/i });
 
       await expect(volume).toBeVisible();
-      // Reduced motion collapses popup durations to the instant token rather than removing the transition.
-      expect((await popupContract(popupAncestor(volume))).motion.every(({ duration }) => duration === '0.05s')).toBe(
-        true
-      );
+      return popupContract(popupAncestor(volume));
+    };
+
+    for (const panel of comparison.panels) expectPopupMovement(await readPopup(panel));
+
+    await page.mouse.move(0, 0);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    const contracts = [];
+
+    for (const panel of comparison.panels) {
+      const contract = await readPopup(panel);
+
+      expectReducedPopupMotion(contract);
+      contracts.push(contract);
     }
+
+    expect(contracts[1]).toEqual(contracts[0]);
   });
 
   for (const preference of ['reduced-transparency', 'contrast-more', 'forced-colors'] as const) {

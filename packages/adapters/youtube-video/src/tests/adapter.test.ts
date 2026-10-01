@@ -3,12 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { buildYouTubeIframeSrc, YouTubeAdapter } from '..';
 
-vi.mock(import('@videojs/utils/dom'), async (importOriginal) => {
-  const mod = await importOriginal();
-
-  return { ...mod, loadScript: vi.fn(async () => {}) };
-});
-
 interface StateChangeEvent {
   data: number;
 }
@@ -20,22 +14,30 @@ interface MockPlayerEvents {
 
 class MockPlayer {
   static instances: MockPlayer[] = [];
-  target: unknown;
+  target: HTMLIFrameElement;
   events: MockPlayerEvents | undefined;
   listeners = new Map<string, Set<(event: StateChangeEvent) => void>>();
 
   playVideo = vi.fn();
   pauseVideo = vi.fn();
   seekTo = vi.fn();
-  mute = vi.fn();
-  unMute = vi.fn();
+  mute = vi.fn(() => {
+    this.isMuted.mockReturnValue(true);
+  });
+  unMute = vi.fn(() => {
+    this.isMuted.mockReturnValue(false);
+  });
   isMuted = vi.fn(() => false);
-  setVolume = vi.fn();
+  setVolume = vi.fn((volume: number) => {
+    this.getVolume.mockReturnValue(volume);
+  });
   getVolume = vi.fn(() => 100);
   getDuration = vi.fn(() => 60);
   getCurrentTime = vi.fn(() => 0);
   getPlaybackRate = vi.fn(() => 1);
-  setPlaybackRate = vi.fn();
+  setPlaybackRate = vi.fn((rate: number) => {
+    this.getPlaybackRate.mockReturnValue(rate);
+  });
   getVideoLoadedFraction = vi.fn(() => 0);
   getPlayerState = vi.fn(() => -1);
   loadVideoById = vi.fn();
@@ -47,7 +49,7 @@ class MockPlayer {
   setOption = vi.fn();
   destroy = vi.fn();
 
-  constructor(target: unknown, options?: { events?: MockPlayerEvents }) {
+  constructor(target: HTMLIFrameElement, options?: { events?: MockPlayerEvents }) {
     this.target = target;
     this.events = options?.events;
     MockPlayer.instances.push(this);
@@ -107,10 +109,12 @@ async function flushDeferredEmbed(): Promise<void> {
 }
 
 async function waitForEngine(media: YouTubeAdapter): Promise<MockPlayer> {
-  await vi.waitFor(() => {
-    if (!media.engine) throw new Error('player not created yet');
+  return vi.waitFor(() => {
+    const player = media.engine;
+    if (!(player instanceof MockPlayer)) throw new Error('player not created yet');
+
+    return player;
   });
-  return media.engine as unknown as MockPlayer;
 }
 
 async function attachAndLoad(media: YouTubeAdapter): Promise<{ iframe: HTMLIFrameElement; player: MockPlayer }> {
@@ -506,6 +510,160 @@ describe('YouTubeAdapter', () => {
     player.emit('onStateChange', STATE.CUED);
     expect(loadCompleteSpy).toHaveBeenCalledTimes(1);
     media.detach();
+  });
+
+  it.each(['queued writes', 'applied settings', 'clear and refill', 'writes during replacement'])(
+    'applies a changed caption policy after replacement readiness (%s)',
+    async (scenario) => {
+      const media = new YouTubeAdapter();
+      const src = 'aqz-KE-bpKQ';
+
+      media.source = scenario === 'clear and refill' ? { src, engine: { youtube: { cc_load_policy: 1 } } } : { src };
+      const { iframe, player } = await attachAndLoad(media);
+
+      document.body.append(iframe);
+      // The iframe API removes the embed when its player is destroyed.
+      player.destroy.mockImplementation(() => iframe.remove());
+
+      try {
+        media.volume = 0.5;
+        media.muted = true;
+        media.playbackRate = 1.5;
+
+        if (scenario === 'applied settings' || scenario === 'clear and refill') await flushDeferredEmbed();
+
+        if (scenario === 'clear and refill') {
+          media.source = null;
+          media.src = 'dQw4w9WgXcQ';
+        } else {
+          if (scenario === 'queued writes') media.currentTime = 30;
+
+          media.source = { src, engine: { youtube: { cc_load_policy: 1 } } };
+        }
+
+        if (scenario === 'writes during replacement') {
+          media.volume = 0.7;
+          media.muted = false;
+          media.playbackRate = 2;
+        }
+
+        expect(iframe.isConnected).toBe(true);
+        const replacement = await waitForEngine(media);
+        const loadcomplete = vi.fn();
+
+        media.addEventListener('loadcomplete', loadcomplete);
+        const pending = media.play();
+
+        if (scenario !== 'clear and refill') {
+          player.ready();
+          player.emit('onStateChange', STATE.PLAYING);
+          await flushDeferredEmbed();
+
+          expect(media.readyState).toBe(0);
+          expect(media.paused).toBe(true);
+          expect(loadcomplete).not.toHaveBeenCalled();
+          expect(replacement.playVideo).not.toHaveBeenCalled();
+          expect(replacement.setVolume).not.toHaveBeenCalled();
+        }
+
+        replacement.ready();
+        await pending;
+
+        expect(new URL(iframe.src).searchParams.get('cc_load_policy')).toBe(
+          scenario === 'clear and refill' ? null : '1'
+        );
+        expect(replacement).not.toBe(player);
+        expect(media.readyState).toBe(1);
+        expect(loadcomplete).toHaveBeenCalledTimes(1);
+        expect(replacement.playVideo).toHaveBeenCalledTimes(1);
+        expect(replacement.getVolume()).toBe(scenario === 'writes during replacement' ? 70 : 50);
+        expect(replacement.isMuted()).toBe(scenario !== 'writes during replacement');
+        expect(replacement.getPlaybackRate()).toBe(scenario === 'writes during replacement' ? 2 : 1.5);
+        expect(media.volume).toBe(scenario === 'writes during replacement' ? 0.7 : 0.5);
+        expect(media.muted).toBe(scenario !== 'writes during replacement');
+        expect(media.playbackRate).toBe(scenario === 'writes during replacement' ? 2 : 1.5);
+
+        if (scenario === 'queued writes') expect(replacement.seekTo).toHaveBeenCalledWith(30, true);
+      } finally {
+        media.destroy();
+        iframe.remove();
+      }
+    }
+  );
+
+  it.each(['pending play', 'default mute'])('recreates before readiness without losing the %s', async (scenario) => {
+    const media = new YouTubeAdapter();
+    const src = 'aqz-KE-bpKQ';
+    const iframe = createIframe();
+
+    media.defaultMuted = scenario === 'default mute';
+    media.src = src;
+    document.body.append(iframe);
+    media.attach(iframe);
+    const player = await waitForEngine(media);
+
+    // The iframe API removes the embed when its player is destroyed.
+    player.destroy.mockImplementation(() => iframe.remove());
+
+    try {
+      const pending = media.play();
+
+      media.source = { src, engine: { youtube: { cc_load_policy: 1 } } };
+      const replacement = await vi.waitFor(() => {
+        const engine = media.engine;
+        if (!(engine instanceof MockPlayer) || engine === player) throw new Error('replacement not created yet');
+
+        return engine;
+      });
+
+      replacement.ready();
+      await pending;
+
+      expect(replacement.playVideo).toHaveBeenCalledTimes(1);
+      expect(new URL(iframe.src).searchParams.get('mute')).toBe(scenario === 'default mute' ? '1' : '0');
+      expect(replacement.unMute).not.toHaveBeenCalled();
+    } finally {
+      media.destroy();
+      iframe.remove();
+    }
+  });
+
+  it('keeps settings written before readiness across recreation', async () => {
+    const media = new YouTubeAdapter();
+    const src = 'aqz-KE-bpKQ';
+    const iframe = createIframe();
+
+    media.defaultMuted = true;
+    media.src = src;
+    document.body.append(iframe);
+    media.attach(iframe);
+    const player = await waitForEngine(media);
+
+    // The iframe API removes the embed when its player is destroyed.
+    player.destroy.mockImplementation(() => iframe.remove());
+
+    try {
+      media.volume = 0.5;
+      media.source = { src, engine: { youtube: { cc_load_policy: 1 } } };
+      const replacement = await vi.waitFor(() => {
+        const engine = media.engine;
+        if (!(engine instanceof MockPlayer) || engine === player) throw new Error('replacement not created yet');
+
+        return engine;
+      });
+      const reportedVolumes: number[] = [];
+
+      media.addEventListener('volumechange', () => reportedVolumes.push(media.volume));
+      replacement.ready();
+      await media.play();
+
+      expect(reportedVolumes).toEqual([0.5]);
+      expect(replacement.getVolume()).toBe(50);
+      expect(replacement.unMute).not.toHaveBeenCalled();
+    } finally {
+      media.destroy();
+      iframe.remove();
+    }
   });
 
   it('defers the load when src changes before the player is ready', async () => {
@@ -943,21 +1101,6 @@ describe('YouTubeAdapter source', () => {
     media.src = 'dQw4w9WgXcQ';
 
     expect(media.source).toEqual({ engine: { youtube: { cc_load_policy: 1 } }, src: 'dQw4w9WgXcQ' });
-  });
-
-  it('reloads when only YouTube player parameters change', async () => {
-    const media = new YouTubeAdapter();
-
-    media.src = 'aqz-KE-bpKQ';
-    const { player } = await attachAndLoad(media);
-
-    player.cueVideoById.mockClear();
-
-    media.source = { src: 'aqz-KE-bpKQ', engine: { youtube: { cc_load_policy: 1 } } };
-    await Promise.resolve();
-
-    expect(player.cueVideoById).toHaveBeenCalledWith({ videoId: 'aqz-KE-bpKQ' });
-    media.detach();
   });
 
   it('serializes YouTube player parameters onto the initial iframe src', () => {

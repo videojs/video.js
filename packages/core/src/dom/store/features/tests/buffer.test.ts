@@ -11,20 +11,6 @@ describe('bufferFeature', () => {
   describe('attach', () => {
     it('syncs buffered and seekable ranges on attach', () => {
       const video = createMockVideo({
-        buffered: createTimeRanges([[0, 60]]),
-        seekable: createTimeRanges([[0, 120]]),
-      });
-
-      const store = createStore<PlayerTarget>()(bufferFeature);
-
-      store.attach({ media: video, container: null });
-
-      expect(store.state.buffered).toEqual([[0, 60]]);
-      expect(store.state.seekable).toEqual([[0, 120]]);
-    });
-
-    it('handles multiple ranges', () => {
-      const video = createMockVideo({
         buffered: createTimeRanges([
           [0, 30],
           [60, 90],
@@ -40,6 +26,7 @@ describe('bufferFeature', () => {
         [0, 30],
         [60, 90],
       ]);
+      expect(store.state.seekable).toEqual([[0, 120]]);
     });
 
     it('updates on progress event', () => {

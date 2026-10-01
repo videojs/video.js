@@ -73,7 +73,7 @@ function setTargetSeekable(host: FakeHost, ranges: [number, number][]) {
 
 describe('HlsJsLiveMixin', () => {
   describe('defaults', () => {
-    it('starts with `NaN` for both values and no event', () => {
+    it('starts with `NaN` for both values', () => {
       const engine = createEngine();
       const host = new HlsJsLive(engine);
 
@@ -106,13 +106,20 @@ describe('HlsJsLiveMixin', () => {
       expect(host.targetLiveWindow).toBe(Number.POSITIVE_INFINITY);
     });
 
-    it('is `NaN` for non-live playlists', () => {
+    it('resets the window and announces an ended EVENT playlist', () => {
       const engine = createEngine();
       const host = new HlsJsLive(engine);
+      const handler = vi.fn();
 
-      emitLevelLoaded(engine, levelDetails({ live: false, type: 'VOD' }));
+      host.addEventListener('targetlivewindowchange', handler);
+      emitLevelLoaded(engine, levelDetails({ live: true, type: 'EVENT', holdBack: 18 }));
+      expect(host.targetLiveWindow).toBe(Infinity);
+      expect(handler).toHaveBeenCalledOnce();
+
+      emitLevelLoaded(engine, levelDetails({ live: false, type: 'EVENT' }));
 
       expect(host.targetLiveWindow).toBeNaN();
+      expect(handler).toHaveBeenCalledTimes(2);
     });
 
     it('dedupes `targetlivewindowchange` when the value does not change', () => {
@@ -137,9 +144,9 @@ describe('HlsJsLiveMixin', () => {
 
       setTargetSeekable(host, [[0, 60]]);
 
-      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 18, targetduration: 6 }));
+      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 12, targetduration: 6 }));
 
-      expect(host.liveEdgeStart).toBe(42);
+      expect(host.liveEdgeStart).toBe(48);
     });
 
     it('falls back to `targetduration * 3` when `holdBack` is absent', () => {
@@ -192,7 +199,10 @@ describe('HlsJsLiveMixin', () => {
 
       setTargetSeekable(host, [[0, 60]]);
 
-      emitLevelLoaded(engine, levelDetails({ live: false, type: 'VOD' }));
+      emitLevelLoaded(engine, levelDetails({ live: true, type: 'EVENT', holdBack: 18 }));
+      expect(host.liveEdgeStart).toBe(42);
+
+      emitLevelLoaded(engine, levelDetails({ live: false, type: 'EVENT' }));
 
       expect(host.liveEdgeStart).toBeNaN();
     });
@@ -288,13 +298,16 @@ describe('HlsJsLiveMixin', () => {
       expect(video.currentTime).toBe(50);
     });
 
-    it('does not seek when stream is on-demand', () => {
+    it('does not seek after an EVENT playlist ends', () => {
       const engine = createEngine();
       const host = new HlsJsLive(engine);
       const video = setTargetSeekable(host, [[0, 60]]);
 
       emitManifestLoading(engine);
-      emitLevelLoaded(engine, levelDetails({ live: false, type: 'VOD' }));
+      emitLevelLoaded(engine, levelDetails({ live: true, type: 'EVENT', holdBack: 18 }));
+      expect(host.liveEdgeStart).toBe(42);
+
+      emitLevelLoaded(engine, levelDetails({ live: false, type: 'EVENT' }));
 
       video.dispatchEvent(new Event('play'));
 
@@ -334,7 +347,7 @@ describe('HlsJsLiveMixin', () => {
       expect(video.currentTime).toBe(42);
     });
 
-    it('disarms on `DESTROYING`', () => {
+    it('disarms on `MEDIA_DETACHED`', () => {
       const engine = createEngine();
       const host = new HlsJsLive(engine);
       const video = setTargetSeekable(host, [[0, 60]]);
@@ -342,7 +355,8 @@ describe('HlsJsLiveMixin', () => {
       emitManifestLoading(engine);
       emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 18 }));
 
-      (engine as any).emit(Hls.Events.DESTROYING);
+      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+      expect(host.liveEdgeStart).toBe(42);
 
       video.dispatchEvent(new Event('play'));
 
@@ -392,9 +406,13 @@ describe('HlsJsLiveMixin', () => {
 
       setTargetSeekable(host, [[0, 60]]);
 
-      emitLevelLoaded(engine, levelDetails({ live: false, type: 'VOD' }));
+      emitLevelLoaded(engine, levelDetails({ live: true, type: 'EVENT', holdBack: 18 }));
+      expect(engine.config.backBufferLength).toBe(8);
 
-      expect((engine as any).config.backBufferLength).toBeUndefined();
+      engine.config.backBufferLength = 73;
+      emitLevelLoaded(engine, levelDetails({ live: false, type: 'EVENT' }));
+
+      expect(engine.config.backBufferLength).toBe(73);
     });
   });
 

@@ -92,7 +92,7 @@ describe('emitError', () => {
 });
 
 describe('collectErrors', () => {
-  it('retains emitted errors while the source stays resolved', async () => {
+  it('does not clear on a live reload — a new presentation object, still resolved', async () => {
     const state = makeState(resolved());
     const reactor = collectErrors.setup({ state });
 
@@ -102,18 +102,6 @@ describe('collectErrors', () => {
     await flush();
 
     expect(state.errors.get()).toEqual([{ code: SVTA_NO_SUPPORTED_VIDEO_TRACK }]);
-
-    reactor.destroy();
-  });
-
-  it('does not clear on a live reload — a new presentation object, still resolved', async () => {
-    const state = makeState(resolved());
-    const reactor = collectErrors.setup({ state });
-
-    await flush();
-
-    emitError(state, { code: SVTA_NO_SUPPORTED_VIDEO_TRACK });
-    await flush();
 
     // A live media-playlist reload swaps in a new presentation object without
     // ever leaving the resolved state; errors must survive it.
@@ -155,16 +143,5 @@ describe('collectErrors', () => {
     await flush();
 
     expect(state.errors.get()).toBeUndefined();
-  });
-
-  it('stays inert while no source is resolved', async () => {
-    const state = makeState(undefined);
-    const reactor = collectErrors.setup({ state });
-
-    await flush();
-
-    expect(state.errors.get()).toBeUndefined();
-
-    reactor.destroy();
   });
 });

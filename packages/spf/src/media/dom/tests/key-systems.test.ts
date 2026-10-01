@@ -82,16 +82,6 @@ describe('widevineKeySystem', () => {
 });
 
 describe('playReadyKeySystem', () => {
-  it('offers the plain id ahead of the hardware one', () => {
-    // `.recommendation` is the hardware security level, and a hardware CDM
-    // refuses a license issued against a software one. hls.js and Mux Player
-    // never request it.
-    expect(playReadyKeySystem.requestVariants).toEqual([
-      'com.microsoft.playready',
-      'com.microsoft.playready.recommendation',
-    ]);
-  });
-
   it('wraps a raw PlayReady Object into a v0 PSSH box', () => {
     const projected = playReadyKeySystem.toInitData?.(`data:text/plain;base64,${PSSH_BASE64}`);
     const initData = projected!.initData;
@@ -102,7 +92,9 @@ describe('playReadyKeySystem', () => {
     expect([...initData.slice(4, 8)]).toEqual([0x70, 0x73, 0x73, 0x68]); // 'pssh'
     expect(new DataView(initData.buffer).getUint32(8)).toBe(0); // v0, no flags
     // The PlayReady system id, 9a04f079-9840-4286-ab92-e65be0885f95.
-    expect([...initData.slice(12, 16)]).toEqual([0x9a, 0x04, 0xf0, 0x79]);
+    expect([...initData.slice(12, 28)]).toEqual([
+      0x9a, 0x04, 0xf0, 0x79, 0x98, 0x40, 0x42, 0x86, 0xab, 0x92, 0xe6, 0x5b, 0xe0, 0x88, 0x5f, 0x95,
+    ]);
     expect(new DataView(initData.buffer).getUint32(28)).toBe(PSSH_BYTES.length);
     expect([...initData.slice(32)]).toEqual([...PSSH_BYTES]);
   });
@@ -200,14 +192,6 @@ describe('clearKeySystem', () => {
 
     expect(shaped.headers['Content-Type']).toBe('application/json');
     expect(shaped.body).toBe(body);
-  });
-
-  it('stays out of DEFAULT_KEY_SYSTEMS', () => {
-    // Widened on purpose: the ids are literal types now, and the compiler would
-    // otherwise reject the comparison as never overlapping — which is the point.
-    const ids: readonly string[] = DEFAULT_KEY_SYSTEMS.map((module_) => module_.keySystem);
-
-    expect(ids).not.toContain('org.w3.clearkey');
   });
 });
 

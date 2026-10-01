@@ -24,7 +24,7 @@ type SourceBufferIterable = SourceBufferList | Iterable<SourceBuffer>;
  * Check if we have the basics to update MediaSource duration: a `mediaSource` and a `presentation` with a numeric
  * duration.
  */
-export function canUpdateDuration(
+function canUpdateDuration(
   presentation: MaybeResolvedPresentation | undefined,
   mediaSource: MediaSource | undefined
 ): boolean {

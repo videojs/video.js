@@ -39,10 +39,9 @@ export interface RenditionCapController {
  * Renditions are matched on area rather than literal height so anamorphic variants are judged by how many pixels they
  * actually carry: a 2560×1080 ultrawide rendition costs more than 16:9 1080p and is capped accordingly.
  *
- * Mirrors `maxResolutionToPixelArea` in `@videojs/spf`, and agrees with it on every rung whose 16:9 width is a whole
- * number. It parts company at `'480p'` on purpose: 16:9 at 480 tall is 853.33 wide, ladders ship the rounded-up
- * 854×480, and the exact area would put the standard 480p rendition over its own cap. Rounding the width up admits it
- * while still excluding anything genuinely wider.
+ * Rounds the 16:9 width up so every standard rendition fits its own cap. For `'480p'`, the exact width is 853.33, while
+ * ladders ship 854×480. The exact area would put that rendition over its own cap; rounding admits it while still
+ * excluding wider renditions.
  */
 export function resolutionToPixelArea(resolution: MediaResolution | undefined): number {
   if (resolution === undefined) return Number.POSITIVE_INFINITY;

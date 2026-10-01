@@ -1,29 +1,10 @@
-import { createSelector, createStore, type StateContext } from '@videojs/store';
+import { createSelector, createStore } from '@videojs/store';
 import { assertType, describe, expect, it } from 'vite-plus/test';
 
 import { combinePlayerFeatureConfigs, definePlayerFeature, setPlayerConfigValue } from '../feature';
 import type { PlayerFeatureConfig, PlayerTarget } from '../player';
 
-const stateContext = {
-  target: () => {
-    throw new Error('Target is not available in this test.');
-  },
-  signals: undefined as unknown as StateContext<PlayerTarget>['signals'],
-  get: () => ({}),
-  set: () => {},
-} satisfies StateContext<PlayerTarget>;
-
 describe('definePlayerFeature', () => {
-  it('defines a plain player feature', () => {
-    const feature = definePlayerFeature({
-      name: 'plain',
-      state: () => ({ enabled: true }),
-    });
-
-    expect(feature.name).toBe('plain');
-    expect(feature.state(stateContext).enabled).toBe(true);
-  });
-
   it('routes config inputs through private actions and derives detach persistence', () => {
     const USER_LABEL = Symbol('userLabel');
     const SET_USER_LABEL = Symbol('setUserLabel');
@@ -55,6 +36,7 @@ describe('definePlayerFeature', () => {
     const store = createStore<PlayerTarget>()(feature);
 
     setPlayerConfigValue(store, feature.config!.label, 'provided');
+    // SAFETY: This feature only updates store state and never reads the target.
     const detach = store.attach({} as PlayerTarget);
 
     detach();

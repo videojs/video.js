@@ -144,7 +144,8 @@ function updateMediaSourceDurationSetup({
             const maxBufferedEnd = getMaxBufferedEnd(mediaSource.sourceBuffers);
             const duration = maxBufferedEnd > presentation.duration! ? maxBufferedEnd : presentation.duration!;
 
-            mediaSource.duration = duration;
+            // A concurrent append may have established duration while we awaited idle buffers.
+            if (Number.isNaN(mediaSource.duration)) mediaSource.duration = duration;
           };
 
           writeWhenReady();

@@ -25,14 +25,14 @@ describe('satteriReadingTime', () => {
     const words = Array.from({ length: 500 }, (_, i) => `word${i}`).join(' ');
     const frontmatter = render(`# Title\n\n${words}`);
 
-    expect(frontmatter.minutesRead).toMatch(/min read/);
-    expect(typeof frontmatter.readingTimeMinutes).toBe('number');
-    expect(frontmatter.readingTimeMinutes as number).toBeGreaterThan(0);
+    expect(frontmatter.readingTimeMinutes).toBeCloseTo(501 / 200, 6);
+    expect(frontmatter.minutesRead).toBe('3 min read');
   });
 
   it('counts code and inline code toward the total', () => {
     const withCode = render('# Title\n\nSome `inline` text\n\n```ts\nconst a = 1;\n```');
 
-    expect(withCode.minutesRead).toMatch(/min read/);
+    expect(withCode.readingTimeMinutes).toBeCloseTo(8 / 200, 6);
+    expect(withCode.minutesRead).toBe('1 min read');
   });
 });

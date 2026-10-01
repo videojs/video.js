@@ -1,3 +1,5 @@
+import { SourceMap, type SourceMapPayload } from 'node:module';
+
 import { type OutputAsset, type OutputChunk, type Plugin, RolldownMagicString, rolldown } from 'rolldown';
 import { describe, expect, it } from 'vite-plus/test';
 
@@ -17,18 +19,24 @@ describe('inlineTemplatePlugin', () => {
   });
 
   it('returns native edits with a composed source map', async () => {
-    const { chunk, map } = await build(
-      `export const template = /*html*/ \`
+    const source = `export const template = /*html*/ \`
         <div>
           <span></span>
         </div>
-      \`;`,
-      inlineTemplatePlugin()
-    );
+      \`;
+MAP_SENTINEL(template);`;
+    const { chunk, map } = await build(source, inlineTemplatePlugin());
+    const generated = tokenPosition(chunk.code, 'MAP_SENTINEL');
+    const original = tokenPosition(source, 'MAP_SENTINEL');
 
     expect(chunk.code).toContain('`<div><span></span></div>`');
-    expect(map.mappings).not.toBe('');
-    expect(map.sources.length).toBeGreaterThan(0);
+    expect(chunk.code.indexOf('MAP_SENTINEL')).toBeLessThan(source.indexOf('MAP_SENTINEL'));
+    expect(generated.line).toBeLessThan(original.line);
+    expect(new SourceMap(map).findEntry(generated.line, generated.column)).toMatchObject({
+      originalSource: `../${ENTRY_ID}`,
+      originalLine: original.line,
+      originalColumn: original.column,
+    });
   });
 
   it('fails clearly when native MagicString is unavailable', () => {
@@ -76,12 +84,17 @@ describe('cdnI18nExternalPlugin', () => {
   });
 });
 
-interface SourceMapOutput {
-  readonly mappings: string;
-  readonly sources: string[];
+function tokenPosition(source: string, token: string) {
+  const index = source.indexOf(token);
+
+  expect(index).toBeGreaterThanOrEqual(0);
+
+  const lines = source.slice(0, index).split('\n');
+
+  return { line: lines.length - 1, column: lines.at(-1)!.length };
 }
 
-async function build(source: string, plugin: Plugin): Promise<{ chunk: OutputChunk; map: SourceMapOutput }> {
+async function build(source: string, plugin: Plugin): Promise<{ chunk: OutputChunk; map: SourceMapPayload }> {
   const bundle = await rolldown({
     input: ENTRY_ID,
     experimental: { nativeMagicString: true },
@@ -97,7 +110,10 @@ async function build(source: string, plugin: Plugin): Promise<{ chunk: OutputChu
 
   if (!map) throw new Error('Expected fixture build to emit a source map.');
 
-  return { chunk, map: JSON.parse(String(map.source)) as SourceMapOutput };
+  await bundle.close();
+
+  // SAFETY: Rolldown emitted this serialized Source Map v3 asset with sourcemap enabled.
+  return { chunk, map: JSON.parse(String(map.source)) as SourceMapPayload };
 }
 
 function fixturePlugin(source: string): Plugin {

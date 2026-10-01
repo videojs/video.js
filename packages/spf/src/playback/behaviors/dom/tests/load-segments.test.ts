@@ -5,10 +5,10 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 import type { ContextSignals, StateSignals } from '../../../../core/composition/create-composition';
 import { signal } from '../../../../core/signals/primitives';
 import type { MaybeResolvedPresentation, Segment } from '../../../../media/types';
-import type { BandwidthState } from '../../../../network/bandwidth-estimator';
-import { createTrackedFetch, type FetchBytes, fetchStream } from '../../../../network/fetch';
+import { type FetchBytes, fetchStream } from '../../../../network/fetch';
 import { createSegmentLoaderActor, type SegmentLoaderActor } from '../../../actors/dom/segment-loader';
 import { createSourceBufferActor, type SourceBufferActor } from '../../../actors/dom/source-buffer';
+import { makeSourceBuffer } from '../../../actors/dom/tests/segment-loader-fixtures';
 import type { TextTrackSegmentLoaderActor } from '../../../actors/text-track-segment-loader';
 import {
   loadAudioSegments,
@@ -78,78 +78,6 @@ function makeResolvedVideoTrack(segments: Segment[]) {
 }
 
 /**
- * Creates a minimal SourceBuffer mock.
- *
- * `appendRanges` — added to `buffered` in sequence as `appendBuffer` is called (for testing the live append path).
- * `startingRanges` — present in `buffered` from the start, before any appends (for pre-seeded actor context tests where
- * no appendBuffer calls are made). `remove()` clips the current ranges to match real SourceBuffer behaviour, enabling
- * the midpoint-based segment model logic in removeTask.
- */
-function makeSourceBuffer(
-  appendRanges: Array<[number, number]> = [],
-  startingRanges: Array<[number, number]> = []
-): SourceBuffer {
-  const listeners: Record<string, EventListener[]> = {};
-  let appendIndex = 0;
-  let ranges: Array<[number, number]> = [...startingRanges];
-
-  const clipRanges = (start: number, end: number) => {
-    const next: Array<[number, number]> = [];
-
-    for (const [s, e] of ranges) {
-      if (e <= start || s >= end) {
-        next.push([s, e]);
-      } else {
-        if (s < start) next.push([s, start]);
-
-        if (e > end) next.push([end, e]);
-      }
-    }
-
-    ranges = next;
-  };
-
-  return {
-    get buffered() {
-      return {
-        get length() {
-          return ranges.length;
-        },
-        start: (i: number) => ranges[i]![0],
-        end: (i: number) => ranges[i]![1],
-      } as TimeRanges;
-    },
-    updating: false,
-    appendBuffer: vi.fn(() => {
-      const range = appendRanges[appendIndex++];
-
-      if (range) ranges.push(range);
-
-      setTimeout(() => {
-        for (const listener of listeners.updateend ?? []) {
-          listener(new Event('updateend'));
-        }
-      }, 0);
-    }),
-    remove: vi.fn((start: number, end: number) => {
-      clipRanges(start, end);
-      setTimeout(() => {
-        for (const listener of listeners.updateend ?? []) {
-          listener(new Event('updateend'));
-        }
-      }, 0);
-    }),
-    addEventListener: vi.fn((type: string, listener: EventListener) => {
-      listeners[type] ??= [];
-      listeners[type].push(listener);
-    }),
-    removeEventListener: vi.fn((type: string, listener: EventListener) => {
-      listeners[type] = (listeners[type] ?? []).filter((l) => l !== listener);
-    }),
-  } as unknown as SourceBuffer;
-}
-
-/**
  * Creates a SourceBuffer + SourceBufferActor pair.
  *
  * `preloadedRanges` — initial `buffered` ranges (present before any appends). Use when the actor context is pre-seeded
@@ -183,6 +111,7 @@ function setupLoadSegments(
 ) {
   const state = makeState(initialState);
   const loaderActor = createSegmentLoaderActor(bufferActor, fetchFn);
+  const send = vi.spyOn(loaderActor, 'send');
   const context = makeContext(
     type === 'video'
       ? { videoBufferActor: bufferActor, videoSegmentLoaderActor: loaderActor }
@@ -193,17 +122,18 @@ function setupLoadSegments(
   const cleanup = () => {
     reactor.destroy();
     loaderActor.destroy();
+    bufferActor.destroy();
   };
 
-  return { state, context, bufferActor, loaderActor, cleanup };
+  return { state, context, bufferActor, loaderActor, send, cleanup };
 }
 
 // ---------------------------------------------------------------------------
 // loadSegments orchestration — forward buffer behaviour
 // ---------------------------------------------------------------------------
 
-describe('loadSegments orchestration (F5)', () => {
-  it('only fetches segments within the buffer window', async () => {
+describe('loadVideoSegments', () => {
+  it('loads additional segments when currentTime advances', async () => {
     const segments = [
       makeSegment('s1', 0, 10),
       makeSegment('s2', 10, 10),
@@ -221,8 +151,13 @@ describe('loadSegments orchestration (F5)', () => {
     });
 
     const track = makeResolvedVideoTrack(segments);
-    const { actor } = makeSourceBufferWithActor();
-    const { cleanup } = setupLoadSegments(
+    // s1 already loaded — actor pre-seeded with s1 and init
+    const { actor } = makeSourceBufferWithActor(
+      [[0, 10]],
+      [{ id: 's1', startTime: 0, duration: 10, trackId: 'track-1' }],
+      'track-1'
+    );
+    const { state, loaderActor, cleanup } = setupLoadSegments(
       {
         preload: 'auto',
         selectedVideoTrackId: 'track-1',
@@ -240,98 +175,32 @@ describe('loadSegments orchestration (F5)', () => {
     );
 
     await vi.waitFor(() => {
-      expect(fetchedUrls).toContain('http://example.com/init.mp4');
-      expect(fetchedUrls).toContain('http://example.com/s1.m4s');
-      expect(fetchedUrls).toContain('http://example.com/s2.m4s');
-      expect(fetchedUrls).toContain('http://example.com/s3.m4s');
-      expect(fetchedUrls).not.toContain('http://example.com/s4.m4s');
-    });
-
-    cleanup();
-  });
-
-  it('skips init segment when already loaded for the track', async () => {
-    const segments = [makeSegment('s1', 0, 10)];
-
-    const fetchedUrls: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
-    });
-
-    const track = makeResolvedVideoTrack(segments);
-    // Init already loaded for this track — actor context has initTrackId set
-    const { actor } = makeSourceBufferWithActor([], [], 'track-1');
-    const { cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 10,
-          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(() => {
-      expect(fetchedUrls).toContain('http://example.com/s1.m4s');
-      expect(fetchedUrls).not.toContain('http://example.com/init.mp4');
-    });
-
-    cleanup();
-  });
-
-  it('loads additional segments when currentTime advances', async () => {
-    const segments = [makeSegment('s1', 0, 10), makeSegment('s2', 10, 10), makeSegment('s3', 20, 10)];
-
-    const fetchedUrls: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
-    });
-
-    const track = makeResolvedVideoTrack(segments);
-    // s1 already loaded — actor pre-seeded with s1 and init
-    const { actor } = makeSourceBufferWithActor(
-      [[0, 10]],
-      [{ id: 's1', startTime: 0, duration: 10, trackId: 'track-1' }],
-      'track-1'
-    );
-    const { cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 30,
-          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(() => {
       expect(fetchedUrls).toContain('http://example.com/s2.m4s');
       expect(fetchedUrls).toContain('http://example.com/s3.m4s');
       expect(fetchedUrls).not.toContain('http://example.com/s1.m4s');
+      expect(actor.snapshot.get().context.segments.map(({ id, partial }) => ({ id, partial }))).toEqual([
+        { id: 's1', partial: undefined },
+        { id: 's2', partial: undefined },
+        { id: 's3', partial: undefined },
+      ]);
+      expect(actor.snapshot.get().value).toBe('idle');
+      expect(loaderActor.snapshot.get().value).toBe('idle');
       expect(fetchedUrls).not.toContain('http://example.com/init.mp4');
     });
+
+    expect(fetchedUrls).not.toContain('http://example.com/s4.m4s');
+
+    state.currentTime.set(10);
+    await vi.waitFor(() => {
+      expect(actor.snapshot.get().context.segments).toHaveLength(4);
+      expect(actor.snapshot.get().context.segments.every((segment) => !segment.partial)).toBe(true);
+      expect(loaderActor.snapshot.get().value).toBe('idle');
+    });
+    expect(fetchedUrls).toEqual([
+      'http://example.com/s2.m4s',
+      'http://example.com/s3.m4s',
+      'http://example.com/s4.m4s',
+    ]);
 
     cleanup();
   });
@@ -341,7 +210,7 @@ describe('loadSegments orchestration (F5)', () => {
 // preload="metadata" — init segment only, no media segments
 // ---------------------------------------------------------------------------
 
-describe('loadSegments orchestration (metadata mode)', () => {
+describe('loadVideoSegments', () => {
   function makePresentation(segments: Segment[]) {
     return {
       id: 'p1',
@@ -458,356 +327,10 @@ describe('loadSegments orchestration (metadata mode)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Seek handling — pending task + abort
-// ---------------------------------------------------------------------------
-
-describe('loadSegments seek handling', () => {
-  function makeControllableFetch() {
-    const resolvers = new Map<string, () => void>();
-    const fetchedUrls: string[] = [];
-
-    const fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return new Promise<Response>((resolve) => {
-        resolvers.set(url, () => resolve(new Response(new ArrayBuffer(100))));
-      });
-    });
-
-    const resolve = (url: string) => resolvers.get(url)?.();
-    const resolveAll = () => resolvers.forEach((fn) => fn());
-
-    return { fetch, fetchedUrls, resolve, resolveAll };
-  }
-
-  function makePresentation(segments: Segment[]) {
-    return {
-      id: 'p1',
-      url: 'http://example.com/playlist.m3u8',
-      startTime: 0,
-      duration: segments.reduce((acc, s) => acc + s.duration, 0),
-      selectionSets: [
-        {
-          id: 'ss1',
-          type: 'video' as const,
-          switchingSets: [{ id: 'sw1', type: 'video' as const, tracks: [makeResolvedVideoTrack(segments)] }],
-        },
-      ],
-    };
-  }
-
-  it('aborts current task and loads seek destination when seek is detected', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s60', 60, 10),
-      makeSegment('s70', 70, 10),
-      makeSegment('s80', 80, 10),
-    ];
-
-    const { fetch, fetchedUrls, resolve } = makeControllableFetch();
-
-    globalThis.fetch = fetch;
-
-    const { actor } = makeSourceBufferWithActor();
-    const { state, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        loadActivated: true, // seeks are a post-play concern; currentTime only tracked when playing
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: makePresentation(segments),
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(() => expect(fetchedUrls).toContain('http://example.com/init.mp4'));
-
-    state.currentTime.set(60);
-
-    resolve('http://example.com/init.mp4');
-
-    await vi.waitFor(() => expect(fetchedUrls).toContain('http://example.com/s60.m4s'), { timeout: 3000 });
-
-    cleanup();
-  });
-
-  it('uses only the latest pending state when multiple seeks occur during loading', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s30', 30, 10),
-      makeSegment('s60', 60, 10),
-      makeSegment('s90', 90, 10),
-    ];
-
-    const { fetch, fetchedUrls, resolveAll } = makeControllableFetch();
-
-    globalThis.fetch = fetch;
-
-    const { actor } = makeSourceBufferWithActor();
-    const { state, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        loadActivated: true, // seeks are a post-play concern; currentTime only tracked when playing
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: makePresentation(segments),
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(() => expect(fetchedUrls).toContain('http://example.com/init.mp4'));
-
-    state.currentTime.set(60);
-    state.currentTime.set(90);
-
-    resolveAll();
-
-    await vi.waitFor(() => expect(fetchedUrls).toContain('http://example.com/s90.m4s'), { timeout: 3000 });
-
-    expect(fetchedUrls).not.toContain('http://example.com/s30.m4s');
-
-    cleanup();
-  });
-
-  it('does not abort during normal playback as currentTime advances slowly', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s4', 30, 10),
-    ];
-
-    const fetchedUrls: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
-    });
-
-    const { actor } = makeSourceBufferWithActor();
-    const { cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        loadActivated: true, // currentTime advances are only tracked post-play
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: makePresentation(segments),
-      },
-      actor,
-      'video'
-    );
-
-    /* no-op state update */
-    /* no-op state update */
-
-    await vi.waitFor(
-      () => {
-        expect(fetchedUrls).toContain('http://example.com/s1.m4s');
-        expect(fetchedUrls).toContain('http://example.com/s2.m4s');
-        expect(fetchedUrls).toContain('http://example.com/s3.m4s');
-      },
-      { timeout: 3000 }
-    );
-
-    cleanup();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Back buffer management (F6)
-// ---------------------------------------------------------------------------
-
-describe('loadSegments back buffer flushing', () => {
-  function makeControllableFetch() {
-    const resolvers = new Map<string, () => void>();
-    const fetchedUrls: string[] = [];
-
-    const fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return new Promise<Response>((resolve) => {
-        resolvers.set(url, () => resolve(new Response(new ArrayBuffer(100))));
-      });
-    });
-
-    const resolveAll = () => resolvers.forEach((fn) => fn());
-
-    return { fetch, fetchedUrls, resolveAll };
-  }
-
-  function makePresentationF6(segments: Segment[]) {
-    return {
-      id: 'p1',
-      url: 'http://example.com/playlist.m3u8',
-      startTime: 0,
-      duration: segments.reduce((acc, s) => acc + s.duration, 0),
-      selectionSets: [
-        {
-          id: 'ss1',
-          type: 'video' as const,
-          switchingSets: [{ id: 'sw1', type: 'video' as const, tracks: [makeResolvedVideoTrack(segments)] }],
-        },
-      ],
-    };
-  }
-
-  it('flushes back buffer before loading new segments when currentTime advances', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s4', 30, 10),
-      makeSegment('s5', 40, 10),
-      makeSegment('s6', 50, 10),
-    ];
-
-    const { fetch, resolveAll } = makeControllableFetch();
-
-    globalThis.fetch = fetch;
-
-    // s1–s4 already loaded, currentTime jumped to 40s
-    const { sourceBuffer, actor } = makeSourceBufferWithActor(
-      [[0, 40]],
-      [
-        { id: 's1', startTime: 0, duration: 10, trackId: 'track-1' },
-        { id: 's2', startTime: 10, duration: 10, trackId: 'track-1' },
-        { id: 's3', startTime: 20, duration: 10, trackId: 'track-1' },
-        { id: 's4', startTime: 30, duration: 10, trackId: 'track-1' },
-      ],
-      'track-1'
-    );
-    const { cleanup } = setupLoadSegments(
-      { preload: 'auto', selectedVideoTrackId: 'track-1', currentTime: 40, presentation: makePresentationF6(segments) },
-      actor,
-      'video'
-    );
-
-    resolveAll();
-
-    // With keepSegments=2: keep s3@20 and s4@30, flush [0, 20)
-    await vi.waitFor(
-      () => {
-        expect(sourceBuffer.remove).toHaveBeenCalledWith(0, 20);
-      },
-      { timeout: 3000 }
-    );
-
-    cleanup();
-  });
-
-  it('does not flush when back buffer is within the keep threshold', async () => {
-    const segments = [makeSegment('s1', 0, 10), makeSegment('s2', 10, 10), makeSegment('s3', 20, 10)];
-
-    globalThis.fetch = vi.fn().mockImplementation(() => Promise.resolve(new Response(new ArrayBuffer(100))));
-
-    // s1 already loaded, currentTime=10
-    const { sourceBuffer, actor } = makeSourceBufferWithActor(
-      [[0, 10]],
-      [{ id: 's1', startTime: 0, duration: 10, trackId: 'track-1' }],
-      'track-1'
-    );
-    const { bufferActor, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 10,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 30,
-          selectionSets: [
-            {
-              id: 'ss1',
-              type: 'video' as const,
-              switchingSets: [{ id: 'sw1', type: 'video' as const, tracks: [makeResolvedVideoTrack(segments)] }],
-            },
-          ],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(() => (bufferActor.snapshot.get().context.segments.length ?? 0) > 1, {
-      timeout: 3000,
-    });
-
-    expect(sourceBuffer.remove).not.toHaveBeenCalled();
-
-    cleanup();
-  });
-
-  it('removes flushed segments from actor context', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s4', 30, 10),
-      makeSegment('s5', 40, 10),
-    ];
-
-    globalThis.fetch = vi.fn().mockImplementation(() => Promise.resolve(new Response(new ArrayBuffer(100))));
-
-    const { actor } = makeSourceBufferWithActor(
-      [[0, 40]],
-      [
-        { id: 's1', startTime: 0, duration: 10, trackId: 'track-1' },
-        { id: 's2', startTime: 10, duration: 10, trackId: 'track-1' },
-        { id: 's3', startTime: 20, duration: 10, trackId: 'track-1' },
-        { id: 's4', startTime: 30, duration: 10, trackId: 'track-1' },
-      ],
-      'track-1'
-    );
-    const { bufferActor, cleanup } = setupLoadSegments(
-      { preload: 'auto', selectedVideoTrackId: 'track-1', currentTime: 40, presentation: makePresentationF6(segments) },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(
-      () => {
-        const ids = bufferActor.snapshot.get().context.segments.map((s: { id: string }) => s.id) ?? [];
-
-        expect(ids).not.toContain('s1');
-        expect(ids).not.toContain('s2');
-      },
-      { timeout: 3000 }
-    );
-
-    cleanup();
-  });
-});
-
-// ---------------------------------------------------------------------------
 // Forward buffer flushing
 // ---------------------------------------------------------------------------
 
-describe('loadSegments forward buffer flushing', () => {
-  function makeControllableFetchFwd() {
-    const resolvers = new Map<string, () => void>();
-    const fetchedUrls: string[] = [];
-    const fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
-
-      fetchedUrls.push(url);
-      return new Promise<Response>((resolve) => {
-        resolvers.set(url, () => resolve(new Response(new ArrayBuffer(100))));
-      });
-    });
-    const resolveAll = () => resolvers.forEach((fn) => fn());
-
-    return { fetch, fetchedUrls, resolveAll };
-  }
-
+describe('loadVideoSegments', () => {
   function makePresentationFwd(segments: Segment[]) {
     return {
       id: 'p1',
@@ -824,395 +347,36 @@ describe('loadSegments forward buffer flushing', () => {
     };
   }
 
-  it('flushes SourceBuffer content beyond the forward buffer window', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s4', 30, 10),
-      makeSegment('s5', 40, 10),
-    ];
-
-    const { fetch, resolveAll } = makeControllableFetchFwd();
-
-    globalThis.fetch = fetch;
-
-    // All 5 segments pre-loaded; seeded with initial buffered range [0, 50]
-    const { sourceBuffer, actor } = makeSourceBufferWithActor(
-      [[0, 50]],
-      segments.map((s) => ({ id: s.id, startTime: s.startTime, duration: s.duration, trackId: 'track-1' })),
-      'track-1'
-    );
-    const { cleanup } = setupLoadSegments(
-      { preload: 'auto', selectedVideoTrackId: 'track-1', currentTime: 0, presentation: makePresentationFwd(segments) },
-      actor,
-      'video'
-    );
-
-    setTimeout(resolveAll, 10);
-
-    // At currentTime=0, window=[0,30). s4@30 and s5@40 are beyond threshold.
-    await vi.waitFor(
-      () => {
-        expect(sourceBuffer.remove).toHaveBeenCalledWith(30, Infinity);
-      },
-      { timeout: 3000 }
-    );
-
-    cleanup();
-  });
-
-  it('removes forward-flushed segments from actor context', async () => {
-    const segments = [
-      makeSegment('s1', 0, 10),
-      makeSegment('s2', 10, 10),
-      makeSegment('s3', 20, 10),
-      makeSegment('s4', 30, 10),
-      makeSegment('s5', 40, 10),
-    ];
-
-    const { fetch, resolveAll } = makeControllableFetchFwd();
-
-    globalThis.fetch = fetch;
-
-    // Seed buffered ranges to match the pre-seeded actor context
-    const { actor } = makeSourceBufferWithActor(
-      [[0, 50]],
-      segments.map((s) => ({ id: s.id, startTime: s.startTime, duration: s.duration, trackId: 'track-1' })),
-      'track-1'
-    );
-    const { bufferActor, cleanup } = setupLoadSegments(
-      { preload: 'auto', selectedVideoTrackId: 'track-1', currentTime: 0, presentation: makePresentationFwd(segments) },
-      actor,
-      'video'
-    );
-
-    setTimeout(resolveAll, 10);
-
-    await vi.waitFor(
-      () => {
-        const ids = bufferActor.snapshot.get().context.segments.map((s: { id: string }) => s.id) ?? [];
-
-        expect(ids).not.toContain('s4');
-        expect(ids).not.toContain('s5');
-        expect(ids).toContain('s1');
-      },
-      { timeout: 3000 }
-    );
-
-    cleanup();
-  });
-
   it('does not flush when all buffered segments are within the buffer window', async () => {
     const segments = [makeSegment('s1', 0, 10), makeSegment('s2', 10, 10), makeSegment('s3', 20, 10)];
 
-    const { fetch, resolveAll } = makeControllableFetchFwd();
-
-    globalThis.fetch = fetch;
+    globalThis.fetch = vi.fn();
 
     const { sourceBuffer, actor } = makeSourceBufferWithActor(
       [[0, 30]],
       segments.map((s) => ({ id: s.id, startTime: s.startTime, duration: s.duration, trackId: 'track-1' })),
       'track-1'
     );
-    const { cleanup } = setupLoadSegments(
+    const { loaderActor, send, cleanup } = setupLoadSegments(
       { preload: 'auto', selectedVideoTrackId: 'track-1', currentTime: 0, presentation: makePresentationFwd(segments) },
       actor,
       'video'
     );
 
-    setTimeout(resolveAll, 10);
-
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await vi.waitFor(() => {
+      expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: 'load', range: { start: 0, end: 30 } }));
+      expect(loaderActor.snapshot.get().value).toBe('idle');
+      expect(actor.snapshot.get().value).toBe('idle');
+    });
+    expect(actor.snapshot.get().context.segments).toEqual(
+      segments.map(({ id, startTime, duration }) => ({ id, startTime, duration, trackId: 'track-1' }))
+    );
+    expect(sourceBuffer.buffered.length).toBe(1);
+    expect(sourceBuffer.buffered.start(0)).toBe(0);
+    expect(sourceBuffer.buffered.end(0)).toBe(30);
+    expect(globalThis.fetch).not.toHaveBeenCalled();
 
     expect(sourceBuffer.remove).not.toHaveBeenCalled();
-
-    cleanup();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Byte-range segment fetching (fMP4 / CMAF range-request streams)
-// ---------------------------------------------------------------------------
-
-describe('loadSegments byte-range segment fetching', () => {
-  it('sends Range headers for byte-range init and media segments', async () => {
-    const segments: Segment[] = [
-      {
-        id: 's0',
-        url: 'http://example.com/video.mp4',
-        startTime: 0,
-        duration: 6,
-        byteRange: { start: 1000, end: 2999 },
-      },
-      {
-        id: 's1',
-        url: 'http://example.com/video.mp4',
-        startTime: 6,
-        duration: 6,
-        byteRange: { start: 3000, end: 4999 },
-      },
-    ];
-
-    const rangeHeaders: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const range = (input as Request).headers?.get('Range');
-
-      if (range) rangeHeaders.push(range);
-
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
-    });
-
-    const track = {
-      type: 'video' as const,
-      id: 'track-1',
-      url: 'http://example.com/video.m3u8',
-      mimeType: 'video/mp4',
-      codecs: ['avc1.42E01E'],
-      bandwidth: 1_000_000,
-      initialization: { url: 'http://example.com/video.mp4', byteRange: { start: 0, end: 999 } },
-      segments,
-      startTime: 0,
-      duration: 12,
-    };
-
-    const { actor } = makeSourceBufferWithActor();
-    const { bufferActor, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 12,
-          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(
-      () => {
-        expect(bufferActor.snapshot.get().context.segments).toHaveLength(2);
-      },
-      { timeout: 3000 }
-    );
-
-    expect(rangeHeaders).toContain('bytes=0-999'); // init segment
-    expect(rangeHeaders).toContain('bytes=1000-2999'); // s0
-    expect(rangeHeaders).toContain('bytes=3000-4999'); // s1
-
-    cleanup();
-  });
-
-  it('does not send Range header for non-byte-range segments', async () => {
-    const segments = [makeSegment('s0', 0, 10)];
-
-    const rangeHeaders: string[] = [];
-
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const range = (input as Request).headers?.get('Range');
-
-      if (range) rangeHeaders.push(range);
-
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
-    });
-
-    const { actor } = makeSourceBufferWithActor();
-    const { bufferActor, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 10,
-          selectionSets: [
-            {
-              id: 'ss1',
-              type: 'video',
-              switchingSets: [{ id: 'sw1', type: 'video', tracks: [makeResolvedVideoTrack(segments)] }],
-            },
-          ],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(
-      () => {
-        expect(bufferActor.snapshot.get().context.segments).toHaveLength(1);
-      },
-      { timeout: 3000 }
-    );
-
-    expect(rangeHeaders).toHaveLength(0);
-
-    cleanup();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Streaming bandwidth tracking
-//
-// Post-refactor: `setupVideoBufferActors` owns trackedFetch creation +
-// `bandwidthState` writes in production. These tests construct the
-// trackedFetch directly to verify the dispatcher → loader → fetch loop
-// still feeds samples through to the supplied callback.
-// ---------------------------------------------------------------------------
-
-describe('loadSegments bandwidth tracking', () => {
-  function makeStreamingFetch(chunks: Uint8Array[]) {
-    return vi.fn().mockImplementation(() => {
-      const body = new ReadableStream<Uint8Array>({
-        start(controller) {
-          for (const chunk of chunks) controller.enqueue(chunk);
-
-          controller.close();
-        },
-      });
-
-      return Promise.resolve(new Response(body));
-    });
-  }
-
-  it('samples bandwidth per chunk via supplied trackedFetch', async () => {
-    const chunkSize = 50_000; // 50 KB — below 128 KB default, so whole segment = one flush
-    const numChunks = 3;
-    const chunks = Array.from({ length: numChunks }, () => new Uint8Array(chunkSize).fill(1));
-
-    globalThis.fetch = makeStreamingFetch(chunks);
-
-    const segment = { id: 's1', url: 'http://example.com/s1.m4s', startTime: 0, duration: 10 };
-    const track = {
-      type: 'video' as const,
-      id: 'track-1',
-      url: 'http://example.com/video.m3u8',
-      mimeType: 'video/mp4',
-      codecs: ['avc1.42E01E'],
-      bandwidth: 1_000_000,
-      initialization: { url: 'http://example.com/init.mp4' },
-      segments: [segment],
-      startTime: 0,
-      duration: 10,
-    };
-
-    const initialBandwidth: BandwidthState = {
-      fastEstimate: 0,
-      fastTotalWeight: 0,
-      slowEstimate: 0,
-      slowTotalWeight: 0,
-      bytesSampled: 0,
-    };
-    let latestBandwidth: BandwidthState = initialBandwidth;
-    const trackedFetch = createTrackedFetch(initialBandwidth, (next) => {
-      latestBandwidth = next;
-    });
-
-    const { actor } = makeSourceBufferWithActor();
-    const { bufferActor, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 10,
-          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
-        },
-      },
-      actor,
-      'video',
-      trackedFetch
-    );
-
-    // Wait for both init and segment to be appended (actor context will have 1 segment)
-    await vi.waitFor(
-      () => {
-        expect(bufferActor.snapshot.get().context.segments).toHaveLength(1);
-      },
-      { timeout: 3000 }
-    );
-
-    // All bytes (init + segment) should be counted in bytesSampled
-    const totalExpected = chunkSize * numChunks * 2; // init fetch + segment fetch, each 3×50KB
-
-    expect(latestBandwidth.bytesSampled).toBeGreaterThan(0);
-    expect(latestBandwidth.bytesSampled).toBeLessThanOrEqual(totalExpected);
-
-    cleanup();
-  });
-
-  it('appended data matches the concatenated streaming chunks', async () => {
-    const part1 = new Uint8Array([1, 2, 3, 4]);
-    const part2 = new Uint8Array([5, 6, 7, 8]);
-
-    globalThis.fetch = vi.fn().mockImplementation(() => {
-      const body = new ReadableStream<Uint8Array>({
-        start(controller) {
-          controller.enqueue(part1);
-          controller.enqueue(part2);
-          controller.close();
-        },
-      });
-
-      return Promise.resolve(new Response(body));
-    });
-
-    const segment = { id: 's1', url: 'http://example.com/s1.m4s', startTime: 0, duration: 10 };
-    const track = {
-      type: 'video' as const,
-      id: 'track-1',
-      url: 'http://example.com/video.m3u8',
-      mimeType: 'video/mp4',
-      codecs: ['avc1.42E01E'],
-      bandwidth: 500_000,
-      initialization: { url: 'http://example.com/init.mp4' },
-      segments: [segment],
-      startTime: 0,
-      duration: 10,
-    };
-
-    const { sourceBuffer, actor } = makeSourceBufferWithActor();
-    const { bufferActor, cleanup } = setupLoadSegments(
-      {
-        preload: 'auto',
-        selectedVideoTrackId: 'track-1',
-        currentTime: 0,
-        presentation: {
-          id: 'p1',
-          url: 'http://example.com/playlist.m3u8',
-          startTime: 0,
-          duration: 10,
-          selectionSets: [{ id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [track] }] }],
-        },
-      },
-      actor,
-      'video'
-    );
-
-    await vi.waitFor(
-      () => {
-        expect(bufferActor.snapshot.get().context.segments).toHaveLength(1);
-      },
-      { timeout: 3000 }
-    );
-
-    // Each response body yields [1,2,3,4,5,6,7,8] — both init and segment appends should match
-    const calls = (sourceBuffer.appendBuffer as ReturnType<typeof vi.fn>).mock.calls;
-
-    for (const [data] of calls) {
-      expect(Array.from(new Uint8Array(data as ArrayBuffer))).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
-    }
 
     cleanup();
   });
@@ -1222,7 +386,7 @@ describe('loadSegments bandwidth tracking', () => {
 // load-mode FSM transitions — dormant / metadata-only / full-range
 // ---------------------------------------------------------------------------
 
-describe('loadSegments load-mode FSM', () => {
+describe('loadVideoSegments', () => {
   function makePresentation(segments: Segment[]) {
     return {
       id: 'p1',
@@ -1392,6 +556,77 @@ describe('loadSegments load-mode FSM', () => {
     cleanup();
   });
 
+  it('loads segments at currentTime position when track switches mid-playback', async () => {
+    const trackA = makeResolvedVideoTrack([makeSegment('a1', 0), makeSegment('a2', 10)]);
+    const trackB = {
+      ...makeResolvedVideoTrack([
+        makeSegment('b1', 0),
+        makeSegment('b2', 10),
+        makeSegment('b3', 20),
+        makeSegment('b4', 30),
+        makeSegment('b5', 40),
+        makeSegment('b6', 50),
+      ]),
+      id: 'track-2',
+      initialization: { url: 'http://example.com/init-2.mp4' },
+    };
+    const fetchedUrls: string[] = [];
+
+    globalThis.fetch = vi.fn().mockImplementation((request: Request) => {
+      fetchedUrls.push(request.url);
+      return Promise.resolve(new Response(new ArrayBuffer(100)));
+    });
+    const { actor } = makeSourceBufferWithActor(
+      [[0, 20]],
+      [
+        { id: 'a1', startTime: 0, duration: 10, trackId: 'track-1' },
+        { id: 'a2', startTime: 10, duration: 10, trackId: 'track-1' },
+      ],
+      'track-1'
+    );
+    const { state, loaderActor, send, cleanup } = setupLoadSegments(
+      {
+        preload: 'auto',
+        loadActivated: true,
+        currentTime: 25,
+        selectedVideoTrackId: 'track-1',
+        presentation: {
+          id: 'p1',
+          url: 'http://example.com/playlist.m3u8',
+          startTime: 0,
+          duration: 60,
+          selectionSets: [
+            { id: 'ss1', type: 'video', switchingSets: [{ id: 'sw1', type: 'video', tracks: [trackA, trackB] }] },
+          ],
+        },
+      },
+      actor,
+      'video'
+    );
+
+    await vi.waitFor(() =>
+      expect(send).toHaveBeenCalledWith({ type: 'load', track: trackA, range: { start: 25, end: 55 } })
+    );
+    state.selectedVideoTrackId.set('track-2');
+    await vi.waitFor(() => {
+      expect(send).toHaveBeenCalledWith({ type: 'load', track: trackB, range: { start: 25, end: 55 } });
+      expect(actor.snapshot.get().context.initTrackId).toBe('track-2');
+      expect(actor.snapshot.get().context.segments.map(({ id, partial }) => ({ id, partial }))).toEqual(
+        ['a1', 'a2', 'b3', 'b4', 'b5', 'b6'].map((id) => ({ id, partial: undefined }))
+      );
+      expect(loaderActor.snapshot.get().value).toBe('idle');
+    });
+    expect(fetchedUrls).toEqual([
+      'http://example.com/init-2.mp4',
+      'http://example.com/b3.m4s',
+      'http://example.com/b4.m4s',
+      'http://example.com/b5.m4s',
+      'http://example.com/b6.m4s',
+    ]);
+
+    cleanup();
+  });
+
   it('does not re-dispatch on currentTime ticks within the same segment', async () => {
     // 5 segments of 10s — full-range with `loadActivated` true. After initial
     // dispatch fetches the buffer window, ticking currentTime within segment 0
@@ -1405,16 +640,23 @@ describe('loadSegments load-mode FSM', () => {
     ];
 
     const fetchedUrls: string[] = [];
+    let heldSignal: AbortSignal | undefined;
+    let release: () => void = () => {};
 
-    globalThis.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
+    globalThis.fetch = vi.fn().mockImplementation((request: Request) => {
+      fetchedUrls.push(request.url);
 
-      fetchedUrls.push(url);
-      return Promise.resolve(new Response(new ArrayBuffer(100)));
+      if (!request.url.endsWith('/s1.m4s')) return Promise.resolve(new Response(new ArrayBuffer(100)));
+
+      heldSignal = request.signal;
+      return new Promise<Response>((resolve, reject) => {
+        request.signal.addEventListener('abort', () => reject(request.signal.reason), { once: true });
+        release = () => resolve(new Response(new ArrayBuffer(100)));
+      });
     });
 
     const { actor } = makeSourceBufferWithActor();
-    const { state, cleanup } = setupLoadSegments(
+    const { state, loaderActor, send, cleanup } = setupLoadSegments(
       {
         preload: 'auto',
         loadActivated: true,
@@ -1431,19 +673,27 @@ describe('loadSegments load-mode FSM', () => {
       expect(fetchedUrls).toContain('http://example.com/s1.m4s');
     });
 
-    const callsAfterInitial = fetchedUrls.length;
+    const assignments = send.mock.calls.length;
 
-    // Tick within segment 0 — boundary stays at 0; the boundary-dedup
-    // computed (`segmentStartForTime` on the same segment) returns the
-    // same value, so signal-polyfill's `Object.is` equality suppresses
-    // dispatch re-fire.
-    state.currentTime.set(2);
-    state.currentTime.set(5);
-    state.currentTime.set(8);
+    for (const time of [1, 2, 3, 5, 8]) {
+      state.currentTime.set(time);
+      // The real dispatcher flushes its boundary computed on a microtask.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(send).toHaveBeenCalledTimes(assignments);
+      expect(heldSignal!.aborted).toBe(false);
+      expect(fetchedUrls.filter((url) => url.endsWith('/s1.m4s'))).toHaveLength(1);
+    }
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(fetchedUrls.length).toBe(callsAfterInitial);
+    release();
+    await vi.waitFor(() => {
+      expect(actor.snapshot.get().context.segments.map(({ id, partial }) => ({ id, partial }))).toEqual([
+        { id: 's1', partial: undefined },
+        { id: 's2', partial: undefined },
+        { id: 's3', partial: undefined },
+      ]);
+      expect(actor.snapshot.get().value).toBe('idle');
+      expect(loaderActor.snapshot.get().value).toBe('idle');
+    });
 
     cleanup();
   });
@@ -1453,7 +703,7 @@ describe('loadSegments load-mode FSM', () => {
 // loadingSuspended — observed policy 'dormant' gate (uniform across variants)
 // ---------------------------------------------------------------------------
 
-describe('loadSegments orchestration (loadingSuspended)', () => {
+describe('loadVideoSegments', () => {
   function makePresentation(segments: Segment[]) {
     return {
       id: 'p1',

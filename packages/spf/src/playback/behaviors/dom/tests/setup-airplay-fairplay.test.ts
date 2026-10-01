@@ -1,13 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { signal } from '../../../../core/signals/primitives';
-import {
-  attachMediaKeys,
-  type DrmSystemsConfig,
-  fetchDrm,
-  fetchServerCertificate,
-  requestKeySystemAccess,
-} from '../../../../media/dom/eme';
+import type { DrmSystemsConfig } from '../../../../media/dom/eme';
 import { DEFAULT_KEY_SYSTEMS, fairPlayAirPlayKeySystem, widevineKeySystem } from '../../../../media/dom/key-systems';
 import {
   SVTA_DRM_CERTIFICATE_ERROR,
@@ -21,23 +15,6 @@ import {
   type AirPlayFairPlayState,
   setupAirPlayFairPlay,
 } from '../setup-airplay-fairplay';
-
-// Same seams as `setup-media-keys.test.ts`: the DOM- and network-touching calls
-// are mocked, the pure helpers (candidate selection, declared-key collection,
-// the key-system modules) run real against manifest-shaped fixtures. `fetchDrm`
-// is mocked too because the license exchange runs through `openLicenseSession`
-// for real here — only the wire is stubbed.
-vi.mock('../../../../media/dom/eme', async () => {
-  const actual = await vi.importActual<typeof import('../../../../media/dom/eme')>('../../../../media/dom/eme');
-
-  return {
-    ...actual,
-    requestKeySystemAccess: vi.fn(),
-    attachMediaKeys: vi.fn(async () => {}),
-    fetchServerCertificate: vi.fn(),
-    fetchDrm: vi.fn(),
-  };
-});
 
 const FAIRPLAY_KEY = {
   method: 'SAMPLE-AES',
@@ -56,6 +33,33 @@ const CERT_URL = 'https://license.example.com/appcert';
 const DRM_CONFIG: DrmSystemsConfig = {
   'com.apple.fps': { licenseUrl: LICENSE_URL, serverCertificateUrl: CERT_URL },
 };
+
+const requestMediaKeySystemAccess = vi.fn<Navigator['requestMediaKeySystemAccess']>();
+const setMediaKeys = vi.fn<HTMLMediaElement['setMediaKeys']>();
+const fetch = vi.fn<typeof globalThis.fetch>();
+
+beforeEach(() => {
+  requestMediaKeySystemAccess.mockReset();
+  setMediaKeys.mockReset().mockImplementation(async function (this: HTMLMediaElement, keys) {
+    Object.defineProperty(this, 'mediaKeys', { value: keys, configurable: true });
+  });
+  fetch.mockReset().mockImplementation(async (url) => {
+    if (url === CERT_URL) return new Response(new Uint8Array([7, 7]));
+
+    if (url === LICENSE_URL) return new Response(new Uint8Array([9]));
+
+    throw new Error(`Unexpected DRM URL: ${url}`);
+  });
+
+  vi.spyOn(navigator, 'requestMediaKeySystemAccess').mockImplementation(requestMediaKeySystemAccess);
+  vi.spyOn(HTMLMediaElement.prototype, 'setMediaKeys').mockImplementation(setMediaKeys);
+  vi.spyOn(globalThis, 'fetch').mockImplementation(fetch);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  Reflect.deleteProperty(globalThis, 'WebKitMediaKeys');
+});
 
 function makePresentation(keys?: object[]): Presentation {
   return {
@@ -159,44 +163,59 @@ function receiverRequest(video: HTMLMediaElement, bytes = [1, 2, 3], initDataTyp
 }
 
 describe('setupAirPlayFairPlay', () => {
-  beforeEach(() => {
-    vi.mocked(requestKeySystemAccess).mockReset();
-    vi.mocked(attachMediaKeys).mockReset().mockResolvedValue(undefined);
-    vi.mocked(fetchServerCertificate)
-      .mockReset()
-      .mockResolvedValue(new Uint8Array([7, 7]));
-    vi.mocked(fetchDrm)
-      .mockReset()
-      .mockResolvedValue(new Uint8Array([9]));
-  });
-
   it('negotiates for skd, applies the certificate, attaches, and licenses the receiver request', async () => {
     const eme = makeFakeEme();
+    let releaseCertificate!: (accepted: boolean) => void;
+    let releaseAttach!: () => void;
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    vi.mocked(eme.mediaKeys.setServerCertificate).mockReturnValueOnce(
+      new Promise((resolve) => (releaseCertificate = resolve))
+    );
+    setMediaKeys.mockReturnValueOnce(new Promise<void>((resolve) => (releaseAttach = resolve)));
+
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { context, reactor } = setup();
     const video = context.mediaElement.get()!;
 
     // Nothing happens until the receiver actually asks: a session on a FairPlay
     // source is not itself evidence it wants anything from this CDM.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(requestKeySystemAccess).not.toHaveBeenCalled();
+    expect(requestMediaKeySystemAccess).not.toHaveBeenCalled();
 
     receiverRequest(video);
 
+    await vi.waitFor(() => expect(eme.mediaKeys.setServerCertificate).toHaveBeenCalled());
+    expect(setMediaKeys).not.toHaveBeenCalled();
+    expect(eme.mediaKeys.createSession).not.toHaveBeenCalled();
+
+    releaseCertificate(true);
+    await vi.waitFor(() => expect(setMediaKeys).toHaveBeenCalledWith(eme.mediaKeys));
+    expect(eme.mediaKeys.createSession).not.toHaveBeenCalled();
+
+    releaseAttach();
     await vi.waitFor(() => expect(eme.sessions).toHaveLength(1));
 
     // `skd`, against the manifest rather than a codec — the receiver plays the
     // native-HLS fallback, so the MSE renditions say nothing about its decode.
-    expect(requestKeySystemAccess).toHaveBeenCalledWith(
-      [fairPlayAirPlayKeySystem],
-      { video: ['application/vnd.apple.mpegurl'], audio: [] },
-      undefined
-    );
+    expect(requestMediaKeySystemAccess).toHaveBeenCalledWith('com.apple.fps', [
+      { initDataTypes: ['skd'], videoCapabilities: [{ contentType: 'application/vnd.apple.mpegurl' }] },
+    ]);
     // Certificate before any generateRequest, carried by the shared promise.
     expect(eme.mediaKeys.setServerCertificate).toHaveBeenCalledWith(new Uint8Array([7, 7]));
-    expect(attachMediaKeys).toHaveBeenCalledWith(video, eme.mediaKeys);
+    expect(setMediaKeys).toHaveBeenCalledWith(eme.mediaKeys);
     expect(eme.sessions[0]!.generateRequest).toHaveBeenCalledWith('skd', new Uint8Array([1, 2, 3]));
+
+    const message = new Uint8Array([4, 5, 6]);
+
+    eme.sessions[0]!.dispatchEvent(Object.assign(new Event('message'), { message: message.buffer }));
+    await vi.waitFor(() => expect(eme.sessions[0]!.update).toHaveBeenCalledWith(new Uint8Array([9])));
+    expect(fetch).toHaveBeenCalledWith(LICENSE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: message.buffer,
+      credentials: undefined,
+      signal: expect.any(AbortSignal),
+    });
 
     reactor.destroy();
   });
@@ -204,7 +223,7 @@ describe('setupAirPlayFairPlay', () => {
   it('opens a session per receiver request, including a byte-identical repeat', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { context, reactor } = setup();
     const video = context.mediaElement.get()!;
 
@@ -215,7 +234,7 @@ describe('setupAirPlayFairPlay', () => {
 
     await vi.waitFor(() => expect(eme.sessions).toHaveLength(2));
     // One negotiation, shared.
-    expect(requestKeySystemAccess).toHaveBeenCalledTimes(1);
+    expect(requestMediaKeySystemAccess).toHaveBeenCalledTimes(1);
 
     reactor.destroy();
   });
@@ -223,7 +242,7 @@ describe('setupAirPlayFairPlay', () => {
   it('resolves the license server per request, so a source swap that drops it is reported, not POSTed', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
 
     // Resolver-backed, as the Media installs it: each field reads whatever
     // source is current. A same-URL swap that changes only `drm` does not
@@ -252,13 +271,13 @@ describe('setupAirPlayFairPlay', () => {
   it('ignores sinf requests, which belong to the MSE pipeline', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { context, reactor } = setup();
 
     receiverRequest(context.mediaElement.get()!, [1, 2, 3], 'sinf');
 
     await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(requestKeySystemAccess).not.toHaveBeenCalled();
+    expect(requestMediaKeySystemAccess).not.toHaveBeenCalled();
     expect(eme.sessions).toHaveLength(0);
 
     reactor.destroy();
@@ -267,7 +286,7 @@ describe('setupAirPlayFairPlay', () => {
   it('never writes context.mediaKeys, so exchangeLicenses stays parked', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { context, reactor } = setup();
 
     receiverRequest(context.mediaElement.get()!);
@@ -281,21 +300,20 @@ describe('setupAirPlayFairPlay', () => {
   it('closes its sessions and releases the element when the session ends', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { state, context, reactor } = setup();
     const video = context.mediaElement.get()!;
 
     receiverRequest(video);
     await vi.waitFor(() => expect(eme.sessions).toHaveLength(1));
 
-    // The element reports the keys this behavior attached, so the detach is ours to make.
-    Object.defineProperty(video, 'mediaKeys', { value: eme.mediaKeys, configurable: true });
-    vi.mocked(attachMediaKeys).mockClear();
+    expect(video.mediaKeys).toBe(eme.mediaKeys);
+    setMediaKeys.mockClear();
 
     state.loadingSuspended.set(false);
 
     await vi.waitFor(() => expect(eme.sessions[0]!.close).toHaveBeenCalled());
-    expect(attachMediaKeys).toHaveBeenCalledWith(video, null);
+    expect(setMediaKeys).toHaveBeenCalledWith(null);
 
     reactor.destroy();
   });
@@ -303,7 +321,7 @@ describe('setupAirPlayFairPlay', () => {
   it('leaves the element alone when MediaKeys it did not attach are on it', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const { state, context, reactor } = setup();
     const video = context.mediaElement.get()!;
 
@@ -313,18 +331,18 @@ describe('setupAirPlayFairPlay', () => {
     // `setupMediaKeys` re-negotiated off the same falling edge and got there
     // first; detaching now would strip the CDM it just attached.
     Object.defineProperty(video, 'mediaKeys', { value: {} as MediaKeys, configurable: true });
-    vi.mocked(attachMediaKeys).mockClear();
+    setMediaKeys.mockClear();
 
     state.loadingSuspended.set(false);
 
     await vi.waitFor(() => expect(eme.sessions[0]!.close).toHaveBeenCalled());
-    expect(attachMediaKeys).not.toHaveBeenCalled();
+    expect(setMediaKeys).not.toHaveBeenCalled();
 
     reactor.destroy();
   });
 
   it('reports a refused negotiation and a failed certificate', async () => {
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(undefined);
+    requestMediaKeySystemAccess.mockRejectedValue(new DOMException('Unsupported key system', 'NotSupportedError'));
     const refused = setup();
 
     receiverRequest(refused.context.mediaElement.get()!);
@@ -333,14 +351,14 @@ describe('setupAirPlayFairPlay', () => {
 
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
-    vi.mocked(fetchServerCertificate).mockRejectedValue(new Error('appcert 403'));
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
+    fetch.mockResolvedValueOnce(new Response(null, { status: 403 }));
     const certFailed = setup();
 
     receiverRequest(certFailed.context.mediaElement.get()!);
     await vi.waitFor(() => expect(certFailed.state.errors.get()?.[0]?.code).toBe(SVTA_DRM_CERTIFICATE_ERROR));
     // Nothing attached, no session opened.
-    expect(attachMediaKeys).not.toHaveBeenCalled();
+    expect(setMediaKeys).not.toHaveBeenCalled();
     expect(eme.sessions).toHaveLength(0);
 
     certFailed.reactor.destroy();
@@ -359,13 +377,13 @@ describe('setupAirPlayFairPlay', () => {
     it.each(cases)('stays out with %s', async (_label, overrides) => {
       const eme = makeFakeEme();
 
-      vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+      requestMediaKeySystemAccess.mockResolvedValue(eme.access);
       const { context, reactor } = setup(overrides);
 
       receiverRequest(context.mediaElement.get()!);
 
       await new Promise((resolve) => setTimeout(resolve, 20));
-      expect(requestKeySystemAccess).not.toHaveBeenCalled();
+      expect(requestMediaKeySystemAccess).not.toHaveBeenCalled();
       expect(eme.sessions).toHaveLength(0);
 
       reactor.destroy();
@@ -374,7 +392,7 @@ describe('setupAirPlayFairPlay', () => {
     it('stays out entirely when no AirPlay bridge declares the slot', async () => {
       const eme = makeFakeEme();
 
-      vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+      requestMediaKeySystemAccess.mockResolvedValue(eme.access);
       // No `loadingSuspended` at all — an engine composed without `setupAirPlay`.
       const state = {
         presentation: signal<AirPlayFairPlayState['presentation']>(makePresentation([FAIRPLAY_KEY])),
@@ -394,7 +412,7 @@ describe('setupAirPlayFairPlay', () => {
       receiverRequest(video);
 
       await new Promise((resolve) => setTimeout(resolve, 20));
-      expect(requestKeySystemAccess).not.toHaveBeenCalled();
+      expect(requestMediaKeySystemAccess).not.toHaveBeenCalled();
 
       reactor.destroy();
     });
@@ -405,7 +423,7 @@ describe('setupAirPlayFairPlay', () => {
  * The pre-EME key API, installed on `globalThis` and on the element the way Safari exposes it. Returns the sessions it
  * creates so the exchange can be driven and asserted.
  */
-function stubWebKitMediaKeys(video: HTMLMediaElement) {
+function stubWebKitMediaKeys(video: HTMLMediaElement, preinstalled = true) {
   const sessions: Array<EventTarget & { update: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn> }> = [];
   const created: Array<{ mimeType: string; initData: Uint8Array }> = [];
   const keys = {
@@ -421,13 +439,22 @@ function stubWebKitMediaKeys(video: HTMLMediaElement) {
     }),
   };
 
-  (globalThis as Record<string, unknown>).WebKitMediaKeys = class {
-    constructor(public keySystem: string) {}
-  };
-  Object.defineProperty(video, 'webkitSetMediaKeys', { value: vi.fn(), configurable: true, writable: true });
-  Object.defineProperty(video, 'webkitKeys', { value: keys, configurable: true, writable: true });
+  const construct = vi.fn();
+  const setMediaKeys = vi.fn((installed: typeof keys | null) => {
+    Object.defineProperty(video, 'webkitKeys', { value: installed, configurable: true, writable: true });
+  });
 
-  return { sessions, created };
+  (globalThis as Record<string, unknown>).WebKitMediaKeys = class {
+    createSession = keys.createSession;
+
+    constructor(keySystem: string) {
+      construct(keySystem);
+    }
+  };
+  Object.defineProperty(video, 'webkitSetMediaKeys', { value: setMediaKeys, configurable: true, writable: true });
+  Object.defineProperty(video, 'webkitKeys', { value: preinstalled ? keys : null, configurable: true, writable: true });
+
+  return { sessions, created, construct, setMediaKeys };
 }
 
 /** The exact refusal `generateRequest` raises during an AirPlay session on an affected sender. */
@@ -448,7 +475,7 @@ function makeRefusingEme() {
     (session as { keyStatuses: unknown }).keyStatuses = new Map();
     return session;
   });
-  vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+  requestMediaKeySystemAccess.mockResolvedValue(eme.access);
 
   return eme;
 }
@@ -475,34 +502,18 @@ function needKey(video: HTMLMediaElement, initData = legacyInitData()) {
   video.dispatchEvent(Object.assign(new Event('webkitneedkey'), { initData }));
 }
 
-describe('setupAirPlayFairPlay legacy fallback', () => {
-  beforeEach(() => {
-    vi.mocked(requestKeySystemAccess).mockReset();
-    vi.mocked(attachMediaKeys).mockReset().mockResolvedValue(undefined);
-    vi.mocked(fetchServerCertificate)
-      .mockReset()
-      .mockResolvedValue(new Uint8Array([7, 7]));
-    vi.mocked(fetchDrm)
-      .mockReset()
-      .mockResolvedValue(new Uint8Array([9]));
-  });
-
-  afterEach(() => {
-    delete (globalThis as Record<string, unknown>).WebKitMediaKeys;
-  });
-
+describe('setupAirPlayFairPlay', () => {
   /** EME reaches `generateRequest` and is refused, with the legacy API available and its payload already delivered. */
-  async function refuseEme(overrides: Parameters<typeof setup>[0] = {}) {
+  async function refuseEme(overrides: Parameters<typeof setup>[0] = {}, preinstalled = true) {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     const harness = setup(overrides);
     const video = harness.context.mediaElement.get()!;
 
     goWireless(video, true);
-    const webkit = stubWebKitMediaKeys(video);
+    const webkit = stubWebKitMediaKeys(video, preinstalled);
 
-    eme.sessions.push; // keep the fake's shape obvious at the call site
     vi.mocked(eme.mediaKeys.createSession).mockImplementation(() => {
       const session = new EventTarget() as never as MediaKeySession & { generateRequest: ReturnType<typeof vi.fn> };
 
@@ -522,6 +533,8 @@ describe('setupAirPlayFairPlay legacy fallback', () => {
 
     Object.defineProperty(video, 'load', { value: load, configurable: true });
 
+    if (!preinstalled) expect((video as unknown as { webkitKeys: unknown }).webkitKeys).toBeNull();
+
     receiverRequest(video);
 
     // EME is refused, the element is released, and the resource reloads.
@@ -535,9 +548,15 @@ describe('setupAirPlayFairPlay legacy fallback', () => {
   }
 
   it('hands the session to the legacy key system on the AirPlay refusal, and licenses through it', async () => {
-    const { webkit, state, reactor, video } = await refuseEme();
+    const { webkit, state, reactor, video } = await refuseEme({}, false);
 
     await vi.waitFor(() => expect(webkit.created).toHaveLength(1));
+
+    expect(webkit.construct).toHaveBeenCalledExactlyOnceWith('com.apple.fps.1_0');
+    expect(webkit.setMediaKeys).toHaveBeenCalledExactlyOnceWith(
+      (video as unknown as { webkitKeys: unknown }).webkitKeys
+    );
+    expect((video as unknown as { webkitKeys: unknown }).webkitKeys).not.toBeNull();
 
     // Negotiated against the manifest, and the certificate is packed into the
     // session rather than handed to the CDM.
@@ -545,7 +564,7 @@ describe('setupAirPlayFairPlay legacy fallback', () => {
     expect([...webkit.created[0]!.initData].slice(-2)).toEqual([7, 7]);
 
     // EME released the element before the legacy API claimed it.
-    expect(attachMediaKeys).toHaveBeenCalledWith(video, null);
+    expect(setMediaKeys).toHaveBeenCalledWith(null);
 
     // The exchange runs through the same fetch and transform layers.
     webkit.sessions[0]!.dispatchEvent(
@@ -580,30 +599,75 @@ describe('setupAirPlayFairPlay legacy fallback', () => {
     reactor.destroy();
   });
 
-  it('ignores the key request delivered before the reload', async () => {
-    const eme = makeFakeEme();
+  it('serves only fresh legacy requests after EME detachment and reload', async () => {
+    const eme = makeRefusingEme();
+    let releaseDetach!: () => void;
+    const detach = new Promise<void>((resolve) => {
+      releaseDetach = resolve;
+    });
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
-    const { context, reactor } = setup();
+    setMediaKeys.mockImplementation(async function (this: HTMLMediaElement, keys) {
+      if (keys === null) await detach;
+
+      Object.defineProperty(this, 'mediaKeys', { value: keys, configurable: true });
+    });
+    const { context, state, reactor } = setup();
     const video = context.mediaElement.get()!;
 
     goWireless(video, true);
-    const webkit = stubWebKitMediaKeys(video);
+    const webkit = stubWebKitMediaKeys(video, false);
+    const blob = document.createElement('source');
+    const load = vi.fn();
 
-    // Arrives while EME is still the active path, so it belongs to the
-    // resource the handover is about to replace.
-    needKey(video);
+    blob.src = 'blob:https://example.com/dead';
+    video.prepend(blob);
+    Object.defineProperty(video, 'load', { value: load, configurable: true });
 
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(webkit.created).toHaveLength(0);
+    try {
+      needKey(video);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(webkit.created).toHaveLength(0);
 
-    reactor.destroy();
+      receiverRequest(video);
+      await vi.waitFor(() => expect(setMediaKeys).toHaveBeenLastCalledWith(null));
+
+      expect(video.mediaKeys).toBe(eme.mediaKeys);
+
+      needKey(video);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(load).not.toHaveBeenCalled();
+      expect(webkit.setMediaKeys).not.toHaveBeenCalled();
+      expect(webkit.created).toHaveLength(0);
+
+      releaseDetach();
+      await vi.waitFor(() => expect(video.mediaKeys).toBeNull());
+
+      // Detachment alone does not make payloads from the old resource usable.
+      needKey(video);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(load).not.toHaveBeenCalled();
+      expect(webkit.setMediaKeys).not.toHaveBeenCalled();
+      expect(webkit.created).toHaveLength(0);
+
+      blob.remove();
+      await vi.waitFor(() => expect(load).toHaveBeenCalledTimes(1));
+      needKey(video);
+      await vi.waitFor(() => expect(webkit.sessions).toHaveLength(1));
+      webkit.sessions[0]!.dispatchEvent(
+        Object.assign(new Event('webkitkeymessage'), { message: new Uint8Array([1]).buffer })
+      );
+      await vi.waitFor(() => expect(webkit.sessions[0]!.update).toHaveBeenCalledWith(new Uint8Array([9])));
+      expect(state.errors.get() ?? []).toEqual([]);
+    } finally {
+      releaseDetach();
+      reactor.destroy();
+    }
   });
 
   it('reports 4021 instead of falling back when the legacy API is absent', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     vi.mocked(eme.mediaKeys.createSession).mockImplementation(() => {
       const session = new EventTarget() as never as MediaKeySession;
 
@@ -629,7 +693,7 @@ describe('setupAirPlayFairPlay legacy fallback', () => {
   it('reports a generateRequest failure that is not the AirPlay refusal', async () => {
     const eme = makeFakeEme();
 
-    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    requestMediaKeySystemAccess.mockResolvedValue(eme.access);
     vi.mocked(eme.mediaKeys.createSession).mockImplementation(() => {
       const session = new EventTarget() as never as MediaKeySession;
 

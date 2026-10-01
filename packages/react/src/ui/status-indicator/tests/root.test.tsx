@@ -1,58 +1,115 @@
-import { cleanup, render } from '@testing-library/react';
-import type { StatusIndicatorCore } from '@videojs/core';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+import { act, cleanup } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-const inputIndicatorMock = vi.hoisted(() => ({
-  useInputIndicatorRoot: vi.fn(),
-}));
-
-vi.mock('../../input-indicator/use-input-indicator-root', () => inputIndicatorMock);
-
+import { controlFrames, renderIndicator } from '../../input-indicator/tests/fixture';
 import { StatusIndicatorRoot } from '../root';
-
-const state: StatusIndicatorCore.State = {
-  open: true,
-  generation: 1,
-  status: 'play',
-  label: 'Playing',
-  value: null,
-  transitionStarting: false,
-  transitionEnding: false,
-};
-
-beforeEach(() => {
-  inputIndicatorMock.useInputIndicatorRoot.mockReturnValue({
-    elementRef: { current: null },
-    present: true,
-    state,
-  });
-});
+import { StatusIndicatorValue } from '../value';
 
 afterEach(() => {
   cleanup();
-  vi.clearAllMocks();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe('StatusIndicatorRoot', () => {
-  it('keeps repeated updates in the current transition', () => {
-    render(<StatusIndicatorRoot actions={['togglePaused']} />);
-
-    expect(inputIndicatorMock.useInputIndicatorRoot).toHaveBeenCalledWith(
-      expect.any(Function),
-      expect.objectContaining({ actions: ['togglePaused'] }),
-      { replayOnUpdate: false }
+  it('keeps repeated updates in the current transition and filters actions', async () => {
+    const frame = controlFrames();
+    const fixture = renderIndicator(
+      <StatusIndicatorRoot actions={['togglePaused', 'volumeStep']} data-testid="status">
+        <StatusIndicatorValue />
+      </StatusIndicatorRoot>
     );
+
+    try {
+      await fixture.input('k', 'togglePaused');
+      const root = fixture.getByTestId('status');
+
+      expect(root.textContent).toBe('Playing');
+      expect(root.hasAttribute('data-starting-style')).toBe(true);
+      await frame();
+      await frame();
+      expect(root.hasAttribute('data-starting-style')).toBe(false);
+
+      await fixture.input('u', 'volumeStep', 0.1);
+      expect(root.textContent).toBe('60%');
+      expect(root.hasAttribute('data-open')).toBe(true);
+      expect(root.hasAttribute('data-starting-style')).toBe(false);
+
+      await fixture.input('f', 'toggleFullscreen');
+      expect(root.textContent).toBe('60%');
+      expect(root.getAttribute('data-status')).toBe('volume-high');
+      expect(root.hasAttribute('data-starting-style')).toBe(false);
+    } finally {
+      fixture.dispose();
+    }
   });
 
-  it('forwards deriveCustomStatus to the core props without rendering it', () => {
-    const deriveCustomStatus = () => null;
-    const { container } = render(<StatusIndicatorRoot deriveCustomStatus={deriveCustomStatus} />);
-
-    expect(inputIndicatorMock.useInputIndicatorRoot).toHaveBeenCalledWith(
-      expect.any(Function),
-      expect.objectContaining({ deriveCustomStatus }),
-      { replayOnUpdate: false }
+  it('cancels an exit on accepted input and survives its old completion', async () => {
+    vi.useFakeTimers();
+    const frame = controlFrames();
+    const fixture = renderIndicator(
+      <StatusIndicatorRoot data-testid="status">
+        <StatusIndicatorValue />
+      </StatusIndicatorRoot>
     );
-    expect(container.firstElementChild?.hasAttribute('derivecustomstatus')).toBe(false);
+
+    try {
+      await fixture.input('k', 'togglePaused');
+      const root = fixture.getByTestId('status');
+
+      await frame();
+      await frame();
+      await frame();
+      let finish!: () => void;
+      const finished = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+
+      Object.defineProperty(root, 'getAnimations', { value: () => [{ finished, cancel: () => {} }] });
+      await act(async () => vi.advanceTimersByTime(800));
+      expect(root.hasAttribute('data-ending-style')).toBe(true);
+      expect(root.textContent).toBe('Playing');
+      await frame();
+      await frame();
+
+      await fixture.input('u', 'volumeStep', 0.1);
+      expect(fixture.getByTestId('status')).toBe(root);
+      expect(root.hasAttribute('data-ending-style')).toBe(false);
+      expect(root.hasAttribute('data-starting-style')).toBe(false);
+      expect(root.hasAttribute('data-open')).toBe(true);
+      expect(root.textContent).toBe('60%');
+
+      await act(async () => finish());
+      await frame();
+      expect(fixture.getByTestId('status')).toBe(root);
+      expect(root.hasAttribute('data-open')).toBe(true);
+      expect(root.textContent).toBe('60%');
+    } finally {
+      fixture.dispose();
+    }
+  });
+
+  it('renders deriveCustomStatus results without forwarding the prop to the DOM', async () => {
+    const fixture = renderIndicator(
+      <StatusIndicatorRoot
+        data-testid="status"
+        deriveCustomStatus={(event) =>
+          event.action === 'seekStep' ? { status: 'frame', label: 'Frame', value: null } : null
+        }
+      >
+        <StatusIndicatorValue />
+      </StatusIndicatorRoot>
+    );
+
+    try {
+      await fixture.input('l', 'seekStep', 10);
+      const root = fixture.getByTestId('status');
+
+      expect(root.getAttribute('data-status')).toBe('frame');
+      expect(root.textContent).toBe('Frame');
+      expect(root.hasAttribute('derivecustomstatus')).toBe(false);
+    } finally {
+      fixture.dispose();
+    }
   });
 });

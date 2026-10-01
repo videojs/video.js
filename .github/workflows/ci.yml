@@ -88,6 +88,9 @@ jobs:
       - name: Test lint rules
         run: pnpm exec vp test run tools/oxlint/anti-slop/rules/tests tools/oxlint/videojs/rules/tests
 
+      - name: Test inline template transformation
+        run: pnpm exec node --import tsx --test build/plugins/tests/inline-template-plugin.test.ts
+
   typecheck:
     runs-on: ubuntu-latest
 

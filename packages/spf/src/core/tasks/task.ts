@@ -154,7 +154,7 @@ export class Task<TValue = void, TError = unknown> implements TaskLike<TValue, T
   clone(): Task<TValue, TError> {
     const cloned = new Task<TValue, TError>(this.#runFn, { id: this.id, signal: this.#externalSignal });
 
-    cloned.#previous = this.#value ?? this.#previous;
+    cloned.#previous = this.#status === 'done' ? this.#value : this.#previous;
     return cloned;
   }
 }

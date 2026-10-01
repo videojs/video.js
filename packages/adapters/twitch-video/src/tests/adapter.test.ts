@@ -233,10 +233,14 @@ describe('TwitchAdapter', () => {
     const src = `${ORIGIN}/?video=v123456789&parent=${globalThis.location.hostname}`;
 
     iframe.setAttribute('src', src);
+    const navigate = vi.spyOn(iframe, 'src', 'set');
+
     media.attach(iframe);
 
+    expect(navigate).not.toHaveBeenCalled();
     expect(iframe.getAttribute('src')).toBe(src);
     media.detach();
+    navigate.mockRestore();
   });
 
   it('defers the embed until a source arrives', async () => {
@@ -566,10 +570,20 @@ describe('TwitchAdapter', () => {
 
     media.addEventListener('timeupdate', timeupdate);
 
-    postFromWindow({ postMessage: vi.fn() }, { namespace: PROXY_NAMESPACE, eventName: 'UPDATE_STATE', params: {} });
-    postFromWindow(iframe.contentWindow, { namespace: 'some-other-embed', eventName: 'UPDATE_STATE' });
+    const params = { currentTime: 9 };
 
+    postFromWindow({ postMessage: vi.fn() }, { namespace: PROXY_NAMESPACE, eventName: 'UPDATE_STATE', params });
+    expect(media.currentTime).toBe(0);
     expect(timeupdate).not.toHaveBeenCalled();
+
+    postFromWindow(iframe.contentWindow, { namespace: 'some-other-embed', eventName: 'UPDATE_STATE', params });
+
+    expect(media.currentTime).toBe(0);
+    expect(timeupdate).not.toHaveBeenCalled();
+
+    postPlayerState(iframe, params);
+    expect(media.currentTime).toBe(9);
+    expect(timeupdate).toHaveBeenCalledTimes(1);
     media.detach();
   });
 

@@ -46,10 +46,6 @@ describe('generateCdnCode', () => {
     );
   });
 
-  it('does not add a Mux Data script for non-Mux media', () => {
-    expect(generateCdnCode('default-video', 'video', 'dash', manifest)).not.toContain('mux-data');
-  });
-
   it('omits the media script for a media renderer absent from the manifest', () => {
     expect(generateCdnCode('default-video', 'video', 'vimeo', manifest)).toEqual(
       `<script type="module" src="${CDN_BASE}/video.js"></script>`

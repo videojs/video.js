@@ -420,7 +420,10 @@ export function collectPageErrors(page: Page): string[] {
 
 /** Reads the visible and hidden paint contract for a Controls content host. */
 export async function controlsVisibilityContract(controls: Locator) {
-  return controls.evaluate((element) => {
+  await expect(controls).toHaveAttribute('data-visible', '');
+  await expect(controls).toHaveCSS('opacity', '1');
+
+  return controls.evaluate(async (element) => {
     const inspect = () => {
       const style = getComputedStyle(element);
 
@@ -435,12 +438,18 @@ export async function controlsVisibilityContract(controls: Locator) {
     const visible = inspect();
     const hadVisible = element.hasAttribute('data-visible');
 
-    element.removeAttribute('data-visible');
-    const hidden = inspect();
+    try {
+      element.removeAttribute('data-visible');
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
-    element.toggleAttribute('data-visible', hadVisible);
+      for (const animation of element.getAnimations()) {
+        if (animation instanceof CSSTransition) animation.finish();
+      }
 
-    return { hidden, visible };
+      return { hidden: inspect(), visible };
+    } finally {
+      element.toggleAttribute('data-visible', hadVisible);
+    }
   });
 }
 
@@ -510,6 +519,7 @@ export async function popupContract(popup: Locator) {
     const renderedStyle = getComputedStyle(element);
     const durations = renderedStyle.transitionDuration.split(',').map((value) => value.trim());
     const properties = renderedStyle.transitionProperty.split(',').map((value) => value.trim());
+    const positionedTranslate = renderedStyle.translate;
     const motion = properties.flatMap((property, index) =>
       ['opacity', 'filter', 'transform', 'scale'].includes(property)
         ? [{ duration: durations[index % durations.length] ?? '0s', property }]
@@ -529,11 +539,19 @@ export async function popupContract(popup: Locator) {
       element.toggleAttribute(attribute, true);
 
       const style = getComputedStyle(element);
+      const matrix = new DOMMatrixReadOnly(style.transform === 'none' ? undefined : style.transform);
+      const scales = style.scale === 'none' ? [1, 1] : style.scale.split(' ').map(Number);
       const state = {
         filter: style.filter,
         opacity: style.opacity,
         scale: style.scale === '1' ? 'none' : style.scale,
         transform: style.transform,
+        positioningPreserved: style.translate === positionedTranslate,
+        visual: {
+          blur: Number.parseFloat(style.filter.match(/blur\(([^)]+)\)/)?.[1] ?? '0'),
+          displacement: [matrix.e, matrix.f],
+          scale: [matrix.a * scales[0]!, matrix.d * (scales[1] ?? scales[0]!)],
+        },
       };
 
       element.removeAttribute(attribute);
@@ -549,6 +567,7 @@ export async function popupContract(popup: Locator) {
       .some((shadow) => !/rgba?\([^)]*(?:\/|,)\s*0(?:\.0+)?\)/.test(shadow) && /-?[1-9]\d*(?:\.\d+)?px/.test(shadow));
     const contract = {
       align: element.getAttribute('data-align'),
+      animation: style.animationName,
       backdropFilter: style.backdropFilter === 'none' ? 'none' : 'painted',
       background: style.backgroundColor === 'rgba(0, 0, 0, 0)' ? 'transparent' : 'painted',
       borderRadius: Number.parseFloat(style.borderRadius) > 50 ? 'pill' : style.borderRadius,
@@ -589,6 +608,47 @@ export async function popupContract(popup: Locator) {
 /** Finds the positioned popup that owns a control rendered inside it. */
 export function popupAncestor(child: Locator): Locator {
   return child.locator('xpath=ancestor::*[@popover][1]');
+}
+
+/** A normal-motion control establishes that the presence probe can see hidden popup movement. */
+export function expectPopupMovement(contract: Awaited<ReturnType<typeof popupContract>>) {
+  for (const state of Object.values(contract.presence)) {
+    expect(
+      state.visual.scale.some((value) => value !== 1) ||
+        state.visual.displacement.some((value) => value !== 0) ||
+        state.visual.blur > 0
+    ).toBe(true);
+    expect(state.positioningPreserved).toBe(true);
+  }
+}
+
+/** Reduced motion preserves the short opacity fade and popup positioning while removing hidden movement. */
+export function expectReducedPopupMotion(contract: Awaited<ReturnType<typeof popupContract>>) {
+  expect(contract.animation).toBe('none');
+  expect([...contract.motion].sort((a, b) => a.property.localeCompare(b.property))).toEqual(
+    ['filter', 'opacity', 'scale', 'transform'].map((property) => ({ property, duration: '0.05s' }))
+  );
+
+  for (const state of Object.values(contract.presence)) {
+    expect(state.opacity).toBe('0');
+    expect(state.positioningPreserved).toBe(true);
+    expect(state.visual).toEqual({ blur: 0, displacement: [0, 0], scale: [1, 1] });
+  }
+}
+
+/** Fail the selected live source without changing the sandbox template or mounted live skin. */
+export async function failLiveManifest(page: Page) {
+  const url = SOURCES['hls-live'].url;
+  if (!url) throw new Error('Expected a live manifest URL.');
+
+  await page.route(url, (route) =>
+    route.fulfill({
+      status: 404,
+      contentType: 'application/vnd.apple.mpegurl',
+      headers: { 'access-control-allow-origin': '*' },
+      body: 'Missing live manifest',
+    })
+  );
 }
 
 /** Applies one accessibility preference used by the Skin surface matrix. */

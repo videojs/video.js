@@ -10,7 +10,7 @@ import {
   withPageContext,
   type AnalyticsEvent,
 } from '../analytics';
-import { FRAMEWORK_COOKIE, STYLE_STORAGE_KEY_PREFIX } from '../docs/preferences';
+import { FRAMEWORK_COOKIE } from '../docs/preferences';
 
 const SOURCE = 'https%3A%2F%2Fcdn.example.com%2Fsecret.m3u8%3Ftoken%3Dabc';
 
@@ -141,7 +141,8 @@ describe('getDocsContext', () => {
 
   it('reports the saved framework and its saved style', () => {
     document.cookie = `${FRAMEWORK_COOKIE}=html; path=/`;
-    localStorage.setItem(`${STYLE_STORAGE_KEY_PREFIX}html`, 'css');
+    // The saved style key is a public storage contract.
+    localStorage.setItem('vjs_docs_style_html', 'css');
 
     expect(getDocsContext()).toEqual({ docs_framework: 'html', docs_style: 'css' });
   });

@@ -77,7 +77,18 @@ describe('createMuxMetadataURL', () => {
 
 describe('parseMuxMetadata', () => {
   it('flattens the title and the entries on the first chapter', () => {
-    expect(parseMuxMetadata(DOCUMENT)).toEqual(FLATTENED);
+    expect(
+      parseMuxMetadata([
+        ...DOCUMENT,
+        {
+          titles: [{ title: 'Later chapter' }],
+          metadata: [
+            { key: 'com.mux.video.branding', value: 'later' },
+            { key: 'second-only', value: 'excluded' },
+          ],
+        },
+      ])
+    ).toEqual(FLATTENED);
   });
 
   it('takes the first title as the default', () => {
@@ -174,20 +185,30 @@ describe('loadMuxMetadata', () => {
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
-  it('resolves undefined quietly when aborted', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const controller = new AbortController();
+  it.each(['AbortError', 'aborted signal', 'DOMException with aborted signal'] as const)(
+    'resolves undefined quietly for %s',
+    async (reason) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const controller = new AbortController();
 
-    stubFetch(() => {
-      controller.abort();
-      return Promise.reject(new DOMException('Aborted', 'AbortError'));
-    });
+      stubFetch(() => {
+        if (reason !== 'AbortError') controller.abort(new Error('Cancelled'));
 
-    await expect(
-      loadMuxMetadata('https://stream.mux.com/abc123/metadata.json', controller.signal)
-    ).resolves.toBeUndefined();
-    expect(warn).not.toHaveBeenCalled();
-  });
+        return Promise.reject(
+          reason === 'AbortError'
+            ? Object.assign(new Error('Aborted'), { name: 'AbortError' })
+            : reason === 'aborted signal'
+              ? controller.signal.reason
+              : new DOMException('Aborted', 'AbortError')
+        );
+      });
+
+      await expect(
+        loadMuxMetadata('https://stream.mux.com/abc123/metadata.json', controller.signal)
+      ).resolves.toBeUndefined();
+      expect(warn).not.toHaveBeenCalled();
+    }
+  );
 });
 
 describe('toMuxContentData', () => {

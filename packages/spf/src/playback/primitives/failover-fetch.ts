@@ -1,3 +1,5 @@
+import { isFunction, isObject } from '@videojs/utils/predicate';
+
 import { type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../media/types';
 import { addFailedCdn, getCdnId as defaultGetCdnId, type GetCdnId } from '../../media/utils/cdn';
@@ -23,8 +25,9 @@ type FailoverState<K extends SelectedTrackKey> = {
 type FailoverableFetch = (addressable: Resource, options?: FetchOptions) => Promise<unknown>;
 
 /**
- * Decorate a fetch so a failed request trips the **selected track's** CDN into `failedCdns`. The decorated fetch's type
- * is preserved, so this wraps both `resolve-track`'s playlist `FetchText` and the segment loaders' `FetchBytes`.
+ * Decorate a fetch so a failed request or body read trips the **selected track's** CDN into `failedCdns`. The decorated
+ * fetch's type is preserved, so this wraps both `resolve-track`'s playlist `FetchText` and the segment loaders'
+ * `FetchBytes`.
  *
  * The CDN id comes from the selected track's media-playlist URL, never the failed addressable: a segment URL resolves
  * relative to its playlist and, per RFC 3986, drops the playlist's query string (`…/r.m3u8?cdn=fastly` → `…/0.ts`), so
@@ -42,18 +45,40 @@ export function failoverFetch<K extends SelectedTrackKey, Fetch extends Failover
 ): Fetch {
   const getCdnId = config.getCdnId ?? defaultGetCdnId;
 
+  const trackFailure = (options?: FetchOptions) => {
+    if (options?.signal?.aborted || !state.failedCdns) return;
+
+    const presentation = state.presentation.get();
+    const trackId = state[config.selectedKey].get();
+    const track = presentation && trackId ? findTrackById(presentation, trackId) : undefined;
+
+    if (track) update(state.failedCdns, (cdns) => addFailedCdn(cdns, getCdnId(track.url)));
+  };
+
+  // SAFETY: the wrapper preserves fetch arguments and text or byte-iterable results.
   return (async (addressable: Resource, options?: FetchOptions) => {
     try {
-      return await baseFetch(addressable, options);
-    } catch (error) {
-      if (!options?.signal?.aborted && state.failedCdns) {
-        const presentation = state.presentation.get();
-        const trackId = state[config.selectedKey].get();
-        const track = presentation && trackId ? findTrackById(presentation, trackId) : undefined;
+      const result = await baseFetch(addressable, options);
 
-        if (track) update(state.failedCdns, (cdns) => addFailedCdn(cdns, getCdnId(track.url)));
+      if (!isObject(result) || !(Symbol.asyncIterator in result) || !isFunction(result[Symbol.asyncIterator])) {
+        return result;
       }
 
+      // SAFETY: the result has a callable async iterator, as required by AsyncIterable.
+      const body = result as AsyncIterable<unknown>;
+
+      return {
+        async *[Symbol.asyncIterator]() {
+          try {
+            yield* body;
+          } catch (error) {
+            trackFailure(options);
+            throw error;
+          }
+        },
+      };
+    } catch (error) {
+      trackFailure(options);
       throw error;
     }
   }) as Fetch;

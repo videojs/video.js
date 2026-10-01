@@ -30,13 +30,18 @@ describe('satteriCodeFrame', () => {
   it('passes the fence title and language as props', () => {
     const code = compile('```ts title="App.ts"\nconst a = 1;\n```');
 
-    expect(code).toContain('App.ts');
-    expect(code).toContain('ts');
+    const frameProps = code.match(/_jsx\(CodeFrame,\s*\{([\s\S]*?)children:/)?.[1];
+
+    expect(frameProps).toBeDefined();
+    expect(frameProps).toMatch(/\btitle: "App\.ts"/);
+    expect(frameProps).toMatch(/\blang: "ts"/);
   });
 
   it('does not wrap a code block already inside a TabsPanel', () => {
     const code = compile('<TabsPanel value="npm">\n\n```bash\nnpm i\n```\n\n</TabsPanel>');
 
     expect(code).not.toContain('CodeFrame');
+    expect(code).toMatch(/_jsx\(TabsPanel,/);
+    expect(code).toContain('npm i\\n');
   });
 });

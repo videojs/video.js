@@ -56,15 +56,60 @@ class TestRadioOptionsElement extends MenuRadioGroupElement {
   }
 }
 
+class DefaultRadioOptionsElement extends MenuRadioGroupElement {
+  static override readonly tagName = 'test-default-radio-options';
+
+  readonly controller = new RadioOptionsController(this, { onValueChange: vi.fn() });
+}
+
 defineElement(MenuRadioItemElement.tagName, MenuRadioItemElement);
 defineElement(MenuItemIndicatorElement.tagName, MenuItemIndicatorElement);
 defineElement(TestRadioOptionsElement.tagName, TestRadioOptionsElement);
+defineElement(DefaultRadioOptionsElement.tagName, DefaultRadioOptionsElement);
 
 afterEach(() => {
   document.body.innerHTML = '';
 });
 
 describe('RadioOptionsController', () => {
+  it('renders template labels and checked indicators with the default renderer', async () => {
+    const element = new DefaultRadioOptionsElement();
+    const template = document.createElement('template');
+
+    template.innerHTML =
+      '<media-menu-radio-item class="custom-item"><span class="custom-label" data-part="label"></span><media-menu-item-indicator force-mount class="custom-indicator"></media-menu-item-indicator></media-menu-radio-item>';
+    element.append(template);
+    document.body.append(element);
+    element.controller.sync(
+      {
+        label: 'Audio',
+        value: 'one',
+        options: [
+          { value: 'one', label: 'English', disabled: false },
+          { value: 'two', label: 'Spanish', disabled: false },
+        ],
+        disabled: false,
+        hidden: false,
+        availability: 'available',
+      },
+      createTranslator({}, 'en'),
+      'en'
+    );
+    await element.updateComplete;
+
+    const items = [...element.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+    const indicators = [...element.querySelectorAll<MenuItemIndicatorElement>(MenuItemIndicatorElement.tagName)];
+
+    expect(items.map((item) => item.className)).toEqual(['custom-item', 'custom-item']);
+    expect(items.map((item) => item.querySelector('[data-part~="label"]')?.textContent)).toEqual([
+      'English',
+      'Spanish',
+    ]);
+    expect(indicators.map((indicator) => indicator.checked)).toEqual([true, false]);
+    expect(element.querySelector('template')).toBe(template);
+    expect(template.content.querySelector('.custom-label')?.textContent).toBe('');
+  });
+
   it('renders translated options from a template and synchronizes item state', async () => {
     const element = new TestRadioOptionsElement();
     const template = document.createElement('template');

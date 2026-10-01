@@ -68,23 +68,25 @@ describe('calculateBackBufferFlushPoint', () => {
     });
 
     it('should return 0 when at start of stream', () => {
-      const segments: Segment[] = [createSegment(0, 6), createSegment(6, 6)];
+      const segments = [0, 6, 12, 18].map((start) => createSegment(start, 6));
 
       const currentTime = 0;
 
       const flushEnd = calculateBackBufferFlushPoint(segments, currentTime);
 
       expect(flushEnd).toBe(0);
+      expect(calculateBackBufferFlushPoint(segments, 24)).toBe(12);
     });
 
     it('should handle currentTime before first segment', () => {
-      const segments: Segment[] = [createSegment(10, 6), createSegment(16, 6)];
+      const segments = [10, 16, 22, 28].map((start) => createSegment(start, 6));
 
       const currentTime = 5;
 
       const flushEnd = calculateBackBufferFlushPoint(segments, currentTime);
 
       expect(flushEnd).toBe(0);
+      expect(calculateBackBufferFlushPoint(segments, 34)).toBe(22);
     });
 
     it('should handle currentTime after all segments', () => {
@@ -172,21 +174,6 @@ describe('calculateBackBufferFlushPoint', () => {
   });
 
   describe('configuration', () => {
-    it('should use default keep count of 2', () => {
-      const segments: Segment[] = [
-        createSegment(0, 6),
-        createSegment(6, 6),
-        createSegment(12, 6),
-        createSegment(18, 6),
-      ];
-
-      const currentTime = 18;
-
-      const flushEnd = calculateBackBufferFlushPoint(segments, currentTime);
-
-      expect(flushEnd).toBe(6);
-    });
-
     it('should allow keeping 0 segments (flush everything)', () => {
       const segments: Segment[] = [createSegment(0, 6), createSegment(6, 6), createSegment(12, 6)];
 

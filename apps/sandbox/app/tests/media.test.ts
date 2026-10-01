@@ -78,6 +78,8 @@ describe('mediaSources', () => {
       const sources = mediaSources(media, 'html');
 
       expect(sources).toContain('none');
+      expect(sources).toContain('hls-1');
+      expect(sources).toContain('hls-4k');
       expect(sources).not.toContain('mp4-1');
       expect(sources).not.toContain('mux-drm');
 

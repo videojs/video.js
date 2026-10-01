@@ -1,13 +1,7 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { Presentation } from '../../../types';
-import {
-  canUpdateDuration,
-  getMaxBufferedEnd,
-  getMinBufferedEnd,
-  shouldUpdateDuration,
-  waitForSourceBuffersReady,
-} from '../duration';
+import { getMaxBufferedEnd, getMinBufferedEnd, shouldUpdateDuration, waitForSourceBuffersReady } from '../duration';
 
 function makeUpdatingSourceBuffer() {
   const updateEndListeners: Array<() => void> = [];
@@ -50,27 +44,17 @@ function makeUpdatingSourceBuffer() {
 
 const openMs = { readyState: 'open' } as MediaSource;
 
-describe('canUpdateDuration', () => {
-  it('returns true when mediaSource exists and presentation has duration', () => {
-    expect(canUpdateDuration({ duration: 60 } as Presentation, openMs)).toBe(true);
-  });
-
-  it('returns false when mediaSource is missing', () => {
-    expect(canUpdateDuration({ duration: 60 } as Presentation, undefined)).toBe(false);
-  });
-
-  it('returns false when presentation is missing', () => {
-    expect(canUpdateDuration(undefined, openMs)).toBe(false);
-  });
-
-  it('returns false when presentation.duration is undefined', () => {
-    expect(canUpdateDuration({} as Presentation, openMs)).toBe(false);
-  });
-});
-
 describe('shouldUpdateDuration', () => {
   it('returns true when the basics + a valid positive duration are present', () => {
     expect(shouldUpdateDuration({ duration: 60 } as Presentation, openMs)).toBe(true);
+  });
+
+  it.each([
+    ['mediaSource', { duration: 60 } as Presentation, undefined],
+    ['presentation', undefined, openMs],
+    ['presentation.duration', {} as Presentation, openMs],
+  ])('returns false when %s is missing', (_name, presentation, mediaSource) => {
+    expect(shouldUpdateDuration(presentation, mediaSource)).toBe(false);
   });
 
   it('returns false when duration is NaN', () => {
@@ -195,19 +179,6 @@ describe('waitForSourceBuffersReady', () => {
     const controller = new AbortController();
 
     await waitForSourceBuffersReady([], controller.signal);
-  });
-
-  it('resolves when all updating buffers fire updateend', async () => {
-    const { buffer: video, finishUpdating: finishVideo } = makeUpdatingSourceBuffer();
-    const { buffer: audio, finishUpdating: finishAudio } = makeUpdatingSourceBuffer();
-    const controller = new AbortController();
-
-    const ready = waitForSourceBuffersReady([video, audio], controller.signal);
-
-    finishVideo();
-    finishAudio();
-
-    await ready;
   });
 
   it('resolves on abort even if buffers never finish updating', async () => {

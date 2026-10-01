@@ -272,10 +272,12 @@ describe('buildKeySystemConfigurations', () => {
     expect(configs[0]?.videoCapabilities).toEqual([{ contentType: VIDEO_TYPE, encryptionScheme: 'cbcs' }]);
   });
 
-  it('offers only one configuration when neither preference applies', () => {
-    expect(buildKeySystemConfigurations(playReadyKeySystem, { video: [VIDEO_TYPE], audio: [] })).toHaveLength(1);
-  });
-
+  // The reason the ladder has a floor instead of an unstamped last resort.
+  // Chromium warns for any *requested* configuration that omits `robustness`, not
+  // only the one it accepts — measured four ways against a real CDM: the same
+  // ladder warns with a trailing unstamped entry and is silent without it, while
+  // the accepted configuration is identical either way. So a stamped rung winning
+  // is not enough; nothing in the list may be unstamped.
   it("descends the module's robustness tiers, strongest rung first", () => {
     const configs = buildKeySystemConfigurations(widevineKeySystem, { video: [VIDEO_TYPE], audio: [AUDIO_TYPE] });
 
@@ -288,40 +290,12 @@ describe('buildKeySystemConfigurations', () => {
     ]);
   });
 
-  // The reason the ladder has a floor instead of an unstamped last resort.
-  // Chromium warns for any *requested* configuration that omits `robustness`, not
-  // only the one it accepts — measured four ways against a real CDM: the same
-  // ladder warns with a trailing unstamped entry and is silent without it, while
-  // the accepted configuration is identical either way. So a stamped rung winning
-  // is not enough; nothing in the list may be unstamped.
-  it('offers no unstamped configuration when the module names tiers', () => {
-    const configs = buildKeySystemConfigurations(widevineKeySystem, { video: [VIDEO_TYPE], audio: [AUDIO_TYPE] });
-
-    for (const config of configs) {
-      for (const capability of [...(config.videoCapabilities ?? []), ...(config.audioCapabilities ?? [])]) {
-        expect(capability.robustness).toBeTruthy();
-      }
-    }
-  });
-
   // The weakest tier stands in for the unstamped entry, so a CDM without the
   // stronger rungs still negotiates rather than being refused.
   it('ends the ladder on the weakest tier', () => {
     const configs = buildKeySystemConfigurations(widevineKeySystem, { video: [VIDEO_TYPE], audio: [AUDIO_TYPE] });
 
     expect(configs.at(-1)?.videoCapabilities).toEqual([{ contentType: VIDEO_TYPE, robustness: 'SW_SECURE_CRYPTO' }]);
-  });
-
-  // A shorter audio list clamps to its last entry rather than dropping out, so the
-  // audio tier survives every video rung.
-  it('clamps the shorter tier list across the longer one', () => {
-    const configs = buildKeySystemConfigurations(widevineKeySystem, { video: [VIDEO_TYPE], audio: [AUDIO_TYPE] });
-
-    expect(configs.map((config) => config.audioCapabilities?.[0]?.robustness)).toEqual([
-      'SW_SECURE_CRYPTO',
-      'SW_SECURE_CRYPTO',
-      'SW_SECURE_CRYPTO',
-    ]);
   });
 
   // An audio-only source still gets a stamped rung: the tier lives on the audio

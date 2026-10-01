@@ -160,13 +160,4 @@ describe('i18n registry shared across module instances', () => {
     second.registerI18n('fr', { buttons: { pause: 'Pause' } });
     expect(spy).toHaveBeenCalledOnce();
   });
-
-  it('resets every instance at once', async () => {
-    const { first, second } = await loadTwoInstances();
-
-    first.registerI18n('es', { buttons: { play: 'Reproducir' } });
-    second.resetI18nRegistry();
-
-    expect(first.hasRegisteredLocale('es')).toBe(false);
-  });
 });

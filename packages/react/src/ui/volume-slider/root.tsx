@@ -64,7 +64,7 @@ export const VolumeSliderRoot = forwardRef<HTMLDivElement, VolumeSliderRootProps
 
     const getPercent = () => (volumeRef.current?.volume ?? 0) * 100;
     const getStepPercent = () => core.getStepPercent();
-    const setVolume = (percent: number) => volumeRef.current?.setVolume(percent / 100);
+    const setVolume = (percent: number) => volumeRef.current?.setVolume(core.valueFromPercent(percent) / 100);
 
     const { state, input, cssVars, rootRef, thumbRef, rootProps, rootStyle, thumbProps } =
       useSlider<VolumeSliderCore.State>({
@@ -92,7 +92,7 @@ export const VolumeSliderRoot = forwardRef<HTMLDivElement, VolumeSliderRootProps
         isDisabled: () => disabledRef.current,
         getPercent: () => (volumeRef.current?.volume ?? 0) * 100,
         getStepPercent: () => core.getWheelStepPercent(),
-        onValueChange: (percent) => volumeRef.current?.setVolume(percent / 100),
+        onValueChange: (percent) => volumeRef.current?.setVolume(core.rawValueFromPercent(percent) / 100),
       })
     );
 

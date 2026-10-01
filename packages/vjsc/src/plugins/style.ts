@@ -32,12 +32,9 @@ import {
 } from '../styles/resolved';
 import { moduleFilename, parseModuleId, type TransformModule, SCRIPT_MODULE_ID } from '../utils/module-id';
 import { toPosixPath } from '../utils/path';
-import { mergeModuleBuildMeta } from './component-meta';
-
-type InternalStyleTransformOptions = StyleTransformOptions & { readonly resolvedStyles?: ResolvedStyles | undefined };
 
 export type StylePluginConfig =
-  | InternalStyleTransformOptions
+  | StyleTransformOptions
   | ((module: TransformModule) => StyleTransformOptions | null | Promise<StyleTransformOptions | null>);
 
 interface CachedStyleModule {
@@ -143,9 +140,7 @@ export function stylePlugin(
     transform: {
       filter: { id: SCRIPT_MODULE_ID, code: '.styles' },
       async handler(_code, id, transform) {
-        const options: InternalStyleTransformOptions | null = isFunction(config)
-          ? await config(parseModuleId(id))
-          : config;
+        const options: StyleTransformOptions | null = isFunction(config) ? await config(parseModuleId(id)) : config;
 
         if (!options || !transform.ast || !transform.magicString) {
           replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
@@ -162,7 +157,7 @@ export function stylePlugin(
           return null;
         }
 
-        const styles = options.resolvedStyles ?? (await cachedStyles(styleCache, files));
+        const styles = await cachedStyles(styleCache, files);
 
         await manifest?.record(styles);
         lifecycle?.onOwnerTransform(id, styles.watchFiles);
@@ -211,11 +206,6 @@ export function stylePlugin(
           return null;
         }
 
-        const styleFiles = [
-          ...new Set(styles.rules.filter((rule) => referencedRules.has(rule.className)).map((rule) => rule.file)),
-        ].sort();
-        let styleAssets: readonly string[] = [];
-
         if (options.mode === 'css' && options.stylesheet && cachedDesign) {
           const base = options.stylesheet.base ? resolve(cwd, options.stylesheet.base) : undefined;
 
@@ -261,7 +251,6 @@ export function stylePlugin(
 
           replaceVirtualCss(cssById, cssByOwner, id, modules, lifecycle);
           insertModuleImports(transform.ast, transform.magicString, imports);
-          styleAssets = modules.map(([moduleId]) => moduleId);
         } else {
           report();
           replaceVirtualCss(cssById, cssByOwner, id, [], lifecycle);
@@ -269,9 +258,6 @@ export function stylePlugin(
 
         return {
           code: transform.magicString,
-          meta: mergeModuleBuildMeta(this.getModuleInfo(id)?.meta, {
-            moduleStyles: { files: styleFiles, assets: styleAssets },
-          }),
         };
       },
     },

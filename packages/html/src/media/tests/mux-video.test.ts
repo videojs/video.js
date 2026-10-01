@@ -22,6 +22,7 @@ describe('MuxVideo', () => {
     el.source = { playbackId: 'abc123', preferPlayback: 'native' };
 
     expect(el.source?.preferPlayback).toBe('native');
+    expect(el.adapter.source).toEqual({ playbackId: 'abc123', preferPlayback: 'native' });
     expect(el.hasAttribute('source')).toBe(false);
   });
 
@@ -31,6 +32,7 @@ describe('MuxVideo', () => {
     el.source = { playbackId: 'abc123', preferPlayback: 'native', maxAutoResolution: '720p' };
 
     expect(el.source?.maxAutoResolution).toBe('720p');
+    expect(el.adapter.source?.maxAutoResolution).toBe('720p');
     // Normalized source options ride the property; no attribute is reflected.
     expect(el.hasAttribute('maxautoresolution')).toBe(false);
   });
@@ -41,7 +43,11 @@ describe('MuxVideo', () => {
     el.source = { playbackId: 'abc123', preferPlayback: 'native', maxAutoResolution: '720p' };
     el.setAttribute('src', 'https://stream.mux.com/other.m3u8');
 
+    expect(el.adapter.src).toBe('https://stream.mux.com/other.m3u8');
+    expect(el.adapter.source?.playbackId).toBe('other');
+
     expect(el.source?.maxAutoResolution).toBe('720p');
+    expect(el.adapter.source?.maxAutoResolution).toBe('720p');
   });
 
   it('carries the player-size caps through the source property', () => {
@@ -56,6 +62,8 @@ describe('MuxVideo', () => {
 
     expect(el.source?.capRenditionToPlayerSize).toBe(false);
     expect(el.source?.minAutoResolution).toBe('1080p');
+    expect(el.adapter.source?.capRenditionToPlayerSize).toBe(false);
+    expect(el.adapter.source?.minAutoResolution).toBe('1080p');
     // Normalized source options ride the property; no attribute is reflected.
     expect(el.hasAttribute('caprenditiontoplayersize')).toBe(false);
     expect(el.hasAttribute('minautoresolution')).toBe(false);
@@ -72,8 +80,13 @@ describe('MuxVideo', () => {
     };
     el.setAttribute('src', 'https://stream.mux.com/other.m3u8');
 
+    expect(el.adapter.src).toBe('https://stream.mux.com/other.m3u8');
+    expect(el.adapter.source?.playbackId).toBe('other');
+
     expect(el.source?.capRenditionToPlayerSize).toBe(false);
     expect(el.source?.minAutoResolution).toBe('1080p');
+    expect(el.adapter.source?.capRenditionToPlayerSize).toBe(false);
+    expect(el.adapter.source?.minAutoResolution).toBe('1080p');
   });
 
   it('keeps engine options when the src attribute changes', () => {

@@ -162,12 +162,14 @@ describe('ControlsElement', () => {
     const menu = createDefinedElement(MenuElement);
     const playbackRateMenu = createDefinedElement(MenuElement);
     const tooltip = createDefinedElement(TooltipElement);
+    const dialog = document.createElement('dialog');
     const popoverClose = vi.spyOn(popover, 'close');
     const menuClose = vi.spyOn(menu, 'close');
     const playbackRateMenuClose = vi.spyOn(playbackRateMenu, 'close');
     const tooltipClose = vi.spyOn(tooltip, 'close');
+    const dialogClose = vi.spyOn(dialog, 'close');
 
-    controls.append(popover, menu, playbackRateMenu, tooltip);
+    controls.append(popover, menu, playbackRateMenu, tooltip, dialog);
     document.body.append(provider);
     provider.append(controls);
 
@@ -186,25 +188,8 @@ describe('ControlsElement', () => {
       expect(playbackRateMenuClose).toHaveBeenCalledWith('imperative-action');
       expect(tooltipClose).toHaveBeenCalledWith('imperative-action');
     });
-  });
 
-  it('does not call close on native dialogs inside controls when controls hide', async () => {
-    const provider = document.createElement('test-controls-player-provider') as TestPlayerProviderElement;
-    const controls = createDefinedElement(ControlsElement);
-    const dialog = document.createElement('dialog');
-    const closeSpy = vi.spyOn(dialog, 'close');
-
-    controls.append(dialog);
-    document.body.append(provider);
-    provider.append(controls);
-
-    await controls.updateComplete;
-
-    provider.setVisible(false);
-
-    await waitForAssertion(() => {
-      expect(closeSpy).not.toHaveBeenCalled();
-    });
+    expect(dialogClose).not.toHaveBeenCalled();
   });
 
   it('ignores popup host markers when close is missing or not a function', async () => {
@@ -224,15 +209,16 @@ describe('ControlsElement', () => {
 
     await controls.updateComplete;
 
-    expect(() => provider.setVisible(false)).not.toThrow();
+    expect(controls.hasAttribute('data-visible')).toBe(true);
+
+    provider.setVisible(false);
+
+    await expect(controls.updateComplete).resolves.toBe(true);
+    expect(controls.hasAttribute('data-visible')).toBe(false);
   });
 });
 
 describe('ControlsBackdropElement', () => {
-  it('has the correct tag name', () => {
-    expect(ControlsBackdropElement.tagName).toBe('media-controls-backdrop');
-  });
-
   it('is presentational and receives controls state attributes', async () => {
     const provider = document.createElement('test-controls-player-provider') as TestPlayerProviderElement;
     const controls = createDefinedElement(ControlsElement);
@@ -250,11 +236,5 @@ describe('ControlsBackdropElement', () => {
       expect(backdrop.hasAttribute('data-visible')).toBe(true);
       expect(backdrop.hasAttribute('data-user-active')).toBe(true);
     });
-  });
-});
-
-describe('ControlsContentElement', () => {
-  it('has the correct tag name', () => {
-    expect(ControlsContentElement.tagName).toBe('media-controls-content');
   });
 });

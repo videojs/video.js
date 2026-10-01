@@ -33,25 +33,15 @@ describe('createMuxVideoURL', () => {
     );
   });
 
-  it('appends playback params as snake_case query params', () => {
-    const url = new URL(
-      createMuxVideoURL({
-        playbackId: 'abc123',
-        playback: { maxResolution: '1080p', renditionOrder: 'desc', extraParam: 'x', skip: undefined },
-      })!
-    );
-
-    expect(url.searchParams.get('max_resolution')).toBe('1080p');
-    expect(url.searchParams.get('rendition_order')).toBe('desc');
-    expect(url.searchParams.get('extra_param')).toBe('x');
-    expect(url.searchParams.has('skip')).toBe(false);
-  });
-
   it('appends manifest modifiers as snake_case query params', () => {
     const url = new URL(
       createMuxVideoURL({
         playbackId: 'abc123',
         playback: {
+          maxResolution: '1080p',
+          renditionOrder: 'desc',
+          extraParam: 'x',
+          skip: undefined,
           redundantStreams: true,
           rokuTrickPlay: true,
           defaultSubtitlesLang: 'en-US',
@@ -64,6 +54,10 @@ describe('createMuxVideoURL', () => {
       })!
     );
 
+    expect(url.searchParams.get('max_resolution')).toBe('1080p');
+    expect(url.searchParams.get('rendition_order')).toBe('desc');
+    expect(url.searchParams.get('extra_param')).toBe('x');
+    expect(url.searchParams.has('skip')).toBe(false);
     expect(url.searchParams.get('redundant_streams')).toBe('true');
     expect(url.searchParams.get('roku_trick_play')).toBe('true');
     expect(url.searchParams.get('default_subtitles_lang')).toBe('en-US');

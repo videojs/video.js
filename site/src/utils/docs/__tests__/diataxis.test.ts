@@ -4,9 +4,9 @@ import { join, relative, resolve } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { getDocTypeFromId, isSection } from '../../../types/docs';
-import type { DocPage } from '../diataxis';
-import { findDiataxisIssues, findTaskHeadings } from '../diataxis';
 import { getAllGuideSlugs } from '../sidebar';
+import type { DocPage } from './diataxis';
+import { findDiataxisIssues, findTaskHeadings } from './diataxis';
 
 const CONTENT_ROOT = resolve(process.cwd(), 'src/content/docs');
 
@@ -81,14 +81,12 @@ describe('findDiataxisIssues', () => {
 });
 
 describe('docs content', () => {
-  it('keeps every page inside the boundary of its folder', () => {
+  it('keeps every page inside the boundary of its folder', async () => {
     const issues = pages.flatMap((entry) => findDiataxisIssues(entry));
     const report = issues.map((issue) => `${issue.id} [${issue.rule}]: ${issue.message}`).join('\n');
 
     expect(issues, `\n${report}\n`).toEqual([]);
-  });
 
-  it('warns about task headings on concept pages', async () => {
     const { sidebar } = await import('../../../docs.config');
     const conceptSlugs = new Set<string>();
 

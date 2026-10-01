@@ -19,7 +19,6 @@ import {
   deriveSharedMinStartMediaTime,
   establishStartMediaTime,
   gateFirstParseOnAnchor,
-  NEAR_ZERO_ORIGIN_THRESHOLD,
 } from '../establish-start-media-time';
 
 // ============================================================================
@@ -122,7 +121,10 @@ const trackStartDate = (presentation: MaybeResolvedPresentation | undefined, id:
 // setup signature requires `context`/`config` even though this behavior takes
 // no context, and its cleanup widens to BehaviorCleanup; cast for ergonomics.
 const setupEstablish = (state: ReturnType<typeof makeEstablishState>) =>
-  establishStartMediaTime.setup({ state, context: {}, config: {} }) as { destroy(): void };
+  establishStartMediaTime.setup({ state, context: {}, config: {} }) as {
+    destroy(): void;
+    snapshot: { get(): { value: string } };
+  };
 
 describe('establishStartMediaTime', () => {
   it('freezes the reference track startDate as the anchor and stamps it onto every track lacking one', async () => {
@@ -245,16 +247,41 @@ describe('establishStartMediaTime', () => {
 
     await vi.waitFor(() => expect(trackStartDate(state.presentation.get(), 'a1')).toBe(ANCHOR));
 
-    // Source change: through unresolved, then a new presentation with a new anchor.
+    state.mediaContainerData.set({
+      video: { timescale: 1000, baseMediaDecodeTime: 12_000, segmentStartTime: 2 },
+      audio: { timescale: 1000, baseMediaDecodeTime: 11_000, segmentStartTime: 2 },
+    });
+    await vi.waitFor(() => expect(reactor.snapshot.get().value).toBe('established'));
+    const established = state.presentation.get() as Presentation;
+
+    expect(findTrackById(established, 'v1')?.startMediaTime).toBe(9);
+    expect(findTrackById(established, 'a1')?.startMediaTime).toBe(9);
+
+    state.mediaContainerData.set({
+      video: { timescale: 1000, baseMediaDecodeTime: 42_000, segmentStartTime: 2 },
+      audio: { timescale: 1000, baseMediaDecodeTime: 41_000, segmentStartTime: 2 },
+    });
+    await Promise.resolve();
+    expect(state.presentation.get()).toBe(established);
+
     const newAnchor = ANCHOR + 3600;
 
     state.presentation.set(undefined);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(reactor.snapshot.get().value).toBe('inactive');
+    expect(state.mediaContainerData.get()).toBeUndefined();
+
     state.presentation.set({
       ...makePresentation({ video: [resolveVideo(videoShell('v1'), newAnchor)], audio: [audioShell] }),
       id: 'pres-2',
     } as Presentation);
 
     await vi.waitFor(() => expect(trackStartDate(state.presentation.get(), 'a1')).toBe(newAnchor));
+    const fresh = state.presentation.get() as Presentation;
+
+    expect(findTrackById(fresh, 'v1')?.startMediaTime).toBeUndefined();
+    expect(findTrackById(fresh, 'a1')?.startMediaTime).toBeUndefined();
+    expect(reactor.snapshot.get().value).toBe('monitoring');
 
     reactor.destroy();
   });
@@ -400,16 +427,17 @@ describe('deriveSharedMinStartMediaTime', () => {
     ).toEqual({ video: 0, audio: 0 });
   });
 
-  it('relocates at/above the threshold (the boundary is exclusive)', () => {
-    const atThreshold = {
-      video: { timescale: 90000, baseMediaDecodeTime: 90000 * NEAR_ZERO_ORIGIN_THRESHOLD, segmentStartTime: 0 },
-      audio: { timescale: 48000, baseMediaDecodeTime: 48000 * NEAR_ZERO_ORIGIN_THRESHOLD, segmentStartTime: 0 },
+  it.each([
+    [0.999, 0],
+    [1, 1],
+    [1.001, 1.001],
+  ])('relocates at/above one second: %s → %s', (origin, expected) => {
+    const data = {
+      video: { timescale: 1000, baseMediaDecodeTime: 1000 * origin, segmentStartTime: 0 },
+      audio: { timescale: 1000, baseMediaDecodeTime: 1000 * origin, segmentStartTime: 0 },
     };
 
-    expect(deriveSharedMinStartMediaTime(atThreshold, sel)).toEqual({
-      video: NEAR_ZERO_ORIGIN_THRESHOLD,
-      audio: NEAR_ZERO_ORIGIN_THRESHOLD,
-    });
+    expect(deriveSharedMinStartMediaTime(data, sel)).toEqual({ video: expected, audio: expected });
   });
 
   it('snaps a negative shared origin to 0 (never relocates forward)', () => {
@@ -448,12 +476,23 @@ describe('derivePerTypeStartMediaTime', () => {
     ).toEqual({ video: 60 });
   });
 
-  it('is undefined for a type until timescale + baseMediaDecodeTime + segmentStartTime are all present', () => {
-    expect(derivePerTypeStartMediaTime({ video: { timescale: 90000 } }, {})).toEqual({ video: undefined });
-    expect(derivePerTypeStartMediaTime({ audio: { baseMediaDecodeTime: 100, segmentStartTime: 0 } }, {})).toEqual({
-      audio: undefined,
-    });
-  });
+  it.each(['timescale', 'baseMediaDecodeTime', 'segmentStartTime'] as const)(
+    'is undefined for a type missing %s',
+    (field) => {
+      const complete: MediaContainerData = { timescale: 1000, baseMediaDecodeTime: 12_000, segmentStartTime: 2 };
+      const incomplete = { ...complete, [field]: undefined };
+
+      expect(derivePerTypeStartMediaTime({ video: complete, audio: complete }, {})).toEqual({ video: 10, audio: 10 });
+      expect(derivePerTypeStartMediaTime({ video: incomplete, audio: complete }, {})).toEqual({
+        video: undefined,
+        audio: 10,
+      });
+      expect(derivePerTypeStartMediaTime({ video: complete, audio: incomplete }, {})).toEqual({
+        video: 10,
+        audio: undefined,
+      });
+    }
+  );
 
   it('snaps a below-threshold origin to 0 independently per type', () => {
     expect(

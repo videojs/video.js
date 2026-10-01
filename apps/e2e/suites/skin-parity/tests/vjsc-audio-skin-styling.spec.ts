@@ -7,6 +7,8 @@ import {
   collectPageErrors,
   emulatePreference,
   expectRenderingParity,
+  expectPopupMovement,
+  expectReducedPopupMotion,
   expectSameRendering,
   frameRect,
   freezeSliderState,
@@ -118,32 +120,32 @@ for (const variant of CASES) {
   });
 
   test(`${variant.framework} ${variant.skin} removes movement under reduced motion`, async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-
     const comparison = await openVariants(page, variant, 672);
-
-    await expect.poll(() => page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
-
-    for (const panel of comparison.panels) {
+    const readPopup = async (panel: SkinPanel) => {
       const button = panel.root.getByRole('button', { name: /Playback rate/i });
 
-      await button.click();
+      if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
+
       await expect(button).toHaveAttribute('aria-expanded', 'true');
 
-      const popup = visibleMenuPopup(panel.root);
-      const motion = await popup.evaluate((element) => {
-        const style = getComputedStyle(element);
+      return popupContract(popupAncestor(panel.root.getByRole('menu')));
+    };
 
-        return {
-          animation: style.animationName,
-          duration: style.transitionDuration,
-          scale: style.scale === '1' ? 'none' : style.scale,
-        };
-      });
+    for (const panel of comparison.panels) expectPopupMovement(await readPopup(panel));
 
-      // Reduced motion collapses popup durations to the instant token and neutralizes the hidden scale.
-      expect(motion).toEqual({ animation: 'none', duration: '0.05s', scale: 'none' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect.poll(() => page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
+
+    const contracts = [];
+
+    for (const panel of comparison.panels) {
+      const contract = await readPopup(panel);
+
+      expectReducedPopupMotion(contract);
+      contracts.push(contract);
     }
+
+    expect(contracts[1]).toEqual(contracts[0]);
   });
 
   for (const preference of ['reduced-transparency', 'contrast-more', 'forced-colors'] as const) {

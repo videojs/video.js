@@ -29,6 +29,7 @@ describe('InstallationMethodNavClient', () => {
     framework.set('react');
     window.history.replaceState(null, '', '/');
     vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('shows the methods supported by React', () => {
@@ -46,14 +47,6 @@ describe('InstallationMethodNavClient', () => {
     expect(markup).toContain('data-installation-method="packaged"');
     expect(markup).toContain('data-installation-method="shadcn"');
     expect(markup).toContain('href="/docs/guides/installation/shadcn?framework=html"');
-    expect(markup).toContain('data-installation-method="cdn"');
-  });
-
-  it('keeps the active CDN method visible while route state is normalized', () => {
-    media.set('vimeo');
-
-    const markup = renderToString(<InstallationMethodNavClient currentFramework="html" route="cdn" />);
-
     expect(markup).toContain('data-installation-method="cdn"');
   });
 

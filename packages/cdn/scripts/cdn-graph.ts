@@ -6,7 +6,7 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 /** Static `import`/`export … from`, and dynamic `import()`, specifiers. */
 const SPECIFIER = /(?:\bfrom|\bimport)\s*\(?\s*["']([^"']+)["']/g;
@@ -41,6 +41,12 @@ function isAbsoluteSpecifier(specifier: string): boolean {
   return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(specifier);
 }
 
+function isOutsideDirectory(dir: string, path: string): boolean {
+  const file = relative(dir, path);
+
+  return file === '..' || file.startsWith(`..${sep}`) || isAbsolute(file);
+}
+
 /**
  * Every file reachable from `roots` by following relative specifiers, as paths relative to `dir`.
  *
@@ -56,6 +62,8 @@ export function resolveClosure(dir: string, roots: readonly string[]): Set<strin
     if (seen.has(file)) continue;
 
     const path = resolve(dir, file);
+    if (isOutsideDirectory(dir, path)) throw new Error(`Expected bundle resolves outside the build: ${file}`);
+
     if (!existsSync(path)) throw new Error(`Expected bundle is missing from the build: ${file}`);
 
     seen.add(file);
@@ -94,7 +102,7 @@ export function findUnresolvableSpecifiers(dir: string, files: Iterable<string>)
 
       const target = resolve(dirname(path), specifier);
 
-      if (!existsSync(target)) {
+      if (isOutsideDirectory(dir, target) || !existsSync(target)) {
         problems.push(`${file}: "${specifier}" resolves outside the build (${relative(dir, target)})`);
       }
     }

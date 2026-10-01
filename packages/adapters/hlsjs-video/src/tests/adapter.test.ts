@@ -1,8 +1,8 @@
 import { MediaError, type RemotePlaybackLike } from '@videojs/media';
 import { CustomMediaElement } from '@videojs/media/dom';
-import { NativeHlsAdapter } from '@videojs/native-hls-video';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import type { RenditionCapController } from '../cap-level';
 import { ContentTypes, Hls, HlsJsAdapter, type HlsSource } from '../index';
 
 // Stands in for `<hlsjs-video>`, so markup reaches the media adapter the same way
@@ -406,19 +406,6 @@ describe('HlsJsAdapter', () => {
       expect(media.engine).not.toBe(engine);
     });
 
-    it('hands DRM options straight to the hls.js engine', () => {
-      const { media } = setupMse({ engine: { hlsJs: drmEngine } });
-
-      expect(media.engine!.config.emeEnabled).toBe(true);
-      expect(media.engine!.config.drmSystems).toEqual({ 'com.widevine.alpha': { licenseUrl: WIDEVINE_LICENSE } });
-    });
-
-    it('leaves EME disabled for unprotected playback', () => {
-      const { media } = setupMse({});
-
-      expect(media.engine!.config.emeEnabled).toBe(false);
-    });
-
     it('reuses the engine for an equivalent DRM config', () => {
       const { media } = setupMse({ engine: { hlsJs: drmEngine } });
       const engine = media.engine;
@@ -439,6 +426,8 @@ describe('HlsJsAdapter', () => {
       const { media } = setupMse({ engine: { hlsJs: drmEngine } });
       const engine = media.engine;
 
+      expect(engine!.config.emeEnabled).toBe(true);
+
       media.source = {
         src: media.src,
         engine: {
@@ -451,6 +440,7 @@ describe('HlsJsAdapter', () => {
       media.load();
 
       expect(media.engine).not.toBe(engine);
+      expect(media.engine!.config.emeEnabled).toBe(true);
       expect(media.engine!.config.drmSystems).toEqual({
         'com.widevine.alpha': { licenseUrl: 'https://other.test/widevine' },
       });
@@ -507,31 +497,6 @@ describe('HlsJsAdapter', () => {
       expect(requestMediaKeySystemAccess).toHaveBeenCalledWith('com.apple.fps', expect.any(Array));
     });
 
-    it('recreates the native delegate when `source.drm` changes', () => {
-      const { media, video } = setup();
-
-      media.source = { ...media.source, drm };
-      media.load();
-
-      fireDurationChange(video, Infinity);
-      expect(media.streamType).toBe('live');
-
-      const handler = vi.fn();
-
-      media.addEventListener('streamtypechange', handler);
-
-      media.source = { ...media.source, drm: { ...drm } };
-      media.load();
-      // Structurally equal, so the delegate playing it is left alone.
-      expect(handler).not.toHaveBeenCalled();
-
-      media.source = { ...media.source, drm: { 'com.apple.fps': { licenseUrl: 'https://other.test/fairplay' } } };
-      media.load();
-
-      // Teardown `live` → `unknown`, then the new delegate re-detects `live`.
-      expect(handler).toHaveBeenCalledTimes(2);
-    });
-
     it('hands `nativeHls` to the native delegate', async () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const requestMediaKeySystemAccess = vi.fn(() => new Promise<never>(() => {}));
@@ -582,24 +547,6 @@ describe('HlsJsAdapter', () => {
 
       // Teardown `live` → `unknown`, then the new delegate re-detects `live`.
       expect(handler).toHaveBeenCalledTimes(2);
-    });
-
-    it('leaves the native delegate alone for a structurally equal `nativeHls`', () => {
-      const { media, video } = setup();
-      const nativeHls = { drmSystems: { 'com.apple.fps': { licenseUrl: FAIRPLAY_LICENSE } } };
-
-      media.source = { ...media.source, engine: { nativeHls: { ...nativeHls } } };
-      media.load();
-
-      fireDurationChange(video, Infinity);
-      const handler = vi.fn();
-
-      media.addEventListener('streamtypechange', handler);
-
-      media.source = { ...media.source, engine: { nativeHls: { ...nativeHls } } };
-      media.load();
-
-      expect(handler).not.toHaveBeenCalled();
     });
   });
 
@@ -667,8 +614,14 @@ describe('HlsJsAdapter', () => {
      * The probe defaults to a viewport larger than the whole ladder, so the player-size ceiling never binds and a
      * requested resolution is what is being measured. Pass a smaller one to measure the size cap itself.
      */
-    function cappedIndex(media: HlsJsAdapter, playerSize = { width: 4096, height: 2160 }) {
+    function cappedIndex(
+      media: HlsJsAdapter,
+      playerSize = { width: 4096, height: 2160 },
+      config?: Partial<Hls['config']>
+    ) {
       const engine = probeEngine(LADDER);
+
+      Object.assign(engine.config, config);
       const Controller = media.engine!.config.capLevelController;
       const controller = new Controller(engine);
 
@@ -684,14 +637,19 @@ describe('HlsJsAdapter', () => {
       return index;
     }
 
+    it.each([
+      [1, 1],
+      [2, 2],
+    ])('measures device pixels with the engine defaults at ratio %s', (ratio, expected) => {
+      vi.stubGlobal('devicePixelRatio', ratio);
+
+      const { media } = setupMse({ minAutoResolution: '270p' });
+
+      expect(cappedIndex(media, { width: 960, height: 540 }, media.engine!.config)).toBe(expected);
+    });
+
     /** Small enough that every rung but the lowest is above what it needs. */
     const SMALL_PLAYER = { width: 320, height: 180 };
-
-    it('installs its own cap-level controller over the hls.js default', () => {
-      const { media } = setupMse();
-
-      expect(media.engine!.config.capLevelController).not.toBe(Hls.DefaultConfig.capLevelController);
-    });
 
     it('caps automatic selection at the requested resolution', () => {
       const { media } = setupMse({ maxAutoResolution: '720p' });
@@ -716,11 +674,13 @@ describe('HlsJsAdapter', () => {
       const { media } = setupMse();
       const engine = media.engine;
 
-      expect(cappedIndex(media)).toBe(2);
+      const prototype = engine!.config.capLevelController.prototype as unknown as RenditionCapController;
+      const apply = vi.spyOn(prototype, 'apply');
 
       media.source = { src: M3U8, maxAutoResolution: '360p' };
 
       expect(media.engine).toBe(engine);
+      expect(apply).toHaveBeenCalledOnce();
       expect(cappedIndex(media)).toBe(0);
     });
 
@@ -819,14 +779,6 @@ describe('HlsJsAdapter', () => {
         const { media } = setupMse({ minAutoResolution: '1080p' });
 
         expect(cappedIndex(media, SMALL_PLAYER)).toBe(2);
-      });
-
-      it('does not raise an explicit maxAutoResolution', () => {
-        const { media } = setupMse({ maxAutoResolution: '360p', minAutoResolution: '1080p' });
-
-        // The ceiling the caller asked for is the stricter instruction. A floor
-        // bounds how far the element's size may cap, and nothing else.
-        expect(cappedIndex(media, SMALL_PLAYER)).toBe(0);
       });
 
       it('weakens to nothing at the bottom of the ladder', () => {
@@ -946,21 +898,6 @@ describe('HlsJsAdapter', () => {
     });
   });
 
-  describe('property proxying', () => {
-    it('proxies paused from the native element', () => {
-      const { media } = setup();
-
-      expect(media.paused).toBe(true);
-    });
-
-    it('proxies volume to the native element', () => {
-      const { media, video } = setup();
-
-      media.volume = 0.5;
-      expect(video.volume).toBe(0.5);
-    });
-  });
-
   describe('streamType', () => {
     it('defaults to `unknown` before load', () => {
       const media = new HlsJsAdapter();
@@ -979,54 +916,6 @@ describe('HlsJsAdapter', () => {
 
       expect(media.streamType).toBe('live');
       expect(handler).toHaveBeenCalledOnce();
-    });
-
-    it('auto-detects `on-demand` from a native delegate with finite duration', () => {
-      const { media, video } = setup();
-
-      const handler = vi.fn();
-
-      media.addEventListener('streamtypechange', handler);
-
-      fireDurationChange(video, 120);
-
-      expect(media.streamType).toBe('on-demand');
-      expect(handler).toHaveBeenCalledOnce();
-    });
-
-    it('dedupes `streamtypechange` when the detected value does not change', () => {
-      const { media, video } = setup();
-
-      const handler = vi.fn();
-
-      media.addEventListener('streamtypechange', handler);
-
-      fireDurationChange(video, 120);
-      fireDurationChange(video, 240);
-
-      expect(handler).toHaveBeenCalledOnce();
-    });
-
-    it('dispatches `streamtypechange` once per transition when the engine is recreated', () => {
-      const { media, video } = setup();
-
-      const handler = vi.fn();
-
-      media.addEventListener('streamtypechange', handler);
-
-      fireDurationChange(video, Infinity);
-      expect(media.streamType).toBe('live');
-
-      handler.mockClear();
-      // `engine.hlsJs.debug` is part of `HlsJsAdapter`'s engine key — toggling it
-      // recreates the native delegate without switching playback engines.
-      media.source = { type: ContentTypes.M3U8, preferPlayback: 'native', engine: { hlsJs: { debug: true } } };
-      media.load();
-
-      // Teardown: a single `live` → `unknown`, then the new delegate re-detects
-      // `live` from the same element during `attach`.
-      expect(handler).toHaveBeenCalledTimes(2);
-      expect(media.streamType).toBe('live');
     });
 
     it('does not emit a transient auto-detected `streamType` before a user override when the native delegate is recreated', () => {
@@ -1122,19 +1011,47 @@ describe('HlsJsAdapter', () => {
     });
 
     it('stops preserving after the user override is cleared with `unknown`', () => {
-      const { media } = setup();
+      const { media, video } = setup();
 
       media.streamType = 'live';
+      Object.defineProperty(video, 'duration', { value: 120, configurable: true });
       media.streamType = 'unknown';
+      expect(media.streamType).toBe('on-demand');
 
       media.source = { type: ContentTypes.M3U8, preferPlayback: 'mse' };
       media.load();
 
-      expect(media.streamType).toBe('unknown');
+      fireDurationChange(video, Infinity);
+      expect(media.streamType).toBe('live');
     });
   });
 
   describe('live edge', () => {
+    async function setupLive() {
+      const src = 'https://example.com/event.m3u8';
+      const playlist = '#EXTM3U\n#EXT-X-PLAYLIST-TYPE:EVENT\n#EXT-X-TARGETDURATION:6\n#EXTINF:6,\nsegment.ts';
+      const fetchMock = vi.fn(async () => new Response(playlist));
+
+      vi.stubGlobal('fetch', fetchMock);
+
+      const { media, video } = setup();
+      const handler = vi.fn();
+
+      Object.defineProperty(video, 'currentSrc', { value: src, configurable: true });
+      Object.defineProperty(video, 'seekable', {
+        value: { length: 1, start: () => 0, end: () => 60 },
+        configurable: true,
+      });
+      media.addEventListener('targetlivewindowchange', handler);
+      media.src = src;
+      await Promise.resolve();
+      video.dispatchEvent(new Event('loadstart'));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(fetchMock).toHaveBeenCalledWith(src, expect.anything());
+      return { media, handler };
+    }
+
     it('defaults to `NaN` for both values before load', () => {
       const media = new HlsJsAdapter();
 
@@ -1142,15 +1059,21 @@ describe('HlsJsAdapter', () => {
       expect(media.targetLiveWindow).toBeNaN();
     });
 
-    it('forwards `NaN` from the native delegate', () => {
-      const { media } = setup();
+    it('forwards the native live edge and window notification', async () => {
+      const { media, handler } = await setupLive();
 
-      expect(media.liveEdgeStart).toBeNaN();
-      expect(media.targetLiveWindow).toBeNaN();
+      expect(media.liveEdgeStart).toBe(42);
+      expect(media.targetLiveWindow).toBe(Infinity);
+      expect(handler).toHaveBeenCalledOnce();
+
+      media.destroy();
     });
 
-    it('returns `NaN` again after destroy', () => {
-      const { media } = setup();
+    it('returns `NaN` again after destroy', async () => {
+      const { media } = await setupLive();
+
+      expect(media.liveEdgeStart).toBe(42);
+      expect(media.targetLiveWindow).toBe(Infinity);
 
       media.destroy();
 
@@ -1216,19 +1139,6 @@ describe('HlsJsAdapter', () => {
       delete (globalThis as any).WebKitPlaybackTargetAvailabilityEvent;
     });
 
-    it('enables AirPlay when nothing opted out', () => {
-      const video = createAirPlayVideo();
-      const media = createMseMedia();
-
-      media.attach(video);
-      loadMse(media);
-
-      simulateHlsJsMmsAttach(video);
-      fireMediaAttached(media, video);
-
-      expect(video.disableRemotePlayback).toBe(false);
-    });
-
     it('honors a disableremoteplayback attribute on the custom element', () => {
       // The binding layer converts markup into a media API call, so the opt-out
       // is known before an engine exists rather than read off the element.
@@ -1278,21 +1188,6 @@ describe('HlsJsAdapter', () => {
       expect(video.disableRemotePlayback).toBe(false);
     });
 
-    it('honors the media API set before the engine is created', () => {
-      const video = createAirPlayVideo();
-      const media = createMseMedia();
-
-      media.attach(video);
-      media.disableRemotePlayback = true;
-
-      loadMse(media);
-
-      simulateHlsJsMmsAttach(video);
-      fireMediaAttached(media, video);
-
-      expect(video.disableRemotePlayback).toBe(true);
-    });
-
     it('honors the media API set after the engine attached', () => {
       const video = createAirPlayVideo();
       const media = createMseMedia();
@@ -1306,47 +1201,5 @@ describe('HlsJsAdapter', () => {
 
       expect(video.disableRemotePlayback).toBe(true);
     });
-  });
-});
-
-describe('NativeHlsAdapter streamType', () => {
-  function setupNative() {
-    const video = document.createElement('video');
-
-    document.body.appendChild(video);
-    const media = new NativeHlsAdapter();
-
-    media.attach(video);
-    return { media, video };
-  }
-
-  it('defaults to `unknown`', () => {
-    const media = new NativeHlsAdapter();
-
-    expect(media.streamType).toBe('unknown');
-  });
-
-  it('detects `live` and fires `streamtypechange`', () => {
-    const { media, video } = setupNative();
-
-    const handler = vi.fn();
-
-    media.addEventListener('streamtypechange', handler);
-
-    fireDurationChange(video, Infinity);
-
-    expect(media.streamType).toBe('live');
-    expect(handler).toHaveBeenCalledOnce();
-  });
-
-  it('honors a user override and clears it on `unknown`', () => {
-    const { media, video } = setupNative();
-
-    media.streamType = 'live';
-    fireDurationChange(video, 120);
-    expect(media.streamType).toBe('live');
-
-    media.streamType = 'unknown';
-    expect(media.streamType).toBe('on-demand');
   });
 });

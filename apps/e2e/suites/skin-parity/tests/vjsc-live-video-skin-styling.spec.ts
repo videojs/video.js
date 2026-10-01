@@ -8,6 +8,9 @@ import {
   controlsVisibilityContract,
   emulatePreference,
   expectRenderingParity,
+  expectPopupMovement,
+  expectReducedPopupMotion,
+  failLiveManifest,
   expectSameRendering,
   feedbackContract,
   freezeSliderState,
@@ -118,7 +121,11 @@ for (const variant of CASES) {
     }
 
     expect(contracts[1]!).toEqual(contracts[0]!);
-    expect(contracts[0]!.hidden).toMatchObject({ pointerEvents: 'none' });
+
+    for (const contract of contracts) {
+      expect(contract.visible.opacity).toBe('1');
+      expect(contract.hidden).toMatchObject({ opacity: '0', pointerEvents: 'none' });
+    }
   });
 
   test(`${variant.framework} ${variant.skin} keeps fullscreen layout in sync`, async ({ page }, testInfo) => {
@@ -137,11 +144,15 @@ for (const variant of CASES) {
   });
 
   test(`${variant.framework} ${variant.skin} keeps error-dialog styling in sync`, async ({ page }) => {
-    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+    await failLiveManifest(page);
+
+    const comparison = await openVariants(page, variant, 672, { expectPlay: false });
     const contracts: Awaited<ReturnType<typeof popupContract>>[] = [];
 
     for (const panel of comparison.panels) {
       await test.step(panel.style, async () => {
+        await expect(panel.root).toHaveAttribute('data-preset', 'live-video');
+
         const dialog = panel.root.getByRole('alertdialog');
 
         await expect(dialog).toBeVisible({ timeout: 20_000 });
@@ -174,21 +185,38 @@ for (const variant of CASES) {
   });
 
   test(`${variant.framework} ${variant.skin} removes movement under reduced motion`, async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-
     const comparison = await openVariants(page, variant, 672, { captions: 'multiple' });
-
-    for (const panel of comparison.panels) {
+    const readPopup = async (panel: SkinPanel) => {
       const button = await captionsButton(panel.root);
 
-      await button.click();
+      if ((await button.getAttribute('aria-expanded')) !== 'true') await button.click();
+
       await expect(button).toHaveAttribute('aria-expanded', 'true');
 
       const menu = panel.root.getByRole('menu');
-      const motion = await transitionContract(menu);
 
-      expect(motion.movement.every(({ duration }) => duration === '0s')).toBe(true);
+      await expect(menu).toBeVisible();
+      return { content: await transitionContract(menu), popup: await popupContract(popupAncestor(menu)) };
+    };
+
+    for (const panel of comparison.panels) expectPopupMovement((await readPopup(panel)).popup);
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
+    const contracts = [];
+
+    for (const panel of comparison.panels) {
+      const contract = await readPopup(panel);
+
+      expect(contract.content.movement).toEqual([
+        { property: 'translate', duration: '0s' },
+        { property: 'filter', duration: '0s' },
+      ]);
+      expectReducedPopupMotion(contract.popup);
+      contracts.push(contract);
     }
+
+    expect(contracts[1]).toEqual(contracts[0]);
   });
 
   for (const preference of ['reduced-transparency', 'contrast-more', 'forced-colors'] as const) {
@@ -426,11 +454,7 @@ async function transitionContract(target: Locator) {
       movement: style.transitionProperty
         .split(',')
         .map((property) => property.trim())
-        .flatMap((property, index) =>
-          ['opacity', 'filter', 'transform', 'scale'].includes(property)
-            ? [{ duration: durations[index % durations.length] ?? '0s', property }]
-            : []
-        ),
+        .map((property, index) => ({ duration: durations[index % durations.length] ?? '0s', property })),
     };
   });
 }

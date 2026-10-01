@@ -2,7 +2,7 @@ import * as html from '@videojs/html';
 import { describe, expect, it } from 'vite-plus/test';
 
 import * as root from '../index';
-import videojs, { getPlayer, options, registerPlugin } from '../videojs';
+import videojs, { getComponent, getPlayer, getPlugin, options, registerComponent, registerPlugin } from '../videojs';
 
 describe('video.js', () => {
   it('registers the video preset on import, matching the CDN video.js bundle', () => {
@@ -34,6 +34,9 @@ describe('video.js', () => {
 
     expect(root.default).toBe(videojs);
     expect(root.registerPlugin).toBe(registerPlugin);
+    expect(root.getPlugin).toBe(getPlugin);
+    expect(root.registerComponent).toBe(registerComponent);
+    expect(root.getComponent).toBe(getComponent);
     expect(root.getPlayer).toBe(getPlayer);
     expect(root.options).toBe(options);
   });

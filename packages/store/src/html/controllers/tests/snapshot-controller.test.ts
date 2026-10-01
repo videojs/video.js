@@ -124,6 +124,15 @@ describe('SnapshotController', () => {
       document.body.appendChild(host);
 
       expect(controller.value).toBe(0.8);
+      await Promise.resolve();
+      const countAfterReconnect = host.updateCount;
+
+      state.patch({ volume: 0.2 });
+      flush();
+      await Promise.resolve();
+
+      expect(controller.value).toBe(0.2);
+      expect(host.updateCount).toBeGreaterThan(countAfterReconnect);
     });
   });
 

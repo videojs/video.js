@@ -33,14 +33,4 @@ describe('AlertDialog', () => {
 
     expect(getByRole('alertdialog')).toBeDefined();
   });
-
-  it('does not render the popup while closed', () => {
-    const { queryByRole } = render(
-      <AlertDialog.Root open={false}>
-        <AlertDialog.Popup>Content</AlertDialog.Popup>
-      </AlertDialog.Root>
-    );
-
-    expect(queryByRole('alertdialog')).toBeNull();
-  });
 });

@@ -62,6 +62,14 @@ describe('Thumbnail', () => {
     expect(getByTestId('image').tagName).toBe('IMG');
     expect(getByTestId('image').getAttribute('src')).toBe('thumbnail.jpg');
     expect(getByTestId('image').getAttribute('decoding')).toBe('async');
+    expect(getByTestId('image').getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('keeps image props on Thumbnail.Image', () => {
+    const { getByTestId } = render(<DefaultThumbnail imageProps={{ crossOrigin: 'anonymous', loading: 'eager' }} />);
+
+    expect(getByTestId('image').getAttribute('crossorigin')).toBe('anonymous');
+    expect(getByTestId('image').getAttribute('loading')).toBe('eager');
   });
 
   it('reports state on the root', () => {

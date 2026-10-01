@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { parseSync } from 'oxc-parser';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { abbreviateType, formatDetailedType, formatProperties, formatType } from '../formatter';
+import { abbreviateType, formatDetailedType, formatType } from '../formatter';
 import type { ResolvedType, SourceFile } from '../oxc-project';
 import { OxcProject } from '../oxc-project';
 
@@ -168,29 +168,6 @@ describe('formatDetailedType', () => {
     expect(formatDetailedType(project, parseType('InferFixtureState<FixtureStore>', file), false)).toBe(
       "FixtureStore['state']"
     );
-  });
-});
-
-describe('formatProperties', () => {
-  const project = new OxcProject(FIXTURE_ROOT);
-  const coreFile = path.join(FIXTURE_ROOT, 'packages/core/src/core/ui/toggle-button/core.ts');
-  const declaration = project.resolveName(coreFile, 'ToggleButtonProps')!;
-  const type = parseType('ToggleButtonProps', declaration.file);
-  const properties = formatProperties(project, project.interfaceMembers(type));
-
-  it('skips ref and @ignore members', () => {
-    expect(properties.ref).toBeUndefined();
-    expect(properties._internalFlag).toBeUndefined();
-  });
-
-  it('preserves descriptions, defaults, required state, and detailed callback types', () => {
-    expect(properties.disabled).toMatchObject({
-      type: 'boolean',
-      description: 'Whether the button is disabled.',
-      required: true,
-    });
-    expect(properties.onPressedChange).toMatchObject({ type: 'function' });
-    expect(properties.onPressedChange?.detailedType).toContain('=>');
   });
 });
 

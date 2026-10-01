@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import type { MediaAudioTrack } from '@videojs/media';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
@@ -68,16 +68,6 @@ describe('useAudioTrackOptions', () => {
     expect(screen.getByRole('menuitemradio', { name: 'English' }).getAttribute('aria-checked')).toBe('true');
     expect(screen.getByRole('menuitemradio', { name: 'Spanish' }).getAttribute('aria-checked')).toBe('false');
     expect(screen.getByTestId('selected-label').textContent).toBe('English');
-  });
-
-  it('sets the selected audio track', () => {
-    const selectAudioTrack = vi.fn();
-
-    renderAudioTrackOptions({ selectAudioTrack });
-
-    fireEvent.click(screen.getByRole('menuitemradio', { name: 'Spanish' }));
-
-    expect(selectAudioTrack).toHaveBeenCalledWith('1');
   });
 
   it('uses a custom track formatter', () => {

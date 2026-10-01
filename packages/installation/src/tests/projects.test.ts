@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import {
+  defaultInstallationTemplate,
+  INSTALLATION_TEMPLATES,
+  installationTemplates,
+  resolveInstallationTemplate,
   installationHtmlDocumentCode,
   installationHtmlPageCode,
   installationHtmlEntrySetup,
@@ -169,5 +173,48 @@ describe('installationStarterFiles', () => {
     expect(installationStarterFiles('html', 'vite')).toContain('src/main.ts');
     expect(installationStarterFiles('react', 'vite')).toEqual(['src/App.css']);
     expect(installationStarterFiles('react', 'next')).toEqual([]);
+  });
+});
+
+describe('INSTALLATION_TEMPLATES', () => {
+  it('owns the complete app-template vocabulary outside the Shadcn model', () => {
+    expect(INSTALLATION_TEMPLATES).toEqual([
+      'none',
+      'next',
+      'vite',
+      'start',
+      'react-router',
+      'astro',
+      'laravel',
+      'nuxt',
+      'sveltekit',
+    ]);
+  });
+});
+
+describe('defaultInstallationTemplate', () => {
+  it('defaults each app framework to a suitable project template', () => {
+    expect(defaultInstallationTemplate('react')).toBe('next');
+    expect(defaultInstallationTemplate('html')).toBe('vite');
+    expect(defaultInstallationTemplate('vue')).toBe('vite');
+    expect(defaultInstallationTemplate('svelte')).toBe('vite');
+  });
+});
+
+describe('installationTemplates', () => {
+  it('offers compatible app templates for each project framework', () => {
+    expect(installationTemplates('react')).toEqual(['next', 'vite', 'start', 'react-router', 'astro', 'laravel']);
+    expect(installationTemplates('html')).toEqual(['vite', 'astro', 'laravel', 'none']);
+    expect(installationTemplates('vue')).toEqual(['vite', 'astro', 'nuxt']);
+    expect(installationTemplates('svelte')).toEqual(['vite', 'astro', 'sveltekit']);
+  });
+});
+
+describe('resolveInstallationTemplate', () => {
+  it('falls back when a project template does not support the source framework', () => {
+    expect(resolveInstallationTemplate('html', 'next')).toBe('vite');
+    expect(resolveInstallationTemplate('html', 'astro')).toBe('astro');
+    expect(resolveInstallationTemplate('react', 'next')).toBe('next');
+    expect(resolveInstallationTemplate('react', null)).toBe('next');
   });
 });

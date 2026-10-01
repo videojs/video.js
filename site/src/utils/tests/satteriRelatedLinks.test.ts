@@ -82,5 +82,8 @@ describe('satteriRelatedLinks', () => {
 
     expect(code).not.toContain('RelatedLinks');
     expect(code).toContain('Related guides');
+    expect(code).toMatch(/_jsxs\(_components\.li,/);
+    expect(code).toMatch(/_jsx\(DocsLink,\s*\{\s*slug: "guides\/features",\s*children: "Features"\s*\}\)/);
+    expect(code).toContain(' and more');
   });
 });

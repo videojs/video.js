@@ -40,7 +40,20 @@ describe('ClientCode', () => {
       )
     );
 
-    expect(markup).toContain('video-399');
+    const container = document.createElement('div');
+
+    container.innerHTML = markup;
+
+    const blocks = [...container.querySelectorAll('pre code')];
+
+    expect(blocks).toHaveLength(2);
+
+    for (const block of blocks) {
+      expect(block.textContent).toBe(code);
+      expect(block.querySelectorAll('.line')).toHaveLength(400);
+      expect(block.querySelectorAll('.line span[style]')).not.toHaveLength(0);
+    }
+
     expect(markup).not.toMatch(/<!--\$[?!]?-->|\$RC\(/);
   });
 

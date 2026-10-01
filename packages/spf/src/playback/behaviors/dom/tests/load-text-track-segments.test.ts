@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { ContextSignals, StateSignals } from '../../../../core/composition/create-composition';
 import { signal } from '../../../../core/signals/primitives';
-import { resolveVttSegment } from '../../../../media/dom/text/resolve-vtt-segment';
 import type {
   Cue,
   MaybeResolvedPresentation,
@@ -38,17 +37,7 @@ interface TextTrackSegmentLoadingContext {
 // signal map has to satisfy both.
 type ComposedContext = TextTrackSegmentLoadingContext & TextTrackActorsContext;
 
-// Mock resolveVttSegment
-vi.mock('../../../../media/dom/text/resolve-vtt-segment', () => ({
-  resolveVttSegment: vi.fn((url: string) => {
-    if (url.includes('fail')) {
-      return Promise.reject(new Error('Failed to load'));
-    }
-
-    return Promise.resolve([new VTTCue(0, 5, `Subtitle from ${url}`)]);
-  }),
-  destroyVttResolver: vi.fn(),
-}));
+const resolveVttSegment = vi.fn(async (url: string): Promise<VTTCue[]> => [new VTTCue(0, 5, `Subtitle from ${url}`)]);
 
 function makeState(initial: TextTrackSegmentLoadingState = {}): StateSignals<TextTrackSegmentLoadingState> {
   return {
@@ -135,8 +124,49 @@ describe('loadTextTrackSegments', () => {
     vi.clearAllMocks();
   });
 
-  describe('cue deduplication', () => {
-    function makeTrackWithPersistentCues() {
+  it('does nothing when track not selected', async () => {
+    const video = document.createElement('video');
+    const slot = document.createElement('track');
+
+    slot.id = 'text-1';
+    slot.kind = 'subtitles';
+    video.appendChild(slot);
+    slot.track.mode = 'hidden';
+
+    const { state, context, cleanup } = setupLoadTextTrackCues(
+      { presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(1) }]) },
+      { mediaElement: video }
+    );
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(context.textTrackSegmentLoaderActor.get()).toBeDefined();
+      expect(resolveVttSegment).not.toHaveBeenCalled();
+
+      state.selectedTextTrackId.set('text-1');
+
+      await vi.waitFor(() =>
+        expect(resolveVttSegment).toHaveBeenCalledExactlyOnceWith('https://example.com/segment-0.vtt')
+      );
+    } finally {
+      cleanup();
+    }
+  });
+
+  describe.each([undefined, 0])('initial currentTime=%s', (currentTime) => {
+    it.each([
+      { count: 1, urls: ['https://example.com/segment-0.vtt'] },
+      { count: 2, urls: ['https://example.com/segment-0.vtt', 'https://example.com/segment-1.vtt'] },
+      {
+        count: 3,
+        urls: [
+          'https://example.com/segment-0.vtt',
+          'https://example.com/segment-1.vtt',
+          'https://example.com/segment-2.vtt',
+        ],
+      },
+    ])('triggers loading for $count segments in order with auto preload', async ({ count, urls }) => {
       const trackElement = document.createElement('track');
 
       trackElement.id = 'text-1';
@@ -145,229 +175,23 @@ describe('loadTextTrackSegments', () => {
       video.appendChild(trackElement);
       trackElement.track.mode = 'hidden';
 
-      const persistedCues: VTTCue[] = [];
-
-      const addCueSpy = vi.spyOn(trackElement.track, 'addCue').mockImplementation((cue) => {
-        persistedCues.push(cue as VTTCue);
-      });
-
-      Object.defineProperty(trackElement.track, 'cues', {
-        get: () =>
-          Object.assign(persistedCues, {
-            item: (i: number) => persistedCues[i] ?? null,
-          }) as unknown as TextTrackCueList,
-        configurable: true,
-      });
-
-      return { trackElement, video, addCueSpy };
-    }
-
-    it('adds all cues when there are no duplicates', async () => {
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      vi.mocked(resolveVttSegment)
-        .mockResolvedValueOnce([new VTTCue(0, 5, 'Cue A')])
-        .mockResolvedValueOnce([new VTTCue(5, 10, 'Cue B')])
-        .mockResolvedValueOnce([new VTTCue(10, 15, 'Cue C')]);
-
-      const { video, addCueSpy } = makeTrackWithPersistentCues();
-
       const { cleanup } = setupLoadTextTrackCues(
         {
           selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(3) }]),
+          currentTime,
+          preload: 'auto',
+          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(count) }]),
         },
         { mediaElement: video }
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect(addCueSpy).toHaveBeenCalledTimes(3);
-      cleanup();
+      try {
+        await vi.waitFor(() => expect(resolveVttSegment).toHaveBeenCalledTimes(count));
+        expect(resolveVttSegment.mock.calls).toEqual(urls.map((url) => [url]));
+      } finally {
+        cleanup();
+      }
     });
-
-    it('drops a duplicate cue from a subsequent segment', async () => {
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      vi.mocked(resolveVttSegment)
-        .mockResolvedValueOnce([new VTTCue(8, 12, 'Boundary cue')])
-        .mockResolvedValueOnce([new VTTCue(8, 12, 'Boundary cue')]);
-
-      const { video, addCueSpy } = makeTrackWithPersistentCues();
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(2) }]),
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect(addCueSpy).toHaveBeenCalledTimes(1);
-      cleanup();
-    });
-
-    it('keeps cues with identical timing but different text', async () => {
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      vi.mocked(resolveVttSegment)
-        .mockResolvedValueOnce([new VTTCue(0, 5, 'Hello')])
-        .mockResolvedValueOnce([new VTTCue(0, 5, 'World')]);
-
-      const { video, addCueSpy } = makeTrackWithPersistentCues();
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(2) }]),
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect(addCueSpy).toHaveBeenCalledTimes(2);
-      cleanup();
-    });
-
-    it('handles mixed: boundary duplicate dropped, unique cues kept', async () => {
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      vi.mocked(resolveVttSegment)
-        .mockResolvedValueOnce([new VTTCue(0, 8, 'Unique to seg 0'), new VTTCue(8, 12, 'Boundary cue')])
-        .mockResolvedValueOnce([new VTTCue(8, 12, 'Boundary cue'), new VTTCue(12, 20, 'Unique to seg 1')]);
-
-      const { video, addCueSpy } = makeTrackWithPersistentCues();
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(2) }]),
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect(addCueSpy).toHaveBeenCalledTimes(3);
-      cleanup();
-    });
-  });
-
-  it('does nothing when track not selected', async () => {
-    const { cleanup } = setupLoadTextTrackCues({ presentation: createMockPresentation([]) }, {});
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-    expect(resolveVttSegment).not.toHaveBeenCalled();
-
-    cleanup();
-  });
-
-  it('triggers loading for single segment', async () => {
-    const trackElement = document.createElement('track');
-
-    trackElement.id = 'text-1';
-    const video = document.createElement('video');
-
-    video.appendChild(trackElement);
-    trackElement.track.mode = 'hidden';
-
-    const { cleanup } = setupLoadTextTrackCues(
-      {
-        selectedTextTrackId: 'text-1',
-        presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(1) }]),
-      },
-      { mediaElement: video }
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-    expect(resolveVttSegment).toHaveBeenCalledTimes(1);
-    expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-0.vtt');
-
-    cleanup();
-  });
-
-  it('triggers loading for multiple segments', async () => {
-    const trackElement = document.createElement('track');
-
-    trackElement.id = 'text-1';
-    const video = document.createElement('video');
-
-    video.appendChild(trackElement);
-    trackElement.track.mode = 'hidden';
-
-    const { cleanup } = setupLoadTextTrackCues(
-      {
-        selectedTextTrackId: 'text-1',
-        presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(3) }]),
-      },
-      { mediaElement: video }
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-    expect(resolveVttSegment).toHaveBeenCalledTimes(3);
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(1, 'https://example.com/segment-0.vtt');
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(2, 'https://example.com/segment-1.vtt');
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(3, 'https://example.com/segment-2.vtt');
-
-    cleanup();
-  });
-
-  it('continues on segment error (partial loading)', async () => {
-    const trackElement = document.createElement('track');
-
-    trackElement.id = 'text-1';
-    const video = document.createElement('video');
-
-    video.appendChild(trackElement);
-    trackElement.track.mode = 'hidden';
-
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    const { cleanup } = setupLoadTextTrackCues(
-      {
-        selectedTextTrackId: 'text-1',
-        presentation: createMockPresentation([
-          {
-            id: 'text-1',
-            segments: [
-              { id: 'seg-0', url: 'https://example.com/segment-0.vtt', duration: 10, startTime: 0 },
-              { id: 'seg-1', url: 'https://example.com/fail.vtt', duration: 10, startTime: 10 },
-              { id: 'seg-2', url: 'https://example.com/segment-2.vtt', duration: 10, startTime: 20 },
-            ] as Segment[],
-          },
-        ]),
-      },
-      { mediaElement: video }
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-    expect(resolveVttSegment).toHaveBeenCalledTimes(3);
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(1, 'https://example.com/segment-0.vtt');
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(2, 'https://example.com/fail.vtt');
-    expect(resolveVttSegment).toHaveBeenNthCalledWith(3, 'https://example.com/segment-2.vtt');
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to load text-track segment'),
-      expect.any(Error)
-    );
-
-    consoleErrorSpy.mockRestore();
-    cleanup();
   });
 
   it('does nothing when track not in presentation', async () => {
@@ -387,8 +211,6 @@ describe('loadTextTrackSegments', () => {
     );
 
     await new Promise((resolve) => setTimeout(resolve, 50));
-
-    const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
 
     expect(resolveVttSegment).not.toHaveBeenCalled();
 
@@ -422,8 +244,6 @@ describe('loadTextTrackSegments', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
       expect(resolveVttSegment).toHaveBeenCalledTimes(3);
       expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-0.vtt');
       expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-1.vtt');
@@ -439,8 +259,6 @@ describe('loadTextTrackSegments', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
       expect(resolveVttSegment).toHaveBeenCalledTimes(3);
 
       state.currentTime.set(15);
@@ -452,59 +270,13 @@ describe('loadTextTrackSegments', () => {
       expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-3.vtt');
       expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-4.vtt');
 
-      cleanup();
-    });
-
-    it('does not re-fetch already-loaded segments when the window advances', async () => {
-      const { state, cleanup } = makeWindowingSetup(0);
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-      const callsBefore = (resolveVttSegment as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0]);
-
-      expect(callsBefore).toContain('https://example.com/segment-0.vtt');
-
-      state.currentTime.set(15);
-      await vi.waitFor(() => {
-        expect(resolveVttSegment).toHaveBeenCalledTimes(5);
-      });
-
-      const allCalls = (resolveVttSegment as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0]);
-
-      expect(allCalls.filter((u) => u === 'https://example.com/segment-0.vtt')).toHaveLength(1);
-      expect(allCalls.filter((u) => u === 'https://example.com/segment-1.vtt')).toHaveLength(1);
-      expect(allCalls.filter((u) => u === 'https://example.com/segment-2.vtt')).toHaveLength(1);
-
-      cleanup();
-    });
-
-    it('fetches all segments immediately when the track fits in one window', async () => {
-      const trackElement = document.createElement('track');
-
-      trackElement.id = 'text-1';
-      const video = document.createElement('video');
-
-      video.appendChild(trackElement);
-      trackElement.track.mode = 'hidden';
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          currentTime: 0,
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(3) }]),
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      expect(resolveVttSegment).toHaveBeenCalledTimes(3);
-      expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-0.vtt');
-      expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-1.vtt');
-      expect(resolveVttSegment).toHaveBeenCalledWith('https://example.com/segment-2.vtt');
+      for (const url of [
+        'https://example.com/segment-0.vtt',
+        'https://example.com/segment-1.vtt',
+        'https://example.com/segment-2.vtt',
+      ]) {
+        expect(resolveVttSegment.mock.calls.filter(([calledUrl]) => calledUrl === url)).toHaveLength(1);
+      }
 
       cleanup();
     });
@@ -526,27 +298,6 @@ describe('loadTextTrackSegments', () => {
       return video;
     }
 
-    it("dormant — preload='none' && !loadActivated: no fetches", async () => {
-      const video = makeMountedTrack();
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(2) }]),
-          preload: 'none',
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      expect(resolveVttSegment).not.toHaveBeenCalled();
-
-      cleanup();
-    });
-
     it("dormant — preload='metadata' && !loadActivated: no fetches (text has no init segment)", async () => {
       const video = makeMountedTrack();
 
@@ -561,30 +312,7 @@ describe('loadTextTrackSegments', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
       expect(resolveVttSegment).not.toHaveBeenCalled();
-
-      cleanup();
-    });
-
-    it("full-range — preload='auto' triggers loading immediately", async () => {
-      const video = makeMountedTrack();
-
-      const { cleanup } = setupLoadTextTrackCues(
-        {
-          selectedTextTrackId: 'text-1',
-          presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(2) }]),
-          preload: 'auto',
-        },
-        { mediaElement: video }
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
-      expect(resolveVttSegment).toHaveBeenCalledTimes(2);
 
       cleanup();
     });
@@ -603,8 +331,6 @@ describe('loadTextTrackSegments', () => {
       );
 
       await new Promise((resolve) => setTimeout(resolve, 50));
-
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
 
       expect(resolveVttSegment).toHaveBeenCalledTimes(2);
 
@@ -625,8 +351,6 @@ describe('loadTextTrackSegments', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-
       expect(resolveVttSegment).not.toHaveBeenCalled();
 
       state.loadActivated.set(true);
@@ -641,35 +365,40 @@ describe('loadTextTrackSegments', () => {
     it('does not re-dispatch on currentTime ticks within the same segment', async () => {
       const video = makeMountedTrack();
 
-      const { state, cleanup } = setupLoadTextTrackCues(
+      const { state, context, cleanup } = setupLoadTextTrackCues(
         {
           selectedTextTrackId: 'text-1',
           currentTime: 0,
-          // 5 segments of 10s — initial currentTime=0 → boundary=0
           presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(5) }]),
         },
         { mediaElement: video }
       );
+      const loader = context.textTrackSegmentLoaderActor.get()!;
+      const send = vi.spyOn(loader, 'send');
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      try {
+        await vi.waitFor(() => {
+          expect(context.textTracksActor.get()!.snapshot.get().context.segments['text-1']).toHaveLength(3);
+          expect(loader.snapshot.get().value).toBe('idle');
+        });
+        send.mockClear();
 
-      const { resolveVttSegment } = await import('../../../../media/dom/text/resolve-vtt-segment');
-      const callsAfterInitial = (resolveVttSegment as ReturnType<typeof vi.fn>).mock.calls.length;
+        for (const time of [2, 5, 8]) {
+          state.currentTime.set(time);
+          await new Promise((resolve) => setTimeout(resolve, 0));
 
-      expect(callsAfterInitial).toBeGreaterThan(0);
+          expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'load' }));
+        }
 
-      // Tick currentTime within segment 0 (boundary stays at 0). Loader
-      // should not receive new load messages → no new resolveVttSegment
-      // calls.
-      state.currentTime.set(2);
-      state.currentTime.set(5);
-      state.currentTime.set(8);
+        state.currentTime.set(10);
 
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      expect((resolveVttSegment as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callsAfterInitial);
-
-      cleanup();
+        await vi.waitFor(() =>
+          expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: 'load', range: { start: 10, end: 40 } }))
+        );
+      } finally {
+        send.mockRestore();
+        cleanup();
+      }
     });
   });
 

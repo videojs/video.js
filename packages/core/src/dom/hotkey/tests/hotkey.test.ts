@@ -22,13 +22,6 @@ describe('parseHotkeyPattern', () => {
     expect(result[0]!.modifiers.size).toBe(1);
   });
 
-  it('parses Ctrl modifier', () => {
-    const result = parseHotkeyPattern('Ctrl+k');
-
-    expect(result).toHaveLength(1);
-    expect(result[0]!.modifiers.has('ctrl')).toBe(true);
-  });
-
   it('parses multiple modifiers', () => {
     const result = parseHotkeyPattern('Ctrl+Shift+f');
 
@@ -118,7 +111,7 @@ describe('matchesHotkeyEvent', () => {
   });
 
   it('skips Unidentified key events (IME)', () => {
-    const binding = parseHotkeyPattern('k')[0]!;
+    const binding = parseHotkeyPattern('Unidentified')[0]!;
 
     expect(matchesHotkeyEvent(binding, createEvent('Unidentified'))).toBe(false);
   });
@@ -130,28 +123,22 @@ describe('matchesHotkeyEvent', () => {
   });
 
   describe('implicit modifiers for non-letter characters', () => {
-    it('matches > when Shift is held (US keyboard: Shift+. produces >)', () => {
-      const binding = parseHotkeyPattern('>')[0]!;
+    it.each([
+      ['>', { shiftKey: true }],
+      ['<', { shiftKey: true }],
+      ['?', { shiftKey: true }],
+      ['>', { altKey: true }],
+      ['<', { altKey: true }],
+    ] as const)('matches punctuation %s with %s', (key, modifiers) => {
+      const binding = parseHotkeyPattern(key)[0]!;
 
-      expect(matchesHotkeyEvent(binding, createEvent('>', { shiftKey: true }))).toBe(true);
-    });
-
-    it('matches < when Shift is held (US keyboard: Shift+, produces <)', () => {
-      const binding = parseHotkeyPattern('<')[0]!;
-
-      expect(matchesHotkeyEvent(binding, createEvent('<', { shiftKey: true }))).toBe(true);
+      expect(matchesHotkeyEvent(binding, createEvent(key, modifiers))).toBe(true);
     });
 
     it('matches > when Shift is NOT held (European keyboard: > is unshifted)', () => {
       const binding = parseHotkeyPattern('>')[0]!;
 
       expect(matchesHotkeyEvent(binding, createEvent('>'))).toBe(true);
-    });
-
-    it('matches ? when Shift is held', () => {
-      const binding = parseHotkeyPattern('?')[0]!;
-
-      expect(matchesHotkeyEvent(binding, createEvent('?', { shiftKey: true }))).toBe(true);
     });
 
     it('matches Ctrl+> with Ctrl and Shift held', () => {
@@ -192,22 +179,10 @@ describe('matchesHotkeyEvent', () => {
       expect(matchesHotkeyEvent(binding, createEvent('>'))).toBe(false);
     });
 
-    it('matches > when Alt is held (Mac Option key produces >)', () => {
-      const binding = parseHotkeyPattern('>')[0]!;
-
-      expect(matchesHotkeyEvent(binding, createEvent('>', { altKey: true }))).toBe(true);
-    });
-
     it('matches > when Alt and Shift are held (Mac Option+Shift produces >)', () => {
       const binding = parseHotkeyPattern('>')[0]!;
 
       expect(matchesHotkeyEvent(binding, createEvent('>', { altKey: true, shiftKey: true }))).toBe(true);
-    });
-
-    it('matches < when Alt is held (Mac Option key produces <)', () => {
-      const binding = parseHotkeyPattern('<')[0]!;
-
-      expect(matchesHotkeyEvent(binding, createEvent('<', { altKey: true }))).toBe(true);
     });
 
     it('Alt+> binding requires Alt held', () => {
@@ -256,37 +231,17 @@ describe('createHotkey', () => {
     return container;
   }
 
-  it('returns a cleanup function', () => {
-    const el = setup();
-    const cleanup = createHotkey(el, { keys: 'k', onActivate: vi.fn() });
-
-    expect(typeof cleanup).toBe('function');
-
-    cleanup();
-  });
-
-  it('calls onActivate when matching key is pressed', () => {
-    const el = setup();
-    const onActivate = vi.fn();
-    const cleanup = createHotkey(el, { keys: 'k', onActivate });
-
-    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
-
-    expect(onActivate).toHaveBeenCalledOnce();
-
-    cleanup();
-  });
-
   it('does not fire after cleanup', () => {
     const el = setup();
     const onActivate = vi.fn();
     const cleanup = createHotkey(el, { keys: 'k', onActivate });
 
-    cleanup();
-
     el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
+    expect(onActivate).toHaveBeenCalledOnce();
 
-    expect(onActivate).not.toHaveBeenCalled();
+    cleanup();
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
+    expect(onActivate).toHaveBeenCalledOnce();
   });
 
   it('does not fire when disabled', () => {
@@ -297,8 +252,13 @@ describe('createHotkey', () => {
     el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
 
     expect(onActivate).not.toHaveBeenCalled();
-
     cleanup();
+
+    const removeEnabled = createHotkey(el, { keys: 'k', onActivate, disabled: false });
+
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', bubbles: true }));
+    expect(onActivate).toHaveBeenCalledOnce();
+    removeEnabled();
   });
 
   it('passes the matched key to onActivate', () => {

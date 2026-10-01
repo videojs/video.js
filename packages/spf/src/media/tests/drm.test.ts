@@ -81,7 +81,7 @@ describe('declaredDrmKeys', () => {
   it('dedupes the same declaration across tracks', () => {
     const presentation = makePresentation([
       makeResolvedTrack([WIDEVINE_KEY]),
-      makeResolvedTrack([WIDEVINE_KEY], { id: 'v-2', url: 'https://example.com/v2.m3u8' }),
+      makeResolvedTrack([{ ...WIDEVINE_KEY }], { id: 'v-2', url: 'https://example.com/v2.m3u8' }),
     ]);
 
     expect(declaredDrmKeys(presentation)).toEqual([WIDEVINE_KEY]);
@@ -91,6 +91,11 @@ describe('declaredDrmKeys', () => {
     expect(declaredDrmKeys(undefined)).toEqual([]);
     expect(declaredDrmKeys({ url: 'https://example.com/m.m3u8' })).toEqual([]);
     expect(declaredDrmKeys(makePresentation([makeResolvedTrack()]))).toEqual([]);
+
+    const { segments: _segments, ...unresolved } = makeResolvedTrack([FAIRPLAY_KEY]);
+
+    expect(declaredDrmKeys(makePresentation([unresolved]))).toEqual([]);
+    expect(declaredDrmKeys(makePresentation([unresolved, makeResolvedTrack([WIDEVINE_KEY])]))).toEqual([WIDEVINE_KEY]);
   });
 });
 
@@ -144,6 +149,7 @@ describe('keySystemCandidates', () => {
 
   it('ignores keys with unrecognized or absent KEYFORMAT', () => {
     expect(keySystemCandidates([{ method: 'AES-128', uri: 'k.bin' }], drm, keySystems)).toEqual([]);
+    expect(keySystemCandidates([{ ...WIDEVINE_KEY, keyFormat: 'urn:uuid:unknown' }], drm, keySystems)).toEqual([]);
   });
 
   it('resolves a function-valued license server', () => {

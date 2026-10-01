@@ -26,6 +26,10 @@ import { buildYouTubeIframeSrc, parseYouTubeSource, type YouTubeSource } from '.
 const SEEK_TOLERANCE = 1;
 const SEEK_SETTLE_TIMEOUT = 1_000;
 
+type PlayerSetting = 'volume' | 'muted' | 'playbackRate';
+
+const PLAYER_SETTINGS: readonly PlayerSetting[] = ['volume', 'muted', 'playbackRate'];
+
 export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implements Partial<Video> {
   static readonly defaultProps: YouTubeAdapterProps = {
     src: '',
@@ -48,6 +52,17 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #pendingLoad = false;
   // Player creation is in flight; the API load makes it span more than a tick.
   #creatingPlayer = false;
+  // Keep URL-only option changes pending until a valid source can rebuild the embed.
+  #pendingEmbedOptions = false;
+  // Settings to apply to a replacement player before it reports its own.
+  #restoreSettings: ReadonlySet<PlayerSetting> = new Set();
+  // Settings written through setters since attach; before a player reports, only these are real.
+  #writtenSettings = new Set<PlayerSetting>();
+  // Cached settings mirror a player only after one reported them; before that they are defaults.
+  #playerSettingsRead = false;
+  // Counts embed recreations, so a pending `play()` follows the replacement rather than a superseding load.
+  #recreations = 0;
+  #pendingWrites: ((player: YouTubePlayerApi) => void)[] = [];
   #loadComplete = createPublicPromise<void>();
   // Guards async player creation across attach/detach cycles.
   #attachId = 0;
@@ -119,10 +134,17 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#playerReady = false;
     this.#pendingLoad = false;
     this.#creatingPlayer = false;
+    this.#restoreSettings = new Set();
+    this.#writtenSettings = new Set();
+    this.#playerSettingsRead = false;
+    this.#pendingWrites = [];
     this.#target = null;
     // Unblock callers awaiting load; they re-check `#player` (now null) and no-op.
     this.#loadComplete.resolve();
     this.#resetState();
+    this.#volume = 1;
+    this.#muted = false;
+    this.#playbackRate = 1;
   }
 
   override destroy() {
@@ -220,6 +242,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #beginLoad(): PublicPromise<void> {
     this.#loadComplete.resolve();
     this.#loadComplete = createPublicPromise<void>();
+    this.#flushAfterLoad();
     return this.#loadComplete;
   }
 
@@ -236,7 +259,13 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   async play() {
-    await this.#loadComplete;
+    let recreations: number;
+
+    // Recreating the embed replaces the load barrier; follow it to the replacement player.
+    do {
+      recreations = this.#recreations;
+      await this.#loadComplete;
+    } while (recreations !== this.#recreations && this.#target);
 
     // The embed still holds the stopped video, so playing it would resume a cleared source.
     if (!this.#src) return;
@@ -281,6 +310,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (this.#volume === value) return;
 
     this.#volume = value;
+    this.#writtenSettings.add('volume');
     this.#afterLoad((p) => p.setVolume(value * 100));
   }
 
@@ -291,6 +321,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (this.#muted === value) return;
 
     this.#muted = value;
+    this.#writtenSettings.add('muted');
     this.#afterLoad((p) => (value ? p.mute() : p.unMute()));
   }
 
@@ -301,6 +332,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (this.#playbackRate === value) return;
 
     this.#playbackRate = value;
+    this.#writtenSettings.add('playbackRate');
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
@@ -365,13 +397,51 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
     const src = source?.src ?? '';
     const srcChanged = this.#src !== src;
-    // Player parameters are read when the embed is built, so changing them reloads even a matching URL.
+    // Player parameters are read from the embed URL, not by `cueVideoById`/`loadVideoById`.
     const engineChanged = !deepEqual(this.#source?.engine?.youtube ?? null, source?.engine?.youtube ?? null);
+
+    this.#pendingEmbedOptions ||= engineChanged;
 
     this.#source = source;
     this.#src = src;
 
-    if (srcChanged || engineChanged) void this.load();
+    const target = this.#target;
+    const embedSrc =
+      this.#pendingEmbedOptions && target?.getAttribute('src') ? buildYouTubeIframeSrc(src, this.#snapshotProps()) : '';
+
+    if (target && embedSrc) {
+      // `destroy()` removes the iframe, so keep the host's target in its original position.
+      const parent = target.parentNode;
+      const nextSibling = target.nextSibling;
+      const volume = this.#volume;
+      const muted = this.#muted;
+      const playbackRate = this.#playbackRate;
+      const pendingWrites = this.#pendingWrites;
+      const playerSettingsRead = this.#playerSettingsRead;
+      const writtenSettings = this.#writtenSettings;
+      // Before a player reports its settings, only values written through setters are real.
+      const restoreSettings = new Set<PlayerSetting>(playerSettingsRead ? PLAYER_SETTINGS : writtenSettings);
+
+      this.detach();
+      target.src = embedSrc;
+      this.#pendingEmbedOptions = false;
+      parent?.insertBefore(target, nextSibling);
+      this.#target = target;
+      this.#volume = volume;
+      this.#muted = muted;
+      this.#playbackRate = playbackRate;
+      this.#restoreSettings = restoreSettings;
+      this.#writtenSettings = writtenSettings;
+      this.#playerSettingsRead = playerSettingsRead;
+      this.#pendingWrites = pendingWrites;
+      this.#recreations++;
+
+      this.#beginLoad();
+      this.dispatchEvent(new Event('emptied'));
+      this.#createPlayer();
+    } else if (srcChanged || engineChanged) {
+      void this.load();
+    }
 
     // Assigning is always a source change, so it is always announced.
     this.dispatchEvent(new Event('sourcechange'));
@@ -424,7 +494,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (!target || this.#player || this.#creatingPlayer) return false;
 
     // Only the attribute tells an embed apart from a placeholder; `src` resolves empty to the document URL.
-    if (!target.getAttribute('src')) {
+    if (!target.getAttribute('src') || this.#pendingEmbedOptions) {
       const initialSrc = buildYouTubeIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no player is coming to settle this load.
@@ -436,6 +506,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
       target.src = initialSrc;
     }
 
+    this.#pendingEmbedOptions = false;
     this.#creatingPlayer = true;
     this.dispatchEvent(new Event('loadstart'));
     void this.#createPlayerApi(target);
@@ -491,10 +562,26 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
   // Defer a player call until `loadComplete` resolves, swallowing failures.
   #afterLoad(fn: (player: YouTubePlayerApi) => void) {
-    this.#loadComplete.then(() => {
-      const player = this.#player;
+    this.#pendingWrites.push(fn);
+    this.#flushAfterLoad();
+  }
 
-      if (player) tryCall(() => fn(player));
+  #flushAfterLoad() {
+    const load = this.#loadComplete;
+
+    load.then(() => {
+      // Only the latest load may drain the queue, preserving the order of writes across replacement.
+      if (load !== this.#loadComplete) return;
+
+      const player = this.#player;
+      if (!player) return;
+
+      while (load === this.#loadComplete && player === this.#player) {
+        const write = this.#pendingWrites.shift();
+        if (!write) break;
+
+        tryCall(() => write(player));
+      }
     }, noop);
   }
 
@@ -513,10 +600,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #resetState() {
     this.#currentTime = 0;
     this.#duration = Number.NaN;
-    this.#muted = false;
     this.#paused = !this.#autoplay;
     this.#ended = false;
-    this.#playbackRate = 1;
     this.#progress = 0;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#seeking = false;
@@ -525,13 +610,34 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#seekStartedAt = 0;
     this.#loaded = false;
     this.#playFired = false;
-    this.#volume = 1;
     this.#error = null;
     this.#isFullscreen = false;
   }
 
   #onPlayerReady() {
     this.#playerReady = true;
+
+    const player = this.#player;
+    const restore = this.#restoreSettings;
+
+    if (restore.size && player) {
+      // Restore before metadata reads the replacement player's default settings.
+      const volume = this.#volume;
+      const muted = this.#muted;
+      const playbackRate = this.#playbackRate;
+
+      this.#restoreSettings = new Set();
+      tryCall(() => {
+        if (restore.has('volume')) player.setVolume(volume * 100);
+
+        if (restore.has('muted')) {
+          if (muted) player.mute();
+          else player.unMute();
+        }
+
+        if (restore.has('playbackRate')) player.setPlaybackRate(playbackRate);
+      });
+    }
 
     if (this.#pendingLoad) {
       // The iframe was built from a stale src; skip its metadata and reload. The post-cue state
@@ -557,6 +663,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
       this.#muted = player.isMuted();
       this.#volume = player.getVolume() / 100;
       this.#playbackRate = player.getPlaybackRate();
+      this.#playerSettingsRead = true;
     }
 
     for (const type of ['loadedmetadata', 'durationchange', 'volumechange', 'loadcomplete']) {

@@ -9,8 +9,10 @@ export function isSeekIndicatorAction(action: string | null | undefined): action
   return action === 'seekStep' || action === 'seekToPercent';
 }
 
-export function formatCurrentTime(snapshot: MediaSnapshot): string {
-  return formatTime(snapshot.currentTime ?? 0, snapshot.duration);
+export function formatCurrentTime(snapshot: MediaSnapshot, locale?: string | string[]): string {
+  const options = locale === undefined ? undefined : { locale };
+
+  return formatTime(snapshot.currentTime ?? 0, snapshot.duration, options);
 }
 
 export function getSeekIndicatorDisplayValue(state: { value: string | null; currentTime: string }): string {

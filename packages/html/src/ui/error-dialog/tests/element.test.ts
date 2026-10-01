@@ -1,10 +1,14 @@
+import type { AnyPlayerStore } from '@videojs/core/dom';
 import { registerI18n, resetI18nRegistry } from '@videojs/core/i18n';
-import { ContextProvider } from '@videojs/element/context';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { ContextConsumer, ContextProvider } from '@videojs/element/context';
+import { MediaError, type MediaErrorState } from '@videojs/media';
+import { createStore } from '@videojs/store';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MediaI18nProviderElement } from '../../../i18n';
-import { containerContext } from '../../../player/context';
+import { containerContext, playerContext } from '../../../player/context';
 import { DialogCloseElement } from '../../dialog/close';
+import { dialogContext } from '../../dialog/context';
 import { DialogDescriptionElement } from '../../dialog/description';
 import { DialogPopupElement } from '../../dialog/popup';
 import { DialogTitleElement } from '../../dialog/title';
@@ -40,6 +44,24 @@ class TestContainerProviderElement extends UIElement {
   });
 }
 
+class TestPlayerProviderElement extends UIElement {
+  readonly store = createStore<unknown>()<MediaErrorState>({
+    name: 'error',
+    state: () => ({
+      error: new MediaError(undefined, MediaError.MEDIA_ERR_NETWORK),
+      dismissError: vi.fn(),
+    }),
+  });
+  readonly provider = new ContextProvider(this, {
+    context: playerContext,
+    initialValue: this.store as unknown as AnyPlayerStore,
+  });
+}
+
+class TestDialogConsumerElement extends UIElement {
+  readonly consumer = new ContextConsumer(this, { context: dialogContext, subscribe: true });
+}
+
 afterEach(() => {
   resetI18nRegistry();
   document.documentElement.removeAttribute('lang');
@@ -47,10 +69,6 @@ afterEach(() => {
 });
 
 describe('ErrorDialogElement', () => {
-  it('has the correct tag name', () => {
-    expect(ErrorDialogElement.tagName).toBe('media-error-dialog');
-  });
-
   it('provides dialogContext for child parts', async () => {
     ensureDefined(DialogTitleElement.tagName, DialogTitleElement);
     ensureDefined(DialogDescriptionElement.tagName, DialogDescriptionElement);
@@ -89,15 +107,6 @@ describe('ErrorDialogElement', () => {
 
     expect(popup.getAttribute('role')).toBe('alertdialog');
     expect(popup.hasAttribute('aria-modal')).toBe(false);
-  });
-
-  it('handles missing child elements gracefully', async () => {
-    const el = createElement(ErrorDialogElement);
-
-    document.body.appendChild(el);
-    await el.updateComplete;
-
-    expect(el.isConnected).toBe(true);
   });
 
   it('shows translated dialog copy when es locale is registered', async () => {
@@ -167,13 +176,30 @@ describe('ErrorDialogElement', () => {
   });
 
   it('cleans up on disconnect', async () => {
+    const provider = createElement(TestPlayerProviderElement);
     const el = createElement(ErrorDialogElement);
+    const popup = createElement(DialogPopupElement);
+    const consumer = createElement(TestDialogConsumerElement);
+    const background = document.createElement('button');
 
-    document.body.appendChild(el);
-    await el.updateComplete;
+    popup.append(consumer);
+    el.append(popup);
+    provider.append(background, el);
+    document.body.append(provider);
 
-    document.body.removeChild(el);
+    await vi.waitFor(() => {
+      expect(consumer.consumer.value?.dialog.input.current).toEqual({ active: true, status: 'idle' });
+      expect(background.hasAttribute('inert')).toBe(true);
+    });
 
-    expect(el.isConnected).toBe(false);
+    const dialog = consumer.consumer.value!.dialog;
+
+    el.remove();
+    const input = { ...dialog.input.current };
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+    expect(dialog.input.current).toEqual(input);
+    expect(background.hasAttribute('inert')).toBe(false);
   });
 });

@@ -224,6 +224,63 @@ describe('syncTextTrackModes', () => {
     expect(elements[2]!.track.mode).toBe('hidden');
   });
 
+  it.each([
+    { initialMode: 'showing' as const, cues: [[0, 5, 'Hello']] as const },
+    { initialMode: 'hidden' as const, cues: [[0, 5, 'Hello']] as const },
+    {
+      initialMode: 'showing' as const,
+      cues: [
+        [0, 2, 'First'],
+        [2, 4, 'Second'],
+        [4, 6, 'Third'],
+      ] as const,
+    },
+  ])('preserves $cues.length cues through disabling and reselection from $initialMode', ({ initialMode, cues }) => {
+    const media = document.createElement('video');
+
+    addSubtitlesTracksToMedia(media, [makeModelTrack()]);
+
+    const el = media.querySelector<HTMLTrackElement>('#track-en')!;
+    const track = el.track;
+    const readCues = () =>
+      Array.from(track.cues ?? [], (cue) => {
+        // SAFETY: this srcless SPF slot is populated only with the VTTCues below.
+        const vttCue = cue as VTTCue;
+
+        return [vttCue.startTime, vttCue.endTime, vttCue.text];
+      });
+
+    expect(el.hasAttribute('src')).toBe(false);
+    expect(track.mode).toBe('disabled');
+    expect(track.cues).toBeNull();
+
+    track.mode = initialMode;
+    expect(track.cues).not.toBeNull();
+
+    for (const [start, end, text] of cues) track.addCue(new VTTCue(start, end, text));
+
+    expect(readCues()).toEqual(cues);
+
+    syncTextTrackModes(media.textTracks, undefined);
+    expect(track.mode).toBe('disabled');
+    expect(track.cues).toBeNull();
+
+    syncTextTrackModes(media.textTracks, 'track-en');
+    expect(track.mode).toBe('showing');
+    expect(readCues()).toEqual(cues);
+
+    syncTextTrackModes(media.textTracks, undefined);
+    expect(track.mode).toBe('disabled');
+    expect(track.cues).toBeNull();
+
+    track.mode = 'hidden';
+    expect(readCues()).toEqual(cues);
+
+    syncTextTrackModes(media.textTracks, 'track-en');
+    expect(track.mode).toBe('showing');
+    expect(readCues()).toEqual(cues);
+  });
+
   it('treats caption-kind tracks the same as subtitles', () => {
     const { media, elements } = setupTextTracks([{ id: 'caps-en', kind: 'captions' }]);
 

@@ -1,16 +1,12 @@
 import { ReactiveElement } from '@videojs/element';
 import { noop } from '@videojs/utils/function';
-import { afterEach } from 'vite-plus/test';
 
 import { defineSlice } from '../../core/slice';
 import type { Store } from '../../core/store';
 import { createStore as createCoreStore } from '../../core/store';
 
-/** Concrete base class for mixin tests (ReactiveElement is abstract). */
-export class TestBaseElement extends ReactiveElement {}
-
 /** Test host element that extends ReactiveElement. Tracks update calls for assertions. */
-export class TestHostElement extends ReactiveElement {
+class TestHostElement extends ReactiveElement {
   updateCount = 0;
 
   requestUpdate(): void {
@@ -19,12 +15,12 @@ export class TestHostElement extends ReactiveElement {
   }
 }
 
-export class MockMedia extends EventTarget {
+class MockMedia extends EventTarget {
   volume = 1;
   muted = false;
 }
 
-export const audioSlice = defineSlice<MockMedia>()({
+const audioSlice = defineSlice<MockMedia>()({
   state: ({ target }) => ({
     volume: 1,
     muted: false,
@@ -37,12 +33,6 @@ export const audioSlice = defineSlice<MockMedia>()({
       target().muted = muted;
       target().dispatchEvent(new Event('volumechange'));
       return muted;
-    },
-    async slowSetVolume(volume: number) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      target().volume = volume;
-      target().dispatchEvent(new Event('volumechange'));
-      return volume;
     },
   }),
 
@@ -58,12 +48,11 @@ export const audioSlice = defineSlice<MockMedia>()({
   },
 });
 
-export type AudioSliceState = {
+type AudioSliceState = {
   volume: number;
   muted: boolean;
   setVolume: (volume: number) => number;
   setMuted: (muted: boolean) => boolean;
-  slowSetVolume: (volume: number) => Promise<number>;
 };
 
 type TestStore = Store<MockMedia, AudioSliceState>;
@@ -80,7 +69,7 @@ export function createCoreTestStore(): { store: TestStore; target: MockMedia } {
 }
 
 /** Type alias for test host. */
-export type TestHost = TestHostElement;
+type TestHost = TestHostElement;
 
 let testHostCounter = 0;
 
@@ -93,17 +82,4 @@ export function createTestHost(): TestHost {
   }
 
   return document.createElement(tagName) as TestHost;
-}
-
-// For mixin tests - unique custom element tags
-let tagCounter = 0;
-
-export function uniqueTag(base: string): string {
-  return `${base}-${Date.now()}-${tagCounter++}`;
-}
-
-export function setupDomCleanup(): void {
-  afterEach(() => {
-    document.body.innerHTML = '';
-  });
 }

@@ -35,7 +35,8 @@ describe('VimeoVideo', () => {
     await flushDeferredEmbed();
 
     expect(iframeSrc(element)).toContain('https://player.vimeo.com/video/1181503036');
-    expect(element.engine).not.toBe(null);
+    expect(element.engine).toBeTruthy();
+    expect(new URL(iframeSrc(element)).searchParams.get('controls')).toBe('0');
   });
 
   it('builds the embed from attributes set after src in the same task', async () => {
@@ -46,8 +47,11 @@ describe('VimeoVideo', () => {
     element.setAttribute('controls', '');
     await flushDeferredEmbed();
 
-    // Vimeo chrome is hidden with `controls=0` unless controls are asked for.
-    expect(iframeSrc(element)).not.toContain('controls=0');
-    expect(element.engine).not.toBe(null);
+    const iframe = element.shadowRoot?.querySelector('iframe');
+
+    expect(iframe).toBeTruthy();
+    expect(iframe!.getAttribute('src')).toContain('https://player.vimeo.com/video/1181503036');
+    expect(new URL(iframe!.src).searchParams.has('controls')).toBe(false);
+    expect(element.engine).toBeTruthy();
   });
 });

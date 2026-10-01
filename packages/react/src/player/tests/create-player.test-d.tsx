@@ -12,7 +12,13 @@ import {
 import type { Slice } from '@videojs/store';
 import { assertType, describe, it } from 'vite-plus/test';
 
+import type { PlayerContextValue } from '../../index';
 import { type CreatePlayerResult, createPlayer } from '../create-player';
+
+// @ts-expect-error Popup coordination is not player context.
+type PlayerContextPopupGroup = PlayerContextValue['popupGroup'];
+
+void (0 as unknown as PlayerContextPopupGroup);
 
 describe('createPlayer', () => {
   it('resolves video features to VideoPlayerStore', () => {

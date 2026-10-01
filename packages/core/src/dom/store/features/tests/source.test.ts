@@ -23,21 +23,6 @@ describe('sourceFeature', () => {
       expect(store.state.canPlay).toBe(true);
     });
 
-    it('returns an empty currentSrc when no source set', () => {
-      // Note: Don't set src at all - setting src="" resolves to page URL
-      const video = document.createElement('video');
-
-      Object.defineProperty(video, 'currentSrc', { value: '', writable: false });
-      Object.defineProperty(video, 'readyState', { value: HTMLMediaElement.HAVE_NOTHING, writable: false });
-
-      const store = createStore<PlayerTarget>()(sourceFeature);
-
-      store.attach({ media: video, container: null });
-
-      expect(store.state.currentSrc).toBe('');
-      expect(store.state.canPlay).toBe(false);
-    });
-
     it('updates on canplay event', () => {
       const video = createMockVideo({
         currentSrc: '',

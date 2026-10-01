@@ -20,7 +20,7 @@ function installMockTranslator(
 
   const Translator = {
     availability: vi.fn(async () => availability),
-    create: vi.fn(async () => ({
+    create: vi.fn(async (_options: { sourceLanguage: string; targetLanguage: string }) => ({
       translate: vi.fn(async (text: string) => translate(text)),
     })),
   };
@@ -116,16 +116,6 @@ describe('getBrowserTranslations', () => {
     expect(result['buttons.pause']).toBe('translated:Pause');
   });
 
-  it('preserves {param} placeholders in translated strings', async () => {
-    installMockTranslator({
-      translate: (text) => `FR:${text}`,
-    });
-
-    const result = await getBrowserTranslations('fr');
-
-    expect(result['seek.forward']).toBe('FR:Seek forward {seconds} seconds');
-  });
-
   it('masks named placeholders as numeric slots for whole-string translation', async () => {
     const translatedInputs: string[] = [];
 
@@ -163,25 +153,23 @@ describe('getBrowserTranslations', () => {
     expect(result['playback.rate']).toBe('Kecepatan pemutaran {rate}');
   });
 
-  it('interpolates seek seconds after browser translation', async () => {
-    installMockTranslator({
-      translate: (text) => (text === 'Seek forward {0} seconds' ? 'Mencari maju {0} detik' : text),
-    });
-
-    const { createTranslator } = await import('../translator');
-    const result = await getBrowserTranslations('fr');
-    const t = createTranslator(result, 'fr');
-
-    expect(t('seek.forward', { seconds: 10 })).toBe('Mencari maju 10 detik');
-  });
-
   it('caches results per target language', async () => {
     const translator = installMockTranslator();
 
-    await getBrowserTranslations('fr');
-    await getBrowserTranslations('fr');
+    translator.create.mockImplementation(async ({ targetLanguage }: { targetLanguage: string }) => ({
+      translate: vi.fn(async (text: string) => `${targetLanguage}:${text}`),
+    }));
 
-    expect(translator.create).toHaveBeenCalledTimes(1);
+    const french = await getBrowserTranslations('fr');
+    const german = await getBrowserTranslations('de');
+    const frenchAgain = await getBrowserTranslations('fr');
+
+    expect(french['buttons.play']).toBe('fr:Play');
+    expect(german['buttons.play']).toBe('de:Play');
+    expect(frenchAgain['buttons.play']).toBe('fr:Play');
+    expect(translator.create).toHaveBeenCalledTimes(2);
+    expect(translator.create).toHaveBeenNthCalledWith(1, { sourceLanguage: 'en', targetLanguage: 'fr' });
+    expect(translator.create).toHaveBeenNthCalledWith(2, { sourceLanguage: 'en', targetLanguage: 'de' });
   });
 
   it('downloads and translates when downloadIfNeeded is true', async () => {

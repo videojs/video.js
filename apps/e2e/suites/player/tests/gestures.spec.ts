@@ -19,6 +19,19 @@ async function getCenter(player: PlayerPage) {
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
+async function seekToMiddle(player: PlayerPage) {
+  await player.page.evaluate(() => {
+    const media = document.querySelector('video')!;
+
+    media.currentTime = media.duration / 2;
+  });
+  await player.page.waitForFunction(() => {
+    const media = document.querySelector('video');
+
+    return media && !media.seeking && Math.abs(media.currentTime - media.duration / 2) < 0.5;
+  });
+}
+
 // --- Mouse gestures (pointer="mouse") ---
 
 test.describe('Mouse Gestures', () => {
@@ -44,19 +57,28 @@ test.describe('Mouse Gestures', () => {
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '', { timeout: 5_000 });
   });
 
-  test('click on button does not trigger container gesture', async () => {
+  test('click on button does not trigger container gesture', async ({ page }) => {
     // Clicking the play button should only fire the button action, not the
     // container gesture. If both fired, play would toggle twice (no-op).
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
     await player.playButton.click();
     await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
+    // Single taps can be deferred while the recognizer waits for a second tap.
+    await page.waitForTimeout(300);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
   });
 
-  test('click on controls container does not trigger container gesture', async () => {
+  test('click on controls container does not trigger container gesture', async ({ page }) => {
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
     await player.controls.dispatchEvent('pointerdown', { button: 0, pointerType: 'mouse' });
     await player.controls.dispatchEvent('pointerup', { button: 0, pointerType: 'mouse' });
+    await page.waitForTimeout(300);
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+
+    const { x, y } = await getCenter(player);
+
+    await page.mouse.click(x, y);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
   });
 
   test('click on slider does not trigger container gesture', async ({ page }) => {
@@ -92,17 +114,26 @@ test.describe('React Mouse Gestures', () => {
     await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
   });
 
-  test('click on button does not trigger container gesture', async () => {
+  test('click on button does not trigger container gesture', async ({ page }) => {
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
     await player.playButton.click();
     await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
+    // Single taps can be deferred while the recognizer waits for a second tap.
+    await page.waitForTimeout(300);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
   });
 
-  test('click on controls container does not trigger container gesture', async () => {
+  test('click on controls container does not trigger container gesture', async ({ page }) => {
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
     await player.controls.dispatchEvent('pointerdown', { button: 0, pointerType: 'mouse' });
     await player.controls.dispatchEvent('pointerup', { button: 0, pointerType: 'mouse' });
+    await page.waitForTimeout(300);
     await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+
+    const { x, y } = await getCenter(player);
+
+    await page.mouse.click(x, y);
+    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused);
   });
 
   test('click on slider does not trigger container gesture', async ({ page }) => {
@@ -131,19 +162,27 @@ test.describe('Touch Gestures', () => {
   });
 
   test('tap container toggles controls visibility', async ({ page }) => {
-    // Tap the center of the player container with touch
+    await player.play();
+    await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.visible);
     const { x, y } = await getCenter(player);
 
     await page.touchscreen.tap(x, y);
-
-    // Controls should respond to the tap gesture
-    await expect(player.controls).toBeAttached();
+    await expect(player.controls).toHaveAttribute(DATA_ATTRS.visible, '');
+    // Separate single taps, then require hiding before the two-second idle timeout.
+    await page.waitForTimeout(300);
+    await page.touchscreen.tap(x, y);
+    await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.visible, { timeout: 1_000 });
   });
 
   test('double-tap right side seeks forward', async ({ page }) => {
-    // Start playback first so seek has buffered data
     await player.play();
     await player.waitForPlayback();
+    await player.pause();
+    await seekToMiddle(player);
+    const before = await player.getCurrentTime();
+    const duration = await page.evaluate(() => document.querySelector('video')!.duration);
+
+    expect(duration - before).toBeGreaterThan(10);
 
     // Get a point in the right third of the player
     const box = await player.playerRoot.boundingBox();
@@ -157,14 +196,17 @@ test.describe('Touch Gestures', () => {
     await page.waitForTimeout(50);
     await page.touchscreen.tap(rightX, centerY);
 
-    // Verify the player registered a seek (data-started should be set)
-    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.started, '');
+    await expect.poll(async () => Math.abs((await player.getCurrentTime()) - (before + 10))).toBeLessThan(0.5);
   });
 
   test('double-tap left side seeks backward', async ({ page }) => {
-    // Play and seek forward first so there's room to seek back
     await player.play();
-    await player.waitForPlayback(1);
+    await player.waitForPlayback();
+    await player.pause();
+    await seekToMiddle(player);
+    const before = await player.getCurrentTime();
+
+    expect(before).toBeGreaterThan(10);
 
     // Get a point in the left third of the player
     const box = await player.playerRoot.boundingBox();
@@ -178,7 +220,6 @@ test.describe('Touch Gestures', () => {
     await page.waitForTimeout(50);
     await page.touchscreen.tap(leftX, centerY);
 
-    // Player should still be started (seek doesn't stop playback)
-    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.started, '');
+    await expect.poll(async () => Math.abs((await player.getCurrentTime()) - (before - 10))).toBeLessThan(0.5);
   });
 });

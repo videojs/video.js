@@ -9,13 +9,14 @@ describe('formatPercent', () => {
   });
 
   it('clamps to 0-100%', () => {
-    expect(formatPercent(-1)).toBe(formatPercent(0));
-    expect(formatPercent(2)).toBe(formatPercent(1));
+    expect(formatPercent(-1, 'en')).toBe('0%');
+    expect(formatPercent(0, 'en')).toBe('0%');
+    expect(formatPercent(1, 'en')).toBe('100%');
+    expect(formatPercent(2, 'en')).toBe('100%');
   });
 
   it('handles invalid fraction', () => {
-    expect(formatPercent(Number.NaN)).toMatch(/0/);
-    expect(formatPercent(Number.NaN)).toMatch(/%/);
+    expect(formatPercent(Number.NaN, 'en')).toBe('0%');
   });
 
   it('falls back when locale is invalid', () => {

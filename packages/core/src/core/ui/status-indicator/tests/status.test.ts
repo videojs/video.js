@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { MediaSnapshot } from '../../input-action';
-import { getSeekDirection, getSeekIndicatorDisplayValue } from '../../seek-indicator/status';
-import { getVolumeIndicatorDisplayValue, predictVolumeActionOutcome } from '../../volume-indicator/status';
 import { deriveStatus, getStatusIndicatorDisplayValue } from '../status';
 
 const SNAPSHOT: MediaSnapshot = {
@@ -16,7 +14,7 @@ const SNAPSHOT: MediaSnapshot = {
   duration: 120,
 };
 
-describe('status', () => {
+describe('deriveStatus', () => {
   it('derives playback status from the expected next state', () => {
     expect(deriveStatus({ action: 'togglePaused' }, SNAPSHOT)).toMatchObject({
       status: 'pause',
@@ -53,32 +51,13 @@ describe('status', () => {
 
   it('does not derive status or values for seek and unsupported actions', () => {
     expect(deriveStatus({ action: 'seekStep', value: 10 }, SNAPSHOT)).toBeNull();
-    expect(deriveStatus({ action: 'seekToPercent', value: 50 }, SNAPSHOT)?.value ?? null).toBeNull();
+    expect(deriveStatus({ action: 'seekToPercent', value: 50 }, SNAPSHOT)).toBeNull();
     expect(deriveStatus({ action: 'speedUp' }, SNAPSHOT)).toBeNull();
   });
+});
 
-  it('predicts volume outcome like volumeFeature.setVolume when muted', () => {
-    expect(predictVolumeActionOutcome({ action: 'volumeStep', value: 0.05 }, { muted: true, volume: 0.5 })).toEqual({
-      snapshotVolume: 0.5,
-      nextMuted: false,
-      nextVolume: 0.55,
-    });
-
-    expect(predictVolumeActionOutcome({ action: 'volumeStep', value: -0.05 }, { muted: true, volume: 0.05 })).toEqual({
-      snapshotVolume: 0.05,
-      nextMuted: true,
-      nextVolume: 0,
-    });
-  });
-
-  it('infers seek direction from action details', () => {
-    expect(getSeekDirection({ action: 'seekStep', value: -10 }, SNAPSHOT)).toBe('backward');
-    expect(getSeekDirection({ action: 'seekToPercent', key: '8' }, SNAPSHOT)).toBe('forward');
-  });
-
-  it('derives display values for mounted indicators', () => {
+describe('getStatusIndicatorDisplayValue', () => {
+  it('uses the label when no value is available', () => {
     expect(getStatusIndicatorDisplayValue({ label: 'Paused', value: null })).toBe('Paused');
-    expect(getVolumeIndicatorDisplayValue({ value: null })).toBe('');
-    expect(getSeekIndicatorDisplayValue({ value: null, currentTime: '0:30' })).toBe('0:30');
   });
 });

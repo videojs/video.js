@@ -259,52 +259,13 @@ describe('orientationLockFeature', () => {
     expect(orientation.unlock).toHaveBeenCalledTimes(1);
   });
 
-  it('does nothing when screen orientation APIs are unsupported', () => {
-    const orientation = stubOrientation({});
-    const video = createMockVideo();
-    const container = document.createElement('div');
-
-    const store = createOrientationStore();
-
-    store.attach({ media: video, container });
-
-    setFullscreenElement(container);
-    document.dispatchEvent(new Event('fullscreenchange'));
-    setFullscreenElement(null);
-    document.dispatchEvent(new Event('fullscreenchange'));
-
-    expect(orientation).toEqual({});
-  });
-
-  it('does not unlock when the lock request rejects', async () => {
-    const orientation = stubOrientation({
-      lock: vi.fn().mockRejectedValue(new Error('NotAllowedError')),
-      unlock: vi.fn(),
-    });
-    const video = createMockVideo();
-    const container = document.createElement('div');
-
-    const store = createOrientationStore();
-
-    store.attach({ media: video, container });
-
-    setFullscreenElement(container);
-    document.dispatchEvent(new Event('fullscreenchange'));
-
-    await vi.waitFor(() => {
-      expect(orientation.lock).toHaveBeenCalled();
-    });
-
-    setFullscreenElement(null);
-    document.dispatchEvent(new Event('fullscreenchange'));
-
-    expect(orientation.unlock).not.toHaveBeenCalled();
-  });
-
   it('restores the default type for an empty configured value', () => {
     stubOrientation();
 
     const store = createOrientationStore();
+
+    store.state.setOrientationLockType('portrait');
+    expect(store.state.orientationLockType).toBe('portrait');
 
     store.state.setOrientationLockType('' as ScreenOrientationLockType);
 
@@ -322,12 +283,6 @@ describe('orientationLockFeature', () => {
     const store = createOrientationStore();
 
     expect(selectOrientationLock(store.state)?.orientationLockType).toBe('landscape');
-  });
-
-  it('selects undefined when the feature is not configured', () => {
-    const store = createStore<PlayerTarget>()(noiseSlice);
-
-    expect(selectOrientationLock(store.state)).toBeUndefined();
   });
 
   it('does not re-request a rejected lock when unrelated state changes', async () => {

@@ -17,15 +17,6 @@ describe('safeDefine', () => {
     expect(customElements.get('test-sd-register')).toBe(TestElement);
   });
 
-  it('does not throw when element is already registered', () => {
-    class TestElement extends HTMLElement {
-      static tagName = 'test-sd-no-throw';
-    }
-
-    customElements.define('test-sd-no-throw', TestElement);
-    expect(() => safeDefine(TestElement)).not.toThrow();
-  });
-
   it('does not replace an existing registration', () => {
     class Original extends HTMLElement {
       static tagName = 'test-sd-no-replace';

@@ -81,7 +81,7 @@ describe('markdownFetchEvent', () => {
   it('records installation picks and drops private input', async () => {
     const body = await markdownFetchEvent({
       request: markdownRequest(
-        'https://videojs.org/docs/guides/installation/html.md?package-manager=npm&skin=minimal&source-url=https%3A%2F%2Fsecret.example.com%2Fv.m3u8%3Ftoken%3Dx'
+        'https://videojs.org/docs/guides/installation/html.md?package-manager=npm&skin=neutral&source-url=https%3A%2F%2Fsecret.example.com%2Fv.m3u8%3Ftoken%3Dx'
       ),
       response: markdownResponse(),
       via: 'twin',
@@ -89,11 +89,11 @@ describe('markdownFetchEvent', () => {
     });
 
     expect(body.properties).toMatchObject({
-      $current_url: 'https://videojs.org/docs/guides/installation/html.md?package-manager=npm&skin=minimal',
+      $current_url: 'https://videojs.org/docs/guides/installation/html.md?package-manager=npm&skin=neutral',
       installation_route: 'html',
       installation_framework: 'html',
       installation_method: 'npm',
-      installation_skin: 'minimal-video',
+      installation_skin: 'neutral-video',
       installation_custom_source: true,
       has_private_input: true,
     });

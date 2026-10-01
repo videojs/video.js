@@ -142,8 +142,11 @@ export function compareVersions(a: string, b: string): number {
     const rightPart = right.prerelease[index];
     if (leftPart === undefined || rightPart === undefined) return leftPart === undefined ? -1 : 1;
 
-    const numeric = /^\d+$/.test(leftPart) && /^\d+$/.test(rightPart);
-    const difference = numeric ? Number(leftPart) - Number(rightPart) : leftPart.localeCompare(rightPart);
+    const leftNumeric = /^\d+$/.test(leftPart);
+    const rightNumeric = /^\d+$/.test(rightPart);
+    if (leftNumeric !== rightNumeric) return leftNumeric ? -1 : 1;
+
+    const difference = leftNumeric ? Number(leftPart) - Number(rightPart) : leftPart.localeCompare(rightPart);
     if (difference !== 0) return Math.sign(difference);
   }
 

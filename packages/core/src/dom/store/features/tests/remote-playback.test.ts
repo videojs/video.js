@@ -1,11 +1,9 @@
-import type { Media } from '@videojs/media/dom';
-import type { AttachContext } from '@videojs/store';
+import { createStore } from '@videojs/store';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
+import { collectUncaughtExceptions, createMockVideo } from '../../../tests/test-helpers';
 import { remotePlaybackFeature } from '../remote-playback';
-
-type RemotePlaybackState = ReturnType<typeof remotePlaybackFeature.state>;
 
 function createRemote(overrides: Partial<RemotePlaybackLike> = {}) {
   const target = new EventTarget();
@@ -24,45 +22,31 @@ interface RemotePlaybackLike {
   cancelWatchAvailability?: (id?: number) => Promise<void>;
 }
 
-function attach(media: Media) {
-  const controller = new AbortController();
-  const set = vi.fn();
-
-  remotePlaybackFeature.attach?.({
-    target: { media, container: null } as PlayerTarget,
-    signal: controller.signal,
-    set,
-    get: () => ({}) as RemotePlaybackState,
-    store: { state: {}, subscribe: () => () => {} },
-    reportError: () => {},
-  } as AttachContext<PlayerTarget, RemotePlaybackState>);
-
-  return { controller, set };
-}
-
 describe('remotePlaybackFeature', () => {
   it('cancels availability watching on abort (W3C path)', () => {
     const remote = createRemote();
-    const media = { remote } as unknown as Media;
+    const media = Object.assign(createMockVideo(), { remote });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
 
-    const { controller } = attach(media);
+    const detach = store.attach({ media, container: null });
 
-    controller.abort();
+    detach();
 
     expect(remote.cancelWatchAvailability).toHaveBeenCalledOnce();
   });
 
-  it('does not throw on abort when cancelWatchAvailability becomes unavailable', () => {
+  it('does not throw on abort when cancelWatchAvailability becomes unavailable', async () => {
     // Simulate a custom element whose `remote` resolves to a partial object at
     // detach time — the captured reference must guard the method call.
     const remote = createRemote();
-    const media = { remote } as unknown as Media;
+    const media = Object.assign(createMockVideo(), { remote });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
 
-    const { controller } = attach(media);
+    const detach = store.attach({ media, container: null });
 
     // The W3C RemotePlayback object loses its method (e.g. inner video torn down).
     (remote as { cancelWatchAvailability?: unknown }).cancelWatchAvailability = undefined;
 
-    expect(() => controller.abort()).not.toThrow();
+    expect(await collectUncaughtExceptions(detach)).toEqual([]);
   });
 });

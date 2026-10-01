@@ -7,11 +7,11 @@ describe('renderInlineMarkdown', () => {
     expect(renderInlineMarkdown('Whether the button is disabled.')).toBe('Whether the button is disabled.');
   });
 
-  it('unwraps a single paragraph', () => {
-    const result = renderInlineMarkdown('Hello **world**.');
-
-    expect(result).not.toMatch(/^<p/);
-    expect(result).toContain('<strong class="font-semibold">world</strong>');
+  it.each([
+    ['Hello **world**.', 'Hello <strong class="font-semibold">world</strong>.'],
+    ['**bold text**', '<strong class="font-semibold">bold text</strong>'],
+  ])('unwraps a single paragraph: %s', (markdown, expectedHtml) => {
+    expect(renderInlineMarkdown(markdown)).toBe(expectedHtml);
   });
 
   it('preserves multiple paragraphs', () => {
@@ -43,12 +43,6 @@ describe('renderInlineMarkdown', () => {
     expect(result).toContain('data-code-inline');
     expect(result).toContain('<span data-hl>foo</span>');
     expect(renderInlineMarkdown('Use `foo` here.')).not.toContain('data-hl');
-  });
-
-  it('renders strong text', () => {
-    const result = renderInlineMarkdown('**bold text**');
-
-    expect(result).toContain('<strong class="font-semibold">bold text</strong>');
   });
 
   it('renders emphasized text', () => {

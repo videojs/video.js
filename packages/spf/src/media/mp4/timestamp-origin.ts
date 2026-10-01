@@ -12,25 +12,10 @@
  * - `mdhd.timescale` (from the init segment's `moov`) — ticks per second for that track, needed to convert the raw tick
  *   count to seconds.
  *
- * ## Presumptive vs. track-selected reads
- *
- * The two variants share only the leaf field-readers (`mdhd` timescale, `tfdt` baseMediaDecodeTime) and the box walker.
- * Everything else differs, and the split is deliberate so the presumptive pair is _proportionally_ smaller under
- * tree-shaking:
- *
- * - **Presumptive** — {@link readFirstMediaTimescale} / {@link readFirstBaseMediaDecodeTime} read the first `mdhd`
- *   timescale and first `tfdt` baseMediaDecodeTime. There's no `track_id` (nothing to match against) and no
- *   `trak`/`traf` iteration — a direct `findBox` to the first leaf. Correct when the init/segment holds a single media
- *   track (the common CMAF case). A caption-free platform imports only this pair and tree-shakes away all the matching
- *   machinery below.
- * - **Track-selected** — {@link findMediaTrack} / {@link readBaseMediaDecodeTime}. `findMediaTrack` returns `{ trackId,
- *   timescale }` for the `trak` whose `hdlr` handler matches; `readBaseMediaDecodeTime` takes that `trackId` and reads
- *   the `traf` whose `tfhd.track_id` matches. The `track_id` is the join that ties one track's timescale to the _same_
- *   track's baseMediaDecodeTime — required when a source muxes CEA-608/708 captions (a `clcp` track shares the same
- *   `moov` and `moof`, each track with its own timescale + baseMediaDecodeTime, so a presumptive read there risks
- *   `300000 / 6000 = 50s` instead of `60000 / 6000 = 10s`). This pair adds `trak`/`traf` iteration plus the handler and
- *   `track_id` reads. We only ever ask for buffered media handlers (`vide` / `soun`); the caption track is never
- *   selected — we read the origin, not the captions (caption _rendering_ is out of scope).
+ * {@link findMediaTrack} returns the track ID and timescale for the matching media handler;
+ * {@link readBaseMediaDecodeTime} uses that ID to select the corresponding media fragment. The ID joins one track's
+ * timescale to the same track's decode time, even when a caption track precedes it in a muxed init or segment. Only
+ * buffered media handlers (`vide` / `soun`) are selected; caption rendering is outside this reader's scope.
  *
  * Both raw values are returned un-divided to leave room for an edit-list (`elst`) presentation-time correction term if
  * a source ever carries one — the validated streams do not.
@@ -46,32 +31,6 @@ export interface MediaTrackInfo {
   /** `mdhd.timescale` — ticks per second for this track. */
   timescale: number;
 }
-
-// --- presumptive: first leaf, no track_id, no iteration -----------------------
-
-/**
- * Presumptive: the `timescale` of the **first** `mdhd` in an init segment. Correct only for single-media-track inits —
- * for muxed captions use {@link findMediaTrack}. `undefined` if no `mdhd` exists.
- */
-export function readFirstMediaTimescale(initSegment: ArrayBuffer | Uint8Array): number | undefined {
-  const view = toDataView(initSegment);
-  const mdhd = findBox(view, ['moov', 'trak', 'mdia', 'mdhd']);
-
-  return mdhd ? readMdhdTimescale(view, mdhd) : undefined;
-}
-
-/**
- * Presumptive: `baseMediaDecodeTime` from the **first** `tfdt` of a media segment. Correct only for single-`traf`
- * segments — for muxed captions use {@link readBaseMediaDecodeTime}. `undefined` if no `tfdt` exists.
- */
-export function readFirstBaseMediaDecodeTime(mediaSegment: ArrayBuffer | Uint8Array): number | undefined {
-  const view = toDataView(mediaSegment);
-  const tfdt = findBox(view, ['moof', 'traf', 'tfdt']);
-
-  return tfdt ? readTfdtBaseMediaDecodeTime(view, tfdt) : undefined;
-}
-
-// --- track-selected: iterate + match by handler / track_id --------------------
 
 /**
  * The `track_ID` + timescale of the `trak` whose `mdhd` handler matches `handlerType`, skipping a muxed `clcp` caption
@@ -136,7 +95,7 @@ function readTfdtBaseMediaDecodeTime(view: DataView, tfdt: Box): number {
   return readFullBoxVersion(view, tfdt.dataStart) === 1 ? Number(view.getBigUint64(at)) : view.getUint32(at);
 }
 
-// --- track-selection readers (referenced only by the track-selected variants) -
+// --- track identity readers --------------------------------------------------
 
 /** `hdlr.handler_type` for a `trak`: FullBox version(1)+flags(3) + pre_defined(4) + handler_type(4). */
 function readTrakHandler(view: DataView, trak: Box): string | undefined {

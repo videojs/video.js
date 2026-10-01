@@ -234,6 +234,20 @@ describe('TimeElement', () => {
     expect(time.textContent).toBe('۱:۳۰');
   });
 
+  it('renders an authored negative sign outside the accessible time value', async () => {
+    const { time } = await setup({ type: 'remaining' });
+
+    time.setAttribute('negative-sign', '−');
+    await time.updateComplete;
+    const sign = time.querySelector('span')!;
+
+    expect(time.textContent).toBe('−3:30');
+    expect(sign.textContent).toBe('−');
+    expect(sign.hidden).toBe(false);
+    expect(sign.getAttribute('aria-hidden')).toBe('true');
+    expect(time.lastChild?.textContent).toBe('3:30');
+  });
+
   it('exposes static time semantics', async () => {
     const { time } = await setup();
 

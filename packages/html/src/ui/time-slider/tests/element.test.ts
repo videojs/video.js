@@ -1,11 +1,12 @@
 import { SliderDataAttrs, type SliderState } from '@videojs/core';
 import type { AnyPlayerStore, PlayerTarget } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
-import { createStore } from '@videojs/store';
+import { createStore, flush } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { playerContext } from '../../../player/context';
 import { sliderContext } from '../../slider/context';
+import { measureSlider, pointer } from '../../slider/tests/support';
 import { SliderThumbElement } from '../../slider/thumb';
 import { SliderValueElement } from '../../slider/value';
 import { UIElement } from '../../ui-element';
@@ -65,28 +66,35 @@ class TestPlayerProviderElement extends UIElement {
 customElements.define('test-time-slider-player', TestPlayerProviderElement);
 
 const timeOnlySeek = vi.fn();
+const timeOnlyPlay = vi.fn(() => Promise.resolve());
+const timeOnlyPause = vi.fn();
 
 /** A store without `bufferFeature`, i.e. the documented composition that omits it. */
 class TestTimeOnlyPlayerProviderElement extends UIElement {
+  setTime!: (patch: { seeking?: boolean }) => void;
+
   // SAFETY: minimal test store; the element only reads the time and playback slices declared below.
   readonly store = createStore<PlayerTarget>()({
     name: 'timeOnly',
-    state: () => ({
-      currentTime: 30,
-      duration: 120,
-      seeking: false,
-      seek: timeOnlySeek,
-      paused: true,
-      ended: false,
-      started: false,
-      waiting: false,
-      play: vi.fn(() => Promise.resolve()),
-      pause: vi.fn(),
-      userActive: true,
-      controlsVisible: true,
-      requestControlsLock: vi.fn(() => vi.fn()),
-      toggleControls: vi.fn(),
-    }),
+    state: ({ set }) => {
+      this.setTime = set;
+      return {
+        currentTime: 30,
+        duration: 120,
+        seeking: false,
+        seek: timeOnlySeek,
+        paused: false,
+        ended: false,
+        started: false,
+        waiting: false,
+        play: timeOnlyPlay,
+        pause: timeOnlyPause,
+        userActive: true,
+        controlsVisible: true,
+        requestControlsLock: vi.fn(() => vi.fn()),
+        toggleControls: vi.fn(),
+      };
+    },
   }) as AnyPlayerStore;
 
   readonly provider = new ContextProvider(this, {
@@ -121,13 +129,11 @@ function createSliderContext(state: Partial<SliderState> = {}, pointerValue = 0)
 afterEach(() => {
   document.body.innerHTML = '';
   timeOnlySeek.mockClear();
+  timeOnlyPlay.mockClear();
+  timeOnlyPause.mockClear();
 });
 
 describe('TimeSliderElement', () => {
-  it('has the correct tag name', () => {
-    expect(TimeSliderElement.tagName).toBe('media-time-slider');
-  });
-
   it('initializes with default property values', () => {
     const slider = createElement(TimeSliderElement);
 
@@ -153,17 +159,46 @@ describe('TimeSliderElement', () => {
   });
 
   it('binds rootProps pointer events on connect', async () => {
+    const player = document.createElement('test-time-only-player');
     const slider = createElement(TimeSliderElement);
 
-    document.body.appendChild(slider);
+    player.append(slider);
+    document.body.append(player);
     await slider.updateComplete;
+    measureSlider(slider);
+    pointer(slider, 'pointerdown', 100);
+    pointer(slider, 'pointerup', 100, 0);
+    pointer(slider, 'lostpointercapture', 100, 0);
+    expect(timeOnlySeek).toHaveBeenCalledExactlyOnceWith(60);
+  });
 
-    // Without store, slider is disabled — but rootProps should still be bound.
-    // Verify by dispatching pointermove (which does not guard on disabled).
-    slider.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 50, clientY: 0 }));
+  it.each(['release', 'disconnect'] as const)('resumes playback after a drag ends by %s', async (end) => {
+    const player = document.createElement('test-time-only-player') as TestTimeOnlyPlayerProviderElement;
+    const slider = createElement(TimeSliderElement);
 
-    // No errors thrown means rootProps were bound correctly.
-    expect(slider.isConnected).toBe(true);
+    slider.pauseOnDrag = true;
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    const pause = timeOnlyPause;
+    const play = timeOnlyPlay;
+
+    measureSlider(slider);
+    pointer(slider, 'pointerdown', 50);
+    expect(pause).not.toHaveBeenCalled();
+    pointer(slider, 'pointermove', 60);
+    flush();
+    expect(pause).toHaveBeenCalledOnce();
+    expect(play).not.toHaveBeenCalled();
+
+    if (end === 'release') {
+      pointer(slider, 'pointerup', 60, 0);
+      pointer(slider, 'lostpointercapture', 60, 0);
+    } else {
+      slider.remove();
+    }
+
+    expect(play).toHaveBeenCalledOnce();
   });
 
   it('sets touch-action and user-select styles on connect', async () => {
@@ -222,57 +257,49 @@ describe('TimeSliderElement', () => {
 
     // Without player store providing time state, the element guards early.
     expect(slider.style.getPropertyValue('--media-slider-fill')).toBe('');
+
+    const player = document.createElement('test-time-only-player');
+
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    expect(slider.style.getPropertyValue('--media-slider-fill')).toBe('25.000%');
+    expect(slider.style.getPropertyValue('--media-slider-pointer')).toBe('0.000%');
+    expect(slider.style.getPropertyValue('--media-slider-buffer')).toBe('0.000%');
   });
 
   it('sets data-orientation to horizontal by default', async () => {
-    // Without store, data attrs are not applied (early return in update).
+    const player = document.createElement('test-time-only-player') as TestTimeOnlyPlayerProviderElement;
     const slider = createElement(TimeSliderElement);
 
-    document.body.appendChild(slider);
+    player.append(slider);
+    document.body.append(player);
     await slider.updateComplete;
+    expect(slider.getAttribute('data-orientation')).toBe('horizontal');
+    expect(slider.hasAttribute('data-seeking')).toBe(false);
 
-    // Without store the update guard returns early, so no data attrs.
-    // This confirms the element connects and runs without errors.
-    expect(slider.isConnected).toBe(true);
+    player.setTime({ seeking: true });
+    flush();
+    await slider.updateComplete;
+    expect(slider.hasAttribute('data-seeking')).toBe(true);
   });
 
   it('provides time-formatted values to SliderValueElement via context', async () => {
-    // Without a real player store, context isn't populated.
-    // This test verifies the element structure and connection works.
+    const player = document.createElement('test-time-only-player');
     const slider = createElement(TimeSliderElement);
     const valueEl = createElement(SliderValueElement);
 
-    slider.appendChild(valueEl);
-    document.body.appendChild(slider);
+    slider.append(valueEl);
+    player.append(slider);
+    document.body.append(player);
     await slider.updateComplete;
     await valueEl.updateComplete;
 
-    // Without store, formatValue isn't available to children.
-    // Verifies no runtime errors in the parent-child context chain.
-    expect(valueEl.isConnected).toBe(true);
-  });
-
-  it('provides ARIA attributes to SliderThumbElement via context', async () => {
-    const slider = createElement(TimeSliderElement);
-    const thumb = createElement(SliderThumbElement);
-
-    slider.appendChild(thumb);
-    document.body.appendChild(slider);
-    await slider.updateComplete;
-    await thumb.updateComplete;
-
-    // Without store, context is not populated so thumb has no ARIA.
-    // This verifies no errors occur in the context chain.
-    expect(thumb.isConnected).toBe(true);
+    expect(valueEl.textContent).toBe('0:30');
   });
 });
 
 describe('TimeSlider chapter elements', () => {
-  it('exposes the chapter collection and title tags', () => {
-    expect(TimeSliderChaptersElement.tagName).toBe('media-time-slider-chapters');
-    expect(TimeSliderChapterTitleElement.tagName).toBe('media-time-slider-chapter-title');
-  });
-
   it('only exposes the chapter title to assistive technology during keyboard interaction', async () => {
     const slider = createElement(TestSliderProviderElement);
     const title = createElement(TimeSliderChapterTitleElement);

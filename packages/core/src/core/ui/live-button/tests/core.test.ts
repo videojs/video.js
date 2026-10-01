@@ -26,19 +26,16 @@ function createState(overrides: Partial<LiveButtonState> = {}): LiveButtonState 
 
 describe('LiveButtonCore', () => {
   describe('setProps', () => {
-    it('uses default props', () => {
-      const core = new LiveButtonCore();
-      const attrs = core.getAttrs(createState());
-
-      expect(attrs['aria-disabled']).toBeUndefined();
-    });
-
     it('accepts constructor props', () => {
       const core = new LiveButtonCore({ disabled: true });
 
-      core.setMedia(createMediaState());
-      const attrs = core.getAttrs(core.getState());
+      core.setMedia(
+        createMediaState({ targetLiveWindow: 0, seekable: [[0, 100]], liveEdgeStart: 95, currentTime: 50 })
+      );
+      const state = core.getState();
+      const attrs = core.getAttrs(state);
 
+      expect(state.disabled).toBe(true);
       expect(attrs['aria-disabled']).toBe('true');
     });
   });
@@ -208,6 +205,13 @@ describe('LiveButtonCore', () => {
   });
 
   describe('getAttrs', () => {
+    it('omits aria-disabled when enabled and behind the live edge', () => {
+      const core = new LiveButtonCore();
+      const attrs = core.getAttrs(createState());
+
+      expect(attrs['aria-disabled']).toBeUndefined();
+    });
+
     it('sets aria-disabled when at live edge', () => {
       const core = new LiveButtonCore();
       const attrs = core.getAttrs(createState({ liveEdge: true, live: true }));
@@ -255,7 +259,12 @@ describe('LiveButtonCore', () => {
 
     it('does nothing when stream is not live', async () => {
       const core = new LiveButtonCore();
-      const media = createMediaState({ targetLiveWindow: Number.NaN });
+      const media = createMediaState({
+        targetLiveWindow: Number.NaN,
+        seekable: [[0, 100]],
+        liveEdgeStart: 95,
+        currentTime: 50,
+      });
 
       await core.seekToLive(media);
       expect(media.seek).not.toHaveBeenCalled();

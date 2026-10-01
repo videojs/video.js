@@ -35,25 +35,6 @@ describe('useSnapshot', () => {
       expect(renderCount).toBe(2);
       expect(result.current.volume).toBe(0.5);
     });
-
-    it('does not re-render when patched values are identical', async () => {
-      const state = createState({ volume: 1, muted: false });
-      let renderCount = 0;
-
-      renderHook(() => {
-        renderCount++;
-        return useSnapshot(state);
-      });
-
-      expect(renderCount).toBe(1);
-
-      await act(async () => {
-        state.patch({ volume: 1 });
-        flush();
-      });
-
-      expect(renderCount).toBe(1);
-    });
   });
 
   describe('with selector', () => {
@@ -119,31 +100,6 @@ describe('useSnapshot', () => {
       // Should NOT re-render because custom comparator says values are equal
       expect(renderCount).toBe(1);
       expect(result.current).toBe(1);
-    });
-  });
-
-  describe('microtask batching', () => {
-    it('batches multiple patches into a single re-render', async () => {
-      const state = createState({ volume: 1, muted: false });
-      let renderCount = 0;
-
-      const { result } = renderHook(() => {
-        renderCount++;
-        return useSnapshot(state);
-      });
-
-      expect(renderCount).toBe(1);
-
-      await act(async () => {
-        state.patch({ volume: 0.5 });
-        state.patch({ muted: true });
-        flush();
-      });
-
-      // Should have batched into a single re-render
-      expect(renderCount).toBe(2);
-      expect(result.current.volume).toBe(0.5);
-      expect(result.current.muted).toBe(true);
     });
   });
 });

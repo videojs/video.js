@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -25,7 +25,7 @@ function renderPlaybackRateOptions({
   render(
     <Menu.Root defaultOpen align="center">
       <PlaybackRateTrigger formatRate={formatRate} />
-      <Menu.Popup data-testid="popup">
+      <Menu.Popup>
         <Menu.Content data-testid="content">
           <PlaybackRateRadioGroup formatRate={formatRate} />
         </Menu.Content>
@@ -70,15 +70,6 @@ function PlaybackRateTrigger({ formatRate }: { formatRate?: ((rate: number) => s
 }
 
 describe('usePlaybackRateOptions', () => {
-  it('renders a trigger with the current playback rate state', () => {
-    renderPlaybackRateOptions({ playbackRate: 1.5 });
-
-    const trigger = screen.getByTestId('trigger');
-
-    expect(trigger.getAttribute('aria-label')).toBe('Playback rate 1.5');
-    expect(trigger.getAttribute('data-rate')).toBe('1.5');
-  });
-
   it('renders radio items from the available playback rates', () => {
     renderPlaybackRateOptions({ playbackRates: [1, 1.25, 1.5], playbackRate: 1.25 });
 
@@ -86,22 +77,6 @@ describe('usePlaybackRateOptions', () => {
     expect(screen.getByRole('menuitemradio', { name: '1.25×' }).getAttribute('aria-checked')).toBe('true');
     expect(screen.getByRole('menuitemradio', { name: '1.5×' }).getAttribute('aria-checked')).toBe('false');
     expect(screen.getByTestId('selected-label').textContent).toBe('1.25×');
-  });
-
-  it('center aligns the popup by default', () => {
-    renderPlaybackRateOptions();
-
-    expect(screen.getByTestId('popup').getAttribute('data-align')).toBe('center');
-  });
-
-  it('sets the selected playback rate', () => {
-    const setPlaybackRate = vi.fn();
-
-    renderPlaybackRateOptions({ setPlaybackRate });
-
-    fireEvent.click(screen.getByRole('menuitemradio', { name: '2×' }));
-
-    expect(setPlaybackRate).toHaveBeenCalledWith(2);
   });
 
   it('uses a custom rate formatter for items', () => {

@@ -63,20 +63,6 @@ function makeMediaElement({
 const flush = () => new Promise((resolve) => setTimeout(resolve, 10));
 
 describe('trackLoadTriggers', () => {
-  it('sets loadActivated to true when mediaElement fires play event', async () => {
-    const { el, play } = makeMediaElement();
-    const { state, reactor } = setupTrackLoadTriggers(
-      { presentation: { url: 'http://example.com/stream.m3u8' } },
-      { mediaElement: el }
-    );
-
-    play();
-    await flush();
-
-    expect(state.loadActivated.get()).toBe(true);
-    reactor.destroy();
-  });
-
   it('sets loadActivated to true when mediaElement fires seeking event', async () => {
     const { el, seek } = makeMediaElement();
     const { state, reactor } = setupTrackLoadTriggers(

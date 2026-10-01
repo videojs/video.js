@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { useStore } from '../use-store';
 import { createTestStore } from './test-utils';
@@ -18,6 +18,7 @@ describe('useStore', () => {
 
     it('does not re-render on state change', async () => {
       const { store } = createTestStore();
+      const subscribe = vi.spyOn(store, 'subscribe');
       let renderCount = 0;
 
       const { result } = renderHook(() => {
@@ -32,9 +33,8 @@ describe('useStore', () => {
         await result.current.setVolume(0.5);
       });
 
-      // Should NOT have re-rendered (equality always returns true)
+      expect(subscribe).not.toHaveBeenCalled();
       expect(renderCount).toBe(1);
-      // But state DID change - just not reflected in result.current
       expect(store.state.volume).toBe(0.5);
     });
   });

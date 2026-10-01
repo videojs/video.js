@@ -5,8 +5,6 @@
  * VTTCue objects.
  */
 
-import { resolveVttSegmentMetadata, type TextSegmentMetadata } from '../../text/resolve-vtt-metadata';
-
 // Singleton dummy video (reused across all parsing)
 let dummyVideo: HTMLVideoElement | null = null;
 
@@ -76,24 +74,4 @@ export function resolveVttSegment(url: string): Promise<VTTCue[]> {
 
 export function destroyVttResolver(): void {
   dummyVideo = null;
-}
-
-/**
- * A resolved VTT segment paired with its header metadata — the shape used when a caller needs the `X-TIMESTAMP-MAP`
- * correlation (e.g. non-zero-PTS sources), not just the cues.
- */
-export interface ResolvedVttSegment {
-  cues: VTTCue[];
-  metadata: TextSegmentMetadata;
-}
-
-/**
- * Resolve a VTT segment's cues and header metadata together. Cues still come from the browser's native parser ({@link
- * resolveVttSegment}); the header is scraped in parallel ({@link resolveVttSegmentMetadata}).
- */
-export function resolveVttSegmentWithMetadata(url: string): Promise<ResolvedVttSegment> {
-  return Promise.all([resolveVttSegment(url), resolveVttSegmentMetadata(url)]).then(([cues, metadata]) => ({
-    cues,
-    metadata,
-  }));
 }

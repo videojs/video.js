@@ -1,6 +1,8 @@
 import { flush } from '@videojs/store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { SliderCore } from '../../../../core/ui/slider/core';
+import { createSliderState } from '../../../tests/test-helpers';
 import type { UIKeyboardEvent, UIPointerEvent } from '../../event';
 import { createSlider, type SliderApi, type SliderOptions } from '../slider';
 
@@ -100,24 +102,86 @@ describe('createSlider', () => {
     vi.restoreAllMocks();
   });
 
-  describe('shape', () => {
-    it('returns state, rootProps, thumbProps, and destroy', () => {
-      const slider = createSlider(createOptions());
+  describe('adjustForAlignment', () => {
+    it.each([
+      ['horizontal', 5, 23],
+      ['vertical', 10, 26],
+    ] as const)('measures the %s axis for fill and pointer alignment', (orientation, fill, pointer) => {
+      const root = createMockElement();
+      const thumb = document.createElement('div');
 
-      expect(slider.input).toBeDefined();
-      expect(slider.input.current).toBeDefined();
-      expect(slider.input.subscribe).toBeTypeOf('function');
-      expect(slider.rootProps.onPointerDown).toBeTypeOf('function');
-      expect(slider.rootProps.onPointerMove).toBeTypeOf('function');
-      expect(slider.rootProps.onPointerLeave).toBeTypeOf('function');
-      expect(slider.thumbProps.onKeyDownCapture).toBeTypeOf('function');
-      expect(slider.thumbProps.onFocus).toBeTypeOf('function');
-      expect(slider.thumbProps.onBlur).toBeTypeOf('function');
-      expect(slider.destroy).toBeTypeOf('function');
+      Object.defineProperties(root, { offsetWidth: { value: 200 }, offsetHeight: { value: 300 } });
+      Object.defineProperties(thumb, { offsetWidth: { value: 20 }, offsetHeight: { value: 60 } });
 
+      const core = new SliderCore({ thumbAlignment: 'edge', orientation });
+      const slider = createSlider(
+        createOptions({
+          getElement: () => root,
+          getThumbElement: () => thumb,
+          adjustPercent: (percent, thumbSize, trackSize) =>
+            core.adjustPercentForAlignment(percent, thumbSize, trackSize),
+        })
+      );
+      const state = createSliderState({ orientation, thumbAlignment: 'edge', fillPercent: 0, pointerPercent: 20 });
+
+      expect(slider.adjustForAlignment(state)).toMatchObject({ fillPercent: fill, pointerPercent: pointer });
       slider.destroy();
     });
 
+    it.each(['center', 'no thumb', 'no adjustment'] as const)('preserves state with %s', (bypass) => {
+      const root = createMockElement();
+      const thumb = document.createElement('div');
+      const adjustPercent = vi.fn(() => 99);
+      const slider = createSlider(
+        createOptions({
+          getElement: () => root,
+          getThumbElement: () => (bypass === 'no thumb' ? null : thumb),
+          adjustPercent: bypass === 'no adjustment' ? undefined : adjustPercent,
+        })
+      );
+      const state = createSliderState({
+        thumbAlignment: bypass === 'center' ? 'center' : 'edge',
+        fillPercent: 10,
+        pointerPercent: 20,
+      });
+
+      expect(slider.adjustForAlignment(state)).toBe(state);
+      expect(adjustPercent).not.toHaveBeenCalled();
+      slider.destroy();
+    });
+  });
+
+  it('notifies on root resize and disconnects the observer on destroy', () => {
+    let callback: ResizeObserverCallback;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: ResizeObserverCallback) {
+          callback = cb;
+        }
+        observe = observe;
+        disconnect = disconnect;
+      }
+    );
+
+    const root = createMockElement();
+    const onResize = vi.fn();
+    const slider = createSlider(createOptions({ getElement: () => root, onResize }));
+
+    expect(observe).toHaveBeenCalledExactlyOnceWith(root);
+    // SAFETY: the resize callback ignores the observer and entries.
+    callback!([], {} as ResizeObserver);
+    expect(onResize).toHaveBeenCalledOnce();
+
+    slider.destroy();
+    expect(disconnect).toHaveBeenCalledOnce();
+    vi.unstubAllGlobals();
+  });
+
+  describe('shape', () => {
     it('has correct initial state', () => {
       const slider = createSlider(createOptions());
 
@@ -559,8 +623,8 @@ describe('createSlider', () => {
 
       slider.thumbProps.onKeyDownCapture(event);
 
-      expect(onValueChange).toHaveBeenCalledWith(51);
-      expect(onValueCommit).toHaveBeenCalledWith(51);
+      expect(onValueChange).toHaveBeenCalledExactlyOnceWith(51);
+      expect(onValueCommit).toHaveBeenCalledExactlyOnceWith(51);
       expect(event.preventDefault).toHaveBeenCalled();
 
       slider.destroy();
@@ -752,31 +816,6 @@ describe('createSlider', () => {
       slider.destroy();
     });
 
-    it('calls both onValueChange and onValueCommit for each step', () => {
-      const onValueChange = vi.fn();
-      const onValueCommit = vi.fn();
-      const slider = createSlider(createOptions({ getPercent: () => 50, onValueChange, onValueCommit }));
-
-      slider.thumbProps.onKeyDownCapture(keyboardEvent('ArrowRight'));
-
-      expect(onValueChange).toHaveBeenCalledOnce();
-      expect(onValueCommit).toHaveBeenCalledOnce();
-
-      slider.destroy();
-    });
-
-    it('preventDefault is called for handled keys', () => {
-      const slider = createSlider(createOptions());
-
-      const event = keyboardEvent('ArrowRight');
-
-      slider.thumbProps.onKeyDownCapture(event);
-
-      expect(event.preventDefault).toHaveBeenCalled();
-
-      slider.destroy();
-    });
-
     it('does not preventDefault for unhandled keys', () => {
       const onValueChange = vi.fn();
       const slider = createSlider(createOptions({ onValueChange }));
@@ -962,23 +1001,6 @@ describe('createSlider', () => {
 
       slider.destroy();
     });
-
-    it('computes percent from X axis for horizontal orientation', () => {
-      const el = createMockElement({ left: 0, width: 200 });
-      const slider = createSlider(
-        createOptions({
-          getElement: () => el,
-          getOrientation: () => 'horizontal',
-        })
-      );
-
-      slider.rootProps.onPointerDown(pointerEvent({ clientX: 50 }));
-      flush();
-
-      expect(slider.input.current.pointerPercent).toBe(25);
-
-      slider.destroy();
-    });
   });
 
   describe('pointer in an RTL document', () => {
@@ -998,15 +1020,6 @@ describe('createSlider', () => {
   });
 
   describe('lifecycle', () => {
-    it('destroy cleans up without errors', () => {
-      const slider = createSlider(createOptions());
-
-      slider.destroy();
-
-      // Should not throw on repeated destroy
-      expect(() => slider.destroy()).not.toThrow();
-    });
-
     it('releases pointer capture on destroy', () => {
       const el = createMockElement({ left: 0, width: 200 });
       const slider = createSlider(createOptions({ getElement: () => el }));
@@ -1303,6 +1316,8 @@ describe('createSlider', () => {
     });
 
     it('does not throttle keyboard changes', () => {
+      vi.useFakeTimers();
+
       const onValueChange = vi.fn();
       const slider = createSlider(
         createOptions({
@@ -1314,28 +1329,14 @@ describe('createSlider', () => {
 
       slider.thumbProps.onKeyDownCapture(keyboardEvent('ArrowRight'));
 
-      expect(onValueChange).toHaveBeenCalledOnce();
+      slider.thumbProps.onKeyDownCapture(keyboardEvent('ArrowRight', { repeat: true }));
+
+      expect(onValueChange).toHaveBeenCalledTimes(2);
+      expect(onValueChange).toHaveBeenLastCalledWith(52);
       expect(onValueChange).toHaveBeenCalledWith(51);
 
       slider.destroy();
-    });
-
-    it('defaults changeThrottle to 0 when not provided', () => {
-      const onValueChange = vi.fn();
-      const el = createMockElement({ left: 0, width: 200 });
-      const slider = createSlider(createOptions({ getElement: () => el, onValueChange }));
-
-      slider.rootProps.onPointerDown(pointerEvent({ clientX: 50 }));
-      onValueChange.mockClear();
-
-      // Every drag move fires immediately (no throttle).
-      firePointerMove(slider, { clientX: 60 });
-      firePointerMove(slider, { clientX: 80 });
-      firePointerMove(slider, { clientX: 100 });
-
-      expect(onValueChange).toHaveBeenCalledTimes(3);
-
-      slider.destroy();
+      vi.useRealTimers();
     });
   });
 });

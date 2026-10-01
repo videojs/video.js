@@ -22,7 +22,7 @@ export interface FailoverMonitorConfig {
   cooldownMs: number;
 }
 
-export const DEFAULT_FAILOVER_MONITOR_CONFIG: FailoverMonitorConfig = {
+const DEFAULT_FAILOVER_MONITOR_CONFIG: FailoverMonitorConfig = {
   // 5 minutes — a CDN outage is an infrastructure problem that outlasts a
   // transient blip, so re-probing it sooner mostly re-trips. Matches the
   // prevailing prior-art default (ExoPlayer's location exclusion, hls.js's

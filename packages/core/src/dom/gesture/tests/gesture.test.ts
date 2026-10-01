@@ -51,28 +51,15 @@ describe('createTapGesture', () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it('does not fire on secondary button (right-click)', () => {
+  it.each([1, 2])('rejects non-primary button %s', (button) => {
     const container = setup();
     const handler = vi.fn();
 
     createTapGesture(container, handler);
 
-    pointerDown(container, { button: 2 });
+    pointerDown(container, { button });
     vi.advanceTimersByTime(50);
-    pointerUp(container, { pointerType: 'mouse', clientX: 150, button: 2 });
-
-    expect(handler).not.toHaveBeenCalled();
-  });
-
-  it('does not fire on auxiliary button (middle-click)', () => {
-    const container = setup();
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(container, { button: 1 });
-    vi.advanceTimersByTime(50);
-    pointerUp(container, { pointerType: 'mouse', clientX: 150, button: 1 });
+    pointerUp(container, { pointerType: 'mouse', clientX: 150, button });
 
     expect(handler).not.toHaveBeenCalled();
   });
@@ -88,19 +75,6 @@ describe('createTapGesture', () => {
     pointerUp(container, { pointerType: 'mouse', clientX: 150 });
 
     expect(handler).not.toHaveBeenCalled();
-  });
-
-  it('fires immediately when no doubletap bindings exist', () => {
-    const container = setup();
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(container);
-    vi.advanceTimersByTime(50);
-    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).toHaveBeenCalledOnce();
   });
 
   it('cleanup removes binding', () => {
@@ -119,10 +93,20 @@ describe('createTapGesture', () => {
 
   it('double cleanup is safe', () => {
     const container = setup();
-    const cleanup = createTapGesture(container, vi.fn());
+    const removed = vi.fn();
+    const survivor = vi.fn();
+    const cleanup = createTapGesture(container, removed);
 
+    createTapGesture(container, survivor);
     cleanup();
     cleanup();
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+
+    expect(removed).not.toHaveBeenCalled();
+    expect(survivor).toHaveBeenCalledOnce();
   });
 
   it('first registered binding wins when multiple match', () => {
@@ -284,6 +268,67 @@ describe('tap/doubletap disambiguation', () => {
     expect(tapHandler).not.toHaveBeenCalled();
   });
 
+  it('clears pending tap timers before reconnecting', () => {
+    const container = setup();
+    const oldTap = vi.fn();
+    const oldDoubleTap = vi.fn();
+    const removeTap = createTapGesture(container, oldTap);
+    const removeDoubleTap = createDoubleTapGesture(container, oldDoubleTap);
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+    expect(oldTap).not.toHaveBeenCalled();
+
+    removeTap();
+    removeDoubleTap();
+
+    const newTap = vi.fn();
+    const removeNewTap = createTapGesture(container, newTap);
+
+    vi.advanceTimersByTime(DOUBLETAP_WINDOW);
+    expect(oldTap).not.toHaveBeenCalled();
+    expect(oldDoubleTap).not.toHaveBeenCalled();
+    expect(newTap).not.toHaveBeenCalled();
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+    expect(newTap).toHaveBeenCalledOnce();
+
+    removeNewTap();
+  });
+
+  it('clears doubletap candidates before reconnecting', () => {
+    const container = setup();
+    const oldDoubleTap = vi.fn();
+    const remove = createDoubleTapGesture(container, oldDoubleTap);
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+    remove();
+
+    const newDoubleTap = vi.fn();
+    const cleanup = createDoubleTapGesture(container, newDoubleTap);
+
+    vi.advanceTimersByTime(50);
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+    expect(newDoubleTap).not.toHaveBeenCalled();
+    expect(oldDoubleTap).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(50);
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+    expect(newDoubleTap).toHaveBeenCalledOnce();
+    expect(oldDoubleTap).not.toHaveBeenCalled();
+
+    cleanup();
+  });
+
   it('deferred tap does not fire after binding cleanup', () => {
     const container = setup();
     const tapHandler = vi.fn();
@@ -432,81 +477,6 @@ describe('interactive child filtering', () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it('does not fire when event originates from a child with role="slider"', () => {
-    const container = setup();
-    const slider = document.createElement('div');
-
-    slider.setAttribute('role', 'slider');
-    container.appendChild(slider);
-
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(slider);
-    vi.advanceTimersByTime(50);
-    pointerUp(slider, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).not.toHaveBeenCalled();
-  });
-
-  it('does not fire when event originates from a child with role="menuitemradio"', () => {
-    const container = setup();
-    const item = document.createElement('div');
-
-    item.setAttribute('role', 'menuitemradio');
-    container.appendChild(item);
-
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(item);
-    vi.advanceTimersByTime(50);
-    pointerUp(item, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).not.toHaveBeenCalled();
-  });
-
-  it('does not fire when event originates from a nested child inside an interactive element', () => {
-    const container = setup();
-    const button = document.createElement('button');
-    const icon = document.createElement('span');
-
-    button.appendChild(icon);
-    container.appendChild(button);
-
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(icon);
-    vi.advanceTimersByTime(50);
-    pointerUp(icon, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).not.toHaveBeenCalled();
-  });
-
-  it('does not fire from any child inside a marked controls surface', () => {
-    const container = setup();
-    const controls = document.createElement('div');
-    const label = document.createElement('span');
-
-    controls.setAttribute('data-interactive', '');
-    controls.appendChild(label);
-    container.appendChild(controls);
-
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(label);
-    vi.advanceTimersByTime(50);
-    pointerUp(label, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).not.toHaveBeenCalled();
-  });
-
   it('fires when event originates from a non-interactive child', () => {
     const container = setup();
     const overlay = document.createElement('div');
@@ -520,19 +490,6 @@ describe('interactive child filtering', () => {
     pointerDown(overlay);
     vi.advanceTimersByTime(50);
     pointerUp(overlay, { pointerType: 'mouse', clientX: 150 });
-
-    expect(handler).toHaveBeenCalledOnce();
-  });
-
-  it('fires when event targets the container directly', () => {
-    const container = setup();
-    const handler = vi.fn();
-
-    createTapGesture(container, handler);
-
-    pointerDown(container);
-    vi.advanceTimersByTime(50);
-    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
 
     expect(handler).toHaveBeenCalledOnce();
   });

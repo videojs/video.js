@@ -1,7 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import coreSchema from '@videojs/core/vjsc';
+import { isNil } from '@videojs/utils/predicate';
 import { describe, expect, it } from 'vite-plus/test';
 import type { ComponentPartDefinition, ComponentParts } from 'vjsc/components';
 import { type ComponentPath, isTargetElement, readTargetReference } from 'vjsc/target';
@@ -10,12 +13,8 @@ import { htmlComponentTarget } from '../target/html.tsx';
 import { reactComponentTarget } from '../target/react.tsx';
 
 const workspaceDir = resolve(import.meta.dirname, '../../../..');
+const resolveReact = createRequire(resolve(workspaceDir, 'packages/react/package.json')).resolve;
 const htmlElementsDir = resolve(workspaceDir, 'packages/html/src/define/ui');
-const reactBarrel = readFileSync(resolve(workspaceDir, 'packages/react/src/index.ts'), 'utf8');
-const reactExports = Object.keys(
-  (JSON.parse(readFileSync(resolve(workspaceDir, 'packages/react/package.json'), 'utf8')) as { exports: object })
-    .exports
-);
 
 /** Every canonical component and nested part path the Core schema declares. */
 function componentPaths(): ComponentPath[] {
@@ -63,7 +62,8 @@ describe('htmlComponentTarget', () => {
 });
 
 describe('reactComponentTarget', () => {
-  it('imports every canonical component from a real React export', () => {
+  it('imports every canonical component from a real React export', async () => {
+    const modules = new Map<string, Record<string, unknown>>();
     const missing: string[] = [];
     let checked = 0;
 
@@ -76,24 +76,25 @@ describe('reactComponentTarget', () => {
 
       checked += 1;
 
-      const { from, name } = reference.import;
-      const exported =
-        from === '@videojs/react'
-          ? new RegExp(`\\b${name}\\b`).test(reactBarrel)
-          : reactExports.some((subpath) => matchesExport(subpath, from.replace('@videojs/react', '.')));
+      const { from, name, path: members = [] } = reference.import;
+      let module = modules.get(from);
 
-      if (!exported) missing.push(`${path.component}.${path.part} -> ${from}#${name}`);
+      if (!module) {
+        module = (await import(pathToFileURL(resolveReact(from)).href)) as Record<string, unknown>;
+        modules.set(from, module);
+      }
+
+      let value: unknown = module[name];
+
+      for (const member of members) {
+        value = isNil(value) ? undefined : (value as Record<string, unknown>)[member];
+      }
+
+      if (value === undefined)
+        missing.push(`${path.component}.${path.part} -> ${from}#${[name, ...members].join('.')}`);
     }
 
     expect(missing).toEqual([]);
     expect(checked).toBeGreaterThan(40);
   });
 });
-
-function matchesExport(pattern: string, subpath: string): boolean {
-  if (!pattern.includes('*')) return pattern === subpath;
-
-  const [prefix, suffix] = pattern.split('*');
-
-  return subpath.startsWith(prefix!) && subpath.endsWith(suffix!);
-}

@@ -108,12 +108,8 @@ describe('liveWindowFromState', () => {
     });
   });
 
-  // `sync-live-seekable-range` writes the result straight to
-  // `setLiveSeekableRange` with no try/catch, on the stated invariant that
-  // `0 <= start < end`. The `max` clamp above only rescues a *non-reference*
-  // track — these pin down what happens when the reference window itself is
-  // negative, which a mis-anchored source produces.
-  it('does NOT clamp a negative reference-track window start (the mis-anchored case)', () => {
+  // Opposite A/V placement still takes the intersection's later start.
+  it('intersects a negative video window with an audio window starting at zero', () => {
     const pres = presentation({ video: videoTrack(-2), audio: audioTrack(0) });
 
     expect(liveWindowFromState(state({ presentation: pres, videoId: 'v-1', audioId: 'a-1' }))).toEqual({

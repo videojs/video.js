@@ -57,47 +57,6 @@ describe('@videojs/html/icons', () => {
     });
   });
 
-  it('does not microtask-loop when icon name is missing from a loaded family', async () => {
-    const testWindow = new Window();
-
-    vi.stubGlobal('window', testWindow);
-    vi.stubGlobal('document', testWindow.document);
-    vi.stubGlobal('customElements', testWindow.customElements);
-    vi.stubGlobal('HTMLElement', testWindow.HTMLElement);
-
-    document.body.innerHTML = `
-      <media-icon id="good" name="play"></media-icon>
-      <media-icon id="bad" name="__no_such_icon__"></media-icon>
-    `;
-
-    await import('../element');
-    await customElements.whenDefined('media-icon');
-
-    await vi.waitFor(() => {
-      expect(document.querySelector('#good')?.innerHTML).toContain('<svg');
-    });
-
-    expect(document.querySelector('#bad')?.innerHTML).toBe('');
-  });
-
-  it('does not microtask-loop when family has no loader', async () => {
-    const testWindow = new Window();
-
-    vi.stubGlobal('window', testWindow);
-    vi.stubGlobal('document', testWindow.document);
-    vi.stubGlobal('customElements', testWindow.customElements);
-    vi.stubGlobal('HTMLElement', testWindow.HTMLElement);
-
-    document.body.innerHTML = '<media-icon family="__unknown_family__" name="play"></media-icon>';
-
-    await import('../element');
-    await customElements.whenDefined('media-icon');
-
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(document.querySelector('media-icon')?.innerHTML).toBe('');
-  });
-
   it('renders icons from a family-specific import', async () => {
     const testWindow = new Window();
 

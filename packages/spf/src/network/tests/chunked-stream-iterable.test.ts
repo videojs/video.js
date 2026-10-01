@@ -43,46 +43,69 @@ function totalBytes(chunks: Uint8Array[]): number {
 // ---------------------------------------------------------------------------
 
 describe('ChunkedStreamIterable', () => {
-  it('exposes minChunkSize', () => {
-    const stream = makeStream();
-    const iterable = new ChunkedStreamIterable(stream, { minChunkSize: 1024 });
+  it.each([
+    { threshold: 64, options: { minChunkSize: 64 } },
+    { threshold: 131_072, options: undefined },
+  ])('yields a single chunk when it meets minChunkSize exactly: $threshold', async ({ threshold, options }) => {
+    let controller!: ReadableStreamDefaultController<Uint8Array>;
+    const stream = new ReadableStream<Uint8Array>({
+      start(value) {
+        controller = value;
+      },
+    });
+    const iterator = new ChunkedStreamIterable(stream, options)[Symbol.asyncIterator]();
+    let output: IteratorResult<Uint8Array> | undefined;
+    const next = iterator.next().then((value) => {
+      output = value;
+      return value;
+    });
 
-    expect(iterable.minChunkSize).toBe(1024);
-  });
+    try {
+      controller.enqueue(bytes(threshold - 1));
+      // A macrotask lets the reader consume input without closing the stream.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(output).toBeUndefined();
 
-  it('defaults minChunkSize to 128 KB', () => {
-    const stream = makeStream();
-    const iterable = new ChunkedStreamIterable(stream);
-
-    expect(iterable.minChunkSize).toBe(2 ** 17);
-  });
-
-  it('yields a single chunk when it meets minChunkSize exactly', async () => {
-    const minChunkSize = 64;
-    const stream = makeStream(bytes(64));
-    const chunks = await collect(new ChunkedStreamIterable(stream, { minChunkSize }));
-
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]!.length).toBe(64);
-  });
-
-  it('yields a single chunk when it exceeds minChunkSize', async () => {
-    const minChunkSize = 64;
-    const stream = makeStream(bytes(100));
-    const chunks = await collect(new ChunkedStreamIterable(stream, { minChunkSize }));
-
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]!.length).toBe(100);
+      controller.enqueue(bytes(1));
+      await expect.poll(() => output).toBeDefined();
+      expect(output?.done).toBe(false);
+      expect(output?.value).toEqual(bytes(threshold));
+    } finally {
+      controller.close();
+      await next;
+      await iterator.return(undefined);
+    }
   });
 
   it('accumulates small chunks until minChunkSize is met', async () => {
-    const minChunkSize = 64;
-    // 3 × 30-byte chunks — first two should accumulate, third triggers flush at 90 bytes
-    const stream = makeStream(bytes(30, 1), bytes(30, 2), bytes(30, 3));
-    const chunks = await collect(new ChunkedStreamIterable(stream, { minChunkSize }));
+    let controller!: ReadableStreamDefaultController<Uint8Array>;
+    const stream = new ReadableStream<Uint8Array>({
+      start(value) {
+        controller = value;
+      },
+    });
+    const iterator = new ChunkedStreamIterable(stream, { minChunkSize: 64 })[Symbol.asyncIterator]();
+    let output: IteratorResult<Uint8Array> | undefined;
+    const next = iterator.next().then((value) => {
+      output = value;
+      return value;
+    });
 
-    expect(chunks).toHaveLength(1);
-    expect(chunks[0]!.length).toBe(90);
+    try {
+      controller.enqueue(bytes(30, 1));
+      controller.enqueue(bytes(30, 2));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(output).toBeUndefined();
+
+      controller.enqueue(bytes(30, 3));
+      await expect.poll(() => output).toBeDefined();
+      expect(output?.done).toBe(false);
+      expect(output?.value).toHaveLength(90);
+    } finally {
+      controller.close();
+      await next;
+      await iterator.return(undefined);
+    }
   });
 
   it('flushes remaining bytes on stream end even if below minChunkSize', async () => {
@@ -101,6 +124,11 @@ describe('ChunkedStreamIterable', () => {
     const chunks = await collect(new ChunkedStreamIterable(stream, { minChunkSize }));
 
     expect(totalBytes(chunks)).toBe(120);
+    expect(chunks.flatMap((chunk) => Array.from(chunk))).toEqual([
+      ...Array(40).fill(1),
+      ...Array(40).fill(2),
+      ...Array(40).fill(3),
+    ]);
   });
 
   it('concatenates chunk bytes correctly', async () => {

@@ -164,12 +164,15 @@ export function openLicenseSession({
       return;
     }
 
-    // The fetch rejects on abort in practice; the check is the commit point
-    // for a response that landed as the abort did.
+    // A response can land as its fetch is aborted.
     if (signal.aborted) return;
 
     try {
-      await session.update(await unwrapLicense(module_, entry, license));
+      const unwrapped = await unwrapLicense(module_, entry, license);
+
+      if (signal.aborted) return;
+
+      await session.update(unwrapped);
     } catch (error) {
       if (signal.aborted) return;
 

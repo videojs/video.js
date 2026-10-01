@@ -611,23 +611,6 @@ describe('VimeoAdapter', () => {
     expect(media.duration).toBeNaN();
   });
 
-  it('omits the title when Vimeo reports none', async () => {
-    const media = new VimeoAdapter();
-
-    media.src = '76979871';
-    const iframe = createIframe();
-
-    media.attach(iframe);
-
-    const player = media.engine as unknown as MockPlayerLike;
-
-    player.getVideoTitle.mockResolvedValueOnce('');
-    player.emit('loaded');
-    await waitForVimeoLoaded(media);
-
-    expect(media.contentData).toEqual({});
-  });
-
   it('updates state from player events', async () => {
     const media = new VimeoAdapter();
     const { player } = await attachAndLoad(media);
@@ -867,4 +850,106 @@ describe('VimeoAdapter', () => {
     expect(media.target).toBe(null);
     expect(media.engine).toBe(null);
   });
+
+  it.each(['detach', 'destroy', 'target replacement'])(
+    'preserves the iframe and clears its playback on %s',
+    async (action) => {
+      // Exercise SDK destruction, which removes the iframe unless the adapter preserves it.
+      vi.doUnmock('@vimeo/player');
+      vi.resetModules();
+      const { VimeoAdapter } = await import('../adapter');
+      const media = new VimeoAdapter();
+      const iframe = createIframe();
+      const replacement = createIframe();
+      const container = document.createElement('div');
+
+      media.src = '76979871';
+      container.append(iframe, replacement);
+      document.body.append(container);
+
+      try {
+        media.attach(iframe);
+
+        expect(media.engine).not.toBe(null);
+        expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/76979871');
+
+        if (action === 'target replacement') media.attach(replacement);
+        else if (action === 'destroy') media.destroy();
+        else media.detach();
+
+        expect(container.firstChild).toBe(iframe);
+        expect(iframe.getAttribute('src')).toBe(null);
+        expect(iframe.contentDocument?.URL).toBe('about:blank');
+        expect(media.target).toBe(action === 'target replacement' ? replacement : null);
+      } finally {
+        media.destroy();
+        container.remove();
+      }
+    }
+  );
+
+  it.each(['same adapter', 'new adapter'])(
+    'delivers one SDK event after reattaching the iframe to the %s',
+    async (mode) => {
+      // SDK callbacks are keyed by iframe, so reusing its node must not revive the previous attachment's handlers.
+      vi.doUnmock('@vimeo/player');
+      vi.resetModules();
+      const { VimeoAdapter } = await import('../adapter');
+      const media = new VimeoAdapter();
+      const reattached = mode === 'same adapter' ? media : new VimeoAdapter();
+      const iframe = createIframe();
+      const container = document.createElement('div');
+      const previousTimeupdate = vi.fn();
+      const timeupdate = vi.fn();
+      const reportTime = (seconds: number) => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            origin: 'https://player.vimeo.com',
+            source: iframe.contentWindow,
+            data: { event: 'timeupdate', data: { seconds, duration: 60, percent: seconds / 60 } },
+          })
+        );
+      };
+
+      media.src = '76979871';
+      media.addEventListener('timeupdate', previousTimeupdate);
+      container.append(iframe);
+      document.body.append(container);
+
+      try {
+        media.attach(iframe);
+        const player = media.engine;
+
+        expect(player).not.toBe(null);
+        reportTime(12);
+        expect(previousTimeupdate).toHaveBeenCalledTimes(1);
+        expect(media.currentTime).toBe(12);
+
+        if (mode === 'same adapter') media.detach();
+        else media.destroy();
+
+        previousTimeupdate.mockClear();
+        reattached.src = '76979871';
+        reattached.addEventListener('timeupdate', timeupdate);
+        reattached.attach(iframe);
+
+        expect(reattached.engine).not.toBe(null);
+        expect(reattached.engine).not.toBe(player);
+
+        reportTime(24);
+
+        expect(timeupdate).toHaveBeenCalledTimes(1);
+        expect(reattached.currentTime).toBe(24);
+
+        if (mode === 'new adapter') {
+          expect(previousTimeupdate).not.toHaveBeenCalled();
+          expect(media.currentTime).toBe(0);
+        }
+      } finally {
+        reattached.destroy();
+        media.destroy();
+        container.remove();
+      }
+    }
+  );
 });

@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { cleanup, render, waitFor } from '@testing-library/react';
 import { useLayoutEffect } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -11,6 +11,7 @@ function makeDOMRect(x: number, y: number, width: number, height: number): DOMRe
 }
 
 afterEach(() => {
+  cleanup();
   vi.restoreAllMocks();
 });
 

@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { createStore } from '@videojs/store';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -102,29 +103,40 @@ describe('Poster', () => {
     expect(getByTestId('poster').hasAttribute('data-loaded')).toBe(false);
   });
 
-  it('hides the root once playback starts', () => {
-    const { getByTestId } = render(<DefaultPoster />, {
-      wrapper: wrapper({ started: true, poster: 'poster.jpg' }),
+  it('hides the root once playback starts', async () => {
+    const { value, Wrapper } = createPlayerWrapper();
+    let start = () => {};
+    const store = createStore()({
+      name: 'poster',
+      state: () => ({
+        paused: true,
+        ended: false,
+        started: false,
+        waiting: false,
+        play: async () => {},
+        pause: () => {},
+        title: '',
+        poster: 'poster.jpg',
+      }),
+      attach({ set }) {
+        start = () => set({ started: true });
+      },
     });
 
-    expect(getByTestId('poster').hasAttribute('data-visible')).toBe(false);
+    store.attach({});
+    value.store = store;
+
+    const { getByTestId } = render(<DefaultPoster />, { wrapper: Wrapper });
+    const root = getByTestId('poster');
+
+    expect(root.hasAttribute('data-visible')).toBe(true);
+
+    await act(async () => start());
+
+    expect(root.hasAttribute('data-visible')).toBe(false);
   });
 
   it('reports the image lifecycle on the root, matching the HTML element', () => {
-    const { getByTestId } = render(<DefaultPoster />, {
-      wrapper: wrapper({ poster: 'poster.jpg' }),
-    });
-
-    expect(getByTestId('poster').hasAttribute('data-loading')).toBe(true);
-    expect(getByTestId('poster').hasAttribute('data-loaded')).toBe(false);
-
-    fireEvent.load(getByTestId('image'));
-
-    expect(getByTestId('poster').hasAttribute('data-loaded')).toBe(true);
-    expect(getByTestId('poster').hasAttribute('data-loading')).toBe(false);
-  });
-
-  it('lets sibling presentation react to the image lifecycle', () => {
     const { getByTestId } = render(
       <Poster.Root data-testid="poster">
         <div data-testid="blur" />
@@ -133,16 +145,17 @@ describe('Poster', () => {
       </Poster.Root>,
       { wrapper: wrapper({ poster: 'poster.jpg' }) }
     );
-
     const root = getByTestId('poster');
 
     expect(root.contains(getByTestId('blur'))).toBe(true);
     expect(root.contains(getByTestId('overlay'))).toBe(true);
     expect(root.hasAttribute('data-loading')).toBe(true);
+    expect(root.hasAttribute('data-loaded')).toBe(false);
 
     fireEvent.load(getByTestId('image'));
 
     expect(root.hasAttribute('data-loaded')).toBe(true);
+    expect(root.hasAttribute('data-loading')).toBe(false);
   });
 
   it('reports the lifecycle of a render override that rewrote the src', () => {

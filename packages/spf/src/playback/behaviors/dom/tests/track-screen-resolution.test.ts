@@ -77,7 +77,8 @@ describe('trackScreenResolution', () => {
     // The value a cap reads as "no cap", rather than leaving the slot unwritten.
     vi.stubGlobal('screen', undefined);
 
-    const { state, cleanup } = setupTrackScreenResolution();
+    const state = { screenResolution: signal<ScreenResolution | undefined>({ width: 1920, height: 1080 }) };
+    const cleanup = trackScreenResolution.setup({ state, context: {} });
 
     expect(state.screenResolution.get()).toBeUndefined();
     cleanup();
