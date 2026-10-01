@@ -42,8 +42,6 @@ export interface CaptionsRadioGroupOptionsProps extends Omit<
 
 export type CaptionsRadioGroupValueProps = UIComponentProps<'span', CaptionsOptionsResult>;
 
-export interface CaptionsRadioGroupLegacyProps extends CaptionsRadioGroupOptionsProps, CaptionsOptionsProps {}
-
 const CaptionsRadioGroupContext = createContext<CaptionsOptionsResult | null | undefined>(undefined);
 
 /** Owns captions option state and shares it with an enclosing menu. Does not render a DOM element. */
@@ -120,17 +118,6 @@ export const CaptionsRadioGroupOptions = forwardRef<HTMLDivElement, CaptionsRadi
           );
         })}
       </MenuRadioGroup>
-    );
-  }
-);
-
-/** @internal Compatibility adapter for the existing preset sources. */
-export const CaptionsRadioGroupLegacy = forwardRef<HTMLDivElement, CaptionsRadioGroupLegacyProps>(
-  function CaptionsRadioGroupLegacy({ label, formatTrack, disabled, ...props }, forwardedRef) {
-    return (
-      <CaptionsRadioGroupRoot label={label} formatTrack={formatTrack} disabled={disabled}>
-        <CaptionsRadioGroupOptions {...props} ref={forwardedRef} />
-      </CaptionsRadioGroupRoot>
     );
   }
 );

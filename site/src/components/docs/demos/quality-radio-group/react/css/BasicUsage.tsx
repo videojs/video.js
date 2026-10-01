@@ -1,6 +1,5 @@
-import { Container, createPlayer, Menu } from '@videojs/react';
+import { Container, createPlayer, Menu, QualityRadioGroup } from '@videojs/react';
 import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
-import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 import { videoFeatures } from '@videojs/react/video';
 import type { ReactNode } from 'react';
 

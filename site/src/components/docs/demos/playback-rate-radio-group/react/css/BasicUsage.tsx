@@ -1,5 +1,4 @@
-import { Container, createPlayer, Menu } from '@videojs/react';
-import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';
+import { Container, createPlayer, Menu, PlaybackRateRadioGroup } from '@videojs/react';
 import { Video, videoFeatures } from '@videojs/react/video';
 import type { ReactNode } from 'react';
 

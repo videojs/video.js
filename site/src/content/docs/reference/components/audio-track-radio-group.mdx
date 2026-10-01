@@ -27,7 +27,7 @@ Creates radio items from the player audio track state and selects the enabled tr
 
 ## Import
 
-<ComponentImports component="AudioTrackRadioGroup" html={["audio-track-radio-group", "menu-radio-item", "menu-item-indicator"]} reactFrom="@videojs/react/ui/audio-track-radio-group" />
+<ComponentImports component="AudioTrackRadioGroup" html={["audio-track-radio-group", "menu-radio-item", "menu-item-indicator"]} />
 
 ## Anatomy
 
@@ -70,8 +70,6 @@ The group is available when the configured media exposes more than one audio tra
 
 <FrameworkCase frameworks={["react"]}>
 `AudioTrackRadioGroup.Root` uses <DocsLink slug="reference/api/use-audio-track-options">`useAudioTrackOptions`</DocsLink> to own selection and renders no element. Wrap the menu's `Menu.Trigger` and `Menu.Content` in it so the trigger inherits the group's disabled and hidden state and exposes `data-availability`. `AudioTrackRadioGroup.Options` renders the items: its required `renderItem` callback renders the <DocsLink slug="reference/components/menu">`Menu.RadioItem`</DocsLink> root and receives item state containing the translated `label` and current `checked` value. `AudioTrackRadioGroup.Value` displays the selected label, typically inside the trigger. `Options` and `Value` render `null` when the <DocsLink slug="reference/api/feature-audio-track">audio track feature</DocsLink> is not configured.
-
-The `AudioTrackRadioGroup` export from the `@videojs/react` root is a compatibility component that composes `Root` and `Options` behind the former single-component props. Prefer the parts for new code.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>

@@ -42,8 +42,6 @@ export interface AudioTrackRadioGroupOptionsProps extends Omit<
 
 export type AudioTrackRadioGroupValueProps = UIComponentProps<'span', AudioTrackOptionsResult>;
 
-export interface AudioTrackRadioGroupLegacyProps extends AudioTrackRadioGroupOptionsProps, AudioTrackOptionsProps {}
-
 const AudioTrackRadioGroupContext = createContext<AudioTrackOptionsResult | null | undefined>(undefined);
 
 /** Owns audio-track option state and shares it with an enclosing menu. Does not render a DOM element. */
@@ -120,17 +118,6 @@ export const AudioTrackRadioGroupOptions = forwardRef<HTMLDivElement, AudioTrack
           );
         })}
       </MenuRadioGroup>
-    );
-  }
-);
-
-/** @internal Compatibility adapter for the existing preset sources. */
-export const AudioTrackRadioGroupLegacy = forwardRef<HTMLDivElement, AudioTrackRadioGroupLegacyProps>(
-  function AudioTrackRadioGroupLegacy({ label, formatTrack, disabled, ...props }, forwardedRef) {
-    return (
-      <AudioTrackRadioGroupRoot label={label} formatTrack={formatTrack} disabled={disabled}>
-        <AudioTrackRadioGroupOptions {...props} ref={forwardedRef} />
-      </AudioTrackRadioGroupRoot>
     );
   }
 );

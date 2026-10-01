@@ -1,5 +1,4 @@
-import { Container, createPlayer, Menu } from '@videojs/react';
-import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
+import { Container, createPlayer, Menu, CaptionsRadioGroup } from '@videojs/react';
 import { Video, videoFeatures } from '@videojs/react/video';
 import type { ReactNode } from 'react';
 

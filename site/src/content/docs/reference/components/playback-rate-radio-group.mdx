@@ -27,7 +27,7 @@ Creates radio items from the player playback rate state and selects the playback
 
 ## Import
 
-<ComponentImports component="PlaybackRateRadioGroup" html={["playback-rate-radio-group", "menu-radio-item", "menu-item-indicator"]} reactFrom="@videojs/react/ui/playback-rate-radio-group" />
+<ComponentImports component="PlaybackRateRadioGroup" html={["playback-rate-radio-group", "menu-radio-item", "menu-item-indicator"]} />
 
 ## Anatomy
 
@@ -70,8 +70,6 @@ The group is available when the configured media exposes playback rates. Option 
 
 <FrameworkCase frameworks={["react"]}>
 `PlaybackRateRadioGroup.Root` uses <DocsLink slug="reference/api/use-playback-rate-options">`usePlaybackRateOptions`</DocsLink> to own selection and renders no element. Wrap the menu's `Menu.Trigger` and `Menu.Content` in it so the trigger inherits the group's disabled and hidden state and exposes `data-availability`. `PlaybackRateRadioGroup.Options` renders the items: its required `renderItem` callback renders the <DocsLink slug="reference/components/menu">`Menu.RadioItem`</DocsLink> root and receives item state containing the translated `label` and current `checked` value. `PlaybackRateRadioGroup.Value` displays the selected label, typically inside the trigger. `Options` and `Value` render `null` when the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> is not configured.
-
-The `PlaybackRateRadioGroup` export from the `@videojs/react` root is a compatibility component that composes `Root` and `Options` behind the former single-component props. Prefer the parts for new code.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>

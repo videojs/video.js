@@ -37,8 +37,6 @@ export interface QualityRadioGroupOptionsProps extends Omit<
 
 export type QualityRadioGroupValueProps = UIComponentProps<'span', QualityOptionsResult>;
 
-export interface QualityRadioGroupLegacyProps extends QualityRadioGroupOptionsProps, QualityOptionsProps {}
-
 const QualityRadioGroupContext = createContext<QualityOptionsResult | null | undefined>(undefined);
 
 /** Owns quality option state and shares it with an enclosing menu. Does not render a DOM element. */
@@ -115,17 +113,6 @@ export const QualityRadioGroupOptions = forwardRef<HTMLDivElement, QualityRadioG
           );
         })}
       </MenuRadioGroup>
-    );
-  }
-);
-
-/** @internal Compatibility adapter for the existing preset sources. */
-export const QualityRadioGroupLegacy = forwardRef<HTMLDivElement, QualityRadioGroupLegacyProps>(
-  function QualityRadioGroupLegacy({ label, formatRendition, disabled, ...props }, forwardedRef) {
-    return (
-      <QualityRadioGroupRoot label={label} formatRendition={formatRendition} disabled={disabled}>
-        <QualityRadioGroupOptions {...props} ref={forwardedRef} />
-      </QualityRadioGroupRoot>
     );
   }
 );

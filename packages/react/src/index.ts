@@ -85,14 +85,14 @@ export {
   type AudioTrackOptionsResult,
   useAudioTrackOptions,
 } from './ui/audio-track';
-export { AudioTrackRadioGroupLegacy as AudioTrackRadioGroup } from './ui/audio-track-radio-group';
+export { AudioTrackRadioGroup } from './ui/audio-track-radio-group';
 export { BufferingIndicator, type BufferingIndicatorProps } from './ui/buffering-indicator/component';
 export { CaptionsButton, type CaptionsButtonProps } from './ui/captions-button/component';
 export {
-  CaptionsRadioGroupLegacy as CaptionsRadioGroup,
   type CaptionsOption,
   type CaptionsOptionsProps,
   type CaptionsOptionsResult,
+  CaptionsRadioGroup,
   useCaptionsOptions,
 } from './ui/captions-radio-group';
 export { CastButton, type CastButtonProps } from './ui/cast-button/component';
@@ -123,7 +123,7 @@ export {
   usePlaybackRateOptions,
 } from './ui/playback-rate';
 export { PlaybackRateButton, type PlaybackRateButtonProps } from './ui/playback-rate-button/component';
-export { PlaybackRateRadioGroupLegacy as PlaybackRateRadioGroup } from './ui/playback-rate-radio-group';
+export { PlaybackRateRadioGroup } from './ui/playback-rate-radio-group';
 export { Popover, type PopoverContextValue, usePopoverContext } from './ui/popover';
 export { Poster } from './ui/poster';
 export type { PosterImageProps } from './ui/poster/image';
@@ -134,7 +134,7 @@ export {
   type QualityOptionsResult,
   useQualityOptions,
 } from './ui/quality';
-export { QualityRadioGroupLegacy as QualityRadioGroup } from './ui/quality-radio-group';
+export { QualityRadioGroup } from './ui/quality-radio-group';
 export { SeekButton, type SeekButtonProps } from './ui/seek-button/component';
 export { SeekIndicator } from './ui/seek-indicator';
 export type { SeekIndicatorRootProps } from './ui/seek-indicator/root';
