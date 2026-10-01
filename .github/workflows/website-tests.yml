@@ -84,3 +84,6 @@ jobs:
 
       - name: Check anchors
         run: pnpm -F site check:anchors
+
+      - name: Check link analytics tags
+        run: pnpm -F site check:link-analytics

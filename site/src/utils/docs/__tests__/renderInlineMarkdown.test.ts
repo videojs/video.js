@@ -74,6 +74,12 @@ describe('renderInlineMarkdown', () => {
     );
   });
 
+  it('tags Mux links with the Video.js campaign and the docs placement', () => {
+    expect(renderInlineMarkdown('[Mux Data](https://www.mux.com/data)')).toContain(
+      'href="https://www.mux.com/data?utm_source=videojs&utm_campaign=vjs10&utm_content=docs-content"'
+    );
+  });
+
   it('renders unordered lists', () => {
     const result = renderInlineMarkdown('- item one\n- item two');
 

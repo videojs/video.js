@@ -2,6 +2,7 @@ import clsx from 'clsx';
 
 import CheckCircle from '@/assets/icons/check-circle.svg?react';
 import { MUX_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 
 export type UploaderState = 'idle' | 'needs_login' | 'uploading' | 'preparing' | 'ready' | 'polling_error';
 
@@ -48,7 +49,7 @@ export default function UploaderOverlay({ state, error, playbackId, onLogin, onR
         <p className="text-p3 font-semibold">
           To upload this video to{' '}
           <a
-            href={MUX_URL}
+            href={withMuxAttribution(MUX_URL, 'mux-uploader')}
             data-ph-capture-attribute-destination="mux"
             target="_blank"
             rel="noopener"
@@ -89,7 +90,7 @@ export default function UploaderOverlay({ state, error, playbackId, onLogin, onR
         <p className="text-p3 text-center">
           See code below, or{' '}
           <a
-            href="https://dashboard.mux.com/my/video/assets"
+            href={withMuxAttribution('https://dashboard.mux.com/my/video/assets', 'mux-uploader')}
             data-ph-capture-attribute-cta="mux-dashboard"
             data-ph-capture-attribute-destination="mux"
             target="_blank"

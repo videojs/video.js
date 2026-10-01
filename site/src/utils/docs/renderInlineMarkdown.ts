@@ -2,6 +2,7 @@ import { Marked, type MarkedExtension, type Tokens } from 'marked';
 
 import { getLinkDestination } from '@/components/typography/linkDestination';
 import { shared } from '@/components/typography/styles';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import { twMerge } from '@/utils/twMerge';
 
 const classes = {
@@ -63,8 +64,10 @@ const renderer: MarkedExtension['renderer'] = {
   link({ href, tokens }) {
     const destination = getLinkDestination(href);
     const destinationAttribute = destination ? ` data-ph-capture-attribute-destination="${destination}"` : '';
+    // Inline Markdown renders reference and guide text, never blog posts.
+    const target = destination === 'mux' ? withMuxAttribution(href, 'docs-content') : href;
 
-    return `<a href="${href}" class="${classes.a}"${destinationAttribute}>${this.parser.parseInline(tokens)}</a>`;
+    return `<a href="${target}" class="${classes.a}"${destinationAttribute}>${this.parser.parseInline(tokens)}</a>`;
   },
 
   // --- Unsupported elements — downgrade or suppress ---

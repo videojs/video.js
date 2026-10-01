@@ -5,6 +5,7 @@ import GitHub from '@/assets/logos/github.svg?react';
 import LogoMonoVersion from '@/assets/logos/videojs-mono.svg?react';
 import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL, MUX_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import GetStartedLink from './NavBar/GetStartedLink';
 
 type NavLink = {
@@ -123,7 +124,7 @@ const { class: className } = Astro.props;
       <span class="hidden @5xl:inline">{" "}</span>
       <br class="@5xl:hidden" />
       Video hosting and streaming <a
-        href={MUX_URL}
+        href={withMuxAttribution(MUX_URL, 'footer-docs')}
         data-ph-capture-attribute-destination="mux"
         class="underline intent:decoration-gold"
         >sponsored by Mux.

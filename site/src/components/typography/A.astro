@@ -1,5 +1,6 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
+import { contentPlacement, withMuxAttribution } from '@/utils/mux/attribution';
 import { twMerge } from '@/utils/twMerge';
 
 import { getLinkDestination } from './linkDestination';
@@ -11,6 +12,11 @@ type Props<Tag extends HTMLTag = 'a'> = Polymorphic<{ as: Tag }> & {
 
 const { as: Tag = 'a', class: className, ...props } = Astro.props;
 const destination = Tag === 'a' ? getLinkDestination(props.href) : undefined;
+// A `mux` destination means a real Mux page URL.
+const href =
+  destination === 'mux' ? withMuxAttribution(String(props.href), contentPlacement(Astro.url.pathname)) : props.href;
 ---
 
-<Tag class={twMerge(shared.a, className)} data-ph-capture-attribute-destination={destination} {...props}><slot /></Tag>
+<Tag class={twMerge(shared.a, className)} data-ph-capture-attribute-destination={destination} {...props} href={href}
+  ><slot /></Tag
+>

@@ -3,6 +3,7 @@ import DialNav from '@/components/DialNav';
 import Footer from '@/components/Footer.astro';
 import NavBar from '@/components/NavBar/NavBar.astro';
 import { MUX_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import Base from '@/layouts/Base.astro';
 
 interface Props {
@@ -42,7 +43,7 @@ const { title, description, code = '404', message = 'NOT FOUND' } = Astro.props;
           ]}
           right={[
             {
-              href: MUX_URL,
+              href: withMuxAttribution(MUX_URL, 'error-page'),
               label: "mux.com",
               angle: 60,
               destination: "mux",

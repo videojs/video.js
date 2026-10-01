@@ -3,6 +3,7 @@ import ArrowUpRight from '@/assets/icons/arrow-up-right.svg?react';
 import Footer from '@/components/Footer.astro';
 import NavBar from '@/components/NavBar/NavBar.astro';
 import { GITHUB_REPO_URL, MUX_SUPPORT_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import Base from '@/layouts/Base.astro';
 
 const tiles = [
@@ -36,7 +37,7 @@ const tiles = [
     body: ['Provided by Mux', 'Starting at $20k/yr.'],
     cta: {
       label: 'Get in touch',
-      href: MUX_SUPPORT_URL,
+      href: withMuxAttribution(MUX_SUPPORT_URL, 'support-page'),
       id: 'sales-contact',
       destination: 'mux',
     },

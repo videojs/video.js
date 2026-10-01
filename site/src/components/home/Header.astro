@@ -2,6 +2,7 @@
 import MuxLogoSmall from '@/assets/logos/mux-small.svg?react';
 import HeroVideo from '@/components/home/HeroVideo';
 import { MUX_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 
 interface Props {
   poster: string;
@@ -49,7 +50,7 @@ const { poster } = Astro.props;
   >
     Video hosting sponsored by <a
       class="relative inline-flex w-11 items-center justify-center md:w-12.5"
-      href={MUX_URL}
+      href={withMuxAttribution(MUX_URL, 'hero')}
       data-ph-capture-attribute-destination="mux"
       target="_blank"
       rel="noopener"

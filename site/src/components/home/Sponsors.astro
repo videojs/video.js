@@ -7,6 +7,7 @@ import FastlyLogo from '@/assets/logos/fastly.svg?react';
 import MuxLogo from '@/assets/logos/mux.svg?react';
 import NetlifyLogo from '@/assets/logos/netlify.svg?react';
 import { MUX_URL } from '@/consts';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 
 type SponsorItem = {
   Logo: ComponentType<SVGProps<SVGSVGElement>>;
@@ -52,7 +53,7 @@ const sponsors: SponsorItem[] = [
     class="grid grid-cols-1 rounded-lg corner-squircle border border-faded-black p-2 text-manila-light md:grid-cols-2 md:items-center dark:border-manila-light dark:text-faded-black"
   >
     <a
-      href={MUX_URL}
+      href={withMuxAttribution(MUX_URL, 'sponsors')}
       data-ph-capture-attribute-destination="mux"
       target="_blank"
       rel="noopener"

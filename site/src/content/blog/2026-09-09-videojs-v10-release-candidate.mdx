@@ -6,6 +6,7 @@ authors: [darius-cepulis]
 
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from '@/consts';
 import GetStartedLink from '@/components/NavBar/GetStartedLink';
+import A from '@/components/typography/A.astro';
 import { shared } from '@/components/typography/styles';
 
 We're excited to announce the Release Candidate of Video.js v10. The project has come a long way since [its tech preview 10 months ago](https://www.youtube.com/watch?v=dR4Wmj_BIsQ&t=4s&pp=ygUTdmlkZW8uanMgMTAgZGVtdXhlZA%3D%3D). And now, we want you to start building with it. With your feedback, a few more docs, and maybe a last-minute fix or two, we're looking forward to shipping 10.0.0 very soon.
@@ -41,6 +42,6 @@ It's taken a while because we put in a lot of work. Dozens of releases, hundreds
 
 This is a big change. We think it's worth it. But we'd love to hear what **you** think.
 
-Video.js v10 is ready for you to migrate your projects over. And when you do, tell us how it goes. Join us on <a href={DISCORD_INVITE_URL}>Discord</a> or <a href={GITHUB_REPO_URL}>leave an issue</a>.
+Video.js v10 is ready for you to migrate your projects over. And when you do, tell us how it goes. Join us on <A href={DISCORD_INVITE_URL}>Discord</A> or <A href={GITHUB_REPO_URL}>leave an issue</A>.
 
 You (or your agent) can get started at <GetStartedLink client:idle className={shared.a}>videojs.org/docs</GetStartedLink>

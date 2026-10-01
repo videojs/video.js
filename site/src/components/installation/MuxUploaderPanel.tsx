@@ -12,6 +12,7 @@ import CloudUpload from '@/assets/icons/cloud-upload.svg?react';
 import MuxLogo from '@/assets/logos/mux-small.svg?react';
 import { MUX_URL } from '@/consts';
 import { muxPlaybackId, media, sourceUrl } from '@/stores/installation';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import { initiateAuthPopup } from '@/utils/mux/auth-flow';
 import { pollForPlaybackId } from '@/utils/mux/polling';
 
@@ -218,7 +219,7 @@ export default function MuxUploaderPanel() {
         <span className="text-p4 dark:text-muted mt-2 inline-flex items-center gap-1.5">
           Powered by{' '}
           <a
-            href={MUX_URL}
+            href={withMuxAttribution(MUX_URL, 'mux-uploader')}
             data-ph-capture-attribute-destination="mux"
             target="_blank"
             rel="noopener"
