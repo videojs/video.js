@@ -9,6 +9,8 @@ export interface InstallationRendererDefinition {
   readonly reactComponent: string;
   readonly defaultSource: string;
   readonly playsInline: boolean;
+  /** The media loads a cross-origin `<track>`, such as a Mux storyboard, which needs a CORS-enabled media element. */
+  readonly crossOrigin: boolean;
   readonly preset: boolean;
   readonly muxData: boolean;
 }
@@ -29,6 +31,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'BackgroundVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoMp4,
     playsInline: true,
+    crossOrigin: false,
     preset: true,
     muxData: false,
   },
@@ -41,6 +44,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'HlsBackgroundVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoHls,
     playsInline: true,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -53,6 +57,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'CloudflareVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.cloudflare,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -65,6 +70,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'DashVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.dash,
     playsInline: true,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -77,6 +83,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'HlsJsVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoHls,
     playsInline: true,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -89,6 +96,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'Audio',
     defaultSource: INSTALLATION_DEMO_SOURCES.audio,
     playsInline: false,
+    crossOrigin: false,
     preset: true,
     muxData: false,
   },
@@ -101,6 +109,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'Video',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoMp4,
     playsInline: true,
+    crossOrigin: false,
     preset: true,
     muxData: false,
   },
@@ -113,6 +122,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'MuxAudio',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoHls,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: true,
   },
@@ -125,6 +135,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'MuxBackgroundVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoHls,
     playsInline: true,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -137,6 +148,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'MuxVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.videoHls,
     playsInline: true,
+    crossOrigin: true,
     preset: false,
     muxData: true,
   },
@@ -149,6 +161,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'SpotifyAudio',
     defaultSource: INSTALLATION_DEMO_SOURCES.spotify,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -161,6 +174,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'TikTokVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.tiktok,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -173,6 +187,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'TwitchVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.twitch,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -185,6 +200,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'VimeoVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.vimeo,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -197,6 +213,7 @@ export const INSTALLATION_RENDERERS = {
     reactComponent: 'YouTubeVideo',
     defaultSource: INSTALLATION_DEMO_SOURCES.youtube,
     playsInline: false,
+    crossOrigin: false,
     preset: false,
     muxData: false,
   },
@@ -233,4 +250,8 @@ export function isPresetRenderer(renderer: Renderer): boolean {
 
 export function isVideoLikeRenderer(renderer: Renderer): boolean {
   return INSTALLATION_RENDERERS[renderer].playsInline;
+}
+
+export function needsCrossOrigin(renderer: Renderer): boolean {
+  return INSTALLATION_RENDERERS[renderer].crossOrigin;
 }

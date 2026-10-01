@@ -265,6 +265,22 @@ describe('generateHTMLUsageCode', () => {
     expect(result.imports).toContain("import '@videojs/html/media/mux-video'");
   });
 
+  it('enables CORS on Mux video so its storyboard track loads', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, media: 'mux-video' });
+
+    expect(result.html).toMatch(/<mux-video src="[^"]+" crossorigin="anonymous" playsinline><\/mux-video>/);
+  });
+
+  it('omits crossorigin for media without a cross-origin track', () => {
+    for (const media of ['html5-video', 'hls', 'mux-background-video'] as const) {
+      expect(generateHTMLUsageCode({ ...baseHTML, media }).html).not.toContain('crossorigin');
+    }
+
+    expect(generateHTMLUsageCode({ ...baseHTML, useCase: 'default-audio', media: 'mux-audio' }).html).not.toContain(
+      'crossorigin'
+    );
+  });
+
   it('adds the Mux Data component and import alongside Mux video by default', () => {
     const result = generateHTMLUsageCode({ ...baseHTML, media: 'mux-video' });
 
@@ -520,6 +536,16 @@ video-skin {
     expect(usage['App.svelte']).toContain('<a href="https://videojs.org/help">Video player not working?</a></video>');
   });
 
+  it('enables CORS on Mux video in Vue, Svelte, and Astro usage', () => {
+    const muxOptions = { ...baseHTML, media: 'mux-video' as const };
+    const vue = generateVueUsageCode(muxOptions);
+    const svelte = generateSvelteUsageCode(muxOptions);
+
+    for (const usage of [vue['App.vue'], vue['index.astro'], svelte['App.svelte'], svelte['+page.svelte']]) {
+      expect(usage).toContain('crossorigin="anonymous" playsinline></mux-video>');
+    }
+  });
+
   it('emits custom Svelte sources as JavaScript string expressions', () => {
     const sourceUrl = 'https://example.com/video.mp4?label={quoted}&path=\\media';
     const usage = generateSvelteUsageCode({ ...hlsOptions, sourceUrl });
@@ -595,6 +621,13 @@ describe('generateReactCreateCode', () => {
     expect(code).toContain("import { MuxVideo } from '@videojs/react/media/mux-video'");
     expect(code).toContain('<MuxVideo src={"');
     expect(code).toContain('playsInline />');
+  });
+
+  it('enables CORS on Mux video so its storyboard track loads', () => {
+    const code = generateReactCreateCode({ ...baseReact, media: 'mux-video' })['app/page.tsx'];
+
+    expect(code).toMatch(/<MuxVideo src=\{"[^"]+"\} crossOrigin="anonymous" playsInline \/>/);
+    expect(generateReactCreateCode({ ...baseReact, media: 'hls' })['app/page.tsx']).not.toContain('crossOrigin');
   });
 
   it('renders and imports the Mux Data component alongside Mux video by default', () => {
@@ -839,6 +872,14 @@ describe('source installation code', () => {
 
     expect(packaged).toContain(`src={${JSON.stringify(sourceUrl)}}`);
     expect(source).toContain(`src={${JSON.stringify(sourceUrl)}}`);
+  });
+
+  it('enables CORS on Mux video in source installation code', () => {
+    const react = generateSourceReactCreateCode({ ...baseReact, media: 'mux-video' })['app/page.tsx'];
+    const html = generateSourceHTMLUsageCode({ ...baseHTML, media: 'mux-video' });
+
+    expect(react).toContain('crossOrigin="anonymous" playsInline />');
+    expect(html.media).toContain('crossorigin="anonymous" playsinline></mux-video>');
   });
 
   it('keeps the local component name stable when the Neutral catalog is selected', () => {
