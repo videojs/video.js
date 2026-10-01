@@ -28,11 +28,10 @@ interface Props<BodyProps extends object> {
   bodyProps: BodyProps;
   /** Keep the content mounted while the dialog is closed, so work such as an upload keeps going. */
   keepMounted?: boolean;
-  /** Open the dialog from elsewhere, such as a menu item or a link that offers an upload. */
+  /** Open the dialog from elsewhere, such as a menu item. */
   actionsRef?: Ref<PromptDialogActions>;
   /** Render the form control that opens the dialog; without it, only `actionsRef` does. */
   showTrigger?: boolean;
-  onOpenChange?: (open: boolean) => void;
   /** Where focus goes on closing, when something other than the trigger opened the dialog. */
   finalFocus?: RefObject<HTMLElement | null> | undefined;
 }
@@ -61,10 +60,9 @@ export default function PromptDialog<BodyProps extends object>({
   keepMounted = false,
   actionsRef,
   showTrigger = true,
-  onOpenChange,
   finalFocus,
 }: Props<BodyProps>) {
-  const [open, setOpenState] = useState(false);
+  const [open, setOpen] = useState(false);
   const [Body, setBody] = useState<ComponentType<BodyProps> | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const loading = useRef<Promise<void> | null>(null);
@@ -90,11 +88,6 @@ export default function PromptDialog<BodyProps extends object>({
 
   function preload() {
     load().catch(() => {});
-  }
-
-  function setOpen(next: boolean) {
-    setOpenState(next);
-    onOpenChange?.(next);
   }
 
   function show(focus?: string) {

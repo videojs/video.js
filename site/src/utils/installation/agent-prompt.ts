@@ -514,20 +514,20 @@ export function agentPromptAnalytics({ useCase, skin, media, extensions }: Insta
   return extensions.includes('mux-data');
 }
 
-/** Media hosted on another platform, which a Mux upload would not replace. */
+/** Media hosted on another platform, whose hosting the reader already chose. */
 const HOSTED_ELSEWHERE: readonly Renderer[] = ['youtube', 'vimeo', 'twitch', 'tiktok', 'cloudflare', 'spotify'];
 
 /**
- * Why Mux would help the picks, if it would: a live preset needs an ingest point, a quality menu an adaptive stream
- * rather than a file, and thumbnail previews a storyboard, which only Mux media provides automatically. Nothing for
- * media already on Mux or hosted on another platform.
+ * Why the picks need video hosting, if they do: a live preset needs an ingest point, a quality menu an adaptive stream
+ * rather than a file, and thumbnail previews a storyboard, which only Mux media provides on its own. Nothing for media
+ * hosted on a platform, or on Mux with the reader's own URL.
  */
-export type AgentPromptMuxHint = 'live' | 'quality' | 'thumbnails';
+export type AgentPromptHostingHint = 'live' | 'quality' | 'thumbnails';
 
-export function agentPromptMuxHint(
+export function agentPromptHostingHint(
   selection: InstallationSelection,
   features: readonly InstallationFeature[]
-): AgentPromptMuxHint | null {
+): AgentPromptHostingHint | null {
   const { media, sourceUrl, useCase } = selection;
   if (HOSTED_ELSEWHERE.includes(media) || (isMuxRenderer(media) && sourceUrl)) return null;
 

@@ -20,6 +20,7 @@ import {
   skillAgent,
 } from '@/stores/agentPrompt';
 import { updateInstallationSelection } from '@/stores/installation';
+import { resolveDocsHref } from '@/utils/docs/routing';
 import {
   AGENT_PROMPT_REQUEST_EXAMPLES,
   AGENT_PROMPT_STEP_SEPARATOR,
@@ -30,7 +31,7 @@ import {
   agentPromptExampleSummary,
   agentPromptMarkdown,
   agentPromptMediaChoices,
-  agentPromptMuxHint,
+  agentPromptHostingHint,
   agentPromptPlayerPicks,
   agentPromptPlayerPicksEqual,
   agentPromptSelection,
@@ -43,6 +44,7 @@ import {
   type AgentPromptRequestExample,
 } from '@/utils/installation/agent-prompt';
 import type { InstallationRouteSegment } from '@/utils/installation/routes';
+import { withMuxAttribution } from '@/utils/mux/attribution';
 import { useHydratedStore } from '@/utils/useHydratedStore';
 
 import PromptActions from './PromptActions';
@@ -68,13 +70,13 @@ function copyPromptSelection(event: ClipboardEvent<HTMLElement>): void {
 // A URL ends before closing punctuation, so a sentence's period or a parenthesis around the link stays outside it.
 const URL_PATTERN = /(https:\/\/[^\s()]*[^\s().,;:!?])/;
 
-/** Prose text with its URLs as links. */
+/** Prose text with its URLs as links. A link to Mux carries the prompt's attribution; the copied text stays as written. */
 function Linked({ text }: { text: string }) {
   return text.split(URL_PATTERN).map((piece, index) =>
     index % 2 === 1 ? (
       <a
         key={index}
-        href={piece}
+        href={withMuxAttribution(piece, 'agent-prompt')}
         className="decoration-manila-light/40 intent:decoration-gold wrap-anywhere underline underline-offset-2"
       >
         {piece}
@@ -257,7 +259,8 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
             ),
           })
         }
-        muxHint={agentPromptMuxHint(selection, features)}
+        hostingHint={agentPromptHostingHint(selection, features)}
+        hostingHref={resolveDocsHref({ slug: 'guides/video-hosting', framework: sourceFrameworkFor(target.framework) })}
       />
       {/* The prompt is dark in both color schemes, so it takes the dark theme tokens. */}
       <div className="dark bg-soot text-manila-light relative">

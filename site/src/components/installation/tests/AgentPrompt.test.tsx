@@ -442,21 +442,19 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument();
   });
 
-  it('says a quality menu needs an adaptive stream when the media is a file, offering a Mux upload', async () => {
-    const user = userEvent.setup();
-
+  it('says a quality menu needs an adaptive stream when the media is a file, pointing at video hosting', () => {
     render(<AgentPrompt route="react" framework="react" />);
 
-    // Nothing to say about Mux until a pick needs it.
-    expect(screen.queryByRole('button', { name: 'Upload to Mux' })).not.toBeInTheDocument();
+    // Nothing to say about hosting until a pick needs it.
+    expect(screen.queryByRole('link', { name: 'Choose video hosting' })).not.toBeInTheDocument();
 
     act(() => promptFeatures.set(['quality']));
 
     expect(screen.getByText('Quality menus need an adaptive stream.', { exact: false })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Upload to Mux' }));
-
-    expect(await screen.findByText('Mux upload', {}, RENDER_WAIT)).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Choose video hosting' })).toHaveAttribute(
+      'href',
+      '/docs/framework/react/guides/video-hosting'
+    );
   });
 
   it('turns viewer analytics on and off for Mux media', async () => {

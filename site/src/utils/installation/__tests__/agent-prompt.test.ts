@@ -12,7 +12,7 @@ import {
   agentPromptLeftOut,
   agentPromptMarkdown,
   agentPromptMediaChoices,
-  agentPromptMuxHint,
+  agentPromptHostingHint,
   agentPromptPlayerPicksEqual,
   agentPromptOpenUrl,
   agentPromptSelection,
@@ -402,24 +402,26 @@ describe('agentPromptExampleFits', () => {
   });
 });
 
-describe('agentPromptMuxHint', () => {
+describe('agentPromptHostingHint', () => {
   const select = (overrides: Partial<InstallationUiSelection>) =>
     agentPromptSelection({ method: 'packaged', framework: 'react' }, picks(overrides));
 
   it('says why Mux would help: an ingest point, an adaptive stream, or a storyboard', () => {
-    expect(agentPromptMuxHint(select({ useCase: 'live-video', media: 'hls' }), [])).toBe('live');
-    expect(agentPromptMuxHint(select({}), ['quality'])).toBe('quality');
-    expect(agentPromptMuxHint(select({ media: 'hls' }), ['thumbnails'])).toBe('thumbnails');
+    expect(agentPromptHostingHint(select({ useCase: 'live-video', media: 'hls' }), [])).toBe('live');
+    expect(agentPromptHostingHint(select({}), ['quality'])).toBe('quality');
+    expect(agentPromptHostingHint(select({ media: 'hls' }), ['thumbnails'])).toBe('thumbnails');
   });
 
   it('says nothing when no pick needs Mux, or once the media is on Mux or another platform', () => {
-    expect(agentPromptMuxHint(select({}), [])).toBeNull();
+    expect(agentPromptHostingHint(select({}), [])).toBeNull();
     // A quality menu works with the demo HLS stream.
-    expect(agentPromptMuxHint(select({ media: 'hls' }), ['quality'])).toBeNull();
+    expect(agentPromptHostingHint(select({ media: 'hls' }), ['quality'])).toBeNull();
     expect(
-      agentPromptMuxHint(select({ media: 'mux-video', sourceUrl: 'https://stream.mux.com/abc.m3u8' }), ['thumbnails'])
+      agentPromptHostingHint(select({ media: 'mux-video', sourceUrl: 'https://stream.mux.com/abc.m3u8' }), [
+        'thumbnails',
+      ])
     ).toBeNull();
-    expect(agentPromptMuxHint(select({ media: 'youtube' }), ['quality'])).toBeNull();
+    expect(agentPromptHostingHint(select({ media: 'youtube' }), ['quality'])).toBeNull();
   });
 });
 

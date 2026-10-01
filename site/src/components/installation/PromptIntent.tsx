@@ -35,14 +35,14 @@ import {
   agentPromptGoalLabel,
   AGENT_PROMPT_REQUEST_MAX_LENGTH,
   type AgentPromptGoal,
-  type AgentPromptMuxHint,
+  type AgentPromptHostingHint,
   type AgentPromptRequestExample,
   type AgentPromptRequestExampleGroup,
 } from '@/utils/installation/agent-prompt';
 import { twMerge } from '@/utils/twMerge';
 
 import PromptDialog, { type PromptDialogActions } from './PromptDialog';
-import PromptMuxHint from './PromptMuxHint';
+import PromptHostingHint from './PromptHostingHint';
 import {
   ANY_AGENT,
   INLINE_BUTTON_CLASS,
@@ -142,8 +142,9 @@ interface Props {
   /** Whether Mux Data measures viewers, or `null` for media it cannot. */
   analytics: boolean | null;
   onAnalyticsChange: (analytics: boolean) => void;
-  /** Why Mux would help the picks, if it would. */
-  muxHint: AgentPromptMuxHint | null;
+  /** Why the picks need video hosting, if they do, and the guide to it. */
+  hostingHint: AgentPromptHostingHint | null;
+  hostingHref: string;
 }
 
 /**
@@ -176,7 +177,8 @@ export default function PromptIntent({
   onFeaturesChange,
   analytics,
   onAnalyticsChange,
-  muxHint,
+  hostingHint,
+  hostingHref,
 }: Props) {
   const requestId = useId();
   const chosen = availableFeatures.filter((feature) => features.includes(feature));
@@ -198,11 +200,9 @@ export default function PromptIntent({
   // empty one would do for nothing.
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
-  // The media menu opens the URL and upload dialog, and so does the Mux line, which then gets focus back.
+  // The media menu opens the URL and upload dialog, which returns focus to the menu's trigger.
   const mediaDialog = useRef<PromptDialogActions>(null);
   const mediaTriggerRef = useRef<HTMLButtonElement>(null);
-  const [mediaOpenedFromHint, setMediaOpenedFromHint] = useState(false);
-  const uploadRef = useRef<HTMLButtonElement>(null);
   // A migration keeps the existing player's media and skin until the reader picks others.
   const shownMedia =
     migrating && !sourceUrl && media === supportedRenderers[0] ? 'Existing media' : mediaLabel(media, sourceUrl);
@@ -298,16 +298,7 @@ export default function PromptIntent({
             )}
           </p>
         )}
-        {muxHint && (
-          <PromptMuxHint
-            hint={muxHint}
-            uploadRef={uploadRef}
-            onUpload={() => {
-              setMediaOpenedFromHint(true);
-              mediaDialog.current?.open(UPLOAD_FOCUS);
-            }}
-          />
-        )}
+        {hostingHint && <PromptHostingHint hint={hostingHint} href={hostingHref} />}
         <span aria-live="polite" className="sr-only">
           {pickedExample ? `Set up for ${pickedExample.label}: ${pickedExample.summary}.` : ''}
         </span>
@@ -465,10 +456,7 @@ export default function PromptIntent({
                 bodyProps={{ supportedRenderers }}
                 keepMounted
                 actionsRef={mediaDialog}
-                onOpenChange={(open) => {
-                  if (!open) setMediaOpenedFromHint(false);
-                }}
-                finalFocus={mediaOpenedFromHint ? uploadRef : mediaTriggerRef}
+                finalFocus={mediaTriggerRef}
               />
             </Field>
             {skin && (

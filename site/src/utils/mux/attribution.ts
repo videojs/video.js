@@ -13,6 +13,7 @@ export type MuxPlacement =
   | 'footer-docs'
   | 'sponsors'
   | 'mux-uploader'
+  | 'agent-prompt'
   | 'error-page'
   | 'support-page'
   | 'docs-content'
