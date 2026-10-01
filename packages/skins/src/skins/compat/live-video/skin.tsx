@@ -42,5 +42,5 @@ export function LiveVideoSkin({ children, className, renderPoster, ...props }: L
 
 export const meta = {
   title: 'Compat Live Video Skin',
-  description: 'A live video skin designed for broader browser compatibility.',
+  description: 'A plain, unbranded live video skin with live-edge, captions, remote playback, and feedback controls.',
 } as const satisfies SkinDescription;
