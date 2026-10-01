@@ -66,8 +66,16 @@ function chineseFallback(segments: string[]): Locale | undefined {
   return script === 'hant' ? 'zh-tw' : script === 'hans' ? 'zh-cn' : undefined;
 }
 
-/** Registry map key: normalized tag with unicode extensions removed (same base as {@link findLocaleKeys}). */
-export function getCanonicalLocaleKey(locale: Locale): Locale {
+/**
+ * Normalize a BCP 47 tag to the key the registry stores it under: lowercase, with Unicode extensions removed.
+ *
+ * @example
+ *   `en-US-u-nu-latn` → `en-us`
+ *
+ * @param locale - BCP 47 tag to normalize.
+ * @public
+ */
+export function getLocaleKey(locale: Locale): Locale {
   return stripUnicodeExtensions(normalizeLocaleTag(locale));
 }
 
@@ -76,9 +84,12 @@ export function getCanonicalLocaleKey(locale: Locale): Locale {
  *
  * @example
  *   `es-419-u-nu-latn` → `['es-419', 'es', 'en']`
+ *
+ * @param locale - BCP 47 tag to resolve.
+ * @public
  */
 export function findLocaleKeys(locale: Locale): Locale[] {
-  const base = getCanonicalLocaleKey(locale);
+  const base = getLocaleKey(locale);
   if (!base) return [DEFAULT_LOCALE];
 
   const segments = base.split('-').filter(Boolean);
@@ -137,7 +148,7 @@ function mergeI18nTranslations(chain: Locale[]): FlatTranslations {
  */
 export function registerI18n(locale: Locale, translations: Partial<Translations>): void {
   const { layers } = getRegistry();
-  const tag = getCanonicalLocaleKey(locale);
+  const tag = getLocaleKey(locale);
   const existing = layers.get(tag) ?? {};
 
   layers.set(tag, { ...existing, ...flattenTranslations(translations) });
@@ -177,10 +188,14 @@ export function onI18nRegistryChange(callback: () => void): () => void {
  * @public
  */
 export function hasRegisteredLocale(locale: Locale): boolean {
-  return getRegistry().layers.has(getCanonicalLocaleKey(locale));
+  return getRegistry().layers.has(getLocaleKey(locale));
 }
 
-/** Clears registered locale overlays (test isolation). */
+/**
+ * Clears registered locale overlays (test isolation).
+ *
+ * @internal
+ */
 export function resetI18nRegistry(): void {
   const { layers, subscribers } = getRegistry();
 

@@ -46,7 +46,11 @@ export interface SpotifySourceEngineConfig {
   spotify?: SpotifyEngineConfig | undefined;
 }
 
-/** Build the iframe `src` URL for an initial Spotify embed from the given props. */
+/**
+ * Build the iframe `src` URL for an initial Spotify embed from the given props.
+ *
+ * @internal
+ */
 export function buildSpotifyIframeSrc(src: string, props: Partial<SpotifyAdapterProps> = {}) {
   const parsed = parseSpotifySource(src);
   if (!parsed) return '';

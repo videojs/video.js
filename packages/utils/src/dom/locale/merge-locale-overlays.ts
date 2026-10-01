@@ -1,6 +1,8 @@
 /**
  * Loads overlay layers for each resolved locale key, least-specific first, then merges most-specific-last (same
  * semantics as the core i18n registry).
+ *
+ * @internal
  */
 export async function mergeLocaleOverlays<Overlay extends object>(
   locale: string,

@@ -8,6 +8,8 @@ import { supportsIdleCallback } from './supports';
  *   const cancel = idleCallback(doWork, { timeout: 1000 });
  *   cancel(); // Cancel if needed
  *   ```;
+ *
+ * @internal
  */
 export function idleCallback(callback: IdleRequestCallback, options?: IdleRequestOptions): () => void {
   if (supportsIdleCallback()) {

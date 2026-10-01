@@ -46,6 +46,7 @@ export interface SliderSegmentState extends Omit<SliderSegmentGeometry, 'last'> 
   interactive: boolean;
 }
 
+/** @internal */
 export interface SliderSegmentsGeometryInput {
   ranges: readonly SliderSegmentRange[];
   min: number;
@@ -53,7 +54,11 @@ export interface SliderSegmentsGeometryInput {
   orientation: SliderState['orientation'];
 }
 
-/** Localizes ordered numeric ranges into slider geometry and interaction state. */
+/**
+ * Localizes ordered numeric ranges into slider geometry and interaction state.
+ *
+ * @internal
+ */
 export class SliderSegmentsCore {
   getGeometry(input: SliderSegmentsGeometryInput): SliderSegmentGeometry[] {
     const { ranges, min, max, orientation } = input;
@@ -108,6 +113,7 @@ export class SliderSegmentsCore {
   }
 }
 
+/** @internal */
 export namespace SliderSegmentsCore {
   export type Range = SliderSegmentRange;
   export type Geometry = SliderSegmentGeometry;

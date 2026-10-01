@@ -2,6 +2,8 @@
  * Extract a Wistia hashed id from a raw ten-character id or any recognized URL: media pages
  * (`<account>.wistia.com/medias/<id>`), embed URLs (`fast.wistia.net/embed/iframe/<id>` and the `medias/<id>.jsonp` and
  * `playlists/<id>` paths), the `wi.st` short host, and the `wvideo=<id>` parameter Wistia links carry.
+ *
+ * @internal
  */
 export function parseWistiaMediaId(src: string): string | null {
   if (!src) return null;
@@ -14,6 +16,8 @@ export function parseWistiaMediaId(src: string): string | null {
 /**
  * Parse the `wtime` parameter of a Wistia URL into seconds. Wistia spells timestamps the way it spells them elsewhere:
  * `90`, `90s`, `1m30s`, `1h2m3s`.
+ *
+ * @internal
  */
 export function parseWistiaStartTime(src: string): number | null {
   const value = /[?&]wtime=([\dhms]+)/i.exec(src)?.[1]?.toLowerCase();

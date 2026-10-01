@@ -16,6 +16,7 @@ import { useDestroy } from './use-destroy';
  *
  * @param MediaClass - Media class to instantiate and attach to the current player.
  * @param setup - Optional callback run once before the instance is attached.
+ * @internal
  */
 export function useMediaInstance<Instance extends Media & { destroy(): void }>(
   MediaClass: new () => Instance,

@@ -29,6 +29,8 @@ function setRef<T>(ref: OptionalRef<T>, value: T): (() => void) | void | undefin
  *   const composedRef = composeRefs(ref1, ref2, ref3);
  *   return <div ref={composedRef} />;
  *   ```;
+ *
+ * @internal
  */
 export function composeRefs<T>(...refs: (OptionalRef<T> | OptionalRef<T>[])[]): RefCallback<T> {
   const flatRefs = refs.flat();

@@ -1,9 +1,11 @@
 import type { MediaControlsState } from '@videojs/media';
 
+/** @internal */
 export interface ContainerState {
   controlsVisible: boolean;
 }
 
+/** @internal */
 export class ContainerCore {
   #media: MediaControlsState | null = null;
 
@@ -18,6 +20,7 @@ export class ContainerCore {
   }
 }
 
+/** @internal */
 export namespace ContainerCore {
   export type State = ContainerState;
 }

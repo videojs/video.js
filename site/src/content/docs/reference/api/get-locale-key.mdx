@@ -1,0 +1,48 @@
+---
+title: getLocaleKey
+description: Normalize a locale tag to the key the i18n registry stores it under
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { getLocaleKey } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { getLocaleKey } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`getLocaleKey` lowercases a BCP 47 tag, replaces underscores with hyphens, and removes Unicode extensions such as `-u-nu-latn`. The registry stores <DocsLink slug="reference/api/register-i18n">`registerI18n`</DocsLink> layers under this key, so use it to compare a tag with one you have registered or to key your own per-locale data the same way.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { getLocaleKey } from '@videojs/html/i18n';
+
+getLocaleKey('en_US-u-nu-latn'); // 'en-us'
+getLocaleKey('zh-Hant'); // 'zh-hant'
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { getLocaleKey } from '@videojs/react/i18n';
+
+getLocaleKey('en_US-u-nu-latn'); // 'en-us'
+getLocaleKey('zh-Hant'); // 'zh-hant'
+```
+
+</FrameworkCase>
+
+<UtilReference util="getLocaleKey" />

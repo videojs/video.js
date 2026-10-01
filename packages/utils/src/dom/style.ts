@@ -1,17 +1,20 @@
 import { kebabCase } from '../string/casing';
 
+/** @internal */
 export interface InlineStyleSnapshotEntry {
   property: string;
   value: string;
   priority: string;
 }
 
+/** @internal */
 export type InlineStyleSnapshot = readonly InlineStyleSnapshotEntry[];
 
 function normalizeStyleProperty(property: string): string {
   return property.startsWith('--') ? property : kebabCase(property);
 }
 
+/** @internal */
 export function getAnchorNames(element: HTMLElement): string[] {
   const value = element.style.getPropertyValue('anchor-name').trim();
   if (!value || value === 'none') return [];
@@ -22,6 +25,7 @@ export function getAnchorNames(element: HTMLElement): string[] {
     .filter(Boolean);
 }
 
+/** @internal */
 export function addAnchorName(element: HTMLElement, name: string): () => void {
   const anchor = `--${name}`;
   const anchors = getAnchorNames(element);
@@ -44,6 +48,7 @@ export function addAnchorName(element: HTMLElement, name: string): () => void {
   };
 }
 
+/** @internal */
 export function applyStyles(element: HTMLElement, styles: Record<string, string | undefined>): void {
   for (const [prop, value] of Object.entries(styles)) {
     if (typeof value === 'string') {
@@ -52,7 +57,11 @@ export function applyStyles(element: HTMLElement, styles: Record<string, string 
   }
 }
 
-/** Capture authored inline values and priorities for the selected properties. */
+/**
+ * Capture authored inline values and priorities for the selected properties.
+ *
+ * @internal
+ */
 export function snapshotInlineStyles(element: HTMLElement, properties: Iterable<string>): InlineStyleSnapshot {
   return [...properties].map((property) => {
     const normalizedProperty = normalizeStyleProperty(property);
@@ -65,7 +74,11 @@ export function snapshotInlineStyles(element: HTMLElement, properties: Iterable<
   });
 }
 
-/** Restore a snapshot created by `snapshotInlineStyles`. */
+/**
+ * Restore a snapshot created by `snapshotInlineStyles`.
+ *
+ * @internal
+ */
 export function restoreInlineStyles(element: HTMLElement, snapshot: InlineStyleSnapshot): void {
   for (const { property, value, priority } of snapshot) {
     if (value) {
@@ -76,7 +89,11 @@ export function restoreInlineStyles(element: HTMLElement, snapshot: InlineStyleS
   }
 }
 
-/** Apply inline styles for a synchronous callback and restore authored styles afterward. */
+/**
+ * Apply inline styles for a synchronous callback and restore authored styles afterward.
+ *
+ * @internal
+ */
 export function withInlineStyles<Result>(
   element: HTMLElement,
   styles: Readonly<Record<string, string | undefined>>,
@@ -92,11 +109,16 @@ export function withInlineStyles<Result>(
   }
 }
 
+/** @internal */
 export interface ReadCSSLengthOptions {
   source?: 'inline' | 'computed' | 'inline-or-computed' | undefined;
 }
 
-/** Read and resolve a CSS property as a pixel length. */
+/**
+ * Read and resolve a CSS property as a pixel length.
+ *
+ * @internal
+ */
 export function readCSSLength(
   element: Element,
   property: string,
@@ -111,6 +133,7 @@ export function readCSSLength(
   return value.trim() ? resolveCSSLength(element, value) : null;
 }
 
+/** @internal */
 export function resolveCSSLength(el: Element, value: string): number {
   const trimmed = value.trim();
   if (!trimmed) return 0;

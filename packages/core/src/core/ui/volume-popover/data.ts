@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { VolumePopoverState } from './core';
 
+/** @internal */
 export const VolumePopoverDataAttrs = {
   /** Present when the popover is open. */
   open: 'data-open',

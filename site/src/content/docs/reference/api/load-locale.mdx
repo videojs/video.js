@@ -1,0 +1,52 @@
+---
+title: loadLocale
+description: Lazy-load the built-in translation pack for a locale
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { loadLocale } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { loadLocale } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`loadLocale` imports the built-in pack for a tag, or for the closest tag in its <DocsLink slug="reference/api/find-locale-keys">`findLocaleKeys`</DocsLink> chain, and resolves to its flat translations. It resolves to `undefined` when that chain reaches a locale registered with <DocsLink slug="reference/api/register-i18n">`registerI18n`</DocsLink> first, or when no built-in pack matches. Providers call it for you; use it to translate UI outside a provider without bundling every pack.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, loadLocale } from '@videojs/html/i18n';
+
+const pack = await loadLocale('fr-CA');
+const t = createTranslator({ ...pack, ...getI18nTranslations('fr-CA') }, 'fr-CA');
+
+t('buttons.play'); // 'Lecture'
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, loadLocale } from '@videojs/react/i18n';
+
+const pack = await loadLocale('fr-CA');
+const t = createTranslator({ ...pack, ...getI18nTranslations('fr-CA') }, 'fr-CA');
+
+t('buttons.play'); // 'Lecture'
+```
+
+</FrameworkCase>
+
+<UtilReference util="loadLocale" />

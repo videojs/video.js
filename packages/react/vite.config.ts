@@ -1,3 +1,7 @@
+import { globSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
@@ -8,6 +12,7 @@ import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '..
 import { LOCALES, localeAliases } from '../core/src/core/i18n/locales.ts';
 import packageJson from './package.json' with { type: 'json' };
 
+const packageDir = dirname(fileURLToPath(import.meta.url));
 const srcDir = new URL('./src', import.meta.url).pathname;
 const srcAlias = { '@': srcDir };
 const localeTags = [...LOCALES, ...localeAliases(LOCALES)];
@@ -21,12 +26,16 @@ const i18nLocaleEntries = Object.fromEntries([
   ...localeTags.map((tag) => [`i18n/locales/${tag}/register`, `src/i18n/locales/${tag}/register.ts`]),
 ]);
 
+const i18nTextEntries = Object.fromEntries(
+  globSync('src/i18n/text/*.ts', { cwd: packageDir }).map((file) => [file.replace('src/', '').replace('.ts', ''), file])
+);
+
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'browser'),
   // Flavor modules sit beside their element's index rather than under one, so
   // they need their own entries to stay separate chunks: importing one flavor
   // must never pull the other engine in with it.
-  entry: ['src/**/index.{ts,tsx}', 'src/media/*/{hls-js,spf}.tsx', i18nLocaleEntries],
+  entry: ['src/**/index.{ts,tsx}', 'src/media/*/{hls-js,spf}.tsx', i18nLocaleEntries, i18nTextEntries],
   alias: srcAlias,
   // Pack does not yet preserve exact public CSS entry filenames, so retain the
   // focused source-to-dist copy until its CSS entry support can replace it.

@@ -3,6 +3,7 @@ import type { NonNullableObject } from '@videojs/utils/types';
 import type { TransitionFlags, TransitionState, TransitionStatus } from '../transition';
 import { getTransitionFlags } from '../transition';
 
+/** @internal */
 export type DialogRole = 'dialog' | 'alertdialog';
 
 export interface DialogProps {
@@ -14,6 +15,7 @@ export interface DialogProps {
   closeOnEscape?: boolean | undefined;
 }
 
+/** @internal */
 export interface DialogInput extends TransitionState {}
 
 export interface DialogState extends TransitionFlags {
@@ -27,6 +29,7 @@ export interface DialogState extends TransitionFlags {
   descriptionId: string | undefined;
 }
 
+/** @internal */
 export class DialogCore {
   static readonly defaultProps: NonNullableObject<DialogProps> = {
     open: false,
@@ -93,6 +96,7 @@ export class DialogCore {
   }
 }
 
+/** @internal */
 export namespace DialogCore {
   export type Props = DialogProps;
   export type State = DialogState;

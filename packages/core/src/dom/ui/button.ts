@@ -2,11 +2,13 @@ import type { UIEvent, UIKeyboardEvent } from './event';
 
 export type ButtonActivationSource = 'pointer' | 'keyboard' | 'virtual';
 
+/** @internal */
 export interface ButtonOptions {
   onActivate: (event: UIEvent, source: ButtonActivationSource) => void;
   isDisabled: () => boolean;
 }
 
+/** @internal */
 export interface ButtonProps {
   role: 'button';
   tabIndex: 0;
@@ -17,6 +19,7 @@ export interface ButtonProps {
   onKeyUp: (event: UIKeyboardEvent) => void;
 }
 
+/** @internal */
 export function createButton(options: ButtonOptions): ButtonProps {
   const { onActivate, isDisabled } = options;
 

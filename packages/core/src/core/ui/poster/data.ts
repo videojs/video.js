@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { PosterState } from './core';
 
+/** @internal */
 export const PosterDataAttrs = {
   /** Present until playback starts. */
   visible: 'data-visible',

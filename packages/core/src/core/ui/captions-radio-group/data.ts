@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { CaptionsRadioGroupState } from './core';
 
+/** @internal */
 export const CaptionsRadioGroupDataAttrs = {
   /** Present when captions are enabled. */
   subtitlesShowing: 'data-active',

@@ -28,7 +28,11 @@ export interface StatusDetails<Status extends IndicatorStatus = BuiltInIndicator
   value: string | null;
 }
 
-/** Derives the predicted visual status from an input action and its pre-action media snapshot. */
+/**
+ * Derives the predicted visual status from an input action and its pre-action media snapshot.
+ *
+ * @internal
+ */
 export function deriveStatus(
   event: InputActionEvent,
   snapshot: MediaSnapshot,
@@ -81,7 +85,11 @@ export function deriveStatus(
   }
 }
 
-/** Returns the volume percentage when present, then the translated status label. */
+/**
+ * Returns the volume percentage when present, then the translated status label.
+ *
+ * @internal
+ */
 export function getStatusIndicatorDisplayValue(state: { value: string | null; label: string | null }): string {
   return state.value ?? state.label ?? '';
 }

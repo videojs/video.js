@@ -1,5 +1,6 @@
 import { resolveEventTarget } from './event';
 
+/** @internal */
 export const INTERACTIVE_SELECTOR = [
   'button',
   'input',
@@ -17,6 +18,7 @@ export const INTERACTIVE_SELECTOR = [
 
 const EDITABLE_INPUT_TYPES = ['text', 'search', 'url', 'tel', 'email', 'password', 'number'];
 
+/** @internal */
 export const EDITABLE_SELECTOR = [
   'textarea',
   'select',
@@ -25,18 +27,27 @@ export const EDITABLE_SELECTOR = [
   '[contenteditable]:not([contenteditable="false"])',
 ].join(',');
 
+/** @internal */
 export function isEditableElement(el: Element): boolean {
   return el.matches(EDITABLE_SELECTOR);
 }
 
-/** Whether the keyboard event target is an editable element (input, textarea, etc). */
+/**
+ * Whether the keyboard event target is an editable element (input, textarea, etc).
+ *
+ * @internal
+ */
 export function isEditableTarget(event: KeyboardEvent): boolean {
   const target = resolveEventTarget(event);
 
   return target instanceof Element && isEditableElement(target);
 }
 
-/** Whether the event originated from an interactive control (button, slider, etc). */
+/**
+ * Whether the event originated from an interactive control (button, slider, etc).
+ *
+ * @internal
+ */
 export function isInteractiveTarget(event: Event): boolean {
   const target = resolveEventTarget(event);
   if (!(target instanceof Element)) return false;
@@ -52,7 +63,11 @@ const ACTIVATION_KEYS = new Set([' ', 'Enter']);
  */
 const ACTIVATABLE_SELECTOR = 'button,a[href],[role="slider"],[role="button"]';
 
-/** Whether the event is an activation key on an activatable element (button, link, slider). */
+/**
+ * Whether the event is an activation key on an activatable element (button, link, slider).
+ *
+ * @internal
+ */
 export function isInteractiveActivation(event: KeyboardEvent): boolean {
   if (!ACTIVATION_KEYS.has(event.key)) return false;
 

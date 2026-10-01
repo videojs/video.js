@@ -7,6 +7,8 @@ import { parseWistiaMediaId, parseWistiaStartTime, type WistiaSource } from './s
  * The members of Wistia's `<wistia-player>` that {@link normalizeWistiaPlayer} reads, described structurally and used
  * as its argument type: `WistiaAdapter` and React both pass Wistia's own element, so a member Wistia renames or drops
  * fails to compile rather than quietly disabling a store feature at runtime.
+ *
+ * @internal
  */
 export interface WistiaPlayerMembers {
   mediaId: string;
@@ -21,7 +23,11 @@ export interface WistiaPlayerMembers {
   cancelFullscreen(): Promise<void>;
 }
 
-/** A player as this module works on it: Wistia's members, plus everything it defines onto them. */
+/**
+ * A player as this module works on it: Wistia's members, plus everything it defines onto them.
+ *
+ * @internal
+ */
 export interface WistiaPlayerLike extends HTMLElement, WistiaPlayerMembers {
   [key: string]: any;
 }
@@ -36,6 +42,8 @@ export interface WistiaPlayerLike extends HTMLElement, WistiaPlayerMembers {
  * from two: `second-change` is a coarser subset of `time-update`, so taking both keeps the clock running at whatever
  * resolution is on offer, and a repeat costs one re-read of the playhead. `progress` and `playing` ride along because
  * Wistia announces neither.
+ *
+ * @internal
  */
 export const WISTIA_EVENT_ALIASES: Readonly<Record<string, readonly string[]>> = {
   'api-ready': ['loadedmetadata', 'durationchange'],
@@ -61,6 +69,8 @@ export const WISTIA_EVENT_ALIASES: Readonly<Record<string, readonly string[]>> =
  *
  * `controls` is deliberately not among the members: Wistia has one already and it means the player's control instances,
  * which its internals read. Turning chrome on and off is `wistiaControlProps`.
+ *
+ * @internal
  */
 export function normalizeWistiaPlayer<T extends HTMLElement & WistiaPlayerMembers>(player: T): T {
   // Strict on the way in, loose inside: the members installed below do not exist on the argument yet.

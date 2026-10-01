@@ -2,7 +2,11 @@ import type { MediaSnapshot } from '../input-action';
 import { formatVolumeValue } from '../volume-indicator/status';
 import { DEFAULT_STATUS_ANNOUNCER_LABELS, type StatusAnnouncerLabels } from './labels';
 
-/** Derives the immediate announcement for changed playback, captions, presentation, and playback-rate state. */
+/**
+ * Derives the immediate announcement for changed playback, captions, presentation, and playback-rate state.
+ *
+ * @internal
+ */
 export function deriveStatusAnnouncement(
   previous: MediaSnapshot,
   snapshot: MediaSnapshot,
@@ -33,7 +37,11 @@ export function deriveStatusAnnouncement(
   return announcements.length > 0 ? announcements.join('. ') : null;
 }
 
-/** Derives the announcement for changed volume or mute state. */
+/**
+ * Derives the announcement for changed volume or mute state.
+ *
+ * @internal
+ */
 export function deriveVolumeAnnouncement(
   previous: MediaSnapshot,
   snapshot: MediaSnapshot,

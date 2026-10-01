@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { SeekIndicatorState } from './core';
 
+/** @internal */
 export const SeekIndicatorDataAttrs = {
   /** Present while the indicator is open. */
   open: 'data-open',

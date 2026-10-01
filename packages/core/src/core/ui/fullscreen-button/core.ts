@@ -26,6 +26,7 @@ export interface FullscreenButtonState extends ButtonState {
   hidden: boolean;
 }
 
+/** @internal */
 export class FullscreenButtonCore {
   static readonly defaultProps: NonNullableObject<FullscreenButtonProps> = {
     label: '',
@@ -94,6 +95,7 @@ export class FullscreenButtonCore {
   }
 }
 
+/** @internal */
 export namespace FullscreenButtonCore {
   export type Props = FullscreenButtonProps;
   export type State = FullscreenButtonState;

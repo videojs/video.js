@@ -16,6 +16,7 @@ export type MenuOpenChangeReason = PopoverOpenChangeReason;
 
 export type MenuChangeDetails = PopoverChangeDetails;
 
+/** @internal */
 export interface MenuOptions {
   transition: TransitionApi;
   onOpenChange: (open: boolean, details: MenuChangeDetails) => void;
@@ -45,6 +46,7 @@ export interface MenuHighlightOptions {
   pointer?: boolean;
 }
 
+/** @internal */
 export function isMenuNavigationKey(event: UIKeyboardEvent): boolean {
   const { key } = event;
 
@@ -62,13 +64,18 @@ export function isMenuNavigationKey(event: UIKeyboardEvent): boolean {
   );
 }
 
+/** @internal */
 export function getRootPositionOptions(side: MenuState['side'], align: MenuState['align']): PositioningOptions | null {
   if (!side || !align) return null;
 
   return { side, align };
 }
 
-/** Uses Popover offset inputs while publishing Menu-owned available-size outputs. */
+/**
+ * Uses Popover offset inputs while publishing Menu-owned available-size outputs.
+ *
+ * @internal
+ */
 export const MenuPositioningCSSVars = {
   ...PopoverCSSVars,
   availableWidth: MenuCSSVars.availableWidth,
@@ -112,10 +119,12 @@ export interface MenuApi {
   destroy: () => void;
 }
 
+/** @internal */
 export function completeMenuItemSelection(menu: MenuApi): void {
   menu.close();
 }
 
+/** @internal */
 export function createMenu(options: MenuOptions): MenuApi {
   // Items are stored in DOM order. Framework/component lifecycle ordering is
   // not always the same as visual order, especially across nested components.

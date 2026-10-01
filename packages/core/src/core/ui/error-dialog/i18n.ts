@@ -25,6 +25,7 @@ import {
  */
 const SVTA_UNSUPPORTED_PLAYBACK_FEATURE = 99001;
 
+/** @internal */
 export type MediaErrorTranslationKey = Extract<
   keyof TranslationParams,
   | 'errors.aborted'
@@ -57,18 +58,22 @@ function isStandardMediaErrorCode(code: number): boolean {
   return code >= MediaError.MEDIA_ERR_ABORTED && code <= MediaError.MEDIA_ERR_ENCRYPTED;
 }
 
+/** @internal */
 export function getMediaErrorTranslationKey(code: number): MediaErrorTranslationKey | undefined {
   return MEDIA_ERROR_TRANSLATIONS[code]?.key as MediaErrorTranslationKey | undefined;
 }
 
+/** @internal */
 export function getErrorDialogTitleText(): Text {
   return titleText;
 }
 
+/** @internal */
 export function getErrorDialogDismissText(): Text {
   return okText;
 }
 
+/** @internal */
 export function getErrorDialogUnexpectedText(): Text {
   return unexpectedText;
 }
@@ -76,6 +81,8 @@ export function getErrorDialogUnexpectedText(): Text {
 /**
  * Resolves dialog body copy: default phrases for known {@link MediaError} defaults, literal text for custom messages,
  * otherwise the generic fallback key.
+ *
+ * @internal
  */
 export function resolveErrorDialogDescription(
   error: (Pick<MediaError, 'code' | 'message'> & { context?: MediaError['context'] }) | null | undefined,

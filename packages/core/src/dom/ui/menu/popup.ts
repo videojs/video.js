@@ -39,7 +39,11 @@ interface RegisteredContent extends MenuContentRegistration {
   unsubscribe: () => void;
 }
 
-/** Coordinates sibling Contents and sizes their shared Popup. */
+/**
+ * Coordinates sibling Contents and sizes their shared Popup.
+ *
+ * @internal
+ */
 export function createMenuPopup(): MenuPopupApi {
   const contents = new Set<RegisteredContent>();
   const exitFrames = new Map<RegisteredContent, number>();

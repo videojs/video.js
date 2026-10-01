@@ -15,7 +15,7 @@ import {
 import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
 import { isNil, isNull } from '@videojs/utils/predicate';
 
-import { DEFAULT_LOCALE, findLocaleKeys, getCanonicalLocaleKey } from '../../../core/i18n';
+import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
 import { clampCuesToDuration } from '../text-cues';
 
@@ -56,17 +56,17 @@ function toCorsMode(value: string | null | undefined): MediaThumbnailsTrack['cro
 }
 
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
-  const localeKey = getCanonicalLocaleKey(locale);
+  const localeKey = getLocaleKey(locale);
   const keys = findLocaleKeys(locale);
 
   // Translation lookup falls back to English; caption selection should not.
   if (localeKey !== DEFAULT_LOCALE && !localeKey.startsWith(`${DEFAULT_LOCALE}-`)) keys.pop();
 
   for (const key of keys) {
-    const exact = tracks.find(({ track }) => getCanonicalLocaleKey(track.language) === key);
+    const exact = tracks.find(({ track }) => getLocaleKey(track.language) === key);
     if (exact) return exact;
 
-    const regional = tracks.find(({ track }) => getCanonicalLocaleKey(track.language).startsWith(`${key}-`));
+    const regional = tracks.find(({ track }) => getLocaleKey(track.language).startsWith(`${key}-`));
     if (regional) return regional;
   }
 

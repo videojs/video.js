@@ -1,10 +1,15 @@
-/** Resolve the deepest event target, preferring composedPath for shadow DOM. */
+/**
+ * Resolve the deepest event target, preferring composedPath for shadow DOM.
+ *
+ * @internal
+ */
 export function resolveEventTarget(event: Event): EventTarget | null {
   const path = event.composedPath();
 
   return path.length > 0 ? path[0]! : event.target;
 }
 
+/** @internal */
 export interface OnEventOptions extends AddEventListenerOptions {
   /**
    * An AbortSignal to cancel waiting for the event.
@@ -21,6 +26,8 @@ export interface OnEventOptions extends AddEventListenerOptions {
  *   ```ts
  *   const event = await onEvent(video, 'seeked');
  *   ```;
+ *
+ * @internal
  */
 export function onEvent<K extends keyof HTMLMediaElementEventMap>(
   target: HTMLMediaElement,
@@ -28,26 +35,31 @@ export function onEvent<K extends keyof HTMLMediaElementEventMap>(
   options?: OnEventOptions
 ): Promise<HTMLMediaElementEventMap[K]>;
 
+/** @internal */
 export function onEvent<K extends keyof HTMLElementEventMap>(
   target: HTMLElement,
   type: K,
   options?: OnEventOptions
 ): Promise<HTMLElementEventMap[K]>;
 
+/** @internal */
 export function onEvent<K extends keyof WindowEventMap>(
   target: Window,
   type: K,
   options?: OnEventOptions
 ): Promise<WindowEventMap[K]>;
 
+/** @internal */
 export function onEvent<K extends keyof DocumentEventMap>(
   target: Document,
   type: K,
   options?: OnEventOptions
 ): Promise<DocumentEventMap[K]>;
 
+/** @internal */
 export function onEvent(target: EventTarget, type: string, options?: OnEventOptions): Promise<Event>;
 
+/** @internal */
 export function onEvent(target: EventTarget, type: string, options?: OnEventOptions): Promise<Event> {
   return new Promise((resolve, reject) => {
     const handleAbort = () => {

@@ -4,6 +4,7 @@ import type { MenuCore, MenuOptionState, MenuState } from '@videojs/core';
 import type { MediaContainer, MenuApi, MenuPopupApi, PositioningBoundary } from '@videojs/core/dom';
 import { createContext, useContext, useLayoutEffect, useState } from 'react';
 
+/** @internal */
 export interface MenuContextValue {
   core: MenuCore;
   menu: MenuApi;
@@ -23,7 +24,11 @@ const MenuContext = createContext<MenuContextValue | null>(null);
 
 export const MenuContextProvider = MenuContext.Provider;
 
-/** Returns the current menu compound-component context. Throws outside `Menu.Root`. */
+/**
+ * Returns the current menu compound-component context. Throws outside `Menu.Root`.
+ *
+ * @internal
+ */
 export function useMenuContext(): MenuContextValue {
   const ctx = useContext(MenuContext);
   if (!ctx) throw new Error('Menu compound components must be used within a Menu.Root');
@@ -31,7 +36,11 @@ export function useMenuContext(): MenuContextValue {
   return ctx;
 }
 
-/** Returns the nearest menu context, or `null` outside `Menu.Root`. */
+/**
+ * Returns the nearest menu context, or `null` outside `Menu.Root`.
+ *
+ * @internal
+ */
 export function useOptionalMenuContext(): MenuContextValue | null {
   return useContext(MenuContext);
 }

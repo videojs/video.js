@@ -30,6 +30,7 @@ export interface TooltipProps {
 
 type TooltipCoreProps = Omit<TooltipProps, 'boundary'>;
 
+/** @internal */
 export interface TooltipInput extends TransitionState {}
 
 export interface TooltipState extends TransitionFlags {
@@ -43,6 +44,7 @@ export interface TooltipState extends TransitionFlags {
   align: PopoverAlign;
 }
 
+/** @internal */
 export class TooltipCore {
   static readonly defaultProps: NonNullableObject<TooltipCoreProps> = {
     side: 'top',
@@ -92,6 +94,7 @@ export class TooltipCore {
   }
 }
 
+/** @internal */
 export namespace TooltipCore {
   export type Props = TooltipCoreProps;
   export type State = TooltipState;

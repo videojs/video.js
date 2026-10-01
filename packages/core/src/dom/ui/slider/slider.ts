@@ -85,6 +85,7 @@ export interface SliderApi {
   destroy: () => void;
 }
 
+/** @internal */
 export function createSlider(options: SliderOptions): SliderApi {
   const input = createState<SliderInput>({
     pointerPercent: 0,

@@ -1,0 +1,50 @@
+---
+title: isText
+description: Check whether a value is a text descriptor
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { isText } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { isText } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`isText` returns whether a value is a text descriptor: an object with a translation `key` and its English default `text`. Use it to accept either a descriptor or a plain string, as <DocsLink slug="reference/api/translate-text">`translateText`</DocsLink> does. See <DocsLink slug="reference/api/translation-phrases">Translation phrases</DocsLink> for the built-in descriptors.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { isText } from '@videojs/html/i18n';
+import { playText } from '@videojs/html/i18n/text/buttons';
+
+isText(playText); // true
+isText('Play'); // false
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { isText } from '@videojs/react/i18n';
+import { playText } from '@videojs/react/i18n/text/buttons';
+
+isText(playText); // true
+isText('Play'); // false
+```
+
+</FrameworkCase>
+
+<UtilReference util="isText" />

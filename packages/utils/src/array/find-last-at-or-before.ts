@@ -22,7 +22,11 @@ export function findLastIndexAtOrBefore<Item>(
   return index;
 }
 
-/** Finds the last ordered item whose value is at or before the target. */
+/**
+ * Finds the last ordered item whose value is at or before the target.
+ *
+ * @internal
+ */
 export function findLastAtOrBefore<Item>(
   items: readonly Item[],
   value: number,

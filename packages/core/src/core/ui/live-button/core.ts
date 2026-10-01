@@ -31,6 +31,8 @@ const LIVE_EDGE_TOLERANCE = 5;
 /**
  * Media state slice consumed by `LiveButtonCore` — composed by the HTML and React `LiveButton` adapters from the
  * `live`, `time`, and `buffer` store slices.
+ *
+ * @internal
  */
 export type LiveButtonMediaState = Pick<MediaTimeState, 'currentTime' | 'seek'> &
   Pick<MediaBufferState, 'seekable'> &
@@ -49,6 +51,7 @@ export interface LiveButtonState extends ButtonState {
  * Core state machine for a "Live" button. Indicates whether the player is playing at the live edge and seeks to the
  * Seekable Live Edge when activated.
  *
+ * @internal
  * @see https://github.com/video-dev/media-ui-extensions/blob/main/proposals/0007-live-edge.md
  */
 export class LiveButtonCore {
@@ -140,6 +143,7 @@ export class LiveButtonCore {
   }
 }
 
+/** @internal */
 export namespace LiveButtonCore {
   export type Props = LiveButtonProps;
   export type State = LiveButtonState;

@@ -1,4 +1,8 @@
-/** Parsed pieces of a YouTube source URL. */
+/**
+ * Parsed pieces of a YouTube source URL.
+ *
+ * @internal
+ */
 export interface ParsedYouTubeSource {
   /** 11-character video id (null for playlist-only sources). */
   id: string | null;
@@ -12,7 +16,11 @@ export interface ParsedYouTubeSource {
   noCookie: boolean;
 }
 
-/** Extract a YouTube video id from a raw 11-character id, a `youtube/<id>` shorthand, or any recognized URL. */
+/**
+ * Extract a YouTube video id from a raw 11-character id, a `youtube/<id>` shorthand, or any recognized URL.
+ *
+ * @internal
+ */
 export function parseYouTubeVideoId(src: string) {
   return parseYouTubeSource(src)?.id ?? null;
 }
@@ -21,6 +29,8 @@ export function parseYouTubeVideoId(src: string) {
  * Parse a YouTube source string. Recognizes raw 11-character ids, `youtube/<id>` and `youtube/shorts/<id>` shorthands,
  * `youtu.be` short links, `watch?v=`, `embed/`, `v/`, `shorts/` and `live/` URLs (with or without the `-nocookie`
  * host), playlist URLs via the `list` parameter, and start times via the `t` parameter.
+ *
+ * @internal
  */
 export function parseYouTubeSource(src: string): ParsedYouTubeSource | null {
   if (!src) return null;

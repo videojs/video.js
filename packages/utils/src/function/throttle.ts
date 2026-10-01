@@ -1,4 +1,8 @@
-/** A throttled function that can be cancelled. */
+/**
+ * A throttled function that can be cancelled.
+ *
+ * @internal
+ */
 export interface Throttled<Args extends unknown[]> {
   (...args: Args): void;
   /** Cancel any pending trailing-edge invocation. */
@@ -21,6 +25,8 @@ export interface ThrottleOptions {
  *   update the arguments. The function fires once per window with the latest arguments.
  * - `{ leading: true }`: leading + trailing — the first call invokes immediately and opens a cooldown window. Subsequent
  *   calls within the window are coalesced to a single trailing-edge invocation.
+ *
+ * @internal
  */
 export function throttle<Args extends unknown[]>(
   fn: (...args: Args) => void,

@@ -9,6 +9,7 @@ import { useMediaInstance } from '../../utils/use-media-instance';
 import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
+/** @experimental */
 export interface ShakaVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof ShakaAdapterProps>,
@@ -17,6 +18,7 @@ export interface ShakaVideoProps
   children?: ReactNode;
 }
 
+/** @experimental */
 export const ShakaVideo = forwardRef<HTMLVideoElement, ShakaVideoProps>(function ShakaVideo(
   { children, mediaRef, ...props },
   ref
@@ -33,6 +35,7 @@ export const ShakaVideo = forwardRef<HTMLVideoElement, ShakaVideoProps>(function
   );
 });
 
+/** @experimental */
 export namespace ShakaVideo {
   export type Props = ShakaVideoProps;
 }

@@ -5,8 +5,10 @@ import type { InputAction } from '../../core/ui/input-action';
 import { getMediaInputActionValue } from '../media-action-value';
 import { HotkeyCoordinator } from './coordinator';
 
+/** @internal */
 export type HotkeyModifierKey = 'shift' | 'ctrl' | 'alt' | 'meta';
 
+/** @internal */
 export interface ParsedHotkeyBinding {
   modifiers: Set<HotkeyModifierKey>;
   /** Lowercased key for matching. */
@@ -15,6 +17,7 @@ export interface ParsedHotkeyBinding {
   originalKey: string;
 }
 
+/** @internal */
 export interface HotkeyOptions extends Pick<HotkeyProps, 'keys' | 'target' | 'disabled' | 'value'> {
   onActivate: (event: KeyboardEvent, key: string) => void;
   /** Whether `event.repeat` should fire the callback. */
@@ -36,6 +39,8 @@ const MODIFIER_KEYS = new Set(['shift', 'ctrl', 'alt', 'meta']);
  *   parseHotkeyPattern('0-9');
  *   // 10 bindings, one per digit
  *   ```;
+ *
+ * @internal
  */
 export function parseHotkeyPattern(pattern: string): ParsedHotkeyBinding[] {
   // Range expansion: "0-9" → individual digit bindings.
@@ -79,7 +84,11 @@ function isImplicitModifierKey(key: string): boolean {
   return key.length === 1 && !/[a-z]/i.test(key);
 }
 
-/** Whether a parsed binding matches a keyboard event. */
+/**
+ * Whether a parsed binding matches a keyboard event.
+ *
+ * @internal
+ */
 export function matchesHotkeyEvent(binding: ParsedHotkeyBinding, event: KeyboardEvent): boolean {
   // IME composition filtering.
   if (event.key === 'Unidentified') return false;
@@ -110,12 +119,20 @@ export function matchesHotkeyEvent(binding: ParsedHotkeyBinding, event: Keyboard
 
 const coordinators = new WeakMap<HTMLElement, HotkeyCoordinator>();
 
-/** Look up the coordinator for a target element, if one exists. */
+/**
+ * Look up the coordinator for a target element, if one exists.
+ *
+ * @internal
+ */
 export function findHotkeyCoordinator(target: HTMLElement): HotkeyCoordinator | undefined {
   return coordinators.get(target);
 }
 
-/** Look up or create the hotkey coordinator for a target element. */
+/**
+ * Look up or create the hotkey coordinator for a target element.
+ *
+ * @internal
+ */
 export function getHotkeyCoordinator(target: HTMLElement): HotkeyCoordinator {
   let coordinator = coordinators.get(target);
 
@@ -142,6 +159,7 @@ export function getHotkeyCoordinator(target: HTMLElement): HotkeyCoordinator {
  *   ```;
  *
  * @returns A cleanup function that removes the binding.
+ * @internal
  */
 export function createHotkey(target: HTMLElement, options: HotkeyOptions): () => void {
   const coordinator = getHotkeyCoordinator(target);

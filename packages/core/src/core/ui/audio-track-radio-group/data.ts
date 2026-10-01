@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { AudioTrackRadioGroupState } from './core';
 
+/** @internal */
 export const AudioTrackRadioGroupDataAttrs = {
   /** Current audio track value. */
   value: 'data-audio-track',

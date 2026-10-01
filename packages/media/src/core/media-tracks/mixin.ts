@@ -17,6 +17,7 @@ import { VideoRenditionList } from './video-rendition-list';
 import { VideoTrack } from './video-track';
 import { addVideoTrack, removeVideoTrack, VideoTrackList } from './video-track-list';
 
+/** @experimental */
 export type WithMediaTracks<Base extends AnyConstructor<any>> = MixinReturn<
   Base,
   MediaVideoTrackCapability & MediaAudioTrackCapability & MediaVideoRenditionCapability & MediaAudioRenditionCapability
@@ -29,6 +30,7 @@ const nativeAudioTracksFn = getBaseMediaTracksFn(HTMLMediaElementConstructor, 'a
 
 // Safari supports native media tracks, but native implementations cannot
 // reliably represent manifest-derived MSE tracks or manually-added tracks.
+/** @internal */
 export function MediaTracksMixin<Base extends AnyConstructor<any>>(MediaElementClass: Base): WithMediaTracks<Base> {
   if (!MediaElementClass?.prototype) return MediaElementClass as WithMediaTracks<Base>;
 

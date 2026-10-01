@@ -44,6 +44,8 @@ type PopoverCoreProps = Omit<PopoverProps, 'boundary'>;
 /**
  * The raw transition state managed by `createTransition`. Uses `active` (not `open`) to distinguish the generic
  * transition state machine from the domain-specific `PopoverState.open`.
+ *
+ * @internal
  */
 export interface PopoverInput extends TransitionState {}
 
@@ -56,6 +58,7 @@ export interface PopoverState extends TransitionFlags {
   modal: boolean | 'trap-focus';
 }
 
+/** @internal */
 export class PopoverCore {
   static readonly defaultProps: NonNullableObject<PopoverCoreProps> = {
     side: 'top',
@@ -116,6 +119,7 @@ export class PopoverCore {
   }
 }
 
+/** @internal */
 export namespace PopoverCore {
   export type Props = PopoverCoreProps;
   export type State = PopoverState;

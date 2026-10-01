@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { AirPlayButtonState } from './core';
 
+/** @internal */
 export const AirPlayButtonDataAttrs = {
   /**
    * Current AirPlay connection state.

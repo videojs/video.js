@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { SeekButtonState } from './core';
 
+/** @internal */
 export const SeekButtonDataAttrs = {
   /** Present when a seek is in progress. */
   seeking: 'data-seeking',

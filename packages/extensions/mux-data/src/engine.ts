@@ -2,7 +2,11 @@ import { hasMethods, isFunction, isObject, isString } from '@videojs/utils/predi
 
 import type { MuxDataOptions } from './types';
 
-/** The `mux-embed` monitor options that hook a playback engine's own telemetry. */
+/**
+ * The `mux-embed` monitor options that hook a playback engine's own telemetry.
+ *
+ * @internal
+ */
 export type MuxDataEngineOptions = Partial<Pick<MuxDataOptions, 'Hls' | 'hlsjs' | 'dashjs'>>;
 
 type MuxDataHlsJsEngine = NonNullable<MuxDataOptions['hlsjs']>;
@@ -26,6 +30,7 @@ const warnedEngines = new WeakSet<object>();
  *
  * @returns Options to spread into a `Mux.monitor()` call. Empty when the engine has no integration, which leaves
  *   element-level monitoring intact.
+ * @internal
  */
 export function toMuxDataEngineOptions(engine: unknown): MuxDataEngineOptions {
   if (isDashJsEngine(engine)) return { dashjs: engine };

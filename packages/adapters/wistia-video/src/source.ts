@@ -64,6 +64,8 @@ export type WistiaQuality = 224 | 360 | 540 | 720 | 1080 | 2160;
  * What a Wistia player is started with here, whatever Wistia's default or the Wistia app says; a source overrides it.
  * Only the corner radius so far, squared because the skin is what rounds a media — see `wistiaPlayerStyle`.
  * `roundedPlayer` is the one to set: the three `*BorderRadius` options derive from it.
+ *
+ * @internal
  */
 export const wistiaPlayerDefaultOptions = {
   roundedPlayer: 0,
@@ -78,6 +80,8 @@ export const wistiaPlayerDefaultOptions = {
  * those clicks and answers them with chrome of its own. The iframe embeds do the same through a
  * `:host(:not([controls]))` rule in a template they own, which a player that brings its own element has no equivalent
  * of.
+ *
+ * @internal
  */
 export function wistiaPlayerStyle(controls: boolean) {
   return {
@@ -91,6 +95,8 @@ export function wistiaPlayerStyle(controls: boolean) {
 /**
  * The eight control-bar switches `controls` drives as a group, since Wistia has no single chromeless flag.
  * `playBarControl` doubles as the one the group is read back from.
+ *
+ * @internal
  */
 export function wistiaControlProps(controls: boolean) {
   return {

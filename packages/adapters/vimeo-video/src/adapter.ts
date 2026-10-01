@@ -709,7 +709,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 }
 
-/** Build the iframe `src` URL for an initial Vimeo embed from the given props. */
+/**
+ * Build the iframe `src` URL for an initial Vimeo embed from the given props.
+ *
+ * @internal
+ */
 export function buildVimeoIframeSrc(src: string, props: Partial<VimeoAdapterProps> = {}) {
   const parsed = parseVimeoSource(src);
   if (!parsed) return '';

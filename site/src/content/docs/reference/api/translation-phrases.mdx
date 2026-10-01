@@ -1,6 +1,41 @@
 ---
 title: Translation phrases
 description: Semantic i18n keys, their English defaults, and the player UI that uses them
+apis:
+  - '@videojs/react/i18n/text/airplay'
+  - '@videojs/react/i18n/text/buttons'
+  - '@videojs/react/i18n/text/captions'
+  - '@videojs/react/i18n/text/cast'
+  - '@videojs/react/i18n/text/common'
+  - '@videojs/react/i18n/text/container'
+  - '@videojs/react/i18n/text/errors'
+  - '@videojs/react/i18n/text/fullscreen'
+  - '@videojs/react/i18n/text/live'
+  - '@videojs/react/i18n/text/menu'
+  - '@videojs/react/i18n/text/pip'
+  - '@videojs/react/i18n/text/playback'
+  - '@videojs/react/i18n/text/seek'
+  - '@videojs/react/i18n/text/slider'
+  - '@videojs/react/i18n/text/status'
+  - '@videojs/react/i18n/text/time'
+  - '@videojs/react/i18n/text/volume'
+  - '@videojs/html/i18n/text/airplay'
+  - '@videojs/html/i18n/text/buttons'
+  - '@videojs/html/i18n/text/captions'
+  - '@videojs/html/i18n/text/cast'
+  - '@videojs/html/i18n/text/common'
+  - '@videojs/html/i18n/text/container'
+  - '@videojs/html/i18n/text/errors'
+  - '@videojs/html/i18n/text/fullscreen'
+  - '@videojs/html/i18n/text/live'
+  - '@videojs/html/i18n/text/menu'
+  - '@videojs/html/i18n/text/pip'
+  - '@videojs/html/i18n/text/playback'
+  - '@videojs/html/i18n/text/seek'
+  - '@videojs/html/i18n/text/slider'
+  - '@videojs/html/i18n/text/status'
+  - '@videojs/html/i18n/text/time'
+  - '@videojs/html/i18n/text/volume'
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
@@ -14,6 +49,34 @@ Locale packs and provider overrides use nested objects, so `buttons.play` is aut
 
 <FrameworkCase frameworks={["html"]}>
 Locale packs and provider overrides use nested objects, so `buttons.play` is authored as `{ buttons: { play: '…' } }`. Translators and the `<media-text token>` attribute use the dotted form.
+</FrameworkCase>
+
+## Text descriptors
+
+Each key also ships as a text descriptor: an object with the `key` and its English default `text`. Descriptors are grouped by the key's first segment and named after the rest, so `buttons.play` is `playText` in the `buttons` module and `container.label` is `labelText` in `container`. Pass one to a translator, or to <DocsLink slug="reference/api/translate-text">`translateText`</DocsLink>, to get the active locale's copy with English as the fallback.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { useTranslator } from '@videojs/react/i18n';
+import { playText } from '@videojs/react/i18n/text/buttons';
+
+function PlayLabel() {
+  const t = useTranslator();
+
+  return <span>{t(playText)}</span>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { createTranslator, getI18nTranslations } from '@videojs/html/i18n';
+import { playText } from '@videojs/html/i18n/text/buttons';
+
+const t = createTranslator(getI18nTranslations('fr'), 'fr');
+
+t(playText); // 'Lecture' once French is registered, else 'Play'
+```
 </FrameworkCase>
 
 ## Playback controls

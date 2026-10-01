@@ -5,20 +5,24 @@ import type { InputActionEvent, MediaSnapshot } from '../input-action';
 
 export type IndicatorDirection = 'forward' | 'backward';
 
+/** @internal */
 export function isSeekIndicatorAction(action: string | null | undefined): action is 'seekStep' | 'seekToPercent' {
   return action === 'seekStep' || action === 'seekToPercent';
 }
 
+/** @internal */
 export function formatCurrentTime(snapshot: MediaSnapshot, locale?: string | string[]): string {
   const options = locale === undefined ? undefined : { locale };
 
   return formatTime(snapshot.currentTime ?? 0, snapshot.duration, options);
 }
 
+/** @internal */
 export function getSeekIndicatorDisplayValue(state: { value: string | null; currentTime: string }): string {
   return state.value ?? state.currentTime;
 }
 
+/** @internal */
 export function getSeekToPercent(event: InputActionEvent): number | null {
   if (event.value !== undefined) return clamp(event.value, 0, 100);
 
@@ -27,6 +31,7 @@ export function getSeekToPercent(event: InputActionEvent): number | null {
   return Number(event.key) * 10;
 }
 
+/** @internal */
 export function getSeekDirection(event: InputActionEvent, snapshot: MediaSnapshot): IndicatorDirection | null {
   if (event.action === 'seekStep' && event.value !== undefined) {
     if (event.value > 0) return 'forward';

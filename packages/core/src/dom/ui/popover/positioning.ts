@@ -6,6 +6,7 @@ import type { PopoverAlign, PopoverSide } from '../../../core/ui/popover/core';
 import { PopoverCSSVars } from '../../../core/ui/popover/vars';
 import { createDOMRect } from '../../utils/layout';
 
+/** @internal */
 export interface PositioningOptions {
   side: PopoverSide;
   align: PopoverAlign;
@@ -18,7 +19,11 @@ export interface PositioningOffsets {
   boundaryOffset?: number;
 }
 
-/** CSS custom property names for anchor-based positioning. */
+/**
+ * CSS custom property names for anchor-based positioning.
+ *
+ * @internal
+ */
 export interface PositioningCSSVars {
   sideOffset: string;
   alignOffset: string;

@@ -4,6 +4,8 @@
  * For config that is read at use time rather than at setup: a per-request URL or header can be supplied as a function
  * that reads whatever is current, so the thing holding the config is not rebuilt when the underlying value changes.
  * `undefined`, given outright or returned, means "nothing configured".
+ *
+ * @internal
  */
 export type ValueOrFunction<T> = T | undefined | (() => T | undefined);
 
@@ -19,6 +21,8 @@ export type ValueOrFunction<T> = T | undefined | (() => T | undefined);
  *   toValue(() => current?.url); // whatever `current.url` is right now
  *   toValue(undefined); // undefined
  *   ```;
+ *
+ * @internal
  */
 export function toValue<T>(value: ValueOrFunction<T>): T | undefined {
   if (typeof value !== 'function') return value;

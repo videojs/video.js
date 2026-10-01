@@ -1,11 +1,17 @@
 import { isPlainObject, isString } from '../predicate';
 
 type ClassPrimitive = string | Record<string, unknown> | false | null | undefined;
+/** @internal */
 export type ClassValue = ClassPrimitive | readonly string[] | readonly ClassPrimitive[];
 
+/** @internal */
 export type ClassName<State, Value = string | undefined> = Value | ((state: State) => Value);
 
-/** Resolve a static or state-derived class name. */
+/**
+ * Resolve a static or state-derived class name.
+ *
+ * @internal
+ */
 export function resolveClassName<State, Value>(className: ClassName<State, Value>, state: State): Value {
   return typeof className === 'function' ? (className as (state: State) => Value)(state) : className;
 }
@@ -21,6 +27,8 @@ export function resolveClassName<State, Value>(className: ClassName<State, Value
  *   cn('foo', { bar: true, baz: false }, 'qux');
  *   // => 'foo bar qux'
  *   ```;
+ *
+ * @internal
  */
 export function cn(...classes: ClassValue[]): string {
   const result: string[] = [];

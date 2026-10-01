@@ -6,6 +6,7 @@ import { toAriaKeyShortcut, toDisplayKeyShortcut } from './aria';
 import type { HotkeyOptions, ParsedHotkeyBinding } from './hotkey';
 import { matchesHotkeyEvent, parseHotkeyPattern } from './hotkey';
 
+/** @internal */
 export interface HotkeyActivateEvent {
   source: 'hotkey';
   action?: string | undefined;
@@ -25,6 +26,7 @@ export interface HotkeyShortcutDetails {
   shortcut?: string | undefined;
 }
 
+/** @internal */
 export class HotkeyCoordinator {
   #target: HTMLElement;
   #bindings: HotkeyBinding[] = [];

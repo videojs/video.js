@@ -33,7 +33,11 @@ export const PLAYBACK_BUFFERING = 'Buffering';
 export const PLAYBACK_PLAYING = 'Playing';
 export const PLAYBACK_ENDED = 'Ended';
 
-/** Where the embed is in its playback lifecycle. */
+/**
+ * Where the embed is in its playback lifecycle.
+ *
+ * @internal
+ */
 export type TwitchPlaybackState =
   | typeof PLAYBACK_IDLE
   | typeof PLAYBACK_READY
@@ -41,13 +45,21 @@ export type TwitchPlaybackState =
   | typeof PLAYBACK_PLAYING
   | typeof PLAYBACK_ENDED;
 
-/** Delivery statistics the embed reports alongside its player state. */
+/**
+ * Delivery statistics the embed reports alongside its player state.
+ *
+ * @internal
+ */
 export interface TwitchVideoStats extends Record<string, unknown> {
   /** Seconds of media buffered ahead of the playhead. */
   bufferSize?: number;
 }
 
-/** Player state snapshot. The embed sends only what changed, so a snapshot reads as a patch, not a whole state. */
+/**
+ * Player state snapshot. The embed sends only what changed, so a snapshot reads as a patch, not a whole state.
+ *
+ * @internal
+ */
 export interface TwitchPlayerState {
   /** Length of the VOD in seconds. Live channels report no meaningful duration. */
   duration?: number;
@@ -59,24 +71,40 @@ export interface TwitchPlayerState {
   stats?: { videoStats?: TwitchVideoStats };
 }
 
-/** Lifecycle event the embed emits (`ready`, `play`, `pause`, `seek`, `ended`, `offline`, …). */
+/**
+ * Lifecycle event the embed emits (`ready`, `play`, `pause`, `seek`, `ended`, `offline`, …).
+ *
+ * @internal
+ */
 export interface TwitchEmbedMessage {
   namespace: typeof EMBED_NAMESPACE;
   eventName: string;
   params?: unknown;
 }
 
-/** Player state snapshot, pushed on the same namespace the host sends commands on. */
+/**
+ * Player state snapshot, pushed on the same namespace the host sends commands on.
+ *
+ * @internal
+ */
 export interface TwitchPlayerProxyMessage {
   namespace: typeof PLAYER_PROXY_NAMESPACE;
   eventName: string;
   params?: TwitchPlayerState;
 }
 
-/** Anything the embed posts back to the host. */
+/**
+ * Anything the embed posts back to the host.
+ *
+ * @internal
+ */
 export type TwitchInboundMessage = TwitchEmbedMessage | TwitchPlayerProxyMessage;
 
-/** Command the host posts to the embed. Its `eventName` is one of the numeric codes above. */
+/**
+ * Command the host posts to the embed. Its `eventName` is one of the numeric codes above.
+ *
+ * @internal
+ */
 export interface TwitchCommandMessage {
   namespace: typeof PLAYER_PROXY_NAMESPACE;
   eventName: number;

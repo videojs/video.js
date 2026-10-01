@@ -1,9 +1,12 @@
+/** @internal */
 export type PositionSide = 'top' | 'bottom' | 'left' | 'right';
 
+/** @internal */
 export interface PositionSideOptions {
   side: PositionSide;
 }
 
+/** @internal */
 export interface PositionSideOffsets {
   sideOffset: number;
   boundaryOffset?: number;
@@ -38,7 +41,11 @@ function getSideAvailable(
   }
 }
 
-/** Resolve the preferred side against a positioning boundary. */
+/**
+ * Resolve the preferred side against a positioning boundary.
+ *
+ * @internal
+ */
 export function getPositionedSide(
   triggerRect: DOMRect,
   positionedRect: DOMRect,
@@ -57,6 +64,7 @@ export function getPositionedSide(
   return oppositeSpace > preferredSpace ? opposite : preferred;
 }
 
+/** @internal */
 export function tryShowPopover(el: HTMLElement | null): void {
   try {
     el?.showPopover?.();
@@ -65,6 +73,7 @@ export function tryShowPopover(el: HTMLElement | null): void {
   }
 }
 
+/** @internal */
 export function tryHidePopover(el: HTMLElement | null): void {
   try {
     el?.hidePopover?.();

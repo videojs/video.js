@@ -9,17 +9,29 @@ export const PLAYER_MESSAGE_KEY = 'x-tiktok-player';
 /** Target origin for commands; `*` since the serving TikTok origin varies and commands carry nothing private. */
 export const PLAYER_TARGET_ORIGIN = '*';
 
-/** Commands the embed accepts. Only `seekTo` carries a value: seconds. */
+/**
+ * Commands the embed accepts. Only `seekTo` carries a value: seconds.
+ *
+ * @internal
+ */
 export type TikTokPlayerCommand = 'play' | 'pause' | 'seekTo' | 'mute' | 'unMute';
 
-/** A command on its way to the embed. */
+/**
+ * A command on its way to the embed.
+ *
+ * @internal
+ */
 export interface TikTokPlayerCommandMessage {
   [PLAYER_MESSAGE_KEY]: true;
   type: TikTokPlayerCommand;
   value?: number;
 }
 
-/** The events the embed reports. */
+/**
+ * The events the embed reports.
+ *
+ * @internal
+ */
 export type TikTokPlayerEventType =
   | 'onPlayerReady'
   | 'onStateChange'
@@ -30,7 +42,11 @@ export type TikTokPlayerEventType =
   /** Deprecated by TikTok in favor of `onPlayerError`; older embeds still report it. */
   | 'onError';
 
-/** A message from the embed. `value` stays unknown: it arrives from another origin and depends on `type`. */
+/**
+ * A message from the embed. `value` stays unknown: it arrives from another origin and depends on `type`.
+ *
+ * @internal
+ */
 export interface TikTokPlayerEventMessage {
   [PLAYER_MESSAGE_KEY]: true;
   /** Widened past the known events, since the embed can report ones we don't handle. */
@@ -38,7 +54,11 @@ export interface TikTokPlayerEventMessage {
   value?: unknown;
 }
 
-/** Payload of `onCurrentTime`, the embed's only progress report. */
+/**
+ * Payload of `onCurrentTime`, the embed's only progress report.
+ *
+ * @internal
+ */
 export interface TikTokCurrentTime {
   currentTime: number;
   duration: number;

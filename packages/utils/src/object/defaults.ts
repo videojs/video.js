@@ -16,6 +16,8 @@ type PartialWithUndefined<T> = { [K in keyof T]?: T[K] | undefined };
  *   const defaultProps = { label: '', disabled: false };
  *   defaults(props, defaultProps); // { label: '', disabled: true }
  *   ```;
+ *
+ * @internal
  */
 export function defaults<T extends object>(object: PartialWithUndefined<T>, defaultValues: T): T {
   const result = { ...defaultValues };

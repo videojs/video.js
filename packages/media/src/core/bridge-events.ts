@@ -1,4 +1,8 @@
-/** Wrap `source.dispatchEvent` so every event is also re-dispatched on `target`. */
+/**
+ * Wrap `source.dispatchEvent` so every event is also re-dispatched on `target`.
+ *
+ * @internal
+ */
 export function bridgeEvents(source: EventTarget, target: EventTarget): void {
   if (!source.dispatchEvent) return;
 

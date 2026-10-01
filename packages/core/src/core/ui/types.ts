@@ -57,8 +57,16 @@ export interface MediaButtonComponent<
   getLabel(state: ComponentState): Text | string;
 }
 
-/** Extracts the media state parameter type from a core's `setMedia` method. */
+/**
+ * Extracts the media state parameter type from a core's `setMedia` method.
+ *
+ * @internal
+ */
 export type InferMediaState<Core extends MediaUIComponent> = Parameters<Core['setMedia']>[0];
 
-/** Extracts the component state return type from a core's `getState` method. */
+/**
+ * Extracts the component state return type from a core's `getState` method.
+ *
+ * @internal
+ */
 export type InferComponentState<Core extends UIComponent> = ReturnType<Core['getState']>;

@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { ControlsState } from './core';
 
+/** @internal */
 export const ControlsDataAttrs = {
   /** Present when controls are visible. */
   visible: 'data-visible',

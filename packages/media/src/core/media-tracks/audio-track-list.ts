@@ -58,6 +58,7 @@ export function enabledChanged(track: AudioTrack) {
   });
 }
 
+/** @internal */
 export class AudioTrackList extends EventTarget {
   [index: number]: AudioTrack;
   #addTrackCallback: (() => void) | undefined;

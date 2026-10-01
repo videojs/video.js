@@ -24,6 +24,7 @@ export interface StatusAnnouncerState {
   label: string | null;
 }
 
+/** @internal */
 export class StatusAnnouncerCore {
   readonly state = createState<StatusAnnouncerState>({ generation: 0, label: null });
 
@@ -154,6 +155,7 @@ export class StatusAnnouncerCore {
   }
 }
 
+/** @internal */
 export namespace StatusAnnouncerCore {
   export type Props = StatusAnnouncerProps;
   export type State = StatusAnnouncerState;

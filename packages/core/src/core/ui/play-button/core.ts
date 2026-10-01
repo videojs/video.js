@@ -17,6 +17,7 @@ export interface PlayButtonProps {
 
 export interface PlayButtonState extends Pick<MediaPlaybackState, 'paused' | 'ended' | 'started'>, ButtonState {}
 
+/** @internal */
 export class PlayButtonCore {
   static readonly defaultProps: NonNullableObject<PlayButtonProps> = {
     label: '',
@@ -81,6 +82,7 @@ export class PlayButtonCore {
   }
 }
 
+/** @internal */
 export namespace PlayButtonCore {
   export type Props = PlayButtonProps;
   export type State = PlayButtonState;

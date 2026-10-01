@@ -2,7 +2,11 @@ import { TransitionDataAttrs } from '../transition';
 import type { StateAttrMap } from '../types';
 import type { MenuState } from './core';
 
-/** Root popup state used for positioning and surface transitions. */
+/**
+ * Root popup state used for positioning and surface transitions.
+ *
+ * @internal
+ */
 export const MenuPopupDataAttrs = {
   /** Present when the menu is open. */
   open: 'data-open',
@@ -13,7 +17,11 @@ export const MenuPopupDataAttrs = {
   ...TransitionDataAttrs,
 } as const satisfies StateAttrMap<MenuState>;
 
-/** State for one root or nested Content. */
+/**
+ * State for one root or nested Content.
+ *
+ * @internal
+ */
 export const MenuContentDataAttrs = {
   /** Present while this Content is active or transitioning out. */
   open: 'data-open',
@@ -24,7 +32,11 @@ export const MenuContentDataAttrs = {
   ...TransitionDataAttrs,
 } as const satisfies StateAttrMap<MenuState> & { childOpen: string };
 
-/** All public Menu data attributes exposed to component transforms. */
+/**
+ * All public Menu data attributes exposed to component transforms.
+ *
+ * @internal
+ */
 export const MenuDataAttrs = {
   ...MenuPopupDataAttrs,
   ...MenuContentDataAttrs,

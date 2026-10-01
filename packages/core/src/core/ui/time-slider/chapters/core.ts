@@ -20,7 +20,11 @@ function getCueKey(cue: MediaTextCue, seen: Map<string, number>): string {
   return count ? `${base}-${count}` : base;
 }
 
-/** Produces an ordered, non-overlapping, contiguous partition of the slider domain. */
+/**
+ * Produces an ordered, non-overlapping, contiguous partition of the slider domain.
+ *
+ * @internal
+ */
 export function normalizeChapterCues(
   cues: readonly MediaTextCue[],
   min: number,
@@ -62,7 +66,11 @@ export function normalizeChapterCues(
   return chapters;
 }
 
-/** Prepares chapter ranges and state for platform renderers. */
+/**
+ * Prepares chapter ranges and state for platform renderers.
+ *
+ * @internal
+ */
 export class TimeSliderChaptersCore {
   #cues: readonly MediaTextCue[] | null = null;
   #min = 0;
@@ -121,6 +129,7 @@ export class TimeSliderChaptersCore {
   }
 }
 
+/** @internal */
 export namespace TimeSliderChaptersCore {
   export type State = TimeSliderChapterState;
 }

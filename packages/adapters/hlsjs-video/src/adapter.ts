@@ -25,11 +25,13 @@ export type PlaybackType = 'mse' | 'native' | (string & {});
 export type SourceType = 'application/vnd.apple.mpegurl' | 'video/mp4' | (string & {});
 export type StreamType = MediaStreamType;
 
+/** @internal */
 export const PlaybackTypes = {
   MSE: 'mse',
   NATIVE: 'native',
 };
 
+/** @internal */
 export const ContentTypes = {
   M3U8: 'application/vnd.apple.mpegurl',
   MP4: 'video/mp4',
@@ -50,6 +52,7 @@ const HLS_CONTENT_TYPES: ReadonlySet<string> = new Set([
 
 const MP4_CONTENT_TYPES: ReadonlySet<string> = new Set([ContentTypes.MP4]);
 
+/** @internal */
 export const StreamTypes = MediaStreamTypes;
 
 export interface HlsJsAdapterProps {

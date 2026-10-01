@@ -30,7 +30,11 @@ function formatFallback(fraction: number): string {
   return `${percent}%`;
 }
 
-/** Format a fraction (0-1) with {@link Intl.NumberFormat} `style: "percent"`. */
+/**
+ * Format a fraction (0-1) with {@link Intl.NumberFormat} `style: "percent"`.
+ *
+ * @internal
+ */
 export function formatPercent(fraction: number, locale?: string | string[]): string {
   const value = !isNumber(fraction) || !Number.isFinite(fraction) ? 0 : Math.min(1, Math.max(0, fraction));
 

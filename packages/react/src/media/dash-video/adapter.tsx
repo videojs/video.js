@@ -9,6 +9,7 @@ import { useMediaInstance } from '../../utils/use-media-instance';
 import type { MediaRefProps } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
+/** @experimental */
 export interface DashVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof DashAdapterProps>,
@@ -17,6 +18,7 @@ export interface DashVideoProps
   children?: ReactNode;
 }
 
+/** @experimental */
 export const DashVideo = forwardRef<HTMLVideoElement, DashVideoProps>(function DashVideo(
   { children, mediaRef, ...props },
   ref
@@ -33,6 +35,7 @@ export const DashVideo = forwardRef<HTMLVideoElement, DashVideoProps>(function D
   );
 });
 
+/** @experimental */
 export namespace DashVideo {
   export type Props = DashVideoProps;
 }

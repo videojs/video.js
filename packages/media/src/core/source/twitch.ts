@@ -1,4 +1,8 @@
-/** Parsed pieces of a Twitch source URL. */
+/**
+ * Parsed pieces of a Twitch source URL.
+ *
+ * @internal
+ */
 export interface ParsedTwitchSource {
   /** `'video'` for VODs, `'channel'` for live channels. */
   kind: 'video' | 'channel';
@@ -8,7 +12,11 @@ export interface ParsedTwitchSource {
   channel: string | null;
 }
 
-/** Extract a Twitch VOD id from any recognized video URL. */
+/**
+ * Extract a Twitch VOD id from any recognized video URL.
+ *
+ * @internal
+ */
 export function parseTwitchVideoId(src: string) {
   return parseTwitchSource(src)?.id ?? null;
 }
@@ -16,6 +24,8 @@ export function parseTwitchVideoId(src: string) {
 /**
  * Parse a Twitch source string. Recognizes VOD URLs (`twitch.tv/videos/<id>` and `twitch.tv/?video=<id>`) and channel
  * URLs (`twitch.tv/<channel>`), with or without the `www.` and `go.` hosts, and with or without a trailing slash.
+ *
+ * @internal
  */
 export function parseTwitchSource(src: string): ParsedTwitchSource | null {
   if (!src) return null;

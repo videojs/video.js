@@ -18,6 +18,7 @@ export interface EventTargetLike<Events extends { [K in keyof Events]: EventLike
   dispatchEvent(event: EventLike): boolean;
 }
 
+/** @internal */
 export function TypedEventTarget<Events extends { [K in keyof Events]: EventLike }>() {
   return EventTarget as unknown as { new (): EventTargetLike<Events> };
 }
@@ -106,6 +107,7 @@ export interface MediaSeekCapability {
 
 export type MediaPreloadType = '' | 'none' | 'metadata' | 'auto';
 
+/** @internal */
 export const MediaReadyState = {
   HAVE_NOTHING: 0,
   HAVE_METADATA: 1,
@@ -326,6 +328,7 @@ export interface MediaAudioTrackCapability {
   removeAudioTrack(track: AudioTrackLike): void;
 }
 
+/** @experimental */
 export interface MediaVideoTrackCapability {
   readonly videoTracks: VideoTrackListLike;
   addVideoTrack(kind: string, label?: string, language?: string): VideoTrackLike;
@@ -384,6 +387,7 @@ export interface VideoRenditionListLike extends EventTargetLike<VideoRenditionLi
   selectedIndex: number;
 }
 
+/** @experimental */
 export interface MediaAudioRenditionCapability {
   readonly audioRenditions: AudioRenditionListLike;
 }
@@ -422,7 +426,11 @@ export interface MediaPictureInPictureCapability {
 // Stream type
 // ----------------------------------------
 
-/** Named values of {@link MediaStreamType}. */
+/**
+ * Named values of {@link MediaStreamType}.
+ *
+ * @internal
+ */
 export const MediaStreamTypes = {
   ON_DEMAND: 'on-demand',
   LIVE: 'live',
@@ -622,8 +630,10 @@ export interface Video
     MediaPictureInPictureCapability,
     MediaVideoDimensionsCapability {}
 
+/** @internal */
 export interface AudioEvents extends CommonMediaEvents {}
 
+/** @internal */
 export interface Audio extends CommonMedia<AudioEvents> {}
 
 // ----------------------------------------
@@ -658,6 +668,7 @@ export interface VideoTargetLike
   requestFullscreen(): Promise<unknown>;
 }
 
+/** @experimental */
 export interface EngineAdapter<Engine = unknown, Target = unknown> {
   readonly engine: Engine | null;
   attach?(target: Target): void;

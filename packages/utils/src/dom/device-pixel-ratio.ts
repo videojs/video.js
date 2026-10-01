@@ -1,7 +1,11 @@
 import { noop } from '../function/noop';
 import { listen } from './listen';
 
-/** The environment's `devicePixelRatio`, or `1` where it isn't reported. */
+/**
+ * The environment's `devicePixelRatio`, or `1` where it isn't reported.
+ *
+ * @internal
+ */
 export function getDevicePixelRatio(): number {
   return globalThis.devicePixelRatio || 1;
 }
@@ -21,6 +25,7 @@ export function getDevicePixelRatio(): number {
  * @param signal - Optional, for a caller that tears every subscription down through one signal rather than a handle
  *   each; aborting it stops the watching
  * @returns Cleanup that detaches the armed query
+ * @internal
  */
 export function watchDevicePixelRatio(onChange: (devicePixelRatio: number) => void, signal?: AbortSignal): () => void {
   if (typeof globalThis.matchMedia !== 'function') return noop;

@@ -56,7 +56,11 @@ import zh from './zh';
 import zh_CN from './zh-CN';
 import zh_TW from './zh-TW';
 
-/** Every built-in locale pack keyed by BCP 47 tag. */
+/**
+ * Every built-in locale pack keyed by BCP 47 tag.
+ *
+ * @internal
+ */
 export const all = {
   en,
   ar,
@@ -114,7 +118,12 @@ export const all = {
   zh,
 } as const satisfies Record<string, Partial<Translations>>;
 
+/** @internal */
 export type LocaleTag = keyof typeof all;
 
-/** BCP 47 tags for every pack in {@link all}. */
+/**
+ * BCP 47 tags for every pack in {@link all}.
+ *
+ * @internal
+ */
 export const localeTags = Object.keys(all) as LocaleTag[];

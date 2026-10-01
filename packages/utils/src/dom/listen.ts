@@ -6,6 +6,8 @@
  *   const cleanup = listen(video, 'play', () => console.log('playing'));
  *   cleanup(); // Remove listener
  *   ```;
+ *
+ * @internal
  */
 export function listen<K extends keyof HTMLMediaElementEventMap>(
   target: HTMLMediaElement,
@@ -14,6 +16,7 @@ export function listen<K extends keyof HTMLMediaElementEventMap>(
   options?: AddEventListenerOptions
 ): () => void;
 
+/** @internal */
 export function listen<K extends keyof HTMLElementEventMap>(
   target: HTMLElement,
   type: K,
@@ -21,6 +24,7 @@ export function listen<K extends keyof HTMLElementEventMap>(
   options?: AddEventListenerOptions
 ): () => void;
 
+/** @internal */
 export function listen<K extends keyof WindowEventMap>(
   target: Window,
   type: K,
@@ -28,6 +32,7 @@ export function listen<K extends keyof WindowEventMap>(
   options?: AddEventListenerOptions
 ): () => void;
 
+/** @internal */
 export function listen<K extends keyof DocumentEventMap>(
   target: Document,
   type: K,
@@ -35,6 +40,7 @@ export function listen<K extends keyof DocumentEventMap>(
   options?: AddEventListenerOptions
 ): () => void;
 
+/** @internal */
 export function listen(
   target: EventTarget,
   type: string,
@@ -42,6 +48,7 @@ export function listen(
   options?: AddEventListenerOptions
 ): () => void;
 
+/** @internal */
 export function listen(
   target: EventTarget,
   type: string,

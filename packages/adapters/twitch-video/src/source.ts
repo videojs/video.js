@@ -48,7 +48,11 @@ export interface TwitchSourceEngineConfig {
   twitch?: TwitchEngineConfig | undefined;
 }
 
-/** Build the iframe `src` URL for an initial Twitch embed from the given props. */
+/**
+ * Build the iframe `src` URL for an initial Twitch embed from the given props.
+ *
+ * @internal
+ */
 // Literal fallbacks mirror `TwitchAdapter.defaultProps`; the class imports this module, so it cannot be imported back.
 export function buildTwitchIframeSrc(src: string, props: Partial<TwitchAdapterProps> = {}) {
   const parsed = parseTwitchSource(src);

@@ -31,6 +31,7 @@ function formatTrackLabel(track: MediaAudioTrack): Text | string {
   return audioText;
 }
 
+/** @internal */
 export class AudioTrackRadioGroupCore {
   static readonly defaultProps: NonNullableObject<AudioTrackRadioGroupProps> = {
     label: '',
@@ -117,6 +118,7 @@ export class AudioTrackRadioGroupCore {
   }
 }
 
+/** @internal */
 export namespace AudioTrackRadioGroupCore {
   export type Props = AudioTrackRadioGroupProps;
   export type State = AudioTrackRadioGroupState;

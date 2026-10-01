@@ -26,6 +26,8 @@ function getRecognizer(target: HTMLElement): TapRecognizer {
  *     { pointer: 'mouse' }
  *   );
  *   ```;
+ *
+ * @internal
  */
 export function createTapGesture(
   target: HTMLElement,
@@ -57,6 +59,8 @@ export function createTapGesture(
  *     { region: 'center' }
  *   );
  *   ```;
+ *
+ * @internal
  */
 export function createDoubleTapGesture(
   target: HTMLElement,

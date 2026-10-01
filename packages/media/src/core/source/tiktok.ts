@@ -1,13 +1,19 @@
 /**
  * Parsed pieces of a TikTok source URL. TikTok embeds one thing — a video named by a numeric id — so the id is all
  * there is to take from a source.
+ *
+ * @internal
  */
 export interface ParsedTikTokSource {
   /** Numeric video id. */
   id: string;
 }
 
-/** Extract a TikTok video id from a raw numeric id or any recognized URL. */
+/**
+ * Extract a TikTok video id from a raw numeric id or any recognized URL.
+ *
+ * @internal
+ */
 export function parseTikTokVideoId(src: string) {
   return parseTikTokSource(src)?.id ?? null;
 }
@@ -15,6 +21,8 @@ export function parseTikTokVideoId(src: string) {
 /**
  * Parse a TikTok source string. Recognizes raw numeric ids, `player/v1/` embed URLs, `share/video/` links, and the
  * `@user/video/` URLs the app hands out.
+ *
+ * @internal
  */
 export function parseTikTokSource(src: string): ParsedTikTokSource | null {
   if (!src) return null;

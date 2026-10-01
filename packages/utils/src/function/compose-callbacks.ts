@@ -9,6 +9,8 @@ import { isNil } from '../predicate';
  *   const onSetup = composeCallbacks(base.onSetup, extension.onSetup);
  *   onSetup?.(ctx); // Calls both if defined
  *   ```;
+ *
+ * @internal
  */
 export function composeCallbacks<T extends (...args: any[]) => void>(...fns: (T | undefined | null)[]): T | undefined {
   const defined = fns.filter((fn): fn is T => !isNil(fn));

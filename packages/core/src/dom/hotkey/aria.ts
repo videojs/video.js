@@ -27,6 +27,8 @@ const MODIFIER_ORDER: readonly HotkeyModifierKey[] = ['ctrl', 'shift', 'alt', 'm
  *   toAriaKeyShortcut([...parseHotkeyPattern('k'), ...parseHotkeyPattern('Space')]);
  *   // "k Space"
  *   ```;
+ *
+ * @internal
  */
 export function toAriaKeyShortcut(bindings: ParsedHotkeyBinding[]): string {
   return bindings
@@ -45,7 +47,11 @@ export function toAriaKeyShortcut(bindings: ParsedHotkeyBinding[]): string {
     .join(' ');
 }
 
-/** Convert a parsed key binding to a compact display shortcut. */
+/**
+ * Convert a parsed key binding to a compact display shortcut.
+ *
+ * @internal
+ */
 export function toDisplayKeyShortcut(binding: ParsedHotkeyBinding): string {
   const parts: string[] = [];
 

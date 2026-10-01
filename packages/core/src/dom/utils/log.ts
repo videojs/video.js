@@ -1,5 +1,6 @@
 const warned = new Set<string>();
 
+/** @internal */
 export function logMissingFeature(displayName: string, featureName: string): void {
   if (!__DEV__) return;
 

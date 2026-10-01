@@ -26,6 +26,7 @@ export interface PiPButtonState extends ButtonState {
   hidden: boolean;
 }
 
+/** @internal */
 export class PiPButtonCore {
   static readonly defaultProps: NonNullableObject<PiPButtonProps> = {
     label: '',
@@ -95,6 +96,7 @@ export class PiPButtonCore {
   }
 }
 
+/** @internal */
 export namespace PiPButtonCore {
   export type Props = PiPButtonProps;
   export type State = PiPButtonState;

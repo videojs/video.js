@@ -1,3 +1,4 @@
+/** @internal */
 export const PopoverCSSVars = {
   /** Distance between the popup and the trigger along the side axis. */
   sideOffset: '--media-popover-side-offset',

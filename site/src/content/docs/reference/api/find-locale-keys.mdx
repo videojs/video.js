@@ -1,0 +1,48 @@
+---
+title: findLocaleKeys
+description: List the locale tags a lookup falls back through, most specific first
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { findLocaleKeys } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { findLocaleKeys } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`findLocaleKeys` returns the fallback chain the player resolves a locale through: the normalized tag from <DocsLink slug="reference/api/get-locale-key">`getLocaleKey`</DocsLink>, then each shorter prefix, ending with `en`. A Chinese tag with a script, such as `zh-Hant-HK`, also falls back through `zh-tw` or `zh-cn` before `zh`. A translation missing from one locale is looked up in the next.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { findLocaleKeys } from '@videojs/html/i18n';
+
+findLocaleKeys('es-419-u-nu-latn'); // ['es-419', 'es', 'en']
+findLocaleKeys('fr'); // ['fr', 'en']
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { findLocaleKeys } from '@videojs/react/i18n';
+
+findLocaleKeys('es-419-u-nu-latn'); // ['es-419', 'es', 'en']
+findLocaleKeys('fr'); // ['fr', 'en']
+```
+
+</FrameworkCase>
+
+<UtilReference util="findLocaleKeys" />

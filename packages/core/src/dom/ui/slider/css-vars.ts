@@ -2,6 +2,7 @@ import type { SliderPreviewOverflow, SliderState } from '../../../core/ui/slider
 import { SliderCSSVars } from '../../../core/ui/slider/vars';
 import type { TimeSliderState } from '../../../core/ui/time-slider/core';
 
+/** @internal */
 export function getSliderCSSVars(state: SliderState): Record<string, string> {
   return {
     [SliderCSSVars.fill]: `${state.fillPercent.toFixed(3)}%`,
@@ -9,6 +10,7 @@ export function getSliderCSSVars(state: SliderState): Record<string, string> {
   };
 }
 
+/** @internal */
 export function getTimeSliderCSSVars(state: TimeSliderState): Record<string, string> {
   return {
     ...getSliderCSSVars(state),
@@ -22,7 +24,11 @@ export function getTimeSliderCSSVars(state: TimeSliderState): Record<string, str
 
 export type { SliderPreviewOverflow } from '../../../core/ui/slider/core';
 
-/** Compute structural positioning styles for a slider preview element. */
+/**
+ * Compute structural positioning styles for a slider preview element.
+ *
+ * @internal
+ */
 export function getSliderPreviewStyle(width: number, overflow: SliderPreviewOverflow) {
   const halfWidth = width / 2;
 

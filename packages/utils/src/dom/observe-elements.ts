@@ -2,9 +2,14 @@ import { noop } from '../function/noop';
 import { getDevicePixelRatio, watchDevicePixelRatio } from './device-pixel-ratio';
 import type { ElementSize } from './layout';
 
+/** @internal */
 export type ObservedElements = Element | Iterable<Element>;
 
-/** Observe one or more elements for size changes and return a cleanup function. */
+/**
+ * Observe one or more elements for size changes and return a cleanup function.
+ *
+ * @internal
+ */
 export function observeResize(elements: ObservedElements, callback: ResizeObserverCallback): () => void {
   if (typeof ResizeObserver === 'undefined') return noop;
 
@@ -16,6 +21,7 @@ export function observeResize(elements: ObservedElements, callback: ResizeObserv
   return () => observer.disconnect();
 }
 
+/** @internal */
 export interface ObserveElementsOptions {
   /** Resolve the current set of elements to resize-observe. */
   getElements: () => Iterable<Element>;
@@ -30,6 +36,8 @@ export interface ObserveElementsOptions {
 /**
  * Observe a dynamically resolved element set. When the optional root mutates, the set is resolved again before
  * `onChange` is called.
+ *
+ * @internal
  */
 export function observeElements({ getElements, onChange, root, mutations }: ObserveElementsOptions): () => void {
   let stopObservingResize = noop;
@@ -66,6 +74,8 @@ function toElementSize(entry: ResizeObserverEntry): ElementSize {
 /**
  * Call `onResize` with `element`'s content box whenever it changes, starting with the observer's initial delivery.
  * Returns a cleanup function.
+ *
+ * @internal
  */
 export function observeElementSize(element: Element, onResize: (size: ElementSize) => void): () => void {
   return observeResize(element, (entries) => {
@@ -75,6 +85,7 @@ export function observeElementSize(element: Element, onResize: (size: ElementSiz
   });
 }
 
+/** @internal */
 export interface RenderedSize extends ElementSize {
   /** `devicePixelRatio` at measurement time — CSS pixels × `scale` per axis. */
   scale: number;
@@ -83,6 +94,8 @@ export interface RenderedSize extends ElementSize {
 /**
  * Call `onResize` with `element`'s content box and the current `devicePixelRatio` whenever either changes. Returns a
  * cleanup function to stop both watchers.
+ *
+ * @internal
  */
 export function observeRenderedSize(element: Element, onResize: (size: RenderedSize) => void): () => void {
   let size: ElementSize | undefined;

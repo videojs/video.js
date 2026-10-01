@@ -10,11 +10,13 @@
  * @param object - The object to flatten.
  * @param options - Options controlling the flattened key path.
  * @returns A new object containing the flattened values.
+ * @internal
  */
 export interface FlattenOptions {
   prefix?: string;
 }
 
+/** @internal */
 export function flatten(object: Record<string, unknown>, options: FlattenOptions = {}): Record<string, unknown> {
   const { prefix = '' } = options;
   const result: Record<string, unknown> = {};

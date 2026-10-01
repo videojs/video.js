@@ -1,6 +1,7 @@
 import type { TransitionFlags, TransitionState } from '../transition';
 import { getTransitionFlags } from '../transition';
 
+/** @internal */
 export const INDICATOR_CLOSE_DELAY = 800;
 
 export interface IndicatorCoreProps {
@@ -13,6 +14,7 @@ export interface IndicatorLifecycleState extends TransitionFlags {
   generation: number;
 }
 
+/** @internal */
 export class IndicatorCloseController {
   #timer: ReturnType<typeof setTimeout> | null = null;
   #close: () => void;
@@ -48,10 +50,12 @@ export class IndicatorCloseController {
   }
 }
 
+/** @internal */
 export interface IndicatorVisibilityHandle {
   close(): void;
 }
 
+/** @internal */
 export class IndicatorVisibilityCoordinator<Handle extends IndicatorVisibilityHandle = IndicatorVisibilityHandle> {
   #handles = new Set<Handle>();
 
@@ -67,10 +71,12 @@ export class IndicatorVisibilityCoordinator<Handle extends IndicatorVisibilityHa
   }
 }
 
+/** @internal */
 export function getIndicatorCloseDelay(props: IndicatorCoreProps): number {
   return props.closeDelay ?? INDICATOR_CLOSE_DELAY;
 }
 
+/** @internal */
 export function isIndicatorPresent(
   current: Pick<IndicatorLifecycleState, 'open'>,
   transition: Pick<TransitionState, 'active'>
@@ -78,6 +84,7 @@ export function isIndicatorPresent(
   return current.open || transition.active;
 }
 
+/** @internal */
 export function getRenderedIndicatorState<State extends IndicatorLifecycleState>(
   current: State,
   snapshot: State,

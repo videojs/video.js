@@ -23,6 +23,7 @@ export interface MediaRefProps<Media> {
  *
  * @param media - Playback object to hand out.
  * @param mediaRef - Consumer ref that receives `media`.
+ * @internal
  */
 export function useMediaRef<Media>(media: Media, mediaRef: Ref<Media> | undefined): RefCallback<Element> {
   return useCallback((element) => composeRefs(mediaRef)(element ? media : null), [media, mediaRef]);

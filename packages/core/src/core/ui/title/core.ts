@@ -9,6 +9,7 @@ export interface TitleState {
   visible: boolean;
 }
 
+/** @internal */
 export class TitleCore {
   getState(media: MediaMetadataState, controls?: Pick<MediaControlsState, 'controlsVisible'> | null): TitleState {
     const { title } = media;
@@ -21,6 +22,7 @@ export class TitleCore {
   }
 }
 
+/** @internal */
 export namespace TitleCore {
   export type State = TitleState;
 }

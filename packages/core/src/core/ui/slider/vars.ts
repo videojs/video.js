@@ -1,4 +1,8 @@
-/** CSS custom property names for slider visual state. */
+/**
+ * CSS custom property names for slider visual state.
+ *
+ * @internal
+ */
 export const SliderCSSVars = {
   /** Fill level percentage (0–100). */
   fill: '--media-slider-fill',

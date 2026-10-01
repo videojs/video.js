@@ -30,6 +30,7 @@ function formatPlaybackRate(rate: number): string {
   return `${rate}×`;
 }
 
+/** @internal */
 export class PlaybackRateRadioGroupCore {
   static readonly defaultProps: NonNullableObject<PlaybackRateRadioGroupProps> = {
     label: '',
@@ -129,6 +130,7 @@ export class PlaybackRateRadioGroupCore {
   }
 }
 
+/** @internal */
 export namespace PlaybackRateRadioGroupCore {
   export type Props = PlaybackRateRadioGroupProps;
   export type State = PlaybackRateRadioGroupState;

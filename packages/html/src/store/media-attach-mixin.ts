@@ -5,6 +5,7 @@ import type { AnyConstructor, Constructor } from '@videojs/utils/types';
 
 import { type MediaContext, mediaContext } from '../player/context';
 
+/** @internal */
 export type MediaAttachMixin = <Class extends AnyConstructor<HTMLElement>>(BaseClass: Class) => Class;
 
 /**
@@ -14,6 +15,7 @@ export type MediaAttachMixin = <Class extends AnyConstructor<HTMLElement>>(BaseC
  * required.
  *
  * @param context - The media context to consume.
+ * @internal
  */
 export function createMediaAttachMixin(context: MediaContext): MediaAttachMixin {
   return <Class extends AnyConstructor<HTMLElement>>(BaseClass: Class) => {
@@ -66,4 +68,5 @@ export function createMediaAttachMixin(context: MediaContext): MediaAttachMixin 
   };
 }
 
+/** @internal */
 export const MediaAttachMixin = createMediaAttachMixin(mediaContext);

@@ -16,12 +16,17 @@ export interface TransitionFlags {
   transitionEnding: boolean;
 }
 
+/** @internal */
 export interface TransitionStyleAttrs {
   'data-starting-style'?: '' | undefined;
   'data-ending-style'?: '' | undefined;
 }
 
-/** Shared data attributes for open/close transition state. Spread into component data-attrs objects. */
+/**
+ * Shared data attributes for open/close transition state. Spread into component data-attrs objects.
+ *
+ * @internal
+ */
 export const TransitionDataAttrs = {
   /** Present during the open transition. */
   transitionStarting: 'data-starting-style',
@@ -29,6 +34,7 @@ export const TransitionDataAttrs = {
   transitionEnding: 'data-ending-style',
 } as const satisfies StateAttrMap<TransitionFlags>;
 
+/** @internal */
 export function getTransitionFlags(status: TransitionStatus): TransitionFlags {
   return {
     transitionStarting: status === 'starting',
@@ -36,6 +42,7 @@ export function getTransitionFlags(status: TransitionStatus): TransitionFlags {
   };
 }
 
+/** @internal */
 export function getTransitionStyleAttrs({
   transitionStarting,
   transitionEnding,

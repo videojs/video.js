@@ -2,6 +2,7 @@ import type { MediaFeatureAvailability, MediaVolumeState } from '@videojs/media'
 
 import { PopoverCore, type PopoverProps, type PopoverState } from '../popover/core';
 
+/** @internal */
 export interface VolumePopoverProps extends PopoverProps {}
 
 export interface VolumePopoverState extends PopoverState {
@@ -11,7 +12,11 @@ export interface VolumePopoverState extends PopoverState {
   hidden: boolean;
 }
 
-/** A volume-aware popover that preserves its mute trigger when volume level controls are unavailable. */
+/**
+ * A volume-aware popover that preserves its mute trigger when volume level controls are unavailable.
+ *
+ * @internal
+ */
 export class VolumePopoverCore extends PopoverCore {
   static override readonly defaultProps = PopoverCore.defaultProps;
 
@@ -32,6 +37,7 @@ export class VolumePopoverCore extends PopoverCore {
   }
 }
 
+/** @internal */
 export namespace VolumePopoverCore {
   export type Props = PopoverCore.Props;
   export type State = VolumePopoverState;

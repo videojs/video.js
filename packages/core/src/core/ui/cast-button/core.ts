@@ -26,6 +26,7 @@ export interface CastButtonState extends ButtonState {
   hidden: boolean;
 }
 
+/** @internal */
 export class CastButtonCore {
   static readonly defaultProps: NonNullableObject<CastButtonProps> = {
     label: '',
@@ -99,6 +100,7 @@ export class CastButtonCore {
   }
 }
 
+/** @internal */
 export namespace CastButtonCore {
   export type Props = CastButtonProps;
   export type State = CastButtonState;

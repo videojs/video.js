@@ -1,4 +1,8 @@
-/** CSS custom property names for menu layout and positioning. */
+/**
+ * CSS custom property names for menu layout and positioning.
+ *
+ * @internal
+ */
 export const MenuCSSVars = {
   /** Distance between the popup and the trigger along the side axis. */
   sideOffset: '--media-popover-side-offset',

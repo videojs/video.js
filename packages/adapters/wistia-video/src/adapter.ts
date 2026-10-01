@@ -11,6 +11,8 @@ import { type WistiaSource, wistiaPlayerStyle } from './source';
  * Wistia in would leave a bundler free to drop this module and React rendering an undefined tag.
  *
  * `server.ts` declares it too, for the runtimes that resolve there instead.
+ *
+ * @internal
  */
 export const WISTIA_PLAYER_TAG = 'wistia-player';
 

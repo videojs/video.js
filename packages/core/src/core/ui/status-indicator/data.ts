@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { StatusIndicatorState } from './core';
 
+/** @internal */
 export const StatusIndicatorDataAttrs = {
   /** Present while the indicator is open. */
   open: 'data-open',

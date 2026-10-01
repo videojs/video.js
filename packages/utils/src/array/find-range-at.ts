@@ -1,6 +1,10 @@
 import { findLastIndexAtOrBefore } from './find-last-at-or-before';
 
-/** Finds the ordered range containing the target value. */
+/**
+ * Finds the ordered range containing the target value.
+ *
+ * @internal
+ */
 export function findRangeAt<Range>(
   ranges: readonly Range[],
   value: number,

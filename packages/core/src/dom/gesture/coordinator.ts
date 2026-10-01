@@ -14,6 +14,7 @@ import { resolveRegion } from './region';
 
 const TAP_THRESHOLD = 250;
 
+/** @internal */
 export class GestureCoordinator {
   #target: HTMLElement;
   #bindings: GestureBinding[] = [];
@@ -172,11 +173,16 @@ export class GestureCoordinator {
 
 const coordinators = new WeakMap<HTMLElement, GestureCoordinator>();
 
-/** Look up the gesture coordinator for a target element, if one exists. */
+/**
+ * Look up the gesture coordinator for a target element, if one exists.
+ *
+ * @internal
+ */
 export function findGestureCoordinator(target: HTMLElement): GestureCoordinator | undefined {
   return coordinators.get(target);
 }
 
+/** @internal */
 export function getGestureCoordinator(target: HTMLElement): GestureCoordinator {
   let coordinator = coordinators.get(target);
 

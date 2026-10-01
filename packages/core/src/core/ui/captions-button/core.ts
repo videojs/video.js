@@ -30,6 +30,7 @@ export interface CaptionsButtonState extends Pick<MediaTextTrackState, 'subtitle
   hidden: boolean;
 }
 
+/** @internal */
 export class CaptionsButtonCore {
   static readonly defaultProps: NonNullableObject<CaptionsButtonProps> = {
     label: '',
@@ -110,6 +111,7 @@ function getCaptionTrackCount(media: MediaTextTrackState): number {
   return media.textTrackList.filter(isCaptionOrSubtitleTrack).length;
 }
 
+/** @internal */
 export namespace CaptionsButtonCore {
   export type Props = CaptionsButtonProps;
   export type State = CaptionsButtonState;

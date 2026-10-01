@@ -3,7 +3,11 @@ import { isNumber } from '@videojs/utils/predicate';
 
 import type { ThumbnailCoords, ThumbnailImage } from './types';
 
-/** Parse `url#xywh=x,y,w,h` into a URL and optional sprite coordinates. */
+/**
+ * Parse `url#xywh=x,y,w,h` into a URL and optional sprite coordinates.
+ *
+ * @internal
+ */
 export function parseMediaFragment(
   text: string,
   baseURL?: string
@@ -55,6 +59,8 @@ export function parseMediaFragment(
 /**
  * Convert an array of text cues (e.g. `VTTCue` from a `<track>` element) into {@link ThumbnailImage} entries by parsing
  * the media-fragment in each cue's text.
+ *
+ * @internal
  */
 export function mapCuesToThumbnails(cues: MediaTextCue[], baseURL?: string): ThumbnailImage[] {
   const images: ThumbnailImage[] = [];

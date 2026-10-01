@@ -22,6 +22,7 @@ export interface PopoverChangeDetails {
   event?: Event;
 }
 
+/** @internal */
 export interface PopoverOptions {
   transition: TransitionApi;
   onOpenChange: (open: boolean, details: PopoverChangeDetails) => void;
@@ -37,6 +38,7 @@ export interface PopoverOptions {
   deferOpenChanges?: boolean;
 }
 
+/** @internal */
 export interface PopoverTriggerProps {
   onClick: (event: UIEvent) => void;
   onPointerEnter: (event: UIPointerEvent) => void;
@@ -45,6 +47,7 @@ export interface PopoverTriggerProps {
   onFocusOut: (event: UIFocusEvent) => void;
 }
 
+/** @internal */
 export interface PopoverPopupProps {
   onPointerEnter: (event: UIPointerEvent) => void;
   onPointerLeave: (event: UIPointerEvent) => void;
@@ -53,6 +56,7 @@ export interface PopoverPopupProps {
   onFocusOut: (event: UIFocusEvent) => void;
 }
 
+/** @internal */
 export interface PopoverApi {
   input: State<PopoverInput>;
   triggerProps: PopoverTriggerProps;
@@ -67,6 +71,7 @@ export interface PopoverApi {
   destroy: () => void;
 }
 
+/** @internal */
 export function createPopover(options: PopoverOptions): PopoverApi {
   const { onOpenChange, closeOnOutsideClick } = options;
 

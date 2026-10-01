@@ -6,6 +6,7 @@ export interface FlattenTranslationsOptions {
   prefix?: string;
 }
 
+/** @internal */
 export function flattenTranslations(locale: Translations, options: FlattenTranslationsOptions = {}): FlatTranslations {
   return flatten(locale, options) as FlatTranslations;
 }

@@ -137,10 +137,14 @@ function emitDeclarationDefinitions(entries: readonly SchemaComponent[]): string
 
 function emitDeclarationComponents(entries: readonly SchemaComponent[]): string {
   return entries
-    .map((entry) => `export declare const ${entry.name}: ComponentFrom<(typeof DEFINITIONS)['${entry.name}']>;`)
+    .map(
+      (entry) =>
+        `/** @internal */\nexport declare const ${entry.name}: ComponentFrom<(typeof DEFINITIONS)['${entry.name}']>;`
+    )
     .join('\n');
 }
 
 function emitDeclarationSchema(source: string): string {
-  return `declare const schema: ComponentSchema<typeof DEFINITIONS, ${JSON.stringify(source)}>;\n\nexport default schema;`;
+  // Generated schemas are build inputs for VJSC, not public API; the tag reaches consumers through the declaration.
+  return `/** @internal */\ndeclare const schema: ComponentSchema<typeof DEFINITIONS, ${JSON.stringify(source)}>;\n\nexport default schema;`;
 }

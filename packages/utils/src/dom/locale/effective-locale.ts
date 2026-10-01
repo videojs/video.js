@@ -1,7 +1,11 @@
 import { DEFAULT_LOCALE } from '../../i18n';
 import { isUndefined } from '../../predicate';
 
-/** Resolves locale: explicit non-empty value → ambient `lang` → {@link fallback}. */
+/**
+ * Resolves locale: explicit non-empty value → ambient `lang` → {@link fallback}.
+ *
+ * @internal
+ */
 export function effectiveLocale<Locale extends string = string>(
   explicitLocale: Locale | undefined,
   ambientLang: Locale | undefined,

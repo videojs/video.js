@@ -1,8 +1,11 @@
 import { containsComposed, getDeepActiveElement } from '@videojs/utils/dom';
 
+/** @internal */
 export const DEFAULT_CONTAINER_ROLE = 'group';
+/** @internal */
 export const DEFAULT_CONTAINER_TAB_INDEX = 0;
 
+/** @internal */
 export function applyContainerAttrs(element: HTMLElement): void {
   if (!element.hasAttribute('role')) {
     element.setAttribute('role', DEFAULT_CONTAINER_ROLE);
@@ -14,6 +17,7 @@ export function applyContainerAttrs(element: HTMLElement): void {
   }
 }
 
+/** @internal */
 export function focusContainer(element: HTMLElement): void {
   const active = getDeepActiveElement(element.ownerDocument);
 

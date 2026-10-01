@@ -1,4 +1,8 @@
-/** Clamp a value between min and max (inclusive). */
+/**
+ * Clamp a value between min and max (inclusive).
+ *
+ * @internal
+ */
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -9,6 +13,7 @@ export function clamp(value: number, min: number, max: number): number {
  * @param value - Value to convert.
  * @param min - Start of the range.
  * @param max - End of the range.
+ * @internal
  */
 export function toPercent(value: number, min: number, max: number): number {
   const range = max - min;
@@ -17,7 +22,11 @@ export function toPercent(value: number, min: number, max: number): number {
   return clamp(((value - min) / range) * 100, 0, 100);
 }
 
-/** Snap a value to the nearest step, offset from min. */
+/**
+ * Snap a value to the nearest step, offset from min.
+ *
+ * @internal
+ */
 export function roundToStep(value: number, step: number, min: number): number {
   const nearest = Math.round((value - min) / step) * step + min;
   const dot = `${step}`.indexOf('.');

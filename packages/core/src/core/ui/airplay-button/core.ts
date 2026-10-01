@@ -28,6 +28,7 @@ export interface AirPlayButtonState extends ButtonState {
   hidden: boolean;
 }
 
+/** @internal */
 export class AirPlayButtonCore {
   static readonly defaultProps: NonNullableObject<AirPlayButtonProps> = {
     label: '',
@@ -108,6 +109,7 @@ export class AirPlayButtonCore {
   }
 }
 
+/** @internal */
 export namespace AirPlayButtonCore {
   export type Props = AirPlayButtonProps;
   export type State = AirPlayButtonState;

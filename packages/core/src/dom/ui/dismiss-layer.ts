@@ -4,6 +4,7 @@ import { listen } from '@videojs/utils/dom';
 import type { TransitionState } from '../../core/ui/transition';
 import type { TransitionApi, TransitionElement } from './transition';
 
+/** @internal */
 export interface DismissLayerOptions {
   /** Transition API for animated open/close. */
   transition: TransitionApi;
@@ -15,6 +16,7 @@ export interface DismissLayerOptions {
   onDocumentActive?: (signal: AbortSignal) => void;
 }
 
+/** @internal */
 export interface DismissLayerApi {
   /** Reactive transition state for platforms to subscribe to. */
   input: State<TransitionState>;
@@ -28,6 +30,7 @@ export interface DismissLayerApi {
   destroy(): void;
 }
 
+/** @internal */
 export function createDismissLayer(options: DismissLayerOptions): DismissLayerApi {
   const { transition } = options;
   const state: WritableState<TransitionState> = transition.state as WritableState<TransitionState>;

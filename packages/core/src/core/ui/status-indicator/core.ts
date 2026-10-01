@@ -52,6 +52,7 @@ const INITIAL_STATE: StatusIndicatorState = {
   transitionEnding: false,
 };
 
+/** @internal */
 export class StatusIndicatorCore {
   readonly state = createState<StatusIndicatorState>({ ...INITIAL_STATE });
 
@@ -93,6 +94,7 @@ export class StatusIndicatorCore {
   }
 }
 
+/** @internal */
 export namespace StatusIndicatorCore {
   export type Props = StatusIndicatorProps;
   export type State = StatusIndicatorState;

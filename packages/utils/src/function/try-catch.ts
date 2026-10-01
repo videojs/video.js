@@ -6,6 +6,8 @@
  *   const safeFn = tryCatch(riskyFn, (e) => logger.error(e));
  *   safeFn?.(); // Never throws
  *   ```;
+ *
+ * @internal
  */
 export function tryCatch<T extends (...args: any[]) => unknown>(
   fn: T | undefined,

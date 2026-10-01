@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { LiveButtonState } from './core';
 
+/** @internal */
 export const LiveButtonDataAttrs = {
   /** Present when the stream is live (or DVR). */
   live: 'data-live',

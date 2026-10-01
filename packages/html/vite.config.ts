@@ -60,6 +60,14 @@ const i18nLocaleEntries = Object.fromEntries([
   ...localeTags.map((tag) => [`i18n/locales/${tag}/register`, `src/i18n/locales/${tag}/register.ts`]),
 ]);
 
+const i18nTextEntries = Object.fromEntries(
+  globSync('src/i18n/text/*.ts', { cwd: packageDir }).map((file) => {
+    const key = file.replace('src/', '').replace('.ts', '');
+
+    return [key, file];
+  })
+);
+
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'browser'),
   name: 'package',
@@ -67,6 +75,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     index: 'src/index.ts',
     'i18n/index': 'src/i18n/index.ts',
     ...i18nLocaleEntries,
+    ...i18nTextEntries,
     ...iconEntries,
     ...defineEntries,
     ...presetEntries,

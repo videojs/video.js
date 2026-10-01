@@ -12,6 +12,8 @@
  *   uniqBy(features, (s) => s.id);
  *   // => [{ id: 'b', v: 2 }, { id: 'a', v: 3 }]
  *   ```;
+ *
+ * @internal
  */
 export function uniqBy<T, K>(arr: T[], mapper: (item: T) => K): T[] {
   const seen = new Map<K, number>();

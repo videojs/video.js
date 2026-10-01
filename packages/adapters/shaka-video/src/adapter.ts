@@ -40,10 +40,18 @@ type DeepPartial<T> = T extends Opaque | readonly any[] | ((...args: any[]) => a
   ? T
   : { [Key in keyof T]?: DeepPartial<T[Key]> };
 
-/** Shaka Player's configuration, as `configure()` accepts it. */
+/**
+ * Shaka Player's configuration, as `configure()` accepts it.
+ *
+ * @experimental
+ */
 export type ShakaConfig = DeepPartial<shaka.extern.PlayerConfiguration>;
 
-/** Structured Shaka source: which source to play, plus how to play it. */
+/**
+ * Structured Shaka source: which source to play, plus how to play it.
+ *
+ * @experimental
+ */
 export interface ShakaSource {
   /**
    * Manifest URL. Shaka plays DASH, HLS, and progressive files from the same property. Mirrors the host's `src`
@@ -66,7 +74,11 @@ export interface ShakaSource {
   engine?: ShakaEngineConfig | undefined;
 }
 
-/** The engines a Shaka source can configure. */
+/**
+ * The engines a Shaka source can configure.
+ *
+ * @experimental
+ */
 export interface ShakaEngineConfig {
   /**
    * Shaka Player's own configuration, passed through untouched. Replacing it resets any previously applied
@@ -76,6 +88,7 @@ export interface ShakaEngineConfig {
   shaka?: ShakaConfig | undefined;
 }
 
+/** @experimental */
 export interface ShakaAdapterProps {
   src: string;
   source: ShakaSource | null;
@@ -464,6 +477,7 @@ class ShakaAdapterCore
  * @fires error - Fired when playback fails in a way Shaka could not recover from. Read `error` for the failure.
  * @fires streamtypechange - Fired when the detected stream type changes. Read `streamType` for the new value.
  * @fires targetlivewindowchange - Fired when `targetLiveWindow` changes. Read it for the new value.
+ * @experimental
  */
 export class ShakaAdapter extends ShakaLiveMixin(ShakaStreamTypeMixin(ShakaMediaTracksMixin(ShakaAdapterCore))) {}
 

@@ -8,6 +8,8 @@
  *   ```ts
  *   tryCall(() => player.destroy()); // Never throws
  *   ```;
+ *
+ * @internal
  */
 export function tryCall(fn: () => void): void {
   try {

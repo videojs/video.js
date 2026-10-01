@@ -1,4 +1,8 @@
-/** CSS geometry and progress local to each chapter. */
+/**
+ * CSS geometry and progress local to each chapter.
+ *
+ * @internal
+ */
 export const TimeSliderChapterCSSVars = {
   start: '--media-slider-chapter-start',
   end: '--media-slider-chapter-end',

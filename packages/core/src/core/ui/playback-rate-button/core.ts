@@ -21,6 +21,7 @@ export interface PlaybackRateButtonState extends ButtonState {
   rate: number;
 }
 
+/** @internal */
 export class PlaybackRateButtonCore {
   static readonly defaultProps: NonNullableObject<PlaybackRateButtonProps> = {
     label: '',
@@ -95,6 +96,7 @@ export class PlaybackRateButtonCore {
   }
 }
 
+/** @internal */
 export namespace PlaybackRateButtonCore {
   export type Props = PlaybackRateButtonProps;
   export type State = PlaybackRateButtonState;

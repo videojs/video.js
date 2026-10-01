@@ -70,6 +70,7 @@ export type MediaEventProps<Target extends EventTarget = EventTarget> = {
  * @param props - Component props, which may include media event handlers.
  * @param media - Adapter that dispatches the standard media events. Omit it when the rendered element is the media
  *   itself, such as a third-party web component; the listeners then bind to whatever the ref receives.
+ * @internal
  */
 export function useMediaEvents<Props extends Record<string, unknown>>(
   props: Props,
@@ -118,6 +119,7 @@ export function useMediaEvents<Props extends Record<string, unknown>>(
   return { ref, props: rest as Omit<Props, MediaEventPropName> };
 }
 
+/** @internal */
 export namespace useMediaEvents {
   export interface Result<Props> {
     /** Ref for the rendered element; compose it ahead of the ref that attaches the media. */

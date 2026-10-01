@@ -9,6 +9,7 @@ import { NativeHlsStreamTypeMixin } from './stream-type';
 export type PreloadType = '' | 'none' | 'metadata' | 'auto';
 export type StreamType = MediaStreamType;
 
+/** @internal */
 export const StreamTypes = MediaStreamTypes;
 
 export interface NativeHlsAdapterProps {

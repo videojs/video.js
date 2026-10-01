@@ -53,8 +53,10 @@ export const LOCALES = [
   'zh-TW',
 ] as const;
 
+/** @internal */
 export type LocaleAlias<Tags extends readonly string[]> = Tags[number] extends `${infer Lang}-${string}` ? Lang : never;
 
+/** @internal */
 export function localeAliases<const Tags extends readonly string[]>(tags: Tags): LocaleAlias<Tags>[] {
   const counts = new Map<string, number>();
 

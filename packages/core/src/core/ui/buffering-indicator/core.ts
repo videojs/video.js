@@ -13,6 +13,7 @@ export interface BufferingIndicatorState {
   visible: boolean;
 }
 
+/** @internal */
 export class BufferingIndicatorCore {
   static readonly defaultProps: NonNullableObject<BufferingIndicatorProps> = {
     delay: 500,
@@ -53,6 +54,7 @@ export class BufferingIndicatorCore {
   }
 }
 
+/** @internal */
 export namespace BufferingIndicatorCore {
   export type Props = BufferingIndicatorProps;
   export type State = BufferingIndicatorState;

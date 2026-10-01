@@ -2,6 +2,7 @@
  * Data attributes set on all navigable menu item elements.
  *
  * @parts item, radio-item, checkbox-item, trigger
+ * @internal
  */
 export const MenuItemDataAttrs = {
   /**

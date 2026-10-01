@@ -25,6 +25,7 @@ export interface InputIndicatorLabels {
   exitPictureInPicture: string;
 }
 
+/** @internal */
 export const DEFAULT_INPUT_INDICATOR_LABELS: InputIndicatorLabels = {
   muted: translateText(mutedText),
   volume: translateText(labelText),
@@ -38,7 +39,11 @@ export const DEFAULT_INPUT_INDICATOR_LABELS: InputIndicatorLabels = {
   exitPictureInPicture: translateText(exitPipText),
 };
 
-/** Maps i18n indicator keys to {@link InputIndicatorLabels} for status / volume feedback. */
+/**
+ * Maps i18n indicator keys to {@link InputIndicatorLabels} for status / volume feedback.
+ *
+ * @internal
+ */
 export function createInputIndicatorLabels(translator: Translator): InputIndicatorLabels {
   return {
     muted: translator(mutedText),

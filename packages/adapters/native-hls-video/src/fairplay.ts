@@ -12,6 +12,8 @@ export const FAIRPLAY_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 /**
  * `context` values carried by the `MediaError`s key exchange produces. The message is prose meant for a person; this is
  * the part to branch on.
+ *
+ * @internal
  */
 export const NativeHlsDrmErrors = {
   /** The content is encrypted but `source.engine.nativeHls.drmSystems` is missing something required. */
@@ -34,6 +36,7 @@ export const NativeHlsDrmErrors = {
   OUTPUT_RESTRICTED: 'drmOutputRestricted',
 } as const;
 
+/** @internal */
 export type NativeHlsDrmErrorContext = (typeof NativeHlsDrmErrors)[keyof typeof NativeHlsDrmErrors];
 
 export const NativeHlsDrmMessages = {

@@ -1,5 +1,6 @@
 import { isShadowRoot } from './predicates';
 
+/** @internal */
 export function containsComposed(root: Element, element: Element): boolean {
   let current: Element | null = element;
 

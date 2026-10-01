@@ -2,6 +2,7 @@ import type { SliderState, StateAttrMap } from '@videojs/core';
 import type { SliderThumbProps } from '@videojs/core/dom';
 import { createContext } from '@videojs/element/context';
 
+/** @internal */
 export interface SliderContextValue {
   /** Base slider state — children use this for data attributes and value display. */
   state: SliderState;
@@ -19,4 +20,5 @@ export interface SliderContextValue {
 
 const SLIDER_CONTEXT_KEY = Symbol('@videojs/slider');
 
+/** @internal */
 export const sliderContext = createContext<SliderContextValue>(SLIDER_CONTEXT_KEY);

@@ -13,6 +13,7 @@ const TABBABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+/** @internal */
 export function getDeepActiveElement(root: Document | ShadowRoot = document): Element | null {
   let active = root.activeElement;
 
@@ -23,7 +24,11 @@ export function getDeepActiveElement(root: Document | ShadowRoot = document): El
   return active;
 }
 
-/** Returns the elements in a composed subtree that participate in sequential keyboard navigation. */
+/**
+ * Returns the elements in a composed subtree that participate in sequential keyboard navigation.
+ *
+ * @internal
+ */
 export function getTabbableElements(root: ParentNode): HTMLElement[] {
   const tabbable: HTMLElement[] = [];
   const visited = new Set<Element>();

@@ -39,6 +39,7 @@ export interface SpotifyControllerOptions extends Record<string, unknown> {
   height?: string | number;
 }
 
+/** @internal */
 export interface SpotifyIframeApi {
   /** Build a controller; `target` is replaced by an iframe of the controller's own, so hand it a placeholder. */
   createController(

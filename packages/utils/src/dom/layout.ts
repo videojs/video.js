@@ -1,10 +1,12 @@
 import { withInlineStyles } from './style';
 
+/** @internal */
 export interface ElementSize {
   width: number;
   height: number;
 }
 
+/** @internal */
 export interface LogicalBoxEdges {
   inlineStart: number;
   inlineEnd: number;
@@ -12,9 +14,12 @@ export interface LogicalBoxEdges {
   blockEnd: number;
 }
 
+/** @internal */
 export type ElementSizeBox = 'bounding' | 'layout';
+/** @internal */
 export type ElementOverflowMeasurement = 'none' | 'width' | 'height' | 'both';
 
+/** @internal */
 export interface GetElementSizeOptions {
   /** Measure the transformed bounding box or the untransformed layout box. */
   box?: ElementSizeBox | undefined;
@@ -22,7 +27,11 @@ export interface GetElementSizeOptions {
   overflow?: ElementOverflowMeasurement | undefined;
 }
 
-/** Read an element's current rendered size. */
+/**
+ * Read an element's current rendered size.
+ *
+ * @internal
+ */
 export function getElementSize(
   element: HTMLElement,
   { box = 'bounding', overflow = 'none' }: GetElementSizeOptions = {}
@@ -41,6 +50,8 @@ export function getElementSize(
 /**
  * Whether a viewport point, such as a mouse event's `clientX` and `clientY`, falls inside an element's border box. The
  * right and bottom edges are outside, matching how the browser hit-tests. An element with no size contains nothing.
+ *
+ * @internal
  */
 export function isPointInElement(element: Element, point: { clientX: number; clientY: number }): boolean {
   const rect = element.getBoundingClientRect();
@@ -55,12 +66,17 @@ export function isPointInElement(element: Element, point: { clientX: number; cli
   );
 }
 
+/** @internal */
 export interface MeasureElementOptions extends GetElementSizeOptions {
   /** Inline styles temporarily applied while measuring. */
   styles?: Readonly<Record<string, string | undefined>> | undefined;
 }
 
-/** Measure an element with optional temporary inline style overrides. */
+/**
+ * Measure an element with optional temporary inline style overrides.
+ *
+ * @internal
+ */
 export function measureElement(element: HTMLElement, options: MeasureElementOptions = {}): ElementSize {
   const { styles, ...sizeOptions } = options;
   const measure = () => getElementSize(element, sizeOptions);
@@ -68,7 +84,11 @@ export function measureElement(element: HTMLElement, options: MeasureElementOpti
   return styles ? withInlineStyles(element, styles, measure) : measure();
 }
 
-/** Read logical padding edges in pixels. */
+/**
+ * Read logical padding edges in pixels.
+ *
+ * @internal
+ */
 export function getElementPadding(element: Element): LogicalBoxEdges {
   const style = getComputedStyle(element);
 
@@ -80,10 +100,12 @@ export function getElementPadding(element: Element): LogicalBoxEdges {
   };
 }
 
+/** @internal */
 export function getInlineExtent(edges: LogicalBoxEdges): number {
   return edges.inlineStart + edges.inlineEnd;
 }
 
+/** @internal */
 export function getBlockExtent(edges: LogicalBoxEdges): number {
   return edges.blockStart + edges.blockEnd;
 }
@@ -97,6 +119,7 @@ function getPaddingOrigin(element: Element): { x: number; y: number } {
   };
 }
 
+/** @internal */
 export interface ChildMeasurement {
   element: HTMLElement;
   size: ElementSize;
@@ -104,6 +127,7 @@ export interface ChildMeasurement {
   offsetTop: number;
 }
 
+/** @internal */
 export interface MeasureElementChildrenOptions {
   /** Children to measure. Defaults to direct HTMLElement children. */
   children?: Iterable<HTMLElement> | undefined;
@@ -130,7 +154,11 @@ function defaultResolveChildrenSize(measurements: readonly ChildMeasurement[]): 
   return { width, height };
 }
 
-/** Measure the layout occupied by a collection of child elements. */
+/**
+ * Measure the layout occupied by a collection of child elements.
+ *
+ * @internal
+ */
 export function measureElementChildren(
   container: HTMLElement,
   {

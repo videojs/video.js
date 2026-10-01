@@ -1,6 +1,8 @@
 /**
  * Resolve after `ms` milliseconds. Pass a `signal` to make it cancellable: the timer is cleared and the promise rejects
  * with the signal's reason as soon as the signal aborts (including if it's already aborted).
+ *
+ * @internal
  */
 export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise<void>((resolve, reject) => {

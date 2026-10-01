@@ -2,6 +2,7 @@ import { TransitionDataAttrs } from '../transition';
 import type { StateAttrMap } from '../types';
 import type { TooltipState } from './core';
 
+/** @internal */
 export const TooltipDataAttrs = {
   /** Present when the tooltip is open. */
   open: 'data-open',

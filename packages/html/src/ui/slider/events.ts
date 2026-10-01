@@ -1,8 +1,10 @@
+/** @internal */
 export interface SliderValueEventDetail {
   /** The current slider value in the domain range (e.g., seconds for time, 0–1 for volume). */
   value: number;
 }
 
+/** @internal */
 export interface SliderEventMap {
   /** Fires continuously as the slider value changes during drag or keyboard interaction. */
   'value-change': CustomEvent<SliderValueEventDetail>;

@@ -44,6 +44,8 @@ function stop(): void {
 /**
  * Subscribes to DOM updates that can change inherited `lang`: any `lang` attribute edit, or subtree structural changes
  * under `<html>` (which can move nodes between labeled ancestors).
+ *
+ * @internal
  */
 export function subscribeAmbientLang(onStoreChange: () => void): () => void {
   if (typeof document === 'undefined') {

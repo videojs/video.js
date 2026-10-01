@@ -24,7 +24,11 @@ export interface VolumeSliderState extends SliderState, Pick<MediaVolumeState, '
   hidden: boolean;
 }
 
-/** Volume-domain slider: maps media volume/mute state to slider state. */
+/**
+ * Volume-domain slider: maps media volume/mute state to slider state.
+ *
+ * @internal
+ */
 export class VolumeSliderCore extends SliderCore {
   static override readonly defaultProps: NonNullableObject<VolumeSliderProps> = {
     ...SliderCore.defaultProps,
@@ -111,6 +115,7 @@ export class VolumeSliderCore extends SliderCore {
   }
 }
 
+/** @internal */
 export namespace VolumeSliderCore {
   export type Props = VolumeSliderProps;
   export type State = VolumeSliderState;

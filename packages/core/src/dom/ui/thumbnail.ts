@@ -3,12 +3,14 @@ import { listen, observeResize } from '@videojs/utils/dom';
 import { ThumbnailCore } from '../../core/ui/thumbnail/core';
 import type { ThumbnailConstraints } from '../../core/ui/thumbnail/types';
 
+/** @internal */
 export interface CreateThumbnailOptions {
   getContainer: () => HTMLElement | null;
   getImg: () => HTMLImageElement | null;
   onStateChange: () => void;
 }
 
+/** @internal */
 export interface ThumbnailApi {
   readonly loading: boolean;
   readonly error: boolean;
@@ -21,6 +23,7 @@ export interface ThumbnailApi {
   destroy(): void;
 }
 
+/** @internal */
 export function createThumbnail(options: CreateThumbnailOptions): ThumbnailApi {
   const { getContainer, getImg, onStateChange } = options;
   const core = new ThumbnailCore();

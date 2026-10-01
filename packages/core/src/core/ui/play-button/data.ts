@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { PlayButtonState } from './core';
 
+/** @internal */
 export const PlayButtonDataAttrs = {
   /** Present when the media is paused. */
   paused: 'data-paused',

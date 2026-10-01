@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { FullscreenButtonState } from './core';
 
+/** @internal */
 export const FullscreenButtonDataAttrs = {
   /** Present when fullscreen mode is active. */
   fullscreen: 'data-fullscreen',

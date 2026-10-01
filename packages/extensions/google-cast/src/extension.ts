@@ -1,4 +1,4 @@
-import type { MediaOverride, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
+import type { MediaOverride, PlayerTarget } from '@videojs/core/dom';
 import type { MediaStreamType } from '@videojs/media';
 import { getMediaElement, type HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isUndefined } from '@videojs/utils/predicate';
@@ -23,8 +23,11 @@ export interface GoogleCastExtensionProps {
  * Player extension that adds Google Cast to whatever media the player attaches: a plain `<video>`, a custom media
  * element, or a media adapter. While a cast session is connected, playback members the player reads route to the
  * receiver; otherwise only `remote` is taken over so the cast button can prompt.
+ *
+ * Its `PlayerExtension` members are internal: the player drives them, and the element and hook that register it check
+ * that it conforms.
  */
-export class GoogleCastExtension implements GoogleCastExtensionProps, PlayerExtension {
+export class GoogleCastExtension implements GoogleCastExtensionProps {
   static readonly defaultProps: GoogleCastExtensionProps = {
     src: undefined,
     contentType: undefined,
@@ -47,6 +50,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps, PlayerExte
     Object.assign(this, props);
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   attach({ media }: PlayerTarget) {
     // Every media the player resolves (native element, custom media element, adapter) exposes this surface.
     const target = media as HTMLMediaTargetLike;
@@ -70,6 +74,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps, PlayerExte
     this.#followSource();
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   detach() {
     this.#media?.removeEventListener('loadstart', this.#onLoadStart);
     this.#media = null;
@@ -84,6 +89,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps, PlayerExte
     this.#connected = false;
   }
 
+  /** @internal Read by the player to route media members to the receiver. */
   get mediaOverride() {
     return this.#override;
   }

@@ -25,6 +25,7 @@ import {
   resolveOffsets,
 } from './positioning';
 
+/** @internal */
 export interface PopupPositionerOptions {
   anchorName: string;
   position: PositioningOptions | null;
@@ -62,7 +63,11 @@ const POPUP_STYLE_PROPS = [
   'left',
 ] as const;
 
-/** Positions a popup and tracks layout changes while it is active. */
+/**
+ * Positions a popup and tracks layout changes while it is active.
+ *
+ * @internal
+ */
 export class PopupPositioner {
   #options: PopupPositionerOptions | null = null;
   #boundaryElement: Element | null = null;

@@ -1,16 +1,19 @@
 import { isString } from '@videojs/utils/predicate';
 
+/** @internal */
 export function forceLayout(element: HTMLElement | null): void {
   element?.getBoundingClientRect();
 }
 
 export type PositioningBoundary = 'viewport' | 'container' | (string & {}) | Element | null | undefined;
 
+/** @internal */
 export interface ResolvePositioningBoundaryOptions {
   container?: Element | null;
   root?: Document | ShadowRoot | Element | null;
 }
 
+/** @internal */
 export function createDOMRect(left: number, top: number, width: number, height: number): DOMRect {
   const right = left + width;
   const bottom = top + height;
@@ -30,6 +33,7 @@ export function createDOMRect(left: number, top: number, width: number, height: 
   } as DOMRect;
 }
 
+/** @internal */
 export function intersectDOMRects(firstRect: DOMRect, secondRect: DOMRect): DOMRect {
   const left = Math.max(firstRect.left, secondRect.left);
   const top = Math.max(firstRect.top, secondRect.top);
@@ -39,12 +43,14 @@ export function intersectDOMRects(firstRect: DOMRect, secondRect: DOMRect): DOMR
   return createDOMRect(left, top, Math.max(0, right - left), Math.max(0, bottom - top));
 }
 
+/** @internal */
 export function getPositioningBoundaryRect(boundaryElement?: Element | null): DOMRect {
   const viewportRect = document.documentElement.getBoundingClientRect();
 
   return boundaryElement ? intersectDOMRects(viewportRect, boundaryElement.getBoundingClientRect()) : viewportRect;
 }
 
+/** @internal */
 export function resolvePositioningBoundary(
   boundary: PositioningBoundary,
   options: ResolvePositioningBoundaryOptions = {}

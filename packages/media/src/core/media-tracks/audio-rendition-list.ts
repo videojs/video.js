@@ -71,6 +71,7 @@ function getCurrentRenditions(renditionList: AudioRenditionList): AudioRendition
     .flatMap((track) => [...(getPrivate(track).renditionSet as Set<AudioRendition>)]);
 }
 
+/** @internal */
 export class AudioRenditionList extends EventTarget {
   [index: number]: AudioRendition;
   #addRenditionCallback: (() => void) | undefined;

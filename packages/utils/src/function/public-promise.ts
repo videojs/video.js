@@ -1,3 +1,4 @@
+/** @internal */
 export interface PublicPromise<T> extends Promise<T> {
   resolve: (value: T) => void;
   reject: (reason?: unknown) => void;
@@ -15,6 +16,8 @@ export interface PublicPromise<T> extends Promise<T> {
  *   element.addEventListener('load', () => ready.resolve(), { once: true });
  *   await ready;
  *   ```;
+ *
+ * @internal
  */
 export function createPublicPromise<T>(): PublicPromise<T> {
   let resolve!: (value: T) => void;

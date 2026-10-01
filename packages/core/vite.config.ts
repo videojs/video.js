@@ -61,6 +61,8 @@ export default defineConfig({
           // to Core's locale generators or package build.
           input: [
             ...cachedTaskInputs,
+            // Listed explicitly: without them, a cache hit after a generator change restored stale generated sources.
+            'scripts/**',
             { pattern: '!packages/cdn/*.css', base: 'workspace' },
             { pattern: '!packages/cdn/*.d.ts', base: 'workspace' },
             { pattern: '!packages/cdn/*.js', base: 'workspace' },
@@ -80,6 +82,8 @@ export default defineConfig({
             'src/core/i18n/text/**',
             { pattern: 'packages/html/src/i18n/locales/**', base: 'workspace' },
             { pattern: 'packages/react/src/i18n/locales/**', base: 'workspace' },
+            { pattern: 'packages/html/src/i18n/text/**', base: 'workspace' },
+            { pattern: 'packages/react/src/i18n/text/**', base: 'workspace' },
           ],
         },
       },

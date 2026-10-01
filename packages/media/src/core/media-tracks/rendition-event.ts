@@ -1,6 +1,7 @@
 import type { AudioRendition } from './audio-rendition';
 import type { VideoRendition } from './video-rendition';
 
+/** @internal */
 export class RenditionEvent extends Event {
   rendition: AudioRendition | VideoRendition;
 

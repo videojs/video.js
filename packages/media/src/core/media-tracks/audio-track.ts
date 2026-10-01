@@ -2,6 +2,7 @@ import { AudioRendition } from './audio-rendition';
 import { addRendition, removeRendition } from './audio-rendition-list';
 import { enabledChanged } from './audio-track-list';
 
+/** @internal */
 export const AudioTrackKind = {
   alternative: 'alternative',
   descriptions: 'descriptions',
@@ -11,6 +12,7 @@ export const AudioTrackKind = {
   commentary: 'commentary',
 };
 
+/** @internal */
 export class AudioTrack {
   id: string | undefined;
   kind: string | undefined;

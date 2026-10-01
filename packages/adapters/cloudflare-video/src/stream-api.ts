@@ -30,7 +30,11 @@ export interface CloudflareStreamPlayerApi {
   readonly videoHeight: number;
 }
 
-/** The SDK is a single factory: hand it the embed iframe, get its player back. */
+/**
+ * The SDK is a single factory: hand it the embed iframe, get its player back.
+ *
+ * @internal
+ */
 export type CloudflareStreamApi = (target: HTMLIFrameElement) => CloudflareStreamPlayerApi;
 
 const API_URL = 'https://embed.videodelivery.net/embed/sdk.latest.js';

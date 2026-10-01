@@ -24,6 +24,7 @@ export interface UIPointerEvent extends UIEvent {
   buttons: number;
 }
 
+/** @internal */
 export interface UIWheelEvent extends UIEvent {
   deltaY: number;
 }

@@ -12,7 +12,11 @@ function getElementLang(node: Element): string | undefined {
   return undefined;
 }
 
-/** First non-empty `lang` on `start` or an ancestor (HTML language inheritance). */
+/**
+ * First non-empty `lang` on `start` or an ancestor (HTML language inheritance).
+ *
+ * @internal
+ */
 export function findNearestLang(start: Element | null): string | undefined {
   return walkAncestors(start, getElementLang);
 }

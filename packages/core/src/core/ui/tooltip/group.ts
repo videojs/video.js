@@ -10,6 +10,7 @@ export interface TooltipGroupProps {
   timeout?: number | undefined;
 }
 
+/** @internal */
 export class TooltipGroupCore {
   static readonly defaultProps: NonNullableObject<TooltipGroupProps> = {
     delay: 600,
@@ -53,6 +54,7 @@ export class TooltipGroupCore {
   }
 }
 
+/** @internal */
 export namespace TooltipGroupCore {
   export type Props = TooltipGroupProps;
 }

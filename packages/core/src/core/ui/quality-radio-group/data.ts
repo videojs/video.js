@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { QualityRadioGroupState } from './core';
 
+/** @internal */
 export const QualityRadioGroupDataAttrs = {
   /** Current quality value. */
   value: 'data-quality',

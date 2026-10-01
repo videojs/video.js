@@ -6,12 +6,14 @@ import type { AnyPlayerStore } from '../player';
 
 export type { GestureActionName } from '../../core/ui/gesture/core';
 
+/** @internal */
 export interface GestureActionContext {
   store: AnyPlayerStore;
   value?: number | undefined;
   event: PointerEvent;
 }
 
+/** @internal */
 export type GestureActionResolver = (context: GestureActionContext) => void;
 
 /** Actions that need custom logic beyond `store.state[action]()`. */
@@ -33,6 +35,7 @@ const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionR
   speedDown: MEDIA_INPUT_ACTION_OVERRIDES.speedDown,
 };
 
+/** @internal */
 export function resolveGestureAction(name: GestureActionName | (string & {})): GestureActionResolver | undefined {
   const override = GESTURE_ACTION_OVERRIDES[name as GestureActionName];
   if (override) return override;

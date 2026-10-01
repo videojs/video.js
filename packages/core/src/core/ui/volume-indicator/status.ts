@@ -5,6 +5,7 @@ import type { InputActionEvent, MediaSnapshot } from '../input-action';
 
 export type IndicatorVolumeLevel = 'off' | 'low' | 'high';
 
+/** @internal */
 export interface VolumeStatusDetails {
   status: 'volume-off' | 'volume-low' | 'volume-high';
   label: string;
@@ -12,31 +13,40 @@ export interface VolumeStatusDetails {
   volumeLevel: IndicatorVolumeLevel;
 }
 
+/** @internal */
 export interface VolumeActionPrediction {
   snapshotVolume: number;
   nextMuted: boolean;
   nextVolume: number;
 }
 
+/** @internal */
 export function isVolumeIndicatorAction(action: string | null | undefined): action is 'toggleMuted' | 'volumeStep' {
   return action === 'toggleMuted' || action === 'volumeStep';
 }
 
+/** @internal */
 export function getVolumeLevel(volume: number): IndicatorVolumeLevel {
   if (volume <= 0) return 'off';
 
   return volume <= 0.5 ? 'low' : 'high';
 }
 
+/** @internal */
 export function formatVolumeValue(volume: number): string {
   return `${Math.round(clamp(volume, 0, 1) * 100)}%`;
 }
 
+/** @internal */
 export function getVolumeIndicatorDisplayValue(state: { value: string | null }): string {
   return state.value ?? '';
 }
 
-/** Predicted mute/volume after a volume-indicator action. */
+/**
+ * Predicted mute/volume after a volume-indicator action.
+ *
+ * @internal
+ */
 export function predictVolumeActionOutcome(event: InputActionEvent, snapshot: MediaSnapshot): VolumeActionPrediction {
   const muted = snapshot.muted === true;
   const snapshotVolume = snapshot.volume ?? 0;
@@ -56,7 +66,11 @@ export function predictVolumeActionOutcome(event: InputActionEvent, snapshot: Me
   return { snapshotVolume, nextMuted: muted, nextVolume: snapshotVolume };
 }
 
-/** Labels/value/level for volume actions, shared with `StatusIndicatorCore`. */
+/**
+ * Labels/value/level for volume actions, shared with `StatusIndicatorCore`.
+ *
+ * @internal
+ */
 export function deriveVolumeStatus(
   event: InputActionEvent,
   snapshot: MediaSnapshot,

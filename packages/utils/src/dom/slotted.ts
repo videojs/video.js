@@ -13,6 +13,7 @@ import type { Falsy } from '../types';
  * @param slotName - The slot name to search (empty string for default slot)
  * @param predicate - Function that returns the element if it matches, or falsy if not
  * @returns The first matching element, or null if not found
+ * @internal
  */
 export function getSlottedElement<T extends Element>(
   shadowRoot: ShadowRoot,
@@ -30,7 +31,11 @@ export function getSlottedElement<T extends Element>(
   return null;
 }
 
-/** Queries a slot element by name in a shadow root. */
+/**
+ * Queries a slot element by name in a shadow root.
+ *
+ * @internal
+ */
 export function querySlot(shadowRoot: ShadowRoot, name: string): HTMLSlotElement | null {
   return shadowRoot.querySelector<HTMLSlotElement>(name ? `slot[name="${name}"]` : 'slot:not([name])');
 }

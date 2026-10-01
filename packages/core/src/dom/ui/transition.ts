@@ -3,6 +3,7 @@ import { noop } from '@videojs/utils/function';
 
 import type { TransitionState } from '../../core/ui/transition';
 
+/** @internal */
 export interface TransitionApi {
   state: State<TransitionState>;
   open(el?: TransitionElement): Promise<void>;
@@ -11,6 +12,7 @@ export interface TransitionApi {
   destroy(): void;
 }
 
+/** @internal */
 export type TransitionElement = HTMLElement | null | (() => HTMLElement | null);
 
 /**
@@ -22,6 +24,8 @@ export type TransitionElement = HTMLElement | null | (() => HTMLElement | null);
  *
  * **Close:** patches `{ status: 'ending' }` (keeping `active: true` so the element stays mounted), then after a
  * double-RAF waits for `getAnimations()` to settle before patching `{ active: false, status: 'idle' }`.
+ *
+ * @internal
  */
 export function createTransition(): TransitionApi {
   const state = createState<TransitionState>({ active: false, status: 'idle' });

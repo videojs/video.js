@@ -44,6 +44,7 @@ export interface ThumbnailState {
   hidden: boolean;
 }
 
+/** @internal */
 export class ThumbnailCore {
   findActiveThumbnail(thumbnails: ThumbnailImage[], time: number): ThumbnailImage | undefined {
     return findLastAtOrBefore(thumbnails, time, (thumbnail) => thumbnail.startTime);
@@ -169,6 +170,7 @@ export class ThumbnailCore {
   }
 }
 
+/** @internal */
 export namespace ThumbnailCore {
   export type Props = ThumbnailProps & ThumbnailImageProps;
   export type RootProps = ThumbnailProps;

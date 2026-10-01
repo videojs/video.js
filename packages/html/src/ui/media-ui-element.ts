@@ -17,6 +17,8 @@ type MediaUICore<ComponentState extends object, MediaState> = MediaUIComponent<o
 /**
  * Abstract base for HTML custom elements that display media state with data attributes. `ComponentState` is the state
  * the element reflects to data attributes, and `MediaState` is the player state it reads.
+ *
+ * @internal
  */
 export abstract class MediaUIElement<
   ComponentState extends object = object,

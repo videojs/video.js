@@ -40,6 +40,7 @@ export interface MuxAdapterAPI extends MuxAdapterProps {
  *   new value.
  * @fires contentdatachange - Fired when `contentData` changes: the derived URLs with `source`, and the metadata once it
  *   loads. Read `contentData` for the new value.
+ * @internal
  */
 export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class MuxImpl extends BaseClass {

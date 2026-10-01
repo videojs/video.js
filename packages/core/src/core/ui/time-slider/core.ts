@@ -33,7 +33,11 @@ export interface TimeSliderState extends SliderState, Pick<MediaTimeState, 'curr
   bufferPercent: number;
 }
 
-/** Time-domain slider: maps media time/buffer state to slider state. */
+/**
+ * Time-domain slider: maps media time/buffer state to slider state.
+ *
+ * @internal
+ */
 export class TimeSliderCore extends SliderCore {
   static override readonly defaultProps: NonNullableObject<TimeSliderProps> = {
     ...SliderCore.defaultProps,
@@ -162,6 +166,7 @@ export class TimeSliderCore extends SliderCore {
   }
 }
 
+/** @internal */
 export namespace TimeSliderCore {
   export type Props = TimeSliderProps;
   export type State = TimeSliderState;

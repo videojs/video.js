@@ -4,7 +4,11 @@ import { kebabCase } from '@videojs/utils/string';
 import type { WistiaAdapterProps } from './props';
 import { type WistiaSource, wistiaControlProps, wistiaPlayerDefaultOptions } from './source';
 
-/** The media props that configure a Wistia player rather than name the media it plays. */
+/**
+ * The media props that configure a Wistia player rather than name the media it plays.
+ *
+ * @internal
+ */
 export type WistiaMediaOptionsProps = {
   [Key in 'autoplay' | 'controls' | 'loop' | 'poster' | 'preload']?: WistiaAdapterProps[Key] | undefined;
 };
@@ -19,6 +23,8 @@ export type WistiaMediaOptionsProps = {
  *
  * `muted` is missing because it is the state a player _starts_ in, where this runs again on every render and every
  * attribute change; `src` and `source` because they name a media rather than configure one.
+ *
+ * @internal
  */
 export function wistiaMediaOptions(props: WistiaMediaOptionsProps): WistiaSource {
   return {
@@ -66,6 +72,8 @@ const WISTIA_PLAYER_MEMBERS = new Set([
  *
  * Anything else has no attribute spelling at all and is left out, `playerColorGradient` being the one documented option
  * in that gap.
+ *
+ * @internal
  */
 export function wistiaAttributes(options: Record<string, unknown>): Record<string, string | number | boolean> {
   const attributes: Record<string, string | number | boolean> = {};

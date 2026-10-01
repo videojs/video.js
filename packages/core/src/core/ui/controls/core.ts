@@ -16,6 +16,7 @@ export interface ControlsState {
   userActive: boolean;
 }
 
+/** @internal */
 export class ControlsCore {
   static readonly defaultProps: NonNullableObject<ControlsProps> = {
     visibility: 'auto',
@@ -47,6 +48,7 @@ export class ControlsCore {
   }
 }
 
+/** @internal */
 export namespace ControlsCore {
   export type Props = ControlsProps;
   export type State = ControlsState;

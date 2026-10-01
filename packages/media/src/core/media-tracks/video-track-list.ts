@@ -69,6 +69,7 @@ export function selectedChanged(selected: VideoTrack) {
   });
 }
 
+/** @internal */
 export class VideoTrackList extends EventTarget {
   [index: number]: VideoTrack;
   #addTrackCallback: (() => void) | undefined;

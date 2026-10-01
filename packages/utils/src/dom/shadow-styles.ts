@@ -1,8 +1,13 @@
 import { supportsConstructableStyleSheets } from './supports';
 
+/** @internal */
 export type ShadowStyle = CSSStyleSheet | string;
 
-/** Inject a `<style>` tag into `document.head` once (idempotent by `id`). */
+/**
+ * Inject a `<style>` tag into `document.head` once (idempotent by `id`).
+ *
+ * @internal
+ */
 export function ensureGlobalStyle(id: string, css: string): void {
   const doc = globalThis.document;
   if (!doc || doc.getElementById(id)) return;
@@ -26,7 +31,11 @@ function getStyleText(style: ShadowStyle): string {
     .join('\n');
 }
 
-/** Create a constructable stylesheet when available, otherwise return raw CSS. */
+/**
+ * Create a constructable stylesheet when available, otherwise return raw CSS.
+ *
+ * @internal
+ */
 export function createShadowStyle(css: string): ShadowStyle {
   // Skins call this while their modules evaluate, so a throw here would break every page that imports them.
   if (!supportsConstructableStyleSheets()) return css;
@@ -37,7 +46,11 @@ export function createShadowStyle(css: string): ShadowStyle {
   return sheet;
 }
 
-/** Apply styles to a shadow root using `adoptedStyleSheets` when available, falling back to `<style>` injection. */
+/**
+ * Apply styles to a shadow root using `adoptedStyleSheets` when available, falling back to `<style>` injection.
+ *
+ * @internal
+ */
 export function applyShadowStyles(shadowRoot: ShadowRoot, styles: ShadowStyle[]): void {
   if (styles.every(isConstructableStyleSheet) && 'adoptedStyleSheets' in shadowRoot) {
     shadowRoot.adoptedStyleSheets = styles;

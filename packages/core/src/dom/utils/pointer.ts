@@ -1,6 +1,10 @@
 import { clamp } from '@videojs/utils/number';
 
-/** Convert a pointer event position to a 0–100 percent along an element's rect. */
+/**
+ * Convert a pointer event position to a 0–100 percent along an element's rect.
+ *
+ * @internal
+ */
 export function getPercentFromPointerEvent(
   event: { clientX: number; clientY: number },
   rect: DOMRect,

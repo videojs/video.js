@@ -16,12 +16,15 @@ import {
   selectVolume,
 } from '../store/selectors';
 
+/** @internal */
 export type CoordinatorEvent = GestureActivateEvent | HotkeyActivateEvent;
 
+/** @internal */
 export interface MediaSnapshotStore {
   readonly state: object;
 }
 
+/** @internal */
 export function toInputActionEvent(event: CoordinatorEvent): InputActionEvent {
   return {
     action: event.action,
@@ -32,6 +35,7 @@ export function toInputActionEvent(event: CoordinatorEvent): InputActionEvent {
   };
 }
 
+/** @internal */
 export function getMediaSnapshot(store: MediaSnapshotStore | undefined): MediaSnapshot {
   if (!store) return {};
 
@@ -55,6 +59,7 @@ export function getMediaSnapshot(store: MediaSnapshotStore | undefined): MediaSn
   };
 }
 
+/** @internal */
 export function subscribeToInputActions(
   container: HTMLElement,
   callback: (event: InputActionEvent) => void
@@ -71,6 +76,7 @@ export function subscribeToInputActions(
 
 const indicatorVisibilityCoordinators = new WeakMap<HTMLElement, IndicatorVisibilityCoordinator>();
 
+/** @internal */
 export function getIndicatorVisibilityCoordinator(container: HTMLElement): IndicatorVisibilityCoordinator {
   let coordinator = indicatorVisibilityCoordinators.get(container);
 

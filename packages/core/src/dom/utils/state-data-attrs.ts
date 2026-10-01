@@ -15,6 +15,8 @@ import type { StateAttrMap } from '../../core/ui/types';
  *   ```
  *
  *   When a mapping is provided, only mapped keys are converted.
+ *
+ * @internal
  */
 export function getStateDataAttrs<State extends object>(
   state: State,
@@ -51,6 +53,8 @@ export function getStateDataAttrs<State extends object>(
  *   applyStateDataAttrs(element, state);
  *   // element has data-paused="", data-ended is removed
  *   ```;
+ *
+ * @internal
  */
 export function applyStateDataAttrs<State extends object>(
   element: HTMLElement,

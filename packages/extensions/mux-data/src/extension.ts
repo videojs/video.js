@@ -1,4 +1,4 @@
-import type { ExtensionPlayer, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
+import type { ExtensionPlayer, PlayerTarget } from '@videojs/core/dom';
 import { isEngineAdapter, isMediaSourceCapable, type Media } from '@videojs/media';
 import { getMediaAdapter, getMediaElement } from '@videojs/media/dom';
 import { listen } from '@videojs/utils/dom';
@@ -54,8 +54,11 @@ function srcOf(media: Media): string {
  *
  * The SDK needs the native element, so a custom media element or adapter is resolved to the `<video>` it fronts; a
  * plain `<video>` is monitored directly. Source and engine changes are read from the media the player attached.
+ *
+ * Its `PlayerExtension` members are internal: the player drives them, and the element and hook that register it check
+ * that it conforms.
  */
-export class MuxDataExtension implements MuxDataExtensionProps, PlayerExtension {
+export class MuxDataExtension implements MuxDataExtensionProps {
   static readonly defaultProps: MuxDataExtensionProps = {
     MuxDataSdk: Mux,
     beaconCollectionDomain: undefined,
@@ -97,14 +100,17 @@ export class MuxDataExtension implements MuxDataExtensionProps, PlayerExtension 
     Object.assign(this, props);
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   connect(player: ExtensionPlayer) {
     this.#playerCreatedAt = player.initTime;
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   disconnect() {
     this.#playerCreatedAt = undefined;
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   attach({ media }: PlayerTarget) {
     if (this.#media === media) return;
 
@@ -115,6 +121,7 @@ export class MuxDataExtension implements MuxDataExtensionProps, PlayerExtension 
     this.#syncMonitor();
   }
 
+  /** @internal Player lifecycle; the player calls it. */
   detach() {
     this.#destroyMonitor();
     this.#stopListening?.();

@@ -9,6 +9,7 @@ export type {
   ShakaSource,
 } from '@videojs/shaka-video';
 
+/** @experimental */
 export class ShakaVideoElement extends ShakaVideo {
   static readonly tagName = 'shaka-video';
 }

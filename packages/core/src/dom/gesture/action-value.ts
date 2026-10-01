@@ -4,7 +4,11 @@ import { DEFAULT_SEEK_STEP } from '../../core/ui/constants';
 import { getMediaInputActionValue } from '../media-action-value';
 import type { GestureRegion } from './gesture';
 
-/** Resolves the effective value for a gesture action from its explicit value and region. */
+/**
+ * Resolves the effective value for a gesture action from its explicit value and region.
+ *
+ * @internal
+ */
 export function getGestureActionValue(
   action: string,
   region: GestureRegion | undefined,

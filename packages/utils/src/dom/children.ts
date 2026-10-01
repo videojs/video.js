@@ -1,9 +1,17 @@
+/** @internal */
 export type ElementPredicate = (element: Element, index: number) => boolean;
+/** @internal */
 export type ElementTypePredicate<T extends Element> = (element: Element, index: number) => element is T;
 
-/** Return direct element children accepted by the predicate. */
+/**
+ * Return direct element children accepted by the predicate.
+ *
+ * @internal
+ */
 export function getElementChildren<T extends Element>(parent: Element, predicate: ElementTypePredicate<T>): T[];
+/** @internal */
 export function getElementChildren(parent: Element, predicate: ElementPredicate): Element[];
+/** @internal */
 export function getElementChildren(parent: Element, predicate: ElementPredicate): Element[] {
   const children: Element[] = [];
 
@@ -16,9 +24,15 @@ export function getElementChildren(parent: Element, predicate: ElementPredicate)
   return children;
 }
 
-/** Find the first direct element child accepted by the predicate. */
+/**
+ * Find the first direct element child accepted by the predicate.
+ *
+ * @internal
+ */
 export function findElementChild<T extends Element>(parent: Element, predicate: ElementTypePredicate<T>): T | null;
+/** @internal */
 export function findElementChild(parent: Element, predicate: ElementPredicate): Element | null;
+/** @internal */
 export function findElementChild(parent: Element, predicate: ElementPredicate): Element | null {
   for (let index = 0; index < parent.children.length; index++) {
     const child = parent.children.item(index);
@@ -32,6 +46,8 @@ export function findElementChild(parent: Element, predicate: ElementPredicate): 
  * Return what an element composes: the elements assigned to a slot, or otherwise its own children.
  *
  * A slot with nothing assigned yields its fallback content, so the result always describes what renders.
+ *
+ * @internal
  */
 export function getComposedChildren(parent: Element): Element[] {
   if (parent instanceof HTMLSlotElement) {
@@ -47,9 +63,13 @@ export function getComposedChildren(parent: Element): Element[] {
  *
  * Depth-first from the root's composed children, so an element slotted in from outside is found even through a
  * forwarding slot or a wrapper such as `<picture>`. The root itself is never returned.
+ *
+ * @internal
  */
 export function findComposedElement<T extends Element>(root: Element, predicate: ElementTypePredicate<T>): T | null;
+/** @internal */
 export function findComposedElement(root: Element, predicate: ElementPredicate): Element | null;
+/** @internal */
 export function findComposedElement(root: Element, predicate: ElementPredicate): Element | null {
   const children = getComposedChildren(root);
 
@@ -63,7 +83,11 @@ export function findComposedElement(root: Element, predicate: ElementPredicate):
   return null;
 }
 
-/** Follow a single-child relationship from the root until it ends or cycles. */
+/**
+ * Follow a single-child relationship from the root until it ends or cycles.
+ *
+ * @internal
+ */
 export function followElementPath<T extends Element>(root: T, getNext: (element: T) => T | null): T[] {
   const path: T[] = [];
   const visited = new Set<T>();

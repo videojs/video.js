@@ -26,10 +26,12 @@ export interface MenuProps {
 
 type MenuCoreProps = Omit<MenuProps, 'boundary'>;
 
+/** @internal */
 export interface MenuTriggerProps {
   disabled?: boolean | undefined;
 }
 
+/** @internal */
 export interface MenuPopupProps {
   /** Keep the popup mounted while closed. */
   keepMounted?: boolean | undefined;
@@ -46,16 +48,22 @@ export interface MenuOptionState {
   availability: 'available' | 'unavailable' | 'unsupported';
 }
 
+/** @internal */
 export interface MenuItemProps {
   disabled?: boolean | undefined;
 }
 
+/** @internal */
 export interface MenuItemIndicatorProps {
   checked?: boolean | undefined;
   forceMount?: boolean | undefined;
 }
 
-/** Combines direct and nested option-menu state for a parent trigger. */
+/**
+ * Combines direct and nested option-menu state for a parent trigger.
+ *
+ * @internal
+ */
 export function resolveMenuOptionState(states: Iterable<MenuOptionState>): MenuOptionState | null {
   const options = [...states];
   if (options.length === 0) return null;
@@ -93,7 +101,11 @@ export interface MenuState extends TransitionFlags {
   isSubmenu: boolean;
 }
 
-/** Base menu logic: ARIA attributes and open/close state computation. */
+/**
+ * Base menu logic: ARIA attributes and open/close state computation.
+ *
+ * @internal
+ */
 export class MenuCore {
   static readonly defaultProps: NonNullableObject<MenuCoreProps> = {
     side: 'bottom',
@@ -158,6 +170,7 @@ export class MenuCore {
   }
 }
 
+/** @internal */
 export namespace MenuCore {
   export type Props = MenuCoreProps;
   export type State = MenuState;

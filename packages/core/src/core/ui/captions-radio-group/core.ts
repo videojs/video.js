@@ -23,6 +23,7 @@ export interface CaptionsRadioGroupOption extends RadioOption {}
 export interface CaptionsRadioGroupState
   extends Pick<MediaTextTrackState, 'subtitlesShowing'>, RadioOptionsState<CaptionsRadioGroupOption> {}
 
+/** @internal */
 export const CAPTIONS_OFF_VALUE = 'off';
 
 function formatTrackLabel(track: MediaTextTrack): Text | string {
@@ -33,6 +34,7 @@ function formatTrackLabel(track: MediaTextTrack): Text | string {
   return track.kind === 'captions' ? captionsText : subtitlesText;
 }
 
+/** @internal */
 export class CaptionsRadioGroupCore {
   static readonly defaultProps: NonNullableObject<CaptionsRadioGroupProps> = {
     label: '',
@@ -134,6 +136,7 @@ export class CaptionsRadioGroupCore {
   }
 }
 
+/** @internal */
 export namespace CaptionsRadioGroupCore {
   export type Props = CaptionsRadioGroupProps;
   export type State = CaptionsRadioGroupState;

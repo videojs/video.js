@@ -1,0 +1,54 @@
+---
+title: translateText
+description: Translate a text descriptor, or fall back to its English default
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { translateText } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { translateText } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`translateText` translates a text descriptor with a translator from <DocsLink slug="reference/api/create-translator">`createTranslator`</DocsLink>. Without one, it fills the descriptor's English default with the params. A plain string is returned as is, so a label can be either.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, translateText } from '@videojs/html/i18n';
+import { forwardText } from '@videojs/html/i18n/text/seek';
+
+translateText(forwardText, { seconds: 10 }); // 'Seek forward 10 seconds'
+
+const t = createTranslator(getI18nTranslations('fr'), 'fr');
+translateText(forwardText, t, { seconds: 10 });
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, translateText } from '@videojs/react/i18n';
+import { forwardText } from '@videojs/react/i18n/text/seek';
+
+translateText(forwardText, { seconds: 10 }); // 'Seek forward 10 seconds'
+
+const t = createTranslator(getI18nTranslations('fr'), 'fr');
+translateText(forwardText, t, { seconds: 10 });
+```
+
+</FrameworkCase>
+
+<UtilReference util="translateText" />

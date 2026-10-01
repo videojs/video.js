@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { CaptionsButtonState } from './core';
 
+/** @internal */
 export const CaptionsButtonDataAttrs = {
   /** Present when captions are enabled. */
   subtitlesShowing: 'data-active',

@@ -6,7 +6,11 @@ import * as dashjs from 'dashjs';
 
 import { DashMediaTracksMixin } from './media-tracks';
 
-/** Structured DASH source: which source to play, plus how to play it. */
+/**
+ * Structured DASH source: which source to play, plus how to play it.
+ *
+ * @experimental
+ */
 export interface DashSource {
   /** MPD URL. Mirrors the host's `src` property. */
   src?: string | undefined;
@@ -14,12 +18,17 @@ export interface DashSource {
   engine?: DashEngineConfig | undefined;
 }
 
-/** The engines a DASH source can configure. */
+/**
+ * The engines a DASH source can configure.
+ *
+ * @experimental
+ */
 export interface DashEngineConfig {
   /** Dash.js's own settings, passed through untouched. Replacing them resets any previously applied settings. */
   dashJs?: dashjs.MediaPlayerSettingClass | undefined;
 }
 
+/** @experimental */
 export interface DashAdapterProps {
   src: string;
   source: DashSource | null;
@@ -130,5 +139,6 @@ class DashAdapterCore
 /**
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
+ * @experimental
  */
 export class DashAdapter extends DashMediaTracksMixin(DashAdapterCore) {}

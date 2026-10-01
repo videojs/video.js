@@ -20,5 +20,7 @@ const readVersion = (): string => {
  *
  *   console.log(VERSION); // '10.0.0-rc.4'
  *   ```
+ *
+ * @internal
  */
 export const VERSION: string = readVersion();

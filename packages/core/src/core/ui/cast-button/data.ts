@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { CastButtonState } from './core';
 
+/** @internal */
 export const CastButtonDataAttrs = {
   /**
    * Current remote playback connection state.

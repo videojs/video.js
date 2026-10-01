@@ -68,7 +68,11 @@ export interface YouTubeSourceEngineConfig {
   youtube?: YouTubeEngineConfig | undefined;
 }
 
-/** Build the iframe `src` URL for an initial YouTube embed from the given props. */
+/**
+ * Build the iframe `src` URL for an initial YouTube embed from the given props.
+ *
+ * @internal
+ */
 // Literal fallbacks mirror `YouTubeAdapter.defaultProps`; the class imports this module, so it cannot be imported back.
 export function buildYouTubeIframeSrc(src: string, props: Partial<YouTubeAdapterProps> = {}) {
   const parsed = parseYouTubeSource(src);

@@ -1,3 +1,4 @@
+/** @internal */
 export const TooltipCSSVars = {
   /** Distance between the popup and the trigger along the side axis. */
   sideOffset: '--media-tooltip-side-offset',

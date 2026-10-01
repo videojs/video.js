@@ -11,8 +11,8 @@ import { UIElement } from '../ui/ui-element';
  * (plain `<video>` / `<audio>` included) through the player itself, is released when this element disconnects, and is
  * destroyed with this element.
  */
-export abstract class PlayerExtensionElement<Extension extends PlayerExtension> extends UIElement {
-  #extension: Extension | null = null;
+export abstract class PlayerExtensionElement<Extension extends object> extends UIElement {
+  #extension: (Extension & PlayerExtension) | null = null;
   #register: ExtensionContextValue['registerExtension'] | null = null;
   #release: (() => void) | null = null;
 
@@ -21,12 +21,15 @@ export abstract class PlayerExtensionElement<Extension extends PlayerExtension> 
    *
    * Must be a method rather than a field: upgrading an element that is already in the document runs its constructor
    * while connected, so the context callback below can fire before subclass field initializers have run.
+   *
+   * @internal Returning a `PlayerExtension` is what checks that the extension conforms, without making the player
+   *   extension contract part of every element's public types.
    */
-  protected abstract createExtension(): Extension;
+  protected abstract createExtension(): Extension & PlayerExtension;
 
   /** The player extension instance registered with the player. */
   protected get extension(): Extension {
-    return (this.#extension ??= this.createExtension());
+    return this.#getExtension();
   }
 
   constructor() {
@@ -59,6 +62,10 @@ export abstract class PlayerExtensionElement<Extension extends PlayerExtension> 
     this.#release = null;
     this.#register = register;
 
-    if (register) this.#release = register(this.extension);
+    if (register) this.#release = register(this.#getExtension());
+  }
+
+  #getExtension(): Extension & PlayerExtension {
+    return (this.#extension ??= this.createExtension());
   }
 }

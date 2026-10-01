@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { PlaybackRateRadioGroupState } from './core';
 
+/** @internal */
 export const PlaybackRateRadioGroupDataAttrs = {
   /** Current playback rate. */
   rate: 'data-rate',

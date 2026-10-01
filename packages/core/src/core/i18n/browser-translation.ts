@@ -24,6 +24,7 @@ interface BrowserTranslatorConstructor {
   }): Promise<BrowserTranslatorInstance>;
 }
 
+/** @internal */
 export interface GetBrowserTranslationsOptions {
   /**
    * When true, call `Translator.create()` for `downloadable` / `downloading` (may download the on-device model).
@@ -79,7 +80,11 @@ function getBrowserTranslator(): BrowserTranslatorConstructor | undefined {
   return (globalThis as typeof globalThis & { Translator: BrowserTranslatorConstructor }).Translator;
 }
 
-/** First non-default tag in the lookup chain used as the browser translation target. */
+/**
+ * First non-default tag in the lookup chain used as the browser translation target.
+ *
+ * @internal
+ */
 export function resolveBrowserTranslationTarget(locale: string): string | undefined {
   for (const tag of findLocaleKeys(locale)) {
     if (!isDefaultLocale(tag)) return tag;
@@ -88,7 +93,11 @@ export function resolveBrowserTranslationTarget(locale: string): string | undefi
   return undefined;
 }
 
-/** Whether to invoke the Browser Translation API for this locale after lazy built-in loading. */
+/**
+ * Whether to invoke the Browser Translation API for this locale after lazy built-in loading.
+ *
+ * @internal
+ */
 export function shouldAttemptBrowserTranslation(
   locale: Locale,
   loadedLazyTags: readonly string[],
@@ -113,6 +122,8 @@ function hasMissingEnglishTranslations(translations: Partial<FlatTranslations>):
 /**
  * Translates English registry values via the on-device Browser Translation API when a pre-installed model is available.
  * Results are cached per target language tag.
+ *
+ * @internal
  */
 export async function getBrowserTranslations(
   locale: string,
@@ -183,7 +194,11 @@ export async function getBrowserTranslations(
   return result;
 }
 
-/** Clears the browser translation cache (test isolation). */
+/**
+ * Clears the browser translation cache (test isolation).
+ *
+ * @internal
+ */
 export function resetBrowserTranslationCacheForTesting(): void {
   cache.clear();
 }

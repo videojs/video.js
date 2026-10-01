@@ -47,6 +47,7 @@ const INITIAL_STATE: VolumeIndicatorState = {
   transitionEnding: false,
 };
 
+/** @internal */
 export class VolumeIndicatorCore {
   readonly state = createState<VolumeIndicatorState>({ ...INITIAL_STATE });
 
@@ -123,6 +124,7 @@ export class VolumeIndicatorCore {
   }
 }
 
+/** @internal */
 export namespace VolumeIndicatorCore {
   export type Props = VolumeIndicatorProps;
   export type State = VolumeIndicatorState;

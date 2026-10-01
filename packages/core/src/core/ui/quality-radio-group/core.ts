@@ -24,6 +24,7 @@ export interface QualityRadioGroupOption extends RadioOption {
 
 export interface QualityRadioGroupState extends RadioOptionsState<QualityRadioGroupOption> {}
 
+/** @internal */
 export const QUALITY_AUTO_VALUE = 'auto';
 
 const STANDARD_RENDITION_SIZES: readonly number[] = [4320, 2160, 1440, 1080, 720, 480, 360, 240];
@@ -93,6 +94,7 @@ function formatRenditionTier(rendition: MediaVideoRendition): string | undefined
   return undefined;
 }
 
+/** @internal */
 export class QualityRadioGroupCore {
   static readonly defaultProps: NonNullableObject<QualityRadioGroupProps> = {
     label: '',
@@ -222,6 +224,7 @@ export class QualityRadioGroupCore {
   }
 }
 
+/** @internal */
 export namespace QualityRadioGroupCore {
   export type Props = QualityRadioGroupProps;
   export type State = QualityRadioGroupState;

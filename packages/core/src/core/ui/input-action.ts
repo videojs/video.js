@@ -37,6 +37,7 @@ export interface MediaSnapshot {
   seeking?: boolean | undefined;
 }
 
+/** @internal */
 export function isInputActionIncluded(
   action: string | undefined,
   actions: readonly InputAction[] | undefined

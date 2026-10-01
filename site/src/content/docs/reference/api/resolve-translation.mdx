@@ -1,0 +1,52 @@
+---
+title: resolveTranslation
+description: Translate a key with the params its English default requires
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { resolveTranslation } from "@videojs/react/i18n";
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { resolveTranslation } from "@videojs/html/i18n";
+```
+</FrameworkCase>
+
+`resolveTranslation` calls a translator from <DocsLink slug="reference/api/create-translator">`createTranslator`</DocsLink> with a key and its params. Unlike calling the translator directly with a variable key, its type requires the params that key's English default interpolates, such as `seconds` for `seek.forward`.
+
+<FrameworkCase frameworks={["html"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, resolveTranslation } from '@videojs/html/i18n';
+
+const t = createTranslator(getI18nTranslations('fr'), 'fr');
+
+resolveTranslation(t, 'buttons.play');
+resolveTranslation(t, 'seek.forward', { seconds: 10 });
+```
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+```ts
+import { createTranslator, getI18nTranslations, resolveTranslation } from '@videojs/react/i18n';
+
+const t = createTranslator(getI18nTranslations('fr'), 'fr');
+
+resolveTranslation(t, 'buttons.play');
+resolveTranslation(t, 'seek.forward', { seconds: 10 });
+```
+
+</FrameworkCase>
+
+<UtilReference util="resolveTranslation" />

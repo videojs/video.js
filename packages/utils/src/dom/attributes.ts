@@ -1,18 +1,28 @@
 import { escapeHtml } from '../string/escape-html';
 
+/** @internal */
 export interface AttributeSnapshotEntry {
   name: string;
   value: string | null;
 }
 
+/** @internal */
 export type AttributeSnapshot = readonly AttributeSnapshotEntry[];
 
-/** Capture authored values for the selected attributes. */
+/**
+ * Capture authored values for the selected attributes.
+ *
+ * @internal
+ */
 export function snapshotAttributes(element: Element, names: Iterable<string>): AttributeSnapshot {
   return [...names].map((name) => ({ name, value: element.getAttribute(name) }));
 }
 
-/** Restore a snapshot created by `snapshotAttributes`. */
+/**
+ * Restore a snapshot created by `snapshotAttributes`.
+ *
+ * @internal
+ */
 export function restoreAttributes(element: Element, snapshot: AttributeSnapshot): void {
   for (const { name, value } of snapshot) {
     if (value === null) {
@@ -23,7 +33,11 @@ export function restoreAttributes(element: Element, snapshot: AttributeSnapshot)
   }
 }
 
-/** Convert a NamedNodeMap to a plain object. */
+/**
+ * Convert a NamedNodeMap to a plain object.
+ *
+ * @internal
+ */
 export function namedNodeMapToObject(namedNodeMap: NamedNodeMap) {
   const obj: Record<string, string> = {};
 
@@ -34,7 +48,11 @@ export function namedNodeMapToObject(namedNodeMap: NamedNodeMap) {
   return obj;
 }
 
-/** Helper function to serialize attributes into a string. */
+/**
+ * Helper function to serialize attributes into a string.
+ *
+ * @internal
+ */
 export function serializeAttributes(attrs: Record<string, string>) {
   let html = '';
 

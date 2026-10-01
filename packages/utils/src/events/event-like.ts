@@ -1,5 +1,6 @@
 import { isNumber, isObject, isString } from '../predicate';
 
+/** @internal */
 export interface EventLike {
   type: string;
   timeStamp: number;
@@ -10,6 +11,8 @@ export interface EventLike {
  * Check if a value looks like an Event (has type and timeStamp).
  *
  * Works with DOM Events, React SyntheticEvents, and RN events.
+ *
+ * @internal
  */
 export function isEventLike(value: unknown): value is EventLike {
   return (

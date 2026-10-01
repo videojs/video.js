@@ -4,6 +4,7 @@ import type { DialogCore, StateAttrMap, DialogState } from '@videojs/core';
 import type { DialogApi } from '@videojs/core/dom';
 import { createContext, useContext } from 'react';
 
+/** @internal */
 export interface DialogContextValue {
   core: DialogCore;
   dialog: DialogApi;
@@ -16,7 +17,11 @@ const DialogContext = createContext<DialogContextValue | null>(null);
 
 export const DialogContextProvider = DialogContext.Provider;
 
-/** Returns the current dialog compound-component context. Throws outside a dialog root. */
+/**
+ * Returns the current dialog compound-component context. Throws outside a dialog root.
+ *
+ * @internal
+ */
 export function useDialogContext(): DialogContextValue {
   return useDialogContextFor('Dialog');
 }

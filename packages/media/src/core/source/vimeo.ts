@@ -1,4 +1,8 @@
-/** Parsed pieces of a Vimeo source URL. */
+/**
+ * Parsed pieces of a Vimeo source URL.
+ *
+ * @internal
+ */
 export interface ParsedVimeoSource {
   id: number;
   /** `'video'` for regular clips, `'event'` for live events. */
@@ -7,7 +11,11 @@ export interface ParsedVimeoSource {
   hash: string | null;
 }
 
-/** Extract a Vimeo video id from a numeric id, `vimeo/<id>` shorthand, vimeo.com URL, or player URL. */
+/**
+ * Extract a Vimeo video id from a numeric id, `vimeo/<id>` shorthand, vimeo.com URL, or player URL.
+ *
+ * @internal
+ */
 export function parseVimeoVideoId(src: string) {
   return parseVimeoSource(src)?.id ?? null;
 }
@@ -16,6 +24,8 @@ export function parseVimeoVideoId(src: string) {
  * Parse a Vimeo source: a numeric id, a `vimeo/<id>` shorthand, `vimeo.com/<id>`, `vimeo.com/video/<id>`,
  * `player.vimeo.com/video/<id>`, or `vimeo.com/event/<id>` (live events), plus unlisted/event hashes from `?h=` or a
  * `/<hash>` segment. Shorthands also take the hash from `?hash=`.
+ *
+ * @internal
  */
 export function parseVimeoSource(src: string): ParsedVimeoSource | null {
   if (!src) return null;

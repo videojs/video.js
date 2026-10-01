@@ -8,6 +8,7 @@ import { selectBuffer, selectTextTrack, selectTime } from '../store/selectors';
 
 export type { HotkeyActionName } from '../../core/ui/hotkey/core';
 
+/** @internal */
 export interface HotkeyActionContext {
   store: AnyPlayerStore;
   value?: number | undefined;
@@ -15,8 +16,10 @@ export interface HotkeyActionContext {
   key: string;
 }
 
+/** @internal */
 export type HotkeyActionResolver = (context: HotkeyActionContext) => void;
 
+/** @internal */
 export function isHotkeyToggleAction(action: string): boolean {
   return action.startsWith('toggle');
 }
@@ -64,6 +67,7 @@ const HOTKEY_ACTIONS: Record<HotkeyActionName, HotkeyActionResolver> = {
   },
 };
 
+/** @internal */
 export function resolveHotkeyAction(name: string): HotkeyActionResolver | undefined {
   const resolver = HOTKEY_ACTIONS[name as HotkeyActionName];
 

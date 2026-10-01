@@ -28,7 +28,11 @@ export interface HTMLMediaTargetLike extends MediaTargetLike, EventTarget {
   querySelectorAll<E extends Element = Element>(selectors: string): NodeListOf<E> | never[];
 }
 
-/** An {@link HTMLMediaAdapter} over any target and event map: the shape element façades share. */
+/**
+ * An {@link HTMLMediaAdapter} over any target and event map: the shape element façades share.
+ *
+ * @internal
+ */
 export type AnyHTMLMediaAdapter<Target extends HTMLMediaTargetLike = any> = HTMLMediaAdapter<Target, any>;
 
 /**

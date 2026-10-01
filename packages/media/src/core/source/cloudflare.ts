@@ -1,4 +1,8 @@
-/** Parsed pieces of a Cloudflare Stream source. */
+/**
+ * Parsed pieces of a Cloudflare Stream source.
+ *
+ * @internal
+ */
 export interface ParsedCloudflareSource {
   /** Video UID, or the signed token standing in for one. */
   id: string;
@@ -12,7 +16,11 @@ export interface ParsedCloudflareSource {
   origin: string | null;
 }
 
-/** Extract a Cloudflare video UID from a raw UID, a signed token, or any recognized URL. */
+/**
+ * Extract a Cloudflare video UID from a raw UID, a signed token, or any recognized URL.
+ *
+ * @internal
+ */
 export function parseCloudflareVideoId(src: string) {
   return parseCloudflareSource(src)?.id ?? null;
 }
@@ -21,6 +29,8 @@ export function parseCloudflareVideoId(src: string) {
  * Parse a Cloudflare Stream source string. Recognizes `videodelivery.net` and `cloudflarestream.com` URLs (embed,
  * iframe, manifest, and thumbnail paths all carry the id in the same position), raw 32-character video UIDs, and signed
  * tokens, which stand in for the UID wherever it appears.
+ *
+ * @internal
  */
 export function parseCloudflareSource(src: string): ParsedCloudflareSource | null {
   if (!src) return null;

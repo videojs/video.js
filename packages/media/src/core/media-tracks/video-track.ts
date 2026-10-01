@@ -2,6 +2,7 @@ import { VideoRendition } from './video-rendition';
 import { addRendition, removeRendition } from './video-rendition-list';
 import { selectedChanged } from './video-track-list';
 
+/** @internal */
 export const VideoTrackKind = {
   alternative: 'alternative',
   captions: 'captions',
@@ -11,6 +12,7 @@ export const VideoTrackKind = {
   commentary: 'commentary',
 };
 
+/** @internal */
 export class VideoTrack {
   id: string | undefined;
   kind: string | undefined;

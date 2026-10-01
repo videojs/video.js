@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { SliderState } from './core';
 
+/** @internal */
 export const SliderDataAttrs = {
   /** Present when the user is actively dragging. */
   dragging: 'data-dragging',

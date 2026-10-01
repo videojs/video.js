@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { PiPButtonState } from './core';
 
+/** @internal */
 export const PiPButtonDataAttrs = {
   /** Present when picture-in-picture mode is active. */
   pip: 'data-pip',

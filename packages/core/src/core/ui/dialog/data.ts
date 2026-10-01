@@ -1,6 +1,7 @@
 import type { StateAttrMap } from '../types';
 import type { DialogState } from './core';
 
+/** @internal */
 export const DialogDataAttrs = {
   /** Present when the dialog is open. */
   open: 'data-open',

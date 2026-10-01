@@ -74,6 +74,9 @@ jobs:
       - name: Generate site content
         run: pnpm exec vp run site#api-docs:generate
 
+      - name: Check public API stability tags
+        run: pnpm -F site check:api-stability
+
       - name: Astro check
         run: cd site && pnpm astro check --minimumSeverity warning
 

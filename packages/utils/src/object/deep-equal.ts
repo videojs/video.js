@@ -10,6 +10,8 @@ import { isPlainObject, isUndefined } from '../predicate';
  *   deepEqual({ a: [1, { b: 2 }] }, { a: [1, { b: 2 }] }); // true
  *   deepEqual({ a: 1, b: undefined }, { a: 1 }); // true
  *   ```;
+ *
+ * @internal
  */
 export function deepEqual(a: unknown, b: unknown): boolean {
   if (Object.is(a, b)) return true;

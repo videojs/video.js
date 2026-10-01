@@ -45,7 +45,11 @@ export interface CloudflareSourceEngineConfig {
   cloudflare?: CloudflareEngineConfig | undefined;
 }
 
-/** Build the iframe `src` URL for an initial Cloudflare Stream embed from the given props. */
+/**
+ * Build the iframe `src` URL for an initial Cloudflare Stream embed from the given props.
+ *
+ * @internal
+ */
 // Literal fallbacks mirror `CloudflareAdapter.defaultProps`; the class imports this module, so it cannot be imported back.
 export function buildCloudflareIframeSrc(src: string, props: Partial<CloudflareAdapterProps> = {}) {
   const parsed = parseCloudflareSource(src);

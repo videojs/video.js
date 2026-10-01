@@ -87,6 +87,7 @@ function getCurrentRenditions(renditionList: VideoRenditionList): VideoRendition
     .flatMap((track) => [...(getPrivate(track).renditionSet as Set<VideoRendition>)]);
 }
 
+/** @internal */
 export class VideoRenditionList extends EventTarget {
   [index: number]: VideoRendition;
   #addRenditionCallback: (() => void) | undefined;
