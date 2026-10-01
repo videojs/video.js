@@ -184,6 +184,18 @@ The installed skin sets `data-theme` and `data-preset` on its `Container`. Keep 
 The `skin.html` file contains the layout. The `skin.ts` module registers the custom elements and loads `skin.css`. Elements use class names that start with `media-`; change a class in `skin.html` or a rule in the stylesheet to change one part of the interface.
 </FrameworkCase>
 
+### Change which controls narrow players hide
+
+Skins hide some controls when the player is narrow, using container queries on the player's width rather than the viewport. The Default and Neutral video skins show the captions button on players at least `20rem` wide, about 320 pixels; below that, captions stay available from the settings menu. The live video skins, which have no settings menu, always show their captions menu.
+
+<FrameworkCase frameworks={["react"]}>
+To change that width, edit the class on `CaptionsButton` in `components/videojs/video/layout/controls.tsx`. With Tailwind CSS, replace `media-max-xs:hidden` with another breakpoint, such as `media-max-sm:hidden`, or remove it to always show the button. With vanilla CSS, edit the `@container media-root (width < 20rem)` rule for `.video-controls-captions-button` in `skin.css`. Other controls follow the same pattern.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+To change that width, edit the `@container media-root (width < 20rem)` rule for `.video-controls-captions-button` in `skin.css`, or remove the rule to always show the button. Other controls follow the same pattern.
+</FrameworkCase>
+
 ### Inspect or update the skin source
 
 Use the CLI's `search` command to find source and `view` to inspect it before installation:
