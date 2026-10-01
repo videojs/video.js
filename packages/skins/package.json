@@ -1,6 +1,6 @@
 {
   "name": "@videojs/skins",
-  "version": "10.0.0-rc.5",
+  "version": "10.0.0",
   "private": true,
   "description": "Canonical VJSC skin sources and delivery generators for Video.js",
   "keywords": [
