@@ -2,7 +2,7 @@ import type { CompareMode } from '@app/compare';
 import { Badge } from '@app/components/ui/badge';
 import { Button } from '@app/components/ui/button';
 import { useSidebar } from '@app/components/ui/sidebar';
-import { SKIN_SOURCES, type SKINS } from '@app/constants';
+import { SKINS, SKIN_SOURCES } from '@app/constants';
 import { PLATFORM_LABELS, SKIN_LABELS, SKIN_SOURCE_LABELS, STYLING_LABELS } from '@app/labels';
 import { hasSkinChoice, hasTailwindSkin, MEDIA, MEDIA_IDS, type MediaId } from '@app/media';
 import { skinSourceAvailable, tailwindSkinAvailable } from '@app/shared/skin-sources';
@@ -26,8 +26,6 @@ type NavbarProps = {
   /** The options panel this bar's toggle opens and closes. */
   optionsId: string;
 };
-
-const SKIN_OPTIONS: readonly Skin[] = ['default', 'neutral'] satisfies readonly (typeof SKINS)[number][];
 
 /** What plays: the platform, the media, and its source. The skin controls sit in the preview's header below. */
 export function Navbar({
@@ -168,7 +166,7 @@ export function SkinControls({
         label="Skin"
         value={skin}
         onChange={(v) => onSkinChange(v as Skin)}
-        options={SKIN_OPTIONS.map((s) => ({ value: s, label: SKIN_LABELS[s] }))}
+        options={SKINS.map((value) => ({ value, label: SKIN_LABELS[value] }))}
         disabled={!hasSkinChoice(media)}
       />
 

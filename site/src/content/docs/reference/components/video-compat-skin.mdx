@@ -1,0 +1,73 @@
+---
+title: CompatVideoSkin
+frameworkTitle:
+  html: video-compat-skin
+description: A video skin designed for broader browser compatibility
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
+import OwnTheUI from '@/components/installation/OwnTheUI.astro';
+
+The Compat skin of the video preset provides basic controls and plain surfaces, with broader browser compatibility as its design goal. Its time slider supports chapter segments and thumbnail previews. See <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> to install and edit its source.
+
+## Import
+
+<SkinImports preset="video" react="CompatVideoSkin" compat />
+
+## Usage
+
+The skin goes between the player and the media element. It renders its controls around the media.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<VideoPlayer>
+  <CompatVideoSkin>
+    <Video src="video.mp4" />
+  </CompatVideoSkin>
+</VideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<video-player>
+  <video-compat-skin>
+    <video src="video.mp4"></video>
+  </video-compat-skin>
+</video-player>
+```
+</FrameworkCase>
+
+## Poster
+
+<FrameworkCase frameworks={["react"]}>
+The skin renders a poster image before playback starts. Pass `renderPoster` to replace it with your own component.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The skin renders a poster image before playback starts. An element with `slot="poster"` replaces it.
+</FrameworkCase>
+
+See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink> for complete examples.
+
+## Thumbnail
+
+<FrameworkCase frameworks={["react"]}>
+The skin renders a storyboard preview image while scrubbing the time slider. Pass `renderThumbnail` to replace it with your own image, for example to set `crossOrigin`, `loading`, or `fetchPriority`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The skin renders a storyboard preview image while scrubbing the time slider. An `<img slot="thumbnail">` replaces it, so image attributes such as `crossorigin`, `loading`, and `fetchpriority` go on it.
+</FrameworkCase>
+
+See <DocsLink slug="guides/thumbnails">Show timeline thumbnail previews</DocsLink> for complete examples.
+
+## Styling
+
+Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
+
+## Own the UI
+
+<OwnTheUI />

@@ -27,8 +27,7 @@ export interface SkinCatalogEntry {
 function describe(name: SkinName): SkinCatalogEntry {
   const style = skinStyles[name];
   const preset = skinPreset(name);
-  const neutral = style.theme === 'neutral';
-  const cssTag = neutral ? `${preset}-neutral-skin` : `${preset}-skin`;
+  const cssTag = style.theme === 'default' ? `${preset}-skin` : `${preset}-${style.theme}-skin`;
 
   return {
     name,
@@ -38,7 +37,7 @@ function describe(name: SkinName): SkinCatalogEntry {
     live: preset.startsWith('live-'),
     label: `${pascalCase(style.theme)} ${preset.split('-').map(pascalCase).join(' ')}`,
     exportName: `${pascalCase(preset)}Skin`,
-    component: `${neutral ? 'Neutral' : ''}${pascalCase(preset)}Skin`,
+    component: `${style.theme === 'default' ? '' : pascalCase(style.theme)}${pascalCase(preset)}Skin`,
     tags: { css: cssTag, tailwind: `${cssTag}-tailwind` },
     registryItem: preset,
     directory: skinDirectory(name),

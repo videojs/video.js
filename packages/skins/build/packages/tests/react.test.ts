@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 import type { Graph } from 'vjsc/graph';
 
-import type { SkinModuleMeta } from '../../../src/meta.ts';
+import { isSkinName, type SkinModuleMeta, skinStyles } from '../../../src/meta.ts';
 import { skinClassNameMergeImport } from '../../imports.ts';
 import { skinSourceDirectory } from '../../skin.ts';
 import { createReactPackageSkins } from '../react.ts';
@@ -63,71 +63,69 @@ describe('createReactPackageSkins', () => {
 
 function fixtureGraph(root: string): Graph<SkinModuleMeta> {
   const modules = new Map();
+  const skins = Object.keys(skinStyles).filter(isSkinName);
 
-  for (const theme of ['default', 'neutral'] as const) {
-    for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
-      const skin = `${theme}-${preset}` as const;
-      const rootId = `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx?skin=${skin}&style=css&target=react`;
-      const buttonId = `${root}/components/button.tsx?skin=${skin}&style=css&target=react`;
-      const themedId = `${root}/components/themed.tsx?skin=${skin}&style=css&target=react`;
-      const labelId = `${root}/components/label.tsx?skin=${skin}&style=css&target=react`;
-      const rootSource = `import { Button } from '../../components/button';\nimport { Label } from '../../components/label';\nimport { Themed } from '../../components/themed';\nexport function ${pascalCase(theme)}${pascalCase(preset)}Skin() { return <><Button /><Label />{Themed}</>; }`;
-      const labelSource =
-        "import { Themed } from './themed';\nexport function Label() { return <span>{Themed}</span>; }";
-      const buttonSource = `import { PlayButton } from '@videojs/react';\nimport { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';\nimport { cn } from '${skinClassNameMergeImport}';\nexport function Button() { return <PlaybackRateRadioGroup.Root className={cn('button')}><PlayButton /></PlaybackRateRadioGroup.Root>; }`;
+  for (const skin of skins) {
+    const { preset, theme } = skinStyles[skin];
+    const rootId = `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx?skin=${skin}&style=css&target=react`;
+    const buttonId = `${root}/components/button.tsx?skin=${skin}&style=css&target=react`;
+    const themedId = `${root}/components/themed.tsx?skin=${skin}&style=css&target=react`;
+    const labelId = `${root}/components/label.tsx?skin=${skin}&style=css&target=react`;
+    const rootSource = `import { Button } from '../../components/button';\nimport { Label } from '../../components/label';\nimport { Themed } from '../../components/themed';\nexport function ${pascalCase(theme)}${pascalCase(preset)}Skin() { return <><Button /><Label />{Themed}</>; }`;
+    const labelSource = "import { Themed } from './themed';\nexport function Label() { return <span>{Themed}</span>; }";
+    const buttonSource = `import { PlayButton } from '@videojs/react';\nimport { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';\nimport { cn } from '${skinClassNameMergeImport}';\nexport function Button() { return <PlaybackRateRadioGroup.Root className={cn('button')}><PlayButton /></PlaybackRateRadioGroup.Root>; }`;
 
-      modules.set(rootId, {
-        id: rootId,
-        filename: `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx`,
-        sourcePath: `skins/${skinSourceDirectory(skin)}/skin.tsx`,
-        params: { skin, style: 'css', target: 'react' },
-        source: rootSource,
-        imports: [
-          { ...importReference(rootSource, '../../components/button'), resolvedId: buttonId },
-          { ...importReference(rootSource, '../../components/label'), resolvedId: labelId },
-          { ...importReference(rootSource, '../../components/themed'), resolvedId: themedId },
-        ],
-        styles: { files: [], assets: [] },
-        meta: {
-          type: 'skin',
-          name: skin,
-          title: skin,
-          description: skin,
-          style: { scope: '.media-skin', theme, preset },
-        },
-      });
-      modules.set(buttonId, {
-        id: buttonId,
-        filename: `${root}/components/button.tsx`,
-        sourcePath: 'components/button.tsx',
-        params: { skin, style: 'css', target: 'react' },
-        source: buttonSource,
-        imports: [
-          importReference(buttonSource, '@videojs/react'),
-          importReference(buttonSource, '@videojs/react/ui/playback-rate-radio-group'),
-          importReference(buttonSource, skinClassNameMergeImport),
-        ],
-        styles: { files: [], assets: [] },
-      });
-      modules.set(labelId, {
-        id: labelId,
-        filename: `${root}/components/label.tsx`,
-        sourcePath: 'components/label.tsx',
-        params: { skin, style: 'css', target: 'react' },
-        source: labelSource,
-        imports: [{ ...importReference(labelSource, './themed'), resolvedId: themedId }],
-        styles: { files: [], assets: [] },
-      });
-      modules.set(themedId, {
-        id: themedId,
-        filename: `${root}/components/themed.tsx`,
-        sourcePath: 'components/themed.tsx',
-        params: { skin, style: 'css', target: 'react' },
-        source: `export const Themed = '${theme}';`,
-        imports: [],
-        styles: { files: [], assets: [] },
-      });
-    }
+    modules.set(rootId, {
+      id: rootId,
+      filename: `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx`,
+      sourcePath: `skins/${skinSourceDirectory(skin)}/skin.tsx`,
+      params: { skin, style: 'css', target: 'react' },
+      source: rootSource,
+      imports: [
+        { ...importReference(rootSource, '../../components/button'), resolvedId: buttonId },
+        { ...importReference(rootSource, '../../components/label'), resolvedId: labelId },
+        { ...importReference(rootSource, '../../components/themed'), resolvedId: themedId },
+      ],
+      styles: { files: [], assets: [] },
+      meta: {
+        type: 'skin',
+        name: skin,
+        title: skin,
+        description: skin,
+        style: { scope: '.media-skin', theme, preset },
+      },
+    });
+    modules.set(buttonId, {
+      id: buttonId,
+      filename: `${root}/components/button.tsx`,
+      sourcePath: 'components/button.tsx',
+      params: { skin, style: 'css', target: 'react' },
+      source: buttonSource,
+      imports: [
+        importReference(buttonSource, '@videojs/react'),
+        importReference(buttonSource, '@videojs/react/ui/playback-rate-radio-group'),
+        importReference(buttonSource, skinClassNameMergeImport),
+      ],
+      styles: { files: [], assets: [] },
+    });
+    modules.set(labelId, {
+      id: labelId,
+      filename: `${root}/components/label.tsx`,
+      sourcePath: 'components/label.tsx',
+      params: { skin, style: 'css', target: 'react' },
+      source: labelSource,
+      imports: [{ ...importReference(labelSource, './themed'), resolvedId: themedId }],
+      styles: { files: [], assets: [] },
+    });
+    modules.set(themedId, {
+      id: themedId,
+      filename: `${root}/components/themed.tsx`,
+      sourcePath: 'components/themed.tsx',
+      params: { skin, style: 'css', target: 'react' },
+      source: `export const Themed = '${theme}';`,
+      imports: [],
+      styles: { files: [], assets: [] },
+    });
   }
 
   return { root, modules, assets: new Map() };

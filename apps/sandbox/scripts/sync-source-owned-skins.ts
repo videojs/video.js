@@ -51,33 +51,86 @@ const installs = [
     destination: 'react-tailwind-default',
     alias: '@registry-react-tailwind-default',
     globalStyles: true,
+    presets,
+    baseStyle: 'base.css',
   },
   {
     catalog: 'react/neutral',
     destination: 'react-tailwind-neutral',
     alias: '@registry-react-tailwind-neutral',
     globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
+    catalog: 'react/compat',
+    destination: 'react-tailwind-compat',
+    alias: '@registry-react-tailwind-compat',
+    globalStyles: true,
+    presets,
+    baseStyle: 'base.css',
   },
   {
     catalog: 'react/css',
     destination: 'react-css-default',
     alias: '@registry-react-css-default',
     globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
   },
   {
     catalog: 'react/css/neutral',
     destination: 'react-css-neutral',
     alias: '@registry-react-css-neutral',
     globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
   },
-  { catalog: 'html', destination: 'html-default', alias: '@registry-html-default', globalStyles: false },
-  { catalog: 'html/neutral', destination: 'html-neutral', alias: '@registry-html-neutral', globalStyles: false },
+  {
+    catalog: 'react/css/compat',
+    destination: 'react-css-compat',
+    alias: '@registry-react-css-compat',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
+    catalog: 'html',
+    destination: 'html-default',
+    alias: '@registry-html-default',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
+    catalog: 'html/neutral',
+    destination: 'html-neutral',
+    alias: '@registry-html-neutral',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
+    catalog: 'html/compat',
+    destination: 'html-compat',
+    alias: '@registry-html-compat',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
 ] as const;
 
 await rm(generatedDir, { recursive: true, force: true });
 
 try {
   for (const install of installs) await installCatalog(install, address);
+
+  const styles = installs
+    .filter((install) => install.globalStyles)
+    .map((install) => `@import "./registry/${install.destination}/index.css";`)
+    .join('\n');
+
+  await writeFile(resolve(generatedDir, 'styles.css'), `${styles}\n`);
 } catch (error) {
   // Inside the workspace the registry is the local build, so a failure there is a bug. Outside it, a StackBlitz
   // template for instance, the hosted registry may be unreachable or not deployed yet; the sandbox still has the
@@ -102,7 +155,7 @@ if (inWorkspace) {
 }
 
 if (existsSync(resolve(generatedDir, 'registry/react-tailwind-default/components/videojs'))) {
-  console.log(`Installed 8 React Tailwind, 8 React CSS, and 8 HTML source-owned Sandbox skins from ${address}.`);
+  console.log(`Installed 12 React Tailwind, 12 React CSS, and 12 HTML source-owned Sandbox skins from ${address}.`);
 }
 
 /**
@@ -132,9 +185,9 @@ async function installCatalog(install: (typeof installs)[number], address: strin
   const destination = resolve(generatedDir, 'registry', install.destination);
 
   try {
-    await writeFixture(root, `${address}/${install.catalog}`, install.alias);
+    await writeFixture(root, `${address}/${install.catalog}`, install.alias, install.baseStyle);
 
-    const items = presets.map((preset) => `@videojs/${preset}`);
+    const items = install.presets.map((preset) => `@videojs/${preset}`);
 
     await runCommand(
       process.execPath,
@@ -144,16 +197,12 @@ async function installCatalog(install: (typeof installs)[number], address: strin
 
     await mkdir(resolve(destination, '..'), { recursive: true });
     await cp(resolve(root, 'src'), destination, { recursive: true });
-
-    if (install.globalStyles) {
-      await writeFile(resolve(generatedDir, 'styles.css'), `@import "./registry/${install.destination}/index.css";\n`);
-    }
   } finally {
     await rm(root, { recursive: true, force: true });
   }
 }
 
-async function writeFixture(root: string, address: string, alias: string): Promise<void> {
+async function writeFixture(root: string, address: string, alias: string, baseStyle: string): Promise<void> {
   const packageJson = {
     name: 'videojs-sandbox-skins',
     private: true,
@@ -209,7 +258,7 @@ async function writeFixture(root: string, address: string, alias: string): Promi
   await writeFile(resolve(root, 'package.json'), `${JSON.stringify(packageJson, null, 2)}\n`);
   await writeFile(resolve(root, 'components.json'), `${JSON.stringify(components, null, 2)}\n`);
   await writeFile(resolve(root, 'tsconfig.json'), `${JSON.stringify(tsconfig, null, 2)}\n`);
-  await writeFile(resolve(root, 'src/index.css'), '@import "./components/videojs/styles/base.css";\n');
+  await writeFile(resolve(root, 'src/index.css'), `@import "./components/videojs/styles/${baseStyle}";\n`);
   await writeFile(resolve(root, 'src/lib/utils.ts'), "export { cn } from 'cn';\n");
 }
 

@@ -5,6 +5,15 @@ import { cdnBaseForVersion, generateCdnCode, rendererSupportsCdn } from '../inde
 const CDN_BASE = cdnBaseForVersion();
 
 describe('generateCdnCode', () => {
+  it.each([
+    ['default-video', 'compat-video', 'html5-video', 'video'],
+    ['default-audio', 'compat-audio', 'html5-audio', 'audio'],
+    ['live-video', 'compat-video', 'hls', 'live-video'],
+    ['live-audio', 'compat-audio', 'mux-audio', 'live-audio'],
+  ] as const)('loads the Compat bundle for %s', (preset, skin, media, bundle) => {
+    expect(generateCdnCode(preset, skin, media, [])).toContain(`${CDN_BASE}/${bundle}-compat.js`);
+  });
+
   // Media subpaths that ship a CDN build. The media script is emitted only for
   // renderers whose subpath is in this set. Extensions such as Mux Data are not
   // part of this manifest.

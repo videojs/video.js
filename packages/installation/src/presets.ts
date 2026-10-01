@@ -1,9 +1,9 @@
 import type { Renderer } from './renderers';
 
-export type Skin = 'video' | 'audio' | 'neutral-video' | 'neutral-audio' | 'none';
+export type Skin = 'video' | 'audio' | 'neutral-video' | 'neutral-audio' | 'compat-video' | 'compat-audio' | 'none';
 
 /** Public skin values accepted by installation requests. */
-export const INSTALLATION_SKIN_FLAGS = ['default', 'neutral', 'none'] as const;
+export const INSTALLATION_SKIN_FLAGS = ['default', 'neutral', 'compat', 'none'] as const;
 
 export interface InstallationPreset {
   label: string;

@@ -9,7 +9,7 @@ import {
   skinStyles,
 } from '../src/meta.ts';
 import { registryTargets } from './registry/targets.ts';
-import { type SkinPreset, skinPreset, skinPresets, skinSourceDirectory } from './skin.ts';
+import { type SkinPreset, skinPreset, skinSourceDirectory } from './skin.ts';
 
 export type SkinFramework = 'html' | 'react';
 export type SkinStyling = 'css' | 'tailwind';
@@ -41,7 +41,7 @@ const publishedSkins = Object.keys(skinStyles).filter(isSkinName);
 const representativeSkins = {
   default: 'default-video',
   neutral: 'neutral-video',
-} as const satisfies Record<SkinStyle['theme'], SkinName>;
+} as const satisfies Record<Exclude<SkinStyle['theme'], 'compat'>, SkinName>;
 
 /** The variants one authored module is compiled for. Skin-owned modules compile for their skin only. */
 export function variantsFor(filename: string): readonly SkinVariant[] {
@@ -53,6 +53,9 @@ export function variantsFor(filename: string): readonly SkinVariant[] {
         ? [{ target: framework, style: styling, theme, skin: ownedSkin }]
         : [];
     }
+
+    // Compat publishes complete editable skins, without standalone UI registry items.
+    if (theme === 'compat') return [];
 
     return framework === 'html'
       ? [{ target: framework, style: styling, theme, skin: representativeSkins[theme] }]
@@ -67,7 +70,7 @@ export function parseVariant(parameters: URLSearchParams): SkinVariant | null {
   if ((target !== 'react' && target !== 'html') || (style !== 'tailwind' && style !== 'css')) return null;
 
   const theme = parameters.get('theme');
-  if (theme !== 'default' && theme !== 'neutral') return null;
+  if (theme !== 'compat' && theme !== 'default' && theme !== 'neutral') return null;
 
   const requested = parameters.get('skin');
   const skin = requested && isSkinName(requested) ? requested : undefined;
@@ -107,7 +110,9 @@ export function skinRoots(
       (variant.theme === undefined || module.params.theme === variant.theme) &&
       module.params.skin === module.meta.name
   );
-  const expected = skinPresets.length * (variant.theme === undefined ? 2 : 1);
+  const expected = Object.values(skinStyles).filter(
+    (skin) => variant.theme === undefined || skin.theme === variant.theme
+  ).length;
 
   if (roots.length !== expected) {
     throw new Error(`Expected ${expected} ${variant.target} ${variant.style} Skin roots, received ${roots.length}.`);

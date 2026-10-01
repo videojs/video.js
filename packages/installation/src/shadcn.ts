@@ -9,7 +9,7 @@ import {
 
 export type RegistryFramework = 'html' | 'react';
 export type RegistryStyling = 'css' | 'tailwind';
-export type RegistryTheme = 'default' | 'neutral';
+export type RegistryTheme = 'default' | 'neutral' | 'compat';
 export type RegistryPreset = 'audio' | 'live-audio' | 'live-video' | 'video';
 export type ShadcnRunner = PackageManager;
 
@@ -31,7 +31,7 @@ export const SHADCN_RUNNERS = {
 export const REGISTRY_STYLINGS = ['tailwind', 'css'] as const satisfies readonly RegistryStyling[];
 const HTML_REGISTRY_STYLINGS = ['css'] as const satisfies readonly RegistryStyling[];
 
-export const REGISTRY_THEMES = ['default', 'neutral'] as const satisfies readonly RegistryTheme[];
+export const REGISTRY_THEMES = ['default', 'neutral', 'compat'] as const satisfies readonly RegistryTheme[];
 
 export const DEFAULT_REGISTRY_PRESET = 'video' satisfies RegistryPreset;
 
@@ -78,6 +78,13 @@ export const REGISTRY_SKINS: readonly RegistrySkin[] = REGISTRY_PRESETS.flatMap(
     theme: 'neutral',
     directory,
   },
+  {
+    item: preset,
+    label: `Compat ${label}`,
+    preset,
+    theme: 'compat',
+    directory,
+  },
 ]);
 
 /** The stylings a framework's registry catalog publishes. HTML skins are vanilla CSS only. */
@@ -101,7 +108,7 @@ export function registryNamespaceUrl(
   theme: RegistryTheme = 'default'
 ): string {
   const target = framework === 'react' && styling === 'css' ? 'react/css' : framework;
-  const catalog = theme === 'neutral' ? `${target}/neutral` : target;
+  const catalog = theme === 'default' ? target : `${target}/${theme}`;
 
   return `${REGISTRY_ORIGIN}/r/${catalog}/{name}.json`;
 }
@@ -243,6 +250,6 @@ export function registrySkinSelection({
 
   return {
     item,
-    theme: skin.startsWith('neutral-') ? 'neutral' : 'default',
+    theme: skin.startsWith('neutral-') ? 'neutral' : skin.startsWith('compat-') ? 'compat' : 'default',
   };
 }

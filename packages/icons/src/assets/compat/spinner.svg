@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewBox="0 0 18 18">
+  <style>
+    @keyframes media-spinner-fade{0%{opacity:1}to{opacity:0}}.media-spinner__segment{animation:var(--media-spinner-animation, media-spinner-fade 1s steps(8, end) infinite);animation-delay:var(--media-spinner-delay)}@media (prefers-reduced-motion:reduce){.media-spinner__segment{animation:none}}
+  </style>
+  <line x1="9" x2="9" y1="1.5" y2="4.5" class="media-spinner__segment" opacity=".5" style="--media-spinner-delay:0s"/>
+  <line x1="14.5" x2="12.5" y1="3.5" y2="5.5" class="media-spinner__segment" opacity=".45" style="--media-spinner-delay:0.125s"/>
+  <line x1="16.5" x2="13.5" y1="9" y2="9" class="media-spinner__segment" opacity=".4" style="--media-spinner-delay:0.25s"/>
+  <line x1="14.5" x2="12.5" y1="14.5" y2="12.5" class="media-spinner__segment" opacity=".35" style="--media-spinner-delay:0.375s"/>
+  <line x1="9" x2="9" y1="16.5" y2="13.5" class="media-spinner__segment" opacity=".3" style="--media-spinner-delay:0.5s"/>
+  <line x1="3.5" x2="5.5" y1="14.5" y2="12.5" class="media-spinner__segment" opacity=".25" style="--media-spinner-delay:0.625s"/>
+  <line x1="1.5" x2="4.5" y1="9" y2="9" class="media-spinner__segment" opacity=".15" style="--media-spinner-delay:0.75s"/>
+  <line x1="3.5" x2="5.5" y1="3.5" y2="5.5" class="media-spinner__segment" opacity=".1" style="--media-spinner-delay:0.875s"/>
+</svg>

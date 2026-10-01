@@ -16,6 +16,7 @@ import {
   DEFAULT_PRELOAD,
   PLATFORMS,
   PRELOAD_VALUES,
+  SKINS,
   type PreloadValue,
   SKIN_SOURCES,
   STYLINGS,
@@ -77,7 +78,7 @@ function readParams() {
     styling: readOption(STYLINGS, params.get('styling'), 'css'),
     skins: readSkins(params.get('skins'), platform),
     media,
-    skin: (params.get('skin') ?? 'default') as 'default' | 'neutral',
+    skin: readOption(SKINS, params.get('skin'), 'default'),
     // An explicit `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: (params.get('source') ?? MEDIA[media].entrySource ?? DEFAULT_SOURCE) as SourceId,
     autoplay: params.get('autoplay') === '1',
@@ -464,9 +465,16 @@ export function App() {
 
   // The URL carried these too, but a change made while the page was still loading has no other way in.
   const handleFrameLoad = (id: string) => {
-    const target = frames.current.get(id)?.contentWindow;
+    const frame = frames.current.get(id);
+    const target = frame?.contentWindow;
+    const panel = panels.find((panel) => panel.id === id);
+    if (!frame || !target || !panel) return;
 
-    if (target) postPreferences(target, frameParams);
+    if (new URL(frame.src).searchParams.get('skin') !== panel.skin) {
+      target.postMessage({ type: 'skin-change', skin: panel.skin }, '*');
+    }
+
+    postPreferences(target, frameParams);
   };
 
   const summary = summarizeSelection({

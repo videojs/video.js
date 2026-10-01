@@ -15,12 +15,16 @@ export interface HtmlSkinRequest {
 const packageSkins = {
   'video/default': () => import('@videojs/html/video/skin'),
   'video/neutral': () => import('@videojs/html/video/neutral-skin'),
+  'video/compat': () => import('@videojs/html/video/compat-skin'),
   'live-video/default': () => import('@videojs/html/live-video/skin'),
   'live-video/neutral': () => import('@videojs/html/live-video/neutral-skin'),
+  'live-video/compat': () => import('@videojs/html/live-video/compat-skin'),
   'audio/default': () => import('@videojs/html/audio/skin'),
   'audio/neutral': () => import('@videojs/html/audio/neutral-skin'),
+  'audio/compat': () => import('@videojs/html/audio/compat-skin'),
   'live-audio/default': () => import('@videojs/html/live-audio/skin'),
   'live-audio/neutral': () => import('@videojs/html/live-audio/neutral-skin'),
+  'live-audio/compat': () => import('@videojs/html/live-audio/compat-skin'),
 } satisfies Record<`${SkinPreset}/${Skin}`, () => Promise<unknown>>;
 
 async function loadPackageSkin({ player, live, skin }: HtmlSkinRequest, preset: SkinPreset): Promise<string> {

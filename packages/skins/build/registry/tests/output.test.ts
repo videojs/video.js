@@ -9,16 +9,19 @@ const packageDir = resolve(import.meta.dirname, '../../..');
 const registryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react'),
   neutral: resolve(packageDir, 'dist/registry/source/r/react/neutral'),
+  compat: resolve(packageDir, 'dist/registry/source/r/react/compat'),
 } as const;
 const cssRegistryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react/css'),
   neutral: resolve(packageDir, 'dist/registry/source/r/react/css/neutral'),
+  compat: resolve(packageDir, 'dist/registry/source/r/react/css/compat'),
 } as const;
 
 describe('React registry output', () => {
   const registries = {
     default: readRegistryItems(registryDirs.default),
     neutral: readRegistryItems(registryDirs.neutral),
+    compat: readRegistryItems(registryDirs.compat),
   } as const;
 
   it('keeps the Video Skin installation notes concise', () => {
@@ -31,7 +34,7 @@ describe('React registry output', () => {
   });
 
   it('marks every public module root as a client entry', () => {
-    for (const theme of ['default', 'neutral'] as const) {
+    for (const theme of ['default', 'neutral', 'compat'] as const) {
       const items = registries[theme];
       const missing = [...items.values()]
         .filter((item) => item.meta?.public)
@@ -141,13 +144,14 @@ describe('React registry output', () => {
         .sort();
 
     expect(publicNames(registries.neutral)).toEqual(publicNames(registries.default));
+    expect(publicNames(registries.compat)).toEqual(['audio', 'live-audio', 'live-video', 'video']);
     expect(publicNames(registries.default)).toContain('video');
     expect(publicNames(registries.default)).not.toContain('video-neutral');
     expect([...registries.default.keys()].some((name) => name.endsWith('-neutral'))).toBe(false);
   });
 
   it('publishes component categories that match the UI taxonomy', () => {
-    for (const items of Object.values(registries)) {
+    for (const items of [registries.default, registries.neutral]) {
       expect(items.get('buffering-indicator')?.categories).toEqual(['media', 'display']);
       expect(items.get('error-dialog')?.categories).toEqual(['media', 'dialogs']);
       expect(items.get('poster')?.categories).toEqual(['media', 'display']);
@@ -159,7 +163,7 @@ describe('React registry output', () => {
   });
 
   it('publishes title styles in the shared display stylesheet', () => {
-    for (const registryDir of Object.values(cssRegistryDirs)) {
+    for (const registryDir of [cssRegistryDirs.default, cssRegistryDirs.neutral]) {
       const items = readRegistryItems(registryDir);
 
       expect(items.get('title')?.registryDependencies).toContain('@videojs/_style-display');
@@ -175,7 +179,9 @@ describe('React registry output', () => {
       for (const item of items.values()) {
         expect(item.docs ?? '').not.toMatch(/videojs\.org\/docs\/(?:concepts|how-to|reference)\//);
       }
+    }
 
+    for (const items of [registries.default, registries.neutral]) {
       expect(items.get('container')?.docs).toContain('/docs/framework/react/reference/player-container/');
       expect(items.get('button')?.docs).toContain('/docs/framework/react/how-to/customize-skins/');
       expect(items.get('_style-theme')?.docs).toContain(`data-theme="${items.get('_style-theme')?.meta?.theme}"`);
@@ -184,13 +190,13 @@ describe('React registry output', () => {
   });
 
   it('imports the preset theme before each React CSS skin stylesheet', () => {
-    for (const theme of ['default', 'neutral'] as const) {
+    for (const theme of ['default', 'neutral', 'compat'] as const) {
       const items = readRegistryItems(cssRegistryDirs[theme]);
 
       for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
         const source = readItemRoot(cssRegistryDirs[theme], items.get(preset)!);
         const media = preset.endsWith('audio') ? 'audio' : 'video';
-        const base = `../styles/${media}/${theme === 'neutral' ? 'neutral' : 'base'}.css`;
+        const base = `../styles/${media}/${theme === 'default' ? 'base' : theme}.css`;
 
         expect(source.indexOf(base), `${theme}/${preset}`).toBeGreaterThanOrEqual(0);
         expect(source.indexOf(base), `${theme}/${preset}`).toBeLessThan(source.indexOf('./skin.css'));
@@ -198,14 +204,26 @@ describe('React registry output', () => {
     }
   });
 
-  it('composes Neutral media styles from theme and preset entries', () => {
-    for (const media of ['audio', 'video'] as const) {
-      const source = readFileSync(
-        resolve(cssRegistryDirs.neutral, `support/files/_style-${media}-neutral/styles/${media}/neutral.css`),
-        'utf8'
-      );
+  it('composes preset media styles from theme and base entries', () => {
+    for (const theme of ['neutral', 'compat'] as const) {
+      for (const media of ['audio', 'video'] as const) {
+        const source = readFileSync(
+          resolve(cssRegistryDirs[theme], `support/files/_style-${media}-${theme}/styles/${media}/${theme}.css`),
+          'utf8'
+        );
 
-      expect(cssImports(source).sort()).toEqual(['../themes/neutral.css', './base.css'].sort());
+        expect(cssImports(source).sort()).toEqual([`../themes/${theme}.css`, './base.css'].sort());
+      }
+    }
+  });
+
+  it('includes the design system and media theme in Compat installation dependencies', () => {
+    for (const preset of ['audio', 'video'] as const) {
+      const closure = itemClosure(registries.compat, preset);
+
+      expect(closure.has('_style-theme')).toBe(true);
+      expect(closure.has('_style-compat')).toBe(true);
+      expect(closure.has(`_style-${preset}-compat`)).toBe(true);
     }
   });
 
@@ -241,7 +259,12 @@ function readRegistryItems(registryDir: string): ReadonlyMap<string, RegistryIte
   const items = new Map<string, RegistryItem>();
 
   for (const group of ['skins', 'ui', 'support']) {
-    const registry: unknown = JSON.parse(readFileSync(resolve(registryDir, group, 'registry.json'), 'utf8'));
+    const path = resolve(registryDir, group, 'registry.json');
+
+    // Compat intentionally has no standalone UI catalog. All other groups must exist.
+    if (group === 'ui' && registryDir.endsWith('/compat')) continue;
+
+    const registry: unknown = JSON.parse(readFileSync(path, 'utf8'));
     if (!isPlainObject(registry) || !Array.isArray(registry.items)) throw new Error(`Invalid ${group} registry.`);
 
     for (const item of registry.items) {

@@ -8,6 +8,10 @@ export interface CssVar {
 
 /** Classification for every `--media-*` custom property used by a Skin. */
 export const vars = {
+  '--media-button-highlight': {
+    kind: 'internal',
+    description: 'Compat button and menu item highlight background.',
+  },
   '--media-accent-color': {
     kind: 'public',
     description: 'Accent color used by highlighted controls, menu items, slider fills, and primary actions.',

@@ -14,13 +14,13 @@ export default styles({
       utilities: '-scale-x-100',
     },
     label: {
-      utilities: 'absolute bottom-[-3px] text-media-xs font-medium tracking-[-0.05em] tabular-nums',
+      utilities: 'absolute bottom-[-3px] text-media-xs font-medium tracking-tighter tabular-nums',
     },
     backwardLabel: {
-      utilities: 'left-[-1px]',
+      utilities: '-left-px',
     },
     forwardLabel: {
-      utilities: 'right-[-1px]',
+      utilities: '-right-px',
     },
   },
 });

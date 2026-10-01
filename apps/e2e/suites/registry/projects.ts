@@ -6,7 +6,7 @@ interface RegistryConsumerProjectBase {
   readonly directory: string;
   readonly port: number;
   readonly bundler: RegistryConsumerBundler;
-  readonly theme: 'default' | 'neutral';
+  readonly theme: 'default' | 'neutral' | 'compat';
 }
 
 export type RegistryConsumerProject = RegistryConsumerProjectBase &
@@ -84,5 +84,32 @@ export const registryConsumerProjects = [
     theme: 'neutral',
     bundler: 'rspack',
     port: 5314,
+  },
+  {
+    name: 'next-react-tailwind-compat',
+    directory: 'next-react-tailwind-compat',
+    framework: 'react',
+    styling: 'tailwind',
+    theme: 'compat',
+    bundler: 'next',
+    port: 5317,
+  },
+  {
+    name: 'next-react-css-compat',
+    directory: 'next-react-css-compat',
+    framework: 'react',
+    styling: 'css',
+    theme: 'compat',
+    bundler: 'next',
+    port: 5318,
+  },
+  {
+    name: 'vite-html-css-compat',
+    directory: 'vite-html-css-compat',
+    framework: 'html',
+    styling: 'css',
+    theme: 'compat',
+    bundler: 'vite',
+    port: 5319,
   },
 ] as const satisfies readonly RegistryConsumerProject[];

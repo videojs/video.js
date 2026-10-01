@@ -66,7 +66,7 @@ export async function createReactPackageSkins(
   for (const skin of skins) {
     const publicRoot = `${packageRoot}/presets/${skin.preset}`;
     const entry = skinCatalogEntry(skin.root.meta.name);
-    const publicName = skin.theme === 'neutral' ? 'neutral-skin' : 'skin';
+    const publicName = skin.theme === 'default' ? 'skin' : `${skin.theme}-skin`;
     const component = entry.component;
     const generatedComponent = entry.exportName;
     const generatedRoot = destinations.get(skin.root.id)!;
@@ -175,7 +175,8 @@ function reactFrameworkImport(specifier: string): string | undefined {
 
   if (specifier === '@videojs/react/icons') return `${packageRoot}/icons/index.ts`;
 
-  if (specifier === '@videojs/react/icons/neutral') return `${packageRoot}/icons/neutral/index.ts`;
+  const family = specifier.match(/^@videojs\/react\/icons\/([a-z0-9]+(?:-[a-z0-9]+)*)$/)?.[1];
+  if (family) return `${packageRoot}/icons/${family}/index.ts`;
 
   return undefined;
 }

@@ -15,10 +15,12 @@ interface Props {
   react: string;
   /** Whether this is the preset's neutral variant, shipped as `neutral-skin`. */
   neutral?: boolean;
+  /** Compat variant, shipped as `compat-skin`. */
+  compat?: boolean;
 }
 
-const { preset, react, neutral = false } = Astro.props;
-const module = neutral ? 'neutral-skin' : 'skin';
+const { preset, react, neutral = false, compat = false } = Astro.props;
+const module = compat ? 'compat-skin' : neutral ? 'neutral-skin' : 'skin';
 const bundle = preset === 'background' ? 'background' : `${preset}${neutral ? '-neutral' : ''}`;
 const cdnCode = `<script type="module" src="${VJS10_CDN_BASE}/${bundle}.js"></script>`;
 
@@ -46,7 +48,7 @@ const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledL
   ))
 }
 
-<FrameworkCase frameworks={['html']}>
+{!compat && <FrameworkCase frameworks={['html']}>
   <P>
     The import registers the skin and every UI element it composes. The <DocsLink slug="guides/cdn">CDN</DocsLink>{' '}
     player bundle registers this skin together with its player:
@@ -54,4 +56,4 @@ const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledL
   <CodeFrame lang="html">
     <ServerCode code={cdnCode} lang="html" />
   </CodeFrame>
-</FrameworkCase>
+</FrameworkCase>}

@@ -6,7 +6,9 @@ for (const preset of ['video', 'audio'] as const) {
   test(`installs a styled ${preset} player with an attached media element`, async ({ page }, testInfo) => {
     const errors: string[] = [];
     const theme = testInfo.project.metadata.theme;
-    if (theme !== 'default' && theme !== 'neutral') throw new Error(`Unknown registry theme: ${String(theme)}.`);
+
+    if (theme !== 'default' && theme !== 'neutral' && theme !== 'compat')
+      throw new Error(`Unknown registry theme: ${String(theme)}.`);
 
     page.on('console', (message) => {
       if (message.type() === 'error') errors.push(message.text());
@@ -22,11 +24,14 @@ for (const preset of ['video', 'audio'] as const) {
 
     await expect(skin).toBeVisible();
     await expect(skin).toHaveAttribute('data-theme', theme);
-    await expect(controls).toBeAttached();
+
+    // Compat's Tailwind output carries no semantic controls class; the play button checks below cover its controls.
+    if (theme !== 'compat') await expect(controls).toBeAttached();
+
     await expect(media).toBeAttached();
     await expect(skin).toHaveCSS('position', 'relative');
     await expect(skin).toHaveCSS('display', 'block');
-    await expect(skin).toHaveCSS('border-radius', theme === 'neutral' ? '12px' : '28px');
+    await expect(skin).toHaveCSS('border-radius', theme === 'default' ? '28px' : '12px');
 
     const themeStyles = await skin.evaluate((element) => {
       const style = getComputedStyle(element);
@@ -34,11 +39,13 @@ for (const preset of ['video', 'audio'] as const) {
       return {
         controlSize: style.getPropertyValue('--media-control-size').trim(),
         spacing: style.getPropertyValue('--media-spacing').trim(),
+        duration: style.getPropertyValue('--media-duration-fast').trim(),
       };
     });
 
     expect(themeStyles.controlSize).not.toBe('');
     expect(themeStyles.spacing).not.toBe('');
+    expect(themeStyles.duration).not.toBe('');
 
     if (preset === 'audio') {
       for (const colorScheme of ['light', 'dark'] as const) {
@@ -49,32 +56,30 @@ for (const preset of ['video', 'audio'] as const) {
           element.style.colorScheme = scheme;
         }, colorScheme);
 
-        const hairline = await skin
-          .locator('.audio-controls')
-          .first()
-          .evaluate((element) => {
-            const style = getComputedStyle(element);
-            const probe = document.createElement('span');
+        const surface = theme === 'compat' ? skin : skin.locator('.audio-controls').first();
+        const hairline = await surface.evaluate((element) => {
+          const style = getComputedStyle(element);
+          const probe = document.createElement('span');
 
-            probe.style.color = 'var(--media-border)';
-            element.append(probe);
+          probe.style.color = 'var(--media-border)';
+          element.append(probe);
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            if (!context) throw new Error('Could not create a canvas context.');
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('Could not create a canvas context.');
 
-            context.fillStyle = getComputedStyle(probe).color;
-            context.fillRect(0, 0, 1, 1);
-            probe.remove();
+          context.fillStyle = getComputedStyle(probe).color;
+          context.fillRect(0, 0, 1, 1);
+          probe.remove();
 
-            const pixel = context.getImageData(0, 0, 1, 1).data;
+          const pixel = context.getImageData(0, 0, 1, 1).data;
 
-            return {
-              alpha: pixel[3]!,
-              boxShadow: style.boxShadow,
-              luminance: pixel[0]! + pixel[1]! + pixel[2]!,
-            };
-          });
+          return {
+            alpha: pixel[3]!,
+            boxShadow: style.boxShadow,
+            luminance: pixel[0]! + pixel[1]! + pixel[2]!,
+          };
+        });
 
         expect(hairline.boxShadow, `${theme} ${colorScheme} audio hairline`).not.toBe('none');
         expect(hairline.alpha, `${theme} ${colorScheme} audio hairline`).toBeGreaterThan(0);

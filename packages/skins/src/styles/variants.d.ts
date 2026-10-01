@@ -5,6 +5,7 @@ declare module 'vjsc/styles' {
   interface StyleVariants {
     default: true;
     neutral: true;
+    compat: true;
     video: true;
     audio: true;
     'live-video': true;

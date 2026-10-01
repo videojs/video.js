@@ -72,6 +72,34 @@ const skins = [
     playerTag: 'live-audio-player',
     scope: '.media-skin[data-theme=neutral][data-preset=live-audio]',
   },
+  {
+    entry: 'video-compat',
+    generated: 'compat-video',
+    skinTag: 'video-compat-skin',
+    playerTag: 'video-player',
+    scope: '.media-skin[data-theme=compat][data-preset=video]',
+  },
+  {
+    entry: 'audio-compat',
+    generated: 'compat-audio',
+    skinTag: 'audio-compat-skin',
+    playerTag: 'audio-player',
+    scope: '.media-skin[data-theme=compat][data-preset=audio]',
+  },
+  {
+    entry: 'live-video-compat',
+    generated: 'compat-live-video',
+    skinTag: 'live-video-compat-skin',
+    playerTag: 'live-video-player',
+    scope: '.media-skin[data-theme=compat][data-preset=live-video]',
+  },
+  {
+    entry: 'live-audio-compat',
+    generated: 'compat-live-audio',
+    skinTag: 'live-audio-compat-skin',
+    playerTag: 'live-audio-player',
+    scope: '.media-skin[data-theme=compat][data-preset=live-audio]',
+  },
 ] as const;
 
 function main(): void {

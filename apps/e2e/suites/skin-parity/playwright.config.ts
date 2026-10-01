@@ -26,7 +26,13 @@ export default defineConfig({
     {
       name: 'vjsc-chromium',
       // Both stacked panels must fit without scrolling: a capture that scrolls moves the pointer off hovered controls.
-      use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:5190', viewport: { width: 1280, height: 1600 } },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5190',
+        viewport: { width: 1280, height: 1600 },
+        // Linux can rasterize identical text with LCD or grayscale smoothing in different composited panels.
+        launchOptions: { args: ['--disable-lcd-text'] },
+      },
     },
   ],
   // The sandbox hosts the comparison: its compare mode renders the two variants in two frames of the same template.

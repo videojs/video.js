@@ -341,6 +341,7 @@ export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentT
 
         return new Map([
           ['@videojs/html/icons', icons],
+          ['@videojs/html/icons/compat', icons],
           ['@videojs/html/icons/neutral', icons],
         ]);
       },

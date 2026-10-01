@@ -62,6 +62,8 @@ packages/react/src/presets/*/skin.tsx
 packages/react/src/presets/*/skin.css
 packages/react/src/presets/*/neutral-skin.tsx
 packages/react/src/presets/*/neutral-skin.css
+packages/react/src/presets/*/compat-skin.tsx
+packages/react/src/presets/*/compat-skin.css
 
 # -------------------------
 # Merge & Patch Backups

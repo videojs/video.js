@@ -1,0 +1,49 @@
+---
+title: CompatAudioSkin
+frameworkTitle:
+  html: audio-compat-skin
+description: An audio skin designed for broader browser compatibility
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
+import OwnTheUI from '@/components/installation/OwnTheUI.astro';
+
+The Compat skin of the audio preset provides basic controls and plain surfaces, with broader browser compatibility as its design goal. Its time slider supports chapter segments and thumbnail previews. See <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> to install and edit its source.
+
+## Import
+
+<SkinImports preset="audio" react="CompatAudioSkin" compat />
+
+## Usage
+
+The skin goes between the player and the media element. It renders its controls around the media.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<AudioPlayer>
+  <CompatAudioSkin>
+    <Audio src="audio.mp3" />
+  </CompatAudioSkin>
+</AudioPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<audio-player>
+  <audio-compat-skin>
+    <audio src="audio.mp3"></audio>
+  </audio-compat-skin>
+</audio-player>
+```
+</FrameworkCase>
+
+## Styling
+
+Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
+
+## Own the UI
+
+<OwnTheUI />

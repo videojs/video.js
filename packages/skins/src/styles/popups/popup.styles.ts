@@ -9,7 +9,7 @@ export default styles({
       utilities: [
         'm-0 overflow-visible border-0 text-inherit',
         'media-transitioning:opacity-0 media-transitioning:blur-media-hidden-popup media-transitioning:scale-media-hidden-popup',
-        'data-starting-style:[transform:translate(var(--media-popup-translate-x-distance,0),var(--media-popup-translate-y-distance,0))]',
+        'data-starting-style:transform-[translate(var(--media-popup-translate-x-distance,0),var(--media-popup-translate-y-distance,0))]',
         'data-ending-style:transform-none',
         'data-[side=top]:origin-bottom data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left',
         'data-[side=top]:[--media-popup-translate-y-distance:var(--media-popup-translate-distance)]',
@@ -19,6 +19,12 @@ export default styles({
       ],
       variants: {
         neutral: 'data-starting-style:filter-none',
+        // Compat combines translate and scale into one transform for browsers without individual transform properties.
+        compat: [
+          'media-transitioning:scale-none!',
+          'data-starting-style:transform-[translate(var(--media-popup-translate-x-distance,0),var(--media-popup-translate-y-distance,0))_scale(var(--media-hidden-popup-scale))]',
+          'data-ending-style:transform-[scale(var(--media-hidden-popup-scale))]',
+        ],
       },
     },
     safeArea: {

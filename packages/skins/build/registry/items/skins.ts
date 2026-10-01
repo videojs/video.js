@@ -140,7 +140,7 @@ export function skinModuleTarget(
   if (!sourcePath.startsWith('skins/')) throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
 
   const match = /^skins\/([^/]+)\/([^/]+)\/(.+)$/.exec(sourcePath);
-  if (!match) return sourcePath;
+  if (!match) throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
 
   const [, theme, preset, filename] = match;
   const owner = `${theme}-${preset}`;
@@ -151,7 +151,9 @@ export function skinModuleTarget(
 
   if (theme === 'shared' && preset && filename) return `${skinDirectory(skin)}/${preset}/${filename}`;
 
-  return sourcePath;
+  if (theme === 'compat' && preset === 'shared') return `${skinDirectory(skin)}/shared/${filename}`;
+
+  throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
 }
 
 function skinDocs(

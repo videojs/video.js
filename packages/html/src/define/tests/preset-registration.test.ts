@@ -54,6 +54,10 @@ describe('preset registration boundaries', () => {
   });
 
   it.each([
+    ['video/compat-skin', 'video-compat-skin', () => import('../video/compat-skin')],
+    ['audio/compat-skin', 'audio-compat-skin', () => import('../audio/compat-skin')],
+    ['live-video/compat-skin', 'live-video-compat-skin', () => import('../live-video/compat-skin')],
+    ['live-audio/compat-skin', 'live-audio-compat-skin', () => import('../live-audio/compat-skin')],
     ['video/neutral-skin', 'video-neutral-skin', () => import('../video/neutral-skin')],
     ['audio/neutral-skin', 'audio-neutral-skin', () => import('../audio/neutral-skin')],
     ['live-video/neutral-skin', 'live-video-neutral-skin', () => import('../live-video/neutral-skin')],

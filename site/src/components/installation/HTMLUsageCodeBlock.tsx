@@ -72,7 +72,7 @@ function HTMLUsageCodeBlock({ installMethod }: Props) {
     method === 'cdn' ? result.html : installationHtmlPlayerPageCode(result.html, $template, project.usage!, $project);
 
   if (method === 'cdn') {
-    // A new app's page replaces the starter page whole, so it carries the CDN scripts the existing-page flow loads
+    // A new app's page replaces the compat page whole, so it carries the CDN scripts the existing-page flow loads
     // separately.
     const code =
       $project === 'new'

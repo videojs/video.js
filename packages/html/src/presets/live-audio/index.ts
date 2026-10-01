@@ -3,6 +3,7 @@
  * swaps the time slider and time displays for a Live button.
  */
 export { liveAudioFeatures } from '@videojs/core/dom';
+export { CompatLiveAudioSkinElement } from './compat-skin';
 export { LiveAudioPlayerElement, PlayerController } from './player';
 export { LiveAudioSkinElement } from './skin';
 export { NeutralLiveAudioSkinElement } from './neutral-skin';

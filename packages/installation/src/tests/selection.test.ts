@@ -7,6 +7,13 @@ import { INSTALLATION_FRAMEWORKS } from '../projects';
 import { fitSelectionToPreset, playerOwnerFor, resolveInstallationSelection } from '../selection';
 
 describe('resolveInstallationSelection', () => {
+  it.each(['video', 'audio', 'live-video', 'live-audio'])('accepts Compat for the %s preset', (preset) => {
+    expect(resolveInstallationSelection({ preset, skin: 'compat' })).toMatchObject({
+      ok: true,
+      selection: { skin: preset.includes('audio') ? 'compat-audio' : 'compat-video' },
+    });
+  });
+
   it('resolves defaults for each player package', () => {
     expect(resolveInstallationSelection({ framework: 'react' }, '10.0.0').ok).toBe(true);
     expect(resolveInstallationSelection({}, '10.0.0').ok).toBe(true);

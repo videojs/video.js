@@ -1,0 +1,118 @@
+@layer base.theme, base.preset, base.preferences;
+
+@layer base.preset {
+  .media-skin[data-theme="compat"] {
+    --media-accent: var(--media-accent-color, var(--media-popover));
+    --media-accent-foreground: var(--media-accent-text-color, white);
+    --media-background: black;
+    --media-border: transparent;
+    --media-foreground: white;
+    --media-muted: rgb(255 255 255 / 0.2);
+    --media-popover: rgb(0 0 0 / 0.85);
+    --media-popover-foreground: white;
+    --media-frame-border: var(--media-border-color, transparent);
+    --media-primary: var(--media-accent-color, white);
+    --media-primary-foreground: var(--media-accent-text-color, black);
+    --media-ring: var(--media-accent-color, white);
+    --media-surface-border: var(--media-border);
+    --media-scrollbar-thumb-color: rgb(255 255 255 / 0.3);
+    --media-shadow-surface: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --media-spacing: calc(var(--media-scale-unit, 16px) / 4);
+    --media-video-border-radius: var(--media-border-radius, 0.75rem);
+    --media-button-highlight: rgb(255 255 255 / 0.15);
+
+    --media-backdrop-filter-surface: none;
+    --media-backdrop-filter-indicator: none;
+    --media-backdrop-filter-dialog: none;
+  }
+
+  .media-skin[data-theme="compat"][data-preset$="video"] {
+    --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.1));
+  }
+
+  .media-skin[data-theme="compat"][data-preset$="audio"] {
+    --media-accent-foreground: var(--media-accent-text-color, black);
+    --media-background: white;
+    --media-border: rgb(0 0 0 / 0.1);
+    --media-foreground: black;
+    --media-muted: rgb(0 0 0 / 0.2);
+    --media-popover: white;
+    --media-popover-foreground: black;
+    --media-primary: var(--media-accent-color, black);
+    --media-primary-foreground: var(--media-accent-text-color, white);
+    --media-ring: var(--media-accent-color, black);
+    --media-surface-border: rgb(0 0 0 / 0.05);
+    --media-scrollbar-thumb-color: rgb(0 0 0 / 0.3);
+    --media-shadow-surface: 0 1px 3px rgb(0 0 0 / 0.15);
+    --media-button-highlight: rgb(0 0 0 / 0.1);
+  }
+
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="compat"][data-preset$="video"] {
+      --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1)));
+    }
+
+    .media-skin[data-theme="compat"][data-preset$="audio"] {
+      --media-accent-foreground: var(--media-accent-text-color, light-dark(black, white));
+      --media-background: light-dark(white, black);
+      --media-scrollbar-thumb-color: light-dark(rgb(0 0 0 / 0.3), rgb(255 255 255 / 0.3));
+      --media-border: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
+      --media-foreground: light-dark(black, white);
+      --media-muted: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.2));
+      --media-popover: light-dark(white, black);
+      --media-popover-foreground: light-dark(black, white);
+      --media-primary: var(--media-accent-color, light-dark(black, white));
+      --media-primary-foreground: var(--media-accent-text-color, light-dark(white, black));
+      --media-ring: var(--media-accent-color, light-dark(black, white));
+      --media-button-highlight: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
+    }
+  }
+
+  @supports (color: contrast-color(red)) {
+    .media-skin[data-theme="compat"] {
+      --media-accent-foreground: var(--media-accent-text-color, contrast-color(var(--media-accent-color, rgb(0 0 0))));
+      --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-accent-color, white)));
+    }
+
+    .media-skin[data-theme="compat"][data-preset$="audio"] {
+      --media-accent-foreground: var(--media-accent-text-color, var(--media-foreground));
+      --media-primary-foreground: var(
+        --media-accent-text-color,
+        contrast-color(var(--media-accent-color, var(--media-primary)))
+      );
+    }
+  }
+
+  /* The shared preferences collapse the other motion tokens; Compat also zeroes the instant duration they resolve to. */
+  @media (prefers-reduced-motion: reduce) {
+    .media-skin[data-theme="compat"] {
+      --media-duration-instant: 0ms;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .media-skin[data-theme="compat"][data-preset] {
+      --media-accent: var(--media-foreground);
+      --media-accent-foreground: var(--media-background);
+      --media-border: var(--media-foreground);
+      --media-surface-border: var(--media-foreground);
+      --media-primary: var(--media-foreground);
+      --media-primary-foreground: var(--media-background);
+      --media-ring: var(--media-foreground);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .media-skin[data-theme="compat"][data-preset] {
+      --media-accent: Highlight;
+      --media-accent-foreground: HighlightText;
+      --media-background: Canvas;
+      --media-surface-border: CanvasText;
+      --media-scrollbar-thumb-color: CanvasText;
+      --media-foreground: CanvasText;
+      --media-muted: GrayText;
+      --media-primary: Highlight;
+      --media-primary-foreground: HighlightText;
+    }
+  }
+}

@@ -8,7 +8,7 @@ import {
   setPlayerConfigValue,
 } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
-import { ContextProvider } from '@videojs/element/context';
+import { ContextProvider, ContextRoot } from '@videojs/element/context';
 import type { Media } from '@videojs/media/dom';
 import { isNull } from '@videojs/utils/predicate';
 import { camelCase, kebabCase } from '@videojs/utils/string';
@@ -65,6 +65,7 @@ export function createPlayerElement<Store extends PlayerStore>(
     } satisfies PropertyDeclarationMap;
 
     #store: Store | null = options.factory();
+    readonly #contextRoot = new ContextRoot();
     #configuredStore: Store | null = null;
     #detach: (() => void) | null = null;
     #connected = false;
@@ -148,6 +149,8 @@ export function createPlayerElement<Store extends PlayerStore>(
 
     override connectedCallback(): void {
       this.#connected = true;
+      // Retry part subscriptions when their parent is registered later.
+      this.#contextRoot.attach(this);
       super.connectedCallback();
       this.#syncInitialConfig();
       this.#playerProvider.setValue(this.store);
@@ -162,12 +165,14 @@ export function createPlayerElement<Store extends PlayerStore>(
 
     override disconnectedCallback(): void {
       this.#connected = false;
+      this.#contextRoot.detach(this);
       this.#observer.disconnect();
       this.#detachStore();
       super.disconnectedCallback();
     }
 
     override destroyCallback(): void {
+      this.#contextRoot.detach(this);
       this.#observer.disconnect();
       this.#detachStore();
       this.#extensions.destroy();

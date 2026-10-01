@@ -32,15 +32,19 @@ const cdnPresets = [
   'video',
   'video-player',
   'video-neutral',
+  'video-compat',
   'live-video',
   'live-video-player',
   'live-video-neutral',
+  'live-video-compat',
   'audio',
   'audio-player',
   'audio-neutral',
+  'audio-compat',
   'live-audio',
   'live-audio-player',
   'live-audio-neutral',
+  'live-audio-compat',
   'background',
 ];
 
@@ -69,7 +73,8 @@ function cdnStylesheetName(file: string): string | null {
 
   if (preset === 'background') return name === 'skin' ? 'background.css' : null;
 
-  const suffix = name === 'skin' ? '' : name === 'neutral-skin' ? '-neutral' : null;
+  const suffix =
+    name === 'skin' ? '' : name === 'neutral-skin' ? '-neutral' : name === 'compat-skin' ? '-compat' : null;
   if (suffix === null) return null;
 
   return `${preset}${suffix}.css`;

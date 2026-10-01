@@ -10,6 +10,7 @@ Icons are grouped into visual sets. Each set contains the same icon names with d
 | --- | --- |
 | `default` | Standard icon set used by the default skin |
 | `neutral` | Simplified icon set used by the neutral skin |
+| `compat` | Icon set used by the compat skin |
 
 ### Available Icons
 

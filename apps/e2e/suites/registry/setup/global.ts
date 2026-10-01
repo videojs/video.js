@@ -463,7 +463,7 @@ async function registryPackageRoots(): Promise<Set<string>> {
 function registryPath(project: RegistryConsumerProject): string {
   const target = project.framework === 'html' ? 'html' : project.styling === 'css' ? 'react/css' : 'react';
 
-  return project.theme === 'neutral' ? `${target}/neutral` : target;
+  return project.theme === 'default' ? target : `${target}/${project.theme}`;
 }
 
 /** Package directories under `packages/`, descending one level into bucket directories such as `adapters/`. */

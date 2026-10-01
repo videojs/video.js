@@ -15,7 +15,7 @@ export default styles({
     icon: {
       utilities: [
         'hidden size-media-icon-lg group-data-direction/seek-status:block',
-        'group-data-[direction=backward]/seek-status:[scale:-1_1]',
+        'group-data-[direction=backward]/seek-status:scale-[-1_1]',
         'transition-[translate,opacity] duration-media-slow ease-in-out',
         'group-media-transitioning/seek-status:opacity-0',
         'group-data-[direction=forward]/seek-status:group-data-starting-style/seek-status:-translate-x-media-hidden-seek-offset',

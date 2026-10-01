@@ -156,6 +156,13 @@ describe('generateReactInstallCode', () => {
 });
 
 describe('generateHTMLUsageCode', () => {
+  it('imports and renders the Compat skin for HTML', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, skin: 'compat-video' });
+
+    expect(result.imports).toContain('@videojs/html/video/compat-skin');
+    expect(result.html).toContain('<video-compat-skin');
+  });
+
   it('generates HTML with video-player and video-skin for default video', () => {
     const result = generateHTMLUsageCode(baseHTML);
 
@@ -857,6 +864,8 @@ describe('getSkinTag', () => {
   it('follows the preset and skin tier', () => {
     expect(getSkinTag('default-video', 'video')).toBe('video-skin');
     expect(getSkinTag('live-audio', 'neutral-audio')).toBe('live-audio-neutral-skin');
+    expect(getSkinTag('default-video', 'compat-video')).toBe('video-compat-skin');
+    expect(getSkinTag('live-audio', 'compat-audio')).toBe('live-audio-compat-skin');
   });
 
   it('always uses the background skin for background video', () => {
@@ -868,5 +877,7 @@ describe('getSkinComponent', () => {
   it('follows the preset and skin tier', () => {
     expect(getSkinComponent('default-audio', 'audio')).toBe('AudioSkin');
     expect(getSkinComponent('live-video', 'neutral-video')).toBe('NeutralLiveVideoSkin');
+    expect(getSkinComponent('default-video', 'compat-video')).toBe('CompatVideoSkin');
+    expect(getSkinComponent('live-audio', 'compat-audio')).toBe('CompatLiveAudioSkin');
   });
 });

@@ -14,6 +14,7 @@ declare module '*.css';
 // Authored skin modules, addressed by the compiler query; their exports are checked at runtime by name.
 declare module '*&skin=default-video';
 declare module '*&skin=neutral-video';
+declare module '*&skin=compat-video';
 declare module '*&skin=default-live-video';
 declare module '*&skin=neutral-live-video';
 declare module '*&skin=default-live-audio';

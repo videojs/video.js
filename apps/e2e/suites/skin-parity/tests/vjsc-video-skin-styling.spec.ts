@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { testCompatParity } from './compat';
 import { testRtlLayout } from './rtl';
 import {
   captureRendering,
@@ -21,7 +22,7 @@ import {
   settleFonts,
 } from './vjsc-skin-parity';
 
-const CASES = skinCases('video');
+const CASES = skinCases('video').filter((variant) => !variant.skin.startsWith('compat-'));
 const REACT_DEFAULT: SkinCase = { framework: 'react', skin: 'default-video' };
 const WIDTHS = [320, 800] as const;
 const BUFFERING_INDICATOR_SELECTOR =
@@ -42,6 +43,7 @@ const LAYOUT_SELECTORS = [CONTROLS_SELECTOR, POSTER_SELECTOR] as const;
 const THUMBNAIL_SPINNER_SELECTOR = ':scope > :last-child > :first-child > :is(svg, media-icon)';
 
 testRtlLayout(CASES);
+testCompatParity('video');
 
 for (const variant of CASES) {
   test(`${variant.framework} ${variant.skin} keeps poster sizing and fit in sync`, async ({ page }) => {

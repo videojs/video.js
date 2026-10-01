@@ -1,0 +1,63 @@
+---
+title: CompatLiveVideoSkin
+frameworkTitle:
+  html: live-video-compat-skin
+description: A live video skin designed for broader browser compatibility
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
+import OwnTheUI from '@/components/installation/OwnTheUI.astro';
+
+The Compat skin of the live video preset provides basic controls and plain surfaces, with broader browser compatibility as its design goal. It shows a Live button in place of time controls. See <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> to install and edit its source.
+
+## Import
+
+<SkinImports preset="live-video" react="CompatLiveVideoSkin" compat />
+
+## Usage
+
+The skin goes between the player and the media element. It renders its controls around the media.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<LiveVideoPlayer>
+  <CompatLiveVideoSkin>
+    <HlsVideo src="live.m3u8" />
+  </CompatLiveVideoSkin>
+</LiveVideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<live-video-player>
+  <live-video-compat-skin>
+    <hls-video src="live.m3u8"></hls-video>
+  </live-video-compat-skin>
+</live-video-player>
+```
+</FrameworkCase>
+
+The examples use the lightweight <DocsLink slug="reference/components/hls-video">HLS video element</DocsLink> because most browsers can't play HLS streams with a plain `<video>`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
+
+## Poster
+
+<FrameworkCase frameworks={["react"]}>
+The skin renders a poster image before playback starts. Pass `renderPoster` to replace it with your own component.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The skin renders a poster image before playback starts. An element with `slot="poster"` replaces it.
+</FrameworkCase>
+
+See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink> for complete examples.
+
+## Styling
+
+Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
+
+## Own the UI
+
+<OwnTheUI />

@@ -7,7 +7,7 @@ export type SkinTheme = SkinStyle['theme'];
 
 /** Resolve the public preset shared by a default or Neutral Skin. */
 export function skinPreset(name: SkinName): SkinPreset {
-  const preset = name.replace(/^(?:default|neutral)-/, '');
+  const preset = name.replace(/^(?:compat|default|neutral)-/, '');
   if (!isSkinPreset(preset)) throw new Error(`Unsupported Skin preset: \`${name}\`.`);
 
   return preset;
@@ -25,18 +25,18 @@ export function skinDirectory(name: SkinName): string {
   return skinPreset(name);
 }
 
-/** Runtime stylesheet entry carrying the shared, preset, and optional Neutral tokens relative to `src/styles`. */
+/** Runtime stylesheet entry carrying the shared, preset, and catalog theme tokens relative to `src/styles`. */
 export function skinBaseStylesheet(preset: SkinPreset, theme: SkinTheme = 'default'): string {
   const media = skinMedia(preset);
 
-  return `${media}/${theme === 'neutral' ? 'neutral' : 'base'}.css`;
+  return `${media}/${theme === 'default' ? 'base' : theme}.css`;
 }
 
 /** Registry style item that owns one skin's exact stylesheet dependency closure. */
 export function skinStyleItemName(preset: SkinPreset, theme: SkinTheme): string {
   const media = skinMedia(preset);
 
-  return `_style-${media}${theme === 'neutral' ? '-neutral' : ''}`;
+  return `_style-${media}${theme === 'default' ? '' : `-${theme}`}`;
 }
 
 export function isSkinPreset(value: string): value is SkinPreset {

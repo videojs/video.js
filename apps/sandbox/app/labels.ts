@@ -15,6 +15,7 @@ export const STYLING_LABELS: Record<Styling, string> = {
 export const SKIN_LABELS: Record<Skin, string> = {
   default: 'Default',
   neutral: 'Neutral',
+  compat: 'Compat',
 };
 
 export const SKIN_SOURCE_LABELS: Record<SkinSource, string> = {

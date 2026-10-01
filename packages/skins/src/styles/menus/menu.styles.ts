@@ -35,6 +35,14 @@ const menuIcon = ['shrink-0 drop-shadow-media-icon text-media-muted-foreground']
 
 const menuChevron = [...menuIcon, 'size-media-icon-sm'] as const;
 
+export const menuContent = [
+  'not-data-submenu:flex not-data-submenu:flex-col not-data-submenu:gap-0.5',
+  'not-data-submenu:data-child-open:blur-media-hidden',
+  'not-data-submenu:data-child-open:before:hidden',
+  'data-submenu:media-transitioning:pointer-events-none data-submenu:media-transitioning:overflow-hidden',
+  'data-submenu:media-transitioning:blur-media-hidden',
+] as const;
+
 export default styles({
   file: 'menus.css',
   prefix: 'media-menu',
@@ -53,18 +61,14 @@ export default styles({
     content: {
       utilities: [
         ...menuHighlight,
+        ...menuContent,
         'absolute max-h-[inherit] overflow-auto overscroll-none outline-hidden',
-        'not-data-submenu:flex not-data-submenu:flex-col not-data-submenu:gap-0.5',
         'transition-[translate,filter] duration-media-menu ease-out',
         'not-data-submenu:inset-x-1 not-data-submenu:top-1',
         'not-data-submenu:data-child-open:-translate-x-full',
         'not-data-submenu:data-child-open:rtl:translate-x-full',
-        'not-data-submenu:data-child-open:blur-media-hidden',
-        'not-data-submenu:data-child-open:before:hidden',
         'data-submenu:inset-x-0 data-submenu:top-0 data-submenu:z-10 data-submenu:max-h-[inherit] data-submenu:p-1',
-        'data-submenu:media-transitioning:pointer-events-none data-submenu:media-transitioning:overflow-hidden',
         'data-submenu:media-transitioning:translate-x-full data-submenu:media-transitioning:rtl:-translate-x-full',
-        'data-submenu:media-transitioning:blur-media-hidden',
       ],
     },
     radioGroup: {
