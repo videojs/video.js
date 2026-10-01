@@ -21,11 +21,7 @@ export default styles({
   prefix: 'video-controls',
   rules: {
     captionsButton: {
-      utilities: [],
-      variants: {
-        default: 'media-max-lg:hidden',
-        neutral: 'media-max-xs:hidden',
-      },
+      utilities: 'media-max-xs:hidden',
     },
     root: {
       utilities: [],

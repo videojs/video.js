@@ -26,7 +26,7 @@ export function DefaultLiveVideoControls() {
             <LiveButton />
             <Box aria-hidden="true" className={controlsStyles.spacer} />
             <VolumePopover />
-            <CaptionsMenu className={styles.captionsMenu} />
+            <CaptionsMenu />
             <ButtonTooltip side="top">
               <CastButton />
             </ButtonTooltip>
