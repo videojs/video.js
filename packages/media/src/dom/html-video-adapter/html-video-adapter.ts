@@ -2,41 +2,41 @@ import type { WebKitDocument, WebKitPresentationMode, WebKitVideoElement } from 
 import { isFunction } from '@videojs/utils/predicate';
 
 import type { Video, VideoEvents, VideoTargetLike } from '../../core/types';
-import { getMediaProp, HTMLMediaAdapter, type HTMLMediaTargetLike, setMediaProp } from '../html-media-adapter';
+import { HTMLMediaAdapter, type HTMLMediaTargetLike } from '../html-media-adapter';
 
 export interface HTMLVideoTargetLike extends VideoTargetLike, HTMLMediaTargetLike {}
 
 export class HTMLVideoAdapter extends HTMLMediaAdapter<HTMLVideoTargetLike, VideoEvents> implements Video {
   get poster() {
-    return getMediaProp(this, 'poster') ?? '';
+    return this.target?.poster ?? '';
   }
 
   set poster(value: string) {
-    setMediaProp(this, 'poster', value);
+    if (this.target) this.target.poster = value;
   }
 
   get playsInline() {
-    return getMediaProp(this, 'playsInline') ?? false;
+    return this.target?.playsInline ?? false;
   }
 
   set playsInline(value: boolean) {
-    setMediaProp(this, 'playsInline', value);
+    if (this.target) this.target.playsInline = value;
   }
 
   get videoWidth() {
-    return getMediaProp(this, 'videoWidth') ?? 0;
+    return this.target?.videoWidth ?? 0;
   }
 
   get videoHeight() {
-    return getMediaProp(this, 'videoHeight') ?? 0;
+    return this.target?.videoHeight ?? 0;
   }
 
   get disablePictureInPicture() {
-    return getMediaProp(this, 'disablePictureInPicture') ?? false;
+    return this.target?.disablePictureInPicture ?? false;
   }
 
   set disablePictureInPicture(value: boolean) {
-    setMediaProp(this, 'disablePictureInPicture', value);
+    if (this.target) this.target.disablePictureInPicture = value;
   }
 
   get webkitCurrentPlaybackTargetIsWireless() {

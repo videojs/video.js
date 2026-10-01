@@ -1,6 +1,7 @@
 import { createStore, flush } from '@videojs/store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { PlayerExtensionCoordinator } from '../../../extensions/coordinator';
 import { getGestureCoordinator } from '../../../gesture/coordinator';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
@@ -212,6 +213,31 @@ describe('controlsFeature', () => {
       flush();
 
       expect(store.state.userActive).toBe(false);
+      expect(store.state.controlsVisible).toBe(false);
+    });
+
+    it('hides controls on a tap on the media while the store sees it through the player facade', () => {
+      const video = createMockVideo({ paused: false });
+      const container = createContainer();
+      const extensions = new PlayerExtensionCoordinator(() => {});
+
+      container.append(video);
+      extensions.register({ mediaOverride: null });
+
+      const media = extensions.getStoreMedia(video);
+      const store = createStore<PlayerTarget>()(controlsFeature);
+
+      expect(media).not.toBe(video);
+
+      store.attach({ media, container });
+      flush();
+
+      video.dispatchEvent(createPointerEvent('pointerdown', { pointerType: 'touch' }));
+      vi.advanceTimersByTime(100);
+
+      video.dispatchEvent(createPointerEvent('pointerup', { pointerType: 'touch' }));
+      flush();
+
       expect(store.state.controlsVisible).toBe(false);
     });
 

@@ -11,7 +11,7 @@ import {
 import { combine, createStore } from '@videojs/store';
 
 import type { PlayerElementConstructor } from '../store/types';
-import { containerContext, mediaContext, type PlayerContext, playerContext } from './context';
+import { containerContext, extensionContext, mediaContext, type PlayerContext, playerContext } from './context';
 import { createPlayerController, type PlayerController } from './controller';
 import { createPlayerElement } from './element';
 
@@ -81,6 +81,7 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     playerContext,
     mediaContext,
     containerContext,
+    extensionContext,
     factory: () => createStore<PlayerTarget>()(slice),
     config: featureConfig,
   });

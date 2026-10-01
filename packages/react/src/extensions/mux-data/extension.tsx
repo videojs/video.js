@@ -3,16 +3,15 @@
 import { MuxDataExtension, type MuxDataExtensionProps } from '@videojs/mux-data';
 import type { ReactNode } from 'react';
 
-import { useMediaExtension } from '../../utils/use-media-extension';
+import { usePlayerExtension } from '../../utils/use-player-extension';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 export type MuxDataProps = Partial<MuxDataExtensionProps>;
 
 /**
- * Adds the [Mux Data](https://www.mux.com/data) extension to the surrounding player's media.
+ * Adds the [Mux Data](https://www.mux.com/data) extension to the surrounding player.
  *
- * Renders nothing — place it inside the Player as a sibling of the media component (e.g. `<MuxVideo />`) and it follows
- * the active media.
+ * Renders nothing — place it inside the Player and it follows whatever media the player attaches.
  *
  * Mux-hosted playback needs no `envKey`: the view reports the Mux playback ID as its `video_id`, which Mux attributes
  * to the owning environment. Set `envKey` to monitor sources Mux doesn't host.
@@ -29,7 +28,7 @@ export type MuxDataProps = Partial<MuxDataExtensionProps>;
  *   ```;
  */
 export function MuxData(props: MuxDataProps): ReactNode {
-  const component = useMediaExtension(MuxDataExtension);
+  const extension = usePlayerExtension(MuxDataExtension);
   const { MuxDataSdk, ...rest } = props;
 
   // `useSyncProps` treats an `undefined` prop as "reset to the default", but
@@ -38,9 +37,9 @@ export function MuxData(props: MuxDataProps): ReactNode {
   // omitting it falls back to the default SDK.
   const sdk = 'MuxDataSdk' in props ? MuxDataSdk : MuxDataExtension.defaultProps.MuxDataSdk;
 
-  if (component.MuxDataSdk !== sdk) component.MuxDataSdk = sdk;
+  if (extension.MuxDataSdk !== sdk) extension.MuxDataSdk = sdk;
 
-  useSyncProps(component, rest, MuxDataExtension.defaultProps);
+  useSyncProps(extension, rest, MuxDataExtension.defaultProps);
 
   return null;
 }

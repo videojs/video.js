@@ -1,5 +1,7 @@
 import {
   type MediaContainer,
+  type PlayerExtension,
+  PlayerExtensionCoordinator,
   type PlayerFeatureConfig,
   type PlayerStore,
   type PlayerTarget,
@@ -13,12 +15,13 @@ import { camelCase, kebabCase } from '@videojs/utils/string';
 
 import type { PlayerElementConstructor } from '../store/types';
 import { UIElement } from '../ui/ui-element';
-import type { ContainerContext, MediaContext, PlayerContext } from './context';
+import type { ContainerContext, ExtensionContext, MediaContext, PlayerContext } from './context';
 
 export interface CreatePlayerElementOptions<Store extends PlayerStore> {
   playerContext: PlayerContext<Store>;
   mediaContext: MediaContext;
   containerContext: ContainerContext;
+  extensionContext: ExtensionContext;
   factory: () => Store;
   config: PlayerFeatureConfig;
 }
@@ -68,9 +71,14 @@ export function createPlayerElement<Store extends PlayerStore>(
     #media: Media | null = null;
     #nativeMedia: HTMLMediaElement | null = null;
     #container: MediaContainer | null = null;
+    // The raw target the store is attached to; `store.target.media` may be the extensions' facade over it.
+    #attached: PlayerTarget | null = null;
     #mediaRegistrations: Registration<Media>[] = [];
     #containerRegistrations: Registration<MediaContainer>[] = [];
     #observer = new MutationObserver(() => this.#syncNativeMedia());
+    #extensions = new PlayerExtensionCoordinator(() => this.#syncExtensions());
+
+    #registerExtension = (extension: PlayerExtension): (() => void) => this.#extensions.register(extension);
 
     #registerMedia = (media: Media): (() => void) => {
       const registration = { value: media };
@@ -121,6 +129,15 @@ export function createPlayerElement<Store extends PlayerStore>(
       },
     });
 
+    constructor() {
+      super();
+      // Registers itself as a controller on this element; the value never changes, so nothing reads it back.
+      new ContextProvider(this, {
+        context: options.extensionContext,
+        initialValue: { registerExtension: this.#registerExtension },
+      });
+    }
+
     get store(): Store {
       if (isNull(this.#store)) {
         this.#store = options.factory();
@@ -153,6 +170,7 @@ export function createPlayerElement<Store extends PlayerStore>(
     override destroyCallback(): void {
       this.#observer.disconnect();
       this.#detachStore();
+      this.#extensions.destroy();
       this.#store?.destroy();
       this.#store = null;
       super.destroyCallback();
@@ -210,8 +228,7 @@ export function createPlayerElement<Store extends PlayerStore>(
     }
 
     #tryAttach(): void {
-      const store = this.#store;
-      if (!this.#connected || !store) return;
+      if (!this.#connected || !this.#store) return;
 
       if (!this.#media) {
         this.#detachStore();
@@ -223,18 +240,41 @@ export function createPlayerElement<Store extends PlayerStore>(
         container: this.#container,
       };
 
-      const hasMediaChanged = store.target?.media !== target.media;
-      const hasContainerChanged = store.target?.container !== target.container;
+      const hasMediaChanged = this.#attached?.media !== target.media;
+      const hasContainerChanged = this.#attached?.container !== target.container;
 
-      if (hasMediaChanged || hasContainerChanged) {
-        this.#detachStore();
-        this.#detach = store.attach(target);
-      }
+      if (hasMediaChanged || hasContainerChanged) this.#attach(target);
+    }
+
+    /**
+     * Extensions attach before the store so their overrides are in place when features first read the media; the store
+     * then sees the media through the extensions' facade. Extensions follow the media only, so a container change
+     * re-attaches the store but leaves them attached.
+     */
+    #attach(target: PlayerTarget): void {
+      const store = this.#store;
+      if (!store) return;
+
+      this.#detach?.();
+      this.#attached = target;
+      this.#extensions.attach(target);
+      this.#detach = store.attach({ media: this.#extensions.getStoreMedia(target.media), container: target.container });
+    }
+
+    /**
+     * An extension that overrides media members was added or removed. Features hold members read at attach time (such
+     * as `remote`), so the store re-attaches to the same target to pick up what the extensions now own. Observers such
+     * as analytics never get here. Extensions themselves stay attached.
+     */
+    #syncExtensions(): void {
+      if (this.#attached) this.#attach(this.#attached);
     }
 
     #detachStore(): void {
       this.#detach?.();
       this.#detach = null;
+      this.#extensions.detach();
+      this.#attached = null;
     }
 
     #syncInitialConfig(): void {

@@ -1,14 +1,19 @@
 import {
   audioFeatures,
   backgroundFeatures,
+  type ExtensionPlayer,
   features,
   metadataFeature,
+  type PlayerExtension,
+  type PlayerTarget,
   type PopupGroup,
   videoFeatures,
+  volumeFeature,
 } from '@videojs/core/dom';
 import { ContextConsumer } from '@videojs/element/context';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { PlayerExtensionElement } from '../../extensions/player-extension-element';
 import { BackgroundVideo } from '../../media/background-video';
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 import { ContainerElement } from '../../ui/container/element';
@@ -181,6 +186,167 @@ describe('createPlayer', () => {
 
     second.remove();
     await vi.waitFor(() => expect(player.store.target).toBeNull());
+  });
+
+  describe('extensions', () => {
+    class MutedExtension implements PlayerExtension {
+      attach = vi.fn<(target: PlayerTarget) => void>();
+      detach = vi.fn();
+
+      get mediaOverride() {
+        return { muted: true };
+      }
+    }
+
+    class MutedExtensionElement extends PlayerExtensionElement<MutedExtension> {
+      get instance() {
+        return this.extension;
+      }
+
+      protected createExtension() {
+        return new MutedExtension();
+      }
+    }
+
+    /** Declares no `mediaOverride`, like Mux Data. */
+    class ObserverExtension implements PlayerExtension {
+      connect = vi.fn<(player: ExtensionPlayer) => void>();
+      disconnect = vi.fn();
+      attach = vi.fn<(target: PlayerTarget) => void>();
+      detach = vi.fn();
+    }
+
+    class ObserverExtensionElement extends PlayerExtensionElement<ObserverExtension> {
+      get instance() {
+        return this.extension;
+      }
+
+      protected createExtension() {
+        return new ObserverExtension();
+      }
+    }
+
+    const extensionTag = defineTestElement(MutedExtensionElement);
+    const observerTag = defineTestElement(ObserverExtensionElement);
+
+    it('attaches extensions to a plain video and routes store reads through their overrides', async () => {
+      const { PlayerElement } = createPlayer({ features: [volumeFeature] });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const video = document.createElement('video');
+      const extension = document.createElement(extensionTag) as MutedExtensionElement;
+
+      player.append(video, extension);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target).not.toBeNull());
+
+      const media = player.store.target?.media as HTMLVideoElement | undefined;
+
+      expect(extension.instance.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+      expect(media).not.toBe(video);
+      expect(media).toBeInstanceOf(HTMLVideoElement);
+      expect(media?.muted).toBe(true);
+      expect(player.store.state.muted).toBe(true);
+      expect(video.muted).toBe(false);
+    });
+
+    it('re-attaches the store when an extension arrives after the media', async () => {
+      const { PlayerElement } = createPlayer({ features: [volumeFeature] });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const video = document.createElement('video');
+
+      player.append(video);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+      expect(player.store.state.muted).toBe(false);
+
+      const extension = document.createElement(extensionTag) as MutedExtensionElement;
+
+      player.append(extension);
+
+      expect(extension.instance.attach).toHaveBeenCalledTimes(1);
+      expect(player.store.target?.media).not.toBe(video);
+      expect(player.store.state.muted).toBe(true);
+
+      extension.remove();
+
+      expect(extension.instance.detach).toHaveBeenCalledTimes(1);
+      expect(player.store.target?.media).toBe(video);
+      expect(player.store.state.muted).toBe(false);
+    });
+
+    it('never wraps the media or re-attaches the store for an observer', async () => {
+      const { PlayerElement } = createPlayer({ features: [volumeFeature] });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const video = document.createElement('video');
+
+      player.append(video);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+
+      const attach = vi.spyOn(player.store, 'attach');
+      const extension = document.createElement(observerTag) as ObserverExtensionElement;
+
+      player.append(extension);
+
+      expect(extension.instance.connect).toHaveBeenCalledWith({ initTime: expect.any(Number) });
+      expect(extension.instance.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+      expect(player.store.target?.media).toBe(video);
+
+      extension.remove();
+
+      expect(extension.instance.detach).toHaveBeenCalledTimes(1);
+      expect(extension.instance.disconnect).toHaveBeenCalledTimes(1);
+      expect(attach).not.toHaveBeenCalled();
+    });
+
+    it('keeps extensions attached when only the container changes', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const container = document.createElement(defineTestElement(class extends ContainerElement {}));
+      const video = document.createElement('video');
+      const extension = document.createElement(observerTag) as ObserverExtensionElement;
+
+      player.append(video, extension);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+
+      player.append(container);
+      await vi.waitFor(() => expect(player.store.target?.container).toBe(container));
+
+      container.remove();
+      await vi.waitFor(() => expect(player.store.target?.container).toBeNull());
+
+      expect(extension.instance.attach).toHaveBeenCalledTimes(1);
+      expect(extension.instance.detach).not.toHaveBeenCalled();
+    });
+
+    it('moves extensions with the media and detaches them with the store', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+      const extension = document.createElement(extensionTag) as MutedExtensionElement;
+
+      player.append(extension, first);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(extension.instance.attach).toHaveBeenCalledTimes(1));
+
+      first.replaceWith(second);
+      await vi.waitFor(() => expect(extension.instance.attach).toHaveBeenCalledTimes(2));
+
+      expect(extension.instance.detach).toHaveBeenCalledTimes(1);
+      expect(extension.instance.attach).toHaveBeenLastCalledWith(expect.objectContaining({ media: second }));
+
+      second.remove();
+      await vi.waitFor(() => expect(player.store.target).toBeNull());
+
+      expect(extension.instance.detach).toHaveBeenCalledTimes(2);
+    });
   });
 
   it('does not retain disconnected context media as a native fallback', async () => {

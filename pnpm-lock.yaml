@@ -868,6 +868,9 @@ importers:
 
   packages/extensions/google-cast:
     dependencies:
+      '@videojs/core':
+        specifier: workspace:*
+        version: link:../../core
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media
@@ -890,6 +893,9 @@ importers:
 
   packages/extensions/mux-data:
     dependencies:
+      '@videojs/core':
+        specifier: workspace:*
+        version: link:../../core
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media

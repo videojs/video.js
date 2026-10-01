@@ -6,6 +6,7 @@
  * shared here.
  */
 
+import { PlayerExtensionCoordinator } from '@videojs/core/dom';
 import type { ReactNode } from 'react';
 import type { Mock } from 'vite-plus/test';
 import { vi } from 'vite-plus/test';
@@ -37,25 +38,29 @@ export function createMockStore(state: Record<string, unknown> = {}): MockStore 
 /**
  * Create a React wrapper that provides `PlayerContextProvider`.
  *
- * Accepts an optional store state seed. Returns the wrapper component, the mock store, and the context value for
- * assertions.
+ * Accepts an optional store state seed. Returns the wrapper component, the mock store, a real extension coordinator
+ * backing `registerExtension`, and the context value for assertions.
  */
 export function createPlayerWrapper(storeState: Record<string, unknown> = {}): {
   store: MockStore;
+  extensions: PlayerExtensionCoordinator;
   value: PlayerContextValue;
   Wrapper: ({ children }: { children: ReactNode }) => ReactNode;
 } {
   const store = createMockStore(storeState);
+  const extensions = new PlayerExtensionCoordinator(() => {});
   const value: PlayerContextValue = {
     store: store as any,
     media: null,
     setMedia: vi.fn(),
     container: null,
     setContainer: vi.fn(),
+    registerExtension: (extension) => extensions.register(extension),
   };
 
   return {
     store,
+    extensions,
     value,
     Wrapper({ children }: { children: ReactNode }) {
       return (

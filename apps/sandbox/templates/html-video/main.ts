@@ -1,5 +1,6 @@
 import '@app/styles.css';
 import '@videojs/html/video/player';
+import '@videojs/html/extensions/google-cast';
 import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 
 createHtmlSandbox({
@@ -12,6 +13,8 @@ createHtmlSandbox({
           ${storyboard}
         </video>
         ${poster ? html`<img slot="poster" src="${poster}" alt="Video poster" crossorigin />` : ''}
+        <!-- Cast works with a plain <video>; the extension goes anywhere inside the player. -->
+        <google-cast></google-cast>
       </${skinTag}>
     </video-player>
   `,

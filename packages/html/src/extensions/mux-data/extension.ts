@@ -1,12 +1,12 @@
 import type { PropertyDeclarationMap } from '@videojs/element';
 import { MuxDataExtension as MuxDataExtensionBase, type MuxDataExtensionProps } from '@videojs/mux-data';
 
-import { MediaExtensionElement } from '../media-extension-element';
+import { PlayerExtensionElement } from '../player-extension-element';
 
 /**
- * Adds the [Mux Data](https://www.mux.com/data) extension to the surrounding player's media.
+ * Adds the [Mux Data](https://www.mux.com/data) extension to the surrounding player.
  *
- * Renders nothing — place it inside the player as a sibling of the media element and it follows the active media.
+ * Renders nothing — place it inside the player and it follows whatever media the player attaches.
  *
  * Mux-hosted playback needs no `env-key`: the view reports the Mux playback ID as its `video_id`, which Mux attributes
  * to the owning environment. Set `env-key` to monitor sources Mux doesn't host.
@@ -22,7 +22,7 @@ import { MediaExtensionElement } from '../media-extension-element';
  *   </video-player>
  *   ```;
  */
-export class MuxDataExtension extends MediaExtensionElement<MuxDataExtensionBase> {
+export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBase> {
   static readonly tagName = 'mux-data';
 
   static override properties = {
@@ -36,88 +36,88 @@ export class MuxDataExtension extends MediaExtensionElement<MuxDataExtensionBase
     // `metadata` and `MuxDataSdk` take objects, so they're property-only props.
   } satisfies PropertyDeclarationMap<Exclude<keyof MuxDataExtensionProps, 'metadata' | 'MuxDataSdk'>>;
 
-  protected createComponent(): MuxDataExtensionBase {
+  protected createExtension(): MuxDataExtensionBase {
     return new MuxDataExtensionBase();
   }
 
   /** Mux Data environment key for the beacons. Optional for Mux-hosted playback. */
   get envKey(): string | undefined {
-    return this.component.envKey;
+    return this.extension.envKey;
   }
 
   set envKey(value: string | null | undefined) {
-    this.component.envKey = value ?? undefined;
+    this.extension.envKey = value ?? undefined;
   }
 
   /** Custom domain beacons are sent to. */
   get beaconCollectionDomain(): string | undefined {
-    return this.component.beaconCollectionDomain;
+    return this.extension.beaconCollectionDomain;
   }
 
   set beaconCollectionDomain(value: string | null | undefined) {
-    this.component.beaconCollectionDomain = value ?? undefined;
+    this.extension.beaconCollectionDomain = value ?? undefined;
   }
 
   /** Enables Mux Data SDK debug logging. */
   get debug(): boolean {
-    return this.component.debug;
+    return this.extension.debug;
   }
 
   set debug(value: boolean) {
-    this.component.debug = value;
+    this.extension.debug = value;
   }
 
   /** Disables Mux Data SDK cookies. */
   get disableCookies(): boolean {
-    return this.component.disableCookies;
+    return this.extension.disableCookies;
   }
 
   set disableCookies(value: boolean) {
-    this.component.disableCookies = value;
+    this.extension.disableCookies = value;
   }
 
   /** Player software name reported to Mux Data (e.g. `mux-video`). */
   get playerSoftwareName(): string | undefined {
-    return this.component.playerSoftwareName;
+    return this.extension.playerSoftwareName;
   }
 
   set playerSoftwareName(value: string | null | undefined) {
-    this.component.playerSoftwareName = value ?? undefined;
+    this.extension.playerSoftwareName = value ?? undefined;
   }
 
   /** Player software version reported to Mux Data. Defaults to the Video.js version. */
   get playerSoftwareVersion(): string | undefined {
-    return this.component.playerSoftwareVersion;
+    return this.extension.playerSoftwareVersion;
   }
 
   set playerSoftwareVersion(value: string | null | undefined) {
-    this.component.playerSoftwareVersion = value ?? undefined;
+    this.extension.playerSoftwareVersion = value ?? undefined;
   }
 
-  /** Epoch milliseconds the player was initialized. Defaults to the component's creation time. */
+  /** Epoch milliseconds the player was initialized. Defaults to when the player was created. */
   get playerInitTime(): number | undefined {
-    return this.component.playerInitTime;
+    return this.extension.playerInitTime;
   }
 
   set playerInitTime(value: number | null | undefined) {
-    this.component.playerInitTime = value ?? undefined;
+    this.extension.playerInitTime = value ?? undefined;
   }
 
   /** Custom view metadata forwarded to the Mux Data SDK. */
   get metadata(): MuxDataExtensionProps['metadata'] {
-    return this.component.metadata;
+    return this.extension.metadata;
   }
 
   set metadata(value: MuxDataExtensionProps['metadata']) {
-    this.component.metadata = value;
+    this.extension.metadata = value;
   }
 
   /** Mux Data SDK used for monitoring. Set to `undefined` to disable monitoring. */
   get MuxDataSdk(): MuxDataExtensionProps['MuxDataSdk'] {
-    return this.component.MuxDataSdk;
+    return this.extension.MuxDataSdk;
   }
 
   set MuxDataSdk(value: MuxDataExtensionProps['MuxDataSdk']) {
-    this.component.MuxDataSdk = value;
+    this.extension.MuxDataSdk = value;
   }
 }

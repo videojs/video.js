@@ -1,4 +1,4 @@
-import type { MediaFullscreenCapability } from '@videojs/media';
+import { type MediaFullscreenCapability, getRegisteredMedia } from '@videojs/media';
 import type { WebKitDocument, WebKitFullscreenElement, WebKitVideoElement } from '@videojs/utils/dom';
 import { isFunction } from '@videojs/utils/predicate';
 
@@ -32,7 +32,9 @@ export function isFullscreen(container: HTMLElement | null, media: EventTarget) 
   if (webkitVideo.webkitPresentationMode === 'fullscreen') return true;
 
   const fullscreenElement = getFullscreenElement();
-  if (fullscreenElement && (fullscreenElement === container || fullscreenElement === media)) return true;
+
+  if (fullscreenElement && (fullscreenElement === container || fullscreenElement === getRegisteredMedia(media)))
+    return true;
 
   // `:fullscreen` matches the fullscreen element AND its ancestors (across
   // shadow boundaries), so this covers cases where fullscreen was requested

@@ -1,4 +1,4 @@
-import type { GoogleCastProvider } from './google-cast-provider';
+import type { GoogleCastProvider } from './provider';
 import { getCastContext, IterableWeakSet, loadCastFramework, onCastApiAvailable } from './utils';
 
 export const googleCastInstances = new IterableWeakSet<GoogleCastProvider>();

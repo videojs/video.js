@@ -25,4 +25,4 @@ Three properties of the contract shaped the details:
 - mux-embed SDK behavior (`videochange` resets the view and arms `viewstart` on `play`; the element monitor's event list), as shipped in the `mux-embed` npm package: https://www.npmjs.com/package/mux-embed
 - `playback-core` destroy-per-source and its `muxDataKeepSession` workaround: https://github.com/muxinc/elements/blob/e1a32eb3fb147fcbd42f810ecf54101f4582f868/packages/playback-core/src/index.ts#L671-L679 and https://github.com/muxinc/elements/blob/e1a32eb3fb147fcbd42f810ecf54101f4582f868/packages/playback-core/src/index.ts#L697-L740
 - Bug and fix: https://github.com/videojs/v10/issues/2562, https://github.com/videojs/v10/pull/2565. Inheriting work: https://github.com/videojs/v10/issues/1845
-- Implementation: [`mux-data.ts`](/packages/extensions/mux-data/src/mux-data.ts), [`mux-data.test.ts`](/packages/extensions/mux-data/src/tests/mux-data.test.ts)
+- Implementation: [`extension.ts`](/packages/extensions/mux-data/src/extension.ts), [`extension.test.ts`](/packages/extensions/mux-data/src/tests/extension.test.ts)

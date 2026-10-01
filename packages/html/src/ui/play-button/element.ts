@@ -14,7 +14,7 @@ export class PlayButtonElement extends MediaButtonElement<PlayButtonCore> {
   protected readonly mediaState = new PlayerController(this, playerContext, selectPlayback);
   protected override readonly hotkeyAction = 'togglePaused';
 
-  protected activate(state: MediaPlaybackState): void {
-    this.core.toggle(state);
+  protected activate(state: MediaPlaybackState): Promise<void> {
+    return this.core.toggle(state);
   }
 }

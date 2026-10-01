@@ -6,6 +6,7 @@ import { VideoSkinComponent } from '@app/shared/react/skins';
 import { Storyboard } from '@app/shared/react/storyboard';
 import { useSandbox } from '@app/shared/react/use-sandbox';
 import { getChapters, getPosterSrc, getStoryboardSrc, SOURCES } from '@app/shared/sources';
+import { GoogleCast } from '@videojs/react/extensions/google-cast';
 import { Video } from '@videojs/react/video';
 import { createRoot } from 'react-dom/client';
 
@@ -21,6 +22,8 @@ function App() {
             <Chapters tracks={getChapters(source)} />
             <Storyboard src={getStoryboardSrc(source)} />
           </Video>
+          {/* Cast works with a plain <Video />; the extension goes anywhere inside the player. */}
+          <GoogleCast />
         </VideoSkinComponent>
       </VideoPlayer>
     </SandboxI18nProvider>

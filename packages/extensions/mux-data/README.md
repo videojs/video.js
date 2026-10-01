@@ -30,7 +30,6 @@ import '@videojs/html/extensions/mux-data';
 import { MuxData } from '@videojs/react/extensions/mux-data';
 ```
 
-Low-level consumers can import the framework-neutral `MuxDataExtension` extension from `@videojs/mux-data`.
 
 ## License
 

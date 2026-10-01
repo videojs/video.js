@@ -81,7 +81,52 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** Runs `action`, then collects any rejection it left unhandled. */
+async function collectUnhandledRejections(action: () => void): Promise<unknown[]> {
+  // SAFETY: tests run on Node, and the test types omit Node's globals.
+  const { process } = globalThis as unknown as {
+    process: {
+      on(type: string, fn: (reason: unknown) => void): void;
+      off(type: string, fn: (reason: unknown) => void): void;
+    };
+  };
+  const reasons: unknown[] = [];
+  const onRejection = (reason: unknown) => reasons.push(reason);
+
+  process.on('unhandledRejection', onRejection);
+
+  try {
+    action();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  } finally {
+    process.off('unhandledRejection', onRejection);
+  }
+
+  return reasons;
+}
+
 describe('MediaButtonElement', () => {
+  it('absorbs a refused play request instead of leaving it unhandled', async () => {
+    ensureDefined(PlayButtonElement);
+
+    const player = document.createElement(TestPlayerProviderElement.tagName) as TestPlayerProviderElement;
+    const button = document.createElement(PlayButtonElement.tagName) as PlayButtonElement;
+    const video = player.store.target!.media as HTMLVideoElement;
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    // Not a `vi.fn`: Vitest attaches handlers to a mock's results, which would mark the rejection handled.
+    video.play = () => Promise.reject(new DOMException('Autoplay refused', 'NotAllowedError'));
+
+    document.body.append(player);
+    player.append(button);
+    await button.updateComplete;
+
+    const reasons = await collectUnhandledRejections(() => button.click());
+
+    expect(reasons).toEqual([]);
+    expect(error).toHaveBeenCalledWith(`[${PlayButtonElement.tagName}]`, expect.any(DOMException));
+  });
+
   it('resolves its label before the first update', () => {
     ensureDefined(PlayButtonElement);
 

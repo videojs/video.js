@@ -24,6 +24,7 @@ Skip implementation detail, inventories, status logs, speculative design, generi
 | `element/` | Custom-element architecture |
 | `i18n/` | Locale and translation architecture |
 | `media/` | Media model architecture |
+| `player/` | Player-level lifecycle and extension architecture |
 | `site/` | Documentation-site decisions |
 | `spf/` | Streaming framework architecture, conventions, feature registry, and use-case compositions |
 | `store/` | Player-feature state ownership, configuration, and derivation |

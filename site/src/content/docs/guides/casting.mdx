@@ -43,11 +43,11 @@ pnpm add @videojs/html @videojs/google-cast @videojs/hlsjs-video
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Use the <DocsLink slug="reference/components/google-cast">GoogleCast extension</DocsLink> with a <DocsLink slug="reference/components/cast-button">CastButton</DocsLink>, and add an <DocsLink slug="reference/components/airplay-button">AirPlayButton</DocsLink> for Safari. The packaged skins already include both buttons; add `GoogleCast` next to a streaming media component to enable the configurable Cast route.
+Use the <DocsLink slug="reference/components/google-cast">GoogleCast extension</DocsLink> with a <DocsLink slug="reference/components/cast-button">CastButton</DocsLink>, and add an <DocsLink slug="reference/components/airplay-button">AirPlayButton</DocsLink> for Safari. The packaged skins already include both buttons; add `GoogleCast` anywhere inside the player to enable the configurable Cast route. It works with any media the player attaches, including a plain `<Video />`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Use the <DocsLink slug="reference/components/google-cast">`<google-cast>` extension</DocsLink> with a <DocsLink slug="reference/components/cast-button">`<media-cast-button>`</DocsLink>, and add an <DocsLink slug="reference/components/airplay-button">`<media-airplay-button>`</DocsLink> for Safari. The packaged skins already include both buttons; add `<google-cast>` next to a streaming media component to enable the configurable Cast route.
+Use the <DocsLink slug="reference/components/google-cast">`<google-cast>` extension</DocsLink> with a <DocsLink slug="reference/components/cast-button">`<media-cast-button>`</DocsLink>, and add an <DocsLink slug="reference/components/airplay-button">`<media-airplay-button>`</DocsLink> for Safari. The packaged skins already include both buttons; add `<google-cast>` anywhere inside the player to enable the configurable Cast route. It works with any media the player attaches, including a plain `<video>`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -74,11 +74,11 @@ Use the <DocsLink slug="reference/components/google-cast">`<google-cast>` extens
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-The demo pairs the streaming media component with the `GoogleCast` extension. Without that extension, `CastButton` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
+The demo pairs the media component with the `GoogleCast` extension. Without that extension, `CastButton` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The demo pairs the streaming media element with the `<google-cast>` extension. Without that extension, `<media-cast-button>` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
+The demo pairs the media element with the `<google-cast>` extension. Without that extension, `<media-cast-button>` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
 </FrameworkCase>
 
 ## How it works
@@ -92,6 +92,14 @@ The <DocsLink slug="reference/api/feature-remote-playback">remote playback featu
 AirPlay uses WebKit's presentation APIs. Google Cast uses a sender and receiver: the browser sends the receiver a media URL and then controls playback. Your UI reads the same Video.js state for either route.
 
 While connected, playback actions — play, pause, seek, volume — proxy to the remote device, and player state keeps reflecting the remote session. Local playback is suspended.
+
+<FrameworkCase frameworks={["react"]}>
+Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> from `usePlayer`. Don't call methods on the media element or listen for its events to drive or track a session.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> on the player element's `store`. Don't call methods on the media element or listen for its events to drive or track a session.
+</FrameworkCase>
 
 For a custom control, call `promptRemotePlayback()` directly from the click handler and catch its promise. It rejects when no remote route exists or the browser refuses the request. A canceled Google Cast picker can also resolve without connecting, so show success only when `remotePlaybackState` is `'connected'`. The built-in buttons handle the request for you.
 
@@ -143,11 +151,11 @@ By default, Video.js sends the current source to Google's Default Media Receiver
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Use `src` and `contentType` when the receiver should load a different source than the browser. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">GoogleCast reference</DocsLink> for the exact option types.
+Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">GoogleCast reference</DocsLink> for the exact option types.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Use `src` and `contentType` when the receiver should load a different source than the browser. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">`<google-cast>` reference</DocsLink> for the exact option types and attribute-to-property mapping.
+Use `src` and `contentType` when the receiver should load a different source than the browser. A YouTube or Vimeo embed needs `src`: the receiver can't play the embed itself, so without it nothing is sent to the receiver. `streamType` and `customData` let you describe that source and attach application-specific data. See the <DocsLink slug="reference/components/google-cast">`<google-cast>` reference</DocsLink> for the exact option types and attribute-to-property mapping.
 </FrameworkCase>
 
 ### Read connection state
@@ -169,6 +177,10 @@ The Cast button hides when the route is unsupported. In Chromium with no Cast de
 ### Casting starts but the device shows an error
 
 The receiver cannot fetch the media. Confirm the source URL is reachable from the device and served with CORS headers, including caption tracks.
+
+### Custom UI shows local playback while casting
+
+The code reads or controls the media element directly. Read playback state from the player store and call its actions instead; only the player reflects the remote session.
 
 ### The UI freezes on "connecting"
 

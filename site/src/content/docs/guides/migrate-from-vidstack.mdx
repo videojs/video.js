@@ -1247,7 +1247,7 @@ See <DocsLink slug="guides/live-streams">Live streams</DocsLink>.
 The video skins include AirPlay and Cast buttons. Both call one action, `promptRemotePlayback()`, and each button shows only on the platform that supports it. Without the Google Cast extension, the Cast button uses the browser's Remote Playback API.
 
 <FrameworkCase frameworks={["react"]}>
-Vidstack's `googleCast` prop becomes the `GoogleCast` extension, placed next to the media:
+Vidstack's `googleCast` prop becomes the `GoogleCast` extension, placed anywhere inside the player:
 
 ```tsx
 import { GoogleCast } from '@videojs/react/extensions/google-cast';
@@ -1262,7 +1262,7 @@ import { GoogleCast } from '@videojs/react/extensions/google-cast';
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Vidstack's `googleCast` property becomes the `<google-cast>` extension, placed next to the media:
+Vidstack's `googleCast` property becomes the `<google-cast>` extension, placed anywhere inside the player:
 
 ```html
 <video-skin>

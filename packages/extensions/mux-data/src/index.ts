@@ -1,3 +1,3 @@
-export { MuxDataExtension, type MuxDataExtensionProps } from './mux-data';
-export { type MuxDataEngineOptions, toMuxDataEngineOptions } from './mux-data-engine';
+export { MuxDataExtension, type MuxDataExtensionProps } from './extension';
+export { type MuxDataEngineOptions, toMuxDataEngineOptions } from './engine';
 export type { MuxDataOptions, MuxDataSdk } from './types';

@@ -41,6 +41,7 @@
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
   },
   "dependencies": {
+    "@videojs/core": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/utils": "workspace:*"
   },

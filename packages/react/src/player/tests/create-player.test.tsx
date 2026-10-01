@@ -1,5 +1,13 @@
 import { act, cleanup, render, renderHook, screen, waitFor } from '@testing-library/react';
-import { features, metadataFeature, type PlayerStore } from '@videojs/core/dom';
+import {
+  type ExtensionPlayer,
+  features,
+  metadataFeature,
+  type PlayerExtension,
+  type PlayerStore,
+  type PlayerTarget,
+  volumeFeature,
+} from '@videojs/core/dom';
 import { defineSlice } from '@videojs/store';
 import { Component, type ErrorInfo, type ReactNode, StrictMode, useState } from 'react';
 import { renderToString } from 'react-dom/server';
@@ -7,6 +15,8 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { I18nProvider, useLocale } from '../../i18n';
 import { Container } from '../../index';
+import { Video } from '../../media/video';
+import { usePlayerExtension } from '../../utils/use-player-extension';
 import { useContainer, usePlayerContext } from '../context';
 import { createPlayer } from '../create-player';
 
@@ -144,6 +154,202 @@ describe('createPlayer', () => {
 
       expect(store).not.toBe(destroyedStore);
       expect(store.title).toBe('Replacement title');
+    });
+
+    describe('extensions', () => {
+      class MutedExtension implements PlayerExtension {
+        static instances: MutedExtension[] = [];
+        attach = vi.fn<(target: PlayerTarget) => void>();
+        detach = vi.fn();
+        destroy = vi.fn();
+
+        constructor() {
+          MutedExtension.instances.push(this);
+        }
+
+        get mediaOverride() {
+          return { muted: true };
+        }
+      }
+
+      /** Declares no `mediaOverride`, like Mux Data. */
+      class ObserverExtension implements PlayerExtension {
+        static instances: ObserverExtension[] = [];
+        connect = vi.fn<(player: ExtensionPlayer) => void>();
+        disconnect = vi.fn();
+        attach = vi.fn<(target: PlayerTarget) => void>();
+        detach = vi.fn();
+        destroy = vi.fn();
+
+        constructor() {
+          ObserverExtension.instances.push(this);
+        }
+      }
+
+      function Muted() {
+        usePlayerExtension(MutedExtension);
+        return null;
+      }
+
+      function Observer() {
+        usePlayerExtension(ObserverExtension);
+        return null;
+      }
+
+      afterEach(() => {
+        MutedExtension.instances.length = 0;
+        ObserverExtension.instances.length = 0;
+      });
+
+      it('attaches extensions to a plain video and routes store reads through their overrides', () => {
+        const { Player, usePlayer } = createPlayer({ features: [volumeFeature] });
+        let store!: PlayerStore<[typeof volumeFeature]>;
+
+        function Consumer() {
+          store = usePlayer();
+          return null;
+        }
+
+        const { container } = render(
+          <Player>
+            <Video data-testid="video" />
+            <Muted />
+            <Consumer />
+          </Player>
+        );
+
+        const video = container.querySelector('video')!;
+        const [extension] = MutedExtension.instances;
+
+        expect(extension!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+        expect(store.target?.media).not.toBe(video);
+        expect(store.target?.media).toBeInstanceOf(HTMLVideoElement);
+        expect(store.state.muted).toBe(true);
+        expect(video.muted).toBe(false);
+      });
+
+      it('re-attaches the store when an extension mounts after the media', () => {
+        const { Player, usePlayer } = createPlayer({ features: [volumeFeature] });
+        let store!: PlayerStore<[typeof volumeFeature]>;
+
+        function Consumer() {
+          store = usePlayer();
+          return null;
+        }
+
+        function App({ cast }: { cast: boolean }) {
+          return (
+            <Player>
+              <Video />
+              {cast && <Muted />}
+              <Consumer />
+            </Player>
+          );
+        }
+
+        const { container, rerender } = render(<App cast={false} />);
+        const video = container.querySelector('video')!;
+
+        expect(store.target?.media).toBe(video);
+        expect(store.state.muted).toBe(false);
+
+        rerender(<App cast />);
+
+        const [extension] = MutedExtension.instances;
+
+        expect(extension!.attach).toHaveBeenCalledTimes(1);
+        expect(store.target?.media).not.toBe(video);
+        expect(store.state.muted).toBe(true);
+
+        rerender(<App cast={false} />);
+
+        expect(extension!.detach).toHaveBeenCalledTimes(1);
+        expect(store.target?.media).toBe(video);
+        expect(store.state.muted).toBe(false);
+      });
+
+      it('never wraps the media or re-attaches the store for an observer', () => {
+        const { Player, usePlayer } = createPlayer({ features: [volumeFeature] });
+        let store!: PlayerStore<[typeof volumeFeature]>;
+
+        function Consumer() {
+          store = usePlayer();
+          return null;
+        }
+
+        function App({ observe }: { observe: boolean }) {
+          return (
+            <Player>
+              <Video />
+              {observe && <Observer />}
+              <Consumer />
+            </Player>
+          );
+        }
+
+        const { container, rerender } = render(<App observe={false} />);
+        const video = container.querySelector('video')!;
+        const attach = vi.spyOn(store, 'attach');
+
+        rerender(<App observe />);
+
+        const [extension] = ObserverExtension.instances;
+
+        expect(extension!.connect).toHaveBeenCalledWith({ initTime: expect.any(Number) });
+        expect(extension!.attach).toHaveBeenCalledWith(expect.objectContaining({ media: video }));
+        expect(store.target?.media).toBe(video);
+
+        rerender(<App observe={false} />);
+
+        expect(extension!.detach).toHaveBeenCalledTimes(1);
+        expect(extension!.disconnect).toHaveBeenCalledTimes(1);
+        expect(attach).not.toHaveBeenCalled();
+      });
+
+      it('keeps extensions attached when only the container changes', () => {
+        const { Player } = createPlayer({ features: [volumeFeature] });
+        let setContainer!: (container: HTMLElement | null) => void;
+
+        function Consumer() {
+          setContainer = usePlayerContext().setContainer;
+          return null;
+        }
+
+        render(
+          <Player>
+            <Video />
+            <Observer />
+            <Consumer />
+          </Player>
+        );
+
+        const [extension] = ObserverExtension.instances;
+
+        act(() => setContainer(document.createElement('div')));
+        act(() => setContainer(document.createElement('div')));
+
+        expect(extension!.attach).toHaveBeenCalledTimes(1);
+        expect(extension!.detach).not.toHaveBeenCalled();
+      });
+
+      it('detaches extensions with the store on unmount', () => {
+        const { Player } = createPlayer({ features: [volumeFeature] });
+
+        const { unmount } = render(
+          <Player>
+            <Video />
+            <Muted />
+          </Player>
+        );
+
+        const [extension] = MutedExtension.instances;
+
+        expect(extension!.attach).toHaveBeenCalledTimes(1);
+
+        unmount();
+
+        expect(extension!.detach).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('survives React StrictMode without StoreError', () => {

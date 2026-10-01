@@ -3,29 +3,29 @@
 import { GoogleCastExtension, type GoogleCastExtensionProps } from '@videojs/google-cast';
 import type { ReactNode } from 'react';
 
-import { useMediaExtension } from '../../utils/use-media-extension';
+import { usePlayerExtension } from '../../utils/use-player-extension';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 export type GoogleCastProps = Partial<GoogleCastExtensionProps>;
 
 /**
- * Adds the Google Cast extension to the surrounding player's media.
+ * Adds the Google Cast extension to the surrounding player.
  *
- * Renders nothing — place it inside the Player as a sibling of the media component (e.g. `<HlsJsVideo />`) and it
- * follows the active media.
+ * Renders nothing — place it inside the Player and it follows whatever media the player attaches, a plain `<Video />`
+ * included.
  *
  * @example
  *   ```tsx
  *   <Player>
- *     <HlsJsVideo src="https://example.com/stream.m3u8" />
+ *     <Video src="https://example.com/video.mp4" />
  *     <GoogleCast receiver="YOUR_APP_ID" />
  *   </Player>;
  *   ```;
  */
 export function GoogleCast(props: GoogleCastProps): ReactNode {
-  const component = useMediaExtension(GoogleCastExtension);
+  const extension = usePlayerExtension(GoogleCastExtension);
 
-  useSyncProps(component, props, GoogleCastExtension.defaultProps);
+  useSyncProps(extension, props, GoogleCastExtension.defaultProps);
 
   return null;
 }

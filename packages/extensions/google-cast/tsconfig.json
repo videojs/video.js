@@ -9,6 +9,12 @@
   },
   "references": [
     {
+      "path": "../../core"
+    },
+    {
+      "path": "../../core/src/dom"
+    },
+    {
       "path": "../../media"
     },
     {

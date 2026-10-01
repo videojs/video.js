@@ -13,7 +13,7 @@ export class AirPlayButtonElement extends MediaButtonElement<AirPlayButtonCore> 
   protected readonly stateAttrMap = AirPlayButtonDataAttrs;
   protected readonly mediaState = new PlayerController(this, playerContext, selectRemotePlayback);
 
-  protected activate(state: MediaRemotePlaybackState): void {
-    this.core.toggle(state);
+  protected activate(state: MediaRemotePlaybackState): Promise<void> {
+    return this.core.toggle(state);
   }
 }

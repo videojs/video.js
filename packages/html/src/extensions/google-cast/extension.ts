@@ -1,22 +1,23 @@
 import type { PropertyDeclarationMap } from '@videojs/element';
 import { GoogleCastExtension as GoogleCastExtensionBase, type GoogleCastExtensionProps } from '@videojs/google-cast';
 
-import { MediaExtensionElement } from '../media-extension-element';
+import { PlayerExtensionElement } from '../player-extension-element';
 
 /**
- * Adds the Google Cast extension to the surrounding player's media.
+ * Adds the Google Cast extension to the surrounding player.
  *
- * Renders nothing — place it inside the player as a sibling of the media element and it follows the active media.
+ * Renders nothing — place it inside the player and it follows whatever media the player attaches, a plain `<video>`
+ * included.
  *
  * @example
  *   ```html
  *   <video-player>
- *   <hlsjs-video src="https://example.com/stream.m3u8"></hlsjs-video>
+ *   <video src="https://example.com/video.mp4"></video>
  *   <google-cast receiver="YOUR_APP_ID"></google-cast>
  *   </video-player>
  *   ```;
  */
-export class GoogleCastExtension extends MediaExtensionElement<GoogleCastExtensionBase> {
+export class GoogleCastExtension extends PlayerExtensionElement<GoogleCastExtensionBase> {
   static readonly tagName = 'google-cast';
 
   static override properties = {
@@ -27,52 +28,52 @@ export class GoogleCastExtension extends MediaExtensionElement<GoogleCastExtensi
     // `customData` takes an object, so it's a property-only prop.
   } satisfies PropertyDeclarationMap<Exclude<keyof GoogleCastExtensionProps, 'customData'>>;
 
-  protected createComponent(): GoogleCastExtensionBase {
+  protected createExtension(): GoogleCastExtensionBase {
     return new GoogleCastExtensionBase();
   }
 
-  /** Source URL loaded on the Cast receiver. Falls back to the media's `src` / `currentSrc`. */
+  /** Source URL loaded on the Cast receiver. Falls back to the source the media is playing. */
   get src(): string {
-    return this.component.src ?? '';
+    return this.extension.src ?? '';
   }
 
   set src(value: string | null | undefined) {
-    this.component.src = value ?? undefined;
+    this.extension.src = value ?? undefined;
   }
 
   /** MIME type of the Cast source. When unset, the receiver infers it from the URL. */
   get contentType(): string | undefined {
-    return this.component.contentType;
+    return this.extension.contentType;
   }
 
   set contentType(value: string | null | undefined) {
-    this.component.contentType = value ?? undefined;
+    this.extension.contentType = value ?? undefined;
   }
 
   /** Stream type used on the Cast receiver. Falls back to the media's `streamType`. */
   get streamType(): GoogleCastExtensionProps['streamType'] {
-    return this.component.streamType;
+    return this.extension.streamType;
   }
 
   set streamType(value: GoogleCastExtensionProps['streamType'] | null) {
-    this.component.streamType = value ?? undefined;
+    this.extension.streamType = value ?? undefined;
   }
 
   /** Cast receiver application ID. Defaults to Google's default media receiver. */
   get receiver(): string | undefined {
-    return this.component.receiver;
+    return this.extension.receiver;
   }
 
   set receiver(value: string | null | undefined) {
-    this.component.receiver = value ?? undefined;
+    this.extension.receiver = value ?? undefined;
   }
 
   /** Custom data sent to the Cast receiver with the load request. */
   get customData(): GoogleCastExtensionProps['customData'] {
-    return this.component.customData;
+    return this.extension.customData;
   }
 
   set customData(value: GoogleCastExtensionProps['customData']) {
-    this.component.customData = value;
+    this.extension.customData = value;
   }
 }

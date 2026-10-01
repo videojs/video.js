@@ -1,1 +1,1 @@
-export * from './google-cast';
+export * from './extension';

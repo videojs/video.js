@@ -1,5 +1,5 @@
 import type { MediaPictureInPictureCapability } from '@videojs/media';
-import { isMediaPictureInPictureCapable } from '@videojs/media';
+import { isMediaPictureInPictureCapable, getRegisteredMedia } from '@videojs/media';
 import type { WebKitVideoElement } from '@videojs/utils/dom';
 import { isFunction } from '@videojs/utils/predicate';
 
@@ -33,7 +33,7 @@ export function isPictureInPicture(media: EventTarget) {
   const webkitVideo = media as WebKitVideoElement;
   if (webkitVideo.webkitPresentationMode === 'picture-in-picture') return true;
 
-  if (document.pictureInPictureElement === media) {
+  if (document.pictureInPictureElement === getRegisteredMedia(media)) {
     return true;
   }
 

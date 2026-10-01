@@ -1,4 +1,4 @@
-import type { GoogleCastProvider } from './google-cast-provider';
+import type { GoogleCastProvider } from './provider';
 import { InvalidStateError, NotFoundError } from './utils';
 
 export type RemotePlaybackState = 'disconnected' | 'connecting' | 'connected';

@@ -1,5 +1,5 @@
 import { MediaError, type RemotePlaybackLike } from '@videojs/media';
-import { addMediaExtension, CustomMediaElement, type MediaExtension } from '@videojs/media/dom';
+import { CustomMediaElement } from '@videojs/media/dom';
 import { NativeHlsAdapter } from '@videojs/native-hls-video';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -881,27 +881,26 @@ describe('HlsJsAdapter', () => {
   });
 
   describe('remote playback load', () => {
+    // While the element's own remote playback session is connected, the adapter
+    // leaves the engine alone and defers to the element's `load()`.
     function setupConnected(load: () => Promise<void>) {
       const video = document.createElement('video');
 
+      Object.defineProperty(video, 'remote', {
+        value: { state: 'connected' } as RemotePlaybackLike,
+        configurable: true,
+      });
+      Object.defineProperty(video, 'load', { value: load, configurable: true });
       document.body.appendChild(video);
 
       const media = new HlsJsAdapter();
 
       media.attach(video);
 
-      const component: MediaExtension = {
-        get targetOverride() {
-          return { remote: { state: 'connected' } as RemotePlaybackLike, load };
-        },
-      };
-
-      addMediaExtension(media, component);
-
       return { media };
     }
 
-    it('awaits the receiver load while connected', async () => {
+    it('awaits the element load while connected', async () => {
       let resolveLoad!: () => void;
       const load = vi.fn(() => new Promise<void>((resolve) => (resolveLoad = resolve)));
       const { media } = setupConnected(load);
@@ -920,7 +919,7 @@ describe('HlsJsAdapter', () => {
       expect(settled).toBe(true);
     });
 
-    it('rejects when the receiver load rejects', async () => {
+    it('rejects when the element load rejects', async () => {
       const load = vi.fn(() => Promise.reject(new Error('receiver failed')));
       const { media } = setupConnected(load);
 

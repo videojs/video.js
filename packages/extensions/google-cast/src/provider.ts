@@ -23,15 +23,16 @@ type RemotePlayerListener = (event?: cast.framework.RemotePlayerChangedEvent) =>
 type GoogleCastConfig = GoogleCastExtensionProps;
 
 /**
- * Cast provider + lifecycle. Created by the {@link GoogleCastExtension} component and installed as the host's
- * `targetOverride` while a cast session is connected, so its getters/setters route through the cast receiver; when
- * disconnected the host falls through to the attached target. Also owns the cast framework integration, the
- * `RemotePlayback` instance exposed via {@link GoogleCastProvider#remote}, and dispatches media events on the attached
- * target (forwarded by the host) while casting.
+ * Cast provider + lifecycle. Created by the {@link GoogleCastExtension} and installed as the player's media override
+ * while a cast session is connected, so its getters/setters route through the cast receiver; when disconnected the
+ * player falls through to the attached media. Also owns the cast framework integration, the `RemotePlayback` instance
+ * exposed via {@link GoogleCastProvider#remote}, and dispatches media events on the attached target (which the media
+ * forwards to the player) while casting.
  */
 export class GoogleCastProvider {
   target: HTMLMediaTargetLike | null = null;
   #googleCast: GoogleCastConfig;
+  #loadedSrc: string | null = null;
   #hooks: Partial<RemotePlaybackHooks> = {};
   #remotePlayback: RemotePlayback;
   #isInit = false;
@@ -58,6 +59,14 @@ export class GoogleCastProvider {
     }
 
     return this.#remotePlayback;
+  }
+
+  /**
+   * Source this provider has sent, or is sending, to the receiver. `null` while nothing is on its way, after a
+   * disconnect, and after a failed load so the same source can be retried.
+   */
+  get loadedSrc() {
+    return this.#loadedSrc;
   }
 
   attach(target: HTMLMediaTargetLike) {
@@ -139,17 +148,39 @@ export class GoogleCastProvider {
       return;
     }
 
-    if (!this.#googleCast.src) {
+    const { src } = this.#googleCast;
+
+    if (!src) {
       // TODO: handle unloading the media?
       return;
     }
 
-    const mediaInfo = new chrome.cast.media.MediaInfo(this.#googleCast.src, this.#googleCast.contentType ?? '');
+    // Claim the source before anything is awaited, so a `loadstart` that lands while the request is still being built
+    // sees it as already on its way to the receiver.
+    this.#loadedSrc = src;
+
+    try {
+      const request = await this.#createLoadRequest(src);
+
+      await currentSession()?.loadMedia(request);
+    } catch (error) {
+      // Free the source for a retry, unless a newer load has claimed another one since.
+      if (this.#loadedSrc === src) this.#loadedSrc = null;
+
+      throw error;
+    }
+
+    this.target?.dispatchEvent(new Event('volumechange'));
+  }
+
+  async #createLoadRequest(src: string) {
+    const mediaInfo = new chrome.cast.media.MediaInfo(src, this.#googleCast.contentType ?? '');
 
     mediaInfo.customData = this.#googleCast.customData ?? null;
 
     const { target } = this;
-    const subtitles = [...(target?.querySelectorAll<HTMLTrackElement>('track') ?? [])].filter(
+    // Embed adapters (YouTube, Vimeo) have no `<track>` children to query; an explicit `src` can still be cast.
+    const subtitles = [...(target?.querySelectorAll?.<HTMLTrackElement>('track') ?? [])].filter(
       (el) => el.src && isCaptionOrSubtitleTrack(el)
     );
 
@@ -181,10 +212,10 @@ export class GoogleCastProvider {
     mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
     mediaInfo.metadata.images = [new chrome.cast.Image((target as HTMLVideoElement | null)?.poster ?? '')];
 
-    if (await isHls(this.#googleCast.src)) {
+    if (await isHls(src)) {
       mediaInfo.contentType ||= 'application/x-mpegURL';
 
-      const fmt = (await getPlaylistSegmentFormat(this.#googleCast.src)) ?? '';
+      const fmt = (await getPlaylistSegmentFormat(src)) ?? '';
       const { HlsSegmentFormat: HS, HlsVideoSegmentFormat: HVS } = chrome.cast.media;
 
       if (fmt.includes('m4s') || fmt.includes('mp4')) {
@@ -198,15 +229,13 @@ export class GoogleCastProvider {
 
     const request = new chrome.cast.media.LoadRequest(mediaInfo);
 
-    // Use `super.currentTime` to read the local element's time even though our
-    // own `currentTime` getter is overridden to return the remote player's.
+    // Read the local element's time directly; our own `currentTime` getter
+    // reports the remote player's while casting.
     request.currentTime = this.target?.currentTime ?? 0;
     request.autoplay = !this.#localPaused;
     request.activeTrackIds = activeTrackIds;
 
-    await currentSession()?.loadMedia(request);
-
-    this.target?.dispatchEvent(new Event('volumechange'));
+    return request;
   }
 
   get paused() {
@@ -394,8 +423,11 @@ export class GoogleCastProvider {
     const { SESSION_RESUMED } = castFramework!.SessionState;
 
     if (getCastContext()!.getSessionState() === SESSION_RESUMED) {
-      if (this.#googleCast.src === currentMedia()?.media?.contentId) {
+      const { src } = this.#googleCast;
+
+      if (src && src === currentMedia()?.media?.contentId) {
         this.#isCasting = true;
+        this.#loadedSrc = src;
 
         this.#attachRemoteListeners();
 
@@ -462,6 +494,7 @@ export class GoogleCastProvider {
     this.#seeking = false;
     this.#playbackRate = 1;
     this.#isCasting = false;
+    this.#loadedSrc = null;
 
     if (this.target) {
       this.target.muted = this.#remotePlayer.isMuted;
