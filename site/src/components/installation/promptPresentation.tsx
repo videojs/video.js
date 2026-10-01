@@ -46,7 +46,7 @@ export const SKILL_AGENT_OPTIONS = [
   ...SKILL_AGENTS.map((agent) => ({ value: agent, ...SKILL_AGENT_PRESENTATIONS[agent] })),
 ];
 
-const SKIN_LABELS = { default: 'Default', minimal: 'Minimal', none: 'Build my own' } satisfies Record<SkinFlag, string>;
+const SKIN_LABELS = { default: 'Default', neutral: 'Neutral', none: 'Build my own' } satisfies Record<SkinFlag, string>;
 
 /** How the skin control names a skin. */
 export function presentSkin(skin: SkinFlag): PromptOption {

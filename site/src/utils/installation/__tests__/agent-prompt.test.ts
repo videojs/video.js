@@ -338,7 +338,7 @@ describe('agentPromptPlayerPicksEqual', () => {
       )
     ).toBe(true);
     expect(
-      agentPromptPlayerPicksEqual({ ...base, extensions: [] }, { ...base, skin: 'minimal-video', extensions: [] })
+      agentPromptPlayerPicksEqual({ ...base, extensions: [] }, { ...base, skin: 'neutral-video', extensions: [] })
     ).toBe(false);
   });
 });
@@ -368,7 +368,7 @@ describe('agentPromptExamplePicks', () => {
       extensions: ['google-cast'],
     });
     expect(agentPromptExamplePicks(example('Mux'), demo)).toMatchObject({ extensions: ['mux-data'] });
-    expect(agentPromptExamplePicks(example('Community clips'), demo)).toMatchObject({ skin: 'minimal-video' });
+    expect(agentPromptExamplePicks(example('Community clips'), demo)).toMatchObject({ skin: 'neutral-video' });
   });
 
   it("keeps the reader's media URL unless the example names other media or a preset it cannot play in", () => {

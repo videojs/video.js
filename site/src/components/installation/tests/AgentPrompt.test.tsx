@@ -211,10 +211,10 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     render(<AgentPrompt route="react" framework="react" />);
     await openOptions(user);
     await user.click(screen.getByRole('button', { name: 'Skin: Default' }));
-    await user.click(await screen.findByRole('radio', { name: /Minimal/ }, RENDER_WAIT));
+    await user.click(await screen.findByRole('radio', { name: /Neutral/ }, RENDER_WAIT));
 
     expect(screen.getByText('Player preview')).toBeInTheDocument();
-    expect(initCommand()).toContain('--skin minimal');
+    expect(initCommand()).toContain('--skin neutral');
   });
 
   it('installs the skill for the chosen coding agent and remembers it', async () => {
@@ -510,7 +510,7 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
 
     expect(setupLine()).toHaveTextContent('Set up for Podcast');
 
-    act(() => skin.set('minimal-audio'));
+    act(() => skin.set('neutral-audio'));
 
     expect(setupLine()).toBeNull();
   });

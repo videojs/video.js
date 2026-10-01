@@ -283,7 +283,7 @@ export interface AgentPromptRequestExample {
   useCase?: UseCase;
   /** The media, when the preset's first would be wrong: a quality menu or casting needs a stream, not a file. */
   media?: Renderer;
-  minimal?: boolean;
+  neutral?: boolean;
   /** Extensions beyond the ones the media installs by default. */
   extensions?: readonly InstallationExtension[];
   features?: readonly InstallationFeature[];
@@ -356,7 +356,7 @@ export const AGENT_PROMPT_REQUEST_EXAMPLES: readonly AgentPromptRequestExampleGr
         label: 'Community clips',
         request: 'Vertical clips shared by members of a community site',
         keywords: ['uploads', 'ugc', 'user generated content', 'reels', 'shorts', 'tiktok', 'phones'],
-        minimal: true,
+        neutral: true,
         features: ['autoplay'],
       },
       {
@@ -482,7 +482,7 @@ export function agentPromptExamplePicks(
     current.sourceUrl !== '' && (example.media ? example.media === current.media : renderers.includes(current.media));
   const { skin, media } = fitSelectionToPreset(
     useCase,
-    example.minimal ? 'minimal-video' : 'video',
+    example.neutral ? 'neutral-video' : 'video',
     example.media ?? (keepsSource ? current.media : renderers[0]!)
   );
   const defaults = defaultInstallationExtensions(media);
@@ -501,7 +501,7 @@ export function agentPromptExampleSummary(example: AgentPromptRequestExample, ap
   return formatList([
     ...(example.useCase ? [`${getInstallationPreset(example.useCase).label} player`] : []),
     ...(example.media ? [getInstallationRenderer(applied.media).label] : []),
-    ...(example.minimal ? ['Minimal skin'] : []),
+    ...(example.neutral ? ['Neutral skin'] : []),
     ...applied.extensions.map((extension) => INSTALLATION_EXTENSION_DEFINITIONS[extension].label),
     ...(example.features ?? []).map((feature) => INSTALLATION_FEATURE_DEFINITIONS[feature].label),
   ]);
