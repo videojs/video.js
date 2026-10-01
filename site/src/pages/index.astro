@@ -3,7 +3,6 @@ import Footer from '@/components/Footer.astro';
 import Built from '@/components/home/Built/BuiltSection.astro';
 import GetStartedBanner from '@/components/home/GetStartedBanner.astro';
 import Header from '@/components/home/Header.astro';
-import RoadMap from '@/components/home/Roadmap.astro';
 import Sponsors from '@/components/home/Sponsors.astro';
 import NavBar from '@/components/NavBar/NavBar.astro';
 import { SITE_DESCRIPTION, SITE_TITLE, VJS10_DEMO_VIDEO } from '@/consts';
@@ -24,12 +23,11 @@ const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}`;
     slot="priority-head"
   />
   {/* The home page stays on literal orange; the logo follows the accent everywhere else. */}
-  <NavBar pill={false} class="[--color-accent:var(--color-orange)]" />
+  <NavBar class="[--color-accent:var(--color-orange)]" />
   <main id="main-content">
     <Header poster={poster} />
     <GetStartedBanner />
     <Built />
-    <RoadMap />
     <Sponsors />
   </main>
   <Footer />

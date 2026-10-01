@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 ## Overview
 
 `@videojs/media` provides the engine-neutral media contracts, state types, DOM hosts, and shared behavior used by

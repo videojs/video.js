@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       recover_version:
-        description: 'Existing release version to finish publishing (for example, 10.0.0-rc.4); leave empty to run release-please'
+        description: 'Existing release version to finish publishing (for example, 10.0.1); leave empty to run release-please'
         required: false
         type: string
 
@@ -19,9 +19,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     environment: production
-    outputs:
-      released: ${{ steps.target.outputs.released }}
-      version: ${{ steps.target.outputs.dist_tag_version }}
     permissions:
       contents: write
       pull-requests: write
@@ -57,7 +54,6 @@ jobs:
           RELEASE_SHA: ${{ steps.release.outputs['packages/cdn--sha'] }}
           RELEASE_VERSION: ${{ steps.release.outputs['packages/cdn--version'] }}
           RELEASE_TAG: ${{ steps.release.outputs['packages/cdn--tag_name'] }}
-          DIST_TAG_VERSION: ${{ steps.release.outputs['packages/html--version'] }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -n "$RECOVER_VERSION" ]; then
@@ -66,7 +62,7 @@ jobs:
               exit 1
             fi
 
-            # Publishing sets latest and later force-pushes site/v10, so only
+            # Publishing moves an npm dist-tag and later force-pushes site/v10, so only
             # the current release on main is safe to resume.
             if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
               echo '::error::Release recovery must be dispatched from main'
@@ -84,7 +80,6 @@ jobs:
             echo "ref=refs/tags/$tag" >> "$GITHUB_OUTPUT"
             echo "version=$RECOVER_VERSION" >> "$GITHUB_OUTPUT"
             echo "tag=$tag" >> "$GITHUB_OUTPUT"
-            echo "dist_tag_version=$RECOVER_VERSION" >> "$GITHUB_OUTPUT"
           elif [ "$RELEASE_CREATED" = 'true' ]; then
             if [ -z "$RELEASE_SHA" ] || [ -z "$RELEASE_VERSION" ] || [ -z "$RELEASE_TAG" ]; then
               echo '::error::Release Please did not provide the CDN release ref, version, and tag'
@@ -94,7 +89,6 @@ jobs:
             echo "ref=$RELEASE_SHA" >> "$GITHUB_OUTPUT"
             echo "version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
             echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
-            echo "dist_tag_version=$DIST_TAG_VERSION" >> "$GITHUB_OUTPUT"
           else
             exit 0
           fi
@@ -186,9 +180,17 @@ jobs:
 
       - name: Publish
         if: ${{ steps.target.outputs.released == 'true' }}
-        run: pnpm --fail-if-no-match -r publish --filter "./packages/**" --access public --provenance --no-git-checks
+        # Stable versions go to `latest`; prereleases go to `next` so they never
+        # become the default install. npm authenticates through trusted
+        # publishing (OIDC), so no token is needed.
+        run: |
+          tag=latest
+          if [[ "$VERSION" == *-* ]]; then
+            tag=next
+          fi
+          pnpm --fail-if-no-match -r publish --filter "./packages/**" --access public --provenance --no-git-checks --tag "$tag"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ steps.target.outputs.version }}
 
       # Attach the archive to the @videojs/cdn release so installers outside npm
       # (Composer, Drupal) have a stable, versioned download. Use the tag and
@@ -214,14 +216,3 @@ jobs:
       - name: Update site/v10 branch
         if: ${{ steps.target.outputs.released == 'true' }}
         run: git push origin HEAD:refs/heads/site/v10 --force
-
-  # `pnpm publish` above tags each release `latest`; keep `next` on the same
-  # version so both install channels resolve to the newest release.
-  dist-tag:
-    needs: release
-    if: ${{ needs.release.outputs.released == 'true' }}
-    uses: ./.github/workflows/npm-dist-tag.yml
-    with:
-      version: ${{ needs.release.outputs.version }}
-      tag: next
-    secrets: inherit

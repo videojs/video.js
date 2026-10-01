@@ -4,7 +4,7 @@
 #
 # Usage: changelog-prose-open-pr.sh [VERSION] [RELEASE_URL]
 #
-#   VERSION            Release version, e.g. 10.0.0-rc.1 (or env VERSION)
+#   VERSION            Release version, e.g. 10.0.0 (or env VERSION)
 #   RELEASE_URL        GitHub release page linked from the PR body (or env RELEASE_URL)
 #   CONTEXT_DIR        Scratch directory for the PR body (env; default .prose-context)
 #   GITHUB_REPOSITORY  owner/name the PR is opened on (env; default videojs/v10)
@@ -21,7 +21,7 @@ GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/v10}"
 
 if [ -z "$VERSION" ] || [ -z "$RELEASE_URL" ]; then
   echo "Usage: $(basename "$0") VERSION RELEASE_URL" >&2
-  echo "  VERSION      release version, e.g. 10.0.0-rc.1 (or env VERSION)" >&2
+  echo "  VERSION      release version, e.g. 10.0.0 (or env VERSION)" >&2
   echo "  RELEASE_URL  release page URL for the PR body (or env RELEASE_URL)" >&2
   echo "  Requires an authenticated gh (GH_TOKEN) and push access to origin." >&2
   exit 2

@@ -8,13 +8,10 @@ import ChangelogEntryCard from '@/components/changelog/ChangelogEntryCard.astro'
 import FooterEasterEgg from '@/components/FooterEasterEgg.astro';
 import { BLOG_PAGE_SIZE } from '@/consts';
 import Blog from '@/layouts/Blog.astro';
+import { compareChangelogEntries } from '@/utils/changelog';
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const entries = (await getCollection('changelog')).sort(
-    (a, b) =>
-      b.data.date.valueOf() - a.data.date.valueOf() ||
-      b.data.version.localeCompare(a.data.version, undefined, { numeric: true })
-  );
+  const entries = (await getCollection('changelog')).sort((a, b) => compareChangelogEntries(a.data, b.data));
 
   return paginate(entries, { pageSize: BLOG_PAGE_SIZE });
 }) satisfies GetStaticPaths;

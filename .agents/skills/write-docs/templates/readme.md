@@ -20,8 +20,6 @@ Most packages should use the **light** template. Use comprehensive when the READ
 
 [![package-badge]][package]
 
-> **⚠️ Alpha - SUBJECT TO CHANGE** Not recommended for production use.
-
 {One-sentence description of what this package does.}
 
 ```bash
@@ -53,7 +51,7 @@ members:
 [Apache-2.0](./LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/{name}
-[package-badge]: https://img.shields.io/npm/v/@videojs/{name}/next?label=@videojs/{name}@next
+[package-badge]: https://img.shields.io/npm/v/@videojs/{name}?label=@videojs/{name}
 [discord]: https://discord.gg/JBqHh485uF
 [gh-discussions]: https://github.com/videojs/v10/discussions
 ```
@@ -66,8 +64,6 @@ Use this structure when the README is the primary documentation for the package.
 # @videojs/{name}
 
 [![package-badge]][package]
-
-> **⚠️ Alpha - SUBJECT TO CHANGE** Not recommended for production use.
 
 {One-sentence description.}
 
@@ -114,15 +110,14 @@ members:
 [Apache-2.0](./LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/{name}
-[package-badge]: https://img.shields.io/npm/v/@videojs/{name}/next?label=@videojs/{name}@next
+[package-badge]: https://img.shields.io/npm/v/@videojs/{name}?label=@videojs/{name}
 [discord]: https://discord.gg/JBqHh485uF
 [gh-discussions]: https://github.com/videojs/v10/discussions
 ```
 
 ## Conventions
 
-- **Badge:** Always use the `/next` tag badge during alpha.
-- **Alpha warning:** Include the blockquote warning until stable release.
+- **Badge:** Use the default npm badge, which shows the `latest` version.
 - **Code examples:** Must be self-contained — include imports, use realistic values.
 - **Progressive disclosure:** Start simple, add complexity in later sections.
 - **No inline animation JS or framework code** — READMEs show the package API, not framework integration.
@@ -130,8 +125,7 @@ members:
 
 ## Checklist
 
-- [ ] npm badge with `/next` tag
-- [ ] Alpha warning blockquote
+- [ ] npm badge
 - [ ] Install command
 - [ ] Working quick example with imports
 - [ ] Self-contained code examples (copy-paste and run)

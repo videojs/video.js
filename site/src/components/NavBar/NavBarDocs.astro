@@ -6,7 +6,7 @@ import GitHub from '@/assets/logos/github.svg?react';
 import Logo from '@/assets/logos/videojs.svg?react';
 import CompactLogo from '@/assets/logos/vjs.svg?react';
 import AppearanceMenu from '@/components/AppearanceMenu';
-import BetaPill from '@/components/BetaPill';
+import VersionPill from '@/components/VersionPill';
 import Search from '@/components/Search';
 import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL, VJS10_VERSION } from '@/consts';
@@ -48,7 +48,7 @@ const { class: className } = Astro.props;
     <CompactLogo height="100%" className="xs:hidden w-auto" />
     <Logo height="100%" className="hidden xs:inline w-auto" />
     <span class="sr-only">Video.js video player</span>
-    <BetaPill compact label={`v${VJS10_VERSION}`} />
+    <VersionPill compact label={`v${VJS10_VERSION}`} />
   </a>
   <Search client:idle className="mr-2 xs:mr-4 ml-auto sm:self-center" />
   {/* Desktop nav links */}
@@ -111,7 +111,7 @@ const { class: className } = Astro.props;
   </div>
 
   <MobileNav client:idle navLinks={navLinks} currentPath={currentPath} compact>
-    <BetaPill compact label={`v${VJS10_VERSION}`} slot="pill" />
+    <VersionPill compact label={`v${VJS10_VERSION}`} slot="pill" />
     <slot name="mobile-nav" />
   </MobileNav>
 </nav>

@@ -5,7 +5,6 @@ import Discord from '@/assets/logos/discord.svg?react';
 import GitHub from '@/assets/logos/github.svg?react';
 import Logo from '@/assets/logos/videojs.svg?react';
 import AppearanceMenu from '@/components/AppearanceMenu';
-import BetaPill from '@/components/BetaPill';
 import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from '@/consts';
 import Search from '../Search';
@@ -14,8 +13,6 @@ import MobileNav from './MobileNav';
 
 export interface Props {
   class?: string;
-  /** Show the version chip beside the logo. The homepage hides it. */
-  pill?: boolean;
 }
 
 type NavLink = {
@@ -33,7 +30,7 @@ const navLinks: NavLink[] = [
 const currentPath = Astro.url.pathname;
 const isDocsActive = currentPath.startsWith('/docs');
 const otherNavLinks = navLinks.filter((link) => link.href !== '/docs');
-const { class: className, pill = true } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
 <nav
@@ -48,7 +45,6 @@ const { class: className, pill = true } = Astro.props;
   <a href="/" class="flex h-7 items-end gap-3 lg:h-10 lg:gap-4">
     <Logo height="100%" />
     <span class="sr-only">Video.js video player</span>
-    {pill && <BetaPill className="hidden sm:inline-flex" />}
   </a>
   <Search client:idle className="mr-2 ml-auto sm:self-center" />
   {/* Desktop nav links */}
@@ -105,7 +101,7 @@ const { class: className, pill = true } = Astro.props;
     </a>
   </div>
 
-  <MobileNav client:idle navLinks={navLinks} currentPath={currentPath} pill={pill ? undefined : null}>
+  <MobileNav client:idle navLinks={navLinks} currentPath={currentPath}>
     <slot name="mobile-nav" />
   </MobileNav>
 </nav>

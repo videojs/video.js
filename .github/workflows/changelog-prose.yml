@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release tag (e.g. @videojs/core@10.0.0-beta.24)'
+        description: 'Release tag (e.g. @videojs/core@10.0.0)'
         required: true
         type: string
       release_url:

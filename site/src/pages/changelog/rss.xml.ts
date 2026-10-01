@@ -3,13 +3,10 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
 import { SITE_TITLE } from '@/consts';
+import { compareChangelogEntries } from '@/utils/changelog';
 
 export const GET: APIRoute = async (context) => {
-  const entries = (await getCollection('changelog')).sort(
-    (a, b) =>
-      b.data.date.valueOf() - a.data.date.valueOf() ||
-      b.data.version.localeCompare(a.data.version, undefined, { numeric: true })
-  );
+  const entries = (await getCollection('changelog')).sort((a, b) => compareChangelogEntries(a.data, b.data));
 
   return rss({
     title: `${SITE_TITLE} Changelog`,

@@ -6,7 +6,7 @@
 #
 # Usage: changelog-prose-verify.sh [VERSION]
 #
-#   VERSION      Release version, e.g. 10.0.0-rc.1 (or env VERSION)
+#   VERSION      Release version, e.g. 10.0.0 (or env VERSION)
 #   CONTEXT_DIR  Context directory to ignore in the stray-change report
 #                (env; default .prose-context)
 #
@@ -18,7 +18,7 @@ CONTEXT_DIR="${CONTEXT_DIR:-.prose-context}"
 
 if [ -z "$VERSION" ]; then
   echo "Usage: $(basename "$0") VERSION" >&2
-  echo "  VERSION  release version, e.g. 10.0.0-rc.1 (or env VERSION)" >&2
+  echo "  VERSION  release version, e.g. 10.0.0 (or env VERSION)" >&2
   exit 2
 fi
 

@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 ## Overview
 
 `@videojs/core` provides runtime-agnostic core components and utilities shared across Video.js

@@ -1,6 +1,6 @@
 ---
 title: v10 Roadmap
-description: Timeline and milestones for Video.js v10 rebuild and the future of v8
+description: Where Video.js v10 stands, what comes after 10.0, and the support plan for Video.js 8
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
@@ -8,6 +8,13 @@ import DocsLink from '@/components/docs/DocsLink.astro';
 Video.js v10 is a complete rebuild from the ground up, designed to be more modular, framework-flexible, and aligned with modern web development practices.
 
 ## Current versions
+
+### Version 10
+
+- Stable and recommended for new projects. Start with the <DocsLink slug="guides/installation">installation guide</DocsLink>
+- Follows semantic versioning: breaking changes wait for a new major version
+- Covers the fundamentals of Video.js 8
+- Migration guides for <DocsLink slug="guides/migrate-from-video-js-8">Video.js 8</DocsLink>, <DocsLink slug="guides/migrate-from-mux-player">Mux Player</DocsLink>, <DocsLink slug="guides/migrate-from-plyr">Plyr</DocsLink>, <DocsLink slug="guides/migrate-from-media-chrome">Media Chrome</DocsLink>, and <DocsLink slug="guides/migrate-from-vidstack">Vidstack</DocsLink>, each listing its known gaps
 
 ### Version 8
 
@@ -20,72 +27,30 @@ Video.js v10 is a complete rebuild from the ground up, designed to be more modul
 
 - Reserved only for urgent API-breaking changes that cannot be avoided
 
-## March 2026: v10 Beta Release
+## After 10.0
 
-Wider testing release to the community.
+These land in 10.x minor releases as they're ready.
 
-### Core feature parity target
+### Feature parity with Video.js 8 contrib
 
-- Basic control set (play, pause, seek, volume, fullscreen)
-- Adaptive streaming support via existing community engines
-- No plugin migrations yet, without plugin author contribution
-
-### What to expect
-
-- Close to stable, but API changes are still possible
-- Intended for experimental adoption in real-world projects
-- Developers encouraged to follow the <DocsLink slug="guides/installation">installation guide</DocsLink>, try it out, and report issues
-
-## September 2026: v10 Release Candidate
-
-Feature-complete release ahead of GA.
-
-### What to expect
-
-- Close to stable. Remaining API changes are driven by feedback on the release candidate
-- Intended for adoption in real-world projects
-- Migration guides and reference documentation ready for review
-
-## Fall 2026: v10 GA Release
-
-**Stable release** of Video.js v10
-
-### Feature targets
-
-- Core feature parity with v8 in terms of fundamentals
-- Feature parity with Media Chrome, Vidstack, Plyr, and Mux Player
-- Community encouraged to begin full reintegration projects, following the migration guides for <DocsLink slug="guides/migrate-from-video-js-8">Video.js 8</DocsLink>, <DocsLink slug="guides/migrate-from-mux-player">Mux Player</DocsLink>, <DocsLink slug="guides/migrate-from-plyr">Plyr</DocsLink>, <DocsLink slug="guides/migrate-from-media-chrome">Media Chrome</DocsLink>, and <DocsLink slug="guides/migrate-from-vidstack">Vidstack</DocsLink>
-- Plugin ecosystem migration begins in earnest
+- Ads integration
+- Analytics support
+- Plugin ecosystem migration, dependent on community contributions
 
 ### Engine development focus
 
 - Lightweight adaptive streaming
 - MoQ (Media over QUIC) support
 
-## Late-2026: Feature parity with v8 Contrib
+## Support plan for Video.js 8
 
-**Extended feature parity** with Video.js "contrib" plugins:
-
-- Ads integration
-- Analytics support
-- Further community plugin migration dependent on contributions
-
-## End-of-life plan for Video.js v8
-
-### Mid-2026
-
-- v8/v9 moved to "video.js-legacy" repository and package
-- Documentation preserved at [legacy.videojs.org](https://legacy.videojs.org)
-- Hosted CDN copies will remain available
-
-### 2027 and beyond
-
-- Security patches only
-- Community contributions de-prioritized
+- Documentation stays at [legacy.videojs.org](https://legacy.videojs.org)
+- Hosted CDN copies remain available
+- From 2027, security patches only, and community contributions are de-prioritized
 
 ---
 
-**Want to contribute?** Check out the [v10 repository on GitHub](https://github.com/videojs/v10) to get involved in the rebuild
+**Want to contribute?** Check out the [v10 repository on GitHub](https://github.com/videojs/v10) to get involved.
 
 ## Related guides
 

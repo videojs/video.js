@@ -3,7 +3,6 @@ import P from '@/components/typography/P.astro';
 import { isInstallationRouteSegment } from '@/utils/installation/routes';
 import ShadcnFrameworkCase from '../registry/ShadcnFrameworkCase.astro';
 import InstallationMigrationNotice from './InstallationMigrationNotice.astro';
-import ReleaseCandidateNotice from './ReleaseCandidateNotice.astro';
 
 const route = Astro.params.framework;
 if (!isInstallationRouteSegment(route)) throw new Error(`Unsupported installation route: ${route}`);
@@ -63,8 +62,6 @@ if (!isInstallationRouteSegment(route)) throw new Error(`Unsupported installatio
     )
   }
 </P>
-
-<ReleaseCandidateNotice />
 
 {
   route === 'shadcn' ? (

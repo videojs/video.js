@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 `@videojs/react` is a comprehensive library for building media players in React applications. It
 provides a complete set of components, hooks, and utilities for creating feature-rich, accessible
 video and audio players with React.

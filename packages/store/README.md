@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 A reactive store for managing state owned by external systems. Built for media players, streaming libraries, and real-time systems where you don't own the state.
 
 > **Note:** The authoring APIs this README describes, including `createStore`, `defineSlice`, `combine`, `createState`, `flush`, `isState`, `InferStoreTarget`, and the store error helpers, are internal building blocks of the Video.js player and may change between releases. To read player state, use the player's own APIs, such as `usePlayer` and `PlayerController`. The store APIs that are stable and documented are `useStore`, `useSelector`, `useSnapshot`, `createSelector`, `shallowEqual`, `StoreController`, `SnapshotController`, and `SubscriptionController`; see the [API reference](https://videojs.org/docs/framework/react).

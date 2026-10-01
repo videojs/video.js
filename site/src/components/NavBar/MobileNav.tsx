@@ -5,7 +5,6 @@ import ArrowUpRight from '@/assets/icons/arrow-up-right.svg?react';
 import Logo from '@/assets/logos/videojs.svg?react';
 import CompactLogo from '@/assets/logos/vjs.svg?react';
 import { AppearanceControls } from '@/components/AppearanceMenu';
-import BetaPill from '@/components/BetaPill';
 import type { LinkDestination } from '@/components/typography/linkDestination';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from '@/consts';
 
@@ -24,7 +23,7 @@ export interface MobileNavProps {
   currentPath: string;
   children?: React.ReactNode;
   compact?: boolean;
-  /** Version chip beside the logo. `undefined` renders the default chip; `null` hides it. */
+  /** Version chip beside the logo. Omit it to show the logo alone. */
   pill?: React.ReactNode;
 }
 
@@ -75,7 +74,7 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
                 <Logo height="100%" className="w-auto" />
               )}
               <span className="sr-only">Video.js video player</span>
-              {pill === undefined ? <BetaPill className="hidden sm:inline-flex" /> : pill}
+              {pill}
             </a>
             <Dialog.Close
               className={clsx(

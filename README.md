@@ -7,9 +7,7 @@
 
 Modern, modular, and composable media player framework for Web and React.
 
-🚧 Release candidate - close to stable. Adoption in real projects encouraged. 🚧
-
-Video.js v10 is close to stable. Try it out in real projects and share your feedback 🙏.
+Video.js v10 is stable. Build with it and share your feedback 🙏.
 
 - Read our [design documents][rfcs].
 - Read the [v10 discussion topic][v10-discussion].
@@ -32,9 +30,9 @@ npx @videojs/cli agents init
 - **Technical Preview (Complete):** Initial showcase for Demuxed.
 - **Alpha (Complete):** [See milestone](https://github.com/videojs/v10/milestone/3)
 - **Beta (Complete):** [See milestone](https://github.com/videojs/v10/milestone/1)
-- **Release Candidate (Complete):** Close to stable. Adoption in real projects encouraged.
-- **GA (Fall 2026):** [See milestone](https://github.com/videojs/v10/milestone/6) ← WIP
-- **Video.js (End of 2026):** Video.js core/contrib parity and supported plugins migrated.
+- **Release Candidate (Complete):** Feature-complete release ahead of GA.
+- **GA (Complete):** Stable release of Video.js 10.0.
+- **After 10.0:** Video.js 8 contrib parity and supported plugins migrated. See the [roadmap](https://videojs.org/docs/guides/v10-roadmap).
 
 ## Documentation
 

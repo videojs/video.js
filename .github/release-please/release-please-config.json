@@ -1,6 +1,5 @@
 {
-  "bump-minor-pre-major": true,
-  "bump-patch-for-minor-pre-major": false,
+  "release-as": "10.0.0",
   "tag-separator": "@",
   "include-component-in-tag": true,
   "include-v-in-tag": false,
@@ -47,178 +46,91 @@
   ],
   "packages": {
     "packages/cdn": {
-      "component": "@videojs/cdn",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/cdn"
     },
     "packages/cli": {
-      "component": "@videojs/cli",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/cli"
     },
     "packages/adapters/cloudflare-video": {
-      "component": "@videojs/cloudflare-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/cloudflare-video"
     },
     "packages/core": {
-      "component": "@videojs/core",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/core"
     },
     "packages/adapters/dash-video": {
-      "component": "@videojs/dash-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/dash-video"
     },
     "packages/element": {
-      "component": "@videojs/element",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/element"
     },
     "packages/extensions/google-cast": {
-      "component": "@videojs/google-cast",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/google-cast"
     },
     "packages/adapters/hlsjs-video": {
-      "component": "@videojs/hlsjs-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/hlsjs-video"
     },
     "packages/html": {
-      "component": "@videojs/html",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/html"
     },
     "packages/icons": {
-      "component": "@videojs/icons",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/icons"
     },
     "packages/installation": {
-      "component": "@videojs/installation",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/installation"
     },
     "packages/media": {
-      "component": "@videojs/media",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/media"
     },
     "packages/adapters/mux-audio": {
-      "component": "@videojs/mux-audio",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/mux-audio"
     },
     "packages/extensions/mux-data": {
-      "component": "@videojs/mux-data",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/mux-data"
     },
     "packages/adapters/mux-video": {
-      "component": "@videojs/mux-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/mux-video"
     },
     "packages/adapters/native-hls-video": {
-      "component": "@videojs/native-hls-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/native-hls-video"
     },
     "packages/react": {
-      "component": "@videojs/react",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/react"
     },
     "packages/adapters/shaka-video": {
-      "component": "@videojs/shaka-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/shaka-video"
     },
     "packages/skins": {
-      "component": "@videojs/skins",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/skins"
     },
     "packages/spf": {
-      "component": "@videojs/spf",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/spf"
     },
     "packages/adapters/spotify-audio": {
-      "component": "@videojs/spotify-audio",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/spotify-audio"
     },
     "packages/store": {
-      "component": "@videojs/store",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/store"
     },
     "packages/adapters/tiktok-video": {
-      "component": "@videojs/tiktok-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/tiktok-video"
     },
     "packages/adapters/twitch-video": {
-      "component": "@videojs/twitch-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/twitch-video"
     },
     "packages/utils": {
-      "component": "@videojs/utils",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/utils"
     },
     "packages/adapters/vimeo-video": {
-      "component": "@videojs/vimeo-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/vimeo-video"
     },
     "packages/adapters/wistia-video": {
-      "component": "@videojs/wistia-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/wistia-video"
     },
     "packages/adapters/youtube-video": {
-      "component": "@videojs/youtube-video",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "@videojs/youtube-video"
     },
     "packages/video.js": {
-      "component": "video.js",
-      "prerelease": true,
-      "prerelease-type": "rc",
-      "versioning": "prerelease"
+      "component": "video.js"
     }
   }
 }

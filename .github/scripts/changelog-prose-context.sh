@@ -6,7 +6,7 @@
 #
 # Usage: changelog-prose-context.sh [VERSION] [CONTEXT_DIR]
 #
-#   VERSION            Release version, e.g. 10.0.0-rc.1 (or env VERSION)
+#   VERSION            Release version, e.g. 10.0.0 (or env VERSION)
 #   CONTEXT_DIR        Output directory (or env CONTEXT_DIR; default .prose-context)
 #   GITHUB_REPOSITORY  owner/name to query (env; default videojs/v10)
 #   GH_TOKEN           `gh` must be authenticated
@@ -21,7 +21,7 @@ GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/v10}"
 
 if [ -z "$VERSION" ]; then
   echo "Usage: $(basename "$0") VERSION [CONTEXT_DIR]" >&2
-  echo "  VERSION      release version, e.g. 10.0.0-rc.1 (or env VERSION)" >&2
+  echo "  VERSION      release version, e.g. 10.0.0 (or env VERSION)" >&2
   echo "  CONTEXT_DIR  output directory (or env CONTEXT_DIR; default .prose-context)" >&2
   echo "  Requires an authenticated gh (GH_TOKEN)." >&2
   exit 2

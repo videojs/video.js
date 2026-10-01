@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 `@videojs/html` is a comprehensive library for building media players with vanilla JavaScript and
 Web Components. It provides a complete set of Custom Elements, state management, controllers,
 and utilities for creating feature-rich, accessible video and audio players.

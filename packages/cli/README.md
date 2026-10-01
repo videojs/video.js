@@ -2,8 +2,6 @@
 
 [![package-badge]][package]
 
-> **⚠️ Release candidate** Close to stable. Adoption in real projects encouraged.
-
 The Video.js 10 command line. `agents init` prints version-matched installation instructions for a coding agent or
 for you to follow: the packages to install, the files to add, and the commands to run for your framework, installation
 method, player, skin, and media source. `agents skills` prints how to install the
