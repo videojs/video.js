@@ -87,7 +87,7 @@ Resolved during implementation:
 **State slots:**
 
 - `selectedAudioTrackId` — single-writer (`switchAudioTrack` when composed; `selectAudioTrack` when the lighter variant is composed instead — they're mutually exclusive). Constraint+filter pattern keeps writer count at 1; intent flows through `userAudioTrackSelection`.
-- `userAudioTrackSelection` — new slot in `HlsVideoEngineState` + `HlsAudioEngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `makeExternalInputs`). Read by `switchAudioTrack`.
+- `userAudioTrackSelection` — new slot in `HlsVideoEngineState` + `HlsAudioEngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `defineExternalSignals`). Read by `switchAudioTrack`.
 
 **Actor state:**
 

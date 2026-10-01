@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { createComposition, type StateSignals } from '../create-composition';
-import { makeExternalInputs } from '../make-external-inputs';
+import { defineExternalSignals } from '../define-external-signals';
 
 interface ExternalState {
   userChoice?: string;
@@ -12,37 +12,37 @@ interface ExternalContext {
 }
 
 // A reader that consults `userChoice` optionally and declares no keys for it,
-// the shape that leaves an external input undeclared without `makeExternalInputs`.
+// the shape that leaves an external signal undeclared without `defineExternalSignals`.
 const reader = {
   stateKeys: ['count'] as const,
   contextKeys: [],
   setup: (_deps: { state: StateSignals<{ count?: number }> }) => {},
 };
 
-describe('makeExternalInputs', () => {
+describe('defineExternalSignals', () => {
   it('declares every external state and context key', () => {
-    const externalInputs = makeExternalInputs<ExternalState, ExternalContext>()({
+    const externalSignals = defineExternalSignals<ExternalState, ExternalContext>()({
       state: ['userChoice', 'userLimit'],
       context: ['host'],
     });
 
-    expect(externalInputs.stateKeys).toEqual(['userChoice', 'userLimit']);
-    expect(externalInputs.contextKeys).toEqual(['host']);
+    expect(externalSignals.stateKeys).toEqual(['userChoice', 'userLimit']);
+    expect(externalSignals.contextKeys).toEqual(['host']);
   });
 
-  it('declares no keys when there are no external inputs', () => {
-    const externalInputs = makeExternalInputs()({});
+  it('declares no keys when there are no external signals', () => {
+    const externalSignals = defineExternalSignals()({});
 
-    expect(externalInputs.stateKeys).toEqual([]);
-    expect(externalInputs.contextKeys).toEqual([]);
+    expect(externalSignals.stateKeys).toEqual([]);
+    expect(externalSignals.contextKeys).toEqual([]);
   });
 
-  it('adds the external inputs to the composition, unset and writable', async () => {
-    const externalInputs = makeExternalInputs<ExternalState, ExternalContext>()({
+  it('adds the external signals to the composition, unset and writable', async () => {
+    const externalSignals = defineExternalSignals<ExternalState, ExternalContext>()({
       state: ['userChoice', 'userLimit'],
       context: ['host'],
     });
-    const composition = createComposition([reader, externalInputs]);
+    const composition = createComposition([reader, externalSignals]);
 
     expect(composition.state.userChoice.get()).toBeUndefined();
     expect(composition.context.host.get()).toBeUndefined();

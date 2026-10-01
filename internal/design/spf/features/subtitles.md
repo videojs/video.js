@@ -66,7 +66,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 **State slots:**
 
 - `selectedTextTrackId` — **single-writer output**, owned by `switchTextTrack` (cleared on src unload by its exit cleanup). Other behaviors only read it.
-- `userTextTrackSelection` — the user-intent **input**: `Partial<TextTrack>` (language-based) selects, `'off'` disables, `undefined` is auto. Written by `syncTextTracks` (DOM) and consumers (through the engine's `state`); both are intent surfaces, so dual-write is last-write-wins by design. Declared with `makeExternalInputs`; **not** cleared on src unload (sticky preference, like `userAudioTrackSelection`).
+- `userTextTrackSelection` — the user-intent **input**: `Partial<TextTrack>` (language-based) selects, `'off'` disables, `undefined` is auto. Written by `syncTextTracks` (DOM) and consumers (through the engine's `state`); both are intent surfaces, so dual-write is last-write-wins by design. Declared with `defineExternalSignals`; **not** cleared on src unload (sticky preference, like `userAudioTrackSelection`).
 - `cdnPriority`, `failedCdns` — read by the chain (active-CDN scope + failed-CDN constraint).
 - `presentation`, `preload`, `loadActivated`, `currentTime` — read-only consumers.
 

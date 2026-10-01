@@ -4,7 +4,7 @@ import {
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
-import { makeExternalInputs } from '../../../core/composition/make-external-inputs';
+import { defineExternalSignals } from '../../../core/composition/define-external-signals';
 import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
 import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
 import { canPlayTrack } from '../../../media/dom/capabilities';
@@ -59,10 +59,10 @@ import {
 // ============================================================================
 
 /**
- * External inputs of the audio-only HLS playback engine: state written from outside the engine (by the adapter) that no
- * composed behavior declares — the consumer's track selections and remote-playback opt-out.
+ * External signals of the audio-only HLS playback engine: state written from outside the engine (by the adapter) that
+ * no composed behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsAudioEngineExternalInputs = makeExternalInputs<
+const hlsAudioEngineExternalSignals = defineExternalSignals<
   UserTrackSelectionState<'audio'> & DisableRemotePlaybackState
 >()({
   state: ['userAudioTrackSelection', 'disableRemotePlayback'],
@@ -150,8 +150,8 @@ const hlsAudioEngineBehaviors = [
   // `preferredSubtitleLanguage` on this config the `und` track leads.
   loadChapters,
 
-  // External inputs: written by the adapter, read by the behaviors above.
-  hlsAudioEngineExternalInputs,
+  // External signals: written by the adapter, read by the behaviors above.
+  hlsAudioEngineExternalSignals,
 ] as const;
 
 /** State shape for the audio-only HLS playback engine: every state key its behaviors and inputs declare. */

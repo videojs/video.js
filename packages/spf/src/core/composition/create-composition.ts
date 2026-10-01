@@ -64,7 +64,7 @@ export interface BehaviorDeps<StateMap extends AnySlotMap, ContextMap extends An
  * (per-slot `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
  *
  * Manual `Behavior<>` literals (e.g. engine wrappers that forward keys from a wrapped behavior, or
- * `makeExternalInputs`, which checks its key list itself) opt out of exhaustiveness — the type alias is permissive
+ * `defineExternalSignals`, which checks its key list itself) opt out of exhaustiveness — the type alias is permissive
  * (subset). Source behaviors should use `defineBehavior` to get exhaustiveness enforcement at the call site.
  */
 export interface Behavior<

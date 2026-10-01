@@ -4,7 +4,7 @@ import {
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
-import { makeExternalInputs } from '../../../core/composition/make-external-inputs';
+import { defineExternalSignals } from '../../../core/composition/define-external-signals';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import type { Reschedule } from '../../../core/tasks/task';
 import type { QualityConfig } from '../../../media/abr/quality-selection';
@@ -90,10 +90,10 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
 // ============================================================================
 
 /**
- * External inputs of the HLS playback engine: state written from outside the engine (by the adapter) that no composed
+ * External signals of the HLS playback engine: state written from outside the engine (by the adapter) that no composed
  * behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsVideoEngineExternalInputs = makeExternalInputs<UserTrackSelectionState & DisableRemotePlaybackState>()({
+const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
   state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
 });
 
@@ -232,8 +232,8 @@ const hlsVideoEngineBehaviors = [
   // language leading. Cues live on the element; no state signal.
   loadChapters,
 
-  // External inputs: written by the adapter, read by the behaviors above.
-  hlsVideoEngineExternalInputs,
+  // External signals: written by the adapter, read by the behaviors above.
+  hlsVideoEngineExternalSignals,
 ] as const;
 
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */

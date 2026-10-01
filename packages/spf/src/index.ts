@@ -29,7 +29,7 @@ export type {
   StateSignals,
 } from './core/composition/create-composition';
 export { createComposition, defineBehavior } from './core/composition/create-composition';
-export { makeExternalInputs } from './core/composition/make-external-inputs';
+export { defineExternalSignals } from './core/composition/define-external-signals';
 
 // =============================================================================
 // Signals

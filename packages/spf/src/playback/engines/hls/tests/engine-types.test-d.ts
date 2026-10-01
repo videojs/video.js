@@ -1,6 +1,6 @@
 /**
  * Type-level guard on the engines' derived state and context types: that each is a closed set of keys (a behavior typed
- * with an index signature would open the whole engine's type to any key), and that each engine's external inputs are
+ * with an index signature would open the whole engine's type to any key), and that each engine's external signals are
  * part of its state even though no behavior declares them.
  */
 import { describe, expectTypeOf, it } from 'vite-plus/test';
@@ -17,7 +17,7 @@ describe('HlsVideoEngineState', () => {
     expectTypeOf<IsOpen<HlsVideoEngineState>>().toEqualTypeOf<false>();
   });
 
-  it('includes the external inputs', () => {
+  it('includes the external signals', () => {
     expectTypeOf<HlsVideoEngineState['userVideoTrackSelection']>().toEqualTypeOf<Partial<VideoTrack> | undefined>();
     expectTypeOf<HlsVideoEngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
     expectTypeOf<HlsVideoEngineState['userTextTrackSelection']>().toEqualTypeOf<
@@ -38,7 +38,7 @@ describe('HlsAudioEngineState', () => {
     expectTypeOf<IsOpen<HlsAudioEngineState>>().toEqualTypeOf<false>();
   });
 
-  it('includes the external inputs, and no video or text selection', () => {
+  it('includes the external signals, and no video or text selection', () => {
     expectTypeOf<HlsAudioEngineState['userAudioTrackSelection']>().toEqualTypeOf<Partial<AudioTrack> | undefined>();
     expectTypeOf<HlsAudioEngineState['disableRemotePlayback']>().toEqualTypeOf<boolean | undefined>();
     expectTypeOf<HlsAudioEngineState>().not.toHaveProperty('userVideoTrackSelection');

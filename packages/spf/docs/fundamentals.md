@@ -27,7 +27,7 @@ Use `defineBehavior()` for ordinary source behaviors. It verifies that runtime k
 
 Each behavior expresses slot access with `Signal<T>` for values it writes and `ReadonlySignal<T>` for values it only consumes. This is a local ownership contract over shared signal identities.
 
-Initial state or context materializes values that no behavior naturally seeds. State and context written from outside the composition that no behavior declares are its external inputs, declared with `makeExternalInputs()`.
+Initial state or context materializes values that no behavior naturally seeds. State and context written from outside the composition that no behavior declares are its external signals, declared with `defineExternalSignals()`.
 
 ## Signals
 

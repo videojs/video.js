@@ -1,7 +1,7 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
 import type { ResolveBehaviorContext, ResolveBehaviorState, StateSignals } from '../create-composition';
-import { makeExternalInputs } from '../make-external-inputs';
+import { defineExternalSignals } from '../define-external-signals';
 
 interface ExternalState {
   userChoice?: string;
@@ -17,14 +17,14 @@ const reader = {
   setup: (_deps: { state: StateSignals<{ count?: number }> }) => {},
 };
 
-describe('makeExternalInputs', () => {
-  it('contributes its external inputs to the resolved composition state and context', () => {
-    const externalInputs = makeExternalInputs<ExternalState, ExternalContext>()({
+describe('defineExternalSignals', () => {
+  it('contributes its external signals to the resolved composition state and context', () => {
+    const externalSignals = defineExternalSignals<ExternalState, ExternalContext>()({
       state: ['userChoice', 'userLimit'],
       context: ['host'],
     });
 
-    type Behaviors = [typeof reader, typeof externalInputs];
+    type Behaviors = [typeof reader, typeof externalSignals];
 
     expectTypeOf<ResolveBehaviorState<Behaviors>>().toEqualTypeOf<
       { count: number | undefined } & { userChoice: string | undefined; userLimit: number | undefined }
@@ -32,23 +32,23 @@ describe('makeExternalInputs', () => {
     expectTypeOf<ResolveBehaviorContext<Behaviors>>().toEqualTypeOf<{ host: { id: string } | undefined }>();
   });
 
-  it('rejects a state key list that omits an external input', () => {
+  it('rejects a state key list that omits an external signal', () => {
     // @ts-expect-error — `userLimit` is missing
-    makeExternalInputs<ExternalState>()({ state: ['userChoice'] });
+    defineExternalSignals<ExternalState>()({ state: ['userChoice'] });
   });
 
   it('rejects omitting the state key list when there is external state', () => {
     // @ts-expect-error — `state` must list `userChoice` and `userLimit`
-    makeExternalInputs<ExternalState>()({});
+    defineExternalSignals<ExternalState>()({});
   });
 
-  it('rejects a context key list that omits an external input', () => {
+  it('rejects a context key list that omits an external signal', () => {
     // @ts-expect-error — `host` is missing
-    makeExternalInputs<{}, ExternalContext>()({ context: [] });
+    defineExternalSignals<{}, ExternalContext>()({ context: [] });
   });
 
-  it('rejects a key that is not an external input', () => {
+  it('rejects a key that is not an external signal', () => {
     // @ts-expect-error — `userOther` is not a key of `ExternalState`
-    makeExternalInputs<ExternalState>()({ state: ['userChoice', 'userLimit', 'userOther'] });
+    defineExternalSignals<ExternalState>()({ state: ['userChoice', 'userLimit', 'userOther'] });
   });
 });
