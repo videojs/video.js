@@ -1030,7 +1030,7 @@ export function generateRootIndex({
 
   content += `> AI coding agents can install the [Video.js skill](https://github.com/videojs/skills) to find version-matched documentation and follow current Video.js 10 patterns.\n\n`;
 
-  content += `> The \`video.js\` package on npm is still Video.js 8. Video.js 10 ships as \`@videojs/react\` and \`@videojs/html\`.\n\n`;
+  content += `> Video.js 10 ships as \`@videojs/react\` and \`@videojs/html\`. Since version 10, the \`video.js\` package on npm contains no player; install \`video.js@8\` to stay on Video.js 8.\n\n`;
 
   content += `> Print version-matched installation options without changing files: \`npx @videojs/cli agents init\`. Installation guide index: ${siteUrl}/docs/guides/installation.md\n\n`;
 
@@ -1103,7 +1103,7 @@ export function generateDocsIndex(
 
   content += `> Install the [Video.js skill](https://github.com/videojs/skills) to help AI coding agents find version-matched pages from this index.\n\n`;
 
-  content += `> The \`video.js\` package on npm is still Video.js 8. Video.js 10 ships as \`@videojs/${framework}\`; to move existing Video.js 8 code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-video-js-8.md\n\n`;
+  content += `> Video.js 10 ships as \`@videojs/${framework}\`. Since version 10, the \`video.js\` package on npm contains no player; install \`video.js@8\` to stay on Video.js 8. To move existing Video.js 8 code, read ${siteUrl}/docs/framework/${framework}/guides/migrate-from-video-js-8.md\n\n`;
 
   const vidstackPackage = framework === 'react' ? '@vidstack/react' : 'vidstack';
 

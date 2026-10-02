@@ -417,7 +417,7 @@ describe('generateRootIndex', () => {
       '> AI coding agents can install the [Video.js skill](https://github.com/videojs/skills) to find version-matched documentation and follow current Video.js 10 patterns.\n'
     );
     expect(index).toContain(
-      '> The `video.js` package on npm is still Video.js 8. Video.js 10 ships as `@videojs/react` and `@videojs/html`.\n'
+      '> Video.js 10 ships as `@videojs/react` and `@videojs/html`. Since version 10, the `video.js` package on npm contains no player; install `video.js@8` to stay on Video.js 8.\n'
     );
     expect(index).toContain(
       '- [HTML documentation](https://videojs.org/docs/framework/html/llms.txt): Every HTML guide and reference page, each with a one-line description.\n' +
@@ -458,7 +458,7 @@ describe('generateDocsIndex', () => {
       '> Install the [Video.js skill](https://github.com/videojs/skills) to help AI coding agents find version-matched pages from this index.'
     );
     expect(index).toContain(
-      '> The `video.js` package on npm is still Video.js 8. Video.js 10 ships as `@videojs/html`; to move existing Video.js 8 code, read https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8.md\n'
+      '> Video.js 10 ships as `@videojs/html`. Since version 10, the `video.js` package on npm contains no player; install `video.js@8` to stay on Video.js 8. To move existing Video.js 8 code, read https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8.md\n'
     );
     expect(index).toContain(
       '> Vidstack Player is in security-only maintenance. To move existing `vidstack` code, read https://videojs.org/docs/framework/html/guides/migrate-from-vidstack.md\n'
