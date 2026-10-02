@@ -58,7 +58,7 @@ If the media is a custom element that isn't defined yet, the player waits for `c
 
 Each of these is a working prototype, and each is a reasonable choice.
 
-- **`data-vjs-media`** ([#3149](https://github.com/videojs/v10/pull/3149)). An attribute with no existing meaning: it never affects rendering, never collides with our media elements' inner slot, and needs no skin change. The cost is one more name to learn, and media-chrome markup has to change from `slot="media"`.
-- **Match `*-video` and `*-audio` tag names** (branch `claude/discoverable-media-suffix`). Zero configuration, like plain `<video>`, and the media-chrome element family already uses these names. The cost is false positives, such as a `<my-intro-video>` layout wrapper, so it needs a capability check after definition, and there's no way to override a wrong guess without adding a marker anyway.
+- **`data-vjs-media`** ([videojs/v10#3149](https://github.com/videojs/v10/pull/3149)). An attribute with no existing meaning: it never affects rendering, never collides with our media elements' inner slot, and needs no skin change. The cost is one more name to learn, and media-chrome markup has to change from `slot="media"`.
+- **Match `*-video` and `*-audio` tag names** ([videojs/v10#3151](https://github.com/videojs/v10/pull/3151)). Zero configuration, like plain `<video>`, and the media-chrome element family already uses these names. The cost is false positives, such as a `<my-intro-video>` layout wrapper, so it needs a capability check after definition, and there's no way to override a wrong guess without adding a marker anyway.
 - **Search the DOM in React.** It only works when a container exists, so a player without a skin or container would never find its media.
 - **Re-check support on every event**, like media-chrome's store. That changes every feature to handle a case only third-party elements hit. The element contract covers it.
