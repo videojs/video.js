@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [@videojs/core@10.0.0] - 2026-10-01
+
+### 🚀 Features
+- *(packages)* Release Video.js 10.0.0 as stable ([#3058](https://github.com/videojs/v10/pull/3058)) by [@decepulis](https://github.com/decepulis)
+
 ## [@videojs/core@10.0.0-rc.5] - 2026-10-01
 
 ### 🚀 Features
@@ -2213,6 +2218,7 @@ All notable changes to this project will be documented in this file.
 * @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
 * @heff made their first contribution
 
+[@videojs/core@10.0.0]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.5...@videojs/core@10.0.0
 [@videojs/core@10.0.0-rc.5]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.4...@videojs/core@10.0.0-rc.5
 [@videojs/core@10.0.0-rc.4]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.3...@videojs/core@10.0.0-rc.4
 [@videojs/core@10.0.0-rc.3]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.2...@videojs/core@10.0.0-rc.3

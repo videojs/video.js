@@ -189,8 +189,8 @@ export const textTrackFeature = definePlayerFeature({
           // the CueList is typed as TextTrackCue which doesn't expose `text`.
           cues: thumbnailsTextTrack.cues ? (Array.from(thumbnailsTextTrack.cues) as unknown as MediaTextCue[]) : [],
           src: findTrackElement(media, thumbnailsTextTrack)?.src ?? null,
-          // Read the host rather than any inner native element: for a custom media
-          // element the attribute lives on the host and is forwarded inward.
+          // Read the host rather than any inner native element: for a media
+          // component the attribute lives on the host and is forwarded inward.
           crossOrigin: isMediaSourceCapable(media) ? toCorsMode(media.crossOrigin) : null,
         };
       }

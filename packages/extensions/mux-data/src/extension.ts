@@ -52,8 +52,8 @@ function srcOf(media: Media): string {
 /**
  * Player extension that monitors the player's media with the Mux Data SDK.
  *
- * The SDK needs the native element, so a custom media element or adapter is resolved to the `<video>` it fronts; a
- * plain `<video>` is monitored directly. Source and engine changes are read from the media the player attached.
+ * The SDK needs the native element, so a media component or adapter is resolved to the `<video>` it fronts; a plain
+ * `<video>` is monitored directly. Source and engine changes are read from the media the player attached.
  *
  * Its `PlayerExtension` members are internal: the player drives them, and the element and hook that register it check
  * that it conforms.
@@ -284,7 +284,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     const media = this.#media;
     if (!media) return;
 
-    // A custom media element or adapter can swap the element it fronts without the player noticing.
+    // A media component or adapter can swap the element it fronts without the player noticing.
     const target = getMediaElement(media) as HTMLVideoElement | null;
 
     if (target !== this.#target) {

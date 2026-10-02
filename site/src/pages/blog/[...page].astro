@@ -7,6 +7,7 @@ import BlogPagination from '@/components/blog/BlogPagination.astro';
 import BlogPostCard from '@/components/blog/BlogPostCard.astro';
 import FooterEasterEgg from '@/components/FooterEasterEgg.astro';
 import JsonLd from '@/components/JsonLd.astro';
+import A from '@/components/typography/A.astro';
 import { BLOG_PAGE_SIZE, PRODUCTION_URL } from '@/consts';
 import Blog from '@/layouts/Blog.astro';
 import { createBlogCollectionSchema } from '@/utils/jsonLd/schemas';
@@ -76,4 +77,14 @@ const jsonLdSchema = createBlogCollectionSchema({
     }
   </div>
   {page.lastPage > 1 && <BlogPagination page={page} />}
+  {
+    !page.url.next && (
+      <p class="mx-auto mt-10 w-full max-w-3xl text-center">
+        Looking for posts from before Video.js v10?{" "}
+        <A href="https://legacy.videojs.org/blog">
+          Visit the legacy blog
+        </A>
+      </p>
+    )
+  }
 </Blog>

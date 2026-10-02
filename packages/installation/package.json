@@ -1,6 +1,6 @@
 {
   "name": "@videojs/installation",
-  "version": "10.0.0-rc.5",
+  "version": "10.0.0",
   "private": true,
   "description": "Shared Video.js installation schema and instruction renderer",
   "license": "Apache-2.0",
@@ -28,7 +28,6 @@
   "devDependencies": {
     "@types/node": "^22.18.6",
     "@videojs/media": "workspace:*",
-    "typescript": "6.0.2",
     "vite-plus": "catalog:"
   }
 }

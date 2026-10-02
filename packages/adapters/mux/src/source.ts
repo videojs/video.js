@@ -154,8 +154,9 @@ export function createMuxVideoURL(source?: MuxSourceBase | null): string | undef
 }
 
 /**
- * Parse a Mux stream URL (`https://stream.<domain>/<playback-id>.m3u8?...`) into a `MuxSourceBase`, mapping
- * `snake_case` query params back to camelCase playback params. Returns `undefined` for non-Mux URLs.
+ * Parse a Mux stream URL (`https://stream.<domain>/<playback-id>.m3u8?...`, with or without the `.m3u8` extension) into
+ * a `MuxSourceBase`, mapping `snake_case` query params back to camelCase playback params. Returns `undefined` for
+ * non-Mux URLs.
  */
 export function parseMuxVideoURL(src: string): MuxSourceBase | undefined {
   if (!src) return undefined;
@@ -169,7 +170,8 @@ export function parseMuxVideoURL(src: string): MuxSourceBase | undefined {
   }
 
   const [, domain] = url.hostname.match(/^stream\.(.+)$/) ?? [];
-  const [, playbackId] = url.pathname.match(/^\/([^/]+)\.m3u8$/) ?? [];
+  // Mux serves the manifest with or without `.m3u8`, so both parse, matching what `resolveAdapterType` calls `mux`.
+  const [, playbackId] = url.pathname.match(/^\/([^/.]+)(?:\.m3u8)?$/) ?? [];
   if (!domain || !playbackId) return undefined;
 
   const source: MuxSourceBase = { playbackId };

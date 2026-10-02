@@ -20,7 +20,7 @@ const SOURCE_VIDEO_SKIN = relative(
 ).replaceAll('\\', '/');
 
 // ---------------------------------------------------------------------------
-// Media type config — maps media element name to its import + attributes
+// Media type config — maps media component name to its import + attributes
 // ---------------------------------------------------------------------------
 
 interface MediaTypeConfig {
@@ -28,7 +28,7 @@ interface MediaTypeConfig {
   element: string;
   /** Side-effect imports to register the element */
   imports: string[];
-  /** HTML attributes on the media element */
+  /** HTML attributes on the media component */
   attrs: string;
   /** Whether a storyboard track should be included */
   hasStoryboard: boolean;
@@ -124,7 +124,7 @@ const MEDIA_TYPES: Record<string, MediaTypeConfig> = {
   },
 };
 
-// React component names for media elements
+// React component names for media components
 const REACT_MEDIA: Record<string, { component: string; importPath: string }> = {
   video: { component: 'Video', importPath: '@videojs/react/video' },
   'hlsjs-video': { component: 'HlsJsVideo', importPath: '@videojs/react/media/hlsjs-video' },

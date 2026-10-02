@@ -8,7 +8,7 @@ export interface ThumbnailContextValue {
   state: ThumbnailState;
   src: string | undefined;
   imageStyle: CSSProperties | undefined;
-  /** CORS mode inherited from the media element, supplied only for `<track>`-sourced thumbnails. */
+  /** CORS mode inherited from the media component, supplied only for `<track>`-sourced thumbnails. */
   inheritedCrossOrigin: ThumbnailImageProps['crossOrigin'];
   /** Attach to the image so the root can track its loading lifecycle. */
   imageRef: RefCallback<HTMLImageElement>;

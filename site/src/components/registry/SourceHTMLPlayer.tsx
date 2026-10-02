@@ -73,7 +73,7 @@ function SourceHTMLPlayer({ part }: Props) {
           directory instead.
         </p>
         <p className={`${shared.p} ${shared.prose}`}>
-          In <code>{html.skinFile}</code>, replace the “Add a compatible media element here” comment with:
+          In <code>{html.skinFile}</code>, replace the “Add a compatible media component here” comment with:
         </p>
         <CodeTabs
           label="Skin source"

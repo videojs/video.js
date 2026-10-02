@@ -6,14 +6,14 @@ import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
-import type { MediaRefProps } from '../../utils/use-media-ref';
+import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface HlsAudioProps
   extends
     Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof HlsAudioAdapterProps>,
     Partial<HlsAudioAdapterProps>,
-    MediaRefProps<HTMLAudioElement> {
+    MediaRefProps<HlsAudioAdapter> {
   children?: ReactNode;
 }
 
@@ -23,7 +23,8 @@ export const HlsAudio = forwardRef<HTMLAudioElement, HlsAudioProps>(function Hls
 ) {
   const media = useMediaInstance(HlsAudioAdapter);
   const attachRef = useAttachMedia(media);
-  const composedRef = useComposedRefs(attachRef, ref, mediaRef);
+  const exposeRef = useMediaRef(media, mediaRef);
+  const composedRef = useComposedRefs(attachRef, exposeRef, ref);
   const htmlProps = useSyncProps(media, props, HlsAudioAdapter.defaultProps);
 
   return (

@@ -990,6 +990,24 @@ describe('YouTubeAdapter', () => {
     expect(media.engine).toBe(null);
   });
 
+  it('returns the iframe to its host position after the player removes it on detach', async () => {
+    const media = new YouTubeAdapter();
+    const { iframe, player } = await attachAndLoad(media);
+    const container = document.createElement('div');
+    const sibling = document.createElement('span');
+
+    container.append(iframe, sibling);
+    // The iframe API removes the embed when its player is destroyed.
+    player.destroy.mockImplementation(() => iframe.remove());
+
+    media.detach();
+
+    expect(player.destroy).toHaveBeenCalled();
+    expect(iframe.nextSibling).toBe(sibling);
+    // A framework unmounting the host can still remove the iframe it rendered.
+    expect(() => container.removeChild(iframe)).not.toThrow();
+  });
+
   it('unblocks pending play() when detached before load completes', async () => {
     const media = new YouTubeAdapter();
 

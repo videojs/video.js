@@ -1,5 +1,36 @@
 # Changelog
 
+## [10.0.0](https://github.com/videojs/v10/compare/@videojs/cdn@10.0.0-rc.5...@videojs/cdn@10.0.0) (2026-10-01)
+
+
+### Miscellaneous Chores
+
+* **@videojs/cdn:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.0.0
+    * @videojs/core bumped to 10.0.0
+    * @videojs/dash-video bumped to 10.0.0
+    * @videojs/google-cast bumped to 10.0.0
+    * @videojs/hlsjs-video bumped to 10.0.0
+    * @videojs/html bumped to 10.0.0
+    * @videojs/mux-audio bumped to 10.0.0
+    * @videojs/mux-data bumped to 10.0.0
+    * @videojs/mux-video bumped to 10.0.0
+    * @videojs/native-hls-video bumped to 10.0.0
+    * @videojs/shaka-video bumped to 10.0.0
+    * @videojs/spf bumped to 10.0.0
+    * @videojs/spotify-audio bumped to 10.0.0
+    * @videojs/tiktok-video bumped to 10.0.0
+    * @videojs/twitch-video bumped to 10.0.0
+    * @videojs/vimeo-video bumped to 10.0.0
+    * @videojs/wistia-video bumped to 10.0.0
+    * @videojs/youtube-video bumped to 10.0.0
+
 ## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/cdn@10.0.0-rc.4...@videojs/cdn@10.0.0-rc.5) (2026-10-01)
 
 

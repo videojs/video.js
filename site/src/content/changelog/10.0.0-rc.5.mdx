@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Renames Minimal to Neutral, aligns the player store with media element names, and adds the Compat skin."
 date: 2026-10-01
 version: "10.0.0-rc.5"
 prerelease: true
@@ -7,55 +7,59 @@ breaking: true
 compareUrl: "https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.4...@videojs/core@10.0.0-rc.5"
 ---
 
+This is the last round of API cleanup before 10.0: the Minimal skin becomes Neutral, the player store adopts media element names, and a new Compat skin joins wider browser support.
 
-### 🚀 Features
-- *(vjsc)* Flatten @scope in the packaged skins ([#2966](https://github.com/videojs/v10/pull/2966)) by [@sampotts](https://github.com/sampotts)
-- *(packages)* Support chrome 111, firefox 121, and safari 16.4 ([#2951](https://github.com/videojs/v10/pull/2951)) by [@sampotts](https://github.com/sampotts)
-- *(core)* Add deriveCustomStatus to display custom actions ([#3064](https://github.com/videojs/v10/pull/3064)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(media)* Add resolveAdapterType and resolveMimeType ([#3024](https://github.com/videojs/v10/pull/3024)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Mask private installation input in PostHog analytics ([#2666](https://github.com/videojs/v10/pull/2666)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Tag clickable markup for PostHog autocapture ([#3084](https://github.com/videojs/v10/pull/3084)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Tag Mux links with their placement for attribution ([#3086](https://github.com/videojs/v10/pull/3086)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Record docs, installation, agent-handoff, and Mux upload events ([#3087](https://github.com/videojs/v10/pull/3087)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Count agent Markdown reads at the edge ([#3081](https://github.com/videojs/v10/pull/3081)) by [@decepulis](https://github.com/decepulis)
-- *(packages)* Export a per-package VERSION from core, html, and react ([#3078](https://github.com/videojs/v10/pull/3078)) by [@decepulis](https://github.com/decepulis)
-- *(react)* Add mediaRef prop to media components ([#3098](https://github.com/videojs/v10/pull/3098)) by [@luwes](https://github.com/luwes)
-- *(skin)* Add compat skin ([#3026](https://github.com/videojs/v10/pull/3026)) by [@sampotts](https://github.com/sampotts)
+## Breaking changes
 
-### 🐛 Bug Fixes
-- *(packages)* Name Video.js 10 in npm descriptions and keywords ([#2995](https://github.com/videojs/v10/pull/2995)) by [@mihar-22](https://github.com/mihar-22)
-- *(test)* Stop e2e web servers hanging at teardown ([#2991](https://github.com/videojs/v10/pull/2991)) by [@mihar-22](https://github.com/mihar-22)
-- *(core)* Preserve submenu exit transitions ([#3025](https://github.com/videojs/v10/pull/3025)) by [@sampotts](https://github.com/sampotts)
-- *(native-hls)* Honour SERVER-CONTROL hold-back when deriving the live edge ([#3027](https://github.com/videojs/v10/pull/3027)) by [@spuppo-mux](https://github.com/spuppo-mux)
-- *(react)* Declare client boundaries per module ([#3079](https://github.com/videojs/v10/pull/3079)) by [@mihar-22](https://github.com/mihar-22)
-- *(media)* Keep hls.js text tracks when MEDIA_ATTACHED follows the manifest ([#3099](https://github.com/videojs/v10/pull/3099)) by [@spuppo-mux](https://github.com/spuppo-mux)
+If you use the Default skin with no custom UI and no hand-wired extensions, there's nothing to change. Otherwise, start with the first two.
 
-### 🚜 Refactor
-- *(core)* [**breaking**] Align player store API ([#3012](https://github.com/videojs/v10/pull/3012)) by [@luwes](https://github.com/luwes)
-- *(media)* [**breaking**] Tidy text track state ([#3057](https://github.com/videojs/v10/pull/3057)) by [@luwes](https://github.com/luwes)
-- *(skin)* Reduce default saturation filter ([#3091](https://github.com/videojs/v10/pull/3091)) by [@sampotts](https://github.com/sampotts)
-- *(skin)* Rename media-opaque to media-high-contrast ([#3094](https://github.com/videojs/v10/pull/3094)) by [@sampotts](https://github.com/sampotts)
-- *(packages)* [**breaking**] Attach extensions at the player ([#2880](https://github.com/videojs/v10/pull/2880)) by [@luwes](https://github.com/luwes)
-- *(packages)* [**breaking**] Rename the minimal skin to neutral ([#3092](https://github.com/videojs/v10/pull/3092)) by [@mihar-22](https://github.com/mihar-22)
+### Likely to affect you
 
-### 📚 Documentation
-- *(site)* Add changelog prose for 10.0.0-rc.4 ([#2988](https://github.com/videojs/v10/pull/2988)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(site)* Add player store api overview page ([#3034](https://github.com/videojs/v10/pull/3034)) by [@luwes](https://github.com/luwes)
-- *(site)* Improve migration accuracy and agent guidance ([#3074](https://github.com/videojs/v10/pull/3074)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Improve playback guides and examples ([#3075](https://github.com/videojs/v10/pull/3075)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Correct stale playback and package guidance ([#3076](https://github.com/videojs/v10/pull/3076)) by [@mihar-22](https://github.com/mihar-22)
-- *(site)* Add the vidstack migration guide ([#3021](https://github.com/videojs/v10/pull/3021)) by [@mihar-22](https://github.com/mihar-22)
+- **Minimal is now Neutral** ([#3092](https://github.com/videojs/v10/pull/3092)). This affects anyone on the Minimal skin, however you installed it. Rename every `minimal` to `neutral`: import paths, `Minimal*Skin` components, `<*-minimal-skin>` elements, `data-theme`, `family="minimal"` icons, CDN `*-minimal.*` files, Shadcn `r/*/minimal` paths, and `--skin minimal`. There are no aliases. Old import paths fail at build time, but some failures are quiet: an old CDN URL returns 404, and CSS that targets `data-theme="minimal"` stops matching. See [Customize skins](/docs/guides/customize-skins/).
+- **The player store uses media element names** ([#3012](https://github.com/videojs/v10/pull/3012)). This affects custom UI that reads state or calls actions on the store. Toggles split into explicit pairs, and state fields take the `HTMLMediaElement` names. TypeScript flags each rename. In plain JavaScript, an old field reads as `undefined` without an error, and an old action throws when called.
 
-### 🧪 Testing
-- *(skins)* Check the skins in the oldest supported engines ([#2952](https://github.com/videojs/v10/pull/2952)) by [@sampotts](https://github.com/sampotts)
-- *(packages)* Audit every test with the maintain-tests skill ([#3080](https://github.com/videojs/v10/pull/3080)) by [@mihar-22](https://github.com/mihar-22)
+  | Before | After |
+  |---|---|
+  | `togglePaused()` | `play()` or `pause()` |
+  | `toggleMuted()` | `setMuted(muted)` |
+  | `toggleFullscreen()` | `requestFullscreen()` or `exitFullscreen()` |
+  | `togglePictureInPicture()` | `requestPictureInPicture()` or `exitPictureInPicture()` |
+  | `toggleRemotePlayback()` | `promptRemotePlayback()` |
+  | `fullscreen` | `isFullscreen` |
+  | `pip`, `pipAvailability` | `isPictureInPicture`, `pictureInPictureAvailability` |
+  | `source` (`string` or `null`) | `currentSrc` (always a `string`) |
+  | `loadSource(src)` | Set `src` or `source` on the media element |
 
-### ⚙️ Miscellaneous Tasks
-- *(root)* Bump pnpm to 12.6.0 ([#2990](https://github.com/videojs/v10/pull/2990)) by [@mihar-22](https://github.com/mihar-22)
-- *(cd)* Allow resuming a partially published release ([#2989](https://github.com/videojs/v10/pull/2989)) by [@mihar-22](https://github.com/mihar-22)
-- *(root)* Upgrade vite+ to 1.0.0 ([#3010](https://github.com/videojs/v10/pull/3010)) by [@mihar-22](https://github.com/mihar-22)
-- *(test)* Cut the e2e jobs competing for runners ([#3017](https://github.com/videojs/v10/pull/3017)) by [@sampotts](https://github.com/sampotts)
-- *(root)* Silence module-level directive warnings in pack builds ([#3018](https://github.com/videojs/v10/pull/3018)) by [@sampotts](https://github.com/sampotts)
-- *(root)* Keep directive warnings in bundled packs ([#3022](https://github.com/videojs/v10/pull/3022)) by [@mihar-22](https://github.com/mihar-22)
-- *(test)* Add browserstack compatibility checks ([#3071](https://github.com/videojs/v10/pull/3071)) by [@sampotts](https://github.com/sampotts)
-- *(ci)* Remove e2e failure triage ([#3095](https://github.com/videojs/v10/pull/3095)) by [@sampotts](https://github.com/sampotts)
+  `toggleSubtitles()` and `toggleControls()` stay, and hotkey and gesture action names such as `togglePaused` are unchanged. `canPlay` now turns true at `HAVE_FUTURE_DATA`, and `requestPictureInPicture()` rejects before metadata loads. See the [player store reference](/docs/framework/react/reference/api/player-store/).
+
+### Only if you use these APIs
+
+- **Thumbnail and subtitle state** ([#3057](https://github.com/videojs/v10/pull/3057)). Custom thumbnail or captions UI: read `thumbnailsTrack` (`{ cues, src, crossOrigin }` or `null`) instead of `thumbnailCues`, `thumbnailTrackSrc`, and `thumbnailTrackCrossOrigin`. Call `selectSubtitlesTrack(null)` instead of passing `'off'`.
+- **Hand-wired extensions** ([#2880](https://github.com/videojs/v10/pull/2880)). Mounted `<google-cast>`, `<mux-data>`, `<GoogleCast>`, and `<MuxData>` need no change. If you called `useMediaExtension`, `addMediaExtension`, or an extension's `setAdapter()`, render the element or component inside the player instead.
+- **Tailwind skin source** ([#3094](https://github.com/videojs/v10/pull/3094)). If you added skin source to your project, rename the `media-opaque` variant to `media-high-contrast`. Its behavior is unchanged.
+- **Exhaustive `IndicatorStatus` switches** ([#3064](https://github.com/videojs/v10/pull/3064)). `IndicatorStatus` now accepts custom strings, so a `switch` that covers every status needs a `default` case. Use `BuiltInIndicatorStatus` for the built-in names only.
+
+## Skins and browser support
+
+The new Compat skin offers a simpler control layout with conservative CSS for video, live video, audio, and live audio. It ships in the HTML and React packages, CDN bundles, Shadcn registries, and installation tools ([#3026](https://github.com/videojs/v10/pull/3026)).
+
+Packaged skins now support Chrome and Edge 111, Firefox 121, and Safari and iOS 16.4. Their bundles flatten `@scope` rules and include CSS fallbacks, while editable registry CSS keeps `@scope` for readability ([#2966](https://github.com/videojs/v10/pull/2966), [#2951](https://github.com/videojs/v10/pull/2951)). See [browser support](/docs/guides/browser-support/) for details.
+
+We also restored the closing transition on nested menus and lowered the default skin's backdrop saturation so controls read more clearly ([#3025](https://github.com/videojs/v10/pull/3025), [#3091](https://github.com/videojs/v10/pull/3091)).
+
+## Media and playback
+
+`resolveAdapterType()` and `resolveMimeType()` pick the right media component from a URL or MIME type, using the same rules as the installation flow. They handle service URLs, streams, and files, recognize `youtube/<id>` and `vimeo/<id>` shorthands, and return `null` for ambiguous bare IDs ([#3024](https://github.com/videojs/v10/pull/3024)).
+
+Google Cast and Mux Data now attach at the player, so they work with a plain `<video>` or `<audio>` and follow media changes. A refused play or AirPlay request no longer surfaces as an unhandled rejection ([#2880](https://github.com/videojs/v10/pull/2880)). Native HLS honors a stream's `SERVER-CONTROL` hold-back when it finds the live edge, and hls.js keeps captions when media attaches after the manifest loads ([#3027](https://github.com/videojs/v10/pull/3027), [#3099](https://github.com/videojs/v10/pull/3099)).
+
+## React and custom UI
+
+- React Server Components can now call `@videojs/react` helpers such as `mergeProps` and read its constants. Each component and hook module declares its own client boundary, instead of the package barrels marking every export as client-only ([#3079](https://github.com/videojs/v10/pull/3079)).
+- React media components accept `mediaRef`. On native media it receives the element; on iframe embeds such as YouTube and Vimeo it receives the playback adapter, so you can call `play()` without `useMedia()`. `ref` still points to the rendered element ([#3098](https://github.com/videojs/v10/pull/3098)).
+- The [status indicator](/docs/framework/react/reference/components/status-indicator/) can show feedback for your own hotkey actions through `deriveCustomStatus` ([#3064](https://github.com/videojs/v10/pull/3064)).
+- Core, HTML, and React each export a `VERSION` constant for diagnostics ([#3078](https://github.com/videojs/v10/pull/3078)).
+
+## Documentation
+
+The new [Vidstack migration guide](/docs/guides/migrate-from-vidstack/) maps providers to Video.js media components ([#3021](https://github.com/videojs/v10/pull/3021)). The [player store reference](/docs/framework/react/reference/api/player-store/) lists every state field and action, generated from source, and the migration and playback guides now use current APIs with complete examples and agent-ready migration prompts ([#3034](https://github.com/videojs/v10/pull/3034), [#3074](https://github.com/videojs/v10/pull/3074), [#3075](https://github.com/videojs/v10/pull/3075), [#3076](https://github.com/videojs/v10/pull/3076)).

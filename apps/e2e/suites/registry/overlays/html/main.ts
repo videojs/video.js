@@ -11,7 +11,7 @@ import './style.css';
 const root = document.querySelector<HTMLDivElement>('#app');
 if (!root) throw new Error('Could not find the application root.');
 
-const mediaPlaceholder = '<!-- Add a compatible media element here. -->';
+const mediaPlaceholder = '<!-- Add a compatible media component here. -->';
 
 root.innerHTML = `
   <video-player data-registry-skin="video">

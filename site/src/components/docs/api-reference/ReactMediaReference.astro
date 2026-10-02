@@ -41,9 +41,10 @@ const nativeInterface =
   data.target === 'video' ? 'HTMLVideoElement' : data.target === 'audio' ? 'HTMLAudioElement' : 'HTMLIFrameElement';
 const mdnApiUrl = `https://developer.mozilla.org/en-US/docs/Web/API/${nativeInterface}`;
 
-// Embeds hand out the adapter that drives the iframe; native media hand out the element `ref` already resolves to.
+// Adapter-backed media hand out the adapter that drives the rendered element; plain media hand out that element itself.
 const mediaRef = data.mediaRef;
 const mediaRefIsAdapter = Boolean(mediaRef && mediaRef.type !== nativeInterface);
+const isEmbed = data.target === 'iframe';
 const refExample = [`const ref = useRef<${nativeInterface}>(null);`, '', `<${media} ref={ref} />`].join('\n');
 const mediaRefExample = mediaRef
   ? [
@@ -128,7 +129,7 @@ const mediaRefExample = mediaRef
           <H4 id={mediaRefEntry.id}>
             <MarkdownCode>{mediaRefEntry.title}</MarkdownCode>
           </H4>
-          {mediaRefIsAdapter ? (
+          {mediaRefIsAdapter && isEmbed && (
             <P>
               Receives the <MarkdownCode>{mediaRef.type}</MarkdownCode> that
               drives the embed, which exposes media methods and properties such
@@ -138,13 +139,29 @@ const mediaRefExample = mediaRef
               <MarkdownCode>target</MarkdownCode> is already that iframe, and
               it is cleared when the iframe unmounts.
             </P>
-          ) : (
+          )}
+          {mediaRefIsAdapter && !isEmbed && (
+            <P>
+              Receives the <MarkdownCode>{mediaRef.type}</MarkdownCode> that
+              drives the <MarkdownCode>{targetTag}</MarkdownCode>, the same
+              object <MarkdownCode>useMedia()</MarkdownCode> returns inside a
+              player. It forwards the native media methods, properties, and
+              events, such as <MarkdownCode>play()</MarkdownCode> and{" "}
+              <MarkdownCode>currentTime</MarkdownCode>, and exposes the
+              playback engine through <MarkdownCode>engine</MarkdownCode>. It
+              is set once the adapter has attached to the element and cleared
+              when the element unmounts. For DOM-only APIs, use{" "}
+              <MarkdownCode>ref</MarkdownCode>.
+            </P>
+          )}
+          {!mediaRefIsAdapter && (
             <P>
               Receives the same <MarkdownCode>{nativeInterface}</MarkdownCode>{" "}
-              as <MarkdownCode>ref</MarkdownCode>. Embed components hand their
-              playback adapter to <MarkdownCode>mediaRef</MarkdownCode>{" "}
-              instead, so code that works with several media components can
-              read the playback object from one prop.
+              as <MarkdownCode>ref</MarkdownCode>. Adapter-backed components
+              hand their playback adapter to{" "}
+              <MarkdownCode>mediaRef</MarkdownCode> instead, so code that works
+              with several media components can read the playback object from
+              one prop.
             </P>
           )}
           <CodeFrame lang="tsx">
@@ -164,7 +181,7 @@ const mediaRefExample = mediaRef
         Handle standard media events with React event props such as{" "}
         <MarkdownCode>onPlay</MarkdownCode> and{" "}
         <MarkdownCode>onTimeUpdate</MarkdownCode>.{" "}
-        {mediaRefIsAdapter ? (
+        {mediaRefIsAdapter && isEmbed ? (
           <>
             The adapter dispatches them, not the iframe. For events without a
             React prop, call <MarkdownCode>addEventListener</MarkdownCode> on

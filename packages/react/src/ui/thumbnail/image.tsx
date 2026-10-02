@@ -17,7 +17,7 @@ export interface ThumbnailImageProps extends Omit<
   UIComponentProps<'img', ThumbnailState>,
   'crossOrigin' | 'fetchPriority' | 'loading' | 'src'
 > {
-  /** CORS setting for the selected image. Leave unset to follow the media element, or pass `null` to opt out. */
+  /** CORS setting for the selected image. Leave unset to follow the media component, or pass `null` to opt out. */
   crossOrigin?: CoreThumbnailImageProps['crossOrigin'];
   /** Image loading strategy. */
   loading?: CoreThumbnailImageProps['loading'];

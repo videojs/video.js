@@ -1,6 +1,6 @@
 {
   "name": "@videojs/skins",
-  "version": "10.0.0-rc.5",
+  "version": "10.0.0",
   "private": true,
   "description": "Canonical VJSC skin sources and delivery generators for Video.js",
   "keywords": [
@@ -24,13 +24,13 @@
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
   },
   "devDependencies": {
-    "@lit/context": "^1.1.0",
     "@tailwindcss/vite": "catalog:",
     "@types/caniuse-lite": "^1.0.5",
     "@types/node": "^22.18.6",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@videojs/core": "workspace:*",
+    "@videojs/element": "workspace:*",
     "@videojs/icons": "workspace:*",
     "@videojs/installation": "workspace:*",
     "@videojs/utils": "workspace:*",
@@ -38,16 +38,12 @@
     "browserslist": "^4.29.0",
     "caniuse-lite": "^1.0.30001810",
     "cn": "^0.2.5",
-    "dashjs": "^5.2.0",
-    "hls.js": "^1.6.7",
     "lightningcss": "catalog:",
-    "mux-embed": "5.17.10",
     "oxfmt": "0.70.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "shadcn": "^4.19.0",
     "tailwindcss": "catalog:",
-    "typescript": "^6.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vjsc": "workspace:*"

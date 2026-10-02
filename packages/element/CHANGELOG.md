@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.0](https://github.com/videojs/v10/compare/@videojs/element@10.0.0-rc.5...@videojs/element@10.0.0) (2026-10-01)
+
+
+### Features
+
+* **packages:** release Video.js 10.0.0 as stable ([#3058](https://github.com/videojs/v10/issues/3058)) ([37477fc](https://github.com/videojs/v10/commit/37477fc187f36fc2ab3cbc0db7c1b2d3fc6bcca9))
+
 ## [10.0.0-rc.5](https://github.com/videojs/v10/compare/@videojs/element@10.0.0-rc.4...@videojs/element@10.0.0-rc.5) (2026-10-01)
 
 

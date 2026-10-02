@@ -458,7 +458,7 @@ Move license URLs from v8's `keySystems` configuration to `source.drm`, keyed by
 The examples configure Widevine. Replace both URL placeholders and add every key system your supported browsers need.
 
 <FrameworkCase frameworks={["html"]}>
-With a bundler, install `@videojs/shaka-video` and import `@videojs/html/media/shaka-video`. From the CDN, load `{{VJS10_CDN_BASE}}/media/shaka-video.js` in a `<script type="module">` tag. Then replace the media element inside your player's skin with:
+With a bundler, install `@videojs/shaka-video` and import `@videojs/html/media/shaka-video`. From the CDN, load `{{VJS10_CDN_BASE}}/media/shaka-video.js` in a `<script type="module">` tag. Then replace the media component inside your player's skin with:
 
 ```html
 <shaka-video id="protected-media"></shaka-video>
@@ -498,7 +498,7 @@ import { ShakaVideo } from '@videojs/react/media/shaka-video';
 
 ### Events
 
-Your media element is a real media element, so every event you already listen for still fires on it. Keep your listeners, and attach them to the media element instead of the v8 player.
+Your media component is a real media element, so every event you already listen for still fires on it. Keep your listeners, and attach them to the media component instead of the v8 player.
 
 ```js
 // Video.js 8
@@ -598,13 +598,13 @@ Replace v8 accessor methods with <DocsLink slug="reference/api/player-store">pla
 | `player.volume()` / `player.volume(0.5)` | `volume` in player state / `media.volume = 0.5` |
 | `player.muted()` / `player.muted(true)` | `muted` in player state / the player's `setMuted(true)` |
 | `player.playbackRate()` / `player.playbackRate(1.5)` | `playbackRate` in player state / the player's `setPlaybackRate(1.5)` |
-| `player.src({ src, type })` | set `src` on the media or replace the media element (`<video>` tag, `<hlsjs-video>`, `<dash-video>`, etc) |
+| `player.src({ src, type })` | set `src` on the media or replace the media component (`<video>` tag, `<hlsjs-video>`, `<dash-video>`, etc) |
 | `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
 | `player.textTracks()`, `addRemoteTextTrack()` | `<track>` elements; read `textTrackList` from player state or `textTracks` from the media |
 | `player.audioTracks()` | `audioTrackList` in player state, `audioTracks` in media |
 | `player.error()` | `error` in player state |
 | `player.dispose()` | remove the element |
-| `player.tech()` | the media element's `engine` property, where one exists |
+| `player.tech()` | the media component's `engine` property, where one exists |
 | `videojs.getPlayer(id)` | hold a reference to the element |
 </FrameworkCase>
 

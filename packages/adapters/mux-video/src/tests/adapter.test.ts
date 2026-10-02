@@ -123,6 +123,15 @@ describe('MuxVideoAdapter', () => {
     expect(media.source).toEqual({ playbackId: 'abc123' });
   });
 
+  it('parses source from a Mux stream src without the .m3u8 extension', () => {
+    const media = new MuxVideoAdapter();
+
+    media.src = 'https://stream.mux.com/abc123?max_resolution=1080p';
+
+    expect(media.source).toEqual({ playbackId: 'abc123', playback: { maxResolution: '1080p' } });
+    expect(media.contentData.poster).toBe('https://image.mux.com/abc123/thumbnail.webp');
+  });
+
   it('parses the custom domain and playback params from a Mux stream src', () => {
     const media = new MuxVideoAdapter();
 
@@ -517,6 +526,23 @@ describe('MuxVideoAdapter', () => {
     // `<mux-video>` reflects the derived URL back to the host, so this has to be
     // a no-op rather than re-deriving and dropping `poster`.
     media.src = 'https://stream.mux.com/abc123.m3u8';
+
+    expect(onSourceChange).not.toHaveBeenCalled();
+    expect(media.source).toEqual({ playbackId: 'abc123', poster: { time: 5 } });
+  });
+
+  it('ignores an extension-less src that describes the current source', () => {
+    const media = new MuxVideoAdapter();
+
+    media.source = { playbackId: 'abc123', poster: { time: 5 } };
+
+    const onSourceChange = vi.fn();
+
+    media.addEventListener('sourcechange', onSourceChange);
+
+    // `src` reads back as the `.m3u8` form, so React re-syncs the authored URL on
+    // every render.
+    media.src = 'https://stream.mux.com/abc123';
 
     expect(onSourceChange).not.toHaveBeenCalled();
     expect(media.source).toEqual({ playbackId: 'abc123', poster: { time: 5 } });

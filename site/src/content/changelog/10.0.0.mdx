@@ -1,0 +1,23 @@
+---
+description: "Makes Video.js 10 stable, with a summary of the breaking changes from the release candidates."
+date: 2026-10-01
+version: "10.0.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.5...@videojs/core@10.0.0"
+---
+
+Video.js 10 is stable. Read the [Video.js 10 announcement](/blog/videojs-10/) for the full story.
+
+From here on, Video.js 10 follows semantic versioning: breaking changes wait for a new major version. Stable releases publish to npm's `latest` tag, and prereleases publish to `next` ([#3058](https://github.com/videojs/v10/pull/3058)). The [installation guide](/docs/guides/installation) no longer carries a release-candidate notice, and the [v10 roadmap](/docs/guides/v10-roadmap) describes what comes after 10.0.
+
+## Upgrade from a release candidate
+
+10.0.0 has no changes from 10.0.0-rc.5. If you're coming from an earlier release candidate, these releases had breaking changes:
+
+- **[rc.1](/changelog/10.0.0-rc.1):** playback integrations became standalone adapter packages, and browser bundles moved to `@videojs/cdn`.
+- **[rc.2](/changelog/10.0.0-rc.2):** React posters, thumbnails, and slider thumbnails became compound parts, and HTML thumbnails adopt their `<img>` child.
+- **[rc.3](/changelog/10.0.0-rc.3):** Shadcn registry URLs and installed paths changed, and the CLI's `docs` and `config` commands were removed.
+- **[rc.5](/changelog/10.0.0-rc.5):** the Minimal skin became Neutral, the player store adopted media element names such as `play()`, `pause()`, and `isFullscreen`, text-track state got a smaller shape, and extensions now attach at the player.
+
+Each release's notes list the exact migrations.

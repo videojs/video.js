@@ -1,6 +1,6 @@
 {
   "name": "@videojs/core",
-  "version": "10.0.0-rc.5",
+  "version": "10.0.0",
   "description": "Core components and utilities for Video.js",
   "keywords": [
     "core",
@@ -105,7 +105,6 @@
   },
   "devDependencies": {
     "jsdom": "^26.1.0",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:",
     "vjsc": "workspace:*"
   }

@@ -12,15 +12,17 @@ import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface SpotifyAudioProps
   extends Partial<SpotifyAdapterProps>, MediaEventProps<SpotifyAdapter>, MediaRefProps<SpotifyAdapter> {
+  /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
+  autoPlay?: boolean | undefined;
   children?: ReactNode;
 }
 
 export const SpotifyAudio = forwardRef<HTMLIFrameElement, SpotifyAudioProps>(function SpotifyAudio(
-  { children, mediaRef, ...rawProps },
+  { children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
   const media = useMediaInstance(SpotifyAdapter);
-  const props: Partial<SpotifyAdapterProps> & Record<string, unknown> = { ...rawProps };
+  const props: Partial<SpotifyAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // `source.src` is the only other way to name an entity, so honor it when `src` is absent.
     buildSpotifyIframeSrc(props.src || props.source?.src || '', { ...SpotifyAdapter.defaultProps, ...props })

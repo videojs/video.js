@@ -6,14 +6,14 @@ import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
-import type { MediaRefProps } from '../../utils/use-media-ref';
+import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface HlsVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsVideoAdapterProps>,
     Partial<HlsVideoAdapterProps>,
-    MediaRefProps<HTMLVideoElement> {
+    MediaRefProps<HlsVideoAdapter> {
   children?: ReactNode;
 }
 
@@ -23,7 +23,8 @@ export const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(function Hls
 ) {
   const media = useMediaInstance(HlsVideoAdapter);
   const attachRef = useAttachMedia(media);
-  const composedRef = useComposedRefs(attachRef, ref, mediaRef);
+  const exposeRef = useMediaRef(media, mediaRef);
+  const composedRef = useComposedRefs(attachRef, exposeRef, ref);
   const htmlProps = useSyncProps(media, props, HlsVideoAdapter.defaultProps);
 
   return (

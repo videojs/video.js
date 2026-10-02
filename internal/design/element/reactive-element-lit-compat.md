@@ -41,7 +41,7 @@ class (from `DelegateMixin`) overrides `destroyCallback()` to call
 ## Why a Mixin
 
 - `ReactiveElement` stays Lit-compatible (no added public surface)
-- Works with `HTMLElement` directly (no `ReactiveElement` required for custom media elements)
+- Works with `HTMLElement` directly (no `ReactiveElement` required for media components)
 - Composable — any element can opt in
 
 ## Alternatives Considered
@@ -49,4 +49,4 @@ class (from `DelegateMixin`) overrides `destroyCallback()` to call
 - **Put everything on `ReactiveElement`** — Simpler (direct `#controllers`
   access), but breaks Lit structural compat. Rejected.
 - **Separate `UIElement` class without mixin** — Doesn't compose with
-  `CustomMediaMixin(HTMLElement)` for custom media elements. Rejected.
+  `CustomMediaMixin(HTMLElement)` for media components. Rejected.

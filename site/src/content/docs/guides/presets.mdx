@@ -1,16 +1,16 @@
 ---
 title: Presets
-description: Pre-packaged player configurations that bundle state management, skins, and media elements for specific use cases.
+description: Pre-packaged player configurations that bundle state management, skins, and media components for specific use cases.
 ---
 
 import PresetReference from '@/components/docs/api-reference/PresetReference.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 
-A **preset** packages what you need for a specific player use case. It can include special <DocsLink slug="guides/features">state management</DocsLink>, one or more <DocsLink slug="guides/skins">skins</DocsLink> for UI, and specific media elements. Instead of assembling these pieces individually, you pick a preset that matches what you're building.
+A **preset** packages what you need for a specific player use case. It can include special <DocsLink slug="guides/features">state management</DocsLink>, one or more <DocsLink slug="guides/skins">skins</DocsLink> for UI, and specific media components. Instead of assembling these pieces individually, you pick a preset that matches what you're building.
 
 <FrameworkCase frameworks={["react"]}>
-For example, the `@videojs/react/background` preset includes a media element with autoplay, mute, and loop built in, a skin with no controls, and just the features needed to power them:
+For example, the `@videojs/react/background` preset includes a media component with autoplay, mute, and loop built in, a skin with no controls, and just the features needed to power them:
 
 ```tsx title="App.tsx"
 import { BackgroundVideo, BackgroundVideoPlayer, BackgroundVideoSkin } from '@videojs/react/background'; // [!code focus]
@@ -28,7 +28,7 @@ function Hero() {
 ```
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
-For example, the `@videojs/html/background` preset includes a media element with autoplay, mute, and loop built in, a skin with no controls, and just the features needed to power them:
+For example, the `@videojs/html/background` preset includes a media component with autoplay, mute, and loop built in, a skin with no controls, and just the features needed to power them:
 
 ```html title="index.html"
 <script type="module">
@@ -64,20 +64,20 @@ Each preset has a reference page that lists its player, feature bundle, skins, m
 ## What's in a preset
 
 <FrameworkCase frameworks={["react"]}>
-Each React preset exports a named, preconfigured player component and typed `usePlayer` hook, plus the building blocks needed to extend its features, add its skin source to your project, or swap its media element:
+Each React preset exports a named, preconfigured player component and typed `usePlayer` hook, plus the building blocks needed to extend its features, add its skin source to your project, or swap its media component:
 
 - **Player** — A player component named for the preset, such as `VideoPlayer`, already configured with the preset's feature bundle.
 - **Typed hook** — A `usePlayer` hook whose state and actions match the preset.
 - **Feature bundle** — An array of <DocsLink slug="guides/features">features</DocsLink> that define the player's state and actions. For example, the video feature bundle includes playback, volume, time, fullscreen, and more.
 - **Skins** — Pre-built UIs designed for that feature bundle. For example, a video skin renders fullscreen and PiP controls because the video feature bundle includes those features. An audio skin doesn't.
-- **Media element** — A media component suited to the use case. For example, the background video element bakes in autoplay, mute, and loop.
+- **Media component** — One suited to the use case. For example, the background video element bakes in autoplay, mute, and loop.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Each HTML preset provides registration entry points for a preconfigured player element, its skins, and any preset-specific media element, plus the feature bundle needed to compose your own player. For example, `@videojs/html/video/player` registers `<video-player>`, while `@videojs/html/video/skin` registers `<video-skin>`.
+Each HTML preset provides registration entry points for a preconfigured player element, its skins, and any preset-specific media component, plus the feature bundle needed to compose your own player. For example, `@videojs/html/video/player` registers `<video-player>`, while `@videojs/html/video/skin` registers `<video-skin>`.
 </FrameworkCase>
 
-These parts aren't equally tied together. Skins depend tightly on their feature bundle — a skin expects specific features to exist. Media elements are more interchangeable — you can swap in an HLS or DASH provider without changing your skin or features.
+These parts aren't equally tied together. Skins depend tightly on their feature bundle — a skin expects specific features to exist. Media components are more interchangeable — you can swap in an HLS or DASH provider without changing your skin or features.
 
 <FrameworkCase frameworks={["html"]}>
 HTML preset roots are side-effect-free modules for importing the configured classes, typed controller, and feature bundle:
@@ -105,7 +105,7 @@ A complete player imports `video/player` and one skin. Each skin registration in
 
 ## Customizing a preset
 
-You can customize a preset in three ways: extend its feature bundle, add its skin source to your project, or swap its media element.
+You can customize a preset in three ways: extend its feature bundle, add its skin source to your project, or swap its media component.
 
 ### Extend the feature bundle
 
@@ -161,9 +161,9 @@ function Hero() {
 
 If a preset's skin is close but not quite right, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add its source to your project</DocsLink> and customize its components and styles.
 
-### Swap the media element
+### Swap the media component
 
-A preset's default media element is just the starting point. You can replace it with any compatible media provider. For example, using an HLS source with the video preset:
+A preset's default media component is just the starting point. You can replace it with any compatible media provider. For example, using an HLS source with the video preset:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx

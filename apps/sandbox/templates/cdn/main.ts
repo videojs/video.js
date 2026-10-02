@@ -210,7 +210,7 @@ async function loadCdnMedia(media: MediaId) {
       break;
     // `<background-video>` rides along inside the `background` bundle above; the
     // SPF-backed tags are their own bundles, so the page loads them the way it
-    // loads every other media element. Both tags are one element, and a CDN page
+    // loads every other media component. Both tags are one element, and a CDN page
     // loads bundles at runtime — so it loads only the one the media names.
     case 'hls-background-video':
       await import('@videojs/cdn/media/hls-background-video');
@@ -392,7 +392,7 @@ async function render() {
 
   template.innerHTML = wrapCdnPlayerI18n(playerTag, skin);
 
-  // Subtitle tracks go in while the markup is still inert, as on the html pages: a custom media element reads its
+  // Subtitle tracks go in while the markup is still inert, as on the html pages: a media component reads its
   // tracks when it upgrades. An embed hands captions to its provider, so it gets none.
   const mediaElement = skinnedVideo ? findMediaTag(template.content) : undefined;
 

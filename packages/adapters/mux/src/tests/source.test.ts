@@ -91,6 +91,13 @@ describe('parseMuxVideoURL', () => {
     expect(parseMuxVideoURL('https://stream.mux.com/abc123.m3u8')).toEqual({ playbackId: 'abc123' });
   });
 
+  it('parses stream URLs without the .m3u8 extension', () => {
+    expect(parseMuxVideoURL('https://stream.mux.com/abc123?max_resolution=1080p&token=jwt')).toEqual({
+      playbackId: 'abc123',
+      playback: { maxResolution: '1080p', token: 'jwt' },
+    });
+  });
+
   it('extracts a custom domain', () => {
     expect(parseMuxVideoURL('https://stream.example.com/abc123.m3u8')).toEqual({
       playbackId: 'abc123',
@@ -137,6 +144,7 @@ describe('parseMuxVideoURL', () => {
     expect(parseMuxVideoURL('not a url')).toBeUndefined();
     expect(parseMuxVideoURL('https://example.com/video.m3u8')).toBeUndefined();
     expect(parseMuxVideoURL('https://stream.mux.com/abc123/highest.mp4')).toBeUndefined();
+    expect(parseMuxVideoURL('https://stream.mux.com/abc123.mp4')).toBeUndefined();
   });
 
   it('round-trips through createMuxVideoURL', () => {

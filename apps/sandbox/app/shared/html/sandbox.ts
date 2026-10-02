@@ -43,9 +43,9 @@ export interface HtmlSandboxContext {
   readonly placeholder: string;
   /** The selected source's plain URL, or empty when it has none. */
   readonly url: string;
-  /** ` src="…"` for the media element, or empty when the source has to be assigned as an object after render. */
+  /** ` src="…"` for the media component, or empty when the source has to be assigned as an object after render. */
   readonly src: string;
-  /** The object to assign to the media element's `source` once rendered, when `src` is empty. */
+  /** The object to assign to the media component's `source` once rendered, when `src` is empty. */
   readonly source: HtmlSandboxSource | undefined;
   /** The attributes the settings menu controls: autoplay, muted, loop, and preload. */
   readonly attrs: string;
@@ -185,7 +185,7 @@ export function createHtmlSandbox(options: HtmlSandboxOptions): void {
     template.innerHTML = wrapSandboxHtmlI18n(options.render(context));
 
     // Subtitle tracks are the page's to add, so a template never has to spell them out. They go in while the markup is
-    // still inert: a custom media element reads its tracks when it upgrades, not when children arrive later.
+    // still inert: a media component reads its tracks when it upgrades, not when children arrive later.
     const media = options.player === 'video' ? findMediaTag(template.content) : undefined;
 
     if (media) applyCaptionTracks(media, state.captions);

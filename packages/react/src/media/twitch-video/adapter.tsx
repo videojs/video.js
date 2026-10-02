@@ -12,15 +12,17 @@ import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface TwitchVideoProps
   extends Partial<TwitchAdapterProps>, MediaEventProps<TwitchAdapter>, MediaRefProps<TwitchAdapter> {
+  /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
+  autoPlay?: boolean | undefined;
   children?: ReactNode;
 }
 
 export const TwitchVideo = forwardRef<HTMLIFrameElement, TwitchVideoProps>(function TwitchVideo(
-  { children, mediaRef, ...rawProps },
+  { children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
   const media = useMediaInstance(TwitchAdapter);
-  const props: Partial<TwitchAdapterProps> & Record<string, unknown> = { ...rawProps };
+  const props: Partial<TwitchAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // Server rendering has no `location` to name as the embed's parent, and Twitch
     // refuses to play in a page its URL never named. Rendering no `src` leaves the

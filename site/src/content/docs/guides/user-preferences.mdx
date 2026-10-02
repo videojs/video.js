@@ -101,7 +101,7 @@ Subscribe to the state you want to remember, write it to storage when it changes
 - `store.subscribe(callback)` fires on any state change. The store batches notifications per microtask, so changes made in the same tick produce one callback. There is no per-key subscription on the store: read the state and diff the slice you care about.
 - `usePlayer(selector)` re-renders only when the selected value changes. To save a value, select it with `usePlayer` and write it to storage in an effect.
 - Feature selectors exported by `@videojs/react` (`selectVolume`, `selectTextTrack`, `selectQuality`, and the rest) read a feature's slice from any store, returning `undefined` when the feature isn't present.
-- Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media element, so state and UI stay consistent.
+- Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media component, so state and UI stay consistent.
 - Actions need an attached media target: calling one before the store attaches throws. Check `store.target` and defer the restore until it is set, as the examples do.
 </FrameworkCase>
 
@@ -109,13 +109,13 @@ Subscribe to the state you want to remember, write it to storage when it changes
 - Player state is the single source of truth: it already reflects every change, whatever caused it — your UI, keyboard shortcuts, native controls, or scripts.
 - `store.subscribe(callback)` fires on any state change. The store batches notifications per microtask, so changes made in the same tick produce one callback. There is no per-key subscription on the store: read the state and diff the slice you care about.
 - Feature selectors exported by `@videojs/html` (`selectVolume`, `selectTextTrack`, `selectQuality`, and the rest) read a feature's slice from any store, returning `undefined` when the feature isn't present.
-- Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media element, so state and UI stay consistent.
+- Restore through the feature actions (`setVolume`, `setMuted`, `selectSubtitlesTrack`, `selectVideoRendition`) rather than poking the media component, so state and UI stay consistent.
 - Actions need an attached media target: calling one before the store attaches throws. Check `store.target` and defer the restore until it is set, as the examples do.
 </FrameworkCase>
 
 ## Availability and constraints
 
-- Video.js does not write preferences to storage. Initial values come from the media element, track markup, and playback engine.
+- Video.js does not write preferences to storage. Initial values come from the media component, track markup, and playback engine.
 - `setVolume` clamps to 0–1 and unmutes above zero. Restore volume first, then call `setMuted(true)` if the saved preference is muted. Calling `setMuted(false)` at zero raises the volume to 0.25.
 - The volume examples leave autoplay off. For muted autoplay, defer volume restoration until a user action: restoring a positive volume unmutes the media and can interrupt autoplay, even if you immediately mute it again.
 - `setVolume` and `setMuted` update `store.state` immediately. A React hook's selected value updates on the next render.

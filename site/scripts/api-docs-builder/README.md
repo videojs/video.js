@@ -67,7 +67,7 @@ site/scripts/api-docs-builder/
     ├── css-vars-handler.ts    # Extracts CSS custom properties
     ├── feature-handler.ts     # Extracts player feature state and actions
     ├── html-handler.ts        # Extracts Lit element info
-    ├── media-element-handler.ts # Extracts media element APIs
+    ├── media-element-handler.ts # Extracts media component APIs
     ├── parts-handler.ts       # Parses index.parts.ts for multi-part components
     ├── preset-handler.ts      # Extracts preset composition
     ├── util-handler.ts        # Extracts util params/return from store/react packages
@@ -80,7 +80,7 @@ site/scripts/api-docs-builder/
 site/src/
 ├── content/generated-component-reference/  # Generated component JSON (gitignored)
 ├── content/generated-feature-reference/    # Generated player feature JSON (gitignored)
-├── content/generated-media-reference/      # Generated media element JSON (gitignored)
+├── content/generated-media-reference/      # Generated media component JSON (gitignored)
 ├── content/generated-preset-reference/     # Generated preset JSON (gitignored)
 ├── content/generated-util-reference/       # Generated util JSON (gitignored)
 └── components/docs/api-reference/

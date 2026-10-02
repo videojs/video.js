@@ -12,15 +12,17 @@ import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface YouTubeVideoProps
   extends Partial<YouTubeAdapterProps>, MediaEventProps<YouTubeAdapter>, MediaRefProps<YouTubeAdapter> {
+  /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
+  autoPlay?: boolean | undefined;
   children?: ReactNode;
 }
 
 export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(function YouTubeVideo(
-  { children, mediaRef, ...rawProps },
+  { children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
   const media = useMediaInstance(YouTubeAdapter);
-  const props: Partial<YouTubeAdapterProps> & Record<string, unknown> = { ...rawProps };
+  const props: Partial<YouTubeAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // `source.src` is the only other way to name a video, so honor it when `src` is absent.
     buildYouTubeIframeSrc(props.src || props.source?.src || '', { ...YouTubeAdapter.defaultProps, ...props })

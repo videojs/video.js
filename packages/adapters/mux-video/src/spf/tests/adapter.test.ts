@@ -293,6 +293,21 @@ describe('MuxVideoAdapter', () => {
     expect(onSourceChange).not.toHaveBeenCalled();
   });
 
+  it('ignores a src that describes the current source, with or without .m3u8', () => {
+    const media = new MuxVideoAdapter();
+
+    media.source = { playbackId: 'abc123', poster: { time: 5 } };
+
+    const onSourceChange = vi.fn();
+
+    media.addEventListener('sourcechange', onSourceChange);
+    media.src = 'https://stream.mux.com/abc123.m3u8';
+    media.src = 'https://stream.mux.com/abc123';
+
+    expect(onSourceChange).not.toHaveBeenCalled();
+    expect(media.source).toEqual({ playbackId: 'abc123', poster: { time: 5 } });
+  });
+
   it('keeps the presentation when only image params change', () => {
     const media = new MuxVideoAdapter();
 

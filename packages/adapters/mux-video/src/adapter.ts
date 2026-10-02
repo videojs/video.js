@@ -56,8 +56,9 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
   }
 
   /**
-   * Media source URL. Setting a Mux stream URL (`https://stream.mux.com/<playback-id>.m3u8?...`) extracts the playback
-   * ID and query params into `source`; other URLs are kept as a plain `source.src`.
+   * Media source URL. Setting a Mux stream URL (`https://stream.mux.com/<playback-id>.m3u8?...`, with or without the
+   * `.m3u8` extension) extracts the playback ID and query params into `source`; other URLs are kept as a plain
+   * `source.src`.
    *
    * Only playback options carry over. Mux identity comes from the URL, and the signed `poster`, `storyboard`, and `drm`
    * tokens are scoped to a playback ID, so carrying them onto a different source would build rejected URLs.
@@ -67,10 +68,12 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
   }
 
   set src(value: string) {
-    // A URL already describing the current source leaves it alone. `<mux-video>`
-    // reflects the derived `src` back to the host, and re-deriving would drop the
-    // params a Mux URL does not carry, such as `poster`.
-    if (super.src === value) return;
+    const parsed = parseMuxVideoURL(value);
+    // A URL already describing the current source leaves it alone, compared in
+    // its canonical `.m3u8` form. `<mux-video>` reflects the derived `src` back to
+    // the host, React re-syncs the authored one on every render, and re-deriving
+    // would drop the params a Mux URL does not carry, such as `poster`.
+    if (super.src === (createMuxVideoURL(parsed) ?? value)) return;
 
     const { type, preferPlayback, engine, maxAutoResolution, capRenditionToPlayerSize, minAutoResolution } =
       this.#source ?? {};
@@ -81,7 +84,7 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
       ...(maxAutoResolution && { maxAutoResolution }),
       ...(capRenditionToPlayerSize !== undefined && { capRenditionToPlayerSize }),
       ...(minAutoResolution && { minAutoResolution }),
-      ...(parseMuxVideoURL(value) ?? (value ? { src: value } : null)),
+      ...(parsed ?? (value ? { src: value } : null)),
     };
 
     this.source = Object.keys(source).length > 0 ? source : null;

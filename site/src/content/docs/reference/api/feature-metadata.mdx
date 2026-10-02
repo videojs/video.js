@@ -118,6 +118,6 @@ The flow between an attribute and its property runs one way: an attribute change
 
 The media tier comes from media that reports content data and announces changes to it, and it covers `title` and `poster`. A media reports only the keys it can vouch for, so either may be absent while the other arrives. A key that never arrives means that tier never contributes, and the resolved value is whatever you set. Detaching the media clears its values; the values you set survive and apply to the next source.
 
-`poster` is the feature's own resolved value, not the media element's `poster` attribute. Setting one does not set the other.
+`poster` is the feature's own resolved value, not the media component's `poster` attribute. Setting one does not set the other.
 
 A low-resolution stand-in to show while the poster loads is not part of this feature. The <DocsLink slug="reference/components/poster">poster</DocsLink> renders an `<img>` you control, so give it a `background-image` and that shows until the poster itself paints over it. <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink> walks through that technique for each framework.

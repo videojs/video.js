@@ -20,7 +20,7 @@ Capabilities compose as player features. Preset-like feature bundles are conveni
 
 ### One store owns one composite player target
 
-A player uses one store whose target can contain both the media element and an optional container. One state graph makes cross-feature derivation and debugging simpler; the optional container keeps headless and audio-only composition possible.
+A player uses one store whose target can contain both the media component and an optional container. One state graph makes cross-feature derivation and debugging simpler; the optional container keeps headless and audio-only composition possible.
 
 The cost is that media-only features receive a broader target than they strictly need. The consistent lifecycle and selector model were judged more valuable than multiple coordinated stores.
 

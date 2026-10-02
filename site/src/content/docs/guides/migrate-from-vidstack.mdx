@@ -50,7 +50,7 @@ Video.js 10 splits those jobs:
 
 **The player** holds state and hands it to everything inside it. It draws nothing and takes no layout. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from.
 
-**The media** plays the video. This is where Vidstack's *provider* went, except you choose it yourself: a plain `<video>` for progressive files, or a <DocsLink slug="guides/media-sources">media component</DocsLink> for HLS, DASH, YouTube, Vimeo, and Mux. There's no `<media-provider>`; the media element sits inside the skin.
+**The media** plays the video. This is where Vidstack's *provider* went, except you choose it yourself: a plain `<video>` for progressive files, or a <DocsLink slug="guides/media-sources">media component</DocsLink> for HLS, DASH, YouTube, Vimeo, and Mux. There's no `<media-provider>`; the media component sits inside the skin.
 
 **The skin** is the UI, and it's where Vidstack's *layout* went. Every skin renders a container, the box that sizes the player, goes fullscreen, and receives gestures and hotkeys.
 
@@ -259,7 +259,7 @@ Remove `controls` yourself: Video.js doesn't turn native controls off when a ski
 
 `<media-player>` accepted about fifty props. In Video.js they scatter in four directions:
 
-1. **Media attributes** move to the media element, where the browser already understands them.
+1. **Media attributes** move to the media component, where the browser already understands them.
 2. **Player metadata**, the title and poster, stays on the player so the skin can render it.
 3. **Playback values** such as volume and current time become actions you call.
 4. **Behavior** such as live UI, shortcuts, and casting becomes a choice of preset, component, or extension.
@@ -350,7 +350,7 @@ Import each media component from `@videojs/react/media/<name>`, for example `@vi
 | Vimeo | <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | `@videojs/vimeo-video` |
 | Remotion | No equivalent ([#3053](https://github.com/videojs/v10/issues/3053)) | |
 
-Register each media element with `import '@videojs/html/media/<name>'`, or load `{{VJS10_CDN_BASE}}/media/<name>.js` from the CDN, where the engine is already bundled.
+Register each media component with `import '@videojs/html/media/<name>'`, or load `{{VJS10_CDN_BASE}}/media/<name>.js` from the CDN, where the engine is already bundled.
 </FrameworkCase>
 
 ### HLS and DASH
@@ -418,7 +418,7 @@ media.source = { src: '/stream.m3u8', engine: { hlsJs: { maxBufferLength: 60 } }
 `source` is replaced, not merged. Changing hls.js options rebuilds the engine; dash.js and Shaka apply new settings to the running one. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for the options every engine shares, such as `preferPlayback`, rendition caps, and DRM.
 
 <FrameworkCase frameworks={["react"]}>
-Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
+Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Outside the player, pass `mediaRef` to `HlsJsVideo` instead: it receives the same `HlsJsAdapter`, so `mediaRef.current?.engine` is already typed as the hls.js instance. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
 
 ```tsx
 import { useMedia } from '@videojs/react';
@@ -443,7 +443,7 @@ function LevelLogger() {
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Where you used `provider.instance` or `onInstance`, read `.engine` on the media element. For hls.js's event names, import `Hls` from `@videojs/hlsjs-video`, the package you installed for `<hlsjs-video>`, which exports it for this kind of low-level access. Vidstack re-dispatched hls.js events as `hls-*` events on the player; Video.js doesn't forward engine events, so subscribe on the engine itself:
+Where you used `provider.instance` or `onInstance`, read `.engine` on the media component. For hls.js's event names, import `Hls` from `@videojs/hlsjs-video`, the package you installed for `<hlsjs-video>`, which exports it for this kind of low-level access. Vidstack re-dispatched hls.js events as `hls-*` events on the player; Video.js doesn't forward engine events, so subscribe on the engine itself:
 
 ```js
 import { Hls } from '@videojs/hlsjs-video';
@@ -884,7 +884,7 @@ Several roots render no element of their own: `Controls.Root`, `Tooltip.Root`, `
 | Vidstack | Video.js 10 |
 |---|---|
 | `<media-player>` | `<video-player>` plus the skin's `<media-container>` |
-| `<media-provider>` | The media element: `<video>`, `<hlsjs-video>`, `<youtube-video>`, … |
+| `<media-provider>` | The media component: `<video>`, `<hlsjs-video>`, `<youtube-video>`, … |
 | `<media-play-button>`, `<media-mute-button>`, `<media-fullscreen-button>`, `<media-airplay-button>`, `<media-live-button>`, `<media-seek-button>`, `<media-pip-button>` | Same tags |
 | `<media-caption-button>` | `<media-captions-button>` |
 | `<media-google-cast-button>` | `<media-cast-button>` |
@@ -1047,10 +1047,12 @@ The store has no toggles apart from `toggleSubtitles()` and `toggleControls()`, 
 Vidstack methods took an optional trigger event as their last argument. Video.js actions don't, so wrap them in a handler, as in `onClick={() => seek(30)}`. Passing an action straight to `onClick` would hand it the click event.
 
 <FrameworkCase frameworks={["react"]}>
-Where you called `play()` or set `currentTime` through a `MediaPlayerInstance` ref, pass `mediaRef` to the media component instead. It receives the element for `Video`, `HlsJsVideo`, and other `<video>`-backed media, and the playback adapter for embeds:
+Where you called `play()` or set `currentTime` through a `MediaPlayerInstance` ref, pass `mediaRef` to the media component instead. It receives the element for `Video` and `Audio`, and the playback adapter for `HlsJsVideo`, embeds, and other adapter-backed media. That's the same object `useMedia()` returns:
 
 ```tsx
-const mediaRef = useRef<HTMLVideoElement>(null);
+import type { HlsJsAdapter } from '@videojs/hlsjs-video';
+
+const mediaRef = useRef<HlsJsAdapter>(null);
 
 <HlsJsVideo mediaRef={mediaRef} src="https://example.com/stream.m3u8" />
 
@@ -1098,7 +1100,7 @@ function FullscreenTracker() {
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Listen on the media element with native event names: `canplay` for `can-play`, `loadedmetadata` for `loaded-metadata`, and so on. Media events don't bubble, so a listener on `<video-player>` won't hear them. For anything that isn't a media event, subscribe to the store and compare values, as in [Read player state](#read-player-state).
+Listen on the media component with native event names: `canplay` for `can-play`, `loadedmetadata` for `loaded-metadata`, and so on. Media events don't bubble, so a listener on `<video-player>` won't hear them. For anything that isn't a media event, subscribe to the store and compare values, as in [Read player state](#read-player-state).
 </FrameworkCase>
 
 | Vidstack event | Video.js 10 |
@@ -1350,7 +1352,7 @@ Move `autoPlay` from `MediaPlayer` to the media component, along with `muted` an
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Move `autoplay` from `<media-player>` to the media element, along with `muted` and `playsinline`. There's no `auto-play-fail` event or `autoPlayError` state; a blocked autoplay looks like media that never started. To react to it, leave out `autoplay`, call `play()` once the player attaches, and catch the rejection. See <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
+Move `autoplay` from `<media-player>` to the media component, along with `muted` and `playsinline`. There's no `auto-play-fail` event or `autoPlayError` state; a blocked autoplay looks like media that never started. To react to it, leave out `autoplay`, call `play()` once the player attaches, and catch the rejection. See <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -1363,7 +1365,7 @@ In Angular, add `CUSTOM_ELEMENTS_SCHEMA` to the `schemas` of the component that 
 
 ## Element lifecycle
 
-Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js keeps the attribute but doesn't pass it down: set it on each element you plan to move. When you're done with them, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media elements. Packaged skins don't pass it to their controls either ([#3036](https://github.com/videojs/v10/issues/3036)), so move a player that uses one synchronously. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
+Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js keeps the attribute but doesn't pass it down: set it on each element you plan to move. When you're done with them, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media components. Packaged skins don't pass it to their controls either ([#3036](https://github.com/videojs/v10/issues/3036)), so move a player that uses one synchronously. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
 
 </FrameworkCase>
 

@@ -1,16 +1,3 @@
----
-import { BANNER_DISMISS_KEY } from '@/consts';
----
-
-{/* Hide a dismissed legacy banner before paint. */}
-<script is:inline define:vars={{ bannerKey: BANNER_DISMISS_KEY }}>
-  try {
-    if (localStorage[bannerKey] === "true") {
-      document.documentElement.classList.add("banner-dismissed");
-    }
-  } catch (e) {}
-</script>
-
 <script>
   import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 
@@ -40,7 +27,6 @@ import { BANNER_DISMISS_KEY } from '@/consts';
     const height = currentRoot.style.getPropertyValue('--banner-height');
 
     nextRoot.style.setProperty('--banner-height', height);
-    nextRoot.classList.toggle('banner-dismissed', currentRoot.classList.contains('banner-dismissed'));
   };
 
   observeBannerHeight();
