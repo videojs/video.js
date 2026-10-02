@@ -134,17 +134,21 @@ const behaviors = [
   externalSignals,
 ] as const;
 
+type Behaviors = typeof behaviors;
+/** Every config key the behaviors read, before `defaultConfig` makes any optional. */
+type Config = ResolveBehaviorConfig<Behaviors>;
+
 /** State shape for the audio-only HLS playback engine: every state key its behaviors and inputs declare. */
-export type EngineState = ResolveBehaviorState<typeof behaviors>;
+export type EngineState = ResolveBehaviorState<Behaviors>;
 
 /** Context shape for the audio-only HLS playback engine: every context key its behaviors declare. */
-export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
+export type EngineContext = ResolveBehaviorContext<Behaviors>;
 
 /**
  * Configuration for the audio-only HLS playback engine: every config key its behaviors read, with each key
  * `defaultConfig` covers optional. Each field is documented on the config type of the behavior that reads it.
  */
-export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
 
 // ============================================================================
 // Audio-Only HLS Playback Engine
@@ -170,7 +174,7 @@ export const defaultConfig = {
   // `establishStartMediaTime` derives from; same `deriveStartMediaTime` seam. Remove
   // with the reactor.
   audioMessagePipelines: relocationPipelinesFor('audio'),
-} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
+} satisfies Partial<Config>;
 
 /** The state the engine starts with. Nothing needs seeding; exported so every engine module has the same shape. */
 export const initialState = {} satisfies Partial<EngineState>;
