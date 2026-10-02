@@ -37,7 +37,7 @@ import { excludeUnplayableTracks } from '../../primitives/selection-rules';
  * The behaviors the background-video playback engine composes, in setup order. The engine's state and context types are
  * derived from this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const behaviors = [
+export const behaviors = [
   resolvePresentation,
   // Presentation duration
   calculatePresentationDuration,
@@ -71,9 +71,9 @@ const behaviors = [
   endOfStream,
 ] as const;
 
-type Behaviors = typeof behaviors;
+export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
-type Config = ResolveBehaviorConfig<Behaviors>;
+export type Config = ResolveBehaviorConfig<Behaviors>;
 
 /**
  * State shape for the background-video playback engine: every state key its behaviors declare.

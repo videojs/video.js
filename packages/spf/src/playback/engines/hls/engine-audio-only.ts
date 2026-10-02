@@ -52,7 +52,7 @@ const externalSignals = defineExternalSignals<UserTrackSelectionState<'audio'> &
  * The behaviors the audio-only HLS playback engine composes, in setup order. The engine's state and context types are
  * derived from this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const behaviors = [
+export const behaviors = [
   syncPreload,
   trackLoadTriggers,
   resolvePresentation,
@@ -134,9 +134,9 @@ const behaviors = [
   externalSignals,
 ] as const;
 
-type Behaviors = typeof behaviors;
+export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
-type Config = ResolveBehaviorConfig<Behaviors>;
+export type Config = ResolveBehaviorConfig<Behaviors>;
 
 /** State shape for the audio-only HLS playback engine: every state key its behaviors and external signals declare. */
 export type EngineState = ResolveBehaviorState<Behaviors>;
