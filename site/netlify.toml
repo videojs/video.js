@@ -1525,387 +1525,1183 @@
   to = "https://legacy.videojs.org/guides/:splat"
   status = 308
 
-# Redirect old Tumblr blog post URLs (migrated from videojs.tumblr.com)
+# The index ran to eight pages while it held the pre-v10 posts. Temporary and not forced, so pages the v10 blog
+# grows into win and browsers have not cached the hop.
+[[redirects]]
+  from = "/blog/2"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/3"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/4"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/5"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/6"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/7"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/8"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+# Authors who only wrote pre-v10 posts; the legacy blog has no author pages. Temporary, since an author who writes
+# for v10 gets their page back.
+[[redirects]]
+  from = "/blog/authors/matthew-mcclure"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/pat-oneill"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/garrett-singer"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/brandon-casey"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/gary-katsevman"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/jim-whisenant"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/jon-carlos-rivera"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/lahiru-dayananda"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/david-lapalomento"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/michael-roca"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+[[redirects]]
+  from = "/blog/authors/greg-smith"
+  to = "https://legacy.videojs.org/blog"
+  status = 307
+
+# Pre-v10 blog posts live on the legacy site. Each post has a .md twin.
+# legacy.videojs.org serves two posts under slugs its build prefixed with the previous post's filename.
+[[redirects]]
+  from = "/blog/new-videojs-site-now-with-more-html5"
+  to = "https://legacy.videojs.org/blog/new-videojs-site-now-with-more-html5"
+  status = 308
+
+[[redirects]]
+  from = "/blog/new-videojs-site-now-with-more-html5.md"
+  to = "https://legacy.videojs.org/blog/new-videojs-site-now-with-more-html5"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-is-ie9-compatible"
+  to = "https://legacy.videojs.org/blog/videojs-is-ie9-compatible"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-is-ie9-compatible.md"
+  to = "https://legacy.videojs.org/blog/videojs-is-ie9-compatible"
+  status = 308
+
+[[redirects]]
+  from = "/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
+  to = "https://legacy.videojs.org/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
+  status = 308
+
+[[redirects]]
+  from = "/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix.md"
+  to = "https://legacy.videojs.org/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
+  status = 308
+
+[[redirects]]
+  from = "/blog/facebook-adds-html5-video"
+  to = "https://legacy.videojs.org/blog/facebook-adds-html5-video"
+  status = 308
+
+[[redirects]]
+  from = "/blog/facebook-adds-html5-video.md"
+  to = "https://legacy.videojs.org/blog/facebook-adds-html5-video"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-1-1-3-release"
+  to = "https://legacy.videojs.org/blog/version-1-1-3-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-1-1-3-release.md"
+  to = "https://legacy.videojs.org/blog/version-1-1-3-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-1-1-4-release-css-loading-spinner-more"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more.mdxversion-1-1-4-release-css-loading-spinner-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-1-1-4-release-css-loading-spinner-more.md"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more.mdxversion-1-1-4-release-css-loading-spinner-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/1-1-5-release-subtitles-using-track-android-fix-more"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/1-1-5-release-subtitles-using-track-android-fix-more.md"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/make-sites-serve-you-html5-video-in-safari"
+  to = "https://legacy.videojs.org/blog/make-sites-serve-you-html5-video-in-safari"
+  status = 308
+
+[[redirects]]
+  from = "/blog/make-sites-serve-you-html5-video-in-safari.md"
+  to = "https://legacy.videojs.org/blog/make-sites-serve-you-html5-video-in-safari"
+  status = 308
+
+[[redirects]]
+  from = "/blog/2-0-0-release-behaviors-fallback-apis-and-more"
+  to = "https://legacy.videojs.org/blog/2-0-0-release-behaviors-fallback-apis-and-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/2-0-0-release-behaviors-fallback-apis-and-more.md"
+  to = "https://legacy.videojs.org/blog/2-0-0-release-behaviors-fallback-apis-and-more"
+  status = 308
+
+[[redirects]]
+  from = "/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
+  to = "https://legacy.videojs.org/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
+  status = 308
+
+[[redirects]]
+  from = "/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix.md"
+  to = "https://legacy.videojs.org/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
+  status = 308
+
+[[redirects]]
+  from = "/blog/html5-video-google-maps-mashup"
+  to = "https://legacy.videojs.org/blog/html5-video-google-maps-mashup"
+  status = 308
+
+[[redirects]]
+  from = "/blog/html5-video-google-maps-mashup.md"
+  to = "https://legacy.videojs.org/blog/html5-video-google-maps-mashup"
+  status = 308
+
+[[redirects]]
+  from = "/blog/over-50-of-web-users-now-support-html5-video"
+  to = "https://legacy.videojs.org/blog/over-50-of-web-users-now-support-html5-video"
+  status = 308
+
+[[redirects]]
+  from = "/blog/over-50-of-web-users-now-support-html5-video.md"
+  to = "https://legacy.videojs.org/blog/over-50-of-web-users-now-support-html5-video"
+  status = 308
+
+[[redirects]]
+  from = "/blog/google-is-dropping-h-264-from-chrome"
+  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome"
+  status = 308
+
+[[redirects]]
+  from = "/blog/google-is-dropping-h-264-from-chrome.md"
+  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome"
+  status = 308
+
+[[redirects]]
+  from = "/blog/apple-adds-airplay-to-mobile-safari"
+  to = "https://legacy.videojs.org/blog/apple-adds-airplay-to-mobile-safari"
+  status = 308
+
+[[redirects]]
+  from = "/blog/apple-adds-airplay-to-mobile-safari.md"
+  to = "https://legacy.videojs.org/blog/apple-adds-airplay-to-mobile-safari"
+  status = 308
+
+[[redirects]]
+  from = "/blog/new-mpeg-la-webm-vp8-patent-pool"
+  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool"
+  status = 308
+
+[[redirects]]
+  from = "/blog/new-mpeg-la-webm-vp8-patent-pool.md"
+  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool"
+  status = 308
+
+[[redirects]]
+  from = "/blog/how-are-you-using-video-js"
+  to = "https://legacy.videojs.org/blog/how-are-you-using-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/how-are-you-using-video-js.md"
+  to = "https://legacy.videojs.org/blog/how-are-you-using-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/lynda-com-html5-video-tutorial-released"
+  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/lynda-com-html5-video-tutorial-released.md"
+  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-3-0"
+  to = "https://legacy.videojs.org/blog/video-js-version-3-0"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-3-0.md"
+  to = "https://legacy.videojs.org/blog/video-js-version-3-0"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-3-1-update"
+  to = "https://legacy.videojs.org/blog/version-3-1-update"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-3-1-update.md"
+  to = "https://legacy.videojs.org/blog/version-3-1-update"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-3-2-update"
+  to = "https://legacy.videojs.org/blog/version-3-2-update"
+  status = 308
+
+[[redirects]]
+  from = "/blog/version-3-2-update.md"
+  to = "https://legacy.videojs.org/blog/version-3-2-update"
+  status = 308
+
+[[redirects]]
+  from = "/blog/brightcove-acquires-zencoder"
+  to = "https://legacy.videojs.org/blog/brightcove-acquires-zencoder"
+  status = 308
+
+[[redirects]]
+  from = "/blog/brightcove-acquires-zencoder.md"
+  to = "https://legacy.videojs.org/blog/brightcove-acquires-zencoder"
+  status = 308
+
+[[redirects]]
+  from = "/blog/site-and-support-updates"
+  to = "https://legacy.videojs.org/blog/site-and-support-updates"
+  status = 308
+
+[[redirects]]
+  from = "/blog/site-and-support-updates.md"
+  to = "https://legacy.videojs.org/blog/site-and-support-updates"
+  status = 308
+
+[[redirects]]
+  from = "/blog/repo-moved"
+  to = "https://legacy.videojs.org/blog/repo-moved"
+  status = 308
+
+[[redirects]]
+  from = "/blog/repo-moved.md"
+  to = "https://legacy.videojs.org/blog/repo-moved"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-0-now-available"
+  to = "https://legacy.videojs.org/blog/video-js-4-0-now-available"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-0-now-available.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-0-now-available"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-1-0-released"
+  to = "https://legacy.videojs.org/blog/video-js-4-1-0-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-1-0-released.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-1-0-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/new-player-skin-designer-for-video-js"
+  to = "https://legacy.videojs.org/blog/new-player-skin-designer-for-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/new-player-skin-designer-for-video-js.md"
+  to = "https://legacy.videojs.org/blog/new-player-skin-designer-for-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/hiding-and-showing-video-player-controls"
+  to = "https://legacy.videojs.org/blog/hiding-and-showing-video-player-controls"
+  status = 308
+
+[[redirects]]
+  from = "/blog/hiding-and-showing-video-player-controls.md"
+  to = "https://legacy.videojs.org/blog/hiding-and-showing-video-player-controls"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
+  to = "https://legacy.videojs.org/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
+  status = 308
+
+[[redirects]]
+  from = "/blog/unauthorized-modification-of-video-js-cdn-files"
+  to = "https://legacy.videojs.org/blog/unauthorized-modification-of-video-js-cdn-files"
+  status = 308
+
+[[redirects]]
+  from = "/blog/unauthorized-modification-of-video-js-cdn-files.md"
+  to = "https://legacy.videojs.org/blog/unauthorized-modification-of-video-js-cdn-files"
+  status = 308
+
+[[redirects]]
+  from = "/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
+  to = "https://legacy.videojs.org/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
+  status = 308
+
+[[redirects]]
+  from = "/blog/running-video-js-unit-tests-in-real-browsers-with-karma.md"
+  to = "https://legacy.videojs.org/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
+  status = 308
+
+[[redirects]]
+  from = "/blog/4-2-2-patch-release"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article.mdx4-2-2-patch-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/4-2-2-patch-release.md"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article.mdx4-2-2-patch-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/the-guardian-uses-video-js-in-feature-article"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article"
+  status = 308
+
+[[redirects]]
+  from = "/blog/the-guardian-uses-video-js-in-feature-article.md"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs.md"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify.md"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along.md"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month.md"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
+  status = 308
+
+[[redirects]]
+  from = "/blog/dash-everywhere-ish-hack-project"
+  to = "https://legacy.videojs.org/blog/dash-everywhere-ish-hack-project"
+  status = 308
+
+[[redirects]]
+  from = "/blog/dash-everywhere-ish-hack-project.md"
+  to = "https://legacy.videojs.org/blog/dash-everywhere-ish-hack-project"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
+  to = "https://legacy.videojs.org/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js.md"
+  to = "https://legacy.videojs.org/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-8-0-released-prost"
+  to = "https://legacy.videojs.org/blog/video-js-4-8-0-released-prost"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-8-0-released-prost.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-8-0-released-prost"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-9-now-can-join-the-party"
+  to = "https://legacy.videojs.org/blog/video-js-4-9-now-can-join-the-party"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-9-now-can-join-the-party.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-9-now-can-join-the-party"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-12-the-last-of-the-4-minors"
+  to = "https://legacy.videojs.org/blog/video-js-4-12-the-last-of-the-4-minors"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-4-12-the-last-of-the-4-minors.md"
+  to = "https://legacy.videojs.org/blog/video-js-4-12-the-last-of-the-4-minors"
+  status = 308
+
+[[redirects]]
+  from = "/blog/it-s-here-5-0-release-candidates"
+  to = "https://legacy.videojs.org/blog/it-s-here-5-0-release-candidates"
+  status = 308
+
+[[redirects]]
+  from = "/blog/it-s-here-5-0-release-candidates.md"
+  to = "https://legacy.videojs.org/blog/it-s-here-5-0-release-candidates"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
+  to = "https://legacy.videojs.org/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name.md"
+  to = "https://legacy.videojs.org/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-s-fluid-mode-and-playlist-picker"
+  to = "https://legacy.videojs.org/blog/video-js-5-s-fluid-mode-and-playlist-picker"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-s-fluid-mode-and-playlist-picker.md"
+  to = "https://legacy.videojs.org/blog/video-js-5-s-fluid-mode-and-playlist-picker"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-11-0-prelease"
+  to = "https://legacy.videojs.org/blog/video-js-5-11-0-prelease"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-11-0-prelease.md"
+  to = "https://legacy.videojs.org/blog/video-js-5-11-0-prelease"
+  status = 308
+
+[[redirects]]
+  from = "/blog/the-end-of-html-first"
+  to = "https://legacy.videojs.org/blog/the-end-of-html-first"
+  status = 308
+
+[[redirects]]
+  from = "/blog/the-end-of-html-first.md"
+  to = "https://legacy.videojs.org/blog/the-end-of-html-first"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-12-0-and-5-11-5-releases"
+  to = "https://legacy.videojs.org/blog/video-js-5-12-0-and-5-11-5-releases"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-5-12-0-and-5-11-5-releases.md"
+  to = "https://legacy.videojs.org/blog/video-js-5-12-0-and-5-11-5-releases"
+  status = 308
+
+[[redirects]]
+  from = "/blog/introducing-thumbcoil"
+  to = "https://legacy.videojs.org/blog/introducing-thumbcoil"
+  status = 308
+
+[[redirects]]
+  from = "/blog/introducing-thumbcoil.md"
+  to = "https://legacy.videojs.org/blog/introducing-thumbcoil"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-0-0-rc-0-the-first-rc"
+  to = "https://legacy.videojs.org/blog/video-js-6-0-0-rc-0-the-first-rc"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-0-0-rc-0-the-first-rc.md"
+  to = "https://legacy.videojs.org/blog/video-js-6-0-0-rc-0-the-first-rc"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-advanced-plugins"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-advanced-plugins"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-advanced-plugins.md"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-advanced-plugins"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-accessibility"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-accessibility"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-accessibility.md"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-accessibility"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-removes-flash-from-core-player"
+  to = "https://legacy.videojs.org/blog/video-js-removes-flash-from-core-player"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-removes-flash-from-core-player.md"
+  to = "https://legacy.videojs.org/blog/video-js-removes-flash-from-core-player"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-middleware"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-middleware"
+  status = 308
+
+[[redirects]]
+  from = "/blog/feature-spotlight-middleware.md"
+  to = "https://legacy.videojs.org/blog/feature-spotlight-middleware"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-0-release"
+  to = "https://legacy.videojs.org/blog/video-js-6-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-0-release.md"
+  to = "https://legacy.videojs.org/blog/video-js-6-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-4-0-release"
+  to = "https://legacy.videojs.org/blog/video-js-6-4-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-4-0-release.md"
+  to = "https://legacy.videojs.org/blog/video-js-6-4-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-5-0-release"
+  to = "https://legacy.videojs.org/blog/video-js-6-5-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-5-0-release.md"
+  to = "https://legacy.videojs.org/blog/video-js-6-5-0-release"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-7-1-released"
+  to = "https://legacy.videojs.org/blog/video-js-6-7-1-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-6-7-1-released.md"
+  to = "https://legacy.videojs.org/blog/video-js-6-7-1-released"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-vr-now-under-the-video-js-org"
+  to = "https://legacy.videojs.org/blog/videojs-vr-now-under-the-video-js-org"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-vr-now-under-the-video-js-org.md"
+  to = "https://legacy.videojs.org/blog/videojs-vr-now-under-the-video-js-org"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-roadmap"
+  to = "https://legacy.videojs.org/blog/video-js-7-roadmap"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-roadmap.md"
+  to = "https://legacy.videojs.org/blog/video-js-7-roadmap"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-contrib-ads-6"
+  to = "https://legacy.videojs.org/blog/videojs-contrib-ads-6"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-contrib-ads-6.md"
+  to = "https://legacy.videojs.org/blog/videojs-contrib-ads-6"
+  status = 308
+
+[[redirects]]
+  from = "/blog/autoplay-best-practices-with-video-js"
+  to = "https://legacy.videojs.org/blog/autoplay-best-practices-with-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/autoplay-best-practices-with-video-js.md"
+  to = "https://legacy.videojs.org/blog/autoplay-best-practices-with-video-js"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-is-here"
+  to = "https://legacy.videojs.org/blog/video-js-7-is-here"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-is-here.md"
+  to = "https://legacy.videojs.org/blog/video-js-7-is-here"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-1-and-6-11-autoplay-and-fullscreen-changes"
+  to = "https://legacy.videojs.org/blog/video-js-7-1-and-6-11-autoplay-and-fullscreen-changes"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-1-and-6-11-autoplay-and-fullscreen-changes.md"
+  to = "https://legacy.videojs.org/blog/video-js-7-1-and-6-11-autoplay-and-fullscreen-changes"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createLogger"
+  to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createLogger"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createLogger.md"
+  to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createLogger"
+  status = 308
+
+[[redirects]]
+  from = "/blog/introducing-video-js-http-streaming-vhs"
+  to = "https://legacy.videojs.org/blog/introducing-video-js-http-streaming-vhs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/introducing-video-js-http-streaming-vhs.md"
+  to = "https://legacy.videojs.org/blog/introducing-video-js-http-streaming-vhs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/bugpost-disconnects-and-reconnects"
+  to = "https://legacy.videojs.org/blog/bugpost-disconnects-and-reconnects"
+  status = 308
+
+[[redirects]]
+  from = "/blog/bugpost-disconnects-and-reconnects.md"
+  to = "https://legacy.videojs.org/blog/bugpost-disconnects-and-reconnects"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-4"
+  to = "https://legacy.videojs.org/blog/video-js-7-4"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-4.md"
+  to = "https://legacy.videojs.org/blog/video-js-7-4"
+  status = 308
+
+[[redirects]]
+  from = "/blog/inband-captions-support-with-vhs"
+  to = "https://legacy.videojs.org/blog/inband-captions-support-with-vhs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/inband-captions-support-with-vhs.md"
+  to = "https://legacy.videojs.org/blog/inband-captions-support-with-vhs"
+  status = 308
+
+[[redirects]]
+  from = "/blog/announcing-the-new-videojs-com"
+  to = "https://legacy.videojs.org/blog/announcing-the-new-videojs-com"
+  status = 308
+
+[[redirects]]
+  from = "/blog/announcing-the-new-videojs-com.md"
+  to = "https://legacy.videojs.org/blog/announcing-the-new-videojs-com"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-8-and-vhs-3"
+  to = "https://legacy.videojs.org/blog/videojs-8-and-vhs-3"
+  status = 308
+
+[[redirects]]
+  from = "/blog/videojs-8-and-vhs-3.md"
+  to = "https://legacy.videojs.org/blog/videojs-8-and-vhs-3"
+  status = 308
+
+# Redirect old Tumblr blog post URLs (migrated from videojs.tumblr.com) to the legacy blog
 # Each post had a numeric Tumblr ID; URLs may include an optional slug after the ID.
 [[redirects]]
   from = "/blog/post/35888462908/*"
-  to = "/blog/new-videojs-site-now-with-more-html5"
+  to = "https://legacy.videojs.org/blog/new-videojs-site-now-with-more-html5"
   status = 308
 [[redirects]]
   from = "/blog/post/35888462908"
-  to = "/blog/new-videojs-site-now-with-more-html5"
+  to = "https://legacy.videojs.org/blog/new-videojs-site-now-with-more-html5"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35888302484/*"
-  to = "/blog/videojs-is-ie9-compatible"
+  to = "https://legacy.videojs.org/blog/videojs-is-ie9-compatible"
   status = 308
 [[redirects]]
   from = "/blog/post/35888302484"
-  to = "/blog/videojs-is-ie9-compatible"
+  to = "https://legacy.videojs.org/blog/videojs-is-ie9-compatible"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35888138568/*"
-  to = "/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
+  to = "https://legacy.videojs.org/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
   status = 308
 [[redirects]]
   from = "/blog/post/35888138568"
-  to = "/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
+  to = "https://legacy.videojs.org/blog/ipad-iphone-video-poster-fix-bonus-javascript-placement-fix"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35887879903/*"
-  to = "/blog/facebook-adds-html5-video"
+  to = "https://legacy.videojs.org/blog/facebook-adds-html5-video"
   status = 308
 [[redirects]]
   from = "/blog/post/35887879903"
-  to = "/blog/facebook-adds-html5-video"
+  to = "https://legacy.videojs.org/blog/facebook-adds-html5-video"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35887731208/*"
-  to = "/blog/version-1-1-3-release"
+  to = "https://legacy.videojs.org/blog/version-1-1-3-release"
   status = 308
 [[redirects]]
   from = "/blog/post/35887731208"
-  to = "/blog/version-1-1-3-release"
+  to = "https://legacy.videojs.org/blog/version-1-1-3-release"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35887428303/*"
-  to = "/blog/1-1-5-release-subtitles-using-track-android-fix-more"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more"
   status = 308
 [[redirects]]
   from = "/blog/post/35887428303"
-  to = "/blog/1-1-5-release-subtitles-using-track-android-fix-more"
+  to = "https://legacy.videojs.org/blog/1-1-5-release-subtitles-using-track-android-fix-more"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35887203978/*"
-  to = "/blog/make-sites-serve-you-html5-video-in-safari"
+  to = "https://legacy.videojs.org/blog/make-sites-serve-you-html5-video-in-safari"
   status = 308
 [[redirects]]
   from = "/blog/post/35887203978"
-  to = "/blog/make-sites-serve-you-html5-video-in-safari"
+  to = "https://legacy.videojs.org/blog/make-sites-serve-you-html5-video-in-safari"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35887003151/*"
-  to = "/blog/2-0-0-release-behaviors-fallback-apis-and-more"
+  to = "https://legacy.videojs.org/blog/2-0-0-release-behaviors-fallback-apis-and-more"
   status = 308
 [[redirects]]
   from = "/blog/post/35887003151"
-  to = "/blog/2-0-0-release-behaviors-fallback-apis-and-more"
+  to = "https://legacy.videojs.org/blog/2-0-0-release-behaviors-fallback-apis-and-more"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35886359508/*"
-  to = "/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
+  to = "https://legacy.videojs.org/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
   status = 308
 [[redirects]]
   from = "/blog/post/35886359508"
-  to = "/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
+  to = "https://legacy.videojs.org/blog/2-0-2-release-subtitle-optimization-safari-on-leopard-fs-fix"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35886098711/*"
-  to = "/blog/html5-video-google-maps-mashup"
+  to = "https://legacy.videojs.org/blog/html5-video-google-maps-mashup"
   status = 308
 [[redirects]]
   from = "/blog/post/35886098711"
-  to = "/blog/html5-video-google-maps-mashup"
+  to = "https://legacy.videojs.org/blog/html5-video-google-maps-mashup"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35885839763/*"
-  to = "/blog/over-50-of-web-users-now-support-html5-video"
+  to = "https://legacy.videojs.org/blog/over-50-of-web-users-now-support-html5-video"
   status = 308
 [[redirects]]
   from = "/blog/post/35885839763"
-  to = "/blog/over-50-of-web-users-now-support-html5-video"
+  to = "https://legacy.videojs.org/blog/over-50-of-web-users-now-support-html5-video"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35885627647/*"
-  to = "/blog/google-is-dropping-h-264-from-chrome"
+  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome"
   status = 308
 [[redirects]]
   from = "/blog/post/35885627647"
-  to = "/blog/google-is-dropping-h-264-from-chrome"
+  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35885444487/*"
-  to = "/blog/apple-adds-airplay-to-mobile-safari"
+  to = "https://legacy.videojs.org/blog/apple-adds-airplay-to-mobile-safari"
   status = 308
 [[redirects]]
   from = "/blog/post/35885444487"
-  to = "/blog/apple-adds-airplay-to-mobile-safari"
+  to = "https://legacy.videojs.org/blog/apple-adds-airplay-to-mobile-safari"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35885249818/*"
-  to = "/blog/new-mpeg-la-webm-vp8-patent-pool"
+  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool"
   status = 308
 [[redirects]]
   from = "/blog/post/35885249818"
-  to = "/blog/new-mpeg-la-webm-vp8-patent-pool"
+  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35885081376/*"
-  to = "/blog/how-are-you-using-video-js"
+  to = "https://legacy.videojs.org/blog/how-are-you-using-video-js"
   status = 308
 [[redirects]]
   from = "/blog/post/35885081376"
-  to = "/blog/how-are-you-using-video-js"
+  to = "https://legacy.videojs.org/blog/how-are-you-using-video-js"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35884942031/*"
-  to = "/blog/lynda-com-html5-video-tutorial-released"
+  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released"
   status = 308
 [[redirects]]
   from = "/blog/post/35884942031"
-  to = "/blog/lynda-com-html5-video-tutorial-released"
+  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35884704314/*"
-  to = "/blog/video-js-version-3-0"
+  to = "https://legacy.videojs.org/blog/video-js-version-3-0"
   status = 308
 [[redirects]]
   from = "/blog/post/35884704314"
-  to = "/blog/video-js-version-3-0"
+  to = "https://legacy.videojs.org/blog/video-js-version-3-0"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35884369527/*"
-  to = "/blog/version-3-1-update"
+  to = "https://legacy.videojs.org/blog/version-3-1-update"
   status = 308
 [[redirects]]
   from = "/blog/post/35884369527"
-  to = "/blog/version-3-1-update"
+  to = "https://legacy.videojs.org/blog/version-3-1-update"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35883671470/*"
-  to = "/blog/version-3-2-update"
+  to = "https://legacy.videojs.org/blog/version-3-2-update"
   status = 308
 [[redirects]]
   from = "/blog/post/35883671470"
-  to = "/blog/version-3-2-update"
+  to = "https://legacy.videojs.org/blog/version-3-2-update"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35666994917/*"
-  to = "/blog/brightcove-acquires-zencoder"
+  to = "https://legacy.videojs.org/blog/brightcove-acquires-zencoder"
   status = 308
 [[redirects]]
   from = "/blog/post/35666994917"
-  to = "/blog/brightcove-acquires-zencoder"
+  to = "https://legacy.videojs.org/blog/brightcove-acquires-zencoder"
   status = 308
 
 [[redirects]]
   from = "/blog/post/35788231775/*"
-  to = "/blog/site-and-support-updates"
+  to = "https://legacy.videojs.org/blog/site-and-support-updates"
   status = 308
 [[redirects]]
   from = "/blog/post/35788231775"
-  to = "/blog/site-and-support-updates"
+  to = "https://legacy.videojs.org/blog/site-and-support-updates"
   status = 308
 
 [[redirects]]
   from = "/blog/post/49797985868/*"
-  to = "/blog/repo-moved"
+  to = "https://legacy.videojs.org/blog/repo-moved"
   status = 308
 [[redirects]]
   from = "/blog/post/49797985868"
-  to = "/blog/repo-moved"
+  to = "https://legacy.videojs.org/blog/repo-moved"
   status = 308
 
 [[redirects]]
   from = "/blog/post/50021214078/*"
-  to = "/blog/video-js-4-0-now-available"
+  to = "https://legacy.videojs.org/blog/video-js-4-0-now-available"
   status = 308
 [[redirects]]
   from = "/blog/post/50021214078"
-  to = "/blog/video-js-4-0-now-available"
+  to = "https://legacy.videojs.org/blog/video-js-4-0-now-available"
   status = 308
 
 [[redirects]]
   from = "/blog/post/54136228059/*"
-  to = "/blog/video-js-4-1-0-released"
+  to = "https://legacy.videojs.org/blog/video-js-4-1-0-released"
   status = 308
 [[redirects]]
   from = "/blog/post/54136228059"
-  to = "/blog/video-js-4-1-0-released"
+  to = "https://legacy.videojs.org/blog/video-js-4-1-0-released"
   status = 308
 
 [[redirects]]
   from = "/blog/post/55553002104/*"
-  to = "/blog/new-player-skin-designer-for-video-js"
+  to = "https://legacy.videojs.org/blog/new-player-skin-designer-for-video-js"
   status = 308
 [[redirects]]
   from = "/blog/post/55553002104"
-  to = "/blog/new-player-skin-designer-for-video-js"
+  to = "https://legacy.videojs.org/blog/new-player-skin-designer-for-video-js"
   status = 308
 
 [[redirects]]
   from = "/blog/post/57828375480/*"
-  to = "/blog/hiding-and-showing-video-player-controls"
+  to = "https://legacy.videojs.org/blog/hiding-and-showing-video-player-controls"
   status = 308
 [[redirects]]
   from = "/blog/post/57828375480"
-  to = "/blog/hiding-and-showing-video-player-controls"
+  to = "https://legacy.videojs.org/blog/hiding-and-showing-video-player-controls"
   status = 308
 
 [[redirects]]
   from = "/blog/post/60471080014/*"
-  to = "/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
+  to = "https://legacy.videojs.org/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
   status = 308
 [[redirects]]
   from = "/blog/post/60471080014"
-  to = "/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
+  to = "https://legacy.videojs.org/blog/video-js-4-2-0-released-rtmp-css-designer-and-stability"
   status = 308
 
 [[redirects]]
   from = "/blog/post/61309840958/*"
-  to = "/blog/unauthorized-modification-of-video-js-cdn-files"
+  to = "https://legacy.videojs.org/blog/unauthorized-modification-of-video-js-cdn-files"
   status = 308
 [[redirects]]
   from = "/blog/post/61309840958"
-  to = "/blog/unauthorized-modification-of-video-js-cdn-files"
+  to = "https://legacy.videojs.org/blog/unauthorized-modification-of-video-js-cdn-files"
   status = 308
 
 [[redirects]]
   from = "/blog/post/61644484835/*"
-  to = "/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
+  to = "https://legacy.videojs.org/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
   status = 308
 [[redirects]]
   from = "/blog/post/61644484835"
-  to = "/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
+  to = "https://legacy.videojs.org/blog/running-video-js-unit-tests-in-real-browsers-with-karma"
   status = 308
 
 [[redirects]]
   from = "/blog/post/66131645152/*"
-  to = "/blog/the-guardian-uses-video-js-in-feature-article"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article"
   status = 308
 [[redirects]]
   from = "/blog/post/66131645152"
-  to = "/blog/the-guardian-uses-video-js-in-feature-article"
+  to = "https://legacy.videojs.org/blog/the-guardian-uses-video-js-in-feature-article"
   status = 308
 
 [[redirects]]
   from = "/blog/post/66138384272/*"
-  to = "/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
   status = 308
 [[redirects]]
   from = "/blog/post/66138384272"
-  to = "/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-3-0-released-w-shiny-new-api-docs"
   status = 308
 
 [[redirects]]
   from = "/blog/post/77214236892/*"
-  to = "/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
   status = 308
 [[redirects]]
   from = "/blog/post/77214236892"
-  to = "/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-4-0-released-now-supporting-requirejs-and-browserify"
   status = 308
 
 [[redirects]]
   from = "/blog/post/80918861872/*"
-  to = "/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
   status = 308
 [[redirects]]
   from = "/blog/post/80918861872"
-  to = "/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-5-0-released-nothing-to-see-here-move-along"
   status = 308
 
 [[redirects]]
   from = "/blog/post/86341869931/*"
-  to = "/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
   status = 308
 [[redirects]]
   from = "/blog/post/86341869931"
-  to = "/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
+  to = "https://legacy.videojs.org/blog/video-js-version-4-6-0-released-it-s-been-a-productive-month"
   status = 308
 
 [[redirects]]
   from = "/blog/post/92536319027/*"
-  to = "/blog/dash-everywhere-ish-hack-project"
+  to = "https://legacy.videojs.org/blog/dash-everywhere-ish-hack-project"
   status = 308
 [[redirects]]
   from = "/blog/post/92536319027"
-  to = "/blog/dash-everywhere-ish-hack-project"
+  to = "https://legacy.videojs.org/blog/dash-everywhere-ish-hack-project"
   status = 308
 
 [[redirects]]
   from = "/blog/post/93989313276/*"
-  to = "/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
+  to = "https://legacy.videojs.org/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
   status = 308
 [[redirects]]
   from = "/blog/post/93989313276"
-  to = "/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
+  to = "https://legacy.videojs.org/blog/video-js-v4-7-0-built-mostly-by-new-contributors-also-google-chooses-video-js"
   status = 308
 
 [[redirects]]
   from = "/blog/post/96564061826/*"
-  to = "/blog/video-js-4-8-0-released-prost"
+  to = "https://legacy.videojs.org/blog/video-js-4-8-0-released-prost"
   status = 308
 [[redirects]]
   from = "/blog/post/96564061826"
-  to = "/blog/video-js-4-8-0-released-prost"
+  to = "https://legacy.videojs.org/blog/video-js-4-8-0-released-prost"
   status = 308
 
 [[redirects]]
   from = "/blog/post/99014232526/*"
-  to = "/blog/video-js-4-9-now-can-join-the-party"
+  to = "https://legacy.videojs.org/blog/video-js-4-9-now-can-join-the-party"
   status = 308
 [[redirects]]
   from = "/blog/post/99014232526"
-  to = "/blog/video-js-4-9-now-can-join-the-party"
+  to = "https://legacy.videojs.org/blog/video-js-4-9-now-can-join-the-party"
   status = 308
 
 [[redirects]]
   from = "/blog/post/111390879116/*"
-  to = "/blog/video-js-4-12-the-last-of-the-4-minors"
+  to = "https://legacy.videojs.org/blog/video-js-4-12-the-last-of-the-4-minors"
   status = 308
 [[redirects]]
   from = "/blog/post/111390879116"
-  to = "/blog/video-js-4-12-the-last-of-the-4-minors"
+  to = "https://legacy.videojs.org/blog/video-js-4-12-the-last-of-the-4-minors"
   status = 308
 
 [[redirects]]
   from = "/blog/post/121061752226/*"
-  to = "/blog/it-s-here-5-0-release-candidates"
+  to = "https://legacy.videojs.org/blog/it-s-here-5-0-release-candidates"
   status = 308
 [[redirects]]
   from = "/blog/post/121061752226"
-  to = "/blog/it-s-here-5-0-release-candidates"
+  to = "https://legacy.videojs.org/blog/it-s-here-5-0-release-candidates"
   status = 308
 
 [[redirects]]
   from = "/blog/post/130143694631/*"
-  to = "/blog/video-js-5-the-only-thing-that's-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
+  to = "https://legacy.videojs.org/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
   status = 308
 [[redirects]]
   from = "/blog/post/130143694631"
-  to = "/blog/video-js-5-the-only-thing-that's-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
+  to = "https://legacy.videojs.org/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name"
   status = 308
 
-# Redirect old tags pages to blog (no tag filtering in v10)
+# Tag pages belonged to the pre-v10 blog, which lives on the legacy site
 [[redirects]]
   from = "/tags"
-  to = "/blog"
-  status = 307
+  to = "https://legacy.videojs.org/blog"
+  status = 308
 
 [[redirects]]
   from = "/tags/*"
-  to = "/blog"
-  status = 307
+  to = "https://legacy.videojs.org/tags/:splat"
+  status = 308
 
 # Misc v8 stragglers
 [[redirects]]
