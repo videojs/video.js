@@ -34,9 +34,17 @@ const setMedia = useMediaAttach();
 <acme-video ref={setMedia} src="…" />;
 ```
 
-Self-registered media still wins, then the marked element, then a plain `<video>` or `<audio>`. The HTML search covers the same subtree as the existing `<video>` and `<audio>` search, and the first marked element in document order wins.
+Self-registered media still wins, then the marked element, then a plain `<video>` or `<audio>`. If there are several marked elements, the first in document order wins.
 
 If the media is a custom element that isn't defined yet, the player waits for `customElements.whenDefined()` before attaching. In React, that only applies when you pass a custom element like `<acme-video>` to the ref; our own React media components render native elements, not custom elements. Features check what the media supports once, when the store attaches. An element that isn't defined yet has no media properties, so every feature would skip setup and never retry. Once defined, the element must return real values from its media getters, as media-chrome-compatible elements already do.
+
+## Potential problems
+
+- **Elements that break the contract fail quietly.** If a getter returns `undefined` when the store attaches, that feature stays off for the life of the attachment, and nothing reports why.
+- **The marker or ref must land on the media element itself.** A wrapper `<div>` isn't media. React components must forward the ref, and HTML components must keep the attribute on their media element.
+- **The player can attach to the wrong media briefly.** Until a marked custom element is defined, the player may use a plain `<video>` it finds, often that element's own child, then switch. Self-registered elements already behave this way.
+- **A marked element that's never defined is never attached.** The player keeps whatever fallback it found, or no media at all, with no warning.
+- **The search has the same limits as today's `<video>` and `<audio>` search.** It reaches into nested players and can't see inside shadow roots.
 
 ## Alternatives considered
 
