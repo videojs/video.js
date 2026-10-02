@@ -3,7 +3,7 @@ status: draft
 date: 2026-10-02
 ---
 
-# Marked media
+# Discoverable media
 
 ## Problem
 
@@ -34,9 +34,9 @@ const setMedia = useMediaAttach();
 <acme-video ref={setMedia} src="…" />;
 ```
 
-Self-registered media still wins, then the marked element, then a plain `<video>` or `<audio>`.
+Self-registered media still wins, then the marked element, then a plain `<video>` or `<audio>`. The HTML search covers the same subtree as the existing `<video>` and `<audio>` search, and the first marked element in document order wins.
 
-Both players wait for `customElements.whenDefined()` before attaching. Features check what the media supports once, when the store attaches. An element that isn't defined yet has no media properties, so every feature would skip setup and never retry. Once defined, the element must return real values from its media getters, as media-chrome-compatible elements already do.
+If the media is a custom element that isn't defined yet, the player waits for `customElements.whenDefined()` before attaching. In React, that only applies when you pass a custom element like `<acme-video>` to the ref; our own React media components render native elements, not custom elements. Features check what the media supports once, when the store attaches. An element that isn't defined yet has no media properties, so every feature would skip setup and never retry. Once defined, the element must return real values from its media getters, as media-chrome-compatible elements already do.
 
 ## Alternatives considered
 
