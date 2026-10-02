@@ -9,6 +9,19 @@ import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
 import OwnTheUI from '@/components/installation/OwnTheUI.astro';
+import Demo from '@/components/docs/demos/Demo.astro';
+import StyleCase from '@/components/docs/StyleCase.astro';
+
+{/* React demos */}
+import BasicUsageDemoReact from '@/components/docs/demos/live-video-neutral-skin/react/css/BasicUsage';
+import basicUsageReactTsx from '@/components/docs/demos/live-video-neutral-skin/react/css/BasicUsage.tsx?raw';
+import basicUsageReactCss from '@/components/docs/demos/live-video-neutral-skin/react/css/BasicUsage.css?raw';
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from '@/components/docs/demos/live-video-neutral-skin/html/css/BasicUsage.astro';
+import basicUsageHtml from '@/components/docs/demos/live-video-neutral-skin/html/css/BasicUsage.html?raw';
+import basicUsageHtmlCss from '@/components/docs/demos/live-video-neutral-skin/html/css/BasicUsage.css?raw';
+import basicUsageHtmlTs from '@/components/docs/demos/live-video-neutral-skin/html/css/BasicUsage.ts?raw';
 
 The neutral skin of the live video preset: the same player and the same controls in a visually lighter design, closer to a classic control bar. Like the default skin, it shows a Live button in place of time controls. <DocsLink slug="reference/components/live-video-skin">LiveVideoSkin</DocsLink> is the same preset's other variant. See <DocsLink slug="guides/skins">Skins</DocsLink> for how packaged skins work and <DocsLink slug="guides/presets">Presets</DocsLink> for what the live video preset ships.
 
@@ -16,7 +29,7 @@ The neutral skin of the live video preset: the same player and the same controls
 
 <SkinImports preset="live-video" react="NeutralLiveVideoSkin" neutral />
 
-## Usage
+## Anatomy
 
 The skin goes between the player and the media element. It renders its controls around the media.
 
@@ -24,7 +37,7 @@ The skin goes between the player and the media element. It renders its controls 
 ```tsx
 <LiveVideoPlayer>
   <NeutralLiveVideoSkin>
-    <HlsVideo src="live.m3u8" />
+    <HlsVideo />
   </NeutralLiveVideoSkin>
 </LiveVideoPlayer>
 ```
@@ -34,13 +47,13 @@ The skin goes between the player and the media element. It renders its controls 
 ```html
 <live-video-player>
   <live-video-neutral-skin>
-    <hls-video src="live.m3u8"></hls-video>
+    <hls-video></hls-video>
   </live-video-neutral-skin>
 </live-video-player>
 ```
 </FrameworkCase>
 
-The examples use the lightweight <DocsLink slug="reference/components/hls-video">HLS video element</DocsLink> because most browsers can't play HLS streams with a plain `<video>`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
+This uses the lightweight <DocsLink slug="reference/components/hls-video">HLS video element</DocsLink> because most browsers can't play HLS streams with a plain `<video>`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
 
 ## Poster
 
@@ -57,6 +70,33 @@ See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLin
 ## Styling
 
 Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo clip={false} files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo clip={false} files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
 
 ## Own the UI
 

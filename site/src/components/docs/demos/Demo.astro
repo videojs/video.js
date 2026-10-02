@@ -12,9 +12,11 @@ interface FileTab {
 
 interface Props {
   files: FileTab[];
+  /** Round and clip the preview. Turn off for demos that draw their own rounded surface, such as packaged skins. */
+  clip?: boolean;
 }
 
-const { files } = Astro.props;
+const { files, clip = true } = Astro.props;
 
 function hash(input: string): string {
   let value = 5381;
@@ -38,7 +40,7 @@ const scopedCss = cssFile && scopeId ? `@scope ([data-demo-scope="${scopeId}"]) 
   {scopedCss && <style is:inline set:html={scopedCss} />}
   {/* The demo sits inside a padded surface so it reads as a component being previewed, like the installation preview. */}
   <div class="relative z-20 p-5 sm:p-8" data-llms-ignore>
-    <div class="overflow-hidden rounded-2xl" data-demo-scope={scopeId}>
+    <div class:list={[clip && 'overflow-hidden rounded-2xl']} data-demo-scope={scopeId}>
       <slot />
     </div>
   </div>

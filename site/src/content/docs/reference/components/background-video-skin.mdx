@@ -8,6 +8,19 @@ description: The background preset's chrome-less skin for ambient video
 import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
+import Demo from '@/components/docs/demos/Demo.astro';
+import StyleCase from '@/components/docs/StyleCase.astro';
+
+{/* React demos */}
+import BasicUsageDemoReact from '@/components/docs/demos/background-video-skin/react/css/BasicUsage';
+import basicUsageReactTsx from '@/components/docs/demos/background-video-skin/react/css/BasicUsage.tsx?raw';
+import basicUsageReactCss from '@/components/docs/demos/background-video-skin/react/css/BasicUsage.css?raw';
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from '@/components/docs/demos/background-video-skin/html/css/BasicUsage.astro';
+import basicUsageHtml from '@/components/docs/demos/background-video-skin/html/css/BasicUsage.html?raw';
+import basicUsageHtmlCss from '@/components/docs/demos/background-video-skin/html/css/BasicUsage.css?raw';
+import basicUsageHtmlTs from '@/components/docs/demos/background-video-skin/html/css/BasicUsage.ts?raw';
 
 The only skin of the background preset: a chrome-less surface that sizes ambient video with no visible controls. See <DocsLink slug="guides/skins">Skins</DocsLink> for how packaged skins work and <DocsLink slug="guides/presets">Presets</DocsLink> for what the background preset ships.
 
@@ -15,7 +28,7 @@ The only skin of the background preset: a chrome-less surface that sizes ambient
 
 <SkinImports preset="background" react="BackgroundVideoSkin" />
 
-## Usage
+## Anatomy
 
 The skin goes between the player and the media element. It sizes the ambient video and renders no visible controls.
 
@@ -23,7 +36,7 @@ The skin goes between the player and the media element. It sizes the ambient vid
 ```tsx
 <BackgroundVideoPlayer>
   <BackgroundVideoSkin>
-    <BackgroundVideo src="video.mp4" />
+    <BackgroundVideo />
   </BackgroundVideoSkin>
 </BackgroundVideoPlayer>
 ```
@@ -33,7 +46,7 @@ The skin goes between the player and the media element. It sizes the ambient vid
 ```html
 <background-video-player>
   <background-video-skin>
-    <background-video src="video.mp4"></background-video>
+    <background-video></background-video>
   </background-video-skin>
 </background-video-player>
 ```
@@ -42,6 +55,33 @@ The skin goes between the player and the media element. It sizes the ambient vid
 ## Styling
 
 Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
 
 ## Own the UI
 
