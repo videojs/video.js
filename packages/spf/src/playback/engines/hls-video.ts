@@ -308,7 +308,6 @@ export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = ty
    * report nothing.
    */
   reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
-  preferredAudioLanguage?: string;
   preferredSubtitleLanguage?: string;
   includeForcedTracks?: boolean;
   enableDefaultTrack?: boolean;
@@ -516,7 +515,6 @@ export const initialState = {
  *   ```ts
  *   const engine = createEngine({
  *     initialBandwidth: 2_000_000,
- *     preferredAudioLanguage: 'en',
  *   });
  *
  *   engine.context.mediaElement.set(videoEl);
