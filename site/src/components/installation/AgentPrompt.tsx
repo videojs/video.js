@@ -12,6 +12,7 @@ import { Fragment, useRef, type ClipboardEvent, type ReactNode } from 'react';
 
 import Undo from '@/assets/icons/undo.svg?react';
 import { OverflowToggle, useOverflowCollapse } from '@/components/OverflowCollapse';
+import { getLinkDestination } from '@/components/typography/linkDestination';
 import {
   promptExample,
   promptFeatures,
@@ -72,13 +73,17 @@ function copyPromptSelection(event: ClipboardEvent<HTMLElement>): void {
 // A URL ends before closing punctuation, so a sentence's period or a parenthesis around the link stays outside it.
 const URL_PATTERN = /(https:\/\/[^\s()]*[^\s().,;:!?])/;
 
-/** Prose text with its URLs as links. A link to Mux carries the prompt's attribution; the copied text stays as written. */
+/**
+ * Prose text with its URLs as links, tagged with where they lead. A link to Mux carries the prompt's attribution; the
+ * copied text stays as written.
+ */
 function Linked({ text }: { text: string }) {
   return text.split(URL_PATTERN).map((piece, index) =>
     index % 2 === 1 ? (
       <a
         key={index}
         href={withMuxAttribution(piece, 'agent-prompt')}
+        data-ph-capture-attribute-destination={getLinkDestination(piece)}
         className="decoration-manila-light/40 intent:decoration-gold wrap-anywhere underline underline-offset-2"
       >
         {piece}
