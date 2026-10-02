@@ -63,7 +63,7 @@ function setup() {
   return { video, media, googleCast, provider };
 }
 
-/** A custom media element or adapter: fronts a native element as `target` and forwards its events. */
+/** A media component or adapter: fronts a native element as `target` and forwards its events. */
 function createHost(element: HTMLVideoElement) {
   return Object.assign(new EventTarget(), { target: element, src: '', currentSrc: '' });
 }
@@ -138,7 +138,7 @@ describe('GoogleCastExtension', () => {
     });
   });
 
-  it('drives the native element behind a custom media element or adapter', () => {
+  it('drives the native element behind a media component or adapter', () => {
     const googleCast = new GoogleCastExtension();
     const video = document.createElement('video');
 

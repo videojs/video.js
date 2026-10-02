@@ -117,7 +117,7 @@ describe('createPlayer', () => {
       originalStore.destroy();
       expect(originalStore.destroyed).toBe(true);
 
-      // Mirrors the real app: Activity reveals the subtree with an already-attached media element.
+      // Mirrors the real app: Activity reveals the subtree with an already-attached media component.
       expect(() => {
         act(() => {
           setMediaFn(document.createElement('video'));

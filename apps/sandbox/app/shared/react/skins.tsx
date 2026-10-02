@@ -195,7 +195,7 @@ function useCaptionTracks(root: RefObject<HTMLElement | null>, captions: Caption
     const media = root.current ? findMediaElement(root.current) : undefined;
 
     if (media) applyCaptionTracks(media, captions);
-    // the media element changes with the source and the skin, which the caller lists
+    // the media component changes with the source and the skin, which the caller lists
     // oxlint-disable-next-line react/exhaustive-deps
   }, [captions, ...deps]);
 }

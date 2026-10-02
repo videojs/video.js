@@ -111,7 +111,7 @@ Everything that needs player state goes inside `<video-player>`: skins, containe
 ```tsx
 <Player>
   <VideoSkin>           {/* skin — includes container + controls */}
-    <Video src="..." /> {/* media element */}
+    <Video src="..." /> {/* media component */}
   </VideoSkin>
   <MyCustomOverlay />   {/* your own component — can use usePlayer() */}
 </Player>
@@ -121,7 +121,7 @@ Everything that needs player state goes inside `<video-player>`: skins, containe
 ```html
 <video-player>
   <video-skin>               <!-- skin — includes container + controls -->
-    <video src="..."></video> <!-- media element -->
+    <video src="..."></video> <!-- media component -->
   </video-skin>
   <my-custom-overlay></my-custom-overlay> <!-- your own element — can use PlayerController -->
 </video-player>
@@ -138,7 +138,7 @@ Everything that needs player state goes inside `<video-player>`: skins, containe
 <FrameworkCase frameworks={["html"]}>
 Packaged skins make `<video-player>` boxless with `display: contents`. Width, height, positioning, transforms, and `getBoundingClientRect()` do not describe a visible player box there. Put layout and measurements on the <DocsLink slug="reference/components/player-container">`<media-container>`</DocsLink> instead.
 
-If you omit `<video-skin>` and import only the player and media elements, those skin styles are not loaded. The player element still owns state, not layout, so add and style a `<media-container>` instead of using the player itself as the layout surface.
+If you omit `<video-skin>` and import only the player and media components, those skin styles are not loaded. The player element still owns state, not layout, so add and style a `<media-container>` instead of using the player itself as the layout surface.
 </FrameworkCase>
 
 ## Accessing state
@@ -243,7 +243,7 @@ The player's scope can extend beyond the fullscreen target. Playlists, transcrip
 Video.js elements clean up after themselves when you remove them from the page:
 
 - `<video-player>` and the UI elements destroy themselves two animation frames after they're removed. Destroying the player also destroys its store.
-- Media elements such as `<hlsjs-video>` tear down their playback engine in a microtask after they're removed.
+- Media components such as `<hlsjs-video>` tear down their playback engine in a microtask after they're removed.
 
 Moving an element synchronously, removing it and inserting it elsewhere with no `await` in between, triggers neither. To keep an element through a longer move, add the `keep-alive` attribute:
 
@@ -255,6 +255,6 @@ Moving an element synchronously, removing it and inserting it elsewhere with no 
 </video-player>
 ```
 
-`keep-alive` applies only to the element that carries it; descendants don't inherit it. Set it on every Video.js element in the tree you move. Packaged skins don't pass it to the controls inside them, so move a player that uses a packaged skin synchronously. An element with `keep-alive` is never destroyed automatically. When you're finished with it, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media elements, which release their engine that way. A destroyed element can't be reconnected; create a new one instead.
+`keep-alive` applies only to the element that carries it; descendants don't inherit it. Set it on every Video.js element in the tree you move. Packaged skins don't pass it to the controls inside them, so move a player that uses a packaged skin synchronously. An element with `keep-alive` is never destroyed automatically. When you're finished with it, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media components, which release their engine that way. A destroyed element can't be reconnected; create a new one instead.
 
 </FrameworkCase>

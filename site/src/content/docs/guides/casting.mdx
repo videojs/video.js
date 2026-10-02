@@ -78,7 +78,7 @@ The demo pairs the media component with the `GoogleCast` extension. Without that
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The demo pairs the media element with the `<google-cast>` extension. Without that extension, `<media-cast-button>` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
+The demo pairs the media component with the `<google-cast>` extension. Without that extension, `<media-cast-button>` drives the browser's native Remote Playback API instead, which does not provide Video.js receiver or load-request configuration.
 </FrameworkCase>
 
 ## How it works
@@ -94,11 +94,11 @@ AirPlay uses WebKit's presentation APIs. Google Cast uses a sender and receiver:
 While connected, playback actions — play, pause, seek, volume — proxy to the remote device, and player state keeps reflecting the remote session. Local playback is suspended.
 
 <FrameworkCase frameworks={["react"]}>
-Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> from `usePlayer`. Don't call methods on the media element or listen for its events to drive or track a session.
+Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> from `usePlayer`. Don't call methods on the media component or listen for its events to drive or track a session.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> on the player element's `store`. Don't call methods on the media element or listen for its events to drive or track a session.
+Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> on the player element's `store`. Don't call methods on the media component or listen for its events to drive or track a session.
 </FrameworkCase>
 
 For a custom control, call `promptRemotePlayback()` directly from the click handler and catch its promise. It rejects when no remote route exists or the browser refuses the request. A canceled Google Cast picker can also resolve without connecting, so show success only when `remotePlaybackState` is `'connected'`. The built-in buttons handle the request for you.
@@ -118,7 +118,7 @@ The Google Cast SDK loads only when the player includes the `<google-cast>` exte
 - Google Cast works only in Chromium-based browsers; elsewhere its route reports `'unsupported'`.
 - AirPlay works only in Safari; availability requires an AirPlay device reachable on the network.
 - The remote device fetches the source and its text tracks on its own. Localhost, VPN-only, expired, or cross-origin URLs without the necessary CORS headers will fail on the receiver even if they play in the browser.
-- Set `disableRemotePlayback` on the media element to opt out entirely.
+- Set `disableRemotePlayback` on the media component to opt out entirely.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -126,7 +126,7 @@ The Google Cast SDK loads only when the player includes the `<google-cast>` exte
 - Google Cast works only in Chromium-based browsers; elsewhere its route reports `'unsupported'`.
 - AirPlay works only in Safari; availability requires an AirPlay device reachable on the network.
 - The remote device fetches the source and its text tracks on its own. Localhost, VPN-only, expired, or cross-origin URLs without the necessary CORS headers will fail on the receiver even if they play in the browser.
-- Set the `disableremoteplayback` attribute on the media element to opt out entirely.
+- Set the `disableremoteplayback` attribute on the media component to opt out entirely.
 </FrameworkCase>
 
 ## Common variations
@@ -180,7 +180,7 @@ The receiver cannot fetch the media. Confirm the source URL is reachable from th
 
 ### Custom UI shows local playback while casting
 
-The code reads or controls the media element directly. Read playback state from the player store and call its actions instead; only the player reflects the remote session.
+The code reads or controls the media component directly. Read playback state from the player store and call its actions instead; only the player reflects the remote session.
 
 ### The UI freezes on "connecting"
 

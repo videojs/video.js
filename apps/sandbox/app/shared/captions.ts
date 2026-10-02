@@ -18,8 +18,8 @@ export function captionTracks(mode: CaptionsMode): readonly { readonly label: st
 }
 
 /**
- * Add the sandbox's subtitle tracks to a media element, replacing the ones a previous render added. A custom media
- * element reads its tracks when it upgrades, so markup should receive them while still inert; see `findMediaTag`.
+ * Add the sandbox's subtitle tracks to a media component, replacing the ones a previous render added. A media component
+ * reads its tracks when it upgrades, so markup should receive them while still inert; see `findMediaTag`.
  */
 export function applyCaptionTracks(media: MediaLike | Element, mode: CaptionsMode): void {
   for (const stale of media.querySelectorAll('track[data-sandbox-captions]')) stale.remove();

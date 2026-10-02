@@ -269,7 +269,7 @@ Document common errors:
 ```markdown
 ## Troubleshooting
 
-### "Player not attached to media element"
+### "Player not attached to media component"
 
 **Cause:** Called method before `attach()`.
 

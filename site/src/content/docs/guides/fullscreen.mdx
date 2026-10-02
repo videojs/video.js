@@ -60,7 +60,7 @@ Add a <DocsLink slug="reference/components/fullscreen-button">`<media-fullscreen
 The <DocsLink slug="reference/api/feature-fullscreen">fullscreen feature</DocsLink> tracks fullscreen state and provides the actions:
 
 - `isFullscreen` is `true` while the player is fullscreen, from any path — your button, native controls, or the platform presentation.
-- `fullscreenAvailability` is `'available'`, `'unavailable'`, or `'unsupported'`. It starts as `'unavailable'`, then settles to `'available'` or `'unsupported'` when the feature attaches to a media element.
+- `fullscreenAvailability` is `'available'`, `'unavailable'`, or `'unsupported'`. It starts as `'unavailable'`, then settles to `'available'` or `'unsupported'` when the feature attaches to a media component.
 - `requestFullscreen()` and `exitFullscreen()` change the presentation. When the Fullscreen API is available, requests target the player container. Otherwise they fall back to the media element's native presentation.
 
 Fullscreen and picture-in-picture are exclusive: requesting fullscreen exits an active picture-in-picture presentation first.

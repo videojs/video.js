@@ -214,7 +214,7 @@ describe('createMediaFacade', () => {
     expect(media.querySelectorAll('track')[0]).toBe(track);
   });
 
-  it('forwards the shadow root of a custom media element', () => {
+  it('forwards the shadow root of a media component', () => {
     const host = new ShadowMedia();
     const root = host.attachShadow({ mode: 'open' });
 

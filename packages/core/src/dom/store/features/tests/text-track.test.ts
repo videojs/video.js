@@ -103,21 +103,21 @@ describe('textTrackFeature', () => {
       expect(store.state.thumbnailsTrack?.cues).toEqual(first);
     });
 
-    it('reports the media element CORS mode', () => {
+    it('reports the media component CORS mode', () => {
       expect(crossOriginFor('anonymous')).toBe('anonymous');
       expect(crossOriginFor('use-credentials')).toBe('use-credentials');
     });
 
     it('maps the empty string and unknown keywords to anonymous', () => {
       // The CORS-settings attribute treats every value but `use-credentials` as
-      // Anonymous. A custom media element reflects `crossOrigin` as a plain
+      // Anonymous. A media component reflects `crossOrigin` as a plain
       // string, so unnormalized values reach here in practice.
       expect(crossOriginFor('')).toBe('anonymous');
       expect(crossOriginFor('bogus')).toBe('anonymous');
       expect(crossOriginFor('USE-CREDENTIALS')).toBe('use-credentials');
     });
 
-    it('reports a null CORS mode when the media element is not in CORS mode', () => {
+    it('reports a null CORS mode when the media component is not in CORS mode', () => {
       expect(crossOriginFor(undefined)).toBeNull();
     });
   });

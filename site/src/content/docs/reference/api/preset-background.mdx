@@ -12,7 +12,7 @@ import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`@videojs/html/background` is the preset for ambient background video with no user controls. It bundles the `<background-video-player>` element, the `backgroundFeatures` bundle it is configured with, one chrome-less skin, and the `<background-video>` media element, which autoplays, mutes, and loops. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/background-video">Background video</DocsLink> for building one.
+`@videojs/html/background` is the preset for ambient background video with no user controls. It bundles the `<background-video-player>` element, the `backgroundFeatures` bundle it is configured with, one chrome-less skin, and the `<background-video>` media component, which autoplays, mutes, and loops. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/background-video">Background video</DocsLink> for building one.
 </FrameworkCase>
 
 ## Import
@@ -103,7 +103,7 @@ The preset root also exports a `PlayerController` bound to the background player
 
 ## Feature bundle
 
-`backgroundFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. The background media element handles autoplay, muting, and looping on its own:
+`backgroundFeatures` is the array of <DocsLink slug="guides/features">features</DocsLink> the player is configured with. The background media component handles autoplay, muting, and looping on its own:
 
 <PresetFeatures preset="background" />
 

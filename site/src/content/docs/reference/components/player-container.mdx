@@ -139,7 +139,7 @@ React media components such as `MuxVideo` render a native media element, so the 
 Media discovery is handled by `Player`, not `Container`. When a media component like `<Video>` registers itself via context, `Player` wires it to the store and all of the player's features.
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
-Media discovery is handled by the player provider, not the container. Custom media elements like `<hlsjs-video>` register themselves via context when they connect. Plain `<video>` and `<audio>` elements are tracked automatically, including when they are added, removed, or replaced after connection. No `slot="media"` attribute is needed.
+Media discovery is handled by the player provider, not the container. Media components like `<hlsjs-video>` register themselves via context when they connect. Plain `<video>` and `<audio>` elements are tracked automatically, including when they are added, removed, or replaced after connection. No `slot="media"` attribute is needed.
 </FrameworkCase>
 
 ### Interaction surface

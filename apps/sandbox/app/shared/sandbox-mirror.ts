@@ -140,7 +140,7 @@ function parseState(data: Record<string, unknown>): MirroredState | undefined {
 
 /**
  * Mirror playback between compare panels. Pages re-render their player as the shell streams changes, so the media
- * element is re-found whenever the document changes; the shell relays each report to the sibling frames.
+ * component is re-found whenever the document changes; the shell relays each report to the sibling frames.
  */
 export function installSandboxMirror(): void {
   if (window.parent === window) return;
