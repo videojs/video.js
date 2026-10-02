@@ -175,6 +175,70 @@ describe('createPlayer', () => {
     await vi.waitFor(() => expect(player.store.target).toBeNull());
   });
 
+  describe('data-vjs-media', () => {
+    it('prefers a marked element over the first native media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const ambient = document.createElement('video');
+      const marked = document.createElement('video');
+
+      marked.setAttribute('data-vjs-media', '');
+      player.append(ambient, marked);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(marked));
+    });
+
+    it('waits for a marked custom element to be defined before attaching', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const mediaTag = `test-marked-media-${tagCounter++}`;
+      const marked = document.createElement(mediaTag);
+
+      marked.setAttribute('data-vjs-media', '');
+      player.append(marked);
+      document.body.append(player);
+      await Promise.resolve();
+
+      expect(player.store.target).toBeNull();
+
+      customElements.define(mediaTag, class extends HTMLElement {});
+
+      // jsdom can hand back a new wrapper for an upgraded element, so compare against a fresh lookup.
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(player.querySelector(mediaTag)));
+    });
+
+    it('follows the attribute when it is added or removed', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+
+      player.append(first, second);
+      document.body.append(player);
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(first));
+
+      second.setAttribute('data-vjs-media', '');
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(second));
+
+      second.removeAttribute('data-vjs-media');
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(first));
+    });
+
+    it('still prefers self-registered media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const registered = document.createElement(defineTestElement(MediaAttachMixin(HTMLElement)));
+      const marked = document.createElement('video');
+
+      marked.setAttribute('data-vjs-media', '');
+      player.append(marked, registered);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(registered));
+    });
+  });
+
   describe('extensions', () => {
     class MutedExtension implements PlayerExtension {
       attach = vi.fn<(target: PlayerTarget) => void>();
