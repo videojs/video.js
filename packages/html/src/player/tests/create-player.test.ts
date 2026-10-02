@@ -175,6 +175,72 @@ describe('createPlayer', () => {
     await vi.waitFor(() => expect(player.store.target).toBeNull());
   });
 
+  describe('slot="media"', () => {
+    it('prefers a media-slotted element over the first native media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const ambient = document.createElement('video');
+      const slotted = document.createElement('video');
+
+      slotted.setAttribute('slot', 'media');
+      player.append(ambient, slotted);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(slotted));
+    });
+
+    it('waits for a media-slotted custom element to be defined before attaching', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const mediaTag = `test-slotted-media-${tagCounter++}`;
+      const slotted = document.createElement(mediaTag);
+
+      slotted.setAttribute('slot', 'media');
+      player.append(slotted);
+      document.body.append(player);
+      await Promise.resolve();
+
+      expect(player.store.target).toBeNull();
+
+      customElements.define(mediaTag, class extends HTMLElement {});
+
+      // jsdom can hand back a new wrapper for an upgraded element, so compare against a fresh lookup.
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(player.querySelector(mediaTag)));
+    });
+
+    it('follows the attribute when it is added or removed', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+
+      player.append(first, second);
+      document.body.append(player);
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(first));
+
+      second.setAttribute('slot', 'media');
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(second));
+
+      second.removeAttribute('slot');
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(first));
+    });
+
+    it('still prefers self-registered media, including over its own slotted inner video', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const registered = document.createElement(defineTestElement(MediaAttachMixin(HTMLElement)));
+      const inner = document.createElement('video');
+
+      // Our media elements accept `<video slot="media">` to replace their inner element.
+      inner.setAttribute('slot', 'media');
+      registered.append(inner);
+      player.append(registered);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(registered));
+    });
+  });
+
   describe('extensions', () => {
     class MutedExtension implements PlayerExtension {
       attach = vi.fn<(target: PlayerTarget) => void>();
