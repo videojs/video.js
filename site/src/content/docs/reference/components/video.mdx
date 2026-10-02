@@ -76,7 +76,7 @@ Video.js does not replace the native video API. Use `src` for one URL or add chi
 Add native [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) for captions, subtitles, chapters, descriptions, or metadata.
 
 <FrameworkCase frameworks={["react"]}>
-`Video` forwards native attributes, event handlers, and children to the underlying `<video>`. Its `ref` resolves to the `HTMLVideoElement`, and so does `mediaRef`. Embed components such as <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+`Video` forwards native attributes, event handlers, and children to the underlying `<video>`. Its `ref` resolves to the `HTMLVideoElement`, and so does `mediaRef`. Adapter-backed components such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> and <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>

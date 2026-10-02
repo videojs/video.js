@@ -72,7 +72,7 @@ Place a native `<audio>` anywhere inside `<audio-player>`. It becomes that playe
 Video.js does not replace the native audio API. Use `src` for one URL or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> when you need an HLS, Mux, Spotify, or other playback adapter.
 
 <FrameworkCase frameworks={["react"]}>
-`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`. Its `ref` resolves to the `HTMLAudioElement`, and so does `mediaRef`. Embed components such as <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`. Its `ref` resolves to the `HTMLAudioElement`, and so does `mediaRef`. Adapter-backed components such as <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> and <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>

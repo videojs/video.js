@@ -925,8 +925,8 @@ The SPF flavor supports FairPlay, Widevine, and PlayReady through its EME licens
 | Mux Player | Video.js v10 |
 |---|---|
 | `media.nativeEl` | `ref.current` from a `ref` on the media component |
-| the Video.js media object | `useMedia()` inside the player |
-| the hls.js instance | the media object's `.engine`, reached through `useMedia`, on the hls.js-backed flavor |
+| the Video.js media object | `mediaRef.current` from a `mediaRef` on the media component, or `useMedia()` inside the player |
+| the hls.js instance | the media object's `.engine` on the hls.js-backed flavor |
 | `prefer-playback` | `source.preferPlayback`, or pick <DocsLink slug="reference/components/native-hls-video">native HLS</DocsLink> outright |
 </FrameworkCase>
 
@@ -937,7 +937,7 @@ Reading `.engine` couples your app to hls.js and the `/hls-js` flavor. Prefer Vi
 </Aside>
 
 <FrameworkCase frameworks={["react"]}>
-The media component's React ref is the native `HTMLVideoElement`; it has no `.target` or `.host`. Call `useMedia()` inside the player to get the Video.js media object:
+The media component's React ref is the native `HTMLVideoElement`; it has no `.target` or `.host`. Pass a `mediaRef` to the media component, or call `useMedia()` inside the player, to get the Video.js media object:
 
 ```tsx
 import { useMedia } from '@videojs/react';

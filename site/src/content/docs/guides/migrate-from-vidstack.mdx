@@ -418,7 +418,7 @@ media.source = { src: '/stream.m3u8', engine: { hlsJs: { maxBufferLength: 60 } }
 `source` is replaced, not merged. Changing hls.js options rebuilds the engine; dash.js and Shaka apply new settings to the running one. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for the options every engine shares, such as `preferPlayback`, rendition caps, and DRM.
 
 <FrameworkCase frameworks={["react"]}>
-Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
+Where you used `provider.instance` or `onInstance`, read the engine from the media object that `useMedia` returns. `useMedia` doesn't know which media component you rendered, so check the media with `instanceof HlsJsAdapter` first; that types `engine` as the hls.js instance. `HlsJsAdapter` and `Hls` come from `@videojs/hlsjs-video`, the package you installed for `HlsJsVideo`, which exports them for this kind of low-level access. Outside the player, pass `mediaRef` to `HlsJsVideo` instead: it receives the same `HlsJsAdapter`, so `mediaRef.current?.engine` is already typed as the hls.js instance. Vidstack re-dispatched hls.js events as `onHls*` callbacks; Video.js doesn't forward engine events, so subscribe on the engine itself:
 
 ```tsx
 import { useMedia } from '@videojs/react';
@@ -1047,10 +1047,12 @@ The store has no toggles apart from `toggleSubtitles()` and `toggleControls()`, 
 Vidstack methods took an optional trigger event as their last argument. Video.js actions don't, so wrap them in a handler, as in `onClick={() => seek(30)}`. Passing an action straight to `onClick` would hand it the click event.
 
 <FrameworkCase frameworks={["react"]}>
-Where you called `play()` or set `currentTime` through a `MediaPlayerInstance` ref, pass `mediaRef` to the media component instead. It receives the element for `Video`, `HlsJsVideo`, and other `<video>`-backed media, and the playback adapter for embeds:
+Where you called `play()` or set `currentTime` through a `MediaPlayerInstance` ref, pass `mediaRef` to the media component instead. It receives the element for `Video` and `Audio`, and the playback adapter for `HlsJsVideo`, embeds, and other adapter-backed media. That's the same object `useMedia()` returns:
 
 ```tsx
-const mediaRef = useRef<HTMLVideoElement>(null);
+import type { HlsJsAdapter } from '@videojs/hlsjs-video';
+
+const mediaRef = useRef<HlsJsAdapter>(null);
 
 <HlsJsVideo mediaRef={mediaRef} src="https://example.com/stream.m3u8" />
 

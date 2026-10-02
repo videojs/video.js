@@ -7,7 +7,7 @@ import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
-import type { MediaRefProps } from '../../utils/use-media-ref';
+import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
 import { MuxStoryboard } from './storyboard';
 
@@ -27,7 +27,7 @@ export interface MuxVideoProps
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsJsAdapterProps | keyof MuxVideoAdapterProps>,
     Partial<Omit<HlsJsAdapterProps, 'source'>>,
     Partial<MuxVideoAdapterProps>,
-    MediaRefProps<HTMLVideoElement> {
+    MediaRefProps<MuxVideoAdapter> {
   children?: ReactNode;
 }
 
@@ -37,7 +37,8 @@ export const MuxVideo = forwardRef<HTMLVideoElement, MuxVideoProps>(function Mux
 ) {
   const media = useMediaInstance(MuxVideoAdapter);
   const attachRef = useAttachMedia(media);
-  const composedRef = useComposedRefs(attachRef, ref, mediaRef);
+  const exposeRef = useMediaRef(media, mediaRef);
+  const composedRef = useComposedRefs(attachRef, exposeRef, ref);
   const htmlProps = useSyncProps(media, props, MuxVideoAdapter.defaultProps);
 
   return (
