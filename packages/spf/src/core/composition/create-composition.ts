@@ -343,21 +343,83 @@ export function createComposition<
     Config
   >
 ): Composition<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>> {
-  type S = ResolveBehaviorState<Behaviors>;
-  type C = ResolveBehaviorContext<Behaviors>;
-  type Cfg = ResolveBehaviorConfig<Behaviors>;
+  return compose<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>, ResolveBehaviorConfig<Behaviors>>(
+    validBehaviorList(behaviors),
+    options
+  );
+}
 
-  // ValidateComposition<Behaviors> is `[...Behaviors]` on success, an error
-  // string on conflict. The function body only runs when the call typechecks
-  // (i.e. the success case), so iterating as the behavior tuple is sound.
-  const validBehaviors = behaviors as unknown as readonly AnyBehavior[];
+/**
+ * A create function for one fixed list of behaviors with its defaults: what an engine module exports as its
+ * `createEngine`. The returned function checks each call's config the way {@link createComposition} does, at its own
+ * call site, so a module needs no type plumbing of its own.
+ *
+ * @example
+ *   ```ts
+ *   export const createEngine = defineCompositionFactory(behaviors, { defaultConfig, initialState });
+ *   ```;
+ */
+export function defineCompositionFactory<
+  const Behaviors extends readonly AnyBehavior[],
+  Defaults extends Partial<ResolveBehaviorConfig<Behaviors>> = Empty,
+>(
+  behaviors: ValidateComposition<Behaviors>,
+  options: Omit<
+    CompositionOptions<
+      ResolveBehaviorState<Behaviors>,
+      ResolveBehaviorContext<Behaviors>,
+      ResolveBehaviorConfig<Behaviors>,
+      Defaults
+    >,
+    'config'
+  > = {}
+) {
+  const validBehaviors = validBehaviorList(behaviors);
 
+  return <
+    const Config extends ConfigWithDefaults<ResolveBehaviorConfig<Behaviors>, Defaults> = ConfigWithDefaults<
+      ResolveBehaviorConfig<Behaviors>,
+      Defaults
+    >,
+  >(
+    config?: Config & CheckKeyedFields<ResolveBehaviorConfig<Behaviors>, Config, Defaults>
+  ): Composition<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>> =>
+    compose<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>, ResolveBehaviorConfig<Behaviors>>(
+      validBehaviors,
+      { ...options, config }
+    );
+}
+
+/**
+ * `ValidateComposition<Behaviors>` is `[...Behaviors]` on success and an error string on conflict. A caller only runs
+ * when its call typechecks (the success case), so treating the value as the behavior list is sound.
+ */
+function validBehaviorList<Behaviors extends readonly AnyBehavior[]>(
+  behaviors: ValidateComposition<Behaviors>
+): readonly AnyBehavior[] {
+  // SAFETY: see above; on success `ValidateComposition<Behaviors>` is the behavior tuple itself.
+  return behaviors as unknown as readonly AnyBehavior[];
+}
+
+/** The runtime half of {@link createComposition} and {@link defineCompositionFactory}, typed by its caller. */
+function compose<S extends object, C extends object, Cfg extends object>(
+  behaviors: readonly AnyBehavior[],
+  options:
+    | {
+        // Typed by the caller: the merge of these two is `Cfg` (see the cast below).
+        defaultConfig?: object | undefined;
+        config?: object | undefined;
+        initialState?: Partial<S>;
+        initialContext?: Partial<C>;
+      }
+    | undefined
+): Composition<S, C> {
   const state = buildSignalMap<S>(
-    validBehaviors.flatMap((b) => b.stateKeys),
+    behaviors.flatMap((b) => b.stateKeys),
     options?.initialState ?? {}
   );
   const context = buildSignalMap<C>(
-    validBehaviors.flatMap((b) => b.contextKeys),
+    behaviors.flatMap((b) => b.contextKeys),
     options?.initialContext ?? {}
   );
 
@@ -367,7 +429,7 @@ export function createComposition<
     // SAFETY: `ConfigWithDefaults` types `config` as `Cfg` minus the keys `defaultConfig` fills, so the merge is `Cfg`.
     config: mergeDefaultConfig(options?.config ?? {}, options?.defaultConfig) as Cfg,
   };
-  const cleanups = validBehaviors.map((behavior) => behavior.setup(deps));
+  const cleanups = behaviors.map((behavior) => behavior.setup(deps));
 
   return {
     state,

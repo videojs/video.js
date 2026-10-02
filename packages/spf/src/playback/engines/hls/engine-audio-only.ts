@@ -1,13 +1,11 @@
 import {
-  type Composition,
   type ConfigWithDefaults,
-  createComposition,
+  defineCompositionFactory,
   type ResolveBehaviorConfig,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import type { CheckKeyedFields } from '../../../core/composition/keyed-by';
 import { canPlayTrack } from '../../../media/dom/capabilities';
 import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
@@ -198,11 +196,4 @@ export const initialState = {};
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *   ```;
  */
-export function createEngine<const Config extends EngineConfig = EngineConfig>(
-  config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
-): Composition<EngineState, EngineContext> {
-  // Checked at this function's call site. Widened to the general type, the composition's own check of it is trivial.
-  const engineConfig: EngineConfig | undefined = config;
-
-  return createComposition([...behaviors], { defaultConfig, config: engineConfig, initialState });
-}
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });

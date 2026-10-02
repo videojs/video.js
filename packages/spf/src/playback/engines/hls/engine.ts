@@ -1,13 +1,11 @@
 import {
-  type Composition,
   type ConfigWithDefaults,
-  createComposition,
+  defineCompositionFactory,
   type ResolveBehaviorConfig,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import type { CheckKeyedFields } from '../../../core/composition/keyed-by';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
 import { canPlayTrackWithDrm } from '../../../media/dom/capabilities';
 import { DEFAULT_KEY_SYSTEMS } from '../../../media/dom/key-systems';
@@ -345,11 +343,4 @@ export const initialState = {
  *   await engine.destroy();
  *   ```;
  */
-export function createEngine<const Config extends EngineConfig = EngineConfig>(
-  config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
-): Composition<EngineState, EngineContext> {
-  // Checked at this function's call site. Widened to the general type, the composition's own check of it is trivial.
-  const engineConfig: EngineConfig | undefined = config;
-
-  return createComposition([...behaviors], { defaultConfig, config: engineConfig, initialState });
-}
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
