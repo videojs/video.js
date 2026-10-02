@@ -456,7 +456,9 @@ describe('agentPromptDesignFor', () => {
 });
 
 describe('agentPromptCompatSkin', () => {
-  it('offers no skin for older browsers until the installation package has one', () => {
-    expect(agentPromptCompatSkin(agentPromptSelection({ method: 'packaged', framework: 'react' }, picks()))).toBeNull();
+  it('offers the compat skin for a player that must work in older browsers', () => {
+    expect(agentPromptCompatSkin(agentPromptSelection({ method: 'packaged', framework: 'react' }, picks()))).toBe(
+      'compat'
+    );
   });
 });

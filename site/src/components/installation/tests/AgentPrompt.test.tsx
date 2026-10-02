@@ -219,8 +219,13 @@ describe('AgentPrompt', { timeout: 20_000 }, () => {
     await user.click(await screen.findByRole('option', { name: 'Build my own design' }, RENDER_WAIT));
 
     expect(initCommand()).toContain('--skin none');
-    // Without a compatible skin to offer yet, there is no browser question.
-    expect(screen.queryByRole('combobox', { name: 'Browsers' })).not.toBeInTheDocument();
+
+    // Older browsers take the compat skin, whatever the design.
+    await user.click(screen.getByRole('combobox', { name: 'Browsers' }));
+    await user.click(await screen.findByRole('option', { name: 'Include older browsers' }, RENDER_WAIT));
+
+    expect(initCommand()).toContain('--skin compat');
+    expect(screen.getByRole('combobox', { name: 'Design' })).toHaveTextContent('Either works');
   });
 
   it('previews the skins in a dialog', async () => {
