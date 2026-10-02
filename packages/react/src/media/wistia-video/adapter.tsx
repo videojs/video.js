@@ -39,6 +39,8 @@ export interface WistiaVideoProps
     Omit<HTMLAttributes<WistiaPlayer>, MediaEventPropName>,
     MediaEventProps<WistiaPlayer>,
     MediaRefProps<WistiaPlayer> {
+  /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
+  autoPlay?: boolean | undefined;
   /** Wistia's own options, `mediaId` among them: everything the player understands that a media does not. */
   source?: WistiaSource | null;
 }
@@ -59,7 +61,8 @@ export const WistiaVideo: ForwardRefExoticComponent<WistiaVideoProps & RefAttrib
   WistiaVideoProps
 >(function WistiaVideo(
   {
-    autoplay,
+    autoPlay,
+    autoplay = autoPlay,
     children,
     controls = false,
     defaultMuted,

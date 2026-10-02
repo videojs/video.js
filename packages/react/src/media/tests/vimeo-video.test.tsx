@@ -43,6 +43,15 @@ describe('VimeoVideo', () => {
     expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/1181503036');
   });
 
+  it('accepts autoPlay like <video>, for the media and the initial embed', () => {
+    const { container, media } = renderWithMedia(<VimeoVideo src="https://vimeo.com/1181503036" autoPlay />);
+    const iframe = container.querySelector('iframe')!;
+
+    expect(media.autoplay).toBe(true);
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    expect(iframe.hasAttribute('autoplay')).toBe(false);
+  });
+
   it('routes media event props to the media rather than the iframe', () => {
     const onPlay = vi.fn((event: Event) => event.currentTarget);
     const onTimeUpdate = vi.fn();

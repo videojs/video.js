@@ -85,8 +85,8 @@ export function useMediaEvents<Props extends Record<string, unknown>>(
   }
 
   const handlersRef = useLatestRef(handlers);
-  // React 18 signals detach by calling the ref with `null` and ignores the returned cleanup, so the controller is kept
-  // where that call can reach it.
+  // Detach is handled on the `null` call rather than a returned cleanup, which React 18 ignores and warns about; React
+  // 19 makes the same call when no cleanup is returned.
   const controllerRef = useRef<AbortController | null>(null);
 
   const ref = useCallback<RefCallback<EventTarget>>(
@@ -110,8 +110,6 @@ export function useMediaEvents<Props extends Record<string, unknown>>(
 
         target.addEventListener(MEDIA_EVENT_PROPS[prop], listener, { signal: controller.signal });
       }
-
-      return () => controller.abort();
     },
     [media, handlersRef]
   );
