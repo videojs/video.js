@@ -16,50 +16,11 @@ export const PLAYER_VERSION = '0.0.11';
  */
 export const PLAYER_TARGET_ORIGIN = '*';
 
-/** Methods from the player.js spec. */
-export type PlayerJsSpecMethod =
-  | 'play'
-  | 'pause'
-  | 'getPaused'
-  | 'mute'
-  | 'unmute'
-  | 'getMuted'
-  | 'setVolume'
-  | 'getVolume'
-  | 'getDuration'
-  | 'setCurrentTime'
-  | 'getCurrentTime'
-  | 'setLoop'
-  | 'getLoop'
-  | 'addEventListener'
-  | 'removeEventListener';
-
-/** Methods receivers commonly add on top of the spec (Gumlet's receiver, for one). Only used when advertised. */
-export type PlayerJsExtensionMethod = 'setPlaybackRate' | 'getPlaybackRate';
-
-/** @internal */
-export type PlayerJsMethod = PlayerJsSpecMethod | PlayerJsExtensionMethod;
-
-/** Events from the player.js spec. */
-export type PlayerJsSpecEvent = 'ready' | 'play' | 'pause' | 'ended' | 'timeupdate' | 'progress' | 'error';
-
-/** Events receivers commonly add on top of the spec. Only subscribed to when advertised. */
-export type PlayerJsExtensionEvent =
-  | 'seeked'
-  | 'volumeChange'
-  | 'playbackRateChange'
-  // Bunny Stream's spelling of the same two.
-  | 'volumechange'
-  | 'playbackratechange';
-
-/** @internal */
-export type PlayerJsEvent = PlayerJsSpecEvent | PlayerJsExtensionEvent;
-
 /**
- * What an embed is assumed to support when its `ready` message carries no lists. The spec's own methods and events, and
- * nothing beyond them: an extension is only used once an embed says it has it.
+ * The spec's own methods and events. They are also what an embed is assumed to support when its `ready` message carries
+ * no lists, and nothing beyond them: an extension is only used once an embed says it has it.
  */
-export const SPEC_METHODS: readonly PlayerJsSpecMethod[] = [
+export const SPEC_METHODS = [
   'play',
   'pause',
   'getPaused',
@@ -75,17 +36,31 @@ export const SPEC_METHODS: readonly PlayerJsSpecMethod[] = [
   'getLoop',
   'addEventListener',
   'removeEventListener',
-];
+] as const;
 
-export const SPEC_EVENTS: readonly PlayerJsSpecEvent[] = [
-  'ready',
-  'play',
-  'pause',
-  'ended',
-  'timeupdate',
-  'progress',
-  'error',
-];
+export const SPEC_EVENTS = ['ready', 'play', 'pause', 'ended', 'timeupdate', 'progress', 'error'] as const;
+
+/**
+ * Methods from the spec, plus the ones receivers commonly add on top of it (Gumlet's receiver, for one), which are only
+ * used when advertised.
+ *
+ * @internal
+ */
+export type PlayerJsMethod = (typeof SPEC_METHODS)[number] | 'setPlaybackRate' | 'getPlaybackRate';
+
+/**
+ * Events from the spec, plus the ones receivers commonly add on top of it, which are only subscribed to when
+ * advertised. Bunny Stream spells the volume and rate events in lowercase.
+ *
+ * @internal
+ */
+export type PlayerJsEvent =
+  | (typeof SPEC_EVENTS)[number]
+  | 'seeked'
+  | 'volumeChange'
+  | 'playbackRateChange'
+  | 'volumechange'
+  | 'playbackratechange';
 
 /** What a command carries: an event name, a volume, a time, a rate, or a loop flag. */
 export type PlayerJsCommandValue = string | number | boolean;
@@ -143,7 +118,6 @@ export interface PlayerJsErrorValue {
 }
 
 // https://github.com/embedly/player.js/blob/master/SPEC.rst#events
-export const ERROR_UNDEFINED = -1;
 export const ERROR_NOT_SUPPORTED = 1;
 // The spec calls 2 "method not supported"; the reference receiver reports 2 for an unknown method and 3 for a known
 // one it doesn't implement. Neither says anything about the media.

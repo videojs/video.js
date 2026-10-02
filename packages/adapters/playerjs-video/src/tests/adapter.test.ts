@@ -639,6 +639,20 @@ describe('PlayerJsAdapter', () => {
       expect(media.readyState).toBe(1);
     });
 
+    it('keeps the frame when only the URL hash changes, since no new document loads to report ready', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe } = await attachAndReady(media);
+      const emptied = vi.fn();
+
+      media.addEventListener('emptied', emptied);
+      media.src = `${EMBED_SRC}#t=25`;
+      await flush();
+
+      expect(iframe.getAttribute('src')).toBe(`${EMBED_SRC}#t=25`);
+      expect(emptied).not.toHaveBeenCalled();
+      expect(media.readyState).toBe(1);
+    });
+
     it('drops the frame URL when src is cleared', async () => {
       const media = new PlayerJsAdapter();
       const { iframe } = await attachAndReady(media);
@@ -1030,17 +1044,18 @@ describe('PlayerJsAdapter', () => {
       expect(commands.named('setLoop')).toEqual([expect.objectContaining({ value: false })]);
     });
 
-    it('replays on ended where the embed lacks setLoop', async () => {
+    it('replays from the start on ended where the embed lacks setLoop', async () => {
       const media = new PlayerJsAdapter();
 
       media.loop = true;
       const { iframe, commands, listener } = await attachAndReady(media, {
         methods: ['play', 'pause', 'setCurrentTime'],
-        events: ['ready', 'ended'],
+        events: ['ready', 'ended', 'timeupdate'],
       });
 
       const ended = vi.fn();
 
+      report(iframe, 'timeupdate', { seconds: 60, duration: 60 }, listener);
       media.addEventListener('ended', ended);
       commands.clear();
       report(iframe, 'ended', undefined, listener);
@@ -1049,9 +1064,27 @@ describe('PlayerJsAdapter', () => {
         ['setCurrentTime', 0],
         ['play', undefined],
       ]);
-      // A looping media element never ends.
+      // A looping media element never ends, and the timeline returns to the start with the replay.
       expect(ended).not.toHaveBeenCalled();
       expect(media.ended).toBe(false);
+      expect(media.currentTime).toBe(0);
+    });
+
+    it('does not end where the embed loops itself', async () => {
+      const media = new PlayerJsAdapter();
+
+      media.loop = true;
+      const { iframe, commands, listener } = await attachAndReady(media);
+      const ended = vi.fn();
+
+      report(iframe, 'play', undefined, listener);
+      media.addEventListener('ended', ended);
+      commands.clear();
+      report(iframe, 'ended', undefined, listener);
+
+      expect(ended).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
+      expect(commands.all()).toEqual([]);
     });
   });
 
@@ -1076,10 +1109,32 @@ describe('PlayerJsAdapter', () => {
       report(iframe, 'timeupdate', { seconds: 5 }, listener);
       expect(media.currentTime).toBe(30);
 
+      commands.clear();
       report(iframe, 'seeked', { seconds: 30.2 }, listener);
+      answer(iframe, commands, { getCurrentTime: 30.2 });
+      await flush();
+
       expect(media.seeking).toBe(false);
       expect(media.currentTime).toBe(30.2);
       expect(seeked).toHaveBeenCalledOnce();
+    });
+
+    it('takes the landing position from the embed when a seeked report may be for an earlier seek', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe, commands, listener } = await attachAndReady(media);
+
+      media.currentTime = 10;
+      media.currentTime = 20;
+      commands.clear();
+
+      report(iframe, 'seeked', { seconds: 10 }, listener);
+      expect(media.currentTime).toBe(20);
+
+      answer(iframe, commands, { getCurrentTime: 20 });
+      await flush();
+
+      expect(media.seeking).toBe(false);
+      expect(media.currentTime).toBe(20);
     });
 
     it('clears ended when seeking back from the end', async () => {

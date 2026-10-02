@@ -87,7 +87,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #playRequested = false;
   // Whether the frame has loaded the document last pointed at; until then, the outgoing one can still post.
   #frameLoaded = true;
-  // Identifies the latest seek, so a round trip made for an earlier one does not settle it.
+  // Identifies the latest seek, so the round trip confirming an earlier one does not settle it.
   #seekCount = 0;
 
   #paused = true;
@@ -122,7 +122,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#target = target;
     this.#listen(target);
     this.#beginLoad();
-    this.#createPlayer();
+    this.#createPlayer(target);
   }
 
   detach(): void {
@@ -195,10 +195,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     // Detached while waiting; `detach()` already settled this load.
     if (!target) return;
 
-    const embedSrc = this.#src ? buildPlayerJsIframeSrc(this.#src, this.#snapshotProps()) : '';
+    const embedSrc = buildPlayerJsIframeSrc(this.#src, this.#snapshotProps());
+    const currentSrc = target.getAttribute('src');
 
-    // Reloading the same embed would only discard its position; nothing is cleared, so no lifecycle event is due.
-    if (embedSrc && target.getAttribute('src') === embedSrc) {
+    // The frame keeps its document for the same URL, or one that only moves to a new hash: rebuilding it would only
+    // discard its position, and no new `ready` is coming. Nothing is cleared, so no lifecycle event is due.
+    if (embedSrc && keepsDocument(currentSrc, embedSrc)) {
+      if (currentSrc !== embedSrc) target.src = embedSrc;
+
       // Still loading means a `ready` is coming to settle this load; already ready means none is.
       if (this.#ready) load.resolve();
 
@@ -206,15 +210,25 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     }
 
     this.#resetState();
-    // `emptied` announces that reset before the bails below, where the embed reports nothing further.
+    // `emptied` announces that reset before the bails in `#loadEmbed`, where the embed reports nothing further.
     this.dispatchEvent(new Event('emptied'));
+    this.#loadEmbed(target, embedSrc);
+  }
 
-    if (!this.#src) {
-      // Drop the URL too; a frame left in place keeps playing and keeps reporting.
-      load.resolve();
+  // Point the frame at the embed, or clear it when there is none to point at. A frame left in place would keep playing
+  // and reporting a video the host no longer tracks.
+  #loadEmbed(target: HTMLIFrameElement, embedSrc: string) {
+    if (!embedSrc) {
       target.removeAttribute('src');
-      return;
+      // No embed means no `ready` is coming to settle this load.
+      this.#loadComplete.resolve();
+    } else {
+      // Until the new document loads, the outgoing one can still post, so `#onMessage` checks the `ready` it claims.
+      this.#frameLoaded = false;
+      target.src = embedSrc;
     }
+
+    if (!this.#src) return;
 
     this.dispatchEvent(new Event('loadstart'));
 
@@ -224,22 +238,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
         MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
       );
       this.dispatchEvent(new Event('error'));
-      // Unblock callers awaiting load so play()/fullscreen don't hang.
-      load.resolve();
-      // The last embed would otherwise keep playing a video the host no longer reports.
-      target.removeAttribute('src');
-      return;
     }
-
-    // The new document reports `ready`, which is what settles this load.
-    this.#navigate(target, embedSrc);
-  }
-
-  // Point the frame at a new document. Until it loads, the outgoing document can still post, so `#onReady` checks what
-  // arrives in the meantime against the URL it claims.
-  #navigate(target: HTMLIFrameElement, src: string) {
-    this.#frameLoaded = false;
-    target.src = src;
   }
 
   // Take over as the current load; settling the outgoing barrier releases its waiters.
@@ -283,10 +282,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#currentTime;
   }
   set currentTime(value) {
-    if (this.#currentTime === value) return;
-
     // An embed that cannot seek keeps its position, and so does the host.
-    if (this.#ready && !this.#methods.has('setCurrentTime')) return;
+    if (this.#currentTime === value || !this.#accepts('setCurrentTime')) return;
 
     this.#seeking = true;
     // Seeking away from the end leaves it, as on a media element; the embed's next report says otherwise if not.
@@ -308,30 +305,24 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#volume;
   }
   set volume(value) {
-    if (this.#volume === value) return;
-
-    if (this.#ready && !this.#methods.has('setVolume')) return;
+    if (this.#volume === value || !this.#accepts('setVolume')) return;
 
     this.#volume = value;
     // The spec has no volume event, so the host announces its own change rather than wait on one that may never come.
     this.dispatchEvent(new Event('volumechange'));
-
-    if (this.#ready) this.#post('setVolume', toEmbedVolume(value));
+    this.#call('setVolume', toEmbedVolume(value));
   }
 
   get muted() {
     return this.#muted;
   }
   set muted(value) {
-    if (this.#muted === value) return;
-
     const method = value ? 'mute' : 'unmute';
-    if (this.#ready && !this.#methods.has(method)) return;
+    if (this.#muted === value || !this.#accepts(method)) return;
 
     this.#muted = value;
     this.dispatchEvent(new Event('volumechange'));
-
-    if (this.#ready) this.#post(method);
+    this.#call(method);
   }
 
   /** Reaches the embed only where it advertises `setPlaybackRate`, an extension to the spec. */
@@ -339,14 +330,11 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#playbackRate;
   }
   set playbackRate(value) {
-    if (this.#playbackRate === value) return;
-
-    if (this.#ready && !this.#methods.has('setPlaybackRate')) return;
+    if (this.#playbackRate === value || !this.#accepts('setPlaybackRate')) return;
 
     this.#playbackRate = value;
     this.dispatchEvent(new Event('ratechange'));
-
-    if (this.#ready) this.#post('setPlaybackRate', value);
+    this.#call('setPlaybackRate', value);
   }
 
   get autoplay() {
@@ -372,9 +360,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
   set loop(value) {
     this.#loop = value;
-
     // An embed without `setLoop` is looped by replaying on `ended`.
-    if (this.#ready && this.#methods.has('setLoop')) this.#post('setLoop', value);
+    this.#call('setLoop', value);
   }
 
   get controls() {
@@ -467,50 +454,25 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   async exitFullscreen() {
     const doc = globalThis.document;
 
-    if (doc?.fullscreenElement && doc.fullscreenElement === this.#target) {
-      await doc.exitFullscreen();
-    }
+    if (doc?.fullscreenElement && doc.fullscreenElement === this.#target) await doc.exitFullscreen();
 
     this.#isFullscreen = false;
   }
 
   // Build the embed for the attached target. A server-rendered target already holds a URL, so it is left alone and
   // its `ready` settles the load; a target that cannot resolve yet settles its load, and `load()` retries.
-  #createPlayer() {
-    const target = this.#target;
-    if (!target) return;
-
+  #createPlayer(target: HTMLIFrameElement) {
     // The `src` property resolves an empty attribute to the document URL; only the attribute tells embed from empty.
-    if (target.getAttribute('src')) {
-      // The document already there is the one to talk to; there is no earlier one it could be confused with.
-      this.#frameLoaded = true;
-      this.dispatchEvent(new Event('loadstart'));
-      // The frame may have reported `ready` before anything listened; asking has a ready receiver repeat it.
-      this.#requestReady();
+    if (!target.getAttribute('src')) {
+      this.#loadEmbed(target, buildPlayerJsIframeSrc(this.#src, this.#snapshotProps()));
       return;
     }
 
-    const initialSrc = buildPlayerJsIframeSrc(this.#src, this.#snapshotProps());
-
-    // No embed means no `ready` is coming to settle this load.
-    if (!initialSrc) {
-      this.#loadComplete.resolve();
-
-      // A source that names no embed is an error the first time as much as after a change; `load()` reports the latter.
-      if (this.#src) {
-        this.dispatchEvent(new Event('loadstart'));
-        this.#error = new MediaError(
-          `Unrecognized player.js embed URL: ${this.#src}`,
-          MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
-        );
-        this.dispatchEvent(new Event('error'));
-      }
-
-      return;
-    }
-
-    this.#navigate(target, initialSrc);
+    // The document already there is the one to talk to; there is no earlier one it could be confused with.
+    this.#frameLoaded = true;
     this.dispatchEvent(new Event('loadstart'));
+    // The frame may have reported `ready` before anything listened; asking has a ready receiver repeat it.
+    this.#requestReady();
   }
 
   // Listen for what the embed reports; messages arrive on `window`, so each is matched against this host's frame.
@@ -593,8 +555,9 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
         break;
       case 'seeked':
-        // Receivers report the landing position bare or the way `timeupdate` does.
-        this.#onSeeked(isNumber(value) ? value : isPlayerJsTimeValue(value) ? value.seconds : undefined);
+        // Receivers report the landing position bare or the way `timeupdate` does. Confirmed before it is taken, since
+        // the report may be for an earlier seek than the latest.
+        this.#confirmSeek(isNumber(value) ? value : isPlayerJsTimeValue(value) ? value.seconds : undefined);
         break;
       case 'error':
         this.#onPlayerError(isPlayerJsErrorValue(value) ? value : {});
@@ -674,10 +637,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
       if (paused === false) this.#onPlay();
     });
     this.#get('getCurrentTime', isNumber).then((time) => {
-      if (isUndefined(time) || this.#seeking || time === this.#currentTime) return;
-
-      this.#currentTime = time;
-      this.dispatchEvent(new Event('timeupdate'));
+      if (!this.#seeking) this.#applyCurrentTime(time);
     });
     this.#syncVolume();
     this.#get('getPlaybackRate', isNumber).then((rate) => this.#applyPlaybackRate(rate));
@@ -714,7 +674,16 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.dispatchEvent(new Event('durationchange'));
   }
 
+  #applyCurrentTime(time: number | undefined) {
+    if (!isNumber(time) || time === this.#currentTime) return;
+
+    this.#currentTime = time;
+    this.dispatchEvent(new Event('timeupdate'));
+  }
+
   #seek(time: number) {
+    this.#seekCount++;
+
     if (!this.#call('setCurrentTime', time)) {
       // Only reachable for a seek made before `ready` revealed the embed cannot take one.
       this.#currentTime = 0;
@@ -722,22 +691,20 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
       return;
     }
 
-    // Its own report settles the seek where the embed has one.
-    if (this.#events.has('seeked')) return;
+    // An embed that reports `seeked` settles the seek when it lands; any other settles on the round trip alone.
+    if (!this.#events.has('seeked')) this.#confirmSeek();
+  }
 
-    // Otherwise a round trip does. Receivers answer in order, so the answer is the position after the seek, and any
-    // answer — even from an embed without `getCurrentTime`, which resolves at once — means the seek was taken. Only
-    // the latest seek's answer settles: an earlier one would land on a position the viewer has already left.
-    const seek = ++this.#seekCount;
+  // Settle the latest seek on a round trip. Receivers answer in order, so the answer is the position after every seek
+  // sent so far, where a `seeked` report may belong to an earlier one, and any answer (even from an embed without
+  // `getCurrentTime`, which resolves at once) means the seek was taken. A later seek takes over from this round trip.
+  #confirmSeek(reported?: number) {
+    const seek = this.#seekCount;
 
-    this.#get('getCurrentTime', isNumber).then((position) => {
-      if (seek !== this.#seekCount || !this.#seeking) return;
+    this.#get('getCurrentTime', isNumber).then((position = reported) => {
+      if (seek !== this.#seekCount) return;
 
-      if (isNumber(position) && position !== this.#currentTime) {
-        this.#currentTime = position;
-        this.dispatchEvent(new Event('timeupdate'));
-      }
-
+      this.#applyCurrentTime(position);
       this.#settleSeek();
     });
   }
@@ -768,11 +735,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
 
   #onEnded() {
-    // An embed that took `setLoop` restarts itself; one without it is restarted here. A looping media element never
-    // ends, so neither does this one: announcing it would flash an end state before playback resumes.
-    if (this.#loop && !this.#methods.has('setLoop')) {
-      this.#call('setCurrentTime', 0);
-      this.#post('play');
+    // A looping media element never ends, so neither does this one: an embed that took `setLoop` restarts itself, and
+    // one without it is restarted here, seeking back to the start as a media element does.
+    if (this.#loop) {
+      if (!this.#methods.has('setLoop')) {
+        this.currentTime = 0;
+        this.#post('play');
+      }
+
       return;
     }
 
@@ -786,12 +756,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
     // Positions from before the seek landed would drag the slider back. The seek settles on the embed's `seeked`
     // report or the round trip `#seek` makes, and positions resume after that.
-    if (this.#seeking) return;
-
-    if (isNumber(seconds) && seconds !== this.#currentTime) {
-      this.#currentTime = seconds;
-      this.dispatchEvent(new Event('timeupdate'));
-    }
+    if (!this.#seeking) this.#applyCurrentTime(seconds);
   }
 
   #onProgress({ seconds, duration, percent }: PlayerJsTimeValue) {
@@ -804,15 +769,6 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
       this.#bufferedEnd = end;
       this.dispatchEvent(new Event('progress'));
     }
-  }
-
-  #onSeeked(seconds: number | undefined) {
-    if (isNumber(seconds) && seconds !== this.#currentTime) {
-      this.#currentTime = seconds;
-      this.dispatchEvent(new Event('timeupdate'));
-    }
-
-    this.#settleSeek();
   }
 
   #onPlayerError({ code, msg }: PlayerJsErrorValue) {
@@ -832,7 +788,13 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#loadComplete.resolve();
   }
 
-  // Send a command the embed advertises; false when it doesn't, so the caller can fall back.
+  // Whether a setter can take a value: before ready, every value is held for `#syncToEmbed`; after, only what the embed
+  // advertises, so the host never reports a value the embed does not have.
+  #accepts(method: PlayerJsMethod): boolean {
+    return !this.#ready || this.#methods.has(method);
+  }
+
+  // Send a command the embed advertises; false when it doesn't (or is not ready), so the caller can fall back.
   #call(method: PlayerJsMethod, value?: PlayerJsCommandValue): boolean {
     if (!this.#methods.has(method)) return false;
 
@@ -915,6 +877,12 @@ const SUBSCRIBED_EVENTS: readonly PlayerJsEvent[] = [
 ];
 
 const EMPTY_SET: ReadonlySet<string> = new Set();
+
+// Whether pointing the frame at `next` keeps its document: a URL differing only in its hash is a same-document
+// navigation, which fires no `load` and brings no new `ready`.
+function keepsDocument(current: string | null, next: string): boolean {
+  return !!current && current.split('#')[0] === next.split('#')[0];
+}
 
 /**
  * Whether a URL a receiver reports names the document the frame was pointed at. Receivers report their own location,
