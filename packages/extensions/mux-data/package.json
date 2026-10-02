@@ -48,7 +48,6 @@
     "mux-embed": "5.17.10"
   },
   "devDependencies": {
-    "@videojs/mux": "workspace:*",
     "dashjs": "5.2.0",
     "hls.js": "1.6.7",
     "jsdom": "^26.1.0",

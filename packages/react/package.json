@@ -197,7 +197,6 @@
     "jsdom": "^26.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "typescript": "6.0.2",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {

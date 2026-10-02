@@ -104,7 +104,6 @@
   },
   "devDependencies": {
     "jsdom": "^26.1.0",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:",
     "vjsc": "workspace:*"
   }

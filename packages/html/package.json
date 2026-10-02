@@ -180,7 +180,6 @@
     "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.1",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
@@ -198,7 +197,6 @@
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
     "happy-dom": "^20.11.1",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
