@@ -170,10 +170,10 @@ export const defaultConfig = {
   // `establishStartMediaTime` derives from; same `deriveStartMediaTime` seam. Remove
   // with the reactor.
   audioMessagePipelines: relocationPipelinesFor('audio'),
-};
+} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
 
 /** The state the engine starts with. Nothing needs seeding; exported so every engine module has the same shape. */
-export const initialState = {};
+export const initialState = {} satisfies Partial<EngineState>;
 
 /**
  * Create an audio-only HLS playback engine.

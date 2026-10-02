@@ -113,7 +113,7 @@ export const defaultConfig = {
   resolveDuration: getResolvedSelectedTrackDuration,
   canPlayTrack,
   reportUnsupportedTrackConditions,
-};
+} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
 
 /**
  * The state the engine starts with. `loadActivated: true` stands in for the preload gating this engine doesn't compose,
@@ -121,7 +121,7 @@ export const defaultConfig = {
  */
 export const initialState = {
   loadActivated: true,
-};
+} satisfies Partial<EngineState>;
 
 /**
  * Create a background-video playback engine.
