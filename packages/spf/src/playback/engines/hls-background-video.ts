@@ -1,3 +1,5 @@
+import type { Simplify } from '@videojs/utils/types';
+
 import {
   type ConfigWithDefaults,
   defineCompositionFactory,
@@ -81,16 +83,16 @@ export type Config = ResolveBehaviorConfig<Behaviors>;
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
  */
-export type EngineState = ResolveBehaviorState<Behaviors>;
+export type EngineState = Simplify<ResolveBehaviorState<Behaviors>>;
 
 /** Context shape for the background-video playback engine: every context key its behaviors declare. */
-export type EngineContext = ResolveBehaviorContext<Behaviors>;
+export type EngineContext = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /**
  * Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig`
  * covers optional. Each field is documented on the config type of the behavior that reads it.
  */
-export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
+export type EngineConfig = Simplify<ConfigWithDefaults<Config, typeof defaultConfig>>;
 
 // ============================================================================
 // Background-video playback engine

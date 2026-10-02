@@ -1,3 +1,5 @@
+import type { Simplify } from '@videojs/utils/types';
+
 import {
   type ConfigWithDefaults,
   defineCompositionFactory,
@@ -225,16 +227,16 @@ export type Behaviors = typeof behaviors;
 export type Config = ResolveBehaviorConfig<Behaviors>;
 
 /** State shape for the HLS playback engine: every state key its behaviors and external signals declare. */
-export type EngineState = ResolveBehaviorState<Behaviors>;
+export type EngineState = Simplify<ResolveBehaviorState<Behaviors>>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type EngineContext = ResolveBehaviorContext<Behaviors>;
+export type EngineContext = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /**
  * Configuration for the HLS playback engine: every config key its behaviors read, with each key `defaultConfig` covers
  * optional. Each field is documented on the config type of the behavior that reads it.
  */
-export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
+export type EngineConfig = Simplify<ConfigWithDefaults<Config, typeof defaultConfig>>;
 
 // ============================================================================
 // HLS Playback Engine
