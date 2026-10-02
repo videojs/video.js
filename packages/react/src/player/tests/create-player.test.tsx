@@ -684,6 +684,40 @@ describe('createPlayer', () => {
     });
   });
 
+  describe('custom element media', () => {
+    it('waits for the element to be defined before attaching', async () => {
+      const { Player, usePlayer } = createPlayer({ features: [mockSlice] });
+      const tag = 'test-react-defined-media';
+      let store!: PlayerStore;
+      let setMedia!: (media: HTMLMediaElement | null) => void;
+
+      function Consumer() {
+        store = usePlayer();
+        setMedia = usePlayerContext().setMedia;
+        return null;
+      }
+
+      render(
+        <Player>
+          <Consumer />
+        </Player>
+      );
+
+      const element = document.body.appendChild(document.createElement(tag));
+
+      act(() => setMedia(element as unknown as HTMLMediaElement));
+      expect(store.target).toBeNull();
+
+      await act(async () => {
+        customElements.define(tag, class extends HTMLElement {});
+        await customElements.whenDefined(tag);
+      });
+
+      expect(store.target?.media).toBe(element);
+      element.remove();
+    });
+  });
+
   describe('full integration', () => {
     it('Player → Container → media attach flow', () => {
       const { Player, usePlayer } = createPlayer({ features: [mockSlice] });
