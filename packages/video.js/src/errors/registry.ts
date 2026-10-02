@@ -40,7 +40,8 @@ export const LEGACY_V8_LINE = `Staying on v8 is fine: \`${LEGACY_V8_INSTALL}\` â
 
 export const LEGACY_ERRORS = {
   VJS8_LEGACY_INIT: {
-    summary: '`videojs()` was the Video.js 8 API. Video.js 10 has no factory; players are components you compose.',
+    summary:
+      '`videojs()` was the Video.js 8 setup call. Video.js 10 does not set up a player from an element or id; players are components you compose.',
     legacy: "const player = videojs('my-video', { controls: true });",
     html: "Install `@videojs/html`, `import '@videojs/html/video/player'` and `import '@videojs/html/video/skin'`, and render `<video-player><video-skin><video src></video></video-skin></video-player>`.",
     react:
