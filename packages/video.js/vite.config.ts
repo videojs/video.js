@@ -47,7 +47,7 @@ export default defineConfig({
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
     // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
     clearMocks: false,
-    // The stub tests call `videojs()` with a media element, as v8 snippets do.
+    // The stub tests call `videojs()` with a `<video>` element, as v8 snippets do.
     environment: 'happy-dom',
   },
   pack: packageBuildModes.map(createPackConfig),
