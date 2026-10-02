@@ -220,17 +220,21 @@ const behaviors = [
   externalSignals,
 ] as const;
 
+type Behaviors = typeof behaviors;
+/** Every config key the behaviors read, before `defaultConfig` makes any optional. */
+type Config = ResolveBehaviorConfig<Behaviors>;
+
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
-export type EngineState = ResolveBehaviorState<typeof behaviors>;
+export type EngineState = ResolveBehaviorState<Behaviors>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
+export type EngineContext = ResolveBehaviorContext<Behaviors>;
 
 /**
  * Configuration for the HLS playback engine: every config key its behaviors read, with each key `defaultConfig` covers
  * optional. Each field is documented on the config type of the behavior that reads it.
  */
-export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
 
 // ============================================================================
 // HLS Playback Engine
@@ -306,7 +310,7 @@ export const defaultConfig = {
   // Inert for VoD (the cadence returns null once a playlist is complete), so it
   // composes always.
   reschedule: delayedReschedule(mediaPlaylistReloadDelay),
-} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
+} satisfies Partial<Config>;
 
 /**
  * The state the engine starts with. Seeds `bandwidthState` so `switchVideoTrack` fires on initial subscribe with the

@@ -71,22 +71,26 @@ const behaviors = [
   endOfStream,
 ] as const;
 
+type Behaviors = typeof behaviors;
+/** Every config key the behaviors read, before `defaultConfig` makes any optional. */
+type Config = ResolveBehaviorConfig<Behaviors>;
+
 /**
  * State shape for the background-video playback engine: every state key its behaviors and inputs declare.
  *
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
  */
-export type EngineState = ResolveBehaviorState<typeof behaviors>;
+export type EngineState = ResolveBehaviorState<Behaviors>;
 
 /** Context shape for the background-video playback engine: every context key its behaviors declare. */
-export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
+export type EngineContext = ResolveBehaviorContext<Behaviors>;
 
 /**
  * Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig`
  * covers optional. Each field is documented on the config type of the behavior that reads it.
  */
-export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
 
 // ============================================================================
 // Background-video playback engine
@@ -113,7 +117,7 @@ export const defaultConfig = {
   resolveDuration: getResolvedSelectedTrackDuration,
   canPlayTrack,
   reportUnsupportedTrackConditions,
-} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
+} satisfies Partial<Config>;
 
 /**
  * The state the engine starts with. `loadActivated: true` stands in for the preload gating this engine doesn't compose,
