@@ -1,5 +1,6 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
+import { defineCompositionFactory, type StateSignals } from '../create-composition';
 import type { CheckKeyedFields, KeyedBy } from '../keyed-by';
 
 interface Server {
@@ -46,5 +47,24 @@ describe('CheckKeyedFields', () => {
 
   it('accepts any key when the source list is not literal', () => {
     expectTypeOf<Passes<{ systems: readonly { id: string }[]; servers: { y: Server } }>>().toEqualTypeOf<unknown>();
+  });
+});
+
+describe('defineCompositionFactory', () => {
+  const usesServers = {
+    stateKeys: ['count'] as const,
+    contextKeys: [],
+    setup: (_deps: { state: StateSignals<{ count?: number }>; config?: Config }) => {},
+  };
+  const create = defineCompositionFactory([usesServers], { defaultConfig: defaults });
+  const server = { url: 'https://s' };
+
+  it('checks keyed fields at its own call site', () => {
+    create({ servers: { a: server } });
+    create({ systems: [{ id: 'x' }], servers: { x: server } });
+    // @ts-expect-error — `x` isn't one of the default systems
+    create({ servers: { x: server } });
+    // @ts-expect-error — `a` isn't in the narrowed systems
+    create({ systems: [{ id: 'x' }], servers: { a: server } });
   });
 });

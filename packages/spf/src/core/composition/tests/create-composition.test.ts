@@ -4,6 +4,7 @@ import {
   type Behavior,
   type ContextSignals,
   createComposition,
+  defineCompositionFactory,
   defineBehavior,
   type StateSignals,
 } from '../create-composition';
@@ -378,6 +379,53 @@ describe('createComposition', () => {
     it('uses the defaults alone when config is omitted', () => {
       expect(captureComposedConfig({ defaultConfig: { interval: 250 } })).toEqual({ interval: 250 });
     });
+  });
+});
+
+describe('defineCompositionFactory', () => {
+  interface Cfg {
+    interval: number;
+    label?: string;
+  }
+
+  function captureConfig() {
+    const received: { config?: Cfg; count?: number } = {};
+    const behavior: Behavior<StateSignals<State>, ContextSignals<Context>, Cfg> = {
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: ({ state, config }) => {
+        received.config = config;
+        received.count = state.count.get();
+      },
+    };
+
+    return { behavior, received };
+  }
+
+  it('composes the same behaviors, defaults, and initial state on every call', () => {
+    const { behavior, received } = captureConfig();
+    const create = defineCompositionFactory([behavior], {
+      defaultConfig: { interval: 250 },
+      initialState: { count: 1 },
+    });
+
+    create();
+    expect(received).toEqual({ config: { interval: 250 }, count: 1 });
+
+    create({ interval: 500, label: 'a' });
+    expect(received).toEqual({ config: { interval: 500, label: 'a' }, count: 1 });
+  });
+
+  it('creates a separate composition per call', async () => {
+    const { behavior } = captureConfig();
+    const create = defineCompositionFactory([behavior], { defaultConfig: { interval: 250 } });
+    const first = create();
+    const second = create();
+
+    expect(first.state.count).not.toBe(second.state.count);
+
+    await first.destroy();
+    await second.destroy();
   });
 });
 

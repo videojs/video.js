@@ -457,8 +457,8 @@ export const defaultConfig = {
   // ...
 };
 
-// createEngine: `config` overrides; `defaultConfig` fills every key it leaves out or `undefined`
-createComposition([...behaviors], { defaultConfig, config, initialState });
+// `config` overrides; `defaultConfig` fills every key it leaves out or `undefined`
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
 ```
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.

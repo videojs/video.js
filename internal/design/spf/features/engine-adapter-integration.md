@@ -101,7 +101,7 @@ export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 // ...
 
-return createComposition([...behaviors], { config, initialState });
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
 ```
 
 **Behavior factory:**
