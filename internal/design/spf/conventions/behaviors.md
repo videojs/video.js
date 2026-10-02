@@ -446,16 +446,13 @@ export interface ResolvePresentationConfig {
   defaultPreload?: StandardPreload;     // optional, spec-fallback
 }
 
-// In the engine — optional, defaulted in defaultConfig
-interface EngineConfig {
-  parsePresentation?: ParsePresentation;
-  // ...
-}
-
+// In the engine — optional, because `defaultConfig` covers it
 export const defaultConfig = {
   parsePresentation: parseMultivariantPlaylist,
   // ...
-};
+} satisfies Partial<Config>;
+
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>; // parsePresentation?: ParsePresentation
 
 // `config` overrides; `defaultConfig` fills every key it leaves out or `undefined`
 export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });

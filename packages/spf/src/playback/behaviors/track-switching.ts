@@ -139,8 +139,9 @@ export interface TrackSwitchingSharedConfig {
   /**
    * Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment
    * can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM
-   * API directly; the engine defaults it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`. Absent → no codec
-   * filtering (the constraint passes everything through).
+   * API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or
+   * `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything
+   * through).
    */
   canPlayTrack?: CanPlayTrack;
   /**

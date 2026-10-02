@@ -131,8 +131,8 @@ Per `conventions/signals.md`:
 ### Step 3 — Choose composition placement
 
 - **Always-on or variant-specific?** Composed into the `hls/video` engine
-  (always-on), or into a variant factory (`createAudioOnlyHlsEngine`,
-  etc.)?
+  (always-on), or into a variant engine (the `hls/audio` or
+  `hls/background-video` engine)?
 - **Position in the composition order?** Per `packages/spf/docs/hls-engine.md`,
   the composition has a logical order (lead-in: presentation resolution;
   middle: per-track-type setup, MSE, segment loading; tail-out: adapter

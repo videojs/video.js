@@ -58,10 +58,9 @@ A custom linter rule that warns on multi-writer slots with a `// writer-audit-al
 A slot with **zero writer behaviors** must be seeded via the composition's `initialState` or `initialContext` option. The type system requires this — if no behavior declares write intent, the seed is mandatory, not optional.
 
 ```ts
-createComposition({
-  behaviors: [...],
+createComposition([...behaviors], {
   initialState: { preload: 'auto' },          // required — no behavior writes preload
-  initialContext: { mediaElement: undefined } // required — no behavior writes mediaElement
+  initialContext: { mediaElement: undefined }, // required — no behavior writes mediaElement
 });
 ```
 

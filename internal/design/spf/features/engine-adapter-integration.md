@@ -83,8 +83,8 @@ engines still shared `./hls`, splitting the adapters out took it from
 ## Implementation surface
 
 **Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (`@videojs/spf/hls/video`) —
-the behaviors are listed once at module level, ending with the consumer
-inputs, and the engine's state and context types are derived from that
+the behaviors are listed once at module level, ending with the external
+signals, and the engine's state and context types are derived from that
 list:
 
 ```ts
@@ -159,7 +159,7 @@ each `set src`).
     → "allows patching state and owners from outside" — direct
     engine-level write surface (bypasses the mixin)
   - `packages/spf/src/core/composition/tests/define-external-signals.test.ts`
-    — the inputs behavior itself
+    — the `defineExternalSignals` factory itself
 - **Downstream usage:**
   - `packages/spf/src/playback/adapters/hls-video/adapter.ts` —
     `HlsVideoAdapter` consumer

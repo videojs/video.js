@@ -4,7 +4,7 @@ The HLS video engine, `createEngine()` from `@videojs/spf/hls/video`, composes S
 
 ## Inputs and adapter boundary
 
-The adapter supplies a media element and an unresolved presentation URL through shared signals. It may also write preload, current-time triggers, or user track-selection intent.
+The adapter supplies a media element and an unresolved presentation URL by writing the engine's `state` and `context` signals. It may also write preload, current-time triggers, or user track-selection intent.
 
 The engine returns a composition with one asynchronous destruction boundary. Assigning another presentation reuses that composition while per-source behaviors clean up and set up again.
 
