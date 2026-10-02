@@ -292,7 +292,6 @@ html.dark[data-tone="deep"] {
   }
 }
 @custom-variant dark (&:where(.dark, .dark *));
-@custom-variant banner-dismissed (&:where(.banner-dismissed, .banner-dismissed *));
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 

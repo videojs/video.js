@@ -14,6 +14,7 @@ export const twMerge = extendTailwindMerge({
         'text-p1',
         'text-p2',
         'text-p3',
+        'text-p4',
         'text-code',
       ],
       'font-family': ['font-display-compact', 'font-display'],

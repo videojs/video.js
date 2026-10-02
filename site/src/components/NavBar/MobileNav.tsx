@@ -6,6 +6,7 @@ import Logo from '@/assets/logos/videojs.svg?react';
 import CompactLogo from '@/assets/logos/vjs.svg?react';
 import { AppearanceControls } from '@/components/AppearanceMenu';
 import type { LinkDestination } from '@/components/typography/linkDestination';
+import VersionMenu, { type VersionMenuProps } from '@/components/VersionMenu';
 import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from '@/consts';
 
 import GetStartedLink from './GetStartedLink';
@@ -23,11 +24,11 @@ export interface MobileNavProps {
   currentPath: string;
   children?: React.ReactNode;
   compact?: boolean;
-  /** Version chip beside the logo. Omit it to show the logo alone. */
-  pill?: React.ReactNode;
+  /** Version menu beside the logo. Omit it to show the logo alone. */
+  versionMenu?: VersionMenuProps;
 }
 
-export default function MobileNav({ navLinks, currentPath, children, compact, pill }: MobileNavProps) {
+export default function MobileNav({ navLinks, currentPath, children, compact, versionMenu }: MobileNavProps) {
   return (
     <Dialog.Root modal>
       {/* Trigger button - hamburger menu */}
@@ -61,21 +62,22 @@ export default function MobileNav({ navLinks, currentPath, children, compact, pi
           {/* Header with close button */}
           <div className={clsx('flex justify-between items-center px-5', compact ? 'py-2' : 'py-7')}>
             <Dialog.Title className="sr-only">Navigation</Dialog.Title>
-            <a
-              href="/"
+            <div
               className={clsx('flex items-end', compact ? 'h-5 gap-2 sm:h-6 sm:gap-3' : 'h-7 gap-3 lg:h-10 lg:gap-4')}
             >
-              {compact ? (
-                <>
-                  <CompactLogo height="100%" className="xs:hidden w-auto" />
-                  <Logo height="100%" className="xs:inline hidden w-auto" />
-                </>
-              ) : (
-                <Logo height="100%" className="w-auto" />
-              )}
-              <span className="sr-only">Video.js video player</span>
-              {pill}
-            </a>
+              <a href="/" className="flex h-full items-end">
+                {compact ? (
+                  <>
+                    <CompactLogo height="100%" className="xs:hidden w-auto" />
+                    <Logo height="100%" className="xs:inline hidden w-auto" />
+                  </>
+                ) : (
+                  <Logo height="100%" className="w-auto" />
+                )}
+                <span className="sr-only">Video.js video player</span>
+              </a>
+              {versionMenu && <VersionMenu {...versionMenu} />}
+            </div>
             <Dialog.Close
               className={clsx(
                 'inline-flex items-stretch p-0.75 border-2 border-faded-black dark:border-manila-light rounded-md corner-squircle'

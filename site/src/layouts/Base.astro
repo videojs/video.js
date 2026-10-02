@@ -10,7 +10,6 @@ import BannerInit from '@/components/BannerInit.astro';
 import { PreferenceSync } from '@/components/docs/PreferenceSync';
 import ResolveDocsLinks from '@/components/docs/ResolveDocsLinks.astro';
 import FooterEasterEgg from '@/components/FooterEasterEgg.astro';
-import LegacyBanner from '@/components/LegacyBanner.astro';
 import PlatformInit from '@/components/PlatformInit.astro';
 import Posthog from '@/components/Posthog.astro';
 import PrereleaseBanner from '@/components/PrereleaseBanner.astro';
@@ -203,7 +202,6 @@ const fullTitle = buildPageTitle(title, suffix);
         class="sticky top-0 z-40"
       >
         <PrereleaseBanner />
-        <LegacyBanner />
       </div>
       <slot />
     </div>
