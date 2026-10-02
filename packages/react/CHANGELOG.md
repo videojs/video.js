@@ -1,5 +1,57 @@
 # Changelog
 
+## [10.0.1](https://github.com/videojs/v10/compare/@videojs/react@10.0.0...@videojs/react@10.0.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **react:** accept autoPlay on embeds and drop callback-ref cleanups that warn on React 18 ([#3136](https://github.com/videojs/v10/issues/3136)) ([f0c2782](https://github.com/videojs/v10/commit/f0c27823c2a8e15c926e39f0ec866e37dd1a2a43))
+* **react:** hand the playback adapter to mediaRef on adapter-backed media ([#3141](https://github.com/videojs/v10/issues/3141)) ([ef04287](https://github.com/videojs/v10/commit/ef04287a200fcf2150005e717b30d6d528537559))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.0.1
+    * @videojs/media bumped to 10.0.1
+    * @videojs/native-hls-video bumped to 10.0.1
+    * @videojs/spf bumped to 10.0.1
+    * @videojs/store bumped to 10.0.1
+    * @videojs/utils bumped to 10.0.1
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.0.1
+    * @videojs/dash-video bumped to 10.0.1
+    * @videojs/google-cast bumped to 10.0.1
+    * @videojs/hlsjs-video bumped to 10.0.1
+    * @videojs/icons bumped to 10.0.1
+    * @videojs/mux-audio bumped to 10.0.1
+    * @videojs/mux-data bumped to 10.0.1
+    * @videojs/mux-video bumped to 10.0.1
+    * @videojs/shaka-video bumped to 10.0.1
+    * @videojs/spf bumped to 10.0.1
+    * @videojs/spotify-audio bumped to 10.0.1
+    * @videojs/tiktok-video bumped to 10.0.1
+    * @videojs/twitch-video bumped to 10.0.1
+    * @videojs/vimeo-video bumped to 10.0.1
+    * @videojs/wistia-video bumped to 10.0.1
+    * @videojs/youtube-video bumped to 10.0.1
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.0.1
+    * @videojs/dash-video bumped to 10.0.1
+    * @videojs/google-cast bumped to 10.0.1
+    * @videojs/hlsjs-video bumped to 10.0.1
+    * @videojs/mux-audio bumped to 10.0.1
+    * @videojs/mux-data bumped to 10.0.1
+    * @videojs/mux-video bumped to 10.0.1
+    * @videojs/shaka-video bumped to 10.0.1
+    * @videojs/spotify-audio bumped to 10.0.1
+    * @videojs/tiktok-video bumped to 10.0.1
+    * @videojs/twitch-video bumped to 10.0.1
+    * @videojs/vimeo-video bumped to 10.0.1
+    * @videojs/wistia-video bumped to 10.0.1
+    * @videojs/youtube-video bumped to 10.0.1
+
 ## [10.0.0](https://github.com/videojs/v10/compare/@videojs/react@10.0.0-rc.5...@videojs/react@10.0.0) (2026-10-01)
 
 

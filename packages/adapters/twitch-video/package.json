@@ -1,6 +1,6 @@
 {
   "name": "@videojs/twitch-video",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Twitch embed playback adapter for Video.js",
   "keywords": [
     "embed",

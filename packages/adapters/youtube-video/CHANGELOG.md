@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.0.1](https://github.com/videojs/v10/compare/@videojs/youtube-video@10.0.0...@videojs/youtube-video@10.0.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **youtube-video:** keep the iframe in place when detach destroys the player ([#3154](https://github.com/videojs/v10/issues/3154)) ([27dcd7d](https://github.com/videojs/v10/commit/27dcd7dcdf44eb7ed46154dfdbc1bf4781377436))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.0.1
+    * @videojs/utils bumped to 10.0.1
+
 ## [10.0.0](https://github.com/videojs/v10/compare/@videojs/youtube-video@10.0.0-rc.5...@videojs/youtube-video@10.0.0) (2026-10-01)
 
 

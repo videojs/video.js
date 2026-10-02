@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.0.1](https://github.com/videojs/v10/compare/@videojs/mux-video@10.0.0...@videojs/mux-video@10.0.1) (2026-10-02)
+
+
+### Bug Fixes
+
+* **mux-video:** parse mux stream urls without the .m3u8 extension ([#3143](https://github.com/videojs/v10/issues/3143)) ([ad7f2a0](https://github.com/videojs/v10/commit/ad7f2a03f4a61635ea55fb100ea6f13e7afdb8eb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/hlsjs-video bumped to 10.0.1
+    * @videojs/media bumped to 10.0.1
+    * @videojs/spf bumped to 10.0.1
+    * @videojs/utils bumped to 10.0.1
+
 ## [10.0.0](https://github.com/videojs/v10/compare/@videojs/mux-video@10.0.0-rc.5...@videojs/mux-video@10.0.0) (2026-10-01)
 
 

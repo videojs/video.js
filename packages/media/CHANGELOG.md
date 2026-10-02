@@ -1,5 +1,19 @@
 # Changelog
 
+## [10.0.1](https://github.com/videojs/v10/compare/@videojs/media@10.0.0...@videojs/media@10.0.1) (2026-10-02)
+
+
+### Miscellaneous Chores
+
+* **@videojs/media:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.0.1
+
 ## [10.0.0](https://github.com/videojs/v10/compare/@videojs/media@10.0.0-rc.5...@videojs/media@10.0.0) (2026-10-01)
 
 
