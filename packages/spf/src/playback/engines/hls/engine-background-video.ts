@@ -1,13 +1,15 @@
 import {
   type Composition,
+  type ConfigWithDefaults,
   createComposition,
+  type ResolveBehaviorConfig,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
+import type { CheckKeyedFields } from '../../../core/composition/keyed-by';
 import { canPlayTrack } from '../../../media/dom/capabilities';
 import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import type { CanPlayTrack } from '../../../media/types';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
 import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors, reportAbsentTrackType } from '../../behaviors/collect-errors';
@@ -18,7 +20,7 @@ import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
 import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
 import { trackScreenResolution } from '../../behaviors/dom/track-screen-resolution';
 import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
+import { resolvePresentation } from '../../behaviors/resolve-presentation';
 import { resolveVideoTrack } from '../../behaviors/resolve-track';
 import {
   preferHighestResolution,
@@ -26,10 +28,7 @@ import {
   screenResolutionCap,
   selectVideoTrack,
 } from '../../behaviors/select-tracks';
-import {
-  type ReportUnsupportedTrackConditions,
-  reportUnsupportedTrackConditions,
-} from '../../primitives/report-track-conditions';
+import { reportUnsupportedTrackConditions } from '../../primitives/report-track-conditions';
 import { excludeUnplayableTracks } from '../../primitives/selection-rules';
 
 // ============================================================================
@@ -86,42 +85,10 @@ export type EngineState = ResolveBehaviorState<typeof behaviors>;
 export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
- * Configuration for the background-video engine.
- *
- * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
- * Compared to the HLS video engine's `EngineConfig`, audio/text/ABR/bandwidth/quality knobs are dropped: the variant
- * subtracts the behaviors that read them.
+ * Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig`
+ * covers optional. Each field is documented on the config type of the behavior that reads it.
  */
-export interface EngineConfig {
-  /**
-   * Hard-constraint pre-pass handed to `selectVideoTrack`. Defaults to `[excludeUnplayableTracks,
-   * reportAbsentTrackType(2011)]` — prune the renditions this environment can't decode, then report 2011 if nothing is
-   * left (this engine composes only video, so a source with none playable can never play).
-   */
-  videoConstraints?: SelectVideoTrackConfig['videoConstraints'];
-  /**
-   * Selection-rule chain handed to `selectVideoTrack`. Defaults to `[screenResolutionCap, preferHighestResolution]` —
-   * narrows to the renditions that fit the screen, takes the largest of those, and pins it for the session.
-   *
-   * The cap sits ahead of the ranker because a scope that narrows first wins over one applied later; pass
-   * `[preferHighestResolution]` alone to opt out and always pin the largest rendition on offer.
-   */
-  videoRules?: readonly NonNullable<SelectVideoTrackConfig['videoRules']>[number][];
-  /** Manifest parser handed to `resolvePresentation`. Defaults to the HLS multivariant-playlist parser. */
-  parsePresentation?: ParsePresentation;
-  /** Whether `state.screenResolution` is reported in device pixels. Read by `trackScreenResolution`; defaults to `true`. */
-  useDevicePixelRatio?: boolean;
-  /**
-   * Codec/container capability probe read by `selectVideoTrack`'s constraint pre-pass. Defaults to the DOM
-   * `canPlayTrack`; override to force-exclude a codec.
-   */
-  canPlayTrack?: CanPlayTrack;
-  /**
-   * Per-rendition condition reporting, called by `resolveVideoTrack` once a media playlist parses. Defaults to
-   * {@link reportUnsupportedTrackConditions}, which reports non-fMP4 containers (1004) and encryption (4008).
-   */
-  reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
-}
+export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
 
 // ============================================================================
 // Background-video playback engine
@@ -132,10 +99,10 @@ export interface EngineConfig {
 // SAFETY: `reportAbsentTrackType` also reads the optional `errors` state, which the config's rule type doesn't
 // declare; `collectErrors` provides it in this composition, and the rule no-ops without it.
 const videoConstraints = [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK)] as NonNullable<
-  EngineConfig['videoConstraints']
+  SelectVideoTrackConfig['videoConstraints']
 >;
 // Narrow to the renditions that fit the screen, then take the largest.
-const videoRules: NonNullable<EngineConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
+const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
 
 /**
  * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
@@ -185,6 +152,13 @@ export const initialState = {
  *   await engine.destroy();
  *   ```;
  */
-export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
-  return createComposition([...behaviors], { defaultConfig, config, initialState });
+export function createEngine<const Config extends EngineConfig = EngineConfig>(
+  config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
+): Composition<EngineState, EngineContext> {
+  // Checked above, at this function's call site; here `config` is generic, so compose against the general type.
+  return createComposition<typeof behaviors, typeof defaultConfig, EngineConfig>([...behaviors], {
+    defaultConfig,
+    config,
+    initialState,
+  });
 }

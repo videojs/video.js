@@ -37,17 +37,12 @@ import { defineBehavior } from '../../../core/composition/create-composition';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal } from '../../../core/signals/primitives';
-import {
-  type DrmSystemsConfig,
-  type KeySystemModule,
-  manifestInitData,
-  NO_KEY_SYSTEM,
-  resolveDrmUrl,
-} from '../../../media/dom/eme';
+import { type KeySystemModule, manifestInitData, NO_KEY_SYSTEM, resolveDrmUrl } from '../../../media/dom/eme';
 import { listenForEncryptedInitData, openLicenseSession } from '../../../media/dom/license-sessions';
 import { SVTA_BAD_LICENSE_REQUEST, type SvtaError } from '../../../media/errors';
 import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
+import type { NegotiableDrmSystemsConfig } from './setup-media-keys';
 
 /** State shape for license exchange. */
 export interface ExchangeLicensesState {
@@ -66,7 +61,7 @@ export interface ExchangeLicensesContext {
 /** Config for license exchange. */
 export interface ExchangeLicensesConfig {
   /** License servers keyed by EME key-system id — `source.drm`'s shape. Semantics on `MediaKeysSetupConfig['drm']`. */
-  drm: DrmSystemsConfig;
+  drm: NegotiableDrmSystemsConfig;
   /** The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. */
   keySystems: readonly KeySystemModule[];
 }

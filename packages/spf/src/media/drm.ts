@@ -124,9 +124,9 @@ export interface DrmSystemConfig {
 export const NO_KEY_SYSTEM = 'none';
 
 /**
- * License servers keyed by EME key-system id, for the ids `Id` names. The HLS video engine's `EngineConfig` uses it to
- * key `drm` by the composed modules' ids, so a config entry no composed module could ever negotiate is a type error
- * rather than a silent miss at negotiation time.
+ * License servers keyed by EME key-system id, for the ids `Id` names. The HLS video adapter's options use it to key
+ * `drm` by the default modules' ids when no `keySystems` is named, so a config entry no composed module could ever
+ * negotiate is a type error rather than a silent miss at negotiation time.
  */
 export type DrmSystemsConfigFor<Id extends string> = Partial<Record<Id, DrmSystemConfig>>;
 

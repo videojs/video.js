@@ -1,23 +1,18 @@
 import {
   type Composition,
+  type ConfigWithDefaults,
   createComposition,
+  type ResolveBehaviorConfig,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
-import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
+import type { CheckKeyedFields } from '../../../core/composition/keyed-by';
 import { canPlayTrack } from '../../../media/dom/capabilities';
 import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import type { CanPlayTrack } from '../../../media/types';
-import type { GetCdnId } from '../../../media/utils/cdn';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
-import {
-  calculatePresentationDuration,
-  type PresentationDurationResolver,
-} from '../../behaviors/calculate-presentation-duration';
+import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors } from '../../behaviors/collect-errors';
 import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
 import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
@@ -34,25 +29,14 @@ import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasourc
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
 // `audioMessagePipelines` defaultConfig entry, the `mediaContainerData` state slot,
 // and the `deriveStartMediaTime` config field to drop relocation from audio-only.
-import {
-  type DeriveStartMediaTime,
-  deriveSharedMinStartMediaTime,
-  establishStartMediaTime,
-} from '../../behaviors/establish-start-media-time';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
+import { deriveSharedMinStartMediaTime, establishStartMediaTime } from '../../behaviors/establish-start-media-time';
+import { resolvePresentation } from '../../behaviors/resolve-presentation';
 import { resolveAudioTrack } from '../../behaviors/resolve-track';
-import { type FailoverMonitorConfig, setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
+import { setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
 import { syncPreload } from '../../behaviors/sync-preload';
-import {
-  type SwitchAudioTrackConfig,
-  switchAudioTrack,
-  type UserTrackSelectionState,
-} from '../../behaviors/track-switching';
+import { switchAudioTrack, type UserTrackSelectionState } from '../../behaviors/track-switching';
 import { relocationPipelinesFor } from '../../primitives/relocation-pipelines';
-import {
-  type ReportUnsupportedTrackConditions,
-  reportUnsupportedTrackConditions,
-} from '../../primitives/report-track-conditions';
+import { reportUnsupportedTrackConditions } from '../../primitives/report-track-conditions';
 
 // ============================================================================
 // Audio-Only HLS Engine State & Context
@@ -159,58 +143,10 @@ export type EngineState = ResolveBehaviorState<typeof behaviors>;
 export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
- * Configuration for the audio-only HLS playback engine.
- *
- * Subset of the HLS video engine's `EngineConfig` — video-quality, bandwidth-estimator, and text-track config fields
- * are omitted (no behavior consumes them).
+ * Configuration for the audio-only HLS playback engine: every config key its behaviors read, with each key
+ * `defaultConfig` covers optional. Each field is documented on the config type of the behavior that reads it.
  */
-export interface EngineConfig {
-  /**
-   * Codec capability probe read by `track-switching`'s `excludeUnplayableTracks` constraint. Defaults to the
-   * `MediaSource.isTypeSupported`-backed `canPlayTrack`; override to force-exclude a codec. Mirrors the default engine
-   * — without it, capability probing (and TS / raw-AAC detection) would be inert for audio-only playback.
-   */
-  canPlayTrack?: CanPlayTrack;
-  /**
-   * Codec families the initial audio pick prefers on a mixed-codec source (`preferCodecFamilies` scope) — the family it
-   * lands in is then sticky for the source's lifetime (`stickToSelectedCodecs`; SPF implements no
-   * `SourceBuffer.changeType()`). Defaults to `DEFAULT_PREFERRED_CODECS` (AAC, plus video 4CCs inert here); pass `[]`
-   * to disable.
-   */
-  preferredCodecs?: string[];
-  /**
-   * The hard-constraint pre-pass and rule chain `switchAudioTrack` runs, each replacing its `DEFAULT_AUDIO_*` chain
-   * outright (`@videojs/spf/hls` exports the defaults, so spread one to extend it).
-   */
-  audioConstraints?: SwitchAudioTrackConfig['audioConstraints'];
-  audioRules?: SwitchAudioTrackConfig['audioRules'];
-  /**
-   * Conditions reported about each rendition as it resolves — the _causes_ behind a later verdict, and the copy a
-   * verdict reuses when they agree. Defaults to {@link reportUnsupportedTrackConditions}, which reports non-fMP4
-   * containers and encryption; supply your own to report a different set (a provider that never ships MPEG-TS can drop
-   * that check) or `() => []` to report nothing.
-   */
-  reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
-  resolveDuration?: PresentationDurationResolver;
-  parsePresentation?: ParsePresentation;
-  forwardBuffer?: Partial<ForwardBufferConfig>;
-  backBuffer?: Partial<BackBufferConfig>;
-  /** Multi-CDN failover monitor tuning. Defaults: `DEFAULT_FAILOVER_MONITOR_CONFIG`. */
-  failover?: Partial<FailoverMonitorConfig>;
-  /**
-   * Derive a CDN grouping key from a track URL (used by `cdnPriority`, the failover trip, and the track-switching CDN
-   * rules — one function read by all). Defaults to the URL origin; override to key on e.g. Mux's `cdn=` param.
-   */
-  getCdnId?: GetCdnId;
-  /** Non-zero-PTS relocation (spike): the reduce seam (tier knob); defaults to per-track own. */
-  deriveStartMediaTime?: DeriveStartMediaTime;
-  /**
-   * The `credentials` mode every engine request is made with: a fixed mode, or a policy consulted per request. The
-   * media adapter supplies a policy reading the element's `crossorigin` (`use-credentials` → `'include'`). See the
-   * video engine's `HlsVideoEngineConfig['requestCredentials']`.
-   */
-  requestCredentials?: RequestCredentialsPolicy;
-}
+export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
 
 // ============================================================================
 // Audio-Only HLS Playback Engine
@@ -262,6 +198,13 @@ export const initialState = {};
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *   ```;
  */
-export function createEngine(config: EngineConfig = {}): Composition<EngineState, EngineContext> {
-  return createComposition([...behaviors], { defaultConfig, config, initialState });
+export function createEngine<const Config extends EngineConfig = EngineConfig>(
+  config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
+): Composition<EngineState, EngineContext> {
+  // Checked above, at this function's call site; here `config` is generic, so compose against the general type.
+  return createComposition<typeof behaviors, typeof defaultConfig, EngineConfig>([...behaviors], {
+    defaultConfig,
+    config,
+    initialState,
+  });
 }

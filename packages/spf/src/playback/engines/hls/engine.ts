@@ -1,15 +1,14 @@
 import {
   type Composition,
+  type ConfigWithDefaults,
   createComposition,
+  type ResolveBehaviorConfig,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../core/composition/define-external-signals';
+import type { CheckKeyedFields } from '../../../core/composition/keyed-by';
 import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
-import type { Reschedule } from '../../../core/tasks/task';
-import type { QualityConfig } from '../../../media/abr/quality-selection';
-import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
-import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
 import { canPlayTrackWithDrm } from '../../../media/dom/capabilities';
 import { DEFAULT_KEY_SYSTEMS } from '../../../media/dom/key-systems';
 import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
@@ -19,18 +18,11 @@ import {
   getShowingSubtitlesTrackFromMedia,
   removeAllSubtitlesTracksFromMedia,
 } from '../../../media/dom/text/text-track-slots';
-import type { DrmSystemsConfig, DrmSystemsConfigFor, KeySystemId, KeySystemModule } from '../../../media/drm';
+import type { DrmSystemsConfig } from '../../../media/drm';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
 import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../../media/hls/reload-policy';
-import type { CanPlayTrack, ResolvedTrack } from '../../../media/types';
-import type { GetCdnId } from '../../../media/utils/cdn';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { BandwidthConfig } from '../../../network/bandwidth-estimator';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
-import {
-  calculatePresentationDuration,
-  type PresentationDurationResolver,
-} from '../../behaviors/calculate-presentation-duration';
+import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
 import { collectErrors } from '../../behaviors/collect-errors';
 import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
 import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
@@ -57,22 +49,18 @@ import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasourc
 // state slot, and the `deriveStartMediaTime` config field to drop relocation entirely
 // (text then falls back to the plain `resolveVttSegment` resolver).
 import {
-  type DeriveStartMediaTime,
   deriveSharedMinStartMediaTime,
   establishStartMediaTime,
   gateFirstParseOnAnchor,
 } from '../../behaviors/establish-start-media-time';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
+import { resolvePresentation } from '../../behaviors/resolve-presentation';
 import { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../../behaviors/resolve-track';
-import { type FailoverMonitorConfig, setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
+import { setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
 import { syncPreload } from '../../behaviors/sync-preload';
 import {
   DEFAULT_AUDIO_CONSTRAINTS,
   DEFAULT_VIDEO_CONSTRAINTS,
-  type SwitchAudioTrackConfig,
-  type SwitchTextTrackConfig,
   type SwitchAudioTrackRule,
-  type SwitchVideoTrackConfig,
   type SwitchVideoTrackRule,
   type UserTrackSelectionState,
   switchAudioTrack,
@@ -80,12 +68,8 @@ import {
   switchVideoTrack,
 } from '../../behaviors/track-switching';
 import { relocatingTextPipelines, relocationPipelinesFor } from '../../primitives/relocation-pipelines';
-import {
-  type ReportUnsupportedTrackConditions,
-  reportUnsupportedTrackConditionsWithDrm,
-} from '../../primitives/report-track-conditions';
+import { reportUnsupportedTrackConditionsWithDrm } from '../../primitives/report-track-conditions';
 import { excludeRefusedKeySystems } from '../../primitives/selection-rules';
-import type { TextTrackSegmentResolver } from '../../primitives/text-segment-load-pipeline';
 
 // ============================================================================
 // HLS Engine State & Context
@@ -245,175 +229,10 @@ export type EngineState = ResolveBehaviorState<typeof behaviors>;
 export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
- * Configuration for the HLS playback engine.
- *
- * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
+ * Configuration for the HLS playback engine: every config key its behaviors read, with each key `defaultConfig` covers
+ * optional. Each field is documented on the config type of the behavior that reads it.
  */
-export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
-  /**
-   * Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5
-   * Mbps).
-   */
-  initialBandwidth?: number;
-  /**
-   * License servers keyed by EME key-system id — `source.drm`'s shape. Feeds `setupMediaKeys` (negotiation, MediaKeys
-   * attach, license exchange) and the DRM-aware capability probe / condition reporter, so encrypted renditions a
-   * configured system can serve play instead of being pruned. Absent or empty, encrypted renditions are refused exactly
-   * as a DRM-less engine refuses them: pruned before selection, with `SVTA_UNSUPPORTED_DRM_SYSTEM` causes reported.
-   *
-   * Keyed by the ids `keySystems` composes: an entry for a system no composed module claims could never be negotiated
-   * (`keySystemCandidates` intersects the two), so naming one is a type error here instead of a silent refusal. A
-   * `keySystems` list typed as plain `KeySystemModule[]` widens the keys back to `string`.
-   */
-  drm?: DrmSystemsConfigFor<KeySystemId<KeySystems>>;
-  /**
-   * The key systems this engine can negotiate, most-preferred first. Defaults to `DEFAULT_KEY_SYSTEMS` (FairPlay,
-   * Widevine, PlayReady). Narrow it to drop the systems an engine will never see along with their code — a
-   * `[widevineKeySystem]` engine carries no PlayReady request variants, PSSH wrap, or XML envelope unwrap. Inferred as
-   * a tuple, so it also decides which ids `drm` may name.
-   */
-  keySystems?: KeySystems;
-  /**
-   * Codec capability probe injected into `track-switching`'s `excludeUnplayableTracks` constraint — drops renditions
-   * the environment can't decode before selection. Defaults to `canPlayTrackWithDrm`, which reads `drm` and
-   * `keySystems` off this config (with no `drm`, equivalent to the plain `MediaSource.isTypeSupported`-backed
-   * `canPlayTrack`); supply your own to override (e.g. force-exclude a codec).
-   */
-  canPlayTrack?: CanPlayTrack;
-  /**
-   * Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial video/audio picks prefer on a
-   * mixed-codec source, read by the `preferCodecFamilies` selection scope. SPF implements no
-   * `SourceBuffer.changeType()`, so the initial pick's codec family is sticky for the source's lifetime
-   * (`stickToSelectedCodecs`); this decides which family that is. Soft — a source with no preferred-family rendition is
-   * unaffected. Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC, the broadest-decode pair); pass `[]` to disable and
-   * let ABR pick the initial family (it then still can't leave it mid-stream).
-   */
-  preferredCodecs?: string[];
-  /**
-   * The per-type hard-constraint pre-pass and rule chain `switch{Video,Audio,Text}Track` run, each replacing its
-   * `DEFAULT_*` chain outright (`@videojs/spf/hls` exports the defaults, so spread one to extend it). The video and
-   * audio constraints default here to the DRM-aware pair: the default pre-pass plus `excludeRefusedKeySystems`.
-   */
-  videoConstraints?: SwitchVideoTrackConfig['videoConstraints'];
-  videoRules?: SwitchVideoTrackConfig['videoRules'];
-  audioConstraints?: SwitchAudioTrackConfig['audioConstraints'];
-  audioRules?: SwitchAudioTrackConfig['audioRules'];
-  textConstraints?: SwitchTextTrackConfig['textConstraints'];
-  textRules?: SwitchTextTrackConfig['textRules'];
-  /**
-   * Conditions reported about each rendition as it resolves — the _causes_ behind a later verdict, and the copy a
-   * verdict reuses when they agree. Defaults to `reportUnsupportedTrackConditionsWithDrm`, which reads `drm` and
-   * `keySystems` off this config and reports non-fMP4 containers plus encryption no configured system serves; supply
-   * your own to report a different set (a provider that never ships MPEG-TS can drop that check) or `() => []` to
-   * report nothing.
-   */
-  reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
-  preferredSubtitleLanguage?: string;
-  includeForcedTracks?: boolean;
-  enableDefaultTrack?: boolean;
-  /**
-   * Resolver that turns a text-track segment fetch into VTT cues. Defaults to the DOM-bound `resolveVttSegment`
-   * resolver, which uses an offscreen `<track>` element to parse WebVTT.
-   */
-  resolveTextTrackSegment?: TextTrackSegmentResolver<VTTCue>;
-  /**
-   * Resolver for `presentation.duration`. Defaults to picking the first resolved selected track's duration (video
-   * preferred, audio fallback) — appropriate for VoD and audio-only. Live engines should supply a resolver that returns
-   * `Number.POSITIVE_INFINITY` once the presentation is established as live; downstream `updateMediaSourceDuration`
-   * propagates that value to `mediaSource.duration` per the MSE spec.
-   */
-  resolveDuration?: PresentationDurationResolver;
-  /**
-   * Manifest parser handed to `resolvePresentation`. Defaults to the HLS multivariant-playlist parser; supply your own
-   * for alternate format support without forking the engine.
-   */
-  parsePresentation?: ParsePresentation;
-  /**
-   * Allocate SPF-owned text-track slots on the media element. Defaults to the standard `<track>`-element implementation
-   * in `media/dom/text/text-track-slots`.
-   */
-  addSubtitlesTracksToMedia?: typeof addSubtitlesTracksToMedia;
-  /**
-   * Return the SPF-owned subtitle/caption `TextTrack` currently in showing mode. Defaults to the standard
-   * selector-based implementation in `media/dom/text/text-track-slots`.
-   */
-  getShowingSubtitlesTrackFromMedia?: typeof getShowingSubtitlesTrackFromMedia;
-  /**
-   * Evict all SPF-owned text-track slots from the media element. Defaults to the standard selector-based implementation
-   * in `media/dom/text/text-track-slots`.
-   */
-  removeAllSubtitlesTracksFromMedia?: typeof removeAllSubtitlesTracksFromMedia;
-  /**
-   * Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where
-   * forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader
-   * actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range.
-   */
-  forwardBuffer?: Partial<ForwardBufferConfig>;
-  /**
-   * Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults:
-   * see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use
-   * back-buffer eviction).
-   */
-  backBuffer?: Partial<BackBufferConfig>;
-  /**
-   * Bandwidth-estimator tuning. Overrides any field of `BandwidthConfig` (`fastHalfLife`, `slowHalfLife`,
-   * `minTotalBytes`, `minBytes`, `minDuration`). `bandwidth.minTotalBytes` supersedes the flat `minTotalBytes` field
-   * above. Defaults: see `DEFAULT_BANDWIDTH_CONFIG`.
-   */
-  bandwidth?: Partial<BandwidthConfig>;
-  /**
-   * Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier used by `selectQuality`;
-   * `upgradeMargin` is the hysteresis ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15).
-   */
-  quality?: Partial<QualityConfig>;
-  /**
-   * Whether video renditions are capped to the player element's rendered size. Read by `trackPlayerResolution`; `false`
-   * measures nothing, which leaves the `playerResolutionCap` rule inert. Defaults to `true`.
-   */
-  capRenditionToPlayerSize?: boolean;
-  /** Whether `state.playerResolution` is reported in device pixels. Read by `trackPlayerResolution`; defaults to `true`. */
-  useDevicePixelRatio?: boolean;
-  /**
-   * Multi-CDN failover monitor tuning. `cooldownMs` is how long a CDN stays excluded after a failed fetch trips it.
-   * Defaults: `DEFAULT_FAILOVER_MONITOR_CONFIG` (300s). Only meaningful for redundant-stream sources.
-   */
-  failover?: Partial<FailoverMonitorConfig>;
-  /**
-   * How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in
-   * `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the
-   * keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query
-   * param).
-   */
-  getCdnId?: GetCdnId;
-  /**
-   * Non-zero-PTS relocation (spike): the reduce seam consumed by the `establishStartMediaTime` reactor. Defaults to
-   * per-track own origin (Tier 1); a Tier-2 variant returns the shared `min` across selected A/V. Relocation is
-   * composed into the standard engine below — see the marked block — so this only needs setting to swap the tier
-   * policy. See `internal/design/spf/presentation-timeline-model.md`.
-   */
-  deriveStartMediaTime?: DeriveStartMediaTime;
-  /**
-   * Proximity window (seconds) for the `recoverEndStall` behavior — how close the playhead must be to the reachable
-   * buffered end for a `waiting` to be treated as the end-of-stream freeze and nudged to `ended`. Defaults to `0.2`.
-   * See `behaviors/dom/recover-end-stall`.
-   */
-  endStallNudgeWindow?: number;
-  /**
-   * Live media-playlist re-run policy for the resolve* loaders' `RecurringRunner`: returns a promise that resolves when
-   * the playlist should reload, or `null` to stop. Defaults to `mediaPlaylistReloadDelay` (target-duration cadence,
-   * half on an unchanged window, stop on `#EXT-X-ENDLIST`) composed with a cancellable `sleep`. Inert for VoD (a
-   * complete playlist stops it after the first resolve). Override to tune live reload timing.
-   */
-  reschedule?: Reschedule<ResolvedTrack>;
-  /**
-   * The `credentials` mode every engine request (manifest, media playlists, segments, chapters) is made with: a fixed
-   * mode, or a policy consulted per request. The media adapters supply a policy that reads the element's `crossorigin`
-   * attribute — `use-credentials` maps to `'include'`, so cookie-gated cross-origin streams work the way they do under
-   * native playback — which is why this is a policy rather than a value: the engine is built once and outlives
-   * attribute changes. Absent, or `undefined` from the policy, leaves the platform default (`same-origin`).
-   */
-  requestCredentials?: RequestCredentialsPolicy;
-}
+export type EngineConfig = ConfigWithDefaults<ResolveBehaviorConfig<typeof behaviors>, typeof defaultConfig>;
 
 // ============================================================================
 // HLS Playback Engine
@@ -421,7 +240,8 @@ export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = ty
 
 // Typed as the runtime shapes the behaviors read, so `defaults` accepts any `EngineConfig` against them.
 const noLicenseServers: DrmSystemsConfig = {};
-const defaultKeySystems: readonly KeySystemModule[] = DEFAULT_KEY_SYSTEMS;
+// The literal tuple, so a config that omits `keySystems` is checked against the default systems' ids.
+const defaultKeySystems: typeof DEFAULT_KEY_SYSTEMS = DEFAULT_KEY_SYSTEMS;
 const drmAwareVideoConstraints: readonly SwitchVideoTrackRule[] = [
   ...DEFAULT_VIDEO_CONSTRAINTS,
   excludeRefusedKeySystems,
@@ -525,8 +345,13 @@ export const initialState = {
  *   await engine.destroy();
  *   ```;
  */
-export function createEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
-  config: EngineConfig<KeySystems> = {}
+export function createEngine<const Config extends EngineConfig = EngineConfig>(
+  config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
 ): Composition<EngineState, EngineContext> {
-  return createComposition([...behaviors], { defaultConfig, config, initialState });
+  // Checked above, at this function's call site; here `config` is generic, so compose against the general type.
+  return createComposition<typeof behaviors, typeof defaultConfig, EngineConfig>([...behaviors], {
+    defaultConfig,
+    config,
+    initialState,
+  });
 }

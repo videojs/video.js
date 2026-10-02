@@ -1,6 +1,7 @@
 import { defaults } from '@videojs/utils/object';
 
 import { type ReadonlySignal, type Signal, signal } from '../signals/primitives';
+import type { CheckKeyedFields } from './keyed-by';
 
 /**
  * Cleanup returned by a behavior. Behaviors may return: - `void` / `undefined` — no cleanup needed - A function —
@@ -236,14 +237,18 @@ export interface CompositionOptions<
   C extends object,
   Cfg extends object,
   Defaults extends Partial<Cfg> = Empty,
+  Config extends ConfigWithDefaults<Cfg, Defaults> = ConfigWithDefaults<Cfg, Defaults>,
 > {
   /**
    * Default configuration. Each key fills the same key of `config` when `config` leaves it out or sets it to
    * `undefined`. The merge is shallow: a nested sub-config in `config` replaces the default's whole.
    */
   defaultConfig?: Defaults;
-  /** Static configuration passed to every behavior, over `defaultConfig`. */
-  config?: ConfigWithDefaults<Cfg, Defaults>;
+  /**
+   * Static configuration passed to every behavior, over `defaultConfig`. Its {@link KeyedBy} fields must be keyed by ids
+   * their source lists, from `config` or else `defaultConfig`.
+   */
+  config?: Config & CheckKeyedFields<Cfg, Config, Defaults>;
   /** Initial values for state signals — any subset of `keyof S`. */
   initialState?: Partial<S>;
   /** Initial values for context signals — any subset of `keyof C`. */
@@ -323,13 +328,19 @@ function mergeDefaultConfig<Config extends object, Defaults extends object>(
 export function createComposition<
   const Behaviors extends readonly AnyBehavior[],
   Defaults extends Partial<ResolveBehaviorConfig<Behaviors>> = Empty,
+  // `const` so a keyed field's check sees this call's literal keys and source list.
+  const Config extends ConfigWithDefaults<ResolveBehaviorConfig<Behaviors>, Defaults> = ConfigWithDefaults<
+    ResolveBehaviorConfig<Behaviors>,
+    Defaults
+  >,
 >(
   behaviors: ValidateComposition<Behaviors>,
   options?: CompositionOptions<
     ResolveBehaviorState<Behaviors>,
     ResolveBehaviorContext<Behaviors>,
     ResolveBehaviorConfig<Behaviors>,
-    Defaults
+    Defaults,
+    Config
   >
 ): Composition<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>> {
   type S = ResolveBehaviorState<Behaviors>;
