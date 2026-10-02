@@ -165,7 +165,6 @@ export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
  * are omitted (no behavior consumes them).
  */
 export interface EngineConfig {
-  preferredAudioLanguage?: string;
   /**
    * Codec capability probe read by `track-switching`'s `excludeUnplayableTracks` constraint. Defaults to the
    * `MediaSource.isTypeSupported`-backed `canPlayTrack`; override to force-exclude a codec. Mirrors the default engine
@@ -257,9 +256,7 @@ export const initialState = {};
  *
  * @example
  *   ```ts
- *   const engine = createEngine({
- *     preferredAudioLanguage: 'en',
- *   });
+ *   const engine = createEngine();
  *
  *   engine.context.mediaElement.set(audioEl);
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
