@@ -37,6 +37,8 @@ describe('generated HTML package skins', () => {
 
     expect(template).toContain('createTemplate');
     expect(template).toContain('<media-container');
+    // A `slot="media"` child, as media-chrome markup writes it, renders where the default slot's media would.
+    expect(template).toMatch(/<slot name="media">\s*<\/slot>\s*<slot>\s*<\/slot>/);
     expect(template).not.toMatch(/(?:virtual:vjsc|vjsc\/components|vjsc\/target)/);
     expect(registeredTags).toEqual(tags);
     expect(registeredIcons).toEqual(iconNames);
