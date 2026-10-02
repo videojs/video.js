@@ -226,6 +226,18 @@ export interface Composition<S extends object, C extends object> {
  * `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.
  */
 /**
+ * `unknown` when config `C` names only keys of the composition's config `Cfg`; otherwise an error tag listing the
+ * others. Restores the excess-property check TypeScript skips when it infers `C` from a literal (as the `const` config
+ * parameters here do), so a misspelled key is an error even beside valid ones.
+ */
+export type CheckConfigKeys<Cfg, C> = [Exclude<keyof C, keyof Cfg>] extends [never]
+  ? unknown
+  : { 'Error: config names keys no composed behavior reads': Exclude<keyof C, keyof Cfg> };
+
+/** Every check a composition applies to the config of one call: known keys, and {@link KeyedBy} fields. */
+type CheckConfig<Cfg, C, Defaults> = CheckConfigKeys<Cfg, C> & CheckKeyedFields<Cfg, C, Defaults>;
+
+/**
  * `Cfg` with every key `Defaults` covers made optional: a default fills it when the caller leaves it out or passes
  * `undefined`. Keys `Defaults` doesn't cover keep the behaviors' own requirements.
  */
@@ -248,7 +260,7 @@ export interface CompositionOptions<
    * Static configuration passed to every behavior, over `defaultConfig`. Its {@link KeyedBy} fields must be keyed by ids
    * their source lists, from `config` or else `defaultConfig`.
    */
-  config?: Config & CheckKeyedFields<Cfg, Config, Defaults>;
+  config?: Config & CheckConfig<Cfg, Config, Defaults>;
   /** Initial values for state signals — any subset of `keyof S`. */
   initialState?: Partial<S>;
   /** Initial values for context signals — any subset of `keyof C`. */
@@ -382,7 +394,7 @@ export function defineCompositionFactory<
       Defaults
     >,
   >(
-    config?: Config & CheckKeyedFields<ResolveBehaviorConfig<Behaviors>, Config, Defaults>
+    config?: Config & CheckConfig<ResolveBehaviorConfig<Behaviors>, Config, Defaults>
   ): Composition<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>> =>
     compose<ResolveBehaviorState<Behaviors>, ResolveBehaviorContext<Behaviors>, ResolveBehaviorConfig<Behaviors>>(
       validBehaviors,
