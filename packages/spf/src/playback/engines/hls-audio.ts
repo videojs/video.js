@@ -138,7 +138,7 @@ type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
 type Config = ResolveBehaviorConfig<Behaviors>;
 
-/** State shape for the audio-only HLS playback engine: every state key its behaviors and inputs declare. */
+/** State shape for the audio-only HLS playback engine: every state key its behaviors and external signals declare. */
 export type EngineState = ResolveBehaviorState<Behaviors>;
 
 /** Context shape for the audio-only HLS playback engine: every context key its behaviors declare. */
@@ -155,12 +155,12 @@ export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
 // ============================================================================
 
 /**
- * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
- * engine config doesn't expose (`attachMediaSource`, the relocation pipeline).
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`, including wiring such as
+ * `attachMediaSource` and the relocation pipeline. Each is optional in `EngineConfig`, so a caller may override it.
  */
 export const defaultConfig = {
   deriveStartMediaTime: deriveSharedMinStartMediaTime,
-  // Not in `EngineConfig`: this engine composes `setupAirPlay`, whose native
+  // The `<source>` attachment: this engine composes `setupAirPlay`, whose native
   // fallback `<source>` requires the MSE attachment to keep sibling source
   // alternatives part of resource selection. The helper's `video/mp4` source
   // type is inert here — resource selection probes it with `canPlayType`,

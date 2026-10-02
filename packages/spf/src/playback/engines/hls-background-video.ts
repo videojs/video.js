@@ -76,7 +76,7 @@ type Behaviors = typeof behaviors;
 type Config = ResolveBehaviorConfig<Behaviors>;
 
 /**
- * State shape for the background-video playback engine: every state key its behaviors and inputs declare.
+ * State shape for the background-video playback engine: every state key its behaviors declare.
  *
  * Includes `bandwidthState`: `setupVideoBufferActors` declares it and `loadVideoSegments` samples into it, which is
  * wasted work in this variant, since nothing ranks by bandwidth.
@@ -107,8 +107,8 @@ const videoConstraints = [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO
 const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
 
 /**
- * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
- * engine config doesn't expose (`resolveDuration`).
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`, including wiring such as
+ * `resolveDuration`. Each is optional in `EngineConfig`, so a caller may override it.
  */
 export const defaultConfig = {
   videoConstraints,

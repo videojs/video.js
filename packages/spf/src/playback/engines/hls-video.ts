@@ -224,7 +224,7 @@ type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
 type Config = ResolveBehaviorConfig<Behaviors>;
 
-/** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
+/** State shape for the HLS playback engine: every state key its behaviors and external signals declare. */
 export type EngineState = ResolveBehaviorState<Behaviors>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
@@ -240,7 +240,7 @@ export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>;
 // HLS Playback Engine
 // ============================================================================
 
-// Typed as the runtime shapes the behaviors read, so `defaults` accepts any `EngineConfig` against them.
+// Typed as the runtime shapes the behaviors read, so a caller's `EngineConfig` can override them.
 const noLicenseServers: DrmSystemsConfig = {};
 // The literal tuple, so a config that omits `keySystems` is checked against the default systems' ids.
 const defaultKeySystems: typeof DEFAULT_KEY_SYSTEMS = DEFAULT_KEY_SYSTEMS;
@@ -254,9 +254,9 @@ const drmAwareAudioConstraints: readonly SwitchAudioTrackRule[] = [
 ];
 
 /**
- * The defaults `createEngine` fills in for every config key the caller leaves `undefined`. Also includes wiring the
- * engine config doesn't expose (`attachMediaSource`, the relocation pipelines, `gateFirstParse`,
- * `resolveLiveLatency`).
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`, including wiring such as
+ * `attachMediaSource`, the relocation pipelines, `gateFirstParse`, and `resolveLiveLatency`. Each is optional in
+ * `EngineConfig`, so a caller may override it.
  */
 export const defaultConfig = {
   // Non-zero-PTS relocation (spike): the coordination seam the reactor (model
@@ -272,7 +272,7 @@ export const defaultConfig = {
   // config type is the intersection of what they declare.
   drm: noLicenseServers,
   keySystems: defaultKeySystems,
-  // Not in `EngineConfig`: this engine composes `setupAirPlay`, whose native
+  // The `<source>` attachment: this engine composes `setupAirPlay`, whose native
   // fallback `<source>` requires the MSE attachment to keep sibling source
   // alternatives part of resource selection.
   attachMediaSource: attachMediaSourceAsSourceElement,
