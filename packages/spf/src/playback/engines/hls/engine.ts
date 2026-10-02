@@ -306,7 +306,7 @@ export const defaultConfig = {
   // Inert for VoD (the cadence returns null once a playlist is complete), so it
   // composes always.
   reschedule: delayedReschedule(mediaPlaylistReloadDelay),
-};
+} satisfies Partial<ResolveBehaviorConfig<typeof behaviors>>;
 
 /**
  * The state the engine starts with. Seeds `bandwidthState` so `switchVideoTrack` fires on initial subscribe with the
@@ -321,7 +321,7 @@ export const initialState = {
     slowTotalWeight: 0,
     bytesSampled: 0,
   },
-};
+} satisfies Partial<EngineState>;
 
 /**
  * Create an HLS playback engine.
