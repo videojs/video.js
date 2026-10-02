@@ -348,10 +348,8 @@ export const initialState = {
 export function createEngine<const Config extends EngineConfig = EngineConfig>(
   config?: Config & CheckKeyedFields<ResolveBehaviorConfig<typeof behaviors>, Config, typeof defaultConfig>
 ): Composition<EngineState, EngineContext> {
-  // Checked above, at this function's call site; here `config` is generic, so compose against the general type.
-  return createComposition<typeof behaviors, typeof defaultConfig, EngineConfig>([...behaviors], {
-    defaultConfig,
-    config,
-    initialState,
-  });
+  // Checked at this function's call site. Widened to the general type, the composition's own check of it is trivial.
+  const engineConfig: EngineConfig | undefined = config;
+
+  return createComposition([...behaviors], { defaultConfig, config: engineConfig, initialState });
 }
