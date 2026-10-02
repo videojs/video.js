@@ -8,6 +8,7 @@ import {
   type ContextSignals,
   createComposition,
   defineBehavior,
+  defineCompositionFactory,
   type InferBehaviorConfig,
   type InferBehaviorContext,
   type InferBehaviorState,
@@ -1007,6 +1008,16 @@ describe('ConfigWithDefaults', () => {
     createComposition([optionalConfig], { defaultConfig: { interval: 250 } });
     // @ts-expect-error — `interval` is a number
     createComposition([optionalConfig], { defaultConfig: { interval: '250' } });
+  });
+
+  // Inferring `config` as a `const` type parameter skips TypeScript's own
+  // excess-property check, so the composition restores it.
+  it('rejects a misspelled config key, even beside a valid one', () => {
+    createComposition([needsInterval], { config: { interval: 1, label: 'a' } });
+    // @ts-expect-error — `intervl` is not a config key
+    createComposition([needsInterval], { config: { interval: 1, intervl: 2 } });
+    // @ts-expect-error — the same, through a factory's create function
+    defineCompositionFactory([needsInterval])({ interval: 1, intervl: 2 });
   });
 
   it('rejects a default of the wrong type', () => {

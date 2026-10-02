@@ -9,6 +9,7 @@ import type { AudioTrack, TextTrack, VideoTrack } from '../../../media/types';
 import type * as hlsAudio from '../hls-audio';
 import type * as hlsBackgroundVideo from '../hls-background-video';
 import type * as hlsVideo from '../hls-video';
+import { createEngine } from '../hls-video';
 
 type IsOpen<T> = string extends keyof T ? true : false;
 
@@ -41,5 +42,13 @@ describe('EngineContext', () => {
     expectTypeOf<IsOpen<hlsVideo.EngineContext>>().toEqualTypeOf<false>();
     expectTypeOf<IsOpen<hlsAudio.EngineContext>>().toEqualTypeOf<false>();
     expectTypeOf<IsOpen<hlsBackgroundVideo.EngineContext>>().toEqualTypeOf<false>();
+  });
+});
+
+describe('createEngine', () => {
+  it('rejects a misspelled config key, even beside a valid one', () => {
+    createEngine({ initialBandwidth: 1, videoRules: [] });
+    // @ts-expect-error — `videoRulez` is not a config key
+    createEngine({ initialBandwidth: 1, videoRulez: [] });
   });
 });
