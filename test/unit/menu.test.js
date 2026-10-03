@@ -141,18 +141,20 @@ QUnit.test('should keep all the added menu items', function(assert) {
   MenuButton.prototype.createItems = oldCreateItems;
 });
 
-QUnit.test('should add or remove role menu for accessibility purpose', function(assert) {
+QUnit.test('should hide the menu from assistive technology when no items are present', function(assert) {
   const player = TestHelpers.makePlayer();
   const menuButton = new MenuButton(player);
 
   menuButton.createItems = () => [];
   menuButton.update();
-  assert.equal(menuButton.menu.contentEl_.hasAttribute('role'), false, 'the menu does not have a role attribute when it contains no menu items');
+  assert.equal(menuButton.menu.contentEl_.hasAttribute('role'), true, 'the menu has a role attribute');
+  assert.strictEqual(menuButton.menu.contentEl_.getAttribute('role'), 'menu', 'the menu has a role attribute with the value of menu');
+  assert.equal(menuButton.menu.contentEl_.hasAttribute('aria-hidden'), true, 'the menu has an aria-hidden attribute when it contains no menu items');
+  assert.strictEqual(menuButton.menu.contentEl_.getAttribute('aria-hidden'), 'true', 'the value of the aria-hidden attribute on the menu is true when it contains no menu items');
 
   menuButton.createItems = () => [new MenuItem(player, { label: 'menu-item' })];
   menuButton.update();
-  assert.equal(menuButton.menu.contentEl_.hasAttribute('role'), true, 'the menu has a role attribute when it contains menu items');
-  assert.strictEqual(menuButton.menu.contentEl_.getAttribute('role'), 'menu', 'the menu role is `menu`');
+  assert.equal(menuButton.menu.contentEl_.hasAttribute('aria-hidden'), false, 'the menu does not have an aria-hidden attribute when it contains menu items');
 
   menuButton.dispose();
   player.dispose();
