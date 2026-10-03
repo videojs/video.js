@@ -90,6 +90,8 @@ class Menu extends Component {
 
     this.removeEventListenerForItem(component);
     super.removeChild(component);
+
+    this.updateMenuRole_();
   }
 
   /**
@@ -105,6 +107,26 @@ class Menu extends Component {
     if (childComponent) {
       this.addEventListenerForItem(childComponent);
     }
+
+    this.updateMenuRole_();
+  }
+
+  /**
+   * A menu with no selectable items -- an empty captions/chapters menu, for
+   * example, still shows its title -- has no need for `role="menu"`; leaving
+   * it in place is an ARIA accessibility error when the underlying list has
+   * no children a screen reader could navigate to.
+   */
+  updateMenuRole_() {
+    const children = this.children();
+    const hasTitle = children.length > 0 && children[0].hasClass('vjs-menu-title');
+    const itemCount = hasTitle ? children.length - 1 : children.length;
+
+    if (itemCount > 0) {
+      this.contentEl_.setAttribute('role', 'menu');
+    } else {
+      this.contentEl_.removeAttribute('role');
+    }
   }
 
   /**
@@ -119,8 +141,6 @@ class Menu extends Component {
     this.contentEl_ = Dom.createEl(contentElType, {
       className: 'vjs-menu-content'
     });
-
-    this.contentEl_.setAttribute('role', 'menu');
 
     const el = super.createEl('div', {
       append: this.contentEl_,
