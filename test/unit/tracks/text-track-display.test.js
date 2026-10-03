@@ -620,3 +620,39 @@ if (!Html5.supportsNativeTextTracks()) {
     player.dispose();
   });
 }
+
+QUnit.test('aria-live is set to "off" for captions/subtitles tracks and "polite" for descriptions tracks', function(assert) {
+  const player = TestHelpers.makePlayer();
+  const display = player.textTrackDisplay;
+
+  // Stub clearDisplay and updateForTrack so no WebVTT processing occurs
+  display.clearDisplay = () => {};
+  display.updateForTrack = () => {};
+
+  const tracks = player.textTracks();
+
+  // Add a captions track and make it active
+  player.addRemoteTextTrack({ kind: 'captions', language: 'en', label: 'English' }, true);
+  tracks[0].mode = 'showing';
+
+  display.updateDisplay();
+  assert.strictEqual(
+    display.el_.getAttribute('aria-live'),
+    'off',
+    'aria-live should be "off" when a captions track is active to avoid interrupting screen reader announcements'
+  );
+
+  // Switch to a descriptions track
+  tracks[0].mode = 'disabled';
+  player.addRemoteTextTrack({ kind: 'descriptions', language: 'en', label: 'English Descriptions' }, true);
+  tracks[1].mode = 'showing';
+
+  display.updateDisplay();
+  assert.strictEqual(
+    display.el_.getAttribute('aria-live'),
+    'polite',
+    'aria-live should be "polite" for descriptions tracks so announcements queue without interrupting other screen reader output'
+  );
+
+  player.dispose();
+});
