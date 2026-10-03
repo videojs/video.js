@@ -8,8 +8,8 @@ import { throwLegacyError } from './errors/legacy-error';
  * Only setup-time entry points are stubbed: anything reached through a v8 player instance is unreachable once
  * `videojs()` throws.
  *
- * @deprecated The Video.js 8 module shape. Every member throws a `VJS8_LEGACY_*` code; see
- * https://videojs.org/docs/reference/api/error-codes.
+ * @deprecated The Video.js 8 module shape. Every member throws a `VJS8_LEGACY_*` code.
+ * @see {@link https://videojs.org/docs/reference/api/error-codes}
  */
 export interface LegacyVideojs {
   (...args: unknown[]): never;
@@ -22,40 +22,40 @@ export interface LegacyVideojs {
 }
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_PLUGIN`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-plugin.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_PLUGIN`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-plugin}
  */
 export function registerPlugin(..._args: unknown[]): never {
   throwLegacyError('VJS8_LEGACY_PLUGIN');
 }
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_PLUGIN`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-plugin.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_PLUGIN`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-plugin}
  */
 export function getPlugin(..._args: unknown[]): never {
   throwLegacyError('VJS8_LEGACY_PLUGIN');
 }
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_COMPONENT`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-component.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_COMPONENT`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-component}
  */
 export function registerComponent(..._args: unknown[]): never {
   throwLegacyError('VJS8_LEGACY_COMPONENT');
 }
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_COMPONENT`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-component.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_COMPONENT`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-component}
  */
 export function getComponent(..._args: unknown[]): never {
   throwLegacyError('VJS8_LEGACY_COMPONENT');
 }
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_GET_PLAYER`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-get-player.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_GET_PLAYER`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-get-player}
  */
 export function getPlayer(..._args: unknown[]): never {
   throwLegacyError('VJS8_LEGACY_GET_PLAYER');
@@ -69,8 +69,8 @@ function throwOptions(): never {
  * `videojs.options` was a mutable bag of global defaults, so a plain value cannot report its use. The proxy throws on
  * any read, write, check, or delete of a key instead.
  *
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_OPTIONS`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-options.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_OPTIONS`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-options}
  */
 export const options: Record<string, never> = new Proxy(Object.freeze({}), {
   get: throwOptions,
@@ -81,8 +81,8 @@ export const options: Record<string, never> = new Proxy(Object.freeze({}), {
 });
 
 /**
- * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_INIT`; see
- *   https://videojs.org/docs/reference/api/vjs8-legacy-init.
+ * @deprecated Video.js 8 API. Throws `VJS8_LEGACY_INIT`.
+ * @see {@link https://videojs.org/docs/reference/api/vjs8-legacy-init}
  */
 const videojs: LegacyVideojs = Object.assign(
   function videojs(..._args: unknown[]): never {
