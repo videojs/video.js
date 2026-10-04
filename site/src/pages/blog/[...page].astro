@@ -10,6 +10,7 @@ import JsonLd from '@/components/JsonLd.astro';
 import A from '@/components/typography/A.astro';
 import { BLOG_PAGE_SIZE, PRODUCTION_URL } from '@/consts';
 import Blog from '@/layouts/Blog.astro';
+import { FEEDS } from '@/utils/feeds/rssFeed';
 import { createBlogCollectionSchema } from '@/utils/jsonLd/schemas';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -65,6 +66,9 @@ const jsonLdSchema = createBlogCollectionSchema({
             ? "Coming soon"
             : "News and updates from the Video.js open-source video player project"
         }
+      </p>
+      <p class="mt-4">
+        <A href={FEEDS.blog.path}>Subscribe via RSS</A>
       </p>
     </div>
     <FooterEasterEgg variant="extra-short" />

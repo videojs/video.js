@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { compareChangelogEntries, compareVersions } from '../changelog';
+import { compareChangelogEntries, compareVersions, releaseCategories } from '../changelog';
 
 describe('compareVersions', () => {
   it('ranks a release above its prereleases', () => {
@@ -40,5 +40,16 @@ describe('compareChangelogEntries', () => {
       '10.0.0-rc.5',
       '10.0.0-rc.4',
     ]);
+  });
+});
+
+describe('releaseCategories', () => {
+  it('tags stability', () => {
+    expect(releaseCategories({ prerelease: false, breaking: false })).toEqual(['Stable']);
+    expect(releaseCategories({ prerelease: true, breaking: false })).toEqual(['Prerelease']);
+  });
+
+  it('tags breaking releases', () => {
+    expect(releaseCategories({ prerelease: false, breaking: true })).toEqual(['Stable', 'Breaking changes']);
   });
 });

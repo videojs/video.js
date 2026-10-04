@@ -6,9 +6,11 @@ import type { GetStaticPaths, Page } from 'astro';
 import BlogPagination from '@/components/blog/BlogPagination.astro';
 import ChangelogEntryCard from '@/components/changelog/ChangelogEntryCard.astro';
 import FooterEasterEgg from '@/components/FooterEasterEgg.astro';
+import A from '@/components/typography/A.astro';
 import { BLOG_PAGE_SIZE } from '@/consts';
 import Blog from '@/layouts/Blog.astro';
 import { compareChangelogEntries } from '@/utils/changelog';
+import { FEEDS } from '@/utils/feeds/rssFeed';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const entries = (await getCollection('changelog')).sort((a, b) => compareChangelogEntries(a.data, b.data));
@@ -32,6 +34,9 @@ const { page } = Astro.props;
   >
     <div class="mx-auto max-w-3xl px-5 py-20">
       <h1 class="font-display text-h15 uppercase lg:text-h1">Changelog</h1>
+      <p class="mt-4">
+        <A href={FEEDS.changelog.path}>Subscribe via RSS</A>
+      </p>
     </div>
     <FooterEasterEgg variant="extra-short" />
   </header>
