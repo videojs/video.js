@@ -71,6 +71,8 @@ describe('createEngine', () => {
     // seeded via `initialState` with an empty BandwidthState. `preload` is
     // backfilled by `syncPreload` to its default (`'metadata'`); `currentTime`
     // is backfilled by `trackCurrentTime` to its default (`0`).
+    // `segmentLoadingBlocked` is raised by `setupMediaKeys` until a source
+    // is confirmed clear or its keys attach.
     // Everything else starts as `undefined` and behaviors write their
     // own slots in response to inputs.
     expect(snapshot(engine.state)).toEqual({
@@ -87,6 +89,7 @@ describe('createEngine', () => {
       loadActivated: undefined,
       preload: 'metadata',
       presentation: undefined,
+      segmentLoadingBlocked: true,
       selectedAudioTrackId: undefined,
       selectedTextTrackId: undefined,
       selectedVideoTrackId: undefined,
@@ -584,7 +587,7 @@ http://example.com/audio-seg1.m4s
 
     const engine = createEngine();
 
-    expect(engine.state.segmentLoadingBlocked.get()).toBeUndefined();
+    expect(engine.state.segmentLoadingBlocked.get()).toBe(true);
     const mediaElement = document.createElement('video');
 
     mediaElement.preload = 'auto';

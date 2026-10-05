@@ -57,7 +57,13 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   manifest parse.
 - **Behavior split:** two behaviors, not one. `setupMediaKeys`
   negotiates a key system, applies the server certificate, attaches
-  MediaKeys, and owns the `segmentLoadingBlocked` load gate;
+  MediaKeys, and owns the `segmentLoadingBlocked` load gate, which
+  holds from setup and each new source until the source is confirmed
+  clear or its MediaKeys attach, so it doesn't depend on composition
+  order. Clear means each selected track type has a resolved rendition
+  and nothing declares keys: a type's renditions are assumed to be all
+  clear or all encrypted, so mixed renditions within one type and
+  clear-lead content are out of scope;
   `exchangeLicenses` opens sessions and exchanges licenses. The handoff
   is `context.mediaKeys` + `state.negotiatedKeySystem`, published
   together only after the certificate is applied — which is what
