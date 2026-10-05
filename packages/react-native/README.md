@@ -26,14 +26,11 @@ import { Player } from "@videojs/react-native";
 
 ## Contributing
 
-- [Development workflow](CONTRIBUTING.md#development-workflow)
-- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
-- [Code of conduct](CODE_OF_CONDUCT.md)
+Repository setup and workflow are in the monorepo's
+[`CONTRIBUTING.md`](https://github.com/videojs/v10/blob/main/CONTRIBUTING.md). The native toolchain
+this package needs, and the example app that exercises it, are documented in
+[`apps/react-native/README.md`](https://github.com/videojs/v10/blob/main/apps/react-native/README.md).
 
 ## License
 
 MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
