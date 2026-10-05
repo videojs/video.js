@@ -49,6 +49,10 @@ function removeComments(root: Element): void {
   }
 }
 
+function hasOwnText(element: Element): boolean {
+  return [...element.childNodes].some((child) => child.nodeType === child.TEXT_NODE && child.textContent?.trim());
+}
+
 function isEmpty(element: Element): boolean {
   return !element.textContent?.trim() && !element.querySelector(MEDIA_SELECTOR);
 }
@@ -91,9 +95,11 @@ export function cleanFeedHtml(html: string, entryUrl: URL): string {
     if (span.attributes.length === 0) unwrap(span);
   }
 
-  // Layout wrappers left with nothing in them once their decoration is gone.
+  // Layout wrappers mean nothing once their decoration is gone: drop the empty ones and unwrap the ones that only group
+  // blocks. A wrapper around bare text stays, so it doesn't run into its neighbours.
   for (const wrapper of [...root.querySelectorAll('div')].reverse()) {
     if (isEmpty(wrapper)) wrapper.remove();
+    else if (wrapper.attributes.length === 0 && !hasOwnText(wrapper)) unwrap(wrapper);
   }
 
   removeComments(root);

@@ -84,9 +84,9 @@ describe('cleanFeedHtml', () => {
     const frame = (label: string) =>
       `<astro-island><div data-tabs-root><div role="tablist"><button role="tab" data-value="code">${label}</button><button>Copy</button></div><astro-island><div role="tabpanel" data-value="code"><astro-slot><pre data-language="ts"><code>x</code></pre></astro-slot></div></astro-island></div></astro-island>`;
 
-    expect(cleanFeedHtml(frame('ts'), ENTRY_URL)).toBe('<div><pre><code>x</code></pre></div>');
+    expect(cleanFeedHtml(frame('ts'), ENTRY_URL)).toBe('<pre><code>x</code></pre>');
     expect(cleanFeedHtml(frame('player.ts'), ENTRY_URL)).toBe(
-      '<div><p><strong>player.ts</strong></p>\n<pre><code>x</code></pre></div>'
+      '<p><strong>player.ts</strong></p>\n<pre><code>x</code></pre>'
     );
   });
 
@@ -96,13 +96,16 @@ describe('cleanFeedHtml', () => {
     );
   });
 
-  it('removes wrappers left empty once their decoration is gone', () => {
+  it('removes layout wrappers once their decoration is gone', () => {
     expect(
       cleanFeedHtml(
         '<section><div class="w-2"></div><div><div><svg aria-hidden="true"></svg></div><p>Note</p></div></section>',
         ENTRY_URL
       )
-    ).toBe('<section><div><p>Note</p></div></section>');
+    ).toBe('<section><p>Note</p></section>');
+    expect(cleanFeedHtml('<div class="a">one</div><div class="b">two</div>', ENTRY_URL)).toBe(
+      '<div>one</div><div>two</div>'
+    );
   });
 
   it('flattens code to plain text, keeping its line breaks', () => {
