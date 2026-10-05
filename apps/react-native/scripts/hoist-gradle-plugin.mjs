@@ -9,11 +9,12 @@
  * editing native code without the IDE is not a great experience, so we support it with this workaround
  */
 
-import { cpSync, lstatSync, realpathSync, rmSync } from 'node:fs';
+import { cpSync, lstatSync, readFileSync, realpathSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const pkg = join(dirname(fileURLToPath(import.meta.url)), '..', 'node_modules', '@react-native', 'gradle-plugin');
+const here = dirname(fileURLToPath(import.meta.url));
+const pkg = join(here, '..', 'node_modules', '@react-native', 'gradle-plugin');
 
 let stats;
 
@@ -31,6 +32,23 @@ if (!stats.isSymbolicLink()) {
 
 const target = realpathSync(pkg);
 
-rmSync(pkg);
+// A failed postinstall fails every pnpm command in the workspace, so name the usual cause instead of
+// leaving a stack trace: Node 24.0.x throws EISDIR when rmSync() meets a symlink to a directory.
+try {
+  rmSync(pkg);
+} catch (error) {
+  let pinned = 'the version in .nvmrc';
+
+  try {
+    pinned = readFileSync(join(here, '..', '..', '..', '.nvmrc'), 'utf8').trim();
+  } catch {}
+
+  console.error(`[gradle-plugin] could not remove the symlink at ${pkg}: ${error.message}`);
+  console.error(
+    `[gradle-plugin] running Node ${process.version}; this repo pins ${pinned}. Switch Node and re-run pnpm install.`
+  );
+  process.exit(1);
+}
+
 cpSync(target, pkg, { recursive: true });
 console.log(`[gradle-plugin] materialized from ${target}`);
