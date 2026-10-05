@@ -71,7 +71,7 @@ import {
   type MaybeResolvedPresentation,
   type Presentation,
 } from '../../../media/types';
-import { getAllTracks, mimeCodecsByType } from '../../../media/utils/tracks';
+import { getTracksByType, mimeCodecsByType } from '../../../media/utils/tracks';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
 
 /** State shape for MediaKeys setup. */
@@ -243,7 +243,13 @@ function setupMediaKeysSetup({
   context,
   config,
 }: {
-  state: MediaKeysStateMap & ErrorEmitterState;
+  state: MediaKeysStateMap &
+    ErrorEmitterState & {
+      // Optional so the one behavior composes across video-only / audio-only / both,
+      // like other cross-track-type behaviors (present at runtime iff a sibling owns it).
+      selectedVideoTrackId?: ReadonlySignal<string | undefined>;
+      selectedAudioTrackId?: ReadonlySignal<string | undefined>;
+    };
   context: MediaKeysContextMap;
   config: MediaKeysSetupConfig;
 }): Reactor<MediaKeysFsmState | 'destroying' | 'destroyed'> {
@@ -260,35 +266,22 @@ function setupMediaKeysSetup({
   // AirPlay bridge. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments import.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
-  // The selected track types decide when a source counts as clear. Read optionally, like `loadingSuspended`, so a
-  // variant's state map needn't carry both selections.
-  // SAFETY: a composition passes every behavior its full state map; each key read here is checked for presence.
-  const selection = state as {
-    selectedVideoTrackId?: ReadonlySignal<string | undefined>;
-    selectedAudioTrackId?: ReadonlySignal<string | undefined>;
-  };
-
   /**
    * Whether each selected track type has a resolved rendition, which is when that type's key declarations are known.
    * Any resolved rendition of the type counts, not only the selected one: a type's renditions are assumed to be all
    * clear or all encrypted, so the answer survives an ABR switch to a rendition that hasn't resolved yet.
    */
   const selectedTypesResolved = (presentation: Presentation) => {
-    const selectedTypes = [
-      selection.selectedVideoTrackId?.get() !== undefined && 'video',
-      selection.selectedAudioTrackId?.get() !== undefined && 'audio',
-    ].filter((type) => type !== false);
-    const tracks = getAllTracks(presentation.selectionSets);
+    const selected = [
+      { id: state.selectedVideoTrackId?.get(), type: 'video' },
+      { id: state.selectedAudioTrackId?.get(), type: 'audio' },
+    ] as const;
+    const composed = selected.filter(({ id }) => id !== undefined);
 
     return (
-      selectedTypes.length > 0 &&
-      selectedTypes.every((type) => tracks.some((track) => track.type === type && isResolvedTrack(track)))
+      composed.length > 0 && composed.every(({ type }) => getTracksByType(presentation, type).some(isResolvedTrack))
     );
   };
-
-  // Loading is blocked until this source is known to be safe to load: synchronous, so it holds before any loader's
-  // first dispatch whatever order the composition lists them in.
-  state.segmentLoadingBlocked.set(true);
 
   const derivedStateSignal = computed<MediaKeysFsmState>(() => {
     const presentation = state.presentation.get();
@@ -320,36 +313,35 @@ function setupMediaKeysSetup({
   // The handoff: what `exchangeLicenses` preconditions on and rendition pruning
   // reads. The three writes land together, before any further await — a
   // reactor monitor cannot observe an intermediate write, the flush being a
-  // microtask away — so they read as one fact. `clearNegotiation` is its exact
-  // inverse, and the only other writer of these slots.
+  // microtask away — so they read as one fact. `clearNegotiation` undoes the
+  // first two; otherwise each state's entry sets the gate.
   const publishNegotiation = ({ keySystem, mediaKeys }: Negotiation) => {
     context.mediaKeys.set(mediaKeys);
     state.negotiatedKeySystem.set(keySystem);
     state.segmentLoadingBlocked.set(false);
   };
-  // Leaves loading blocked: whatever comes next (a new source, a re-attached element) is unknown until confirmed.
   const clearNegotiation = () => {
     context.mediaKeys.set(undefined);
     state.negotiatedKeySystem.set(undefined);
-    state.segmentLoadingBlocked.set(true);
   };
 
   return createMachineReactor<MediaKeysFsmState>({
     initial: 'preconditions-unmet',
     monitor: () => derivedStateSignal.get(),
     states: {
-      'preconditions-unmet': {},
-
-      // A confirmed-clear source loads with no MediaKeys at all. Leaving it — a
-      // new source, a detached element, an AirPlay session, or a rendition that
-      // turns out to declare keys — blocks loading again until confirmed.
+      // The gate follows the state: blocked until the source is known to be
+      // safe, open for a confirmed-clear source. The initial entry runs during
+      // setup, so the gate is up before any loader's first dispatch whatever
+      // order the composition lists them in. Cleanups never write it, so
+      // entry/cleanup ordering across a transition can't reopen it.
+      'preconditions-unmet': {
+        entry: () => {
+          state.segmentLoadingBlocked.set(true);
+        },
+      },
       'source-clear': {
         entry: () => {
           state.segmentLoadingBlocked.set(false);
-
-          return () => {
-            state.segmentLoadingBlocked.set(true);
-          };
         },
       },
 
