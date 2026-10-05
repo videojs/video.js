@@ -20,7 +20,7 @@
  * relocateCues → dispatchCues` pipeline that shifts cues onto the same 0-based timeline, reading the primary A/V
  * track's `startMediaTime` (the reactor's consumed value) via `deps`.
  */
-import type { StateSignals } from '../../core/composition/create-composition';
+import type { StateSignals } from '../../core/composition/define-behavior';
 import { effect } from '../../core/signals/effect';
 import { peek, type Signal, update } from '../../core/signals/primitives';
 import { findMediaTrack, type MediaHandlerType, readBaseMediaDecodeTime } from '../../media/mp4/timestamp-origin';

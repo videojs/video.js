@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { InferBehaviorConfig } from '../../../core/composition/create-composition';
+import type { InferBehaviorConfig } from '../../../core/composition/define-behavior';
 import { switchAudioTrack, switchVideoTrack } from '../track-switching';
 
 // These setups take `config?:`, which once made `defineBehavior` drop their config

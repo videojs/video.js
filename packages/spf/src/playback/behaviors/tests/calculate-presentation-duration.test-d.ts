@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { InferBehaviorContext } from '../../../core/composition/create-composition';
+import type { InferBehaviorContext } from '../../../core/composition/define-behavior';
 import type { calculatePresentationDuration } from '../calculate-presentation-duration';
 
 describe('calculatePresentationDuration', () => {

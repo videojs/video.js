@@ -24,7 +24,7 @@
  * Multi-writer with the engine adapter, which writes the initial unresolved `{ url }` to `state.presentation` from src
  * input. Different domains (config-input vs. derived state via fetch) — legitimate multi-writer.
  */
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import type { Reactor } from '../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal } from '../../core/signals/primitives';

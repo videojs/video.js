@@ -20,7 +20,7 @@
  *
  * DOM-free reactor; sticky per source (`inactive → monitoring → established`).
  */
-import type { Behavior } from '../../core/composition/create-composition';
+import type { Behavior } from '../../core/composition/define-behavior';
 import { createMachineReactor, type Reactor } from '../../core/reactors/create-machine-reactor';
 import { type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import {

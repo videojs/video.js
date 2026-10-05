@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import type { ContextSignals, StateSignals } from '../../../../core/composition/create-composition';
+import type { ContextSignals, StateSignals } from '../../../../core/composition/define-behavior';
 import { signal } from '../../../../core/signals/primitives';
 import { type LoadTriggersContext, type LoadTriggersState, trackLoadTriggers } from '../track-load-triggers';
 

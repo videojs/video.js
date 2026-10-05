@@ -37,7 +37,7 @@
  * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
  * with right resolver) is enforced at the variant call site.
  */
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal } from '../../../core/signals/primitives';

@@ -39,7 +39,7 @@
  * standing `userTextTrackSelection` intent against the constrained, CDN-scoped renditions.
  */
 
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
 import type { Resolution } from '../../media/primitives/resolution';

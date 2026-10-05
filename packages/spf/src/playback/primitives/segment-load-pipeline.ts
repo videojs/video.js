@@ -8,7 +8,7 @@
  * actor type — the loader folds the real actor into `config` at construction, and it satisfies the seam by structure —
  * so this module carries no dependency on the actor implementation, and no dependency on the DOM.
  */
-import type { AnySlotMap } from '../../core/composition/create-composition';
+import type { AnySlotMap } from '../../core/composition/define-behavior';
 import { effect } from '../../core/signals/effect';
 import type { ReadonlySignal } from '../../core/signals/primitives';
 import type { AddressableObject } from '../../media/types';

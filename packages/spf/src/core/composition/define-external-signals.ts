@@ -1,4 +1,4 @@
-import type { Behavior, ContextSignals, Empty, ExhaustiveKeys, StateSignals } from './create-composition';
+import type { Behavior, ContextSignals, Empty, ExhaustiveKeys, StateSignals } from './define-behavior';
 
 /** The keys of `Values` that are not optional. */
 type RequiredKeys<Values extends object> = {

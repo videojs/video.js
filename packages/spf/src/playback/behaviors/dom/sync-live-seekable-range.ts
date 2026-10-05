@@ -19,7 +19,7 @@
  * still `Infinity` until `endOfStream`, so clearing would shrink `seekable` to buffered-only while the stream is still
  * effectively live.
  */
-import type { Behavior } from '../../../core/composition/create-composition';
+import type { Behavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../../media/types';

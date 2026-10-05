@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import {
-  type Behavior,
-  type ContextSignals,
-  createComposition,
-  defineCompositionFactory,
-  defineBehavior,
-  type StateSignals,
-} from '../create-composition';
+import { createComposition, defineCompositionFactory } from '../create-composition';
+import { type Behavior, type ContextSignals, defineBehavior, type StateSignals } from '../define-behavior';
 
 interface Resource {
   id: string;
