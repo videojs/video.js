@@ -136,10 +136,10 @@ export const behaviors = [
   setupMediaSource,
   updateMediaSourceDuration,
 
-  // EME for encrypted sources (no-op for clear ones). Composed right after
-  // MSE setup and — load-bearing — before the `load*Segments` dispatchers,
-  // so the `segmentLoadingBlocked` gate is up before their first dispatch of
-  // encrypted segments.
+  // EME for encrypted sources (no-op for clear ones). The
+  // `segmentLoadingBlocked` gate it owns is up from setup until each source
+  // is confirmed clear or keyed, so its position relative to the
+  // `load*Segments` dispatchers doesn't matter.
   //
   // `exchangeLicenses` precedes the negotiation it consumes, also
   // load-bearing: `createComposition` calls cleanups in registration order,

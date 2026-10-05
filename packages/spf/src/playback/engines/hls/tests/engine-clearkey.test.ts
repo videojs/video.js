@@ -63,7 +63,7 @@ describe('createEngine (Clear Key, real EME end to end)', () => {
     });
     const { state, context } = engine;
 
-    expect(state.segmentLoadingBlocked.get()).toBeUndefined();
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
     expect(context.mediaKeys.get()).toBeUndefined();
 
     context.mediaElement.set(video);
