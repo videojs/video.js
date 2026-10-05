@@ -7,7 +7,7 @@ date: 2026-05-07
 
 > **Behaviors are the unit of composition in SPF — almost all functionality lives in one.** A Behavior may be "simple" (using only signals from core) or "primitive-augmented" (reaching for a Reactor, Actor, Task + Runner, or other primitive under its setup). The questions this doc answers are *how much primitive infrastructure does this behavior need*, *should this be one behavior or several*, and *what does it look like when a behavior wants refactoring* — not "should this be a behavior at all," because it almost always should.
 >
-> For how Behaviors and the primitives they use work under the hood see [`../primitives.md`](../primitives.md), [`../architecture.md`](../architecture.md), [`../actor-reactor-factories.md`](../actor-reactor-factories.md), and [`packages/spf/src/core/composition/create-composition.ts`](../../../../packages/spf/src/core/composition/create-composition.ts).
+> For how Behaviors and the primitives they use work under the hood see [`../primitives.md`](../primitives.md), [`../architecture.md`](../architecture.md), [`../actor-reactor-factories.md`](../actor-reactor-factories.md), [`packages/spf/src/core/composition/define-behavior.ts`](../../../../packages/spf/src/core/composition/define-behavior.ts), and [`packages/spf/src/core/composition/create-composition.ts`](../../../../packages/spf/src/core/composition/create-composition.ts).
 
 ## Behaviors are the universal unit
 

@@ -14,21 +14,24 @@ export const VERSION = '0.1.0';
 // =============================================================================
 
 export type {
+  Composition,
+  CompositionOptions,
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+} from './core/composition/create-composition';
+export { createComposition, defineCompositionFactory } from './core/composition/create-composition';
+export type {
   Behavior,
   BehaviorCleanup,
   BehaviorDeps,
-  Composition,
-  CompositionOptions,
   ContextSignals,
   InferBehaviorConfig,
   InferBehaviorContext,
   InferBehaviorState,
-  ResolveBehaviorConfig,
-  ResolveBehaviorContext,
-  ResolveBehaviorState,
   StateSignals,
-} from './core/composition/create-composition';
-export { createComposition, defineBehavior, defineCompositionFactory } from './core/composition/create-composition';
+} from './core/composition/define-behavior';
+export { defineBehavior } from './core/composition/define-behavior';
 export { defineExternalSignals } from './core/composition/define-external-signals';
 
 // =============================================================================

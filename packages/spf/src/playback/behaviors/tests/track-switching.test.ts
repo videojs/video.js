@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import type { StateSignals } from '../../../core/composition/create-composition';
+import type { StateSignals } from '../../../core/composition/define-behavior';
 import { signal } from '../../../core/signals/primitives';
 import { NO_KEY_SYSTEM } from '../../../media/drm';
 import { SVTA_NO_SUPPORTED_AUDIO_TRACK, SVTA_NO_SUPPORTED_VIDEO_TRACK, type SvtaError } from '../../../media/errors';

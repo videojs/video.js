@@ -1,6 +1,7 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import { defineCompositionFactory, type StateSignals } from '../create-composition';
+import { defineCompositionFactory } from '../create-composition';
+import { type StateSignals } from '../define-behavior';
 import type { CheckKeyedFields, KeyedBy } from '../keyed-by';
 
 interface Server {

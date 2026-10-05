@@ -9,7 +9,7 @@
  * `TextTracksActor` type — the loader folds the real actor into `config`, and it satisfies the seam by structure — so
  * this module names no actor and stays DOM-free (generic over the cue type `C`).
  */
-import type { AnySlotMap } from '../../core/composition/create-composition';
+import type { AnySlotMap } from '../../core/composition/define-behavior';
 import type { Cue, Segment } from '../../media/types';
 import type { AddCuesMessage } from './text-track-messages';
 
