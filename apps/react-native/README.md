@@ -6,29 +6,76 @@ pnpm/Turbo monorepo.
 
 ## Prerequisites
 
-Beyond the repo-wide setup in [`CONTRIBUTING.md`](../../CONTRIBUTING.md):
+Beyond the repo-wide setup in [`CONTRIBUTING.md`](../../CONTRIBUTING.md), this
+app needs native toolchains that [mise](https://mise.jdx.dev) provisions from the
+`mise.toml` in this directory. mise is optional for the web packages and required
+here: the `Gemfile` needs Ruby 4 and `android/` needs JDK 17, and macOS ships
+neither.
 
-- **iOS** — Xcode, plus CocoaPods via Bundler: `cd apps/react-native && bundle install`
-- **Android** — Android SDK with `ANDROID_HOME` set, and JDK 17+
+```bash
+brew install mise                 # once; add `eval "$(mise activate zsh)"` to your shell rc
+cd apps/react-native && mise trust && mise install   # Ruby 4, CocoaPods 1.17, Temurin JDK 17
+```
+
+- **Node** — the version in `.nvmrc`, via `nvm install` or mise. `pnpm install`
+  runs this app's `postinstall` (`scripts/hoist-gradle-plugin.mjs`); on Node
+  24.0.x it throws `EISDIR`, and a failed postinstall fails every `pnpm`
+  command in the workspace, not just this app's.
+- **iOS** — Xcode with the simulator runtime for its SDK installed
+  (`xcodebuild -downloadPlatform iOS`; recent Xcode releases don't bundle it).
+  Then `bundle install` in this directory, under mise's Ruby: the system Ruby
+  can't satisfy the `Gemfile`.
+- **Android** — the Android SDK, with these in your shell rc:
+
+  ```bash
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+  export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+  ```
+
+  `sdk.dir` in `android/local.properties` covers Gradle alone; the React Native
+  CLI still needs `ANDROID_HOME` for `adb` and the emulator. With the SDK
+  licenses accepted, the first build downloads the pinned platform, build-tools,
+  NDK, and CMake itself; expect 10–20 minutes.
 - **Watchman** (optional but recommended): `brew install watchman`
 
 ## Running
 
 ```bash
-# Install iOS pods (first run, and after native dependency changes)
+# Install iOS pods: first run, after native dependency changes, and after any
+# pnpm-lock.yaml change (see below)
 pnpm -F @videojs/react-native-example pods
 
 # Start Metro
 pnpm -F @videojs/react-native-example start
 
-# Build and launch (in a second terminal)
-pnpm -F @videojs/react-native-example ios
-pnpm -F @videojs/react-native-example android
+# Build and launch (in a second terminal). Name a current simulator: the CLI's
+# default is the oldest available device, which the current Xcode may not build
+# for. `xcrun simctl list devices available` prints the names.
+pnpm -F @videojs/react-native-example ios --simulator "<device name>"   # e.g. "iPhone 18 Pro"
+pnpm -F @videojs/react-native-example android   # with an emulator booted or a device attached
 ```
+
+**Re-run `pods` after any `pnpm-lock.yaml` change.** `project.pbxproj` and the
+Pods project hard-code `REACT_NATIVE_PATH` into pnpm's store, and that directory
+name includes a hash of `react-native`'s peer set. When the lockfile changes the
+path goes stale, `react-native run-ios` skips `pod install` because
+`Podfile.lock` is unchanged, and `xcodebuild` fails with
+`…/ReactCommon/react/timing/PrivacyInfo.xcprivacy: No such file or directory`.
+`pod install` rewrites the path; commit the resulting `project.pbxproj` diff
+alongside the lockfile.
 
 `ios` and `android` run Fabric codegen as part of the native build, so changes
 to `packages/react-native/src/PlayerViewNativeComponent.ts` require a
 native rebuild — Fast Refresh alone won't pick up new props.
+
+### Smoke test
+
+Three checks cover the integration points: the app loads with no red screen
+(two `react-native` copies surface here as `ReferenceError: Property 'window'
+doesn't exist`; see below); **Play** toggles to Pause and back repeatedly;
+**Swap src** changes the label and the video without the surface going black.
+The default VOD asset renders badly in the Android emulator (an emulator
+encoding quirk; it plays on devices), so use the live source there.
 
 ## Monorepo wiring
 
