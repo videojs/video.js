@@ -10,20 +10,15 @@
  * which is what carries the "certificate before `generateRequest`" ordering across the boundary.
  *
  * The negotiation is the minimal key-system probe — capability-probing's full async probe supersedes it when that lands
- * — over per-system init-data types and the declared encryption scheme. Segment loading is blocked (the
- * `segmentLoadingBlocked` gate) from setup and again for every new source, until the source is known to be safe:
- * confirmed clear (each selected track type has a resolved rendition and nothing declares keys) or its MediaKeys
- * attached. A track type's renditions are assumed to be all clear or all encrypted — mixed clear and encrypted
- * renditions within one type, and clear-lead content whose later segments declare keys, are out of scope — so one
- * resolved rendition answers for its type, and an ABR switch to an unresolved one doesn't block loading again.
- * Appending encrypted data with no MediaKeys attached misbehaves on Chromium, so the segment-load dispatchers park
- * while the gate is up (see `load-segments.ts`). Because the gate is up from setup, it holds before any dispatcher's
- * first load whatever order a composition lists them in. It is lowered on _attach_, not on license: the appends that
- * follow are what fire `encrypted` for the event-driven path, and browsers queue decode on missing keys. Failures
- * report onto the errors sequence via `emitError` (SVTA 4008 no usable key system, 99408 the source is non-DRM
- * clear-key encryption we can't decrypt, 4010 MediaKeys init, 4013 certificate); a refused negotiation or failed
- * certificate leaves the gate up — playback stays parked rather than failing decode, and severity is the adapter's
- * call. A refusal publishes {@link NO_KEY_SYSTEM}, which is what lets rendition pruning reach the verdict
+ * — over per-system init-data types and the declared encryption scheme. The `segmentLoadingBlocked` load gate is raised
+ * synchronously at setup and for each new source, and lowered once it's confirmed clear or MediaKeys attach: appending
+ * encrypted data with no MediaKeys attached misbehaves on Chromium, so the segment-load dispatchers park while the gate
+ * is up (see `load-segments.ts`), whatever order a composition lists them in — but lowered on _attach_, not on license:
+ * the appends that follow are what fire `encrypted` for the event-driven path, and browsers queue decode on missing
+ * keys. Failures report onto the errors sequence via `emitError` (SVTA 4008 no usable key system, 99408 the source is
+ * non-DRM clear-key encryption we can't decrypt, 4010 MediaKeys init, 4013 certificate); a refused negotiation or
+ * failed certificate leaves the gate up — playback stays parked rather than failing decode, and severity is the
+ * adapter's call. A refusal publishes {@link NO_KEY_SYSTEM}, which is what lets rendition pruning reach the verdict
  * `track-switching` owns.
  *
  * Single-positive-state reactor riding the resolver's resolved/unresolved lifecycle, like `setupMediaSource`. The EME
@@ -34,16 +29,14 @@
  *
  * A live AirPlay session routes through that same exit. Playback moves off MSE onto the native-HLS fallback `<source>`
  * the receiver plays, and the MediaKeys negotiated here cannot serve the `skd` requests it raises — so an observed
- * `loadingSuspended` yields the element, and `setupAirPlayFairPlay` negotiates for the receiver in the gap. Loading
- * stays blocked through the session, so when it ends nothing loads until the re-negotiated MediaKeys attach (or the
- * source is confirmed clear); the falling edge re-enters and re-negotiates with no extra machinery.
+ * `loadingSuspended` yields the element, and `setupAirPlayFairPlay` negotiates for the receiver in the gap. The falling
+ * edge re-enters and re-negotiates with no extra machinery.
  *
  * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
- * HLS video engine unconditionally today; on a clear source it never negotiates, and only opens the gate once the
- * source is confirmed clear, one scheduler pass after its selected renditions resolve. A composition that omits it —
- * along with `exchangeLicenses` and the two DRM-aware config defaults — carries neither the machinery nor the slots,
- * and none of this file's key-system code survives tree-shaking; the DRM-free engine variant that would do so is
- * tracked in drm-support.md.
+ * HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
+ * gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
+ * defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
+ * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
  *
  * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD
  * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
@@ -267,7 +260,7 @@ function setupMediaKeysSetup({
   // AirPlay bridge. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments import.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
-  // The selected renditions decide when a source counts as clear. Read optionally, like `loadingSuspended`, so a
+  // The selected track types decide when a source counts as clear. Read optionally, like `loadingSuspended`, so a
   // variant's state map needn't carry both selections.
   // SAFETY: a composition passes every behavior its full state map; each key read here is checked for presence.
   const selection = state as {
