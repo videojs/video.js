@@ -53,7 +53,7 @@ describe('cleanFeedHtml', () => {
     expect(cleanFeedHtml('<p data-llms-content class="mb-2">x</p>', ENTRY_URL)).toBe('<p>x</p>');
   });
 
-  it('keeps an island that sits in a sentence, minus its wrapper', () => {
+  it('keeps the server-rendered markup of an island, minus its wrapper', () => {
     expect(
       cleanFeedHtml(
         '<p>Try it at <astro-island component-url="/x.js"><a href="/docs">videojs.org/docs</a></astro-island>.</p>',
@@ -62,21 +62,32 @@ describe('cleanFeedHtml', () => {
     ).toBe('<p>Try it at <a href="https://videojs.org/docs">videojs.org/docs</a>.</p>');
   });
 
-  it('points a standalone widget back to the page', () => {
+  it('honors the same opt-out and text-alternative markers as the Markdown twins', () => {
     expect(
-      cleanFeedHtml('<p>Before</p><astro-island><div><video></video></div></astro-island><p>After</p>', ENTRY_URL)
-    ).toBe(
-      '<p>Before</p><p><em><a href="https://videojs.org/blog/hello">View the interactive example on the web.</a></em></p><p>After</p>'
-    );
+      cleanFeedHtml(
+        '<div data-llms-ignore><button>Copy</button></div><p hidden data-llms-only>Run the CLI.</p>',
+        ENTRY_URL
+      )
+    ).toBe('<p>Run the CLI.</p>');
   });
 
-  it('gives adjacent widgets one shared pointer', () => {
-    const html = cleanFeedHtml(
-      '<astro-island><video></video></astro-island><astro-island><div></div></astro-island>',
-      ENTRY_URL
-    );
+  it('turns an aside into a labeled blockquote', () => {
+    expect(
+      cleanFeedHtml(
+        '<aside data-aside="caution"><div class="w-1.5"></div><div><p data-aside-title>Caution</p><div data-aside-body><p>Careful.</p></div></div></aside>',
+        ENTRY_URL
+      )
+    ).toBe('<blockquote><p><strong>Caution</strong></p><p>Careful.</p></blockquote>');
+  });
 
-    expect(html.match(/interactive example/g)).toHaveLength(1);
+  it('reduces a code frame to its code, keeping a title the code cannot carry', () => {
+    const frame = (label: string) =>
+      `<astro-island><div data-tabs-root><div role="tablist"><button role="tab" data-value="code">${label}</button><button>Copy</button></div><astro-island><div role="tabpanel" data-value="code"><astro-slot><pre data-language="ts"><code>x</code></pre></astro-slot></div></astro-island></div></astro-island>`;
+
+    expect(cleanFeedHtml(frame('ts'), ENTRY_URL)).toBe('<div><pre><code>x</code></pre></div>');
+    expect(cleanFeedHtml(frame('player.ts'), ENTRY_URL)).toBe(
+      '<div><p><strong>player.ts</strong></p>\n<pre><code>x</code></pre></div>'
+    );
   });
 
   it('unwraps slot placeholders', () => {
@@ -88,10 +99,10 @@ describe('cleanFeedHtml', () => {
   it('removes wrappers left empty once their decoration is gone', () => {
     expect(
       cleanFeedHtml(
-        '<aside><div class="w-2"></div><div><div><svg aria-hidden="true"></svg></div><p>Note</p></div></aside>',
+        '<section><div class="w-2"></div><div><div><svg aria-hidden="true"></svg></div><p>Note</p></div></section>',
         ENTRY_URL
       )
-    ).toBe('<aside><div><p>Note</p></div></aside>');
+    ).toBe('<section><div><p>Note</p></div></section>');
   });
 
   it('flattens code to plain text, keeping its line breaks', () => {

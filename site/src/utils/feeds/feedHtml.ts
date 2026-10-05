@@ -1,38 +1,12 @@
 import { parseHTML } from 'linkedom';
 
+import { normalizeRenderedContent, unwrap } from '@/utils/rendered-content';
+
 /**
  * Markup with no meaning in a feed reader: nothing runs there, no stylesheet applies, and anything hidden from
  * assistive technology is decoration (icons, heading anchors).
  */
-const DROPPED_SELECTOR = 'script, style, link, noscript, template, [aria-hidden="true"]';
-
-/** Wrappers Astro puts around slotted content. The content stays. */
-const UNWRAPPED_SELECTOR = 'astro-slot, astro-static-slot';
-
-/**
- * Parents that make an island part of the prose, like a link in the middle of a sentence. Its server-rendered markup
- * reads fine without hydrating. Anywhere else an island is a standalone widget, such as a player demo, that only works
- * on the page.
- */
-const PHRASING_PARENTS = new Set([
-  'p',
-  'li',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'td',
-  'th',
-  'dt',
-  'dd',
-  'figcaption',
-  'a',
-  'em',
-  'strong',
-  'span',
-]);
+const DROPPED_SELECTOR = 'link, noscript, [aria-hidden="true"]';
 
 /** Elements that carry content even when they have no text. */
 const MEDIA_SELECTOR = 'img, picture, video, audio, iframe, svg';
@@ -42,8 +16,6 @@ const URL_ATTRIBUTES = ['href', 'src', 'poster', 'cite'];
 
 /** Hooks for the site's stylesheet and scripts. A feed has neither, so they are dead weight. */
 const PRESENTATION_ATTRIBUTE = /^(?:class|style|data-.+)$/;
-
-const FALLBACK_MARKER = 'data-feed-fallback';
 
 function toAbsoluteUrl(value: string, base: URL): string {
   // Schemes other than the page's own (mailto:, data:) have nothing to resolve.
@@ -66,33 +38,6 @@ function toAbsoluteSrcset(value: string, base: URL): string {
     })
     .filter(Boolean)
     .join(', ');
-}
-
-function unwrap(element: Element): void {
-  while (element.firstChild) element.parentNode?.insertBefore(element.firstChild, element);
-
-  element.remove();
-}
-
-function replaceWidget(island: Element, entryUrl: URL): void {
-  // Adjacent widgets (a player and its controls) share one pointer back to the page. Islands are visited last to first,
-  // so a neighbour's pointer is the next sibling.
-  if (island.nextElementSibling?.hasAttribute(FALLBACK_MARKER)) {
-    island.remove();
-    return;
-  }
-
-  const document = island.ownerDocument;
-  const paragraph = document.createElement('p');
-  const emphasis = document.createElement('em');
-  const link = document.createElement('a');
-
-  paragraph.setAttribute(FALLBACK_MARKER, '');
-  link.setAttribute('href', entryUrl.href);
-  link.textContent = 'View the interactive example on the web.';
-  emphasis.append(link);
-  paragraph.append(emphasis);
-  island.replaceWith(paragraph);
 }
 
 /** Astro leaves render markers (`<!--astro:end-->`) behind. */
@@ -119,15 +64,11 @@ export function cleanFeedHtml(html: string, entryUrl: URL): string {
   const root = document.getElementById('feed-root');
   if (!root) return '';
 
+  // Shared with the Markdown twins: asides, tabs, and code frames become plain structure, and islands keep only their
+  // server-rendered markup.
+  normalizeRenderedContent(root);
+
   for (const node of root.querySelectorAll(DROPPED_SELECTOR)) node.remove();
-
-  for (const node of root.querySelectorAll(UNWRAPPED_SELECTOR)) unwrap(node);
-
-  // Innermost first, so a nested island is settled before its parent decides.
-  for (const island of [...root.querySelectorAll('astro-island')].reverse()) {
-    if (PHRASING_PARENTS.has(island.parentElement?.localName ?? '')) unwrap(island);
-    else replaceWidget(island, entryUrl);
-  }
 
   for (const element of root.querySelectorAll('*')) {
     for (const { name } of [...element.attributes]) {
