@@ -12,7 +12,9 @@ interface SurfaceHost {
 /**
  * Bind the rendered surface to a media instance as it mounts and unmounts.
  *
- * The web counterpart is typed against `HTMLMediaElement`; the target type is the only thing that differs here.
+ * The web counterpart reconciles attach/detach in layout effects. This one is a plain callback ref: React 19 runs the
+ * returned cleanup on unmount, and React 18 ignores it and calls the ref with `null` instead, which takes the same
+ * `detach` branch.
  */
 export function useAttachMedia<T extends PlayerSurface>(media: SurfaceHost): RefCallback<T> {
   return useCallback(

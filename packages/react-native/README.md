@@ -4,10 +4,12 @@ video.js for react-native
 
 ## Installation
 
-
 ```sh
-npm install react-native
+npm install @videojs/react-native
 ```
+
+Requires React Native 0.76 or later with the New Architecture enabled (the default since 0.76): the player view is a
+Fabric component and the engine is a TurboModule, both generated from `codegenConfig`. React 18 and 19 are supported.
 
 
 ## Usage
