@@ -4,7 +4,7 @@
 
 Required work before RN can reuse the base-lib store features over the DOM-free
 `Media` contract instead of faking an `HTMLMediaElement`. Design context:
-[`internal/design/react-native/index.md` § Not portable as-is](./index.md)
+[`index.md` § Not portable as-is](./index.md)
 and the "Closing the shared-feature DOM leaks" open question.
 
 **Important:** almost all of this work lands in `packages/core` and
@@ -43,8 +43,8 @@ shape) — **out of scope for this plan**; tracked under RN feature variants.
 ## Tasks
 
 ### 1. Export the readyState constant; fix Tier B leaks
-- [ ] Export `MediaReadyState` from `core/media/types.ts` (today only the
-      `MediaReadyStateValue` *type* is exported; the const is module-private).
+- [x] Export `MediaReadyState` from `packages/media/src/core/types.ts` (done;
+      `source.ts` already reads it, `playback.ts` still uses `HTMLMediaElement`).
 - [ ] `playback.ts` / `source.ts`: replace `HTMLMediaElement.HAVE_*` with the
       contract constant. Removes the crash from two core features.
 
@@ -73,9 +73,9 @@ own API:
       `state()` + `attach()` against it (seed, event → `set`, actions → host).
 - [ ] This doubles as the contract for the RN native host to satisfy.
 
-### 5. Coordinate with media.md (draft)
-- [ ] `media.md` is `status: draft`; confirm the capability surface is stable
-      before depending on it. Flag any shape this work forces (e.g. a
+### 5. Coordinate with media/architecture.md
+- [ ] `media/architecture.md` is `status: implemented`, so a shape change is a
+      breaking change. Flag any shape this work forces (e.g. a
       `MediaReadyState` export, a volume-probe capability) back into the doc.
 
 ## Out of scope

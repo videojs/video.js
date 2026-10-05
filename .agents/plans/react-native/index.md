@@ -70,8 +70,8 @@ Two layers make this tractable, and two layers stand in the way:
     `addEventListener`/`removeEventListener`, and a contract-native `listen`
     helper (not the DOM-typed one) may be warranted.
 
-  `media/architecture.md` is still `status: draft`, so the contract surface could shift —
-  tracked in [Open questions](#open-questions).
+  `media/architecture.md` is `status: implemented`, so a contract-shape change is a breaking
+  change — tracked in [Open questions](#open-questions).
 
 ## Solution overview
 
@@ -257,7 +257,7 @@ Two kinds of preset feature, then:
   (readyState constants), `volume` (support probe), and the shared DOM utilities
   (`listen` / `onEvent` / `serializeTimeRanges`). De-DOM these in place so the
   preset uses the same code on both platforms. Enumerated and planned in
-  [`media-contract-feature-reuse.md`](../../../.claude/plans/react-native/media-contract-feature-reuse.md);
+  [`media-contract-feature-reuse.md`](./media-contract-feature-reuse.md);
   see also [Not portable as-is](#not-portable-as-is).
 - **Inherently platform-specific (RN variant).** `fullscreen`, `pip`,
   `controls` activity, `remotePlayback`, `text-track` — DOM/platform APIs by
@@ -406,7 +406,7 @@ See [decisions.md § Multiple player instances; platform-native background, no c
 
 > Detailed construction (the `MediaSessionService` wiring, iOS audio-session /
 > now-playing sequencing, background hand-off) is an implementation concern —
-> it belongs in a `.claude/plans/` plan, not this doc.
+> it belongs in a `.agents/plans/` plan, not this doc.
 
 ## Native module structure
 
@@ -966,8 +966,8 @@ Detailed mapping is deferred until the UI component layer is scoped.
   [decisions.md § Media adapter implements the Media contract](decisions.md#media-adapter-implements-the-media-contract-not-a-fake-htmlmediaelement)
   and [Not portable as-is](#not-portable-as-is)). The required base-lib work is
   audited and planned in
-  [`.claude/plans/react-native/media-contract-feature-reuse.md`](../../../.claude/plans/react-native/media-contract-feature-reuse.md)
-  (export `MediaReadyState`; DOM-free `listen`/`onEvent`/`serializeTimeRanges`;
+  [`media-contract-feature-reuse.md`](./media-contract-feature-reuse.md)
+  (`MediaReadyState` is exported; DOM-free `listen`/`onEvent`/`serializeTimeRanges`;
   a non-DOM volume probe; verify against an in-memory `Media` host). The one
   genuine unknown is `media/architecture.md`'s `draft` status — the contract surface could
   shift before this work lands.

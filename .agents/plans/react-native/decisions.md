@@ -49,7 +49,7 @@ feature logic. The remaining work is bounded and enumerated — close the residu
 DOM-global leaks in the shared features (export `MediaReadyState` and swap the
 `HTMLMediaElement.HAVE_*` references in `playback.ts` / `source.ts`; RN variants
 for `volume` / `text-track` / `controls`), not fake an element. Residual risk:
-`media/architecture.md` is `status: draft`, so the contract surface could still shift — a thin
+`media/architecture.md` is `status: implemented`, but a feature may still outrun the contract — a thin
 HTML-shaped adapter remains a fallback for individual adapter-shared features if
 a specific one can't yet run on the contract, but the committed direction is the
 contract.

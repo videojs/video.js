@@ -3,7 +3,7 @@
 **Status:** STUB — not started
 
 Implementation plan for the persistent background session described in
-[`internal/design/react-native/index.md` § Persistent background session](./index.md).
+[`index.md` § Persistent background session](./index.md).
 This file is the **how**; the design doc owns the **what/why** and the decisions
 (see [`decisions.md`](./decisions.md)).
 
