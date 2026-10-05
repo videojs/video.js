@@ -131,6 +131,15 @@ type MediaKeysStateMap = {
   negotiatedKeySystem: Signal<MediaKeysState['negotiatedKeySystem']>;
 };
 
+/** What the setup helper reads: the declared map, plus optional reads of state other behaviors own. */
+type MediaKeysSetupState = MediaKeysStateMap &
+  ErrorEmitterState & {
+    // Optional so the one behavior composes across video-only / audio-only / both,
+    // like other cross-track-type behaviors (present at runtime iff a sibling owns it).
+    selectedVideoTrackId?: ReadonlySignal<string | undefined>;
+    selectedAudioTrackId?: ReadonlySignal<string | undefined>;
+  };
+
 type MediaKeysContextMap = {
   mediaElement: ReadonlySignal<MediaKeysContext['mediaElement']>;
   mediaKeys: Signal<MediaKeysContext['mediaKeys']>;
@@ -243,13 +252,7 @@ function setupMediaKeysSetup({
   context,
   config,
 }: {
-  state: MediaKeysStateMap &
-    ErrorEmitterState & {
-      // Optional so the one behavior composes across video-only / audio-only / both,
-      // like other cross-track-type behaviors (present at runtime iff a sibling owns it).
-      selectedVideoTrackId?: ReadonlySignal<string | undefined>;
-      selectedAudioTrackId?: ReadonlySignal<string | undefined>;
-    };
+  state: MediaKeysSetupState;
   context: MediaKeysContextMap;
   config: MediaKeysSetupConfig;
 }): Reactor<MediaKeysFsmState | 'destroying' | 'destroyed'> {
