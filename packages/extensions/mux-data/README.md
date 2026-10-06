@@ -30,7 +30,6 @@ import '@videojs/html/extensions/mux-data';
 import { MuxData } from '@videojs/react/extensions/mux-data';
 ```
 
-
 ## License
 
 [Apache-2.0](../../../LICENSE)

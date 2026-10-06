@@ -22,7 +22,7 @@ members:
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](../../LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/spf
 [package-badge]: https://img.shields.io/npm/v/@videojs/spf?label=@videojs/spf

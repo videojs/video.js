@@ -16,7 +16,7 @@ Video.js v10 is stable. Build with it and share your feedback 🙏.
 ## AI Quickstart
 
 Using an AI coding agent? Install the [Video.js skill](https://github.com/videojs/skills) so it reads
-the docs that match this package version before writing code.
+the docs that match your installed version before writing code.
 
 Then print the version-matched installation choices for your framework. The command returns instructions without
 modifying your project:
