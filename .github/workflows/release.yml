@@ -10,6 +10,9 @@ jobs:
   release:
     env:
       NETLIFY_BASE: 'videojs-preview.netlify.app'
+    # npm trusts this workflow only when the job runs in the Deploy environment,
+    # which is limited to release tags.
+    environment: Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Required for creating a release
