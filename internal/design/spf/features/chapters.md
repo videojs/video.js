@@ -78,7 +78,8 @@ Extension boundaries, each a candidate slice on this doc or its own:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (under the text-track group),
+**Composition:** `chaptersFeature` (`packages/spf/src/playback/engines/hls/features/chapters.ts`),
+composed by `packages/spf/src/playback/engines/hls-video.ts` and
 `packages/spf/src/playback/engines/hls-audio.ts`.
 
 | Piece | File | Responsibility |
