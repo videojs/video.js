@@ -15,6 +15,13 @@ export const SMALL_FONT_SIZE = 36;
 export const LARGE_SMALL_THRESHOLD = 25;
 /** Titles longer than this (in characters, after uppercasing) are truncated with an ellipsis. */
 export const MAX_CHAR_LIMIT = 80;
+/** Conservative characters per line at the small font size; Eurostile caps average ~29–35px at 36px. */
+export const MAX_LINE_CHARS = 28;
+/** A clause break is used only when its shorter line is at least this fraction of the longer one. */
+export const MIN_CLAUSE_BALANCE = 0.5;
+
+/** Clause boundaries that read better as line breaks; the punctuation stays at the end of the first line. */
+const CLAUSE_BREAK = /(?<= [—–])\s+|(?<=[:?!])\s+/g;
 
 // ---------------------------------------------------------------------------
 // Design tokens
@@ -114,6 +121,37 @@ function ColorBars() {
 }
 
 // ---------------------------------------------------------------------------
+// Line breaking
+// ---------------------------------------------------------------------------
+
+/**
+ * Split a two-line title at a clause boundary (em dash, colon, …) when both halves fit on a line and are close in
+ * length, so `VIDEO.JS V10 IS GA — LET / THE MIGRATIONS BEGIN!` becomes `VIDEO.JS V10 IS GA — / LET THE MIGRATIONS
+ * BEGIN!`. Returns the title as a single line when no break qualifies, leaving wrapping to `text-wrap`.
+ */
+export function splitTitleLines(title: string): string[] {
+  if (title.length <= MAX_LINE_CHARS) return [title];
+
+  let best: [string, string] | null = null;
+  let bestDelta = Infinity;
+
+  for (const match of title.matchAll(CLAUSE_BREAK)) {
+    const first = title.slice(0, match.index);
+    const second = title.slice(match.index + match[0].length);
+    const longer = Math.max(first.length, second.length);
+    const shorter = Math.min(first.length, second.length);
+    if (longer > MAX_LINE_CHARS || shorter < longer * MIN_CLAUSE_BALANCE) continue;
+
+    if (longer - shorter < bestDelta) {
+      best = [first, second];
+      bestDelta = longer - shorter;
+    }
+  }
+
+  return best ?? [title];
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -141,6 +179,9 @@ export async function renderOgImage(options: { title?: string; size: OgSize }): 
   const fontSize = displayTitle && displayTitle.length > LARGE_SMALL_THRESHOLD ? SMALL_FONT_SIZE : LARGE_FONT_SIZE;
   const titleGap = fontSize === LARGE_FONT_SIZE ? LARGE_TITLE_GAP : SMALL_TITLE_GAP;
   const textWrap = fontSize === LARGE_FONT_SIZE ? 'pretty' : 'balance'; // balance messes up text when single-line
+  const titleLines = displayTitle && fontSize === SMALL_FONT_SIZE ? splitTitleLines(displayTitle) : [displayTitle];
+  // Explicit clause lines already fit, and balancing a single line misplaces it.
+  const lineWrap = titleLines.length > 1 ? 'pretty' : textWrap;
 
   const svg = await satori(
     <div
@@ -169,6 +210,9 @@ export async function renderOgImage(options: { title?: string; size: OgSize }): 
         {displayTitle && (
           <div
             style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
               marginTop: titleGap,
               fontFamily: FONT_FAMILY,
               fontSize,
@@ -176,10 +220,13 @@ export async function renderOgImage(options: { title?: string; size: OgSize }): 
               lineHeight: 1.2,
               color: TEXT_COLOR,
               textAlign: 'center',
-              textWrap,
             }}
           >
-            {displayTitle}
+            {titleLines.map((line) => (
+              <div key={line} style={{ textWrap: lineWrap }}>
+                {line}
+              </div>
+            ))}
           </div>
         )}
       </div>

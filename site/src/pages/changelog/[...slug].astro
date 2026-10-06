@@ -27,7 +27,7 @@ const description =
   entry.data.description || `What's new in Video.js ${title} — new features, bug fixes, and improvements.`;
 ---
 
-<Blog title={[title, "Changelog"]} description={description}>
+<Blog title={`${title} Changelog`} description={description}>
   <MarkdownAlternate slot="head" />
   <TableOfContents client:idle headings={headings} railOnly />
   <article

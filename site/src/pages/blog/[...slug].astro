@@ -53,7 +53,7 @@ const jsonLdSchema = createBlogPostingSchema({
 ---
 
 <Blog
-  title={[post.data.title, "Blog"]}
+  title={post.data.title}
   description={post.data.description}
   canonical={post.data.canonical}
   image={post.data.ogImage}
