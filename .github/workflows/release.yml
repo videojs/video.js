@@ -10,9 +10,9 @@ jobs:
   release:
     env:
       NETLIFY_BASE: 'videojs-preview.netlify.app'
-    # npm trusts this workflow only when the job runs in the Deploy environment,
-    # which is limited to release tags.
-    environment: Deploy
+    # npm trusts this workflow only when the job runs in legacy-release, which
+    # only v7 and v8 release tags (v7.*, v8.*) can use.
+    environment: legacy-release
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Required for creating a release
@@ -84,7 +84,7 @@ jobs:
   deploy:
     needs: release
     runs-on: ubuntu-latest
-    environment: Deploy
+    environment: legacy-release
     env:
       VJS_VERSION: ${{ github.event.head_commit.message }}
       S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
