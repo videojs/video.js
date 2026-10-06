@@ -242,15 +242,27 @@ The blockquote element represents content that is quoted from another source, op
 
 ### Footnotes
 
+Write a reference as `[^label]` and its definition anywhere in the file as `[^label]: text`. Definitions render in order of first reference, numbered from 1, in a **Footnotes** section at the end of the page, so the label is only an identifier. Use footnotes for asides that would interrupt the sentence, not for content the reader needs.
+
 ```markdown
 > Don't communicate by sharing memory, share memory by communicating.<br/>
-> — <cite>Rob Pike[^1]</cite>
+> — <cite>Rob Pike[^pike]</cite>
+
+Players buffer ahead[^buffer], and a definition can be cited more than once[^pike].
+
+[^pike]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
+[^buffer]: How far ahead depends on the engine. HLS.js reads `maxBufferLength`, which defaults to 30 seconds.
 ```
 
 > Don't communicate by sharing memory, share memory by communicating.<br/>
-> — <cite>Rob Pike[^1]</cite>
+> — <cite>Rob Pike[^pike]</cite>
 
-[^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
+Players buffer ahead[^buffer], and a definition can be cited more than once[^pike].
+
+[^pike]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
+[^buffer]: How far ahead depends on the engine. HLS.js reads `maxBufferLength`, which defaults to 30 seconds.
+
+Each reference links to its definition, and each definition links back. In browsers that support CSS anchor positioning, clicking a reference opens its definition in a popover beside it instead; where interest invokers are supported, hovering or focusing it does too.
 
 ### Tables
 

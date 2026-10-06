@@ -32,6 +32,7 @@ import { PRERELEASE_URL, PRODUCTION_URL } from './src/consts.ts';
 import { satteriCdnVersion } from './src/utils/satteriCdnVersion';
 import { satteriCodeFrame } from './src/utils/satteriCodeFrame';
 import { satteriConditionalHeadings } from './src/utils/satteriConditionalHeadings';
+import { satteriFootnotes } from './src/utils/satteriFootnotes';
 import { satteriReadingTime } from './src/utils/satteriReadingTime';
 import { satteriRelatedLinks } from './src/utils/satteriRelatedLinks';
 import { shikiNotationTransformers } from './src/utils/shikiNotationTransformers';
@@ -157,6 +158,7 @@ export default defineConfig({
         satteriCdnVersion(),
         satteriCodeFrame(),
       ],
+      hastPlugins: [satteriFootnotes()],
     }),
   },
 

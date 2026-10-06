@@ -1,0 +1,67 @@
+---
+import Hr from './Hr.astro';
+
+/**
+ * Footnote definitions section, produced from GFM footnotes by `satteriFootnotes`. Owns the `footnote-label` heading
+ * that each `FootnoteRef` points at with `aria-describedby`.
+ */
+---
+
+<section data-footnotes aria-labelledby="footnote-label" class="mx-auto my-6 w-full max-w-3xl">
+  <Hr maxWidth={false} class="my-16" />
+  <h2 id="footnote-label" class="mb-3 font-display text-h4 uppercase text-muted select-none" data-search-ignore>
+    Footnotes
+  </h2>
+  <div
+    class="text-p3 [&_li]:rounded-sm [&_li]:target:bg-hover [&_li>p]:my-1 [&_li>p]:max-w-none [&_ol]:max-w-none"
+  >
+    <slot />
+  </div>
+</section>
+
+<script>
+  import { enhanceFootnotes } from './footnotePopovers';
+
+  enhanceFootnotes();
+  document.addEventListener('astro:page-load', () => enhanceFootnotes());
+</script>
+
+<style is:global>
+  /*
+   * The definition popover that `footnotePopovers` creates and appends to <body>, outside this component's scope. The
+   * script sets `position-anchor`. A block-axis-only area spans the viewport's width, so `anchor-center` can slide the
+   * box back inside it near either edge.
+   */
+  .footnote-popover {
+    inset: auto;
+    margin: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    position-area: block-start;
+    justify-self: anchor-center;
+    position-try-fallbacks: flip-block;
+    width: max-content;
+    max-width: min(28rem, 100% - var(--spacing) * 8);
+    /* The same scale-and-fade as the Base UI popups, with discrete transitions so it also runs on close. */
+    transition:
+      opacity 150ms ease-out,
+      scale 150ms ease-out,
+      display 100ms allow-discrete,
+      overlay 100ms allow-discrete;
+
+    &:not(:popover-open) {
+      opacity: 0;
+      scale: 0.95;
+      transition-duration: 100ms;
+    }
+
+    @starting-style {
+      &:popover-open {
+        opacity: 0;
+        scale: 0.95;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+</style>
