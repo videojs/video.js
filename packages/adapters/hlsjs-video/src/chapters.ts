@@ -5,6 +5,7 @@ import type { Constructor } from '@videojs/utils/types';
 import type { ManifestLoadedData } from 'hls.js';
 import Hls from 'hls.js';
 
+import { isCredentialed } from './request-credentials';
 import type { HlsEngineHost } from './types';
 
 /**
@@ -18,7 +19,8 @@ import type { HlsEngineHost } from './types';
  *
  * Read on `MANIFEST_LOADED`, whose `url` is the response URL, so a relative `URI` resolves past redirects. The tracks
  * go with the source (`MANIFEST_LOADING`) and the element (`MEDIA_DETACHED`, `DESTROYING`); a manifest that loaded
- * before media was attached loads once it is.
+ * before media was attached loads once it is. The document request sends cookies under `crossorigin="use-credentials"`,
+ * as hls.js's own requests do.
  */
 export function HlsJsChaptersMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsChapters extends (BaseClass as Constructor<HlsEngineHost>) {
@@ -52,6 +54,7 @@ export function HlsJsChaptersMixin<Base extends Constructor<HlsEngineHost>>(Base
       this.#chapters = new AbortController();
       loadChaptersTracks(target, this.#chaptersUrl, this.#chapters.signal, {
         preferredLanguage: this.engine?.config.subtitlePreference?.lang,
+        credentials: isCredentialed(target.crossOrigin) ? 'include' : undefined,
       });
     }
 

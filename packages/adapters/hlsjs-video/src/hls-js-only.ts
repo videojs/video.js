@@ -20,6 +20,7 @@ import { HlsJsLiveMixin } from './live';
 import { HlsJsMediaTracksMixin } from './media-tracks';
 import { HlsJsMetadataTracksMixin } from './metadata-tracks';
 import { HlsJsPreloadMixin } from './preload';
+import { withRequestCredentials } from './request-credentials';
 import { HlsJsStreamTypeMixin } from './stream-type';
 import { HlsJsTextTracksMixin, withPreservedTextTracks } from './text-tracks';
 
@@ -56,6 +57,9 @@ class HlsJsOnlyAdapterCore extends HTMLVideoAdapter implements EngineAdapter<Hls
       // Layered over whatever controller the config already names, so a
       // `capLevelController` passed through `source.engine` keeps working.
       capLevelController: createCapLevelController(this.#capPolicy, config.capLevelController),
+      // Likewise layered over the config's own loader hooks: the element's
+      // `crossorigin="use-credentials"` sends cookies with every request.
+      ...withRequestCredentials(config, () => this.target?.crossOrigin),
     });
 
     setupDrm(this.#engine);

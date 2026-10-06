@@ -23,6 +23,8 @@
  * the asset title; the request is cacheable, and each side stays ignorant of the other.
  */
 
+import { isFunction } from '@videojs/utils/predicate';
+
 import { defineBehavior } from '../../../core/composition/create-composition';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -31,11 +33,15 @@ import { loadChaptersTracks } from '../../../media/dom/text/load-chapters-tracks
 import { APPLE_HLS_CHAPTERS_DATA_ID } from '../../../media/hls/parse-json-chapters';
 import type { TextSelectionConfig } from '../../../media/primitives/select-tracks';
 import { getSessionData, isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
+import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
 
 type LoadChaptersFsmState = 'preconditions-unmet' | 'loading';
 
 /** The chapters track for `preferredSubtitleLanguage` leads, when the document titles chapters in it. */
-export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'>;
+export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'> & {
+  /** The `credentials` mode the chapters-document request is made with; absent → the platform default. */
+  requestCredentials?: RequestCredentialsPolicy;
+};
 
 function deriveState(
   presentation: MaybeResolvedPresentation | undefined,
@@ -61,6 +67,7 @@ function loadChaptersSetup({
   config: LoadChaptersConfig;
 }): Reactor<LoadChaptersFsmState | 'destroying' | 'destroyed'> {
   const derivedStateSignal = computed(() => deriveState(state.presentation.get(), context.mediaElement.get()));
+  const { requestCredentials } = config;
 
   return createMachineReactor<LoadChaptersFsmState>({
     initial: 'preconditions-unmet',
@@ -84,6 +91,8 @@ function loadChaptersSetup({
 
           loadChaptersTracks(mediaElement, uri, controller.signal, {
             preferredLanguage: config.preferredSubtitleLanguage,
+            // Resolved per load: the adapter's policy reads the live `crossorigin`.
+            credentials: isFunction(requestCredentials) ? requestCredentials({ url: uri }) : requestCredentials,
           });
 
           return controller;

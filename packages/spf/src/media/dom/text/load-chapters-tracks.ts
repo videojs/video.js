@@ -12,9 +12,13 @@ import {
  * Fetch and parse one Apple JSON chapters document. Chapters are optional and playback never depends on them, so a
  * document that won't load or won't parse is warned about and yields none.
  */
-async function fetchHlsJsonChapters(url: string, signal: AbortSignal): Promise<Chapter[]> {
+async function fetchHlsJsonChapters(
+  url: string,
+  signal: AbortSignal,
+  credentials: RequestCredentials | undefined
+): Promise<Chapter[]> {
   try {
-    const response = await fetchResolvable({ url }, { signal });
+    const response = await fetchResolvable({ url }, { signal, credentials });
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
 
     // The tag's contract is an Apple JSON chapters document; the parser is
@@ -32,6 +36,11 @@ async function fetchHlsJsonChapters(url: string, signal: AbortSignal): Promise<C
   }
 }
 
+export interface LoadChaptersTracksOptions extends AddChaptersTracksOptions {
+  /** The `credentials` mode the document request is made with; absent → the platform default (`same-origin`). */
+  credentials?: RequestCredentials | undefined;
+}
+
 /**
  * Load the Apple JSON chapters document at `url` onto `mediaElement` as hidden `<track kind="chapters">` elements, one
  * per title language, via {@link addChaptersTracksToMedia}. Shared by SPF's `loadChapters` behavior and the hls.js and
@@ -44,13 +53,13 @@ export function loadChaptersTracks(
   mediaElement: HTMLMediaElement,
   url: string,
   signal: AbortSignal,
-  options: AddChaptersTracksOptions = {}
+  { credentials, ...options }: LoadChaptersTracksOptions = {}
 ): void {
   if (signal.aborted) return;
 
   signal.addEventListener('abort', () => removeAllChaptersTracksFromMedia(mediaElement), { once: true });
 
-  void fetchHlsJsonChapters(url, signal).then((chapters) => {
+  void fetchHlsJsonChapters(url, signal, credentials).then((chapters) => {
     // A document that settled before the abort still must not load onto an
     // element that has since been cleaned up.
     if (signal.aborted) return;

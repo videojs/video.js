@@ -93,6 +93,22 @@ describe('HlsJsChaptersMixin', () => {
     expect(loadChaptersTracks.mock.lastCall![3]).toEqual({ preferredLanguage: 'es' });
   });
 
+  it('sends cookies with the document request only for crossorigin="use-credentials"', () => {
+    const engine = createEngine();
+    const host = new HlsJsChapters(engine);
+    const video = document.createElement('video');
+
+    host.attach(video);
+    loadManifest(engine, 'https://example.com/main.m3u8', { URI: 'chapters.json' });
+
+    expect(loadChaptersTracks.mock.lastCall![3]?.credentials).toBeUndefined();
+
+    video.crossOrigin = 'use-credentials';
+    loadManifest(engine, 'https://example.com/main.m3u8', { URI: 'chapters.json' });
+
+    expect(loadChaptersTracks.mock.lastCall![3]?.credentials).toBe('include');
+  });
+
   it('does nothing for a manifest without a chapters URI', () => {
     const engine = createEngine();
     const host = new HlsJsChapters(engine);
