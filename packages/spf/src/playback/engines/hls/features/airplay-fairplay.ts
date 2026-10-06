@@ -3,8 +3,10 @@ import { setupAirPlayFairPlay } from '../../../behaviors/dom/setup-airplay-fairp
 
 /**
  * Plays FairPlay-protected content on an AirPlay receiver, negotiating the receiver's keys while a session holds.
- * Compose it with both `airPlayFeature` and `drmFeature`, listed immediately before `drmFeature`: when a session ends,
- * list order is what releases the receiver's MediaKeys before `setupMediaKeys` attaches MSE's afresh.
+ *
+ * Requires the `drm` and `keySystems` config, such as `drmFeature` sets; without them it throws once a session starts.
+ * Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeature`, which signals the session. The
+ * HLS video engine lists it before `drmFeature`, the order its handoff was verified with on real devices.
  */
 export const airPlayFairPlayFeature = defineFeature({
   behaviors: [setupAirPlayFairPlay],

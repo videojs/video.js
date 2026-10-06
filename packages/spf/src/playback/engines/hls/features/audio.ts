@@ -10,6 +10,13 @@ import { reportUnsupportedTrackConditions } from '../../../primitives/report-tra
 /**
  * Plays audio: resolves the selected rendition's playlist, switches renditions, and buffers and loads its segments.
  * Honors the user's `userAudioTrackSelection`, such as a language.
+ *
+ * Requires, from this or other features:
+ *
+ * - A writer of `context.mediaSource`, such as `mediaSourceFeature`; nothing loads without one.
+ * - A writer of `state.currentTime`, such as `currentTimeFeature`; without one, loading stops after the first window.
+ * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
+ *   init segments load.
  */
 export const audioFeature = defineFeature({
   behaviors: [

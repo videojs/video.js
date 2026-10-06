@@ -3,8 +3,10 @@ import { relocatingTextPipelines } from '../../../primitives/relocation-pipeline
 
 /**
  * Shifts text cues onto the playlist's zero-based timeline along with the audio and video, rebasing each cue by the
- * shift `shiftTimestampsFeature` establishes. Compose it only with both `shiftTimestampsFeature` and
- * `textTracksFeature`: without the shift, cues would wait for an origin nothing establishes.
+ * shift `shiftTimestampsFeature` establishes. Does nothing without a text feature, such as `textTracksFeature`.
+ *
+ * Requires a writer of each track's `startMediaTime` from its container timestamps, such as `shiftTimestampsFeature`;
+ * without one, cues wait for an origin nothing establishes and never appear.
  */
 export const shiftTextTimestampsFeature = defineFeature({
   behaviors: [],

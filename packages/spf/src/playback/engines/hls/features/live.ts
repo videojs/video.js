@@ -8,7 +8,14 @@ import { establishStartMediaTime, gateFirstParseOnAnchor } from '../../../behavi
 /**
  * Plays live streams: reloads their playlists, keeps the seekable window current, starts at the live edge, and keeps
  * the playhead inside the window. Aligns separately delivered tracks on the stream's program date-times when joining
- * mid-stream. Inert for on-demand content. Needs `startPositionFeature`, which performs the live-edge seek.
+ * mid-stream. Inert for on-demand content.
+ *
+ * Requires:
+ *
+ * - A consumer of `state.startPosition`, such as `startPositionFeature`; without one, playback starts at the window's
+ *   start instead of the live edge.
+ * - A writer of `presentation.duration` and of the MediaSource's duration, such as `calculateDurationFeature` with
+ *   `mediaSourceFeature`; without them, the stream never gets its infinite duration and stalls.
  */
 export const liveFeature = defineFeature({
   behaviors: [syncLiveSeekableRange, seekToLiveEdge, establishStartMediaTime],
