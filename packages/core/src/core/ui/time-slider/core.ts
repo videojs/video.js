@@ -86,7 +86,7 @@ export class TimeSliderCore extends SliderCore {
 
     return {
       currentTime: media?.currentTime ?? 0,
-      duration: media?.duration ?? 0,
+      duration: media ? getTimeRangeEnd(media) : 0,
       playbackRate,
       seeking: media?.seeking ?? false,
       playing:

@@ -145,6 +145,38 @@ describe('TimeSliderRoot', () => {
     expect(thumb?.getAttribute('tabindex')).toBe('-1');
   });
 
+  it('starts and stops progress when only the seekable range changes', () => {
+    vi.useFakeTimers();
+    mockTimeState.duration = 0;
+    mockBufferState.seekable = [];
+    const { Wrapper, update } = createPlayerWrapper();
+    const ref = createRef<HTMLDivElement>();
+
+    try {
+      render(
+        <Wrapper>
+          <TimeSliderRoot ref={ref} />
+        </Wrapper>
+      );
+
+      expect(ref.current?.hasAttribute('data-playing')).toBe(false);
+
+      update({ seekable: [[0, 120]] });
+      act(() => {
+        vi.advanceTimersByTime(16);
+        flush();
+      });
+      expect(ref.current?.hasAttribute('data-playing')).toBe(true);
+
+      update({ seekable: [] });
+      act(() => flush());
+      expect(ref.current?.hasAttribute('data-playing')).toBe(false);
+    } finally {
+      cleanup();
+      vi.useRealTimers();
+    }
+  });
+
   it('stays interactive when the buffer feature is not composed', () => {
     mockNoBuffer.value = true;
     const { Wrapper } = createPlayerWrapper();

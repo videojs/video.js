@@ -181,6 +181,7 @@ describe('TimeSliderCore', () => {
       expect(state.disabled).toBe(false);
       expect(state.duration).toBe(120);
       expect(core.getAttrs(state)['aria-valuemax']).toBe(120);
+      expect(core.getProgressState(null).duration).toBe(120);
     });
   });
 

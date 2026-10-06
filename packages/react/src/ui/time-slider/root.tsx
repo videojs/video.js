@@ -154,6 +154,7 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       time?.currentTime,
       time?.duration,
       time?.seeking,
+      buffer?.seekable,
       rate?.playbackRate,
       core,
       playback,
