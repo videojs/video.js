@@ -192,6 +192,8 @@ export function skinToFlag(skin: Skin): SkinFlag {
 
   if (skin.startsWith('neutral-')) return 'neutral';
 
+  if (skin.startsWith('scaffold-')) return 'scaffold';
+
   return skin.startsWith('compat-') ? 'compat' : 'default';
 }
 
@@ -506,7 +508,7 @@ export function resolveInstallationSelection(
         field: 'skin',
         value: skinFlag,
         message: 'Shadcn installs editable skin source, so the `none` skin is not available.',
-        hint: `Use ${syntax.options(['skin', 'default'])}, ${syntax.options(['skin', 'neutral'])}, or ${syntax.options(['skin', 'compat'])}, or ${syntax.options(['method', 'packaged'])} for a skinless player.`,
+        hint: `Use ${syntax.options(['skin', 'default'])}, ${syntax.options(['skin', 'neutral'])}, ${syntax.options(['skin', 'compat'])}, or ${syntax.options(['skin', 'scaffold'])}, or ${syntax.options(['method', 'packaged'])} for a skinless player.`,
       });
     }
 

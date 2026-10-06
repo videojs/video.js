@@ -1,0 +1,57 @@
+@layer base.theme, base.preset, base.preferences;
+
+@layer base.preset {
+  .media-skin[data-theme="scaffold"] {
+    --media-spacing: calc(var(--media-scale-unit, 16px) / 4);
+    --media-background: transparent;
+    --media-foreground: white;
+    --media-accent: var(--media-accent-color, var(--media-default-accent-color));
+    --media-accent-foreground: var(--media-accent-text-color, black);
+    --media-primary: var(--media-accent);
+    --media-primary-foreground: var(--media-accent-text-color, black);
+    --media-muted: rgb(255 255 255 / 0.1);
+    --media-popover: rgb(0 0 0 / 0.2);
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 3);
+    --media-tooltip-boundary-offset: var(--media-popover-boundary-offset);
+    --media-popover-foreground: var(--media-foreground);
+    --media-ring: var(--media-accent);
+    --media-button-highlight: rgb(0 0 0 / 0.2);
+    --media-video-border-radius: var(--media-border-radius, 0px);
+    --media-control-radius: 0px;
+    --media-controls-radius: 0px;
+    --media-menu-item-radius: 0px;
+    --media-popup-radius: 0px;
+    --media-dialog-radius: 0px;
+    --media-scrollbar-thumb-color: color-mix(in srgb, var(--media-foreground) 60%, transparent);
+    --media-shadow-surface: none;
+    --media-shadow-surface-inset: none;
+    --media-shadow-thumb: none;
+    --media-backdrop-filter-surface: none;
+    --media-backdrop-filter-indicator: none;
+    --media-backdrop-filter-dialog: none;
+  }
+
+  .media-skin[data-theme="scaffold"][data-preset$="audio"] {
+    --media-foreground: black;
+    --media-muted: rgb(0 0 0 / 0.1);
+  }
+
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="scaffold"][data-preset$="audio"] {
+      --media-foreground: light-dark(black, white);
+      --media-muted: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
+    }
+  }
+
+  @media (forced-colors: active) {
+    .media-skin[data-theme="scaffold"] {
+      --media-background: Canvas;
+      --media-popover: Canvas;
+      --media-foreground: CanvasText;
+      --media-accent: Highlight;
+      --media-primary: Highlight;
+      --media-primary-foreground: HighlightText;
+      --media-ring: Highlight;
+    }
+  }
+}

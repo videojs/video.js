@@ -26,6 +26,11 @@ const registrySkins = {
       import('@registry-html-compat/components/videojs/video/skin.html?raw'),
       import('@registry-html-compat/components/videojs/video/skin'),
     ]),
+  'video/scaffold': () =>
+    Promise.all([
+      import('@registry-html-scaffold/components/videojs/video/skin.html?raw'),
+      import('@registry-html-scaffold/components/videojs/video/skin'),
+    ]),
   'live-video/default': () =>
     Promise.all([
       import('@registry-html-default/components/videojs/live-video/skin.html?raw'),
@@ -40,6 +45,11 @@ const registrySkins = {
     Promise.all([
       import('@registry-html-compat/components/videojs/live-video/skin.html?raw'),
       import('@registry-html-compat/components/videojs/live-video/skin'),
+    ]),
+  'live-video/scaffold': () =>
+    Promise.all([
+      import('@registry-html-scaffold/components/videojs/live-video/skin.html?raw'),
+      import('@registry-html-scaffold/components/videojs/live-video/skin'),
     ]),
   'audio/default': () =>
     Promise.all([
@@ -56,6 +66,11 @@ const registrySkins = {
       import('@registry-html-compat/components/videojs/audio/skin.html?raw'),
       import('@registry-html-compat/components/videojs/audio/skin'),
     ]),
+  'audio/scaffold': () =>
+    Promise.all([
+      import('@registry-html-scaffold/components/videojs/audio/skin.html?raw'),
+      import('@registry-html-scaffold/components/videojs/audio/skin'),
+    ]),
   'live-audio/default': () =>
     Promise.all([
       import('@registry-html-default/components/videojs/live-audio/skin.html?raw'),
@@ -70,6 +85,11 @@ const registrySkins = {
     Promise.all([
       import('@registry-html-compat/components/videojs/live-audio/skin.html?raw'),
       import('@registry-html-compat/components/videojs/live-audio/skin'),
+    ]),
+  'live-audio/scaffold': () =>
+    Promise.all([
+      import('@registry-html-scaffold/components/videojs/live-audio/skin.html?raw'),
+      import('@registry-html-scaffold/components/videojs/live-audio/skin'),
     ]),
 } satisfies Record<`${SkinPreset}/${Skin}`, SkinLoader>;
 

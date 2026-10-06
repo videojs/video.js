@@ -3,7 +3,7 @@ import { defaultInstallationExtensions, getInstallationExtension, type Installat
 import { getInstallationPreset, type Skin, type UseCase } from './presets';
 import { getMediaSubpath, RENDERERS, type Renderer } from './renderers';
 
-// Every installation preset ships default, neutral, compat, and skinless CDN bundles.
+// Every installation preset ships default, neutral, compat, scaffold, and skinless CDN bundles.
 // The skinless bundle is named for the element it defines (e.g. `video-player`).
 // Background video is the exception: all skin choices resolve to one bundle.
 function getCdnFileName(useCase: UseCase, skin: Skin): string {
@@ -16,6 +16,8 @@ function getCdnFileName(useCase: UseCase, skin: Skin): string {
   if (skin.startsWith('neutral-')) return `${group}-neutral`;
 
   if (skin.startsWith('compat-')) return `${group}-compat`;
+
+  if (skin.startsWith('scaffold-')) return `${group}-scaffold`;
 
   return group;
 }
