@@ -28,10 +28,6 @@
  * conditional: both this behavior and `setupMediaKeys` react to the same falling edge, so it releases the element only
  * while it still holds it, exactly as the native path does.
  *
- * **Compose it ahead of `setupMediaKeys`**, beside `exchangeLicenses` and for the same reason: `createComposition`
- * calls cleanups in registration order, so the receiver MediaKeys detach before the re-entering negotiation attaches
- * its own.
- *
  * **EME first, then the legacy key system.** Measured on macOS/Safari 26.6.2 against a real receiver: the CDM grants
  * access for `initDataTypes: ['skd']` and then throws `NotSupportedError` from `generateRequest` — self-inconsistent,
  * and the reason the pre-EME `WebKitMediaKeys` path still exists. That refusal, and only that refusal while the target
