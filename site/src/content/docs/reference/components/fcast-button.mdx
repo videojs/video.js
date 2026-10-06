@@ -1,0 +1,67 @@
+---
+title: FCastButton
+frameworkTitle:
+  html: media-fcast-button
+description: FCast receiver control backed by an application-provided sender
+stability: unstable
+apis:
+  - FCastExtension
+  - FCastExtensionProps
+  - FCastLoadRequest
+  - FCastSender
+  - FCastSnapshot
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+`FCastButton` registers an FCast player extension and displays a separate casting control beside Google Cast and AirPlay. It requires an `FCastSender` supplied by the application. See <DocsLink slug="guides/casting">Casting</DocsLink> for the setup and the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries.
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { FCastButton } from '@videojs/react/ui/fcast-button';
+import type { FCastSender } from '@videojs/fcast';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/ui/fcast-button';
+import type { FCastSender } from '@videojs/fcast';
+```
+</FrameworkCase>
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<FCastButton sender={sender}>FCast</FCastButton>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-fcast-button>FCast</media-fcast-button>
+```
+
+Assign `sender` as a property on the element.
+</FrameworkCase>
+
+## Behavior
+
+The sender's `snapshot` supplies availability, connection, device name, playback position, duration, volume, mute state, speed, and optional buffering and ended states. The sender dispatches `change` whenever this snapshot changes. The button calls `prompt()` to choose a receiver and `disconnect()` to end a session. While connected, the extension forwards the player's load, play, pause, seek, volume, and speed actions to the sender.
+
+The button is hidden when no sender is assigned, or when the disconnected sender reports `unsupported`. It stays visible with `aria-disabled="true"` when no receiver is available. A connected session can be disconnected even if discovery later reports no available devices. The sender handles receiver discovery and the FCast protocol; the browser control uses its published state.
+
+| Input | React | HTML | Description |
+|---|---|---|---|
+| Sender | `sender` prop | `sender` property | Native SDK sender or application bridge implementing `FCastSender` |
+| Receiver URL | `src` prop | `src` attribute or property | Playable URL to send instead of the local media URL |
+| MIME type | `contentType` prop | `content-type` attribute or `contentType` property | MIME type sent with the load request |
+| Disabled | `disabled` prop | `disabled` attribute or property | Keeps the control focusable and prevents activation |
+
+## Styling
+
+The button exposes `data-fcast-state` (`disconnected`, `connecting`, or `connected`) and `data-availability` (`unsupported`, `unavailable`, or `available`). Its label names the next action and includes the device name when connected. React renders a native `<button>`; the HTML element uses button semantics with Enter and Space activation.

@@ -1,6 +1,6 @@
 ---
-title: 'Cast to AirPlay and Chromecast'
-description: 'Send playback to AirPlay and Google Cast devices, with availability detection and connection state.'
+title: 'Cast to AirPlay, Chromecast, and FCast'
+description: 'Send playback to AirPlay, Google Cast, and FCast receivers.'
 ---
 
 import Demo from '@/components/docs/demos/Demo.astro';
@@ -167,6 +167,36 @@ Use `remotePlaybackAvailability` to decide whether to offer a route and `remoteP
 <FrameworkCase frameworks={["html"]}>
 Use `remotePlaybackAvailability` to decide whether to offer a route and `remotePlaybackState` to show whether it is disconnected, connecting, or connected. `<media-cast-button>` and `<media-airplay-button>` already apply these states to their presentation; read them directly only when another part of your app needs them.
 </FrameworkCase>
+
+### FCast receivers
+
+FCast receivers use a separate sender. Browsers cannot discover receivers over mDNS or open the FCast TCP connection, so provide an `FCastSender` backed by a native [FCast SDK](https://docs.fcast.org/sdk/) or an application bridge. Install `@videojs/fcast` alongside your Video.js framework package. The sender reports receiver availability and playback state, opens the device picker, and sends playback commands.
+
+<FrameworkCase frameworks={["react"]}>
+Add `FCastButton` to your player UI beside `CastButton` and `AirPlayButton`. Pass it the sender from your application:
+
+```tsx
+import { FCastButton } from '@videojs/react/ui/fcast-button';
+
+<FCastButton sender={sender}>FCast</FCastButton>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Register the custom element, place it beside the other cast controls, and assign the sender property:
+
+```ts
+import '@videojs/html/ui/fcast-button';
+
+document.querySelector('media-fcast-button')!.sender = sender;
+```
+
+```html
+<media-fcast-button>FCast</media-fcast-button>
+```
+</FrameworkCase>
+
+The FCast button registers its own player extension, so existing play, pause, seek, volume, and speed controls follow the FCast receiver while connected. It reads the sender's `snapshot`, separate from `remotePlaybackState`, and exposes `data-fcast-state` and `data-availability` for styling. The packaged skins include AirPlay and Cast controls; add the FCast button to your own UI or skin source. Set `src` and `contentType` on the FCast button when the receiver needs a different playable URL or MIME type.
 
 ## Troubleshooting
 

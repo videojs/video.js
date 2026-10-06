@@ -17,6 +17,7 @@
         "@videojs/core",
         "@videojs/dash-video",
         "@videojs/element",
+        "@videojs/fcast",
         "@videojs/google-cast",
         "@videojs/hlsjs-video",
         "@videojs/html",
@@ -61,6 +62,9 @@
     },
     "packages/element": {
       "component": "@videojs/element"
+    },
+    "packages/extensions/fcast": {
+      "component": "@videojs/fcast"
     },
     "packages/extensions/google-cast": {
       "component": "@videojs/google-cast"
