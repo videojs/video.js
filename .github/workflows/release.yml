@@ -68,7 +68,7 @@ jobs:
   deploy:
     needs: release
     runs-on: ubuntu-latest
-    environment: Deploy
+    environment: legacy-release
     env:
       VJS_VERSION: ${{ github.event.head_commit.message }}
       S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
