@@ -1,6 +1,11 @@
 name: ci
 
-on: [push, pull_request]
+# v8 is maintained on the 8.x branch; main runs the Video.js 10 workflows.
+on:
+  push:
+    branches: [8.x]
+  pull_request:
+    branches: [8.x]
 
 jobs:
   should-skip:
@@ -17,7 +22,7 @@ jobs:
 
   ci:
     needs: should-skip
-    if: ${{needs.should-skip.outputs.should-skip-job != 'true' || github.ref == 'refs/heads/main'}}
+    if: ${{needs.should-skip.outputs.should-skip-job != 'true' || github.ref == 'refs/heads/8.x'}}
     strategy:
       fail-fast: false
       matrix:

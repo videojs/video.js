@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   action:
-    if: ${{ github.repository_owner == 'videojs' }}
+    if: ${{ github.repository_owner == 'videojs' && github.ref == 'refs/heads/8.x' }}
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/lock-threads@v4
