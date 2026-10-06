@@ -84,6 +84,9 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
+  "publishConfig": {
+    "tag": "next-8"
+  },
   "engines": {
     "node": "^22.13.0 || >=24"
   },
