@@ -48,9 +48,11 @@ jobs:
       - name: npm install
         run: npm i --prefer-offline --no-audit
 
-      # publish runs build for us via a prepublishOnly script
+      # publish runs build for us via a prepublishOnly script.
+      # v8 uses its own dist-tags (next-8, latest-8, like next-7/latest-7) because
+      # latest and next belong to Video.js 10.
       - name: npm release
-        run: npm publish --provenance --tag next
+        run: npm publish --provenance --tag next-8
 
       - name: get current changelog
         run: node -e "console.log(require('./build/current-changelog.js')())" > CHANGELOG-LATEST.md
