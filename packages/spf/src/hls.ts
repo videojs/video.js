@@ -81,10 +81,35 @@ export {
   excludeRefusedKeySystems,
   preferCodecFamilies,
 } from './playback/primitives/selection-rules';
+// The features the engines are composed from: each a set of behaviors with the
+// config defaults and initial state they need. Pass a list of them, in order, to
+// `flattenFeatures` (from `@videojs/spf`) to compose an engine of your own; each
+// engine entry also exports its own `features` list.
+export { airPlayFeature } from './playback/engines/hls/features/airplay';
+export { airPlayFairPlayFeature } from './playback/engines/hls/features/airplay-fairplay';
+export { audioFeature } from './playback/engines/hls/features/audio';
+export { backgroundVideoFeature } from './playback/engines/hls/features/background-video';
+export { calculateDurationFeature } from './playback/engines/hls/features/calculate-duration';
+export { chaptersFeature } from './playback/engines/hls/features/chapters';
+export { currentTimeFeature } from './playback/engines/hls/features/current-time';
+export { drmFeature } from './playback/engines/hls/features/drm';
+export { endStallRecoveryFeature } from './playback/engines/hls/features/end-stall-recovery';
+export { errorFeature } from './playback/engines/hls/features/error';
+export { hlsLoadingFeature } from './playback/engines/hls/features/hls-loading';
+export { initialLoadFeature } from './playback/engines/hls/features/initial-load';
+export { liveFeature } from './playback/engines/hls/features/live';
+export { mediaSourceFeature } from './playback/engines/hls/features/media-source';
+export { monitorPlayerSizeFeature } from './playback/engines/hls/features/monitor-player-size';
+export { multiCdnFeature } from './playback/engines/hls/features/multi-cdn';
+export { shiftTextTimestampsFeature } from './playback/engines/hls/features/shift-text-timestamps';
+export { shiftTimestampsFeature } from './playback/engines/hls/features/shift-timestamps';
+export { startPositionFeature } from './playback/engines/hls/features/start-position';
+export { textTracksFeature } from './playback/engines/hls/features/text-tracks';
+export { videoFeature } from './playback/engines/hls/features/video';
 // The engines themselves are not here: each has its own entry point —
 // `@videojs/spf/engines/hls-video`, `@videojs/spf/engines/hls-audio`, and
 // `@videojs/spf/engines/hls-background-video` — exporting the same names
-// (`createEngine`, `behaviors`, `defaultConfig`, `initialState`, and the
+// (`createEngine`, `features`, `behaviors`, `defaultConfig`, `initialState`, and the
 // `EngineState`, `EngineContext`, `EngineConfig`, `Behaviors`, `Config` types), so a
 // consumer pulls in only the engine it drives. This entry holds what they
 // share. The Medias over the engines live behind `@videojs/spf/adapters/hls-video`,
