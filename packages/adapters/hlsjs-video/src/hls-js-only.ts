@@ -13,6 +13,7 @@ import Hls, { type HlsConfig } from 'hls.js';
 
 import { HlsJsAirPlayMixin } from './airplay-bridge';
 import { createCapLevelController, DEFAULT_MIN_AUTO_RESOLUTION, type RenditionCapPolicy } from './cap-level';
+import { HlsJsChaptersMixin } from './chapters';
 import { setupDrm } from './drm';
 import { HlsJsErrorsMixin } from './errors';
 import { HlsJsLiveMixin } from './live';
@@ -141,7 +142,9 @@ const HlsJsOnlyAdapterComposed = HlsJsAirPlayMixin(
     HlsJsLiveMixin(
       HlsJsStreamTypeMixin(
         HlsJsMediaTracksMixin(
-          HlsJsMetadataTracksMixin(HlsJsTextTracksMixin(HlsJsErrorsMixin(MediaTracksMixin(HlsJsOnlyAdapterCore))))
+          HlsJsChaptersMixin(
+            HlsJsMetadataTracksMixin(HlsJsTextTracksMixin(HlsJsErrorsMixin(MediaTracksMixin(HlsJsOnlyAdapterCore))))
+          )
         )
       )
     )

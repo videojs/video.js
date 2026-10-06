@@ -515,6 +515,9 @@ importers:
       '@videojs/native-hls-video':
         specifier: workspace:*
         version: link:../native-hls-video
+      '@videojs/spf':
+        specifier: workspace:*
+        version: link:../../spf
       '@videojs/utils':
         specifier: workspace:*
         version: link:../../utils
@@ -594,6 +597,9 @@ importers:
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media
+      '@videojs/spf':
+        specifier: workspace:*
+        version: link:../../spf
       '@videojs/utils':
         specifier: workspace:*
         version: link:../../utils

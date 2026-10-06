@@ -84,6 +84,23 @@ describe('NativeHlsErrorsMixin', () => {
     expect(nativeHandler).not.toHaveBeenCalled();
   });
 
+  it("lets a child's error reach the child, and reports none of its own", () => {
+    const { host, video } = setup();
+    const track = document.createElement('track');
+    const trackHandler = vi.fn();
+    const handler = vi.fn();
+
+    video.appendChild(track);
+    track.addEventListener('error', trackHandler);
+    host.addEventListener('error', handler);
+
+    // What a srcless `<track>` fires once its empty load fails.
+    track.dispatchEvent(new Event('error'));
+
+    expect(trackHandler).toHaveBeenCalledOnce();
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it('maps MEDIA_ERR_ABORTED correctly', () => {
     const { host, video } = setup();
 

@@ -6,6 +6,11 @@
     "declarationDir": "types",
     "useDefineForClassFields": false
   },
-  "references": [{ "path": "../../media" }, { "path": "../../media/src/dom" }, { "path": "../../utils" }],
+  "references": [
+    { "path": "../../media" },
+    { "path": "../../media/src/dom" },
+    { "path": "../../spf" },
+    { "path": "../../utils" }
+  ],
   "include": ["src"]
 }
