@@ -45,6 +45,7 @@ export interface UseSliderReturnValue<State extends SliderState = SliderState> {
   state: State;
   input: SliderApi['input'];
   cssVars: Record<string, string>;
+  adjustForAlignment: SliderApi['adjustForAlignment'];
   rootRef: React.RefCallback<HTMLElement>;
   thumbRef: React.RefCallback<HTMLElement>;
   rootProps: SliderRootProps;
@@ -170,6 +171,7 @@ export function useSlider<State extends SliderState = SliderState>(
     state,
     input: slider.input,
     cssVars,
+    adjustForAlignment: slider.adjustForAlignment,
     rootRef,
     thumbRef,
     rootProps: slider.rootProps,

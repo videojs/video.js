@@ -145,6 +145,43 @@ describe('TimeSliderRoot', () => {
     expect(thumb?.getAttribute('tabindex')).toBe('-1');
   });
 
+  it('updates the visual fill without rendering the thumb between media updates', () => {
+    vi.useFakeTimers();
+    const { Wrapper, update } = createPlayerWrapper();
+    const ref = createRef<HTMLDivElement>();
+    const thumbRender = vi.fn((props: HTMLAttributes<HTMLDivElement>) => <div {...props} />);
+
+    try {
+      const { getByRole } = render(
+        <Wrapper>
+          <TimeSliderRoot ref={ref}>
+            <SliderThumb render={thumbRender} />
+          </TimeSliderRoot>
+        </Wrapper>
+      );
+      const thumb = getByRole('slider');
+      const fill = ref.current!.style.getPropertyValue('--media-slider-fill');
+
+      thumbRender.mockClear();
+
+      act(() => {
+        vi.advanceTimersByTime(160);
+        flush();
+      });
+
+      expect(ref.current!.style.getPropertyValue('--media-slider-fill')).not.toBe(fill);
+      expect(thumbRender).not.toHaveBeenCalled();
+      expect(thumb.getAttribute('aria-valuenow')).toBe('30');
+
+      update({ currentTime: 31 });
+      expect(thumbRender).toHaveBeenCalled();
+      expect(thumb.getAttribute('aria-valuenow')).toBe('31');
+    } finally {
+      cleanup();
+      vi.useRealTimers();
+    }
+  });
+
   it('starts and stops progress when only the seekable range changes', () => {
     vi.useFakeTimers();
     mockTimeState.duration = 0;

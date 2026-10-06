@@ -19,6 +19,7 @@ import { ContextConsumer, ContextProvider } from '@videojs/element/context';
 import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
 import { getMediaElement } from '@videojs/media/dom';
 import { applyStyles } from '@videojs/utils/dom';
+import { shallowEqual } from '@videojs/utils/object';
 import { formatTime } from '@videojs/utils/time';
 
 import { i18nContext } from '../../i18n/context';
@@ -66,6 +67,8 @@ export class TimeSliderElement extends UIElement {
   readonly #progress = createTimeSliderProgress(SliderCSSVars.fill);
   readonly #i18n = new I18nController(this, i18nContext);
 
+  #context: object | undefined;
+  #cssVars: Record<string, string> = {};
   #slider: SliderApi | null = null;
   #disconnect: AbortController | null = null;
   #releaseControlsLock: (() => void) | null = null;
@@ -138,6 +141,7 @@ export class TimeSliderElement extends UIElement {
     this.#releaseControlsVisibilityLock();
     this.#resumeIfDragPaused();
     this.#progress.destroy();
+    this.#context = undefined;
     super.disconnectedCallback();
     this.#disconnect?.abort();
     this.#disconnect = null;
@@ -208,11 +212,21 @@ export class TimeSliderElement extends UIElement {
     );
     this.toggleAttribute('data-playing', this.#progress.state.current.advancing);
 
-    const state = this.#core.getState(this.#progress.state.current.currentTime);
-    const cssVars = getTimeSliderCSSVars(this.#slider.adjustForAlignment(state));
-    const thumbAttrs = this.#core.getAttrs(state);
+    const state = this.#core.getState();
+    const visual = this.#core.getState(this.#progress.state.current.currentTime);
+    const cssVars = getTimeSliderCSSVars(this.#slider.adjustForAlignment(visual));
+    const context = { state, label: this.label, locale: this.#i18n.locale, translator: this.#i18n.value };
+    const unchanged = shallowEqual(this.#context, context);
 
-    applyStyles(this, cssVars);
+    const styles = Object.fromEntries(Object.entries(cssVars).filter(([name, value]) => this.#cssVars[name] !== value));
+
+    applyStyles(this, styles);
+    this.#cssVars = cssVars;
+
+    if (unchanged) return;
+
+    this.#context = context;
+    const thumbAttrs = this.#core.getAttrs(state);
 
     // Domain-specific data attributes on root (includes data-seeking).
     applyStateDataAttrs(this, state, TimeSliderDataAttrs);

@@ -7,7 +7,7 @@ import {
   type MediaTimeState,
 } from '@videojs/media';
 import { toPercent } from '@videojs/utils/number';
-import { defaults } from '@videojs/utils/object';
+import { defaults, shallowEqual } from '@videojs/utils/object';
 import { formatTimeAsPhrase } from '@videojs/utils/time';
 import type { NonNullableObject } from '@videojs/utils/types';
 
@@ -60,6 +60,7 @@ export class TimeSliderCore extends SliderCore {
   #media: (MediaTimeState & MediaBufferState) | null = null;
   #formatLocale: string | string[] | undefined;
   #wasPlayingBeforeDrag = false;
+  #state: TimeSliderState | undefined;
 
   constructor(props?: TimeSliderProps) {
     super();
@@ -114,15 +115,14 @@ export class TimeSliderCore extends SliderCore {
     const bufferedEnd = buffered.length > 0 ? buffered[buffered.length - 1]![1] : 0;
     const bufferPercent = toPercent(bufferedEnd, 0, duration);
 
-    return {
-      ...base,
-      fillPercent:
-        !base.dragging && !base.disabled ? this.percentFromValue(visualTime ?? currentTime) : base.fillPercent,
-      currentTime,
-      duration,
-      seeking,
-      bufferPercent,
-    };
+    const state = { ...base, currentTime, duration, seeking, bufferPercent };
+
+    // Keep semantic consumers stable between visual clock ticks.
+    if (!this.#state || !shallowEqual(this.#state, state)) this.#state = state;
+
+    if (visualTime === undefined || base.dragging || base.disabled) return this.#state;
+
+    return { ...this.#state, fillPercent: this.percentFromValue(visualTime) };
   }
 
   override getLabel(state: SliderState): Text | string {
