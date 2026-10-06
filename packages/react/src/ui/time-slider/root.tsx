@@ -18,6 +18,7 @@ import {
 } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
 import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
+import { getMediaElement } from '@videojs/media/dom';
 import { useSnapshot } from '@videojs/store/react';
 import { formatTime } from '@videojs/utils/time';
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -145,7 +146,8 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       progress.update(
         core.getProgressState(playback, rate?.playbackRate ?? 1),
         () => (isMediaSeekCapable(mediaElement) ? mediaElement.currentTime : undefined),
-        element.current
+        element.current,
+        !getMediaElement(mediaElement)
       );
     }, [
       progress,

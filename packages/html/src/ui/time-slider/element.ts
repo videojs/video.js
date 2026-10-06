@@ -17,6 +17,7 @@ import { type Text, translateText } from '@videojs/core/i18n';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextConsumer, ContextProvider } from '@videojs/element/context';
 import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
+import { getMediaElement } from '@videojs/media/dom';
 import { applyStyles } from '@videojs/utils/dom';
 import { formatTime } from '@videojs/utils/time';
 
@@ -202,7 +203,8 @@ export class TimeSliderElement extends UIElement {
 
         return isMediaSeekCapable(media) ? media.currentTime : undefined;
       },
-      this
+      this,
+      !getMediaElement(this.#media.value?.media)
     );
     this.toggleAttribute('data-playing', this.#progress.state.current.advancing);
 

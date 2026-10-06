@@ -22,6 +22,7 @@ export function createTimeSliderProgress(transition?: string) {
   let readTime: (() => number | undefined) | undefined;
   let element: HTMLElement | null = null;
   let pending = false;
+  let interpolate = true;
   let time = 0;
   let since = 0;
 
@@ -54,13 +55,13 @@ export function createTimeSliderProgress(transition?: string) {
     const actual = readTime?.() ?? media.currentTime;
     const forward = actual >= time;
 
-    // Native media advances every frame. Cached embed clocks need interpolation between their updates.
+    // Native media is already a frame clock; only cached embed time needs interpolation.
     if (actual !== time) {
       time = actual;
       since = now;
     }
 
-    let currentTime = time + ((now - since) / 1000) * media.playbackRate;
+    let currentTime = time + (interpolate ? ((now - since) / 1000) * media.playbackRate : 0);
 
     // A sampled media clock can advance more slowly just after a seek. Wait for it to catch up instead of reversing.
     if (forward && state.current.advancing) currentTime = Math.max(currentTime, state.current.currentTime ?? 0);
@@ -89,9 +90,15 @@ export function createTimeSliderProgress(transition?: string) {
   return {
     state,
     seek,
-    update(next: TimeSliderProgressState, getCurrentTime?: () => number | undefined, el: HTMLElement | null = null) {
+    update(
+      next: TimeSliderProgressState,
+      getCurrentTime?: () => number | undefined,
+      el: HTMLElement | null = null,
+      interpolateTime = true
+    ) {
       readTime = getCurrentTime;
       element = el;
+      interpolate = interpolateTime;
 
       if (media && shallowEqual(media, next)) return;
 

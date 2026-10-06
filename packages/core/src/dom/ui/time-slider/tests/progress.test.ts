@@ -43,6 +43,26 @@ describe('createTimeSliderProgress', () => {
     progress.destroy();
   });
 
+  it('does not extrapolate a stalled native clock after seeking backward', () => {
+    const video = document.createElement('video');
+    const progress = createTimeSliderProgress();
+
+    video.currentTime = 10;
+    progress.update(media, () => video.currentTime, null, false);
+    vi.advanceTimersByTime(16);
+
+    progress.seek(5);
+    video.currentTime = 5;
+    progress.update({ ...media, currentTime: 5 }, () => video.currentTime, null, false);
+    vi.advanceTimersByTime(480);
+    expect(progress.state.current.currentTime).toBe(5);
+
+    video.currentTime = 5.1;
+    vi.advanceTimersByTime(16);
+    expect(progress.state.current.currentTime).toBe(5.1);
+    progress.destroy();
+  });
+
   it('uses playback rate and clamps at the end', () => {
     const progress = createTimeSliderProgress();
 
