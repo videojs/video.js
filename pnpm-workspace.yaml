@@ -6,7 +6,6 @@ trustPolicyExclude:
   - '@netlify/serverless-functions-api@2.16.0'
   - '@netlify/zip-it-and-ship-it@14.7.1'
   - 'chokidar@4.0.3'
-  - 'fast-xml-parser@4.5.7'
   - 'semver@6.3.1'
   - 'undici-types@6.21.0'
 
