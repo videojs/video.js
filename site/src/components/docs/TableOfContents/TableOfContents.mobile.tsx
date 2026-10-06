@@ -4,18 +4,43 @@ import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 
 import { TableOfContentsDesktop } from './TableOfContents.desktop';
+import type { RailGeometry } from './utils';
 import { calculateRailGeometry } from './utils';
 
 interface TableOfContentsMobileProps {
   headings: MarkdownHeading[];
   activeId: string;
   onNavigate: (slug: string) => void;
+  /** Stay available at every width and sit in the page margin instead of beside the docs sidebar. */
+  railOnly?: boolean;
   className?: string;
 }
 
-type RailStripeStyle = React.CSSProperties & Record<'--w' | '--lg-w', string>;
+type RailStyle = React.CSSProperties & Record<'--gap' | '--lg-gap', string>;
+type RailStripeStyle = React.CSSProperties & Record<'--w' | '--lg-w' | '--h' | '--lg-h', string>;
 
-export function TableOfContentsMobile({ headings, activeId, onNavigate, className }: TableOfContentsMobileProps) {
+// Standalone rails sit in the page margin beside body copy, so the lg breakpoint gets heavier marks.
+// Breakpoint sizes stay in CSS so server-rendered rails match hydrated ones.
+const WIDE_RAIL_GEOMETRY: RailGeometry = { stripeHeight: 2, gap: 6 };
+
+// Keep a standalone rail 2.5rem outside the centered max-w-3xl column, or at the viewport edge once the margin runs out.
+const MARGIN_RAIL_LEFT = 'max(0px, calc(50% - 24rem - 2.5rem - 1.5rem))';
+
+function getStripeWidths(depth: number, railOnly: boolean) {
+  const width = depth === 2 ? 10 : depth === 3 ? 8 : 4;
+
+  if (railOnly) return { width, largeWidth: depth === 2 ? 16 : depth === 3 ? 10 : 6 };
+
+  return { width, largeWidth: depth === 2 ? 12 : width };
+}
+
+export function TableOfContentsMobile({
+  headings,
+  activeId,
+  onNavigate,
+  railOnly = false,
+  className,
+}: TableOfContentsMobileProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -25,12 +50,21 @@ export function TableOfContentsMobile({ headings, activeId, onNavigate, classNam
   });
 
   const railGeometry = calculateRailGeometry(headings.length, viewportLayout.availableHeight);
+  const largeRailGeometry = railOnly
+    ? calculateRailGeometry(headings.length, viewportLayout.availableHeight, WIDE_RAIL_GEOMETRY)
+    : railGeometry;
+  const railStyle: RailStyle = {
+    '--gap': `${railGeometry.gap}px`,
+    '--lg-gap': `${largeRailGeometry.gap}px`,
+  };
 
   useEffect(() => {
     const updateViewportLayout = () => {
       const computedStyle = triggerRef.current ? getComputedStyle(triggerRef.current) : null;
       const bannerHeight = Number.parseFloat(computedStyle?.getPropertyValue('--banner-height') ?? '') || 0;
-      const navHeight = Number.parseFloat(computedStyle?.getPropertyValue('--nav-h') ?? '') || 52;
+      const parsedNavHeight = Number.parseFloat(computedStyle?.getPropertyValue('--nav-h') ?? '');
+      // --nav-h is 0px outside the docs layout. Docs leaves it as an unresolved calc(), which parses as NaN and falls back.
+      const navHeight = Number.isNaN(parsedNavHeight) ? 52 : parsedNavHeight;
       const stickyHeaderHeight = bannerHeight + navHeight;
       const contentHeight = Math.max(0, window.innerHeight - stickyHeaderHeight);
 
@@ -58,6 +92,8 @@ export function TableOfContentsMobile({ headings, activeId, onNavigate, classNam
   }, []);
 
   useEffect(() => {
+    if (railOnly) return;
+
     const desktopMedia = window.matchMedia('(min-width: 80rem)');
     const closeAtDesktopBreakpoint = (event: MediaQueryListEvent) => {
       if (event.matches) setOpen(false);
@@ -65,7 +101,7 @@ export function TableOfContentsMobile({ headings, activeId, onNavigate, classNam
 
     desktopMedia.addEventListener('change', closeAtDesktopBreakpoint);
     return () => desktopMedia.removeEventListener('change', closeAtDesktopBreakpoint);
-  }, []);
+  }, [railOnly]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,32 +125,38 @@ export function TableOfContentsMobile({ headings, activeId, onNavigate, classNam
         aria-label="On this page"
         data-ph-capture-attribute-location="docs-toc"
         className={clsx(
-          'fixed left-0 z-20 flex min-h-6 w-6 items-center justify-start intent:text-manila-dark md:left-70 dark:intent:text-manila-dark lg:left-75',
+          'fixed left-0 z-20 flex min-h-6 w-6 items-center justify-start intent:text-manila-dark dark:intent:text-manila-dark',
+          !railOnly && 'md:left-70 lg:left-75',
           open ? 'text-manila-dark dark:text-manila-dark' : 'text-manila-75 dark:text-warm-gray',
           className
         )}
         style={{
-          top: viewportLayout.railTop ?? 'calc(50dvh + 1.625rem)',
+          left: railOnly ? MARGIN_RAIL_LEFT : undefined,
+          top: viewportLayout.railTop ?? 'calc(50dvh + (var(--banner-height) + var(--nav-h)) / 2)',
           transform: 'translateY(-50%)',
           cursor: 'pointer',
         }}
       >
-        <span aria-hidden="true" className="flex flex-col items-start pl-1" style={{ gap: railGeometry.gap }}>
+        <span
+          aria-hidden="true"
+          className="flex flex-col items-start gap-(--gap) pl-1 lg:gap-(--lg-gap)"
+          style={railStyle}
+        >
           {headings.map((heading) => {
             const isActive = activeId === heading.slug;
-            const width = heading.depth === 2 ? 10 : heading.depth === 3 ? 8 : 4;
-            const largeWidth = heading.depth === 2 ? 12 : width;
-            const stripeStyle = {
+            const { width, largeWidth } = getStripeWidths(heading.depth, railOnly);
+            const stripeStyle: RailStripeStyle = {
               '--w': `${width}px`,
               '--lg-w': `${largeWidth}px`,
-              height: railGeometry.stripeHeight,
-            } satisfies RailStripeStyle;
+              '--h': `${railGeometry.stripeHeight}px`,
+              '--lg-h': `${largeRailGeometry.stripeHeight}px`,
+            };
 
             return (
               <span
                 key={heading.slug}
                 className={clsx(
-                  'block w-(--w) lg:w-(--lg-w)',
+                  'block h-(--h) w-(--w) lg:h-(--lg-h) lg:w-(--lg-w)',
                   isActive ? 'bg-faded-black dark:bg-manila-light' : 'bg-current'
                 )}
                 style={stripeStyle}
