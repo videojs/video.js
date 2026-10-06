@@ -237,7 +237,7 @@ const relocateCuesStep = async <C extends Cue>(
     const presentation = state.presentation.get();
     if (!presentation) return undefined;
 
-    const primaryId = state.selectedVideoTrackId.get() ?? state.selectedAudioTrackId.get();
+    const primaryId = state.selectedVideoTrackId?.get() ?? state.selectedAudioTrackId?.get();
 
     if (primaryId !== undefined) {
       // A/V selected: use its origin once stamped (undefined until then → keep waiting).
