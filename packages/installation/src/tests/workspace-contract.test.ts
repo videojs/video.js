@@ -97,6 +97,8 @@ describe('installation workspace contract', () => {
       '@videojs/html',
       '@videojs/react',
       '@videojs/cdn',
+      // `video.js` routes npm installs to the framework packages, so its README carries the same AI Quickstart.
+      'video.js',
       ...adapterPackages,
       ...extensionPackages,
     ]);
