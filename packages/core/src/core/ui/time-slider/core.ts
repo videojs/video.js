@@ -1,6 +1,7 @@
 import {
   getTimeRangeEnd,
   hasTimeRange,
+  isMediaPlaying,
   type MediaBufferState,
   type MediaPlaybackState,
   type MediaTimeState,
@@ -31,6 +32,15 @@ export interface TimeSliderProps extends SliderProps {
 export interface TimeSliderState extends SliderState, Pick<MediaTimeState, 'currentTime' | 'duration' | 'seeking'> {
   /** Buffered amount as a percentage of duration (0–100). */
   bufferPercent: number;
+}
+
+/** @internal */
+export interface TimeSliderProgressState {
+  currentTime: number;
+  duration: number;
+  playbackRate: number;
+  playing: boolean;
+  seeking?: boolean;
 }
 
 /**
@@ -71,7 +81,26 @@ export class TimeSliderCore extends SliderCore {
     this.#formatLocale = locale;
   }
 
-  getState(): TimeSliderState {
+  getProgressState(playback: MediaPlaybackState | null | undefined, playbackRate = 1): TimeSliderProgressState {
+    const media = this.#media;
+
+    return {
+      currentTime: media?.currentTime ?? 0,
+      duration: media?.duration ?? 0,
+      playbackRate,
+      seeking: media?.seeking ?? false,
+      playing:
+        !!media &&
+        hasTimeRange(media) &&
+        isMediaPlaying(playback) &&
+        !media.seeking &&
+        !this.input.dragging &&
+        !this.#props.disabled,
+    };
+  }
+
+  /** Visual time changes only the fill; values and ARIA remain tied to media time. */
+  getState(visualTime?: number): TimeSliderState {
     const media = this.#media!;
     const { currentTime, seeking, buffered } = media;
     const duration = getTimeRangeEnd(media);
@@ -87,6 +116,8 @@ export class TimeSliderCore extends SliderCore {
 
     return {
       ...base,
+      fillPercent:
+        !base.dragging && !base.disabled ? this.percentFromValue(visualTime ?? currentTime) : base.fillPercent,
       currentTime,
       duration,
       seeking,

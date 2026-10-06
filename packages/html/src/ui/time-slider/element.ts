@@ -1,26 +1,28 @@
-import { TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps } from '@videojs/core';
+import { SliderCSSVars, TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps } from '@videojs/core';
 import {
   applyElementProps,
   applyStateDataAttrs,
   createSlider,
+  createTimeSliderProgress,
   getTimeSliderCSSVars,
   logMissingFeature,
   type SliderApi,
   selectBuffer,
   selectControls,
   selectPlayback,
+  selectPlaybackRate,
   selectTime,
 } from '@videojs/core/dom';
 import { type Text, translateText } from '@videojs/core/i18n';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
-import { ContextProvider } from '@videojs/element/context';
-import { hasTimeRange } from '@videojs/media';
+import { ContextConsumer, ContextProvider } from '@videojs/element/context';
+import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
 import { applyStyles } from '@videojs/utils/dom';
 import { formatTime } from '@videojs/utils/time';
 
 import { i18nContext } from '../../i18n/context';
 import { I18nController } from '../../i18n/controller';
-import { playerContext } from '../../player/context';
+import { mediaContext, playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { sliderContext } from '../slider/context';
 import { UIElement } from '../ui-element';
@@ -58,6 +60,9 @@ export class TimeSliderElement extends UIElement {
   readonly #timeState = new PlayerController(this, playerContext, selectTime);
   readonly #bufferState = new PlayerController(this, playerContext, selectBuffer);
   readonly #playbackState = new PlayerController(this, playerContext, selectPlayback);
+  readonly #rateState = new PlayerController(this, playerContext, selectPlaybackRate);
+  readonly #media = new ContextConsumer(this, { context: mediaContext, subscribe: true });
+  readonly #progress = createTimeSliderProgress(SliderCSSVars.fill);
   readonly #i18n = new I18nController(this, i18nContext);
 
   #slider: SliderApi | null = null;
@@ -94,7 +99,12 @@ export class TimeSliderElement extends UIElement {
       onValueCommit: (percent) => {
         const media = this.#timeState.value;
 
-        if (media) media.seek(this.#core.rawValueFromPercent(percent));
+        if (media) {
+          const time = this.#core.rawValueFromPercent(percent);
+
+          this.#progress.seek(time);
+          media.seek(time);
+        }
       },
       changeThrottle: this.changeThrottle,
       onPressStart: () => {
@@ -116,6 +126,7 @@ export class TimeSliderElement extends UIElement {
     applyElementProps(this, this.#slider.rootProps, { signal });
     applyStyles(this, this.#slider.rootStyle);
     this.#slider.input.subscribe(() => this.requestUpdate(), { signal });
+    this.#progress.state.subscribe(() => this.requestUpdate(), { signal });
 
     if (__DEV__ && !this.#timeState.value) {
       logMissingFeature(this.localName, this.#timeState.displayName!);
@@ -125,6 +136,7 @@ export class TimeSliderElement extends UIElement {
   override disconnectedCallback(): void {
     this.#releaseControlsVisibilityLock();
     this.#resumeIfDragPaused();
+    this.#progress.destroy();
     super.disconnectedCallback();
     this.#disconnect?.abort();
     this.#disconnect = null;
@@ -133,6 +145,7 @@ export class TimeSliderElement extends UIElement {
   override destroyCallback(): void {
     this.#releaseControlsVisibilityLock();
     this.#resumeIfDragPaused();
+    this.#progress.destroy();
     this.#slider?.destroy();
     super.destroyCallback();
   }
@@ -172,14 +185,28 @@ export class TimeSliderElement extends UIElement {
     const time = this.#timeState.value;
     const buffer = this.#bufferState.value;
 
-    if (!time) return;
+    if (!time) {
+      this.#progress.destroy();
+      this.removeAttribute('data-playing');
+      return;
+    }
 
     this.#core.setInput(this.#slider.input.current);
     const media = { ...time, ...(buffer ?? { buffered: [], seekable: [] }) };
 
     this.#core.setMedia(media);
-    const state = this.#core.getState();
+    this.#progress.update(
+      this.#core.getProgressState(this.#playbackState.value, this.#rateState.value?.playbackRate ?? 1),
+      () => {
+        const media = this.#media.value?.media;
 
+        return isMediaSeekCapable(media) ? media.currentTime : undefined;
+      },
+      this
+    );
+    this.toggleAttribute('data-playing', this.#progress.state.current.advancing);
+
+    const state = this.#core.getState(this.#progress.state.current.currentTime);
     const cssVars = getTimeSliderCSSVars(this.#slider.adjustForAlignment(state));
     const thumbAttrs = this.#core.getAttrs(state);
 

@@ -1,14 +1,29 @@
 'use client';
 
-import { TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps, type TimeSliderState } from '@videojs/core';
-import { getTimeSliderCSSVars, logMissingFeature, selectBuffer, selectPlayback, selectTime } from '@videojs/core/dom';
+import {
+  SliderCSSVars,
+  TimeSliderCore,
+  TimeSliderDataAttrs,
+  type TimeSliderProps,
+  type TimeSliderState,
+} from '@videojs/core';
+import {
+  createTimeSliderProgress,
+  getTimeSliderCSSVars,
+  logMissingFeature,
+  selectBuffer,
+  selectPlayback,
+  selectPlaybackRate,
+  selectTime,
+} from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
-import { hasTimeRange } from '@videojs/media';
+import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
+import { useSnapshot } from '@videojs/store/react';
 import { formatTime } from '@videojs/utils/time';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useLocale, useTranslator } from '../../i18n/context';
-import { usePlayer } from '../../player/context';
+import { useMedia, usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { renderElement } from '../../utils/use-render';
@@ -44,6 +59,11 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
     const time = usePlayer(selectTime);
     const buffer = usePlayer(selectBuffer);
     const playback = usePlayer(selectPlayback);
+    const rate = usePlayer(selectPlaybackRate);
+    const mediaElement = useMedia();
+    const [progress] = useState(() => createTimeSliderProgress(SliderCSSVars.fill));
+    const visual = useSnapshot(progress.state);
+    const element = useRef<HTMLDivElement>(null);
 
     const translator = useTranslator();
     const locale = useLocale();
@@ -90,7 +110,7 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
           }
         );
 
-        return core.getState();
+        return core.getState(visual.currentTime);
       },
       getPercent: () => core.percentFromValue(time?.currentTime ?? 0),
       getStepPercent: () => core.getStepPercent(),
@@ -104,7 +124,12 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       onValueCommit: (percent) => {
         const media = mediaRef.current;
 
-        if (media) media.seek(core.rawValueFromPercent(percent));
+        if (media) {
+          const time = core.rawValueFromPercent(percent);
+
+          progress.seek(time);
+          media.seek(time);
+        }
       },
       onDragStart: () => {
         core.startDrag(playbackRef.current);
@@ -115,6 +140,26 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
         onDragEnd?.();
       },
     });
+
+    useLayoutEffect(() => {
+      progress.update(
+        core.getProgressState(playback, rate?.playbackRate ?? 1),
+        () => (isMediaSeekCapable(mediaElement) ? mediaElement.currentTime : undefined),
+        element.current
+      );
+    }, [
+      progress,
+      time?.currentTime,
+      time?.duration,
+      time?.seeking,
+      rate?.playbackRate,
+      core,
+      playback,
+      state.dragging,
+      disabled,
+      mediaElement,
+    ]);
+    useEffect(() => () => progress.destroy(), [progress]);
 
     if (!time) {
       if (__DEV__) logMissingFeature('TimeSlider', 'time');
@@ -154,8 +199,12 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
           {
             state,
             stateAttrMap: TimeSliderDataAttrs,
-            ref: [forwardedRef, rootRef],
-            props: [{ style: { ...cssVars, ...rootStyle } }, rootProps, elementProps],
+            ref: [forwardedRef, rootRef, element],
+            props: [
+              { 'data-playing': visual.advancing ? '' : undefined, style: { ...cssVars, ...rootStyle } },
+              rootProps,
+              elementProps,
+            ],
           }
         )}
       </SliderProvider>
