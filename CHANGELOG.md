@@ -1,3 +1,11 @@
+<a name="8.24.2"></a>
+## [8.24.2](https://github.com/videojs/video.js/compare/v8.24.1...v8.24.2) (2026-10-06)
+
+### Bug Fixes
+
+* ran npm audit fix on npm 6 ([#9231](https://github.com/videojs/video.js/issues/9231)) ([b63eb29](https://github.com/videojs/video.js/commit/b63eb29))
+* update node, replace access-sniff with pa11y and override underscore  ([#9232](https://github.com/videojs/video.js/issues/9232)) ([1aea7c9](https://github.com/videojs/video.js/commit/1aea7c9))
+
 <a name="8.24.1"></a>
 ## [8.24.1](https://github.com/videojs/video.js/compare/v8.24.0...v8.24.1) (2026-09-10)
 
