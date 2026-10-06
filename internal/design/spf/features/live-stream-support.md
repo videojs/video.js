@@ -171,35 +171,11 @@ under [Open questions § Resolved during implementation](#resolved-during-implem
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — the
-live behaviors compose alongside the VOD ones; live vs VOD is a runtime
-distinction in the *data* (a growing playlist), not a separate engine
-variant:
-
-```ts
-// Resolve selected tracks — now also the live reload loop, driven by
-// the injected `reschedule` seam.
-resolveVideoTrack,
-resolveAudioTrack,
-resolveTextTrack,
-
-// ...
-
-// Establishes the PDT anchor + startMediaTime origin.
-establishStartMediaTime,
-
-// ...
-
-// Performs the live-edge startup seek (shared with AirPlay restore).
-applyStartPosition,
-
-// Live: declare the seekable window, then command the live-edge start
-// position + keep the playhead in-window.
-syncLiveSeekableRange,
-seekToLiveEdge,
-
-endOfStream,
-```
+**Composition:** `liveFeature` (`packages/spf/src/playback/engines/hls/features/live.ts`),
+composed by the `hls/video` engine — the live behaviors compose alongside the VOD ones; live vs
+VOD is a runtime distinction in the *data* (a growing playlist), not a separate engine variant, and
+the feature is inert for on-demand content. It carries the `reschedule` reload seam that
+`resolve*Track` runs on, and `establishStartMediaTime` with the `gateFirstParse` anchor gate.
 
 **Behaviors:**
 

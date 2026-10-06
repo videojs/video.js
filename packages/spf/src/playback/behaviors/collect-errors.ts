@@ -81,7 +81,7 @@ export function emitError(state: ErrorEmitterState, error: SvtaError): void {
  * computed from subscribing to the slot this writes.
  *
  * @example
- *   // engine-background-video.ts — video-only, so a source with none can't play
+ *   // features/background-video.ts — video-only, so a source with none can't play
  *   constraints: [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK)];
  */
 export function reportAbsentTrackType<T>(code: number): SelectionRule<T, ErrorEmitterState> {

@@ -7,71 +7,39 @@ import {
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
 } from '../../../core/composition/create-composition';
-import { canPlayTrack } from '../../../media/dom/capabilities';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
-import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
-import { collectErrors, reportAbsentTrackType } from '../../behaviors/collect-errors';
-import { endOfStream } from '../../behaviors/dom/end-of-stream';
-import { loadVideoSegments } from '../../behaviors/dom/load-segments';
-import { setupVideoBufferActors } from '../../behaviors/dom/setup-buffer-actors';
-import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
-import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
-import { trackScreenResolution } from '../../behaviors/dom/track-screen-resolution';
-import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
-import { resolvePresentation } from '../../behaviors/resolve-presentation';
-import { resolveVideoTrack } from '../../behaviors/resolve-track';
-import {
-  preferHighestResolution,
-  type SelectVideoTrackConfig,
-  screenResolutionCap,
-  selectVideoTrack,
-} from '../../behaviors/select-tracks';
-import { reportUnsupportedTrackConditions } from '../../primitives/report-track-conditions';
-import { excludeUnplayableTracks } from '../../primitives/selection-rules';
+import { flattenFeatures } from '../../../core/composition/define-feature';
+import { backgroundVideoFeature } from './features/background-video';
+import { calculateDurationFeature } from './features/calculate-duration';
+import { currentTimeFeature } from './features/current-time';
+import { errorFeature } from './features/error';
+import { hlsLoadingFeature } from './features/hls-loading';
+import { mediaSourceFeature } from './features/media-source';
 
 // ============================================================================
-// Background-video engine state & context
+// Background-Video Engine State & Context
 // ============================================================================
 
 /**
- * The behaviors the background-video playback engine composes, in setup order. The engine's state and context types are
- * derived from this list, so adding or removing a behavior changes them with no separate type to update.
+ * The features the background-video playback engine composes, in order. A feature's behaviors compose in its position,
+ * and a later feature's `defaultConfig` and `initialState` values replace an earlier one's.
  */
-export const behaviors = [
-  resolvePresentation,
-  // Presentation duration
-  calculatePresentationDuration,
-
-  // Owns `errors` and its per-source lifecycle; reporters append into it.
-  collectErrors,
-
-  // Track selection - pinned single-rendition pick on presentation resolve,
-  // unpinned again if the constraint pre-pass later prunes every rendition
-  // (which is how a container relabel reaches a pick already made).
-  selectVideoTrack,
-  // Resolve selected video track (fetch its media playlist)
-  resolveVideoTrack,
-  // Segment loading — video-only.
-  loadVideoSegments,
-
-  // MSE setup — video-only.
-  setupMediaSource,
-  updateMediaSourceDuration,
-  setupVideoBufferActors,
-
-  // Playback tracking
-  trackCurrentTime,
-
-  // Environment tracking — the signal source for a screen-size rendition
-  // cap. Independent of the presentation, so it sits outside the
-  // resolve/select/load sequence above.
-  trackScreenResolution,
-
-  // End of stream coordination
-  endOfStream,
+export const features = [
+  hlsLoadingFeature,
+  errorFeature,
+  calculateDurationFeature,
+  mediaSourceFeature,
+  backgroundVideoFeature,
+  currentTimeFeature,
 ] as const;
+
+const composed = flattenFeatures(features);
+
+/**
+ * The behaviors the engine composes, in setup order: its features' behaviors, each composed once. The engine's state
+ * and context types are derived from this list, so adding or removing a feature changes them with no separate type to
+ * update.
+ */
+export const behaviors = composed.behaviors;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
@@ -95,39 +63,20 @@ export type EngineContext = Simplify<ResolveBehaviorContext<Behaviors>>;
 export type EngineConfig = Simplify<ConfigWithDefaults<Config, typeof defaultConfig>>;
 
 // ============================================================================
-// Background-video playback engine
+// Background-Video Playback Engine
 // ============================================================================
 
-// Prune what this environment can't decode, then report 2011 if nothing is left: this engine composes only video, so a
-// source with none playable can never play.
-// SAFETY: `reportAbsentTrackType` also reads the optional `errors` state, which the config's rule type doesn't
-// declare; `collectErrors` provides it in this composition, and the rule no-ops without it.
-const videoConstraints = [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK)] as NonNullable<
-  SelectVideoTrackConfig['videoConstraints']
->;
-// Narrow to the renditions that fit the screen, then take the largest.
-const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
+/**
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged
+ * `defaultConfig`. Each is optional in `EngineConfig`, so a caller may override it.
+ */
+export const defaultConfig = composed.defaultConfig;
 
 /**
- * The defaults `createEngine` fills in for every config key the caller leaves `undefined`, including wiring such as
- * `resolveDuration`. Each is optional in `EngineConfig`, so a caller may override it.
+ * The state the engine starts with. `loadActivated: true` stands in for `initialLoadFeature`, which this engine doesn't
+ * compose, so it starts loading the moment a source is set.
  */
-export const defaultConfig = {
-  videoConstraints,
-  videoRules,
-  parsePresentation: parseMultivariantPlaylist,
-  resolveDuration: getResolvedSelectedTrackDuration,
-  canPlayTrack,
-  reportUnsupportedTrackConditions,
-} satisfies Partial<Config>;
-
-/**
- * The state the engine starts with. `loadActivated: true` stands in for the preload gating this engine doesn't compose,
- * so it starts loading the moment a source is set.
- */
-export const initialState = {
-  loadActivated: true,
-} satisfies Partial<EngineState>;
+export const initialState = { ...composed.initialState, loadActivated: true };
 
 /**
  * Create a background-video playback engine.
@@ -156,4 +105,4 @@ export const initialState = {
  *   await engine.destroy();
  *   ```;
  */
-export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
+export const createEngine = defineCompositionFactory(behaviors, { defaultConfig, initialState });
