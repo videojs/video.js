@@ -1,5 +1,4 @@
 import RelatedLinks from '../docs/RelatedLinks.astro';
-import Grid from '../Grid.astro';
 import A from './A.astro';
 import Blockquote from './Blockquote.astro';
 import CodeFrame from './CodeFrame.astro';
@@ -28,6 +27,10 @@ import Thead from './Thead.astro';
 import Tr from './Tr.astro';
 import Ul from './Ul.astro';
 
+/**
+ * Overrides for Markdown elements, plus the components that Markdown plugins insert (code frames, related links,
+ * footnotes), which content cannot import. Components an author writes by hand are imported where they are used.
+ */
 const defaultMarkdownComponents = {
   h1: H1Warning,
   h2: H2Markdown,
@@ -50,7 +53,6 @@ const defaultMarkdownComponents = {
   Footnotes,
   FootnoteRef,
   FootnoteBackref,
-  Grid,
   RelatedLinks,
   table: Table,
   thead: Thead,

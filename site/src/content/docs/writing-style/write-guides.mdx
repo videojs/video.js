@@ -450,6 +450,22 @@ Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and ot
 
 
 ## Other custom components
+### `<Figure>` for captioned media
+
+Use `<Figure>` when an image or video needs a credit or context under it. Put the media inside, followed by a `<figcaption>`, with blank lines between them. Markdown links work in the caption. Keep the description of the media itself in its `alt` text.
+
+```mdx
+import Figure from '@/components/typography/Figure.astro';
+
+<Figure>
+
+![A folded phone playing video](../../assets/blog/my-post/screenshot.png)
+
+<figcaption>Screenshot from [the source video](https://example.com).</figcaption>
+
+</Figure>
+```
+
 ### Asides / Callouts / Admonitions
 
 Use the `<Aside>` component to highlight important information. It supports four types: `note`, `tip`, `caution`, and `danger`.
