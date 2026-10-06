@@ -33,6 +33,8 @@ export type {
 } from './core/composition/define-behavior';
 export { defineBehavior } from './core/composition/define-behavior';
 export { defineExternalSignals } from './core/composition/define-external-signals';
+export type { Feature, FlattenedFeatures } from './core/composition/define-feature';
+export { defineFeature, flattenFeatures } from './core/composition/define-feature';
 
 // =============================================================================
 // Signals

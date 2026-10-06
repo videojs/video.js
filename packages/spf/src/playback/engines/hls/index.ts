@@ -81,10 +81,35 @@ export {
   excludeRefusedKeySystems,
   preferCodecFamilies,
 } from '../../primitives/selection-rules';
+// The features the engines are composed from: each a set of behaviors with the
+// config defaults and initial state they need. Pass a list of them, in order, to
+// `flattenFeatures` (from `@videojs/spf`) to compose an engine of your own; each
+// engine entry also exports its own `features` list.
+export { airPlayFeature } from './features/airplay';
+export { airPlayFairPlayFeature } from './features/airplay-fairplay';
+export { audioFeature } from './features/audio';
+export { backgroundVideoFeature } from './features/background-video';
+export { calculateDurationFeature } from './features/calculate-duration';
+export { chaptersFeature } from './features/chapters';
+export { currentTimeFeature } from './features/current-time';
+export { drmFeature } from './features/drm';
+export { endStallRecoveryFeature } from './features/end-stall-recovery';
+export { errorFeature } from './features/error';
+export { hlsLoadingFeature } from './features/hls-loading';
+export { initialLoadFeature } from './features/initial-load';
+export { liveFeature } from './features/live';
+export { mediaSourceFeature } from './features/media-source';
+export { monitorPlayerSizeFeature } from './features/monitor-player-size';
+export { multiCdnFeature } from './features/multi-cdn';
+export { shiftTextTimestampsFeature } from './features/shift-text-timestamps';
+export { shiftTimestampsFeature } from './features/shift-timestamps';
+export { startPositionFeature } from './features/start-position';
+export { textTracksFeature } from './features/text-tracks';
+export { videoFeature } from './features/video';
 // The engines themselves are not here: each has its own entry point —
 // `@videojs/spf/hls/video`, `@videojs/spf/hls/audio`, and
 // `@videojs/spf/hls/background-video` — exporting the same names
-// (`createEngine`, `behaviors`, `defaultConfig`, `initialState`, and the
+// (`createEngine`, `features`, `behaviors`, `defaultConfig`, `initialState`, and the
 // `EngineState`, `EngineContext`, `EngineConfig`, `Behaviors`, `Config` types), so a
 // consumer pulls in only the engine it drives. This entry holds what they
 // share. The Medias over the engines live behind `@videojs/spf/hls-video`,
