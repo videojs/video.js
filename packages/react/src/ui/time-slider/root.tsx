@@ -8,23 +8,21 @@ import {
   type TimeSliderState,
 } from '@videojs/core';
 import {
-  createTimeSliderProgress,
+  createTimeSliderSeek,
   getTimeSliderCSSVars,
   logMissingFeature,
   selectBuffer,
   selectPlayback,
-  selectPlaybackRate,
   selectTime,
 } from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
-import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
-import { getMediaElement } from '@videojs/media/dom';
+import { hasTimeRange, isMediaPlaying } from '@videojs/media';
 import { useSnapshot } from '@videojs/store/react';
 import { formatTime } from '@videojs/utils/time';
 import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocale, useTranslator } from '../../i18n/context';
-import { useMedia, usePlayer } from '../../player/context';
+import { usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { renderElement } from '../../utils/use-render';
@@ -60,10 +58,8 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
     const time = usePlayer(selectTime);
     const buffer = usePlayer(selectBuffer);
     const playback = usePlayer(selectPlayback);
-    const rate = usePlayer(selectPlaybackRate);
-    const mediaElement = useMedia();
-    const [progress] = useState(() => createTimeSliderProgress(SliderCSSVars.fill));
-    const visual = useSnapshot(progress.state);
+    const [seek] = useState(() => createTimeSliderSeek(SliderCSSVars.fill));
+    const target = useSnapshot(seek.state);
     const element = useRef<HTMLDivElement>(null);
 
     const translator = useTranslator();
@@ -96,74 +92,63 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       return () => core.endDrag(playbackRef.current);
     }, [core]);
 
-    const { state, input, adjustForAlignment, rootRef, thumbRef, rootProps, rootStyle, thumbProps } =
-      useSlider<TimeSliderState>({
-        computeState: (input) => {
-          core.setInput(input);
+    const { state, input, cssVars, rootRef, thumbRef, rootProps, rootStyle, thumbProps } = useSlider<TimeSliderState>({
+      computeState: (input) => {
+        core.setInput(input);
 
-          core.setMedia(
-            media ?? {
-              currentTime: 0,
-              duration: 0,
-              seeking: false,
-              seek: noopSeek,
-              buffered: [],
-              seekable: [],
-            }
-          );
-
-          return core.getState();
-        },
-        getPercent: () => core.percentFromValue(time?.currentTime ?? 0),
-        getStepPercent: () => core.getStepPercent(),
-        getLargeStepPercent: () => core.getLargeStepPercent(),
-        orientation,
-        disabled: disabled || !media || !hasTimeRange(media),
-        changeThrottle,
-        adjustPercent: (rawPercent, thumbSize, trackSize) =>
-          core.adjustPercentForAlignment(rawPercent, thumbSize, trackSize),
-        getCSSVars: getTimeSliderCSSVars,
-        onValueCommit: (percent) => {
-          const media = mediaRef.current;
-
-          if (media) {
-            const time = core.rawValueFromPercent(percent);
-
-            progress.seek(time);
-            media.seek(time);
+        core.setMedia(
+          media ?? {
+            currentTime: 0,
+            duration: 0,
+            seeking: false,
+            seek: noopSeek,
+            buffered: [],
+            seekable: [],
           }
-        },
-        onDragStart: () => {
-          core.startDrag(playbackRef.current);
-          onDragStart?.();
-        },
-        onDragEnd: () => {
-          core.endDrag(playbackRef.current);
-          onDragEnd?.();
-        },
-      });
+        );
+
+        return core.getState();
+      },
+      getPercent: () => core.percentFromValue(time?.currentTime ?? 0),
+      getStepPercent: () => core.getStepPercent(),
+      getLargeStepPercent: () => core.getLargeStepPercent(),
+      orientation,
+      disabled: disabled || !media || !hasTimeRange(media),
+      changeThrottle,
+      adjustPercent: (rawPercent, thumbSize, trackSize) =>
+        core.adjustPercentForAlignment(rawPercent, thumbSize, trackSize),
+      getStyleState: (state) =>
+        target.percent === undefined || state.dragging || state.disabled
+          ? state
+          : { ...state, fillPercent: target.percent },
+      getCSSVars: getTimeSliderCSSVars,
+      onValueCommit: (percent) => {
+        const media = mediaRef.current;
+
+        if (media) {
+          const time = core.rawValueFromPercent(percent);
+
+          seek.seek(percent);
+          media.seek(time);
+        }
+      },
+      onDragStart: () => {
+        core.startDrag(playbackRef.current);
+        onDragStart?.();
+      },
+      onDragEnd: () => {
+        core.endDrag(playbackRef.current);
+        onDragEnd?.();
+      },
+    });
 
     useLayoutEffect(() => {
-      progress.update(
-        core.getProgressState(playback, rate?.playbackRate ?? 1),
-        () => (isMediaSeekCapable(mediaElement) ? mediaElement.currentTime : undefined),
-        element.current,
-        !getMediaElement(mediaElement)
-      );
-    }, [
-      progress,
-      time?.currentTime,
-      time?.duration,
-      time?.seeking,
-      buffer?.seekable,
-      rate?.playbackRate,
-      core,
-      playback,
-      state.dragging,
-      disabled,
-      mediaElement,
-    ]);
-    useEffect(() => () => progress.destroy(), [progress]);
+      seek.update(!!time?.seeking, state.fillPercent, element.current);
+    }, [seek, time?.seeking, state.fillPercent]);
+    useEffect(() => () => seek.destroy(), [seek]);
+
+    const playing =
+      isMediaPlaying(playback) && !state.disabled && !state.dragging && !time?.seeking && target.percent === undefined;
 
     const context = useMemo<SliderContextValue>(
       () => ({
@@ -192,9 +177,6 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       [state, input, core, thumbRef, thumbProps, translator, locale, label]
     );
 
-    const visualState = core.getState(visual.currentTime);
-    const cssVars = getTimeSliderCSSVars(adjustForAlignment(visualState));
-
     if (!time) {
       if (__DEV__) logMissingFeature('TimeSlider', 'time');
 
@@ -207,11 +189,11 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
           'div',
           { render, className, style },
           {
-            state: visualState,
+            state,
             stateAttrMap: TimeSliderDataAttrs,
             ref: [forwardedRef, rootRef, element],
             props: [
-              { 'data-playing': visual.advancing ? '' : undefined, style: { ...cssVars, ...rootStyle } },
+              { 'data-playing': playing ? '' : undefined, style: { ...cssVars, ...rootStyle } },
               rootProps,
               elementProps,
             ],

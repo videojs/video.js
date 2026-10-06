@@ -134,43 +134,6 @@ afterEach(() => {
 });
 
 describe('TimeSliderElement', () => {
-  it('updates the visual fill without rewriting thumb attributes between media updates', async () => {
-    vi.useFakeTimers();
-    const player = document.createElement('test-time-only-player') as TestTimeOnlyPlayerProviderElement;
-    const slider = createElement(TimeSliderElement);
-    const thumb = createElement(SliderThumbElement);
-
-    slider.append(thumb);
-    player.append(slider);
-    document.body.append(player);
-
-    try {
-      await slider.updateComplete;
-      await thumb.updateComplete;
-      const fill = slider.style.getPropertyValue('--media-slider-fill');
-      const attrs = vi.spyOn(thumb, 'setAttribute');
-
-      await vi.advanceTimersByTimeAsync(160);
-      flush();
-      await slider.updateComplete;
-      await thumb.updateComplete;
-
-      expect(slider.style.getPropertyValue('--media-slider-fill')).not.toBe(fill);
-      expect(attrs).not.toHaveBeenCalled();
-      expect(thumb.getAttribute('aria-valuenow')).toBe('30');
-
-      player.setTime({ seeking: true });
-      flush();
-      await slider.updateComplete;
-      await thumb.updateComplete;
-      expect(thumb.hasAttribute('data-seeking')).toBe(true);
-      attrs.mockRestore();
-    } finally {
-      player.remove();
-      vi.useRealTimers();
-    }
-  });
-
   it('initializes with default property values', () => {
     const slider = createElement(TimeSliderElement);
 

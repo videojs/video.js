@@ -145,73 +145,46 @@ describe('TimeSliderRoot', () => {
     expect(thumb?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('updates the visual fill without rendering the thumb between media updates', () => {
-    vi.useFakeTimers();
+  it('keeps the fill at media time during hover and updates the thumb with the store', () => {
     const { Wrapper, update } = createPlayerWrapper();
     const ref = createRef<HTMLDivElement>();
-    const thumbRender = vi.fn((props: HTMLAttributes<HTMLDivElement>) => <div {...props} />);
+    const { getByRole } = render(
+      <Wrapper>
+        <TimeSliderRoot ref={ref}>
+          <SliderThumb />
+        </TimeSliderRoot>
+      </Wrapper>
+    );
+    const fill = ref.current!.style.getPropertyValue('--media-slider-fill');
 
-    try {
-      const { getByRole } = render(
-        <Wrapper>
-          <TimeSliderRoot ref={ref}>
-            <SliderThumb render={thumbRender} />
-          </TimeSliderRoot>
-        </Wrapper>
-      );
-      const thumb = getByRole('slider');
-      const fill = ref.current!.style.getPropertyValue('--media-slider-fill');
+    measureSlider(ref.current!);
+    pointer(ref.current!, 'pointermove', 100, 0);
+    pointer(ref.current!, 'pointermove', 120, 0);
+    expect(ref.current!.style.getPropertyValue('--media-slider-fill')).toBe(fill);
 
-      thumbRender.mockClear();
-
-      act(() => {
-        vi.advanceTimersByTime(160);
-        flush();
-      });
-
-      expect(ref.current!.style.getPropertyValue('--media-slider-fill')).not.toBe(fill);
-      expect(thumbRender).not.toHaveBeenCalled();
-      expect(thumb.getAttribute('aria-valuenow')).toBe('30');
-
-      update({ currentTime: 31 });
-      expect(thumbRender).toHaveBeenCalled();
-      expect(thumb.getAttribute('aria-valuenow')).toBe('31');
-    } finally {
-      cleanup();
-      vi.useRealTimers();
-    }
+    update({ currentTime: 31 });
+    expect(ref.current!.style.getPropertyValue('--media-slider-fill')).not.toBe(fill);
+    expect(getByRole('slider').getAttribute('aria-valuenow')).toBe('31');
   });
 
-  it('starts and stops progress when only the seekable range changes', () => {
-    vi.useFakeTimers();
+  it('updates playback styling when only the seekable range changes', () => {
     mockTimeState.duration = 0;
     mockBufferState.seekable = [];
     const { Wrapper, update } = createPlayerWrapper();
     const ref = createRef<HTMLDivElement>();
 
-    try {
-      render(
-        <Wrapper>
-          <TimeSliderRoot ref={ref} />
-        </Wrapper>
-      );
+    render(
+      <Wrapper>
+        <TimeSliderRoot ref={ref} />
+      </Wrapper>
+    );
+    expect(ref.current?.hasAttribute('data-playing')).toBe(false);
 
-      expect(ref.current?.hasAttribute('data-playing')).toBe(false);
+    update({ seekable: [[0, 120]] });
+    expect(ref.current?.hasAttribute('data-playing')).toBe(true);
 
-      update({ seekable: [[0, 120]] });
-      act(() => {
-        vi.advanceTimersByTime(16);
-        flush();
-      });
-      expect(ref.current?.hasAttribute('data-playing')).toBe(true);
-
-      update({ seekable: [] });
-      act(() => flush());
-      expect(ref.current?.hasAttribute('data-playing')).toBe(false);
-    } finally {
-      cleanup();
-      vi.useRealTimers();
-    }
+    update({ seekable: [] });
+    expect(ref.current?.hasAttribute('data-playing')).toBe(false);
   });
 
   it('stays interactive when the buffer feature is not composed', () => {

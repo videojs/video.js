@@ -61,13 +61,6 @@ describe('TimeSliderCore', () => {
       expect(state.currentTime).toBe(90);
       expect(state.duration).toBe(300);
       expect(state.fillPercent).toBe(30); // 90/300 * 100
-
-      const visual = core.getState(120);
-
-      expect(visual.fillPercent).toBe(40);
-      expect(visual.value).toBe(90);
-      expect(visual.currentTime).toBe(90);
-      expect(core.getAttrs(visual)['aria-valuenow']).toBe(90);
     });
 
     it('fill stays at currentTime during drag, pointerPercent tracks drag', () => {
@@ -75,7 +68,7 @@ describe('TimeSliderCore', () => {
 
       core.setInput(createInput({ dragging: true, dragPercent: 50, pointerPercent: 50 }));
       core.setMedia(createMediaState({ currentTime: 90, duration: 300 }));
-      const state = core.getState(120);
+      const state = core.getState();
 
       expect(state.value).toBe(90); // still currentTime
       expect(state.fillPercent).toBe(30); // 90/300 * 100
@@ -181,7 +174,6 @@ describe('TimeSliderCore', () => {
       expect(state.disabled).toBe(false);
       expect(state.duration).toBe(120);
       expect(core.getAttrs(state)['aria-valuemax']).toBe(120);
-      expect(core.getProgressState(null).duration).toBe(120);
     });
   });
 

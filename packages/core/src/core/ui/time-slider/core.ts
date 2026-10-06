@@ -1,13 +1,12 @@
 import {
   getTimeRangeEnd,
   hasTimeRange,
-  isMediaPlaying,
   type MediaBufferState,
   type MediaPlaybackState,
   type MediaTimeState,
 } from '@videojs/media';
 import { toPercent } from '@videojs/utils/number';
-import { defaults, shallowEqual } from '@videojs/utils/object';
+import { defaults } from '@videojs/utils/object';
 import { formatTimeAsPhrase } from '@videojs/utils/time';
 import type { NonNullableObject } from '@videojs/utils/types';
 
@@ -34,15 +33,6 @@ export interface TimeSliderState extends SliderState, Pick<MediaTimeState, 'curr
   bufferPercent: number;
 }
 
-/** @internal */
-export interface TimeSliderProgressState {
-  currentTime: number;
-  duration: number;
-  playbackRate: number;
-  playing: boolean;
-  seeking?: boolean;
-}
-
 /**
  * Time-domain slider: maps media time/buffer state to slider state.
  *
@@ -60,7 +50,7 @@ export class TimeSliderCore extends SliderCore {
   #media: (MediaTimeState & MediaBufferState) | null = null;
   #formatLocale: string | string[] | undefined;
   #wasPlayingBeforeDrag = false;
-  #state: TimeSliderState | undefined;
+  #text: { current: number; duration: number; params: { current: string; duration?: string } } | undefined;
 
   constructor(props?: TimeSliderProps) {
     super();
@@ -79,29 +69,12 @@ export class TimeSliderCore extends SliderCore {
 
   /** @internal Platform adapters set the active i18n locale for `aria-valuetext` time formatting. */
   setFormatLocale(locale: string | string[] | undefined): void {
+    if (this.#formatLocale !== locale) this.#text = undefined;
+
     this.#formatLocale = locale;
   }
 
-  getProgressState(playback: MediaPlaybackState | null | undefined, playbackRate = 1): TimeSliderProgressState {
-    const media = this.#media;
-
-    return {
-      currentTime: media?.currentTime ?? 0,
-      duration: media ? getTimeRangeEnd(media) : 0,
-      playbackRate,
-      seeking: media?.seeking ?? false,
-      playing:
-        !!media &&
-        hasTimeRange(media) &&
-        isMediaPlaying(playback) &&
-        !media.seeking &&
-        !this.input.dragging &&
-        !this.#props.disabled,
-    };
-  }
-
-  /** Visual time changes only the fill; values and ARIA remain tied to media time. */
-  getState(visualTime?: number): TimeSliderState {
+  getState(): TimeSliderState {
     const media = this.#media!;
     const { currentTime, seeking, buffered } = media;
     const duration = getTimeRangeEnd(media);
@@ -115,14 +88,13 @@ export class TimeSliderCore extends SliderCore {
     const bufferedEnd = buffered.length > 0 ? buffered[buffered.length - 1]![1] : 0;
     const bufferPercent = toPercent(bufferedEnd, 0, duration);
 
-    const state = { ...base, currentTime, duration, seeking, bufferPercent };
-
-    // Keep semantic consumers stable between visual clock ticks.
-    if (!this.#state || !shallowEqual(this.#state, state)) this.#state = state;
-
-    if (visualTime === undefined || base.dragging || base.disabled) return this.#state;
-
-    return { ...this.#state, fillPercent: this.percentFromValue(visualTime) };
+    return {
+      ...base,
+      currentTime,
+      duration,
+      seeking,
+      bufferPercent,
+    };
   }
 
   override getLabel(state: SliderState): Text | string {
@@ -145,17 +117,18 @@ export class TimeSliderCore extends SliderCore {
     return Number.isFinite(state.duration) ? positionText : this.getValueTextParams(state).current;
   }
 
-  getValueTextParams(state: TimeSliderState): { current: string; duration: string } | { current: string } {
-    const current = this.#formatTimeAsPhrase(this.#announceValue(state));
+  getValueTextParams(state: TimeSliderState): { current: string; duration?: string } {
+    // Spoken time has whole-second precision even though slider values advance on every frame.
+    const current = Math.floor(this.#announceValue(state));
+    const duration = Math.floor(state.duration);
+    if (this.#text && this.#text.current === current && this.#text.duration === duration) return this.#text.params;
 
-    if (!Number.isFinite(state.duration)) {
-      return { current };
-    }
+    const params = Number.isFinite(duration)
+      ? { current: this.#formatTimeAsPhrase(current), duration: this.#formatTimeAsPhrase(duration) }
+      : { current: this.#formatTimeAsPhrase(current) };
 
-    return {
-      current,
-      duration: this.#formatTimeAsPhrase(state.duration),
-    };
+    this.#text = { current, duration, params };
+    return params;
   }
 
   /**

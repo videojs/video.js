@@ -30,7 +30,7 @@ export * from './ui/popover/positioner';
 export * from './ui/slider/slider';
 export * from './ui/slider/css-vars';
 export * from './ui/slider/focus';
-export * from './ui/time-slider/progress';
+export * from './ui/time-slider/seek';
 export * from './ui/status-announcer';
 export * from './ui/thumbnail';
 export * from './ui/tooltip/tooltip';

@@ -3,28 +3,25 @@ import {
   applyElementProps,
   applyStateDataAttrs,
   createSlider,
-  createTimeSliderProgress,
+  createTimeSliderSeek,
   getTimeSliderCSSVars,
   logMissingFeature,
   type SliderApi,
   selectBuffer,
   selectControls,
   selectPlayback,
-  selectPlaybackRate,
   selectTime,
 } from '@videojs/core/dom';
 import { type Text, translateText } from '@videojs/core/i18n';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
-import { ContextConsumer, ContextProvider } from '@videojs/element/context';
-import { hasTimeRange, isMediaSeekCapable } from '@videojs/media';
-import { getMediaElement } from '@videojs/media/dom';
+import { ContextProvider } from '@videojs/element/context';
+import { hasTimeRange, isMediaPlaying } from '@videojs/media';
 import { applyStyles } from '@videojs/utils/dom';
-import { shallowEqual } from '@videojs/utils/object';
 import { formatTime } from '@videojs/utils/time';
 
 import { i18nContext } from '../../i18n/context';
 import { I18nController } from '../../i18n/controller';
-import { mediaContext, playerContext } from '../../player/context';
+import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { sliderContext } from '../slider/context';
 import { UIElement } from '../ui-element';
@@ -62,12 +59,9 @@ export class TimeSliderElement extends UIElement {
   readonly #timeState = new PlayerController(this, playerContext, selectTime);
   readonly #bufferState = new PlayerController(this, playerContext, selectBuffer);
   readonly #playbackState = new PlayerController(this, playerContext, selectPlayback);
-  readonly #rateState = new PlayerController(this, playerContext, selectPlaybackRate);
-  readonly #media = new ContextConsumer(this, { context: mediaContext, subscribe: true });
-  readonly #progress = createTimeSliderProgress(SliderCSSVars.fill);
+  readonly #seek = createTimeSliderSeek(SliderCSSVars.fill);
   readonly #i18n = new I18nController(this, i18nContext);
 
-  #context: object | undefined;
   #cssVars: Record<string, string> = {};
   #slider: SliderApi | null = null;
   #disconnect: AbortController | null = null;
@@ -106,7 +100,7 @@ export class TimeSliderElement extends UIElement {
         if (media) {
           const time = this.#core.rawValueFromPercent(percent);
 
-          this.#progress.seek(time);
+          this.#seek.seek(percent);
           media.seek(time);
         }
       },
@@ -130,7 +124,7 @@ export class TimeSliderElement extends UIElement {
     applyElementProps(this, this.#slider.rootProps, { signal });
     applyStyles(this, this.#slider.rootStyle);
     this.#slider.input.subscribe(() => this.requestUpdate(), { signal });
-    this.#progress.state.subscribe(() => this.requestUpdate(), { signal });
+    this.#seek.state.subscribe(() => this.requestUpdate(), { signal });
 
     if (__DEV__ && !this.#timeState.value) {
       logMissingFeature(this.localName, this.#timeState.displayName!);
@@ -140,8 +134,7 @@ export class TimeSliderElement extends UIElement {
   override disconnectedCallback(): void {
     this.#releaseControlsVisibilityLock();
     this.#resumeIfDragPaused();
-    this.#progress.destroy();
-    this.#context = undefined;
+    this.#seek.destroy();
     super.disconnectedCallback();
     this.#disconnect?.abort();
     this.#disconnect = null;
@@ -150,7 +143,7 @@ export class TimeSliderElement extends UIElement {
   override destroyCallback(): void {
     this.#releaseControlsVisibilityLock();
     this.#resumeIfDragPaused();
-    this.#progress.destroy();
+    this.#seek.destroy();
     this.#slider?.destroy();
     super.destroyCallback();
   }
@@ -191,7 +184,7 @@ export class TimeSliderElement extends UIElement {
     const buffer = this.#bufferState.value;
 
     if (!time) {
-      this.#progress.destroy();
+      this.#seek.destroy();
       this.removeAttribute('data-playing');
       return;
     }
@@ -200,32 +193,27 @@ export class TimeSliderElement extends UIElement {
     const media = { ...time, ...(buffer ?? { buffered: [], seekable: [] }) };
 
     this.#core.setMedia(media);
-    this.#progress.update(
-      this.#core.getProgressState(this.#playbackState.value, this.#rateState.value?.playbackRate ?? 1),
-      () => {
-        const media = this.#media.value?.media;
-
-        return isMediaSeekCapable(media) ? media.currentTime : undefined;
-      },
-      this,
-      !getMediaElement(this.#media.value?.media)
-    );
-    this.toggleAttribute('data-playing', this.#progress.state.current.advancing);
-
     const state = this.#core.getState();
-    const visual = this.#core.getState(this.#progress.state.current.currentTime);
-    const cssVars = getTimeSliderCSSVars(this.#slider.adjustForAlignment(visual));
-    const context = { state, label: this.label, locale: this.#i18n.locale, translator: this.#i18n.value };
-    const unchanged = shallowEqual(this.#context, context);
 
+    this.#seek.update(state.seeking, state.fillPercent, this);
+    const percent = this.#seek.state.current.percent;
+
+    this.toggleAttribute(
+      'data-playing',
+      isMediaPlaying(this.#playbackState.value) &&
+        !state.disabled &&
+        !state.dragging &&
+        !state.seeking &&
+        percent === undefined
+    );
+
+    const fill = percent === undefined || state.dragging || state.disabled ? state : { ...state, fillPercent: percent };
+    const cssVars = getTimeSliderCSSVars(this.#slider.adjustForAlignment(fill));
     const styles = Object.fromEntries(Object.entries(cssVars).filter(([name, value]) => this.#cssVars[name] !== value));
 
     applyStyles(this, styles);
     this.#cssVars = cssVars;
 
-    if (unchanged) return;
-
-    this.#context = context;
     const thumbAttrs = this.#core.getAttrs(state);
 
     // Domain-specific data attributes on root (includes data-seeking).
