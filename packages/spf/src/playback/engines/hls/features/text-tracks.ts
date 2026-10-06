@@ -15,6 +15,13 @@ import { switchTextTrack, type UserTrackSelectionState } from '../../../behavior
 /**
  * Adds the source's subtitle and caption renditions to the media element as text tracks and loads the WebVTT cues of
  * the showing one. Honors the user's `userTextTrackSelection`, including `'off'`.
+ *
+ * Requires, from other features:
+ *
+ * - A writer of `state.currentTime`, such as `currentTimeFeature`; without one, cue loading stops after the first window.
+ * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`.
+ *
+ * Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeature`, or its cues are misaligned.
  */
 export const textTracksFeature = defineFeature({
   behaviors: [

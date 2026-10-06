@@ -11,8 +11,12 @@ import { reportUnsupportedTrackConditions } from '../../../primitives/report-tra
  * Plays video with adaptive bitrate: resolves the selected rendition's playlist, switches renditions as bandwidth
  * changes, and buffers and loads its segments. Honors the user's `userVideoTrackSelection`.
  *
- * Compose it before `audioFeature`: when both buffers become ready together, the video SourceBuffer must be added first
- * (see the Firefox `mozHasAudio` invariant in `setup-buffer-actors.ts`).
+ * Requires, from this or other features:
+ *
+ * - A writer of `context.mediaSource`, such as `mediaSourceFeature`; nothing loads without one.
+ * - A writer of `state.currentTime`, such as `currentTimeFeature`; without one, loading stops after the first window.
+ * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
+ *   init segments load.
  */
 export const videoFeature = defineFeature({
   behaviors: [

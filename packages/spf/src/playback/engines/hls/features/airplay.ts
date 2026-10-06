@@ -6,6 +6,8 @@ import { type DisableRemotePlaybackState, setupAirPlay } from '../../../behavior
 /**
  * Plays to AirPlay receivers (WebKit only; inert elsewhere), unless the user sets `disableRemotePlayback`. Attaches the
  * MediaSource through a `<source>` element, which the native fallback the receiver plays requires.
+ *
+ * Requires a writer of `context.mediaSource`, such as `mediaSourceFeature`; without one, AirPlay is never offered.
  */
 export const airPlayFeature = defineFeature({
   behaviors: [setupAirPlay, defineExternalSignals<DisableRemotePlaybackState>()({ state: ['disableRemotePlayback'] })],

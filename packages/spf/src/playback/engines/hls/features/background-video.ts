@@ -28,6 +28,13 @@ const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenRes
 /**
  * Plays one video rendition for the whole session: the largest that fits the screen, picked once rather than adapted to
  * bandwidth. For ambient, hero, and GIF-replacement video. Reports when no rendition is playable.
+ *
+ * Requires, from this or other features:
+ *
+ * - A writer of `context.mediaSource`, such as `mediaSourceFeature`; nothing loads without one.
+ * - A writer of `state.currentTime`, such as `currentTimeFeature`; without one, loading stops after the first window.
+ * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
+ *   init segments load.
  */
 export const backgroundVideoFeature = defineFeature({
   behaviors: [selectVideoTrack, resolveVideoTrack, setupVideoBufferActors, loadVideoSegments, trackScreenResolution],

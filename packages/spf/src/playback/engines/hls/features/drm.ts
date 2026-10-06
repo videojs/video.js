@@ -31,8 +31,12 @@ const drmAwareAudioConstraints: readonly SwitchAudioTrackRule[] = [
  * servers, attaches its MediaKeys, and exchanges licenses. Segment loading waits until a source is confirmed clear or
  * its MediaKeys attach.
  *
- * Replaces the playability probe, the unsupported-track reporter, and the video and audio constraints with DRM-aware
- * versions, so compose it after `videoFeature` and `audioFeature`.
+ * Requires writers of resolved, selected video or audio renditions, such as `videoFeature` and `audioFeature`; without
+ * them, no source is ever confirmed clear and loading stays blocked.
+ *
+ * Replaces `canPlayTrack` and `reportUnsupportedTrackConditions` with DRM-aware versions, and sets DRM-aware video and
+ * audio constraints. Compose it after the features that set the plain versions, such as `videoFeature` and
+ * `audioFeature`, or theirs win and encrypted renditions are refused.
  */
 export const drmFeature = defineFeature({
   behaviors: [
