@@ -36,10 +36,10 @@ You’ll need the following installed:
 2. Clone your fork locally and set up upstream tracking:
 
 ```sh
-git clone https://github.com/{your-github-username}/v10.git
-cd v10
+git clone https://github.com/{your-github-username}/video.js.git
+cd video.js
 
-git remote add upstream git@github.com:videojs/v10.git
+git remote add upstream git@github.com:videojs/video.js.git
 git fetch upstream
 git branch --set-upstream-to=upstream/main main
 ```
@@ -327,7 +327,7 @@ By submitting a pull request, you agree that your contribution is provided under
 
 ### Step 1: Verify
 
-Whether you're adding something new, making something better, or fixing a bug, you'll first want to search the [GitHub issues](https://github.com/videojs/v10/issues) to make sure you're aware of any previous discussion or work. If an unclaimed issue exists, claim it via a comment. If no issue exists for your change, [submit a new issue][vjs-issue-choose].
+Whether you're adding something new, making something better, or fixing a bug, you'll first want to search the [GitHub issues](https://github.com/videojs/video.js/issues) to make sure you're aware of any previous discussion or work. If an unclaimed issue exists, claim it via a comment. If no issue exists for your change, [submit a new issue][vjs-issue-choose].
 
 ### Step 2: Update remote
 
@@ -440,8 +440,8 @@ To discuss larger ideas or prototypes, or to help out with ongoing discussions, 
 - [Discord][vjs-discord]
 - [GitHub Discussions][vjs-gh-discussions]
 
-[vjs-gh]: https://github.com/videojs/v10
-[vjs-issue-choose]: https://github.com/videojs/v10/issues/new/choose
-[vjs-gh-discussions]: https://github.com/videojs/v10/discussions
+[vjs-gh]: https://github.com/videojs/video.js
+[vjs-issue-choose]: https://github.com/videojs/video.js/issues/new/choose
+[vjs-gh-discussions]: https://github.com/videojs/video.js/discussions
 [vjs-discord]: https://discord.gg/JBqHh485uF
 [conventional-commit-style]: https://www.conventionalcommits.org/en/v1.0.0/#summary

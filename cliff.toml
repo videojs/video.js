@@ -3,7 +3,7 @@
 
 [remote.github]
 owner = "videojs"
-repo = "v10"
+repo = "video.js"
 
 [changelog]
 # A Tera template to be rendered for each release in the changelog.
@@ -84,7 +84,10 @@ postprocessors = [
 # output = "test.md"
 
 [git]
-tag_pattern = "^(v[0-9]|@videojs/core@[0-9]).*"
+# Only Video.js 10 releases. The merged Video.js 8 history is also excluded by the
+# `history/v8-tip..HEAD` range passed in `.github/workflows/release-pr.yml` and the
+# `changelog` script.
+tag_pattern = "^@videojs/core@[0-9].*"
 
 # Parse commits according to the conventional commits specification.
 # See https://www.conventionalcommits.org
@@ -100,7 +103,10 @@ split_commits = false
 commit_preprocessors = [
     # Replace issue numbers with link templates to be updated in `changelog.postprocessors`.
     #{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
-    # Replace (#NNN) with a Markdown link to the GitHub PR.
+    # Replace (#NNN) with a Markdown link to the GitHub PR. Video.js 10 was developed in
+    # videojs/v10 until it moved into videojs/video.js, whose PRs start at #9248, so
+    # lower numbers still belong to videojs/v10.
+    { pattern = '\(#(924[89]|92[5-9][0-9]|9[3-9][0-9]{2}|[1-9][0-9]{4,})\)', replace = "([#${1}](https://github.com/videojs/video.js/pull/${1}))" },
     { pattern = '\(#([0-9]+)\)', replace = "([#${1}](https://github.com/videojs/v10/pull/${1}))" },
     # Check spelling of the commit message using https://github.com/crate-ci/typos.
     # If the spelling is incorrect, it will be fixed automatically.

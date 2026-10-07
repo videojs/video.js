@@ -27,4 +27,4 @@ members:
 [package]: https://www.npmjs.com/package/@videojs/spf
 [package-badge]: https://img.shields.io/npm/v/@videojs/spf?label=@videojs/spf
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions

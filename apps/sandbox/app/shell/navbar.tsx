@@ -113,7 +113,7 @@ export function Navbar({
           role="link"
           render={
             <a
-              href="https://github.com/videojs/v10"
+              href="https://github.com/videojs/video.js"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub repository"

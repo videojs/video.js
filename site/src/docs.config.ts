@@ -37,7 +37,10 @@ export const sidebar: Sidebar = [
           { slug: 'guides/browser-support' },
           { slug: 'guides/build-with-ai' },
           { slug: 'guides/v10-roadmap', sidebarLabel: 'Roadmap' },
-          { href: 'https://github.com/videojs/v10/blob/main/CONTRIBUTING.md', sidebarLabel: 'Contribute to Video.js' },
+          {
+            href: 'https://github.com/videojs/video.js/blob/main/CONTRIBUTING.md',
+            sidebarLabel: 'Contribute to Video.js',
+          },
         ],
       },
       {
