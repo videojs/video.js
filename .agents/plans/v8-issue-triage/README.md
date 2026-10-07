@@ -109,6 +109,8 @@ Docs:
 
 ## 4. Review the triage (Rahim)
 
+Signed off by Rahim on 2026-10-07.
+
 Open `triage.csv`; `execute.mjs` with no flags prints every comment variant.
 
 - `bucket` = `close`, `variant` = `feature`: v8 feature requests. Flags:

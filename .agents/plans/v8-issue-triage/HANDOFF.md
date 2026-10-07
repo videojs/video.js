@@ -41,7 +41,7 @@ Follow the README's steps:
    - List the rest for Heff, such as npm settings that need web 2FA.
    - Use `videojs-v8-SECURITY.md` as its `SECURITY.md`.
 3. **Open a PR on `video.js` `main`** pointing `SECURITY.md` and the issue templates at `videojs-v8` (README step 3). `execute.mjs` refuses to post until that's merged and `videojs-v8` has a `SECURITY.md`.
-4. **Wait for Rahim's sign-off** on `triage.csv` (README step 4).
+4. **Triage sign-off:** Rahim signed off on `triage.csv` on 2026-10-07, so there's nothing to wait for.
 5. **Close.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=close …`
 6. **Transfer.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=migrate …`
 7. **Move PRs.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=move-pr …`. Moved PRs aren't merged by default. When one is, use rebase so the contributor stays the author (README step 7).
