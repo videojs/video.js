@@ -23,23 +23,23 @@ export default styles({
     track: {
       utilities: [
         'absolute inset-x-0 isolate h-1.5 rounded-none forced-colors:h-1.5',
-        'before:absolute before:inset-y-0 before:rounded-none before:bg-media-foreground before:opacity-20 before:clip-media-chapter-track-x',
-        'media-high-contrast:before:opacity-50! forced-colors:before:bg-[Canvas] forced-colors:before:opacity-100! forced-colors:before:forced-color-adjust-none',
+        'before:absolute before:inset-y-0 before:rounded-none before:bg-white/10 before:clip-media-chapter-track-x',
+        'forced-colors:before:bg-[Canvas] forced-colors:before:opacity-100! forced-colors:before:forced-color-adjust-none',
         'forced-colors:before:border forced-colors:before:border-solid forced-colors:before:border-[CanvasText]',
       ],
     },
     audioTrack: {
-      utilities: 'before:opacity-20! forced-colors:before:opacity-100!',
+      utilities: 'before:bg-media-muted! forced-colors:before:bg-[Canvas]!',
     },
     buffer: {
       utilities: [
-        'absolute inset-y-0 rounded-none bg-media-foreground opacity-20 clip-media-x-[--media-slider-buffer]',
+        'absolute inset-y-0 rounded-none bg-white/10 clip-media-x-[--media-slider-buffer]',
         'forced-colors:opacity-100! forced-colors:forced-color-adjust-none',
         'forced-colors:bg-[repeating-linear-gradient(135deg,CanvasText_0px,CanvasText_1px,Canvas_1px,Canvas_3px)]',
       ],
     },
     audioBuffer: {
-      utilities: 'opacity-20! forced-colors:opacity-100!',
+      utilities: 'bg-[#b3b3b3]!',
     },
     fill: {
       utilities: [
@@ -66,11 +66,11 @@ export default styles({
       ],
     },
     previewMeta: {
-      utilities: 'flex w-full min-w-0 justify-center bg-media-popover px-2 py-1',
+      utilities: 'flex w-full min-w-0 justify-center px-2 py-1',
     },
     audioPreviewMeta: {
       utilities: [
-        'w-auto! rounded-none bg-media-popover px-1.5! py-0.5 text-media-popover-foreground',
+        'w-auto! rounded-none px-1.5! py-0.5 text-media-foreground',
         'media-high-contrast:outline forced-colors:outline',
       ],
     },

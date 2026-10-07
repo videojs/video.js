@@ -5,7 +5,7 @@ export default styles({
   prefix: 'media-dialog',
   rules: {
     backdrop: {
-      utilities: 'absolute inset-0 z-40 bg-[rgba(0,0,0,0.75)] not-data-open:hidden',
+      utilities: 'absolute inset-0 z-40 bg-black not-data-open:hidden',
     },
     popup: {
       utilities: [

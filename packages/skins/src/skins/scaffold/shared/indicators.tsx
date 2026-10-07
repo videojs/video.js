@@ -6,8 +6,6 @@ import {
   FullscreenExitIcon,
   PipEnterIcon,
   PipExitIcon,
-  PlayIcon,
-  PauseIcon,
   VolumeHighIcon,
   VolumeLowIcon,
   VolumeOffIcon,
@@ -17,8 +15,6 @@ import { Box, type VjscNode } from 'vjsc/components';
 import indicatorStyles from './indicator.styles';
 import statusIndicatorStyles from './status-indicator.styles';
 import volumeIndicatorStyles from './volume-indicator.styles';
-
-const PLAYBACK_ACTIONS = ['togglePaused'] as const;
 
 const STATUS_ACTIONS = ['toggleSubtitles', 'toggleFullscreen', 'togglePictureInPicture'] as const;
 
@@ -32,7 +28,6 @@ export function Indicators({ children }: { children?: VjscNode } = {}) {
     <Box aria-hidden="true" className={indicatorStyles.group}>
       <VolumeIndicator />
       <StatusIndicator />
-      <PlaybackIndicator />
       {children}
     </Box>
   );
@@ -62,17 +57,5 @@ function VolumeIndicator() {
         <$.VolumeIndicator.Value className={volumeIndicatorStyles.value} />
       </$.VolumeIndicator.Fill>
     </$.VolumeIndicator.Root>
-  );
-}
-
-function PlaybackIndicator() {
-  return (
-    <$.StatusIndicator.Root
-      actions={PLAYBACK_ACTIONS}
-      className={[indicatorStyles.root, statusIndicatorStyles.playback]}
-    >
-      <PlayIcon className={[statusIndicatorStyles.icon, statusIndicatorStyles.playIcon]} />
-      <PauseIcon className={[statusIndicatorStyles.icon, statusIndicatorStyles.pauseIcon]} />
-    </$.StatusIndicator.Root>
   );
 }

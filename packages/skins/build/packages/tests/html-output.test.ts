@@ -85,7 +85,7 @@ describe('generated HTML package skins', () => {
       expect(tags).toContain('buffering-indicator');
 
       if (skin.endsWith('video')) {
-        expect(template).toContain('<media-status-indicator actions="togglePaused"');
+        expect(template).not.toContain('<media-status-indicator actions="togglePaused"');
       }
     }
 

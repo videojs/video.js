@@ -4,15 +4,6 @@ export default styles({
   file: 'indicators.css',
   prefix: 'media-status-indicator',
   rules: {
-    playback: {
-      utilities: 'group/playback-status col-start-2 row-start-1',
-    },
-    playIcon: {
-      utilities: 'group-data-[status=play]/playback-status:block',
-    },
-    pauseIcon: {
-      utilities: 'group-data-[status=pause]/playback-status:block',
-    },
     root: {
       utilities: 'group/input-status col-start-2 row-start-1 self-start mt-3',
     },
