@@ -74,8 +74,6 @@ Three checks cover the integration points: the app loads with no red screen
 (two `react-native` copies surface here as `ReferenceError: Property 'window'
 doesn't exist`; see below); **Play** toggles to Pause and back repeatedly;
 **Swap src** changes the label and the video without the surface going black.
-The default VOD asset renders badly in the Android emulator (an emulator
-encoding quirk; it plays on devices), so use the live source there.
 
 ## Monorepo wiring
 
