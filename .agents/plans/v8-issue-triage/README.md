@@ -54,6 +54,13 @@ For each PR:
 
 These verdicts are also in `overrides.json`. `execute.mjs` leaves `merge-here` PRs alone.
 
+**Done on 2026-10-07.** All squash-merged into `8.x`, each authored by its contributor:
+
+- #9042, #7795, #9220, #9221, #9242, and #9043, as is.
+- #9234, with the translation fix and Marina Vella as co-author.
+- #9241, limited to local runs so CI keeps testing Firefox. The full Karma suite passed locally: 1391 of 1392, 1 skipped.
+- #7789's fork couldn't be pushed to (it's owned by an organization), so #9319 superseded it, with Nathan Naveen as co-author, and #7789 was closed with a link.
+
 ## 2. Stand up `videojs/videojs-v8` (Wes or an org admin)
 
 Do this before any comment links there. Checked on 2026-10-07; `[x]` means already in place.
