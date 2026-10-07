@@ -15,7 +15,7 @@ export interface SkinMeta extends ComponentMeta {
 /** Build-time styling identity of one skin: its CSS scope, theme, and preset. Keyed by skin name in `skinStyles`. */
 export interface SkinStyle {
   readonly scope: string;
-  readonly theme: 'compat' | 'default' | 'neutral';
+  readonly theme: 'compat' | 'default' | 'neutral' | 'scaffold';
   readonly preset: 'video' | 'audio' | 'live-video' | 'live-audio';
 }
 
@@ -86,6 +86,26 @@ export const skinStyles = {
   'compat-live-audio': {
     scope: '.media-skin[data-theme="compat"][data-preset="live-audio"]',
     theme: 'compat',
+    preset: 'live-audio',
+  },
+  'scaffold-video': {
+    scope: '.media-skin[data-theme="scaffold"][data-preset="video"]',
+    theme: 'scaffold',
+    preset: 'video',
+  },
+  'scaffold-live-video': {
+    scope: '.media-skin[data-theme="scaffold"][data-preset="live-video"]',
+    theme: 'scaffold',
+    preset: 'live-video',
+  },
+  'scaffold-audio': {
+    scope: '.media-skin[data-theme="scaffold"][data-preset="audio"]',
+    theme: 'scaffold',
+    preset: 'audio',
+  },
+  'scaffold-live-audio': {
+    scope: '.media-skin[data-theme="scaffold"][data-preset="live-audio"]',
+    theme: 'scaffold',
     preset: 'live-audio',
   },
 } as const satisfies Record<string, SkinStyle>;
