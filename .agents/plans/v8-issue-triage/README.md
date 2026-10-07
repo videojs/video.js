@@ -206,7 +206,7 @@ Force-push it to `moved/video.js-<n>`, then rebase and merge.
 
 ## Posting: hand-off to Heff's agent
 
-Heff's agent runs the steps from this branch with Heff's own `gh` login, so everything posts from Heff's account. `HANDOFF.md` is the draft note for that agent. The goal is that nothing reads as AI-posted:
+Heff's agent runs the steps from this branch with Heff's own `gh` login, so everything posts from Heff's account. `HANDOFF.md` is the message for that agent. The goal is that nothing reads as AI-posted:
 
 - **Wording:** final as of 2026-10-07 (Heff, in the Notion review doc), copied verbatim into `messages.mjs`.
   - The only additions are links. "new issue", "discussion", and "pull request" point at `videojs/video.js`; feature requests go to the Ideas discussion category. Repo mentions and "fork" point at `videojs/videojs-v8`.
@@ -228,7 +228,7 @@ Heff's agent runs the steps from this branch with Heff's own `gh` login, so ever
 
 ## 8. Keep the record
 
-Don't delete this branch or `run-log.jsonl`. If an item needs to be reopened or a step rerun, the branch shows what was decided, and the log shows what was done.
+Don't delete this branch or `run-log.jsonl`. Commit the log to this branch after each batch, so the record isn't only on one machine. If an item needs to be reopened or a step rerun, the branch shows what was decided, and the log shows what was done.
 
 ## Files
 
@@ -243,4 +243,4 @@ Don't delete this branch or `run-log.jsonl`. If an item needs to be reopened or 
 - `verify.mjs`: checks every rendered comment (see "Posting"). It writes `messages-rendered.md`.
 - `feature-check.json`: the fit check for feature-request closes (see step 4).
 - `videojs-v8-SECURITY.md`: the draft security policy for `videojs/videojs-v8` (step 2), with Heff's edits.
-- `HANDOFF.md`: the draft note for Heff's agent, which does the posting.
+- `HANDOFF.md`: the hand-off message for Heff's agent, which does the posting.
