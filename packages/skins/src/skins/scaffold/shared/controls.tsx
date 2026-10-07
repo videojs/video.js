@@ -72,15 +72,17 @@ export function ControlsContent({
       <$.Tooltip.Provider>
         {top && <$.Controls.Group className={controlsStyles.top}>{top}</$.Controls.Group>}
         {center && (
-          <$.Controls.Group className={controlsStyles.center}>
-            {seekBackward}
-            <PlayButton
-              className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
-              iconClassName={controlsStyles.centerPlayIcon}
-              tooltip={false}
-            />
-            {seekForward}
-          </$.Controls.Group>
+          <$.BufferingIndicator className={controlsStyles.buffering}>
+            <$.Controls.Group className={controlsStyles.center}>
+              {seekBackward}
+              <PlayButton
+                className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
+                iconClassName={controlsStyles.centerPlayIcon}
+                tooltip={false}
+              />
+              {seekForward}
+            </$.Controls.Group>
+          </$.BufferingIndicator>
         )}
         <Box
           className={[controlsStyles.bottom, audio && audioControlsStyles.bottom, !audio && controlsStyles.videoBottom]}

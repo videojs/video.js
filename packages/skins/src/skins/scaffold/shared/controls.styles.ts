@@ -11,11 +11,14 @@ export default styles({
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
     },
+    buffering: {
+      utilities: 'group/center-buffering contents',
+    },
     center: {
       utilities: [
         'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-2 media-360:flex',
         'media-high-contrast:rounded-none media-high-contrast:bg-media-background forced-colors:bg-transparent!',
-        'group-not-data-visible/controls:opacity-0',
+        'group-not-data-visible/controls:opacity-0 group-data-visible/center-buffering:hidden!',
       ],
     },
     top: {
