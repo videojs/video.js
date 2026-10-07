@@ -7,7 +7,7 @@
 #   VERSION            Release version, e.g. 10.0.0 (or env VERSION)
 #   RELEASE_URL        GitHub release page linked from the PR body (or env RELEASE_URL)
 #   CONTEXT_DIR        Scratch directory for the PR body (env; default .prose-context)
-#   GITHUB_REPOSITORY  owner/name the PR is opened on (env; default videojs/v10)
+#   GITHUB_REPOSITORY  owner/name the PR is opened on (env; default videojs/video.js)
 #   GH_TOKEN           `gh` must be authenticated; git push uses the checkout's origin
 #
 # Runs from the repository root regardless of the caller's cwd. The commit is
@@ -17,7 +17,7 @@ set -euo pipefail
 VERSION="${1:-${VERSION:-}}"
 RELEASE_URL="${2:-${RELEASE_URL:-}}"
 CONTEXT_DIR="${CONTEXT_DIR:-.prose-context}"
-GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/v10}"
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/video.js}"
 
 if [ -z "$VERSION" ] || [ -z "$RELEASE_URL" ]; then
   echo "Usage: $(basename "$0") VERSION RELEASE_URL" >&2

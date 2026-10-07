@@ -33,7 +33,9 @@ describe('withMuxAttribution', () => {
     const stream = 'https://stream.mux.com/abc.m3u8';
 
     expect(withMuxAttribution(stream, 'docs-content')).toBe(stream);
-    expect(withMuxAttribution('https://github.com/videojs/v10', 'docs-content')).toBe('https://github.com/videojs/v10');
+    expect(withMuxAttribution('https://github.com/videojs/video.js', 'docs-content')).toBe(
+      'https://github.com/videojs/video.js'
+    );
     expect(withMuxAttribution('/docs/guides/mux-data', 'docs-content')).toBe('/docs/guides/mux-data');
   });
 });

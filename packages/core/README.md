@@ -58,4 +58,4 @@ members:
 [package]: https://www.npmjs.com/package/@videojs/core
 [package-badge]: https://img.shields.io/npm/v/@videojs/core?label=@videojs/core
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions

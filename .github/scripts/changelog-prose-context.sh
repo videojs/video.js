@@ -8,7 +8,7 @@
 #
 #   VERSION            Release version, e.g. 10.0.0 (or env VERSION)
 #   CONTEXT_DIR        Output directory (or env CONTEXT_DIR; default .prose-context)
-#   GITHUB_REPOSITORY  owner/name to query (env; default videojs/v10)
+#   GITHUB_REPOSITORY  owner/name to query (env; default videojs/video.js)
 #   GH_TOKEN           `gh` must be authenticated
 #
 # Runs from the repository root regardless of the caller's cwd. The changelog
@@ -17,7 +17,7 @@ set -euo pipefail
 
 VERSION="${1:-${VERSION:-}}"
 CONTEXT_DIR="${2:-${CONTEXT_DIR:-.prose-context}}"
-GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/v10}"
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-videojs/video.js}"
 
 if [ -z "$VERSION" ]; then
   echo "Usage: $(basename "$0") VERSION [CONTEXT_DIR]" >&2

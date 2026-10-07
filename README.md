@@ -75,6 +75,6 @@ participating in this project you agree to abide by its terms.
 [package-badge]: https://img.shields.io/npm/v/@videojs/core?label=@videojs/core
 [discord]: https://discord.gg/JBqHh485uF
 [discord-badge]: https://img.shields.io/discord/507627062434070529?color=%235865F2&label=%20&logo=discord&logoColor=white
-[gh-discussions]: https://github.com/videojs/v10/discussions
-[preview]: https://pkg.pr.new/~/videojs/v10
-[preview-badge]: https://pkg.pr.new/badge/videojs/v10
+[gh-discussions]: https://github.com/videojs/video.js/discussions
+[preview]: https://pkg.pr.new/~/videojs/video.js
+[preview-badge]: https://pkg.pr.new/badge/videojs/video.js

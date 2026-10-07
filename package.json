@@ -6,7 +6,7 @@
   "author": "Video.js Contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videojs/v10.git"
+    "url": "https://github.com/videojs/video.js.git"
   },
   "type": "module",
   "scripts": {
