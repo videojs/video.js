@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thanks for helping us improve our documentation! Please fill this template out as completely as possible.
-        * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/v10/discussions) instead.
+        * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/video.js/discussions) instead.
         * Check the [docs](https://videojs.org/docs).
         * Please check to see if there's an existing issue and replying there instead.
   - type: checkboxes
