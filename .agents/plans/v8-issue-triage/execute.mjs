@@ -1,73 +1,39 @@
-// Applies triage.json to GitHub. Dry run by default.
+// Applies triage.json to GitHub. Dry run by default. Don't pass --execute without sign-off.
 //
-//   node .agents/plans/v8-issue-triage/execute.mjs                       # dry run, all buckets
-//   node .agents/plans/v8-issue-triage/execute.mjs --check               # dry run + live state checks
-//   node .agents/plans/v8-issue-triage/execute.mjs --execute --numbers=8302
-//   node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=keep-v8
-//   node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=close --limit=50
+//   node .agents/plans/v8-issue-triage/execute.mjs                          # dry run, every bucket
+//   node .agents/plans/v8-issue-triage/execute.mjs --check                  # dry run + live state checks
+//   node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=close --numbers=8961
+//   node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=close --limit=150
 //
 // Flags:
-//   --execute               perform writes (otherwise print the plan)
-//   --check                 in dry run, fetch each item's live state too
-//   --bucket=a,b            keep-v8 | close | close-pr (default: all three)
-//   --numbers=1,2           restrict to these issue/PR numbers
-//   --limit=N               stop after N acted-on items
-//   --delay=MS              pause between items in execute mode (default 8000)
-//   --allow-missing-policy  run even if SECURITY.md is not on the default branch yet
-//   --include-updated       act on items with activity after the snapshot
+//   --execute          perform writes (otherwise print the plan); needs an explicit --bucket
+//   --check            in dry run, fetch each item's live state too
+//   --bucket=a,b       close | migrate | move-pr (default: all three)
+//   --numbers=1,2      restrict to these issue/PR numbers
+//   --limit=N          stop after N acted-on items
+//   --delay=MS         pause between items in execute mode (default 8000)
+//   --include-updated  act on items with activity after the snapshot
+//
+// close    comment, then close with the v8-maintenance label (issues as not planned)
+// migrate  transfer the issue to videojs/videojs-v8 as is, without a comment; the old URL redirects
+// move-pr  push the PR's commits to a videojs-v8 branch, open a PR there crediting the author,
+//          then comment on the original with the new link and close it
 //
 // Resumable: every completed step is appended to run-log.jsonl and skipped on rerun.
-// GitHub caps content-creating requests (~80/min, ~500/hour), so a full run takes hours.
+// GitHub caps content-creating requests (~80/min, ~500/hour), so run in --limit batches.
 
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const REPO = 'videojs/video.js';
-const LABELS = {
-  closed: { name: 'v8-maintenance', color: '777777', description: 'Closed in the move to Video.js 10; v8 receives security fixes only' },
-  security: { name: 'security', color: 'B60205', description: 'Security vulnerability or hardening' },
-  v8: { name: '8.x', color: 'c5def5', description: '' },
-};
-const ACTIONABLE = ['keep-v8', 'close', 'close-pr'];
+import { REPO, V8_REPO, V8_URL, closeComment, movedBody, movedBranch, movedComment } from './messages.mjs';
 
-const BRANCH_URL = `https://github.com/${REPO}/tree/8.x`;
-const POLICY_URL = `https://github.com/${REPO}/security/policy`;
-const REPORT_URL = `https://github.com/${REPO}/security/advisories/new`;
-const GUIDE_URL = (framework) => `https://videojs.org/docs/framework/${framework}/guides/migrate-from-video-js-8`;
+const LABEL = { name: 'v8-maintenance', color: '777777', description: 'Closed in the move to Video.js 10; v8 receives security fixes only' };
+const BUCKETS = ['close', 'migrate', 'move-pr'];
+const FINAL_STEP = { close: 'close', migrate: 'transfer', 'move-pr': 'close' };
 
-const MIGRATION = [
-  `**Moving to Video.js 10?** The migration guide maps v8 options, techs, plugins, and the player API onto v10: [HTML](${GUIDE_URL('html')}) · [React](${GUIDE_URL('react')}).`,
-  '',
-  `**Migrating with a coding agent?** Paste the prompt from the guide's AI Quickstart section into your agent: [HTML](${GUIDE_URL('html')}#ai-quickstart) · [React](${GUIDE_URL('react')}#ai-quickstart).`,
-].join('\n');
-
-const COMMENTS = {
-  close: (item) =>
-    [
-      item.reason.startsWith('addressed in v10') ? 'This is addressed in Video.js 10.\n' : null,
-      `Video.js 10 is now the current version. It's a complete redesign and ground-up rebuild of the player. Video.js 8 is maintained on the [\`8.x\` branch](${BRANCH_URL}) and receives security fixes only — see the [security policy](${POLICY_URL}).`,
-      '',
-      `We're closing v8 issues that aren't security-related. If this still applies to Video.js 10, please open a new issue with a reproduction and link back here so we keep the context.`,
-      '',
-      MIGRATION,
-      '',
-      `If this is a security vulnerability, don't add details here. Report it privately through [private vulnerability reporting](${REPORT_URL}).`,
-      '',
-      'Thank you for helping improve Video.js.',
-    ]
-      .filter((line) => line !== null)
-      .join('\n'),
-  'close-pr': () =>
-    [
-      'Thank you for this contribution. Video.js 10 is a complete redesign and ground-up rebuild of the player, and it has replaced the v8 source on `main`, so this pull request no longer applies here.',
-      '',
-      `Video.js 8 is maintained on the [\`8.x\` branch](${BRANCH_URL}) and receives security fixes only — see the [security policy](${POLICY_URL}). If this fixes a security issue in v8, leave a comment and we'll retarget it to \`8.x\`. If the change still matters for Video.js 10, please open an issue or a new pull request against the current \`main\`.`,
-      '',
-      MIGRATION,
-    ].join('\n'),
-};
+// --- Arguments -------------------------------------------------------------
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const logPath = join(dir, 'run-log.jsonl');
@@ -79,13 +45,14 @@ const args = Object.fromEntries(
   })
 );
 const execute = args.execute === true;
-const buckets = args.bucket ? String(args.bucket).split(',') : ACTIONABLE;
+const buckets = args.bucket ? String(args.bucket).split(',') : BUCKETS;
 const numbers = args.numbers ? new Set(String(args.numbers).split(',').map(Number)) : null;
 const limit = args.limit ? Number(args.limit) : Infinity;
 const delay = args.delay ? Number(args.delay) : 8000;
 
-const unknownBuckets = buckets.filter((b) => !ACTIONABLE.includes(b));
+const unknownBuckets = buckets.filter((b) => !BUCKETS.includes(b));
 if (unknownBuckets.length) throw new Error(`Unknown bucket(s): ${unknownBuckets.join(', ')}`);
+if (execute && !args.bucket) throw new Error('--execute needs an explicit --bucket');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -114,6 +81,12 @@ async function api(method, path, body) {
   return output.trim() ? JSON.parse(output) : null;
 }
 
+async function graphql(query, variables) {
+  const argv = ['api', 'graphql', '-f', `query=${query}`];
+  for (const [key, value] of Object.entries(variables)) argv.push('-f', `${key}=${value}`);
+  return JSON.parse(await gh(argv)).data;
+}
+
 async function exists(path) {
   try {
     await api('GET', path);
@@ -123,6 +96,8 @@ async function exists(path) {
     throw error;
   }
 }
+
+const git = (...argv) => execFileSync('git', argv, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 // --- Run log ---------------------------------------------------------------
 
@@ -146,33 +121,58 @@ const touched = (number) => [...done.keys()].some((key) => key.startsWith(`${num
 
 // --- Actions ---------------------------------------------------------------
 
-async function closeItem(item, live) {
-  const isPr = item.kind === 'pr';
-
+async function commentAndClose(item, live, body) {
   if (!isDone(item.number, 'comment')) {
-    await api('POST', `repos/${REPO}/issues/${item.number}/comments`, { body: COMMENTS[item.bucket](item) });
+    await api('POST', `repos/${REPO}/issues/${item.number}/comments`, { body });
     record(item.number, 'comment');
   }
 
   if (!isDone(item.number, 'close')) {
-    const labels = [...new Set([...live.labels.map((l) => l.name), LABELS.closed.name])];
+    const labels = [...new Set([...live.labels.map((l) => l.name), LABEL.name])];
     await api('PATCH', `repos/${REPO}/issues/${item.number}`, {
       labels,
       state: 'closed',
-      ...(isPr ? {} : { state_reason: 'not_planned' }),
+      ...(item.kind === 'pr' ? {} : { state_reason: 'not_planned' }),
     });
     record(item.number, 'close');
   }
 }
 
-async function labelV8Security(item) {
-  if (!isDone(item.number, 'label')) {
-    await api('POST', `repos/${REPO}/issues/${item.number}/labels`, { labels: [LABELS.security.name, LABELS.v8.name] });
-    record(item.number, 'label');
-  }
+// createLabelsIfMissing keeps labels the v8 repo doesn't have yet; GitHub drops them otherwise.
+async function transferIssue(item, live, v8Repo) {
+  if (isDone(item.number, 'transfer')) return;
+
+  const data = await graphql(
+    'mutation($issue: ID!, $repo: ID!) { transferIssue(input: { issueId: $issue, repositoryId: $repo, createLabelsIfMissing: true }) { issue { url } } }',
+    { issue: live.node_id, repo: v8Repo.node_id }
+  );
+  record(item.number, 'transfer', { url: data.transferIssue.issue.url });
 }
 
-const isComplete = (item) => isDone(item.number, item.bucket === 'keep-v8' ? 'label' : 'close');
+// The PR's commits share history with the v8 repo, so pushing its head gives a clean diff there.
+async function movePullRequest(item, live, v8Repo) {
+  if (!isDone(item.number, 'push')) {
+    git('fetch', '--quiet', `https://github.com/${REPO}.git`, `refs/pull/${item.number}/head`);
+    const sha = git('rev-parse', 'FETCH_HEAD');
+    if (sha !== live.head.sha) throw new Error(`fetched ${sha}, but the PR head is ${live.head.sha}`);
+
+    git('push', '--quiet', `https://github.com/${V8_REPO}.git`, `${sha}:refs/heads/${movedBranch(item)}`);
+    record(item.number, 'push', { sha, branch: movedBranch(item) });
+  }
+
+  if (!isDone(item.number, 'pr')) {
+    const pr = await api('POST', `repos/${V8_REPO}/pulls`, {
+      title: live.title,
+      head: movedBranch(item),
+      base: v8Repo.default_branch,
+      body: movedBody(item, live.body),
+      draft: live.draft,
+    });
+    record(item.number, 'pr', { url: pr.html_url });
+  }
+
+  await commentAndClose(item, live, movedComment(item, done.get(`${item.number}:pr`).url));
+}
 
 // Returns a skip reason, or null when the item should be acted on.
 function skipReason(item, live) {
@@ -184,6 +184,24 @@ function skipReason(item, live) {
   return null;
 }
 
+// The v8 repo must be set up (README step 1) before anything points people at it. Comments link its
+// security policy, the policy here must send v8 there, and moving anything needs push access.
+async function assertReady(v8Repo) {
+  const problems = [];
+  if (!(await exists(`repos/${V8_REPO}/contents/SECURITY.md`))) problems.push(`${V8_REPO} has no SECURITY.md`);
+
+  if (buckets.some((b) => b !== 'migrate')) {
+    const policy = await api('GET', `repos/${REPO}/contents/SECURITY.md`);
+    if (!Buffer.from(policy.content, 'base64').toString('utf8').includes(V8_REPO)) {
+      problems.push(`${REPO}'s SECURITY.md doesn't point Video.js 8 at ${V8_REPO} yet`);
+    }
+  }
+
+  if (buckets.some((b) => b !== 'close') && !v8Repo.permissions?.push) problems.push(`no push access to ${V8_REPO}`);
+
+  if (problems.length) throw new Error(`Not ready:\n- ${problems.join('\n- ')}`);
+}
+
 // --- Main ------------------------------------------------------------------
 
 const triage = JSON.parse(readFileSync(join(dir, 'triage.json'), 'utf8'));
@@ -193,36 +211,44 @@ const strays = triage.filter((item) => !snapshotNumbers.has(item.number));
 if (strays.length) throw new Error(`triage.json has numbers outside the snapshot: ${strays.map((i) => i.number).join(', ')}`);
 
 const queue = triage.filter(
-  (item) => buckets.includes(item.bucket) && (!numbers || numbers.has(item.number)) && !isComplete(item)
+  (item) =>
+    buckets.includes(item.bucket) &&
+    (!numbers || numbers.has(item.number)) &&
+    !isDone(item.number, FINAL_STEP[item.bucket])
 );
 
-const counts = Object.fromEntries(buckets.map((b) => [b, queue.filter((i) => i.bucket === b).length]));
+const counts = {};
+for (const item of queue) {
+  const key = `${item.kind} ${item.bucket}${item.variant ? `/${item.variant}` : ''}`;
+  counts[key] = (counts[key] ?? 0) + 1;
+}
 console.log(`${execute ? 'EXECUTE' : 'DRY RUN'} — ${REPO}`);
 console.table(counts);
 
 if (!execute) {
-  for (const bucket of buckets) {
-    const sample = queue.find((i) => i.bucket === bucket);
-    if (!sample || !COMMENTS[bucket]) continue;
-    console.log(`\n--- ${bucket} comment (e.g. #${sample.number}) ---\n${COMMENTS[bucket](sample)}`);
+  const shown = new Set();
+  for (const item of queue) {
+    const key = `${item.kind} ${item.bucket}${item.variant ? `/${item.variant}` : ''}`;
+    if (shown.has(key) || item.bucket === 'migrate') continue;
+    shown.add(key);
+
+    if (item.bucket === 'close') console.log(`\n--- ${key} comment (e.g. #${item.number}) ---\n${closeComment(item)}`);
+    if (item.bucket === 'move-pr') {
+      console.log(`\n--- move-pr: comment on the original (e.g. #${item.number}) ---\n${movedComment(item, `${V8_URL}/pull/<new>`)}`);
+      console.log(`\n--- move-pr: new PR body in ${V8_REPO}, branch ${movedBranch(item)} ---\n${movedBody(item, '<original description>')}`);
+    }
   }
-  const addressed = queue.find((i) => i.bucket === 'close' && i.reason.startsWith('addressed in v10'));
-  if (addressed) console.log(`\n--- close comment, addressed variant (#${addressed.number}) ---\n${COMMENTS.close(addressed)}`);
+  if (buckets.includes('migrate')) console.log(`\n--- migrate: transfer to ${V8_REPO}, no comment ---`);
 }
 
+let v8Repo;
 if (execute) {
-  let hasPolicy = false;
-  for (const path of ['SECURITY.md', '.github/SECURITY.md', 'docs/SECURITY.md']) {
-    if (await exists(`repos/${REPO}/contents/${path}`)) hasPolicy = true;
-  }
-  if (!hasPolicy && !args['allow-missing-policy']) {
-    throw new Error(`${REPO} has no SECURITY.md on its default branch; comments link to it. Merge it or pass --allow-missing-policy.`);
-  }
+  v8Repo = await api('GET', `repos/${V8_REPO}`);
+  await assertReady(v8Repo);
 
-  for (const label of Object.values(LABELS)) {
-    if (await exists(`repos/${REPO}/labels/${encodeURIComponent(label.name)}`)) continue;
-    await api('POST', `repos/${REPO}/labels`, label);
-    console.log(`created label "${label.name}"`);
+  if (buckets.some((b) => b !== 'migrate') && !(await exists(`repos/${REPO}/labels/${encodeURIComponent(LABEL.name)}`))) {
+    await api('POST', `repos/${REPO}/labels`, LABEL);
+    console.log(`created label "${LABEL.name}"`);
   }
 }
 
@@ -234,11 +260,11 @@ for (const item of queue) {
   if (acted >= limit) break;
 
   if (!execute && !args.check) {
-    console.log(`#${item.number} [${item.kind}] ${item.bucket}${item.reason ? ` — ${item.reason}` : ''}`);
+    console.log(`#${item.number} [${item.kind}] ${item.bucket}${item.variant ? `/${item.variant}` : ''}${item.reason ? ` — ${item.reason}` : ''}`);
     continue;
   }
 
-  const live = await api('GET', `repos/${REPO}/issues/${item.number}`);
+  const live = await api('GET', `repos/${REPO}/${item.kind === 'pr' ? 'pulls' : 'issues'}/${item.number}`);
   const skip = skipReason(item, live);
   if (skip) {
     skipped.push({ number: item.number, skip });
@@ -252,11 +278,14 @@ for (const item of queue) {
   }
 
   try {
-    if (item.bucket === 'keep-v8') {
-      await labelV8Security(item);
-      console.log(`#${item.number} labeled security, 8.x`);
+    if (item.bucket === 'migrate') {
+      await transferIssue(item, live, v8Repo);
+      console.log(`#${item.number} transferred to ${done.get(`${item.number}:transfer`).url}`);
+    } else if (item.bucket === 'move-pr') {
+      await movePullRequest(item, live, v8Repo);
+      console.log(`#${item.number} moved to ${done.get(`${item.number}:pr`).url}`);
     } else {
-      await closeItem(item, live);
+      await commentAndClose(item, live, closeComment(item));
       console.log(`#${item.number} closed`);
     }
     acted++;

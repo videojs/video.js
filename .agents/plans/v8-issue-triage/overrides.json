@@ -1,23 +1,68 @@
 {
-  "3249": { "bucket": "close", "reason": "false positive (\"dependency injection\"); v8 fullscreen API" },
-  "7785": { "bucket": "close", "reason": "false positive; v8 TextTrack credentials question" },
-  "7795": { "bucket": "close-pr", "reason": "CI dependabot config for the v8 tree; not a runtime fix" },
-  "7887": { "bucket": "keep-v10", "reason": "CSP-friendly styling applies to v10; verify v10 behavior" },
-  "8237": { "bucket": "close", "reason": "xmldom advisory resolved; v8 lockfile now has @xmldom/xmldom 0.8.15" },
-  "8302": { "bucket": "close", "reason": "superseded by #9164 (current npm audit report)" },
-  "8489": { "bucket": "close", "reason": "false positive; v8 Next.js inline-style support question" },
-  "9091": { "bucket": "close-pr", "reason": "ReDoS claim targets build/jsdoc-typeof-plugin.js, which is not shipped" },
-  "9164": { "bucket": "keep-v8", "reason": "dependency audit failures (minimatch, octokit); v8 security maintenance" },
-  "9198": { "bucket": "keep-v10", "reason": "CSP style-src-attr 'none' applies to v10; verify v10 behavior" },
-  "9201": { "bucket": "keep-v8", "reason": "not a Video.js vuln; decide whether to claim the unregistered npm name videojs-v8" },
-  "9210": { "bucket": "keep-v8", "reason": "dependency audit report; likely duplicate of #9164" },
-  "9223": { "bucket": "keep-v8", "reason": "vtt.js injected from CDN without SRI; runtime hardening" },
-
-  "9247": { "bucket": "keep-v10", "reason": "v10 PR (playerjs-video), opened after cutover" },
   "4106": { "bucket": "keep-v10", "reason": "distinguish user vs programmatic pause; API need still open in v10" },
   "5947": { "bucket": "keep-v10", "reason": "publish an accessibility commitment statement on the v10 site" },
   "6436": { "bucket": "keep-v10", "reason": "keyboard focus should stay inside the player in fullscreen; verify v10" },
-  "6335": { "bucket": "close", "reason": "addressed in v10: time slider aria-valuetext uses formatTimeAsPhrase" },
-  "6336": { "bucket": "close", "reason": "addressed in v10: time displays expose phrase-formatted labels" },
-  "5765": { "bucket": "close", "reason": "addressed in v10: hotkey component" }
+  "7887": { "bucket": "keep-v10", "reason": "CSP-friendly styling applies to v10; verify v10 behavior" },
+  "9198": { "bucket": "keep-v10", "reason": "CSP style-src-attr 'none' applies to v10; verify v10 behavior" },
+  "9247": { "bucket": "keep-v10", "reason": "v10 PR (playerjs-video), opened after cutover" },
+
+  "5765": {
+    "bucket": "close",
+    "reason": "addressed in v10: hotkeys on by default",
+    "message": "Video.js 10 does this: its built-in skins turn keyboard shortcuts on by default. If something's still missing there, open a [new issue](https://github.com/videojs/video.js/issues/new/choose) and link back here."
+  },
+  "6335": {
+    "bucket": "close",
+    "reason": "addressed in v10: time slider aria-valuetext reads times as words",
+    "message": "Video.js 10 does this: its time slider's `aria-valuetext` reads times as words instead of timestamps. If something's still missing there, open a [new issue](https://github.com/videojs/video.js/issues/new/choose) and link back here."
+  },
+  "6336": {
+    "bucket": "close",
+    "reason": "addressed in v10: time displays have phrase labels",
+    "message": "Video.js 10 does this: its time displays have an accessible label that reads the time as words. If something's still missing there, open a [new issue](https://github.com/videojs/video.js/issues/new/choose) and link back here."
+  },
+  "8237": {
+    "bucket": "close",
+    "reason": "xmldom advisory resolved",
+    "message": "The xmldom advisory this reports is resolved: the Video.js 8 lockfile now resolves `@xmldom/xmldom` to 0.8.15."
+  },
+  "8302": {
+    "bucket": "close",
+    "reason": "superseded by #9164",
+    "message": "This is superseded by #9164, which tracks the current dependency audit report."
+  },
+
+  "8901": {
+    "bucket": "close",
+    "reason": "addressed in v10: written in TypeScript",
+    "message": "Video.js 10 does this: it's written in TypeScript and ships its own type definitions. If something's still missing there, open a [new issue](https://github.com/videojs/video.js/issues/new/choose) and link back here."
+  },
+
+  "3249": { "bucket": "close", "reason": "security keyword false positive (\"dependency injection\"); fullscreen custom element feature request" },
+  "7785": { "bucket": "close", "variant": "stale", "reason": "security keyword false positive; stale v8 TextTrack credentials question" },
+  "8489": { "bucket": "migrate", "reason": "security keyword false positive; v8 Next.js inline-style question" },
+  "9164": { "bucket": "migrate", "reason": "security: dependency audit (minimatch, octokit); dev-only on 8.x" },
+  "9201": { "bucket": "migrate", "reason": "security: dependency confusion via Motive's private alias videojs-v8; not a Video.js vulnerability" },
+  "9210": { "bucket": "migrate", "reason": "security: dependency audit report; likely duplicate of #9164" },
+  "9223": { "bucket": "migrate", "reason": "security: vtt.js injected from CDN without SRI; runtime hardening" },
+
+  "7789": { "bucket": "merge-here", "reason": "review: fix, then merge. Re-apply on the current release.yml: top-level permissions contents: read, and deploy job contents: read" },
+  "7795": { "bucket": "merge-here", "reason": "review: merge as is (dependabot for GitHub Actions)" },
+  "8843": {
+    "bucket": "close",
+    "reason": "review: behavior change, not a fix (named AMD module)",
+    "message": "This changes how the UMD build registers with AMD loaders, making it a named `videojs` module. That could break sites that load Video.js under a different module ID, so we won't be changing that behavior in Video.js 8."
+  },
+  "9042": { "bucket": "merge-here", "reason": "review: merge as is (comment typos)" },
+  "9043": { "bucket": "merge-here", "reason": "review: fix, then merge. Rebase onto the maintenance README notice" },
+  "9220": { "bucket": "merge-here", "reason": "review: merge as is (JSDoc param names match the signatures)" },
+  "9221": { "bucket": "merge-here", "reason": "review: merge as is (lock-threads v6.0.2; pinned SHA verified)" },
+  "9234": { "bucket": "merge-here", "reason": "review: fix, then merge. \"Seek to live, currently playing live\" is translated as \"behind live\"" },
+  "9236": {
+    "bucket": "close",
+    "reason": "review: duplicate of #9234, and its pt-BR.json is invalid JSON",
+    "message": "This adds the same Portuguese (Brazil) strings as #9234, and its `pt-BR.json` is missing a few commas, so we're closing it in favor of #9234."
+  },
+  "9241": { "bucket": "merge-here", "reason": "review: fix if needed, then merge. Run the karma tests locally and in CI before merging" },
+  "9242": { "bucket": "merge-here", "reason": "review: merge as is (Romanian; also fixes the Drop shadow key)" }
 }
