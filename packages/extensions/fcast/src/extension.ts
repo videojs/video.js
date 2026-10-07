@@ -49,9 +49,12 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
   #connected = false;
   #wasPlaying = false;
   #firstLoad = false;
+  #replaying = false;
   #lastSnapshot = EMPTY_SNAPSHOT;
   #override: MediaOverride;
   #version = 0;
+  #session = 0;
+  #unmutedVolume = 1;
 
   constructor(props: FCastExtensionProps = {}) {
     super();
@@ -70,7 +73,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     this.#detachedMedia = null;
     target.addEventListener('loadstart', this.#onLoadStart);
 
-    if (this.#connected) {
+    if (this.#connected && this.enabled) {
       this.#wasPlaying = !target.paused;
       target.pause();
       this.#firstLoad = true;
@@ -88,6 +91,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     media?.removeEventListener('loadstart', this.#onLoadStart);
     this.#detachedMedia = media;
     this.#media = null;
+    this.#invalidateLoads();
 
     if (media) this.#notify();
   }
@@ -96,6 +100,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     this.disconnect();
     this.detach();
     this.#sender?.removeEventListener('change', this.#onSenderChange);
+    this.#sender?.removeEventListener('error', this.#onSenderError);
 
     this.#sender = undefined;
     this.#connected = false;
@@ -104,18 +109,22 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
 
   /** @internal Player lifecycle. */
   disconnect(): void {
-    if (!this.#connected) return;
+    if (!this.#connected && this.snapshot.connection !== 'connecting') return;
+
+    const wasConnected = this.#connected;
 
     this.#connected = false;
-    this.#loadedSrc = null;
-    this.#restoreLocal(this.#lastSnapshot, this.#media ?? this.#detachedMedia);
+    this.#invalidateLoads();
+
+    if (wasConnected) this.#restoreLocal(this.#lastSnapshot, this.#media ?? this.#detachedMedia);
+
     void this.#sender?.disconnect().catch(this.#reportError);
     this.#notify();
   }
 
   /** @internal Read by the player media facade. */
   get mediaOverride(): MediaOverride | null {
-    return this.#connected ? this.#override : null;
+    return this.#connected && this.enabled ? this.#override : null;
   }
 
   /** Last state published by the supplied sender. */
@@ -143,17 +152,20 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     const previous = this.#sender;
 
     previous?.removeEventListener('change', this.#onSenderChange);
+    previous?.removeEventListener('error', this.#onSenderError);
 
-    if (previous && this.#connected) {
+    if (previous && previous.snapshot.connection !== 'disconnected') {
+      if (this.#connected) this.#restoreLocal(this.#lastSnapshot, this.#media ?? this.#detachedMedia);
+
       this.#connected = false;
-      this.#restoreLocal(this.#lastSnapshot);
       void previous.disconnect().catch(this.#reportError);
     }
 
+    this.#invalidateLoads();
     this.#sender = value;
-    this.#loadedSrc = null;
     this.#lastSnapshot = EMPTY_SNAPSHOT;
     value?.addEventListener('change', this.#onSenderChange);
+    value?.addEventListener('error', this.#onSenderError);
     this.#onSenderChange();
   }
 
@@ -197,7 +209,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     if (!this.enabled) throw new DOMException('Remote playback is disabled.', 'InvalidStateError');
 
     if (sender.snapshot.connection === 'connected') await sender.disconnect();
-    else await sender.prompt();
+    else if (sender.snapshot.connection !== 'connecting') await sender.prompt();
   }
 
   /** Load the current media URL on the connected receiver. */
@@ -205,28 +217,38 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     const sender = this.#sender;
     const media = this.#media;
     const src = this.src;
-    if (!sender || !media || !this.#connected || !src) return;
+    if (!sender || !media || !this.#connected || !this.enabled || !src) return;
 
     if (src === this.#loadedSrc) return this.#pendingLoad ?? undefined;
 
     const firstLoad = this.#firstLoad;
+    const session = this.#session;
 
     this.#firstLoad = false;
     this.#loadedSrc = src;
     const request = {
       url: src,
       contentType: this.#contentType ?? resolveMimeType(src) ?? '',
-      time: media.currentTime || 0,
-      paused: firstLoad ? !this.#wasPlaying : sender.snapshot.paused,
-      volume: media.muted ? 0 : media.volume,
-      speed: media.playbackRate,
+      time: sender.snapshot.ended ? 0 : media.currentTime || 0,
+      paused: this.#replaying ? false : firstLoad ? !this.#wasPlaying : sender.snapshot.paused,
+      volume: firstLoad ? (media.muted ? 0 : media.volume) : sender.snapshot.muted ? 0 : sender.snapshot.volume,
+      speed: firstLoad ? media.playbackRate : sender.snapshot.speed,
     };
+
+    this.#replaying = false;
 
     const pending = (this.#pendingLoad ?? Promise.resolve())
       .catch(() => {})
-      .then(() => sender.load(request))
+      .then(() => {
+        if (session !== this.#session || sender !== this.#sender || !this.#connected || !this.enabled) return;
+
+        return sender.load(request);
+      })
       .catch((error: unknown) => {
-        if (this.#loadedSrc === src) this.#loadedSrc = null;
+        if (session === this.#session && this.#loadedSrc === src) {
+          this.#loadedSrc = null;
+          this.#firstLoad = firstLoad;
+        }
 
         throw error;
       });
@@ -240,7 +262,17 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     }
   }
 
-  #onLoadStart = () => this.#followSource();
+  #invalidateLoads(): void {
+    this.#session += 1;
+    this.#loadedSrc = null;
+    this.#pendingLoad = null;
+  }
+
+  #onLoadStart = () => {
+    if (this.#connected && this.enabled) this.#media?.pause();
+
+    this.#followSource();
+  };
 
   #followSource(): void {
     if (this.#connected && this.src && this.#loadedSrc !== this.src) {
@@ -256,18 +288,22 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
 
     if (connected && !wasConnected) {
       this.#wasPlaying = !this.#media?.paused;
-      this.#media?.pause();
+
+      if (this.enabled) this.#media?.pause();
+
       this.#connected = true;
       this.#firstLoad = true;
       this.#loadedSrc = null;
       this.#followSource();
     } else if (!connected && wasConnected) {
       this.#connected = false;
-      this.#loadedSrc = null;
-      this.#restoreLocal(previous);
+      this.#invalidateLoads();
+      this.#restoreLocal(previous, this.#media ?? this.#detachedMedia);
     }
 
-    if (connected) {
+    if (next.volume > 0) this.#unmutedVolume = next.volume;
+
+    if (connected && this.enabled) {
       if (!wasConnected || next.paused !== previous.paused) {
         this.#media?.dispatchEvent(new Event(next.paused ? 'pause' : 'play'));
       }
@@ -283,8 +319,10 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
 
       if (!wasConnected || next.speed !== previous.speed) this.#media?.dispatchEvent(new Event('ratechange'));
 
-      if (next.buffering !== previous.buffering) {
-        this.#media?.dispatchEvent(new Event(next.buffering ? 'waiting' : 'playing'));
+      if (next.buffering && !previous.buffering) this.#media?.dispatchEvent(new Event('waiting'));
+
+      if (!next.paused && !next.buffering && (!wasConnected || previous.paused || previous.buffering)) {
+        this.#media?.dispatchEvent(new Event('playing'));
       }
 
       if (next.ended && !previous.ended) this.#media?.dispatchEvent(new Event('ended'));
@@ -300,7 +338,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
   }
 
   #restoreLocal(snapshot: FCastSnapshot, media = this.#media): void {
-    if (!media) return;
+    if (!media || media.disableRemotePlayback) return;
 
     if (Number.isFinite(snapshot.currentTime)) media.currentTime = snapshot.currentTime;
 
@@ -309,6 +347,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     media.playbackRate = snapshot.speed;
 
     if (!snapshot.paused && !snapshot.ended) void media.play().catch(this.#reportError);
+    else media.pause();
   }
 
   #createOverride(): MediaOverride {
@@ -343,7 +382,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
         return extension.snapshot.muted;
       },
       set muted(value: boolean) {
-        void extension.#sender?.setVolume(value ? 0 : (extension.#media?.volume ?? 1)).catch(extension.#reportError);
+        void extension.#sender?.setVolume(value ? 0 : extension.#unmutedVolume).catch(extension.#reportError);
       },
       get playbackRate() {
         return extension.snapshot.speed;
@@ -354,8 +393,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
       play() {
         if (extension.snapshot.ended) {
           extension.#loadedSrc = null;
-          extension.#firstLoad = true;
-          extension.#wasPlaying = true;
+          extension.#replaying = true;
           return extension.load();
         }
 
@@ -370,7 +408,14 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     };
   }
 
+  #onSenderError = (event: Event): void => {
+    // SAFETY: FCastBridge specifies error events as CustomEvent<unknown>.
+    this.#reportError((event as CustomEvent<unknown>).detail);
+  };
+
   #reportError = (error: unknown): void => {
+    this.dispatchEvent(new CustomEvent('error', { detail: error }));
+
     if (__DEV__) console.error('[FCast]', error);
   };
 }
