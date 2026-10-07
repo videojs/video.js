@@ -33,6 +33,8 @@ export interface UseSliderOptions<State extends SliderState = SliderState> exten
   | 'onDragEnd'
 > {
   computeState: (input: SliderInput) => State;
+  /** Optional fill projection while a seek transition is finishing. */
+  getStyleState?: ((state: State) => State) | undefined;
   orientation?: 'horizontal' | 'vertical' | undefined;
   disabled?: boolean | undefined;
   /** Adjust a raw 0–100 percent for thumb alignment. Called for fill and pointer percents. */
@@ -130,7 +132,8 @@ export function useSlider<State extends SliderState = SliderState>(
   }, [state.thumbAlignment]);
 
   // Adjust CSS var percents for edge thumb alignment using live DOM measurements.
-  const cssVars = options.getCSSVars(slider.adjustForAlignment(state));
+  const styleState = options.getStyleState?.(state) ?? state;
+  const cssVars = options.getCSSVars(slider.adjustForAlignment(styleState));
 
   const syncStyles = useCallback(
     (element = rootElementRef.current) => {
@@ -142,8 +145,9 @@ export function useSlider<State extends SliderState = SliderState>(
       if (!dragging && !pointing) return;
 
       const next = optionsRef.current.computeState(slider.input.current);
+      const visual = optionsRef.current.getStyleState?.(next) ?? next;
 
-      applyStyles(element, optionsRef.current.getCSSVars(slider.adjustForAlignment(next)));
+      applyStyles(element, optionsRef.current.getCSSVars(slider.adjustForAlignment(visual)));
     },
     [slider]
   );

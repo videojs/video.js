@@ -5,7 +5,7 @@ export default styles({
   prefix: 'media-time-slider',
   rules: {
     root: {
-      utilities: [],
+      utilities: 'data-playing:transition-[--media-slider-buffer]',
     },
     chapters: {
       utilities: 'relative flex size-full min-h-0 min-w-0 flex-1 items-center rounded-[inherit]',

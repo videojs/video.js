@@ -8,10 +8,14 @@ body:
     attributes:
       value: |
         Thanks for taking the time to file a bug report! Please fill this template out as completely as possible.
-        * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/v10/discussions) instead.
+        * If you are not reporting a bug, but want to ask a general question, use [discussions](https://github.com/videojs/video.js/discussions) instead.
         * Check the [docs](https://videojs.org/docs).
         * Please check to see if there's an existing issue and replying there instead.
         * Please give as much details as you can. Ideally, include a [minimal, reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
+
+        **Video.js 8 receives security fixes only** until October 1, 2028, so non-security v8 bugs are closed. See the [migration guide](https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8) to move to Video.js 10.
+
+        **Security vulnerabilities:** don't file them here. [Report them privately](https://github.com/videojs/video.js/security/advisories/new).
   - type: checkboxes
     attributes:
       label: Is there an existing issue for this?
@@ -19,6 +23,15 @@ body:
       options:
         - label: I have searched the existing issues
           required: true
+  - type: dropdown
+    id: major-version
+    validations:
+      required: true
+    attributes:
+      label: Which major version of Video.js are you using?
+      options:
+        - Video.js 10 (@videojs/*)
+        - Video.js 8 (video.js@8)
   - type: dropdown
     id: affected
     validations:

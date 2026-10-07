@@ -44,9 +44,9 @@ members:
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](../../LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/html
 [package-badge]: https://img.shields.io/npm/v/@videojs/html?label=@videojs/html
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions

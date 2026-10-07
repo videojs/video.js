@@ -56,6 +56,24 @@ HLS video element powered by [hls.js](https://github.com/video-dev/hls.js/) for 
   </StyleCase>
 </FrameworkCase>
 
+## Cookie-gated streams
+
+A stream on another origin that is gated by cookies — CloudFront signed cookies, for example — needs those cookies on every manifest and segment request, or the CDN answers 403. Set the standard `crossorigin="use-credentials"` on the element and hls.js sends them (`withCredentials` on its XHR loader, `credentials: 'include'` on its fetch loader), the same way the browser does under native playback. Any other value, or no attribute, leaves hls.js's default and sends no cross-origin cookies. An `xhrSetup` or `fetchSetup` you pass through `source.engine.hlsJs` still runs, after this, on the same request.
+
+The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`, or the browser refuses the credentialed response.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsJsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<hlsjs-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hlsjs-video>
+```
+</FrameworkCase>
+
 <MediaReference media="HlsJsVideo">
   <Fragment slot="engine-hlsJs">
     Pass hls.js's own configuration here. It's handed to hls.js untouched, so every option in its [config reference](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) works, spelled the way hls.js spells it. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.

@@ -1,6 +1,7 @@
 import { type DrmSystemsConfig, type MediaStreamType, MediaStreamTypes } from '@videojs/media';
 import { HTMLVideoAdapter } from '@videojs/media/dom';
 
+import { NativeHlsChaptersMixin } from './chapters';
 import { NativeHlsDrmMixin } from './drm';
 import { NativeHlsErrorsMixin } from './errors';
 import { NativeHlsLiveMixin } from './live';
@@ -152,6 +153,6 @@ class NativeHlsAdapterCore extends HTMLVideoAdapter implements Omit<NativeHlsAda
   }
 }
 
-export class NativeHlsAdapter extends NativeHlsLiveMixin(
-  NativeHlsStreamTypeMixin(NativeHlsDrmMixin(NativeHlsErrorsMixin(NativeHlsAdapterCore)))
+export class NativeHlsAdapter extends NativeHlsChaptersMixin(
+  NativeHlsLiveMixin(NativeHlsStreamTypeMixin(NativeHlsDrmMixin(NativeHlsErrorsMixin(NativeHlsAdapterCore))))
 ) {}

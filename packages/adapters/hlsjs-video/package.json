@@ -1,6 +1,6 @@
 {
   "name": "@videojs/hlsjs-video",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "hls.js playback adapter for Video.js",
   "keywords": [
     "hls",
@@ -13,7 +13,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videojs/v10",
+    "url": "https://github.com/videojs/video.js",
     "directory": "packages/adapters/hlsjs-video"
   },
   "files": [
@@ -44,8 +44,9 @@
   "dependencies": {
     "@videojs/media": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
+    "@videojs/spf": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "hls.js": "1.6.7"
+    "hls.js": "1.6.19"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",

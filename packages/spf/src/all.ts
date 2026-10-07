@@ -22,6 +22,7 @@ export type {
   HlsJsonChapters,
 } from './media/hls/parse-json-chapters';
 export { APPLE_HLS_CHAPTERS_DATA_ID, parseHlsJsonChapters } from './media/hls/parse-json-chapters';
+export { findSessionDataUri } from './media/hls/session-data';
 export { parseMediaPlaylist } from './media/hls/parse-media-playlist';
 export { parseMultivariantPlaylist } from './media/hls/parse-multivariant';
 export { resolveUrl } from './media/hls/resolve-url';
@@ -90,6 +91,7 @@ export {
 } from './media/dom/mse/mediasource-setup';
 export type { AddChaptersTracksOptions } from './media/dom/text/chapters-tracks';
 export { addChaptersTracksToMedia, removeAllChaptersTracksFromMedia } from './media/dom/text/chapters-tracks';
+export { loadChaptersTracks } from './media/dom/text/load-chapters-tracks';
 export { fetchResolvable, getResponseText } from './network/fetch';
 
 // =============================================================================

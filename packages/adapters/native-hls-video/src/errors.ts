@@ -58,6 +58,12 @@ export function NativeHlsErrorsMixin<Base extends Constructor<NativeHlsHost>>(Ba
       target.addEventListener(
         'error',
         (event) => {
+          // A capture listener also sees the errors of `<track>` and `<source>`
+          // children on their way down; stopping those would keep them from the
+          // listeners on the child itself, such as a chapters track waiting for
+          // its load to settle.
+          if (event.target !== target) return;
+
           event.stopImmediatePropagation();
 
           const native = target.error;

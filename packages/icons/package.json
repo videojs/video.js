@@ -1,6 +1,6 @@
 {
   "name": "@videojs/icons",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "private": true,
   "description": "SVG icon library for Video.js",
   "keywords": [
@@ -11,7 +11,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videojs/v10",
+    "url": "https://github.com/videojs/video.js",
     "directory": "packages/icons"
   },
   "files": [

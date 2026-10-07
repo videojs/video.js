@@ -1,7 +1,7 @@
 import { isFunction, isObject, isUndefined } from '@videojs/utils/predicate';
 
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from './constants';
-import type { MediaBufferState, MediaTimeState } from './state';
+import type { MediaBufferState, MediaPlaybackState, MediaTimeState } from './state';
 import { MediaReadyState } from './types';
 import type {
   EngineAdapter,
@@ -43,6 +43,17 @@ export function getTimeRangeEnd(media: MediaTimeRangeState): number {
 /** @internal */
 export function hasTimeRange(media: MediaTimeRangeState): boolean {
   return getTimeRangeEnd(media) > 0;
+}
+
+/**
+ * Whether playback is running without waiting for data.
+ *
+ * @internal
+ */
+export function isMediaPlaying(
+  media: Pick<MediaPlaybackState, 'paused' | 'ended' | 'waiting'> | null | undefined
+): boolean {
+  return !!media && !media.paused && !media.ended && !media.waiting;
 }
 
 export function isMediaPauseCapable(value: unknown): value is MediaPauseCapability {

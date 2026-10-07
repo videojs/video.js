@@ -452,6 +452,28 @@ export function createTurndown(): TurndownService {
     },
   });
 
+  // Footnotes render as numbered links into a definitions section; emit GFM footnote syntax instead, which agents and
+  // Markdown renderers read as footnotes rather than as links to ids the Markdown file does not have.
+  turndown.addRule('footnote-ref', {
+    filter: (node) => node.nodeName === 'A' && hasAttribute(node, 'data-footnote-ref'),
+    replacement: (content) => `[^${content}]`,
+  });
+
+  turndown.addRule('footnotes', {
+    filter: (node) => node.nodeName === 'SECTION' && hasAttribute(node, 'data-footnotes'),
+    replacement: (_content, node) => {
+      const items = Array.from(node.querySelector('ol')?.children ?? []);
+      const definitions = items.map((item, index) => {
+        // SAFETY: the children of an `<ol>` are `<li>` elements.
+        const body = turndown.turndown(item as HTMLElement).replace(/\n(?=[^\n])/g, '\n    ');
+
+        return `[^${index + 1}]: ${body}`;
+      });
+
+      return `\n\n${definitions.join('\n')}\n\n`;
+    },
+  });
+
   // Flatten docs link cards, whose block markup nests inside the <a>, into list items.
   // Emitting a single leading/trailing newline keeps a run of adjacent cards as one tight list.
   turndown.addRule('docs-link-card', {
