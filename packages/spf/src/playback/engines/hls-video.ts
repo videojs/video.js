@@ -1,12 +1,11 @@
 import type { Simplify } from '@videojs/utils/types';
 
-import {
-  type ConfigWithDefaults,
-  defineCompositionFactory,
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
-} from '../../core/composition/create-composition';
+import { type ConfigWithDefaults, defineCompositionFactory } from '../../core/composition/create-composition';
+import type {
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+} from '../../core/composition/define-behavior';
 import { flattenFeatures } from '../../core/composition/define-feature';
 import { airPlayFeature } from './hls/features/airplay';
 import { airPlayFairPlayFeature } from './hls/features/airplay-fairplay';

@@ -13,13 +13,7 @@ export const VERSION = '0.1.0';
 // Composition
 // =============================================================================
 
-export type {
-  Composition,
-  CompositionOptions,
-  ResolveBehaviorConfig,
-  ResolveBehaviorContext,
-  ResolveBehaviorState,
-} from './core/composition/create-composition';
+export type { Composition, CompositionOptions } from './core/composition/create-composition';
 export { createComposition, defineCompositionFactory } from './core/composition/create-composition';
 export type {
   Behavior,
@@ -29,6 +23,9 @@ export type {
   InferBehaviorConfig,
   InferBehaviorContext,
   InferBehaviorState,
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
   StateSignals,
 } from './core/composition/define-behavior';
 export { defineBehavior } from './core/composition/define-behavior';

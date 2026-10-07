@@ -1,10 +1,10 @@
 import type { Simplify } from '@videojs/utils/types';
 
-import {
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
-} from '../../../../core/composition/create-composition';
+import type {
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+} from '../../../../core/composition/define-behavior';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { canPlayTrackWithDrm } from '../../../../media/dom/capabilities';
 import { DEFAULT_KEY_SYSTEMS } from '../../../../media/dom/key-systems';

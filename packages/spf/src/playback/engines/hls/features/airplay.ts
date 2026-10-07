@@ -1,10 +1,10 @@
 import type { Simplify } from '@videojs/utils/types';
 
-import {
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
-} from '../../../../core/composition/create-composition';
+import type {
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+} from '../../../../core/composition/define-behavior';
 import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { attachMediaSourceAsSourceElement } from '../../../../media/dom/mse/mediasource-setup';

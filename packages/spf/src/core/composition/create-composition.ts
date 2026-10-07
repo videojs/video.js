@@ -6,58 +6,12 @@ import type {
   BehaviorDeps,
   ContextSignals,
   Empty,
-  InferBehaviorConfig,
-  InferBehaviorContext,
-  InferBehaviorState,
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
   StateSignals,
 } from './define-behavior';
 import type { CheckKeyedFields } from './keyed-by';
-
-// =============================================================================
-// Behavior list resolution
-// =============================================================================
-
-/**
- * Recursively intersect a per-behavior projection across the tuple.
- *
- * Iterating over the tuple directly avoids `UnionToIntersection`'s function-contravariance trick, which produces
- * unstable intersections (collapsing concrete fields to `never` or unrelated types) when one of the union members is
- * the empty `{}` fallback.
- */
-type IntersectBehaviors<Behaviors extends readonly AnyBehavior[], Project extends object> = Behaviors extends readonly [
-  infer First extends AnyBehavior,
-  ...infer Rest extends readonly AnyBehavior[],
-]
-  ? Apply<Project, First> & IntersectBehaviors<Rest, Project>
-  : Empty;
-
-/**
- * Apply a projection (one of the marker types below) to a single behavior. Encoded as a discriminated dispatch so the
- * recursion above can stay generic and we don't have to write three near-identical recursive types.
- */
-type Apply<Project extends object, F> = Project extends { kind: 'state' }
-  ? InferBehaviorState<F>
-  : Project extends { kind: 'context' }
-    ? InferBehaviorContext<F>
-    : Project extends { kind: 'config' }
-      ? InferBehaviorConfig<F>
-      : never;
-
-type StateProjection = { kind: 'state' };
-type ContextProjection = { kind: 'context' };
-type ConfigProjection = { kind: 'config' };
-
-/** Resolve the combined state shape from an array of behaviors (intersection of all requirements). */
-export type ResolveBehaviorState<Behaviors extends readonly AnyBehavior[]> =
-  IntersectBehaviors<Behaviors, StateProjection> extends infer R extends object ? R : Empty;
-
-/** Resolve the combined context shape from an array of behaviors (intersection of all requirements). */
-export type ResolveBehaviorContext<Behaviors extends readonly AnyBehavior[]> =
-  IntersectBehaviors<Behaviors, ContextProjection> extends infer R extends object ? R : Empty;
-
-/** Resolve the combined config shape from an array of behaviors (intersection of all requirements). */
-export type ResolveBehaviorConfig<Behaviors extends readonly AnyBehavior[]> =
-  IntersectBehaviors<Behaviors, ConfigProjection> extends infer R extends object ? R : Empty;
 
 /**
  * True if any property in `T` collapsed to `undefined` or `never` — indicating a type conflict from intersecting
