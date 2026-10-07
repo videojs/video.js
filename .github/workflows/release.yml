@@ -6,6 +6,9 @@ on:
     - "v[0-9]+.[0-9]+.[0-9]+"
     # match semver pre-releases
     - "v[0-9]+.[0-9]+.[0-9]+-*"
+permissions:
+  contents: read
+
 jobs:
   release:
     env:
@@ -82,6 +85,8 @@ jobs:
           discussion_category_name: Releases
 
   deploy:
+    permissions:
+      contents: none
     needs: release
     runs-on: ubuntu-latest
     environment: Deploy
