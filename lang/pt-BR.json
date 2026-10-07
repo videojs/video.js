@@ -9,6 +9,8 @@
   "Remaining Time": "Tempo Restante",
   "Stream Type": "Tipo de Stream",
   "LIVE": "AO VIVO",
+  "Seek to live, currently behind live": "Buscar ao vivo, atualmente atrás do ao vivo",
+  "Seek to live, currently playing live": "Buscar ao vivo, atualmente reproduzindo ao vivo",
   "Loaded": "Carregado",
   "Progress": "Progresso",
   "Progress Bar": "Barra de progresso",
@@ -84,5 +86,13 @@
   "End of dialog window.": "Fim da Janela-de-Diálogo",
   "{1} is loading.": "{1} está carregando.",
   "Exit Picture-in-Picture": "Sair de Picture-in-Picture",
-  "Picture-in-Picture": "Picture-in-Picture"
+  "Picture-in-Picture": "Picture-in-Picture",
+  "No content": "Sem conteúdo",
+  "Color": "Cor",
+  "Opacity": "Opacidade",
+  "Text Background": "Fundo do texto",
+  "Caption Area Background": "Fundo da área de legenda",
+  "Playing in Picture-in-Picture": "Reproduzindo em Picture-in-Picture",
+  "Skip backward {1} seconds": "Retroceder {1} segundos",
+  "Skip forward {1} seconds": "Avançar {1} segundos"
 }
