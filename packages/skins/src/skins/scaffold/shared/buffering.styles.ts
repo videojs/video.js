@@ -11,5 +11,11 @@ export default styles({
     spinnerIcon: {
       utilities: 'size-7',
     },
+    controls: {
+      utilities: 'group/buffering-controls contents',
+    },
+    backdrop: {
+      utilities: 'z-40 group-not-data-visible/buffering-controls:bg-[rgba(0,0,0,0.4)] forced-colors:bg-transparent!',
+    },
   },
 });

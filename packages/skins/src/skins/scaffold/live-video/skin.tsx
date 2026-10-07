@@ -8,7 +8,7 @@ import containerStyles from '../shared/container.styles';
 import { ErrorDialog } from '../shared/error-dialog';
 import { Indicators } from '../shared/indicators';
 import { StatusAnnouncer } from '../shared/status-announcer';
-import { BufferingIndicator, Poster } from '../shared/video-feedback';
+import { Poster } from '../shared/video-feedback';
 import { LiveVideoControls } from './controls';
 
 export interface LiveVideoSkinProps extends Omit<PropsOf<typeof $.Container>, 'children'> {
@@ -26,7 +26,6 @@ export function LiveVideoSkin({ children, className, renderPoster, ...props }: L
     >
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
-      <BufferingIndicator />
       <ErrorDialog />
       <LiveVideoControls />
 

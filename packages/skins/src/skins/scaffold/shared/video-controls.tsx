@@ -5,6 +5,7 @@ import { ControlsContent, type ControlsSlots } from './controls';
 import controlsStyles from './controls.styles';
 import { ScreenControls } from './screen-controls';
 import { Title } from './title';
+import { VideoBufferingIndicator } from './video-feedback';
 
 export function VideoControlsContent({
   center = false,
@@ -17,6 +18,7 @@ export function VideoControlsContent({
   return (
     <>
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
+      <VideoBufferingIndicator />
       <ControlsContent
         center={center}
         live={live}

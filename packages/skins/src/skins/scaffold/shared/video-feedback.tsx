@@ -22,3 +22,11 @@ export function BufferingIndicator({ className }: { className?: ClassNameValue }
     </$.BufferingIndicator>
   );
 }
+
+export function VideoBufferingIndicator() {
+  return (
+    <$.Controls.Group className={bufferingStyles.controls}>
+      <BufferingIndicator className={bufferingStyles.backdrop} />
+    </$.Controls.Group>
+  );
+}

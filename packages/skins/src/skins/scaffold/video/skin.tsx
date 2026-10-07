@@ -9,7 +9,7 @@ import { ErrorDialog } from '../shared/error-dialog';
 import { Indicators } from '../shared/indicators';
 import { SeekIndicator } from '../shared/seek-indicator';
 import { StatusAnnouncer } from '../shared/status-announcer';
-import { BufferingIndicator, Poster } from '../shared/video-feedback';
+import { Poster } from '../shared/video-feedback';
 import { VideoControls } from './controls';
 
 export interface VideoSkinProps extends Omit<PropsOf<typeof $.Container>, 'children'> {
@@ -28,7 +28,6 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
     >
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
-      <BufferingIndicator />
       <ErrorDialog />
       <VideoControls renderThumbnail={renderThumbnail} />
 
