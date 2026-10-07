@@ -1,3 +1,10 @@
+import type { Simplify } from '@videojs/utils/types';
+
+import {
+  type ResolveBehaviorConfig,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
+} from '../../../../core/composition/create-composition';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { canPlayTrack } from '../../../../media/dom/capabilities';
 import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../../media/errors';
@@ -25,6 +32,34 @@ const videoConstraints = [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO
 // Narrow to the renditions that fit the screen, then take the largest.
 const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenResolutionCap, preferHighestResolution];
 
+/** The behaviors the feature composes, in setup order. */
+export const behaviors = [
+  selectVideoTrack,
+  resolveVideoTrack,
+  setupVideoBufferActors,
+  loadVideoSegments,
+  trackScreenResolution,
+] as const;
+
+export type Behaviors = typeof behaviors;
+/** Every config key the behaviors read. */
+export type Config = ResolveBehaviorConfig<Behaviors>;
+/** Every state key the behaviors and external signals declare. */
+export type State = Simplify<ResolveBehaviorState<Behaviors>>;
+/** Every context key the behaviors declare. */
+export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
+
+/** The config defaults the feature contributes. */
+export const defaultConfig = {
+  videoConstraints,
+  videoRules,
+  canPlayTrack,
+  reportUnsupportedTrackConditions,
+} satisfies Partial<Config>;
+
+/** The state values the feature seeds. */
+export const initialState = {} satisfies Partial<State>;
+
 /**
  * Plays one video rendition for the whole session: the largest that fits the screen, picked once rather than adapted to
  * bandwidth. For ambient, hero, and GIF-replacement video. Reports when no rendition is playable.
@@ -36,7 +71,4 @@ const videoRules: NonNullable<SelectVideoTrackConfig['videoRules']> = [screenRes
  * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
  *   init segments load.
  */
-export const backgroundVideoFeature = defineFeature({
-  behaviors: [selectVideoTrack, resolveVideoTrack, setupVideoBufferActors, loadVideoSegments, trackScreenResolution],
-  defaultConfig: { videoConstraints, videoRules, canPlayTrack, reportUnsupportedTrackConditions },
-});
+export const backgroundVideoFeature = defineFeature({ behaviors, defaultConfig, initialState });
