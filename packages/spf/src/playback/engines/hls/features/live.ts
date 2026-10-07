@@ -11,6 +11,7 @@ import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../../../media/
 import { seekToLiveEdge } from '../../../behaviors/dom/seek-to-live-edge';
 import { syncLiveSeekableRange } from '../../../behaviors/dom/sync-live-seekable-range';
 import { establishStartMediaTime, gateFirstParseOnAnchor } from '../../../behaviors/establish-start-media-time';
+import type { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../../../behaviors/resolve-track';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [syncLiveSeekableRange, seekToLiveEdge, establishStartMediaTime] as const;
@@ -23,10 +24,15 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 /** Every context key the behaviors declare. */
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
-/**
- * The config defaults the feature contributes. `reschedule` and `gateFirstParse` are read by the track features'
- * resolvers, not by this feature's own behaviors, so the object is not checked against `Config`.
- */
+/** This feature's behaviors plus the track resolvers, which read `reschedule` and `gateFirstParse`. */
+type ConfigReaders = readonly [
+  ...Behaviors,
+  typeof resolveVideoTrack,
+  typeof resolveAudioTrack,
+  typeof resolveTextTrack,
+];
+
+/** The config defaults the feature contributes. */
 export const defaultConfig = {
   // Format-neutral live-latency seam for `seekToLiveEdge` — the HLS resolver
   // (HOLD-BACK); a DASH engine would inject `suggestedPresentationDelay`.
@@ -38,7 +44,7 @@ export const defaultConfig = {
   // waits for the reference track to settle the wall-clock anchor question
   // (see `gate-first-parse.ts`); pairs with the reactor's anchor stamp.
   gateFirstParse: gateFirstParseOnAnchor,
-};
+} satisfies Partial<ResolveBehaviorConfig<ConfigReaders>>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;

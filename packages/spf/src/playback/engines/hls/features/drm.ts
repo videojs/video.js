@@ -11,10 +11,13 @@ import { DEFAULT_KEY_SYSTEMS } from '../../../../media/dom/key-systems';
 import type { DrmSystemsConfig } from '../../../../media/drm';
 import { exchangeLicenses } from '../../../behaviors/dom/exchange-licenses';
 import { setupMediaKeys } from '../../../behaviors/dom/setup-media-keys';
+import type { resolveAudioTrack, resolveVideoTrack } from '../../../behaviors/resolve-track';
 import {
   DEFAULT_AUDIO_CONSTRAINTS,
   DEFAULT_VIDEO_CONSTRAINTS,
+  type switchAudioTrack,
   type SwitchAudioTrackRule,
+  type switchVideoTrack,
   type SwitchVideoTrackRule,
 } from '../../../behaviors/track-switching';
 import { reportUnsupportedTrackConditionsWithDrm } from '../../../primitives/report-track-conditions';
@@ -53,9 +56,18 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /**
- * The config defaults the feature contributes. Most keys here are read by `videoFeature`'s and `audioFeature`'s
- * behaviors rather than this feature's own, so they are typed above instead of checked against `Config`.
+ * This feature's behaviors plus the track switchers and resolvers, which read the DRM-aware probe, reporter, and
+ * constraints.
  */
+type ConfigReaders = readonly [
+  ...Behaviors,
+  typeof switchVideoTrack,
+  typeof switchAudioTrack,
+  typeof resolveVideoTrack,
+  typeof resolveAudioTrack,
+];
+
+/** The config defaults the feature contributes. */
 export const defaultConfig = {
   // No license servers configured is the degenerate DRM config: the DRM-aware
   // probe and reporter refuse encrypted renditions exactly as the DRM-less
@@ -70,7 +82,7 @@ export const defaultConfig = {
   videoConstraints: drmAwareVideoConstraints,
   audioConstraints: drmAwareAudioConstraints,
   reportUnsupportedTrackConditions: reportUnsupportedTrackConditionsWithDrm,
-};
+} satisfies Partial<ResolveBehaviorConfig<ConfigReaders>>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;

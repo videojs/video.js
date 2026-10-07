@@ -6,6 +6,7 @@ import {
   type ResolveBehaviorState,
 } from '../../../../core/composition/create-composition';
 import { defineFeature } from '../../../../core/composition/define-feature';
+import type { setupTextTrackActors } from '../../../behaviors/dom/setup-text-track-actors';
 import { relocatingTextPipelines } from '../../../primitives/relocation-pipelines';
 
 /** The behaviors the feature composes, in setup order. */
@@ -19,11 +20,13 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 /** Every context key the behaviors declare. */
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
-/**
- * The config defaults the feature contributes. The feature has no behaviors of its own, so `Config` is empty and the
- * key is read by `textTracksFeature`'s loaders.
- */
-export const defaultConfig = { textMessagePipelines: relocatingTextPipelines };
+/** `setupTextTrackActors`, which reads `textMessagePipelines`; the feature has no behaviors of its own. */
+type ConfigReaders = readonly [...Behaviors, typeof setupTextTrackActors];
+
+/** The config defaults the feature contributes. */
+export const defaultConfig = { textMessagePipelines: relocatingTextPipelines } satisfies Partial<
+  ResolveBehaviorConfig<ConfigReaders>
+>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;
