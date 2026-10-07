@@ -14,12 +14,12 @@ import {
   skinCases,
 } from './vjsc-skin-parity';
 
-// Compat has different controls and motion from Default/Neutral; compare its output rather than their styling contracts.
-export function testCompatParity(preset: SkinPreset) {
+// Compat and Scaffold have different controls and motion from Default/Neutral; compare their rendered output.
+export function testOutputParity(preset: SkinPreset) {
   const live = preset.startsWith('live-');
   const audio = preset.endsWith('audio');
 
-  for (const variant of skinCases(preset).filter((variant) => variant.skin.startsWith('compat-'))) {
+  for (const variant of skinCases(preset).filter((variant) => /^(compat|scaffold)-/.test(variant.skin))) {
     const params = { ...variant, media: live ? 'hls-live' : 'mp4-1', width: 672 };
 
     test(`${variant.framework} ${variant.skin} keeps CSS and Tailwind rendering in sync`, async ({

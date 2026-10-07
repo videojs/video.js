@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-import { testCompatParity } from './compat';
+import { testOutputParity } from './output-parity';
 import { testRtlLayout } from './rtl';
 import {
   captureRendering,
@@ -22,7 +22,7 @@ import {
   settleFonts,
 } from './vjsc-skin-parity';
 
-const CASES = skinCases('video').filter((variant) => !variant.skin.startsWith('compat-'));
+const CASES = skinCases('video').filter((variant) => /^(default|neutral)-/.test(variant.skin));
 const REACT_DEFAULT: SkinCase = { framework: 'react', skin: 'default-video' };
 const WIDTHS = [320, 800] as const;
 const BUFFERING_INDICATOR_SELECTOR =
@@ -42,8 +42,8 @@ const LAYOUT_SELECTORS = [CONTROLS_SELECTOR, POSTER_SELECTOR] as const;
  */
 const THUMBNAIL_SPINNER_SELECTOR = ':scope > :last-child > :first-child > :is(svg, media-icon)';
 
-testRtlLayout(CASES);
-testCompatParity('video');
+testRtlLayout(skinCases('video').filter((variant) => !variant.skin.startsWith('compat-')));
+testOutputParity('video');
 
 for (const variant of CASES) {
   test(`${variant.framework} ${variant.skin} keeps poster sizing and fit in sync`, async ({ page }) => {
@@ -749,13 +749,15 @@ test('menu item and moving-highlight styling matches across styles', async ({ pa
 });
 
 test('pointer focus does not keep the slider preview visible', async ({ page }) => {
-  for (const variant of CASES) {
+  for (const variant of skinCases('video').filter((variant) => !variant.skin.startsWith('compat-'))) {
     const { panels } = await openVariants(page, variant, 800);
 
     for (const { root } of panels) {
       const thumb = root.getByRole('slider', { name: 'Seek' });
       const slider = thumb.locator('..');
-      const previewContent = slider.locator(':scope > :last-child > :last-child');
+      const previewContent = slider.locator(
+        variant.skin.startsWith('scaffold-') ? ':scope > :last-child' : ':scope > :last-child > :last-child'
+      );
 
       await slider.scrollIntoViewIfNeeded();
 
@@ -766,12 +768,16 @@ test('pointer focus does not keep the slider preview visible', async ({ page }) 
       await page.mouse.click(sliderRect.x + sliderRect.width / 2, sliderRect.y + sliderRect.height / 2);
       await expect(thumb).toBeFocused();
       expect(await thumb.evaluate((element) => element.matches(':focus-visible'))).toBe(false);
+      await expect(previewContent).toHaveCSS('opacity', '1');
 
       await page.mouse.move(rootRect.x + 1, rootRect.y + 1);
 
       await expect(slider).not.toHaveAttribute('data-pointing', '');
       await expect(slider).toHaveAttribute('data-interactive', '');
       await expect(previewContent).toHaveCSS('opacity', '0');
+
+      // Scaffold does not show a preview for keyboard focus alone.
+      if (variant.skin.startsWith('scaffold-')) continue;
 
       await page.keyboard.press('Tab');
       await page.keyboard.press('Shift+Tab');
@@ -955,7 +961,7 @@ async function openPackagedVariants(page: Page, variant: SkinCase, width: number
 async function preparePanel({ root }: SkinPanel, width: number) {
   await expect(root).toBeVisible();
   await expect(root).toHaveAttribute('data-controls-visible', '');
-  await expect(root.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
+  await expect(root.getByRole('button', { name: 'Play', exact: true }).last()).toBeVisible();
 
   const poster = root.locator('[data-loaded]').first();
 
