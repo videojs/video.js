@@ -35,6 +35,13 @@ const ACTIONABLE = ['keep-v8', 'close', 'close-pr'];
 const BRANCH_URL = `https://github.com/${REPO}/tree/8.x`;
 const POLICY_URL = `https://github.com/${REPO}/security/policy`;
 const REPORT_URL = `https://github.com/${REPO}/security/advisories/new`;
+const GUIDE_URL = (framework) => `https://videojs.org/docs/framework/${framework}/guides/migrate-from-video-js-8`;
+
+const MIGRATION = [
+  `**Moving to Video.js 10?** The migration guide maps v8 options, techs, plugins, and the player API onto v10: [HTML](${GUIDE_URL('html')}) · [React](${GUIDE_URL('react')}).`,
+  '',
+  `**Migrating with a coding agent?** Paste the prompt from the guide's AI Quickstart section into your agent: [HTML](${GUIDE_URL('html')}#ai-quickstart) · [React](${GUIDE_URL('react')}#ai-quickstart).`,
+].join('\n');
 
 const COMMENTS = {
   close: (item) =>
@@ -42,7 +49,11 @@ const COMMENTS = {
       item.reason.startsWith('addressed in v10') ? 'This is addressed in Video.js 10.\n' : null,
       `Video.js 10 is now the current version. Video.js 8 is maintained on the [\`8.x\` branch](${BRANCH_URL}) and receives security fixes only — see the [security policy](${POLICY_URL}).`,
       '',
-      `We're closing v8 issues that aren't security-related. If this still applies to Video.js 10, please open a new issue with a reproduction. To report a vulnerability in any version, use [private vulnerability reporting](${REPORT_URL}).`,
+      `We're closing v8 issues that aren't security-related. If this still applies to Video.js 10, please open a new issue with a reproduction and link back here so we keep the context.`,
+      '',
+      MIGRATION,
+      '',
+      `If this is a security vulnerability, don't add details here. Report it privately through [private vulnerability reporting](${REPORT_URL}).`,
       '',
       'Thank you for helping improve Video.js.',
     ]
@@ -53,6 +64,8 @@ const COMMENTS = {
       'Thank you for this contribution. Video.js 10 has replaced the v8 source on `main`, so this pull request no longer applies here.',
       '',
       `Video.js 8 is maintained on the [\`8.x\` branch](${BRANCH_URL}) and receives security fixes only — see the [security policy](${POLICY_URL}). If this fixes a security issue in v8, leave a comment and we'll retarget it to \`8.x\`. If the change still matters for Video.js 10, please open an issue or a new pull request against the current \`main\`.`,
+      '',
+      MIGRATION,
     ].join('\n'),
 };
 
