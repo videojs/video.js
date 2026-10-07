@@ -6,7 +6,7 @@ export default styles({
   rules: {
     root: {
       utilities:
-        'pointer-events-none absolute inset-0 grid place-items-center not-data-visible:hidden not-data-visible:[--media-spinner-animation:none]',
+        'pointer-events-none absolute inset-0 grid place-items-center not-data-visible:hidden not-data-visible:[--media-spinner-animation:none] motion-reduce:[--media-spinner-animation:none]',
     },
     spinnerIcon: {
       utilities: 'size-7',
