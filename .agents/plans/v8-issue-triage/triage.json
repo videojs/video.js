@@ -1,0 +1,4727 @@
+[
+  {
+    "number": 396,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2019-05-07T16:35:05Z"
+  },
+  {
+    "number": 422,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2020-04-10T08:25:01Z"
+  },
+  {
+    "number": 624,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2020-08-06T06:53:11Z"
+  },
+  {
+    "number": 835,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:06Z"
+  },
+  {
+    "number": 1147,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:28Z"
+  },
+  {
+    "number": 1169,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2024-06-01T14:18:28Z"
+  },
+  {
+    "number": 1170,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:32Z"
+  },
+  {
+    "number": 1277,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:24Z"
+  },
+  {
+    "number": 1445,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:17Z"
+  },
+  {
+    "number": 1474,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:18Z"
+  },
+  {
+    "number": 1602,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:08Z"
+  },
+  {
+    "number": 1880,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2019-06-26T05:32:37Z"
+  },
+  {
+    "number": 1913,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2020-07-12T13:53:24Z"
+  },
+  {
+    "number": 1962,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:23Z"
+  },
+  {
+    "number": 1981,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:30Z"
+  },
+  {
+    "number": 2004,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2015-04-03T00:45:26Z"
+  },
+  {
+    "number": 2006,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:02Z"
+  },
+  {
+    "number": 2033,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:33Z"
+  },
+  {
+    "number": 2045,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2025-02-25T08:57:20Z"
+  },
+  {
+    "number": 2066,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2022-03-21T14:31:01Z"
+  },
+  {
+    "number": 2235,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:05Z"
+  },
+  {
+    "number": 2268,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:42Z"
+  },
+  {
+    "number": 2341,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:05Z"
+  },
+  {
+    "number": 2355,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2023-08-04T23:16:08Z"
+  },
+  {
+    "number": 2369,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:32Z"
+  },
+  {
+    "number": 2603,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2018-07-02T19:06:22Z"
+  },
+  {
+    "number": 2632,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:41Z"
+  },
+  {
+    "number": 2669,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2020-05-13T12:30:53Z"
+  },
+  {
+    "number": 2730,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2019-07-30T19:17:16Z"
+  },
+  {
+    "number": 2734,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:31Z"
+  },
+  {
+    "number": 2777,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:09Z"
+  },
+  {
+    "number": 2846,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:24Z"
+  },
+  {
+    "number": 2851,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:32Z"
+  },
+  {
+    "number": 2901,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:16Z"
+  },
+  {
+    "number": 2910,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:15Z"
+  },
+  {
+    "number": 2912,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:39Z"
+  },
+  {
+    "number": 2914,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-03T15:13:54Z"
+  },
+  {
+    "number": 2932,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:13Z"
+  },
+  {
+    "number": 2958,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:26Z"
+  },
+  {
+    "number": 2979,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:39Z"
+  },
+  {
+    "number": 3018,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:35Z"
+  },
+  {
+    "number": 3035,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:07Z"
+  },
+  {
+    "number": 3061,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:29Z"
+  },
+  {
+    "number": 3097,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2020-04-13T15:51:43Z"
+  },
+  {
+    "number": 3152,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:03Z"
+  },
+  {
+    "number": 3159,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:02Z"
+  },
+  {
+    "number": 3217,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-07-02T19:06:23Z"
+  },
+  {
+    "number": 3249,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "false positive (\"dependency injection\"); v8 fullscreen API",
+    "updated_at": "2022-01-13T21:42:27Z"
+  },
+  {
+    "number": 3307,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:13Z"
+  },
+  {
+    "number": 3390,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:13Z"
+  },
+  {
+    "number": 3419,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-11-15T20:48:48Z"
+  },
+  {
+    "number": 3592,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:34Z"
+  },
+  {
+    "number": 3608,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-03T15:13:26Z"
+  },
+  {
+    "number": 3619,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:18Z"
+  },
+  {
+    "number": 3657,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:09Z"
+  },
+  {
+    "number": 3663,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-07-02T19:06:18Z"
+  },
+  {
+    "number": 3672,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:37Z"
+  },
+  {
+    "number": 3720,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-03T15:18:28Z"
+  },
+  {
+    "number": 3742,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:10Z"
+  },
+  {
+    "number": 3755,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:19Z"
+  },
+  {
+    "number": 3779,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-03T15:18:57Z"
+  },
+  {
+    "number": 3811,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:00Z"
+  },
+  {
+    "number": 3819,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:36Z"
+  },
+  {
+    "number": 3820,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:37Z"
+  },
+  {
+    "number": 3823,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-03T15:18:45Z"
+  },
+  {
+    "number": 3837,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:38Z"
+  },
+  {
+    "number": 3857,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2023-12-12T14:19:32Z"
+  },
+  {
+    "number": 3882,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:43Z"
+  },
+  {
+    "number": 3887,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:43Z"
+  },
+  {
+    "number": 3943,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-07-03T15:19:18Z"
+  },
+  {
+    "number": 4106,
+    "kind": "issue",
+    "bucket": "keep-v10",
+    "reason": "distinguish user vs programmatic pause; API need still open in v10",
+    "updated_at": "2019-03-20T04:09:14Z"
+  },
+  {
+    "number": 4180,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-11-20T22:23:38Z"
+  },
+  {
+    "number": 4193,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-06T05:57:13Z"
+  },
+  {
+    "number": 4346,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-07-03T15:17:02Z"
+  },
+  {
+    "number": 4369,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-07-03T15:14:10Z"
+  },
+  {
+    "number": 4391,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-08-11T01:13:32Z"
+  },
+  {
+    "number": 4627,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-08-11T01:14:41Z"
+  },
+  {
+    "number": 4691,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-08T14:01:36Z"
+  },
+  {
+    "number": 4710,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-08-10T21:20:52Z"
+  },
+  {
+    "number": 4724,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-08-10T21:24:16Z"
+  },
+  {
+    "number": 4757,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-08-10T21:25:14Z"
+  },
+  {
+    "number": 4765,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-09-10T19:04:11Z"
+  },
+  {
+    "number": 4833,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-10-18T19:57:44Z"
+  },
+  {
+    "number": 4851,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-06-18T16:15:13Z"
+  },
+  {
+    "number": 4902,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2019-07-05T21:35:45Z"
+  },
+  {
+    "number": 4917,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-08-17T20:29:38Z"
+  },
+  {
+    "number": 4970,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2022-07-20T13:16:36Z"
+  },
+  {
+    "number": 5056,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-02-08T21:16:22Z"
+  },
+  {
+    "number": 5060,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-08-10T21:27:03Z"
+  },
+  {
+    "number": 5092,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2018-11-09T19:56:28Z"
+  },
+  {
+    "number": 5172,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2019-05-28T15:34:39Z"
+  },
+  {
+    "number": 5182,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-11-20T22:23:10Z"
+  },
+  {
+    "number": 5193,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-02T19:06:45Z"
+  },
+  {
+    "number": 5223,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2019-04-16T15:33:46Z"
+  },
+  {
+    "number": 5250,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-07-08T00:12:04Z"
+  },
+  {
+    "number": 5252,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2021-10-29T17:37:05Z"
+  },
+  {
+    "number": 5269,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2019-12-12T06:24:51Z"
+  },
+  {
+    "number": 5270,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-07-02T19:06:49Z"
+  },
+  {
+    "number": 5271,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-07-02T19:06:50Z"
+  },
+  {
+    "number": 5281,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2021-08-03T16:54:17Z"
+  },
+  {
+    "number": 5303,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-09-21T02:08:05Z"
+  },
+  {
+    "number": 5353,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2018-10-07T22:45:17Z"
+  },
+  {
+    "number": 5404,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-04-01T18:14:15Z"
+  },
+  {
+    "number": 5438,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-20T06:07:25Z"
+  },
+  {
+    "number": 5472,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2018-11-09T23:45:48Z"
+  },
+  {
+    "number": 5526,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-01-01T00:54:11Z"
+  },
+  {
+    "number": 5585,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2019-01-26T17:08:52Z"
+  },
+  {
+    "number": 5618,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2019-01-26T17:19:03Z"
+  },
+  {
+    "number": 5624,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-01-01T19:59:16Z"
+  },
+  {
+    "number": 5626,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-02-16T20:07:33Z"
+  },
+  {
+    "number": 5628,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-12-27T15:32:35Z"
+  },
+  {
+    "number": 5737,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-03-12T15:49:40Z"
+  },
+  {
+    "number": 5751,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-19T08:32:45Z"
+  },
+  {
+    "number": 5758,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-04-01T19:44:23Z"
+  },
+  {
+    "number": 5762,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 5765,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "addressed in v10: hotkey component",
+    "updated_at": "2019-04-19T14:25:19Z"
+  },
+  {
+    "number": 5768,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2021-07-02T03:31:52Z"
+  },
+  {
+    "number": 5774,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2019-10-28T21:24:37Z"
+  },
+  {
+    "number": 5795,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-04-19T14:25:22Z"
+  },
+  {
+    "number": 5824,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-01-08T11:28:23Z"
+  },
+  {
+    "number": 5858,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2021-02-04T18:08:15Z"
+  },
+  {
+    "number": 5885,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-06-25T19:12:54Z"
+  },
+  {
+    "number": 5932,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-04-22T17:51:29Z"
+  },
+  {
+    "number": 5947,
+    "kind": "issue",
+    "bucket": "keep-v10",
+    "reason": "publish an accessibility commitment statement on the v10 site",
+    "updated_at": "2019-05-17T21:23:02Z"
+  },
+  {
+    "number": 5950,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-05-17T21:22:49Z"
+  },
+  {
+    "number": 5962,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-03-12T17:51:31Z"
+  },
+  {
+    "number": 5973,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-30T22:48:41Z"
+  },
+  {
+    "number": 6000,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-12-16T09:20:21Z"
+  },
+  {
+    "number": 6044,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-08-11T04:41:09Z"
+  },
+  {
+    "number": 6159,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2019-10-04T13:54:16Z"
+  },
+  {
+    "number": 6223,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2021-09-13T21:52:44Z"
+  },
+  {
+    "number": 6226,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2019-12-02T21:40:09Z"
+  },
+  {
+    "number": 6242,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2019-10-01T18:38:11Z"
+  },
+  {
+    "number": 6273,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2020-11-17T22:32:33Z"
+  },
+  {
+    "number": 6335,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "addressed in v10: time slider aria-valuetext uses formatTimeAsPhrase",
+    "updated_at": "2025-02-23T18:33:39Z"
+  },
+  {
+    "number": 6336,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "addressed in v10: time displays expose phrase-formatted labels",
+    "updated_at": "2025-04-10T17:36:05Z"
+  },
+  {
+    "number": 6414,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 6436,
+    "kind": "issue",
+    "bucket": "keep-v10",
+    "reason": "keyboard focus should stay inside the player in fullscreen; verify v10",
+    "updated_at": "2025-11-07T09:53:14Z"
+  },
+  {
+    "number": 6437,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2020-03-06T21:42:17Z"
+  },
+  {
+    "number": 6447,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-07-01T03:13:50Z"
+  },
+  {
+    "number": 6458,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-10T08:22:55Z"
+  },
+  {
+    "number": 6516,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2020-04-20T01:57:19Z"
+  },
+  {
+    "number": 6632,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2020-05-04T18:13:21Z"
+  },
+  {
+    "number": 6633,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2020-05-04T18:23:06Z"
+  },
+  {
+    "number": 6642,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2020-11-17T22:32:05Z"
+  },
+  {
+    "number": 6660,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2021-10-01T10:57:02Z"
+  },
+  {
+    "number": 6694,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 6723,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-06-24T04:29:00Z"
+  },
+  {
+    "number": 6754,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-11-17T22:32:56Z"
+  },
+  {
+    "number": 6762,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-01-03T14:56:16Z"
+  },
+  {
+    "number": 6766,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-29T04:48:32Z"
+  },
+  {
+    "number": 6818,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2020-12-09T19:44:20Z"
+  },
+  {
+    "number": 6862,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-22T12:08:03Z"
+  },
+  {
+    "number": 6886,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:09Z"
+  },
+  {
+    "number": 6888,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-29T13:14:05Z"
+  },
+  {
+    "number": 6893,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-18T00:33:58Z"
+  },
+  {
+    "number": 6903,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-09-11T22:10:12Z"
+  },
+  {
+    "number": 6917,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:20Z"
+  },
+  {
+    "number": 6918,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:19Z"
+  },
+  {
+    "number": 6926,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:16Z"
+  },
+  {
+    "number": 6951,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-11T01:50:58Z"
+  },
+  {
+    "number": 6952,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2020-12-01T17:02:25Z"
+  },
+  {
+    "number": 6955,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-29T04:48:31Z"
+  },
+  {
+    "number": 6956,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-27T22:17:11Z"
+  },
+  {
+    "number": 6960,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2022-08-12T20:28:55Z"
+  },
+  {
+    "number": 6962,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-04T14:34:49Z"
+  },
+  {
+    "number": 6964,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-29T04:48:29Z"
+  },
+  {
+    "number": 6974,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-29T04:48:28Z"
+  },
+  {
+    "number": 6976,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-07T16:47:56Z"
+  },
+  {
+    "number": 6979,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:11Z"
+  },
+  {
+    "number": 6980,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:17Z"
+  },
+  {
+    "number": 6990,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:22Z"
+  },
+  {
+    "number": 6995,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:16Z"
+  },
+  {
+    "number": 6997,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-04T16:32:47Z"
+  },
+  {
+    "number": 7001,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:15Z"
+  },
+  {
+    "number": 7002,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:14Z"
+  },
+  {
+    "number": 7005,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-01T10:13:03Z"
+  },
+  {
+    "number": 7006,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:12Z"
+  },
+  {
+    "number": 7007,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:13Z"
+  },
+  {
+    "number": 7008,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-02T04:34:07Z"
+  },
+  {
+    "number": 7017,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:08Z"
+  },
+  {
+    "number": 7025,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:10Z"
+  },
+  {
+    "number": 7028,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:07Z"
+  },
+  {
+    "number": 7029,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:06Z"
+  },
+  {
+    "number": 7030,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:03Z"
+  },
+  {
+    "number": 7032,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T19:14:47Z"
+  },
+  {
+    "number": 7036,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:04Z"
+  },
+  {
+    "number": 7043,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:02Z"
+  },
+  {
+    "number": 7046,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:00Z"
+  },
+  {
+    "number": 7052,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:49:01Z"
+  },
+  {
+    "number": 7057,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:58Z"
+  },
+  {
+    "number": 7058,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:57Z"
+  },
+  {
+    "number": 7062,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-01-29T09:12:30Z"
+  },
+  {
+    "number": 7066,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:56Z"
+  },
+  {
+    "number": 7068,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2022-08-15T16:31:42Z"
+  },
+  {
+    "number": 7069,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:51Z"
+  },
+  {
+    "number": 7070,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:13Z"
+  },
+  {
+    "number": 7076,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:54Z"
+  },
+  {
+    "number": 7078,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T17:48:52Z"
+  },
+  {
+    "number": 7080,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:11Z"
+  },
+  {
+    "number": 7085,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-16T00:27:53Z"
+  },
+  {
+    "number": 7087,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-01T18:53:03Z"
+  },
+  {
+    "number": 7090,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:09Z"
+  },
+  {
+    "number": 7093,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-08-17T17:22:05Z"
+  },
+  {
+    "number": 7096,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:18Z"
+  },
+  {
+    "number": 7107,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-30T06:33:51Z"
+  },
+  {
+    "number": 7108,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:13Z"
+  },
+  {
+    "number": 7116,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:04Z"
+  },
+  {
+    "number": 7119,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:10Z"
+  },
+  {
+    "number": 7120,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:05Z"
+  },
+  {
+    "number": 7127,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:08Z"
+  },
+  {
+    "number": 7140,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:07Z"
+  },
+  {
+    "number": 7197,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2022-04-30T06:10:57Z"
+  },
+  {
+    "number": 7232,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-11T23:33:37Z"
+  },
+  {
+    "number": 7285,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-30T10:00:20Z"
+  },
+  {
+    "number": 7308,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-19T16:23:39Z"
+  },
+  {
+    "number": 7363,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:12Z"
+  },
+  {
+    "number": 7413,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:07Z"
+  },
+  {
+    "number": 7418,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-08-08T20:11:42Z"
+  },
+  {
+    "number": 7450,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2022-11-09T11:19:39Z"
+  },
+  {
+    "number": 7453,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-08T18:21:22Z"
+  },
+  {
+    "number": 7463,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:13Z"
+  },
+  {
+    "number": 7496,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-02-01T23:02:33Z"
+  },
+  {
+    "number": 7497,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:01Z"
+  },
+  {
+    "number": 7509,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:03Z"
+  },
+  {
+    "number": 7520,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-03T05:30:37Z"
+  },
+  {
+    "number": 7528,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:49:00Z"
+  },
+  {
+    "number": 7531,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:48:59Z"
+  },
+  {
+    "number": 7538,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:48:52Z"
+  },
+  {
+    "number": 7539,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:48:54Z"
+  },
+  {
+    "number": 7540,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:15Z"
+  },
+  {
+    "number": 7548,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:48:52Z"
+  },
+  {
+    "number": 7549,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-24T03:38:29Z"
+  },
+  {
+    "number": 7551,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T05:48:50Z"
+  },
+  {
+    "number": 7553,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:21Z"
+  },
+  {
+    "number": 7554,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:20Z"
+  },
+  {
+    "number": 7557,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-11T15:32:59Z"
+  },
+  {
+    "number": 7569,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:19Z"
+  },
+  {
+    "number": 7572,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:18Z"
+  },
+  {
+    "number": 7577,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-02-08T13:59:18Z"
+  },
+  {
+    "number": 7585,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-07T15:10:05Z"
+  },
+  {
+    "number": 7586,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-07T15:10:52Z"
+  },
+  {
+    "number": 7587,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-06T15:37:06Z"
+  },
+  {
+    "number": 7598,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-06-12T20:36:05Z"
+  },
+  {
+    "number": 7599,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:14Z"
+  },
+  {
+    "number": 7600,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:12Z"
+  },
+  {
+    "number": 7612,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:10Z"
+  },
+  {
+    "number": 7613,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:48:58Z"
+  },
+  {
+    "number": 7620,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-18T14:28:12Z"
+  },
+  {
+    "number": 7637,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-24T22:46:47Z"
+  },
+  {
+    "number": 7640,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:48:59Z"
+  },
+  {
+    "number": 7643,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:48:59Z"
+  },
+  {
+    "number": 7645,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:01Z"
+  },
+  {
+    "number": 7650,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-28T04:49:03Z"
+  },
+  {
+    "number": 7655,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-01T11:48:23Z"
+  },
+  {
+    "number": 7659,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-30T04:48:24Z"
+  },
+  {
+    "number": 7663,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-30T04:48:23Z"
+  },
+  {
+    "number": 7666,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-07T15:51:50Z"
+  },
+  {
+    "number": 7669,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-07T16:00:34Z"
+  },
+  {
+    "number": 7683,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-21T14:46:13Z"
+  },
+  {
+    "number": 7688,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2022-03-28T14:39:54Z"
+  },
+  {
+    "number": 7693,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-28T15:36:30Z"
+  },
+  {
+    "number": 7695,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-03-28T15:40:12Z"
+  },
+  {
+    "number": 7696,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-01T10:57:50Z"
+  },
+  {
+    "number": 7700,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-11T14:06:32Z"
+  },
+  {
+    "number": 7703,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-01T06:28:20Z"
+  },
+  {
+    "number": 7705,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-11T14:13:42Z"
+  },
+  {
+    "number": 7711,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-11T14:23:17Z"
+  },
+  {
+    "number": 7712,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-08T15:25:13Z"
+  },
+  {
+    "number": 7714,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "pinned",
+    "updated_at": "2022-08-23T11:51:21Z"
+  },
+  {
+    "number": 7730,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-22T15:48:18Z"
+  },
+  {
+    "number": 7731,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-04-25T14:32:08Z"
+  },
+  {
+    "number": 7736,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-18T21:23:56Z"
+  },
+  {
+    "number": 7738,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2023-09-12T14:48:57Z"
+  },
+  {
+    "number": 7742,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-16T14:19:57Z"
+  },
+  {
+    "number": 7743,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: i18n",
+    "updated_at": "2023-06-14T06:58:43Z"
+  },
+  {
+    "number": 7747,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-22T03:28:34Z"
+  },
+  {
+    "number": 7748,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-02T06:30:27Z"
+  },
+  {
+    "number": 7755,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-05-17T22:02:03Z"
+  },
+  {
+    "number": 7764,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:14Z"
+  },
+  {
+    "number": 7765,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:15Z"
+  },
+  {
+    "number": 7766,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:16Z"
+  },
+  {
+    "number": 7783,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:16Z"
+  },
+  {
+    "number": 7785,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "false positive; v8 TextTrack credentials question",
+    "updated_at": "2022-07-11T14:21:17Z"
+  },
+  {
+    "number": 7789,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 7795,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "CI dependabot config for the v8 tree; not a runtime fix",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 7803,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:18Z"
+  },
+  {
+    "number": 7804,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:18Z"
+  },
+  {
+    "number": 7808,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2022-11-23T01:30:04Z"
+  },
+  {
+    "number": 7814,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:21:19Z"
+  },
+  {
+    "number": 7816,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-07T22:22:03Z"
+  },
+  {
+    "number": 7818,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T14:28:31Z"
+  },
+  {
+    "number": 7824,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-13T20:09:44Z"
+  },
+  {
+    "number": 7829,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-06-07T08:02:09Z"
+  },
+  {
+    "number": 7830,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-07-11T16:16:04Z"
+  },
+  {
+    "number": 7843,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2023-03-28T16:32:39Z"
+  },
+  {
+    "number": 7869,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-28T16:43:29Z"
+  },
+  {
+    "number": 7874,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-08-21T08:57:53Z"
+  },
+  {
+    "number": 7883,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-08-22T14:26:58Z"
+  },
+  {
+    "number": 7886,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-05T05:46:19Z"
+  },
+  {
+    "number": 7887,
+    "kind": "issue",
+    "bucket": "keep-v10",
+    "reason": "CSP-friendly styling applies to v10; verify v10 behavior",
+    "updated_at": "2026-05-30T13:34:58Z"
+  },
+  {
+    "number": 7900,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-19T06:33:04Z"
+  },
+  {
+    "number": 7903,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-25T21:20:18Z"
+  },
+  {
+    "number": 7906,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-08-31T20:13:14Z"
+  },
+  {
+    "number": 7913,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-03-31T09:45:47Z"
+  },
+  {
+    "number": 7915,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-05T11:52:44Z"
+  },
+  {
+    "number": 7923,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-14T13:50:57Z"
+  },
+  {
+    "number": 7939,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2023-02-01T17:15:40Z"
+  },
+  {
+    "number": 7942,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-07T13:01:02Z"
+  },
+  {
+    "number": 7955,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-16T01:14:33Z"
+  },
+  {
+    "number": 7957,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-13T21:17:31Z"
+  },
+  {
+    "number": 7960,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-18T11:55:45Z"
+  },
+  {
+    "number": 7962,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-11T11:15:49Z"
+  },
+  {
+    "number": 7966,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-09T17:07:45Z"
+  },
+  {
+    "number": 7970,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-26T18:23:42Z"
+  },
+  {
+    "number": 7971,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-23T18:22:18Z"
+  },
+  {
+    "number": 7980,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-10-28T23:59:32Z"
+  },
+  {
+    "number": 7981,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-28T03:47:42Z"
+  },
+  {
+    "number": 7983,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-07T05:32:27Z"
+  },
+  {
+    "number": 7985,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-01T22:53:44Z"
+  },
+  {
+    "number": 7987,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-01T10:42:54Z"
+  },
+  {
+    "number": 7988,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-02T11:42:47Z"
+  },
+  {
+    "number": 7992,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-17T02:33:28Z"
+  },
+  {
+    "number": 7994,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-21T04:46:48Z"
+  },
+  {
+    "number": 7995,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-03T16:46:05Z"
+  },
+  {
+    "number": 8000,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-16T11:52:34Z"
+  },
+  {
+    "number": 8001,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-15T05:40:23Z"
+  },
+  {
+    "number": 8007,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-17T20:51:42Z"
+  },
+  {
+    "number": 8008,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-23T08:47:41Z"
+  },
+  {
+    "number": 8013,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-01-03T13:35:27Z"
+  },
+  {
+    "number": 8017,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-25T18:52:24Z"
+  },
+  {
+    "number": 8024,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-20T16:06:58Z"
+  },
+  {
+    "number": 8026,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-01T16:31:08Z"
+  },
+  {
+    "number": 8027,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-11-29T22:05:58Z"
+  },
+  {
+    "number": 8029,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T16:21:48Z"
+  },
+  {
+    "number": 8030,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-01T22:35:47Z"
+  },
+  {
+    "number": 8033,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-27T16:35:56Z"
+  },
+  {
+    "number": 8034,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T16:24:20Z"
+  },
+  {
+    "number": 8035,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-06-11T13:00:30Z"
+  },
+  {
+    "number": 8042,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-13T17:16:21Z"
+  },
+  {
+    "number": 8046,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-14T15:05:46Z"
+  },
+  {
+    "number": 8047,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-03-07T20:44:05Z"
+  },
+  {
+    "number": 8053,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-06-10T13:42:53Z"
+  },
+  {
+    "number": 8054,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T16:34:26Z"
+  },
+  {
+    "number": 8056,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2022-12-23T10:22:34Z"
+  },
+  {
+    "number": 8057,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T16:38:31Z"
+  },
+  {
+    "number": 8062,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-01-03T17:10:37Z"
+  },
+  {
+    "number": 8069,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T16:42:08Z"
+  },
+  {
+    "number": 8076,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-01-18T08:02:27Z"
+  },
+  {
+    "number": 8080,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-01-19T17:14:09Z"
+  },
+  {
+    "number": 8092,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-04T07:06:56Z"
+  },
+  {
+    "number": 8094,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-08T14:58:33Z"
+  },
+  {
+    "number": 8096,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-01-28T10:57:34Z"
+  },
+  {
+    "number": 8097,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-23T11:16:51Z"
+  },
+  {
+    "number": 8119,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-18T00:51:00Z"
+  },
+  {
+    "number": 8121,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-10T14:31:31Z"
+  },
+  {
+    "number": 8124,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-23T23:52:16Z"
+  },
+  {
+    "number": 8126,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-16T01:12:21Z"
+  },
+  {
+    "number": 8127,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-13T09:34:51Z"
+  },
+  {
+    "number": 8137,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-02T06:23:39Z"
+  },
+  {
+    "number": 8141,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-12-10T17:39:58Z"
+  },
+  {
+    "number": 8143,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-08T21:27:47Z"
+  },
+  {
+    "number": 8146,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-19T14:47:36Z"
+  },
+  {
+    "number": 8152,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-11T16:13:27Z"
+  },
+  {
+    "number": 8153,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-02-23T06:49:47Z"
+  },
+  {
+    "number": 8157,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-08T11:13:07Z"
+  },
+  {
+    "number": 8159,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-13T13:21:49Z"
+  },
+  {
+    "number": 8176,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-07T08:25:14Z"
+  },
+  {
+    "number": 8177,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-07T23:28:43Z"
+  },
+  {
+    "number": 8179,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-12T13:13:01Z"
+  },
+  {
+    "number": 8189,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-19T22:17:01Z"
+  },
+  {
+    "number": 8199,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-20T15:24:03Z"
+  },
+  {
+    "number": 8201,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-09T14:36:13Z"
+  },
+  {
+    "number": 8206,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-26T12:36:59Z"
+  },
+  {
+    "number": 8209,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-29T17:23:19Z"
+  },
+  {
+    "number": 8210,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-28T04:08:21Z"
+  },
+  {
+    "number": 8216,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-03-29T14:42:59Z"
+  },
+  {
+    "number": 8217,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2023-06-06T20:06:37Z"
+  },
+  {
+    "number": 8221,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-01T16:11:37Z"
+  },
+  {
+    "number": 8222,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-05-03T18:38:06Z"
+  },
+  {
+    "number": 8233,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-02T21:08:21Z"
+  },
+  {
+    "number": 8236,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-18T10:40:53Z"
+  },
+  {
+    "number": 8237,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "xmldom advisory resolved; v8 lockfile now has @xmldom/xmldom 0.8.15",
+    "updated_at": "2023-04-16T10:59:54Z"
+  },
+  {
+    "number": 8238,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-16T10:39:35Z"
+  },
+  {
+    "number": 8240,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-16T10:50:26Z"
+  },
+  {
+    "number": 8242,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-14T06:34:10Z"
+  },
+  {
+    "number": 8248,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-03T01:50:11Z"
+  },
+  {
+    "number": 8250,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-27T06:58:36Z"
+  },
+  {
+    "number": 8251,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-04-27T20:09:23Z"
+  },
+  {
+    "number": 8259,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-07T11:56:18Z"
+  },
+  {
+    "number": 8264,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-04T05:50:08Z"
+  },
+  {
+    "number": 8265,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-05T19:37:43Z"
+  },
+  {
+    "number": 8268,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T07:13:10Z"
+  },
+  {
+    "number": 8269,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-09T17:34:13Z"
+  },
+  {
+    "number": 8272,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-12T12:03:43Z"
+  },
+  {
+    "number": 8278,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-25T10:50:39Z"
+  },
+  {
+    "number": 8281,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-23T17:24:52Z"
+  },
+  {
+    "number": 8284,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-22T15:49:53Z"
+  },
+  {
+    "number": 8290,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-03T13:52:35Z"
+  },
+  {
+    "number": 8292,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-26T14:45:55Z"
+  },
+  {
+    "number": 8293,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-05-31T18:53:43Z"
+  },
+  {
+    "number": 8299,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-01T07:49:46Z"
+  },
+  {
+    "number": 8302,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "superseded by #9164 (current npm audit report)",
+    "updated_at": "2023-06-02T10:05:09Z"
+  },
+  {
+    "number": 8309,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2023-12-13T17:40:22Z"
+  },
+  {
+    "number": 8319,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-13T05:39:26Z"
+  },
+  {
+    "number": 8320,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2023-07-07T14:40:57Z"
+  },
+  {
+    "number": 8322,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-16T16:34:22Z"
+  },
+  {
+    "number": 8324,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-16T10:45:22Z"
+  },
+  {
+    "number": 8325,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-20T15:30:47Z"
+  },
+  {
+    "number": 8327,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-22T16:22:10Z"
+  },
+  {
+    "number": 8328,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-03T14:38:59Z"
+  },
+  {
+    "number": 8329,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-27T16:21:33Z"
+  },
+  {
+    "number": 8331,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-26T12:55:09Z"
+  },
+  {
+    "number": 8335,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-06-30T04:28:56Z"
+  },
+  {
+    "number": 8343,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-04T07:33:52Z"
+  },
+  {
+    "number": 8344,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-06T18:46:50Z"
+  },
+  {
+    "number": 8345,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-15T08:35:09Z"
+  },
+  {
+    "number": 8352,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-09T20:31:47Z"
+  },
+  {
+    "number": 8353,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-03T19:30:56Z"
+  },
+  {
+    "number": 8355,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-12T07:35:33Z"
+  },
+  {
+    "number": 8357,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-13T07:35:42Z"
+  },
+  {
+    "number": 8358,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-16T06:48:41Z"
+  },
+  {
+    "number": 8360,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2024-02-14T00:30:56Z"
+  },
+  {
+    "number": 8364,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-22T04:57:15Z"
+  },
+  {
+    "number": 8366,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-28T15:33:16Z"
+  },
+  {
+    "number": 8367,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-07-18T20:48:35Z"
+  },
+  {
+    "number": 8376,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-20T12:29:18Z"
+  },
+  {
+    "number": 8387,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-11T13:15:33Z"
+  },
+  {
+    "number": 8393,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-18T15:27:56Z"
+  },
+  {
+    "number": 8397,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-15T06:01:25Z"
+  },
+  {
+    "number": 8398,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-03T18:30:32Z"
+  },
+  {
+    "number": 8403,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-05T11:37:23Z"
+  },
+  {
+    "number": 8411,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-23T07:48:34Z"
+  },
+  {
+    "number": 8412,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-22T09:07:22Z"
+  },
+  {
+    "number": 8416,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-25T08:45:33Z"
+  },
+  {
+    "number": 8418,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-08-24T02:39:13Z"
+  },
+  {
+    "number": 8426,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-18T21:09:19Z"
+  },
+  {
+    "number": 8429,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-12T08:48:17Z"
+  },
+  {
+    "number": 8432,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-05T14:09:43Z"
+  },
+  {
+    "number": 8436,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-20T12:21:25Z"
+  },
+  {
+    "number": 8437,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-09-14T15:50:42Z"
+  },
+  {
+    "number": 8452,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-23T19:01:20Z"
+  },
+  {
+    "number": 8469,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-18T15:16:28Z"
+  },
+  {
+    "number": 8476,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-10-26T04:58:04Z"
+  },
+  {
+    "number": 8488,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-27T06:58:26Z"
+  },
+  {
+    "number": 8489,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "false positive; v8 Next.js inline-style support question",
+    "updated_at": "2023-11-14T13:08:38Z"
+  },
+  {
+    "number": 8490,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-21T18:16:21Z"
+  },
+  {
+    "number": 8491,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-23T12:03:18Z"
+  },
+  {
+    "number": 8493,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-23T09:47:21Z"
+  },
+  {
+    "number": 8496,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-25T21:20:39Z"
+  },
+  {
+    "number": 8497,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-04T13:24:03Z"
+  },
+  {
+    "number": 8498,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-11-25T01:27:28Z"
+  },
+  {
+    "number": 8504,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-11-30T05:23:48Z"
+  },
+  {
+    "number": 8508,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-12T13:57:59Z"
+  },
+  {
+    "number": 8512,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-12T08:04:11Z"
+  },
+  {
+    "number": 8518,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-04-24T15:12:42Z"
+  },
+  {
+    "number": 8520,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2023-12-21T12:49:40Z"
+  },
+  {
+    "number": 8521,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2025-07-21T12:33:58Z"
+  },
+  {
+    "number": 8522,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2023-12-21T12:49:41Z"
+  },
+  {
+    "number": 8523,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2023-12-21T12:49:42Z"
+  },
+  {
+    "number": 8530,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2023-12-24T09:51:27Z"
+  },
+  {
+    "number": 8535,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2023-12-28T12:18:51Z"
+  },
+  {
+    "number": 8544,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-01-19T12:56:13Z"
+  },
+  {
+    "number": 8545,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-07-16T12:17:33Z"
+  },
+  {
+    "number": 8554,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-02T15:39:39Z"
+  },
+  {
+    "number": 8561,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-19T03:48:53Z"
+  },
+  {
+    "number": 8569,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-02T15:28:02Z"
+  },
+  {
+    "number": 8573,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-01-30T21:51:54Z"
+  },
+  {
+    "number": 8582,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-09T20:52:48Z"
+  },
+  {
+    "number": 8586,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-15T22:55:05Z"
+  },
+  {
+    "number": 8588,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-14T10:34:05Z"
+  },
+  {
+    "number": 8590,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-11T15:18:51Z"
+  },
+  {
+    "number": 8593,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-23T18:17:38Z"
+  },
+  {
+    "number": 8594,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-02T18:27:39Z"
+  },
+  {
+    "number": 8597,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-03-04T12:33:00Z"
+  },
+  {
+    "number": 8602,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-21T14:34:10Z"
+  },
+  {
+    "number": 8608,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-02-29T20:31:20Z"
+  },
+  {
+    "number": 8612,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-19T16:17:50Z"
+  },
+  {
+    "number": 8618,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-04T15:06:04Z"
+  },
+  {
+    "number": 8620,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-03-04T07:16:19Z"
+  },
+  {
+    "number": 8632,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-05-17T22:28:28Z"
+  },
+  {
+    "number": 8635,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-03-11T09:56:10Z"
+  },
+  {
+    "number": 8640,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-03-13T10:58:26Z"
+  },
+  {
+    "number": 8646,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-11-04T17:22:36Z"
+  },
+  {
+    "number": 8653,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-08T10:14:34Z"
+  },
+  {
+    "number": 8654,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-23T10:43:51Z"
+  },
+  {
+    "number": 8662,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: enhancement",
+    "updated_at": "2025-02-25T09:23:46Z"
+  },
+  {
+    "number": 8684,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-04-19T09:25:58Z"
+  },
+  {
+    "number": 8712,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-13T21:33:31Z"
+  },
+  {
+    "number": 8726,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-05-09T14:42:04Z"
+  },
+  {
+    "number": 8732,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-28T06:01:46Z"
+  },
+  {
+    "number": 8733,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2026-01-30T05:23:53Z"
+  },
+  {
+    "number": 8748,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-05-30T20:55:56Z"
+  },
+  {
+    "number": 8759,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-14T13:50:37Z"
+  },
+  {
+    "number": 8780,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-10T15:41:07Z"
+  },
+  {
+    "number": 8784,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-04T04:11:35Z"
+  },
+  {
+    "number": 8789,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-14T16:37:18Z"
+  },
+  {
+    "number": 8797,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-16T03:57:56Z"
+  },
+  {
+    "number": 8802,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-15T18:45:46Z"
+  },
+  {
+    "number": 8803,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-16T14:29:23Z"
+  },
+  {
+    "number": 8806,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-29T01:57:39Z"
+  },
+  {
+    "number": 8807,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-07-24T07:57:53Z"
+  },
+  {
+    "number": 8818,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-08T19:21:52Z"
+  },
+  {
+    "number": 8828,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-13T12:02:19Z"
+  },
+  {
+    "number": 8834,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-15T19:37:28Z"
+  },
+  {
+    "number": 8843,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-04-02T07:19:09Z"
+  },
+  {
+    "number": 8845,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-27T14:43:45Z"
+  },
+  {
+    "number": 8850,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-30T13:03:48Z"
+  },
+  {
+    "number": 8851,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-08-31T23:49:39Z"
+  },
+  {
+    "number": 8853,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-02T09:36:41Z"
+  },
+  {
+    "number": 8855,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-09T15:57:11Z"
+  },
+  {
+    "number": 8856,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-02-01T01:26:46Z"
+  },
+  {
+    "number": 8857,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-11-13T15:59:52Z"
+  },
+  {
+    "number": 8862,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-10T06:26:58Z"
+  },
+  {
+    "number": 8866,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-12T00:27:30Z"
+  },
+  {
+    "number": 8867,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-13T08:26:27Z"
+  },
+  {
+    "number": 8871,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-28T14:09:56Z"
+  },
+  {
+    "number": 8872,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-09-18T10:38:48Z"
+  },
+  {
+    "number": 8880,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-11-14T08:04:54Z"
+  },
+  {
+    "number": 8884,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-07T10:12:23Z"
+  },
+  {
+    "number": 8885,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-23T03:10:01Z"
+  },
+  {
+    "number": 8893,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-22T16:14:27Z"
+  },
+  {
+    "number": 8895,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-17T16:01:11Z"
+  },
+  {
+    "number": 8897,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-21T21:12:19Z"
+  },
+  {
+    "number": 8898,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-10-16T13:10:19Z"
+  },
+  {
+    "number": 8901,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-14T06:46:16Z"
+  },
+  {
+    "number": 8906,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-03-08T18:21:04Z"
+  },
+  {
+    "number": 8907,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-11-06T05:23:11Z"
+  },
+  {
+    "number": 8909,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-05T20:24:35Z"
+  },
+  {
+    "number": 8910,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-05T20:24:38Z"
+  },
+  {
+    "number": 8912,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2024-12-10T00:34:56Z"
+  },
+  {
+    "number": 8913,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-11-08T03:32:03Z"
+  },
+  {
+    "number": 8923,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-11-20T19:00:26Z"
+  },
+  {
+    "number": 8928,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-12-09T21:24:24Z"
+  },
+  {
+    "number": 8936,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-08T10:10:07Z"
+  },
+  {
+    "number": 8940,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-30T08:45:33Z"
+  },
+  {
+    "number": 8943,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-23T17:00:17Z"
+  },
+  {
+    "number": 8946,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-23T17:34:43Z"
+  },
+  {
+    "number": 8948,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2024-12-27T16:46:42Z"
+  },
+  {
+    "number": 8950,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-09T14:17:31Z"
+  },
+  {
+    "number": 8952,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-06T06:26:59Z"
+  },
+  {
+    "number": 8953,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-07T08:29:12Z"
+  },
+  {
+    "number": 8958,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-15T04:01:26Z"
+  },
+  {
+    "number": 8959,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-15T09:48:11Z"
+  },
+  {
+    "number": 8961,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-02T09:40:35Z"
+  },
+  {
+    "number": 8962,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-23T06:26:24Z"
+  },
+  {
+    "number": 8966,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-23T10:11:13Z"
+  },
+  {
+    "number": 8967,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-24T04:36:17Z"
+  },
+  {
+    "number": 8968,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-03-31T18:57:51Z"
+  },
+  {
+    "number": 8970,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-01-30T23:51:15Z"
+  },
+  {
+    "number": 8972,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-05-12T06:40:46Z"
+  },
+  {
+    "number": 8974,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-12T13:23:32Z"
+  },
+  {
+    "number": 8975,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-10T14:59:58Z"
+  },
+  {
+    "number": 8977,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-07T00:03:59Z"
+  },
+  {
+    "number": 8985,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-04-02T04:21:47Z"
+  },
+  {
+    "number": 8987,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-24T07:21:31Z"
+  },
+  {
+    "number": 8995,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-11T13:25:36Z"
+  },
+  {
+    "number": 8997,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-02-28T15:20:54Z"
+  },
+  {
+    "number": 8999,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-11T13:00:54Z"
+  },
+  {
+    "number": 9006,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-20T15:02:33Z"
+  },
+  {
+    "number": 9009,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-15T00:05:00Z"
+  },
+  {
+    "number": 9010,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-19T19:14:48Z"
+  },
+  {
+    "number": 9011,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-16T23:14:09Z"
+  },
+  {
+    "number": 9016,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-24T23:40:56Z"
+  },
+  {
+    "number": 9017,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-03-21T11:41:10Z"
+  },
+  {
+    "number": 9018,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-09-29T12:33:44Z"
+  },
+  {
+    "number": 9019,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-05-20T19:00:08Z"
+  },
+  {
+    "number": 9020,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-07T15:21:12Z"
+  },
+  {
+    "number": 9021,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-02T20:06:05Z"
+  },
+  {
+    "number": 9024,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-10T16:24:09Z"
+  },
+  {
+    "number": 9033,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-04-18T12:14:37Z"
+  },
+  {
+    "number": 9039,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-05-09T19:50:17Z"
+  },
+  {
+    "number": 9040,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-04-27T09:55:29Z"
+  },
+  {
+    "number": 9042,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-07-22T06:02:36Z"
+  },
+  {
+    "number": 9043,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-06-20T13:58:01Z"
+  },
+  {
+    "number": 9045,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-12T21:13:30Z"
+  },
+  {
+    "number": 9046,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-05-28T22:22:15Z"
+  },
+  {
+    "number": 9047,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-01T20:11:24Z"
+  },
+  {
+    "number": 9048,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-05-26T08:03:13Z"
+  },
+  {
+    "number": 9052,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "labels: a11y",
+    "updated_at": "2026-04-14T12:21:45Z"
+  },
+  {
+    "number": 9053,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-09T07:11:23Z"
+  },
+  {
+    "number": 9057,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-14T01:48:11Z"
+  },
+  {
+    "number": 9060,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-06T12:55:24Z"
+  },
+  {
+    "number": 9061,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-23T15:59:49Z"
+  },
+  {
+    "number": 9062,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-24T07:12:36Z"
+  },
+  {
+    "number": 9063,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-06-26T18:17:06Z"
+  },
+  {
+    "number": 9066,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-11-25T09:24:07Z"
+  },
+  {
+    "number": 9069,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-11T19:09:55Z"
+  },
+  {
+    "number": 9071,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-07-17T19:44:30Z"
+  },
+  {
+    "number": 9072,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-09T17:40:59Z"
+  },
+  {
+    "number": 9075,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-21T23:25:02Z"
+  },
+  {
+    "number": 9076,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-07-30T20:07:02Z"
+  },
+  {
+    "number": 9077,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-14T07:15:47Z"
+  },
+  {
+    "number": 9078,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-22T21:58:47Z"
+  },
+  {
+    "number": 9081,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-31T14:21:57Z"
+  },
+  {
+    "number": 9082,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-30T17:30:36Z"
+  },
+  {
+    "number": 9083,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-07-31T15:24:11Z"
+  },
+  {
+    "number": 9086,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-06T19:44:41Z"
+  },
+  {
+    "number": 9087,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-07T02:35:18Z"
+  },
+  {
+    "number": 9088,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-17T16:31:27Z"
+  },
+  {
+    "number": 9091,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "ReDoS claim targets build/jsdoc-typeof-plugin.js, which is not shipped",
+    "updated_at": "2025-08-25T01:45:44Z"
+  },
+  {
+    "number": 9093,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-08-22T10:53:49Z"
+  },
+  {
+    "number": 9095,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-17T07:10:29Z"
+  },
+  {
+    "number": 9096,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-29T11:39:12Z"
+  },
+  {
+    "number": 9098,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-29T09:12:42Z"
+  },
+  {
+    "number": 9100,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-09-23T12:11:44Z"
+  },
+  {
+    "number": 9102,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-09-26T10:59:38Z"
+  },
+  {
+    "number": 9106,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-10-20T12:06:57Z"
+  },
+  {
+    "number": 9107,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-03T10:32:30Z"
+  },
+  {
+    "number": 9109,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-16T09:10:18Z"
+  },
+  {
+    "number": 9111,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-22T06:54:12Z"
+  },
+  {
+    "number": 9112,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2025-11-26T20:08:13Z"
+  },
+  {
+    "number": 9116,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-10-30T00:01:57Z"
+  },
+  {
+    "number": 9117,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-26T11:50:58Z"
+  },
+  {
+    "number": 9124,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-28T02:21:09Z"
+  },
+  {
+    "number": 9128,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-11-27T08:34:08Z"
+  },
+  {
+    "number": 9132,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-12-02T05:41:39Z"
+  },
+  {
+    "number": 9134,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2025-12-09T03:04:43Z"
+  },
+  {
+    "number": 9143,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-04-08T05:35:44Z"
+  },
+  {
+    "number": 9144,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-29T10:50:26Z"
+  },
+  {
+    "number": 9145,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-28T12:39:18Z"
+  },
+  {
+    "number": 9146,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-28T12:38:47Z"
+  },
+  {
+    "number": 9148,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-01-30T08:29:46Z"
+  },
+  {
+    "number": 9149,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-02-04T21:44:52Z"
+  },
+  {
+    "number": 9150,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-11T02:17:27Z"
+  },
+  {
+    "number": 9154,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-31T20:11:24Z"
+  },
+  {
+    "number": 9155,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-06T13:30:45Z"
+  },
+  {
+    "number": 9156,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-03-03T08:10:32Z"
+  },
+  {
+    "number": 9157,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-09-29T13:11:01Z"
+  },
+  {
+    "number": 9160,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-16T11:47:20Z"
+  },
+  {
+    "number": 9161,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-09-29T10:51:30Z"
+  },
+  {
+    "number": 9163,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-18T12:10:10Z"
+  },
+  {
+    "number": 9164,
+    "kind": "issue",
+    "bucket": "keep-v8",
+    "reason": "dependency audit failures (minimatch, octokit); v8 security maintenance",
+    "updated_at": "2026-04-23T09:40:27Z"
+  },
+  {
+    "number": 9165,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-29T13:25:59Z"
+  },
+  {
+    "number": 9172,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-04-18T16:17:55Z"
+  },
+  {
+    "number": 9175,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-04-27T18:44:35Z"
+  },
+  {
+    "number": 9177,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-06-05T06:37:55Z"
+  },
+  {
+    "number": 9178,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-10T11:02:09Z"
+  },
+  {
+    "number": 9179,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-13T05:09:33Z"
+  },
+  {
+    "number": 9181,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:50:07Z"
+  },
+  {
+    "number": 9182,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:50:39Z"
+  },
+  {
+    "number": 9183,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:51:31Z"
+  },
+  {
+    "number": 9184,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:54:31Z"
+  },
+  {
+    "number": 9185,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:55:03Z"
+  },
+  {
+    "number": 9186,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:55:36Z"
+  },
+  {
+    "number": 9187,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-05-19T21:56:49Z"
+  },
+  {
+    "number": 9189,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-05-23T05:31:51Z"
+  },
+  {
+    "number": 9198,
+    "kind": "issue",
+    "bucket": "keep-v10",
+    "reason": "CSP style-src-attr 'none' applies to v10; verify v10 behavior",
+    "updated_at": "2026-05-30T14:10:15Z"
+  },
+  {
+    "number": 9200,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-06-15T10:51:39Z"
+  },
+  {
+    "number": 9201,
+    "kind": "issue",
+    "bucket": "keep-v8",
+    "reason": "not a Video.js vuln; decide whether to claim the unregistered npm name videojs-v8",
+    "updated_at": "2026-06-17T09:29:38Z"
+  },
+  {
+    "number": 9202,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-06-16T07:52:18Z"
+  },
+  {
+    "number": 9203,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-06-16T07:52:19Z"
+  },
+  {
+    "number": 9204,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-06-16T07:52:21Z"
+  },
+  {
+    "number": 9210,
+    "kind": "issue",
+    "bucket": "keep-v8",
+    "reason": "dependency audit report; likely duplicate of #9164",
+    "updated_at": "2026-07-01T01:42:32Z"
+  },
+  {
+    "number": 9213,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-07-13T10:27:33Z"
+  },
+  {
+    "number": 9214,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-03T08:15:07Z"
+  },
+  {
+    "number": 9216,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-07-31T15:14:25Z"
+  },
+  {
+    "number": 9220,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-12T23:35:36Z"
+  },
+  {
+    "number": 9221,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-12T23:35:38Z"
+  },
+  {
+    "number": 9222,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-08-22T05:37:37Z"
+  },
+  {
+    "number": 9223,
+    "kind": "issue",
+    "bucket": "keep-v8",
+    "reason": "vtt.js injected from CDN without SRI; runtime hardening",
+    "updated_at": "2026-08-23T18:52:40Z"
+  },
+  {
+    "number": 9224,
+    "kind": "issue",
+    "bucket": "close",
+    "reason": "",
+    "updated_at": "2026-10-06T07:13:27Z"
+  },
+  {
+    "number": 9226,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-28T14:10:30Z"
+  },
+  {
+    "number": 9227,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-28T17:37:29Z"
+  },
+  {
+    "number": 9228,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-08-29T21:06:29Z"
+  },
+  {
+    "number": 9233,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-10-01T07:44:11Z"
+  },
+  {
+    "number": 9234,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-23T15:19:25Z"
+  },
+  {
+    "number": 9236,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-23T11:19:36Z"
+  },
+  {
+    "number": 9237,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-29T10:55:38Z"
+  },
+  {
+    "number": 9238,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-29T13:15:49Z"
+  },
+  {
+    "number": 9239,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-29T13:16:51Z"
+  },
+  {
+    "number": 9240,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-29T13:14:38Z"
+  },
+  {
+    "number": 9241,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-09-30T23:19:15Z"
+  },
+  {
+    "number": 9242,
+    "kind": "pr",
+    "bucket": "close-pr",
+    "reason": "",
+    "updated_at": "2026-10-04T09:25:48Z"
+  },
+  {
+    "number": 9247,
+    "kind": "pr",
+    "bucket": "keep-v10",
+    "reason": "v10 PR (playerjs-video), opened after cutover",
+    "updated_at": "2026-10-06T23:57:28Z"
+  }
+]

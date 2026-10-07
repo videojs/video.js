@@ -1,0 +1,23 @@
+{
+  "3249": { "bucket": "close", "reason": "false positive (\"dependency injection\"); v8 fullscreen API" },
+  "7785": { "bucket": "close", "reason": "false positive; v8 TextTrack credentials question" },
+  "7795": { "bucket": "close-pr", "reason": "CI dependabot config for the v8 tree; not a runtime fix" },
+  "7887": { "bucket": "keep-v10", "reason": "CSP-friendly styling applies to v10; verify v10 behavior" },
+  "8237": { "bucket": "close", "reason": "xmldom advisory resolved; v8 lockfile now has @xmldom/xmldom 0.8.15" },
+  "8302": { "bucket": "close", "reason": "superseded by #9164 (current npm audit report)" },
+  "8489": { "bucket": "close", "reason": "false positive; v8 Next.js inline-style support question" },
+  "9091": { "bucket": "close-pr", "reason": "ReDoS claim targets build/jsdoc-typeof-plugin.js, which is not shipped" },
+  "9164": { "bucket": "keep-v8", "reason": "dependency audit failures (minimatch, octokit); v8 security maintenance" },
+  "9198": { "bucket": "keep-v10", "reason": "CSP style-src-attr 'none' applies to v10; verify v10 behavior" },
+  "9201": { "bucket": "keep-v8", "reason": "not a Video.js vuln; decide whether to claim the unregistered npm name videojs-v8" },
+  "9210": { "bucket": "keep-v8", "reason": "dependency audit report; likely duplicate of #9164" },
+  "9223": { "bucket": "keep-v8", "reason": "vtt.js injected from CDN without SRI; runtime hardening" },
+
+  "9247": { "bucket": "keep-v10", "reason": "v10 PR (playerjs-video), opened after cutover" },
+  "4106": { "bucket": "keep-v10", "reason": "distinguish user vs programmatic pause; API need still open in v10" },
+  "5947": { "bucket": "keep-v10", "reason": "publish an accessibility commitment statement on the v10 site" },
+  "6436": { "bucket": "keep-v10", "reason": "keyboard focus should stay inside the player in fullscreen; verify v10" },
+  "6335": { "bucket": "close", "reason": "addressed in v10: time slider aria-valuetext uses formatTimeAsPhrase" },
+  "6336": { "bucket": "close", "reason": "addressed in v10: time displays expose phrase-formatted labels" },
+  "5765": { "bucket": "close", "reason": "addressed in v10: hotkey component" }
+}
