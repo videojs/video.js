@@ -48,7 +48,8 @@
     "format:astro": "vp fmt 'site/src/**/*.astro' --write",
     "typecheck": "vp run typecheck:workspace",
     "changelog": "git-cliff --config cliff.toml --output CHANGELOG.md",
-    "check:workspace": "node build/scripts/check-workspace.mjs"
+    "check:workspace": "node build/scripts/check-workspace.mjs",
+    "contributors": "node build/scripts/generate-contributors.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",

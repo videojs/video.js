@@ -60,6 +60,11 @@ We'd love for you to join our community channels above and give us feedback! Fee
 
 Please see our [contributing guide](./CONTRIBUTING.md) for getting set up locally and making code or docs changes.
 
+## Contributors
+
+Video.js is built by everyone who has contributed to it since 2010, from the first release through Video.js 10. See
+the [full list of contributors](./CONTRIBUTORS.md).
+
 ## Code of Conduct
 
 Please note that this project is released with a [Contributor Code of Conduct][coc]. By
