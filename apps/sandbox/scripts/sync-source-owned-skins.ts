@@ -211,6 +211,7 @@ async function writeFixture(root: string, address: string, alias: string, baseSt
     // Every package the registry items depend on, so the CLI copies files without installing anything.
     dependencies: {
       '@videojs/core': '*',
+      '@videojs/fcast': '*',
       '@videojs/html': '*',
       '@videojs/react': '*',
       cn: '*',

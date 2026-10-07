@@ -24,12 +24,17 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
     return extension;
   }
 
+  protected override get shouldRegisterExtension(): boolean {
+    return !!this.sender;
+  }
+
   get sender(): FCastSender | undefined {
     return this.extension.sender;
   }
 
   set sender(value: FCastSender | undefined) {
     this.extension.sender = value;
+    this.refreshExtensionRegistration();
     this.requestUpdate();
   }
 
@@ -90,6 +95,7 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
       'aria-label': label,
       'aria-disabled': this.#isDisabled() ? 'true' : undefined,
       hidden: !this.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
+      'data-hidden': !this.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
       'data-fcast-state': connection,
       'data-availability': availability,
     });

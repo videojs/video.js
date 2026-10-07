@@ -1,6 +1,7 @@
-import { cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { SKIN_HELP_URL } from '@videojs/core';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { FCastExtension, type FCastSender, type FCastSnapshot } from '@videojs/fcast';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { createPlayerWrapper } from '../../../testing/mocks';
 import { VideoSkin } from '../skin';
@@ -23,6 +24,48 @@ function wrapper(overrides: Record<string, unknown> = {}) {
 }
 
 describe('VideoSkin', () => {
+  it('shows its FCast control when a sender is configured', () => {
+    const { Wrapper, extensions } = createPlayerWrapper({
+      controlsVisible: true,
+      userActive: true,
+      requestControlsLock: () => () => {},
+    });
+    const snapshot: FCastSnapshot = {
+      availability: 'available',
+      connection: 'disconnected',
+      paused: true,
+      currentTime: 0,
+      duration: 0,
+      volume: 1,
+      muted: false,
+      speed: 1,
+    };
+    const prompt = vi.fn(async () => {});
+    const sender = Object.assign(new EventTarget(), {
+      snapshot,
+      prompt,
+      disconnect: async () => {},
+      load: async () => {},
+      play: async () => {},
+      pause: async () => {},
+      seek: async () => {},
+      setVolume: async () => {},
+      setSpeed: async () => {},
+    }) satisfies FCastSender;
+
+    const view = render(<VideoSkin />, { wrapper: Wrapper });
+
+    expect(screen.queryByRole('button', { name: 'Cast with FCast' })).toBeNull();
+    expect(extensions.get(FCastExtension)).toBeUndefined();
+
+    view.rerender(<VideoSkin fcastSender={sender} />);
+    act(() => extensions.attach({ media: document.createElement('video'), container: null }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cast with FCast' }));
+    expect(extensions.get(FCastExtension)?.sender).toBe(sender);
+    expect(prompt).toHaveBeenCalledOnce();
+  });
+
   it('renders component-owned backdrops', () => {
     const { container } = render(<VideoSkin />, {
       wrapper: wrapper({

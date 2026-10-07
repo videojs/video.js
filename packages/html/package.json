@@ -173,6 +173,7 @@
   "dependencies": {
     "@videojs/core": "workspace:*",
     "@videojs/element": "workspace:*",
+    "@videojs/fcast": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/spf": "workspace:*",
@@ -182,7 +183,6 @@
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
-    "@videojs/fcast": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
@@ -203,7 +203,6 @@
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
-    "@videojs/fcast": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
@@ -225,9 +224,6 @@
       "optional": true
     },
     "@videojs/google-cast": {
-      "optional": true
-    },
-    "@videojs/fcast": {
       "optional": true
     },
     "@videojs/hlsjs-video": {

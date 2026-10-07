@@ -16,6 +16,7 @@ type CoreSchema = typeof coreSchema;
 const componentSources = {
   AudioTrackRadioGroup: '@videojs/react/ui/audio-track-radio-group',
   CaptionsRadioGroup: '@videojs/react/ui/captions-radio-group',
+  FCastButton: '@videojs/react/ui/fcast-button',
   PlaybackRateRadioGroup: '@videojs/react/ui/playback-rate-radio-group',
   QualityRadioGroup: '@videojs/react/ui/quality-radio-group',
 } as const satisfies Partial<Record<keyof CoreSchema['definitions'], string>>;

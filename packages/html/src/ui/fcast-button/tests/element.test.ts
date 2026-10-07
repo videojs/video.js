@@ -38,13 +38,21 @@ describe('FCastButtonElement', () => {
     const button = new FCastButtonElement();
     const sender = new TestSender();
 
-    button.sender = sender;
     provider.append(button);
     document.body.append(provider);
     provider.extensions.attach({ media: document.createElement('video'), container: null });
     await button.updateComplete;
 
+    expect(button.hidden).toBe(true);
+    expect(button.hasAttribute('data-hidden')).toBe(true);
+    expect(provider.extensions.get(FCastExtension)).toBeUndefined();
+
+    button.sender = sender;
+    await button.updateComplete;
+
     expect(button.getAttribute('aria-label')).toBe('Cast with FCast');
+    expect(button.hidden).toBe(false);
+    expect(button.hasAttribute('data-hidden')).toBe(false);
     expect(button.getAttribute('data-availability')).toBe('available');
     expect(provider.extensions.get(FCastExtension)?.enabled).toBe(true);
     expect(button.getAttribute('aria-disabled')).toBeNull();
@@ -58,5 +66,10 @@ describe('FCastButtonElement', () => {
 
     expect(button.hidden).toBe(false);
     expect(button.getAttribute('aria-label')).toBe('Disconnect from FCast');
+
+    button.sender = undefined;
+    await button.updateComplete;
+    expect(provider.extensions.get(FCastExtension)).toBeUndefined();
+    expect(button.hidden).toBe(true);
   });
 });
