@@ -9,6 +9,7 @@ import { defineExternalSignals } from '../../../../core/composition/define-exter
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { attachMediaSourceAsSourceElement } from '../../../../media/dom/mse/mediasource-setup';
 import { type DisableRemotePlaybackState, setupAirPlay } from '../../../behaviors/dom/airplay';
+import type { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [
@@ -24,11 +25,13 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 /** Every context key the behaviors declare. */
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
-/**
- * The config defaults the feature contributes. `attachMediaSource` is read by `setupMediaSource` in
- * `mediaSourceFeature`, not by this feature's own behaviors, so the object is not checked against `Config`.
- */
-export const defaultConfig = { attachMediaSource: attachMediaSourceAsSourceElement };
+/** This feature's behaviors plus `setupMediaSource`, which reads `attachMediaSource`. */
+type ConfigReaders = readonly [...Behaviors, typeof setupMediaSource];
+
+/** The config defaults the feature contributes. */
+export const defaultConfig = { attachMediaSource: attachMediaSourceAsSourceElement } satisfies Partial<
+  ResolveBehaviorConfig<ConfigReaders>
+>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;

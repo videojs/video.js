@@ -6,6 +6,7 @@ import {
   type ResolveBehaviorState,
 } from '../../../../core/composition/create-composition';
 import { defineFeature } from '../../../../core/composition/define-feature';
+import type { setupAudioBufferActors, setupVideoBufferActors } from '../../../behaviors/dom/setup-buffer-actors';
 import { deriveSharedMinStartMediaTime, establishStartMediaTime } from '../../../behaviors/establish-start-media-time';
 import { relocationPipelinesFor } from '../../../primitives/relocation-pipelines';
 
@@ -20,10 +21,10 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 /** Every context key the behaviors declare. */
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
-/**
- * The config defaults the feature contributes. The pipelines are read by the track features' buffer actors, not by this
- * feature's own behavior, so the object is not checked against `Config`.
- */
+/** This feature's behaviors plus the buffer actors, which read the message pipelines. */
+type ConfigReaders = readonly [...Behaviors, typeof setupVideoBufferActors, typeof setupAudioBufferActors];
+
+/** The config defaults the feature contributes. */
 export const defaultConfig = {
   // The coordination seam the reactor (model `startMediaTime`) and the
   // loader stamps (buffer `timestampOffset`) both read from config, so they
@@ -33,7 +34,7 @@ export const defaultConfig = {
   // The discover/stamp steps `establishStartMediaTime` pairs with.
   videoMessagePipelines: relocationPipelinesFor('video'),
   audioMessagePipelines: relocationPipelinesFor('audio'),
-};
+} satisfies Partial<ResolveBehaviorConfig<ConfigReaders>>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;
