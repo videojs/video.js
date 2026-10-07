@@ -23,7 +23,7 @@ export default styles({
     },
     top: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute inset-x-0 top-0 p-3 flex items-center justify-end gap-2',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute inset-x-0 top-0 p-3 flex items-center rtl:flex-row-reverse justify-end gap-2',
         'media-high-contrast:rounded-none media-high-contrast:bg-media-background forced-colors:rounded-none forced-colors:bg-[Canvas]',
         'forced-colors:inset-x-0 forced-colors:top-0 forced-colors:justify-end forced-colors:rounded-none!',
         'forced-colors:inset-e-0',
