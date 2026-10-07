@@ -170,10 +170,35 @@ Use `remotePlaybackAvailability` to decide whether to offer a route and `remoteP
 
 ### FCast receivers
 
-FCast receivers use a separate sender. Browsers cannot discover receivers over mDNS or open the FCast TCP connection, so provide an `FCastSender` backed by a native [FCast SDK](https://docs.fcast.org/sdk/) or an application bridge. Install `@videojs/fcast` alongside your Video.js framework package. The sender reports receiver availability and playback state, opens the device picker, and sends playback commands.
+FCast receivers use a separate sender. Browsers cannot discover receivers over mDNS or open the FCast TCP connection, so provide an `FCastSender` backed by a native [FCast SDK](https://docs.fcast.org/sdk/) or an application bridge. The sender reports receiver availability and playback state, opens the device picker, and sends playback commands.
+
+The packaged video and live video skins include an FCast control beside Cast and AirPlay. It stays hidden until you supply a sender. Install `@videojs/fcast` when creating the sender in your application.
 
 <FrameworkCase frameworks={["react"]}>
-Add `FCastButton` to your player UI beside `CastButton` and `AirPlayButton`. Pass it the sender from your application:
+Pass the sender to the skin:
+
+```tsx
+<VideoSkin fcastSender={sender} />
+```
+
+Set `fcastSrc` and `fcastContentType` when the receiver needs a different playable URL or MIME type.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Assign the sender to the skin element:
+
+```ts
+const skin = document.querySelector('video-skin')!;
+skin.fcastSender = sender;
+```
+
+Set `skin.fcastSrc` and `skin.fcastContentType` when the receiver needs a different playable URL or MIME type.
+</FrameworkCase>
+
+For a custom UI, add the FCast button beside the other casting controls:
+
+<FrameworkCase frameworks={["react"]}>
+Pass your sender to `FCastButton`:
 
 ```tsx
 import { FCastButton } from '@videojs/react/ui/fcast-button';
@@ -183,7 +208,7 @@ import { FCastButton } from '@videojs/react/ui/fcast-button';
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Register the custom element, place it beside the other cast controls, and assign the sender property:
+Register the custom element and assign the sender property:
 
 ```ts
 import '@videojs/html/ui/fcast-button';
@@ -196,7 +221,7 @@ document.querySelector('media-fcast-button')!.sender = sender;
 ```
 </FrameworkCase>
 
-The FCast button registers its own player extension, so existing play, pause, seek, volume, and speed controls follow the FCast receiver while connected. It reads the sender's `snapshot`, separate from `remotePlaybackState`, and exposes `data-fcast-state` and `data-availability` for styling. The packaged skins include AirPlay and Cast controls; add the FCast button to your own UI or skin source. Set `src` and `contentType` on the FCast button when the receiver needs a different playable URL or MIME type.
+The FCast button registers its own player extension, so existing play, pause, seek, volume, and speed controls follow the FCast receiver while connected. It reads the sender's `snapshot`, separate from `remotePlaybackState`, and exposes `data-fcast-state` and `data-availability` for styling. Set `src` and `contentType` on a custom FCast button when the receiver needs a different playable URL or MIME type.
 
 ## Troubleshooting
 

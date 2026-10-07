@@ -338,6 +338,9 @@ importers:
       '@videojs/dash-video':
         specifier: workspace:*
         version: link:../../packages/adapters/dash-video
+      '@videojs/fcast':
+        specifier: workspace:*
+        version: link:../../packages/extensions/fcast
       '@videojs/google-cast':
         specifier: workspace:*
         version: link:../../packages/extensions/google-cast
@@ -990,6 +993,9 @@ importers:
       '@videojs/element':
         specifier: workspace:*
         version: link:../element
+      '@videojs/fcast':
+        specifier: workspace:*
+        version: link:../extensions/fcast
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
@@ -1147,6 +1153,9 @@ importers:
       '@videojs/core':
         specifier: workspace:*
         version: link:../core
+      '@videojs/fcast':
+        specifier: workspace:*
+        version: link:../extensions/fcast
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
@@ -1262,6 +1271,9 @@ importers:
       '@videojs/element':
         specifier: workspace:*
         version: link:../element
+      '@videojs/fcast':
+        specifier: workspace:*
+        version: link:../extensions/fcast
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons

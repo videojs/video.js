@@ -1,12 +1,12 @@
 import { createShadowStyle } from '@videojs/utils/dom';
 
 import { template } from '../../internal/skins/default-video/template';
-import { SkinElement } from '../skin';
+import { FCastVideoSkinElement } from '../video-skin';
 
 import styles from '../../define/video/skin.css?inline';
 
 /** Packaged default video UI registered as `<video-skin>`. */
-export class VideoSkinElement extends SkinElement {
+export class VideoSkinElement extends FCastVideoSkinElement {
   static readonly tagName = 'video-skin';
   static styles: CSSStyleSheet | string = createShadowStyle(styles);
   static template = template;

@@ -1,4 +1,4 @@
-/** A media load request passed to an application-provided FCast bridge. @experimental */
+/** A media load request passed to an application-provided FCast bridge. */
 export interface FCastLoadRequest {
   /** Absolute media URL reachable by the receiver, not a browser blob URL or embed page. */
   url: string;
@@ -14,7 +14,7 @@ export interface FCastLoadRequest {
   speed: number;
 }
 
-/** Normalized receiver state published by an application-provided FCast bridge. @experimental */
+/** Normalized receiver state published by an application-provided FCast bridge. */
 export interface FCastSnapshot {
   /** Unsupported means no usable bridge; unavailable means discovery currently has no receivers. */
   availability: 'available' | 'unavailable' | 'unsupported';
@@ -50,8 +50,6 @@ export interface FCastSnapshot {
  * The application creates and disposes the bridge and owns its discovery resources. One bridge controls one player
  * session at a time. Video.js only subscribes, issues commands, and disconnects on removal; it does not destroy the
  * bridge. No transport, global injection mechanism, or bridge implementation is supplied by this package.
- *
- * @experimental
  */
 export interface FCastBridge extends EventTarget {
   readonly snapshot: FCastSnapshot;
@@ -71,5 +69,5 @@ export interface FCastBridge extends EventTarget {
   setSpeed(speed: number): Promise<void>;
 }
 
-/** Compatible name for the FCast bridge accepted by the `sender` property. @experimental */
+/** Compatible name for the FCast bridge accepted by the `sender` property. */
 export type FCastSender = FCastBridge;

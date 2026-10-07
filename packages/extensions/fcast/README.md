@@ -53,6 +53,10 @@ mute state, and speed. It dispatches a `change` event whenever those values chan
 device picker; `disconnect()` ends the session; `load()` and the remaining commands control the receiver. The button
 uses `src`/`contentType` when the receiver needs a different playable URL or MIME type from the local media.
 
+The packaged video and live video skins include an FCast button, hidden until a sender is supplied. In React, pass
+`fcastSender={sender}` to the skin. In HTML, assign `skin.fcastSender = sender` on the `<video-skin>` (or live video skin)
+element. The skin also accepts `fcastSrc` and `fcastContentType` when the receiver needs a different source.
+
 See the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries and the
 [FCast protocol](https://docs.fcast.org/protocol/v4/) for a bridge implementation.
 

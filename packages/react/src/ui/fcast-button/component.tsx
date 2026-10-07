@@ -27,9 +27,25 @@ export interface FCastButtonProps extends UIComponentProps<'button', FCastButton
  * @experimental
  */
 export const FCastButton = forwardRef(function FCastButton(
-  { sender, src, contentType, disabled, render, className, style, ...elementProps }: FCastButtonProps,
+  props: FCastButtonProps,
   forwardedRef: ForwardedRef<HTMLButtonElement>
 ) {
+  if (!props.sender) return null;
+
+  return <ActiveFCastButton {...props} forwardedRef={forwardedRef} />;
+});
+
+function ActiveFCastButton({
+  sender,
+  src,
+  contentType,
+  disabled,
+  render,
+  className,
+  style,
+  forwardedRef,
+  ...elementProps
+}: FCastButtonProps & { forwardedRef: ForwardedRef<HTMLButtonElement> }) {
   const extension = usePlayerExtension(FCastExtension);
 
   useSyncProps(extension, { contentType, src, sender }, FCastExtension.defaultProps);
@@ -71,7 +87,7 @@ export const FCastButton = forwardRef(function FCastButton(
     },
   });
 
-  if (!sender || (state.availability === 'unsupported' && state.connection !== 'connected')) return null;
+  if (state.availability === 'unsupported' && state.connection !== 'connected') return null;
 
   return renderElement(
     'button',
@@ -91,10 +107,11 @@ export const FCastButton = forwardRef(function FCastButton(
       ],
     }
   );
-});
+}
 
 if (__DEV__) FCastButton.displayName = 'FCastButton';
 
+/** @experimental */
 export namespace FCastButton {
   export type Props = FCastButtonProps;
   export type State = FCastButtonState;

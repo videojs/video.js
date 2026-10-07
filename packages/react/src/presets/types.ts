@@ -1,3 +1,4 @@
+import type { FCastSender } from '@videojs/fcast';
 import type { CSSProperties, PropsWithChildren } from 'react';
 
 import type { Poster } from '@/ui/poster';
@@ -16,6 +17,12 @@ export type BaseSkinProps<T = unknown> = PropsWithChildren<
 
 /** Shared props for video skins, including poster rendering customization. */
 export type BaseVideoSkinProps<T = unknown> = BaseSkinProps<T> & {
+  /** FCast bridge used by the skin's built-in FCast control. */
+  fcastSender?: FCastSender;
+  /** Receiver-playable URL when the local media source cannot be sent directly. */
+  fcastSrc?: string;
+  /** MIME type of the receiver-playable URL. */
+  fcastContentType?: string;
   /**
    * Draws the poster image, in place of the `<img>` the skin renders. The URL still comes from the player, as `src`
    * alongside the rest of the image props — undefined until one resolves.
