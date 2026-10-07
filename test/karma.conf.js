@@ -27,7 +27,8 @@ module.exports = function(config) {
 
   config = generate(config, options);
 
-  if (!config.browsers || !config.browsers.length) {
+  // Only for local runs: CI keeps karma's browser detection, which also covers Firefox.
+  if (!process.env.CI && (!config.browsers || !config.browsers.length)) {
     config.browsers = ['ChromeHeadless'];
     config.detectBrowsers.enabled = false;
   }
