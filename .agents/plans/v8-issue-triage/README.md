@@ -61,55 +61,49 @@ These verdicts are also in `overrides.json`. `execute.mjs` leaves `merge-here` P
 - #9241, limited to local runs so CI keeps testing Firefox. The full Karma suite passed locally: 1391 of 1392, 1 skipped.
 - #7789's fork couldn't be pushed to (it's owned by an organization), so #9319 superseded it, with Nathan Naveen as co-author, and #7789 was closed with a link.
 
-## 2. Stand up `videojs/videojs-v8` (Wes or an org admin)
+## 2. Stand up `videojs/videojs-v8`
 
-Do this before any comment links there. Checked on 2026-10-07; `[x]` means already in place.
+Done on 2026-10-07, except for the items that need secret values or an npm login. The file changes are in [videojs-v8#9](https://github.com/videojs/videojs-v8/pull/9), which merges once CI passes. `[x]` means done.
 
 Access and settings:
 
-- [x] Rahim has admin access. Transfers need write access to both repos.
+- [x] Rahim, Heff, and Wes have admin on both repos.
 - [x] Private vulnerability reporting is on.
 - [x] Description and homepage (`legacy.videojs.org`) are set.
 - [x] Org secrets `BROWSER_STACK_*` and `NPM_TOKEN` are visible to the repo.
-- [ ] Add the `CODECOV_TOKEN` repo secret, or drop Codecov from `ci.yml`. In `video.js` it's a repo secret, so it didn't carry over.
-- [ ] Merge settings: allow only rebase merging, so moved PRs keep their authors (see step 7).
+- [x] Merge settings: rebase only, and merged branches are deleted. Moved PRs keep their authors (see step 7).
+- [ ] **Needs the value:** add the `CODECOV_TOKEN` repo secret, or drop Codecov from `ci.yml`. In `video.js` it's a repo secret, so it didn't carry over.
 
 Code, branches, and tags:
 
-- [x] All v1–v8 git tags are present except `v8.24.2`. The `@videojs/*` tags are v10 and belong in `video.js`.
-- [ ] Keep `main` as the v8 branch. After step 1's merges, fast-forward it to `video.js` `8.x`, and push tag `v8.24.2`. Today it's 2 commits behind: #9244 and 8.24.2.
-- [ ] Then commit to `main` to point the workflows back at `main`. #9244 limited them to `8.x` so they'd stay off v10's `main` in `video.js`, and the fast-forward brings that limit in. Four places:
-  - `ci.yml`: `push`/`pull_request` branches, and the `refs/heads/8.x` check.
-  - `pr-titles.yml`: `branches`.
-  - `lock.yml`: the `refs/heads/8.x` check.
-  - `release.yml`: the `origin/8.x` ancestry check and its error message.
-  Keep #9244's `publishConfig.tag: next-8` in `package.json`; it stops a bare `npm publish` from taking `latest`.
-- [ ] Delete the stray `HEAD` branch.
-- [ ] Add a ruleset protecting `main`, matching `video.js`'s `8.x` ruleset. The repo has no rulesets yet.
+- [x] `main` was fast-forwarded to `video.js` `8.x` (`b13f5fe159`, which includes step 1). Tag `v8.24.2` was pushed, so every v1–v8 tag is now present. Actions were paused for the few seconds of the push, so the tag didn't start a release run.
+- [x] Workflows run on `main` again, in PR #9: `ci.yml`, `pr-titles.yml`, `lock.yml`, and the `release.yml` tag check. #9244's `publishConfig.tag: next-8` stays. The PR's own checks run with the new triggers.
+- [x] The stray `HEAD` branch is deleted.
+- [x] Ruleset `main`: no deletion and no force-push, matching `video.js`'s `8.x` ruleset.
 
 Releases:
 
-- [ ] Create a `Deploy` environment with a tag policy for `v8.*`, matching `video.js`. Add its five secrets: `AWS_ACCESS_KEY_ID`, `AWS_S3_ACCESS`, `AWS_S3_BUCKET`, `AWS_S3_KEY`, and `AWS_S3_SECRET`. `release.yml` publishes to npm and uploads to the CDN from that environment; today the repo has no environments.
-- [ ] Turn on Discussions with a `Releases` category, or remove `discussion_category_name` from `release.yml`. The release step posts a discussion there, and Discussions are off.
-- [ ] On npmjs.com, add a trusted publisher for `video.js`: `videojs/videojs-v8`, `release.yml`, environment `Deploy`. Keep the one for `videojs/video.js`, because v10 publishes `video.js` from there.
+- [x] The `Deploy` environment exists, matching `video.js`: a 5-minute wait timer and `v8.*` tags only.
+- [ ] **Needs the values:** add its five secrets, `AWS_ACCESS_KEY_ID`, `AWS_S3_ACCESS`, `AWS_S3_BUCKET`, `AWS_S3_KEY`, and `AWS_S3_SECRET`. They're copied from `video.js`'s `Deploy` environment, and the CDN upload job uses them.
+- [x] The release no longer posts a discussion (PR #9). Discussions are off here, and the API can't create a `Releases` category.
+- [ ] **Needs an npm login:** on npmjs.com, add a trusted publisher for `video.js`: `videojs/videojs-v8`, `release.yml`, environment `Deploy`. Keep the one for `videojs/video.js`, because v10 publishes `video.js` from there.
   - 8.24.2's provenance shows it was published by `videojs/video.js` `release.yml`.
-  - I couldn't list the configured publishers; that needs an npm login.
   - A package can have up to 10 publishers, and a new one must complete a publish within 2 days.
-- [ ] Set `repository.url` in `package.json` to `videojs/videojs-v8`. npm trusted publishing requires an exact match.
-- [ ] Keep `--tag next-8` in `release.yml` and `publishConfig.tag` in `package.json`. Without them, `npm publish` would move `latest` back to v8.
-- [ ] Promote 8.24.2 to `latest-8` once it's verified: `npm dist-tag add video.js@8.24.2 latest-8`. It shipped on `next-8` only, and `latest-8` is still 8.24.1.
-- [ ] Release notes: the 60 existing v8 GitHub Releases stay in `video.js` (the repo has 0). New ones are created wherever `release.yml` runs.
+- [x] `repository.url` in `package.json` points at `videojs/videojs-v8` (PR #9). npm trusted publishing requires an exact match.
+- [x] `--tag next-8` in `release.yml` and `publishConfig.tag` in `package.json` are unchanged.
+- [ ] **Needs npm 2FA:** promote 8.24.2 to `latest-8` once it's verified, with `npm dist-tag add video.js@8.24.2 latest-8`. It shipped on `next-8` only, and `latest-8` is still 8.24.1.
+- [x] Release notes: the 60 existing v8 GitHub Releases stay in `video.js`. New ones are created here by `release.yml`.
 
-Docs:
+Docs (PR #9):
 
-- [ ] Add a `SECURITY.md` with the v8 policy: security fixes only until October 1, 2028. The draft is `videojs-v8-SECURITY.md` in this folder, adapted from `video.js`'s current policy. Every close comment links to it.
-- [ ] Add a maintenance notice to the README, which still says "Big changes coming in Video.js 10, early 2026". It ships to npm with the next v8 patch.
-- [ ] Update the issue templates: a security contact link, a pointer to v10, and a note that v8 is security-only.
+- [x] `SECURITY.md`, from `videojs-v8-SECURITY.md` with Heff's edits.
+- [x] The README maintenance notice replaces "Big changes coming in Video.js 10, early 2026". It ships to npm with the next v8 patch.
+- [x] Issue templates: a v8 note on the bug form, and contact links for private security reports, Video.js 10, and the migration guide.
 
 ## 3. Point `videojs/video.js` at it (a PR on `main`)
 
-- [ ] `SECURITY.md`: in the 8.x row and the "Fixes land on the `8.x` branch" line, point at `videojs/videojs-v8` (`main`), and send v8 vulnerability reports there. Match the v8 draft's wording too: it now promises "security fixes and a best effort on bug fixes", while this file still says "no non-security bug fixes". `execute.mjs` refuses to run until this file mentions `videojs/videojs-v8`.
-- [ ] Issue templates: change the bug report's v8 note and the "Video.js 8" version option to point v8 bugs at `videojs/videojs-v8`, and add a v8 contact link to `config.yml`.
+- [x] Opened as [#9321](https://github.com/videojs/video.js/pull/9321); it merges once checks pass. `SECURITY.md`: in the 8.x row and the "Fixes land on the `8.x` branch" line, point at `videojs/videojs-v8` (`main`), and send v8 vulnerability reports there. Its v8 wording now matches the v8 draft: "security fixes and a best effort on bug fixes". `execute.mjs` refuses to run until this file mentions `videojs/videojs-v8`.
+- [x] Issue templates (#9321): the bug report's v8 note sends v8 bugs to `videojs/videojs-v8`, and `config.yml` gains a v8 contact link. The version dropdown is unchanged, since nothing reads it.
 - [ ] Keep `8.x` and every `v*` tag here. v10's `release-pr.yml` builds the root changelog from `origin/8.x` and the release tags. Freeze the branch with a ruleset, or move the changelog source before deleting anything.
 - [ ] Optional: edit the two test comments (#2004 and #5762) to point at `videojs/videojs-v8`.
 - [ ] When #9259 releases, check that both `latest` and `next` on `video.js` point at v10. As of 2026-10-07, both are still 8.24.1.
