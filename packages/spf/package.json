@@ -160,6 +160,161 @@
       "development": "./dist/dev/hls/features/video.js",
       "default": "./dist/default/hls/features/video.js"
     },
+    "./behaviors/calculate-presentation-duration": {
+      "types": "./dist/dev/behaviors/calculate-presentation-duration.d.ts",
+      "development": "./dist/dev/behaviors/calculate-presentation-duration.js",
+      "default": "./dist/default/behaviors/calculate-presentation-duration.js"
+    },
+    "./behaviors/collect-errors": {
+      "types": "./dist/dev/behaviors/collect-errors.d.ts",
+      "development": "./dist/dev/behaviors/collect-errors.js",
+      "default": "./dist/default/behaviors/collect-errors.js"
+    },
+    "./behaviors/derive-cdn-priority": {
+      "types": "./dist/dev/behaviors/derive-cdn-priority.d.ts",
+      "development": "./dist/dev/behaviors/derive-cdn-priority.js",
+      "default": "./dist/default/behaviors/derive-cdn-priority.js"
+    },
+    "./behaviors/dom/airplay": {
+      "types": "./dist/dev/behaviors/dom/airplay.d.ts",
+      "development": "./dist/dev/behaviors/dom/airplay.js",
+      "default": "./dist/default/behaviors/dom/airplay.js"
+    },
+    "./behaviors/dom/apply-start-position": {
+      "types": "./dist/dev/behaviors/dom/apply-start-position.d.ts",
+      "development": "./dist/dev/behaviors/dom/apply-start-position.js",
+      "default": "./dist/default/behaviors/dom/apply-start-position.js"
+    },
+    "./behaviors/dom/end-of-stream": {
+      "types": "./dist/dev/behaviors/dom/end-of-stream.d.ts",
+      "development": "./dist/dev/behaviors/dom/end-of-stream.js",
+      "default": "./dist/default/behaviors/dom/end-of-stream.js"
+    },
+    "./behaviors/dom/exchange-licenses": {
+      "types": "./dist/dev/behaviors/dom/exchange-licenses.d.ts",
+      "development": "./dist/dev/behaviors/dom/exchange-licenses.js",
+      "default": "./dist/default/behaviors/dom/exchange-licenses.js"
+    },
+    "./behaviors/dom/load-chapters": {
+      "types": "./dist/dev/behaviors/dom/load-chapters.d.ts",
+      "development": "./dist/dev/behaviors/dom/load-chapters.js",
+      "default": "./dist/default/behaviors/dom/load-chapters.js"
+    },
+    "./behaviors/dom/load-segments": {
+      "types": "./dist/dev/behaviors/dom/load-segments.d.ts",
+      "development": "./dist/dev/behaviors/dom/load-segments.js",
+      "default": "./dist/default/behaviors/dom/load-segments.js"
+    },
+    "./behaviors/dom/recover-end-stall": {
+      "types": "./dist/dev/behaviors/dom/recover-end-stall.d.ts",
+      "development": "./dist/dev/behaviors/dom/recover-end-stall.js",
+      "default": "./dist/default/behaviors/dom/recover-end-stall.js"
+    },
+    "./behaviors/dom/seek-to-live-edge": {
+      "types": "./dist/dev/behaviors/dom/seek-to-live-edge.d.ts",
+      "development": "./dist/dev/behaviors/dom/seek-to-live-edge.js",
+      "default": "./dist/default/behaviors/dom/seek-to-live-edge.js"
+    },
+    "./behaviors/dom/setup-airplay-fairplay": {
+      "types": "./dist/dev/behaviors/dom/setup-airplay-fairplay.d.ts",
+      "development": "./dist/dev/behaviors/dom/setup-airplay-fairplay.js",
+      "default": "./dist/default/behaviors/dom/setup-airplay-fairplay.js"
+    },
+    "./behaviors/dom/setup-buffer-actors": {
+      "types": "./dist/dev/behaviors/dom/setup-buffer-actors.d.ts",
+      "development": "./dist/dev/behaviors/dom/setup-buffer-actors.js",
+      "default": "./dist/default/behaviors/dom/setup-buffer-actors.js"
+    },
+    "./behaviors/dom/setup-media-keys": {
+      "types": "./dist/dev/behaviors/dom/setup-media-keys.d.ts",
+      "development": "./dist/dev/behaviors/dom/setup-media-keys.js",
+      "default": "./dist/default/behaviors/dom/setup-media-keys.js"
+    },
+    "./behaviors/dom/setup-mediasource": {
+      "types": "./dist/dev/behaviors/dom/setup-mediasource.d.ts",
+      "development": "./dist/dev/behaviors/dom/setup-mediasource.js",
+      "default": "./dist/default/behaviors/dom/setup-mediasource.js"
+    },
+    "./behaviors/dom/setup-text-track-actors": {
+      "types": "./dist/dev/behaviors/dom/setup-text-track-actors.d.ts",
+      "development": "./dist/dev/behaviors/dom/setup-text-track-actors.js",
+      "default": "./dist/default/behaviors/dom/setup-text-track-actors.js"
+    },
+    "./behaviors/dom/sync-live-seekable-range": {
+      "types": "./dist/dev/behaviors/dom/sync-live-seekable-range.d.ts",
+      "development": "./dist/dev/behaviors/dom/sync-live-seekable-range.js",
+      "default": "./dist/default/behaviors/dom/sync-live-seekable-range.js"
+    },
+    "./behaviors/dom/sync-text-tracks": {
+      "types": "./dist/dev/behaviors/dom/sync-text-tracks.d.ts",
+      "development": "./dist/dev/behaviors/dom/sync-text-tracks.js",
+      "default": "./dist/default/behaviors/dom/sync-text-tracks.js"
+    },
+    "./behaviors/dom/track-current-time": {
+      "types": "./dist/dev/behaviors/dom/track-current-time.d.ts",
+      "development": "./dist/dev/behaviors/dom/track-current-time.js",
+      "default": "./dist/default/behaviors/dom/track-current-time.js"
+    },
+    "./behaviors/dom/track-load-triggers": {
+      "types": "./dist/dev/behaviors/dom/track-load-triggers.d.ts",
+      "development": "./dist/dev/behaviors/dom/track-load-triggers.js",
+      "default": "./dist/default/behaviors/dom/track-load-triggers.js"
+    },
+    "./behaviors/dom/track-playback-rate": {
+      "types": "./dist/dev/behaviors/dom/track-playback-rate.d.ts",
+      "development": "./dist/dev/behaviors/dom/track-playback-rate.js",
+      "default": "./dist/default/behaviors/dom/track-playback-rate.js"
+    },
+    "./behaviors/dom/track-player-resolution": {
+      "types": "./dist/dev/behaviors/dom/track-player-resolution.d.ts",
+      "development": "./dist/dev/behaviors/dom/track-player-resolution.js",
+      "default": "./dist/default/behaviors/dom/track-player-resolution.js"
+    },
+    "./behaviors/dom/track-screen-resolution": {
+      "types": "./dist/dev/behaviors/dom/track-screen-resolution.d.ts",
+      "development": "./dist/dev/behaviors/dom/track-screen-resolution.js",
+      "default": "./dist/default/behaviors/dom/track-screen-resolution.js"
+    },
+    "./behaviors/dom/update-mediasource-duration": {
+      "types": "./dist/dev/behaviors/dom/update-mediasource-duration.d.ts",
+      "development": "./dist/dev/behaviors/dom/update-mediasource-duration.js",
+      "default": "./dist/default/behaviors/dom/update-mediasource-duration.js"
+    },
+    "./behaviors/establish-start-media-time": {
+      "types": "./dist/dev/behaviors/establish-start-media-time.d.ts",
+      "development": "./dist/dev/behaviors/establish-start-media-time.js",
+      "default": "./dist/default/behaviors/establish-start-media-time.js"
+    },
+    "./behaviors/resolve-presentation": {
+      "types": "./dist/dev/behaviors/resolve-presentation.d.ts",
+      "development": "./dist/dev/behaviors/resolve-presentation.js",
+      "default": "./dist/default/behaviors/resolve-presentation.js"
+    },
+    "./behaviors/resolve-track": {
+      "types": "./dist/dev/behaviors/resolve-track.d.ts",
+      "development": "./dist/dev/behaviors/resolve-track.js",
+      "default": "./dist/default/behaviors/resolve-track.js"
+    },
+    "./behaviors/select-tracks": {
+      "types": "./dist/dev/behaviors/select-tracks.d.ts",
+      "development": "./dist/dev/behaviors/select-tracks.js",
+      "default": "./dist/default/behaviors/select-tracks.js"
+    },
+    "./behaviors/setup-failover-monitor": {
+      "types": "./dist/dev/behaviors/setup-failover-monitor.d.ts",
+      "development": "./dist/dev/behaviors/setup-failover-monitor.js",
+      "default": "./dist/default/behaviors/setup-failover-monitor.js"
+    },
+    "./behaviors/sync-preload": {
+      "types": "./dist/dev/behaviors/sync-preload.d.ts",
+      "development": "./dist/dev/behaviors/sync-preload.js",
+      "default": "./dist/default/behaviors/sync-preload.js"
+    },
+    "./behaviors/track-switching": {
+      "types": "./dist/dev/behaviors/track-switching.d.ts",
+      "development": "./dist/dev/behaviors/track-switching.js",
+      "default": "./dist/default/behaviors/track-switching.js"
+    },
     "./media-tracks": {
       "types": "./dist/dev/media-tracks.d.ts",
       "development": "./dist/dev/media-tracks.js",
