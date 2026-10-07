@@ -50,8 +50,8 @@ changes your project. `npx` downloads only the small `@videojs/cli` package, not
 
 ## Video.js 8
 
-Video.js 8 is alive and well. Brightcove maintains it as the legacy release line, with security and bug fixes. Pin the
-major version to install it:
+Video.js 8 is alive and well. Brightcove maintains it as the legacy release line, with security fixes until October 1,
+2028. Pin the major version to install it:
 
 ```sh
 npm install video.js@8
@@ -98,7 +98,7 @@ If you need help with anything related to Video.js 10, or if you'd like to casua
 [cdn-install]: https://videojs.org/docs/guides/installation/cdn
 [html-migrate]: https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8
 [react-migrate]: https://videojs.org/docs/framework/react/guides/migrate-from-video-js-8
-[v8-repo]: https://github.com/videojs/video.js
+[v8-repo]: https://github.com/videojs/videojs-v8
 [v8-docs]: https://legacy.videojs.org
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions
