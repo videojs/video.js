@@ -35,6 +35,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: '.nvmrc'
+          package-manager-cache: false
 
       # Generates Video.js 10 from main, excluding the merged Video.js 8 history
       # (history/v8-tip), and Video.js 8 and earlier from origin/8.x. fetch-depth: 0
