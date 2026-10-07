@@ -84,7 +84,10 @@ export {
 // The features the engines are composed from: each a set of behaviors with the
 // config defaults and initial state they need. Pass a list of them, in order, to
 // `flattenFeatures` (from `@videojs/spf`) to compose an engine of your own; each
-// engine entry also exports its own `features` list.
+// engine entry also exports its own `features` list. Each feature also has its
+// own entry point, `@videojs/spf/hls/features/<name>`, exporting its parts under
+// the same names as the engine entries (`behaviors`, `defaultConfig`,
+// `initialState`, and the `Behaviors`, `Config`, `State`, `Context` types).
 export { airPlayFeature } from './features/airplay';
 export { airPlayFairPlayFeature } from './features/airplay-fairplay';
 export { audioFeature } from './features/audio';

@@ -1,3 +1,10 @@
+import type { Simplify } from '@videojs/utils/types';
+
+import {
+  type ResolveBehaviorConfig,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
+} from '../../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { canPlayTrack } from '../../../../media/dom/capabilities';
@@ -6,6 +13,29 @@ import { setupAudioBufferActors } from '../../../behaviors/dom/setup-buffer-acto
 import { resolveAudioTrack } from '../../../behaviors/resolve-track';
 import { switchAudioTrack, type UserTrackSelectionState } from '../../../behaviors/track-switching';
 import { reportUnsupportedTrackConditions } from '../../../primitives/report-track-conditions';
+
+/** The behaviors the feature composes, in setup order. */
+export const behaviors = [
+  resolveAudioTrack,
+  switchAudioTrack,
+  setupAudioBufferActors,
+  loadAudioSegments,
+  defineExternalSignals<UserTrackSelectionState<'audio'>>()({ state: ['userAudioTrackSelection'] }),
+] as const;
+
+export type Behaviors = typeof behaviors;
+/** Every config key the behaviors read. */
+export type Config = ResolveBehaviorConfig<Behaviors>;
+/** Every state key the behaviors and external signals declare. */
+export type State = Simplify<ResolveBehaviorState<Behaviors>>;
+/** Every context key the behaviors declare. */
+export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
+
+/** The config defaults the feature contributes. */
+export const defaultConfig = { canPlayTrack, reportUnsupportedTrackConditions } satisfies Partial<Config>;
+
+/** The state values the feature seeds. */
+export const initialState = {} satisfies Partial<State>;
 
 /**
  * Plays audio: resolves the selected rendition's playlist, switches renditions, and buffers and loads its segments.
@@ -18,13 +48,4 @@ import { reportUnsupportedTrackConditions } from '../../../primitives/report-tra
  * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
  *   init segments load.
  */
-export const audioFeature = defineFeature({
-  behaviors: [
-    resolveAudioTrack,
-    switchAudioTrack,
-    setupAudioBufferActors,
-    loadAudioSegments,
-    defineExternalSignals<UserTrackSelectionState<'audio'>>()({ state: ['userAudioTrackSelection'] }),
-  ],
-  defaultConfig: { canPlayTrack, reportUnsupportedTrackConditions },
-});
+export const audioFeature = defineFeature({ behaviors, defaultConfig, initialState });

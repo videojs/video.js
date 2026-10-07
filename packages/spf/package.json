@@ -55,6 +55,111 @@
       "development": "./dist/dev/hls/background-video.js",
       "default": "./dist/default/hls/background-video.js"
     },
+    "./hls/features/airplay": {
+      "types": "./dist/dev/hls/features/airplay.d.ts",
+      "development": "./dist/dev/hls/features/airplay.js",
+      "default": "./dist/default/hls/features/airplay.js"
+    },
+    "./hls/features/airplay-fairplay": {
+      "types": "./dist/dev/hls/features/airplay-fairplay.d.ts",
+      "development": "./dist/dev/hls/features/airplay-fairplay.js",
+      "default": "./dist/default/hls/features/airplay-fairplay.js"
+    },
+    "./hls/features/audio": {
+      "types": "./dist/dev/hls/features/audio.d.ts",
+      "development": "./dist/dev/hls/features/audio.js",
+      "default": "./dist/default/hls/features/audio.js"
+    },
+    "./hls/features/background-video": {
+      "types": "./dist/dev/hls/features/background-video.d.ts",
+      "development": "./dist/dev/hls/features/background-video.js",
+      "default": "./dist/default/hls/features/background-video.js"
+    },
+    "./hls/features/calculate-duration": {
+      "types": "./dist/dev/hls/features/calculate-duration.d.ts",
+      "development": "./dist/dev/hls/features/calculate-duration.js",
+      "default": "./dist/default/hls/features/calculate-duration.js"
+    },
+    "./hls/features/chapters": {
+      "types": "./dist/dev/hls/features/chapters.d.ts",
+      "development": "./dist/dev/hls/features/chapters.js",
+      "default": "./dist/default/hls/features/chapters.js"
+    },
+    "./hls/features/current-time": {
+      "types": "./dist/dev/hls/features/current-time.d.ts",
+      "development": "./dist/dev/hls/features/current-time.js",
+      "default": "./dist/default/hls/features/current-time.js"
+    },
+    "./hls/features/drm": {
+      "types": "./dist/dev/hls/features/drm.d.ts",
+      "development": "./dist/dev/hls/features/drm.js",
+      "default": "./dist/default/hls/features/drm.js"
+    },
+    "./hls/features/end-stall-recovery": {
+      "types": "./dist/dev/hls/features/end-stall-recovery.d.ts",
+      "development": "./dist/dev/hls/features/end-stall-recovery.js",
+      "default": "./dist/default/hls/features/end-stall-recovery.js"
+    },
+    "./hls/features/error": {
+      "types": "./dist/dev/hls/features/error.d.ts",
+      "development": "./dist/dev/hls/features/error.js",
+      "default": "./dist/default/hls/features/error.js"
+    },
+    "./hls/features/hls-loading": {
+      "types": "./dist/dev/hls/features/hls-loading.d.ts",
+      "development": "./dist/dev/hls/features/hls-loading.js",
+      "default": "./dist/default/hls/features/hls-loading.js"
+    },
+    "./hls/features/initial-load": {
+      "types": "./dist/dev/hls/features/initial-load.d.ts",
+      "development": "./dist/dev/hls/features/initial-load.js",
+      "default": "./dist/default/hls/features/initial-load.js"
+    },
+    "./hls/features/live": {
+      "types": "./dist/dev/hls/features/live.d.ts",
+      "development": "./dist/dev/hls/features/live.js",
+      "default": "./dist/default/hls/features/live.js"
+    },
+    "./hls/features/media-source": {
+      "types": "./dist/dev/hls/features/media-source.d.ts",
+      "development": "./dist/dev/hls/features/media-source.js",
+      "default": "./dist/default/hls/features/media-source.js"
+    },
+    "./hls/features/monitor-player-size": {
+      "types": "./dist/dev/hls/features/monitor-player-size.d.ts",
+      "development": "./dist/dev/hls/features/monitor-player-size.js",
+      "default": "./dist/default/hls/features/monitor-player-size.js"
+    },
+    "./hls/features/multi-cdn": {
+      "types": "./dist/dev/hls/features/multi-cdn.d.ts",
+      "development": "./dist/dev/hls/features/multi-cdn.js",
+      "default": "./dist/default/hls/features/multi-cdn.js"
+    },
+    "./hls/features/shift-text-timestamps": {
+      "types": "./dist/dev/hls/features/shift-text-timestamps.d.ts",
+      "development": "./dist/dev/hls/features/shift-text-timestamps.js",
+      "default": "./dist/default/hls/features/shift-text-timestamps.js"
+    },
+    "./hls/features/shift-timestamps": {
+      "types": "./dist/dev/hls/features/shift-timestamps.d.ts",
+      "development": "./dist/dev/hls/features/shift-timestamps.js",
+      "default": "./dist/default/hls/features/shift-timestamps.js"
+    },
+    "./hls/features/start-position": {
+      "types": "./dist/dev/hls/features/start-position.d.ts",
+      "development": "./dist/dev/hls/features/start-position.js",
+      "default": "./dist/default/hls/features/start-position.js"
+    },
+    "./hls/features/text-tracks": {
+      "types": "./dist/dev/hls/features/text-tracks.d.ts",
+      "development": "./dist/dev/hls/features/text-tracks.js",
+      "default": "./dist/default/hls/features/text-tracks.js"
+    },
+    "./hls/features/video": {
+      "types": "./dist/dev/hls/features/video.d.ts",
+      "development": "./dist/dev/hls/features/video.js",
+      "default": "./dist/default/hls/features/video.js"
+    },
     "./media-tracks": {
       "types": "./dist/dev/media-tracks.d.ts",
       "development": "./dist/dev/media-tracks.js",

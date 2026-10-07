@@ -1,3 +1,10 @@
+import type { Simplify } from '@videojs/utils/types';
+
+import {
+  type ResolveBehaviorConfig,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
+} from '../../../../core/composition/create-composition';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { canPlayTrackWithDrm } from '../../../../media/dom/capabilities';
 import { DEFAULT_KEY_SYSTEMS } from '../../../../media/dom/key-systems';
@@ -26,6 +33,48 @@ const drmAwareAudioConstraints: readonly SwitchAudioTrackRule[] = [
   excludeRefusedKeySystems,
 ];
 
+/** The behaviors the feature composes, in setup order. */
+export const behaviors = [
+  // `exchangeLicenses` precedes the negotiation it consumes, also
+  // load-bearing: `createComposition` calls cleanups in registration order,
+  // and the sessions it opens must close before `setupMediaKeys` detaches
+  // the MediaKeys they belong to. Setup order costs nothing in return — its
+  // precondition is reactive on `context.mediaKeys`.
+  exchangeLicenses,
+  setupMediaKeys,
+] as const;
+
+export type Behaviors = typeof behaviors;
+/** Every config key the behaviors read. */
+export type Config = ResolveBehaviorConfig<Behaviors>;
+/** Every state key the behaviors and external signals declare. */
+export type State = Simplify<ResolveBehaviorState<Behaviors>>;
+/** Every context key the behaviors declare. */
+export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
+
+/**
+ * The config defaults the feature contributes. Most keys here are read by `videoFeature`'s and `audioFeature`'s
+ * behaviors rather than this feature's own, so they are typed above instead of checked against `Config`.
+ */
+export const defaultConfig = {
+  // No license servers configured is the degenerate DRM config: the DRM-aware
+  // probe and reporter refuse encrypted renditions exactly as the DRM-less
+  // `canPlayTrack` / `reportUnsupportedTrackConditions` pair does, and
+  // `setupMediaKeys` reports SVTA 4008 for an encrypted source it can't serve.
+  drm: noLicenseServers,
+  keySystems: defaultKeySystems,
+  canPlayTrack: canPlayTrackWithDrm,
+  // The late half of DRM pruning, appended to each type's default pre-pass:
+  // once negotiation publishes a refusal, encrypted renditions prune and the
+  // emptied type reports its own verdict.
+  videoConstraints: drmAwareVideoConstraints,
+  audioConstraints: drmAwareAudioConstraints,
+  reportUnsupportedTrackConditions: reportUnsupportedTrackConditionsWithDrm,
+};
+
+/** The state values the feature seeds. */
+export const initialState = {} satisfies Partial<State>;
+
 /**
  * Plays DRM-protected content through Encrypted Media Extensions: negotiates a key system over the configured license
  * servers, attaches its MediaKeys, and exchanges licenses. Segment loading waits until a source is confirmed clear or
@@ -38,29 +87,4 @@ const drmAwareAudioConstraints: readonly SwitchAudioTrackRule[] = [
  * audio constraints. Compose it after the features that set the plain versions, such as `videoFeature` and
  * `audioFeature`, or theirs win and encrypted renditions are refused.
  */
-export const drmFeature = defineFeature({
-  behaviors: [
-    // `exchangeLicenses` precedes the negotiation it consumes, also
-    // load-bearing: `createComposition` calls cleanups in registration order,
-    // and the sessions it opens must close before `setupMediaKeys` detaches
-    // the MediaKeys they belong to. Setup order costs nothing in return — its
-    // precondition is reactive on `context.mediaKeys`.
-    exchangeLicenses,
-    setupMediaKeys,
-  ],
-  defaultConfig: {
-    // No license servers configured is the degenerate DRM config: the DRM-aware
-    // probe and reporter refuse encrypted renditions exactly as the DRM-less
-    // `canPlayTrack` / `reportUnsupportedTrackConditions` pair does, and
-    // `setupMediaKeys` reports SVTA 4008 for an encrypted source it can't serve.
-    drm: noLicenseServers,
-    keySystems: defaultKeySystems,
-    canPlayTrack: canPlayTrackWithDrm,
-    // The late half of DRM pruning, appended to each type's default pre-pass:
-    // once negotiation publishes a refusal, encrypted renditions prune and the
-    // emptied type reports its own verdict.
-    videoConstraints: drmAwareVideoConstraints,
-    audioConstraints: drmAwareAudioConstraints,
-    reportUnsupportedTrackConditions: reportUnsupportedTrackConditionsWithDrm,
-  },
-});
+export const drmFeature = defineFeature({ behaviors, defaultConfig, initialState });

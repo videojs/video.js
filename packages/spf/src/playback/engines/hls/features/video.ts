@@ -1,3 +1,10 @@
+import type { Simplify } from '@videojs/utils/types';
+
+import {
+  type ResolveBehaviorConfig,
+  type ResolveBehaviorContext,
+  type ResolveBehaviorState,
+} from '../../../../core/composition/create-composition';
 import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
 import { defineFeature } from '../../../../core/composition/define-feature';
 import { canPlayTrack } from '../../../../media/dom/capabilities';
@@ -6,6 +13,37 @@ import { setupVideoBufferActors } from '../../../behaviors/dom/setup-buffer-acto
 import { resolveVideoTrack } from '../../../behaviors/resolve-track';
 import { switchVideoTrack, type UserTrackSelectionState } from '../../../behaviors/track-switching';
 import { reportUnsupportedTrackConditions } from '../../../primitives/report-track-conditions';
+
+/** The behaviors the feature composes, in setup order. */
+export const behaviors = [
+  resolveVideoTrack,
+  switchVideoTrack,
+  setupVideoBufferActors,
+  loadVideoSegments,
+  defineExternalSignals<UserTrackSelectionState<'video'>>()({ state: ['userVideoTrackSelection'] }),
+] as const;
+
+export type Behaviors = typeof behaviors;
+/** Every config key the behaviors read. */
+export type Config = ResolveBehaviorConfig<Behaviors>;
+/** Every state key the behaviors and external signals declare. */
+export type State = Simplify<ResolveBehaviorState<Behaviors>>;
+/** Every context key the behaviors declare. */
+export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
+
+/** The config defaults the feature contributes. */
+export const defaultConfig = { canPlayTrack, reportUnsupportedTrackConditions } satisfies Partial<Config>;
+
+/** The state values the feature seeds. */
+export const initialState = {
+  bandwidthState: {
+    fastEstimate: 0,
+    fastTotalWeight: 0,
+    slowEstimate: 0,
+    slowTotalWeight: 0,
+    bytesSampled: 0,
+  },
+} satisfies Partial<State>;
 
 /**
  * Plays video with adaptive bitrate: resolves the selected rendition's playlist, switches renditions as bandwidth
@@ -18,22 +56,4 @@ import { reportUnsupportedTrackConditions } from '../../../primitives/report-tra
  * - A writer of `state.loadActivated`, such as `initialLoadFeature`, or a seeded `loadActivated: true`; without one, only
  *   init segments load.
  */
-export const videoFeature = defineFeature({
-  behaviors: [
-    resolveVideoTrack,
-    switchVideoTrack,
-    setupVideoBufferActors,
-    loadVideoSegments,
-    defineExternalSignals<UserTrackSelectionState<'video'>>()({ state: ['userVideoTrackSelection'] }),
-  ],
-  defaultConfig: { canPlayTrack, reportUnsupportedTrackConditions },
-  initialState: {
-    bandwidthState: {
-      fastEstimate: 0,
-      fastTotalWeight: 0,
-      slowEstimate: 0,
-      slowTotalWeight: 0,
-      bytesSampled: 0,
-    },
-  },
-});
+export const videoFeature = defineFeature({ behaviors, defaultConfig, initialState });
