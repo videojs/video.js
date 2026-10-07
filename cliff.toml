@@ -84,7 +84,9 @@ postprocessors = [
 # output = "test.md"
 
 [git]
-tag_pattern = "^(v[0-9]|@videojs/core@[0-9]).*"
+# Only Video.js 10 releases. The merged Video.js 8 history is also excluded by the
+# commit range passed in `.github/workflows/release-pr.yml` and the `changelog` script.
+tag_pattern = "^@videojs/core@[0-9].*"
 
 # Parse commits according to the conventional commits specification.
 # See https://www.conventionalcommits.org

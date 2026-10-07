@@ -32,11 +32,13 @@ jobs:
           VERSION=$(jq -r '."packages/core"' .github/release-please/.release-please-manifest.json)
           echo "tag=@videojs/core@${VERSION}" >> "$GITHUB_OUTPUT"
 
+      # main also contains the Video.js 8 history merged in from videojs/video.js.
+      # Hiding its tip (#9232) keeps v8 commits out of the Video.js 10 changelog.
       - name: Update root changelog
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: --verbose --tag ${{ steps.version.outputs.tag }}
+          args: --verbose --tag ${{ steps.version.outputs.tag }} 1aea7c9cdec4e530cb5b96efdb98768e9e1cedf0..HEAD
         env:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
