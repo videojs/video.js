@@ -68,34 +68,41 @@ export function ControlsContent({
   top,
 }: ControlsSlots & { audio?: boolean; center?: boolean; live?: boolean; menu?: VjscNode; top?: VjscNode } = {}) {
   return (
-    <$.Controls.Content className={[controlsStyles.content, audio && audioControlsStyles.content]}>
-      <$.Tooltip.Provider>
-        {top && <$.Controls.Group className={controlsStyles.top}>{top}</$.Controls.Group>}
-        {center && (
-          <$.Controls.Group className={controlsStyles.center}>
-            {seekBackward}
-            <PlayButton
-              className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
-              iconClassName={controlsStyles.centerPlayIcon}
-              tooltip={false}
+    <$.BufferingIndicator className={controlsStyles.buffering}>
+      {!audio && <$.Controls.Backdrop className={controlsStyles.backdrop} />}
+      <$.Controls.Content className={[controlsStyles.content, audio && audioControlsStyles.content]}>
+        <$.Tooltip.Provider>
+          {top && <$.Controls.Group className={controlsStyles.top}>{top}</$.Controls.Group>}
+          {center && (
+            <$.Controls.Group className={controlsStyles.center}>
+              {seekBackward}
+              <PlayButton
+                className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
+                iconClassName={controlsStyles.centerPlayIcon}
+                tooltip={false}
+              />
+              {seekForward}
+            </$.Controls.Group>
+          )}
+          <Box
+            className={[
+              controlsStyles.bottom,
+              audio && audioControlsStyles.bottom,
+              !audio && controlsStyles.videoBottom,
+            ]}
+          >
+            {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}
+            <ControlsRow
+              audio={audio}
+              live={live}
+              menu={menu}
+              rate={rate}
+              seekBackward={center ? undefined : seekBackward}
+              seekForward={center ? undefined : seekForward}
             />
-            {seekForward}
-          </$.Controls.Group>
-        )}
-        <Box
-          className={[controlsStyles.bottom, audio && audioControlsStyles.bottom, !audio && controlsStyles.videoBottom]}
-        >
-          {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}
-          <ControlsRow
-            audio={audio}
-            live={live}
-            menu={menu}
-            rate={rate}
-            seekBackward={center ? undefined : seekBackward}
-            seekForward={center ? undefined : seekForward}
-          />
-        </Box>
-      </$.Tooltip.Provider>
-    </$.Controls.Content>
+          </Box>
+        </$.Tooltip.Provider>
+      </$.Controls.Content>
+    </$.BufferingIndicator>
   );
 }
