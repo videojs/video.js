@@ -46,7 +46,7 @@ class ModalDialog extends Component {
    *        A text label for the modal, primarily for accessibility.
    *
    * @param {boolean} [options.pauseOnOpen=true]
-   *        If `true`, playback will will be paused if playing when
+   *        If `true`, playback will be paused if playing when
    *        the modal opens, and resumed when it closes.
    *
    * @param {boolean} [options.temporary=true]
