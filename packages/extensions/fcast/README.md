@@ -3,7 +3,7 @@
 An FCast casting option for Video.js 10. The package connects player playback controls to an FCast sender supplied by
 your application. The sender handles receiver discovery, the device picker, the FCast connection, and receiver state.
 Browsers cannot use the FCast SDK's TCP and mDNS features directly. Use a native SDK sender or a local bridge behind the
-`FCastSender` interface.
+`FCastBridge` interface (`FCastSender` remains a compatible alias). This package defines the bridge contract; it does not implement a bridge.
 
 ```bash
 pnpm add @videojs/react @videojs/fcast
@@ -55,3 +55,5 @@ uses `src`/`contentType` when the receiver needs a different playable URL or MIM
 
 See the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries and the
 [FCast protocol](https://docs.fcast.org/protocol/v4/) for a bridge implementation.
+
+The [FCast extension reference](https://videojs.org/docs/framework/react/reference/components/fcast) documents bridge lifecycle, command ordering, state normalization, and error events.

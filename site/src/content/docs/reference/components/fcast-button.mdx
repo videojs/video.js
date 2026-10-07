@@ -4,18 +4,12 @@ frameworkTitle:
   html: media-fcast-button
 description: FCast receiver control backed by an application-provided sender
 stability: unstable
-apis:
-  - FCastExtension
-  - FCastExtensionProps
-  - FCastLoadRequest
-  - FCastSender
-  - FCastSnapshot
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 
-`FCastButton` registers an FCast player extension and displays a separate casting control beside Google Cast and AirPlay. It requires an `FCastSender` supplied by the application. See <DocsLink slug="guides/casting">Casting</DocsLink> for the setup and the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries.
+`FCastButton` registers an FCast player extension and displays a separate casting control beside Google Cast and AirPlay. It requires an `FCastSender` supplied by the application. See <DocsLink slug="reference/components/fcast">FCast</DocsLink> for the bridge contract and <DocsLink slug="guides/casting">Casting</DocsLink> for the setup and the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries.
 
 ## Import
 
