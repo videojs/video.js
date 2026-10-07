@@ -47,7 +47,7 @@
     "format": "vp fmt --write",
     "format:astro": "vp fmt 'site/src/**/*.astro' --write",
     "typecheck": "vp run typecheck:workspace",
-    "changelog": "git-cliff --config cliff.toml --output CHANGELOG.md 1aea7c9cdec4e530cb5b96efdb98768e9e1cedf0..HEAD",
+    "changelog": "git-cliff --config cliff.toml --output CHANGELOG.md history/v8-tip..HEAD",
     "check:workspace": "node build/scripts/check-workspace.mjs"
   },
   "devDependencies": {
