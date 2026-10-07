@@ -1,11 +1,25 @@
 'use client';
 
-import { TimeSliderCore, TimeSliderDataAttrs, type TimeSliderProps, type TimeSliderState } from '@videojs/core';
-import { getTimeSliderCSSVars, logMissingFeature, selectBuffer, selectPlayback, selectTime } from '@videojs/core/dom';
+import {
+  SliderCSSVars,
+  TimeSliderCore,
+  TimeSliderDataAttrs,
+  type TimeSliderProps,
+  type TimeSliderState,
+} from '@videojs/core';
+import {
+  createTimeSliderSeek,
+  getTimeSliderCSSVars,
+  logMissingFeature,
+  selectBuffer,
+  selectPlayback,
+  selectTime,
+} from '@videojs/core/dom';
 import { translateText } from '@videojs/core/i18n';
-import { hasTimeRange } from '@videojs/media';
+import { hasTimeRange, isMediaPlaying } from '@videojs/media';
+import { useSnapshot } from '@videojs/store/react';
 import { formatTime } from '@videojs/utils/time';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocale, useTranslator } from '../../i18n/context';
 import { usePlayer } from '../../player/context';
@@ -13,7 +27,7 @@ import type { UIComponentProps } from '../../utils/types';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { renderElement } from '../../utils/use-render';
 import { useSlider } from '../hooks/use-slider';
-import { SliderProvider } from '../slider/context';
+import { SliderProvider, type SliderContextValue } from '../slider/context';
 
 const noopSeek = (): Promise<number> => Promise.resolve(0);
 
@@ -44,6 +58,9 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
     const time = usePlayer(selectTime);
     const buffer = usePlayer(selectBuffer);
     const playback = usePlayer(selectPlayback);
+    const [seek] = useState(() => createTimeSliderSeek(SliderCSSVars.fill));
+    const target = useSnapshot(seek.state);
+    const element = useRef<HTMLDivElement>(null);
 
     const translator = useTranslator();
     const locale = useLocale();
@@ -100,11 +117,20 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       changeThrottle,
       adjustPercent: (rawPercent, thumbSize, trackSize) =>
         core.adjustPercentForAlignment(rawPercent, thumbSize, trackSize),
+      getStyleState: (state) =>
+        target.percent === undefined || state.dragging || state.disabled
+          ? state
+          : { ...state, fillPercent: target.percent },
       getCSSVars: getTimeSliderCSSVars,
       onValueCommit: (percent) => {
         const media = mediaRef.current;
 
-        if (media) media.seek(core.rawValueFromPercent(percent));
+        if (media) {
+          const time = core.rawValueFromPercent(percent);
+
+          seek.seek(percent);
+          media.seek(time);
+        }
       },
       onDragStart: () => {
         core.startDrag(playbackRef.current);
@@ -116,6 +142,41 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       },
     });
 
+    useLayoutEffect(() => {
+      seek.update(!!time?.seeking, state.fillPercent, element.current);
+    }, [seek, time?.seeking, state.fillPercent]);
+    useEffect(() => () => seek.destroy(), [seek]);
+
+    const playing =
+      isMediaPlaying(playback) && !state.disabled && !state.dragging && !time?.seeking && target.percent === undefined;
+
+    const context = useMemo<SliderContextValue>(
+      () => ({
+        state,
+        pointerValue: core.rawValueFromPercent(state.pointerPercent),
+        input,
+        getPointerValue: (percent) => core.rawValueFromPercent(percent),
+        thumbRef,
+        thumbProps,
+        stateAttrMap: TimeSliderDataAttrs,
+        getAttrs: (sliderState) => {
+          const attrs = core.getAttrs(sliderState as TimeSliderState);
+
+          return {
+            ...attrs,
+            'aria-label': translateText(attrs['aria-label'], translator),
+            'aria-valuetext': translateText(
+              attrs['aria-valuetext'],
+              translator,
+              core.getValueTextParams(sliderState as TimeSliderState)
+            ),
+          };
+        },
+        formatValue: (value) => formatTime(value, state.duration, { locale }),
+      }),
+      [state, input, core, thumbRef, thumbProps, translator, locale, label]
+    );
+
     if (!time) {
       if (__DEV__) logMissingFeature('TimeSlider', 'time');
 
@@ -123,39 +184,19 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
     }
 
     return (
-      <SliderProvider
-        value={{
-          state,
-          pointerValue: core.rawValueFromPercent(state.pointerPercent),
-          input,
-          getPointerValue: (percent) => core.rawValueFromPercent(percent),
-          thumbRef,
-          thumbProps,
-          stateAttrMap: TimeSliderDataAttrs,
-          getAttrs: (sliderState) => {
-            const attrs = core.getAttrs(sliderState as TimeSliderState);
-
-            return {
-              ...attrs,
-              'aria-label': translateText(attrs['aria-label'], translator),
-              'aria-valuetext': translateText(
-                attrs['aria-valuetext'],
-                translator,
-                core.getValueTextParams(sliderState as TimeSliderState)
-              ),
-            };
-          },
-          formatValue: (value) => formatTime(value, state.duration, { locale }),
-        }}
-      >
+      <SliderProvider value={context}>
         {renderElement(
           'div',
           { render, className, style },
           {
             state,
             stateAttrMap: TimeSliderDataAttrs,
-            ref: [forwardedRef, rootRef],
-            props: [{ style: { ...cssVars, ...rootStyle } }, rootProps, elementProps],
+            ref: [forwardedRef, rootRef, element],
+            props: [
+              { 'data-playing': playing ? '' : undefined, style: { ...cssVars, ...rootStyle } },
+              rootProps,
+              elementProps,
+            ],
           }
         )}
       </SliderProvider>
