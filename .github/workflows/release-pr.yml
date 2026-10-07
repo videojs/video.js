@@ -44,6 +44,10 @@ jobs:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
 
+      # fetch-depth: 0 also fetches origin/8.x and the v2.0.3 tag the script reads.
+      - name: Append Video.js 8 and earlier history
+        run: node build/scripts/append-legacy-changelog.mjs
+
       - name: Extract changelog for site
         run: |
           # Find first versioned release heading (skip [Unreleased])
