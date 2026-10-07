@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { ResolveBehaviorContext, ResolveBehaviorState } from '../create-composition';
+import type { ResolveBehaviorContext, ResolveBehaviorState } from '../define-behavior';
 import type { StateSignals } from '../define-behavior';
 import { defineExternalSignals } from '../define-external-signals';
 

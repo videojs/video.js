@@ -5,7 +5,7 @@
  */
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { ResolveBehaviorConfig } from '../../../../core/composition/create-composition';
+import type { ResolveBehaviorConfig } from '../../../../core/composition/define-behavior';
 import type { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
 import type * as airPlay from '../features/airplay';
 import type * as shiftTextTimestamps from '../features/shift-text-timestamps';

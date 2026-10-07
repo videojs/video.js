@@ -1,14 +1,8 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
 import { type Signal, signal } from '../../signals/primitives';
-import {
-  type Composition,
-  createComposition,
-  defineCompositionFactory,
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
-} from '../create-composition';
+import { type Composition, createComposition, defineCompositionFactory } from '../create-composition';
+import type { ResolveBehaviorConfig, ResolveBehaviorContext, ResolveBehaviorState } from '../define-behavior';
 import {
   type Behavior,
   type BehaviorDeps,
