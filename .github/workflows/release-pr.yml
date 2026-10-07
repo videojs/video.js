@@ -32,21 +32,19 @@ jobs:
           VERSION=$(jq -r '."packages/core"' .github/release-please/.release-please-manifest.json)
           echo "tag=@videojs/core@${VERSION}" >> "$GITHUB_OUTPUT"
 
-      # main also contains the Video.js 8 history merged in from videojs/video.js.
-      # Hiding its tip, tagged history/v8-tip, keeps v8 commits out of the Video.js 10
-      # changelog. fetch-depth: 0 fetches the tag.
-      - name: Update root changelog
-        uses: orhun/git-cliff-action@v4
+      - uses: actions/setup-node@v5
         with:
-          config: cliff.toml
-          args: --verbose --tag ${{ steps.version.outputs.tag }} history/v8-tip..HEAD
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
+          node-version-file: '.nvmrc'
 
-      # fetch-depth: 0 also fetches origin/8.x and the v2.0.3 tag the script reads.
-      - name: Append Video.js 8 and earlier history
-        run: node build/scripts/append-legacy-changelog.mjs
+      # Generates Video.js 10 from main, excluding the merged Video.js 8 history
+      # (history/v8-tip), and Video.js 8 and earlier from origin/8.x. fetch-depth: 0
+      # fetches that branch and the release tags. Runs git-cliff via npx.
+      - name: Update root changelog
+        run: node build/scripts/generate-changelog.mjs --tag "$TAG"
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Extract changelog for site
         run: |

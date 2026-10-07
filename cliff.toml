@@ -84,9 +84,8 @@ postprocessors = [
 # output = "test.md"
 
 [git]
-# Only Video.js 10 releases. The merged Video.js 8 history is also excluded by the
-# `history/v8-tip..HEAD` range passed in `.github/workflows/release-pr.yml` and the
-# `changelog` script.
+# Video.js 10 releases. `build/scripts/generate-changelog.mjs` runs git-cliff once over
+# `history/v8-tip..HEAD` and once over the 8.x branch with `--tag-pattern` for v8 tags.
 tag_pattern = "^@videojs/core@[0-9].*"
 
 # Parse commits according to the conventional commits specification.
