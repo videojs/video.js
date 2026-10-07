@@ -24,9 +24,6 @@ class SubsCapsButton extends TextTrackButton {
    *
    * @param {Object} [options]
    *        The key/value store of player options.
-   *
-   * @param {Function} [ready]
-   *        The function to call when this component is ready.
    */
   constructor(player, options = {}) {
     super(player, options);
