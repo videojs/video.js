@@ -408,7 +408,7 @@ All notable changes to this project will be documented in this file.
 - *(cd)* Prepare the 10.0.0-rc.1 release ([#2599](https://github.com/videojs/v10/pull/2599)) by [@decepulis](https://github.com/decepulis)
 
 ### New Contributors
-* @videojs-release[bot] made their first contribution
+* @videojs-release[bot] made their first contribution in [#2617](https://github.com/videojs/v10/pull/2617)
 
 ## [@videojs/core@10.0.0-beta.32] - 2026-08-26
 
@@ -510,6 +510,9 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 - *(ci)* Migrate agent workflows to codex ([#2312](https://github.com/videojs/v10/pull/2312)) by [@mihar-22](https://github.com/mihar-22)
+
+### New Contributors
+* @dylanjha made their first contribution in [#1945](https://github.com/videojs/v10/pull/1945)
 
 ## [@videojs/core@10.0.0-beta.31] - 2026-08-21
 
@@ -740,7 +743,7 @@ All notable changes to this project will be documented in this file.
 - *(root)* Split ui component skills ([#2024](https://github.com/videojs/v10/pull/2024)) by [@mihar-22](https://github.com/mihar-22)
 
 ### New Contributors
-* @littlespex made their first contribution
+* @littlespex made their first contribution in [#1814](https://github.com/videojs/v10/pull/1814)
 
 ## [@videojs/core@10.0.0-beta.26] - 2026-08-02
 
@@ -802,7 +805,8 @@ All notable changes to this project will be documented in this file.
 - *(ci)* Upgrade deps ([#1868](https://github.com/videojs/v10/pull/1868)) by [@sampotts](https://github.com/sampotts)
 
 ### New Contributors
-* @claude[bot] made their first contribution
+* @mmcc made their first contribution in [#1881](https://github.com/videojs/v10/pull/1881)
+* @claude[bot] made their first contribution in [#1876](https://github.com/videojs/v10/pull/1876)
 
 ## [@videojs/core@10.0.0-beta.25] - 2026-07-07
 
@@ -912,7 +916,7 @@ All notable changes to this project will be documented in this file.
 - *(core)* Unmerge i18n stack base ([#1707](https://github.com/videojs/v10/pull/1707)) by [@sampotts](https://github.com/sampotts)
 
 ### New Contributors
-* @Jerricho93 made their first contribution
+* @Jerricho93 made their first contribution in [#1670](https://github.com/videojs/v10/pull/1670)
 
 ## [@videojs/core@10.0.0-beta.24] - 2026-05-19
 
@@ -959,8 +963,8 @@ All notable changes to this project will be documented in this file.
 - *(ci)* Scope triage label to external authors ([#1550](https://github.com/videojs/v10/pull/1550)) by [@decepulis](https://github.com/decepulis)
 
 ### New Contributors
-* @R-Delfino95 made their first contribution
-* @spuppo-mux made their first contribution
+* @R-Delfino95 made their first contribution in [#1522](https://github.com/videojs/v10/pull/1522)
+* @spuppo-mux made their first contribution in [#1540](https://github.com/videojs/v10/pull/1540)
 
 ## [@videojs/core@10.0.0-beta.23] - 2026-04-27
 
@@ -1355,7 +1359,7 @@ All notable changes to this project will be documented in this file.
 - *(site)* Add Algolia site verification meta tag ([#939](https://github.com/videojs/v10/pull/939)) by [@decepulis](https://github.com/decepulis)
 
 ### New Contributors
-* @esbie made their first contribution
+* @esbie made their first contribution in [#917](https://github.com/videojs/v10/pull/917)
 
 ## [@videojs/core@10.0.0-beta.5] - 2026-03-12
 
@@ -1514,7 +1518,7 @@ All notable changes to this project will be documented in this file.
 - Fix repo biome lint errors ([#804](https://github.com/videojs/v10/pull/804)) by [@mihar-22](https://github.com/mihar-22)
 
 ### New Contributors
-* @ronald-urbina made their first contribution
+* @ronald-urbina made their first contribution in [#566](https://github.com/videojs/v10/pull/566)
 
 ## [@videojs/core@10.0.0-alpha.9] - 2026-03-06
 
@@ -1877,9 +1881,9 @@ All notable changes to this project will be documented in this file.
 - *(packages)* Bump to 10.0.0-alpha.0 by [@decepulis](https://github.com/decepulis)
 
 ### New Contributors
-* @dh-mux made their first contribution
-* @daniel-hayes made their first contribution
-* @LachlanRumery made their first contribution
+* @dh-mux made their first contribution in [#581](https://github.com/videojs/v10/pull/581)
+* @daniel-hayes made their first contribution in [#280](https://github.com/videojs/v10/pull/280)
+* @LachlanRumery made their first contribution in [#211](https://github.com/videojs/v10/pull/211)
 
 ## [@videojs/core@0.1.0-preview.10] - 2025-12-06
 
@@ -2238,12 +2242,13 @@ All notable changes to this project will be documented in this file.
 - *(cd)* Add if statement to pnpm by [@luwes](https://github.com/luwes)
 
 ### New Contributors
-* @github-actions[bot] made their first contribution
+* @github-actions[bot] made their first contribution in [#130](https://github.com/videojs/v10/pull/130)
 * @luwes made their first contribution
-* @mihar-22 made their first contribution
-* @sampotts made their first contribution
-* @cjpillsbury made their first contribution
-* @decepulis made their first contribution
+* @mihar-22 made their first contribution in [#129](https://github.com/videojs/v10/pull/129)
+* @sampotts made their first contribution in [#126](https://github.com/videojs/v10/pull/126)
+* @cjpillsbury made their first contribution in [#125](https://github.com/videojs/v10/pull/125)
+* @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
+* @heff made their first contribution
 
 [@videojs/core@10.0.1]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0...@videojs/core@10.0.1
 [@videojs/core@10.0.0]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.5...@videojs/core@10.0.0

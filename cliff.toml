@@ -15,8 +15,14 @@ All notable changes to this project will be documented in this file.\n
 # A Tera template to be rendered for each release in the changelog.
 # See https://keats.github.io/tera/docs/#introduction
 body = """
-{%- macro remote_url() -%}
-  https://github.com/videojs/video.js
+{#- Video.js 10 was released from videojs/v10 until it moved into videojs/video.js on
+    2026-10-06 (Unix time 1791320657); contributor links for those releases stay there. -#}
+{%- macro remote_url(version, timestamp) -%}
+  {%- if version and version is starting_with("@videojs/") and timestamp < 1791320657 -%}
+    https://github.com/videojs/v10
+  {%- else -%}
+    https://github.com/videojs/video.js
+  {%- endif -%}
 {%- endmacro -%}
 
 {% if version -%}
@@ -42,7 +48,7 @@ body = """
 {% for contributor in github.contributors | filter(attribute="is_first_time", value=true) %}
   * @{{ contributor.username }} made their first contribution
     {%- if contributor.pr_number %} in \
-      [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
+      [#{{ contributor.pr_number }}]({{ self::remote_url(version=version, timestamp=timestamp) }}/pull/{{ contributor.pr_number }}) \
     {%- endif %}
 {%- endfor %}\n
 

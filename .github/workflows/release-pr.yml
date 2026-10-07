@@ -44,7 +44,6 @@ jobs:
         env:
           TAG: ${{ steps.version.outputs.tag }}
           GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPO: ${{ github.repository }}
 
       - name: Extract changelog for site
         run: |
