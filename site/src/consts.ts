@@ -17,7 +17,7 @@ export const SEO_SUFFIX = 'Open Source Video Player';
 /** Month (`YYYY-MM`) of the first Video.js 10 blog post; earlier posts document Video.js 1 through 8. */
 export const FIRST_V10_BLOG_MONTH = '2026-03';
 export const SITE_DESCRIPTION = `The open-source video player for React and HTML. Lightweight, accessible components built for performance and streaming.`;
-export const GITHUB_REPO_URL = 'https://github.com/videojs/v10/';
+export const GITHUB_REPO_URL = 'https://github.com/videojs/video.js/';
 export const DISCORD_INVITE_URL = 'https://discord.gg/JBqHh485uF';
 export const MUX_URL = 'https://www.mux.com?utm_source=videojs&utm_campaign=vjs10';
 export const MUX_SUPPORT_URL = 'https://www.mux.com/sales-contact?form=sales&utm_source=videojs&utm_campaign=vjs10';

@@ -1,4 +1,10 @@
-import type { ErrorLike, MediaFeatureAvailability, MediaStreamType, TextTrackKind } from './types';
+import type {
+  ErrorLike,
+  MediaCrossOriginType,
+  MediaFeatureAvailability,
+  MediaStreamType,
+  TextTrackKind,
+} from './types';
 
 export type { TextTrackKind };
 
@@ -320,7 +326,7 @@ export interface MediaThumbnailsTrack {
    * mode. Thumbnail UI fetches the sprite sheets the cues point at with this mode, since a cross-origin `<track>` only
    * loads at all when the media component is CORS-enabled.
    */
-  crossOrigin: 'anonymous' | 'use-credentials' | null;
+  crossOrigin: MediaCrossOriginType | null;
 }
 
 /**

@@ -7,6 +7,7 @@ ogImage: '../../assets/blog/2099-12-31-blog-component-test/og.png'
 ---
 
 import Aside from '@/components/Aside.astro'
+import Figure from '@/components/typography/Figure.astro'
 
 <Aside type="note">
 This isn't a comprehensive component test. For that, head on over to the docs
@@ -46,6 +47,18 @@ Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sap
 ```
 
 ![All four Video.js themes](../../assets/blog/2099-12-31-blog-component-test/collage.png)
+
+### Figures
+
+Use `<Figure>` when media needs a caption, such as a credit.
+
+<Figure>
+
+![All four Video.js themes](../../assets/blog/2099-12-31-blog-component-test/collage.png)
+
+<figcaption>The four Video.js themes. Captions can hold [links](/docs).</figcaption>
+
+</Figure>
 
 ### Blockquotes
 
@@ -190,6 +203,24 @@ we can use 3 backticks ``` in new line and write snippet and close with 3 backti
 - Dairy
   - Milk
   - Cheese
+
+### Footnotes
+
+#### Syntax
+
+```markdown
+Video.js began in 2010[^origin], when most web video still played through Flash[^flash]. A footnote can be cited again later[^origin].
+
+[^origin]: Steve Heffernan started the project to help move video from Flash to the open web.
+[^flash]: Flash Player reached end of life on December 31, 2020. See [Adobe's announcement](https://www.adobe.com/products/flashplayer/end-of-life.html) for details.
+```
+
+#### Output
+
+Video.js began in 2010[^origin], when most web video still played through Flash[^flash]. A footnote can be cited again later[^origin].
+
+[^origin]: Steve Heffernan started the project to help move video from Flash to the open web.
+[^flash]: Flash Player reached end of life on December 31, 2020. See [Adobe's announcement](https://www.adobe.com/products/flashplayer/end-of-life.html) for details.
 
 ### Other Elements — abbr, sub, sup, kbd, mark
 

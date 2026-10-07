@@ -40,13 +40,13 @@ Bundle a single file when you already build your front end. Download the release
 
 ### Download the release archive
 
-[Video.js releases](https://github.com/videojs/v10/releases) provide a `videojs-cdn-<version>.zip` (and a `.tar.gz`) holding the prebuilt player. Use it when your deployment installs dependencies outside npm, or when you want a versioned artifact to vendor into your own repository.
+[Video.js releases](https://github.com/videojs/video.js/releases) provide a `videojs-cdn-<version>.zip` (and a `.tar.gz`) holding the prebuilt player. Use it when your deployment installs dependencies outside npm, or when you want a versioned artifact to vendor into your own repository.
 
 Unpack it into whatever your server treats as static files:
 
 ```bash
 VIDEOJS_VERSION={{VJS10_CDN_ARCHIVE_VERSION}}
-curl -fLO "https://github.com/videojs/v10/releases/download/@videojs/cdn@${VIDEOJS_VERSION}/videojs-cdn-${VIDEOJS_VERSION}.zip"
+curl -fLO "https://github.com/videojs/video.js/releases/download/@videojs/cdn@${VIDEOJS_VERSION}/videojs-cdn-${VIDEOJS_VERSION}.zip"
 unzip "videojs-cdn-${VIDEOJS_VERSION}.zip" -d public/
 ```
 
@@ -71,7 +71,7 @@ For Composer-based projects such as Drupal, declare the archive as a package:
         "type": "drupal-library",
         "dist": {
           "type": "zip",
-          "url": "https://github.com/videojs/v10/releases/download/@videojs/cdn@{{VJS10_CDN_ARCHIVE_VERSION}}/videojs-cdn-{{VJS10_CDN_ARCHIVE_VERSION}}.zip"
+          "url": "https://github.com/videojs/video.js/releases/download/@videojs/cdn@{{VJS10_CDN_ARCHIVE_VERSION}}/videojs-cdn-{{VJS10_CDN_ARCHIVE_VERSION}}.zip"
         }
       }
     }

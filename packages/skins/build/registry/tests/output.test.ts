@@ -162,6 +162,23 @@ describe('React registry output', () => {
     }
   });
 
+  it('publishes the button tooltip as a standalone UI component', () => {
+    for (const items of [
+      registries.default,
+      registries.neutral,
+      readRegistryItems(cssRegistryDirs.default),
+      readRegistryItems(cssRegistryDirs.neutral),
+    ]) {
+      const tooltip = items.get('button-tooltip');
+
+      expect(tooltip?.type).toBe('registry:ui');
+      expect(tooltip?.meta?.public).toBe(true);
+      expect(tooltip?.registryDependencies).toContain('@videojs/_style-theme');
+      expect(items.get('video')?.registryDependencies).toContain('@videojs/button-tooltip');
+      expect(items.has('_button-tooltip')).toBe(false);
+    }
+  });
+
   it('publishes title styles in the shared display stylesheet', () => {
     for (const registryDir of [cssRegistryDirs.default, cssRegistryDirs.neutral]) {
       const items = readRegistryItems(registryDir);

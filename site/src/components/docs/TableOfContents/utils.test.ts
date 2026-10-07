@@ -69,6 +69,11 @@ describe('calculateRailGeometry', () => {
   it('keeps the default geometry for a single stripe', () => {
     expect(calculateRailGeometry(1, 1)).toEqual({ stripeHeight: 1, gap: 4 });
   });
+
+  it('compresses from a preferred geometry', () => {
+    expect(calculateRailGeometry(10, 100, { stripeHeight: 2, gap: 6 })).toEqual({ stripeHeight: 2, gap: 6 });
+    expect(calculateRailGeometry(10, 38, { stripeHeight: 2, gap: 6 })).toEqual({ stripeHeight: 2, gap: 2 });
+  });
 });
 
 describe('filterRenderedHeadings', () => {

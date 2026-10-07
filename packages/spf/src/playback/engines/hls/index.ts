@@ -46,6 +46,7 @@ export type {
   HlsJsonChapters,
 } from '../../../media/hls/parse-json-chapters';
 export { APPLE_HLS_CHAPTERS_DATA_ID, parseHlsJsonChapters } from '../../../media/hls/parse-json-chapters';
+export { findSessionDataUri } from '../../../media/hls/session-data';
 // Non-zero-PTS relocation (spike): the coordination seam type + the shared-`min`
 // default and the per-type alternative, for a consumer swapping the policy via
 // `config.deriveStartMediaTime`.

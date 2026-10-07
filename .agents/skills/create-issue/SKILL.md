@@ -1,6 +1,6 @@
 ---
 name: create-issue
-description: Draft or create a videojs/v10 GitHub issue and its native planning relationships. Use when asked to file a bug, feature, task, epic, or repository issue.
+description: Draft or create a videojs/video.js GitHub issue and its native planning relationships. Use when asked to file a bug, feature, task, epic, or repository issue.
 ---
 
 # Create a GitHub issue

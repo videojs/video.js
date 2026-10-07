@@ -58,7 +58,7 @@ pnpm -F site astro check
 ## Site-specific gotchas
 
 - `astro.config.ts` has a root `vite.optimizeDeps` block that can shadow renderer-provided includes. Keep React client dependencies in its explicit `include` list when changing renderer setup.
-- Markdown uses Satteri MDAST plugins, not remark/rehype plugins. Add transformations with `defineMdastPlugin` and write derived frontmatter through `ctx.data.astro.frontmatter`.
+- Markdown uses Satteri plugins, not remark/rehype plugins. Add transformations with `defineMdastPlugin`, or `defineHastPlugin` for nodes that only exist after HTML conversion such as GFM footnotes, and write derived frontmatter through `ctx.data.astro.frontmatter`.
 - Shiki highlighting is configured independently from the Markdown processor.
 - React context does not cross Astro islands.
 - Never expose `context.locals.accessToken` to client code. Auth and Mux integration are only for the installation uploader; trace the middleware and server actions before changing that flow.

@@ -350,6 +350,59 @@ describe('HlsAudioAdapterCore', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // crossOrigin — synchronous IDL attribute doubling as request-credentials intent
+  // (full contract pinned on the video adapter; this checks the audio wiring)
+  // ---------------------------------------------------------------------------
+  describe('crossOrigin', () => {
+    /** The `credentials` mode the engine's next manifest request carries — see the video adapter tests. */
+    async function manifestCredentials(media: HlsAudioAdapterCore, url = 'https://cdn.example.com/master.m3u8') {
+      const fetchMock = vi.mocked(globalThis.fetch);
+
+      // Unload first and let the reactor observe it: a pending resolve is not
+      // restarted by another URL, and two synchronous writes coalesce.
+      fetchMock.mockClear();
+      media.src = '';
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      media.preload = 'auto';
+      media.src = url;
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+      expect(fetchMock).toHaveBeenCalledOnce();
+
+      // SAFETY: `fetchResolvable` always calls `fetch` with a `Request`.
+      return (fetchMock.mock.calls[0]![0] as Request).credentials;
+    }
+
+    it('is null by default, leaving requests at the platform default', async () => {
+      const media = new HlsAudioAdapterCore();
+
+      expect(media.crossOrigin).toBeNull();
+      expect(await manifestCredentials(media)).toBe('same-origin');
+    });
+
+    it('sends credentials for use-credentials, and follows a later change on the same engine', async () => {
+      const media = new HlsAudioAdapterCore();
+
+      media.crossOrigin = 'use-credentials';
+      expect(media.crossOrigin).toBe('use-credentials');
+      expect(await manifestCredentials(media, 'https://cdn.example.com/a.m3u8')).toBe('include');
+
+      media.crossOrigin = 'anonymous';
+      expect(await manifestCredentials(media, 'https://cdn.example.com/b.m3u8')).toBe('same-origin');
+    });
+
+    it('adopts the crossorigin attribute of an attached element when none was set', async () => {
+      const media = new HlsAudioAdapterCore();
+      const el = document.createElement('audio');
+
+      el.setAttribute('crossorigin', 'use-credentials');
+      media.attach(el);
+
+      expect(await manifestCredentials(media)).toBe('include');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // destroy()
   // ---------------------------------------------------------------------------
   describe('destroy()', () => {

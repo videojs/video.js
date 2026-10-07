@@ -17,6 +17,9 @@
       "path": "../native-hls-video"
     },
     {
+      "path": "../../spf"
+    },
+    {
       "path": "../../utils"
     }
   ],
