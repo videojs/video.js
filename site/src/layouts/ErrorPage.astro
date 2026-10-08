@@ -16,7 +16,7 @@ interface Props {
 const { title, description, code = '404', message = 'NOT FOUND' } = Astro.props;
 ---
 
-<Base easterEgg {title} {description} withCompact>
+<Base easterEgg {title} {description}>
   <div class="flex flex-col" style={{ minHeight: "80dvh" }}>
     <NavBar />
     <main id="main-content" class="w-full" data-ph-capture-attribute-location="error-page">

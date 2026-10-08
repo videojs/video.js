@@ -46,7 +46,7 @@
     url("https://static.mux.com/fonts/EurostileLTProExtended2/font.woff") format("woff");
   font-weight: normal;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
 }
 @font-face {
   font-family: "Eurostile LT Pro Extended";
@@ -55,7 +55,7 @@
     url("https://static.mux.com/fonts/EurostileLTProBoldExtended2/font.woff") format("woff");
   font-weight: bold;
   font-style: normal;
-  font-display: auto;
+  font-display: swap;
 }
 @font-face {
   font-family: "Eurostile LT Pro Extended Fallback";

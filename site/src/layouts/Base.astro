@@ -24,7 +24,6 @@ interface Props {
   canonical?: string;
   /** SEO title suffix. Pass `false` to keep the title to `Page | Video.js`. */
   suffix?: string | false;
-  withCompact?: boolean;
   /**
    * Pin the color-block easter egg behind the page so it is only revealed when the document rubber-bands past its
    * end. The page content is painted above it, so nothing shows until the user overscrolls.
@@ -36,7 +35,7 @@ interface Props {
 const { canonical, suffix, easterEgg = false, easterEggClass } = Astro.props;
 const canonicalURL = canonical || new URL(Astro.url.pathname, PRODUCTION_URL).href;
 
-const { title, description, image, twitterImage, withCompact } = Astro.props;
+const { title, description, image, twitterImage } = Astro.props;
 
 function resolveImageUrl(img: ImageMetadata | string): string {
   if (typeof img === 'string') return img;
@@ -98,31 +97,12 @@ const fullTitle = buildPageTitle(title, suffix);
     {/* Font preloads */}
     <Font cssVariable="--font-instrument-sans" preload />
     <Font cssVariable="--font-ibm-plex-mono" preload />
-    {
-      withCompact && (
-        <link
-          rel="preload"
-          href="https://static.mux.com/fonts/EurostileLTProBold/font.woff2"
-          as="font"
-          type="font/woff2"
-          crossorigin
-        />
-      )
-    }
-    <link
-      rel="preload"
-      href="https://static.mux.com/fonts/EurostileLTProExtended2/font.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="https://static.mux.com/fonts/EurostileLTProBoldExtended2/font.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    {/*
+      Eurostile is served from Mux's font host. Preloading it opened a third-party connection that competed with the
+      page's own critical requests; the metric-matched fallbacks in globals.css swap to it without reflow, so warm the
+      connection instead.
+    */}
+    <link rel="preconnect" href="https://static.mux.com" crossorigin />
 
     {/* Canonical URL */}
     <link rel="canonical" href={canonicalURL} />
