@@ -210,9 +210,9 @@ export class ThumbnailElement extends UIElement {
   }
 
   /**
-   * Leaving `crossOrigin` unset means "follow the media element", so thumbnails keep working on a CORS-enabled player
+   * Leaving `crossOrigin` unset means "follow the media component", so thumbnails keep working on a CORS-enabled player
    * without a skin having to thread an attribute through. Only the `<track>` path inherits: `thumbnails` set directly
-   * may point at a host that has nothing to do with the media element.
+   * may point at a host that has nothing to do with the media component.
    */
   #inheritedCrossOrigin(
     textTrack: MediaTextTrackState | undefined

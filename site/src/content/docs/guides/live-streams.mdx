@@ -34,11 +34,11 @@ pnpm add @videojs/html @videojs/hlsjs-video
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Use the live feature bundle with a streaming media element, and give users a `LiveButton`: it shows whether playback is at the live edge and seeks back to it when activated.
+Use the live feature bundle with a streaming media component, and give users a `LiveButton`: it shows whether playback is at the live edge and seeks back to it when activated.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Use the live feature bundle with a streaming media element, and give users a `<media-live-button>`: it shows whether playback is at the live edge and seeks back to it when activated.
+Use the live feature bundle with a streaming media component, and give users a `<media-live-button>`: it shows whether playback is at the live edge and seeks back to it when activated.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -234,11 +234,11 @@ export default function App() {
 ### The live badge never activates
 
 <FrameworkCase frameworks={["react"]}>
-LiveButton reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
+LiveButton reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media component such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<media-live-button>` reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media element such as <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
+`<media-live-button>` reads `targetLiveWindow`, `currentTime`, and `seekable`. Confirm that `targetLiveWindow` is `0` or `Infinity` and that `seekable` has a finite end. Use a live-capable media component such as <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>. The live button does not need `streamTypeFeature`; add it only when your own UI reads `streamType`.
 </FrameworkCase>
 
 ### Playback keeps falling behind the edge

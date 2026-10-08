@@ -120,7 +120,7 @@ Media components are the components that actually display your media. They're es
 Media components can be format specific (HLS, DASH), service specific (YouTube, Vimeo, Mux), or use case specific (background video).
 
 <FrameworkCase frameworks={["html"]}>
-Media elements are discovered automatically. Plain `<video>` and `<audio>` elements are found via a `querySelector`. Custom media elements like `<hlsjs-video>` register themselves after you import their registration entry point.
+Media components are discovered automatically. Plain `<video>` and `<audio>` elements are found via a `querySelector`. Media components like `<hlsjs-video>` register themselves after you import their registration entry point.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -191,7 +191,7 @@ The default presets are `@videojs/react/video` and `@videojs/react/audio`, cover
 The default presets are `@videojs/html/video` and `@videojs/html/audio`, covering the baseline set of controls you'd expect from the HTML `<video>` and `<audio>` tags. 
 </FrameworkCase>
 
-Beyond the defaults, presets target more specific use cases. The `/background` preset combines a media element with autoplay, mute, and loop built in, a skin with no controls, and only the features needed to power it.
+Beyond the defaults, presets target more specific use cases. The `/background` preset combines a media component with autoplay, mute, and loop built in, a skin with no controls, and only the features needed to power it.
 
 <FrameworkCase frameworks={["react"]}>
 You can use it from `@videojs/react/background`.

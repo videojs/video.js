@@ -25,10 +25,15 @@ export function calculateActiveHeadingOffset(scrollPaddingTop: string, scrollMar
   return (hasScrollPadding ? scrollPadding : 0) + (hasScrollMargin ? scrollMargin : 0);
 }
 
+const DEFAULT_RAIL_GEOMETRY: RailGeometry = { stripeHeight: 1, gap: 4 };
+
 /** Keep the full heading map visible by reducing gaps first, then stripe height. */
-export function calculateRailGeometry(headingCount: number, availableHeight: number): RailGeometry {
-  const stripeHeight = 1;
-  const gap = 4;
+export function calculateRailGeometry(
+  headingCount: number,
+  availableHeight: number,
+  preferred: RailGeometry = DEFAULT_RAIL_GEOMETRY
+): RailGeometry {
+  const { stripeHeight, gap } = preferred;
 
   if (headingCount <= 1) {
     return { stripeHeight, gap };

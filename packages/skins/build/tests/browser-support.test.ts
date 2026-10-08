@@ -98,12 +98,12 @@ describe('auditSkinCss', () => {
   it('passes every generated skin stylesheet once lowered like the package builds', () => {
     const files = [
       ...globSync('packages/html/src/internal/skins/*/skin.css', { cwd: workspaceDir }),
-      ...globSync('packages/react/src/presets/*/{skin,neutral-skin,compat-skin}.css', { cwd: workspaceDir }).filter(
-        (file) => !file.includes('/background/')
-      ),
+      ...globSync('packages/react/src/presets/*/{skin,neutral-skin,compat-skin,scaffold-skin}.css', {
+        cwd: workspaceDir,
+      }).filter((file) => !file.includes('/background/')),
     ];
 
-    expect(files.length, 'Generate the skins first: pnpm exec vp run @videojs/skins#generate').toBe(24);
+    expect(files.length, 'Generate the skins first: pnpm exec vp run @videojs/skins#generate').toBe(32);
 
     for (const file of files) {
       const path = resolve(workspaceDir, file);

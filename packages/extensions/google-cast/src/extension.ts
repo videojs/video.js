@@ -20,9 +20,9 @@ export interface GoogleCastExtensionProps {
 }
 
 /**
- * Player extension that adds Google Cast to whatever media the player attaches: a plain `<video>`, a custom media
- * element, or a media adapter. While a cast session is connected, playback members the player reads route to the
- * receiver; otherwise only `remote` is taken over so the cast button can prompt.
+ * Player extension that adds Google Cast to whatever media the player attaches: a plain `<video>`, a media component,
+ * or a media adapter. While a cast session is connected, playback members the player reads route to the receiver;
+ * otherwise only `remote` is taken over so the cast button can prompt.
  *
  * Its `PlayerExtension` members are internal: the player drives them, and the element and hook that register it check
  * that it conforms.
@@ -52,7 +52,7 @@ export class GoogleCastExtension implements GoogleCastExtensionProps {
 
   /** @internal Player lifecycle; the player calls it. */
   attach({ media }: PlayerTarget) {
-    // Every media the player resolves (native element, custom media element, adapter) exposes this surface.
+    // Every media the player resolves (native element, media component, adapter) exposes this surface.
     const target = media as HTMLMediaTargetLike;
     if (this.#media === target) return;
 

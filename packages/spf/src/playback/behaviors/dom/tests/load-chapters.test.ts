@@ -210,6 +210,20 @@ describe('loadChapters', () => {
     reactor.destroy();
   });
 
+  it('requests the document with the credentials its policy resolves for that URL', async () => {
+    const fetchMock = stubFetch();
+    const policy = vi.fn((): RequestCredentials => 'include');
+    const { reactor } = setup(
+      { presentation: makePresentation(), mediaElement: document.createElement('video') },
+      { requestCredentials: policy }
+    );
+
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    expect(policy).toHaveBeenCalledWith({ url: CHAPTERS_URL });
+    expect((fetchMock.mock.calls[0]![0] as Request).credentials).toBe('include');
+    reactor.destroy();
+  });
+
   it('adds nothing when the document fails to load', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

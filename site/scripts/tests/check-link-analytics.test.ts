@@ -5,7 +5,7 @@ import { findUntaggedLinks } from '../check-link-analytics.ts';
 describe('findUntaggedLinks', () => {
   it('accepts tagged off-site links and a Mux link with a placement', () => {
     const html = [
-      '<a href="https://github.com/videojs/v10" data-ph-capture-attribute-destination="github">GitHub</a>',
+      '<a href="https://github.com/videojs/video.js" data-ph-capture-attribute-destination="github">GitHub</a>',
       '<a data-ph-capture-attribute-destination="mux" href="https://www.mux.com/?utm_source=videojs&amp;utm_content=footer">Mux</a>',
     ].join('');
 

@@ -145,6 +145,48 @@ describe('TimeSliderRoot', () => {
     expect(thumb?.getAttribute('tabindex')).toBe('-1');
   });
 
+  it('keeps the fill at media time during hover and updates the thumb with the store', () => {
+    const { Wrapper, update } = createPlayerWrapper();
+    const ref = createRef<HTMLDivElement>();
+    const { getByRole } = render(
+      <Wrapper>
+        <TimeSliderRoot ref={ref}>
+          <SliderThumb />
+        </TimeSliderRoot>
+      </Wrapper>
+    );
+    const fill = ref.current!.style.getPropertyValue('--media-slider-fill');
+
+    measureSlider(ref.current!);
+    pointer(ref.current!, 'pointermove', 100, 0);
+    pointer(ref.current!, 'pointermove', 120, 0);
+    expect(ref.current!.style.getPropertyValue('--media-slider-fill')).toBe(fill);
+
+    update({ currentTime: 31 });
+    expect(ref.current!.style.getPropertyValue('--media-slider-fill')).not.toBe(fill);
+    expect(getByRole('slider').getAttribute('aria-valuenow')).toBe('31');
+  });
+
+  it('updates playback styling when only the seekable range changes', () => {
+    mockTimeState.duration = 0;
+    mockBufferState.seekable = [];
+    const { Wrapper, update } = createPlayerWrapper();
+    const ref = createRef<HTMLDivElement>();
+
+    render(
+      <Wrapper>
+        <TimeSliderRoot ref={ref} />
+      </Wrapper>
+    );
+    expect(ref.current?.hasAttribute('data-playing')).toBe(false);
+
+    update({ seekable: [[0, 120]] });
+    expect(ref.current?.hasAttribute('data-playing')).toBe(true);
+
+    update({ seekable: [] });
+    expect(ref.current?.hasAttribute('data-playing')).toBe(false);
+  });
+
   it('stays interactive when the buffer feature is not composed', () => {
     mockNoBuffer.value = true;
     const { Wrapper } = createPlayerWrapper();

@@ -32,7 +32,7 @@ export function looksLikeM3u8(src: string) {
  *
  * The presence of `#EXT-X-STREAM-INF` is conclusive — media playlists only contain `#EXTINF` segment tags.
  */
-function isMultivariantPlaylist(playlist: string) {
+export function isMultivariantPlaylist(playlist: string) {
   return playlist.includes('#EXT-X-STREAM-INF');
 }
 
@@ -139,7 +139,8 @@ function parseStreamInfo(playlist: string): StreamInfo {
   return { targetLiveWindow, liveEdgeStartOffset };
 }
 
-async function fetchPlaylist(url: string, init: RequestInit): Promise<{ text: string; url: string }> {
+/** Fetch a playlist's text, along with the URL it was served from after any redirects. */
+export async function fetchPlaylist(url: string, init: RequestInit): Promise<{ text: string; url: string }> {
   const response = await fetch(url, init);
   if (!response.ok) throw new Error(`Failed to fetch playlist (${response.status}): ${url}`);
 

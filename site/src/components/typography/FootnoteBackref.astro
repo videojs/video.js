@@ -1,0 +1,19 @@
+---
+/** Link from a footnote definition back to the reference that cites it, produced by `satteriFootnotes`. */
+interface Props {
+  href: string;
+  label: string;
+}
+
+const { href, label } = Astro.props;
+---
+
+<a
+  href={href}
+  aria-label={label}
+  data-footnote-backref
+  data-llms-ignore
+  data-copy-ignore
+  class="ml-1 rounded-md px-0.5 text-muted no-underline intent:text-accent"
+  ><slot /></a
+>

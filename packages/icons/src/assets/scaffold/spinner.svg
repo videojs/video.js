@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 18 18">
+  <style>
+    @keyframes media-scaffold-spinner-spin{to{transform:rotate(360deg)}}
+  </style>
+  <path stroke="currentColor" d="M9 2.5A6.5 6.5 0 1 1 2.5 9" style="transform-box:view-box;transform-origin:center;animation:var(--media-spinner-animation, media-scaffold-spinner-spin 0.8s linear infinite)"/>
+</svg>

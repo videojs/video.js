@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const visualProjects = new Set(['next-react-tailwind', 'next-react-tailwind-neutral']);
 
 for (const preset of ['video', 'audio'] as const) {
-  test(`installs a styled ${preset} player with an attached media element`, async ({ page }, testInfo) => {
+  test(`installs a styled ${preset} player with an attached media component`, async ({ page }, testInfo) => {
     const errors: string[] = [];
     const theme = testInfo.project.metadata.theme;
 
@@ -122,7 +122,7 @@ for (const preset of ['video', 'audio'] as const) {
     expect(iconBox?.width).toBeGreaterThan(10);
     expect(iconBox?.height).toBeGreaterThan(10);
 
-    // The React page carries a probe that reports whether the media element reached the player store.
+    // The React page carries a probe that reports whether the media component reached the player store.
     if ((await consumer.locator('[data-media-probe]').count()) > 0) {
       await expect(consumer.locator('[data-media-probe]')).toHaveAttribute('data-attached', 'true');
     }

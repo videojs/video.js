@@ -70,6 +70,21 @@ const guidesSection: SectionFile = {
 };
 
 describe('convertPage', () => {
+  it('converts footnotes to GFM footnote syntax', () => {
+    const markdown = convert(
+      '<p>Claim<sup><a href="#user-content-fn-a" id="user-content-fnref-a" data-footnote-ref>1</a></sup>.</p>' +
+        '<section data-footnotes><hr><h2 id="footnote-label">Footnotes</h2><div><ol>' +
+        '<li id="user-content-fn-a"><p>First.</p><p>Second <a href="/docs">link</a>.' +
+        '<a href="#user-content-fnref-a" data-footnote-backref data-llms-ignore>↩</a></p></li>' +
+        '</ol></div></section>'
+    );
+
+    expect(markdown).toContain('Claim[^1].');
+    expect(markdown).toContain('[^1]: First.\n\n    Second [link](https://videojs.org/docs).');
+    expect(markdown).not.toContain('Footnotes');
+    expect(markdown).not.toContain('↩');
+  });
+
   it('emits an authored table as a GFM pipe table with escaped pipes and padded colspans', () => {
     const markdown = convert(`
       <table>

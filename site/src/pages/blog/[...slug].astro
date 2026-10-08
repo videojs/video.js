@@ -2,6 +2,7 @@
 
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, getEntries, render } from 'astro:content';
+import { TableOfContents } from '@/components/docs/TableOfContents';
 import FormattedDate from '@/components/FormattedDate.astro';
 import JsonLd from '@/components/JsonLd.astro';
 import defaultMarkdownComponents from '@/components/typography/defaultMarkdownComponents';
@@ -23,7 +24,7 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
-const { Content, remarkPluginFrontmatter } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 const authors = await getEntries(post.data.authors);
 const publishedDate = post.data.pubDate.toISOString().slice(0, 10);
 // Posts are read one at a time by agents, so a pre-v10 post says so itself rather than relying on the blog index.
@@ -52,7 +53,7 @@ const jsonLdSchema = createBlogPostingSchema({
 ---
 
 <Blog
-  title={[post.data.title, "Blog"]}
+  title={post.data.title}
   description={post.data.description}
   canonical={post.data.canonical}
   image={post.data.ogImage}
@@ -60,6 +61,7 @@ const jsonLdSchema = createBlogPostingSchema({
 >
   <MarkdownAlternate slot="head" />
   <JsonLd slot="head" schema={jsonLdSchema} />
+  <TableOfContents client:idle headings={headings} railOnly />
   <article
     class="@container text-p2 sm:text-p15"
     data-search-content

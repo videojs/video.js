@@ -56,20 +56,20 @@
  *     audio.ts   — Exercises: single skin, subset of features.
  *   React (packages/react/src/presets/):
  *     video/     — Exercises: feature bundle, React skins (_Skin naming),
- *                  media element export, tailwind skin exclusion.
- *     audio/     — Exercises: single skin, different media element.
+ *                  media component export, tailwind skin exclusion.
+ *     audio/     — Exercises: single skin, different media component.
  *
- * Media elements (packages/html/src/define/media/ + packages/media/src/dom/):
- *   simple-video  — Simple media element. Exercises: discovery via static
+ * Media components (packages/html/src/define/media/ + packages/media/src/dom/):
+ *   simple-video  — Simple media component. Exercises: discovery via static
  *                   tagName in define/media/_.ts, minimal host (src rw,
  *                   engine readonly), shared attributes/events/CSS vars
  *                   from custom-media-element.
- *   complex-video — Complex media element. Exercises: host with JSDoc
+ *   complex-video — Complex media component. Exercises: host with JSDoc
  *                   descriptions, multiple property types (string, boolean,
  *                   Record), and the intentional content-attribute vs
  *                   IDL-property overlap (src, preload appear in BOTH
  *                   hostProperties and nativeAttributes — no dedup).
- *   extending-video — Extending media element. Exercises: host inheritance
+ *   extending-video — Extending media component. Exercises: host inheritance
  *                   (ExtendingHost extends ComplexHost). Builder must
  *                   walk the extends chain to include inherited properties.
  *                   Child overrides (debug) replace parent definitions.
@@ -1445,7 +1445,7 @@ describe('Feature pipeline (end-to-end)', () => {
 // PRESET PIPELINE
 // ═══════════════════════════════════════════════════════════════════════
 //
-// Presets bundle features, skins, and media elements for a specific use
+// Presets bundle features, skins, and media components for a specific use
 // case. They are discovered from package.json exports in
 // packages/{html,react}/.
 //
@@ -1453,11 +1453,11 @@ describe('Feature pipeline (end-to-end)', () => {
 //   - Discovery: reads package.json exports for ./X + ./X/* pairs
 //   - Feature bundle: *Features export from barrel → resolved to feature names
 //   - HTML skins: classes with static tagName whose name matches *Skin*Element
-//   - HTML media element: classes with static tagName that aren't skins or
-//     players; native tags derived from the React media element (Video →
+//   - HTML media component: classes with static tagName that aren't skins or
+//     players; native tags derived from the React media component (Video →
 //     video, Audio → audio) when the scan finds none
 //   - React skins: exports matching *Skin naming
-//   - React media element: remaining exports that aren't bundles or skins
+//   - React media component: remaining exports that aren't bundles or skins
 //   - Tailwind exclusion: .tailwind files are filtered out
 //   - Player exclusion: *Player* classes are filtered out
 
@@ -1544,7 +1544,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skinNames).not.toContain('VideoSkinTailwindElement');
     });
 
-    it('derives the native HTML media element from the React media component', () => {
+    it('derives the native HTML media component from the React media component', () => {
       const ref = findPreset('video')!.reference;
 
       expect(ref.html.mediaElement).toBe('video');
@@ -1567,7 +1567,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skinNames).not.toContain('VideoTailwindSkin');
     });
 
-    it('detects React media element', () => {
+    it('detects React media component', () => {
       const ref = findPreset('video')!.reference;
 
       expect(ref.react.mediaElement).toBe('Video');
@@ -1597,7 +1597,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skins).toEqual([{ name: 'AudioSkinElement', tagName: 'audio-skin' }]);
     });
 
-    it('derives the native HTML media element from the React media component', () => {
+    it('derives the native HTML media component from the React media component', () => {
       const ref = findPreset('audio')!.reference;
 
       expect(ref.html.mediaElement).toBe('audio');
@@ -1609,7 +1609,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skins).toEqual([{ name: 'AudioSkin', cssImport: '@videojs/react/audio/skin.css' }]);
     });
 
-    it('detects React media element', () => {
+    it('detects React media component', () => {
       const ref = findPreset('audio')!.reference;
 
       expect(ref.react.mediaElement).toBe('Audio');
@@ -1617,7 +1617,7 @@ describe('Preset pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // BACKGROUND PRESET (incomplete barrel, custom media element)
+  // BACKGROUND PRESET (incomplete barrel, media component)
   // ─────────────────────────────────────────────────────────────────
 
   describe('background preset', () => {
@@ -1639,7 +1639,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skins).toEqual([{ name: 'BackgroundVideoSkinElement', tagName: 'background-video-skin' }]);
     });
 
-    it('detects HTML media element via export * chain', () => {
+    it('detects HTML media component via export * chain', () => {
       const ref = findPreset('background')!.reference;
 
       expect(ref.html.mediaElement).toBe('background-video');
@@ -1651,7 +1651,7 @@ describe('Preset pipeline (end-to-end)', () => {
       expect(skins).toEqual([{ name: 'BackgroundVideoSkin' }]);
     });
 
-    it('detects React media element', () => {
+    it('detects React media component', () => {
       const ref = findPreset('background')!.reference;
 
       expect(ref.react.mediaElement).toBe('BackgroundVideo');
@@ -1677,10 +1677,10 @@ describe('Preset pipeline (end-to-end)', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// MEDIA ELEMENT PIPELINE
+// MEDIA COMPONENT PIPELINE
 // ═══════════════════════════════════════════════════════════════════════
 //
-// Media elements are custom elements that adapt native <video>/<audio> targets
+// Media components are custom elements that adapt native <video>/<audio> targets
 // or embedded players. They are discovered from
 // packages/html/src/define/media/*.ts and public nested index.ts barrels by
 // looking for files that declare a class with `static tagName`.
@@ -1711,7 +1711,7 @@ describe('Preset pipeline (end-to-end)', () => {
 //   - React: forwardRef and useSyncProps conventions produce the ref target and
 //     Video.js-specific prop table without per-element configuration.
 
-describe('Media element pipeline (end-to-end)', () => {
+describe('Media component pipeline (end-to-end)', () => {
   const results = generateMediaElementReferences(FIXTURE_ROOT);
 
   function findElement(name: string): MediaElementResult | undefined {
@@ -1723,7 +1723,7 @@ describe('Media element pipeline (end-to-end)', () => {
   // ─────────────────────────────────────────────────────────────────
 
   describe('Discovery', () => {
-    it('discovers media elements from define/media/ files', () => {
+    it('discovers media components from define/media/ files', () => {
       // UI containers live outside media registrations. Background video has no
       // CustomMediaElement and keeps its manually maintained reference.
       const names = results.map((r) => r.name).sort();
@@ -1751,10 +1751,10 @@ describe('Media element pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // SIMPLE MEDIA ELEMENT: SimpleVideo
+  // SIMPLE MEDIA COMPONENT: SimpleVideo
   // ─────────────────────────────────────────────────────────────────
   //
-  // A minimal media element with a simple host (src rw, engine readonly).
+  // A minimal media component with a simple host (src rw, engine readonly).
   // No JSDoc on host properties — descriptions should be undefined.
   // No overlap between host props and native attributes (engine is not
   // in static properties), so nativeAttributes should be the full shared list.
@@ -1896,10 +1896,10 @@ describe('Media element pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // COMPLEX MEDIA ELEMENT: ComplexVideo
+  // COMPLEX MEDIA COMPONENT: ComplexVideo
   // ─────────────────────────────────────────────────────────────────
   //
-  // A full media element with a complex host that has JSDoc descriptions,
+  // A full media component with a complex host that has JSDoc descriptions,
   // multiple property types, and overlap with native attributes (src, preload).
   // Tests that the builder extracts descriptions from JSDoc on getters and
   // deduplicates host props from nativeAttributes.
@@ -2035,7 +2035,7 @@ describe('Media element pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // EMBED MEDIA ELEMENT: EmbedVideo
+  // EMBED MEDIA COMPONENT: EmbedVideo
   // ─────────────────────────────────────────────────────────────────
 
   describe('EmbedVideo (iframe-backed media)', () => {
@@ -2110,10 +2110,10 @@ describe('Media element pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // EXTENDING MEDIA ELEMENT: ExtendingVideo
+  // EXTENDING MEDIA COMPONENT: ExtendingVideo
   // ─────────────────────────────────────────────────────────────────
   //
-  // A media element whose host extends another host (mirrors
+  // A media component whose host extends another host (mirrors
   // MuxVideoAdapter extending HlsMedia). The builder must walk the
   // extends chain to include inherited properties. Child properties
   // override parent definitions.
@@ -2237,10 +2237,10 @@ describe('Media element pipeline (end-to-end)', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // MIXIN MEDIA ELEMENT: MixinVideo
+  // MIXIN MEDIA COMPONENT: MixinVideo
   // ─────────────────────────────────────────────────────────────────
   //
-  // A media element whose host extends a chain of mixins
+  // A media component whose host extends a chain of mixins
   // (`MixinBVolumeMixin(MixinAFooMixin(MixinBaseHost))` — mirrors
   // `MuxDataMediaMixin(GoogleCastMixin(HlsMedia))`). The builder must walk
   // the call-expression extends, follow each mixin to its source file, and

@@ -114,7 +114,7 @@ export const ThumbnailRoot = forwardRef(function ThumbnailRoot(
         state,
         src: thumbnail?.url,
         imageStyle,
-        // Only `<track>`-sourced thumbnails follow the media element's CORS mode.
+        // Only `<track>`-sourced thumbnails follow the media component's CORS mode.
         inheritedCrossOrigin: externalThumbnails?.length ? undefined : textTrack?.thumbnailsTrack?.crossOrigin,
         imageRef,
       }}

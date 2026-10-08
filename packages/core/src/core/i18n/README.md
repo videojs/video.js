@@ -1,4 +1,6 @@
-# Adding a built-in locale
+# i18n
+
+## Adding a built-in locale
 
 Built-in locales live in `locales/`. The locale build generates lazy loaders, CDN chunks, and HTML/React re-exports from that directory.
 
@@ -36,3 +38,23 @@ semantics.
 
 To decide what a translated value should say, and to source it and check it against the known
 pitfalls, follow the `write-locale-translations` skill.
+
+## Changing player copy
+
+Translation keys are opaque semantic paths such as `buttons.play`. English copy is stored separately, so it can change
+without renaming the key.
+
+When you add, rename, or remove player copy:
+
+1. Update `locales/en.ts`. Add the English value under a short semantic path and keep required `{placeholder}` tokens
+   in the value.
+
+2. Update every non-English file in `locales/`. Use the same nested path, move an existing translation when the meaning
+   is unchanged, and add or remove values with the English source.
+
+3. Run `pnpm -F @videojs/core run generate:locales` and `pnpm -F @videojs/core run generate:i18n-types`.
+
+4. Update call sites and tests. Import the generated text descriptor from `text/<group>.ts`; do not duplicate the key
+   and English fallback at each call site.
+
+5. Run the package tests that cover the changed copy and `pnpm typecheck`.

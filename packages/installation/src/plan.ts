@@ -731,7 +731,7 @@ function shadcnPlayerSteps(
     componentsAlias: project.componentsAlias,
     componentsDirectory: project.componentsDirectory,
   });
-  const mediaPlaceholder = '<!-- Add a compatible media element here. -->';
+  const mediaPlaceholder = '<!-- Add a compatible media component here. -->';
 
   return presentSteps(
     htmlEntrySetupStep(selection.template, project.usage!),
@@ -786,7 +786,7 @@ function createShadcnSteps(selection: InstallationSelection, packageVersion: str
           : null,
         'The add command overwrites an existing Video.js skin so catalog and theme changes fully apply. Review and remove obsolete Video.js style files left by a previous catalog.',
         selection.sourceFramework === 'html'
-          ? 'The later media step restores the selected media element after an overwrite.'
+          ? 'The later media step restores the selected media component after an overwrite.'
           : null,
       ]
         .filter((sentence) => sentence !== null)

@@ -35,18 +35,18 @@ import jsonSpriteHtmlTs from "@/components/docs/demos/thumbnail/html/css/JsonSpr
 ## Quick Start: Video Track
 
 <FrameworkCase frameworks={["react"]}>
-`Thumbnail` can read thumbnail cues directly from your video track. Add a `<track>` with `kind="metadata"` and `label="thumbnails"` to your media element.
+`Thumbnail` can read thumbnail cues directly from your video track. Add a `<track>` with `kind="metadata"` and `label="thumbnails"` to your media component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<media-thumbnail>` can read thumbnail cues directly from your video track. Add a `<track>` with `kind="metadata"` and `label="thumbnails"` to your media element.
+`<media-thumbnail>` can read thumbnail cues directly from your video track. Add a `<track>` with `kind="metadata"` and `label="thumbnails"` to your media component.
 </FrameworkCase>
 
 [Mux](https://www.mux.com?utm_source=videojs&utm_campaign=vjs10) provides this as `storyboard.vtt`:
 
 `https://image.mux.com/{PLAYBACK_ID}/storyboard.vtt`
 
-That track is cross-origin, and a cross-origin `<track>` only loads when the media element is CORS-enabled:
+That track is cross-origin, and a cross-origin `<track>` only loads when the media component is CORS-enabled:
 
 <FrameworkCase frameworks={["react"]}>
   ```tsx
@@ -132,7 +132,7 @@ The component picks the latest thumbnail whose `startTime` is less than or equal
 
 ### Cross-origin images
 
-Leave `crossOrigin` unset and the component follows the media element. A cross-origin thumbnail `<track>` only loads when the media is CORS-enabled, so the images its cues point at are fetched with that same mode. Skins get this for free, with nothing to thread through.
+Leave `crossOrigin` unset and the thumbnail follows the media component. A cross-origin thumbnail `<track>` only loads when the media is CORS-enabled, so the images its cues point at are fetched with that same mode. Skins get this for free, with nothing to thread through.
 
 Opt out to fetch them without CORS:
 
@@ -150,12 +150,12 @@ const thumbnail = document.querySelector('media-thumbnail');
 thumbnail.crossOrigin = null;
 ```
 
-Leaving the `crossorigin` attribute off is not the opt out. An absent attribute means "follow the media element"; only the property set to `null` opts out.
+Leaving the `crossorigin` attribute off is not the opt out. An absent attribute means "follow the media component"; only the property set to `null` opts out.
 </FrameworkCase>
 
 An empty value does not opt out either. The [CORS settings attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/crossorigin) reads anything other than `use-credentials` as Anonymous, so it is a value like any other.
 
-Thumbnails you supply through `thumbnails` never inherit, since they need not be related to the media element at all. Set `crossOrigin` yourself when those images need it.
+Thumbnails you supply through `thumbnails` never inherit, since they need not be related to the media component at all. Set `crossOrigin` yourself when those images need it.
 
 ## Styling
 

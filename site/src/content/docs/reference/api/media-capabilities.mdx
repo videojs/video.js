@@ -44,7 +44,7 @@ The examples below assume `media` comes from `useMedia()` in a component rendere
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The player element's `store.target` holds the media the player attached. It's `null` until a media element inside the player registers, so read it when you need it rather than once at startup:
+The player element's `store.target` holds the media the player attached. It's `null` until a media component inside the player registers, so read it when you need it rather than once at startup:
 
 ```ts title="index.ts"
 import "@videojs/html/video/player";

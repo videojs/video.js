@@ -5,7 +5,7 @@ import { twMerge } from '@/utils/twMerge';
 
 /**
  * Responsive grid for content that should share rows: link cards, images, related pages. One column on small screens,
- * `columns` from the `md` breakpoint up. Available in MDX without an import.
+ * `columns` from the `md` breakpoint up.
  */
 type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{ as: Tag }> & {
   columns?: 2 | 3 | 4;
