@@ -200,11 +200,11 @@ function generateMediaMarkup(
  * nobody sees it; it gives every pasted snippet a crawlable link to Video.js that the page author can delete freely.
  */
 function generateMediaFallback(tag: string): string {
-  if (tag === 'video') return '<a href="https://videojs.org/help">Video player not working?</a>';
+  if (tag !== 'video' && tag !== 'audio') return '';
 
-  if (tag === 'audio') return '<a href="https://videojs.org/help">Audio player not working?</a>';
+  const kind = tag === 'video' ? 'Video' : 'Audio';
 
-  return '';
+  return `<a href="https://videojs.org/help">${kind} player not working?</a>`;
 }
 
 function generateMediaMarkupWithSource(
