@@ -1,4 +1,3 @@
-import { SKIN_HELP_TEXT, SKIN_HELP_URL } from '@videojs/core';
 import { ReactiveElement } from '@videojs/element';
 import {
   applyShadowStyles,
@@ -46,8 +45,6 @@ export class SkinElement extends ReactiveElement {
 
       this.#updateHelp = mediaSlot ? createSlotHelp(mediaSlot, 'Add a Media to this skin.') : null;
 
-      this.shadowRoot!.append(createHelpLink(this.ownerDocument));
-
       const sheets: ShadowStyle[] = [shadowSheet];
 
       if (ctor.styles) {
@@ -63,16 +60,4 @@ export class SkinElement extends ReactiveElement {
 
     if (this.#updateHelp) afterParse(this.ownerDocument, this.#updateHelp);
   }
-}
-
-/** Every packaged skin links to the page that explains what the player is. See `SKIN_HELP_URL`. */
-function createHelpLink(doc: Document): HTMLAnchorElement {
-  const link = doc.createElement('a');
-
-  link.rel = 'help';
-  link.href = SKIN_HELP_URL;
-  link.hidden = true;
-  link.textContent = SKIN_HELP_TEXT;
-
-  return link;
 }

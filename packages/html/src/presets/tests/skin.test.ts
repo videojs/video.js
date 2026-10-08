@@ -1,4 +1,3 @@
-import { SKIN_HELP_URL } from '@videojs/core';
 import { createTemplate } from '@videojs/utils/dom';
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
@@ -31,21 +30,6 @@ describe('SkinElement', () => {
     const skin = createSkin(createTemplate('<media-container><slot></slot></media-container>'));
 
     expect(skin.shadowRoot?.querySelector('media-container')).not.toBeNull();
-  });
-
-  it('appends a help link after the template content', () => {
-    const skin = createSkin(createTemplate('<media-container></media-container>'));
-    const link = skin.shadowRoot?.querySelector<HTMLAnchorElement>('a[rel="help"]');
-
-    expect(link?.getAttribute('href')).toBe(SKIN_HELP_URL);
-    expect(link?.hidden).toBe(true);
-    expect(link?.previousElementSibling?.tagName.toLowerCase()).toBe('media-container');
-  });
-
-  it('adds the help link even without a template', () => {
-    const skin = createSkin();
-
-    expect(skin.shadowRoot?.querySelector('a[rel="help"]')).not.toBeNull();
   });
 
   it('shows help beside its media slot while it has no Media', () => {
