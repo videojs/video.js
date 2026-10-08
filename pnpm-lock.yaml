@@ -1450,6 +1450,9 @@ importers:
       just-throttle:
         specifier: ^4.2.0
         version: 4.2.0
+      linkedom:
+        specifier: ^0.18.12
+        version: 0.18.12
       marked:
         specifier: ^17.0.1
         version: 17.0.4
@@ -1547,9 +1550,6 @@ importers:
       jsdom:
         specifier: ^27.0.0
         version: 27.4.0(supports-color@8.1.1)
-      linkedom:
-        specifier: ^0.18.12
-        version: 0.18.12
       oxc-parser:
         specifier: 0.146.0
         version: 0.146.0

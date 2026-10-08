@@ -38,3 +38,8 @@ function splitVersion(version: string): [number[], string[]] {
 
   return [core.split('.').map(Number), prerelease ? prerelease.split('.') : []];
 }
+
+/** Feed categories, so a subscriber can filter for stable releases or for ones that need migration work. */
+export function releaseCategories({ prerelease, breaking }: { prerelease: boolean; breaking: boolean }): string[] {
+  return [prerelease ? 'Prerelease' : 'Stable', ...(breaking ? ['Breaking changes'] : [])];
+}
