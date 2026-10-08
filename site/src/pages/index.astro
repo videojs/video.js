@@ -10,7 +10,9 @@ import Base from '@/layouts/Base.astro';
 
 const times = [0, 12.9, 17.61, 15.8, 7.72, 4.8, 3.3];
 const posterTime = times[Math.floor(Math.random() * times.length)];
-const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}`;
+// Mux serves the source resolution (3840px, ~150 KB) by default. The hero is at most ~1180 CSS px wide, so 1920px
+// covers desktop at 1x and phones at their device pixel ratio for about a third of the bytes.
+const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}&width=1920`;
 ---
 
 <Base easterEgg title={SITE_TITLE} description={SITE_DESCRIPTION}>
