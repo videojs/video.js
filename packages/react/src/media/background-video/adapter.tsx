@@ -6,11 +6,13 @@ import { forwardRef, useCallback } from 'react';
 import { useMediaAttach } from '../../player/context';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import type { MediaRefProps } from '../../utils/use-media-ref';
+import { type MediaFallbackProps, videoFallback } from '../fallback';
 
-export interface BackgroundVideoProps extends VideoHTMLAttributes<HTMLVideoElement>, MediaRefProps<HTMLVideoElement> {}
+export interface BackgroundVideoProps
+  extends VideoHTMLAttributes<HTMLVideoElement>, MediaRefProps<HTMLVideoElement>, MediaFallbackProps {}
 
 export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps>(function BackgroundVideo(
-  { children, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, ...props },
   ref
 ) {
   const setMedia = useMediaAttach();
@@ -27,6 +29,7 @@ export const BackgroundVideo = forwardRef<HTMLVideoElement, BackgroundVideoProps
   return (
     <video ref={composedRef} muted autoPlay loop playsInline disableRemotePlayback disablePictureInPicture {...props}>
       {children}
+      {fallback}
     </video>
   );
 });
