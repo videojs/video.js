@@ -320,12 +320,12 @@ describe('ThumbnailElement', () => {
   });
 
   describe('crossorigin', () => {
-    it('inherits the media element CORS mode when unset', async () => {
+    it('inherits the media component CORS mode when unset', async () => {
       await expect(renderCrossOrigin('anonymous')).resolves.toBe('anonymous');
       await expect(renderCrossOrigin('use-credentials')).resolves.toBe('use-credentials');
     });
 
-    it('sets nothing when the media element is not in CORS mode', async () => {
+    it('sets nothing when the media component is not in CORS mode', async () => {
       await expect(renderCrossOrigin(null)).resolves.toBeNull();
     });
 
@@ -378,7 +378,7 @@ describe('ThumbnailElement', () => {
 
     it('does not inherit for thumbnails supplied directly', async () => {
       // Images set through the property may live anywhere, so they carry no
-      // relationship to the media element's CORS mode.
+      // relationship to the media component's CORS mode.
       const attribute = await renderCrossOrigin('anonymous', (el) => {
         el.thumbnails = [{ url: 'https://images.example.com/sprite.jpg', startTime: 0 }];
       });

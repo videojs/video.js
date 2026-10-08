@@ -215,7 +215,7 @@ describe('fullscreenFeature', () => {
     });
 
     it('detects fullscreen via :fullscreen pseudo-class on the media element', () => {
-      // When the inner `<video>` of a custom media element is fullscreened
+      // When the inner `<video>` of a media component is fullscreened
       // directly (e.g. via native controls), `document.fullscreenElement`
       // points to a different element, but `:fullscreen` matches the media
       // element because the fullscreen flag propagates to ancestors across

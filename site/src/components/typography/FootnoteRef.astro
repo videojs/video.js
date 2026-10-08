@@ -1,0 +1,25 @@
+---
+import { shared } from './styles';
+
+/**
+ * In-text footnote reference, produced from GFM `[^label]` syntax by `satteriFootnotes`. It stays a plain link to its
+ * definition; `Footnotes` enhances it with a popover where the browser supports anchor positioning.
+ */
+interface Props {
+  href: string;
+  id: string;
+}
+
+const { href, id } = Astro.props;
+---
+
+<sup
+  ><a
+    href={href}
+    id={id}
+    aria-describedby="footnote-label"
+    data-footnote-ref
+    class:list={[shared.a, "rounded-sm px-0.5 target:bg-hover data-[popup-open]:bg-hover"]}
+    ><slot /></a
+  ></sup
+>

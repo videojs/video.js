@@ -26,7 +26,7 @@ Make a migration checklist before changing your embed:
 
 - **List the Mux Player attributes or React props you set.** Compare them with the mapping tables below.
 - **Grep your codebase for `mux-player` selectors.** After the swap, CSS rules and `querySelector` calls that reach into the element stop matching, with no error. Look for patterns such as `mux-player::part(…)`, `mux-player [role="slider"]`, and `player.shadowRoot`. Restyle the UI with the skin's custom properties or rebuild it with Video.js components.
-- **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media element; the rest is mapped under [Drive playback](#drive-playback).
+- **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media component; the rest is mapped under [Drive playback](#drive-playback).
 - **Note your theme and CSS variables.** Compare your Mux Player theme with the two Video.js skins, and map its CSS variables.
 - **Check [Known gaps](#known-gaps)** for features your app needs.
 - **Check your catalog for MPEG-TS, raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).

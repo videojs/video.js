@@ -4,6 +4,7 @@
  */
 export { liveVideoFeatures } from '@videojs/core/dom';
 export { CompatLiveVideoSkinElement } from './compat-skin';
+export { ScaffoldLiveVideoSkinElement } from './scaffold-skin';
 export { LiveVideoPlayerElement, PlayerController } from './player';
 export { LiveVideoSkinElement } from './skin';
 export { NeutralLiveVideoSkinElement } from './neutral-skin';

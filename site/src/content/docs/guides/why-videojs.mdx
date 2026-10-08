@@ -3,14 +3,15 @@ title: 'Why Video.js?'
 description: 'The open-source video player for React and HTML. Lightweight, accessible components built for performance and streaming.'
 ---
 
+import { Image } from 'astro:assets';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 import ContentWidth from '@/components/frames/ContentWidth.astro';
 import { TabsRoot, TabsList, TabsPanel, Tab } from '@/components/Tabs.tsx';
-import chromeDefaultControls from '@/assets/docs/concepts/why-videojs/chrome-default-controls.png';
-import safariDefaultControls from '@/assets/docs/concepts/why-videojs/safari-default-controls.png';
-import firefoxDefaultControls from '@/assets/docs/concepts/why-videojs/firefox-default-controls.png';
+import chromeDefaultControls from '@/assets/docs/concepts/why-videojs/chrome-default-controls.webp';
+import safariDefaultControls from '@/assets/docs/concepts/why-videojs/safari-default-controls.webp';
+import firefoxDefaultControls from '@/assets/docs/concepts/why-videojs/firefox-default-controls.webp';
 
 Video.js is the open-source video player for the web. It makes web video easy, performant, accessible, and customizable. 
 
@@ -27,32 +28,38 @@ Chrome, Safari, and Firefox each render the default `<video>` controls different
 
 <ContentWidth margins="lg" class="grid grid-cols-3 gap-4">
   <figure>
-    <img 
-        src={chromeDefaultControls.src} 
-        width={chromeDefaultControls.width} 
-        height={chromeDefaultControls.height} 
-        alt="Chrome's default video controls" 
+    <Image
+        src={chromeDefaultControls}
+        width={246}
+        layout="constrained"
+        sizes="(min-width: 48rem) 15.375rem, 33vw"
+        quality={90}
+        alt="Chrome's default video controls"
         class="w-full h-auto"
     />
     <figcaption class="mt-2 text-center">Chrome</figcaption>
   </figure>
   <figure>
-    <img 
-        src={safariDefaultControls.src} 
-        width={safariDefaultControls.width} 
-        height={safariDefaultControls.height} 
-        alt="Safari's default video controls" 
+    <Image
+        src={safariDefaultControls}
+        width={246}
+        layout="constrained"
+        sizes="(min-width: 48rem) 15.375rem, 33vw"
+        quality={90}
+        alt="Safari's default video controls"
         class="w-full h-auto"
     />
     <figcaption class="mt-2 text-center">Safari</figcaption>
   </figure>
   <figure>
-    <img 
-        src={firefoxDefaultControls.src} 
-        width={firefoxDefaultControls.width}
-        height={firefoxDefaultControls.height} 
-        alt="Firefox's default video controls" 
-        class="w-full h-auto" 
+    <Image
+        src={firefoxDefaultControls}
+        width={246}
+        layout="constrained"
+        sizes="(min-width: 48rem) 15.375rem, 33vw"
+        quality={90}
+        alt="Firefox's default video controls"
+        class="w-full h-auto"
     />
     <figcaption class="mt-2 text-center">Firefox</figcaption>
   </figure>

@@ -151,7 +151,8 @@ export function skinModuleTarget(
 
   if (theme === 'shared' && preset && filename) return `${skinDirectory(skin)}/${preset}/${filename}`;
 
-  if (theme === 'compat' && preset === 'shared') return `${skinDirectory(skin)}/shared/${filename}`;
+  if ((theme === 'compat' || theme === 'scaffold') && preset === 'shared')
+    return `${skinDirectory(skin)}/shared/${filename}`;
 
   throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
 }

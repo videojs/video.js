@@ -12,7 +12,7 @@ export type {
   StreamType,
 } from '@videojs/hlsjs-video';
 
-/** Cross-browser HLS media element powered by hls.js and registered as `<hlsjs-video>`. */
+/** Cross-browser HLS media component powered by hls.js and registered as `<hlsjs-video>`. */
 export class HlsJsVideoElement extends HlsJsVideo {
   static readonly tagName = 'hlsjs-video';
 }

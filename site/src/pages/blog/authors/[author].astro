@@ -48,7 +48,7 @@ const jsonLdSchema = createProfilePageSchema({
 ---
 
 <Blog
-  title={[author.data.name, "Blog"]}
+  title={author.data.name}
   description={`Posts by ${author.data.name} on the Video.js blog`}
 >
   <JsonLd slot="head" schema={jsonLdSchema} />

@@ -62,9 +62,11 @@ function escapeHTMLAttribute(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
-/** Skin module basename within a preset group: `skin`, `neutral-skin`, or `compat-skin`. */
-function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'neutral-skin' | 'compat-skin' {
+/** Skin module basename within a preset group: `skin`, `neutral-skin`, `compat-skin`, or `scaffold-skin`. */
+function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'neutral-skin' | 'compat-skin' | 'scaffold-skin' {
   if (skin.startsWith('neutral-')) return 'neutral-skin';
+
+  if (skin.startsWith('scaffold-')) return 'scaffold-skin';
 
   return skin.startsWith('compat-') ? 'compat-skin' : 'skin';
 }
@@ -581,6 +583,8 @@ export function getSkinComponent(useCase: UseCase, skin: Exclude<Skin, 'none'>):
   if (useCase === 'background-video') return name;
 
   if (skin.startsWith('neutral-')) return `Neutral${name}`;
+
+  if (skin.startsWith('scaffold-')) return `Scaffold${name}`;
 
   return skin.startsWith('compat-') ? `Compat${name}` : name;
 }

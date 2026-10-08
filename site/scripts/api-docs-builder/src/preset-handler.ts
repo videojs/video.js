@@ -2,13 +2,13 @@
  * Preset reference extraction.
  *
  * Discovers presets from package.json exports in packages/{html,react}/ and extracts feature bundles, skins, and media
- * elements.
+ * components.
  *
  * Discovery:
  *
  * - Reads package.json exports to find preset names and their source paths
  * - Barrel file (./X export) → feature bundle name + file-level description
- * - Source directory (./X/* export) → skins + media elements via directory scan
+ * - Source directory (./X/* export) → skins + media components via directory scan
  *
  * Classification (positive detection only):
  *
@@ -16,14 +16,14 @@
  *
  *   - _Skin_Element → skin
  *   - _Player_ → skip
- *   - Remaining → media element
+ *   - Remaining → media component
  * - React: exported functions/classes/consts
  *
  *   - *Skin → skin
- *   - Remaining → media element
+ *   - Remaining → media component
  * - .tailwind in filename → excluded (both frameworks)
- * - No HTML media element found → derived from the React media element when it wraps a native tag (Video → `video`, Audio
- *   → `audio`), so every preset framework pair reports the same default media
+ * - No HTML media component found → derived from the React media component when it wraps a native tag (Video → `video`,
+ *   Audio → `audio`), so every preset framework pair reports the same default media
  *
  * Feature resolution: packages/core/src/dom/store/features/presets.ts
  */
@@ -346,7 +346,7 @@ function findFeatureBundleExport(filePath: string): string | undefined {
 }
 
 /**
- * Find the media element from a React barrel's named exports. The media element is a named re-export that isn't a
+ * Find the media component from a React barrel's named exports. The media component is a named re-export that isn't a
  * feature bundle or skin.
  */
 function findReactMediaElement(filePath: string): string | undefined {
@@ -525,7 +525,7 @@ function buildPresetReference(
   // Scan HTML directory
   const htmlResult = preset.html ? scanHtmlDirectory(preset.html.scanDir) : { skins: [] as PresetSkinDef[] };
 
-  // Scan React directory for skins, read barrel for media element
+  // Scan React directory for skins, read barrel for media component
   const reactSkins = preset.react
     ? scanReactDirectory(preset.react.scanDir, preset.react.barrelPath, preset.name)
     : ([] as PresetSkinDef[]);

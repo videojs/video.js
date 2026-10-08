@@ -5,7 +5,7 @@ function isMediaLike(element: Element): element is MediaLike {
   return 'currentTime' in element && 'paused' in element && 'play' in element && typeof element.play === 'function';
 }
 
-/** The page's media element, wherever the skin put it; skin parts are skipped because they never play anything. */
+/** The page's media component, wherever the skin put it; skin parts are skipped because they never play anything. */
 export function findMediaElement(scope: ParentNode = document): MediaLike | undefined {
   for (const element of scope.querySelectorAll('*')) {
     if (element.localName.startsWith('media-')) continue;
@@ -17,7 +17,7 @@ export function findMediaElement(scope: ParentNode = document): MediaLike | unde
 }
 
 /**
- * The media element by tag, for markup that has not been adopted into the document yet: a native element, or a custom
+ * The media component by tag, for markup that has not been adopted into the document yet: a native element, or a custom
  * `*-video` / `*-audio` element the skin's own `media-*` parts never are.
  */
 export function findMediaTag(scope: ParentNode): Element | undefined {

@@ -15,7 +15,7 @@ Media and container elements register themselves with the provider through attac
 
 The [player-container separation](player-container-separation.md) decision established that the provider owns state and the container handles layout. But the container still owned a critical piece of the store lifecycle: media discovery and `store.attach()`.
 
-The container discovered media via `querySelector('video, audio')`, duck-type checks for custom media elements, `MutationObserver` watching the subtree, and `slotchange` listeners on `<slot name="media">`. When it found media, it called `store.attach({ media, container: this })` and managed the detach lifecycle.
+The container discovered media via `querySelector('video, audio')`, duck-type checks for media components, `MutationObserver` watching the subtree, and `slotchange` listeners on `<slot name="media">`. When it found media, it called `store.attach({ media, container: this })` and managed the detach lifecycle.
 
 This split created friction:
 
@@ -27,9 +27,9 @@ This split created friction:
 
 - **Keep attach in the container** — Leave the current architecture. Rejected because it perpetuates the split lifecycle and forces container presence for attachment.
 
-- **Move all discovery to provider DOM queries** — The provider watches its subtree for every kind of media element. Rejected as the primary mechanism because custom media can be nested across component boundaries, making reliable DOM queries fragile. DOM observation is used only for plain `<video>`/`<audio>`.
+- **Move all discovery to provider DOM queries** — The provider watches its subtree for every kind of media component. Rejected as the primary mechanism because custom media can be nested across component boundaries, making reliable DOM queries fragile. DOM observation is used only for plain `<video>`/`<audio>`.
 
-- **Event-based registration** — Media elements dispatch a bubbling event that the provider catches. Simpler than context but doesn't handle disconnection cleanly and requires the provider to be in the DOM path (shadow DOM boundaries block event bubbling unless composed).
+- **Event-based registration** — Media components dispatch a bubbling event that the provider catches. Simpler than context but doesn't handle disconnection cleanly and requires the provider to be in the DOM path (shadow DOM boundaries block event bubbling unless composed).
 
 ## Rationale
 

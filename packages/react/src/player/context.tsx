@@ -98,7 +98,7 @@ export function useOptionalPlayer<R>(selector?: (state: UnknownState) => R) {
   return ctx ? value : undefined;
 }
 
-/** Access the media element from within a Player. */
+/** Access the media component from within a Player. */
 export function useMedia(): Media | null {
   const { media } = usePlayerContext();
 
@@ -120,7 +120,7 @@ export function useOptionalContainer(): MediaContainer | null {
 }
 
 /**
- * Access the media attach setter for connecting a media element to the player.
+ * Access the media attach setter for connecting a media component to the player.
  *
  * @internal
  */

@@ -11,6 +11,7 @@ import { reactHelperDependency } from './support.ts';
 const customizationOnlyComponents = new Set([
   'audio-track-menu',
   'button',
+  'button-tooltip',
   'captions-menu',
   'captions-submenu',
   'playback-rate-submenu',

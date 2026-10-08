@@ -108,14 +108,14 @@ storyboard.jpg#xywh=256,0,256,160
 
 <FrameworkCase frameworks={["react"]}>
 - Thumbnails require a storyboard asset generated alongside the media; the player doesn't extract frames from the video itself.
-- Cross-origin storyboards need CORS headers, and `crossOrigin` on the media element for the track to load.
+- Cross-origin storyboards need CORS headers, and `crossOrigin` on the media component for the track to load.
 - Cues load asynchronously. The track appears before its cues are parsed, so previews fill in when the track finishes loading.
 - Storyboard images download on demand; oversized sprite sheets hurt seek-preview responsiveness more than they help quality.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 - Thumbnails require a storyboard asset generated alongside the media; the player doesn't extract frames from the video itself.
-- Cross-origin storyboards need CORS headers, and `crossorigin` on the media element for the track to load.
+- Cross-origin storyboards need CORS headers, and `crossorigin` on the media component for the track to load.
 - Cues load asynchronously. The track appears before its cues are parsed, so previews fill in when the track finishes loading.
 - Storyboard images download on demand; oversized sprite sheets hurt seek-preview responsiveness more than they help quality.
 </FrameworkCase>
@@ -156,11 +156,11 @@ Inside a packaged skin, an `<img slot="thumbnail">` replaces the image the skin 
 ### Thumbnails don't appear while scrubbing
 
 <FrameworkCase frameworks={["react"]}>
-Confirm the storyboard track is `kind="metadata"` with `label="thumbnails"` and has the `default` attribute — the browser leaves a non-default track disabled and never loads its cues. Then confirm the VTT loads (network panel) and cross-origin assets have CORS headers with `crossOrigin` set on the media element.
+Confirm the storyboard track is `kind="metadata"` with `label="thumbnails"` and has the `default` attribute — the browser leaves a non-default track disabled and never loads its cues. Then confirm the VTT loads (network panel) and cross-origin assets have CORS headers with `crossOrigin` set on the media component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Confirm the storyboard track is `kind="metadata"` with `label="thumbnails"` and has the `default` attribute — the browser leaves a non-default track disabled and never loads its cues. Then confirm the VTT loads (network panel) and cross-origin assets have CORS headers with `crossorigin` set on the media element.
+Confirm the storyboard track is `kind="metadata"` with `label="thumbnails"` and has the `default` attribute — the browser leaves a non-default track disabled and never loads its cues. Then confirm the VTT loads (network panel) and cross-origin assets have CORS headers with `crossorigin` set on the media component.
 </FrameworkCase>
 
 ### Thumbnails are blurry or slow

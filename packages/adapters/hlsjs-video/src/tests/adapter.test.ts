@@ -550,6 +550,81 @@ describe('HlsJsAdapter', () => {
     });
   });
 
+  describe('request credentials', () => {
+    const M3U8 = 'https://example.com/video.m3u8';
+    const built: HlsJsAdapter[] = [];
+
+    afterEach(async () => {
+      await Promise.resolve();
+
+      while (built.length) built.pop()!.destroy();
+    });
+
+    function setupMse(source: HlsSource = {}) {
+      vi.spyOn(Hls, 'isSupported').mockReturnValue(true);
+
+      const video = document.createElement('video');
+
+      document.body.appendChild(video);
+
+      const media = new HlsJsAdapter();
+
+      built.push(media);
+      media.attach(video);
+      media.source = { ...source, src: M3U8 };
+      media.load();
+
+      return { media, video };
+    }
+
+    /** Run the engine's installed `xhrSetup` on a probe request; what hls.js does before every load. */
+    async function probeXhr(media: HlsJsAdapter) {
+      const xhr = { withCredentials: false } as XMLHttpRequest;
+
+      await media.engine!.config.xhrSetup!(xhr, M3U8);
+
+      return xhr;
+    }
+
+    async function xhrCredentials(media: HlsJsAdapter) {
+      return (await probeXhr(media)).withCredentials;
+    }
+
+    it('sends cookies with hls.js requests when the element is crossorigin="use-credentials"', async () => {
+      const { media } = setupMse();
+
+      media.crossOrigin = 'use-credentials';
+
+      expect(await xhrCredentials(media)).toBe(true);
+    });
+
+    it('follows the attribute as it changes, without rebuilding the engine', async () => {
+      const { media } = setupMse();
+      const engine = media.engine;
+
+      expect(await xhrCredentials(media)).toBe(false);
+
+      media.crossOrigin = 'use-credentials';
+      expect(await xhrCredentials(media)).toBe(true);
+
+      media.crossOrigin = 'anonymous';
+      expect(await xhrCredentials(media)).toBe(false);
+      expect(media.engine).toBe(engine);
+    });
+
+    it('keeps a configured xhrSetup working alongside it', async () => {
+      const own = vi.fn();
+      const { media } = setupMse({ engine: { hlsJs: { xhrSetup: own } } });
+
+      media.crossOrigin = 'use-credentials';
+
+      const xhr = await probeXhr(media);
+
+      expect(xhr.withCredentials).toBe(true);
+      expect(own).toHaveBeenCalledWith(xhr, M3U8);
+    });
+  });
+
   describe('rendition caps', () => {
     const M3U8 = 'https://example.com/video.m3u8';
     const built: HlsJsAdapter[] = [];

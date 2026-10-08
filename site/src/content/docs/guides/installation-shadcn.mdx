@@ -147,7 +147,7 @@ Commit your work before installing or updating source so you can review every fi
 
 ## Add the skin source
 
-Configure `@videojs`, then add the selected skin source. Shadcn skips existing namespaces, so when you change styling or theme, replace the existing `@videojs` URL in `components.json` with the URL shown in the first step. Adding the skin overwrites an existing Video.js skin so the selected catalog applies completely. Review and remove obsolete Video.js style files left by an earlier catalog. For HTML source, repeat the media replacement below after an overwrite.
+Configure `@videojs`, then add the selected skin source. Shadcn skips the registry command when `components.json` already defines `@videojs`, for example from an earlier install with a different styling or theme. If that URL differs from the one in the command, replace it in `components.json`. Adding the skin overwrites an existing Video.js skin so the selected catalog applies completely. Review and remove obsolete Video.js style files left by an earlier catalog. For HTML source, repeat the media replacement below after an overwrite.
 
 <ShadcnFrameworkCase framework="react">
 <InstallationRegistryCommand framework="react" />

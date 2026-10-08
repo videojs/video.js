@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cdn",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Video.js 10 as browser-ready bundles for script tags, with no build step",
   "keywords": [
     "audio",
@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videojs/v10",
+    "url": "https://github.com/videojs/video.js",
     "directory": "packages/cdn"
   },
   "files": [
@@ -104,7 +104,6 @@
     "happy-dom": "^20.11.1",
     "rolldown": "~1.2.5",
     "tsx": "^4.23.1",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:"
   }
 }

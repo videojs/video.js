@@ -178,6 +178,7 @@ export type {
   MediaContentValue,
   MediaControlsCapability,
   MediaControlsState,
+  MediaCrossOriginType,
   MediaErrorCapability,
   MediaErrorEvents,
   MediaErrorState,
@@ -254,7 +255,7 @@ export type {
 // Media
 export * from '@videojs/media/dom';
 export type { WithMediaTracks } from '@videojs/media/media-tracks';
-// The declaration bundler needs this explicit export for media element subpaths to reference the type.
+// The declaration bundler needs this explicit export for media component subpaths to reference the type.
 export type { CustomMediaConstructor } from '@videojs/media/dom';
 // Store
 export type { Comparator, Selector } from '@videojs/store';

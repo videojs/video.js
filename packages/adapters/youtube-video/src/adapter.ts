@@ -124,8 +124,22 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   detach(): void {
-    if (!this.#target) return;
+    const target = this.#target;
+    if (!target) return;
 
+    // The iframe API's `destroy()` removes the iframe, but the host that rendered it still owns it; a framework
+    // unmounting it next would otherwise fail to remove it.
+    const { parentNode, nextSibling } = target;
+
+    this.#teardown();
+
+    if (parentNode && !target.parentNode) {
+      parentNode.insertBefore(target, nextSibling?.parentNode === parentNode ? nextSibling : null);
+    }
+  }
+
+  // Release the player and reset state, leaving the iframe wherever `destroy()` put it.
+  #teardown(): void {
     this.#attachId++;
     this.#stopPolling();
     this.#teardownTextTracks();
@@ -422,7 +436,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
       // Before a player reports its settings, only values written through setters are real.
       const restoreSettings = new Set<PlayerSetting>(playerSettingsRead ? PLAYER_SETTINGS : writtenSettings);
 
-      this.detach();
+      // Not `detach()`: the iframe takes its new `src` before going back, so it loads only once.
+      this.#teardown();
       target.src = embedSrc;
       this.#pendingEmbedOptions = false;
       parent?.insertBefore(target, nextSibling);

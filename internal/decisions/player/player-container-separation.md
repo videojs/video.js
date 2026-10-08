@@ -31,7 +31,7 @@ The HTML equivalent:
 
 ## Context
 
-On the React side, the separation between `Player` (state), `Container` (layout/media attachment), and `Video` (media element) is natural — React's component model encourages composition through nesting.
+On the React side, the separation between `Player` (state), `Container` (layout/media attachment), and `Video` (media component) is natural — React's component model encourages composition through nesting.
 
 On the HTML side, there was temptation to combine the provider and container into a single `<video-player>` element. This would make the wrapping element feel more "functional" as a traditional HTML element that handles both state and layout. However, combining them means:
 

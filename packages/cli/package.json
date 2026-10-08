@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cli",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Video.js 10 command line: version-matched installation instructions for coding agents",
   "keywords": [
     "agents",
@@ -14,7 +14,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/videojs/v10.git",
+    "url": "git+https://github.com/videojs/video.js.git",
     "directory": "packages/cli"
   },
   "bin": {
@@ -36,7 +36,6 @@
     "@types/node": "^22.18.6",
     "@videojs/installation": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "typescript": "6.0.2",
     "vite-plus": "catalog:"
   }
 }

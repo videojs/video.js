@@ -1,6 +1,6 @@
 {
   "name": "@videojs/html",
-  "version": "10.0.0",
+  "version": "10.0.1",
   "description": "Video.js 10 for HTML, Vue, and Svelte: player custom elements and skins for video and audio",
   "keywords": [
     "audio",
@@ -22,7 +22,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/videojs/v10",
+    "url": "https://github.com/videojs/video.js",
     "directory": "packages/html"
   },
   "files": [
@@ -180,7 +180,6 @@
     "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.1",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
@@ -198,7 +197,6 @@
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
     "happy-dom": "^20.11.1",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {

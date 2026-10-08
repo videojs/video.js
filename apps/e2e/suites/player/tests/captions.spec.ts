@@ -126,7 +126,7 @@ test.describe('Captions sideloaded before an hls.js source', () => {
   };
 
   test.beforeEach(async ({ page }) => {
-    // Reuse the page's registered elements, but start from a media element that
+    // Reuse the page's registered elements, but start from a media component that
     // has caption tracks and no source yet.
     await page.goto('/pages/html-video-hls.html');
     await page.evaluate((vtt) => {

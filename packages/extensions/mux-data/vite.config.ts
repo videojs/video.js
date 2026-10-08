@@ -7,11 +7,6 @@ import packageJson from './package.json' with { type: 'json' };
 
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'browser'),
-  // `@videojs/mux` is a private workspace package: inline it (code and declarations) rather than depend on it.
-  deps: {
-    alwaysBundle: ['@videojs/mux'],
-    dts: { alwaysBundle: ['@videojs/mux'] },
-  },
   entry: { index: './src/index.ts' },
   define: {
     __DEV__: mode === 'dev' ? 'true' : 'false',

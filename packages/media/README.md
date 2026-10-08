@@ -13,7 +13,7 @@ Runtime-agnostic APIs are exported from `@videojs/media`. Browser hosts and the 
 
 ## Community
 
-If you need help with anything related to Video.js v10, or if you'd like to casually chat with other
+If you need help with anything related to Video.js 10, or if you'd like to casually chat with other
 members:
 
 - [Join Discord Server][discord]
@@ -21,9 +21,9 @@ members:
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](../../LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/media
 [package-badge]: https://img.shields.io/npm/v/@videojs/media?label=@videojs/media
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions

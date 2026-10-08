@@ -31,7 +31,7 @@ Each installation <DocsLink slug="guides/presets">preset</DocsLink> ships its bu
 | `video-compat.js` | `<video-player>`, `<video-compat-skin>`, and the UI elements the compat skin composes |
 | `video-player.js` | `<video-player>` alone, for markup without a packaged skin |
 
-The other presets follow the same pattern. Background video is the exception: one bundle, `background.js`, registers the player, the skin, and the `<background-video>` media element.
+The other presets follow the same pattern. Background video is the exception: one bundle, `background.js`, registers the player, the skin, and the `<background-video>` media component.
 
 A skin bundle registers every UI element its skin is built from. Any element the skin does not compose is its own bundle under `ui/`.
 
@@ -48,7 +48,7 @@ Each path mirrors its npm subpath: `ui/play-button.js` registers the element tha
 
 ## Media bundles
 
-The default presets play through the browser's own `<video>` and `<audio>`. Every other <DocsLink slug="guides/media-sources">media element</DocsLink> is its own bundle under `media/`, loaded beside the player bundle:
+The default presets play through the browser's own `<video>` and `<audio>`. Every other <DocsLink slug="guides/media-sources">media component</DocsLink> is its own bundle under `media/`, loaded beside the player bundle:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
