@@ -3,7 +3,7 @@ import type { DocSearchModal as DocSearchModalComponent } from '@docsearch/react
 import { useDocSearchKeyboardEvents } from '@docsearch/react/useDocSearchKeyboardEvents';
 import { useStore } from '@nanostores/react';
 import clsx from 'clsx';
-import { debounce } from 'es-toolkit/function';
+import { debounce, noop } from 'es-toolkit/function';
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -49,8 +49,14 @@ function loadModal() {
   return modalPromise;
 }
 
+// A failed preload surfaces when the reader opens the modal.
 function preloadModal() {
-  void loadModal();
+  loadModal().catch(noop);
+}
+
+// Browsers cache a failed module import, so a reload is the only way to fetch the modal again.
+function reloadPage() {
+  window.location.reload();
 }
 
 // Ask AI is not configured, so the modal never toggles it.
@@ -67,10 +73,10 @@ export default function Search({ className }: SearchProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   function open() {
-    void loadModal().then((modal) => {
+    loadModal().then((modal) => {
       setDocSearchModal(() => modal);
       setIsOpen(true);
-    });
+    }, reloadPage);
   }
 
   function close() {
