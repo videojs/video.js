@@ -5,15 +5,7 @@ import type { ComponentProps } from 'astro/types';
 import { twMerge } from '@/utils/twMerge';
 
 type Props = ComponentProps<typeof Image>;
-const props = Astro.props;
-
-// Generate responsive widths by default; Astro's layout and pixel densities are mutually exclusive.
-if (!props.densities) props.layout ??= 'constrained';
-
-// Match the 48rem prose width so browsers choose an appropriately sized image, preserving caller overrides.
-props.sizes ??= '(min-width: 48rem) 48rem, 100vw';
-
-const { class: className, src, ...rest } = props;
+const { class: className, src, ...rest } = Astro.props;
 
 const imgClass = twMerge('my-8 h-auto max-w-full', className);
 ---
