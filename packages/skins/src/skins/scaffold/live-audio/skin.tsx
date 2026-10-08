@@ -20,6 +20,7 @@ export function LiveAudioSkin({ children, className, ...props }: LiveAudioSkinPr
       data-preset="live-audio"
       {...props}
     >
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <ErrorDialog />
       <LiveAudioControls />
