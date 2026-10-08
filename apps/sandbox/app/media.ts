@@ -4,10 +4,15 @@ import {
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_PLAYERJS_SOURCE,
+  DEFAULT_SOURCE,
+  DEFAULT_YOUTUBE_SOURCE,
+  getYouTubeSource,
   HLS_SOURCE_IDS,
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
+  PLAYERJS_SOURCE_IDS,
   type SandboxSource,
   SHAKA_SOURCE_IDS,
   SOURCE_IDS,
@@ -19,7 +24,7 @@ import {
   TWITCH_VIDEO_SRC,
   VIMEO_VIDEO_SRC,
   WISTIA_VIDEO_SRC,
-  YOUTUBE_VIDEO_SRC,
+  YOUTUBE_SOURCE_IDS,
 } from './shared/sources';
 import type { Platform } from './types';
 
@@ -217,7 +222,10 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed renders one provider page URL rather than the picker's list.
+  // Each embed but YouTube and `<playerjs-video>` renders one provider page URL rather than the picker's list. YouTube
+  // offers a set of page URLs instead, covering the caption, short, and live cases its adapter handles differently. The
+  // CDN page builds elements from attributes alone, so the entries that need player parameters stay off it. player.js
+  // is a protocol many providers speak, so its embed picks between their embed pages.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -231,8 +239,9 @@ const MEDIA_MAP = {
     player: 'video',
     tag: 'youtube-video',
     embed: true,
-    fixedSource: YOUTUBE_VIDEO_SRC,
-    sources: NON_DASH_SOURCE_IDS,
+    sources: YOUTUBE_SOURCE_IDS,
+    cdnSources: YOUTUBE_SOURCE_IDS.filter((id) => !getYouTubeSource(id)),
+    fallbackSource: DEFAULT_YOUTUBE_SOURCE,
   },
   'cloudflare-video': {
     label: 'Cloudflare Stream Video',
@@ -241,6 +250,15 @@ const MEDIA_MAP = {
     embed: true,
     fixedSource: CLOUDFLARE_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
+  },
+  'playerjs-video': {
+    label: 'Player.js Video',
+    player: 'video',
+    tag: 'playerjs-video',
+    embed: true,
+    sources: PLAYERJS_SOURCE_IDS,
+    fallbackSource: DEFAULT_PLAYERJS_SOURCE,
+    entrySource: DEFAULT_PLAYERJS_SOURCE,
   },
   'spotify-audio': {
     label: 'Spotify Audio',
@@ -293,6 +311,17 @@ export function mediaSources(media: MediaId, platform: Platform): readonly Sourc
   const { sources, cdnSources } = MEDIA[media];
 
   return platform === 'cdn' ? (cdnSources ?? sources) : sources;
+}
+
+/**
+ * Where the picker lands when `media` is entered: its entry source, else the current source while still offered, else
+ * the media's fallback.
+ */
+export function landingSource(media: MediaId, platform: Platform, current: SourceId): SourceId {
+  const { entrySource, fallbackSource } = MEDIA[media];
+  if (entrySource) return entrySource;
+
+  return mediaSources(media, platform).includes(current) ? current : (fallbackSource ?? DEFAULT_SOURCE);
 }
 
 /**

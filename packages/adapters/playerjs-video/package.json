@@ -1,0 +1,52 @@
+{
+  "name": "@videojs/playerjs-video",
+  "version": "10.0.1",
+  "description": "Player.js embed playback adapter for Video.js",
+  "keywords": [
+    "embed",
+    "media",
+    "player.js",
+    "playerjs",
+    "videojs"
+  ],
+  "homepage": "https://videojs.org",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/video.js",
+    "directory": "packages/adapters/playerjs-video"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/default/index.js",
+  "module": "dist/default/index.js",
+  "types": "dist/dev/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/dev/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "default": "./dist/default/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build:watch": "vp pack --watch ./src --no-clean",
+    "dev": "pnpm run build:watch",
+    "test": "vp test run",
+    "test:watch": "vp test",
+    "clean": "rimraf --glob dist types '*.tsbuildinfo'"
+  },
+  "dependencies": {
+    "@videojs/media": "workspace:*",
+    "@videojs/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "vite-plus": "catalog:"
+  }
+}

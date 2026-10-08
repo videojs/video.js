@@ -3,15 +3,20 @@ import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { hasSkinChoice, hasTailwindSkin, MEDIA, MEDIA_IDS, mediaSources } from '../media';
+import { hasSkinChoice, hasTailwindSkin, landingSource, MEDIA, MEDIA_IDS, mediaSources } from '../media';
 import {
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_PLAYERJS_SOURCE,
+  DEFAULT_SOURCE,
+  DEFAULT_YOUTUBE_SOURCE,
   MUX_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
+  PLAYERJS_SOURCE_IDS,
   SOURCE_IDS,
   SOURCES,
+  YOUTUBE_SOURCE_IDS,
 } from '../shared/sources';
 
 const templatesDir = resolve(import.meta.dirname, '../../templates');
@@ -32,15 +37,20 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube and player.js and the native background video only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
 
-    expect(fixed).toEqual(['background-video', ...embeds]);
+    // player.js is a protocol many providers speak, so its embed picks between their pages instead.
+    expect(fixed).toEqual([
+      'background-video',
+      ...embeds.filter((id) => id !== 'youtube-video' && id !== 'playerjs-video'),
+    ]);
     expect(embeds).toEqual([
       'vimeo-video',
       'youtube-video',
       'cloudflare-video',
+      'playerjs-video',
       'spotify-audio',
       'tiktok-video',
       'twitch-video',
@@ -52,7 +62,17 @@ describe('MEDIA', () => {
     expect(MEDIA['hls-background-video'].entrySource).toBe(DEFAULT_BACKGROUND_SOURCE);
     expect(MEDIA['mux-background-video'].entrySource).toBe(DEFAULT_BACKGROUND_SOURCE);
     expect(MEDIA['dash-video'].fallbackSource).toBe(DEFAULT_DASH_SOURCE);
-    expect(MEDIA_IDS.filter((id) => MEDIA[id].fallbackSource)).toEqual(['dash-video']);
+    expect(MEDIA['youtube-video'].fallbackSource).toBe(DEFAULT_YOUTUBE_SOURCE);
+    expect(MEDIA_IDS.filter((id) => MEDIA[id].fallbackSource)).toEqual([
+      'dash-video',
+      'youtube-video',
+      'playerjs-video',
+    ]);
+  });
+
+  it('lands the player.js embed on one of its provider pages, whichever source was showing', () => {
+    expect(MEDIA['playerjs-video'].entrySource).toBe(DEFAULT_PLAYERJS_SOURCE);
+    expect(MEDIA['playerjs-video'].fallbackSource).toBe(DEFAULT_PLAYERJS_SOURCE);
   });
 
   it('labels what the SPF engines do with protected and MPEG-TS sources', () => {
@@ -94,10 +114,55 @@ describe('mediaSources', () => {
     expect(mediaSources('hlsjs-video', 'cdn')).not.toContain('hls-drm');
   });
 
+  it('offers YouTube page URLs to the YouTube media only, minus player parameters on the CDN page', () => {
+    expect(mediaSources('youtube-video', 'react')).toEqual(YOUTUBE_SOURCE_IDS);
+    expect(mediaSources('youtube-video', 'cdn')).not.toContain('youtube-captions-on');
+    expect(mediaSources('youtube-video', 'cdn')).toContain('youtube-captions');
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'youtube-video')) {
+      for (const platform of ['html', 'cdn'] as const) {
+        expect(
+          mediaSources(media, platform).some((id) => SOURCES[id].type === 'youtube'),
+          media
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('offers the player.js embed its provider pages, and nothing else those pages', () => {
+    expect(PLAYERJS_SOURCE_IDS).toEqual([
+      'playerjs-mux',
+      'playerjs-gumlet',
+      'playerjs-framerate',
+      'playerjs-livid',
+      'playerjs-bunny',
+      'playerjs-streamable',
+    ]);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('playerjs-video', platform)).toEqual(PLAYERJS_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'playerjs-video')) {
+      for (const id of PLAYERJS_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
   it('narrows dash.js to DASH manifests and lets the audio player take anything', () => {
     expect(mediaSources('dash-video', 'react')).toEqual(DASH_SOURCE_IDS);
     expect(mediaSources('audio', 'react')).toEqual(SOURCE_IDS);
     expect(mediaSources('video', 'react')).toEqual(NON_DASH_SOURCE_IDS);
+  });
+});
+
+describe('landingSource', () => {
+  it('keeps an offered source and otherwise lands on the entry or fallback source', () => {
+    expect(landingSource('youtube-video', 'html', 'hls-1')).toBe(DEFAULT_YOUTUBE_SOURCE);
+    expect(landingSource('youtube-video', 'html', 'youtube-short')).toBe('youtube-short');
+    expect(landingSource('youtube-video', 'cdn', 'youtube-captions-on')).toBe(DEFAULT_YOUTUBE_SOURCE);
+    expect(landingSource('video', 'html', 'youtube-short')).toBe(DEFAULT_SOURCE);
+    expect(landingSource('video', 'html', 'hls-2')).toBe('hls-2');
+    expect(landingSource('hls-background-video', 'html', 'hls-2')).toBe(DEFAULT_BACKGROUND_SOURCE);
   });
 });
 

@@ -1,5 +1,6 @@
 import type { MuxSource } from '@videojs/mux-video';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
+import type { YouTubeEngineConfig, YouTubeSource } from '@videojs/youtube-video';
 
 import { getMuxAssetId } from './mux';
 
@@ -14,7 +15,11 @@ export interface SandboxSource {
   label: string;
   /** Plain media URL. Absent when the source needs more than a URL can carry. */
   url?: string;
-  type: 'hls' | 'mp4' | 'dash' | 'none';
+  /**
+   * `youtube` is a YouTube page URL for `<youtube-video>`, and `playerjs` an embed page URL for `<playerjs-video>`,
+   * rather than a media file or manifest.
+   */
+  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -33,6 +38,8 @@ export interface SandboxSource {
    */
   source?: Omit<MuxSource, 'drm'> & { drm?: MuxSource['drm'] | DrmSystemsConfig };
   chapters?: readonly ChapterTrack[];
+  /** YouTube player parameters, for a YouTube source whose embed needs more than its URL can carry. */
+  youtube?: YouTubeEngineConfig;
 }
 
 // The two DRM sources below are the same Mux asset reached two ways, so the
@@ -486,6 +493,60 @@ const SOURCE_MAP = {
     url: 'https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd',
     type: 'dash',
   },
+  // YouTube page URLs, which only `<youtube-video>` plays. Big Buck Bunny has no
+  // dialogue and no captions, so switching to it is how a previous video's
+  // caption tracks are seen to go away.
+  'youtube-1': {
+    label: 'YouTube - Big Buck Bunny (no captions)',
+    url: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+    type: 'youtube',
+  },
+  // English captions, uploaded and auto-generated. Whether YouTube shows them on
+  // load follows the viewer's own YouTube caption preference.
+  'youtube-captions': {
+    label: 'YouTube - Captions (English)',
+    url: 'https://www.youtube.com/watch?v=M7lc1UVf-VE',
+    type: 'youtube',
+  },
+  // The same video with `cc_load_policy`, so YouTube shows captions on load
+  // whatever the viewer's preference — the state the CC button must pick up.
+  'youtube-captions-on': {
+    label: 'YouTube - Captions on at load (cc_load_policy)',
+    url: 'https://www.youtube.com/watch?v=M7lc1UVf-VE',
+    type: 'youtube',
+    youtube: { cc_load_policy: 1 },
+  },
+  // Dozens of uploaded subtitle languages, which fills the captions menu.
+  'youtube-captions-multi': {
+    label: 'YouTube - Captions (many languages)',
+    url: 'https://www.youtube.com/watch?v=iG9CE55wbtY',
+    type: 'youtube',
+  },
+  // Forced on in a language other than the first, so the track the player marks
+  // showing has to be the one YouTube picked rather than whichever came first.
+  'youtube-captions-french': {
+    label: 'YouTube - Captions on at load in French (cc_lang_pref)',
+    url: 'https://www.youtube.com/watch?v=iG9CE55wbtY',
+    type: 'youtube',
+    youtube: { cc_load_policy: 1, cc_lang_pref: 'fr' },
+  },
+  'youtube-short': {
+    label: 'YouTube - Short (portrait, captions)',
+    url: 'https://www.youtube.com/shorts/8ZCeXQyavog',
+    type: 'youtube',
+  },
+  // A 24/7 stream reached through a `/live/` URL. Not flagged `live`: the YouTube
+  // media has no live player variant to switch to.
+  'youtube-live': {
+    label: 'YouTube - Live stream (Lofi Girl)',
+    url: 'https://www.youtube.com/live/jfKfPfyJRdk',
+    type: 'youtube',
+  },
+  'youtube-start-time': {
+    label: 'YouTube - Short link with start time (youtu.be, t=60)',
+    url: 'https://youtu.be/aqz-KE-bpKQ?t=60',
+    type: 'youtube',
+  },
   // A file that does not exist, so the player's error dialog can be looked at
   // without waiting for a network to fail.
   error: {
@@ -503,6 +564,48 @@ const SOURCE_MAP = {
     url: '',
     type: 'none',
   },
+  // player.js is a protocol rather than a host, so one media plays every service
+  // below. They implement the spec to different degrees, which is what makes them
+  // worth switching between: Mux Player reports no duration before playback and
+  // keeps its controls, which no parameter hides; Gumlet adds rate, seek, and
+  // volume events; FrameRate adds `seeked`; Livid sticks to the spec, with no
+  // `seeked` or `progress`; Bunny adds rate; Streamable sends no `seeked` and no
+  // duration before playback.
+  // Mux Player's iframe embed, playing the same asset as `hls-1`.
+  'playerjs-mux': {
+    label: 'Player.js - Mux Player (iframe)',
+    url: 'https://player.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    type: 'playerjs',
+  },
+  'playerjs-gumlet': {
+    label: 'Player.js - Gumlet',
+    url: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
+    type: 'playerjs',
+  },
+  // A video from a FrameRate user's public profile.
+  'playerjs-framerate': {
+    label: 'Player.js - FrameRate',
+    url: 'https://framerate.tv/embed/361c224a-b10f-483f-811b-8602f46b7be8',
+    type: 'playerjs',
+  },
+  // The demo on Livid's own homepage.
+  'playerjs-livid': {
+    label: 'Player.js - Livid',
+    url: 'https://livid.com/embed/AJPwABnzkTXj',
+    type: 'playerjs',
+  },
+  // A video from Bunny's own public demo library, so it may not stay up for good.
+  'playerjs-bunny': {
+    label: 'Player.js - Bunny Stream',
+    // The current player host; the legacy `iframe.mediadelivery.net` one serves an older player without playback rate.
+    url: 'https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe',
+    type: 'playerjs',
+  },
+  'playerjs-streamable': {
+    label: 'Player.js - Streamable',
+    url: 'https://streamable.com/e/moo',
+    type: 'playerjs',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -512,7 +615,15 @@ export type SourceId = keyof typeof SOURCE_MAP;
 // instead of a union of literal types that only some members share.
 export const SOURCES: Record<SourceId, SandboxSource> = SOURCE_MAP;
 
-export const SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
+const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
+
+/**
+ * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
+ * the player.js services' for `<playerjs-video>`, so every list derived from this one stays free of them.
+ */
+export const SOURCE_IDS = ALL_SOURCE_IDS.filter((id) => !isYouTubeSource(id) && !isPlayerJsSource(id));
+export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
+export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -548,6 +659,8 @@ export const DASH_SOURCE_IDS = SOURCE_IDS.filter((id) => SOURCES[id].type === 'd
 export const SHAKA_SOURCE_IDS = SOURCE_IDS.filter((id) => !isDrmSource(id) && !isMuxSource(id));
 export const DEFAULT_SOURCE: SourceId = 'hls-1';
 export const DEFAULT_DASH_SOURCE: SourceId = 'dash-1';
+export const DEFAULT_YOUTUBE_SOURCE: SourceId = 'youtube-1';
+export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -574,8 +687,6 @@ export function withMuxMaxResolution(url: string, maxResolution: string): string
 
 export const VIMEO_VIDEO_SRC = 'https://vimeo.com/76979871';
 
-export const YOUTUBE_VIDEO_SRC = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
-
 export const CLOUDFLARE_VIDEO_SRC = 'https://watch.videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4';
 
 // An episode rather than a track: Spotify plays episodes in full for a signed-out
@@ -593,6 +704,21 @@ export const WISTIA_VIDEO_SRC = 'https://wesleyluyten.wistia.com/medias/oifkgmxn
 /** Returns true when the given source represents a live stream and should use the live-video skin. */
 export function isLiveSource(id: SourceId): boolean {
   return SOURCES[id].live === true;
+}
+
+export function isYouTubeSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'youtube';
+}
+
+export function isPlayerJsSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'playerjs';
+}
+
+/** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */
+export function getYouTubeSource(id: SourceId): YouTubeSource | undefined {
+  const { url, youtube } = SOURCES[id];
+
+  return youtube ? { src: url, engine: { youtube } } : undefined;
 }
 
 /** Returns true when the given source is DRM protected and needs signed tokens. */

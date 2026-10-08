@@ -24,7 +24,7 @@ import {
   type TextDirection,
 } from '@app/constants';
 import { COMPARE_LABELS } from '@app/labels';
-import { hasTailwindSkin, isMediaId, MEDIA, type MediaId, mediaSources } from '@app/media';
+import { hasTailwindSkin, isMediaId, landingSource, MEDIA, type MediaId, mediaSources } from '@app/media';
 import { CAPTIONS_MODES, type CaptionsMode } from '@app/shared/captions';
 import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } from '@app/shared/player-frame';
@@ -403,19 +403,6 @@ export function App() {
     if (!availableSources.includes(source)) setSource(descriptor.fallbackSource ?? DEFAULT_SOURCE);
   }, [availableSources, descriptor.fallbackSource, source]);
 
-  // Land on the media's own source when *switched into*, rather than inheriting whatever the previous media was
-  // showing — `readParams` covers the first-mount half. Keyed on entry, so a source picked afterwards sticks. Declared
-  // after the constraint so the landing wins when both fire in one pass.
-  const previousMedia = useRef(media);
-
-  useEffect(() => {
-    const entered = previousMedia.current !== media;
-
-    previousMedia.current = media;
-
-    if (entered && descriptor.entrySource) setSource(descriptor.entrySource);
-  }, [media, descriptor.entrySource]);
-
   useEffect(() => {
     if (!tailwindAvailable && styling === 'tailwind') setStyling('css');
   }, [tailwindAvailable, styling]);
@@ -430,6 +417,17 @@ export function App() {
   useEffect(() => {
     if (compare !== 'off' && !compareAvailable(compare, selection)) setCompare('off');
   }, [compare, selection]);
+
+  // Land on the media's own source in the same update that switches media — `readParams` covers the first-mount half.
+  // Switching remounts the preview frame with the URL of that render, so a source fixed up by an effect afterwards would
+  // be posted to a page that is still loading and lost.
+  const handleMediaChange = useCallback(
+    (value: MediaId) => {
+      setMedia(value);
+      setSource((current) => landingSource(value, platform, current));
+    },
+    [platform]
+  );
 
   const handleSourceChange = useCallback((value: string) => setSource(value as SourceId), []);
 
@@ -470,9 +468,13 @@ export function App() {
     const panel = panels.find((panel) => panel.id === id);
     if (!frame || !target || !panel) return;
 
-    if (new URL(frame.src).searchParams.get('skin') !== panel.skin) {
+    const frameQuery = new URL(frame.src).searchParams;
+
+    if (frameQuery.get('skin') !== panel.skin) {
       target.postMessage({ type: 'skin-change', skin: panel.skin }, '*');
     }
+
+    if (frameQuery.get('source') !== source) target.postMessage({ type: 'source-change', source }, '*');
 
     postPreferences(target, frameParams);
   };
@@ -498,7 +500,7 @@ export function App() {
         platform={platform}
         onPlatformChange={setPlatform}
         media={media}
-        onMediaChange={setMedia}
+        onMediaChange={handleMediaChange}
         source={source}
         onSourceChange={handleSourceChange}
         availableSources={availableSources}

@@ -1,0 +1,192 @@
+---
+title: PlayerJsVideo
+frameworkTitle:
+  html: playerjs-video
+description: Video component that plays any embed implementing the player.js protocol, such as Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, and Streamable
+---
+
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/playerjs-video/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/playerjs-video/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/playerjs-video/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/playerjs-video/html/css/BasicUsage.ts?raw";
+
+[player.js](https://github.com/embedly/player.js/blob/master/SPEC.rst) is a `postMessage` protocol for controlling embedded players, not a video host. Any embed that implements its receiver side plays through this one component: Mux Player's iframe embed, Gumlet, FrameRate, Livid, Bunny Stream, Streamable, and others. Commands are posted to the embed directly, so no third-party script loads.
+
+## Import
+
+<MediaImports media="playerjs-video" package="@videojs/playerjs-video" react="PlayerJsVideo" />
+
+## Load a source
+
+`src` takes the embed URL of any player.js receiver: an absolute `http` or `https` URL, with protocol-relative URLs (`//host/…`) read as `https`. Nothing inspects the URL to decide whether it speaks player.js; choosing this component is the opt-in. A `src` that isn't an `http(s)` URL fails with `MEDIA_ERR_SRC_NOT_SUPPORTED`, and an embed that doesn't implement the protocol never reports ready, so the element stays at `readyState` 0.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<PlayerJsVideo src="https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<playerjs-video src="https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e"></playerjs-video>
+```
+</FrameworkCase>
+
+## Feature detection
+
+Embeds implement the spec to different degrees. Each one lists the methods and events it supports in its `ready` message, and every command is checked against that list:
+
+- A missing getter leaves its value at the default, such as a `duration` of `NaN`. Some embeds implement a getter but can't answer it yet: Streamable reports no duration until playback starts.
+- A missing setter is a no-op; the value stays wherever the embed has it.
+
+`supports(type, name)` reports whether the embed advertised a method or event. `type` is `'method'` or `'event'`, and `name` is one player.js name or an array of names that must all be supported. It returns `false` until the embed reports ready.
+
+<FrameworkCase frameworks={["react"]}>
+`onLoadedMetadata` fires when the embed reports ready, so its handler is the first point where the answer is meaningful. `event.currentTarget` is the playback adapter:
+
+```tsx
+<PlayerJsVideo
+  src="https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e"
+  onLoadedMetadata={(event) => {
+    const canSeek = event.currentTarget.supports('method', 'setCurrentTime');
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The `loadcomplete` event marks the point where the answer is meaningful:
+
+```ts
+const video = document.querySelector('playerjs-video');
+
+video.addEventListener('loadcomplete', () => {
+  const canSeek = video.supports('method', 'setCurrentTime');
+});
+```
+</FrameworkCase>
+
+## Controls
+
+Without `controls`, the element ignores pointer events, so a <DocsLink slug="guides/skins">player skin</DocsLink> above it receives every click. With `controls`, the embed's own chrome takes pointer input.
+
+player.js itself can't hide an embed's chrome, but for the services it recognizes, the element does it through the embed URL, as far as each service allows:
+
+| Service | Without `controls` |
+|---|---|
+| [Mux Player](https://www.mux.com/docs/guides/player) (`player.mux.com`) | Nothing: its controls are hidden with the `--controls` CSS property, which the iframe doesn't expose. Under a skin its control bar still stays out of sight, since the frame never gets the hover that reveals it, but its center play button shows while paused |
+| [Gumlet](https://docs.gumlet.com/video/embed-stream) | `disable_player_controls=true`: only the large center play button stays |
+| FrameRate | `show_controls=0` and `initial_play_btn=0`: no control bar and no large start button |
+| [Livid](https://support.livid.com/article/46-advanced-embedding-parameters) | `controls=0`: no chrome at all, the play button included. Livid applies it to videos on Pro and Premium accounts only |
+| [Bunny Stream](https://bunny.net/docs/stream/embedding) | No parameter hides the control bar, so it's shrunk instead: `compactControls=true`, `showSpeed=false`, `showHeatmap=false`, `chromecast=false`, `disableAirPlay=true` |
+| Streamable | `nocontrols=1`: no chrome at all |
+
+Other services get their URL untouched; pass whatever they offer under [`source.engine.playerJs`](#engine-options-playerjs).
+
+## URL parameters
+
+For the recognized services, `autoplay`, `muted` (either `muted` or `defaultMuted`), `loop`, and `preload` are written onto the embed URL in the service's own spelling, and turned off explicitly where the service defaults to on: Gumlet and Streamable loop, and Bunny Stream autoplays. Livid and Mux Player also take `preload` as the element's own value. The embed reads its URL once, so changing these later reaches the embed over the protocol (`autoplay`, `muted`, `loop`) or not until the next source (`controls`, `preload`); rebuilding the frame for them would restart the video.
+
+Every other parameter a service documents works too, in either of two places. Written into `src`, a parameter is kept as written, even over one the element would derive. Under `source.engine.playerJs`, it overrides both. A parameter a service reads from the URL hash, like Livid's start time `#t=25`, goes in `src`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<PlayerJsVideo src="https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe?t=30s&captions=en" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<playerjs-video src="https://player.mediadelivery.net/embed/759/eb1c4f77-0cda-46be-b47d-1118ad7c2ffe?t=30s&captions=en"></playerjs-video>
+```
+</FrameworkCase>
+
+## Behavior
+
+- `autoplay`, `muted` (seeded by `defaultMuted`), and `loop` are also applied over the protocol once the embed reports ready, which is how they reach services the element doesn't recognize. An embed without `setLoop` is looped by replaying it on `ended`.
+- `volume` (0 to 1, sent as the spec's 0 to 100), `muted`, and seeking through `currentTime` use the spec's methods.
+- `playbackRate` reaches only embeds that advertise `setPlaybackRate`, an extension to the spec that Gumlet implements.
+- player.js reports no buffering, so a started embed counts as playing.
+- No text tracks: `textTracks` stays empty.
+- The protocol has no fullscreen command, so the element's own `requestFullscreen()` fullscreens the iframe.
+- `poster` and `playsInline` are stored but have no effect on the embed. `preload` reaches Livid and Mux Player as is and Bunny Stream as `preload=false` when it's `"none"`, and no other service.
+- An embed `error` with code 1 surfaces as `MEDIA_ERR_SRC_NOT_SUPPORTED`. Codes 2 and 3 mean a command wasn't supported; they're ignored, with a warning in development. Any other code is a fatal error carrying the embed's message.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="PlayerJsVideo">
+  <Fragment slot="engine-playerJs">
+    player.js standardizes the messages an embed answers, not its URL, so there are no shared parameters. Every key under `source.engine.playerJs` is written onto the embed URL's query as given, for whichever service serves it — anything in [Gumlet's](https://docs.gumlet.com/video/embed-stream), [Bunny Stream's](https://bunny.net/docs/stream/embedding), or [Livid's](https://support.livid.com/article/46-advanced-embedding-parameters) parameter lists, for example. Values are stringified (`true` becomes `'true'`), an array repeats the parameter once per value, and `null` removes a parameter the URL would otherwise carry. These override both `src` and the parameters the element derives from its props. Changing them reloads the embed. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+
+    <FrameworkCase frameworks={["react"]}>
+    `referrerPolicy` never reaches the URL; it sets the `referrerpolicy` of the iframe the component renders.
+    </FrameworkCase>
+
+    <FrameworkCase frameworks={["html"]}>
+    `referrerPolicy` never reaches the URL, and `<playerjs-video>` doesn't apply it to its iframe either; it takes effect only in the React component.
+    </FrameworkCase>
+
+    Prefer the `autoplay`, `loop`, `muted`, `controls`, and `preload` props over their URL spellings: the props also reach the embed over the protocol and keep the element's state in step with it.
+
+    <FrameworkCase frameworks={["react"]}>
+    ```tsx
+    <PlayerJsVideo
+      controls
+      source={{
+        src: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
+        engine: { playerJs: { player_color: '#ff0000', disabled_player_control: ['cast', 'pip'] } },
+      }}
+    />
+    ```
+    </FrameworkCase>
+
+    <FrameworkCase frameworks={["html"]}>
+    ```ts
+    const video = document.querySelector('playerjs-video');
+    video.controls = true;
+    video.source = {
+      src: 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e',
+      engine: { playerJs: { player_color: '#ff0000', disabled_player_control: ['cast', 'pip'] } },
+    };
+    ```
+    </FrameworkCase>
+  </Fragment>
+</MediaReference>
