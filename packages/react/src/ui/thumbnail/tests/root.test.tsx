@@ -153,12 +153,12 @@ describe('Thumbnail', () => {
   });
 
   describe('crossOrigin', () => {
-    it('inherits the media element CORS mode when unset', () => {
+    it('inherits the media component CORS mode when unset', () => {
       expect(renderCrossOrigin('anonymous')).toBe('anonymous');
       expect(renderCrossOrigin('use-credentials')).toBe('use-credentials');
     });
 
-    it('sets nothing when the media element is not in CORS mode', () => {
+    it('sets nothing when the media component is not in CORS mode', () => {
       expect(renderCrossOrigin(null)).toBeNull();
     });
 

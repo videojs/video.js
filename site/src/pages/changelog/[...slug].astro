@@ -3,6 +3,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import ArrowUpRight from '@/assets/icons/arrow-up-right.svg?react';
+import { TableOfContents } from '@/components/docs/TableOfContents';
 import FormattedDate from '@/components/FormattedDate.astro';
 import defaultMarkdownComponents from '@/components/typography/defaultMarkdownComponents';
 import Blog from '@/layouts/Blog.astro';
@@ -19,15 +20,16 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<'changelog'>;
 
 const entry = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 
 const title = `v${entry.data.version}`;
 const description =
   entry.data.description || `What's new in Video.js ${title} — new features, bug fixes, and improvements.`;
 ---
 
-<Blog title={[title, "Changelog"]} description={description}>
+<Blog title={`${title} Changelog`} description={description}>
   <MarkdownAlternate slot="head" />
+  <TableOfContents client:idle headings={headings} railOnly />
   <article
     class="@container text-p2 sm:text-p15"
     data-search-content

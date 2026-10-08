@@ -23,7 +23,7 @@ For the best chance of autoplay succeeding, start playback muted and enable inli
 
 ## Recommended approach
 
-Set autoplay, muted, and inline playback on the media element, and keep a manual play control available for when autoplay is blocked.
+Set autoplay, muted, and inline playback on the media component, and keep a manual play control available for when autoplay is blocked.
 
 <FrameworkCase frameworks={["react"]}>
   <StyleCase styles={["css"]}>
@@ -139,7 +139,7 @@ export default function App() {
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Call `play()` on the media element from a click handler:
+Call `play()` on the media component from a click handler:
 
 ```html
 <video-player>
@@ -184,7 +184,7 @@ Enable inline playback with the `playsInline` prop on the media component.
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 
-Enable inline playback with the `playsinline` attribute on the media element.
+Enable inline playback with the `playsinline` attribute on the media component.
 
 </FrameworkCase>
 

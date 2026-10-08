@@ -5,6 +5,7 @@ frameworkTitle:
 description: Video component that plays Wistia-hosted videos through Wistia's web component
 ---
 
+import Aside from "@/components/Aside.astro";
 import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
@@ -28,6 +29,12 @@ import basicUsageHtmlTs from "@/components/docs/demos/wistia-video/html/css/Basi
 <FrameworkCase frameworks={["html"]}>
 `<wistia-video>` adapts Wistia's own `<wistia-player>` web component to the Video.js media contract. Wistia's chrome stays hidden by default so a Video.js player skin can control playback; set `controls` to use Wistia's UI.
 </FrameworkCase>
+
+<Aside type="caution" title="Wistia loads Sentry when playback fails">
+  Wistia's player loads the Sentry error-reporting SDK from `browser.sentry-cdn.com` the first time
+  playback errors, then sends the error to a Wistia-owned Sentry project. Video.js has no setting
+  that changes this. Wistia's [consent API](https://docs.wistia.com/docs/player-privacy-mode) turns it off.
+</Aside>
 
 ## Import
 

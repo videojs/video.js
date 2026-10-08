@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to file an enhancement report! Please fill this template out as completely as possible.
-        * If you are not requesting a new feature or enhancement, but want to ask a general question, use [discussions](https://github.com/videojs/v10/discussions) instead.
+        * If you are not requesting a new feature or enhancement, but want to ask a general question, use [discussions](https://github.com/videojs/video.js/discussions) instead.
         * Check the [docs](https://videojs.org/docs).
         * Please check to see if there's an existing issue or discussion and, if so, reply there instead.
         * Please provide as much detail as you can.
@@ -16,7 +16,7 @@ body:
     attributes:
       label: Should this be a feature proposal discussion?
       description: |
-        Video.js 10 currently uses [feature proposal discussions](https://github.com/videojs/v10/discussions) for larger feature requests, proposals, and discussions
+        Video.js 10 currently uses [feature proposal discussions](https://github.com/videojs/video.js/discussions) for larger feature requests, proposals, and discussions
       options:
         - label: This is not a substantial change
           required: true

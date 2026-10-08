@@ -78,7 +78,7 @@ function createReferenceGroups(): {
       })),
     },
     {
-      name: 'media element',
+      name: 'media component',
       outputPath: path.join(CONTENT_ROOT, 'generated-media-reference'),
       schema: MediaReferenceSchema,
       minimumDocs: 1,

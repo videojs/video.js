@@ -1,0 +1,63 @@
+---
+title: ScaffoldLiveVideoSkin
+frameworkTitle:
+  html: live-video-scaffold-skin
+description: A live video skin with minimal styling for custom skins
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import SkinImports from '@/components/docs/api-reference/SkinImports.astro';
+import OwnTheUI from '@/components/installation/OwnTheUI.astro';
+
+The Scaffold skin of the live video preset provides functional controls with minimal styling and no transitions. It is a starting point for a custom skin, intended to be restyled before use. It shows a Live button in place of time controls. See <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> to install and edit its source.
+
+## Import
+
+<SkinImports preset="live-video" react="ScaffoldLiveVideoSkin" scaffold />
+
+## Usage
+
+The skin goes between the player and the media element. It renders its controls around the media.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<LiveVideoPlayer>
+  <ScaffoldLiveVideoSkin>
+    <HlsVideo src="live.m3u8" />
+  </ScaffoldLiveVideoSkin>
+</LiveVideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<live-video-player>
+  <live-video-scaffold-skin>
+    <hls-video src="live.m3u8"></hls-video>
+  </live-video-scaffold-skin>
+</live-video-player>
+```
+</FrameworkCase>
+
+The examples use the lightweight <DocsLink slug="reference/components/hls-video">HLS video element</DocsLink> because most browsers can't play HLS streams with a plain `<video>`. See <DocsLink slug="guides/live-streams">Play live streams</DocsLink>.
+
+## Poster
+
+<FrameworkCase frameworks={["react"]}>
+The skin renders a poster image before playback starts. Pass `renderPoster` to replace it with your own component.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The skin renders a poster image before playback starts. An element with `slot="poster"` replaces it.
+</FrameworkCase>
+
+See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink> for complete examples.
+
+## Styling
+
+Packaged skins style themselves and expose a small set of public CSS custom properties. Everything else inside the skin is private and may change between releases. <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> documents the properties. For deeper changes, the Video.js registry provides the skin files.
+
+## Own the UI
+
+<OwnTheUI />

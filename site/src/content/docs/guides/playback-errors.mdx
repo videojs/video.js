@@ -79,10 +79,10 @@ The dialog shows its text through child parts: a title, the error description, a
 
 ## How it works
 
-The <DocsLink slug="reference/api/feature-error">error feature</DocsLink> mirrors the media element's error into player state:
+The <DocsLink slug="reference/api/feature-error">error feature</DocsLink> mirrors the media component's error into player state:
 
 - `error` holds the media's error — `code`, `message` — or `null` when there is none.
-- `dismissError()` clears the error from player state (the media element keeps its own error until a new load).
+- `dismissError()` clears the error from player state (the media component keeps its own error until a new load).
 - Loading a new source resets `error` to `null` automatically.
 
 The dialog owns presentation, not recovery. Decide the next step in your application: let the user dismiss the message, choose another item, refresh an expired URL, or contact support.
@@ -191,7 +191,7 @@ These codes identify Video.js 8 APIs used with the Video.js 10 `video.js` packag
 
 ### Error code says the source isn't supported
 
-The browser can't play the format through this media element. HLS in a plain video element outside Safari is the classic case; use the matching streaming media element. See <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+The browser can't play the format through this media component. HLS in a plain video element outside Safari is the classic case; use the matching streaming media component. See <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
 
 ### Reopening the source produces the same error
 

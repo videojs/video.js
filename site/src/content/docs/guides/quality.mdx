@@ -69,7 +69,7 @@ Let automatic quality selection do its job by default, and offer a quality menu 
 
 ## How it works
 
-The <DocsLink slug="reference/api/feature-quality">quality feature</DocsLink> mirrors the media element's video renditions into player state:
+The <DocsLink slug="reference/api/feature-quality">quality feature</DocsLink> mirrors the media component's video renditions into player state:
 
 - `videoRenditionList` holds each rendition's `id`, `width`, `height`, `bitrate`, `frameRate`, `codec`, and whether it's `selected`.
 - `activeVideoRendition` is the rendition currently playing. When the engine doesn't report one directly, the player matches it from the video's current dimensions.
@@ -190,11 +190,11 @@ updateButton();
 Confirm that the player includes `qualityFeature`. The live preset omits it; compose a custom player as described above.
 
 <FrameworkCase frameworks={["react"]}>
-Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media element doesn't support renditions. Use a streaming media element such as <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>.
+Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media component doesn't support renditions. Use a streaming media component such as <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media element doesn't support renditions. Use a streaming media element such as <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>.
+Quality availability is `'unavailable'`. The source is progressive (no renditions), the manifest hasn't loaded yet, or the media component doesn't support renditions. Use a streaming media component such as <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> or <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>.
 </FrameworkCase>
 
 ### The menu doesn't render for a single-rendition stream

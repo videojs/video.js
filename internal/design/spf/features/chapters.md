@@ -72,8 +72,6 @@ Extension boundaries, each a candidate slice on this doc or its own:
 - **Other `DATA-ID`s.** Recorded on the presentation, no consumer. Reading one is `getSessionData(presentation, id)`.
 - **Several chapters entries.** Only the first with a URI is read; merging per-`LANGUAGE` documents would need a
   cue-dedupe policy nothing calls for yet.
-- **hls.js-backed flavors.** `<mux-video>` / `<hls-video>` over hls.js get `sessionData` from `MANIFEST_PARSED`; the
-  pure parser and the DOM track helpers are exported so that path can reuse them.
 - **Live / EVENT chapters.** The open chapter's `MAX_SAFE_INTEGER` end is never clamped while the duration is
   non-finite, and the time-slider UI shows nothing for a non-finite duration.
 - **Language fallback.** Exact BCP-47 match only; no region/base-language collapsing.
@@ -85,8 +83,10 @@ Extension boundaries, each a candidate slice on this doc or its own:
 
 | Piece | File | Responsibility |
 |---|---|---|
-| `loadChapters` | `packages/spf/src/playback/behaviors/dom/load-chapters.ts` | Reactor gated on media element + resolved presentation + a chapters entry with a URI; fetches, parses, projects; aborts and removes the tracks on exit |
+| `loadChapters` | `packages/spf/src/playback/behaviors/dom/load-chapters.ts` | Reactor gated on media element + resolved presentation + a chapters entry with a URI; hands its controller's signal to `loadChaptersTracks`, aborting it on exit |
+| `loadChaptersTracks` | `packages/spf/src/media/dom/text/load-chapters-tracks.ts` | Fetches, parses, and adds one document's tracks; aborting its signal cancels the fetch and removes them. Also used by the hls.js and native HLS adapters |
 | `parseMultivariantPlaylist` | `packages/spf/src/media/hls/parse-multivariant.ts` | Records `#EXT-X-SESSION-DATA` as `SessionDataEntry[]` under `presentation.metadata` |
+| `parseSessionData` / `findSessionDataUri` | `packages/spf/src/media/hls/session-data.ts` | One tag → `SessionDataEntry`; the first entry's resolved `URI` read straight from playlist text, for native HLS |
 | `getSessionData` / `getMultivariantPlaylistMetadata` | `packages/spf/src/media/types/index.ts` | Typed reads of the recorded entries |
 | `parseHlsJsonChapters` | `packages/spf/src/media/hls/parse-json-chapters.ts` | Apple JSON (typed as its schema, `HlsJsonChapters`) → `Chapter[]`, document order, `duration` or next start as end, images resolved |
 | `addChaptersTracksToMedia` / `removeAllChaptersTracksFromMedia` | `packages/spf/src/media/dom/text/chapters-tracks.ts` | Per-language hidden tracks, ordering, settle-then-fill, `OPEN_CHAPTER_END`, ownership tag |
@@ -110,6 +110,9 @@ Extension boundaries, each a candidate slice on this doc or its own:
   entries without titles.
 - `packages/spf/src/media/dom/text/tests/chapters-tracks.test.ts` — element shape, ordering, settle-then-fill,
   `change` after fill, the `OPEN_CHAPTER_END` end, ownership isolation from subtitle tracks.
+- `packages/spf/src/media/hls/tests/session-data.test.ts` — `findSessionDataUri`: resolution, first entry with a URI.
+- `packages/spf/src/media/dom/text/tests/load-chapters-tracks.test.ts` — preferred language, removal and
+  cancellation on abort, an already-aborted signal.
 - `packages/spf/src/playback/behaviors/dom/tests/load-chapters.test.ts` — gating (media element, entry),
   projection, first-entry selection, quiet failure, abort on source change, cleanup on unload and destroy.
 - `packages/spf/src/playback/engines/hls/tests/engine.test.ts`, `engine-audio-only.test.ts` — end to end from a
@@ -121,6 +124,27 @@ Extension boundaries, each a candidate slice on this doc or its own:
   Verified headless in Chromium against a CMAF staging asset (2026-09-15): the track projects before playback (cues
   `0→3`, `3→open`), the store mirrors them in `chaptersCues` with the open end clamped to the media duration, the time slider partitions at 12.6%, and the hover
   title follows the pointer.
+
+## Outside SPF
+
+The hls.js adapter (`HlsJsChaptersMixin`) and native HLS playback (`NativeHlsChaptersMixin`, fetching the
+multivariant playlist itself) load the same tracks through SPF's `loadChaptersTracks(media, url, signal)` from
+`@videojs/spf/dom`; native HLS finds the document with `findSessionDataUri` from `@videojs/spf/hls`.
+
+- **hls.js reads the last entry.** hls.js keeps one `sessionData` entry per `DATA-ID`, the last, and the mixin reads
+  it as-is rather than reparsing the playlist. SPF and native HLS read the first entry with a `URI`, so the paths
+  differ only for a playlist naming several chapters documents.
+- **Language preference.** The hls.js mixin leads with hls.js's own `subtitlePreference.lang`, the counterpart of
+  SPF's `preferredSubtitleLanguage`. Native HLS has no preference to read, so `und`, then first-seen, leads.
+- **Mux's metadata document is fetched twice.** Mux publishes asset metadata as an Apple JSON chapters document, so
+  when a playlist names it as its chapters, `MuxMetadataLoader` and `loadChaptersTracks` each fetch it. Sharing the
+  request would need a hook between the adapters for a small, cacheable (`max-age=300`) document.
+- **Safari's own chapter tracks.** WebKit reads the same session data and adds one chapters text track per language
+  after the `<track>` children, holding no cues (measured in Playwright WebKit on macOS, 2026-09-30). The projected
+  track leads, so the store reads it. `apps/e2e/suites/player/tests/hls-chapters.spec.ts` covers this.
+- **Native HLS must not swallow child errors.** A srcless `<track>` settles by firing `error`, and
+  `NativeHlsErrorsMixin`'s capture listener on the media element used to stop it before it reached the track, so
+  cues were never filled.
 
 ## Related features
 

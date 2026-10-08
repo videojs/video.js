@@ -29,11 +29,11 @@ import basicUsageHtmlTs from '@/components/docs/demos/text-tracks/html/css/Basic
 ## Recommended approach
 
 <FrameworkCase frameworks={["react"]}>
-Add WebVTT tracks as `<track>` children of the media element, and give users a <DocsLink slug="reference/components/captions-button">CaptionsButton</DocsLink> to toggle them.
+Add WebVTT tracks as `<track>` children of the media component, and give users a <DocsLink slug="reference/components/captions-button">CaptionsButton</DocsLink> to toggle them.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Add WebVTT tracks as `<track>` children of the media element, and give users a <DocsLink slug="reference/components/captions-button">`<media-captions-button>`</DocsLink> to toggle them.
+Add WebVTT tracks as `<track>` children of the media component, and give users a <DocsLink slug="reference/components/captions-button">`<media-captions-button>`</DocsLink> to toggle them.
 </FrameworkCase>
 
 The `<track>` loads `/docs/demos/text-tracks/captions.vtt`, shown in the `captions.vtt` tab. Host a WebVTT file for your video and point `src` at its URL.
@@ -65,7 +65,7 @@ The `<track>` loads `/docs/demos/text-tracks/captions.vtt`, shown in the `captio
 
 ## How it works
 
-The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> mirrors the media element's `textTracks` into player state:
+The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> mirrors the media component's `textTracks` into player state:
 
 - `textTrackList` holds every track with its `id`, `kind`, `label`, `language`, and `mode`.
 - `subtitlesShowing` is `true` when any caption or subtitle track is showing.
@@ -81,7 +81,7 @@ The browser renders the cues. Style them with the `::cue` pseudo-element.
 <FrameworkCase frameworks={["react"]}>
 - Captions availability is `'unavailable'` until the media has at least one caption or subtitle track; caption controls render nothing in that case.
 - Cues load asynchronously. A track appears in `textTrackList` before its cues are parsed, so cue-driven UI fills in when the track finishes loading.
-- Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossOrigin` on the media element.
+- Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossOrigin` on the media component.
 - Track selection UIs identify tracks by `label` and `language`; give every track both.
 - `default` on a `<track>` marks it as the preferred initial track. The browser's caption preferences can select another track.
 </FrameworkCase>
@@ -89,7 +89,7 @@ The browser renders the cues. Style them with the `::cue` pseudo-element.
 <FrameworkCase frameworks={["html"]}>
 - Captions availability is `'unavailable'` until the media has at least one caption or subtitle track; caption controls render nothing in that case.
 - Cues load asynchronously. A track appears in `textTrackList` before its cues are parsed, so cue-driven UI fills in when the track finishes loading.
-- Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossorigin` on the media element.
+- Cross-origin track files require CORS: serve the VTT with CORS headers and set `crossorigin` on the media component.
 - Track selection UIs identify tracks by `label` and `language`; give every track both.
 - `default` on a `<track>` marks it as the preferred initial track. The browser's caption preferences can select another track.
 </FrameworkCase>
@@ -166,11 +166,11 @@ Confirm that:
 ### Captions work locally but not in production
 
 <FrameworkCase frameworks={["react"]}>
-The track file is served from another origin without CORS headers. Serve it with `Access-Control-Allow-Origin` and set `crossOrigin` on the media element.
+The track file is served from another origin without CORS headers. Serve it with `Access-Control-Allow-Origin` and set `crossOrigin` on the media component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The track file is served from another origin without CORS headers. Serve it with `Access-Control-Allow-Origin` and set `crossorigin` on the media element.
+The track file is served from another origin without CORS headers. Serve it with `Access-Control-Allow-Origin` and set `crossorigin` on the media component.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>

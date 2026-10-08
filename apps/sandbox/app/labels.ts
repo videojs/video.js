@@ -16,6 +16,7 @@ export const SKIN_LABELS: Record<Skin, string> = {
   default: 'Default',
   neutral: 'Neutral',
   compat: 'Compat',
+  scaffold: 'Scaffold',
 };
 
 export const SKIN_SOURCE_LABELS: Record<SkinSource, string> = {

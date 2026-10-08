@@ -4,7 +4,7 @@ import { getRegisteredMedia } from '../../core/registered-media';
 import { type AnyHTMLMediaAdapter, HTMLMediaAdapter } from '../html-media-adapter';
 
 /**
- * The media adapter behind a media the player resolved: the adapter itself, or the one a custom media element such as
+ * The media adapter behind a media the player resolved: the adapter itself, or the one a media component such as
  * `<mux-video>` exposes as `adapter`. `null` for a plain `<video>` / `<audio>` or an unrelated media implementation.
  *
  * @internal
@@ -20,8 +20,8 @@ export function getMediaAdapter(media: unknown): AnyHTMLMediaAdapter | null {
 }
 
 /**
- * The native element behind a media the player resolved: the element itself, or the one a custom media element or
- * adapter fronts as `target`. `null` when the media is not backed by an `HTMLMediaElement` (an embed, for example).
+ * The native element behind a media the player resolved: the element itself, or the one a media component or adapter
+ * fronts as `target`. `null` when the media is not backed by an `HTMLMediaElement` (an embed, for example).
  *
  * @internal
  */
@@ -31,7 +31,7 @@ export function getMediaElement(media: unknown): HTMLMediaElement | null {
 
   if (media instanceof HTMLMediaElement) return media;
 
-  // `HTMLMediaAdapter.target` is protected in TypeScript, but exists at runtime on it and on custom media elements.
+  // `HTMLMediaAdapter.target` is protected in TypeScript, but exists at runtime on it and on media components.
   const target = isObject(media) ? (media as { target?: unknown }).target : null;
 
   return target instanceof HTMLMediaElement ? target : null;

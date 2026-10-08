@@ -78,9 +78,14 @@ The site deploys via Netlify from two branches:
 
 On each release, the CD workflow force-pushes `main` to `site/v10`, keeping production docs in sync with published packages.
 
-**Changelog prose and blog posts** arrive between releases. The prose bot only starts once the release is published, so its PR lands on `main` after production has already moved, and blog posts merge whenever they are ready. The [Forward-port changelog and blog](../.github/workflows/forward-port-changelog.yml) workflow closes the gap: whenever `src/content/changelog/`, `src/content/blog/`, `src/assets/blog/`, or `src/content/authors.json` changes on `main`, it copies the changed paths onto `site/v10`. No cherry-pick needed. A blog post that merges before it should be public needs `devOnly: true` in its frontmatter, and a post that imports a component new to `main` needs the cherry-pick route below instead, since only those paths are copied.
+**Shipping a change between releases:** The [Cherry-pick to site/v10](../.github/workflows/cherry-pick-site.yml) workflow cherry-picks a change from `main` onto `site/v10`. Ask for it either way:
 
-**Fixing a typo without cutting a release:** Land the fix on `main` first, then cherry-pick to `site/v10`. The next release's force-push already includes the fix (since it came from `main`), so nothing gets lost. Treat `site/v10` as bot-owned — it is rewritten from `main` on every release, so anything pushed there that isn't also on `main` disappears at the next cut.
+- Add the `cherry-pick:site` label to the PR. It's picked when the PR merges, or right away if it already has. The changelog prose bot adds the label to every PR it opens, since prose lands after its release is already in production; remove it to hold the prose until the next release.
+- Run the workflow from the Actions tab with a merged PR number or a commit SHA on `main`, at any point after the merge (`gh workflow run cherry-pick-site.yml -f target=1234`).
+
+If the pick doesn't apply cleanly, the workflow comments on the PR and you cherry-pick by hand. Nothing else reaches production between releases.
+
+**Cherry-picking by hand:** Land the change on `main` first, then `git cherry-pick -x` it onto `site/v10`. The next release's force-push already includes the change (since it came from `main`), so nothing gets lost. Treat `site/v10` as bot-owned — it is rewritten from `main` on every release, so anything pushed there that isn't also on `main` disappears at the next cut.
 
 ## Environment Variables
 

@@ -70,7 +70,7 @@ export const LEGACY_ERRORS = {
     summary:
       '`videojs.options` held Video.js 8 global defaults. Video.js 10 has no global; configuration lives on the components you render.',
     legacy: 'videojs.options.autoplay = true;',
-    html: 'Set attributes on `<video-player>`, `<video-skin>`, and the media element.',
+    html: 'Set attributes on `<video-player>`, `<video-skin>`, and the media component.',
     react: 'Pass props to `<VideoPlayer>`, `<VideoSkin>`, and the media component.',
   },
 } satisfies Record<LegacyErrorCode, LegacyErrorEntry>;

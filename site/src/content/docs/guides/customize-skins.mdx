@@ -65,7 +65,7 @@ If you omit `--media-accent-text-color`, the skins choose a contrasting text col
 
 The skins use [`Inter`](https://rsms.me/inter/) when your page loads it and fall back to the system UI font. Video.js does not load the webfont for you. Set `--media-font-family` to use another font.
 
-The media element and poster share `--media-object-fit` and `--media-object-position`, so a `cover` poster stays aligned with `cover` video. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
+The media component and poster share `--media-object-fit` and `--media-object-position`, so a `cover` poster stays aligned with `cover` video. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 
 ### Set the color scheme
 
@@ -144,7 +144,7 @@ The skin's entry file is `components/videojs/<preset>/skin.tsx`. Keep importing 
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The skin directory contains `skin.html`, `skin.ts`, and `skin.css`. Keep importing the player and media from `@videojs/html`. Import the installed `skin.ts` once, then paste the markup from `skin.html` inside your player around the media element.
+The skin directory contains `skin.html`, `skin.ts`, and `skin.css`. Keep importing the player and media from `@videojs/html`. Import the installed `skin.ts` once, then paste the markup from `skin.html` inside your player around the media component.
 </FrameworkCase>
 
 ### Edit the installed files

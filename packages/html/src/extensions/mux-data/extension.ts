@@ -11,7 +11,7 @@ import { PlayerExtensionElement } from '../player-extension-element';
  * Mux-hosted playback needs no `env-key`: the view reports the Mux playback ID as its `video_id`, which Mux attributes
  * to the owning environment. Set `env-key` to monitor sources Mux doesn't host.
  *
- * Any media element works. When the media plays through an hls.js or dash.js engine, that engine is handed to the Mux
+ * Any media component works. When the media plays through an hls.js or dash.js engine, that engine is handed to the Mux
  * Data SDK so the view also carries stream-level detail such as rendition switches and request timing.
  *
  * @example

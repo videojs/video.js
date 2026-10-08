@@ -378,6 +378,22 @@ import { VideoPlayer, VideoSkin } from '@videojs/react/video';
 
 Your VHS tuning options don't have direct equivalents. Settings such as rendition capping and bandwidth hints are engine-specific. Configure them through the engine you chose. Video.js has no shared options object for these settings.
 
+The exception is `html5.vhs.withCredentials`. Cookie-gated streams on another origin (CloudFront signed cookies and the like) need the standard `crossorigin="use-credentials"` on the media element, which both HLS components honor for every manifest and segment request, the same way the browser does under native playback:
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<hls-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hls-video>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
+```
+</FrameworkCase>
+
+As with a plain `<video>`, the CDN has to answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`.
+
 ## Customize your player
 
 In v8, you customized the player with options, `addChild`, component subclasses, or CSS overrides on `.vjs-*` selectors. In v10, choose a skin, restyle it with CSS custom properties, or edit its source. Try these approaches in order.
@@ -458,7 +474,7 @@ Move license URLs from v8's `keySystems` configuration to `source.drm`, keyed by
 The examples configure Widevine. Replace both URL placeholders and add every key system your supported browsers need.
 
 <FrameworkCase frameworks={["html"]}>
-With a bundler, install `@videojs/shaka-video` and import `@videojs/html/media/shaka-video`. From the CDN, load `{{VJS10_CDN_BASE}}/media/shaka-video.js` in a `<script type="module">` tag. Then replace the media element inside your player's skin with:
+With a bundler, install `@videojs/shaka-video` and import `@videojs/html/media/shaka-video`. From the CDN, load `{{VJS10_CDN_BASE}}/media/shaka-video.js` in a `<script type="module">` tag. Then replace the media component inside your player's skin with:
 
 ```html
 <shaka-video id="protected-media"></shaka-video>
@@ -498,7 +514,7 @@ import { ShakaVideo } from '@videojs/react/media/shaka-video';
 
 ### Events
 
-Your media element is a real media element, so every event you already listen for still fires on it. Keep your listeners, and attach them to the media element instead of the v8 player.
+Your media component is a real media element, so every event you already listen for still fires on it. Keep your listeners, and attach them to the media component instead of the v8 player.
 
 ```js
 // Video.js 8
@@ -598,13 +614,13 @@ Replace v8 accessor methods with <DocsLink slug="reference/api/player-store">pla
 | `player.volume()` / `player.volume(0.5)` | `volume` in player state / `media.volume = 0.5` |
 | `player.muted()` / `player.muted(true)` | `muted` in player state / the player's `setMuted(true)` |
 | `player.playbackRate()` / `player.playbackRate(1.5)` | `playbackRate` in player state / the player's `setPlaybackRate(1.5)` |
-| `player.src({ src, type })` | set `src` on the media or replace the media element (`<video>` tag, `<hlsjs-video>`, `<dash-video>`, etc) |
+| `player.src({ src, type })` | set `src` on the media or replace the media component (`<video>` tag, `<hlsjs-video>`, `<dash-video>`, etc) |
 | `player.requestFullscreen()`, `exitFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
 | `player.textTracks()`, `addRemoteTextTrack()` | `<track>` elements; read `textTrackList` from player state or `textTracks` from the media |
 | `player.audioTracks()` | `audioTrackList` in player state, `audioTracks` in media |
 | `player.error()` | `error` in player state |
 | `player.dispose()` | remove the element |
-| `player.tech()` | the media element's `engine` property, where one exists |
+| `player.tech()` | the media component's `engine` property, where one exists |
 | `videojs.getPlayer(id)` | hold a reference to the element |
 </FrameworkCase>
 

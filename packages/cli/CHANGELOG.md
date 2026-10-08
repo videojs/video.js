@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.0.1](https://github.com/videojs/v10/compare/@videojs/cli@10.0.0...@videojs/cli@10.0.1) (2026-10-02)
+
+
+### Miscellaneous Chores
+
+* **@videojs/cli:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/installation bumped to 10.0.1
+    * @videojs/utils bumped to 10.0.1
+
 ## [10.0.0](https://github.com/videojs/v10/compare/@videojs/cli@10.0.0-rc.5...@videojs/cli@10.0.0) (2026-10-01)
 
 

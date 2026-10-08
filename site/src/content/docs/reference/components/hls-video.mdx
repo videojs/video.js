@@ -56,4 +56,22 @@ The lightweight HLS video element, optimized for minimal bundle size. The <DocsL
   </StyleCase>
 </FrameworkCase>
 
+## Cookie-gated streams
+
+A stream on another origin that is gated by cookies — CloudFront signed cookies, for example — needs those cookies on every manifest and segment request, or the CDN answers 403. Set the standard `crossorigin="use-credentials"` on the element and the engine sends them, the same way the browser does under native playback. Any other value, or no attribute, leaves requests at the platform default and sends no cross-origin cookies.
+
+The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`, or the browser refuses the credentialed response.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<hls-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hls-video>
+```
+</FrameworkCase>
+
 <MediaReference media="HlsVideo" />

@@ -1,11 +1,12 @@
 import {
   hasMetadata,
   isMediaBufferCapable,
+  isMediaPauseCapable,
   isMediaSeekCapable,
   isMediaSourceCapable,
   type MediaTimeState,
 } from '@videojs/media';
-import { listen, onEvent } from '@videojs/utils/dom';
+import { animationFrame, listen, onEvent } from '@videojs/utils/dom';
 import { noop } from '@videojs/utils/function';
 
 import { definePlayerFeature } from '../../feature';
@@ -79,14 +80,68 @@ export const timeFeature = definePlayerFeature({
       sync();
     };
 
-    sync();
+    let cancel: (() => void) | undefined;
 
-    listen(media, 'timeupdate', syncUnlessSeeking, { signal });
+    const stop = () => {
+      cancel?.();
+      cancel = undefined;
+    };
+
+    const frame = () => {
+      if (!isMediaPauseCapable(media) || media.paused || media.ended) {
+        stop();
+        return;
+      }
+
+      // Duration and seek state are event-driven. Avoid even allocating a store patch for a frozen clock.
+      const state = get();
+      const currentTime = media.currentTime;
+
+      if (!state.seeking && currentTime !== state.currentTime) set({ currentTime });
+
+      cancel = animationFrame(frame);
+    };
+
+    const start = () => {
+      if (!cancel && isMediaPauseCapable(media) && !media.paused && !media.ended) cancel = animationFrame(frame);
+    };
+
+    const finish = () => {
+      stop();
+      syncUnlessSeeking();
+    };
+
+    sync();
+    start();
+    signal.addEventListener('abort', stop, { once: true });
+
+    listen(media, 'play', start, { signal });
+    listen(media, 'playing', start, { signal });
+
+    listen(media, 'pause', finish, { signal });
+    listen(media, 'ended', finish, { signal });
+    listen(
+      media,
+      'timeupdate',
+      () => {
+        // Hidden tabs suspend rAF. Keep their state current, and retain event updates while paused.
+        if (!cancel || document.hidden) syncUnlessSeeking();
+      },
+      { signal }
+    );
     listen(media, 'durationchange', sync, { signal });
     listen(media, 'seeking', sync, { signal });
     listen(media, 'seeked', sync, { signal });
     listen(media, 'loadedmetadata', sync, { signal });
-    listen(media, 'emptied', sync, { signal });
+    listen(
+      media,
+      'emptied',
+      () => {
+        stop();
+        sync();
+      },
+      { signal }
+    );
     // `progress` fires as the seekable range grows, so the live-edge duration
     // tracks the DVR window without requiring a separate durationchange event.
     listen(media, 'progress', syncUnlessSeeking, { signal });

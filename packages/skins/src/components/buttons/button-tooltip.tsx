@@ -27,5 +27,5 @@ export function ButtonTooltip({ children, label, ...props }: PropsWithChildren<B
 
 export const meta = {
   title: 'Button Tooltip',
-  description: 'An internal tooltip composition shared by button controls.',
+  description: 'A tooltip that wraps a control button and shows its label and keyboard shortcut.',
 } as const satisfies SkinComponentDescription;

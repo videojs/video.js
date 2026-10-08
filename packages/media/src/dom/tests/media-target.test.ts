@@ -23,7 +23,7 @@ describe('getMediaAdapter', () => {
     expect(getMediaAdapter(adapter)).toBe(adapter);
   });
 
-  it('resolves the adapter a custom media element fronts', () => {
+  it('resolves the adapter a media component fronts', () => {
     const element = document.createElement('test-media-target-video') as HTMLElement & { adapter: TestVideoAdapter };
 
     expect(getMediaAdapter(element)).toBe(element.adapter);
@@ -49,7 +49,7 @@ describe('getMediaElement', () => {
     expect(getMediaElement(video)).toBe(video);
   });
 
-  it('resolves the element a custom media element renders', () => {
+  it('resolves the element a media component renders', () => {
     const element = document.createElement('test-media-target-video');
 
     expect(getMediaElement(element)).toBe(element.shadowRoot?.querySelector('video'));
