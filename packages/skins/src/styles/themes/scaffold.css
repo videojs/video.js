@@ -1,0 +1,58 @@
+@layer base.theme, base.preset, base.preferences;
+
+@layer base.preset {
+  .media-skin[data-theme="scaffold"] {
+    --media-spacing: calc(var(--media-scale-unit, 16px) / 4);
+    --media-background: transparent;
+    --media-foreground: white;
+    --media-accent: var(--media-accent-color, var(--media-default-accent-color));
+    --media-accent-foreground: var(--media-accent-text-color, black);
+    --media-primary: var(--media-accent);
+    --media-primary-foreground: var(--media-accent-text-color, black);
+    --media-muted: #404040;
+    --media-popover: black;
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 3);
+    --media-tooltip-boundary-offset: var(--media-popover-boundary-offset);
+    --media-popover-foreground: white;
+    --media-ring: var(--media-accent);
+    --media-button-highlight: rgb(255 255 255 / 0.2);
+    --media-video-border-radius: var(--media-border-radius, 0px);
+    --media-control-radius: 0px;
+    --media-controls-radius: 0px;
+    --media-menu-item-radius: 0px;
+    --media-popup-radius: 0px;
+    --media-dialog-radius: 0px;
+    --media-scrollbar-thumb-color: #808080;
+    --media-shadow-surface: none;
+    --media-shadow-surface-inset: none;
+    --media-shadow-thumb: none;
+    --media-backdrop-filter-surface: none;
+    --media-backdrop-filter-indicator: none;
+    --media-backdrop-filter-dialog: none;
+  }
+
+  .media-skin[data-theme="scaffold"][data-preset$="audio"] {
+    --media-foreground: black;
+    --media-muted: #e5e5e5;
+  }
+
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="scaffold"][data-preset$="audio"] {
+      --media-foreground: light-dark(black, white);
+      --media-muted: light-dark(#e5e5e5, #404040);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .media-skin[data-theme="scaffold"] {
+      --media-background: Canvas;
+      --media-popover: Canvas;
+      --media-popover-foreground: CanvasText;
+      --media-foreground: CanvasText;
+      --media-accent: Highlight;
+      --media-primary: Highlight;
+      --media-primary-foreground: HighlightText;
+      --media-ring: Highlight;
+    }
+  }
+}

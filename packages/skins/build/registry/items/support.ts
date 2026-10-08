@@ -6,37 +6,10 @@ import { skinModuleSourcePath } from '../../config.ts';
 import type { VideojsRegistryMeta } from '../meta.ts';
 import type { RegistryTarget } from '../targets.ts';
 
-const privateComponents = new Set(['button-tooltip']);
 const privateModules = new Map([['components/menus/menu-chevron.tsx', '_menu-chevron']]);
-
-export function isPrivateComponent(name: string): boolean {
-  return privateComponents.has(name);
-}
 
 export function privateModuleName(module: GraphModule<SkinModuleMeta>): string | undefined {
   return privateModules.get(skinModuleSourcePath(module.filename));
-}
-
-export function privateComponentItem(
-  meta: Extract<SkinModuleMeta, { type: 'component' }>,
-  target: RegistryTarget
-): RegistryModuleItem<SkinModuleMeta> {
-  return {
-    name: `_${meta.name}`,
-    type: 'registry:lib',
-    title: meta.title,
-    description: `Private ${meta.description.charAt(0).toLowerCase()}${meta.description.slice(1)}`,
-    docs: 'Installed automatically by the Video.js controls that use it.',
-    registryDependencies: reactHelperDependency(target),
-    meta: {
-      role: 'support',
-      framework: 'react',
-      styling: target.styling,
-      public: false,
-    } satisfies VideojsRegistryMeta,
-    group: 'support',
-    target: `ui/${meta.name}.tsx`,
-  };
 }
 
 export function privateModuleItem(

@@ -366,7 +366,7 @@ const { paused } = store;     // Always reflects video.paused
 
 ## Community
 
-If you need help with anything related to Video.js v10, or if you'd like to casually chat with other
+If you need help with anything related to Video.js 10, or if you'd like to casually chat with other
 members:
 
 - [Join Discord Server][discord]
@@ -374,9 +374,9 @@ members:
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](../../LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/store
 [package-badge]: https://img.shields.io/npm/v/@videojs/store?label=@videojs/store
 [discord]: https://discord.gg/JBqHh485uF
-[gh-discussions]: https://github.com/videojs/v10/discussions
+[gh-discussions]: https://github.com/videojs/video.js/discussions

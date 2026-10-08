@@ -1,3 +1,5 @@
+import { isNil } from '@videojs/utils/predicate';
+
 // ----------------------------------------
 // Event primitives
 // ----------------------------------------
@@ -106,6 +108,26 @@ export interface MediaSeekCapability {
 // ----------------------------------------
 
 export type MediaPreloadType = '' | 'none' | 'metadata' | 'auto';
+
+/**
+ * A media element's CORS mode as its `crossOrigin` IDL attribute reflects it — "limited to only known values": the
+ * empty string and unknown keywords read as `anonymous`. `null` (no attribute) is not a mode; the element is not in
+ * CORS mode at all.
+ */
+export type MediaCrossOriginType = 'anonymous' | 'use-credentials';
+
+/**
+ * Normalize a `crossorigin` value the way the element's IDL attribute reflects it: missing stays `null`,
+ * `use-credentials` in any ASCII case is itself, and everything else — the empty string and unknown keywords included —
+ * is `anonymous`. A custom element delivers the raw attribute string, so this is where author spelling is settled.
+ *
+ * @internal
+ */
+export function toMediaCrossOrigin(value: string | null | undefined): MediaCrossOriginType | null {
+  if (isNil(value)) return null;
+
+  return value.toLowerCase() === 'use-credentials' ? 'use-credentials' : 'anonymous';
+}
 
 /** @internal */
 export const MediaReadyState = {

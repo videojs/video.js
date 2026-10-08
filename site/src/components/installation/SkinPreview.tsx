@@ -7,11 +7,12 @@ interface SkinPreviewProps {
 
 /**
  * One-glance glyphs for the skin picker: a frame with a control bar for the default skin, a frame with a single play
- * button for the neutral skin, a frame with one plain bar for the compat skin, and an empty dashed frame for
+ * button for the neutral skin, a plain bar for Compat, dashed controls for Scaffold, and an empty dashed frame for
  * bring-your-own-UI.
  */
 export default function SkinPreview({ skin, className }: SkinPreviewProps) {
   const isNeutral = skin === 'neutral-video' || skin === 'neutral-audio';
+  const isScaffold = skin === 'scaffold-video' || skin === 'scaffold-audio';
   const isCompat = skin === 'compat-video' || skin === 'compat-audio';
 
   return (
@@ -30,10 +31,10 @@ export default function SkinPreview({ skin, className }: SkinPreviewProps) {
         y="4.75"
         width="18.5"
         height="14.5"
-        rx="3"
-        strokeDasharray={skin === 'none' ? '2.5 2.5' : undefined}
+        rx={isScaffold ? 0 : 3}
+        strokeDasharray={skin === 'none' || isScaffold ? '2.5 2.5' : undefined}
       />
-      {skin !== 'none' && !isNeutral && !isCompat && (
+      {skin !== 'none' && !isNeutral && !isCompat && !isScaffold && (
         <>
           <path d="M6.5 15.25h3" />
           <path d="M12.5 15.25h5" />
@@ -41,6 +42,7 @@ export default function SkinPreview({ skin, className }: SkinPreviewProps) {
         </>
       )}
       {isNeutral && <path d="M10.25 9.25l4 2.75-4 2.75z" fill="currentColor" stroke="none" />}
+      {isScaffold && <path d="M7 9h4v4H7zM6.5 16h11" />}
       {isCompat && <path d="M6.5 15.25h11" />}
     </svg>
   );

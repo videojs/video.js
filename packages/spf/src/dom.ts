@@ -9,6 +9,7 @@ export { appendSegment } from './media/dom/mse/append-segment';
 export { flushBuffer } from './media/dom/mse/buffer-flusher';
 export type { AddChaptersTracksOptions } from './media/dom/text/chapters-tracks';
 export { addChaptersTracksToMedia, removeAllChaptersTracksFromMedia } from './media/dom/text/chapters-tracks';
+export { loadChaptersTracks } from './media/dom/text/load-chapters-tracks';
 export { destroyVttResolver, resolveVttSegment } from './media/dom/text/resolve-vtt-segment';
 export type { LoadChaptersConfig } from './playback/behaviors/dom/load-chapters';
 export { loadChapters } from './playback/behaviors/dom/load-chapters';

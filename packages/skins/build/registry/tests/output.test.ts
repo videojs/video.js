@@ -10,11 +10,13 @@ const registryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react'),
   neutral: resolve(packageDir, 'dist/registry/source/r/react/neutral'),
   compat: resolve(packageDir, 'dist/registry/source/r/react/compat'),
+  scaffold: resolve(packageDir, 'dist/registry/source/r/react/scaffold'),
 } as const;
 const cssRegistryDirs = {
   default: resolve(packageDir, 'dist/registry/source/r/react/css'),
   neutral: resolve(packageDir, 'dist/registry/source/r/react/css/neutral'),
   compat: resolve(packageDir, 'dist/registry/source/r/react/css/compat'),
+  scaffold: resolve(packageDir, 'dist/registry/source/r/react/css/scaffold'),
 } as const;
 
 describe('React registry output', () => {
@@ -22,6 +24,7 @@ describe('React registry output', () => {
     default: readRegistryItems(registryDirs.default),
     neutral: readRegistryItems(registryDirs.neutral),
     compat: readRegistryItems(registryDirs.compat),
+    scaffold: readRegistryItems(registryDirs.scaffold),
   } as const;
 
   it('keeps the Video Skin installation notes concise', () => {
@@ -34,7 +37,7 @@ describe('React registry output', () => {
   });
 
   it('marks every public module root as a client entry', () => {
-    for (const theme of ['default', 'neutral', 'compat'] as const) {
+    for (const theme of ['default', 'neutral', 'compat', 'scaffold'] as const) {
       const items = registries[theme];
       const missing = [...items.values()]
         .filter((item) => item.meta?.public)
@@ -162,6 +165,23 @@ describe('React registry output', () => {
     }
   });
 
+  it('publishes the button tooltip as a standalone UI component', () => {
+    for (const items of [
+      registries.default,
+      registries.neutral,
+      readRegistryItems(cssRegistryDirs.default),
+      readRegistryItems(cssRegistryDirs.neutral),
+    ]) {
+      const tooltip = items.get('button-tooltip');
+
+      expect(tooltip?.type).toBe('registry:ui');
+      expect(tooltip?.meta?.public).toBe(true);
+      expect(tooltip?.registryDependencies).toContain('@videojs/_style-theme');
+      expect(items.get('video')?.registryDependencies).toContain('@videojs/button-tooltip');
+      expect(items.has('_button-tooltip')).toBe(false);
+    }
+  });
+
   it('publishes title styles in the shared display stylesheet', () => {
     for (const registryDir of [cssRegistryDirs.default, cssRegistryDirs.neutral]) {
       const items = readRegistryItems(registryDir);
@@ -190,7 +210,7 @@ describe('React registry output', () => {
   });
 
   it('imports the preset theme before each React CSS skin stylesheet', () => {
-    for (const theme of ['default', 'neutral', 'compat'] as const) {
+    for (const theme of ['default', 'neutral', 'compat', 'scaffold'] as const) {
       const items = readRegistryItems(cssRegistryDirs[theme]);
 
       for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
@@ -205,7 +225,7 @@ describe('React registry output', () => {
   });
 
   it('composes preset media styles from theme and base entries', () => {
-    for (const theme of ['neutral', 'compat'] as const) {
+    for (const theme of ['neutral', 'compat', 'scaffold'] as const) {
       for (const media of ['audio', 'video'] as const) {
         const source = readFileSync(
           resolve(cssRegistryDirs[theme], `support/files/_style-${media}-${theme}/styles/${media}/${theme}.css`),
@@ -261,8 +281,8 @@ function readRegistryItems(registryDir: string): ReadonlyMap<string, RegistryIte
   for (const group of ['skins', 'ui', 'support']) {
     const path = resolve(registryDir, group, 'registry.json');
 
-    // Compat intentionally has no standalone UI catalog. All other groups must exist.
-    if (group === 'ui' && registryDir.endsWith('/compat')) continue;
+    // Compat and Scaffold have no standalone UI catalog. All other groups must exist.
+    if (group === 'ui' && (registryDir.endsWith('/compat') || registryDir.endsWith('/scaffold'))) continue;
 
     const registry: unknown = JSON.parse(readFileSync(path, 'utf8'));
     if (!isPlainObject(registry) || !Array.isArray(registry.items)) throw new Error(`Invalid ${group} registry.`);

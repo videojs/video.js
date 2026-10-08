@@ -1,0 +1,24 @@
+---
+import { twMerge } from '@/utils/twMerge';
+
+/**
+ * Captioned media: an image, a video, or anything else, with an optional `<figcaption>` for credits and context that
+ * belong under it rather than in its alt text. Children are the media and the caption; put blank lines between them in
+ * MDX so each is parsed as its own block.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<figure
+  class={twMerge(
+    "mx-auto my-8 max-w-3xl [&_img]:my-0 [&_p]:my-0",
+    "[&_figcaption]:mt-2 [&_figcaption]:text-center [&_figcaption]:text-p3 [&_figcaption]:text-muted",
+    className,
+  )}
+>
+  <slot />
+</figure>

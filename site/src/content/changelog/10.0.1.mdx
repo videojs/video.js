@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Improves the docs site and fixes React media refs, embeds, and extension-less Mux streams."
 date: 2026-10-02
 version: "10.0.1"
 prerelease: false
@@ -7,26 +7,18 @@ breaking: false
 compareUrl: "https://github.com/videojs/v10/compare/@videojs/core@10.0.0...@videojs/core@10.0.1"
 ---
 
+10.0.1 smooths the first upgrade path after Video.js 10, with clearer documentation and fixes for React media and Mux streams.
 
-### 🚀 Features
-- *(site)* Move pre-v10 blog posts to the legacy site ([#3127](https://github.com/videojs/v10/pull/3127)) by [@decepulis](https://github.com/decepulis)
+## React media and playback
 
-### 🐛 Bug Fixes
-- *(react)* Hand the playback adapter to mediaRef on adapter-backed media ([#3141](https://github.com/videojs/v10/pull/3141)) by [@luwes](https://github.com/luwes)
-- *(mux-video)* Parse mux stream urls without the .m3u8 extension ([#3143](https://github.com/videojs/v10/pull/3143)) by [@luwes](https://github.com/luwes)
-- *(react)* Accept autoPlay on embeds and drop callback-ref cleanups that warn on React 18 ([#3136](https://github.com/videojs/v10/pull/3136)) by [@luwes](https://github.com/luwes)
-- *(youtube-video)* Keep the iframe in place when detach destroys the player ([#3154](https://github.com/videojs/v10/pull/3154)) by [@luwes](https://github.com/luwes)
+Adapter-backed React media now hand `mediaRef` the playback adapter, as intended, matching what embeds already did and what `useMedia()` returns. On `HlsJsVideo`, `MuxVideo`, `DashVideo`, and other adapter-backed components, `mediaRef.current` is the adapter, so `mediaRef.current?.engine` reaches the underlying engine; use `ref` when you need the rendered `<video>` or `<audio>` element. `Video` and `Audio` keep handing `mediaRef` their element ([#3141](https://github.com/videojs/v10/pull/3141)).
 
-### 📚 Documentation
-- *(site)* Add changelog prose for 10.0.0-rc.5 ([#3129](https://github.com/videojs/v10/pull/3129)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(site)* Add changelog prose for 10.0.0 ([#3133](https://github.com/videojs/v10/pull/3133)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(blog)* Add Video.js 10 release post ([#3061](https://github.com/videojs/v10/pull/3061)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Add live demos to skin reference pages ([#3137](https://github.com/videojs/v10/pull/3137)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Turn the nav version pill into a docs version menu ([#3144](https://github.com/videojs/v10/pull/3144)) by [@decepulis](https://github.com/decepulis)
-- *(site)* Fix shadcn and migration links in 10.0 blog post ([#3148](https://github.com/videojs/v10/pull/3148)) by [@decepulis](https://github.com/decepulis)
-- Say "media component" instead of "media element" ([#3150](https://github.com/videojs/v10/pull/3150)) by [@decepulis](https://github.com/decepulis)
+Embed components now honor React's `autoPlay` prop, so YouTube, Vimeo, Spotify, Twitch, TikTok, Cloudflare, and Wistia embeds behave like native media without leaving a stray `autoplay` attribute on the iframe. The same update removes callback-ref cleanup warnings in React 18 ([#3136](https://github.com/videojs/v10/pull/3136)). Unmounting `YouTubeVideo` also no longer lets the YouTube IFrame API remove an iframe before React cleans it up ([#3154](https://github.com/videojs/v10/pull/3154)).
 
-### ⚙️ Miscellaneous Tasks
-- *(release)* Add the 10.0.0 root and site changelog ([#3131](https://github.com/videojs/v10/pull/3131)) by [@decepulis](https://github.com/decepulis)
-- *(root)* Remove release-as after the 10.0.0 release ([#3065](https://github.com/videojs/v10/pull/3065)) by [@decepulis](https://github.com/decepulis)
-- *(packages)* Prune stale and add missing workspace dependencies ([#3125](https://github.com/videojs/v10/pull/3125)) by [@luwes](https://github.com/luwes)
+`MuxVideo` now recognizes `stream.mux.com` URLs with or without `.m3u8`. Extension-less stream URLs gain the same playback ID, poster, storyboard, metadata, playback parameters, and DRM configuration as their `.m3u8` equivalents ([#3143](https://github.com/videojs/v10/pull/3143)). See the [React MuxVideo reference](/docs/framework/react/reference/components/mux-video/) or [HTML MuxVideo reference](/docs/framework/html/reference/components/mux-video/).
+
+## Documentation and navigation
+
+The docs navigation now lets you switch between the pre-release docs, the current version, and the legacy site from one menu ([#3144](https://github.com/videojs/v10/pull/3144)). Blog posts from before Video.js 10 now redirect to the legacy blog, while the current archive points readers there for older posts ([#3127](https://github.com/videojs/v10/pull/3127)). The [Video.js 10 announcement](/blog/videojs-10/) is also available for the full release story ([#3061](https://github.com/videojs/v10/pull/3061)).
+
+Skin reference pages now include live [React](/docs/framework/react/reference/components/video-skin/#examples) and [HTML](/docs/framework/html/reference/components/video-skin/#examples) examples, so you can see each packaged skin before adapting it ([#3137](https://github.com/videojs/v10/pull/3137)). The docs now consistently call Video.js attachable media a `media component`, while reserving “media element” for the native `HTMLMediaElement` ([#3150](https://github.com/videojs/v10/pull/3150)).

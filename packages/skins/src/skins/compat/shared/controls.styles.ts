@@ -7,16 +7,19 @@ export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
   rules: {
+    buffering: {
+      utilities: 'group/buffering contents',
+    },
     backdrop: {
       utilities:
-        'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),rgba(0,0,0,0.2),rgba(0,0,0,0.5))] not-data-visible:hidden forced-colors:bg-none',
+        'pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),rgba(0,0,0,0.2),rgba(0,0,0,0.5))] group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
     },
     center: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 media-360:flex',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 media-360:flex group-data-visible/buffering:hidden!',
         'media-high-contrast:rounded-lg media-high-contrast:bg-media-background forced-colors:bg-transparent!',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translate(-50%,-50%)_scale(0.9)]',

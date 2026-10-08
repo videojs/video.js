@@ -12,6 +12,7 @@
  *
  * Future: consider web-platform-tests (wpt) fixtures for deeper spec coverage.
  */
+import type { MediaCrossOriginType } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import {
@@ -28,6 +29,7 @@ import { MEDIA_PLAYLIST_METADATA_KEY, type Presentation } from '../../../../medi
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../../primitives/error-messages';
 import { HlsAudioAdapterCore } from '../../hls-audio/mixin';
 import { HlsBackgroundVideoAdapterCore } from '../../hls-background-video/mixin';
+import { HlsVideoAdapter } from '../adapter';
 import { HlsVideoAdapterCore, HlsVideoMixin } from '../mixin';
 
 describe.each([
@@ -522,6 +524,162 @@ describe('HlsVideoAdapterCore', () => {
       media.src = 'https://example.com/v2.m3u8';
       expect(media.preload).toBe('auto');
       expect(media.engine.state.preload.get()).toBe('auto');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // crossOrigin — synchronous IDL attribute (WHATWG §4.8.11.2) doubling as the
+  // engine's request-credentials intent
+  // ---------------------------------------------------------------------------
+  describe('crossOrigin', () => {
+    /**
+     * The `credentials` mode the engine's next manifest request carries. The engine reads `crossOrigin` through a
+     * per-request policy rather than state, so the request itself is the observable.
+     */
+    async function manifestCredentials(media: HlsVideoAdapterCore, url = 'https://cdn.example.com/master.m3u8') {
+      const fetchMock = vi.mocked(globalThis.fetch);
+
+      // Unload first and let the reactor observe it: a pending resolve is not
+      // restarted by another URL, and two synchronous writes coalesce.
+      fetchMock.mockClear();
+      media.src = '';
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      media.preload = 'auto';
+      media.src = url;
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+      expect(fetchMock).toHaveBeenCalledOnce();
+
+      // SAFETY: `fetchResolvable` always calls `fetch` with a `Request`.
+      const request = fetchMock.mock.calls[0]![0] as Request;
+
+      expect(request.url).toBe(url);
+
+      return request.credentials;
+    }
+
+    it('is null before any crossOrigin is set, leaving requests at the platform default', async () => {
+      const media = new HlsVideoAdapterCore();
+
+      expect(media.crossOrigin).toBeNull();
+      expect(await manifestCredentials(media)).toBe('same-origin');
+    });
+
+    it('reflects the set value synchronously', () => {
+      const media = new HlsVideoAdapterCore();
+
+      media.crossOrigin = 'use-credentials';
+      expect(media.crossOrigin).toBe('use-credentials');
+    });
+
+    it('sends the manifest request with credentials for use-credentials', async () => {
+      const media = new HlsVideoAdapterCore();
+
+      media.crossOrigin = 'use-credentials';
+      expect(await manifestCredentials(media)).toBe('include');
+    });
+
+    it('honors any ASCII case of use-credentials, as the attribute is case-insensitive', async () => {
+      const media = new HlsVideoAdapterCore();
+      const el = document.createElement('video');
+
+      media.attach(el);
+      // A custom element delivers the raw attribute string; the type is the
+      // canonical spelling, so this is what markup can do that TypeScript can't.
+      media.crossOrigin = 'USE-CREDENTIALS' as MediaCrossOriginType;
+
+      // The getter reflects the canonical keyword; the attribute keeps the author's spelling.
+      expect(media.crossOrigin).toBe('use-credentials');
+      expect(el.getAttribute('crossorigin')).toBe('USE-CREDENTIALS');
+      expect(await manifestCredentials(media)).toBe('include');
+    });
+
+    it('reads an unknown keyword as anonymous, as the element does', async () => {
+      const media = new HlsVideoAdapterCore();
+
+      media.crossOrigin = 'bogus' as MediaCrossOriginType;
+
+      expect(media.crossOrigin).toBe('anonymous');
+      expect(await manifestCredentials(media)).toBe('same-origin');
+    });
+
+    it('follows the attribute as it changes, on the same engine, without rebuilding it', async () => {
+      const media = new HlsVideoAdapterCore();
+      const engine = media.engine;
+
+      media.crossOrigin = 'use-credentials';
+      expect(await manifestCredentials(media, 'https://cdn.example.com/a.m3u8')).toBe('include');
+
+      media.crossOrigin = 'anonymous';
+      expect(await manifestCredentials(media, 'https://cdn.example.com/b.m3u8')).toBe('same-origin');
+
+      media.crossOrigin = 'use-credentials';
+      media.crossOrigin = null;
+      expect(await manifestCredentials(media, 'https://cdn.example.com/c.m3u8')).toBe('same-origin');
+      expect(media.engine).toBe(engine);
+    });
+
+    it('adopts the crossorigin attribute of an attached element when none was set', async () => {
+      const media = new HlsVideoAdapterCore();
+      const el = document.createElement('video');
+
+      el.setAttribute('crossorigin', 'use-credentials');
+      media.attach(el);
+
+      expect(media.crossOrigin).toBe('use-credentials');
+      expect(await manifestCredentials(media)).toBe('include');
+    });
+
+    it('adopts an authored crossorigin attribute over an earlier set (most-recent-wins on attach, as preload)', async () => {
+      const media = new HlsVideoAdapterCore();
+      const el = document.createElement('video');
+
+      el.setAttribute('crossorigin', 'anonymous');
+      media.crossOrigin = 'use-credentials';
+      media.attach(el);
+
+      expect(media.crossOrigin).toBe('anonymous');
+      expect(el.crossOrigin).toBe('anonymous');
+      expect(await manifestCredentials(media)).toBe('same-origin');
+    });
+
+    it('defers to a consumer-supplied requestCredentials policy', async () => {
+      const media = new HlsVideoAdapterCore({ config: { requestCredentials: 'omit' } });
+
+      media.crossOrigin = 'use-credentials';
+      expect(await manifestCredentials(media)).toBe('omit');
+    });
+
+    it('reflects onto the attached media element, before and after attach, and null removes it', () => {
+      const media = new HlsVideoAdapterCore();
+      const el = document.createElement('video');
+
+      // Set before attach: nothing to reflect onto yet, so attach applies it.
+      media.crossOrigin = 'use-credentials';
+      media.attach(el);
+      expect(el.getAttribute('crossorigin')).toBe('use-credentials');
+
+      // Set after attach: reflected immediately.
+      media.crossOrigin = 'anonymous';
+      expect(el.getAttribute('crossorigin')).toBe('anonymous');
+
+      // Unset: the attribute goes with it, as on the element's own IDL attribute.
+      media.crossOrigin = null;
+      expect(media.crossOrigin).toBeNull();
+      expect(el.hasAttribute('crossorigin')).toBe(false);
+    });
+
+    it('reflects onto the element the same way through the HTMLMediaAdapter base', () => {
+      const media = new HlsVideoAdapter();
+      const el = document.createElement('video');
+
+      media.attach(el);
+      media.crossOrigin = 'use-credentials';
+      expect(el.getAttribute('crossorigin')).toBe('use-credentials');
+      expect(media.crossOrigin).toBe('use-credentials');
+
+      media.crossOrigin = null;
+      expect(el.hasAttribute('crossorigin')).toBe(false);
     });
   });
 

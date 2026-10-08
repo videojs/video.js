@@ -14,6 +14,7 @@ import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant
 import type { AudioTrack, CanPlayTrack, MaybeResolvedPresentation, MediaContainerData } from '../../../media/types';
 import type { GetCdnId } from '../../../media/utils/cdn';
 import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
+import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
 import type { SegmentLoaderActor } from '../../actors/dom/segment-loader';
 import type { SourceBufferActor } from '../../actors/dom/source-buffer';
 import {
@@ -180,6 +181,12 @@ export interface HlsAudioEngineConfig extends ShareSignalsConfig<HlsAudioEngineS
   getCdnId?: GetCdnId;
   /** Non-zero-PTS relocation (spike): the reduce seam (tier knob); defaults to per-track own. */
   deriveStartMediaTime?: DeriveStartMediaTime;
+  /**
+   * The `credentials` mode every engine request is made with: a fixed mode, or a policy consulted per request. The
+   * media adapter supplies a policy reading the element's `crossorigin` (`use-credentials` → `'include'`). See the
+   * video engine's `HlsVideoEngineConfig['requestCredentials']`.
+   */
+  requestCredentials?: RequestCredentialsPolicy;
 }
 
 // ============================================================================
