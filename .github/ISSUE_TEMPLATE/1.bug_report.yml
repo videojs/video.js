@@ -13,7 +13,7 @@ body:
         * Please check to see if there's an existing issue and replying there instead.
         * Please give as much details as you can. Ideally, include a [minimal, reproducible example](https://stackoverflow.com/help/minimal-reproducible-example)
 
-        **Video.js 8 receives security fixes only** until October 1, 2028, so non-security v8 bugs are closed. See the [migration guide](https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8) to move to Video.js 10.
+        **Using Video.js 8?** File v8 issues in [videojs/videojs-v8](https://github.com/videojs/videojs-v8/issues/new/choose). It gets security fixes and a best effort on bug fixes until October 1, 2028. See the [migration guide](https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8) to move to Video.js 10.
 
         **Security vulnerabilities:** don't file them here. [Report them privately](https://github.com/videojs/video.js/security/advisories/new).
   - type: checkboxes
