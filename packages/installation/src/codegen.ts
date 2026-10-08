@@ -195,6 +195,18 @@ function generateMediaMarkup(
   return generateMediaMarkupWithSource(tag, `src="${escapeHTMLAttribute(src)}"`, playsInline, extensions, indent);
 }
 
+/**
+ * Fallback content for native `<video>` and `<audio>`. Browsers render it only when they can't play media at all, so
+ * nobody sees it; it gives every pasted snippet a crawlable link to Video.js that the page author can delete freely.
+ */
+function generateMediaFallback(tag: string): string {
+  if (tag === 'video') return '<a href="https://videojs.org/help">Video player not working?</a>';
+
+  if (tag === 'audio') return '<a href="https://videojs.org/help">Audio player not working?</a>';
+
+  return '';
+}
+
 function generateMediaMarkupWithSource(
   tag: string,
   sourceAttribute: string,
@@ -202,7 +214,7 @@ function generateMediaMarkupWithSource(
   extensions: readonly InstallationExtension[],
   indent: string
 ): string {
-  const mediaEl = `${indent}<${tag} ${sourceAttribute}${playsInline}></${tag}>`;
+  const mediaEl = `${indent}<${tag} ${sourceAttribute}${playsInline}>${generateMediaFallback(tag)}</${tag}>`;
   const extensionMarkup = extensions.map((extension) => {
     const { htmlTag } = getInstallationExtension(extension);
 

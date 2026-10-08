@@ -29,6 +29,12 @@
   status = 200
   force = true
 
+# Video.js 10 embed snippets and React Medias put this short URL inside `<video>` and `<audio>` as fallback content.
+[[redirects]]
+  from = "/help"
+  to = "/html5-video-support"
+  status = 301
+
 # Netlify aliases -> videojs.org
 [[redirects]]
   from = "https://videojs.com/*"
