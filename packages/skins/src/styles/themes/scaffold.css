@@ -43,6 +43,12 @@
     }
   }
 
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .media-skin[data-theme="scaffold"]:where([data-preset$="video"]) {
+      --media-background: black;
+    }
+  }
+
   @media (forced-colors: active) {
     .media-skin[data-theme="scaffold"] {
       --media-background: Canvas;
