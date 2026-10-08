@@ -208,7 +208,7 @@ Default steps.
       '/docs/guides/installation.md',
       '/docs/framework/react/guides/build-with-ai.md',
       '/blog/launch.md',
-      '/about-this-player.md',
+      '/help.md',
     ]) {
       expect(matches(directConfig.path, pathname)).toBe(false);
       expect(matches(negotiationConfig.excludedPath, pathname)).toBe(true);

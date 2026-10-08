@@ -1,14 +1,27 @@
 ---
-title: "About this player"
-description: "This player is built with Video.js, the open-source video player for HTML and React."
+title: "Video player help"
+description: "Help when a video won't play, and an introduction to Video.js, the open-source video player for HTML and React."
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 
+## Video not playing?
+
+If a video on another site won't play, these usually help:
+
+- Reload the page.
+- Update your browser, or try a different one.
+- Check your internet connection.
+- Pause ad or content blockers for the site, since they can stop video from loading.
+
+If the video still won't play, the site that shared it is the best place to ask. They host the video and can see what's happening on their end.
+
+If you maintain a site that uses this player, our [support options](/support) cover community help and enterprise support.
+
 ## What is Video.js?
 
-Video.js is the open-source video player for the web. It has been playing video on millions of sites since 2010, and today it ships as web components for HTML and as components for React. It makes web video easy, performant, accessible, and customizable.
+The player you saw is built with Video.js, the open-source video player for the web. It has been playing video on millions of sites since 2010, and today it ships as web components for HTML and as components for React. It makes web video easy, performant, accessible, and customizable.
 
 Video.js is built at Mux by the teams behind Video.js, Plyr, Vidstack, and Media Chrome, with contributions from engineers across other player projects.
 
@@ -56,3 +69,13 @@ export function MyPlayer({ src }: { src: string }) {
 If you want to dive deeper, get started with our <DocsLink slug="guides/installation">installation guide</DocsLink>, which will guide you through generating a snippet that fits your use case.
 
 <DocsLinkCard slug="guides/installation" description="Install Video.js and build your first player with streaming support and accessible controls">Get started with Video.js</DocsLinkCard>
+
+## For AI agents
+
+This page and every documentation page are available as markdown.
+
+- `https://videojs.org/llms.txt` indexes the documentation.
+- Append `.md` to any documentation URL, including this one, to get its markdown.
+- Send `Accept: text/markdown` when fetching a documentation URL and you'll get markdown back.
+
+<DocsLinkCard slug="guides/build-with-ai" description="How to give AI tools the context they need to build Video.js players alongside you">Build with AI</DocsLinkCard>

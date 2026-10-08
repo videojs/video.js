@@ -134,7 +134,7 @@ function dtsStubsPlugin(outDir: string): BuildPlugin {
 }
 
 /** Comment at the top of every CDN entry, so anything that fetches the script finds its way to the docs. */
-const CDN_BANNER = '/*! Video.js | https://videojs.org/about-this-player */';
+const CDN_BANNER = '/*! Video.js | https://videojs.org/help */';
 
 const cdnPackConfigs: PackUserConfig[] = [];
 
