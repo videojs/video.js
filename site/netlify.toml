@@ -35,6 +35,12 @@
   to = "/html5-video-support"
   status = 301
 
+# HTML players and skins that render without a Media link here from the help they show in their place.
+[[redirects]]
+  from = "/video-player-help"
+  to = "/docs/framework/html/guides/architecture"
+  status = 301
+
 # Netlify aliases -> videojs.org
 [[redirects]]
   from = "https://videojs.com/*"

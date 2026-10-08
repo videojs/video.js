@@ -4,9 +4,12 @@ import {
   applyShadowStyles,
   createShadowStyle,
   ensureGlobalStyle,
+  querySlot,
   renderTemplate,
   type ShadowStyle,
 } from '@videojs/utils/dom';
+
+import { afterParse, createSlotHelp } from '../help/slot-help';
 
 import globalStyles from '../define/global.css?inline';
 import shadowStyles from '../define/shadow.css?inline';
@@ -23,6 +26,8 @@ export class SkinElement extends ReactiveElement {
   static styles?: ShadowStyle;
   static template?: HTMLTemplateElement | null;
 
+  #updateHelp: (() => void) | null = null;
+
   constructor() {
     super();
 
@@ -37,6 +42,10 @@ export class SkinElement extends ReactiveElement {
         renderTemplate(this.shadowRoot!, ctor.template);
       }
 
+      const mediaSlot = querySlot(this.shadowRoot!, '');
+
+      this.#updateHelp = mediaSlot ? createSlotHelp(mediaSlot, 'Add a Media to this skin.') : null;
+
       this.shadowRoot!.append(createHelpLink(this.ownerDocument));
 
       const sheets: ShadowStyle[] = [shadowSheet];
@@ -47,6 +56,12 @@ export class SkinElement extends ReactiveElement {
 
       applyShadowStyles(this.shadowRoot!, sheets);
     }
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    if (this.#updateHelp) afterParse(this.ownerDocument, this.#updateHelp);
   }
 }
 

@@ -47,4 +47,25 @@ describe('SkinElement', () => {
 
     expect(skin.shadowRoot?.querySelector('a[rel="help"]')).not.toBeNull();
   });
+
+  it('shows help beside its media slot while it has no Media', () => {
+    const skin = createSkin(createTemplate('<media-container><slot></slot></media-container>'));
+
+    skin.append('\n');
+    document.body.append(skin);
+
+    const help = skin.shadowRoot?.querySelector<HTMLElement>('slot + .media-help');
+
+    expect(help?.hidden).toBe(false);
+    expect(help?.textContent).toContain('Add a Media to this skin.');
+  });
+
+  it('hides the help when the Media is slotted', () => {
+    const skin = createSkin(createTemplate('<media-container><slot></slot></media-container>'));
+
+    skin.append(document.createElement('video'));
+    document.body.append(skin);
+
+    expect(skin.shadowRoot?.querySelector<HTMLElement>('.media-help')?.hidden).toBe(true);
+  });
 });

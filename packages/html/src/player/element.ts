@@ -13,6 +13,7 @@ import type { Media } from '@videojs/media/dom';
 import { isNull } from '@videojs/utils/predicate';
 import { camelCase, kebabCase } from '@videojs/utils/string';
 
+import { afterParse, createSlotHelp } from '../help/slot-help';
 import type { PlayerElementConstructor } from '../store/types';
 import { UIElement } from '../ui/ui-element';
 import type { ContainerContext, ExtensionContext, MediaContext, PlayerContext } from './context';
@@ -161,6 +162,7 @@ export function createPlayerElement<Store extends PlayerStore>(
         if (this.#connected) this.#syncNativeMedia();
       });
       this.#tryAttach();
+      afterParse(this.ownerDocument, () => this.#showHelpWhenEmpty());
     }
 
     override disconnectedCallback(): void {
@@ -192,6 +194,19 @@ export function createPlayerElement<Store extends PlayerStore>(
 
         setPlayerConfigValue(this.store, entry, this[configProperty]);
       }
+    }
+
+    /**
+     * Only an empty player gets a shadow root: its slot passes later children through, and the help beside it explains
+     * what is missing until they arrive. A player with children renders exactly as it did without one.
+     */
+    #showHelpWhenEmpty(): void {
+      if (!this.#connected || this.shadowRoot || this.firstElementChild) return;
+
+      const slot = this.ownerDocument.createElement('slot');
+
+      this.attachShadow({ mode: 'open' }).append(slot);
+      createSlotHelp(slot, 'Add a Media to this player.')();
     }
 
     #syncMedia(): void {

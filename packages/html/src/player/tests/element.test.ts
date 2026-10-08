@@ -43,6 +43,33 @@ describe('createPlayerElement', () => {
     document.body.innerHTML = '';
   });
 
+  it('explains itself with help in a shadow root while it is empty', async () => {
+    const { PlayerElement } = createPlayer({ features: videoFeatures });
+    const player = document.createElement(defineTestElement(PlayerElement));
+
+    document.body.append(player);
+
+    const help = player.shadowRoot?.querySelector<HTMLElement>('slot + .media-help');
+
+    expect(help?.hidden).toBe(false);
+    expect(help?.textContent).toContain('Add a Media to this player.');
+
+    player.append(document.createElement('div'));
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(help?.hidden).toBe(true);
+  });
+
+  it('gets no shadow root when it connects with children', () => {
+    const { PlayerElement } = createPlayer({ features: videoFeatures });
+    const player = document.createElement(defineTestElement(PlayerElement));
+
+    player.append(document.createElement('div'));
+    document.body.append(player);
+
+    expect(player.shadowRoot).toBeNull();
+  });
+
   it('delivers part context from a provider that appears after its consumers', async () => {
     const { PlayerElement } = createPlayer({ features: videoFeatures });
     const player = document.createElement(defineTestElement(PlayerElement));

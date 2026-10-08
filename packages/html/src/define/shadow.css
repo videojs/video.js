@@ -20,3 +20,26 @@
 ::slotted(audio) {
   margin: 0 !important;
 }
+
+/* The help a skin shows while it has no Media (`createSlotHelp`). Covers the controls, which have nothing to drive. */
+.media-help:not([hidden]) {
+  position: absolute;
+  inset: 0;
+  /* Above the skins' highest layer (dialogs). */
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  margin: 0;
+  padding: 0.5em 1em;
+  text-align: center;
+  color: var(--media-foreground, CanvasText);
+  background: var(--media-background, Canvas);
+  border-radius: inherit;
+}
+
+.media-help a {
+  color: inherit;
+}
