@@ -29,10 +29,15 @@
   status = 200
   force = true
 
-# Video.js 10 embed snippets and React Medias put this short URL inside `<video>` and `<audio>` as fallback content.
+# Released players link here from inside the player; the page now lives at /help.
 [[redirects]]
-  from = "/help"
-  to = "/html5-video-support"
+  from = "/about-this-player"
+  to = "/help"
+  status = 301
+
+[[redirects]]
+  from = "/about-this-player.md"
+  to = "/help.md"
   status = 301
 
 # Netlify aliases -> videojs.org

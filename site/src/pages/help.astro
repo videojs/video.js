@@ -1,9 +1,9 @@
 ---
 import defaultMarkdownComponents from '@/components/typography/defaultMarkdownComponents';
-import AboutThisPlayerMdx, { frontmatter } from '@/content/pages/about-this-player.mdx';
+import HelpMdx, { frontmatter } from '@/content/pages/help.mdx';
 import MarkdownLayout from '@/layouts/Markdown.astro';
 ---
 
 <MarkdownLayout title={frontmatter.title} description={frontmatter.description} llms>
-  <AboutThisPlayerMdx components={{ ...defaultMarkdownComponents }} />
+  <HelpMdx components={{ ...defaultMarkdownComponents }} />
 </MarkdownLayout>
