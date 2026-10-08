@@ -63,7 +63,9 @@ These verdicts are also in `overrides.json`. `execute.mjs` leaves `merge-here` P
 
 ## 2. Stand up `videojs/videojs-v8`
 
-Done on 2026-10-07, except for the items that need secret values or an npm login. The file changes are in [videojs-v8#9](https://github.com/videojs/videojs-v8/pull/9), which merges once CI passes. `[x]` means done.
+Done on 2026-10-07, except for the items that need secret values or an npm login. The file changes landed in [videojs-v8#9](https://github.com/videojs/videojs-v8/pull/9), rebase-merged.
+
+Its unit CI job (`npm test` on BrowserStack) hangs until GitHub's 6-hour limit. That predates this work: the 8.24.2 run on `8.x` hung the same way on 2026-10-06. The coverage job runs the same suite on local browsers and passed; only its Codecov upload failed, for lack of `CODECOV_TOKEN`. `[x]` means done.
 
 Access and settings:
 
@@ -102,7 +104,7 @@ Docs (PR #9):
 
 ## 3. Point `videojs/video.js` at it (a PR on `main`)
 
-- [x] Opened as [#9321](https://github.com/videojs/video.js/pull/9321); it merges once checks pass. `SECURITY.md`: in the 8.x row and the "Fixes land on the `8.x` branch" line, point at `videojs/videojs-v8` (`main`), and send v8 vulnerability reports there. Its v8 wording now matches the v8 draft: "security fixes and a best effort on bug fixes". `execute.mjs` refuses to run until this file mentions `videojs/videojs-v8`.
+- [x] Merged as [#9321](https://github.com/videojs/video.js/pull/9321) (`d2d7814a46`). `SECURITY.md`: in the 8.x row and the "Fixes land on the `8.x` branch" line, point at `videojs/videojs-v8` (`main`), and send v8 vulnerability reports there. Its v8 wording now matches the v8 draft: "security fixes and a best effort on bug fixes". `execute.mjs` refuses to run until this file mentions `videojs/videojs-v8`.
 - [x] Issue templates (#9321): the bug report's v8 note sends v8 bugs to `videojs/videojs-v8`, and `config.yml` gains a v8 contact link. The version dropdown is unchanged, since nothing reads it.
 - [ ] Keep `8.x` and every `v*` tag here. v10's `release-pr.yml` builds the root changelog from `origin/8.x` and the release tags. Freeze the branch with a ruleset, or move the changelog source before deleting anything.
 - [ ] Optional: edit the two test comments (#2004 and #5762) to point at `videojs/videojs-v8`.
