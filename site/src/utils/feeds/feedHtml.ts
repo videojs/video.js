@@ -11,6 +11,10 @@ const DROPPED_SELECTOR = 'link, noscript, [aria-hidden="true"]';
 /** Elements that carry content even when they have no text. */
 const MEDIA_SELECTOR = 'img, picture, video, audio, iframe, svg';
 
+/** Elements that already start on their own line, so unwrapping a wrapper around them changes nothing visible. */
+const BLOCK_SELECTOR =
+  'blockquote, details, div, dl, figure, h1, h2, h3, h4, h5, h6, hr, ol, p, pre, section, table, ul';
+
 /** Attributes that hold a single URL. */
 const URL_ATTRIBUTES = ['href', 'src', 'poster', 'cite'];
 
@@ -51,6 +55,10 @@ function removeComments(root: Element): void {
 
 function hasOwnText(element: Element): boolean {
   return [...element.childNodes].some((child) => child.nodeType === child.TEXT_NODE && child.textContent?.trim());
+}
+
+function holdsOnlyBlocks(element: Element): boolean {
+  return !hasOwnText(element) && [...element.children].every((child) => child.matches(BLOCK_SELECTOR));
 }
 
 function isEmpty(element: Element): boolean {
@@ -96,10 +104,10 @@ export function cleanFeedHtml(html: string, entryUrl: URL): string {
   }
 
   // Layout wrappers mean nothing once their decoration is gone: drop the empty ones and unwrap the ones that only group
-  // blocks. A wrapper around bare text stays, so it doesn't run into its neighbours.
+  // blocks. A wrapper around text or inline elements stays, so its content doesn't run into its neighbours'.
   for (const wrapper of [...root.querySelectorAll('div')].reverse()) {
     if (isEmpty(wrapper)) wrapper.remove();
-    else if (wrapper.attributes.length === 0 && !hasOwnText(wrapper)) unwrap(wrapper);
+    else if (wrapper.attributes.length === 0 && holdsOnlyBlocks(wrapper)) unwrap(wrapper);
   }
 
   removeComments(root);

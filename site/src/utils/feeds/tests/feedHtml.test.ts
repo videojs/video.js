@@ -106,6 +106,9 @@ describe('cleanFeedHtml', () => {
     expect(cleanFeedHtml('<div class="a">one</div><div class="b">two</div>', ENTRY_URL)).toBe(
       '<div>one</div><div>two</div>'
     );
+    expect(cleanFeedHtml('<div><a href="/a">A</a></div><div><code>b</code></div>', ENTRY_URL)).toBe(
+      '<div><a href="https://videojs.org/a">A</a></div><div><code>b</code></div>'
+    );
   });
 
   it('flattens code to plain text, keeping its line breaks', () => {
