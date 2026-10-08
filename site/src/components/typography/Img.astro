@@ -5,7 +5,13 @@ import type { ComponentProps } from 'astro/types';
 import { twMerge } from '@/utils/twMerge';
 
 type Props = ComponentProps<typeof Image>;
-const { class: className, src, ...rest } = Astro.props;
+const props = Astro.props;
+
+if (!props.densities) props.layout ??= 'constrained';
+
+props.sizes ??= '(min-width: 768px) 768px, 100vw';
+
+const { class: className, src, ...rest } = props;
 
 const imgClass = twMerge('my-8 h-auto max-w-full', className);
 ---
@@ -17,11 +23,11 @@ const imgClass = twMerge('my-8 h-auto max-w-full', className);
     ) : (
       // Non-HTTP string: public path or relative URL. Astro's Image needs
       // inferSize to skip the width/height requirement for string src.
-      <Image layout="constrained" sizes="(min-width: 768px) 768px, 100vw" class={imgClass} inferSize={true} src={src} {...rest} />
+      <Image class={imgClass} inferSize={true} src={src} {...rest} />
     )
   ) : (
     // ImageMetadata (ESM-imported image): width/height come from metadata,
     // no inferSize needed.
-    <Image layout="constrained" sizes="(min-width: 768px) 768px, 100vw" class={imgClass} src={src} {...rest} />
+    <Image class={imgClass} src={src} {...rest} />
   )
 }
