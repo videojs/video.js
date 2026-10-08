@@ -31,17 +31,12 @@ You're helping Heff close out the Video.js 8 backlog in `videojs/video.js`. You 
 
 Follow the README's steps:
 
-1. **Merge 9 easy PRs in place** on `video.js` `8.x` (README step 1 has the table). For each one:
-   - Change the base to `8.x`.
-   - Push the fix to the contributor's branch if it needs one; 4 of them do.
-   - Use a conventional title.
-   - Squash and merge.
-2. **Set up `videojs/videojs-v8`** (README step 2):
-   - Do what `gh` can, with Heff's go.
-   - List the rest for Heff, such as npm settings that need web 2FA.
-   - Use `videojs-v8-SECURITY.md` as its `SECURITY.md`.
-3. **Open a PR on `video.js` `main`** pointing `SECURITY.md` and the issue templates at `videojs-v8` (README step 3). `execute.mjs` refuses to post until that's merged and `videojs-v8` has a `SECURITY.md`.
-4. **Triage sign-off:** Rahim signed off on `triage.csv` on 2026-10-07, so there's nothing to wait for.
+1. **Done (2026-10-07):** the 9 easy PRs are merged on `video.js` `8.x`, and #7789 was superseded by #9319.
+2. **Done:** `videojs/videojs-v8` is set up: `main` is synced, `v8.24.2` is tagged, the workflows run on `main`, and `SECURITY.md`, the ruleset, and the `Deploy` environment are in place (videojs-v8#9).
+   - Still open, but not your job and not blocking: the `AWS_*` and `CODECOV_TOKEN` values, the npm trusted publisher, and promoting `latest-8`.
+   - v8's unit CI job hangs on BrowserStack; that predates this work.
+3. **Done:** `video.js`'s `SECURITY.md` and issue templates point at `videojs-v8` (#9321).
+4. **Done:** Rahim signed off on `triage.csv` on 2026-10-07.
 5. **Close.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=close …`
 6. **Transfer.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=migrate …`
 7. **Move PRs.** Run `node .agents/plans/v8-issue-triage/execute.mjs --execute --bucket=move-pr …`. Moved PRs aren't merged by default. When one is, use rebase so the contributor stays the author (README step 7).
