@@ -16,5 +16,7 @@ describe('resolveReferenceSlug', () => {
     expect(resolveReferenceSlug('AirPlayButton')).toBe('airplay-button');
     // kebabCase('HlsJsVideo') would be 'hls-js-video'; the tag name is 'hlsjs-video'.
     expect(resolveReferenceSlug('HlsJsVideo')).toBe('hlsjs-video');
+    // kebabCase('PlayerJsVideo') would be 'player-js-video'; the tag name is 'playerjs-video'.
+    expect(resolveReferenceSlug('PlayerJsVideo')).toBe('playerjs-video');
   });
 });
