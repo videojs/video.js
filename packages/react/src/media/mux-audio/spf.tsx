@@ -9,6 +9,7 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, audioFallback } from '../fallback';
 
 export type {
   MuxAdapterAPI,
@@ -27,12 +28,13 @@ export interface MuxAudioProps
     Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof HlsAudioAdapterProps | keyof MuxAdapterProps>,
     Partial<Omit<HlsAudioAdapterProps, 'src' | 'source'>>,
     Partial<MuxAdapterProps>,
-    MediaRefProps<MuxAudioAdapter> {
+    MediaRefProps<MuxAudioAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 export const MuxAudio = forwardRef<HTMLAudioElement, MuxAudioProps>(function MuxAudio(
-  { children, mediaRef, ...props },
+  { children, fallback = audioFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(MuxAudioAdapter);
@@ -44,6 +46,7 @@ export const MuxAudio = forwardRef<HTMLAudioElement, MuxAudioProps>(function Mux
   return (
     <audio ref={composedRef} {...htmlProps}>
       {children}
+      {fallback}
     </audio>
   );
 });
