@@ -3,7 +3,7 @@
     :scope {
       --media-caption-track-duration: var(--media-duration-controls);
       --media-caption-track-delay: 25ms;
-      --media-caption-track-y: calc(var(--media-spacing) * -2);
+      --media-caption-track-y: calc(var(--media-spacing) * -3);
     }
 
     video::-webkit-media-text-track-container {
@@ -27,10 +27,14 @@
       transition-property: transform;
     }
 
-    /* Matches the `--container-media-2xl` layout breakpoint. */
-    @container media-root (width >= 42rem) {
+    /* Matches the `--container-media-2xl` control layout breakpoint. */
+    @container media-root (width < 42rem) {
+      :scope[data-theme="default"][data-controls-visible] video {
+        --media-caption-track-y: calc(var(--media-spacing) * -14);
+      }
+
       :scope[data-theme="neutral"][data-controls-visible] video {
-        --media-caption-track-y: calc(var(--media-spacing) * -12);
+        --media-caption-track-y: calc(var(--media-spacing) * -17);
       }
     }
   }

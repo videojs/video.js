@@ -11,7 +11,7 @@
       color-mix(in oklab, var(--media-backdrop) 20%, transparent),
       color-mix(in oklab, var(--media-backdrop) 50%, transparent)
     );
-    --media-caption-controls-y: calc(var(--media-spacing) * -14);
+    --media-caption-controls-y: calc(var(--media-spacing) * -16);
     --media-slider-preview-offset: calc(var(--media-spacing) * 9);
     --media-thumbnail-gradient: linear-gradient(
       to top,
@@ -56,8 +56,16 @@
       color-mix(in oklab, var(--media-backdrop) 20%, transparent) calc(var(--media-spacing) * 12),
       transparent
     );
-    --media-caption-controls-y: calc(var(--media-spacing) * -18);
+    --media-caption-controls-y: calc(var(--media-spacing) * -14);
     --media-slider-preview-offset: calc(var(--media-spacing) * 11);
+  }
+
+  .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="compat"] {
+    --media-caption-controls-y: calc(var(--media-spacing) * -18);
+  }
+
+  .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="scaffold"] {
+    --media-caption-controls-y: calc(var(--media-spacing) * -20);
   }
 
   @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {

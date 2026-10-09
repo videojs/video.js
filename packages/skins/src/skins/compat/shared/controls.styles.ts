@@ -27,9 +27,10 @@ export default styles({
     },
     top: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute end-3 top-2.5 flex items-center gap-1',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute end-3 top-2.5 media-max-2xl:end-2 media-max-2xl:top-2 flex items-center gap-1',
         'media-high-contrast:rounded-lg media-high-contrast:bg-media-background forced-colors:rounded-lg forced-colors:bg-[Canvas]',
         'forced-colors:inset-x-0 forced-colors:top-0 forced-colors:justify-end forced-colors:rounded-none! forced-colors:px-3 forced-colors:py-2.5',
+        'media-max-2xl:forced-colors:px-2 media-max-2xl:forced-colors:py-2 media-max-2xl:forced-colors:top-0 media-max-2xl:forced-colors:end-0',
         'forced-colors:end-0',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translateY(var(--media-spacing))]',
