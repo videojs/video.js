@@ -1,0 +1,104 @@
+---
+title: FCast
+description: FCast playback extension and the application bridge contract for receiver discovery and control
+stability: unstable
+apis:
+  - FCastExtension
+  - FCastExtensionProps
+  - FCastBridge
+  - FCastSender
+  - FCastLoadRequest
+  - FCastSnapshot
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+The FCast extension routes player controls to a receiver through an application-provided bridge. The <DocsLink slug="reference/components/fcast-button">FCastButton</DocsLink> registers the extension inside a player and supplies its casting control. Google Cast and AirPlay remain separate controls. See <DocsLink slug="guides/casting">Casting</DocsLink> for player setup.
+
+Browsers cannot perform FCast's mDNS discovery or open its native TCP transport. `@videojs/fcast` defines the browser-facing `FCastBridge` interface; it does not include a bridge, device picker, discovery service, or protocol transport. An application supplies an implementation backed by a native host or companion service. Without one, the FCast button is hidden.
+
+## Import
+
+```ts
+import { FCastExtension } from '@videojs/fcast';
+import type { FCastBridge, FCastLoadRequest, FCastSnapshot } from '@videojs/fcast';
+```
+
+## Usage
+
+These examples receive an application-owned bridge. `FCastSender` is a compatible alias for `FCastBridge`; the component input remains named `sender`.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { FCastButton } from '@videojs/react/ui/fcast-button';
+import type { FCastBridge } from '@videojs/fcast';
+
+export function CastingControl({ bridge }: { bridge: FCastBridge }) {
+  return <FCastButton sender={bridge}>FCast</FCastButton>;
+}
+```
+
+`CastingControl` belongs inside the player.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-fcast-button>FCast</media-fcast-button>
+```
+
+```ts
+import '@videojs/html/ui/fcast-button';
+import type { FCastBridge } from '@videojs/fcast';
+
+export function connectCastingControl(bridge: FCastBridge) {
+  const button = document.querySelector('media-fcast-button');
+  if (button) button.sender = bridge;
+}
+```
+
+The element belongs inside the player. `sender` is a property, not an HTML attribute.
+</FrameworkCase>
+
+## Options
+
+| Option | Description |
+|---|---|
+| `sender` | Application-owned `FCastBridge`. Defaults to absent. |
+| `src` | Receiver-accessible media URL. Defaults to the attached media's playable source. Embed pages require an explicit stream URL. Browser blob URLs are not portable to receivers. |
+| `contentType` | MIME type sent with the load request. Inferred from the URL when absent; an unknown type is sent as an empty string for the bridge to resolve or reject. |
+
+## Playback behavior
+
+On connection, local playback pauses and its position, volume, rate, and playing state become the initial load request. Player play, pause, seek, volume, mute, and rate controls then target the receiver. Source changes load the new media while retaining the receiver's volume and rate. Replay after an ended update starts at zero.
+
+On disconnect, the extension restores the last receiver position, volume, mute, rate, and playback state to the local media. Removal also disconnects the bridge, including pending receiver selection. Unsent extension loads are discarded when the sender or attached media changes. Media with `disableRemotePlayback` does not receive a remote override or load request.
+
+FCast has no independent mute command. Muting sends volume zero; unmuting restores the last nonzero receiver volume. Receiver updates drive media events and the player state. The extension emits `change` when its observable state changes and `CustomEvent('error')` with the failure in `detail` for asynchronous load, control, or bridge failures. Methods returning promises also reject to their caller.
+
+## Bridge contract
+
+`FCastBridge` extends `EventTarget` and exposes a complete `snapshot`. Each update replaces or updates the snapshot **before** dispatching `change`. Availability is independent of connection state: discovery can become unavailable while a session remains connected.
+
+| Member | Contract |
+|---|---|
+| `snapshot` | `FCastSnapshot`: availability, connection, optional device name, paused state, position, duration, volume, mute, rate, and optional buffering/ended state. |
+| `prompt()` | Owns permission requests and receiver selection; publishes `connecting`, then `connected`. Cancellation restores `disconnected` and rejects with `AbortError`. |
+| `disconnect()` | Idempotently cancels pending selection and unsent commands, stops remote playback, closes the connection, and publishes `disconnected` before resolving. |
+| `load(request)` | Replaces media and applies the requested position, volume, speed, and paused state in order. |
+| `play()` / `pause()` | Requests receiver playback or pause. |
+| `seek(time)` | Requests a position in seconds. |
+| `setVolume(volume)` | Requests volume from zero to one; zero is muted. |
+| `setSpeed(speed)` | Requests a positive playback rate multiplier. |
+
+Playback commands reject when disconnected or when sending fails. Resolution means the command was sent, not that the receiver acknowledged it. The bridge serializes commands and reports actual state from receiver updates. Receiver and transport failures arriving later emit `CustomEvent('error', { detail: error })`; connection loss also publishes `disconnected`. Updates from an old session cannot overwrite a newer session.
+
+Positions and durations use seconds, including fractional seconds. Unknown duration is `NaN`; an unbounded live duration is `Infinity`. Volume is normalized to `[0, 1]`, `muted` reflects zero volume, and speed is a positive multiplier. `load()` includes the desired paused state even when the negotiated protocol requires a separate pause after loading.
+
+The application owns bridge creation, disposal, discovery resources, and access permissions. Each bridge serves one player session at a time. Video.js subscribes to the bridge and disconnects its session on removal; the application disposes the bridge itself.
+
+## Protocol boundary
+
+The bridge implements discovery, receiver selection, version negotiation, message encoding, heartbeats, and transport security according to the [FCast protocol](https://docs.fcast.org/protocol/). Native libraries are listed in the [FCast SDK documentation](https://docs.fcast.org/sdk/). Protocol-specific time units and playback states are normalized to `FCastSnapshot` at this boundary.
+
+The browser contract covers single-media playback. It does not expose protocol-specific queues, mirroring, track selection, or companion-resource serving. The receiver must be able to fetch the media URL independently; browser cookies and local object URLs are not forwarded.

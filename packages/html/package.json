@@ -173,6 +173,7 @@
   "dependencies": {
     "@videojs/core": "workspace:*",
     "@videojs/element": "workspace:*",
+    "@videojs/fcast": "workspace:*",
     "@videojs/media": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/spf": "workspace:*",

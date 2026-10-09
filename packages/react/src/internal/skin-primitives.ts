@@ -10,6 +10,7 @@ export { CaptionsRadioGroup } from '../ui/captions-radio-group';
 export { CastButton } from '../ui/cast-button';
 export { Controls } from '../ui/controls';
 export { ErrorDialog } from '../ui/error-dialog';
+export { FCastButton } from '../ui/fcast-button';
 export { FullscreenButton } from '../ui/fullscreen-button';
 export { Gesture } from '../ui/gesture';
 export { Hotkey } from '../ui/hotkey';
