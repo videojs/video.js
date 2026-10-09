@@ -41,20 +41,14 @@ export default defineConfig({
   define: {
     __DEV__: 'true',
   },
-  resolve: {
-    // Same reason as `@videojs/html`: Vitest transforms through the SSR pipeline, where `browser` is not a resolve
-    // condition, and `@videojs/media` answers `browser` separately for medias whose engine has a server build.
-    conditions: ['browser', 'development', 'module', 'import', 'default'],
-  },
   test: {
     // Vitest v4 compatibility: preserve mock call history.
     // Remove after tests no longer rely on calls from setup or earlier tests.
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
     // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
     clearMocks: false,
-    // The root entry registers `@videojs/html` custom elements, which need a DOM to load.
+    // The stub tests call `videojs()` with a `<video>` element, as v8 snippets do.
     environment: 'happy-dom',
-    onConsoleLog: (log) => !log.includes('Lit is in dev mode'),
   },
   pack: packageBuildModes.map(createPackConfig),
 });
