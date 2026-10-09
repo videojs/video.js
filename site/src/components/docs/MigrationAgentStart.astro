@@ -5,7 +5,7 @@ import AgentPrompt from '@/components/AgentPrompt.astro';
 import { DEFAULT_FRAMEWORK, resolveDocsFramework } from '@/types/docs';
 
 interface Props {
-  source: 'video-js-8' | 'media-chrome' | 'mux-player' | 'plyr' | 'vidstack';
+  source: 'video-js-8' | 'media-chrome' | 'mux-player' | 'plyr' | 'vidstack' | 'video-react';
 }
 
 const { source } = Astro.props;
@@ -15,6 +15,7 @@ const names = {
   'mux-player': 'Mux Player',
   plyr: 'Plyr',
   vidstack: 'Vidstack',
+  'video-react': 'Video-React',
 };
 const framework = resolveDocsFramework(Astro.params.framework) ?? DEFAULT_FRAMEWORK;
 const packageName = framework === 'react' ? '@videojs/react' : '@videojs/html';
