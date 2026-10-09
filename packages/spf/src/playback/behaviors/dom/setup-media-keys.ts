@@ -34,7 +34,10 @@ import { type ErrorEmitterState, emitError } from '../collect-errors';
 /** State shape for MediaKeys setup. */
 export interface MediaKeysState {
   presentation?: MaybeResolvedPresentation;
-  /** Segment-load gate; semantics on `SegmentLoadingState['segmentLoadingBlocked']`. */
+  /**
+   * Segment-load gate: `true` while an encrypted source's MediaKeys aren't attached yet; the `loadXSegments`
+   * dispatchers park on it. Semantics on `SegmentLoadingState['segmentLoadingBlocked']`.
+   */
   segmentLoadingBlocked?: boolean;
   /**
    * The key system negotiation settled on for the current source, or `undefined` when none has been (yet, or at all).
@@ -50,6 +53,7 @@ export interface MediaKeysState {
 /** Context shape for MediaKeys setup. */
 export interface MediaKeysContext {
   mediaElement?: HTMLMediaElement | undefined;
+  /** The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. */
   mediaKeys?: MediaKeys;
 }
 

@@ -10,6 +10,11 @@ import { type Resolution, scaleResolution } from '../../../media/primitives/reso
 export type PlayerResolution = Resolution;
 
 export interface PlayerResolutionState {
+  /**
+   * The player element's rendered pixel dimensions, or `undefined` where there is nothing to measure. Written by
+   * `trackPlayerResolution`, read by the `playerResolutionCap` selection rule — which treats `undefined` as "don't
+   * cap".
+   */
   playerResolution?: PlayerResolution;
 }
 

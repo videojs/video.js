@@ -7,6 +7,11 @@ import type { SelectionRule } from '../primitives/selection-rules';
 
 export interface CollectErrorsState {
   presentation?: MaybeResolvedPresentation;
+  /**
+   * Conditions reported during playback, in the order encountered — appended by whichever behavior detects one
+   * (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is
+   * decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`.
+   */
   errors?: SvtaError[];
 }
 

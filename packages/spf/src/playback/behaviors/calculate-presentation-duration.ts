@@ -22,6 +22,12 @@ export interface PresentationDurationState {
 export type PresentationDurationResolver = (state: PresentationDurationState) => number | undefined;
 
 export interface PresentationDurationConfig {
+  /**
+   * Resolver for `presentation.duration`. `calculateDurationFeature` supplies `getResolvedSelectedTrackDuration`, which
+   * picks the first resolved selected track's duration (video preferred, audio fallback). A resolver returning
+   * `Number.POSITIVE_INFINITY` marks the presentation live; downstream `updateMediaSourceDuration` propagates that
+   * value to `mediaSource.duration` per the MSE spec.
+   */
   resolveDuration: PresentationDurationResolver;
 }
 
