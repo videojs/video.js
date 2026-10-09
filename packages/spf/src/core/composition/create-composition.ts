@@ -61,12 +61,6 @@ export interface Composition<S extends object, C extends object> {
 }
 
 /**
- * Options for `createComposition`.
- *
- * Composition derives the state and context signal maps from each behavior's declared `stateKeys` / `contextKeys`;
- * `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.
- */
-/**
  * `unknown` when config `C` names only keys of the composition's config `Cfg`; otherwise an error tag listing the
  * others. Restores the excess-property check TypeScript skips when it infers `C` from a literal (as the `const` config
  * parameters here do), so a misspelled key is an error even beside valid ones.
@@ -85,6 +79,12 @@ type CheckConfig<Cfg, C, Defaults> = CheckConfigKeys<Cfg, C> & CheckKeyedFields<
 export type ConfigWithDefaults<Cfg extends object, Defaults extends object> = Omit<Cfg, keyof Defaults> &
   Partial<Pick<Cfg, Extract<keyof Defaults, keyof Cfg>>>;
 
+/**
+ * Options for `createComposition`.
+ *
+ * Composition derives the state and context signal maps from each behavior's declared `stateKeys` / `contextKeys`;
+ * `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.
+ */
 export interface CompositionOptions<
   S extends object,
   C extends object,
@@ -108,24 +108,6 @@ export interface CompositionOptions<
   initialContext?: Partial<C>;
 }
 
-/**
- * Create a composition from a set of behaviors.
- *
- * Composition unions the behaviors' declared `stateKeys` / `contextKeys` to know which signals to create. Each signal
- * is seeded from `initialState` / `initialContext` when supplied, defaulting to `undefined`. Behaviors are responsible
- * for writing their own slots once their preconditions are met.
- *
- * Cross-behavior type conflicts (e.g. two behaviors disagreeing on a field's type) surface as a compose-time type error
- * via `ValidateComposition`.
- *
- * @example
- *   ```ts
- *   const composition = createComposition([resolvePresentation, switchVideoTrack], {
- *   config: { parsePresentation: parseMultivariantPlaylist, initialBandwidth: 2_000_000 },
- *   initialState: { bandwidthState: { fastEstimate: 0, ... } },
- *   });
- *   ```;
- */
 /**
  * Create a typed signal map for a given set of keys, seeded from an optional partial initial value.
  *
@@ -178,6 +160,24 @@ function mergeDefaultConfig<Config extends object, Defaults extends object>(
   return { ...config, ...defaults(config as Partial<Defaults>, defaultConfig) };
 }
 
+/**
+ * Create a composition from a set of behaviors.
+ *
+ * Composition unions the behaviors' declared `stateKeys` / `contextKeys` to know which signals to create. Each signal
+ * is seeded from `initialState` / `initialContext` when supplied, defaulting to `undefined`. Behaviors are responsible
+ * for writing their own slots once their preconditions are met.
+ *
+ * Cross-behavior type conflicts (e.g. two behaviors disagreeing on a field's type) surface as a compose-time type error
+ * via `ValidateComposition`.
+ *
+ * @example
+ *   ```ts
+ *   const composition = createComposition([resolvePresentation, switchVideoTrack], {
+ *   config: { parsePresentation: parseMultivariantPlaylist, initialBandwidth: 2_000_000 },
+ *   initialState: { bandwidthState: { fastEstimate: 0, ... } },
+ *   });
+ *   ```;
+ */
 export function createComposition<
   const Behaviors extends readonly AnyBehavior[],
   Defaults extends Partial<ResolveBehaviorConfig<Behaviors>> = Empty,

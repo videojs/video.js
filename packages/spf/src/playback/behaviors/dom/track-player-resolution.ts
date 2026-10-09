@@ -1,20 +1,3 @@
-/**
- * Mirror the player element's rendered pixel dimensions into reactive state, so a rendition cap can narrow candidates
- * to what the element can actually show without reading the DOM at pick time — which would make the picker impure, and
- * would never re-pick when the element resized.
- *
- * The player-element half of the caps in `internal/design/spf/features/rendition-selection-caps.md`, and the tighter
- * half: a small embed on a large display is capped by its own box rather than by the screen behind it
- * (`trackScreenResolution`).
- *
- * Reported as a width and a height in device pixels — the same units, and for the same reason, as `media/dom/screen`'s
- * reading: the cap compares against real track dimensions, and a `"720p"`-style tier only describes a track once you
- * assume its aspect ratio.
- *
- * `undefined` where there is nothing to measure — no element attached, or one that isn't being rendered (detached,
- * `display: none`, not yet laid out) — which is the value the cap reads as "don't cap".
- */
-
 import { type ElementSize, observeElementSize, observeRenderedSize } from '@videojs/utils/dom';
 import { shallowEqual } from '@videojs/utils/object';
 
@@ -89,6 +72,21 @@ function trackPlayerResolutionSetup({
 }
 
 /**
+ * Mirror the player element's rendered pixel dimensions into reactive state, so a rendition cap can narrow candidates
+ * to what the element can actually show without reading the DOM at pick time — which would make the picker impure, and
+ * would never re-pick when the element resized.
+ *
+ * The player-element half of the caps in `internal/design/spf/features/rendition-selection-caps.md`, and the tighter
+ * half: a small embed on a large display is capped by its own box rather than by the screen behind it
+ * (`trackScreenResolution`).
+ *
+ * Reported as a width and a height in device pixels — the same units, and for the same reason, as `media/dom/screen`'s
+ * reading: the cap compares against real track dimensions, and a `"720p"`-style tier only describes a track once you
+ * assume its aspect ratio.
+ *
+ * `undefined` where there is nothing to measure — no element attached, or one that isn't being rendered (detached,
+ * `display: none`, not yet laid out) — which is the value the cap reads as "don't cap".
+ *
  * Track the player element's rendered resolution in `state.playerResolution`.
  *
  * @example

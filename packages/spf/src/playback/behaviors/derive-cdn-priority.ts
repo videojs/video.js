@@ -1,3 +1,17 @@
+import { defineBehavior } from '../../core/composition/define-behavior';
+import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
+import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
+import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../media/types';
+import { getCdnId as defaultGetCdnId, type GetCdnId, getOrderedCdnIds } from '../../media/utils/cdn';
+
+export interface DeriveCdnPriorityState {
+  presentation?: MaybeResolvedPresentation;
+  cdnPriority?: string[];
+}
+
+const samePriority = (a: string[] | undefined, b: string[]): boolean =>
+  !!a && a.length === b.length && a.every((cdn, i) => cdn === b[i]);
+
 /**
  * **Session-level CDN priority.** While a presentation is resolved, owns the `cdnPriority` signal: the distinct CDNs
  * the source is served from (origin of each track's URL), in manifest priority order — most-preferred first. Cleared on
@@ -17,24 +31,6 @@
  * Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`, mirroring `setupTrackSwitching`. The resolved
  * state owns the signal; its entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per
  * `reactors.md`).
- */
-
-import { defineBehavior } from '../../core/composition/define-behavior';
-import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
-import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
-import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../media/types';
-import { getCdnId as defaultGetCdnId, type GetCdnId, getOrderedCdnIds } from '../../media/utils/cdn';
-
-export interface DeriveCdnPriorityState {
-  presentation?: MaybeResolvedPresentation;
-  cdnPriority?: string[];
-}
-
-const samePriority = (a: string[] | undefined, b: string[]): boolean =>
-  !!a && a.length === b.length && a.every((cdn, i) => cdn === b[i]);
-
-/**
- * Manage `cdnPriority`: publish the manifest-ordered CDN list on src load, clear on src unload.
  *
  * @example
  *   const reactor = deriveCdnPriority.setup({ state });

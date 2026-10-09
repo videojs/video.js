@@ -1,16 +1,3 @@
-/**
- * **CDN failover cooldown.** The expiry half of multi-CDN failover. Fetch sites own the _trip_: on a failed fetch they
- * add the failing CDN (origin) to the `failedCdns` state signal directly. This behavior owns the _expiry_: while a
- * presentation is resolved, it watches `failedCdns` and, for each CDN that appears, schedules a timer to remove it once
- * its cooldown lapses. `track-switching`'s `excludeFailedCdns` constraint prunes a failed CDN's tracks and the
- * active-CDN scope falls to the next one — and back, once the cooldown removes it here.
- *
- * Lifecycle is per-source: timers + `failedCdns` are cleared on exit (a new source starts with a clean slate). Policy
- * (cooldown) is engine config. This is the minimal `network-resilience` slice — a single failure trips a CDN, since
- * transient blips are the retry layer's job (it sits below the fetch sites, so anything that reaches `failedCdns` is
- * already terminal).
- */
-
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
@@ -41,7 +28,16 @@ export interface SetupFailoverMonitorConfig {
 }
 
 /**
- * Expire failed CDNs from `failedCdns` once their cooldown lapses, for the resolved source.
+ * **CDN failover cooldown.** The expiry half of multi-CDN failover. Fetch sites own the _trip_: on a failed fetch they
+ * add the failing CDN (origin) to the `failedCdns` state signal directly. This behavior owns the _expiry_: while a
+ * presentation is resolved, it watches `failedCdns` and, for each CDN that appears, schedules a timer to remove it once
+ * its cooldown lapses. `track-switching`'s `excludeFailedCdns` constraint prunes a failed CDN's tracks and the
+ * active-CDN scope falls to the next one — and back, once the cooldown removes it here.
+ *
+ * Lifecycle is per-source: timers + `failedCdns` are cleared on exit (a new source starts with a clean slate). Policy
+ * (cooldown) is engine config. This is the minimal `network-resilience` slice — a single failure trips a CDN, since
+ * transient blips are the retry layer's job (it sits below the fetch sites, so anything that reaches `failedCdns` is
+ * already terminal).
  *
  * @example
  *   const reactor = setupFailoverMonitor.setup({ state });

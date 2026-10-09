@@ -1,22 +1,3 @@
-/**
- * **Bidirectional sync between `state.preload` and `mediaElement.preload`.**
- *
- * Two effects:
- *
- * - **Read (DOM → state)** — on `context.mediaElement` swap or `state.presentation.url` change, copies the media
- *   element's _authored_ preload into `state.preload` if it's a W3C value and `state.preload` isn't holding an extended
- *   (non-W3C) value. Author intent only: on a DOM element the `preload` IDL property reports a browser-dependent UA
- *   default even when no attribute was set (`'metadata'` Chromium, `'auto'` WebKit), so the property is consulted only
- *   when the element carries a `preload` content attribute — a UA default is never a source. When the element has no
- *   authored W3C opinion and `state.preload` is undefined, backfills from `config.defaultPreload` (default-default
- *   `'metadata'`) so `state.preload` is never undefined in steady state.
- * - **Write (state → DOM)** — on `state.preload` change or `context.mediaElement` swap, writes `state.preload` back to
- *   `mediaElement.preload` if the value is W3C.
- *
- * Extended values (e.g. `'canplay'`) written externally to `state.preload` are sticky: read won't overwrite them, write
- * won't push them to the DOM. All writes are deduped to break echo loops and avoid spurious re-triggers downstream
- * (notably `resolvePresentation`, which reads `state.preload`).
- */
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { effect } from '../../core/signals/effect';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
@@ -104,6 +85,25 @@ function syncPreloadSetup({
   };
 }
 
+/**
+ * **Bidirectional sync between `state.preload` and `mediaElement.preload`.**
+ *
+ * Two effects:
+ *
+ * - **Read (DOM → state)** — on `context.mediaElement` swap or `state.presentation.url` change, copies the media
+ *   element's _authored_ preload into `state.preload` if it's a W3C value and `state.preload` isn't holding an extended
+ *   (non-W3C) value. Author intent only: on a DOM element the `preload` IDL property reports a browser-dependent UA
+ *   default even when no attribute was set (`'metadata'` Chromium, `'auto'` WebKit), so the property is consulted only
+ *   when the element carries a `preload` content attribute — a UA default is never a source. When the element has no
+ *   authored W3C opinion and `state.preload` is undefined, backfills from `config.defaultPreload` (default-default
+ *   `'metadata'`) so `state.preload` is never undefined in steady state.
+ * - **Write (state → DOM)** — on `state.preload` change or `context.mediaElement` swap, writes `state.preload` back to
+ *   `mediaElement.preload` if the value is W3C.
+ *
+ * Extended values (e.g. `'canplay'`) written externally to `state.preload` are sticky: read won't overwrite them, write
+ * won't push them to the DOM. All writes are deduped to break echo loops and avoid spurious re-triggers downstream
+ * (notably `resolvePresentation`, which reads `state.preload`).
+ */
 export const syncPreload = defineBehavior({
   stateKeys: ['preload', 'presentation'],
   contextKeys: ['mediaElement'],

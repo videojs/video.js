@@ -1,28 +1,3 @@
-/**
- * **Project Apple JSON chapters onto the host media element.** When the resolved presentation carries an
- * `#EXT-X-SESSION-DATA` entry for `com.apple.hls.chapters`, fetch the document it points at, parse it, and add one
- * hidden `<track kind="chapters">` per title language — cues and all — to `mediaElement`. The element is the store:
- * there is no chapters state signal, exactly as subtitle cues live on their DOM tracks and nowhere else. Consumers
- * (video.js's textTrack feature, a host page) read the first chapters track's `cues` the way they would an authored
- * `<track>`.
- *
- * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'loading'`), gated on a media element, a resolved
- * presentation, and a chapters entry with a URI. An element-bound effect fetches and projects; the returned cleanup
- * aborts an in-flight fetch and removes the tracks on element replacement or state exit (source unload, destroy). The
- * document leaves the last chapter open; it is written with `OPEN_CHAPTER_END` and never amended — a consumer that
- * wants it to end where the media ends clamps to the media duration on read (video.js's textTrack feature does), so
- * nothing here waits for, or chases, a duration.
- *
- * Failures are never fatal: a document that won't load or won't parse is warned about and projects nothing. An entry
- * carrying its data inline as `VALUE` is skipped — chapters are a document, not a string. Exactly one document is
- * assumed: Apple carries every language inside it, so the first entry with a URI is the one read.
- *
- * The tracks carry `data-src-chapters-track`, distinct from the subtitle tracks' tag, so neither cleanup removes the
- * other's. A `<track kind="chapters">` the host page authored precedes these in `textTracks` (tree order), so a page
- * that supplies its own chapters keeps them. On a Mux source this document is the same one the Mux adapter reads for
- * the asset title; the request is cacheable, and each side stays ignorant of the other.
- */
-
 import { isFunction } from '@videojs/utils/predicate';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -102,6 +77,30 @@ function loadChaptersSetup({
   });
 }
 
+/**
+ * **Project Apple JSON chapters onto the host media element.** When the resolved presentation carries an
+ * `#EXT-X-SESSION-DATA` entry for `com.apple.hls.chapters`, fetch the document it points at, parse it, and add one
+ * hidden `<track kind="chapters">` per title language — cues and all — to `mediaElement`. The element is the store:
+ * there is no chapters state signal, exactly as subtitle cues live on their DOM tracks and nowhere else. Consumers
+ * (video.js's textTrack feature, a host page) read the first chapters track's `cues` the way they would an authored
+ * `<track>`.
+ *
+ * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'loading'`), gated on a media element, a resolved
+ * presentation, and a chapters entry with a URI. An element-bound effect fetches and projects; the returned cleanup
+ * aborts an in-flight fetch and removes the tracks on element replacement or state exit (source unload, destroy). The
+ * document leaves the last chapter open; it is written with `OPEN_CHAPTER_END` and never amended — a consumer that
+ * wants it to end where the media ends clamps to the media duration on read (video.js's textTrack feature does), so
+ * nothing here waits for, or chases, a duration.
+ *
+ * Failures are never fatal: a document that won't load or won't parse is warned about and projects nothing. An entry
+ * carrying its data inline as `VALUE` is skipped — chapters are a document, not a string. Exactly one document is
+ * assumed: Apple carries every language inside it, so the first entry with a URI is the one read.
+ *
+ * The tracks carry `data-src-chapters-track`, distinct from the subtitle tracks' tag, so neither cleanup removes the
+ * other's. A `<track kind="chapters">` the host page authored precedes these in `textTracks` (tree order), so a page
+ * that supplies its own chapters keeps them. On a Mux source this document is the same one the Mux adapter reads for
+ * the asset title; the request is cacheable, and each side stays ignorant of the other.
+ */
 export const loadChapters = defineBehavior({
   stateKeys: ['presentation'],
   contextKeys: ['mediaElement'],
