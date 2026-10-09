@@ -1,36 +1,3 @@
-/**
- * **Own the text-track slots on the host media element, mirroring the SPF model.** When a presentation is resolved and
- * a media element is available, allocate one slot in `mediaElement.textTracks` per model text track — via creating
- * `<track>` children, since that's the only spec mechanism for adding _and_ removing entries to `textTracks` (no
- * `removeTextTrack` API exists). Once slots are provisioned, mirror the resolved `selectedTextTrackId` into their
- * `mode`s (one-way: state → DOM), and propagate user-initiated DOM `change` events back to `userTextTrackSelection` —
- * the standing _intent_ (a language-based partial, or `'off'`) that `switchTextTrack` resolves into
- * `selectedTextTrackId`. So non-SPF consumers (host-page captions buttons, browser native UI, video.js store) drive
- * selection by expressing intent, not by writing the resolved id.
- *
- * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): an element-bound effect allocates the
- * slots, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
- * guard, with paired cleanup on element replacement or state exit. A separate effect mirrors subsequent
- * `selectedTextTrackId` changes into `mode`s without reallocating the slots.
- *
- * State-exit cleanup also sends a `'clear'` message to the `TextTracksActor` so its cue+segment cache (keyed by
- * trackId) is dropped alongside the DOM `<track>` slots. The actor itself is owned by `setupTextTrackActors` and bound
- * to mediaElement, not presentation, so it survives source resets; clearing its context here keeps the cache consistent
- * with the DOM. Without this, a subsequent presentation reusing a trackId would have `getSegmentsToLoad` treat its
- * segments as already-buffered and skip loading them.
- *
- * Single-writer separation: `selectedTextTrackId` is the resolved _output_ owned solely by `switchTextTrack`; this
- * behavior only reads it (to mirror modes). The write path here is `userTextTrackSelection` — the user-intent _input_ —
- * so DOM action and the resolver never contend for one slot. The intent isn't cleared on source unload (it's a standing
- * preference, like `userAudioTrackSelection`); `'off'` is written when the user disables all tracks via native UI.
- *
- * Echo guard: `selectedTextTrackId` is exactly the id this behavior last drove into the DOM, so a `change` event still
- * showing it is our own echo (or a resolver-driven correction — e.g. the picked track's CDN failed and the resolver
- * disabled it) and is ignored, never written back as a spurious user action. Only a showing id that _differs_ from the
- * resolved id is a real user pick. The settling-window guard additionally swallows Chromium's init-time auto-selection
- * before the resolved selection has settled.
- */
-
 import { listen } from '@videojs/utils/dom';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -211,6 +178,38 @@ function syncTextTracksSetup({
   });
 }
 
+/**
+ * **Own the text-track slots on the host media element, mirroring the SPF model.** When a presentation is resolved and
+ * a media element is available, allocate one slot in `mediaElement.textTracks` per model text track — via creating
+ * `<track>` children, since that's the only spec mechanism for adding _and_ removing entries to `textTracks` (no
+ * `removeTextTrack` API exists). Once slots are provisioned, mirror the resolved `selectedTextTrackId` into their
+ * `mode`s (one-way: state → DOM), and propagate user-initiated DOM `change` events back to `userTextTrackSelection` —
+ * the standing _intent_ (a language-based partial, or `'off'`) that `switchTextTrack` resolves into
+ * `selectedTextTrackId`. So non-SPF consumers (host-page captions buttons, browser native UI, video.js store) drive
+ * selection by expressing intent, not by writing the resolved id.
+ *
+ * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): an element-bound effect allocates the
+ * slots, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
+ * guard, with paired cleanup on element replacement or state exit. A separate effect mirrors subsequent
+ * `selectedTextTrackId` changes into `mode`s without reallocating the slots.
+ *
+ * State-exit cleanup also sends a `'clear'` message to the `TextTracksActor` so its cue+segment cache (keyed by
+ * trackId) is dropped alongside the DOM `<track>` slots. The actor itself is owned by `setupTextTrackActors` and bound
+ * to mediaElement, not presentation, so it survives source resets; clearing its context here keeps the cache consistent
+ * with the DOM. Without this, a subsequent presentation reusing a trackId would have `getSegmentsToLoad` treat its
+ * segments as already-buffered and skip loading them.
+ *
+ * Single-writer separation: `selectedTextTrackId` is the resolved _output_ owned solely by `switchTextTrack`; this
+ * behavior only reads it (to mirror modes). The write path here is `userTextTrackSelection` — the user-intent _input_ —
+ * so DOM action and the resolver never contend for one slot. The intent isn't cleared on source unload (it's a standing
+ * preference, like `userAudioTrackSelection`); `'off'` is written when the user disables all tracks via native UI.
+ *
+ * Echo guard: `selectedTextTrackId` is exactly the id this behavior last drove into the DOM, so a `change` event still
+ * showing it is our own echo (or a resolver-driven correction — e.g. the picked track's CDN failed and the resolver
+ * disabled it) and is ignored, never written back as a spurious user action. Only a showing id that _differs_ from the
+ * resolved id is a real user pick. The settling-window guard additionally swallows Chromium's init-time auto-selection
+ * before the resolved selection has settled.
+ */
 export const syncTextTracks = defineBehavior({
   stateKeys: ['presentation', 'selectedTextTrackId', 'userTextTrackSelection'],
   contextKeys: ['mediaElement', 'textTracksActor'],

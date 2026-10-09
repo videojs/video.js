@@ -1,44 +1,3 @@
-/**
- * **Default audio/video track selection on src load / unselect on src unload.** When a presentation is resolved, sets
- * `selectedVideoTrackId` / `selectedAudioTrackId` from a per-type default rule chain if no selection already exists.
- * When the presentation is unset/reset (transitions back to unresolved), clears the selection so a stale id from the
- * previous source doesn't persist.
- *
- * Lifecycle-driven: the pick fires once per transition, and nothing re-picks — that is what separates these from the
- * `switch*` variants. External writes (user picks, ABR, programmatic filter-driven re-picks) are left alone, including
- * a write naming a track the manifest never offered.
- *
- * The one thing policed between transitions is a pick the _constraints_ turn against: a rendition's container and
- * encryption are only known once its media playlist resolves, which is after the pick was made, so a selection that
- * becomes unplayable is dropped. Dropped, never moved — re-picking is exactly the behavior `switchVideoTrack` exists to
- * provide. Dropping reports nothing on its own, since whatever made the pick unplayable already reported its own, more
- * specific cause.
- *
- * Selection runs the same rule model `switchVideoTrack` does — a hard `constraints` pre-pass, then an ordered `rules`
- * chain, with the pick as the head (see `internal/design/spf/track-switching-model.md`). What differs is reactivity,
- * not the rules: this evaluates the chain once on resolve and pins the result, where `switchVideoTrack` re-evaluates
- * inside an effect so its rules subscribe to bandwidth and user selection. A rule written for one therefore composes
- * into the other unchanged.
- *
- * Both are config-driven, each per-type export wiring a sensible default: audio's three-tier language policy, and for
- * video the _empty_ chain — with nothing narrowing or reordering, the head is the first candidate. The behavior's
- * `config` is forwarded to the rules, so options like `preferredAudioLanguage` reach them without an intermediate
- * layer.
- *
- * Note a rule can only pick among real candidates, where the picker it replaced could return any id at all. An id
- * absent from the manifest was never selectable, so that narrowing is the point rather than a limitation.
- *
- * Compose `selectVideoTrack` for the simple "pick a default video track" behavior, or `switchVideoTrack`
- * (`./track-switching.ts`) for the ABR-driven variant. Compose `selectAudioTrack` for the simple default pick, or
- * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush slot-owner variant — when
- * audio-abr lands, `switchAudioTrack` extends into `switchAudioQuality`. Compose only one per type — they're
- * alternatives, not stackable (each writes the same `selected*TrackId` slot). The simple variants tree-shake out the
- * heavier machinery (bandwidth estimator, quality selection, flush orchestration).
- *
- * Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves
- * standing `userTextTrackSelection` intent against the constrained, CDN-scoped renditions.
- */
-
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
@@ -298,6 +257,10 @@ export const screenResolutionCap: SelectTrackRule<unknown> = (tracks, { state })
  * `switchVideoTrack`'s are, because one engine config reaches every variant.
  */
 export interface SelectVideoTrackConfig extends CapabilityConstraintConfig {
+  /**
+   * The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone)
+   * outright.
+   */
   videoConstraints?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
   videoRules?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
 }
@@ -309,6 +272,45 @@ export interface SelectVideoTrackConfig extends CapabilityConstraintConfig {
 const DEFAULT_VIDEO_CONSTRAINTS: readonly SelectTrackRule<SelectVideoTrackConfig>[] = [excludeUnplayableTracks];
 
 /**
+ * **Default audio/video track selection on src load / unselect on src unload.** When a presentation is resolved, sets
+ * `selectedVideoTrackId` / `selectedAudioTrackId` from a per-type default rule chain if no selection already exists.
+ * When the presentation is unset/reset (transitions back to unresolved), clears the selection so a stale id from the
+ * previous source doesn't persist.
+ *
+ * Lifecycle-driven: the pick fires once per transition, and nothing re-picks — that is what separates these from the
+ * `switch*` variants. External writes (user picks, ABR, programmatic filter-driven re-picks) are left alone, including
+ * a write naming a track the manifest never offered.
+ *
+ * The one thing policed between transitions is a pick the _constraints_ turn against: a rendition's container and
+ * encryption are only known once its media playlist resolves, which is after the pick was made, so a selection that
+ * becomes unplayable is dropped. Dropped, never moved — re-picking is exactly the behavior `switchVideoTrack` exists to
+ * provide. Dropping reports nothing on its own, since whatever made the pick unplayable already reported its own, more
+ * specific cause.
+ *
+ * Selection runs the same rule model `switchVideoTrack` does — a hard `constraints` pre-pass, then an ordered `rules`
+ * chain, with the pick as the head (see `internal/design/spf/track-switching-model.md`). What differs is reactivity,
+ * not the rules: this evaluates the chain once on resolve and pins the result, where `switchVideoTrack` re-evaluates
+ * inside an effect so its rules subscribe to bandwidth and user selection. A rule written for one therefore composes
+ * into the other unchanged.
+ *
+ * Both are config-driven, each per-type export wiring a sensible default: audio's three-tier language policy, and for
+ * video the _empty_ chain — with nothing narrowing or reordering, the head is the first candidate. The behavior's
+ * `config` is forwarded to the rules, so options like `preferredAudioLanguage` reach them without an intermediate
+ * layer.
+ *
+ * Note a rule can only pick among real candidates, where the picker it replaced could return any id at all. An id
+ * absent from the manifest was never selectable, so that narrowing is the point rather than a limitation.
+ *
+ * Compose `selectVideoTrack` for the simple "pick a default video track" behavior, or `switchVideoTrack`
+ * (`./track-switching.ts`) for the ABR-driven variant. Compose `selectAudioTrack` for the simple default pick, or
+ * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush slot-owner variant — when
+ * audio-abr lands, `switchAudioTrack` extends into `switchAudioQuality`. Compose only one per type — they're
+ * alternatives, not stackable (each writes the same `selected*TrackId` slot). The simple variants tree-shake out the
+ * heavier machinery (bandwidth estimator, quality selection, flush orchestration).
+ *
+ * Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves
+ * standing `userTextTrackSelection` intent against the constrained, CDN-scoped renditions.
+ *
  * Select a video track when a presentation loads. Clears the selection on src unload.
  *
  * This is the simple, non-ABR counterpart to `switchVideoTrack` — compose one or the other, not both (both write

@@ -1,44 +1,3 @@
-/**
- * **Per-type buffer + segment-loader actor setup.** Per available track type (video / audio), when `mediaSource` is
- * attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
- * multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
- * creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
- * per-type actor slots. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
- * the per-type slots so the next source starts fresh.
- *
- * Each per-type variant (`setupVideoBufferActors` / `setupAudioBufferActors`) is a single-positive-state reactor
- * (`'preconditions-unmet'` ↔ `'buffer-ready'`) gating only on its own type. No cross-type coupling in `stateKeys` —
- * `setupVideoBufferActors` carries only `selectedVideoTrackId` (plus `bandwidthState`, written by its trackedFetch),
- * and audio mirrors.
- *
- * # Firefox `mozHasAudio` invariant
- *
- * Appending to a video `SourceBuffer` before the audio `SourceBuffer` exists causes `mozHasAudio` to be permanently
- * false in Firefox. With the two per-type variants decoupled, the invariant is no longer structural to a single `entry`
- * body (as it was when both buffers were created in one synchronous block inside a merged behavior). It's now preserved
- * by a chain of assumptions about how this behavior composes with its upstream and downstream siblings:
- *
- * 1. **Upstream — default selections land in one `runPending`.** `selectAudioTrack` (default audio) and `switchVideoTrack`
- *    (default video) both subscribe to `state.presentation` flipping to resolved; their effects run in the same
- *    `runPending` iteration and write `selectedAudioTrackId` + `selectedVideoTrackId` within it.
- * 2. **Self — both per-type monitors flip in one `runPending`.** After (1), both monitors re-evaluate and flip to
- *    `'buffer-ready'` in the next `runPending`. Both `entry` bodies run synchronously within that iteration — both
- *    `addSourceBuffer` calls land before the iteration ends.
- * 3. **Downstream — `appendBuffer` is async.** `loadVideoSegments` / `loadAudioSegments` read the per-type
- *    `xSegmentLoaderActor` slots; their effects fire in the _next_ `runPending` and the actual `appendBuffer` requires
- *    a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
- *
- * The cross-tick failure mode — a user-initiated audio track switch _after_ video segments have begun appending — is
- * out of scope for this behavior and would be addressed in the buffer/segment-loading path via `changeType`-aware
- * logic.
- *
- * # Sole writer
- *
- * `setupVideoBufferActors` is sole writer of `videoBufferActor` + `videoSegmentLoaderActor` (and `bandwidthState` via
- * its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor` + `audioSegmentLoaderActor`. Both
- * read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
- * `endOfStream`, `updateMediaSourceDuration`) only read these slots.
- */
 import { listen } from '@videojs/utils/dom';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -108,9 +67,9 @@ type BufferActorsContextMap<A extends BufferActorKey, L extends SegmentLoaderAct
 // the per-type `selectedKey`, `actorKey`, `loaderKey`, `type` discriminator,
 // and `fetch` inline.
 //
-// Gating is per-type only: no cross-type coupling. See the file-level
-// JSDoc for how the Firefox `mozHasAudio` invariant survives the split
-// via SPF's effect coalescing.
+// Gating is per-type only: no cross-type coupling. See
+// `setupVideoBufferActors`'s JSDoc for how the Firefox `mozHasAudio`
+// invariant survives the split via SPF's effect coalescing.
 // ============================================================================
 
 function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey, L extends SegmentLoaderActorKey>({
@@ -166,7 +125,7 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
           );
 
           // Synchronous slot writes — load-bearing for the Firefox
-          // `mozHasAudio` invariant (see file-level JSDoc). Both per-type
+          // `mozHasAudio` invariant (see `setupVideoBufferActors`'s JSDoc). Both per-type
           // entries' `addSourceBuffer` calls must land in the same
           // `runPending` iteration; synchronous writes keep the contiguous
           // JS frame. Downstream `loadXSegments` effects fire in the
@@ -207,6 +166,46 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
 // ============================================================================
 
 /**
+ * **Per-type buffer + segment-loader actor setup.** Per available track type (video / audio), when `mediaSource` is
+ * attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
+ * multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
+ * creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
+ * per-type actor slots. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
+ * the per-type slots so the next source starts fresh.
+ *
+ * Each per-type variant (`setupVideoBufferActors` / `setupAudioBufferActors`) is a single-positive-state reactor
+ * (`'preconditions-unmet'` ↔ `'buffer-ready'`) gating only on its own type. No cross-type coupling in `stateKeys` —
+ * `setupVideoBufferActors` carries only `selectedVideoTrackId` (plus `bandwidthState`, written by its trackedFetch),
+ * and audio mirrors.
+ *
+ * # Firefox `mozHasAudio` invariant
+ *
+ * Appending to a video `SourceBuffer` before the audio `SourceBuffer` exists causes `mozHasAudio` to be permanently
+ * false in Firefox. With the two per-type variants decoupled, the invariant is no longer structural to a single `entry`
+ * body (as it was when both buffers were created in one synchronous block inside a merged behavior). It's now preserved
+ * by a chain of assumptions about how this behavior composes with its upstream and downstream siblings:
+ *
+ * 1. **Upstream — default selections land in one `runPending`.** `selectAudioTrack` (default audio) and `switchVideoTrack`
+ *    (default video) both subscribe to `state.presentation` flipping to resolved; their effects run in the same
+ *    `runPending` iteration and write `selectedAudioTrackId` + `selectedVideoTrackId` within it.
+ * 2. **Self — both per-type monitors flip in one `runPending`.** After (1), both monitors re-evaluate and flip to
+ *    `'buffer-ready'` in the next `runPending`. Both `entry` bodies run synchronously within that iteration — both
+ *    `addSourceBuffer` calls land before the iteration ends.
+ * 3. **Downstream — `appendBuffer` is async.** `loadVideoSegments` / `loadAudioSegments` read the per-type
+ *    `xSegmentLoaderActor` slots; their effects fire in the _next_ `runPending` and the actual `appendBuffer` requires
+ *    a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
+ *
+ * The cross-tick failure mode — a user-initiated audio track switch _after_ video segments have begun appending — is
+ * out of scope for this behavior and would be addressed in the buffer/segment-loading path via `changeType`-aware
+ * logic.
+ *
+ * # Sole writer
+ *
+ * `setupVideoBufferActors` is sole writer of `videoBufferActor` + `videoSegmentLoaderActor` (and `bandwidthState` via
+ * its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor` + `audioSegmentLoaderActor`. Both
+ * read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
+ * `endOfStream`, `updateMediaSourceDuration`) only read these slots.
+ *
  * Set up the video `SourceBufferActor` + `SegmentLoaderActor`. Fires when `mediaSource` is attached and the selected
  * video track is present in the presentation with codecs. Gates only on video state — no cross-type coupling. Owns a
  * bandwidth-sampling `trackedFetch` and is sole writer of `state.bandwidthState`.
@@ -224,6 +223,7 @@ export const setupVideoBufferActors = defineBehavior({
     };
     context: BufferActorsContextMap<'videoBufferActor', 'videoSegmentLoaderActor'>;
     config?: SegmentLoaderActorConfig & {
+      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
       getCdnId?: GetCdnId;
       /** The `credentials` mode segment requests are made with; absent → the platform default. */
       requestCredentials?: RequestCredentialsPolicy;
@@ -286,6 +286,7 @@ export const setupAudioBufferActors = defineBehavior({
     state: BufferActorsStateMap<'selectedAudioTrackId'>;
     context: BufferActorsContextMap<'audioBufferActor', 'audioSegmentLoaderActor'>;
     config?: SegmentLoaderActorConfig & {
+      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
       getCdnId?: GetCdnId;
       /** The `credentials` mode segment requests are made with; absent → the platform default. */
       requestCredentials?: RequestCredentialsPolicy;

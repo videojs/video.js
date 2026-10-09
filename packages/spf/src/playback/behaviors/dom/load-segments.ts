@@ -1,42 +1,3 @@
-/**
- * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
- * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
- * (selected track, current time crossing a segment boundary).
- *
- * Loader-actor lifecycle is owned upstream:
- *
- * - Video: `setupVideoBufferActors`
- * - Audio: `setupAudioBufferActors`
- * - Text: `setupTextTrackActors`
- *
- * This behavior is pure-consumer: it reads `context[loaderKey]` and dispatches typed messages via the variant's
- * per-type `findResolvedTrack` resolver.
- *
- * # Load modes as reactor states
- *
- * Four states encode the load-gating policy directly:
- *
- * - `'preconditions-unmet'` — no loader actor in context, or the selected track hasn't resolved.
- * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
- *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
- *   Auto-resumes into the derived state when the policy lifts.
- * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
- *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
- *   text's actor no-ops (no init concept).
- * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
- *   segment-boundary crossing.
- *
- * # Per-type parameterization (inference-driven)
- *
- * The helper is generic over `Track` — the resolved-track type. Each variant supplies its own `findResolvedTrack`
- * resolver via config; TS infers `Track` from the resolver's return type. The loader signal's value type is constrained
- * to `SegmentLoaderLike<Track>` — anything with a `send` method accepting the `Track`-parameterized message. Concrete
- * actor types (`SegmentLoaderActor`, `TextTrackSegmentLoaderActor`) satisfy this via function-parameter contravariance:
- * an actor whose `.send` accepts a wider track type is assignable to a slot expecting a narrower track type.
- *
- * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
- * with right resolver) is enforced at the variant call site.
- */
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -128,9 +89,15 @@ interface SegmentLoaderLike<Track> {
 }
 
 /**
- * Specialization helper. Generic over `Track` (inferred from `findResolvedTrack`'s return type). The loader value type
- * is constrained to `SegmentLoaderLike<Track>` — concrete actor types (whose `.send` accepts a wider track union)
- * satisfy this via function-parameter contravariance.
+ * Specialization helper. The helper is generic over `Track` — the resolved-track type. Each variant supplies its own
+ * `findResolvedTrack` resolver via config; TS infers `Track` from the resolver's return type. The loader signal's value
+ * type is constrained to `SegmentLoaderLike<Track>` — anything with a `send` method accepting the `Track`-parameterized
+ * message. Concrete actor types (`SegmentLoaderActor`, `TextTrackSegmentLoaderActor`) satisfy this via
+ * function-parameter contravariance: an actor whose `.send` accepts a wider track type is assignable to a slot
+ * expecting a narrower track type.
+ *
+ * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
+ * with right resolver) is enforced at the variant call site.
  *
  * Tracks that the helper handles must have a `segments` field — used by `segmentBoundarySignal` to compute the
  * load-anchor boundary. Each variant's resolver narrows to the right resolved-track shape.
@@ -160,6 +127,7 @@ function setupSegmentLoading<
       presentation: MaybeResolvedPresentation | undefined,
       trackId: string | undefined
     ) => Track | undefined;
+    /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
@@ -291,6 +259,34 @@ const TEXT_SEGMENT_LOADING_CONFIG = {
 // Specialized exports — one per media type
 // ============================================================================
 
+/**
+ * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
+ * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
+ * (selected track, current time crossing a segment boundary).
+ *
+ * Loader-actor lifecycle is owned upstream:
+ *
+ * - Video: `setupVideoBufferActors`
+ * - Audio: `setupAudioBufferActors`
+ * - Text: `setupTextTrackActors`
+ *
+ * This behavior is pure-consumer: it reads `context[loaderKey]` and dispatches typed messages via the variant's
+ * per-type `findResolvedTrack` resolver.
+ *
+ * # Load modes as reactor states
+ *
+ * Four states encode the load-gating policy directly:
+ *
+ * - `'preconditions-unmet'` — no loader actor in context, or the selected track hasn't resolved.
+ * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
+ *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
+ *   Auto-resumes into the derived state when the policy lifts.
+ * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
+ *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
+ *   text's actor no-ops (no init concept).
+ * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
+ *   segment-boundary crossing.
+ */
 export const loadVideoSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedVideoTrackId'],
   contextKeys: ['videoSegmentLoaderActor'],

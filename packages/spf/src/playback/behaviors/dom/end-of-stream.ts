@@ -1,76 +1,3 @@
-/**
- * **Drive each `open → ended` transition of the MediaSource.** Calls `MediaSource.endOfStream()` once every active
- * buffer actor's currently-loading track is _complete_ (finite `Track.duration` — the parser's completeness signal),
- * its temporally last segments are fully appended, and the user has reached them — letting the browser finalize
- * duration and fire `ended` on the media element. The completeness gate keeps it inert for ongoing live
- * (`Track.duration === Infinity`), whose "last segment" is only the rolling edge; a live stream opts in when its
- * duration turns finite.
- *
- * Re-fires on every subsequent `open → ended → open` cycle. Per the MSE spec, `appendBuffer()` after `endOfStream()`
- * transitions the MediaSource back to `'open'`; seek-back replays and back-buffer refills that re-load earlier segments
- * take this path, so the behavior must call `endOfStream()` again once the last segments are reappended. The reactor's
- * `'preconditions-unmet'` ↔ `'eos-ready'` cycle _is_ the re-arm mechanism: a successful `endOfStream()` flips
- * `mediaSource.readyState` to `'ended'`, which (via the local `msIsOpen` signal) exits `'eos-ready'`; the next `'open'`
- * re-evaluates preconditions and may re-enter.
- *
- * # Tracking what's in the buffer
- *
- * Each `SourceBufferActor` knows which track it's currently loading via `initTrackId` (set on the most recent
- * `append-init` message) and which segments it has appended. `deriveState` iterates over the available buffer actors
- * (`[videoBufferActor, audioBufferActor].filter(Boolean)`), resolves each to its track via `findTrackById`, and checks
- * that track's last segment is appended. This means audio-only / video-only / mixed configurations compose uniformly —
- * the body iterates whatever's in scope. No reliance on `selectedTrackId` slots: the actor's view IS the source of
- * truth for "what's being loaded into this buffer."
- *
- * **Two-fire on mid-end ABR switches**: when a quality switch occurs near end-of-stream, the actor's `initTrackId`
- * still reflects the _old_ track until the new init segment is appended. The reactor may fire `endOfStream()` against
- * the old track's last-segment-appended state, then the new init's `appendBuffer()` re-opens the MS, which re-arms us
- * to fire again once the new track's last segment lands. Functionally correct (the browser re-fires `ended` after the
- * re-arm), at the cost of one extra call. Accepted as the price of dropping `selectedTrackId` dependence.
- *
- * # Buffer-actor idle gate
- *
- * Each actor must be `'idle'` (no queued or in-flight tasks) before we fire. `buffer.updating === false` alone is
- * insufficient: for chunked fMP4 streaming, `updateend` fires after each chunk while the actor's for-await loop
- * synchronously enqueues the next `appendBuffer()` — so the buffer flips `!updating → updating` across a microtask
- * boundary. The actor's `'updating'` state spans the entire multi-chunk append, so `actor.snapshot.value === 'idle'` is
- * the canonical "no more pending or in-flight work" oracle.
- *
- * This bet (actor models the pipeline; `mediaSource.sourceBuffers` models DOM state) is durable as long as the segment
- * loader is the sole writer of `appendBuffer()` calls. A future loop-mode that auto-fetches earlier segments
- * mid-`ended` would require a broader coordination story between SourceBuffers and the MediaSource — possibly via a
- * `MediaSourceActor` — and that's where this gate would want re-evaluating.
- *
- * # currentTime gate
- *
- * `currentTime` must have reached (within {@link LAST_SEGMENT_REACHED_SLACK}) at least one active track's last segment
- * startTime. Prevents `'eos-ready'` entry when a back-buffer `remove()` / `appendBuffer()` briefly re-opens the
- * MediaSource while the user is mid-stream. HLS rendition time-alignment means any active track works as the reference.
- * The slack absorbs the near-end playhead freeze (see the constant) so a tiny final segment doesn't deadlock.
- *
- * # MS readyState — local subscription
- *
- * The behavior subscribes to `mediaSource`'s readyState changes inside its setup (via `onMediaSourceReadyStateChange`)
- * and mirrors `'open'` to a behavior-local `msIsOpen` signal that `deriveState` reads. No shared
- * `mediaSourceReadyState` slot dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the same
- * signal — the consumer code wouldn't change.
- *
- * # `endOfStream` entry sequence
- *
- * 1. Wait for all SourceBuffers to be idle (DOM-level — defensive, should already hold given the actor-idle gate in
- *    `deriveState`).
- * 2. Set `mediaSource.duration` from `getMaxBufferedEnd` to match actual container timestamps (`endOfStream()` only clamps
- *    up implicitly; setting it explicitly here keeps the final value deterministic).
- * 3. Call `mediaSource.endOfStream()`.
- *
- * State-exit cleanup (`controller.abort()`) cancels any in-flight wait on source unload, presentation replace, or
- * behavior destroy.
- *
- * # Coordination with `updateMediaSourceDuration`
- *
- * `updateMediaSourceDuration` writes the initial `mediaSource.duration` from `presentation.duration` once per source;
- * this behavior writes the final value from the buffered end. Decision domains don't overlap.
- */
 import type { Behavior } from '../../../core/composition/define-behavior';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { effect } from '../../../core/signals/effect';
@@ -260,6 +187,78 @@ function endOfStreamSetup({
 }
 
 /**
+ * **Drive each `open → ended` transition of the MediaSource.** Calls `MediaSource.endOfStream()` once every active
+ * buffer actor's currently-loading track is _complete_ (finite `Track.duration` — the parser's completeness signal),
+ * its temporally last segments are fully appended, and the user has reached them — letting the browser finalize
+ * duration and fire `ended` on the media element. The completeness gate keeps it inert for ongoing live
+ * (`Track.duration === Infinity`), whose "last segment" is only the rolling edge; a live stream opts in when its
+ * duration turns finite.
+ *
+ * Re-fires on every subsequent `open → ended → open` cycle. Per the MSE spec, `appendBuffer()` after `endOfStream()`
+ * transitions the MediaSource back to `'open'`; seek-back replays and back-buffer refills that re-load earlier segments
+ * take this path, so the behavior must call `endOfStream()` again once the last segments are reappended. The reactor's
+ * `'preconditions-unmet'` ↔ `'eos-ready'` cycle _is_ the re-arm mechanism: a successful `endOfStream()` flips
+ * `mediaSource.readyState` to `'ended'`, which (via the local `msIsOpen` signal) exits `'eos-ready'`; the next `'open'`
+ * re-evaluates preconditions and may re-enter.
+ *
+ * # Tracking what's in the buffer
+ *
+ * Each `SourceBufferActor` knows which track it's currently loading via `initTrackId` (set on the most recent
+ * `append-init` message) and which segments it has appended. `deriveState` iterates over the available buffer actors
+ * (`[videoBufferActor, audioBufferActor].filter(Boolean)`), resolves each to its track via `findTrackById`, and checks
+ * that track's last segment is appended. This means audio-only / video-only / mixed configurations compose uniformly —
+ * the body iterates whatever's in scope. No reliance on `selectedTrackId` slots: the actor's view IS the source of
+ * truth for "what's being loaded into this buffer."
+ *
+ * **Two-fire on mid-end ABR switches**: when a quality switch occurs near end-of-stream, the actor's `initTrackId`
+ * still reflects the _old_ track until the new init segment is appended. The reactor may fire `endOfStream()` against
+ * the old track's last-segment-appended state, then the new init's `appendBuffer()` re-opens the MS, which re-arms us
+ * to fire again once the new track's last segment lands. Functionally correct (the browser re-fires `ended` after the
+ * re-arm), at the cost of one extra call. Accepted as the price of dropping `selectedTrackId` dependence.
+ *
+ * # Buffer-actor idle gate
+ *
+ * Each actor must be `'idle'` (no queued or in-flight tasks) before we fire. `buffer.updating === false` alone is
+ * insufficient: for chunked fMP4 streaming, `updateend` fires after each chunk while the actor's for-await loop
+ * synchronously enqueues the next `appendBuffer()` — so the buffer flips `!updating → updating` across a microtask
+ * boundary. The actor's `'updating'` state spans the entire multi-chunk append, so `actor.snapshot.value === 'idle'` is
+ * the canonical "no more pending or in-flight work" oracle.
+ *
+ * This bet (actor models the pipeline; `mediaSource.sourceBuffers` models DOM state) is durable as long as the segment
+ * loader is the sole writer of `appendBuffer()` calls. A future loop-mode that auto-fetches earlier segments
+ * mid-`ended` would require a broader coordination story between SourceBuffers and the MediaSource — possibly via a
+ * `MediaSourceActor` — and that's where this gate would want re-evaluating.
+ *
+ * # currentTime gate
+ *
+ * `currentTime` must have reached (within {@link LAST_SEGMENT_REACHED_SLACK}) at least one active track's last segment
+ * startTime. Prevents `'eos-ready'` entry when a back-buffer `remove()` / `appendBuffer()` briefly re-opens the
+ * MediaSource while the user is mid-stream. HLS rendition time-alignment means any active track works as the reference.
+ * The slack absorbs the near-end playhead freeze (see the constant) so a tiny final segment doesn't deadlock.
+ *
+ * # MS readyState — local subscription
+ *
+ * The behavior subscribes to `mediaSource`'s readyState changes inside its setup (via `onMediaSourceReadyStateChange`)
+ * and mirrors `'open'` to a behavior-local `msIsOpen` signal that `deriveState` reads. No shared
+ * `mediaSourceReadyState` slot dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the same
+ * signal — the consumer code wouldn't change.
+ *
+ * # `endOfStream` entry sequence
+ *
+ * 1. Wait for all SourceBuffers to be idle (DOM-level — defensive, should already hold given the actor-idle gate in
+ *    `deriveState`).
+ * 2. Set `mediaSource.duration` from `getMaxBufferedEnd` to match actual container timestamps (`endOfStream()` only clamps
+ *    up implicitly; setting it explicitly here keeps the final value deterministic).
+ * 3. Call `mediaSource.endOfStream()`.
+ *
+ * State-exit cleanup (`controller.abort()`) cancels any in-flight wait on source unload, presentation replace, or
+ * behavior destroy.
+ *
+ * # Coordination with `updateMediaSourceDuration`
+ *
+ * `updateMediaSourceDuration` writes the initial `mediaSource.duration` from `presentation.duration` once per source;
+ * this behavior writes the final value from the buffered end. Decision domains don't overlap.
+ *
  * `endOfStream` uses a manual `Behavior<>` literal (rather than `defineBehavior`) because it reads `videoBufferActor` /
  * `audioBufferActor` defensively without declaring them in its contextKeys — those slots are contributed by other
  * behaviors and compose conditionally per engine variant. The `Behavior<>` literal opts out of the exhaustiveness check

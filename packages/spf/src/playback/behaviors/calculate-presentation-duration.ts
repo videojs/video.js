@@ -1,27 +1,3 @@
-/**
- * **Populate presentation duration via a config-supplied resolver.**
- *
- * Once a presentation is in place and its `duration` is still undefined, calls `config.resolveDuration(state)` whenever
- * a tracked slot changes. The resolver decides what counts as "duration is now derivable" for the variant in play; the
- * behavior itself stays variant-agnostic:
- *
- * - **VoD** — derive from the first resolved selected track's `duration` (video preferred, audio fallback). The HLS
- *   engine wires `getResolvedSelectedTrackDuration` from `media/utils/track-selection.ts` as the default. Audio-only
- *   falls out of the same resolver naturally (no video selected → audio is the first resolved track).
- * - **Live** — return `Number.POSITIVE_INFINITY` once the presentation is established as live. This is the MSE-spec value
- *   for `mediaSource.duration` under live playback; downstream `updateMediaSourceDuration` propagates it through.
- *
- * Validation: writes whatever the resolver returns as long as it's a positive number, including `Infinity`. `undefined`
- * / `NaN` / `<= 0` are skipped.
- *
- * Fires at most once per presentation — an already-set `duration` is never overwritten, and the next reset arrives
- * structurally when a new (unresolved) presentation replaces the current one. The resolver may return `undefined` while
- * duration is still indeterminate; subsequent tracked-slot changes re-run the effect until the resolver commits a
- * value.
- *
- * Downstream of `resolveVideoTrack` / `resolveAudioTrack`; upstream of `updateMediaSourceDuration` (which writes the
- * value through to `mediaSource.duration`).
- */
 import type { Behavior, Empty } from '../../core/composition/define-behavior';
 import { effect } from '../../core/signals/effect';
 import { type ReadonlySignal, type Signal, untrack, update } from '../../core/signals/primitives';
@@ -46,6 +22,12 @@ export interface PresentationDurationState {
 export type PresentationDurationResolver = (state: PresentationDurationState) => number | undefined;
 
 export interface PresentationDurationConfig {
+  /**
+   * Resolver for `presentation.duration`. `calculateDurationFeature` supplies `getResolvedSelectedTrackDuration`, which
+   * picks the first resolved selected track's duration (video preferred, audio fallback). A resolver returning
+   * `Number.POSITIVE_INFINITY` marks the presentation live; downstream `updateMediaSourceDuration` propagates that
+   * value to `mediaSource.duration` per the MSE spec.
+   */
   resolveDuration: PresentationDurationResolver;
 }
 
@@ -94,6 +76,29 @@ function calculatePresentationDurationSetup({
 }
 
 /**
+ * **Populate presentation duration via a config-supplied resolver.**
+ *
+ * Once a presentation is in place and its `duration` is still undefined, calls `config.resolveDuration(state)` whenever
+ * a tracked slot changes. The resolver decides what counts as "duration is now derivable" for the variant in play; the
+ * behavior itself stays variant-agnostic:
+ *
+ * - **VoD** — derive from the first resolved selected track's `duration` (video preferred, audio fallback). The HLS
+ *   engine wires `getResolvedSelectedTrackDuration` from `media/utils/track-selection.ts` as the default. Audio-only
+ *   falls out of the same resolver naturally (no video selected → audio is the first resolved track).
+ * - **Live** — return `Number.POSITIVE_INFINITY` once the presentation is established as live. This is the MSE-spec value
+ *   for `mediaSource.duration` under live playback; downstream `updateMediaSourceDuration` propagates it through.
+ *
+ * Validation: writes whatever the resolver returns as long as it's a positive number, including `Infinity`. `undefined`
+ * / `NaN` / `<= 0` are skipped.
+ *
+ * Fires at most once per presentation — an already-set `duration` is never overwritten, and the next reset arrives
+ * structurally when a new (unresolved) presentation replaces the current one. The resolver may return `undefined` while
+ * duration is still indeterminate; subsequent tracked-slot changes re-run the effect until the resolver commits a
+ * value.
+ *
+ * Downstream of `resolveVideoTrack` / `resolveAudioTrack`; upstream of `updateMediaSourceDuration` (which writes the
+ * value through to `mediaSource.duration`).
+ *
  * `calculatePresentationDuration` uses a manual `Behavior<>` literal (rather than `defineBehavior`) so it can declare
  * just `presentation` in its stateKeys while the typed setup-param shape includes the optional `selectedVideoTrackId` /
  * `selectedAudioTrackId` reads used at runtime. Mirrors the pattern in `endOfStream` for the same reason: the behavior

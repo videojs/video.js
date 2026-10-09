@@ -1,12 +1,3 @@
-/**
- * Mirror `mediaElement.playbackRate` into reactive state. On each `ratechange` event, write the new value to
- * `state.playbackRate`. Also syncs immediately when a media element becomes available so consumers don't wait for the
- * first event.
- *
- * When no media element is attached, writes `config.defaultPlaybackRate` (default-default `1`, matching the
- * HTMLMediaElement spec) so consumers always see the rate a freshly attached element would have. Read-only mirror; does
- * not push `state.playbackRate` back to the element.
- */
 import { listen } from '@videojs/utils/dom';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -56,6 +47,15 @@ function trackPlaybackRateSetup({
   });
 }
 
+/**
+ * Mirror `mediaElement.playbackRate` into reactive state. On each `ratechange` event, write the new value to
+ * `state.playbackRate`. Also syncs immediately when a media element becomes available so consumers don't wait for the
+ * first event.
+ *
+ * When no media element is attached, writes `config.defaultPlaybackRate` (default-default `1`, matching the
+ * HTMLMediaElement spec) so consumers always see the rate a freshly attached element would have. Read-only mirror; does
+ * not push `state.playbackRate` back to the element.
+ */
 export const trackPlaybackRate = defineBehavior({
   stateKeys: ['playbackRate'],
   contextKeys: ['mediaElement'],
