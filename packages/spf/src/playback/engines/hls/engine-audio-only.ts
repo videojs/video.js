@@ -1,140 +1,58 @@
 import type { Simplify } from '@videojs/utils/types';
 
-import {
-  type ConfigWithDefaults,
-  defineCompositionFactory,
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
-} from '../../../core/composition/create-composition';
-import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import { canPlayTrack } from '../../../media/dom/capabilities';
-import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
-import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
-import { collectErrors } from '../../behaviors/collect-errors';
-import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
-import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
-import { applyStartPosition } from '../../behaviors/dom/apply-start-position';
-import { endOfStream } from '../../behaviors/dom/end-of-stream';
-import { loadChapters } from '../../behaviors/dom/load-chapters';
-import { loadAudioSegments } from '../../behaviors/dom/load-segments';
-import { recoverEndStall } from '../../behaviors/dom/recover-end-stall';
-import { setupAudioBufferActors } from '../../behaviors/dom/setup-buffer-actors';
-import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
-import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
-import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
-import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
-// Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
-// `audioMessagePipelines` defaultConfig entry, the `mediaContainerData` state slot,
-// and the `deriveStartMediaTime` config field to drop relocation from audio-only.
-import { deriveSharedMinStartMediaTime, establishStartMediaTime } from '../../behaviors/establish-start-media-time';
-import { resolvePresentation } from '../../behaviors/resolve-presentation';
-import { resolveAudioTrack } from '../../behaviors/resolve-track';
-import { setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
-import { syncPreload } from '../../behaviors/sync-preload';
-import { switchAudioTrack, type UserTrackSelectionState } from '../../behaviors/track-switching';
-import { relocationPipelinesFor } from '../../primitives/relocation-pipelines';
-import { reportUnsupportedTrackConditions } from '../../primitives/report-track-conditions';
+import { type ConfigWithDefaults, defineCompositionFactory } from '../../../core/composition/create-composition';
+import type {
+  ResolveBehaviorConfig,
+  ResolveBehaviorContext,
+  ResolveBehaviorState,
+} from '../../../core/composition/define-behavior';
+import { flattenFeatures } from '../../../core/composition/define-feature';
+import { airPlayFeature } from './features/airplay';
+import { audioFeature } from './features/audio';
+import { calculateDurationFeature } from './features/calculate-duration';
+import { chaptersFeature } from './features/chapters';
+import { currentTimeFeature } from './features/current-time';
+import { endStallRecoveryFeature } from './features/end-stall-recovery';
+import { errorFeature } from './features/error';
+import { hlsLoadingFeature } from './features/hls-loading';
+import { initialLoadFeature } from './features/initial-load';
+import { mediaSourceFeature } from './features/media-source';
+import { multiCdnFeature } from './features/multi-cdn';
+import { shiftTimestampsFeature } from './features/shift-timestamps';
+import { startPositionFeature } from './features/start-position';
 
 // ============================================================================
 // Audio-Only HLS Engine State & Context
 // ============================================================================
 
 /**
- * External signals of the audio-only HLS playback engine: state written from outside the engine (by the adapter) that
- * no composed behavior declares — the consumer's track selections and remote-playback opt-out.
+ * The features the audio-only HLS playback engine composes, in order. A feature's behaviors compose in its position,
+ * and a later feature's `defaultConfig` and `initialState` values replace an earlier one's.
  */
-const externalSignals = defineExternalSignals<UserTrackSelectionState<'audio'> & DisableRemotePlaybackState>()({
-  state: ['userAudioTrackSelection', 'disableRemotePlayback'],
-});
+export const features = [
+  initialLoadFeature,
+  hlsLoadingFeature,
+  multiCdnFeature,
+  errorFeature,
+  calculateDurationFeature,
+  mediaSourceFeature,
+  audioFeature,
+  shiftTimestampsFeature,
+  airPlayFeature,
+  currentTimeFeature,
+  startPositionFeature,
+  endStallRecoveryFeature,
+  chaptersFeature,
+] as const;
+
+const composed = flattenFeatures(features);
 
 /**
- * The behaviors the audio-only HLS playback engine composes, in setup order. The engine's state and context types are
- * derived from this list, so adding or removing a behavior changes them with no separate type to update.
+ * The behaviors the engine composes, in setup order: its features' behaviors, each composed once. The engine's state
+ * and context types are derived from this list, so adding or removing a feature changes them with no separate type to
+ * update.
  */
-export const behaviors = [
-  syncPreload,
-  trackLoadTriggers,
-  resolvePresentation,
-
-  // Session-level CDN priority for redundant-stream sources. Owns
-  // `cdnPriority`; switchAudioTrack's preferActiveCdn scope reads it. No-op
-  // for single-CDN sources.
-  //
-  // With a single track type there's no cross-type coherence to enforce and
-  // the first pick is the primary CDN regardless, so composition order is
-  // not load-bearing here today. It earns its place for forward-consistency
-  // with the default engine and for future failover / steering, where the
-  // active CDN changes dynamically (and selection stays reactive either way).
-  deriveCdnPriority,
-
-  // CDN failover cooldown: watches `failedCdns` (tripped directly by audio
-  // track resolution on a failed media-playlist fetch) and removes each CDN
-  // once its cooldown lapses.
-  setupFailoverMonitor,
-
-  // Owns `errors` and its per-source lifecycle; reporters append into it.
-  collectErrors,
-
-  // Audio track selection — slot owner with filter reactivity.
-  // Mid-stream flush on language switch is handled in segment-loader's
-  // planTasks, not here.
-  switchAudioTrack,
-
-  // Resolve selected tracks — audio only.
-  resolveAudioTrack,
-
-  // Presentation duration
-  calculatePresentationDuration,
-
-  // MSE setup. Single audio buffer; no video buffer to coordinate with,
-  // so the Firefox `mozHasAudio` registration ordering is moot here.
-  setupMediaSource,
-  updateMediaSourceDuration,
-
-  // Non-zero-PTS relocation (spike): establishes per-track startMediaTime;
-  // MUST precede setupAudioBufferActors. Remove this line + the import + the
-  // defaultConfig/state entries to drop relocation. (Selection is optional in the
-  // reactor, so it works with only audio in scope.)
-  establishStartMediaTime,
-
-  setupAudioBufferActors,
-
-  // AirPlay/MSE bridge (WebKit only; no-op elsewhere). Audio-only sources
-  // AirPlay to audio receivers (HomePod, AirPlay speakers) through the same
-  // native-HLS fallback `<source>`; `webkitCurrentPlaybackTargetIsWireless`
-  // and the picker are HTMLMediaElement-level, so an `<audio>` host is
-  // AirPlay-capable on the same terms as a `<video>` one.
-  setupAirPlay,
-
-  // Playback tracking
-  trackCurrentTime,
-  // After trackCurrentTime: the one-shot currentTime seed must land after
-  // the mirror's attach-time sync (see apply-start-position.ts).
-  applyStartPosition,
-
-  // Segment loading — audio only.
-  loadAudioSegments,
-
-  // End of stream coordination. `endOfStream` iterates buffer actors via
-  // `[videoBufferActor, audioBufferActor].filter(Boolean)` and reads
-  // `mediaSource.sourceBuffers` aggregately — composes unchanged with
-  // only audio in scope.
-  endOfStream,
-  // Force native `ended` if Chrome freezes the playhead short of the buffered end
-  // after `endOfStream`. Inert for a clean-ending single-track source.
-  recoverEndStall,
-
-  // Chapters. Not a subtitle behavior: an `<audio>` element carries text
-  // tracks too, and podcast-style sources ship chapters. With no
-  // `preferredSubtitleLanguage` on this config the `und` track leads.
-  loadChapters,
-
-  // External signals: written by the adapter, read by the behaviors above.
-  externalSignals,
-] as const;
+export const behaviors = composed.behaviors;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read, before `defaultConfig` makes any optional. */
@@ -157,29 +75,13 @@ export type EngineConfig = Simplify<ConfigWithDefaults<Config, typeof defaultCon
 // ============================================================================
 
 /**
- * The defaults `createEngine` fills in for every config key the caller leaves `undefined`, including wiring such as
- * `attachMediaSource` and the relocation pipeline. Each is optional in `EngineConfig`, so a caller may override it.
+ * The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged
+ * `defaultConfig`. Each is optional in `EngineConfig`, so a caller may override it.
  */
-export const defaultConfig = {
-  deriveStartMediaTime: deriveSharedMinStartMediaTime,
-  // The `<source>` attachment: this engine composes `setupAirPlay`, whose native
-  // fallback `<source>` requires the MSE attachment to keep sibling source
-  // alternatives part of resource selection. The helper's `video/mp4` source
-  // type is inert here — resource selection probes it with `canPlayType`,
-  // which answers `'maybe'` on an audio element too.
-  attachMediaSource: attachMediaSourceAsSourceElement,
-  canPlayTrack,
-  reportUnsupportedTrackConditions,
-  resolveDuration: getResolvedSelectedTrackDuration,
-  parsePresentation: parseMultivariantPlaylist,
-  // Non-zero-PTS relocation (spike): pair the audio loader with the relocation steps
-  // `establishStartMediaTime` derives from; same `deriveStartMediaTime` seam. Remove
-  // with the reactor.
-  audioMessagePipelines: relocationPipelinesFor('audio'),
-} satisfies Partial<Config>;
+export const defaultConfig = composed.defaultConfig;
 
-/** The state the engine starts with. Nothing needs seeding; exported so every engine module has the same shape. */
-export const initialState = {} satisfies Partial<EngineState>;
+/** The state the engine starts with: its features' merged `initialState`. */
+export const initialState = composed.initialState;
 
 /**
  * Create an audio-only HLS playback engine.
@@ -202,4 +104,4 @@ export const initialState = {} satisfies Partial<EngineState>;
  *   engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
  *   ```;
  */
-export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
+export const createEngine = defineCompositionFactory(behaviors, { defaultConfig, initialState });

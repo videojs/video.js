@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { createComposition, type StateSignals } from '../create-composition';
+import { createComposition } from '../create-composition';
+import { type StateSignals } from '../define-behavior';
 import { defineExternalSignals } from '../define-external-signals';
 
 interface ExternalState {

@@ -96,20 +96,9 @@ surface.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
-dispatchers composed after MSE setup, after `trackCurrentTime` and
-`switchVideoQuality`:
-
-```ts
-trackCurrentTime,
-switchVideoQuality,
-loadVideoSegments,
-loadAudioSegments,
-// ...
-syncTextTracks,
-setupTextTrackActors,
-loadTextTrackSegments,
-```
+**Composition:** each dispatcher is composed by its track's feature
+(`videoFeature`, `audioFeature`, `textTracksFeature` in
+`packages/spf/src/playback/engines/hls/features/`), after MSE setup.
 
 The per-type segment-loader **actors** are owned by the MSE setup
 behaviors (`setupVideoBufferActors` / `setupAudioBufferActors` /

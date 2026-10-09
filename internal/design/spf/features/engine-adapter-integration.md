@@ -43,7 +43,7 @@ engines still shared `./hls`, splitting the adapters out took it from
 ## Status
 
 - **Composition:** The `hls/video` engine (HLS VoD); external signals
-  declared with `defineExternalSignals`, the last entry in the behavior list
+  declared with `defineExternalSignals` by the feature that reads each one
 - **Definition depth:** sketched — capability surface and the
   adapter-rationale open question both documented
 

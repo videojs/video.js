@@ -87,9 +87,7 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   fetch and transform layers. It writes no slots — publishing receiver
   MediaKeys into `context.mediaKeys` would wake `exchangeLicenses` to
   license a pipeline that is not playing — and dedupes nothing, because
-  the receiver re-proxies its SPC on connect and on disconnect. Composed
-  ahead of `setupMediaKeys` so its detach precedes that re-attach on the
-  shared falling edge. Costs **1,028 B brotli** on `/hls`, all recoverable
+  the receiver re-proxies its SPC on connect and on disconnect. Costs **1,028 B brotli** on `/hls`, all recoverable
   by omitting the behavior — of which **612 B** is the legacy fallback
   alone, separately deletable when WebKit stops needing it
   (`engine-drm-optional.test-d.ts` pins the behavior slot-neutral, and
@@ -128,11 +126,10 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   unrelated branch-era churn. Pinned by
   `playback/engines/hls/tests/engine-drm-optional.test-d.ts`, which
   asserts the DRM-free composition materializes none of the three DRM
-  slots. The DRM-free **engine variant** is not built yet; the
-  measurement patches `engine.ts` directly. A spread-based additive
-  variant (`[...BASE_PRE, setupMediaKeys, ...BASE_POST]`) typechecks
-  with inference intact, so it needs no duplicated behavior list — the
-  cost that sank the short-lived `createDrmHlsVideoEngine`.
+  slots. The DRM-free **engine variant** is not built yet; it is the video
+  engine's feature list without `drmFeature` and `airPlayFairPlayFeature`,
+  which typechecks with inference intact and needs no duplicated behavior
+  list — the cost that sank the short-lived `createDrmHlsVideoEngine`.
 - **Consumer contract already landed:** `source.drm` is typed by
   `@videojs/media`'s `DrmSystemsConfig` (`packages/media/src/core/drm.ts`) —
   license servers keyed by EME key-system id, `licenseUrl` + optional

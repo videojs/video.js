@@ -189,6 +189,28 @@ describe('relocatingTextPipelines', () => {
     expect(c.endTime).toBe(8);
   });
 
+  it('uses the audio origin in a composition with no video selection signal', async () => {
+    // An audio + text composition never declares `selectedVideoTrackId`.
+    // SAFETY: test fixtures; the step reads only these fields.
+    const presentation = {
+      selectionSets: [{ type: 'audio', switchingSets: [{ tracks: [{ id: 'a', type: 'audio', startMediaTime: 10 }] }] }],
+    } as unknown as MaybeResolvedPresentation;
+    const state = {
+      presentation: signal<MaybeResolvedPresentation | undefined>(presentation),
+      selectedAudioTrackId: signal<string | undefined>('a'),
+    };
+    // SAFETY: as above; no `selectedVideoTrackId` is the point of the test.
+    const deps = { state, context: {}, config: {} } as unknown as TextStepDeps;
+    const c = cue(5, 6);
+    // SAFETY: as above.
+    const frame = { cues: [c], metadata: appleMap } as unknown as TextFrame<Cue>;
+
+    await relocateCues(frame, notAborted, deps);
+
+    // delta = mapCorrection(10) − startMediaTime(10) = 0 ⇒ cue unchanged.
+    expect(c.startTime).toBe(5);
+  });
+
   it('relocates a genuinely text-only source by offset 0 without hanging', async () => {
     // No A/V tracks ⇒ no origin will ever come; resolve immediately with startMediaTime 0.
     const state = makeState(presTextOnly());

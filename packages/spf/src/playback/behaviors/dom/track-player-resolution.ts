@@ -18,7 +18,7 @@
 import { type ElementSize, observeElementSize, observeRenderedSize } from '@videojs/utils/dom';
 import { shallowEqual } from '@videojs/utils/object';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
 import { type Resolution, scaleResolution } from '../../../media/primitives/resolution';

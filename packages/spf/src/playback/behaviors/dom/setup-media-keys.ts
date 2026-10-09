@@ -41,7 +41,7 @@
  * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD
  * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
  */
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { KeyedBy } from '../../../core/composition/keyed-by';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';

@@ -7,7 +7,7 @@ import type {
 } from '@videojs/media';
 import type { Constructor } from '@videojs/utils/types';
 
-import type { Composition } from '../../../core/composition/create-composition';
+import type { StateSignals } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import { computed, untrack } from '../../../core/signals/primitives';
 import {
@@ -23,7 +23,7 @@ import {
   toUserVideoTrackSelection,
   type VideoTrack,
 } from '../../../media/media-tracks';
-import type { EngineContext, EngineState } from '../../engines/hls/engine';
+import type { EngineState } from '../../engines/hls/engine';
 
 // Translate a DOM rendition/track into the SPF dedupe-key shape
 const toVideoKey = (rendition: VideoRenditionLike) => ({
@@ -34,8 +34,21 @@ const toVideoKey = (rendition: VideoRenditionLike) => ({
 
 const toAudioKey = (track: AudioTrackLike) => ({ language: track.language, name: track.label });
 
+/**
+ * The engine signals the mixin reads, so any composition that declares them qualifies, not only the shipped engine: an
+ * adapter over a composed engine gets the same track lists.
+ */
 type HlsVideoEngineHost = {
-  readonly engine: Composition<EngineState, EngineContext>;
+  readonly engine: {
+    readonly state: Pick<
+      StateSignals<EngineState>,
+      | 'presentation'
+      | 'selectedVideoTrackId'
+      | 'userVideoTrackSelection'
+      | 'selectedAudioTrackId'
+      | 'userAudioTrackSelection'
+    >;
+  };
   destroy?(): void;
 };
 

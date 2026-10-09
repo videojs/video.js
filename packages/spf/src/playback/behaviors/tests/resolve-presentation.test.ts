@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import type { StateSignals } from '../../../core/composition/create-composition';
+import type { StateSignals } from '../../../core/composition/define-behavior';
 import { signal } from '../../../core/signals/primitives';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
 import type { MaybeResolvedPresentation, Presentation } from '../../../media/types';

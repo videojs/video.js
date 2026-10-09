@@ -33,7 +33,7 @@
  * rotation for Widevine / PlayReady on a live reload — the entry captures the presentation once, later reloads' keys
  * are never re-scanned, and the `encrypted` fallback isn't armed for manifest-licensed content.
  */
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal } from '../../../core/signals/primitives';

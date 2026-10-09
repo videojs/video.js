@@ -25,7 +25,7 @@
  */
 import { listen } from '@videojs/utils/dom';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal } from '../../../core/signals/primitives';
 import { getMinBufferedEnd } from '../../../media/dom/mse/duration';

@@ -11,7 +11,7 @@
  * already terminal).
  */
 
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../media/types';

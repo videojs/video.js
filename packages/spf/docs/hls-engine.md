@@ -61,6 +61,7 @@ Defaults are resolved at the engine boundary and passed to the behaviors that co
 ## Current sources
 
 - Composition, state, context, and configuration: `packages/spf/src/playback/engines/hls/engine.ts`
+- Features the engines compose: `packages/spf/src/playback/engines/hls/features/`
 - Adapter behavior: `packages/spf/src/playback/adapters/hls-video/mixin.ts`
 - Behaviors and tests: `packages/spf/src/playback/behaviors/`
 - Actors and tests: `packages/spf/src/playback/actors/`
