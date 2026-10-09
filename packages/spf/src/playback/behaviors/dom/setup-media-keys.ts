@@ -11,9 +11,9 @@
  *
  * The negotiation is the minimal key-system probe — capability-probing's full async probe supersedes it when that lands
  * — over per-system init-data types and the declared encryption scheme. The `segmentLoadingBlocked` load gate is raised
- * synchronously on entry and lowered once MediaKeys attach: appending encrypted data with no MediaKeys attached
- * misbehaves on Chromium, so the segment-load dispatchers park while the gate is up (see `load-segments.ts`); compose
- * this behavior ahead of them so the gate is up before their first dispatch — but lowered on _attach_, not on license:
+ * synchronously at setup and for each new source, and lowered once it's confirmed clear or MediaKeys attach: appending
+ * encrypted data with no MediaKeys attached misbehaves on Chromium, so the segment-load dispatchers park while the gate
+ * is up (see `load-segments.ts`), whatever order a composition lists them in — but lowered on _attach_, not on license:
  * the appends that follow are what fire `encrypted` for the event-driven path, and browsers queue decode on missing
  * keys. Failures report onto the errors sequence via `emitError` (SVTA 4008 no usable key system, 99408 the source is
  * non-DRM clear-key encryption we can't decrypt, 4010 MediaKeys init, 4013 certificate); a refused negotiation or
@@ -33,8 +33,8 @@
  * edge re-enters and re-negotiates with no extra machinery.
  *
  * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
- * HLS video engine's `createEngine` unconditionally today, degenerate on a clear source (the derived state never leaves
- * `'preconditions-unmet'`). A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
+ * HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
+ * gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
  * defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
  * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
  *
@@ -65,8 +65,13 @@ import {
   SVTA_DRM_INITIALIZATION_ERROR,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
 } from '../../../media/errors';
-import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
-import { mimeCodecsByType } from '../../../media/utils/tracks';
+import {
+  isResolvedPresentation,
+  isResolvedTrack,
+  type MaybeResolvedPresentation,
+  type Presentation,
+} from '../../../media/types';
+import { getTracksByType, mimeCodecsByType } from '../../../media/utils/tracks';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
 
 /** State shape for MediaKeys setup. */
@@ -126,12 +131,21 @@ type MediaKeysStateMap = {
   negotiatedKeySystem: Signal<MediaKeysState['negotiatedKeySystem']>;
 };
 
+/** What the setup helper reads: the declared map, plus optional reads of state other behaviors own. */
+type MediaKeysSetupState = MediaKeysStateMap &
+  ErrorEmitterState & {
+    // Optional so the one behavior composes across video-only / audio-only / both,
+    // like other cross-track-type behaviors (present at runtime iff a sibling owns it).
+    selectedVideoTrackId?: ReadonlySignal<string | undefined>;
+    selectedAudioTrackId?: ReadonlySignal<string | undefined>;
+  };
+
 type MediaKeysContextMap = {
   mediaElement: ReadonlySignal<MediaKeysContext['mediaElement']>;
   mediaKeys: Signal<MediaKeysContext['mediaKeys']>;
 };
 
-type MediaKeysFsmState = 'preconditions-unmet' | 'media-keys-required';
+type MediaKeysFsmState = 'preconditions-unmet' | 'source-clear' | 'media-keys-required';
 
 /** What a settled negotiation publishes: the chosen system, and the MediaKeys attached for it. */
 interface Negotiation {
@@ -238,7 +252,7 @@ function setupMediaKeysSetup({
   context,
   config,
 }: {
-  state: MediaKeysStateMap & ErrorEmitterState;
+  state: MediaKeysSetupState;
   context: MediaKeysContextMap;
   config: MediaKeysSetupConfig;
 }): Reactor<MediaKeysFsmState | 'destroying' | 'destroyed'> {
@@ -255,6 +269,22 @@ function setupMediaKeysSetup({
   // AirPlay bridge. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments import.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
+  /**
+   * Whether each selected track type has a resolved rendition, which is when that type's key declarations are known.
+   * Any resolved rendition of the type counts, not only the selected one: a type's renditions are assumed to be all
+   * clear or all encrypted, so the answer survives an ABR switch to a rendition that hasn't resolved yet.
+   */
+  const selectedTypesResolved = (presentation: Presentation) => {
+    const selected = [
+      { id: state.selectedVideoTrackId?.get(), type: 'video' },
+      { id: state.selectedAudioTrackId?.get(), type: 'audio' },
+    ] as const;
+    const composed = selected.filter(({ id }) => id !== undefined);
+
+    return (
+      composed.length > 0 && composed.every(({ type }) => getTracksByType(presentation, type).some(isResolvedTrack))
+    );
+  };
 
   const derivedStateSignal = computed<MediaKeysFsmState>(() => {
     const presentation = state.presentation.get();
@@ -274,16 +304,20 @@ function setupMediaKeysSetup({
     // Keys are declared per media playlist, so this flips only once an
     // encrypted rendition has resolved — exactly when encrypted segments
     // become loadable.
-    if (declaredDrmKeys(presentation).length === 0) return 'preconditions-unmet';
+    if (declaredDrmKeys(presentation).length > 0) return 'media-keys-required';
 
-    return 'media-keys-required';
+    // No keys so far, but a selected type with no resolved rendition could
+    // still declare them: the source counts as clear only once each has one.
+    if (selectedTypesResolved(presentation)) return 'source-clear';
+
+    return 'preconditions-unmet';
   });
 
   // The handoff: what `exchangeLicenses` preconditions on and rendition pruning
   // reads. The three writes land together, before any further await — a
   // reactor monitor cannot observe an intermediate write, the flush being a
-  // microtask away — so they read as one fact. `clearNegotiation` is its exact
-  // inverse, and the only other writer of these slots.
+  // microtask away — so they read as one fact. `clearNegotiation` undoes the
+  // first two; otherwise each state's entry sets the gate.
   const publishNegotiation = ({ keySystem, mediaKeys }: Negotiation) => {
     context.mediaKeys.set(mediaKeys);
     state.negotiatedKeySystem.set(keySystem);
@@ -292,14 +326,27 @@ function setupMediaKeysSetup({
   const clearNegotiation = () => {
     context.mediaKeys.set(undefined);
     state.negotiatedKeySystem.set(undefined);
-    state.segmentLoadingBlocked.set(false);
   };
 
   return createMachineReactor<MediaKeysFsmState>({
     initial: 'preconditions-unmet',
     monitor: () => derivedStateSignal.get(),
     states: {
-      'preconditions-unmet': {},
+      // The gate follows the state: blocked until the source is known to be
+      // safe, open for a confirmed-clear source. The initial entry runs during
+      // setup, so the gate is up before any loader's first dispatch whatever
+      // order the composition lists them in. Cleanups never write it, so
+      // entry/cleanup ordering across a transition can't reopen it.
+      'preconditions-unmet': {
+        entry: () => {
+          state.segmentLoadingBlocked.set(true);
+        },
+      },
+      'source-clear': {
+        entry: () => {
+          state.segmentLoadingBlocked.set(false);
+        },
+      },
 
       'media-keys-required': {
         // entry body is auto-untracked. Raises the gate synchronously, then runs

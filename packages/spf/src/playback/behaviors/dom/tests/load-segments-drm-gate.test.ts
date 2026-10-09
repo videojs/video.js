@@ -30,12 +30,13 @@ vi.mock('../../../../media/dom/eme', async (importOriginal) => {
 });
 
 const { requestKeySystemAccess, attachMediaKeys } = await import('../../../../media/dom/eme');
+const { widevineKeySystem } = await import('../../../../media/dom/key-systems');
 
 const PSSH_BASE64 =
   'AAAAW3Bzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAADsIARIQAAAAAAAAAAAAAAAAAAAAABoNd2lkZXZpbmVfdGVzdCIQAAAAAAAAAAAAAAAAAAAAACo=';
 
 /** A resolved video track that is both loadable and key-declaring — a real DRM rendition's shape. */
-function encryptedPresentation(): MaybeResolvedPresentation {
+function encryptedPresentation({ encrypted = true } = {}): MaybeResolvedPresentation {
   return {
     id: 'p1',
     url: 'https://example.com/multivariant.m3u8',
@@ -66,13 +67,15 @@ function encryptedPresentation(): MaybeResolvedPresentation {
                     targetDuration: 4,
                     mediaSequence: 0,
                     endList: true,
-                    keys: [
-                      {
-                        method: 'SAMPLE-AES',
-                        uri: `data:text/plain;base64,${PSSH_BASE64}`,
-                        keyFormat: 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
-                      },
-                    ],
+                    keys: encrypted
+                      ? [
+                          {
+                            method: 'SAMPLE-AES',
+                            uri: `data:text/plain;base64,${PSSH_BASE64}`,
+                            keyFormat: 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
+                          },
+                        ]
+                      : [],
                   },
                 },
               },
@@ -85,13 +88,13 @@ function encryptedPresentation(): MaybeResolvedPresentation {
 }
 
 /** Composes both behaviors over one state map and records every dispatched load against the gate's value. */
-function setupComposed({ withMediaKeys }: { withMediaKeys: boolean }) {
+function setupComposed({ withMediaKeys, loaderFirst = false }: { withMediaKeys: boolean; loaderFirst?: boolean }) {
   const state = {
     presentation: signal<MaybeResolvedPresentation | undefined>(undefined),
     preload: signal<string | undefined>('auto'),
     currentTime: signal<number | undefined>(0),
     loadActivated: signal<boolean | undefined>(true),
-    loadingSuspended: signal<boolean | undefined>(undefined),
+    loadingSuspended: signal<boolean | undefined>(false),
     segmentLoadingBlocked: signal<boolean | undefined>(undefined),
     selectedVideoTrackId: signal<string | undefined>('track-1'),
     selectedAudioTrackId: signal<string | undefined>(undefined),
@@ -101,7 +104,7 @@ function setupComposed({ withMediaKeys }: { withMediaKeys: boolean }) {
   };
 
   const dispatched: (boolean | undefined)[] = [];
-  const loader = {
+  const segmentLoader = {
     send: (message: { type: string }) => {
       if (message.type === 'load') dispatched.push(state.segmentLoadingBlocked.get());
     },
@@ -112,26 +115,24 @@ function setupComposed({ withMediaKeys }: { withMediaKeys: boolean }) {
     mediaKeys: signal<MediaKeys | undefined>(undefined),
     videoBufferActor: signal<unknown>({}),
     audioBufferActor: signal<unknown>(undefined),
-    videoSegmentLoaderActor: signal<unknown>(loader),
+    videoSegmentLoaderActor: signal<unknown>(segmentLoader),
     audioSegmentLoaderActor: signal<unknown>(undefined),
     textTrackSegmentLoaderActor: signal<unknown>(undefined),
   };
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  // Registration order mirrors `engine.ts`: `setupMediaKeys` precedes the loaders.
-  const reactors = withMediaKeys
-    ? [
-        setupMediaKeys.setup({
-          state: state as any,
-          context: context as any,
-          config: {
-            drm: { 'com.widevine.alpha': { licenseUrl: 'https://license.example.com/wv' } },
-            keySystems: DEFAULT_KEY_SYSTEMS,
-          } as any,
-        }),
-        loadVideoSegments.setup({ state: state as any, context: context as any }),
-      ]
-    : [loadVideoSegments.setup({ state: state as any, context: context as any })];
+  const mediaKeys = () =>
+    setupMediaKeys.setup({
+      state: state as any,
+      context: context as any,
+      config: {
+        drm: { 'com.widevine.alpha': { licenseUrl: 'https://license.example.com/wv' } },
+        keySystems: DEFAULT_KEY_SYSTEMS,
+      } as any,
+    });
+  const loader = () => loadVideoSegments.setup({ state: state as any, context: context as any });
+  // Either composition order must hold the invariant; `loaderFirst` is the order that used to break it.
+  const reactors = withMediaKeys ? (loaderFirst ? [loader(), mediaKeys()] : [mediaKeys(), loader()]) : [loader()];
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
   return { state, dispatched, destroy: () => reactors.forEach((reactor) => reactor.destroy()) };
@@ -148,19 +149,69 @@ describe('loadVideoSegments (encrypted-source load gate)', () => {
     vi.mocked(attachMediaKeys).mockReset().mockResolvedValue(undefined);
   });
 
-  it('dispatches no load when the gate rises in the same flush that resolves the rendition', async () => {
-    const { state, dispatched, destroy } = setupComposed({ withMediaKeys: true });
+  for (const loaderFirst of [false, true]) {
+    const order = loaderFirst ? 'loader composed first' : 'setupMediaKeys composed first';
 
-    state.presentation.set(encryptedPresentation());
-    await settle();
+    it(`dispatches no load for an encrypted source before its keys attach (${order})`, async () => {
+      const { state, dispatched, destroy } = setupComposed({ withMediaKeys: true, loaderFirst });
 
-    // The gate went up, and nothing was dispatched behind it. Before the guards
-    // in the state handlers this dispatched one load with the gate already true.
-    expect(state.segmentLoadingBlocked.get()).toBe(true);
-    expect(dispatched).toEqual([]);
+      state.presentation.set(encryptedPresentation());
+      await settle();
 
-    destroy();
-  });
+      // Blocked from setup, so nothing was dispatched in either order. With the
+      // loader first, a gate raised only on entry let one load out ahead of it.
+      expect(state.segmentLoadingBlocked.get()).toBe(true);
+      expect(dispatched).toEqual([]);
+
+      destroy();
+    });
+
+    it(`dispatches no load when an AirPlay session ends until keys attach again (${order})`, async () => {
+      // SAFETY: a test double; negotiation only passes the MediaKeys through to the mocked attach.
+      const mediaKeys = {} as MediaKeys;
+      const access = { createMediaKeys: vi.fn(async () => mediaKeys) };
+
+      vi.mocked(requestKeySystemAccess).mockResolvedValue({
+        module: widevineKeySystem,
+        // SAFETY: only `createMediaKeys` is called on it.
+        access: access as unknown as MediaKeySystemAccess,
+        mediaKeys,
+      } as Awaited<ReturnType<typeof requestKeySystemAccess>>);
+      const { state, dispatched, destroy } = setupComposed({ withMediaKeys: true, loaderFirst });
+
+      state.presentation.set(encryptedPresentation());
+      await vi.waitFor(() => expect(state.segmentLoadingBlocked.get()).toBe(false));
+
+      // A session takes playback off MSE; the MediaKeys are given up.
+      state.loadingSuspended.set(true);
+      await settle();
+
+      // The session ends while the next negotiation is still pending.
+      dispatched.length = 0;
+      vi.mocked(requestKeySystemAccess).mockReturnValue(new Promise(() => {}));
+      state.loadingSuspended.set(false);
+      await settle();
+
+      expect(state.segmentLoadingBlocked.get()).toBe(true);
+      expect(dispatched).toEqual([]);
+
+      destroy();
+    });
+
+    it(`loads a clear source once it's confirmed clear (${order})`, async () => {
+      const { state, dispatched, destroy } = setupComposed({ withMediaKeys: true, loaderFirst });
+
+      state.presentation.set(encryptedPresentation({ encrypted: false }));
+      await settle();
+
+      expect(state.segmentLoadingBlocked.get()).toBe(false);
+      // Every dispatch came after the gate opened.
+      expect(dispatched.length).toBeGreaterThan(0);
+      expect(dispatched.every((gate) => gate === false)).toBe(true);
+
+      destroy();
+    });
+  }
 
   it('dispatches for the encrypted fixture when no behavior raises the gate', async () => {
     // Liveness control. Without it the assertion above passes for the wrong
