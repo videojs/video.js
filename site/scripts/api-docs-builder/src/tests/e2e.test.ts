@@ -568,6 +568,26 @@ describe('Component pipeline (end-to-end)', () => {
       expect(root.platforms.react).toEqual({});
     });
 
+    it('resolves defaults spread from the base core defaultProps', () => {
+      const props = findComponent('VolumeSlider')!.reference.parts!.root!.props;
+
+      expect(props.max!.default).toBe('100');
+      expect(props.orientation!.default).toBe("'horizontal'");
+    });
+
+    it('resolves defaults that reference a constant', () => {
+      const props = findComponent('VolumeSlider')!.reference.parts!.root!.props;
+
+      expect(props.step!.default).toBe('5');
+    });
+
+    it('keeps inherited props overridden as @internal without the base default', () => {
+      const props = findComponent('VolumeSlider')!.reference.parts!.root!.props;
+
+      expect(Object.keys(props)).toEqual(expect.arrayContaining(['min', 'max', 'step', 'orientation']));
+      expect(props.min!.default).toBeUndefined();
+    });
+
     it('re-exported sub-part (Thumb) resolves from slider origin', () => {
       const thumb = findComponent('VolumeSlider')!.reference.parts!.thumb!;
 

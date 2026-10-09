@@ -192,6 +192,8 @@ Renders with `role="slider"` and an automatic `aria-label` that resolves to "See
 - <kbd>Home</kbd>: seek to start
 - <kbd>End</kbd>: seek to end
 
+Before each keyboard seek, the current time snaps to the nearest multiple of `step`. With the default `step` of `1`, pressing <kbd>Arrow Right</kbd> at 12.4 seconds seeks to 13 seconds.
+
 <FrameworkCase frameworks={["react"]}>
 `ChapterTitle` follows the pointer during pointer interaction. While the slider has keyboard focus, it follows the current playback position and announces chapter changes.
 </FrameworkCase>
