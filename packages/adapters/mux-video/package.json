@@ -1,6 +1,6 @@
 {
   "name": "@videojs/mux-video",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Mux playback adapter for Video.js, over hls.js",
   "keywords": [
     "hls",

@@ -1,5 +1,28 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.0.1...@videojs/hlsjs-video@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **packages:** support hls json chapters in hls.js and native hls ([#2993](https://github.com/videojs/video.js/issues/2993)) ([511e8a6](https://github.com/videojs/video.js/commit/511e8a69db8fb111d2d41f9e55910a243b5ef6ed))
+* **spf:** send credentials with hls requests for crossorigin="use-credentials" ([#2870](https://github.com/videojs/video.js/issues/2870)) ([897901b](https://github.com/videojs/video.js/commit/897901b88359dca0dc3e59fcecd766cb59f8fe24))
+
+
+### Bug Fixes
+
+* **hlsjs-video:** bump hls.js ([#3171](https://github.com/videojs/video.js/issues/3171)) ([fe34200](https://github.com/videojs/video.js/commit/fe342001739bf47d4d135871d4aab0a9fc425c24))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.1.0
+    * @videojs/native-hls-video bumped to 10.1.0
+    * @videojs/spf bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/hlsjs-video@10.0.0...@videojs/hlsjs-video@10.0.1) (2026-10-02)
 
 

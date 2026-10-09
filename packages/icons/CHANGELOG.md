@@ -1,5 +1,24 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/icons@10.0.1...@videojs/icons@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **skin:** add scaffold skin ([#9251](https://github.com/videojs/video.js/issues/9251)) ([c39479b](https://github.com/videojs/video.js/commit/c39479baf04c906d8fe732bf1e93a5483c6b1cc4))
+
+
+### Bug Fixes
+
+* **icons:** optically center the compat play icon ([#3146](https://github.com/videojs/video.js/issues/3146)) ([04d29bc](https://github.com/videojs/video.js/commit/04d29bc44d6275396c22618613546b00f55fadb4))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/icons@10.0.0...@videojs/icons@10.0.1) (2026-10-02)
 
 

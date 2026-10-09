@@ -1,5 +1,34 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.0.1...@videojs/skins@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **skin:** add scaffold skin ([#9251](https://github.com/videojs/video.js/issues/9251)) ([c39479b](https://github.com/videojs/video.js/commit/c39479baf04c906d8fe732bf1e93a5483c6b1cc4))
+* **skin:** publish the button tooltip as a registry component ([#3194](https://github.com/videojs/video.js/issues/3194)) ([f16a42d](https://github.com/videojs/video.js/commit/f16a42d4dbce7cc758d414284dda5366ed4d645e))
+
+
+### Bug Fixes
+
+* **core:** smooth time slider playback progress ([50f59a2](https://github.com/videojs/video.js/commit/50f59a23f1ca2c394998ba38cc274df6154ef214))
+* **core:** smooth time slider playback progress ([6a21d0b](https://github.com/videojs/video.js/commit/6a21d0b4ee6211f705edc3efbac36bc53cb8855f))
+* **skin:** clean up title and caption alignment ([#9389](https://github.com/videojs/video.js/issues/9389)) ([fe45929](https://github.com/videojs/video.js/commit/fe45929069fd5f0e05f63972ca5113208ab3736a))
+* **skin:** correct scaffold parity checks and rtl controls ([#9269](https://github.com/videojs/video.js/issues/9269)) ([69b53d9](https://github.com/videojs/video.js/commit/69b53d9b85c96ac597e83419bc84f65ca55396ac))
+* **skin:** improve scaffold reduced-transparency controls ([#9287](https://github.com/videojs/video.js/issues/9287)) ([74cf8cd](https://github.com/videojs/video.js/commit/74cf8cd93f18b0dd55bd00fdb22ed2703da3a1a2))
+* **skin:** show compat backdrop while buffering ([#9252](https://github.com/videojs/video.js/issues/9252)) ([f23b55c](https://github.com/videojs/video.js/commit/f23b55c2e5133f0bf16f7704328fb5fcd6220605))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.1.0
+    * @videojs/element bumped to 10.1.0
+    * @videojs/icons bumped to 10.1.0
+    * @videojs/installation bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/skins@10.0.0...@videojs/skins@10.0.1) (2026-10-02)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@videojs/utils",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Utility functions and helpers for Video.js",
   "keywords": [
     "media",

@@ -1,6 +1,6 @@
 {
   "name": "@videojs/native-hls-video",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Native HLS playback adapter for Video.js, for browsers that play HLS themselves",
   "keywords": [
     "hls",
