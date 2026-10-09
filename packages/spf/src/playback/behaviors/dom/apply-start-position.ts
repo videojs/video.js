@@ -10,8 +10,9 @@ import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../..
 export interface StartPositionState {
   presentation?: MaybeResolvedPresentation;
   /**
-   * One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery
-   * snapshot); consumed (cleared) by `applyStartPosition` once the element seeks.
+   * One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot
+   * — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element
+   * seeks.
    */
   startPosition?: number;
   currentTime?: number;

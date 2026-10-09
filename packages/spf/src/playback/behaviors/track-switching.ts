@@ -57,7 +57,17 @@ export interface TrackSwitchingState {
 
 interface UserTrackSelections {
   video: Partial<VideoTrack>;
+  /**
+   * Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track
+   * shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path.
+   */
   audio: Partial<AudioTrack>;
+  /**
+   * Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A
+   * language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the
+   * configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via
+   * `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference).
+   */
   text: Partial<TextTrack> | 'off';
 }
 
@@ -75,7 +85,12 @@ export type UserTrackSelectionState<T extends keyof UserTrackSelections = keyof 
  * every variant. Each variant's own config extends this with its chains (and, for video, its ABR tuning).
  */
 export interface TrackSwitchingSharedConfig {
-  /** Override CDN-id derivation (shared by the CDN scope + failover constraint). */
+  /**
+   * How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in
+   * `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the
+   * keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query
+   * param).
+   */
   getCdnId?: GetCdnId;
   /**
    * Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment
@@ -111,8 +126,20 @@ export interface SwitchVideoTrackConfig extends TrackSwitchingSharedConfig {
    */
   videoConstraints?: readonly SwitchVideoTrackRule[];
   videoRules?: readonly SwitchVideoTrackRule[];
+  /**
+   * Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis
+   * ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15).
+   */
   quality?: Partial<QualityConfig>;
+  /**
+   * Bandwidth-estimator tuning. Overrides any field of `BandwidthConfig` (`fastHalfLife`, `slowHalfLife`,
+   * `minTotalBytes`, `minBytes`, `minDuration`). Defaults: see `DEFAULT_BANDWIDTH_CONFIG`.
+   */
   bandwidth?: Partial<BandwidthConfig>;
+  /**
+   * Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5
+   * Mbps).
+   */
   initialBandwidth?: number;
 }
 
@@ -986,7 +1013,10 @@ export const switchAudioTrack = defineBehavior({
  * `getCdnId` override shared with the CDN constraint + scope.
  */
 export interface SwitchTextTrackConfig extends TextSelectionConfig {
-  /** Override CDN-id derivation (shared by the failed-CDN constraint + active-CDN scope). */
+  /**
+   * Override CDN-id derivation (shared by the failed-CDN constraint + active-CDN scope). See
+   * `TrackSwitchingSharedConfig['getCdnId']`.
+   */
   getCdnId?: GetCdnId;
   /** `switchTextTrack`'s chains, replacing {@link DEFAULT_TEXT_CONSTRAINTS} / {@link DEFAULT_TEXT_RULES}. */
   textConstraints?: readonly SwitchTextTrackRule[];

@@ -257,6 +257,10 @@ export const screenResolutionCap: SelectTrackRule<unknown> = (tracks, { state })
  * `switchVideoTrack`'s are, because one engine config reaches every variant.
  */
 export interface SelectVideoTrackConfig extends CapabilityConstraintConfig {
+  /**
+   * The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone)
+   * outright.
+   */
   videoConstraints?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
   videoRules?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
 }

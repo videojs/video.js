@@ -127,6 +127,7 @@ function setupSegmentLoading<
       presentation: MaybeResolvedPresentation | undefined,
       trackId: string | undefined
     ) => Track | undefined;
+    /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
