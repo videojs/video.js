@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/google-cast@10.0.1...@videojs/google-cast@10.1.0) (2026-10-09)
+
+
+### Miscellaneous Chores
+
+* **@videojs/google-cast:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.1.0
+    * @videojs/media bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/google-cast@10.0.0...@videojs/google-cast@10.0.1) (2026-10-02)
 
 

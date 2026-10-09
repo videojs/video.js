@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/media@10.0.1...@videojs/media@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **spf:** send credentials with hls requests for crossorigin="use-credentials" ([#2870](https://github.com/videojs/video.js/issues/2870)) ([897901b](https://github.com/videojs/video.js/commit/897901b88359dca0dc3e59fcecd766cb59f8fe24))
+
+
+### Bug Fixes
+
+* **core:** smooth time slider playback progress ([50f59a2](https://github.com/videojs/video.js/commit/50f59a23f1ca2c394998ba38cc274df6154ef214))
+* **core:** smooth time slider playback progress ([6a21d0b](https://github.com/videojs/video.js/commit/6a21d0b4ee6211f705edc3efbac36bc53cb8855f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/media@10.0.0...@videojs/media@10.0.1) (2026-10-02)
 
 

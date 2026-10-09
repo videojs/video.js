@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/youtube-video@10.0.1...@videojs/youtube-video@10.1.0) (2026-10-09)
+
+
+### Bug Fixes
+
+* **youtube-video:** keep caption tracks in sync with the embed ([#9367](https://github.com/videojs/video.js/issues/9367)) ([16aa693](https://github.com/videojs/video.js/commit/16aa6934919ab7b4444002e64dd0e61fa114acca))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/youtube-video@10.0.0...@videojs/youtube-video@10.0.1) (2026-10-02)
 
 

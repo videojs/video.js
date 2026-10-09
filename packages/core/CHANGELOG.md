@@ -1,5 +1,35 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/core@10.0.1...@videojs/core@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **spf:** send credentials with hls requests for crossorigin="use-credentials" ([#2870](https://github.com/videojs/video.js/issues/2870)) ([897901b](https://github.com/videojs/video.js/commit/897901b88359dca0dc3e59fcecd766cb59f8fe24))
+
+
+### Bug Fixes
+
+* **core:** sample playback time on animation frames ([88e229c](https://github.com/videojs/video.js/commit/88e229cf6a6ae110f8a2a041efd2ba0f8fc57a66))
+* **core:** smooth time slider playback progress ([50f59a2](https://github.com/videojs/video.js/commit/50f59a23f1ca2c394998ba38cc274df6154ef214))
+* **core:** smooth time slider playback progress ([6a21d0b](https://github.com/videojs/video.js/commit/6a21d0b4ee6211f705edc3efbac36bc53cb8855f))
+* **core:** stop extrapolating stalled native media time ([7d88ca2](https://github.com/videojs/video.js/commit/7d88ca248ec6b9a2b0acb5e251f7b7e1b1d72a5c))
+* **core:** sync time slider progress with seekable ranges ([5fe31de](https://github.com/videojs/video.js/commit/5fe31def6689ac4a84a2f619afeb3d51f104ae19))
+
+
+### Performance Improvements
+
+* **core:** skip semantic updates on time slider frames ([258fafb](https://github.com/videojs/video.js/commit/258fafb32814be36e67c390bf1ffdb64e1fe1a41))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.1.0
+    * @videojs/store bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/core@10.0.0...@videojs/core@10.0.1) (2026-10-02)
 
 

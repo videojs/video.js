@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/native-hls-video@10.0.1...@videojs/native-hls-video@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **packages:** support hls json chapters in hls.js and native hls ([#2993](https://github.com/videojs/video.js/issues/2993)) ([511e8a6](https://github.com/videojs/video.js/commit/511e8a69db8fb111d2d41f9e55910a243b5ef6ed))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.1.0
+    * @videojs/spf bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/native-hls-video@10.0.0...@videojs/native-hls-video@10.0.1) (2026-10-02)
 
 

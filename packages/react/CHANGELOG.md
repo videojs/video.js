@@ -1,5 +1,75 @@
 # Changelog
 
+## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/react@10.0.1...@videojs/react@10.1.0) (2026-10-09)
+
+
+### Features
+
+* **playerjs-video:** add player.js embed media ([#9247](https://github.com/videojs/video.js/issues/9247)) ([b56d02d](https://github.com/videojs/video.js/commit/b56d02d33bdda01f1aaec1c5ada893002932ce5f))
+* **react:** link native media fallback to videojs.org/help ([#9382](https://github.com/videojs/video.js/issues/9382)) ([3f5f75d](https://github.com/videojs/video.js/commit/3f5f75d6fbf49c2425c236e57da23be2070e97a8))
+* **skin:** add scaffold skin ([#9251](https://github.com/videojs/video.js/issues/9251)) ([c39479b](https://github.com/videojs/video.js/commit/c39479baf04c906d8fe732bf1e93a5483c6b1cc4))
+* **spf:** send credentials with hls requests for crossorigin="use-credentials" ([#2870](https://github.com/videojs/video.js/issues/2870)) ([897901b](https://github.com/videojs/video.js/commit/897901b88359dca0dc3e59fcecd766cb59f8fe24))
+
+
+### Bug Fixes
+
+* **core:** sample playback time on animation frames ([88e229c](https://github.com/videojs/video.js/commit/88e229cf6a6ae110f8a2a041efd2ba0f8fc57a66))
+* **core:** smooth time slider playback progress ([50f59a2](https://github.com/videojs/video.js/commit/50f59a23f1ca2c394998ba38cc274df6154ef214))
+* **core:** smooth time slider playback progress ([6a21d0b](https://github.com/videojs/video.js/commit/6a21d0b4ee6211f705edc3efbac36bc53cb8855f))
+* **core:** stop extrapolating stalled native media time ([7d88ca2](https://github.com/videojs/video.js/commit/7d88ca248ec6b9a2b0acb5e251f7b7e1b1d72a5c))
+* **core:** sync time slider progress with seekable ranges ([5fe31de](https://github.com/videojs/video.js/commit/5fe31def6689ac4a84a2f619afeb3d51f104ae19))
+
+
+### Performance Improvements
+
+* **core:** skip semantic updates on time slider frames ([258fafb](https://github.com/videojs/video.js/commit/258fafb32814be36e67c390bf1ffdb64e1fe1a41))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.1.0
+    * @videojs/media bumped to 10.1.0
+    * @videojs/native-hls-video bumped to 10.1.0
+    * @videojs/spf bumped to 10.1.0
+    * @videojs/store bumped to 10.1.0
+    * @videojs/utils bumped to 10.1.0
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.1.0
+    * @videojs/dash-video bumped to 10.1.0
+    * @videojs/google-cast bumped to 10.1.0
+    * @videojs/hlsjs-video bumped to 10.1.0
+    * @videojs/icons bumped to 10.1.0
+    * @videojs/mux-audio bumped to 10.1.0
+    * @videojs/mux-data bumped to 10.1.0
+    * @videojs/mux-video bumped to 10.1.0
+    * @videojs/playerjs-video bumped to 10.1.0
+    * @videojs/shaka-video bumped to 10.1.0
+    * @videojs/spf bumped to 10.1.0
+    * @videojs/spotify-audio bumped to 10.1.0
+    * @videojs/tiktok-video bumped to 10.1.0
+    * @videojs/twitch-video bumped to 10.1.0
+    * @videojs/vimeo-video bumped to 10.1.0
+    * @videojs/wistia-video bumped to 10.1.0
+    * @videojs/youtube-video bumped to 10.1.0
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.1.0
+    * @videojs/dash-video bumped to 10.1.0
+    * @videojs/google-cast bumped to 10.1.0
+    * @videojs/hlsjs-video bumped to 10.1.0
+    * @videojs/mux-audio bumped to 10.1.0
+    * @videojs/mux-data bumped to 10.1.0
+    * @videojs/mux-video bumped to 10.1.0
+    * @videojs/playerjs-video bumped to 10.1.0
+    * @videojs/shaka-video bumped to 10.1.0
+    * @videojs/spotify-audio bumped to 10.1.0
+    * @videojs/tiktok-video bumped to 10.1.0
+    * @videojs/twitch-video bumped to 10.1.0
+    * @videojs/vimeo-video bumped to 10.1.0
+    * @videojs/wistia-video bumped to 10.1.0
+    * @videojs/youtube-video bumped to 10.1.0
+
 ## [10.0.1](https://github.com/videojs/v10/compare/@videojs/react@10.0.0...@videojs/react@10.0.1) (2026-10-02)
 
 

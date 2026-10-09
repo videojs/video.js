@@ -1,6 +1,6 @@
 {
   "name": "@videojs/playerjs-video",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Player.js embed playback adapter for Video.js",
   "keywords": [
     "embed",
