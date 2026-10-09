@@ -148,4 +148,5 @@ jobs:
           './packages/spf'
           './packages/store'
           './packages/utils'
+          './packages/video.js'
           --template './apps/sandbox'

@@ -9,7 +9,7 @@ import MigrationAgentStart from '@/components/docs/MigrationAgentStart.astro';
 
 Move your Video.js 8 setup to v10 by replacing `videojs()` with a player, media component, and skin. This guide maps your options, techs, plugins, and imperative calls to those pieces.
 
-Video.js 10 ships as scoped `@videojs/*` packages. The `video.js` npm package remains Video.js 8; its [repository](https://github.com/videojs/video.js) and [docs](https://legacy.videojs.org) remain available.
+Video.js 10 ships as scoped `@videojs/*` packages. Since version 10, the `video.js` npm package contains no player; it throws a coded error when Video.js 8 code calls it. To stay on Video.js 8, install `video.js@8`. Its [repository](https://github.com/videojs/videojs-v8) and [docs](https://legacy.videojs.org) remain available.
 
 ## Before you migrate
 
