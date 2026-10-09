@@ -1,62 +1,3 @@
-/**
- * **Per-type track selection as a rule chain.** While a presentation is resolved, owns that type's
- * `selected{Video,Audio,Text}TrackId` signal: pick a default, react to user intent and algorithmic ranking, and clear
- * it on src unload.
- *
- * Selection runs in two stages. First a **hard-constraints pre-pass** (`applyConstraints`) prunes the unplayable from
- * the candidate set — the failed-CDN constraint (`excludeFailedCdns`, failover cooldown), the capability constraint
- * (`excludeUnplayableTracks`, codec support), and the codec-family sticky constraint (`stickToSelectedCodecs`, no
- * `SourceBuffer.changeType()` — see its note). Then a small ordered chain of rules (`applyRules`) picks among the
- * survivors. Each constraint/rule reads the signals it needs at apply time, so the effect subscribes to exactly what
- * was consulted. The chain runs most authoritative first:
- *
- * 1. **user intent** — a soft filter on `user*TrackSelection`: narrow to the partial-track match; an empty match falls
- *    through to the full set.
- * 2. **codec-family preference** — a soft filter on `preferredCodecs` (`preferCodecFamilies`, default AVC/AAC): on a
- *    mixed-codec source, narrow which family the _initial_ pick — the one the sticky constraint then holds — lands in.
- *    Behind user intent so an explicit initial pick may land anywhere; inert once the constraint narrows to a
- *    non-preferred family.
- * 3. **active CDN** — a soft filter on `cdnPriority` (`preferActiveCdn`): narrow to the highest-priority CDN that still
- *    has tracks; an empty match falls through. Shared by video and audio, so every type stays on one CDN
- *    (`deriveCdnPriority` owns the list). No-op for non-redundant sources.
- * 4. **audio preference** — a soft filter (audio only): narrow to `preferredAudioLanguage` matches, or manifest-default
- *    tracks when the language has no match. Keeps all matching renditions for the bandwidth ranker.
- * 5. **player resolution** — a soft filter on `playerResolution` (`playerResolutionCap`, video only): narrow to the
- *    smallest rendition tier covering the player element, plus everything below it. No-op without a measurement. Ahead
- *    of the ranker but behind the CDN scope, so the cap chooses _within_ a host rather than between hosts.
- * 6. **ranking** — the terminal sort: `rankByBandwidth`, shared by video and audio. Fitting tracks (within the throughput
- *    threshold) first, highest bitrate first; over-throughput tracks after, least-over first. Hysteresis via boosting
- *    the current track's sort weight by `upgradeMargin`.
- *
- * The composer's early-bail (one survivor → stop) is load-bearing: a user selection that narrows to a single track is
- * the pick without the ranker running, so the bandwidth estimate is never read and the effect doesn't re-fire on
- * bandwidth while that choice holds.
- *
- * Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`. The resolved state owns the signal; its
- * entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per `reactors.md`).
- *
- * The pick is the chain's result mapped to a slot value by `resolveSelection` (default: the head,
- * `applyRules(...)[0]`). Each variant supplies its **constraints + rule chain (+ optional resolveSelection)** via
- * config; `setupTrackSwitching` owns only the lifecycle and runs what it's given. Both chains are themselves config: a
- * per-type key pair (`videoConstraints` / `videoRules`, `audioConstraints` / `audioRules`, `textConstraints` /
- * `textRules`) that replaces the whole chain, defaulting to the `DEFAULT_*` constants below. Per type because one
- * engine config reaches every variant. Video and audio default to constraints `[excludeFailedCdns,
- * excludeUnplayableTracks, stickToSelectedCodecs]` then rules `[filterByUserSelection, preferCodecFamilies,
- * preferActiveCdn, rankByBandwidth]` and take the head; video inserts `playerResolutionCap` after the active-CDN scope,
- * audio inserts its language/default preference there. `switchVideoTrack` also accepts ABR tuning config.
- * `switchTextTrack` differs — selection is _optional_ (captions are opt-in / off-able), so it runs
- * `[excludeFailedCdns]` + `[preferActiveCdn]` and supplies a text terminal (`pickResolvedTextTrack`) that resolves
- * standing user intent (`userTextTrackSelection`, incl. `'off'`) and may yield no selection. (The active-CDN _scope_ is
- * the sticky-pick half of multi-CDN; the failed-CDN _constraint_ is the failover half — prune the cooled-down CDN, the
- * scope falls to the next.)
- *
- * When the pre-pass prunes a type that _has_ tracks to empty, the behavior clears the selection (so a now-unplayable
- * pick can't linger and stall) and reports the type's `noSupportedTrackCode`. Which constraint emptied the set is
- * deliberately not consulted — the behavior reads no constraint's state, so the chain stays composable. A type with no
- * tracks at all is left alone; that's a legitimate source shape, not a failure. The late `createSourceBuffer` check
- * stays as the structural backstop.
- */
-
 import { type AnySlotMap, defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
@@ -900,6 +841,62 @@ export const DEFAULT_TEXT_RULES: readonly SwitchTextTrackRule[] = [preferActiveC
 // ============================================================================
 
 /**
+ * **Per-type track selection as a rule chain.** While a presentation is resolved, owns that type's
+ * `selected{Video,Audio,Text}TrackId` signal: pick a default, react to user intent and algorithmic ranking, and clear
+ * it on src unload.
+ *
+ * Selection runs in two stages. First a **hard-constraints pre-pass** (`applyConstraints`) prunes the unplayable from
+ * the candidate set — the failed-CDN constraint (`excludeFailedCdns`, failover cooldown), the capability constraint
+ * (`excludeUnplayableTracks`, codec support), and the codec-family sticky constraint (`stickToSelectedCodecs`, no
+ * `SourceBuffer.changeType()` — see its note). Then a small ordered chain of rules (`applyRules`) picks among the
+ * survivors. Each constraint/rule reads the signals it needs at apply time, so the effect subscribes to exactly what
+ * was consulted. The chain runs most authoritative first:
+ *
+ * 1. **user intent** — a soft filter on `user*TrackSelection`: narrow to the partial-track match; an empty match falls
+ *    through to the full set.
+ * 2. **codec-family preference** — a soft filter on `preferredCodecs` (`preferCodecFamilies`, default AVC/AAC): on a
+ *    mixed-codec source, narrow which family the _initial_ pick — the one the sticky constraint then holds — lands in.
+ *    Behind user intent so an explicit initial pick may land anywhere; inert once the constraint narrows to a
+ *    non-preferred family.
+ * 3. **active CDN** — a soft filter on `cdnPriority` (`preferActiveCdn`): narrow to the highest-priority CDN that still
+ *    has tracks; an empty match falls through. Shared by video and audio, so every type stays on one CDN
+ *    (`deriveCdnPriority` owns the list). No-op for non-redundant sources.
+ * 4. **audio preference** — a soft filter (audio only): narrow to `preferredAudioLanguage` matches, or manifest-default
+ *    tracks when the language has no match. Keeps all matching renditions for the bandwidth ranker.
+ * 5. **player resolution** — a soft filter on `playerResolution` (`playerResolutionCap`, video only): narrow to the
+ *    smallest rendition tier covering the player element, plus everything below it. No-op without a measurement. Ahead
+ *    of the ranker but behind the CDN scope, so the cap chooses _within_ a host rather than between hosts.
+ * 6. **ranking** — the terminal sort: `rankByBandwidth`, shared by video and audio. Fitting tracks (within the throughput
+ *    threshold) first, highest bitrate first; over-throughput tracks after, least-over first. Hysteresis via boosting
+ *    the current track's sort weight by `upgradeMargin`.
+ *
+ * The composer's early-bail (one survivor → stop) is load-bearing: a user selection that narrows to a single track is
+ * the pick without the ranker running, so the bandwidth estimate is never read and the effect doesn't re-fire on
+ * bandwidth while that choice holds.
+ *
+ * Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`. The resolved state owns the signal; its
+ * entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per `reactors.md`).
+ *
+ * The pick is the chain's result mapped to a slot value by `resolveSelection` (default: the head,
+ * `applyRules(...)[0]`). Each variant supplies its **constraints + rule chain (+ optional resolveSelection)** via
+ * config; `setupTrackSwitching` owns only the lifecycle and runs what it's given. Both chains are themselves config: a
+ * per-type key pair (`videoConstraints` / `videoRules`, `audioConstraints` / `audioRules`, `textConstraints` /
+ * `textRules`) that replaces the whole chain, defaulting to the `DEFAULT_*` constants. Per type because one engine
+ * config reaches every variant. Video and audio default to constraints `[excludeFailedCdns, excludeUnplayableTracks,
+ * stickToSelectedCodecs]` then rules `[filterByUserSelection, preferCodecFamilies, preferActiveCdn, rankByBandwidth]`
+ * and take the head; video inserts `playerResolutionCap` after the active-CDN scope, audio inserts its language/default
+ * preference there. `switchVideoTrack` also accepts ABR tuning config. `switchTextTrack` differs — selection is
+ * _optional_ (captions are opt-in / off-able), so it runs `[excludeFailedCdns]` + `[preferActiveCdn]` and supplies a
+ * text terminal (`pickResolvedTextTrack`) that resolves standing user intent (`userTextTrackSelection`, incl. `'off'`)
+ * and may yield no selection. (The active-CDN _scope_ is the sticky-pick half of multi-CDN; the failed-CDN _constraint_
+ * is the failover half — prune the cooled-down CDN, the scope falls to the next.)
+ *
+ * When the pre-pass prunes a type that _has_ tracks to empty, the behavior clears the selection (so a now-unplayable
+ * pick can't linger and stall) and reports the type's `noSupportedTrackCode`. Which constraint emptied the set is
+ * deliberately not consulted — the behavior reads no constraint's state, so the chain stays composable. A type with no
+ * tracks at all is left alone; that's a legitimate source shape, not a failure. The late `createSourceBuffer` check
+ * stays as the structural backstop.
+ *
  * Manage `selectedVideoTrackId`: pick a default on src load, dynamically adjust based on bandwidth, clear on src
  * unload. Honors `userVideoTrackSelection` as a partial-track constraint on candidates; short-circuits ABR when the
  * constraint narrows to a single track.

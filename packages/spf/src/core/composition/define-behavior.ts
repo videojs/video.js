@@ -191,28 +191,6 @@ export type ExhaustiveKeys<Keys extends readonly PropertyKey[], Slot extends obj
   : { [K in `Error: ${Name}Keys must list every key in the typed slice`]: Exclude<keyof Slot, Keys[number]> };
 
 /**
- * Typed factory for behaviors that enforces single-behavior key/param consistency: declared `stateKeys` must equal
- * `keyof S` (where `S` is inferred from the setup's `state` parameter type), and same for `contextKeys` / `C`.
- *
- * The `const` modifier on `SK` / `CK` captures literal tuples so e.g. `stateKeys: ['preload']` infers as `readonly
- * ['preload']`, no `as const` needed at the call site.
- *
- * Cross-behavior consistency at `createComposition` is unchanged — the existing `IntersectBehaviors` machinery still
- * runs over each behavior's setup param type.
- *
- * @example
- *   ```ts
- *   export const syncPreload = defineBehavior({
- *   stateKeys: ['preload'],
- *   contextKeys: ['mediaElement'],
- *   setup: ({ state, context }: {
- *   state: StateSignals<{ preload?: 'auto' | 'metadata' | 'none' }>;
- *   context: ContextSignals<{ mediaElement?: HTMLMediaElement | undefined }>;
- *   }) => { ... },
- *   });
- *   ```;
- */
-/**
  * Deps shape for a behavior whose deps slot is empty (no keys). When a slot is empty, the corresponding deps field is
  * optional — callers (typically tests) can omit it, and it defaults to `{}` at runtime via `createComposition`.
  *
@@ -238,6 +216,28 @@ type DepsForCfg<StateMap extends AnySlotMap, ContextMap extends AnySlotMap, CfgI
   RequireIfNonEmpty<'context', ContextMap> &
   ConfigDeps<CfgIn>;
 
+/**
+ * Typed factory for behaviors that enforces single-behavior key/param consistency: declared `stateKeys` must equal
+ * `keyof S` (where `S` is inferred from the setup's `state` parameter type), and same for `contextKeys` / `C`.
+ *
+ * The `const` modifier on `SK` / `CK` captures literal tuples so e.g. `stateKeys: ['preload']` infers as `readonly
+ * ['preload']`, no `as const` needed at the call site.
+ *
+ * Cross-behavior consistency at `createComposition` is unchanged — the existing `IntersectBehaviors` machinery still
+ * runs over each behavior's setup param type.
+ *
+ * @example
+ *   ```ts
+ *   export const syncPreload = defineBehavior({
+ *   stateKeys: ['preload'],
+ *   contextKeys: ['mediaElement'],
+ *   setup: ({ state, context }: {
+ *   state: StateSignals<{ preload?: 'auto' | 'metadata' | 'none' }>;
+ *   context: ContextSignals<{ mediaElement?: HTMLMediaElement | undefined }>;
+ *   }) => { ... },
+ *   });
+ *   ```;
+ */
 export function defineBehavior<
   StateMap extends AnySlotMap = Empty,
   ContextMap extends AnySlotMap = Empty,

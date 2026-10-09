@@ -1,38 +1,3 @@
-/**
- * Keep the playhead in the live window, via a two-state reactor gated on the preconditions for "we know where live is":
- *
- * - **`inactive`** — no media element, or no live edge (`getLiveEdge` is `null`: VOD, ended, or unresolved). Idle.
- * - **`live`** — preconditions met. `entry` commands `state.startPosition` once to the target live latency behind the
- *   edge (clamped to the window start) so playback begins near the edge and the loader dispatches an in-window range;
- *   `effects` runs the window-exit guard.
- *
- * A derivable live edge is itself the establishment gate: segment placement is settled at parse time — the reference
- * track's local placement _is_ the presentation timeline, and every other track's first parse is held until the anchor
- * is stamped (`resolve-track`'s gate + `establishStartMediaTime`) — so any window derived from resolved segments is
- * already final, with no separate anchor signal to wait on (see
- * `internal/design/spf/live-presentation-timeline-model.md`).
- *
- * The two pieces split along the axis a future DVR / EVENT mode will care about: the **one-time start position**
- * (`entry`) is the _live-specific_ behavior — start near the edge on load; a DVR mode makes it conditional (start in
- * place). The **window-exit guard** (`effects`) is the _general windowed-live_ behavior — applies to sliding-window
- * live, DVR, and EVENT alike. Because the command is an `entry`, it fires once per entry into `live`; a source change
- * exits to `inactive`, so the next source re-commands (no closure latch to reset). The guard stays a direct seek — it
- * is recurring, while `startPosition` is a self-clearing one-shot.
- *
- * Window-exit guard: while playing (not paused), reposition to the live edge when the playhead has fallen behind the
- * window start — including when a seek to a now-evicted position has stranded the playhead (such a seek can never
- * settle, so we rescue rather than wait on it). Two triggers: the **window-update re-fire** (the guard reads the live
- * edge, so each reload / slide re-runs it — this catches a stall, where `timeupdate` stops but the playlist keeps
- * reloading) and a **`play` listener** for immediate reactivity on resume, since the reload interval can be seconds.
- * `play`, not `playing`: after a long pause the playhead sits behind the window at an unseekable position, where the
- * browser stalls and `playing` never fires; `play` fires on the paused→false transition regardless, so we snap before
- * the stall. In-window pause / DVR scrub-back are left untouched.
- *
- * The latency comes from the injected `resolveLiveLatency` seam (HLS: `HOLD-BACK`), so this behavior carries no
- * delivery-format specifics. `applyStartPosition` performs the seek, gated on `loadedmetadata` — which implies an open
- * MediaSource and hence a declared seekable range (a seek outside `seekable` is clamped) — so this behavior needs no
- * MediaSource precondition of its own.
- */
 import { listen } from '@videojs/utils/dom';
 
 import type { Behavior } from '../../../core/composition/define-behavior';
@@ -76,7 +41,7 @@ type SeekToLiveEdgeFsmState = 'inactive' | 'live';
 
 /**
  * `'live'` once the preconditions hold: a media element and a derivable live edge (whose placement is final by
- * construction — see the module docstring). `'inactive'` otherwise.
+ * construction — see `seekToLiveEdge`'s JSDoc). `'inactive'` otherwise.
  *
  * Deliberately narrow: every signal here can flip the reactor out of and back into `live`, re-firing `entry`. Neither
  * blinks mid-source — the edge can't, because `liveWindowForType` falls back to any resolved track of the type — so
@@ -175,6 +140,40 @@ function seekToLiveEdgeSetup({
 }
 
 /**
+ * Keep the playhead in the live window, via a two-state reactor gated on the preconditions for "we know where live is":
+ *
+ * - **`inactive`** — no media element, or no live edge (`getLiveEdge` is `null`: VOD, ended, or unresolved). Idle.
+ * - **`live`** — preconditions met. `entry` commands `state.startPosition` once to the target live latency behind the
+ *   edge (clamped to the window start) so playback begins near the edge and the loader dispatches an in-window range;
+ *   `effects` runs the window-exit guard.
+ *
+ * A derivable live edge is itself the establishment gate: segment placement is settled at parse time — the reference
+ * track's local placement _is_ the presentation timeline, and every other track's first parse is held until the anchor
+ * is stamped (`resolve-track`'s gate + `establishStartMediaTime`) — so any window derived from resolved segments is
+ * already final, with no separate anchor signal to wait on (see
+ * `internal/design/spf/live-presentation-timeline-model.md`).
+ *
+ * The two pieces split along the axis a future DVR / EVENT mode will care about: the **one-time start position**
+ * (`entry`) is the _live-specific_ behavior — start near the edge on load; a DVR mode makes it conditional (start in
+ * place). The **window-exit guard** (`effects`) is the _general windowed-live_ behavior — applies to sliding-window
+ * live, DVR, and EVENT alike. Because the command is an `entry`, it fires once per entry into `live`; a source change
+ * exits to `inactive`, so the next source re-commands (no closure latch to reset). The guard stays a direct seek — it
+ * is recurring, while `startPosition` is a self-clearing one-shot.
+ *
+ * Window-exit guard: while playing (not paused), reposition to the live edge when the playhead has fallen behind the
+ * window start — including when a seek to a now-evicted position has stranded the playhead (such a seek can never
+ * settle, so we rescue rather than wait on it). Two triggers: the **window-update re-fire** (the guard reads the live
+ * edge, so each reload / slide re-runs it — this catches a stall, where `timeupdate` stops but the playlist keeps
+ * reloading) and a **`play` listener** for immediate reactivity on resume, since the reload interval can be seconds.
+ * `play`, not `playing`: after a long pause the playhead sits behind the window at an unseekable position, where the
+ * browser stalls and `playing` never fires; `play` fires on the paused→false transition regardless, so we snap before
+ * the stall. In-window pause / DVR scrub-back are left untouched.
+ *
+ * The latency comes from the injected `resolveLiveLatency` seam (HLS: `HOLD-BACK`), so this behavior carries no
+ * delivery-format specifics. `applyStartPosition` performs the seek, gated on `loadedmetadata` — which implies an open
+ * MediaSource and hence a declared seekable range (a seek outside `seekable` is clamped) — so this behavior needs no
+ * MediaSource precondition of its own.
+ *
  * Manual `Behavior<>` literal (like `calculatePresentationDuration`): declares only `presentation` + `startPosition` in
  * stateKeys while reading `selectedVideoTrackId` / `selectedAudioTrackId` defensively (contributed by the switch*
  * behaviors), so it composes without a stateKeys/type conflict.
