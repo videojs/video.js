@@ -152,6 +152,7 @@ export const sidebar: Sidebar = [
           { slug: 'guides/migrate-from-plyr', sidebarLabel: 'Plyr' },
           { slug: 'guides/migrate-from-media-chrome', sidebarLabel: 'Media Chrome' },
           { slug: 'guides/migrate-from-vidstack', sidebarLabel: 'Vidstack' },
+          { slug: 'guides/migrate-from-video-react', sidebarLabel: 'Video-React', frameworks: ['react'] },
         ],
       },
     ],
