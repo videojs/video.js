@@ -5,6 +5,7 @@ import { AirPlayButton } from '../../../../components/buttons/airplay-button';
 import { ButtonTooltip } from '../../../../components/buttons/button-tooltip';
 import { CaptionsButton } from '../../../../components/buttons/captions-button';
 import { CastButton } from '../../../../components/buttons/cast-button';
+import { FCastButton, type FCastButtonProps } from '../../../../components/buttons/fcast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
 import { PlayButton } from '../../../../components/buttons/play-button';
@@ -17,9 +18,10 @@ import styles from './controls.styles';
 
 export interface DefaultVideoControlsProps {
   renderThumbnail?: PropsOf<typeof TimeSlider>['renderThumbnail'];
+  fcast?: FCastButtonProps | undefined;
 }
 
-export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsProps = {}) {
+export function DefaultVideoControls({ renderThumbnail, fcast }: DefaultVideoControlsProps = {}) {
   return (
     <$.Controls.Root>
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
@@ -46,6 +48,9 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
           <$.Controls.Group className={controlsStyles.secondary}>
             <ButtonTooltip side="top">
               <CastButton />
+            </ButtonTooltip>
+            <ButtonTooltip side="top">
+              <FCastButton {...fcast} />
             </ButtonTooltip>
             <ButtonTooltip side="top">
               <AirPlayButton />

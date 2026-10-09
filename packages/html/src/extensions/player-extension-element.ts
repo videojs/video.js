@@ -27,6 +27,23 @@ export abstract class PlayerExtensionElement<Extension extends object> extends U
    */
   protected abstract createExtension(): Extension & PlayerExtension;
 
+  /** Whether this element currently has enough configuration to register its extension. */
+  protected get shouldRegisterExtension(): boolean {
+    return true;
+  }
+
+  /** Re-evaluate registration after a required property changes. */
+  protected refreshExtensionRegistration(): void {
+    if (!this.#register) return;
+
+    if (this.shouldRegisterExtension) {
+      if (!this.#release) this.#release = this.#register(this.#getExtension());
+    } else {
+      this.#release?.();
+      this.#release = null;
+    }
+  }
+
   /** The player extension instance registered with the player. */
   protected get extension(): Extension {
     return this.#getExtension();
@@ -62,7 +79,7 @@ export abstract class PlayerExtensionElement<Extension extends object> extends U
     this.#release = null;
     this.#register = register;
 
-    if (register) this.#release = register(this.#getExtension());
+    if (register && this.shouldRegisterExtension) this.#release = register(this.#getExtension());
   }
 
   #getExtension(): Extension & PlayerExtension {

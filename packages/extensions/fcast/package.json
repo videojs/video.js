@@ -1,0 +1,51 @@
+{
+  "name": "@videojs/fcast",
+  "version": "10.0.1",
+  "description": "FCast sender integration for Video.js",
+  "keywords": [
+    "cast",
+    "fcast",
+    "media",
+    "videojs"
+  ],
+  "homepage": "https://videojs.org",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/v10",
+    "directory": "packages/extensions/fcast"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/default/index.js",
+  "module": "dist/default/index.js",
+  "types": "dist/dev/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/dev/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "default": "./dist/default/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build:watch": "vp pack --watch ./src --no-clean",
+    "dev": "pnpm run build:watch",
+    "test": "vp test run",
+    "clean": "rimraf --glob dist types '*.tsbuildinfo'"
+  },
+  "dependencies": {
+    "@videojs/core": "workspace:*",
+    "@videojs/media": "workspace:*",
+    "@videojs/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "vite-plus": "catalog:"
+  }
+}

@@ -31,6 +31,7 @@
     "@types/react-dom": "^19.2.3",
     "@videojs/core": "workspace:*",
     "@videojs/element": "workspace:*",
+    "@videojs/fcast": "workspace:*",
     "@videojs/icons": "workspace:*",
     "@videojs/installation": "workspace:*",
     "@videojs/utils": "workspace:*",
