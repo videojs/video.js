@@ -1,7 +1,7 @@
 ---
 import Aside from '@/components/Aside.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
-import { FRAMEWORK_LABELS, type SupportedFramework } from '@/types/docs';
+import { FRAMEWORK_LABELS, resolveDocsFramework, type SupportedFramework } from '@/types/docs';
 
 interface Props {
   framework?: SupportedFramework;
@@ -10,6 +10,8 @@ interface Props {
 const { framework } = Astro.props;
 // Pages that render one notice per framework name it, so each reads as its own branch.
 const guide = framework ? `${FRAMEWORK_LABELS[framework]} migration guide` : 'migration guide';
+// Video-React is React-only, so list it only where the notice targets React.
+const showVideoReact = (framework ?? resolveDocsFramework(Astro.params.framework)) === 'react';
 ---
 
 <Aside type="tip" title="Coming from another player?">
@@ -18,9 +20,16 @@ const guide = framework ? `${FRAMEWORK_LABELS[framework]} migration guide` : 'mi
   >, <DocsLink slug="guides/migrate-from-mux-player" framework={framework}>Mux Player</DocsLink>, <DocsLink
     slug="guides/migrate-from-plyr"
     framework={framework}>Plyr</DocsLink
-  >, <DocsLink slug="guides/migrate-from-media-chrome" framework={framework}>Media Chrome</DocsLink>, or <DocsLink
-    slug="guides/migrate-from-vidstack"
-    framework={framework}>Vidstack</DocsLink
-  >. Each maps your
-  existing setup onto Video.js v10 instead of starting from scratch.
+  >, <DocsLink slug="guides/migrate-from-media-chrome" framework={framework}>Media Chrome</DocsLink>, {
+    showVideoReact ? (
+      <Fragment
+        ><DocsLink slug="guides/migrate-from-vidstack" framework={framework}>Vidstack</DocsLink>, or <DocsLink
+          slug="guides/migrate-from-video-react"
+          framework={framework}>Video-React</DocsLink
+        ></Fragment
+      >
+    ) : (
+      <Fragment>or <DocsLink slug="guides/migrate-from-vidstack" framework={framework}>Vidstack</DocsLink></Fragment>
+    )
+  }. Each maps your existing setup onto Video.js v10 instead of starting from scratch.
 </Aside>
