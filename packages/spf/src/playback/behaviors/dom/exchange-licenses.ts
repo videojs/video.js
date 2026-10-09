@@ -1,38 +1,3 @@
-/**
- * **Open MediaKeySessions for the negotiated key system and exchange their licenses.** Preconditions on the handoff
- * `setupMediaKeys` publishes — attached `context.mediaKeys` plus `state.negotiatedKeySystem` — so entry implies the CDM
- * is negotiated, its server certificate applied, and the MediaKeys attached; the "certificate before `generateRequest`"
- * ordering rides that handoff rather than a position in a shared function body.
- *
- * Sessions open manifest-driven — one per inline init data the negotiated system's module can project out of a key URI
- * (Widevine PSSH / PlayReady PRO as `data:` URIs) — or, when the manifest carries none (FairPlay `skd://`),
- * event-driven off the element's `encrypted` events, deduped by init-data bytes. Each exchange composes two transform
- * layers, module first: the negotiated system's module default (wire protocol) then the per-source override
- * (`source.drm[ks]`, deployment decoration) — over the request outbound and the response inbound — around the fetch to
- * that system's configured server.
- *
- * Failures report onto the errors sequence via `emitError` (SVTA 4004 license request, 4016 license rejected, 4021
- * request generation). None of them raise the load gate: by the time this behavior runs the gate is already down —
- * deliberately, since the appends that follow are what fire `encrypted` for the event-driven path — and browsers queue
- * decode on missing keys, so an unlicensed source stalls rather than failing. Post-license, each session's
- * `keystatuschange` is observed report-only: a key transitioning to expired / output-restricted / internal-error
- * reports 4003 / 4007 / 4014, turning the HDCP and expiry silent-stall shapes diagnosable. Exclusion or renewal policy
- * on those transitions stays downstream.
- *
- * Single-positive-state reactor, like `setupMediaKeys`. The session machinery lives in `media/dom/license-sessions.ts`
- * — `openLicenseSession` drives one session for its lifetime, `listenForEncryptedInitData` is the fallback — bound to
- * one `AbortController` per entry, so this behavior only decides which sessions to open and its state-exit cleanup is
- * the abort. **Compose it ahead of `setupMediaKeys`**: `createComposition` calls cleanups in registration order, and
- * the sessions opened here must be closed before `setupMediaKeys` detaches the MediaKeys they belong to. Setup order
- * costs nothing in return — the precondition is reactive on `context.mediaKeys`, so this behavior parks until the
- * negotiation it consumes has published.
- *
- * Writes no slots — it only reads the handoff and talks to the CDM and the license server. Rotation scope (tracked in
- * drm-support.md): the manifest loop licenses every key declared at entry, so VOD key rotation (all keys present at
- * load) is covered, and FairPlay rotation rides the `encrypted` fallback as segments append. The one gap is mid-stream
- * rotation for Widevine / PlayReady on a live reload — the entry captures the presentation once, later reloads' keys
- * are never re-scanned, and the `encrypted` fallback isn't armed for manifest-licensed content.
- */
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -179,6 +144,41 @@ function setupExchangeLicenses({
   });
 }
 
+/**
+ * **Open MediaKeySessions for the negotiated key system and exchange their licenses.** Preconditions on the handoff
+ * `setupMediaKeys` publishes — attached `context.mediaKeys` plus `state.negotiatedKeySystem` — so entry implies the CDM
+ * is negotiated, its server certificate applied, and the MediaKeys attached; the "certificate before `generateRequest`"
+ * ordering rides that handoff rather than a position in a shared function body.
+ *
+ * Sessions open manifest-driven — one per inline init data the negotiated system's module can project out of a key URI
+ * (Widevine PSSH / PlayReady PRO as `data:` URIs) — or, when the manifest carries none (FairPlay `skd://`),
+ * event-driven off the element's `encrypted` events, deduped by init-data bytes. Each exchange composes two transform
+ * layers, module first: the negotiated system's module default (wire protocol) then the per-source override
+ * (`source.drm[ks]`, deployment decoration) — over the request outbound and the response inbound — around the fetch to
+ * that system's configured server.
+ *
+ * Failures report onto the errors sequence via `emitError` (SVTA 4004 license request, 4016 license rejected, 4021
+ * request generation). None of them raise the load gate: by the time this behavior runs the gate is already down —
+ * deliberately, since the appends that follow are what fire `encrypted` for the event-driven path — and browsers queue
+ * decode on missing keys, so an unlicensed source stalls rather than failing. Post-license, each session's
+ * `keystatuschange` is observed report-only: a key transitioning to expired / output-restricted / internal-error
+ * reports 4003 / 4007 / 4014, turning the HDCP and expiry silent-stall shapes diagnosable. Exclusion or renewal policy
+ * on those transitions stays downstream.
+ *
+ * Single-positive-state reactor, like `setupMediaKeys`. The session machinery lives in `media/dom/license-sessions.ts`
+ * — `openLicenseSession` drives one session for its lifetime, `listenForEncryptedInitData` is the fallback — bound to
+ * one `AbortController` per entry, so this behavior only decides which sessions to open and its state-exit cleanup is
+ * the abort. **Compose it ahead of `setupMediaKeys`**: `createComposition` calls cleanups in registration order, and
+ * the sessions opened here must be closed before `setupMediaKeys` detaches the MediaKeys they belong to. Setup order
+ * costs nothing in return — the precondition is reactive on `context.mediaKeys`, so this behavior parks until the
+ * negotiation it consumes has published.
+ *
+ * Writes no slots — it only reads the handoff and talks to the CDM and the license server. Rotation scope (tracked in
+ * drm-support.md): the manifest loop licenses every key declared at entry, so VOD key rotation (all keys present at
+ * load) is covered, and FairPlay rotation rides the `encrypted` fallback as segments append. The one gap is mid-stream
+ * rotation for Widevine / PlayReady on a live reload — the entry captures the presentation once, later reloads' keys
+ * are never re-scanned, and the `encrypted` fallback isn't armed for manifest-licensed content.
+ */
 export const exchangeLicenses = defineBehavior({
   stateKeys: ['presentation', 'negotiatedKeySystem'],
   contextKeys: ['mediaElement', 'mediaKeys'],

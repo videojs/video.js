@@ -1,17 +1,3 @@
-/**
- * **Own the TextTracks actor pair for the current `mediaElement`.** When a `mediaElement` is in scope, creates the
- * `TextTracksActor` (bound to the element's `textTracks`) and the `TextTrackSegmentLoaderActor` (bound to that actor +
- * the injected cue resolver), and publishes both on `context`. On element identity change or behavior destroy, destroys
- * both actors and clears the slots.
- *
- * Single-resource synchronous create/destroy driven by one signal — the simple-effect form is the right shape (per
- * `behaviors.md` → "Where both shapes are legitimate": criterion 4b applies; sole writer of `textTracksActor` /
- * `textTrackSegmentLoaderActor`, the effect's cleanup return handles destroy + slot clear structurally).
- *
- * Pairs with the `loadTextTrackSegments` behavior (a per-type variant of `setupSegmentLoading` in `load-segments.ts`),
- * which only reads `textTrackSegmentLoaderActor`. The cue resolver is injected via `config` so this behavior owns the
- * DOM-bound part of the text-track pipeline.
- */
 import type { AnySlotMap, Behavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
@@ -81,6 +67,20 @@ function setupTextTrackActorsSetup({
   });
 }
 
+/**
+ * **Own the TextTracks actor pair for the current `mediaElement`.** When a `mediaElement` is in scope, creates the
+ * `TextTracksActor` (bound to the element's `textTracks`) and the `TextTrackSegmentLoaderActor` (bound to that actor +
+ * the injected cue resolver), and publishes both on `context`. On element identity change or behavior destroy, destroys
+ * both actors and clears the slots.
+ *
+ * Single-resource synchronous create/destroy driven by one signal — the simple-effect form is the right shape (per
+ * `behaviors.md` → "Where both shapes are legitimate": criterion 4b applies; sole writer of `textTracksActor` /
+ * `textTrackSegmentLoaderActor`, the effect's cleanup return handles destroy + slot clear structurally).
+ *
+ * Pairs with the `loadTextTrackSegments` behavior (a per-type variant of `setupSegmentLoading` in `load-segments.ts`),
+ * which only reads `textTrackSegmentLoaderActor`. The cue resolver is injected via `config` so this behavior owns the
+ * DOM-bound part of the text-track pipeline.
+ */
 // Manual `Behavior` literal (like `end-of-stream`): no state of its own
 // (`stateKeys: []`), but the setup forwards the composition `state` to the resolver
 // opaquely. A literal (not `defineBehavior`) so `stateKeys: []` can coexist with a
