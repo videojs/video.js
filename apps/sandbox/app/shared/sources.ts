@@ -213,6 +213,21 @@ const SOURCE_MAP = {
     subType: 'mp4',
     source: { playbackId: 'lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4' },
   },
+  'mux-cosmic-dawn': {
+    label: 'HLS - NASA Cosmic Dawn Trailer (chapters)',
+    type: 'hls',
+    subType: 'mp4',
+    poster: 'https://image.mux.com/83EzHOvVzVN01AsrD01BCpiH02Pj3S8mfzBOu101w2nHC5s/thumbnail.webp?time=69',
+    source: { playbackId: '83EzHOvVzVN01AsrD01BCpiH02Pj3S8mfzBOu101w2nHC5s', poster: { time: 69 } },
+    chapters: [
+      {
+        label: 'English',
+        lang: 'en',
+        src: new URL('./cosmic-dawn-chapters.vtt?no-inline', import.meta.url).href,
+        isDefault: true,
+      },
+    ],
+  },
   'mux-source-ts': {
     label: 'HLS - Big Buck Bunny (Mux source)',
     type: 'hls',
