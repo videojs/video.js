@@ -6,13 +6,7 @@ import { parseVariant } from '../../variants.ts';
 import type { RegistryTarget } from '../targets.ts';
 import { componentItem } from './components.ts';
 import { skinItem } from './skins.ts';
-import {
-  isPrivateComponent,
-  privateComponentItem,
-  privateModuleItem,
-  privateModuleName,
-  utilsItem,
-} from './support.ts';
+import { privateModuleItem, privateModuleName, utilsItem } from './support.ts';
 
 /** React publishes transformed source modules: every skin, component, and private helper is its own item. */
 export function reactRegistryItems(
@@ -39,7 +33,7 @@ export function reactRegistryItems(
       if (meta?.type === 'component') {
         if (variant.skin !== undefined) return null;
 
-        return isPrivateComponent(meta.name) ? privateComponentItem(meta, target) : componentItem(module, meta, target);
+        return componentItem(module, meta, target);
       }
 
       if (variant.skin !== undefined) return null;

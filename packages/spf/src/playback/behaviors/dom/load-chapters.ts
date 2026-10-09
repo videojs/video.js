@@ -23,27 +23,25 @@
  * the asset title; the request is cacheable, and each side stays ignorant of the other.
  */
 
-import { isAbortError } from '@videojs/utils/predicate';
+import { isFunction } from '@videojs/utils/predicate';
 
 import { defineBehavior } from '../../../core/composition/create-composition';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal } from '../../../core/signals/primitives';
-import { addChaptersTracksToMedia, removeAllChaptersTracksFromMedia } from '../../../media/dom/text/chapters-tracks';
-import {
-  APPLE_HLS_CHAPTERS_DATA_ID,
-  type Chapter,
-  type HlsJsonChapters,
-  parseHlsJsonChapters,
-} from '../../../media/hls/parse-json-chapters';
+import { loadChaptersTracks } from '../../../media/dom/text/load-chapters-tracks';
+import { APPLE_HLS_CHAPTERS_DATA_ID } from '../../../media/hls/parse-json-chapters';
 import type { TextSelectionConfig } from '../../../media/primitives/select-tracks';
 import { getSessionData, isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
-import { fetchResolvableText } from '../../../network/fetch';
+import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
 
 type LoadChaptersFsmState = 'preconditions-unmet' | 'loading';
 
 /** The chapters track for `preferredSubtitleLanguage` leads, when the document titles chapters in it. */
-export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'>;
+export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'> & {
+  /** The `credentials` mode the chapters-document request is made with; absent → the platform default. */
+  requestCredentials?: RequestCredentialsPolicy;
+};
 
 function deriveState(
   presentation: MaybeResolvedPresentation | undefined,
@@ -59,22 +57,6 @@ function findChaptersDocument(presentation: MaybeResolvedPresentation): string |
   return getSessionData(presentation, APPLE_HLS_CHAPTERS_DATA_ID).find((entry) => entry.uri !== undefined)?.uri;
 }
 
-/** Fetch and parse one chapters document; a failure other than our own abort is warned about and yields nothing. */
-async function loadChaptersDocument(uri: string, signal: AbortSignal): Promise<Chapter[]> {
-  try {
-    const text = await fetchResolvableText({ url: uri }, { signal });
-    // The tag's contract is an Apple JSON chapters document; the parser is
-    // written for that shape, and anything else lands in the catch below.
-    const document: HlsJsonChapters = JSON.parse(text);
-
-    return parseHlsJsonChapters(document, uri);
-  } catch (error) {
-    if (!isAbortError(error)) console.warn(`[loadChapters] Failed to load the chapters document at ${uri}`, error);
-
-    return [];
-  }
-}
-
 function loadChaptersSetup({
   state,
   context,
@@ -85,6 +67,7 @@ function loadChaptersSetup({
   config: LoadChaptersConfig;
 }): Reactor<LoadChaptersFsmState | 'destroying' | 'destroyed'> {
   const derivedStateSignal = computed(() => deriveState(state.presentation.get(), context.mediaElement.get()));
+  const { requestCredentials } = config;
 
   return createMachineReactor<LoadChaptersFsmState>({
     initial: 'preconditions-unmet',
@@ -103,20 +86,16 @@ function loadChaptersSetup({
           // the monitor leaves the state; recheck the inputs it reads.
           if (!mediaElement || !uri) return;
 
+          // Aborting on rerun, state exit, or destroy cancels the fetch and removes the tracks.
           const controller = new AbortController();
 
-          void loadChaptersDocument(uri, controller.signal).then((chapters) => {
-            // A document that settled before the abort still must not project
-            // onto a media element the state has since left.
-            if (controller.signal.aborted) return;
-
-            addChaptersTracksToMedia(mediaElement, chapters, { preferredLanguage: config.preferredSubtitleLanguage });
+          loadChaptersTracks(mediaElement, uri, controller.signal, {
+            preferredLanguage: config.preferredSubtitleLanguage,
+            // Resolved per load: the adapter's policy reads the live `crossorigin`.
+            credentials: isFunction(requestCredentials) ? requestCredentials({ url: uri }) : requestCredentials,
           });
 
-          return () => {
-            controller.abort();
-            removeAllChaptersTracksFromMedia(mediaElement);
-          };
+          return controller;
         },
       },
     },

@@ -150,6 +150,7 @@ export type {
   MediaContentValue,
   MediaControlsCapability,
   MediaControlsState,
+  MediaCrossOriginType,
   MediaErrorCapability,
   MediaErrorEvents,
   MediaErrorState,

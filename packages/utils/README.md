@@ -12,7 +12,7 @@ members:
 
 ## License
 
-[Apache-2.0](./LICENSE)
+[Apache-2.0](../../LICENSE)
 
 [package]: https://www.npmjs.com/package/@videojs/utils
 [package-badge]: https://img.shields.io/npm/v/@videojs/utils?label=@videojs/utils

@@ -1,80 +1,28 @@
-# Video.js v10
+# Video.js v10 has moved 🚚
 
-[![package-badge]][package]
-[![discord-badge]][discord]
-[![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc00ff.svg)](https://pnpm.io/)
-[![preview-badge]][preview]
+> [!IMPORTANT]
+> **This repository is no longer maintained.** Video.js v10 development now lives in
+> **[videojs/video.js](https://github.com/videojs/video.js)**.
 
-Modern, modular, and composable media player framework for Web and React.
+The full v10 history was merged into the main Video.js repository, so nothing was lost. Please go there for
+everything from now on:
 
-Video.js v10 is stable. Build with it and share your feedback 🙏.
+| Looking for…           | Go to                                                          |
+| ---------------------- | -------------------------------------------------------------- |
+| Source code            | [videojs/video.js](https://github.com/videojs/video.js)        |
+| Bug reports & features | [Issues](https://github.com/videojs/video.js/issues)           |
+| Questions & ideas      | [Discussions](https://github.com/videojs/video.js/discussions) |
+| Pull requests          | [Pull requests](https://github.com/videojs/video.js/pulls)     |
+| Documentation          | [videojs.org/docs](https://videojs.org/docs)                   |
+| Chat                   | [Discord](https://discord.gg/JBqHh485uF)                       |
 
-- Read our [design documents][rfcs].
-- Read the [v10 discussion topic][v10-discussion].
-- Watch [Heff's recent presentation][heff-presentation].
+## Installing
 
-## AI Quickstart
+The npm packages haven't changed. Keep installing from the same `@videojs/*` scope, for example
+[`@videojs/react`](https://www.npmjs.com/package/@videojs/react). Only the source repository moved.
 
-Using an AI coding agent? Install the [Video.js skill](https://github.com/videojs/skills) so it reads
-the docs that match this package version before writing code.
+## Open issues and pull requests
 
-Then print the version-matched installation choices for your framework. The command returns instructions without
-modifying your project:
-
-```sh
-npx @videojs/cli agents init
-```
-
-## Timeline
-
-- **Technical Preview (Complete):** Initial showcase for Demuxed.
-- **Alpha (Complete):** [See milestone](https://github.com/videojs/v10/milestone/3)
-- **Beta (Complete):** [See milestone](https://github.com/videojs/v10/milestone/1)
-- **Release Candidate (Complete):** Feature-complete release ahead of GA.
-- **GA (Complete):** Stable release of Video.js 10.0.
-- **After 10.0:** Video.js 8 contrib parity and supported plugins migrated. See the [roadmap](https://videojs.org/docs/guides/v10-roadmap).
-
-## Documentation
-
-If you'd like to get started and learn more, you can find our documentation on our website:
-
-- [Website][site]
-- [Documentation][docs]
-
-## Community
-
-If you need help with anything related to Video.js 10, or if you'd like to casually chat with other
-members:
-
-- [Join Discord Server][discord]
-- [See GitHub Discussions][gh-discussions]
-
-## Contributing
-
-We'd love for you to join our community channels above and give us feedback! Feedback on any of the following would help us:
-
-- Player skin designs
-- Component structures and APIs
-- Package structure and exports
-- Repo, workspace, contributor guides
-
-Please see our [contributing guide](./CONTRIBUTING.md) for getting set up locally and making code or docs changes.
-
-## Code of Conduct
-
-Please note that this project is released with a [Contributor Code of Conduct][coc]. By
-participating in this project you agree to abide by its terms.
-
-[rfcs]: ./rfc
-[v10-discussion]: https://github.com/videojs/video.js/discussions/9035
-[heff-presentation]: https://players.brightcove.net/3737230800001/eyILA5XG7K_default/index.html?videoId=6379311036112
-[coc]: https://github.com/videojs/video.js/blob/main/CODE_OF_CONDUCT.md
-[site]: http://videojs.org
-[docs]: http://videojs.org/docs
-[package]: https://www.npmjs.com/package/@videojs/core
-[package-badge]: https://img.shields.io/npm/v/@videojs/core?label=@videojs/core
-[discord]: https://discord.gg/JBqHh485uF
-[discord-badge]: https://img.shields.io/discord/507627062434070529?color=%235865F2&label=%20&logo=discord&logoColor=white
-[gh-discussions]: https://github.com/videojs/v10/discussions
-[preview]: https://pkg.pr.new/~/videojs/v10
-[preview-badge]: https://pkg.pr.new/badge/videojs/v10
+If you have an open issue or PR here, please re-open it against
+[videojs/video.js](https://github.com/videojs/video.js). Most local branches should rebase onto the new repo's
+default branch, with paths unchanged.

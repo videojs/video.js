@@ -44,8 +44,9 @@
   "dependencies": {
     "@videojs/media": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
+    "@videojs/spf": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "hls.js": "1.6.7"
+    "hls.js": "1.6.19"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",

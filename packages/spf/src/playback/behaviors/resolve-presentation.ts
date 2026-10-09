@@ -30,7 +30,8 @@ import { createMachineReactor } from '../../core/reactors/create-machine-reactor
 import { computed, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
 import { isResolvedPresentation, type MaybeResolvedPresentation, type Presentation } from '../../media/types';
 import { DEFAULT_PRELOAD, isBlockingPreload, type StandardPreload } from '../../media/utils/preload';
-import { fetchResolvable, getResponseText } from '../../network/fetch';
+import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
+import { fetchResolvable as defaultFetchResolvable, getResponseText } from '../../network/fetch';
 
 export interface PresentationState {
   presentation?: MaybeResolvedPresentation;
@@ -52,6 +53,8 @@ export interface ResolvePresentationConfig {
    * `'metadata'`, matching `syncPreload`'s own `defaultPreload`.
    */
   defaultPreload?: StandardPreload;
+  /** The `credentials` mode the manifest request is made with; absent → the platform default. */
+  requestCredentials?: RequestCredentialsPolicy;
 }
 
 export type ResolvePresentationState = 'preconditions-unmet' | 'idle' | 'resolving' | 'resolved';
@@ -84,6 +87,7 @@ function resolvePresentationSetup({
 }): Reactor<ResolvePresentationState | 'destroying' | 'destroyed'> {
   const { parsePresentation } = config;
   const defaultPreload: StandardPreload = config.defaultPreload ?? DEFAULT_PRELOAD;
+  const fetchResolvable = credentialsFetch(defaultFetchResolvable, config.requestCredentials);
 
   const derivedStateSignal = computed(() =>
     deriveState(state.presentation.get(), state.preload.get(), state.loadActivated.get(), defaultPreload)

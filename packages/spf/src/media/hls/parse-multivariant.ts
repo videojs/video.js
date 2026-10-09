@@ -20,6 +20,7 @@ import type {
 import { MULTIVARIANT_PLAYLIST_METADATA_KEY } from '../types';
 import { matchTag, parseCodecs } from './parse-attributes';
 import { resolveUrl } from './resolve-url';
+import { parseSessionData } from './session-data';
 
 /**
  * Parse HLS multivariant playlist into a Presentation.
@@ -93,26 +94,9 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
     const sessionDataAttrs = matchTag(trimmed, 'EXT-X-SESSION-DATA');
 
     if (sessionDataAttrs) {
-      const dataId = sessionDataAttrs.get('DATA-ID');
-      const value = sessionDataAttrs.get('VALUE');
-      const uri = sessionDataAttrs.get('URI');
+      const entry = parseSessionData(sessionDataAttrs, baseUrl);
 
-      // A tag MUST carry DATA-ID and exactly one of VALUE / URI.
-      if (dataId && (value !== undefined || uri !== undefined)) {
-        const language = sessionDataAttrs.get('LANGUAGE');
-        const entry: SessionDataEntry = { dataId };
-
-        if (value !== undefined) entry.value = value;
-
-        if (uri !== undefined) {
-          entry.uri = resolveUrl(uri, baseUrl);
-          entry.format = sessionDataAttrs.get('FORMAT') === 'RAW' ? 'RAW' : 'JSON';
-        }
-
-        if (language) entry.language = language;
-
-        sessionData.push(entry);
-      }
+      if (entry) sessionData.push(entry);
 
       continue;
     }

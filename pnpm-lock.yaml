@@ -518,12 +518,15 @@ importers:
       '@videojs/native-hls-video':
         specifier: workspace:*
         version: link:../native-hls-video
+      '@videojs/spf':
+        specifier: workspace:*
+        version: link:../../spf
       '@videojs/utils':
         specifier: workspace:*
         version: link:../../utils
       hls.js:
-        specifier: 1.6.7
-        version: 1.6.7
+        specifier: 1.6.19
+        version: 1.6.19
     devDependencies:
       jsdom:
         specifier: ^26.1.0
@@ -597,6 +600,9 @@ importers:
       '@videojs/media':
         specifier: workspace:*
         version: link:../../media
+      '@videojs/spf':
+        specifier: workspace:*
+        version: link:../../spf
       '@videojs/utils':
         specifier: workspace:*
         version: link:../../utils
@@ -914,8 +920,8 @@ importers:
         specifier: 5.2.0
         version: 5.2.0(@svta/cml-cta@1.0.6(@svta/cml-structured-field-values@1.1.3(@svta/cml-utils@1.5.0))(@svta/cml-utils@1.5.0))(@svta/cml-structured-field-values@1.1.3(@svta/cml-utils@1.5.0))(@svta/cml-utils@1.5.0)
       hls.js:
-        specifier: 1.6.7
-        version: 1.6.7
+        specifier: 1.6.19
+        version: 1.6.19
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(supports-color@8.1.1)
@@ -7210,8 +7216,8 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hls.js@1.6.7:
-    resolution: {integrity: sha512-QW2fnwDGKGc9DwQUGLbmMOz8G48UZK7PVNJPcOUql1b8jubKx4/eMHNP5mGqr6tYlJNDG1g10Lx2U/qPzL6zwQ==}
+  hls.js@1.6.19:
+    resolution: {integrity: sha512-A//aZeaAgM5rgUCbTURD4gkfyw5Uag2/4Jky7CfDOukL/DN+P5DjbgK2BYteyP3/KnCkPfkGVkbLxQG2T0AbUQ==}
 
   hono@4.13.1:
     resolution: {integrity: sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw==}
@@ -15921,7 +15927,7 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hls.js@1.6.7: {}
+  hls.js@1.6.19: {}
 
   hono@4.13.1: {}
 
