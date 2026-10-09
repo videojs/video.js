@@ -343,7 +343,9 @@
     "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "test:watch": "vp test",
-    "clean": "rimraf --glob dist types '*.tsbuildinfo' 'src/**/*.tsbuildinfo'"
+    "clean": "rimraf --glob dist types '*.tsbuildinfo' 'src/**/*.tsbuildinfo'",
+    "docs:reference": "tsx scripts/build-reference.ts",
+    "docs:reference:check": "tsx scripts/build-reference.ts --check"
   },
   "dependencies": {
     "@videojs/media": "workspace:*",
@@ -354,6 +356,7 @@
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "playwright": "^1.59.1",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   }
