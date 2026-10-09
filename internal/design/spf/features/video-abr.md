@@ -12,7 +12,7 @@ This doc captures the **capability surface**: what works, what doesn't, which be
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls/video` engine (HLS VoD)
 - **Definition depth:** sketched — algorithm, config, state flow documented; deeper algorithm justification (why Shaka's dual-EWMA, why these margins) is not yet written down
 
 ## Phases of complexity

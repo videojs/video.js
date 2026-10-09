@@ -10,7 +10,7 @@ Recognize multiple audio renditions from a multivariant HLS playlist, expose the
 
 ## Status
 
-- **Composition:** Tier 1 (recognition + default selection) and most of Tier 2 (programmatic selection via `userAudioTrackSelection` + mid-stream switching) implemented in `createHlsVideoEngine` and `createHlsAudioEngine`. A/V sync policy on mid-stream switch is "switch at next-segment boundary" (starting point, area for improvement). Persistence (Tier 2 phase 6) deferred.
+- **Composition:** Tier 1 (recognition + default selection) and most of Tier 2 (programmatic selection via `userAudioTrackSelection` + mid-stream switching) implemented in the `hls/video` engine and the `hls/audio` engine. A/V sync policy on mid-stream switch is "switch at next-segment boundary" (starting point, area for improvement). Persistence (Tier 2 phase 6) deferred.
 - **Definition depth:** sketched — implementation surface populated for Tier 1 and Tier 2; specific phases (A/V sync policy refinement, persistence) remain coarse pending follow-up.
 
 ## Phases of complexity
@@ -87,7 +87,7 @@ Resolved during implementation:
 **State slots:**
 
 - `selectedAudioTrackId` — single-writer (`switchAudioTrack` when composed; `selectAudioTrack` when the lighter variant is composed instead — they're mutually exclusive). Constraint+filter pattern keeps writer count at 1; intent flows through `userAudioTrackSelection`.
-- `userAudioTrackSelection` — new slot in `HlsVideoEngineState` + `HlsAudioEngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `defineExternalSignals`). Read by `switchAudioTrack`.
+- `userAudioTrackSelection` — new slot in the `hls/video` engine's `EngineState` + the `hls/audio` engine's `EngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `defineExternalSignals`). Read by `switchAudioTrack`.
 
 **Actor state:**
 
@@ -158,7 +158,7 @@ Resolved during implementation:
 
 ## Use cases that compose this feature
 
-- **[`audio-only-mode-override`](../use-cases/audio-only-mode-override.md)** *(Phase 2 partial — landed with this feature)* — variant engine `createHlsAudioEngine` exposes `userAudioTrackSelection` and composes the filter-reactive `selectAudioTrack` + flush-aware `setupAudioBufferActors` unchanged from the default engine.
+- **[`audio-only-mode-override`](../use-cases/audio-only-mode-override.md)** *(Phase 2 partial — landed with this feature)* — variant engine `hls/audio` exposes `userAudioTrackSelection` and composes the filter-reactive `selectAudioTrack` + flush-aware `setupAudioBufferActors` unchanged from the default engine.
 
 ## See also
 

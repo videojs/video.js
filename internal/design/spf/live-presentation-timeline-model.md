@@ -14,7 +14,7 @@ convergence: how the `startTime` / `startMediaTime` / `startDate` triple behaves
 a **sliding live window**, and the model the live work was re-landed onto.
 
 The sections under [What's settled](#whats-settled) are the shipped contract — live
-HLS plays against this model in `createHlsVideoEngine`. The remaining
+HLS plays against this model in the `hls/video` engine. The remaining
 [Open questions](#open-questions) are the parts still deliberately unresolved.
 
 **Revised 2026-07-28 (PDT-primary placement; timestamps for sample sync).** The first

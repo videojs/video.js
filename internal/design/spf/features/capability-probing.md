@@ -26,7 +26,7 @@ DRM, and the unsupported-case error mapping.
 ## Status
 
 - **Composition:** synchronous codec filtering is live in
-  `createHlsVideoEngine`. The `canPlayTrack` probe is injected into
+  the `hls/video` engine. The `canPlayTrack` probe is injected into
   `track-switching`'s hard-constraints pre-pass (`excludeUnplayableTracks`),
   so undecodable renditions are pruned *before* selection. The pre-existing
   late-failure check (`isCodecSupported` inside `createSourceBuffer`) stays as

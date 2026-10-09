@@ -28,7 +28,7 @@ The audit prompt during refactor: "If an engine wanted to swap this value, would
 Tunables come from one place: the engine config object passed to `createComposition({ config })`. The composition framework distributes the same config to every behavior; each variant reads its slice.
 
 ```ts
-const engine = createHlsVideoEngine({
+const engine = createEngine({ // from '@videojs/spf/hls/video'
   initialBandwidth: 2_000_000,
   forwardBuffer: { bufferDuration: 60 },        // nested sub-config
   quality: { safetyMargin: 0.9, upgradeMargin: 1.2 },
@@ -56,7 +56,7 @@ Worked example: `bufferDuration` is used by the load-segments dispatcher (for `r
 Engine config groups domain-related tunables under sub-configs that reuse the lower-layer `*Config` types:
 
 ```ts
-interface HlsVideoEngineConfig {
+interface EngineConfig {
   // Sub-configs reuse the canonical types from their owning module
   bandwidth?: Partial<BandwidthConfig>;        // network/bandwidth-estimator
   quality?: Partial<QualityConfig>;            // media/abr/quality-selection

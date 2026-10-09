@@ -356,7 +356,7 @@ logged copy gains a second sentence with no other change. Empty for
   same shape [clusters.md § Multi-writer state slots](./clusters.md#multi-writer-state-slots)
   records for `userTextTrackSelection`.
 
-**Composition** — both `createHlsVideoEngine` and the audio-only
+**Composition** — both the `hls/video` engine and the audio-only
 variant declare the `errors` slot, compose `collectErrors`, and wire
 `reportUnsupportedTrackConditions`. The audio-only variant matters
 because an all-encrypted or all-TS source there has no video to fall

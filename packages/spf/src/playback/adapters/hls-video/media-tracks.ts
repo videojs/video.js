@@ -23,7 +23,7 @@ import {
   toUserVideoTrackSelection,
   type VideoTrack,
 } from '../../../media/media-tracks';
-import type { HlsVideoEngineContext, HlsVideoEngineState } from '../../engines/hls/engine';
+import type { EngineContext, EngineState } from '../../engines/hls/engine';
 
 // Translate a DOM rendition/track into the SPF dedupe-key shape
 const toVideoKey = (rendition: VideoRenditionLike) => ({
@@ -35,7 +35,7 @@ const toVideoKey = (rendition: VideoRenditionLike) => ({
 const toAudioKey = (track: AudioTrackLike) => ({ language: track.language, name: track.label });
 
 type HlsVideoEngineHost = {
-  readonly engine: Composition<HlsVideoEngineState, HlsVideoEngineContext>;
+  readonly engine: Composition<EngineState, EngineContext>;
   destroy?(): void;
 };
 

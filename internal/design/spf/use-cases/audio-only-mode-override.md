@@ -23,9 +23,9 @@ single composition with two variant-decision-source paths
 
 ## Status
 
-- **Composition:** Phase 1 implemented. `createHlsAudioEngine` and
+- **Composition:** Phase 1 implemented. The `hls/audio` engine and
   `HlsAudioAdapterCore` ship in `packages/spf/src/playback/engines/hls/`
-  and re-export from `@videojs/spf/hls`. The adapter handles both truly
+  and export from `@videojs/spf/hls/audio` and `@videojs/spf/hls-audio`. The adapter handles both truly
   audio-only HLS sources and mixed-AV sources (video / subtitle renditions
   ignored at composition time). Phases 2 (audio-abr, multi-language-audio)
   and 3 (alternative buffer-target defaults) are not yet implemented.
@@ -47,7 +47,7 @@ single composition with two variant-decision-source paths
 declares only audio renditions):
 
 - **Audio-only HLS assets** — sources published as audio-only (podcasts,
-  music, audio articles). The current default `createHlsVideoEngine` *tolerates*
+  music, audio articles). The current default `hls/video` engine *tolerates*
   these via `setupVideoBufferActors` / `loadVideoSegments` no-op-ing when
   `presentation.videoTracks` is empty; this variant composes the audio-only
   pipeline *explicitly*, saving the no-op overhead and making the "no video"
@@ -75,7 +75,7 @@ below).
 
 | Phase | What |
 |---|---|
-| **1 — Basic functionality** *(implemented)* | Parallel engine-factory + adapter pair. `createHlsAudioEngine` composes the audio-side subset of `createHlsVideoEngine`'s behavior list, subtracting video-side and text-track behaviors entirely (Phase 1 ships without subtitle support). `HlsAudioAdapterCore` wraps the engine with the same pattern as `HlsVideoAdapterCore`. See *Implementation surface* below |
+| **1 — Basic functionality** *(implemented)* | Parallel engine-factory + adapter pair. The `hls/audio` engine composes the audio-side subset of the `hls/video` engine's behavior list, subtracting video-side and text-track behaviors entirely (Phase 1 ships without subtitle support). `HlsAudioAdapterCore` wraps the engine with the same pattern as `HlsVideoAdapterCore`. See *Implementation surface* below |
 | **2 — Features/functionality relevant to the use case** | Compose constituent feature behaviors as they land: [`audio-abr`](../features/audio-abr.md) when implemented (multi-bitrate audio support in the variant), [`multi-language-audio`](../features/multi-language-audio.md) when implemented (language selection within the variant). Both are additive — the variant gains capability as the constituent features get built |
 | **3 — Optimizations** | Alternative default configurations for the audio-only delivery context: shorter forward-buffer targets (audio is lower-bandwidth; less ahead-buffering needed), possibly different `preload` defaults. The Path-A (update existing behavior's defaults) vs Path-B (audio-only-specific buffer-management behavior) judgment call applies — see [`README.md` § Implementation note](./README.md#implementation-note-customizing-behaviors-for-use-cases) |
 
@@ -85,7 +85,7 @@ Phase 1 is subtractive-only; Phases 2 and 3 surface the other mechanisms.
 
 ### Behaviors subtracted (Phase 1)
 
-From `createHlsVideoEngine`'s composition, omit:
+From the `hls/video` engine's composition, omit:
 
 **Video-side:**
 - `resolveVideoTrack` — no video media playlist fetch
@@ -187,7 +187,7 @@ actually call.
 ## Variant-decision signal source
 
 The variant composes identically regardless of signal source. Two paths
-exist; both target the same `createHlsAudioEngine` factory:
+exist; both target the same `hls/audio` engine:
 
 **1. Adapter-upfront (implemented; Phase 1).** Selecting
 `HlsAudioAdapterCore` over `HlsVideoAdapterCore` *is* the
@@ -199,11 +199,11 @@ delivery-mode-choice scenarios in *Target delivery context*).
 where `HlsVideoAdapterCore` (or a higher-level adapter) detects an
 audio-only source shape from the parsed presentation
 (`presentation.videoTracks` empty) and switches its internal engine
-factory to `createHlsAudioEngine` for that source. Targets the
+factory to the `hls/audio` engine for that source. Targets the
 source-shape-correctness scenario without forcing consumers of
 audio-only sources to opt into a separate adapter type. The default
-adapter would default to `createHlsVideoEngine` for mixed sources and
-`createHlsAudioEngine` for audio-only ones; existing tolerance
+adapter would default to the `hls/video` engine for mixed sources and
+the `hls/audio` engine for audio-only ones; existing tolerance
 behavior would be supplanted by explicit composition. Not yet built.
 
 Both paths can coexist. The shared factory is the load-bearing
@@ -219,8 +219,8 @@ artifact; how the variant is signaled is orthogonal.
   pattern.
 - **Default-adapter routing change (when Variant-decision path 2 lands).**
   Detect-from-parser routing in `HlsVideoAdapterCore` would change the
-  default engine for audio-only sources from `createHlsVideoEngine` (current
-  tolerance) to `createHlsAudioEngine` (explicit composition). Compatible
+  default engine for audio-only sources from the `hls/video` engine (current
+  tolerance) to the `hls/audio` engine (explicit composition). Compatible
   in observable behavior — both produce working audio playback — but the
   composition shape changes structurally. Worth a test-fixture pass when the
   routing lands.
@@ -261,7 +261,7 @@ Phase 1 implementation pass (kept for traceability):
   Case-1 source-shape concern and the Case-2 delivery-mode concern were
   documented as separate features+use-case (`audio-only-composition` +
   `audio-only-mode-override`); the Phase 1 implementation pass landed a
-  single `createHlsAudioEngine` serving both, and the two docs
+  single `hls/audio` engine serving both, and the two docs
   consolidated into this one. Variant-decision source remains the
   orthogonal axis (see *Variant-decision signal source* above).
 - **Adapter naming** — `HlsAudioAdapterCore` (with
@@ -281,10 +281,10 @@ parallel to the existing `hls-video` pair.
 
 | Export | File | Purpose |
 |---|---|---|
-| `createHlsAudioEngine` | `engine-audio-only.ts` | Subtractive composition variant; omits all video + text-track behaviors |
-| `HlsAudioEngineState` | `engine-audio-only.ts` | Trimmed state — no `selectedVideoTrackId` / `selectedTextTrackId` / `userVideoTrackSelection` / `bandwidthState` |
-| `HlsAudioEngineContext` | `engine-audio-only.ts` | Trimmed context — no video buffer / video segment loader / text-track actor slots |
-| `HlsAudioEngineConfig` | `engine-audio-only.ts` | Trimmed config — no video-quality, bandwidth, or text-track fields |
+| `createEngine` | `engine-audio-only.ts` (`@videojs/spf/hls/audio`) | Subtractive composition variant; omits all video + text-track behaviors |
+| `EngineState` | `engine-audio-only.ts` | Trimmed state — no `selectedVideoTrackId` / `selectedTextTrackId` / `userVideoTrackSelection` / `bandwidthState` |
+| `EngineContext` | `engine-audio-only.ts` | Trimmed context — no video buffer / video segment loader / text-track actor slots |
+| `EngineConfig` | `engine-audio-only.ts` | Trimmed config — no video-quality, bandwidth, or text-track fields |
 
 **SPF — adapter** (`packages/spf/src/playback/engines/hls/`):
 
@@ -295,8 +295,8 @@ parallel to the existing `hls-video` pair.
 | `HlsAudioAdapterProps` / `…API` | `hls-audio/adapter.ts` | Adapter API surface — same WHATWG src/preload/play contract as `HlsVideoAdapterCore` |
 | `hlsAudioAdapterDefaultProps` | `hls-audio/adapter.ts` | Default-prop constants |
 
-Public re-export: `@videojs/spf/hls` — all of the above ship via
-`packages/spf/src/playback/engines/hls/index.ts`.
+Public entry points: the engine ships at `@videojs/spf/hls/audio`
+(`engine-audio-only.ts`), and the adapter at `@videojs/spf/hls-audio`.
 
 **Media** (`packages/spf/src/playback/adapters/hls-audio/`):
 

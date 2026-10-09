@@ -19,8 +19,8 @@ the `<track>` mechanism and the text-track DOM surface.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` and `createHlsAudioEngine` (an `<audio>` element carries text tracks too;
-  podcast-style sources ship chapters). Not `createBackgroundVideoEngine`.
+- **Composition:** The `hls/video` engine and the `hls/audio` engine (an `<audio>` element carries text tracks too;
+  podcast-style sources ship chapters). Not the `hls/background-video` engine.
 - **Definition depth:** sketched — shipped behavior, decisions, and source pointers below.
 
 ## Decisions

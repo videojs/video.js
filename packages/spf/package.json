@@ -40,6 +40,21 @@
       "development": "./dist/dev/hls.js",
       "default": "./dist/default/hls.js"
     },
+    "./hls/video": {
+      "types": "./dist/dev/hls/video.d.ts",
+      "development": "./dist/dev/hls/video.js",
+      "default": "./dist/default/hls/video.js"
+    },
+    "./hls/audio": {
+      "types": "./dist/dev/hls/audio.d.ts",
+      "development": "./dist/dev/hls/audio.js",
+      "default": "./dist/default/hls/audio.js"
+    },
+    "./hls/background-video": {
+      "types": "./dist/dev/hls/background-video.d.ts",
+      "development": "./dist/dev/hls/background-video.js",
+      "default": "./dist/default/hls/background-video.js"
+    },
     "./media-tracks": {
       "types": "./dist/dev/media-tracks.d.ts",
       "development": "./dist/dev/media-tracks.js",

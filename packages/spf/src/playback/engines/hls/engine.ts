@@ -93,7 +93,7 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
  * External signals of the HLS playback engine: state written from outside the engine (by the adapter) that no composed
  * behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
+const externalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
   state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
 });
 
@@ -101,7 +101,7 @@ const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionSt
  * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
  * this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const hlsVideoEngineBehaviors = [
+const behaviors = [
   syncPreload,
   trackLoadTriggers,
   resolvePresentation,
@@ -233,21 +233,21 @@ const hlsVideoEngineBehaviors = [
   loadChapters,
 
   // External signals: written by the adapter, read by the behaviors above.
-  hlsVideoEngineExternalSignals,
+  externalSignals,
 ] as const;
 
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
-export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
+export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type HlsVideoEngineContext = ResolveBehaviorContext<typeof hlsVideoEngineBehaviors>;
+export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
  * Configuration for the HLS playback engine.
  *
  * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
  */
-export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
+export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
   /**
    * Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5
    * Mbps).
@@ -426,7 +426,7 @@ export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModul
  *
  * @example
  *   ```ts
- *   const engine = createHlsVideoEngine({
+ *   const engine = createEngine({
  *     initialBandwidth: 2_000_000,
  *     preferredAudioLanguage: 'en',
  *   });
@@ -439,9 +439,9 @@ export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModul
  *   await engine.destroy();
  *   ```;
  */
-export function createHlsVideoEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
-  config: HlsVideoEngineConfig<KeySystems> = {}
-): Composition<HlsVideoEngineState, HlsVideoEngineContext> {
+export function createEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
+  config: EngineConfig<KeySystems> = {}
+): Composition<EngineState, EngineContext> {
   // Non-zero-PTS relocation (spike): resolve the coordination seam once so the reactor
   // (model `startMediaTime`) and the loader stamps (buffer `timestampOffset`) apply the
   // SAME derive. Default is shared-`min` across selected A/V (subsumes per-type).
@@ -500,7 +500,7 @@ export function createHlsVideoEngine<const KeySystems extends readonly KeySystem
     reschedule: config.reschedule ?? delayedReschedule(mediaPlaylistReloadDelay),
   };
 
-  return createComposition([...hlsVideoEngineBehaviors], {
+  return createComposition([...behaviors], {
     config: finalConfig,
     // Seed bandwidthState so switchVideoTrack fires on initial subscribe
     // with the `initialBandwidth` fallback rather than waiting for the
