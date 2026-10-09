@@ -8,6 +8,10 @@ import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/c
 import { fetchResolvable as defaultFetchResolvable, getResponseText } from '../../network/fetch';
 
 export interface PresentationState {
+  /**
+   * The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates
+   * the rest.
+   */
   presentation?: MaybeResolvedPresentation;
   preload?: 'auto' | 'metadata' | 'none' | undefined;
   /** True once a preload-overriding event has fired for the current source — enables resolution regardless of preload. */

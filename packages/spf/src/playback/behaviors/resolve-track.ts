@@ -87,7 +87,10 @@ interface TrackResolutionConfig<K extends SelectedTrackKey> {
 
 /** Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. */
 export interface ResolveTrackConfig {
-  /** CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. */
+  /**
+   * CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See
+   * `TrackSwitchingSharedConfig['getCdnId']`.
+   */
   getCdnId?: GetCdnId;
   /** First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. */
   gateFirstParse?: GateFirstParse;
