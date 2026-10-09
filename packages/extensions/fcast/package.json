@@ -2,7 +2,12 @@
   "name": "@videojs/fcast",
   "version": "10.0.1",
   "description": "FCast sender integration for Video.js",
-  "keywords": ["cast", "fcast", "media", "videojs"],
+  "keywords": [
+    "cast",
+    "fcast",
+    "media",
+    "videojs"
+  ],
   "homepage": "https://videojs.org",
   "license": "Apache-2.0",
   "repository": {
