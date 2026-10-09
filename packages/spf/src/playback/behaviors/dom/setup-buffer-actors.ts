@@ -223,6 +223,7 @@ export const setupVideoBufferActors = defineBehavior({
     };
     context: BufferActorsContextMap<'videoBufferActor', 'videoSegmentLoaderActor'>;
     config?: SegmentLoaderActorConfig & {
+      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
       getCdnId?: GetCdnId;
       /** The `credentials` mode segment requests are made with; absent → the platform default. */
       requestCredentials?: RequestCredentialsPolicy;
@@ -285,6 +286,7 @@ export const setupAudioBufferActors = defineBehavior({
     state: BufferActorsStateMap<'selectedAudioTrackId'>;
     context: BufferActorsContextMap<'audioBufferActor', 'audioSegmentLoaderActor'>;
     config?: SegmentLoaderActorConfig & {
+      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
       getCdnId?: GetCdnId;
       /** The `credentials` mode segment requests are made with; absent → the platform default. */
       requestCredentials?: RequestCredentialsPolicy;

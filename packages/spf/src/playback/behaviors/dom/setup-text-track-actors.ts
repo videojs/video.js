@@ -18,6 +18,10 @@ export interface TextTrackActorsContext {
 }
 
 export interface TextTrackActorsConfig extends Pick<TextTrackSegmentLoaderActorConfig<VTTCue>, 'forwardBuffer'> {
+  /**
+   * Resolver that turns a text-track segment fetch into VTT cues. `textTracksFeature` supplies the DOM-bound
+   * `resolveVttSegment` resolver, which uses an offscreen `<track>` element to parse WebVTT.
+   */
   resolveTextTrackSegment: TextTrackSegmentResolver<VTTCue>;
   /**
    * Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to

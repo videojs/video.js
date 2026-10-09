@@ -19,6 +19,11 @@ const DEFAULT_FAILOVER_MONITOR_CONFIG: FailoverMonitorConfig = {
 
 export interface SetupFailoverMonitorState {
   presentation?: MaybeResolvedPresentation;
+  /**
+   * CDN ids (origins) currently in failover cooldown — read by `track-switching`'s `excludeFailedCdns` hard constraint,
+   * which prunes their tracks so the active-CDN scope falls to the next CDN in `cdnPriority`. Empty / absent means all
+   * CDNs are eligible.
+   */
   failedCdns?: string[];
 }
 

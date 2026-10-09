@@ -6,6 +6,12 @@ import { getCdnId as defaultGetCdnId, type GetCdnId, getOrderedCdnIds } from '..
 
 export interface DeriveCdnPriorityState {
   presentation?: MaybeResolvedPresentation;
+  /**
+   * The CDNs the source is served from (track-URL origins), in manifest priority order — most-preferred first (mirrors
+   * HLS content steering's `PATHWAY-PRIORITY`). Owned by `deriveCdnPriority`, read by `track-switching`'s
+   * `preferActiveCdn` scope, which narrows to the highest-priority CDN with surviving tracks so video / audio / text
+   * stay on one host. Only meaningful for redundant-stream sources; a single-CDN source has one entry.
+   */
   cdnPriority?: string[];
 }
 
@@ -46,6 +52,7 @@ export const deriveCdnPriority = defineBehavior({
       presentation: ReadonlySignal<DeriveCdnPriorityState['presentation']>;
       cdnPriority: Signal<DeriveCdnPriorityState['cdnPriority']>;
     };
+    /** `getCdnId`: see `TrackSwitchingSharedConfig['getCdnId']`. */
     config?: { getCdnId?: GetCdnId };
   }) => {
     const getCdnId = config.getCdnId ?? defaultGetCdnId;
