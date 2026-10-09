@@ -341,12 +341,14 @@
   },
   "scripts": {
     "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
-    "test": "vp test run",
-    "test:watch": "vp test",
     "clean": "rimraf --glob dist types '*.tsbuildinfo' 'src/**/*.tsbuildinfo'",
+    "dev": "pnpm run build:watch",
+    "docs:reference": "tsx scripts/build-reference.ts",
+    "docs:reference:check": "tsx scripts/build-reference.ts --check",
     "size": "node scripts/measure-size.js --hls",
-    "size:all": "node scripts/measure-size.js --all"
+    "size:all": "node scripts/measure-size.js --all",
+    "test": "vp test run",
+    "test:watch": "vp test"
   },
   "dependencies": {
     "@videojs/media": "workspace:*",
@@ -357,6 +359,7 @@
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "playwright": "^1.59.1",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   }
