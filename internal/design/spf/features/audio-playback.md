@@ -45,10 +45,12 @@ Capability slices around today's audio playback contract.
 - **Multi-rendition recognition + programmatic selection + mid-stream
   switching** — covered by
   [`multi-language-audio`](./multi-language-audio.md) (partial, sketched —
-  Tier 1 + most of Tier 2 implemented). Default selection now uses
-  `pickAudioTrack`'s three-tier picker (`preferredAudioLanguage` →
-  `DEFAULT=YES` → first-track), so `preferredAudioLanguage` config
-  takes effect. Tier 2 programmatic selection via
+  Tier 1 + most of Tier 2 implemented). Default selection in the HLS
+  engines is track switching's rule chain, which applies no preferred
+  language or `DEFAULT=YES` tier (dropped in #1658); a consumer sets
+  `userAudioTrackSelection: { language }` for the same preference.
+  `preferredAudioLanguage` is read only by `selectAudioTrack`'s policy and
+  is not an HLS engine config option. Tier 2 programmatic selection via
   `userAudioTrackSelection` filter and same-codec mid-stream switching
   with next-segment-boundary flush also implemented. Persistence and
   A/V sync policy refinements deferred.
@@ -137,9 +139,8 @@ renditions from `#EXT-X-MEDIA:TYPE=AUDIO` lines.
 
 ```ts
 {
-  preferredAudioLanguage?: string;   // Exposed but inert with the
-                                      // default picker; see What's
-                                      // not implemented
+  // None at the engine level: preferred-language selection goes
+  // through `userAudioTrackSelection` state.
 }
 ```
 

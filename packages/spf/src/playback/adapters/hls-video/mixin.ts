@@ -5,7 +5,13 @@ import type { Constructor, MixinReturn } from '@videojs/utils/types';
 import type { Composition } from '../../../core/composition/create-composition';
 import { effect } from '../../../core/signals/effect';
 import { DEFAULT_KEY_SYSTEMS } from '../../../media/dom/key-systems';
-import { type DrmSystemsConfig, type KeySystemModule, sourceDrmSystems } from '../../../media/drm';
+import {
+  type DrmSystemsConfig,
+  type DrmSystemsConfigFor,
+  type KeySystemId,
+  type KeySystemModule,
+  sourceDrmSystems,
+} from '../../../media/drm';
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
@@ -77,14 +83,17 @@ export type HlsVideoAdapterOptions =
        * `source.drm`, so an entry here names a server the source does not. With no `keySystems`, `drm` is keyed by the
        * default systems' ids.
        */
-      config?: EngineConfig;
+      config?: Omit<EngineConfig, 'drm' | 'keySystems'> & {
+        drm?: DrmSystemsConfigFor<KeySystemId<typeof DEFAULT_KEY_SYSTEMS>>;
+        keySystems?: undefined;
+      };
     }
   | {
       /**
        * The same, with `keySystems` narrowed. A constructor cannot be generic per call the way `createEngine` is, so
        * `drm` is keyed by any id here; the engine still negotiates only what `keySystems` composes.
        */
-      config: EngineConfig<readonly KeySystemModule[]> & { keySystems: readonly KeySystemModule[] };
+      config: EngineConfig & { keySystems: readonly KeySystemModule[] };
     };
 
 export interface HlsVideoAdapterProps {
@@ -197,7 +206,7 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     readonly #engine: Composition<EngineState, EngineContext>;
-    #config: EngineConfig<readonly KeySystemModule[]>;
+    #config: EngineConfig;
     #preload: '' | 'none' | 'metadata' | 'auto' = HlsVideoImpl.defaultProps.preload;
     #crossOrigin: MediaCrossOriginType | null = toMediaCrossOrigin(HlsVideoImpl.defaultProps.crossOrigin);
     #disableRemotePlayback: boolean = HlsVideoImpl.defaultProps.disableRemotePlayback;

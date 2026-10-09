@@ -25,7 +25,7 @@ The audit prompt during refactor: "If an engine wanted to swap this value, would
 
 ## Engine config as the single source of truth
 
-Tunables come from one place: the engine config object passed to `createComposition({ config })`. The composition framework distributes the same config to every behavior; each variant reads its slice.
+Tunables come from one place: the engine config passed to `createComposition`, as `config` over the engine's exported `defaultConfig`. The composition framework distributes the same config to every behavior; each variant reads its slice.
 
 ```ts
 const engine = createEngine({ // from '@videojs/spf/hls/video'
@@ -53,10 +53,11 @@ Worked example: `bufferDuration` is used by the load-segments dispatcher (for `r
 
 ## Nested sub-configs at the engine layer
 
-Engine config groups domain-related tunables under sub-configs that reuse the lower-layer `*Config` types:
+Behavior config types group domain-related tunables under sub-configs that reuse the lower-layer `*Config` types, and an engine's `EngineConfig` is the intersection of its behaviors' config types, so the engine surface shows the same grouping. For example, across the HLS video engine's behaviors:
 
 ```ts
-interface EngineConfig {
+// Combined from `SwitchVideoTrackConfig`, `SegmentLoaderActorConfig`, `TextTrackActorsConfig`, …
+{
   // Sub-configs reuse the canonical types from their owning module
   bandwidth?: Partial<BandwidthConfig>;        // network/bandwidth-estimator
   quality?: Partial<QualityConfig>;            // media/abr/quality-selection

@@ -310,7 +310,10 @@ describe('selectVideoTrack — capability constraint + verdict', () => {
     let pruneEncrypted = false;
     const reactor = selectVideoTrack.setup({
       state,
-      config: { canPlayTrack: (track: { id?: string }) => !(pruneEncrypted && track.id === 'video-encrypted') },
+      config: {
+        // SAFETY: the probe is handed the whole track; `CanPlayTrack` names only the fields real probes read.
+        canPlayTrack: (track) => !(pruneEncrypted && (track as { id?: string }).id === 'video-encrypted'),
+      },
     });
 
     await new Promise((resolve) => setTimeout(resolve, 50));

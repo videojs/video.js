@@ -109,8 +109,10 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   init-data projection, and license-message shaping. `config.keySystems`
   narrows the list; dropping `playReadyKeySystem` removes its PSSH wrap,
   its XML envelope unwrap, and `DOMParser` from the bundle. Each shipped
-  module carries its id as a literal type, and the `hls/video` engine's `EngineConfig` keys
-  `drm` by the composed ids, so a config entry no module claims is a type
+  module carries its id as a literal type, and the DRM behaviors type
+  `drm` as `NegotiableDrmSystemsConfig`, a `KeyedBy` record that
+  `createComposition` (and each engine's `createEngine`) checks against
+  the composed `keySystems`, so a config entry no module claims is a type
   error (it replaced a dev-only runtime warning). Replaces six
   string-keyed lookup tables that previously split one system's facts
   across the DOM boundary.
