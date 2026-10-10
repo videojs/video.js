@@ -86,19 +86,13 @@ export {
 // `@videojs/spf/hls-background-video` so that driving an engine directly doesn't pull
 // a Media (and `@videojs/media`) in with it — and so this entry stays the
 // engines' own size budget.
-export type { HlsVideoEngineConfig, HlsVideoEngineContext, HlsVideoEngineSignals, HlsVideoEngineState } from './engine';
+export type { HlsVideoEngineConfig, HlsVideoEngineContext, HlsVideoEngineState } from './engine';
 export { createHlsVideoEngine } from './engine';
-export type {
-  HlsAudioEngineConfig,
-  HlsAudioEngineContext,
-  HlsAudioEngineSignals,
-  HlsAudioEngineState,
-} from './engine-audio-only';
+export type { HlsAudioEngineConfig, HlsAudioEngineContext, HlsAudioEngineState } from './engine-audio-only';
 export { createHlsAudioEngine } from './engine-audio-only';
 export type {
   BackgroundVideoEngineConfig,
   BackgroundVideoEngineContext,
-  BackgroundVideoEngineSignals,
   BackgroundVideoEngineState,
 } from './engine-background-video';
 export { createBackgroundVideoEngine } from './engine-background-video';

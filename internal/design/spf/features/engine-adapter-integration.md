@@ -6,19 +6,19 @@ definition: sketched
 
 # Engine-adapter integration
 
-The engine's external-driving contract: `shareSignals` exposes the
-composition's writable + readonly signal refs to a consumer callback at
-setup time, and `HlsVideoMixin` is the canonical adapter that
-maps a WHATWG HTMLMediaElement-shaped API onto those refs. The
+The engine's external-driving contract: the composition an engine
+returns exposes its `state` and `context` signal maps, `defineExternalSignals`
+declares the external signals, keys the adapter writes but no behavior declares, and
+`HlsVideoMixin` is the canonical adapter that maps a WHATWG
+HTMLMediaElement-shaped API onto those signals. The
 *audience* for this feature is adapter authors and contributors who
 need to drive the engine from outside — not end users, who see the
 adapter's API only through whatever wraps it (e.g., the
 `HlsVideoAdapter` class, or the custom elements built on it).
 
-The feature ships as a *pair*: the framework-level `shareSignals`
-mechanism + the canonical mixin. New adapter shapes (React hooks, RN
-bridges, etc.) would compose on top of `shareSignals` independently of
-the mixin.
+The feature ships as a *pair*: the engine's returned signals + the
+canonical mixin. New adapter shapes (React hooks, RN bridges, etc.)
+would drive those signals independently of the mixin.
 
 **Both halves live in `@videojs/spf`, and the Media is the package's
 public playback API.** SPF is unlike hls.js or dash.js in that it
@@ -40,9 +40,8 @@ as the engine's own size budget: splitting the adapters out took it from
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD); `shareSignals`
-  composed last so other behaviors' setups have run by the time the
-  callback fires
+- **Composition:** `createHlsVideoEngine` (HLS VoD); external signals
+  declared with `defineExternalSignals`, the last entry in the behavior list
 - **Definition depth:** sketched — capability surface and the
   adapter-rationale open question both documented
 
@@ -50,8 +49,8 @@ as the engine's own size budget: splitting the adapters out took it from
 
 | Phase | What | Notes |
 |---|---|---|
-| Writable signal refs via `onSignalsReady` | `shareSignals` captures `Signal<T>` / `ReadonlySignal<T>` refs into a consumer-supplied callback at setup time. Generic over composition shape (`makeShareSignals<S, C>()`) | Per-slot read/write intent is expressed at the use site (callers type captured refs as `Signal<T>` or `ReadonlySignal<T>`). Composed last in the engine so initial state writes are visible to the consumer |
-| Mixin adapter pattern | `HlsVideoMixin` is the canonical consumer: function-of-base-class structure (mix into any base), captures refs once in `onSignalsReady`, exposes a WHATWG HTMLMediaElement-shaped API mapping each setter/method to engine writes | Downstream use: `class HlsVideoAdapter extends HlsVideoMixin(HTMLVideoAdapter) {}` in `packages/spf/src/playback/adapters/hls-video/` |
+| Engine signals on the returned composition | `createComposition` returns the same `state` / `context` signal maps every behavior receives, and the engine returns that composition. `defineExternalSignals<ExternalState>()({ state })` declares the external signals (`user*TrackSelection`, `disableRemotePlayback`) | Read/write intent is expressed at the use site. Previously a `shareSignals` behavior, composed last, handed these same signal objects to an `onSignalsReady` callback |
+| Mixin adapter pattern | `HlsVideoMixin` is the canonical consumer: function-of-base-class structure (mix into any base), holds the engine and drives its `state` / `context`, exposes a WHATWG HTMLMediaElement-shaped API mapping each setter/method to engine writes | Downstream use: `class HlsVideoAdapter extends HlsVideoMixin(HTMLVideoAdapter) {}` in `packages/spf/src/playback/adapters/hls-video/` |
 | Media element binding | `attach(el)` writes `context.mediaElement`; `detach()` clears it. **Engine persists across attach/detach cycles** — only `src` reassignment or explicit `destroy()` tears it down | Re-attach to a different element is supported. The engine is the durable state holder; `mediaElement` is a context slot |
 | Source assignment via in-place recycling | Adapter's `set src` overwrites `state.presentation` on its single recycled engine (`{ url }`, or `undefined` for empty src). Media element + engine-wide preload persist; no engine recreation, no signal re-capture | Drives the engine's in-place source-replacement cascade — see [source-replacement.md](./source-replacement.md). (The adapter previously destroyed + recreated the engine per assignment.) |
 | Preload reflection | `set preload(value)` writes W3C values to `state.preload`; clearing (`preload = ''`) doesn't patch the current engine but is re-applied on the next src change. Pre-attach src + preload combinations are supported | Extended preload values flow through state but don't reach the DOM (per [`preload-modes`](./preload-modes.md)'s sticky-extended-values semantics) |
@@ -59,21 +58,21 @@ as the engine's own size budget: splitting the adapters out took it from
 
 ## What's not implemented
 
-- **Reactive change-notification surface** — `onSignalsReady` fires
-  once at setup. Consumers wanting to react to state changes from
-  outside the engine must keep refs and subscribe via SPF primitives
-  (`effect()`, signal `subscribe()`). The adapter doesn't expose
+- **Reactive change-notification surface** — the engine exposes
+  signals, not events. Consumers wanting to react to state changes from
+  outside the engine subscribe via SPF primitives (`effect()`, signal
+  `subscribe()`). The adapter doesn't expose
   curated `onPlay` / `onSrcChange` / `onError` callbacks.
 - **Multiple engine instances per adapter** — one engine per adapter
   instance. No built-in pattern for multi-engine scenarios
   (picture-in-picture with two streams, A/B testing).
 - **Non-HTMLMediaElement adapter shapes** — React-friendly hooks,
-  React Native bridges, etc. would compose on top of `shareSignals`
+  React Native bridges, etc. would drive the engine's signals
   independently. Today the canonical adapter is HTMLMediaElement-
   shaped via the mixin. No bracketed candidate features tracked yet;
   add when concrete need surfaces.
 - **Curated state / error introspection** — consumers can read
-  `signals.state.*.get()` directly, but there's no adapter-level
+  `engine.state.*.get()` directly, but there's no adapter-level
   "current playback state" / "current error" shape that doesn't
   require knowing the engine's signal map. The error half is owned by
   [errors](./errors.md) (its phase 4 adds the `error` / `MediaError`
@@ -82,35 +81,38 @@ as the engine's own size budget: splitting the adapters out took it from
 ## Implementation surface
 
 **Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
-`shareSignals` is the last behavior in the composition. Instantiated
-once at module load:
+the behaviors are listed once at module level, ending with the consumer
+inputs, and the engine's state and context types are derived from that
+list:
 
 ```ts
-const shareSignals = makeShareSignals<HlsVideoEngineState, HlsVideoEngineContext>();
+const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
+  state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
+});
+
+const hlsVideoEngineBehaviors = [
+  // ... all other behaviors ...
+  hlsVideoEngineExternalSignals,
+] as const;
+
+export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
 
 // ...
 
-return createComposition(
-  [
-    // ... all other behaviors ...
-    shareSignals,
-  ],
-  { config, initialState }
-);
+return createComposition([...hlsVideoEngineBehaviors], { config, initialState });
 ```
 
 **Behavior factory:**
 
 | Export | File | Role |
 |---|---|---|
-| `makeShareSignals<S, C>()` | `packages/spf/src/core/composition/share-signals.ts` | Generic behavior factory. Returns a `Behavior<StateSignals<S>, ContextSignals<C>, ShareSignalsConfig<S, C>>` whose setup invokes `config.onSignalsReady?.({ state, context })` |
-| `ShareSignalsConfig<S, C>` | same | Config interface carrying the `onSignalsReady` callback |
+| `defineExternalSignals<ExternalState, ExternalContext>()({ state, context })` | `packages/spf/src/core/composition/define-external-signals.ts` | Generic behavior factory. Declares the external state and context keys, checked complete against the two shapes; its setup does nothing |
 
 **Canonical adapter:**
 
 | Export | File | Role |
 |---|---|---|
-| `HlsVideoMixin<Base>` | `packages/spf/src/playback/adapters/hls-video/mixin.ts` | Function-of-base-class mixin. Captures refs in `onSignalsReady`, exposes WHATWG HTMLMediaElement-shaped API |
+| `HlsVideoMixin<Base>` | `packages/spf/src/playback/adapters/hls-video/mixin.ts` | Function-of-base-class mixin. Holds the engine and drives its `state` / `context`; exposes WHATWG HTMLMediaElement-shaped API |
 | `HlsVideoAdapterCore` | same | Standalone subclass: `HlsVideoMixin(class {})`. Bare-bones reference instance |
 | `HlsVideoAdapterProps` / `HlsVideoAdapterAPI` | same | The adapter's public-facing shape |
 
@@ -136,19 +138,8 @@ expects an HTMLMediaElement-shaped object backed by SPF.
 
 ## Config surface
 
-```ts
-// ShareSignalsConfig<S, C>
-{
-  onSignalsReady?: (signals: {
-    state: StateSignals<S>;
-    context: ContextSignals<C>;
-  }) => void;
-}
-```
-
-The HLS engine config (`HlsVideoEngineConfig`) extends
-`ShareSignalsConfig<HlsVideoEngineState, HlsVideoEngineContext>`, so
-`onSignalsReady` is part of the engine's config surface.
+The engine config (`HlsVideoEngineConfig`) carries only what its
+behaviors read; there is no callback.
 
 `HlsVideoMixin`'s constructor takes optional `config` and threads
 it through to every engine instance (including the ones created on
@@ -165,8 +156,8 @@ each `set src`).
   - `packages/spf/src/playback/engines/hls/tests/engine.test.ts`
     → "allows patching state and owners from outside" — direct
     engine-level write surface (bypasses the mixin)
-  - `packages/spf/src/core/composition/tests/share-signals.test.ts`
-    — the behavior itself
+  - `packages/spf/src/core/composition/tests/define-external-signals.test.ts`
+    — the inputs behavior itself
 - **Downstream usage:**
   - `packages/spf/src/playback/adapters/hls-video/adapter.ts` —
     `HlsVideoAdapter` consumer
@@ -185,11 +176,10 @@ each `set src`).
   wire once at construction rather than re-wiring on every src change.
   It also makes source-change behavior stable enough to build the
   media-tracks mixin integration on top of.
-- **Callback timing semantics.** `shareSignals`'s JSDoc explicitly
-  notes the callback fires while other behaviors are still in setup;
-  reads inside the callback may yield only initial-seed values. The
-  documented use is "capture refs, use later." Is read-at-setup-time
-  ever a supported case, or always discouraged?
+- **Callback timing semantics.** Resolved by removal: the
+  `onSignalsReady` callback handed out the same signal objects
+  `createComposition` returns, so adapters read the returned
+  composition and no setup-time timing question remains.
 - **Mixin base-class genericity.** `HlsVideoMixin<Base extends Constructor<any>>`
   accepts any base; today's only documented consumer is
   `HTMLVideoAdapter`. Other bases are structurally allowed but
@@ -223,20 +213,19 @@ each `set src`).
   alternative adapter shape. The variant ships an independent
   `HlsAudioAdapterCore` adapter (via
   `HlsAudioMixin`) parallel to `HlsVideoAdapterCore`;
-  the `shareSignals` mechanism + mixin pattern compose unchanged. The
+  the mixin pattern composes unchanged. The
   consumer-facing API matches the WHATWG `HTMLMediaElement` surface.
 - **[`video-only-mode-override`](../use-cases/video-only-mode-override.md)**
   *(coarse)* — Phase 1 baseline constituent on the inverse axis.
   Ships an independent `SimpleVideoOnlyHlsMediaElement`-style
-  adapter parallel to `HlsVideoAdapterCore`. Same `shareSignals`
-  pattern; consumer-facing API differs from both default and
+  adapter parallel to `HlsVideoAdapterCore`. Same pattern; consumer-facing API differs from both default and
   audio-only-mode-override.
 
 ## See also
 
 - [clusters.md § Engine lifecycle](./clusters.md#engine-lifecycle)
 - [packages/spf/docs/hls-engine.md § Stage 10](../../../../packages/spf/docs/hls-engine.md)
-  — `shareSignals` and the adapter pattern walkthrough
+  — the adapter pattern walkthrough
 - [conventions/signals.md](../conventions/signals.md) — per-slot
   `Signal<T>` / `ReadonlySignal<T>` intent (relevant for how consumers
   type captured refs at the use site)

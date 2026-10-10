@@ -115,7 +115,7 @@ The sniffs below map to those answers. The fourth bucket is the most easily mist
 
 - Setup body grows past ~50 lines of imperative effect code. Almost always a Reactor or Actor wants to live underneath.
 - The behavior creates a resource (SourceBuffer, MediaSource, fetch reader) that has its own lifecycle and needs disposing in cleanup. Move resource ownership to an Actor whose lifecycle the behavior orchestrates.
-- The behavior captures **long-lived references** it didn't get from context. Those references want to be in context, written by another behavior or via `shareSignals`. A behavior that creates *and stashes* a reference is doing two jobs.
+- The behavior captures **long-lived references** it didn't get from context. Those references want to be in context, written by another behavior or from outside the composition. A behavior that creates *and stashes* a reference is doing two jobs.
 - Body branches on `config.type` at runtime. Split into per-type specializations (see [Per-type specialization](#per-type-specialization)).
 
 ### Sniffs that say "fight the shape"
@@ -394,7 +394,7 @@ export const syncPreload = defineBehavior({
 });
 ```
 
-The narrow exception is `makeShareSignals` (and any future zero-key behavior factory): empty key arrays trip the `defineBehavior` exhaustiveness check, so a `Behavior<>` literal is correct there. If you find yourself reaching for the literal form for any other reason, pause — there's probably a missing key declaration.
+The narrow exception is `defineExternalSignals` (and any similar generic behavior factory): `defineBehavior`'s exhaustiveness check only resolves on concrete types, so a factory generic over its keys checks them on its own parameter and returns a `Behavior<>` literal. If you find yourself reaching for the literal form for any other reason, pause — there's probably a missing key declaration.
 
 ### Setup-param typing (read/write intent)
 
@@ -720,13 +720,13 @@ For helpers that don't dispatch typed messages — `setupTrackResolution`, `setu
 
 ### Behavior factory
 
-A function that *returns* a Behavior, parameterized by the type/keys/config the caller cares about. The product is a Behavior; the factory captures the parameterization. `makeShareSignals<S, C>()` is the canonical example.
+A function that *returns* a Behavior, parameterized by the type/keys/config the caller cares about. The product is a Behavior; the factory captures the parameterization. `defineExternalSignals<ExternalState, ExternalContext>()` is the canonical example.
 
 When to use a behavior factory:
 
 - The same Behavior shape applies to multiple keys, and you want the lightest call sites — each export is a single-line factory invocation, no `defineBehavior` boilerplate per export.
 - A Behavior is parameterized by something that varies *across compositions but is fixed within one* — pass it via factory args rather than via runtime `config`, so each composition gets a Behavior with the parameterization baked in (and dead branches drop out).
-- The `stateKeys`/`contextKeys` themselves are parameterized in a way the factory can express but a setup-shape helper can't (e.g. `makeShareSignals` declares zero keys regardless of `S`/`C`).
+- The `stateKeys`/`contextKeys` themselves are parameterized in a way the factory can express but a setup-shape helper can't (e.g. `defineExternalSignals` declares exactly the keys of `ExternalState` / `ExternalContext`, checked where it is called).
 
 When **not** to use a behavior factory:
 
@@ -789,7 +789,7 @@ Per-export JSDoc (already conventional) describes individual exports; the file-l
 - Behaviors are named as **descriptive verbs**: `syncPreload`, `selectVideoTrack`, `loadVideoSegments`, `endOfStream`. No `*Behavior` suffix.
 - Files match the exported name in kebab-case: `sync-preload.ts` exports `syncPreload`.
 - Per-type specializations co-locate in one module: `select-tracks.ts` exports `selectVideoTrack` / `selectAudioTrack`; `track-switching.ts` exports `switchVideoTrack` / `switchAudioTrack` / `switchTextTrack`.
-- Behavior factories are named `make*`: `makeShareSignals`. The factory's product is a Behavior; the prefix distinguishes the factory from a Behavior export.
+- Behavior factories that produce a behavior from a declarative spec are named `define*`, as `defineBehavior` and `defineExternalSignals` are. The factory's product is a Behavior; the prefix distinguishes the factory from a Behavior export.
 - Setup-shape helpers are named `setup*`: `setupTrackResolution`. The shape is a `Behavior.setup`-style function called from inside a per-type behavior's setup.
 - **Name by the unit-of-work this behavior triggers, not by its downstream observable.** When per-type-specialized behaviors exist (video / audio / text), the names must match the work they share — sibling consistency is load-bearing. `loadVideoSegments` triggers segment fetches; segments produce frames downstream, but we don't call it `loadVideoFrames`. Same for audio (`loadAudioSegments`, not `loadAudioSamples`) and text (`loadTextTrackSegments`, not `loadTextTrackCues`). A name that breaks the sibling pattern is a sniff that the author was thinking about a different layer than the convention assumes.
 - **Domain-prefix slot / context keys when a same-shape sibling can exist** in the engine's composition. `segmentLoaderActor` reads as generic when there's only one in scope, but the moment a sibling appears — text-track segment loader, audio segment loader — the unqualified name becomes ambiguous. Prefer `videoSegmentLoaderActor` / `textTrackSegmentLoaderActor` even if only one exists today; the rename later is non-trivial because the slot leaks through behavior signatures and engine state types.
@@ -808,10 +808,10 @@ When a Behavior is augmented with an Actor, the Actor's own tests live in `playb
 
 ## Anti-patterns
 
-- **Building behavior objects without `defineBehavior`** outside the `makeShareSignals` exception. Drops the exhaustiveness check and lets `stateKeys` / body drift.
+- **Building behavior objects without `defineBehavior`** outside the generic-factory exception (`defineExternalSignals`). Drops the exhaustiveness check and lets `stateKeys` / body drift.
 - **Typing setup deps against the full state/context shape** instead of `Pick`'d slices. Hides the read/write contract; makes wide-to-narrow casts necessary inside the body.
 - **Runtime `config.type` discriminants** for per-media-type behaviors. Costs all three of A/C/E for a small body-reuse gain.
-- **Behaviors that mutate slots they didn't declare** in `stateKeys` / `contextKeys`. The type system stops most of this, but mutating a slot via a captured ref obtained from `shareSignals`-style channels can still slip past — convention: write to your own declared slots only, even when a wider ref is in scope.
+- **Behaviors that mutate slots they didn't declare** in `stateKeys` / `contextKeys`. The type system stops most of this, but mutating a slot via a wider ref in scope (such as the composition's own `state` map) can still slip past — convention: write to your own declared slots only, even when a wider ref is in scope.
 - **Reaching for a Reactor or Actor when a simple behavior would do.** The dual of the augment-sniffs above. If the body is short, signal-only, and effect-shaped, leave it.
 - **Force-fitting a "no good fit" sniff into the closest existing primitive** to make the body look conventional. Hold the sniff visibly with a comment and surface the gap; a clean-looking force-fit hides the real signal.
 - **Declaring "no good fit yet" without naming what you considered.** The factory inventory has grown; what looked like a gap a year ago may have a real primitive now. Name the candidates you ruled out and why before flagging a missing primitive.

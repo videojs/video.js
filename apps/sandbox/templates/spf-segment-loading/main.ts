@@ -10,7 +10,7 @@ import '@app/styles.css';
 //   preload=auto|metadata|none  Initial preload mode
 import { SOURCE_IDS, SOURCES } from '@app/shared/sources';
 import { effect, snapshot } from '@videojs/spf';
-import type { HlsVideoEngineSignals, HlsVideoEngineState } from '@videojs/spf/hls';
+import type { HlsVideoEngineState } from '@videojs/spf/hls';
 import { createHlsVideoEngine, getMediaPlaylistMetadata } from '@videojs/spf/hls';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
@@ -259,7 +259,7 @@ function updateThroughputDisplay() {
 let videoTrackSetKey = '';
 
 function renderRenditionPicker() {
-  if (!engine || !signals) return;
+  if (!engine) return;
 
   const presentation = engine.state.presentation.get();
   const selectedVideoTrackId = engine.state.selectedVideoTrackId.get();
@@ -359,7 +359,7 @@ function buildVideoTrackButtons(groups: VideoSelectionGroup[]) {
         : (group.members[0] ?? group.key);
     btn.addEventListener('click', () => {
       log(`Manual rendition select: ${JSON.stringify(group.filter)} (ABR disabled)`, 'warning');
-      signals.state.userVideoTrackSelection.set(group.filter);
+      engine.state.userVideoTrackSelection.set(group.filter);
     });
     renditionButtonsDiv.appendChild(btn);
   }
@@ -391,7 +391,7 @@ function updateVideoTrackSelection(
       enableBtn.textContent = 'Enable ABR';
       enableBtn.addEventListener('click', () => {
         log('ABR re-enabled', 'success');
-        signals.state.userVideoTrackSelection.set(undefined);
+        engine.state.userVideoTrackSelection.set(undefined);
       });
       statusRow.appendChild(enableBtn);
     }
@@ -419,7 +419,7 @@ function updateVideoTrackSelection(
 let audioTrackSetKey = '';
 
 function renderAudioTrackPicker() {
-  if (!engine || !signals) return;
+  if (!engine) return;
 
   const presentation = engine.state.presentation.get();
   const selectedAudioTrackId = engine.state.selectedAudioTrackId.get();
@@ -513,7 +513,7 @@ function buildAudioTrackButtons(groups: AudioSelectionGroup[]) {
         `Audio track filter: ${JSON.stringify(filter)} — mid-stream flush will fire if language differs from buffered`,
         'warning'
       );
-      signals.state.userAudioTrackSelection.set(filter);
+      engine.state.userAudioTrackSelection.set(filter);
     });
     audioTrackButtonsDiv.appendChild(btn);
   }
@@ -545,7 +545,7 @@ function updateAudioTrackSelection(
       clearBtn.textContent = 'Clear filter';
       clearBtn.addEventListener('click', () => {
         log('Cleared userAudioTrackSelection (back to default picker)', 'success');
-        signals!.state.userAudioTrackSelection.set(undefined);
+        engine.state.userAudioTrackSelection.set(undefined);
       });
       statusRow.appendChild(clearBtn);
     }
@@ -576,7 +576,7 @@ function updateAudioTrackSelection(
 // so it writes userTextTrackSelection=undefined directly — the programmatic
 // escape hatch. Highlighting reads the resolved selectedTextTrackId + intent.
 function renderTextTrackPicker() {
-  if (!engine || !signals) return;
+  if (!engine) return;
 
   const presentation = engine.state.presentation.get();
   const selectedTextTrackId = engine.state.selectedTextTrackId.get();
@@ -617,7 +617,7 @@ function renderTextTrackPicker() {
     resetBtn.textContent = 'Reset to auto';
     resetBtn.addEventListener('click', () => {
       log('Cleared userTextTrackSelection (back to default policy)', 'success');
-      signals!.state.userTextTrackSelection.set(undefined);
+      engine.state.userTextTrackSelection.set(undefined);
     });
     statusRow.appendChild(resetBtn);
   }
@@ -696,9 +696,9 @@ function renderResolutionStatus() {
 
 /** The selected timeline-bearing track (video ?? audio) from the live state. */
 function selectedTimelineTrack() {
-  if (!signals) return undefined;
+  if (!engine) return undefined;
 
-  const state = snapshot(signals.state);
+  const state = snapshot(engine.state);
   const trackId = state.selectedVideoTrackId ?? state.selectedAudioTrackId;
   if (!state.presentation?.selectionSets || !trackId) return undefined;
 
@@ -736,7 +736,7 @@ function liveEdgeTarget(): number | undefined {
  * both need reflecting even while nothing signal-shaped changes.
  */
 function updateLiveStatus() {
-  const streamType = signals ? snapshot(signals.state).presentation?.streamType : undefined;
+  const streamType = engine ? snapshot(engine.state).presentation?.streamType : undefined;
 
   if (streamType !== 'live') {
     liveStatusDiv.className = '';
@@ -837,7 +837,6 @@ log('=== SPF Segment Loading POC Test ===');
 log(`Stream: ${INITIAL_SRC}`);
 
 let engine: ReturnType<typeof createHlsVideoEngine>;
-let signals: HlsVideoEngineSignals;
 let cleanupEffects: () => void = () => {};
 
 function startEngine(src: string) {
@@ -845,14 +844,8 @@ function startEngine(src: string) {
 
   if (engine) engine.destroy();
 
-  engine = createHlsVideoEngine({
-    initialBandwidth: 1_000_000,
-    onSignalsReady: (refs) => {
-      signals = refs;
-    },
-  });
+  engine = createHlsVideoEngine({ initialBandwidth: 1_000_000 });
   (window as any).engine = engine;
-  (window as any).signals = signals;
   (window as any).state = () => snapshot(engine.state);
   (window as any).context = () => snapshot(engine.context);
 
@@ -988,7 +981,7 @@ function startEngine(src: string) {
   };
 
   log('✓ Engine created', 'success');
-  log('Exposed as window.engine / window.signals / window.state() / window.context()');
+  log('Exposed as window.engine / window.state() / window.context()');
   log('✓ Reactive effects active', 'success');
 
   // ── Wire media element ──────────────────────────────────────────────────────
@@ -996,8 +989,8 @@ function startEngine(src: string) {
   // effect picks up the user-selected value rather than the hardcoded "none"
   // from the HTML.
   video.preload = preloadSelect.value as 'auto' | 'metadata' | 'none';
-  signals.context.mediaElement.set(video);
-  signals.state.presentation.set({ url: src });
+  engine.context.mediaElement.set(video);
+  engine.state.presentation.set({ url: src });
 
   log('✓ Orchestration started', 'success');
 
@@ -1093,7 +1086,7 @@ loopToggle.addEventListener('change', () => {
 preloadSelect.addEventListener('change', () => {
   const value = preloadSelect.value as 'auto' | 'metadata' | 'none';
 
-  signals.state.preload.set(value);
+  engine.state.preload.set(value);
   log(`Preload: ${value}`);
   updateShareUrl();
 });

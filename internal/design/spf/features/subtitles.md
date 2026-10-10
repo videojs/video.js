@@ -25,7 +25,7 @@ What's implemented today, organized from base case to richer support. Each row i
 | Multi-language tracks | Any number of subtitle renditions surfaced from a multivariant playlist | `LANGUAGE`, `NAME`, `DEFAULT`, `AUTOSELECT`, `FORCED`, `URI` parsed from `#EXT-X-MEDIA:TYPE=SUBTITLES` |
 | Default selection | Auto (no user intent) runs the opt-in three-tier policy: `preferredSubtitleLanguage` → `DEFAULT=YES + AUTOSELECT=YES` → none | `switchTextTrack`'s terminal (`pickResolvedTextTrack` → `pickTextTrackFromTracks`) over the constrained, CDN-scoped candidates. Forced-only tracks excluded by default (Apple-spec); opt-in via `includeForcedTracks` |
 | User selection (DOM-driven) | Browser captions UI / host-page button → DOM `mode='showing'` → `userTextTrackSelection` intent → resolved into `selectedTextTrackId` | `change` listener on `mediaElement.textTracks` writes a language-based partial (or `'off'`); Chromium settling-window + echo guard (`showingId === selectedTextTrackId`) reject auto-pick / mirror echoes |
-| Programmatic selection | Consumer writes `state.userTextTrackSelection` (partial / `'off'`) via `onSignalsReady` | `switchTextTrack` resolves it; `syncTextTracks` mirrors the resolved id into DOM `mode`. (Was a direct `selectedTextTrackId` write.) |
+| Programmatic selection | Consumer writes `state.userTextTrackSelection` (partial / `'off'`) through the engine's `state` | `switchTextTrack` resolves it; `syncTextTracks` mirrors the resolved id into DOM `mode`. (Was a direct `selectedTextTrackId` write.) |
 | Constraint- & CDN-aware selection | Selection runs the track-switching chain: failed-CDN renditions pruned, narrowed to the active CDN | `[excludeFailedCdns]` + `[preferActiveCdn]`; re-resolves on failover. Sticky language / `'off'` intent persists across source changes |
 | Cue deduplication | Per-track cue cache in `TextTracksActor`; segment reloads don't double-add | Dedup by exact `(startTime, endTime, text)` match |
 | Preload-aware segment loading | FSM gates fetches: `'preconditions-unmet' → 'dormant' → 'metadata-only' → 'full-range'` driven by `preload` + `loadActivated` | `metadata-only` is a no-op for text (no init-segment concept) |
@@ -66,7 +66,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 **State slots:**
 
 - `selectedTextTrackId` — **single-writer output**, owned by `switchTextTrack` (cleared on src unload by its exit cleanup). Other behaviors only read it.
-- `userTextTrackSelection` — the user-intent **input**: `Partial<TextTrack>` (language-based) selects, `'off'` disables, `undefined` is auto. Written by `syncTextTracks` (DOM) and consumers (`shareSignals` / `onSignalsReady`); both are intent surfaces, so dual-write is last-write-wins by design. Materialized by `shareSignals`; **not** cleared on src unload (sticky preference, like `userAudioTrackSelection`).
+- `userTextTrackSelection` — the user-intent **input**: `Partial<TextTrack>` (language-based) selects, `'off'` disables, `undefined` is auto. Written by `syncTextTracks` (DOM) and consumers (through the engine's `state`); both are intent surfaces, so dual-write is last-write-wins by design. Declared with `defineExternalSignals`; **not** cleared on src unload (sticky preference, like `userAudioTrackSelection`).
 - `cdnPriority`, `failedCdns` — read by the chain (active-CDN scope + failed-CDN constraint).
 - `presentation`, `preload`, `loadActivated`, `currentTime` — read-only consumers.
 
