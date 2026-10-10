@@ -96,7 +96,10 @@ export class VolumeSliderElement extends UIElement {
         this.dispatchEvent(new CustomEvent('drag-end', { bubbles: true }));
       },
       adjustPercent: (raw, thumbSize, trackSize) => this.#core.adjustPercentForAlignment(raw, thumbSize, trackSize),
-      onResize: () => this.requestUpdate(),
+      // Only edge alignment depends on the slider's size.
+      onResize: () => {
+        if (this.thumbAlignment === 'edge') this.requestUpdate();
+      },
     });
 
     const wheelProps = createWheelStep({

@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { playerContext } from '../../../player/context';
 import { sliderContext } from '../../slider/context';
-import { measureSlider, pointer } from '../../slider/tests/support';
+import { measureSlider, pointer, stubResizeObserver } from '../../slider/tests/support';
 import { SliderThumbElement } from '../../slider/thumb';
 import { SliderValueElement } from '../../slider/value';
 import { UIElement } from '../../ui-element';
@@ -199,6 +199,31 @@ describe('TimeSliderElement', () => {
     }
 
     expect(play).toHaveBeenCalledOnce();
+  });
+
+  it('re-renders on resize only when thumb alignment is edge', async () => {
+    const { resize } = stubResizeObserver();
+
+    try {
+      const slider = createElement(TimeSliderElement);
+
+      document.body.appendChild(slider);
+      await slider.updateComplete;
+
+      const requestUpdate = vi.spyOn(slider, 'requestUpdate');
+
+      resize(slider);
+      expect(requestUpdate).not.toHaveBeenCalled();
+
+      slider.thumbAlignment = 'edge';
+      await slider.updateComplete;
+      requestUpdate.mockClear();
+
+      resize(slider);
+      expect(requestUpdate).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('sets touch-action and user-select styles on connect', async () => {
