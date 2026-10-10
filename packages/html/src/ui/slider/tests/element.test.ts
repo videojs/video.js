@@ -10,7 +10,7 @@ import { SliderElement } from '../element';
 import { SliderThumbElement } from '../thumb';
 import { SliderTrackElement } from '../track';
 import { SliderValueElement } from '../value';
-import { measureSlider, pointer } from './support';
+import { measureSlider, pointer, stubResizeObserver } from './support';
 
 // Unique tag names to avoid customElements.define collisions across tests.
 let tagCounter = 0;
@@ -231,6 +231,31 @@ describe('SliderElement', () => {
     slider.dispatchEvent(new PointerEvent('lostpointercapture', { bubbles: true, pointerId: 1 }));
 
     expect(provider.releaseControlsLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-renders on resize only when thumb alignment is edge', async () => {
+    const { resize } = stubResizeObserver();
+
+    try {
+      const slider = createElement(SliderElement);
+
+      document.body.appendChild(slider);
+      await slider.updateComplete;
+
+      const requestUpdate = vi.spyOn(slider, 'requestUpdate');
+
+      resize(slider);
+      expect(requestUpdate).not.toHaveBeenCalled();
+
+      slider.thumbAlignment = 'edge';
+      await slider.updateComplete;
+      requestUpdate.mockClear();
+
+      resize(slider);
+      expect(requestUpdate).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('supports vertical orientation', async () => {
