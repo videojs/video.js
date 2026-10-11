@@ -1266,7 +1266,7 @@ import '@videojs/html/media/hlsjs-video';
 </FrameworkCase>
 
 - **DVR comes from the stream.** `live:dvr` becomes `targetLiveWindow === Infinity`, which the media reports for event playlists. There's no way to force DVR on a sliding window. Add a time slider in skin source to let viewers seek.
-- **The live edge moved to the live button.** `liveEdge`, `userBehindLiveEdge`, and `seekToLiveEdge()` become the live button's state and behavior. It counts playback as live within 5 seconds of the stream's live edge start, which already sits behind the seekable end by the playlist's hold-back. Vidstack counted the last `liveEdgeTolerance` seconds before the seekable end, 10 by default and configurable ([#1730](https://github.com/videojs/v10/issues/1730)).
+- **The live edge moved to the live button.** `liveEdge`, `userBehindLiveEdge`, and `seekToLiveEdge()` become the live button's state and behavior. It counts playback as live within 5 seconds of the stream's live edge start, which already sits behind the seekable end by the engine's target latency (the playlist's hold-back by default). Vidstack counted the last `liveEdgeTolerance` seconds before the seekable end, 10 by default and configurable ([#1730](https://github.com/videojs/v10/issues/1730)).
 - **`streamType` needs a feature.** No preset includes `streamTypeFeature`; add it to a custom player when one player switches between live and on-demand UI.
 - **Live presets are narrower.** They leave out playback rate, quality, and audio-track state. Build a player from a feature list to add them back.
 
