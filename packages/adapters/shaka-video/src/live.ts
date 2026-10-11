@@ -96,7 +96,7 @@ export function ShakaLiveMixin<Base extends Constructor<ShakaEngineHost>>(BaseCl
         return;
       }
 
-      // The hls.js media reads the manifest's HOLD-BACK, falling back to the
+      // The native HLS media reads the manifest's HOLD-BACK, falling back to the
       // HLS spec's three target durations. Shaka resolves its own presentation
       // delay but does not expose it publicly — `getManifest()` warns on every
       // call that its shape is not covered by semver — so the same spec
