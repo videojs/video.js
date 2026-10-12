@@ -18,7 +18,7 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "echo 'Preview skins in the sandbox: pnpm dev:sandbox, then pick Authored source.' && vp run generate:watch",
+    "dev": "echo 'Preview skins in the sandbox: pnpm dev:sandbox, then pick Authored source.' && vp run --ignore-depends-on --no-cache generate:watch",
     "test": "pnpm run test:types && vp test run",
     "test:types": "tsgo --project ./src/tsconfig.json",
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"

@@ -164,8 +164,7 @@
     "access": "public"
   },
   "scripts": {
-    "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
+    "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "clean": "rimraf --glob dist docs types '*.tsbuildinfo'",
     "prepack": "node --import tsx ../../site/scripts/copy-package-docs.ts html"
