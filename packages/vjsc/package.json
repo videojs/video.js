@@ -96,6 +96,7 @@
     "magic-string": "^1.2.2",
     "oxc-parser": "0.146.0",
     "oxc-walker": "^1.1.1",
+    "piscina": "^5.3.2",
     "rolldown": "~1.2.5",
     "shadcn": "^4.16.2",
     "tailwindcss": "catalog:"

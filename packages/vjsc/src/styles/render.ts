@@ -11,6 +11,7 @@ import {
 import { cloneCssAst, collectRuleClasses, hasNestedCssRules, withoutNullValues } from './css-ast';
 import type { DesignSystem } from './design-system';
 import type { StyleOutputFile } from './output';
+import { renderPool } from './render-pool';
 import { replaceRuleClasses } from './selectors';
 import { collectTailwindDefaults, dedupeRuleDeclarations, inlinePrivateTailwindVariables } from './tailwind-values';
 
@@ -39,9 +40,18 @@ const renderedFiles = new WeakMap<DesignSystem, Map<string, Promise<string>>>();
 const RENDERED_FILE_LIMIT = 1024;
 
 export async function renderStylesheets(options: RenderStylesheetsOptions): Promise<Map<string, string>> {
+  // Files render independently, so a render pool can work on all of them at once. The map keeps their order, and a
+  // failure reports the earliest failed file in that order, as rendering them one by one would.
+  const rendered = await Promise.allSettled(
+    options.files.map((file) => renderStylesheet(options.design, options.scope, file))
+  );
   const files = new Map<string, string>();
 
-  for (const file of options.files) files.set(file.name, await renderStylesheet(options.design, options.scope, file));
+  for (const [index, result] of rendered.entries()) {
+    if (result.status === 'rejected') throw result.reason;
+
+    files.set(options.files[index]!.name, result.value);
+  }
 
   return files;
 }
@@ -91,9 +101,17 @@ async function renderUncachedStylesheet(
   const source = file.rules
     .map((rule) => `.${rule.className} {\n  ${ROOT_SENTINEL}: 0;\n  @apply ${rule.candidates.join(' ')};\n}`)
     .join('\n');
-  const analyzed = analyzeCompiledFile(await design.compileCss(source), file);
+  // Tailwind compiles on the main thread, which owns the design system and the dependencies it discovers.
+  const css = await design.compileCss(source);
+  const render = (): string => renderCompiledFile(css, scope, file);
+  const pool = renderPool();
 
-  return wrapFileCss(renderFile(analyzed, file), scope, file);
+  return pool ? pool.render({ css, scope, file }, render) : render();
+}
+
+/** Render one file's Tailwind output into its final CSS. Pure, so render workers can run it too. */
+export function renderCompiledFile(css: string, scope: string | undefined, file: StyleOutputFile): string {
+  return wrapFileCss(renderFile(analyzeCompiledFile(css, file), file), scope, file);
 }
 
 type StyleRuleNode = Extract<Rule, { type: 'style' }>;
