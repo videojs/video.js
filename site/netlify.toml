@@ -29,6 +29,17 @@
   status = 200
   force = true
 
+# Released players link here from inside the player; the page now lives at /help.
+[[redirects]]
+  from = "/about-this-player"
+  to = "/help"
+  status = 301
+
+[[redirects]]
+  from = "/about-this-player.md"
+  to = "/help.md"
+  status = 301
+
 # Netlify aliases -> videojs.org
 [[redirects]]
   from = "https://videojs.com/*"

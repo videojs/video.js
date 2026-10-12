@@ -15,6 +15,7 @@ const VIDEO_SKINS: CardRadioOption<Skin>[] = [
   option('video', 'Default', 'Complete controls with a modern, frosted look'),
   option('neutral-video', 'Neutral', 'The same controls with clean, solid surfaces'),
   option('compat-video', 'Compat', 'Basic controls for the widest browser support'),
+  option('scaffold-video', 'Scaffold', 'A wireframe starting point for your own skin'),
   option('none', 'No skin', 'Bring your own UI built from the components'),
 ];
 
@@ -22,6 +23,7 @@ const AUDIO_SKINS: CardRadioOption<Skin>[] = [
   option('audio', 'Default', 'Complete controls with a modern, frosted look'),
   option('neutral-audio', 'Neutral', 'The same controls with clean, solid surfaces'),
   option('compat-audio', 'Compat', 'Basic controls for the widest browser support'),
+  option('scaffold-audio', 'Scaffold', 'A wireframe starting point for your own skin'),
   option('none', 'No skin', 'Bring your own UI built from the components'),
 ];
 

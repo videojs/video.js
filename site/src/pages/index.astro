@@ -10,7 +10,9 @@ import Base from '@/layouts/Base.astro';
 
 const times = [0, 12.9, 17.61, 15.8, 7.72, 4.8, 3.3];
 const posterTime = times[Math.floor(Math.random() * times.length)];
-const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}`;
+// Mux serves the 3840px source by default. The hero is at most 1180 CSS px wide and stays on its poster until played,
+// so 2400px keeps it sharp on 2x screens for about half the bytes.
+const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}&width=2400`;
 ---
 
 <Base easterEgg title={SITE_TITLE} description={SITE_DESCRIPTION}>

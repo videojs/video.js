@@ -8,17 +8,19 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, audioFallback } from '../fallback';
 
 export interface HlsAudioProps
   extends
     Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof HlsAudioAdapterProps>,
     Partial<HlsAudioAdapterProps>,
-    MediaRefProps<HlsAudioAdapter> {
+    MediaRefProps<HlsAudioAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 export const HlsAudio = forwardRef<HTMLAudioElement, HlsAudioProps>(function HlsAudio(
-  { children, mediaRef, ...props },
+  { children, fallback = audioFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(HlsAudioAdapter);
@@ -30,6 +32,7 @@ export const HlsAudio = forwardRef<HTMLAudioElement, HlsAudioProps>(function Hls
   return (
     <audio ref={composedRef} {...htmlProps}>
       {children}
+      {fallback}
     </audio>
   );
 });

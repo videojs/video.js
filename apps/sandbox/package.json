@@ -26,6 +26,7 @@
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
+    "@videojs/playerjs-video": "workspace:*",
     "@videojs/react": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/spf": "workspace:*",

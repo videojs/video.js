@@ -3,8 +3,11 @@ contact_links:
   - name: 🔒 Report a Security Vulnerability
     about: Report vulnerabilities in any version privately, not in a public issue.
     url: https://github.com/videojs/video.js/security/advisories/new
+  - name: 🐛 Video.js 8 Issue
+    about: Video.js 8 lives in videojs/videojs-v8, with security fixes and a best effort on bug fixes until October 1, 2028.
+    url: https://github.com/videojs/videojs-v8/issues/new/choose
   - name: 🚚 Migrate from Video.js 8
-    about: Video.js 8 receives security fixes only. The migration guide maps v8 onto Video.js 10.
+    about: The migration guide maps Video.js 8 onto Video.js 10.
     url: https://videojs.org/docs/framework/html/guides/migrate-from-video-js-8
   - name: ❓ Get Help
     about: Having a hard time with something? Open a question in discussions to get help.

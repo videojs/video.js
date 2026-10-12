@@ -53,6 +53,14 @@ describe('Audio', () => {
       expect(audio?.querySelector('source')).toBeTruthy();
     });
 
+    it('links to the help page as fallback content', () => {
+      const { container } = render(<Audio />);
+      const link = container.querySelector('audio > a');
+
+      expect(link?.getAttribute('href')).toBe('https://videojs.org/help');
+      expect(link?.textContent).toBe('Audio player not working?');
+    });
+
     it('forwards ref correctly', () => {
       const ref = createRef<HTMLAudioElement>();
 

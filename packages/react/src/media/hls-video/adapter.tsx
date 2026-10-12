@@ -8,17 +8,19 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, videoFallback } from '../fallback';
 
 export interface HlsVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsVideoAdapterProps>,
     Partial<HlsVideoAdapterProps>,
-    MediaRefProps<HlsVideoAdapter> {
+    MediaRefProps<HlsVideoAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 export const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(function HlsVideo(
-  { children, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(HlsVideoAdapter);
@@ -30,6 +32,7 @@ export const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(function Hls
   return (
     <video ref={composedRef} {...htmlProps}>
       {children}
+      {fallback}
     </video>
   );
 });

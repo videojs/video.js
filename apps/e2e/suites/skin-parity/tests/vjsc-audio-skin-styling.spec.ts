@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-import { testCompatParity } from './compat';
+import { testOutputParity } from './output-parity';
 import { testRtlLayout } from './rtl';
 import {
   buttonInteractionContract,
@@ -28,11 +28,11 @@ import {
   waitForStableText,
 } from './vjsc-skin-parity';
 
-const CASES = skinCases('audio').filter((variant) => !variant.skin.startsWith('compat-'));
+const CASES = skinCases('audio').filter((variant) => /^(default|neutral)-/.test(variant.skin));
 const WIDTHS = [384, 672] as const;
 
-testRtlLayout(CASES);
-testCompatParity('audio');
+testRtlLayout(skinCases('audio').filter((variant) => !variant.skin.startsWith('compat-')));
+testOutputParity('audio');
 
 for (const variant of CASES) {
   test(`${variant.framework} ${variant.skin} keeps CSS and Tailwind rendering in sync`, async ({ page }, testInfo) => {
@@ -193,6 +193,8 @@ async function preparePanel({ root, section }: SkinPanel, width: number, expectP
   if (expectPlay) {
     await expect(root.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
     await expect(root.getByRole('button', { name: /Playback rate/i })).toBeVisible();
+    // Wait for metadata before comparing time labels and slider geometry.
+    await expect(root.getByRole('slider', { name: 'Seek' })).toBeEnabled({ timeout: 20_000 });
   }
 
   await expect.poll(() => root.evaluate((element) => Math.round(element.getBoundingClientRect().width))).toBe(width);

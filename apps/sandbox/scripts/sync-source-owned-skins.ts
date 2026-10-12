@@ -71,6 +71,14 @@ const installs = [
     baseStyle: 'base.css',
   },
   {
+    catalog: 'react/scaffold',
+    destination: 'react-tailwind-scaffold',
+    alias: '@registry-react-tailwind-scaffold',
+    globalStyles: true,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
     catalog: 'react/css',
     destination: 'react-css-default',
     alias: '@registry-react-css-default',
@@ -95,6 +103,14 @@ const installs = [
     baseStyle: 'base.css',
   },
   {
+    catalog: 'react/css/scaffold',
+    destination: 'react-css-scaffold',
+    alias: '@registry-react-css-scaffold',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
     catalog: 'html',
     destination: 'html-default',
     alias: '@registry-html-default',
@@ -114,6 +130,14 @@ const installs = [
     catalog: 'html/compat',
     destination: 'html-compat',
     alias: '@registry-html-compat',
+    globalStyles: false,
+    presets,
+    baseStyle: 'base.css',
+  },
+  {
+    catalog: 'html/scaffold',
+    destination: 'html-scaffold',
+    alias: '@registry-html-scaffold',
     globalStyles: false,
     presets,
     baseStyle: 'base.css',
@@ -155,7 +179,7 @@ if (inWorkspace) {
 }
 
 if (existsSync(resolve(generatedDir, 'registry/react-tailwind-default/components/videojs'))) {
-  console.log(`Installed 12 React Tailwind, 12 React CSS, and 12 HTML source-owned Sandbox skins from ${address}.`);
+  console.log(`Installed 16 React Tailwind, 16 React CSS, and 16 HTML source-owned Sandbox skins from ${address}.`);
 }
 
 /**

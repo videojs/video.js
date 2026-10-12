@@ -9,6 +9,7 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, videoFallback } from '../fallback';
 import { MuxStoryboard } from './storyboard';
 
 export type {
@@ -28,12 +29,13 @@ export interface MuxVideoProps
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof HlsVideoAdapterProps | keyof MuxAdapterProps>,
     Partial<Omit<HlsVideoAdapterProps, 'src' | 'source'>>,
     Partial<MuxAdapterProps>,
-    MediaRefProps<MuxVideoAdapter> {
+    MediaRefProps<MuxVideoAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 export const MuxVideo = forwardRef<HTMLVideoElement, MuxVideoProps>(function MuxVideo(
-  { children, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(MuxVideoAdapter);
@@ -46,6 +48,7 @@ export const MuxVideo = forwardRef<HTMLVideoElement, MuxVideoProps>(function Mux
     <video ref={composedRef} {...htmlProps}>
       <MuxStoryboard media={media} />
       {children}
+      {fallback}
     </video>
   );
 });

@@ -23,9 +23,15 @@
   font-style: normal;
   font-display: swap;
 }
+/*
+ * The metric overrides below are tuned against Arial's bold and regular faces. `local()` matches a single face by its
+ * full or PostScript name, so name the exact face for each weight, plus Liberation Sans (metric-compatible with Arial)
+ * for Linux, where Arial is usually missing and an unmatched fallback would leave headings to reflow when the web
+ * font arrives.
+ */
 @font-face {
   font-family: "Eurostile LT Pro Fallback";
-  src: local("Arial");
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
   font-weight: bold;
   ascent-override: 88.67%;
   descent-override: 25.22%;
@@ -53,7 +59,7 @@
 }
 @font-face {
   font-family: "Eurostile LT Pro Extended Fallback";
-  src: local("Arial");
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans-Regular");
   font-weight: normal;
   ascent-override: 71.41%;
   descent-override: 19.47%;
@@ -62,7 +68,7 @@
 }
 @font-face {
   font-family: "Eurostile LT Pro Extended Fallback";
-  src: local("Arial");
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
   font-weight: bold;
   ascent-override: 71.41%;
   descent-override: 19.47%;

@@ -9,4 +9,5 @@ export const REGISTRY_THEME_LABELS = {
   default: 'Default',
   neutral: 'Neutral',
   compat: 'Compat',
+  scaffold: 'Scaffold',
 } as const satisfies Record<RegistryTheme, string>;

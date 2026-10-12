@@ -58,6 +58,7 @@ const THEME_ICONS = {
   default: <SkinPreview skin="video" className="size-4" />,
   neutral: <SkinPreview skin="neutral-video" className="size-4" />,
   compat: <SkinPreview skin="compat-video" className="size-4" />,
+  scaffold: <SkinPreview skin="scaffold-video" className="size-4" />,
 } satisfies Record<RegistryTheme, ReactNode>;
 
 interface Props {

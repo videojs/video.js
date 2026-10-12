@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { createRef } from 'react';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { PlayerContextProvider, type PlayerContextValue } from '../../player/context';
@@ -54,6 +55,34 @@ describe('Video', () => {
 
       expect(video?.querySelector('source')).toBeTruthy();
       expect(video?.querySelector('track')).toBeTruthy();
+    });
+
+    it('links to the help page as fallback content after children', () => {
+      const { container } = render(
+        <Video>
+          <track kind="captions" src="captions.vtt" />
+        </Video>
+      );
+      const link = container.querySelector('video')?.lastElementChild;
+
+      expect(link?.previousElementSibling?.tagName).toBe('TRACK');
+      expect(link?.getAttribute('href')).toBe('https://videojs.org/help');
+      expect(link?.textContent).toBe('Video player not working?');
+    });
+
+    it('server-renders the fallback link', () => {
+      expect(renderToString(<Video src="test.mp4" />)).toBe(
+        '<video src="test.mp4"><a href="https://videojs.org/help">Video player not working?</a></video>'
+      );
+    });
+
+    it('replaces or removes the fallback content through fallback', () => {
+      const custom = render(<Video fallback={<p>Download the video instead.</p>} />);
+      const none = render(<Video fallback={null} />);
+
+      expect(custom.container.querySelector('video')?.innerHTML).toBe('<p>Download the video instead.</p>');
+      expect(none.container.querySelector('video')?.childNodes).toHaveLength(0);
+      expect(none.container.querySelector('video')?.hasAttribute('fallback')).toBe(false);
     });
 
     it('forwards ref correctly', () => {

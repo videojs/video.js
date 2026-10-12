@@ -8,19 +8,21 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, videoFallback } from '../fallback';
 
 /** @experimental */
 export interface ShakaVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof ShakaAdapterProps>,
     Partial<ShakaAdapterProps>,
-    MediaRefProps<ShakaAdapter> {
+    MediaRefProps<ShakaAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 /** @experimental */
 export const ShakaVideo = forwardRef<HTMLVideoElement, ShakaVideoProps>(function ShakaVideo(
-  { children, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(ShakaAdapter);
@@ -32,6 +34,7 @@ export const ShakaVideo = forwardRef<HTMLVideoElement, ShakaVideoProps>(function
   return (
     <video ref={composedRef} {...htmlProps}>
       {children}
+      {fallback}
     </video>
   );
 });

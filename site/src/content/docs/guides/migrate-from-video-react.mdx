@@ -1,0 +1,439 @@
+---
+title: Migrate from Video-React
+description: Move a Video-React integration to Video.js 10, mapping the Player component, control bar children, player ref, and Redux state onto composed components and hooks
+---
+
+import Aside from '@/components/Aside.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import MigrationAgentStart from '@/components/docs/MigrationAgentStart.astro';
+
+Video-React gives you one `<Player>` that renders a `<video>`, merges your children into a default control bar, and exposes state and methods through a component ref.
+
+Video.js 10 replaces `<Player>` with a player, a media component, and a skin. Video-React was modeled on Video.js, and most of its styles came from Video.js, so many ideas carry over: a control bar that hides during playback, hotkeys, and one player state object. The API that wires them together is new. This guide maps each Video-React concept to its new home.
+
+<Aside type="note">
+Video-React is in security-only maintenance. We'll merge priority security patches until January 2028. After that, Video-React won't receive further updates. This guide covers Video-React 0.16.
+</Aside>
+
+## AI Quickstart
+
+The [Video.js skill](https://github.com/videojs/skills) teaches coding agents how Video.js 10 is composed and points them at documentation that matches your installed version. This prompt installs it and starts the migration.
+
+<MigrationAgentStart source="video-react" />
+
+See <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink> to install the skill yourself or give your tool the docs another way.
+
+## Before you migrate
+
+- **Upgrade to React 18 or later.** Video-React supports React 15 through 18. `@videojs/react` supports React 18 and 19.
+- **Compare your features with [Known gaps](#known-gaps).** Custom playback rate lists, a configurable auto-hide delay, and a full-window fullscreen fallback have no equivalent yet.
+- **List what you pass to `<Player>`.** Note its props, control bar children, `isVideoChild` components, ref calls, and `subscribeToStateChange` listeners. Each one moves to a different place.
+- **Migrate one player at a time if you need to.** Neither library registers custom elements, and Video-React's stylesheet only targets its own `video-react-*` classes, so both can render in the same app. Remove `video-react` and its stylesheet once nothing imports them.
+
+## Your first player
+
+Here's a typical Video-React player with a poster, captions, a centered big play button, and a captions menu:
+
+```jsx
+import 'video-react/dist/video-react.css';
+import { BigPlayButton, ClosedCaptionButton, ControlBar, Player } from 'video-react';
+
+export function AppVideoPlayer() {
+  return (
+    <Player playsInline poster="/poster.jpg" src="/video.mp4">
+      <track kind="captions" src="/captions/en.vtt" srcLang="en" label="English" default />
+      <BigPlayButton position="center" />
+      <ControlBar>
+        <ClosedCaptionButton order={7} />
+      </ControlBar>
+    </Player>
+  );
+}
+```
+
+Install `@videojs/react`:
+
+```bash
+npm install @videojs/react
+```
+
+The video <DocsLink slug="guides/presets">preset</DocsLink> gives you a player, a skin, and a media component that already fit together. The Neutral skin is the closest match to Video-React's control bar:
+
+```tsx
+'use client';
+
+import '@videojs/react/video/neutral-skin.css';
+import { NeutralVideoSkin, Video, VideoPlayer } from '@videojs/react/video';
+
+export function AppVideoPlayer() {
+  return (
+    <VideoPlayer poster="/poster.jpg">
+      <NeutralVideoSkin className="app-video-player" style={{ aspectRatio: '16 / 9' }}>
+        <Video src="/video.mp4" playsInline>
+          <track kind="captions" src="/captions/en.vtt" srcLang="en" label="English" default />
+        </Video>
+      </NeutralVideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+What changed:
+
+- **`src` and `playsInline` moved to the media.** `Video` renders a native `<video>`, so `<source>` and `<track>` children go inside it, as they did inside `<Player>`.
+- **`poster` stays on the player.** `VideoPlayer` holds it as metadata, and the skin renders it. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
+- **No control bar children.** The skin ships its controls. A captions button appears when the media has caption or subtitle tracks, so `ClosedCaptionButton` has nothing to replace.
+- **No big play button.** The Default and Neutral video skins don't render one. Clicking the video or pressing the control bar's play button starts playback.
+- **Set the aspect ratio yourself.** Video-React's `fluid` mode drew a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
+- **One stylesheet per skin.** Replace `video-react.css` with the skin's CSS file.
+
+For the Default skin, import `skin.css` and replace `NeutralVideoSkin` with `VideoSkin`. `VideoPlayer` takes only its config props and children. It renders no element, so it takes no `className`, `style`, or `ref`; style the skin instead. Keep `'use client'` at the client boundary in Next.js and other React Server Components setups.
+
+## Three pieces instead of one
+
+`<Player>` did several jobs. It rendered the `<video>`, held state in a Redux store, sized the player box, took fullscreen, and assembled the UI from its children. Video.js 10 splits those jobs:
+
+**The player** holds state and hands it to everything inside it. It draws nothing and takes no layout. Which state it holds depends on the <DocsLink slug="guides/features">features</DocsLink> it's built from. Video-React's internal Redux store, `Manager`, and `actions` are all replaced by this player store.
+
+**The media** plays the video. `Video` renders a plain `<video>` for progressive files. HLS, DASH, YouTube, Vimeo, and Mux each have a <DocsLink slug="guides/media-sources">media component</DocsLink> of their own.
+
+**The skin** is the UI. It renders a container that sizes the player, goes fullscreen, and receives gestures and hotkeys. It replaces `ControlBar`, `BigPlayButton`, `LoadingSpinner`, `PosterImage`, `Bezel`, and `Shortcut` at once.
+
+Note the nesting. Video-React put your `<track>` elements and your UI components side by side inside `<Player>`. In Video.js, the skin wraps the media, and tracks go inside the media.
+
+## Where your Player props went
+
+| Video-React `Player` prop | Video.js 10 |
+|---|---|
+| `src` | `src` on the media, or `<source>` children inside it |
+| `autoPlay`, `muted`, `loop`, `playsInline`, `preload`, `crossOrigin` | The same props on the media |
+| `poster` | `poster` on `VideoPlayer` |
+| `videoId` | `id` on the media |
+| `className` | `className` on the skin |
+| `fluid`, `aspectRatio` | CSS `aspect-ratio` on the skin. `aspectRatio="auto"` read the ratio from the video's metadata; set the ratio you expect instead |
+| `width`, `height` with `fluid={false}` | CSS `width` and `height` on the skin |
+| `startTime` | No prop. Seek in `onLoadedMetadata`; see [Start at a time](#start-at-a-time) |
+| `onPlay`, `onPause`, `onTimeUpdate`, `onEnded`, and the other media event props | The same props on the media. See [Events](#events) |
+| `store` | No equivalent. The player owns its store; see [Read player state](#read-player-state) |
+
+### Start at a time
+
+Video-React's `startTime` set `currentTime` once metadata loaded. Do the same on the media:
+
+```tsx
+<Video
+  src="/video.mp4"
+  playsInline
+  onLoadedMetadata={(event) => {
+    event.currentTarget.currentTime = 30;
+  }}
+/>
+```
+
+## Map the components
+
+Video-React merged your children into the default player and control bar by type, then sorted them by `order` and dropped any with `disabled`. Video.js has no merge step. A packaged skin always renders its own controls, and children you add to it render with the media, not in the control bar.
+
+| Video-React | Video.js 10 |
+|---|---|
+| `Player` | `VideoPlayer`, or `Player` from <DocsLink slug="reference/api/create-player">`createPlayer`</DocsLink>, plus a skin and media |
+| `Video` | `Video`, or another media component |
+| `ControlBar` | The skin's controls. In skin source, `Controls.Root` and `Controls.Content` |
+| `BigPlayButton` | No equivalent in the video skins; add a `PlayButton` in skin source |
+| `PlayToggle` | `PlayButton` |
+| `ReplayControl`, `ForwardControl` | <DocsLink slug="reference/components/seek-button">`SeekButton`</DocsLink> with negative or positive `seconds` |
+| `VolumeMenuButton` | `VolumePopover`, or `MuteButton` with `VolumeSlider` |
+| `CurrentTimeDisplay`, `DurationDisplay`, `RemainingTimeDisplay`, `TimeDivider` | `Time.Value` with `type="current"`, `"duration"`, or `"remaining"`, and `Time.Separator` |
+| `ProgressControl`, `SeekBar`, `PlayProgressBar`, `LoadProgressBar`, `MouseTimeDisplay` | `TimeSlider`, which shows buffered progress and a pointer preview |
+| `PlaybackRateMenuButton` | The skin's settings menu, or `PlaybackRateButton` and `PlaybackRateRadioGroup` |
+| `ClosedCaptionButton` | `CaptionsButton`, and a captions submenu in the settings menu |
+| `FullscreenToggle` | `FullscreenButton` |
+| `LoadingSpinner` | `BufferingIndicator` |
+| `PosterImage` | `Poster`, reading the player's `poster` |
+| `Bezel` | `StatusIndicator`, `VolumeIndicator`, and `SeekIndicator` |
+| `Shortcut` | `Hotkey` and `Gesture`; see [Keyboard shortcuts and gestures](#keyboard-shortcuts-and-gestures) |
+| `MenuButton` | `Menu` |
+| `Slider` | `Slider` |
+
+The skins also include controls Video-React didn't have: picture-in-picture, AirPlay, and Cast buttons, a settings menu for quality and audio tracks, and an error dialog. The Cast button needs the Google Cast extension; see <DocsLink slug="guides/casting">Cast to AirPlay and Chromecast</DocsLink>.
+
+### Customize the controls
+
+Map each control bar change to a level and try them in order:
+
+1. **Pick a skin.** Choose Default, Neutral, or Compat. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+2. **Restyle it.** Use the skin's CSS custom properties; see [Rewrite your styles](#rewrite-your-styles).
+3. **Edit skin source.** Add the skin source to your project with the <DocsLink slug="guides/installation-shadcn">Shadcn registry</DocsLink>. Its components and styles become local files you own. See <DocsLink slug="guides/customize-skins" anchor="style-skin-source">Customize skins</DocsLink>.
+
+Every `ControlBar` customization lands at the third level:
+
+```tsx
+// Video-React
+<ControlBar autoHide={false}>
+  <ReplayControl seconds={10} order={1.1} />
+  <ForwardControl seconds={30} order={1.2} />
+  <VolumeMenuButton disabled />
+</ControlBar>
+```
+
+- **`order`** becomes the position of the component in the local controls file.
+- **`disabled`** becomes a deleted line.
+- **`ReplayControl seconds={10}`** becomes `<SeekButton seconds={-10} />`, and `ForwardControl seconds={30}` becomes `<SeekButton seconds={30} />`. The Default and Neutral video skins don't include skip buttons, so add them where you want them.
+- **`autoHide={false}`** becomes `visibility="always"` on `Controls.Root`.
+- **`disableDefaultControls`** means writing the controls layout yourself; start from the Scaffold skin or compose <DocsLink slug="guides/ui-components">UI components</DocsLink> inside a `Container`.
+- **`disableCompletely`** means leaving the skin out. Render the media inside `VideoPlayer` with no skin for a player with no UI, or use the background video preset.
+
+Individual React controls don't include visible content. Use their `render` props to add an icon or text, and style the element you return.
+
+## Read and control the player
+
+### Replace the player ref
+
+Video-React handed you the player through a ref. You called methods on it, read `getState()`, and listened with `subscribeToStateChange`:
+
+```jsx
+// Video-React
+class App extends Component {
+  state = { currentTime: 0 };
+
+  componentDidMount() {
+    this.player.subscribeToStateChange((state) => {
+      this.setState({ currentTime: state.currentTime });
+    });
+  }
+
+  render() {
+    return (
+      <>
+        <Player ref={(player) => (this.player = player)} src="/video.mp4" />
+        <button type="button" onClick={() => this.player.seek(50)}>Jump to 0:50</button>
+        <p>{Math.round(this.state.currentTime)} seconds</p>
+      </>
+    );
+  }
+}
+```
+
+In Video.js, components inside the player read state and actions with the preset's <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> hook. `VideoPlayer` renders no DOM, so wrap it around everything that needs the player, including controls that sit outside the video box:
+
+```tsx
+// Video.js 10
+import '@videojs/react/video/neutral-skin.css';
+import { NeutralVideoSkin, usePlayer, Video, VideoPlayer } from '@videojs/react/video';
+
+function JumpButton() {
+  const seek = usePlayer((state) => state.seek);
+  return <button type="button" onClick={() => seek(50)}>Jump to 0:50</button>;
+}
+
+function Elapsed() {
+  const currentTime = usePlayer((state) => state.currentTime);
+  return <p>{Math.round(currentTime)} seconds</p>;
+}
+
+export function App() {
+  return (
+    <VideoPlayer>
+      <NeutralVideoSkin>
+        <Video src="/video.mp4" playsInline />
+      </NeutralVideoSkin>
+      <JumpButton />
+      <Elapsed />
+    </VideoPlayer>
+  );
+}
+```
+
+- **A selector replaces `subscribeToStateChange`.** The component re-renders when the selected value changes. For side effects, select the value and run a `useEffect` on it.
+- **The component that renders `VideoPlayer` can't call `usePlayer`.** Put store access in a child component.
+- **Hooks need function components.** If the code that used the ref is a class component, move the part that reads state into a small function component.
+- **Actions aren't queued.** Most fail until the player has attached to its media. `seek()` waits for metadata once attached. Call actions from event handlers, not from a mount effect inside the player.
+
+### Drive playback
+
+The player ref's methods and `player.actions` become store actions. Select them with `usePlayer`:
+
+| Video-React | Video.js 10 |
+|---|---|
+| `play()`, `pause()` | `play()`, `pause()` |
+| `actions.togglePlay()` | `paused ? play() : pause()` |
+| `seek(time)` | `seek(time)` |
+| `forward(seconds)`, `replay(seconds)` | `seek(currentTime + seconds)`, `seek(currentTime - seconds)` |
+| `actions.changeRate(rate)`, `player.playbackRate = rate` | `setPlaybackRate(rate)` |
+| `actions.changeVolume(volume)`, `player.volume = volume` | `setVolume(volume)`, which also unmutes |
+| `actions.mute(muted)`, `player.muted = muted` | `setMuted(muted)` |
+| `toggleFullscreen()` | `isFullscreen ? exitFullscreen() : requestFullscreen()` |
+| `actions.activateTextTrack(track)` | `selectSubtitlesTrack(id)`, or `toggleSubtitles()` |
+| `load()`, `addTextTrack()`, `canPlayType()` | The native methods on the media element |
+| `player.video.video` | A `ref` or `mediaRef` on `Video`, or `useMedia()` inside the player |
+
+Video-React's `changeVolume` and `volume` setter left the mute state alone. `setVolume` unmutes for values above zero. Set `media.volume` directly to keep the mute state. If the volume is `0`, `setMuted(false)` also sets it to `0.25`.
+
+For video-backed media, `ref` and `mediaRef` point to the rendered `HTMLVideoElement`. Native calls such as `media.play()` and assignments such as `media.currentTime = 10` update the controls through media events. For adapter-backed media such as `HlsJsVideo`, `mediaRef` receives the playback adapter, the same object `useMedia()` returns.
+
+### Read player state
+
+`getState().player` becomes the player store. Most keys keep their names:
+
+| Video-React `player` state | Video.js 10 |
+|---|---|
+| `paused`, `ended`, `waiting`, `seeking`, `currentTime`, `duration`, `volume`, `muted`, `playbackRate`, `isFullscreen`, `currentSrc` | Same names |
+| `hasStarted` | `started` |
+| `userActivity` | `userActive`; use `controlsVisible` for whether the controls are shown |
+| `buffered` | `buffered`, as an array of `[start, end]` pairs instead of `TimeRanges` |
+| `textTracks`, `activeTextTrack` | `textTrackList`, and the caption or subtitle entry with `mode: 'showing'`; `subtitlesShowing` says whether there is one |
+| `error` | `error`, the media's `MediaError` instead of a string |
+| `readyState` | `canPlay` for `HAVE_FUTURE_DATA` or later; read `readyState` from the media for other values |
+| `videoWidth`, `videoHeight`, `networkState`, `autoPaused`, `seekingTime`, `isActive` | No store key. Read the media element, or use `:focus-within` on the skin for `isActive` |
+| `getState().operation` | No equivalent |
+
+The <DocsLink slug="reference/api/player-store">player store reference</DocsLink> lists every state field and action, grouped by the feature that adds it. `usePlayer()` with no selector returns the store without subscribing, so always pass a selector for values you render.
+
+If you passed your own Redux store to `<Player store>` or combined `playerReducer` into your app's reducers, remove them. To mirror player state into your app store, select the value with `usePlayer` and dispatch it from an effect.
+
+### Events
+
+Move media event props from `<Player>` to `Video` or your chosen media component. They keep their names, such as `onPlay`, `onTimeUpdate`, `onEnded`, and `onError`, and receive React's synthetic event.
+
+Video-React kept the state of the player UI in its store, such as `userActivity` and `isFullscreen`. Read those from the player store with a selector instead of listening for an event.
+
+## Streaming
+
+Video-React played what the browser's `<video>` could play. For HLS, its docs showed an `isVideoChild` component that attached hls.js to the `video` prop:
+
+```jsx
+// Video-React
+<Player>
+  <HLSSource isVideoChild src="https://example.com/stream.m3u8" />
+</Player>
+```
+
+Replace that component with <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink>, which manages hls.js for you:
+
+```bash
+npm install @videojs/react @videojs/hlsjs-video
+```
+
+```tsx
+import '@videojs/react/video/neutral-skin.css';
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
+import { NeutralVideoSkin, VideoPlayer } from '@videojs/react/video';
+
+<VideoPlayer>
+  <NeutralVideoSkin>
+    <HlsJsVideo src="https://example.com/stream.m3u8" playsInline />
+  </NeutralVideoSkin>
+</VideoPlayer>
+```
+
+The skins show a quality menu when the stream has renditions. Other `isVideoChild` components that received the `video` prop can read the element from `mediaRef` or `useMedia()` instead. For DASH, YouTube, Vimeo, and Mux sources, see <DocsLink slug="guides/media-sources">Media sources</DocsLink>. For live streams, use the live video preset; see <DocsLink slug="guides/live-streams">Live streams</DocsLink>.
+
+## Captions and thumbnails
+
+Caption and subtitle `<track>` elements move from `<Player>` into the media. The skins show a captions button and a captions submenu when the media has caption or subtitle tracks. Video-React's `ClosedCaptionButton` `kinds`, `offMenuText`, and `showOffMenu` props have no equivalent.
+
+When enabling captions without a previous selection in this player instance, `toggleSubtitles()` prefers a track matching `navigator.language`, then falls back to the first available caption or subtitle track. For an authored track that should show on load, add `default`. See <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>.
+
+Video-React had no thumbnail previews. To add them, put a `<track kind="metadata" label="thumbnails" default>` on the media; the video skins show thumbnails in the time slider. See <DocsLink slug="guides/thumbnails">Thumbnail previews</DocsLink>.
+
+## Keyboard shortcuts and gestures
+
+The video skins ship a default set close to Video-React's `Shortcut` component:
+
+| Key | Video-React | Video.js 10 skins |
+|---|---|---|
+| Space, `k` | Play or pause | Play or pause |
+| `f` | Toggle fullscreen | Toggle fullscreen |
+| Left and Right arrows | Seek 5 seconds | Seek 10 seconds |
+| `j`, `l` | Seek 10 seconds | Seek 10 seconds |
+| Up and Down arrows | Change volume by 5% | Change volume by 5% |
+| Home, End | Jump to start or end | Jump to start or end |
+| Shift+`<`, Shift+`>` | Step through 0.25× to 2× | Step through the fixed rate list |
+| `m`, `c`, `i`, `0`–`9` | None | Mute, captions, picture-in-picture, jump to a percentage |
+
+Video-React listened on `document` while the player had focus. Video.js hotkeys listen on the player container, so they also need focus inside the player. Pass `target="document"` on a hotkey to make it page-wide.
+
+Custom `shortcuts` become one `Hotkey` per shortcut in a layout you compose or in skin source. Each takes a key pattern instead of a `keyCode`:
+
+```tsx
+// Video-React
+<Shortcut
+  shortcuts={[
+    { keyCode: 37, handle: (player, actions) => actions.replay(10) },
+    { keyCode: 78, handle: () => playNext() },
+  ]}
+/>
+
+// Video.js 10, inside a Container
+<Hotkey keys="ArrowLeft" action="seekStep" value={-10} />
+```
+
+Shortcuts with custom callbacks become the `useHotkey` hook: `useHotkey({ keys: 'n', onActivate: playNext })`. See <DocsLink slug="guides/keyboard-shortcuts">Keyboard shortcuts</DocsLink>.
+
+Video-React's `clickable` and `dblclickable` props toggled play and fullscreen on the video. The video skins bind a mouse click in the center to play or pause, a touch tap to show or hide the controls, a double tap in the center to toggle fullscreen, and a double tap on the left or right edge to seek. To turn any of these off, remove its `Gesture` in skin source.
+
+## Rewrite your styles
+
+Video-React's styles came from Video.js, so you probably restyled the player by overriding `.video-react-*` selectors. Replace them with the skin's custom properties where they cover the change:
+
+```css
+/* Video-React */
+.video-react .video-react-play-progress {
+  background-color: rebeccapurple;
+}
+```
+
+```css
+/* Video.js 10: the className on the skin in the first example */
+.app-video-player {
+  --media-accent-color: rebeccapurple;
+}
+```
+
+`--media-accent-color` reaches the sliders, active buttons, and accent surfaces at once. Video.js picks a readable text color for content on the accent color. To choose that text color yourself, set `--media-accent-text-color`. `--media-border-radius` rounds the player's corners. If you resized the controls by changing the player's `font-size`, use `--media-scale-unit` instead. See <DocsLink slug="guides/customize-skins" anchor="style-a-packaged-skin">Customize skins</DocsLink> for the full list.
+
+Video-React reflected state as classes on its root, such as `video-react-paused`, `video-react-waiting`, `video-react-fullscreen`, and `video-react-user-inactive`. Video.js puts state on the component it belongs to: `data-paused` on `PlayButton`, `data-visible` on `BufferingIndicator`, `data-fullscreen` on `FullscreenButton`, and `data-controls-visible` on `Container`. For your own components, read the value with `usePlayer`, or pass a function to `className` on a Video.js component: `className={(state) => …}`.
+
+## Languages
+
+Video-React's control labels were English only. Video.js ships locale packs for around 50 languages. Wrap the player in `I18nProvider` and set `locale`, or omit it to follow `<html lang>`. To change individual strings, pass `translations`:
+
+```tsx
+import { I18nProvider } from '@videojs/react/i18n';
+
+<I18nProvider locale="en" translations={{ buttons: { play: 'Start video' } }}>
+  <VideoPlayer>{/* … */}</VideoPlayer>
+</I18nProvider>
+```
+
+See <DocsLink slug="guides/internationalization">Internationalize the player</DocsLink>.
+
+## Behavior changes to check
+
+These changes don't throw errors, so test for them:
+
+- **Size.** There's no fluid 16:9 box; set `aspect-ratio` on the skin.
+- **Controls.** They hide after 2 seconds of inactivity instead of Video-React's 3-second default, and as soon as the pointer leaves the player during playback.
+- **Fullscreen.** Fullscreen targets the skin's container, falling back to the video element on iPhone. Video-React fell back to a full-window CSS mode when the Fullscreen API was unavailable.
+- **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%.
+- **Hotkeys.** The arrow keys seek 10 seconds instead of 5, and the speed keys step through a fixed list.
+- **Play failures.** Video-React swallowed rejections from `play()`. The `play` action returns the media's promise, so catch rejections where you call it. A blocked `autoPlay` still looks like media that never started; see <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
+
+## Known gaps
+
+- **Fixed playback rates**: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2`. `PlaybackRateMenuButton`'s `rates` has no equivalent yet ([#1404](https://github.com/videojs/v10/issues/1404)).
+- **Fixed auto-hide delay.** `ControlBar`'s `autoHideTime` has no equivalent ([#1728](https://github.com/videojs/v10/issues/1728)). For `autoHide={false}`, set `visibility="always"` on `Controls.Root` in skin source.
+- **No full-window fullscreen fallback.** Test fullscreen on your supported browsers; see <DocsLink slug="guides/browser-support">Browser support</DocsLink>.
+- **No order-based merge.** Children of a packaged skin don't join its control bar. Edit skin source to add, move, or remove controls.
+- **No `startTime` prop.** Seek in `onLoadedMetadata`, as shown in [Start at a time](#start-at-a-time).
+- **No external store.** The player store can't be replaced with your own Redux store, and there's no `operation` state recording which control triggered an action.
+- **Nothing persists** between visits: volume, captions, or rate ([#944](https://github.com/videojs/v10/issues/944)). See <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink>.
+- **Native controls** are not automatically removed when custom controls load ([#1160](https://github.com/videojs/v10/issues/1160)). Leave `controls` off the media.
+
+## See also
+
+- <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink>
+- <DocsLink slug="guides/features">Features</DocsLink> and <DocsLink slug="guides/presets">Presets</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/skins">Skins</DocsLink> and <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>
+- <DocsLink slug="guides/migrate-from-video-js-8">Migrate from Video.js 8</DocsLink>

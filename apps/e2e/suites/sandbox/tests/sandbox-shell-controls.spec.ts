@@ -86,6 +86,7 @@ test.describe('Sandbox shell controls', () => {
     await slider.press('ArrowRight');
     await expect(slider).toHaveAttribute('aria-valuetext', '481 pixels');
     await page.getByRole('spinbutton', { name: 'Width in pixels' }).fill('640');
+    await page.getByRole('spinbutton', { name: 'Width in pixels' }).press('Enter');
 
     await expect(page).toHaveURL(/[?&]width=640(?:&|$)/);
     await expect.poll(() => playerWidth(frame)).toBe(640);

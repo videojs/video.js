@@ -8,19 +8,21 @@ import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useMediaInstance } from '../../utils/use-media-instance';
 import { type MediaRefProps, useMediaRef } from '../../utils/use-media-ref';
 import { useSyncProps } from '../../utils/use-sync-props';
+import { type MediaFallbackProps, videoFallback } from '../fallback';
 
 /** @experimental */
 export interface DashVideoProps
   extends
     Omit<VideoHTMLAttributes<HTMLVideoElement>, keyof DashAdapterProps>,
     Partial<DashAdapterProps>,
-    MediaRefProps<DashAdapter> {
+    MediaRefProps<DashAdapter>,
+    MediaFallbackProps {
   children?: ReactNode;
 }
 
 /** @experimental */
 export const DashVideo = forwardRef<HTMLVideoElement, DashVideoProps>(function DashVideo(
-  { children, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, ...props },
   ref
 ) {
   const media = useMediaInstance(DashAdapter);
@@ -32,6 +34,7 @@ export const DashVideo = forwardRef<HTMLVideoElement, DashVideoProps>(function D
   return (
     <video ref={composedRef} {...htmlProps}>
       {children}
+      {fallback}
     </video>
   );
 });

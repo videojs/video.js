@@ -4,6 +4,7 @@
  *
  * Rows come from the public HTML string exports, so the table follows the icon build without a hand-kept list.
  */
+import * as scaffoldIcons from '@videojs/html/icons/scaffold';
 import * as compatIcons from '@videojs/html/icons/compat';
 import * as defaultIcons from '@videojs/html/icons/default';
 import * as neutralIcons from '@videojs/html/icons/neutral';
@@ -19,6 +20,7 @@ import { resolveDocsFramework } from '@/types/docs';
 
 const framework = resolveDocsFramework(Astro.params.framework);
 const neutral = new Map<string, string>(Object.entries(neutralIcons));
+const scaffold = new Map<string, string>(Object.entries(scaffoldIcons));
 const compat = new Map<string, string>(Object.entries(compatIcons));
 
 const icons = Object.entries(defaultIcons)
@@ -34,6 +36,7 @@ const icons = Object.entries(defaultIcons)
       defaultSvg,
       neutralSvg: neutral.get(htmlName) ?? "",
       compatSvg: compat.get(htmlName) ?? "",
+      scaffoldSvg: scaffold.get(htmlName) ?? "",
     };
   });
 ---
@@ -45,6 +48,7 @@ const icons = Object.entries(defaultIcons)
       <Th data-llms-ignore>Default</Th>
       <Th data-llms-ignore>Neutral</Th>
       <Th data-llms-ignore>Compat</Th>
+      <Th data-llms-ignore>Scaffold</Th>
       {framework === 'html' && <Th>Name</Th>}
       <Th>Export</Th>
     </Tr>
@@ -64,6 +68,10 @@ const icons = Object.entries(defaultIcons)
           <Td data-llms-ignore>
             <span class="inline-flex size-4.5" set:html={icon.compatSvg} />
             <span class="sr-only">{icon.name}, compat set</span>
+          </Td>
+          <Td data-llms-ignore>
+            <span class="inline-flex size-4.5" set:html={icon.scaffoldSvg} />
+            <span class="sr-only">{icon.name}, scaffold set</span>
           </Td>
           {framework === 'html' && (
             <Td>

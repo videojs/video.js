@@ -208,6 +208,28 @@ describe('generateHTMLUsageCode', () => {
     expect(result.html).not.toContain('playsinline');
   });
 
+  it('links to the help page from native video and audio fallback content', () => {
+    const video = generateHTMLUsageCode(baseHTML);
+    const audio = generateHTMLUsageCode({
+      ...baseHTML,
+      useCase: 'default-audio',
+      skin: 'audio',
+      media: 'html5-audio',
+    });
+
+    expect(video.html).toContain(
+      'playsinline><a href="https://videojs.org/help">Video player not working?</a></video>'
+    );
+    expect(audio.html).toContain('><a href="https://videojs.org/help">Audio player not working?</a></audio>');
+  });
+
+  it('leaves custom media elements without fallback content', () => {
+    const result = generateHTMLUsageCode({ ...baseHTML, media: 'mux-video' });
+
+    expect(result.html).toContain('playsinline></mux-video>');
+    expect(result.html).not.toContain('videojs.org/help');
+  });
+
   it('uses background-video tags', () => {
     const opts: InstallationOptions = {
       ...baseHTML,
@@ -488,6 +510,12 @@ video-skin {
     expect(usage['+page.svelte']).toContain("import VideoPlayer from '$lib/VideoPlayer.svelte'");
     expect(usage['App.svelte']).toContain('<VideoPlayer>');
     expect(usage['App.svelte']).toContain('<hlsjs-video src={"https://example.com/live.m3u8"} playsinline>');
+  });
+
+  it('links to the help page from native video in Svelte usage', () => {
+    const usage = generateSvelteUsageCode(baseHTML);
+
+    expect(usage['App.svelte']).toContain('<a href="https://videojs.org/help">Video player not working?</a></video>');
   });
 
   it('emits custom Svelte sources as JavaScript string expressions', () => {

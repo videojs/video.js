@@ -33,18 +33,22 @@ const cdnPresets = [
   'video-player',
   'video-neutral',
   'video-compat',
+  'video-scaffold',
   'live-video',
   'live-video-player',
   'live-video-neutral',
   'live-video-compat',
+  'live-video-scaffold',
   'audio',
   'audio-player',
   'audio-neutral',
   'audio-compat',
+  'audio-scaffold',
   'live-audio',
   'live-audio-player',
   'live-audio-neutral',
   'live-audio-compat',
+  'live-audio-scaffold',
   'background',
 ];
 
@@ -74,7 +78,15 @@ function cdnStylesheetName(file: string): string | null {
   if (preset === 'background') return name === 'skin' ? 'background.css' : null;
 
   const suffix =
-    name === 'skin' ? '' : name === 'neutral-skin' ? '-neutral' : name === 'compat-skin' ? '-compat' : null;
+    name === 'skin'
+      ? ''
+      : name === 'neutral-skin'
+        ? '-neutral'
+        : name === 'compat-skin'
+          ? '-compat'
+          : name === 'scaffold-skin'
+            ? '-scaffold'
+            : null;
   if (suffix === null) return null;
 
   return `${preset}${suffix}.css`;
@@ -122,7 +134,7 @@ function dtsStubsPlugin(outDir: string): BuildPlugin {
 }
 
 /** Comment at the top of every CDN entry, so anything that fetches the script finds its way to the docs. */
-const CDN_BANNER = '/*! Video.js | https://videojs.org/about-this-player */';
+const CDN_BANNER = '/*! Video.js | https://videojs.org/help */';
 
 const cdnPackConfigs: PackUserConfig[] = [];
 

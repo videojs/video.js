@@ -62,9 +62,11 @@ function escapeHTMLAttribute(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
-/** Skin module basename within a preset group: `skin`, `neutral-skin`, or `compat-skin`. */
-function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'neutral-skin' | 'compat-skin' {
+/** Skin module basename within a preset group: `skin`, `neutral-skin`, `compat-skin`, or `scaffold-skin`. */
+function getSkinFile(skin: Exclude<Skin, 'none'>): 'skin' | 'neutral-skin' | 'compat-skin' | 'scaffold-skin' {
   if (skin.startsWith('neutral-')) return 'neutral-skin';
+
+  if (skin.startsWith('scaffold-')) return 'scaffold-skin';
 
   return skin.startsWith('compat-') ? 'compat-skin' : 'skin';
 }
@@ -193,6 +195,18 @@ function generateMediaMarkup(
   return generateMediaMarkupWithSource(tag, `src="${escapeHTMLAttribute(src)}"`, playsInline, extensions, indent);
 }
 
+/**
+ * Fallback content for native `<video>` and `<audio>`. Browsers render it only when they can't play media at all, so
+ * nobody sees it; it gives every pasted snippet a crawlable link to Video.js that the page author can delete freely.
+ */
+function generateMediaFallback(tag: string): string {
+  if (tag !== 'video' && tag !== 'audio') return '';
+
+  const kind = tag === 'video' ? 'Video' : 'Audio';
+
+  return `<a href="https://videojs.org/help">${kind} player not working?</a>`;
+}
+
 function generateMediaMarkupWithSource(
   tag: string,
   sourceAttribute: string,
@@ -200,7 +214,7 @@ function generateMediaMarkupWithSource(
   extensions: readonly InstallationExtension[],
   indent: string
 ): string {
-  const mediaEl = `${indent}<${tag} ${sourceAttribute}${playsInline}></${tag}>`;
+  const mediaEl = `${indent}<${tag} ${sourceAttribute}${playsInline}>${generateMediaFallback(tag)}</${tag}>`;
   const extensionMarkup = extensions.map((extension) => {
     const { htmlTag } = getInstallationExtension(extension);
 
@@ -581,6 +595,8 @@ export function getSkinComponent(useCase: UseCase, skin: Exclude<Skin, 'none'>):
   if (useCase === 'background-video') return name;
 
   if (skin.startsWith('neutral-')) return `Neutral${name}`;
+
+  if (skin.startsWith('scaffold-')) return `Scaffold${name}`;
 
   return skin.startsWith('compat-') ? `Compat${name}` : name;
 }

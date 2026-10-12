@@ -41,7 +41,7 @@ const publishedSkins = Object.keys(skinStyles).filter(isSkinName);
 const representativeSkins = {
   default: 'default-video',
   neutral: 'neutral-video',
-} as const satisfies Record<Exclude<SkinStyle['theme'], 'compat'>, SkinName>;
+} as const satisfies Record<Exclude<SkinStyle['theme'], 'compat' | 'scaffold'>, SkinName>;
 
 /** The variants one authored module is compiled for. Skin-owned modules compile for their skin only. */
 export function variantsFor(filename: string): readonly SkinVariant[] {
@@ -54,8 +54,8 @@ export function variantsFor(filename: string): readonly SkinVariant[] {
         : [];
     }
 
-    // Compat publishes complete editable skins, without standalone UI registry items.
-    if (theme === 'compat') return [];
+    // Compat and Scaffold publish complete editable skins, without standalone UI registry items.
+    if (theme === 'compat' || theme === 'scaffold') return [];
 
     return framework === 'html'
       ? [{ target: framework, style: styling, theme, skin: representativeSkins[theme] }]
@@ -70,7 +70,7 @@ export function parseVariant(parameters: URLSearchParams): SkinVariant | null {
   if ((target !== 'react' && target !== 'html') || (style !== 'tailwind' && style !== 'css')) return null;
 
   const theme = parameters.get('theme');
-  if (theme !== 'compat' && theme !== 'default' && theme !== 'neutral') return null;
+  if (theme !== 'compat' && theme !== 'default' && theme !== 'neutral' && theme !== 'scaffold') return null;
 
   const requested = parameters.get('skin');
   const skin = requested && isSkinName(requested) ? requested : undefined;

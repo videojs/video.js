@@ -7,7 +7,7 @@ export type SkinTheme = SkinStyle['theme'];
 
 /** Resolve the public preset shared by a default or Neutral Skin. */
 export function skinPreset(name: SkinName): SkinPreset {
-  const preset = name.replace(/^(?:compat|default|neutral)-/, '');
+  const preset = name.replace(/^(?:compat|default|neutral|scaffold)-/, '');
   if (!isSkinPreset(preset)) throw new Error(`Unsupported Skin preset: \`${name}\`.`);
 
   return preset;

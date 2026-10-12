@@ -25,15 +25,6 @@ modifying your project:
 npx @videojs/cli agents init
 ```
 
-## Timeline
-
-- **Technical Preview (Complete):** Initial showcase for Demuxed.
-- **Alpha (Complete):** [See milestone](https://github.com/videojs/v10/milestone/3)
-- **Beta (Complete):** [See milestone](https://github.com/videojs/v10/milestone/1)
-- **Release Candidate (Complete):** Feature-complete release ahead of GA.
-- **GA (Complete):** Stable release of Video.js 10.0.
-- **After 10.0:** Video.js 8 contrib parity and supported plugins migrated. See the [roadmap](https://videojs.org/docs/guides/v10-roadmap).
-
 ## Documentation
 
 If you'd like to get started and learn more, you can find our documentation on our website:

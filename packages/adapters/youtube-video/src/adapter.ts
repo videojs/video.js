@@ -2,11 +2,11 @@
 // TypeScript and reshaped as a media adapter (mirrors `dom/vimeo`).
 // Source: https://github.com/muxinc/media-elements
 
-import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type TextTrackListLike, type Video } from '@videojs/media';
+import { EMPTY_TIME_RANGES, MediaError, type TextTrackListLike, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, noop, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
-import { isNumber, isUndefined } from '@videojs/utils/predicate';
+import { isNumber, isObject } from '@videojs/utils/predicate';
 
 import {
   loadYouTubeApi,
@@ -22,6 +22,7 @@ import {
 } from './iframe-api';
 import type { YouTubeAdapterProps } from './props';
 import { buildYouTubeIframeSrc, parseYouTubeSource, type YouTubeSource } from './source';
+import { YouTubeTextTrackList } from './text-tracks';
 
 const SEEK_TOLERANCE = 1;
 const SEEK_SETTLE_TIMEOUT = 1_000;
@@ -95,10 +96,19 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #error: MediaError | null = null;
   #isFullscreen = false;
   #pollInterval: ReturnType<typeof setInterval> | null = null;
-  #textTracksHost: HTMLVideoElement | null = null;
-  #textTracksDisconnect: AbortController | null = null;
+  #textTracks = new YouTubeTextTrackList();
+  // The caption language YouTube is rendering, as last reported by or sent to the embed.
+  #captionLanguage: string | null = null;
+  // The embed does not refresh its cached `track` option after `setOption`, so once a selection is sent the reported
+  // track is stale until the next source.
+  #captionSelected = false;
 
   static PLAYER_SOFTWARE_NAME = 'youtube-video';
+
+  constructor() {
+    super();
+    this.#textTracks.addEventListener('change', () => this.#onTextTracksChange());
+  }
 
   /** Underlying YouTube iframe API player instance (null until the API loads). */
   get engine() {
@@ -142,7 +152,6 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #teardown(): void {
     this.#attachId++;
     this.#stopPolling();
-    this.#teardownTextTracks();
     tryCall(() => this.#player?.destroy());
     this.#player = null;
     this.#playerReady = false;
@@ -476,9 +485,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#error;
   }
 
-  get textTracks() {
-    this.#textTracksHost ??= globalThis.document?.createElement('video') ?? null;
-    return (this.#textTracksHost?.textTracks as TextTrackListLike) ?? EMPTY_TEXT_TRACKS;
+  get textTracks(): TextTrackListLike {
+    return this.#textTracks;
   }
 
   get isFullscreen() {
@@ -566,7 +574,6 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#player = player;
     this.#creatingPlayer = false;
     this.#bindPlayerEvents(player, attachId);
-    this.#setupTextTracks(player);
   }
 
   // Whether a callback belongs to a superseded attach: `destroy()` does not stop the iframe API from
@@ -627,6 +634,9 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#playFired = false;
     this.#error = null;
     this.#isFullscreen = false;
+    this.#captionLanguage = null;
+    this.#captionSelected = false;
+    this.#textTracks.clear();
   }
 
   #onPlayerReady() {
@@ -771,6 +781,13 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
       this.#muted = player.isMuted();
       emit('volumechange');
     });
+
+    // The captions module reports its tracks after playback starts, in an API change of its own.
+    player.addEventListener('onApiChange', () => {
+      if (this.#isStale(attachId)) return;
+
+      this.#syncTextTracks(player);
+    });
   }
 
   // The iframe API pushes no timeupdate/progress/seek events, so poll like `youtube-video-element` does.
@@ -843,47 +860,42 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     }
   }
 
-  #setupTextTracks(player: YouTubePlayerApi) {
-    const doc = globalThis.document;
-    if (isUndefined(doc)) return;
-
-    this.#teardownTextTracks();
-    const host = doc.createElement('video');
-
-    this.#textTracksHost = host;
-    this.#textTracksDisconnect = new AbortController();
-    host.textTracks?.addEventListener?.(
-      'change',
-      () => {
-        const showing = Array.from(host.textTracks).find((t) => t.mode === 'showing');
-
-        tryCall(() => player.setOption('captions', 'track', showing ? { languageCode: showing.language } : {}));
-      },
-      { signal: this.#textTracksDisconnect.signal }
-    );
-  }
-
-  // Caption metadata is only available once playback starts.
   #syncTextTracks(player: YouTubePlayerApi) {
-    const host = this.#textTracksHost;
-    if (!host) return;
+    const tracklist = (player.getOption('captions', 'tracklist') ?? []) as YouTubeCaptionTrack[];
+    const current = player.getOption('captions', 'track') as YouTubeCaptionTrack | undefined;
 
-    const trackList = (player.getOption('captions', 'tracklist') ?? []) as YouTubeCaptionTrack[];
+    for (const track of tracklist) this.#addTextTrack(track);
 
-    for (const track of trackList) {
-      if (!track.languageCode) continue;
+    if (isObject(current)) this.#addTextTrack(current);
 
-      if (Array.from(host.textTracks).some((t) => t.language === track.languageCode)) continue;
+    // An absent `track` means the captions module is not loaded, which says nothing about what is showing.
+    if (this.#captionSelected || !isObject(current)) return;
 
-      // Throws in jsdom and other environments without text-track support.
-      tryCall(() => host.addTextTrack?.('subtitles', track.displayName ?? '', track.languageCode));
+    this.#captionLanguage = current.languageCode || null;
+
+    for (const track of this.#textTracks) {
+      track.mode = track.language === this.#captionLanguage ? 'showing' : 'disabled';
     }
   }
 
-  #teardownTextTracks() {
-    this.#textTracksDisconnect?.abort();
-    this.#textTracksDisconnect = null;
-    this.#textTracksHost = null;
+  #addTextTrack({ languageCode, displayName }: YouTubeCaptionTrack) {
+    if (!languageCode || this.#textTracks.getTrackByLanguage(languageCode)) return;
+
+    this.#textTracks.add(displayName ?? '', languageCode);
+  }
+
+  // Mirroring YouTube's own state also changes modes; comparing against the last known language keeps that from
+  // echoing back to the embed as a selection.
+  #onTextTracksChange() {
+    const player = this.#player;
+    if (!player) return;
+
+    const language = Array.from(this.#textTracks).find((track) => track.mode === 'showing')?.language ?? null;
+    if (language === this.#captionLanguage) return;
+
+    this.#captionLanguage = language;
+    this.#captionSelected = true;
+    tryCall(() => player.setOption('captions', 'track', language ? { languageCode: language } : {}));
   }
 }
 

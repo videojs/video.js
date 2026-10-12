@@ -11,6 +11,10 @@ const skins = [
   'compat-audio',
   'compat-live-video',
   'compat-live-audio',
+  'scaffold-video',
+  'scaffold-audio',
+  'scaffold-live-video',
+  'scaffold-live-audio',
   'default-video',
   'neutral-video',
   'default-audio',
@@ -52,22 +56,24 @@ describe('generated HTML package skins', () => {
       expect(tags).not.toContain('title');
     }
 
-    if (skin.startsWith('compat-')) {
-      expect(template).toContain('family="compat"');
-      expect(registration).toContain("from '../../../icons/compat';");
+    if (skin.startsWith('compat-') || skin.startsWith('scaffold-')) {
+      const family = skin.split('-')[0];
+
+      expect(template).toContain(`family="${family}"`);
+      expect(registration).toContain(`from '../../../icons/${family}';`);
       expect(tags).toEqual(
         expect.arrayContaining(['play-button', 'mute-button', 'volume-popover', 'volume-slider', 'captions-button'])
       );
 
-      if (skin !== 'compat-live-audio') expect(tags).toContain('menu');
+      if (!skin.endsWith('live-audio')) expect(tags).toContain('menu');
     }
 
-    if (skin === 'compat-video' || skin === 'compat-audio') {
+    if (['compat-video', 'compat-audio', 'scaffold-video', 'scaffold-audio'].includes(skin)) {
       expect(tags).toContain('time-slider');
       expect(tags).toContain('time-slider-chapters');
     }
 
-    if (skin === 'compat-live-video' || skin === 'compat-live-audio') {
+    if (['compat-live-video', 'compat-live-audio', 'scaffold-live-video', 'scaffold-live-audio'].includes(skin)) {
       expect(tags).not.toContain('time-slider');
       expect(tags).not.toContain('time');
       expect(tags).not.toContain('quality-radio-group');
@@ -75,7 +81,15 @@ describe('generated HTML package skins', () => {
       expect(tags).not.toContain('playback-rate-radio-group');
     }
 
-    if (skin === 'compat-live-video') {
+    if (skin.startsWith('scaffold-')) {
+      expect(tags).toContain('buffering-indicator');
+
+      if (skin.endsWith('video')) {
+        expect(template).not.toContain('<media-status-indicator actions="togglePaused"');
+      }
+    }
+
+    if (skin === 'compat-live-video' || skin === 'scaffold-live-video') {
       expect(tags).toContain('captions-radio-group');
       expect(template.match(/<media-captions-button\b/g)).toHaveLength(1);
       expect(template).not.toContain('media-settings-button');

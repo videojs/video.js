@@ -14,6 +14,7 @@ export const NAME_OVERRIDES: Record<string, string> = {
   'hlsjs-video': 'HlsJsVideo',
   'youtube-video': 'YouTubeVideo',
   'tiktok-video': 'TikTokVideo',
+  'playerjs-video': 'PlayerJsVideo',
 };
 
 const NAME_TO_SLUG: Record<string, string> = Object.fromEntries(

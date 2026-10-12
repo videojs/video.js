@@ -16,15 +16,19 @@ const packageSkins = {
   'video/default': () => import('@videojs/html/video/skin'),
   'video/neutral': () => import('@videojs/html/video/neutral-skin'),
   'video/compat': () => import('@videojs/html/video/compat-skin'),
+  'video/scaffold': () => import('@videojs/html/video/scaffold-skin'),
   'live-video/default': () => import('@videojs/html/live-video/skin'),
   'live-video/neutral': () => import('@videojs/html/live-video/neutral-skin'),
   'live-video/compat': () => import('@videojs/html/live-video/compat-skin'),
+  'live-video/scaffold': () => import('@videojs/html/live-video/scaffold-skin'),
   'audio/default': () => import('@videojs/html/audio/skin'),
   'audio/neutral': () => import('@videojs/html/audio/neutral-skin'),
   'audio/compat': () => import('@videojs/html/audio/compat-skin'),
+  'audio/scaffold': () => import('@videojs/html/audio/scaffold-skin'),
   'live-audio/default': () => import('@videojs/html/live-audio/skin'),
   'live-audio/neutral': () => import('@videojs/html/live-audio/neutral-skin'),
   'live-audio/compat': () => import('@videojs/html/live-audio/compat-skin'),
+  'live-audio/scaffold': () => import('@videojs/html/live-audio/scaffold-skin'),
 } satisfies Record<`${SkinPreset}/${Skin}`, () => Promise<unknown>>;
 
 async function loadPackageSkin({ player, live, skin }: HtmlSkinRequest, preset: SkinPreset): Promise<string> {

@@ -352,6 +352,10 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
           replacement: resolve(__dirname, 'app/_generated/registry/react-tailwind-compat'),
         },
         {
+          find: '@registry-react-tailwind-scaffold',
+          replacement: resolve(__dirname, 'app/_generated/registry/react-tailwind-scaffold'),
+        },
+        {
           find: '@registry-react-css-default',
           replacement: resolve(__dirname, 'app/_generated/registry/react-css-default'),
         },
@@ -363,11 +367,19 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
           find: '@registry-react-css-compat',
           replacement: resolve(__dirname, 'app/_generated/registry/react-css-compat'),
         },
+        {
+          find: '@registry-react-css-scaffold',
+          replacement: resolve(__dirname, 'app/_generated/registry/react-css-scaffold'),
+        },
         { find: '@registry-html-default', replacement: resolve(__dirname, 'app/_generated/registry/html-default') },
         { find: '@registry-html-neutral', replacement: resolve(__dirname, 'app/_generated/registry/html-neutral') },
         {
           find: '@registry-html-compat',
           replacement: resolve(__dirname, 'app/_generated/registry/html-compat'),
+        },
+        {
+          find: '@registry-html-scaffold',
+          replacement: resolve(__dirname, 'app/_generated/registry/html-scaffold'),
         },
         { find: '@app', replacement: resolve(__dirname, 'app') },
         { find: '@videojs/cdn/i18n', replacement: cdnI18nRegistry },

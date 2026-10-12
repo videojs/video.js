@@ -7,10 +7,14 @@ import { INSTALLATION_FRAMEWORKS } from '../projects';
 import { fitSelectionToPreset, playerOwnerFor, resolveInstallationSelection } from '../selection';
 
 describe('resolveInstallationSelection', () => {
-  it.each(['video', 'audio', 'live-video', 'live-audio'])('accepts Compat for the %s preset', (preset) => {
-    expect(resolveInstallationSelection({ preset, skin: 'compat' })).toMatchObject({
+  it.each(
+    ['video', 'audio', 'live-video', 'live-audio'].flatMap((preset) =>
+      ['compat', 'scaffold'].map((skin) => [preset, skin])
+    )
+  )('accepts %s with the %s skin', (preset, skin) => {
+    expect(resolveInstallationSelection({ preset, skin })).toMatchObject({
       ok: true,
-      selection: { skin: preset.includes('audio') ? 'compat-audio' : 'compat-video' },
+      selection: { skin: `${skin}-${preset.includes('audio') ? 'audio' : 'video'}` },
     });
   });
 

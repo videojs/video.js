@@ -1,0 +1,14 @@
+# Feeds. Static files otherwise go out as `application/xml`, which some readers won't recognize, and browser-based
+# readers can't fetch them cross-origin. Netlify purges its CDN on every deploy, so only the CDN keeps a long TTL;
+# readers that honor `max-age` poll at most every 15 minutes, and revalidate against the ETag Netlify adds.
+/rss.xml
+  content-type: application/rss+xml; charset=utf-8
+  cache-control: public, max-age=900
+  netlify-cdn-cache-control: public, s-maxage=31536000
+  access-control-allow-origin: *
+
+/changelog/rss.xml
+  content-type: application/rss+xml; charset=utf-8
+  cache-control: public, max-age=900
+  netlify-cdn-cache-control: public, s-maxage=31536000
+  access-control-allow-origin: *

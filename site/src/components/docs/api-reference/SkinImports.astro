@@ -17,11 +17,13 @@ interface Props {
   neutral?: boolean;
   /** Compat variant, shipped as `compat-skin`. */
   compat?: boolean;
+  /** Scaffold variant, shipped as `scaffold-skin`. */
+  scaffold?: boolean;
 }
 
-const { preset, react, neutral = false, compat = false } = Astro.props;
-const module = compat ? 'compat-skin' : neutral ? 'neutral-skin' : 'skin';
-const bundle = preset === 'background' ? 'background' : `${preset}${neutral ? '-neutral' : ''}`;
+const { preset, react, neutral = false, compat = false, scaffold = false } = Astro.props;
+const module = scaffold ? 'scaffold-skin' : compat ? 'compat-skin' : neutral ? 'neutral-skin' : 'skin';
+const bundle = preset === 'background' ? 'background' : `${preset}${scaffold ? '-scaffold' : neutral ? '-neutral' : ''}`;
 const cdnCode = `<script type="module" src="${VJS10_CDN_BASE}/${bundle}.js"></script>`;
 
 const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledLanguage }> = [

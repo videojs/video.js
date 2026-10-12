@@ -7,6 +7,7 @@
 @import "./video/theme.css";
 @import "./audio/theme.css";
 @import "./themes/compat.css";
+@import "./themes/scaffold.css";
 @import "./tailwind.css";
 
 @theme inline {

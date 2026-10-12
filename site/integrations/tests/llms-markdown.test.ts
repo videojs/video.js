@@ -478,10 +478,19 @@ describe('generateDocsIndex', () => {
     expect(index).toContain(
       '> Vidstack Player is in security-only maintenance. To move existing `vidstack` code, read https://videojs.org/docs/framework/html/guides/migrate-from-vidstack.md\n'
     );
+    expect(index).not.toContain('Video-React');
     expect(index).toContain(
       '## Guides\n\n' +
         'Installation, migration, concepts, playback guides, customization, and tooling for Video.js.\n\n' +
         'Section index: [guides/llms.txt](https://videojs.org/docs/framework/html/guides/llms.txt). This section in one file (about 90k tokens): https://videojs.org/docs/framework/html/guides/llms-full.txt\n\n'
+    );
+  });
+
+  it('points React readers at the Video-React migration guide', () => {
+    const index = generateDocsIndex('react', [], SITE_URL);
+
+    expect(index).toContain(
+      '> Video-React is in security-only maintenance. To move existing `video-react` code, read https://videojs.org/docs/framework/react/guides/migrate-from-video-react.md\n'
     );
   });
 });

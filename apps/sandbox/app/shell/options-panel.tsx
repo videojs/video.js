@@ -26,7 +26,7 @@ import { CAPTIONS_MODES, type CaptionsMode } from '@app/shared/captions';
 import { SANDBOX_LOCALE_OPTION_GROUPS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import { ASPECT_RATIOS, type AspectRatio, PLAYER_WIDTH } from '@app/shared/player-frame';
 import { XMarkIcon } from '@heroicons/react/16/solid';
-import { type ReactNode, useId, useMemo, useRef } from 'react';
+import { type ReactNode, useId, useMemo, useRef, useState } from 'react';
 
 import { PREFERENCE_QUERIES, type Preferences } from './report';
 import { SelectField } from './select';
@@ -254,6 +254,7 @@ type WidthControlProps = {
 function WidthControl({ value, onChange, disabled }: WidthControlProps) {
   const id = useId();
   const dragging = useRef(false);
+  const [draft, setDraft] = useState<string | null>(null);
   const clamp = (width: number) =>
     Number.isFinite(width) ? Math.min(PLAYER_WIDTH.max, Math.max(PLAYER_WIDTH.min, Math.round(width))) : value;
 
@@ -269,9 +270,20 @@ function WidthControl({ value, onChange, disabled }: WidthControlProps) {
           min={PLAYER_WIDTH.min}
           max={PLAYER_WIDTH.max}
           step={1}
-          value={value}
+          value={draft ?? value}
           disabled={disabled}
-          onChange={(event) => onChange(clamp(event.target.valueAsNumber))}
+          onChange={(event) => setDraft(event.target.value)}
+          onBlur={(event) => {
+            if (draft !== null) onChange(clamp(event.target.valueAsNumber));
+
+            setDraft(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              event.currentTarget.blur();
+            }
+          }}
           className="h-8 w-20 text-right text-sm tabular-nums"
         />
         <span className="text-muted-foreground text-sm">px</span>
@@ -342,7 +354,7 @@ type ColorItemProps = {
 function ColorItem({ id, value, onChange }: ColorItemProps) {
   const pickerValue = useMemo(() => {
     const context = document.createElement('canvas').getContext('2d');
-    if (!context || !CSS.supports('color', value)) return '#ff0000';
+    if (!context || !CSS.supports('color', value)) return '#808080';
 
     // The native picker needs sRGB hex even when the text uses another CSS color format.
     context.fillStyle = value;
@@ -370,9 +382,10 @@ function ColorItem({ id, value, onChange }: ColorItemProps) {
         <input
           type="color"
           value={pickerValue}
+          disabled={!value.trim()}
           onChange={(event) => onChange(event.target.value)}
           aria-label="Choose accent color"
-          className="size-7 cursor-pointer rounded border-none bg-transparent p-0"
+          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 disabled:cursor-default disabled:opacity-50"
         />
       </div>
     </>

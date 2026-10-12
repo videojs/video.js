@@ -32,6 +32,9 @@ export const registryTargets = [
   { framework: 'react', styling: 'tailwind', theme: 'compat', output: 'r/react/compat' },
   { framework: 'react', styling: 'css', theme: 'compat', output: 'r/react/css/compat' },
   { framework: 'html', styling: 'css', theme: 'compat', output: 'r/html/compat' },
+  { framework: 'react', styling: 'tailwind', theme: 'scaffold', output: 'r/react/scaffold' },
+  { framework: 'react', styling: 'css', theme: 'scaffold', output: 'r/react/css/scaffold' },
+  { framework: 'html', styling: 'css', theme: 'scaffold', output: 'r/html/scaffold' },
 ] as const satisfies readonly RegistryTarget[];
 
 export const packageRequirements = {

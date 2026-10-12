@@ -17,11 +17,11 @@ export default async function agentMarkdownNegotiation(request: Request, context
 
 // Netlify requires inline static config values, so this repeats `markdown-negotiation.ts`; a test keeps them equal.
 export const config: Config = {
-  excludedPath: ['/blog/*.md', '/changelog/*.md', '/docs/*.md', '/html5-video-support.md', '/about-this-player.md'],
+  excludedPath: ['/blog/*.md', '/changelog/*.md', '/docs/*.md', '/html5-video-support.md', '/help.md'],
   header: {
     accept: '[Tt][Ee][Xx][Tt]/[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn]',
   },
   method: 'GET',
   onError: 'bypass',
-  path: ['/blog/*', '/changelog/*', '/docs/*', '/html5-video-support', '/about-this-player'],
+  path: ['/blog/*', '/changelog/*', '/docs/*', '/html5-video-support', '/help'],
 };

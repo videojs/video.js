@@ -45,7 +45,7 @@ class MockPlayer {
   loadPlaylist = vi.fn();
   cuePlaylist = vi.fn();
   stopVideo = vi.fn();
-  getOption = vi.fn(() => []);
+  getOption = vi.fn((_module: string, _option: string): unknown => undefined);
   setOption = vi.fn();
   destroy = vi.fn();
 
@@ -1239,5 +1239,240 @@ describe('YouTubeAdapter source', () => {
 
     await expect(pending).resolves.toBeUndefined();
     media.detach();
+  });
+});
+
+describe('YouTubeAdapter textTracks', () => {
+  const EN = { languageCode: 'en', displayName: 'English' };
+  const ES = { languageCode: 'es', displayName: 'Spanish' };
+  const FR = { languageCode: 'fr', displayName: 'French' };
+
+  interface CaptionReport {
+    tracklist?: { languageCode: string; displayName: string }[];
+    track?: { languageCode?: string };
+  }
+
+  /** Answer the captions module's options the way the iframe API caches them, then announce the module change. */
+  function reportCaptions(player: MockPlayer, { tracklist = [], track = {} }: CaptionReport): void {
+    player.getOption.mockImplementation((module, option) => {
+      if (module !== 'captions') return undefined;
+
+      return option === 'tracklist' ? tracklist : option === 'track' ? track : undefined;
+    });
+    player.emit('onApiChange');
+  }
+
+  /** Track list events are queued like native ones. */
+  async function flushTrackEvents(): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve));
+  }
+
+  function snapshot(media: YouTubeAdapter) {
+    return Array.from(media.textTracks, ({ kind, label, language, mode }) => ({ kind, label, language, mode }));
+  }
+
+  it('surfaces caption tracks on the list read before the player existed', async () => {
+    const media = new YouTubeAdapter();
+    const textTracks = media.textTracks;
+    const addtrack = vi.fn();
+
+    textTracks.addEventListener('addtrack', addtrack);
+
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN, ES] });
+    await flushTrackEvents();
+
+    expect(media.textTracks).toBe(textTracks);
+    expect(addtrack).toHaveBeenCalledTimes(2);
+    expect(snapshot(media)).toEqual([
+      { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+      { kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+    ]);
+    media.detach();
+  });
+
+  it('surfaces caption tracks on the list read after the player is ready', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+    const addtrack = vi.fn();
+
+    media.textTracks.addEventListener('addtrack', addtrack);
+    reportCaptions(player, { tracklist: [EN] });
+    await flushTrackEvents();
+
+    expect(addtrack).toHaveBeenCalledTimes(1);
+    expect(snapshot(media).map(({ language }) => language)).toEqual(['en']);
+    media.detach();
+  });
+
+  it('surfaces tracks the captions module reports after the first playing transition', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    player.emit('onStateChange', STATE.PLAYING);
+    expect(media.textTracks).toHaveLength(0);
+
+    reportCaptions(player, { tracklist: [EN] });
+    reportCaptions(player, { tracklist: [EN, ES] });
+
+    expect(snapshot(media).map(({ language }) => language)).toEqual(['en', 'es']);
+    media.detach();
+  });
+
+  it('shows the track YouTube renders on load without echoing it back', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+    const change = vi.fn();
+
+    media.textTracks.addEventListener('change', change);
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    await flushTrackEvents();
+
+    expect(snapshot(media).map(({ mode }) => mode)).toEqual(['disabled', 'showing']);
+    expect(change).toHaveBeenCalledTimes(1);
+    expect(player.setOption).not.toHaveBeenCalled();
+    media.detach();
+  });
+
+  it('surfaces the track YouTube renders even when the track list omits it', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN], track: FR });
+
+    expect(snapshot(media)).toEqual([
+      { kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+      { kind: 'subtitles', label: 'French', language: 'fr', mode: 'showing' },
+    ]);
+    media.detach();
+  });
+
+  it('turns off the captions YouTube shows when the showing track is disabled', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    await flushTrackEvents();
+
+    media.textTracks[1]!.mode = 'disabled';
+    await flushTrackEvents();
+
+    expect(player.setOption).toHaveBeenCalledTimes(1);
+    expect(player.setOption).toHaveBeenCalledWith('captions', 'track', {});
+    media.detach();
+  });
+
+  it('selects one language for a switch made within a tick', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    await flushTrackEvents();
+
+    media.textTracks[1]!.mode = 'disabled';
+    media.textTracks[0]!.mode = 'showing';
+    await flushTrackEvents();
+
+    expect(player.setOption).toHaveBeenCalledTimes(1);
+    expect(player.setOption).toHaveBeenCalledWith('captions', 'track', { languageCode: 'en' });
+    media.detach();
+  });
+
+  it('keeps a selection over the stale track YouTube keeps reporting', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    await flushTrackEvents();
+
+    media.textTracks[1]!.mode = 'disabled';
+    await flushTrackEvents();
+
+    // The embed's cached `track` still names the language that was turned off.
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    player.emit('onStateChange', STATE.PLAYING);
+    await flushTrackEvents();
+
+    expect(snapshot(media).map(({ mode }) => mode)).toEqual(['disabled', 'disabled']);
+    expect(player.setOption).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('leaves modes alone while the captions module is not loaded', async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+
+    reportCaptions(player, { tracklist: [EN], track: EN });
+    player.getOption.mockReturnValue(undefined);
+    player.emit('onStateChange', STATE.BUFFERING);
+
+    expect(snapshot(media).map(({ mode }) => mode)).toEqual(['showing']);
+    media.detach();
+  });
+
+  it("drops the previous video's tracks when the source changes", async () => {
+    const media = new YouTubeAdapter();
+    const { player } = await attachAndLoad(media);
+    const removetrack = vi.fn();
+
+    reportCaptions(player, { tracklist: [EN, ES], track: ES });
+    await flushTrackEvents();
+    media.textTracks[1]!.mode = 'disabled';
+    await flushTrackEvents();
+
+    media.textTracks.addEventListener('removetrack', removetrack);
+    media.src = 'dQw4w9WgXcQ';
+    await flushTrackEvents();
+
+    expect(media.textTracks).toHaveLength(0);
+    expect(media.textTracks[0]).toBeUndefined();
+    expect(removetrack).toHaveBeenCalledTimes(2);
+
+    // The new video's report is YouTube's own state again, not stale after the earlier selection.
+    reportCaptions(player, { tracklist: [FR], track: FR });
+    await flushTrackEvents();
+
+    expect(snapshot(media)).toEqual([{ kind: 'subtitles', label: 'French', language: 'fr', mode: 'showing' }]);
+    expect(player.setOption).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('keeps one track list across embed recreation, dropping the old tracks', async () => {
+    const media = new YouTubeAdapter();
+    const src = 'aqz-KE-bpKQ';
+
+    media.source = { src };
+    const { iframe, player } = await attachAndLoad(media);
+    const textTracks = media.textTracks;
+
+    document.body.append(iframe);
+    // The iframe API removes the embed when its player is destroyed.
+    player.destroy.mockImplementation(() => iframe.remove());
+
+    try {
+      reportCaptions(player, { tracklist: [EN] });
+
+      media.source = { src, engine: { youtube: { cc_load_policy: 1 } } };
+      const replacement = await vi.waitFor(() => {
+        const engine = media.engine;
+        if (!(engine instanceof MockPlayer) || engine === player) throw new Error('replacement not created yet');
+
+        return engine;
+      });
+
+      expect(media.textTracks).toHaveLength(0);
+
+      replacement.ready();
+      reportCaptions(replacement, { tracklist: [ES], track: ES });
+      // A report from the destroyed player belongs to the old embed.
+      reportCaptions(player, { tracklist: [FR], track: FR });
+
+      expect(media.textTracks).toBe(textTracks);
+      expect(snapshot(media)).toEqual([{ kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' }]);
+    } finally {
+      media.destroy();
+      iframe.remove();
+    }
   });
 });
