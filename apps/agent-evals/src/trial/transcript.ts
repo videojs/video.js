@@ -296,7 +296,10 @@ export interface ActivitySignals {
   fetchedLegacyDocs: boolean;
   fetchedGithubSource: boolean;
   ranShadcn: boolean;
-  /** Tried to install the `video.js` npm package, which resolves to Video.js 8. */
+  /**
+   * Tried to install the `video.js` npm package: Video.js 8, until a release publishes the Video.js 10 package that
+   * only points to the framework packages.
+   */
   installedVideojsPackage: boolean;
   loadedSkill: boolean;
   ranBuild: boolean;

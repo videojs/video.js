@@ -17,9 +17,9 @@ export interface PackOptions {
 }
 
 /**
- * Builds the workspace the way the release job does and packs each public package, so evals can run against code that
- * is not on npm yet. Unlike pkg.pr.new previews, these packs keep real version numbers and the bundled docs. Returns
- * the packed tarballs.
+ * Builds the workspace the way the release job does and packs each public package, with the private workspace packages
+ * they depend on, so evals can run against code that is not on npm yet. Unlike pkg.pr.new previews, these packs keep
+ * real version numbers and the bundled docs. Returns the packed tarballs.
  */
 export function packWorkspace({ root, out, build }: PackOptions): string[] {
   if (build) {
@@ -29,7 +29,7 @@ export function packWorkspace({ root, out, build }: PackOptions): string[] {
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
 
-  for (const dir of publicPackageDirs(root)) {
+  for (const dir of packageDirs(root)) {
     run('pnpm', ['pack', '--pack-destination', out], dir);
   }
 
@@ -44,20 +44,45 @@ export function packWorkspace({ root, out, build }: PackOptions): string[] {
   return tarballs.map((file) => join(out, file));
 }
 
-function publicPackageDirs(root: string): string[] {
-  return PACKAGE_GROUPS.flatMap((group) =>
-    readdirSync(join(root, group), { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => join(root, group, entry.name))
-      .filter((dir) => {
-        const manifestPath = join(dir, 'package.json');
-        if (!existsSync(manifestPath)) return false;
+interface WorkspaceManifest {
+  name: string;
+  private?: boolean;
+  dependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+}
 
-        const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as { name: string; private?: boolean };
+/**
+ * Every public package, and every workspace package they depend on. Packing pins a workspace dependency to its exact
+ * version, so a private one must be packed too: `@videojs/core` depends on `video.js` before `video.js` publishes.
+ */
+function packageDirs(root: string): string[] {
+  const workspace = new Map(
+    PACKAGE_GROUPS.flatMap((group) =>
+      readdirSync(join(root, group), { withFileTypes: true })
+        .map((entry) => join(root, group, entry.name))
+        .filter((dir) => existsSync(join(dir, 'package.json')))
+        .map((dir) => {
+          const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as WorkspaceManifest;
 
-        return !manifest.private;
-      })
+          return [manifest.name, { dir, manifest }] as const;
+        })
+    )
   );
+  const packed = new Set(
+    [...workspace.values()].filter(({ manifest }) => !manifest.private).map(({ manifest }) => manifest.name)
+  );
+
+  // A set visits what is added while iterating it, so this walks the whole dependency closure.
+  for (const name of packed) {
+    const { dependencies, optionalDependencies, peerDependencies } = workspace.get(name)!.manifest;
+
+    for (const dependency of Object.keys({ ...dependencies, ...optionalDependencies, ...peerDependencies })) {
+      if (workspace.has(dependency)) packed.add(dependency);
+    }
+  }
+
+  return [...packed].map((name) => workspace.get(name)!.dir);
 }
 
 function run(command: string, args: string[], cwd: string): void {

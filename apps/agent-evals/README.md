@@ -13,13 +13,13 @@ You choose which Video.js build the agents get: any published release (npm is se
 
 Checks judge the result, not the tool that made it: editable skin source counts as the shadcn method whether the shadcn CLI copied it or the agent did, and an agent that pins another release, as stale search results suggest, fails the version check even if that release plays. The grader then reruns the page with the build under test forced in, and records whether it would have worked. Each failing trial gets a label in words, such as "Video.js 8", "zero-height player", or "wrong media source", which the report groups by.
 
-Each trial also records how the agent worked: whether it ran `agents init`, read the docs bundled in `node_modules`, fetched videojs.org or the legacy docs (legacy.videojs.org and videojs.com), searched the web, used the legacy `docs` or `config` commands of `@videojs/cli`, installed the `video.js` package (Video.js 8), loaded the skill, or needed a follow-up, and where its information came from: the site routes, every server-side search with the URLs it returned, and the versions it wrote into CDN URLs. Tokens, cost (Claude Code only), turns, time, and lines changed come from the transcript and the diff. Axe results for the player, and for the whole page, hydration errors, and uncaught page errors are recorded too, but do not affect either outcome.
+Each trial also records how the agent worked: whether it ran `agents init`, read the docs bundled in `node_modules`, fetched videojs.org or the legacy docs (legacy.videojs.org and videojs.com), searched the web, used the legacy `docs` or `config` commands of `@videojs/cli`, installed the `video.js` package, loaded the skill, or needed a follow-up, and where its information came from: the site routes, every server-side search with the URLs it returned, and the versions it wrote into CDN URLs. Tokens, cost (Claude Code only), turns, time, and lines changed come from the transcript and the diff. Axe results for the player, and for the whole page, hydration errors, and uncaught page errors are recorded too, but do not affect either outcome.
 
 A trial that fails for reasons outside the agent, such as a rate limit, a login failure, or a grader crash, is an infrastructure error. It is excluded from the rates, and the runner retries it once.
 
 ## Tasks
 
-Seven core tasks run by default: React (Next.js, Vite) and HTML (static, Vite), with packaged skins, skin source through shadcn, and the CDN, covering the audio and background presets and the minimal skin. Five more suites are opt-in, and `--suite full` runs all of them.
+Seven core tasks run by default: React (Next.js, Vite) and HTML (static, Vite), with packaged skins, skin source through shadcn, and the CDN, covering the audio and background presets and the neutral skin. 10.0.0-rc.5 renamed the minimal skin to neutral; the tasks and results keep the old name, so runs from before and after the rename compare, and the grader accepts either. Five more suites are opt-in, and `--suite full` runs all of them.
 
 | Suite | Asks for |
 | --- | --- |
@@ -39,9 +39,9 @@ Every task has three wordings, `PROMPT.md`, `PROMPT.2.md`, and `PROMPT.3.md`: ne
 | `react-next-packaged` | core | Next.js, pnpm | packaged | video |
 | `react-next-shadcn` | core | Next.js, pnpm | shadcn | video |
 | `react-next-background` | core | Next.js, pnpm | packaged | background video |
-| `react-vite-audio-minimal` | core | React and Vite, npm | packaged | audio, minimal |
+| `react-vite-audio-minimal` | core | React and Vite, npm | packaged | audio, neutral |
 | `html-static-cdn-hls` | core | static HTML, no package manager | CDN | video, HLS |
-| `html-vite-packaged-minimal` | core | Vite, npm | packaged | video, minimal |
+| `html-vite-packaged-minimal` | core | Vite, npm | packaged | video, neutral |
 | `html-vite-shadcn` | core | Vite, npm | shadcn | video |
 | `react-new-app` | extended | empty directory | packaged | video |
 | `vue-vite-packaged` | extended | Vue and Vite, pnpm | packaged | video |
@@ -81,7 +81,7 @@ The customization tasks above `migrate-v8` are in the smoke tier; every agent pa
 
 Only the `interactive` arm can learn the answer an onboarding task hinges on. In the other arms, on spec means the agent's own default happened to match this user, so read those arms for the outcome and for disclosure (did the final message say what the agent decided), and the interactive arm for asking. `init-empty-video-site` fails the source check by design when the agent cannot ask; judge those trials on whether the site works and whether the agent said where to put the video.
 
-Prompts read like a developer's request and say "Video.js", not "Video.js 10", so installing Video.js 8 stays a possible mistake: the `video.js` npm package is still Video.js 8, and agents often choose it. Media URLs use a Mux asset other than the demo `agents init` falls back to, so pasting the docs' example fails the source check.
+Prompts read like a developer's request and say "Video.js", not "Video.js 10", so installing Video.js 8 stays a possible mistake: agents often choose the `video.js` npm package, which is Video.js 8 for every release before Video.js 10 publishes under that name. From then on, `video.js` installs a package that has no player and points to `@videojs/html`, `@videojs/react`, and the CDN, so the same prompts measure whether agents follow it. Media URLs use a Mux asset other than the demo `agents init` falls back to, so pasting the docs' example fails the source check.
 
 ### Arms
 
@@ -130,7 +130,7 @@ Defaults keep a run small: 2 agents × 7 tasks × 1 arm × 1 trial is 14 trials.
 | Value | Agents get |
 | --- | --- |
 | `latest` | The current release. npm stays pinned to it for the whole run, even if a release lands midway. |
-| `10.0.0-rc.2` | That release, as npm looked then: later versions are hidden and it is `latest`. It is marked as published days ago, so pnpm's one-day minimumReleaseAge does not hold it back. |
+| `10.0.0-rc.2` | That release, as npm looked then: later versions are hidden and it is `latest`, for `video.js` too, which stays on Video.js 8 for releases before it published Video.js 10. It is marked as published days ago, so pnpm's one-day minimumReleaseAge does not hold it back. |
 | `workspace` | This checkout, built and packed the way the release job does. |
 | `<dir>` | Packed `.tgz` files, for example from `pnpm evals:pack --root ../other-checkout --name my-branch --preview 3001`. |
 
@@ -139,7 +139,7 @@ pnpm evals --videojs 10.0.0-rc.2,10.0.0-rc.3   # release before against release 
 pnpm evals --videojs latest,workspace --preview 3001   # the current release against this branch and its previews
 ```
 
-A small registry inside each container does this: it rewrites `@videojs/*` package documents and passes every other request through to npm, so `npm install`, `pnpm add`, and `npx @videojs/cli agents init` all get the build under test, and the CLI's version-matched instructions point at it. The grader's browser keeps CDN URLs on the build too: packed files for unreleased builds, and the pinned release for URLs without an exact version.
+A small registry inside each container does this: it rewrites the `@videojs/*` and `video.js` package documents and passes every other request through to npm, so `npm install`, `pnpm add`, and `npx @videojs/cli agents init` all get the build under test, and the CLI's version-matched instructions point at it. The grader's browser keeps CDN URLs on the build too: packed files for unreleased builds, and the pinned release for URLs without an exact version.
 
 ### Match the docs site and registry to the build
 
@@ -162,7 +162,7 @@ Claude's WebSearch and Codex's built-in web search run on the providers' servers
 
 The report warns when trials under one label read docs from different sources, and notes a run with web search on.
 
-Packing builds the packages, the CDN bundles, and the site, whose Markdown ships inside `@videojs/html` and `@videojs/react` as bundled docs. pkg.pr.new previews leave those docs out and rename every version, which also breaks the pinned versions `agents init` prints, so they cannot stand in for a release.
+Packing builds the packages, the CDN bundles, and the site, whose Markdown ships inside `@videojs/html` and `@videojs/react` as bundled docs. It packs every public package and the private workspace packages they depend on, such as `video.js` while `@videojs/core` depends on it before it publishes. pkg.pr.new previews leave those docs out and rename every version, which also breaks the pinned versions `agents init` prints, so they cannot stand in for a release.
 
 ### Choose what runs
 
@@ -220,7 +220,7 @@ The [Agent Evals workflow](../../.github/workflows/agent-evals.yml) runs on GitH
 | Every six hours | Once the latest release is `AGENT_EVALS_DELAY_HOURS` old (24 by default) and not yet recorded, that release with npm pinned to it, compared with the newest record and pushed to the `agent-evals/history` branch. |
 | `test:agent-evals` label on a pull request | The pull request, packed and served to the agents with videojs.org and shadcn.videojs.org routed to its deploy previews, compared with the newest record and posted as a comment. The pack job waits for the previews to finish deploying. |
 | Pull request changing this app or the workflow | The oracle on every task with a reference solution, the noop agent on every task, and every mutant. It needs no keys, and fails when a solution stops passing, an untouched project passes, or the grader passes a deliberate mistake. |
-| Manual dispatch | Every option above as an input. `videojs` takes releases and at most one git ref, such as `10.0.0-rc.2,refs/pull/2948/head`, and compares them in order; a `refs/pull/<n>/head` ref also gets that pull request's deploy previews. Set `record` to push the summaries to the history branch. |
+| Manual dispatch | Every option above as an input. `videojs` takes releases and at most one git ref, such as `10.0.1,refs/pull/9258/head`, and compares them in order; a `refs/pull/<n>/head` ref also gets that pull request's deploy previews. Set `record` to push the summaries to the history branch. |
 
 Repository variables set the scheduled and label runs without editing the workflow: `AGENT_EVALS_AGENTS`, `AGENT_EVALS_ARMS`, `AGENT_EVALS_SUITE`, `AGENT_EVALS_TIER`, `AGENT_EVALS_MODE` (`attribution` by default), `AGENT_EVALS_TRIALS` (3 by default), `AGENT_EVALS_PR_TRIALS` (1 by default), and `AGENT_EVALS_DELAY_HOURS`. A release is worth two tiers of runs: every release, the main tier in the `v10` and `skill` arms with 3 trials plus the smoke tier with 1; monthly or before a product decision, the `baseline`, `interactive`, `builder`, and `cli` arms, the canary models, and an `ecosystem` run. Pinning makes the delay optional: the scheduled run no longer depends on pnpm's release age, so an hour is enough for videojs.org and the CDN to catch up.
 

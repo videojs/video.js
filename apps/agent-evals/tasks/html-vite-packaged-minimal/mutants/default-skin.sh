@@ -3,5 +3,5 @@
 # expect: skin
 set -euo pipefail
 
-sed -i 's|video/minimal-skin|video/skin|' src/player.ts
-sed -i 's|video-minimal-skin|video-skin|g' index.html
+sed -i -E 's#video/(minimal|neutral)-skin#video/skin#' src/player.ts
+sed -i -E 's#video-(minimal|neutral)-skin#video-skin#g' index.html

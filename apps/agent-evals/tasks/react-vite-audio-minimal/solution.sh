@@ -4,16 +4,20 @@ set -euo pipefail
 
 npm install @videojs/react
 
-cat > src/PodcastPlayer.tsx <<'TSX'
-import '@videojs/react/audio/minimal-skin.css';
-import { Audio, AudioPlayer, MinimalAudioSkin } from '@videojs/react/audio';
+# 10.0.0-rc.5 renamed the minimal skin to neutral.
+skin=$(node -p "/^10\\.0\\.0-(?:alpha|beta|rc\\.[1-4]$)/.test(require('./node_modules/@videojs/react/package.json').version) ? 'minimal' : 'neutral'")
+Skin=${skin^}
+
+cat > src/PodcastPlayer.tsx <<TSX
+import '@videojs/react/audio/${skin}-skin.css';
+import { Audio, AudioPlayer, ${Skin}AudioSkin } from '@videojs/react/audio';
 
 export function PodcastPlayer({ src }: { src: string }) {
   return (
     <AudioPlayer>
-      <MinimalAudioSkin>
+      <${Skin}AudioSkin>
         <Audio src={src} />
-      </MinimalAudioSkin>
+      </${Skin}AudioSkin>
     </AudioPlayer>
   );
 }

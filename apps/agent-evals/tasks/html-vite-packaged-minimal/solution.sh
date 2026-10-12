@@ -4,12 +4,15 @@ set -euo pipefail
 
 npm install @videojs/html
 
-cat > src/player.ts <<'TS'
+# 10.0.0-rc.5 renamed the minimal skin to neutral.
+skin=$(node -p "/^10\\.0\\.0-(?:alpha|beta|rc\\.[1-4]$)/.test(require('./node_modules/@videojs/html/package.json').version) ? 'minimal' : 'neutral'")
+
+cat > src/player.ts <<TS
 import '@videojs/html/video/player'
-import '@videojs/html/video/minimal-skin'
+import '@videojs/html/video/${skin}-skin'
 TS
 
-cat > index.html <<'HTML'
+cat > index.html <<HTML
 <!doctype html>
 <html lang="en">
   <head>
@@ -23,9 +26,9 @@ cat > index.html <<'HTML'
       <h1>Acme Studio</h1>
       <p>Short films from independent creators.</p>
       <video-player>
-        <video-minimal-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
+        <video-${skin}-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
           <video src="https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4" playsinline></video>
-        </video-minimal-skin>
+        </video-${skin}-skin>
       </video-player>
     </main>
     <script type="module" src="/src/main.ts"></script>

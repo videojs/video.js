@@ -99,6 +99,50 @@ describe('analyzeProject', () => {
     expect(analyzeProject(dir, changed)).toMatchObject({ method: 'packaged', preset: 'audio', skin: 'minimal' });
   });
 
+  it('counts the neutral skin, the minimal skin renamed, as minimal', () => {
+    const react = project({
+      'package.json': JSON.stringify({ dependencies: { '@videojs/react': '10.0.1' } }),
+      'src/Podcast.tsx': [
+        "import '@videojs/react/audio/neutral-skin.css';",
+        "import { Audio, AudioPlayer, NeutralAudioSkin } from '@videojs/react/audio';",
+      ].join('\n'),
+    });
+    const html = project({
+      'package.json': JSON.stringify({ dependencies: { '@videojs/html': '10.0.1' } }),
+      'src/player.ts': "import '@videojs/html/video/player';\nimport '@videojs/html/video/neutral-skin';",
+      'index.html': '<video-player><video-neutral-skin><video src="a.mp4"></video></video-neutral-skin></video-player>',
+    });
+
+    expect(analyzeProject(react.dir, react.changed)).toMatchObject({ method: 'packaged', skin: 'minimal' });
+    expect(analyzeProject(html.dir, html.changed)).toMatchObject({ method: 'packaged', skin: 'minimal' });
+  });
+
+  it('tells the compat and scaffold skins from the default skin', () => {
+    const compat = project({
+      'package.json': JSON.stringify({ dependencies: { '@videojs/react': '10.0.1' } }),
+      'src/Player.tsx': "import { CompatVideoSkin, Video, VideoPlayer } from '@videojs/react/video';",
+    });
+    const scaffold = project({
+      'package.json': JSON.stringify({ dependencies: { '@videojs/html': '10.0.1' } }),
+      'index.html':
+        '<video-player><video-scaffold-skin><video src="a.mp4"></video></video-scaffold-skin></video-player>',
+    });
+
+    expect(analyzeProject(compat.dir, compat.changed)).toMatchObject({ method: 'packaged', skin: 'compat' });
+    expect(analyzeProject(scaffold.dir, scaffold.changed)).toMatchObject({ method: 'packaged', skin: 'scaffold' });
+  });
+
+  it('takes the video.js 10 package, which only routes installs, for Video.js 10', () => {
+    const { dir, changed } = project({
+      'package.json': JSON.stringify({ dependencies: { 'video.js': '^10.1.0', '@videojs/html': '^10.1.0' } }),
+      'src/player.ts': "import '@videojs/html/video/player';",
+    });
+    const report = analyzeProject(dir, changed);
+
+    expect(report.v8Evidence).toEqual([]);
+    expect(report.choice).toBe('videojs-10');
+  });
+
   it('collects Video.js 8 evidence', () => {
     const { dir, changed } = project({
       'package.json': JSON.stringify({ dependencies: { 'video.js': '^8.10.0' } }),

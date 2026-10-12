@@ -109,6 +109,26 @@ describe('pinToRelease', () => {
     });
     expect(pinToRelease(packument, '9.0.0', now)).toBeNull();
   });
+
+  it('keeps video.js on Video.js 8 for releases before it published Video.js 10', () => {
+    const videojs = {
+      name: 'video.js',
+      versions: { '8.24.1': {}, '8.24.2': {}, '10.1.0': {} },
+      'dist-tags': { latest: '10.1.0', 'latest-8': '8.24.1', 'next-8': '8.24.2' },
+      time: { '8.24.1': '2026-09-10T00:00:00.000Z', '8.24.2': '2026-10-06T00:00:00.000Z' },
+    };
+
+    expect(pinToRelease(videojs, '10.0.1', now)!['dist-tags']).toEqual({
+      latest: '8.24.2',
+      next: '8.24.2',
+      'latest-8': '8.24.1',
+      'next-8': '8.24.2',
+    });
+    expect(pinToRelease(videojs, '10.1.0', now)!['dist-tags']).toMatchObject({
+      latest: '10.1.0',
+      'latest-8': '8.24.1',
+    });
+  });
 });
 
 describe('withProxyTarballs', () => {

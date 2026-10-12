@@ -56,6 +56,12 @@ describe('builderCommand', () => {
     expect(builderCommand(context('html-static-cdn-hls'))).not.toContain('--package-manager');
   });
 
+  it('names the minimal skin as each release does', () => {
+    expect(builderCommand(context('html-vite-packaged-minimal', '10.0.0-rc.4'))).toContain('--skin minimal');
+    expect(builderCommand(context('html-vite-packaged-minimal', '10.0.0-rc.5'))).toContain('--skin neutral');
+    expect(builderCommand(context('html-vite-packaged-minimal', null))).toContain('--skin neutral');
+  });
+
   it('falls back to latest for unreleased builds', () => {
     expect(builderCommand(context('react-next-packaged', null))).toContain('npx @videojs/cli@latest agents init');
   });

@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import type { Fixture, Task } from './tasks.ts';
+import { compareVersions } from './registry/proxy.ts';
+import type { Fixture, Task, TaskExpectation } from './tasks.ts';
 
 /**
  * How each trial words its request, holding the task constant:
@@ -71,7 +72,7 @@ export function builderCommand({ task, fixture, release }: ArmContext): string {
     template: fixture.template ?? undefined,
     method: expect.method,
     preset: expect.preset,
-    skin: expect.preset === 'background-video' ? undefined : expect.skin,
+    skin: expect.preset === 'background-video' ? undefined : skinFlag(expect.skin, release),
     media: expect.media,
     'source-url': expect.source ?? 'demo',
     extensions: 'none',
@@ -84,6 +85,16 @@ export function builderCommand({ task, fixture, release }: ArmContext): string {
     .map(([flag, value]) => `--${flag} ${value}`);
 
   return `\`\`\`sh\nnpx @videojs/cli@${release ?? 'latest'} agents init ${args.join(' ')}\n\`\`\``;
+}
+
+/**
+ * The `--skin` value for an expected skin: the minimal skin is `neutral` from 10.0.0-rc.5 on, unreleased builds
+ * included.
+ */
+function skinFlag(skin: TaskExpectation['skin'], release: string | null): string | undefined {
+  if (skin !== 'minimal') return skin;
+
+  return release && compareVersions(release, '10.0.0-rc.5') < 0 ? 'minimal' : 'neutral';
 }
 
 function usesTailwind(fixtureDir: string): boolean {

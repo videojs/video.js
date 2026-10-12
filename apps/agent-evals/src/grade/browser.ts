@@ -12,8 +12,8 @@ const PLAY_BUTTON =
   'media-play-button, .media-play-button, button[aria-keyshortcuts~="Space"], button[aria-label="Play" i]';
 // A generic task accepts any player, so its play button can be Video.js 8's, Plyr's, or any control labelled Play.
 const ANY_PLAY_BUTTON = `${PLAY_BUTTON}, .vjs-big-play-button, .plyr__control--overlaid, button[title="Play" i]`;
-const MINIMAL_SKIN =
-  'video-minimal-skin, audio-minimal-skin, live-video-minimal-skin, live-audio-minimal-skin, [data-theme="minimal"]';
+// The minimal skin, under its names before and after 10.0.0-rc.5 renamed it neutral.
+const MINIMAL_SKIN = ['minimal', 'neutral'].map((name) => `${skinElements(name)}, [data-theme="${name}"]`).join(', ');
 // Packaged skins, skin source, and hand-built containers all put `media-skin` or `media-container` on the player box.
 const PLAYER_BOX = '.media-skin, media-container, .media-container';
 // Elements only Video.js 10 renders: players, skins, the container, and its controls, as custom elements or React parts.
@@ -22,7 +22,7 @@ const VIDEOJS_10 = [
   PLAYER_BOX,
   PLAYERS,
   'video-skin, audio-skin, live-video-skin, live-audio-skin, background-video-skin, .media-background-skin',
-  'video-minimal-skin, audio-minimal-skin, live-video-minimal-skin, live-audio-minimal-skin',
+  ...['minimal', 'neutral', 'compat', 'scaffold'].map(skinElements),
   'media-play-button, .media-play-button, media-time-slider, .media-time-slider',
 ].join(', ');
 // Axe cannot see into shadow roots from a selector, so it starts from the light-DOM player or React container.
@@ -468,4 +468,9 @@ async function checkPlayback(
     currentTime: state?.currentTime ?? null,
     mediaError: state?.error ?? null,
   };
+}
+
+/** A skin's custom elements for every preset, such as `video-neutral-skin`. */
+function skinElements(skin: string): string {
+  return ['video', 'audio', 'live-video', 'live-audio'].map((preset) => `${preset}-${skin}-skin`).join(', ');
 }

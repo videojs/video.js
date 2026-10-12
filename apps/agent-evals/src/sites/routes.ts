@@ -69,7 +69,8 @@ export function releasePullRequestFromSubject(subject: string): number | null {
 /**
  * The pull request that released a version. Its deploy previews are the docs site and registry as they stood at that
  * release: the production sites deploy every merge to main, so they describe the newest release only. Reads the release
- * tag from the checkout, or from GitHub when the checkout has no tags.
+ * tag from the checkout, or from GitHub when the checkout has no tags. Releases through 10.0.1 were cut in videojs/v10,
+ * whose history and tags videojs/video.js keeps, and their pull requests' previews still deploy to the same sites.
  */
 export async function releasePullRequest(version: string, repoRoot: string): Promise<number | null> {
   const tag = `@videojs/react@${version}`;
@@ -77,7 +78,7 @@ export async function releasePullRequest(version: string, repoRoot: string): Pro
   if (local.status === 0) return releasePullRequestFromSubject(local.stdout);
 
   const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
-  const response = await fetch(`https://api.github.com/repos/videojs/v10/commits/${encodeURIComponent(tag)}`, {
+  const response = await fetch(`https://api.github.com/repos/videojs/video.js/commits/${encodeURIComponent(tag)}`, {
     headers: { accept: 'application/vnd.github+json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
     signal: AbortSignal.timeout(15_000),
   }).catch(() => null);

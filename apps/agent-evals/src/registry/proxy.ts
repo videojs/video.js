@@ -112,10 +112,6 @@ export function compareVersions(a: string, b: string): number {
 }
 
 /**
- * Rolls a packument back to how npm looked at `release`: later versions disappear and `latest` is the release, or the
- * newest earlier version for a package that skipped it. Returns `null` for a package that did not exist yet.
- */
-/**
  * Points a pinned release's tarballs at the proxy, in npm's standard layout. pnpm records a tarball URL from another
  * host in its lockfile and later verifies that entry's release age against that host, where a release under a day old
  * fails, so pnpm commands after the first install would reject the pinned release. Only pnpm gets this: npm lockfiles
@@ -140,6 +136,11 @@ export function withProxyTarballs(packument: Record<string, unknown>, registryUr
   return { ...packument, versions };
 }
 
+/**
+ * Rolls a packument back to how npm looked at `release`: later versions disappear and `latest` is the release, or the
+ * newest earlier version for a package that skipped it. Other dist-tags that still name a kept version stay, such as
+ * `video.js`'s `latest-8`. Returns `null` for a package that did not exist yet.
+ */
 export function pinToRelease(
   packument: Record<string, unknown>,
   release: string,
@@ -151,6 +152,10 @@ export function pinToRelease(
     .sort(compareVersions);
   const latest = kept.at(-1);
   if (!latest) return null;
+
+  const distTags = Object.entries((packument['dist-tags'] ?? {}) as Record<string, string>).filter(([, version]) =>
+    kept.includes(version)
+  );
 
   const allTime = (packument.time ?? {}) as Record<string, string>;
   const time: Record<string, string> = Object.fromEntries(
@@ -165,7 +170,7 @@ export function pinToRelease(
     ...packument,
     versions: Object.fromEntries(kept.map((version) => [version, versions[version]])),
     time: { ...time, created: allTime.created ?? settled, modified: time[latest] },
-    'dist-tags': { latest, next: latest },
+    'dist-tags': { ...Object.fromEntries(distTags), latest, next: latest },
   };
 }
 
@@ -182,8 +187,8 @@ export interface RegistryProxy {
 }
 
 /**
- * Serves packed builds as the latest @videojs packages, or pins every @videojs package to one release, and forwards all
- * other requests to the public npm registry.
+ * Serves packed builds as the latest versions of their packages, or pins every Video.js package to one release, and
+ * forwards all other requests to the public npm registry.
  */
 export async function startRegistryProxy(source: RegistrySource, port = 4873): Promise<RegistryProxy> {
   const dir = 'packagesDir' in source ? source.packagesDir : null;
@@ -217,7 +222,7 @@ export async function startRegistryProxy(source: RegistrySource, port = 4873): P
     const name = request.method === 'GET' && /^(?:@[^/]+\/)?[^/@]+$/.test(decoded) ? decoded : '';
     const preview = byName.get(name);
 
-    if (release && name.startsWith('@videojs/')) {
+    if (release && isVideojsPackage(name)) {
       const upstream = await fetch(`${UPSTREAM}/${name.replace('/', '%2f')}`, {
         headers: { accept: 'application/json' },
       });
@@ -296,6 +301,14 @@ async function forward(request: IncomingMessage, response: ServerResponse): Prom
   }
 
   response.end();
+}
+
+/**
+ * Packages a release pins: the `@videojs` scope, and `video.js`, which is Video.js 8 on npm until a release publishes
+ * its Video.js 10 package.
+ */
+function isVideojsPackage(name: string): boolean {
+  return name.startsWith('@videojs/') || name === 'video.js';
 }
 
 function notFound(response: ServerResponse): void {

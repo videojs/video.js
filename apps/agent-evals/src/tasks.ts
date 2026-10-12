@@ -17,6 +17,10 @@ export interface TaskExpectation {
   library?: 'videojs-10' | 'any';
   method?: InstallMethod;
   preset?: Preset;
+  /**
+   * `minimal` is the understated skin, renamed neutral in 10.0.0-rc.5. Tasks and results keep the old name, so runs
+   * from either side of the rename still compare.
+   */
   skin?: 'default' | 'minimal' | 'none';
   media?: string;
   /** The media URL the prompt gives. The player must request it, or the same Mux asset in another format. */

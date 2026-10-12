@@ -43,7 +43,7 @@ What to test
                         agent's questions from the task's answer card
   --suite <suites>      Comma-separated (default: core):
                           core        React and HTML installs: Next.js, Vite, static; packaged, shadcn, CDN;
-                                      audio, background, and minimal
+                                      audio, background, and the neutral skin
                           extended    installs for Vue, Nuxt, SvelteKit, Astro, and a new app
                           generic     no library named; records which player the agent picks
                           customize   changes to a working Video.js 10 player, and Video.js 8 migrations
@@ -453,7 +453,7 @@ function packsLabel(dir: string): string {
 
 function describeSource(source: Source): string {
   const build = source.release
-    ? `@videojs/*@${source.release} from npm, pinned`
+    ? `@videojs/* and video.js from npm, pinned to ${source.release}`
     : source.spec === 'workspace'
       ? 'this checkout, packed'
       : `packs in ${relative(process.cwd(), source.packagesDir!)}`;

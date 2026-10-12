@@ -610,7 +610,7 @@ export function renderMarkdown(summary: RunSummary, baseline?: RunSummary): stri
       '',
       '## Player agents ended up with',
       '',
-      'Every trial. For a plain "Video.js" request, Video.js 10 here is adoption; installing Video.js 8 is what the `video.js` npm package gives.',
+      'Every trial. For a plain "Video.js" request, Video.js 10 here is adoption; the `video.js` npm package gave Video.js 8 until a release published Video.js 10 under that name.',
       '',
       `| Agent | Arm | ${choices.join(' | ')} |`,
       `| --- | --- | ${choices.map(() => '---').join(' | ')} |`

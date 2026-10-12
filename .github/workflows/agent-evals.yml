@@ -5,7 +5,7 @@ name: Agent Evals
 # - schedule: once a new @videojs/react release is AGENT_EVALS_DELAY_HOURS old (default 24), evaluate it with npm pinned
 #   to that release, compare with the newest recorded summary, and record it on the agent-evals/history branch.
 # - pull_request labeled `test:agent-evals`: build and pack the pull request, serve those packs to the agents as the
-#   latest @videojs packages, serve videojs.org and shadcn.videojs.org from its Netlify deploy previews, and comment the
+#   latest Video.js packages, serve videojs.org and shadcn.videojs.org from its Netlify deploy previews, and comment the
 #   results compared with the newest recorded summary.
 # - pull_request touching the harness: check fixtures and graders with the oracle, noop, and mutant agents, which cost no
 #   tokens.

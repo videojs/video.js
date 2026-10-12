@@ -13,8 +13,8 @@ describe('rewriteLocation', () => {
 
   it('leaves relative and external redirects alone', () => {
     expect(rewriteLocation('/docs/guides', 'videojs.org', origin)).toBe('/docs/guides');
-    expect(rewriteLocation('https://github.com/videojs/v10', 'videojs.org', origin)).toBe(
-      'https://github.com/videojs/v10'
+    expect(rewriteLocation('https://github.com/videojs/video.js', 'videojs.org', origin)).toBe(
+      'https://github.com/videojs/video.js'
     );
   });
 });

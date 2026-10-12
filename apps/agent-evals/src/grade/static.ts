@@ -57,7 +57,8 @@ export interface StaticReport {
    */
   skinSource?: { parts: number; files: string[] };
   preset: Preset | 'unknown';
-  skin: 'default' | 'minimal' | 'none' | 'unknown';
+  /** `minimal` covers its rename, neutral, as in task expectations. */
+  skin: 'default' | 'minimal' | 'compat' | 'scaffold' | 'none' | 'unknown';
   media: 'hls' | 'dash' | 'background-video' | 'html5' | 'unknown';
   choice: PlayerChoice;
 }
@@ -260,8 +261,8 @@ function detectMethod(
   if (!hasPackages) return 'none';
 
   const packagedSkin =
-    /\b(?:Minimal)?(?:Video|Audio|LiveVideo|LiveAudio)Skin\b/.test(code) ||
-    /<(?:minimal-)?(?:video|audio|live-video|live-audio)(?:-minimal)?-skin\b/.test(code) ||
+    /\b(?:Minimal|Neutral|Compat|Scaffold)?(?:Video|Audio|LiveVideo|LiveAudio)Skin\b/.test(code) ||
+    /<(?:minimal-)?(?:video|audio|live-video|live-audio)(?:-(?:minimal|neutral|compat|scaffold))?-skin\b/.test(code) ||
     /@videojs\/(?:react|html)\/[\w/-]*(?:skin|background)/.test(code) ||
     /\bBackgroundVideo\b|<background-video/.test(code);
 
@@ -316,9 +317,16 @@ function detectSkin(code: string): StaticReport['skin'] {
   if (
     /minimal-(?:video|audio)-skin|(?:video|audio)-minimal-skin|Minimal(?:Video|Audio)Skin|\/minimal[-/]|minimal-(?:video|audio)\b/i.test(
       code
-    )
+    ) ||
+    /(?:video|audio)-neutral(?:-skin)?\b|Neutral(?:Video|Audio)Skin|\/neutral-skin\b/.test(code)
   ) {
     return 'minimal';
+  }
+
+  if (/(?:video|audio)-compat(?:-skin)?\b|Compat(?:Video|Audio)Skin|\/compat-skin\b/.test(code)) return 'compat';
+
+  if (/(?:video|audio)-scaffold(?:-skin)?\b|Scaffold(?:Video|Audio)Skin|\/scaffold-skin\b/.test(code)) {
+    return 'scaffold';
   }
 
   if (/(?:video|audio)-skin|(?:Video|Audio)Skin|skin\.css/.test(code)) return 'default';
