@@ -66,6 +66,34 @@ describe('assertCompositionOrder', () => {
     ).toThrow('both are emitted to `sliders.css`');
   });
 
+  it('accepts an important override, and rejects one that two important declarations contest', async () => {
+    const design = await loadDesignSystem(designPath);
+    const container = rule('media-container', 'container.css', ['overflow-hidden']);
+    const audio = rule('media-audio', 'container.css', ['overflow-visible!']);
+    const pinned = rule('media-container', 'container.css', ['overflow-hidden!']);
+    const compositions = [{ classNames: ['media-container', 'media-audio'], pos: 0 }];
+
+    expect(() => assertCompositionOrder({ design, rules: [container, audio], compositions })).not.toThrow();
+    expect(() => assertCompositionOrder({ design, rules: [pinned, audio], compositions })).toThrow(
+      /`\.media-audio` is composed after `\.media-container`.*`overflow`/
+    );
+  });
+
+  it('accepts an override whose selector is more specific, and rejects one of equal specificity', async () => {
+    const design = await loadDesignSystem(designPath);
+    const icon = rule('media-icon', 'indicators.css', ['hidden']);
+    const shown = rule('media-captions-icon', 'indicators.css', ['group-data-[status=captions-on]/status:block']);
+    const hovered = rule('media-captions-icon', 'indicators.css', ['group-hover/status:block']);
+    const plain = rule('media-captions-icon', 'indicators.css', ['block']);
+    const compositions = [{ classNames: ['media-icon', 'media-captions-icon'], pos: 0 }];
+
+    expect(() => assertCompositionOrder({ design, rules: [icon, shown], compositions })).not.toThrow();
+    expect(() => assertCompositionOrder({ design, rules: [icon, hovered], compositions })).not.toThrow();
+    expect(() => assertCompositionOrder({ design, rules: [icon, plain], compositions })).toThrow(
+      /`\.media-captions-icon` is composed after `\.media-icon`.*`display`/
+    );
+  });
+
   it('accepts compositions whose rules style attribute states no element can be in at once', async () => {
     const design = await loadDesignSystem(designPath);
     const closed = rule('media-z-closed', 'states.css', ['data-[state=closed]:bg-red-500']);

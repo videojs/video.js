@@ -44,9 +44,17 @@ interface RuleProperty {
   readonly name: string;
   /** Attribute name → the value it must equal, `true` when it must be present, or `false` when it must be absent. */
   readonly attributes: ReadonlyMap<string, string | boolean>;
+  /** Whether the declaration is `!important`, which beats a normal declaration wherever each is emitted. */
+  readonly important: boolean;
+  /** Specificity of the rule's selector, or `undefined` for a selector list, whose matching selector can vary. */
+  readonly specificity: Specificity | undefined;
 }
 
+/** Selector specificity as ID, class, and type counts. */
+type Specificity = readonly [ids: number, classes: number, types: number];
+
 type AttributeComponent = Extract<SelectorComponent, { type: 'attribute' }>;
+type PseudoClassComponent = Extract<SelectorComponent, { type: 'pseudo-class' }>;
 
 export interface CompositionOrderOptions {
   readonly compositions: readonly StyleComposition[];
@@ -164,11 +172,23 @@ function candidateProperties(design: DesignSystem, candidate: string): readonly 
               .find((component) => component.type === 'pseudo-element');
             const target = pseudo ? `::${pseudo.kind} ` : '';
             const [selector, ...others] = rule.value.selectors;
-            const attributes = selector && others.length === 0 ? subjectAttributes(selector) : new Map();
+            const single = selector && others.length === 0 ? selector : undefined;
+            const attributes = single ? subjectAttributes(single) : new Map();
+            const specificity = single ? selectorSpecificity(single) : undefined;
             const block = rule.value.declarations;
 
-            for (const declaration of [...(block?.declarations ?? []), ...(block?.importantDeclarations ?? [])]) {
-              properties.push({ name: `${target}${declarationProperty(declaration)}`, attributes });
+            for (const [important, declarations] of [
+              [false, block?.declarations],
+              [true, block?.importantDeclarations],
+            ] as const) {
+              for (const declaration of declarations ?? []) {
+                properties.push({
+                  name: `${target}${declarationProperty(declaration)}`,
+                  attributes,
+                  important,
+                  specificity,
+                });
+              }
             }
           },
         },
@@ -207,6 +227,72 @@ function subjectAttributes(selector: Selector): ReadonlyMap<string, string | boo
   }
 
   return attributes;
+}
+
+/**
+ * Selectors Level 4 specificity: `:where()` adds nothing, and `:is()`, `:not()`, and `:has()` add their most specific
+ * argument.
+ */
+function selectorSpecificity(selector: Selector): Specificity {
+  return selector.reduce<Specificity>(
+    (total, component) => addSpecificity(total, componentSpecificity(component)),
+    [0, 0, 0]
+  );
+}
+
+function componentSpecificity(component: SelectorComponent): Specificity {
+  switch (component.type) {
+    case 'id':
+      return [1, 0, 0];
+    case 'class':
+    case 'attribute':
+      return [0, 1, 0];
+    case 'type':
+    case 'pseudo-element':
+      return [0, 0, 1];
+    case 'pseudo-class':
+      return pseudoClassSpecificity(component);
+    default:
+      return [0, 0, 0];
+  }
+}
+
+function pseudoClassSpecificity(component: PseudoClassComponent): Specificity {
+  switch (component.kind) {
+    case 'where':
+      return [0, 0, 0];
+    case 'is':
+    case 'not':
+    case 'has':
+    case 'any':
+      return maxSpecificity(component.selectors);
+    case 'nth-child':
+    case 'nth-last-child':
+      return addSpecificity([0, 1, 0], maxSpecificity(component.of ?? []));
+    default:
+      return [0, 1, 0];
+  }
+}
+
+function maxSpecificity(selectors: readonly Selector[]): Specificity {
+  return selectors
+    .map(selectorSpecificity)
+    .reduce<Specificity>((max, next) => (compareSpecificity(next, max) > 0 ? next : max), [0, 0, 0]);
+}
+
+function addSpecificity(left: Specificity, right: Specificity): Specificity {
+  return [left[0] + right[0], left[1] + right[1], left[2] + right[2]];
+}
+
+function compareSpecificity(left: Specificity, right: Specificity): number {
+  return left[0] - right[0] || left[1] - right[1] || left[2] - right[2];
+}
+
+/** Whether source order decides between two declarations: the cascade compares importance, then specificity, first. */
+function orderDecides(left: RuleProperty, right: RuleProperty): boolean {
+  if (left.important !== right.important) return false;
+
+  return !left.specificity || !right.specificity || compareSpecificity(left.specificity, right.specificity) === 0;
 }
 
 /** Add one attribute test, keeping the stronger of two: a value or absence already implies whether it is present. */
@@ -269,7 +355,13 @@ function sharedProperties(left: readonly RuleProperty[], right: readonly RulePro
 
   for (const a of left) {
     for (const b of right) {
-      if (!propertiesOverlap(a.name, b.name) || exclusiveAttributes(a.attributes, b.attributes)) continue;
+      if (
+        !propertiesOverlap(a.name, b.name) ||
+        !orderDecides(a, b) ||
+        exclusiveAttributes(a.attributes, b.attributes)
+      ) {
+        continue;
+      }
 
       shared.add(a.name.length <= b.name.length ? a.name : b.name);
     }
