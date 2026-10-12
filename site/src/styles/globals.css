@@ -374,6 +374,14 @@ html.dark[data-tone="deep"] {
   }
 }
 
+@utility text-box-trim-both {
+  text-box-trim: trim-both;
+}
+
+@utility text-box-edge-cap-alphabetic {
+  text-box-edge: cap alphabetic;
+}
+
 /* Thin scrollbars for side navigation and code blocks. `scroll` keeps the track visible where the platform allows. */
 @utility scrollbar-thin {
   scrollbar-width: thin;

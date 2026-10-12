@@ -1,0 +1,42 @@
+/* A native range with a filled track. Set `--fill` to the value's percentage. */
+.range-input {
+  width: 100%;
+  min-height: 1.5rem;
+  appearance: none;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--color-orange) var(--fill), rgb(0 0 0 / 10%) var(--fill));
+}
+
+.range-input::-moz-range-track {
+  height: 4px;
+  border: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--color-orange) var(--fill), rgb(0 0 0 / 10%) var(--fill));
+}
+
+.range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.range-input::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
