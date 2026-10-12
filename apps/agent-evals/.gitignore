@@ -4,3 +4,7 @@ results/
 history/
 # Agent credentials for `pnpm evals`.
 .env
+# The repository ignores these for its packages; the harness and the fixtures need them.
+!src/lib/
+!fixtures/*/src/lib/
+!fixtures/**/package-lock.json
