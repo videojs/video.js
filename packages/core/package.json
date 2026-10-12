@@ -100,8 +100,7 @@
   "dependencies": {
     "@videojs/media": "workspace:*",
     "@videojs/store": "workspace:*",
-    "@videojs/utils": "workspace:*",
-    "video.js": "workspace:*"
+    "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",
