@@ -2,6 +2,8 @@
 import ResponsivePlayer from '@/components/blog/ResponsivePlayer';
 import Figure from '@/components/typography/Figure.astro';
 import '../Range.css';
+// Also imported by the island; importing it here lets the dev server put it in <head> before the player hydrates.
+import '@videojs/react/video/skin.css';
 ---
 
 <Figure>
