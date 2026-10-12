@@ -1,13 +1,13 @@
 {
   "name": "video.js",
   "version": "10.0.1",
-  "private": true,
   "description": "Points Video.js installs to @videojs/html and @videojs/react, and throws coded errors for Video.js 8 patterns",
   "keywords": [
     "media",
     "player",
     "videojs"
   ],
+  "homepage": "https://videojs.org",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
