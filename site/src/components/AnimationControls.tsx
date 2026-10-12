@@ -53,6 +53,7 @@ export default function AnimationControls({
           <Select
             aria-label="Animation speed"
             className="h-8 shrink-0 rounded-full border-0 bg-black/50 text-white shadow-none backdrop-blur-sm"
+            iconClassName="text-white/75"
             value={String(speed)}
             onChange={(value) => {
               if (value) onSpeedChange?.(Number(value));
