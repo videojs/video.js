@@ -30,7 +30,7 @@ export const HlsAudio = forwardRef<HTMLAudioElement, HlsAudioProps>(function Hls
   const htmlProps = useSyncProps(media, props, HlsAudioAdapter.defaultProps);
 
   return (
-    <audio ref={composedRef} {...htmlProps}>
+    <audio ref={composedRef} {...htmlProps} crossOrigin={props.crossOrigin ?? undefined}>
       {children}
       {fallback}
     </audio>
