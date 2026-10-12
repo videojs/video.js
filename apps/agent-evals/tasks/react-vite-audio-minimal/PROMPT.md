@@ -1,0 +1,1 @@
+Add a podcast episode player to the home page using Video.js. The episode audio is https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/audio.m4a. We'd like the minimal look rather than the default one.

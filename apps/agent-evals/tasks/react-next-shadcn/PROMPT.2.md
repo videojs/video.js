@@ -1,0 +1,1 @@
+design's going to rework the player controls, so add a Video.js player below the intro text on the home page with the control UI code as editable files in our repo (not buried in node_modules). video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

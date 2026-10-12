@@ -1,0 +1,484 @@
+name: Agent Evals
+
+# Measures how well coding agents install Video.js. See apps/agent-evals/README.md.
+#
+# - schedule: once a new @videojs/react release is AGENT_EVALS_DELAY_HOURS old (default 24), evaluate it with npm pinned
+#   to that release, compare with the newest recorded summary, and record it on the agent-evals/history branch.
+# - pull_request labeled `test:agent-evals`: build and pack the pull request, serve those packs to the agents as the
+#   latest Video.js packages, serve videojs.org and shadcn.videojs.org from its Netlify deploy previews, and comment the
+#   results compared with the newest recorded summary.
+# - pull_request touching the harness: check fixtures and graders with the oracle, noop, and mutant agents, which cost no
+#   tokens.
+# - workflow_dispatch: any mix of releases and one git ref, compared in order.
+#
+# Repository variables set the scheduled and label runs: AGENT_EVALS_AGENTS, AGENT_EVALS_ARMS, AGENT_EVALS_SUITE,
+# AGENT_EVALS_TIER, AGENT_EVALS_MODE, AGENT_EVALS_TRIALS, AGENT_EVALS_DELAY_HOURS, and AGENT_EVALS_PR_TRIALS.
+on:
+  schedule:
+    - cron: '37 */6 * * *'
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      videojs:
+        description: 'Builds to compare, in order: latest, releases such as 10.0.0-rc.2, and at most one git ref'
+        default: latest
+      agents:
+        description: Agents, id[:effort] or claude-code/<model>, codex/<model>
+        default: claude-opus-5.5,codex-gpt-6-sol
+      arms:
+        description: 'Arms, comma-separated: baseline, v10 (prompts say Video.js 10), skill, builder, cli, interactive'
+        default: baseline
+      suite:
+        description: 'Suites, comma-separated: core, extended, generic, customize, realworld, onboarding, or full (ignored when tasks is set)'
+        default: core
+      tier:
+        description: 'Tiers, comma-separated: smoke (tasks at the ceiling), main; empty for both'
+        required: false
+      mode:
+        description: 'attribution pins docs and turns provider web search off, for comparing builds; ecosystem leaves both live'
+        default: attribution
+      tasks:
+        description: Task ids, * wildcards allowed
+        required: false
+      trials:
+        description: Trials per task, agent, arm, and build
+        default: '1'
+      effort:
+        description: Reasoning effort for agents without one
+        required: false
+      budget:
+        description: Claude Code spending cap per turn, in USD
+        required: false
+      skill_ref:
+        description: videojs/skills ref for the skill arm
+        default: main
+      record:
+        description: Record each build's summary on the agent-evals/history branch
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-evals-${{ github.event.pull_request.number || github.event_name }}
+  cancel-in-progress: false
+
+env:
+  HISTORY_BRANCH: agent-evals/history
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      agents: ${{ steps.plan.outputs.agents }}
+      oracle: ${{ steps.plan.outputs.oracle }}
+      videojs: ${{ steps.plan.outputs.videojs }}
+      packages_ref: ${{ steps.plan.outputs.packages_ref }}
+      packs_label: ${{ steps.plan.outputs.packs_label }}
+      preview: ${{ steps.plan.outputs.preview }}
+      suite: ${{ steps.plan.outputs.suite }}
+      tier: ${{ steps.plan.outputs.tier }}
+      mode: ${{ steps.plan.outputs.mode }}
+      tasks: ${{ steps.plan.outputs.tasks }}
+      trials: ${{ steps.plan.outputs.trials }}
+      effort: ${{ steps.plan.outputs.effort }}
+      budget: ${{ steps.plan.outputs.budget }}
+      skill_ref: ${{ steps.plan.outputs.skill_ref }}
+      record: ${{ steps.plan.outputs.record }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - name: Decide what to run
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          RUN_ID: ${{ github.run_id }}
+          ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          VAR_AGENTS: ${{ vars.AGENT_EVALS_AGENTS || 'claude-opus-5.5,codex-gpt-6-sol' }}
+          VAR_ARMS: ${{ vars.AGENT_EVALS_ARMS || 'baseline' }}
+          VAR_SUITE: ${{ vars.AGENT_EVALS_SUITE || 'core' }}
+          VAR_TIER: ${{ vars.AGENT_EVALS_TIER || '' }}
+          VAR_MODE: ${{ vars.AGENT_EVALS_MODE || 'attribution' }}
+          VAR_TRIALS: ${{ vars.AGENT_EVALS_TRIALS || '3' }}
+          VAR_PR_TRIALS: ${{ vars.AGENT_EVALS_PR_TRIALS || '1' }}
+          VAR_DELAY_HOURS: ${{ vars.AGENT_EVALS_DELAY_HOURS || '24' }}
+          IN_VIDEOJS: ${{ inputs.videojs }}
+          IN_AGENTS: ${{ inputs.agents }}
+          IN_ARMS: ${{ inputs.arms }}
+          IN_SUITE: ${{ inputs.suite }}
+          IN_TIER: ${{ inputs.tier }}
+          IN_MODE: ${{ inputs.mode }}
+          IN_TASKS: ${{ inputs.tasks }}
+          IN_TRIALS: ${{ inputs.trials }}
+          IN_EFFORT: ${{ inputs.effort }}
+          IN_BUDGET: ${{ inputs.budget }}
+          IN_SKILL_REF: ${{ inputs.skill_ref }}
+          IN_RECORD: ${{ inputs.record }}
+        run: |
+          agents=false oracle=false videojs='' packages_ref='' packs_label='' preview='' tasks='' effort='' budget=''
+          agent_ids=$VAR_AGENTS arms=$VAR_ARMS suite=$VAR_SUITE tier=$VAR_TIER mode=$VAR_MODE trials=$VAR_TRIALS
+          skill_ref=main record=false
+
+          case "$EVENT" in
+            workflow_dispatch)
+              agents=true agent_ids=$IN_AGENTS arms=$IN_ARMS suite=$IN_SUITE tier=$IN_TIER mode=$IN_MODE tasks=$IN_TASKS
+              trials=$IN_TRIALS
+              effort=$IN_EFFORT budget=$IN_BUDGET skill_ref=$IN_SKILL_REF record=$IN_RECORD
+
+              # Releases pass through; one git ref becomes the packs built by the pack job.
+              for spec in ${IN_VIDEOJS//,/ }; do
+                if [ "$spec" = latest ] || [[ "$spec" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+                  videojs="${videojs:+$videojs,}$spec"
+                elif [ -z "$packages_ref" ]; then
+                  packages_ref=$spec packs_label="packs-${spec//\//-}" videojs="${videojs:+$videojs,}packages"
+                  # A pull request ref gets that pull request's deploy previews.
+                  if [[ "$spec" =~ ^(refs/)?pull/([0-9]+)/ ]]; then preview=${BASH_REMATCH[2]}; fi
+                else
+                  echo "::error::Only one git ref per run: $packages_ref and $spec."; exit 1
+                fi
+              done
+              ;;
+
+            schedule)
+              latest=$(npm view @videojs/react dist-tags.latest)
+              published=$(npm view @videojs/react time --json | jq -r --arg v "$latest" '.[$v]')
+              age=$(( $(date +%s) - $(date -d "$published" +%s) ))
+              active=$(gh run list --repo "$REPO" --workflow agent-evals.yml --event schedule --status in_progress \
+                --json databaseId --jq "map(select(.databaseId != $RUN_ID)) | length")
+
+              if [ "$age" -lt $(( VAR_DELAY_HOURS * 3600 )) ]; then
+                echo "::notice::@videojs/react@$latest is under $VAR_DELAY_HOURS hours old."
+              elif gh api "repos/$REPO/contents/$latest.json?ref=$HISTORY_BRANCH" > /dev/null 2>&1; then
+                echo "::notice::@videojs/react@$latest is already recorded on $HISTORY_BRANCH."
+              elif [ "$active" -gt 0 ]; then
+                echo "::notice::A scheduled evaluation is already running."
+              else
+                agents=true videojs=$latest record=true
+              fi
+              ;;
+
+            pull_request)
+              files=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')
+              if grep -Eq '^(apps/agent-evals/|\.github/workflows/agent-evals\.yml$)' <<< "$files"; then oracle=true; fi
+
+              if [ "$ACTION" = labeled ] && [ "$ADDED_LABEL" = test:agent-evals ]; then
+                if [ "$PR_SAME_REPO" = true ]; then
+                  agents=true videojs=packages packages_ref=$PR_SHA packs_label="pr-$PR_NUMBER-${PR_SHA:0:7}" preview=$PR_NUMBER
+                  trials=$VAR_PR_TRIALS
+                else
+                  echo "::warning::Agent evals need API keys, which pull requests from forks cannot use."
+                fi
+              elif [ "$ACTION" = labeled ]; then
+                oracle=false
+              fi
+              ;;
+          esac
+
+          matrix=$(jq -cn --arg agents "$agent_ids" --arg arms "$arms" \
+            '{include: [($agents | split(",") | .[]) as $agent | ($arms | split(",") | .[]) as $arm | {agent: $agent, arm: $arm}]}')
+
+          {
+            echo "agents=$agents"
+            echo "oracle=$oracle"
+            echo "videojs=$videojs"
+            echo "packages_ref=$packages_ref"
+            echo "packs_label=$packs_label"
+            echo "preview=$preview"
+            echo "suite=$suite"
+            echo "tier=$tier"
+            echo "mode=$mode"
+            echo "tasks=$tasks"
+            echo "trials=$trials"
+            echo "effort=$effort"
+            echo "budget=$budget"
+            echo "skill_ref=$skill_ref"
+            echo "record=$record"
+            echo "matrix=$matrix"
+          } >> "$GITHUB_OUTPUT"
+
+  # Built once and shared, the way the release job builds what it publishes: packages, CDN bundles, and the site whose
+  # Markdown ships inside @videojs/html and @videojs/react.
+  pack:
+    name: Pack ${{ needs.plan.outputs.packages_ref }}
+    needs: plan
+    if: needs.plan.outputs.packages_ref != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      statuses: read
+    steps:
+      - name: Checkout harness
+        uses: actions/checkout@v5
+        with:
+          path: harness
+
+      - name: Checkout packages
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ needs.plan.outputs.packages_ref }}
+          path: source
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          package_json_file: source/package.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: source/.nvmrc
+          cache: pnpm
+          cache-dependency-path: source/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: source
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build and pack
+        env:
+          PACKS_LABEL: ${{ needs.plan.outputs.packs_label }}
+          PREVIEW: ${{ needs.plan.outputs.preview }}
+        run: |
+          node harness/apps/agent-evals/src/cli/pack.ts --root source --out packages --name "$PACKS_LABEL" \
+            ${PREVIEW:+--preview "$PREVIEW"}
+
+      # The previews must show this commit before agents read them. A preview Netlify skips (the registry, when the pull
+      # request leaves the skins alone) never goes pending, and the eval keeps that host on production.
+      - name: Wait for Netlify deploy previews
+        if: needs.plan.outputs.preview != ''
+        working-directory: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          sha=$(git rev-parse HEAD)
+          for _ in $(seq 1 40); do
+            pending=$(gh api "repos/$REPO/commits/$sha/statuses" --jq \
+              '[.[] | select(.context | startswith("netlify/"))] | group_by(.context) | map(.[0].state) | map(select(. == "pending")) | length')
+            if [ "$pending" = 0 ]; then exit 0; fi
+            sleep 30
+          done
+          echo "::warning::Netlify deploy previews were still pending after 20 minutes."
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evals-packages
+          path: packages/
+          retention-days: 30
+
+  oracle:
+    name: Oracle
+    needs: plan
+    if: needs.plan.outputs.oracle == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: apps/agent-evals
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+
+      - name: Run reference solutions
+        run: node src/cli/run.ts --agents oracle --suite full --retries 0 --concurrency 2 --label oracle
+
+      - name: Require every reference solution to pass
+        run: |
+          failed=$(jq -s '[.[] | select(.outcome.onSpec | not) | .trial.task] | join(", ")' results/oracle/*/trials/*/result.json)
+          cat results/oracle/*/summary.md >> "$GITHUB_STEP_SUMMARY"
+          if [ "$failed" != '""' ]; then echo "::error::Reference solutions failed: $failed"; exit 1; fi
+
+      # Tasks that start from a working player have only their own checks between an untouched project and a pass.
+      - name: Leave every task untouched
+        run: node src/cli/run.ts --agents noop --suite full --retries 0 --concurrency 2 --label noop --no-build
+
+      - name: Require untouched projects to fail
+        run: |
+          passed=$(jq -s '[.[] | select(.outcome.onSpec) | .trial.task] | join(", ")' results/noop/*/trials/*/result.json)
+          if [ "$passed" != '""' ]; then echo "::error::Untouched projects passed: $passed"; exit 1; fi
+
+      # Each mutant is a reference solution with one deliberate mistake; the runner fails when the grader passes one.
+      - name: Require the grader to catch near misses
+        run: node src/cli/run.ts --agents mutant --suite full --retries 0 --concurrency 2 --label mutant --no-build
+
+      - name: Upload results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evals-oracle
+          path: apps/agent-evals/results/
+          retention-days: 14
+
+  run:
+    name: ${{ matrix.agent }} / ${{ matrix.arm }}
+    needs: [plan, pack]
+    if: ${{ !cancelled() && needs.plan.outputs.agents == 'true' && needs.pack.result != 'failure' }}
+    runs-on: ubuntu-latest
+    environment: agent-evals
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: apps/agent-evals
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+
+      # The eval image and per-trial builds need more room than a stock runner leaves free.
+      - name: Free disk space
+        working-directory: .
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - name: Download packages
+        if: needs.plan.outputs.packages_ref != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: agent-evals-packages
+          path: apps/agent-evals/packages
+
+      - name: Run evals
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Finds the release pull requests whose deploy previews serve older releases' docs.
+          GITHUB_TOKEN: ${{ github.token }}
+          VIDEOJS: ${{ needs.plan.outputs.videojs }}
+          AGENT: ${{ matrix.agent }}
+          ARM: ${{ matrix.arm }}
+          SUITE: ${{ needs.plan.outputs.suite }}
+          TIER: ${{ needs.plan.outputs.tier }}
+          MODE: ${{ needs.plan.outputs.mode }}
+          TASKS: ${{ needs.plan.outputs.tasks }}
+          TRIALS: ${{ needs.plan.outputs.trials }}
+          EFFORT: ${{ needs.plan.outputs.effort }}
+          BUDGET: ${{ needs.plan.outputs.budget }}
+          SKILL_REF: ${{ needs.plan.outputs.skill_ref }}
+        run: |
+          node src/cli/run.ts --videojs "$VIDEOJS" --agents "$AGENT" --arms "$ARM" --suite "$SUITE" ${TASKS:+--tasks "$TASKS"} \
+            ${TIER:+--tier "$TIER"} --mode "${MODE:-attribution}" --trials "$TRIALS" ${EFFORT:+--effort "$EFFORT"} \
+            ${BUDGET:+--budget "$BUDGET"} --skill-ref "$SKILL_REF" --concurrency 3 --memory 4g
+
+      - name: Upload results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evals-${{ matrix.agent }}-${{ matrix.arm }}
+          path: |
+            apps/agent-evals/results/
+            !apps/agent-evals/results/*/*/packages/
+            !apps/agent-evals/results/skills/
+          retention-days: 90
+
+  report:
+    name: Report
+    needs: [plan, run]
+    if: ${{ !cancelled() && needs.plan.outputs.agents == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: apps/agent-evals
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: agent-evals-*-*
+          path: apps/agent-evals/downloaded
+
+      # Earlier summaries, for the comparison and for recording this run.
+      - name: Fetch recorded history
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git clone --quiet --depth 1 --branch "$HISTORY_BRANCH" "https://x-access-token:$GH_TOKEN@github.com/$REPO.git" history \
+            || git init --quiet --initial-branch "$HISTORY_BRANCH" history
+
+      # Several builds compare with the first, in the order requested; one build compares with the newest record.
+      - name: Summarize
+        env:
+          VIDEOJS: ${{ needs.plan.outputs.videojs }}
+        run: |
+          runs=()
+          for spec in ${VIDEOJS//,/ }; do
+            while IFS= read -r file; do
+              if [ "$(jq -r .videojs.spec "$file")" = "$spec" ]; then runs+=("$(dirname "$file")"); fi
+            done < <(find downloaded -name run.json | sort)
+          done
+
+          labels=$(for run in "${runs[@]}"; do jq -r .label "$run/run.json"; done | sort -u | wc -l)
+          compare=()
+          if [ "$labels" -eq 1 ]; then compare=(--compare latest); fi
+
+          node src/cli/report.ts "${runs[@]}" "${compare[@]}" --save > report.md
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment on the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          { cat report.md; echo; echo "[Transcripts, diffs, and screenshots]($RUN_URL)"; } > comment.md
+          gh pr comment "$PR_NUMBER" --body-file comment.md
+
+      - name: Record on the history branch
+        if: needs.plan.outputs.record == 'true'
+        working-directory: apps/agent-evals/history
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit --quiet -m "chore(agent-evals): record $(git diff --cached --name-only -- '*.json' | sed 's/\.json$//' | paste -sd, -)"
+          git push --quiet "https://x-access-token:$GH_TOKEN@github.com/$REPO.git" "HEAD:$HISTORY_BRANCH"
+
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evals-summary
+          path: |
+            apps/agent-evals/report.md
+            apps/agent-evals/history/

@@ -1,0 +1,8 @@
+{
+  "name": "acme-studio",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build"
+  },
+  "packageManager": "pnpm@12.6.0"
+}

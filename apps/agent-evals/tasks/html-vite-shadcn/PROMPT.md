@@ -1,0 +1,1 @@
+Add a Video.js video player to the home page of this Vite site, below the intro text, for https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4. We'll be rearranging and restyling the controls, so copy the player skin's source into the project so we can edit it, instead of using the packaged skin.

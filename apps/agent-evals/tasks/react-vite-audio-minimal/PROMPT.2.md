@@ -1,0 +1,1 @@
+add a Video.js podcast player to the home page for this episode https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/audio.m4a with the pared-back, understated look instead of the standard one

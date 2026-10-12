@@ -1,0 +1,1 @@
+add a Video.js player under the intro text on the home page for https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4. design is going to restyle the controls, but we also want the player to pick up Video.js upgrades automatically

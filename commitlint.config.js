@@ -14,6 +14,7 @@ export default {
       2,
       'always',
       [
+        'agent-evals',
         'build',
         'cd',
         'cdn',

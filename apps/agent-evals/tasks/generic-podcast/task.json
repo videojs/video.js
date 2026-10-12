@@ -1,0 +1,13 @@
+{
+  "fixture": "react-vite",
+  "suite": "generic",
+  "tier": "main",
+  "expect": {
+    "framework": "react",
+    "library": "any",
+    "preset": "audio",
+    "playback": "click",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/audio.m4a",
+    "after": "Short films from independent creators."
+  }
+}

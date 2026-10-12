@@ -1,0 +1,10 @@
+# Raw trial output: transcripts, diffs, screenshots, and packed builds.
+results/
+# Summaries live on the agent-evals/history branch; `report --save` writes them here for pushing.
+history/
+# Agent credentials for `pnpm evals`.
+.env
+# The repository ignores these for its packages; the harness and the fixtures need them.
+!src/lib/
+!fixtures/*/src/lib/
+!fixtures/**/package-lock.json

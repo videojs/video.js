@@ -1,0 +1,7 @@
+{
+  "framework": "svelte",
+  "template": "sveltekit",
+  "packageManager": "pnpm",
+  "build": "pnpm run build",
+  "serve": "pnpm exec vite preview --port {port} --strictPort --host 127.0.0.1"
+}

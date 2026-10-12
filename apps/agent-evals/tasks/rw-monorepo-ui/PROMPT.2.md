@@ -1,0 +1,1 @@
+can you add a Video.js VideoPlayer to @acme/ui so all our apps can share it, then put it on the web home page under the intro text? video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

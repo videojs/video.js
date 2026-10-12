@@ -1,0 +1,14 @@
+{
+  "fixture": "html-vite",
+  "suite": "generic",
+  "tier": "main",
+  "expect": {
+    "framework": "html",
+    "library": "any",
+    "preset": "video",
+    "media": "hls",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4.m3u8",
+    "playback": "click",
+    "after": "Short films from independent creators."
+  }
+}

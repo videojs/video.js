@@ -1,0 +1,23 @@
+{
+  "topics": [
+    {
+      "id": "ownership",
+      "about": "how far the designers' restyling goes and whether that or automatic Video.js upgrades matters more: controls whose code the team copies into the project and edits, or controls Video.js maintains and updates",
+      "kind": "necessary",
+      "answer": "Automatic upgrades matter more. Our designers only need to change colors, fonts, and spacing."
+    },
+    {
+      "id": "look",
+      "about": "which starting look the player has, such as a fuller or more minimal style",
+      "kind": "indifferent",
+      "answer": "No preference, whatever looks good out of the box."
+    },
+    {
+      "id": "source",
+      "about": "which video the player plays",
+      "kind": "derivable",
+      "answer": "The one in my message."
+    }
+  ],
+  "disclose": ["ownership"]
+}

@@ -1,0 +1,10 @@
+{
+  "fixture": "empty",
+  "suite": "onboarding",
+  "tier": "main",
+  "expect": {
+    "framework": "any",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "playback": "click"
+  }
+}

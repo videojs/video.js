@@ -1,0 +1,15 @@
+{
+  "fixture": "sveltekit",
+  "suite": "extended",
+  "tier": "main",
+  "expect": {
+    "framework": "svelte",
+    "method": "packaged",
+    "preset": "video",
+    "skin": "default",
+    "media": "html5-video",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "playback": "click",
+    "after": "Short films from independent creators."
+  }
+}

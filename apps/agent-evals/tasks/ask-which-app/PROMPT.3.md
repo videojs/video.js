@@ -1,0 +1,1 @@
+We want to feature a new film on our homepage this week. Please add a video player built with Video.js right below the intro text, playing https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4.

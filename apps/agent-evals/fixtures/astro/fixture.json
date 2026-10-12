@@ -1,0 +1,7 @@
+{
+  "framework": "html",
+  "template": "astro",
+  "packageManager": "pnpm",
+  "build": "pnpm run build",
+  "serve": "pnpm exec astro preview --port {port} --host 127.0.0.1"
+}

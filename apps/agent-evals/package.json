@@ -1,0 +1,21 @@
+{
+  "name": "@videojs/agent-evals",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Release-over-release evals of coding agents installing Video.js",
+  "type": "module",
+  "scripts": {
+    "evals": "node src/cli/run.ts",
+    "pack:workspace": "node src/cli/pack.ts",
+    "report": "node src/cli/report.ts",
+    "rescore": "node src/cli/rescore.ts",
+    "test": "vp test run"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@types/node": "^22.18.6",
+    "playwright": "^1.59.1",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

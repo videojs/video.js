@@ -1,0 +1,10 @@
+**/node_modules
+**/.next
+**/.nuxt
+**/.output
+**/.svelte-kit
+**/.astro
+**/dist
+results
+history
+.env

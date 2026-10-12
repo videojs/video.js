@@ -48,7 +48,11 @@
     "format:astro": "vp fmt 'site/src/**/*.astro' --write",
     "typecheck": "vp run typecheck:workspace",
     "changelog": "node build/scripts/generate-changelog.mjs",
-    "check:workspace": "node build/scripts/check-workspace.mjs"
+    "check:workspace": "node build/scripts/check-workspace.mjs",
+    "evals": "pnpm --dir apps/agent-evals evals",
+    "evals:pack": "pnpm --dir apps/agent-evals pack:workspace",
+    "evals:report": "pnpm --dir apps/agent-evals report",
+    "evals:rescore": "pnpm --dir apps/agent-evals rescore"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",

@@ -1,0 +1,1 @@
+In our Video.js player's controls (the source is in this repo), put the captions button right after the volume control on desktop. On screens narrower than 480px, move both of them below the timeline. Keep their keyboard behavior working.

@@ -1,0 +1,1 @@
+Our marketing site is intentionally simple: a plain static HTML site served as-is, with no build step and no package manager, and we want to keep it that way. Please add a Video.js player to index.html, below the intro text, that plays our HLS stream: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4.m3u8

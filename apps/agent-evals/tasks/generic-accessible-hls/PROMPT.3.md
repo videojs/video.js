@@ -1,0 +1,1 @@
+We're adding video to our home page for the first time and want to get the player right from the start. It has to be accessible, and customizable enough that we can restyle it to match our brand later on. Please put it below the intro text and have it play our HLS stream: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4.m3u8

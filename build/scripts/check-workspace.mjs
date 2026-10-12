@@ -626,10 +626,14 @@ function checkFileBudget(path, maxLines, maxBytes, warnings) {
   }
 }
 
+// Agent eval fixtures keep the agent files their scaffolders generate: they are test inputs, not repository guidance.
+const AGENT_EVAL_FIXTURES = `${join(ROOT, 'apps/agent-evals/fixtures')}/`;
+
 function checkAgentContext() {
   const warnings = [];
-  const agentDocs = listFiles(ROOT, (path) => path.endsWith('/AGENTS.md'));
-  const claudeDocs = listFiles(ROOT, (path) => path.endsWith('/CLAUDE.md'));
+  const isGuidance = (path, name) => path.endsWith(`/${name}`) && !path.startsWith(AGENT_EVAL_FIXTURES);
+  const agentDocs = listFiles(ROOT, (path) => isGuidance(path, 'AGENTS.md'));
+  const claudeDocs = listFiles(ROOT, (path) => isGuidance(path, 'CLAUDE.md'));
   const gitignoreRules = new Set(
     readText(join(ROOT, '.gitignore'))
       .split(/\r?\n/)

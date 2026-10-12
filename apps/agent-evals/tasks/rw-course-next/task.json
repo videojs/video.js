@@ -1,0 +1,13 @@
+{
+  "fixture": "react-next",
+  "suite": "realworld",
+  "tier": "main",
+  "setup": "setup.sh",
+  "expect": {
+    "framework": "react",
+    "preset": "video",
+    "source": "https://stream.mux.com/s41JYeqIpBMBzE4OzxDyGR2yrp2hD1CQ6gJN9SlVGDQ.m3u8",
+    "after": "Lighting basics",
+    "playback": "click"
+  }
+}

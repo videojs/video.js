@@ -1,0 +1,1 @@
+Acme Studio is premiering a short film tonight with a live Q&A, streamed from our own HLS origin at http://media.acme.test/live/master.m3u8. Please add a Video.js player to the home page of this Vue app, below the intro text, so visitors can watch the stream as it happens.

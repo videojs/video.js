@@ -1,0 +1,7 @@
+{
+  "framework": null,
+  "template": null,
+  "packageManager": null,
+  "build": "detect",
+  "serve": "detect"
+}

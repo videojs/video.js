@@ -1,0 +1,1 @@
+We're rebuilding our studio's site in Vue, and the home page still looks bare. Please add a video player using Video.js just below the intro text, playing this video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

@@ -1,0 +1,1 @@
+Our product team wants a simpler set of controls on the video player on our site. Please remove the fullscreen and picture-in-picture buttons from the player, and keep all of its other controls as they are.

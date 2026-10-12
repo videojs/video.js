@@ -1,0 +1,1 @@
+Our home page is a Vite site with a very pared-back design, and we want a video right below the intro text. Please add a Video.js video player, installed as an npm dependency, that fits that aesthetic: a subtle, minimal-looking player with clean, understated controls. It should play https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

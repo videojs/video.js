@@ -1,0 +1,29 @@
+{
+  "topics": [
+    {
+      "id": "framework",
+      "about": "which framework, stack, or kind of site to build, and where it will be hosted",
+      "kind": "indifferent",
+      "answer": "Whatever you recommend, something simple we can host anywhere."
+    },
+    {
+      "id": "source",
+      "about": "which video the site plays, or where the user's films come from and where to put them",
+      "kind": "necessary",
+      "answer": "Use this one for now: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4"
+    },
+    {
+      "id": "content",
+      "about": "what else the site shows, such as the studio's name, other pages, or a list of films",
+      "kind": "indifferent",
+      "answer": "Keep it simple for now, a home page with the film is enough."
+    },
+    {
+      "id": "look",
+      "about": "how the site, the player, and its controls look, such as a fuller or more minimal style, colors, or size",
+      "kind": "indifferent",
+      "answer": "No preference, whatever looks good out of the box."
+    }
+  ],
+  "disclose": ["framework", "source"]
+}

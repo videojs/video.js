@@ -1,0 +1,14 @@
+{
+  "fixture": "react-next",
+  "suite": "core",
+  "tier": "main",
+  "expect": {
+    "framework": "react",
+    "method": "packaged",
+    "preset": "background-video",
+    "skin": "none",
+    "media": "background-video",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "playback": "autoplay"
+  }
+}

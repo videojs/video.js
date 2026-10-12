@@ -1,0 +1,1 @@
+We're putting together an Astro site to showcase short films from independent creators, and the home page needs a video. Please add a player built with Video.js directly beneath the intro text. It should play this file: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

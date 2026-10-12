@@ -1,0 +1,29 @@
+{
+  "topics": [
+    {
+      "id": "app",
+      "about": "which app in the repository gets the player: the marketing site, the dashboard, or both",
+      "kind": "necessary",
+      "answer": "The marketing site — that's the one customers see."
+    },
+    {
+      "id": "source",
+      "about": "which video the player plays",
+      "kind": "derivable",
+      "answer": "The one in my message."
+    },
+    {
+      "id": "install",
+      "about": "how the library gets into the site, such as an npm dependency or a script tag from a CDN",
+      "kind": "indifferent",
+      "answer": "Whatever you recommend."
+    },
+    {
+      "id": "look",
+      "about": "how the player and its controls look, such as a fuller or more minimal style, colors, or size",
+      "kind": "indifferent",
+      "answer": "No preference, whatever looks good out of the box."
+    }
+  ],
+  "disclose": ["app"]
+}

@@ -1,0 +1,1 @@
+We recently rolled out new brand guidelines, and the video player on our site still uses its original colors. Please change the player so its progress bar and other accent colors use our brand color, #e11d48. Everything else about the player can stay as it is.

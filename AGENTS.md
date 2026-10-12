@@ -29,6 +29,7 @@ When prose conflicts with executable sources, follow the executable source and u
 - `packages/installation`: shared installation schema, compatibility, code generation, and agent instruction renderer.
 - `apps/sandbox`: Vite playground. `templates/` is tracked; `src/` is scratch.
 - `apps/e2e`: Playwright coverage.
+- `apps/agent-evals`: Docker-based evals of coding agents installing the published packages, compared release over release.
 - `site`: Astro documentation site; follow `site/AGENTS.md`.
 
 Keep framework-neutral packages free of DOM or framework dependencies. Put platform behavior in the appropriate adapter or binding package.

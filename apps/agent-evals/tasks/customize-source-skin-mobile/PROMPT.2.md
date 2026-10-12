@@ -1,0 +1,1 @@
+in our Video.js player controls (source is in the repo) can you move the captions button so it's right after the volume control? and on screens under 480px wide put both of them below the timeline. keyboard needs to keep working for both

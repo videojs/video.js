@@ -1,0 +1,11 @@
+#!/bin/sh
+# Hands /work to the agent's account for its turn, or back to the harness's account for grading.
+set -eu
+
+case "${1:-}" in
+  agent) owner=agent ;;
+  harness) owner=pwuser ;;
+  *) echo "usage: eval-own agent|harness" >&2; exit 64 ;;
+esac
+
+chown -R --no-dereference "$owner:$owner" /work

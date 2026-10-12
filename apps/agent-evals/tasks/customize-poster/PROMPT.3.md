@@ -1,0 +1,1 @@
+Visitors see the video player on our site before they press play, and we want that first impression to be our own artwork. Please show this image on the player until the video starts playing: https://image.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/thumbnail.webp

@@ -1,0 +1,1 @@
+Add a Video.js video player to the home page, below the intro text, for https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4. Our designers will rearrange and restyle the player controls, so we need the player's skin as editable source files in this repo rather than a packaged skin from node_modules.
