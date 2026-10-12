@@ -7,8 +7,10 @@ export default defineConfig({
     tasks: {
       typecheck: {
         command: 'tsgo --project tsconfig.json --noEmit',
-        input: [...cachedTaskInputs, '!fixtures/**', '!results/**'],
-        output: [],
+        cache: {
+          input: [...cachedTaskInputs, '!fixtures/**', '!results/**'],
+          output: [],
+        },
       },
     },
   },
