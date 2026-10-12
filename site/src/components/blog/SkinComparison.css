@@ -1,0 +1,70 @@
+.skin-comparison {
+  --comparison-background: var(--color-manila-light);
+  margin-block: 2rem;
+}
+
+.dark .skin-comparison {
+  --comparison-background: var(--color-faded-black);
+}
+
+.skin-comparison .comparison-stage {
+  container-name: media-root;
+  background: black;
+}
+
+.skin-comparison-video {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The shared video sits outside the skins' scoped native-caption styles. */
+.skin-comparison-video::-webkit-media-text-track-container {
+  z-index: 40;
+  font-family: inherit;
+  scale: 0.98;
+  translate: 0 var(--comparison-caption-y, 0px);
+}
+
+.skin-comparison .skin-comparison-skin {
+  --media-accent-color: var(--color-orange);
+  isolation: auto;
+  container-type: normal;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: transparent;
+  /* The shared video sits outside the skins; cover its corners using each skin's own radius. */
+  box-shadow: 0 0 0 100vmax var(--comparison-background);
+}
+
+.skin-comparison .comparison:fullscreen {
+  --comparison-background: black;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 1rem;
+  color: white;
+  background: black;
+}
+
+.skin-comparison .comparison:fullscreen .comparison-stage {
+  flex: 1;
+  min-height: 0;
+  aspect-ratio: auto !important;
+}
+
+/* Draw container focus around the whole comparison, outside the clipped skin slices. */
+.skin-comparison .comparison-stage:has(.skin-comparison-skin:focus-visible) {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.skin-comparison .skin-comparison-skin:focus-visible {
+  outline: none !important;
+}
