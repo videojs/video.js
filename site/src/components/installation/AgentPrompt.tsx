@@ -32,6 +32,7 @@ import {
   agentPromptExampleFits,
   agentPromptExamplePicks,
   agentPromptExampleSummary,
+  agentPromptGoalsFor,
   agentPromptMarkdown,
   agentPromptMediaChoices,
   agentPromptHostingHint,
@@ -159,7 +160,7 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
   const picks = useInstallationSelection();
   const registryFramework = useRegistryFramework(sourceFrameworkFor(pageFramework));
   const agent = useHydratedStore(skillAgent, null);
-  const goal = useHydratedStore(promptGoal, null) ?? pageGoal;
+  const storedGoal = useHydratedStore(promptGoal, null);
   const features = useHydratedStore(promptFeatures, NO_FEATURES);
   const request = useHydratedStore(promptRequest, '');
   const picked = useHydratedStore(promptExample, null);
@@ -167,6 +168,9 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
   const promptRef = useRef<HTMLDivElement>(null);
 
   const target = agentPromptTarget(route, route === 'shadcn' ? registryFramework : pageFramework);
+  const goals = agentPromptGoalsFor(target.framework);
+  // A goal picked under another framework, such as a React-only migration, gives way to the page's.
+  const goal = storedGoal && goals.includes(storedGoal) ? storedGoal : pageGoal;
   const selection = agentPromptSelection(target, picks, { goal, features });
   const view = agentPromptView(selection, { agent }, { goal, request, features });
   const text = agentPromptMarkdown(view);
@@ -244,6 +248,7 @@ function AgentPrompt({ route, framework: pageFramework, goal: pageGoal = default
         onSkinChange={(next) => updateInstallationSelection({ skin: skinFromFlag(next, picks.useCase) })}
         agent={agent}
         onAgentChange={(next) => skillAgent.set(next)}
+        goals={goals}
         goal={goal}
         onGoalChange={(next) => promptGoal.set(next)}
         request={request}

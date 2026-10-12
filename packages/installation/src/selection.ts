@@ -20,6 +20,7 @@ import {
 import {
   INSTALLATION_MIGRATION_NAMES,
   INSTALLATION_MIGRATION_SOURCES,
+  installationMigrationFramework,
   type InstallationMigrationSource,
 } from './migrations';
 import {
@@ -508,6 +509,16 @@ export function resolveInstallationSelection(
       field: 'from',
       value: from,
       message: `Migrates an existing ${INSTALLATION_MIGRATION_NAMES[from]} project, so it needs ${syntax.options(['project', 'existing'])}.`,
+    });
+  }
+
+  const migrationFramework = from && installationMigrationFramework(from);
+
+  if (from && migrationFramework && frameworkValid && framework !== migrationFramework) {
+    errors.push({
+      field: 'from',
+      value: from,
+      message: `Migrates a ${INSTALLATION_MIGRATION_NAMES[from]} project, so it needs ${syntax.options(['framework', migrationFramework])}.`,
     });
   }
 

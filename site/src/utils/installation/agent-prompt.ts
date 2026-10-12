@@ -9,6 +9,7 @@ import {
   INSTALLATION_FEATURE_DEFINITIONS,
   INSTALLATION_MIGRATION_NAMES,
   installationFeaturesFor,
+  installationMigrationFramework,
   INSTALLATION_SKIN_FLAGS,
   installationCommandParts,
   installationCompatibility,
@@ -222,6 +223,16 @@ export function agentPromptMigrationSource(goal: AgentPromptGoal): InstallationM
   const source = goal.replace(/^migrate-/, '');
 
   return goal !== source && isInstallationMigrationSource(source) ? source : null;
+}
+
+/** The goals a framework's page offers, leaving out migrations from players its projects can't use, such as Video-React. */
+export function agentPromptGoalsFor(framework: InstallationFramework): AgentPromptGoal[] {
+  return AGENT_PROMPT_GOALS.filter((goal) => {
+    const source = agentPromptMigrationSource(goal);
+    const required = source && installationMigrationFramework(source);
+
+    return !required || required === framework;
+  });
 }
 
 export function agentPromptGoalLabel(goal: AgentPromptGoal): string {

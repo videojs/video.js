@@ -12,6 +12,7 @@ import {
   agentPromptExampleFits,
   agentPromptExampleSummary,
   agentPromptExamplePicks,
+  agentPromptGoalsFor,
   agentPromptLeftOut,
   agentPromptMarkdown,
   agentPromptMediaChoices,
@@ -204,6 +205,14 @@ describe('agentPromptText', () => {
       "2. Migrate this project's Vidstack player to Video.js 10: `npx @videojs/cli agents init --from vidstack --project existing`."
     );
     expect(text).toContain('explains how to choose the preset, skin, media, media URL, and extensions');
+  });
+});
+
+describe('agentPromptGoalsFor', () => {
+  it('offers the Video-React migration only to React projects', () => {
+    expect(agentPromptGoalsFor('react')).toContain('migrate-video-react');
+    expect(agentPromptGoalsFor('html')).not.toContain('migrate-video-react');
+    expect(agentPromptGoalsFor('html')).toContain('migrate-plyr');
   });
 });
 

@@ -32,7 +32,6 @@ import {
 import { Select } from '@/components/Select';
 import {
   AGENT_PROMPT_DESIGNS,
-  AGENT_PROMPT_GOALS,
   agentPromptDesignFor,
   agentPromptDesignSkin,
   agentPromptGoalLabel,
@@ -73,12 +72,6 @@ const GOAL_ICONS = {
   'migrate-video-react': <ArrowRight className="size-4" />,
   'customize-skin': <Paintbrush className="size-4" />,
 } satisfies Record<AgentPromptGoal, ReactNode>;
-
-const GOAL_OPTIONS = AGENT_PROMPT_GOALS.map((goal) => ({
-  value: goal,
-  label: agentPromptGoalLabel(goal),
-  icon: GOAL_ICONS[goal],
-}));
 
 const CONTROL_CLASS = clsx(
   'h-9 rounded-lg corner-squircle border border-line bg-surface text-p3 shadow-xs',
@@ -156,6 +149,8 @@ interface Props {
   onSkinChange: (skin: SkinFlag) => void;
   agent: SkillAgent | null;
   onAgentChange: (agent: SkillAgent | null) => void;
+  /** The goals the page offers. */
+  goals: readonly AgentPromptGoal[];
   goal: AgentPromptGoal;
   onGoalChange: (goal: AgentPromptGoal) => void;
   request: string;
@@ -198,6 +193,7 @@ export default function PromptIntent({
   onSkinChange,
   agent,
   onAgentChange,
+  goals,
   goal,
   onGoalChange,
   request,
@@ -238,6 +234,7 @@ export default function PromptIntent({
   const mediaDialog = useRef<PromptDialogActions>(null);
   const mediaTriggerRef = useRef<HTMLButtonElement>(null);
   const skinDialog = useRef<PromptDialogActions>(null);
+  const goalOptions = goals.map((value) => ({ value, label: agentPromptGoalLabel(value), icon: GOAL_ICONS[value] }));
   const designOptions = AGENT_PROMPT_DESIGNS.filter((design) => includeNoSkin || design !== 'own').map((design) => ({
     value: design,
     label: DESIGN_LABELS[design],
@@ -366,7 +363,7 @@ export default function PromptIntent({
                 aria-label="Goal"
                 className="w-full"
                 value={goal}
-                options={GOAL_OPTIONS}
+                options={goalOptions}
                 onChange={(next) => {
                   if (next) onGoalChange(next);
                 }}

@@ -1,3 +1,5 @@
+import type { InstallationFramework } from './projects';
+
 /** Players an installation can migrate from, each with a migration guide. */
 export const INSTALLATION_MIGRATION_SOURCES = [
   'video-js-8',
@@ -17,6 +19,16 @@ export const INSTALLATION_MIGRATION_NAMES = {
   vidstack: 'Vidstack',
   'video-react': 'Video-React',
 } as const satisfies Record<InstallationMigrationSource, string>;
+
+// Video-React is a React library, so only React has its migration guide.
+const MIGRATION_FRAMEWORKS: Partial<Record<InstallationMigrationSource, InstallationFramework>> = {
+  'video-react': 'react',
+};
+
+/** The framework every project using a player is built with, or `null` when any framework can migrate from it. */
+export function installationMigrationFramework(source: InstallationMigrationSource): InstallationFramework | null {
+  return MIGRATION_FRAMEWORKS[source] ?? null;
+}
 
 export function isInstallationMigrationSource(value: string): value is InstallationMigrationSource {
   return INSTALLATION_MIGRATION_SOURCES.some((source) => source === value);
