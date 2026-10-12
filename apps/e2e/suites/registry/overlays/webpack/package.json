@@ -6,12 +6,12 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "css-loader": "7.1.5",
     "html-webpack-plugin": "5.6.8",
     "style-loader": "4.0.0",

@@ -87,13 +87,13 @@
     "@oxc-project/types": "0.146.0",
     "@tailwindcss/node": "catalog:",
     "@videojs/utils": "workspace:*",
-    "cn": "^0.2.5",
+    "cn": "^0.4.0",
     "lightningcss": "catalog:",
-    "magic-string": "^1.2.2",
+    "magic-string": "^1.4.3",
     "oxc-parser": "0.146.0",
     "oxc-walker": "^1.1.1",
     "rolldown": "~1.2.5",
-    "shadcn": "^4.16.2",
+    "shadcn": "^4.21.4",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
