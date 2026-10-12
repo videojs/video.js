@@ -145,7 +145,7 @@ From the start, I wanted the skins to fit naturally into the sites using them.
 
 Typography was a good example. Inheriting the document’s font would leave the controls at the mercy of whatever typeface someone had chosen for their site. Instead, the skins have their own sans-serif stack, with Inter first and the operating system’s UI font as the fallback. I like how Inter looks, but Video.js doesn’t download it: it’s only used if the site already loads it, or it’s installed locally and the browser allows access to it.
 
-Those defaults are easy to change. The accent color, player corner radius, and font family can all be set through CSS custom properties: `--media-accent-color`, `--media-border-radius`, and `--media-font-family`. You can even set the font family to `inherit` if that suits your site. The [skin customization guide](/docs/guides/customize-skins#style-a-packaged-skin) covers these options.
+Those defaults are easy to change. The accent color, player corner radius, and font family can all be set through CSS custom properties: `--media-accent-color`, `--media-border-radius`, and `--media-font-family`. You can even set the font family to `inherit` if that suits your site. The [skin customization guide](/docs/framework/html/guides/customize-skins#style-a-packaged-skin) covers these options.
 
 Accent colors are another example. Letting someone use their own brand color means designing for colors I haven’t chosen myself. White text or icons might work over a dark blue accent, then become difficult to see when someone switches it to yellow.
 
