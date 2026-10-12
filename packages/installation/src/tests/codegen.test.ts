@@ -501,12 +501,14 @@ video-skin {
     const player = generateSvelteCreateCode(hlsOptions).component;
     const usage = generateSvelteUsageCode({ ...hlsOptions, sourceUrl: 'https://example.com/live.m3u8' });
 
-    expect(player).toContain('<slot />');
+    expect(player).toContain("import type { Snippet } from 'svelte';");
+    expect(player).toContain('let { children }: { children?: Snippet } = $props();');
+    expect(player).toContain('{@render children?.()}');
+    expect(player).not.toContain('<slot');
     expect(player).toContain(`<style>
 video-skin {
   display: block;`);
     expect(player).not.toContain('style="');
-    expect(player).not.toContain('$props');
     expect(usage['+page.svelte']).toContain("import VideoPlayer from '$lib/VideoPlayer.svelte'");
     expect(usage['App.svelte']).toContain('<VideoPlayer>');
     expect(usage['App.svelte']).toContain('<hlsjs-video src={"https://example.com/live.m3u8"} playsinline>');
