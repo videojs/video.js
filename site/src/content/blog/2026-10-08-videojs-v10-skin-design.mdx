@@ -4,8 +4,8 @@ description: 'The ideas behind Default, Neutral, and Compat, and the small desig
 authors: [sam-potts]
 ---
 
-import SkinComparison from '@/components/blog/SkinComparison';
-import PlyrComparison from '@/components/blog/PlyrComparison';
+import SkinComparison from '@/components/blog/SkinComparisonDemo.astro';
+import PlyrComparison from '@/components/blog/PlyrComparisonDemo.astro';
 import FrostedDemo from '@/components/blog/FrostedDemo.astro';
 import AlignmentDemo from '@/components/blog/AlignmentDemo.astro';
 import TimeDemo from '@/components/blog/TimeDemo.astro';
@@ -16,11 +16,11 @@ import Figure from '@/components/typography/Figure.astro';
 import Img from '@/components/typography/Img.astro';
 import roasted from '@/assets/blog/2026-10-08-videojs-v10-skin-design/roasted.png';
 
-When I started thinking about the skins for Video.js v10, I had a few ideas I’d been carrying around from my time working on Plyr. One was what I’d do if I were designing its next skin: something with a modern frosted glass background, softer shapes, and a bit more character.
+When I started thinking about the skins for Video.js v10, I had a few ideas I’d been carrying around from my time working on [Plyr](https://plyr.io/). One was what I’d do if I were designing its next skin: something with a modern frosted glass background, softer shapes, and a bit more character.
 
-Plyr’s design changed over the years. The early light skin kept the controls in a separate bar below the video. By version 2, they sat over the video itself, with a gradient providing contrast. Plyr version 3 refined that direction with a simpler central play button and a settings menu.
+Plyr’s design changed over the years. The early light skin kept the controls in a separate bar below the video. By v2, they sat over the video itself, with a gradient providing contrast. Plyr v3 refined that direction with a simpler central play button and a settings menu.
 
-<PlyrComparison client:visible />
+<PlyrComparison />
 
 Video.js gave me a chance to explore that direction. It also posed a broader question. A player can end up on almost any website, so how much personality should its design have?
 
@@ -28,7 +28,7 @@ The skins share the same attention to detail, but make different tradeoffs betwe
 
 The comparison below also includes Scaffold: functional controls with minimal styling, intended as a starting point for your own skin. It gives you a foundation to restyle when you want to take the design in your own direction.
 
-<SkinComparison client:visible />
+<SkinComparison />
 
 ## Default: A little opinionated
 
@@ -36,7 +36,7 @@ I wanted Default to stand out. Video players share a lot of familiar visual conv
 
 The frosted glass treatment was something I’d wanted to try for a while. Backdrop blur lets the controls retain a connection to the video underneath, while giving them a surface of their own. I paired that with the exaggerated border radii that have become more common in interface design.
 
-Liquid Glass was an influence too. For this version, though, I kept the treatment to frosted glass. More ambitious glass effects brought practical concerns around bundle size, battery life, cross-origin video, and browser compatibility that I wasn’t comfortable taking on. I’m still warming to it myself: in some applications it looks great, while in others I find the controls harder to read.
+[Apple’s Liquid Glass](https://www.apple.com/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/) was an influence too. For this version, though, I kept the treatment to frosted glass. More ambitious glass effects brought practical concerns around bundle size, battery life, cross-origin video, and browser compatibility that I wasn’t comfortable taking on. I’m still warming to it myself: in some applications it looks great, while in others I find the controls harder to read.
 
 I was constantly refining that surface. Getting the blur in place was only the beginning. The borders and shadows needed attention too: enough definition to give the controls shape, without making them feel heavy.
 
@@ -171,6 +171,13 @@ The transparency preferences above and the accent-color contrast handling are pa
 
 ## Choosing a skin
 
-Default is the direction I’d been wanting to explore for a while. Neutral and Compat grew around different needs. If you want that visual character in your product, Default is a good place to start. If you want the player to sit quietly within an existing design, try Neutral. If broader browser compatibility guides the decision, choose Compat. And if you want to build your own visual treatment, Scaffold provides the starting point.
+Default is the direction I’d been wanting to explore for a while. Neutral and Compat grew around different needs, and Scaffold gives you a starting point for your own design.
 
-That choice was the point of offering different skins: the details should feel considered whichever direction fits your product.
+| Skin | What it looks like | Pick it when |
+| --- | --- | --- |
+| Default | Frosted surfaces, rounded controls, and a distinctive visual identity | You want the player to have a character of its own. |
+| Neutral | A gradient backdrop, thinner icons, and no surrounding chrome | You want the player to blend into your site’s design. |
+| Compat | Simple controls and near-opaque menus, without backdrop blur | Broader browser compatibility is your priority. |
+| Scaffold | Functional controls with minimal styling | You want to build your own visual treatment. |
+
+[Choose a skin and get started with Video.js](/docs/guides/installation), or explore the [skin documentation](/docs/guides/skins) to see how packaged skins and editable source fit into your project.
