@@ -9,7 +9,8 @@
 
 .skin-comparison .comparison-stage {
   container-name: media-root;
-  background: black;
+  /* Match the page rather than black: Safari can leave a hairline between a skin's corner shadow and the stage edge. */
+  background: var(--comparison-background);
 }
 
 .skin-comparison-video {
