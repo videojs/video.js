@@ -6,10 +6,12 @@ export interface InstallationInput {
   skin?: string;
   media?: string;
   extensions?: string;
+  features?: string;
   sourceUrl?: string;
   packageManager?: string;
   template?: string;
   styling?: string;
+  from?: string;
 }
 
 export type InstallationInputKey = keyof InstallationInput;
@@ -36,10 +38,12 @@ export const INSTALLATION_PARAMETERS = Object.freeze([
   { key: 'skin', flag: '--skin', query: 'skin' },
   { key: 'media', flag: '--media', query: 'media' },
   { key: 'extensions', flag: '--extensions', query: 'extensions' },
+  { key: 'features', flag: '--features', query: 'features' },
   { key: 'sourceUrl', flag: '--source-url', query: 'source-url', private: true },
   { key: 'packageManager', flag: '--package-manager', query: 'package-manager' },
   { key: 'template', flag: '--template', query: 'template' },
   { key: 'styling', flag: '--styling', query: 'styling' },
+  { key: 'from', flag: '--from', query: 'from' },
 ] as const satisfies readonly InstallationParameter[]);
 
 export function installationParameterForKey<Key extends InstallationInputKey>(

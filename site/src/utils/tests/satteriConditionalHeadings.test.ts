@@ -101,8 +101,8 @@ describe('satteriConditionalHeadings', () => {
     const headings = collect('<SkinPickerSection />\n\n<SourceMediaInstall client:idle />');
 
     expect(headings).toEqual([
-      { depth: 2, text: 'Choose your skin', slug: 'choose-your-skin' },
-      { depth: 2, text: 'Install the media adapter', slug: 'install-the-media-adapter' },
+      { depth: 3, text: 'Choose your skin', slug: 'choose-your-skin' },
+      { depth: 3, text: 'Install the media adapter', slug: 'install-the-media-adapter' },
     ]);
   });
 });

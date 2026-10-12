@@ -166,19 +166,49 @@ export const SKILLS_OPTIONS: readonly SkillsOptionDefinition[] = [
   },
 ];
 
+export interface SkillsCommandOption {
+  key: keyof SkillsSelection;
+  flag: `--${string}`;
+  /** The value as the command prints it; absent for a flag that takes none, such as `--global`. */
+  value?: string;
+}
+
+export interface SkillsCommandParts {
+  /** The `agents skills` invocation without options. */
+  command: string;
+  /** The selected options in flag order. */
+  options: readonly SkillsCommandOption[];
+}
+
+/** The pieces {@link skillsCommand} joins, for interfaces that present each option on its own. */
+export function skillsCommandParts(
+  selection: SkillsSelection = {},
+  packageVersion: string | null = null
+): SkillsCommandParts {
+  const packageSpecifier = packageVersion ? `${INSTALLATION_CLI_PACKAGE}@${packageVersion}` : INSTALLATION_CLI_PACKAGE;
+  const options: SkillsCommandOption[] = [];
+  const { agents } = selection;
+
+  if (agents) {
+    options.push({
+      key: 'agents',
+      flag: '--agent',
+      value: SKILL_AGENTS.filter((agent) => agents.includes(agent)).join(','),
+    });
+  }
+
+  if (selection.scope) options.push({ key: 'scope', flag: '--scope', value: selection.scope });
+
+  if (selection.global) options.push({ key: 'global', flag: '--global' });
+
+  return { command: `npx ${packageSpecifier} agents skills`, options };
+}
+
 /** The `agents skills` command for a selection, with agents in canonical order. */
 export function skillsCommand(selection: SkillsSelection = {}, packageVersion: string | null = null): string {
-  const packageSpecifier = packageVersion ? `${INSTALLATION_CLI_PACKAGE}@${packageVersion}` : INSTALLATION_CLI_PACKAGE;
-  const parts = [`npx ${packageSpecifier} agents skills`];
+  const { command, options } = skillsCommandParts(selection, packageVersion);
 
-  if (selection.agents)
-    parts.push(`--agent ${SKILL_AGENTS.filter((agent) => selection.agents!.includes(agent)).join(',')}`);
-
-  if (selection.scope) parts.push(`--scope ${selection.scope}`);
-
-  if (selection.global) parts.push('--global');
-
-  return parts.join(' ');
+  return [command, ...options.map(({ flag, value }) => (value === undefined ? flag : `${flag} ${value}`))].join(' ');
 }
 
 export interface SkillsInstructions {

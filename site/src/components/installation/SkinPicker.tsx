@@ -1,14 +1,14 @@
-import { getInstallationPreset, type Skin } from '@videojs/installation';
+import { getInstallationPreset, skinToFlag, type Skin } from '@videojs/installation';
 import { useEffect } from 'react';
 
 import CardRadioGroup, { type CardRadioOption } from '@/components/CardRadioGroup';
 import { skin } from '@/stores/installation';
 
-import SkinPreview from './SkinPreview';
+import SkinIcon from './SkinIcon';
 import { useSelection } from './useSelection';
 
 function option(value: Skin, label: string, description: string): CardRadioOption<Skin> {
-  return { value, label, description, media: <SkinPreview skin={value} className="size-6" /> };
+  return { value, label, description, media: <SkinIcon skin={skinToFlag(value)} className="size-6" /> };
 }
 
 const VIDEO_SKINS: CardRadioOption<Skin>[] = [

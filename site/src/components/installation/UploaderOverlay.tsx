@@ -85,10 +85,12 @@ export default function UploaderOverlay({ state, error, playbackId, onLogin, onR
       <OverlayWrapper>
         <div className="flex items-center gap-2">
           <CheckCircle className="text-accent size-4" aria-hidden="true" />
-          <p className="font-semibold">Ready to play</p>
+          <p className="font-semibold">Ready on Mux</p>
         </div>
-        <p className="text-p3 text-center">
-          See code below, or{' '}
+        {/* What the upload gives the player, which the source now points to. No token or key reaches the page. */}
+        <p className="text-p3 text-center text-balance">
+          It streams at the right quality for each viewer, with thumbnail previews and viewer analytics, and it's now
+          your source.{' '}
           <a
             href={withMuxAttribution('https://dashboard.mux.com/my/video/assets', 'mux-uploader')}
             data-ph-capture-attribute-cta="mux-dashboard"
@@ -97,9 +99,8 @@ export default function UploaderOverlay({ state, error, playbackId, onLogin, onR
             className="intent:decoration-gold underline"
             rel="noopener"
           >
-            manage on Mux
+            Manage it on Mux
           </a>
-          .
         </p>
       </OverlayWrapper>
     );

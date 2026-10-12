@@ -82,6 +82,18 @@ describe('resolveInstallationSelection', () => {
     });
   });
 
+  it('migrates from Video-React only in a React project', () => {
+    expect(resolveInstallationSelection({ framework: 'react', from: 'video-react' })).toMatchObject({
+      ok: true,
+      selection: { from: 'video-react' },
+    });
+    expect(resolveInstallationSelection({ framework: 'vue', from: 'video-react' })).toMatchObject({
+      ok: false,
+      errors: [{ field: 'from', value: 'video-react', message: expect.stringContaining('react') }],
+    });
+    expect(resolveInstallationSelection({ framework: 'html', from: 'plyr' }).ok).toBe(true);
+  });
+
   it('rejects incompatible paths', () => {
     expect(resolveInstallationSelection({ framework: 'react', method: 'cdn' }, '10.0.0')).toMatchObject({
       ok: false,

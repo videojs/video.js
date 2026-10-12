@@ -87,6 +87,7 @@ export const sidebar: Sidebar = [
         llmsDescription:
           'Guides for one player capability each: the recommended setup, how it works, browser constraints, variations, and troubleshooting.',
         contents: [
+          { slug: 'guides/video-hosting', sidebarLabel: 'Video hosting' },
           { slug: 'guides/autoplay', sidebarLabel: 'Autoplay' },
           { slug: 'guides/controls', sidebarLabel: 'Controls' },
           {

@@ -7,10 +7,13 @@ import ChevronDown from '@/assets/icons/chevron-down.svg?react';
 import Copy from '@/assets/icons/copy.svg?react';
 import Markdown from '@/assets/icons/markdown.svg?react';
 import ClaudeLogo from '@/assets/logos/brands/claude.svg?react';
+import CursorLogo from '@/assets/logos/brands/cursor.svg?react';
 import OpenAiLogo from '@/assets/logos/brands/openai.svg?react';
 import { ANALYTICS_EVENTS, trackEvent } from '@/utils/analytics-events';
 import { getInstallationRouteSegment } from '@/utils/installation/routes';
 import useIsHydrated from '@/utils/useIsHydrated';
+
+import { MENU_ITEM_CLASS, MENU_POPUP_CLASS, MENU_SEPARATOR_CLASS } from './menuClasses';
 
 export interface CopyMarkdownButtonProps {
   className?: string;
@@ -72,11 +75,6 @@ const segmentClass = clsx(
   'inline-flex h-8 items-center border border-line bg-surface text-p3 whitespace-nowrap shadow-xs select-none',
   'intent:border-line-strong intent:text-faded-black dark:intent:text-manila-light text-muted',
   'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold focus-visible:relative focus-visible:z-10'
-);
-
-const itemClass = clsx(
-  'flex cursor-pointer items-center gap-2.5 rounded-md corner-squircle px-2 py-1.5 text-p3 no-underline outline-none select-none',
-  'data-[highlighted]:bg-surface dark:data-[highlighted]:bg-warm-gray'
 );
 
 /**
@@ -196,61 +194,59 @@ export default function CopyMarkdownButton({ className, style }: CopyMarkdownBut
         </Menu.Trigger>
         <Menu.Portal>
           <Menu.Positioner side="bottom" align="end" sideOffset={6} className="z-40 outline-none">
-            <Menu.Popup
-              className={clsx(
-                'min-w-56 origin-(--transform-origin) rounded-lg corner-squircle border border-line bg-surface-raised p-1 text-p3 shadow-lg dark:bg-soot',
-                'transition duration-150 ease-out starting-style:scale-95 starting-style:opacity-0 ending-style:scale-95 ending-style:opacity-0 ending-style:duration-100',
-                'motion-reduce:transition-none'
-              )}
-            >
-              <Menu.Item
-                className={itemClass}
+            <Menu.Popup className={clsx(MENU_POPUP_CLASS, 'min-w-56')}>
+              <Menu.LinkItem
+                className={MENU_ITEM_CLASS}
+                href={mdUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                closeOnClick
                 onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'view-markdown' })}
-                render={
-                  <a
-                    href={mdUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-ph-capture-attribute-cta="view-markdown"
-                  />
-                }
+                data-ph-capture-attribute-cta="view-markdown"
               >
                 <Markdown className="size-4 shrink-0" aria-hidden="true" />
                 View as Markdown
-              </Menu.Item>
-              <Menu.Separator className="bg-line my-1 h-px" />
-              <Menu.Item
-                className={itemClass}
+              </Menu.LinkItem>
+              <Menu.Separator className={MENU_SEPARATOR_CLASS} />
+              <Menu.LinkItem
+                className={MENU_ITEM_CLASS}
+                href={`https://chatgpt.com/?hints=search&prompt=${prompt}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                closeOnClick
                 onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'open-in-chatgpt' })}
-                render={
-                  <a
-                    href={`https://chatgpt.com/?hints=search&prompt=${prompt}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-ph-capture-attribute-cta="open-in-chatgpt"
-                    data-ph-capture-attribute-destination="external"
-                  />
-                }
+                data-ph-capture-attribute-cta="open-in-chatgpt"
+                data-ph-capture-attribute-destination="external"
               >
                 <OpenAiLogo className="size-4 shrink-0" aria-hidden="true" />
                 Open in ChatGPT
-              </Menu.Item>
-              <Menu.Item
-                className={itemClass}
+              </Menu.LinkItem>
+              <Menu.LinkItem
+                className={MENU_ITEM_CLASS}
+                href={`https://claude.ai/new?q=${prompt}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                closeOnClick
                 onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'open-in-claude' })}
-                render={
-                  <a
-                    href={`https://claude.ai/new?q=${prompt}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-ph-capture-attribute-cta="open-in-claude"
-                    data-ph-capture-attribute-destination="external"
-                  />
-                }
+                data-ph-capture-attribute-cta="open-in-claude"
+                data-ph-capture-attribute-destination="external"
               >
                 <ClaudeLogo className="size-4 shrink-0" aria-hidden="true" />
                 Open in Claude
-              </Menu.Item>
+              </Menu.LinkItem>
+              <Menu.LinkItem
+                className={MENU_ITEM_CLASS}
+                href={`https://cursor.com/link/prompt?text=${prompt}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                closeOnClick
+                onClick={() => trackEvent(ANALYTICS_EVENTS.agentHandoff, { method: 'open-in-cursor' })}
+                data-ph-capture-attribute-cta="open-in-cursor"
+                data-ph-capture-attribute-destination="external"
+              >
+                <CursorLogo className="size-4 shrink-0" aria-hidden="true" />
+                Open in Cursor
+              </Menu.LinkItem>
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>

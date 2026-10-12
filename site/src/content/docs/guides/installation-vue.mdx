@@ -38,7 +38,11 @@ import StartingPointPicker from '@/components/installation/StartingPointPicker';
 
 <HumanCase>
 
-## Choose your framework
+## Manual installation
+
+Prefer to set it up yourself? Each choice below updates the code in the steps after it.
+
+### Choose your framework
 
 Choose the JavaScript framework for your project.
 
@@ -46,18 +50,26 @@ Choose the JavaScript framework for your project.
   <JSPicker />
 </ContentWidth>
 
-## Choose your app
+### Choose your app
 
 Choose whether the instructions target a Vite, Astro, or Nuxt app.
 
 <AppSetupPicker framework="vue" method="packaged" />
 
-## Choose your use case
+### Choose your use case
 
 Choose the ready-made player that is closest to what you are building.
 
 <ContentWidth margins="lg">
   <UseCasePicker client:idle />
+</ContentWidth>
+
+### Choose your media
+
+Paste a media URL to detect its source type, pick one directly, or upload a video to Mux. Mux is optional hosting that gives any video an adaptive stream, thumbnail previews, and viewer analytics; <DocsLink slug="guides/video-hosting">compare it with other video hosting</DocsLink>. The generated packages and component update with your choice.
+
+<ContentWidth margins="lg">
+  <MediaSourcePicker client:idle />
 </ContentWidth>
 
 <ContentWidth margins="lg">
@@ -68,15 +80,7 @@ Choose the ready-made player that is closest to what you are building.
   <InstallationPreview client:visible={{ rootMargin: "200px" }} />
 </ContentWidth>
 
-## Choose your media
-
-Paste a media URL to detect its source type, pick one directly, or upload a video to Mux. The generated packages and component update with your choice.
-
-<ContentWidth margins="lg">
-  <MediaSourcePicker client:idle />
-</ContentWidth>
-
-## Choose your extensions
+### Choose your extensions
 
 Add optional behavior to the player. Only extensions that work with your player and media source appear below.
 
@@ -88,7 +92,7 @@ Add optional behavior to the player. Only extensions that work with your player 
 
 <div data-installation-plan class="contents">
 
-## Prepare your app
+### Prepare your app
 
 Choose whether to create the selected Vue app setup or add Video.js to a project you already have.
 
@@ -100,19 +104,19 @@ Choose whether to create the selected Vue app setup or add Video.js to a project
 
 <ProjectCommands client:idle part="create" serverFramework="vue" serverTemplate="vite" />
 
-## Install the packages
+### Install the packages
 
 Install the HTML elements and any playback adapter your selected media source needs.
 
 <HTMLInstallTabs />
 
-## Register custom elements
+### Register custom elements
 
 Vue's template compiler treats unknown tags as Vue components and warns when it cannot resolve them. Tell it which tags are Video.js custom elements with [`isCustomElement`](https://vuejs.org/guide/extras/web-components.html#skipping-component-resolution). List only the tags your templates use.
 
 <VueConfigCodeBlock client:visible={{ rootMargin: "200px" }} />
 
-## Add your player
+### Add your player
 
 <Steps>
   <Step number={1} title="Add the player component">
@@ -127,7 +131,7 @@ Vue's template compiler treats unknown tags as Vue components and warns when it 
   </Step>
 </Steps>
 
-## Run your app
+### Run your app
 
 Start the app and verify that the selected media plays.
 

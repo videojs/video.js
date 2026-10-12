@@ -77,11 +77,13 @@ describe('installationOptionDefinitionsFor', () => {
       '--preset is not background-video',
       '--method is not cdn with --template none',
       '--method shadcn',
+      '--project existing',
     ]);
     expect(appliesWhen(installationOptionDefinitionsFor(context, QUERY_OPTION_SYNTAX))).toEqual([
       'preset is not background-video',
       'method is not cdn with template none',
       'method=shadcn',
+      'project=existing',
     ]);
   });
 });
@@ -94,9 +96,24 @@ describe('installationDecisionOrderFor', () => {
 
     expect(guidance('Choose the player')).toMatch(/^Use video unless the request signals another experience/);
     expect(guidance('Choose the player')).toContain('Ask only when those signals conflict.');
-    expect(guidance('Choose the skin')).toMatch(/^Use default unless the request asks for a minimal/);
+    expect(guidance('Choose the skin')).toMatch(
+      /^Decide whether the project applies its brand to our design or builds its own/
+    );
+    expect(guidance('Choose the skin')).toContain('use neutral');
+    expect(guidance('Choose the skin')).toContain('use default, the distinctly Video.js design');
     expect(guidance('Choose the skin')).toContain('which Shadcn does not support');
     expect(shadcn.find(({ title }) => title === 'Choose the skin')?.guidance).not.toContain('none');
+  });
+
+  it('keeps platform media on its standard player and names the sources the live players and Google Cast take', () => {
+    const decisions = installationDecisionOrderFor({ methods: ['packaged'], frameworks: ['react'] });
+    const guidance = (title: string) => decisions.find((decision) => decision.title === title)?.guidance;
+
+    expect(guidance('Choose the player')).toContain('live-video (hls or mux-video) or live-audio (mux-audio only)');
+    expect(guidance('Choose the player')).toContain('youtube, vimeo, twitch, tiktok, and cloudflare use video');
+    expect(guidance('Choose the player')).toContain('as describing the experience rather than the media source');
+    expect(guidance('Choose the media')).toContain('only when the content is hosted there');
+    expect(guidance('Choose extensions')).toContain('plays hls, dash, or mux-video media');
   });
 
   it('explains every installation method when all frameworks are available', () => {

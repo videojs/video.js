@@ -110,12 +110,12 @@ export function satteriConditionalHeadings(): MdastPluginInput {
             break;
           case 'SkinPickerSection':
             publish(ctx);
-            headings.push({ depth: 2, text: 'Choose your skin', slug: 'choose-your-skin' });
+            headings.push({ depth: 3, text: 'Choose your skin', slug: 'choose-your-skin' });
             break;
           case 'SourceMediaInstall':
             publish(ctx);
             headings.push({
-              depth: 2,
+              depth: 3,
               text: 'Install the media adapter',
               slug: 'install-the-media-adapter',
             });

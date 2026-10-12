@@ -32,7 +32,8 @@ export const INSTALLATION_EXTENSION_DEFINITIONS = {
   },
 } as const satisfies Record<InstallationExtension, InstallationExtensionDefinition>;
 
-const GOOGLE_CAST_RENDERERS = ['hls', 'dash', 'mux-video'] as const satisfies readonly Renderer[];
+/** The media Google Cast can send to a receiver. */
+export const GOOGLE_CAST_RENDERERS = ['hls', 'dash', 'mux-video'] as const satisfies readonly Renderer[];
 
 export function isInstallationExtension(value: string): value is InstallationExtension {
   return INSTALLATION_EXTENSIONS.some((extension) => extension === value);

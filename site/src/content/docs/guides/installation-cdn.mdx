@@ -33,7 +33,11 @@ import HumanCase from '@/components/docs/HumanCase.astro';
 
 <HumanCase>
 
-## Choose your framework
+## Manual installation
+
+Prefer to set it up yourself? Each choice below updates the code in the steps after it.
+
+### Choose your framework
 
 Choose the JavaScript framework for your project.
 
@@ -41,7 +45,7 @@ Choose the JavaScript framework for your project.
   <JSPicker />
 </ContentWidth>
 
-## Choose your app
+### Choose your app
 
 Add the player to an HTML page you already have, or create a minimal Vite app for it.
 
@@ -51,12 +55,20 @@ Add the player to an HTML page you already have, or create a minimal Vite app fo
 </ContentWidth>
 </div>
 
-## Choose your use case
+### Choose your use case
 
 Choose the ready-made player that is closest to what you are building. Live presets add live-edge controls; background video is muted and loops behind your content.
 
 <ContentWidth margins="lg">
   <UseCasePicker client:idle />
+</ContentWidth>
+
+### Choose your media
+
+Choose what the player will play. The CDN page only shows sources with a browser-ready bundle.
+
+<ContentWidth margins="lg">
+  <CdnMediaSourcePicker />
 </ContentWidth>
 
 <ContentWidth margins="lg">
@@ -67,15 +79,7 @@ Choose the ready-made player that is closest to what you are building. Live pres
   <InstallationPreview client:visible={{ rootMargin: "200px" }} />
 </ContentWidth>
 
-## Choose your media
-
-Choose what the player will play. The CDN page only shows sources with a browser-ready bundle.
-
-<ContentWidth margins="lg">
-  <CdnMediaSourcePicker />
-</ContentWidth>
-
-## Choose your extensions
+### Choose your extensions
 
 Add optional behavior to the player. Only extensions that work with your player and media source appear below.
 
@@ -83,7 +87,7 @@ Add optional behavior to the player. Only extensions that work with your player 
   <ExtensionPicker client:idle />
 </ContentWidth>
 
-## Choose how to install
+### Choose how to install
 
 Choose from the installation options available for your selections.
 
@@ -95,7 +99,7 @@ Choose from the installation options available for your selections.
 
 <div data-installation-project-content="new">
 
-## Prepare your app
+### Prepare your app
 
 Create the app in an empty directory, then run the remaining commands from that directory.
 
@@ -105,7 +109,7 @@ Create the app in an empty directory, then run the remaining commands from that 
 
 <div data-installation-project-content="existing">
 
-## Load Video.js
+### Load Video.js
 
 Add these generated module scripts to your page. They register the player, selected skin, media component, and selected extensions.
 
@@ -115,7 +119,7 @@ Add these generated module scripts to your page. They register the player, selec
 
 </div>
 
-## Add your player
+### Add your player
 
 <div data-installation-project-content="existing">
 
@@ -135,7 +139,7 @@ Replace the compat page with this generated page. It loads Video.js and renders 
 
 <div data-installation-named-app class="contents">
 
-## Run your app
+### Run your app
 
 Start the app and verify that the media plays.
 

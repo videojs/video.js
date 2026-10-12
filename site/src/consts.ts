@@ -24,6 +24,7 @@ export const MUX_SUPPORT_URL = 'https://www.mux.com/sales-contact?form=sales&utm
 export const THEME_KEY = 'vjs-site-theme';
 export const ACCENT_KEY = 'vjs-site-accent';
 export const TONE_KEY = 'vjs-site-tone';
+export const SKILL_AGENT_KEY = 'vjs-site-skill-agent';
 
 /**
  * Page background per resolved theme and dark tone, written to the `theme-color` meta tag for browser chrome.

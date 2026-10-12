@@ -52,7 +52,11 @@ If a preset and skin do not meet your user's requirements, follow [Customize ski
 
 <HumanCase>
 
-## Choose your framework
+## Manual installation
+
+Prefer to set it up yourself? Each choice below updates the code in the steps after it.
+
+### Choose your framework
 
 Choose the JavaScript framework for your project.
 
@@ -60,7 +64,7 @@ Choose the JavaScript framework for your project.
   <JSPicker />
 </ContentWidth>
 
-## Choose your app
+### Choose your app
 
 Choose the app environment that controls the setup commands and file locations below.
 
@@ -71,7 +75,7 @@ Choose the app environment that controls the setup commands and file locations b
 <AppSetupPicker framework="html" method="packaged" />
 </FrameworkCase>
 
-## Choose your use case
+### Choose your use case
 
 The default presets work well for general website playback. The live presets suit streams: they add a Live button and drop the duration and current-time displays that on-demand playback relies on. More pre-built players to come.
 
@@ -79,17 +83,9 @@ The default presets work well for general website playback. The live presets sui
   <UseCasePicker client:idle />
 </ContentWidth>
 
-<ContentWidth margins="lg">
-  <SkinPickerSection />
-</ContentWidth>
+### Choose your media
 
-<ContentWidth margins="lg">
-  <InstallationPreview client:visible={{ rootMargin: "200px" }} />
-</ContentWidth>
-
-## Choose your media
-
-Video.js plays plain files, adaptive streams, and embeds from hosting services, and switching between them is a one-line change. Paste a URL to detect the type, pick one directly, or upload a video to Mux.
+Video.js plays plain files, adaptive streams, and embeds from hosting services, and switching between them is a one-line change. Paste a URL to detect the type, pick one directly, or upload a video to Mux. Mux is optional hosting that gives any video an adaptive stream, thumbnail previews, and viewer analytics; <DocsLink slug="guides/video-hosting">compare it with other video hosting</DocsLink>.
 
 <ContentWidth margins="lg">
   <MediaSourcePicker client:idle />
@@ -101,7 +97,15 @@ This guide uses <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</Do
 </Aside>
 </MediaSourceCase>
 
-## Choose your extensions
+<ContentWidth margins="lg">
+  <SkinPickerSection />
+</ContentWidth>
+
+<ContentWidth margins="lg">
+  <InstallationPreview client:visible={{ rootMargin: "200px" }} />
+</ContentWidth>
+
+### Choose your extensions
 
 Add optional behavior to the player. Only extensions that work with your player and media source appear below.
 
@@ -109,7 +113,7 @@ Add optional behavior to the player. Only extensions that work with your player 
   <ExtensionPicker client:idle />
 </ContentWidth>
 
-## Choose how to install
+### Choose how to install
 
 Choose from the installation options available for your selections.
 
@@ -121,7 +125,7 @@ Choose from the installation options available for your selections.
 
 <div data-installation-starting-point-section class="contents">
 
-## Prepare your app
+### Prepare your app
 
 Choose whether to create the selected app setup or add Video.js to a project you already have.
 
@@ -140,7 +144,7 @@ Choose whether to create the selected app setup or add Video.js to a project you
 
 </div>
 
-## Install the packages
+### Install the packages
 
 <FrameworkCase frameworks={["html"]}>
   <HTMLInstallTabs />
@@ -151,7 +155,7 @@ Choose whether to create the selected app setup or add Video.js to a project you
 
 <FrameworkCase frameworks={["html"]}>
 
-## Add your player
+### Add your player
 
 <HTMLUsageCodeBlock client:visible={{ rootMargin: "200px" }} />
 
@@ -169,7 +173,7 @@ Some bundlers default to an IIFE output format. Loading that bundle without `typ
 
 <FrameworkCase frameworks={["react"]}>
 
-## Add your player
+### Add your player
 
 Add the player to the file shown for your selected app setup. It imports the selected player, skin, media, and extensions from the packages you installed.
 
@@ -180,7 +184,7 @@ Add the player to the file shown for your selected app setup. It imports the sel
 
 <div data-installation-named-app class="contents">
 
-## Run your app
+### Run your app
 
 Start the app and verify that the media plays.
 

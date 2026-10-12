@@ -1,14 +1,10 @@
 import clsx from 'clsx';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useRef } from 'react';
 
-import ChevronDown from '@/assets/icons/chevron-down.svg?react';
-
+import { OverflowToggle, useOverflowCollapse } from './OverflowCollapse';
 import type { TabsVariant } from './Tabs';
 
-/**
- * Collapsed height for long code. Content that only slightly exceeds the cap is shown in full, since a "Show more"
- * button that reveals a couple of lines is more annoying than the extra height.
- */
+/** Collapsed height for long code, and how far past it code still shows in full. */
 const COLLAPSED_MAX_HEIGHT = 512;
 const COLLAPSE_SLACK = 96;
 
@@ -38,44 +34,12 @@ export default function CollapsibleCode({
   scrollTarget,
 }: CollapsibleCodeProps) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [overflows, setOverflows] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-
-  // The content's natural height decides whether the collapse affordance is needed at all.
-  useEffect(() => {
-    const content = contentRef.current;
-    if (!active || !content) return;
-
-    const measure = () => setOverflows(content.scrollHeight > COLLAPSED_MAX_HEIGHT + COLLAPSE_SLACK);
-
-    measure();
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(content);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [active]);
-
-  const collapsed = overflows && !expanded;
-
-  const onCollapse = () => {
-    setExpanded(false);
-
-    // Collapsing from the bottom of a long block would otherwise leave the reader below it.
-    const content = contentRef.current;
-    const root = scrollTarget ? content?.closest(scrollTarget) : content;
-
-    if (root && root.getBoundingClientRect().top < 0) root.scrollIntoView({ block: 'start' });
-  };
-
-  const buttonClassName = clsx(
-    'flex items-center gap-1.5 h-7 pl-2.5 pr-3 rounded-full corner-squircle text-p3 font-medium cursor-pointer select-none',
-    variant === 'compact'
-      ? 'bg-warm-gray text-manila-light border border-manila-light/15 intent:border-manila-light/30'
-      : 'bg-surface-raised border border-line intent:border-line-strong'
-  );
+  const { overflows, expanded, collapsed, expand, collapse } = useOverflowCollapse(contentRef, {
+    maxHeight: COLLAPSED_MAX_HEIGHT,
+    slack: COLLAPSE_SLACK,
+    measurable: active,
+  });
+  const tone = variant === 'compact' ? 'dark' : 'surface';
 
   return (
     <>
@@ -97,14 +61,7 @@ export default function CollapsibleCode({
           data-search-ignore
           data-llms-ignore
         >
-          <button
-            type="button"
-            className={clsx(buttonClassName, 'pointer-events-auto')}
-            onClick={() => setExpanded(true)}
-          >
-            <ChevronDown className="size-4" />
-            Show more
-          </button>
+          <OverflowToggle expanded={false} tone={tone} onClick={expand} className="pointer-events-auto" />
         </div>
       )}
       {overflows && expanded && (
@@ -117,10 +74,15 @@ export default function CollapsibleCode({
           data-search-ignore
           data-llms-ignore
         >
-          <button type="button" className={buttonClassName} onClick={onCollapse}>
-            <ChevronDown className="size-4 rotate-180" />
-            Show less
-          </button>
+          <OverflowToggle
+            expanded
+            tone={tone}
+            onClick={() => {
+              const content = contentRef.current;
+
+              collapse(scrollTarget ? content?.closest(scrollTarget) : content);
+            }}
+          />
         </div>
       )}
     </>

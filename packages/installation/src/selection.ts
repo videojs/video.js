@@ -10,6 +10,20 @@ import {
   type InstallationExtension,
 } from './extensions';
 import {
+  INSTALLATION_FEATURES,
+  installationFeaturesFor,
+  isInstallationFeature,
+  parseInstallationFeatures,
+  serializeInstallationFeatures,
+  type InstallationFeature,
+} from './features';
+import {
+  INSTALLATION_MIGRATION_NAMES,
+  INSTALLATION_MIGRATION_SOURCES,
+  installationMigrationFramework,
+  type InstallationMigrationSource,
+} from './migrations';
+import {
   CLI_OPTION_SYNTAX,
   INSTALLATION_PROJECTS,
   PACKAGE_MANAGERS,
@@ -34,7 +48,7 @@ import {
   type InstallationFramework,
   type InstallationTemplate,
 } from './projects';
-import { RENDERERS, type Renderer } from './renderers';
+import { isMuxRenderer, RENDERERS, type Renderer } from './renderers';
 import { resolveRenderer, resolveRendererCandidates } from './resolve-renderer';
 import { defaultRegistryStyling, registryStylings, type RegistryFramework, type RegistryStyling } from './shadcn';
 
@@ -66,10 +80,16 @@ export interface InstallationSelection {
   skinFlag: SkinFlag;
   media: Renderer;
   extensions: readonly InstallationExtension[];
+  /** The player features to add, each with its guide. */
+  features: readonly InstallationFeature[];
   sourceUrl: string;
+  /** A local media file to upload to Mux, whose playback URL replaces the demo source once it exists. */
+  sourceFile: string | null;
   packageManager: PackageManager;
   template: InstallationTemplate;
   styling: RegistryStyling | null;
+  /** The player the project migrates from, or `null` for a new installation. */
+  from: InstallationMigrationSource | null;
   cdnBase: string;
   defaulted: readonly InstallationInputKey[];
   /** Where a detected default came from, keyed by the defaulted option. */
@@ -118,6 +138,13 @@ export function containsControlCharacter(value: string): boolean {
       (codePoint <= 0x1f || codePoint === 0x7f || codePoint === 0x85 || codePoint === 0x2028 || codePoint === 0x2029)
     );
   });
+}
+
+const LOCAL_MEDIA_FILE = /\.(mp4|m4v|mov|webm|mkv|avi|mp3|m4a|aac|wav|flac|ogg|oga|opus)$/i;
+
+/** A path to a media file on disk, such as `./intro.mp4`, rather than a URL or a protocol-relative `//host/path`. */
+function isLocalMediaFile(value: string): boolean {
+  return !/^[a-z][a-z\d+.-]*:/i.test(value) && !value.startsWith('//') && LOCAL_MEDIA_FILE.test(value);
 }
 
 function isHttpUrl(value: string): boolean {
@@ -337,15 +364,21 @@ export function resolveInstallationSelection(
   const skin = skinFromFlag(skinFlag, useCase);
 
   const requestedSourceUrl = input.sourceUrl?.trim() ?? '';
+  // A local file is uploaded to Mux rather than played from its path, so the player keeps the demo source until the
+  // upload's playback URL replaces it.
+  const sourceFile =
+    requestedSourceUrl && !containsControlCharacter(requestedSourceUrl) && isLocalMediaFile(requestedSourceUrl)
+      ? requestedSourceUrl
+      : null;
   // An explicit `demo` resolves like an omitted URL, but it is a choice rather than a default.
-  const sourceUrl = requestedSourceUrl === INSTALLATION_DEMO_SOURCE_URL ? '' : requestedSourceUrl;
+  const sourceUrl = requestedSourceUrl === INSTALLATION_DEMO_SOURCE_URL || sourceFile ? '' : requestedSourceUrl;
   const sourceUrlError = !sourceUrl
     ? null
     : containsControlCharacter(sourceUrl)
       ? 'Must not contain control characters or line breaks.'
       : isHttpUrl(sourceUrl)
         ? null
-        : `Expected an http:// or https:// media URL, or \`${INSTALLATION_DEMO_SOURCE_URL}\` for the Video.js demo source.`;
+        : `Expected an http:// or https:// media URL, a local media file to upload to Mux, or \`${INSTALLATION_DEMO_SOURCE_URL}\` for the Video.js demo source.`;
   const validSourceUrl = sourceUrl !== '' && !sourceUrlError;
 
   if (!requestedSourceUrl) defaulted.push('sourceUrl');
@@ -424,6 +457,70 @@ export function resolveInstallationSelection(
   }
 
   const extensions = INSTALLATION_EXTENSIONS.filter((extension) => requestedExtensions.has(extension));
+
+  if (sourceFile && mediaAvailable && !isMuxRenderer(media)) {
+    errors.push({
+      field: 'sourceUrl',
+      value: sourceFile,
+      message: 'Is a local file, which a player cannot load from disk. Host it and pass its URL, or upload it to Mux.',
+      hint: `To upload it to Mux, use ${syntax.options(['media', availableMedia.find(isMuxRenderer) ?? 'mux-video'])}.`,
+    });
+  }
+
+  // Features are optional additions, so leaving them out is not a default the plan reports.
+  const availableFeatures = installationFeaturesFor(useCase);
+  const requestedFeatures = new Set<InstallationFeature>();
+
+  for (const feature of input.features === undefined ? [] : parseInstallationFeatures(input.features)) {
+    if (!isInstallationFeature(feature)) {
+      errors.push({
+        field: 'features',
+        value: feature,
+        message: `Expected a comma-separated list containing ${INSTALLATION_FEATURES.join(', ')}, or none.`,
+      });
+    } else if (presetValid && !availableFeatures.includes(feature)) {
+      errors.push({
+        field: 'features',
+        value: feature,
+        message: `${feature} does not apply to the ${preset} preset.`,
+        hint: `Use ${syntax.options(['features', serializeInstallationFeatures(availableFeatures)])}.`,
+      });
+    } else {
+      requestedFeatures.add(feature);
+    }
+  }
+
+  const features = INSTALLATION_FEATURES.filter((feature) => requestedFeatures.has(feature));
+
+  let from: InstallationMigrationSource | null = null;
+
+  if (input.from !== undefined) {
+    if (includes(INSTALLATION_MIGRATION_SOURCES, input.from)) from = input.from;
+    else
+      errors.push({
+        field: 'from',
+        value: input.from,
+        message: `Expected one of: ${INSTALLATION_MIGRATION_SOURCES.join(', ')}`,
+      });
+  }
+
+  if (from && projectValid && project === 'new') {
+    errors.push({
+      field: 'from',
+      value: from,
+      message: `Migrates an existing ${INSTALLATION_MIGRATION_NAMES[from]} project, so it needs ${syntax.options(['project', 'existing'])}.`,
+    });
+  }
+
+  const migrationFramework = from && installationMigrationFramework(from);
+
+  if (from && migrationFramework && frameworkValid && framework !== migrationFramework) {
+    errors.push({
+      field: 'from',
+      value: from,
+      message: `Migrates a ${INSTALLATION_MIGRATION_NAMES[from]} project, so it needs ${syntax.options(['framework', migrationFramework])}.`,
+    });
+  }
 
   const sourceFramework = sourceFrameworkFor(framework);
   // App setups depend on a supported method and framework, which are reported above when they are not.
@@ -542,10 +639,13 @@ export function resolveInstallationSelection(
       skinFlag,
       media,
       extensions,
+      features,
       sourceUrl,
+      sourceFile,
       packageManager,
       template,
       styling,
+      from,
       cdnBase: cdnBaseForVersion(packageVersion),
       defaulted,
       defaultSources,
@@ -562,9 +662,11 @@ export function selectionToInput(selection: InstallationSelection): Required<Ins
     skin: selection.skinFlag,
     media: selection.media,
     extensions: serializeInstallationExtensions(selection.extensions),
-    sourceUrl: selection.sourceUrl,
+    features: serializeInstallationFeatures(selection.features),
+    sourceUrl: selection.sourceFile ?? selection.sourceUrl,
     packageManager: selection.packageManager,
     template: selection.template,
     styling: selection.styling ?? '',
+    from: selection.from ?? '',
   };
 }

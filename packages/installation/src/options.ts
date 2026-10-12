@@ -1,5 +1,7 @@
 import { INSTALLATION_DEMO_SOURCE_URL } from './defaults';
-import { INSTALLATION_EXTENSIONS } from './extensions';
+import { GOOGLE_CAST_RENDERERS, INSTALLATION_EXTENSIONS } from './extensions';
+import { INSTALLATION_FEATURES } from './features';
+import { INSTALLATION_MIGRATION_NAMES, INSTALLATION_MIGRATION_SOURCES } from './migrations';
 import {
   CLI_OPTION_SYNTAX,
   INSTALLATION_PROJECTS,
@@ -135,13 +137,28 @@ export function installationCompatibilityFor(
   };
 }
 
-function formatChoices(values: readonly string[]): string {
+function formatChoices(values: readonly string[], conjunction: 'or' | 'and' = 'or'): string {
   if (values.length < 2) return values[0] ?? '';
 
-  if (values.length === 2) return `${values[0]} or ${values[1]}`;
+  if (values.length === 2) return `${values[0]} ${conjunction} ${values[1]}`;
 
-  return `${values.slice(0, -1).join(', ')}, or ${values.at(-1)}`;
+  return `${values.slice(0, -1).join(', ')}, ${conjunction} ${values.at(-1)}`;
 }
+
+/**
+ * Media hosted on another platform, whose adapter stays on the platform's standard player even for a live broadcast:
+ * the live players take only streams the page controls.
+ */
+const PLATFORM_VIDEO_RENDERERS = [
+  'youtube',
+  'vimeo',
+  'twitch',
+  'tiktok',
+  'cloudflare',
+] as const satisfies readonly Renderer[];
+const PLATFORM_AUDIO_RENDERERS = ['spotify'] as const satisfies readonly Renderer[];
+
+const COMPAT_SKIN: string = 'compat';
 
 function unique<Choice extends string>(values: readonly Choice[]): Choice[] {
   return [...new Set(values)];
@@ -155,7 +172,11 @@ export function installationDecisionOrderFor(
   const skinlessGuidance =
     methods.length === 1 && methods[0] === 'shadcn'
       ? ''
-      : `Use none only when the project builds its own controls${methods.includes('shadcn') ? ', which Shadcn does not support' : ''}. `;
+      : `When it builds its own design, use none and build the controls from components${methods.includes('shadcn') ? ', which Shadcn does not support' : ''}. `;
+  // The skin that trades features for broad browser support, offered once the skins include it.
+  const compatGuidance = INSTALLATION_SKIN_FLAGS.some((flag) => flag === COMPAT_SKIN)
+    ? `When the player must work in older browsers, use ${COMPAT_SKIN}, which keeps fewer features. `
+    : '';
   const methodGuidance =
     methods.length === 1
       ? methods[0] === 'packaged'
@@ -181,6 +202,10 @@ export function installationDecisionOrderFor(
 
   return [
     {
+      title: 'Check for a migration',
+      guidance: `When the project already plays media with ${formatChoices(Object.values(INSTALLATION_MIGRATION_NAMES))}, pass ${syntax.options(['from'])} with that player, and keep its media URLs as the source.`,
+    },
+    {
       title: 'Inspect the project',
       guidance:
         'Read package.json, framework config, and lockfiles to infer the framework, app setup, and package manager. React installs @videojs/react; HTML, Vue, and Svelte install @videojs/html.',
@@ -192,22 +217,24 @@ export function installationDecisionOrderFor(
     },
     {
       title: 'Choose the player',
-      guidance:
-        'Use video unless the request signals another experience: audio, music, or podcasts use audio; a live stream uses live-video or live-audio; a muted, looping decorative video uses background-video. Ask only when those signals conflict.',
+      guidance: `Use video unless the request signals another experience: audio, music, or podcasts use audio; a live stream uses live-video (${formatChoices(INSTALLATION_PRESETS['live-video'].renderers)}) or live-audio (${formatChoices(INSTALLATION_PRESETS['live-audio'].renderers)} only); a muted, looping decorative video uses background-video. Content hosted on another platform keeps that platform's player even when it is live: ${formatChoices(PLATFORM_VIDEO_RENDERERS, 'and')} use video, and ${formatChoices(PLATFORM_AUDIO_RENDERERS, 'and')} uses audio. Treat comparisons to other products, such as "like Netflix", as describing the experience rather than the media source: build only what Video.js provides, and name anything out of scope, such as chat, playlists, or DRM. Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the skin',
-      guidance: `Use default unless the request asks for a minimal, cleaner, or more subtle look, which uses neutral; both contain the same controls. ${skinlessGuidance}Ask only when those signals conflict.`,
+      guidance: `Decide whether the project applies its brand to our design or builds its own. When it applies its brand, or asks for a minimal, cleaner, or more subtle look, use neutral: an opinionated design that's easy to brand. ${skinlessGuidance}When either works or the request doesn't say, use default, the distinctly Video.js design; default and neutral contain the same controls. ${compatGuidance}Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the media',
       guidance:
-        'Infer the adapter from the source when possible. Mux wins for Mux playback URLs: stream.mux.com/<playback-id>.m3u8 or a bare playback ID uses mux-video, mux-audio, or mux-background-video rather than hls. Mux static renditions such as .mp4 or .m4a files use html5-video or html5-audio. Other .m3u8 URLs use hls.',
+        'Infer the adapter from the source when possible. Mux wins for Mux playback URLs: stream.mux.com/<playback-id>.m3u8 or a bare playback ID uses mux-video, mux-audio, or mux-background-video rather than hls. Mux static renditions such as .mp4 or .m4a files use html5-video or html5-audio. Other .m3u8 URLs use hls. Choose a platform adapter only when the content is hosted there, not when the request compares itself to that platform. Without a URL, use hls or dash for a player that should cast, since the default html5-video cannot.',
+    },
+    {
+      title: 'Choose features',
+      guidance: `Pass ${syntax.options(['features'])} for what the request asks for, such as captions, a quality menu, or thumbnail previews; the plan points at each feature's guide. Leave it out when the request names none.`,
     },
     {
       title: 'Choose extensions',
-      guidance:
-        'Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin should cast a compatible source. Use none when no extension is needed.',
+      guidance: `Mux Data is included by default for Mux video and audio sources. Add Google Cast when a standard or live video player with a ready-made skin plays ${formatChoices(GOOGLE_CAST_RENDERERS)} media. Use none when no extension is needed.`,
     },
     { title: 'Choose how to install', guidance: methodGuidance },
     ...stylingDecisions,
@@ -292,9 +319,15 @@ export function installationOptionDefinitionsFor(
       description:
         'A comma-separated list of optional player extensions compatible with the selected player. Pass `none` when no extension is needed.',
     }),
+    optionDefinition('features', {
+      values: ['none', ...INSTALLATION_FEATURES],
+      default: 'none',
+      description:
+        'A comma-separated list of player features to add, each with the guide that shows how. Features depend on the preset: audio has no poster or thumbnails, and live streams have no thumbnails.',
+    }),
     optionDefinition('sourceUrl', {
       default: 'the Video.js demo source for the selected media (reported as defaulted)',
-      description: `The http:// or https:// media URL placed in the generated player example. Pass \`${INSTALLATION_DEMO_SOURCE_URL}\` to choose the Video.js demo source for the selected media explicitly.`,
+      description: `The http:// or https:// media URL placed in the generated player example. Pass \`${INSTALLATION_DEMO_SOURCE_URL}\` to choose the Video.js demo source for the selected media explicitly. With Mux media, a local file such as \`./intro.mp4\` adds a step that uploads it with the Mux CLI.`,
     }),
   ];
 
@@ -326,6 +359,16 @@ export function installationOptionDefinitionsFor(
       })
     );
   }
+
+  definitions.push(
+    optionDefinition('from', {
+      values: INSTALLATION_MIGRATION_SOURCES,
+      default: 'none (a new installation)',
+      description:
+        'The player an existing project migrates from. The plan adds the migration guide, the checks before changing code, and the cleanup after.',
+      appliesWhen: syntax.options(['project', 'existing']),
+    })
+  );
 
   definitions.push({
     flag: '--json',

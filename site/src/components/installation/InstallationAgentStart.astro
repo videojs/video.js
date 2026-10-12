@@ -1,23 +1,42 @@
 ---
-import { installationCommand, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
+import { installationCommand, isInstallationFramework } from '@videojs/installation';
 
-import AgentPrompt from '@/components/AgentPrompt.astro';
-import { INSTALLATION_ROUTES, isInstallationRouteSegment } from '@/utils/installation/routes';
+import AgentPrompt from '@/components/installation/AgentPrompt';
+import P from '@/components/typography/P.astro';
+import { AGENT_PROMPT_SKILL_INSTRUCTIONS } from '@/utils/installation/agent-prompt';
+import { getInstallationRouteSegment, INSTALLATION_ROUTES } from '@/utils/installation/routes';
 
-const route = Astro.params.framework;
-const routeConfig = isInstallationRouteSegment(route) ? INSTALLATION_ROUTES[route] : undefined;
+// Installation guides fix the method and framework through their route; other pages, such as Build with AI, start
+// from the docs framework.
+const route = getInstallationRouteSegment(Astro.url.pathname);
+const docsFramework = Astro.params.framework;
+const framework = route
+  ? INSTALLATION_ROUTES[route].pickerFramework
+  : isInstallationFramework(docsFramework)
+    ? docsFramework
+    : 'react';
+
+// The Markdown twin keeps the route-level command, which leaves every other choice to the agent's project inspection.
 // The CLI detects the framework from the project, so each packaged guide names its own in case the repository holds
 // another one.
 const input = route === 'cdn'
   ? { method: 'cdn', framework: 'html' }
-  : routeConfig?.method === 'packaged'
-    ? { framework: routeConfig.pickerFramework }
+  : !route || INSTALLATION_ROUTES[route].method === 'packaged'
+    ? { framework }
     : undefined;
 const init = installationCommand(input, null);
 const installationPrompt = route === 'shadcn'
   ? `When installation details are needed, run \`${installationCommand({ method: 'shadcn', framework: 'react' }, null)}\` for React, or \`${installationCommand({ method: 'shadcn', framework: 'html' }, null)}\` for plain HTML. The command prints version-matched choices and instructions without changing files.`
   : `When installation details are needed, run \`${init}\` to print the version-matched choices and instructions without changing files.`;
-const prompt = `Install the Video.js skill: run \`${skillsCommand()}\` and follow the steps for the agent you are running in. If you can't run commands, follow the install instructions at ${SKILLS_REPOSITORY_URL} instead. Then use the Video.js skill when you work on video or audio in this project. ${installationPrompt}`;
+const agentPrompt = `${AGENT_PROMPT_SKILL_INSTRUCTIONS} ${installationPrompt}`;
 ---
 
-<AgentPrompt prompt={prompt} />
+<P>Copy this prompt into your coding agent. It works as is, or tell it what you're building first.</P>
+
+<div data-llms-ignore>
+  <AgentPrompt client:idle route={route} framework={framework} />
+</div>
+
+<div hidden data-llms-only>
+  <pre><code data-agent-prompt-markdown>{agentPrompt}</code></pre>
+</div>

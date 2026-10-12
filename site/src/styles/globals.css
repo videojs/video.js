@@ -90,6 +90,12 @@
 /* Tailwind theme namespace resets are order-sensitive. */
 @theme {
   --breakpoint-xs: 30rem;
+  /*
+   * A bordered card that fills the docs prose column (`max-w-3xl`, 48rem), measured inside its 1px border (48rem less
+   * 2px), for `@prose:`. A plain length rather than `calc()`: container query conditions cannot read custom properties,
+   * and Tailwind orders container variants by size only when it can compare them.
+   */
+  --container-prose: 47.875rem;
 
   --color-*: initial;
 
@@ -368,6 +374,32 @@ html.dark[data-tone="deep"] {
 }
 
 /* Thin scrollbars for side navigation and code blocks. `scroll` keeps the track visible where the platform allows. */
+/*
+ * A thin scrollbar that stays visible, for popups whose overflow would otherwise go unnoticed. Blink and Gecko ignore the
+ * WebKit pseudo-elements once `scrollbar-width` is set and then use macOS overlay scrollbars, which appear only while
+ * scrolling, so the standard properties apply only where the pseudo-elements are unsupported.
+ */
+@utility scrollbar-thin-visible {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background-color: color-mix(in srgb, currentColor 35%, transparent);
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, currentColor 35%, transparent) transparent;
+  }
+}
+
 @utility scrollbar-thin {
   scrollbar-width: thin;
 

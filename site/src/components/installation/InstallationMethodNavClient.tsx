@@ -1,8 +1,5 @@
 import {
-  CDN_MEDIA_SUBPATHS,
   installationMethodsForFramework,
-  registrySkinSelection,
-  rendererSupportsCdn,
   resolveInstallationTemplate,
   sourceFrameworkFor,
   type InstallationFramework,
@@ -17,13 +14,16 @@ import JsdelivrLogo from '@/assets/logos/brands/jsdelivr.svg?react';
 import NpmLogo from '@/assets/logos/brands/npm.svg?react';
 import ShadcnLogo from '@/assets/logos/brands/shadcn.svg?react';
 import { DOCS_FRAMEWORK_NAVIGATION_INFO, savePageScrollForNavigation } from '@/utils/docs/navigation';
-import { resolveInstallationMethodHref } from '@/utils/installation/method-navigation';
+import {
+  installationMethodBaseHref,
+  isInstallationMethodAvailable,
+  resolveInstallationMethodHref,
+} from '@/utils/installation/method-navigation';
 import { INSTALLATION_METHOD_OPTIONS } from '@/utils/installation/method-options';
 import type { InstallationRouteSegment } from '@/utils/installation/routes';
-import { getInstallationRoutePath } from '@/utils/installation/routes';
 
 import { useRegistryFramework } from './useRegistryFramework';
-import { useInstallationSelectionReady, useSelection } from './useSelection';
+import { useInstallationSelection, useInstallationSelectionReady } from './useSelection';
 import { withSelectionMarker } from './withSelectionMarker';
 
 const ICONS = {
@@ -43,48 +43,16 @@ function getActiveMethod(route: InstallationRouteSegment): InstallationMethod {
   return 'packaged';
 }
 
-function getMethodBaseHref(method: InstallationMethod, framework: InstallationFramework): string {
-  if (method === 'packaged') return getInstallationRoutePath(framework);
-
-  if (method === 'shadcn') {
-    return `${getInstallationRoutePath('shadcn')}?framework=${framework}`;
-  }
-
-  return getInstallationRoutePath('cdn');
-}
-
 function InstallationMethodNavClient({ currentFramework, route }: Props) {
-  const selectedInstallMethod = useSelection('installMethod');
-  const selectedRenderer = useSelection('media');
-  const selectedExtensions = useSelection('extensions');
-  const selectedProject = useSelection('project');
-  const selectedSkin = useSelection('skin');
-  const selectedSourceUrl = useSelection('sourceUrl');
-  const selectedTemplate = useSelection('template');
-  const selectedUseCase = useSelection('useCase');
-  const selectedStyling = useSelection('styling');
+  const selection = useInstallationSelection();
   const registryFramework = useRegistryFramework(sourceFrameworkFor(currentFramework));
   const isSelectionReady = useInstallationSelectionReady();
   const framework = route === 'shadcn' ? registryFramework : currentFramework;
   const active = getActiveMethod(route);
   const items = INSTALLATION_METHOD_OPTIONS.filter(({ id }) => installationMethodsForFramework(framework).includes(id));
 
-  const isMethodAvailable = (id: InstallationMethod) => {
-    if (id === 'shadcn' && route !== 'shadcn') {
-      // A packaged existing site without a bundler cannot build skin source; Shadcn gives a plain CDN page its default
-      // app setup instead.
-      if (route !== 'cdn' && selectedTemplate === 'none') return false;
-
-      return registrySkinSelection({ useCase: selectedUseCase, skin: selectedSkin }) !== null;
-    }
-
-    if (id === 'cdn') return route === 'cdn' || rendererSupportsCdn(selectedRenderer, CDN_MEDIA_SUBPATHS);
-
-    return true;
-  };
-
   const getMethodHref = (method: InstallationMethod) => {
-    const baseHref = getMethodBaseHref(method, framework);
+    const baseHref = installationMethodBaseHref(method, framework);
 
     // The prerendered links name only the destination; the reader's picks join them once the stores hold them.
     if (!isSelectionReady) return baseHref;
@@ -93,18 +61,7 @@ function InstallationMethodNavClient({ currentFramework, route }: Props) {
       new URL(window.location.href),
       baseHref,
       method,
-      {
-        framework,
-        project: selectedProject,
-        installMethod: selectedInstallMethod,
-        media: selectedRenderer,
-        extensions: selectedExtensions,
-        skin: selectedSkin,
-        sourceUrl: selectedSourceUrl,
-        template: resolveInstallationTemplate(framework, selectedTemplate),
-        useCase: selectedUseCase,
-        styling: selectedStyling,
-      },
+      { ...selection, framework, template: resolveInstallationTemplate(framework, selection.template) },
       route === 'shadcn' ? registryFramework : undefined
     );
   };
@@ -155,7 +112,7 @@ function InstallationMethodNavClient({ currentFramework, route }: Props) {
       {items.map(({ id, label, description }) => {
         const Icon = ICONS[id];
         const href = getMethodHref(id);
-        const available = isMethodAvailable(id);
+        const available = isInstallationMethodAvailable(id, active, selection);
         const isActive = active === id;
 
         return (
