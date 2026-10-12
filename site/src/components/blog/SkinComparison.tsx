@@ -100,12 +100,17 @@ export default function SkinComparison() {
     const root = wrapper.current?.querySelector<HTMLElement>('.comparison-stage');
     if (!root || !media) return;
 
-    // The shared video cannot inherit caption offsets from its sibling skins.
+    // The shared video cannot inherit caption offsets or corners from its sibling skins.
     const update = () => {
       const offsets = ['0px'];
+      const radii: string[] = [];
 
       for (const slice of root.querySelectorAll<HTMLElement>('.comparison-slice')) {
         if (slice.inert) continue;
+
+        const skin = slice.querySelector<HTMLElement>('.skin-comparison-skin');
+
+        if (skin) radii.push(getComputedStyle(skin).borderTopLeftRadius);
 
         // Each skin offsets captions on its own descendant video, including container-query overrides, so read the
         // value from a hidden probe video rather than copying the skins' breakpoints here.
@@ -116,6 +121,10 @@ export default function SkinComparison() {
       }
 
       media.style.setProperty('--comparison-caption-y', `min(${offsets.join(', ')})`);
+      // Round the video's outer corners like the skins at either edge. Their corner shadows alone can leave a hairline
+      // of video showing in Safari.
+      media.style.setProperty('--comparison-radius-start', radii[0] ?? '0px');
+      media.style.setProperty('--comparison-radius-end', radii.at(-1) ?? '0px');
     };
 
     update();

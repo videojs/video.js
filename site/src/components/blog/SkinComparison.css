@@ -19,6 +19,11 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* Also clips any pixel of the video layer that Safari draws outside the stage. */
+  clip-path: inset(
+    0 round var(--comparison-radius-start, 0px) var(--comparison-radius-end, 0px) var(--comparison-radius-end, 0px)
+      var(--comparison-radius-start, 0px)
+  );
 }
 
 /* The shared video sits outside the skins' scoped native-caption styles. */
@@ -52,6 +57,10 @@
   padding: 1rem;
   color: white;
   background: black;
+}
+
+.skin-comparison .comparison:fullscreen .skin-comparison-video {
+  clip-path: none;
 }
 
 .skin-comparison .comparison:fullscreen .comparison-stage {
