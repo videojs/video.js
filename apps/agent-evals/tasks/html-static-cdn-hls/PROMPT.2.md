@@ -1,0 +1,1 @@
+plain static HTML site, no build step or package manager. add a Video.js player to index.html under the intro text that plays our HLS stream https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4.m3u8

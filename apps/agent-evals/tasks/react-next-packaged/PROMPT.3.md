@@ -1,0 +1,1 @@
+We're refreshing the home page and want to feature one of our short films on it. Please add a video player right below the intro text, built with Video.js, that plays this video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

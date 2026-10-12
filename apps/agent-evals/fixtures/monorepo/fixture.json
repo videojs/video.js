@@ -1,0 +1,7 @@
+{
+  "framework": "react",
+  "template": "next",
+  "packageManager": "pnpm",
+  "build": "pnpm --filter web build",
+  "serve": "pnpm --filter web exec next start --port {port} --hostname 127.0.0.1"
+}

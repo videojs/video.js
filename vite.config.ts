@@ -10,6 +10,9 @@ const ignoredPaths = [
   '**/.agents/**',
   '**/.claude/**',
   '**/.vite-hooks/**',
+  // Scaffolded apps the agent evals start from; formatting them would change the experiment.
+  'apps/agent-evals/fixtures/**',
+  'apps/agent-evals/results/**',
   '**/.opencode/**',
   '**/.github/**',
   '**/*.md',
@@ -185,8 +188,8 @@ export default defineConfig({
       'typecheck:workspace': {
         command: 'tsgo --build',
         cache: false,
-        // The E2E suites are not project references, so type-check them as a task alongside the build graph.
-        dependsOn: ['@videojs/skins#generate', '@videojs/e2e#typecheck'],
+        // The E2E suites and agent evals are not project references, so type-check them as tasks alongside the build graph.
+        dependsOn: ['@videojs/skins#generate', '@videojs/e2e#typecheck', '@videojs/agent-evals#typecheck'],
       },
     },
   },

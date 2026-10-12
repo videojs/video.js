@@ -1,0 +1,1 @@
+Our home page's film player still runs on Video.js 8, and we're standardizing on Video.js 10. Please upgrade it without losing anything viewers rely on today: the poster, the playback speed menu, English captions, the Download button in the controls, and the "Up next" card that appears when the film ends.

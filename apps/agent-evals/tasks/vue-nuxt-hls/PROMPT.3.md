@@ -1,0 +1,1 @@
+We stream our films over HLS, and we want the home page of this Nuxt app to feature one of them. Please add a Video.js player below the intro text that plays our HLS stream: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4.m3u8

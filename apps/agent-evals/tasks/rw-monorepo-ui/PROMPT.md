@@ -1,0 +1,1 @@
+Add a reusable VideoPlayer component to our shared UI package, built with Video.js, and use it on the web app's home page below the intro text to play this video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

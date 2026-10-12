@@ -1,0 +1,16 @@
+{
+  "fixture": "vue-vite",
+  "suite": "realworld",
+  "tier": "main",
+  "services": ["live-hls"],
+  "expect": {
+    "framework": "vue",
+    "method": "packaged",
+    "preset": "live-video",
+    "skin": "default",
+    "media": "hls",
+    "source": "http://media.acme.test/live/master.m3u8",
+    "after": "Short films from independent creators.",
+    "playback": "click"
+  }
+}

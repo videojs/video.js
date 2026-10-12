@@ -1,0 +1,8 @@
+{
+  "framework": "html",
+  "template": "vite",
+  "packageManager": "pnpm",
+  "root": "apps/marketing",
+  "build": "pnpm --filter marketing build",
+  "serve": "pnpm --filter marketing exec vite preview --port {port} --strictPort --host 127.0.0.1"
+}

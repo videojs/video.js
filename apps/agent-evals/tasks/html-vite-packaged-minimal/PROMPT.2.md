@@ -1,0 +1,1 @@
+add a Video.js player to the home page of this Vite site, under the intro text, installed as an npm dependency, and keep the controls light and unobtrusive. video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

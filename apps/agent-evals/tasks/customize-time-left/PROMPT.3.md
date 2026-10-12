@@ -1,0 +1,1 @@
+Our designer has tweaked the layout of the video player on our site. In the player's control bar, the current time display should now sit to the left of the play button. Please move it there; the rest of the controls can stay where they are.

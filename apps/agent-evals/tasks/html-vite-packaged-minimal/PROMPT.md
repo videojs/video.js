@@ -1,0 +1,1 @@
+Add a Video.js video player to the home page of this Vite site, below the intro text, installed as an npm dependency. Use the minimal skin. Play https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4.

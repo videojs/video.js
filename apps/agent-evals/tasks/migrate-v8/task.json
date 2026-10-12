@@ -1,0 +1,11 @@
+{
+  "fixture": "html-vite",
+  "suite": "customize",
+  "tier": "smoke",
+  "setup": "../_setup/html-vite-v8.sh",
+  "expect": {
+    "framework": "html",
+    "preset": "video",
+    "playback": "click"
+  }
+}

@@ -1,0 +1,1 @@
+This SvelteKit app is going to be the new home for Acme Studio's short films, and the first thing we want is a video on the home page. Please add a video player built with Video.js below the intro text that plays this file: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

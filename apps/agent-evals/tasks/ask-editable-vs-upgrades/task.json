@@ -1,0 +1,12 @@
+{
+  "fixture": "react-next",
+  "suite": "onboarding",
+  "tier": "main",
+  "expect": {
+    "framework": "react",
+    "method": "packaged",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "after": "Short films from independent creators.",
+    "playback": "click"
+  }
+}

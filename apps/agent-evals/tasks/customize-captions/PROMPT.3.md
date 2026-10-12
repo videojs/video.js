@@ -1,0 +1,1 @@
+Accessibility came up in our last content review: the video player on our site doesn't have captions yet. We already have an English caption file in the repo at public/captions/en.vtt. Please add it to the player as English captions.

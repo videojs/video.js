@@ -1,0 +1,29 @@
+{
+  "topics": [
+    {
+      "id": "version",
+      "about": "which Video.js version the new home page player uses: Video.js 8 like the About page's player, or the new Video.js 10",
+      "kind": "necessary",
+      "answer": "The new one, Video.js 10. Leave the About page on the old player for now."
+    },
+    {
+      "id": "about",
+      "about": "whether to change, upgrade, or migrate the About page and its existing player",
+      "kind": "derivable",
+      "answer": "Leave the About page as it is for now."
+    },
+    {
+      "id": "source",
+      "about": "which video the player plays",
+      "kind": "derivable",
+      "answer": "The one in my message."
+    },
+    {
+      "id": "look",
+      "about": "how the player and its controls look, such as a fuller or more minimal style, colors, or size",
+      "kind": "indifferent",
+      "answer": "No preference, whatever looks good out of the box."
+    }
+  ],
+  "disclose": ["version"]
+}

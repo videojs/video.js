@@ -1,0 +1,13 @@
+{
+  "fixture": "react-next",
+  "suite": "generic",
+  "tier": "main",
+  "expect": {
+    "framework": "react",
+    "library": "any",
+    "preset": "video",
+    "playback": "click",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "after": "Short films from independent creators."
+  }
+}

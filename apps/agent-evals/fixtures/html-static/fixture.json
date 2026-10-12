@@ -1,0 +1,7 @@
+{
+  "framework": "html",
+  "template": "none",
+  "packageManager": null,
+  "build": null,
+  "serve": "static"
+}

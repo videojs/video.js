@@ -1,0 +1,1 @@
+We're prototyping a new viewing experience for Acme Studio from scratch, so this directory is empty. Please create a new React app here with a home page that shows a Video.js player for this video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

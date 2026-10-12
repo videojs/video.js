@@ -1,0 +1,1 @@
+We want our home page to open with a hero banner, with the page heading sitting on top of a muted background video that loops continuously. Please build that with Video.js using this video: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

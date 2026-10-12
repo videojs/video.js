@@ -1,0 +1,1 @@
+Send analytics events from the Video.js player on the home page: call `window.acme.track(event, { currentTime })` when the video starts playing, when it is paused, and when it ends, with the video's current time in seconds.

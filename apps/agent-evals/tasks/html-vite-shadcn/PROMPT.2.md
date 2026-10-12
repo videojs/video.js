@@ -1,0 +1,1 @@
+add a Video.js player under the intro text on this Vite site's home page for https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4 and copy the control UI code into our repo instead of using the prebuilt version, we're going to rearrange and restyle the controls ourselves

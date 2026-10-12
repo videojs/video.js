@@ -1,0 +1,1 @@
+We're featuring a new film on the Acme Studio home page. Please add a video player built with Video.js below the intro text so visitors can watch it: https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4

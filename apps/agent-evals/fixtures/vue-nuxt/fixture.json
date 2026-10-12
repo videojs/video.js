@@ -1,0 +1,7 @@
+{
+  "framework": "vue",
+  "template": "nuxt",
+  "packageManager": "npm",
+  "build": "npm run build",
+  "serve": "PORT={port} HOST=127.0.0.1 node .output/server/index.mjs"
+}

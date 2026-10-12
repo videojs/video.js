@@ -1,0 +1,1 @@
+We're launching Acme Studio in Spain and Latin America, and the whole site is in Spanish, but the Video.js player on the home page still labels its controls in English. Screen reader users have noticed too. Please make every player control use Spanish, so that, for example, the play button reads "Reproducir".

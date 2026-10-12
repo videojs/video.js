@@ -1,0 +1,12 @@
+{
+  "fixture": "react-next",
+  "suite": "customize",
+  "tier": "main",
+  "setup": "setup.sh",
+  "expect": {
+    "framework": "react",
+    "preset": "video",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4",
+    "playback": "click"
+  }
+}

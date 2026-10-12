@@ -1,0 +1,7 @@
+{
+  "framework": "html",
+  "template": "vite",
+  "packageManager": "npm",
+  "build": "npm run build",
+  "serve": "npx vite preview --port {port} --strictPort --host 127.0.0.1"
+}

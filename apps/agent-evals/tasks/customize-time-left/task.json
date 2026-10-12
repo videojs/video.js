@@ -1,0 +1,11 @@
+{
+  "fixture": "react-next",
+  "suite": "customize",
+  "tier": "smoke",
+  "setup": "../_setup/react-next-player.sh",
+  "expect": {
+    "framework": "react",
+    "preset": "video",
+    "playback": "click"
+  }
+}

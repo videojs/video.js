@@ -1,0 +1,1 @@
+We're adding a featured film to the Acme Studio home page, right below the intro text. Please build the player with Video.js and have it play https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/highest.mp4. Our design team will restyle the controls to match the brand, and engineering wants future Video.js upgrades to flow into the player automatically.

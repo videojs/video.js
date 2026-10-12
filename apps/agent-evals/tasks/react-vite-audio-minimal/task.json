@@ -1,0 +1,14 @@
+{
+  "fixture": "react-vite",
+  "suite": "core",
+  "tier": "main",
+  "expect": {
+    "framework": "react",
+    "method": "packaged",
+    "preset": "audio",
+    "skin": "minimal",
+    "media": "html5-audio",
+    "source": "https://stream.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/audio.m4a",
+    "playback": "click"
+  }
+}

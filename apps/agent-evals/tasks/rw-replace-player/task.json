@@ -1,0 +1,11 @@
+{
+  "fixture": "react-vite",
+  "suite": "realworld",
+  "tier": "main",
+  "setup": "setup.sh",
+  "expect": {
+    "framework": "react",
+    "preset": "video",
+    "playback": "click"
+  }
+}

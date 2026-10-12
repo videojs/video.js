@@ -1,0 +1,1 @@
+Many of the films on our site have long opening sequences, and viewers have asked for a faster way to get through them. Please add a button to the video player's controls that skips forward 30 seconds each time it's pressed.

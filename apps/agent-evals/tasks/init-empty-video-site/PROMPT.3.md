@@ -1,0 +1,1 @@
+We're a small studio that makes short films, and we'd like a website where people can watch them. Nothing exists yet, so this folder is empty. Please build the site, with the video player built on Video.js.
