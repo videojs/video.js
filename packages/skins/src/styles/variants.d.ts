@@ -6,6 +6,7 @@ declare module 'vjsc/styles' {
     default: true;
     neutral: true;
     compat: true;
+    scaffold: true;
     video: true;
     audio: true;
     'live-video': true;

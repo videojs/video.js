@@ -1,3 +1,4 @@
+// Core's task config loads this module before workspace packages build, so it cannot import `@videojs/utils`.
 import type { InputOption } from 'rolldown';
 
 /** Add named entries without replacing existing Rolldown inputs. */

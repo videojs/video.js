@@ -3,6 +3,7 @@ import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
+// Task configs load before any package builds, so a fresh checkout has no vjsc dist to import from yet.
 import { vjscComponentSchemaPlugin } from '../vjsc/src/plugins/component-schema.ts';
 import packageJson from './package.json' with { type: 'json' };
 import { LOCALES, localeAliases } from './src/core/i18n/locales.ts';

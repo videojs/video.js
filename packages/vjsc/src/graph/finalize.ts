@@ -1,30 +1,25 @@
 import { isAbsolute, relative, resolve } from 'node:path';
 
-import { parseSync } from 'oxc-parser';
-
 import type { ModuleMeta } from '../components/meta';
 import { moduleFilename } from '../utils/module-id';
 import { escapesRoot, toPosixPath } from '../utils/path';
 import type { GraphModule, Graph } from './types';
 
-export type GraphModuleInput<Node extends ModuleMeta = ModuleMeta> = Omit<GraphModule<Node>, 'sourcePath'> & {
-  /** Set by the component metadata pass when it removed the `meta` export, so finalization skips re-parsing. */
-  readonly metaRemoved?: boolean | undefined;
-};
-
-/** Cheap prefilter for a `meta` variable export; only matching sources are parsed. */
-const META_EXPORT = /\bexport\s+(?:const|let|var)\b[^;{]*\bmeta\b/;
+export type GraphModuleInput<Node extends ModuleMeta = ModuleMeta, Variant = unknown> = Omit<
+  GraphModule<Node, Variant>,
+  'sourcePath'
+>;
 
 /** Normalize and validate the immutable graph exposed after the build has completed. */
-export function finalizeGraph<Node extends ModuleMeta>(
+export function finalizeGraph<Node extends ModuleMeta, Variant = unknown>(
   graphRoot: string,
-  inputs: readonly GraphModuleInput<Node>[],
+  inputs: readonly GraphModuleInput<Node, Variant>[],
   graphAssets: ReadonlyMap<string, string>
-): Graph<Node> {
+): Graph<Node, Variant> {
   if (!isAbsolute(graphRoot)) throw new Error(`VJSC graph root must be absolute: \`${graphRoot}\`.`);
 
   const root = resolve(graphRoot);
-  const modules = new Map<string, GraphModule<Node>>();
+  const modules = new Map<string, GraphModule<Node, Variant>>();
 
   for (const input of inputs) {
     if (modules.has(input.id)) throw new Error(`VJSC graph module is captured twice: \`${input.id}\`.`);
@@ -44,11 +39,12 @@ export function finalizeGraph<Node extends ModuleMeta>(
       throw new Error(`VJSC graph module has an empty name: \`${input.id}\`.`);
     }
 
-    if (!input.metaRemoved && META_EXPORT.test(input.source)) assertMetaRemoved(input);
+    // The metadata pass removes the export it reads; one left behind would ship build-time data at runtime.
+    if (input.exports.includes('meta')) {
+      throw new Error(`Module metadata remains in transformed source: \`${input.id}\`.`);
+    }
 
-    const { metaRemoved: _metaRemoved, ...module } = input;
-
-    modules.set(input.id, { ...module, filename, sourcePath });
+    modules.set(input.id, { ...input, filename, sourcePath });
   }
 
   for (const module of modules.values()) {
@@ -67,21 +63,4 @@ export function finalizeGraph<Node extends ModuleMeta>(
   }
 
   return { root, modules, assets: new Map(graphAssets) };
-}
-
-function assertMetaRemoved(module: GraphModuleInput): void {
-  const parsed = parseSync(module.filename, module.source);
-  if (parsed.errors.length > 0) throw new Error(parsed.errors.map((error) => error.message).join('\n'));
-
-  for (const statement of parsed.program.body) {
-    if (
-      statement.type === 'ExportNamedDeclaration' &&
-      statement.declaration?.type === 'VariableDeclaration' &&
-      statement.declaration.declarations.some(
-        (declaration) => declaration.id.type === 'Identifier' && declaration.id.name === 'meta'
-      )
-    ) {
-      throw new Error(`Module metadata remains in transformed source: \`${module.id}\`.`);
-    }
-  }
 }

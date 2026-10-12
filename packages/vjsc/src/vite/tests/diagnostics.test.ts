@@ -39,7 +39,7 @@ describe('vjscPlugin style diagnostics', () => {
     await rm(root, { recursive: true, force: true });
   });
 
-  it('reports diagnostics while serving and skips them during production builds', async () => {
+  it('reports complex-selector warnings while serving and skips them during production builds', async () => {
     const logger = createLogger('silent');
     const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
     const warnOnce = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
@@ -76,6 +76,33 @@ describe('vjscPlugin style diagnostics', () => {
     });
 
     expect(warnings(warn, warnOnce)).toBe('');
+  });
+
+  it('fails production builds on style isolation errors', async () => {
+    const isolated = join(root, 'peer.ts');
+
+    await writeFile(
+      join(root, 'peer.styles.ts'),
+      `
+        import { styles } from 'vjsc/styles';
+
+        export default styles({
+          file: 'peer.css',
+          layer: 'fixture.components',
+          rules: { root: { className: 'fixture-peer', utilities: 'peer-hover:block' } },
+        });
+      `
+    );
+    await writeFile(isolated, `import styles from './peer.styles'; export const className = styles.root;`);
+
+    await expect(
+      build({
+        configFile: false,
+        logLevel: 'silent',
+        plugins: vjscPlugin({ transform: transforms }),
+        build: { write: false, rolldownOptions: { input: isolated } },
+      })
+    ).rejects.toThrow('[VJSC_STYLE_PEER_RELATIONSHIP]');
   });
 });
 

@@ -1,11 +1,12 @@
 import { resolve } from 'node:path';
 
+import { pascalCase } from '@videojs/utils/string';
 import { describe, expect, it } from 'vite-plus/test';
-import type { Graph } from 'vjsc/graph';
 
-import { isSkinName, type SkinModuleMeta, skinStyles } from '../../../src/meta.ts';
+import { isSkinName, skinStyles } from '../../../src/meta.ts';
 import { skinClassNameMergeImport } from '../../imports.ts';
 import { skinSourceDirectory } from '../../skin.ts';
+import type { SkinGraph } from '../../variants.ts';
 import { createReactPackageSkins } from '../react.ts';
 
 describe('createReactPackageSkins', () => {
@@ -61,7 +62,7 @@ describe('createReactPackageSkins', () => {
   });
 });
 
-function fixtureGraph(root: string): Graph<SkinModuleMeta> {
+function fixtureGraph(root: string): SkinGraph {
   const modules = new Map();
   const skins = Object.keys(skinStyles).filter(isSkinName);
 
@@ -80,6 +81,7 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
       filename: `${root}/skins/${skinSourceDirectory(skin)}/skin.tsx`,
       sourcePath: `skins/${skinSourceDirectory(skin)}/skin.tsx`,
       params: { skin, style: 'css', target: 'react' },
+      variant: { skin, style: 'css', target: 'react', theme },
       source: rootSource,
       imports: [
         { ...importReference(rootSource, '../../components/button'), resolvedId: buttonId },
@@ -87,6 +89,8 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
         { ...importReference(rootSource, '../../components/themed'), resolvedId: themedId },
       ],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
       meta: {
         type: 'skin',
         name: skin,
@@ -100,6 +104,7 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
       filename: `${root}/components/button.tsx`,
       sourcePath: 'components/button.tsx',
       params: { skin, style: 'css', target: 'react' },
+      variant: { skin, style: 'css', target: 'react', theme },
       source: buttonSource,
       imports: [
         importReference(buttonSource, '@videojs/react'),
@@ -107,24 +112,32 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
         importReference(buttonSource, skinClassNameMergeImport),
       ],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
     });
     modules.set(labelId, {
       id: labelId,
       filename: `${root}/components/label.tsx`,
       sourcePath: 'components/label.tsx',
       params: { skin, style: 'css', target: 'react' },
+      variant: { skin, style: 'css', target: 'react', theme },
       source: labelSource,
       imports: [{ ...importReference(labelSource, './themed'), resolvedId: themedId }],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
     });
     modules.set(themedId, {
       id: themedId,
       filename: `${root}/components/themed.tsx`,
       sourcePath: 'components/themed.tsx',
       params: { skin, style: 'css', target: 'react' },
+      variant: { skin, style: 'css', target: 'react', theme },
       source: `export const Themed = '${theme}';`,
       imports: [],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
     });
   }
 
@@ -135,8 +148,4 @@ function importReference(source: string, specifier: string) {
   const start = source.indexOf(`'${specifier}'`);
 
   return { specifier, kind: 'static' as const, start, end: start + specifier.length + 2, quote: "'", bindings: [] };
-}
-
-function pascalCase(value: string): string {
-  return value.replace(/(?:^|-)([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }

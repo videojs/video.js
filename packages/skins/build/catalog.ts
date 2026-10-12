@@ -1,12 +1,12 @@
 import { pascalCase } from '@videojs/utils/string';
 
-import { type SkinName, type SkinStyle, skinStyles } from '../src/meta.ts';
-import { skinDirectory, type SkinPreset, skinPreset } from './skin.ts';
+import { type SkinName, type SkinTheme, skinStyles } from '../src/meta.ts';
+import { type SkinPreset, skinMedia, skinPreset } from './skin.ts';
 
 /** Everything a consumer needs to address one published skin without re-deriving names from conventions. */
 export interface SkinCatalogEntry {
   readonly name: SkinName;
-  readonly theme: SkinStyle['theme'];
+  readonly theme: SkinTheme;
   readonly preset: SkinPreset;
   readonly media: 'audio' | 'video';
   readonly live: boolean;
@@ -33,14 +33,14 @@ function describe(name: SkinName): SkinCatalogEntry {
     name,
     theme: style.theme,
     preset,
-    media: preset.endsWith('audio') ? 'audio' : 'video',
+    media: skinMedia(preset),
     live: preset.startsWith('live-'),
     label: `${pascalCase(style.theme)} ${preset.split('-').map(pascalCase).join(' ')}`,
     exportName: `${pascalCase(preset)}Skin`,
     component: `${style.theme === 'default' ? '' : pascalCase(style.theme)}${pascalCase(preset)}Skin`,
     tags: { css: cssTag, tailwind: `${cssTag}-tailwind` },
     registryItem: preset,
-    directory: skinDirectory(name),
+    directory: preset,
   };
 }
 

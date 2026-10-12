@@ -2,6 +2,8 @@ import type { ImportDeclaration, Program } from '@oxc-project/types';
 import { walk } from 'oxc-walker';
 import type { RolldownMagicString } from 'rolldown';
 
+import { moduleExportName } from './traverse';
+
 export interface ModuleImport {
   readonly from: string;
   readonly name: string;
@@ -16,6 +18,11 @@ export interface ModuleImportsOptions {
    * type-only ones, because a value import also provides its type.
    */
   readonly kind?: 'value' | 'type' | undefined;
+  /**
+   * Names taken in the module, shared with other collections that insert into the same module so a value import and a
+   * type import never allocate the same local. Defaults to the identifiers the module already declares.
+   */
+  readonly usedNames?: Set<string> | undefined;
 }
 
 /** Collect collision-safe runtime or type-only imports and insert them together. */
@@ -33,7 +40,7 @@ export class ModuleImports {
     this.#ast = ast;
     this.#magicString = magicString;
     this.#options = options;
-    this.#usedNames = collectIdentifierNames(ast);
+    this.#usedNames = options.usedNames ?? collectIdentifierNames(ast);
 
     for (const statement of ast.body) {
       if (statement.type !== 'ImportDeclaration') continue;
@@ -101,9 +108,7 @@ export class ModuleImports {
 
       if (specifier.importKind === 'type' && this.#options.kind !== 'type') continue;
 
-      const imported = specifier.imported.type === 'Identifier' ? specifier.imported.name : specifier.imported.value;
-
-      this.#existing.set(importKey(source, imported), specifier.local.name);
+      this.#existing.set(importKey(source, moduleExportName(specifier.imported)), specifier.local.name);
     }
   }
 

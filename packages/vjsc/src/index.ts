@@ -1,4 +1,7 @@
 export {
+  defineVariants,
+  type VariantCodec,
+  type VariantModule,
   type VjscComponentSchemaOptions,
   vjscComponentSchemaPlugin,
   type EntriesOptions,

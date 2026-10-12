@@ -1,12 +1,9 @@
-import type { Plugin } from 'rolldown';
-import { rolldown } from 'rolldown';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { defineComponent, defineSchema } from '../../components/definition';
 import { defineComponentTarget } from '../../target/definition';
-import { renderTargetPlugin } from '../render-target';
-
-const MODULE_ID = '\0fixture.tsx?target=react';
+import { targetSourcePlugin } from '../target-source';
+import { lowerFixture } from './helpers/lower';
 
 const schema = defineSchema('@fixture/components', {
   PlayButton: defineComponent({ name: 'PlayButton' }),
@@ -41,7 +38,7 @@ const definitionSource = `
   export const PlayButton = ({ className }) => <$.PlayButton $render={Button} className={[className]} />;
 `;
 
-describe('renderTargetPlugin', () => {
+describe('lowerRenderTargets', () => {
   it('lowers definitions and directives to React render props', async () => {
     const source = await transform(definitionSource, reactTarget);
 
@@ -99,43 +96,9 @@ describe('renderTargetPlugin', () => {
   });
 });
 
-async function transform(source: string, target: typeof reactTarget | typeof htmlTarget): Promise<string> {
-  let output: string | undefined;
-  const inspect: Plugin = {
-    name: 'fixture:inspect',
-    buildEnd() {
-      output = this.getModuleInfo(MODULE_ID)?.code ?? undefined;
-    },
-  };
-  const bundle = await rolldown({
-    input: 'fixture',
-    experimental: { nativeMagicString: true },
-    external: (id) => !id.startsWith('.') && !id.startsWith('\0'),
-    transform: { jsx: 'preserve' },
-    plugins: [
-      {
-        name: 'fixture:module',
-        resolveId(id) {
-          if (id === 'fixture') return MODULE_ID;
-
-          return id.startsWith('./') ? `\0${id}` : null;
-        },
-        load(id) {
-          if (id === MODULE_ID) return { code: source, moduleType: 'tsx' };
-
-          return id.startsWith('\0./')
-            ? { code: 'export const CaptionsButton = () => null;', moduleType: 'tsx' }
-            : null;
-        },
-      },
-      renderTargetPlugin({ targets: [target] }),
-      inspect,
-    ],
+function transform(source: string, target: typeof reactTarget | typeof htmlTarget): Promise<string> {
+  return lowerFixture(source, {
+    modules: { './captions-button': 'export const CaptionsButton = () => null;' },
+    plugins: [targetSourcePlugin({ targets: [target] })],
   });
-
-  await bundle.generate({ format: 'es' });
-
-  if (!output) throw new Error('Fixture did not capture transformed source.');
-
-  return output;
 }

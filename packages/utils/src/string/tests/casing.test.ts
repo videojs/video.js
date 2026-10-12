@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { camelCase, kebabCase, pascalCase, snakeCase } from '../casing';
+import { camelCase, kebabCase, kebabCaseName, pascalCase, snakeCase } from '../casing';
 
 describe('casing', () => {
   describe('pascalCase', () => {
@@ -68,6 +68,19 @@ describe('casing', () => {
 
     it('does not special-case CSS custom properties', () => {
       expect(kebabCase('--media-popover-offset')).toBe('--media-popover-offset');
+    });
+  });
+
+  describe('kebabCaseName', () => {
+    it('converts PascalCase and camelCase identifiers without a leading dash', () => {
+      expect(kebabCaseName('PlayButton')).toBe('play-button');
+      expect(kebabCaseName('playButton')).toBe('play-button');
+      expect(kebabCaseName('PiP2Button')).toBe('pi-p2-button');
+    });
+
+    it('preserves lowercase and kebab-case names', () => {
+      expect(kebabCaseName('button')).toBe('button');
+      expect(kebabCaseName('play-button')).toBe('play-button');
     });
   });
 });

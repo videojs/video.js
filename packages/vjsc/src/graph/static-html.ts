@@ -1,7 +1,10 @@
 import { rolldown } from 'rolldown';
 
 import type { ModuleMeta } from '../components/meta';
-import { resolveHtmlRuntime } from '../plugins/html-runtime';
+import { renderedElementTypes } from '../html-runtime/jsx-runtime';
+import { resolveHtmlRuntime } from '../html-runtime/resolve';
+import { isVirtualCssId } from '../styles/virtual-css';
+import { COMPONENT_SOURCE } from '../target/bindings';
 import { scriptModuleType } from '../utils/module-id';
 import type { Graph } from './types';
 
@@ -10,30 +13,40 @@ const emptyId = '\0vjsc:module-graph-html-empty';
 
 type HtmlRenderProps = Readonly<Record<never, never>>;
 
-export interface HtmlEntry {
+export interface StaticHtmlEntry {
   /** Stable key used for the rendered result. */
   readonly name: string;
-  /** VJSC graph module containing the renderer export. */
+  /** VJSC graph module containing the component export. */
   readonly moduleId: string;
   /** Named component export to render. */
   readonly exportName: string;
 }
 
-export interface RenderHtmlOptions {
+export interface StaticHtmlOptions {
   /** Redirect an external import to a concrete source module. */
   readonly aliases?: ReadonlyMap<string, string> | undefined;
-  /** Replace imports that have no effect while rendering static markup. */
+  /**
+   * Replace imports that have no effect while rendering static markup, such as element registrations. The authoring
+   * runtime and generated stylesheets are always replaced.
+   */
   readonly empty?: ((specifier: string) => boolean) | undefined;
   /** Provide source for external modules needed only while rendering. */
   readonly modules?: ReadonlyMap<string, string> | undefined;
 }
 
-/** Render named HTML component exports directly from one finalized module graph. */
-export async function renderHtml<Node extends ModuleMeta>(
+export interface StaticHtml {
+  /** Static markup, one element per line. */
+  readonly html: string;
+  /** Every element type the markup contains, such as the custom elements a page must register. */
+  readonly elements: ReadonlySet<string>;
+}
+
+/** Generate static markup for named HTML component exports by evaluating them from one finalized module graph. */
+export async function generateStaticHtml<Node extends ModuleMeta>(
   graph: Graph<Node>,
-  entries: readonly HtmlEntry[],
-  options: RenderHtmlOptions = {}
-): Promise<ReadonlyMap<string, string>> {
+  entries: readonly StaticHtmlEntry[],
+  options: StaticHtmlOptions = {}
+): Promise<ReadonlyMap<string, StaticHtml>> {
   const modules = graph.modules;
   const importResolutions = new Map<string, string>();
   const virtualModules = new Map<string, string>();
@@ -70,7 +83,7 @@ export async function renderHtml<Node extends ModuleMeta>(
           const runtime = resolveHtmlRuntime(id);
           if (runtime) return runtime;
 
-          if (options.empty?.(id)) return emptyId;
+          if (id === COMPONENT_SOURCE || isVirtualCssId(id) || options.empty?.(id)) return emptyId;
 
           const resolved = importer ? importResolutions.get(importKey(importer, id)) : undefined;
           if (resolved && modules.has(resolved)) return resolved;
@@ -104,7 +117,12 @@ export async function renderHtml<Node extends ModuleMeta>(
     const chunks = output.output.filter((value) => value.type === 'chunk');
 
     if (chunks.length !== 1 || chunks[0]!.imports.length > 0) {
-      throw new Error('HTML module graph renderer did not produce one self-contained module.');
+      const imports = chunks.flatMap((chunk) => chunk.imports).map((specifier) => `\`${specifier}\``);
+
+      throw new Error(
+        `HTML module graph renderer did not produce one self-contained module.${imports.length ? ` Unresolved imports: ${imports.join(', ')}.` : ''}\n` +
+          'Recommendation: resolve each import with `aliases` or `modules`, or mark it `empty` when rendering ignores it.'
+      );
     }
 
     const url = `data:text/javascript;base64,${Buffer.from(chunks[0]!.code).toString('base64')}`;
@@ -119,7 +137,9 @@ export async function renderHtml<Node extends ModuleMeta>(
         const render = rendered[`render${index}`];
         if (!render) throw new Error(`HTML module graph entry \`${entry.name}\` has no renderer export.`);
 
-        return [entry.name, formatHtml(String(render({})))] as const;
+        const output = render({});
+
+        return [entry.name, { html: formatHtml(String(output)), elements: renderedElementTypes(output) }] as const;
       })
     );
   } finally {

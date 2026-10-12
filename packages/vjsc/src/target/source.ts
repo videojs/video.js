@@ -1,11 +1,18 @@
 import type { JSXAttribute, JSXElement, JSXElementName, JSXOpeningElement } from '@oxc-project/types';
+import { isObject, isString } from '@videojs/utils/predicate';
 
-import { createSourceText, renderSourceRange, type SourceText } from '../ast';
-import { type SourceProps, type TargetOutput, type TargetReplacement, TARGET_REPLACEMENT } from './definition';
+import { createSourceText, renderSourceRange, type SourceEdit, type SourceText } from '../ast';
+import {
+  SOURCE_CHILDREN,
+  type SourceChildren,
+  type SourceProps,
+  type TargetOutput,
+  type TargetReplacement,
+  TARGET_REPLACEMENT,
+} from './definition';
 
 export const SOURCE_PROPS = Symbol.for('vjsc/source-props');
 export const SOURCE_PROP = Symbol.for('vjsc/source-prop');
-export const SOURCE_CHILDREN = Symbol.for('vjsc/source-children');
 
 export interface SourcePropsToken {
   readonly [SOURCE_PROPS]: true;
@@ -21,20 +28,43 @@ export interface SourcePropToken {
   readonly attribute: JSXAttribute | undefined;
 }
 
-export interface SourceChildrenToken {
-  readonly [SOURCE_CHILDREN]: true;
+export interface SourceChildrenToken extends SourceChildren {
   readonly source: SourceText;
   readonly value: string;
-  /** Opening-tag offset when the children contain exactly one JSX element. */
+  /** Whether the children are exactly one `{expression}` container, which can stand in for a JSX attribute value. */
+  readonly expression: boolean;
+  /** Opening-tag offset when the children contain exactly one JSX element whose opening tag survives lowering. */
   readonly rootOpeningEnd?: number | undefined;
   /** Whether the single root is a component invocation rather than an intrinsic element. */
   readonly rootComponent?: boolean | undefined;
 }
 
+/** The JSX children that render output: every child except whitespace-only text. */
+export function significantJsxChildren(node: JSXElement): JSXElement['children'] {
+  return node.children.filter((child) => child.type !== 'JSXText' || child.value.trim() !== '');
+}
+
 export function singleJsxElementChild(node: JSXElement): JSXElement | undefined {
-  const children = node.children.filter((child) => child.type !== 'JSXText' || child.value.trim() !== '');
+  const children = significantJsxChildren(node);
 
   return children.length === 1 && children[0]?.type === 'JSXElement' ? children[0] : undefined;
+}
+
+/**
+ * The props and children a rule reads from one source element, rendered with the edits already made inside it. With
+ * `forwardProps`, a single child element can receive the host props the rule forwards.
+ */
+export function sourceElement<Props extends object = object>(
+  code: string,
+  node: JSXElement,
+  edits: readonly SourceEdit[],
+  forwardProps = false
+): { readonly props: SourceProps<Props>; readonly children: SourceChildrenToken } {
+  const source = createSourceText(code, edits);
+  const rootOpening = forwardProps ? singleJsxElementChild(node)?.openingElement : undefined;
+  const children = createSourceChildren(source, node, rootOpening);
+
+  return { props: createSourceProps<Props>(source, node.openingElement, children), children };
 }
 
 export function createSourceProps<Props extends object>(
@@ -58,9 +88,12 @@ function createSourcePropsFromAttributes<Props extends object>(
     get(_target, property) {
       if (property === SOURCE_PROPS) return token;
 
-      if (property === 'has') return (name: string) => findAttribute(attributes, name) !== undefined;
+      // Omitted props are gone for every operation, so a rule never reads a prop another rule consumed.
+      if (property === 'has')
+        return (name: string) => !omitted.has(name) && findAttribute(attributes, name) !== undefined;
 
-      if (property === 'get') return (name: string) => createSourceProp(source, attributes, name, children);
+      if (property === 'get')
+        return (name: string) => createSourceProp(source, visible(attributes, omitted), name, children);
 
       if (property === 'omit') {
         return (...names: string[]) =>
@@ -87,7 +120,7 @@ function createSourcePropsFromAttributes<Props extends object>(
 
       if (property === 'children') return children;
 
-      if (typeof property === 'string') return createSourceProp(source, attributes, property, children);
+      if (isString(property)) return createSourceProp(source, visible(attributes, omitted), property, children);
 
       return undefined;
     },
@@ -102,20 +135,33 @@ function createSourcePropsFromAttributes<Props extends object>(
   });
 }
 
+/**
+ * Capture an element's rendered children. Pass `rootOpening` when the children's single root element may receive
+ * forwarded host props.
+ */
 export function createSourceChildren(
   source: string | SourceText,
-  opening: JSXOpeningElement,
-  closingStart: number,
+  node: JSXElement,
   rootOpening?: JSXOpeningElement
 ): SourceChildrenToken {
   const normalized = normalizeSourceText(source);
-  const rendered = renderSourceRange(normalized, opening.end, closingStart);
-  const rootOpeningEnd = rootOpening ? rendered.position(rootOpening.end) : undefined;
+  const rendered = renderSourceRange(
+    normalized,
+    node.openingElement.end,
+    node.closingElement?.start ?? node.openingElement.end
+  );
+  // An edit that starts at or before the root's `<` replaced or erased the opening tag, so props cannot be inserted.
+  const rootReplaced =
+    rootOpening && normalized.edits.some((edit) => edit.start <= rootOpening.start && edit.end > rootOpening.start);
+  const rootOpeningEnd = rootOpening && !rootReplaced ? rendered.position(rootOpening.end) : undefined;
+  const children = significantJsxChildren(node);
+  const only = children.length === 1 ? children[0] : undefined;
 
   return {
     [SOURCE_CHILDREN]: true,
     source: normalized,
     value: rendered.value,
+    expression: only?.type === 'JSXExpressionContainer' && only.expression.type !== 'JSXEmptyExpression',
     ...(rootOpeningEnd !== undefined ? { rootOpeningEnd } : {}),
     ...(rootOpening ? { rootComponent: isComponentName(rootOpening.name) } : {}),
   };
@@ -128,17 +174,15 @@ function isComponentName(name: JSXElementName): boolean {
 }
 
 export function isSourcePropsToken(value: unknown): value is SourcePropsToken {
-  return Boolean(value && typeof value === 'object' && (value as Partial<SourcePropsToken>)[SOURCE_PROPS] === true);
+  return Boolean(isObject(value) && (value as Partial<SourcePropsToken>)[SOURCE_PROPS] === true);
 }
 
 export function isSourcePropToken(value: unknown): value is SourcePropToken {
-  return Boolean(value && typeof value === 'object' && (value as Partial<SourcePropToken>)[SOURCE_PROP] === true);
+  return Boolean(isObject(value) && (value as Partial<SourcePropToken>)[SOURCE_PROP] === true);
 }
 
 export function isSourceChildrenToken(value: unknown): value is SourceChildrenToken {
-  return Boolean(
-    value && typeof value === 'object' && (value as Partial<SourceChildrenToken>)[SOURCE_CHILDREN] === true
-  );
+  return Boolean(isObject(value) && (value as Partial<SourceChildrenToken>)[SOURCE_CHILDREN] === true);
 }
 
 export function createTargetReplacement(
@@ -161,9 +205,7 @@ export function createTargetReplacement(
 }
 
 export function isTargetReplacement(value: unknown): value is TargetReplacement {
-  return Boolean(
-    value && typeof value === 'object' && (value as Partial<TargetReplacement>)[TARGET_REPLACEMENT] === true
-  );
+  return Boolean(isObject(value) && (value as Partial<TargetReplacement>)[TARGET_REPLACEMENT] === true);
 }
 
 function createSourceProp(
@@ -183,7 +225,19 @@ function createSourceProp(
 }
 
 function normalizeSourceText(source: string | SourceText): SourceText {
-  return typeof source === 'string' ? createSourceText(source) : source;
+  return isString(source) ? createSourceText(source) : source;
+}
+
+function visible(
+  attributes: JSXOpeningElement['attributes'],
+  omitted: ReadonlySet<string>
+): JSXOpeningElement['attributes'] {
+  if (omitted.size === 0) return attributes;
+
+  return attributes.filter(
+    (attribute) =>
+      attribute.type !== 'JSXAttribute' || attribute.name.type !== 'JSXIdentifier' || !omitted.has(attribute.name.name)
+  );
 }
 
 function findAttribute(attributes: JSXOpeningElement['attributes'], name: string): JSXAttribute | undefined {

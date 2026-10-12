@@ -1,21 +1,22 @@
-import { posix } from 'node:path';
+import { pascalCase } from '@videojs/utils/string';
+import { bundleStyles, relativeImport } from 'vjsc/graph';
+import type { RegistryCreatedItem } from 'vjsc/shadcn';
 
-import { type Graph, type GraphModule, bundleStyles } from 'vjsc/graph';
-import type { RegistryCreatedItem, RegistryModuleItem } from 'vjsc/shadcn';
-
-import { isSkinName, type SkinModuleMeta, type SkinName } from '../../../src/meta.ts';
+import type { SkinModuleMeta, SkinName } from '../../../src/meta.ts';
 import { skinCatalogEntry } from '../../catalog.ts';
-import { createHtmlSkinRegistration, createSourceOwnedHtml, type RenderedHtmlSkin } from '../../packages/html.ts';
-import { isSkinPreset, skinBaseStylesheet, skinDirectory, skinPreset, skinStyleItemName } from '../../skin.ts';
+import { createHtmlSkinRegistration, createSourceOwnedHtml, type GeneratedHtmlSkin } from '../../packages/html.ts';
+import { isSkinPreset, skinBaseStylesheet, skinPreset, skinStyleItemName } from '../../skin.ts';
+import { skinSource } from '../../source.ts';
+import type { SkinGraph, SkinGraphModule } from '../../variants.ts';
 import { registryDocsUrl } from '../docs.ts';
-import type { VideojsRegistryMeta } from '../meta.ts';
+import type { SkinRegistryItem, VideojsItemMeta } from '../meta.ts';
 import { packageRequirements, registryPaths, type RegistryTarget } from '../targets.ts';
 import { exportedComponentName } from './components.ts';
 import { reactHelperDependency } from './support.ts';
 
 export async function htmlSkinItem(
-  skin: RenderedHtmlSkin,
-  graph: Graph<SkinModuleMeta>,
+  skin: GeneratedHtmlSkin,
+  graph: SkinGraph,
   target: RegistryTarget
 ): Promise<RegistryCreatedItem> {
   const meta = skin.root.meta;
@@ -24,15 +25,12 @@ export async function htmlSkinItem(
   const template = createSourceOwnedHtml(skin.template);
 
   const styleTarget = `${directory}/skin.css`;
-  const themeImport = relativeRegistryImport(
-    `${directory}/skin.ts`,
-    `styles/${skinBaseStylesheet(skin.preset, skin.theme)}`
-  );
-  const styleImport = relativeRegistryImport(`${directory}/skin.ts`, styleTarget);
+  const themeImport = relativeImport(`${directory}/skin.ts`, `styles/${skinBaseStylesheet(skin.preset, skin.theme)}`);
+  const styleImport = relativeImport(`${directory}/skin.ts`, styleTarget);
 
   // The shared and preset theme items must load before the skin's own scoped rules.
   const registration = `import '${themeImport}';\nimport '${styleImport}';\n\n${createHtmlSkinRegistration(
-    template,
+    skin.elements,
     skin.modules,
     'registry'
   )}`;
@@ -71,35 +69,22 @@ export async function htmlSkinItem(
     files,
     meta: {
       role: 'skin',
-      framework: 'html',
-      styling: target.styling,
       preset: skin.preset,
-      media: skin.preset.endsWith('audio') ? 'audio' : 'video',
-      theme: skin.theme,
+      media: skinCatalogEntry(skin.root.meta.name).media,
       public: true,
-    } satisfies VideojsRegistryMeta,
+    } satisfies VideojsItemMeta,
     group: 'skins',
   };
 }
 
 export function skinItem(
-  module: GraphModule<SkinModuleMeta>,
+  module: SkinGraphModule,
   meta: Extract<SkinModuleMeta, { type: 'skin' }>,
   target: RegistryTarget
-): RegistryModuleItem<SkinModuleMeta> {
+): SkinRegistryItem {
   const skin = meta.name;
-  if (!isSkinName(skin)) throw new Error(`Unknown Skin registry module: \`${skin}\`.`);
-
-  const { preset, theme, directory, registryItem } = skinCatalogEntry(skin);
-  const registryMeta = {
-    role: 'skin',
-    framework: target.framework,
-    styling: target.styling,
-    preset,
-    media: preset.endsWith('audio') ? 'audio' : 'video',
-    theme,
-    public: true,
-  } satisfies VideojsRegistryMeta;
+  const { preset, theme, media, directory, registryItem } = skinCatalogEntry(skin);
+  const registryMeta = { role: 'skin', preset, media, public: true } satisfies VideojsItemMeta;
 
   return {
     name: registryItem,
@@ -112,62 +97,46 @@ export function skinItem(
     meta: registryMeta,
     group: 'skins',
     directives: ['use client'],
-    target: (candidate, root) => skinModuleTarget(candidate, root, skin),
+    target: `${directory}/skin.tsx`,
+    place: (candidate, root) => skinModuleTarget(candidate, root, skin),
     stylesheet: target.styling === 'css' ? { target: `${directory}/skin.css` } : undefined,
     theme: `styles/${skinBaseStylesheet(preset, theme)}`,
   };
 }
 
-function relativeRegistryImport(importer: string, target: string): string {
-  const specifier = posix.relative(posix.dirname(importer), target);
+export function skinModuleTarget(module: SkinGraphModule, root: SkinGraphModule, skin: SkinName): string {
+  if (module.id === root.id) return `${skinPreset(skin)}/skin.tsx`;
 
-  return specifier.startsWith('.') ? specifier : `./${specifier}`;
-}
+  const source = skinSource(module.sourcePath);
 
-export function skinModuleTarget(
-  module: GraphModule<SkinModuleMeta>,
-  root: GraphModule<SkinModuleMeta>,
-  skin: SkinName
-): string {
-  if (module.id === root.id) return `${skinDirectory(skin)}/skin.tsx`;
-
-  const sourcePath = module.sourcePath;
-
-  if (sourcePath.startsWith('components/')) {
-    throw new Error(`Reusable registry component was not published independently: \`${sourcePath}\`.`);
+  switch (source.kind) {
+    case 'component':
+      throw new Error(`Reusable registry component was not published independently: \`${source.path}\`.`);
+    case 'skin':
+      return `${skinPreset(source.skin)}/${source.file}`;
+    case 'shared':
+      // Preset-shared modules compile with each theme's variants and stay beside that skin.
+      return isSkinPreset(source.group)
+        ? `${skinPreset(skin)}/${source.file}`
+        : `${skinPreset(skin)}/${source.group}/${source.file}`;
+    case 'theme':
+      return `${skinPreset(skin)}/shared/${source.file}`;
+    default:
+      throw new Error(`Registry module is not below a skin or shared directory: \`${source.path}\`.`);
   }
-
-  if (!sourcePath.startsWith('skins/')) throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
-
-  const match = /^skins\/([^/]+)\/([^/]+)\/(.+)$/.exec(sourcePath);
-  if (!match) throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
-
-  const [, theme, preset, filename] = match;
-  const owner = `${theme}-${preset}`;
-  if (isSkinName(owner)) return `${skinDirectory(owner)}/${filename}`;
-
-  // Preset-shared modules compile with each theme's variants and stay beside that skin.
-  if (theme === 'shared' && preset && isSkinPreset(preset)) return `${skinDirectory(skin)}/${filename}`;
-
-  if (theme === 'shared' && preset && filename) return `${skinDirectory(skin)}/${preset}/${filename}`;
-
-  if ((theme === 'compat' || theme === 'scaffold') && preset === 'shared')
-    return `${skinDirectory(skin)}/shared/${filename}`;
-
-  throw new Error(`Unsupported registry source: \`${sourcePath}\`.`);
 }
 
 function skinDocs(
-  module: GraphModule<SkinModuleMeta>,
+  module: SkinGraphModule,
   meta: Extract<SkinModuleMeta, { type: 'skin' }>,
   skin: SkinName,
   target: RegistryTarget,
   directory: string
 ): string {
   const component = exportedComponentName(module);
-  const preset = skinPreset(skin);
+  const { preset, media: mediaType } = skinCatalogEntry(skin);
   const player = `${pascalCase(preset)}Player`;
-  const media = preset.endsWith('audio') ? 'Audio' : 'Video';
+  const media = pascalCase(mediaType);
 
   if (target.framework === 'html') {
     return `Installs editable ${meta.title} source under \`${registryPaths.install}/${directory}\` together with the shared theme stylesheet. Requires \`${packageRequirements.html}\`; import the matching Player and media registrations before using the installed light-DOM template.`;
@@ -190,8 +159,4 @@ export function Player({ src }: { src: string }) {
   );
 }
 \`\`\``;
-}
-
-function pascalCase(value: string): string {
-  return value.replace(/(?:^|-)([a-z])/g, (_match, letter: string) => letter.toUpperCase());
 }

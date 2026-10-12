@@ -1,3 +1,7 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { ComponentMeta } from '../../components';
@@ -44,9 +48,8 @@ describe('createShadcnRegistryFiles', () => {
             description: `${name}.`,
             group: 'skins',
             directives: ['use client'],
-            target(candidate, root) {
-              return candidate.id === root.id ? `skins/${name}/skin.tsx` : `skins/${name}/ui/button.tsx`;
-            },
+            target: `skins/${name}/skin.tsx`,
+            place: () => `skins/${name}/ui/button.tsx`,
           };
         },
       },
@@ -97,11 +100,8 @@ describe('createShadcnRegistryFiles', () => {
             title: name,
             description: `${name}.`,
             group: 'skins',
-            target(candidate, root) {
-              if (candidate.id === root.id) return `skins/${name}/skin.tsx`;
-
-              return `skins/${name}/ui/${candidate.sourcePath.slice('components/'.length)}`;
-            },
+            target: `skins/${name}/skin.tsx`,
+            place: (candidate) => `skins/${name}/ui/${candidate.sourcePath.slice('components/'.length)}`,
           };
         },
       },
@@ -139,11 +139,8 @@ describe('createShadcnRegistryFiles', () => {
             title: `Video ${theme}`,
             description: `Video ${theme}.`,
             group: 'skins',
-            target(candidate, root) {
-              return candidate.id === root.id
-                ? `skins/video/${theme}.tsx`
-                : `skins/video/${theme}/${candidate.sourcePath}`;
-            },
+            target: `skins/video/${theme}.tsx`,
+            place: (candidate) => `skins/video/${theme}/${candidate.sourcePath}`,
             theme: `styles/${theme}.css`,
           };
         },
@@ -341,6 +338,190 @@ describe('createShadcnRegistryFiles', () => {
   });
 });
 
+describe('createShadcnRegistryFiles options', () => {
+  const shared = {
+    name: 'example',
+    homepage: 'https://example.com',
+    namespace: '@example',
+    paths: { install: 'components/example', import: '@/components/example' },
+  } as const;
+  const button = (theme?: boolean | string) => ({
+    resolve({ module }: { readonly module: GraphModule<FixtureMeta> }) {
+      if (module.meta?.type !== 'component' || module.params.theme !== 'default') return null;
+
+      return {
+        name: 'button',
+        type: 'registry:ui' as const,
+        title: 'Button',
+        description: 'Button.',
+        group: 'ui',
+        target: 'ui/button.tsx',
+        ...(theme === undefined ? {} : { theme }),
+      };
+    },
+  });
+  const theme = { name: '_style-theme', title: 'Theme', description: 'Theme.', target: 'styles/theme.css' };
+
+  it('imports the primary theme for styled items unless they opt out', async () => {
+    const graph = fixtureGraph();
+    const automatic = await createShadcnRegistryFiles(graph, { ...shared, items: button(), styles: { theme } });
+    const optedOut = await createShadcnRegistryFiles(graph, { ...shared, items: button(false), styles: { theme } });
+
+    expect(registryItem(automatic, 'ui/registry.json', 'button').registryDependencies).toEqual([
+      '@example/_style-theme',
+    ]);
+    expect(sourceFile(automatic, 'ui/files/button/button.tsx')).toContain(`import '../styles/theme.css';`);
+    expect(registryItem(optedOut, 'ui/registry.json', 'button').registryDependencies).toBeUndefined();
+    expect(sourceFile(optedOut, 'ui/files/button/button.tsx')).not.toContain('theme.css');
+  });
+
+  it('derives theme files and dependencies from the local imports of each entry', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'vjsc-registry-entries-'));
+
+    mkdirSync(join(root, 'styles/video'), { recursive: true });
+    writeFileSync(join(root, 'styles/base.css'), `@import "./tokens.css";\n.base {}`);
+    writeFileSync(join(root, 'styles/tokens.css'), `:root {}`);
+    writeFileSync(join(root, 'styles/video/base.css'), `@import "../base.css";\n@import "./captions.css";\n.video {}`);
+    writeFileSync(join(root, 'styles/video/captions.css'), `.captions {}`);
+
+    const files = await createShadcnRegistryFiles(
+      { root, modules: new Map(), assets: new Map() },
+      {
+        ...shared,
+        items: {},
+        styles: {
+          theme: { ...theme, target: 'styles/base.css', entry: './styles/base.css' },
+          themes: [
+            {
+              name: '_style-video',
+              title: 'Video',
+              description: 'Video.',
+              target: 'styles/video/base.css',
+              entry: './styles/video/base.css',
+            },
+          ],
+        },
+      }
+    );
+    const base = registryItem(files, 'support/registry.json', '_style-theme');
+    const video = registryItem(files, 'support/registry.json', '_style-video');
+
+    expect(base.files.map((file: { target: string }) => file.target)).toEqual([
+      'components/example/styles/base.css',
+      'components/example/styles/tokens.css',
+    ]);
+    expect(video.files.map((file: { target: string }) => file.target)).toEqual([
+      'components/example/styles/video/base.css',
+      'components/example/styles/video/captions.css',
+    ]);
+    expect(video.registryDependencies).toEqual(['@example/_style-theme']);
+  });
+
+  it('follows qualified and url() imports of a theme entry', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'vjsc-registry-entries-'));
+
+    mkdirSync(join(root, 'styles'), { recursive: true });
+    writeFileSync(
+      join(root, 'styles/base.css'),
+      `@import "./tokens.css" layer(tokens);\n@import url(./print.css) print;\n.base {}`
+    );
+    writeFileSync(join(root, 'styles/tokens.css'), `:root {}`);
+    writeFileSync(join(root, 'styles/print.css'), `.print {}`);
+
+    const files = await createShadcnRegistryFiles(
+      { root, modules: new Map(), assets: new Map() },
+      { ...shared, items: {}, styles: { theme: { ...theme, target: 'styles/base.css', entry: './styles/base.css' } } }
+    );
+
+    expect(
+      registryItem(files, 'support/registry.json', '_style-theme').files.map((file: { target: string }) => file.target)
+    ).toEqual([
+      'components/example/styles/base.css',
+      'components/example/styles/print.css',
+      'components/example/styles/tokens.css',
+    ]);
+  });
+
+  it('rejects a theme entry that imports a stylesheet outside the graph root', async () => {
+    const parent = mkdtempSync(join(tmpdir(), 'vjsc-registry-entries-'));
+    const root = join(parent, 'root');
+
+    mkdirSync(join(root, 'styles'), { recursive: true });
+    writeFileSync(join(root, 'styles/base.css'), `@import "../../outside.css";\n.base {}`);
+    writeFileSync(join(parent, 'outside.css'), `.outside {}`);
+
+    await expect(
+      createShadcnRegistryFiles(
+        { root, modules: new Map(), assets: new Map() },
+        { ...shared, items: {}, styles: { theme: { ...theme, target: 'styles/base.css', entry: './styles/base.css' } } }
+      )
+    ).rejects.toThrow('VJSC graph style is outside its root: `../../outside.css`.');
+  });
+
+  it('rejects an unpinned dependency on a pinned package', async () => {
+    const graph = fixtureGraph();
+    const component = [...graph.modules.values()].find((module) => module.id.endsWith('button.tsx?theme=default'))!;
+    const source = `import { helper } from '@example/core';\nexport function Button() { return <button />; }`;
+
+    (graph.modules as Map<string, GraphModule<FixtureMeta>>).set(component.id, {
+      ...component,
+      source,
+      imports: [importReference(source, '@example/core')],
+    });
+
+    await expect(
+      createShadcnRegistryFiles(graph, {
+        ...shared,
+        items: button(false),
+        pinned: (name) => name.startsWith('@example/'),
+      })
+    ).rejects.toThrow('Shadcn item `button` depends on `@example/core` without a pinned requirement.');
+    await expect(
+      createShadcnRegistryFiles(graph, {
+        ...shared,
+        items: button(false),
+        packages: { '@example/core': '@example/core@1.0.0' },
+        pinned: (name) => name.startsWith('@example/'),
+      })
+    ).resolves.toBeDefined();
+  });
+
+  it('describes generated style items with the configured style metadata', async () => {
+    const files = await createShadcnRegistryFiles(fixtureGraph(), {
+      ...shared,
+      items: button(false),
+      styles: { files: 'styles', meta: { role: 'support' } },
+    });
+
+    expect(registryItem(files, 'support/registry.json', '_style-buttons').meta).toEqual({ role: 'support' });
+  });
+
+  it('builds a catalog from created items alone', async () => {
+    const files = await createShadcnRegistryFiles(fixtureGraph(), {
+      ...shared,
+      items: {
+        create: () => [
+          {
+            name: 'template',
+            type: 'registry:block',
+            title: 'Template',
+            description: 'Template.',
+            group: 'blocks',
+            files: [
+              { path: 'template.html', type: 'registry:file', target: 'template.html', content: '<main></main>' },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(sourceFile(files, 'blocks/files/template/template.html')).toBe('<main></main>');
+    expect(registryItem(files, 'blocks/registry.json', 'template').files).toEqual([
+      { path: 'files/template/template.html', type: 'registry:file', target: 'template.html' },
+    ]);
+  });
+});
+
 function fixtureGraph(): Graph<FixtureMeta> {
   const root = '/fixture';
   const modules = new Map<string, GraphModule<FixtureMeta>>();
@@ -350,7 +531,7 @@ function fixtureGraph(): Graph<FixtureMeta> {
     const rootId = `${root}/skins/${theme}.tsx?theme=${theme}`;
     const componentId = `${root}/components/button.tsx?theme=${theme}`;
     const source = `import { Button } from '../components/button';\nexport function Skin() { return <Button />; }`;
-    const styleId = `virtual:vjsc/css/${theme}/buttons.css`;
+    const styleId = `virtual:vjsc/css/asset/${theme}/buttons.css`;
 
     assets.set(styleId, `.media-button { color: ${theme === 'default' ? 'black' : 'white'}; }`);
     modules.set(rootId, {
@@ -361,6 +542,8 @@ function fixtureGraph(): Graph<FixtureMeta> {
       source,
       imports: [{ ...importReference(source, '../components/button'), resolvedId: componentId }],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
       meta: { name: theme, type: 'block', title: theme, description: `${theme}.` },
     });
     modules.set(componentId, {
@@ -371,6 +554,8 @@ function fixtureGraph(): Graph<FixtureMeta> {
       source: 'export function Button() { return <button />; }',
       imports: [],
       styles: { files: ['buttons.css'], assets: [styleId] },
+      exports: [],
+      annotations: {},
       meta: { name: 'button', type: 'component', title: 'Button', description: 'Button.' },
     });
   }
@@ -390,7 +575,7 @@ function chainFixtureGraph(): Graph<FixtureMeta> {
     const buttonId = `${root}/components/button.tsx?theme=${theme}`;
     const skinSource = `import { RateButton } from '../components/rate-button';\nexport function Skin() { return <RateButton />; }`;
     const rateButtonSource = `import { Button } from './button';\nexport function RateButton() { return <Button />; }`;
-    const styleId = `virtual:vjsc/css/${theme}/buttons.css`;
+    const styleId = `virtual:vjsc/css/asset/${theme}/buttons.css`;
 
     assets.set(styleId, `.media-button { border-radius: ${theme === 'default' ? '8px' : '16px'}; }`);
     modules.set(rootId, {
@@ -401,6 +586,8 @@ function chainFixtureGraph(): Graph<FixtureMeta> {
       source: skinSource,
       imports: [{ ...importReference(skinSource, '../components/rate-button'), resolvedId: rateButtonId }],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
       meta: { name: theme, type: 'block', title: theme, description: `${theme}.` },
     });
     modules.set(rateButtonId, {
@@ -411,6 +598,8 @@ function chainFixtureGraph(): Graph<FixtureMeta> {
       source: rateButtonSource,
       imports: [{ ...importReference(rateButtonSource, './button'), resolvedId: buttonId }],
       styles: { files: [], assets: [] },
+      exports: [],
+      annotations: {},
       meta: { name: 'rate-button', type: 'component', title: 'Rate Button', description: 'Rate button.' },
     });
     modules.set(buttonId, {
@@ -421,6 +610,8 @@ function chainFixtureGraph(): Graph<FixtureMeta> {
       source: 'export function Button() { return <button />; }',
       imports: [],
       styles: { files: ['buttons.css'], assets: [styleId] },
+      exports: [],
+      annotations: {},
       meta: { name: 'button', type: 'component', title: 'Button', description: 'Button.' },
     });
   }

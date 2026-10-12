@@ -1,54 +1,99 @@
 import type { ImportDeclaration, Node, Program } from '@oxc-project/types';
+import { parseSync } from 'oxc-parser';
 import { walk } from 'oxc-walker';
-import type { Plugin } from 'rolldown';
 
-import { SCRIPT_MODULE_ID } from '../utils/module-id';
-import { type ComponentTargetPluginOptions, selectComponentTargets } from './component-target';
+import { jsxNamePath, parseError, type SourceEdit, sourceError } from '../ast';
+import { COMPONENT_SOURCE } from '../target/bindings';
+import type { TargetModule } from '../target/module';
+import { isRenderTargetMarker } from '../target/render-target';
+import { moduleFilename } from '../utils/module-id';
 
-export function targetImportCleanupPlugin(options: ComponentTargetPluginOptions): Plugin {
-  return {
-    name: 'vjsc:target-import-cleanup',
-    transform: {
-      filter: { id: SCRIPT_MODULE_ID, code: 'import' },
-      handler(_code, id, transform) {
-        const targets = selectComponentTargets(options.targets, id);
-        if (targets.length === 0 || !transform.ast || !transform.magicString) return null;
+/**
+ * Reject JSX that still names a canonical import or carries a render marker. Either means no target rule consumed the
+ * element, so the output would reference a component source that does not exist at runtime.
+ *
+ * @param consumed - Ranges this stage lowers itself, such as templates, whose canonical names are expected.
+ */
+export function assertLowered(module: TargetModule, consumed: readonly SourceEdit[]): void {
+  const sources = canonicalSources(module);
+  const canonical = new Set<string>();
 
-        const sourceImports = new Set(['vjsc/components', ...targets.map((target) => target.source)]);
-        const declarations = transform.ast.body.filter(
-          (statement): statement is ImportDeclaration =>
-            statement.type === 'ImportDeclaration' &&
-            statement.specifiers.length > 0 &&
-            (sourceImports.has(statement.source.value) || isTypeOnlyImport(statement))
+  for (const statement of module.ast.body) {
+    if (statement.type !== 'ImportDeclaration' || statement.importKind === 'type') continue;
+
+    if (!sources.has(statement.source.value)) continue;
+
+    for (const specifier of statement.specifiers) {
+      if (specifier.type !== 'ImportSpecifier' || specifier.importKind !== 'type') canonical.add(specifier.local.name);
+    }
+  }
+
+  walk(module.ast, {
+    enter(node) {
+      if (node.type === 'JSXAttribute' && node.name.type === 'JSXIdentifier' && isRenderTargetMarker(node.name.name)) {
+        throw sourceError(
+          `\`$render\` marker \`${node.name.name}\` was not consumed by the component target.\n` +
+            'Reason: the canonical host lowered without handing its render target to a component rule.\n' +
+            'Recommendation: call consumeRenderTarget() in the rule that lowers this component or part.',
+          node.start
         );
-        if (declarations.length === 0) return null;
+      }
 
-        const imported = new Set(declarations.flatMap((declaration) => declaration.specifiers.map(localName)));
-        const referenced = referencedBindings(transform.ast, imported);
-        let changed = false;
+      if (node.type !== 'JSXOpeningElement') return;
 
-        for (const declaration of declarations) {
-          const kept = declaration.specifiers.filter((specifier) => referenced.all.has(localName(specifier)));
-          const typeOnly = kept.length > 0 && kept.every((specifier) => !referenced.runtime.has(localName(specifier)));
-          if (kept.length === declaration.specifiers.length && (!typeOnly || isTypeOnlyImport(declaration))) continue;
+      const path = jsxNamePath(node.name);
+      if (!canonical.has(path[0]!) || consumed.some((edit) => node.start >= edit.start && node.end <= edit.end)) return;
 
-          if (kept.length === 0) {
-            transform.magicString.remove(declaration.start, declaration.end);
-          } else {
-            transform.magicString.overwrite(
-              declaration.start,
-              declaration.end,
-              renderImport(declaration, kept, typeOnly)
-            );
-          }
-
-          changed = true;
-        }
-
-        return changed ? { code: transform.magicString } : null;
-      },
+      throw sourceError(
+        `<${path.join('.')}> was not lowered by the component target.\n` +
+          'Reason: the target has no rule for this component or part and its resolver returned nothing.\n' +
+          'Recommendation: add a rule for it, return a target element from `components.resolve`, or unwrap() it.',
+        node.start
+      );
     },
-  };
+  });
+}
+
+/**
+ * Remove canonical and type-only imports the lowered module no longer references, and turn imports it references only
+ * as types into `import type`. References are read from a parse of the module as the stage leaves it, so bindings that
+ * lowering dropped or copied are counted exactly.
+ */
+export function pruneImports(module: TargetModule): void {
+  const sources = canonicalSources(module);
+  const declarations = module.ast.body.filter(
+    (statement): statement is ImportDeclaration =>
+      statement.type === 'ImportDeclaration' &&
+      statement.specifiers.length > 0 &&
+      (sources.has(statement.source.value) || isTypeOnlyImport(statement))
+  );
+  if (declarations.length === 0) return;
+
+  const filename = moduleFilename(module.id);
+  const code = module.magicString.toString();
+  const lowered = parseSync(filename, code);
+
+  if (lowered.errors.length > 0)
+    throw parseError(`VJSC lowered \`${module.id}\` to invalid syntax.`, filename, code, lowered.errors);
+
+  const imported = new Set(declarations.flatMap((declaration) => declaration.specifiers.map(localName)));
+  const referenced = referencedBindings(lowered.program, imported);
+
+  for (const declaration of declarations) {
+    const kept = declaration.specifiers.filter((specifier) => referenced.all.has(localName(specifier)));
+    const typeOnly = kept.length > 0 && kept.every((specifier) => !referenced.runtime.has(localName(specifier)));
+    if (kept.length === declaration.specifiers.length && (!typeOnly || isTypeOnlyImport(declaration))) continue;
+
+    if (kept.length === 0) {
+      module.magicString.remove(declaration.start, declaration.end);
+    } else {
+      module.magicString.overwrite(declaration.start, declaration.end, renderImport(declaration, kept, typeOnly));
+    }
+  }
+}
+
+function canonicalSources(module: TargetModule): ReadonlySet<string> {
+  return new Set([COMPONENT_SOURCE, ...module.targets.map((target) => target.source)]);
 }
 
 function isTypeOnlyImport(declaration: ImportDeclaration): boolean {

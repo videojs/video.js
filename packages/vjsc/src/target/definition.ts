@@ -1,8 +1,9 @@
 import type { Program } from '@oxc-project/types';
+import { isFunction } from '@videojs/utils/predicate';
 import type { RolldownMagicString } from 'rolldown';
 
 import type { SourceText } from '../ast';
-import type { ModuleImport } from '../ast/imports';
+import type { ModuleImport, ModuleImports } from '../ast/imports';
 import type {
   ComponentDefinitions,
   ComponentPartDefinition,
@@ -12,7 +13,6 @@ import type {
   InferProps,
 } from '../components/definition';
 import type { BoxProps, SlotProps, TemplatePartProps, TemplateProps, TextProps } from '../components/jsx-runtime';
-import type { GraphModule } from '../graph/types';
 import { createTargetCode } from './expression';
 
 export const TARGET_ELEMENT = Symbol.for('vjsc/target-element');
@@ -24,6 +24,7 @@ export const TARGET_REPLACEMENT = Symbol.for('vjsc/target-replacement');
 export const TARGET_SPREAD = Symbol.for('vjsc/target-spread');
 export const TARGET_WITH_PROPS = Symbol.for('vjsc/target-with-props');
 export const TARGET_UNWRAP = Symbol.for('vjsc/target-unwrap');
+export const SOURCE_CHILDREN = Symbol.for('vjsc/source-children');
 
 export type TargetImport = ModuleImport;
 
@@ -41,7 +42,7 @@ export type TargetReference =
   | {
       readonly kind: 'component';
       readonly component: string;
-      readonly part: string | null;
+      readonly parts: readonly string[];
     }
   | {
       readonly kind: 'import';
@@ -90,8 +91,14 @@ export interface TargetReplacement {
   readonly output: TargetOutput;
 }
 
+/** Children captured from the authored source. A rule places them in its output, where they render as written. */
+export interface SourceChildren {
+  readonly [SOURCE_CHILDREN]: true;
+}
+
 export type TargetOutput =
   | TargetNode
+  | SourceChildren
   | TargetExpression
   | TargetWithProps
   | TargetReplacement
@@ -126,7 +133,8 @@ export interface TargetCode {
 
 export interface ComponentPath<Schema extends ComponentSchema = ComponentSchema> {
   readonly component: keyof Schema['definitions'] & string;
-  readonly part: string | null;
+  /** The part path below the component, such as `['Thumbnail', 'Image']`; empty for the component itself. */
+  readonly parts: readonly string[];
 }
 
 export interface SourcePropOperations<Props extends object> {
@@ -284,14 +292,21 @@ export type RenderTargetRule = RenderTargetHost | RenderTargetComponent;
 
 export type RenderTargetRules = Readonly<Record<string, RenderTargetRule>>;
 
-/** How modules compiled for this target render statically outside a browser. */
-export interface TargetRenderOptions {
-  /** Redirect an external import to a concrete module file while rendering. */
-  readonly aliases?: ReadonlyMap<string, string> | undefined;
-  /** Imports that have no effect while rendering static markup, such as element registrations. */
-  readonly empty?: ((specifier: string) => boolean) | undefined;
-  /** Source for external modules needed only while rendering, given the graph modules being rendered. */
-  readonly modules?: ((modules: readonly GraphModule[]) => ReadonlyMap<string, string>) | undefined;
+/** JSX lowering for targets that render static HTML through the VJSC HTML runtime. */
+export const htmlJsx: JsxOptions = {
+  importSource: 'vjsc/html-runtime',
+  attributes: 'html',
+  host: { from: 'vjsc/html-runtime/jsx-runtime', name: 'Host' },
+  scope: { from: 'vjsc/html-runtime/jsx-runtime', name: 'Scope' },
+};
+
+/**
+ * Whether a target lowers to static markup, whose attributes use HTML names, rather than to framework components.
+ * Markup has no component functions, so constructs that become components elsewhere, such as render targets, lower to
+ * classes and markers instead.
+ */
+export function emitsMarkup(target: Pick<ComponentTarget, 'jsx'>): boolean {
+  return target.jsx.attributes === 'html';
 }
 
 export interface TypeMappings {
@@ -303,11 +318,24 @@ export interface TargetTransformContext {
   readonly id: string;
   readonly ast: Program;
   readonly magicString: RolldownMagicString;
+  /** The selected target that owns this transform. */
+  readonly target: ComponentTarget;
+  /**
+   * Runtime imports and top-level statements the transform adds. They are inserted with every other import the source
+   * stage requests, so their local names never collide and a transform never commits them itself.
+   */
+  readonly imports: ModuleImports;
+  /**
+   * Record a structured fact about this module for build tooling, readable as `GraphModule.annotations[key]` once the
+   * graph is finalized. Keys are owned by the transform that writes them; a later write replaces an earlier one.
+   */
+  annotate(key: string, value: unknown): void;
 }
 
 export interface TargetTransform {
   readonly name: string;
-  transform(context: TargetTransformContext): boolean;
+  /** Edit the module through `magicString` and `imports`; the source stage emits whatever changed. */
+  transform(context: TargetTransformContext): void;
 }
 
 export interface ComponentTargetOptions<Schema extends ComponentSchema> {
@@ -324,8 +352,6 @@ export interface ComponentTargetOptions<Schema extends ComponentSchema> {
   /** Elements for shared components declared with `defineRenderTarget`, keyed by their exported name. */
   readonly renderTargets?: RenderTargetRules | undefined;
   readonly jsx: JsxOptions;
-  /** Static rendering policy for modules compiled with this target. */
-  readonly render?: TargetRenderOptions | undefined;
 }
 
 export interface ComponentTarget<Schema extends ComponentSchema = ComponentSchema> {
@@ -339,7 +365,6 @@ export interface ComponentTarget<Schema extends ComponentSchema = ComponentSchem
   readonly transforms: readonly TargetTransform[];
   readonly renderTargets: RenderTargetRules;
   readonly jsx: JsxOptions;
-  readonly render?: TargetRenderOptions | undefined;
 }
 
 export interface TargetElementOptions {
@@ -386,7 +411,6 @@ export function defineComponentTarget<const Schema extends ComponentSchema>(): (
       transforms: definition.transforms ?? [],
       renderTargets: definition.renderTargets ?? {},
       jsx: definition.jsx,
-      ...(definition.render ? { render: definition.render } : {}),
     };
   };
 }
@@ -396,7 +420,7 @@ export function createUnwrapTarget(): TargetUnwrap {
 }
 
 export function isTargetUnwrap(value: unknown): value is TargetUnwrap {
-  return typeof value === 'function' && TARGET_UNWRAP in value;
+  return isFunction(value) && TARGET_UNWRAP in value;
 }
 
 export function createElementTarget<Props extends object = Record<string, unknown>>(
@@ -428,13 +452,8 @@ export function createTargetElement<Props extends object = Record<string, unknow
   return Object.assign(element, { [TARGET_ELEMENT]: reference });
 }
 
-/** Read the reference a target element was created from. */
-export function readTargetReference(element: TargetElement): TargetReference {
-  return element[TARGET_ELEMENT];
-}
-
 export function isTargetElement(value: unknown): value is TargetElement {
-  return typeof value === 'function' && TARGET_ELEMENT in value;
+  return isFunction(value) && TARGET_ELEMENT in value;
 }
 
 function createTargetNamespace<Schema extends ComponentSchema>(): ComponentReferences<Schema> {
@@ -445,7 +464,7 @@ function createComponentTargetReference(path: readonly string[]): TargetElement 
   const reference = createTargetElement({
     kind: 'component',
     component: path[0] ?? '',
-    part: path.length > 1 ? path.slice(1).join('.') : null,
+    parts: path.slice(1),
   });
   const children = new Map<PropertyKey, unknown>();
 

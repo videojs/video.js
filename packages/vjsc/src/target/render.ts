@@ -1,5 +1,8 @@
+import { isBoolean, isNumber, isObject, isString } from '@videojs/utils/predicate';
+
 import { createSourceText, type ModuleImports, renderSourceRange, sliceSource } from '../ast';
 import { htmlAttributeName } from './attributes';
+import { displayPath } from './bindings';
 import {
   type ComponentTarget,
   type ComponentPath,
@@ -68,7 +71,7 @@ export function renderTargetOutput(output: TargetOutput, context: TargetRenderCo
 
   if (isTargetNode(output)) return renderTargetNode(output, context);
 
-  if (typeof output === 'string' || typeof output === 'number' || typeof output === 'boolean') {
+  if (isString(output) || isNumber(output) || isBoolean(output)) {
     return `{${JSON.stringify(output)}}`;
   }
 
@@ -124,7 +127,7 @@ function renderAttributesFor(
       continue;
     }
 
-    if (typeof property !== 'string' || value === undefined) continue;
+    if (!isString(property) || value === undefined) continue;
 
     const attribute = renderAttribute(property, value, context, attributeMode);
 
@@ -151,7 +154,7 @@ function renderChildren(value: unknown, context: TargetRenderContext): string {
 
   if (value === null || value === undefined || value === false) return '';
 
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  if (isString(value) || isNumber(value) || isBoolean(value)) {
     return `{${JSON.stringify(value)}}`;
   }
 
@@ -202,9 +205,9 @@ function renderGeneratedAttribute(name: string, value: unknown, context: TargetR
 
   if (value === null) return `${name}={null}`;
 
-  if (typeof value === 'string') return `${name}=${JSON.stringify(value)}`;
+  if (isString(value)) return `${name}=${JSON.stringify(value)}`;
 
-  if (typeof value === 'number' || typeof value === 'boolean') return `${name}={${String(value)}}`;
+  if (isNumber(value) || isBoolean(value)) return `${name}={${String(value)}}`;
 
   throw new Error(`vjsc/target: target JSX prop \`${name}\` contains an unsupported value.`);
 }
@@ -250,7 +253,7 @@ function renderChildrenAttribute(token: SourceChildrenToken): string {
   const value = token.value.trim();
   if (!value) return '{null}';
 
-  if (value.startsWith('{') && value.endsWith('}')) return value;
+  if (token.expression) return value;
 
   if (token.rootOpeningEnd !== undefined) return `{${value}}`;
 
@@ -333,13 +336,11 @@ function renderTargetReference(
 
   if (reference.kind === 'import') return context.imports.reference(reference.import);
 
-  const path: ComponentPath = { component: reference.component, part: reference.part };
+  const path: ComponentPath = { component: reference.component, parts: reference.parts };
   const resolved = context.target.components.resolve(path);
 
   if (!resolved || !isTargetElement(resolved)) {
-    throw new Error(
-      `Component target did not resolve <${reference.component}${reference.part ? `.${reference.part}` : ''}>.`
-    );
+    throw new Error(`Component target did not resolve <${displayPath(reference)}>.`);
   }
 
   return renderTargetReference(resolved[TARGET_ELEMENT], context, seen);
@@ -352,5 +353,5 @@ function targetAttributeName(name: string, attributes: ComponentTarget['jsx']['a
 }
 
 export function isTargetNode(value: unknown): value is TargetNode {
-  return Boolean(value && typeof value === 'object' && (value as Partial<TargetNode>)[TARGET_NODE] === true);
+  return Boolean(isObject(value) && (value as Partial<TargetNode>)[TARGET_NODE] === true);
 }

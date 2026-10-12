@@ -15,7 +15,9 @@
     "directory": "packages/core"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/*/vjsc.*",
+    "!dist/*/core/ui/*/component.*"
   ],
   "type": "module",
   "sideEffects": [

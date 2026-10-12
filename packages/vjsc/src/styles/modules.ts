@@ -15,23 +15,14 @@ export function resolveStyleModuleFile(importer: string, specifier: string): str
   return file && isStyleModulePath(file) ? file : undefined;
 }
 
+/** The loaded module a style import names, by the real path its rules are keyed by. */
 export function resolveStyleModule(importer: string, specifier: string, styles: ResolvedStyles): string | undefined {
-  if (!specifier.startsWith('.')) return undefined;
-
   const file = resolveStyleModuleFile(importer, specifier);
+  if (!file) return undefined;
 
-  if (file) {
-    const modulePath = realpathSync(file);
-    if (styles.modules.has(modulePath)) return modulePath;
-  }
+  const modulePath = realpathSync(file);
 
-  const imported = resolve(dirname(importer), specifier);
-
-  for (const modulePath of styles.modules.keys()) {
-    if (modulePath === imported || stripScriptExtension(modulePath) === imported) return modulePath;
-  }
-
-  return undefined;
+  return styles.modules.has(modulePath) ? modulePath : undefined;
 }
 
 const sourceExtensions = ['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs'] as const;
@@ -52,8 +43,4 @@ function resolveSourceModule(importer: string, specifier: string): string | unde
   }
 
   return undefined;
-}
-
-function stripScriptExtension(path: string): string {
-  return path.replace(/\.(?:[cm]?[jt]s|[jt]sx)$/, '');
 }

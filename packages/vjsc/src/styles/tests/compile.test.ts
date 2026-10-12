@@ -96,6 +96,48 @@ describe('compileStyles', () => {
     expect(changed.get('buttons.css')).not.toEqual(first.get('buttons.css'));
   });
 
+  it('renders a file once for owners that select the same rules for it', async () => {
+    const design = await loadDesignSystem(designPath);
+    let compiles = 0;
+    const counted: DesignSystem = {
+      ...design,
+      compileCss(css) {
+        compiles += 1;
+        return design.compileCss(css);
+      },
+    };
+    const button = rule('root', 'media-button', ['grid']);
+    const menu = { ...rule('menu', 'media-menu', ['flex']), file: 'menus.css' };
+    const first = await compileStyles({
+      design: counted,
+      scope: '.media-skin-video',
+      variants: ['default'],
+      styles: resolvedStyles([button]),
+      ruleClassNames: new Set(['media-button']),
+    });
+    // Another owner: a different variant label, more style modules, and references to classes it does not style.
+    const second = await compileStyles({
+      design: counted,
+      scope: '.media-skin-video',
+      variants: ['minimal'],
+      styles: resolvedStyles([button, menu]),
+      ruleClassNames: new Set(['media-button', 'media-unstyled']),
+    });
+
+    expect(compiles).toBe(1);
+    expect(second).toEqual(first);
+
+    await compileStyles({ design: counted, scope: '.media-skin-audio', styles: resolvedStyles([button]) });
+    await compileStyles({
+      design: counted,
+      scope: '.media-skin-video',
+      styles: resolvedStyles([{ ...button, shadowHost: true }]),
+      ruleClassNames: new Set(['media-button']),
+    });
+
+    expect(compiles).toBe(3);
+  });
+
   it('folds zero sizing and spacing without resolving the runtime spacing variable', async () => {
     const styles = await compileStyles({
       design: await loadDesignSystem(resolve(import.meta.dirname, 'fixtures/variable-spacing.css')),
@@ -161,16 +203,37 @@ describe('compileStyles', () => {
     expect(rootBase).toBeGreaterThanOrEqual(0);
     expect(rootResponsive).toBeGreaterThan(rootBase);
   });
-  it('orders referenced output files by their first composed class', async () => {
+  it('orders output files by the declared cascade order, not by reference order', async () => {
     const popup = { ...rule('popup', 'media-popup', ['m-0']), file: 'popups.css' };
     const menu = { ...rule('menu', 'media-menu-popup', ['p-1']), file: 'menus.css' };
-    const styles = await compileStyles({
-      design: await loadDesignSystem(designPath),
+    const design = await loadDesignSystem(designPath);
+    const byName = await compileStyles({
+      design,
       styles: resolvedStyles([menu, popup]),
       ruleClassNames: new Set(['media-popup', 'media-menu-popup']),
     });
+    const declared = await compileStyles({
+      design,
+      styles: resolvedStyles([menu, popup]),
+      ruleClassNames: new Set(['media-menu-popup', 'media-popup']),
+      order: ['popups.css', 'menus.css'],
+    });
 
-    expect([...styles.keys()]).toEqual(['popups.css', 'menus.css']);
+    expect([...byName.keys()]).toEqual(['menus.css', 'popups.css']);
+    expect([...declared.keys()]).toEqual(['popups.css', 'menus.css']);
+  });
+
+  it('rejects emitted files missing from the declared order', async () => {
+    await expect(
+      compileStyles({
+        design: await loadDesignSystem(designPath),
+        styles: resolvedStyles([
+          rule('root', 'media-button', ['grid']),
+          { ...rule('menu', 'media-menu', ['p-1']), file: 'menus.css' },
+        ]),
+        order: ['buttons.css'],
+      })
+    ).rejects.toThrow('Style output `menus.css` is missing from `stylesheet.order`.');
   });
 
   it('combines selected variants in order across rules', async () => {
@@ -215,6 +278,25 @@ describe('compileStyles', () => {
     expect(css).toContain('@scope (.media-skin-video)');
     expect(css).toContain('.media-poster > slot::slotted(img:not([src]))');
     expect(css).toMatch(/}\s*\.media-poster > slot::slotted/);
+  });
+
+  it('adds scope-root selectors only to rules inside the scope', async () => {
+    const container = {
+      ...rule('root', 'media-container', ['relative'], { 'shadow-dom': ['[&>slot::slotted(video)]:w-full'] }),
+      scopeRoot: true,
+    };
+    const styles = await compileStyles({
+      design: await loadDesignSystem(designPath),
+      styles: resolvedStyles([container]),
+      scope: '.media-skin-video',
+      variants: ['shadow-dom'],
+    });
+    const css = styles.get('buttons.css') ?? '';
+    const unscoped = css.slice(css.indexOf('\n  }\n'));
+
+    expect(css).toContain(':scope.media-container {');
+    expect(unscoped).toContain('.media-container > slot::slotted(video)');
+    expect(unscoped).not.toContain(':scope');
   });
 
   it('repeats shadow host rules outside the scope without changing specificity or conditions', async () => {

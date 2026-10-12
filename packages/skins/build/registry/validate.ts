@@ -1,20 +1,16 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { isPlainObject, isString } from '@videojs/utils/predicate';
 import { registryItemSchema, registrySchema, type RegistryItem } from 'shadcn/schema';
 
 import { registryTargets } from './targets.ts';
 
 const packageDir = resolve(import.meta.dirname, '../..');
-const workspaceDir = resolve(packageDir, '../..');
 const hostedDir = resolve(packageDir, 'dist/shadcn/r');
 const catalogs = registryTargets.map((target) => target.output.replace(/^r\//, ''));
 
-const versions = await workspacePackageVersions();
+// Package pins are enforced while the registry is emitted; this checks the hosted catalogs are complete.
 const items = (await Promise.all(catalogs.map(validateCatalog))).flat();
-
-validatePackagePins(items, versions);
 
 console.log(`Validated Video.js policy for ${items.length} hosted registry items.`);
 
@@ -42,63 +38,4 @@ async function validateCatalog(path: (typeof catalogs)[number]): Promise<Registr
       return registryItemSchema.parse(JSON.parse(source));
     })
   );
-}
-
-function validatePackagePins(items: readonly RegistryItem[], versions: ReadonlyMap<string, string>): void {
-  for (const item of items) {
-    for (const dependency of item.dependencies ?? []) {
-      if (!dependency.startsWith('@videojs/')) continue;
-
-      const separator = dependency.lastIndexOf('@');
-      const name = dependency.slice(0, separator);
-      const version = dependency.slice(separator + 1);
-      const expected = versions.get(name);
-
-      if (separator <= 0 || !expected || version !== expected) {
-        throw new Error(
-          `${item.name} must pin ${name || dependency} to its workspace artifact (${expected ?? 'unknown package'}).`
-        );
-      }
-    }
-  }
-}
-
-/** Package directories under `packages/`, descending one level into bucket directories such as `adapters/`. */
-async function workspacePackageDirs(): Promise<string[]> {
-  const packagesDir = resolve(workspaceDir, 'packages');
-  const dirs: string[] = [];
-
-  for (const entry of await readdir(packagesDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-
-    const dir = resolve(packagesDir, entry.name);
-    const manifest = await readFile(resolve(dir, 'package.json'), 'utf8').catch(() => undefined);
-
-    if (manifest !== undefined) {
-      dirs.push(dir);
-      continue;
-    }
-
-    for (const child of await readdir(dir, { withFileTypes: true })) {
-      if (child.isDirectory()) dirs.push(resolve(dir, child.name));
-    }
-  }
-
-  return dirs;
-}
-
-async function workspacePackageVersions(): Promise<ReadonlyMap<string, string>> {
-  const manifests = await Promise.all(
-    (await workspacePackageDirs()).map(async (dir) => {
-      const source = await readFile(resolve(dir, 'package.json'), 'utf8').catch(() => undefined);
-      if (!source) return undefined;
-
-      const manifest = JSON.parse(source);
-      if (!isPlainObject(manifest) || !isString(manifest.name) || !isString(manifest.version)) return undefined;
-
-      return [manifest.name, manifest.version] as const;
-    })
-  );
-
-  return new Map(manifests.filter((entry) => entry !== undefined));
 }

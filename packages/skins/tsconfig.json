@@ -5,13 +5,12 @@
     "jsx": "react-jsx",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "paths": {
-      "@videojs/react/video": ["../react/src/presets/video/index.ts"],
-      "vjsc/*": ["../vjsc/src/*"]
+      "@videojs/react/video": ["../react/src/presets/video/index.ts"]
     },
     "types": ["node"],
     "declarationDir": "types"
   },
-  "include": ["build", "src/*.ts", "src/styles/utilities.ts", "src/styles/vars.ts"],
+  "include": ["build", "src/*.ts", "src/styles/utilities.ts", "src/styles/variants.d.ts", "src/styles/vars.ts"],
   "references": [
     { "path": "../../apps/sandbox/tsconfig.shared.json" },
     { "path": "../core" },

@@ -1,3 +1,4 @@
+import { isObject } from '@videojs/utils/predicate';
 import type { Rule, Selector, SelectorComponent } from 'lightningcss';
 
 /**
@@ -7,7 +8,7 @@ import type { Rule, Selector, SelectorComponent } from 'lightningcss';
 export function cloneCssAst<T>(value: T): T {
   if (Array.isArray(value)) return value.map(cloneCssAst) as T;
 
-  if (!value || typeof value !== 'object') return value;
+  if (!isObject(value)) return value;
 
   const clone: Record<string, unknown> = {};
 
@@ -23,7 +24,7 @@ export function cloneCssAst<T>(value: T): T {
 export function withoutNullValues<T>(value: T): T {
   if (Array.isArray(value)) return value.map(withoutNullValues) as T;
 
-  if (!value || typeof value !== 'object') return value;
+  if (!isObject(value)) return value;
 
   const record = value as Record<string, unknown>;
 
@@ -82,33 +83,72 @@ function collectSelectorClasses(selector: Selector, classes: Set<string>): void 
   }
 }
 
-function nestedSelectors(component: SelectorComponent): readonly Selector[] {
+/** The selectors nested in a component, such as the arguments of `:is()`, `:host()`, or `::slotted()`. */
+export function nestedSelectors(component: SelectorComponent): readonly Selector[] {
   if (component.type === 'pseudo-class') {
-    if (
-      component.kind === 'not' ||
-      component.kind === 'where' ||
-      component.kind === 'is' ||
-      component.kind === 'any' ||
-      component.kind === 'has'
-    ) {
-      return component.selectors;
+    switch (component.kind) {
+      case 'not':
+      case 'where':
+      case 'is':
+      case 'any':
+      case 'has':
+        return component.selectors;
+      case 'host':
+        return component.selectors ? [component.selectors] : [];
+      case 'nth-child':
+      case 'nth-last-child':
+        return component.of ?? [];
+      case 'local':
+      case 'global':
+        return [component.selector];
+      default:
+        return [];
     }
-
-    if (component.kind === 'host') return component.selectors ? [component.selectors] : [];
-
-    if (component.kind === 'nth-child' || component.kind === 'nth-last-child') {
-      return component.of ?? [];
-    }
-
-    if (component.kind === 'local' || component.kind === 'global') return [component.selector];
   }
 
-  if (
-    component.type === 'pseudo-element' &&
-    (component.kind === 'slotted' || component.kind === 'cue-function' || component.kind === 'cue-region-function')
-  ) {
-    return [component.selector];
-  }
+  if (component.type === 'pseudo-element' && hasNestedSelector(component)) return [component.selector];
 
   return [];
+}
+
+/** A copy of a component with every selector nested in it mapped. Components without nested selectors are returned. */
+export function mapNestedSelectors(
+  component: SelectorComponent,
+  map: (selector: Selector) => Selector
+): SelectorComponent {
+  if (component.type === 'pseudo-class') {
+    switch (component.kind) {
+      case 'not':
+      case 'where':
+      case 'is':
+      case 'any':
+      case 'has':
+        return { ...component, selectors: component.selectors.map(map) };
+      case 'host':
+        return component.selectors ? { ...component, selectors: map(component.selectors) } : component;
+      case 'nth-child':
+      case 'nth-last-child':
+        return component.of ? { ...component, of: component.of.map(map) } : component;
+      case 'local':
+      case 'global':
+        return { ...component, selector: map(component.selector) };
+      default:
+        return component;
+    }
+  }
+
+  if (component.type === 'pseudo-element' && hasNestedSelector(component)) {
+    return { ...component, selector: map(component.selector) };
+  }
+
+  return component;
+}
+
+function hasNestedSelector(
+  component: Extract<SelectorComponent, { type: 'pseudo-element' }>
+): component is Extract<
+  SelectorComponent,
+  { type: 'pseudo-element'; kind: 'slotted' | 'cue-function' | 'cue-region-function' }
+> {
+  return component.kind === 'slotted' || component.kind === 'cue-function' || component.kind === 'cue-region-function';
 }

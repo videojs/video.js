@@ -46,13 +46,6 @@ packages/react/docs/
 
 # VJSC
 packages/*/.vjsc/
-packages/adapters/*/.vjsc/
-packages/extensions/*/.vjsc/
-packages/core/src/core/ui/schema.generated.ts
-packages/html/vjsc/entries.generated.ts
-packages/icons/vjsc/schema.generated.ts
-packages/react/vjsc/entries.generated.ts
-packages/skins/vjsc/registry/
 # Framework Skin sources are generated from the canonical VJSC component graph.
 packages/html/src/presets/background/skin.ts
 packages/html/src/define/background/skin.css

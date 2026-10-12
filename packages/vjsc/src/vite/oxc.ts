@@ -1,4 +1,5 @@
 import type { Program } from '@oxc-project/types';
+import { isFunction, isNumber, isString } from '@videojs/utils/predicate';
 import MagicString from 'magic-string';
 import type { ModuleType, Plugin, RolldownMagicString, TransformPluginContext, TransformResult } from 'rolldown';
 
@@ -32,6 +33,16 @@ type RolldownTransformHandler = (
 ) => TransformResult | Promise<TransformResult>;
 
 export type VitePlugin = Plugin & { readonly enforce?: 'pre' | 'post' | undefined };
+
+/**
+ * The AST of each module's latest source. Vite gives every plugin source text only, and most VJSC passes leave a given
+ * module unchanged, so the next pass reuses the tree instead of parsing identical code again. Passes read the tree and
+ * edit through `magicString`, so a shared tree stays accurate for its source. Bounded because a development server
+ * never says when it is done with a module.
+ */
+const parsedModules = new Map<string, { readonly code: string; readonly ast: Program }>();
+const PARSED_MODULE_LIMIT = 64;
+
 export type ViteOxcPlugin = VitePlugin & { readonly enforce: 'pre' };
 
 /** Adapt a transform that consumes Rolldown's AST metadata to Vite's transform contract. */
@@ -39,7 +50,7 @@ export function viteOxcPlugin(plugin: Plugin): ViteOxcPlugin {
   const transform = plugin.transform;
   if (!transform) return { ...plugin, enforce: 'pre' };
 
-  const handler = (typeof transform === 'function' ? transform : transform.handler) as RolldownTransformHandler;
+  const handler = (isFunction(transform) ? transform : transform.handler) as RolldownTransformHandler;
 
   const wrapped = async function (
     this: TransformPluginContext,
@@ -54,7 +65,7 @@ export function viteOxcPlugin(plugin: Plugin): ViteOxcPlugin {
     // that as a script fails the build. The id check covers hosts that pass no module type and would fall back to `js`.
     const ast =
       SCRIPT_MODULE_TYPES.has(moduleType) && SCRIPT_MODULE_ID.test(id)
-        ? this.parse(code, { lang: parserLanguage(moduleType, filename) })
+        ? parseModule(this, id, code, parserLanguage(moduleType, filename))
         : undefined;
 
     let result: TransformResult;
@@ -72,7 +83,7 @@ export function viteOxcPlugin(plugin: Plugin): ViteOxcPlugin {
       throw error;
     }
 
-    if (!result || typeof result === 'string' || result.code === undefined || typeof result.code === 'string') {
+    if (!result || isString(result) || result.code === undefined || isString(result.code)) {
       return result;
     }
 
@@ -94,12 +105,36 @@ export function viteOxcPlugin(plugin: Plugin): ViteOxcPlugin {
   return {
     ...plugin,
     enforce: 'pre',
-    transform: typeof transform === 'function' ? wrapped : { ...transform, handler: wrapped },
+    transform: isFunction(transform) ? wrapped : { ...transform, handler: wrapped },
   };
 }
 
+function parseModule(
+  context: TransformPluginContext,
+  id: string,
+  code: string,
+  lang: ReturnType<typeof parserLanguage>
+): Program {
+  const key = `${lang}\0${id}`;
+  const cached = parsedModules.get(key);
+  if (cached?.code === code) return cached.ast;
+
+  const ast = context.parse(code, { lang });
+
+  parsedModules.delete(key);
+  parsedModules.set(key, { code, ast });
+
+  for (const oldest of parsedModules.keys()) {
+    if (parsedModules.size <= PARSED_MODULE_LIMIT) break;
+
+    parsedModules.delete(oldest);
+  }
+
+  return ast;
+}
+
 function isPositionedError(error: unknown): error is PositionedError {
-  return error instanceof Error && 'pos' in error && typeof error.pos === 'number';
+  return error instanceof Error && 'pos' in error && isNumber(error.pos);
 }
 
 function parserLanguage(moduleType: ModuleType, filename: string): 'js' | 'jsx' | 'ts' | 'tsx' | 'dts' {

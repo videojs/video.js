@@ -1,24 +1,6 @@
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import type { Plugin } from 'rolldown';
 
-const HTML_RUNTIME_SOURCE = 'vjsc/html-runtime';
-
-/**
- * Resolve the HTML target's JSX runtime to its module file. From source that is the sibling `html-runtime` directory;
- * from the built package it is the public export.
- */
-export function resolveHtmlRuntime(id: string): string | null {
-  if (id !== `${HTML_RUNTIME_SOURCE}/jsx-runtime` && id !== `${HTML_RUNTIME_SOURCE}/jsx-dev-runtime`) return null;
-
-  const here = fileURLToPath(import.meta.url);
-  const entry = id.slice(HTML_RUNTIME_SOURCE.length + 1);
-
-  return here.endsWith('.ts')
-    ? resolve(dirname(here), `../html-runtime/${entry}.ts`)
-    : fileURLToPath(import.meta.resolve(id));
-}
+import { HTML_RUNTIME_ID, resolveHtmlRuntime } from '../html-runtime/resolve';
 
 /** Serve `vjsc/html-runtime/*` from the runtime module while HTML target modules compile. */
 export function htmlRuntimePlugin(): Plugin {
@@ -27,6 +9,7 @@ export function htmlRuntimePlugin(): Plugin {
     enforce: 'pre',
     resolveId: {
       order: 'pre',
+      filter: { id: HTML_RUNTIME_ID },
       handler(id) {
         return resolveHtmlRuntime(id);
       },

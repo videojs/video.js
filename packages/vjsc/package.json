@@ -67,6 +67,10 @@
       "types": "./dist/styles/index.d.ts",
       "default": "./dist/styles/index.js"
     },
+    "./tailwind": {
+      "types": "./dist/tailwind/index.d.ts",
+      "default": "./dist/tailwind/index.js"
+    },
     "./plugins": {
       "types": "./dist/plugins/index.d.ts",
       "default": "./dist/plugins/index.js"

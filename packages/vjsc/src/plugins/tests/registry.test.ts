@@ -6,10 +6,10 @@ import { type Plugin, type RolldownOutput, rolldown } from 'rolldown';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { vjscPlugin, vjscRegistryPlugin } from '..';
+import { defineVariants, vjscPlugin, vjscRegistryPlugin } from '..';
 import type { ComponentMeta } from '../../components';
 import type { GraphModule } from '../../graph';
-import type { VjscRegistryOptions, RegistryModuleItem } from '../../shadcn';
+import type { RegistryCatalogOptions, RegistryModuleItem, VjscRegistryOptions } from '../../shadcn';
 
 interface FixtureMeta extends ComponentMeta {
   readonly type: 'block' | 'component' | 'support';
@@ -41,6 +41,41 @@ describe('vjscRegistryPlugin', () => {
     ]);
     expect(registryFile(output, 'items', rootItem, '/root.tsx')).toContain(`from '@/components/example/ui/public'`);
     expect(output.output.some((item) => item.type === 'chunk')).toBe(false);
+  });
+
+  it('emits every catalog from one graph analysis', async () => {
+    const root = setup({
+      'components/public.tsx': `export function Public() { return <span/>; } ${meta('public')}`,
+    });
+    const transform = fixtureTransform(root);
+    const registry = vjscRegistryPlugin<FixtureMeta>({
+      ...baseOptions(),
+      catalogs: [
+        { output: 'r/default', items: { resolve: ({ module }) => describeItem(module) } },
+        { output: 'r/other', items: { resolve: ({ module }) => describeItem(module) }, meta: { catalog: 'other' } },
+      ],
+    });
+    const bundle = await rolldown({
+      input: [],
+      external: (id) => !id.startsWith('.') && !id.startsWith('/') && !id.startsWith('\0'),
+      plugins: [...transform, registry],
+    });
+    const output = await bundle.generate({ format: 'es' });
+
+    expect(assetJson(output, 'r/default/registry.json').name).toBe('example');
+    expect(registryItem(output, 'r/other/items', 'public').meta).toMatchObject({ catalog: 'other' });
+  });
+
+  it('rejects catalogs that share an output directory', () => {
+    expect(() =>
+      vjscRegistryPlugin({
+        ...baseOptions(),
+        catalogs: [
+          { output: 'r', items: {} },
+          { output: './r', items: {} },
+        ],
+      })
+    ).toThrow('Shadcn registry catalogs must use distinct outputs.');
   });
 
   it('supports item-specific installation and import roots', async () => {
@@ -103,7 +138,7 @@ describe('vjscRegistryPlugin', () => {
   });
 
   it('captures finalized virtual style assets', async () => {
-    const virtualStyle = 'virtual:vjsc/css/root';
+    const virtualStyle = 'virtual:vjsc/css/asset/root/root.css';
     const root = setup({
       'components/root.tsx': `import ${JSON.stringify(virtualStyle)}; export const Root = <main />; ${meta('root', 'block')}`,
     });
@@ -129,14 +164,10 @@ describe('vjscRegistryPlugin', () => {
             return id === virtualStyle ? `\0${virtualStyle}` : null;
           },
           load(id) {
-            return id === `\0${virtualStyle}` ? '.root { color: red; }' : null;
+            return id === `\0${virtualStyle}` ? { code: '.root { color: red; }', moduleType: 'js' } : null;
           },
           transform(_code, id) {
-            if (id === `\0${virtualStyle}`) return { code: 'export {};' };
-
-            if (!id.endsWith('/components/root.tsx')) return null;
-
-            return { meta: { moduleStyles: { files: ['buttons.css'], assets: [virtualStyle] } } };
+            return id === `\0${virtualStyle}` ? { code: 'export {};', moduleType: 'js' } : null;
           },
         },
       ]
@@ -150,7 +181,7 @@ describe('vjscRegistryPlugin', () => {
   });
 
   it('derives shared style items, dependencies, and imports from graph ownership', async () => {
-    const virtualStyle = 'virtual:vjsc/css/current/audio%2Fbuttons.css';
+    const virtualStyle = 'virtual:vjsc/css/asset/current/audio%2Fbuttons.css';
     const root = setup({
       'components/root.tsx': `import ${JSON.stringify(virtualStyle)}; export const Root = <main />; ${meta('root', 'block')}`,
       'styles/base.css': ':root { --accent: red; }',
@@ -202,11 +233,7 @@ describe('vjscRegistryPlugin', () => {
             return id === `\0${virtualStyle}` ? { code: '.button { color: var(--accent); }', moduleType: 'js' } : null;
           },
           transform(_code, id) {
-            if (id === `\0${virtualStyle}`) return { code: 'export {};' };
-
-            if (!id.endsWith('/components/root.tsx')) return null;
-
-            return { meta: { moduleStyles: { files: ['audio/buttons.css'], assets: [virtualStyle] } } };
+            return id === `\0${virtualStyle}` ? { code: 'export {};' } : null;
           },
         },
       ]
@@ -379,7 +406,7 @@ describe('vjscRegistryPlugin', () => {
   });
 });
 
-type FixtureOptions = VjscRegistryOptions<FixtureMeta>;
+type FixtureOptions = RegistryCatalogOptions<FixtureMeta>;
 
 async function build(
   root: string,
@@ -400,13 +427,21 @@ async function build(
   return bundle.generate({ format: 'es', entryFileNames: '[name].js' });
 }
 
-function fixtureTransform(root: string, transformations?: () => readonly Readonly<Record<string, string>>[]): Plugin[] {
-  return vjscPlugin<FixtureMeta>({
+type FixtureVariant = Readonly<Record<string, string>>;
+
+const fixtureVariants = defineVariants<FixtureVariant>({
+  encode: (variant) => variant,
+  decode: (params) => Object.fromEntries(params),
+});
+
+function fixtureTransform(root: string, transformations?: () => readonly FixtureVariant[]): Plugin[] {
+  return vjscPlugin<FixtureMeta, FixtureVariant>({
     entries: {
       root,
       include: './components/**/*.{ts,tsx}',
-      ...(transformations ? { resolve: { params: transformations } } : {}),
+      ...(transformations ? { variants: transformations } : {}),
     },
+    variants: fixtureVariants,
     transform: {
       components: () => [],
       styles: () => null,
@@ -414,16 +449,18 @@ function fixtureTransform(root: string, transformations?: () => readonly Readonl
   });
 }
 
-function baseOptions(overrides: Partial<FixtureOptions> = {}): FixtureOptions {
-  return {
+function baseOptions(overrides: Partial<FixtureOptions> = {}): VjscRegistryOptions<FixtureMeta> {
+  const { output, items, styles, meta, ...shared } = {
     name: 'example',
     homepage: 'https://example.com',
     namespace: '@example',
     paths: { install: 'components/example', import: '@/components/example' },
-    meta: { framework: 'react', style: 'tailwind' },
+    meta: { framework: 'react', styling: 'tailwind' },
     items: { resolve: ({ module }) => describeItem(module) },
     ...overrides,
-  };
+  } satisfies FixtureOptions;
+
+  return { ...shared, catalogs: [{ output, items, styles, meta }] };
 }
 
 function describeItem(module: GraphModule<FixtureMeta>): RegistryModuleItem<FixtureMeta> | null {

@@ -5,19 +5,13 @@ import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 import { vjscPlugin, vjscRegistryPlugin } from 'vjsc/plugins';
 
 import { skinCatalog } from './catalog.ts';
-import {
-  packageDir,
-  resolveBuildComponents,
-  resolveBuildStyles,
-  skinEntries,
-  skinMetaDefaults,
-  skinUtils,
-} from './config.ts';
+import { packageDir, skinCompilerOptions, skinEntries, skinUtils } from './config.ts';
 import { skinClassNameMergeImport } from './imports.ts';
 import { packageSkinsPlugin } from './packages/plugin.ts';
 import { formatSource } from './registry/format.ts';
 import { registryItems } from './registry/items/index.ts';
 import { registryStyles } from './registry/items/styles.ts';
+import type { VideojsCatalogMeta } from './registry/meta.ts';
 import { registryPackages, registryPaths, registryTargets } from './registry/targets.ts';
 
 export const skinBuildConfig: PackUserConfig = {
@@ -43,35 +37,35 @@ export const skinBuildConfig: PackUserConfig = {
   },
   plugins: [
     vjscPlugin({
+      ...skinCompilerOptions,
       entries: skinEntries,
-      transform: {
-        components: resolveBuildComponents,
-        styles: resolveBuildStyles,
-      },
-      meta: { defaults: skinMetaDefaults },
+      // The build only captures the graph; the registry and package writers emit everything it produces.
+      assetsOnly: true,
     }),
-    ...registryTargets.map((target) =>
-      vjscRegistryPlugin({
-        name: 'videojs',
-        homepage: 'https://videojs.org',
-        namespace: '@videojs',
+    vjscRegistryPlugin({
+      name: 'videojs',
+      homepage: 'https://videojs.org',
+      namespace: '@videojs',
+      format: formatSource,
+      paths: registryPaths,
+      imports: {
+        '@videojs/utils/style': '@/lib/resolve-class-name',
+        [skinClassNameMergeImport]: '@/lib/utils',
+      },
+      packages: registryPackages,
+      // Every Video.js dependency must install the version this registry was built from.
+      pinned: (name) => name.startsWith('@videojs/'),
+      catalogs: registryTargets.map((target) => ({
         output: target.output,
-        format: formatSource,
-        paths: registryPaths,
-        imports: {
-          '@videojs/utils/style': '@/lib/resolve-class-name',
-          [skinClassNameMergeImport]: '@/lib/utils',
-        },
-        packages: registryPackages,
         meta: {
           framework: target.framework,
-          style: target.styling,
+          styling: target.styling,
           theme: target.theme,
-        },
+        } satisfies VideojsCatalogMeta,
         items: registryItems(target),
         styles: registryStyles(target),
-      })
-    ),
+      })),
+    }),
     {
       name: 'skins:catalog',
       generateBundle() {
@@ -92,17 +86,6 @@ export const skinBuildConfig: PackUserConfig = {
       workspaceDir: resolve(packageDir, '../..'),
       format: formatSource,
     }),
-    {
-      name: 'skins:static-registry-output',
-      generateBundle: {
-        order: 'post',
-        handler(_options, bundle) {
-          for (const filename of Object.keys(bundle)) {
-            if (!filename.startsWith('r/')) delete bundle[filename];
-          }
-        },
-      },
-    },
   ],
 };
 

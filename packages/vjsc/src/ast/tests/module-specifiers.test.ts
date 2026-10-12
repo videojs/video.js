@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { analyzeImports, replaceImportSpecifiers } from '../analyze';
+import { analyzeImports, analyzeModule, replaceImportSpecifiers } from '../module-specifiers';
 
 describe('analyzeImports', () => {
   it('classifies authored module references and preserves their source ranges', () => {
@@ -69,5 +69,31 @@ describe('replaceImportSpecifiers', () => {
     ]);
 
     expect(output).toBe(`import value from '@/value';\nconst lazy = import("./installed/lazy");\n`);
+  });
+});
+
+describe('analyzeModule', () => {
+  it('lists runtime export names and skips type-only exports', () => {
+    const { exports } = analyzeModule(
+      `
+        export const { a, b: [c] } = value, d = 1;
+        export function Play() {}
+        export class Player {}
+        export enum Mode { A }
+        export type Props = {};
+        export interface Options {}
+        export { e as f, type G } from './other';
+        export * as H from './namespace';
+        export * from './all';
+        export default Play;
+      `,
+      'module.tsx'
+    );
+
+    expect(exports).toEqual(['a', 'c', 'd', 'Play', 'Player', 'Mode', 'f', 'H', 'default']);
+  });
+
+  it('names the module in parse errors', () => {
+    expect(() => analyzeModule('export const = ;', 'broken.ts')).toThrow('Cannot analyze `broken.ts`');
   });
 });

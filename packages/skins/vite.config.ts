@@ -1,23 +1,11 @@
 import { defineConfig } from 'vite-plus';
 
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
+import { packageOutputGlobs } from './build/packages/outputs.ts';
 import { registryTargets } from './build/registry/targets.ts';
 
 const packageDir = import.meta.dirname;
-const generatedPackageOutputs = [
-  { pattern: 'packages/html/src/presets/background/skin.ts', base: 'workspace' as const },
-  { pattern: 'packages/html/src/define/background/skin.css', base: 'workspace' as const },
-  { pattern: 'packages/html/src/internal/skins/**', base: 'workspace' as const },
-  { pattern: 'packages/react/src/internal/skins/**', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/skin.tsx', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/skin.css', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/neutral-skin.tsx', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/neutral-skin.css', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/compat-skin.tsx', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/scaffold-skin.tsx', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/compat-skin.css', base: 'workspace' as const },
-  { pattern: 'packages/react/src/presets/*/scaffold-skin.css', base: 'workspace' as const },
-] as const;
+const generatedPackageOutputs = packageOutputGlobs();
 
 export default defineConfig({
   run: {
@@ -91,8 +79,7 @@ export default defineConfig({
       },
       'test:ci': {
         ...packageTestTask('pnpm run test:types && vp test run'),
-        // The React target test imports `@videojs/react` exports, which skins doesn't otherwise depend on.
-        dependsOn: ['generate', '@videojs/react#build'],
+        dependsOn: ['generate'],
       },
     },
   },
