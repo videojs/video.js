@@ -1,0 +1,392 @@
+---
+title: Build your own skin
+description: Create a skin project, preview it locally, and compose your own player interface from Video.js UI components
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+
+A skin is the player interface: markup that arranges Video.js UI components inside the player, plus the styles that give it a look. The components handle playback state, keyboard support, and accessibility, so building your own skin is mostly a layout and design job.
+
+For the thinking behind our own skins, such as shapes, surfaces, motion, and contrast over video, read [Design inspiration behind the Video.js v10 skins](/blog/videojs-v10-skin-design). If a packaged skin is already close to what you want, <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> is less work.
+
+## Create a skin project
+
+The quickest way to start is a standalone skin project:
+
+```bash
+npm create @videojs/skin@latest
+```
+
+`pnpm create`, `yarn create`, and `bun create` work too. The command asks for a name, a framework (React or HTML), a styling approach (Tailwind or CSS), a starting skin, and a preset (video, audio, live video, or live audio). The starting skin defaults to **Scaffold**: every control wired up, with minimal styling and no transitions, so there's little to undo.
+
+The project goes in a folder named after the skin, so a skin called "My Skin" goes in `my-skin`. Open it and start the preview:
+
+```bash
+cd my-skin
+npm run dev
+```
+
+The project has two parts:
+
+- **`src/`** holds the skin and nothing else. Edit it however you like, including its markup, class names, theme tokens, and stylesheets.
+- **`apps/preview/`** is a workbench that plays your skin. Use it to try different player sizes and aspect ratios, light and dark color schemes, right-to-left text, every built-in language, and playback settings such as autoplay and loop.
+
+When you want to share it, `npm run deploy` publishes the preview to Vercel, Netlify, or Cloudflare Pages. When the skin is done, move `src/` into your app.
+
+## Other starting points
+
+- **Inside an existing app.** Add a skin's source with <DocsLink slug="guides/installation-shadcn">Install with Shadcn</DocsLink> and pick **Scaffold** as the skin.
+- **From nothing.** Put a <DocsLink slug="reference/components/player-container">Container</DocsLink> inside your player and add the components you want, as in the example below.
+
+No path requires Scaffold's structure, its theme tokens, or any particular CSS approach.
+
+## A minimal skin
+
+This example shows how a skin fits together without Scaffold's extra parts. It has a play button, a timeline, the current time, mute, fullscreen, keyboard shortcuts, screen reader announcements, and an error dialog. The player provides state, the Container is the skin's root, and the media element goes inside the Container next to the controls.
+
+<FrameworkCase frameworks={["html"]}>
+
+```html title="index.html"
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
+  import '@videojs/html/ui/controls';
+  import '@videojs/html/ui/controls-content';
+  import '@videojs/html/ui/controls-group';
+  import '@videojs/html/ui/play-button';
+  import '@videojs/html/ui/time-slider';
+  import '@videojs/html/ui/slider-track';
+  import '@videojs/html/ui/slider-buffer';
+  import '@videojs/html/ui/slider-fill';
+  import '@videojs/html/ui/slider-thumb';
+  import '@videojs/html/ui/time';
+  import '@videojs/html/ui/mute-button';
+  import '@videojs/html/ui/fullscreen-button';
+  import '@videojs/html/ui/hotkey';
+  import '@videojs/html/ui/status-announcer';
+  import '@videojs/html/ui/error-dialog';
+  import '@videojs/html/ui/dialog-popup';
+  import '@videojs/html/ui/dialog-title';
+  import '@videojs/html/ui/dialog-description';
+  import '@videojs/html/ui/dialog-close';
+</script>
+
+<video-player>
+  <media-container class="video-skin">
+    <video src="video.mp4" playsinline></video>
+
+    <media-controls>
+      <media-controls-content class="video-skin-controls">
+        <media-time-slider class="video-skin-time-slider">
+          <media-slider-track class="video-skin-track">
+            <media-slider-buffer class="video-skin-buffer"></media-slider-buffer>
+            <media-slider-fill class="video-skin-fill"></media-slider-fill>
+          </media-slider-track>
+          <media-slider-thumb class="video-skin-thumb"></media-slider-thumb>
+        </media-time-slider>
+
+        <media-controls-group class="video-skin-controls-group" aria-label="Playback controls">
+          <media-play-button class="video-skin-play">
+            <span class="show-when-paused">Play</span>
+            <span class="show-when-playing">Pause</span>
+          </media-play-button>
+          <media-time type="current"></media-time>
+          <media-mute-button class="video-skin-mute">
+            <span class="show-when-muted">Unmute</span>
+            <span class="show-when-unmuted">Mute</span>
+          </media-mute-button>
+          <media-fullscreen-button class="video-skin-fullscreen">
+            <span class="show-when-fullscreen">Exit fullscreen</span>
+            <span class="show-when-not-fullscreen">Fullscreen</span>
+          </media-fullscreen-button>
+        </media-controls-group>
+      </media-controls-content>
+    </media-controls>
+
+    <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+    <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+    <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+    <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+    <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+
+    <media-status-announcer></media-status-announcer>
+
+    <media-error-dialog>
+      <media-dialog-popup class="video-skin-error">
+        <media-dialog-title></media-dialog-title>
+        <media-dialog-description></media-dialog-description>
+        <media-dialog-close></media-dialog-close>
+      </media-dialog-popup>
+    </media-error-dialog>
+  </media-container>
+</video-player>
+```
+
+The `@videojs/html/video/player` import registers `<video-player>` with the video features, which hold the state these controls need. Some controls, such as Cast or Quality, depend on features that not every preset includes. Each control's reference page names the feature it needs.
+
+</FrameworkCase>
+<FrameworkCase frameworks={["react"]}>
+
+```tsx title="VideoSkin.tsx"
+import {
+  Container,
+  Controls,
+  ErrorDialog,
+  FullscreenButton,
+  Hotkey,
+  MuteButton,
+  PlayButton,
+  StatusAnnouncer,
+  Time,
+  TimeSlider,
+} from '@videojs/react';
+import type { ReactNode } from 'react';
+import './video-skin.css';
+
+export function VideoSkin({ children }: { children: ReactNode }) {
+  return (
+    <Container className="video-skin">
+      {children}
+
+      <Controls.Root>
+        <Controls.Content className="video-skin-controls">
+          <TimeSlider.Root className="video-skin-time-slider">
+            <TimeSlider.Track className="video-skin-track">
+              <TimeSlider.Buffer className="video-skin-buffer" />
+              <TimeSlider.Fill className="video-skin-fill" />
+            </TimeSlider.Track>
+            <TimeSlider.Thumb className="video-skin-thumb" />
+          </TimeSlider.Root>
+
+          <Controls.Group className="video-skin-controls-group" aria-label="Playback controls">
+            <PlayButton
+              className="video-skin-play"
+              render={(props, state) => <button {...props}>{state.paused ? 'Play' : 'Pause'}</button>}
+            />
+            <Time.Value type="current" />
+            <MuteButton
+              className="video-skin-mute"
+              render={(props, state) => <button {...props}>{state.muted ? 'Unmute' : 'Mute'}</button>}
+            />
+            <FullscreenButton
+              className="video-skin-fullscreen"
+              render={(props, state) => (
+                <button {...props}>{state.fullscreen ? 'Exit fullscreen' : 'Fullscreen'}</button>
+              )}
+            />
+          </Controls.Group>
+        </Controls.Content>
+      </Controls.Root>
+
+      <Hotkey keys="Space" action="togglePaused" />
+      <Hotkey keys="m" action="toggleMuted" />
+      <Hotkey keys="f" action="toggleFullscreen" />
+      <Hotkey keys="ArrowLeft" action="seekStep" value={-5} />
+      <Hotkey keys="ArrowRight" action="seekStep" value={5} />
+
+      <StatusAnnouncer />
+
+      <ErrorDialog.Root>
+        <ErrorDialog.Popup className="video-skin-error">
+          <ErrorDialog.Title />
+          <ErrorDialog.Description />
+          <ErrorDialog.Close />
+        </ErrorDialog.Popup>
+      </ErrorDialog.Root>
+    </Container>
+  );
+}
+```
+
+Use it the same way as a packaged skin, with the media as its child:
+
+```tsx title="Player.tsx"
+import { createPlayer } from '@videojs/react';
+import { Video, videoFeatures } from '@videojs/react/video';
+import { VideoSkin } from './VideoSkin';
+
+const { Player } = createPlayer({ features: videoFeatures });
+
+export function VideoPlayer() {
+  return (
+    <Player>
+      <VideoSkin>
+        <Video src="video.mp4" playsInline />
+      </VideoSkin>
+    </Player>
+  );
+}
+```
+
+`videoFeatures` gives the player the state these controls need. Some controls, such as Cast or Quality, depend on features that not every preset includes. Each control's reference page names the feature it needs.
+
+</FrameworkCase>
+
+This CSS places the controls over the video, hides them when the viewer is idle, draws the timeline, and keeps the error dialog hidden until playback fails:
+
+```css title="video-skin.css"
+.video-skin {
+  position: relative;
+  display: block;
+}
+
+.video-skin video {
+  display: block;
+  width: 100%;
+}
+
+.video-skin-controls {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 12px;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.7), transparent);
+  color: white;
+  transition: opacity 0.25s;
+}
+
+/* Keep controls visible while something inside them has keyboard focus. */
+.video-skin-controls:not([data-visible]):not(:has(:focus-visible)) {
+  opacity: 0;
+}
+
+.video-skin-controls-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* The slider sets its progress as CSS custom properties. */
+.video-skin-time-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  cursor: pointer;
+}
+
+.video-skin-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgb(255 255 255 / 0.3);
+  border-radius: 9999px;
+}
+
+.video-skin-buffer,
+.video-skin-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+}
+
+.video-skin-buffer {
+  width: var(--media-slider-buffer);
+  background: rgb(255 255 255 / 0.4);
+}
+
+.video-skin-fill {
+  width: var(--media-slider-fill);
+  background: white;
+}
+
+.video-skin-thumb {
+  position: absolute;
+  left: var(--media-slider-fill);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  translate: -50% 0;
+}
+
+.video-skin-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 12px;
+  place-content: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 0.85);
+  color: white;
+  text-align: center;
+}
+
+.video-skin-error:not([data-open]) {
+  display: none;
+}
+```
+
+<FrameworkCase frameworks={["html"]}>
+Each button in the HTML example holds a label for every state. Show only the one that matches:
+
+```css title="video-skin.css"
+.video-skin-play:not([data-paused]) .show-when-paused,
+.video-skin-play[data-paused] .show-when-playing,
+.video-skin-mute:not([data-muted]) .show-when-muted,
+.video-skin-mute[data-muted] .show-when-unmuted,
+.video-skin-fullscreen:not([data-fullscreen]) .show-when-fullscreen,
+.video-skin-fullscreen[data-fullscreen] .show-when-not-fullscreen {
+  display: none;
+}
+```
+</FrameworkCase>
+
+From here, add the components your design needs.
+
+## Pick the components
+
+Each skin is made of the same building blocks. Use the ones your design needs; their reference pages cover props, state, data attributes, and examples.
+
+| Purpose | Components |
+| ------- | ---------- |
+| Player surface, fullscreen and activity target | <DocsLink slug="reference/components/player-container">Container</DocsLink> |
+| Show and hide controls with user activity | <DocsLink slug="reference/components/controls">Controls</DocsLink> |
+| Playback buttons | <DocsLink slug="reference/components/play-button">Play button</DocsLink>, <DocsLink slug="reference/components/seek-button">Seek button</DocsLink>, <DocsLink slug="reference/components/mute-button">Mute button</DocsLink>, <DocsLink slug="reference/components/playback-rate-button">Playback rate button</DocsLink>, <DocsLink slug="reference/components/live-button">Live button</DocsLink> |
+| Screen and device buttons | <DocsLink slug="reference/components/fullscreen-button">Fullscreen button</DocsLink>, <DocsLink slug="reference/components/pip-button">Picture-in-picture button</DocsLink>, <DocsLink slug="reference/components/airplay-button">AirPlay button</DocsLink>, <DocsLink slug="reference/components/cast-button">Cast button</DocsLink>, <DocsLink slug="reference/components/captions-button">Captions button</DocsLink> |
+| Timeline and volume | <DocsLink slug="reference/components/time-slider">Time slider</DocsLink>, <DocsLink slug="reference/components/volume-slider">Volume slider</DocsLink>, <DocsLink slug="reference/components/volume-popover">Volume popover</DocsLink>, <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink>, <DocsLink slug="reference/components/time">Time</DocsLink> |
+| Menus and popups | <DocsLink slug="reference/components/menu">Menu</DocsLink>, <DocsLink slug="reference/components/popover">Popover</DocsLink>, <DocsLink slug="reference/components/tooltip">Tooltip</DocsLink>, and the radio groups for <DocsLink slug="reference/components/captions-radio-group">captions</DocsLink>, <DocsLink slug="reference/components/quality-radio-group">quality</DocsLink>, <DocsLink slug="reference/components/playback-rate-radio-group">playback rate</DocsLink>, and <DocsLink slug="reference/components/audio-track-radio-group">audio tracks</DocsLink> |
+| Media details and loading | <DocsLink slug="reference/components/title">Title</DocsLink>, <DocsLink slug="reference/components/poster">Poster</DocsLink>, <DocsLink slug="reference/components/buffering-indicator">Buffering indicator</DocsLink> |
+| Feedback after an action | <DocsLink slug="reference/components/seek-indicator">Seek indicator</DocsLink>, <DocsLink slug="reference/components/volume-indicator">Volume indicator</DocsLink>, <DocsLink slug="reference/components/status-indicator">Status indicator</DocsLink> |
+| Errors | <DocsLink slug="reference/components/error-dialog">Error dialog</DocsLink> |
+| Keyboard, gestures, and announcements | <DocsLink slug="reference/components/hotkey">Hotkey</DocsLink>, <DocsLink slug="reference/components/gesture">Gesture</DocsLink>, <DocsLink slug="reference/components/status-announcer">Status announcer</DocsLink> |
+| Icons | <DocsLink slug="reference/components/icons">Icons</DocsLink> |
+
+Some of these are easy to leave out by accident because they have little or no visible UI. Include the error dialog, keyboard shortcuts, and status announcer unless you replace them with your own.
+
+<FrameworkCase frameworks={["html"]}>
+Import the registration for every element you use, including the parts of compound components. Each reference page lists its imports.
+</FrameworkCase>
+
+To build a control Video.js doesn't provide, follow <DocsLink slug="guides/build-your-own-component">Build your own UI component</DocsLink>.
+
+## Style it your way
+
+The components bring no visual styles. You add the icons, text, and CSS. They describe their state with `data-*` attributes, such as `data-paused` on the play button, so you can style them with plain CSS, Tailwind, or anything else. <DocsLink slug="guides/ui-components">UI components</DocsLink> explains how. <DocsLink slug="guides/controls">Automatically show and hide controls</DocsLink> covers the controls' visibility states.
+
+Lay out controls in source order that matches their visual order, so keyboard focus follows the layout.
+
+## Support the public CSS properties
+
+If the skin is only for your own site, you can skip this.
+
+If you want to offer it as a Video.js skin, support the same CSS custom properties as the packaged skins, such as `--media-accent-color` and `--media-border-radius`. People can then restyle your skin the same way they restyle ours. <DocsLink slug="guides/customize-skins" anchor="set-the-skins-styles">Set the skin's styles</DocsLink> lists them. We're still working out how to accept community skins into Video.js.
+
+## Test it
+
+Check the finished skin with real media, at the narrowest player size you support:
+
+- Play, pause, seek, change volume, open every menu, and enter fullscreen.
+- Use only a keyboard, then only touch. Focus stays visible and follows the layout, and controls hide when idle.
+- Check loading, errors, ended playback, captions, and controls the browser doesn't support.
+- Check text and icon contrast over bright and dark footage, with forced colors, and with reduced motion.
+
+<DocsLink slug="guides/accessibility">Accessibility</DocsLink> covers these checks in more detail.
+
+## Related guides
+
+- <DocsLink slug="guides/skins">Skins</DocsLink>
+- <DocsLink slug="guides/customize-skins">Customize skins</DocsLink>
+- <DocsLink slug="guides/build-your-own-component">Build your own UI component</DocsLink>
