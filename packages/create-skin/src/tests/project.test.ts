@@ -21,7 +21,6 @@ describe('createProject', () => {
     expect(skinDirectory).toBe('src/video');
     expect(skinFiles.sort()).toEqual([
       'src/lib/resolve-class-name.ts',
-      'src/lib/utils.ts',
       'src/skin.css',
       'src/styles/theme.css',
       'src/video/skin.tsx',

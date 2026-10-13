@@ -19,7 +19,6 @@ describe('resolveRegistrySkin', () => {
 
     expect([...skin.files.keys()].sort()).toEqual([
       'src/lib/resolve-class-name.ts',
-      'src/lib/utils.ts',
       'src/styles/theme.css',
       'src/video/skin.tsx',
     ]);
@@ -30,10 +29,8 @@ describe('resolveRegistrySkin', () => {
       react: '',
     });
     expect(Object.fromEntries(skin.themeVars)).toEqual({ 'color-media-accent': 'var(--media-accent)' });
-    // A plain `cn` reads `text-media` as a color and drops the skin's `text-media-*` colors.
-    expect(skin.files.get('src/lib/utils.ts')).toContain(
-      "text: ['media', 'media-xs', 'media-sm', 'media-lg', 'media-xl']"
-    );
+    // The registry's own `cn` knows the skin's theme, so merged `text-media-*` colors survive; no Shadcn `utils` is needed.
+    expect(skin.files.get('src/lib/resolve-class-name.ts')).toContain('export const cn = createCn(');
   });
 
   it('reports a missing local registry build', async () => {
@@ -55,7 +52,7 @@ describe('projectPath', () => {
   it('gives the skin all of src', () => {
     expect(projectPath('@components/videojs/video/skin.tsx')).toBe('src/video/skin.tsx');
     expect(projectPath('@components/other/thing.tsx')).toBe('src/components/other/thing.tsx');
-    expect(projectPath('@lib/utils.ts')).toBe('src/lib/utils.ts');
+    expect(projectPath('@lib/resolve-class-name.ts')).toBe('src/lib/resolve-class-name.ts');
     expect(() => projectPath('~/elsewhere.ts')).toThrow(/Unsupported/);
   });
 });
@@ -63,8 +60,10 @@ describe('projectPath', () => {
 describe('rewriteImports', () => {
   it('points imports at the flattened skin', () => {
     expect(
-      rewriteImports("import { Button } from '@/components/videojs/ui/button';\nimport { cn } from '@/lib/utils';")
-    ).toBe("import { Button } from '@/ui/button';\nimport { cn } from '@/lib/utils';");
+      rewriteImports(
+        "import { Button } from '@/components/videojs/ui/button';\nimport { cn } from '@/lib/resolve-class-name';"
+      )
+    ).toBe("import { Button } from '@/ui/button';\nimport { cn } from '@/lib/resolve-class-name';");
   });
 });
 

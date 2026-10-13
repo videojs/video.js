@@ -35,22 +35,6 @@ export interface ResolvedSkin {
   css: CssTree;
 }
 
-/**
- * Shadcn's built-in `utils` item, which every Video.js React item imports `cn` from. The skin's font sizes share the
- * `text-` prefix with its colors, so a plain `cn` reads `text-media` as a color and drops
- * `text-media-popover-foreground`. Registering them as font sizes keeps both. The skin owns `src/lib`, so this never
- * changes an app's own `cn`.
- */
-const SHADCN_UTILS = [
-  "import { createCn } from 'cn/config';",
-  '',
-  "// The skin's font sizes share the text- prefix with its colors; registering them keeps text-media-* colors intact.",
-  'export const cn = createCn({',
-  "  extend: { classGroups: { 'font-size': [{ text: ['media', 'media-xs', 'media-sm', 'media-lg', 'media-xl'] }] } },",
-  '});',
-  '',
-].join('\n');
-
 /** The catalog path for a selection, matching `registryNamespaceUrl` in `@videojs/installation`. */
 export function registryCatalog(framework: RegistryFramework, styling: RegistryStyling, theme: RegistryTheme): string {
   const target = framework === 'react' && styling === 'css' ? 'react/css' : framework;
@@ -60,7 +44,8 @@ export function registryCatalog(framework: RegistryFramework, styling: RegistryS
 
 /**
  * Map a Shadcn target to the project. The skin owns `src/`, so the `videojs` folder Shadcn nests it in is dropped:
- * `@components/videojs/video/skin.tsx` → `src/video/skin.tsx`, `@lib/utils.ts` → `src/lib/utils.ts`.
+ * `@components/videojs/video/skin.tsx` → `src/video/skin.tsx`, `@lib/resolve-class-name.ts` →
+ * `src/lib/resolve-class-name.ts`.
  */
 export function projectPath(target: string): string {
   const match = /^@(components|lib|hooks)\/(.+)$/.exec(target);
@@ -159,7 +144,6 @@ export async function resolveRegistrySkin(options: {
     for (const dependency of item.registryDependencies ?? []) {
       if (dependency.startsWith(`${REGISTRY_NAMESPACE}/`))
         pending.push(dependency.slice(REGISTRY_NAMESPACE.length + 1));
-      else if (dependency === 'utils') resolved.files.set('src/lib/utils.ts', SHADCN_UTILS);
       else throw new Error(`Unsupported registry dependency "${dependency}" in ${catalog}/${name}.`);
     }
   }
