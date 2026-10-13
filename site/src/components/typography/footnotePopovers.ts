@@ -2,7 +2,7 @@ const ENHANCED_ATTR = 'data-footnote-popover';
 
 // Matches the site's Base UI popups (see `AppearanceMenu`); the popover sits under `<body>`, so it inherits text color.
 const POPOVER_CLASS =
-  'footnote-popover rounded-lg corner-squircle border border-line bg-surface-raised p-4 text-p3 shadow-lg dark:bg-soot [&_p]:my-0 [&_p+p]:mt-2';
+  'footnote-popover rounded-lg corner-squircle ring-1 ring-black/10 dark:ring-white/10 bg-surface-raised p-4 text-p3 shadow-lg dark:bg-soot [&_p]:my-0 [&_p+p]:mt-2';
 
 let popoverCount = 0;
 

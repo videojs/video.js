@@ -53,7 +53,6 @@ export default function CardCheckboxGroup<T extends string = string>({
               'rounded-xl corner-squircle border bg-surface p-3 ring-1 ring-transparent',
               'transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out',
               'intent:-translate-y-0.5 intent:shadow-md motion-reduce:intent:translate-y-0',
-              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
               isSelected
                 ? 'border-accent bg-surface-raised shadow-sm ring-accent'
                 : 'border-line intent:border-line-strong'

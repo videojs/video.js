@@ -1,6 +1,6 @@
 {
   "name": "@videojs/core",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Core components and utilities for Video.js",
   "keywords": [
     "core",

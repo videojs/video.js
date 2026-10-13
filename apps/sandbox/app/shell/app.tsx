@@ -29,7 +29,14 @@ import { CAPTIONS_MODES, type CaptionsMode } from '@app/shared/captions';
 import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } from '@app/shared/player-frame';
 import { skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '@app/shared/skin-sources';
-import { DEFAULT_SOURCE, SOURCES, type SourceId } from '@app/shared/sources';
+import {
+  DEFAULT_SOURCE,
+  PLAYERJS_SOURCE_IDS,
+  SOURCE_IDS,
+  SOURCES,
+  type SourceId,
+  YOUTUBE_SOURCE_IDS,
+} from '@app/shared/sources';
 import type { Platform, SkinSource, Styling } from '@app/types';
 import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
@@ -44,6 +51,9 @@ function readMedia(params: URLSearchParams): MediaId {
 
   return isMediaId(value) ? value : 'video';
 }
+
+// Embed sources are listed apart from SOURCE_IDS, but a shared link may name any of them.
+const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS];
 
 function readOption<T extends string, const Fallback>(
   values: readonly T[],
@@ -79,8 +89,8 @@ function readParams() {
     skins: readSkins(params.get('skins'), platform),
     media,
     skin: readOption(SKINS, params.get('skin'), 'default'),
-    // An explicit `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
-    source: (params.get('source') ?? MEDIA[media].entrySource ?? DEFAULT_SOURCE) as SourceId,
+    // A valid `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
+    source: readOption(LINKABLE_SOURCE_IDS, params.get('source'), MEDIA[media].entrySource ?? DEFAULT_SOURCE),
     autoplay: params.get('autoplay') === '1',
     muted: params.get('muted') === '1',
     loop: params.get('loop') === '1',
