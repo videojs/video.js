@@ -196,8 +196,11 @@ const REQUIRED_FIELDS = ['sideEffects', 'files', 'exports'];
 /** Required only when the package has a root "." export. */
 const ROOT_EXPORT_FIELDS = ['main', 'module', 'types'];
 
-/** The only package that publishes an executable. It is bin-only, so library fields don't apply. */
+/** The package that publishes the `videojs` executable. It is bin-only, so library fields don't apply. */
 const CLI_PACKAGE_DIR = 'cli';
+
+/** `npm create @videojs/<name>` runs `@videojs/create-<name>`, so these scaffolders ship their own bin. */
+const CREATE_PACKAGE_DIR_PREFIX = 'create-';
 
 /**
  * `npx @videojs/cli` runs the package's only bin, which installs globally as `videojs`, and every cold run downloads
@@ -226,6 +229,30 @@ function cliMetadataWarnings(pkg) {
   return warnings;
 }
 
+/**
+ * `npm create @videojs/<name>` runs the only bin of `@videojs/create-<name>`. Like the CLI, it is one bundled file with
+ * no runtime dependencies, plus the template files it copies.
+ */
+function createMetadataWarnings(dir, pkg) {
+  const warnings = [];
+
+  if (JSON.stringify(Object.keys(pkg.bin ?? {})) !== JSON.stringify([dir]) || typeof pkg.bin[dir] !== 'string') {
+    warnings.push(`${pkg.name}: "bin" should be { "${dir}": "<path>" } so \`npm create\` runs its only command`);
+  }
+
+  if (JSON.stringify(pkg.files) !== JSON.stringify(['dist', 'templates'])) {
+    warnings.push(`${pkg.name}: "files" should be ["dist", "templates"]`);
+  }
+
+  for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
+    if (Object.keys(pkg[field] ?? {}).length > 0) {
+      warnings.push(`${pkg.name}: "${field}" should be empty; bundle workspace code into the bin instead`);
+    }
+  }
+
+  return warnings;
+}
+
 function checkPackageMetadata() {
   const warnings = [];
 
@@ -243,8 +270,13 @@ function checkPackageMetadata() {
       continue;
     }
 
+    if (dir.startsWith(CREATE_PACKAGE_DIR_PREFIX)) {
+      warnings.push(...createMetadataWarnings(dir, pkg));
+      continue;
+    }
+
     if (pkg.bin !== undefined) {
-      warnings.push(`${pkg.name}: remove "bin"; command line tools ship in @videojs/cli`);
+      warnings.push(`${pkg.name}: remove "bin"; command line tools ship in @videojs/cli or a create-* package`);
     }
 
     for (const field of REQUIRED_FIELDS) {
