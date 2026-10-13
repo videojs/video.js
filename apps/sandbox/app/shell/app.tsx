@@ -44,6 +44,7 @@ import { Navbar, SkinControls } from './navbar';
 import { OptionsPanel } from './options-panel';
 import { type FrameParams, Preview } from './preview';
 import { describeError, MAX_ERRORS, type RelayedError, usePreferences } from './report';
+import { createUrlWriter } from './url';
 
 /** `preset` named this parameter before the skins' player presets took the word, so older links still resolve. */
 function readMedia(params: URLSearchParams): MediaId {
@@ -53,6 +54,8 @@ function readMedia(params: URLSearchParams): MediaId {
 }
 
 // Embed sources are listed apart from SOURCE_IDS, but a shared link may name any of them.
+const writeUrl = createUrlWriter();
+
 const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS];
 
 function readOption<T extends string, const Fallback>(
@@ -266,7 +269,7 @@ export function App() {
       if (mirror) params.set('mirror', '1');
     }
 
-    history.replaceState(null, '', `/?${params}`);
+    writeUrl(`/?${params}`);
   }, [
     platform,
     styling,
