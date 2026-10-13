@@ -871,6 +871,9 @@ importers:
       '@types/node':
         specifier: ^22.18.6
         version: 22.20.1
+      '@videojs/core':
+        specifier: workspace:*
+        version: link:../core
       '@videojs/installation':
         specifier: workspace:*
         version: link:../installation

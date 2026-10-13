@@ -33,6 +33,6 @@ export default defineConfig({
     dts: false,
     banner: { js: '#!/usr/bin/env node' },
     // `npm create` fetches one file and the templates beside it, which only need Node built-ins.
-    deps: { alwaysBundle: ['@clack/prompts', '@videojs/installation', '@videojs/utils'] },
+    deps: { alwaysBundle: ['@clack/prompts', '@videojs/core', '@videojs/installation', '@videojs/utils'] },
   },
 });

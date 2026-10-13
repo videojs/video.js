@@ -6,7 +6,10 @@ import packageJson from '../package.json' with { type: 'json' };
  */
 export const VERSIONS = {
   videojs: packageJson.version,
+  baseUi: '^1.6.0',
+  classVarianceAuthority: '^0.7.1',
   cn: '^0.4.0',
+  heroicons: '^2.2.0',
   react: '^19.3.0',
   reactTypes: '^19.3.0',
   tailwind: '^4.3.3',

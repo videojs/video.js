@@ -11,7 +11,8 @@
     "isolatedModules": true,
     "types": ["vite/client"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@preview/*": ["./apps/preview/src/*"]
     }
   },
   "include": ["src", "apps"]

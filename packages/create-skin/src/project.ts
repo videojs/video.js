@@ -6,6 +6,7 @@ import { BASE_SKIN_LABELS, FRAMEWORK_LABELS, PRESET_LABELS, STYLING_LABELS, type
 import { htmlPlayer, presetModule, reactPlayer } from './player';
 import { resolveRegistrySkin, type ResolvedSkin } from './registry';
 import { VERSIONS } from './versions';
+import { workbenchConfig } from './workbench';
 
 /** Template files ship beside `dist/` in the published package. */
 const TEMPLATES = new URL('../templates/', import.meta.url);
@@ -60,30 +61,27 @@ function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSk
   // The preview plays Mux media; the adapter is an optional peer of the framework packages.
   dependencies.set(`@videojs/mux-${presetModule(options.preset).kind}`, videojsVersion);
 
-  if (isReact) {
-    dependencies.set('react', VERSIONS.react);
-    dependencies.set('react-dom', VERSIONS.react);
-  }
+  // The workbench shell is React with Shadcn components, whichever framework the skin is written for.
+  dependencies.set('react', VERSIONS.react);
+  dependencies.set('react-dom', VERSIONS.react);
+  dependencies.set('@base-ui/react', VERSIONS.baseUi);
+  dependencies.set('@heroicons/react', VERSIONS.heroicons);
+  dependencies.set('class-variance-authority', VERSIONS.classVarianceAuthority);
+  dependencies.set('cn', VERSIONS.cn);
 
   for (const [name, version] of dependencies) {
     if (!version) dependencies.set(name, name === 'cn' ? VERSIONS.cn : 'latest');
   }
 
   const devDependencies = new Map<string, string>([
+    ['@tailwindcss/vite', VERSIONS.tailwind],
+    ['@types/react', VERSIONS.reactTypes],
+    ['@types/react-dom', VERSIONS.reactTypes],
+    ['@vitejs/plugin-react', VERSIONS.vitePluginReact],
+    ['tailwindcss', VERSIONS.tailwind],
     ['typescript', VERSIONS.typescript],
     ['vite', VERSIONS.vite],
   ]);
-
-  if (isReact) {
-    devDependencies.set('@types/react', VERSIONS.reactTypes);
-    devDependencies.set('@types/react-dom', VERSIONS.reactTypes);
-    devDependencies.set('@vitejs/plugin-react', VERSIONS.vitePluginReact);
-  }
-
-  if (options.styling === 'tailwind') {
-    devDependencies.set('@tailwindcss/vite', VERSIONS.tailwind);
-    devDependencies.set('tailwindcss', VERSIONS.tailwind);
-  }
 
   for (const [name, specifier] of Object.entries(options.overrides)) {
     if (dependencies.has(name)) dependencies.set(name, specifier);
@@ -155,7 +153,7 @@ A Video.js ${PRESET_LABELS[options.preset].toLowerCase()} skin for ${FRAMEWORK_L
 ${run} dev
 \`\`\`
 
-The preview shows your skin in a player. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/player\`.
+The workbench opens your skin in a slimmed-down version of the Video.js sandbox. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/frame/player\`. The options panel sets the player's width and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay, muted, loop, and preload. The arrow button opens the preview on its own.
 
 ## Where things live
 
@@ -163,8 +161,9 @@ The preview shows your skin in a player. It plays NASA's Cosmic Dawn trailer fro
   - \`src/${options.preset}/\`: the skin component and its parts.
   - \`src/styles/\`: theme tokens and shared styles the skin imports, when it started from a packaged skin.
   - \`src/skin.css\`: global styles for the skin.
-- \`apps/preview/\`: the page that previews the skin. You don't need to change it.
-  - \`src/player\`: mounts your skin in a player and sets the media it plays.
+- \`apps/preview/\`: the workbench that previews the skin. You don't need to change it.
+  - \`src/shell/\`: the Shadcn shell.
+  - \`src/frame/\`: the page the shell frames. \`player\` mounts your skin in a player and sets the media it plays.
   - \`public/\`: files the preview serves, such as the chapters track.
 - \`skin.json\`: what this skin is built from. Keep it; it records the Video.js version the skin was created with.
 
@@ -176,32 +175,22 @@ The preview shows your skin in a player. It plays NASA's Cosmic Dawn trailer fro
 `;
 }
 
-function viteConfig(options: SkinOptions): string {
-  const imports = [];
-  const plugins = [];
-
-  if (options.styling === 'tailwind') {
-    imports.push("import tailwindcss from '@tailwindcss/vite';");
-    plugins.push('tailwindcss()');
-  }
-
-  if (options.framework === 'react') {
-    imports.push("import react from '@vitejs/plugin-react';");
-    plugins.push('react()');
-  }
-
+function viteConfig(): string {
   return `import { fileURLToPath, URL } from 'node:url';
 
-${[...imports, "import { defineConfig } from 'vite';"].join('\n')}
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 const path = (file: string) => fileURLToPath(new URL(file, import.meta.url));
 
-// The preview in apps/preview serves the app; \`@/\` imports reach the skin in src/.
+// The workbench in apps/preview serves the app; \`@/\` imports reach the skin in src/.
 export default defineConfig({
   root: path('./apps/preview'),
-  plugins: [${plugins.join(', ')}],
+  plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
+      '@preview': path('./apps/preview/src'),
       '@': path('./src'),
     },
   },
@@ -211,6 +200,10 @@ export default defineConfig({
   build: {
     outDir: path('./dist'),
     emptyOutDir: true,
+    rolldownOptions: {
+      // The workbench shell, and the preview page it frames.
+      input: { workbench: path('./apps/preview/index.html'), preview: path('./apps/preview/preview.html') },
+    },
   },
 });
 `;
@@ -219,7 +212,7 @@ export default defineConfig({
 function agentsGuide(options: SkinOptions): string {
   return `# Agent guide
 
-This project is a Video.js ${FRAMEWORK_LABELS[options.framework]} skin. The skin is everything in \`src/\`, starting from \`src/${options.preset}/skin\`. \`apps/preview/\` is a page that previews it; change it only when asked.
+This project is a Video.js ${FRAMEWORK_LABELS[options.framework]} skin. The skin is everything in \`src/\`, starting from \`src/${options.preset}/skin\`. \`apps/preview/\` is a workbench that previews it; change it only when asked.
 
 - Run \`npx @videojs/cli agents skills\` to install the Video.js skill, and read https://videojs.org/docs/framework/${options.framework}/guides/build-your-own-skin before changing the skin.
 - Keep the error dialog, hotkeys, and status announcer unless you replace them.
@@ -247,7 +240,7 @@ export async function createProject(options: SkinOptions, packageName: string): 
     for (const [path, source] of await readTemplateDirectory(directory)) files.set(path, fill(source, templateValues));
   }
 
-  files.set('vite.config.ts', viteConfig(options));
+  files.set('vite.config.ts', viteConfig());
   files.set(
     'src/skin.css',
     options.styling === 'tailwind'
@@ -255,8 +248,9 @@ export async function createProject(options: SkinOptions, packageName: string): 
       : '/* Global styles for the skin, loaded only in the preview. */\n'
   );
 
+  files.set('apps/preview/src/shell/config.ts', workbenchConfig(options, packageName));
   files.set(
-    options.framework === 'react' ? 'apps/preview/src/player.tsx' : 'apps/preview/src/player.ts',
+    options.framework === 'react' ? 'apps/preview/src/frame/player.tsx' : 'apps/preview/src/frame/player.ts',
     options.framework === 'react' ? reactPlayer(options.preset) : htmlPlayer(options.preset)
   );
 

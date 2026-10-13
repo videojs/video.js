@@ -41,7 +41,7 @@ describe('bin', () => {
     expect(result.stdout).toContain('Edit your skin in src/video');
     expect(result.stdout).toContain('--framework react --styling tailwind --base scaffold --preset video --no-install');
     expect(existsSync(join(directory, 'src/video/skin.tsx'))).toBe(true);
-    expect(existsSync(join(directory, 'apps/preview/src/player.tsx'))).toBe(true);
+    expect(existsSync(join(directory, 'apps/preview/src/shell/app.tsx'))).toBe(true);
   });
 
   it('asks for the choices it cannot prompt for without a terminal', () => {

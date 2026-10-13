@@ -1,8 +1,9 @@
 # @videojs/create-skin
 
-Create a local project for building your own [Video.js](https://videojs.org) skin. It copies a skin's source into a
-new Vite project with a page that previews it. The preview plays NASA's Cosmic Dawn trailer from Mux, with chapters;
-change the media in `apps/preview/src/player`.
+Create a local workbench for building your own [Video.js](https://videojs.org) skin. It copies a skin's source into a
+new Vite project and opens it in a slimmed-down version of the Video.js sandbox, where you can set the player's width
+and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay and loop. The preview plays NASA's Cosmic Dawn trailer from Mux, with chapters; change
+the media in `apps/preview/src/frame/player`.
 
 ## Usage
 
@@ -34,7 +35,7 @@ Run with `--help` for every option.
 ## What you get
 
 - `src/`: the skin, and nothing else, so it can move into an app as it is. The component is `src/<preset>/skin`.
-- `apps/preview/`: a page that mounts the skin in a player.
+- `apps/preview/`: the workbench, a Shadcn shell that frames a page mounting the skin in a player.
 - `skin.json`: what the skin was created from, including the Video.js version.
 
 Packaged skins come from the same [Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn)
