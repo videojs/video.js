@@ -64,8 +64,7 @@
 
     { "path": "packages/video.js" },
 
-    { "path": "packages/cli" },
-    { "path": "packages/create-skin" }
+    { "path": "packages/cli" }
   ],
   "files": []
 }

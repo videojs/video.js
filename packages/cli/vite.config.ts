@@ -1,7 +1,36 @@
+import { execFileSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
+import { join, relative } from 'node:path';
+
 import { defineConfig } from 'vite-plus';
 
 import { baseConfig } from '../../build/pack.ts';
-import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
+import { packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
+
+const templatesDir = join(import.meta.dirname, 'templates/skin');
+
+/**
+ * `skin create` downloads its templates from the commit the CLI was built from, so a CLI version always gets its own.
+ * CI builds name it in `GITHUB_SHA`; local builds read it from git. Local runs pass `--templates` with this folder.
+ */
+function skinTemplates() {
+  let ref = process.env.GITHUB_SHA;
+
+  if (!ref) {
+    try {
+      ref = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+    } catch {
+      ref = 'main';
+    }
+  }
+
+  const files = readdirSync(templatesDir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(templatesDir, join(entry.parentPath, entry.name)))
+    .sort();
+
+  return { ref, files };
+}
 
 export default defineConfig({
   run: {
@@ -9,10 +38,8 @@ export default defineConfig({
       build: {
         command: 'vp pack',
         dependsOn: workspaceTaskDependencies(),
-        cache: {
-          input: cachedTaskInputs,
-          output: ['dist/**'],
-        },
+        // The bundle records the current commit for template downloads, so a cached build would point at an old one.
+        cache: false,
       },
       'test:ci': packageTestTask('vp test run'),
     },
@@ -35,7 +62,9 @@ export default defineConfig({
     sourcemap: false,
     dts: false,
     banner: { js: '#!/usr/bin/env node' },
-    // The published package has no runtime dependencies: `npx` fetches one file that only needs Node built-ins.
-    deps: { alwaysBundle: ['@videojs/installation', '@videojs/utils'] },
+    define: { __SKIN_TEMPLATES__: JSON.stringify(skinTemplates()) },
+    // The published package has no runtime dependencies: `npx` fetches one file that only needs Node built-ins. Skin
+    // templates aren't published either; `skin create` downloads the ones it needs.
+    deps: { alwaysBundle: ['@videojs/core', '@videojs/installation', '@videojs/utils'] },
   },
 });

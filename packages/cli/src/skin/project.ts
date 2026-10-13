@@ -1,15 +1,10 @@
-import { readdir, readFile } from 'node:fs/promises';
-import { join, relative } from 'node:path';
-
 import { tailwindStylesheet } from './css';
 import { BASE_SKIN_LABELS, FRAMEWORK_LABELS, PRESET_LABELS, STYLING_LABELS, type SkinOptions } from './options';
 import { htmlPlayer, presetModule, reactPlayer } from './player';
 import { resolveRegistrySkin, type ResolvedSkin } from './registry';
+import { loadTemplates } from './templates';
 import { VERSIONS } from './versions';
 import { workbenchConfig } from './workbench';
-
-/** Template files ship beside `dist/` in the published package. */
-const TEMPLATES = new URL('../templates/', import.meta.url);
 
 export interface Project {
   /** Files keyed by path relative to the project root. */
@@ -18,25 +13,14 @@ export interface Project {
   skinDirectory: string;
 }
 
-async function readTemplateDirectory(directory: string): Promise<Map<string, string>> {
-  const root = new URL(`${directory}/`, TEMPLATES);
-  const files = new Map<string, string>();
-  const entries = await readdir(root, { recursive: true, withFileTypes: true });
-
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
-
-    const path = join(entry.parentPath, entry.name);
-    // npm drops `.gitignore` from published packages, and a `tsconfig.json` would join the monorepo's project graph,
-    // so templates prefix both with `_`.
-    const target = relative(root.pathname, path).replace(/(^|\/)_(gitignore|tsconfig\.json)$/, (_, slash, name) =>
-      name === 'gitignore' ? `${slash}.gitignore` : `${slash}${name}`
-    );
-
-    files.set(target, await readFile(path, 'utf8'));
-  }
-
-  return files;
+/**
+ * A template's path in the project. A `tsconfig.json` would join the monorepo's project graph, and `.gitignore` is easy
+ * to lose in tooling, so templates prefix both with `_`.
+ */
+function templateTarget(path: string): string {
+  return path.replace(/(^|\/)_(gitignore|tsconfig\.json)$/, (_, slash: string, name: string) =>
+    name === 'gitignore' ? `${slash}.gitignore` : `${slash}${name}`
+  );
 }
 
 function escapeHtml(value: string): string {
@@ -236,8 +220,10 @@ export async function createProject(options: SkinOptions, packageName: string): 
     PREVIEW_EXTENSION: options.framework === 'react' ? 'tsx' : 'ts',
   };
 
-  for (const directory of ['shared', options.framework]) {
-    for (const [path, source] of await readTemplateDirectory(directory)) files.set(path, fill(source, templateValues));
+  const templates = await loadTemplates(options.templates, ['shared', options.framework]);
+
+  for (const directory of templates.values()) {
+    for (const [path, source] of directory) files.set(templateTarget(path), fill(source, templateValues));
   }
 
   files.set('vite.config.ts', viteConfig());

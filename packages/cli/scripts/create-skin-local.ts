@@ -1,8 +1,8 @@
 /**
- * Run `@videojs/create-skin` against this checkout instead of npm and the hosted registry: it builds the CLI, packs the
- * Video.js packages a skin needs into tarballs, and points the CLI at the local registry build. Every argument is
- * passed through, so prompts and flags work as they will after publishing. Relative paths resolve from where you ran
- * the command. From the repository root: `pnpm create:skin ~/skins/neon --name Neon --framework html`.
+ * Run `videojs skin create` against this checkout instead of npm and the hosted registry: it builds the CLI, packs the
+ * Video.js packages a skin needs into tarballs, and points the CLI at the local registry build and templates. Every
+ * argument is passed through, so prompts and flags work as they will after publishing. Relative paths resolve from
+ * where you ran the command. From the repository root: `pnpm create:skin ~/skins/neon --name Neon --framework html`.
  */
 import { execFile, spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -126,8 +126,8 @@ async function packWorkspace(): Promise<string[]> {
 async function main(): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => arg !== '--');
 
-  console.log('Building @videojs/create-skin…');
-  await quietly('pnpm', ['exec', 'vp', 'run', '@videojs/create-skin#build']);
+  console.log('Building @videojs/cli…');
+  await quietly('pnpm', ['exec', 'vp', 'run', '@videojs/cli#build']);
 
   if (!existsSync(join(registryDir, 'r'))) {
     console.log('Building the skin registry…');
@@ -142,11 +142,16 @@ async function main(): Promise<void> {
     process.execPath,
     [
       join(packageDir, 'dist/index.mjs'),
+      'skin',
+      'create',
       ...args,
       '--package-manager',
       'pnpm',
       '--registry',
       registryDir,
+      // The templates in this checkout, rather than a download of the commit the CLI was built from.
+      '--templates',
+      join(packageDir, 'templates/skin'),
       ...overrides.flatMap((override) => ['--override', override]),
     ],
     // pnpm runs scripts from the package directory; resolve relative paths from where the command was typed.
