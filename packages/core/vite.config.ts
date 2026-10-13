@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
-import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
+import { isWatchMode, type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 import { vjscComponentSchemaPlugin } from '../vjsc/src/plugins/component-schema.ts';
 import packageJson from './package.json' with { type: 'json' };
@@ -21,7 +21,7 @@ const localeEntries = Object.fromEntries([
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'neutral'),
   dts:
-    mode === 'dev'
+    mode === 'dev' && !isWatchMode
       ? {
           generator: 'tsgo',
           tsconfig: 'tsconfig.dts.json',

@@ -98,6 +98,8 @@ pnpm dev
 
 This will run the entire workspace in developer mode, meaning all applications (examples and website) will also be started on their respective ports.
 
+`pnpm dev` and `pnpm dev:packages` prepare package outputs, then watch development JavaScript and CSS only to reduce memory use. Restart either task or run `pnpm build:packages` to refresh type declarations and production outputs. Use Ctrl+C to stop the servers and watchers; interactive watcher shortcuts are disabled.
+
 ```sh
 pnpm dev:site       # just the documentation site
 pnpm dev:packages   # just the library packages (no apps)

@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite-plus';
 import type { UserConfig as PackUserConfig } from 'vite-plus/pack';
 
-import { neutralLibraryConfig } from '../../build/pack.ts';
+import { isWatchMode, neutralLibraryConfig } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 
 const pack: PackUserConfig = {
   ...neutralLibraryConfig,
-  dts: true,
+  dts: !isWatchMode,
   entry: {
     index: './src/index.ts',
     'ast/index': './src/ast/index.ts',
