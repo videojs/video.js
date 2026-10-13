@@ -22,9 +22,6 @@ export default styles({
           'supports-[corner-shape:squircle]:rounded-2xl supports-[corner-shape:squircle]:[corner-shape:squircle]',
       },
     },
-    currentValue: {
-      utilities: [],
-    },
     separator: {
       utilities: 'hidden media-2xl:inline media-2xl:text-media-controls-foreground/60',
     },
