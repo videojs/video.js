@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 import {
   REGISTRY_NAMESPACE,
+  registryCatalog,
   type RegistryFramework,
   type RegistryPreset,
   type RegistryStyling,
@@ -35,13 +36,6 @@ export interface ResolvedSkin {
   css: CssTree;
 }
 
-/** The catalog path for a selection, matching `registryNamespaceUrl` in `@videojs/installation`. */
-export function registryCatalog(framework: RegistryFramework, styling: RegistryStyling, theme: RegistryTheme): string {
-  const target = framework === 'react' && styling === 'css' ? 'react/css' : framework;
-
-  return theme === 'default' ? target : `${target}/${theme}`;
-}
-
 /**
  * Map a Shadcn target to the project. The skin owns `src/`, so the `videojs` folder Shadcn nests it in is dropped:
  * `@components/videojs/video/skin.tsx` → `src/video/skin.tsx`, `@lib/resolve-class-name.ts` →
@@ -69,6 +63,33 @@ export function splitDependency(specifier: string): [name: string, version: stri
   return at === -1 ? [specifier, ''] : [specifier.slice(0, at), specifier.slice(at + 1)];
 }
 
+/** Long enough for a slow connection to send one registry item, short enough not to look stuck. */
+const FETCH_TIMEOUT_MS = 30_000;
+
+/**
+ * Fetch one registry item. Node's `fetch` ignores `HTTPS_PROXY` unless `NODE_USE_ENV_PROXY=1` is set, so a failure
+ * mentions that along with the local registry option.
+ */
+async function fetchItem(location: string): Promise<string> {
+  let response: Response;
+
+  try {
+    response = await fetch(location, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+  } catch (error) {
+    const reason = error instanceof Error && error.name === 'TimeoutError' ? 'timed out' : 'failed';
+
+    throw new Error(
+      `Fetching ${location} ${reason}. Behind a proxy, set HTTPS_PROXY and NODE_USE_ENV_PROXY=1 (recent Node versions), ` +
+        'or pass --registry with a local registry build.',
+      { cause: error }
+    );
+  }
+
+  if (!response.ok) throw new Error(`Could not fetch ${location}: ${response.status} ${response.statusText}.`);
+
+  return response.text();
+}
+
 async function readItem(registry: string, catalog: string, name: string): Promise<RegistryItem> {
   const isRemote = /^https?:\/\//.test(registry);
   const location = isRemote
@@ -78,10 +99,7 @@ async function readItem(registry: string, catalog: string, name: string): Promis
   let source: string;
 
   if (isRemote) {
-    const response = await fetch(location);
-    if (!response.ok) throw new Error(`Could not fetch ${location}: ${response.status} ${response.statusText}.`);
-
-    source = await response.text();
+    source = await fetchItem(location);
   } else {
     source = await readFile(location, 'utf8').catch(() => {
       throw new Error(`Could not read ${location}. Build the registry with \`pnpm build:shadcn\` first.`);
@@ -137,7 +155,14 @@ export async function resolveRegistrySkin(options: {
       if (!resolved.dependencies.get(dependency)) resolved.dependencies.set(dependency, version);
     }
 
-    for (const [key, value] of Object.entries(item.cssVars?.theme ?? {})) resolved.themeVars.set(key, value);
+    const { theme = {}, ...modes } = item.cssVars ?? {};
+
+    // Light and dark variables need `:root` and `.dark` blocks; fail like an unknown dependency rather than drop them.
+    if (Object.keys(modes).length > 0) {
+      throw new Error(`Unsupported cssVars ${Object.keys(modes).join(', ')} in ${catalog}/${name}.`);
+    }
+
+    for (const [key, value] of Object.entries(theme)) resolved.themeVars.set(key, value);
 
     if (item.css) mergeCss(resolved.css, item.css);
 
@@ -149,4 +174,13 @@ export async function resolveRegistrySkin(options: {
   }
 
   return resolved;
+}
+
+/** The `@videojs/*` version a resolved skin pins, which the registry sets to the release it was built from. */
+export function registryVersion(skin: ResolvedSkin): string | undefined {
+  for (const [name, version] of skin.dependencies) {
+    if (name.startsWith('@videojs/') && version) return version;
+  }
+
+  return undefined;
 }

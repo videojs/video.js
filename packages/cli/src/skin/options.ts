@@ -5,6 +5,7 @@ import {
   PACKAGE_MANAGERS,
   REGISTRY_ORIGIN,
   REGISTRY_PRESETS,
+  REGISTRY_THEMES,
   registryStylings,
   type PackageManager,
   type RegistryFramework,
@@ -13,13 +14,15 @@ import {
   type RegistryTheme,
 } from '@videojs/installation';
 
+import packageJson from '../../package.json' with { type: 'json' };
 import { defaultTemplateSource } from './templates';
 
 /** The packaged skin a new skin starts from, copied from the registry. */
 export type BaseSkin = RegistryTheme;
 
 export const FRAMEWORKS = ['react', 'html'] as const satisfies readonly RegistryFramework[];
-export const BASE_SKINS = ['scaffold', 'default', 'neutral', 'compat'] as const satisfies readonly BaseSkin[];
+/** Every registry theme, Scaffold first: it is the default and the easiest to build on. */
+export const BASE_SKINS: readonly BaseSkin[] = ['scaffold', ...REGISTRY_THEMES.filter((theme) => theme !== 'scaffold')];
 export const PRESETS = REGISTRY_PRESETS.map(({ preset }) => preset);
 
 export const FRAMEWORK_LABELS = { react: 'React', html: 'HTML' } as const satisfies Record<RegistryFramework, string>;
@@ -52,8 +55,8 @@ export interface SkinOptions {
   install: boolean;
   /** Registry origin, or a local directory that mirrors its `r/` tree. */
   registry: string;
-  /** Where the workbench templates come from: a local folder or a URL. Downloaded from GitHub by default. */
-  templates: string | undefined;
+  /** The workbench templates folder; the one published with this package by default. */
+  templates: string;
   /** Package specifiers that replace registry pins, such as `@videojs/react` → `file:…/videojs-react.tgz`. */
   overrides: Readonly<Record<string, string>>;
 }
@@ -72,7 +75,7 @@ export interface SkinFlags {
   help: boolean;
   version: boolean;
   registry: string;
-  templates: string | undefined;
+  templates: string;
   overrides: Readonly<Record<string, string>>;
 }
 
@@ -241,19 +244,23 @@ export function missingChoices(flags: SkinFlags): MissingChoice[] {
   return missing;
 }
 
-const CREATE_COMMANDS = {
-  npm: 'npx @videojs/cli@latest skin create',
-  pnpm: 'pnpm dlx @videojs/cli@latest skin create',
-  yarn: 'npx @videojs/cli@latest skin create',
-  bun: 'bunx @videojs/cli@latest skin create',
+const RUNNERS = {
+  npm: 'npx',
+  pnpm: 'pnpm dlx',
+  yarn: 'yarn dlx',
+  bun: 'bunx',
 } as const satisfies Record<PackageManager, string>;
 
 function quote(value: string): string {
   return /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 }
 
-/** The command that creates the same skin without asking anything, for sharing a setup or putting it in docs. */
-export function reproduceCommand(options: SkinOptions): string {
+/**
+ * The command that creates the same skin without asking anything, for sharing a setup or putting it in docs. It pins
+ * this CLI version, since another version brings other templates, and names the package manager, since the runner a
+ * reader uses may not be the one that ran this.
+ */
+export function reproduceCommand(options: SkinOptions, version: string = packageJson.version): string {
   const args = [
     options.directory,
     '--name',
@@ -266,11 +273,19 @@ export function reproduceCommand(options: SkinOptions): string {
     options.base,
     '--preset',
     options.preset,
+    '--package-manager',
+    options.packageManager,
   ];
 
   if (!options.install) args.push('--no-install');
 
-  return [CREATE_COMMANDS[options.packageManager], ...args.map((arg) => quote(arg))].join(' ');
+  return [
+    RUNNERS[options.packageManager],
+    `@videojs/cli@${version}`,
+    'skin',
+    'create',
+    ...args.map((arg) => quote(arg)),
+  ].join(' ');
 }
 
 export const HELP = `Create a local workbench for building your own Video.js skin.
@@ -294,5 +309,5 @@ Options:
 Advanced:
   --registry <url|path>         Skin registry origin, or a local registry build (default: ${REGISTRY_ORIGIN})
   --override <name=specifier>   Replace a package version, such as a local tarball; repeatable
-  --templates <path|url>        Workbench templates folder or URL (default: downloaded for this CLI version)
+  --templates <path>            Workbench templates folder (default: the one published with this CLI)
 `;
