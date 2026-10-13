@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vite-plus/test';
 import type { Graph } from 'vjsc/graph';
 
 import { isSkinName, type SkinModuleMeta, skinStyles } from '../../../src/meta.ts';
-import { skinClassNameMergeImport } from '../../imports.ts';
 import { skinSourceDirectory } from '../../skin.ts';
 import { createReactPackageSkins } from '../react.ts';
 
@@ -73,7 +72,7 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
     const labelId = `${root}/components/label.tsx?skin=${skin}&style=css&target=react`;
     const rootSource = `import { Button } from '../../components/button';\nimport { Label } from '../../components/label';\nimport { Themed } from '../../components/themed';\nexport function ${pascalCase(theme)}${pascalCase(preset)}Skin() { return <><Button /><Label />{Themed}</>; }`;
     const labelSource = "import { Themed } from './themed';\nexport function Label() { return <span>{Themed}</span>; }";
-    const buttonSource = `import { PlayButton } from '@videojs/react';\nimport { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';\nimport { cn } from '${skinClassNameMergeImport}';\nexport function Button() { return <PlaybackRateRadioGroup.Root className={cn('button')}><PlayButton /></PlaybackRateRadioGroup.Root>; }`;
+    const buttonSource = `import { PlayButton } from '@videojs/react';\nimport { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';\nimport { cn } from '@videojs/utils/style';\nexport function Button() { return <PlaybackRateRadioGroup.Root className={cn('button')}><PlayButton /></PlaybackRateRadioGroup.Root>; }`;
 
     modules.set(rootId, {
       id: rootId,
@@ -104,7 +103,7 @@ function fixtureGraph(root: string): Graph<SkinModuleMeta> {
       imports: [
         importReference(buttonSource, '@videojs/react'),
         importReference(buttonSource, '@videojs/react/ui/playback-rate-radio-group'),
-        importReference(buttonSource, skinClassNameMergeImport),
+        importReference(buttonSource, '@videojs/utils/style'),
       ],
       styles: { files: [], assets: [] },
     });
