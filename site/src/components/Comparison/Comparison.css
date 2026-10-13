@@ -1,0 +1,131 @@
+.comparison {
+  margin-block: 2rem;
+}
+.comparison-slice {
+  position: absolute;
+  inset-block: 0;
+  overflow: hidden;
+}
+.comparison-content {
+  position: absolute;
+  top: 0;
+  width: 100cqw;
+  height: 100%;
+}
+
+.comparison-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.comparison-toolbar button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.comparison-toolbar button[aria-pressed="true"] {
+  color: var(--color-manila-light);
+  background: var(--color-faded-black);
+}
+
+.dark .comparison-toolbar button[aria-pressed="true"],
+.comparison:fullscreen .comparison-toolbar button[aria-pressed="true"] {
+  color: var(--color-faded-black);
+  background: var(--color-manila-light);
+}
+
+.comparison-stage {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+}
+
+.comparison-label {
+  position: absolute;
+  z-index: 50;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgb(0 0 0 / 75%);
+  color: white;
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.comparison-divider {
+  position: absolute;
+  z-index: 60;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: white;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+  transform: translate(-50%, -50%);
+  cursor: ew-resize;
+  touch-action: none;
+  color: black;
+}
+
+.comparison-divider-line {
+  position: absolute;
+  z-index: 50;
+  inset-block: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: white;
+  box-shadow: 0 0 2px black;
+  pointer-events: none;
+}
+
+.comparison-footer {
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.comparison-adjust {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.comparison-adjust summary {
+  cursor: pointer;
+}
+
+.comparison-adjust > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.comparison-adjust label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .comparison[data-animate] .comparison-slice {
+    transition:
+      left 180ms ease-in-out,
+      width 180ms ease-in-out;
+  }
+
+  .comparison[data-animate] .comparison-content,
+  .comparison[data-animate] .comparison-divider,
+  .comparison[data-animate] .comparison-divider-line {
+    transition: left 180ms ease-in-out;
+  }
+}

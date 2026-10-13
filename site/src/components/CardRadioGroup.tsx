@@ -65,7 +65,6 @@ export default function CardRadioGroup<T extends string = string>({
               'rounded-xl corner-squircle border bg-surface ring-1 ring-transparent',
               'transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out',
               layout === 'tile' ? 'flex-col gap-3 p-4' : 'items-center gap-3 p-3',
-              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
               option.disabled
                 ? 'cursor-not-allowed opacity-50'
                 : 'cursor-pointer intent:-translate-y-0.5 intent:shadow-md motion-reduce:intent:translate-y-0',
