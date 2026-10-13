@@ -1,6 +1,7 @@
 import { type Browser, type BrowserContextOptions, test as base } from '@playwright/test';
 import playwrightPkg from 'playwright-core/package.json' with { type: 'json' };
 
+import { CONNECT_BUDGET, connectWithRetry } from './connect.ts';
 import { getIosDevice } from './ios-device.ts';
 
 export interface Options {
@@ -68,11 +69,12 @@ export const test = base.extend<{ session: Browser }, Options>({
 
     const endpoint = `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(JSON.stringify(capabilities))}`;
     const type = caps.realMobile ? playwright.webkit : playwright.chromium;
-    // Connection errors can include the endpoint, which contains the credentials.
-    const browser = await type.connect(endpoint, { timeout: 60_000 }).catch(() => {
-      throw new Error(
-        `BrowserStack could not connect to ${testInfo.project.name}. Check its availability and credentials.`
-      );
+
+    testInfo.setTimeout(testInfo.timeout + CONNECT_BUDGET);
+
+    const browser = await connectWithRetry((timeout) => type.connect(endpoint, { timeout }), {
+      name: testInfo.project.name,
+      secrets: [key, username],
     });
 
     try {
