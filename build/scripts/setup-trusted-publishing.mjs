@@ -11,12 +11,6 @@
  * `--force` also replaces a `cd.yml` publisher that looks correct, which is needed when it expired before its first
  * publish: npm still lists expired configurations unchanged.
  *
- * Once every trusted publisher is in place, a second pass sets each package's publishing access to npm's recommendation
- * for trusted publishing, "Require two-factor authentication and disallow tokens". OIDC publishes keep working;
- * long-lived tokens can no longer publish. The registry offers no way to read this setting, so it's applied to every
- * package unless `--skip-access` is passed. npm asks for 2FA on each of these changes without offering to skip it, so
- * they run after the trust changes rather than interrupting them.
- *
  * Requires `npm login` with an account that has 2FA and write access to the packages. Reading and writing trust
  * configurations both ask for 2FA; when npm's website offers "skip two-factor authentication for the next 5 minutes",
  * tick it to get through the batch.
@@ -37,8 +31,7 @@ const ENVIRONMENT = 'production';
 const REGISTRY = 'https://registry.npmjs.org';
 const PLACEHOLDER_VERSION = '0.0.0-placeholder';
 const PLACEHOLDER_TAG = 'placeholder';
-// `npm access set mfa=publish` is "Require two-factor authentication and disallow tokens" on npmjs.com.
-const PUBLISHING_ACCESS = 'publish';
+
 // npm recommends pausing between trust writes to avoid rate limiting.
 const WRITE_DELAY_MS = 2000;
 
@@ -49,14 +42,14 @@ const { values: flags, positionals } = parseArgs({
   options: {
     'dry-run': { type: 'boolean', default: false },
     force: { type: 'boolean', default: false },
-    'skip-access': { type: 'boolean', default: false },
+
     check: { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
   },
 });
 
 if (flags.help) {
-  console.log('Usage: pnpm release:trust [--dry-run] [--force] [--skip-access] [--check] [package-name...]');
+  console.log('Usage: pnpm release:trust [--dry-run] [--force] [--check] [package-name...]');
   process.exit(0);
 }
 
@@ -142,14 +135,6 @@ function npmRead(args) {
   if (result.status !== 0) throw npmError(args, result);
 
   return result.stdout;
-}
-
-/** Runs a silent npm write without breaking the progress line, unless npm needs 2FA to complete it. */
-function npmQuiet(args) {
-  const result = npmCapture(args);
-  if (needsOtp(result)) return npmWithOtp(args);
-
-  if (result.status !== 0) throw npmError(args, result);
 }
 
 function needsOtp(result) {
@@ -417,7 +402,7 @@ async function main() {
   console.log(styleText('bold', `\nnpm trusted publishing${dryRun ? ' (dry run, no changes)' : ''}\n`));
   field('user', user);
   field('publisher', `${REPOSITORY} ${WORKFLOW} (${ENVIRONMENT}) publish`);
-  field('access', flags['skip-access'] ? 'unchanged (--skip-access)' : 'require 2FA and disallow tokens');
+
   field('packages', String(packages.length));
   console.log();
 
@@ -426,7 +411,6 @@ async function main() {
   const detail = (style, text) => console.log(styleText(style, `${detailIndent}${text}`));
   const index = (i) => styleText('dim', `[${String(i + 1).padStart(indexWidth)}/${packages.length}]`);
   const rows = [];
-  const trusted = [];
 
   for (const [i, name] of packages.entries()) {
     if (i > 0) console.log();
@@ -437,7 +421,6 @@ async function main() {
       const { replaced, kept, kind, result } = await setupPackage(name);
 
       rows.push({ result, kind });
-      trusted.push(name);
       endProgress(styleText(KIND_STYLES[kind], result));
 
       for (const config of replaced) detail('dim', `↳ ${config}`);
@@ -453,46 +436,7 @@ async function main() {
 
   printTotals(rows);
 
-  if (!flags['skip-access'])
-    await setPublishingAccess(trusted, { index: (name) => index(packages.indexOf(name)), nameWidth, detail });
-
   console.log();
-}
-
-/** Restricts token publishing on packages whose trusted publisher is in place, as npm recommends. */
-async function setPublishingAccess(names, { index, nameWidth, detail }) {
-  console.log(styleText('bold', '\nPublishing access: require 2FA and disallow tokens\n'));
-
-  if (dryRun) {
-    console.log(styleText('yellow', `  would set on ${names.length} packages`));
-    return;
-  }
-
-  console.log(styleText('dim', '  npm asks for 2FA on each change.\n'));
-
-  let failed = 0;
-
-  for (const name of names) {
-    startProgress(`  ${index(name)} ${name.padEnd(nameWidth)}  `);
-
-    try {
-      npmQuiet(['access', 'set', `mfa=${PUBLISHING_ACCESS}`, name]);
-      endProgress(styleText('green', 'set'));
-    } catch (error) {
-      failed++;
-      endProgress(styleText('red', 'failed'));
-      detail('red', `↳ ${error.message}`);
-      process.exitCode = 1;
-    }
-
-    await sleep(WRITE_DELAY_MS);
-  }
-
-  const summary = [styleText('green', `${names.length - failed} set`), failed && styleText('red', `${failed} failed`)];
-
-  console.log(
-    `\n  ${styleText('bold', `${names.length} packages`)}  ${summary.filter(Boolean).join(styleText('dim', ' · '))}`
-  );
 }
 
 try {
