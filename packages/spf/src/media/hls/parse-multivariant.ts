@@ -270,8 +270,18 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
 
   const videoTracks: PartiallyResolvedVideoTrack[] = [...videoTracksByUrl.values()];
 
+  const audioGroupIdOf = (stream: StreamInfo) => stream.audioGroupId || 'default';
+
+  // An audio-only variant pointing at a rendition's playlist is the same track, not a second one.
+  const isRenditionPlaylist = (stream: StreamInfo, rendition: AudioRenditionInfo) =>
+    stream.uri === rendition.uri && audioGroupIdOf(stream) === rendition.groupId;
+
+  const distinctAudioOnlyStreams = audioOnlyStreams.filter(
+    (stream) => !audioRenditions.some((rendition) => isRenditionPlaylist(stream, rendition))
+  );
+
   // Build PartiallyResolvedAudioTracks from audio-only streams
-  const audioOnlyTracks: PartiallyResolvedAudioTrack[] = audioOnlyStreams.map((stream) => {
+  const audioOnlyTracks: PartiallyResolvedAudioTrack[] = distinctAudioOnlyStreams.map((stream) => {
     const codecs = stream.codecs ? parseCodecs(stream.codecs) : undefined;
 
     const track: PartiallyResolvedAudioTrack = {
@@ -281,7 +291,7 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
       bandwidth: stream.bandwidth,
       mimeType: 'audio/mp4',
       codecs: codecs?.audio ? [codecs.audio] : [],
-      groupId: stream.audioGroupId || 'default',
+      groupId: audioGroupIdOf(stream),
       name: 'Default',
       sampleRate: 48000, // Default - will be in media playlist if available
       channels: 2, // Default - will be in media playlist if available
@@ -327,7 +337,14 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
 
         return [];
       }
+
+      // The group's carrier is another rendition's playlist, so it is already that track.
+      if (audioOnlyStreams.some((stream) => audioGroupIdOf(stream) === rendition.groupId)) return [];
     }
+
+    const playlistBandwidths = audioOnlyStreams
+      .filter((stream) => isRenditionPlaylist(stream, rendition))
+      .map((stream) => stream.bandwidth);
 
     const track: PartiallyResolvedAudioTrack = {
       type: 'audio' as const,
@@ -337,7 +354,7 @@ export function parseMultivariantPlaylist(text: string, unresolved: AddressableO
       name: rendition.name,
       // Type-specific defaults (CMAF audio)
       mimeType: 'audio/mp4',
-      bandwidth: 0, // Not available in multivariant for demuxed audio
+      bandwidth: Math.max(0, ...playlistBandwidths), // Demuxed audio has none unless a variant shares its playlist
       sampleRate: 48000, // CMAF default
       channels: rendition.channels ?? 2, // From EXT-X-MEDIA CHANNELS; stereo default
       codecs: [],
