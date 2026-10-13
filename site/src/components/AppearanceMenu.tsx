@@ -103,7 +103,6 @@ export function AppearanceControls({ className }: { className?: string }) {
                 onClick={() => accentStore.set(value)}
                 className={clsx(
                   'flex size-7 items-center justify-center rounded-full text-manila-light transition',
-                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
                   isHydrated ? 'cursor-pointer' : 'cursor-wait',
                   selected
                     ? 'ring-2 ring-faded-black ring-offset-2 ring-offset-surface-raised dark:ring-manila-light'
@@ -138,7 +137,7 @@ export default function AppearanceMenu({ className }: { className?: string }) {
         <Popover.Positioner side="bottom" align="end" sideOffset={8} className="z-40">
           <Popover.Popup
             className={clsx(
-              'w-88 origin-(--transform-origin) rounded-lg corner-squircle border border-line bg-surface-raised p-4 shadow-lg dark:bg-soot',
+              'w-88 origin-(--transform-origin) rounded-lg corner-squircle ring-1 ring-black/10 dark:ring-white/10 bg-surface-raised p-4 shadow-lg dark:bg-soot',
               'transition duration-150 ease-out starting-style:scale-95 starting-style:opacity-0 ending-style:scale-95 ending-style:opacity-0 ending-style:duration-100',
               'motion-reduce:transition-none'
             )}

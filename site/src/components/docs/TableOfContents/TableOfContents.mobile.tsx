@@ -183,7 +183,7 @@ export function TableOfContentsMobile({
               popupRef.current
             }
             className={clsx(
-              'origin-left overflow-y-auto rounded-lg corner-squircle border border-manila-dark bg-manila-light pl-6 text-p3 shadow-xl transition duration-150 ease-out',
+              'origin-left overflow-y-auto rounded-lg corner-squircle ring-1 ring-black/10 dark:ring-white/10 bg-manila-light pl-6 text-p3 shadow-xl transition duration-150 ease-out',
               'starting-style:-translate-x-1 starting-style:scale-98 starting-style:opacity-0',
               'ending-style:-translate-x-1 ending-style:scale-98 ending-style:opacity-0 ending-style:duration-100 ending-style:ease-in',
               'motion-reduce:transition-none motion-reduce:starting-style:translate-x-0 motion-reduce:starting-style:scale-100 motion-reduce:ending-style:translate-x-0 motion-reduce:ending-style:scale-100',
