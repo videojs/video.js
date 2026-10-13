@@ -124,14 +124,22 @@ jobs:
           node -e "process.exit(require('./packages/cdn/package.json').version === process.env.VERSION ? 0 : 1)"
 
           if [ -n "$RECOVER_VERSION" ]; then
-            git fetch origin main --quiet
+            git fetch origin main site/v10 --quiet
             if ! git merge-base --is-ancestor HEAD origin/main; then
               echo '::error::The recovery tag is not on main'
               exit 1
             fi
 
-            if ! git diff --quiet HEAD origin/main -- packages site; then
-              echo '::error::Packages or site changed on main since this release'
+            # Main may have moved on: packages publish from this checkout, but the
+            # final step resets site/v10 to it, so every pick on site/v10 must
+            # already be in this release.
+            missing=$(git log --format=%B origin/main..origin/site/v10 \
+              | sed -n 's/^(cherry picked from commit \([0-9a-f]*\))$/\1/p' \
+              | while read -r commit; do
+                  git merge-base --is-ancestor "$commit" HEAD 2>/dev/null || echo "$commit"
+                done)
+            if [ -n "$missing" ]; then
+              echo "::error::site/v10 has picks newer than this release: $(echo $missing)"
               exit 1
             fi
           fi
@@ -181,17 +189,14 @@ jobs:
       - name: Publish
         if: ${{ steps.target.outputs.released == 'true' }}
         # Stable versions go to `latest`; prereleases go to `next` so they never
-        # become the default install. `video.js` always goes to `next`, so
-        # `npm install video.js` keeps resolving Video.js 8 until it is promoted;
-        # it publishes first so dependents never pin a version npm lacks. npm
-        # authenticates through trusted publishing (OIDC), so no token is needed.
+        # become the default install. npm authenticates through trusted
+        # publishing (OIDC), so no token is needed.
         run: |
           tag=latest
           if [[ "$VERSION" == *-* ]]; then
             tag=next
           fi
-          pnpm --fail-if-no-match -r publish --filter "./packages/video.js" --access public --provenance --no-git-checks --tag next
-          pnpm --fail-if-no-match -r publish --filter "./packages/**" --filter "!./packages/video.js" --access public --provenance --no-git-checks --tag "$tag"
+          pnpm --fail-if-no-match -r publish --filter "./packages/**" --access public --provenance --no-git-checks --tag "$tag"
         env:
           VERSION: ${{ steps.target.outputs.version }}
 
