@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { defaultConfig } from 'cn/config';
 import { describe, expect, test } from 'vite-plus/test';
 
-import { cn } from '../utils';
+import { cn, mediaTheme } from '../utils';
 
 /** A stock utility from each merge theme group, paired with the utility prefix that reads that group. */
 const stockUtilities: Record<string, { prefix: string; stock: string }> = {
@@ -32,19 +32,23 @@ describe('cn', () => {
     expect(cn('text-media-popover-foreground text-media', 'text-sm')).toBe('text-media-popover-foreground text-sm');
   });
 
-  test('merges every media theme key the Tailwind theme declares', async () => {
+  test('lists every media theme key the Tailwind theme declares', async () => {
     const source = await readFile(resolve(import.meta.dirname, '../styles/tailwind.css'), 'utf8');
     const mergeGroups = new Set(Object.keys(defaultConfig().theme));
-    const keys = [...source.matchAll(/^\s*--([a-z-]+?)-(media(?:-[a-z0-9-]+)?):/gm)]
-      .map(([, group, key]) => [group!, key!] as const)
-      .filter(([group]) => mergeGroups.has(group));
+    const declared: Record<string, string[]> = {};
 
-    expect(keys.length).toBeGreaterThan(40);
+    for (const [, group, key] of source.matchAll(/^\s*--([a-z-]+?)-(media(?:-[a-z0-9-]+)?):/gm)) {
+      if (mergeGroups.has(group!)) (declared[group!] ??= []).push(key!);
+    }
 
-    for (const [group, key] of keys) {
+    expect(mediaTheme).toEqual(declared);
+  });
+
+  test('merges each listed key against a stock utility from the same group', () => {
+    for (const [group, keys] of Object.entries(mediaTheme)) {
       const { prefix, stock } = stockUtilities[group] ?? { prefix: group, stock: `missing stock utility for ${group}` };
 
-      expect(cn(stock, `${prefix}-${key}`), `${group}: ${key}`).toBe(`${prefix}-${key}`);
+      for (const key of keys) expect(cn(stock, `${prefix}-${key}`), `${group}: ${key}`).toBe(`${prefix}-${key}`);
     }
   });
 });
