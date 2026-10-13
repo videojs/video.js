@@ -5,6 +5,5 @@
     "declarationDir": "types",
     "useDefineForClassFields": false
   },
-  "references": [{ "path": "../html" }],
   "include": ["src"]
 }

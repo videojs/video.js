@@ -75,7 +75,6 @@ export default function VersionMenu({ className, version, channel, currentPath }
           clsx(
             'inline-flex h-5 items-center gap-0.5 rounded-md corner-squircle bg-surface-raised pr-1 pl-1.5 text-p4 font-medium text-muted whitespace-nowrap ring-1 ring-line select-none',
             'intent:text-faded-black dark:intent:text-manila-light data-[popup-open]:text-faded-black dark:data-[popup-open]:text-manila-light',
-            'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold',
             isHydrated ? 'cursor-pointer' : 'cursor-wait'
           ),
           className

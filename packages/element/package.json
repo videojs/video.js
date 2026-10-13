@@ -1,6 +1,6 @@
 {
   "name": "@videojs/element",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Lightweight reactive custom element base for Video.js",
   "keywords": [
     "custom-element",
@@ -39,8 +39,7 @@
     "access": "public"
   },
   "scripts": {
-    "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
+    "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
   },

@@ -119,11 +119,6 @@
   color: var(--color-manila-light);
 }
 
-.DocSearch-Button:focus-visible {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 1px;
-}
-
 .DocSearch-Button .DocSearch-Search-Icon {
   width: calc(var(--spacing) * 4);
   height: calc(var(--spacing) * 4);

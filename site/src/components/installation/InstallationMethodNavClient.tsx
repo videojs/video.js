@@ -168,7 +168,6 @@ function InstallationMethodNavClient({ currentFramework, route }: Props) {
             aria-disabled={available ? undefined : true}
             className={clsx(
               'group relative flex min-w-0 items-center gap-3 rounded-xl corner-squircle border bg-surface p-3 no-underline transition duration-150 ease-out select-none',
-              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold',
               available
                 ? 'intent:-translate-y-0.5 intent:shadow-md motion-reduce:intent:translate-y-0'
                 : 'cursor-not-allowed opacity-50',

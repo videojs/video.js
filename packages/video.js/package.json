@@ -1,14 +1,13 @@
 {
   "name": "video.js",
-  "version": "10.0.1",
-  "private": true,
-  "description": "Video.js for HTML in one import, plus coded errors for Video.js 8 patterns",
+  "version": "10.1.0",
+  "description": "Points Video.js installs to @videojs/html and @videojs/react, and throws coded errors for Video.js 8 patterns",
   "keywords": [
-    "html",
     "media",
     "player",
     "videojs"
   ],
+  "homepage": "https://videojs.org",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -16,12 +15,11 @@
     "directory": "packages/video.js"
   },
   "files": [
+    "AGENTS.md",
     "dist"
   ],
   "type": "module",
-  "sideEffects": [
-    "./dist/*/index.js"
-  ],
+  "sideEffects": false,
   "main": "dist/default/index.js",
   "module": "dist/default/index.js",
   "types": "dist/dev/index.d.ts",
@@ -43,14 +41,10 @@
     "access": "public"
   },
   "scripts": {
-    "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
+    "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "test:watch": "vp test",
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"
-  },
-  "dependencies": {
-    "@videojs/html": "workspace:*"
   },
   "devDependencies": {
     "happy-dom": "^20.11.1",
