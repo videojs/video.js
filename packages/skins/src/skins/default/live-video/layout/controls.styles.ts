@@ -7,8 +7,5 @@ export default styles({
     spaced: {
       utilities: 'gap-px',
     },
-    captionsMenu: {
-      utilities: 'media-max-lg:hidden',
-    },
   },
 });
