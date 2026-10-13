@@ -11,18 +11,20 @@ const templatesDir = join(import.meta.dirname, 'templates/skin');
 
 /**
  * `skin create` downloads its templates from the commit the CLI was built from, so a CLI version always gets its own.
- * CI builds name it in `GITHUB_SHA`; local builds read it from git. Local runs pass `--templates` with this folder.
+ * The ref comes from the checkout rather than `GITHUB_SHA`: release recovery and PR previews build a different commit
+ * from the one that triggered the workflow, and the file list below is read from the checkout. Local runs pass
+ * `--templates` with this folder.
  */
 function skinTemplates() {
-  let ref = process.env.GITHUB_SHA;
+  let ref: string | undefined;
 
-  if (!ref) {
-    try {
-      ref = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-    } catch {
-      ref = 'main';
-    }
+  try {
+    ref = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  } catch {
+    ref = process.env.GITHUB_SHA;
   }
+
+  ref ||= 'main';
 
   const files = readdirSync(templatesDir, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile())
