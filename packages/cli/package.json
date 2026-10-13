@@ -23,7 +23,8 @@
     "videojs": "./dist/index.mjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "type": "module",
   "publishConfig": {

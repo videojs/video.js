@@ -110,11 +110,19 @@ describe('missingChoices', () => {
 });
 
 describe('reproduceCommand', () => {
-  it('spells out every choice for the package manager that ran it', () => {
+  it('pins the CLI version and spells out every choice, including the package manager', () => {
     const options = resolveDefaults(parseFlags(['--name', 'Neon', '--package-manager', 'npm']));
 
-    expect(reproduceCommand(options)).toBe(
-      'npx @videojs/cli@latest skin create neon --name Neon --framework react --styling tailwind --base scaffold --preset video'
+    expect(reproduceCommand(options, '10.1.0')).toBe(
+      'npx @videojs/cli@10.1.0 skin create neon --name Neon --framework react --styling tailwind --base scaffold --preset video --package-manager npm'
+    );
+  });
+
+  it("runs through each package manager's own runner, so yarn reproduces as yarn", () => {
+    const options = resolveDefaults(parseFlags(['--name', 'Neon', '--package-manager', 'yarn']));
+
+    expect(reproduceCommand(options, '10.1.0')).toMatch(
+      /^yarn dlx @videojs\/cli@10\.1\.0 skin create .* --package-manager yarn$/
     );
   });
 
@@ -123,8 +131,8 @@ describe('reproduceCommand', () => {
       parseFlags(['my skins/neon', '--name', "Neon's Glow", '--package-manager', 'pnpm', '--no-install'])
     );
 
-    expect(reproduceCommand(options)).toBe(
-      "pnpm dlx @videojs/cli@latest skin create 'my skins/neon' --name 'Neon'\\''s Glow' --framework react --styling tailwind --base scaffold --preset video --no-install"
+    expect(reproduceCommand(options, '10.1.0')).toBe(
+      "pnpm dlx @videojs/cli@10.1.0 skin create 'my skins/neon' --name 'Neon'\\''s Glow' --framework react --styling tailwind --base scaffold --preset video --package-manager pnpm --no-install"
     );
   });
 });

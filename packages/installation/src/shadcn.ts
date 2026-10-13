@@ -108,16 +108,24 @@ export function resolveRegistryStyling(framework: RegistryFramework, styling: Re
   return styling && registryStylings(framework).includes(styling) ? styling : defaultRegistryStyling(framework);
 }
 
+/** The registry path of one catalog under `r/`, such as `react`, `react/css`, or `html/scaffold`. */
+export function registryCatalog(
+  framework: RegistryFramework,
+  styling: RegistryStyling,
+  theme: RegistryTheme = 'default'
+): string {
+  const target = framework === 'react' && styling === 'css' ? 'react/css' : framework;
+
+  return theme === 'default' ? target : `${target}/${theme}`;
+}
+
 /** The `{name}` template Shadcn stores in `components.json` for one catalog. */
 export function registryNamespaceUrl(
   framework: RegistryFramework,
   styling: RegistryStyling,
   theme: RegistryTheme = 'default'
 ): string {
-  const target = framework === 'react' && styling === 'css' ? 'react/css' : framework;
-  const catalog = theme === 'default' ? target : `${target}/${theme}`;
-
-  return `${REGISTRY_ORIGIN}/r/${catalog}/{name}.json`;
+  return `${REGISTRY_ORIGIN}/r/${registryCatalog(framework, styling, theme)}/{name}.json`;
 }
 
 export function shadcnCommand(runner: ShadcnRunner, action: string): string {

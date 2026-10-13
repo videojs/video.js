@@ -1,8 +1,9 @@
 /**
  * Run `videojs skin create` against this checkout instead of npm and the hosted registry: it builds the CLI, packs the
- * Video.js packages a skin needs into tarballs, and points the CLI at the local registry build and templates. Every
- * argument is passed through, so prompts and flags work as they will after publishing. Relative paths resolve from
- * where you ran the command. From the repository root: `pnpm create:skin ~/skins/neon --name Neon --framework html`.
+ * Video.js packages a skin needs into tarballs, and points the CLI at the local registry build. The built CLI already
+ * reads the templates in this checkout, beside its bundle. Every argument is passed through, so prompts and flags work
+ * as they will after publishing. Relative paths resolve from where you ran the command. From the repository root: `pnpm
+ * create:skin ~/skins/neon --name Neon --framework html`.
  */
 import { execFile, spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -149,9 +150,6 @@ async function main(): Promise<void> {
       'pnpm',
       '--registry',
       registryDir,
-      // The templates in this checkout, rather than a download of the commit the CLI was built from.
-      '--templates',
-      join(packageDir, 'templates/skin'),
       ...overrides.flatMap((override) => ['--override', override]),
     ],
     // pnpm runs scripts from the package directory; resolve relative paths from where the command was typed.
