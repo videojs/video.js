@@ -92,9 +92,10 @@ test.describe('Sandbox compare', () => {
         }
 
         await expectDocuments(frames, tokens);
-        const ratio = new URL(page.url()).searchParams.get('ratio');
-
-        expect(ratio).toBe(label === '16:9' ? null : label.toLowerCase());
+        // The shell debounces URL writes, so wait for the query to settle.
+        await expect
+          .poll(() => new URL(page.url()).searchParams.get('ratio'))
+          .toBe(label === '16:9' ? null : label.toLowerCase());
       }
 
       await page.getByRole('combobox', { name: 'Aspect ratio', exact: true }).click();
@@ -105,6 +106,7 @@ test.describe('Sandbox compare', () => {
       }
 
       await expectDocuments(frames, tokens);
+      await expect.poll(() => new URL(page.url()).searchParams.get('ratio')).toBe('4:3');
       await page.reload();
       await expect(page.getByRole('combobox', { name: 'Aspect ratio', exact: true })).toHaveText('4:3');
 
