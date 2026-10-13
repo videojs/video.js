@@ -44,9 +44,8 @@ export function utilsItem(target: RegistryTarget): RegistryModuleItem<SkinModule
     name: '_resolve-class-name',
     type: 'registry:lib',
     title: 'Video.js Utilities',
-    description: 'Resolves state-aware class names used by editable Video.js React components.',
-    docs: 'Installed automatically with React components and composed with the project Shadcn `cn` utility.',
-    registryDependencies: ['utils'],
+    description: 'Merges and resolves state-aware class names used by editable Video.js React components.',
+    docs: 'Installed automatically with React components. Its `cn` merges Video.js Tailwind theme keys such as `text-media`.',
     meta: {
       role: 'support',
       framework: 'react',
