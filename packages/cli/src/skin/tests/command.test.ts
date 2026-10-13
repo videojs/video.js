@@ -5,14 +5,15 @@ import { join, resolve } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
-import packageJson from '../../package.json' with { type: 'json' };
+import packageJson from '../../../package.json' with { type: 'json' };
 
-const bin = resolve(import.meta.dirname, '../..', packageJson.bin['create-skin']);
+const bin = resolve(import.meta.dirname, '../../..', packageJson.bin.videojs);
 const registry = resolve(import.meta.dirname, 'fixtures/registry');
+const templates = resolve(import.meta.dirname, '../../../templates/skin');
 const directories: string[] = [];
 
 function run(...args: string[]) {
-  return spawnSync(process.execPath, [bin, ...args], { encoding: 'utf8' });
+  return spawnSync(process.execPath, [bin, 'skin', 'create', ...args, '--templates', templates], { encoding: 'utf8' });
 }
 
 function temporaryDirectory(): string {
@@ -27,9 +28,9 @@ afterEach(() => {
   for (const directory of directories.splice(0)) rmSync(directory, { recursive: true, force: true });
 });
 
-describe('bin', () => {
+describe('runSkinCommand', () => {
   it('prints help and the version', () => {
-    expect(run('--help').stdout).toContain('npm create @videojs/skin');
+    expect(run('--help').stdout).toContain('npx @videojs/cli skin create');
     expect(run('--version').stdout).toBe(`${packageJson.version}\n`);
   });
 

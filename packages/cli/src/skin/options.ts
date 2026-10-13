@@ -13,6 +13,8 @@ import {
   type RegistryTheme,
 } from '@videojs/installation';
 
+import { defaultTemplateSource } from './templates';
+
 /** The packaged skin a new skin starts from, copied from the registry. */
 export type BaseSkin = RegistryTheme;
 
@@ -50,6 +52,8 @@ export interface SkinOptions {
   install: boolean;
   /** Registry origin, or a local directory that mirrors its `r/` tree. */
   registry: string;
+  /** Where the workbench templates come from: a local folder or a URL. Downloaded from GitHub by default. */
+  templates: string | undefined;
   /** Package specifiers that replace registry pins, such as `@videojs/react` → `file:…/videojs-react.tgz`. */
   overrides: Readonly<Record<string, string>>;
 }
@@ -68,6 +72,7 @@ export interface SkinFlags {
   help: boolean;
   version: boolean;
   registry: string;
+  templates: string | undefined;
   overrides: Readonly<Record<string, string>>;
 }
 
@@ -116,6 +121,7 @@ export function parseFlags(argv: readonly string[]): SkinFlags {
       help: { type: 'boolean', short: 'h', default: false },
       version: { type: 'boolean', short: 'v', default: false },
       registry: { type: 'string', default: REGISTRY_ORIGIN },
+      templates: { type: 'string' },
       override: { type: 'string', multiple: true, default: [] },
     },
   });
@@ -143,11 +149,12 @@ export function parseFlags(argv: readonly string[]): SkinFlags {
     help: values.help,
     version: values.version,
     registry: values.registry,
+    templates: values.templates ?? defaultTemplateSource(),
     overrides: parseOverrides(values.override),
   };
 }
 
-/** The package manager that launched `npm create`, `pnpm create`, `yarn create`, or `bun create`. */
+/** The package manager that ran the CLI, from `npx`, `pnpm dlx`, `yarn dlx`, or `bunx`. */
 export function detectPackageManager(userAgent = process.env.npm_config_user_agent): PackageManager {
   const name = userAgent?.split('/')[0];
 
@@ -199,6 +206,7 @@ export function resolveDefaults(flags: SkinFlags): SkinOptions {
     packageManager: flags.packageManager ?? detectPackageManager(),
     install: flags.install ?? true,
     registry: flags.registry,
+    templates: flags.templates,
     overrides: flags.overrides,
   };
 }
@@ -234,20 +242,17 @@ export function missingChoices(flags: SkinFlags): MissingChoice[] {
 }
 
 const CREATE_COMMANDS = {
-  npm: 'npm create @videojs/skin@latest',
-  pnpm: 'pnpm create @videojs/skin',
-  yarn: 'yarn create @videojs/skin',
-  bun: 'bun create @videojs/skin',
+  npm: 'npx @videojs/cli@latest skin create',
+  pnpm: 'pnpm dlx @videojs/cli@latest skin create',
+  yarn: 'npx @videojs/cli@latest skin create',
+  bun: 'bunx @videojs/cli@latest skin create',
 } as const satisfies Record<PackageManager, string>;
 
 function quote(value: string): string {
   return /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 }
 
-/**
- * The command that creates the same skin without asking anything, for sharing a setup or putting it in docs. npm needs
- * `--` before flags meant for the package; the other package managers pass them through.
- */
+/** The command that creates the same skin without asking anything, for sharing a setup or putting it in docs. */
 export function reproduceCommand(options: SkinOptions): string {
   const args = [
     options.directory,
@@ -265,16 +270,13 @@ export function reproduceCommand(options: SkinOptions): string {
 
   if (!options.install) args.push('--no-install');
 
-  const [directory, ...flags] = args.map((arg) => quote(arg));
-  const separator = options.packageManager === 'npm' ? ['--'] : [];
-
-  return [CREATE_COMMANDS[options.packageManager], directory, ...separator, ...flags].join(' ');
+  return [CREATE_COMMANDS[options.packageManager], ...args.map((arg) => quote(arg))].join(' ');
 }
 
 export const HELP = `Create a local workbench for building your own Video.js skin.
 
 Usage:
-  npm create @videojs/skin [directory] --name <name> [options]
+  npx @videojs/cli skin create [directory] --name <name> [options]
 
 Options:
   --name <name>                 Name of the skin (required)
@@ -292,4 +294,5 @@ Options:
 Advanced:
   --registry <url|path>         Skin registry origin, or a local registry build (default: ${REGISTRY_ORIGIN})
   --override <name=specifier>   Replace a package version, such as a local tarball; repeatable
+  --templates <path|url>        Workbench templates folder or URL (default: downloaded for this CLI version)
 `;

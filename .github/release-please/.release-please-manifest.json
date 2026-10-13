@@ -1,7 +1,6 @@
 {
   "packages/cdn": "10.1.0",
   "packages/cli": "10.1.0",
-  "packages/create-skin": "10.1.0",
   "packages/adapters/cloudflare-video": "10.1.0",
   "packages/core": "10.1.0",
   "packages/adapters/dash-video": "10.1.0",

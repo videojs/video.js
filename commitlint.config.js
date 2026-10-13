@@ -20,7 +20,6 @@ export default {
         'ci',
         'claude',
         'cli',
-        'create-skin',
         'vjsc',
         'core',
         'design',
