@@ -30,7 +30,7 @@ export const HlsVideo = forwardRef<HTMLVideoElement, HlsVideoProps>(function Hls
   const htmlProps = useSyncProps(media, props, HlsVideoAdapter.defaultProps);
 
   return (
-    <video ref={composedRef} {...htmlProps}>
+    <video ref={composedRef} {...htmlProps} crossOrigin={props.crossOrigin ?? undefined}>
       {children}
       {fallback}
     </video>
