@@ -120,3 +120,56 @@ jobs:
           git diff --cached --quiet || git commit -m "chore(release): update root changelog"
           git pull --rebase
           git push
+
+  # cd.yml publishes through npm trusted publishing, which npm only lets a
+  # maintainer configure on a package that already exists. Flag the release PR
+  # while any public package isn't on npm yet, so `pnpm release:trust` runs
+  # before merge instead of the publish failing after the release is tagged.
+  # Reading trust configurations needs npm 2FA, so this can't verify them.
+  trusted-publishing:
+    needs: changelog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
+
+    steps:
+      # The changelog job's commit is the pull request head, and a push made with
+      # GITHUB_TOKEN starts no workflow that could check it, so check out the
+      # branch tip and report on it with a commit status.
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          package-manager-cache: false
+
+      - name: Check every public package is on npm
+        id: check
+        run: node build/scripts/setup-trusted-publishing.mjs --check
+
+      - name: Report status on the release PR
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.check.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$OUTCOME" = 'success' ]; then
+            state=success
+            description='Every public package is on npm'
+          else
+            state=failure
+            description='A new package needs pnpm release:trust before merging; see details'
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$(git rev-parse HEAD)" \
+            -f state="$state" \
+            -f context='npm trusted publishing' \
+            -f description="$description" \
+            -f target_url="$RUN_URL"

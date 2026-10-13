@@ -16,6 +16,10 @@ import { positionText, unknownText } from '../../i18n/text/time';
 import { SliderCore, type SliderProps, type SliderState } from '../slider/core';
 
 export interface TimeSliderProps extends SliderProps {
+  /** Step increment in seconds for value changes (arrow keys). */
+  step?: number | undefined;
+  /** Large step increment in seconds (Page Up/Down keys). */
+  largeStep?: number | undefined;
   /** @internal Derived from `currentTime` — not user-settable. */
   value?: number | undefined;
   /** @internal Always 0 — not user-settable. */
