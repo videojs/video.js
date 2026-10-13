@@ -250,7 +250,7 @@ pnpm release:trust --dry-run   # show each package's current trusted publisher
 pnpm release:trust             # add missing ones, replace mismatched ones, set publishing access
 ```
 
-npm asks for 2FA to read trusted publishers as well as change them, so `--dry-run` prompts too. Choose "skip two-factor authentication for the next 5 minutes" on the npm website to get through the batch. Pass package names to limit the run, and add `--force` to replace configurations that look correct but are still rejected. The script only replaces trusted publishers for `cd.yml`; publishers for other workflows, such as the Video.js 8 release, are left alone.
+npm asks for 2FA to read trusted publishers as well as change them, so `--dry-run` prompts too. When npm's website offers "skip two-factor authentication for the next 5 minutes", tick it to get through the batch. Publishing access is set in a final pass because npm asks for 2FA on every access change without that option; add `--skip-access` to leave it unchanged. Pass package names to limit the run, and add `--force` to replace configurations that look correct but are still rejected. The script only replaces trusted publishers for `cd.yml`; publishers for other workflows, such as the Video.js 8 release, are left alone.
 
 > [!IMPORTANT]
 > npm can't attach a trusted publisher to a package that doesn't exist yet. When you add a new public package, run `pnpm release:trust` before merging the release PR that first includes it. The script publishes a deprecated `0.0.0-placeholder` version to claim the name, and the release then publishes the real version over `latest`.
