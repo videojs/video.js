@@ -48,6 +48,7 @@
     "format:astro": "vp fmt 'site/src/**/*.astro' --write",
     "typecheck": "vp run typecheck:workspace",
     "changelog": "node build/scripts/generate-changelog.mjs",
+    "release:trust": "node build/scripts/setup-trusted-publishing.mjs",
     "check:workspace": "node build/scripts/check-workspace.mjs"
   },
   "devDependencies": {
