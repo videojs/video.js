@@ -189,16 +189,16 @@ jobs:
       - name: Publish
         if: ${{ steps.target.outputs.released == 'true' }}
         # Stable versions go to `latest`; prereleases go to `next` so they never
-        # become the default install. `video.js` always goes to `next`, so
-        # `npm install video.js` keeps resolving Video.js 8 until it is promoted;
-        # it publishes first so dependents never pin a version npm lacks. npm
-        # authenticates through trusted publishing (OIDC), so no token is needed.
+        # become the default install. `video.js` publishes first because
+        # `@videojs/core` pins its exact version, so a dependent never pins a
+        # version npm lacks. npm authenticates through trusted publishing (OIDC),
+        # so no token is needed.
         run: |
           tag=latest
           if [[ "$VERSION" == *-* ]]; then
             tag=next
           fi
-          pnpm --fail-if-no-match -r publish --filter "./packages/video.js" --access public --provenance --no-git-checks --tag next
+          pnpm --fail-if-no-match -r publish --filter "./packages/video.js" --access public --provenance --no-git-checks --tag "$tag"
           pnpm --fail-if-no-match -r publish --filter "./packages/**" --filter "!./packages/video.js" --access public --provenance --no-git-checks --tag "$tag"
         env:
           VERSION: ${{ steps.target.outputs.version }}
