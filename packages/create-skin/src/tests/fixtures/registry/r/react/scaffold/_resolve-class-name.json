@@ -1,0 +1,13 @@
+{
+  "name": "_resolve-class-name",
+  "dependencies": ["cn"],
+  "registryDependencies": ["utils", "@videojs/_style-theme"],
+  "files": [
+    {
+      "path": "skins/lib/resolve-class-name.ts",
+      "type": "registry:lib",
+      "target": "@lib/resolve-class-name.ts",
+      "content": "export {};\n"
+    }
+  ]
+}

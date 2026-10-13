@@ -1,0 +1,30 @@
+/* The page around the player. Your skin lives in the project's src/ folder. */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: light-dark(#ffffff, #0a0a0a);
+}
+
+.preview-page {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.preview-player {
+  width: 100%;
+  max-width: var(--preview-player-width, 56rem);
+}
+
+/* Player elements only provide state; the skin inside them is the box that gets sized. */
+video-player,
+live-video-player,
+audio-player,
+live-audio-player {
+  display: contents;
+}

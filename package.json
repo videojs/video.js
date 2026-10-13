@@ -16,6 +16,7 @@
     "build:sandbox": "vp run @videojs/sandbox#build",
     "build:cdn": "vp run @videojs/cdn#build:cdn",
     "build:shadcn": "vp run @videojs/skins#build:shadcn",
+    "create:skin": "pnpm --silent --filter @videojs/create-skin create:local",
     "build:site": "vp run site#build",
     "build": "vp run -r build",
     "clean": "vp run -r --no-cache clean",

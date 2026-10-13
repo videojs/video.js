@@ -124,6 +124,7 @@ jobs:
           --packageManager=pnpm
           './packages/cdn'
           './packages/cli'
+          './packages/create-skin'
           './packages/core'
           './packages/element'
           './packages/html'
