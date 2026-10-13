@@ -13,7 +13,6 @@ import {
   skinMetaDefaults,
   skinUtils,
 } from './config.ts';
-import { skinClassNameMergeImport } from './imports.ts';
 import { packageSkinsPlugin } from './packages/plugin.ts';
 import { formatSource } from './registry/format.ts';
 import { registryItems } from './registry/items/index.ts';
@@ -65,7 +64,6 @@ export const skinBuildConfig: PackUserConfig = {
         paths: registryPaths,
         imports: {
           '@videojs/utils/style': '@/lib/resolve-class-name',
-          [skinClassNameMergeImport]: '@/lib/utils',
         },
         packages: registryPackages,
         meta: {
