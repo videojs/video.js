@@ -5,9 +5,15 @@
  *
  * The registry only accepts a trusted publisher for a package that already exists, so a package that has never been
  * published first gets a deprecated placeholder release; the next CD run publishes the real version (with provenance)
- * over `latest`. An existing configuration that doesn't match this repository's workflow is revoked and replaced,
- * because the registry allows only one per package. `--force` also replaces configurations that look correct, for when
- * the registry rejects one anyway.
+ * over `latest`. A package can have several trusted publishers; only those for this repository's `cd.yml` are managed.
+ * If none of them has the expected environment and permissions, they're revoked and one correct publisher is added.
+ * Publishers for other workflows or repositories (for example, the Video.js 8 release workflow) are left alone.
+ * `--force` also replaces a `cd.yml` publisher that looks correct, which is needed when it expired before its first
+ * publish: npm still lists expired configurations unchanged.
+ *
+ * Once a package's trusted publisher is in place, its publishing access is set to npm's recommendation for trusted
+ * publishing, "Require two-factor authentication and disallow tokens". OIDC publishes keep working; long-lived tokens
+ * can no longer publish. The registry offers no way to read this setting, so it's applied to every package.
  *
  * Requires `npm login` with an account that has 2FA and write access to the packages. Reading and writing trust
  * configurations both ask for 2FA; choose "skip two-factor authentication for the next 5 minutes" on the npm website to
@@ -29,6 +35,8 @@ const ENVIRONMENT = 'production';
 const REGISTRY = 'https://registry.npmjs.org';
 const PLACEHOLDER_VERSION = '0.0.0-placeholder';
 const PLACEHOLDER_TAG = 'placeholder';
+// `npm access set mfa=publish` is "Require two-factor authentication and disallow tokens" on npmjs.com.
+const PUBLISHING_ACCESS = 'publish';
 // npm recommends pausing between trust writes to avoid rate limiting.
 const WRITE_DELAY_MS = 2000;
 
@@ -123,20 +131,40 @@ function npmCapture(args) {
 function npmRead(args) {
   let result = npmCapture(args);
 
-  if (result.status !== 0 && /\bEOTP\b/.test(result.stderr)) {
-    log(
-      styleText(
-        'cyan',
-        '  npm needs 2FA. Tick "skip two-factor authentication for the next 5 minutes" to approve the rest.'
-      )
-    );
-    npm(args.filter((arg) => arg !== '--json'));
+  if (needsOtp(result)) {
+    npmWithOtp(args.filter((arg) => arg !== '--json'));
     result = npmCapture(args);
   }
 
-  if (result.status !== 0) throw new Error(`npm ${args[0]} ${args[1] ?? ''}: ${npmErrorReason(result.stderr)}`);
+  if (result.status !== 0) throw npmError(args, result);
 
   return result.stdout;
+}
+
+/** Runs a silent npm write without breaking the progress line, unless npm needs 2FA to complete it. */
+function npmQuiet(args) {
+  const result = npmCapture(args);
+  if (needsOtp(result)) return npmWithOtp(args);
+
+  if (result.status !== 0) throw npmError(args, result);
+}
+
+function needsOtp(result) {
+  return result.status !== 0 && /\bEOTP\b/.test(result.stderr);
+}
+
+function npmWithOtp(args) {
+  log(
+    styleText(
+      'cyan',
+      '  npm needs 2FA. Tick "skip two-factor authentication for the next 5 minutes" to approve the rest.'
+    )
+  );
+  npm(args);
+}
+
+function npmError(args, result) {
+  return new Error(`npm ${args[0]} ${args[1] ?? ''}: ${npmErrorReason(result.stderr)}`);
 }
 
 /** Reduces npm's stderr to `CODE: first message`, dropping notices and the debug-log pointer. */
@@ -214,11 +242,14 @@ function listTrustConfigs(name) {
     .map((chunk) => JSON.parse(chunk));
 }
 
+/** Whether a configuration trusts this repository's release workflow, whatever its environment or permissions. */
+function isManagedConfig(config) {
+  return config.type === 'github' && config.repository === REPOSITORY && config.file === WORKFLOW;
+}
+
 function isExpectedConfig(config) {
   return (
-    config.type === 'github' &&
-    config.repository === REPOSITORY &&
-    config.file === WORKFLOW &&
+    isManagedConfig(config) &&
     config.environment === ENVIRONMENT &&
     Array.isArray(config.permissions) &&
     config.permissions.includes('createPackage')
@@ -242,14 +273,14 @@ function describeConfig(config) {
 }
 
 /**
- * Resolves to `{ previous, kind, result }`: `previous` describes the trusted publishers found before any change, and
- * `kind` is `ok` (nothing to do) or `change`.
+ * Resolves to `{ replaced, kept, kind, result }`: descriptions of the `cd.yml` publishers that were (or would be)
+ * revoked and of the other publishers left in place, and `kind`, which is `ok` (nothing to do) or `change`.
  */
 async function setupPackage(name) {
   let placeholder = false;
 
   if (!(await existsOnRegistry(name))) {
-    if (dryRun) return { previous: [], kind: 'change', result: RESULTS.placeholder };
+    if (dryRun) return { replaced: [], kept: [], kind: 'change', result: RESULTS.placeholder };
 
     publishPlaceholder(name);
     await waitForRegistry(name);
@@ -258,17 +289,33 @@ async function setupPackage(name) {
   }
 
   const configs = listTrustConfigs(name);
-  const previous = configs.map(describeConfig);
+  const managed = configs.filter(isManagedConfig);
+  const kept = configs.filter((config) => !isManagedConfig(config)).map(describeConfig);
+  const trusted = managed.some(isExpectedConfig) && !flags.force;
+  const replaced = trusted ? [] : managed.map(describeConfig);
+  const kind = trusted ? 'ok' : 'change';
+  const result = trusted
+    ? RESULTS.ok
+    : placeholder
+      ? RESULTS.placeholder
+      : managed.length
+        ? RESULTS.replace
+        : RESULTS.add;
 
-  if (configs.length === 1 && isExpectedConfig(configs[0]) && !flags.force) {
-    return { previous, kind: 'ok', result: RESULTS.ok };
-  }
+  if (dryRun) return { replaced, kept, kind, result };
 
-  const result = placeholder ? RESULTS.placeholder : configs.length ? RESULTS.replace : RESULTS.add;
+  if (!trusted) await replaceTrust(name, managed);
 
-  if (dryRun) return { previous, kind: 'change', result };
+  // npm recommends restricting tokens only after the trusted publisher exists.
+  npmQuiet(['access', 'set', `mfa=${PUBLISHING_ACCESS}`, name]);
+  await sleep(WRITE_DELAY_MS);
 
-  for (const config of configs) {
+  return { replaced, kept, kind, result };
+}
+
+/** Revokes the given `cd.yml` publishers and adds the expected one; other publishers are never passed in. */
+async function replaceTrust(name, managed) {
+  for (const config of managed) {
     npm(['trust', 'revoke', name, '--id', config.id]);
     await sleep(WRITE_DELAY_MS);
   }
@@ -287,8 +334,6 @@ async function setupPackage(name) {
     '--yes',
   ]);
   await sleep(WRITE_DELAY_MS);
-
-  return { previous, kind: 'change', result };
 }
 
 const KIND_STYLES = { ok: 'green', change: 'yellow', failed: 'red' };
@@ -375,6 +420,7 @@ async function main() {
   console.log(styleText('bold', `\nnpm trusted publishing${dryRun ? ' (dry run, no changes)' : ''}\n`));
   field('user', user);
   field('publisher', `${REPOSITORY} · ${WORKFLOW} · ${ENVIRONMENT} · publish`);
+  field('access', `require 2FA and disallow tokens · ${dryRun ? 'would set' : 'set'} on every package`);
   field('packages', String(packages.length));
   console.log();
 
@@ -391,13 +437,14 @@ async function main() {
     startProgress(`  ${index} ${name.padEnd(nameWidth)}  `);
 
     try {
-      const { previous, kind, result } = await setupPackage(name);
+      const { replaced, kept, kind, result } = await setupPackage(name);
 
       rows.push({ result, kind });
       endProgress(styleText(KIND_STYLES[kind], result));
 
-      // An already-configured package's publisher is the one in the header.
-      if (kind !== 'ok') for (const config of previous) detail('dim', `↳ ${config}`);
+      for (const config of replaced) detail('dim', `↳ ${config}`);
+
+      for (const config of kept) detail('dim', `↳ ${config} (other publisher, kept)`);
     } catch (error) {
       rows.push({ result: 'failed', kind: 'failed' });
       endProgress(styleText('red', 'failed'));
