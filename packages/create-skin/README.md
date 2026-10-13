@@ -37,6 +37,14 @@ Run with `--help` for every option.
 - `src/`: the skin, and nothing else, so it can move into an app as it is. The component is `src/<preset>/skin`.
 - `apps/preview/`: the workbench, a Shadcn shell that frames a page mounting the skin in a player.
 - `skin.json`: what the skin was created from, including the Video.js version.
+- `vercel.json`, `netlify.toml`: build settings for those hosts.
+
+## Publish
+
+`pnpm run deploy` (or `npm run deploy`, and so on) asks whether to publish to Vercel, Netlify, or Cloudflare
+Pages, then runs that host's CLI through your package manager's runner (`pnpm dlx`, `npx`, or `bunx`). The CLI handles
+signing in and creating the project, and prints the URL. `pnpm run deploy vercel` skips the question. With pnpm, use `run`: `pnpm deploy` is a built-in pnpm command. The build uses
+relative URLs, so `dist/` works on any static host.
 
 Packaged skins come from the same [Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn)
 the installation guide uses, at the version that matches this package.

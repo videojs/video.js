@@ -218,7 +218,9 @@ async function main(argv: readonly string[]): Promise<void> {
   ].filter(Boolean);
   const next = steps.map((step) => `  ${step}`).join('\n');
   const again = `To create the same skin without questions:\n\n  ${reproduceCommand(options)}`;
-  const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${again}`;
+  // `pnpm deploy` is a built-in command, so the script always goes through `run`.
+  const publish = `When it's ready to share, publish it with \`${options.packageManager} run deploy\`.`;
+  const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${publish}\n\n${again}`;
 
   if (interactive) prompts.outro(summary);
   else process.stdout.write(`${summary}\n`);
