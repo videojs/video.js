@@ -18,7 +18,7 @@
  * `--check` needs no npm login: it fails when a public package isn't on npm yet, which is the one case CI can detect,
  * because reading trust configurations requires 2FA. CI runs it on release PRs.
  */
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -32,8 +32,9 @@ const REGISTRY = 'https://registry.npmjs.org';
 const PLACEHOLDER_VERSION = '0.0.0-placeholder';
 const PLACEHOLDER_TAG = 'placeholder';
 
-// npm recommends pausing between trust writes to avoid rate limiting.
+// npm recommends pausing between trust writes to avoid rate limiting. Reads aren't throttled, so a few run at once.
 const WRITE_DELAY_MS = 2000;
+const READ_CONCURRENCY = 8;
 
 const root = resolve(import.meta.dirname, '../..');
 
@@ -42,7 +43,6 @@ const { values: flags, positionals } = parseArgs({
   options: {
     'dry-run': { type: 'boolean', default: false },
     force: { type: 'boolean', default: false },
-
     check: { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
   },
@@ -62,14 +62,27 @@ const RESULTS = dryRun
       placeholder: 'would publish placeholder + add',
     }
   : { ok: 'already configured', add: 'added', replace: 'replaced', placeholder: 'published placeholder + added' };
-const npmCommand = resolveNpmCommand();
 
-function resolveNpmCommand() {
+let npmBinary;
+
+/**
+ * Returns the npm to run: the local one when it has `npm trust` (11.15+), otherwise an npm 11 that npx resolves once.
+ * Sending every call through npx instead costs about 3 s each.
+ */
+function npmBin() {
+  if (npmBinary) return npmBinary;
+
   const [major, minor] = execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim().split('.').map(Number);
-  if (major > 11 || (major === 11 && minor >= 15)) return ['npm'];
+  const hasTrust = major > 11 || (major === 11 && minor >= 15);
 
-  // `npm trust` shipped in npm 11.15.
-  return ['npx', '--yes', 'npm@11'];
+  npmBinary = hasTrust
+    ? 'npm'
+    : execFileSync('npx', ['--yes', '--package=npm@11', '-c', 'command -v npm'], { cwd: tmpdir(), encoding: 'utf8' })
+        .trim()
+        .split('\n')
+        .at(-1);
+
+  return npmBinary;
 }
 
 /**
@@ -102,22 +115,46 @@ function log(text = '') {
 
 /** Runs npm with the terminal attached so 2FA prompts and web-auth links reach the user. */
 function npm(args, { cwd = tmpdir() } = {}) {
-  const [command, ...prefix] = npmCommand;
-
   breakProgress();
 
-  const result = spawnSync(command, [...prefix, ...args], { cwd, stdio: 'inherit' });
+  const result = spawnSync(npmBin(), args, { cwd, stdio: 'inherit' });
   if (result.status !== 0) throw new Error(`npm ${args.join(' ')} exited with ${result.status}`);
 }
 
 function npmCapture(args) {
-  const [command, ...prefix] = npmCommand;
+  return spawnSync(npmBin(), args, { cwd: tmpdir(), encoding: 'utf8', stdio: ['inherit', 'pipe', 'pipe'] });
+}
 
-  return spawnSync(command, [...prefix, ...args], {
-    cwd: tmpdir(),
-    encoding: 'utf8',
-    stdio: ['inherit', 'pipe', 'pipe'],
+/** Like `npmCapture`, but resolves without blocking so several reads can run at once. */
+function npmCaptureAsync(args) {
+  return new Promise((done) => {
+    const child = spawn(npmBin(), args, { cwd: tmpdir(), stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.setEncoding('utf8').on('data', (chunk) => (stdout += chunk));
+    child.stderr.setEncoding('utf8').on('data', (chunk) => (stderr += chunk));
+    child.on('close', (status) => done({ status, stdout, stderr }));
+    child.on('error', (error) => done({ status: 1, stdout, stderr: String(error) }));
   });
+}
+
+/** Maps `items` through `fn` with at most `limit` calls in flight, keeping the results in order. */
+async function mapLimit(items, limit, fn) {
+  const results = [];
+  let next = 0;
+
+  const worker = async () => {
+    while (next < items.length) {
+      const i = next++;
+
+      results[i] = await fn(items[i]);
+    }
+  };
+
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+
+  return results;
 }
 
 /**
@@ -218,11 +255,59 @@ function publishPlaceholder(name) {
 }
 
 /** `npm trust list --json` prints each configuration as a pretty-printed object followed by a blank line. */
-function listTrustConfigs(name) {
-  return npmRead(['trust', 'list', name, '--json'])
+function parseTrustConfigs(stdout) {
+  return stdout
     .split(/\n\s*\n/)
     .filter((chunk) => chunk.trim())
     .map((chunk) => JSON.parse(chunk));
+}
+
+/** Reads one package's trust configurations, prompting for 2FA when npm asks for it. */
+function readTrustConfigs(name) {
+  try {
+    return { configs: parseTrustConfigs(npmRead(['trust', 'list', name, '--json'])) };
+  } catch (error) {
+    return { error };
+  }
+}
+
+/**
+ * Reads every package's registry presence and trust configurations before anything changes. The first existing package
+ * is read on its own, so npm's 2FA prompt (and its offer to skip 2FA for 5 minutes) comes up once; the rest are read in
+ * parallel. Any parallel read that still needs 2FA is read again on its own.
+ */
+async function readPackages(packages) {
+  const presence = await Promise.all(
+    packages.map(async (name) => {
+      try {
+        return { exists: await existsOnRegistry(name) };
+      } catch (error) {
+        return { error };
+      }
+    })
+  );
+  const [first, ...rest] = packages.filter((_, i) => presence[i].exists);
+  const reads = new Map();
+
+  if (first) reads.set(first, readTrustConfigs(first));
+
+  const parallel = await mapLimit(rest, READ_CONCURRENCY, async (name) => {
+    const args = ['trust', 'list', name, '--json'];
+    const result = await npmCaptureAsync(args);
+    if (needsOtp(result)) return null;
+
+    if (result.status !== 0) return { error: npmError(args, result) };
+
+    try {
+      return { configs: parseTrustConfigs(result.stdout) };
+    } catch (error) {
+      return { error };
+    }
+  });
+
+  for (const [i, name] of rest.entries()) reads.set(name, parallel[i] ?? readTrustConfigs(name));
+
+  return packages.map((name, i) => ({ ...presence[i], ...reads.get(name) }));
 }
 
 /** Whether a configuration trusts this repository's release workflow, whatever its environment or permissions. */
@@ -262,10 +347,13 @@ function describeConfig(config) {
  * Resolves to `{ replaced, kept, kind, result }`: descriptions of the `cd.yml` publishers that were (or would be)
  * revoked and of the other publishers left in place, and `kind`, which is `ok` (nothing to do) or `change`.
  */
-async function setupPackage(name) {
+async function setupPackage(name, { exists, configs = [], error }) {
+  if (error) throw error;
+
   let placeholder = false;
 
-  if (!(await existsOnRegistry(name))) {
+  // A package that isn't on npm has no trusted publishers yet, so `configs` stays empty once its placeholder exists.
+  if (!exists) {
     if (dryRun) return { replaced: [], kept: [], kind: 'change', result: RESULTS.placeholder };
 
     publishPlaceholder(name);
@@ -274,7 +362,6 @@ async function setupPackage(name) {
     placeholder = true;
   }
 
-  const configs = listTrustConfigs(name);
   const managed = configs.filter(isManagedConfig);
   const kept = configs.filter((config) => !isManagedConfig(config)).map(describeConfig);
   const trusted = managed.some(isExpectedConfig) && !flags.force;
@@ -402,9 +489,14 @@ async function main() {
   console.log(styleText('bold', `\nnpm trusted publishing${dryRun ? ' (dry run, no changes)' : ''}\n`));
   field('user', user);
   field('publisher', `${REPOSITORY} ${WORKFLOW} (${ENVIRONMENT}) publish`);
-
   field('packages', String(packages.length));
   console.log();
+
+  startProgress(styleText('dim', '  reading trusted publishers… '));
+
+  const states = await readPackages(packages);
+
+  endProgress(styleText('dim', 'done\n'));
 
   // Details sit under the package name, past the `[ n/total] ` index.
   const detailIndent = ' '.repeat(2 + indexWidth * 2 + 4);
@@ -418,7 +510,7 @@ async function main() {
     startProgress(`  ${index(i)} ${name.padEnd(nameWidth)}  `);
 
     try {
-      const { replaced, kept, kind, result } = await setupPackage(name);
+      const { replaced, kept, kind, result } = await setupPackage(name, states[i]);
 
       rows.push({ result, kind });
       endProgress(styleText(KIND_STYLES[kind], result));
