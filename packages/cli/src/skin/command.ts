@@ -3,7 +3,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 
-import { registryStylings, type RegistryPreset, type RegistryStyling } from '@videojs/installation';
+import { REGISTRY_ORIGIN, registryStylings, type RegistryPreset, type RegistryStyling } from '@videojs/installation';
 
 import packageJson from '../../package.json' with { type: 'json' };
 import {
@@ -50,7 +50,14 @@ function validateDirectory(directory: string | undefined): string | undefined {
 async function promptForOptions(prompter: Prompter, flags: SkinFlags): Promise<SkinOptions> {
   const defaults = resolveDefaults(flags);
 
-  const name = flags.name?.trim() || (await prompter.text('What is your skin called?', { validate: validateName }));
+  const nameProblem = validateName(flags.name);
+
+  // A `--name` that can't name a package is asked for again, rather than slugged to nothing.
+  if (flags.name !== undefined && nameProblem) process.stdout.write(`--name: ${nameProblem}\n`);
+
+  const name = nameProblem
+    ? await prompter.text('What is your skin called?', { validate: validateName })
+    : flags.name!.trim();
 
   const directory = expandHome(
     flags.directory ??
@@ -119,17 +126,23 @@ function run(command: string, args: string[], cwd: string): Promise<void> {
   });
 }
 
-async function createSkin(argv: readonly string[]): Promise<void> {
+async function createSkin(argv: readonly string[]): Promise<number> {
   const flags = parseFlags(argv);
 
   if (flags.help) {
     process.stdout.write(HELP);
-    return;
+    return 0;
   }
 
   if (flags.version) {
     process.stdout.write(`${packageJson.version}\n`);
-    return;
+    return 0;
+  }
+
+  // Check a directory given up front before asking anything, rather than after every question.
+  if (flags.directory !== undefined) {
+    const problem = validateDirectory(flags.directory);
+    if (problem) throw new UsageError(`${problem} Choose a new or empty directory.`);
   }
 
   const interactive = !flags.yes && process.stdin.isTTY && process.stdout.isTTY;
@@ -188,16 +201,38 @@ async function createSkin(argv: readonly string[]): Promise<void> {
 
   process.stdout.write(`Created ${project.files.size} files in ${displayPath(root)}\n`);
 
+  // The registry isn't versioned yet, so an older CLI copies the latest skin source into its own templates.
+  if (
+    options.registry === REGISTRY_ORIGIN &&
+    project.registryVersion &&
+    project.registryVersion !== packageJson.version
+  ) {
+    process.stderr.write(
+      `\nWarning: the skin registry is at Video.js ${project.registryVersion}, but this CLI is ${packageJson.version}. ` +
+        'The workbench may not match the skin; run `@videojs/cli@latest` for a matching pair.\n'
+    );
+  }
+
+  let installFailed = false;
+
   if (options.install) {
     process.stdout.write(`\nInstalling dependencies with ${options.packageManager}…\n`);
 
-    await run(options.packageManager, ['install'], root);
+    try {
+      await run(options.packageManager, ['install'], root);
+    } catch (error) {
+      // The project is written; finish with the usual next steps so the user can install it themselves.
+      const message = error instanceof Error ? error.message : String(error);
+
+      process.stderr.write(`\nThe install failed: ${message} Run it yourself from the project.\n`);
+      installFailed = true;
+    }
   }
 
   const cd = displayPath(root);
   const steps = [
     cd !== '.' && `cd ${cd.includes(' ') ? JSON.stringify(cd) : cd}`,
-    !options.install && `${options.packageManager} install`,
+    (!options.install || installFailed) && `${options.packageManager} install`,
     `${options.packageManager === 'npm' ? 'npm run' : options.packageManager} dev`,
   ].filter(Boolean);
   const next = steps.map((step) => `  ${step}`).join('\n');
@@ -205,6 +240,8 @@ async function createSkin(argv: readonly string[]): Promise<void> {
   const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${again}`;
 
   process.stdout.write(`\n${summary}\n`);
+
+  return installFailed ? 1 : 0;
 }
 
 /**
@@ -213,8 +250,7 @@ async function createSkin(argv: readonly string[]): Promise<void> {
  */
 export async function runSkinCommand(argv: readonly string[]): Promise<number> {
   try {
-    await createSkin(argv);
-    return 0;
+    return await createSkin(argv);
   } catch (error) {
     if (error instanceof PromptCancelled) {
       process.stdout.write('\nNo skin created.\n');

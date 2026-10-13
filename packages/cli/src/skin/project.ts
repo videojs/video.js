@@ -1,7 +1,7 @@
 import { tailwindStylesheet } from './css';
 import { BASE_SKIN_LABELS, FRAMEWORK_LABELS, PRESET_LABELS, STYLING_LABELS, type SkinOptions } from './options';
 import { htmlPlayer, presetModule, reactPlayer } from './player';
-import { resolveRegistrySkin, type ResolvedSkin } from './registry';
+import { registryVersion, resolveRegistrySkin, type ResolvedSkin } from './registry';
 import { loadTemplates } from './templates';
 import { VERSIONS } from './versions';
 
@@ -10,6 +10,8 @@ export interface Project {
   files: Map<string, string>;
   /** Where the skin source lives, relative to the project root. */
   skinDirectory: string;
+  /** The Video.js version the registry pinned the skin to. */
+  registryVersion: string | undefined;
 }
 
 /**
@@ -255,5 +257,5 @@ export async function createProject(options: SkinOptions, packageName: string): 
 
   if (options.packageManager === 'pnpm') files.set('pnpm-workspace.yaml', pnpmWorkspace(options));
 
-  return { files, skinDirectory: `src/${options.preset}` };
+  return { files, skinDirectory: `src/${options.preset}`, registryVersion: registryVersion(skin) };
 }

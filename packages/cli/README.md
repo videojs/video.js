@@ -65,7 +65,7 @@ npx @videojs/cli agents skills --agent other --global --json
 npx @videojs/cli skin create
 ```
 
-`pnpm dlx @videojs/cli skin create` and `bunx @videojs/cli skin create` work too. The command asks for:
+`pnpm dlx @videojs/cli skin create`, `yarn dlx @videojs/cli skin create`, and `bunx @videojs/cli skin create` work too. The command asks for:
 
 - **Name**: required. The project goes in a folder named after it unless you choose another directory.
 - **Framework**: React or HTML.
@@ -80,24 +80,27 @@ npx @videojs/cli skin create --name Neon --framework html --base default --prese
 npx @videojs/cli skin create ~/skins/neon --name Neon --yes
 ```
 
-Every run ends with the command that creates the same skin without questions. Without a terminal to ask in, such as in
+Every run ends with the command that creates the same skin without questions, pinned to the same CLI version and
+package manager. Without a terminal to ask in, such as in
 CI or from a coding agent, the command stops and lists the choices you left out instead of picking them for you. Run
 `npx @videojs/cli skin create --help` for every option.
 
 The project keeps the skin alone in `src/`, so it can move into an app as it is, and previews it on a page in
 `apps/preview/` that plays NASA's Cosmic Dawn trailer from Mux, with chapters.
 
-The CLI doesn't carry any of this with it. The skin's source comes from the
-[Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn) at the matching version, and the
-preview templates are downloaded from GitHub at the commit this CLI version was built from. The project's own
-dependencies install into the project.
+The skin's source comes from the latest
+[Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn) build, which isn't versioned
+yet; when its Video.js version differs from the CLI's, the command warns you. The preview templates ship with the CLI as
+plain files, and the project's own dependencies install into the project. Behind a proxy, set `HTTPS_PROXY` and
+`NODE_USE_ENV_PROXY=1` so Node's `fetch` uses it.
 
 ## What it does not do
 
 The `agents` commands only print instructions. They never install packages or skills, run other CLIs, write files,
 prompt, or save preferences. `skin create` is the one command that writes files: it creates a new project, refuses a
 folder that isn't empty, and installs that project's dependencies unless you pass `--no-install`. The package is a
-single bundled file with no dependencies, so `npx` downloads it without the player packages it describes.
+single bundled file with no dependencies, plus the skin templates beside it, so `npx` downloads it without the player
+packages it describes.
 
 ## Versions
 
@@ -112,7 +115,7 @@ plain HTML page.
 
 ## Develop this package
 
-To try `skin create` against this checkout instead of npm, the hosted registry, and GitHub, run from the repository
+To try `skin create` against this checkout instead of npm and the hosted registry, run from the repository
 root:
 
 ```sh
@@ -122,7 +125,7 @@ pnpm create:skin ~/skins/neon --name Neon --framework html --base default
 ```
 
 `create:skin` builds the CLI, packs the Video.js packages a skin needs into tarballs, builds the registry if it is
-missing, and passes `--registry`, `--templates`, and `--override` so the new project uses those local builds. It asks
+missing, and passes `--registry` and `--override` so the new project uses those local builds. It asks
 where to put the project like the published command does, relative to the directory you ran it from.
 
 ## Community

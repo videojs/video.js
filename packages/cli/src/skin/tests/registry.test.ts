@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { tailwindStylesheet } from '../css';
-import { projectPath, registryCatalog, resolveRegistrySkin, rewriteImports, splitDependency } from '../registry';
+import { projectPath, registryVersion, resolveRegistrySkin, rewriteImports, splitDependency } from '../registry';
 
 const registry = resolve(import.meta.dirname, 'fixtures/registry');
 
@@ -40,11 +40,17 @@ describe('resolveRegistrySkin', () => {
   });
 });
 
-describe('registryCatalog', () => {
-  it('matches the published catalog paths', () => {
-    expect(registryCatalog('react', 'tailwind', 'default')).toBe('react');
-    expect(registryCatalog('react', 'css', 'neutral')).toBe('react/css/neutral');
-    expect(registryCatalog('html', 'css', 'scaffold')).toBe('html/scaffold');
+describe('registryVersion', () => {
+  it('reads the Video.js version the registry pinned', async () => {
+    const skin = await resolveRegistrySkin({
+      registry,
+      framework: 'react',
+      styling: 'tailwind',
+      theme: 'scaffold',
+      preset: 'video',
+    });
+
+    expect(registryVersion(skin)).toBe('10.1.0');
   });
 });
 
