@@ -14,7 +14,6 @@
         "@videojs/cdn",
         "@videojs/cli",
         "@videojs/cloudflare-video",
-        "@videojs/create-skin",
         "@videojs/core",
         "@videojs/dash-video",
         "@videojs/element",
@@ -51,9 +50,6 @@
     },
     "packages/cli": {
       "component": "@videojs/cli"
-    },
-    "packages/create-skin": {
-      "component": "@videojs/create-skin"
     },
     "packages/adapters/cloudflare-video": {
       "component": "@videojs/cloudflare-video"

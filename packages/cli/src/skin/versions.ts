@@ -1,4 +1,4 @@
-import packageJson from '../package.json' with { type: 'json' };
+import packageJson from '../../package.json' with { type: 'json' };
 
 /**
  * Versions written into new projects. `videojs` follows this package, which releases in lockstep with the Video.js

@@ -103,6 +103,7 @@ describe('bin', () => {
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('- `npx @videojs/cli agents init`:');
       expect(result.stdout).toContain('- `npx @videojs/cli agents skills`:');
+      expect(result.stdout).toContain('- `npx @videojs/cli skin create`:');
       expect(result.stdout).not.toContain('## Options');
     }
 
@@ -117,7 +118,11 @@ describe('bin', () => {
     expect(JSON.parse(json.stdout)).toMatchObject({
       kind: 'usage',
       package: '@videojs/cli',
-      commands: [{ command: 'npx @videojs/cli agents init' }, { command: 'npx @videojs/cli agents skills' }],
+      commands: [
+        { command: 'npx @videojs/cli agents init' },
+        { command: 'npx @videojs/cli agents skills' },
+        { command: 'npx @videojs/cli skin create' },
+      ],
     });
     expect(version.stdout).toBe(`${packageJson.version}\n`);
     expect(run('agents', 'init')).toContain(`npx @videojs/cli@${packageJson.version} agents init`);

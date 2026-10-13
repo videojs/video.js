@@ -6,10 +6,22 @@ import { parseFlags, resolveDefaults } from '../options';
 import { createProject } from '../project';
 
 const registry = resolve(import.meta.dirname, 'fixtures/registry');
+const templates = resolve(import.meta.dirname, '../../../templates/skin');
 
 function options(...argv: string[]) {
   return resolveDefaults(
-    parseFlags(['my-skin', '--name', 'My Skin', '--registry', registry, '--package-manager', 'pnpm', ...argv])
+    parseFlags([
+      'my-skin',
+      '--name',
+      'My Skin',
+      '--registry',
+      registry,
+      '--templates',
+      templates,
+      '--package-manager',
+      'pnpm',
+      ...argv,
+    ])
   );
 }
 

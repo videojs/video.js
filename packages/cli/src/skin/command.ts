@@ -3,10 +3,9 @@ import { existsSync, readdirSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 
-import * as prompts from '@clack/prompts';
 import { registryStylings, type RegistryPreset, type RegistryStyling } from '@videojs/installation';
 
-import packageJson from '../package.json' with { type: 'json' };
+import packageJson from '../../package.json' with { type: 'json' };
 import {
   BASE_SKIN_LABELS,
   BASE_SKINS,
@@ -29,18 +28,7 @@ import {
   type SkinOptions,
 } from './options';
 import { createProject } from './project';
-
-/** Stopping at a prompt is a choice, not a failure, so it exits cleanly. */
-function cancelled(): never {
-  prompts.cancel('No skin created.');
-  process.exit(0);
-}
-
-function answer<Value>(value: Value | symbol): Value {
-  if (prompts.isCancel(value)) cancelled();
-
-  return value;
-}
+import { Prompter, PromptCancelled } from './prompt';
 
 function isEmptyDirectory(path: string): boolean {
   if (!existsSync(path)) return true;
@@ -59,80 +47,65 @@ function validateDirectory(directory: string | undefined): string | undefined {
 }
 
 /** Ask for each option the flags left out. */
-async function promptForOptions(flags: SkinFlags): Promise<SkinOptions> {
+async function promptForOptions(prompter: Prompter, flags: SkinFlags): Promise<SkinOptions> {
   const defaults = resolveDefaults(flags);
 
-  const name =
-    flags.name?.trim() ||
-    answer(
-      await prompts.text({
-        message: 'What is your skin called?',
-        placeholder: 'Neon Glow',
-        validate: validateName,
-      })
-    ).trim();
+  const name = flags.name?.trim() || (await prompter.text('What is your skin called?', { validate: validateName }));
 
   const directory = expandHome(
     flags.directory ??
-      answer(
-        await prompts.text({
-          message: `Where should it go? (relative to ${process.cwd()})`,
-          initialValue: `./${slugify(name)}`,
-          validate: validateDirectory,
-        })
-      ).trim()
+      (await prompter.text(`Where should it go? (relative to ${process.cwd()})`, {
+        initial: `./${slugify(name)}`,
+        validate: validateDirectory,
+      }))
   );
 
   const framework =
     flags.framework ??
-    answer(
-      await prompts.select({
-        message: 'Which framework?',
-        options: FRAMEWORKS.map((value) => ({ value, label: FRAMEWORK_LABELS[value] })),
-        initialValue: defaults.framework,
-      })
-    );
+    (await prompter.select(
+      'Which framework?',
+      FRAMEWORKS.map((value) => ({ value, label: FRAMEWORK_LABELS[value] })),
+      defaults.framework
+    ));
 
   const stylings = registryStylings(framework);
   const styling: RegistryStyling =
     flags.styling ??
     (stylings.length === 1
       ? stylings[0]!
-      : answer(
-          await prompts.select({
-            message: 'How do you want to style it?',
-            options: stylings.map((value) => ({ value, label: STYLING_LABELS[value] })),
-            initialValue: stylings[0]!,
-          })
+      : await prompter.select(
+          'How do you want to style it?',
+          stylings.map((value) => ({ value, label: STYLING_LABELS[value] })),
+          stylings[0]!
         ));
 
   const base: BaseSkin =
     flags.base ??
-    answer(
-      await prompts.select({
-        message: 'Which skin do you want to start from?',
-        options: BASE_SKINS.map((value) => ({ value, ...BASE_SKIN_LABELS[value] })),
-        initialValue: defaults.base,
-      })
-    );
+    (await prompter.select(
+      'Which skin do you want to start from?',
+      BASE_SKINS.map((value) => ({ value, ...BASE_SKIN_LABELS[value] })),
+      defaults.base
+    ));
 
   const preset: RegistryPreset =
     flags.preset ??
-    answer(
-      await prompts.select({
-        message: 'Which player preset?',
-        options: PRESETS.map((value) => ({ value, label: PRESET_LABELS[value] })),
-        initialValue: defaults.preset,
-      })
-    );
+    (await prompter.select(
+      'Which player preset?',
+      PRESETS.map((value) => ({ value, label: PRESET_LABELS[value] })),
+      defaults.preset
+    ));
 
   const install =
-    flags.install ??
-    answer(
-      await prompts.confirm({ message: `Install dependencies with ${defaults.packageManager}?`, initialValue: true })
-    );
+    flags.install ?? (await prompter.confirm(`Install dependencies with ${defaults.packageManager}?`, true));
 
   return { ...defaults, directory, name, framework, styling, base, preset, install };
+}
+
+/** A path relative to where the command runs; outside it, absolute reads better than a run of `../`. */
+function displayPath(path: string): string {
+  const relativePath = relative(process.cwd(), path);
+
+  return relativePath.startsWith('..') ? path : relativePath || '.';
 }
 
 function run(command: string, args: string[], cwd: string): Promise<void> {
@@ -146,7 +119,7 @@ function run(command: string, args: string[], cwd: string): Promise<void> {
   });
 }
 
-async function main(argv: readonly string[]): Promise<void> {
+async function createSkin(argv: readonly string[]): Promise<void> {
   const flags = parseFlags(argv);
 
   if (flags.help) {
@@ -181,15 +154,28 @@ async function main(argv: readonly string[]): Promise<void> {
     }
   }
 
-  if (interactive) prompts.intro(`Create a Video.js skin (v${packageJson.version})`);
+  let options: SkinOptions;
 
-  const options = interactive ? await promptForOptions(flags) : resolveDefaults(flags);
+  if (interactive) {
+    process.stdout.write(`Create a Video.js skin (v${packageJson.version})\n\n`);
+
+    const prompter = new Prompter();
+
+    try {
+      options = await promptForOptions(prompter, flags);
+    } finally {
+      prompter.close();
+    }
+
+    process.stdout.write('\n');
+  } else {
+    options = resolveDefaults(flags);
+  }
+
   const root = resolve(options.directory);
   if (!isEmptyDirectory(root)) throw new UsageError(`${root} is not empty. Choose a new or empty directory.`);
 
-  const spinner = interactive ? prompts.spinner() : undefined;
-
-  spinner?.start('Copying the skin');
+  process.stdout.write('Copying the skin and its workbench…\n');
 
   const project = await createProject(options, slugify(options.name));
 
@@ -200,19 +186,17 @@ async function main(argv: readonly string[]): Promise<void> {
     await writeFile(target, source);
   }
 
-  spinner?.stop(`Created ${project.files.size} files in ${relative(process.cwd(), root) || '.'}`);
+  process.stdout.write(`Created ${project.files.size} files in ${displayPath(root)}\n`);
 
   if (options.install) {
-    if (interactive) prompts.log.step(`Installing dependencies with ${options.packageManager}`);
+    process.stdout.write(`\nInstalling dependencies with ${options.packageManager}…\n`);
 
     await run(options.packageManager, ['install'], root);
   }
 
-  const relativeRoot = relative(process.cwd(), root);
-  // A project outside the current directory reads better as an absolute path than a run of `../`.
-  const cd = relativeRoot.startsWith('..') ? root : relativeRoot;
+  const cd = displayPath(root);
   const steps = [
-    cd && `cd ${cd.includes(' ') ? JSON.stringify(cd) : cd}`,
+    cd !== '.' && `cd ${cd.includes(' ') ? JSON.stringify(cd) : cd}`,
     !options.install && `${options.packageManager} install`,
     `${options.packageManager === 'npm' ? 'npm run' : options.packageManager} dev`,
   ].filter(Boolean);
@@ -222,16 +206,29 @@ async function main(argv: readonly string[]): Promise<void> {
   const publish = `When it's ready to share, publish it with \`${options.packageManager} run deploy\`.`;
   const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${publish}\n\n${again}`;
 
-  if (interactive) prompts.outro(summary);
-  else process.stdout.write(`${summary}\n`);
+  process.stdout.write(`\n${summary}\n`);
 }
 
-main(process.argv.slice(2)).catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
+/**
+ * `videojs skin create`: create a local skin project. Resolves with the process exit code; a cancelled prompt is a
+ * choice rather than a failure, so it exits cleanly.
+ */
+export async function runSkinCommand(argv: readonly string[]): Promise<number> {
+  try {
+    await createSkin(argv);
+    return 0;
+  } catch (error) {
+    if (error instanceof PromptCancelled) {
+      process.stdout.write('\nNo skin created.\n');
+      return 0;
+    }
 
-  process.stderr.write(
-    error instanceof UsageError ? `${message.trimEnd()}\nRun with --help to see every option.\n` : `${message}\n`
-  );
+    const message = error instanceof Error ? error.message : String(error);
 
-  process.exit(1);
-});
+    process.stderr.write(
+      error instanceof UsageError ? `${message.trimEnd()}\nRun with --help to see every option.\n` : `${message}\n`
+    );
+
+    return 1;
+  }
+}

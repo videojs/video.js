@@ -110,11 +110,11 @@ describe('missingChoices', () => {
 });
 
 describe('reproduceCommand', () => {
-  it('spells out every choice, with the separator npm needs', () => {
+  it('spells out every choice for the package manager that ran it', () => {
     const options = resolveDefaults(parseFlags(['--name', 'Neon', '--package-manager', 'npm']));
 
     expect(reproduceCommand(options)).toBe(
-      'npm create @videojs/skin@latest neon -- --name Neon --framework react --styling tailwind --base scaffold --preset video'
+      'npx @videojs/cli@latest skin create neon --name Neon --framework react --styling tailwind --base scaffold --preset video'
     );
   });
 
@@ -124,7 +124,7 @@ describe('reproduceCommand', () => {
     );
 
     expect(reproduceCommand(options)).toBe(
-      "pnpm create @videojs/skin 'my skins/neon' --name 'Neon'\\''s Glow' --framework react --styling tailwind --base scaffold --preset video --no-install"
+      "pnpm dlx @videojs/cli@latest skin create 'my skins/neon' --name 'Neon'\\''s Glow' --framework react --styling tailwind --base scaffold --preset video --no-install"
     );
   });
 });
