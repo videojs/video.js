@@ -256,20 +256,23 @@ function isExpectedConfig(config) {
   );
 }
 
-const PERMISSION_LABELS = { createPackage: 'publish', createStagedPackage: 'stage publish' };
+const PERMISSION_LABELS = { createPackage: 'publish', createStagedPackage: 'stage', manageDistTags: 'tags' };
 
-/** Summarizes a configuration as `repo · file · environment · permissions`, prefixed by its provider unless GitHub. */
+/**
+ * Summarizes a configuration compactly, e.g. `videojs/videojs-v8 release.yml (Deploy) publish+tags`. The provider is
+ * only named when it isn't GitHub, and the repository only when it isn't this one (the header names it).
+ */
 function describeConfig(config) {
-  const permissions = config.permissions?.map((p) => PERMISSION_LABELS[p] ?? p).join(' + ') || 'no permissions';
+  const permissions = config.permissions?.map((p) => PERMISSION_LABELS[p] ?? p).join('+') || 'no permissions';
   const parts = [
-    config.type === 'github' ? null : config.type,
-    config.repository ?? 'unknown repo',
+    config.type === 'github' ? null : `${config.type}:`,
+    config.repository === REPOSITORY ? null : (config.repository ?? 'unknown repo'),
     config.file ?? 'unknown workflow',
-    config.environment ?? 'any environment',
+    `(${config.environment ?? 'any env'})`,
     permissions,
   ];
 
-  return parts.filter(Boolean).join(' · ');
+  return parts.filter(Boolean).join(' ');
 }
 
 /**
@@ -419,7 +422,7 @@ async function main() {
 
   console.log(styleText('bold', `\nnpm trusted publishing${dryRun ? ' (dry run, no changes)' : ''}\n`));
   field('user', user);
-  field('publisher', `${REPOSITORY} · ${WORKFLOW} · ${ENVIRONMENT} · publish`);
+  field('publisher', `${REPOSITORY} ${WORKFLOW} (${ENVIRONMENT}) publish`);
   field('access', `require 2FA and disallow tokens · ${dryRun ? 'would set' : 'set'} on every package`);
   field('packages', String(packages.length));
   console.log();
@@ -444,7 +447,7 @@ async function main() {
 
       for (const config of replaced) detail('dim', `↳ ${config}`);
 
-      for (const config of kept) detail('dim', `↳ ${config} (other publisher, kept)`);
+      for (const config of kept) detail('dim', `↳ ${config} (kept)`);
     } catch (error) {
       rows.push({ result: 'failed', kind: 'failed' });
       endProgress(styleText('red', 'failed'));
