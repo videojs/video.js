@@ -1,7 +1,7 @@
 /**
  * Configures npm trusted publishing (OIDC) for every public package that `.github/workflows/cd.yml` publishes.
  *
- * Usage: `pnpm release:trust [--dry-run] [--force] [package-name...]`
+ * Usage: `pnpm release:trust [--dry-run] [--force] [--check] [package-name...]`
  *
  * The registry only accepts a trusted publisher for a package that already exists, so a package that has never been
  * published first gets a deprecated placeholder release; the next CD run publishes the real version (with provenance)
@@ -12,9 +12,12 @@
  * Requires `npm login` with an account that has 2FA and write access to the packages. Reading and writing trust
  * configurations both ask for 2FA; choose "skip two-factor authentication for the next 5 minutes" on the npm website to
  * get through the batch.
+ *
+ * `--check` needs no npm login: it fails when a public package isn't on npm yet, which is the one case CI can detect,
+ * because reading trust configurations requires 2FA. CI runs it on release PRs.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -36,13 +39,13 @@ const { values: flags, positionals } = parseArgs({
   options: {
     'dry-run': { type: 'boolean', default: false },
     force: { type: 'boolean', default: false },
-
+    check: { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h', default: false },
   },
 });
 
 if (flags.help) {
-  console.log('Usage: pnpm release:trust [--dry-run] [--force] [package-name...]');
+  console.log('Usage: pnpm release:trust [--dry-run] [--force] [--check] [package-name...]');
   process.exit(0);
 }
 
@@ -300,12 +303,62 @@ function printTotals(rows) {
   console.log(`\n  ${styleText('bold', `${rows.length} packages`)}  ${parts.join(styleText('dim', ' · '))}`);
 }
 
+/** Fails when a package isn't on npm yet, and reports the command that fixes it (as a GitHub step summary in CI). */
+async function checkPublished(packages) {
+  const exists = await Promise.all(packages.map(existsOnRegistry));
+  const missing = packages.filter((_, i) => !exists[i]);
+  const command = `pnpm release:trust ${missing.join(' ')}`;
+
+  console.log(styleText('bold', '\nnpm trusted publishing check\n'));
+
+  if (!missing.length) {
+    console.log(styleText('green', `  All ${packages.length} public packages are on npm.`));
+    console.log(styleText('dim', '  Run `pnpm release:trust --dry-run` locally to verify their trusted publishers.\n'));
+    return;
+  }
+
+  console.log(`  ${packages.length} public packages · ${styleText('red', `${missing.length} not on npm yet`)}\n`);
+
+  for (const name of missing) console.log(styleText('red', `  ✗ ${name}`));
+
+  console.log(`\n  npm can only attach a trusted publisher to a package that already exists. Run:\n\n    ${command}\n`);
+
+  if (process.env.GITHUB_ACTIONS) {
+    for (const name of missing)
+      console.log(`::error title=${name} is not on npm::Run \`${command}\`, then re-run this check.`);
+  }
+
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const summary = [
+      '### npm trusted publishing',
+      '',
+      `These public packages aren't on npm yet, so publishing this release would fail for them:`,
+      '',
+      ...missing.map((name) => `- [ ] \`${name}\``),
+      '',
+      'A maintainer with npm 2FA and access to the packages runs this, then re-runs the check:',
+      '',
+      '```sh',
+      'npm login',
+      command,
+      '```',
+      '',
+    ];
+
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary.join('\n'));
+  }
+
+  process.exitCode = 1;
+}
+
 async function main() {
   const publicPackages = listPublicPackages();
   const unknown = positionals.filter((name) => !publicPackages.includes(name));
   if (unknown.length) throw new Error(`Not a public workspace package: ${unknown.join(', ')}`);
 
   const packages = positionals.length ? positionals : publicPackages;
+
+  if (flags.check) return checkPublished(packages);
 
   const nameWidth = Math.max(...packages.map((name) => name.length));
   const indexWidth = String(packages.length).length;

@@ -252,6 +252,8 @@ npm asks for 2FA to read trusted publishers as well as change them, so `--dry-ru
 
 > [!IMPORTANT]
 > npm can't attach a trusted publisher to a package that doesn't exist yet. When you add a new public package, run `pnpm release:trust` before merging the release PR that first includes it. The script publishes a deprecated `0.0.0-placeholder` version to claim the name, and the release then publishes the real version over `latest`.
+>
+> The release PR's **npm trusted publishing** status fails while any public package isn't on npm, and its workflow summary lists the command to run. Once you've run it, re-run the failed `trusted-publishing` job in the Release PR workflow. The check can't read trusted publisher settings (that needs npm 2FA), so it doesn't catch expired or mismatched ones; `pnpm release:trust --dry-run` does.
 
 #### Recovering a failed publish
 
