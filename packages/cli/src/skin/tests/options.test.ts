@@ -118,11 +118,11 @@ describe('reproduceCommand', () => {
     );
   });
 
-  it("runs through each package manager's own runner, so yarn reproduces as yarn", () => {
+  it('runs yarn through npx, since Yarn 1 has no dlx, and keeps yarn with --package-manager', () => {
     const options = resolveDefaults(parseFlags(['--name', 'Neon', '--package-manager', 'yarn']));
 
     expect(reproduceCommand(options, '10.1.0')).toMatch(
-      /^yarn dlx @videojs\/cli@10\.1\.0 skin create .* --package-manager yarn$/
+      /^npx @videojs\/cli@10\.1\.0 skin create .* --package-manager yarn$/
     );
   });
 

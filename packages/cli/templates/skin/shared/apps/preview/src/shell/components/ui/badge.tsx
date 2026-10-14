@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/badge.tsx, with only the import paths changed.
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cva, type VariantProps } from 'class-variance-authority';

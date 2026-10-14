@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/button.tsx, with only the import paths changed.
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';

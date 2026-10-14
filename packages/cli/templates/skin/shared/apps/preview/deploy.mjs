@@ -1,4 +1,4 @@
-// Publish the workbench to a static host: `<package manager> run deploy`, or `deploy vercel` to skip the question.
+// Deploy the workbench to a static host: `<package manager> run deploy`, or `deploy vercel` to skip the question.
 // Each host's own CLI signs you in and creates the project on the first run, then prints the URL.
 import { spawnSync } from 'node:child_process';
 import { stdin, stdout } from 'node:process';
@@ -27,7 +27,7 @@ async function chooseHost() {
 
   const prompt = createInterface({ input: stdin, output: stdout });
 
-  console.log('Where do you want to publish?\n');
+  console.log('Where do you want to deploy?\n');
   HOSTS.forEach(({ label }, index) => console.log(`  ${index + 1}. ${label}`));
 
   try {
@@ -45,7 +45,7 @@ async function chooseHost() {
 
 const host = await chooseHost();
 
-console.log(`\nPublishing to ${host.label}…\n`);
+console.log(`\nDeploying to ${host.label}…\n`);
 
 const { status } = spawnSync(packageManager, ['run', `deploy:${host.id}`], {
   stdio: 'inherit',

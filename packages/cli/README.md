@@ -65,7 +65,7 @@ npx @videojs/cli agents skills --agent other --global --json
 npx @videojs/cli skin create
 ```
 
-`pnpm dlx @videojs/cli skin create`, `yarn dlx @videojs/cli skin create`, and `bunx @videojs/cli skin create` work too. The command asks for:
+`pnpm dlx @videojs/cli skin create` and `bunx @videojs/cli skin create` work too. The command asks for:
 
 - **Name**: required. The project goes in a folder named after it unless you choose another directory.
 - **Framework**: React or HTML.
@@ -86,7 +86,7 @@ CI or from a coding agent, the command stops and lists the choices you left out 
 `npx @videojs/cli skin create --help` for every option.
 
 The project keeps the skin alone in `src/`, so it can move into an app as it is, and previews it in `apps/preview/`, a
-slimmed-down version of the Video.js sandbox. `pnpm run deploy` (or `npm run deploy`, and so on) publishes it to Vercel,
+slimmed-down version of the Video.js sandbox. `pnpm run deploy` (or `npm run deploy`, and so on) deploys the workbench to Vercel,
 Netlify, or Cloudflare Pages. With pnpm, use `run`: `pnpm deploy` is a built-in pnpm command.
 
 The skin's source comes from the latest

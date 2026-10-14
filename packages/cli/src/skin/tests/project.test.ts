@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { parseFlags, resolveDefaults } from '../options';
 import { createProject } from '../project';
+import { VERSIONS } from '../versions';
 
 const registry = resolve(import.meta.dirname, 'fixtures/registry');
 const templates = resolve(import.meta.dirname, '../../../templates/skin');
@@ -48,11 +49,14 @@ describe('createProject', () => {
 
     const manifest = JSON.parse(files.get('package.json')!);
 
-    expect(manifest.dependencies).toMatchObject({
-      '@videojs/react': '10.1.0',
-      '@base-ui/react': expect.any(String),
-      react: expect.any(String),
+    // The React skin needs React; the workbench's own packages stay out of `dependencies`.
+    expect(manifest.dependencies).toMatchObject({ '@videojs/react': '10.1.0', react: VERSIONS.react });
+    expect(manifest.dependencies).not.toHaveProperty('@base-ui/react');
+    expect(manifest.devDependencies).toMatchObject({
+      '@base-ui/react': VERSIONS.baseUi,
+      '@videojs/mux-video': '10.1.0',
     });
+    expect(manifest.devDependencies).not.toHaveProperty('react');
     expect(JSON.parse(files.get('skin.json')!)).toMatchObject({ base: 'scaffold', videojs: '10.1.0' });
   });
 
@@ -64,21 +68,25 @@ describe('createProject', () => {
     expect(player).toContain("skin.html?raw'");
     expect(files.has('apps/preview/src/frame/main.tsx')).toBe(false);
     expect(files.get('apps/preview/preview.html')).toContain('/src/frame/main.ts"');
-    expect(JSON.parse(files.get('package.json')!).dependencies).not.toHaveProperty('@videojs/react');
+    const manifest = JSON.parse(files.get('package.json')!);
+
+    expect(manifest.dependencies).not.toHaveProperty('@videojs/react');
+    expect(manifest.dependencies).not.toHaveProperty('react');
+    expect(manifest.devDependencies).toMatchObject({ react: VERSIONS.react, 'react-dom': VERSIONS.react });
   });
 
-  it('publishes through each host CLI with the project package manager, from relative URLs', async () => {
+  it('deploys through each host CLI with the project package manager, from relative URLs', async () => {
     const pnpm = await createProject(options(), 'my-skin');
     const npm = await createProject(options('--package-manager', 'npm'), 'my-skin');
 
     expect(JSON.parse(pnpm.files.get('package.json')!).scripts).toMatchObject({
       deploy: 'node apps/preview/deploy.mjs',
-      'deploy:vercel': 'pnpm dlx vercel@latest build && pnpm dlx vercel@latest deploy --prebuilt',
-      'deploy:netlify': 'pnpm dlx netlify-cli@latest deploy --build',
-      'deploy:cloudflare': 'pnpm run build && pnpm dlx wrangler@latest pages deploy dist --project-name my-skin',
+      'deploy:vercel': 'pnpm dlx vercel@64 build && pnpm dlx vercel@64 deploy --prebuilt',
+      'deploy:netlify': 'pnpm dlx netlify-cli@27 deploy --build',
+      'deploy:cloudflare': 'pnpm run build && pnpm dlx wrangler@4 pages deploy dist --project-name my-skin',
     });
     expect(JSON.parse(npm.files.get('package.json')!).scripts['deploy:vercel']).toBe(
-      'npx --yes vercel@latest build && npx --yes vercel@latest deploy --prebuilt'
+      'npx --yes vercel@64 build && npx --yes vercel@64 deploy --prebuilt'
     );
     expect(JSON.parse(pnpm.files.get('vercel.json')!)).toMatchObject({
       buildCommand: 'pnpm run build',

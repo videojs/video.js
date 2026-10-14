@@ -1,5 +1,6 @@
 'use client';
 
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/switch.tsx, with only the import paths changed.
 import { Switch as SwitchPrimitive } from '@base-ui/react/switch';
 import { cn } from 'cn';
 

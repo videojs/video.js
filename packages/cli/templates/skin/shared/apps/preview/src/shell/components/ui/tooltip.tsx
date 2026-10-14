@@ -1,5 +1,6 @@
 'use client';
 
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/tooltip.tsx, with only the import paths changed.
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 import { cn } from 'cn';
 

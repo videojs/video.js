@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/separator.tsx, with only the import paths changed.
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator';
 import { cn } from 'cn';
 

@@ -1,4 +1,4 @@
-import type { PackageManager } from '@videojs/installation';
+import { PACKAGE_RUNNERS, type PackageManager } from '@videojs/installation';
 
 import { tailwindStylesheet } from './css';
 import { BASE_SKIN_LABELS, FRAMEWORK_LABELS, PRESET_LABELS, STYLING_LABELS, type SkinOptions } from './options';
@@ -39,28 +39,33 @@ function sortObject(entries: Iterable<[string, string]>): Record<string, string>
   return Object.fromEntries([...entries].sort(([a], [b]) => a.localeCompare(b)));
 }
 
-/** How each package manager runs a package script, and a CLI it has not installed. Yarn 1 has no `dlx`. */
-const RUNNERS = {
-  npm: { run: 'npm run', dlx: 'npx --yes' },
-  pnpm: { run: 'pnpm run', dlx: 'pnpm dlx' },
-  yarn: { run: 'yarn run', dlx: 'npx --yes' },
-  bun: { run: 'bun run', dlx: 'bunx' },
-} as const satisfies Record<PackageManager, { run: string; dlx: string }>;
+/** How a package manager runs a package script, and a CLI it has not installed, without asking to install it. */
+function runners(manager: PackageManager) {
+  const dlx = PACKAGE_RUNNERS[manager];
+
+  return { run: `${manager} run`, dlx: dlx === 'npx' ? 'npx --yes' : dlx };
+}
 
 /**
- * Publishing goes through each host's own CLI, fetched on demand: it signs the user in, links or creates the project,
+ * Deploying goes through each host's own CLI, fetched on demand: it signs the user in, links or creates the project,
  * and prints the URL. `deploy` asks which host; `deploy:<host>` skips the question.
  */
+/**
+ * Host CLIs pinned to a major version, so a project's deploy scripts keep working after a host ships breaking changes.
+ * Newer minors and patches still apply; bump the majors here when a release is checked against them.
+ */
+const HOST_CLIS = { vercel: 'vercel@64', netlify: 'netlify-cli@27', cloudflare: 'wrangler@4' } as const;
+
 function deployScripts(options: SkinOptions, packageName: string): Record<string, string> {
-  const { run, dlx } = RUNNERS[options.packageManager];
+  const { run, dlx } = runners(options.packageManager);
 
   return {
     deploy: 'node apps/preview/deploy.mjs',
     // Build here and upload the output, so Vercel never installs the project: the deploy matches what was tested, and
     // projects pointing at local package builds deploy too.
-    'deploy:vercel': `${dlx} vercel@latest build && ${dlx} vercel@latest deploy --prebuilt`,
-    'deploy:netlify': `${dlx} netlify-cli@latest deploy --build`,
-    'deploy:cloudflare': `${run} build && ${dlx} wrangler@latest pages deploy dist --project-name ${packageName}`,
+    'deploy:vercel': `${dlx} ${HOST_CLIS.vercel} build && ${dlx} ${HOST_CLIS.vercel} deploy --prebuilt`,
+    'deploy:netlify': `${dlx} ${HOST_CLIS.netlify} deploy --build`,
+    'deploy:cloudflare': `${run} build && ${dlx} ${HOST_CLIS.cloudflare} pages deploy dist --project-name ${packageName}`,
   };
 }
 
@@ -70,7 +75,7 @@ function vercelConfig(options: SkinOptions): string {
     {
       $schema: 'https://openapi.vercel.sh/vercel.json',
       framework: 'vite',
-      buildCommand: `${RUNNERS[options.packageManager].run} build`,
+      buildCommand: `${runners(options.packageManager).run} build`,
       outputDirectory: 'dist',
     },
     null,
@@ -80,8 +85,15 @@ function vercelConfig(options: SkinOptions): string {
 
 /** Netlify reads this for `netlify deploy --build` and for builds from a connected repository. */
 function netlifyConfig(options: SkinOptions): string {
-  return `[build]\n  command = "${RUNNERS[options.packageManager].run} build"\n  publish = "dist"\n`;
+  return `[build]\n  command = "${runners(options.packageManager).run} build"\n  publish = "dist"\n`;
 }
+
+/** Versions for packages the registry lists without one. */
+const UNPINNED_VERSIONS = new Map([
+  ['cn', VERSIONS.cn],
+  ['react', VERSIONS.react],
+  ['react-dom', VERSIONS.react],
+]);
 
 function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSkin): string {
   const isReact = options.framework === 'react';
@@ -90,33 +102,36 @@ function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSk
 
   if (isReact && !dependencies.get('@videojs/react')) dependencies.set('@videojs/react', videojsVersion);
 
-  // The preview plays Mux media; the adapter is an optional peer of the framework packages.
-  dependencies.set(`@videojs/mux-${presetModule(options.preset).kind}`, videojsVersion);
-
-  // The workbench shell is React with Shadcn components, whichever framework the skin is written for.
-  dependencies.set('react', VERSIONS.react);
-  dependencies.set('react-dom', VERSIONS.react);
-  dependencies.set('@base-ui/react', VERSIONS.baseUi);
-  dependencies.set('@heroicons/react', VERSIONS.heroicons);
-  dependencies.set('class-variance-authority', VERSIONS.classVarianceAuthority);
-  dependencies.set('cn', VERSIONS.cn);
-
   for (const [name, version] of dependencies) {
-    if (!version) dependencies.set(name, name === 'cn' ? VERSIONS.cn : 'latest');
+    if (!version) dependencies.set(name, UNPINNED_VERSIONS.get(name) ?? 'latest');
   }
 
+  // Everything else serves the workbench, a React and Shadcn shell whichever framework the skin is written for. It goes
+  // in devDependencies, so `dependencies` lists only what `src/` needs when it moves into an app.
   const devDependencies = new Map<string, string>([
+    ['@base-ui/react', VERSIONS.baseUi],
+    ['@heroicons/react', VERSIONS.heroicons],
     ['@tailwindcss/vite', VERSIONS.tailwind],
     ['@types/react', VERSIONS.reactTypes],
     ['@types/react-dom', VERSIONS.reactTypes],
     ['@vitejs/plugin-react', VERSIONS.vitePluginReact],
+    // The preview plays Mux media; the adapter is an optional peer of the framework packages.
+    [`@videojs/mux-${presetModule(options.preset).kind}`, videojsVersion],
+    ['class-variance-authority', VERSIONS.classVarianceAuthority],
+    ['cn', VERSIONS.cn],
+    ['react', VERSIONS.react],
+    ['react-dom', VERSIONS.react],
     ['tailwindcss', VERSIONS.tailwind],
     ['typescript', VERSIONS.typescript],
     ['vite', VERSIONS.vite],
   ]);
 
+  for (const name of dependencies.keys()) devDependencies.delete(name);
+
   for (const [name, specifier] of Object.entries(options.overrides)) {
     if (dependencies.has(name)) dependencies.set(name, specifier);
+
+    if (devDependencies.has(name)) devDependencies.set(name, specifier);
   }
 
   const manifest: Record<string, unknown> = {
@@ -175,7 +190,7 @@ function skinManifest(options: SkinOptions, skin: ResolvedSkin): string {
 function readme(options: SkinOptions): string {
   const run = options.packageManager === 'npm' ? 'npm run' : options.packageManager;
   // \`pnpm deploy\` is a built-in command, so scripts named like built-ins always go through \`run\`.
-  const runScript = RUNNERS[options.packageManager].run;
+  const runScript = runners(options.packageManager).run;
   const base = BASE_SKIN_LABELS[options.base].label;
 
   return `# ${options.name}
@@ -190,15 +205,15 @@ ${run} dev
 
 The workbench opens your skin in a slimmed-down version of the Video.js sandbox. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/frame/player\`. The options panel sets the player's width and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay, muted, loop, and preload. The arrow button opens the preview on its own.
 
-## Publish
+## Deploy
 
 \`\`\`sh
 ${runScript} deploy
 \`\`\`
 
-It asks where to publish: Vercel, Netlify, or Cloudflare Pages. Name one to skip the question, such as \`${runScript} deploy vercel\`. The first time, the host's CLI signs you in and creates the project, then every run prints the URL. Vercel and Netlify publish a preview URL you can share; to publish to production instead, add \`--prod\` to the \`deploy:netlify\` script, or to both commands in \`deploy:vercel\`.
+It asks where to deploy the workbench: Vercel, Netlify, or Cloudflare Pages. Name one to skip the question, such as \`${runScript} deploy vercel\`. The first time, the host's CLI signs you in and creates the project, then every run prints the URL. Vercel and Netlify deploy to a preview URL you can share; to deploy to production instead, add \`--prod\` to the \`deploy:netlify\` script, or to both commands in \`deploy:vercel\`.
 
-To publish on every push instead, put the project on GitHub and import it on Vercel or Netlify; \`vercel.json\` and \`netlify.toml\` already describe the build. The build uses relative URLs, so \`dist/\` also works on any static host, including in a subfolder.
+To deploy on every push instead, put the project on GitHub and import it on Vercel or Netlify; \`vercel.json\` and \`netlify.toml\` already describe the build. The build uses relative URLs, so \`dist/\` also works on any static host, including in a subfolder.
 
 ## Where things live
 
