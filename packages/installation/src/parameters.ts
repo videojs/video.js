@@ -17,6 +17,14 @@ export type InstallationInputKey = keyof InstallationInput;
 export const PACKAGE_MANAGERS = ['npm', 'pnpm', 'yarn', 'bun'] as const;
 export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
 
+/** The command each package manager uses to run a package without installing it. */
+export const PACKAGE_RUNNERS = {
+  npm: 'npx',
+  pnpm: 'pnpm dlx',
+  yarn: 'yarn dlx',
+  bun: 'bunx',
+} as const satisfies Record<PackageManager, string>;
+
 export const INSTALLATION_PROJECTS = ['new', 'existing'] as const;
 export type InstallationProject = (typeof INSTALLATION_PROJECTS)[number];
 
