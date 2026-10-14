@@ -37,6 +37,13 @@ function sortObject(entries: Iterable<[string, string]>): Record<string, string>
   return Object.fromEntries([...entries].sort(([a], [b]) => a.localeCompare(b)));
 }
 
+/** Versions for packages the registry lists without one. */
+const UNPINNED_VERSIONS: Readonly<Record<string, string>> = {
+  cn: VERSIONS.cn,
+  react: VERSIONS.react,
+  'react-dom': VERSIONS.react,
+};
+
 function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSkin): string {
   const isReact = options.framework === 'react';
   const dependencies = new Map(skin.dependencies);
@@ -44,33 +51,36 @@ function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSk
 
   if (isReact && !dependencies.get('@videojs/react')) dependencies.set('@videojs/react', videojsVersion);
 
-  // The preview plays Mux media; the adapter is an optional peer of the framework packages.
-  dependencies.set(`@videojs/mux-${presetModule(options.preset).kind}`, videojsVersion);
-
-  // The workbench shell is React with Shadcn components, whichever framework the skin is written for.
-  dependencies.set('react', VERSIONS.react);
-  dependencies.set('react-dom', VERSIONS.react);
-  dependencies.set('@base-ui/react', VERSIONS.baseUi);
-  dependencies.set('@heroicons/react', VERSIONS.heroicons);
-  dependencies.set('class-variance-authority', VERSIONS.classVarianceAuthority);
-  dependencies.set('cn', VERSIONS.cn);
-
   for (const [name, version] of dependencies) {
-    if (!version) dependencies.set(name, name === 'cn' ? VERSIONS.cn : 'latest');
+    if (!version) dependencies.set(name, UNPINNED_VERSIONS[name] ?? 'latest');
   }
 
+  // Everything else serves the workbench, a React and Shadcn shell whichever framework the skin is written for. It goes
+  // in devDependencies, so `dependencies` lists only what `src/` needs when it moves into an app.
   const devDependencies = new Map<string, string>([
+    ['@base-ui/react', VERSIONS.baseUi],
+    ['@heroicons/react', VERSIONS.heroicons],
     ['@tailwindcss/vite', VERSIONS.tailwind],
     ['@types/react', VERSIONS.reactTypes],
     ['@types/react-dom', VERSIONS.reactTypes],
     ['@vitejs/plugin-react', VERSIONS.vitePluginReact],
+    // The preview plays Mux media; the adapter is an optional peer of the framework packages.
+    [`@videojs/mux-${presetModule(options.preset).kind}`, videojsVersion],
+    ['class-variance-authority', VERSIONS.classVarianceAuthority],
+    ['cn', VERSIONS.cn],
+    ['react', VERSIONS.react],
+    ['react-dom', VERSIONS.react],
     ['tailwindcss', VERSIONS.tailwind],
     ['typescript', VERSIONS.typescript],
     ['vite', VERSIONS.vite],
   ]);
 
+  for (const name of dependencies.keys()) devDependencies.delete(name);
+
   for (const [name, specifier] of Object.entries(options.overrides)) {
     if (dependencies.has(name)) dependencies.set(name, specifier);
+
+    if (devDependencies.has(name)) devDependencies.set(name, specifier);
   }
 
   const manifest: Record<string, unknown> = {

@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/input.tsx, with only the import paths changed.
 import { Input as InputPrimitive } from '@base-ui/react/input';
 import { cn } from 'cn';
 import * as React from 'react';

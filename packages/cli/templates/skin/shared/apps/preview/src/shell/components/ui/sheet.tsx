@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/sheet.tsx, with only the import paths changed.
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { XMarkIcon } from '@heroicons/react/16/solid';
 import { Button } from '@preview/shell/components/ui/button';

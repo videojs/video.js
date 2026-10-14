@@ -1,3 +1,5 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/sidebar.tsx. Besides import paths, it takes its
+// breakpoint from `useBreakpoint` rather than the sandbox's `useIsMobile`.
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { ViewColumnsIcon } from '@heroicons/react/16/solid';

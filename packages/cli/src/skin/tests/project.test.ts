@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { parseFlags, resolveDefaults } from '../options';
 import { createProject } from '../project';
+import { VERSIONS } from '../versions';
 
 const registry = resolve(import.meta.dirname, 'fixtures/registry');
 const templates = resolve(import.meta.dirname, '../../../templates/skin');
@@ -48,11 +49,14 @@ describe('createProject', () => {
 
     const manifest = JSON.parse(files.get('package.json')!);
 
-    expect(manifest.dependencies).toMatchObject({
-      '@videojs/react': '10.1.0',
-      '@base-ui/react': expect.any(String),
-      react: expect.any(String),
+    // The React skin needs React; the workbench's own packages stay out of `dependencies`.
+    expect(manifest.dependencies).toMatchObject({ '@videojs/react': '10.1.0', react: VERSIONS.react });
+    expect(manifest.dependencies).not.toHaveProperty('@base-ui/react');
+    expect(manifest.devDependencies).toMatchObject({
+      '@base-ui/react': VERSIONS.baseUi,
+      '@videojs/mux-video': '10.1.0',
     });
+    expect(manifest.devDependencies).not.toHaveProperty('react');
     expect(JSON.parse(files.get('skin.json')!)).toMatchObject({ base: 'scaffold', videojs: '10.1.0' });
   });
 
@@ -64,7 +68,11 @@ describe('createProject', () => {
     expect(player).toContain("skin.html?raw'");
     expect(files.has('apps/preview/src/frame/main.tsx')).toBe(false);
     expect(files.get('apps/preview/preview.html')).toContain('/src/frame/main.ts"');
-    expect(JSON.parse(files.get('package.json')!).dependencies).not.toHaveProperty('@videojs/react');
+    const manifest = JSON.parse(files.get('package.json')!);
+
+    expect(manifest.dependencies).not.toHaveProperty('@videojs/react');
+    expect(manifest.dependencies).not.toHaveProperty('react');
+    expect(manifest.devDependencies).toMatchObject({ react: VERSIONS.react, 'react-dom': VERSIONS.react });
   });
 
   it('pins local packages for both npm and pnpm', async () => {

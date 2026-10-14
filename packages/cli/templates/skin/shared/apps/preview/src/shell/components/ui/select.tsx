@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/select.tsx, with only the import paths changed.
 import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from '@heroicons/react/16/solid';
 import { cn } from 'cn';

@@ -1,3 +1,4 @@
+// Copied from the Video.js sandbox, apps/sandbox/app/components/ui/slider.tsx, with only the import paths changed.
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
 import { cn } from 'cn';
 
