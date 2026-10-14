@@ -1,4 +1,4 @@
-import { PACKAGE_MANAGERS, type InstallationProject, type PackageManager } from './parameters';
+import { PACKAGE_MANAGERS, PACKAGE_RUNNERS, type InstallationProject, type PackageManager } from './parameters';
 import { getInstallationPreset, type Skin, type UseCase } from './presets';
 import {
   INSTALLATION_NEW_APP_DIRECTORY,
@@ -22,10 +22,10 @@ export const REGISTRY_INSTALL_DIRECTORY = 'components/videojs';
 export const SHADCN_RUNNER_NAMES = PACKAGE_MANAGERS;
 
 export const SHADCN_RUNNERS = {
-  npm: 'npx shadcn@latest',
-  pnpm: 'pnpm dlx shadcn@latest',
-  yarn: 'npx shadcn@latest',
-  bun: 'bunx --bun shadcn@latest',
+  npm: `${PACKAGE_RUNNERS.npm} shadcn@latest`,
+  pnpm: `${PACKAGE_RUNNERS.pnpm} shadcn@latest`,
+  yarn: `${PACKAGE_RUNNERS.yarn} shadcn@latest`,
+  bun: `${PACKAGE_RUNNERS.bun} --bun shadcn@latest`,
 } as const satisfies Record<ShadcnRunner, string>;
 
 export const REGISTRY_STYLINGS = ['tailwind', 'css'] as const satisfies readonly RegistryStyling[];
