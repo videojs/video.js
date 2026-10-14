@@ -714,6 +714,12 @@ export const TIKTOK_VIDEO_SRC = 'https://www.tiktok.com/@_luwes/video/7527476667
 // live, so it would show an offline banner most of the time.
 export const TWITCH_VIDEO_SRC = 'https://www.twitch.tv/videos/106400740';
 
+// Dailymotion's player embed URL rather than a video page: it names the player
+// configuration Dailymotion refuses to embed without, so a `src` attribute alone
+// can carry it. `x8lr5` is the configuration Dailymotion's own docs embed with,
+// and it keeps its controls on.
+export const DAILYMOTION_VIDEO_SRC = 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87';
+
 export const WISTIA_VIDEO_SRC = 'https://wesleyluyten.wistia.com/medias/oifkgmxnkb';
 
 /** Returns true when the given source represents a live stream and should use the live-video skin. */

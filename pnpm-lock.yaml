@@ -335,6 +335,9 @@ importers:
       '@videojs/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@videojs/dailymotion-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/dailymotion-video
       '@videojs/dash-video':
         specifier: workspace:*
         version: link:../../packages/adapters/dash-video

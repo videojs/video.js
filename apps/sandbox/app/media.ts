@@ -1,6 +1,7 @@
 import {
   BACKGROUND_VIDEO_SRC,
   CLOUDFLARE_VIDEO_SRC,
+  DAILYMOTION_VIDEO_SRC,
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
@@ -282,6 +283,14 @@ const MEDIA_MAP = {
     tag: 'twitch-video',
     embed: true,
     fixedSource: TWITCH_VIDEO_SRC,
+    sources: NON_DASH_SOURCE_IDS,
+  },
+  'dailymotion-video': {
+    label: 'Dailymotion Video',
+    player: 'video',
+    tag: 'dailymotion-video',
+    embed: true,
+    fixedSource: DAILYMOTION_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
   },
   'wistia-video': {
