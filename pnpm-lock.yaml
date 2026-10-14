@@ -874,6 +874,9 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../utils
+      video.js:
+        specifier: workspace:*
+        version: link:../video.js
     devDependencies:
       jsdom:
         specifier: ^26.1.0
