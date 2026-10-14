@@ -78,7 +78,7 @@ The player configuration decides what the embed can't change at runtime. To use 
 |---|---|---|
 | Playback controls | Off | Otherwise Dailymotion's controls show under the skin. Without `controls`, the component keeps the player from taking pointer input so the skin can respond to hover, but it can't hide Dailymotion's controls. |
 | Controls during ads | Off | Same as playback controls, while an ad plays. |
-| Autostart | Off | `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. |
+| Autostart | Off | `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. In development, the component logs a warning when the configuration starts playback while `autoplay` is off. |
 | Spinner | Off | The skin shows its own buffering indicator. |
 | Autonext | Off | When the player moves on to another video by itself, `src` still names the one you loaded. |
 | Picture-in-picture | Off | Dailymotion's picture-in-picture moves the player out of the element, away from the skin. |
@@ -87,9 +87,10 @@ The player configuration decides what the embed can't change at runtime. To use 
 ## Behavior
 
 - Volume and mute both work, like a native `<video>`. Dailymotion has no separate mute, so muting sets its volume to `0` and unmuting restores the previous level.
-- `playbackRate` takes Dailymotion's rates, `0.25` to `2` in steps of `0.25`. Dailymotion rounds any other value up to the next one.
+- `playbackRate` takes Dailymotion's rates, `0.25` to `2` in steps of `0.25`. Dailymotion rounds any other value up to the next one and caps it at `2`, and `playbackRate` then reports the rate it plays at.
 - `loop` is passed to Dailymotion, which restarts the video itself.
 - Changing `src` to another video loads it into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player.
+- Seeking before the video has started, or after it has ended, also starts playback. Dailymotion does this itself; a native `<video>` would stay paused. Seeking while paused mid-video stays paused.
 - The SDK reports no buffered range, so `buffered` ends at the current time.
 - Ads play inside the embed. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
 - When the browser refuses to start playback, as it does for unmuted autoplay, the component reports `pause` instead of playing.
@@ -126,6 +127,6 @@ The player configuration decides what the embed can't change at runtime. To use 
   <Fragment slot="engine-dailymotion">
     Pass the Player ID as `player`, plus [Dailymotion runtime parameters](https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters) under `source.engine.dailymotion`, spelled exactly as Dailymotion spells them. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
 
-    The video comes from `src`, and `loop` from the prop of the same name, so neither has an `engine.dailymotion` spelling. Dailymotion reads `autoplay`, mute, and controls from the player configuration, not from parameters.
+    The video comes from `src`, and `loop` and `autoplay` from the props of the same name, so none of them has an `engine.dailymotion` spelling. Dailymotion reads mute and controls from the player configuration, not from parameters.
   </Fragment>
 </MediaReference>
