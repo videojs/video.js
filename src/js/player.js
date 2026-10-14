@@ -3241,7 +3241,7 @@ class Player extends Component {
       if (this.titleBar) {
         pipContainer.appendChild(this.titleBar.el().cloneNode(true));
       }
-      pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in picture-in-picture')));
+      pipContainer.appendChild(Dom.createEl('p', { className: 'vjs-pip-text' }, {}, this.localize('Playing in Picture-in-Picture')));
 
       return window.documentPictureInPicture.requestWindow({
         // The aspect ratio won't be correct, Chrome bug https://crbug.com/1407629
