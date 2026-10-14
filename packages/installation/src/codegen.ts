@@ -729,8 +729,8 @@ export function generateSourceReactCreateCode(
   const playerComponent = getPresetPlayer(useCase);
   const rendererComponent = getRendererComponent(renderer);
   const source = resolveInstallationSourceUrl(opts.sourceUrl, renderer, useCase);
-  // A registry theme changes the source behind the stable item name. The Default, Neutral, and Compat catalogs export the
-  // same local component (`VideoSkin`, `AudioSkin`, and so on).
+  // A registry theme changes the source behind the stable item name. Every theme's catalog exports the same local
+  // component (`VideoSkin`, `AudioSkin`, and so on).
   const skinComponent = `${preset.componentPrefix}Skin`;
   const rendererProps = isVideoLikeRenderer(renderer)
     ? `src={${JSON.stringify(source)}} playsInline`
