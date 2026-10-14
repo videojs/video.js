@@ -3112,6 +3112,54 @@ QUnit.test('docPiP moves player and triggers events', function(assert) {
   });
 });
 
+QUnit.test('docPiP placeholder text is localized', function(assert) {
+  const done = assert.async();
+  const player = TestHelpers.makePlayer({
+    enableDocumentPictureInPicture: true,
+    language: 'de',
+    languages: {
+      de: {
+        'Playing in Picture-in-Picture': 'Wird im Bild-im-Bild-Modus wiedergegeben'
+      }
+    }
+  });
+  const playerParent = player.el().parentElement;
+
+  player.videoHeight = () => 9;
+  player.videoWidth = () => 16;
+
+  const fakePiPWindow = document.createElement('div');
+
+  fakePiPWindow.document = {
+    head: document.createElement('div'),
+    body: document.createElement('div')
+  };
+
+  // Stub requestWindow even if the browser has docPiP, as a real request needs a user gesture
+  const hadDocPiP = Boolean(window.documentPictureInPicture);
+
+  if (!hadDocPiP) {
+    window.documentPictureInPicture = {};
+  }
+  window.documentPictureInPicture.requestWindow = () => Promise.resolve(fakePiPWindow);
+
+  player.requestPictureInPicture().then(_ => {
+    const pipText = playerParent.querySelector('.vjs-pip-container .vjs-pip-text');
+
+    assert.strictEqual(pipText.textContent, 'Wird im Bild-im-Bild-Modus wiedergegeben', 'placeholder text is localized');
+  }).catch(e => {
+    assert.notOk(true, 'An unexpected error occurred: ' + e);
+  }).then(_ => {
+    if (hadDocPiP) {
+      delete window.documentPictureInPicture.requestWindow;
+    } else {
+      delete window.documentPictureInPicture;
+    }
+    player.dispose();
+    done();
+  });
+});
+
 QUnit.test('playbackRates should trigger a playbackrateschange event', function(assert) {
   const player = TestHelpers.makePlayer({});
   const rates = [];
