@@ -33,6 +33,7 @@ export default {
         'media',
         'mux',
         'cloudflare-video',
+        'dailymotion-video',
         'playerjs-video',
         'spotify-audio',
         'tiktok-video',
