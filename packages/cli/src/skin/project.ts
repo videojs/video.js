@@ -38,11 +38,11 @@ function sortObject(entries: Iterable<[string, string]>): Record<string, string>
 }
 
 /** Versions for packages the registry lists without one. */
-const UNPINNED_VERSIONS: Readonly<Record<string, string>> = {
-  cn: VERSIONS.cn,
-  react: VERSIONS.react,
-  'react-dom': VERSIONS.react,
-};
+const UNPINNED_VERSIONS = new Map([
+  ['cn', VERSIONS.cn],
+  ['react', VERSIONS.react],
+  ['react-dom', VERSIONS.react],
+]);
 
 function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSkin): string {
   const isReact = options.framework === 'react';
@@ -52,7 +52,7 @@ function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSk
   if (isReact && !dependencies.get('@videojs/react')) dependencies.set('@videojs/react', videojsVersion);
 
   for (const [name, version] of dependencies) {
-    if (!version) dependencies.set(name, UNPINNED_VERSIONS[name] ?? 'latest');
+    if (!version) dependencies.set(name, UNPINNED_VERSIONS.get(name) ?? 'latest');
   }
 
   // Everything else serves the workbench, a React and Shadcn shell whichever framework the skin is written for. It goes
