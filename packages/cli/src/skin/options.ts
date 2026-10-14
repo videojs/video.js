@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 
 import {
   PACKAGE_MANAGERS,
+  PACKAGE_RUNNERS,
   REGISTRY_ORIGIN,
   REGISTRY_PRESETS,
   REGISTRY_THEMES,
@@ -244,13 +245,6 @@ export function missingChoices(flags: SkinFlags): MissingChoice[] {
   return missing;
 }
 
-const RUNNERS = {
-  npm: 'npx',
-  pnpm: 'pnpm dlx',
-  yarn: 'yarn dlx',
-  bun: 'bunx',
-} as const satisfies Record<PackageManager, string>;
-
 function quote(value: string): string {
   return /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 }
@@ -280,7 +274,7 @@ export function reproduceCommand(options: SkinOptions, version: string = package
   if (!options.install) args.push('--no-install');
 
   return [
-    RUNNERS[options.packageManager],
+    PACKAGE_RUNNERS[options.packageManager],
     `@videojs/cli@${version}`,
     'skin',
     'create',
