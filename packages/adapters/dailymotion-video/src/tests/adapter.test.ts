@@ -3,6 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 
 import { DailymotionAdapter, type DailymotionPlayerState, resolveDailymotionPlayerOptions } from '..';
 
+// Every other test installs the SDK global, so the library script is only requested when a test removes it.
+const loadScript = vi.hoisted(() => vi.fn<(src: string) => Promise<void>>());
+
+vi.mock('@videojs/utils/dom', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@videojs/utils/dom')>()),
+  loadScript,
+}));
+
 const VIDEO_SRC = 'https://www.dailymotion.com/video/x84sh87';
 const OTHER_VIDEO_SRC = 'https://www.dailymotion.com/video/x7tgad0';
 const PLAYER = 'x8lr5';
@@ -443,6 +451,111 @@ describe('DailymotionAdapter', () => {
       expect(createPlayer).toHaveBeenCalledOnce();
     });
 
+    it('reports an SDK that fails to load as a network error', async () => {
+      delete (globalThis as { dailymotion?: unknown }).dailymotion;
+      loadScript.mockRejectedValueOnce(new Error('offline'));
+
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(createContainer());
+      await flush();
+
+      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_NETWORK);
+      expect(media.error?.data).toHaveProperty('cause');
+      expect(createPlayer).not.toHaveBeenCalled();
+    });
+
+    it('creates the player again for the next source after a failed creation', async () => {
+      createPlayer.mockRejectedValueOnce(new Error('Player options invalid'));
+
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(createContainer());
+      await flush();
+
+      expect(media.error).not.toBeNull();
+
+      media.source = source(OTHER_VIDEO_SRC);
+      await flush();
+
+      expect(createPlayer).toHaveBeenCalledTimes(2);
+      expect(media.error).toBeNull();
+      expect(media.readyState).toBe(1);
+    });
+
+    it('loads only the last of several sources set in one tick', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.source = source(OTHER_VIDEO_SRC);
+      media.source = source('https://www.dailymotion.com/video/x9third');
+      await flush();
+
+      expect(player.loadContent).toHaveBeenCalledExactlyOnceWith({ video: 'x9third' });
+    });
+
+    it('keeps the engine options when only src changes', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source(VIDEO_SRC, { startTime: 5 });
+
+      const { player } = await attachAndReady(media);
+
+      media.src = OTHER_VIDEO_SRC;
+      await flush();
+
+      expect(media.source?.engine?.dailymotion?.startTime).toBe(5);
+      expect(player.loadContent).toHaveBeenCalledWith({ video: 'x7tgad0' });
+      expect(createPlayer).toHaveBeenCalledOnce();
+    });
+
+    it('releases the player when the source is cleared, without reporting an error', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.source = null;
+      await flush();
+
+      expect(player.destroy).toHaveBeenCalledOnce();
+      expect(media.engine).toBeNull();
+      expect(media.currentSrc).toBe('');
+      expect(media.error).toBeNull();
+    });
+
+    it('does nothing when attached to the container it already has', async () => {
+      const media = new DailymotionAdapter();
+      const { container, player } = await attachAndReady(media);
+
+      media.attach(container);
+      await flush();
+
+      expect(createPlayer).toHaveBeenCalledOnce();
+      expect(player.destroy).not.toHaveBeenCalled();
+    });
+
+    it('announces an equal source without reloading, and ignores the same object', async () => {
+      const media = new DailymotionAdapter();
+      const current = source();
+
+      media.source = current;
+      await attachAndReady(media);
+
+      const sourcechange = vi.fn();
+      const emptied = vi.fn();
+
+      media.addEventListener('sourcechange', sourcechange);
+      media.addEventListener('emptied', emptied);
+      media.source = current;
+      media.source = source();
+      await flush();
+
+      expect(sourcechange).toHaveBeenCalledOnce();
+      expect(emptied).not.toHaveBeenCalled();
+      expect(createPlayer).toHaveBeenCalledOnce();
+    });
+
     it('keeps the running player when only the video changes after loop was toggled', async () => {
       const media = new DailymotionAdapter();
       const { player } = await attachAndReady(media);
@@ -572,6 +685,33 @@ describe('DailymotionAdapter', () => {
       await flush();
 
       expect(players[0]!.play).not.toHaveBeenCalled();
+    });
+
+    it('ignores play() without a source', async () => {
+      const media = new DailymotionAdapter();
+
+      await media.play();
+      media.source = source();
+      media.attach(createContainer());
+      await flush();
+
+      expect(players[0]!.play).not.toHaveBeenCalled();
+    });
+
+    it('drops autoplay for a new video when paused before it is ready', async () => {
+      const media = new DailymotionAdapter();
+
+      media.autoplay = true;
+
+      const { player } = await attachAndReady(media);
+
+      media.source = source(OTHER_VIDEO_SRC);
+      await flush();
+      media.pause();
+      player.emit('PLAYER_VIDEOCHANGE', { videoId: 'x7tgad0' });
+
+      expect(player.loadContent).toHaveBeenCalledOnce();
+      expect(player.play).toHaveBeenCalledOnce();
     });
 
     it('warns once per player configuration that starts playback while autoplay is off', async () => {
@@ -865,6 +1005,37 @@ describe('DailymotionAdapter', () => {
       }
     });
 
+    it('does not settle a pending seek from a player that was released', async () => {
+      vi.useFakeTimers();
+
+      try {
+        const media = new DailymotionAdapter();
+        const { player } = await attachAndReady(media);
+        const reads = player.getState.mock.calls.length;
+
+        media.currentTime = 15;
+        media.detach();
+        await vi.advanceTimersByTimeAsync(2_000);
+
+        expect(player.getState).toHaveBeenCalledTimes(reads);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('leaves the ended state on a seek', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      player.emit('VIDEO_END');
+
+      expect(media.ended).toBe(true);
+
+      media.currentTime = 5;
+
+      expect(media.ended).toBe(false);
+    });
+
     it('announces a seek made in the player chrome', async () => {
       const media = new DailymotionAdapter();
       const { player } = await attachAndReady(media);
@@ -936,6 +1107,28 @@ describe('DailymotionAdapter', () => {
 
       expect(media.muted).toBe(true);
       expect(player.setVolume).toHaveBeenCalledWith(0);
+    });
+
+    it('unmutes a level of 0 at full volume, since a level of 0 would stay muted', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.volume = 0;
+      media.muted = true;
+      media.muted = false;
+
+      expect(player.setVolume).toHaveBeenLastCalledWith(1);
+    });
+
+    it('keeps the host mute while the player has not decided on one', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.muted = true;
+      player.emit('PLAYER_VOLUMECHANGE', { playerVolume: 0, playerIsMuted: null });
+
+      expect(media.muted).toBe(true);
+      expect(media.volume).toBe(1);
     });
 
     it('takes a mute made in the player chrome without losing the level', async () => {
@@ -1016,6 +1209,14 @@ describe('DailymotionAdapter', () => {
 
       expect(requestFullscreen).toHaveBeenCalledOnce();
       expect(media.isFullscreen).toBe(true);
+    });
+
+    it('stays out of fullscreen without a container', async () => {
+      const media = new DailymotionAdapter();
+
+      await media.requestFullscreen();
+
+      expect(media.isFullscreen).toBe(false);
     });
   });
 });
