@@ -9,8 +9,9 @@ interface DailymotionCustomMediaElement {
   connectedCallback?(): void;
 }
 
-// The SDK builds its own iframe, so the host is an embed without one of its own: no attributes are mirrored onto the
-// target, and it is marked as a cross-origin frame like the other embeds.
+// The SDK builds its own iframe, so the host is an embed without one of its own. `'iframe'` is what tells
+// `CustomMediaElement` it hosts an embed, though the target is a container: no attributes are mirrored onto it, and the
+// host is marked as a cross-origin frame like the other embeds.
 class DailymotionCustomMediaElement extends CustomMediaElement('iframe', DailymotionAdapter) {
   static override getTemplateHTML = (): string => /*html*/ `
     <style>
@@ -43,7 +44,15 @@ export class DailymotionVideo extends MediaAttachMixin(DailymotionCustomMediaEle
     // The SDK finds the element it builds the player in by id from the document, which cannot see into the shadow
     // root, so the container is light DOM. Slotting it as `media` is what makes it the adapter's target. Created here
     // rather than in the constructor, which may not add children to the element.
-    if (this.querySelector(':scope > [slot=media]')) return;
+    const existing = this.querySelector(':scope > [slot=media]');
+
+    if (existing) {
+      // A container given before the host was in the page was attached while the SDK could not find it, which left
+      // it empty; a source set by then loads now.
+      if (this.adapter.src && !existing.hasChildNodes() && !this.adapter.error) this.adapter.load();
+
+      return;
+    }
 
     const container = document.createElement('div');
 

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { DailymotionVideo } from '../dailymotion-video/adapter';
 
@@ -34,6 +34,41 @@ describe('DailymotionVideo', () => {
 
     expect(el.querySelectorAll(':scope > [slot=media]')).toHaveLength(1);
     expect(el.adapter.target).toBe(container);
+  });
+
+  it('loads a source set before the element was in the page into a container given by then', async () => {
+    const el = document.createElement('test-dailymotion-video') as TestDailymotionVideo;
+    const container = document.createElement('div');
+
+    container.slot = 'media';
+    el.append(container);
+    // A browser's `slotchange` attaches the container while the element is still out of the page; the test DOM fires
+    // none until it is in, so the attach is made here.
+    el.adapter.attach(container);
+    el.adapter.source = {
+      src: 'https://www.dailymotion.com/video/x84sh87',
+      engine: { dailymotion: { player: 'x8lr5' } },
+    };
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(el.adapter.error).toBeNull();
+    expect(container.children).toHaveLength(0);
+
+    const load = vi.spyOn(el.adapter, 'load').mockResolvedValue();
+
+    document.body.append(el);
+
+    expect(load).toHaveBeenCalledOnce();
+  });
+
+  it('keeps one container when the element is moved', () => {
+    const el = document.createElement('test-dailymotion-video') as TestDailymotionVideo;
+
+    document.body.append(el);
+    el.remove();
+    document.body.append(el);
+
+    expect(el.querySelectorAll(':scope > [slot=media]')).toHaveLength(1);
   });
 
   it('slots the container into the media slot', () => {
