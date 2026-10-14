@@ -14,7 +14,8 @@ export const MediaEventDefSchema = z.object({
   description: z.string().optional(),
 });
 
-const MediaTargetTagSchema = z.enum(['video', 'audio', 'iframe']);
+// `div` is a React embed's container when its SDK builds the iframe itself.
+const MediaTargetTagSchema = z.enum(['video', 'audio', 'iframe', 'div']);
 
 export const EngineOptionDefSchema = z.object({
   name: z.string(),
