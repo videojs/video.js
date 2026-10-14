@@ -65,7 +65,7 @@ npx @videojs/cli agents skills --agent other --global --json
 npx @videojs/cli skin create
 ```
 
-`pnpm dlx @videojs/cli skin create`, `yarn dlx @videojs/cli skin create`, and `bunx @videojs/cli skin create` work too. The command asks for:
+`pnpm dlx @videojs/cli skin create` and `bunx @videojs/cli skin create` work too. The command asks for:
 
 - **Name**: required. The project goes in a folder named after it unless you choose another directory.
 - **Framework**: React or HTML.
