@@ -23,6 +23,10 @@ describe('resolveAdapterType', () => {
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
     ['https://www.twitch.tv/monstercat', 'twitch'],
+    ['https://www.dailymotion.com/video/x84sh87', 'dailymotion'],
+    ['https://www.dailymotion.com/embed/video/x84sh87', 'dailymotion'],
+    ['https://dai.ly/x84sh87', 'dailymotion'],
+    ['https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87', 'dailymotion'],
   ])('resolves the service URL %s to %s', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
@@ -93,6 +97,8 @@ describe('resolveAdapterType', () => {
     ['a Vimeo page without a video', 'https://vimeo.com/'],
     ['a TikTok short link', 'https://vm.tiktok.com/ZMabc123/'],
     ['a Twitch clip', 'https://clips.twitch.tv/SomeClipSlug'],
+    ['a bare Dailymotion id', 'x84sh87'],
+    ['a Dailymotion playlist', 'https://www.dailymotion.com/playlist/x6hynp'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
   ])('returns null for %s', (_, src) => {
     expect(resolveAdapterType(src)).toBe(null);

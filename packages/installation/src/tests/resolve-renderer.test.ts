@@ -84,8 +84,9 @@ describe('resolveRendererCandidates', () => {
     ]);
   });
 
-  it('returns no candidates for Wistia, which has no renderer yet', () => {
+  it('returns no candidates for Wistia and Dailymotion, which have no renderer yet', () => {
     expect(resolveRendererCandidates('https://fast.wistia.net/embed/iframe/e4a27b971d')).toEqual([]);
+    expect(resolveRendererCandidates('https://dai.ly/x84sh87')).toEqual([]);
   });
 });
 
