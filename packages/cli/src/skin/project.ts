@@ -230,8 +230,7 @@ To deploy on every push instead, put the project on GitHub and import it on Verc
 
 ## Learn more
 
-- [Build your own skin](https://videojs.org/docs/framework/${options.framework}/guides/build-your-own-skin)
-- [Customize skins](https://videojs.org/docs/framework/${options.framework}/guides/customize-skins)
+- [Customize skins](https://videojs.org/docs/framework/${options.framework}/guides/customize-skins#style-skin-source)
 - [UI components](https://videojs.org/docs/framework/${options.framework}/guides/ui-components)
 `;
 }
