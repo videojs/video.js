@@ -110,3 +110,6 @@ export const VJS10_DEMO_TIKTOK = INSTALLATION_DEMO_SOURCES.tiktok;
 // A VOD rather than a channel: a channel embed only plays while its streamer
 // is live, so it would show an offline banner most of the time.
 export const VJS10_DEMO_TWITCH = INSTALLATION_DEMO_SOURCES.twitch;
+// Dailymotion's player embed URL rather than a video page: it names the player
+// configuration Dailymotion refuses to embed without.
+export const VJS10_DEMO_DAILYMOTION = 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87';
