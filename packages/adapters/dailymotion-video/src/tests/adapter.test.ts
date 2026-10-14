@@ -292,6 +292,26 @@ describe('DailymotionAdapter', () => {
       expect(createPlayer.mock.calls[1]![1].params).toEqual({ loop: false, autoplay: true });
     });
 
+    it('drops a load still waiting when attaching creates the player instead', async () => {
+      const media = new DailymotionAdapter();
+      const next = createContainer();
+      const events: string[] = [];
+
+      media.source = source();
+      media.attach(createContainer());
+      await flush();
+
+      for (const type of ['emptied', 'loadstart']) media.addEventListener(type, () => events.push(type));
+
+      media.source = source(OTHER_VIDEO_SRC);
+      media.attach(next);
+      await flush();
+
+      expect(events).toEqual(['loadstart']);
+      expect(createPlayer).toHaveBeenCalledTimes(2);
+      expect(next.firstElementChild).toBe(players[1]!.root);
+    });
+
     it('rebuilds the player when the runtime parameters change', async () => {
       const media = new DailymotionAdapter();
       const { container, player } = await attachAndReady(media);

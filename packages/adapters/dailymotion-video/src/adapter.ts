@@ -112,6 +112,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (this.#target) this.detach();
 
     this.#target = target;
+    // `attach()` loads the current source itself, so a `load()` still waiting drops out instead of loading it again.
     this.#loadId++;
     this.#createPlayer();
   }
