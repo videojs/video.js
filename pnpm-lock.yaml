@@ -778,6 +778,9 @@ importers:
       '@videojs/core':
         specifier: workspace:*
         version: link:../core
+      '@videojs/dailymotion-video':
+        specifier: workspace:*
+        version: link:../adapters/dailymotion-video
       '@videojs/dash-video':
         specifier: workspace:*
         version: link:../adapters/dash-video
@@ -972,6 +975,9 @@ importers:
       '@videojs/cloudflare-video':
         specifier: workspace:*
         version: link:../adapters/cloudflare-video
+      '@videojs/dailymotion-video':
+        specifier: workspace:*
+        version: link:../adapters/dailymotion-video
       '@videojs/dash-video':
         specifier: workspace:*
         version: link:../adapters/dash-video
@@ -1129,6 +1135,9 @@ importers:
       '@videojs/cloudflare-video':
         specifier: workspace:*
         version: link:../adapters/cloudflare-video
+      '@videojs/dailymotion-video':
+        specifier: workspace:*
+        version: link:../adapters/dailymotion-video
       '@videojs/dash-video':
         specifier: workspace:*
         version: link:../adapters/dash-video
