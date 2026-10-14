@@ -41,7 +41,10 @@ class FakePlayer {
   setVolume = vi.fn((volume: number) => {
     Object.assign(this.state, { playerVolume: volume, playerIsMuted: volume === 0 });
   });
-  setPlaybackSpeed = vi.fn();
+  // Rounds up to Dailymotion's quarter steps and caps at 2, without a speed-change report, as the player does.
+  setPlaybackSpeed = vi.fn((speed: number) => {
+    this.state.playerPlaybackSpeed = Math.min(2, Math.ceil(speed * 4) / 4);
+  });
   setLoop = vi.fn();
   updateParams = vi.fn();
   loadContent = vi.fn();
@@ -59,6 +62,9 @@ class FakePlayer {
   }
 
   getState = vi.fn(async () => ({ ...this.state }));
+  settings: { autostart?: string } = { autostart: 'off' };
+  // Unlike `getState`, the SDK answers this one synchronously.
+  getSettings = vi.fn(() => ({ ...this.settings }));
 
   on(event: string, listener: (state: DailymotionPlayerState) => void) {
     if (!this.listeners.has(event)) this.listeners.set(event, new Set());
@@ -137,7 +143,7 @@ describe('resolveDailymotionPlayerOptions', () => {
     expect(resolveDailymotionPlayerOptions(VIDEO_SRC, { source: source() })).toEqual({
       video: 'x84sh87',
       player: PLAYER,
-      params: { loop: false },
+      params: { loop: false, autoplay: false },
     });
   });
 
@@ -162,8 +168,9 @@ describe('resolveDailymotionPlayerOptions', () => {
     expect(resolveDailymotionPlayerOptions('https://example.com/video.mp4', { source: source() })).toBe(null);
   });
 
-  it('passes engine options as runtime parameters beside loop, and the referrer policy beside them', () => {
+  it('passes engine options as runtime parameters beside loop and autoplay, and the referrer policy beside them', () => {
     const options = resolveDailymotionPlayerOptions(VIDEO_SRC, {
+      autoplay: true,
       loop: true,
       source: source(VIDEO_SRC, { startTime: 30, customConfig: { section: 'news' }, referrerPolicy: 'origin' }),
     });
@@ -171,7 +178,7 @@ describe('resolveDailymotionPlayerOptions', () => {
     expect(options).toEqual({
       video: 'x84sh87',
       player: PLAYER,
-      params: { startTime: 30, customConfig: { section: 'news' }, loop: true },
+      params: { startTime: 30, customConfig: { section: 'news' }, loop: true, autoplay: true },
       referrerPolicy: 'origin',
     });
   });
@@ -226,7 +233,7 @@ describe('DailymotionAdapter', () => {
       expect(createPlayer).toHaveBeenCalledWith(placeholder.id, {
         video: 'x84sh87',
         player: PLAYER,
-        params: { loop: false },
+        params: { loop: false, autoplay: false },
       });
       expect(media.engine).toBe(players[0]);
       expect(media.currentSrc).toBe(VIDEO_SRC);
@@ -277,6 +284,18 @@ describe('DailymotionAdapter', () => {
       expect(media.duration).toBe(86);
     });
 
+    it('rebuilds the player for a new video when autoplay changed, since the player reads it only when created', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.autoplay = true;
+      media.source = source(OTHER_VIDEO_SRC);
+      await flush();
+
+      expect(player.loadContent).not.toHaveBeenCalled();
+      expect(createPlayer.mock.calls[1]![1].params).toEqual({ loop: false, autoplay: true });
+    });
+
     it('rebuilds the player when the runtime parameters change', async () => {
       const media = new DailymotionAdapter();
       const { container, player } = await attachAndReady(media);
@@ -286,7 +305,7 @@ describe('DailymotionAdapter', () => {
 
       expect(player.destroy).toHaveBeenCalledOnce();
       expect(createPlayer).toHaveBeenCalledTimes(2);
-      expect(createPlayer.mock.calls[1]![1].params).toEqual({ startTime: 10, loop: false });
+      expect(createPlayer.mock.calls[1]![1].params).toEqual({ startTime: 10, loop: false, autoplay: false });
       // The outgoing player's placeholder is gone; only the new player is left in the container.
       expect(container.children).toHaveLength(1);
       expect(container.firstElementChild).toBe(players[1]!.root);
@@ -360,7 +379,7 @@ describe('DailymotionAdapter', () => {
       expect(media.error?.message).toMatch(/Unrecognized Dailymotion source/);
     });
 
-    it('reports a player the SDK fails to create as a network error', async () => {
+    it('reports a player the SDK fails to create with the reason it gives', async () => {
       createPlayer.mockRejectedValueOnce(new Error('Player options invalid'));
 
       const media = new DailymotionAdapter();
@@ -369,7 +388,56 @@ describe('DailymotionAdapter', () => {
       media.attach(createContainer());
       await flush();
 
-      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_NETWORK);
+      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_CUSTOM);
+      expect(media.error?.message).toMatch(/Player options invalid/);
+    });
+
+    it('reports a container inside a shadow root, which the SDK cannot find by id', () => {
+      const host = createContainer();
+      const container = document.createElement('div');
+
+      host.attachShadow({ mode: 'open' }).append(container);
+
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(container);
+
+      expect(media.error?.message).toMatch(/shadow root/);
+      expect(container.children).toHaveLength(0);
+      expect(createPlayer).not.toHaveBeenCalled();
+    });
+
+    it('waits for a container out of the page, which the SDK cannot find, and creates on the next load', async () => {
+      const container = document.createElement('div');
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(container);
+      await flush();
+
+      expect(media.error).toBeNull();
+      expect(container.children).toHaveLength(0);
+      expect(createPlayer).not.toHaveBeenCalled();
+
+      document.body.append(container);
+      await media.load();
+      await flush();
+
+      expect(createPlayer).toHaveBeenCalledOnce();
+    });
+
+    it('keeps the running player when only the video changes after loop was toggled', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.loop = true;
+      media.source = source(OTHER_VIDEO_SRC);
+      await flush();
+
+      expect(player.setLoop).toHaveBeenCalledWith(true);
+      expect(player.loadContent).toHaveBeenCalledWith({ video: 'x7tgad0' });
+      expect(createPlayer).toHaveBeenCalledOnce();
     });
 
     it('destroys the player on detach, leaving the container as it was rendered', async () => {
@@ -442,6 +510,42 @@ describe('DailymotionAdapter', () => {
       expect(players[0]!.play).toHaveBeenCalledOnce();
     });
 
+    it('holds a play asked for before attach', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      void media.play();
+      media.attach(createContainer());
+      await flush();
+
+      expect(players[0]!.play).toHaveBeenCalledOnce();
+    });
+
+    it('keeps a held play when autoplay turns off before ready', async () => {
+      const media = new DailymotionAdapter();
+
+      media.autoplay = true;
+      media.source = source();
+      media.attach(createContainer());
+      void media.play();
+      media.autoplay = false;
+      await flush();
+
+      expect(players[0]!.play).toHaveBeenCalledOnce();
+    });
+
+    it('drops autoplay when paused before ready, since the pause is the later intent', async () => {
+      const media = new DailymotionAdapter();
+
+      media.autoplay = true;
+      media.source = source();
+      media.attach(createContainer());
+      media.pause();
+      await flush();
+
+      expect(players[0]!.play).not.toHaveBeenCalled();
+    });
+
     it('drops a held play when paused before ready', async () => {
       const media = new DailymotionAdapter();
 
@@ -452,6 +556,68 @@ describe('DailymotionAdapter', () => {
       await flush();
 
       expect(players[0]!.play).not.toHaveBeenCalled();
+    });
+
+    it('warns once per player configuration that starts playback while autoplay is off', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      createPlayer.mockImplementation(async (id, options) => {
+        const player = new FakePlayer(document.getElementById(id)!, options);
+
+        player.settings = { autostart: 'firstTimeViewable' };
+        players.push(player);
+        return player;
+      });
+
+      const media = new DailymotionAdapter();
+
+      media.source = source(VIDEO_SRC, { player: 'xautostart' });
+      media.attach(createContainer());
+      await flush();
+      media.source = source(VIDEO_SRC, { player: 'xautostart', startTime: 5 });
+      await flush();
+
+      expect(players).toHaveLength(2);
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringMatching(/xautostart starts playback itself/));
+    });
+
+    it('does not warn about autostart when autoplay is on or the configuration leaves it off', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await attachAndReady(new DailymotionAdapter());
+
+      const media = new DailymotionAdapter();
+
+      media.autoplay = true;
+      createPlayer.mockImplementationOnce(async (id, options) => {
+        const player = new FakePlayer(document.getElementById(id)!, options);
+
+        player.settings = { autostart: 'on' };
+        players.push(player);
+        return player;
+      });
+      await attachAndReady(media);
+
+      expect(warn).not.toHaveBeenCalled();
+    });
+
+    it('still loads when the player cannot report its settings', async () => {
+      const media = new DailymotionAdapter();
+      const loadedmetadata = vi.fn();
+
+      createPlayer.mockImplementationOnce(async (id, options) => {
+        const player = new FakePlayer(document.getElementById(id)!, options);
+
+        player.getSettings.mockImplementation(() => {
+          throw new Error('not supported');
+        });
+        players.push(player);
+        return player;
+      });
+      media.addEventListener('loadedmetadata', loadedmetadata);
+      await attachAndReady(media);
+
+      expect(loadedmetadata).toHaveBeenCalledOnce();
     });
 
     it('plays on ready with autoplay, since the player configuration owns autostart', async () => {
@@ -561,6 +727,26 @@ describe('DailymotionAdapter', () => {
 
       expect(player.setLoop).toHaveBeenCalledWith(true);
     });
+
+    it('applies a change made while the player was being created', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(createContainer());
+      media.loop = true;
+      await flush();
+
+      const [player] = players;
+
+      expect(player!.options.params).toEqual({ loop: false, autoplay: false });
+      expect(player!.setLoop).toHaveBeenCalledWith(true);
+
+      media.source = source(OTHER_VIDEO_SRC);
+      await flush();
+
+      expect(player!.loadContent).toHaveBeenCalledWith({ video: 'x7tgad0' });
+      expect(createPlayer).toHaveBeenCalledOnce();
+    });
   });
 
   describe('seeking', () => {
@@ -587,6 +773,80 @@ describe('DailymotionAdapter', () => {
       expect(media.seeking).toBe(false);
       expect(media.currentTime).toBe(15.1);
       expect(events).toEqual(['seeking', 'timeupdate', 'timeupdate', 'seeked']);
+    });
+
+    it('settles a seek the player never reports the end of, from the state it then reports', async () => {
+      vi.useFakeTimers();
+
+      try {
+        const media = new DailymotionAdapter();
+        const { player } = await attachAndReady(media);
+        const seeked = vi.fn();
+
+        media.addEventListener('seeked', seeked);
+        media.currentTime = 15;
+        player.state.videoTime = 14.9;
+
+        await vi.advanceTimersByTimeAsync(2_000);
+
+        expect(media.seeking).toBe(false);
+        expect(media.currentTime).toBe(14.9);
+        expect(seeked).toHaveBeenCalledOnce();
+
+        player.emit('VIDEO_TIMECHANGE', { videoTime: 16 });
+
+        expect(media.currentTime).toBe(16);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('keeps the requested position when the player is still where the seek started', async () => {
+      vi.useFakeTimers();
+
+      try {
+        const media = new DailymotionAdapter();
+        const { player } = await attachAndReady(media);
+        const seeked = vi.fn();
+
+        media.addEventListener('seeked', seeked);
+        media.currentTime = 15;
+
+        await vi.advanceTimersByTimeAsync(2_000);
+
+        expect(media.seeking).toBe(false);
+        expect(media.currentTime).toBe(15);
+
+        player.emit('VIDEO_SEEKEND', { videoTime: 15.1 });
+
+        expect(media.currentTime).toBe(15.1);
+        expect(seeked).toHaveBeenCalledOnce();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('leaves a later seek alone when an earlier one times out', async () => {
+      vi.useFakeTimers();
+
+      try {
+        const media = new DailymotionAdapter();
+        const { player } = await attachAndReady(media);
+
+        media.currentTime = 5;
+        await vi.advanceTimersByTimeAsync(1_500);
+        media.currentTime = 15;
+        await vi.advanceTimersByTimeAsync(600);
+
+        expect(media.seeking).toBe(true);
+        expect(media.currentTime).toBe(15);
+
+        player.emit('VIDEO_SEEKEND', { videoTime: 15 });
+
+        expect(media.seeking).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('announces a seek made in the player chrome', async () => {
@@ -682,17 +942,32 @@ describe('DailymotionAdapter', () => {
   });
 
   describe('playbackRate', () => {
-    it('sets the speed once ready and takes the rate the player settles on', async () => {
+    it('sets the speed once ready and reads back the rate the player rounded to', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+      const ratechange = vi.fn();
+
+      media.addEventListener('ratechange', ratechange);
+      media.playbackRate = 1.1;
+      await flush();
+
+      expect(player.setPlaybackSpeed).toHaveBeenCalledWith(1.1);
+      expect(media.playbackRate).toBe(1.25);
+      expect(ratechange).toHaveBeenCalledTimes(2);
+
+      media.playbackRate = 3;
+      await flush();
+
+      expect(media.playbackRate).toBe(2);
+    });
+
+    it('takes a speed changed in the player chrome', async () => {
       const media = new DailymotionAdapter();
       const { player } = await attachAndReady(media);
 
-      media.playbackRate = 1.1;
+      player.emit('PLAYER_PLAYBACKSPEEDCHANGE', { playerPlaybackSpeed: 0.75 });
 
-      expect(player.setPlaybackSpeed).toHaveBeenCalledWith(1.1);
-
-      player.emit('PLAYER_PLAYBACKSPEEDCHANGE', { playerPlaybackSpeed: 1.25 });
-
-      expect(media.playbackRate).toBe(1.25);
+      expect(media.playbackRate).toBe(0.75);
     });
   });
 

@@ -11,10 +11,10 @@ export { type ParsedDailymotionSource, parseDailymotionSource, parseDailymotionV
  * the player configuration, they are handed to `createPlayer` as its `params` verbatim, so what you write here is what
  * the player reads.
  *
- * Parameters the host owns are deliberately absent: `video` comes from `src`, and `loop` from the prop of the same
- * name, so configuring them here would give two ways to say one thing. `autoplay`, `mute`, and the controls are not
- * runtime parameters at all: the player configuration decides them, and the host applies `autoplay` and `muted` through
- * the SDK. The index signature still carries anything not listed, so whatever Dailymotion adds next keeps working.
+ * Parameters the host owns are deliberately absent: `video` comes from `src`, and `loop` and `autoplay` from the props
+ * of the same name, so configuring them here would give two ways to say one thing. Mute and the controls are not
+ * runtime parameters at all: the player configuration decides them, and the host applies `muted` through the SDK. The
+ * index signature still carries anything not listed, so whatever Dailymotion adds next keeps working.
  */
 export interface DailymotionEngineConfig extends Record<string, unknown> {
   /**
@@ -29,8 +29,6 @@ export interface DailymotionEngineConfig extends Record<string, unknown> {
   scaleMode?: 'fit' | 'fill' | 'fillLeft' | 'fillRight' | 'fillTop' | 'fillBottom';
   /** Advertising key-values (https://developers.dailymotion.com/docs/custom-config). */
   customConfig?: Record<string, string>;
-  /** Syndication key that attributes the embed to a Dailymotion partner. */
-  syndicationKey?: string;
   /**
    * `referrerpolicy` for the iframe the SDK builds. Not a runtime parameter: it is handed to `createPlayer` beside
    * them.
@@ -82,7 +80,7 @@ export function resolveDailymotionPlayerOptions(
     video: parsed.id,
     player,
     // Dailymotion-specific knobs (`startTime`, `scaleMode`, …) flow through beside the one the host owns.
-    params: { ...params, loop: props.loop === true },
+    params: { ...params, loop: props.loop === true, autoplay: props.autoplay === true },
     ...(referrerPolicy && { referrerPolicy }),
   };
 }
