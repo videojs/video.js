@@ -6,21 +6,17 @@ import type { DailymotionCreatePlayerOptions } from './sdk-api';
 export { type ParsedDailymotionSource, parseDailymotionSource, parseDailymotionVideoId } from '@videojs/media';
 
 /**
- * Dailymotion engine options, spelled exactly as Dailymotion spells them
- * (https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters). Apart from `player`, which names
- * the player configuration, they are handed to `createPlayer` as its `params` verbatim, so what you write here is what
- * the player reads.
+ * Dailymotion runtime parameters, spelled as Dailymotion spells them
+ * (https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters) and passed to `createPlayer`
+ * verbatim, plus the `player` that names the player configuration.
  *
- * Parameters the host owns are deliberately absent: `video` comes from `src`, and `loop` and `autoplay` from the props
- * of the same name, so configuring them here would give two ways to say one thing. Mute and the controls are not
- * runtime parameters at all: the player configuration decides them, and the host applies `muted` through the SDK. The
- * index signature still carries anything not listed, so whatever Dailymotion adds next keeps working.
+ * `video` comes from `src`, and `loop` and `autoplay` from the props of the same name, so they have no spelling here.
+ * Anything not listed still passes through, so parameters Dailymotion adds later keep working.
  */
 export interface DailymotionEngineConfig extends Record<string, unknown> {
   /**
-   * Player ID of a player configuration from Dailymotion Studio. Dailymotion refuses every embed that does not name
-   * one, so it is required unless `src` is a player embed URL, which names its own; this one wins over that. Turn the
-   * configuration's controls off so they do not sit under the Video.js skin.
+   * Player ID of a player configuration from Dailymotion Studio. Required unless `src` is a player embed URL, which
+   * names its own; this one wins over it.
    */
   player?: string;
   /** Start position in seconds. */
@@ -29,10 +25,7 @@ export interface DailymotionEngineConfig extends Record<string, unknown> {
   scaleMode?: 'fit' | 'fill' | 'fillLeft' | 'fillRight' | 'fillTop' | 'fillBottom';
   /** Advertising key-values (https://developers.dailymotion.com/docs/custom-config). */
   customConfig?: Record<string, string>;
-  /**
-   * `referrerpolicy` for the iframe the SDK builds. Not a runtime parameter: it is handed to `createPlayer` beside
-   * them.
-   */
+  /** `referrerpolicy` for the iframe the SDK builds. */
   referrerPolicy?: ReferrerPolicy;
 }
 
@@ -79,7 +72,6 @@ export function resolveDailymotionPlayerOptions(
   return {
     video: parsed.id,
     player,
-    // Dailymotion-specific knobs (`startTime`, `scaleMode`, …) flow through beside the one the host owns.
     params: { ...params, loop: props.loop === true, autoplay: props.autoplay === true },
     ...(referrerPolicy && { referrerPolicy }),
   };

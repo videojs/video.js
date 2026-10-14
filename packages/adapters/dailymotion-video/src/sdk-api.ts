@@ -18,7 +18,7 @@ export interface DailymotionPlayerState {
   playerIsPlaying?: boolean;
   playerPlaybackPermissionReason?: string | null;
   playerPlaybackSpeed?: number;
-  /** Level in the `0`–`1` range, kept separately from the muted flag. */
+  /** Level in the `0`–`1` range; `0` while muted. */
   playerVolume?: number;
   videoDuration?: number;
   videoId?: string;
@@ -57,10 +57,7 @@ export interface DailymotionPlayerApi {
   updateParams(params: Record<string, unknown>): void;
   loadContent(options: { video: string; startTime?: number }): void;
   getState(): Promise<DailymotionPlayerState>;
-  /**
-   * The player configuration's settings, of which only `autostart` (`'on'`, `'off'`, `'firstTimeViewable'`, …) is
-   * typed.
-   */
+  /** The player configuration's settings. Only `autostart` (`'on'`, `'off'`, `'firstTimeViewable'`, …) is typed. */
   getSettings(): { autostart?: string };
   on(event: string, listener: (state: DailymotionPlayerState) => void): void;
   off(event: string, listener?: (state: DailymotionPlayerState) => void): void;
@@ -117,4 +114,4 @@ function getDailymotionApi(): DailymotionApi | null {
 }
 
 /** Where the SDK and the player it embeds are served from. */
-export const DAILYMOTION_PLAYER_ORIGIN = 'https://geo.dailymotion.com';
+const DAILYMOTION_PLAYER_ORIGIN = 'https://geo.dailymotion.com';

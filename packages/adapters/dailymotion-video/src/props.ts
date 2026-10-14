@@ -3,10 +3,9 @@ import type { Video } from '@videojs/media';
 import type { DailymotionSource } from './source';
 
 /**
- * The `Video` members the Dailymotion host accepts, plus the source that names the video and the player configuration
- * to embed it with. Several never reach the player as such: `autoplay` and `defaultMuted`, which the player
- * configuration decides and the host applies by command once the player is ready; `controls`, which only the player
- * configuration can turn off; and `playsInline`, `preload`, and `poster`, which the player decides for itself.
+ * The `Video` members the Dailymotion host accepts, plus the source that names the video and player configuration.
+ * `controls` only decides whether the player takes input, since only the configuration can hide its controls, and
+ * `playsInline`, `preload`, and `poster` are left to the player.
  */
 export interface DailymotionAdapterProps extends Pick<
   Video,

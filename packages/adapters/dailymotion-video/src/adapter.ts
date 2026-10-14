@@ -1,9 +1,9 @@
-// Drives the Dailymotion Web SDK (https://developers.dailymotion.com/reference/web-sdk-player-methods), shaped like the
-// other embed adapters (mirrors `youtube-video`, which also loads its player API from a script).
+// Drives the Dailymotion Web SDK (https://developers.dailymotion.com/reference/web-sdk-player-methods). Mirrors
+// `youtube-video`, which also loads its player API from a script.
 
 import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
-import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
+import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
 import { deepEqual } from '@videojs/utils/object';
 import { isBoolean, isNumber } from '@videojs/utils/predicate';
@@ -21,16 +21,14 @@ import { type DailymotionSource, parseDailymotionSource, resolveDailymotionPlaye
 
 /**
  * Plays Dailymotion videos through the Dailymotion Web SDK. Dailymotion only embeds a video inside a player
- * configuration made in Dailymotion Studio, so the source must name one: under `engine.dailymotion.player`, or by being
- * a player embed URL (`geo.dailymotion.com/player/<player>.html?video=<id>`).
+ * configuration from Dailymotion Studio, so the source must name one: under `engine.dailymotion.player`, or as a player
+ * embed URL (`geo.dailymotion.com/player/<player>.html?video=<id>`).
  *
- * The target is a container element the SDK builds its player in. The SDK finds it by id from the document, so the
- * container has to be reachable from there: in the light DOM, not inside a shadow root.
+ * The target is a container the SDK builds its player in. The SDK finds it by id from the document, so it must be in
+ * the light DOM, not inside a shadow root.
  *
- * The configuration owns what the SDK cannot change. Its controls stay drawn under the Video.js skin unless the
- * configuration turns them off, and an `autostart` it enables starts playback whatever `autoplay` says; `autoplay` can
- * only start a player the configuration leaves stopped. In development, a player whose configuration starts it while
- * `autoplay` is off logs a warning. `currentTime` and `duration` always describe the video, while `paused` follows
+ * The configuration owns what the SDK can't change: its controls, and an `autostart` that `autoplay` can't turn off
+ * (development builds warn when they disagree). `currentTime` and `duration` describe the video, while `paused` follows
  * whatever is on screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the playhead.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
@@ -53,13 +51,14 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   static PLAYER_SOFTWARE_NAME = 'dailymotion-video';
 
   #target: HTMLElement | null = null;
-  // The element handed to `createPlayer`, which the SDK swaps for its own and puts back on `destroy()`.
+  // Handed to `createPlayer`; the SDK swaps it for its own root and puts it back on `destroy()`.
   #placeholder: HTMLElement | null = null;
   #player: DailymotionPlayerApi | null = null;
-  // What the current player was created with, so a change of video alone can load into it instead of rebuilding.
+  // What the current player was created with, so a new video can load into it instead of rebuilding.
   #options: DailymotionCreatePlayerOptions | null = null;
   #unbindEvents: (() => void) | null = null;
-  #loadComplete = createPublicPromise<void>();
+  // Lets a `load()` waiting out its microtask drop out once a newer load begins.
+  #loadId = 0;
   // Guards async player creation across attach/detach cycles and rebuilds.
   #attachId = 0;
 
@@ -73,25 +72,23 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #poster = DailymotionAdapter.defaultProps.poster;
   #source: DailymotionSource | null = DailymotionAdapter.defaultProps.source;
 
-  // `createPlayer` resolves once the player takes commands; until then every value is held for `#syncToEmbed`.
-  #ready = false;
-  // A video was loaded into the running player; its `videochange` completes the load.
+  // A new video was loaded into the running player; its `videochange` completes the load.
   #swapping = false;
-  // A play asked for before the player could take it, replayed once it is ready.
+  // A `play()` made before the player was ready.
   #playRequested = false;
-  // Whether the current load may still autoplay once the player is ready; a pause before then withdraws it.
+  // Whether this load may still autoplay; a `pause()` before the player is ready withdraws it.
   #autoplayPending = false;
-  // Where the player was when the pending seek was asked for, to tell a seek that landed from one that has not yet.
+  // The player's position when the pending seek began, to tell whether it has landed.
   #seekFrom = 0;
-  // Identifies the latest seek, so the settle check of an earlier one leaves a later one alone.
-  #seekCount = 0;
+  // Settles a seek the player never reports the end of.
+  #seekTimer: ReturnType<typeof setTimeout> | undefined;
 
   #paused = true;
   #ended = false;
   #seeking = false;
   #currentTime = 0;
   #duration = Number.NaN;
-  // Volume, mute, and rate survive a source change, as on a media element, and are asserted on each new player.
+  // Volume, mute, and rate survive a source change, as on a media element.
   #volume = 1;
   #muted = false;
   #playbackRate = 1;
@@ -99,7 +96,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #error: MediaError | null = null;
   #isFullscreen = false;
 
-  /** The SDK's player object. Null until the SDK has loaded and the player is ready. */
+  /** The SDK's player object, or null until the player is ready. */
   get engine(): DailymotionPlayerApi | null {
     return this.#player;
   }
@@ -108,14 +105,14 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     return this.#target;
   }
 
-  /** Bind the container the SDK builds its player in. The player follows once a `src` resolves, which may be later. */
+  /** Bind the container the SDK builds its player in; the player is created once `src` resolves. */
   attach(target: HTMLElement | null): void {
     if (!target || this.#target === target) return;
 
     if (this.#target) this.detach();
 
     this.#target = target;
-    this.#beginLoad();
+    this.#loadId++;
     this.#createPlayer();
   }
 
@@ -124,10 +121,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#destroyPlayer();
     this.#target = null;
-    // Left set, the next player to become ready would start playing on its own.
+    // A pending play must not start the next player.
     this.#playRequested = false;
     this.#autoplayPending = false;
-    this.#loadComplete.resolve();
     this.#resetState();
   }
 
@@ -149,8 +145,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   get currentSrc() {
-    // The source loaded into the player. Not the URL of the iframe the SDK built, which keeps naming the first video
-    // after another is loaded into the same player. A recommendation the player moves on to by itself is not reflected.
+    // Not the SDK iframe's URL, which keeps naming the first video after another is loaded into it.
     return this.#player ? this.#src : '';
   }
 
@@ -160,25 +155,24 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
   /**
    * Load the current source: into the running player when only the video changed, otherwise into a new player, since
-   * the player configuration and runtime parameters are only read when a player is created.
+   * the player configuration and runtime parameters are only read on creation.
    */
   async load() {
-    // Nothing to load into without a target, and no load to wait on either.
     if (!this.#target) return;
 
-    const load = this.#beginLoad();
+    const loadId = ++this.#loadId;
 
-    // Wait a microtask so a framework's `src` and prop writes all land before the player is configured, once.
+    // Wait a microtask so a framework's prop writes all land before the player is configured.
     await Promise.resolve();
 
-    // A later load took over while waiting, or the target went away; either way this load is not ours to finish.
-    if (load !== this.#loadComplete || !this.#target) return;
+    // A newer load took over, or the target went away.
+    if (loadId !== this.#loadId || !this.#target) return;
 
     const options = resolveDailymotionPlayerOptions(this.#src, this.#snapshotProps());
     const player = this.#player;
 
     this.#resetState();
-    // `emptied` announces that reset before any bail, where the player reports nothing further.
+    // Announced before any early return, since no player report follows those.
     this.dispatchEvent(new Event('emptied'));
 
     if (player && options && isSameEmbed(this.#options, options)) {
@@ -191,14 +185,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     }
 
     this.#destroyPlayer();
-    this.#createPlayer();
-  }
-
-  // Take over as the current load. The barrier marks which load is current: `load()` drops out once another begins.
-  #beginLoad(): PublicPromise<void> {
-    this.#loadComplete.resolve();
-    this.#loadComplete = createPublicPromise<void>();
-    return this.#loadComplete;
+    this.#createPlayer(options);
   }
 
   get paused() {
@@ -216,7 +203,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   async play() {
     if (!this.#src) return;
 
-    if (!this.#ready) {
+    if (!this.#player) {
       this.#playRequested = true;
       return;
     }
@@ -225,11 +212,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   pause() {
-    // A pause after a pending play is the later intent, so it cancels the replay rather than racing it.
+    // The later intent wins over a pending play.
     this.#playRequested = false;
     this.#autoplayPending = false;
 
-    if (this.#ready) tryCall(() => this.#player?.pause());
+    tryCall(() => this.#player?.pause());
   }
 
   get currentTime() {
@@ -238,19 +225,19 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   set currentTime(value) {
     if (this.#currentTime === value) return;
 
-    // A seek over a pending one starts from where the player still is.
+    // A seek over a pending one keeps the position the player is still at.
     if (!this.#seeking) this.#seekFrom = this.#currentTime;
 
     this.#seeking = true;
-    // Seeking away from the end leaves it, as on a media element; the player's next report says otherwise if not.
+    // As on a media element, seeking leaves the ended state.
     this.#ended = false;
-    // Report the requested position now; until the player lands, its reports would look like a lost seek.
+    // Report the target now; the player's reports until it lands would drag it back.
     this.#currentTime = value;
     this.dispatchEvent(new Event('seeking'));
     this.dispatchEvent(new Event('timeupdate'));
 
-    // Before ready, `#syncToEmbed` sends the seek still pending.
-    if (this.#ready) this.#seek(value, this.#seekFrom);
+    // Without a player yet, `#syncToEmbed` sends it once ready.
+    this.#seek(value, this.#seekFrom);
   }
 
   get duration() {
@@ -264,11 +251,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (this.#volume === value) return;
 
     this.#volume = value;
-    // The player's report of a commanded level reads as unchanged, so the host announces its own change.
+    // The player's report of this change reads as unchanged, so the host announces it.
     this.dispatchEvent(new Event('volumechange'));
 
-    // While muted the player holds a level of `0`, so the new level waits for the unmute that restores it.
-    if (this.#ready && !this.#muted) tryCall(() => this.#player?.setVolume(value));
+    // While muted the player holds `0`; the new level applies on unmute.
+    if (!this.#muted) tryCall(() => this.#player?.setVolume(value));
   }
 
   get muted() {
@@ -280,7 +267,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#muted = value;
     this.dispatchEvent(new Event('volumechange'));
 
-    if (this.#ready) this.#applyMuted();
+    this.#applyMuted();
   }
 
   /**
@@ -296,15 +283,14 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#playbackRate = value;
     this.dispatchEvent(new Event('ratechange'));
 
-    if (this.#ready && this.#player) this.#setPlaybackSpeed(this.#player);
+    this.#setPlaybackSpeed();
   }
 
   get autoplay() {
     return this.#autoplay;
   }
   set autoplay(value) {
-    // Read when a player is created, as the `autoplay` runtime parameter, and when it is ready, as a play the host
-    // sends. Neither can stop a player whose configuration's `autostart` starts it.
+    // Read on each load, as the `autoplay` runtime parameter and as a play sent once the player is ready.
     this.#autoplay = value;
   }
 
@@ -314,8 +300,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   set defaultMuted(value) {
     this.#defaultMuted = value;
 
-    // Seed `muted` until the player is up; `#syncToEmbed` asserts it through the SDK.
-    if (!this.#ready) this.#muted = value;
+    // Seeds `muted` until there is a player; `#syncToEmbed` then applies it.
+    if (!this.#player) this.#muted = value;
   }
 
   get loop() {
@@ -324,15 +310,15 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   set loop(value) {
     this.#loop = value;
 
-    // Passed to the next player as a runtime parameter, and changed in place for the current one.
-    if (this.#ready) this.#applyLoop();
+    // A runtime parameter for the next player, and `setLoop` for the current one.
+    this.#applyLoop();
   }
 
   get controls() {
     return this.#controls;
   }
   set controls(value) {
-    // Only the player configuration can hide Dailymotion's chrome; `controls` decides whether the player takes input.
+    // Only the player configuration can hide Dailymotion's controls; `controls` decides whether the player takes input.
     this.#controls = value;
   }
 
@@ -419,18 +405,12 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#isFullscreen = false;
   }
 
-  // Create a player in the target for the current source. A source that cannot resolve settles its load, and
-  // `load()` retries once it changes.
-  #createPlayer() {
+  // A source that can't resolve reports why; `load()` retries once it changes.
+  #createPlayer(options = resolveDailymotionPlayerOptions(this.#src, this.#snapshotProps())) {
     const target = this.#target;
     if (!target) return;
 
-    const options = resolveDailymotionPlayerOptions(this.#src, this.#snapshotProps());
-
     if (!options) {
-      // No player is coming to settle this load.
-      this.#loadComplete.resolve();
-
       if (this.#src) {
         this.dispatchEvent(new Event('loadstart'));
         this.#onSourceError();
@@ -439,30 +419,27 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       return;
     }
 
-    // The SDK looks the container up by id, which has to be a valid selector.
+    // The SDK can't find a container out of the page; a load once it is connected creates the player.
+    if (!target.isConnected) return;
+
+    // The SDK can't find a container inside a shadow root either, and would fail without saying why.
+    if (target.getRootNode() !== globalThis.document) {
+      this.dispatchEvent(new Event('loadstart'));
+      this.#fail(
+        new MediaError(
+          'The Dailymotion player has to be in the document, not in a shadow root: the SDK looks it up by id.',
+          MediaError.MEDIA_ERR_CUSTOM,
+          true
+        )
+      );
+      return;
+    }
+
+    // The SDK looks it up by id, so the id must be a valid selector.
     const placeholder = globalThis.document.createElement('div');
 
     placeholder.id = `videojs-dailymotion-${generateId()}`;
     target.append(placeholder);
-
-    // Out of the page, the SDK cannot find the container either; the player waits for a load once it is in.
-    if (!placeholder.isConnected) {
-      placeholder.remove();
-      this.#loadComplete.resolve();
-      return;
-    }
-
-    // The SDK cannot find a container the document does not reach, such as one inside a shadow root, and would fail
-    // with nothing to say why.
-    if (placeholder.getRootNode() !== globalThis.document) {
-      placeholder.remove();
-      this.#loadComplete.resolve();
-      this.dispatchEvent(new Event('loadstart'));
-      this.#onPlayerCreateError(
-        'The Dailymotion player has to be in the document, not in a shadow root: the SDK looks it up by id.'
-      );
-      return;
-    }
 
     this.#placeholder = placeholder;
     this.#options = options;
@@ -479,17 +456,13 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     try {
       api = await loadDailymotionApi(options.player);
     } catch (cause) {
-      // A failure belongs to the attach that started it; a newer one must not be marked failed.
+      // A newer attach must not be marked failed.
       if (this.#isStale(attachId)) return;
 
-      this.#error = new MediaError('Failed to load the Dailymotion Web SDK', MediaError.MEDIA_ERR_NETWORK);
-      this.#error.data = { cause };
-      this.dispatchEvent(new Event('error'));
-      this.#loadComplete.resolve();
+      this.#fail(new MediaError('Failed to load the Dailymotion Web SDK', MediaError.MEDIA_ERR_NETWORK), { cause });
       return;
     }
 
-    // Stale after the SDK loaded: the placeholder is already gone, and no player was created in it.
     if (this.#isStale(attachId)) return;
 
     try {
@@ -497,14 +470,18 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     } catch (cause) {
       if (this.#isStale(attachId)) return;
 
-      this.#onPlayerCreateError(
-        `Dailymotion could not create the player: ${cause instanceof Error ? cause.message : String(cause)}`,
-        cause
+      this.#fail(
+        new MediaError(
+          `Dailymotion could not create the player: ${cause instanceof Error ? cause.message : String(cause)}`,
+          MediaError.MEDIA_ERR_CUSTOM,
+          true
+        ),
+        { cause }
       );
       return;
     }
 
-    // Superseded while the player was being created: it belongs to no one, so it goes now.
+    // Replaced while being created, so nothing owns this player.
     if (this.#isStale(attachId)) {
       tryCall(() => player.destroy());
       placeholder.remove();
@@ -513,13 +490,12 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#player = player;
     this.#unbindEvents = this.#bindPlayerEvents(api, player, attachId);
-    // Fill the container rather than keep the configuration's aspect ratio, as any media element in a skin does.
+    // Fill the container instead of keeping the configuration's aspect ratio, as media elements in a skin do.
     tryCall(() => player.updateParams({ aspectRatio: 'inherit' }));
-    this.#onReady(player, attachId);
+    this.#onReady();
   }
 
-  // Whether a callback belongs to a superseded player: the SDK resolves and reports asynchronously, so each report has
-  // to match the attach that created its player to touch state.
+  // Whether an async SDK callback belongs to a player that has since been replaced.
   #isStale(attachId: number) {
     return attachId !== this.#attachId;
   }
@@ -575,8 +551,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     };
   }
 
-  // Release the player. `destroy()` puts the placeholder back where the SDK found it, so removing the placeholder
-  // leaves the container as the host rendered it.
+  // `destroy()` puts the placeholder back, so removing it leaves the container as the host rendered it.
   #destroyPlayer() {
     this.#attachId++;
     this.#unbindEvents?.();
@@ -586,8 +561,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#player = null;
     this.#options = null;
-    this.#ready = false;
     this.#swapping = false;
+    clearTimeout(this.#seekTimer);
 
     if (player) tryCall(() => player.destroy());
 
@@ -595,35 +570,42 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#placeholder = null;
   }
 
-  #onReady(player: DailymotionPlayerApi, attachId: number) {
-    this.#ready = true;
+  #onReady() {
+    this.#syncToEmbed();
 
-    this.#syncToEmbed(player);
+    if (__DEV__) this.#warnOnAutostart();
 
-    if (__DEV__) this.#warnOnAutostart(player);
-
-    // Duration arrives with the state read below, which dispatches its own `durationchange`.
+    // The duration arrives with the state read below.
     this.#onLoaded();
 
-    // Read after `#syncToEmbed`, and the player answers in order, so the state includes what was just asserted.
+    // The player answers in order, so this read includes what `#syncToEmbed` just applied.
+    this.#readState((state) => this.#onPlayerState(state));
+  }
+
+  // Drops the answer if the player has been replaced since.
+  #readState(apply: (state: DailymotionPlayerState) => void) {
+    const player = this.#player;
+    if (!player) return;
+
+    const attachId = this.#attachId;
+
     player.getState().then(
       (state) => {
-        if (!this.#isStale(attachId)) this.#onPlayerState(state);
+        if (!this.#isStale(attachId)) apply(state);
       },
       () => {}
     );
   }
 
-  // `autoplay` off cannot stop a configuration that starts playback itself, so the player would play anyway.
-  #warnOnAutostart(player: DailymotionPlayerApi) {
+  #warnOnAutostart() {
     if (this.#autoplay) return;
 
     const id = this.#options?.player;
     let autostart: string | undefined;
 
-    // A diagnostic only, so a player without the method must not fail its load.
+    // Diagnostic only: a player without the method must still load.
     try {
-      autostart = player.getSettings()?.autostart;
+      autostart = this.#player?.getSettings()?.autostart;
     } catch {
       return;
     }
@@ -636,12 +618,12 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     );
   }
 
-  // Assert what the host was asked for before the player was up.
-  #syncToEmbed(player: DailymotionPlayerApi) {
+  // Apply what was asked for before the player was ready.
+  #syncToEmbed() {
     if (this.#muted) this.#applyMuted();
-    else if (this.#volume !== 1) tryCall(() => player.setVolume(this.#volume));
+    else if (this.#volume !== 1) tryCall(() => this.#player?.setVolume(this.#volume));
 
-    if (this.#playbackRate !== 1) this.#setPlaybackSpeed(player);
+    if (this.#playbackRate !== 1) this.#setPlaybackSpeed();
 
     this.#applyLoop();
 
@@ -650,19 +632,12 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#playIfRequested();
   }
 
-  // The player sends no speed-change report for a speed it was told to play at, so the rate it rounded to is read back.
-  #setPlaybackSpeed(player: DailymotionPlayerApi) {
-    const attachId = this.#attachId;
-
-    tryCall(() => player.setPlaybackSpeed(this.#playbackRate));
-    player.getState().then(
-      (state) => {
-        if (!this.#isStale(attachId) && isNumber(state.playerPlaybackSpeed)) {
-          this.#applyPlaybackRate(state.playerPlaybackSpeed);
-        }
-      },
-      () => {}
-    );
+  // The player sends no speed-change report for a commanded speed, so the rate it rounded to is read back.
+  #setPlaybackSpeed() {
+    tryCall(() => this.#player?.setPlaybackSpeed(this.#playbackRate));
+    this.#readState((state) => {
+      if (isNumber(state.playerPlaybackSpeed)) this.#applyPlaybackRate(state.playerPlaybackSpeed);
+    });
   }
 
   #playIfRequested() {
@@ -674,13 +649,13 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (play) tryCall(() => this.#player?.play());
   }
 
-  // The running player was built with one `loop`; a change since goes through `setLoop`, and is recorded as what the
-  // player now has, so the next video can still load into it.
+  // Recorded in `#options` too, so the next video can still load into this player.
   #applyLoop() {
+    const player = this.#player;
     const options = this.#options;
-    if (!options || options.params?.loop === this.#loop) return;
+    if (!player || !options || options.params?.loop === this.#loop) return;
 
-    tryCall(() => this.#player?.setLoop(this.#loop));
+    tryCall(() => player.setLoop(this.#loop));
     this.#options = { ...options, params: { ...options.params, loop: this.#loop } };
   }
 
@@ -690,39 +665,30 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     for (const type of ['loadedmetadata', 'loadcomplete']) {
       this.dispatchEvent(new Event(type));
     }
-
-    this.#loadComplete.resolve();
   }
 
-  // Send a seek, and settle it from the player's state if no seek-end report comes: the player sends none for a seek
-  // it ignores or clamps, which would otherwise hold `currentTime` at the requested position for good. A player still
-  // at `from` has not landed yet, so `currentTime` keeps the requested position rather than jump back.
+  // The player sends no seek-end report for a seek it ignores or clamps, so the seek is settled from its state after a
+  // timeout. A player still at `from` hasn't landed, so `currentTime` keeps the target.
   #seek(time: number, from: number) {
     const player = this.#player;
     if (!player) return;
 
-    const seek = ++this.#seekCount;
-    const attachId = this.#attachId;
-
     tryCall(() => player.seek(time));
+    clearTimeout(this.#seekTimer);
 
-    setTimeout(() => {
-      if (this.#isStale(attachId) || seek !== this.#seekCount || !this.#seeking) return;
+    const timer = setTimeout(() => {
+      if (!this.#seeking) return;
 
-      player.getState().then(
-        (state) => {
-          if (this.#isStale(attachId) || seek !== this.#seekCount) return;
-
-          this.#onSeeked(state.videoTime === from ? undefined : state.videoTime);
-        },
-        () => {}
-      );
+      this.#readState((state) => {
+        if (timer === this.#seekTimer) this.#onSeeked(state.videoTime === from ? undefined : state.videoTime);
+      });
     }, SEEK_SETTLE_TIMEOUT);
+
+    this.#seekTimer = timer;
   }
 
-  // A video loaded into the running player is ready once it says so. The player can also move on by itself, to a
-  // recommendation, which reports the same way: its time and duration are then taken while `src` still names the video
-  // the host loaded. Turning autonext off in the player configuration avoids that.
+  // Completes a video loaded into the running player. A recommendation the player moves on to by itself reports the
+  // same way, while `src` still names the loaded video; turning autonext off avoids that.
   #onVideoChange(state: DailymotionPlayerState) {
     if (this.#swapping) {
       this.#swapping = false;
@@ -733,8 +699,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#onPlayerState(state);
   }
 
-  // Apply a state read, which may already differ from the defaults: the player configuration can start it muted,
-  // playing, or late.
+  // The configuration can start the player muted, playing, or late, so a read may differ from the defaults.
   #onPlayerState(state: DailymotionPlayerState) {
     this.#applyDuration(state.videoDuration);
 
@@ -747,17 +712,16 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (state.playerIsPlaying === true) this.#onPlay();
   }
 
-  // The player has no mute: a level of `0` is what muted means to it, so unmuting restores the level the host holds.
   #onVolumeChange({ playerVolume, playerIsMuted }: DailymotionPlayerState) {
-    // The player reports `null` for a mute it has not decided on yet.
+    // `null` until the player has decided on a mute.
     const muted = isBoolean(playerIsMuted) ? playerIsMuted : this.#muted;
 
-    // A muted player reports the `0` it holds rather than the level to come back to, which only the host remembers.
+    // The player has no mute: muted, it reports `0`, so the level to restore is the host's.
     this.#applyVolume(muted || !isNumber(playerVolume) ? this.#volume : clamp(playerVolume, 0, 1), muted);
   }
 
   #applyMuted() {
-    // `setMute` is deprecated. Unmuting to a level of `0` would leave the player muted, so it comes back at full volume.
+    // `setMute` is deprecated. Unmuting to `0` would stay muted, so it restores full volume.
     tryCall(() => this.#player?.setVolume(this.#muted ? 0 : this.#volume || 1));
   }
 
@@ -810,7 +774,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('pause'));
   }
 
-  // A seek made in the player's own chrome is announced here; one made through `currentTime` already was.
+  // A seek in the player's own controls; one through `currentTime` was already announced.
   #onSeeking() {
     if (this.#seeking) return;
 
@@ -828,7 +792,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onEnded() {
-    // A looping media element never ends, and the player asked to loop restarts itself.
+    // A looping media element never ends; the player restarts itself.
     if (this.#loop) return;
 
     this.#onPause();
@@ -836,8 +800,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('ended'));
   }
 
-  // The browser refused to start playback, as it does an unmuted autoplay. A media element would reject `play()`; the
-  // SDK's `play()` has no answer to reject with, so the host reports the player as paused instead.
+  // The SDK's `play()` returns nothing to reject, so a playback the browser refuses is reported as a pause.
   #onPlaybackRejected(reason: string) {
     if (__DEV__) console.warn(`[vjs-dailymotion] The browser refused playback (${reason}).`);
 
@@ -845,40 +808,33 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onPlayerError({ playerError }: DailymotionPlayerState) {
-    const error = new MediaError(
-      playerError?.message || playerError?.title || 'The Dailymotion player reported an error.',
-      MediaError.MEDIA_ERR_CUSTOM,
-      true
+    this.#fail(
+      new MediaError(
+        playerError?.message || playerError?.title || 'The Dailymotion player reported an error.',
+        MediaError.MEDIA_ERR_CUSTOM,
+        true
+      ),
+      { dailymotionErrorCode: playerError?.code }
     );
-
-    error.data = { dailymotionErrorCode: playerError?.code };
-    this.#error = error;
-    this.dispatchEvent(new Event('error'));
-    this.#loadComplete.resolve();
   }
 
-  #onPlayerCreateError(message: string, cause?: unknown) {
-    this.#error = new MediaError(message, MediaError.MEDIA_ERR_CUSTOM, true);
-
-    if (cause !== undefined) this.#error.data = { cause };
-
-    this.dispatchEvent(new Event('error'));
-    this.#loadComplete.resolve();
-  }
-
-  // The source could not become a player: either it is not a Dailymotion video, or no player configuration is named,
-  // which Dailymotion refuses to embed without.
+  // Not a Dailymotion video, or no Player ID, which Dailymotion refuses to embed without.
   #onSourceError() {
     const message = parseDailymotionSource(this.#src)
       ? 'Dailymotion embeds need a Player ID; set `engine.dailymotion.player`, or use a player embed URL as `src`.'
       : `Unrecognized Dailymotion source: ${this.#src}`;
 
-    this.#error = new MediaError(message, MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
+    this.#fail(new MediaError(message, MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED));
+  }
+
+  #fail(error: MediaError, data?: Record<string, unknown>) {
+    if (data) error.data = data;
+
+    this.#error = error;
     this.dispatchEvent(new Event('error'));
   }
 
-  // What the player options are built from. Only `loop` and the source reach `createPlayer`; the rest reaches the
-  // player through the SDK once it is ready, or not at all.
+  // The props `createPlayer` reads; the rest reach the player through the SDK once it is ready.
   #snapshotProps(): Partial<DailymotionAdapterProps> {
     return {
       autoplay: this.#autoplay,
@@ -899,8 +855,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 }
 
-// Whether a new source can load into the player built for the current one: the same configuration and parameters,
-// since those are only read when a player is created.
+// Whether a new video can load into the current player: same configuration and parameters, which are only read on
+// creation.
 function isSameEmbed(current: DailymotionCreatePlayerOptions | null, next: DailymotionCreatePlayerOptions): boolean {
   if (!current) return false;
 
@@ -910,10 +866,10 @@ function isSameEmbed(current: DailymotionCreatePlayerOptions | null, next: Daily
   return deepEqual(currentEmbed, nextEmbed);
 }
 
-// Player configurations already warned about, so each rebuild of a player does not repeat it.
+// Configurations already warned about, so rebuilds don't repeat it.
 const warnedAutostart = new Set<string>();
 
-// How long a seek may go without a seek-end report before it is settled from the player's state.
+// How long to wait for a seek-end report before settling from the player's state.
 const SEEK_SETTLE_TIMEOUT = 2_000;
 
 const READY_STATE_HAVE_NOTHING = 0;

@@ -54,10 +54,6 @@ class FakePlayer {
     readonly placeholder: HTMLElement,
     readonly options: { video: string; player?: string; params?: Record<string, unknown> }
   ) {
-    const iframe = document.createElement('iframe');
-
-    iframe.setAttribute('src', `https://geo.dailymotion.com/player/${options.player}.html?video=${options.video}`);
-    this.root.append(iframe);
     placeholder.replaceWith(this.root);
   }
 
@@ -245,7 +241,7 @@ describe('DailymotionAdapter', () => {
       expect(player.updateParams).toHaveBeenCalledWith({ aspectRatio: 'inherit' });
     });
 
-    it('settles loadComplete once the player is ready, reports metadata, and reads its state', async () => {
+    it('reports metadata once the player is ready, and reads its state', async () => {
       const media = new DailymotionAdapter();
       const loadedmetadata = vi.fn();
       const loadcomplete = vi.fn();

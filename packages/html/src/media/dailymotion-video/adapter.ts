@@ -3,15 +3,13 @@ import { CustomMediaElement } from '@videojs/media/dom';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
-// `CustomMediaElement` is typed without the lifecycle callbacks it implements, so its `connectedCallback` isn't visible
-// for `super` to reach. Declared here, with method syntax so a subclass can override it.
+// `CustomMediaElement` implements `connectedCallback` but doesn't type it; declared so `super` can reach it.
 interface DailymotionCustomMediaElement {
   connectedCallback?(): void;
 }
 
-// The SDK builds its own iframe, so the host is an embed without one of its own. `'iframe'` is what tells
-// `CustomMediaElement` it hosts an embed, though the target is a container: no attributes are mirrored onto it, and the
-// host is marked as a cross-origin frame like the other embeds.
+// The target is a container the SDK builds its iframe in. `'iframe'` still tells `CustomMediaElement` it hosts an
+// embed: no attributes are mirrored onto the target, and the host is marked as a cross-origin frame.
 class DailymotionCustomMediaElement extends CustomMediaElement('iframe', DailymotionAdapter) {
   static override getTemplateHTML = (): string => /*html*/ `
     <style>
@@ -25,10 +23,6 @@ class DailymotionCustomMediaElement extends CustomMediaElement('iframe', Dailymo
         position: absolute;
         inset: 0;
       }
-      /* A cross-origin frame swallows every pointer event, so the skin above it
-         never sees the hover that reveals the controls. Only the player
-         configuration can hide Dailymotion's chrome, so without controls the
-         player is kept out of hit-testing as well. */
       :host(:not([controls])) {
         pointer-events: none;
       }
@@ -41,14 +35,12 @@ export class DailymotionVideo extends MediaAttachMixin(DailymotionCustomMediaEle
   override connectedCallback(): void {
     super.connectedCallback?.();
 
-    // The SDK finds the element it builds the player in by id from the document, which cannot see into the shadow
-    // root, so the container is light DOM. Slotting it as `media` is what makes it the adapter's target. Created here
-    // rather than in the constructor, which may not add children to the element.
+    // The SDK finds the container by id from the document, so it lives in the light DOM, slotted as `media` to become
+    // the adapter's target. Added here because a constructor may not add children.
     const existing = this.querySelector(':scope > [slot=media]');
 
     if (existing) {
-      // A container given before the host was in the page was attached while the SDK could not find it, which left
-      // it empty; a source set by then loads now.
+      // Attached before the host was in the page, the container stayed empty; load the source now.
       if (this.adapter.src && !existing.hasChildNodes() && !this.adapter.error) this.adapter.load();
 
       return;

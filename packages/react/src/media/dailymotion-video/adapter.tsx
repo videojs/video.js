@@ -18,7 +18,7 @@ export interface DailymotionVideoProps
 }
 
 export const DailymotionVideo = forwardRef<HTMLDivElement, DailymotionVideoProps>(function DailymotionVideo(
-  // The SDK swaps a placeholder in the container for its own player, so React renders nothing inside it.
+  // The SDK owns the container's children, so React renders none.
   { children: _children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
@@ -36,9 +36,7 @@ export const DailymotionVideo = forwardRef<HTMLDivElement, DailymotionVideoProps
   return (
     <div
       data-cross-origin-frame
-      // A cross-origin frame swallows every pointer event, so the skin above it never sees the hover that reveals the
-      // controls. Only the player configuration can hide Dailymotion's chrome, so without controls the player is kept
-      // out of hit-testing as well.
+      // Without `controls`, keep the cross-origin frame out of hit-testing so the skin above it sees hover.
       style={{ width: '100%', height: '100%', ...(!props.controls && { pointerEvents: 'none' }) }}
       {...containerProps}
       ref={composedRef}
