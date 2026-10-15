@@ -34,6 +34,7 @@
     "dev": "vp pack --watch",
     "test": "vp run @videojs/cli#build && vp test run",
     "create:skin": "node --import tsx scripts/create-skin-local.ts",
+    "check:projects": "node --import tsx scripts/check-skin-projects.ts",
     "clean": "rimraf dist types '*.tsbuildinfo'"
   },
   "devDependencies": {
