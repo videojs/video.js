@@ -27,8 +27,8 @@ export interface FCastExtensionProps {
 }
 
 /**
- * Routes player playback controls to an application-provided FCast sender while connected. A separate FCast button can
- * register this extension alongside Google Cast and AirPlay controls; FCast never replaces their Remote Playback API.
+ * Routes player playback controls to an application-provided FCast sender while connected. The opt-in HTML or React
+ * extension component owns its lifecycle; FCast buttons observe it alongside Google Cast and AirPlay controls.
  *
  * @experimental
  */

@@ -1,4 +1,10 @@
-import type { AnyPlayerStore, MediaContainer, PlayerExtension, PlayerStore } from '@videojs/core/dom';
+import type {
+  AnyPlayerStore,
+  MediaContainer,
+  PlayerExtension,
+  PlayerExtensionCoordinator,
+  PlayerStore,
+} from '@videojs/core/dom';
 import type { ReactiveControllerHost } from '@videojs/element';
 import { type Context, type ContextConsumer, createContext } from '@videojs/element/context';
 import type { Media } from '@videojs/media/dom';
@@ -76,6 +82,7 @@ export const EXTENSION_CONTEXT_KEY = Symbol.for('@videojs/extension');
 
 /** @internal */
 export interface ExtensionContextValue {
+  extensions: PlayerExtensionCoordinator;
   /** Register a player extension with the surrounding player. Returns a release callback for that exact instance. */
   registerExtension: (extension: PlayerExtension) => () => void;
 }

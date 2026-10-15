@@ -1,4 +1,3 @@
-import type { FCastSender } from '@videojs/fcast';
 import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import { ErrorDialog } from '../../../components/dialogs/error-dialog';
@@ -17,21 +16,9 @@ export interface VideoSkinProps extends Omit<PropsOf<typeof Container>, 'childre
   children?: VjscNode;
   renderPoster?: PropsOf<typeof Poster>['renderImage'];
   renderThumbnail?: PropsOf<typeof DefaultVideoControls>['renderThumbnail'];
-  fcastSender?: FCastSender;
-  fcastSrc?: string;
-  fcastContentType?: string;
 }
 
-export function VideoSkin({
-  children,
-  className,
-  renderPoster,
-  renderThumbnail,
-  fcastSender,
-  fcastSrc,
-  fcastContentType,
-  ...props
-}: VideoSkinProps = {}) {
+export function VideoSkin({ children, className, renderPoster, renderThumbnail, ...props }: VideoSkinProps = {}) {
   return (
     <Container className={[videoSkinStyles.root, className]} data-theme="default" data-preset="video" {...props}>
       <Slot>{children}</Slot>
@@ -40,10 +27,7 @@ export function VideoSkin({
       <ErrorDialog />
       <Title />
 
-      <DefaultVideoControls
-        renderThumbnail={renderThumbnail}
-        fcast={{ sender: fcastSender, src: fcastSrc, contentType: fcastContentType }}
-      />
+      <DefaultVideoControls renderThumbnail={renderThumbnail} />
 
       <VideoHotkeys />
       <VideoGestures />

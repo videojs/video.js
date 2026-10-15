@@ -1271,9 +1271,6 @@ importers:
       '@videojs/element':
         specifier: workspace:*
         version: link:../element
-      '@videojs/fcast':
-        specifier: workspace:*
-        version: link:../extensions/fcast
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons

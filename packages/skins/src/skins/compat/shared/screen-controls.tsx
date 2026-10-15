@@ -1,5 +1,4 @@
 import * as $ from '@videojs/core/vjsc';
-import type { FCastSender } from '@videojs/fcast';
 import {
   CastEnterIcon,
   CastExitIcon,
@@ -52,22 +51,12 @@ function FullscreenButton() {
   );
 }
 
-export function ScreenControls({
-  fcast,
-}: {
-  fcast?:
-    | {
-        sender?: FCastSender | undefined;
-        src?: string | undefined;
-        contentType?: string | undefined;
-      }
-    | undefined;
-} = {}) {
+export function ScreenControls() {
   return (
     <>
       <AirPlayButton popupClassName={tooltipStyles.screenPopup} />
       <CastButton />
-      <FCastButton {...fcast} />
+      <FCastButton />
       <PiPButton />
       <FullscreenButton />
     </>

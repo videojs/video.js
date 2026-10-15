@@ -1,5 +1,4 @@
 import * as $ from '@videojs/core/vjsc';
-import type { FCastSender } from '@videojs/fcast';
 import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import type { SkinDescription } from '../../../meta';
@@ -16,20 +15,9 @@ import { LiveVideoControls } from './controls';
 export interface LiveVideoSkinProps extends Omit<PropsOf<typeof $.Container>, 'children'> {
   children?: VjscNode;
   renderPoster?: PropsOf<typeof $.Poster.Image>['children'];
-  fcastSender?: FCastSender;
-  fcastSrc?: string;
-  fcastContentType?: string;
 }
 
-export function LiveVideoSkin({
-  children,
-  className,
-  renderPoster,
-  fcastSender,
-  fcastSrc,
-  fcastContentType,
-  ...props
-}: LiveVideoSkinProps = {}) {
+export function LiveVideoSkin({ children, className, renderPoster, ...props }: LiveVideoSkinProps = {}) {
   return (
     <$.Container
       className={['media-skin', containerStyles.root, containerStyles.video, className]}
@@ -42,7 +30,7 @@ export function LiveVideoSkin({
       <BufferingIndicator />
       <ErrorDialog />
       <Title />
-      <LiveVideoControls fcast={{ sender: fcastSender, src: fcastSrc, contentType: fcastContentType }} />
+      <LiveVideoControls />
 
       <LiveVideoHotkeys />
       <LiveVideoGestures />

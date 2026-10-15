@@ -1,13 +1,12 @@
 'use client';
 
-import { FCastExtension, type FCastExtensionProps, type FCastSnapshot } from '@videojs/fcast';
+import { FCastExtension, type FCastSnapshot } from '@videojs/fcast';
 import type { ForwardedRef } from 'react';
 import { forwardRef, useSyncExternalStore } from 'react';
 
+import { usePlayerContext } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
-import { usePlayerExtension } from '../../utils/use-player-extension';
 import { renderElement } from '../../utils/use-render';
-import { useSyncProps } from '../../utils/use-sync-props';
 import { useButton } from '../hooks/use-button';
 
 /** @experimental */
@@ -19,56 +18,46 @@ export interface FCastButtonState {
 }
 
 /** @experimental */
-export interface FCastButtonProps extends UIComponentProps<'button', FCastButtonState>, FCastExtensionProps {}
+export interface FCastButtonProps extends UIComponentProps<'button', FCastButtonState> {}
+
+const noop = () => {};
+const emptySubscribe = () => noop;
 
 /**
- * FCast control that registers a sender-backed player extension. Place it beside CastButton and AirPlayButton.
+ * FCast control that observes the surrounding player’s opt-in FCast extension.
  *
  * @experimental
  */
 export const FCastButton = forwardRef(function FCastButton(
-  props: FCastButtonProps,
+  { disabled, render, className, style, ...elementProps }: FCastButtonProps,
   forwardedRef: ForwardedRef<HTMLButtonElement>
 ) {
-  if (!props.sender) return null;
-
-  return <ActiveFCastButton {...props} forwardedRef={forwardedRef} />;
-});
-
-function ActiveFCastButton({
-  sender,
-  src,
-  contentType,
-  disabled,
-  render,
-  className,
-  style,
-  forwardedRef,
-  ...elementProps
-}: FCastButtonProps & { forwardedRef: ForwardedRef<HTMLButtonElement> }) {
-  const extension = usePlayerExtension(FCastExtension);
-
-  useSyncProps(extension, { contentType, src, sender }, FCastExtension.defaultProps);
+  const { extensions } = usePlayerContext();
+  const extension = useSyncExternalStore(
+    extensions?.subscribe ?? emptySubscribe,
+    () => extensions?.get(FCastExtension),
+    () => undefined
+  );
 
   useSyncExternalStore(
     (notify) => {
-      extension.addEventListener('change', notify);
-      return () => extension.removeEventListener('change', notify);
+      extension?.addEventListener('change', notify);
+      return () => extension?.removeEventListener('change', notify);
     },
-    () => extension.version,
+    () => extension?.version ?? 0,
     () => 0
   );
 
-  const snapshot = extension.snapshot;
+  const snapshot = extension?.snapshot;
   const state: FCastButtonState = {
-    connection: snapshot.connection,
-    availability: snapshot.availability,
-    deviceName: snapshot.deviceName,
+    connection: snapshot?.connection ?? 'disconnected',
+    availability: snapshot?.availability ?? 'unsupported',
+    deviceName: snapshot?.deviceName,
     disabled:
       !!disabled ||
-      !extension.enabled ||
-      snapshot.connection === 'connecting' ||
-      (snapshot.connection !== 'connected' && snapshot.availability !== 'available'),
+      !extension?.enabled ||
+      snapshot?.connection === 'connecting' ||
+      (snapshot?.connection !== 'connected' && snapshot?.availability !== 'available'),
   };
   const label =
     state.connection === 'connected'
@@ -81,7 +70,7 @@ function ActiveFCastButton({
     displayName: 'FCastButton',
     isDisabled: () => state.disabled,
     onActivate: () => {
-      void extension.toggle().catch((error: unknown) => {
+      void extension?.toggle().catch((error: unknown) => {
         if (__DEV__) console.error('[FCastButton]', error);
       });
     },
@@ -107,7 +96,7 @@ function ActiveFCastButton({
       ],
     }
   );
-}
+});
 
 if (__DEV__) FCastButton.displayName = 'FCastButton';
 

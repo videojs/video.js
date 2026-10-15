@@ -1,4 +1,3 @@
-import type { FCastSender } from '@videojs/fcast';
 import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import { ErrorDialog } from '../../../components/dialogs/error-dialog';
@@ -16,20 +15,9 @@ import { DefaultLiveVideoControls } from './layout/controls';
 export interface LiveVideoSkinProps extends Omit<PropsOf<typeof Container>, 'children'> {
   children?: VjscNode;
   renderPoster?: PropsOf<typeof Poster>['renderImage'];
-  fcastSender?: FCastSender;
-  fcastSrc?: string;
-  fcastContentType?: string;
 }
 
-export function LiveVideoSkin({
-  children,
-  className,
-  renderPoster,
-  fcastSender,
-  fcastSrc,
-  fcastContentType,
-  ...props
-}: LiveVideoSkinProps = {}) {
+export function LiveVideoSkin({ children, className, renderPoster, ...props }: LiveVideoSkinProps = {}) {
   return (
     <Container className={[videoSkinStyles.root, className]} data-theme="default" data-preset="live-video" {...props}>
       <Slot>{children}</Slot>
@@ -37,7 +25,7 @@ export function LiveVideoSkin({
       <BufferingIndicator />
       <ErrorDialog />
       <Title />
-      <DefaultLiveVideoControls fcast={{ sender: fcastSender, src: fcastSrc, contentType: fcastContentType }} />
+      <DefaultLiveVideoControls />
       <LiveVideoHotkeys />
       <LiveVideoGestures />
       <LiveVideoStatusIndicators />
