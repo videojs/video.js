@@ -1,15 +1,28 @@
 import { HTMLVideoAdapter } from '@videojs/media/dom';
+import type { HlsConfig } from 'hls.js';
 import Hls from 'hls.js';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { HlsJsLiveMixin } from '../live';
 
-function createEngine(userConfig: Record<string, unknown> = {}): Hls {
+function createEngine(userConfig: Partial<HlsConfig> = {}): Hls {
   const listeners = new Map<string, Set<(...args: any[]) => void>>();
+
+  // A real hls.js instance computes `liveSyncPosition` from the last emitted level details.
+  const hls = new Hls(userConfig);
+  let latestLevelDetails: unknown = null;
+
+  Object.defineProperty(hls, 'latestLevelDetails', { get: () => latestLevelDetails });
 
   return {
     config: { ...userConfig },
     userConfig: { ...userConfig },
+    get liveSyncPosition() {
+      return hls.liveSyncPosition;
+    },
+    set targetLatency(value: number) {
+      hls.targetLatency = value;
+    },
     on(event: string, fn: (...args: any[]) => void) {
       if (!listeners.has(event)) listeners.set(event, new Set());
 
@@ -19,6 +32,8 @@ function createEngine(userConfig: Record<string, unknown> = {}): Hls {
       listeners.get(event)?.delete(fn);
     },
     emit(event: string, ...args: any[]) {
+      if (event === Hls.Events.LEVEL_LOADED) latestLevelDetails = args[0].details;
+
       for (const fn of listeners.get(event) ?? []) fn(event, ...args);
     },
   } as unknown as Hls;
@@ -35,7 +50,8 @@ class FakeHost extends HTMLVideoAdapter {
 
 const HlsJsLive = HlsJsLiveMixin(FakeHost);
 
-// Minimal LevelDetails shape — only the fields the mixin reads.
+// Minimal LevelDetails shape — only the fields the mixin and the hls.js latency controller read. The playlist ends
+// at `60`, which matches the seekable end the tests set.
 function levelDetails(overrides: Record<string, unknown>) {
   return {
     live: false,
@@ -45,7 +61,9 @@ function levelDetails(overrides: Record<string, unknown>) {
     partTarget: 0,
     holdBack: 0,
     targetduration: 6,
-    totalduration: 0,
+    totalduration: 60,
+    edge: 60,
+    age: 0,
     ...overrides,
   } as any;
 }
@@ -171,15 +189,68 @@ describe('HlsJsLiveMixin', () => {
       expect(host.liveEdgeStart).toBe(58);
     });
 
-    it('falls back to `partTarget * 2` when `partHoldBack` is absent', () => {
+    it('falls back to `holdBack` when `partHoldBack` is absent', () => {
       const engine = createEngine();
       const host = new HlsJsLive(engine);
 
       setTargetSeekable(host, [[0, 60]]);
 
-      emitLevelLoaded(engine, levelDetails({ live: true, partList: [{}], partHoldBack: 0, partTarget: 0.5 }));
+      emitLevelLoaded(
+        engine,
+        levelDetails({ live: true, partList: [{}], partHoldBack: 0, partTarget: 0.5, holdBack: 12 })
+      );
 
-      expect(host.liveEdgeStart).toBe(59);
+      expect(host.liveEdgeStart).toBe(48);
+    });
+
+    it('uses `liveSyncDuration` when the integrator configures it', () => {
+      const engine = createEngine({ liveSyncDuration: 30 });
+      const host = new HlsJsLive(engine);
+
+      setTargetSeekable(host, [[0, 60]]);
+
+      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 12, targetduration: 6 }));
+
+      expect(host.liveEdgeStart).toBe(30);
+    });
+
+    it('uses `liveSyncDurationCount` when the integrator configures it', () => {
+      const engine = createEngine({ liveSyncDurationCount: 5 });
+      const host = new HlsJsLive(engine);
+
+      setTargetSeekable(host, [[0, 60]]);
+
+      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 12, targetduration: 6 }));
+
+      expect(host.liveEdgeStart).toBe(30);
+    });
+
+    it('follows a target latency set at runtime through `hls.targetLatency`', () => {
+      const engine = createEngine();
+      const host = new HlsJsLive(engine);
+
+      setTargetSeekable(host, [[0, 60]]);
+
+      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 12, targetduration: 6 }));
+      expect(host.liveEdgeStart).toBe(48);
+
+      engine.targetLatency = 30;
+
+      expect(host.liveEdgeStart).toBe(30);
+    });
+
+    it('ignores `partHoldBack` when `lowLatencyMode` is off', () => {
+      const engine = createEngine({ lowLatencyMode: false });
+      const host = new HlsJsLive(engine);
+
+      setTargetSeekable(host, [[0, 60]]);
+
+      emitLevelLoaded(
+        engine,
+        levelDetails({ live: true, partList: [{}], partHoldBack: 2, partTarget: 0.5, targetduration: 6 })
+      );
+
+      expect(host.liveEdgeStart).toBe(42);
     });
 
     it('is `NaN` when no seekable range is available', () => {
@@ -207,31 +278,29 @@ describe('HlsJsLiveMixin', () => {
       expect(host.liveEdgeStart).toBeNaN();
     });
 
-    it('reflects the current `seekable` on every read', () => {
-      const engine = createEngine();
-      const host = new HlsJsLive(engine);
+    it('advances with the time since the playlist loaded', () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
 
-      let end = 60;
-      const video = document.createElement('video');
+      try {
+        const engine = createEngine();
+        const host = new HlsJsLive(engine);
 
-      Object.defineProperty(video, 'seekable', {
-        configurable: true,
-        get() {
-          return {
-            length: 1,
-            start: () => 0,
-            end: () => end,
-          } as TimeRanges;
-        },
-      });
-      host.attach(video);
+        setTargetSeekable(host, [[0, 60]]);
 
-      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 18 }));
+        const loadedAt = Date.now();
+        const details = levelDetails({ live: true, holdBack: 18 });
 
-      expect(host.liveEdgeStart).toBe(42);
+        // Same rule as hls.js `LevelDetails.age`.
+        Object.defineProperty(details, 'age', { get: () => (Date.now() - loadedAt) / 1000 });
+        emitLevelLoaded(engine, details);
 
-      end = 120;
-      expect(host.liveEdgeStart).toBe(102);
+        expect(host.liveEdgeStart).toBe(42);
+
+        vi.advanceTimersByTime(10_000);
+        expect(host.liveEdgeStart).toBe(52);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -251,6 +320,19 @@ describe('HlsJsLiveMixin', () => {
       video.dispatchEvent(new Event('play'));
 
       expect(video.currentTime).toBe(42);
+    });
+
+    it('seeks to the configured `liveSyncDuration` on the first `play` event', () => {
+      const engine = createEngine({ liveSyncDuration: 30 });
+      const host = new HlsJsLive(engine);
+      const video = setTargetSeekable(host, [[0, 60]]);
+
+      emitManifestLoading(engine);
+      emitLevelLoaded(engine, levelDetails({ live: true, holdBack: 18, targetduration: 6 }));
+
+      video.dispatchEvent(new Event('play'));
+
+      expect(video.currentTime).toBe(30);
     });
 
     it('does not seek when `autoplay` is set', () => {
