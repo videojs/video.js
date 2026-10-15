@@ -55,6 +55,7 @@ export function createPlayerWrapper(storeState: Record<string, unknown> = {}): {
     setMedia: vi.fn(),
     container: null,
     setContainer: vi.fn(),
+    extensions,
     registerExtension: (extension) => extensions.register(extension),
   };
 

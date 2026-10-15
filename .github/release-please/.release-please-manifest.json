@@ -5,6 +5,7 @@
   "packages/core": "10.1.0",
   "packages/adapters/dash-video": "10.1.0",
   "packages/element": "10.1.0",
+  "packages/extensions/fcast": "10.1.0",
   "packages/extensions/google-cast": "10.1.0",
   "packages/adapters/hlsjs-video": "10.1.0",
   "packages/html": "10.1.0",

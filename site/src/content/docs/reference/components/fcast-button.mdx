@@ -1,0 +1,56 @@
+---
+title: FCastButton
+frameworkTitle:
+  html: media-fcast-button
+description: FCast receiver control backed by an application-provided sender
+stability: unstable
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+`FCastButton` displays the surrounding player's FCast extension state and opens its sender's receiver picker. Add the opt-in <DocsLink slug="reference/components/fcast">FCast extension</DocsLink> to the player to configure the sender. Packaged video skins include this button. See <DocsLink slug="guides/casting">Casting</DocsLink> for setup.
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { FCastButton } from '@videojs/react/ui/fcast-button';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/ui/fcast-button';
+```
+</FrameworkCase>
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<FCastButton>FCast</FCastButton>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-fcast-button>FCast</media-fcast-button>
+```
+
+Configure the sender on the separate `<fcast-extension>` element.
+</FrameworkCase>
+
+## Behavior
+
+The sender's `snapshot` supplies availability, connection, device name, playback position, duration, volume, mute state, speed, and optional buffering and ended states. The sender dispatches `change` whenever this snapshot changes. The button calls `prompt()` to choose a receiver and `disconnect()` to end a session. While connected, the extension forwards the player's load, play, pause, seek, volume, and speed actions to the sender.
+
+The button is hidden when no FCast extension with a sender is registered, or when the disconnected sender reports `unsupported`. It stays visible with `aria-disabled="true"` when no receiver is available. A connected session can be disconnected even if discovery later reports no available devices. The sender handles receiver discovery and the FCast protocol; the browser control uses its published state.
+
+| Input | React | HTML | Description |
+|---|---|---|---|
+| Disabled | `disabled` prop | `disabled` attribute or property | Keeps the control focusable and prevents activation |
+
+## Styling
+
+The button exposes `data-fcast-state` (`disconnected`, `connecting`, or `connected`) and `data-availability` (`unsupported`, `unavailable`, or `available`). Its label names the next action and includes the device name when connected. React renders a native `<button>`; the HTML element uses button semantics with Enter and Space activation.
