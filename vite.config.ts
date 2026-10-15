@@ -180,7 +180,7 @@ export default defineConfig({
       'prepare:dev': {
         command: 'node -e ""',
         cache: false,
-        dependsOn: ['site#api-docs:generate', '@videojs/sandbox#setup', '@videojs/skins#generate'],
+        dependsOn: ['site#api-docs:generate', '@videojs/sandbox#setup', '@videojs/cdn#build:cdn'],
       },
       'typecheck:workspace': {
         command: 'tsgo --build',

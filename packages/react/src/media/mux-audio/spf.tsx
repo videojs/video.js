@@ -44,7 +44,7 @@ export const MuxAudio = forwardRef<HTMLAudioElement, MuxAudioProps>(function Mux
   const htmlProps = useSyncProps(media, props, MuxAudioAdapter.defaultProps);
 
   return (
-    <audio ref={composedRef} {...htmlProps}>
+    <audio ref={composedRef} {...htmlProps} crossOrigin={props.crossOrigin ?? undefined}>
       {children}
       {fallback}
     </audio>

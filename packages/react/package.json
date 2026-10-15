@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
     "audio",
@@ -182,8 +182,8 @@
     "react-compiler-runtime": "^1.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "^16.3.0",
-    "@types/react": "^19.2.17",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.3.0",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
@@ -202,8 +202,8 @@
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
     "jsdom": "^26.1.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {

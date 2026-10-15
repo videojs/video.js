@@ -86,7 +86,7 @@ const config: ViteUserConfig = {
         // the generators here would replay every workspace build task on each start, several
         // seconds even when fully cached, so the root `dev:site` script (`scripts/dev.ts`)
         // runs `dev:prepare` only when they are missing or explicitly requested.
-        command: 'NETLIFY_DEV=1 astro dev',
+        command: 'ASTRO_DEV_BACKGROUND=false NETLIFY_DEV=1 astro dev',
         cache: false,
       },
       'dev:prepare': {

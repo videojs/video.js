@@ -1,0 +1,13 @@
+{
+  "name": "video",
+  "dependencies": ["@videojs/core@10.1.0", "@videojs/react@10.1.0", "cn", "react"],
+  "registryDependencies": ["@videojs/_resolve-class-name", "@videojs/_style-theme"],
+  "files": [
+    {
+      "path": "skins/files/video/skin.tsx",
+      "type": "registry:component",
+      "target": "@components/videojs/video/skin.tsx",
+      "content": "import '../styles/theme.css';\n\nexport function VideoSkin() {\n  return null;\n}\n"
+    }
+  ]
+}

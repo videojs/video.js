@@ -22,9 +22,9 @@ export interface LiveButtonProps {
 const LIVE_EDGE_OFFSET = 10;
 
 /**
- * Grace window (in seconds) before `liveEdgeStart` that still counts as "at the live edge". Absorbs the small gap
- * between the player's initial playback position (e.g. hls.js `liveSyncDuration`) and the manifest's `HOLD-BACK`, so
- * autoplay reliably reports live.
+ * Grace window (in seconds) before `liveEdgeStart` that still counts as "at the live edge". Absorbs small gaps between
+ * the engine's playback position and `liveEdgeStart`: playback that falls a little behind after start-up or a stall,
+ * and engines that start at a position other than the playlist hold-back, so autoplay reliably reports live.
  */
 const LIVE_EDGE_TOLERANCE = 5;
 

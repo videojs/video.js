@@ -201,7 +201,8 @@ const CLI_PACKAGE_DIR = 'cli';
 
 /**
  * `npx @videojs/cli` runs the package's only bin, which installs globally as `videojs`, and every cold run downloads
- * its dependencies, so the CLI stays one bundled file with no runtime dependencies.
+ * its dependencies, so the CLI stays one bundled file with no runtime dependencies. `skin create` reads its project
+ * templates as plain files published beside the bundle.
  */
 function cliMetadataWarnings(pkg) {
   const warnings = [];
@@ -213,8 +214,8 @@ function cliMetadataWarnings(pkg) {
     warnings.push(`${pkg.name}: "bin" should be { "videojs": "<path>" } so \`npx ${pkg.name}\` runs its only command`);
   }
 
-  if (JSON.stringify(pkg.files) !== JSON.stringify(['dist'])) {
-    warnings.push(`${pkg.name}: "files" should be ["dist"]`);
+  if (JSON.stringify(pkg.files) !== JSON.stringify(['dist', 'templates'])) {
+    warnings.push(`${pkg.name}: "files" should be ["dist", "templates"]`);
   }
 
   for (const field of ['dependencies', 'peerDependencies', 'optionalDependencies']) {

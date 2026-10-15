@@ -71,7 +71,7 @@ function assistantPrompt(url: string): string {
 const segmentClass = clsx(
   'inline-flex h-8 items-center border border-line bg-surface text-p3 whitespace-nowrap shadow-xs select-none',
   'intent:border-line-strong intent:text-faded-black dark:intent:text-manila-light text-muted',
-  'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold focus-visible:relative focus-visible:z-10'
+  'focus-visible:relative focus-visible:z-10'
 );
 
 const itemClass = clsx(

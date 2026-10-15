@@ -17,6 +17,17 @@ export type InstallationInputKey = keyof InstallationInput;
 export const PACKAGE_MANAGERS = ['npm', 'pnpm', 'yarn', 'bun'] as const;
 export type PackageManager = (typeof PACKAGE_MANAGERS)[number];
 
+/**
+ * The command each package manager uses to run a package without installing it. Yarn 1 has no `dlx`, so yarn uses
+ * `npx`; commands that care which package manager ran them say so with a flag.
+ */
+export const PACKAGE_RUNNERS = {
+  npm: 'npx',
+  pnpm: 'pnpm dlx',
+  yarn: 'npx',
+  bun: 'bunx',
+} as const satisfies Record<PackageManager, string>;
+
 export const INSTALLATION_PROJECTS = ['new', 'existing'] as const;
 export type InstallationProject = (typeof INSTALLATION_PROJECTS)[number];
 

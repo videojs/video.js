@@ -2,7 +2,6 @@
 
 @layer base.preset {
   .media-skin[data-theme="scaffold"] {
-    --media-spacing: calc(var(--media-scale-unit, 16px) / 4);
     --media-background: transparent;
     --media-foreground: white;
     --media-accent: var(--media-accent-color, var(--media-default-accent-color));
