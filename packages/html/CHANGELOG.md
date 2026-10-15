@@ -1,5 +1,64 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/html@10.1.0...@videojs/html@10.2.0) (2026-10-15)
+
+
+### Bug Fixes
+
+* **packages:** seek while dragging the time slider so the frame updates ([#9510](https://github.com/videojs/video.js/issues/9510)) ([6872005](https://github.com/videojs/video.js/commit/68720051268425426aecee76992f69b5b174fdaf))
+
+
+### Performance Improvements
+
+* **html:** re-render sliders on resize only for edge thumb alignment ([#9401](https://github.com/videojs/video.js/issues/9401)) ([2d40a22](https://github.com/videojs/video.js/commit/2d40a220e9608c027e9800e6ff60e5a31cedd451))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.2.0
+    * @videojs/element bumped to 10.2.0
+    * @videojs/media bumped to 10.2.0
+    * @videojs/native-hls-video bumped to 10.2.0
+    * @videojs/spf bumped to 10.2.0
+    * @videojs/store bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.2.0
+    * @videojs/dash-video bumped to 10.2.0
+    * @videojs/google-cast bumped to 10.2.0
+    * @videojs/hlsjs-video bumped to 10.2.0
+    * @videojs/icons bumped to 10.2.0
+    * @videojs/mux-audio bumped to 10.2.0
+    * @videojs/mux-data bumped to 10.2.0
+    * @videojs/mux-video bumped to 10.2.0
+    * @videojs/playerjs-video bumped to 10.2.0
+    * @videojs/shaka-video bumped to 10.2.0
+    * @videojs/skins bumped to 10.2.0
+    * @videojs/spotify-audio bumped to 10.2.0
+    * @videojs/tiktok-video bumped to 10.2.0
+    * @videojs/twitch-video bumped to 10.2.0
+    * @videojs/vimeo-video bumped to 10.2.0
+    * @videojs/wistia-video bumped to 10.2.0
+    * @videojs/youtube-video bumped to 10.2.0
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.2.0
+    * @videojs/dash-video bumped to 10.2.0
+    * @videojs/google-cast bumped to 10.2.0
+    * @videojs/hlsjs-video bumped to 10.2.0
+    * @videojs/mux-audio bumped to 10.2.0
+    * @videojs/mux-data bumped to 10.2.0
+    * @videojs/mux-video bumped to 10.2.0
+    * @videojs/playerjs-video bumped to 10.2.0
+    * @videojs/shaka-video bumped to 10.2.0
+    * @videojs/spotify-audio bumped to 10.2.0
+    * @videojs/tiktok-video bumped to 10.2.0
+    * @videojs/twitch-video bumped to 10.2.0
+    * @videojs/vimeo-video bumped to 10.2.0
+    * @videojs/wistia-video bumped to 10.2.0
+    * @videojs/youtube-video bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/html@10.0.1...@videojs/html@10.1.0) (2026-10-12)
 
 

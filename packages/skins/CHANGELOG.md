@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.1.0...@videojs/skins@10.2.0) (2026-10-15)
+
+
+### Bug Fixes
+
+* **skin:** keep media text colors when merging Tailwind classes ([#9491](https://github.com/videojs/video.js/issues/9491)) ([ff8d26f](https://github.com/videojs/video.js/commit/ff8d26f5192678dcaf74adc86f981bf11233c27b))
+* **skin:** scale scaffold controls in fullscreen ([#9487](https://github.com/videojs/video.js/issues/9487)) ([6172124](https://github.com/videojs/video.js/commit/6172124f41f5ffbd455d0c8644a83454d3115ae6))
+* **skin:** show elapsed time on compact neutral players ([#9484](https://github.com/videojs/video.js/issues/9484)) ([c056868](https://github.com/videojs/video.js/commit/c056868a72abb9970e4b3d3610253390c6be5be2))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.2.0
+    * @videojs/element bumped to 10.2.0
+    * @videojs/icons bumped to 10.2.0
+    * @videojs/installation bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.0.1...@videojs/skins@10.1.0) (2026-10-12)
 
 
