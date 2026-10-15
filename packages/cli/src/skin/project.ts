@@ -203,7 +203,7 @@ A Video.js ${PRESET_LABELS[options.preset].toLowerCase()} skin for ${FRAMEWORK_L
 ${run} dev
 \`\`\`
 
-The workbench opens your skin in a slimmed-down version of the Video.js sandbox. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/frame/player\`. The options panel sets the player's width and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay, muted, loop, and preload. The arrow button opens the preview on its own.
+The workbench opens your skin in a slimmed-down version of the Video.js sandbox. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/frame/player\`. The options panel sets the player's width and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay, muted, loop, and preload. The arrow button opens the preview on its own. The settings live in the URL, so a link such as \`/?width=384&ratio=9:16&dir=rtl&locale=ar\` opens the workbench in that state, and \`/preview.html#width=384&ratio=9:16\` opens the preview alone.
 
 ## Deploy
 
@@ -272,13 +272,15 @@ export default defineConfig({
 }
 
 function agentsGuide(options: SkinOptions): string {
+  const { run } = runners(options.packageManager);
+
   return `# Agent guide
 
-This project is a Video.js ${FRAMEWORK_LABELS[options.framework]} skin. The skin is everything in \`src/\`, starting from \`src/${options.preset}/skin\`. \`apps/preview/\` is a workbench that previews it; change it only when asked.
+This project is a Video.js ${FRAMEWORK_LABELS[options.framework]} skin made by \`videojs skin create\`; \`skin.json\` records how. The skin is everything in \`src/\`, starting from \`src/${options.preset}/skin\`. \`apps/preview/\` is a workbench that previews it; change it only when asked, except \`apps/preview/src/frame/player\` for the media the preview plays. \`README.md\` describes the rest.
 
-- Run \`npx @videojs/cli agents skills\` to install the Video.js skill, and read https://videojs.org/docs/framework/${options.framework}/guides/build-your-own-skin before changing the skin.
-- Keep the error dialog, hotkeys, and status announcer unless you replace them.
-- Keep controls in source order that matches their visual order.
+- Use the \`videojs-skin\` skill when changing the skin. \`npx @videojs/cli agents skills\` prints how to install it.
+- Keep every control keyboard operable, labeled, with a visible focus indicator, and in source order that matches its visual order. Keep the error dialog, hotkeys, and status announcer unless you replace them.
+- Run \`${run} typecheck\` and \`${run} build\` after changes, and check the skin in the workbench with \`${run} dev\`. Deploy the workbench with \`${run} deploy <vercel|netlify|cloudflare>\` only when asked.
 `;
 }
 
@@ -324,6 +326,7 @@ export async function createProject(options: SkinOptions, packageName: string): 
   files.set('skin.json', skinManifest(options, skin));
   files.set('README.md', readme(options));
   files.set('AGENTS.md', agentsGuide(options));
+  files.set('CLAUDE.md', '@AGENTS.md\n');
   files.set('vercel.json', vercelConfig(options));
   files.set('netlify.toml', netlifyConfig(options));
 
