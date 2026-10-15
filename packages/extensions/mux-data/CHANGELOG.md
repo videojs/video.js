@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.1.0...@videojs/mux-data@10.2.0) (2026-10-15)
+
+
+### Miscellaneous Chores
+
+* **@videojs/mux-data:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.2.0
+    * @videojs/media bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.0.1...@videojs/mux-data@10.1.0) (2026-10-12)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cli",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Video.js 10 command line: version-matched installation instructions for coding agents, and a starter for building your own skin",
   "keywords": [
     "agents",

@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file.
 
+## [@videojs/core@10.2.0] - 2026-10-15
+
+### 🚀 Features
+- *(site)* Add a comparison component ([#9406](https://github.com/videojs/video.js/pull/9406)) by [@sampotts](https://github.com/sampotts)
+- *(core)* Depend on video.js ([#9507](https://github.com/videojs/video.js/pull/9507)) by [@luwes](https://github.com/luwes)
+- *(cli)* Add skin create to start a skin project ([#9500](https://github.com/videojs/video.js/pull/9500)) by [@sampotts](https://github.com/sampotts)
+- *(cli)* Preview skins in a sandbox-style workbench ([#9501](https://github.com/videojs/video.js/pull/9501)) by [@sampotts](https://github.com/sampotts)
+- *(cli)* Deploy skin workbenches to vercel, netlify, or cloudflare pages ([#9502](https://github.com/videojs/video.js/pull/9502)) by [@sampotts](https://github.com/sampotts)
+
+### 🐛 Bug Fixes
+- *(sandbox)* Ignore unknown source query values ([#9404](https://github.com/videojs/video.js/pull/9404)) by [@sampotts](https://github.com/sampotts)
+- *(skin)* Show elapsed time on compact neutral players ([#9484](https://github.com/videojs/video.js/pull/9484)) by [@sampotts](https://github.com/sampotts)
+- *(react)* Render crossorigin attributes before hydration ([#9403](https://github.com/videojs/video.js/pull/9403)) by [@sampotts](https://github.com/sampotts)
+- *(skin)* Keep media text colors when merging Tailwind classes ([#9491](https://github.com/videojs/video.js/pull/9491)) by [@sampotts](https://github.com/sampotts)
+- *(skin)* Scale scaffold controls in fullscreen ([#9487](https://github.com/videojs/video.js/pull/9487)) by [@sampotts](https://github.com/sampotts)
+- *(sandbox)* Debounce shell URL sync to avoid replaceState rate limit ([#9497](https://github.com/videojs/video.js/pull/9497)) by [@sampotts](https://github.com/sampotts)
+- *(test)* Retry browserstack connections and report their cause ([#9506](https://github.com/videojs/video.js/pull/9506)) by [@sampotts](https://github.com/sampotts)
+- *(hlsjs-video)* Read live edge start from hls.js live sync position ([#9409](https://github.com/videojs/video.js/pull/9409)) by [@mrlika](https://github.com/mrlika)
+- *(packages)* Seek while dragging the time slider so the frame updates ([#9510](https://github.com/videojs/video.js/pull/9510)) by [@Anandb71](https://github.com/Anandb71)
+
+### 💼 Other
+- *(root)* Watch only development outputs in pnpm dev ([#9483](https://github.com/videojs/video.js/pull/9483)) by [@sampotts](https://github.com/sampotts)
+- *(installation)* Keep node built-ins external in the neutral build ([#9499](https://github.com/videojs/video.js/pull/9499)) by [@sampotts](https://github.com/sampotts)
+
+### 🚜 Refactor
+- *(site)* Share one focus outline and popover ring ([#9405](https://github.com/videojs/video.js/pull/9405)) by [@sampotts](https://github.com/sampotts)
+
+### 📚 Documentation
+- *(site)* Resolve inherited slider defaults ([#9398](https://github.com/videojs/video.js/pull/9398)) by [@javierarams](https://github.com/javierarams)
+- *(site)* Add changelog prose for 10.1.0 ([#9481](https://github.com/videojs/video.js/pull/9481)) by [@github-actions[bot]](https://github.com/github-actions[bot])
+- *(site)* Install composer archive into libraries/videojs-cdn ([#9513](https://github.com/videojs/video.js/pull/9513)) by [@luwes](https://github.com/luwes)
+
+### ⚡ Performance
+- *(html)* Re-render sliders on resize only for edge thumb alignment ([#9401](https://github.com/videojs/video.js/pull/9401)) by [@taekop](https://github.com/taekop)
+
+### 🧪 Testing
+- *(sandbox)* Wait for the debounced URL in the compare aspect-ratio test ([#9504](https://github.com/videojs/video.js/pull/9504)) by [@sampotts](https://github.com/sampotts)
+
+### ⚙️ Miscellaneous Tasks
+- *(root)* Upgrade workspace dependencies ([#9482](https://github.com/videojs/video.js/pull/9482)) by [@sampotts](https://github.com/sampotts)
+- *(cd)* Allow release recovery after main moves on ([#9490](https://github.com/videojs/video.js/pull/9490)) by [@luwes](https://github.com/luwes)
+- *(root)* Add npm trusted publishing setup and release pr check ([#9485](https://github.com/videojs/video.js/pull/9485)) by [@luwes](https://github.com/luwes)
+- *(ci)* Add claude pr bug review workflow ([#9508](https://github.com/videojs/video.js/pull/9508)) by [@luwes](https://github.com/luwes)
+- *(ci)* Review fork prs after workflow approval ([#9515](https://github.com/videojs/video.js/pull/9515)) by [@luwes](https://github.com/luwes)
+- *(ci)* Scope claude reviewer gh commands to the reviewed pr ([#9516](https://github.com/videojs/video.js/pull/9516)) by [@luwes](https://github.com/luwes)
+- *(ci)* Skip claude reviews when the pr diff is unchanged ([#9517](https://github.com/videojs/video.js/pull/9517)) by [@luwes](https://github.com/luwes)
+- *(cli)* Build every skin create combination ([#9514](https://github.com/videojs/video.js/pull/9514)) by [@sampotts](https://github.com/sampotts)
+
+### New Contributors
+* @taekop made their first contribution in [#9401](https://github.com/videojs/video.js/pull/9401)
+* @Anandb71 made their first contribution in [#9510](https://github.com/videojs/video.js/pull/9510)
+* @mrlika made their first contribution in [#9409](https://github.com/videojs/video.js/pull/9409)
+
 ## [@videojs/core@10.1.0] - 2026-10-12
 
 ### 🚀 Features
@@ -2315,6 +2368,7 @@ All notable changes to this project will be documented in this file.
 * @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
 * @heff made their first contribution
 
+[@videojs/core@10.2.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0
 [@videojs/core@10.1.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.0.1...@videojs/core@10.1.0
 [@videojs/core@10.0.1]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0...@videojs/core@10.0.1
 [@videojs/core@10.0.0]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0-rc.5...@videojs/core@10.0.0
