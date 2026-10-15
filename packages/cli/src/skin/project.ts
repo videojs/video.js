@@ -1,3 +1,5 @@
+import { PACKAGE_RUNNERS, type PackageManager } from '@videojs/installation';
+
 import { tailwindStylesheet } from './css';
 import { BASE_SKIN_LABELS, FRAMEWORK_LABELS, PRESET_LABELS, STYLING_LABELS, type SkinOptions } from './options';
 import { htmlPlayer, presetModule, reactPlayer } from './player';
@@ -35,6 +37,55 @@ function fill(source: string, values: Readonly<Record<string, string>>): string 
 
 function sortObject(entries: Iterable<[string, string]>): Record<string, string> {
   return Object.fromEntries([...entries].sort(([a], [b]) => a.localeCompare(b)));
+}
+
+/** How a package manager runs a package script, and a CLI it has not installed, without asking to install it. */
+function runners(manager: PackageManager) {
+  const dlx = PACKAGE_RUNNERS[manager];
+
+  return { run: `${manager} run`, dlx: dlx === 'npx' ? 'npx --yes' : dlx };
+}
+
+/**
+ * Deploying goes through each host's own CLI, fetched on demand: it signs the user in, links or creates the project,
+ * and prints the URL. `deploy` asks which host; `deploy:<host>` skips the question.
+ */
+/**
+ * Host CLIs pinned to a major version, so a project's deploy scripts keep working after a host ships breaking changes.
+ * Newer minors and patches still apply; bump the majors here when a release is checked against them.
+ */
+const HOST_CLIS = { vercel: 'vercel@64', netlify: 'netlify-cli@27', cloudflare: 'wrangler@4' } as const;
+
+function deployScripts(options: SkinOptions, packageName: string): Record<string, string> {
+  const { run, dlx } = runners(options.packageManager);
+
+  return {
+    deploy: 'node apps/preview/deploy.mjs',
+    // Build here and upload the output, so Vercel never installs the project: the deploy matches what was tested, and
+    // projects pointing at local package builds deploy too.
+    'deploy:vercel': `${dlx} ${HOST_CLIS.vercel} build && ${dlx} ${HOST_CLIS.vercel} deploy --prebuilt`,
+    'deploy:netlify': `${dlx} ${HOST_CLIS.netlify} deploy --build`,
+    'deploy:cloudflare': `${run} build && ${dlx} ${HOST_CLIS.cloudflare} pages deploy dist --project-name ${packageName}`,
+  };
+}
+
+/** `vercel build`, and builds from a connected repository, read this, so the project needs no dashboard settings. */
+function vercelConfig(options: SkinOptions): string {
+  return `${JSON.stringify(
+    {
+      $schema: 'https://openapi.vercel.sh/vercel.json',
+      framework: 'vite',
+      buildCommand: `${runners(options.packageManager).run} build`,
+      outputDirectory: 'dist',
+    },
+    null,
+    2
+  )}\n`;
+}
+
+/** Netlify reads this for `netlify deploy --build` and for builds from a connected repository. */
+function netlifyConfig(options: SkinOptions): string {
+  return `[build]\n  command = "${runners(options.packageManager).run} build"\n  publish = "dist"\n`;
 }
 
 /** Versions for packages the registry lists without one. */
@@ -93,6 +144,7 @@ function packageJson(options: SkinOptions, packageName: string, skin: ResolvedSk
       build: 'vite build',
       preview: 'vite preview',
       typecheck: 'tsc --noEmit',
+      ...deployScripts(options, packageName),
     },
     dependencies: sortObject(dependencies),
     devDependencies: sortObject(devDependencies),
@@ -137,6 +189,8 @@ function skinManifest(options: SkinOptions, skin: ResolvedSkin): string {
 
 function readme(options: SkinOptions): string {
   const run = options.packageManager === 'npm' ? 'npm run' : options.packageManager;
+  // \`pnpm deploy\` is a built-in command, so scripts named like built-ins always go through \`run\`.
+  const runScript = runners(options.packageManager).run;
   const base = BASE_SKIN_LABELS[options.base].label;
 
   return `# ${options.name}
@@ -151,6 +205,16 @@ ${run} dev
 
 The workbench opens your skin in a slimmed-down version of the Video.js sandbox. It plays NASA's Cosmic Dawn trailer from Mux, with chapters; change the media in \`apps/preview/src/frame/player\`. The options panel sets the player's width and aspect ratio, the color scheme, text direction, and language, and playback options such as autoplay, muted, loop, and preload. The arrow button opens the preview on its own.
 
+## Deploy
+
+\`\`\`sh
+${runScript} deploy
+\`\`\`
+
+It asks where to deploy the workbench: Vercel, Netlify, or Cloudflare Pages. Name one to skip the question, such as \`${runScript} deploy vercel\`. The first time, the host's CLI signs you in and creates the project, then every run prints the URL. Vercel and Netlify deploy to a preview URL you can share; to deploy to production instead, add \`--prod\` to the \`deploy:netlify\` script, or to both commands in \`deploy:vercel\`.
+
+To deploy on every push instead, put the project on GitHub and import it on Vercel or Netlify; \`vercel.json\` and \`netlify.toml\` already describe the build. The build uses relative URLs, so \`dist/\` also works on any static host, including in a subfolder.
+
 ## Where things live
 
 - \`src/\`: your skin, and only your skin. Keep, rewrite, or delete any of it.
@@ -161,6 +225,7 @@ The workbench opens your skin in a slimmed-down version of the Video.js sandbox.
   - \`src/shell/\`: the Shadcn shell.
   - \`src/frame/\`: the page the shell frames. \`player\` mounts your skin in a player and sets the media it plays.
   - \`public/\`: files the preview serves, such as the chapters track.
+- \`vercel.json\`, \`netlify.toml\`: how those hosts build the workbench.
 - \`skin.json\`: what this skin is built from. Keep it; it records the Video.js version the skin was created with.
 
 ## Learn more
@@ -183,6 +248,8 @@ const path = (file: string) => fileURLToPath(new URL(file, import.meta.url));
 // The workbench in apps/preview serves the app; \`@/\` imports reach the skin in src/.
 export default defineConfig({
   root: path('./apps/preview'),
+  // Relative URLs, so the build works at a domain root or in a subfolder such as GitHub Pages.
+  base: './',
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
@@ -258,6 +325,8 @@ export async function createProject(options: SkinOptions, packageName: string): 
   files.set('skin.json', skinManifest(options, skin));
   files.set('README.md', readme(options));
   files.set('AGENTS.md', agentsGuide(options));
+  files.set('vercel.json', vercelConfig(options));
+  files.set('netlify.toml', netlifyConfig(options));
 
   if (options.packageManager === 'pnpm') files.set('pnpm-workspace.yaml', pnpmWorkspace(options));
 

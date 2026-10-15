@@ -75,6 +75,31 @@ describe('createProject', () => {
     expect(manifest.devDependencies).toMatchObject({ react: VERSIONS.react, 'react-dom': VERSIONS.react });
   });
 
+  it('deploys through each host CLI with the project package manager, from relative URLs', async () => {
+    const pnpm = await createProject(options(), 'my-skin');
+    const npm = await createProject(options('--package-manager', 'npm'), 'my-skin');
+
+    expect(JSON.parse(pnpm.files.get('package.json')!).scripts).toMatchObject({
+      deploy: 'node apps/preview/deploy.mjs',
+      'deploy:vercel': 'pnpm dlx vercel@64 build && pnpm dlx vercel@64 deploy --prebuilt',
+      'deploy:netlify': 'pnpm dlx netlify-cli@27 deploy --build',
+      'deploy:cloudflare': 'pnpm run build && pnpm dlx wrangler@4 pages deploy dist --project-name my-skin',
+    });
+    expect(JSON.parse(npm.files.get('package.json')!).scripts['deploy:vercel']).toBe(
+      'npx --yes vercel@64 build && npx --yes vercel@64 deploy --prebuilt'
+    );
+    expect(JSON.parse(pnpm.files.get('vercel.json')!)).toMatchObject({
+      buildCommand: 'pnpm run build',
+      outputDirectory: 'dist',
+    });
+    expect(pnpm.files.get('netlify.toml')).toContain('command = "pnpm run build"');
+    expect(pnpm.files.get('README.md')).toContain('pnpm run deploy');
+    expect(pnpm.files.get('vite.config.ts')).toContain("base: './'");
+    expect(pnpm.files.get('apps/preview/src/shell/app.tsx')).toContain('`./preview.html#');
+    expect(pnpm.files.get('apps/preview/src/frame/player.tsx')).toContain("'./cosmic-dawn-chapters.vtt'");
+    expect(pnpm.files.has('apps/preview/deploy.mjs')).toBe(true);
+  });
+
   it('pins local packages for both npm and pnpm', async () => {
     const { files } = await createProject(options('--override', '@videojs/react=file:/tmp/react.tgz'), 'my-skin');
 

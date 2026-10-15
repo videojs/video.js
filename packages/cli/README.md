@@ -86,7 +86,8 @@ CI or from a coding agent, the command stops and lists the choices you left out 
 `npx @videojs/cli skin create --help` for every option.
 
 The project keeps the skin alone in `src/`, so it can move into an app as it is, and previews it in `apps/preview/`, a
-slimmed-down version of the Video.js sandbox.
+slimmed-down version of the Video.js sandbox. `pnpm run deploy` (or `npm run deploy`, and so on) deploys the workbench to Vercel,
+Netlify, or Cloudflare Pages. With pnpm, use `run`: `pnpm deploy` is a built-in pnpm command.
 
 The skin's source comes from the latest
 [Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn) build, which isn't versioned

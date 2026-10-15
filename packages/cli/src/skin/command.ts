@@ -237,7 +237,9 @@ async function createSkin(argv: readonly string[]): Promise<number> {
   ].filter(Boolean);
   const next = steps.map((step) => `  ${step}`).join('\n');
   const again = `To create the same skin without questions:\n\n  ${reproduceCommand(options)}`;
-  const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${again}`;
+  // `pnpm deploy` is a built-in command, so the script always goes through `run`.
+  const deploy = `When it's ready to share, deploy the workbench with \`${options.packageManager} run deploy\`.`;
+  const summary = `Edit your skin in ${project.skinDirectory}. Next:\n\n${next}\n\n${deploy}\n\n${again}`;
 
   process.stdout.write(`\n${summary}\n`);
 
