@@ -65,8 +65,33 @@ jobs:
           git fetch --no-tags origin "$HEAD_SHA"
           git update-ref refs/remotes/pr/head "$HEAD_SHA"
 
-      - name: Run Claude PR reviewer
+      # `git patch-id` ignores line numbers and hunk offsets, so merging the base branch into a
+      # PR changes the head SHA but keeps the same ID when the PR's own changes are unchanged.
+      # `--verbatim` keeps whitespace, since an indentation-only edit can change meaning.
+      - name: Fingerprint PR changes
+        id: diff
         if: steps.pr.outputs.number
+        env:
+          BASE_SHA: ${{ steps.pr.outputs.base_sha }}
+        run: |
+          patch_id=$(git diff "$BASE_SHA...refs/remotes/pr/head" | git patch-id --verbatim | cut -d ' ' -f 1)
+          echo "patch_id=${patch_id:-empty}" >> "$GITHUB_OUTPUT"
+          touch "$RUNNER_TEMP/pr-review-marker"
+
+      # A cache entry per PR and patch ID records each reviewed change set. Re-running the
+      # request check skips this lookup to force a fresh review.
+      - name: Check for an earlier review
+        id: seen
+        if: steps.pr.outputs.number && github.event.workflow_run.run_attempt == 1
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/pr-review-marker
+          key: pr-review-${{ steps.pr.outputs.number }}-${{ steps.diff.outputs.patch_id }}
+          lookup-only: true
+
+      - name: Run Claude PR reviewer
+        id: claude
+        if: steps.pr.outputs.number && steps.seen.outputs.cache-hit != 'true'
         uses: anthropics/claude-code-action@1d6de8cb0c237e7c15e9e1bdf973826ebae490cc # v1.0.248
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -135,3 +160,10 @@ jobs:
             --setting-sources user
             --allowedTools "Read,Grep,Glob,Bash(gh pr view ${{ steps.pr.outputs.number }}:*),Bash(gh pr comment ${{ steps.pr.outputs.number }}:*),Bash(gh api repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }}/comments:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git blame:*),Bash(git grep:*)"
             --disallowedTools "Edit,Write,NotebookEdit,WebFetch,WebSearch,Read(//proc/**),Read(/${{ runner.temp }}/**),Read(./.git/**)"
+
+      - name: Record reviewed changes
+        if: steps.claude.outcome == 'success'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/pr-review-marker
+          key: pr-review-${{ steps.pr.outputs.number }}-${{ steps.diff.outputs.patch_id }}
