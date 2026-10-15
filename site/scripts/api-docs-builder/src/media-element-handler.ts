@@ -98,6 +98,7 @@ const INFERRED_CLASS_PROPERTY_TYPES: InferredClassPropertyTypes = {
   HlsJsAdapter: { engine: 'Hls | null', error: 'MediaError | null' },
   NativeHlsMediaBase: { engine: 'null' },
   PlayerJsAdapter: { engine: 'Window | null' },
+  SoundCloudAdapter: { engine: 'Window | null' },
   ShakaMediaBase: { error: 'MediaError | null' },
   TikTokAdapter: { engine: 'Window | null' },
 };

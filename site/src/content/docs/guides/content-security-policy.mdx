@@ -55,6 +55,7 @@ Add only the origins for the providers you use. Extend `script-src` with their s
 | --- | --- | --- |
 | YouTube | `https://www.youtube.com` | `https://www.youtube.com` or `https://www.youtube-nocookie.com`, depending on your source URL |
 | Vimeo | — | `https://player.vimeo.com`; `https://vimeo.com` for live events |
+| SoundCloud | — | `https://w.soundcloud.com` |
 | Spotify | `https://open.spotify.com` | `https://open.spotify.com` |
 | TikTok | — | `https://www.tiktok.com` |
 | Twitch | — | `https://player.twitch.tv` |
@@ -63,6 +64,8 @@ Add only the origins for the providers you use. Extend `script-src` with their s
 | Wistia | `https://fast.wistia.com` and `https://fast.wistia.net` | `https://fast.wistia.com` and `https://fast.wistia.net` if the SDK falls back to an iframe |
 
 For Cloudflare, use `https://iframe.videodelivery.net` unless your source URL names a customer origin. In that case, replace `<code>` with your customer code.
+
+SoundCloud resolves `on.soundcloud.com` short links through its oEmbed endpoint. If you narrow `connect-src` and use short links, allow `https://soundcloud.com`.
 
 The Wistia SDK bundled with Video.js normally renders its player in the page and can fall back to an iframe. It loads scripts and media data from `fast.wistia.com` and `fast.wistia.net`. If you narrow `connect-src`, keep both origins.
 

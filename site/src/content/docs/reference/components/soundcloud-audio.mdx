@@ -1,0 +1,172 @@
+---
+title: SoundCloudAudio
+frameworkTitle:
+  html: soundcloud-audio
+description: Audio component that plays SoundCloud tracks and sets through the SoundCloud Widget
+---
+
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/soundcloud-audio/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/soundcloud-audio/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/soundcloud-audio/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/soundcloud-audio/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/soundcloud-audio/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/soundcloud-audio/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/soundcloud-audio/html/css/BasicUsage.ts?raw";
+
+The [SoundCloud Widget](https://developers.soundcloud.com/docs/api/html5-widget) plays public and private SoundCloud tracks and sets. This component drives the widget and reports its state like a native `<audio>` element, so a <DocsLink slug="guides/skins">player skin</DocsLink> can control it.
+
+## Import
+
+<MediaImports media="soundcloud-audio" package="@videojs/soundcloud-audio" react="SoundCloudAudio" />
+
+## Load a source
+
+`src` takes any of these SoundCloud URLs:
+
+- A track: `soundcloud.com/<user>/<track>`
+- A set: `soundcloud.com/<user>/sets/<set>`
+- A private track or set, with its secret token: `soundcloud.com/<user>/<track>/s-<token>`
+- A short link from the SoundCloud apps: `on.soundcloud.com/<code>`
+- An API resource: `api.soundcloud.com/tracks/<id>` or `api.soundcloud.com/playlists/<id>`, with an optional `secret_token`. The id can also be a URN such as `soundcloud:tracks:<id>`
+- A widget embed URL: `w.soundcloud.com/player/?url=...`, as SoundCloud's own embed code gives it
+
+`m.soundcloud.com` links work too. Add `#t=` to start at a given time, in seconds (`#t=90`), clock time (`#t=1:30`), or units (`#t=1m30s`). Profiles, likes, and other pages that list sounds are not supported.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<SoundCloudAudio src="https://soundcloud.com/forss/flickermood#t=1:30" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<soundcloud-audio src="https://soundcloud.com/forss/flickermood#t=1:30"></soundcloud-audio>
+```
+</FrameworkCase>
+
+The widget does not accept short links, so the component first resolves them through [SoundCloud's oEmbed endpoint](https://developers.soundcloud.com/docs/oembed). That is one extra request to `soundcloud.com`.
+
+## Use with a player skin
+
+The widget stays visible and keeps taking clicks, with or without `controls`. SoundCloud's [API terms](https://developers.soundcloud.com/docs/api/terms-of-use) ask you to credit the uploader and SoundCloud with visible links back to the sound, and the widget shows exactly that. The audio skin draws its controls below the widget, so the two do not overlap.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<AudioPlayer>
+  <AudioSkin>
+    <SoundCloudAudio src="https://soundcloud.com/forss/flickermood" />
+  </AudioSkin>
+</AudioPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<audio-player>
+  <audio-skin>
+    <soundcloud-audio src="https://soundcloud.com/forss/flickermood"></soundcloud-audio>
+  </audio-skin>
+</audio-player>
+```
+</FrameworkCase>
+
+Anything the listener does in the widget shows in the skin: play, pause, seeking on the waveform, and picking another track of a set.
+
+The component is 166 pixels tall by default, SoundCloud's classic layout. Set a height to change it. From about 300 pixels, a set also shows its track list, and 450 pixels shows most of it. The large artwork layout of `visual: true` (see [widget parameters](#widget-parameters)) needs 300 pixels or more.
+
+## Widget parameters
+
+By default, the component hides the parts of the widget a skin has no use for: the buy, share, and download buttons, comments, reposts, the teaser, the related tracks shown after a track ends, and the large artwork layout. The uploader, the title, the artwork, and the SoundCloud logo always stay.
+
+Change any of these, or set `color`, under `source.engine.soundcloud`, spelled as SoundCloud spells them:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<SoundCloudAudio
+  source={{
+    src: 'https://soundcloud.com/forss/sets/soulhack',
+    engine: { soundcloud: { color: '#ff5500', start_track: 2, sharing: true } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const audio = document.querySelector('soundcloud-audio');
+audio.source = {
+  src: 'https://soundcloud.com/forss/sets/soulhack',
+  engine: { soundcloud: { color: '#ff5500', start_track: 2, sharing: true } },
+};
+```
+
+Without JavaScript, put the parameters on a widget embed URL instead:
+
+```html
+<soundcloud-audio
+  src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fforss%2Fsets%2Fsoulhack&color=%23ff5500&start_track=2"
+></soundcloud-audio>
+```
+</FrameworkCase>
+
+Engine options win over the parameters of a widget embed URL, which win over the defaults. Set an option to `null` to drop a default.
+
+## Behavior
+
+- A set plays as one source. When the widget moves on to the next track, `duration` changes, `currentTime` starts again from `0`, and `durationchange` fires. `ended` fires only after the last track. `play()` after the end starts the set again from its first track.
+- `loop` replays the track, or the set from its first track. If the widget does not start again, `ended` still fires.
+- Volume and mute both work. The widget has no separate mute, so muting sets its volume to `0` and unmuting restores the previous level. Mute applies before autoplay starts, so a muted autoplay starts muted.
+- `autoplay` starts playback once the widget is ready. Browsers can still refuse it, as they do for any embed. The widget's own `auto_play` parameter does the same and is never written to the widget URL, so the volume always applies first.
+- `buffered` is the stretch the widget reports as loaded, from where playback last started or landed.
+- The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
+- `controls`, `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
+- A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize.
+
+## Privacy
+
+SoundCloud has no cookie-free embed. The widget sets cookies as soon as it loads, so if your site needs consent for third-party cookies, render the component only after the visitor agrees.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="SoundCloudAudio">
+  <Fragment slot="engine-soundcloud">
+    Pass [SoundCloud Widget parameters](https://developers.soundcloud.com/docs/api/html5-widget#parameters) under `source.engine.soundcloud`, spelled exactly as SoundCloud spells them, plus anything SoundCloud adds next. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+
+    The sound comes from `src`, so `url` has no `engine.soundcloud` spelling. `referrerPolicy` sets the `referrerpolicy` of the widget iframe rather than a widget parameter.
+  </Fragment>
+</MediaReference>
