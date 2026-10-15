@@ -5,6 +5,7 @@ import {
   REGISTRY_PRESETS,
   REGISTRY_SKINS,
   installationTemplatesForMethod,
+  registryCatalog,
   registryNamespaceUrl,
   registrySkinSelection,
   registryStylings,
@@ -17,6 +18,14 @@ import {
   shadcnProjectSetup,
   shadcnRegistryAddCommand,
 } from '../index';
+
+describe('registryCatalog', () => {
+  it('matches the published catalog paths', () => {
+    expect(registryCatalog('react', 'tailwind')).toBe('react');
+    expect(registryCatalog('react', 'css', 'neutral')).toBe('react/css/neutral');
+    expect(registryCatalog('html', 'css', 'scaffold')).toBe('html/scaffold');
+  });
+});
 
 describe('registryNamespaceUrl', () => {
   it('selects the catalog through the URL, not the item name', () => {

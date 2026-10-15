@@ -1,0 +1,13 @@
+{
+  "name": "_resolve-class-name",
+  "dependencies": ["cn"],
+  "registryDependencies": ["@videojs/_style-theme"],
+  "files": [
+    {
+      "path": "support/files/_resolve-class-name/resolve-class-name.ts",
+      "type": "registry:lib",
+      "target": "@lib/resolve-class-name.ts",
+      "content": "import type { ClassValue } from 'cn';\nimport { createCn } from 'cn/config';\n\nexport type ClassName<State> = ClassValue | ((state: State) => ClassValue);\n\nexport function resolveClassName<State>(className: ClassName<State>, state: State): ClassValue {\n  return typeof className === 'function' ? className(state) : className;\n}\n\n/** The `media` keys from the Skin Tailwind theme, by `cn` theme group. Tests keep it equal to `styles/tailwind.css`. */\nexport const mediaTheme = {\n  blur: ['media-hidden', 'media-hidden-popup'],\n  color: [\n    'media-accent',\n    'media-background',\n    'media-border',\n    'media-controls',\n    'media-controls-foreground',\n    'media-foreground',\n    'media-live',\n    'media-muted',\n    'media-muted-foreground',\n    'media-popover',\n    'media-popover-foreground',\n    'media-primary',\n    'media-primary-foreground',\n    'media-ring',\n    'media-backdrop',\n  ],\n  container: [\n    'media-280',\n    'media-xs',\n    'media-360',\n    'media-sm',\n    'media-md',\n    'media-lg',\n    'media-xl',\n    'media-2xl',\n    'media-dialog',\n  ],\n  'drop-shadow': ['media-icon'],\n  radius: [\n    'media-control',\n    'media-controls',\n    'media-dialog',\n    'media-menu-item',\n    'media-pill',\n    'media-player',\n    'media-popup',\n  ],\n  shadow: ['media-hairline', 'media-separator', 'media-thumb', 'media-tooltip'],\n  spacing: [\n    'media-icon-sm',\n    'media-icon',\n    'media-icon-lg',\n    'media-icon-xl',\n    'media-control',\n    'media-dialog-width',\n    'media-hidden-offset',\n    'media-hidden-indicator-offset',\n    'media-hidden-preview-offset',\n    'media-hidden-seek-offset',\n  ],\n  text: ['media-xs', 'media-sm', 'media', 'media-lg', 'media-xl'],\n  'text-shadow': ['media', 'media-dialog'],\n};\n\n/** Merges Skin class names so `text-media` merges as a font size instead of replacing a `text-media-*` color. */\nexport const cn = createCn({ extend: { theme: mediaTheme } });\n"
+    }
+  ]
+}
