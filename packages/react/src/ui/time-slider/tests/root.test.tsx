@@ -210,6 +210,63 @@ describe('TimeSliderRoot', () => {
     expect(mockTimeState.seek).toHaveBeenCalledOnce();
     expect(mockTimeState.seek.mock.calls[0]?.[0]).toBeCloseTo(31, 5);
   });
+
+  it('seeks while dragging so the frame follows the thumb', () => {
+    const { Wrapper } = createPlayerWrapper();
+    const { container } = render(
+      <Wrapper>
+        <TimeSliderRoot />
+      </Wrapper>
+    );
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    measureSlider(root);
+    pointer(root, 'pointerdown', 50);
+    expect(mockTimeState.seek).not.toHaveBeenCalled();
+
+    pointer(root, 'pointermove', 60);
+    expect(mockTimeState.seek).toHaveBeenCalledOnce();
+    expect(mockTimeState.seek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+
+    pointer(root, 'pointerup', 100, 0);
+    pointer(root, 'lostpointercapture', 100, 0);
+    expect(mockTimeState.seek).toHaveBeenCalledTimes(2);
+    expect(mockTimeState.seek.mock.calls[1]?.[0]).toBeCloseTo(60, 5);
+  });
+
+  it('does not seek again when a drag is released where it last sought', () => {
+    const { Wrapper } = createPlayerWrapper();
+    const { container } = render(
+      <Wrapper>
+        <TimeSliderRoot />
+      </Wrapper>
+    );
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    startDrag(root);
+    endDrag(root);
+
+    expect(mockTimeState.seek).toHaveBeenCalledOnce();
+    expect(mockTimeState.seek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+  });
+
+  it('seeks once on a press without a drag', () => {
+    const { Wrapper } = createPlayerWrapper();
+    const { container } = render(
+      <Wrapper>
+        <TimeSliderRoot />
+      </Wrapper>
+    );
+    const root = container.querySelector('[data-orientation]') as HTMLElement;
+
+    measureSlider(root);
+    pointer(root, 'pointerdown', 100);
+    pointer(root, 'pointerup', 100, 0);
+    pointer(root, 'lostpointercapture', 100, 0);
+
+    expect(mockTimeState.seek).toHaveBeenCalledOnce();
+    expect(mockTimeState.seek.mock.calls[0]?.[0]).toBeCloseTo(60, 5);
+  });
 });
 
 describe('TimeSlider compound', () => {

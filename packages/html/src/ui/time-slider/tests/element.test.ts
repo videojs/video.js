@@ -172,6 +172,46 @@ describe('TimeSliderElement', () => {
     expect(timeOnlySeek).toHaveBeenCalledExactlyOnceWith(60);
   });
 
+  it('seeks while dragging so the frame follows the thumb', async () => {
+    const player = document.createElement('test-time-only-player');
+    const slider = createElement(TimeSliderElement);
+
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    measureSlider(slider);
+
+    pointer(slider, 'pointerdown', 50);
+    expect(timeOnlySeek).not.toHaveBeenCalled();
+
+    pointer(slider, 'pointermove', 60);
+    expect(timeOnlySeek).toHaveBeenCalledTimes(1);
+    expect(timeOnlySeek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+
+    pointer(slider, 'pointerup', 100, 0);
+    pointer(slider, 'lostpointercapture', 100, 0);
+    expect(timeOnlySeek).toHaveBeenCalledTimes(2);
+    expect(timeOnlySeek.mock.calls[1]?.[0]).toBeCloseTo(60, 5);
+  });
+
+  it('does not seek again when a drag is released where it last sought', async () => {
+    const player = document.createElement('test-time-only-player');
+    const slider = createElement(TimeSliderElement);
+
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    measureSlider(slider);
+
+    pointer(slider, 'pointerdown', 50);
+    pointer(slider, 'pointermove', 60);
+    pointer(slider, 'pointerup', 60, 0);
+    pointer(slider, 'lostpointercapture', 60, 0);
+
+    expect(timeOnlySeek).toHaveBeenCalledTimes(1);
+    expect(timeOnlySeek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+  });
+
   it.each(['release', 'disconnect'] as const)('resumes playback after a drag ends by %s', async (end) => {
     const player = document.createElement('test-time-only-player') as TestTimeOnlyPlayerProviderElement;
     const slider = createElement(TimeSliderElement);

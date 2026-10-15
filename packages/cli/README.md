@@ -124,7 +124,8 @@ pnpm create:skin
 pnpm create:skin ~/skins/neon --name Neon --framework html --base default
 ```
 
-`create:skin` builds the CLI and the registry, packs the Video.js packages a skin needs into tarballs, and passes `--registry` and `--override` so the new project uses those local builds. It asks
+`create:skin` builds the CLI and the registry, packs the Video.js packages a skin needs into tarballs, and passes
+`--registry` and `--override` so the new project uses those local builds. It asks
 where to put the project like the published command does, relative to the directory you ran it from.
 
 ## Community
