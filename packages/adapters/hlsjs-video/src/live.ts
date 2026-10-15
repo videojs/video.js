@@ -8,7 +8,6 @@ import type { HlsEngineHost, HlsPlaylistTypes } from './types';
 export function HlsJsLiveMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsLive extends (BaseClass as Constructor<HlsEngineHost>) {
     #targetLiveWindow = Number.NaN;
-    #liveEdgeStartOffset: number | undefined;
     #seekToLiveAbort: AbortController | null = null;
     #seekToLivePending = false;
 
@@ -40,17 +39,16 @@ export function HlsJsLiveMixin<Base extends Constructor<HlsEngineHost>>(BaseClas
       return this.#targetLiveWindow;
     }
 
-    // Derived from seekable + offset at read time. No cached state, no event.
+    // Read from hls.js at read time. No cached state, no event. hls.js applies the playlist hold-back, the
+    // `liveSyncDuration` / `liveSyncDurationCount` config and `lowLatencyMode`, so this is where hls.js itself plays.
     get liveEdgeStart() {
-      if (this.#liveEdgeStartOffset === undefined) return Number.NaN;
+      if (Number.isNaN(this.#targetLiveWindow)) return Number.NaN;
 
+      // Keep `NaN` until the media has a seekable range, so the first-play seek does not run before the media can seek.
       const { target } = this;
-      if (!target) return Number.NaN;
+      if (!target?.seekable.length) return Number.NaN;
 
-      const { seekable } = target;
-      if (!seekable.length) return Number.NaN;
-
-      return seekable.end(seekable.length - 1) - this.#liveEdgeStartOffset;
+      return this.engine?.liveSyncPosition ?? Number.NaN;
     }
 
     #derive(details: LevelLoadedData['details']) {
@@ -58,13 +56,11 @@ export function HlsJsLiveMixin<Base extends Constructor<HlsEngineHost>>(BaseClas
 
       const info = getStreamInfoFromHlsjsLevelDetails(details);
 
-      this.#liveEdgeStartOffset = info.liveEdgeStartOffset;
       this.#updateConfig(info);
       this.#setTargetLiveWindow(info.targetLiveWindow);
     }
 
     #reset() {
-      this.#liveEdgeStartOffset = undefined;
       this.#setTargetLiveWindow(Number.NaN);
     }
 
@@ -146,21 +142,10 @@ const getStreamInfoFromHlsjsLevelDetails = (levelDetails: LevelLoadedData['detai
   const streamType = toStreamTypeFromPlaylistType(playlistType);
   const targetLiveWindow = toTargetLiveWindowFromPlaylistType(playlistType);
   const lowLatency = !!levelDetails.partList?.length;
-  let liveEdgeStartOffset: number | undefined;
-
-  if (streamType === MediaStreamTypes.LIVE) {
-    // Prefer manifest-declared HOLD-BACK / PART-HOLD-BACK when present;
-    // otherwise fall back to the per-spec multiples of the target durations.
-    // See https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-12
-    liveEdgeStartOffset = lowLatency
-      ? levelDetails.partHoldBack || levelDetails.partTarget * 2
-      : levelDetails.holdBack || levelDetails.targetduration * 3;
-  }
 
   return {
     streamType,
     targetLiveWindow,
-    liveEdgeStartOffset,
     lowLatency,
   };
 };
