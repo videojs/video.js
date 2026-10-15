@@ -69,6 +69,9 @@ For Composer-based projects such as Drupal, declare the archive as a package:
         "name": "videojs/cdn",
         "version": "{{VJS10_CDN_ARCHIVE_VERSION}}",
         "type": "drupal-library",
+        "extra": {
+          "installer-name": "videojs-cdn"
+        },
         "dist": {
           "type": "zip",
           "url": "https://github.com/videojs/video.js/releases/download/@videojs/cdn@{{VJS10_CDN_ARCHIVE_VERSION}}/videojs-cdn-{{VJS10_CDN_ARCHIVE_VERSION}}.zip"
@@ -82,7 +85,7 @@ For Composer-based projects such as Drupal, declare the archive as a package:
 }
 ```
 
-Composer strips the archive's top-level directory, so the player lands directly in your libraries path.
+Composer strips the archive's top-level directory, and `installer-name` sets the install directory, so the player lands in `libraries/videojs-cdn/`.
 
 ### Mirror the prebuilt CDN files
 
