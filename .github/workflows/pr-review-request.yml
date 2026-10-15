@@ -1,0 +1,24 @@
+name: PR Review Request
+
+# Completing this run starts the reviewer in `pr-review.yml`. GitHub holds fork PR runs of
+# this workflow for maintainer approval like any other, so "Approve and run workflows" also
+# approves the review, and re-running this check re-runs the review.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: pr-review-request-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  request:
+    if: github.event.pull_request.draft == false && github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+
+    steps:
+      - name: Request review
+        run: echo "Requesting a Claude review of ${{ github.event.pull_request.head.sha }}."
