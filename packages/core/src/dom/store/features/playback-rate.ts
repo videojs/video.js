@@ -20,7 +20,12 @@ export const playbackRateFeature = definePlayerFeature({
 
   attach({ target, signal, set }) {
     const { media } = target;
-    if (!isMediaPlaybackRateCapable(media)) return;
+
+    // No rates to offer hides the rate controls, which would otherwise change nothing.
+    if (!isMediaPlaybackRateCapable(media)) {
+      set({ playbackRates: [] });
+      return;
+    }
 
     const sync = () => set({ playbackRate: media.playbackRate });
 
