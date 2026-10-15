@@ -456,7 +456,7 @@ const CLI_COMMANDS = [
   { command: skillsCommand(), description: 'Print how to install the Video.js skill in your coding agent.' },
   {
     command: `npx ${INSTALLATION_CLI_PACKAGE} skin create`,
-    description: 'Create a local project for building your own skin, with a page that previews it.',
+    description: 'Create a local project for building your own skin, with a workbench to preview it.',
   },
 ] as const;
 

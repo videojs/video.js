@@ -66,7 +66,7 @@ function mediaConstants(preset: RegistryPreset): string {
   return lines.join('\n');
 }
 
-/** `apps/preview/src/player.tsx`: the skin in the preset's player, playing Mux media. */
+/** `apps/preview/src/frame/player.tsx`: the skin in the preset's player, playing Mux media. */
 export function reactPlayer(preset: RegistryPreset): string {
   const { kind, skinComponent, playerComponent } = presetModule(preset);
   const media = previewMedia(preset);
@@ -76,16 +76,21 @@ export function reactPlayer(preset: RegistryPreset): string {
   const chapters = media.chapters
     ? `\n          <track kind="chapters" label="English" srcLang="en" src={CHAPTERS} default />\n        `
     : '';
-  const mediaElement = chapters ? `<${Media} ${mediaProps}>${chapters}</${Media}>` : `<${Media} ${mediaProps} />`;
+  // The workbench's playback options come in as \`media\`; anything after it here overrides them.
+  const props = `{...media} ${mediaProps}`;
+  const mediaElement = chapters ? `<${Media} ${props}>${chapters}</${Media}>` : `<${Media} ${props} />`;
 
   return `import { ${Media} } from '@videojs/react/media/mux-${kind}';
 import { ${playerComponent} } from '@videojs/react/${preset}';
 
 import { ${skinComponent} } from '@/${preset}/skin';
 
+import type { PlaybackProps } from '../shell/params';
+
 ${mediaConstants(preset)}
 
-export function Player() {
+/** \`media\` carries the workbench's playback options: autoplay, muted, loop, and preload. */
+export function Player({ media }: { media?: PlaybackProps }) {
   return (
     <${playerComponent}${playerProps}>
       <${skinComponent}>
@@ -97,7 +102,7 @@ export function Player() {
 `;
 }
 
-/** `apps/preview/src/player.ts`: the preset's player element around the skin's light-DOM template. */
+/** `apps/preview/src/frame/player.ts`: the preset's player element around the skin's light-DOM template. */
 export function htmlPlayer(preset: RegistryPreset): string {
   const { kind, playerTag } = presetModule(preset);
   const media = previewMedia(preset);

@@ -1,4 +1,4 @@
-/* The page around the player. Your skin lives in the project's src/ folder. */
+/* The page around the player in the preview frame. Your skin lives in the project's src/ folder. */
 :root {
   color-scheme: light dark;
 }
@@ -21,7 +21,13 @@ body {
   max-width: var(--preview-player-width, 56rem);
 }
 
+/* The aspect ratio option overrides the skin's own; `auto` lets the media's intrinsic size decide. */
+.preview-player[style*="--preview-player-ratio"] .media-skin {
+  aspect-ratio: var(--preview-player-ratio);
+}
+
 /* Player elements only provide state; the skin inside them is the box that gets sized. */
+media-i18n,
 video-player,
 live-video-player,
 audio-player,

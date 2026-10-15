@@ -85,12 +85,12 @@ package manager. Without a terminal to ask in, such as in
 CI or from a coding agent, the command stops and lists the choices you left out instead of picking them for you. Run
 `npx @videojs/cli skin create --help` for every option.
 
-The project keeps the skin alone in `src/`, so it can move into an app as it is, and previews it on a page in
-`apps/preview/` that plays NASA's Cosmic Dawn trailer from Mux, with chapters.
+The project keeps the skin alone in `src/`, so it can move into an app as it is, and previews it in `apps/preview/`, a
+slimmed-down version of the Video.js sandbox.
 
 The skin's source comes from the latest
 [Shadcn registry](https://videojs.org/docs/framework/react/guides/installation-shadcn) build, which isn't versioned
-yet; when its Video.js version differs from the CLI's, the command warns you. The preview templates ship with the CLI as
+yet; when its Video.js version differs from the CLI's, the command warns you. The workbench templates ship with the CLI as
 plain files, and the project's own dependencies install into the project. Behind a proxy, set `HTTPS_PROXY` and
 `NODE_USE_ENV_PROXY=1` so Node's `fetch` uses it.
 

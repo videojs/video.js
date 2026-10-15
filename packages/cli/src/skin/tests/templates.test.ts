@@ -12,7 +12,7 @@ describe('loadTemplates', () => {
 
     expect([...loaded.keys()]).toEqual(['shared', 'html']);
     expect(loaded.get('shared')!.has('apps/preview/index.html')).toBe(true);
-    expect(loaded.get('html')!.has('apps/preview/src/main.ts')).toBe(true);
+    expect(loaded.get('html')!.has('apps/preview/src/frame/main.ts')).toBe(true);
   });
 
   it('names the folder it could not read', async () => {

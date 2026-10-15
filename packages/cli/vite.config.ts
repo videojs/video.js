@@ -37,6 +37,6 @@ export default defineConfig({
     banner: { js: '#!/usr/bin/env node' },
     // The published package has no runtime dependencies: `npx` fetches one file that only needs Node built-ins, plus
     // the skin templates as plain files beside it, which only `skin create` reads.
-    deps: { alwaysBundle: ['@videojs/installation', '@videojs/utils'] },
+    deps: { alwaysBundle: ['@videojs/core', '@videojs/installation', '@videojs/utils'] },
   },
 });
