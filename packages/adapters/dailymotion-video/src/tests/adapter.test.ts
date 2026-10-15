@@ -161,6 +161,15 @@ describe('resolveDailymotionPlayerOptions', () => {
     ).toBe('xother');
   });
 
+  it('takes the configured player for the player embed URL that names none', () => {
+    const src = 'https://geo.dailymotion.com/player.html?video=x84sh87';
+
+    expect(resolveDailymotionPlayerOptions(src, { source: source(src) })).toMatchObject({
+      video: 'x84sh87',
+      player: PLAYER,
+    });
+  });
+
   it('returns null without a player configuration, which Dailymotion refuses to embed without', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
 

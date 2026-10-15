@@ -287,11 +287,14 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#setPlaybackSpeed();
   }
 
+  /**
+   * Starts playback on each load, through Dailymotion's `autoplay` parameter and a play sent once the player is ready.
+   * It can't stop a player configuration whose Autostart is on.
+   */
   get autoplay() {
     return this.#autoplay;
   }
   set autoplay(value) {
-    // Read on each load, as the `autoplay` runtime parameter and as a play sent once the player is ready.
     this.#autoplay = value;
   }
 
@@ -315,11 +318,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#applyLoop();
   }
 
+  /** Only the player configuration can hide Dailymotion's controls; `controls` decides whether the player takes input. */
   get controls() {
     return this.#controls;
   }
   set controls(value) {
-    // Only the player configuration can hide Dailymotion's controls; `controls` decides whether the player takes input.
     this.#controls = value;
   }
 

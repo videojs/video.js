@@ -46,6 +46,13 @@ describe('parseDailymotionSource', () => {
     });
   });
 
+  it('parses the player embed URL legacy embeds redirect to, which names no player configuration', () => {
+    expect(parseDailymotionSource('https://geo.dailymotion.com/player.html?video=x84sh87')).toEqual({
+      id: 'x84sh87',
+      player: null,
+    });
+  });
+
   it('returns null for a player embed URL without a video', () => {
     expect(parseDailymotionSource('https://geo.dailymotion.com/player/x8lr5.html?playlist=x6hynp')).toBe(null);
   });

@@ -23,7 +23,7 @@ import basicUsageHtml from "@/components/docs/demos/dailymotion-video/html/css/B
 import basicUsageHtmlCss from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.ts?raw";
 
-The Dailymotion player plays videos inside a player configuration you create in [Dailymotion Studio](https://www.dailymotion.com/partner/embed/players), and this component drives it through the [Dailymotion Web SDK](https://developers.dailymotion.com/reference/web-sdk-player-methods). Dailymotion refuses any embed that doesn't name a player configuration, so every source carries a Player ID.
+The Dailymotion player plays videos inside a player configuration you create in [Dailymotion Studio](https://www.dailymotion.com/partner/embed/players), and this component drives it through the [Dailymotion Web SDK](https://developers.dailymotion.com/reference/web-sdk-player-methods). Dailymotion refuses any embed that doesn't name a player configuration, so every source carries a Player ID. See [Create a Player](https://developers.dailymotion.com/docs/create-a-player) in the official Dailymotion documentation.
 
 ## Import
 
@@ -45,7 +45,9 @@ The simplest `src` is the player embed URL Dailymotion Studio gives you, which n
 ```
 </FrameworkCase>
 
-Video page URLs (`dailymotion.com/video/<id>`), legacy embed URLs (`dailymotion.com/embed/video/<id>`), and short links (`dai.ly/<id>`) name no player configuration, so pair them with `engine.dailymotion.player`. It also wins over the configuration a player embed URL names:
+### Specify the Player ID
+
+Video page URLs (`dailymotion.com/video/<id>`), legacy embed URLs (`dailymotion.com/embed/video/<id>`, or `geo.dailymotion.com/player.html?video=<id>`, where they now redirect), and short links (`dai.ly/<id>`) name no player configuration, so pair them with `engine.dailymotion.player`. It also wins over the configuration a player embed URL names:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -89,12 +91,13 @@ The player configuration decides what the embed can't change at runtime. To use 
 - Volume and mute both work, like a native `<video>`. Dailymotion has no separate mute, so muting sets its volume to `0` and unmuting restores the previous level.
 - `playbackRate` takes Dailymotion's rates, `0.25` to `2` in steps of `0.25`. Dailymotion rounds any other value up to the next one and caps it at `2`, and `playbackRate` then reports the rate it plays at.
 - `loop` is passed to Dailymotion, which restarts the video itself.
-- Changing `src` to another video loads it into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player.
+- Changing `src` loads the new video into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player, since Dailymotion only reads them when a player is created. So does autoplay, but only at the next load: call load() to apply a change right away. `muted` and `loop` change in place.
 - Seeking before the video has started, or after it has ended, also starts playback. Dailymotion does this itself; a native `<video>` would stay paused. Seeking while paused mid-video stays paused.
 - The SDK reports no buffered range, so `buffered` ends at the current time.
 - Ads play inside the embed. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
 - When the browser refuses to start playback, as it does for unmuted autoplay, the component reports `pause` instead of playing.
 - Fullscreen targets the element the player is built in.
+- `poster`, `preload`, and `playsinline` are accepted for parity with `<video>` but have no effect: the player configuration decides them.
 
 ## Examples
 
@@ -127,6 +130,6 @@ The player configuration decides what the embed can't change at runtime. To use 
   <Fragment slot="engine-dailymotion">
     Pass the Player ID as `player`, plus [Dailymotion runtime parameters](https://developers.dailymotion.com/reference/web-sdk-player-runtime-parameters) under `source.engine.dailymotion`, spelled exactly as Dailymotion spells them. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
 
-    The video comes from `src`, and `loop` and `autoplay` from the props of the same name, so none of them has an `engine.dailymotion` spelling. Dailymotion reads mute and controls from the player configuration, not from parameters.
+    The video comes from `src`, and `loop` and `autoplay` from the props of the same name, so none of them has an `engine.dailymotion` spelling. Mute and controls aren't runtime parameters: the component applies muted through the SDK, and the Dailymotion controls can only be hidden from the player configuration on Dailymotion Studio.
   </Fragment>
 </MediaReference>
