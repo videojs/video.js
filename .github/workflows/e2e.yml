@@ -21,6 +21,7 @@ jobs:
     outputs:
       player: ${{ steps.filter.outputs.player }}
       skins: ${{ steps.filter.outputs.skins }}
+      skin_projects: ${{ steps.filter.outputs.skin_projects }}
     steps:
       - name: Detect e2e-relevant changes
         id: filter
@@ -31,7 +32,7 @@ jobs:
           HEAD_REF: ${{ github.head_ref }}
         run: |
           if [ "$HEAD_REF" = 'release-please--branches--main' ]; then
-            printf 'player=false\nskins=false\n' >> "$GITHUB_OUTPUT"
+            printf 'player=false\nskins=false\nskin_projects=false\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           files=$(gh api "repos/$GH_REPO/pulls/$NUMBER/files" --paginate --jq '.[].filename')
@@ -41,6 +42,8 @@ jobs:
           # The player suite renders the built packages; skin parity compiles the authored skins in the sandbox.
           flag player '^(apps/e2e/|apps/sandbox/|packages/|\.github/workflows/e2e\.yml$|pnpm-lock\.yaml$)'
           flag skins '^(apps/e2e/(shared|suites/skin-parity)/|apps/sandbox/|packages/(skins|vjsc|html|react)/|\.github/workflows/e2e\.yml$|pnpm-lock\.yaml$)'
+          # `skin create` projects meet the CLI and its templates, the installation schema, and the registry build.
+          flag skin_projects '^(packages/(cli|installation|skins|vjsc)/|\.github/workflows/e2e\.yml$|pnpm-lock\.yaml$)'
 
   # Every browser job replays this run's Vite Task cache, so the packages, CDN bundles, generated skins, and sandbox
   # setup compile once per run instead of once per job.
@@ -322,6 +325,55 @@ jobs:
           name: e2e-snapshots
           path: apps/e2e/suites/player/tests/**/*-snapshots/
           retention-days: 7
+
+  # `skin create` copies the registry, the workbench templates, and a generated player into one project, and each of
+  # them changes on its own. Create every framework and styling pair with each preset, and each base skin, against this
+  # checkout, then install, typecheck, and build them. No browser runs, so the job needs no Playwright image.
+  skin-projects:
+    name: Skin projects
+    needs: changes
+    if: ${{ !cancelled() && (github.event_name == 'push' || needs.changes.outputs.skin_projects == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Vite Task cache
+        id: vite-task-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-skin-projects-${{ github.sha }}-${{ github.run_attempt }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-skin-projects-
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
+
+      - name: Build packages
+        run: pnpm build:packages
+
+      - name: Create, install, typecheck, and build skin projects
+        run: pnpm --silent -F @videojs/cli check:projects
+
+      - name: Save Vite Task cache
+        if: success()
+        uses: actions/cache/save@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: ${{ steps.vite-task-cache.outputs.cache-primary-key }}
 
   registry:
     name: Registry consumers
