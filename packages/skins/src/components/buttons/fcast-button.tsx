@@ -1,5 +1,4 @@
 import * as $ from '@videojs/core/vjsc';
-import type { FCastSender } from '@videojs/fcast';
 import { CastEnterIcon, CastExitIcon } from '@videojs/icons/vjsc';
 import { Text } from 'vjsc/components';
 
@@ -8,15 +7,9 @@ import buttonStyles from '../../styles/buttons/button.styles';
 import styles from '../../styles/buttons/fcast-button.styles';
 import { Button } from './button';
 
-export interface FCastButtonProps {
-  sender?: FCastSender | undefined;
-  src?: string | undefined;
-  contentType?: string | undefined;
-}
-
-export function FCastButton({ sender, src, contentType }: FCastButtonProps = {}) {
+export function FCastButton() {
   return (
-    <$.FCastButton $render={Button} className={styles.root} sender={sender} src={src} contentType={contentType}>
+    <$.FCastButton $render={Button} className={styles.root}>
       <CastEnterIcon className={[buttonStyles.icon, styles.enterIcon]} />
       <CastExitIcon className={[buttonStyles.icon, styles.exitIcon]} />
       <Text aria-hidden="true" className={styles.badge}>

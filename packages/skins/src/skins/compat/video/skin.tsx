@@ -1,5 +1,4 @@
 import * as $ from '@videojs/core/vjsc';
-import type { FCastSender } from '@videojs/fcast';
 import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import type { SkinDescription } from '../../../meta';
@@ -18,21 +17,9 @@ export interface VideoSkinProps extends Omit<PropsOf<typeof $.Container>, 'child
   children?: VjscNode;
   renderPoster?: PropsOf<typeof $.Poster.Image>['children'];
   renderThumbnail?: PropsOf<typeof $.Slider.Thumbnail.Image>['children'];
-  fcastSender?: FCastSender;
-  fcastSrc?: string;
-  fcastContentType?: string;
 }
 
-export function VideoSkin({
-  children,
-  className,
-  renderPoster,
-  renderThumbnail,
-  fcastSender,
-  fcastSrc,
-  fcastContentType,
-  ...props
-}: VideoSkinProps = {}) {
+export function VideoSkin({ children, className, renderPoster, renderThumbnail, ...props }: VideoSkinProps = {}) {
   return (
     <$.Container
       className={['media-skin', containerStyles.root, containerStyles.video, className]}
@@ -45,10 +32,7 @@ export function VideoSkin({
       <BufferingIndicator />
       <ErrorDialog />
       <Title />
-      <VideoControls
-        renderThumbnail={renderThumbnail}
-        fcast={{ sender: fcastSender, src: fcastSrc, contentType: fcastContentType }}
-      />
+      <VideoControls renderThumbnail={renderThumbnail} />
 
       <VideoHotkeys />
       <VideoGestures />

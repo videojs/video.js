@@ -1,57 +1,46 @@
 import { applyElementProps, createButton } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
-import { FCastExtension, type FCastSender } from '@videojs/fcast';
+import { ContextConsumer } from '@videojs/element/context';
+import { FCastExtension } from '@videojs/fcast';
 
-import { PlayerExtensionElement } from '../../extensions/player-extension-element';
+import { extensionContext, type ExtensionContextValue } from '../../player/context';
+import { UIElement } from '../ui-element';
 
-/** FCast control that registers a sender-backed player extension beside the Cast and AirPlay buttons. @experimental */
-export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
+/** FCast control that observes the surrounding player’s opt-in FCast extension. @experimental */
+export class FCastButtonElement extends UIElement {
   static readonly tagName = 'media-fcast-button';
 
   static override properties = {
-    src: { type: String },
-    contentType: { type: String, attribute: 'content-type' },
     disabled: { type: Boolean },
   } satisfies PropertyDeclarationMap;
 
   disabled = false;
   #controller: AbortController | null = null;
 
-  protected createExtension(): FCastExtension {
-    const extension = new FCastExtension();
+  #extension: FCastExtension | undefined;
+  #unsubscribe: (() => void) | undefined;
+  #onChange = () => this.requestUpdate();
 
-    extension.addEventListener('change', () => this.requestUpdate());
-    return extension;
+  constructor() {
+    super();
+    new ContextConsumer(this, {
+      context: extensionContext,
+      subscribe: true,
+      callback: (value) => this.#observe(value.extensions),
+    });
   }
 
-  protected override get shouldRegisterExtension(): boolean {
-    return !!this.sender;
-  }
+  #observe(extensions: ExtensionContextValue['extensions']): void {
+    this.#unsubscribe?.();
+    const sync = () => {
+      this.#extension?.removeEventListener('change', this.#onChange);
+      this.#extension = extensions.get(FCastExtension);
+      this.#extension?.addEventListener('change', this.#onChange);
+      this.requestUpdate();
+    };
 
-  get sender(): FCastSender | undefined {
-    return this.extension.sender;
-  }
-
-  set sender(value: FCastSender | undefined) {
-    this.extension.sender = value;
-    this.refreshExtensionRegistration();
-    this.requestUpdate();
-  }
-
-  get src(): string {
-    return this.extension.src;
-  }
-
-  set src(value: string | null | undefined) {
-    this.extension.src = value ?? undefined;
-  }
-
-  get contentType(): string | undefined {
-    return this.extension.contentType;
-  }
-
-  set contentType(value: string | null | undefined) {
-    this.extension.contentType = value ?? undefined;
+    this.#unsubscribe = extensions.subscribe(sync);
+    sync();
   }
 
   override connectedCallback(): void {
@@ -65,7 +54,7 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
       createButton({
         isDisabled: () => this.#isDisabled(),
         onActivate: () => {
-          void this.extension.toggle().catch((error: unknown) => {
+          void this.#extension?.toggle().catch((error: unknown) => {
             if (__DEV__) console.error('[media-fcast-button]', error);
           });
         },
@@ -75,6 +64,10 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
   }
 
   override disconnectedCallback(): void {
+    this.#unsubscribe?.();
+    this.#unsubscribe = undefined;
+    this.#extension?.removeEventListener('change', this.#onChange);
+    this.#extension = undefined;
     this.#controller?.abort();
     this.#controller = null;
     super.disconnectedCallback();
@@ -83,7 +76,7 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
   protected override update(changed: PropertyValues): void {
     super.update(changed);
 
-    const { availability, connection, deviceName } = this.extension.snapshot;
+    const { availability = 'unsupported', connection = 'disconnected', deviceName } = this.#extension?.snapshot ?? {};
     const label =
       connection === 'connected'
         ? `Disconnect from ${deviceName ?? 'FCast'}`
@@ -94,19 +87,21 @@ export class FCastButtonElement extends PlayerExtensionElement<FCastExtension> {
     applyElementProps(this, {
       'aria-label': label,
       'aria-disabled': this.#isDisabled() ? 'true' : undefined,
-      hidden: !this.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
-      'data-hidden': !this.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
+      hidden:
+        !this.#extension?.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
+      'data-hidden':
+        !this.#extension?.sender || (availability === 'unsupported' && connection !== 'connected') ? '' : undefined,
       'data-fcast-state': connection,
       'data-availability': availability,
     });
   }
 
   #isDisabled(): boolean {
-    const { availability, connection } = this.extension.snapshot;
+    const { availability, connection } = this.#extension?.snapshot ?? {};
 
     return (
       this.disabled ||
-      !this.extension.enabled ||
+      !this.#extension?.enabled ||
       connection === 'connecting' ||
       (connection !== 'connected' && availability !== 'available')
     );

@@ -3,6 +3,7 @@ title: FCast
 description: FCast playback extension and the application bridge contract for receiver discovery and control
 stability: unstable
 apis:
+  - FCastProps
   - FCastExtension
   - FCastExtensionProps
   - FCastBridge
@@ -14,7 +15,7 @@ apis:
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 
-The FCast extension routes player controls to a receiver through an application-provided bridge. The <DocsLink slug="reference/components/fcast-button">FCastButton</DocsLink> registers the extension inside a player and supplies its casting control. Google Cast and AirPlay remain separate controls. See <DocsLink slug="guides/casting">Casting</DocsLink> for player setup.
+The FCast extension routes player controls to a receiver through an application-provided bridge. The `FCast` React component or `<fcast-extension>` HTML element registers the extension inside a player. The <DocsLink slug="reference/components/fcast-button">FCastButton</DocsLink> observes it and supplies its casting control. Google Cast and AirPlay remain separate controls. See <DocsLink slug="guides/casting">Casting</DocsLink> for player setup.
 
 Browsers cannot perform FCast's mDNS discovery or open its native TCP transport. `@videojs/fcast` defines the browser-facing `FCastBridge` interface; it does not include a bridge, device picker, discovery service, or protocol transport. An application supplies an implementation backed by a native host or companion service. Without one, the FCast button is hidden.
 
@@ -31,11 +32,12 @@ These examples receive an application-owned bridge. `FCastSender` is a compatibl
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
+import { FCast } from '@videojs/react/extensions/fcast';
 import { FCastButton } from '@videojs/react/ui/fcast-button';
 import type { FCastBridge } from '@videojs/fcast';
 
 export function CastingControl({ bridge }: { bridge: FCastBridge }) {
-  return <FCastButton sender={bridge}>FCast</FCastButton>;
+  return <><FCast sender={bridge} /><FCastButton>FCast</FCastButton></>;
 }
 ```
 
@@ -44,29 +46,33 @@ export function CastingControl({ bridge }: { bridge: FCastBridge }) {
 
 <FrameworkCase frameworks={["html"]}>
 ```html
+<fcast-extension></fcast-extension>
 <media-fcast-button>FCast</media-fcast-button>
 ```
 
 ```ts
 import '@videojs/html/ui/fcast-button';
+import '@videojs/html/extensions/fcast';
 import type { FCastBridge } from '@videojs/fcast';
 
 export function connectCastingControl(bridge: FCastBridge) {
-  const button = document.querySelector('media-fcast-button');
-  if (button) button.sender = bridge;
+  const extension = document.querySelector('fcast-extension');
+  if (extension) extension.sender = bridge;
 }
 ```
 
 The element belongs inside the player. `sender` is a property, not an HTML attribute.
 </FrameworkCase>
 
-## Options
+## Configuration
 
-| Option | Description |
-|---|---|
-| `sender` | Application-owned `FCastBridge`. Defaults to absent. |
-| `src` | Receiver-accessible media URL. Defaults to the attached media's playable source. Embed pages require an explicit stream URL. Browser blob URLs are not portable to receivers. |
-| `contentType` | MIME type sent with the load request. Inferred from the URL when absent; an unknown type is sent as an empty string for the bridge to resolve or reject. |
+| Input | React | HTML | Description |
+|---|---|---|---|
+| Sender | `sender` | `sender` property | Application bridge implementing `FCastSender` |
+| Receiver URL | `src` | `src` attribute or property | Receiver-accessible URL; defaults to the attached media's playable source. Embed pages require an explicit stream URL. |
+| MIME type | `contentType` | `content-type` attribute or `contentType` property | MIME type sent with the load request; inferred from the URL when unset. An unknown type is sent as an empty string. |
+
+The extension follows the player's attached media and disconnects its session when removed. Buttons can mount or unmount independently of the extension.
 
 ## Playback behavior
 

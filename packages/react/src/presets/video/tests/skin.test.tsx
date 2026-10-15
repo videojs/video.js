@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { FCastExtension, type FCastSender, type FCastSnapshot } from '@videojs/fcast';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { FCast } from '../../../extensions/fcast';
 import { createPlayerWrapper } from '../../../testing/mocks';
 import { VideoSkin } from '../skin';
 
@@ -57,7 +58,12 @@ describe('VideoSkin', () => {
     expect(screen.queryByRole('button', { name: 'Cast with FCast' })).toBeNull();
     expect(extensions.get(FCastExtension)).toBeUndefined();
 
-    view.rerender(<VideoSkin fcastSender={sender} />);
+    view.rerender(
+      <>
+        <VideoSkin />
+        <FCast sender={sender} />
+      </>
+    );
     act(() => extensions.attach({ media: document.createElement('video'), container: null }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Cast with FCast' }));

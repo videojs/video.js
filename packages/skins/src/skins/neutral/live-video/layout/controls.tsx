@@ -4,7 +4,7 @@ import { Box } from 'vjsc/components';
 import { AirPlayButton } from '../../../../components/buttons/airplay-button';
 import { ButtonTooltip } from '../../../../components/buttons/button-tooltip';
 import { CastButton } from '../../../../components/buttons/cast-button';
-import { FCastButton, type FCastButtonProps } from '../../../../components/buttons/fcast-button';
+import { FCastButton } from '../../../../components/buttons/fcast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { LiveButton } from '../../../../components/buttons/live-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
@@ -14,7 +14,7 @@ import { VolumePopover } from '../../../../components/menus/volume-popover';
 import controlsStyles from '../../../../styles/layout/controls.styles';
 import styles from './controls.styles';
 
-export function NeutralLiveVideoControls({ fcast }: { fcast?: FCastButtonProps | undefined } = {}) {
+export function NeutralLiveVideoControls() {
   return (
     <$.Controls.Root>
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
@@ -36,7 +36,7 @@ export function NeutralLiveVideoControls({ fcast }: { fcast?: FCastButtonProps |
               <CastButton />
             </ButtonTooltip>
             <ButtonTooltip side="top">
-              <FCastButton {...fcast} />
+              <FCastButton />
             </ButtonTooltip>
             <ButtonTooltip side="top">
               <AirPlayButton />

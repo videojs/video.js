@@ -1,4 +1,3 @@
-import type { FCastSender } from '@videojs/fcast';
 import type { VjscNode } from 'vjsc/components';
 
 import { ControlsContent, type ControlsSlots } from './controls';
@@ -11,18 +10,10 @@ export function VideoControlsContent({
   renderThumbnail,
   seekBackward,
   seekForward,
-  fcast,
 }: ControlsSlots & {
   center?: boolean;
   live?: boolean;
   menu?: VjscNode;
-  fcast?:
-    | {
-        sender?: FCastSender | undefined;
-        src?: string | undefined;
-        contentType?: string | undefined;
-      }
-    | undefined;
 } = {}) {
   return (
     <ControlsContent
@@ -32,7 +23,7 @@ export function VideoControlsContent({
       renderThumbnail={renderThumbnail}
       seekBackward={seekBackward}
       seekForward={seekForward}
-      top={<ScreenControls fcast={fcast} />}
+      top={<ScreenControls />}
     />
   );
 }

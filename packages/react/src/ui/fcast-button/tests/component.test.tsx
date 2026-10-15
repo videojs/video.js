@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { FCastExtension, type FCastLoadRequest, type FCastSender, type FCastSnapshot } from '@videojs/fcast';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
+import { FCast } from '../../../extensions/fcast';
 import { createPlayerWrapper } from '../../../testing/mocks';
 import { FCastButton } from '../component';
 
@@ -30,11 +31,52 @@ class TestSender extends EventTarget implements FCastSender {
 }
 
 describe('FCastButton', () => {
+  it('does not create an extension when rendered alone', () => {
+    const { Wrapper, extensions } = createPlayerWrapper();
+
+    render(<FCastButton />, { wrapper: Wrapper });
+
+    expect(extensions.get(FCastExtension)).toBeUndefined();
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('leaves the extension active when a control unmounts and synchronizes configuration', () => {
+    const { Wrapper, extensions } = createPlayerWrapper();
+    const sender = new TestSender();
+    const replacement = new TestSender();
+    const view = render(
+      <>
+        <FCast sender={sender} />
+        <FCastButton />
+      </>,
+      { wrapper: Wrapper }
+    );
+    const extension = extensions.get(FCastExtension);
+
+    view.rerender(
+      <FCast sender={replacement} src="https://example.com/remote.m3u8" contentType="application/x-mpegURL" />
+    );
+    expect(extensions.get(FCastExtension)).toBe(extension);
+    expect(extension?.sender).toBe(replacement);
+    expect(extension?.src).toBe('https://example.com/remote.m3u8');
+    expect(extension?.contentType).toBe('application/x-mpegURL');
+
+    view.unmount();
+    expect(extensions.get(FCastExtension)).toBeUndefined();
+  });
+
   it('shows its own FCast state and invokes the sender picker', async () => {
     const { Wrapper, extensions } = createPlayerWrapper();
     const sender = new TestSender();
 
-    render(<FCastButton sender={sender}>FCast</FCastButton>, { wrapper: Wrapper });
+    const view = render(
+      <>
+        <FCastButton>FCast</FCastButton>
+        <FCast sender={sender} />
+      </>,
+      { wrapper: Wrapper }
+    );
+
     act(() => extensions.attach({ media: document.createElement('video'), container: null }));
 
     const button = screen.getByRole('button', { name: 'Cast with FCast' });
@@ -53,5 +95,9 @@ describe('FCastButton', () => {
       sender.dispatchEvent(new Event('change'));
     });
     expect(screen.getByRole('button', { name: 'Disconnect from Living room' })).toBeDefined();
+
+    view.rerender(<FCastButton>FCast</FCastButton>);
+    expect(extensions.get(FCastExtension)).toBeUndefined();
+    expect(screen.queryByRole('button')).toBeNull();
   });
 });

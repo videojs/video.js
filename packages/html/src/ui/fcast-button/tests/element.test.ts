@@ -1,6 +1,7 @@
 import { FCastExtension, type FCastLoadRequest, type FCastSender, type FCastSnapshot } from '@videojs/fcast';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { FCastExtension as FCastExtensionElement } from '../../../extensions/fcast';
 import { TestExtensionProvider } from '../../../extensions/tests/test-utils';
 import { FCastButtonElement } from '../element';
 
@@ -27,6 +28,7 @@ class TestSender extends EventTarget implements FCastSender {
 
 customElements.define('test-fcast-provider', TestExtensionProvider);
 customElements.define('test-fcast-button', FCastButtonElement);
+customElements.define('test-fcast-extension', FCastExtensionElement);
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -47,7 +49,10 @@ describe('FCastButtonElement', () => {
     expect(button.hasAttribute('data-hidden')).toBe(true);
     expect(provider.extensions.get(FCastExtension)).toBeUndefined();
 
-    button.sender = sender;
+    const extension = new FCastExtensionElement();
+
+    extension.sender = sender;
+    provider.append(extension);
     await button.updateComplete;
 
     expect(button.getAttribute('aria-label')).toBe('Cast with FCast');
@@ -60,6 +65,19 @@ describe('FCastButtonElement', () => {
     button.click();
     expect(sender.prompt).toHaveBeenCalledOnce();
 
+    const core = provider.extensions.get(FCastExtension);
+
+    button.remove();
+    expect(provider.extensions.get(FCastExtension)).toBe(core);
+    provider.append(button);
+    await button.updateComplete;
+    expect(button.hidden).toBe(false);
+
+    extension.src = 'https://example.com/remote.m3u8';
+    extension.contentType = 'application/x-mpegURL';
+    expect(core?.src).toBe('https://example.com/remote.m3u8');
+    expect(core?.contentType).toBe('application/x-mpegURL');
+
     sender.snapshot = { ...sender.snapshot, availability: 'unsupported', connection: 'connected' };
     sender.dispatchEvent(new Event('change'));
     await button.updateComplete;
@@ -67,7 +85,7 @@ describe('FCastButtonElement', () => {
     expect(button.hidden).toBe(false);
     expect(button.getAttribute('aria-label')).toBe('Disconnect from FCast');
 
-    button.sender = undefined;
+    extension.remove();
     await button.updateComplete;
     expect(provider.extensions.get(FCastExtension)).toBeUndefined();
     expect(button.hidden).toBe(true);
