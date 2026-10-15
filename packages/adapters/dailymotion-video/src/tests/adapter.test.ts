@@ -34,6 +34,7 @@ const EVENTS = {
   PLAYER_PLAYBACKPERMISSION: 'playback_resolution',
   PLAYER_VIDEOCHANGE: 'videochange',
   PLAYER_ERROR: 'error',
+  PLAYER_CRITICALPATHREADY: 'criticalpathready',
 } as const;
 
 /** Stands in for the player object `createPlayer` resolves with, the way the SDK builds and tears it down. */
@@ -494,6 +495,19 @@ describe('DailymotionAdapter', () => {
       expect(media.readyState).toBe(1);
     });
 
+    it('passes the start position to a video loaded into the running player', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source(VIDEO_SRC, { startTime: 10 });
+
+      const { player } = await attachAndReady(media);
+
+      media.source = source(OTHER_VIDEO_SRC, { startTime: 10 });
+      await flush();
+
+      expect(player.loadContent).toHaveBeenCalledExactlyOnceWith({ video: 'x7tgad0', startTime: 10 });
+    });
+
     it('loads only the last of several sources set in one tick', async () => {
       const media = new DailymotionAdapter();
       const { player } = await attachAndReady(media);
@@ -516,7 +530,7 @@ describe('DailymotionAdapter', () => {
       await flush();
 
       expect(media.source?.engine?.dailymotion?.startTime).toBe(5);
-      expect(player.loadContent).toHaveBeenCalledWith({ video: 'x7tgad0' });
+      expect(player.loadContent).toHaveBeenCalledWith({ video: 'x7tgad0', startTime: 5 });
       expect(createPlayer).toHaveBeenCalledOnce();
     });
 
@@ -815,18 +829,37 @@ describe('DailymotionAdapter', () => {
       expect(media.readyState).toBe(3);
     });
 
-    it('does not end when looping, since the player restarts itself', async () => {
+    it('does not end when looping and the player restarts itself', async () => {
       const media = new DailymotionAdapter();
 
       media.loop = true;
 
       const { player } = await attachAndReady(media);
 
-      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_PLAY', { playerIsPlaying: true });
       player.emit('VIDEO_END');
+      await flush();
 
       expect(media.ended).toBe(false);
       expect(media.paused).toBe(false);
+    });
+
+    it('ends when looping but the player stops at the end anyway', async () => {
+      const media = new DailymotionAdapter();
+      const ended = vi.fn();
+
+      media.loop = true;
+
+      const { player } = await attachAndReady(media);
+
+      media.addEventListener('ended', ended);
+      player.emit('VIDEO_PLAY', { playerIsPlaying: true });
+      player.emit('VIDEO_END', { playerIsPlaying: false });
+      await flush();
+
+      expect(ended).toHaveBeenCalledOnce();
+      expect(media.ended).toBe(true);
+      expect(media.paused).toBe(true);
     });
 
     it('reports a refused playback as paused', async () => {
@@ -865,6 +898,50 @@ describe('DailymotionAdapter', () => {
       expect(media.currentTime).toBe(10);
       expect(media.buffered.end(0)).toBe(10);
       expect(media.seekable.end(0)).toBe(100);
+    });
+
+    it('keeps the position within the duration when the player clock runs past it at the end', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      player.emit('VIDEO_TIMECHANGE', { videoTime: 25.4 });
+      player.emit('VIDEO_TIMECHANGE', { videoTime: 25.6 });
+
+      expect(media.duration).toBe(25);
+      expect(media.currentTime).toBe(25);
+    });
+
+    it('announces canplay once when the player can start playback, before playing', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+      const events: string[] = [];
+
+      for (const type of ['canplay', 'playing']) media.addEventListener(type, () => events.push(type));
+
+      expect(media.readyState).toBe(1);
+
+      player.emit('PLAYER_CRITICALPATHREADY');
+      player.emit('VIDEO_PLAYING');
+
+      expect(events).toEqual(['canplay', 'playing']);
+      expect(media.readyState).toBe(3);
+    });
+
+    it('announces canplay from the state read on ready when the player is already able to play', async () => {
+      const media = new DailymotionAdapter();
+      const canplay = vi.fn();
+
+      media.addEventListener('canplay', canplay);
+      createPlayer.mockImplementationOnce(async (id, options) => {
+        const player = new FakePlayer(document.getElementById(id)!, options);
+
+        player.state.playerIsCriticalPathReady = true;
+        players.push(player);
+        return player;
+      });
+      await attachAndReady(media);
+
+      expect(canplay).toHaveBeenCalledOnce();
     });
 
     it('treats an ad as playback without letting it touch the video position', async () => {

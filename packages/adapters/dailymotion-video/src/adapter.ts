@@ -181,7 +181,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       this.#swapping = true;
       this.#autoplayPending = true;
       this.dispatchEvent(new Event('loadstart'));
-      tryCall(() => player.loadContent({ video: options.video }));
+      const startTime = options.params?.startTime;
+
+      tryCall(() => player.loadContent({ video: options.video, ...(isNumber(startTime) && { startTime }) }));
       return;
     }
 
@@ -512,6 +514,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       VIDEO_PAUSE: () => this.#onPause(),
       AD_PAUSE: () => this.#onPause(),
       VIDEO_PLAYING: () => this.#onPlaying(),
+      PLAYER_CRITICALPATHREADY: (state) => {
+        if (!state.playerError) this.#onCanPlay();
+      },
       VIDEO_BUFFERING: () => this.dispatchEvent(new Event('waiting')),
       // The `video*` members describe the video even while an ad plays.
       VIDEO_TIMECHANGE: (state) => {
@@ -713,6 +718,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#onVolumeChange(state);
 
+    if (state.playerIsCriticalPathReady === true && !state.playerError) this.#onCanPlay();
+
     if (state.playerIsPlaying === true) this.#onPlay();
   }
 
@@ -752,9 +759,13 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #applyCurrentTime(time: number | undefined) {
-    if (!isNumber(time) || time === this.#currentTime) return;
+    if (!isNumber(time)) return;
 
-    this.#currentTime = time;
+    // The player's clock runs a little past the duration it reports at the end.
+    const next = Number.isFinite(this.#duration) ? Math.min(time, this.#duration) : time;
+    if (next === this.#currentTime) return;
+
+    this.#currentTime = next;
     this.dispatchEvent(new Event('timeupdate'));
   }
 
@@ -767,8 +778,16 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onPlaying() {
-    this.#readyState = Math.max(this.#readyState, READY_STATE_HAVE_FUTURE_DATA);
+    this.#onCanPlay();
     this.dispatchEvent(new Event('playing'));
+  }
+
+  // Once per load, after `loadedmetadata`: a report from before then belongs to the previous video.
+  #onCanPlay() {
+    if (this.#readyState < READY_STATE_HAVE_METADATA || this.#readyState >= READY_STATE_HAVE_FUTURE_DATA) return;
+
+    this.#readyState = READY_STATE_HAVE_FUTURE_DATA;
+    this.dispatchEvent(new Event('canplay'));
   }
 
   #onPause() {
@@ -796,9 +815,19 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onEnded() {
-    // A looping media element never ends; the player restarts itself.
-    if (this.#loop) return;
+    // A looping media element never ends, and the player usually restarts itself. Some player configurations stop at
+    // the end anyway, so the player's state decides.
+    if (this.#loop) {
+      this.#readState((state) => {
+        if (!state.playerIsPlaying) this.#reportEnded();
+      });
+      return;
+    }
 
+    this.#reportEnded();
+  }
+
+  #reportEnded() {
     this.#onPause();
     this.#ended = true;
     this.dispatchEvent(new Event('ended'));

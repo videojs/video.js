@@ -13,6 +13,8 @@ export interface DailymotionPlayerState {
   /** Whether an ad is running, during which the `video*` members still describe the video. */
   adIsPlaying?: boolean;
   playerError?: DailymotionPlayerError | null;
+  /** Whether the player can start playback. */
+  playerIsCriticalPathReady?: boolean;
   /** `null` while the player has not decided on a mute yet. */
   playerIsMuted?: boolean | null;
   playerIsPlaying?: boolean;
