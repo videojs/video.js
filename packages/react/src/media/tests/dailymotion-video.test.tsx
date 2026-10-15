@@ -33,6 +33,20 @@ describe('DailymotionVideo', () => {
     expect(element.style.pointerEvents).toBe('');
   });
 
+  it('merges a style prop over its own sizing and hit-testing instead of replacing them', () => {
+    const { container, rerender } = render(<DailymotionVideo style={{ borderRadius: 4 }} />);
+    const element = container.firstElementChild as HTMLElement;
+
+    expect(element.style.pointerEvents).toBe('none');
+    expect(element.style.height).toBe('100%');
+    expect(element.style.borderRadius).toBe('4px');
+
+    rerender(<DailymotionVideo style={undefined} />);
+
+    expect(element.style.pointerEvents).toBe('none');
+    expect(element.style.height).toBe('100%');
+  });
+
   it('routes media event props to the media rather than the container', () => {
     const onPlay = vi.fn((event: Event) => event.currentTarget);
     const { container, media } = renderWithMedia(<DailymotionVideo onPlay={onPlay} />);

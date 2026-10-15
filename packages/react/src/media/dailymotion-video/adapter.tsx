@@ -1,7 +1,7 @@
 'use client';
 
 import { DailymotionAdapter, type DailymotionAdapterProps } from '@videojs/dailymotion-video';
-import { forwardRef, type ReactNode } from 'react';
+import { type CSSProperties, forwardRef, type ReactNode } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -15,11 +15,13 @@ export interface DailymotionVideoProps
   /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
   autoPlay?: boolean | undefined;
   children?: ReactNode;
+  /** Merged over the container's own sizing and hit-testing styles. */
+  style?: CSSProperties | undefined;
 }
 
 export const DailymotionVideo = forwardRef<HTMLDivElement, DailymotionVideoProps>(function DailymotionVideo(
   // The SDK owns the container's children, so React renders none.
-  { children: _children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
+  { children: _children, mediaRef, style, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
   const media = useMediaInstance(DailymotionAdapter);
@@ -36,9 +38,9 @@ export const DailymotionVideo = forwardRef<HTMLDivElement, DailymotionVideoProps
   return (
     <div
       data-cross-origin-frame
-      // Without `controls`, keep the cross-origin frame out of hit-testing so the skin above it sees hover.
-      style={{ width: '100%', height: '100%', ...(!props.controls && { pointerEvents: 'none' }) }}
       {...containerProps}
+      // Without `controls`, keep the cross-origin frame out of hit-testing so the skin above it sees hover.
+      style={{ width: '100%', height: '100%', ...(!props.controls && { pointerEvents: 'none' }), ...style }}
       ref={composedRef}
     />
   );
