@@ -74,7 +74,6 @@ export default function SegmentedControl<T extends string = string>({
             aria-label={option['aria-label']}
             className={clsx(
               'flex min-w-0 items-center justify-center gap-2 rounded-md corner-squircle px-3 py-1.5 text-p3 leading-tight whitespace-nowrap select-none',
-              'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold',
               pending ? 'cursor-wait' : option.disabled || disabled ? 'cursor-not-allowed' : 'cursor-pointer',
               isPressed
                 ? 'bg-surface-raised font-semibold text-faded-black dark:text-manila-light shadow-xs ring-1 ring-line'

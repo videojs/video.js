@@ -39,8 +39,7 @@ export function Select<T extends string = string>({
         className={twMerge(
           clsx(
             'inline-flex h-9 min-w-0 items-center gap-2 rounded-lg corner-squircle border border-line bg-surface px-3 text-left text-p3 shadow-xs',
-            'intent:border-line-strong data-[popup-open]:border-line-strong cursor-pointer select-none',
-            'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold'
+            'intent:border-line-strong data-[popup-open]:border-line-strong cursor-pointer select-none'
           ),
           className
         )}

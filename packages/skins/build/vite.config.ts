@@ -13,12 +13,15 @@ import {
   skinMetaDefaults,
   skinUtils,
 } from './config.ts';
-import { skinClassNameMergeImport } from './imports.ts';
 import { packageSkinsPlugin } from './packages/plugin.ts';
 import { formatSource } from './registry/format.ts';
 import { registryItems } from './registry/items/index.ts';
 import { registryStyles } from './registry/items/styles.ts';
 import { registryPackages, registryPaths, registryTargets } from './registry/targets.ts';
+
+// Mirrors `isWatchMode` in build/pack.ts, which this tsconfig project can't import without emitting declarations into build/.
+const isWatchMode =
+  process.env.VP_PACK_WATCH === 'true' || process.argv.includes('--watch') || process.argv.includes('-w');
 
 export const skinBuildConfig: PackUserConfig = {
   name: 'skins',
@@ -50,7 +53,8 @@ export const skinBuildConfig: PackUserConfig = {
       },
       meta: { defaults: skinMetaDefaults },
     }),
-    ...registryTargets.map((target) =>
+    // The preparation task emits the registry; watch mode only refreshes package Skin inputs.
+    ...(isWatchMode ? [] : registryTargets).map((target) =>
       vjscRegistryPlugin({
         name: 'videojs',
         homepage: 'https://videojs.org',
@@ -60,7 +64,6 @@ export const skinBuildConfig: PackUserConfig = {
         paths: registryPaths,
         imports: {
           '@videojs/utils/style': '@/lib/resolve-class-name',
-          [skinClassNameMergeImport]: '@/lib/utils',
         },
         packages: registryPackages,
         meta: {
@@ -75,6 +78,8 @@ export const skinBuildConfig: PackUserConfig = {
     {
       name: 'skins:catalog',
       generateBundle() {
+        if (isWatchMode) return;
+
         for (const target of registryTargets) {
           this.emitFile({
             type: 'asset',

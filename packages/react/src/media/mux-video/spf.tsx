@@ -45,7 +45,7 @@ export const MuxVideo = forwardRef<HTMLVideoElement, MuxVideoProps>(function Mux
   const htmlProps = useSyncProps(media, props, MuxVideoAdapter.defaultProps);
 
   return (
-    <video ref={composedRef} {...htmlProps}>
+    <video ref={composedRef} {...htmlProps} crossOrigin={props.crossOrigin ?? undefined}>
       <MuxStoryboard media={media} />
       {children}
       {fallback}

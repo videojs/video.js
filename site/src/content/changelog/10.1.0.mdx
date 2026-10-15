@@ -1,0 +1,40 @@
+---
+description: "Adds the Scaffold skin, player.js embeds, HLS chapters, and smoother installation and migration paths."
+date: 2026-10-12
+version: "10.1.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.0.1...@videojs/core@10.1.0"
+---
+
+Video.js 10.1.0 gives you a cleaner starting point for custom players, more ways to connect playback sources, and clearer paths into Video.js 10.
+
+## Customize the player
+
+The new Scaffold skin provides functional video, audio, and live-player controls with plain surfaces, inherited fonts, and no presentation transitions. It is designed for you to restyle, while retaining keyboard controls, focus indicators, captions, settings, chapter and thumbnail previews, and status feedback across HTML, React, CSS, Tailwind, registry, and CDN output ([#9251](https://github.com/videojs/video.js/pull/9251)). Start with the [HTML Scaffold skin](/docs/framework/html/reference/components/video-scaffold-skin/) or [React Scaffold skin](/docs/framework/react/reference/components/video-scaffold-skin/), then use the [skin customization guide](/docs/guides/customize-skins/) when you need to edit its source.
+
+Scaffold also handles reduced-transparency and increased-contrast controls more clearly, and keeps its top controls aligned in RTL layouts ([#9287](https://github.com/videojs/video.js/pull/9287), [#9269](https://github.com/videojs/video.js/pull/9269)). Title and caption alignment is cleaner across every skin ([#9389](https://github.com/videojs/video.js/pull/9389)). The Compat skin now keeps its backdrop visible while buffering and centers its play icon more precisely ([#9252](https://github.com/videojs/video.js/pull/9252), [#3146](https://github.com/videojs/v10/pull/3146)). You can also install the button tooltip as a registry component ([#3194](https://github.com/videojs/v10/pull/3194)).
+
+## Play more sources
+
+`<playerjs-video>` and `PlayerJsVideo` play any embed that implements the player.js protocol, including Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, and Streamable. The adapter controls the embed directly without loading a third-party script, and supports the commands and events each receiver advertises ([#9247](https://github.com/videojs/v10/pull/9247)). See the [HTML](/docs/framework/html/reference/components/playerjs-video/) or [React](/docs/framework/react/reference/components/playerjs-video/) reference.
+
+HLS sources can now expose JSON chapters through hls.js and native HLS ([#2993](https://github.com/videojs/v10/pull/2993)), and SPF sends credentials with HLS requests when you use `crossorigin="use-credentials"` ([#2870](https://github.com/videojs/v10/pull/2870)). The hls.js adapter also updates its hls.js dependency ([#3171](https://github.com/videojs/v10/pull/3171)). YouTube captions now stay in sync with the embed, including captions that YouTube enables itself, late-arriving tracks, and source changes ([#9367](https://github.com/videojs/video.js/pull/9367)); the sandbox adds a picker of YouTube clips to exercise those cases ([#9374](https://github.com/videojs/video.js/pull/9374)).
+
+Time sliders now sample playback on animation frames, follow seekable ranges, avoid extrapolating stalled native-media time, and skip unnecessary semantic updates. Together, these fixes make progress updates smoother and more accurate.
+
+## Install and migrate with confidence
+
+The `video.js` package now routes new installs to the HTML, React, or CDN packages instead of shipping a player itself ([#9258](https://github.com/videojs/video.js/pull/9258)). It publishes as `video.js@10` under npm's `next` tag, while unversioned installs and CDN URLs continue to resolve Video.js 8 ([#9477](https://github.com/videojs/video.js/pull/9477)). Native audio and video markup now includes a fallback link to the Video.js help page, including server-rendered React media; React media accepts `fallback={null}` or replacement fallback content when you need to control it ([#9381](https://github.com/videojs/video.js/pull/9381), [#9382](https://github.com/videojs/video.js/pull/9382)).
+
+The documentation now includes a [React-only Video-React migration guide](/docs/framework/react/guides/migrate-from-video-react/) that maps player props, controls, refs, state, and common components to Video.js 10 ([#9397](https://github.com/videojs/video.js/pull/9397)). It also documents Video.js 8's security-only maintenance policy and routes its issues and security reports appropriately ([#9248](https://github.com/videojs/video.js/pull/9248), [#9321](https://github.com/videojs/video.js/pull/9321)). Contributor guidance now starts with getting started and an AI quickstart ([#3191](https://github.com/videojs/v10/pull/3191)), and the Wistia documentation notes its Sentry behavior after playback errors ([#2943](https://github.com/videojs/v10/pull/2943)).
+
+## Site and sandbox polish
+
+Blog and changelog posts gain a popover table-of-contents rail, popover footnotes, and captioned figures ([#3168](https://github.com/videojs/v10/pull/3168), [#3166](https://github.com/videojs/v10/pull/3166), [#3200](https://github.com/videojs/v10/pull/3200)). Their RSS feeds now include full entry content, so you can read release notes and posts in your feed reader ([#9267](https://github.com/videojs/video.js/pull/9267)). Page and Open Graph titles are cleaner ([#3157](https://github.com/videojs/v10/pull/3157)), documentation screenshots render consistently across browsers and load responsively ([#9308](https://github.com/videojs/video.js/pull/9308)), and font fallbacks avoid layout shifts ([#9377](https://github.com/videojs/video.js/pull/9377)).
+
+The site requests a smaller home-page hero poster and loads the DocSearch modal when you show search intent, reducing initial page work ([#9375](https://github.com/videojs/video.js/pull/9375), [#9376](https://github.com/videojs/video.js/pull/9376)). In the sandbox, width fields preserve what you type until you commit the value, empty accent previews no longer imply a selected color ([#9329](https://github.com/videojs/video.js/pull/9329)), and the Cosmic Dawn trailer is available as a Mux source with chapter navigation ([#9390](https://github.com/videojs/video.js/pull/9390)).
+
+Repository links now point to `videojs/video.js`, and the changelog includes Video.js releases back to 2010 ([#9253](https://github.com/videojs/video.js/pull/9253), [#9255](https://github.com/videojs/video.js/pull/9255)).
+
+Thanks to first-time contributor [@javierarams](https://github.com/javierarams).

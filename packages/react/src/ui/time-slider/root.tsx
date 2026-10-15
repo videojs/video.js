@@ -92,6 +92,19 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
       return () => core.endDrag(playbackRef.current);
     }, [core]);
 
+    const dragSeekPercentRef = useRef<number | undefined>(undefined);
+
+    const seekTo = (percent: number) => {
+      const media = mediaRef.current;
+
+      if (media) {
+        const time = core.rawValueFromPercent(percent);
+
+        seek.seek(percent);
+        media.seek(time);
+      }
+    };
+
     const { state, input, cssVars, rootRef, thumbRef, rootProps, rootStyle, thumbProps } = useSlider<TimeSliderState>({
       computeState: (input) => {
         core.setInput(input);
@@ -122,15 +135,19 @@ export const TimeSliderRoot = forwardRef<HTMLDivElement, TimeSliderRootProps>(
           ? state
           : { ...state, fillPercent: target.percent },
       getCSSVars: getTimeSliderCSSVars,
+      // Seek on each (throttled) change while dragging so the frame follows the thumb.
+      // Presses and key steps seek once, on commit.
+      onValueChange: (percent) => {
+        if (!input.current.dragging || percent === dragSeekPercentRef.current) return;
+
+        dragSeekPercentRef.current = percent;
+        seekTo(percent);
+      },
       onValueCommit: (percent) => {
-        const media = mediaRef.current;
+        // Skip the commit when the drag already sought this position.
+        if (percent !== dragSeekPercentRef.current) seekTo(percent);
 
-        if (media) {
-          const time = core.rawValueFromPercent(percent);
-
-          seek.seek(percent);
-          media.seek(time);
-        }
+        dragSeekPercentRef.current = undefined;
       },
       onDragStart: () => {
         core.startDrag(playbackRef.current);

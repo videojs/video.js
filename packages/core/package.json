@@ -1,6 +1,6 @@
 {
   "name": "@videojs/core",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Core components and utilities for Video.js",
   "keywords": [
     "core",
@@ -90,8 +90,7 @@
   "scripts": {
     "generate:locales": "node --import tsx ./scripts/generate-i18n-locales.ts",
     "generate:i18n-types": "node --import tsx ./scripts/generate-i18n-types.ts",
-    "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
+    "dev": "vp pack --watch ./src --no-clean",
     "test": "vp run @videojs/core#build && pnpm run test:types && vp test run",
     "test:types": "tsgo --project ./src/core/ui/tests/tsconfig.json",
     "test:watch": "vp test",
@@ -100,7 +99,8 @@
   "dependencies": {
     "@videojs/media": "workspace:*",
     "@videojs/store": "workspace:*",
-    "@videojs/utils": "workspace:*"
+    "@videojs/utils": "workspace:*",
+    "video.js": "workspace:*"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",

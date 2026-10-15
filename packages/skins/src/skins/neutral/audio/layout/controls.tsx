@@ -27,7 +27,7 @@ export function NeutralAudioControls() {
 
           <$.Controls.Group className={styles.timeSliderGroup}>
             <$.Time.Group className={timeStyles.group}>
-              <$.Time.Value className={[timeStyles.toggle, timeStyles.currentValue]} type="current" toggle />
+              <$.Time.Value className={timeStyles.toggle} type="current" toggle />
               <$.Time.Separator className={timeStyles.separator} />
               <$.Time.Value className={timeStyles.durationValue} type="duration" />
             </$.Time.Group>

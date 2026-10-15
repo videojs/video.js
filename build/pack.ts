@@ -5,9 +5,11 @@ import { cssExclude, cssTargets } from './css-targets.ts';
 /** `dev` and `default` outputs consumed by package `exports` conditions. */
 export type PackageBuildMode = 'dev' | 'default';
 
-export const packageBuildModes: PackageBuildMode[] = ['dev', 'default'];
+// The dev task enables Node's development condition too, so its servers and generators use the same output.
+export const packageBuildModes: PackageBuildMode[] =
+  process.env.VP_PACK_WATCH === 'true' ? ['dev'] : ['dev', 'default'];
 
-const isWatchMode =
+export const isWatchMode =
   process.env.VP_PACK_WATCH === 'true' || process.argv.includes('--watch') || process.argv.includes('-w');
 
 /** Applied to every Vite+ pack config in the monorepo. */
@@ -61,7 +63,11 @@ export function packageBuildConfig(mode: PackageBuildMode, platform: 'browser' |
     define: {
       __DEV__: mode === 'dev' ? 'true' : 'false',
     },
-    dts: mode === 'dev' ? ({ generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const) : (false as const),
+    // Preparation emits declarations once; watching them starts a TypeScript build per package.
+    dts:
+      mode === 'dev' && !isWatchMode
+        ? ({ generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const)
+        : (false as const),
   };
 }
 
@@ -79,5 +85,5 @@ export const neutralLibraryConfig = {
   clean: !isWatchMode,
   hash: false,
   unbundle: true,
-  dts: { generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const,
+  dts: isWatchMode ? false : ({ generator: 'tsgo', tsconfig: 'tsconfig.dts.json' } as const),
 };

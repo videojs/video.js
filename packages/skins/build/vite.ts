@@ -5,13 +5,11 @@ import { vjscPlugin } from 'vjsc/vite';
 
 import { iconElementSourcePlugin } from '../../icons/vjsc/vite.ts';
 import { skinMetaDefaults } from './config.ts';
-import { skinClassNameMergeImport } from './imports.ts';
 import { resolveSkinComponents, resolveSkinStyles } from './transform.ts';
 
 const packageDir = resolve(import.meta.dirname, '..');
 const reactSourceDir = resolve(packageDir, '../react/src');
 const htmlSourceDir = resolve(packageDir, '../html/src');
-const utilsStyleSource = resolve(packageDir, '../utils/src/style/index.ts');
 
 export interface SkinsSourceOptions {
   /** Register the Tailwind candidate manifest so a consumer's Tailwind entry can import `vjsc:candidates`. */
@@ -43,9 +41,7 @@ export interface SkinsSourceConfig {
  * framework plugins such as `react()` or `tailwindcss()`, `define` values, and dev-only helpers.
  */
 export function createSkinsSourceConfig(options: SkinsSourceOptions = {}): SkinsSourceConfig {
-  const alias: { find: string | RegExp; replacement: string }[] = [
-    { find: skinClassNameMergeImport, replacement: utilsStyleSource },
-  ];
+  const alias: { find: string | RegExp; replacement: string }[] = [];
 
   if (options.frameworks === 'source') {
     alias.push(

@@ -301,6 +301,13 @@ html.dark[data-tone="deep"] {
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 
+/* Keep browser, demo, and third-party focus outlines consistent across the site. Players keep their own skin's focus
+   ring, which the blog and docs demonstrate. Unlayered, this already outranks layered component styles. */
+:focus-visible:not(.media-skin *) {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
 @layer base {
   .list-decimal .list-decimal {
     list-style-type: lower-alpha;
@@ -365,6 +372,14 @@ html.dark[data-tone="deep"] {
   &::-webkit-scrollbar-thumb {
     background: var(--line-strong);
   }
+}
+
+@utility text-box-trim-both {
+  text-box-trim: trim-both;
+}
+
+@utility text-box-edge-cap-alphabetic {
+  text-box-edge: cap alphabetic;
 }
 
 /* Thin scrollbars for side navigation and code blocks. `scroll` keeps the track visible where the platform allows. */

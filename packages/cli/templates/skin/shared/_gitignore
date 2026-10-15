@@ -1,0 +1,9 @@
+node_modules
+dist
+*.local
+.DS_Store
+
+# Hosting CLIs keep their project links here.
+.vercel
+.netlify
+.wrangler

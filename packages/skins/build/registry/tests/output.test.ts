@@ -96,9 +96,9 @@ describe('React registry output', () => {
     ].sort();
 
     expect(helper?.files?.map((file) => file.target)).toEqual(['@lib/resolve-class-name.ts']);
-    expect(defaultPlayButton).toContain(`import { resolveClassName } from '@/lib/resolve-class-name';`);
-    expect(defaultPlayButton).toContain(`import { cn } from '@/lib/utils';`);
-    expect(defaultPlayButton).not.toContain(`{ cn, resolveClassName }`);
+    expect(helper?.registryDependencies ?? []).not.toContain('utils');
+    expect(defaultPlayButton).toContain(`import { cn, resolveClassName } from '@/lib/resolve-class-name';`);
+    expect(defaultPlayButton).not.toContain('@/lib/utils');
     expect(styleImports(defaultPlayButton)).toEqual([
       '../styles/base.css',
       '../styles/audio/theme.css',

@@ -6,6 +6,8 @@ import { getLegacyErrorSlug, getLegacyErrorUrl, LEGACY_ERROR_CODES, type LegacyE
  * The registry is the single source for the message the stubs throw in dev builds and for the generated API reference
  * pages, so the two never drift. It lives only in the `video.js` package: the `@videojs/*` packages stay free of legacy
  * detection, and production builds of this package import only `./codes`.
+ *
+ * @internal
  */
 export interface LegacyErrorEntry {
   /** One sentence naming the v8 API and why it no longer exists. */
@@ -23,7 +25,11 @@ export interface LegacyErrorEntry {
  * as-is, and the error pages render them, so a bare `<tag>` outside backticks would be swallowed as HTML there.
  */
 
-/** A registry entry resolved for one code, with everything an error page or message needs. */
+/**
+ * A registry entry resolved for one code, with everything an error page or message needs.
+ *
+ * @internal
+ */
 export interface LegacyErrorRecord extends LegacyErrorEntry {
   code: LegacyErrorCode;
   slug: string;
@@ -32,17 +38,22 @@ export interface LegacyErrorRecord extends LegacyErrorEntry {
   stayOnV8: string;
 }
 
+/** @internal */
 export const LEGACY_V8_DOCS_URL = 'https://legacy.videojs.org';
 
+/** @internal */
 export const LEGACY_V8_INSTALL = 'npm install video.js@8';
 
+/** @internal */
 export const LEGACY_V8_LINE = `Staying on v8 is fine: \`${LEGACY_V8_INSTALL}\` — docs at ${LEGACY_V8_DOCS_URL}.`;
 
+/** @internal */
 export const LEGACY_ERRORS = {
   VJS8_LEGACY_INIT: {
-    summary: '`videojs()` was the Video.js 8 API. Video.js 10 has no factory; players are components you compose.',
+    summary:
+      '`videojs()` was the Video.js 8 setup call. Video.js 10 does not set up a player from an element or id; players are components you compose.',
     legacy: "const player = videojs('my-video', { controls: true });",
-    html: "Keep `import 'video.js'`, remove the factory call, and render `<video-player><video-skin><video src></video></video-skin></video-player>`.",
+    html: "Install `@videojs/html`, `import '@videojs/html/video/player'` and `import '@videojs/html/video/skin'`, and render `<video-player><video-skin><video src></video></video-skin></video-player>`.",
     react:
       "`import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video'` and render `<VideoPlayer><VideoSkin><Video src /></VideoSkin></VideoPlayer>`.",
   },
@@ -75,6 +86,7 @@ export const LEGACY_ERRORS = {
   },
 } satisfies Record<LegacyErrorCode, LegacyErrorEntry>;
 
+/** @internal */
 export function getLegacyErrorRecord(code: LegacyErrorCode): LegacyErrorRecord {
   return {
     code,
@@ -85,7 +97,11 @@ export function getLegacyErrorRecord(code: LegacyErrorCode): LegacyErrorRecord {
   };
 }
 
-/** Every registry entry resolved, in `LEGACY_ERROR_CODES` order, for the site build to enumerate. */
+/**
+ * Every registry entry resolved, in `LEGACY_ERROR_CODES` order, for the site build to enumerate.
+ *
+ * @internal
+ */
 export function getLegacyErrorRecords(): LegacyErrorRecord[] {
   return LEGACY_ERROR_CODES.map(getLegacyErrorRecord);
 }

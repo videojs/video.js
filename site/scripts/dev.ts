@@ -68,7 +68,11 @@ export function main(argv = process.argv.slice(2)): number {
     console.log(PREFIX, `Reusing generated content. Run \`pnpm dev:site ${PREPARE_FLAG}\` to rebuild it.`);
   }
 
-  return run('pnpm', ['exec', 'astro', 'dev', ...astroArgs], SITE_ROOT, { ...process.env, NETLIFY_DEV: '1' });
+  return run('pnpm', ['exec', 'astro', 'dev', ...astroArgs], SITE_ROOT, {
+    ...process.env,
+    ASTRO_DEV_BACKGROUND: 'false',
+    NETLIFY_DEV: '1',
+  });
 }
 
 const isEntrypoint = process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url));

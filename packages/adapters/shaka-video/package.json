@@ -1,6 +1,6 @@
 {
   "name": "@videojs/shaka-video",
-  "version": "10.0.1",
+  "version": "10.1.0",
   "description": "Shaka Player playback adapter for Video.js",
   "keywords": [
     "dash",
@@ -36,8 +36,7 @@
     "access": "public"
   },
   "scripts": {
-    "build:watch": "vp pack --watch ./src --no-clean",
-    "dev": "pnpm run build:watch",
+    "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "test:watch": "vp test",
     "clean": "rimraf --glob dist types '*.tsbuildinfo'"

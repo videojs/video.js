@@ -454,6 +454,10 @@ const CLI_COMMANDS = [
     description: 'List installation options, or add flags to print one complete, version-matched plan.',
   },
   { command: skillsCommand(), description: 'Print how to install the Video.js skill in your coding agent.' },
+  {
+    command: `npx ${INSTALLATION_CLI_PACKAGE} skin create`,
+    description: 'Create a local project for building your own skin, with a workbench to preview it.',
+  },
 ] as const;
 
 function usageResult(packageVersion: string, json: boolean): AgentsInitResult {
@@ -477,7 +481,7 @@ function usageResult(packageVersion: string, json: boolean): AgentsInitResult {
     exitCode: 0,
     stdout: `# ${INSTALLATION_CLI_PACKAGE}@${packageVersion}
 
-Video.js instructions for coding agents and the people working with them. Every command only prints; none installs packages or changes files.
+Video.js instructions for coding agents and the people working with them. The \`agents\` commands only print; they don't install packages or change files. \`skin create\` writes a new project.
 
 ${commands}
 
