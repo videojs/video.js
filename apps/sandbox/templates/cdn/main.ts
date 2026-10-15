@@ -247,6 +247,9 @@ async function loadCdnMedia(media: MediaId) {
     case 'playerjs-video':
       await import('@videojs/cdn/media/playerjs-video');
       break;
+    case 'soundcloud-audio':
+      await import('@videojs/cdn/media/soundcloud-audio');
+      break;
     case 'spotify-audio':
       await import('@videojs/cdn/media/spotify-audio');
       break;
