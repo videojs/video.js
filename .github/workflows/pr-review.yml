@@ -67,13 +67,14 @@ jobs:
 
       # `git patch-id` ignores line numbers and hunk offsets, so merging the base branch into a
       # PR changes the head SHA but keeps the same ID when the PR's own changes are unchanged.
+      # `--verbatim` keeps whitespace, since an indentation-only edit can change meaning.
       - name: Fingerprint PR changes
         id: diff
         if: steps.pr.outputs.number
         env:
           BASE_SHA: ${{ steps.pr.outputs.base_sha }}
         run: |
-          patch_id=$(git diff "$BASE_SHA...refs/remotes/pr/head" | git patch-id --stable | cut -d ' ' -f 1)
+          patch_id=$(git diff "$BASE_SHA...refs/remotes/pr/head" | git patch-id --verbatim | cut -d ' ' -f 1)
           echo "patch_id=${patch_id:-empty}" >> "$GITHUB_OUTPUT"
           touch "$RUNNER_TEMP/pr-review-marker"
 
