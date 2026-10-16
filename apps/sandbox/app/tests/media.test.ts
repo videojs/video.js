@@ -9,11 +9,13 @@ import {
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
+  DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   MUX_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
+  SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   SOURCES,
   YOUTUBE_SOURCE_IDS,
@@ -37,20 +39,20 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube and player.js and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, and SoundCloud and the native background video only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
+    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio'];
 
-    // player.js is a protocol many providers speak, so its embed picks between their pages instead.
-    expect(fixed).toEqual([
-      'background-video',
-      ...embeds.filter((id) => id !== 'youtube-video' && id !== 'playerjs-video'),
-    ]);
+    // player.js is a protocol many providers speak, so its embed picks between their pages instead, and SoundCloud
+    // between the URL shapes its adapter reads differently.
+    expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id))]);
     expect(embeds).toEqual([
       'vimeo-video',
       'youtube-video',
       'cloudflare-video',
       'playerjs-video',
+      'soundcloud-audio',
       'spotify-audio',
       'tiktok-video',
       'twitch-video',
@@ -67,12 +69,26 @@ describe('MEDIA', () => {
       'dash-video',
       'youtube-video',
       'playerjs-video',
+      'soundcloud-audio',
     ]);
   });
 
   it('lands the player.js embed on one of its provider pages, whichever source was showing', () => {
     expect(MEDIA['playerjs-video'].entrySource).toBe(DEFAULT_PLAYERJS_SOURCE);
     expect(MEDIA['playerjs-video'].fallbackSource).toBe(DEFAULT_PLAYERJS_SOURCE);
+  });
+
+  it('offers the SoundCloud embed its own URLs, and nothing else those URLs', () => {
+    expect(MEDIA['soundcloud-audio'].entrySource).toBe(DEFAULT_SOUNDCLOUD_SOURCE);
+    expect(SOUNDCLOUD_SOURCE_IDS).toContain(DEFAULT_SOUNDCLOUD_SOURCE);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('soundcloud-audio', platform)).toEqual(SOUNDCLOUD_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'soundcloud-audio')) {
+      for (const id of SOUNDCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
   });
 
   it('labels what the SPF engines do with protected and MPEG-TS sources', () => {

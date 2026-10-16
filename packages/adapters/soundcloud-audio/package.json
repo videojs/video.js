@@ -1,0 +1,51 @@
+{
+  "name": "@videojs/soundcloud-audio",
+  "version": "10.1.0",
+  "description": "SoundCloud Widget playback adapter for Video.js",
+  "keywords": [
+    "audio",
+    "embed",
+    "media",
+    "soundcloud",
+    "videojs"
+  ],
+  "homepage": "https://videojs.org",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/video.js",
+    "directory": "packages/adapters/soundcloud-audio"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/default/index.js",
+  "module": "dist/default/index.js",
+  "types": "dist/dev/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/dev/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "default": "./dist/default/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vp pack --watch ./src --no-clean",
+    "test": "vp test run",
+    "test:watch": "vp test",
+    "clean": "rimraf --glob dist types '*.tsbuildinfo'"
+  },
+  "dependencies": {
+    "@videojs/media": "workspace:*",
+    "@videojs/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "vite-plus": "catalog:"
+  }
+}

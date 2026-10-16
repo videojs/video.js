@@ -16,10 +16,10 @@ export interface SandboxSource {
   /** Plain media URL. Absent when the source needs more than a URL can carry. */
   url?: string;
   /**
-   * `youtube` is a YouTube page URL for `<youtube-video>`, and `playerjs` an embed page URL for `<playerjs-video>`,
-   * rather than a media file or manifest.
+   * `youtube` is a YouTube page URL for `<youtube-video>`, `playerjs` an embed page URL for `<playerjs-video>`, and
+   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, rather than a media file or manifest.
    */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs';
+  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'soundcloud';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -621,6 +621,56 @@ const SOURCE_MAP = {
     url: 'https://streamable.com/e/moo',
     type: 'playerjs',
   },
+  // Forss is the SoundCloud founder's own account, which SoundCloud's docs embed
+  // from, so its tracks and its set stay public. The URL shapes are the ones the
+  // adapter reads differently; the last two are failures on purpose.
+  'soundcloud-track': {
+    label: 'SoundCloud - Track',
+    url: 'https://soundcloud.com/forss/flickermood',
+    type: 'soundcloud',
+  },
+  'soundcloud-set': {
+    label: 'SoundCloud - Set',
+    url: 'https://soundcloud.com/forss/sets/soulhack',
+    type: 'soundcloud',
+  },
+  // 40 seconds, to reach the end quickly.
+  'soundcloud-short-track': {
+    label: 'SoundCloud - Short track',
+    url: 'https://soundcloud.com/forss/lost-through-inversion',
+    type: 'soundcloud',
+  },
+  'soundcloud-start-time': {
+    label: 'SoundCloud - Track from 1:30',
+    url: 'https://soundcloud.com/forss/flickermood#t=1:30',
+    type: 'soundcloud',
+  },
+  'soundcloud-api': {
+    label: 'SoundCloud - API track URL',
+    url: 'https://api.soundcloud.com/tracks/293',
+    type: 'soundcloud',
+  },
+  // A short link someone shared publicly; it resolves to a podcast episode.
+  'soundcloud-short-link': {
+    label: 'SoundCloud - Short link',
+    url: 'https://on.soundcloud.com/9zRpu',
+    type: 'soundcloud',
+  },
+  'soundcloud-widget-url': {
+    label: 'SoundCloud - Widget URL with color',
+    url: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fforss%2Fsets%2Fsoulhack&color=%2300aa66&start_track=3',
+    type: 'soundcloud',
+  },
+  'soundcloud-missing': {
+    label: 'SoundCloud - Missing track (error)',
+    url: 'https://soundcloud.com/forss/no-such-track-here',
+    type: 'soundcloud',
+  },
+  'soundcloud-profile': {
+    label: 'SoundCloud - Profile URL (error)',
+    url: 'https://soundcloud.com/forss',
+    type: 'soundcloud',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -634,11 +684,15 @@ const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 
 /**
  * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
- * the player.js services' for `<playerjs-video>`, so every list derived from this one stays free of them.
+ * the player.js services' for `<playerjs-video>`, SoundCloud's for `<soundcloud-audio>`, so every list derived from
+ * this one stays free of them.
  */
-export const SOURCE_IDS = ALL_SOURCE_IDS.filter((id) => !isYouTubeSource(id) && !isPlayerJsSource(id));
+export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
+  (id) => !isYouTubeSource(id) && !isPlayerJsSource(id) && !isSoundCloudSource(id)
+);
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
 export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
+export const SOUNDCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isSoundCloudSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -676,6 +730,7 @@ export const DEFAULT_SOURCE: SourceId = 'hls-1';
 export const DEFAULT_DASH_SOURCE: SourceId = 'dash-1';
 export const DEFAULT_YOUTUBE_SOURCE: SourceId = 'youtube-1';
 export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
+export const DEFAULT_SOUNDCLOUD_SOURCE: SourceId = 'soundcloud-track';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -727,6 +782,10 @@ export function isYouTubeSource(id: SourceId): boolean {
 
 export function isPlayerJsSource(id: SourceId): boolean {
   return SOURCES[id].type === 'playerjs';
+}
+
+export function isSoundCloudSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'soundcloud';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */

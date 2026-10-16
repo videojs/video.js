@@ -211,6 +211,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/native-hls-video' },
           { slug: 'reference/components/playerjs-video' },
           { slug: 'reference/components/shaka-video' },
+          { slug: 'reference/components/soundcloud-audio' },
           { slug: 'reference/components/spotify-audio' },
           { slug: 'reference/components/tiktok-video' },
           { slug: 'reference/components/twitch-video' },

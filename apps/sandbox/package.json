@@ -29,6 +29,7 @@
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/react": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/store": "workspace:*",
