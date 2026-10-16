@@ -132,21 +132,6 @@ Engine options win over the parameters of a widget embed URL, which win over the
 - `controls`, `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
 - A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize.
 
-## SoundCloud's terms
-
-The widget is covered by the [SoundCloud Terms of Use](https://soundcloud.com/terms-of-use), in the section about players and widgets. Without written consent from SoundCloud, you may not use the widget to:
-
-- Build a site or app that replicates much of what SoundCloud offers, or a content service that relies on SoundCloud content for a material part.
-- Embed content on a site for one artist, unless it is your own content, or on a site for one genre.
-
-You also may not suggest that SoundCloud or an artist endorses your site. SoundCloud can block the widget at any time.
-
-The [SoundCloud API terms](https://developers.soundcloud.com/docs/api/terms-of-use), which ask you to credit the uploader and SoundCloud with links back to the sound, apply when you use the SoundCloud API, for example to play stream URLs in a player of your own. This component uses the widget, which shows that credit itself.
-
-## Privacy
-
-SoundCloud has no cookie-free embed. The widget sets cookies as soon as it loads, so if your site needs consent for third-party cookies, render the component only after the visitor agrees.
-
 ## Examples
 
 ### Basic Usage
