@@ -32,7 +32,7 @@ import {
 /**
  * Plays SoundCloud tracks and sets through the SoundCloud Widget. A set plays as one source: moving to another track
  * reports a new `duration` and restarts `currentTime`, and `ended` fires once the last track ends. The widget stays
- * visible and takes input, since it carries the attribution SoundCloud requires; what it does is reported like anything
+ * visible and takes input, since it is what credits the uploader and SoundCloud; what it does is reported like anything
  * the host asked for.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
