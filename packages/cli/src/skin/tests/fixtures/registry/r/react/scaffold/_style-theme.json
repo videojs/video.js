@@ -1,0 +1,16 @@
+{
+  "name": "_style-theme",
+  "files": [
+    {
+      "path": "skins/styles/theme.css",
+      "type": "registry:style",
+      "target": "@components/videojs/styles/theme.css",
+      "content": ".media-skin {}\n"
+    }
+  ],
+  "cssVars": { "theme": { "color-media-accent": "var(--media-accent)" } },
+  "css": {
+    "@utility font-media": { "font-family": "var(--media-font-family)" },
+    "@custom-variant media-sm": { "@container media-root (width >= 24rem)": { "@slot": {} } }
+  }
+}

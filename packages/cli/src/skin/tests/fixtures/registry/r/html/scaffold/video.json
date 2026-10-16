@@ -1,0 +1,24 @@
+{
+  "name": "video",
+  "dependencies": ["@videojs/html@10.1.0"],
+  "files": [
+    {
+      "path": "skins/files/video/skin.html",
+      "type": "registry:file",
+      "target": "@components/videojs/video/skin.html",
+      "content": "<media-container class=\"media-skin\">\n<!-- Add a compatible media component here. -->\n</media-container>\n"
+    },
+    {
+      "path": "skins/files/video/skin.ts",
+      "type": "registry:file",
+      "target": "@components/videojs/video/skin.ts",
+      "content": "import './skin.css';\n"
+    },
+    {
+      "path": "skins/files/video/skin.css",
+      "type": "registry:style",
+      "target": "@components/videojs/video/skin.css",
+      "content": ".media-skin {}\n"
+    }
+  ]
+}

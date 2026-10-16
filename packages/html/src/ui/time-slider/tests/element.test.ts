@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { playerContext } from '../../../player/context';
 import { sliderContext } from '../../slider/context';
-import { measureSlider, pointer } from '../../slider/tests/support';
+import { measureSlider, pointer, stubResizeObserver } from '../../slider/tests/support';
 import { SliderThumbElement } from '../../slider/thumb';
 import { SliderValueElement } from '../../slider/value';
 import { UIElement } from '../../ui-element';
@@ -172,6 +172,46 @@ describe('TimeSliderElement', () => {
     expect(timeOnlySeek).toHaveBeenCalledExactlyOnceWith(60);
   });
 
+  it('seeks while dragging so the frame follows the thumb', async () => {
+    const player = document.createElement('test-time-only-player');
+    const slider = createElement(TimeSliderElement);
+
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    measureSlider(slider);
+
+    pointer(slider, 'pointerdown', 50);
+    expect(timeOnlySeek).not.toHaveBeenCalled();
+
+    pointer(slider, 'pointermove', 60);
+    expect(timeOnlySeek).toHaveBeenCalledTimes(1);
+    expect(timeOnlySeek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+
+    pointer(slider, 'pointerup', 100, 0);
+    pointer(slider, 'lostpointercapture', 100, 0);
+    expect(timeOnlySeek).toHaveBeenCalledTimes(2);
+    expect(timeOnlySeek.mock.calls[1]?.[0]).toBeCloseTo(60, 5);
+  });
+
+  it('does not seek again when a drag is released where it last sought', async () => {
+    const player = document.createElement('test-time-only-player');
+    const slider = createElement(TimeSliderElement);
+
+    player.append(slider);
+    document.body.append(player);
+    await slider.updateComplete;
+    measureSlider(slider);
+
+    pointer(slider, 'pointerdown', 50);
+    pointer(slider, 'pointermove', 60);
+    pointer(slider, 'pointerup', 60, 0);
+    pointer(slider, 'lostpointercapture', 60, 0);
+
+    expect(timeOnlySeek).toHaveBeenCalledTimes(1);
+    expect(timeOnlySeek.mock.calls[0]?.[0]).toBeCloseTo(36, 5);
+  });
+
   it.each(['release', 'disconnect'] as const)('resumes playback after a drag ends by %s', async (end) => {
     const player = document.createElement('test-time-only-player') as TestTimeOnlyPlayerProviderElement;
     const slider = createElement(TimeSliderElement);
@@ -199,6 +239,31 @@ describe('TimeSliderElement', () => {
     }
 
     expect(play).toHaveBeenCalledOnce();
+  });
+
+  it('re-renders on resize only when thumb alignment is edge', async () => {
+    const { resize } = stubResizeObserver();
+
+    try {
+      const slider = createElement(TimeSliderElement);
+
+      document.body.appendChild(slider);
+      await slider.updateComplete;
+
+      const requestUpdate = vi.spyOn(slider, 'requestUpdate');
+
+      resize(slider);
+      expect(requestUpdate).not.toHaveBeenCalled();
+
+      slider.thumbAlignment = 'edge';
+      await slider.updateComplete;
+      requestUpdate.mockClear();
+
+      resize(slider);
+      expect(requestUpdate).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('sets touch-action and user-select styles on connect', async () => {

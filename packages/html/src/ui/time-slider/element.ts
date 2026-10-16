@@ -75,6 +75,19 @@ export class TimeSliderElement extends UIElement {
     this.#disconnect = new AbortController();
     const signal = this.#disconnect.signal;
 
+    let dragSeekPercent: number | undefined;
+
+    const seek = (percent: number) => {
+      const media = this.#timeState.value;
+
+      if (media) {
+        const time = this.#core.rawValueFromPercent(percent);
+
+        this.#seek.seek(percent);
+        media.seek(time);
+      }
+    };
+
     this.#slider = createSlider({
       getElement: () => this,
       getThumbElement: () => this.querySelector<HTMLElement>('media-slider-thumb'),
@@ -94,15 +107,19 @@ export class TimeSliderElement extends UIElement {
       },
       getStepPercent: () => this.#core.getStepPercent(),
       getLargeStepPercent: () => this.#core.getLargeStepPercent(),
+      // Seek on each (throttled) change while dragging so the frame follows the thumb.
+      // Presses and key steps seek once, on commit.
+      onValueChange: (percent) => {
+        if (!this.#slider?.input.current.dragging || percent === dragSeekPercent) return;
+
+        dragSeekPercent = percent;
+        seek(percent);
+      },
       onValueCommit: (percent) => {
-        const media = this.#timeState.value;
+        // Skip the commit when the drag already sought this position.
+        if (percent !== dragSeekPercent) seek(percent);
 
-        if (media) {
-          const time = this.#core.rawValueFromPercent(percent);
-
-          this.#seek.seek(percent);
-          media.seek(time);
-        }
+        dragSeekPercent = undefined;
       },
       changeThrottle: this.changeThrottle,
       onPressStart: () => {
@@ -118,7 +135,10 @@ export class TimeSliderElement extends UIElement {
         this.dispatchEvent(new CustomEvent('drag-end', { bubbles: true }));
       },
       adjustPercent: (raw, thumbSize, trackSize) => this.#core.adjustPercentForAlignment(raw, thumbSize, trackSize),
-      onResize: () => this.requestUpdate(),
+      // Only edge alignment depends on the slider's size.
+      onResize: () => {
+        if (this.thumbAlignment === 'edge') this.requestUpdate();
+      },
     });
 
     applyElementProps(this, this.#slider.rootProps, { signal });

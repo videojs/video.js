@@ -1,12 +1,14 @@
 {
   "name": "@videojs/cli",
   "version": "10.1.0",
-  "description": "Video.js 10 command line: version-matched installation instructions for coding agents",
+  "description": "Video.js 10 command line: version-matched installation instructions for coding agents, and a starter for building your own skin",
   "keywords": [
     "agents",
     "ai",
     "cli",
     "installation",
+    "skin",
+    "theme",
     "video.js",
     "videojs"
   ],
@@ -21,7 +23,8 @@
     "videojs": "./dist/index.mjs"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "type": "module",
   "publishConfig": {
@@ -30,10 +33,13 @@
   "scripts": {
     "dev": "vp pack --watch",
     "test": "vp run @videojs/cli#build && vp test run",
+    "create:skin": "node --import tsx scripts/create-skin-local.ts",
+    "check:projects": "node --import tsx scripts/check-skin-projects.ts",
     "clean": "rimraf dist types '*.tsbuildinfo'"
   },
   "devDependencies": {
     "@types/node": "^22.18.6",
+    "@videojs/core": "workspace:*",
     "@videojs/installation": "workspace:*",
     "@videojs/utils": "workspace:*",
     "vite-plus": "catalog:"

@@ -23,12 +23,14 @@ export const liveFeature = definePlayerFeature({
     targetLiveWindow: Number.NaN,
   }),
 
-  // `liveEdgeStart` is derived from `seekable.end` and the target offset —
-  // no dedicated event — so we re-read it whenever any of its inputs
-  // (seekable, targetLiveWindow, streamType, currentTime) might have changed.
+  // `liveEdgeStart` has no change event. The media calculates it at read
+  // time from inputs that can change without an event: the seekable end,
+  // and for hls.js its live edge estimate, which moves with the clock. So
+  // we read it again on events that often come with such a change.
   //
-  // `timeupdate` is what keeps the cached value moving with the live edge
-  // during playback; `progress`/`canplay` cover buffer/metadata transitions.
+  // `timeupdate` keeps the stored value current during playback;
+  // `progress`/`canplay` cover buffer and metadata changes. While paused,
+  // the stored value can lag until the next of these events.
   attach({ target, signal, set }) {
     const { media } = target;
     if (!isMediaLiveCapable(media)) return;
