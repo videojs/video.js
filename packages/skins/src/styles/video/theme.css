@@ -61,6 +61,7 @@
   }
 
   .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="compat"] {
+    --media-controls-gradient: linear-gradient(to top, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.5));
     --media-caption-controls-y: calc(var(--media-spacing) * -18);
   }
 
