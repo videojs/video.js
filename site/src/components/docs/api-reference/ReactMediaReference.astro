@@ -37,14 +37,18 @@ const eventsSection = sections.find((section) => section.key === 'events');
 const hasVideoJsProps = Object.keys(data.props).length > 0;
 
 const targetTag = `<${data.target}>`;
-const nativeInterface =
-  data.target === 'video' ? 'HTMLVideoElement' : data.target === 'audio' ? 'HTMLAudioElement' : 'HTMLIFrameElement';
+const nativeInterface = {
+  video: 'HTMLVideoElement',
+  audio: 'HTMLAudioElement',
+  iframe: 'HTMLIFrameElement',
+  div: 'HTMLDivElement',
+}[data.target];
 const mdnApiUrl = `https://developer.mozilla.org/en-US/docs/Web/API/${nativeInterface}`;
 
 // Adapter-backed media hand out the adapter that drives the rendered element; plain media hand out that element itself.
 const mediaRef = data.mediaRef;
 const mediaRefIsAdapter = Boolean(mediaRef && mediaRef.type !== nativeInterface);
-const isEmbed = data.target === 'iframe';
+const isEmbed = data.target === 'iframe' || data.target === 'div';
 const refExample = [`const ref = useRef<${nativeInterface}>(null);`, '', `<${media} ref={ref} />`].join('\n');
 const mediaRefExample = mediaRef
   ? [
@@ -113,11 +117,11 @@ const mediaRefExample = mediaRef
           <P>
             Forwards to the rendered <MarkdownCode>{targetTag}</MarkdownCode>,
             an <A href={mdnApiUrl}>{nativeInterface}</A>
-            {data.target !== "iframe"
+            {!isEmbed
               ? " with its complete native property and method API."
               : mediaRefEntry
-                ? <>. The iframe cannot play or seek; use{" "}<A href={`#${mediaRefEntry.id}`}><MarkdownCode>mediaRef</MarkdownCode></A>{" "}for playback.</>
-                : ". Control playback with the component props and player APIs rather than the iframe ref."}
+                ? <>. The <MarkdownCode>{targetTag}</MarkdownCode> cannot play or seek; use{" "}<A href={`#${mediaRefEntry.id}`}><MarkdownCode>mediaRef</MarkdownCode></A>{" "}for playback.</>
+                : <>. Control playback with the component props and player APIs rather than the <MarkdownCode>{targetTag}</MarkdownCode> ref.</>}
           </P>
           <CodeFrame lang="tsx">
             <ServerCode code={refExample} lang="tsx" />
@@ -135,9 +139,10 @@ const mediaRefExample = mediaRef
               drives the embed, which exposes media methods and properties such
               as <MarkdownCode>play()</MarkdownCode> and{" "}
               <MarkdownCode>currentTime</MarkdownCode>. It is set once the
-              adapter has attached to the iframe, so its{" "}
-              <MarkdownCode>target</MarkdownCode> is already that iframe, and
-              it is cleared when the iframe unmounts.
+              adapter has attached to the{" "}
+              <MarkdownCode>{targetTag}</MarkdownCode>, so its{" "}
+              <MarkdownCode>target</MarkdownCode> is already that element, and
+              it is cleared when the element unmounts.
             </P>
           )}
           {mediaRefIsAdapter && !isEmbed && (
@@ -183,7 +188,8 @@ const mediaRefExample = mediaRef
         <MarkdownCode>onTimeUpdate</MarkdownCode>.{" "}
         {mediaRefIsAdapter && isEmbed ? (
           <>
-            The adapter dispatches them, not the iframe. For events without a
+            The adapter dispatches them, not the{" "}
+            <MarkdownCode>{targetTag}</MarkdownCode>. For events without a
             React prop, call <MarkdownCode>addEventListener</MarkdownCode> on
             the adapter from <MarkdownCode>mediaRef</MarkdownCode>.
           </>

@@ -20,6 +20,7 @@ export const INSTALLATION_DEMO_SOURCE_URL = 'demo';
 export const CDN_MEDIA_SUBPATHS = [
   'background-video',
   'cloudflare-video',
+  'dailymotion-video',
   'dash-video',
   'hls-audio',
   'hls-background-video',

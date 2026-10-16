@@ -54,6 +54,7 @@ describe('MEDIA', () => {
       'spotify-audio',
       'tiktok-video',
       'twitch-video',
+      'dailymotion-video',
       'wistia-video',
     ]);
   });

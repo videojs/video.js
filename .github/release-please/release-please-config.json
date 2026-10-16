@@ -14,6 +14,7 @@
         "@videojs/cdn",
         "@videojs/cli",
         "@videojs/cloudflare-video",
+        "@videojs/dailymotion-video",
         "@videojs/core",
         "@videojs/dash-video",
         "@videojs/element",
@@ -53,6 +54,9 @@
     },
     "packages/adapters/cloudflare-video": {
       "component": "@videojs/cloudflare-video"
+    },
+    "packages/adapters/dailymotion-video": {
+      "component": "@videojs/dailymotion-video"
     },
     "packages/core": {
       "component": "@videojs/core"
