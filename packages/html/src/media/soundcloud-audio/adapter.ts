@@ -13,8 +13,8 @@ class SoundCloudCustomMediaElement extends CustomMediaElement('iframe', SoundClo
       <style>
         /*
          * The widget stays on screen and takes input whether or not there are
-         * controls: it carries the uploader and SoundCloud attribution that
-         * SoundCloud's terms require, and the skin does not cover it.
+         * controls: it is what credits the uploader and links back to
+         * SoundCloud, and the skin does not cover it.
          */
         :host {
           display: block;
