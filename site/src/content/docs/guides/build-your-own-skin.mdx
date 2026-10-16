@@ -15,10 +15,10 @@ For the thinking behind our own skins, such as shapes, surfaces, motion, and con
 The quickest way to start is a standalone skin project:
 
 ```bash
-npm create @videojs/skin@latest
+npx @videojs/cli skin create
 ```
 
-`pnpm create`, `yarn create`, and `bun create` work too. The command asks for a name, a framework (React or HTML), a styling approach (Tailwind or CSS), a starting skin, and a preset (video, audio, live video, or live audio). The starting skin defaults to **Scaffold**: every control wired up, with minimal styling and no transitions, so there's little to undo.
+`pnpm dlx @videojs/cli skin create` and `bunx @videojs/cli skin create` work too. The command asks for a name, a framework (React or HTML), a styling approach (Tailwind or CSS), a starting skin, and a preset (video, audio, live video, or live audio). The starting skin defaults to **Scaffold**: every control wired up, with minimal styling and no transitions, so there's little to undo.
 
 The project goes in a folder named after the skin, so a skin called "My Skin" goes in `my-skin`. Open it and start the preview:
 
@@ -32,7 +32,17 @@ The project has two parts:
 - **`src/`** holds the skin and nothing else. Edit it however you like, including its markup, class names, theme tokens, and stylesheets.
 - **`apps/preview/`** is a workbench that plays your skin. Use it to try different player sizes and aspect ratios, light and dark color schemes, right-to-left text, every built-in language, and playback settings such as autoplay and loop.
 
-When you want to share it, `npm run deploy` publishes the preview to Vercel, Netlify, or Cloudflare Pages. When the skin is done, move `src/` into your app.
+When you want to share it, `npm run deploy` deploys the workbench to Vercel, Netlify, or Cloudflare Pages. Name the host to skip the question, as in `npm run deploy vercel`. With pnpm, use `pnpm run deploy`, since `pnpm deploy` is a built-in pnpm command. When the skin is done, move `src/` into your app.
+
+### Build it with a coding agent
+
+If you work with a coding agent, such as Claude Code, Codex, or Cursor, it can do all of this for you. Install the Video.js skills, which include a skill for building skins:
+
+```bash
+npx @videojs/cli agents skills
+```
+
+Then ask your agent something like "Help me design my own Video.js skin for our podcast player." It asks for the same choices as the command, creates the project, starts the workbench, and agrees a design with you before styling. It can also match an existing player's look from a screenshot or a link, then checks its work against the reference and for accessibility before handing back. <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink> covers installing the skills in each agent.
 
 ## Other starting points
 
