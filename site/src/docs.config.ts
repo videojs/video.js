@@ -33,6 +33,7 @@ export const sidebar: Sidebar = [
           },
           { slug: 'guides/architecture' },
           { slug: 'guides/customize-skins', sidebarLabel: 'Customize skins' },
+          { slug: 'guides/build-your-own-skin', sidebarLabel: 'Build your own skin' },
           { slug: 'guides/why-videojs' },
           { slug: 'guides/browser-support' },
           { slug: 'guides/build-with-ai' },
