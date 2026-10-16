@@ -115,6 +115,20 @@ describe('DestroyMixin deferred destruction', () => {
     expect(el.destroyed).toBe(false);
   });
 
+  it('keep-alive on a shadow host prevents deferred destruction', () => {
+    const host = createElement(ReactiveElement);
+    const el = createElement(DestroyableElement);
+
+    host.attachShadow({ mode: 'open' }).appendChild(el);
+    host.setAttribute('keep-alive', '');
+
+    document.body.appendChild(host);
+    host.remove();
+
+    vi.advanceTimersByTime(100);
+    expect(el.destroyed).toBe(false);
+  });
+
   it('manual destroy() works even with keep-alive', () => {
     const el = createElement(DestroyableElement);
 
