@@ -70,6 +70,8 @@ video.source = {
 ```
 </FrameworkCase>
 
+The URL's query can also carry Dailymotion's `startTime` (or the older `start`), `scaleMode`, and `customConfig[key]=value`, as Dailymotion's iframe embed reads them; `engine.dailymotion` wins over them. `loop`, `autoplay`, and mute come from the component's own props.
+
 Without a Player ID, the component reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error instead of creating a player Dailymotion would reject. The SDK script is loaded from `geo.dailymotion.com` with the first player created on the page.
 
 ## Configure the player in Dailymotion Studio
@@ -82,7 +84,7 @@ The player configuration decides what the embed can't change at runtime. To use 
 | Controls during ads | Off | Same as playback controls, while an ad plays. |
 | Autostart | Off | `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. In development, the component logs a warning when the configuration starts playback while `autoplay` is off. |
 | Spinner | Off | The skin shows its own buffering indicator. |
-| Autonext | Off | Without `controls`, its "Up next" card at the end can't be clicked or closed: clicks reach the skin, which replays the video. When the player moves on to the next video by itself, `src` still names the one you loaded. |
+| Autonext | Off | Without `controls`, its "Up next" card at the end can't be clicked or closed: clicks reach the skin, which replays the video. When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
 | Picture-in-picture | Off | Dailymotion's picture-in-picture moves the player out of the element, away from the skin. |
 | Keyboard shortcuts | Off | The skin's hotkeys handle playback. |
 
@@ -92,6 +94,7 @@ The player configuration decides what the embed can't change at runtime. To use 
 - `playbackRate` takes Dailymotion's rates, `0.25` to `2` in steps of `0.25`. Dailymotion rounds any other value up to the next one and caps it at `2`, and `playbackRate` then reports the rate it plays at.
 - `loop` is passed to Dailymotion, which restarts the video itself.
 - Changing `src` loads the new video into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player, since Dailymotion only reads them when a player is created. So does autoplay, but only at the next load: call load() to apply a change right away. `muted` and `loop` change in place.
+- Depending on the player configuration, Dailymotion may ignore a seek made before the video first plays, and playback then starts from the beginning. To start at a known position, set `startTime` on the source (under `engine.dailymotion`, or in the URL) instead: Dailymotion applies it on load.
 - Seeking before the video has started, or after it has ended, also starts playback. Dailymotion does this itself; a native `<video>` would stay paused. Seeking while paused mid-video stays paused.
 - The SDK reports no buffered range, so `buffered` ends at the current time.
 - Ads play inside the embed. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.

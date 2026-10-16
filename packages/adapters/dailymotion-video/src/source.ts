@@ -11,7 +11,8 @@ export { type ParsedDailymotionSource, parseDailymotionSource, parseDailymotionV
  * verbatim, plus the `player` that names the player configuration.
  *
  * `video` comes from `src`, and `loop` and `autoplay` from the props of the same name, so they have no spelling here.
- * Anything not listed still passes through, so parameters Dailymotion adds later keep working.
+ * Anything not listed still passes through, so parameters Dailymotion adds later keep working. A source URL's query can
+ * also carry `startTime` (or `start`), `scaleMode`, and `customConfig[key]=value`; these options win over it.
  */
 export interface DailymotionEngineConfig extends Record<string, unknown> {
   /**
@@ -72,7 +73,38 @@ export function resolveDailymotionPlayerOptions(
   return {
     video: parsed.id,
     player,
-    params: { ...params, loop: props.loop === true, autoplay: props.autoplay === true },
+    params: { ...readUrlParams(src), ...params, loop: props.loop === true, autoplay: props.autoplay === true },
     ...(referrerPolicy && { referrerPolicy }),
   };
 }
+
+// Runtime parameters a Dailymotion URL can carry in its query, as its iframe embed reads them: `startTime` (or the
+// legacy `start`), `scaleMode`, and `customConfig[key]=value`. `video`, `loop`, `autoplay`, and mute stay with `src`
+// and the props.
+function readUrlParams(src: string): Record<string, unknown> {
+  const query = src.split('#')[0]!.split('?')[1];
+  if (!query) return {};
+
+  const search = new URLSearchParams(query);
+  const params: Record<string, unknown> = {};
+  const startTime = search.get('startTime') || search.get('start');
+  const seconds = startTime ? Number(startTime) : Number.NaN;
+  const scaleMode = search.get('scaleMode');
+  const customConfig: Record<string, string> = {};
+
+  if (Number.isFinite(seconds) && seconds >= 0) params.startTime = seconds;
+
+  if (scaleMode && SCALE_MODES.has(scaleMode)) params.scaleMode = scaleMode;
+
+  for (const [key, value] of search) {
+    const name = /^customConfig\[(.+)\]$/.exec(key)?.[1];
+
+    if (name) customConfig[name] = value;
+  }
+
+  if (Object.keys(customConfig).length > 0) params.customConfig = customConfig;
+
+  return params;
+}
+
+const SCALE_MODES = new Set(['fit', 'fill', 'fillLeft', 'fillRight', 'fillTop', 'fillBottom']);

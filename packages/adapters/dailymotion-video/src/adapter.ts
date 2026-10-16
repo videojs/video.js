@@ -82,6 +82,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #seekFrom = 0;
   // Settles a seek the player never reports the end of.
   #seekTimer: ReturnType<typeof setTimeout> | undefined;
+  // When `currentTime` is set before the player exists, the player is created at that position instead, through
+  // Dailymotion's `startTime` runtime parameter, so no seek is sent for the player to drop. Until the first
+  // `VIDEO_PLAYING`, the player still reports a position of 0, which is ignored while this is set. Applying the start
+  // position on play reports as a seek, like any seek the player makes.
+  #startPosition: number | null = null;
 
   #paused = true;
   #ended = false;
@@ -226,7 +231,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     return this.#currentTime;
   }
   set currentTime(value) {
-    if (this.#currentTime === value) return;
+    // As on a media element, a seek outside the video lands on its edge.
+    const targetTime = Number.isFinite(this.#duration) ? clamp(value, 0, this.#duration) : Math.max(0, value);
+    if (this.#currentTime === targetTime) return;
 
     // A seek over a pending one keeps the position the player is still at.
     if (!this.#seeking) this.#seekFrom = this.#currentTime;
@@ -234,13 +241,13 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#seeking = true;
     // As on a media element, seeking leaves the ended state.
     this.#ended = false;
-    // Report the target now; the player's reports until it lands would drag it back.
-    this.#currentTime = value;
+    // Report the target time now; the player's reports until it lands would drag it back.
+    this.#currentTime = targetTime;
     this.dispatchEvent(new Event('seeking'));
     this.dispatchEvent(new Event('timeupdate'));
 
     // Without a player yet, `#syncToEmbed` sends it once ready.
-    this.#seek(value, this.#seekFrom);
+    this.#seek(targetTime);
   }
 
   get duration() {
@@ -447,11 +454,19 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     placeholder.id = `videojs-dailymotion-${generateId()}`;
     target.append(placeholder);
 
+    // A `currentTime` set before the player existed becomes its start position (see `#startPosition`).
+    this.#startPosition = this.#seeking ? this.#currentTime : null;
+
+    const createOptions =
+      this.#startPosition === null
+        ? options
+        : { ...options, params: { ...options.params, startTime: this.#startPosition } };
+
     this.#placeholder = placeholder;
     this.#options = options;
     this.#autoplayPending = true;
     this.dispatchEvent(new Event('loadstart'));
-    void this.#createPlayerApi(placeholder, options);
+    void this.#createPlayerApi(placeholder, createOptions);
   }
 
   async #createPlayerApi(placeholder: HTMLElement, options: DailymotionCreatePlayerOptions) {
@@ -497,7 +512,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#player = player;
     this.#unbindEvents = this.#bindPlayerEvents(api, player, attachId);
     // Fill the container instead of keeping the configuration's aspect ratio, as media elements in a skin do.
-    tryCall(() => player.updateParams({ aspectRatio: 'inherit' }));
+    // `updateParams` drops a `loop` it isn't given, so it's sent again here.
+    tryCall(() => player.updateParams({ aspectRatio: 'inherit', loop: this.#loop }));
     this.#onReady();
   }
 
@@ -520,7 +536,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       VIDEO_BUFFERING: () => this.dispatchEvent(new Event('waiting')),
       // The `video*` members describe the video even while an ad plays.
       VIDEO_TIMECHANGE: (state) => {
-        if (!this.#seeking) this.#applyCurrentTime(state.videoTime);
+        if (this.#shouldApplyReportedTime()) this.#applyCurrentTime(state.videoTime);
       },
       VIDEO_DURATIONCHANGE: (state) => this.#applyDuration(state.videoDuration),
       VIDEO_SEEKSTART: () => this.#onSeeking(),
@@ -636,7 +652,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#applyLoop();
 
-    if (this.#seeking) this.#seek(this.#currentTime, this.#seekFrom);
+    // A seek asked for before the player was ready. One that became the start position is already applied.
+    if (this.#seeking) {
+      if (this.#startPosition === null) this.#seek(this.#currentTime);
+      else this.#onSeeked(undefined);
+    }
 
     this.#playIfRequested();
   }
@@ -676,20 +696,20 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     }
   }
 
-  // The player sends no seek-end report for a seek it ignores or clamps, so the seek is settled from its state after a
-  // timeout. A player still at `from` hasn't landed, so `currentTime` keeps the target.
-  #seek(time: number, from: number) {
+  #seek(time: number) {
     const player = this.#player;
     if (!player) return;
 
     tryCall(() => player.seek(time));
     clearTimeout(this.#seekTimer);
 
+    // Some seeks may be dropped by Dailymotion (for example, before the video first plays). This timer settles seeking
+    // from the player's state.
     const timer = setTimeout(() => {
       if (!this.#seeking) return;
 
       this.#readState((state) => {
-        if (timer === this.#seekTimer) this.#onSeeked(state.videoTime === from ? undefined : state.videoTime);
+        if (timer === this.#seekTimer) this.#onSeeked(state.videoTime === this.#seekFrom ? undefined : state.videoTime);
       });
     }, SEEK_SETTLE_TIMEOUT);
 
@@ -701,6 +721,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #onVideoChange(state: DailymotionPlayerState) {
     if (this.#swapping) {
       this.#swapping = false;
+      // Loading a video drops the `loop` the player had, so it's sent again.
+      tryCall(() => this.#player?.setLoop(this.#loop));
       this.#onLoaded();
       this.#playIfRequested();
     }
@@ -712,7 +734,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #onPlayerState(state: DailymotionPlayerState) {
     this.#applyDuration(state.videoDuration);
 
-    if (!this.#seeking) this.#applyCurrentTime(state.videoTime);
+    if (this.#shouldApplyReportedTime()) this.#applyCurrentTime(state.videoTime);
 
     if (isNumber(state.playerPlaybackSpeed)) this.#applyPlaybackRate(state.playerPlaybackSpeed);
 
@@ -758,6 +780,12 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('durationchange'));
   }
 
+  // Whether the player's time reports move `currentTime`. Not while a seek is pending, or before the start position
+  // plays (see `#startPosition`): until then the player reports where it was, not where it's going.
+  #shouldApplyReportedTime() {
+    return !this.#seeking && this.#startPosition === null;
+  }
+
   #applyCurrentTime(time: number | undefined) {
     if (!isNumber(time)) return;
 
@@ -778,6 +806,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onPlaying() {
+    // Playing from the start position, so the player's reports are accurate again.
+    this.#startPosition = null;
     this.#onCanPlay();
     this.dispatchEvent(new Event('playing'));
   }
@@ -815,8 +845,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onEnded() {
-    // A looping media element never ends, and the player usually restarts itself. Some player configurations stop at
-    // the end anyway, so the player's state decides.
+    // A looping media element never ends, and the player restarts itself. If it stopped anyway, its state says so.
     if (this.#loop) {
       this.#readState((state) => {
         if (!state.playerIsPlaying) this.#reportEnded();
@@ -882,6 +911,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#paused = true;
     this.#ended = false;
     this.#seeking = false;
+    this.#startPosition = null;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#error = null;
     this.#isFullscreen = false;
@@ -889,14 +919,17 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 }
 
 // Whether a new video can load into the current player: same configuration and parameters, which are only read on
-// creation.
+// creation. `startTime` belongs to the video, and `loadContent` takes it.
 function isSameEmbed(current: DailymotionCreatePlayerOptions | null, next: DailymotionCreatePlayerOptions): boolean {
   if (!current) return false;
 
-  const { video: _current, ...currentEmbed } = current;
-  const { video: _next, ...nextEmbed } = next;
+  return deepEqual(embedOf(current), embedOf(next));
+}
 
-  return deepEqual(currentEmbed, nextEmbed);
+function embedOf({ video: _video, params, ...embed }: DailymotionCreatePlayerOptions) {
+  const { startTime: _startTime, ...rest } = params ?? {};
+
+  return { ...embed, params: rest };
 }
 
 // Configurations already warned about, so rebuilds don't repeat it.
