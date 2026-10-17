@@ -7,6 +7,14 @@ export interface Destroyable {
   destroyCallback(): void;
 }
 
+function hasKeepAlive(element: Element): boolean {
+  if (element.hasAttribute('keep-alive')) return true;
+
+  const root = element.getRootNode();
+
+  return typeof ShadowRoot !== 'undefined' && root instanceof ShadowRoot && hasKeepAlive(root.host);
+}
+
 /**
  * Mixin that adds a deferred destruction lifecycle to a `ReactiveElement`.
  *
@@ -63,7 +71,7 @@ export function DestroyMixin<Base extends new (...args: any[]) => ReactiveElemen
     disconnectedCallback(): void {
       super.disconnectedCallback();
 
-      if (!this.#destroyed && !this.hasAttribute('keep-alive')) {
+      if (!this.#destroyed && !hasKeepAlive(this)) {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (!this.isConnected) this.destroy();
