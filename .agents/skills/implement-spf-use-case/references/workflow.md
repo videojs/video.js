@@ -424,7 +424,7 @@ typical for use-case implementations:
   parallels `createHlsVideoEngine` shape with the composition mechanism
   applied (subtract / add / swap / configure).
 - **Adapter creation** (new) — parallels `HlsVideoAdapterCore` /
-  `HlsVideoMixin`; uses `shareSignals` unchanged.
+  `HlsVideoMixin`; reads and writes the engine's `state` / `context` directly.
 - **Constituent feature implementation chunks** (if bundling per Step
   2) — route to `/implement-spf-feature`.
 - **Use-case-specific behavior creation** (if any) — route to

@@ -65,38 +65,29 @@ createComposition({
 });
 ```
 
-Use `initialState` / `initialContext` for **constants** and **shaped initial values**. Time-varying inputs from outside the composition go through `shareSignals` instead (see below).
+Use `initialState` / `initialContext` for **constants** and **shaped initial values**. Time-varying inputs from outside the composition are written through the composition's own `state` / `context` instead (see below).
 
-## External writes: `shareSignals`
+## External writes: the composition's `state` and `context`
 
-When something outside the composition needs to drive composition state (an adapter, a sandbox harness, an engine consumer), use the `shareSignals` behavior factory rather than reaching into the composition's internals.
+When something outside the composition needs to drive composition state (an adapter, a sandbox harness, an engine consumer), it writes through the `state` and `context` signal maps that `createComposition` returns. Every behavior receives these same signal objects, so an external write reaches every behavior that reads the key.
+
+A key the consumer writes but no behavior declares still has to exist in the composition. `user*TrackSelection` is the example: the selection rules only read it, and read it optionally. Declare such keys as external signals with `defineExternalSignals`, composed like any other behavior:
 
 ```ts
-const composition = createComposition({
-  behaviors: [
-    ...otherBehaviors,
-    makeShareSignals<EngineState, EngineContext>(),
-  ],
-  config: {
-    onSignalsReady: ({ state, context }) => {
-      // capture writable refs for use later
-      mediaElementRef = context.mediaElement;
-      preloadRef = state.preload;
-    },
-  },
-});
+const externalSignals = defineExternalSignals<{ userChoice?: string }>()({ state: ['userChoice'] });
+const composition = createComposition([...otherBehaviors, externalSignals], { config });
 
 // elsewhere — drive composition state from outside
-mediaElementRef.set(element);
+composition.context.mediaElement.set(element);
+composition.state.userChoice.set('en');
 ```
 
-### When to use `shareSignals`
+### When to write from outside
 
 - An adapter pushes external values into the composition (e.g. `SpfMedia` writing `mediaElement`, `preload`, `presentation`, `playbackInitiated`).
 - A test or harness needs to inject values to drive a behavior's reactivity.
-- Cross-IPC / web-worker scenarios where the writer is in a different realm — the callback shape is preserved across the boundary, the writes happen by reference.
 
-### When NOT to use `shareSignals`
+### When not to write from outside
 
 - When the value is **constant** at composition time. Use `initialState` / `initialContext` — same effect, less ceremony.
 - When the value is **derived from other signals**. Use a behavior with `computed` or an `effect` writing into a state slot — keeps the dataflow inside the composition.
@@ -167,8 +158,8 @@ Prefer the function form when the updater needs to handle different shapes (e.g.
 
 - **Typing a write-only slot as `ReadonlySignal<T>`** because the type happened to import that way. Subsequent `.set()` calls will be type errors at the body, not at the import.
 - **Reaching for `Signal.State` directly instead of the composition's signal map** in a behavior body. Composition slots are constructed by `createComposition` for a reason — the engine destroy loop relies on the map being canonical.
-- **Using `shareSignals` to bridge two parts of the same composition.** If both ends are inside the composition, write a Behavior. `shareSignals` is for crossing the composition boundary.
-- **Capturing a `Signal<T>` ref via `shareSignals` and writing to a slot you didn't formally declare ownership of.** This bypasses the per-behavior write annotation. Convention: external writers via `shareSignals` should be treated as "the canonical owner of this slot for write purposes," and no behavior in the composition should also declare write intent on it. (The current adapter-driven slots — `mediaElement`, `preload`, `presentation`, `playbackInitiated` — follow this rule.)
+- **Writing through the composition's `state` to bridge two parts of the same composition.** If both ends are inside the composition, write a Behavior. External writes are for crossing the composition boundary.
+- **Writing from outside to state a behavior also declares write intent on.** This bypasses the per-behavior write annotation. Convention: an external writer should be treated as "the canonical owner of this slot for write purposes," and no behavior in the composition should also declare write intent on it. (The current adapter-driven slots — `mediaElement`, `preload`, `presentation`, `playbackInitiated` — follow this rule.)
 - **Defining a state slot for a value that never changes after setup.** A Signal that's set once and never updated is just a constant with extra plumbing — close over it or seed it via `initialState` / `initialContext`.
 - **Maintaining a parallel state slot for an Actor's snapshot.** The snapshot is already a Signal; observe it directly. A duplicate slot drifts.
 - **Framing a design choice as "signal vs Actor" or "signal vs Reactor."** Signals are the substrate either way — the real choice (covered in [`behaviors.md`](behaviors.md)) is what additional primitive lives *under* the signals.
