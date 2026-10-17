@@ -2,11 +2,11 @@ import type { Translations } from '../params';
 
 export default {
   buttons: {
-    play: 'Hasi',
-    pause: 'Gelditu',
-    replay: 'Berriz hasi',
-    mute: 'Ixildu',
-    unmute: 'Soinua jarri',
+    play: 'Erreproduzitu',
+    pause: 'Pausatu',
+    replay: 'Erreproduzitu berriro',
+    mute: 'Mututu soinua',
+    unmute: 'Aktibatu soinua',
   },
   seek: {
     forward: 'Joan aurrera {seconds} segundo',
@@ -21,17 +21,17 @@ export default {
     disable: 'Desaktibatu azpitituluak',
   },
   pip: {
-    enter: 'Irudiz-irudi',
-    exit: 'Irten irudiz-irudiztik',
+    enter: 'Irudiz irudi',
+    exit: 'Irten irudiz irudi modutik',
   },
   live: {
     playing: 'Zuzenean erreproduzitzen',
-    seekToEdge: 'Zuzeneko ertzeraino joan',
+    seekToEdge: 'Joan zuzeneko emisiora',
     badge: 'Zuzenean',
   },
   cast: {
-    start: 'Hasi emankizuna',
-    stop: 'Gelditu emankizuna',
+    start: 'Hasi transmititzen',
+    stop: 'Gelditu transmititzea',
     connecting: 'Konektatzen',
   },
   airplay: {
@@ -39,7 +39,7 @@ export default {
     stop: 'Gelditu AirPlay',
   },
   slider: {
-    seek: 'Bilatu',
+    seek: 'Kokapena',
   },
   time: {
     current: 'Uneko denbora',
@@ -54,41 +54,41 @@ export default {
     toggleElapsed: 'Txandakatu igarotako denboraren eta geratzen den denboraren artean.',
     toggleDuration: 'Txandakatu iraupenaren eta geratzen den denboraren artean.',
     position: '{current} / {duration}',
-    unknown: 'Multimedia ez da kargatu, ordu ezezaguna.',
+    unknown: 'Multimedia ez da kargatu, denbora ezezaguna.',
   },
   playback: {
-    rate: 'Abiadura {rate}',
+    rate: 'Erreprodukzio-abiadura {rate}',
   },
   volume: {
-    mutedValue: '{percent}, isilarazia',
-    muted: 'Isilarazia',
+    mutedValue: '{percent}, mutututa',
+    muted: 'Mutututa',
     label: 'Bolumena',
     value: 'Bolumena {value}',
   },
   status: {
-    captionsOn: 'Oharrak aktibo',
-    captionsOff: 'Oharrak ez aktibo',
-    paused: 'Geldituta',
+    captionsOn: 'Azpitituluak aktibatuta',
+    captionsOff: 'Azpitituluak desaktibatuta',
+    paused: 'Pausatuta',
     playing: 'Erreproduzitzen',
     fullscreen: 'Pantaila osoa',
     pip: 'Irudiz irudi',
-    exitPip: 'Irten irudiz irudiztik',
+    exitPip: 'Irten irudiz irudi modutik',
     seekedTo: '{time} denborara jauzi egin da',
   },
   container: {
     label: 'Multimedia-erreproduzitzailea',
   },
   errors: {
-    aborted: 'Bertan behera utzi duzu',
-    network: 'Sare errore batek deskargak huts egitea eragin du.',
+    aborted: 'Multimediaren erreprodukzioa gelditu duzu amaitu baino lehen.',
+    network: 'Ezin izan da multimedia hau kargatu, sareko edo zerbitzariko arazo baten ondorioz.',
     decode:
-      'Bertan behera gelditu da fitxategia ondo ez dagoelako edo zure nabigatzailean erabili ezin diren ezaugarriak dituelako.',
+      'Ezin izan da multimedia hau erreproduzitu. Baliteke hondatuta egotea edo nabigatzaileak formatu hori ez onartzea.',
     source:
-      'Media ezin izan da kargatu, zerbitzariak edo sareak huts egin duelako edo formatu horretako media erabili ezin delako.',
-    encrypted: 'Media zifratuta dago eta ez ditugu beharrezko gakoak.',
-    unplayable: 'Erreproduzitzaileak ez du media hau onartzen.',
+      'Ezin izan da multimedia hau kargatu. Baliteke erabilgarri ez egotea edo nabigatzaileak formatu hori ez onartzea.',
+    encrypted: 'Ezin izan da multimedia hau erreproduzitu, ezin izan delako deszifratu.',
+    unplayable: 'Erreproduzitzaileak ez du multimedia hau onartzen.',
     title: 'Zerbait gaizki joan da.',
-    unexpected: 'Errore bat gertatu da. Saiatu berriro.',
+    unexpected: 'Ustekabeko errore bat gertatu da.',
   },
   common: {
     empty: '',
