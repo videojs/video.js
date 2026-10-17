@@ -10,6 +10,7 @@ import {
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextProvider, ContextRoot } from '@videojs/element/context';
 import type { Media } from '@videojs/media/dom';
+import { isUndefinedCustomElement } from '@videojs/utils/dom';
 import { isNull } from '@videojs/utils/predicate';
 import { camelCase, kebabCase } from '@videojs/utils/string';
 
@@ -25,6 +26,9 @@ export interface CreatePlayerElementOptions<Store extends PlayerStore> {
   factory: () => Store;
   config: PlayerFeatureConfig;
 }
+
+/** Marks a descendant that isn't a Video.js media element as the player's media. */
+const MARKED_MEDIA_ATTRIBUTE = 'data-vjs-media';
 
 interface Registration<Value> {
   value: Value;
@@ -156,7 +160,12 @@ export function createPlayerElement<Store extends PlayerStore>(
       this.#playerProvider.setValue(this.store);
       this.#publishMedia();
       this.#publishContainer();
-      this.#observer.observe(this, { childList: true, subtree: true });
+      this.#observer.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: [MARKED_MEDIA_ATTRIBUTE],
+      });
       queueMicrotask(() => {
         if (this.#connected) this.#syncNativeMedia();
       });
@@ -214,11 +223,29 @@ export function createPlayerElement<Store extends PlayerStore>(
     }
 
     #syncNativeMedia(): void {
-      const media = this.querySelector<HTMLMediaElement>('video, audio');
+      const media = this.#findMarkedMedia() ?? this.querySelector<HTMLMediaElement>('video, audio');
       if (this.#nativeMedia === media) return;
 
       this.#nativeMedia = media;
       this.#syncMedia();
+    }
+
+    /** The first descendant marked `data-vjs-media`, once its custom element class (if any) is defined. */
+    #findMarkedMedia(): HTMLMediaElement | null {
+      const marked = this.querySelector<HTMLElement>(`[${MARKED_MEDIA_ATTRIBUTE}]`);
+      if (!marked) return null;
+
+      // Features check what the media supports once, at attach, so attaching before the upgrade would leave them off.
+      if (isUndefinedCustomElement(marked)) {
+        customElements.whenDefined(marked.localName).then(() => {
+          if (this.#connected) this.#syncNativeMedia();
+        });
+
+        return null;
+      }
+
+      // SAFETY: the author marked this element as media; each feature checks the capabilities it needs before use.
+      return marked as unknown as HTMLMediaElement;
     }
 
     #publishMedia(): void {
