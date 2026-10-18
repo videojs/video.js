@@ -38,8 +38,8 @@ export default styles({
     },
     centerButton: {
       utilities: [
-        'bg-[rgba(0,0,0,0.4)]! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-[rgba(0,0,0,0.85)]! focus-visible:bg-[rgba(0,0,0,0.85)]! aria-expanded:bg-[rgba(0,0,0,0.85)]!',
+        'bg-media-backdrop/40! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
+        'hover:bg-media-backdrop/85! focus-visible:bg-media-backdrop/85! aria-expanded:bg-media-backdrop/85!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],
