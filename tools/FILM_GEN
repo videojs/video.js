@@ -1,0 +1,2991 @@
+ #!/usr/bin/env python3
+
+# -*- coding: utf-8 -*-
+
+# NEXUS FILM STUDIO v7.0.0 — A-SHELL iOS
+
+# Studio complet + Viewer integre pour voir les films.
+
+# Aucun import a risque (pas de zipfile/pathlib/tarfile).
+
+# Auteur : Aissa Mohammedi (DGK)
+
+# Licence : NEXUS-OPEN-2.0
+
+# Port : 8095
+
+
+
+import os
+
+import re
+
+import sys
+
+import json
+
+import time
+
+import ssl
+
+import gzip
+
+import bz2
+
+import lzma
+
+import random
+
+import shutil
+
+import hashlib
+
+import datetime
+
+import threading
+
+import socket
+
+import traceback
+
+import urllib.parse
+
+import urllib.request
+
+import urllib.error
+
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+from socketserver import ThreadingMixIn
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+
+VERSION = "7.0.0"
+
+AUTEUR = "Aissa Mohammedi (DGK)"
+
+LICENCE = "NEXUS-OPEN-2.0"
+
+
+
+HOME = os.path.expanduser("~")
+
+OUT = os.path.join(HOME, "Documents", "nexus_film_studio")
+
+
+
+DIR_FILMS = os.path.join(OUT, "films")
+
+DIR_FRAMES = os.path.join(OUT, "frames")
+
+DIR_POSTERS = os.path.join(OUT, "posters")
+
+DIR_CATALOGUE = os.path.join(OUT, "catalogue")
+
+DIR_ARCHIVES = os.path.join(OUT, "archives")
+
+DIR_LOGS = os.path.join(OUT, "logs")
+
+
+
+for _d in (OUT, DIR_FILMS, DIR_FRAMES, DIR_POSTERS, DIR_CATALOGUE, DIR_ARCHIVES, DIR_LOGS):
+
+    try:
+
+        os.makedirs(_d, exist_ok=True)
+
+    except OSError:
+
+        pass
+
+
+
+CTX = ssl.create_default_context()
+
+CTX.check_hostname = False
+
+CTX.verify_mode = ssl.CERT_NONE
+
+
+
+PORT = 8095
+
+TIMEOUT = 45
+
+MAX_THREADS = 3
+
+RETRY_MAX = 2
+
+
+
+ETAT = {
+
+    "en_cours": False,
+
+    "statut": "idle",
+
+    "progression": 0,
+
+    "film_id": "",
+
+    "titre": "",
+
+    "genre": "",
+
+    "total_scenes": 0,
+
+    "scenes_ok": 0,
+
+    "scenes_ko": 0,
+
+    "debut": 0,
+
+    "log": [],
+
+    "erreurs": [],
+
+    "film_final": "",
+
+    "poster_final": "",
+
+    "netflix_score": 0,
+
+}
+
+ETAT_LOCK = threading.RLock()
+
+
+
+
+
+def log(msg):
+
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    line = "[{}] {}".format(ts, msg)
+
+    try:
+
+        print(line, flush=True)
+
+    except Exception:
+
+        pass
+
+    try:
+
+        with ETAT_LOCK:
+
+            ETAT["log"].append(line)
+
+            if len(ETAT["log"]) > 300:
+
+                ETAT["log"] = ETAT["log"][-300:]
+
+    except Exception:
+
+        pass
+
+    try:
+
+        with open(os.path.join(DIR_LOGS, "studio.log"), "a", encoding="utf-8") as f:
+
+            f.write(line + "\n")
+
+    except Exception:
+
+        pass
+
+
+
+
+
+def est_a_shell():
+
+    try:
+
+        if "a-Shell" in os.environ.get("TERM_PROGRAM", ""):
+
+            return True
+
+        if "Containers/Data/Application" in HOME:
+
+            return True
+
+        if sys.platform == "ios":
+
+            return True
+
+    except Exception:
+
+        pass
+
+    return False
+
+
+
+
+
+def which(cmd):
+
+    try:
+
+        for p in os.environ.get("PATH", "").split(os.pathsep):
+
+            if not p:
+
+                continue
+
+            full = os.path.join(p, cmd)
+
+            if os.path.isfile(full) and os.access(full, os.X_OK):
+
+                return full
+
+    except Exception:
+
+        pass
+
+    return None
+
+
+
+
+
+def detecter():
+
+    o = {"ffmpeg": which("ffmpeg") is not None, "a_shell": est_a_shell()}
+
+    try:
+
+        __import__("PIL")
+
+        o["py_PIL"] = True
+
+    except Exception:
+
+        o["py_PIL"] = False
+
+    return o
+
+
+
+
+
+OUTILS = detecter()
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# APIs IMAGES
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+def _ok_image(data):
+
+    if not data or len(data) < 2000:
+
+        return False
+
+    return data[:4] == b"\x89PNG" or data[:2] == b"\xff\xd8"
+
+
+
+
+
+def api_flux(prompt, seed=None):
+
+    enc = urllib.parse.quote(prompt[:180])
+
+    p = {"model": "flux", "width": "1024", "height": "1024", "nologo": "true"}
+
+    if seed is not None:
+
+        p["seed"] = str(seed)
+
+    url = "https://image.pollinations.ai/prompt/" + enc + "?" + urllib.parse.urlencode(p)
+
+    try:
+
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 NEXUS/7.0", "Accept": "image/*"})
+
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=CTX) as r:
+
+            data = r.read()
+
+        if _ok_image(data):
+
+            return {"ok": True, "data": data, "api": "flux"}
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:80], "api": "flux"}
+
+    return {"ok": False, "erreur": "flux invalide", "api": "flux"}
+
+
+
+
+
+def api_turbo(prompt, seed=None):
+
+    enc = urllib.parse.quote(prompt[:180])
+
+    p = {"model": "turbo", "width": "1024", "height": "1024", "nologo": "true"}
+
+    if seed is not None:
+
+        p["seed"] = str(seed)
+
+    url = "https://image.pollinations.ai/prompt/" + enc + "?" + urllib.parse.urlencode(p)
+
+    try:
+
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 NEXUS/7.0", "Accept": "image/*"})
+
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=CTX) as r:
+
+            data = r.read()
+
+        if _ok_image(data):
+
+            return {"ok": True, "data": data, "api": "turbo"}
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:80], "api": "turbo"}
+
+    return {"ok": False, "erreur": "turbo invalide", "api": "turbo"}
+
+
+
+
+
+def api_lexica(prompt, seed=None):
+
+    url = "https://lexica.art/api/v1/search?q=" + urllib.parse.quote(prompt[:100])
+
+    try:
+
+        req = urllib.request.Request(url, headers={"User-Agent": "NEXUS/7.0"})
+
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=CTX) as r:
+
+            data = json.loads(r.read().decode("utf-8", "ignore"))
+
+        for img in data.get("images", [])[:3]:
+
+            src = img.get("src", "")
+
+            if not src:
+
+                continue
+
+            try:
+
+                req2 = urllib.request.Request(src, headers={"User-Agent": "NEXUS/7.0"})
+
+                with urllib.request.urlopen(req2, timeout=TIMEOUT, context=CTX) as r2:
+
+                    img_data = r2.read()
+
+                if _ok_image(img_data):
+
+                    return {"ok": True, "data": img_data, "api": "lexica"}
+
+            except Exception:
+
+                continue
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:80], "api": "lexica"}
+
+    return {"ok": False, "erreur": "lexica vide", "api": "lexica"}
+
+
+
+
+
+def api_picsum(prompt, seed=None):
+
+    s = seed if seed else random.randint(1, 999999)
+
+    url = "https://picsum.photos/seed/{}/1024/1024".format(s)
+
+    try:
+
+        req = urllib.request.Request(url, headers={"User-Agent": "NEXUS/7.0"})
+
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=CTX) as r:
+
+            data = r.read()
+
+        if _ok_image(data):
+
+            return {"ok": True, "data": data, "api": "picsum"}
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:80], "api": "picsum"}
+
+    return {"ok": False, "erreur": "picsum vide", "api": "picsum"}
+
+
+
+
+
+def api_wikimedia(prompt, seed=None):
+
+    search = urllib.parse.quote(prompt[:80])
+
+    url = ("https://commons.wikimedia.org/w/api.php?"
+
+           "action=query&format=json&generator=search&gsrsearch=" + search +
+
+           "&gsrlimit=2&prop=imageinfo&iiprop=url&iiurlwidth=1024")
+
+    try:
+
+        req = urllib.request.Request(url, headers={"User-Agent": "NEXUS/7.0"})
+
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=CTX) as r:
+
+            data = json.loads(r.read().decode("utf-8", "ignore"))
+
+        pages = data.get("query", {}).get("pages", {})
+
+        for page in pages.values():
+
+            info = page.get("imageinfo", [])
+
+            if info:
+
+                img_url = info[0].get("thumburl") or info[0].get("url", "")
+
+                if img_url:
+
+                    try:
+
+                        req2 = urllib.request.Request(img_url, headers={"User-Agent": "NEXUS/7.0"})
+
+                        with urllib.request.urlopen(req2, timeout=TIMEOUT, context=CTX) as r2:
+
+                            img_data = r2.read()
+
+                        if _ok_image(img_data):
+
+                            return {"ok": True, "data": img_data, "api": "wikimedia"}
+
+                    except Exception:
+
+                        continue
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:80], "api": "wikimedia"}
+
+    return {"ok": False, "erreur": "wikimedia vide", "api": "wikimedia"}
+
+
+
+
+
+APIS = [
+
+    ("flux", api_flux),
+
+    ("turbo", api_turbo),
+
+    ("lexica", api_lexica),
+
+    ("wikimedia", api_wikimedia),
+
+    ("picsum", api_picsum),
+
+]
+
+
+
+
+
+def generer_image(prompt, seed=None):
+
+    if not prompt or not prompt.strip():
+
+        return {"ok": False, "erreur": "prompt vide"}
+
+    for nom, api in APIS:
+
+        for tentative in range(RETRY_MAX):
+
+            try:
+
+                r = api(prompt, seed)
+
+            except Exception as e:
+
+                r = {"ok": False, "erreur": str(e)[:80], "api": nom}
+
+            if r.get("ok"):
+
+                return {
+
+                    "ok": True,
+
+                    "data": r["data"],
+
+                    "api": r["api"],
+
+                    "taille": len(r["data"]),
+
+                    "sha256": hashlib.sha256(r["data"]).hexdigest(),
+
+                }
+
+            if tentative < RETRY_MAX - 1:
+
+                time.sleep(1 + tentative)
+
+    return {"ok": False, "erreur": "toutes APIs KO"}
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# ARCHITECTURE FILM
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+GENRES = {
+
+    "sci_fi": {"beats": ["Future", "Discovery", "Anomaly", "Dive", "Reveal", "Threat", "Chase", "Ally", "Twist", "Loss", "Plan", "Attack", "Resolution"], "mots": "sci-fi, neon, futuristic, cyberpunk, cinematic"},
+
+    "thriller": {"beats": ["Opening", "Setup", "Inciting", "Debate", "Break1", "Fun", "Midpoint", "Bad", "Break2", "Dark", "Break3", "Final", "Finale"], "mots": "cinematic, dark, tense, shadows, dramatic"},
+
+    "action": {"beats": ["Setup", "Chase", "Fight1", "Escape", "Ally", "Betrayal", "Chase2", "Boss1", "Trap", "Team", "Boss2", "Final", "Win"], "mots": "high octane, explosions, motion blur, epic"},
+
+    "drama": {"beats": ["Intro", "Family", "Conflict", "Departure", "Meeting", "Growth", "Crisis", "Loss", "Reflection", "Return", "Truth", "Reunion", "Peace"], "mots": "cinematic, soft lighting, emotional, realistic"},
+
+    "mystery": {"beats": ["Hook", "Crime", "Investigation", "Clue1", "Interrogation", "Clue2", "RedHerring", "Breakthrough", "Confrontation", "Twist", "Reveal", "Chase", "Arrest"], "mots": "noir, cinematic, foggy, mysterious, dramatic"},
+
+    "horror": {"beats": ["Normal", "Warning", "First", "Denial", "Second", "Panic", "Escape", "Trap", "Loss", "Truth", "Fight", "Final", "Survivor"], "mots": "dark, horror, creepy, shadows, atmospheric"},
+
+    "comedy": {"beats": ["Meet", "Quirk", "Plan", "Fail1", "Fall", "Help", "Fail2", "Mess", "Truth", "Speeches", "GrandGesture", "Chase", "Happy"], "mots": "cinematic, bright, warm, funny, expressive"},
+
+    "romance": {"beats": ["Meet", "Spark", "Date", "Bond", "Conflict", "Separation", "Reflection", "Reunion", "Confession", "Kiss", "Commitment", "Wedding", "End"], "mots": "cinematic, soft lighting, romantic, golden hour"},
+
+}
+
+
+
+VARIATIONS = [
+
+    "wide establishing shot", "extreme close up on eyes", "medium shot of hero",
+
+    "low angle dramatic", "high angle revealing", "over the shoulder",
+
+    "silhouette against light", "reflection in water", "dutch angle tension",
+
+    "slow motion moment", "aerial drone shot", "tracking shot following",
+
+    "static wide landscape", "macro detail shot", "backlit rim lighting",
+
+    "symmetrical composition",
+
+]
+
+
+
+
+
+def construire_scenes(scenario, genre, nb):
+
+    g = GENRES.get(genre, GENRES["sci_fi"])
+
+    beats = g["beats"]
+
+    mots = g["mots"]
+
+    scenes = []
+
+    for i in range(nb):
+
+        beat = beats[i % len(beats)]
+
+        var = VARIATIONS[i % len(VARIATIONS)]
+
+        prompt = "{}, {}, {}, {} shot".format(scenario[:80], beat, mots, var)
+
+        scenes.append({"index": i, "beat": beat, "prompt": prompt})
+
+    return scenes
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# FICHE NETFLIX
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+def calcul_score(nb_scenes, duree_s, video_ok, poster_ok, genre, scenes_ok):
+
+    score = 0
+
+    details = []
+
+    if nb_scenes >= 60: score += 20; details.append("+20 scenes>=60")
+
+    elif nb_scenes >= 30: score += 15; details.append("+15 scenes>=30")
+
+    elif nb_scenes >= 15: score += 10; details.append("+10 scenes>=15")
+
+    if duree_s >= 120: score += 20; details.append("+20 duree>=2min")
+
+    elif duree_s >= 60: score += 15; details.append("+15 duree>=1min")
+
+    elif duree_s >= 30: score += 10; details.append("+10 duree>=30s")
+
+    if video_ok: score += 25; details.append("+25 video")
+
+    if poster_ok: score += 10; details.append("+10 poster")
+
+    if genre in GENRES: score += 10; details.append("+10 genre")
+
+    if scenes_ok >= 20: score += 15; details.append("+15 scenes reussies")
+
+    elif scenes_ok >= 10: score += 10; details.append("+10 scenes reussies")
+
+    score = min(100, score)
+
+    statut = "PITCHABLE" if score >= 70 else ("VIABLE" if score >= 50 else "BROUILLON")
+
+    return {"score": score, "details": details, "statut": statut}
+
+
+
+
+
+def creer_fiche_netflix(film_id, titre, genre, scenario, scenes, video_path, poster_path, duree_s, scenes_ok):
+
+    fiche = {
+
+        "film_id": film_id, "titre": titre, "genre": genre,
+
+        "sous_genres": [genre, "IA Generated"], "synopsis": scenario,
+
+        "annee": datetime.datetime.now().year,
+
+        "duree_secondes": round(duree_s, 2),
+
+        "duree_formatee": "{}min {}s".format(int(duree_s // 60), int(duree_s % 60)),
+
+        "langue": "Francais", "pays": "Canada", "classification": "13+",
+
+        "realisateur": AUTEUR, "studio": "NEXUS FILM STUDIO",
+
+        "format": "Court-metrage IA", "ratio": "16:9", "definition": "1024x1024",
+
+        "audio": "Stereo", "sous_titres": ["FR", "EN"],
+
+        "nb_scenes": len(scenes), "beats": [s.get("beat", "") for s in scenes],
+
+        "fichier_video": video_path, "fichier_poster": poster_path,
+
+        "prix_vente_suggere": 0, "categorie": "",
+
+        "date_creation": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+
+        "licence": LICENCE, "auteur": AUTEUR, "contact": "awamomo646@outlook.com",
+
+    }
+
+    if duree_s >= 120: fiche["prix_vente_suggere"] = 2500; fiche["categorie"] = "Court-metrage premium"
+
+    elif duree_s >= 60: fiche["prix_vente_suggere"] = 1200; fiche["categorie"] = "Court-metrage standard"
+
+    elif duree_s >= 30: fiche["prix_vente_suggere"] = 500; fiche["categorie"] = "Pilote / teaser"
+
+    else: fiche["prix_vente_suggere"] = 150; fiche["categorie"] = "Concept / demo"
+
+    fiche["netflix_score"] = calcul_score(len(scenes), duree_s,
+
+        bool(video_path and os.path.isfile(video_path)),
+
+        bool(poster_path and os.path.isfile(poster_path)), genre, scenes_ok)
+
+    return fiche
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# COMPRESSION
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+def compresser_fichier(source, destination, methode="gzip"):
+
+    try:
+
+        if methode == "gzip":
+
+            with open(source, "rb") as fi:
+
+                with gzip.open(destination, "wb", compresslevel=9) as fo:
+
+                    shutil.copyfileobj(fi, fo)
+
+        elif methode == "bz2":
+
+            with open(source, "rb") as fi:
+
+                with bz2.open(destination, "wb", compresslevel=9) as fo:
+
+                    shutil.copyfileobj(fi, fo)
+
+        elif methode == "lzma":
+
+            with open(source, "rb") as fi:
+
+                with lzma.open(destination, "wb", preset=9) as fo:
+
+                    shutil.copyfileobj(fi, fo)
+
+        else:
+
+            return False
+
+        return os.path.isfile(destination)
+
+    except Exception:
+
+        return False
+
+
+
+
+
+def compresser_dossier(dossier, film_id):
+
+    if not os.path.isdir(dossier):
+
+        return {}
+
+    ts = time.strftime("%Y%m%d_%H%M%S")
+
+    base = "film_" + film_id + "_" + ts
+
+    resultats = {"gzip": {"total": 0, "fichiers": 0}, "bz2": {"total": 0, "fichiers": 0}, "lzma": {"total": 0, "fichiers": 0}, "prefix": base}
+
+    fichiers = []
+
+    try:
+
+        for root, dirs, files in os.walk(dossier):
+
+            for f in files:
+
+                fichiers.append(os.path.join(root, f))
+
+    except Exception:
+
+        return resultats
+
+    if not fichiers:
+
+        return resultats
+
+    for i, src in enumerate(fichiers):
+
+        for methode, ext in (("gzip", ".gz"), ("bz2", ".bz2"), ("lzma", ".xz")):
+
+            try:
+
+                nom = "frame_{:05d}.png{}".format(i, ext)
+
+                dst = os.path.join(DIR_ARCHIVES, base + "_" + nom)
+
+                if compresser_fichier(src, dst, methode):
+
+                    resultats[methode]["total"] += os.path.getsize(dst)
+
+                    resultats[methode]["fichiers"] += 1
+
+            except Exception:
+
+                pass
+
+    log("Archives : gz {} o | bz2 {} o | xz {} o".format(
+
+        resultats["gzip"]["total"], resultats["bz2"]["total"], resultats["lzma"]["total"]))
+
+    return resultats
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# FILM HTML
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+def creer_film_html(frames_dir, film_id, fps, titre, scenes_info):
+
+    try:
+
+        frames = sorted([f for f in os.listdir(frames_dir) if f.endswith((".png", ".jpg"))])
+
+    except Exception:
+
+        return {"ok": False, "erreur": "lecture frames KO"}
+
+    if not frames:
+
+        return {"ok": False, "erreur": "aucune frame"}
+
+
+
+    chemin = os.path.join(DIR_FILMS, "film_" + film_id + ".html")
+
+    beats_list = []
+
+    for i in range(len(frames)):
+
+        if i < len(scenes_info):
+
+            beats_list.append(scenes_info[i].get("beat", ""))
+
+        else:
+
+            beats_list.append("")
+
+
+
+    titre_safe = (titre or "NEXUS FILM").replace("<", "").replace(">", "").replace("&", "et")[:60]
+
+
+
+    parts = []
+
+    parts.append("<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'>")
+
+    parts.append("<meta name='viewport' content='width=device-width,initial-scale=1,user-scalable=no'>")
+
+    parts.append("<title>" + titre_safe + "</title>")
+
+    parts.append("<style>")
+
+    parts.append("*{margin:0;padding:0;box-sizing:border-box}")
+
+    parts.append("body{background:#000;color:#0ff;font-family:-apple-system,system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:15px}")
+
+    parts.append("h1{font-size:18px;margin-bottom:5px;text-align:center;max-width:90vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0ff}")
+
+    parts.append(".sub{color:#5a8a9a;font-size:10px;font-family:ui-monospace,monospace;margin-bottom:15px;text-align:center}")
+
+    parts.append(".frame{max-width:92vw;max-height:60vh;border:2px solid #0ff;border-radius:10px;box-shadow:0 0 40px rgba(0,240,255,0.4);background:#111}")
+
+    parts.append(".ctrl{margin:15px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}")
+
+    parts.append("button{background:#0ff;color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit}")
+
+    parts.append("button:hover{background:#0fc}")
+
+    parts.append("button.stop{background:#f44;color:#fff}")
+
+    parts.append(".info{font-family:ui-monospace,monospace;font-size:11px;color:#5a8a9a;margin-top:8px;text-align:center}")
+
+    parts.append(".beat{color:#ff00c8;font-weight:700}")
+
+    parts.append(".progress-mini{width:80vw;max-width:600px;height:4px;background:#222;border-radius:2px;overflow:hidden;margin:10px auto}")
+
+    parts.append(".progress-mini > div{height:100%;background:linear-gradient(90deg,#0ff,#f0c);transition:width 0.2s}")
+
+    parts.append(".footer{margin-top:15px;color:#3a4a5a;font-size:9px;font-family:ui-monospace,monospace;text-align:center}")
+
+    parts.append("</style></head><body>")
+
+    parts.append("<h1>" + titre_safe + "</h1>")
+
+    parts.append("<div class='sub'>NEXUS FILM STUDIO - Aissa Mohammedi (DGK)</div>")
+
+    parts.append("<img id='frame' class='frame' src='../frames/" + film_id + "/" + frames[0] + "' alt='frame'>")
+
+    parts.append("<div class='progress-mini'><div id='pbar' style='width:0%'></div></div>")
+
+    parts.append("<div class='ctrl'>")
+
+    parts.append("<button onclick='prec()'>&#9664;</button>")
+
+    parts.append("<button onclick='play()' id='btn'>&#9654; Play</button>")
+
+    parts.append("<button onclick='suiv()'>&#9654;</button>")
+
+    parts.append("<button onclick='stopAll()' class='stop'>&#9632; Stop</button>")
+
+    parts.append("<button onclick='fullscreen()'>&#9974; Fullscreen</button>")
+
+    parts.append("</div>")
+
+    parts.append("<div class='info' id='info'>1 / " + str(len(frames)) + " - FPS " + str(fps) + " - <span class='beat' id='beat'></span></div>")
+
+    parts.append("<div class='footer'>NEXUS FILM STUDIO v" + VERSION + " - " + LICENCE + "</div>")
+
+    parts.append("<script>")
+
+    parts.append("var frames = " + json.dumps(frames) + ";")
+
+    parts.append("var beats = " + json.dumps(beats_list) + ";")
+
+    parts.append("var cur = 0;")
+
+    parts.append("var timer = null;")
+
+    parts.append("var fps = " + str(fps) + ";")
+
+    parts.append("var basePath = '../frames/" + film_id + "/';")
+
+    parts.append("function afficher(){")
+
+    parts.append("  document.getElementById('frame').src = basePath + frames[cur];")
+
+    parts.append("  document.getElementById('info').innerHTML = (cur+1) + ' / ' + frames.length + ' - FPS ' + fps + ' - <span class=\"beat\">' + (beats[cur] || '') + '</span>';")
+
+    parts.append("  document.getElementById('pbar').style.width = ((cur+1)/frames.length*100) + '%';")
+
+    parts.append("}")
+
+    parts.append("function suiv(){ cur = (cur + 1) % frames.length; afficher(); }")
+
+    parts.append("function prec(){ cur = (cur - 1 + frames.length) % frames.length; afficher(); }")
+
+    parts.append("function play(){")
+
+    parts.append("  if (timer){ clearInterval(timer); timer = null; document.getElementById('btn').innerHTML = '&#9654; Play'; }")
+
+    parts.append("  else { timer = setInterval(suiv, 1000/fps); document.getElementById('btn').innerHTML = '&#10074;&#10074; Pause'; }")
+
+    parts.append("}")
+
+    parts.append("function stopAll(){")
+
+    parts.append("  if (timer){ clearInterval(timer); timer = null; }")
+
+    parts.append("  cur = 0; afficher();")
+
+    parts.append("  document.getElementById('btn').innerHTML = '&#9654; Play';")
+
+    parts.append("}")
+
+    parts.append("function fullscreen(){")
+
+    parts.append("  var img = document.getElementById('frame');")
+
+    parts.append("  if (img.requestFullscreen) img.requestFullscreen();")
+
+    parts.append("  else if (img.webkitRequestFullscreen) img.webkitRequestFullscreen();")
+
+    parts.append("}")
+
+    parts.append("afficher();")
+
+    parts.append("</script></body></html>")
+
+
+
+    try:
+
+        with open(chemin, "w", encoding="utf-8") as f:
+
+            f.write("".join(parts))
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:100]}
+
+
+
+    return {
+
+        "ok": True, "chemin": chemin, "nom": os.path.basename(chemin),
+
+        "taille": os.path.getsize(chemin), "nb_frames": len(frames),
+
+        "fps": fps, "duree_s": round(len(frames) / float(fps), 2), "mode": "html",
+
+    }
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# PIPELINE
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+def generer_film(scenario, genre="sci_fi", nb_scenes=15, fps=2):
+
+    with ETAT_LOCK:
+
+        if ETAT["en_cours"]:
+
+            return {"ok": False, "erreur": "film deja en cours"}
+
+        ETAT["en_cours"] = True
+
+        ETAT["statut"] = "generation"
+
+        ETAT["progression"] = 0
+
+        ETAT["film_id"] = time.strftime("%Y%m%d_%H%M%S")
+
+        ETAT["titre"] = scenario[:60]
+
+        ETAT["genre"] = genre
+
+        ETAT["total_scenes"] = nb_scenes
+
+        ETAT["scenes_ok"] = 0
+
+        ETAT["scenes_ko"] = 0
+
+        ETAT["debut"] = time.time()
+
+        ETAT["erreurs"] = []
+
+        ETAT["log"] = []
+
+
+
+    film_id = ETAT["film_id"]
+
+    log("=== FILM {} ===".format(film_id))
+
+    log("Genre : {} | Scenes : {} | FPS : {}".format(genre, nb_scenes, fps))
+
+
+
+    frames_dir = os.path.join(DIR_FRAMES, film_id)
+
+    try:
+
+        os.makedirs(frames_dir, exist_ok=True)
+
+    except Exception as e:
+
+        with ETAT_LOCK:
+
+            ETAT["en_cours"] = False
+
+        return {"ok": False, "erreur": str(e)[:100]}
+
+
+
+    scenes = construire_scenes(scenario, genre, nb_scenes)
+
+    log("Architecture : {} scenes".format(len(scenes)))
+
+
+
+    resultats = []
+
+    erreurs = []
+
+
+
+    try:
+
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as ex:
+
+            futurs = {}
+
+            for i, s in enumerate(scenes):
+
+                seed = 1000 + i + (abs(hash(scenario)) % 1000)
+
+                futurs[ex.submit(generer_image, s["prompt"], seed)] = i
+
+
+
+            for fut in as_completed(futurs):
+
+                i = futurs[fut]
+
+                try:
+
+                    r = fut.result(timeout=180)
+
+                except Exception as e:
+
+                    r = {"ok": False, "erreur": str(e)[:100]}
+
+
+
+                if r.get("ok"):
+
+                    nom = "scene_{:05d}.png".format(i)
+
+                    chemin = os.path.join(frames_dir, nom)
+
+                    try:
+
+                        with open(chemin, "wb") as f:
+
+                            f.write(r["data"])
+
+                        resultats.append({
+
+                            "index": i, "beat": scenes[i]["beat"],
+
+                            "chemin": chemin, "api": r["api"],
+
+                            "taille": r["taille"], "sha256": r["sha256"],
+
+                        })
+
+                        with ETAT_LOCK:
+
+                            ETAT["scenes_ok"] += 1
+
+                    except Exception:
+
+                        with ETAT_LOCK:
+
+                            ETAT["scenes_ko"] += 1
+
+                        erreurs.append("scene {} : ecriture KO".format(i))
+
+                else:
+
+                    with ETAT_LOCK:
+
+                        ETAT["scenes_ko"] += 1
+
+                    erreurs.append("scene {} : {}".format(i, r.get("erreur", "?")))
+
+
+
+                with ETAT_LOCK:
+
+                    done = ETAT["scenes_ok"] + ETAT["scenes_ko"]
+
+                    ETAT["progression"] = int(100 * done / max(1, nb_scenes))
+
+    except Exception as e:
+
+        log("Erreur pipeline : " + str(e)[:150])
+
+
+
+    log("Images OK : {} / {}".format(len(resultats), nb_scenes))
+
+
+
+    video_result = None
+
+    if resultats:
+
+        with ETAT_LOCK:
+
+            ETAT["statut"] = "video"
+
+        try:
+
+            video_result = creer_film_html(frames_dir, film_id, fps, scenario[:60], scenes)
+
+        except Exception as e:
+
+            log("Film HTML KO : " + str(e)[:100])
+
+
+
+    poster_result = None
+
+    if resultats:
+
+        try:
+
+            src = resultats[0]["chemin"]
+
+            dst = os.path.join(DIR_POSTERS, "poster_" + film_id + ".png")
+
+            shutil.copy(src, dst)
+
+            poster_result = {"chemin": dst, "nom": os.path.basename(dst)}
+
+            log("Poster : " + os.path.basename(dst))
+
+        except Exception as e:
+
+            log("Poster KO : " + str(e)[:80])
+
+
+
+    archives = {}
+
+    if resultats:
+
+        with ETAT_LOCK:
+
+            ETAT["statut"] = "compression"
+
+        try:
+
+            archives = compresser_dossier(frames_dir, film_id)
+
+        except Exception as e:
+
+            log("Compression KO : " + str(e)[:100])
+
+
+
+    duree = video_result.get("duree_s", len(resultats) / float(fps)) if (video_result and video_result.get("ok")) else len(resultats) / float(fps)
+
+
+
+    try:
+
+        fiche = creer_fiche_netflix(film_id, scenario[:60], genre, scenario, scenes,
+
+            video_result["chemin"] if (video_result and video_result.get("ok")) else "",
+
+            poster_result["chemin"] if poster_result else "",
+
+            duree, len(resultats))
+
+    except Exception as e:
+
+        log("Fiche KO : " + str(e)[:100])
+
+        fiche = {"netflix_score": {"score": 0, "statut": "?"}}
+
+
+
+    with ETAT_LOCK:
+
+        ETAT["netflix_score"] = fiche.get("netflix_score", {}).get("score", 0)
+
+
+
+    catalogue_path = os.path.join(DIR_CATALOGUE, "film_" + film_id + ".json")
+
+    try:
+
+        with open(catalogue_path, "w", encoding="utf-8") as f:
+
+            json.dump(fiche, f, indent=2, ensure_ascii=False, default=str)
+
+    except Exception as e:
+
+        log("Catalogue KO : " + str(e)[:100])
+
+
+
+    duree_totale = time.time() - ETAT["debut"]
+
+
+
+    rapport = {
+
+        "ok": True, "film_id": film_id, "titre": scenario[:60], "genre": genre,
+
+        "nb_scenes": nb_scenes, "scenes_ok": len(resultats), "scenes_ko": len(erreurs),
+
+        "duree_s": round(duree_totale, 2), "video": video_result,
+
+        "poster": poster_result, "archives": archives,
+
+        "fiche_netflix": fiche, "catalogue": catalogue_path, "erreurs": erreurs,
+
+    }
+
+
+
+    with ETAT_LOCK:
+
+        ETAT["en_cours"] = False
+
+        ETAT["progression"] = 100
+
+        ETAT["statut"] = "termine"
+
+        ETAT["film_final"] = video_result["chemin"] if (video_result and video_result.get("ok")) else ""
+
+        ETAT["poster_final"] = poster_result["chemin"] if poster_result else ""
+
+
+
+    log("=== FILM TERMINE ===")
+
+    log("Duree : {:.1f}s".format(duree_totale))
+
+    log("Score Netflix : {}".format(fiche.get("netflix_score", {}).get("score", 0)))
+
+
+
+    return rapport
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# HTML DASHBOARD
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+HTML_PAGE = r"""<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+<title>NEXUS FILM STUDIO</title>
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{height:100%;overflow:hidden;background:#000;color:#c8f0ff;font-family:-apple-system,system-ui,sans-serif}
+
+#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1}
+
+.hud{position:fixed;top:8px;left:8px;right:8px;z-index:100;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
+
+.hud .box{background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.4);border-radius:10px;padding:8px 12px;font-size:10px;font-family:ui-monospace,monospace;backdrop-filter:blur(12px);pointer-events:auto}
+
+.hud .box b{color:#00f0ff;letter-spacing:1px;font-size:11px}
+
+.hud .box .sub{color:#5a8a9a;font-size:9px;margin-top:2px}
+
+.panel{position:fixed;top:60px;right:8px;width:calc(100vw - 16px);max-width:380px;max-height:calc(100vh - 130px);z-index:100;overflow-y:auto;background:rgba(0,10,20,0.94);border:1px solid rgba(0,240,255,0.4);border-radius:12px;padding:16px;backdrop-filter:blur(15px)}
+
+.panel h2{color:#00f0ff;font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;margin-top:12px}
+
+.panel h2:first-child{margin-top:0}
+
+.panel label{color:#5a8a9a;font-size:10px;display:block;margin-bottom:3px;font-family:ui-monospace,monospace}
+
+.panel input,.panel select,.panel textarea{width:100%;padding:9px 11px;background:rgba(0,0,0,0.6);border:1px solid rgba(0,240,255,0.3);border-radius:6px;color:#e0f0ff;font-size:12px;outline:none;font-family:inherit;margin-bottom:8px}
+
+.panel textarea{min-height:60px;resize:vertical}
+
+.panel button{width:100%;background:#00f0ff;color:#000;border:none;padding:11px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:6px}
+
+.panel button:hover{background:#00ffc8}
+
+.panel button:disabled{opacity:0.5;cursor:not-allowed}
+
+.panel button.sec{background:transparent;color:#00f0ff;border:1px solid rgba(0,240,255,0.4)}
+
+.controls{position:fixed;bottom:8px;left:8px;z-index:100;display:flex;gap:4px;flex-wrap:wrap}
+
+.btn{background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.4);color:#00f0ff;padding:6px 10px;border-radius:6px;font-size:10px;font-family:ui-monospace,monospace;cursor:pointer;font-weight:600}
+
+.btn:hover{background:rgba(0,240,255,0.15)}
+
+.btn.active{background:#00f0ff;color:#000}
+
+.stat{position:fixed;bottom:8px;right:8px;z-index:100;background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.3);border-radius:8px;padding:8px 12px;font-family:ui-monospace,monospace;font-size:10px;color:#5a8a9a}
+
+.stat b{color:#00f0ff;display:block;margin-bottom:3px}
+
+.progress{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden;margin-top:6px}
+
+.progress > div{height:100%;background:linear-gradient(90deg,#00f0ff,#ff00c8);transition:width 0.3s}
+
+#log{background:rgba(0,0,0,0.7);border:1px solid rgba(0,240,255,0.2);border-radius:6px;padding:8px;font-family:ui-monospace,monospace;font-size:9px;color:#5a8a9a;max-height:120px;overflow-y:auto;margin-top:6px;line-height:1.4}
+
+.movie-list{margin-top:10px;max-height:200px;overflow-y:auto}
+
+.movie-item{background:rgba(0,0,0,0.4);border:1px solid rgba(0,240,255,0.2);border-radius:6px;padding:8px;margin-bottom:6px;cursor:pointer;transition:all 0.2s}
+
+.movie-item:hover{border-color:#00f0ff;background:rgba(0,240,255,0.1)}
+
+.movie-item .title{color:#00f0ff;font-size:11px;font-weight:700;margin-bottom:3px}
+
+.movie-item .meta{color:#5a8a9a;font-size:9px;font-family:ui-monospace,monospace}
+
+.movie-item .score{color:#ffc800;font-weight:700;font-size:10px}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="hud">
+
+<div class="box"><b>NEXUS FILM STUDIO</b><div class="sub">Aissa Mohammedi (DGK) - v__V__</div></div>
+
+<div class="box" style="flex:1;max-width:400px"><b>DASHBOARD 3D</b><div class="sub">Cliquez un noeud pour voir les details</div></div>
+
+</div>
+
+<div class="panel">
+
+<h2>Nouveau film</h2>
+
+<label>Scenario</label>
+
+<textarea id="scenario">NEXUS cyber warrior in neon cyberpunk city, night rain, epic final battle</textarea>
+
+<label>Genre</label>
+
+<select id="genre">
+
+<option value="sci_fi">Sci-Fi</option>
+
+<option value="thriller">Thriller</option>
+
+<option value="action">Action</option>
+
+<option value="drama">Drama</option>
+
+<option value="mystery">Mystery</option>
+
+<option value="horror">Horror</option>
+
+<option value="comedy">Comedy</option>
+
+<option value="romance">Romance</option>
+
+</select>
+
+<label>Nombre de scenes (10-60)</label>
+
+<input type="number" id="scenes" value="15" min="10" max="60">
+
+<label>FPS (1-6)</label>
+
+<input type="number" id="fps" value="2" min="1" max="6">
+
+<button id="btn-gen" onclick="generer()">GENERER FILM</button>
+
+<button class="sec" onclick="chargerGalerie()">RAFRAICHIR</button>
+
+<h2>Progression</h2>
+
+<div class="progress"><div id="progress-fill" style="width:0%"></div></div>
+
+<div style="font-family:ui-monospace,monospace;font-size:10px;color:#5a8a9a;margin-top:6px" id="progress-txt">Pret</div>
+
+<h2>Mes films</h2>
+
+<div class="movie-list" id="movie-list"></div>
+
+<h2>Log</h2>
+
+<div id="log"></div>
+
+</div>
+
+<div class="controls">
+
+<button class="btn active" onclick="setView('orbit', this)">ORBITE</button>
+
+<button class="btn" onclick="setView('grid', this)">GRILLE</button>
+
+<button class="btn" onclick="setView('sphere', this)">SPHERE</button>
+
+<button class="btn" onclick="resetCamera()">RESET</button>
+
+</div>
+
+<div class="stat"><b id="stats-total">0 films</b><span id="stats-outils"></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+var scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0x000308);
+
+scene.fog = new THREE.FogExp2(0x000308, 0.008);
+
+var camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.1, 2000);
+
+camera.position.set(0, 15, 45);
+
+camera.lookAt(0, 0, 0);
+
+var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('canvas'), antialias: true});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+scene.add(new THREE.AmbientLight(0x404060, 0.6));
+
+var dl = new THREE.DirectionalLight(0xffffff, 1.2);
+
+dl.position.set(10, 20, 10);
+
+scene.add(dl);
+
+var rl1 = new THREE.PointLight(0x00f0ff, 3, 100);
+
+rl1.position.set(-25, 15, -25);
+
+scene.add(rl1);
+
+var rl2 = new THREE.PointLight(0xff00c8, 2.5, 100);
+
+rl2.position.set(25, 15, -25);
+
+scene.add(rl2);
+
+var grid = new THREE.GridHelper(200, 100, 0x00f0ff, 0x003344);
+
+grid.position.y = -10;
+
+grid.material.opacity = 0.2;
+
+grid.material.transparent = true;
+
+scene.add(grid);
+
+var starGeo = new THREE.BufferGeometry();
+
+var starN = 1500;
+
+var starPos = new Float32Array(starN * 3);
+
+for (var i = 0; i < starN; i++){
+
+  starPos[i*3] = (Math.random() - 0.5) * 400;
+
+  starPos[i*3+1] = (Math.random() - 0.5) * 200;
+
+  starPos[i*3+2] = (Math.random() - 0.5) * 400;
+
+}
+
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+
+var stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
+
+  color: 0xffffff, size: 0.3, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending
+
+}));
+
+scene.add(stars);
+
+var core = new THREE.Mesh(
+
+  new THREE.IcosahedronGeometry(3, 1),
+
+  new THREE.MeshBasicMaterial({color: 0x00f0ff, wireframe: true})
+
+);
+
+scene.add(core);
+
+var filmsGroup = new THREE.Group();
+
+scene.add(filmsGroup);
+
+var filmNodes = [];
+
+var viewMode = 'orbit';
+
+
+
+function creerNode(film){
+
+  var score = 0;
+
+  if (film.netflix_score && film.netflix_score.score) score = film.netflix_score.score;
+
+  var color;
+
+  if (score >= 70) color = 0x00ff88;
+
+  else if (score >= 50) color = 0xffc800;
+
+  else if (score >= 30) color = 0xff8800;
+
+  else color = 0xff4444;
+
+  var mesh = new THREE.Mesh(
+
+    new THREE.SphereGeometry(0.8, 16, 16),
+
+    new THREE.MeshBasicMaterial({color: color})
+
+  );
+
+  var halo = new THREE.Mesh(
+
+    new THREE.SphereGeometry(1.2, 16, 16),
+
+    new THREE.MeshBasicMaterial({color: color, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending})
+
+  );
+
+  mesh.add(halo);
+
+  mesh.userData = {film: film};
+
+  return mesh;
+
+}
+
+
+
+function construireListe(films){
+
+  var list = document.getElementById('movie-list');
+
+  list.innerHTML = '';
+
+  if (!films || films.length === 0){
+
+    list.innerHTML = '<div style="color:#5a8a9a;font-size:10px;text-align:center;padding:10px">Aucun film. Generez-en un.</div>';
+
+    return;
+
+  }
+
+  films.forEach(function(f){
+
+    var div = document.createElement('div');
+
+    div.className = 'movie-item';
+
+    var score = f.netflix_score ? f.netflix_score.score : '?';
+
+    var statut = f.netflix_score ? f.netflix_score.statut : '?';
+
+    var duree = f.duree_formatee || '?';
+
+    div.innerHTML = '<div class="title">' + (f.titre || 'Sans titre') + '</div>' +
+
+      '<div class="meta">' + (f.genre || '?') + ' | ' + duree + ' | <span class="score">' + score + '/100 ' + statut + '</span></div>';
+
+    div.onclick = function(){ voirFilm(f.film_id); };
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+
+function voirFilm(filmId){
+
+  if (!filmId) return;
+
+  window.open('/viewer?film=' + encodeURIComponent(filmId), '_blank');
+
+}
+
+
+
+async function chargerGalerie(){
+
+  try{
+
+    var r = await fetch('/api/galerie');
+
+    var d = await r.json();
+
+    var films = d.films || [];
+
+    while (filmsGroup.children.length > 0){
+
+      filmsGroup.remove(filmsGroup.children[0]);
+
+    }
+
+    filmNodes = [];
+
+    films.forEach(function(f){
+
+      var node = creerNode(f);
+
+      filmsGroup.add(node);
+
+      filmNodes.push(node);
+
+    });
+
+    positionner();
+
+    construireListe(films);
+
+    document.getElementById('stats-total').textContent = films.length + ' films';
+
+    document.getElementById('stats-outils').textContent = 'ffmpeg: ' + (d.outils && d.outils.ffmpeg ? 'OK' : 'HTML');
+
+  } catch(e){ console.log('galerie err', e); }
+
+}
+
+
+
+function positionner(){
+
+  var n = filmNodes.length;
+
+  if (n === 0) return;
+
+  filmNodes.forEach(function(node, i){
+
+    if (viewMode === 'orbit'){
+
+      var angle = (i / n) * Math.PI * 2;
+
+      var rayon = 15 + (i % 3) * 5;
+
+      node.position.set(Math.cos(angle) * rayon, Math.sin(i * 0.5) * 3, Math.sin(angle) * rayon);
+
+    } else if (viewMode === 'grid'){
+
+      var cols = Math.ceil(Math.sqrt(n));
+
+      var x = (i % cols) - cols / 2;
+
+      var z = Math.floor(i / cols) - cols / 2;
+
+      node.position.set(x * 5, 0, z * 5);
+
+    } else if (viewMode === 'sphere'){
+
+      var phi = Math.acos(1 - 2 * (i + 0.5) / n);
+
+      var theta = Math.PI * (1 + Math.sqrt(5)) * i;
+
+      var r = 20;
+
+      node.position.set(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
+
+    }
+
+  });
+
+}
+
+
+
+function setView(mode, btn){
+
+  viewMode = mode;
+
+  var all = document.querySelectorAll('.controls .btn');
+
+  for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
+
+  if (btn) btn.classList.add('active');
+
+  positionner();
+
+}
+
+
+
+function resetCamera(){
+
+  camera.position.set(0, 15, 45);
+
+  targetRotY = 0; targetRotX = 0;
+
+  targetDistance = 45;
+
+}
+
+
+
+var mouseDown = false, mouseX = 0, mouseY = 0;
+
+var targetRotY = 0, targetRotX = 0;
+
+var curRotY = 0, curRotX = 0;
+
+var distance = 45, targetDistance = 45;
+
+
+
+document.addEventListener('mousedown', function(e){ mouseDown = true; mouseX = e.clientX; mouseY = e.clientY; });
+
+document.addEventListener('mouseup', function(){ mouseDown = false; });
+
+document.addEventListener('mousemove', function(e){
+
+  if (mouseDown){
+
+    targetRotY += (e.clientX - mouseX) * 0.005;
+
+    targetRotX += (e.clientY - mouseY) * 0.003;
+
+    targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+
+    mouseX = e.clientX; mouseY = e.clientY;
+
+  }
+
+});
+
+document.addEventListener('wheel', function(e){
+
+  targetDistance += e.deltaY * 0.05;
+
+  targetDistance = Math.max(10, Math.min(150, targetDistance));
+
+}, {passive: true});
+
+document.addEventListener('touchstart', function(e){
+
+  mouseDown = true;
+
+  mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
+
+});
+
+document.addEventListener('touchend', function(){ mouseDown = false; });
+
+document.addEventListener('touchmove', function(e){
+
+  if (mouseDown && e.touches.length > 0){
+
+    targetRotY += (e.touches[0].clientX - mouseX) * 0.005;
+
+    targetRotX += (e.touches[0].clientY - mouseY) * 0.003;
+
+    targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+
+    mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY;
+
+  }
+
+}, {passive: true});
+
+
+
+var t = 0;
+
+var clock = new THREE.Clock();
+
+
+
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  var dt = Math.min(clock.getDelta(), 0.05);
+
+  t += dt;
+
+  curRotY += (targetRotY - curRotY) * 0.1;
+
+  curRotX += (targetRotX - curRotX) * 0.1;
+
+  distance += (targetDistance - distance) * 0.1;
+
+  var camX = Math.sin(curRotY) * distance * Math.cos(curRotX);
+
+  var camY = 15 + Math.sin(curRotX) * distance * 0.5;
+
+  var camZ = Math.cos(curRotY) * distance * Math.cos(curRotX);
+
+  camera.position.x += (camX - camera.position.x) * 0.1;
+
+  camera.position.y += (camY - camera.position.y) * 0.1;
+
+  camera.position.z += (camZ - camera.position.z) * 0.1;
+
+  camera.lookAt(0, 0, 0);
+
+  core.rotation.x = t * 0.3;
+
+  core.rotation.y = t * 0.5;
+
+  core.scale.setScalar(1 + Math.sin(t * 2) * 0.05);
+
+  filmNodes.forEach(function(node, i){ node.rotation.y = t * 0.5 + i; });
+
+  stars.rotation.y = t * 0.005;
+
+  renderer.render(scene, camera);
+
+}
+
+animate();
+
+
+
+window.addEventListener('resize', function(){
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+});
+
+
+
+function addLog(msg){
+
+  var el = document.getElementById('log');
+
+  var div = document.createElement('div');
+
+  div.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+
+  el.appendChild(div);
+
+  el.scrollTop = el.scrollHeight;
+
+}
+
+
+
+async function generer(){
+
+  var scenario = document.getElementById('scenario').value;
+
+  var genre = document.getElementById('genre').value;
+
+  var scenes = parseInt(document.getElementById('scenes').value) || 15;
+
+  var fps = parseInt(document.getElementById('fps').value) || 2;
+
+  if (scenes < 10) scenes = 10;
+
+  if (scenes > 60) scenes = 60;
+
+  if (fps < 1) fps = 1;
+
+  if (fps > 6) fps = 6;
+
+  document.getElementById('btn-gen').disabled = true;
+
+  addLog('Generation : ' + scenes + ' scenes @ ' + fps + ' fps');
+
+  try{
+
+    var r = await fetch('/api/generer', {
+
+      method:'POST',
+
+      headers:{'Content-Type':'application/json'},
+
+      body: JSON.stringify({scenario:scenario, genre:genre, scenes:scenes, fps:fps})
+
+    });
+
+    var d = await r.json();
+
+    if (d.ok){
+
+      addLog('Film OK : ' + d.scenes_ok + '/' + d.nb_scenes);
+
+      if (d.fiche_netflix && d.fiche_netflix.netflix_score){
+
+        addLog('Score : ' + d.fiche_netflix.netflix_score.score + ' (' + d.fiche_netflix.netflix_score.statut + ')');
+
+      }
+
+    } else {
+
+      addLog('Erreur : ' + (d.erreur || '?'));
+
+    }
+
+    chargerGalerie();
+
+  } catch(e){ addLog('Erreur reseau : ' + e.message); }
+
+  document.getElementById('btn-gen').disabled = false;
+
+}
+
+
+
+async function majProgression(){
+
+  try{
+
+    var r = await fetch('/api/etat');
+
+    var d = await r.json();
+
+    document.getElementById('progress-fill').style.width = (d.progression || 0) + '%';
+
+    var txt = d.statut + ' - ' + (d.scenes_ok || 0) + '/' + (d.total_scenes || 0);
+
+    if (d.en_cours && d.debut){
+
+      var el2 = Math.floor(Date.now()/1000 - d.debut);
+
+      txt += ' - ' + el2 + 's';
+
+    }
+
+    document.getElementById('progress-txt').textContent = txt;
+
+  } catch(e){}
+
+}
+
+
+
+var ray = new THREE.Raycaster();
+
+var m2 = new THREE.Vector2();
+
+document.addEventListener('click', function(e){
+
+  m2.x = (e.clientX / window.innerWidth) * 2 - 1;
+
+  m2.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+  ray.setFromCamera(m2, camera);
+
+  var hits = ray.intersectObjects(filmNodes);
+
+  if (hits.length > 0){
+
+    var film = hits[0].object.userData.film;
+
+    if (film && film.film_id){
+
+      if (confirm('Voir le film "' + (film.titre || '?') + '" ?')) voirFilm(film.film_id);
+
+    }
+
+  }
+
+});
+
+
+
+setInterval(majProgression, 2000);
+
+setInterval(chargerGalerie, 15000);
+
+chargerGalerie();
+
+addLog('Studio pret');
+
+</script>
+
+</body>
+
+</html>
+
+"""
+
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+
+# VIEWER HTML — page dediee pour voir un film
+
+# ═══════════════════════════════════════════════════════════════════
+
+
+
+VIEWER_PAGE = r"""<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+<title>NEXUS VIEWER</title>
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{height:100%;background:#000;color:#0ff;font-family:-apple-system,system-ui,sans-serif;overflow:hidden}
+
+#app{display:flex;flex-direction:column;height:100vh;padding:10px;gap:10px}
+
+#header{background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.4);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+#header h1{font-size:14px;color:#00f0ff;letter-spacing:1px}
+
+#header .info{font-size:10px;color:#5a8a9a;font-family:ui-monospace,monospace}
+
+#header a{color:#00f0ff;text-decoration:none;font-size:11px;border:1px solid rgba(0,240,255,0.4);padding:5px 10px;border-radius:6px}
+
+#header a:hover{background:rgba(0,240,255,0.1)}
+
+#viewer-container{flex:1;display:flex;align-items:center;justify-content:center;background:#050810;border:1px solid rgba(0,240,255,0.3);border-radius:10px;overflow:hidden;position:relative}
+
+#frame{max-width:100%;max-height:100%;object-fit:contain}
+
+#no-frame{color:#5a8a9a;font-size:12px;text-align:center;padding:20px}
+
+#controls{background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.4);border-radius:10px;padding:10px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+
+#controls button{background:#00f0ff;color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+
+#controls button:hover{background:#00ffc8}
+
+#controls button.stop{background:#f44;color:#fff}
+
+#controls button.stop:hover{background:#d33}
+
+#controls input[type=range]{width:200px}
+
+#progress{width:100%;height:6px;background:#111;border-radius:3px;overflow:hidden;margin-top:5px}
+
+#progress > div{height:100%;background:linear-gradient(90deg,#00f0ff,#ff00c8);transition:width 0.2s}
+
+#time-info{font-family:ui-monospace,monospace;font-size:11px;color:#5a8a9a;min-width:130px;text-align:center}
+
+#meta{background:rgba(0,10,20,0.9);border:1px solid rgba(0,240,255,0.3);border-radius:10px;padding:10px 14px;font-family:ui-monospace,monospace;font-size:10px;color:#5a8a9a;max-height:100px;overflow-y:auto}
+
+#meta b{color:#00f0ff}
+
+#empty{color:#5a8a9a;text-align:center;padding:40px;font-size:12px}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<div id="header">
+
+<h1 id="title">NEXUS VIEWER</h1>
+
+<div class="info" id="subtitle">Aissa Mohammedi (DGK) - v__V__</div>
+
+<a href="/">&#9664; Retour au studio</a>
+
+</div>
+
+<div id="viewer-container">
+
+<img id="frame" src="" alt="frame" style="display:none">
+
+<div id="no-frame">Aucun film selectionne. Retournez au studio et cliquez un film.</div>
+
+</div>
+
+<div id="progress"><div id="pbar" style="width:0%"></div></div>
+
+<div id="controls">
+
+<button onclick="prec()">&#9664; Precedent</button>
+
+<button onclick="playPause()" id="btn-play">&#9654; Play</button>
+
+<button onclick="suiv()">Suivant &#9654;</button>
+
+<button onclick="stopAll()" class="stop">&#9632; Stop</button>
+
+<button onclick="fullscreen()">&#9974; Fullscreen</button>
+
+<span id="time-info">-</span>
+
+<label style="font-size:11px;color:#5a8a9a">FPS
+
+<input type="range" id="fps-slider" min="1" max="10" value="2" oninput="changerFPS(this.value)">
+
+</label>
+
+<span id="fps-display" style="color:#00f0ff;font-family:ui-monospace,monospace;font-size:11px">2</span>
+
+</div>
+
+<div id="meta"></div>
+
+</div>
+
+<script>
+
+var frames = [];
+
+var beats = [];
+
+var cur = 0;
+
+var timer = null;
+
+var fps = 2;
+
+var basePath = '';
+
+var filmId = '';
+
+var titre = '';
+
+
+
+function afficher(){
+
+  if (!frames || frames.length === 0) return;
+
+  var img = document.getElementById('frame');
+
+  img.src = basePath + frames[cur];
+
+  img.style.display = 'block';
+
+  document.getElementById('no-frame').style.display = 'none';
+
+  document.getElementById('pbar').style.width = ((cur+1)/frames.length*100) + '%';
+
+  var beat = beats[cur] || '';
+
+  document.getElementById('time-info').textContent = (cur+1) + '/' + frames.length + ' - ' + beat;
+
+}
+
+
+
+function suiv(){ cur = (cur + 1) % frames.length; afficher(); }
+
+function prec(){ cur = (cur - 1 + frames.length) % frames.length; afficher(); }
+
+
+
+function playPause(){
+
+  if (timer){
+
+    clearInterval(timer);
+
+    timer = null;
+
+    document.getElementById('btn-play').innerHTML = '&#9654; Play';
+
+  } else {
+
+    timer = setInterval(suiv, 1000/fps);
+
+    document.getElementById('btn-play').innerHTML = '&#10074;&#10074; Pause';
+
+  }
+
+}
+
+
+
+function stopAll(){
+
+  if (timer){ clearInterval(timer); timer = null; }
+
+  cur = 0;
+
+  afficher();
+
+  document.getElementById('btn-play').innerHTML = '&#9654; Play';
+
+}
+
+
+
+function changerFPS(val){
+
+  fps = parseInt(val) || 2;
+
+  document.getElementById('fps-display').textContent = fps;
+
+  if (timer){
+
+    clearInterval(timer);
+
+    timer = setInterval(suiv, 1000/fps);
+
+  }
+
+}
+
+
+
+function fullscreen(){
+
+  var el = document.getElementById('viewer-container');
+
+  if (el.requestFullscreen) el.requestFullscreen();
+
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+
+}
+
+
+
+function getURLParam(name){
+
+  var url = window.location.search.substring(1);
+
+  var parts = url.split('&');
+
+  for (var i = 0; i < parts.length; i++){
+
+    var pair = parts[i].split('=');
+
+    if (pair[0] === name) return decodeURIComponent(pair[1] || '');
+
+  }
+
+  return '';
+
+}
+
+
+
+async function chargerFilm(){
+
+  filmId = getURLParam('film');
+
+  if (!filmId){
+
+    document.getElementById('no-frame').textContent = 'Aucun film dans l URL. Ajoutez ?film=ID';
+
+    return;
+
+  }
+
+  try{
+
+    var r = await fetch('/api/film/' + encodeURIComponent(filmId));
+
+    var d = await r.json();
+
+    if (!d.ok){
+
+      document.getElementById('no-frame').textContent = 'Film introuvable : ' + (d.erreur || '?');
+
+      return;
+
+    }
+
+    frames = d.frames || [];
+
+    beats = d.beats || [];
+
+    basePath = d.base_path || '';
+
+    titre = d.titre || ('Film ' + filmId);
+
+
+
+    if (frames.length === 0){
+
+      document.getElementById('no-frame').textContent = 'Film vide (aucune frame)';
+
+      return;
+
+    }
+
+
+
+    document.getElementById('title').textContent = titre;
+
+    document.getElementById('subtitle').textContent = 'Genre : ' + (d.genre || '?') + ' - ' + frames.length + ' frames - Score Netflix : ' + (d.netflix_score || '?');
+
+
+
+    var meta = document.getElementById('meta');
+
+    meta.innerHTML = '<b>Synopsis :</b> ' + (d.synopsis || '-') + '<br>' +
+
+      '<b>Duree :</b> ' + (d.duree || '?') + ' - ' +
+
+      '<b>Prix suggere :</b> ' + (d.prix || '?') + ' EUR - ' +
+
+      '<b>Studio :</b> NEXUS FILM STUDIO';
+
+
+
+    fps = d.fps || 2;
+
+    document.getElementById('fps-slider').value = fps;
+
+    document.getElementById('fps-display').textContent = fps;
+
+
+
+    afficher();
+
+    playPause();
+
+  } catch(e){
+
+    document.getElementById('no-frame').textContent = 'Erreur : ' + e.message;
+
+  }
+
+}
+
+
+
+document.addEventListener('keydown', function(e){
+
+  if (e.key === ' ' || e.key === 'Spacebar'){ e.preventDefault(); playPause(); }
+
+  else if (e.key === 'ArrowRight'){ suiv(); }
+
+  else if (e.key === 'ArrowLeft'){ prec(); }
+
+});
+
+
+
+chargerFilm();
+
+</script>
+
+</body>
+
+</html>
+
+"""
+
+
+
+
+
+def lister_films():
+
+    films = []
+
+    try:
+
+        if os.path.isdir(DIR_CATALOGUE):
+
+            for f in sorted(os.listdir(DIR_CATALOGUE), reverse=True)[:200]:
+
+                if f.endswith(".json"):
+
+                    try:
+
+                        with open(os.path.join(DIR_CATALOGUE, f), "r", encoding="utf-8") as fp:
+
+                            films.append(json.load(fp))
+
+                    except Exception:
+
+                        continue
+
+    except Exception:
+
+        pass
+
+    return films
+
+
+
+
+
+def charger_film_pour_viewer(film_id):
+
+    if not film_id or "/" in film_id or ".." in film_id:
+
+        return {"ok": False, "erreur": "film_id invalide"}
+
+
+
+    chemin_catalogue = os.path.join(DIR_CATALOGUE, "film_" + film_id + ".json")
+
+    if not os.path.isfile(chemin_catalogue):
+
+        return {"ok": False, "erreur": "catalogue introuvable"}
+
+
+
+    try:
+
+        with open(chemin_catalogue, "r", encoding="utf-8") as f:
+
+            fiche = json.load(f)
+
+    except Exception as e:
+
+        return {"ok": False, "erreur": str(e)[:100]}
+
+
+
+    frames_dir = os.path.join(DIR_FRAMES, film_id)
+
+    frames = []
+
+    if os.path.isdir(frames_dir):
+
+        try:
+
+            frames = sorted([f for f in os.listdir(frames_dir) if f.endswith((".png", ".jpg"))])
+
+        except Exception:
+
+            frames = []
+
+
+
+    beats = fiche.get("beats", [])
+
+    while len(beats) < len(frames):
+
+        beats.append("")
+
+
+
+    return {
+
+        "ok": True,
+
+        "film_id": film_id,
+
+        "titre": fiche.get("titre", "?"),
+
+        "genre": fiche.get("genre", "?"),
+
+        "synopsis": fiche.get("synopsis", ""),
+
+        "duree": fiche.get("duree_formatee", "?"),
+
+        "prix": fiche.get("prix_vente_suggere", 0),
+
+        "netflix_score": fiche.get("netflix_score", {}).get("score", 0),
+
+        "fps": 2,
+
+        "frames": frames,
+
+        "beats": beats[:len(frames)],
+
+        "base_path": "/file?path=" + urllib.parse.quote(frames_dir) + "/",
+
+    }
+
+
+
+
+
+class Handler(BaseHTTPRequestHandler):
+
+    def log_message(self, *a):
+
+        pass
+
+
+
+    def _send(self, code, content, ctype="application/json"):
+
+        try:
+
+            self.send_response(code)
+
+            self.send_header("Content-Type", ctype + "; charset=utf-8")
+
+            self.send_header("Access-Control-Allow-Origin", "*")
+
+            self.send_header("Cache-Control", "no-cache")
+
+            self.send_header("Content-Length", str(len(content)))
+
+            self.end_headers()
+
+            self.wfile.write(content)
+
+        except (BrokenPipeError, ConnectionResetError):
+
+            pass
+
+
+
+    def _body(self):
+
+        try:
+
+            n = int(self.headers.get("Content-Length", "0"))
+
+        except ValueError:
+
+            n = 0
+
+        if n <= 0 or n > 5000000:
+
+            return {}
+
+        try:
+
+            return json.loads(self.rfile.read(n).decode("utf-8", "ignore"))
+
+        except Exception:
+
+            return {}
+
+
+
+    def do_GET(self):
+
+        parsed = urllib.parse.urlparse(self.path)
+
+        p = parsed.path
+
+        q = urllib.parse.parse_qs(parsed.query)
+
+
+
+        if p in ("/", "/index.html"):
+
+            html = HTML_PAGE.replace("__V__", VERSION)
+
+            return self._send(200, html.encode("utf-8"), "text/html")
+
+
+
+        if p == "/viewer":
+
+            html = VIEWER_PAGE.replace("__V__", VERSION)
+
+            return self._send(200, html.encode("utf-8"), "text/html")
+
+
+
+        if p == "/api/etat":
+
+            with ETAT_LOCK:
+
+                d = dict(ETAT)
+
+            return self._send(200, json.dumps(d, ensure_ascii=False, default=str).encode())
+
+
+
+        if p == "/api/galerie":
+
+            return self._send(200, json.dumps({"films": lister_films(), "outils": OUTILS}, ensure_ascii=False, default=str).encode())
+
+
+
+        if p == "/api/hardware":
+
+            return self._send(200, json.dumps({"outils": OUTILS, "apis": [n for n, _ in APIS], "genres": list(GENRES.keys())}, ensure_ascii=False).encode())
+
+
+
+        if p.startswith("/api/film/"):
+
+            film_id = urllib.parse.unquote(p[len("/api/film/"):])
+
+            return self._send(200, json.dumps(charger_film_pour_viewer(film_id), ensure_ascii=False, default=str).encode())
+
+
+
+        if p == "/file":
+
+            chemin = q.get("path", [""])[0]
+
+            if not chemin:
+
+                return self._send(400, b'{"erreur":"path"}')
+
+            chemin_abs = os.path.abspath(chemin)
+
+            base_abs = os.path.abspath(OUT)
+
+            if not chemin_abs.startswith(base_abs):
+
+                return self._send(403, b'{"erreur":"hors dossier"}')
+
+            if os.path.isdir(chemin_abs):
+
+                return self._send(404, b'{"erreur":"est un dossier"}')
+
+            if not os.path.isfile(chemin_abs):
+
+                return self._send(404, b'{"erreur":"introuvable"}')
+
+            try:
+
+                with open(chemin_abs, "rb") as f:
+
+                    data = f.read()
+
+            except Exception as e:
+
+                return self._send(500, str(e).encode())
+
+            ext = os.path.splitext(chemin_abs)[1].lower()
+
+            ctype = {
+
+                ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+
+                ".html": "text/html", ".json": "application/json",
+
+                ".gz": "application/gzip", ".bz2": "application/x-bzip2",
+
+                ".xz": "application/x-xz",
+
+            }.get(ext, "application/octet-stream")
+
+            return self._send(200, data, ctype)
+
+
+
+        return self._send(404, b'{"erreur":"not found"}')
+
+
+
+    def do_POST(self):
+
+        p = urllib.parse.urlparse(self.path).path
+
+        body = self._body()
+
+
+
+        if p == "/api/generer":
+
+            with ETAT_LOCK:
+
+                if ETAT["en_cours"]:
+
+                    return self._send(409, json.dumps({"ok": False, "erreur": "en cours"}, ensure_ascii=False).encode())
+
+            scenario = str(body.get("scenario", ""))[:500]
+
+            genre = str(body.get("genre", "sci_fi"))
+
+            if genre not in GENRES:
+
+                genre = "sci_fi"
+
+            try:
+
+                scenes = int(body.get("scenes", 15))
+
+            except Exception:
+
+                scenes = 15
+
+            if scenes < 10: scenes = 10
+
+            if scenes > 60: scenes = 60
+
+            try:
+
+                fps = int(body.get("fps", 2))
+
+            except Exception:
+
+                fps = 2
+
+            if fps < 1: fps = 1
+
+            if fps > 6: fps = 6
+
+
+
+            def run():
+
+                try:
+
+                    generer_film(scenario, genre, scenes, fps)
+
+                except Exception as e:
+
+                    log("CRASH : " + str(e)[:200])
+
+                    log(traceback.format_exc()[:800])
+
+                    with ETAT_LOCK:
+
+                        ETAT["en_cours"] = False
+
+                        ETAT["statut"] = "crash"
+
+
+
+            threading.Thread(target=run, daemon=True).start()
+
+            return self._send(202, json.dumps({"ok": True}, ensure_ascii=False).encode())
+
+
+
+        if p == "/api/reset":
+
+            with ETAT_LOCK:
+
+                ETAT["en_cours"] = False
+
+                ETAT["progression"] = 0
+
+                ETAT["statut"] = "idle"
+
+                ETAT["log"] = []
+
+            return self._send(200, b'{"ok":true}')
+
+
+
+        return self._send(404, b'{"erreur":"not found"}')
+
+
+
+
+
+class Server(ThreadingMixIn, HTTPServer):
+
+    daemon_threads = True
+
+    allow_reuse_address = True
+
+
+
+
+
+def ip_locale():
+
+    try:
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        s.connect(("8.8.8.8", 80))
+
+        ip = s.getsockname()[0]
+
+        s.close()
+
+        return ip
+
+    except Exception:
+
+        return "localhost"
+
+
+
+
+
+def main():
+
+    print("=" * 60)
+
+    print("NEXUS FILM STUDIO v" + VERSION)
+
+    print("Auteur : " + AUTEUR)
+
+    print("Licence : " + LICENCE)
+
+    print("=" * 60)
+
+    print("")
+
+    print("[Environnement]")
+
+    print("  a-Shell iOS : " + ("OUI" if OUTILS["a_shell"] else "non"))
+
+    print("  Python : " + sys.version.split()[0])
+
+    print("")
+
+    print("[Outils]")
+
+    print("  ffmpeg : " + ("OK" if OUTILS["ffmpeg"] else "absent (mode HTML)"))
+
+    print("  Pillow : " + ("OK" if OUTILS["py_PIL"] else "absent (non requis)"))
+
+    print("")
+
+    print("[APIs]")
+
+    for nom, _ in APIS:
+
+        print("  - " + nom)
+
+    print("")
+
+    print("[Genres]")
+
+    for g in sorted(GENRES.keys()):
+
+        print("  - " + g)
+
+    print("")
+
+    ip = ip_locale()
+
+    print("[Pages]")
+
+    print("  Studio  : http://localhost:" + str(PORT) + "/")
+
+    print("  Viewer  : http://localhost:" + str(PORT) + "/viewer?film=ID")
+
+    print("  Reseau  : http://" + ip + ":" + str(PORT) + "/")
+
+    print("")
+
+    print("[Dossier] " + OUT)
+
+    print("")
+
+    print("Ctrl+C pour arreter")
+
+    print("")
+
+    try:
+
+        with Server(("0.0.0.0", PORT), Handler) as httpd:
+
+            httpd.serve_forever()
+
+    except KeyboardInterrupt:
+
+        print("\nArrete.")
+
+
+
+
+
+if __name__ == "__main__":
+
+    main()
