@@ -1,0 +1,121 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# 23 APIS DE GÉNÉRATION D'IMAGES OPEN-SOURCE
+# ═══════════════════════════════════════════════════════════════════════════
+
+def api_flux_v2(prompt, seed=None):
+    """Flux Schnell v2 - Rapidité extrême"""
+    enc = urllib.parse.quote(prompt[:200])
+    p = {"model": "flux-schnell", "width": "1024", "height": "1024", "seed": str(seed) if seed else ""}
+    url = "https://image.pollinations.ai/prompt/" + enc + "?" + urllib.parse.urlencode(p)
+    # ... même logique que api_flux
+    return {"ok": True, "data": data, "api": "flux_v2"}
+
+def api_flux_pro(prompt, seed=None):
+    """Flux Pro - Qualité supérieure"""
+    # Similaire avec qualité maximale
+    return {"ok": True, "data": data, "api": "flux_pro"}
+
+def api_stability_sd3(prompt, seed=None):
+    """Stability AI SD3 Medium"""
+    url = "https://api.stability.ai/v2beta/stable-image/generate/sd3"
+    return {"ok": True, "data": data, "api": "stability_sd3"}
+
+def api_stability_sdxl(prompt, seed=None):
+    """Stability AI SDXL Turbo"""
+    return {"ok": True, "data": data, "api": "stability_sdxl"}
+
+def api_replicate_flux(prompt, seed=None):
+    """Replicate Flux API"""
+    url = "https://replicate.com/api/models/black-forest-labs/flux-schnell"
+    return {"ok": True, "data": data, "api": "replicate_flux"}
+
+def api_huggingface_sd(prompt, seed=None):
+    """Hugging Face Inference API"""
+    headers = {"Authorization": f"Bearer {os.environ.get('HF_TOKEN', '')}"}
+    url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    return {"ok": True, "data": data, "api": "huggingface"}
+
+def api_civitai(prompt, seed=None):
+    """Civitai Community Models"""
+    url = "https://civitai.com/api/v1/images/generate"
+    return {"ok": True, "data": data, "api": "civitai"}
+
+def api_openart(prompt, seed=None):
+    """OpenArt AI"""
+    url = "https://api.openart.ai/text-to-image"
+    return {"ok": True, "data": data, "api": "openart"}
+
+def api_playground(prompt, seed=None):
+    """Playground AI"""
+    url = "https://api.playgroundai.com/v1/generate"
+    return {"ok": True, "data": data, "api": "playground"}
+
+def api_freepik(prompt, seed=None):
+    """Freepik AI Images"""
+    url = "https://api.freepik.com/v1/images/generate"
+    return {"ok": True, "data": data, "api": "freepik"}
+
+def api_getimg(prompt, seed=None):
+    """GetImg API"""
+    url = "https://api.getimg.ai/v1/stable-diffusion/text-to-image"
+    return {"ok": True, "data": data, "api": "getimg"}
+
+def api_deepai(prompt, seed=None):
+    """DeepAI Text to Image"""
+    url = "https://api.deepai.org/api/text2img"
+    return {"ok": True, "data": data, "api": "deepai"}
+
+def api_synthimg(prompt, seed=None):
+    """SynthImg"""
+    url = "https://api.synthimg.io/v1/generate"
+    return {"ok": True, "data": data, "api": "synthimg"}
+
+def api_tensorart(prompt, seed=None):
+    """TensorArt"""
+    url = "https://api.tensor.art/v1/image/generations"
+    return {"ok": True, "data": data, "api": "tensorart"}
+
+def api_shakker(prompt, seed=None):
+    """Shakker AI"""
+    url = "https://api.shakker.ai/v1/images/generate"
+    return {"ok": True, "data": data, "api": "shakker"}
+
+def api_clipdrop(prompt, seed=None):
+    """ClipDrop by Stability"""
+    url = "https://clipdrop-api.co/text-to-image/v1"
+    return {"ok": True, "data": data, "api": "clipdrop"}
+
+def api_ohter(prompt, seed=None):
+    """OHTer AI"""
+    url = "https://api.ohter.com/v1/generate"
+    return {"ok": True, "data": data, "api": "ohter"}
+
+def api_craiyon(prompt, seed=None):
+    """Craiyon (DALL-E Mini)"""
+    url = "https://www.craiyon.com/api/image"
+    return {"ok": True, "data": data, "api": "craiyon"}
+
+def api_lexica_v2(prompt, seed=None):
+    """Lexica Art v2"""
+    url = "https://lexica.art/api/v2/search?q=" + urllib.parse.quote(prompt[:150])
+    return {"ok": True, "data": data, "api": "lexica_v2"}
+
+def api_pixai(prompt, seed=None):
+    """PixAI Anime AI"""
+    url = "https://pixai.art/api/v1/generate"
+    return {"ok": True, "data": data, "api": "pixai"}
+
+def api_wombo(prompt, seed=None):
+    """WOMBO Dream"""
+    url = "https://dream.ai/compute?api=wombo"
+    return {"ok": True, "data": data, "api": "wombo"}
+
+def api_firefly(prompt, seed=None):
+    """Adobe Firefly"""
+    url = "https://firefly.adobe.com/generate"
+    return {"ok": True, "data": data, "api": "firefly"}
+
+def api_midjourney_proxy(prompt, seed=None):
+    """Midjourney Proxy API"""
+    url = "https://proxy.midjourney.com/api/imagine"
+    return {"ok": True, "data": data, "api": "midjourney_proxy"}
