@@ -550,6 +550,26 @@ describe('SoundCloudAdapter', () => {
       expect(widget.commands()).toEqual([{ method: 'play' }, { method: 'pause' }, { method: 'seekTo', value: 60_000 }]);
     });
 
+    it('stores a time set without a source, or after one failed to load, without seeking', async () => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+      const events = recordEvents(media, ['seeking', 'seeked', 'timeupdate']);
+
+      media.attach(widget.iframe);
+      media.currentTime = 30;
+
+      expect(media.seeking).toBe(false);
+      expect(media.currentTime).toBe(30);
+
+      media.src = 'https://soundcloud.com/forss';
+      await flush();
+      media.currentTime = 45;
+
+      expect(media.seeking).toBe(false);
+      expect(media.currentTime).toBe(45);
+      expect(events).toEqual([]);
+    });
+
     it('holds a play asked for before the widget is ready', async () => {
       const media = new SoundCloudAdapter();
       const widget = new FakeWidget();
