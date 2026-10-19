@@ -2,7 +2,7 @@
 
 import type { Locale } from '@videojs/core/i18n';
 import { nearestLang, resolveLangAttr, subscribeAmbientLang } from '@videojs/utils/dom';
-import { useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 function ambientLangServerSnapshot(): string | undefined {
   return undefined;

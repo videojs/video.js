@@ -4,7 +4,8 @@ import type { SliderInput, SliderState, StateAttrMap } from '@videojs/core';
 import type { SliderThumbProps } from '@videojs/core/dom';
 import type { State } from '@videojs/store';
 import type { ProviderProps, RefCallback } from 'react';
-import { createContext, useContext, useSyncExternalStore } from 'react';
+import { createContext, useContext } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export interface SliderContextValue {
   state: SliderState;

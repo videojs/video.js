@@ -8,7 +8,8 @@ import {
 } from '@videojs/core';
 import { shouldAnnounceStatusChange, subscribeToStatusAnnouncer } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
-import { forwardRef, useEffect, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { useLocale, useTranslator } from '../../i18n/context';
 import { useContainer, usePlayer } from '../../player/context';

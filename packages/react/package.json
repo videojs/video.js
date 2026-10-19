@@ -174,11 +174,13 @@
     "@videojs/spf": "workspace:*",
     "@videojs/store": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "react-compiler-runtime": "^1.0.0"
+    "react-compiler-runtime": "^1.0.0",
+    "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
+    "@types/use-sync-external-store": "^1.7.0",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
@@ -217,8 +219,8 @@
     "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
     "@videojs/youtube-video": "workspace:*",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.14.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "@videojs/cloudflare-video": {

@@ -2,7 +2,8 @@
 
 import { getRenderedIndicatorState, type IndicatorLifecycleState, isIndicatorPresent } from '@videojs/core';
 import { createTransition } from '@videojs/core/dom';
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { useDestroy } from '../../utils/use-destroy';
 

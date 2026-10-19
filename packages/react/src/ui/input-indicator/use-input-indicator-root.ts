@@ -2,7 +2,8 @@
 
 import type { IndicatorLifecycleState, InputActionEvent, MediaSnapshot } from '@videojs/core';
 import type { State as StoreState } from '@videojs/store';
-import { useState, useSyncExternalStore } from 'react';
+import { useState } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { useDestroy } from '../../utils/use-destroy';
 import { useIndicatorVisibility } from './use-indicator-visibility';

@@ -8,7 +8,8 @@ import {
 } from '@videojs/core';
 import { logMissingFeature, selectPlayback } from '@videojs/core/dom';
 import type { ForwardedRef } from 'react';
-import { forwardRef, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useState } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { usePlayer } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
