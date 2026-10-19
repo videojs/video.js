@@ -16,7 +16,7 @@
   "packages/adapters/mux-video": "10.1.0",
   "packages/adapters/native-hls-video": "10.1.0",
   "packages/react": "10.1.0",
-  "packages/react-native": "10.0.0-beta.24",
+  "packages/react-native": "10.0.0-rc.2",
   "packages/adapters/shaka-video": "10.1.0",
   "packages/skins": "10.1.0",
   "packages/spf": "10.1.0",
