@@ -130,7 +130,7 @@ Engine options win over the parameters of a widget embed URL, which win over the
 - `buffered` is the stretch the widget reports as loaded, from where playback last started or landed.
 - The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
 - `controls`, `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
-- A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize. A widget that has not finished loading after 5 seconds reports a `MEDIA_ERR_NETWORK` error.
+- A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize. A widget that has not finished loading after 5 seconds reports a `MEDIA_ERR_NETWORK` error. An error the widget reports during playback fires a non-fatal `error` event but leaves `error` empty, because a set moves on to its next track by itself.
 
 ## Examples
 
