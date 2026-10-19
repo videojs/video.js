@@ -7,10 +7,16 @@ compose-engine stack tip (`docs/spf-behavior-jsdoc`, #9396). The original standa
 ## Shape on the stack (2026-10-19)
 
 The transmux is one feature, `mpegTsTransmuxFeature` (`engines/hls/features/mpeg-ts-transmux.ts`, entry
-`@videojs/spf/hls/features/mpeg-ts-transmux`): no behaviors, five `defaultConfig` overrides
+`@videojs/spf/features/mpeg-ts-transmux`): no behaviors, five `defaultConfig` overrides
 (`videoMessagePipelines`, `audioMessagePipelines`, `canPlayTrack`, `reportUnsupportedTrackConditions`,
 `sourceBufferMimeCodec`), composed after `shiftTimestampsFeature` and `drmFeature` (last-wins). Not in
-any shipped engine's feature list — opt-in. The standalone `createHlsMpegTs*Engine` factories are gone.
+any shipped HLS engine's feature list. **Composed by the Mux SPF Medias only** (`MuxVideoAdapter` /
+`MuxAudioAdapter` lay `withMpegTsTransmux` under the consumer's engine config — a behavior-less feature
+is only config, so the Media composes it without rebuilding the engine). Decided 2026-10-19: the
+transmuxer covers what Mux packages, not general MPEG-TS (no MP3/AC-3/E-AC-3/HEVC, no SAMPLE-AES, AUD-
+dependent AU grouping, no PTS rollover / discontinuity / segment-spanning PES, none of hls.js's timing
+repair, Chromium only), so `<hls-video>` keeps its unsupported-format verdict and the e2e
+`spf-unsupported-source.spec.ts` stays valid. The standalone `createHlsMpegTs*Engine` factories are gone.
 Shared-code seams: `relocationStepsFor(type)` and `sourceBufferMimeCodec` on `setupBufferActors`.
 
 | composition (`flattenFeatures([...features, mpegTsTransmuxFeature])`) | gz | delta |
