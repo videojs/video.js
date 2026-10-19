@@ -23,7 +23,6 @@ export interface DefaultVideoControlsProps {
 export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsProps = {}) {
   return (
     <$.Controls.Root>
-      <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.BufferingIndicator className={controlsStyles.centerBuffering}>
         <$.Controls.Group className={controlsStyles.center}>
           <SeekButton className={[controlsStyles.centerButton, controlsStyles.centerSeek]} seconds={-10} />
@@ -34,6 +33,7 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
           <SeekButton className={[controlsStyles.centerButton, controlsStyles.centerSeek]} seconds={10} />
         </$.Controls.Group>
       </$.BufferingIndicator>
+      <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content]}>
         <$.Tooltip.Provider>
           <$.Controls.Group className={controlsStyles.primary}>

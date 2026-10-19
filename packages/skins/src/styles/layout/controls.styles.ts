@@ -117,23 +117,24 @@ export default styles({
       variants: {
         default: [
           'pointer-events-auto group-not-data-visible/center:pointer-events-none',
-          'rounded-media-pill bg-media-backdrop/35 text-media-controls-foreground backdrop-filter-media-indicator',
-          'media-high-contrast:bg-media-background',
+          // Overrides the base button surface, as the compat skin's centre buttons do.
+          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
+          'media-high-contrast:bg-media-background!',
         ],
       },
     },
     centerPlay: {
       utilities: [],
       // Matches the playback status indicator this button replaces.
-      variants: { default: 'size-auto p-4' },
+      variants: { default: 'size-auto! p-4!' },
     },
     centerPlayIcon: {
       utilities: [],
-      variants: { default: 'size-media-icon-lg' },
+      variants: { default: 'size-media-icon-lg!' },
     },
     centerSeek: {
       utilities: [],
-      variants: { default: 'media-max-280:hidden' },
+      variants: { default: 'media-max-280:hidden!' },
     },
   },
 });
