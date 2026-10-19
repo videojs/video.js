@@ -10,10 +10,9 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 // `html-mux-video`. Same element behavior — derived poster, storyboard track,
 // `poster-time` — over the SPF engine.
 //
-// What differs is what it can play. SPF appends fMP4/CMAF only, so an MPEG-TS
-// playback ID is expected to surface the unsupported-source error, with console
-// copy pointing at the hls.js-backed import. Those sources are left in the
-// picker deliberately: failing well is part of what this page demos. DRM does
+// What differs is what it can play. This flavor composes `mpegTsTransmuxFeature`,
+// so a plus- or basic-tier playback ID (MPEG-TS) plays by transmuxing to fMP4 on
+// the client; the plain `<hls-video>` has no transmuxer and refuses it. DRM does
 // play here — `source.drm` licenses it — except for the deliberately unlicensed
 // asset, which is in the picker to be refused.
 //
