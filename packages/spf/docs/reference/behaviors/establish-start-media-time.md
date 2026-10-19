@@ -43,8 +43,8 @@ The setup declares `config` as required.
 | --- | --- | --- | --- | --- | --- |
 | `mediaContainerData` | writes | yes | `Record<string, MediaContainerData> \| undefined` | `EstablishStartMediaTimeState` | Transient origin-establishment data, keyed by **track type** (`'video'` / `'audio'`) — per spec one init+media pair per type suffices, and ABR rungs of a type share the origin. Filled by the discover steps across appends, reset per source. Never the model — the churn stays here; only the settled `startMediaTime` reaches `Track`. |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `EstablishStartMediaTimeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | No description. |
-| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | No description. |
+| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](track-switching.md#switchaudiotrack)) |
+| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Other exports
 

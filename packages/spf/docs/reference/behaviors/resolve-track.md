@@ -28,7 +28,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
+| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](track-switching.md#switchaudiotrack)) |
 
 ## resolveTextTrack
 
@@ -54,7 +54,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedTextTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
+| `selectedTextTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. (doc of [switchTextTrack](track-switching.md#switchtexttrack)) |
 
 ## resolveVideoTrack
 
@@ -81,7 +81,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Other exports
 

@@ -37,15 +37,15 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | No description. |
+| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `audioBufferActor` | writes | yes | `SourceBufferActor \| undefined` | — | No description. |
-| `audioSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | — | No description. |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | No description. |
+| `audioBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. |
+| `audioSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## setupVideoBufferActors
 
@@ -112,17 +112,17 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | No description. |
+| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors` wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional slot; absent, it ranks on `initialBandwidth`. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | No description. |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](../track-switching.md#switchvideotrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | No description. |
-| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | — | No description. |
-| `videoSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | — | No description. |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. |
+| `videoSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
 
 ## Other exports
 

@@ -30,7 +30,7 @@ resolution cap reads the size and does nothing without it.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

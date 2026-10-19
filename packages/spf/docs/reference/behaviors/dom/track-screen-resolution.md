@@ -31,7 +31,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `screenResolution` | writes | yes | `Resolution \| undefined` | `ScreenResolutionState` | No description. |
+| `screenResolution` | writes | yes | `Resolution \| undefined` | `ScreenResolutionState` | The screen's pixel dimensions, written by `trackScreenResolution` at setup and on change (device pixels when `useDevicePixelRatio`); `undefined` where there is no screen to read, which the `screenResolutionCap` rule treats as no cap. |
 
 ## Other exports
 

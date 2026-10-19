@@ -50,35 +50,57 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
  */
 export interface TrackSwitchingState {
   presentation?: MaybeResolvedPresentation;
+  /**
+   * The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked
+   * whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the
+   * constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it.
+   */
   selectedVideoTrackId?: string;
+  /**
+   * The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`.
+   * `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it.
+   */
   selectedAudioTrackId?: string;
+  /**
+   * The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as
+   * `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it.
+   */
   selectedTextTrackId?: string;
 }
 
-interface UserTrackSelections {
-  video: Partial<VideoTrack>;
+type UserTrackSelectionType = 'video' | 'audio' | 'text';
+
+/** The slots behind {@link UserTrackSelectionState}, one per track type, each documented on its own key. */
+interface UserTrackSelectionSlots {
+  /**
+   * Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a
+   * partial track the `filterByUserSelection` rule matches candidates against; an empty match falls through to the
+   * unfiltered set.
+   */
+  userVideoTrackSelection?: Partial<VideoTrack>;
   /**
    * Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track
    * shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path.
    */
-  audio: Partial<AudioTrack>;
+  userAudioTrackSelection?: Partial<AudioTrack>;
   /**
    * Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A
    * language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the
    * configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via
    * `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference).
    */
-  text: Partial<TextTrack> | 'off';
+  userTextTrackSelection?: Partial<TextTrack> | 'off';
 }
 
 /**
  * The user track selections a consumer writes and the track-switching rules read, per track type (all three by
- * default). No behavior declares them, so a composition declares them as external signals with
- * `defineExternalSignals`.
+ * default). No behavior declares them, so a composition declares them as external signals with `defineExternalSignals`.
+ * A `Pick` rather than a key-remapping mapped type so each key keeps its JSDoc.
  */
-export type UserTrackSelectionState<T extends keyof UserTrackSelections = keyof UserTrackSelections> = {
-  [K in T as `user${Capitalize<K>}TrackSelection`]?: UserTrackSelections[K];
-};
+export type UserTrackSelectionState<T extends UserTrackSelectionType = UserTrackSelectionType> = Pick<
+  UserTrackSelectionSlots,
+  `user${Capitalize<T>}TrackSelection`
+>;
 
 /**
  * Config both `switchVideoTrack` and `switchAudioTrack` read — the cross-cutting fields one engine config serves to
@@ -125,6 +147,7 @@ export interface SwitchVideoTrackConfig extends TrackSwitchingSharedConfig {
    * variant.
    */
   videoConstraints?: readonly SwitchVideoTrackRule[];
+  /** The rule chain of the pair documented on `videoConstraints`. */
   videoRules?: readonly SwitchVideoTrackRule[];
   /**
    * Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis
@@ -151,6 +174,7 @@ export interface SwitchVideoTrackConfig extends TrackSwitchingSharedConfig {
 export interface SwitchAudioTrackConfig extends TrackSwitchingSharedConfig {
   /** `switchAudioTrack`'s chains, replacing {@link DEFAULT_AUDIO_CONSTRAINTS} / {@link DEFAULT_AUDIO_RULES}. */
   audioConstraints?: readonly SwitchAudioTrackRule[];
+  /** The rule chain of the pair documented on `audioConstraints`. */
   audioRules?: readonly SwitchAudioTrackRule[];
 }
 
@@ -1020,6 +1044,7 @@ export interface SwitchTextTrackConfig extends TextSelectionConfig {
   getCdnId?: GetCdnId;
   /** `switchTextTrack`'s chains, replacing {@link DEFAULT_TEXT_CONSTRAINTS} / {@link DEFAULT_TEXT_RULES}. */
   textConstraints?: readonly SwitchTextTrackRule[];
+  /** The rule chain of the pair documented on `textConstraints`. */
   textRules?: readonly SwitchTextTrackRule[];
 }
 

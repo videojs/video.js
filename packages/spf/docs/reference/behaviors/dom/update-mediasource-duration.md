@@ -60,4 +60,4 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | inline | No description. |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | inline | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |

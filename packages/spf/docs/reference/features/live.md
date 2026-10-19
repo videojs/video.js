@@ -44,8 +44,8 @@ Requires:
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge) | No description. |
-| `mediaSource` | `MediaSource \| undefined` | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaSource` | `MediaSource \| undefined` | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 
