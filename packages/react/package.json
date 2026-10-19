@@ -174,13 +174,11 @@
     "@videojs/spf": "workspace:*",
     "@videojs/store": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "react-compiler-runtime": "^1.0.0",
-    "use-sync-external-store": "^1.6.0"
+    "react-compiler-runtime": "^1.0.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
-    "@types/use-sync-external-store": "^1.7.0",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",

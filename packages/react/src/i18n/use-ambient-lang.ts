@@ -1,8 +1,8 @@
 'use client';
 
 import type { Locale } from '@videojs/core/i18n';
+import { useSyncExternalStore } from '@videojs/store/react';
 import { nearestLang, resolveLangAttr, subscribeAmbientLang } from '@videojs/utils/dom';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 function ambientLangServerSnapshot(): string | undefined {
   return undefined;

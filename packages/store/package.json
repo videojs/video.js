@@ -52,13 +52,11 @@
   },
   "dependencies": {
     "@videojs/utils": "workspace:*",
-    "react-compiler-runtime": "^1.0.0",
-    "use-sync-external-store": "^1.6.0"
+    "react-compiler-runtime": "^1.0.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
-    "@types/use-sync-external-store": "^1.7.0",
     "@videojs/element": "workspace:*",
     "jsdom": "^26.1.0",
     "react": "^19.3.0",

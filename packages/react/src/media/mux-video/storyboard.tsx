@@ -2,8 +2,8 @@
 
 import { type MediaStreamType, MediaStreamTypes } from '@videojs/media';
 import type { MuxContentData } from '@videojs/mux-video';
+import { useSyncExternalStore } from '@videojs/store/react';
 import { useCallback } from 'react';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 /**
  * What the storyboard track needs from whichever Mux Media renders it.

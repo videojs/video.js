@@ -1,9 +1,9 @@
 'use client';
 
 import { useRef } from 'react';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 import { type Comparator, type Selector, shallowEqual } from '../../core/shallow-equal';
+import { useSyncExternalStore } from './use-sync-external-store';
 
 export type { Comparator, Selector };
 
