@@ -979,6 +979,82 @@ describe('SoundCloudAdapter', () => {
     });
   });
 
+  describe('content data', () => {
+    const SOUND = {
+      id: TRACK_ID,
+      title: 'Flickermood',
+      artwork_url: 'https://i1.sndcdn.com/artworks-000067273316-smsiqx-large.jpg',
+      user: { username: 'Forss', avatar_url: 'https://i1.sndcdn.com/avatars-000000000001-aaaaaa-large.jpg' },
+    };
+
+    it('reports the title and a large artwork of the sound once the widget is ready', async () => {
+      const media = new SoundCloudAdapter();
+      const events = recordEvents(media, ['contentdatachange']);
+
+      expect(media.contentData).toEqual({});
+
+      media.src = TRACK;
+
+      const widget = new FakeWidget();
+
+      media.attach(widget.iframe);
+      await flush();
+      widget.emit('ready');
+      widget.answer({ ...TRACK_ANSWERS, getCurrentSound: SOUND });
+      await flush();
+
+      expect(events).toEqual(['contentdatachange']);
+      expect(media.contentData).toEqual({
+        title: 'Flickermood',
+        poster: 'https://i1.sndcdn.com/artworks-000067273316-smsiqx-t500x500.jpg',
+      });
+    });
+
+    it('falls back to the avatar of the uploader and leaves out an empty title', async () => {
+      const { media } = await createReadyMedia(TRACK, {
+        ...TRACK_ANSWERS,
+        getCurrentSound: { ...SOUND, title: '', artwork_url: null },
+      });
+
+      expect(media.contentData).toEqual({
+        poster: 'https://i1.sndcdn.com/avatars-000000000001-aaaaaa-t500x500.jpg',
+      });
+    });
+
+    it('follows each track of a set', async () => {
+      const { media, widget } = await createReadyMedia(SET, {
+        getSounds: [{ id: 290 }, { id: 291 }],
+        getCurrentSound: { ...SOUND, id: 290, title: 'City Ports' },
+        getDuration: 142_236,
+        isPaused: true,
+      });
+      const events = recordEvents(media, ['contentdatachange']);
+
+      widget.emit('play', { soundId: 290, currentPosition: 0, loadedProgress: 0 });
+      widget.emit('play', { soundId: 291, currentPosition: 0, loadedProgress: 0 });
+      widget.answer({
+        isPaused: false,
+        getDuration: 274_442,
+        getCurrentSound: { ...SOUND, id: 291, title: 'Soulhack' },
+      });
+      await flush();
+
+      expect(events).toEqual(['contentdatachange']);
+      expect(media.contentData.title).toBe('Soulhack');
+    });
+
+    it('clears what it reported when the source changes', async () => {
+      const { media } = await createReadyMedia(TRACK, { ...TRACK_ANSWERS, getCurrentSound: SOUND });
+      const events = recordEvents(media, ['contentdatachange', 'emptied']);
+
+      media.src = OTHER_TRACK;
+      await flush();
+
+      expect(events).toEqual(['contentdatachange', 'emptied']);
+      expect(media.contentData).toEqual({});
+    });
+  });
+
   describe('buffered', () => {
     it('is empty until the widget reports what it loaded, while still telling the player it reports ranges', () => {
       const media = new SoundCloudAdapter();

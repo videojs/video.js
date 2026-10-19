@@ -1,7 +1,7 @@
 // Speaks the SoundCloud Widget protocol directly rather than loading `api.js`, shaped like the other iframe adapters
 // (mirrors `playerjs-video`).
 
-import { EMPTY_TEXT_TRACKS, MediaError, type TimeRangeLike, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, type MediaContentData, MediaError, type TimeRangeLike, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -37,6 +37,8 @@ import {
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
+ * @fires contentdatachange - Fired when the widget reports the title and artwork of a track, and when they are cleared.
+ *   Read `contentData` for them.
  */
 export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) implements Partial<Video> {
   static readonly defaultProps: SoundCloudAdapterProps = {
@@ -111,6 +113,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #muted = false;
   #readyState = READY_STATE_HAVE_NOTHING;
   #error: MediaError | null = null;
+  #contentData: MediaContentData = {};
 
   /** The widget's window, which commands are posted to. Null until rendered. */
   get engine(): Window | null {
@@ -381,6 +384,14 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#error;
   }
 
+  /**
+   * The `title` and `poster` of the track playing, which change with each track of a set. Empty until the widget
+   * reports them, and again across a source change. `contentdatachange` announces both.
+   */
+  get contentData(): MediaContentData {
+    return this.#contentData;
+  }
+
   /** Always empty: SoundCloud has no captions or other text tracks. */
   get textTracks() {
     return EMPTY_TEXT_TRACKS;
@@ -592,6 +603,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     });
     this.#get('getCurrentSound').then((sound) => {
       this.#soundId = soundIdOf(sound) ?? null;
+      this.#setContentData(sound);
     });
     this.#get('getDuration').then((duration) => this.#onLoaded(duration));
   }
@@ -811,6 +823,9 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#get('getDuration').then((duration) => {
       if (isNumber(duration) && duration > 0) this.#applyDuration(duration / 1000);
     });
+    this.#get('getCurrentSound').then((sound) => {
+      if (soundIdOf(sound) === this.#soundId) this.#setContentData(sound);
+    });
   }
 
   #end() {
@@ -907,6 +922,14 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return Number.isFinite(this.#duration) && this.#duration - (currentPosition ?? 0) / 1000 <= END_TOLERANCE;
   }
 
+  #setContentData(sound: unknown) {
+    const contentData = contentDataOf(sound);
+    if (deepEqual(contentData, this.#contentData)) return;
+
+    this.#contentData = contentData;
+    this.dispatchEvent(new Event('contentdatachange'));
+  }
+
   #fail(error: MediaError) {
     this.#error = error;
     this.dispatchEvent(new Event('error'));
@@ -976,6 +999,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#bufferedEnd = 0;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#error = null;
+    this.#setContentData(null);
   }
 }
 
@@ -992,6 +1016,28 @@ function soundIdOf(sound: unknown): number | undefined {
 
   return isNumber(id) ? id : isString(id) && /^\d+$/.test(id) ? Number(id) : undefined;
 }
+
+// An empty title or artwork is left out, so a player falls back to the one its author set.
+function contentDataOf(sound: unknown): MediaContentData {
+  if (!isObject(sound)) return {};
+
+  const { title, artwork_url: artwork, user } = sound as SoundCloudSound;
+  const image = isString(artwork) && artwork ? artwork : user?.avatar_url;
+
+  return {
+    ...(isString(title) && title && { title }),
+    // The widget reports a 100px image; SoundCloud serves the same one at 500px.
+    ...(isString(image) && image && { poster: image.replace(ARTWORK_SIZE, '-t500x500.') }),
+  };
+}
+
+interface SoundCloudSound {
+  title?: unknown;
+  artwork_url?: unknown;
+  user?: { avatar_url?: string };
+}
+
+const ARTWORK_SIZE = /-large\.(?=[a-z]+$)/;
 
 const SUBSCRIBED_EVENTS: readonly SoundCloudWidgetEvent[] = [
   'play',
