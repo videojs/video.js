@@ -108,6 +108,18 @@ describe('PlaybackRateButtonCore', () => {
     });
   });
 
+  describe('getCSSVars', () => {
+    it.each([
+      [1, '1'],
+      [1.5, '3'],
+      [1.75, '4'],
+    ])('publishes the length of rate %s as %s', (rate, length) => {
+      const core = new PlaybackRateButtonCore();
+
+      expect(core.getCSSVars(createState({ rate }))).toEqual({ '--media-playback-rate-length': length });
+    });
+  });
+
   describe('getLabelParams', () => {
     it('returns rate for default label', () => {
       const core = new PlaybackRateButtonCore();

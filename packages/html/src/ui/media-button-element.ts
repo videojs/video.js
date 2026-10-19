@@ -27,6 +27,8 @@ type MediaButtonCore<ComponentState extends ButtonState, MediaState> = MediaButt
   getLabelParams?: (state: ComponentState) => LabelParams | undefined;
   /** Shorter text for the tooltip than the accessible name, when the two differ. */
   getTooltipLabel?: (state: ComponentState) => Text | string;
+  /** CSS custom properties the button publishes for skins. */
+  getCSSVars?: (state: ComponentState) => Record<string, string>;
 };
 
 /**
@@ -167,6 +169,10 @@ export abstract class MediaButtonElement<
       ...(isHideable(state) && this.reflectsHidden() && { hidden: state.hidden ? '' : undefined }),
     });
     applyStateDataAttrs(this, state, this.stateAttrMap);
+
+    for (const [name, value] of Object.entries(this.core.getCSSVars?.(state) ?? {})) {
+      this.style.setProperty(name, value);
+    }
   }
 
   /**

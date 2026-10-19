@@ -26,6 +26,14 @@ describe('PlaybackRateButtonElement', () => {
     expect(trigger.getResolvedLabel()).toBe('Playback rate');
   });
 
+  it('publishes the rate length for skins', async () => {
+    const { trigger } = setup({ playbackRate: 1.75 });
+
+    await trigger.updateComplete;
+
+    expect(trigger.style.getPropertyValue('--media-playback-rate-length')).toBe('4');
+  });
+
   it('does not cycle when commandfor is set', async () => {
     const setPlaybackRate = vi.fn();
     const { trigger, store } = setup({ playbackRate: 1, setPlaybackRate });

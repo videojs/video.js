@@ -8,6 +8,7 @@ import { playbackRateText } from '../../i18n/text/menu';
 import { rateText } from '../../i18n/text/playback';
 import type { ButtonState } from '../types';
 import { resolveLabel } from '../utils/resolve-label';
+import { PlaybackRateButtonCSSVars } from './vars';
 
 export interface PlaybackRateButtonProps {
   /** Custom label for the button. */
@@ -71,6 +72,11 @@ export class PlaybackRateButtonCore {
     if (resolveLabel(this.#props.label, state) !== undefined) return undefined;
 
     return { rate: state.rate };
+  }
+
+  /** CSS custom properties for the button, so a skin can fit the rate label without measuring it. */
+  getCSSVars(state: PlaybackRateButtonState): Record<string, string> {
+    return { [PlaybackRateButtonCSSVars.length]: String(String(state.rate).length) };
   }
 
   getAttrs(state: PlaybackRateButtonState) {
