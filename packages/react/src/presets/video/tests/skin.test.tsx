@@ -33,6 +33,7 @@ describe('VideoSkin', () => {
     const snapshot: FCastSnapshot = {
       availability: 'available',
       connection: 'disconnected',
+      playbackState: 'idle',
       paused: true,
       currentTime: 0,
       duration: 0,

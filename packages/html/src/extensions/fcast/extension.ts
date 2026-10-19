@@ -24,8 +24,8 @@ export class FCastExtension extends PlayerExtensionElement<FCastExtensionBase> {
   static override properties = {
     src: { type: String },
     contentType: { type: String, attribute: 'content-type' },
-    // `sender` is an object and is assigned as a property only.
-  } satisfies PropertyDeclarationMap<Exclude<keyof FCastExtensionProps, 'sender'>>;
+    // Object inputs are assigned as properties only.
+  } satisfies PropertyDeclarationMap<Exclude<keyof FCastExtensionProps, 'sender' | 'metadata'>>;
 
   protected createExtension(): FCastExtensionBase {
     return new FCastExtensionBase();
@@ -38,6 +38,15 @@ export class FCastExtension extends PlayerExtensionElement<FCastExtensionBase> {
 
   set sender(value: FCastExtensionProps['sender']) {
     this.extension.sender = value;
+  }
+
+  /** Receiver title and thumbnail overrides. Defaults to the media's title and poster. */
+  get metadata(): FCastExtensionProps['metadata'] {
+    return this.extension.metadata;
+  }
+
+  set metadata(value: FCastExtensionProps['metadata']) {
+    this.extension.metadata = value;
   }
 
   /** Receiver URL. Falls back to the attached media's playable URL. */

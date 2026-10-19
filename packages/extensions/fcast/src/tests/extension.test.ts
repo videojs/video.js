@@ -7,6 +7,7 @@ class TestSender extends EventTarget implements FCastSender {
   snapshot: FCastSnapshot = {
     availability: 'available',
     connection: 'disconnected',
+    playbackState: 'idle',
     paused: true,
     currentTime: 0,
     duration: 120,
@@ -32,6 +33,11 @@ class TestSender extends EventTarget implements FCastSender {
 
   async load(request: FCastLoadRequest) {
     this.loads.push(request);
+    this.update({
+      playbackState: request.paused ? 'paused' : 'playing',
+      paused: request.paused,
+      mediaUrl: request.url,
+    });
   }
 
   update(patch: Partial<FCastSnapshot>) {
@@ -55,9 +61,187 @@ function setup() {
   return { sender, video, extension };
 }
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.useRealTimers();
+});
 
 describe('FCastExtension', () => {
+  it('completes player seeks from receiver progress and releases failed or interrupted seeks', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { sender, video, extension } = setup();
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+
+    coordinator.register(extension);
+    coordinator.attach({ media: video, container: null });
+    await extension.toggle();
+    await extension.load();
+    const store = createStore<PlayerTarget>()(timeFeature);
+    const detach = store.attach({ media: coordinator.getStoreMedia(video), container: null });
+
+    const seeking = store.seek(42);
+
+    expect(store.state.seeking).toBe(true);
+    sender.update({ currentTime: 1 });
+    expect(store.state.seeking).toBe(true);
+    sender.update({ currentTime: 42.2 });
+    await expect(seeking).resolves.toBe(42.2);
+    expect(store.state.seeking).toBe(false);
+
+    sender.seek.mockRejectedValueOnce(new Error('Seek failed'));
+    await store.seek(60);
+    expect(store.state.seeking).toBe(false);
+    expect(store.state.currentTime).toBe(42.2);
+
+    let rejectOld!: (error: Error) => void;
+
+    sender.seek.mockReturnValueOnce(
+      new Promise<void>((_resolve, reject) => {
+        rejectOld = reject;
+      })
+    );
+    const oldSeek = store.seek(20);
+    const newSeek = store.seek(60);
+
+    rejectOld(new Error('Superseded'));
+    await oldSeek;
+    expect(store.state.seeking).toBe(true);
+    sender.update({ currentTime: 60 });
+    await newSeek;
+    expect(store.state.seeking).toBe(false);
+
+    await store.seek(60);
+    expect(store.state.seeking).toBe(false);
+
+    const timeout = store.seek(80);
+
+    await vi.advanceTimersByTimeAsync(10_000);
+    await timeout;
+    expect(store.state.seeking).toBe(false);
+
+    const disconnected = store.seek(90);
+
+    await extension.toggle();
+    await disconnected;
+    expect(store.state.seeking).toBe(false);
+    detach();
+    extension.destroy();
+  });
+
+  it('keeps controls visible for FCast without replacing the native remote picker', async () => {
+    vi.useFakeTimers();
+    const { sender, video, extension } = setup();
+    const remote = Object.assign(new EventTarget(), { state: 'disconnected', prompt: vi.fn() });
+
+    Object.defineProperty(video, 'remote', { value: remote });
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+
+    coordinator.register(extension);
+    coordinator.attach({ media: video, container: null });
+    const media = coordinator.getStoreMedia(video);
+    const container = document.createElement('div');
+    const store = createStore<PlayerTarget>()(controlsFeature);
+    const detach = store.attach({ media, container });
+
+    await extension.toggle();
+    await extension.load();
+    sender.update({ playbackState: 'playing', paused: false });
+    container.dispatchEvent(new Event('mouseleave'));
+    vi.advanceTimersByTime(2000);
+    expect(store.state.controlsVisible).toBe(true);
+    expect(media.remote).toBe(remote);
+    detach();
+    extension.destroy();
+  });
+
+  it('adopts matching receiver media without restarting it and loads a different source', async () => {
+    const { sender, video, extension } = setup();
+
+    sender.update({
+      connection: 'connected',
+      mediaUrl: video.src,
+      playbackState: 'playing',
+      paused: false,
+      currentTime: 75,
+    });
+    await extension.load();
+    expect(sender.loads).toHaveLength(0);
+    expect(extension.mediaOverride?.currentTime).toBe(75);
+    expect(extension.mediaOverride?.readyState).toBe(3);
+
+    extension.src = 'https://example.com/other.mp4';
+    await extension.load();
+    expect(sender.loads).toHaveLength(1);
+    expect(sender.loads[0]?.url).toBe('https://example.com/other.mp4');
+    extension.destroy();
+  });
+
+  it('reports media readiness independently of connection and load command completion', async () => {
+    const { sender, video, extension } = setup();
+    const metadata = vi.fn();
+
+    video.addEventListener('loadedmetadata', metadata);
+    vi.spyOn(sender, 'load').mockResolvedValue(undefined);
+    await extension.toggle();
+    await extension.load();
+    expect(extension.mediaOverride?.readyState).toBe(0);
+    expect(metadata).not.toHaveBeenCalled();
+
+    sender.update({ playbackState: 'buffering', mediaUrl: video.src });
+    expect(extension.mediaOverride?.readyState).toBe(2);
+    expect(metadata).toHaveBeenCalledOnce();
+    sender.update({ playbackState: 'playing', paused: false });
+    expect(extension.mediaOverride?.readyState).toBe(3);
+    sender.update({ playbackState: 'ended' });
+    expect(extension.mediaOverride?.ended).toBe(true);
+    expect(extension.mediaOverride?.paused).toBe(true);
+    sender.update({ playbackState: 'idle' });
+    expect(extension.mediaOverride?.readyState).toBe(0);
+    extension.destroy();
+  });
+
+  it('forwards external captions and metadata and synchronizes receiver selection', async () => {
+    const { sender, video, extension } = setup();
+    const setSubtitle = vi.fn(async () => {});
+
+    Object.assign(sender, { setSubtitle });
+    const tracks = new EventTarget();
+
+    Object.defineProperty(video, 'textTracks', { value: tracks });
+    const track = document.createElement('track');
+    const textTrack = { mode: 'showing' };
+
+    track.kind = 'subtitles';
+    track.src = 'https://example.com/en.vtt';
+    track.label = 'English';
+    track.srclang = 'en';
+    Object.defineProperty(track, 'track', { value: textTrack });
+    video.append(track);
+    video.title = 'Example';
+    video.poster = 'https://example.com/poster.jpg';
+    await extension.toggle();
+    await extension.load();
+    expect(sender.loads[0]).toMatchObject({
+      metadata: { title: 'Example', thumbnailUrl: video.poster },
+      subtitles: [{ url: track.src, label: 'English', language: 'en', kind: 'subtitles' }],
+      selectedSubtitle: track.src,
+    });
+
+    textTrack.mode = 'disabled';
+    tracks.dispatchEvent(new Event('change'));
+    expect(setSubtitle).toHaveBeenLastCalledWith(null);
+    sender.update({ selectedSubtitle: track.src });
+    expect(textTrack.mode).toBe('showing');
+    tracks.dispatchEvent(new Event('change'));
+    expect(setSubtitle).toHaveBeenCalledOnce();
+    extension.detach();
+    textTrack.mode = 'disabled';
+    tracks.dispatchEvent(new Event('change'));
+    expect(setSubtitle).toHaveBeenCalledOnce();
+    extension.destroy();
+  });
+
   it('loads the attached media on a selected receiver and routes playback controls', async () => {
     const { sender, video, extension } = setup();
 
@@ -102,7 +286,7 @@ describe('FCastExtension', () => {
       contentType: 'application/x-mpegurl',
     });
 
-    sender.update({ currentTime: 37, paused: false, volume: 0.4 });
+    sender.update({ currentTime: 37, playbackState: 'playing', paused: false, volume: 0.4 });
     await extension.toggle();
 
     expect(extension.mediaOverride).toBeNull();
@@ -149,7 +333,7 @@ describe('FCastExtension', () => {
     await extension.toggle();
     await extension.load();
 
-    sender.update({ ended: true, paused: true });
+    sender.update({ playbackState: 'ended', ended: true, paused: true });
     await extension.mediaOverride?.play?.();
 
     expect(sender.loads).toHaveLength(2);
@@ -162,7 +346,7 @@ describe('FCastExtension', () => {
     const { sender, video, extension } = setup();
 
     await extension.toggle();
-    sender.update({ currentTime: 29, paused: false });
+    sender.update({ currentTime: 29, playbackState: 'playing', paused: false });
     extension.detach();
     extension.disconnect();
 
@@ -221,7 +405,7 @@ describe('FCastExtension', () => {
     video.currentTime = 45;
     await extension.toggle();
     await extension.load();
-    sender.update({ ended: true, currentTime: 120, volume: 0.4, speed: 2 });
+    sender.update({ playbackState: 'ended', ended: true, currentTime: 120, volume: 0.4, speed: 2 });
     await extension.mediaOverride!.play!();
     expect(sender.loads.at(-1)).toMatchObject({ time: 0, paused: false, volume: 0.4, speed: 2 });
     extension.destroy();
@@ -274,13 +458,13 @@ describe('FCastExtension', () => {
     video.addEventListener('playing', playing);
     await extension.toggle();
     await extension.load();
-    sender.update({ buffering: true });
-    sender.update({ buffering: false });
+    sender.update({ playbackState: 'buffering', buffering: true });
+    sender.update({ playbackState: sender.snapshot.paused ? 'paused' : 'playing', buffering: false });
     expect(playing).not.toHaveBeenCalled();
-    sender.update({ paused: false });
+    sender.update({ playbackState: 'playing', paused: false });
     expect(playing).toHaveBeenCalledOnce();
-    sender.update({ buffering: true });
-    sender.update({ buffering: false });
+    sender.update({ playbackState: 'buffering', buffering: true });
+    sender.update({ playbackState: sender.snapshot.paused ? 'paused' : 'playing', buffering: false });
     expect(playing).toHaveBeenCalledTimes(2);
     extension.destroy();
   });
@@ -302,3 +486,5 @@ describe('FCastExtension', () => {
     extension.destroy();
   });
 });
+import { controlsFeature, PlayerExtensionCoordinator, type PlayerTarget, timeFeature } from '@videojs/core/dom';
+import { createStore } from '@videojs/store';

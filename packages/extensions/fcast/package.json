@@ -45,6 +45,7 @@
     "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
+    "@videojs/store": "workspace:*",
     "jsdom": "^26.1.0",
     "vite-plus": "catalog:"
   }
