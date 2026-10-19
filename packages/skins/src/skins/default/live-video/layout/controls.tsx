@@ -16,7 +16,6 @@ import styles from './controls.styles';
 export function DefaultLiveVideoControls() {
   return (
     <$.Controls.Root>
-      <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.BufferingIndicator className={controlsStyles.centerBuffering}>
         <$.Controls.Group className={controlsStyles.center}>
           <PlayButton
@@ -25,6 +24,7 @@ export function DefaultLiveVideoControls() {
           />
         </$.Controls.Group>
       </$.BufferingIndicator>
+      <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content, styles.spaced]}>
         <$.Tooltip.Provider>
           <$.Controls.Group className={[controlsStyles.primary, styles.spaced]}>
