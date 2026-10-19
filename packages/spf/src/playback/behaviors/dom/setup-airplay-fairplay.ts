@@ -58,7 +58,6 @@ export interface AirPlayFairPlayContext {
   mediaKeys?: MediaKeys;
 }
 
-/** Config for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayConfig {
   /** License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. */
   drm: NegotiableDrmSystemsConfig;

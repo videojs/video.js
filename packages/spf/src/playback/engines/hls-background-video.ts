@@ -78,13 +78,11 @@ export const defaultConfig = composed.defaultConfig;
 export const initialState = { ...composed.initialState, loadActivated: true };
 
 /**
- * Create a background-video playback engine.
- *
- * Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven, preload-monitoring, and
- * play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution rule by default) replaces
- * `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds `loadActivated: true` so
- * the composition behaves as if preload has already been activated — appropriate for ambient / hero / GIF-replacement
- * surfaces that should start loading the moment a src is set.
+ * Create a background-video playback engine. Subtractive composition over the HLS engine baseline: audio-side,
+ * text-side, ABR-driven, preload-monitoring, and play/seek load-trigger behaviors are removed. `selectVideoTrack` (with
+ * a highest-resolution rule by default) replaces `switchVideoQuality`, pinning a single rendition for the session. The
+ * initial state seeds `loadActivated: true` so the composition behaves as if preload has already been activated —
+ * appropriate for ambient / hero / GIF-replacement surfaces that should start loading the moment a src is set.
  *
  * Error reporting is _not_ subtracted: `collectErrors` owns the sequence, `resolveVideoTrack` reports per-rendition
  * causes, and `selectVideoTrack` reports the video verdict when nothing survives its constraints. Without them every

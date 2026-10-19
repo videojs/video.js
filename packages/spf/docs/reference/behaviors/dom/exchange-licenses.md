@@ -69,6 +69,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `ExchangeLicensesConfig` | interface | Config of [exchangeLicenses](exchange-licenses.md#exchangelicenses). Config for license exchange. | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |
-| `ExchangeLicensesContext` | interface | Context of [exchangeLicenses](exchange-licenses.md#exchangelicenses). Context shape for license exchange. | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |
-| `ExchangeLicensesState` | interface | State of [exchangeLicenses](exchange-licenses.md#exchangelicenses). State shape for license exchange. | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |
+| `ExchangeLicensesConfig` | interface | Config of [exchangeLicenses](exchange-licenses.md#exchangelicenses). | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |
+| `ExchangeLicensesContext` | interface | Context of [exchangeLicenses](exchange-licenses.md#exchangelicenses). | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |
+| `ExchangeLicensesState` | interface | State of [exchangeLicenses](exchange-licenses.md#exchangelicenses). | [src/playback/behaviors/dom/exchange-licenses.ts](../../../../src/playback/behaviors/dom/exchange-licenses.ts) |

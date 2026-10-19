@@ -7,12 +7,10 @@ import { computed, type ReadonlySignal, type Signal, signal } from '../../../cor
 import { attachMediaSource, createMediaSource, waitForMediaSourceOpen } from '../../../media/dom/mse/mediasource-setup';
 import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
 
-/** State shape required for MediaSource setup. */
 export interface MediaSourceState {
   presentation?: MaybeResolvedPresentation;
 }
 
-/** Context shape for MediaSource setup. */
 export interface MediaSourceContext {
   /**
    * The media element the engine drives. No behavior writes it: the host attaches one with
@@ -26,7 +24,6 @@ export interface MediaSourceContext {
   mediaSource?: MediaSource;
 }
 
-/** Config for MediaSource setup. */
 export interface MediaSourceSetupConfig {
   /**
    * Attach strategy — a composition-supplied implementation. Defaults to `attachMediaSource` (object URL on the `src`

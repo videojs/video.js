@@ -6,7 +6,6 @@ import { createMachineReactor } from '../../../core/reactors/create-machine-reac
 import { computed, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../../media/types';
 
-/** State shape for load-trigger tracking. */
 export interface LoadTriggersState {
   /**
    * Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from
@@ -20,7 +19,6 @@ export interface LoadTriggersState {
   presentation?: MaybeResolvedPresentation;
 }
 
-/** Context shape for load-trigger tracking. */
 export interface LoadTriggersContext {
   mediaElement?: HTMLMediaElement | undefined;
 }

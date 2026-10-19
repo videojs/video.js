@@ -20,7 +20,6 @@ export type { BufferState, SourceBufferState };
 // STATE & CONTEXT
 // ============================================================================
 
-/** State shape for segment loading. */
 export interface SegmentLoadingState {
   presentation?: MaybeResolvedPresentation;
   preload?: string;

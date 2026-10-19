@@ -6,10 +6,8 @@ Source: [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/e
 
 ## createEngine
 
-Create an HLS playback engine.
-
-Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest resolution, track selection, ABR,
-segment loading, and end-of-stream coordination.
+Create an HLS playback engine. Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest
+resolution, track selection, ABR, segment loading, and end-of-stream coordination.
 
 ```ts
 const engine = createEngine({
