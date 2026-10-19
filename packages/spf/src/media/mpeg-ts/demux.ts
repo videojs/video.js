@@ -21,18 +21,8 @@ export interface ElementaryStream {
   packets: PesPacket[];
 }
 
-/** The program's video and audio elementary streams, when the PMT declares a supported codec for each. */
-export interface TransportStreams {
-  video?: ElementaryStream;
-  audio?: ElementaryStream;
-}
-
 export const TS_PACKET_LENGTH = 188;
 const SYNC_BYTE = 0x47;
-
-/** PMT `stream_type` values this demuxer carries. */
-export const STREAM_TYPE_H264 = 0x1b;
-export const STREAM_TYPE_ADTS_AAC = 0x0f;
 
 /** Container sniff: a TS segment starts on a sync byte and keeps the 188-byte cadence. */
 export function isTransportStream(bytes: Uint8Array): boolean {
@@ -132,12 +122,18 @@ function parsePmt(data: Uint8Array, offset: number): Array<{ pid: number; stream
 }
 
 /**
- * Demux a complete TS segment into its video and audio PES packets. Packets are delimited by the payload-unit-start
- * indicator, so a PES whose length field is 0 (unbounded, the norm for video) still reassembles correctly; a trailing
- * PES cut off by the segment end is kept as-is (its payload is simply short).
+ * Demux a complete TS segment into the PES packets of the requested PMT stream types, keyed by stream type (the first
+ * PID the PMT declares for each). Streams of other types are skipped at the packet level, so an audio-only consumer
+ * never assembles the video PES. Packets are delimited by the payload-unit-start indicator, so a PES whose length field
+ * is 0 (unbounded, the norm for video) still reassembles correctly; a trailing PES cut off by the segment end is kept
+ * as-is (its payload is simply short).
  */
-export function demuxTransportStream(bytes: Uint8Array): TransportStreams {
+export function demuxTransportStream(
+  bytes: Uint8Array,
+  streamTypes: ReadonlySet<number>
+): Map<number, ElementaryStream> {
   const assembling = new Map<number, { stream: ElementaryStream; chunks: Uint8Array[] | undefined }>();
+  const claimed = new Set<number>();
   let pmtPid = -1;
 
   const flush = (entry: { stream: ElementaryStream; chunks: Uint8Array[] | undefined }) => {
@@ -169,7 +165,8 @@ export function demuxTransportStream(bytes: Uint8Array): TransportStreams {
 
     if (pid === pmtPid) {
       for (const { pid: esPid, streamType } of parsePmt(bytes, payloadStart ? offset + 1 + bytes[offset]! : offset)) {
-        if (!assembling.has(esPid) && (streamType === STREAM_TYPE_H264 || streamType === STREAM_TYPE_ADTS_AAC)) {
+        if (!assembling.has(esPid) && streamTypes.has(streamType) && !claimed.has(streamType)) {
+          claimed.add(streamType);
           assembling.set(esPid, { stream: { pid: esPid, streamType, packets: [] }, chunks: undefined });
         }
       }
@@ -188,15 +185,11 @@ export function demuxTransportStream(bytes: Uint8Array): TransportStreams {
     entry.chunks?.push(bytes.subarray(offset, start + TS_PACKET_LENGTH));
   }
 
-  const streams: TransportStreams = {};
+  const streams = new Map<number, ElementaryStream>();
 
   for (const entry of assembling.values()) {
     flush(entry);
-
-    const { stream } = entry;
-
-    if (stream.streamType === STREAM_TYPE_H264) streams.video ??= stream;
-    else streams.audio ??= stream;
+    streams.set(entry.stream.streamType, entry.stream);
   }
 
   return streams;

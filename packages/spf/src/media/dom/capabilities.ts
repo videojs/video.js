@@ -17,6 +17,7 @@
 
 import { type DrmConfig, keySystemCandidates } from '../drm';
 import { NON_FMP4_CONTAINER_MIMES } from '../hls/parse-media-playlist';
+import { asTransmuxed } from '../mpeg-ts/transmuxed-track';
 import { type CanPlayTrack, getMediaPlaylistMetadata } from '../types';
 import { buildMimeCodec } from '../utils/tracks';
 import { isCodecSupported } from './mse/mediasource-setup';
@@ -92,3 +93,10 @@ export const canPlayTrackWithDrm: CanPlayTrack = (track, config) => {
 
   return canDecodeTrack(track);
 };
+
+/**
+ * {@link canPlayTrackWithDrm} over the transmuxed container, for a composition with the MPEG-TS transmux feature: a TS
+ * rendition probes by codec as the fMP4 it becomes instead of being pruned. On clear content it answers as the plain
+ * probe does, so it suits a composition without `drmFeature` too.
+ */
+export const canPlayTransmuxedTrack: CanPlayTrack = (track, config) => canPlayTrackWithDrm(asTransmuxed(track), config);

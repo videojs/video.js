@@ -10,6 +10,7 @@
  */
 import type { StateSignals } from '../../core/composition/define-behavior';
 import { peek, update } from '../../core/signals/primitives';
+import type { TransmuxCodec } from '../../media/mpeg-ts/codecs/codec';
 import { isTransportStream } from '../../media/mpeg-ts/demux';
 import { createTransmuxer, type TransmuxOptions } from '../../media/mpeg-ts/transmux';
 import type { MaybeResolvedPresentation, MediaContainerData } from '../../media/types';
@@ -51,35 +52,36 @@ async function* streamOf(...parts: Uint8Array[]): AsyncIterable<Uint8Array> {
 }
 
 /**
- * Which elementary streams this SourceBuffer carries, from the track's declared codecs: a muxed TS rendition whose
- * audio is demuxed into its own renditions (`AUDIO` group) declares only a video codec, so its in-band audio is dropped
- * rather than appended twice. An undeclared `CODECS` carries everything the segment has.
+ * Which of the pipeline's codecs this SourceBuffer carries this time, from the track's declared codecs: a muxed TS
+ * rendition whose audio is demuxed into its own renditions (`AUDIO` group) declares only a video codec, so its in-band
+ * audio is dropped rather than appended twice. An undeclared `CODECS` carries every codec the pipeline has.
  */
-function transmuxOptionsFor(trackType: 'video' | 'audio', deps: StepDeps, trackId: string): TransmuxOptions {
+function transmuxOptionsFor(codecs: readonly TransmuxCodec[], deps: StepDeps, trackId: string): TransmuxOptions {
   const presentation = peek(transmuxState(deps).presentation);
   const track = presentation && findTrackById(presentation, trackId);
-  const codecs = track && 'codecs' in track ? (track.codecs ?? []) : [];
-  const declares = (family: string) => codecs.some((codec) => codec.toLowerCase().startsWith(family));
+  const declared = track && 'codecs' in track ? (track.codecs ?? []) : [];
+  const declares = (family: string) => declared.some((codec) => codec.toLowerCase().startsWith(family));
   const resolution =
     track && 'width' in track && track.width && track.height ? { width: track.width, height: track.height } : undefined;
 
   return {
-    video: trackType === 'video' && (codecs.length === 0 || declares('avc1')),
-    audio: trackType === 'audio' || codecs.length === 0 || declares('mp4a'),
+    codecs: declared.length === 0 ? codecs : codecs.filter((codec) => declares(codec.family)),
     ...(resolution && { resolution }),
   };
 }
 
 /**
- * Transmux pipelines for one track type — the TS analog of `relocationPipelinesFor`. One transmuxer per actor (built
- * inside the per-actor factory), so fragment numbering and the init-segment memory reset with the source. The
- * relocation stamp reads `deriveStartMediaTime` from the composition config, as in the relocation pipelines.
+ * Transmux pipelines for one track type — the TS analog of `relocationPipelinesFor`, carrying `codecs` (the first is
+ * the type's own: the one whose track relocation keys on). One transmuxer per actor (built inside the per-actor
+ * factory), so fragment numbering and the init-segment memory reset with the source. The relocation stamp reads
+ * `deriveStartMediaTime` from the composition config, as in the relocation pipelines.
  */
-export function transmuxPipelinesFor(trackType: 'video' | 'audio'): MessagePipelines {
+export function transmuxPipelinesFor(trackType: 'video' | 'audio', codecs: readonly TransmuxCodec[]): MessagePipelines {
   const { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime } = relocationStepsFor(trackType);
+  const ownFamily = codecs[0]!.family;
 
   return () => {
-    const transmux = createTransmuxer();
+    const transmux = createTransmuxer(codecs);
 
     /** Init step: nothing to fetch for a TS rendition; a real init URL takes the fMP4 path. */
     const fetchInit: LoadStep = async (frame, signal, deps) => {
@@ -112,8 +114,8 @@ export function transmuxPipelinesFor(trackType: 'video' | 'audio'): MessagePipel
         return;
       }
 
-      const result = transmux(bytes, transmuxOptionsFor(trackType, deps, op.meta.trackId));
-      const own = result[trackType];
+      const result = transmux(bytes, transmuxOptionsFor(codecs, deps, op.meta.trackId));
+      const own = result.tracks[ownFamily];
       const slot = transmuxState(deps).mediaContainerData;
 
       if (own && peek(slot)?.[trackType]?.timescale === undefined) {

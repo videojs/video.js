@@ -20,6 +20,7 @@ import {
   type SvtaError,
 } from '../../media/errors';
 import { NON_FMP4_CONTAINER_MIMES } from '../../media/hls/parse-media-playlist';
+import { asTransmuxed } from '../../media/mpeg-ts/transmuxed-track';
 import { getMediaPlaylistMetadata, type ResolvedTrack, type TrackType } from '../../media/types';
 
 /**
@@ -111,3 +112,10 @@ function unsupportedTrackConditions(track: ResolvedTrack, encryptionUnsupported:
 
   return conditions;
 }
+
+/**
+ * The DRM-aware reporter over the transmuxed container: with the MPEG-TS transmux feature, TS is no longer an
+ * unsupported format.
+ */
+export const reportUnsupportedTransmuxedTrackConditions: ReportUnsupportedTrackConditions = (track, config) =>
+  reportUnsupportedTrackConditionsWithDrm(asTransmuxed(track), config);
