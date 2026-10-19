@@ -84,6 +84,7 @@ describe('parseSoundCloudSource', () => {
     ['minutes and seconds', '#t=1m30s', 90],
     ['hours, minutes, and seconds', '#t=1h2m3s', 3723],
     ['minutes alone', '#t=2m', 120],
+    ['percent-encoded clock time', '#t=1%3A30', 90],
   ])('reads a start time given as %s', (_, hash, expected) => {
     expect(parseSoundCloudSource(`${TRACK}${hash}`)?.startTime).toBe(expected);
   });
@@ -94,6 +95,7 @@ describe('parseSoundCloudSource', () => {
 
   it('ignores a start time it cannot read', () => {
     expect(parseSoundCloudSource(`${TRACK}#t=soon`)?.startTime).toBe(null);
+    expect(parseSoundCloudSource(`${TRACK}#t=1%3`)?.startTime).toBe(null);
   });
 
   it.each([
