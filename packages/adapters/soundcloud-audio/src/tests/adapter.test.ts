@@ -300,6 +300,43 @@ describe('SoundCloudAdapter', () => {
       expect(media.readyState).toBe(4);
     });
 
+    it('applies the referrerPolicy option to the iframe before it loads the widget', async () => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+      const assign = vi.spyOn(HTMLIFrameElement.prototype, 'src', 'set');
+      let policyAtLoad = '';
+
+      assign.mockImplementation(function (this: HTMLIFrameElement, value: string) {
+        policyAtLoad = this.referrerPolicy;
+        this.setAttribute('src', value);
+      });
+
+      media.source = { src: TRACK, engine: { soundcloud: { referrerPolicy: 'no-referrer' } } };
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(policyAtLoad).toBe('no-referrer');
+      expect(widget.iframe.referrerPolicy).toBe('no-referrer');
+    });
+
+    it('reloads a widget rendered without the referrerPolicy option asks for', async () => {
+      const iframe = document.createElement('iframe');
+
+      iframe.setAttribute('src', buildSoundCloudIframeSrc(TRACK));
+      document.body.append(iframe);
+
+      const widget = new FakeWidget(iframe);
+      const media = new SoundCloudAdapter();
+      const events = recordEvents(media, ['emptied', 'loadstart']);
+
+      media.attach(iframe);
+      media.source = { src: TRACK, engine: { soundcloud: { referrerPolicy: 'no-referrer' } } };
+      await flush();
+
+      expect(events).toEqual(['loadstart', 'emptied', 'loadstart']);
+      expect(widget.iframe.referrerPolicy).toBe('no-referrer');
+    });
+
     it('autoplays and starts at the start time of a widget rendered from the same source', async () => {
       const iframe = document.createElement('iframe');
 

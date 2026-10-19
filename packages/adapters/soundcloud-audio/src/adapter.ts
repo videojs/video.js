@@ -188,7 +188,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#adoptedSrc = null;
 
     // A widget rendered from the same source before the host had one is this load already.
-    if (adopted && adopted === this.#buildWidgetUrl()) {
+    if (adopted && adopted === this.#buildWidgetUrl() && this.#hasReferrerPolicy(target)) {
       this.#parsed = parseSoundCloudSource(this.#src);
       this.#startTime = this.#parsed?.startTime ?? null;
       this.#autoplayPending = true;
@@ -469,9 +469,20 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
 
   #navigate(target: HTMLIFrameElement, url: string) {
+    const referrerPolicy = this.#source?.engine?.soundcloud?.referrerPolicy;
+
+    // A frame sends the policy it has when it navigates, so it goes on first.
+    if (referrerPolicy !== undefined) target.referrerPolicy = referrerPolicy;
+
     this.#frameLoaded = false;
     this.#navigatedAt = Date.now();
     target.src = url;
+  }
+
+  #hasReferrerPolicy(target: HTMLIFrameElement): boolean {
+    const referrerPolicy = this.#source?.engine?.soundcloud?.referrerPolicy;
+
+    return referrerPolicy === undefined || target.referrerPolicy === referrerPolicy;
   }
 
   #buildWidgetUrl(): string {
