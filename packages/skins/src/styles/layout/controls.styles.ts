@@ -87,5 +87,45 @@ export default styles({
     spacer: {
       utilities: 'flex-1',
     },
+    centerBuffering: {
+      utilities: [],
+      variants: { default: 'group/buffering contents' },
+    },
+    center: {
+      utilities: [],
+      variants: {
+        // Sits above the title and status indicators, level with the control bars, and steps aside for the spinner.
+        default: [
+          'group/center pointer-events-none absolute top-1/2 left-1/2 z-30 flex -translate-1/2 items-center rtl:flex-row-reverse gap-6',
+          'transition-[filter,opacity,scale] duration-media-controls-enter ease-out',
+          'not-data-visible:opacity-0 not-data-visible:scale-media-hidden not-data-visible:duration-media-controls',
+          'pointer-fine:not-data-visible:blur-media-hidden',
+          'group-data-visible/buffering:hidden',
+        ],
+      },
+    },
+    centerButton: {
+      utilities: [],
+      variants: {
+        default: [
+          'pointer-events-auto group-not-data-visible/center:pointer-events-none',
+          'rounded-media-pill bg-media-backdrop/35 text-media-controls-foreground backdrop-filter-media-indicator',
+          'media-high-contrast:bg-media-background',
+        ],
+      },
+    },
+    centerPlay: {
+      utilities: [],
+      // Matches the playback status indicator this button replaces.
+      variants: { default: 'size-auto p-4' },
+    },
+    centerPlayIcon: {
+      utilities: [],
+      variants: { default: 'size-media-icon-lg' },
+    },
+    centerSeek: {
+      utilities: [],
+      variants: { default: 'media-max-280:hidden' },
+    },
   },
 });
