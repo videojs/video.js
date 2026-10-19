@@ -10,71 +10,59 @@ A config key's doc is the config field JSDoc of the first behavior listed under 
 
 ## Engines and features
 
+Each engine's box and arrows share a color. Features are grouped by which engines compose them; each engine page lists its own features in composition order.
+
 ```mermaid
-graph LR
-  engine_video["@videojs/spf/hls/video"]
-  engine_audio["@videojs/spf/hls/audio"]
-  engine_background_video["@videojs/spf/hls/background-video"]
-  feature_airplay["airPlayFeature"]
-  feature_airplay_fairplay["airPlayFairPlayFeature"]
-  feature_audio["audioFeature"]
-  feature_background_video["backgroundVideoFeature"]
-  feature_calculate_duration["calculateDurationFeature"]
-  feature_chapters["chaptersFeature"]
-  feature_current_time["currentTimeFeature"]
-  feature_drm["drmFeature"]
-  feature_end_stall_recovery["endStallRecoveryFeature"]
-  feature_error["errorFeature"]
-  feature_hls_loading["hlsLoadingFeature"]
-  feature_initial_load["initialLoadFeature"]
-  feature_live["liveFeature"]
-  feature_media_source["mediaSourceFeature"]
-  feature_monitor_player_size["monitorPlayerSizeFeature"]
-  feature_multi_cdn["multiCdnFeature"]
-  feature_shift_text_timestamps["shiftTextTimestampsFeature"]
-  feature_shift_timestamps["shiftTimestampsFeature"]
-  feature_start_position["startPositionFeature"]
-  feature_text_tracks["textTracksFeature"]
-  feature_video["videoFeature"]
-  engine_video --> feature_initial_load
-  engine_video --> feature_hls_loading
-  engine_video --> feature_multi_cdn
-  engine_video --> feature_error
-  engine_video --> feature_calculate_duration
-  engine_video --> feature_media_source
-  engine_video --> feature_video
-  engine_video --> feature_audio
-  engine_video --> feature_text_tracks
-  engine_video --> feature_airplay_fairplay
-  engine_video --> feature_drm
-  engine_video --> feature_shift_timestamps
-  engine_video --> feature_shift_text_timestamps
-  engine_video --> feature_airplay
-  engine_video --> feature_current_time
-  engine_video --> feature_start_position
-  engine_video --> feature_monitor_player_size
-  engine_video --> feature_live
-  engine_video --> feature_end_stall_recovery
-  engine_video --> feature_chapters
-  engine_audio --> feature_initial_load
-  engine_audio --> feature_hls_loading
-  engine_audio --> feature_multi_cdn
-  engine_audio --> feature_error
-  engine_audio --> feature_calculate_duration
-  engine_audio --> feature_media_source
-  engine_audio --> feature_audio
-  engine_audio --> feature_shift_timestamps
-  engine_audio --> feature_airplay
-  engine_audio --> feature_current_time
-  engine_audio --> feature_start_position
-  engine_audio --> feature_end_stall_recovery
-  engine_audio --> feature_chapters
-  engine_background_video --> feature_hls_loading
-  engine_background_video --> feature_error
-  engine_background_video --> feature_calculate_duration
-  engine_background_video --> feature_media_source
-  engine_background_video --> feature_background_video
-  engine_background_video --> feature_current_time
+graph TB
+  classDef engine_video fill:#2563eb,stroke:#1d4ed8,color:#fff
+  engine_video["@videojs/spf/hls/video"]:::engine_video
+  classDef engine_audio fill:#d97706,stroke:#b45309,color:#fff
+  engine_audio["@videojs/spf/hls/audio"]:::engine_audio
+  classDef engine_background_video fill:#16a34a,stroke:#15803d,color:#fff
+  engine_background_video["@videojs/spf/hls/background-video"]:::engine_background_video
+  subgraph group_0["every engine"]
+    feature_hls_loading["hlsLoadingFeature"]
+    feature_error["errorFeature"]
+    feature_calculate_duration["calculateDurationFeature"]
+    feature_media_source["mediaSourceFeature"]
+    feature_current_time["currentTimeFeature"]
+  end
+  subgraph group_1["video and audio"]
+    feature_initial_load["initialLoadFeature"]
+    feature_multi_cdn["multiCdnFeature"]
+    feature_audio["audioFeature"]
+    feature_shift_timestamps["shiftTimestampsFeature"]
+    feature_airplay["airPlayFeature"]
+    feature_start_position["startPositionFeature"]
+    feature_end_stall_recovery["endStallRecoveryFeature"]
+    feature_chapters["chaptersFeature"]
+  end
+  subgraph group_2["video only"]
+    feature_video["videoFeature"]
+    feature_text_tracks["textTracksFeature"]
+    feature_airplay_fairplay["airPlayFairPlayFeature"]
+    feature_drm["drmFeature"]
+    feature_shift_text_timestamps["shiftTextTimestampsFeature"]
+    feature_monitor_player_size["monitorPlayerSizeFeature"]
+    feature_live["liveFeature"]
+  end
+  subgraph group_3["background-video only"]
+    feature_background_video["backgroundVideoFeature"]
+  end
+  engine_video --> group_0
+  linkStyle 0 stroke:#2563eb,stroke-width:2px
+  engine_video --> group_1
+  linkStyle 1 stroke:#2563eb,stroke-width:2px
+  engine_video --> group_2
+  linkStyle 2 stroke:#2563eb,stroke-width:2px
+  engine_audio --> group_0
+  linkStyle 3 stroke:#d97706,stroke-width:2px
+  engine_audio --> group_1
+  linkStyle 4 stroke:#d97706,stroke-width:2px
+  engine_background_video --> group_0
+  linkStyle 5 stroke:#16a34a,stroke-width:2px
+  engine_background_video --> group_3
+  linkStyle 6 stroke:#16a34a,stroke-width:2px
 ```
 
 ## Core
