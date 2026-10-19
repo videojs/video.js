@@ -56,9 +56,9 @@ const SITE_URL =
       ? PRERELEASE_URL.origin
       : process.env.DEPLOY_PRIME_URL || PRODUCTION_URL.origin;
 
-// @astrojs/react does not expose @vitejs/plugin-react's native compiler option yet. Register only the compiler here;
-// the remaining plugins are already registered by Astro's integration. Limit compilation to site source because
-// workspace libraries resolve outside node_modules and already ship compiled output.
+// @astrojs/react's `compiler` option shares the integration's `include`/`exclude` with the JSX transform and renderer,
+// so register only the compiler here; the remaining plugins are already registered by Astro's integration. Limit
+// compilation to site source because workspace libraries resolve outside node_modules and already ship compiled output.
 const siteReactCompilerPlugin = reactCompilerPlugin({
   compiler: true,
   exclude: [/\.astro$/, /node_modules/],
@@ -117,6 +117,13 @@ export default defineConfig({
   ],
   prefetch: {
     prefetchAll: true,
+  },
+  // Auth uses iron-session cookies, not Astro sessions. Opting out stops the Netlify adapter from wiring a Netlify
+  // Blobs session driver into the SSR function and lets the session runtime tree-shake out of it.
+  session: false,
+  experimental: {
+    // Render prerendered pages on all CPU cores but one. Each worker adds memory; lower `workers` if builds OOM.
+    parallelPrerender: true,
   },
 
   markdown: {
