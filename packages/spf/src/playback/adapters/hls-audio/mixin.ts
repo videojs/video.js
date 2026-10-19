@@ -14,7 +14,6 @@ import {
   createHlsAudioEngine,
   type HlsAudioEngineConfig,
   type HlsAudioEngineContext,
-  type HlsAudioEngineSignals,
   type HlsAudioEngineState,
 } from '../../engines/hls/engine-audio-only';
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../primitives/error-messages';
@@ -104,7 +103,6 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     readonly #engine: Composition<HlsAudioEngineState, HlsAudioEngineContext>;
     #config: HlsAudioEngineConfig;
-    #signals!: HlsAudioEngineSignals;
     #preload: '' | 'none' | 'metadata' | 'auto' = HlsAudioImpl.defaultProps.preload;
     #crossOrigin: MediaCrossOriginType | null = toMediaCrossOrigin(HlsAudioImpl.defaultProps.crossOrigin);
     #disableRemotePlayback: boolean = HlsAudioImpl.defaultProps.disableRemotePlayback;
@@ -130,7 +128,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       // resets the slot per source, so a new source starts with no error without
       // this needing its own source-change hook.
       this.#stopErrorSync = effect(() => {
-        const errors = this.#signals.state.errors.get();
+        const errors = this.#engine.state.errors.get();
 
         this.#setError(firstFatal(errors, FATAL_SVTA_CODES), errors);
       });
@@ -189,12 +187,12 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     // -------------------------------------------------------------------------
 
     attach(mediaElement: HTMLMediaElement): void {
-      if (mediaElement !== this.#signals.context.mediaElement.get()) {
+      if (mediaElement !== this.#engine.context.mediaElement.get()) {
         this.#cancelPendingPlay();
       }
 
       super.attach?.(mediaElement);
-      this.#signals.context.mediaElement.set(mediaElement);
+      this.#engine.context.mediaElement.set(mediaElement);
 
       // Most-recent-wins on attach — see the video mixin.
       this.#crossOrigin = toMediaCrossOrigin(mediaElement.crossOrigin) ?? this.#crossOrigin;
@@ -203,7 +201,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     detach(): void {
       this.#cancelPendingPlay();
-      this.#signals.context.mediaElement.set(undefined);
+      this.#engine.context.mediaElement.set(undefined);
       super.detach?.();
     }
 
@@ -229,7 +227,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       // Limited to known values, as the element reflects it — see the video mixin.
       this.#crossOrigin = toMediaCrossOrigin(value);
 
-      const mediaElement = this.#signals.context.mediaElement.get();
+      const mediaElement = this.#engine.context.mediaElement.get();
 
       if (mediaElement) mediaElement.crossOrigin = value;
     }
@@ -247,7 +245,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       this.#preload = value;
 
       if (value) {
-        this.#signals.state.preload.set(value);
+        this.#engine.state.preload.set(value);
       }
     }
 
@@ -267,7 +265,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
 
     set disableRemotePlayback(value: boolean) {
       this.#disableRemotePlayback = value;
-      this.#signals.state.disableRemotePlayback.set(value);
+      this.#engine.state.disableRemotePlayback.set(value);
     }
 
     // -------------------------------------------------------------------------
@@ -281,7 +279,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     // -------------------------------------------------------------------------
 
     get src(): string {
-      return this.#signals.state.presentation.get()?.url ?? '';
+      return this.#engine.state.presentation.get()?.url ?? '';
     }
 
     set src(value: string) {
@@ -320,7 +318,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       if (value === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#signals.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(value ? { url: value } : undefined);
     }
 
     // -------------------------------------------------------------------------
@@ -328,12 +326,12 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     // -------------------------------------------------------------------------
 
     play(): Promise<void> {
-      const mediaElement = this.#signals.context.mediaElement.get();
+      const mediaElement = this.#engine.context.mediaElement.get();
       if (!mediaElement) return Promise.reject(new Error('HlsAudioAdapterCore: no media element attached'));
 
       const { signal } = this.#playGeneration;
 
-      this.#signals.state.loadActivated.set(true);
+      this.#engine.state.loadActivated.set(true);
 
       return mediaElement.play().catch((err: unknown) => {
         signal.throwIfAborted();
@@ -365,9 +363,6 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
         // A policy, not a value — see the video mixin. A consumer-supplied one wins.
         requestCredentials:
           this.#config?.requestCredentials ?? (() => crossOriginToRequestCredentials(this.#crossOrigin)),
-        onSignalsReady: (signals) => {
-          this.#signals = signals;
-        },
       });
     }
 
