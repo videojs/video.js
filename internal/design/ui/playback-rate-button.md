@@ -33,21 +33,17 @@ A separate feature wins out ([per review](https://github.com/videojs/v10/pull/62
 - `aria-disabled`: Present when `disabled` prop is true.
 - Keyboard: `Enter` and `Space` cycle to next rate.
 
-## Deferred: Custom `rates` Prop
+## Custom Rates
 
-Custom rates are intentionally deferred ([per review](https://github.com/videojs/v10/pull/624#discussion_r2861088551)). Some providers only support specific playback rates (e.g., [YouTube's `getAvailablePlaybackRates`](https://developers.google.com/youtube/iframe_api_reference#getAvailablePlaybackRates)), so exposing a consumer-facing `rates` prop without accounting for provider constraints could lead to broken UX. The store's `playbackRates` array is the right place — providers can populate it dynamically in the future.
+Rates are a player input, `playbackRates` (`playback-rates="0.5 1 1.5 2"` in HTML), on the playback rate feature rather than a `rates` prop on the button ([#9273](https://github.com/videojs/video.js/issues/9273)). The button, the radio group, and the `speedUp`/`speedDown` hotkeys all read the store's `playbackRates`; a per-button override would let them disagree.
 
-When we're ready to expose custom rates, the following research applies:
-
-**Proposed API:** `<PlaybackRateButton rates={[0.5, 1, 1.5, 2]} />` in React, `rates="0.5 1 1.5 2"` (space-separated) in HTML. A component `rates` prop would override the store's `playbackRates` for that instance.
-
-**ReactiveElement `converter`:** The HTML attribute needs a `converter` option on `ReactiveElement` since it only handles `String`, `Boolean`, and `Number` today. Aligns with [Lit's converter API](https://lit.dev/docs/v1/components/properties/#conversion-converter).
-
-**No auto-sorting:** Rates are cycled in array order, not sorted numerically. Media Chrome sorts with `.sort((a, b) => a - b)`, but we respect the consumer's order.
+- **No converter needed:** HTML player inputs are declared as strings, so the feature's private action parses the space-separated list itself. A JS property can still take an array.
+- **No auto-sorting:** The button cycles in the author's order. `speedUp`/`speedDown` step by value and stop at the ends, so they work whatever the order.
+- **Provider constraints:** Still deferred ([per review](https://github.com/videojs/v10/pull/624#discussion_r2861088551)). Some providers only support specific rates (e.g., [YouTube's `getAvailablePlaybackRates`](https://developers.google.com/youtube/iframe_api_reference#getAvailablePlaybackRates)). When a media capability reports them, the feature should publish the configured rates intersected with the supported ones.
 
 **Alternatives explored:**
 
-- **Property-only (no attribute)** — Forces JS-only configuration, undermines declarative HTML story.
+- **Per-component `rates` prop** — Desyncs the button from the menu and hotkeys.
 - **`AttributeTokenList`** — Media Chrome's `DOMTokenList`-like approach. More infrastructure than needed.
 - **`Array` built-in type with `JSON.parse`** — Produces `rates='[1, 1.5, 2]'` which is awkward for HTML authors.
 - **`min`/`max`/`step`** — [Vidstack's approach](https://vidstack.io/docs/wc/player/components/sliders/speed-slider/) for continuous ranges. Doesn't allow non-uniform spacing or arbitrary ordering.

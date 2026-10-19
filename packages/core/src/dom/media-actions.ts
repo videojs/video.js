@@ -95,10 +95,10 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     if (!rate) return;
 
     const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx < 0 || idx >= playbackRates.length - 1 ? 0 : idx + 1;
+    const faster = playbackRates.filter((candidate) => candidate > playbackRate);
+    if (faster.length === 0) return;
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    rate.setPlaybackRate(Math.min(...faster));
   },
 
   speedDown({ store }) {
@@ -106,9 +106,9 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     if (!rate) return;
 
     const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx <= 0 ? playbackRates.length - 1 : idx - 1;
+    const slower = playbackRates.filter((candidate) => candidate < playbackRate);
+    if (slower.length === 0) return;
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    rate.setPlaybackRate(Math.max(...slower));
   },
 };

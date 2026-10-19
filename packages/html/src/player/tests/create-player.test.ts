@@ -434,6 +434,33 @@ describe('createPlayer', () => {
     player.remove();
   });
 
+  it('applies playback rates configuration through attributes and properties', async () => {
+    const { PlayerElement } = createPlayer({ features: [features.playbackRate] });
+    const tagName = 'test-playback-rates-player';
+
+    customElements.define(tagName, PlayerElement);
+
+    const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
+    const defaults = player.store.playbackRates;
+
+    player.setAttribute('playback-rates', '2 1 0.5');
+    document.body.append(player);
+
+    expect(player.store.playbackRates).toEqual([2, 1, 0.5]);
+
+    player.playbackRates = [1, 1.5];
+    await player.updateComplete;
+
+    expect(player.store.playbackRates).toEqual([1, 1.5]);
+
+    player.playbackRates = undefined;
+    await player.updateComplete;
+
+    expect(player.store.playbackRates).toEqual(defaults);
+
+    player.remove();
+  });
+
   it('applies property configuration that shadowed an accessor before connection', async () => {
     const { PlayerElement } = createPlayer({ features: [features.orientationLock] });
     const tagName = `test-shadowed-config-player-${tagCounter++}`;

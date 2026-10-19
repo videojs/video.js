@@ -16,6 +16,40 @@ Controls speed of playback. `playbackRateAvailability` is `unsupported` when the
 
 <FeatureReference feature="playbackRate" />
 
+### Playback rates
+
+The player offers `0.5` through `2` in steps of `0.25` unless you set your own list. The <DocsLink slug="reference/components/playback-rate-button">playback rate button</DocsLink>, the <DocsLink slug="reference/components/playback-rate-radio-group">playback rate radio group</DocsLink>, and the `speedUp` and `speedDown` <DocsLink slug="guides/keyboard-shortcuts">hotkeys</DocsLink> all read the same list, so they stay in step.
+
+<FrameworkCase frameworks={["react"]}>
+Pass `playbackRates` to <DocsLink slug="reference/components/player">`Player`</DocsLink>:
+
+```tsx
+<Player playbackRates={[0.5, 1, 1.25, 1.5, 2]}>
+  <Container>
+    <Video src="/video.mp4" />
+  </Container>
+</Player>
+```
+
+Removing the prop, or passing `null`, restores the defaults.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Set the `playback-rates` attribute on <DocsLink slug="reference/components/player">`<video-player>`</DocsLink> to a space-separated list:
+
+```html
+<video-player playback-rates="0.5 1 1.25 1.5 2">
+  <media-container>
+    <video src="/video.mp4"></video>
+  </media-container>
+</video-player>
+```
+
+The `playbackRates` property also takes an array, such as `player.playbackRates = [1, 2]`. Removing the attribute restores the defaults.
+</FrameworkCase>
+
+The button cycles through the rates in the order you list them, and the menu shows them in that order. `speedUp` and `speedDown` move to the next faster or slower rate whatever the order, and do nothing at the fastest or slowest rate. The player ignores values that aren't positive numbers, and repeated rates. If nothing usable is left, it falls back to the defaults.
+
 ### Selector
 
 <FrameworkCase frameworks={["react"]}>
