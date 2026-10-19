@@ -22,7 +22,7 @@
  * Downstream of `resolveVideoTrack` / `resolveAudioTrack`; upstream of `updateMediaSourceDuration` (which writes the
  * value through to `mediaSource.duration`).
  */
-import type { Behavior } from '../../core/composition/create-composition';
+import type { Behavior, Empty } from '../../core/composition/create-composition';
 import { effect } from '../../core/signals/effect';
 import { type ReadonlySignal, type Signal, untrack, update } from '../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../media/types';
@@ -102,7 +102,7 @@ function calculatePresentationDurationSetup({
  */
 export const calculatePresentationDuration: Behavior<
   { presentation: Signal<PresentationDurationState['presentation']> },
-  Record<string, never>,
+  Empty,
   PresentationDurationConfig
 > = {
   stateKeys: ['presentation'],
