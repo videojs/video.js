@@ -26,9 +26,13 @@ Shared-code seams: `relocationStepsFor(type)` and `sourceBufferMimeCodec` on `se
 | hls/audio features | 18.47 KB | — |
 | hls/audio + transmux | 22.46 KB | +3.98 KB (carries the unused H.264 framing, ~1.2 KB) |
 
-**Audio-only use case.** Two distinct questions: (1) bundle — the audio engine pays for the H.264
-parser it never runs; splitting the codec parsers out of `transmux.ts` (pass them in, or an
-`mpegTsAudioTransmuxFeature`) would save ~1.2 KB on audio; (2) capability — the hls/audio engine
+**Audio-only use case.** Two distinct questions: (1) bundle — DONE 2026-10-19: the transmuxer is
+composed from codec modules (`media/mpeg-ts/codecs/{avc,aac}.ts`, interface in `codec.ts`); the
+fMP4 writer takes a finished sample entry per track; the demuxer collects only the requested PMT
+stream types (an audio-only consumer never assembles the video PES). `mpegTsAudioTransmuxFeature`
+(own entry point) carries `[aacCodec]` only; the Mux audio flavor composes it. CI-method (brotli)
+numbers: `@videojs/mux-audio/spf` +2.75 kB over base (was +3.9 kB with the shared transmuxer),
+`@videojs/mux-video/spf` +3.7 kB. (2) capability — the hls/audio engine
 cannot play a plus-tier *video* asset's audio at all, because Mux muxes that audio into the video
 TS and declares no audio rendition. That's the same "muxed audio as a selectable source" work as the
 URI-less default (stage 3), seen from the audio engine: select a video variant as the audio source
