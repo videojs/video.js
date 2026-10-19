@@ -706,23 +706,79 @@ function renderCorePage(reference: ReferenceProgram, module: CoreModule): string
 
 // ── README ───────────────────────────────────────────────────────────────────
 
+/** Fill and stroke pairs for engine boxes and their arrows, readable on GitHub's light and dark Mermaid themes. */
+const ENGINE_COLORS = [
+  { fill: '#2563eb', stroke: '#1d4ed8' },
+  { fill: '#d97706', stroke: '#b45309' },
+  { fill: '#16a34a', stroke: '#15803d' },
+  { fill: '#9333ea', stroke: '#7e22ce' },
+  { fill: '#dc2626', stroke: '#b91c1c' },
+];
+
+/**
+ * Engines and features as a Mermaid flowchart. Features are grouped by the set of engines that compose them, so an
+ * engine draws one arrow per group rather than one per feature; each engine's box and arrows share a color. Within a
+ * group, features keep the composition order of the first engine that lists them. Top to bottom, so each group renders
+ * as a column: a subgraph that is an edge target ignores its own `direction`, so the graph's is the only one that
+ * counts.
+ */
 function mermaid(model: Model): string {
   const id = (prefix: string, name: string) => `${prefix}_${name.replace(/[^\w]/g, '_')}`;
-  const lines = ['graph LR'];
-
-  for (const engine of model.engines) {
-    lines.push(`  ${id('engine', engine.name)}["${engine.entry.specifier}"]`);
-  }
+  const color = (index: number) => ENGINE_COLORS[index % ENGINE_COLORS.length]!;
+  const groups = new Map<string, { engines: EngineInfo[]; features: FeatureInfo[] }>();
 
   for (const feature of model.features) {
-    lines.push(`  ${id('feature', feature.entry.name)}["${feature.name}"]`);
+    const engines = model.engines.filter((engine) => engine.features.includes(feature));
+    const key = engines.map((engine) => engine.name).join('+') || '-';
+    const group = groups.get(key) ?? { engines, features: [] };
+
+    group.features.push(feature);
+    groups.set(key, group);
   }
 
-  for (const engine of model.engines) {
-    for (const feature of engine.features) {
-      lines.push(`  ${id('engine', engine.name)} --> ${id('feature', feature.entry.name)}`);
-    }
-  }
+  const ordered = [...groups.values()].sort(
+    (a, b) =>
+      b.engines.length - a.engines.length || model.engines.indexOf(a.engines[0]!) - model.engines.indexOf(b.engines[0]!)
+  );
+  const label = (engines: EngineInfo[]) => {
+    if (engines.length === 0) return 'no engine';
+
+    if (engines.length === model.engines.length) return 'every engine';
+
+    return engines.length === 1 ? `${engines[0]!.name} only` : engines.map((engine) => engine.name).join(' and ');
+  };
+  const lines = ['graph TB'];
+
+  model.engines.forEach((engine, index) => {
+    const { fill, stroke } = color(index);
+
+    lines.push(`  classDef ${id('engine', engine.name)} fill:${fill},stroke:${stroke},color:#fff`);
+    lines.push(`  ${id('engine', engine.name)}["${engine.entry.specifier}"]:::${id('engine', engine.name)}`);
+  });
+
+  ordered.forEach((group, index) => {
+    const features = group.engines[0]
+      ? group.engines[0].features.filter((feature) => group.features.includes(feature))
+      : group.features;
+
+    lines.push(`  subgraph group_${index}["${label(group.engines)}"]`);
+
+    for (const feature of features) lines.push(`    ${id('feature', feature.entry.name)}["${feature.name}"]`);
+
+    lines.push('  end');
+  });
+
+  let edge = 0;
+
+  model.engines.forEach((engine, index) => {
+    ordered.forEach((group, groupIndex) => {
+      if (!group.engines.includes(engine)) return;
+
+      lines.push(`  ${id('engine', engine.name)} --> group_${groupIndex}`);
+      lines.push(`  linkStyle ${edge} stroke:${color(index).fill},stroke-width:2px`);
+      edge += 1;
+    });
+  });
 
   return fence('mermaid', lines.join('\n'));
 }
@@ -771,6 +827,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
     'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
     '## Engines and features',
+    "Each engine's box and arrows share a color. Features are grouped by which engines compose them; each engine page lists its own features in composition order.",
     mermaid(model),
     '## Core',
     table(headers, coreRows),
