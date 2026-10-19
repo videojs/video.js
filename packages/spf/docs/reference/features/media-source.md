@@ -31,8 +31,8 @@ Requires:
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | No description. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | No description. |
+| `currentTime` | `number \| undefined` | [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
@@ -52,7 +52,7 @@ Requires:
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/media-source.ts](../../../src/playback/engines/hls/features/media-source.ts) |

@@ -56,7 +56,7 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `negotiatedKeySystem` | reads | yes | `string \| undefined` | `ExchangeLicensesState` | The negotiated key system; owned by `setupMediaKeys`. Semantics on `MediaKeysState['negotiatedKeySystem']`. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `ExchangeLicensesState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `ExchangeLicensesState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 

@@ -24,7 +24,7 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `loadActivated` | `boolean \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | True once a preload-overriding event has fired for the current source — enables resolution regardless of preload. |
+| `loadActivated` | `boolean \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. (doc of [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers)) |
 | `preload` | `"metadata" \| "auto" \| "none" \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | No description. |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
 
@@ -39,7 +39,7 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |

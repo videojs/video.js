@@ -31,7 +31,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 | --- | --- | --- | --- |
 | `loadActivated` | `boolean \| undefined` | [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. |
 | `preload` | `"metadata" \| "auto" \| "none" \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload) | No description. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
@@ -49,7 +49,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/initial-load.ts](../../../src/playback/engines/hls/features/initial-load.ts) |

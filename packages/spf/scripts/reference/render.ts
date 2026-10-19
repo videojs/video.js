@@ -1,6 +1,8 @@
 /**
  * Renders the model as Markdown pages, one per public entry, plus a README index. Pages hold only what the model read
- * from the sources; a symbol without JSDoc is marked "No description." and nothing more.
+ * from the sources. A state or context key one behavior leaves undocumented borrows the doc of the behavior that writes
+ * it (else the first that reads it), with the lender named; an undocumented type export shows what it declares; a
+ * symbol with no doc anywhere is marked "No description." and nothing more.
  */
 import { dirname, relative } from 'node:path';
 
@@ -15,6 +17,7 @@ import {
   firstSentence,
   moduleExports,
   resolveAlias,
+  declaredTypeOf,
 } from './model';
 import type { EntryPoint, ReferenceProgram } from './program';
 
@@ -171,13 +174,15 @@ function ownerCell(reference: ReferenceProgram, fromPage: string, row: SlotRow, 
 
 function slotTable(
   reference: ReferenceProgram,
+  model: Model,
   fromPage: string,
-  pageFile: string,
-  rows: SlotRow[],
-  declaredKeys: string[] | undefined
+  info: BehaviorInfo,
+  slot: 'state' | 'context'
 ): string | undefined {
+  const rows = info[slot];
   if (rows.length === 0) return undefined;
 
+  const declaredKeys = slot === 'state' ? info.stateKeys : info.contextKeys;
   const long = new LongCells();
   const declaredColumn = declaredKeys !== undefined;
   const headers = ['Key', 'Access', ...(declaredColumn ? ['Declared'] : []), 'Type', 'Owner', 'Doc'];
@@ -186,8 +191,8 @@ function slotTable(
     row.access,
     ...(declaredColumn ? [row.declared ? 'yes' : row.optional ? 'reads if present' : 'no'] : []),
     long.cell(row.key, 'type', row.type),
-    ownerCell(reference, fromPage, row, pageFile),
-    docCell(row.doc),
+    ownerCell(reference, fromPage, row, info.file),
+    row.doc.text ? docCell(row.doc) : borrowedDocCell(reference, fromPage, docPool(model), slot, row.key, [info]),
   ]);
 
   return section([table(headers, body), long.render()]);
@@ -206,7 +211,7 @@ function configTable(rows: ConfigRow[]): string | undefined {
   return section([table(['Key', 'Type', 'Doc'], body), long.render()]);
 }
 
-function behaviorSection(reference: ReferenceProgram, page: string, info: BehaviorInfo): string {
+function behaviorSection(reference: ReferenceProgram, model: Model, page: string, info: BehaviorInfo): string {
   const configNote =
     info.configOptional === undefined
       ? undefined
@@ -218,8 +223,8 @@ function behaviorSection(reference: ReferenceProgram, page: string, info: Behavi
     info.contextKeys === undefined ? '`contextKeys` are not derivable from the type or the initializer.' : undefined,
   ].filter(Boolean);
   const config = configTable(info.config);
-  const state = slotTable(reference, page, info.file, info.state, info.stateKeys);
-  const context = slotTable(reference, page, info.file, info.context, info.contextKeys);
+  const state = slotTable(reference, model, page, info, 'state');
+  const context = slotTable(reference, model, page, info, 'context');
 
   return section([
     `## ${info.name}`,
@@ -244,6 +249,7 @@ function otherExports(
   rendered: Set<string>
 ): string | undefined {
   const { checker } = reference;
+  const long = new LongCells();
   const rows: string[][] = [];
 
   for (const exported of moduleExports(reference, entry.file)) {
@@ -256,7 +262,7 @@ function otherExports(
     rows.push([
       code(exported.name),
       exportKind(symbol),
-      firstSentence(doc) || NO_DESCRIPTION,
+      firstSentence(doc) || declaredTypeCell(long, exported.name, declaredTypeOf(checker, symbol)),
       sourceLink(reference, page, file),
     ]);
   }
@@ -265,7 +271,18 @@ function otherExports(
 
   rows.sort((a, b) => a[0]!.localeCompare(b[0]!));
 
-  return section(['## Other exports', table(['Name', 'Kind', 'Description', 'Source'], rows)]);
+  return section(['## Other exports', table(['Name', 'Kind', 'Description', 'Source'], rows), long.render()]);
+}
+
+/** The description of a type export without JSDoc: what its declaration says it is. */
+function declaredTypeCell(long: LongCells, name: string, declared: ReturnType<typeof declaredTypeOf>): string {
+  if (!declared) return NO_DESCRIPTION;
+
+  if (declared.kind === 'alias') return `No JSDoc; an alias of ${long.cell(name, 'type', declared.text)}.`;
+
+  return declared.text
+    ? `No JSDoc; fields ${long.cell(name, 'fields', declared.text, 'text')}.`
+    : 'No JSDoc; no fields.';
 }
 
 function renderBehaviorPage(reference: ReferenceProgram, model: Model, entry: EntryPoint): string {
@@ -276,7 +293,7 @@ function renderBehaviorPage(reference: ReferenceProgram, model: Model, entry: En
     GENERATED_NOTICE,
     `# ${code(entry.specifier)}`,
     `Source: ${sourceLink(reference, page, entry.file)}`,
-    ...behaviors.map((info) => behaviorSection(reference, page, info)),
+    ...behaviors.map((info) => behaviorSection(reference, model, page, info)),
     otherExports(reference, page, entry, new Set(behaviors.map((info) => info.name))),
   ]);
 }
@@ -302,15 +319,50 @@ function slotOf(info: BehaviorInfo, slot: 'state' | 'context', key: string): Slo
   return info[slot].find((row) => row.key === key);
 }
 
-/** The slot doc from the first behavior that writes the key, else the first that reads it. */
-function slotDoc(behaviors: BehaviorInfo[], slot: 'state' | 'context', key: string): DocBlock | undefined {
-  const rows = behaviors.map((info) => slotOf(info, slot, key)).filter((row): row is SlotRow => !!row);
+/** The slot doc from the first behavior that writes the key, else the first that reads it, and which behavior. */
+function slotDoc(
+  behaviors: BehaviorInfo[],
+  slot: 'state' | 'context',
+  key: string
+): { doc: DocBlock; from: BehaviorInfo } | undefined {
+  const rows = behaviors
+    .map((info) => ({ info, row: slotOf(info, slot, key) }))
+    .filter((pair): pair is { info: BehaviorInfo; row: SlotRow } => !!pair.row);
   const documented = [
-    ...rows.filter((row) => row.access === 'writes'),
-    ...rows.filter((row) => row.access === 'reads'),
+    ...rows.filter(({ row }) => row.access === 'writes'),
+    ...rows.filter(({ row }) => row.access === 'reads'),
   ];
+  const found = documented.find(({ row }) => row.doc.text);
 
-  return documented.find((row) => row.doc.text)?.doc;
+  return found ? { doc: found.row.doc, from: found.info } : undefined;
+}
+
+/**
+ * Every behavior a slot doc can be borrowed from: the exported ones, then those built inline in a feature's list (the
+ * external-signal declarations among them carry the docs of the keys no behavior declares).
+ */
+function docPool(model: Model): BehaviorInfo[] {
+  return [...new Set([...model.behaviors, ...model.features.flatMap((feature) => feature.behaviors)])];
+}
+
+/**
+ * The doc cell for a key none of `own` documents: the doc `slotDoc` finds among `behaviors`, naming the behavior it
+ * comes from when that behavior is not one of `own`.
+ */
+function borrowedDocCell(
+  reference: ReferenceProgram,
+  page: string,
+  behaviors: BehaviorInfo[],
+  slot: 'state' | 'context',
+  key: string,
+  own: BehaviorInfo[]
+): string {
+  const found = slotDoc(behaviors, slot, key);
+  if (!found) return NO_DESCRIPTION;
+
+  const lender = own.includes(found.from) ? '' : ` (doc of ${behaviorLink(reference, page, found.from)})`;
+
+  return `${docCell(found.doc)}${lender}`;
 }
 
 function behaviorLinks(reference: ReferenceProgram, page: string, behaviors: BehaviorInfo[]): string {
@@ -319,6 +371,7 @@ function behaviorLinks(reference: ReferenceProgram, page: string, behaviors: Beh
 
 function slotFieldsTable(
   reference: ReferenceProgram,
+  model: Model,
   page: string,
   fields: TypeField[],
   behaviors: BehaviorInfo[],
@@ -329,13 +382,12 @@ function slotFieldsTable(
   const long = new LongCells();
   const rows = fields.map((field) => {
     const declaredBy = behaviors.filter((info) => slotOf(info, slot, field.key)?.declared);
-    const doc = slotDoc(behaviors, slot, field.key);
 
     return [
       code(field.optional ? `${field.key}?` : field.key),
       long.cell(field.key, 'type', field.type),
       behaviorLinks(reference, page, declaredBy),
-      doc ? docCell(doc) : NO_DESCRIPTION,
+      borrowedDocCell(reference, page, [...behaviors, ...docPool(model)], slot, field.key, behaviors),
     ];
   });
 
@@ -401,8 +453,8 @@ function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: F
         .join('\n')
     : 'None.';
   const config = featureConfigTable(reference, model, page, feature);
-  const state = slotFieldsTable(reference, page, feature.state, feature.behaviors, 'state');
-  const context = slotFieldsTable(reference, page, feature.context, feature.behaviors, 'context');
+  const state = slotFieldsTable(reference, model, page, feature.state, feature.behaviors, 'state');
+  const context = slotFieldsTable(reference, model, page, feature.context, feature.behaviors, 'context');
   const composedBy = feature.composedBy.length
     ? feature.composedBy.map((engine) => `- ${link(page, engine.entry.page!, engine.entry.specifier)}`).join('\n')
     : 'None.';
@@ -453,7 +505,7 @@ function engineConfigTable(reference: ReferenceProgram, page: string, engine: En
   return section([table(['Key', 'Type', 'Default', 'Default from', 'Read by', 'Doc'], rows), long.render()]);
 }
 
-function renderEnginePage(reference: ReferenceProgram, engine: EngineInfo): string {
+function renderEnginePage(reference: ReferenceProgram, model: Model, engine: EngineInfo): string {
   const page = engine.entry.page!;
   const features = engine.features
     .map((feature, index) => `${index + 1}. ${link(page, feature.entry.page!, feature.name)}`)
@@ -462,8 +514,8 @@ function renderEnginePage(reference: ReferenceProgram, engine: EngineInfo): stri
     .map((info, index) => `${index + 1}. ${behaviorLink(reference, page, info)}`)
     .join('\n');
   const config = engineConfigTable(reference, page, engine);
-  const state = slotFieldsTable(reference, page, engine.state, engine.behaviors, 'state');
-  const context = slotFieldsTable(reference, page, engine.context, engine.behaviors, 'context');
+  const state = slotFieldsTable(reference, model, page, engine.state, engine.behaviors, 'state');
+  const context = slotFieldsTable(reference, model, page, engine.context, engine.behaviors, 'context');
 
   return section([
     GENERATED_NOTICE,
@@ -626,8 +678,8 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     GENERATED_NOTICE,
     `# ${code(reference.packageName)} API reference`,
     `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/hls/*\`), their features (\`${reference.packageName}/hls/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
-    'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A symbol without JSDoc reads "No description."',
-    'On feature and engine pages, a config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one, and a state or context key\'s doc is the field JSDoc from the first behavior that writes the key, else the first that reads it.',
+    'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
+    'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
     '## Engines and features',
     mermaid(model),
     '## Core',
@@ -661,7 +713,7 @@ export function renderPages(reference: ReferenceProgram, model: Model): Pages {
 
   for (const feature of model.features) pages.set(feature.entry.page!, renderFeaturePage(reference, model, feature));
 
-  for (const engine of model.engines) pages.set(engine.entry.page!, renderEnginePage(reference, engine));
+  for (const engine of model.engines) pages.set(engine.entry.page!, renderEnginePage(reference, model, engine));
 
   for (const [path, content] of pages) pages.set(path, `${content.replace(/\r\n/g, '\n').trimEnd()}\n`);
 

@@ -27,7 +27,7 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
 | `mediaContainerData` | `Record<string, MediaContainerData> \| undefined` | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | Transient origin-establishment data, keyed by **track type** (`'video'` / `'audio'`) — per spec one init+media pair per type suffices, and ABR rungs of a type share the origin. Filled by the discover steps across appends, reset per source. Never the model — the churn stays here; only the settled `startMediaTime` reaches `Track`. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 
@@ -39,7 +39,7 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/shift-timestamps.ts](../../../src/playback/engines/hls/features/shift-timestamps.ts) |

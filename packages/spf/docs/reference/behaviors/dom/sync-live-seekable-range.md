@@ -40,7 +40,7 @@ The setup declares `config` as required. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SyncLiveSeekableRangeState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SyncLiveSeekableRangeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | No description. |
 | `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | No description. |
 
@@ -54,5 +54,5 @@ The setup declares `config` as required. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SyncLiveSeekableRangeContext` | interface | No description. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
-| `SyncLiveSeekableRangeState` | interface | No description. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
+| `SyncLiveSeekableRangeContext` | interface | No JSDoc; fields `mediaSource`. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
+| `SyncLiveSeekableRangeState` | interface | No JSDoc; fields `presentation, selectedAudioTrackId, selectedVideoTrackId`. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |

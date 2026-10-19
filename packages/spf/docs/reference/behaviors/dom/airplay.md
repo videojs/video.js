@@ -59,7 +59,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `disableRemotePlayback` | reads | yes | `boolean \| undefined` | inline | No description. |
 | `loadingSuspended` | writes | yes | `boolean \| undefined` | `SegmentLoadingState` ([behaviors/dom/load-segments](load-segments.md)) | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent slot means never suspended. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `startPosition` | writes | yes | `number \| undefined` | `StartPositionState` ([behaviors/dom/apply-start-position](apply-start-position.md)) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
 
 ### Context

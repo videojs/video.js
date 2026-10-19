@@ -38,7 +38,7 @@ audio constraints. Compose it after the features that set the plain versions, su
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
 | `negotiatedKeySystem` | `string \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The key system negotiation settled on for the current source, or `undefined` when none has been (yet, or at all). The negotiation outcome as _state_, not just as the private detail it once was: `exchangeLicenses` keys its per-system message shaping and license-server lookup off it, and it is the late fact rendition pruning can't otherwise learn — pruning runs before the CDM has been asked, so a rendition naming a configured server survives it and only negotiation reveals the CDM is absent. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `segmentLoadingBlocked` | `boolean \| undefined` | [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | Segment-load gate: `true` while an encrypted source's MediaKeys aren't attached yet; the `loadXSegments` dispatchers park on it. Semantics on `SegmentLoadingState['segmentLoadingBlocked']`. |
 
 ### Context
@@ -57,7 +57,7 @@ audio constraints. Compose it after the features that set the plain versions, su
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/drm.ts](../../../src/playback/engines/hls/features/drm.ts) |
