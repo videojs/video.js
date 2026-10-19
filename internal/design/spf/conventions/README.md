@@ -32,7 +32,7 @@ Started small. Grow only when the assessment surfaces a recurring decision that 
 | Doc | Question it answers |
 | --- | ------------------- |
 | [behaviors.md](behaviors.md) | When to define a Behavior; behavior shape; helper vs behavior split; per-type specialization; file placement; source-reset handling. |
-| [signals.md](signals.md) | When to use `Signal<T>` (writable) vs `ReadonlySignal<T>` (read-only); when to seed via `initialState`/`initialContext`; when to use `shareSignals`; multi-writer slots; `peek` and `equalsById` helpers. |
+| [signals.md](signals.md) | When to use `Signal<T>` (writable) vs `ReadonlySignal<T>` (read-only); when to seed via `initialState`/`initialContext`; how code outside the composition writes its state; multi-writer slots; `peek` and `equalsById` helpers. |
 | [reactors.md](reactors.md) | When to reach for `createMachineReactor`; the `deriveState` + `monitor` convention; the entry-returns-state-exit-cleanup idiom; source-identity states; policy modes as states. |
 | [actors.md](actors.md) | When to reach for an Actor; the three actor shapes (`MessageActor` / `TransitionActor` / `CallbackActor`); when one actor vs two (mechanism + policy split); the per-type setup-actor cluster-ownership convention. |
 | [config.md](config.md) | When to push a value to config vs bake it in; engine config as single source of truth; nested sub-configs; threading paths through behaviors / helpers / actors / lower-layer functions; multi-layer source-of-truth; DRY for shared defaults; decision logic with the algorithm. |

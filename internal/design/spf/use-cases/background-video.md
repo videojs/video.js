@@ -114,7 +114,7 @@ use cases resolve via adapter choice.
 Phase 1 baseline:
 
 - **`video-only-composition`** — used at the *composition-mechanism* level; same audio-side subtraction pattern as the Case-1 feature, driven by adapter choice instead of source-shape detection. Plus further subtractions (text, ABR, preload).
-- **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** — variant adapter parallels `HlsVideoAdapterCore` via the same `HlsVideoMixin` / `shareSignals` pattern.
+- **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** — variant adapter parallels `HlsVideoAdapterCore` via the same `HlsVideoMixin` pattern.
 - **[`mse-mms-pipeline`](../features/mse-mms-pipeline.md)** — used as-is. Firefox `mozHasAudio=false` verification under subtractive-audio composition is **joint Phase 1 scope** with `video-only-mode-override` and the Case-1 `video-only-composition` feature.
 - **[`buffer-management`](../features/buffer-management.md)** — as-is in Phase 1; Phase 3 surfaces back-buffer tuning and loop-around forward-buffer fetching (the "loop-around buffer fetching" candidate in that feature's *What's not implemented* directly targets this use case).
 - **[`preload-modes`](../features/preload-modes.md)** — alternative initial state (`loadActivated: true`) plus subtraction of `syncPreload` + `trackLoadTriggers`. Semantic contract preserved; the variant just seeds the gate-passable state from composition time.
@@ -131,7 +131,7 @@ Phase 2 (decorations TBD): **[`audio-playback`](../features/audio-playback.md)**
 
 - **Shared engine factory.** Three use cases now want subtractive-audio composition (this, `video-only-mode-override`, Case-1 `video-only-composition`). Lean: shared factory at the subtractive-audio level, with this use case layering further subtractions (text, ABR, preload) and an initial-state override on top.
 - **Firefox `mozHasAudio` verification.** Joint scope with the two sibling cases — same mixed-source-with-audio-subtracted permutation.
-- **Adapter proliferation.** N+1 adapter parallel to `HlsVideoAdapterCore`; three adapters share the `HlsVideoMixin` / `shareSignals` pattern — cost is configuration surface, not architecture.
+- **Adapter proliferation.** N+1 adapter parallel to `HlsVideoAdapterCore`; three adapters share the `HlsVideoMixin` pattern — cost is configuration surface, not architecture.
 - **`loadActivated: true` initial-state pattern.** Pioneered here. If a second use case wants the same shape, consider a shared `withAutoLoad()`-style helper or document treatment in [`preload-modes`](../features/preload-modes.md).
 
 ## Open questions

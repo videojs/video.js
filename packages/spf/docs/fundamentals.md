@@ -27,7 +27,7 @@ Use `defineBehavior()` for ordinary source behaviors. It verifies that runtime k
 
 Each behavior expresses slot access with `Signal<T>` for values it writes and `ReadonlySignal<T>` for values it only consumes. This is a local ownership contract over shared signal identities.
 
-Initial state or context materializes values that no behavior naturally seeds. External input slots can be materialized by `makeShareSignals()` and handed to an adapter through `onSignalsReady`.
+Initial state or context materializes values that no behavior naturally seeds. State and context written from outside the composition that no behavior declares are its external signals, declared with `defineExternalSignals()`.
 
 ## Signals
 
@@ -74,7 +74,7 @@ Reactors do not own a message channel. They commonly translate shared engine sta
 
 ## External adapters
 
-An engine adapter should not depend on internal behavior instances. `makeShareSignals()` exposes selected signal references at setup so an HTML, React, or other platform adapter can drive input and observe output.
+An engine adapter should not depend on internal behavior instances. It drives input and observes output through the engine's `state` and `context` signals, which are the same signals every behavior receives, so an HTML, React, or other platform adapter needs nothing else.
 
 The adapter owns platform semantics such as attachment, play activation, and property synchronization. The engine owns streaming behavior and cleanup.
 

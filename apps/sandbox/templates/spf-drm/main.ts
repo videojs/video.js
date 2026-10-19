@@ -13,7 +13,7 @@
 //                                     the control for telling WebKit's own
 //                                     AirPlay behavior apart from DRM's.
 import { restrictDrmSystems, SOURCES } from '@app/shared/sources';
-import type { DrmSystemsConfig, HlsVideoEngineSignals } from '@videojs/spf/hls';
+import type { DrmSystemsConfig } from '@videojs/spf/hls';
 import { createHlsVideoEngine } from '@videojs/spf/hls';
 
 const video = document.getElementById('video') as HTMLVideoElement;
@@ -55,19 +55,13 @@ subheading.textContent = [
   .filter(Boolean)
   .join('  ·  ');
 
-let signals!: HlsVideoEngineSignals;
-const engine = createHlsVideoEngine({
-  drm: source.drm,
-  onSignalsReady: (refs) => {
-    signals = refs;
-  },
-});
+const engine = createHlsVideoEngine({ drm: source.drm });
 
 // preload before mediaElement: syncPreload reads the element's attribute when
 // it first appears in context.
 video.preload = 'auto';
-signals.context.mediaElement.set(video);
-signals.state.presentation.set({ url: source.src });
+engine.context.mediaElement.set(video);
+engine.state.presentation.set({ url: source.src });
 
 // Raw key-request tap, deliberately unfiltered — `setupAirPlayFairPlay` serves
 // only `encrypted` events whose `initDataType` is `skd`, so a receiver whose
@@ -104,10 +98,10 @@ video.addEventListener('error', () => console.log('[spf-drm] element error', vid
 const drmSnapshot = () => ({
   // WebKit's raw flag, then the session fact `setupAirPlay` derives from it.
   wireless: (video as { webkitCurrentPlaybackTargetIsWireless?: boolean }).webkitCurrentPlaybackTargetIsWireless,
-  loadingSuspended: signals.state.loadingSuspended?.get(),
-  segmentLoadingBlocked: signals.state.segmentLoadingBlocked.get(),
-  negotiatedKeySystem: signals.state.negotiatedKeySystem.get(),
-  mseKeys: Boolean(signals.context.mediaKeys.get()),
+  loadingSuspended: engine.state.loadingSuspended?.get(),
+  segmentLoadingBlocked: engine.state.segmentLoadingBlocked.get(),
+  negotiatedKeySystem: engine.state.negotiatedKeySystem.get(),
+  mseKeys: Boolean(engine.context.mediaKeys.get()),
   elementKeys: Boolean(video.mediaKeys),
   // Resource selection takes the `<source>` children in order, and the engine
   // *prepends* the MediaSource blob while `setupAirPlay` *appends* the
@@ -117,7 +111,7 @@ const drmSnapshot = () => ({
   sources: [...video.querySelectorAll('source')].map((el) =>
     el.src.startsWith('blob:') ? 'blob(mse)' : el.src.endsWith('.m3u8') ? 'hls(fallback)' : el.src.slice(0, 24)
   ),
-  errors: signals.state.errors.get()?.map((error) => error.code),
+  errors: engine.state.errors.get()?.map((error) => error.code),
 });
 
 // An AirPlay pass is run at the device, not at the keyboard, and the live pane
@@ -191,4 +185,4 @@ void (async () => {
   console.log('[spf-drm] CDM robustness tiers accepted:', accepted);
 })();
 
-Object.assign(window as object, { engine, signals, video });
+Object.assign(window as object, { engine, video });
