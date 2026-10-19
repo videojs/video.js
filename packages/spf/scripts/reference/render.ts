@@ -154,6 +154,13 @@ class LongCells {
   }
 }
 
+/** A collapsed block GitHub renders from `<details>`; the blank lines keep Markdown active inside it. */
+function details(summary: string, parts: string[]): string {
+  return [`<details>`, `<summary>${summary}</summary>`, '', ...parts.flatMap((part) => [part, '']), '</details>'].join(
+    '\n'
+  );
+}
+
 function section(parts: (string | undefined)[]): string {
   return parts.filter((part): part is string => !!part).join('\n\n');
 }
@@ -833,18 +840,20 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
         firstParagraph(info.doc) || NO_DESCRIPTION,
       ]);
   const headers = ['Symbol', 'Page', 'Description'];
+  const counts = {
+    core: core.reduce((total, module) => total + module.exports.length, 0),
+    engines: model.engines.length,
+    features: model.features.length,
+    behaviors: model.behaviors.filter((info) => info.entry).length,
+  };
 
   return section([
     GENERATED_NOTICE,
     `# ${code(reference.packageName)} API reference`,
-    `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/hls/*\`), their features (\`${reference.packageName}/hls/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
-    'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
-    'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
+    `${code(reference.packageName)} builds a playback engine by composing behaviors, grouped into features. This reference covers ${counts.engines} engines, the ${counts.features} features they compose, the ${counts.behaviors} behaviors the behavior entry points export, and the ${counts.core} composition exports that put them together. Each engine page lists its features and behaviors in composition order with the config, state, and context keys they resolve to; each feature page does the same for its behaviors; each behavior page shows what its setup reads and writes.`,
     '## Engines and features',
     "Each engine's box and arrows share a color. Features are grouped by which engines compose them; each engine page lists its own features in composition order.",
     mermaid(model),
-    '## Core',
-    table(headers, coreRows),
     '## Engines',
     table(headers, engineRows),
     '## Features',
@@ -853,6 +862,14 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     table(headers, behaviorRows('behavior')),
     '## Behaviors (DOM)',
     table(headers, behaviorRows('behavior-dom')),
+    '## Core',
+    table(headers, coreRows),
+    details('How this reference is generated', [
+      `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/hls/*\`), their features (\`${reference.packageName}/hls/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
+      'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
+      'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
+      'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
+    ]),
   ]);
 }
 
