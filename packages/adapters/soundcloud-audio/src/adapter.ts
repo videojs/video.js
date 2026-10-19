@@ -238,6 +238,13 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
   set currentTime(value) {
     const time = this.#clampTime(value);
+
+    // With no source, or one that failed to load, no widget will ever report the seek landing.
+    if (!this.#ready && (!this.#src || this.#error)) {
+      this.#currentTime = time;
+      return;
+    }
+
     if (time === this.#currentTime && !this.#ended) return;
 
     this.#finished = false;
