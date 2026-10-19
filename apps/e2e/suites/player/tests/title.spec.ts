@@ -80,7 +80,7 @@ for (const framework of ['html', 'react']) {
       await container.hover();
       await expect(title).toHaveAttribute('data-visible');
       await expect(title).toHaveCSS('opacity', '1');
-      await page.getByRole('button', { name: 'Pause', exact: true }).click();
+      await page.getByRole('button', { name: 'Pause', exact: true }).last().click();
 
       await page.emulateMedia({ reducedMotion: 'reduce' });
       expect(
