@@ -5,7 +5,11 @@ import { isNull } from '@videojs/utils/predicate';
 
 import { definePlayerFeature } from '../../feature';
 import { findGestureCoordinator } from '../../gesture/coordinator';
-import { isRemotePlaybackConnected, isRemotePlaybackConnecting } from '../../presentation/remote-playback';
+import {
+  isRemotePlaybackConnected,
+  isRemotePlaybackConnecting,
+  REMOTE_PLAYBACK_CHANGE_EVENT,
+} from '../../presentation/remote-playback';
 
 const IDLE_DELAY = 2000;
 const TAP_THRESHOLD = 250;
@@ -76,6 +80,15 @@ export const controlsFeature = definePlayerFeature({
         isRemotePlaybackConnecting(media)
       );
     };
+
+    listen(
+      media,
+      REMOTE_PLAYBACK_CHANGE_EVENT,
+      () => {
+        set({ controlsVisible: computeVisible(get().userActive) });
+      },
+      { signal }
+    );
 
     function clearIdle() {
       clearTimeout(idleTimer);

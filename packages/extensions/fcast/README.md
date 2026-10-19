@@ -52,7 +52,7 @@ extension!.sender = sender;
 ```
 
 Place the extension and controls inside a Video.js player. The extension component registers the core; buttons observe it. The FCast sender's `snapshot` reports availability, connection, playback position, duration, volume,
-mute state, and speed. It dispatches a `change` event whenever those values change. `prompt()` opens the application
+mute state, speed, and a required `playbackState` (`idle`, `buffering`, `playing`, `paused`, or `ended`). It dispatches a `change` event whenever those values change. `prompt()` opens the application
 device picker; `disconnect()` ends the session; `load()` and the remaining commands control the receiver. The extension
 uses `src`/`contentType` when the receiver needs a different playable URL or MIME type from the local media.
 
@@ -62,3 +62,11 @@ See the [FCast SDK](https://docs.fcast.org/sdk/) for native sender libraries and
 [FCast protocol](https://docs.fcast.org/protocol/v4/) for a bridge implementation.
 
 The [FCast extension reference](https://videojs.org/docs/framework/react/reference/components/fcast) documents bridge lifecycle, command ordering, state normalization, and error events.
+
+Bridges must publish receiver playback state independently of connection. A matching `snapshot.mediaUrl` lets the
+extension adopt existing playback on connection without reloading. Seek completion follows receiver progress, with a
+one-second position tolerance and a ten-second timeout; command resolution alone does not confirm a seek.
+
+The optional `metadata` input supplies a receiver title and thumbnail URL. Bridges implementing `setSubtitle` receive
+external subtitle resources and initial selection on load, followed by selection changes. Publish `selectedSubtitle`
+with the confirmed subtitle URL or `null` for off to synchronize local controls. Omit `setSubtitle` when unsupported.

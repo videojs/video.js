@@ -1,13 +1,14 @@
-import type { MediaOverride, PlayerTarget } from '@videojs/core/dom';
+import { type MediaOverride, type PlayerTarget, setRemotePlaybackState } from '@videojs/core/dom';
 import { resolveMimeType } from '@videojs/media';
 import { getMediaElement, type HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isUndefined } from '@videojs/utils/predicate';
 
-import type { FCastSender, FCastSnapshot } from './sender';
+import type { FCastLoadRequest, FCastMetadata, FCastSender, FCastSnapshot, FCastSubtitle } from './sender';
 
 const EMPTY_SNAPSHOT: FCastSnapshot = {
   availability: 'unsupported',
   connection: 'disconnected',
+  playbackState: 'idle',
   paused: true,
   currentTime: 0,
   duration: NaN,
@@ -24,6 +25,8 @@ export interface FCastExtensionProps {
   src?: string | undefined;
   /** MIME type sent to the receiver; inferred from the URL when absent. */
   contentType?: string | undefined;
+  /** Receiver display metadata; falls back to the media's title and poster. */
+  metadata?: FCastMetadata | undefined;
 }
 
 /**
@@ -37,11 +40,18 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     sender: undefined,
     src: undefined,
     contentType: undefined,
+    metadata: undefined,
   };
 
   #sender: FCastSender | undefined;
   #src: string | undefined;
   #contentType: string | undefined;
+  #metadata: FCastMetadata | undefined;
+  #trackTarget: HTMLMediaElement | null = null;
+  #selectedSubtitle: string | null | undefined;
+  #syncingTracks = false;
+  #awaitingMedia = false;
+  #seek: { time: number; timer: ReturnType<typeof setTimeout> } | null = null;
   #media: HTMLMediaTargetLike | null = null;
   #detachedMedia: HTMLMediaTargetLike | null = null;
   #loadedSrc: string | null = null;
@@ -72,12 +82,14 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     this.#media = target;
     this.#detachedMedia = null;
     target.addEventListener('loadstart', this.#onLoadStart);
+    this.#bindTracks();
 
     if (this.#connected && this.enabled) {
       this.#wasPlaying = !target.paused;
       target.pause();
       this.#firstLoad = true;
       this.#loadedSrc = null;
+      this.#adoptSession();
     }
 
     this.#followSource();
@@ -89,6 +101,10 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     const media = this.#media;
 
     media?.removeEventListener('loadstart', this.#onLoadStart);
+    this.#unbindTracks();
+
+    if (media) setRemotePlaybackState(media, this, 'disconnected');
+
     this.#detachedMedia = media;
     this.#media = null;
     this.#invalidateLoads();
@@ -129,7 +145,15 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
 
   /** Last state published by the supplied sender. */
   get snapshot(): FCastSnapshot {
-    return this.#sender?.snapshot ?? EMPTY_SNAPSHOT;
+    const snapshot = this.#sender?.snapshot ?? EMPTY_SNAPSHOT;
+    const { playbackState } = snapshot;
+
+    return {
+      ...snapshot,
+      paused: playbackState === 'playing' ? false : playbackState === 'buffering' ? snapshot.paused : true,
+      buffering: playbackState === 'buffering',
+      ended: playbackState === 'ended',
+    };
   }
 
   /** Increments whenever the sender publishes state; suitable for subscribing to this extension. */
@@ -201,6 +225,18 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     this.#followSource();
   }
 
+  get metadata(): FCastMetadata | undefined {
+    return this.#metadata;
+  }
+
+  set metadata(value: FCastMetadata | undefined) {
+    if (this.#metadata === value) return;
+
+    this.#metadata = value;
+    this.#loadedSrc = null;
+    this.#followSource();
+  }
+
   /** Ask the supplied sender to pick a receiver, or disconnect the current one. */
   async toggle(): Promise<void> {
     const sender = this.#sender;
@@ -224,18 +260,41 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     const firstLoad = this.#firstLoad;
     const session = this.#session;
 
+    this.#finishSeek();
+
     this.#firstLoad = false;
     this.#loadedSrc = src;
-    const request = {
+    const snapshot = this.snapshot;
+    const request: FCastLoadRequest = {
       url: src,
       contentType: this.#contentType ?? resolveMimeType(src) ?? '',
-      time: sender.snapshot.ended ? 0 : media.currentTime || 0,
-      paused: this.#replaying ? false : firstLoad ? !this.#wasPlaying : sender.snapshot.paused,
+      time: snapshot.ended
+        ? 0
+        : !firstLoad && snapshot.mediaUrl === src
+          ? snapshot.currentTime
+          : media.currentTime || 0,
+      paused: this.#replaying ? false : firstLoad ? !this.#wasPlaying : snapshot.paused,
       volume: firstLoad ? (media.muted ? 0 : media.volume) : sender.snapshot.muted ? 0 : sender.snapshot.volume,
       speed: firstLoad ? media.playbackRate : sender.snapshot.speed,
     };
 
+    const element = getMediaElement(media);
+    const title = this.#metadata?.title ?? element?.title ?? '';
+    const thumbnailUrl = this.#metadata?.thumbnailUrl ?? (element instanceof HTMLVideoElement ? element.poster : '');
+
+    if (title || thumbnailUrl) request.metadata = { title, thumbnailUrl };
+
+    if (sender.setSubtitle) {
+      const subtitles = this.#subtitles();
+
+      request.subtitles = subtitles.map(({ subtitle }) => subtitle);
+      request.selectedSubtitle = subtitles.find(({ track }) => track.mode === 'showing')?.subtitle.url ?? null;
+      this.#selectedSubtitle = request.selectedSubtitle;
+    }
+
     this.#replaying = false;
+    this.#awaitingMedia = true;
+    media.dispatchEvent(new Event('emptied'));
 
     const pending = (this.#pendingLoad ?? Promise.resolve())
       .catch(() => {})
@@ -248,6 +307,8 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
         if (session === this.#session && this.#loadedSrc === src) {
           this.#loadedSrc = null;
           this.#firstLoad = firstLoad;
+          this.#awaitingMedia = true;
+          this.#media?.dispatchEvent(new Event('emptied'));
         }
 
         throw error;
@@ -258,17 +319,26 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     try {
       await pending;
     } finally {
-      if (this.#pendingLoad === pending) this.#pendingLoad = null;
+      if (this.#pendingLoad === pending) {
+        this.#pendingLoad = null;
+
+        if (this.#loadedSrc === src) this.#onTextTrackChange();
+      }
     }
   }
 
   #invalidateLoads(): void {
+    this.#finishSeek();
     this.#session += 1;
     this.#loadedSrc = null;
     this.#pendingLoad = null;
+    this.#awaitingMedia = false;
+    this.#selectedSubtitle = undefined;
   }
 
   #onLoadStart = () => {
+    this.#bindTracks();
+
     if (this.#connected && this.enabled) this.#media?.pause();
 
     this.#followSource();
@@ -280,7 +350,126 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     }
   }
 
+  #adoptSession(): void {
+    const snapshot = this.snapshot;
+    if (!this.src || snapshot.mediaUrl !== this.src || snapshot.playbackState === 'idle' || snapshot.ended) return;
+
+    this.#loadedSrc = this.src;
+    this.#firstLoad = false;
+    this.#awaitingMedia = false;
+    this.#syncRemoteSubtitle();
+  }
+
+  #startSeek(time: number): void {
+    const sender = this.#sender;
+    if (!sender || !this.#media || !Number.isFinite(time)) return;
+
+    if (this.#seek) clearTimeout(this.#seek.timer);
+
+    const seek = {
+      time,
+      timer: setTimeout(() => {
+        if (this.#seek !== seek) return;
+
+        this.#finishSeek();
+        this.#reportError(new DOMException('FCast receiver did not confirm the seek.', 'TimeoutError'));
+      }, 10_000),
+    };
+
+    this.#seek = seek;
+    this.#media.dispatchEvent(new Event('seeking'));
+
+    if (this.snapshot.currentTime === time) {
+      this.#finishSeek();
+      return;
+    }
+
+    void sender.seek(time).catch((error: unknown) => {
+      if (this.#seek !== seek) return;
+
+      this.#finishSeek();
+      this.#reportError(error);
+    });
+  }
+
+  #finishSeek(): void {
+    if (!this.#seek) return;
+
+    clearTimeout(this.#seek.timer);
+    this.#seek = null;
+    const media = this.#media ?? this.#detachedMedia;
+
+    // Player seek actions subscribe after assigning currentTime, including when a bridge answers synchronously.
+    queueMicrotask(() => {
+      if (!this.#seek) media?.dispatchEvent(new Event('seeked'));
+    });
+  }
+
+  #bindTracks(): void {
+    const element = this.#sender?.setSubtitle ? getMediaElement(this.#media) : null;
+    if (element === this.#trackTarget) return;
+
+    this.#unbindTracks();
+    this.#trackTarget = element;
+    element?.textTracks.addEventListener('change', this.#onTextTrackChange);
+  }
+
+  #unbindTracks(): void {
+    this.#trackTarget?.textTracks.removeEventListener('change', this.#onTextTrackChange);
+    this.#trackTarget = null;
+  }
+
+  #subtitles(): { track: TextTrack; subtitle: FCastSubtitle }[] {
+    return [...(this.#trackTarget?.querySelectorAll('track') ?? [])].flatMap((element) => {
+      if (!element.src || (element.kind !== 'captions' && element.kind !== 'subtitles')) return [];
+
+      return [
+        {
+          track: element.track,
+          subtitle: { url: element.src, label: element.label, language: element.srclang, kind: element.kind },
+        },
+      ];
+    });
+  }
+
+  #onTextTrackChange = (): void => {
+    const sender = this.#sender;
+    if (this.#syncingTracks || this.#pendingLoad || !this.#connected || !this.enabled || !sender?.setSubtitle) return;
+
+    const subtitle = this.#subtitles().find(({ track }) => track.mode === 'showing')?.subtitle ?? null;
+    const url = subtitle?.url ?? null;
+    if (url === this.#selectedSubtitle) return;
+
+    this.#selectedSubtitle = url;
+    const session = this.#session;
+
+    void sender.setSubtitle(subtitle).catch((error: unknown) => {
+      if (sender !== this.#sender || session !== this.#session) return;
+
+      this.#selectedSubtitle = undefined;
+      this.#reportError(error);
+    });
+  };
+
+  #syncRemoteSubtitle(): void {
+    const selected = this.snapshot.selectedSubtitle;
+    if (!this.#sender?.setSubtitle || selected === undefined) return;
+
+    const subtitles = this.#subtitles();
+    if (selected !== null && !subtitles.some(({ subtitle }) => subtitle.url === selected)) return;
+
+    this.#selectedSubtitle = selected;
+    this.#syncingTracks = true;
+
+    try {
+      for (const { track, subtitle } of subtitles) track.mode = subtitle.url === selected ? 'showing' : 'disabled';
+    } finally {
+      this.#syncingTracks = false;
+    }
+  }
+
   #onSenderChange = (): void => {
+    this.#bindTracks();
     const next = this.snapshot;
     const previous = this.#lastSnapshot;
     const connected = next.connection === 'connected';
@@ -294,6 +483,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
       this.#connected = true;
       this.#firstLoad = true;
       this.#loadedSrc = null;
+      this.#adoptSession();
       this.#followSource();
     } else if (!connected && wasConnected) {
       this.#connected = false;
@@ -304,6 +494,29 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
     if (next.volume > 0) this.#unmutedVolume = next.volume;
 
     if (connected && this.enabled) {
+      const wasAwaiting = this.#awaitingMedia;
+
+      if (wasConnected && next.playbackState !== 'idle' && (!next.mediaUrl || next.mediaUrl === this.#loadedSrc)) {
+        this.#awaitingMedia = false;
+      }
+
+      if (wasAwaiting && !this.#awaitingMedia) this.#media?.dispatchEvent(new Event('loadedmetadata'));
+
+      if (next.playbackState === 'idle' && previous.playbackState !== 'idle') {
+        this.#finishSeek();
+        this.#media?.dispatchEvent(new Event('emptied'));
+      }
+
+      if (
+        this.#seek &&
+        next.currentTime !== previous.currentTime &&
+        Math.abs(next.currentTime - this.#seek.time) <= 1
+      ) {
+        this.#finishSeek();
+      }
+
+      if (!this.#awaitingMedia && (!next.mediaUrl || next.mediaUrl === this.#loadedSrc)) this.#syncRemoteSubtitle();
+
       if (!wasConnected || next.paused !== previous.paused) {
         this.#media?.dispatchEvent(new Event(next.paused ? 'pause' : 'play'));
       }
@@ -333,6 +546,16 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
   };
 
   #notify(): void {
+    if (this.#media) {
+      const connection = this.snapshot.connection;
+
+      setRemotePlaybackState(
+        this.#media,
+        this,
+        this.enabled && (this.#connected || connection === 'connecting') ? connection : 'disconnected'
+      );
+    }
+
     this.#version += 1;
     this.dispatchEvent(new Event('change'));
   }
@@ -361,13 +584,18 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
         return extension.snapshot.ended ?? false;
       },
       get readyState() {
+        if (extension.#awaitingMedia || extension.snapshot.playbackState === 'idle') return 0;
+
         return extension.snapshot.buffering ? 2 : 3;
+      },
+      get seeking() {
+        return extension.#seek !== null;
       },
       get currentTime() {
         return extension.snapshot.currentTime;
       },
       set currentTime(value: number) {
-        void extension.#sender?.seek(value).catch(extension.#reportError);
+        extension.#startSeek(value);
       },
       get duration() {
         return extension.snapshot.duration;
@@ -409,6 +637,7 @@ export class FCastExtension extends EventTarget implements FCastExtensionProps {
   }
 
   #onSenderError = (event: Event): void => {
+    this.#finishSeek();
     // SAFETY: FCastBridge specifies error events as CustomEvent<unknown>.
     this.#reportError((event as CustomEvent<unknown>).detail);
   };

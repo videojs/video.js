@@ -10,6 +10,8 @@ apis:
   - FCastSender
   - FCastLoadRequest
   - FCastSnapshot
+  - FCastMetadata
+  - FCastSubtitle
 ---
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
@@ -70,6 +72,7 @@ The element belongs inside the player. `sender` is a property, not an HTML attri
 |---|---|---|---|
 | Sender | `sender` | `sender` property | Application bridge implementing `FCastSender` |
 | Receiver URL | `src` | `src` attribute or property | Receiver-accessible URL; defaults to the attached media's playable source. Embed pages require an explicit stream URL. |
+| Metadata | `metadata` | `metadata` property | Optional `FCastMetadata` with receiver title and thumbnail URL; defaults to the media element's title and poster. |
 | MIME type | `contentType` | `content-type` attribute or `contentType` property | MIME type sent with the load request; inferred from the URL when unset. An unknown type is sent as an empty string. |
 
 The extension follows the player's attached media and disconnects its session when removed. Buttons can mount or unmount independently of the extension.
@@ -77,6 +80,10 @@ The extension follows the player's attached media and disconnects its session wh
 ## Playback behavior
 
 On connection, local playback pauses and its position, volume, rate, and playing state become the initial load request. Player play, pause, seek, volume, mute, and rate controls then target the receiver. Source changes load the new media while retaining the receiver's volume and rate. Replay after an ended update starts at zero.
+
+If the bridge reports a non-idle, non-ended `mediaUrl` matching the requested source, the extension adopts that receiver playback without sending a load or resetting its position, volume, or rate. This also applies when attaching to an already connected bridge. Without matching media identity, connection starts a fresh load.
+
+Controls remain visible while FCast is connecting or connected. This presentation state does not replace Google Cast or AirPlay discovery and pickers.
 
 On disconnect, the extension restores the last receiver position, volume, mute, rate, and playback state to the local media. Removal also disconnects the bridge, including pending receiver selection. Unsent extension loads are discarded when the sender or attached media changes. Media with `disableRemotePlayback` does not receive a remote override or load request.
 
@@ -88,7 +95,7 @@ FCast has no independent mute command. Muting sends volume zero; unmuting restor
 
 | Member | Contract |
 |---|---|
-| `snapshot` | `FCastSnapshot`: availability, connection, optional device name, paused state, position, duration, volume, mute, rate, and optional buffering/ended state. |
+| `snapshot` | `FCastSnapshot`: availability, connection, optional device name, paused state, position, duration, volume, mute, rate, required `playbackState`, optional `mediaUrl`, and optional `selectedSubtitle`. |
 | `prompt()` | Owns permission requests and receiver selection; publishes `connecting`, then `connected`. Cancellation restores `disconnected` and rejects with `AbortError`. |
 | `disconnect()` | Idempotently cancels pending selection and unsent commands, stops remote playback, closes the connection, and publishes `disconnected` before resolving. |
 | `load(request)` | Replaces media and applies the requested position, volume, speed, and paused state in order. |
@@ -96,10 +103,23 @@ FCast has no independent mute command. Muting sends volume zero; unmuting restor
 | `seek(time)` | Requests a position in seconds. |
 | `setVolume(volume)` | Requests volume from zero to one; zero is muted. |
 | `setSpeed(speed)` | Requests a positive playback rate multiplier. |
+| `setSubtitle(subtitle)` | Optional external subtitle support. Selects/adds an `FCastSubtitle`, or disables subtitles with `null`. Expose only when supported by the receiver. |
 
 Playback commands reject when disconnected or when sending fails. Resolution means the command was sent, not that the receiver acknowledged it. The bridge serializes commands and reports actual state from receiver updates. Receiver and transport failures arriving later emit `CustomEvent('error', { detail: error })`; connection loss also publishes `disconnected`. Updates from an old session cannot overwrite a newer session.
 
 Positions and durations use seconds, including fractional seconds. Unknown duration is `NaN`; an unbounded live duration is `Infinity`. Volume is normalized to `[0, 1]`, `muted` reflects zero volume, and speed is a positive multiplier. `load()` includes the desired paused state even when the negotiated protocol requires a separate pause after loading.
+
+### Playback state and seeking
+
+`playbackState` is required: `idle`, `buffering`, `playing`, `paused`, or `ended`. Existing bridges must add this field. Connection alone does not imply media readiness, and resolving `load()` does not imply the receiver has loaded it. Publish receiver state after loading; when `mediaUrl` is supplied it must identify that media. The older `buffering` and `ended` fields are compatibility hints; `playbackState` takes precedence.
+
+Video.js reports a seek in progress until receiver position is within one second of the requested position. Command completion alone does not finish the seek. A no-op seek completes asynchronously. A command failure, bridge error, disconnect, or media replacement clears seeking; ten seconds without confirmation clears seeking and emits an error with name `TimeoutError`. A superseding seek ignores older command failures. The bridge must publish the corrected position before reporting an out-of-range seek error so the player can display the receiver's actual position.
+
+### Captions and metadata
+
+When the bridge implements `setSubtitle`, loads include external `<track>` caption/subtitle resources and the selected URL in `selectedSubtitle` (`null` means off). The bridge applies this selection after loading. Local track changes call `setSubtitle`; a receiver-confirmed `snapshot.selectedSubtitle` updates matching local track modes. Omit this field when selection cannot be reported. Unsupported bridges receive no subtitle fields or calls.
+
+`FCastSubtitle` contains `url`, `label`, `language`, and `kind` (`captions` or `subtitles`). These resources must be independently reachable by the receiver. `FCastMetadata` contains optional `title` and `thumbnailUrl`; bridges translate supported fields to the negotiated protocol and may ignore unsupported fields.
 
 The application owns bridge creation, disposal, discovery resources, and access permissions. Each bridge serves one player session at a time. Video.js subscribes to the bridge and disconnects its session on removal; the application disposes the bridge itself.
 
@@ -107,4 +127,4 @@ The application owns bridge creation, disposal, discovery resources, and access 
 
 The bridge implements discovery, receiver selection, version negotiation, message encoding, heartbeats, and transport security according to the [FCast protocol](https://docs.fcast.org/protocol/). Native libraries are listed in the [FCast SDK documentation](https://docs.fcast.org/sdk/). Protocol-specific time units and playback states are normalized to `FCastSnapshot` at this boundary.
 
-The browser contract covers single-media playback. It does not expose protocol-specific queues, mirroring, track selection, or companion-resource serving. The receiver must be able to fetch the media URL independently; browser cookies and local object URLs are not forwarded.
+The browser contract covers single-media playback. It does not expose protocol-specific queues, mirroring, in-band audio/video track selection, or companion-resource serving. External subtitle selection is optional. The receiver must be able to fetch the media URL independently; browser cookies and local object URLs are not forwarded.
