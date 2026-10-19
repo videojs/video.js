@@ -3,6 +3,7 @@ import {
   type HlsVideoAdapterOptions,
   type HlsVideoAdapterProps,
 } from '@videojs/spf/adapters/hls-video';
+import { defaultConfig as mpegTsTransmux } from '@videojs/spf/features/mpeg-ts-transmux';
 
 import { type MuxAdapterProps, MuxMixin } from './mixin';
 import { withMpegTsTransmux } from './transmux';
@@ -30,6 +31,6 @@ export class MuxVideoAdapter extends MuxMixin(HlsVideoAdapter) {
   };
 
   constructor(options?: HlsVideoAdapterOptions) {
-    super(withMpegTsTransmux(options));
+    super(withMpegTsTransmux(options, mpegTsTransmux));
   }
 }

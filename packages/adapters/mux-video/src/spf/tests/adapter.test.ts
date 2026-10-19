@@ -502,7 +502,7 @@ describe('withMpegTsTransmux', () => {
     const { defaultConfig } = await import('@videojs/spf/features/mpeg-ts-transmux');
     const canPlayTrack = () => true;
 
-    const options = withMpegTsTransmux({ config: { canPlayTrack, initialBandwidth: 1 } });
+    const options = withMpegTsTransmux({ config: { canPlayTrack, initialBandwidth: 1 } }, defaultConfig);
 
     expect(options.config).toMatchObject({
       initialBandwidth: 1,
@@ -512,6 +512,6 @@ describe('withMpegTsTransmux', () => {
       sourceBufferMimeCodec: defaultConfig.sourceBufferMimeCodec,
       reportUnsupportedTrackConditions: defaultConfig.reportUnsupportedTrackConditions,
     });
-    expect(withMpegTsTransmux(undefined).config).toEqual(defaultConfig);
+    expect(withMpegTsTransmux(undefined, defaultConfig).config).toEqual(defaultConfig);
   });
 });
