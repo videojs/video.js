@@ -181,7 +181,10 @@ export const controlsFeature = definePlayerFeature({
         // ignores) falls through and resets the idle timer below; without that,
         // repeatedly tapping a control lets the controls auto-hide mid-interaction.
         const coordinator = findGestureCoordinator(container as HTMLElement);
-        if (coordinator?.claimsTap(event, 'toggleControls')) return;
+
+        if (coordinator?.claimsTap(event, 'toggleControls') || coordinator?.claimsTap(event, 'playOrToggleControls')) {
+          return;
+        }
 
         // Inline touch tap-to-toggle for standalone use (no gestures). `media` may be the player's facade, which is
         // never the event target.

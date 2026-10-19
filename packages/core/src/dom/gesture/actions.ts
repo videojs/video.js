@@ -3,6 +3,7 @@ import { isFunction } from '@videojs/utils/predicate';
 import type { GestureActionName } from '../../core/ui/gesture/core';
 import { ignoreRejection, MEDIA_INPUT_ACTION_OVERRIDES } from '../media-actions';
 import type { AnyPlayerStore } from '../player';
+import { selectControls, selectPlayback } from '../store/selectors';
 
 export type { GestureActionName } from '../../core/ui/gesture/core';
 
@@ -19,6 +20,18 @@ export type GestureActionResolver = (context: GestureActionContext) => void;
 /** Actions that need custom logic beyond `store.state[action]()`. */
 const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionResolver>> = {
   togglePaused: MEDIA_INPUT_ACTION_OVERRIDES.togglePaused,
+
+  // Lets a touch tap start paused media, where toggling the always-visible controls would do nothing.
+  playOrToggleControls({ store }) {
+    const playback = selectPlayback(store.state);
+
+    if (playback?.paused) {
+      ignoreRejection(playback.play());
+      return;
+    }
+
+    selectControls(store.state)?.toggleControls();
+  },
 
   toggleMuted: MEDIA_INPUT_ACTION_OVERRIDES.toggleMuted,
 
