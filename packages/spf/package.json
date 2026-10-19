@@ -343,9 +343,7 @@
     "dev": "vp pack --watch ./src --no-clean",
     "test": "vp test run",
     "test:watch": "vp test",
-    "clean": "rimraf --glob dist types '*.tsbuildinfo' 'src/**/*.tsbuildinfo'",
-    "size": "node scripts/measure-size.js --hls",
-    "size:all": "node scripts/measure-size.js --all"
+    "clean": "rimraf --glob dist types '*.tsbuildinfo' 'src/**/*.tsbuildinfo'"
   },
   "dependencies": {
     "@videojs/media": "workspace:*",
