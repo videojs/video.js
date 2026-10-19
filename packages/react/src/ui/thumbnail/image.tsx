@@ -8,10 +8,14 @@ import type {
 import type { ForwardedRef } from 'react';
 import { forwardRef } from 'react';
 
+import { IS_REACT_19 } from '../../utils/react-version';
 import type { UIComponentProps } from '../../utils/types';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { renderElement } from '../../utils/use-render';
 import { useThumbnailContext } from './context';
+
+/** React 19 maps `fetchPriority` to its attribute. Earlier versions drop the camelCase prop with a warning. */
+const FETCH_PRIORITY = IS_REACT_19 ? 'fetchPriority' : 'fetchpriority';
 
 export interface ThumbnailImageProps extends Omit<
   UIComponentProps<'img', ThumbnailState>,
@@ -57,7 +61,7 @@ export const ThumbnailImage = forwardRef(function ThumbnailImage(
           loading,
           style: imageStyle,
           // SAFETY: The core and React types contain the same fetch-priority literals; React alone omits `undefined`.
-          fetchPriority: fetchPriority as ThumbnailFetchPriority,
+          [FETCH_PRIORITY]: fetchPriority as ThumbnailFetchPriority,
         },
       ],
     }

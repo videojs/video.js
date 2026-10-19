@@ -4,12 +4,16 @@ import { MenuPopupDataAttrs, type MenuState } from '@videojs/core';
 import { createMenuPopup, getRootPositionOptions, MenuPositioningCSSVars } from '@videojs/core/dom';
 import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
+import { IS_REACT_19 } from '../../utils/react-version';
 import type { UIComponentProps } from '../../utils/types';
 import { useComposedRefs } from '../../utils/use-composed-refs';
 import { useDestroy } from '../../utils/use-destroy';
 import { renderElement } from '../../utils/use-render';
 import { usePopupPosition } from '../popover/use-popup-position';
 import { MenuPopupContextProvider, useMenuContext } from './context';
+
+/** React 19 writes `inert` as a boolean. Earlier versions, and Preact compat, need a non-empty string. */
+const INERT = IS_REACT_19 ? true : 'inert';
 
 export interface MenuPopupProps extends UIComponentProps<'div', MenuState> {
   /** Keep the popup mounted, hidden, and inert while closed. */
@@ -75,7 +79,7 @@ export const MenuPopup = forwardRef<HTMLDivElement, MenuPopupProps>(function Men
           },
         },
         elementProps,
-        { hidden: inactive, inert: inactive || undefined },
+        { hidden: inactive, inert: inactive ? INERT : undefined },
       ],
     }
   );

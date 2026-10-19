@@ -4,9 +4,10 @@ import { getStateDataAttrs, type StateAttrMap } from '@videojs/core/dom';
 import { isFunction, isObject } from '@videojs/utils/predicate';
 import { resolveClassName } from '@videojs/utils/style';
 import type { CSSProperties, FunctionComponent, ReactElement, ReactNode, Ref } from 'react';
-import { cloneElement, createElement, forwardRef, isValidElement, memo, version } from 'react';
+import { cloneElement, createElement, forwardRef, isValidElement, memo } from 'react';
 
 import { mergeProps } from './merge-props';
+import { IS_REACT_19 } from './react-version';
 import type { HTMLProps, RenderProp } from './types';
 import { composeRefs } from './use-composed-refs';
 
@@ -40,11 +41,6 @@ function getElementRef(element: ReactElement): Ref<unknown> | undefined {
   return elementAny.ref ?? elementAny.props?.ref;
 }
 
-/**
- * React 19 passes `ref` to function components as a prop. React 18 and Preact compat only deliver it through
- * `forwardRef`, so a plain function used as a render target needs wrapping there.
- */
-const REF_AS_PROP = Number.parseInt(version, 10) >= 19;
 const REACT_MEMO_TYPE = Symbol.for('react.memo');
 
 /** What a React element's `type` can be: an intrinsic tag name or a component. */
@@ -91,11 +87,11 @@ function withForwardedRef(component: FunctionComponent<UnknownProps>): Component
 
 /**
  * Resolve the type to create a render element with so the host's composed ref reaches it. Intrinsic tags, classes, and
- * `forwardRef` components already accept refs. Plain function components, bare or wrapped in `memo`, only do on
- * renderers with ref-as-prop and are wrapped otherwise.
+ * `forwardRef` components already accept refs. Plain function components, bare or wrapped in `memo`, only do on React
+ * 19, which passes `ref` as a prop; before it, and on Preact compat, they are wrapped.
  */
 function ensureRefForwarding(type: ComponentOrTag): ComponentOrTag {
-  if (REF_AS_PROP) return type;
+  if (IS_REACT_19) return type;
 
   if (isPlainFunctionComponent(type)) return withForwardedRef(type);
 
