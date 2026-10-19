@@ -9,7 +9,7 @@
  * on a shape the real API forbids.
  */
 
-type ConfigValue = string | null | undefined;
+type ConfigValue = string | readonly number[] | null | undefined;
 
 type ActionInput<Action> = Action extends (...args: infer Arguments) => unknown
   ? Arguments extends [infer Value]
@@ -19,15 +19,19 @@ type ActionInput<Action> = Action extends (...args: infer Arguments) => unknown
 
 /**
  * Actions accepting text, including narrower unions such as a string enum, so
- * a feature keeps its own value type on the provider input. `null | undefined`
- * stays mandatory because that is how a provider clears an absent input.
+ * a feature keeps its own value type on the provider input. A list input must
+ * accept text too, because an HTML attribute only ever delivers text.
+ * `null | undefined` stays mandatory because that is how a provider clears an
+ * absent input.
  */
 type ConfigActionKey<State> = [State] extends [never]
   ? PropertyKey
   : {
       [Key in keyof State]-?: [ActionInput<State[Key]>] extends [ConfigValue]
         ? [null | undefined] extends [ActionInput<State[Key]>]
-          ? Key
+          ? [Extract<ActionInput<State[Key]>, string>] extends [never]
+            ? never
+            : Key
           : never
         : never;
     }[keyof State];
