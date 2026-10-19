@@ -11,6 +11,9 @@ import type { PopupGroup } from '../popover/group';
 import { createPopover, type PopoverChangeDetails, type PopoverOpenChangeReason } from '../popover/popover';
 import type { PositioningCSSVars, PositioningOptions } from '../popover/positioning';
 import type { TransitionApi } from '../transition';
+import { isMenuNavigationKey } from './navigation-key';
+
+export { isMenuNavigationKey };
 
 export type MenuOpenChangeReason = PopoverOpenChangeReason;
 
@@ -44,24 +47,6 @@ export interface MenuHighlightOptions {
   focus?: boolean;
   preventScroll?: boolean;
   pointer?: boolean;
-}
-
-/** @internal */
-export function isMenuNavigationKey(event: Pick<UIKeyboardEvent, 'key' | 'ctrlKey' | 'altKey' | 'metaKey'>): boolean {
-  const { key } = event;
-
-  return (
-    key === 'ArrowDown' ||
-    key === 'ArrowUp' ||
-    key === 'ArrowLeft' ||
-    key === 'ArrowRight' ||
-    key === 'Home' ||
-    key === 'End' ||
-    key === 'Enter' ||
-    key === ' ' ||
-    key === 'Escape' ||
-    (key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey)
-  );
 }
 
 /** @internal */

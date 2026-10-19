@@ -2,7 +2,7 @@ import { isEditableTarget, isInteractiveActivation, listen, resolveEventTarget }
 import { isUndefined } from '@videojs/utils/predicate';
 
 import { isInteractionLocked } from '../ui/interaction-lock';
-import { isMenuNavigationKey } from '../ui/menu/menu';
+import { isMenuNavigationKey } from '../ui/menu/navigation-key';
 import { toAriaKeyShortcut, toDisplayKeyShortcut } from './aria';
 import type { HotkeyOptions, ParsedHotkeyBinding } from './hotkey';
 import { matchesHotkeyEvent, parseHotkeyPattern } from './hotkey';
