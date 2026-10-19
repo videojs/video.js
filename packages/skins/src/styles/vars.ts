@@ -445,6 +445,10 @@ export const vars = {
     kind: 'runtime',
     description: 'Chapter start percentage published by Time Slider and consumed by the Skin.',
   },
+  '--media-playback-rate-length': {
+    kind: 'runtime',
+    description: 'Characters in the current playback rate, published by PlaybackRateButton and consumed by the Skin.',
+  },
   '--media-slider-fill': {
     kind: 'runtime',
     description: 'Fill percentage published by Slider and consumed by the Skin.',

@@ -25,6 +25,8 @@ type LabelParams = Record<string, string | number>;
 type MediaButtonCore<ComponentState extends ButtonState, MediaState> = MediaButtonComponent<object, ComponentState> & {
   setMedia(media: MediaState): void;
   getLabelParams?: (state: ComponentState) => LabelParams | undefined;
+  /** CSS custom properties the button publishes for skins. */
+  getCSSVars?: (state: ComponentState) => Record<string, string>;
 };
 
 /**
@@ -163,6 +165,10 @@ export abstract class MediaButtonElement<
       ...(isHideable(state) && { hidden: state.hidden ? '' : undefined }),
     });
     applyStateDataAttrs(this, state, this.stateAttrMap);
+
+    for (const [name, value] of Object.entries(this.core.getCSSVars?.(state) ?? {})) {
+      this.style.setProperty(name, value);
+    }
   }
 
   #syncHotkeyShortcut(): void {
