@@ -176,11 +176,12 @@ for (const variant of CASES) {
 
     for (const panel of comparison.panels) {
       const captions = await feedbackContract(panel, 'c', '[data-status="captions-on"], [data-status="captions-off"]');
+      const playback = await feedbackContract(panel, 'k', '[data-status="play"], [data-status="pause"]');
 
       await presetVolume(panel);
       const volume = await feedbackContract(panel, 'ArrowUp', '[data-level]:not([role])');
 
-      contracts.push({ captions, volume });
+      contracts.push({ captions, playback, volume });
     }
 
     expect(contracts[1]!).toEqual(contracts[0]!);

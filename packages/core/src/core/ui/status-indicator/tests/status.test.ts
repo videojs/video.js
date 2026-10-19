@@ -27,15 +27,6 @@ describe('deriveStatus', () => {
     });
   });
 
-  it('derives play status only when playOrToggleControls starts paused media', () => {
-    expect(deriveStatus({ action: 'playOrToggleControls' }, { ...SNAPSHOT, paused: true })).toMatchObject({
-      status: 'play',
-      label: 'Playing',
-    });
-
-    expect(deriveStatus({ action: 'playOrToggleControls' }, { ...SNAPSHOT, paused: false })).toBeNull();
-  });
-
   it('derives volume status and value', () => {
     expect(deriveStatus({ action: 'volumeStep', value: 0.3 }, SNAPSHOT)).toMatchObject({
       status: 'volume-high',

@@ -506,24 +506,6 @@ describe('controlsFeature', () => {
     });
   });
 
-  describe('touch tap with a playOrToggleControls gesture', () => {
-    it('leaves the toggle to the gesture', () => {
-      const video = createMockVideo({ paused: false });
-      const { store, container } = createPlayerStore(video);
-
-      addTapGesture(container!, 'playOrToggleControls');
-
-      container!.dispatchEvent(createPointerEvent('pointerdown', { pointerType: 'touch' }));
-      vi.advanceTimersByTime(100);
-      container!.dispatchEvent(createPointerEvent('pointerup', { pointerType: 'touch' }));
-      flush();
-
-      // The inline fallback would hide the visible controls; the gesture owns the tap instead.
-      expect(store.state.userActive).toBe(true);
-      expect(store.state.controlsVisible).toBe(true);
-    });
-  });
-
   describe('playback state interaction', () => {
     it('shows controls when media pauses', () => {
       const video = createMockVideo({ paused: false });
@@ -951,13 +933,9 @@ function createPointerEvent(type: string, init?: { pointerType?: string }): Even
 }
 
 function addToggleControlsGesture(container: HTMLElement): () => void {
-  return addTapGesture(container, 'toggleControls');
-}
-
-function addTapGesture(container: HTMLElement, action: string): () => void {
   return getGestureCoordinator(container).add({
     type: 'tap',
-    action,
+    action: 'toggleControls',
     pointer: 'touch',
     recognizer: { handleUp() {}, reset() {} },
     onActivate() {},

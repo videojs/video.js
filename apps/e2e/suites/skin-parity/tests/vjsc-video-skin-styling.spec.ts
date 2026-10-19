@@ -1484,9 +1484,9 @@ async function keyboardFeedbackContract(panel: SkinPanel) {
   return {
     volume: await triggerIndicator(root, 'ArrowUp', '[data-level]:not([role])'),
     captions: await triggerIndicator(root, 'c', '[data-status="captions-on"], [data-status="captions-off"]'),
-    // The centre seek buttons share `data-direction`; the indicator has no role. Playback has no flash; the centre
-    // play button shows it.
+    // The centre seek buttons share `data-direction`; the indicator has no role.
     seek: await triggerIndicator(root, 'ArrowRight', '[data-direction="forward"]:not([role])'),
+    playback: await triggerIndicator(root, 'k', '[data-status="play"], [data-status="pause"]'),
   };
 }
 

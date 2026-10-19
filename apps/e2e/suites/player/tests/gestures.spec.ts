@@ -7,8 +7,8 @@ import { PlayerPage } from '../../../shared/page-objects/player';
  * Gesture tests — validates the media-gesture components respond to pointer events on the player container (not
  * individual buttons).
  *
- * The player's gesture system: - tap (mouse, center): togglePaused - tap (touch): playOrToggleControls - doubletap
- * (left): seek backward 10s - doubletap (center): toggleFullscreen - doubletap (right): seek forward 10s
+ * The player's gesture system: - tap (mouse, center): togglePaused - tap (touch): toggleControls - doubletap (left):
+ * seek backward 10s - doubletap (center): toggleFullscreen - doubletap (right): seek forward 10s
  */
 
 // Helper to get center coordinates of an element
@@ -180,13 +180,6 @@ test.describe('Touch Gestures', () => {
     await page.waitForTimeout(300);
     await page.touchscreen.tap(x, y);
     await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.visible, { timeout: 1_000 });
-  });
-
-  test('tap paused media plays', async ({ page }) => {
-    const { x, y } = await getOffCenter(player);
-
-    await page.touchscreen.tap(x, y);
-    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
   });
 
   test('double-tap right side seeks forward', async ({ page }) => {

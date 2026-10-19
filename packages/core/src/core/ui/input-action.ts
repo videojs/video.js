@@ -7,7 +7,6 @@ export type InputAction =
   | 'toggleSubtitles'
   | 'togglePictureInPicture'
   | 'toggleControls'
-  | 'playOrToggleControls'
   | 'seekStep'
   | 'seekToPercent'
   | 'volumeStep'
