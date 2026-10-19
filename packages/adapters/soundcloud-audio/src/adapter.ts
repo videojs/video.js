@@ -773,15 +773,24 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
 
   #onWidgetError() {
-    this.#fail(
-      this.#readyState < READY_STATE_HAVE_METADATA
-        ? new MediaError(
-            `SoundCloud could not play ${this.#src}. It may be private, removed, or not available in this region.`,
-            MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
-          )
-        : new MediaError('The SoundCloud widget reported an error.', MediaError.MEDIA_ERR_CUSTOM, true)
-    );
-    this.#onPause();
+    if (this.#readyState < READY_STATE_HAVE_METADATA) {
+      this.#fail(
+        new MediaError(
+          `SoundCloud could not play ${this.#src}. It may be private, removed, or not available in this region.`,
+          MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+        )
+      );
+      this.#onPause();
+      return;
+    }
+
+    // Announced but not kept: a set moves on to its next track by itself, and nothing else blocks the source.
+    const error = new MediaError('The SoundCloud widget reported an error.', MediaError.MEDIA_ERR_CUSTOM, false);
+
+    this.dispatchEvent(new ErrorEvent('error', { error, message: error.message }));
+    this.#get('isPaused').then((paused) => {
+      if (paused === true) this.#onPause();
+    });
   }
 
   // A sound other than the current one is another track of the set, or a related track picked in the widget.

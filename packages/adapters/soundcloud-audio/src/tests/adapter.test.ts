@@ -435,9 +435,16 @@ describe('SoundCloudAdapter', () => {
     });
 
     it('clears a failed source and announces the next one', async () => {
-      const { media, widget } = await createReadyMedia();
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
 
+      media.src = TRACK;
+      media.attach(widget.iframe);
+      await flush();
+      widget.emit('ready');
       widget.emit('error');
+      widget.answer({ getSounds: [], getCurrentSound: null, getDuration: null });
+      await flush();
       expect(media.error).not.toBe(null);
 
       const events = recordEvents(media, ['emptied', 'loadstart', 'canplay']);
@@ -904,6 +911,55 @@ describe('SoundCloudAdapter', () => {
       expect(media.duration).toBe(463.908);
       expect(media.currentTime).toBe(0);
       expect(media.paused).toBe(false);
+    });
+
+    it('announces an error in the middle of a set without keeping it, and follows the widget to the next track', async () => {
+      const { media, widget } = await createReadyMedia(SET, SET_ANSWERS);
+
+      // Settle the `isPaused` the media asks once it is ready, so the next answer is for the error.
+      widget.answer(SET_ANSWERS);
+      const errors: (MediaError | undefined)[] = [];
+
+      media.addEventListener('error', (event) => errors.push((event as ErrorEvent).error));
+      progress(widget, 'play', 290, 0);
+      widget.clear();
+      widget.emit('error');
+      widget.answer({ isPaused: false });
+      await flush();
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0]?.fatal).toBe(false);
+      expect(media.error).toBe(null);
+      expect(media.paused).toBe(false);
+
+      progress(widget, 'play', 291, 0);
+      widget.answer({ getDuration: 274_442 });
+      await flush();
+
+      expect(media.duration).toBe(274.442);
+      expect(media.paused).toBe(false);
+
+      widget.clear();
+      media.pause();
+      await media.play();
+
+      expect(widget.methods()).toEqual(['pause', 'play']);
+    });
+
+    it('reports a pause when the widget stops after an error in the middle of playback', async () => {
+      const { media, widget } = await createReadyMedia(SET, SET_ANSWERS);
+
+      // Settle the `isPaused` the media asks once it is ready, so the next answer is for the error.
+      widget.answer(SET_ANSWERS);
+
+      progress(widget, 'play', 290, 0);
+      widget.clear();
+      widget.emit('error');
+      widget.answer({ isPaused: true });
+      await flush();
+
+      expect(media.paused).toBe(true);
+      expect(media.error).toBe(null);
     });
 
     it('ends after the last track and plays again from the first', async () => {
