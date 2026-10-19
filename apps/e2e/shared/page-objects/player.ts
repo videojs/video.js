@@ -26,6 +26,10 @@ export class PlayerPage {
     return this.page.locator(SELECTORS.playButton).first();
   }
 
+  get centerPlayButton(): Locator {
+    return this.page.locator(SELECTORS.centerPlayButton).first();
+  }
+
   get seekForward(): Locator {
     return this.page.locator(SELECTORS.seekForward).first();
   }

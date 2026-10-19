@@ -53,7 +53,7 @@ for (const framework of ['html', 'react']) {
       expect(textBounds.top + textBounds.height).toBeLessThan(containerBounds!.y + containerBounds!.height);
       expect(await title.evaluate((element) => element.scrollHeight)).toBeLessThanOrEqual(titleBounds!.height + 1);
 
-      await page.getByRole('button', { name: 'Play', exact: true }).click();
+      await page.getByRole('button', { name: 'Play', exact: true }).last().click();
       await page.mouse.move(600, 400);
       await expect(container).not.toHaveAttribute('data-controls-visible');
       await expect(title).not.toHaveAttribute('data-visible');

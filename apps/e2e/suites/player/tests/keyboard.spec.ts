@@ -64,6 +64,12 @@ for (const entry of PAGES as readonly PageEntry[]) {
         await expectTabFocus(page, page.locator('video').first());
       }
 
+      if (!isAudio) {
+        await expectTabFocus(page, player.seekBackward);
+        await expectTabFocus(page, player.centerPlayButton);
+        await expectTabFocus(page, player.seekForward);
+      }
+
       await expectTabFocus(page, player.playButton);
 
       if (isAudio) {
