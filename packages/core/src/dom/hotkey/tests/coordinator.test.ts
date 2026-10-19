@@ -185,6 +185,100 @@ describe('HotkeyCoordinator', () => {
 
       expect(onActivate).toHaveBeenCalledOnce();
     });
+
+    // These widgets prevent their keys themselves, but React 16 runs their handlers after this listener.
+    it('skips navigation keys on a slider that has not prevented them', () => {
+      const c = setup();
+      const onActivate = vi.fn();
+
+      c.add({ keys: 'ArrowLeft', onActivate });
+      c.add({ keys: 'ArrowUp', onActivate });
+      c.add({ keys: 'Home', onActivate });
+
+      const slider = document.createElement('div');
+
+      slider.setAttribute('role', 'slider');
+      container.appendChild(slider);
+
+      for (const key of ['ArrowLeft', 'ArrowUp', 'Home']) keydown(slider, key);
+
+      expect(onActivate).not.toHaveBeenCalled();
+    });
+
+    it('fires non-navigation keys on a slider', () => {
+      const c = setup();
+      const onActivate = vi.fn();
+
+      c.add({ keys: 'k', onActivate });
+
+      const slider = document.createElement('div');
+
+      slider.setAttribute('role', 'slider');
+      container.appendChild(slider);
+
+      keydown(slider, 'k');
+
+      expect(onActivate).toHaveBeenCalledOnce();
+    });
+
+    it('skips navigation and typeahead keys inside a menu', () => {
+      const c = setup();
+      const onActivate = vi.fn();
+
+      c.add({ keys: 'ArrowRight', onActivate });
+      c.add({ keys: 'k', onActivate });
+
+      const menu = document.createElement('div');
+      const item = document.createElement('div');
+
+      menu.setAttribute('role', 'menu');
+      item.setAttribute('role', 'menuitem');
+      menu.appendChild(item);
+      container.appendChild(menu);
+
+      keydown(item, 'ArrowRight');
+      keydown(item, 'k');
+
+      expect(onActivate).not.toHaveBeenCalled();
+    });
+
+    it('skips menu keys on the trigger of an open menu only', () => {
+      const c = setup();
+      const onActivate = vi.fn();
+
+      c.add({ keys: 'ArrowDown', onActivate });
+
+      const trigger = document.createElement('button');
+
+      trigger.setAttribute('aria-haspopup', 'menu');
+      trigger.setAttribute('aria-expanded', 'true');
+      container.appendChild(trigger);
+
+      keydown(trigger, 'ArrowDown');
+
+      expect(onActivate).not.toHaveBeenCalled();
+
+      trigger.setAttribute('aria-expanded', 'false');
+      keydown(trigger, 'ArrowDown');
+
+      expect(onActivate).toHaveBeenCalledOnce();
+    });
+
+    it('fires Escape inside a menu', () => {
+      const c = setup();
+      const onActivate = vi.fn();
+
+      c.add({ keys: 'Escape', onActivate });
+
+      const menu = document.createElement('div');
+
+      menu.setAttribute('role', 'menu');
+      container.appendChild(menu);
+
+      keydown(menu, 'Escape');
+
+      expect(onActivate).toHaveBeenCalledOnce();
+    });
   });
 
   describe('repeat handling', () => {

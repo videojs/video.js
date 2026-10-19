@@ -47,7 +47,7 @@ export interface MenuHighlightOptions {
 }
 
 /** @internal */
-export function isMenuNavigationKey(event: UIKeyboardEvent): boolean {
+export function isMenuNavigationKey(event: Pick<UIKeyboardEvent, 'key' | 'ctrlKey' | 'altKey' | 'metaKey'>): boolean {
   const { key } = event;
 
   return (

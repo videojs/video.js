@@ -1,10 +1,27 @@
-import { isEditableTarget, isInteractiveActivation, listen } from '@videojs/utils/dom';
+import { isEditableTarget, isInteractiveActivation, listen, resolveEventTarget } from '@videojs/utils/dom';
 import { isUndefined } from '@videojs/utils/predicate';
 
 import { isInteractionLocked } from '../ui/interaction-lock';
+import { isMenuNavigationKey } from '../ui/menu/menu';
 import { toAriaKeyShortcut, toDisplayKeyShortcut } from './aria';
 import type { HotkeyOptions, ParsedHotkeyBinding } from './hotkey';
 import { matchesHotkeyEvent, parseHotkeyPattern } from './hotkey';
+
+const SLIDER_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown']);
+const MENU_SELECTOR = '[role="menu"],[aria-haspopup="menu"][aria-expanded="true"]';
+
+/**
+ * Whether the focused slider or open menu navigates with this key. Those widgets prevent the default before the
+ * coordinator runs, except under React 16, which dispatches every handler from the document, after this listener.
+ */
+function isWidgetNavigation(event: KeyboardEvent): boolean {
+  const target = resolveEventTarget(event);
+  if (!(target instanceof Element)) return false;
+
+  if (SLIDER_KEYS.has(event.key) && target.closest('[role="slider"]')) return true;
+
+  return event.key !== 'Escape' && isMenuNavigationKey(event) && target.closest(MENU_SELECTOR) !== null;
+}
 
 /** @internal */
 export interface HotkeyActivateEvent {
@@ -162,8 +179,8 @@ export class HotkeyCoordinator {
     // IME composition filtering.
     if (event.key === 'Unidentified') return;
 
-    // Let interactive elements handle their own activation keys.
-    if (isInteractiveActivation(event)) return;
+    // Let interactive elements handle their own activation keys, and sliders and menus their navigation keys.
+    if (isInteractiveActivation(event) || isWidgetNavigation(event)) return;
 
     if (event.defaultPrevented) return;
 
