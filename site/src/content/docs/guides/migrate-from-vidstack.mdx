@@ -624,7 +624,7 @@ Packaged skins take almost no props. Most layout props either move somewhere els
 | `smallLayoutWhen` | Container queries built into the skin; see [Responsive layouts](#responsive-layouts) |
 | `slots` | Edit skin source; see [Slots become skin source](#slots-become-skin-source) |
 | `seekStep` | 10 seconds in the skin's hotkeys and gestures; edit skin source to change it |
-| `playbackRates` | A fixed list: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)) |
+| `playbackRates` | `playbackRates`. See the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> |
 | `showTooltipDelay` | 600 ms; set `delay` on tooltips in skin source |
 | `noGestures`, `noKeyboardAnimations`, `disableTimeSlider`, `menuGroup` | Edit skin source |
 | `hideQualityBitrate` | Bitrate shows only to tell apart renditions of the same size |
@@ -643,7 +643,7 @@ Packaged skins take almost no props. Most layout props either move somewhere els
 | `color-scheme` | CSS `color-scheme`; see [Color scheme](#color-scheme) |
 | `small-when` | Container queries built into the skin; see [Responsive layouts](#responsive-layouts) |
 | `seek-step` | 10 seconds in the skin's hotkeys and gestures; edit skin source to change it |
-| `playback-rates` | A fixed list: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)) |
+| `playback-rates` | `playback-rates`. See the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> |
 | `no-gestures`, `no-keyboard-animations`, `disable-time-slider`, `menu-group` | Edit skin source |
 | `hide-quality-bitrate` | Bitrate shows only to tell apart renditions of the same size |
 | `no-modal`, `menu-container` | Not needed. Menus render in the browser's top layer |
@@ -1394,7 +1394,7 @@ Ordered roughly by how likely each is to block a Vidstack migration. Follow [Vid
 - **Nothing persists** between visits: volume, captions, language, rate, quality, or position ([#944](https://github.com/videojs/v10/issues/944)).
 - **No caption style settings** ([#1437](https://github.com/videojs/v10/issues/1437)), no custom caption renderer ([#3038](https://github.com/videojs/v10/issues/3038)), and WebVTT only: no SRT, SSA/ASS, or JSON captions ([#3037](https://github.com/videojs/v10/issues/3037)). Audio players don't show captions ([#3039](https://github.com/videojs/v10/issues/3039)).
 - **No chapters menu** or chapter title outside the time slider ([#1873](https://github.com/videojs/v10/issues/1873)), and no dedicated API for chapters from code ([#1268](https://github.com/videojs/v10/issues/1268)). Cue points and markers aren't implemented ([#1442](https://github.com/videojs/v10/issues/1442)).
-- **Fixed playback rates**: `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` ([#1404](https://github.com/videojs/v10/issues/1404)). No speed or quality sliders ([#3052](https://github.com/videojs/v10/issues/3052)).
+- **No speed or quality sliders** ([#3052](https://github.com/videojs/v10/issues/3052)).
 - **No audio gain or boost** ([#1135](https://github.com/videojs/v10/issues/1135)).
 - **No load strategies.** Vidstack's media and poster loading strategies and `startLoading()` have no equivalent ([#3043](https://github.com/videojs/v10/issues/3043)), and embeds don't preconnect ([#1433](https://github.com/videojs/v10/issues/1433)).
 - **No clipping.** Vidstack's clip start and end times have no equivalent ([#3040](https://github.com/videojs/v10/issues/3040)).
