@@ -41,13 +41,19 @@ export function docOf(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): D
   return { text, tags };
 }
 
-/** The first sentence of a doc block, for index tables. */
-export function firstSentence(doc: DocBlock): string {
-  const paragraph =
+/** The first paragraph of a doc block on one line, for index tables. */
+export function firstParagraph(doc: DocBlock): string {
+  return (
     doc.text
       .split(/\n\s*\n/, 1)[0]
       ?.replace(/\s+/g, ' ')
-      .trim() ?? '';
+      .trim() ?? ''
+  );
+}
+
+/** The first sentence of a doc block, for inventory tables. */
+export function firstSentence(doc: DocBlock): string {
+  const paragraph = firstParagraph(doc);
   const match = paragraph.match(/^.*?[.!?](?=\s+[A-Z`(]|$)/);
 
   return match ? match[0] : paragraph;
@@ -247,6 +253,8 @@ export interface BehaviorInfo {
   config: ConfigRow[];
   /** Whether the setup declares `config?:` (callers may omit it); `undefined` when the setup takes no config. */
   configOptional: boolean | undefined;
+  /** The named interfaces and type aliases the setup's config type is, or intersects. */
+  configTypes: Owner[];
 }
 
 export interface Model {
@@ -441,6 +449,17 @@ function configRows(checker: ts.TypeChecker, config: ts.Type | undefined): Confi
     .sort((a, b) => a.key.localeCompare(b.key));
 }
 
+/** The interface or type-alias declarations behind a type: its own, or each member's of an intersection. */
+function namedTypes(type: ts.Type): Owner[] {
+  if (type.isIntersection()) return type.types.flatMap(namedTypes);
+
+  const symbol = type.aliasSymbol ?? type.getSymbol();
+  const declaration = symbol && declarationOf(symbol);
+  if (!declaration || !(ts.isInterfaceDeclaration(declaration) || ts.isTypeAliasDeclaration(declaration))) return [];
+
+  return [{ name: symbol.name, file: declaration.getSourceFile().fileName }];
+}
+
 /** The deps slot `name` of a setup parameter type: its type, less `undefined`, and whether it is optional. */
 function depsSlot(
   checker: ts.TypeChecker,
@@ -502,6 +521,7 @@ function behaviorFromType(
     ),
     config: configRows(checker, config?.type),
     configOptional: config?.optional,
+    configTypes: config ? namedTypes(config.type) : [],
   };
 }
 
@@ -611,6 +631,8 @@ export interface FeatureInfo {
   doc: DocBlock;
   behaviors: BehaviorInfo[];
   defaults: DefaultValue[];
+  /** The `initialState` literal's entries. */
+  initial: DefaultValue[];
   /** The exported `Config`, `State`, and `Context` types' fields. */
   config: TypeField[];
   state: TypeField[];
@@ -698,6 +720,13 @@ function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): 
   }
 
   return values;
+}
+
+/** An exported `const`'s initializer as source, through trailing assertions; `undefined` for any other export. */
+export function exportedLiteral(symbol: ts.Symbol): string | undefined {
+  const initializer = initializerOf(symbol);
+
+  return initializer && ts.isObjectLiteralExpression(initializer) ? printExpression(initializer) : undefined;
 }
 
 /** An identifier naming a `const` of the same file prints as that const's initializer, one level down. */
@@ -817,6 +846,7 @@ export function buildModel(reference: ReferenceProgram): Model {
         behaviorFromElement(element, entry.key)
       ),
       defaults: defaultValues(checker, exports.get('defaultConfig')),
+      initial: defaultValues(checker, exports.get('initialState')),
       config: typeFields(checker, exports.get('Config')),
       state: typeFields(checker, exports.get('State')),
       context: typeFields(checker, exports.get('Context')),

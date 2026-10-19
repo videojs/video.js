@@ -122,6 +122,6 @@ The setup declares `config?`: callers may omit it.
 | --- | --- | --- | --- |
 | `preferHighestResolution` | const | Order the candidates by resolution, largest first, with bandwidth breaking ties between renditions of identical dimensions. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
 | `screenResolutionCap` | const | Narrow to the renditions that fit the screen, by pixel area — the screen-size cap from `internal/design/spf/features/rendition-selection-caps.md`, as a scope (soft filter) rather than a constraint: an over-cap rendition is wasteful, not unplayable, so nothing here may make a source unplayable. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
-| `SelectAudioTrackConfig` | interface | Config for `selectAudioTrack`. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
+| `SelectAudioTrackConfig` | interface | Config of [selectAudioTrack](select-tracks.md#selectaudiotrack). Config for `selectAudioTrack`. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
 | `SelectTrackRule` | type | A selection rule over this behavior's candidate tracks. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
-| `SelectVideoTrackConfig` | interface | Config for `selectVideoTrack`. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |
+| `SelectVideoTrackConfig` | interface | Config of [selectVideoTrack](select-tracks.md#selectvideotrack). Config for `selectVideoTrack`. | [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts) |

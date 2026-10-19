@@ -109,5 +109,5 @@ The setup declares `config` as required. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `EndOfStreamContext` | interface | No JSDoc; fields `audioBufferActor, mediaSource, videoBufferActor`. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
-| `EndOfStreamState` | interface | No JSDoc; fields `currentTime, presentation`. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
+| `EndOfStreamContext` | interface | Context of [endOfStream](end-of-stream.md#endofstream). | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
+| `EndOfStreamState` | interface | State of [endOfStream](end-of-stream.md#endofstream). | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |

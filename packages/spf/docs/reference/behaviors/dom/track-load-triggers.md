@@ -50,5 +50,5 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `LoadTriggersContext` | interface | Context shape for load-trigger tracking. | [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/playback/behaviors/dom/track-load-triggers.ts) |
-| `LoadTriggersState` | interface | State shape for load-trigger tracking. | [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/playback/behaviors/dom/track-load-triggers.ts) |
+| `LoadTriggersContext` | interface | Context of [trackLoadTriggers](track-load-triggers.md#trackloadtriggers). Context shape for load-trigger tracking. | [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/playback/behaviors/dom/track-load-triggers.ts) |
+| `LoadTriggersState` | interface | State of [trackLoadTriggers](track-load-triggers.md#trackloadtriggers). State shape for load-trigger tracking. | [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/playback/behaviors/dom/track-load-triggers.ts) |

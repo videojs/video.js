@@ -57,6 +57,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `PresentationDurationConfig` | interface | No JSDoc; fields `resolveDuration`. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
+| `PresentationDurationConfig` | interface | Config of [calculatePresentationDuration](calculate-presentation-duration.md#calculatepresentationduration). | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
 | `PresentationDurationResolver` | type | Resolver supplied via `config.resolveDuration`. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
-| `PresentationDurationState` | interface | Input shape passed to the duration resolver. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
+| `PresentationDurationState` | interface | State of [calculatePresentationDuration](calculate-presentation-duration.md#calculatepresentationduration). Input shape passed to the duration resolver. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |

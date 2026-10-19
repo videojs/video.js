@@ -73,4 +73,4 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `DisableRemotePlaybackState` | interface | No JSDoc; fields `disableRemotePlayback`. | [src/playback/behaviors/dom/airplay.ts](../../../../src/playback/behaviors/dom/airplay.ts) |
+| `DisableRemotePlaybackState` | interface | State of `defineExternalSignals<DisableRemotePlaybackState>` ([src/playback/engines/hls/features/airplay.ts](../../../../src/playback/engines/hls/features/airplay.ts)). | [src/playback/behaviors/dom/airplay.ts](../../../../src/playback/behaviors/dom/airplay.ts) |

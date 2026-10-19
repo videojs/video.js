@@ -54,5 +54,5 @@ The setup declares `config` as required. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SyncLiveSeekableRangeContext` | interface | No JSDoc; fields `mediaSource`. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
-| `SyncLiveSeekableRangeState` | interface | No JSDoc; fields `presentation, selectedAudioTrackId, selectedVideoTrackId`. | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
+| `SyncLiveSeekableRangeContext` | interface | Context of [syncLiveSeekableRange](sync-live-seekable-range.md#syncliveseekablerange). | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |
+| `SyncLiveSeekableRangeState` | interface | State of [syncLiveSeekableRange](sync-live-seekable-range.md#syncliveseekablerange). | [src/playback/behaviors/dom/sync-live-seekable-range.ts](../../../../src/playback/behaviors/dom/sync-live-seekable-range.ts) |

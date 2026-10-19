@@ -78,7 +78,7 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `MediaKeysContext` | interface | Context shape for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
-| `MediaKeysSetupConfig` | interface | Config for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
-| `MediaKeysState` | interface | State shape for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
+| `MediaKeysContext` | interface | Context of [setupMediaKeys](setup-media-keys.md#setupmediakeys). Context shape for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
+| `MediaKeysSetupConfig` | interface | Config of [setupMediaKeys](setup-media-keys.md#setupmediakeys). Config for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
+| `MediaKeysState` | interface | State of [setupMediaKeys](setup-media-keys.md#setupmediakeys). State shape for MediaKeys setup. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |
 | `NegotiableDrmSystemsConfig` | type | License servers keyed by EME key-system id, where each id must be one of the composition's `keySystems`: an entry for a system no composed module claims can never be negotiated, so a composition's config rejects it. | [src/playback/behaviors/dom/setup-media-keys.ts](../../../../src/playback/behaviors/dom/setup-media-keys.ts) |

@@ -87,5 +87,5 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `ResolveTrackConfig` | interface | Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. | [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts) |
-| `ResolveTrackState` | interface | State shape for track resolution. | [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts) |
+| `ResolveTrackConfig` | interface | Config of [resolveVideoTrack](resolve-track.md#resolvevideotrack), [resolveAudioTrack](resolve-track.md#resolveaudiotrack), [resolveTextTrack](resolve-track.md#resolvetexttrack). Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. | [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts) |
+| `ResolveTrackState` | interface | State of [resolveVideoTrack](resolve-track.md#resolvevideotrack), [resolveAudioTrack](resolve-track.md#resolveaudiotrack), [resolveTextTrack](resolve-track.md#resolvetexttrack). State shape for track resolution. | [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts) |

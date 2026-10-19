@@ -68,4 +68,4 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SyncTextTracksConfig` | interface | No JSDoc; fields `addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia`. | [src/playback/behaviors/dom/sync-text-tracks.ts](../../../../src/playback/behaviors/dom/sync-text-tracks.ts) |
+| `SyncTextTracksConfig` | interface | Config of [syncTextTracks](sync-text-tracks.md#synctexttracks). | [src/playback/behaviors/dom/sync-text-tracks.ts](../../../../src/playback/behaviors/dom/sync-text-tracks.ts) |

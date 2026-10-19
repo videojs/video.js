@@ -14,10 +14,10 @@ Collects the errors the other features report into `state.errors`, per source. W
 
 ### State
 
-| Key | Type | Declared by | Doc |
-| --- | --- | --- | --- |
-| `errors` | `SvtaError[] \| undefined` | [collectErrors](../behaviors/collect-errors.md#collecterrors) | Conditions reported during playback, in the order encountered — appended by whichever behavior detects one (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [collectErrors](../behaviors/collect-errors.md#collecterrors) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| Key | Type | Initial | Declared by | Doc |
+| --- | --- | --- | --- | --- |
+| `errors` | `SvtaError[] \| undefined` | — | [collectErrors](../behaviors/collect-errors.md#collecterrors) | Conditions reported during playback, in the order encountered — appended by whichever behavior detects one (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [collectErrors](../behaviors/collect-errors.md#collecterrors) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 
@@ -29,10 +29,10 @@ Collects the errors the other features report into `state.errors`, per source. W
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
+| `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
 | `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
-| `initialState` | const | The state values the feature seeds. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
-| `State` | type | Every state key the behaviors and external signals declare. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |
+| `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls/features/error.ts](../../../src/playback/engines/hls/features/error.ts) |

@@ -45,7 +45,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `CollectErrorsState` | interface | No JSDoc; fields `errors, presentation`. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
+| `CollectErrorsState` | interface | State of [collectErrors](collect-errors.md#collecterrors). | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
 | `emitError` | function | Append `error` to the engine's error sequence. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
 | `ErrorEmitterState` | interface | State an error reporter writes into. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
 | `reportAbsentTrackType` | function | A "constraint" that reports a type the source carries **no** renditions of, for a composition that can't play without it. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |

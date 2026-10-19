@@ -55,6 +55,6 @@ The setup declares `config?`: callers may omit it.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `PlayerResolution` | type | A player element's rendered pixel dimensions. | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
-| `PlayerResolutionContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
-| `PlayerResolutionState` | interface | No JSDoc; fields `playerResolution`. | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
-| `TrackPlayerResolutionConfig` | interface | No JSDoc; fields `capRenditionToPlayerSize, useDevicePixelRatio`. | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
+| `PlayerResolutionContext` | interface | Context of [trackPlayerResolution](track-player-resolution.md#trackplayerresolution). | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
+| `PlayerResolutionState` | interface | State of [trackPlayerResolution](track-player-resolution.md#trackplayerresolution). | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |
+| `TrackPlayerResolutionConfig` | interface | Config of [trackPlayerResolution](track-player-resolution.md#trackplayerresolution). | [src/playback/behaviors/dom/track-player-resolution.ts](../../../../src/playback/behaviors/dom/track-player-resolution.ts) |

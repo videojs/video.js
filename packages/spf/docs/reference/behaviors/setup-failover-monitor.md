@@ -43,5 +43,5 @@ The setup declares `config?`: callers may omit it.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `FailoverMonitorConfig` | interface | Failover policy: how long a CDN stays excluded after a failed fetch trips it. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
-| `SetupFailoverMonitorConfig` | interface | No JSDoc; fields `failover`. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
-| `SetupFailoverMonitorState` | interface | No JSDoc; fields `failedCdns, presentation`. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
+| `SetupFailoverMonitorConfig` | interface | Config of [setupFailoverMonitor](setup-failover-monitor.md#setupfailovermonitor). | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
+| `SetupFailoverMonitorState` | interface | State of [setupFailoverMonitor](setup-failover-monitor.md#setupfailovermonitor). | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |

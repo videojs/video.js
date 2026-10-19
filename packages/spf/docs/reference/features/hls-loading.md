@@ -22,11 +22,11 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 
 ### State
 
-| Key | Type | Declared by | Doc |
-| --- | --- | --- | --- |
-| `loadActivated` | `boolean \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. (doc of [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers)) |
-| `preload` | `"metadata" \| "auto" \| "none" \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (doc of [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
+| Key | Type | Initial | Declared by | Doc |
+| --- | --- | --- | --- | --- |
+| `loadActivated` | `boolean \| undefined` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. (doc of [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers)) |
+| `preload` | `"metadata" \| "auto" \| "none" \| undefined` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (doc of [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
 
 ### Composed by
 
@@ -38,10 +38,10 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
 | `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
-| `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
-| `initialState` | const | The state values the feature seeds. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
-| `State` | type | Every state key the behaviors and external signals declare. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ parsePresentation: parseMultivariantPlaylist }`. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |
+| `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls/features/hls-loading.ts](../../../src/playback/engines/hls/features/hls-loading.ts) |

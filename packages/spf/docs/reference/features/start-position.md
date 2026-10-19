@@ -15,11 +15,11 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 
 ### State
 
-| Key | Type | Declared by | Doc |
-| --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
-| `startPosition` | `number \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
+| Key | Type | Initial | Declared by | Doc |
+| --- | --- | --- | --- | --- |
+| `currentTime` | `number \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `startPosition` | `number \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
 
 ### Context
 
@@ -36,10 +36,10 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
+| `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
 | `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
-| `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
-| `initialState` | const | The state values the feature seeds. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
-| `State` | type | Every state key the behaviors and external signals declare. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
+| `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |
+| `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls/features/start-position.ts](../../../src/playback/engines/hls/features/start-position.ts) |

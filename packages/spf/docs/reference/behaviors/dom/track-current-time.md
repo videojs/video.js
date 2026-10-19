@@ -48,6 +48,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `CurrentTimeContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
-| `CurrentTimeState` | interface | No JSDoc; fields `currentTime`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
-| `TrackCurrentTimeConfig` | interface | No JSDoc; fields `defaultCurrentTime`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `CurrentTimeContext` | interface | Context of [trackCurrentTime](track-current-time.md#trackcurrenttime). | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `CurrentTimeState` | interface | State of [trackCurrentTime](track-current-time.md#trackcurrenttime). | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `TrackCurrentTimeConfig` | interface | Config of [trackCurrentTime](track-current-time.md#trackcurrenttime). | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
