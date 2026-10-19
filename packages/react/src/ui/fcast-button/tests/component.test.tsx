@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { FCast } from '../../../extensions/fcast';
 import { createPlayerWrapper } from '../../../testing/mocks';
+import { Tooltip } from '../../tooltip';
 import { FCastButton } from '../component';
 
 class TestSender extends EventTarget implements FCastSender {
@@ -71,7 +72,12 @@ describe('FCastButton', () => {
 
     const view = render(
       <>
-        <FCastButton>FCast</FCastButton>
+        <Tooltip.Root defaultOpen>
+          <Tooltip.Trigger render={<FCastButton>FCast</FCastButton>} />
+          <Tooltip.Popup>
+            <Tooltip.Label data-testid="fcast-tooltip-label" />
+          </Tooltip.Popup>
+        </Tooltip.Root>
         <FCast sender={sender} />
       </>,
       { wrapper: Wrapper }
@@ -81,6 +87,7 @@ describe('FCastButton', () => {
 
     const button = screen.getByRole('button', { name: 'Cast with FCast' });
 
+    expect(screen.getByTestId('fcast-tooltip-label').textContent).toBe('Cast with FCast');
     expect(extensions.get(FCastExtension)?.enabled).toBe(true);
     expect(button.getAttribute('aria-disabled')).toBeNull();
     fireEvent.click(button);
@@ -89,6 +96,7 @@ describe('FCastButton', () => {
     expect(
       (await screen.findByRole('button', { name: 'Disconnect from Living room' })).getAttribute('data-fcast-state')
     ).toBe('connected');
+    expect(screen.getByTestId('fcast-tooltip-label').textContent).toBe('Disconnect from Living room');
 
     act(() => {
       sender.snapshot = { ...sender.snapshot, availability: 'unsupported' };

@@ -2,6 +2,7 @@ import { applyElementProps, createButton } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextConsumer } from '@videojs/element/context';
 import { FCastExtension } from '@videojs/fcast';
+import { createState } from '@videojs/store';
 
 import { extensionContext, type ExtensionContextValue } from '../../player/context';
 import { UIElement } from '../ui-element';
@@ -15,11 +16,16 @@ export class FCastButtonElement extends UIElement {
   } satisfies PropertyDeclarationMap;
 
   disabled = false;
+  readonly $state = createState({ label: '' });
   #controller: AbortController | null = null;
 
   #extension: FCastExtension | undefined;
   #unsubscribe: (() => void) | undefined;
   #onChange = () => this.requestUpdate();
+
+  getLabel(): string {
+    return this.$state.current.label;
+  }
 
   constructor() {
     super();
@@ -83,6 +89,8 @@ export class FCastButtonElement extends UIElement {
         : connection === 'connecting'
           ? 'Connecting to FCast'
           : 'Cast with FCast';
+
+    this.$state.patch({ label });
 
     applyElementProps(this, {
       'aria-label': label,
