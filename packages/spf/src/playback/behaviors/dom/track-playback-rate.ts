@@ -5,6 +5,11 @@ import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
 
 export interface PlaybackRateState {
+  /**
+   * The element's `playbackRate`, mirrored by `trackPlaybackRate` on each `ratechange` and when an element attaches;
+   * `config.defaultPlaybackRate` (default `1`) while none is attached. A read-only mirror: writing it does not reach
+   * the element.
+   */
   playbackRate?: number;
 }
 

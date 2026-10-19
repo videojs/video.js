@@ -37,7 +37,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `getCdnId?` | `GetCdnId` | No description. |
+| `getCdnId?` | `GetCdnId` | See `TrackSwitchingSharedConfig['getCdnId']`. |
 
 ### State
 

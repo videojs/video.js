@@ -41,14 +41,14 @@ The setup declares `config` as required. It has no keys.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SyncLiveSeekableRangeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | No description. |
-| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | No description. |
+| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
+| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SyncLiveSeekableRangeState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](../track-switching.md#switchvideotrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `SyncLiveSeekableRangeContext` | No description. |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `SyncLiveSeekableRangeContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Other exports
 

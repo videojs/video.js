@@ -114,6 +114,10 @@ export function sameCandidateSet<T extends { id: string }>(a: readonly T[], b: r
  * the DOM-bound probe; unwired means "no capability filtering" and the constraint passes everything through.
  */
 export interface CapabilityConstraintConfig {
+  /**
+   * The codec capability probe `excludeUnplayableTracks` applies. Each engine defaults it to the DOM-bound probe;
+   * unwired means no capability filtering.
+   */
   canPlayTrack?: CanPlayTrack;
 }
 

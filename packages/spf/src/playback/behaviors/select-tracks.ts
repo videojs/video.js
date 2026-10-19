@@ -262,6 +262,10 @@ export interface SelectVideoTrackConfig extends CapabilityConstraintConfig {
    * outright.
    */
   videoConstraints?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
+  /**
+   * The selection chain `selectVideoTrack` runs after its pre-pass; empty by default, so the first playable candidate
+   * is the pick.
+   */
   videoRules?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
 }
 
@@ -343,7 +347,12 @@ export const selectVideoTrack = defineBehavior({
  * → first).
  */
 export interface SelectAudioTrackConfig extends AudioSelectionConfig {
+  /** The hard-constraint pre-pass `selectAudioTrack` runs before its chain. */
   audioConstraints?: readonly SelectTrackRule<SelectAudioTrackConfig>[];
+  /**
+   * The selection chain `selectAudioTrack` runs, replacing the default three-tier policy (`preferredAudioLanguage` →
+   * `DEFAULT=YES` → first).
+   */
   audioRules?: readonly SelectTrackRule<SelectAudioTrackConfig>[];
 }
 

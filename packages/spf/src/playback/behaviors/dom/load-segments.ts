@@ -308,6 +308,10 @@ export const loadVideoSegments = defineBehavior({
     }),
 });
 
+/**
+ * The audio variant of {@link loadVideoSegments}: dispatches `'load'` messages to `audioSegmentLoaderActor` for the
+ * selected audio track, under the same four load modes.
+ */
 export const loadAudioSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedAudioTrackId'],
   contextKeys: ['audioSegmentLoaderActor'],
@@ -329,6 +333,11 @@ export const loadAudioSegments = defineBehavior({
     }),
 });
 
+/**
+ * The text variant of {@link loadVideoSegments}: dispatches `'load'` messages to `textTrackSegmentLoaderActor` for the
+ * selected text track, under the same four load modes; in `'metadata-only'` the text loader no-ops, since text has no
+ * init segment.
+ */
 export const loadTextTrackSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedTextTrackId'],
   contextKeys: ['textTrackSegmentLoaderActor'],

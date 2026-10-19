@@ -45,7 +45,7 @@ audio constraints. Compose it after the features that set the plain versions, su
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | `MediaKeys \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. |
 
 ### Composed by

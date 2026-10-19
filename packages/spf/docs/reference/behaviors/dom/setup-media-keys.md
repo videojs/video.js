@@ -71,7 +71,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaKeysContext` | No description. |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaKeysContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | writes | yes | `MediaKeys \| undefined` | `MediaKeysContext` | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. |
 
 ## Other exports

@@ -26,7 +26,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Type | Doc |
 | --- | --- | --- |
 | `audioConstraints?` | `readonly SwitchAudioTrackRule[]` | `switchAudioTrack`'s chains, replacing `DEFAULT_AUDIO_CONSTRAINTS` / `DEFAULT_AUDIO_RULES`. |
-| `audioRules?` | `readonly SwitchAudioTrackRule[]` | No description. |
+| `audioRules?` | `readonly SwitchAudioTrackRule[]` | The rule chain of the pair documented on `audioConstraints`. |
 | `canPlayTrack?` | `CanPlayTrack` | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |
 | `getCdnId?` | `GetCdnId` | How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query param). |
 | `preferredCodecs?` | `string[]` | Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial pick prefers on a mixed-codec source, read by the `preferCodecFamilies` scope. With no `SourceBuffer.changeType()`, the initial family is the one `stickToSelectedCodecs` holds for the source's lifetime, so this decides which family that is. Cross-cutting like `getCdnId` — one list serves video and audio (each type's rule matches only the families its tracks carry). Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC); pass `[]` to disable. |
@@ -36,7 +36,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
+| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. |
 
 ## switchTextTrack
 
@@ -68,14 +68,14 @@ The setup declares `config?`: callers may omit it.
 | `includeForcedTracks?` | `boolean` | Include FORCED subtitle tracks in selection. Default: false (follows hls.js/http-streaming pattern) Note: Per Apple's HLS spec, if content has forced and regular subtitles in the same language, the regular track MUST contain both forced and regular content. Therefore, forced-only tracks are redundant and excluded by default. |
 | `preferredSubtitleLanguage?` | `string` | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
 | `textConstraints?` | `readonly SwitchTextTrackRule[]` | `switchTextTrack`'s chains, replacing `DEFAULT_TEXT_CONSTRAINTS` / `DEFAULT_TEXT_RULES`. |
-| `textRules?` | `readonly SwitchTextTrackRule[]` | No description. |
+| `textRules?` | `readonly SwitchTextTrackRule[]` | The rule chain of the pair documented on `textConstraints`. |
 
 ### State
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedTextTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
+| `selectedTextTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. |
 
 ## switchVideoTrack
 
@@ -158,14 +158,14 @@ The setup declares `config?`: callers may omit it.
 | `preferredCodecs?` | `string[]` | Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial pick prefers on a mixed-codec source, read by the `preferCodecFamilies` scope. With no `SourceBuffer.changeType()`, the initial family is the one `stickToSelectedCodecs` holds for the source's lifetime, so this decides which family that is. Cross-cutting like `getCdnId` — one list serves video and audio (each type's rule matches only the families its tracks carry). Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC); pass `[]` to disable. |
 | `quality?` | `Partial<QualityConfig>` | Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15). |
 | `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a slot only it carries. Keyed per type because one engine config reaches every variant. |
-| `videoRules?` | `readonly SwitchVideoTrackRule[]` | No description. |
+| `videoRules?` | `readonly SwitchVideoTrackRule[]` | The rule chain of the pair documented on `videoConstraints`. |
 
 ### State
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
+| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. |
 
 ## Other exports
 

@@ -38,14 +38,14 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `preload` | writes | yes | `"metadata" \| "auto" \| "none" \| undefined` | `PresentationState` ([behaviors/resolve-presentation](resolve-presentation.md)) | No description. |
+| `preload` | writes | yes | `"metadata" \| "auto" \| "none" \| undefined` | `PresentationState` ([behaviors/resolve-presentation](resolve-presentation.md)) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `PresentationState` ([behaviors/resolve-presentation](resolve-presentation.md)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `MediaElementLike \| undefined` | inline | No description. |
+| `mediaElement` | reads | yes | `MediaElementLike \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](dom/setup-mediasource.md#setupmediasource)) |
 
 ## Other exports
 

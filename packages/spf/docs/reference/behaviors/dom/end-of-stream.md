@@ -101,9 +101,9 @@ The setup declares `config` as required. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `audioBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | No description. |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `EndOfStreamContext` | No description. |
-| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | No description. |
+| `audioBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. (doc of [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `EndOfStreamContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. (doc of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## Other exports
 

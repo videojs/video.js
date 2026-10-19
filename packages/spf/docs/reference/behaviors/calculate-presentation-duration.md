@@ -50,8 +50,8 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `PresentationDurationState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | No description. |
-| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | No description. |
+| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](track-switching.md#switchaudiotrack)) |
+| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Other exports
 

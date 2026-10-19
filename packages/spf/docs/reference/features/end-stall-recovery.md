@@ -23,8 +23,8 @@ audio and video end at slightly different times. Inert otherwise.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | No description. |
-| `mediaSource` | `MediaSource \| undefined` | [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaSource` | `MediaSource \| undefined` | [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

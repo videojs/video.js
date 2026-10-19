@@ -14,7 +14,15 @@ export interface MediaSourceState {
 
 /** Context shape for MediaSource setup. */
 export interface MediaSourceContext {
+  /**
+   * The media element the engine drives. No behavior writes it: the host attaches one with
+   * `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do.
+   */
   mediaElement?: HTMLMediaElement | undefined;
+  /**
+   * The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared
+   * when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it.
+   */
   mediaSource?: MediaSource;
 }
 

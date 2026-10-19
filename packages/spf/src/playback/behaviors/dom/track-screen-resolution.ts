@@ -3,6 +3,11 @@ import type { Signal } from '../../../core/signals/primitives';
 import { type ScreenResolution, watchScreenResolution } from '../../../media/dom/screen';
 
 export interface ScreenResolutionState {
+  /**
+   * The screen's pixel dimensions, written by `trackScreenResolution` at setup and on change (device pixels when
+   * `useDevicePixelRatio`); `undefined` where there is no screen to read, which the `screenResolutionCap` rule treats
+   * as no cap.
+   */
   screenResolution?: ScreenResolution;
 }
 

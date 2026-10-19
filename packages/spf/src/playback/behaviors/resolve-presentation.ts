@@ -15,6 +15,12 @@ export interface PresentationState {
    * the rest.
    */
   presentation?: MaybeResolvedPresentation;
+  /**
+   * The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute
+   * (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest
+   * resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode
+   * from it.
+   */
   preload?: 'auto' | 'metadata' | 'none' | undefined;
   /** True once a preload-overriding event has fired for the current source — enables resolution regardless of preload. */
   loadActivated?: boolean;

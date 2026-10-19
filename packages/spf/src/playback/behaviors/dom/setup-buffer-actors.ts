@@ -30,14 +30,30 @@ export interface BufferActorsState {
   presentation?: MaybeResolvedPresentation;
   selectedVideoTrackId?: string;
   selectedAudioTrackId?: string;
+  /**
+   * The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors`
+   * wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional slot;
+   * absent, it ranks on `initialBandwidth`.
+   */
   bandwidthState?: BandwidthState;
 }
 
 export interface BufferActorsContext {
   mediaSource?: MediaSource;
+  /**
+   * The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with
+   * `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both
+   * and clears the slots when that stops holding.
+   */
   videoBufferActor?: SourceBufferActor;
+  /** The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. */
   audioBufferActor?: SourceBufferActor;
+  /**
+   * The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through
+   * `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages.
+   */
   videoSegmentLoaderActor?: SegmentLoaderActor;
+  /** The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. */
   audioSegmentLoaderActor?: SegmentLoaderActor;
 }
 
@@ -53,9 +69,7 @@ type BufferActorsStateMap<K extends SelectedTrackKey> = {
 
 type BufferActorsContextMap<A extends BufferActorKey, L extends SegmentLoaderActorKey> = {
   mediaSource: ReadonlySignal<BufferActorsContext['mediaSource']>;
-} & { [P in A]: Signal<SourceBufferActor | undefined> } & {
-  [P in L]: Signal<SegmentLoaderActor | undefined>;
-};
+} & { [P in A]: Signal<BufferActorsContext[P]> } & { [P in L]: Signal<BufferActorsContext[P]> };
 
 // ============================================================================
 // Specialization helper

@@ -34,8 +34,8 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `audioConstraints?` | `readonly SelectTrackRule<SelectAudioTrackConfig>[]` | No description. |
-| `audioRules?` | `readonly SelectTrackRule<SelectAudioTrackConfig>[]` | No description. |
+| `audioConstraints?` | `readonly SelectTrackRule<SelectAudioTrackConfig>[]` | The hard-constraint pre-pass `selectAudioTrack` runs before its chain. |
+| `audioRules?` | `readonly SelectTrackRule<SelectAudioTrackConfig>[]` | The selection chain `selectAudioTrack` runs, replacing the default three-tier policy (`preferredAudioLanguage` → `DEFAULT=YES` → first). |
 | `preferredAudioLanguage?` | `string` | Preferred audio language (ISO 639 code, e.g., "en", "es"). If not specified, selects first audio track. |
 
 ### State
@@ -43,7 +43,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
+| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](track-switching.md#switchaudiotrack)) |
 
 ## selectVideoTrack
 
@@ -105,16 +105,16 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `canPlayTrack?` | `CanPlayTrack` | No description. |
+| `canPlayTrack?` | `CanPlayTrack` | The codec capability probe `excludeUnplayableTracks` applies. Each engine defaults it to the DOM-bound probe; unwired means no capability filtering. |
 | `videoConstraints?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone) outright. |
-| `videoRules?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | No description. |
+| `videoRules?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The selection chain `selectVideoTrack` runs after its pre-pass; empty by default, so the first playable candidate is the pick. |
 
 ### State
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
+| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Other exports
 

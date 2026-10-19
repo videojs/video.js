@@ -25,7 +25,7 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 
