@@ -158,6 +158,26 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
 ]);
 
+// ============================================================================
+// Source URL
+// ============================================================================
+
+/**
+ * Resolve `src` against the document's base URL, as `<video src>` does. The manifest URL becomes the base for every
+ * playlist entry, and `new URL()` throws on a relative base, so a site-relative `src` (`/media/stream.m3u8`) would
+ * otherwise fail to parse. Left as given outside a document (SSR) or when it cannot be parsed.
+ */
+function resolveSrc(value: string): string {
+  const baseURI = globalThis.document?.baseURI;
+  if (!value || !baseURI) return value;
+
+  try {
+    return new URL(value, baseURI).href;
+  } catch {
+    return value;
+  }
+}
+
 /**
  * Mixin that adds SPF playback engine behavior to any base class.
  *
@@ -517,13 +537,14 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
       // Guarded on the URL rather than on source identity: the presentation can
       // also be written straight to the engine, and clearing `src` has to reach
       // it either way.
-      if (value === this.src) return;
+      const url = resolveSrc(value);
+      if (url === this.src) return;
 
       // A bare URL names a different asset, so whatever the previous source said
       // about licensing it no longer applies — same line the Mux flavor draws
       // when a URL replaces a structured source.
-      this.#source = value ? { src: value } : null;
-      this.#applySrc(value);
+      this.#source = url ? { src: url } : null;
+      this.#applySrc(url);
       this.dispatchEvent?.(new Event('sourcechange'));
     }
 
@@ -553,10 +574,11 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * changing only the licensing half of a source would otherwise cause.
      */
     #applySrc(value: string): void {
-      if (value === this.src) return;
+      const url = resolveSrc(value);
+      if (url === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#signals.state.presentation.set(value ? { url: value } : undefined);
+      this.#signals.state.presentation.set(url ? { url } : undefined);
     }
 
     // -------------------------------------------------------------------------
