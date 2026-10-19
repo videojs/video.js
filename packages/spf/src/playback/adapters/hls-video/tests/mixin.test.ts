@@ -210,6 +210,38 @@ describe('HlsVideoAdapterCore', () => {
       // restarts playback for a source that has not changed.
       expect(media.engine.state.presentation.get()).toBe(presentation);
     });
+
+    // Playlist entries resolve against the manifest URL, and `new URL()` throws on a
+    // relative base, so a relative src must be made absolute before it reaches the engine.
+    it('resolves a site-relative src against the document base URL', () => {
+      const media = new HlsVideoAdapterCore();
+      const expected = new URL('/media/stream.m3u8', document.baseURI).href;
+
+      media.src = '/media/stream.m3u8';
+
+      expect(media.src).toBe(expected);
+      expect(media.engine.state.presentation.get()?.url).toBe(expected);
+    });
+
+    it('resolves a relative src given through source', () => {
+      const media = new HlsVideoAdapterCore();
+
+      media.source = { src: 'stream.m3u8' };
+
+      expect(media.engine.state.presentation.get()?.url).toBe(new URL('stream.m3u8', document.baseURI).href);
+    });
+
+    it('leaves engine presentation state alone when a relative src names the URL already playing', () => {
+      const media = new HlsVideoAdapterCore();
+
+      media.src = '/media/stream.m3u8';
+      const presentation = media.engine.state.presentation.get();
+
+      media.src = new URL('/media/stream.m3u8', document.baseURI).href;
+      media.src = '/media/stream.m3u8';
+
+      expect(media.engine.state.presentation.get()).toBe(presentation);
+    });
   });
 
   // ---------------------------------------------------------------------------
