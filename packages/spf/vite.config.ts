@@ -10,6 +10,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   entry: {
     index: 'src/index.ts',
     dom: 'src/dom.ts',
+    'features/mpeg-ts-transmux': 'src/playback/features/mpeg-ts-transmux.ts',
     hls: 'src/hls.ts',
     'engines/hls-video': 'src/playback/engines/hls-video.ts',
     'engines/hls-audio': 'src/playback/engines/hls-audio.ts',

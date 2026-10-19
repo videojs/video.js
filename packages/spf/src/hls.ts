@@ -103,6 +103,7 @@ export { initialLoadFeature } from './playback/features/initial-load';
 export { liveFeature } from './playback/features/live';
 export { mediaSourceFeature } from './playback/features/media-source';
 export { monitorPlayerSizeFeature } from './playback/features/monitor-player-size';
+export { mpegTsTransmuxFeature } from './playback/features/mpeg-ts-transmux';
 export { multiCdnFeature } from './playback/features/multi-cdn';
 export { shiftTextTimestampsFeature } from './playback/features/shift-text-timestamps';
 export { shiftTimestampsFeature } from './playback/features/shift-timestamps';
