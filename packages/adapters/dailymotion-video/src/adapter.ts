@@ -472,7 +472,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   async #createPlayerApi(placeholder: HTMLElement, options: DailymotionCreatePlayerOptions) {
     const attachId = this.#attachId;
     let api: DailymotionApi;
-    let player: DailymotionPlayerApi;
+    let player: DailymotionPlayerApi | undefined;
 
     try {
       api = await loadDailymotionApi(options.player);
@@ -504,8 +504,19 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     // Replaced while being created, so nothing owns this player.
     if (this.#isStale(attachId)) {
-      tryCall(() => player.destroy());
+      tryCall(() => player?.destroy());
       placeholder.remove();
+      return;
+    }
+
+    if (!player) {
+      this.#fail(
+        new MediaError(
+          `Dailymotion could not create a player with Player ID ${options.player}. Check that it exists in Dailymotion Studio.`,
+          MediaError.MEDIA_ERR_CUSTOM,
+          true
+        )
+      );
       return;
     }
 

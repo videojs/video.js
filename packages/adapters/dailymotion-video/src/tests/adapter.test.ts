@@ -90,7 +90,7 @@ class FakePlayer {
 }
 
 let players: FakePlayer[];
-let createPlayer: Mock<(id: string, options: FakePlayer['options']) => Promise<FakePlayer>>;
+let createPlayer: Mock<(id: string, options: FakePlayer['options']) => Promise<FakePlayer | undefined>>;
 
 beforeEach(() => {
   players = [];
@@ -449,6 +449,19 @@ describe('DailymotionAdapter', () => {
       expect(media.error?.message).toMatch(/Player options invalid/);
     });
 
+    it('reports a Player ID the SDK resolves no player for', async () => {
+      createPlayer.mockResolvedValueOnce(undefined);
+
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(createContainer());
+      await flush();
+
+      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_CUSTOM);
+      expect(media.error?.message).toMatch(/could not create a player with Player ID/);
+    });
+
     it('reports a container inside a shadow root, which the SDK cannot find by id', () => {
       const host = createContainer();
       const container = document.createElement('div');
@@ -648,7 +661,7 @@ describe('DailymotionAdapter', () => {
       const create = createPlayer.getMockImplementation()!;
 
       createPlayer.mockImplementationOnce(async (id, options) => {
-        const player = await create(id, options);
+        const player = (await create(id, options))!;
 
         player.state = {
           videoDuration: 214,

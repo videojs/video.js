@@ -72,7 +72,8 @@ export interface DailymotionPlayerApi {
  * @internal
  */
 export interface DailymotionApi {
-  createPlayer(containerId: string, options: DailymotionCreatePlayerOptions): Promise<DailymotionPlayerApi>;
+  /** Resolves with no player for a Player ID Dailymotion doesn't serve, when the SDK came from another configuration. */
+  createPlayer(containerId: string, options: DailymotionCreatePlayerOptions): Promise<DailymotionPlayerApi | undefined>;
   /** Event names, keyed by the constants the docs use (`VIDEO_PLAY`, `PLAYER_VOLUMECHANGE`, …). */
   events: Record<string, string>;
 }
