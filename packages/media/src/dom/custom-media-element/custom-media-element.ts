@@ -1,4 +1,4 @@
-import { namedNodeMapToObject, serializeAttributes } from '@videojs/utils/dom';
+import { isKeptAlive, namedNodeMapToObject, serializeAttributes } from '@videojs/utils/dom';
 import { omit, pick } from '@videojs/utils/object';
 import { kebabCase } from '@videojs/utils/string';
 import type { Constructor } from '@videojs/utils/types';
@@ -341,7 +341,7 @@ export function CustomMediaElement<T extends Constructor<PlaybackAdapter>>(
     }
 
     disconnectedCallback() {
-      if (this.hasAttribute('keep-alive')) return;
+      if (isKeptAlive(this)) return;
 
       // Defer so a synchronous reparent (remove + insert) doesn't tear down
       // the adapter and its registered components.
