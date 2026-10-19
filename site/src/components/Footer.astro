@@ -4,7 +4,7 @@ import Discord from '@/assets/logos/discord.svg?react';
 import GitHub from '@/assets/logos/github.svg?react';
 import LogoMonoVersion from '@/assets/logos/videojs-mono.svg?react';
 import type { LinkDestination } from '@/components/typography/linkDestination';
-import { DISCORD_INVITE_URL, GITHUB_REPO_URL, MUX_URL } from '@/consts';
+import { DISCORD_INVITE_URL, GITHUB_REPO_URL, MUX_SHOP_URL, MUX_URL } from '@/consts';
 import { withMuxAttribution } from '@/utils/mux/attribution';
 import GetStartedLink from './NavBar/GetStartedLink';
 
@@ -17,6 +17,7 @@ type NavLink = {
 const navLinks: NavLink[] = [
   { href: '/blog', label: 'Blog', destination: 'blog' },
   { href: '/changelog', label: 'Changelog' },
+  { href: withMuxAttribution(MUX_SHOP_URL, 'footer'), label: 'Swag', external: true, destination: 'mux' },
   { href: '/privacy', label: 'Privacy' },
 ];
 
@@ -53,6 +54,8 @@ const { class: className } = Astro.props;
             <a
               href={link.href}
               data-ph-capture-attribute-destination={link.destination}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noopener noreferrer" : undefined}
               class="flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:px-5 intent:bg-hover"
             >
               {link.label}{" "}
