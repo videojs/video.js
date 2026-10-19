@@ -600,9 +600,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
     if (!isNumber(duration) || !(duration > 0)) {
       // A set opened on a later track (`start_track`) answers `null` until that track loads; a sound the widget cannot
-      // play reports `error` instead, which ends the wait.
+      // play reports `error` instead, which ends the wait. So a wait that runs out is a slow load, not a bad sound.
       if (attempt >= DURATION_ATTEMPTS) {
-        this.#onWidgetError();
+        this.#fail(
+          new MediaError('The SoundCloud widget did not finish loading in time.', MediaError.MEDIA_ERR_NETWORK)
+        );
         return;
       }
 
