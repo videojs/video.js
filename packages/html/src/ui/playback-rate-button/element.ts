@@ -21,6 +21,7 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
   protected readonly core = new PlaybackRateButtonCore();
   protected readonly stateAttrMap = PlaybackRateButtonDataAttrs;
   protected readonly mediaState = new PlayerController(this, playerContext, selectPlaybackRate);
+  protected override readonly hotkeyAction = 'speedUp';
 
   protected activate(state: MediaPlaybackRateState, event?: UIEvent): void {
     if (this.commandfor) {

@@ -36,6 +36,7 @@ export const PlaybackRateButton = createMediaButton<PlaybackRateButtonCore, Play
   stateAttrMap: PlaybackRateButtonDataAttrs,
   selector: selectPlaybackRate,
   action: (core, state) => core.cycle(state),
+  hotkeyAction: 'speedUp',
 });
 
 export namespace PlaybackRateButton {
