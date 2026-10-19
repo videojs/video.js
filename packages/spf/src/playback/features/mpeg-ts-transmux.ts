@@ -82,10 +82,11 @@ export const initialState = {} satisfies Partial<State>;
 
 /**
  * Plays HLS content packaged as MPEG-TS (H.264 + AAC) by transmuxing each segment to fMP4 on the client before it
- * reaches the SourceBuffer. fMP4 and CMAF content plays through it unchanged. Compose it after `shiftTimestampsFeature`
- * and `drmFeature`: it replaces the loader pipelines the former sets and the playability probe and reporter the latter
- * sets, and it needs `deriveStartMediaTime` from the former to place TS content, whose timestamps rarely start at zero,
- * onto the playlist timeline.
+ * reaches the SourceBuffer. fMP4 and CMAF content plays through it unchanged. No shipped HLS engine composes it: its
+ * codec and edge coverage is what Mux Video packages, so the Mux media compose it and a general HLS source keeps the
+ * unsupported-format verdict. Compose it after `shiftTimestampsFeature` and `drmFeature`: it replaces the loader
+ * pipelines the former sets and the playability probe and reporter the latter sets, and it needs `deriveStartMediaTime`
+ * from the former to place TS content, whose timestamps rarely start at zero, onto the playlist timeline.
  *
  * Scope (spike): one program, H.264 + AAC-LC, unencrypted. A muxed rendition's in-band audio is carried when the track
  * declares an audio codec and dropped when the audio is demuxed into renditions of its own. A URI-less default audio
