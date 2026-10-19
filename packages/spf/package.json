@@ -130,6 +130,11 @@
       "development": "./dist/dev/features/monitor-player-size.js",
       "default": "./dist/default/features/monitor-player-size.js"
     },
+    "./features/mpeg-ts-audio-transmux": {
+      "types": "./dist/dev/features/mpeg-ts-audio-transmux.d.ts",
+      "development": "./dist/dev/features/mpeg-ts-audio-transmux.js",
+      "default": "./dist/default/features/mpeg-ts-audio-transmux.js"
+    },
     "./features/mpeg-ts-transmux": {
       "types": "./dist/dev/features/mpeg-ts-transmux.d.ts",
       "development": "./dist/dev/features/mpeg-ts-transmux.js",

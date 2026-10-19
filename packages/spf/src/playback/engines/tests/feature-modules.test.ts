@@ -15,6 +15,7 @@ import * as initialLoad from '../../features/initial-load';
 import * as live from '../../features/live';
 import * as mediaSource from '../../features/media-source';
 import * as monitorPlayerSize from '../../features/monitor-player-size';
+import * as mpegTsAudioTransmux from '../../features/mpeg-ts-audio-transmux';
 import * as mpegTsTransmux from '../../features/mpeg-ts-transmux';
 import * as multiCdn from '../../features/multi-cdn';
 import * as shiftTextTimestamps from '../../features/shift-text-timestamps';
@@ -41,6 +42,7 @@ const modules = [
   ['live', live],
   ['media-source', mediaSource],
   ['monitor-player-size', monitorPlayerSize],
+  ['mpeg-ts-audio-transmux', mpegTsAudioTransmux],
   ['mpeg-ts-transmux', mpegTsTransmux],
   ['multi-cdn', multiCdn],
   ['shift-text-timestamps', shiftTextTimestamps],

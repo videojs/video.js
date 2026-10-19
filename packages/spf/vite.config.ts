@@ -10,7 +10,6 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   entry: {
     index: 'src/index.ts',
     dom: 'src/dom.ts',
-    'features/mpeg-ts-transmux': 'src/playback/features/mpeg-ts-transmux.ts',
     hls: 'src/hls.ts',
     'engines/hls-video': 'src/playback/engines/hls-video.ts',
     'engines/hls-audio': 'src/playback/engines/hls-audio.ts',
@@ -30,6 +29,8 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     'features/live': 'src/playback/features/live.ts',
     'features/media-source': 'src/playback/features/media-source.ts',
     'features/monitor-player-size': 'src/playback/features/monitor-player-size.ts',
+    'features/mpeg-ts-audio-transmux': 'src/playback/features/mpeg-ts-audio-transmux.ts',
+    'features/mpeg-ts-transmux': 'src/playback/features/mpeg-ts-transmux.ts',
     'features/multi-cdn': 'src/playback/features/multi-cdn.ts',
     'features/shift-text-timestamps': 'src/playback/features/shift-text-timestamps.ts',
     'features/shift-timestamps': 'src/playback/features/shift-timestamps.ts',

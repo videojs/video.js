@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { createComposition } from '../../../core/composition/create-composition';
 import { flattenFeatures } from '../../../core/composition/define-feature';
 import type { MaybeResolvedPresentation } from '../../../media/types';
+import { mpegTsAudioTransmuxFeature } from '../../features/mpeg-ts-audio-transmux';
 import { mpegTsTransmuxFeature } from '../../features/mpeg-ts-transmux';
 import * as hlsAudio from '../hls-audio';
 import * as hlsVideo from '../hls-video';
@@ -25,7 +26,10 @@ function createTransmuxingVideoEngine() {
 }
 
 function createTransmuxingAudioEngine() {
-  const { behaviors, defaultConfig, initialState } = flattenFeatures([...hlsAudio.features, mpegTsTransmuxFeature]);
+  const { behaviors, defaultConfig, initialState } = flattenFeatures([
+    ...hlsAudio.features,
+    mpegTsAudioTransmuxFeature,
+  ]);
 
   return createComposition(behaviors, { defaultConfig, initialState });
 }
@@ -134,7 +138,7 @@ describe('mpegTsTransmuxFeature (real Mux TS sources, end to end)', () => {
     await engine.destroy();
   }, 60_000);
 
-  it('plays an audio-only TS asset through the audio engine', async () => {
+  it('plays an audio-only TS asset through the audio engine with the audio-only feature', async () => {
     const audio = document.createElement('audio');
 
     media = audio;
