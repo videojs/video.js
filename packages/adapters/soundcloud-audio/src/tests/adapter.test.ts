@@ -377,7 +377,7 @@ describe('SoundCloudAdapter', () => {
       expect(media.duration).toBe(358.373);
     });
 
-    it('reports an error when the duration never arrives', async () => {
+    it('reports a network error, not an unplayable sound, when the duration never arrives', async () => {
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 
       const media = new SoundCloudAdapter();
@@ -394,7 +394,7 @@ describe('SoundCloudAdapter', () => {
         vi.advanceTimersByTime(250);
       }
 
-      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
+      expect(media.error?.code).toBe(MediaError.MEDIA_ERR_NETWORK);
     });
 
     it('clears a failed source and announces the next one', async () => {
