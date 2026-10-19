@@ -57,7 +57,7 @@ export default {
     unknown: 'メディアが読み込まれていないため、時間は不明です。',
   },
   playback: {
-    rate: '再生速度 {rate}',
+    rate: '再生速度、{rate}',
   },
   volume: {
     mutedValue: '{percent}、ミュート',

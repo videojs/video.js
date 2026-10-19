@@ -57,7 +57,7 @@ export default {
     unknown: 'Phương tiện không tải được, thời gian không xác định.',
   },
   playback: {
-    rate: 'Tốc độ phát lại {rate}',
+    rate: 'Tốc độ phát lại, {rate}',
   },
   volume: {
     mutedValue: '{percent}, đã tắt tiếng',

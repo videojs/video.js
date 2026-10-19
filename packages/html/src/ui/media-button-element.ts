@@ -25,6 +25,8 @@ type LabelParams = Record<string, string | number>;
 type MediaButtonCore<ComponentState extends ButtonState, MediaState> = MediaButtonComponent<object, ComponentState> & {
   setMedia(media: MediaState): void;
   getLabelParams?: (state: ComponentState) => LabelParams | undefined;
+  /** Shorter text for the tooltip than the accessible name, when the two differ. */
+  getTooltipLabel?: (state: ComponentState) => Text | string;
 };
 
 /**
@@ -127,6 +129,8 @@ export abstract class MediaButtonElement<
 
     this.core.setMedia(media);
     const state = this.core.getState();
+
+    if (this.core.getTooltipLabel) return translateText(this.core.getTooltipLabel(state), this.#i18n.value);
 
     return translateText(this.core.getLabel(state), this.#i18n.value, this.core.getLabelParams?.(state));
   }

@@ -53,11 +53,11 @@ describe('PlaybackRateButton', () => {
 
     const trigger = screen.getByTestId('trigger');
 
-    expect(trigger.getAttribute('aria-label')).toBe('Playback rate 1.5');
+    expect(trigger.getAttribute('aria-label')).toBe('Playback rate, 1.5');
     expect(trigger.getAttribute('data-rate')).toBe('1.5');
   });
 
-  it('uses the core label and the speed-up shortcut', async () => {
+  it('shows the control name in the tooltip without the rate or a shortcut', async () => {
     const container = document.createElement('div');
     const value = createContextValue(container);
 
@@ -78,10 +78,10 @@ describe('PlaybackRateButton', () => {
     const button = document.querySelector('[data-testid="button"]');
 
     await waitFor(() => {
-      expect(document.querySelector('[data-testid="popup"] span')?.textContent).toBe('Playback rate 1');
-      expect(document.querySelector('[data-testid="popup"] kbd')?.textContent).toBe('>');
+      expect(document.querySelector('[data-testid="popup"] span')?.textContent).toBe('Playback rate');
     });
-    expect(button?.getAttribute('aria-label')).toBe('Playback rate 1');
-    expect(button?.getAttribute('aria-keyshortcuts')).toBe('>');
+    expect(document.querySelector('[data-testid="popup"] kbd')).toBeNull();
+    expect(button?.getAttribute('aria-label')).toBe('Playback rate, 1');
+    expect(button?.hasAttribute('aria-keyshortcuts')).toBe(false);
   });
 });

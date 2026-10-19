@@ -28,7 +28,8 @@ A separate feature wins out ([per review](https://github.com/videojs/v10/pull/62
 
 ## Accessibility
 
-- `aria-label`: Default `"Playback rate {rate}"` (e.g., `"Playback rate 1.5"`). Updates on rate change. Matches Media Chrome's format.
+- `aria-label`: Default `"Playback rate, {rate}"` (e.g., `"Playback rate, 1.5"`). Updates on rate change. The comma gives screen readers a pause before the value.
+- Tooltip: `"Playback rate"` without the value, which the button already shows. No shortcut hint or `aria-keyshortcuts`: the button cycles and wraps, which no hotkey does.
 - `aria-disabled`: Present when `disabled` prop is true.
 - Keyboard: `Enter` and `Space` cycle to next rate.
 

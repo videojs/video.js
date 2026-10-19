@@ -57,7 +57,7 @@ export default {
     unknown: 'Medijski sadržaj nije učitan, vreme nije poznato.',
   },
   playback: {
-    rate: 'Brzina reprodukcije {rate}',
+    rate: 'Brzina reprodukcije, {rate}',
   },
   volume: {
     mutedValue: '{percent}, utišano',
