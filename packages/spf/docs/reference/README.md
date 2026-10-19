@@ -2,11 +2,7 @@
 
 # `@videojs/spf` API reference
 
-Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/hls-audio`, `@videojs/spf/hls-background-video`, `@videojs/spf/hls-video`.
-
-Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."
-
-A config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key's doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".
+`@videojs/spf` builds a playback engine by composing behaviors, grouped into features. This reference covers 3 engines, the 21 features they compose, the 39 behaviors the behavior entry points export, and the 21 composition exports that put them together. Each engine page lists its features and behaviors in composition order with the config, state, and context keys they resolve to; each feature page does the same for its behaviors; each behavior page shows what its setup reads and writes.
 
 ## Engines and features
 
@@ -73,32 +69,6 @@ graph LR
   engine_background_video --> group_3
   linkStyle 21 stroke:#16a34a,stroke-width:2px
 ```
-
-## Core
-
-| Symbol | Page | Description |
-| --- | --- | --- |
-| `Composition` | [create-composition](core/create-composition.md#composition) | A composition of behaviors with shared state and context signal maps. |
-| `CompositionOptions` | [create-composition](core/create-composition.md#compositionoptions) | Options for `createComposition`. |
-| `createComposition` | [create-composition](core/create-composition.md#createcomposition) | Create a composition from a set of behaviors. |
-| `defineCompositionFactory` | [create-composition](core/create-composition.md#definecompositionfactory) | A create function for one fixed list of behaviors with its defaults: what an engine module exports as its `createEngine`. The returned function checks each call's config the way `createComposition` does, at its own call site, so a module needs no type plumbing of its own. |
-| `Behavior` | [define-behavior](core/define-behavior.md#behavior) | A behavior announces the state and context keys it needs alongside a `setup` function that receives deps (state, context, config) and returns an optional cleanup handle. |
-| `BehaviorCleanup` | [define-behavior](core/define-behavior.md#behaviorcleanup) | Cleanup returned by a behavior. Behaviors may return: - `void` / `undefined` — no cleanup needed - A function — called on destroy (may return a Promise) - An object with `destroy()` — called on destroy (may return a Promise) |
-| `BehaviorDeps` | [define-behavior](core/define-behavior.md#behaviordeps) | The deps object passed to each behavior by the composition. |
-| `ContextSignals` | [define-behavior](core/define-behavior.md#contextsignals) | A signal map keyed by the fields of `C`. Each field is a writable signal for a platform object or actor reference. Same dual role as `StateSignals<S>` — see its docblock. |
-| `InferBehaviorConfig` | [define-behavior](core/define-behavior.md#inferbehaviorconfig) | Infer the config shape a behavior requires from its deps parameter, whether it declares `config` or `config?`. |
-| `InferBehaviorContext` | [define-behavior](core/define-behavior.md#inferbehaviorcontext) | Infer the context shape a behavior requires from its deps parameter. |
-| `InferBehaviorState` | [define-behavior](core/define-behavior.md#inferbehaviorstate) | Infer the state shape a behavior requires from its deps parameter. |
-| `ResolveBehaviorConfig` | [define-behavior](core/define-behavior.md#resolvebehaviorconfig) | Resolve the combined config shape from an array of behaviors (intersection of all requirements). |
-| `ResolveBehaviorContext` | [define-behavior](core/define-behavior.md#resolvebehaviorcontext) | Resolve the combined context shape from an array of behaviors (intersection of all requirements). |
-| `ResolveBehaviorState` | [define-behavior](core/define-behavior.md#resolvebehaviorstate) | Resolve the combined state shape from an array of behaviors (intersection of all requirements). |
-| `StateSignals` | [define-behavior](core/define-behavior.md#statesignals) | A signal map keyed by the fields of `S`. Each field is a writable signal. |
-| `defineBehavior` | [define-behavior](core/define-behavior.md#definebehavior) | Typed factory for behaviors that enforces single-behavior key/param consistency: declared `stateKeys` must equal `keyof S` (where `S` is inferred from the setup's `state` parameter type), and same for `contextKeys` / `C`. |
-| `defineExternalSignals` | [define-external-signals](core/define-external-signals.md#defineexternalsignals) | Behavior factory that defines a composition's **external signals**: state and context keys set and updated from outside the composition (typically by an adapter) that no composed behavior declares, because the behaviors that consult them only read them, and read them optionally. |
-| `Feature` | [define-feature](core/define-feature.md#feature) | One capability of a composition: the behaviors that implement it, with the config defaults and initial state they need. Removing a feature from a composition removes its behaviors and their defaults together, except behaviors another composed feature also lists. |
-| `FlattenedFeatures` | [define-feature](core/define-feature.md#flattenedfeatures) | What `flattenFeatures` returns: the inputs `createComposition` and `defineCompositionFactory` take. |
-| `defineFeature` | [define-feature](core/define-feature.md#definefeature) | Define a feature. An identity function: it exists so the behavior list keeps its tuple type, which composition needs to derive the state, context, and config types. |
-| `flattenFeatures` | [define-feature](core/define-feature.md#flattenfeatures) | Flatten features into one behavior list, one `defaultConfig`, and one `initialState`, ready for `createComposition` or `defineCompositionFactory`. The feature list is the composition order. |
 
 ## Engines
 
@@ -182,3 +152,42 @@ graph LR
 | `trackPlayerResolution` | [behaviors/dom/track-player-resolution](behaviors/dom/track-player-resolution.md#trackplayerresolution) | Mirror the player element's rendered pixel dimensions into reactive state, so a rendition cap can narrow candidates to what the element can actually show without reading the DOM at pick time — which would make the picker impure, and would never re-pick when the element resized. |
 | `trackScreenResolution` | [behaviors/dom/track-screen-resolution](behaviors/dom/track-screen-resolution.md#trackscreenresolution) | Mirror the screen's pixel dimensions into reactive state, so a rendition cap can narrow candidates to what the screen can actually show without reading the environment at pick time — which would make the picker impure, and would never re-pick when the screen changed. |
 | `updateMediaSourceDuration` | [behaviors/dom/update-mediasource-duration](behaviors/dom/update-mediasource-duration.md#updatemediasourceduration) | **Propagate `presentation.duration` to `mediaSource.duration` — exactly once per MediaSource.** |
+
+## Core
+
+| Symbol | Page | Description |
+| --- | --- | --- |
+| `Composition` | [create-composition](core/create-composition.md#composition) | A composition of behaviors with shared state and context signal maps. |
+| `CompositionOptions` | [create-composition](core/create-composition.md#compositionoptions) | Options for `createComposition`. |
+| `createComposition` | [create-composition](core/create-composition.md#createcomposition) | Create a composition from a set of behaviors. |
+| `defineCompositionFactory` | [create-composition](core/create-composition.md#definecompositionfactory) | A create function for one fixed list of behaviors with its defaults: what an engine module exports as its `createEngine`. The returned function checks each call's config the way `createComposition` does, at its own call site, so a module needs no type plumbing of its own. |
+| `Behavior` | [define-behavior](core/define-behavior.md#behavior) | A behavior announces the state and context keys it needs alongside a `setup` function that receives deps (state, context, config) and returns an optional cleanup handle. |
+| `BehaviorCleanup` | [define-behavior](core/define-behavior.md#behaviorcleanup) | Cleanup returned by a behavior. Behaviors may return: - `void` / `undefined` — no cleanup needed - A function — called on destroy (may return a Promise) - An object with `destroy()` — called on destroy (may return a Promise) |
+| `BehaviorDeps` | [define-behavior](core/define-behavior.md#behaviordeps) | The deps object passed to each behavior by the composition. |
+| `ContextSignals` | [define-behavior](core/define-behavior.md#contextsignals) | A signal map keyed by the fields of `C`. Each field is a writable signal for a platform object or actor reference. Same dual role as `StateSignals<S>` — see its docblock. |
+| `InferBehaviorConfig` | [define-behavior](core/define-behavior.md#inferbehaviorconfig) | Infer the config shape a behavior requires from its deps parameter, whether it declares `config` or `config?`. |
+| `InferBehaviorContext` | [define-behavior](core/define-behavior.md#inferbehaviorcontext) | Infer the context shape a behavior requires from its deps parameter. |
+| `InferBehaviorState` | [define-behavior](core/define-behavior.md#inferbehaviorstate) | Infer the state shape a behavior requires from its deps parameter. |
+| `ResolveBehaviorConfig` | [define-behavior](core/define-behavior.md#resolvebehaviorconfig) | Resolve the combined config shape from an array of behaviors (intersection of all requirements). |
+| `ResolveBehaviorContext` | [define-behavior](core/define-behavior.md#resolvebehaviorcontext) | Resolve the combined context shape from an array of behaviors (intersection of all requirements). |
+| `ResolveBehaviorState` | [define-behavior](core/define-behavior.md#resolvebehaviorstate) | Resolve the combined state shape from an array of behaviors (intersection of all requirements). |
+| `StateSignals` | [define-behavior](core/define-behavior.md#statesignals) | A signal map keyed by the fields of `S`. Each field is a writable signal. |
+| `defineBehavior` | [define-behavior](core/define-behavior.md#definebehavior) | Typed factory for behaviors that enforces single-behavior key/param consistency: declared `stateKeys` must equal `keyof S` (where `S` is inferred from the setup's `state` parameter type), and same for `contextKeys` / `C`. |
+| `defineExternalSignals` | [define-external-signals](core/define-external-signals.md#defineexternalsignals) | Behavior factory that defines a composition's **external signals**: state and context keys set and updated from outside the composition (typically by an adapter) that no composed behavior declares, because the behaviors that consult them only read them, and read them optionally. |
+| `Feature` | [define-feature](core/define-feature.md#feature) | One capability of a composition: the behaviors that implement it, with the config defaults and initial state they need. Removing a feature from a composition removes its behaviors and their defaults together, except behaviors another composed feature also lists. |
+| `FlattenedFeatures` | [define-feature](core/define-feature.md#flattenedfeatures) | What `flattenFeatures` returns: the inputs `createComposition` and `defineCompositionFactory` take. |
+| `defineFeature` | [define-feature](core/define-feature.md#definefeature) | Define a feature. An identity function: it exists so the behavior list keeps its tuple type, which composition needs to derive the state, context, and config types. |
+| `flattenFeatures` | [define-feature](core/define-feature.md#flattenfeatures) | Flatten features into one behavior list, one `defaultConfig`, and one `initialState`, ready for `createComposition` or `defineCompositionFactory`. The feature list is the composition order. |
+
+<details>
+<summary>How this reference is generated</summary>
+
+Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/hls-audio`, `@videojs/spf/hls-background-video`, `@videojs/spf/hls-video`.
+
+Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.
+
+A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."
+
+A config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key's doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".
+
+</details>
