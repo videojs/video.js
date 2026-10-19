@@ -5,14 +5,19 @@ import { PlaybackStatusIndicator, StatusIndicator } from '../../../../components
 import { VolumeIndicator } from '../../../../components/display/volume-indicator';
 import styles from '../../display/status-indicators.styles';
 
-export function LiveVideoStatusIndicators({ className, ...props }: Props = {}) {
+/** Pass `playback={false}` to skip play/pause feedback in skins with centre playback controls. */
+export function LiveVideoStatusIndicators({
+  className,
+  playback = true,
+  ...props
+}: Props<{ playback?: boolean }> = {}) {
   return (
     <>
       <StatusAnnouncer />
       <Box className={[styles.root, className]} {...props}>
         <VolumeIndicator />
         <StatusIndicator />
-        <PlaybackStatusIndicator />
+        {playback && <PlaybackStatusIndicator />}
       </Box>
     </>
   );

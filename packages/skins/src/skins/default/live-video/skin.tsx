@@ -28,7 +28,7 @@ export function LiveVideoSkin({ children, className, renderPoster, ...props }: L
       <DefaultLiveVideoControls />
       <LiveVideoHotkeys />
       <LiveVideoGestures />
-      <LiveVideoStatusIndicators />
+      <LiveVideoStatusIndicators playback={false} />
     </Container>
   );
 }

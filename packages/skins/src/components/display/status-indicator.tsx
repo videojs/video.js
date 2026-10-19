@@ -19,7 +19,7 @@ import styles from '../../styles/display/status-indicator.styles';
 
 const TOP_STATUS_ACTIONS = ['toggleSubtitles', 'toggleFullscreen', 'togglePictureInPicture'] as const;
 
-const PLAYBACK_STATUS_ACTIONS = ['togglePaused'] as const;
+const PLAYBACK_STATUS_ACTIONS = ['togglePaused', 'playOrToggleControls'] as const;
 
 export function StatusIndicator({ className, ...props }: Props<Omit<CoreProps, 'actions'>> = {}) {
   return (
