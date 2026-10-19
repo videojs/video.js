@@ -11,11 +11,12 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 // only the audio renditions of the playback ID are fetched — the hls.js-backed
 // flavor runs the full engine and downloads video renditions it never plays.
 //
-// What differs otherwise is what it can play. SPF appends fMP4/CMAF only, so an
-// MPEG-TS or DRM-protected playback ID is expected to surface the
-// unsupported-source error, with console copy pointing at the hls.js-backed
-// import. Those sources are left in the picker deliberately: failing well is part
-// of what this page demos.
+// What differs otherwise is what it can play. This flavor composes
+// `mpegTsTransmuxFeature`, so an audio-only MPEG-TS playback ID plays by
+// transmuxing to fMP4 on the client. A plus-tier *video* asset still has no
+// audio rendition to select — Mux muxes its audio into the video segments — so
+// it surfaces no playback here. Those sources are left in the picker
+// deliberately: failing well is part of what this page demos.
 
 createHtmlSandbox({
   player: 'audio',
