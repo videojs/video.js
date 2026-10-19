@@ -54,15 +54,15 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedTextTrackId` | reads | yes | `string \| undefined` | inline | No description. |
-| `userTextTrackSelection` | writes | yes | `Partial<TextTrack> \| "off" \| undefined` | inline | No description. |
+| `selectedTextTrackId` | reads | yes | `string \| undefined` | inline | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. (doc of [switchTextTrack](../track-switching.md#switchtexttrack)) |
+| `userTextTrackSelection` | writes | yes | `Partial<TextTrack> \| "off" \| undefined` | inline | Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference). (doc of `defineExternalSignals<UserTrackSelectionState<'text'>>` ([src/playback/engines/hls/features/text-tracks.ts](../../../../src/playback/engines/hls/features/text-tracks.ts))) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | inline | No description. |
-| `textTracksActor` | reads | yes | `TextTracksActor<VTTCue> \| undefined` | inline | No description. |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `textTracksActor` | reads | yes | `TextTracksActor<VTTCue> \| undefined` | inline | The `TextTracksActor` bound to `mediaElement.textTracks`. `setupTextTrackActors` — its sole writer — creates it together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the slots on element change or destroy. (doc of [setupTextTrackActors](setup-text-track-actors.md#setuptexttrackactors)) |
 
 ## Other exports
 

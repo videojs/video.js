@@ -28,13 +28,13 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `playbackRate` | writes | yes | `number \| undefined` | `PlaybackRateState` | No description. |
+| `playbackRate` | writes | yes | `number \| undefined` | `PlaybackRateState` | The element's `playbackRate`, mirrored by `trackPlaybackRate` on each `ratechange` and when an element attaches; `config.defaultPlaybackRate` (default `1`) while none is attached. A read-only mirror: writing it does not reach the element. |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `PlaybackRateContext` | No description. |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `PlaybackRateContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Other exports
 

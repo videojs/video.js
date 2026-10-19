@@ -65,8 +65,8 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaSourceContext` | No description. |
-| `mediaSource` | writes | yes | `MediaSource \| undefined` | `MediaSourceContext` | No description. |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaSourceContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. |
+| `mediaSource` | writes | yes | `MediaSource \| undefined` | `MediaSourceContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. |
 
 ## Other exports
 

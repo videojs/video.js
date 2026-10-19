@@ -52,8 +52,10 @@ export const deriveCdnPriority = defineBehavior({
       presentation: ReadonlySignal<DeriveCdnPriorityState['presentation']>;
       cdnPriority: Signal<DeriveCdnPriorityState['cdnPriority']>;
     };
-    /** `getCdnId`: see `TrackSwitchingSharedConfig['getCdnId']`. */
-    config?: { getCdnId?: GetCdnId };
+    config?: {
+      /** See `TrackSwitchingSharedConfig['getCdnId']`. */
+      getCdnId?: GetCdnId;
+    };
   }) => {
     const getCdnId = config.getCdnId ?? defaultGetCdnId;
     const derivedStateSignal = computed(() =>

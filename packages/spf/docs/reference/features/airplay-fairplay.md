@@ -32,7 +32,7 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | No description. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | `MediaKeys \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. (doc of [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
 
 ### Composed by
