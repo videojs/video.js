@@ -43,5 +43,5 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `TextTrackActorsConfig` | interface | No description. | [src/playback/behaviors/dom/setup-text-track-actors.ts](../../../../src/playback/behaviors/dom/setup-text-track-actors.ts) |
-| `TextTrackActorsContext` | interface | No description. | [src/playback/behaviors/dom/setup-text-track-actors.ts](../../../../src/playback/behaviors/dom/setup-text-track-actors.ts) |
+| `TextTrackActorsConfig` | interface | No JSDoc; fields `forwardBuffer, resolveTextTrackSegment, textMessagePipelines`. | [src/playback/behaviors/dom/setup-text-track-actors.ts](../../../../src/playback/behaviors/dom/setup-text-track-actors.ts) |
+| `TextTrackActorsContext` | interface | No JSDoc; fields `mediaElement, textTracksActor, textTrackSegmentLoaderActor`. | [src/playback/behaviors/dom/setup-text-track-actors.ts](../../../../src/playback/behaviors/dom/setup-text-track-actors.ts) |

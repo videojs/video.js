@@ -36,12 +36,12 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `failedCdns` | writes | yes | `string[] \| undefined` | `SetupFailoverMonitorState` | CDN ids (origins) currently in failover cooldown — read by `track-switching`'s `excludeFailedCdns` hard constraint, which prunes their tracks so the active-CDN scope falls to the next CDN in `cdnPriority`. Empty / absent means all CDNs are eligible. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SetupFailoverMonitorState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SetupFailoverMonitorState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 
 ## Other exports
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `FailoverMonitorConfig` | interface | Failover policy: how long a CDN stays excluded after a failed fetch trips it. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
-| `SetupFailoverMonitorConfig` | interface | No description. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
-| `SetupFailoverMonitorState` | interface | No description. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
+| `SetupFailoverMonitorConfig` | interface | No JSDoc; fields `failover`. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |
+| `SetupFailoverMonitorState` | interface | No JSDoc; fields `failedCdns, presentation`. | [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback/behaviors/setup-failover-monitor.ts) |

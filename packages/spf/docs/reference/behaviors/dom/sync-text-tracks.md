@@ -53,7 +53,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | reads | yes | `string \| undefined` | inline | No description. |
 | `userTextTrackSelection` | writes | yes | `Partial<TextTrack> \| "off" \| undefined` | inline | No description. |
 
@@ -68,4 +68,4 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SyncTextTracksConfig` | interface | No description. | [src/playback/behaviors/dom/sync-text-tracks.ts](../../../../src/playback/behaviors/dom/sync-text-tracks.ts) |
+| `SyncTextTracksConfig` | interface | No JSDoc; fields `addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia`. | [src/playback/behaviors/dom/sync-text-tracks.ts](../../../../src/playback/behaviors/dom/sync-text-tracks.ts) |

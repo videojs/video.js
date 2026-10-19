@@ -94,8 +94,8 @@ The setup declares `config` as required. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `currentTime` | reads | yes | `number \| undefined` | `EndOfStreamState` | No description. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `EndOfStreamState` | No description. |
+| `currentTime` | reads | yes | `number \| undefined` | `EndOfStreamState` | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](load-segments.md#loadvideosegments)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `EndOfStreamState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
@@ -109,5 +109,5 @@ The setup declares `config` as required. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `EndOfStreamContext` | interface | No description. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
-| `EndOfStreamState` | interface | No description. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
+| `EndOfStreamContext` | interface | No JSDoc; fields `audioBufferActor, mediaSource, videoBufferActor`. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |
+| `EndOfStreamState` | interface | No JSDoc; fields `currentTime, presentation`. | [src/playback/behaviors/dom/end-of-stream.ts](../../../../src/playback/behaviors/dom/end-of-stream.ts) |

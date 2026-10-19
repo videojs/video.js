@@ -42,7 +42,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
 
 ## selectVideoTrack
@@ -113,7 +113,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | No description. |
 
 ## Other exports

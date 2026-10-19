@@ -182,7 +182,7 @@ await engine.destroy();
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the HLS playback engine composes, in setup order: its features' behaviors, each composed once. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |
 | `Config` | type | Every config key the behaviors read, before `defaultConfig` makes any optional. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |
 | `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |
 | `EngineConfig` | type | Configuration for the HLS playback engine: every config key its behaviors read, with each key `defaultConfig` covers optional. | [src/playback/engines/hls/engine.ts](../../../src/playback/engines/hls/engine.ts) |

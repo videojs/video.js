@@ -40,6 +40,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `PlaybackRateContext` | interface | No description. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |
-| `PlaybackRateState` | interface | No description. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |
-| `TrackPlaybackRateConfig` | interface | No description. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |
+| `PlaybackRateContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |
+| `PlaybackRateState` | interface | No JSDoc; fields `playbackRate`. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |
+| `TrackPlaybackRateConfig` | interface | No JSDoc; fields `defaultPlaybackRate`. | [src/playback/behaviors/dom/track-playback-rate.ts](../../../../src/playback/behaviors/dom/track-playback-rate.ts) |

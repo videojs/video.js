@@ -55,7 +55,7 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `ParsePresentation` | type | No description. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
-| `PresentationState` | interface | No description. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
-| `ResolvePresentationConfig` | interface | No description. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
-| `ResolvePresentationState` | type | No description. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `ParsePresentation` | type | No JSDoc; an alias of `(text: string, presentation: MaybeResolvedPresentation) => Presentation`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `PresentationState` | interface | No JSDoc; fields `loadActivated, preload, presentation`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `ResolvePresentationConfig` | interface | No JSDoc; fields `defaultPreload, parsePresentation, requestCredentials`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `ResolvePresentationState` | type | No JSDoc; an alias of `'preconditions-unmet' \| 'idle' \| 'resolving' \| 'resolved'`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |

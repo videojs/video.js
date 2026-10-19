@@ -35,7 +35,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
 
 ## switchTextTrack
@@ -74,7 +74,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
 
 ## switchVideoTrack
@@ -164,7 +164,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | No description. |
 
 ## Other exports
@@ -187,5 +187,5 @@ The setup declares `config?`: callers may omit it.
 | `SwitchVideoTrackRule` | type | A constraint or rule in `switchVideoTrack`'s chains. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `TrackSwitchingSharedConfig` | interface | Config both `switchVideoTrack` and `switchAudioTrack` read — the cross-cutting fields one engine config serves to every variant. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `TrackSwitchingState` | interface | The slots `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it writes. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
-| `TrackSwitchingStateMap` | type | No description. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
+| `TrackSwitchingStateMap` | type | No JSDoc; an alias of `{ presentation: ReadonlySignal<TrackSwitchingState['presentation']>; } & { [P in S]: Signal<TrackSwitchingState[P]> }`. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `UserTrackSelectionState` | type | The user track selections a consumer writes and the track-switching rules read, per track type (all three by default). | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |

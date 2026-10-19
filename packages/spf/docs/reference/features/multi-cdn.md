@@ -27,7 +27,7 @@ next when a CDN fails, returning to it once its cooldown lapses. Single-CDN sour
 | --- | --- | --- | --- |
 | `cdnPriority` | `string[] \| undefined` | [deriveCdnPriority](../behaviors/derive-cdn-priority.md#derivecdnpriority) | The CDNs the source is served from (track-URL origins), in manifest priority order — most-preferred first (mirrors HLS content steering's `PATHWAY-PRIORITY`). Owned by `deriveCdnPriority`, read by `track-switching`'s `preferActiveCdn` scope, which narrows to the highest-priority CDN with surviving tracks so video / audio / text stay on one host. Only meaningful for redundant-stream sources; a single-CDN source has one entry. |
 | `failedCdns` | `string[] \| undefined` | [setupFailoverMonitor](../behaviors/setup-failover-monitor.md#setupfailovermonitor) | CDN ids (origins) currently in failover cooldown — read by `track-switching`'s `excludeFailedCdns` hard constraint, which prunes their tracks so the active-CDN scope falls to the next CDN in `cdnPriority`. Empty / absent means all CDNs are eligible. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [deriveCdnPriority](../behaviors/derive-cdn-priority.md#derivecdnpriority), [setupFailoverMonitor](../behaviors/setup-failover-monitor.md#setupfailovermonitor) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [deriveCdnPriority](../behaviors/derive-cdn-priority.md#derivecdnpriority), [setupFailoverMonitor](../behaviors/setup-failover-monitor.md#setupfailovermonitor) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 
@@ -39,7 +39,7 @@ next when a CDN fails, returning to it once its cooldown lapses. Single-CDN sour
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/multi-cdn.ts](../../../src/playback/engines/hls/features/multi-cdn.ts) |
