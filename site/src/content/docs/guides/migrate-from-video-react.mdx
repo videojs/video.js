@@ -83,7 +83,7 @@ What changed:
 - **`src` and `playsInline` moved to the media.** `Video` renders a native `<video>`, so `<source>` and `<track>` children go inside it, as they did inside `<Player>`.
 - **`poster` stays on the player.** `VideoPlayer` holds it as metadata, and the skin renders it. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 - **No control bar children.** The skin ships its controls. A captions button appears when the media has caption or subtitle tracks, so `ClosedCaptionButton` has nothing to replace.
-- **No big play button.** The Default and Neutral video skins don't render one. Clicking the video or pressing the control bar's play button starts playback.
+- **No big play button.** The Default and Neutral video skins don't render one. Clicking the video or pressing the control bar's play button starts playback. The Compat and Scaffold video skins put large play and seek buttons in the center.
 - **Set the aspect ratio yourself.** Video-React's `fluid` mode drew a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
 - **One stylesheet per skin.** Replace `video-react.css` with the skin's CSS file.
 
@@ -178,7 +178,7 @@ Every `ControlBar` customization lands at the third level:
 
 - **`order`** becomes the position of the component in the local controls file.
 - **`disabled`** becomes a deleted line.
-- **`ReplayControl seconds={10}`** becomes `<SeekButton seconds={-10} />`, and `ForwardControl seconds={30}` becomes `<SeekButton seconds={30} />`. The Default and Neutral video skins don't include skip buttons, so add them where you want them.
+- **`ReplayControl seconds={10}`** becomes `<SeekButton seconds={-10} />`, and `ForwardControl seconds={30}` becomes `<SeekButton seconds={30} />`. The Compat and Scaffold video skins include 10-second skip buttons; the Default and Neutral video skins don't, so add them where you want them.
 - **`autoHide={false}`** becomes `visibility="always"` on `Controls.Root`.
 - **`disableDefaultControls`** means writing the controls layout yourself; start from the Scaffold skin or compose <DocsLink slug="guides/ui-components">UI components</DocsLink> inside a `Container`.
 - **`disableCompletely`** means leaving the skin out. Render the media inside `VideoPlayer` with no skin for a player with no UI, or use the background video preset.
