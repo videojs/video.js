@@ -27,6 +27,7 @@
   ],
   "type": "module",
   "sideEffects": [
+    "*.css",
     "./dist/*/i18n/locales/*/register.js"
   ],
   "main": "dist/default/index.js",
