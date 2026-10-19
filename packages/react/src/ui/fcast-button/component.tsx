@@ -2,12 +2,13 @@
 
 import { FCastExtension, type FCastSnapshot } from '@videojs/fcast';
 import type { ForwardedRef } from 'react';
-import { forwardRef, useSyncExternalStore } from 'react';
+import { forwardRef, useLayoutEffect, useSyncExternalStore } from 'react';
 
 import { usePlayerContext } from '../../player/context';
 import type { UIComponentProps } from '../../utils/types';
 import { renderElement } from '../../utils/use-render';
 import { useButton } from '../hooks/use-button';
+import { useOptionalTooltipContext } from '../tooltip/context';
 
 /** @experimental */
 export interface FCastButtonState {
@@ -65,6 +66,14 @@ export const FCastButton = forwardRef(function FCastButton(
       : state.connection === 'connecting'
         ? 'Connecting to FCast'
         : 'Cast with FCast';
+  const setTooltipContent = useOptionalTooltipContext()?.setContent;
+
+  useLayoutEffect(() => {
+    if (!setTooltipContent) return;
+
+    setTooltipContent({ label });
+    return () => setTooltipContent(undefined);
+  }, [setTooltipContent, label]);
 
   const { getButtonProps, buttonRef } = useButton({
     displayName: 'FCastButton',

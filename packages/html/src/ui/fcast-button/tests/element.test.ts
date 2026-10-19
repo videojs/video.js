@@ -3,6 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { FCastExtension as FCastExtensionElement } from '../../../extensions/fcast';
 import { TestExtensionProvider } from '../../../extensions/tests/test-utils';
+import { TooltipElement } from '../../tooltip/element';
+import { TooltipLabelElement } from '../../tooltip/label';
+import { TooltipShortcutElement } from '../../tooltip/shortcut';
 import { FCastButtonElement } from '../element';
 
 class TestSender extends EventTarget implements FCastSender {
@@ -29,6 +32,9 @@ class TestSender extends EventTarget implements FCastSender {
 customElements.define('test-fcast-provider', TestExtensionProvider);
 customElements.define('test-fcast-button', FCastButtonElement);
 customElements.define('test-fcast-extension', FCastExtensionElement);
+customElements.define('test-fcast-tooltip', TooltipElement);
+customElements.define(TooltipLabelElement.tagName, TooltipLabelElement);
+customElements.define(TooltipShortcutElement.tagName, TooltipShortcutElement);
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -55,7 +61,15 @@ describe('FCastButtonElement', () => {
     provider.append(extension);
     await button.updateComplete;
 
+    const tooltip = new TooltipElement();
+
+    tooltip.id = 'fcast-tooltip';
+    button.setAttribute('commandfor', tooltip.id);
+    provider.append(tooltip);
+    await tooltip.updateComplete;
+
     expect(button.getAttribute('aria-label')).toBe('Cast with FCast');
+    expect(TooltipLabelElement.findIn(tooltip)?.textContent).toBe('Cast with FCast');
     expect(button.hidden).toBe(false);
     expect(button.hasAttribute('data-hidden')).toBe(false);
     expect(button.getAttribute('data-availability')).toBe('available');
@@ -84,6 +98,7 @@ describe('FCastButtonElement', () => {
 
     expect(button.hidden).toBe(false);
     expect(button.getAttribute('aria-label')).toBe('Disconnect from FCast');
+    expect(TooltipLabelElement.findIn(tooltip)?.textContent).toBe('Disconnect from FCast');
 
     extension.remove();
     await button.updateComplete;
