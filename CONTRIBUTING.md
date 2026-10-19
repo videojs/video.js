@@ -27,7 +27,9 @@ You’ll need the following installed:
 
 > [!TIP]
 > PNPM will automatically use the correct Node version when running scripts.
-> If you prefer NVM: after installing it, simply run `nvm use` in the repo root.
+> If you prefer NVM: after installing it, simply run `nvm use` in the repo root. NVM keeps global
+> packages per Node version, so after switching to a new version reinstall pnpm at the version
+> `package.json`'s `packageManager` names: `npm i -g pnpm@<version>`.
 > If you prefer mise: see [Using mise](#-using-mise-optional) — it manages pnpm for you too.
 
 ### ⬇️ Fork & Clone
@@ -87,6 +89,8 @@ mise run setup    # pnpm install + pnpm build:packages
 `mise.toml` also puts the workspace's `node_modules/.bin` on `PATH`, so `biome`, `turbo`, and `tsgo` can be run directly rather than through `pnpm exec`.
 
 Everything else stays as documented below: use the `pnpm` scripts, not mise tasks. Personal additions, such as extra tools, environment variables, belong in a gitignored `mise.local.toml` or `.env.local` and not in the shared config.
+
+One exception: `apps/react-native` has its own `mise.toml` for the native toolchains (JDK, Ruby, CocoaPods), and there mise is not optional. See [its README](./apps/react-native/README.md#prerequisites).
 
 ### 🏗 Building & Development
 

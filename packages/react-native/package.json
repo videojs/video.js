@@ -1,0 +1,115 @@
+{
+  "name": "@videojs/react-native",
+  "version": "10.0.0-rc.2",
+  "private": true,
+  "description": "video.js for react-native",
+  "keywords": [
+    "android",
+    "ios",
+    "react-native"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/v10",
+    "directory": "packages/react-native"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./lib/module/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "react-native-source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "bob build",
+    "clean": "rimraf --glob lib types android/build ios/build '*.tsbuildinfo'",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@videojs/core": "workspace:*",
+    "@videojs/media": "workspace:*",
+    "@videojs/store": "workspace:*",
+    "@videojs/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "20.2.0",
+    "@react-native/babel-preset": "0.86.2",
+    "@react-native/metro-config": "0.86.2",
+    "@types/react": "^19.2.0",
+    "react": "19.2.8",
+    "react-native": "0.86.2",
+    "react-native-builder-bob": "^0.43.0",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-native": ">=0.76.0"
+  },
+  "codegenConfig": {
+    "name": "VideoJSSpec",
+    "type": "all",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.reactnative"
+    },
+    "ios": {
+      "components": {
+        "VideoJSPlayerView": {
+          "className": "VideoJSPlayerView"
+        }
+      }
+    }
+  },
+  "create-react-native-library": {
+    "type": "fabric-view",
+    "languages": "kotlin-objc",
+    "tools": [],
+    "version": "0.63.1"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true,
+          "configFile": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}

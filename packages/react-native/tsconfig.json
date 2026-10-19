@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "declarationDir": "types",
+    "jsx": "react-jsx",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    // Resolves @videojs/react-native and react-native's own exports to their
+    // TypeScript sources rather than the published .d.ts files.
+    "customConditions": ["react-native-source", "react-native-strict-api"],
+    "esModuleInterop": true,
+    "paths": {
+      "@videojs/react-native": ["./src/index"]
+    }
+  },
+  "include": ["src"]
+}

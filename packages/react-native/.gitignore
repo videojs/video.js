@@ -1,0 +1,32 @@
+# Patterns specific to this package's native builds. Repo-wide ignores
+# (node_modules, lib/, .turbo/, .DS_Store, Pods/, types/) live in the root
+# .gitignore — but its `android/build/`-style patterns are anchored to the repo
+# root, so the native output directories below must be re-declared here.
+
+# Xcode
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.xcuserstate
+xcuserdata
+DerivedData
+project.xcworkspace
+**/.xcode.env.local
+
+# Android / Gradle
+.cxx
+.gradle
+local.properties
+android.iml
+android/app/libs
+android/keystores/debug.keystore
+
+# React Native Codegen
+ios/generated
+android/generated

@@ -1,0 +1,33 @@
+{
+  // Standalone on purpose — this drives `bob build`, which emits declarations
+  // into lib/typescript/src and validates them against package.json's "types".
+  // tsconfig.json is the composite config for the root project-reference graph;
+  // its declarationDir/include would redirect bob's output and break that check.
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "@videojs/react-native": ["./src/index"]
+    },
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "customConditions": ["react-native-source", "react-native-strict-api"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
+    "verbatimModuleSyntax": true
+  },
+  "exclude": ["lib", "types"]
+}
