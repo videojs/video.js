@@ -130,10 +130,18 @@ function isOptionalSecret(segment: string | undefined, length: number, required:
   return length === required + 1 && !!segment && SECRET_TOKEN.test(segment);
 }
 
-/** Read a `t=` value from a URL hash: `90`, `90s`, `1:30`, `1:02:03`, `1m30s`, or `1h2m3s`. */
+/** Read a `t=` value from a URL hash: `90`, `90s`, `1:30`, `1:02:03`, `1m30s`, or `1h2m3s`, raw or percent-encoded. */
 function parseStartTime(hash: string): number | null {
-  const value = /(?:^#|&)t=([^&]+)/.exec(hash)?.[1]?.toLowerCase();
-  if (!value) return null;
+  const raw = /(?:^#|&)t=([^&]+)/.exec(hash)?.[1];
+  if (!raw) return null;
+
+  let value: string;
+
+  try {
+    value = decodeURIComponent(raw).toLowerCase();
+  } catch {
+    return null;
+  }
 
   if (CLOCK_TIME.test(value)) {
     return value.split(':').reduce((total, part) => total * 60 + Number.parseInt(part, 10), 0);
