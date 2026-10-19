@@ -31,7 +31,6 @@ import {
 import { getTracksByType, mimeCodecsByType } from '../../../media/utils/tracks';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
 
-/** State shape for MediaKeys setup. */
 export interface MediaKeysState {
   presentation?: MaybeResolvedPresentation;
   /**
@@ -50,7 +49,6 @@ export interface MediaKeysState {
   negotiatedKeySystem?: string;
 }
 
-/** Context shape for MediaKeys setup. */
 export interface MediaKeysContext {
   mediaElement?: HTMLMediaElement | undefined;
   /** The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. */
@@ -63,7 +61,6 @@ export interface MediaKeysContext {
  */
 export type NegotiableDrmSystemsConfig = KeyedBy<'keySystems', 'keySystem', DrmSystemConfig>;
 
-/** Config for MediaKeys setup. */
 export interface MediaKeysSetupConfig {
   /**
    * License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. Required:

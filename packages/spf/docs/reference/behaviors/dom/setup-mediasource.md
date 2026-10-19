@@ -72,6 +72,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `MediaSourceContext` | interface | Context of [setupMediaSource](setup-mediasource.md#setupmediasource). Context shape for MediaSource setup. | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |
-| `MediaSourceSetupConfig` | interface | Config of [setupMediaSource](setup-mediasource.md#setupmediasource). Config for MediaSource setup. | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |
-| `MediaSourceState` | interface | State of [setupMediaSource](setup-mediasource.md#setupmediasource). State shape required for MediaSource setup. | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |
+| `MediaSourceContext` | interface | Context of [setupMediaSource](setup-mediasource.md#setupmediasource). | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |
+| `MediaSourceSetupConfig` | interface | Config of [setupMediaSource](setup-mediasource.md#setupmediasource). | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |
+| `MediaSourceState` | interface | State of [setupMediaSource](setup-mediasource.md#setupmediasource). | [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playback/behaviors/dom/setup-mediasource.ts) |

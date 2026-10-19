@@ -6,13 +6,11 @@ Source: [src/playback/engines/hls/engine-audio-only.ts](../../../src/playback/en
 
 ## createEngine
 
-Create an audio-only HLS playback engine.
-
-Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors
-(`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors
-(`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters
-(`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes
-unchanged.
+Create an audio-only HLS playback engine. Subtractive composition variant of the HLS video engine (`./engine`): omits
+video-side behaviors (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and
+subtitle behaviors (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`,
+`loadTextTrackSegments`). Chapters (`loadChapters`) stay: they are session data, not a subtitle rendition. The
+remaining audio pipeline composes unchanged.
 
 Handles both truly audio-only HLS sources (no video stream-inf) and mixed-AV HLS sources where the audio rendition is
 selected and video / subtitle renditions are ignored at composition time. The variant decision is encoded by adapter

@@ -98,10 +98,8 @@ export const defaultConfig = composed.defaultConfig;
 export const initialState = composed.initialState;
 
 /**
- * Create an HLS playback engine.
- *
- * Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest resolution, track selection, ABR,
- * segment loading, and end-of-stream coordination.
+ * Create an HLS playback engine. Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest
+ * resolution, track selection, ABR, segment loading, and end-of-stream coordination.
  *
  * @example
  *   ```ts

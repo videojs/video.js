@@ -9,21 +9,18 @@ import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../..
 import { type ErrorEmitterState, emitError } from '../collect-errors';
 import type { NegotiableDrmSystemsConfig } from './setup-media-keys';
 
-/** State shape for license exchange. */
 export interface ExchangeLicensesState {
   presentation?: MaybeResolvedPresentation;
   /** The negotiated key system; owned by `setupMediaKeys`. Semantics on `MediaKeysState['negotiatedKeySystem']`. */
   negotiatedKeySystem?: string;
 }
 
-/** Context shape for license exchange. */
 export interface ExchangeLicensesContext {
   mediaElement?: HTMLMediaElement | undefined;
   /** The attached MediaKeys; owned by `setupMediaKeys`. */
   mediaKeys?: MediaKeys;
 }
 
-/** Config for license exchange. */
 export interface ExchangeLicensesConfig {
   /** License servers keyed by EME key-system id — `source.drm`'s shape. Semantics on `MediaKeysSetupConfig['drm']`. */
   drm: NegotiableDrmSystemsConfig;

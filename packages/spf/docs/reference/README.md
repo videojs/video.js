@@ -107,9 +107,9 @@ graph LR
 
 | Symbol | Page | Description |
 | --- | --- | --- |
-| `@videojs/spf/hls/video` | [video](engines/video.md) | Create an HLS playback engine. |
-| `@videojs/spf/hls/audio` | [audio](engines/audio.md) | Create an audio-only HLS playback engine. |
-| `@videojs/spf/hls/background-video` | [background-video](engines/background-video.md) | Create a background-video playback engine. |
+| `@videojs/spf/hls/video` | [video](engines/video.md) | Create an HLS playback engine. Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest resolution, track selection, ABR, segment loading, and end-of-stream coordination. |
+| `@videojs/spf/hls/audio` | [audio](engines/audio.md) | Create an audio-only HLS playback engine. Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters (`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes unchanged. |
+| `@videojs/spf/hls/background-video` | [background-video](engines/background-video.md) | Create a background-video playback engine. Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven, preload-monitoring, and play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution rule by default) replaces `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds `loadActivated: true` so the composition behaves as if preload has already been activated — appropriate for ambient / hero / GIF-replacement surfaces that should start loading the moment a src is set. |
 
 ## Features
 
