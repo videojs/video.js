@@ -91,6 +91,24 @@ function awaitDefined(read: () => number | undefined): Promise<number> {
  * the stamp leaves appends native.
  */
 export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePipelines {
+  const { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime } = relocationStepsFor(trackType);
+
+  return () => ({
+    remove: [dispatchStep],
+    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
+    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
+  });
+}
+
+/** The relocation steps by role, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export interface RelocationSteps {
+  readInitTrackInfo: LoadStep;
+  readSegmentOrigin: LoadStep;
+  stampStartMediaTime: LoadStep;
+}
+
+/** The relocation steps themselves, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export function relocationStepsFor(trackType: 'video' | 'audio'): RelocationSteps {
   const handlerType: MediaHandlerType = trackType === 'video' ? 'vide' : 'soun';
 
   /**
@@ -184,11 +202,7 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     frame.meta = { ...(frame.meta ?? frame.op.meta), timestampOffset: -startMediaTime };
   };
 
-  return () => ({
-    remove: [dispatchStep],
-    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
-    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
-  });
+  return { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime };
 }
 
 // ============================================================================
