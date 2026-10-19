@@ -32,6 +32,26 @@ Use Vite 4.1 or later; Video.js has been tested through Vite 8. Earlier versions
 Packaged HTML skins import their own styles, so an HTML application using `@videojs/html/video/skin` doesn't need to import `skin.css` separately. The CSS limitation matters only when your application imports that stylesheet directly.
 </FrameworkCase>
 
+<FrameworkCase frameworks={["react"]}>
+
+## webpack with React 16 or 17
+
+React 16 and 17 have no `exports` field. Without one, webpack 5 only resolves `react/jsx-runtime` from an ES module package such as `@videojs/react` when the import includes a file extension, so the build fails with `Can't resolve 'react/jsx-runtime'`.
+
+Let webpack resolve those imports without an extension:
+
+```js title="webpack.config.js"
+module.exports = {
+  module: {
+    rules: [{ test: /\.m?js$/, resolve: { fullySpecified: false } }],
+  },
+};
+```
+
+React 18 and later have an `exports` field, so they don't need this rule.
+
+</FrameworkCase>
+
 ## Externalize Video.js in a wrapper library
 
 You can skip this section when building an application.

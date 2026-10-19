@@ -25,7 +25,7 @@ See <DocsLink slug="guides/build-with-ai">Build with AI</DocsLink> to install th
 
 ## Before you migrate
 
-- **Upgrade to React 18 or later.** Video-React supports React 15 through 18. `@videojs/react` supports React 18 and 19.
+- **Upgrade to React 16.14 or later.** Video-React supports React 15 through 18. `@videojs/react` supports React 16.14 through 19. If you bundle React 16 or 17 with webpack, add the rule from <DocsLink slug="guides/bundlers">Bundlers</DocsLink>.
 - **Compare your features with [Known gaps](#known-gaps).** Custom playback rate lists, a configurable auto-hide delay, and a full-window fullscreen fallback have no equivalent yet.
 - **List what you pass to `<Player>`.** Note its props, control bar children, `isVideoChild` components, ref calls, and `subscribeToStateChange` listeners. Each one moves to a different place.
 - **Migrate one player at a time if you need to.** Neither library registers custom elements, and Video-React's stylesheet only targets its own `video-react-*` classes, so both can render in the same app. Remove `video-react` and its stylesheet once nothing imports them.
