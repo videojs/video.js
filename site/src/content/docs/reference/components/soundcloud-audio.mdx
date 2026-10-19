@@ -82,7 +82,24 @@ The widget stays visible and keeps taking clicks, with or without `controls`. It
 
 Anything the listener does in the widget shows in the skin: play, pause, seeking on the waveform, and picking another track of a set.
 
-The component is 166 pixels tall by default, SoundCloud's classic layout. Set a height to change it. From about 300 pixels, a set also shows its track list, and 450 pixels shows most of it. The large artwork layout of `visual: true` (see [widget parameters](#widget-parameters)) needs 300 pixels or more.
+The component is 166 pixels tall by default, SoundCloud's classic layout. Set a height to change it. From about 300 pixels, a set also shows its track list, and 450 pixels shows most of it. The large artwork layout of `visual: true` (see [widget parameters](#widget-parameters)) needs 300 pixels or more. At the default height, the artwork shows only behind the waveform.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<SoundCloudAudio
+  source={{ src: 'https://soundcloud.com/forss/flickermood', engine: { soundcloud: { visual: true } } }}
+  style={{ height: 300 }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```css
+soundcloud-audio {
+  height: 300px;
+}
+```
+</FrameworkCase>
 
 ## Widget parameters
 
