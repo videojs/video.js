@@ -1,0 +1,125 @@
+# SPF MPEG-TS → fMP4 transmux spike
+
+Temporary implementation notes (delete before merge). Branch: `feat/spf-mpeg-ts-feature`, cut from the
+compose-engine stack tip (`docs/spf-behavior-jsdoc`, #9396). The original standalone spike is stashed on
+`spike/spf-mpeg-ts-transmux`.
+
+## Shape on the stack (2026-10-19)
+
+The transmux is one feature, `mpegTsTransmuxFeature` (`engines/hls/features/mpeg-ts-transmux.ts`, entry
+`@videojs/spf/hls/features/mpeg-ts-transmux`): no behaviors, five `defaultConfig` overrides
+(`videoMessagePipelines`, `audioMessagePipelines`, `canPlayTrack`, `reportUnsupportedTrackConditions`,
+`sourceBufferMimeCodec`), composed after `shiftTimestampsFeature` and `drmFeature` (last-wins). Not in
+any shipped engine's feature list — opt-in. The standalone `createHlsMpegTs*Engine` factories are gone.
+Shared-code seams: `relocationStepsFor(type)` and `sourceBufferMimeCodec` on `setupBufferActors`.
+
+| composition (`flattenFeatures([...features, mpegTsTransmuxFeature])`) | gz | delta |
+|---|---|---|
+| hls/video features | 27.62 KB | — |
+| hls/video + transmux | 31.41 KB | +3.79 KB |
+| hls/audio features | 18.47 KB | — |
+| hls/audio + transmux | 22.46 KB | +3.98 KB (carries the unused H.264 framing, ~1.2 KB) |
+
+**Audio-only use case.** Two distinct questions: (1) bundle — the audio engine pays for the H.264
+parser it never runs; splitting the codec parsers out of `transmux.ts` (pass them in, or an
+`mpegTsAudioTransmuxFeature`) would save ~1.2 KB on audio; (2) capability — the hls/audio engine
+cannot play a plus-tier *video* asset's audio at all, because Mux muxes that audio into the video
+TS and declares no audio rendition. That's the same "muxed audio as a selectable source" work as the
+URI-less default (stage 3), seen from the audio engine: select a video variant as the audio source
+and transmux its AAC only.
+Goal: feasibility + size of client-side TS transmuxing scoped to what Mux Video packages.
+
+## Result
+
+Mux TS renditions play end to end in Chromium through the existing MSE pipeline, with no changes
+to the actor, loader, or relocation layers beyond two config seams. Two real assets verified in
+`playback/engines/hls/tests/engine-mpeg-ts.test.ts` (network-dependent, see Open questions):
+
+| asset | shape | observed |
+|---|---|---|
+| `a4nOgmx…` | muxed H.264 + AAC, one SourceBuffer | buffered `[0.033, 23.86]` (10s PTS relocated to 0), 480×270 decoded, 25 frames / 0 dropped at 0.7s, audio decoding |
+| `Sc89iW…` | multi-audio: muxed default + audio-only TS alternates | 2 SourceBuffers, video drops its muxed audio (track declares only `avc1`), Spanish 44.1 kHz rendition plays |
+
+Sandbox smoke (Chrome, `apps/sandbox/src/html-spf-mpeg-ts-video/`, scratch page driving the engines directly):
+
+| case | observed |
+|---|---|
+| audio-only TS (`3zd01…`) through `createHlsMpegTsAudioEngine` on `<audio>` | plays, seeks (+60s → `[60, 100]` buffered), relocated from 10s, no errors |
+| Elephants Dream alternate switching (Spanish → Commentary → Spanish) via `userAudioTrackSelection` | each switch re-inits the audio SourceBuffer and audio keeps decoding; no errors |
+| **URI-less muxed default** (Elephants Dream "English", golf "Default") | selectable, but no audio segments are fetched for it (`url: ''`); playback **stalls at the end of the previously buffered alternate** (readyState 2, no error). Auto-selection skips it too, so these assets default to a *dubbed* alternate — which also makes them useless for lip-sync checks until this lands. |
+| golf commentary TS (`yH00b…`, speech) | plays with the "English (auto-dubbed)" alternate; original audio is the muxed default (gap above) |
+
+ffmpeg decodes the Node-side output of real segments cleanly; frame counts match the source
+(299 video / 469 audio over two 5s segments). Transmux time per 5s segment: 270p 1–3 ms,
+720p 2.5–5 ms, audio-only 0.5 ms (Node, cold JIT first).
+
+## Size (minified / gzipped, `vp pack --minify`, single entry)
+
+| bundle | min | gz | delta gz |
+|---|---|---|---|
+| `engines/hls/engine.ts` (fMP4-only video engine) | 88.7 KB | 26.66 KB | — |
+| `engines/hls/engine-mpeg-ts.ts` (video engine + transmux) | 99.2 KB | 30.49 KB | **+3.84 KB** |
+| `engines/hls/index.ts` before / after (all engines, now exports the TS one) | 94.0 / 104.7 KB | 28.49 / 32.40 KB | +3.91 KB |
+| `media/mpeg-ts/transmux.ts` alone (demux + h264 + adts + mp4 writer) | 8.5 KB | 3.60 KB | |
+| of which `h264.ts` with / without SPS parsing | 2.5 / 1.1 KB | 1.22 / 0.67 KB | SPS parse = 0.55 KB |
+
+Reference points: hls.js's demux+remux is ~6.7 kloc, mux.js ~7.7 kloc, shaka ~8.8 kloc; this is
+~700 lines because it targets one packager's output (H.264 + AAC-LC, AUD-delimited, in-band
+SPS/PPS, no scrambling, no ID3/CEA-608, no MP3/AC-3/HEVC).
+
+## Shape
+
+- `media/mpeg-ts/demux.ts` — 188-byte packet walk, PAT → PMT, PES reassembly by PUSI, `concatPes`.
+- `media/mpeg-ts/h264.ts` — NAL split over the *continuous* ES, AUD-keyed access units, SPS size.
+- `media/mpeg-ts/adts.ts` — ADTS frame walk over the continuous ES, `AudioSpecificConfig`.
+- `media/mp4/mux.ts` — `ftyp`/`moov` (`avc1`+`avcC`, `mp4a`+`esds`, `mvex`) and `moof`+`mdat`
+  (`default-base-is-moof`, v1 `tfdt`, v1 `trun`). Reads back through the existing `box.ts` readers.
+- `media/mpeg-ts/transmux.ts` — stateful per SourceBuffer: fragment numbering, init emitted when the
+  codec config changes (first segment, rendition switch). Native timestamps; audio in sample-rate ticks.
+- `playback/primitives/transmux-pipelines.ts` — `fetch → transmux → readSegmentOrigin → stamp →
+  dispatch`. Sniffs `0x47`; non-TS passes through. The `append-init` op for a TS track (`url: ''`)
+  dispatches an empty append so the actor records the track as initialized. Writes the init half of
+  `mediaContainerData` (track id + timescale) so relocation discovers the `tfdt` unchanged.
+- `playback/engines/hls/engine-mpeg-ts.ts` — `createHlsMpegTsVideoEngine`: the video engine with the
+  transmux pipelines and three container-aware seams (`canPlayTrack`, `reportUnsupportedTrackConditions`,
+  new `sourceBufferMimeCodec`) seeing TS as the fMP4 it becomes.
+- Seams added to shared code: `relocationStepsFor` (exports the relocation steps),
+  `sourceBufferMimeCodec` on `setupBufferActors`, `videoMessagePipelines` / `audioMessagePipelines`
+  honored by `createHlsVideoEngine` config.
+
+## Mux packaging facts the design depends on
+
+- PES packets are **not** access-unit aligned: picture N's slice data runs into PES N+1; the PES
+  PTS/DTS belong to the AU whose AUD starts inside it. A per-PES NAL splitter truncates every large
+  frame. Same for ADTS frames.
+- PTS starts at 10s (as CMAF). Every segment: PAT/PMT, IDR first, AUD per picture, SPS/PPS in-band.
+- Muxed audio 48 kHz; audio-only alternates 44.1 kHz → audio track timescale must be the sample rate.
+- Multi-audio assets declare the muxed default audio as a URI-less `EXT-X-MEDIA`.
+
+## Suggested stages
+
+1. **Land the engine variant as its own entry** (`@videojs/spf/hls-mpeg-ts` or a `<mux-video>`
+   flavor) so fMP4-only consumers pay nothing. Decide SPS parse vs manifest `RESOLUTION` (−0.55 KB).
+2. **Fixtures + unit tests**: a truncated low-bitrate Mux TS segment (~100 KB) or synthetic TS built
+   in-test; today's coverage is the network-backed Chromium test plus ffmpeg validation of Node output.
+3. **URI-less default audio** (confirmed gap, see smoke table): selecting the muxed-default rendition
+   must mean "carry the muxed audio in the video SourceBuffer and create no audio SourceBuffer"
+   (hls.js semantics). Touches shared code: `setupAudioBufferActors` gating (skip a URI-less
+   selection), the transmux options (carry audio when the *selected audio* track is URI-less, not
+   only when the video track declares `mp4a`), and the video SourceBuffer MIME (add the audio codec).
+   Also the default pick: auto-selection currently skips the URI-less `DEFAULT=YES` track, so
+   multi-audio TS assets start on a dubbed alternate.
+4. **Live TS**: segment-spanning PES (a PES cut at a segment boundary), PTS rollover (33-bit wrap
+   at ~26.5 h), discontinuities. VOD Mux segments are self-contained so none of this is exercised.
+5. **Progressive**: TS is packet-granular, so the step could transmux per 128 KB chunk instead of
+   buffering the whole segment; today's whole-segment buffering is the field norm (see the
+   `timestampOffset` prior-art survey) and costs 2–5 ms per segment.
+6. Optional: ID3 timed metadata (PMT 0x15) → `emsg` or cue bridge; CEA-608 is out of scope.
+
+## Open questions
+
+- Keep the network-backed test? It is the only end-to-end proof; the repo otherwise avoids live URLs
+  in unit tests (clear-key test serves a local fixture).
+- `sourceBufferMimeCodec` as a config seam vs. deriving the MSE MIME from the pipeline that produces
+  the bytes (the container is a property of the pipeline, not the track).
+- Whether `container-support.md`'s "not in scope" posture changes; this spike is its revisit evidence.
