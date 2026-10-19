@@ -55,7 +55,6 @@ const { class: className } = Astro.props;
               href={link.href}
               data-ph-capture-attribute-destination={link.destination}
               target={link.external ? "_blank" : undefined}
-              rel={link.external ? "noopener noreferrer" : undefined}
               class="flex items-center gap-1.5 rounded-md corner-squircle px-2 py-2 font-display font-bold uppercase md:px-5 intent:bg-hover"
             >
               {link.label}{" "}
