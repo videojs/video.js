@@ -5,8 +5,10 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { hasSkinChoice, hasTailwindSkin, landingSource, MEDIA, MEDIA_IDS, mediaSources } from '../media';
 import {
+  DAILYMOTION_SOURCE_IDS,
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
+  DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOURCE,
@@ -37,14 +39,14 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube and player.js and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, and Dailymotion and the native background video only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
 
     // player.js is a protocol many providers speak, so its embed picks between their pages instead.
     expect(fixed).toEqual([
       'background-video',
-      ...embeds.filter((id) => id !== 'youtube-video' && id !== 'playerjs-video'),
+      ...embeds.filter((id) => !['youtube-video', 'playerjs-video', 'dailymotion-video'].includes(id)),
     ]);
     expect(embeds).toEqual([
       'vimeo-video',
@@ -68,12 +70,18 @@ describe('MEDIA', () => {
       'dash-video',
       'youtube-video',
       'playerjs-video',
+      'dailymotion-video',
     ]);
   });
 
   it('lands the player.js embed on one of its provider pages, whichever source was showing', () => {
     expect(MEDIA['playerjs-video'].entrySource).toBe(DEFAULT_PLAYERJS_SOURCE);
     expect(MEDIA['playerjs-video'].fallbackSource).toBe(DEFAULT_PLAYERJS_SOURCE);
+  });
+
+  it('lands the Dailymotion embed on its default player configuration, whichever source was showing', () => {
+    expect(MEDIA['dailymotion-video'].entrySource).toBe(DEFAULT_DAILYMOTION_SOURCE);
+    expect(MEDIA['dailymotion-video'].fallbackSource).toBe(DEFAULT_DAILYMOTION_SOURCE);
   });
 
   it('labels what the SPF engines do with protected and MPEG-TS sources', () => {
@@ -146,6 +154,26 @@ describe('mediaSources', () => {
 
     for (const media of MEDIA_IDS.filter((id) => id !== 'playerjs-video')) {
       for (const id of PLAYERJS_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('offers the Dailymotion embed its player embed URLs, and nothing else those URLs', () => {
+    expect(DAILYMOTION_SOURCE_IDS).toEqual([
+      'dailymotion-default',
+      'dailymotion-no-autostart',
+      'dailymotion-start-time',
+      'dailymotion-scale-fill',
+      'dailymotion-no-player-id',
+      'dailymotion-malformed-player-id',
+      'dailymotion-unknown-player-id',
+    ]);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('dailymotion-video', platform)).toEqual(DAILYMOTION_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'dailymotion-video')) {
+      for (const id of DAILYMOTION_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
   });
 
