@@ -31,7 +31,7 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
 
       <VideoHotkeys />
       <VideoGestures />
-      <VideoStatusIndicators playback={false} />
+      <VideoStatusIndicators />
     </Container>
   );
 }

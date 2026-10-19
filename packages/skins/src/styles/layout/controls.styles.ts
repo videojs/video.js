@@ -117,8 +117,11 @@ export default styles({
     },
     centerPlay: {
       utilities: [],
-      // Matches the playback status indicator this button replaces.
-      variants: { default: 'size-auto! p-4!' },
+      variants: {
+        // Matches the playback status indicator. A mouse can click the media to toggle playback, so fine pointers keep
+        // the button only as a start prompt.
+        default: 'size-auto! p-4! pointer-fine:data-started:hidden!',
+      },
     },
     centerPlayIcon: {
       utilities: [],
@@ -126,7 +129,8 @@ export default styles({
     },
     centerSeek: {
       utilities: [],
-      variants: { default: 'media-max-280:hidden!' },
+      // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance.
+      variants: { default: 'media-max-280:hidden! pointer-fine:hidden!' },
     },
   },
 });

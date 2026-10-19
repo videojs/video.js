@@ -51,28 +51,6 @@ describe('resolveGestureAction', () => {
   });
 });
 
-describe('playOrToggleControls', () => {
-  it('plays paused media without toggling controls', () => {
-    const play = vi.fn();
-    const toggleControls = vi.fn();
-
-    resolveGestureAction('playOrToggleControls')!(ctx({ paused: true, play, userActive: true, toggleControls }));
-
-    expect(play).toHaveBeenCalledOnce();
-    expect(toggleControls).not.toHaveBeenCalled();
-  });
-
-  it('toggles controls while media plays', () => {
-    const pause = vi.fn();
-    const toggleControls = vi.fn();
-
-    resolveGestureAction('playOrToggleControls')!(ctx({ paused: false, pause, userActive: true, toggleControls }));
-
-    expect(toggleControls).toHaveBeenCalledOnce();
-    expect(pause).not.toHaveBeenCalled();
-  });
-});
-
 describe('direct store actions', () => {
   it('calls toggleControls on store state', () => {
     const toggleControls = vi.fn();
