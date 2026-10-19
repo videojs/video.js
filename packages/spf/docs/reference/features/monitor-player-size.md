@@ -22,9 +22,9 @@ resolution cap reads the size and does nothing without it.
 
 ### State
 
-| Key | Type | Declared by | Doc |
-| --- | --- | --- | --- |
-| `playerResolution` | `Resolution \| undefined` | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | The player element's rendered pixel dimensions, or `undefined` where there is nothing to measure. Written by `trackPlayerResolution`, read by the `playerResolutionCap` selection rule — which treats `undefined` as "don't cap". |
+| Key | Type | Initial | Declared by | Doc |
+| --- | --- | --- | --- | --- |
+| `playerResolution` | `Resolution \| undefined` | — | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | The player element's rendered pixel dimensions, or `undefined` where there is nothing to measure. Written by `trackPlayerResolution`, read by the `playerResolutionCap` selection rule — which treats `undefined` as "don't cap". |
 
 ### Context
 
@@ -40,10 +40,10 @@ resolution cap reads the size and does nothing without it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
 | `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `initialState` | const | The state values the feature seeds. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `State` | type | Every state key the behaviors and external signals declare. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |

@@ -128,6 +128,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `BufferActorsContext` | interface | No JSDoc; fields `audioBufferActor, audioSegmentLoaderActor, mediaSource, videoBufferActor, videoSegmentLoaderActor`. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
-| `BufferActorsState` | interface | No JSDoc; fields `bandwidthState, presentation, selectedAudioTrackId, selectedVideoTrackId`. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
+| `BufferActorsContext` | interface | Context of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors), [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors). | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
+| `BufferActorsState` | interface | State of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors), [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors). | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
 | `MediaTrackType` | type | Media track type for MSE buffer setup. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |

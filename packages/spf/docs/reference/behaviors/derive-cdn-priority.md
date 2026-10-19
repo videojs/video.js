@@ -50,4 +50,4 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `DeriveCdnPriorityState` | interface | No JSDoc; fields `cdnPriority, presentation`. | [src/playback/behaviors/derive-cdn-priority.ts](../../../src/playback/behaviors/derive-cdn-priority.ts) |
+| `DeriveCdnPriorityState` | interface | State of [deriveCdnPriority](derive-cdn-priority.md#derivecdnpriority). | [src/playback/behaviors/derive-cdn-priority.ts](../../../src/playback/behaviors/derive-cdn-priority.ts) |

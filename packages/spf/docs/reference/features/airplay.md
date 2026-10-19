@@ -24,12 +24,12 @@ Requires a writer of `context.mediaSource`, such as `mediaSourceFeature`; withou
 
 ### State
 
-| Key | Type | Declared by | Doc |
-| --- | --- | --- | --- |
-| `disableRemotePlayback` | `boolean \| undefined` | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), `defineExternalSignals<DisableRemotePlaybackState>` ([src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts)) | Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not `setupAirPlay` is composed. |
-| `loadingSuspended` | `boolean \| undefined` | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent slot means never suspended. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
-| `startPosition` | `number \| undefined` | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
+| Key | Type | Initial | Declared by | Doc |
+| --- | --- | --- | --- | --- |
+| `disableRemotePlayback` | `boolean \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), `defineExternalSignals<DisableRemotePlaybackState>` ([src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts)) | Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not `setupAirPlay` is composed. |
+| `loadingSuspended` | `boolean \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent slot means never suspended. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `startPosition` | `number \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
 
 ### Context
 
@@ -47,10 +47,10 @@ Requires a writer of `context.mediaSource`, such as `mediaSourceFeature`; withou
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
 | `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
-| `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
-| `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
-| `initialState` | const | The state values the feature seeds. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
-| `State` | type | Every state key the behaviors and external signals declare. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ attachMediaSource: attachMediaSourceAsSourceElement }`. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
+| `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls/features/airplay.ts](../../../src/playback/engines/hls/features/airplay.ts) |
