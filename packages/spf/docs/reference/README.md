@@ -13,21 +13,27 @@ A config key's doc is the config field JSDoc of the first behavior listed under 
 Each engine's box and arrows share a color. Features are grouped by which engines compose them; each engine page lists its own features in composition order.
 
 ```mermaid
-graph TB
+graph LR
   classDef engine_video fill:#2563eb,stroke:#1d4ed8,color:#fff
   engine_video["@videojs/spf/hls/video"]:::engine_video
   classDef engine_audio fill:#d97706,stroke:#b45309,color:#fff
   engine_audio["@videojs/spf/hls/audio"]:::engine_audio
   classDef engine_background_video fill:#16a34a,stroke:#15803d,color:#fff
   engine_background_video["@videojs/spf/hls/background-video"]:::engine_background_video
-  subgraph group_0["every engine"]
-    feature_hls_loading["hlsLoadingFeature"]
-    feature_error["errorFeature"]
-    feature_calculate_duration["calculateDurationFeature"]
-    feature_media_source["mediaSourceFeature"]
-    feature_current_time["currentTimeFeature"]
+  subgraph group_0["video only"]
+    direction LR
+    feature_video["videoFeature"]
+    feature_text_tracks["textTracksFeature"]
+    feature_airplay_fairplay["airPlayFairPlayFeature"]
+    feature_drm["drmFeature"]
+    feature_shift_text_timestamps["shiftTextTimestampsFeature"]
+    feature_monitor_player_size["monitorPlayerSizeFeature"]
+    feature_live["liveFeature"]
+    feature_video ~~~ feature_text_tracks ~~~ feature_airplay_fairplay ~~~ feature_drm ~~~ feature_shift_text_timestamps
+    feature_monitor_player_size ~~~ feature_live
   end
   subgraph group_1["video and audio"]
+    direction LR
     feature_initial_load["initialLoadFeature"]
     feature_multi_cdn["multiCdnFeature"]
     feature_audio["audioFeature"]
@@ -36,33 +42,36 @@ graph TB
     feature_start_position["startPositionFeature"]
     feature_end_stall_recovery["endStallRecoveryFeature"]
     feature_chapters["chaptersFeature"]
+    feature_initial_load ~~~ feature_multi_cdn ~~~ feature_audio ~~~ feature_shift_timestamps ~~~ feature_airplay
+    feature_start_position ~~~ feature_end_stall_recovery ~~~ feature_chapters
   end
-  subgraph group_2["video only"]
-    feature_video["videoFeature"]
-    feature_text_tracks["textTracksFeature"]
-    feature_airplay_fairplay["airPlayFairPlayFeature"]
-    feature_drm["drmFeature"]
-    feature_shift_text_timestamps["shiftTextTimestampsFeature"]
-    feature_monitor_player_size["monitorPlayerSizeFeature"]
-    feature_live["liveFeature"]
+  subgraph group_2["every engine"]
+    direction LR
+    feature_hls_loading["hlsLoadingFeature"]
+    feature_error["errorFeature"]
+    feature_calculate_duration["calculateDurationFeature"]
+    feature_media_source["mediaSourceFeature"]
+    feature_current_time["currentTimeFeature"]
+    feature_hls_loading ~~~ feature_error ~~~ feature_calculate_duration ~~~ feature_media_source ~~~ feature_current_time
   end
   subgraph group_3["background-video only"]
+    direction LR
     feature_background_video["backgroundVideoFeature"]
   end
   engine_video --> group_0
-  linkStyle 0 stroke:#2563eb,stroke-width:2px
+  linkStyle 15 stroke:#2563eb,stroke-width:2px
   engine_video --> group_1
-  linkStyle 1 stroke:#2563eb,stroke-width:2px
+  linkStyle 16 stroke:#2563eb,stroke-width:2px
   engine_video --> group_2
-  linkStyle 2 stroke:#2563eb,stroke-width:2px
-  engine_audio --> group_0
-  linkStyle 3 stroke:#d97706,stroke-width:2px
+  linkStyle 17 stroke:#2563eb,stroke-width:2px
   engine_audio --> group_1
-  linkStyle 4 stroke:#d97706,stroke-width:2px
-  engine_background_video --> group_0
-  linkStyle 5 stroke:#16a34a,stroke-width:2px
+  linkStyle 18 stroke:#d97706,stroke-width:2px
+  engine_audio --> group_2
+  linkStyle 19 stroke:#d97706,stroke-width:2px
+  engine_background_video --> group_2
+  linkStyle 20 stroke:#16a34a,stroke-width:2px
   engine_background_video --> group_3
-  linkStyle 6 stroke:#16a34a,stroke-width:2px
+  linkStyle 21 stroke:#16a34a,stroke-width:2px
 ```
 
 ## Core

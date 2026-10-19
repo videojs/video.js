@@ -715,12 +715,16 @@ const ENGINE_COLORS = [
   { fill: '#dc2626', stroke: '#b91c1c' },
 ];
 
+/** Features per row inside a diagram group, so a large group wraps into a block instead of running off the page. */
+const DIAGRAM_ROW = 5;
+
 /**
- * Engines and features as a Mermaid flowchart. Features are grouped by the set of engines that compose them, so an
- * engine draws one arrow per group rather than one per feature; each engine's box and arrows share a color. Within a
- * group, features keep the composition order of the first engine that lists them. Top to bottom, so each group renders
- * as a column: a subgraph that is an edge target ignores its own `direction`, so the graph's is the only one that
- * counts.
+ * Engines and features as a Mermaid flowchart, left to right: engines in a column on the left, groups of features on
+ * the right. Features are grouped by the set of engines that compose them, so an engine draws one arrow per group
+ * rather than one per feature, and each engine's box and arrows share a color. Within a group, features keep the
+ * composition order of the first engine that lists them, chained with invisible links (`~~~`) into rows of
+ * `DIAGRAM_ROW`; a group with internal links honors its own `direction`, which is what keeps the rows horizontal.
+ * Invisible links are edges too, so they count toward the `linkStyle` indices.
  */
 function mermaid(model: Model): string {
   const id = (prefix: string, name: string) => `${prefix}_${name.replace(/[^\w]/g, '_')}`;
@@ -736,9 +740,10 @@ function mermaid(model: Model): string {
     groups.set(key, group);
   }
 
+  // Read from the first engine down: its own features, then the ones it shares with the next engine, and so on.
   const ordered = [...groups.values()].sort(
     (a, b) =>
-      b.engines.length - a.engines.length || model.engines.indexOf(a.engines[0]!) - model.engines.indexOf(b.engines[0]!)
+      model.engines.indexOf(a.engines[0]!) - model.engines.indexOf(b.engines[0]!) || a.engines.length - b.engines.length
   );
   const label = (engines: EngineInfo[]) => {
     if (engines.length === 0) return 'no engine';
@@ -747,7 +752,8 @@ function mermaid(model: Model): string {
 
     return engines.length === 1 ? `${engines[0]!.name} only` : engines.map((engine) => engine.name).join(' and ');
   };
-  const lines = ['graph TB'];
+  const lines = ['graph LR'];
+  let edge = 0;
 
   model.engines.forEach((engine, index) => {
     const { fill, stroke } = color(index);
@@ -760,15 +766,23 @@ function mermaid(model: Model): string {
     const features = group.engines[0]
       ? group.engines[0].features.filter((feature) => group.features.includes(feature))
       : group.features;
+    const nodes = features.map((feature) => id('feature', feature.entry.name));
 
     lines.push(`  subgraph group_${index}["${label(group.engines)}"]`);
+    lines.push('    direction LR');
 
     for (const feature of features) lines.push(`    ${id('feature', feature.entry.name)}["${feature.name}"]`);
 
+    for (let start = 0; start < nodes.length; start += DIAGRAM_ROW) {
+      const row = nodes.slice(start, start + DIAGRAM_ROW);
+      if (row.length < 2) continue;
+
+      lines.push(`    ${row.join(' ~~~ ')}`);
+      edge += row.length - 1;
+    }
+
     lines.push('  end');
   });
-
-  let edge = 0;
 
   model.engines.forEach((engine, index) => {
     ordered.forEach((group, groupIndex) => {
