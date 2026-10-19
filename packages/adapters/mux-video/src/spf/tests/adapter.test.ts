@@ -498,7 +498,7 @@ describe('MuxMixin', () => {
 
 describe('withMpegTsTransmux', () => {
   it('lays the transmux defaults under the consumer config and keeps the consumer keys', async () => {
-    const { withMpegTsTransmux } = await import('../adapter');
+    const { withMpegTsTransmux } = await import('../transmux');
     const { defaultConfig } = await import('@videojs/spf/features/mpeg-ts-transmux');
     const canPlayTrack = () => true;
 
