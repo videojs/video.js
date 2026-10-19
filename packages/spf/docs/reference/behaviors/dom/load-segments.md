@@ -115,6 +115,6 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `BufferState` | interface | Buffer state for all SourceBuffers. | [src/playback/actors/dom/segment-loader.ts](../../../../src/playback/actors/dom/segment-loader.ts) |
-| `SegmentLoadingContext` | interface | Context shape for segment loading. | [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts) |
-| `SegmentLoadingState` | interface | State shape for segment loading. | [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts) |
+| `SegmentLoadingContext` | interface | Context of [loadVideoSegments](load-segments.md#loadvideosegments), [loadAudioSegments](load-segments.md#loadaudiosegments), [loadTextTrackSegments](load-segments.md#loadtexttracksegments). Context shape for segment loading. | [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts) |
+| `SegmentLoadingState` | interface | State of [setupAirPlay](airplay.md#setupairplay), [loadVideoSegments](load-segments.md#loadvideosegments), [loadAudioSegments](load-segments.md#loadaudiosegments), [loadTextTrackSegments](load-segments.md#loadtexttracksegments). State shape for segment loading. | [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts) |
 | `SourceBufferState` | interface | Buffer state for a single SourceBuffer. | [src/playback/actors/dom/segment-loader.ts](../../../../src/playback/actors/dom/segment-loader.ts) |

@@ -8,12 +8,25 @@ import { dirname, relative } from 'node:path';
 
 import ts from 'typescript';
 
-import type { BehaviorInfo, ConfigRow, DocBlock, EngineInfo, FeatureInfo, Model, SlotRow, TypeField } from './model';
+import type {
+  BehaviorInfo,
+  ConfigRow,
+  DefaultValue,
+  DocBlock,
+  EngineInfo,
+  FeatureInfo,
+  Model,
+  Owner,
+  SlotRow,
+  TypeField,
+} from './model';
 import {
   declarationSignature,
   declaringFile,
   docOf,
   exportKind,
+  exportedLiteral,
+  firstParagraph,
   firstSentence,
   moduleExports,
   resolveAlias,
@@ -241,12 +254,19 @@ function behaviorSection(reference: ReferenceProgram, model: Model, page: string
   ]);
 }
 
-/** The module's exports that are not rendered as their own sections: name, kind, first sentence, source. */
+/**
+ * The module's exports that are not rendered as their own sections: name, kind, description, source. The description is
+ * what the model knows first — the behaviors a type is the config, state, or context of; the section of this page that
+ * lists a `Config` / `State` / `Context` type's keys; an object literal's source — then the JSDoc's first sentence,
+ * then what an undocumented type declares.
+ */
 function otherExports(
   reference: ReferenceProgram,
+  model: Model,
   page: string,
   entry: EntryPoint,
-  rendered: Set<string>
+  rendered: Set<string>,
+  sections: Map<string, string> = new Map()
 ): string | undefined {
   const { checker } = reference;
   const long = new LongCells();
@@ -258,11 +278,20 @@ function otherExports(
     const symbol = resolveAlias(checker, exported);
     const file = declaringFile(symbol) ?? entry.file;
     const doc = docOf(checker, symbol);
+    const roles = typeRoles(reference, model, page, { name: symbol.name, file });
+    const listed = sections.get(exported.name);
+    const literal = exportedLiteral(symbol);
+    const parts = [
+      roles,
+      firstSentence(doc),
+      listed ? `Listed under [${listed}](#${anchor(listed)}).` : undefined,
+      literal ? `Its value: ${long.cell(exported.name, 'value', literal)}.` : undefined,
+    ].filter(Boolean);
 
     rows.push([
       code(exported.name),
       exportKind(symbol),
-      firstSentence(doc) || declaredTypeCell(long, exported.name, declaredTypeOf(checker, symbol)),
+      parts.length ? parts.join(' ') : declaredTypeCell(long, exported.name, declaredTypeOf(checker, symbol)),
       sourceLink(reference, page, file),
     ]);
   }
@@ -272,6 +301,35 @@ function otherExports(
   rows.sort((a, b) => a[0]!.localeCompare(b[0]!));
 
   return section(['## Other exports', table(['Name', 'Kind', 'Description', 'Source'], rows), long.render()]);
+}
+
+/**
+ * Which behaviors a named type serves as the config, state, or context type of, as "Config of [a], [b]" sentences;
+ * empty when none does.
+ */
+function typeRoles(reference: ReferenceProgram, model: Model, page: string, owner: Owner): string {
+  const sameOwner = (candidate: Owner | undefined) =>
+    !!candidate && candidate.name === owner.name && candidate.file === owner.file;
+  const pool = docPool(model);
+  const of = (label: string, behaviors: BehaviorInfo[]) =>
+    behaviors.length ? `${label} of ${behaviors.map((info) => behaviorLink(reference, page, info)).join(', ')}.` : '';
+
+  return [
+    of(
+      'Config',
+      pool.filter((info) => info.configTypes.some(sameOwner))
+    ),
+    of(
+      'State',
+      pool.filter((info) => info.state.some((row) => sameOwner(row.owner)))
+    ),
+    of(
+      'Context',
+      pool.filter((info) => info.context.some((row) => sameOwner(row.owner)))
+    ),
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 /** The description of a type export without JSDoc: what its declaration says it is. */
@@ -294,7 +352,7 @@ function renderBehaviorPage(reference: ReferenceProgram, model: Model, entry: En
     `# ${code(entry.specifier)}`,
     `Source: ${sourceLink(reference, page, entry.file)}`,
     ...behaviors.map((info) => behaviorSection(reference, model, page, info)),
-    otherExports(reference, page, entry, new Set(behaviors.map((info) => info.name))),
+    otherExports(reference, model, page, entry, new Set(behaviors.map((info) => info.name))),
   ]);
 }
 
@@ -369,29 +427,48 @@ function behaviorLinks(reference: ReferenceProgram, page: string, behaviors: Beh
   return behaviors.length ? behaviors.map((info) => behaviorLink(reference, page, info)).join(', ') : '—';
 }
 
+/** A key's `initialState` entry and the feature that supplies it; a later feature's entry replaces an earlier one's. */
+function initialOf(features: FeatureInfo[], key: string): { value: DefaultValue; feature: FeatureInfo } | undefined {
+  const feature = [...features].reverse().find((candidate) => candidate.initial.some((value) => value.key === key));
+  const value = feature?.initial.find((candidate) => candidate.key === key);
+
+  return feature && value ? { value, feature } : undefined;
+}
+
+/**
+ * The state or context keys of a feature or engine. A state table also shows each key's `initialState` value from
+ * `features` and, when more than one feature could supply it, which one does.
+ */
 function slotFieldsTable(
   reference: ReferenceProgram,
   model: Model,
   page: string,
   fields: TypeField[],
   behaviors: BehaviorInfo[],
-  slot: 'state' | 'context'
+  slot: 'state' | 'context',
+  features: FeatureInfo[] = []
 ): string | undefined {
   if (fields.length === 0) return undefined;
 
   const long = new LongCells();
+  const initialColumns = slot === 'state' ? ['Initial', ...(features.length > 1 ? ['Initial from'] : [])] : [];
   const rows = fields.map((field) => {
     const declaredBy = behaviors.filter((info) => slotOf(info, slot, field.key)?.declared);
+    const initial = slot === 'state' ? initialOf(features, field.key) : undefined;
 
     return [
       code(field.optional ? `${field.key}?` : field.key),
       long.cell(field.key, 'type', field.type),
+      ...(initialColumns.length ? [initial ? long.cell(field.key, 'initial', initial.value.text) : '—'] : []),
+      ...(initialColumns.length > 1
+        ? [initial ? link(page, initial.feature.entry.page!, initial.feature.name) : '—']
+        : []),
       behaviorLinks(reference, page, declaredBy),
       borrowedDocCell(reference, page, [...behaviors, ...docPool(model)], slot, field.key, behaviors),
     ];
   });
 
-  return section([table(['Key', 'Type', 'Declared by', 'Doc'], rows), long.render()]);
+  return section([table(['Key', 'Type', ...initialColumns, 'Declared by', 'Doc'], rows), long.render()]);
 }
 
 /**
@@ -453,8 +530,14 @@ function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: F
         .join('\n')
     : 'None.';
   const config = featureConfigTable(reference, model, page, feature);
-  const state = slotFieldsTable(reference, model, page, feature.state, feature.behaviors, 'state');
+  const state = slotFieldsTable(reference, model, page, feature.state, feature.behaviors, 'state', [feature]);
   const context = slotFieldsTable(reference, model, page, feature.context, feature.behaviors, 'context');
+  const sections = new Map([
+    ['behaviors', 'Behaviors'],
+    ...(config ? [['Config', 'Config'] as const] : []),
+    ...(state ? [['State', 'State'] as const] : []),
+    ...(context ? [['Context', 'Context'] as const] : []),
+  ]);
   const composedBy = feature.composedBy.length
     ? feature.composedBy.map((engine) => `- ${link(page, engine.entry.page!, engine.entry.specifier)}`).join('\n')
     : 'None.';
@@ -475,7 +558,7 @@ function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: F
     context,
     '### Composed by',
     composedBy,
-    otherExports(reference, page, feature.entry, new Set([feature.name])),
+    otherExports(reference, model, page, feature.entry, new Set([feature.name]), sections),
   ]);
 }
 
@@ -514,8 +597,15 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     .map((info, index) => `${index + 1}. ${behaviorLink(reference, page, info)}`)
     .join('\n');
   const config = engineConfigTable(reference, page, engine);
-  const state = slotFieldsTable(reference, model, page, engine.state, engine.behaviors, 'state');
+  const state = slotFieldsTable(reference, model, page, engine.state, engine.behaviors, 'state', engine.features);
   const context = slotFieldsTable(reference, model, page, engine.context, engine.behaviors, 'context');
+  const sections = new Map([
+    ['features', 'Features'],
+    ['behaviors', 'Behaviors'],
+    ...(config ? [['EngineConfig', 'Config'] as const] : []),
+    ...(state ? [['EngineState', 'State'] as const] : []),
+    ...(context ? [['EngineContext', 'Context'] as const] : []),
+  ]);
 
   return section([
     GENERATED_NOTICE,
@@ -533,7 +623,7 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     state,
     context ? '### Context' : undefined,
     context,
-    otherExports(reference, page, engine.entry, new Set(['createEngine'])),
+    otherExports(reference, model, page, engine.entry, new Set(['createEngine']), sections),
   ]);
 }
 
@@ -650,18 +740,18 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     return module.exports.map((name) => [
       code(name),
       link(page, module.page, module.name, anchor(name)),
-      firstSentence(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
+      firstParagraph(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
     ]);
   });
   const engineRows = model.engines.map((engine) => [
     code(engine.entry.specifier),
     link(page, engine.entry.page!, engine.name),
-    firstSentence(engine.doc) || NO_DESCRIPTION,
+    firstParagraph(engine.doc) || NO_DESCRIPTION,
   ]);
   const featureRows = model.features.map((feature) => [
     code(feature.name),
     link(page, feature.entry.page!, feature.entry.name),
-    firstSentence(feature.doc) || NO_DESCRIPTION,
+    firstParagraph(feature.doc) || NO_DESCRIPTION,
   ]);
   const behaviorRows = (layer: 'behavior' | 'behavior-dom') =>
     model.behaviors
@@ -670,7 +760,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
       .map((info) => [
         code(info.name),
         link(page, info.entry!.page!, info.entry!.key, anchor(info.name)),
-        firstSentence(info.doc) || NO_DESCRIPTION,
+        firstParagraph(info.doc) || NO_DESCRIPTION,
       ]);
   const headers = ['Symbol', 'Page', 'Description'];
 

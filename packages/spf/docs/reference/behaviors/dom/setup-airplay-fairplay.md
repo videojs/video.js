@@ -81,6 +81,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `AirPlayFairPlayConfig` | interface | Config for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |
-| `AirPlayFairPlayContext` | interface | Context shape for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |
-| `AirPlayFairPlayState` | interface | State shape for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |
+| `AirPlayFairPlayConfig` | interface | Config of [setupAirPlayFairPlay](setup-airplay-fairplay.md#setupairplayfairplay). Config for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |
+| `AirPlayFairPlayContext` | interface | Context of [setupAirPlayFairPlay](setup-airplay-fairplay.md#setupairplayfairplay). Context shape for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |
+| `AirPlayFairPlayState` | interface | State of [setupAirPlayFairPlay](setup-airplay-fairplay.md#setupairplayfairplay). State shape for the AirPlay FairPlay handoff. | [src/playback/behaviors/dom/setup-airplay-fairplay.ts](../../../../src/playback/behaviors/dom/setup-airplay-fairplay.ts) |

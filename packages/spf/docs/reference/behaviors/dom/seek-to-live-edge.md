@@ -73,6 +73,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SeekToLiveEdgeConfig` | interface | No JSDoc; fields `resolveLiveLatency`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
-| `SeekToLiveEdgeContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
-| `SeekToLiveEdgeState` | interface | No JSDoc; fields `presentation, selectedAudioTrackId, selectedVideoTrackId, startPosition`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeConfig` | interface | Config of [seekToLiveEdge](seek-to-live-edge.md#seektoliveedge). | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeContext` | interface | Context of [seekToLiveEdge](seek-to-live-edge.md#seektoliveedge). | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeState` | interface | State of [seekToLiveEdge](seek-to-live-edge.md#seektoliveedge). | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |

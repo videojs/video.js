@@ -60,5 +60,5 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `StartPositionContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/apply-start-position.ts](../../../../src/playback/behaviors/dom/apply-start-position.ts) |
-| `StartPositionState` | interface | No JSDoc; fields `currentTime, presentation, startPosition`. | [src/playback/behaviors/dom/apply-start-position.ts](../../../../src/playback/behaviors/dom/apply-start-position.ts) |
+| `StartPositionContext` | interface | Context of [applyStartPosition](apply-start-position.md#applystartposition). | [src/playback/behaviors/dom/apply-start-position.ts](../../../../src/playback/behaviors/dom/apply-start-position.ts) |
+| `StartPositionState` | interface | State of [setupAirPlay](airplay.md#setupairplay), [applyStartPosition](apply-start-position.md#applystartposition). | [src/playback/behaviors/dom/apply-start-position.ts](../../../../src/playback/behaviors/dom/apply-start-position.ts) |
