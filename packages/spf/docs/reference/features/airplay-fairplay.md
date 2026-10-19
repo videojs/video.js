@@ -26,14 +26,14 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
 | `mediaElement` | `HTMLMediaElement \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | No description. |
-| `mediaKeys` | `MediaKeys \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | `setupMediaKeys`' handoff slot, read here only as proof that it has yielded the element. |
+| `mediaKeys` | `MediaKeys \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. (doc of [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
 
 ### Composed by
 
@@ -44,7 +44,7 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/airplay-fairplay.ts](../../../src/playback/engines/hls/features/airplay-fairplay.ts) |

@@ -36,7 +36,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `currentTime` | writes | yes | `number \| undefined` | `CurrentTimeState` | No description. |
+| `currentTime` | writes | yes | `number \| undefined` | `CurrentTimeState` | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](load-segments.md#loadvideosegments)) |
 
 ### Context
 
@@ -48,6 +48,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `CurrentTimeContext` | interface | No description. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
-| `CurrentTimeState` | interface | No description. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
-| `TrackCurrentTimeConfig` | interface | No description. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `CurrentTimeContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `CurrentTimeState` | interface | No JSDoc; fields `currentTime`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |
+| `TrackCurrentTimeConfig` | interface | No JSDoc; fields `defaultCurrentTime`. | [src/playback/behaviors/dom/track-current-time.ts](../../../../src/playback/behaviors/dom/track-current-time.ts) |

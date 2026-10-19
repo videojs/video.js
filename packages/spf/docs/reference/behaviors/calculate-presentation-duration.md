@@ -49,7 +49,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `PresentationDurationState` | No description. |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `PresentationDurationState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | No description. |
 | `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `PresentationDurationState` | No description. |
 
@@ -57,6 +57,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `PresentationDurationConfig` | interface | No description. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
+| `PresentationDurationConfig` | interface | No JSDoc; fields `resolveDuration`. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
 | `PresentationDurationResolver` | type | Resolver supplied via `config.resolveDuration`. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |
 | `PresentationDurationState` | interface | Input shape passed to the duration resolver. | [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts) |

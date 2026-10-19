@@ -6,7 +6,26 @@ Source: [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/play
 
 ## trackLoadTriggers
 
-No description.
+Track preload-overriding events per source.
+
+Writes `state.loadActivated = true` the first time a `play` or `seeking` event fires on the attached media element
+for the current source — or immediately on entry if the element is already committed to loading (`el.autoplay`,
+`!el.paused`, or `el.seeking`), covering autoplay, native-controls, and direct-DOM-`play()` scenarios.
+
+Sticky-true _within a source identity_: subsequent play/pause/seek cycles don't flip back. Source identity =
+(mediaElement, presentation URL). Either changing — including direct in-place swap with no `undefined` intermediate —
+resets the slot to `false`.
+
+Multi-writer with `hls/adapter.ts:play()` (which writes `true` directly on programmatic play) is intentional —
+different domains. The adapter records programmatic intent; this behavior is the DOM-side observer. Pre-existing
+`true` writes are honored because `deriveState` reads the slot — a `true` value routes directly to `'load-active'`
+without entering `'monitoring'`.
+
+```ts
+const reactor = trackLoadTriggers.setup({ state, context });
+// later:
+reactor.destroy();
+```
 
 Source: [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/playback/behaviors/dom/track-load-triggers.ts)
 

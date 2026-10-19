@@ -21,7 +21,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
 | `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
 
 ### Context
@@ -47,7 +47,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
 | `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
 
 ### Context
@@ -98,7 +98,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
 | `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | No description. |
 
 ### Context

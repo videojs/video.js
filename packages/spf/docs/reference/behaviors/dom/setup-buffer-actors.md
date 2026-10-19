@@ -36,7 +36,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | No description. |
 
 ### Context
@@ -113,7 +113,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | No description. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | No description. |
 
 ### Context
@@ -128,6 +128,6 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `BufferActorsContext` | interface | No description. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
-| `BufferActorsState` | interface | No description. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
+| `BufferActorsContext` | interface | No JSDoc; fields `audioBufferActor, audioSegmentLoaderActor, mediaSource, videoBufferActor, videoSegmentLoaderActor`. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
+| `BufferActorsState` | interface | No JSDoc; fields `bandwidthState, presentation, selectedAudioTrackId, selectedVideoTrackId`. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |
 | `MediaTrackType` | type | Media track type for MSE buffer setup. | [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts) |

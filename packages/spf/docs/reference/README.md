@@ -4,9 +4,9 @@
 
 Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/hls-audio`, `@videojs/spf/hls-background-video`, `@videojs/spf/hls-video`.
 
-Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A symbol without JSDoc reads "No description."
+Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale. A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."
 
-On feature and engine pages, a config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one, and a state or context key's doc is the field JSDoc from the first behavior that writes the key, else the first that reads it.
+A config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key's doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".
 
 ## Engines and features
 
@@ -180,7 +180,7 @@ graph LR
 | `syncLiveSeekableRange` | [behaviors/dom/sync-live-seekable-range](behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange) | Mirror the live window into the MediaSource's seekable range. |
 | `syncTextTracks` | [behaviors/dom/sync-text-tracks](behaviors/dom/sync-text-tracks.md#synctexttracks) | **Own the text-track slots on the host media element, mirroring the SPF model.** When a presentation is resolved and a media element is available, allocate one slot in `mediaElement.textTracks` per model text track — via creating `<track>` children, since that's the only spec mechanism for adding _and_ removing entries to `textTracks` (no `removeTextTrack` API exists). |
 | `trackCurrentTime` | [behaviors/dom/track-current-time](behaviors/dom/track-current-time.md#trackcurrenttime) | Mirror `mediaElement.currentTime` into reactive state. |
-| `trackLoadTriggers` | [behaviors/dom/track-load-triggers](behaviors/dom/track-load-triggers.md#trackloadtriggers) | No description. |
+| `trackLoadTriggers` | [behaviors/dom/track-load-triggers](behaviors/dom/track-load-triggers.md#trackloadtriggers) | Track preload-overriding events per source. |
 | `trackPlaybackRate` | [behaviors/dom/track-playback-rate](behaviors/dom/track-playback-rate.md#trackplaybackrate) | Mirror `mediaElement.playbackRate` into reactive state. |
 | `trackPlayerResolution` | [behaviors/dom/track-player-resolution](behaviors/dom/track-player-resolution.md#trackplayerresolution) | Mirror the player element's rendered pixel dimensions into reactive state, so a rendition cap can narrow candidates to what the element can actually show without reading the DOM at pick time — which would make the picker impure, and would never re-pick when the element resized. |
 | `trackScreenResolution` | [behaviors/dom/track-screen-resolution](behaviors/dom/track-screen-resolution.md#trackscreenresolution) | Mirror the screen's pixel dimensions into reactive state, so a rendition cap can narrow candidates to what the screen can actually show without reading the environment at pick time — which would make the picker impure, and would never re-pick when the screen changed. |

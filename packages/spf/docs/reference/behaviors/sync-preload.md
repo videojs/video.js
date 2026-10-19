@@ -51,4 +51,4 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SyncPreloadConfig` | interface | No description. | [src/playback/behaviors/sync-preload.ts](../../../src/playback/behaviors/sync-preload.ts) |
+| `SyncPreloadConfig` | interface | No JSDoc; fields `defaultPreload`. | [src/playback/behaviors/sync-preload.ts](../../../src/playback/behaviors/sync-preload.ts) |

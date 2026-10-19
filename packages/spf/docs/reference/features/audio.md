@@ -48,9 +48,9 @@ Requires, from this or other features:
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
 | `currentTime` | `number \| undefined` | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | Current playback position in seconds. Defaults to 0 when undefined. |
-| `loadActivated` | `boolean \| undefined` | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | True once a preload-overriding event has fired for the current source. |
+| `loadActivated` | `boolean \| undefined` | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. (doc of [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers)) |
 | `preload` | `string \| undefined` | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | No description. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | `string \| undefined` | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | No description. |
 | `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | `defineExternalSignals<UserTrackSelectionState<'audio'>>` ([src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts)) | No description. |
 
@@ -72,7 +72,7 @@ Requires, from this or other features:
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/audio.ts](../../../src/playback/engines/hls/features/audio.ts) |

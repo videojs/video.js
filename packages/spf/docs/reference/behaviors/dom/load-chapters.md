@@ -44,7 +44,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 

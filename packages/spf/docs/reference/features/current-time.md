@@ -22,7 +22,7 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | No description. |
+| `currentTime` | `number \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
 
 ### Context
 
@@ -41,7 +41,7 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/current-time.ts](../../../src/playback/engines/hls/features/current-time.ts) |

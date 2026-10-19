@@ -52,5 +52,5 @@ The setup declares `config?`: callers may omit it.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `DEFAULT_END_STALL_NUDGE_WINDOW` | const | ~2.8× the measured max freeze gap (71ms) — tight, but with headroom against a miss. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
-| `RecoverEndStallConfig` | interface | No description. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
-| `RecoverEndStallContext` | interface | No description. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
+| `RecoverEndStallConfig` | interface | No JSDoc; fields `endStallNudgeWindow`. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
+| `RecoverEndStallContext` | interface | No JSDoc; fields `mediaElement, mediaSource`. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |

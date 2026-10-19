@@ -58,7 +58,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SeekToLiveEdgeState` | No description. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SeekToLiveEdgeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | No description. |
 | `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | No description. |
 | `startPosition` | writes | yes | `number \| undefined` | `SeekToLiveEdgeState` | One-shot start-position command in presentation-timeline seconds. Written here on entry into `live`; consumed (cleared) by `applyStartPosition`. |
@@ -73,6 +73,6 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `SeekToLiveEdgeConfig` | interface | No description. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
-| `SeekToLiveEdgeContext` | interface | No description. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
-| `SeekToLiveEdgeState` | interface | No description. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeConfig` | interface | No JSDoc; fields `resolveLiveLatency`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeContext` | interface | No JSDoc; fields `mediaElement`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |
+| `SeekToLiveEdgeState` | interface | No JSDoc; fields `presentation, selectedAudioTrackId, selectedVideoTrackId, startPosition`. | [src/playback/behaviors/dom/seek-to-live-edge.ts](../../../../src/playback/behaviors/dom/seek-to-live-edge.ts) |

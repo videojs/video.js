@@ -37,5 +37,5 @@ The setup declares `config?`: callers may omit it.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `ScreenResolutionState` | interface | No description. | [src/playback/behaviors/dom/track-screen-resolution.ts](../../../../src/playback/behaviors/dom/track-screen-resolution.ts) |
-| `TrackScreenResolutionConfig` | interface | No description. | [src/playback/behaviors/dom/track-screen-resolution.ts](../../../../src/playback/behaviors/dom/track-screen-resolution.ts) |
+| `ScreenResolutionState` | interface | No JSDoc; fields `screenResolution`. | [src/playback/behaviors/dom/track-screen-resolution.ts](../../../../src/playback/behaviors/dom/track-screen-resolution.ts) |
+| `TrackScreenResolutionConfig` | interface | No JSDoc; fields `useDevicePixelRatio`. | [src/playback/behaviors/dom/track-screen-resolution.ts](../../../../src/playback/behaviors/dom/track-screen-resolution.ts) |

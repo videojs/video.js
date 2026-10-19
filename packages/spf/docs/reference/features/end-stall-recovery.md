@@ -36,7 +36,7 @@ audio and video end at slightly different times. Inert otherwise.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/end-stall-recovery.ts](../../../src/playback/engines/hls/features/end-stall-recovery.ts) |

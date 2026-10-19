@@ -24,7 +24,7 @@ hidden `chapters` text track per language.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
@@ -42,7 +42,7 @@ hidden `chapters` text track per language.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/chapters.ts](../../../src/playback/engines/hls/features/chapters.ts) |

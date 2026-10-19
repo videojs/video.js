@@ -25,7 +25,7 @@ no duration is set.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 
@@ -38,7 +38,7 @@ no duration is set.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/calculate-duration.ts](../../../src/playback/engines/hls/features/calculate-duration.ts) |

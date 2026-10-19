@@ -152,6 +152,29 @@ export function exportKind(symbol: ts.Symbol): string {
   return ts.SyntaxKind[declaration.kind];
 }
 
+/**
+ * What an undocumented type export is, read off its declaration: the type a type alias names, or an interface's field
+ * names. `undefined` for any other kind of export.
+ */
+export function declaredTypeOf(
+  checker: ts.TypeChecker,
+  symbol: ts.Symbol
+): { kind: 'alias' | 'fields'; text: string } | undefined {
+  const declaration = declarationOf(symbol);
+  if (!declaration) return undefined;
+
+  if (ts.isTypeAliasDeclaration(declaration)) return { kind: 'alias', text: declaration.type.getText() };
+
+  if (!ts.isInterfaceDeclaration(declaration)) return undefined;
+
+  const fields = checker
+    .getPropertiesOfType(checker.getDeclaredTypeOfSymbol(symbol))
+    .map((property) => property.name)
+    .sort((a, b) => a.localeCompare(b));
+
+  return { kind: 'fields', text: fields.join(', ') };
+}
+
 /** The file an export is declared in, which differs from the module's when the module re-exports it. */
 export function declaringFile(symbol: ts.Symbol): string | undefined {
   return declarationOf(symbol)?.getSourceFile().fileName;
@@ -504,8 +527,8 @@ function behaviorLiteral(initializer: ts.Expression | undefined): ts.ObjectLiter
   return ts.isCallExpression(initializer.expression) ? behaviorLiteral(initializer.expression) : undefined;
 }
 
-/** The deps parameter type of the function a behavior's `setup` property names or spells out. */
-function setupImplementationDeps(checker: ts.TypeChecker, initializer: ts.Expression | undefined): ts.Type | undefined {
+/** The expression a behavior literal's `setup` property names or spells out. */
+function setupExpression(initializer: ts.Expression | undefined): ts.Expression | undefined {
   const literal = behaviorLiteral(initializer);
   const setup = literal?.properties.find(
     (property) =>
@@ -515,7 +538,32 @@ function setupImplementationDeps(checker: ts.TypeChecker, initializer: ts.Expres
   );
   if (!setup) return undefined;
 
-  const expression = ts.isPropertyAssignment(setup) ? setup.initializer : setup.name;
+  return ts.isPropertyAssignment(setup) ? setup.initializer : setup.name;
+}
+
+/**
+ * A behavior's own JSDoc, else that of the function its `setup` names: a behavior is that function plus its declared
+ * keys, so the function's doc describes it.
+ */
+function behaviorDoc(checker: ts.TypeChecker, symbol: ts.Symbol): DocBlock {
+  const own = docOf(checker, symbol);
+  if (own.text) return own;
+
+  const expression = setupExpression(initializerOf(symbol));
+  if (!expression || !ts.isIdentifier(expression)) return own;
+
+  const named = ts.isShorthandPropertyAssignment(expression.parent)
+    ? checker.getShorthandAssignmentValueSymbol(expression.parent)
+    : checker.getSymbolAtLocation(expression);
+
+  return named ? docOf(checker, resolveAlias(checker, named)) : own;
+}
+
+/** The deps parameter type of the function a behavior's `setup` property names or spells out. */
+function setupImplementationDeps(checker: ts.TypeChecker, initializer: ts.Expression | undefined): ts.Type | undefined {
+  const expression = setupExpression(initializer);
+  if (!expression) return undefined;
+
   const declaration = setupFunction(checker, expression);
   const signature = declaration && checker.getSignatureFromDeclaration(declaration);
   const parameter = signature?.getParameters()[0];
@@ -698,7 +746,7 @@ export function buildModel(reference: ReferenceProgram): Model {
       exported: true,
       file,
       entry: entryByFile.get(file),
-      doc: docOf(checker, symbol),
+      doc: behaviorDoc(checker, symbol),
       ...contract,
     };
 

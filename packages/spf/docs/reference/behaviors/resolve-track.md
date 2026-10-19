@@ -27,7 +27,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | No description. |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
 
 ## resolveTextTrack
@@ -53,7 +53,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | No description. |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
 
 ## resolveVideoTrack
@@ -80,7 +80,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | No description. |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | No description. |
 
 ## Other exports

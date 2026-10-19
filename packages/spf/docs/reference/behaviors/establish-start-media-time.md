@@ -42,7 +42,7 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `mediaContainerData` | writes | yes | `Record<string, MediaContainerData> \| undefined` | `EstablishStartMediaTimeState` | Transient origin-establishment data, keyed by **track type** (`'video'` / `'audio'`) — per spec one init+media pair per type suffices, and ABR rungs of a type share the origin. Filled by the discover steps across appends, reset per source. Never the model — the churn stays here; only the settled `startMediaTime` reaches `Track`. |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `EstablishStartMediaTimeState` | No description. |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `EstablishStartMediaTimeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | No description. |
 | `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | No description. |
 
@@ -54,8 +54,8 @@ The setup declares `config` as required.
 | `deriveSharedMinStartMediaTime` | const | The **default** — relocate the whole presentation by one shared origin: the `min` across the _selected_ A/V tracks' own origins, denormalized onto every type. | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |
 | `DeriveStartMediaTime` | type | Reduce the discovered `MediaContainerData` (keyed by track type) into each type's `startMediaTime` origin; `undefined` means "not ready yet". | [src/playback/primitives/derive-start-media-time.ts](../../../src/playback/primitives/derive-start-media-time.ts) |
 | `DeriveStartMediaTimeContext` | interface | The selected v/a track ids a `DeriveStartMediaTime` may coordinate across. | [src/playback/primitives/derive-start-media-time.ts](../../../src/playback/primitives/derive-start-media-time.ts) |
-| `EstablishStartMediaTimeConfig` | interface | No description. | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |
-| `EstablishStartMediaTimeState` | interface | No description. | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |
+| `EstablishStartMediaTimeConfig` | interface | No JSDoc; fields `deriveStartMediaTime`. | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |
+| `EstablishStartMediaTimeState` | interface | No JSDoc; fields `mediaContainerData, presentation, selectedAudioTrackId, selectedVideoTrackId`. | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |
 | `GateFirstParse` | type | Whether `trackId`'s **first** parse may place its segments now. | [src/playback/primitives/gate-first-parse.ts](../../../src/playback/primitives/gate-first-parse.ts) |
 | `GateFirstParseContext` | interface | The selected v/a track ids a `GateFirstParse` may designate a reference track from. | [src/playback/primitives/gate-first-parse.ts](../../../src/playback/primitives/gate-first-parse.ts) |
 | `gateFirstParseOnAnchor` | const | The live-anchor first-parse gate (the "parses align" step of the establishment order). | [src/playback/behaviors/establish-start-media-time.ts](../../../src/playback/behaviors/establish-start-media-time.ts) |

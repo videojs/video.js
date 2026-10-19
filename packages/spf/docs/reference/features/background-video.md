@@ -49,9 +49,9 @@ Requires, from this or other features:
 | --- | --- | --- | --- |
 | `bandwidthState` | `BandwidthState \| undefined` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | No description. |
 | `currentTime` | `number \| undefined` | [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | Current playback position in seconds. Defaults to 0 when undefined. |
-| `loadActivated` | `boolean \| undefined` | [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | True once a preload-overriding event has fired for the current source. |
+| `loadActivated` | `boolean \| undefined` | [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. (doc of [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers)) |
 | `preload` | `string \| undefined` | [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | No description. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | [selectVideoTrack](../behaviors/select-tracks.md#selectvideotrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | No description. |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | [selectVideoTrack](../behaviors/select-tracks.md#selectvideotrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `screenResolution` | `Resolution \| undefined` | [trackScreenResolution](../behaviors/dom/track-screen-resolution.md#trackscreenresolution) | No description. |
 | `selectedVideoTrackId` | `string \| undefined` | [selectVideoTrack](../behaviors/select-tracks.md#selectvideotrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | No description. |
 
@@ -72,7 +72,7 @@ Requires, from this or other features:
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/background-video.ts](../../../src/playback/engines/hls/features/background-video.ts) |

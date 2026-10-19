@@ -41,7 +41,7 @@ resolution cap reads the size and does nothing without it.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
-| `Behaviors` | type | No description. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. | [src/playback/engines/hls/features/monitor-player-size.ts](../../../src/playback/engines/hls/features/monitor-player-size.ts) |
