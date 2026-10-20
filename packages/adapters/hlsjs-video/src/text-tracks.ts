@@ -147,26 +147,11 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       // The hls.js delegate always binds to the real `<video>` element.
       const media = this.target as HTMLVideoElement;
 
-      // Hls.js addresses CUES_PARSED by `_id` for the tracks that carry one (its CEA-608/708 tracks), and by
-      // `default`/`${kind}${idx}` for the subtitle set, so the element id has to adopt the same scheme.
+      // NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and
+      // `default` or `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
       // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
-      const trackIdFor = (trackObj: NonNativeTextTracksData['tracks'][number]) => {
-        if (trackObj._id != null) return trackObj._id;
-
-        if (trackObj.default) return 'default';
-
-        // Hls.js addresses subtitle cues as `subtitles` plus the playlist index, with that prefix hardcoded, and it
-        // stamps the index onto the playlist object. Prefer it over a search by lang and name, which can tie.
-        const { subtitleTrack } = trackObj;
-        const idx =
-          typeof subtitleTrack?.id === 'number'
-            ? subtitleTrack.id
-            : engine.subtitleTracks.findIndex(({ lang, name, type }) => {
-                return lang === subtitleTrack?.lang && name === trackObj.label && type.toLowerCase() === trackObj.kind;
-              });
-
-        return `subtitles${idx}`;
-      };
+      const trackIdFor = ({ _id, default: isDefault, subtitleTrack }: NonNativeTextTracksData['tracks'][number]) =>
+        _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
 
       const onTracksFound = (_event: string, data: NonNativeTextTracksData) => {
         // The subtitle set arrives in one batch, and each CC track arrives alone once 608 data shows up in the
@@ -220,28 +205,30 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         }
       };
 
-      // The track the last invocation saw showing. Every mode write on any track fires `change`, including this
-      // mixin's own writes while forwarding cues, so the refresh below has to fire on a real transition only.
-      let refreshedTrackId: string | undefined;
+      let lastShowingTrack: TextTrack | undefined;
 
       const onTextTrackChange = () => {
         const showingTrack = Array.from(media.textTracks).find((textTrack) => {
           return textTrack.id && textTrack.mode === 'showing' && isCaptionOrSubtitleTrack(textTrack);
         });
+        const showingChanged = showingTrack !== lastShowingTrack;
 
-        if (!showingTrack) {
-          refreshedTrackId = undefined;
+        lastShowingTrack = showingTrack;
 
-          return;
+        if (!showingTrack) return;
+
+        const hlsTrackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
+
+        // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
+        // Only when the showing track changes: `onCuesParsed` fires `change` for every batch it forwards to a
+        // disabled track, and re-adding each time re-renders the active cue several times a second.
+        if (showingChanged && Array.from(hlsTrackEls).some((trackEl) => trackEl.track === showingTrack)) {
+          Array.from(showingTrack.cues ?? []).forEach((cue) => {
+            showingTrack.addCue(cue);
+          });
         }
 
-        // CEA-608 tracks are fed from the video stream, so hls.js never selects them and a stream may carry them
-        // without any subtitle playlist.
-        const ccShowing = Array.from(
-          media.querySelectorAll<HTMLTrackElement>(`track[${CC_TRACK_ATTR}]`),
-          (trackEl) => trackEl.track
-        ).includes(showingTrack);
-        if (!ccShowing && !engine.subtitleTracks.length) return;
+        if (!engine.subtitleTracks.length) return;
 
         const currentHlsTrack = engine.subtitleTracks[engine.subtitleTrack];
 
@@ -267,19 +254,6 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
           // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
           if (idx >= 0) engine.subtitleTrack = idx;
         }
-
-        if ((ccShowing || showingTrack.id === hlsTrackId) && showingTrack.id !== refreshedTrackId) {
-          // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
-          // Only on a change of which track is showing: re-adding every cue on each forwarded CEA-608 batch tears
-          // down and re-renders the active cue several times a second.
-          if (showingTrack.cues) {
-            Array.from(showingTrack.cues).forEach((cue) => {
-              showingTrack.addCue(cue);
-            });
-          }
-        }
-
-        refreshedTrackId = showingTrack.id;
       };
 
       engine.on(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, onTracksFound);

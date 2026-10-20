@@ -1,6 +1,6 @@
 import { HTMLVideoAdapter } from '@videojs/media/dom';
 import Hls from 'hls.js';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { HlsJsTextTracksMixin, removeHlsTextTracks, withPreservedTextTracks } from '../text-tracks';
 
@@ -324,16 +324,18 @@ const CC_TRACK_FOUND = {
   ],
 };
 
+let restoreTrackSupport: (() => void) | undefined;
+
 function mount() {
   const engine = createEngine();
   const host = new TextTracksHost(engine);
   const video = document.createElement('video');
-  const restore = stubTrackSupport(video);
 
+  restoreTrackSupport = stubTrackSupport(video);
   host.attach(video);
   (engine as any).emit(Hls.Events.MANIFEST_LOADING);
 
-  return { engine, video, restore };
+  return { engine, video };
 }
 
 function hlsTracks(video: HTMLVideoElement) {
@@ -341,258 +343,237 @@ function hlsTracks(video: HTMLVideoElement) {
 }
 
 describe('HlsJsTextTracksMixin', () => {
+  afterEach(() => {
+    restoreTrackSupport?.();
+    restoreTrackSupport = undefined;
+  });
+
   it('keeps the tracks of the current load when MEDIA_ATTACHED arrives after the manifest', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      expect(hlsTracks(video)).toHaveLength(1);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    expect(hlsTracks(video)).toHaveLength(1);
 
-      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
 
-      expect(hlsTracks(video)).toHaveLength(1);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toHaveLength(1);
   });
 
   it('drops the tracks of the previous load when a new manifest reports none', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      expect(hlsTracks(video)).toHaveLength(1);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    expect(hlsTracks(video)).toHaveLength(1);
 
-      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+    (engine as any).emit(Hls.Events.MANIFEST_LOADING);
 
-      expect(hlsTracks(video)).toHaveLength(0);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toHaveLength(0);
   });
 
   it('drops the tracks when the engine is destroyed', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      expect(hlsTracks(video)).toHaveLength(1);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    expect(hlsTracks(video)).toHaveLength(1);
 
-      (engine as any).emit(Hls.Events.DESTROYING);
+    (engine as any).emit(Hls.Events.DESTROYING);
 
-      expect(hlsTracks(video)).toHaveLength(0);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toHaveLength(0);
   });
 
   it('gives a CC track the id hls.js addresses its cues with', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
-      expect(hlsTracks(video)).toEqual(['captions:textTrack1']);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toEqual(['captions:textTrack1']);
   });
 
   it('keeps the subtitle set when a CC track is announced on its own', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
-      expect(hlsTracks(video).sort()).toEqual(['captions:textTrack1', 'subtitles:default']);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video).sort()).toEqual(['captions:textTrack1', 'subtitles:default']);
   });
 
   it('lands CUES_PARSED cues on the CC track', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      (engine as any).emit(Hls.Events.CUES_PARSED, {
-        type: 'captions',
-        track: 'textTrack1',
-        cues: [{ id: 'c1' } as TextTrackCue],
-      });
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'c1' } as TextTrackCue],
+    });
 
-      const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1');
-      const mode = cc!.track.mode;
+    const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1');
+    const mode = cc!.track.mode;
 
-      cc!.track.mode = 'hidden';
-      expect([...(cc!.track.cues ?? [])].map((cue) => cue.id)).toEqual(['c1']);
-      cc!.track.mode = mode;
-    } finally {
-      restore();
-    }
+    cc!.track.mode = 'hidden';
+    expect([...(cc!.track.cues ?? [])].map((cue) => cue.id)).toEqual(['c1']);
+    cc!.track.mode = mode;
   });
 
   it('replaces the subtitle set on a new batch without touching CC tracks', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
 
-      expect(hlsTracks(video).sort()).toEqual(['captions:textTrack1', 'subtitles:default']);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video).sort()).toEqual(['captions:textTrack1', 'subtitles:default']);
   });
 
   it('replaces a re-announced CC track instead of duplicating it', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
-      expect(hlsTracks(video)).toEqual(['captions:textTrack1']);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toEqual(['captions:textTrack1']);
   });
 
   it('drops every track, CC included, when the media detaches', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      expect(hlsTracks(video)).toHaveLength(2);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    expect(hlsTracks(video)).toHaveLength(2);
 
-      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
 
-      expect(hlsTracks(video)).toHaveLength(0);
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toHaveLength(0);
   });
 
   it('leaves the engine subtitle track alone when a closed-caption track is selected', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
-      const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1')!;
+    const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1')!;
 
-      (engine as any).subtitleTrack = 0;
-      cc.track.mode = 'showing';
+    (engine as any).subtitleTrack = 0;
+    cc.track.mode = 'showing';
 
-      // hls.js has no subtitleTracks entry for CEA-608, so a -1 here would disable the track just picked.
-      expect((engine as any).subtitleTrack).not.toBe(-1);
-    } finally {
-      restore();
-    }
+    // hls.js has no subtitleTracks entry for CEA-608, so a -1 here would disable the track just picked.
+    expect((engine as any).subtitleTrack).not.toBe(-1);
   });
 
   it('refreshes the cues of a closed-caption track once when it is selected', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      (engine as any).emit(Hls.Events.CUES_PARSED, {
-        type: 'captions',
-        track: 'textTrack1',
-        cues: [{ id: 'c1' } as TextTrackCue],
-      });
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'c1' } as TextTrackCue],
+    });
 
-      const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1')!;
-      const ccTrack = cc.track as unknown as FakeTextTrack;
-      const before = ccTrack.addCueCalls;
+    const cc = [...video.querySelectorAll('track')].find((el) => el.id === 'textTrack1')!;
+    const ccTrack = cc.track as unknown as FakeTextTrack;
+    const before = ccTrack.addCueCalls;
 
-      ccTrack.mode = 'showing';
-      expect(ccTrack.addCueCalls).toBe(before + 1);
+    ccTrack.mode = 'showing';
+    expect(ccTrack.addCueCalls).toBe(before + 1);
 
-      (engine as any).emit(Hls.Events.CUES_PARSED, {
-        type: 'captions',
-        track: 'textTrack1',
-        cues: [{ id: 'c2' } as TextTrackCue],
-      });
-      expect(ccTrack.addCueCalls).toBe(before + 2);
-    } finally {
-      restore();
-    }
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'c2' } as TextTrackCue],
+    });
+    expect(ccTrack.addCueCalls).toBe(before + 2);
   });
 
   it('refreshes a closed-caption track on a stream without subtitle playlists', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).subtitleTracks = [];
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
-      (engine as any).emit(Hls.Events.CUES_PARSED, {
-        type: 'captions',
-        track: 'textTrack1',
-        cues: [{ id: 'c1' } as TextTrackCue],
-      });
+    (engine as any).subtitleTracks = [];
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'c1' } as TextTrackCue],
+    });
 
-      const ccTrack = [...video.querySelectorAll('track')][0]!.track as unknown as FakeTextTrack;
-      const before = ccTrack.addCueCalls;
+    const ccTrack = [...video.querySelectorAll('track')][0]!.track as unknown as FakeTextTrack;
+    const before = ccTrack.addCueCalls;
 
-      ccTrack.mode = 'showing';
+    ccTrack.mode = 'showing';
 
-      expect(ccTrack.addCueCalls).toBe(before + 1);
-    } finally {
-      restore();
-    }
+    expect(ccTrack.addCueCalls).toBe(before + 1);
   });
 
   it('does not re-add the showing track cues on every forwarded cue batch', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
-      const subs = [...video.querySelectorAll('track')].find((el) => el.id === 'default')!;
-      const subsTrack = subs.track as unknown as FakeTextTrack;
+    const subs = [...video.querySelectorAll('track')].find((el) => el.id === 'default')!;
+    const subsTrack = subs.track as unknown as FakeTextTrack;
 
-      // The state in which the Chrome cue-refresh applies: hls.js is playing the very track that is showing.
-      (engine as any).subtitleTracks = [{ lang: 'de', name: 'German', type: 'SUBTITLES', default: true }];
-      (engine as any).subtitleTrack = 0;
+    // The state in which the Chrome cue-refresh applies: hls.js is playing the very track that is showing.
+    (engine as any).subtitleTracks = [{ lang: 'de', name: 'German', type: 'SUBTITLES', default: true }];
+    (engine as any).subtitleTrack = 0;
 
-      subsTrack.mode = 'showing';
-      subsTrack.addCue({ id: 's1' } as TextTrackCue);
+    subsTrack.mode = 'showing';
+    subsTrack.addCue({ id: 's1' } as TextTrackCue);
 
-      const before = subsTrack.addCueCalls;
+    const before = subsTrack.addCueCalls;
 
-      // Three CEA-608 batches on the sibling track, each flipping its mode and so firing `change`.
-      for (const id of ['c1', 'c2', 'c3']) {
-        (engine as any).emit(Hls.Events.CUES_PARSED, {
-          type: 'captions',
-          track: 'textTrack1',
-          cues: [{ id } as TextTrackCue],
-        });
-      }
-
-      expect(subsTrack.addCueCalls).toBe(before);
-    } finally {
-      restore();
+    // Three CEA-608 batches on the sibling track, each flipping its mode and so firing `change`.
+    for (const id of ['c1', 'c2', 'c3']) {
+      (engine as any).emit(Hls.Events.CUES_PARSED, {
+        type: 'captions',
+        track: 'textTrack1',
+        cues: [{ id } as TextTrackCue],
+      });
     }
+
+    expect(subsTrack.addCueCalls).toBe(before);
   });
 
   it('takes the subtitle id from the index hls.js stamped on the playlist', () => {
-    const { engine, video, restore } = mount();
+    const { engine, video } = mount();
 
-    try {
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
-        tracks: [{ label: 'German', kind: 'subtitles', default: false, subtitleTrack: { id: 2, lang: 'de' } }],
-      });
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [{ label: 'German', kind: 'subtitles', default: false, subtitleTrack: { id: 2, lang: 'de' } }],
+    });
 
-      expect([...video.querySelectorAll('track[data-removeondestroy]')].map((el) => el.id)).toEqual(['subtitles2']);
-    } finally {
-      restore();
-    }
+    expect([...video.querySelectorAll('track[data-removeondestroy]')].map((el) => el.id)).toEqual(['subtitles2']);
+  });
+
+  it('refreshes a subtitle track the user switches to', () => {
+    const { engine, video } = mount();
+
+    (engine as any).subtitleTracks = [
+      { lang: 'de', name: 'German', type: 'SUBTITLES', default: true },
+      { lang: 'fr', name: 'French', type: 'SUBTITLES', default: false },
+    ];
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [
+        ...SUBTITLE_TRACKS_FOUND.tracks,
+        { label: 'French', kind: 'subtitles', default: false, subtitleTrack: { id: 1, lang: 'fr' } },
+      ],
+    });
+    (engine as any).subtitleTrack = 0;
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'subtitles',
+      track: 'subtitles1',
+      cues: [{ id: 'f1' } as TextTrackCue],
+    });
+
+    const french = trackOf(video, 'subtitles1') as unknown as FakeTextTrack;
+    const before = french.addCueCalls;
+
+    // Hls.js still has German selected when the user picks French, so the refresh has to run on this transition.
+    french.mode = 'showing';
+
+    expect((engine as any).subtitleTrack).toBe(1);
+    expect(french.addCueCalls).toBe(before + 1);
   });
 });
