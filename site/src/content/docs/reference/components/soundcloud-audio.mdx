@@ -151,18 +151,18 @@ Engine options win over the parameters of a widget embed URL, which win over the
 
 ## SoundCloud's terms
 
-The widget is covered by the [SoundCloud Terms of Use](https://soundcloud.com/terms-of-use), in the section about players and widgets. Without written consent from SoundCloud, you may not use the widget to:
+The widget is covered by the [SoundCloud Terms of Use](https://soundcloud.com/terms-of-use#use-of-soundcloud-players-and-widget), in the section about players and widgets. Without written consent from SoundCloud, you may not use the widget to:
 
-- Build a site or app that replicates much of what SoundCloud offers, or a content service that relies on SoundCloud content for a material part.
-- Embed content on a site for one artist, unless it is your own content, or on a site for one genre.
+- Aggregate SoundCloud content into a separate destination that substantially replicates what SoundCloud offers, or into a content service where SoundCloud content is a material part.
+- Embed content on a site dedicated to one artist, unless the content is yours and you are that artist or represent them, or on a site dedicated to one genre.
 
-You also may not suggest that SoundCloud or an artist endorses your site. SoundCloud can block the widget at any time.
+These limits apply to commercial and non-commercial use. You also may not use the widget in a way that suggests that SoundCloud, an artist, or anyone else endorses or supports your site. SoundCloud can block your use of the widget at any time, for any reason.
 
-The [SoundCloud API terms](https://developers.soundcloud.com/docs/api/terms-of-use), which ask you to credit the uploader and SoundCloud with links back to the sound, apply when you use the SoundCloud API, for example to play stream URLs in a player of your own. This component uses the widget, which shows that credit itself.
+The [SoundCloud API terms](https://developers.soundcloud.com/docs/api/terms-of-use), which ask you to credit the uploader and SoundCloud with links back to the sound, apply when you use the SoundCloud API, for example to play stream URLs in a player of your own. This component uses the widget, which [SoundCloud says handles that credit itself](https://developers.soundcloud.com/docs/api/buttons-logos).
 
 ## Privacy
 
-SoundCloud has no cookie-free embed. The widget sets cookies as soon as it loads, so if your site needs consent for third-party cookies, render the component only after the visitor agrees.
+The widget loads from SoundCloud as soon as the component renders. The [SoundCloud Privacy Policy](https://soundcloud.com/pages/privacy) says that SoundCloud may receive personal data when a visitor opens a page with an embedded widget, including which site they are on, and may recognize the visitor. The widget also stores data in the visitor's browser. SoundCloud does not document an embed mode that avoids this, so if your site needs consent before it loads third-party content, render the component only after the visitor agrees.
 
 ## Examples
 
