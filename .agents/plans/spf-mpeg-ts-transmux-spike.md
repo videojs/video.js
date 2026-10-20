@@ -83,7 +83,8 @@ to the actor, loader, or relocation layers beyond two config seams. Two real ass
 | `a4nOgmx…` | muxed H.264 + AAC, one SourceBuffer | buffered `[0.033, 23.86]` (10s PTS relocated to 0), 480×270 decoded, 25 frames / 0 dropped at 0.7s, audio decoding |
 | `Sc89iW…` | multi-audio: muxed default + audio-only TS alternates | 2 SourceBuffers, video drops its muxed audio (track declares only `avc1`), Spanish 44.1 kHz rendition plays |
 
-Sandbox smoke (Chrome, `apps/sandbox/src/html-spf-mpeg-ts-video/`, scratch page driving the engines directly):
+Sandbox smoke (Chrome, on a scratch page driving the engines directly — since removed; the committed Mux SPF
+sandbox pages cover these cases now):
 
 | case | observed |
 |---|---|
