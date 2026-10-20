@@ -5,6 +5,7 @@ import { createDialog, createTransition } from '@videojs/core/dom';
 import { useSnapshot } from '@videojs/store/react';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
+import { useOptionalContainer } from '../../player/context';
 import { useDestroy } from '../../utils/use-destroy';
 import { useLatestRef } from '../../utils/use-latest-ref';
 import { useSafeId } from '../../utils/use-safe-id';
@@ -16,23 +17,24 @@ export interface UseDialogRootOptions extends DialogProps {
   coreFactory?: () => DialogCore;
   stateAttrMap?: StateAttrMap<DialogState>;
   idPrefix?: string;
-  interactionRoot?: HTMLElement | null;
 }
 
 export function useDialogRoot({
   open: controlledOpen,
   defaultOpen = DialogCore.defaultProps.defaultOpen,
   closeOnEscape = DialogCore.defaultProps.closeOnEscape,
+  scope = DialogCore.defaultProps.scope,
   onOpenChange: onOpenChangeProp,
   onOpenChangeComplete: onOpenChangeCompleteProp,
   coreFactory = createDialogCore,
   stateAttrMap = DialogDataAttrs,
   idPrefix = 'dialog',
-  interactionRoot,
 }: UseDialogRootOptions): DialogContextValue {
   const [core] = useState(coreFactory);
+  const container = useOptionalContainer();
+  const interactionRoot = scope === 'player' ? container : null;
 
-  core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape });
+  core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape, scope });
 
   const isControlled = controlledOpen !== undefined;
   const onOpenChangeRef = useLatestRef(onOpenChangeProp);
@@ -70,7 +72,7 @@ export function useDialogRoot({
   }, [controlledOpen, dialog]);
 
   useLayoutEffect(() => {
-    dialog.setInteractionRoot(interactionRoot ?? null);
+    dialog.setInteractionRoot(interactionRoot);
   }, [dialog, interactionRoot]);
 
   useDestroy(dialog);

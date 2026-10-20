@@ -13,6 +13,7 @@ export default styles({
         'absolute inset-0 z-40 bg-media-backdrop/20 opacity-100 backdrop-filter-media-dialog rounded-[inherit]',
         'not-data-open:hidden transition-opacity delay-media-dialog duration-media-dialog ease-out',
         'media-transitioning:opacity-0 data-ending-style:delay-0',
+        'data-[scope=document]:fixed data-[scope=document]:rounded-none',
       ],
       variants: {
         default: 'data-ending-style:duration-media-slower',
@@ -24,6 +25,7 @@ export default styles({
         'absolute top-1/2 left-1/2 z-50 flex w-media-dialog-width max-w-media-dialog max-h-[calc(100%-0.5rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-media-dialog text-media-popover-foreground outline-hidden not-data-open:hidden',
         'text-shadow-media-dialog transition-[opacity,scale] delay-media-dialog duration-media-dialog ease-out',
         'media-transitioning:scale-media-hidden-popup media-transitioning:opacity-0 data-ending-style:delay-0',
+        'data-[scope=document]:fixed data-[scope=document]:max-h-[calc(100dvh-1rem)]',
       ],
       variants: {
         default: [
