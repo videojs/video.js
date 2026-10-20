@@ -26,7 +26,7 @@ export function ControlsRow({
         {seekBackward}
         {seekForward}
         {live && <LiveButton />}
-        {audio ? rate : <VolumePopover />}
+        {!audio && <VolumePopover />}
         {!live && (
           <$.Time.Group className={timeStyles.group}>
             <$.Time.Value className={timeStyles.toggle} type="current" toggle />
@@ -39,6 +39,7 @@ export function ControlsRow({
 
       <$.Controls.Group className={controlsStyles.group}>
         {captions}
+        {rate}
         {menu ?? (audio && <VolumePopover />)}
       </$.Controls.Group>
     </$.Controls.Group>
