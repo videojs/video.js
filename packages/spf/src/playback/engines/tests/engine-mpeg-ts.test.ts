@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { createComposition } from '../../../core/composition/create-composition';
 import { flattenFeatures } from '../../../core/composition/define-feature';
+import { isCarriedAudioTrack } from '../../../media/hls/carried-audio';
 import type { MaybeResolvedPresentation } from '../../../media/types';
+import { findTrackById, getTracksByType } from '../../../media/utils/tracks';
 import { mpegTsAudioTransmuxFeature } from '../../features/mpeg-ts-audio-transmux';
 import { mpegTsTransmuxFeature } from '../../features/mpeg-ts-transmux';
 import * as hlsAudio from '../hls-audio';
@@ -32,6 +34,13 @@ function createTransmuxingAudioEngine() {
   ]);
 
   return createComposition(behaviors, { defaultConfig, initialState });
+}
+
+const realFetch = globalThis.fetch;
+
+/** Chromium's decoded audio byte count; `0` where the vendor property is missing. */
+function audioDecodedBytes(video: HTMLVideoElement): number {
+  return (video as HTMLVideoElement & { webkitAudioDecodedByteCount?: number }).webkitAudioDecodedByteCount ?? 0;
 }
 
 /** Draw the current frame and report whether it has any non-uniform content (a rendered picture, not a blank). */
@@ -108,7 +117,7 @@ describe('mpegTsTransmuxFeature (real Mux TS sources, end to end)', () => {
     await engine.destroy();
   }, 60_000);
 
-  it('plays the multi-audio shape: video drops its muxed audio, an audio-only TS alternate plays beside it', async () => {
+  it('plays the multi-audio shape: the carried default audio first, then switches to and from an alternate', async () => {
     const video = document.createElement('video');
 
     media = video;
@@ -116,6 +125,13 @@ describe('mpegTsTransmuxFeature (real Mux TS sources, end to end)', () => {
     video.width = 320;
     video.height = 180;
     document.body.append(video);
+
+    // Every network request, to prove the video and audio loaders share one request per segment.
+    const requested: string[] = [];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
+      requested.push(input instanceof Request ? input.url : String(input));
+      return realFetch(input, init);
+    });
 
     const engine = createTransmuxingVideoEngine();
     const { state, context } = engine;
@@ -125,18 +141,62 @@ describe('mpegTsTransmuxFeature (real Mux TS sources, end to end)', () => {
     state.presentation.set({ url: MUX_MULTI_AUDIO_TS_URL } as MaybeResolvedPresentation);
 
     await vi.waitFor(() => expect(state.selectedAudioTrackId.get()).toBeDefined(), { timeout: 10_000 });
+
+    // The DEFAULT=YES rendition is the one carried in the video segments; it is the pick, not a dubbed alternate.
+    const presentation = state.presentation.get()!;
+    const defaultId = state.selectedAudioTrackId.get()!;
+    const defaultTrack = findTrackById(presentation, defaultId)!;
+
+    expect(defaultTrack).toMatchObject({ type: 'audio', name: 'English', default: true });
+    expect(isCarriedAudioTrack(presentation, defaultTrack)).toBe(true);
+
     void video.play().catch(() => {});
     await vi.waitFor(() => expect(video.getVideoPlaybackQuality().totalVideoFrames).toBeGreaterThan(10), {
       timeout: 15_000,
       interval: 250,
     });
+    await vi.waitFor(() => expect(video.currentTime).toBeGreaterThan(1), { timeout: 10_000, interval: 250 });
 
     expect(context.mediaSource.get()?.sourceBuffers.length).toBe(2);
     expect(state.mediaContainerData.get()?.audio?.trackId).toBe(2);
+    expect(audioDecodedBytes(video)).toBeGreaterThan(0);
     expect(state.errors.get() ?? []).toEqual([]);
 
+    // One request per video segment served both loaders.
+    const segmentRequests = requested.filter((url) => new URL(url).pathname.endsWith('.ts'));
+
+    expect(segmentRequests.length).toBeGreaterThan(0);
+    expect(new Set(segmentRequests).size).toBe(segmentRequests.length);
+
+    // Switch to an audio-only alternate: playback continues on the new rendition's AAC.
+    const alternate = getTracksByType(presentation, 'audio').find((track) => track.language === 'es')!;
+    const decodedBefore = audioDecodedBytes(video);
+    const timeBefore = video.currentTime;
+
+    state.userAudioTrackSelection.set({ id: alternate.id });
+    await vi.waitFor(() => expect(state.selectedAudioTrackId.get()).toBe(alternate.id), { timeout: 5_000 });
+    await vi.waitFor(() => expect(video.currentTime).toBeGreaterThan(timeBefore + 2), {
+      timeout: 15_000,
+      interval: 250,
+    });
+    expect(audioDecodedBytes(video)).toBeGreaterThan(decodedBefore);
+    expect(state.errors.get() ?? []).toEqual([]);
+
+    // And back to the carried default, which now refetches segments the video loader passed long ago.
+    const timeBeforeReturn = video.currentTime;
+
+    state.userAudioTrackSelection.set({ id: defaultId });
+    await vi.waitFor(() => expect(state.selectedAudioTrackId.get()).toBe(defaultId), { timeout: 5_000 });
+    await vi.waitFor(() => expect(video.currentTime).toBeGreaterThan(timeBeforeReturn + 2), {
+      timeout: 15_000,
+      interval: 250,
+    });
+    expect(state.errors.get() ?? []).toEqual([]);
+    expect(state.bandwidthState.get()?.bytesSampled).toBeGreaterThan(0);
+
+    fetchSpy.mockRestore();
     await engine.destroy();
-  }, 60_000);
+  }, 90_000);
 
   it('plays an audio-only TS asset through the audio engine with the audio-only feature', async () => {
     const audio = document.createElement('audio');
