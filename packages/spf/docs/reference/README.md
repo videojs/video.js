@@ -10,13 +10,13 @@ Each engine's box and arrows share a color. Features are grouped by which engine
 
 ```mermaid
 graph LR
-  classDef engine_video fill:#2563eb,stroke:#1d4ed8,color:#fff
-  engine_video["@videojs/spf/hls/video"]:::engine_video
-  classDef engine_audio fill:#d97706,stroke:#b45309,color:#fff
-  engine_audio["@videojs/spf/hls/audio"]:::engine_audio
-  classDef engine_background_video fill:#16a34a,stroke:#15803d,color:#fff
-  engine_background_video["@videojs/spf/hls/background-video"]:::engine_background_video
-  subgraph group_0["video only"]
+  classDef engine_hls_video fill:#2563eb,stroke:#1d4ed8,color:#fff
+  engine_hls_video["@videojs/spf/engines/hls-video"]:::engine_hls_video
+  classDef engine_hls_audio fill:#d97706,stroke:#b45309,color:#fff
+  engine_hls_audio["@videojs/spf/engines/hls-audio"]:::engine_hls_audio
+  classDef engine_hls_background_video fill:#16a34a,stroke:#15803d,color:#fff
+  engine_hls_background_video["@videojs/spf/engines/hls-background-video"]:::engine_hls_background_video
+  subgraph group_0["hls-video only"]
     direction LR
     feature_video["videoFeature"]
     feature_text_tracks["textTracksFeature"]
@@ -28,7 +28,7 @@ graph LR
     feature_video ~~~ feature_text_tracks ~~~ feature_airplay_fairplay ~~~ feature_drm ~~~ feature_shift_text_timestamps
     feature_monitor_player_size ~~~ feature_live
   end
-  subgraph group_1["video and audio"]
+  subgraph group_1["hls-video and hls-audio"]
     direction LR
     feature_initial_load["initialLoadFeature"]
     feature_multi_cdn["multiCdnFeature"]
@@ -50,23 +50,23 @@ graph LR
     feature_current_time["currentTimeFeature"]
     feature_hls_loading ~~~ feature_error ~~~ feature_calculate_duration ~~~ feature_media_source ~~~ feature_current_time
   end
-  subgraph group_3["background-video only"]
+  subgraph group_3["hls-background-video only"]
     direction LR
     feature_background_video["backgroundVideoFeature"]
   end
-  engine_video --> group_0
+  engine_hls_video --> group_0
   linkStyle 15 stroke:#2563eb,stroke-width:2px
-  engine_video --> group_1
+  engine_hls_video --> group_1
   linkStyle 16 stroke:#2563eb,stroke-width:2px
-  engine_video --> group_2
+  engine_hls_video --> group_2
   linkStyle 17 stroke:#2563eb,stroke-width:2px
-  engine_audio --> group_1
+  engine_hls_audio --> group_1
   linkStyle 18 stroke:#d97706,stroke-width:2px
-  engine_audio --> group_2
+  engine_hls_audio --> group_2
   linkStyle 19 stroke:#d97706,stroke-width:2px
-  engine_background_video --> group_2
+  engine_hls_background_video --> group_2
   linkStyle 20 stroke:#16a34a,stroke-width:2px
-  engine_background_video --> group_3
+  engine_hls_background_video --> group_3
   linkStyle 21 stroke:#16a34a,stroke-width:2px
 ```
 
@@ -74,9 +74,9 @@ graph LR
 
 | Symbol | Page | Description |
 | --- | --- | --- |
-| `@videojs/spf/hls/video` | [video](engines/video.md) | Create an HLS playback engine. Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest resolution, track selection, ABR, segment loading, and end-of-stream coordination. |
-| `@videojs/spf/hls/audio` | [audio](engines/audio.md) | Create an audio-only HLS playback engine. Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters (`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes unchanged. |
-| `@videojs/spf/hls/background-video` | [background-video](engines/background-video.md) | Create a background-video playback engine. Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven, preload-monitoring, and play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution rule by default) replaces `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds `loadActivated: true` so the composition behaves as if preload has already been activated — appropriate for ambient / hero / GIF-replacement surfaces that should start loading the moment a src is set. |
+| `@videojs/spf/engines/hls-video` | [hls-video](engines/hls-video.md) | Create an HLS playback engine. Composes SPF behaviors into a reactive pipeline for HLS playback over MSE: manifest resolution, track selection, ABR, segment loading, and end-of-stream coordination. |
+| `@videojs/spf/engines/hls-audio` | [hls-audio](engines/hls-audio.md) | Create an audio-only HLS playback engine. Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters (`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes unchanged. |
+| `@videojs/spf/engines/hls-background-video` | [hls-background-video](engines/hls-background-video.md) | Create a background-video playback engine. Subtractive composition over the HLS engine baseline: audio-side, text-side, ABR-driven, preload-monitoring, and play/seek load-trigger behaviors are removed. `selectVideoTrack` (with a highest-resolution rule by default) replaces `switchVideoQuality`, pinning a single rendition for the session. The initial state seeds `loadActivated: true` so the composition behaves as if preload has already been activated — appropriate for ambient / hero / GIF-replacement surfaces that should start loading the moment a src is set. |
 
 ## Features
 
@@ -182,7 +182,7 @@ graph LR
 <details>
 <summary>How this reference is generated</summary>
 
-Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/hls-audio`, `@videojs/spf/hls-background-video`, `@videojs/spf/hls-video`.
+Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/adapters/hls-audio`, `@videojs/spf/adapters/hls-background-video`, `@videojs/spf/adapters/hls-video`.
 
 Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.
 

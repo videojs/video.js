@@ -68,7 +68,7 @@ Requires, from this or other features:
 
 ### Composed by
 
-- [@videojs/spf/hls/video](../engines/video.md)
+- [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
 ## Other exports
 

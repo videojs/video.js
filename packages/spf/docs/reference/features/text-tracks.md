@@ -68,7 +68,7 @@ Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeat
 
 ### Composed by
 
-- [@videojs/spf/hls/video](../engines/video.md)
+- [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
 ## Other exports
 
