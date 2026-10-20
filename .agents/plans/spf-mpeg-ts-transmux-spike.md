@@ -10,9 +10,13 @@ The transmux is one feature, `mpegTsTransmuxFeature` (`engines/hls/features/mpeg
 `@videojs/spf/features/mpeg-ts-transmux`): no behaviors, five `defaultConfig` overrides
 (`videoMessagePipelines`, `audioMessagePipelines`, `canPlayTrack`, `reportUnsupportedTrackConditions`,
 `sourceBufferMimeCodec`), composed after `shiftTimestampsFeature` and `drmFeature` (last-wins). Not in
-any shipped HLS engine's feature list. **Composed by the Mux SPF Medias only** (`MuxVideoAdapter` /
-`MuxAudioAdapter` lay `withMpegTsTransmux` under the consumer's engine config — a behavior-less feature
-is only config, so the Media composes it without rebuilding the engine). Decided 2026-10-19: the
+any shipped HLS engine's feature list. **Composed by the Mux SPF Medias only**, as engines of their own
+(2026-10-20, replacing the earlier `withMpegTsTransmux` config helper): `@videojs/mux-video/spf`,
+`@videojs/mux-audio/spf`, and `@videojs/mux-video/spf/background-video` each ship an engine module shaped
+like `@videojs/spf/engines/hls-video`'s (`[...base.features, transmuxFeature]`, derived types, `createEngine`),
+and the SPF adapter mixins gained a static `createEngine` seam the Mux adapters override. Every export of
+those modules is annotated from the base engine's exported types because the declaration emitter can't
+name an inferred composition type across packages. Decided 2026-10-19: the
 transmuxer covers what Mux packages, not general MPEG-TS (no MP3/AC-3/E-AC-3/HEVC, no SAMPLE-AES, AUD-
 dependent AU grouping, no PTS rollover / discontinuity / segment-spanning PES, none of hls.js's timing
 repair, Chromium only), so `<hls-video>` keeps its unsupported-format verdict and the e2e
