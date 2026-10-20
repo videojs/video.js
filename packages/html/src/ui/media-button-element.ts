@@ -78,7 +78,6 @@ export abstract class MediaButtonElement<
   #disconnect: AbortController | null = null;
   #hotkeyRegistry: AriaKeyShortcutsController | null = null;
   #lastHotkeyShortcut: string | undefined;
-  #hiddenForMissingFeature = false;
   readonly #i18n = new I18nController(this, i18nContext);
 
   override connectedCallback(): void {
@@ -144,17 +143,7 @@ export abstract class MediaButtonElement<
 
     this.#syncHotkeyShortcut();
 
-    // Without its feature the button cannot work or be named, so it is removed
-    // the way the React components render nothing.
-    if (!media) {
-      this.#hiddenForMissingFeature = true;
-      this.hidden = true;
-      return;
-    }
-
-    const restoreHidden = this.#hiddenForMissingFeature;
-
-    this.#hiddenForMissingFeature = false;
+    if (!media) return;
 
     this.core.setMedia(media);
     const state = this.core.getState();
@@ -171,7 +160,7 @@ export abstract class MediaButtonElement<
       // just the data one: `data-hidden` is a styling hook a skin may or may not
       // act on, where `hidden` removes the control the way the React components
       // do by rendering nothing.
-      ...((isHideable(state) || restoreHidden) && { hidden: isHideable(state) && state.hidden ? '' : undefined }),
+      ...(isHideable(state) && { hidden: state.hidden ? '' : undefined }),
     });
     applyStateDataAttrs(this, state, this.stateAttrMap);
   }
