@@ -7,9 +7,12 @@ import type {
 } from '../../core/composition/define-behavior';
 import { defineFeature } from '../../core/composition/define-feature';
 import { canPlayTransmuxedTrack } from '../../media/dom/capabilities';
+import { resolveCarriedAudioRenditions } from '../../media/hls/carried-audio';
+import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
 import { aacCodec } from '../../media/mpeg-ts/codecs/aac';
 import { transmuxedSourceBufferMimeCodec } from '../../media/mpeg-ts/transmuxed-track';
 import type { setupAudioBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import type { ParsePresentation, resolvePresentation } from '../behaviors/resolve-presentation';
 import type { resolveAudioTrack } from '../behaviors/resolve-track';
 import type { switchAudioTrack } from '../behaviors/track-switching';
 import { reportUnsupportedTransmuxedTrackConditions } from '../primitives/report-track-conditions';
@@ -27,10 +30,20 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /** The audio feature's behaviors that read the keys this feature sets. */
-type ConfigReaders = readonly [typeof setupAudioBufferActors, typeof switchAudioTrack, typeof resolveAudioTrack];
+type ConfigReaders = readonly [
+  typeof resolvePresentation,
+  typeof setupAudioBufferActors,
+  typeof switchAudioTrack,
+  typeof resolveAudioTrack,
+];
+
+/** The HLS parser, with audio renditions carried in the video segments resolved to their carrier variants. */
+const parsePresentation: ParsePresentation = (text, presentation) =>
+  resolveCarriedAudioRenditions(parseMultivariantPlaylist(text, presentation));
 
 /** The config defaults the feature contributes. */
 export const defaultConfig = {
+  parsePresentation,
   // Only the AAC codec: like the audio-only engine ignoring video renditions at
   // the playlist level, this pipeline never assembles the video PES and the
   // composition never bundles the H.264 framing.
@@ -45,7 +58,8 @@ export const initialState = {} satisfies Partial<State>;
 
 /**
  * The audio-only counterpart of `mpegTsTransmuxFeature`: plays MPEG-TS audio renditions (an audio-only `.ts` asset, or
- * the audio-only TS alternates of a video asset) by transmuxing their AAC to fMP4, with no video codec compiled in. For
- * `hls/audio`-shaped compositions; a composition with video takes `mpegTsTransmuxFeature`. Same placement rules.
+ * the audio-only TS alternates of a video asset, or a video asset's default audio carried in its video segments) by
+ * transmuxing their AAC to fMP4, with no video codec compiled in. For `hls/audio`-shaped compositions; a composition
+ * with video takes `mpegTsTransmuxFeature`. Same placement rules.
  */
 export const mpegTsAudioTransmuxFeature = defineFeature({ behaviors, defaultConfig, initialState });
