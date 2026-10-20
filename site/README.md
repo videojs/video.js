@@ -59,6 +59,7 @@ If you're in `site/`...
 | `pnpm install`       | Installs dependencies                            |
 | `pnpm exec vp run dev`   | Starts local dev server at `localhost:4321` (expects generated content; run `pnpm exec vp run dev:prepare` first) |
 | `pnpm exec vp run build` | Build your production site to `./dist/`      |
+| `pnpm astro build --timings` | Build and print where the time went (phases, Vite and Markdown plugins, slowest pages) |
 | `pnpm astro preview`     | Preview your build locally, before deploying |
 | `pnpm api-docs`      | Regenerate API reference JSON from TypeScript    |
 | `pnpm astro ...`     | Run CLI commands like `astro add`, `astro check` |
