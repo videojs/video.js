@@ -418,21 +418,65 @@ describe('HlsJsMediaTracksMixin', () => {
     expect([...host.videoRenditions][1]?.codec).toContain('hvc1');
   });
 
-  it('rebuilds the list when hls.js replaces the levels outright', () => {
+  it('replaces the renditions when no incoming level matches one', () => {
     const engine = createEngine();
     const host = new HlsJsMediaTracks(engine);
 
     manifestParsed(engine, LEVELS);
 
-    // A content-steering pathway switch announces a wholly different set; every key misses.
-    const pathway = [
+    const unrelated = [
       { url: ['https://cdn-b/a0.m3u8'], width: 640, height: 360, videoCodec: 'avc1.64001f', bitrate: 500000 },
       { url: ['https://cdn-b/a1.m3u8'], width: 1280, height: 720, videoCodec: 'avc1.64001f', bitrate: 2000000 },
     ];
 
-    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: pathway });
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: unrelated });
 
     expect([...host.videoRenditions].map((rendition: any) => rendition.id)).toEqual(['0', '1']);
     expect([...host.videoRenditions].map((rendition: any) => rendition.height)).toEqual([360, 720]);
+  });
+
+  it('carries the selection and the active flag across a pathway switch', async () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    host.videoRenditions.selectedIndex = 2;
+    await flush();
+    (engine as any).emit(Hls.Events.LEVEL_SWITCHED, { level: 2 });
+
+    // A content-steering pathway switch re-announces the same encodes from another CDN. hls.js keeps the level index
+    // and its manual pick, and fires no LEVEL_SWITCHED because the index did not change.
+    const pathway = LEVELS.map((level) => ({ ...level, url: [level.url[0]!.replace('cdn', 'cdn-b')] }));
+
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: pathway });
+    await flush();
+
+    const renditions = [...host.videoRenditions];
+
+    expect(renditions).toHaveLength(4);
+    expect(host.videoRenditions.selectedIndex).toBe(2);
+    expect(renditions.map((rendition: any) => rendition.active)).toEqual([false, false, true, false]);
+    expect(engine.manualLevel).toBe(2);
+    expect((engine as any).nextLevelWrites).toEqual([2]);
+  });
+
+  it('returns the engine to auto when hls.js drops the selected level', async () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+
+    // LEVELS[1], the 234p hvc1 playlist, which the reindex removes.
+    host.videoRenditions.selectedIndex = 1;
+    await flush();
+    expect(engine.manualLevel).toBe(1);
+
+    // hls.js moves its manual pick to the playing level rather than to auto when it removes the picked one.
+    (engine as any).manualLevel = 0;
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+    await flush();
+
+    expect(host.videoRenditions.selectedIndex).toBe(-1);
+    expect(engine.manualLevel).toBe(-1);
   });
 });

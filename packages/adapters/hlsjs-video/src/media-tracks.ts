@@ -30,10 +30,10 @@ type HlsJsMediaAudioTrack = {
   lang?: string | undefined;
 };
 
-// hls.js may rebuild its levels array with new object references between
-// events, so key levels by their identifying attributes instead of identity.
-function getLevelKey(level: HlsJsMediaTrackLevel): string {
-  return `${level.url[0] ?? ''}|${level.width}x${level.height}|${level.videoCodec}|${level.bitrate}`;
+// hls.js rebuilds its levels array with new object references between events, and a content-steering pathway switch
+// replaces every URL, so a level is matched to its rendition by the encoding attributes both of them carry.
+function getRenditionKey(width?: number, height?: number, codec?: string, bitrate?: number): string {
+  return `${width}x${height}|${codec}|${bitrate}`;
 }
 
 function getAudioTrackKind(audioTrack: HlsJsMediaAudioTrack): string {
@@ -49,7 +49,6 @@ function getAudioTrackKind(audioTrack: HlsJsMediaAudioTrack): string {
  */
 export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>(BaseClass: Base) {
   class HlsJsMediaTracks extends (BaseClass as Constructor<MediaTracksHost>) {
-    #levelIdMap = new Map<string, string>();
     #currentVideoTrack: VideoTrackLike | null = null;
 
     constructor(...args: any[]) {
@@ -72,7 +71,6 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
 
     #onManifestParsed = (_event: string, data: { levels: HlsJsMediaTrackLevel[] }) => {
       this.#removeAllMediaTracks();
-      this.#levelIdMap.clear();
 
       const videoTrack = this.addVideoTrack('main');
 
@@ -88,7 +86,6 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
           level.bitrate
         );
 
-        this.#levelIdMap.set(getLevelKey(level), `${id}`);
         rendition.id = `${id}`;
       }
     };
@@ -166,30 +163,28 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
       const videoTrack = this.#currentVideoTrack;
       if (!videoTrack) return;
 
-      const renditionByOldId = new Map<string, VideoRenditionLike>();
+      // A queue per key, so levels that share every attribute each claim a rendition of their own.
+      const renditionsByKey = new Map<string, VideoRenditionLike[]>();
 
       for (const rendition of this.videoRenditions) {
-        if (rendition.id) renditionByOldId.set(rendition.id, rendition);
+        const key = getRenditionKey(rendition.width, rendition.height, rendition.codec, rendition.bitrate);
+
+        renditionsByKey.set(key, [...(renditionsByKey.get(key) ?? []), rendition]);
       }
 
-      const nextLevelIdMap = new Map<string, string>();
       const current = new Set<VideoRenditionLike>();
 
       for (const [index, level] of data.levels.entries()) {
-        const key = getLevelKey(level);
-        const id = `${index}`;
-        const oldId = this.#levelIdMap.get(key);
-        const existing = oldId === undefined ? undefined : renditionByOldId.get(oldId);
+        const key = getRenditionKey(level.width, level.height, level.videoCodec, level.bitrate);
 
-        // An incoming level with no rendition is new rather than gone: hls.js also replaces the set outright, on a
-        // content-steering pathway switch, where every key misses and pruning alone would empty the list.
+        // Reusing the rendition carries its `selected` and `active` flags over, including across a pathway switch,
+        // where hls.js keeps the level index and so fires no LEVEL_SWITCHED to restore `active`.
         const rendition =
-          existing ??
+          renditionsByKey.get(key)?.shift() ??
           videoTrack.addRendition(level.url[0] ?? '', level.width, level.height, level.videoCodec, level.bitrate);
 
-        rendition.id = id;
+        rendition.id = `${index}`;
         current.add(rendition);
-        nextLevelIdMap.set(key, id);
       }
 
       // Snapshot first: removeRendition mutates the collection being walked.
@@ -197,11 +192,9 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
         if (rendition.id && !current.has(rendition)) videoTrack.removeRendition(rendition);
       }
 
-      this.#levelIdMap = nextLevelIdMap;
-
-      // hls.js rewrites its own manualLevelIndex when it drops a level, so a manual pick has to be re-asserted
-      // against the new numbering or the menu keeps showing a choice the engine no longer honours.
-      if (this.videoRenditions.selectedIndex >= 0) this.#switchRendition();
+      // hls.js rewrites its own manualLevelIndex when it drops a level, so the selection is re-asserted against the
+      // new numbering. Removing the picked rendition fires no `change`, and this is what returns the engine to auto.
+      this.#switchRendition();
     };
 
     #onLevelSwitched = (_event: string, data: { level: number }) => {
@@ -217,7 +210,7 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
       if (!engine) return;
 
       // The id carries the hls.js level index, which only coincides with the list position while the two are in step.
-      const selected = [...this.videoRenditions][this.videoRenditions.selectedIndex];
+      const selected = this.videoRenditions[this.videoRenditions.selectedIndex];
       const level = selected?.id ? Number(selected.id) : this.videoRenditions.selectedIndex;
 
       // The `nextLevel` getter reports the next buffered fragment's level, not
@@ -240,7 +233,6 @@ export function HlsJsMediaTracksMixin<Base extends Constructor<MediaTracksHost>>
       this.videoRenditions.removeEventListener('change', this.#switchRendition);
 
       this.#removeAllMediaTracks();
-      this.#levelIdMap.clear();
       this.#currentVideoTrack = null;
     };
 
