@@ -43,7 +43,7 @@ export interface HlsBackgroundVideoProps
  * can play the video once, or hold it until it has checked the motion preference. Muted is fixed: the engine drops
  * audio.
  *
- * `MuxBackgroundVideo` is this same component under the name the package it replaces used — an alias, not a variant.
+ * `MuxBackgroundVideo` is this component over the Mux Media, which adds the MPEG-TS transmux and nothing else.
  */
 export const HlsBackgroundVideo = forwardRef<HTMLVideoElement, HlsBackgroundVideoProps>(function HlsBackgroundVideo(
   { children, fallback = videoFallback, mediaRef, loop = true, autoPlay = true, ...props },

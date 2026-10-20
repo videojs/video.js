@@ -1,11 +1,14 @@
+import { MuxBackgroundVideoAdapter } from '@videojs/mux-video/spf/background-video';
+
+import { HlsBackgroundVideo } from '../hls-background-video';
+
 /**
- * The Mux-flavored name for `HlsBackgroundVideo` — the same class, not a subclass or a variant. Kept because
- * `<mux-background-video>` is what the standalone package this element replaces was called.
+ * `<hls-background-video>` over the Mux Media, under the name the standalone `mux-background-video` package used.
  *
- * There is no Mux identity to add, because there is no Mux input to take: `src` is an HLS URL, and capping which
- * rendition is fetched is a param on it rather than an attribute. `../hls-background-video` carries the whole surface.
- *
- * The two tags register from separate `define/media` entries, each subclassing this base with its own `tagName`, so
- * importing both is fine — they are two names for one element, not two elements competing for one name.
+ * The surface is the base's: `src` is an HLS URL, and capping which rendition is fetched is a param on it rather than
+ * an attribute. What the Mux Media adds is the MPEG-TS transmux, so a plus- or basic-tier Mux playback ID plays here
+ * where the HLS-named element refuses it. `../hls-background-video` carries the whole surface.
  */
-export { HlsBackgroundVideo as MuxBackgroundVideo } from '../hls-background-video';
+export class MuxBackgroundVideo extends HlsBackgroundVideo {
+  static override readonly Adapter = MuxBackgroundVideoAdapter;
+}
