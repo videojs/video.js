@@ -14,7 +14,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   entry: {
     index: './src/index.ts',
     spf: './src/spf/index.ts',
-    'spf/background-video': './src/spf/background-video.ts',
+    'spf/background-video': './src/spf/background-video/index.ts',
   },
 });
 
