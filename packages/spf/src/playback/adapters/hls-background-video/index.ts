@@ -15,6 +15,7 @@
  * (`@videojs/mux-video/spf/background-video`), which lays the MPEG-TS transmux under the engine config.
  */
 export type {
+  CreateEngine,
   HlsBackgroundVideoAdapterAPI,
   HlsBackgroundVideoAdapterOptions,
   HlsBackgroundVideoAdapterProps,

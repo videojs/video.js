@@ -107,11 +107,21 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
  *
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  */
+/** What the adapter's `createEngine` static builds: an engine over this adapter's state and context. */
+export type CreateEngine = (config: EngineConfig) => Composition<EngineState, EngineContext>;
+
 export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class HlsBackgroundVideoImpl extends BaseClass {
     static readonly defaultProps: HlsBackgroundVideoAdapterProps = {
       src: '',
     };
+
+    /**
+     * The engine factory the adapter builds its engine with. A Media over a differently composed engine — one sharing
+     * this engine's state and context, with more features laid in, as the Mux Medias lay the MPEG-TS transmux —
+     * overrides this static and nothing else.
+     */
+    static readonly createEngine: CreateEngine = createEngine;
 
     #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
@@ -290,7 +300,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       // No selection config of its own: the engine's default rule chain already
       // narrows to the largest rendition that fits the screen, which is exactly
       // what this adapter used to hand over as a bespoke picker.
-      return createEngine(this.#config);
+      return (this.constructor as typeof HlsBackgroundVideoImpl).createEngine(this.#config);
     }
 
     #cancelPendingPlay(): void {
@@ -304,6 +314,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     HlsBackgroundVideoAdapterAPI,
     [options?: HlsBackgroundVideoAdapterOptions]
   > & {
+    readonly createEngine: CreateEngine;
     readonly defaultProps: HlsBackgroundVideoAdapterProps;
   };
 }
