@@ -405,8 +405,8 @@ video.m3u8`;
       expect(audioTracks).toHaveLength(1);
       // Still URL-less, since the audio lives in the video stream's segments rather
       // than a playlist of its own. Merging that case would mean folding audio into a
-      // video track, which no Mux asset needs — the muxed-audio shapes it serves
-      // declare no audio rendition at all.
+      // video track; a composition that can extract the carried audio resolves the
+      // rendition itself instead (`resolveCarriedAudioRenditions`).
       expect(audioTracks?.[0]).toMatchObject({ type: 'audio', groupId: 'audio-0', url: '' });
     });
   });
