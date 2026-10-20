@@ -201,7 +201,8 @@ export function transmuxPipelinesFor(
       const own = result.tracks[ownFamily];
       const slot = transmuxState(deps).mediaContainerData;
 
-      if (own && peek(slot)?.[trackType]?.timescale === undefined) {
+      // A composition without the slot (the background engine) relocates nothing, so there is nothing to record.
+      if (slot && own && peek(slot)?.[trackType]?.timescale === undefined) {
         update(slot, (current) => ({
           ...current,
           [trackType]: { ...current?.[trackType], trackId: own.trackId, timescale: own.timescale },
