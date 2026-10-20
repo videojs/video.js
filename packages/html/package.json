@@ -181,6 +181,7 @@
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
@@ -202,6 +203,7 @@
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
@@ -221,6 +223,9 @@
       "optional": true
     },
     "@videojs/dash-video": {
+      "optional": true
+    },
+    "@videojs/google-analytics": {
       "optional": true
     },
     "@videojs/google-cast": {

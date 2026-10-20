@@ -136,6 +136,10 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Internationalization',
           },
           {
+            slug: 'guides/google-analytics',
+            sidebarLabel: 'Google Analytics',
+          },
+          {
             slug: 'guides/mux-data',
             sidebarLabel: 'Mux Data',
           },
@@ -223,7 +227,11 @@ export const sidebar: Sidebar = [
       {
         sidebarLabel: 'Extensions',
         llmsDescription: 'API reference for extensions that connect external services to the player.',
-        contents: [{ slug: 'reference/components/google-cast' }, { slug: 'reference/components/mux-data' }],
+        contents: [
+          { slug: 'reference/components/google-analytics' },
+          { slug: 'reference/components/google-cast' },
+          { slug: 'reference/components/mux-data' },
+        ],
       },
       {
         sidebarLabel: 'Buttons',

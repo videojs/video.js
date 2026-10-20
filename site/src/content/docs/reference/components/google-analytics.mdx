@@ -1,0 +1,65 @@
+---
+title: GoogleAnalytics
+frameworkTitle:
+  html: google-analytics
+description: Options for the Google Analytics 4 extension that tracks video engagement and playback events
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
+import ExtensionImports from '@/components/docs/api-reference/ExtensionImports.astro';
+
+Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches, dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer`. See <DocsLink slug="guides/google-analytics">Google Analytics</DocsLink> for how telemetry works.
+
+## Import
+
+<ExtensionImports extension="google-analytics" package="@videojs/google-analytics" react="GoogleAnalytics" />
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics></google-analytics>
+```
+</FrameworkCase>
+
+## Options
+
+<FrameworkCase frameworks={["react"]}>
+| Prop | Type | Description |
+|---|---|---|
+| `streamType` | `'live' \| 'vod'` | Stream type reported in parameters. Defaults to `'vod'` |
+| `videoTitle` | `string` | Explicit title for the video. Falls back to media title or current URL if omitted |
+| `videoProvider` | `string` | Video provider reported in parameters. Defaults to `'video.js'` |
+| `dataLayerName` | `string` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
+| `trackProgress` | `boolean` | Tracks 10%, 25%, 50%, and 75% progress milestones. Defaults to `true` |
+| `debug` | `boolean` | Logs telemetry events to the console. Defaults to `false` |
+| `customParams` | `Record<string, string \| number \| boolean>` | Custom extra parameters to include with every dispatched event |
+| `onEvent` | `(event: string, params: object) => void` | Callback to intercept dispatched events |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Attribute | Property | Description |
+|---|---|---|
+| `stream-type` | `streamType` | Stream type reported in parameters. Defaults to `'vod'` |
+| `video-title` | `videoTitle` | Explicit title for the video. Falls back to media title or current URL if omitted |
+| `video-provider` | `videoProvider` | Video provider reported in parameters. Defaults to `'video.js'` |
+| `data-layer-name` | `dataLayerName` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
+| `track-progress` | `trackProgress` | Tracks 10%, 25%, 50%, and 75% progress milestones. Defaults to `true` |
+| `debug` | `debug` | Logs telemetry events to the console. Defaults to `false` |
+| — | `customParams` | Custom extra parameters to include with every dispatched event |
+| — | `onEvent` | Callback to intercept dispatched events |
+
+`customParams` and `onEvent` take non-primitive values, so they're properties only, with no matching attribute. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
+</FrameworkCase>
+
+## See also
+
+<DocsLinkCard slug="guides/google-analytics" description="Configure GA4 video telemetry">Google Analytics</DocsLinkCard>
