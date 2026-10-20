@@ -31,10 +31,10 @@ track-list infrastructure) — not the other way around — which is why
 `HlsVideoMediaError` extends `ErrorLike` and `HlsVideoMediaStreamType`
 *is* `MediaStreamType` rather than a structurally-compatible copy.
 
-The Medias ship behind their own entry points, `@videojs/spf/hls-video`
-and `@videojs/spf/hls-audio`, kept separate from the engines' own entry
-points (`@videojs/spf/hls/video`, `@videojs/spf/hls/audio`,
-`@videojs/spf/hls/background-video`) so that wiring an engine directly
+The Medias ship behind their own entry points, `@videojs/spf/adapters/hls-video`
+and `@videojs/spf/adapters/hls-audio`, kept separate from the engines' own entry
+points (`@videojs/spf/engines/hls-video`, `@videojs/spf/engines/hls-audio`,
+`@videojs/spf/engines/hls-background-video`) so that wiring an engine directly
 pulls in neither a Media nor `@videojs/media`. That separation also keeps
 each engine entry measurable as that engine's own size budget. (When the
 engines still shared `./hls`, splitting the adapters out took it from
@@ -42,7 +42,7 @@ engines still shared `./hls`, splitting the adapters out took it from
 
 ## Status
 
-- **Composition:** The `hls/video` engine (HLS VoD); external signals
+- **Composition:** The `hls-video` engine (HLS VoD); external signals
   declared with `defineExternalSignals`, the last entry in the behavior list
 - **Definition depth:** sketched — capability surface and the
   adapter-rationale open question both documented
@@ -82,7 +82,7 @@ engines still shared `./hls`, splitting the adapters out took it from
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (`@videojs/spf/hls/video`) —
+**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (`@videojs/spf/engines/hls-video`) —
 the behaviors are listed once at module level, ending with the consumer
 inputs, and the engine's state and context types are derived from that
 list:

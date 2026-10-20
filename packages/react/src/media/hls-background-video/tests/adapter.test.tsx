@@ -12,8 +12,8 @@ const MANIFEST_FEATURE_UNSUPPORTED = 2039;
  */
 const instances: { engine: { state: { errors: { set(value: unknown): void } } } }[] = vi.hoisted(() => []);
 
-vi.mock('@videojs/spf/hls-background-video', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@videojs/spf/hls-background-video')>();
+vi.mock('@videojs/spf/adapters/hls-background-video', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@videojs/spf/adapters/hls-background-video')>();
 
   return {
     ...actual,

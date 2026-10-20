@@ -10,8 +10,8 @@ import '@app/styles.css';
 //   preload=auto|metadata|none  Initial preload mode
 import { SOURCE_IDS, SOURCES } from '@app/shared/sources';
 import { effect, snapshot } from '@videojs/spf';
+import { createEngine, type EngineState } from '@videojs/spf/engines/hls-video';
 import { getMediaPlaylistMetadata } from '@videojs/spf/hls';
-import { createEngine, type EngineState } from '@videojs/spf/hls/video';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const video = document.getElementById('video') as HTMLVideoElement;

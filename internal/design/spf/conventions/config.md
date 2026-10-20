@@ -28,7 +28,7 @@ The audit prompt during refactor: "If an engine wanted to swap this value, would
 Tunables come from one place: the engine config object passed to `createComposition({ config })`. The composition framework distributes the same config to every behavior; each variant reads its slice.
 
 ```ts
-const engine = createEngine({ // from '@videojs/spf/hls/video'
+const engine = createEngine({ // from '@videojs/spf/engines/hls-video'
   initialBandwidth: 2_000_000,
   forwardBuffer: { bufferDuration: 60 },        // nested sub-config
   quality: { safetyMargin: 0.9, upgradeMargin: 1.2 },

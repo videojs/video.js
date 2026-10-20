@@ -13,8 +13,8 @@
 //                                     the control for telling WebKit's own
 //                                     AirPlay behavior apart from DRM's.
 import { restrictDrmSystems, SOURCES } from '@app/shared/sources';
+import { createEngine } from '@videojs/spf/engines/hls-video';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
-import { createEngine } from '@videojs/spf/hls/video';
 
 const video = document.getElementById('video') as HTMLVideoElement;
 const statusPre = document.getElementById('status') as HTMLPreElement;

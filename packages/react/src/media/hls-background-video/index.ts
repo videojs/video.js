@@ -1,2 +1,5 @@
 export * from './adapter';
-export type { HlsBackgroundVideoAdapter, HlsBackgroundVideoAdapterProps } from '@videojs/spf/hls-background-video';
+export type {
+  HlsBackgroundVideoAdapter,
+  HlsBackgroundVideoAdapterProps,
+} from '@videojs/spf/adapters/hls-background-video';

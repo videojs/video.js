@@ -82,10 +82,10 @@ export {
   preferCodecFamilies,
 } from '../../primitives/selection-rules';
 // The engines themselves are not here: each has its own entry point —
-// `@videojs/spf/hls/video`, `@videojs/spf/hls/audio`, and
-// `@videojs/spf/hls/background-video` — exporting the same names
+// `@videojs/spf/engines/hls-video`, `@videojs/spf/engines/hls-audio`, and
+// `@videojs/spf/engines/hls-background-video` — exporting the same names
 // (`createEngine`, `EngineState`, `EngineContext`, `EngineConfig`), so a
 // consumer pulls in only the engine it drives. This entry holds what they
-// share. The Medias over the engines live behind `@videojs/spf/hls-video`,
-// `@videojs/spf/hls-audio`, and `@videojs/spf/hls-background-video`, so
+// share. The Medias over the engines live behind `@videojs/spf/adapters/hls-video`,
+// `@videojs/spf/adapters/hls-audio`, and `@videojs/spf/adapters/hls-background-video`, so
 // driving an engine directly doesn't pull a Media (and `@videojs/media`) in.

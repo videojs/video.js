@@ -16,8 +16,8 @@ import '@app/styles.css';
 // URL that is already playing.
 import { SOURCES } from '@app/shared/sources';
 import { effect, snapshot } from '@videojs/spf';
-import { HlsBackgroundVideoAdapterCore } from '@videojs/spf/hls-background-video';
-import type { EngineState } from '@videojs/spf/hls/background-video';
+import { HlsBackgroundVideoAdapterCore } from '@videojs/spf/adapters/hls-background-video';
+import type { EngineState } from '@videojs/spf/engines/hls-background-video';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const video = document.getElementById('bg-video') as HTMLVideoElement;

@@ -1,6 +1,6 @@
 # HLS engine composition
 
-The HLS video engine, `createEngine()` from `@videojs/spf/hls/video`, composes SPF behaviors into HLS playback over MediaSource. This guide describes ownership and stage relationships, not the exact behavior array or configuration interface; those live in source.
+The HLS video engine, `createEngine()` from `@videojs/spf/engines/hls-video`, composes SPF behaviors into HLS playback over MediaSource. This guide describes ownership and stage relationships, not the exact behavior array or configuration interface; those live in source.
 
 ## Inputs and adapter boundary
 

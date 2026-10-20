@@ -461,7 +461,7 @@ const finalConfig = {
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.
 
-**Worked example**: `resolvePresentation.parsePresentation` (required) + the `hls/video` engine's `EngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
+**Worked example**: `resolvePresentation.parsePresentation` (required) + the `hls-video` engine's `EngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
 
 ### Cleanup contract
 

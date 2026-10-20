@@ -40,40 +40,40 @@
       "development": "./dist/dev/hls.js",
       "default": "./dist/default/hls.js"
     },
-    "./hls/video": {
-      "types": "./dist/dev/hls/video.d.ts",
-      "development": "./dist/dev/hls/video.js",
-      "default": "./dist/default/hls/video.js"
+    "./engines/hls-video": {
+      "types": "./dist/dev/engines/hls-video.d.ts",
+      "development": "./dist/dev/engines/hls-video.js",
+      "default": "./dist/default/engines/hls-video.js"
     },
-    "./hls/audio": {
-      "types": "./dist/dev/hls/audio.d.ts",
-      "development": "./dist/dev/hls/audio.js",
-      "default": "./dist/default/hls/audio.js"
+    "./engines/hls-audio": {
+      "types": "./dist/dev/engines/hls-audio.d.ts",
+      "development": "./dist/dev/engines/hls-audio.js",
+      "default": "./dist/default/engines/hls-audio.js"
     },
-    "./hls/background-video": {
-      "types": "./dist/dev/hls/background-video.d.ts",
-      "development": "./dist/dev/hls/background-video.js",
-      "default": "./dist/default/hls/background-video.js"
+    "./engines/hls-background-video": {
+      "types": "./dist/dev/engines/hls-background-video.d.ts",
+      "development": "./dist/dev/engines/hls-background-video.js",
+      "default": "./dist/default/engines/hls-background-video.js"
     },
     "./media-tracks": {
       "types": "./dist/dev/media-tracks.d.ts",
       "development": "./dist/dev/media-tracks.js",
       "default": "./dist/default/media-tracks.js"
     },
-    "./hls-background-video": {
-      "types": "./dist/dev/hls-background-video.d.ts",
-      "development": "./dist/dev/hls-background-video.js",
-      "default": "./dist/default/hls-background-video.js"
+    "./adapters/hls-background-video": {
+      "types": "./dist/dev/adapters/hls-background-video.d.ts",
+      "development": "./dist/dev/adapters/hls-background-video.js",
+      "default": "./dist/default/adapters/hls-background-video.js"
     },
-    "./hls-audio": {
-      "types": "./dist/dev/hls-audio.d.ts",
-      "development": "./dist/dev/hls-audio.js",
-      "default": "./dist/default/hls-audio.js"
+    "./adapters/hls-audio": {
+      "types": "./dist/dev/adapters/hls-audio.d.ts",
+      "development": "./dist/dev/adapters/hls-audio.js",
+      "default": "./dist/default/adapters/hls-audio.js"
     },
-    "./hls-video": {
-      "types": "./dist/dev/hls-video.d.ts",
-      "development": "./dist/dev/hls-video.js",
-      "default": "./dist/default/hls-video.js"
+    "./adapters/hls-video": {
+      "types": "./dist/dev/adapters/hls-video.d.ts",
+      "development": "./dist/dev/adapters/hls-video.js",
+      "default": "./dist/default/adapters/hls-video.js"
     }
   },
   "publishConfig": {
