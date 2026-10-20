@@ -1,0 +1,67 @@
+---
+import ResponsivePlayer from '@/components/blog/ResponsivePlayer';
+import Figure from '@/components/typography/Figure.astro';
+import '../Range.css';
+// Also imported by the island; importing it here lets the dev server put it in <head> before the player hydrates.
+import '@videojs/react/video/skin.css';
+---
+
+<Figure>
+  <responsive-demo class="@container block space-y-4">
+    <div data-bed class="flex items-center justify-center overflow-hidden rounded-3xl bg-black/5 p-4 dark:bg-white/5" style="min-height: calc((100cqw - 32px) * 9 / 16 + 32px);">
+      <div data-preview style="width: var(--width, 100%); max-width: 100%; --media-accent-color: var(--color-orange);">
+        <ResponsivePlayer client:visible />
+      </div>
+    </div>
+    <label class="grid gap-1 text-p4">
+      <span class="flex items-center justify-between">
+        Preview width
+        {/* The range announces its own value, so the visual readout stays out of the accessibility tree. */}
+        <output data-width class="tabular-nums" aria-hidden="true">768px</output>
+      </span>
+      <input type="range" class="range-input" aria-label="Preview width" aria-valuetext="768 pixels" min="280" max="768" value="768" step="1" style="--fill: 100%;" />
+    </label>
+  </responsive-demo>
+  <figcaption>Drag the slider to resize the Default player. Try playing the video or opening its settings as you resize it. At narrower widths, the fullscreen, picture-in-picture, and casting buttons move to the top-right and the seek track gets more room.</figcaption>
+</Figure>
+
+<script>
+  class ResponsiveDemo extends HTMLElement {
+    resize?: ResizeObserver;
+
+    connectedCallback() {
+      const bed = this.querySelector<HTMLElement>('[data-bed]')!;
+      const preview = this.querySelector<HTMLElement>('[data-preview]')!;
+      const range = this.querySelector<HTMLInputElement>('input[aria-label="Preview width"]')!;
+      const output = this.querySelector<HTMLOutputElement>('[data-width]')!;
+      const update = () => {
+        preview.style.setProperty('--width', `${range.value}px`);
+        output.textContent = `${range.value}px`;
+        range.setAttribute('aria-valuetext', `${range.value} pixels`);
+        const fill = (Number(range.value) - Number(range.min)) / Math.max(1, Number(range.max) - Number(range.min));
+
+        range.style.setProperty('--fill', `${fill * 100}%`);
+      };
+
+      range.oninput = update;
+      this.resize = new ResizeObserver(([entry]) => {
+        const full = range.value === range.max;
+        const max = Math.floor(entry!.contentRect.width);
+
+        range.min = String(Math.min(280, max));
+        range.max = String(max);
+
+        if (full) range.value = range.max;
+
+        update();
+      });
+      this.resize.observe(bed);
+    }
+
+    disconnectedCallback() {
+      this.resize?.disconnect();
+    }
+  }
+
+  customElements.define('responsive-demo', ResponsiveDemo);
+</script>
