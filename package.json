@@ -82,7 +82,7 @@
     "opera >= 98"
   ],
   "engines": {
-    "node": ">=22.19.0",
+    "node": ">=22.22.0",
     "npm": ">=10.9.3"
   },
   "packageManager": "pnpm@12.6.0"

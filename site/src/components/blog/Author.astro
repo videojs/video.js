@@ -1,0 +1,18 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  author: CollectionEntry<'authors'>;
+  link?: boolean;
+}
+
+const { author, link = false } = Astro.props;
+const Tag = link ? 'a' : 'span';
+---
+
+<Tag href={link ? `/blog/authors/${author.id}` : undefined} class:list={["inline-flex items-center gap-2 align-middle", { "intent:underline": link }]}>
+  {author.data.avatar && (
+    <img src={author.data.avatar} alt="" width="24" height="24" class="size-6 shrink-0 rounded-full object-cover" />
+  )}
+  <span>{author.data.name}</span>
+</Tag>

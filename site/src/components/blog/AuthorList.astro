@@ -1,0 +1,27 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import Author from './Author.astro';
+
+interface Props {
+  authors: CollectionEntry<'authors'>[];
+  link?: boolean;
+  prefix?: string;
+  class?: string;
+}
+
+const { authors, link = false, prefix, class: className } = Astro.props;
+const byId = new Map(authors.map((author) => [author.id, author]));
+// Keep the list's words so assistive technology reads "A, B, and C" rather than running the names together.
+const parts = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).formatToParts(
+  authors.map((author) => author.id)
+);
+---
+
+<div class={className}>
+  {prefix && <span>{prefix} </span>}{
+    parts.map((part) =>
+      part.type === 'element' ? <Author author={byId.get(part.value)!} link={link} /> : <span>{part.value}</span>
+    )
+  }
+</div>

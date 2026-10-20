@@ -2,6 +2,7 @@
 
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '@/components/FormattedDate.astro';
+import AuthorList from './AuthorList.astro';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -27,12 +28,7 @@ const { post, authors } = Astro.props;
       </h2>
       {
         authors.length > 0 && (
-          <div class="mb-4 font-semibold">
-            {new Intl.ListFormat("en", {
-              style: "long",
-              type: "conjunction",
-            }).format(authors.map((author) => author.data.name))}
-          </div>
+          <AuthorList authors={authors} class="mb-4 leading-8 font-semibold" />
         )
       }
       <p class="">
