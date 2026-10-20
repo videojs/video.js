@@ -1,24 +1,29 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
+import * as hlsBackgroundVideo from '@videojs/spf/engines/hls-background-video';
+import { mpegTsTransmuxFeature } from '@videojs/spf/features/mpeg-ts-transmux';
+import { describe, expect, it } from 'vite-plus/test';
 
-// Records what the Mux flavor hands the base, in place of building the engine.
-const constructed: unknown[] = [];
+import { createEngine, features, MuxBackgroundVideoAdapter } from '../background-video';
 
-vi.mock('@videojs/spf/adapters/hls-background-video', () => ({
-  HlsBackgroundVideoAdapter: class {
-    constructor(options?: unknown) {
-      constructed.push(options);
-    }
-  },
-}));
+describe('createEngine', () => {
+  it("composes the HLS background-video engine's features and then the MPEG-TS transmux", () => {
+    expect(features.slice(0, hlsBackgroundVideo.features.length)).toEqual(hlsBackgroundVideo.features);
+    expect(features.at(-1)).toBe(mpegTsTransmuxFeature);
+  });
+
+  it("exposes the HLS background-video engine's state and context, since the transmux adds none", () => {
+    const mux = createEngine();
+    const hls = hlsBackgroundVideo.createEngine();
+
+    expect(Object.keys(mux.state).sort()).toEqual(Object.keys(hls.state).sort());
+    expect(Object.keys(mux.context).sort()).toEqual(Object.keys(hls.context).sort());
+
+    mux.destroy();
+    hls.destroy();
+  });
+});
 
 describe('MuxBackgroundVideoAdapter', () => {
-  it('lays the transmux defaults under the consumer config and keeps the consumer keys', async () => {
-    const { MuxBackgroundVideoAdapter } = await import('../background-video');
-    const { defaultConfig } = await import('@videojs/spf/features/mpeg-ts-transmux');
-    const canPlayTrack = () => true;
-
-    new MuxBackgroundVideoAdapter({ config: { canPlayTrack } });
-
-    expect(constructed[0]).toEqual({ config: { ...defaultConfig, canPlayTrack } });
+  it('builds its engine with the Mux background-video engine', () => {
+    expect(MuxBackgroundVideoAdapter.createEngine).toBe(createEngine);
   });
 });
