@@ -26,6 +26,7 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
       data-preset="video"
       {...props}
     >
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
       <ErrorDialog />

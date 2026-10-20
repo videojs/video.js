@@ -7,6 +7,7 @@ import {
   isHTMLMediaElement,
   isHTMLVideoElement,
   isShadowRoot,
+  isUndefinedCustomElement,
 } from '../predicates';
 
 describe('DOM predicates', () => {
@@ -122,6 +123,26 @@ describe('DOM predicates', () => {
       expect(isHTMLMediaElement(undefined)).toBe(false);
       expect(isHTMLMediaElement('video')).toBe(false);
       expect(isHTMLMediaElement({})).toBe(false);
+    });
+  });
+
+  describe('isUndefinedCustomElement', () => {
+    it('returns true until the custom element class is defined', () => {
+      const element = document.body.appendChild(document.createElement('test-undefined-predicate'));
+
+      expect(isUndefinedCustomElement(element)).toBe(true);
+
+      customElements.define('test-undefined-predicate', class extends HTMLElement {});
+
+      expect(isUndefinedCustomElement(element)).toBe(false);
+
+      element.remove();
+    });
+
+    it('returns false for built-in elements and non-elements', () => {
+      expect(isUndefinedCustomElement(document.createElement('video'))).toBe(false);
+      expect(isUndefinedCustomElement(null)).toBe(false);
+      expect(isUndefinedCustomElement({})).toBe(false);
     });
   });
 });
