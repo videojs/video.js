@@ -139,6 +139,26 @@ describe('MediaButtonElement', () => {
     expect(button.getResolvedLabel()).toBe('Play');
   });
 
+  it('hides itself while its feature is missing and shows once it is available', async () => {
+    ensureDefined(PlayButtonElement);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const orphan = createElement(TestContainerProviderElement);
+    const player = document.createElement(TestPlayerProviderElement.tagName) as TestPlayerProviderElement;
+    const button = document.createElement(PlayButtonElement.tagName) as PlayButtonElement;
+
+    document.body.append(orphan, player);
+    orphan.append(button);
+    await button.updateComplete;
+
+    expect(button.hidden).toBe(true);
+
+    player.append(button);
+    await vi.waitFor(() => {
+      expect(button.hidden).toBe(false);
+    });
+  });
+
   it('emits shortcut changes before media is attached', async () => {
     const provider = createElement(TestContainerProviderElement);
     const button = createElement(PlayButtonElement);
