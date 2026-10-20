@@ -34,6 +34,11 @@
       "types": "./dist/dev/spf.d.ts",
       "development": "./dist/dev/spf.js",
       "default": "./dist/default/spf.js"
+    },
+    "./spf/background-video": {
+      "types": "./dist/dev/spf/background-video.d.ts",
+      "development": "./dist/dev/spf/background-video.js",
+      "default": "./dist/default/spf/background-video.js"
     }
   },
   "publishConfig": {

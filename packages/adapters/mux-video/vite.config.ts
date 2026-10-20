@@ -11,7 +11,11 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     alwaysBundle: ['@videojs/mux'],
     dts: { alwaysBundle: ['@videojs/mux'] },
   },
-  entry: { index: './src/index.ts', spf: './src/spf/index.ts' },
+  entry: {
+    index: './src/index.ts',
+    spf: './src/spf/index.ts',
+    'spf/background-video': './src/spf/background-video.ts',
+  },
 });
 
 export default defineConfig({
