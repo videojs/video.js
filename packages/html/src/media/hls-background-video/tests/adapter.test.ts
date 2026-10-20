@@ -1,3 +1,4 @@
+import { MuxBackgroundVideoAdapter } from '@videojs/mux-video/spf/background-video';
 import type { HlsBackgroundVideoAdapter } from '@videojs/spf/adapters/hls-background-video';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -149,8 +150,10 @@ describe('HlsBackgroundVideo', () => {
     });
   });
 
-  it('is what <mux-background-video> resolves to', () => {
-    // An alias, so there is one implementation to test rather than two.
-    expect(MuxBackgroundVideo).toBe(HlsBackgroundVideo);
+  it('is what <mux-background-video> extends, with the Mux Media in place of the HLS one', () => {
+    // A subclass over the Mux Media, so there is one element implementation to test rather than two.
+    expect(Object.getPrototypeOf(MuxBackgroundVideo)).toBe(HlsBackgroundVideo);
+    expect(MuxBackgroundVideo.Adapter).toBe(MuxBackgroundVideoAdapter);
+    expect(MuxBackgroundVideo.Adapter).not.toBe(HlsBackgroundVideo.Adapter);
   });
 });

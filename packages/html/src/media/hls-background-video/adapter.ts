@@ -50,8 +50,8 @@ const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as n
  *
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  *
- *   `<mux-background-video>` is this element under the name the package it replaces used. Same class, so the tag is a
- *   naming choice and nothing more.
+ *   `<mux-background-video>` is this element over the Mux Media (`../mux-background-video`), which adds the MPEG-TS
+ *   transmux and nothing else to the surface.
  */
 // Deliberately not `CustomMediaElement`, matching `<background-video>`: a
 // background video needs one property, not the full WHATWG media API.
@@ -63,7 +63,10 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
     return ['src'];
   }
 
-  #media = new HlsBackgroundVideoAdapter();
+  /** The Media the element instantiates; a flavor substitutes its own, as `<mux-background-video>` does. */
+  static readonly Adapter: new () => HlsBackgroundVideoAdapter = HlsBackgroundVideoAdapter;
+
+  #media = new (this.constructor as typeof HlsBackgroundVideo).Adapter();
 
   constructor() {
     super();
