@@ -83,6 +83,7 @@ describe('features', () => {
       'currentTime',
       'errors',
       'loadActivated',
+      'mediaContainerData',
       'preload',
       'presentation',
       'screenResolution',
