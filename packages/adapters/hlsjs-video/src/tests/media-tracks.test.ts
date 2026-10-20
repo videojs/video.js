@@ -217,7 +217,7 @@ describe('HlsJsMediaTracksMixin', () => {
     expect(engine.audioTrack).toBe(1);
   });
 
-  it('prunes renditions when LEVELS_UPDATED carries new level object references', () => {
+  it('prunes and renumbers when LEVELS_UPDATED carries new level object references', () => {
     const engine = createEngine();
     const host = new HlsJsMediaTracks(engine);
 
@@ -228,7 +228,7 @@ describe('HlsJsMediaTracksMixin', () => {
 
     (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: [{ ...levels[0] }, { ...levels[2] }] });
 
-    expect([...host.videoRenditions].map((rendition) => rendition.id)).toEqual(['0', '2']);
+    expect([...host.videoRenditions].map((rendition) => rendition.id)).toEqual(['0', '1']);
   });
 
   it('switches to the newly enabled audio track when multiple are enabled', async () => {
@@ -320,5 +320,119 @@ describe('HlsJsMediaTracksMixin', () => {
 
     expect(host.videoTracks.length).toBe(0);
     expect(host.audioTracks.length).toBe(0);
+  });
+
+  const LEVELS = [
+    { url: ['https://cdn/a0.m3u8'], width: 416, height: 234, videoCodec: 'avc1.64001f', bitrate: 300000 },
+    { url: ['https://cdn/h0.m3u8'], width: 416, height: 234, videoCodec: 'hvc1.2.4', bitrate: 200000 },
+    { url: ['https://cdn/a1.m3u8'], width: 768, height: 432, videoCodec: 'avc1.64001f', bitrate: 900000 },
+    { url: ['https://cdn/h1.m3u8'], width: 768, height: 432, videoCodec: 'hvc1.2.4', bitrate: 700000 },
+  ];
+  const reindexed = [LEVELS[0], LEVELS[2], LEVELS[3]];
+
+  it('renumbers surviving rendition ids to the reindexed levels', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+
+    expect([...host.videoRenditions].map((r: any) => r.id)).toEqual(['0', '1', '2']);
+  });
+
+  it('marks the rendition hls.js reports active after the reindex', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+    // hls.js now plays its level 1, the 432p avc1 playlist.
+    (engine as any).emit(Hls.Events.LEVEL_SWITCHED, { level: 1 });
+
+    const active = [...host.videoRenditions].find((r: any) => r.active);
+
+    expect(active?.height).toBe(432);
+    expect(active?.codec).toContain('avc1');
+  });
+
+  it('keeps a rendition active when hls.js plays the level whose old id was removed', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+    // hls.js level 2 is now the 432p hvc1 playlist; the stale numbering had no survivor with id "1".
+    (engine as any).emit(Hls.Events.LEVEL_SWITCHED, { level: 2 });
+
+    const active = [...host.videoRenditions].find((r: any) => r.active);
+
+    expect(active?.height).toBe(432);
+    expect(active?.codec).toContain('hvc1');
+  });
+
+  it('keeps a manual selection pointing at the same playlist across a reindex', async () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+
+    // The 432p hvc1 playlist, level 3 of four before hls.js drops one.
+    host.videoRenditions.selectedIndex = 3;
+    await flush();
+    expect(engine.manualLevel).toBe(3);
+
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+    await flush();
+
+    // Same playlist, one index lower now that a level was removed, and the engine told about it.
+    expect(engine.manualLevel).toBe(2);
+    expect([...host.videoRenditions][2]?.codec).toContain('hvc1');
+  });
+
+  it('keeps the active rendition when LEVEL_SWITCHED lands before the reindex', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    // Production order: hls.js reports the switch, then announces the shortened set.
+    (engine as any).emit(Hls.Events.LEVEL_SWITCHED, { level: 2 });
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+
+    const active = [...host.videoRenditions].find((rendition: any) => rendition.active);
+
+    // LEVELS[2] is the 432p avc1 playlist; it keeps the flag through the renumber by object identity.
+    expect(active?.height).toBe(432);
+    expect(active?.codec).toContain('avc1');
+    expect(active?.id).toBe('1');
+  });
+
+  it('renumbers again on a second LEVELS_UPDATED', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: reindexed });
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: [LEVELS[0], LEVELS[3]] });
+
+    expect([...host.videoRenditions].map((rendition: any) => rendition.id)).toEqual(['0', '1']);
+    expect([...host.videoRenditions][1]?.codec).toContain('hvc1');
+  });
+
+  it('rebuilds the list when hls.js replaces the levels outright', () => {
+    const engine = createEngine();
+    const host = new HlsJsMediaTracks(engine);
+
+    manifestParsed(engine, LEVELS);
+
+    // A content-steering pathway switch announces a wholly different set; every key misses.
+    const pathway = [
+      { url: ['https://cdn-b/a0.m3u8'], width: 640, height: 360, videoCodec: 'avc1.64001f', bitrate: 500000 },
+      { url: ['https://cdn-b/a1.m3u8'], width: 1280, height: 720, videoCodec: 'avc1.64001f', bitrate: 2000000 },
+    ];
+
+    (engine as any).emit(Hls.Events.LEVELS_UPDATED, { levels: pathway });
+
+    expect([...host.videoRenditions].map((rendition: any) => rendition.id)).toEqual(['0', '1']);
+    expect([...host.videoRenditions].map((rendition: any) => rendition.height)).toEqual([360, 720]);
   });
 });
