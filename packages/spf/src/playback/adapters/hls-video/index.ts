@@ -7,6 +7,7 @@
  * it.
  */
 export type {
+  CreateEngine,
   HlsVideoAdapterAPI,
   HlsVideoAdapterOptions,
   HlsVideoAdapterProps,
