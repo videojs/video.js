@@ -31,8 +31,8 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 
 ### Composed by
 
-- [@videojs/spf/hls/video](../engines/video.md)
-- [@videojs/spf/hls/audio](../engines/audio.md)
+- [@videojs/spf/engines/hls-video](../engines/hls-video.md)
+- [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
 ## Other exports
 

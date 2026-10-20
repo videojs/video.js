@@ -21,9 +21,9 @@ Collects the errors the other features report into `state.errors`, per source. W
 
 ### Composed by
 
-- [@videojs/spf/hls/video](../engines/video.md)
-- [@videojs/spf/hls/audio](../engines/audio.md)
-- [@videojs/spf/hls/background-video](../engines/background-video.md)
+- [@videojs/spf/engines/hls-video](../engines/hls-video.md)
+- [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
+- [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
 ## Other exports
 

@@ -32,7 +32,7 @@ export interface ReferenceProgram {
   entries: EntryPoint[];
 }
 
-const ENGINE_PREFIX = 'hls/';
+const ENGINE_PREFIX = 'engines/';
 const FEATURE_PREFIX = 'hls/features/';
 const BEHAVIOR_PREFIX = 'behaviors/';
 const DOM_BEHAVIOR_PREFIX = 'behaviors/dom/';
@@ -57,7 +57,7 @@ function classifyEntry(key: string): Pick<EntryPoint, 'layer' | 'page' | 'name'>
     return { layer: 'behavior', page: `behaviors/${name}.md`, name };
   }
 
-  if (key.startsWith(ENGINE_PREFIX) && !key.slice(ENGINE_PREFIX.length).includes('/')) {
+  if (key.startsWith(ENGINE_PREFIX)) {
     const name = key.slice(ENGINE_PREFIX.length);
 
     return { layer: 'engine', page: `engines/${name}.md`, name };

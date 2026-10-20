@@ -65,7 +65,7 @@ Requires, from this or other features:
 
 ### Composed by
 
-- [@videojs/spf/hls/background-video](../engines/background-video.md)
+- [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
 ## Other exports
 

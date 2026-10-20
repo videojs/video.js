@@ -34,7 +34,7 @@ resolution cap reads the size and does nothing without it.
 
 ### Composed by
 
-- [@videojs/spf/hls/video](../engines/video.md)
+- [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
 ## Other exports
 
