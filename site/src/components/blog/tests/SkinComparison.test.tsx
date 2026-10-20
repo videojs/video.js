@@ -50,7 +50,7 @@ describe('SkinComparison', () => {
     const middle = screen.getByRole('slider', { name: 'Neutral and Compat divider' });
     const last = screen.getByRole('slider', { name: 'Compat and Scaffold divider' });
 
-    fireEvent.click(screen.getByText('Adjust dividers'));
+    fireEvent.click(screen.getByText('Comparison controls'));
     const position = screen.getByRole('slider', { name: 'Default / Neutral' });
 
     fireEvent.change(position, { target: { value: '60' } });
