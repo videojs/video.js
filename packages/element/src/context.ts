@@ -24,6 +24,8 @@ const rootedDocuments = new WeakSet<Document>();
  * Before its first request it attaches one shared root to the host's document, which buffers subscribing requests that
  * no provider answered and replays them when a matching provider connects. Custom elements can upgrade in any order, so
  * a consumer cannot rely on its provider existing when it connects.
+ *
+ * @internal
  */
 export class ContextConsumer<
   C extends Context<unknown, unknown>,
