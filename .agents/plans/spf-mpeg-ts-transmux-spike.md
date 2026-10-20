@@ -39,6 +39,39 @@ URI-less default (stage 3), seen from the audio engine: select a video variant a
 and transmux its AAC only.
 Goal: feasibility + size of client-side TS transmuxing scoped to what Mux Video packages.
 
+## Carried (URI-less) default audio — landed 2026-10-20
+
+Weighed three ways to honor the URI-less `DEFAULT=YES` rendition of multi-audio TS assets: (1) tear down and
+rebuild MSE when the selection crosses the muxed/demuxed boundary (the MSE track count of a SourceBuffer is
+fixed by its first init; `changeType` doesn't relax it), (2) always split into two SourceBuffers, hls.js's
+model, (3) remux the selected alternate's AAC into the video SourceBuffer. Chose (2) in its cheapest form:
+the layout follows the manifest, never the selection. `media/hls/carried-audio.ts` resolves the rendition to
+its lowest-bandwidth carrier variant's playlist (applied by the features' `parsePresentation` override — the
+parser itself is unchanged), which also fixes auto-selection (the active-CDN scope keys on URL origin and had
+been excluding the empty-url track, so these assets started on a dubbed alternate). At fetch time the audio
+pipeline redirects a carried segment to the *selected video track's* segment at the same `startTime` (the
+grids and the 10s origin align across Mux renditions) and takes the bytes from `primitives/segment-share.ts`,
+an in-flight share the video pipeline publishes into (waits ≤1s for a publish, remembers published keys so a
+late taker goes to the HTTP cache). Only the video fetch samples bandwidth; Mux segments send no
+`Timing-Allow-Origin`, so Resource Timing can't detect a cache hit, hence the share rather than the cache.
+Verified: 6 segment requests / 0 duplicates at startup; default→es→commentary→default switches clean with
+the audio SourceBuffer's range within 20 ms of the video's. Sizes: mux-video/spf +0.57 kB, mux-audio/spf
++0.43 kB brotli. Residual: the share is a module-level singleton keyed by URL; the audio-only engine still
+can't play a *single-audio* video asset's audio (no audio rendition exists to carry).
+
+## Mux background video — landed 2026-10-20
+
+`<mux-background-video>` / `MuxBackgroundVideo` were re-exports of the HLS-named element/component, so there
+was no adapter to lay the transmux on. Now `MuxBackgroundVideoAdapter` (`@videojs/mux-video/spf/background-video`,
+own entry so `/spf` never bundles the background engine) lays it; html `MuxBackgroundVideo extends
+HlsBackgroundVideo` via a new `static Adapter` seam; react gets its own component over the Mux adapter.
+Two prerequisites surfaced: the background engine declared no `mediaContainerData` (the transmux/relocation
+steps crashed on `peek(undefined)` → they now no-op without the slot), and it composed no
+`shiftTimestampsFeature`, so ANY non-zero-PTS source stranded at 0 — verified with Mux's instant clip
+(`hls-instant-clip`: buffered [60, 92], readyState 1, never played). Composed it (+1.5 kB brotli on the
+hls-background-video entries; CDN `mux-background-video` +6.0 kB total). Sandbox background pages take URL
+presets only (`hls-1`, `hls-2`); `mux-source-ts` is a playback-ID preset and yields an empty `src` there.
+
 ## Result
 
 Mux TS renditions play end to end in Chromium through the existing MSE pipeline, with no changes
@@ -112,13 +145,8 @@ SPS/PPS, no scrambling, no ID3/CEA-608, no MP3/AC-3/HEVC).
    flavor) so fMP4-only consumers pay nothing. Decide SPS parse vs manifest `RESOLUTION` (−0.55 KB).
 2. **Fixtures + unit tests**: a truncated low-bitrate Mux TS segment (~100 KB) or synthetic TS built
    in-test; today's coverage is the network-backed Chromium test plus ffmpeg validation of Node output.
-3. **URI-less default audio** (confirmed gap, see smoke table): selecting the muxed-default rendition
-   must mean "carry the muxed audio in the video SourceBuffer and create no audio SourceBuffer"
-   (hls.js semantics). Touches shared code: `setupAudioBufferActors` gating (skip a URI-less
-   selection), the transmux options (carry audio when the *selected audio* track is URI-less, not
-   only when the video track declares `mp4a`), and the video SourceBuffer MIME (add the audio codec).
-   Also the default pick: auto-selection currently skips the URI-less `DEFAULT=YES` track, so
-   multi-audio TS assets start on a dubbed alternate.
+3. **URI-less default audio** — DONE (see "Carried default audio" above); the earlier plan of carrying it
+   in the video SourceBuffer was dropped because MSE fixes a SourceBuffer's track count at its first init.
 4. **Live TS**: segment-spanning PES (a PES cut at a segment boundary), PTS rollover (33-bit wrap
    at ~26.5 h), discontinuities. VOD Mux segments are self-contained so none of this is exercised.
 5. **Progressive**: TS is packet-granular, so the step could transmux per 128 KB chunk instead of
