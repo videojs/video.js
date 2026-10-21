@@ -34,14 +34,19 @@ next when a CDN fails, returning to it once its cooldown lapses. Single-CDN sour
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/multi-cdn.ts](../../../src/playback/features/multi-cdn.ts) |

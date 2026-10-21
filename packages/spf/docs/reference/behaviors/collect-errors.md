@@ -41,11 +41,16 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | `errors` | writes | yes | `SvtaError[] \| undefined` | `CollectErrorsState` | Conditions reported during playback, in the order encountered — appended by whichever behavior detects one (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `CollectErrorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 
-## Other exports
+## Parts
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
+| `emitError` | function | Append `error` to the engine's error sequence. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
+| `reportAbsentTrackType` | function | A "constraint" that reports a type the source carries **no** renditions of, for a composition that can't play without it. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
+
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `CollectErrorsState` | interface | State of [collectErrors](collect-errors.md#collecterrors). | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
-| `emitError` | function | Append `error` to the engine's error sequence. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
 | `ErrorEmitterState` | interface | State an error reporter writes into. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |
-| `reportAbsentTrackType` | function | A "constraint" that reports a type the source carries **no** renditions of, for a composition that can't play without it. | [src/playback/behaviors/collect-errors.ts](../../../src/playback/behaviors/collect-errors.ts) |

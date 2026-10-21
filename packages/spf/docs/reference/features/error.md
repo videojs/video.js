@@ -25,14 +25,19 @@ Collects the errors the other features report into `state.errors`, per source. W
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |

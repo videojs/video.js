@@ -33,14 +33,19 @@ no duration is set.
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveDuration: getResolvedSelectedTrackDuration }`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
 | `Context` | type | Every context key the behaviors declare. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveDuration: getResolvedSelectedTrackDuration }`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |

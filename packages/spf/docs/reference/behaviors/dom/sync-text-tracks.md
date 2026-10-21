@@ -64,7 +64,7 @@ The setup declares `config` as required.
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `textTracksActor` | reads | yes | `TextTracksActor<VTTCue> \| undefined` | inline | The `TextTracksActor` bound to `mediaElement.textTracks`. `setupTextTrackActors` — its sole writer — creates it together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the slots on element change or destroy. (doc of [setupTextTrackActors](setup-text-track-actors.md#setuptexttrackactors)) |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

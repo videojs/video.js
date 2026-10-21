@@ -54,9 +54,42 @@ export function firstParagraph(doc: DocBlock): string {
 /** The first sentence of a doc block, for inventory tables. */
 export function firstSentence(doc: DocBlock): string {
   const paragraph = firstParagraph(doc);
+  const bold = paragraph.match(/^\*\*[^*]+\*\*/);
+  if (bold) return bold[0];
+
   const match = paragraph.match(/^.*?[.!?](?=\s+[A-Z`(]|$)/);
 
   return match ? match[0] : paragraph;
+}
+
+/**
+ * A module's own description: a JSDoc block at the top of its file, before the imports, set off from the first
+ * statement by a blank line (or carrying `@module`), the way TypeDoc and API Extractor read one. `undefined` when the
+ * file opens with code, or with the JSDoc of its first declaration.
+ */
+export function moduleDoc(reference: ReferenceProgram, file: string): DocBlock | undefined {
+  const sourceFile = reference.program.getSourceFile(file);
+  if (!sourceFile) throw new Error(`Not in the program: ${file}`);
+
+  const text = sourceFile.getFullText();
+  const range = ts.getLeadingCommentRanges(text, 0)?.find((candidate) => text.startsWith('/**', candidate.pos));
+  if (!range) return undefined;
+
+  const comment = text.slice(range.pos, range.end);
+  const firstStatement = sourceFile.statements[0];
+  const gap = text.slice(range.end, firstStatement ? firstStatement.getStart(sourceFile) : text.length);
+  if (!/\n[ \t]*\n/.test(gap) && !comment.includes('@module')) return undefined;
+
+  const body = comment
+    .replace(/^\/\*\*\s*/, '')
+    .replace(/\s*\*\/$/, '')
+    .split('\n')
+    .map((line) => line.replace(/^\s*\* ?/, ''))
+    .filter((line) => !/^@module\b/.test(line.trim()))
+    .join('\n')
+    .trim();
+
+  return { text: inlineLinks(body), tags: [] };
 }
 
 // ── Printing ─────────────────────────────────────────────────────────────────

@@ -51,14 +51,19 @@ Requires:
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveLiveLatency, reschedule: delayedReschedule(mediaPlaylistReloadDelay), gateFirstParse: gateFirstParseOnAnchor }`. | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveLiveLatency, reschedule: delayedReschedule(mediaPlaylistReloadDelay), gateFirstParse: gateFirstParseOnAnchor }`. | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/live.ts](../../../src/playback/features/live.ts) |

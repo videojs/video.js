@@ -32,14 +32,19 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
 | `Config` | type | Every config key the behaviors read. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |

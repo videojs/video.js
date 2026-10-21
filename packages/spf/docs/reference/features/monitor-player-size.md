@@ -36,14 +36,19 @@ resolution cap reads the size and does nothing without it.
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |

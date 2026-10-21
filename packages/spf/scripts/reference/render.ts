@@ -26,8 +26,8 @@ import {
   docOf,
   exportKind,
   exportedLiteral,
-  firstParagraph,
   firstSentence,
+  moduleDoc,
   moduleExports,
   resolveAlias,
   declaredTypeOf,
@@ -307,8 +307,21 @@ function otherExports(
 
   rows.sort((a, b) => a[0]!.localeCompare(b[0]!));
 
-  return section(['## Other exports', table(['Name', 'Kind', 'Description', 'Source'], rows), long.render()]);
+  const headers = ['Name', 'Kind', 'Description', 'Source'];
+  const parts = rows.filter((row) => !TYPE_KINDS.has(row[1]!));
+  const types = rows.filter((row) => TYPE_KINDS.has(row[1]!));
+
+  return section([
+    parts.length ? '## Parts' : undefined,
+    parts.length ? table(headers, parts) : undefined,
+    types.length ? '## Types' : undefined,
+    types.length ? table(headers, types) : undefined,
+    long.render(),
+  ]);
 }
+
+/** Export kinds listed under "Types"; every other kind is a value and lists under "Parts". */
+const TYPE_KINDS = new Set(['type', 'interface', 'enum']);
 
 /**
  * Which behaviors a named type serves as the config, state, or context type of, as "Config of [a], [b]" sentences;
@@ -358,10 +371,13 @@ function renderBehaviorPage(reference: ReferenceProgram, model: Model, entry: En
   const page = entry.page!;
   const behaviors = model.behaviors.filter((info) => info.entry === entry).sort((a, b) => a.name.localeCompare(b.name));
 
+  const description = moduleDoc(reference, entry.file);
+
   return section([
     GENERATED_NOTICE,
     `# ${code(entry.specifier)}`,
     `Source: ${sourceLink(reference, page, entry.file)}`,
+    description ? docBody(description) : undefined,
     ...behaviors.map((info) => behaviorSection(reference, model, page, info)),
     otherExports(reference, model, page, entry, new Set(behaviors.map((info) => info.name))),
   ]);
@@ -821,29 +837,53 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     return module.exports.map((name) => [
       code(name),
       link(page, module.page, module.name, anchor(name)),
-      firstParagraph(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
+      firstSentence(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
     ]);
   });
   const engineRows = model.engines.map((engine) => [
     code(engine.entry.specifier),
     link(page, engine.entry.page!, engine.name),
-    firstParagraph(engine.doc) || NO_DESCRIPTION,
+    firstSentence(engine.doc) || NO_DESCRIPTION,
   ]);
   const featureRows = model.features.map((feature) => [
     code(feature.name),
     link(page, feature.entry.page!, feature.entry.name),
-    firstParagraph(feature.doc) || NO_DESCRIPTION,
+    firstSentence(feature.doc) || NO_DESCRIPTION,
   ]);
+  // Behavior pages in the order the first engine composes them (its page lists the same order), then the pages no
+  // shipped engine composes, alphabetically. A page's description is its module description, else its behavior's.
+  const pipeline = model.engines[0]?.behaviors ?? [];
+  const pagesInOrder = (layer: 'behavior' | 'behavior-dom') => {
+    const pages = new Map<string, { entry: EntryPoint; behaviors: BehaviorInfo[] }>();
+    const register = (info: BehaviorInfo) => {
+      if (info.entry?.layer !== layer) return;
+
+      const group = pages.get(info.entry.page!) ?? { entry: info.entry, behaviors: [] };
+
+      if (!group.behaviors.includes(info)) group.behaviors.push(info);
+
+      pages.set(info.entry.page!, group);
+    };
+
+    for (const info of pipeline) register(info);
+
+    for (const info of [...model.behaviors].sort((a, b) => a.name.localeCompare(b.name))) register(info);
+
+    return [...pages.values()];
+  };
   const behaviorRows = (layer: 'behavior' | 'behavior-dom') =>
-    model.behaviors
-      .filter((info) => info.entry?.layer === layer)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((info) => [
-        code(info.name),
-        link(page, info.entry!.page!, info.entry!.key, anchor(info.name)),
-        firstParagraph(info.doc) || NO_DESCRIPTION,
-      ]);
+    pagesInOrder(layer).map(({ entry, behaviors }) => {
+      const description = moduleDoc(reference, entry.file) ?? behaviors[0]!.doc;
+
+      return [
+        code(entry.specifier),
+        link(page, entry.page!, entry.key),
+        firstSentence(description) || NO_DESCRIPTION,
+        behaviors.map((info) => link(page, entry.page!, info.name, anchor(info.name))).join(', '),
+      ];
+    });
   const headers = ['Symbol', 'Page', 'Description'];
+  const behaviorHeaders = ['Entry point', 'Page', 'Description', 'Behaviors'];
   const counts = {
     core: core.reduce((total, module) => total + module.exports.length, 0),
     engines: model.engines.length,
@@ -863,14 +903,16 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     '## Features',
     table(headers, featureRows),
     '## Behaviors',
-    table(headers, behaviorRows('behavior')),
+    'One row per entry point, in the order the first engine composes them; a module that exports several behaviors lists them all.',
+    table(behaviorHeaders, behaviorRows('behavior')),
     '## Behaviors (DOM)',
-    table(headers, behaviorRows('behavior-dom')),
+    table(behaviorHeaders, behaviorRows('behavior-dom')),
     '## Core',
     table(headers, coreRows),
     details('How this reference is generated', [
       `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/engines/*\`), their features (\`${reference.packageName}/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
+      "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Parts (values) and Types.",
       'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
       'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
     ]),

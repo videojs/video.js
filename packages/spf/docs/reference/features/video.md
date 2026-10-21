@@ -70,14 +70,19 @@ Requires, from this or other features:
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ canPlayTrack, reportUnsupportedTrackConditions }`. | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{ bandwidthState: { fastEstimate: 0, fastTotalWeight: 0, slowEstimate: 0, slowTotalWeight: 0, bytesSampled: 0 } }`. | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ canPlayTrack, reportUnsupportedTrackConditions }`. | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{ bandwidthState: { fastEstimate: 0, fastTotalWeight: 0, slowEstimate: 0, slowTotalWeight: 0, bytesSampled: 0 } }`. | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/video.ts](../../../src/playback/features/video.ts) |

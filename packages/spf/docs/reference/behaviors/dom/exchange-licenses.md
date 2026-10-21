@@ -65,7 +65,7 @@ The setup declares `config` as required.
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `ExchangeLicensesContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | reads | yes | `MediaKeys \| undefined` | `ExchangeLicensesContext` | The attached MediaKeys; owned by `setupMediaKeys`. |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
