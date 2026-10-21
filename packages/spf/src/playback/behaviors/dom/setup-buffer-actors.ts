@@ -100,6 +100,12 @@ export interface BufferActorsContext {
   audioSegmentLoaderActor?: SegmentLoaderActor;
 }
 
+/**
+ * The MIME codec string a SourceBuffer is created with, from the track it will carry. The default is the track's own
+ * container and codecs; a transmuxing composition maps the container its bytes arrive in to the one they leave in.
+ */
+export type SourceBufferMimeCodec = (track: PartiallyResolvedTrack) => string;
+
 type BufferActorsFsmState = 'preconditions-unmet' | 'buffer-ready';
 
 type SelectedTrackKey = 'selectedVideoTrackId' | 'selectedAudioTrackId';
@@ -143,7 +149,7 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
     loaderKey: L;
     fetch: FetchBytes;
     /** The MIME codec string the SourceBuffer is created with; defaults to the track's own container + codecs. */
-    sourceBufferMimeCodec?: (track: PartiallyResolvedTrack) => string;
+    sourceBufferMimeCodec?: SourceBufferMimeCodec;
   } & SegmentLoaderActorConfig;
 }): Reactor<BufferActorsFsmState | 'destroying' | 'destroyed'> {
   const {
@@ -261,7 +267,7 @@ export const setupVideoBufferActors = defineBehavior({
          */
         videoMessagePipelines?: MessagePipelines;
         /** The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). */
-        sourceBufferMimeCodec?: (track: PartiallyResolvedTrack) => string;
+        sourceBufferMimeCodec?: SourceBufferMimeCodec;
       };
   }) => {
     // Bandwidth-sampling fetch. The factory accumulates EWMA state
@@ -328,7 +334,7 @@ export const setupAudioBufferActors = defineBehavior({
          */
         audioMessagePipelines?: MessagePipelines;
         /** The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). */
-        sourceBufferMimeCodec?: (track: PartiallyResolvedTrack) => string;
+        sourceBufferMimeCodec?: SourceBufferMimeCodec;
       };
   }) => {
     // Key order mirrors setupVideoBufferActors.
