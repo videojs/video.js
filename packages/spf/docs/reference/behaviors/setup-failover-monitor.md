@@ -6,11 +6,12 @@ Source: [src/playback/behaviors/setup-failover-monitor.ts](../../../src/playback
 
 ## setupFailoverMonitor
 
-**CDN failover cooldown.** The expiry half of multi-CDN failover. Fetch sites own the _trip_: on a failed fetch they
-add the failing CDN (origin) to the `failedCdns` state signal directly. This behavior owns the _expiry_: while a
-presentation is resolved, it watches `failedCdns` and, for each CDN that appears, schedules a timer to remove it once
-its cooldown lapses. `track-switching`'s `excludeFailedCdns` constraint prunes a failed CDN's tracks and the
-active-CDN scope falls to the next one — and back, once the cooldown removes it here.
+**Returns a failed CDN to the candidates once its cooldown lapses.** The expiry half of multi-CDN failover. Fetch
+sites own the _trip_: on a failed fetch they add the failing CDN (origin) to the `failedCdns` state signal directly.
+This behavior owns the _expiry_: while a presentation is resolved, it watches `failedCdns` and, for each CDN that
+appears, schedules a timer to remove it once its cooldown lapses. `track-switching`'s `excludeFailedCdns` constraint
+prunes a failed CDN's tracks and the active-CDN scope falls to the next one — and back, once the cooldown removes it
+here.
 
 Lifecycle is per-source: timers + `failedCdns` are cleared on exit (a new source starts with a clean slate). Policy
 (cooldown) is engine config. This is the minimal `network-resilience` slice — a single failure trips a CDN, since

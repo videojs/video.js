@@ -4,6 +4,9 @@
 
 Exports of `@videojs/spf` declared in [src/core/composition/define-external-signals.ts](../../../src/core/composition/define-external-signals.ts).
 
+Declaring the state and context keys the host writes, so they reach a composition's types without a behavior that
+sets them.
+
 ## defineExternalSignals
 
 Behavior factory that defines a composition's **external signals**: state and context keys set and updated from

@@ -4,10 +4,11 @@
 
 Source: [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts)
 
-**Default audio/video track selection on src load / unselect on src unload.** When a presentation is resolved, sets
-`selectedVideoTrackId` / `selectedAudioTrackId` from a per-type default rule chain if no selection already exists.
-When the presentation is unset/reset (transitions back to unresolved), clears the selection so a stale id from the
-previous source doesn't persist.
+**Picks the video or audio track once when a source's presentation resolves, and clears it on unload; the simple
+alternative to the `switch*` variants.** When a presentation is resolved, sets `selectedVideoTrackId` /
+`selectedAudioTrackId` from a per-type default rule chain if no selection already exists. When the presentation is
+unset/reset (transitions back to unresolved), clears the selection so a stale id from the previous source doesn't
+persist.
 
 Lifecycle-driven: the pick fires once per transition, and nothing re-picks — that is what separates these from the
 `switch*` variants. External writes (user picks, ABR, programmatic filter-driven re-picks) are left alone, including

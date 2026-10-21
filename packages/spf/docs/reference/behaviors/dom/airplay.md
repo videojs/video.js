@@ -6,7 +6,8 @@ Source: [src/playback/behaviors/dom/airplay.ts](../../../../src/playback/behavio
 
 ## setupAirPlay
 
-**Bridge MSE playback to AirPlay on WebKit.** MSE streams can't be handed to an AirPlay receiver directly. The
+**Lets WebKit hand an MSE stream to an AirPlay receiver, by giving the element a native-HLS fallback source and
+suspending loading while a session holds.** MSE streams can't be handed to an AirPlay receiver directly. The
 WebKit-recommended workaround is to append a fallback `<source type="application/x-mpegURL">` carrying the original
 manifest URL: Safari exposes the AirPlay picker and, when a wireless target is selected, plays that native-HLS source
 on the receiver. The session state (WebKit's wireless flag, falling edge debounced — see `REMOTE_INACTIVE_SETTLE_MS`)
