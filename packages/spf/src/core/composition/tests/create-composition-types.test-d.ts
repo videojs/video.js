@@ -1,22 +1,18 @@
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
 import { type Signal, signal } from '../../signals/primitives';
+import { type Composition, createComposition, defineCompositionFactory } from '../create-composition';
+import type { ResolveBehaviorConfig, ResolveBehaviorContext, ResolveBehaviorState } from '../define-behavior';
 import {
   type Behavior,
   type BehaviorDeps,
-  type Composition,
   type ContextSignals,
-  createComposition,
   defineBehavior,
-  defineCompositionFactory,
   type InferBehaviorConfig,
   type InferBehaviorContext,
   type InferBehaviorState,
-  type ResolveBehaviorConfig,
-  type ResolveBehaviorContext,
-  type ResolveBehaviorState,
   type StateSignals,
-} from '../create-composition';
+} from '../define-behavior';
 
 // =============================================================================
 // Stand-in types
@@ -163,7 +159,7 @@ describe('InferBehaviorState', () => {
       setup: ({ config: _config }: { config: { x: number } }) => {},
     };
 
-    // matches the Empty fallback in create-composition
+    // matches the Empty fallback in define-behavior
     // oxlint-disable-next-line typescript/no-empty-object-type
     expectTypeOf<InferBehaviorState<typeof noState>>().toEqualTypeOf<{}>();
   });
@@ -175,7 +171,7 @@ describe('InferBehaviorContext', () => {
   });
 
   it('returns an empty shape for a behavior with no context in params', () => {
-    // matches the Empty fallback in create-composition
+    // matches the Empty fallback in define-behavior
     // oxlint-disable-next-line typescript/no-empty-object-type
     expectTypeOf<InferBehaviorContext<typeof counter>>().toEqualTypeOf<{}>();
   });
@@ -480,7 +476,7 @@ describe('defineBehavior', () => {
       setup: () => {},
     });
 
-    // matches the Empty fallback in create-composition
+    // matches the Empty fallback in define-behavior
     // oxlint-disable-next-line typescript/no-empty-object-type
     expectTypeOf<InferBehaviorState<typeof b>>().toEqualTypeOf<{}>();
   });

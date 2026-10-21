@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import type { ContextSignals, StateSignals } from '../../../core/composition/create-composition';
+import type { ContextSignals, StateSignals } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import { signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation, MediaElementLike } from '../../../media/types';
