@@ -1,3 +1,8 @@
+/**
+ * Resolve the tracks a selection names. Each variant schedules a fetch of the selected track's media playlist whenever
+ * that track is partially resolved, parses it, and writes the resolved track back into `state.presentation`.
+ */
+
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
