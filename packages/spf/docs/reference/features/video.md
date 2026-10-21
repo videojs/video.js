@@ -77,6 +77,7 @@ The feature declares these state keys for code outside the engine to write; no b
 ### Composed by
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
+- [@videojs/spf/engines/hls-video-mpeg-ts](../engines/hls-video-mpeg-ts.md)
 
 ## Other functions and constants
 

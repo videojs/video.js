@@ -43,6 +43,8 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
+- [@videojs/spf/engines/hls-video-mpeg-ts](../engines/hls-video-mpeg-ts.md)
+- [@videojs/spf/engines/hls-audio-mpeg-ts](../engines/hls-audio-mpeg-ts.md)
 
 ## Other functions and constants
 
