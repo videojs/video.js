@@ -22,6 +22,16 @@ export interface MuxDataExtensionProps {
 
 const MUX_VIDEO_DOMAIN = 'mux.com';
 
+/**
+ * Identifies this extension as the Mux Data integration, so its views can be told apart from other integrations that
+ * also report `player_software_name: 'Video.js'`, such as `videojs-mux` for Video.js 8. Without it the SDK reports its
+ * plain `<video>` monitor. The extension ships in lockstep with the player, so the player version is its version.
+ */
+const MUX_PLUGIN_DATA = {
+  player_mux_plugin_name: '@videojs/mux-data',
+  player_mux_plugin_version: getPlayerVersion(),
+};
+
 /** The SDK's monitor handle on a video element, narrowed to a live (non-destroyed) one. */
 type LiveMuxMonitor = Extract<NonNullable<HTMLVideoElement['mux']>, { deleted: false }>;
 
@@ -65,7 +75,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     debug: false,
     disableCookies: false,
     envKey: undefined,
-    playerSoftwareName: undefined,
+    playerSoftwareName: 'Video.js',
     playerSoftwareVersion: getPlayerVersion(),
     // Falls back to the player's creation time; see `playerInitTime`.
     playerInitTime: undefined,
@@ -194,6 +204,10 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#target?.mux?.updateData(value ? { env_key: value } : {});
   }
 
+  /**
+   * Player name reported to Mux Data. Defaults to `Video.js`; players built on Video.js, such as `mux-video`, set their
+   * own.
+   */
   get playerSoftwareName() {
     return this.#playerSoftwareName;
   }
@@ -202,7 +216,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     if (this.#playerSoftwareName === value) return;
 
     this.#playerSoftwareName = value;
-    this.#target?.mux?.updateData(value ? { player_software_name: value } : {});
+    this.#target?.mux?.updateData(value ? { player_software_name: value, player_software: value } : {});
   }
 
   get playerSoftwareVersion() {
@@ -369,6 +383,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       ...(disableCookies ? { disableCookies } : {}),
       ...engineOptions,
       data: {
+        ...MUX_PLUGIN_DATA,
         ...(env_key ? { env_key } : {}),
         ...(player_software_name ? { player_software_name } : {}),
         // NOTE: Adding this because there appears to be some instability on whether
