@@ -182,7 +182,7 @@ graph LR
 <details>
 <summary>How this reference is generated</summary>
 
-Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/hls/*`), their features (`@videojs/spf/hls/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/adapters/hls-audio`, `@videojs/spf/adapters/hls-background-video`, `@videojs/spf/adapters/hls-video`.
+Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/engines/*`), their features (`@videojs/spf/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/adapters/hls-audio`, `@videojs/spf/adapters/hls-background-video`, `@videojs/spf/adapters/hls-video`.
 
 Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.
 

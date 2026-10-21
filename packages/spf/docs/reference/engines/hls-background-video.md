@@ -2,7 +2,7 @@
 
 # `@videojs/spf/engines/hls-background-video`
 
-Source: [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts)
+Source: [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts)
 
 ## createEngine
 
@@ -103,12 +103,12 @@ await engine.destroy();
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `behaviors` | const | The behaviors the engine composes, in setup order: its features' behaviors, each composed once. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `Config` | type | Every config key the behaviors read, before `defaultConfig` makes any optional. | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `EngineConfig` | type | Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig` covers optional. Listed under [Config](#config). | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `EngineContext` | type | Context shape for the background-video playback engine: every context key its behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `EngineState` | type | State shape for the background-video playback engine: every state key its behaviors declare. Listed under [State](#state). | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `features` | const | The features the background-video playback engine composes, in order. Listed under [Features](#features). | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
-| `initialState` | const | The state the engine starts with. Its value: `{ ...composed.initialState, loadActivated: true }`. | [src/playback/engines/hls/engine-background-video.ts](../../../src/playback/engines/hls/engine-background-video.ts) |
+| `behaviors` | const | The behaviors the engine composes, in setup order: its features' behaviors, each composed once. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `Config` | type | Every config key the behaviors read, before `defaultConfig` makes any optional. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `EngineConfig` | type | Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig` covers optional. Listed under [Config](#config). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `EngineContext` | type | Context shape for the background-video playback engine: every context key its behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `EngineState` | type | State shape for the background-video playback engine: every state key its behaviors declare. Listed under [State](#state). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `features` | const | The features the background-video playback engine composes, in order. Listed under [Features](#features). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `initialState` | const | The state the engine starts with. Its value: `{ ...composed.initialState, loadActivated: true }`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
