@@ -8,8 +8,8 @@ Source: [src/playback/features/mpeg-ts-audio-transmux.ts](../../../src/playback/
 
 The audio-only counterpart of `mpegTsTransmuxFeature`: plays MPEG-TS audio renditions (an audio-only `.ts` asset, or
 the audio-only TS alternates of a video asset, or a video asset's default audio carried in its video segments) by
-transmuxing their AAC to fMP4, with no video codec compiled in. For `hls/audio`-shaped compositions; a composition
-with video takes `mpegTsTransmuxFeature`. Same placement rules.
+transmuxing their AAC to fMP4, with no video codec compiled in. The `hls-audio-mpeg-ts` engine composes it; a
+composition with video takes `mpegTsTransmuxFeature`. Same placement rules.
 
 ### Behaviors
 
@@ -27,7 +27,7 @@ None.
 
 ### Composed by
 
-None.
+- [@videojs/spf/engines/hls-audio-mpeg-ts](../engines/hls-audio-mpeg-ts.md)
 
 ## Parts
 
