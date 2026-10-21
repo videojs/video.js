@@ -1,6 +1,7 @@
 /**
- * Resolve the tracks a selection names. Each variant schedules a fetch of the selected track's media playlist whenever
- * that track is partially resolved, parses it, and writes the resolved track back into `state.presentation`.
+ * Fetches and parses the media playlist of the selected video, audio, or text track, so its segments become known. Each
+ * variant schedules a fetch of the selected track's media playlist whenever that track is partially resolved, parses
+ * it, and writes the resolved track back into `state.presentation`.
  */
 
 import { defineBehavior } from '../../core/composition/define-behavior';

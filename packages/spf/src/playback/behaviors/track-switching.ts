@@ -1,5 +1,6 @@
 /**
- * **Per-type track selection as a rule chain.** While a presentation is resolved, owns that type's
+ * **Picks the video, audio, or text track to play, and re-picks as bandwidth, user intent, or CDN state change, through
+ * a configurable chain of constraints and rules.** While a presentation is resolved, owns that type's
  * `selected{Video,Audio,Text}TrackId` signal: pick a default, react to user intent and algorithmic ranking, and clear
  * it on src unload.
  *

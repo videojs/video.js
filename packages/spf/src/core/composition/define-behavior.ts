@@ -1,13 +1,19 @@
+/**
+ * The behavior contract: what a behavior declares, what its `setup` receives and returns, and the types that derive a
+ * composition's state, context, and config from a list of behaviors.
+ */
+
 import type { ReadonlySignal, Signal } from '../signals/primitives';
 
 /**
- * Cleanup returned by a behavior. Behaviors may return: - `void` / `undefined` — no cleanup needed - A function —
- * called on destroy (may return a Promise) - An object with `destroy()` — called on destroy (may return a Promise)
+ * What a behavior's `setup` may hand back to run on destroy: nothing, a function, or an object with `destroy()`, either
+ * of which may be async. Behaviors may return: - `void` / `undefined` — no cleanup needed - A function — called on
+ * destroy (may return a Promise) - An object with `destroy()` — called on destroy (may return a Promise)
  */
 export type BehaviorCleanup = void | (() => void | Promise<void>) | { destroy(): void | Promise<void> };
 
 /**
- * A signal map keyed by the fields of `S`. Each field is a writable signal.
+ * One writable signal per field of a state type, which is how a composition exposes its state.
  *
  * Optional fields on `S` map to required signals whose value type includes `undefined`, ensuring every key has a signal
  * even when the underlying value is absent.
@@ -25,8 +31,8 @@ export type BehaviorCleanup = void | (() => void | Promise<void>) | { destroy():
 export type StateSignals<S extends object> = { [K in keyof S]-?: Signal<S[K]> };
 
 /**
- * A signal map keyed by the fields of `C`. Each field is a writable signal for a platform object or actor reference.
- * Same dual role as `StateSignals<S>` — see its docblock.
+ * One writable signal per field of a context type: the platform objects and actor references a composition holds. Same
+ * dual role as `StateSignals<S>` — see its docblock.
  */
 export type ContextSignals<C extends object> = { [K in keyof C]-?: Signal<C[K]> };
 
@@ -42,7 +48,7 @@ export type ContextSignals<C extends object> = { [K in keyof C]-?: Signal<C[K]> 
 export type AnySlotMap = Record<PropertyKey, ReadonlySignal<unknown>>;
 
 /**
- * The deps object passed to each behavior by the composition.
+ * What a behavior's `setup` receives: the state and context signals it declared, and the config.
  *
  * - `state` — signal map for state fields (reactive data). Per-signal read/ write intent expressed via `Signal<T>` vs
  *   `ReadonlySignal<T>`.
@@ -217,8 +223,10 @@ type DepsForCfg<StateMap extends AnySlotMap, ContextMap extends AnySlotMap, CfgI
   ConfigDeps<CfgIn>;
 
 /**
- * Typed factory for behaviors that enforces single-behavior key/param consistency: declared `stateKeys` must equal
- * `keyof S` (where `S` is inferred from the setup's `state` parameter type), and same for `contextKeys` / `C`.
+ * Define a behavior, checking that the state and context keys it declares are exactly the ones its `setup` reads.
+ *
+ * Declared `stateKeys` must equal `keyof S`, where `S` is inferred from the setup's `state` parameter type, and the
+ * same holds for `contextKeys` and `C`.
  *
  * The `const` modifier on `SK` / `CK` captures literal tuples so e.g. `stateKeys: ['preload']` infers as `readonly
  * ['preload']`, no `as const` needed at the call site.

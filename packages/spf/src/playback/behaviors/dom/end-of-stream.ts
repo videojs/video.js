@@ -187,12 +187,12 @@ function endOfStreamSetup({
 }
 
 /**
- * **Drive each `open → ended` transition of the MediaSource.** Calls `MediaSource.endOfStream()` once every active
- * buffer actor's currently-loading track is _complete_ (finite `Track.duration` — the parser's completeness signal),
- * its temporally last segments are fully appended, and the user has reached them — letting the browser finalize
- * duration and fire `ended` on the media element. The completeness gate keeps it inert for ongoing live
- * (`Track.duration === Infinity`), whose "last segment" is only the rolling edge; a live stream opts in when its
- * duration turns finite.
+ * **Calls `MediaSource.endOfStream()` once every loading track is complete and its last segments are appended and
+ * reached.** Calls `MediaSource.endOfStream()` once every active buffer actor's currently-loading track is _complete_
+ * (finite `Track.duration` — the parser's completeness signal), its temporally last segments are fully appended, and
+ * the user has reached them — letting the browser finalize duration and fire `ended` on the media element. The
+ * completeness gate keeps it inert for ongoing live (`Track.duration === Infinity`), whose "last segment" is only the
+ * rolling edge; a live stream opts in when its duration turns finite.
  *
  * Re-fires on every subsequent `open → ended → open` cycle. Per the MSE spec, `appendBuffer()` after `endOfStream()`
  * transitions the MediaSource back to `'open'`; seek-back replays and back-buffer refills that re-load earlier segments

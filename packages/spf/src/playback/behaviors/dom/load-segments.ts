@@ -1,7 +1,8 @@
 /**
- * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
- * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
- * (selected track, current time crossing a segment boundary).
+ * **Tells the video, audio, or text segment loader what to load as the selected track or the playhead changes, under
+ * the preload policy.** Per available track type (video / audio / text), reads the per-type segment-loader actor from
+ * context and sends typed `'load'` messages whenever a meaningful loading condition changes (selected track, current
+ * time crossing a segment boundary).
  *
  * Loader-actor lifecycle is owned upstream:
  *

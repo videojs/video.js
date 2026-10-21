@@ -76,7 +76,8 @@ function calculatePresentationDurationSetup({
 }
 
 /**
- * **Populate presentation duration via a config-supplied resolver.**
+ * **Writes `presentation.duration` once the selected tracks make it derivable, using the resolver the engine
+ * supplies.**
  *
  * Once a presentation is in place and its `duration` is still undefined, calls `config.resolveDuration(state)` whenever
  * a tracked key changes. The resolver decides what counts as "duration is now derivable" for the variant in play; the
