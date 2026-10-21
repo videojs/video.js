@@ -22,7 +22,14 @@ Requires, from this or other features:
 2. [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack)
 3. [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors)
 4. [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments)
-5. `defineExternalSignals<UserTrackSelectionState<'audio'>>()({ state: ['userAudioTrackSelection'] })`
+
+### External signals
+
+The feature declares these state keys for code outside the engine to write; no behavior sets them. The SPF Medias write them from their own properties, and code driving an engine directly writes `engine.state.<key>.set(value)`. Each is declared with [defineExternalSignals](../core/define-external-signals.md#defineexternalsignals), which is what makes the key part of the engine's state type.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path. |
 
 ### Config
 
@@ -52,7 +59,7 @@ Requires, from this or other features:
 | `preload` | `string \| undefined` | — | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | `string \| undefined` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. |
-| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | — | `defineExternalSignals<UserTrackSelectionState<'audio'>>` ([src/playback/features/audio.ts](../../../src/playback/features/audio.ts)) | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path. |
+| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | — | [external signal](#external-signals) | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path. |
 
 ### Context
 

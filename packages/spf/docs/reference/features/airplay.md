@@ -14,7 +14,14 @@ Requires a writer of `context.mediaSource`, such as `mediaSourceFeature`; withou
 ### Behaviors
 
 1. [setupAirPlay](../behaviors/dom/airplay.md#setupairplay)
-2. `defineExternalSignals<DisableRemotePlaybackState>()({ state: ['disableRemotePlayback'] })`
+
+### External signals
+
+The feature declares these state keys for code outside the engine to write; no behavior sets them. The SPF Medias write them from their own properties, and code driving an engine directly writes `engine.state.<key>.set(value)`. Each is declared with [defineExternalSignals](../core/define-external-signals.md#defineexternalsignals), which is what makes the key part of the engine's state type.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `disableRemotePlayback` | `boolean \| undefined` | Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not `setupAirPlay` is composed. |
 
 ### Config
 
@@ -26,7 +33,7 @@ Requires a writer of `context.mediaSource`, such as `mediaSourceFeature`; withou
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `disableRemotePlayback` | `boolean \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), `defineExternalSignals<DisableRemotePlaybackState>` ([src/playback/features/airplay.ts](../../../src/playback/features/airplay.ts)) | Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not `setupAirPlay` is composed. |
+| `disableRemotePlayback` | `boolean \| undefined` | — | [external signal](#external-signals), [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not `setupAirPlay` is composed. |
 | `loadingSuspended` | `boolean \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent slot means never suspended. |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `startPosition` | `number \| undefined` | — | [setupAirPlay](../behaviors/dom/airplay.md#setupairplay) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
