@@ -49,7 +49,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
-| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+| `Behaviors` | type | The type of `behaviors`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |

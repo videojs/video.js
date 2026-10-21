@@ -343,6 +343,10 @@ function typeRoles(reference: ReferenceProgram, model: Model, page: string, owne
 function declaredTypeCell(long: LongCells, name: string, declared: ReturnType<typeof declaredTypeOf>): string {
   if (!declared) return NO_DESCRIPTION;
 
+  // `type Behaviors = typeof behaviors` names a value the page already describes; say so instead of quoting it.
+  const typeOf = declared.kind === 'alias' ? /^typeof ([A-Za-z_$][\w$]*)$/.exec(declared.text) : null;
+  if (typeOf) return `The type of ${code(typeOf[1])}.`;
+
   if (declared.kind === 'alias') return `No JSDoc; an alias of ${long.cell(name, 'type', declared.text)}.`;
 
   return declared.text

@@ -104,7 +104,7 @@ await engine.destroy();
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the engine composes, in setup order: its features' behaviors, each composed once. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
-| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
+| `Behaviors` | type | The type of `behaviors`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
 | `Config` | type | Every config key the behaviors read, before `defaultConfig` makes any optional. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
 | `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
 | `EngineConfig` | type | Configuration for the background-video engine: every config key its behaviors read, with each key `defaultConfig` covers optional. Listed under [Config](#config). | [src/playback/engines/hls-background-video.ts](../../../src/playback/engines/hls-background-video.ts) |
