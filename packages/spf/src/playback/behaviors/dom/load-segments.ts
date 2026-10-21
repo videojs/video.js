@@ -1,3 +1,32 @@
+/**
+ * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
+ * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
+ * (selected track, current time crossing a segment boundary).
+ *
+ * Loader-actor lifecycle is owned upstream:
+ *
+ * - Video: `setupVideoBufferActors`
+ * - Audio: `setupAudioBufferActors`
+ * - Text: `setupTextTrackActors`
+ *
+ * This behavior is pure-consumer: it reads `context[loaderKey]` and dispatches typed messages via the variant's
+ * per-type `findResolvedTrack` resolver.
+ *
+ * # Load modes as reactor states
+ *
+ * Four states encode the load-gating policy directly:
+ *
+ * - `'preconditions-unmet'` — no loader actor in context, or the selected track hasn't resolved.
+ * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
+ *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
+ *   Auto-resumes into the derived state when the policy lifts.
+ * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
+ *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
+ *   text's actor no-ops (no init concept).
+ * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
+ *   segment-boundary crossing.
+ */
+
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -259,32 +288,8 @@ const TEXT_SEGMENT_LOADING_CONFIG = {
 // ============================================================================
 
 /**
- * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
- * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
- * (selected track, current time crossing a segment boundary).
- *
- * Loader-actor lifecycle is owned upstream:
- *
- * - Video: `setupVideoBufferActors`
- * - Audio: `setupAudioBufferActors`
- * - Text: `setupTextTrackActors`
- *
- * This behavior is pure-consumer: it reads `context[loaderKey]` and dispatches typed messages via the variant's
- * per-type `findResolvedTrack` resolver.
- *
- * # Load modes as reactor states
- *
- * Four states encode the load-gating policy directly:
- *
- * - `'preconditions-unmet'` — no loader actor in context, or the selected track hasn't resolved.
- * - `'dormant'` — loading disabled by policy: an observed `loadingSuspended` or `segmentLoadingBlocked` (highest
- *   precedence) or `preload === 'none' && !loadActivated`. Nothing fires; already-queued loader work drains.
- *   Auto-resumes into the derived state when the policy lifts.
- * - `'metadata-only'` — `!loadActivated && preload !== 'auto' && preload !== 'none'`. Fires an init-segment-only `load`
- *   message **once on entry**. The variant's loader actor decides what to do — v/a's actor fetches the init segment;
- *   text's actor no-ops (no init concept).
- * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
- *   segment-boundary crossing.
+ * The video variant: dispatches `'load'` messages to `videoSegmentLoaderActor` for the selected video track, under the
+ * four load modes.
  */
 export const loadVideoSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedVideoTrackId'],
