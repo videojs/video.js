@@ -135,7 +135,7 @@ export function createPlayerElement<Store extends PlayerStore>(
       // Registers itself as a controller on this element; the value never changes, so nothing reads it back.
       new ContextProvider(this, {
         context: options.extensionContext,
-        initialValue: { registerExtension: this.#registerExtension },
+        initialValue: { registerExtension: this.#registerExtension, extensions: this.#extensions },
       });
     }
 
