@@ -75,7 +75,7 @@ Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeat
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
-| `Behaviors` | type | No JSDoc; an alias of `typeof behaviors`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
+| `Behaviors` | type | The type of `behaviors`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveTextTrackSegment: resolveVttSegment, addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia }`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
