@@ -1,6 +1,6 @@
 import { type CreateEngine, HlsVideoAdapter, type HlsVideoAdapterProps } from '@videojs/spf/adapters/hls-video';
+import { createEngine } from '@videojs/spf/engines/hls-video-mpeg-ts';
 
-import { createEngine } from './engine';
 import { type MuxAdapterProps, MuxMixin } from './mixin';
 
 /**
@@ -15,8 +15,8 @@ import { type MuxAdapterProps, MuxMixin } from './mixin';
  * outright override them. A source carrying neither prunes its encrypted renditions and reports unsupported DRM,
  * exactly as an engine with no EME does.
  *
- * Plus- and basic-tier playback IDs are packaged as MPEG-TS; this flavor plays them through the Mux video engine
- * (`./engine`), which composes the transmux, where the plain `<hls-video>` refuses them.
+ * Plus- and basic-tier playback IDs are packaged as MPEG-TS; this flavor plays them through
+ * `@videojs/spf/engines/hls-video-mpeg-ts`, where the plain `<hls-video>` refuses them.
  */
 export class MuxVideoAdapter extends MuxMixin(HlsVideoAdapter) {
   static override readonly defaultProps: Omit<HlsVideoAdapterProps, 'src' | 'source'> & MuxAdapterProps = {

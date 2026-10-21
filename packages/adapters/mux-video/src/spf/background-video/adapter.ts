@@ -1,6 +1,5 @@
 import { type CreateEngine, HlsBackgroundVideoAdapter } from '@videojs/spf/adapters/hls-background-video';
-
-import { createEngine } from './engine';
+import { createEngine } from '@videojs/spf/engines/hls-background-video-mpeg-ts';
 
 /**
  * The Mux Media over the SPF background-video engine: `HlsBackgroundVideoAdapter` over the Mux background-video engine
