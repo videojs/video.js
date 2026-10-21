@@ -4,12 +4,13 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { recoverEndStall } from '../../../behaviors/dom/recover-end-stall';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
+import { resolvePresentation } from '../behaviors/resolve-presentation';
 
 /** The behaviors the feature composes, in setup order. */
-export const behaviors = [recoverEndStall] as const;
+export const behaviors = [resolvePresentation] as const;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read. */
@@ -20,13 +21,10 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /** The config defaults the feature contributes. */
-export const defaultConfig = {} satisfies Partial<Config>;
+export const defaultConfig = { parsePresentation: parseMultivariantPlaylist } satisfies Partial<Config>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;
 
-/**
- * Fires the media element's `ended` when Chrome freezes the playhead a few frames short of the end of a stream whose
- * audio and video end at slightly different times. Inert otherwise.
- */
-export const endStallRecoveryFeature = defineFeature({ behaviors, defaultConfig, initialState });
+/** Fetches and parses the source's HLS multivariant playlist into the presentation the other features read. */
+export const hlsLoadingFeature = defineFeature({ behaviors, defaultConfig, initialState });

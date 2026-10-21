@@ -4,13 +4,12 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { parseMultivariantPlaylist } from '../../../../media/hls/parse-multivariant';
-import { resolvePresentation } from '../../../behaviors/resolve-presentation';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { trackCurrentTime } from '../behaviors/dom/track-current-time';
 
 /** The behaviors the feature composes, in setup order. */
-export const behaviors = [resolvePresentation] as const;
+export const behaviors = [trackCurrentTime] as const;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read. */
@@ -21,10 +20,10 @@ export type State = Simplify<ResolveBehaviorState<Behaviors>>;
 export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /** The config defaults the feature contributes. */
-export const defaultConfig = { parsePresentation: parseMultivariantPlaylist } satisfies Partial<Config>;
+export const defaultConfig = {} satisfies Partial<Config>;
 
 /** The state values the feature seeds. */
 export const initialState = {} satisfies Partial<State>;
 
-/** Fetches and parses the source's HLS multivariant playlist into the presentation the other features read. */
-export const hlsLoadingFeature = defineFeature({ behaviors, defaultConfig, initialState });
+/** Mirrors the media element's `currentTime` into state, which segment loading reads to plan what to load next. */
+export const currentTimeFeature = defineFeature({ behaviors, defaultConfig, initialState });

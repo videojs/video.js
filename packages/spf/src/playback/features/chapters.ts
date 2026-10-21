@@ -4,12 +4,12 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { setupAirPlayFairPlay } from '../../../behaviors/dom/setup-airplay-fairplay';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { loadChapters } from '../behaviors/dom/load-chapters';
 
 /** The behaviors the feature composes, in setup order. */
-export const behaviors = [setupAirPlayFairPlay] as const;
+export const behaviors = [loadChapters] as const;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read. */
@@ -26,9 +26,7 @@ export const defaultConfig = {} satisfies Partial<Config>;
 export const initialState = {} satisfies Partial<State>;
 
 /**
- * Plays FairPlay-protected content on an AirPlay receiver, negotiating the receiver's keys while a session holds.
- *
- * Requires the `drm` and `keySystems` config, such as `drmFeature` sets; without them it throws once a session starts.
- * Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeature`, which signals the session.
+ * Adds the source's Apple JSON chapters (`EXT-X-SESSION-DATA`, `com.apple.hls.chapters`) to the media element as a
+ * hidden `chapters` text track per language.
  */
-export const airPlayFairPlayFeature = defineFeature({ behaviors, defaultConfig, initialState });
+export const chaptersFeature = defineFeature({ behaviors, defaultConfig, initialState });

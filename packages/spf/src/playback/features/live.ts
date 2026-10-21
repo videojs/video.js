@@ -4,14 +4,14 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { delayedReschedule } from '../../../../core/tasks/delayed-reschedule';
-import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../../../media/hls/reload-policy';
-import { seekToLiveEdge } from '../../../behaviors/dom/seek-to-live-edge';
-import { syncLiveSeekableRange } from '../../../behaviors/dom/sync-live-seekable-range';
-import { establishStartMediaTime, gateFirstParseOnAnchor } from '../../../behaviors/establish-start-media-time';
-import type { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../../../behaviors/resolve-track';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { delayedReschedule } from '../../core/tasks/delayed-reschedule';
+import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../media/hls/reload-policy';
+import { seekToLiveEdge } from '../behaviors/dom/seek-to-live-edge';
+import { syncLiveSeekableRange } from '../behaviors/dom/sync-live-seekable-range';
+import { establishStartMediaTime, gateFirstParseOnAnchor } from '../behaviors/establish-start-media-time';
+import type { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../behaviors/resolve-track';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [syncLiveSeekableRange, seekToLiveEdge, establishStartMediaTime] as const;

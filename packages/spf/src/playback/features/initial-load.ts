@@ -4,10 +4,10 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { trackLoadTriggers } from '../../../behaviors/dom/track-load-triggers';
-import { syncPreload } from '../../../behaviors/sync-preload';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { trackLoadTriggers } from '../behaviors/dom/track-load-triggers';
+import { syncPreload } from '../behaviors/sync-preload';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [syncPreload, trackLoadTriggers] as const;

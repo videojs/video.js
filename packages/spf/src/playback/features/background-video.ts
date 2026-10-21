@@ -4,23 +4,23 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { canPlayTrack } from '../../../../media/dom/capabilities';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../../media/errors';
-import { reportAbsentTrackType } from '../../../behaviors/collect-errors';
-import { loadVideoSegments } from '../../../behaviors/dom/load-segments';
-import { setupVideoBufferActors } from '../../../behaviors/dom/setup-buffer-actors';
-import { trackScreenResolution } from '../../../behaviors/dom/track-screen-resolution';
-import { resolveVideoTrack } from '../../../behaviors/resolve-track';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { canPlayTrack } from '../../media/dom/capabilities';
+import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../media/errors';
+import { reportAbsentTrackType } from '../behaviors/collect-errors';
+import { loadVideoSegments } from '../behaviors/dom/load-segments';
+import { setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { trackScreenResolution } from '../behaviors/dom/track-screen-resolution';
+import { resolveVideoTrack } from '../behaviors/resolve-track';
 import {
   preferHighestResolution,
   type SelectVideoTrackConfig,
   screenResolutionCap,
   selectVideoTrack,
-} from '../../../behaviors/select-tracks';
-import { reportUnsupportedTrackConditions } from '../../../primitives/report-track-conditions';
-import { excludeUnplayableTracks } from '../../../primitives/selection-rules';
+} from '../behaviors/select-tracks';
+import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
+import { excludeUnplayableTracks } from '../primitives/selection-rules';
 
 // Prune what this environment can't decode, then report 2011 if nothing is left: this engine composes only video, so a
 // source with none playable can never play.

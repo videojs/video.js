@@ -98,7 +98,7 @@ surface.
 
 **Composition:** each dispatcher is composed by its track's feature
 (`videoFeature`, `audioFeature`, `textTracksFeature` in
-`packages/spf/src/playback/engines/hls/features/`), after MSE setup.
+`packages/spf/src/playback/features/`), after MSE setup.
 
 The per-type segment-loader **actors** are owned by the MSE setup
 behaviors (`setupVideoBufferActors` / `setupAudioBufferActors` /

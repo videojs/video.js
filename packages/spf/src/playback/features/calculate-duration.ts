@@ -4,10 +4,10 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { getResolvedSelectedTrackDuration } from '../../../../media/utils/track-selection';
-import { calculatePresentationDuration } from '../../../behaviors/calculate-presentation-duration';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { getResolvedSelectedTrackDuration } from '../../media/utils/track-selection';
+import { calculatePresentationDuration } from '../behaviors/calculate-presentation-duration';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [calculatePresentationDuration] as const;

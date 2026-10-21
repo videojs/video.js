@@ -4,10 +4,10 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { deriveCdnPriority } from '../../../behaviors/derive-cdn-priority';
-import { setupFailoverMonitor } from '../../../behaviors/setup-failover-monitor';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { deriveCdnPriority } from '../behaviors/derive-cdn-priority';
+import { setupFailoverMonitor } from '../behaviors/setup-failover-monitor';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [

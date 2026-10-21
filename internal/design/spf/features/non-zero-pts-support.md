@@ -111,7 +111,7 @@ Extension boundaries — each is a separate candidate feature or a parked phase:
 ## Implementation surface
 
 **Composition:** `shiftTimestampsFeature`
-(`packages/spf/src/playback/engines/hls/features/shift-timestamps.ts`), composed by the
+(`packages/spf/src/playback/features/shift-timestamps.ts`), composed by the
 `hls-video` and `hls-audio` engines — the relocation wiring (reactor + `deriveStartMediaTime`
 seam + the `video`/`audio` message-pipeline config) is one feature, so it adds/drops as a unit
 for bundle / back-compat testing. Text cue relocation (`textMessagePipelines`) is

@@ -7,12 +7,12 @@ import type {
   ResolveBehaviorState,
 } from '../../core/composition/define-behavior';
 import { flattenFeatures } from '../../core/composition/define-feature';
-import { backgroundVideoFeature } from './hls/features/background-video';
-import { calculateDurationFeature } from './hls/features/calculate-duration';
-import { currentTimeFeature } from './hls/features/current-time';
-import { errorFeature } from './hls/features/error';
-import { hlsLoadingFeature } from './hls/features/hls-loading';
-import { mediaSourceFeature } from './hls/features/media-source';
+import { backgroundVideoFeature } from '../features/background-video';
+import { calculateDurationFeature } from '../features/calculate-duration';
+import { currentTimeFeature } from '../features/current-time';
+import { errorFeature } from '../features/error';
+import { hlsLoadingFeature } from '../features/hls-loading';
+import { mediaSourceFeature } from '../features/media-source';
 
 // ============================================================================
 // Background-Video Engine State & Context

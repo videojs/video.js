@@ -4,12 +4,12 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { applyStartPosition } from '../../../behaviors/dom/apply-start-position';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { recoverEndStall } from '../behaviors/dom/recover-end-stall';
 
 /** The behaviors the feature composes, in setup order. */
-export const behaviors = [applyStartPosition] as const;
+export const behaviors = [recoverEndStall] as const;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read. */
@@ -26,7 +26,7 @@ export const defaultConfig = {} satisfies Partial<Config>;
 export const initialState = {} satisfies Partial<State>;
 
 /**
- * Starts playback at `state.startPosition` instead of zero. Also performs the seeks other features request through
- * `state.startPosition`, such as the live edge and the AirPlay session-end restore.
+ * Fires the media element's `ended` when Chrome freezes the playhead a few frames short of the end of a stream whose
+ * audio and video end at slightly different times. Inert otherwise.
  */
-export const startPositionFeature = defineFeature({ behaviors, defaultConfig, initialState });
+export const endStallRecoveryFeature = defineFeature({ behaviors, defaultConfig, initialState });

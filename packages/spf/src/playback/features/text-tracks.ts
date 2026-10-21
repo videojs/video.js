@@ -4,20 +4,20 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { resolveVttSegment } from '../../../../media/dom/text/resolve-vtt-segment';
+} from '../../core/composition/define-behavior';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import { defineFeature } from '../../core/composition/define-feature';
+import { resolveVttSegment } from '../../media/dom/text/resolve-vtt-segment';
 import {
   addSubtitlesTracksToMedia,
   getShowingSubtitlesTrackFromMedia,
   removeAllSubtitlesTracksFromMedia,
-} from '../../../../media/dom/text/text-track-slots';
-import { loadTextTrackSegments } from '../../../behaviors/dom/load-segments';
-import { setupTextTrackActors } from '../../../behaviors/dom/setup-text-track-actors';
-import { syncTextTracks } from '../../../behaviors/dom/sync-text-tracks';
-import { resolveTextTrack } from '../../../behaviors/resolve-track';
-import { switchTextTrack, type UserTrackSelectionState } from '../../../behaviors/track-switching';
+} from '../../media/dom/text/text-track-slots';
+import { loadTextTrackSegments } from '../behaviors/dom/load-segments';
+import { setupTextTrackActors } from '../behaviors/dom/setup-text-track-actors';
+import { syncTextTracks } from '../behaviors/dom/sync-text-tracks';
+import { resolveTextTrack } from '../behaviors/resolve-track';
+import { switchTextTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [

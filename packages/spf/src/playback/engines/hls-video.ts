@@ -7,26 +7,26 @@ import type {
   ResolveBehaviorState,
 } from '../../core/composition/define-behavior';
 import { flattenFeatures } from '../../core/composition/define-feature';
-import { airPlayFeature } from './hls/features/airplay';
-import { airPlayFairPlayFeature } from './hls/features/airplay-fairplay';
-import { audioFeature } from './hls/features/audio';
-import { calculateDurationFeature } from './hls/features/calculate-duration';
-import { chaptersFeature } from './hls/features/chapters';
-import { currentTimeFeature } from './hls/features/current-time';
-import { drmFeature } from './hls/features/drm';
-import { endStallRecoveryFeature } from './hls/features/end-stall-recovery';
-import { errorFeature } from './hls/features/error';
-import { hlsLoadingFeature } from './hls/features/hls-loading';
-import { initialLoadFeature } from './hls/features/initial-load';
-import { liveFeature } from './hls/features/live';
-import { mediaSourceFeature } from './hls/features/media-source';
-import { monitorPlayerSizeFeature } from './hls/features/monitor-player-size';
-import { multiCdnFeature } from './hls/features/multi-cdn';
-import { shiftTextTimestampsFeature } from './hls/features/shift-text-timestamps';
-import { shiftTimestampsFeature } from './hls/features/shift-timestamps';
-import { startPositionFeature } from './hls/features/start-position';
-import { textTracksFeature } from './hls/features/text-tracks';
-import { videoFeature } from './hls/features/video';
+import { airPlayFeature } from '../features/airplay';
+import { airPlayFairPlayFeature } from '../features/airplay-fairplay';
+import { audioFeature } from '../features/audio';
+import { calculateDurationFeature } from '../features/calculate-duration';
+import { chaptersFeature } from '../features/chapters';
+import { currentTimeFeature } from '../features/current-time';
+import { drmFeature } from '../features/drm';
+import { endStallRecoveryFeature } from '../features/end-stall-recovery';
+import { errorFeature } from '../features/error';
+import { hlsLoadingFeature } from '../features/hls-loading';
+import { initialLoadFeature } from '../features/initial-load';
+import { liveFeature } from '../features/live';
+import { mediaSourceFeature } from '../features/media-source';
+import { monitorPlayerSizeFeature } from '../features/monitor-player-size';
+import { multiCdnFeature } from '../features/multi-cdn';
+import { shiftTextTimestampsFeature } from '../features/shift-text-timestamps';
+import { shiftTimestampsFeature } from '../features/shift-timestamps';
+import { startPositionFeature } from '../features/start-position';
+import { textTracksFeature } from '../features/text-tracks';
+import { videoFeature } from '../features/video';
 
 // ============================================================================
 // HLS Engine State & Context

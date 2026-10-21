@@ -4,15 +4,15 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { canPlayTrack } from '../../../../media/dom/capabilities';
-import { loadVideoSegments } from '../../../behaviors/dom/load-segments';
-import { setupVideoBufferActors } from '../../../behaviors/dom/setup-buffer-actors';
-import { resolveVideoTrack } from '../../../behaviors/resolve-track';
-import { switchVideoTrack, type UserTrackSelectionState } from '../../../behaviors/track-switching';
-import { reportUnsupportedTrackConditions } from '../../../primitives/report-track-conditions';
+} from '../../core/composition/define-behavior';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import { defineFeature } from '../../core/composition/define-feature';
+import { canPlayTrack } from '../../media/dom/capabilities';
+import { loadVideoSegments } from '../behaviors/dom/load-segments';
+import { setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { resolveVideoTrack } from '../behaviors/resolve-track';
+import { switchVideoTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
+import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [

@@ -4,11 +4,11 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { endOfStream } from '../../../behaviors/dom/end-of-stream';
-import { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
-import { updateMediaSourceDuration } from '../../../behaviors/dom/update-mediasource-duration';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { endOfStream } from '../behaviors/dom/end-of-stream';
+import { setupMediaSource } from '../behaviors/dom/setup-mediasource';
+import { updateMediaSourceDuration } from '../behaviors/dom/update-mediasource-duration';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [setupMediaSource, updateMediaSourceDuration, endOfStream] as const;

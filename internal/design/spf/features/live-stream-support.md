@@ -171,7 +171,7 @@ under [Open questions § Resolved during implementation](#resolved-during-implem
 
 ## Implementation surface
 
-**Composition:** `liveFeature` (`packages/spf/src/playback/engines/hls/features/live.ts`),
+**Composition:** `liveFeature` (`packages/spf/src/playback/features/live.ts`),
 composed by the `hls-video` engine — the live behaviors compose alongside the VOD ones; live vs
 VOD is a runtime distinction in the *data* (a growing playlist), not a separate engine variant, and
 the feature is inert for on-demand content. It carries the `reschedule` reload seam that

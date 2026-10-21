@@ -4,9 +4,9 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { collectErrors } from '../../../behaviors/collect-errors';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { collectErrors } from '../behaviors/collect-errors';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [collectErrors] as const;

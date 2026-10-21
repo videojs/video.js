@@ -4,10 +4,10 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import type { setupTextTrackActors } from '../../../behaviors/dom/setup-text-track-actors';
-import { relocatingTextPipelines } from '../../../primitives/relocation-pipelines';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import type { setupTextTrackActors } from '../behaviors/dom/setup-text-track-actors';
+import { relocatingTextPipelines } from '../primitives/relocation-pipelines';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [] as const;

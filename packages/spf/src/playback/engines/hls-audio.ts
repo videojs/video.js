@@ -7,19 +7,19 @@ import type {
   ResolveBehaviorState,
 } from '../../core/composition/define-behavior';
 import { flattenFeatures } from '../../core/composition/define-feature';
-import { airPlayFeature } from './hls/features/airplay';
-import { audioFeature } from './hls/features/audio';
-import { calculateDurationFeature } from './hls/features/calculate-duration';
-import { chaptersFeature } from './hls/features/chapters';
-import { currentTimeFeature } from './hls/features/current-time';
-import { endStallRecoveryFeature } from './hls/features/end-stall-recovery';
-import { errorFeature } from './hls/features/error';
-import { hlsLoadingFeature } from './hls/features/hls-loading';
-import { initialLoadFeature } from './hls/features/initial-load';
-import { mediaSourceFeature } from './hls/features/media-source';
-import { multiCdnFeature } from './hls/features/multi-cdn';
-import { shiftTimestampsFeature } from './hls/features/shift-timestamps';
-import { startPositionFeature } from './hls/features/start-position';
+import { airPlayFeature } from '../features/airplay';
+import { audioFeature } from '../features/audio';
+import { calculateDurationFeature } from '../features/calculate-duration';
+import { chaptersFeature } from '../features/chapters';
+import { currentTimeFeature } from '../features/current-time';
+import { endStallRecoveryFeature } from '../features/end-stall-recovery';
+import { errorFeature } from '../features/error';
+import { hlsLoadingFeature } from '../features/hls-loading';
+import { initialLoadFeature } from '../features/initial-load';
+import { mediaSourceFeature } from '../features/media-source';
+import { multiCdnFeature } from '../features/multi-cdn';
+import { shiftTimestampsFeature } from '../features/shift-timestamps';
+import { startPositionFeature } from '../features/start-position';
 
 // ============================================================================
 // Audio-Only HLS Engine State & Context

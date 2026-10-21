@@ -4,12 +4,12 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { attachMediaSourceAsSourceElement } from '../../../../media/dom/mse/mediasource-setup';
-import { type DisableRemotePlaybackState, setupAirPlay } from '../../../behaviors/dom/airplay';
-import type { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
+} from '../../core/composition/define-behavior';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import { defineFeature } from '../../core/composition/define-feature';
+import { attachMediaSourceAsSourceElement } from '../../media/dom/mse/mediasource-setup';
+import { type DisableRemotePlaybackState, setupAirPlay } from '../behaviors/dom/airplay';
+import type { setupMediaSource } from '../behaviors/dom/setup-mediasource';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [

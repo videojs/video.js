@@ -4,12 +4,12 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { loadChapters } from '../../../behaviors/dom/load-chapters';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { applyStartPosition } from '../behaviors/dom/apply-start-position';
 
 /** The behaviors the feature composes, in setup order. */
-export const behaviors = [loadChapters] as const;
+export const behaviors = [applyStartPosition] as const;
 
 export type Behaviors = typeof behaviors;
 /** Every config key the behaviors read. */
@@ -26,7 +26,7 @@ export const defaultConfig = {} satisfies Partial<Config>;
 export const initialState = {} satisfies Partial<State>;
 
 /**
- * Adds the source's Apple JSON chapters (`EXT-X-SESSION-DATA`, `com.apple.hls.chapters`) to the media element as a
- * hidden `chapters` text track per language.
+ * Starts playback at `state.startPosition` instead of zero. Also performs the seeks other features request through
+ * `state.startPosition`, such as the live edge and the AirPlay session-end restore.
  */
-export const chaptersFeature = defineFeature({ behaviors, defaultConfig, initialState });
+export const startPositionFeature = defineFeature({ behaviors, defaultConfig, initialState });

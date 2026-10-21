@@ -16,7 +16,8 @@
     { "path": "../behaviors" },
     { "path": "../behaviors/dom" },
     { "path": "../actors" },
-    { "path": "../actors/dom" }
+    { "path": "../actors/dom" },
+    { "path": "../features" }
   ],
   "include": ["./**/*.ts"]
 }

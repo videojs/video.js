@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { flattenFeatures } from '../../../../core/composition/define-feature';
-import * as hlsVideo from '../engine';
-import * as hlsAudio from '../engine-audio-only';
-import * as hlsBackgroundVideo from '../engine-background-video';
+import { flattenFeatures } from '../../../core/composition/define-feature';
+import * as hlsAudio from '../hls-audio';
+import * as hlsBackgroundVideo from '../hls-background-video';
+import * as hlsVideo from '../hls-video';
 
 // Pins what each engine's feature list composes, so a change to a feature that adds or drops a signal from an engine is
 // a visible test change.

@@ -4,15 +4,15 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineExternalSignals } from '../../../../core/composition/define-external-signals';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { canPlayTrack } from '../../../../media/dom/capabilities';
-import { loadAudioSegments } from '../../../behaviors/dom/load-segments';
-import { setupAudioBufferActors } from '../../../behaviors/dom/setup-buffer-actors';
-import { resolveAudioTrack } from '../../../behaviors/resolve-track';
-import { switchAudioTrack, type UserTrackSelectionState } from '../../../behaviors/track-switching';
-import { reportUnsupportedTrackConditions } from '../../../primitives/report-track-conditions';
+} from '../../core/composition/define-behavior';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import { defineFeature } from '../../core/composition/define-feature';
+import { canPlayTrack } from '../../media/dom/capabilities';
+import { loadAudioSegments } from '../behaviors/dom/load-segments';
+import { setupAudioBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { resolveAudioTrack } from '../behaviors/resolve-track';
+import { switchAudioTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
+import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [

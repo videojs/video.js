@@ -5,11 +5,11 @@
  */
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { ResolveBehaviorConfig } from '../../../../core/composition/define-behavior';
-import type { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
-import type * as airPlay from '../hls/features/airplay';
-import type * as shiftTextTimestamps from '../hls/features/shift-text-timestamps';
-import type * as video from '../hls/features/video';
+import type { ResolveBehaviorConfig } from '../../../core/composition/define-behavior';
+import type { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
+import type * as airPlay from '../../features/airplay';
+import type * as shiftTextTimestamps from '../../features/shift-text-timestamps';
+import type * as video from '../../features/video';
 
 describe('State', () => {
   it('carries the keys the video feature’s behaviors and external signals declare', () => {

@@ -4,14 +4,14 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { canPlayTrackWithDrm } from '../../../../media/dom/capabilities';
-import { DEFAULT_KEY_SYSTEMS } from '../../../../media/dom/key-systems';
-import type { DrmSystemsConfig } from '../../../../media/drm';
-import { exchangeLicenses } from '../../../behaviors/dom/exchange-licenses';
-import { setupMediaKeys } from '../../../behaviors/dom/setup-media-keys';
-import type { resolveAudioTrack, resolveVideoTrack } from '../../../behaviors/resolve-track';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { canPlayTrackWithDrm } from '../../media/dom/capabilities';
+import { DEFAULT_KEY_SYSTEMS } from '../../media/dom/key-systems';
+import type { DrmSystemsConfig } from '../../media/drm';
+import { exchangeLicenses } from '../behaviors/dom/exchange-licenses';
+import { setupMediaKeys } from '../behaviors/dom/setup-media-keys';
+import type { resolveAudioTrack, resolveVideoTrack } from '../behaviors/resolve-track';
 import {
   DEFAULT_AUDIO_CONSTRAINTS,
   DEFAULT_VIDEO_CONSTRAINTS,
@@ -19,9 +19,9 @@ import {
   type SwitchAudioTrackRule,
   type switchVideoTrack,
   type SwitchVideoTrackRule,
-} from '../../../behaviors/track-switching';
-import { reportUnsupportedTrackConditionsWithDrm } from '../../../primitives/report-track-conditions';
-import { excludeRefusedKeySystems } from '../../../primitives/selection-rules';
+} from '../behaviors/track-switching';
+import { reportUnsupportedTrackConditionsWithDrm } from '../primitives/report-track-conditions';
+import { excludeRefusedKeySystems } from '../primitives/selection-rules';
 
 // Typed as the runtime shapes the behaviors read, so a caller's config can override them.
 const noLicenseServers: DrmSystemsConfig = {};

@@ -4,9 +4,9 @@ import type {
   ResolveBehaviorConfig,
   ResolveBehaviorContext,
   ResolveBehaviorState,
-} from '../../../../core/composition/define-behavior';
-import { defineFeature } from '../../../../core/composition/define-feature';
-import { trackPlayerResolution } from '../../../behaviors/dom/track-player-resolution';
+} from '../../core/composition/define-behavior';
+import { defineFeature } from '../../core/composition/define-feature';
+import { trackPlayerResolution } from '../behaviors/dom/track-player-resolution';
 
 /** The behaviors the feature composes, in setup order. */
 export const behaviors = [trackPlayerResolution] as const;
