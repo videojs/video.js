@@ -22,13 +22,13 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | — | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
+| `currentTime` | `number \| undefined` | — | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

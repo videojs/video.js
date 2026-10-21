@@ -26,14 +26,14 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
-| `mediaKeys` | `MediaKeys \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. (doc of [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaKeys` | `MediaKeys \| undefined` | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. (documented on [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
 
 ### Composed by
 

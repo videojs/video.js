@@ -54,10 +54,10 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | inline | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | inline | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | inline | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |

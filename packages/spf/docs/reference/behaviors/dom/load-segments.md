@@ -48,15 +48,15 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
-| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (doc of [syncPreload](../sync-preload.md#syncpreload)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
+| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../sync-preload.md#syncpreload)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `selectedAudioTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (documented on [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `audioSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. (doc of [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
+| `audioSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. (documented on [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
 
 ## loadTextTrackSegments
 
@@ -76,15 +76,15 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
-| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (doc of [syncPreload](../sync-preload.md#syncpreload)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedTextTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. (doc of [switchTextTrack](../track-switching.md#switchtexttrack)) |
+| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../sync-preload.md#syncpreload)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `selectedTextTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. (documented on [switchTextTrack](../track-switching.md#switchtexttrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `textTrackSegmentLoaderActor` | reads | yes | `TextTrackSegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `TextTrackSegmentLoaderActor` that fetches the selected text track's segments and resolves them into cues for `textTracksActor` through the configured `resolveTextTrackSegment`; same lifetime. `loadTextTrackSegments` drives it with `'load'` messages. (doc of [setupTextTrackActors](setup-text-track-actors.md#setuptexttrackactors)) |
+| `textTrackSegmentLoaderActor` | reads | yes | `TextTrackSegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `TextTrackSegmentLoaderActor` that fetches the selected text track's segments and resolves them into cues for `textTracksActor` through the configured `resolveTextTrackSegment`; same lifetime. `loadTextTrackSegments` drives it with `'load'` messages. (documented on [setupTextTrackActors](setup-text-track-actors.md#setuptexttrackactors)) |
 
 ## loadVideoSegments
 
@@ -103,15 +103,15 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
 | `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
-| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (doc of [syncPreload](../sync-preload.md#syncpreload)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](../track-switching.md#switchvideotrack)) |
+| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../sync-preload.md#syncpreload)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `videoSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. (doc of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
+| `videoSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## Types
 

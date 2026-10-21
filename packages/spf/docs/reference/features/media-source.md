@@ -31,8 +31,8 @@ Requires:
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | — | [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `currentTime` | `number \| undefined` | — | [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 

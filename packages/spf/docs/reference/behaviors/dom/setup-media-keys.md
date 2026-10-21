@@ -64,14 +64,14 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `negotiatedKeySystem` | writes | yes | `string \| undefined` | `MediaKeysState` | The key system negotiation settled on for the current source, or `undefined` when none has been (yet, or at all). The negotiation outcome as _state_, not just as the private detail it once was: `exchangeLicenses` keys its per-system message shaping and license-server lookup off it, and it is the late fact rendition pruning can't otherwise learn — pruning runs before the CDM has been asked, so a rendition naming a configured server survives it and only negotiation reveals the CDM is absent. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `MediaKeysState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `MediaKeysState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `segmentLoadingBlocked` | writes | yes | `boolean \| undefined` | `MediaKeysState` | Segment-load gate: `true` while an encrypted source's MediaKeys aren't attached yet; the `loadXSegments` dispatchers park on it. Semantics on `SegmentLoadingState['segmentLoadingBlocked']`. |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaKeysContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `MediaKeysContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | writes | yes | `MediaKeys \| undefined` | `MediaKeysContext` | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. |
 
 ## Types

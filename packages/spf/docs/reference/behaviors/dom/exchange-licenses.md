@@ -56,13 +56,13 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `negotiatedKeySystem` | reads | yes | `string \| undefined` | `ExchangeLicensesState` | The negotiated key system; owned by `setupMediaKeys`. Semantics on `MediaKeysState['negotiatedKeySystem']`. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `ExchangeLicensesState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `ExchangeLicensesState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `ExchangeLicensesContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `ExchangeLicensesContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | reads | yes | `MediaKeys \| undefined` | `ExchangeLicensesContext` | The attached MediaKeys; owned by `setupMediaKeys`. |
 
 ## Types
