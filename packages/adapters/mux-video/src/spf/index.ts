@@ -12,5 +12,3 @@ export type { MuxContentData, MuxSourceBase } from '@videojs/mux';
 export type { MuxAdapterAPI, MuxAdapterProps } from './mixin';
 export { MuxMixin } from './mixin';
 export { MuxVideoAdapter } from './adapter';
-export type { Behaviors, Config, EngineConfig, EngineContext, EngineState } from './engine';
-export { behaviors, createEngine, defaultConfig, features, initialState } from './engine';

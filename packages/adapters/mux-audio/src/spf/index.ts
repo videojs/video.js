@@ -12,6 +12,4 @@
  */
 export type { MuxContentData, MuxSourceBase } from '@videojs/mux-video';
 export type { MuxAdapterAPI, MuxAdapterProps } from '@videojs/mux-video/spf';
-export type { Behaviors, Config, EngineConfig, EngineContext, EngineState } from './engine';
-export { behaviors, createEngine, defaultConfig, features, initialState } from './engine';
 export { MuxAudioAdapter } from './adapter';
