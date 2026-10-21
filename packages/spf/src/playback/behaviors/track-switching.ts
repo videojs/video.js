@@ -246,18 +246,19 @@ type ResolveSelection<T extends SwitchableTrack, State = unknown, Context = unkn
 type SelectionKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedTextTrackId';
 type UserSelectionKey = 'userVideoTrackSelection' | 'userAudioTrackSelection';
 
-// Each mapped value references `P` so TS keeps the per-key dependency and
-// resolves `state[selectionKey]` to the right arm. `T` (track type) stays out
-// of the state map (it flows through `TrackSwitchingConfig` instead).
-//
-// Only the behavior's own lifecycle signals are required here: the presentation
-// gate and the selection slot it writes. Signals a *rule* reads but the
-// behavior doesn't — `user*TrackSelection` (the user-selection filter) and
-// `bandwidthState` (the bandwidth ranker) — are NOT here; each rule declares
-// the signal it needs as *optional* on its own deps and reads it defensively,
-// so the behavior never assumes a rule-only signal exists. Those slots are
-// materialized by whoever owns them: `defineExternalSignals` for the consumer-input
-// `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
+/**
+ * The state signals a track-switching behavior reads and writes: the presentation it gates on, and the selection slot
+ * `S` it writes.
+ *
+ * Each mapped value references `P` so TS keeps the per-key dependency and resolves `state[selectionKey]` to the right
+ * arm. `T` (track type) stays out of the state map (it flows through `TrackSwitchingConfig` instead).
+ *
+ * Only the behavior's own lifecycle signals are required here. Signals a _rule_ reads but the behavior doesn't —
+ * `user*TrackSelection` (the user-selection filter) and `bandwidthState` (the bandwidth ranker) — are NOT here; each
+ * rule declares the signal it needs as _optional_ on its own deps and reads it defensively, so the behavior never
+ * assumes a rule-only signal exists. Those slots are materialized by whoever owns them: `defineExternalSignals` for the
+ * consumer-input `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
+ */
 export type TrackSwitchingStateMap<S extends SelectionKey> = {
   presentation: ReadonlySignal<TrackSwitchingState['presentation']>;
 } & { [P in S]: Signal<TrackSwitchingState[P]> };

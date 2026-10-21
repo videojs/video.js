@@ -24,6 +24,10 @@ export interface PresentationState {
   loadActivated?: boolean;
 }
 
+/**
+ * Parses a manifest body into a resolved `Presentation`. Receives the presentation as the caller wrote it, at least `{
+ * url }`, so the parser can resolve references against it and keep what the caller supplied.
+ */
 export type ParsePresentation = (text: string, presentation: MaybeResolvedPresentation) => Presentation;
 
 export interface ResolvePresentationConfig {
@@ -41,6 +45,11 @@ export interface ResolvePresentationConfig {
   requestCredentials?: RequestCredentialsPolicy;
 }
 
+/**
+ * The resolver's phase, derived from state: `'preconditions-unmet'` until `presentation.url` is set; `'idle'` while the
+ * preload hint holds resolution back and nothing has activated loading; `'resolving'` while the manifest is fetched and
+ * parsed; `'resolved'` once `presentation` carries the parsed result.
+ */
 export type ResolvePresentationState = 'preconditions-unmet' | 'idle' | 'resolving' | 'resolved';
 
 function deriveState(
