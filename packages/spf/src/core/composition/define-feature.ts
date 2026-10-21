@@ -1,3 +1,8 @@
+/**
+ * Grouping behaviors into features, with the defaults and initial state they need, and flattening features into what a
+ * composition takes.
+ */
+
 import type { AnyBehavior, Empty } from './define-behavior';
 
 /**
@@ -26,8 +31,10 @@ export interface Feature<
 type AnyFeature = Feature<readonly AnyBehavior[], any, any>;
 
 /**
- * Define a feature. An identity function: it exists so the behavior list keeps its tuple type, which composition needs
- * to derive the state, context, and config types.
+ * Define a feature: behaviors with the config defaults and initial state they need, kept as a tuple so a composition
+ * can derive its types from them.
+ *
+ * An identity function at runtime; the tuple type is what it exists for.
  *
  * `defaultConfig` may cover config keys that another feature's behaviors read; the composition checks each
  * `defaultConfig` value's type against the behavior that reads it.

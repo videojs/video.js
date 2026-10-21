@@ -19,9 +19,9 @@ const samePriority = (a: string[] | undefined, b: string[]): boolean =>
   !!a && a.length === b.length && a.every((cdn, i) => cdn === b[i]);
 
 /**
- * **Session-level CDN priority.** While a presentation is resolved, owns the `cdnPriority` signal: the distinct CDNs
- * the source is served from (origin of each track's URL), in manifest priority order — most-preferred first. Cleared on
- * src unload. The name mirrors HLS content steering's `PATHWAY-PRIORITY`.
+ * **Publishes which CDNs a source is served from, most-preferred first.** While a presentation is resolved, owns the
+ * `cdnPriority` signal: the distinct CDNs the source is served from (origin of each track's URL), in manifest priority
+ * order — most-preferred first. Cleared on src unload. The name mirrors HLS content steering's `PATHWAY-PRIORITY`.
  *
  * Redundant-stream sources (e.g. Mux's `?redundant_streams=true`) list the same content on multiple hosts, so the
  * candidate tracks already include one variant per CDN. This behavior publishes _which_ CDNs exist and their priority;

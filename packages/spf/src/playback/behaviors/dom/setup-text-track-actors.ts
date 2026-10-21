@@ -82,10 +82,10 @@ function setupTextTrackActorsSetup({
 }
 
 /**
- * **Own the TextTracks actor pair for the current `mediaElement`.** When a `mediaElement` is in scope, creates the
- * `TextTracksActor` (bound to the element's `textTracks`) and the `TextTrackSegmentLoaderActor` (bound to that actor +
- * the injected cue resolver), and publishes both on `context`. On element identity change or behavior destroy, destroys
- * both actors and clears the signals.
+ * **Creates the text-track actor and its segment loader while a media element is attached, and tears them down with
+ * it.** When a `mediaElement` is in scope, creates the `TextTracksActor` (bound to the element's `textTracks`) and the
+ * `TextTrackSegmentLoaderActor` (bound to that actor + the injected cue resolver), and publishes both on `context`. On
+ * element identity change or behavior destroy, destroys both actors and clears the signals.
  *
  * Single-resource synchronous create/destroy driven by one signal — the simple-effect form is the right shape (per
  * `behaviors.md` → "Where both shapes are legitimate": criterion 4b applies; sole writer of `textTracksActor` /

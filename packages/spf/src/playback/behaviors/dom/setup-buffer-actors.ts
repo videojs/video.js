@@ -1,6 +1,7 @@
 /**
- * **Per-type buffer + segment-loader actor setup.** Per available track type (video / audio), when `mediaSource` is
- * attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
+ * **Creates the `SourceBuffer` and segment loader for the selected video or audio track once the MediaSource is
+ * attached, and tears them down per source.** Per available track type (video / audio), when `mediaSource` is attached
+ * and the selected track of that type is present in the presentation with codecs (partial resolution from the
  * multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
  * creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
  * per-type actor signals. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
