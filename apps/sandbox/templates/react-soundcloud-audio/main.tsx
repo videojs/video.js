@@ -12,6 +12,7 @@ function App() {
   return (
     <AudioPlayer>
       <AudioSkinComponent>
+        {/* Hidden unless it is showing SoundCloud's own chrome, so it takes no room and needs no size. */}
         <SoundCloudAudio src={SOURCES[source].url ?? ''} />
       </AudioSkinComponent>
     </AudioPlayer>

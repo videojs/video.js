@@ -56,9 +56,9 @@ The [SoundCloud Widget](https://developers.soundcloud.com/docs/api/html5-widget)
 
 The widget does not accept short links, so the component first resolves them through [SoundCloud's oEmbed endpoint](https://developers.soundcloud.com/docs/oembed). That is one extra request to `soundcloud.com`.
 
-## Use with a player skin
+## Controls
 
-The widget stays visible and keeps taking clicks, with or without `controls`. It is the part of the page that credits the uploader and links back to the sound on SoundCloud. The audio skin draws its controls below the widget, so the two do not overlap.
+The widget is the only UI SoundCloud offers, so `controls` decides whether the component is visible at all. Without `controls`, the component hides itself and plays as an invisible transport: a hidden iframe still loads and plays, so a <DocsLink slug="guides/skins">player skin</DocsLink> drives playback while the widget takes no room on the page.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -80,14 +80,27 @@ The widget stays visible and keeps taking clicks, with or without `controls`. It
 ```
 </FrameworkCase>
 
-Anything the listener does in the widget shows in the skin: play, pause, seeking on the waveform, and picking another track of a set.
+With `controls`, the component shows the widget, and the audio skin draws its controls below it, so the two do not overlap. Anything the listener does in the widget shows in the skin: play, pause, seeking on the waveform, and picking another track of a set. The widget is also the part of the page that credits the uploader and links back to the sound on SoundCloud (see [SoundCloud's terms of use](#soundclouds-terms-of-use)).
 
-The component is 166 pixels tall by default, SoundCloud's classic layout. Set a height to change it. From about 300 pixels, a set also shows its track list, and 450 pixels shows most of it. The large artwork layout of `visual: true` (see [widget parameters](#widget-parameters)) needs 300 pixels or more. At the default height, the artwork shows only behind the waveform.
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<SoundCloudAudio src="https://soundcloud.com/forss/flickermood" controls />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<soundcloud-audio src="https://soundcloud.com/forss/flickermood" controls></soundcloud-audio>
+```
+</FrameworkCase>
+
+With `controls`, the component is 166 pixels tall by default, SoundCloud's classic layout. Set a height to change it. From about 300 pixels, a set also shows its track list, and 450 pixels shows most of it. The large artwork layout of `visual: true` (see [widget parameters](#widget-parameters)) needs 300 pixels or more. At the default height, the artwork shows only behind the waveform.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <SoundCloudAudio
   source={{ src: 'https://soundcloud.com/forss/flickermood', engine: { soundcloud: { visual: true } } }}
+  controls
   style={{ height: 300 }}
 />
 ```
@@ -103,7 +116,7 @@ soundcloud-audio {
 
 ## Widget parameters
 
-By default, the component hides the parts of the widget a skin has no use for: the buy, share, and download buttons, comments, reposts, the teaser, the related tracks shown after a track ends, and the large artwork layout. The uploader, the title, the artwork, and the SoundCloud logo always stay.
+By default, the component hides the parts of the widget a skin has no use for: the buy, share, and download buttons, comments, reposts, the teaser, the related tracks shown after a track ends, and the large artwork layout. The uploader, the title, the artwork, and the SoundCloud logo stay whenever the widget shows.
 
 Change any of these, or set `color`, under `source.engine.soundcloud`, spelled as SoundCloud spells them:
 
@@ -146,10 +159,10 @@ Engine options win over the parameters of a widget embed URL, which win over the
 - `autoplay` starts playback once the widget is ready. Browsers can still refuse it, as they do for any embed. The widget's own `auto_play` parameter does the same and is never written to the widget URL, so the volume always applies first.
 - `buffered` is the stretch the widget reports as loaded, from where playback last started or landed.
 - The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
-- `controls`, `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
+- `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
 - A track that is private without its secret token, removed, or not available in the listener's region reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a URL the component does not recognize. A widget that has not finished loading after 5 seconds reports a `MEDIA_ERR_NETWORK` error. An error the widget reports during playback fires a non-fatal `error` event but leaves `error` empty, because a set moves on to its next track by itself.
 
-## SoundCloud's terms
+## SoundCloud's terms of use
 
 The widget is covered by the [SoundCloud Terms of Use](https://soundcloud.com/terms-of-use#use-of-soundcloud-players-and-widget), in the section about players and widgets. Without written consent from SoundCloud, you may not use the widget to:
 
@@ -158,7 +171,7 @@ The widget is covered by the [SoundCloud Terms of Use](https://soundcloud.com/te
 
 These limits apply to commercial and non-commercial use. You also may not use the widget in a way that suggests that SoundCloud, an artist, or anyone else endorses or supports your site. SoundCloud can block your use of the widget at any time, for any reason.
 
-The [SoundCloud API terms](https://developers.soundcloud.com/docs/api/terms-of-use), which ask you to credit the uploader and SoundCloud with links back to the sound, apply when you use the SoundCloud API, for example to play stream URLs in a player of your own. This component uses the widget, which [SoundCloud says handles that credit itself](https://developers.soundcloud.com/docs/api/buttons-logos).
+The [SoundCloud API terms](https://developers.soundcloud.com/docs/api/terms-of-use), which ask you to credit the uploader and SoundCloud with links back to the sound, apply when you use the SoundCloud API, for example to play stream URLs in a player of your own. This component uses the widget, which [SoundCloud says handles that credit itself](https://developers.soundcloud.com/docs/api/buttons-logos). The widget gives that credit only while it shows, which is with `controls`. Without `controls`, we recommend that your page give the credit itself: name the uploader, name SoundCloud as the source, and link to the sound on SoundCloud. The Terms of Use also say you must not remove trademark, copyright, or other proprietary or legal notices that appear on content from SoundCloud.
 
 ## Privacy
 

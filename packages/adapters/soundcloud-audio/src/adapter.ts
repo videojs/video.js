@@ -319,7 +319,6 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#loop = value;
   }
 
-  /** The widget always shows its own player, so this has no effect. */
   get controls() {
     return this.#controls;
   }
