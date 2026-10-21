@@ -88,8 +88,12 @@ function restoreTextTrack({ track, mode, cues }: TextTrackSnapshot): void {
   });
 }
 
-/** Reads or writes cues through a mode that exposes them, leaving the track's own mode intact. */
-function withReadableCues<T>(track: TextTrack, action: () => T): T {
+/**
+ * Reads or writes cues through a mode that exposes them, leaving the track's own mode intact.
+ *
+ * @internal
+ */
+export function withReadableCues<T>(track: TextTrack, action: () => T): T {
   const { mode } = track;
 
   if (mode === 'disabled') track.mode = 'hidden';
