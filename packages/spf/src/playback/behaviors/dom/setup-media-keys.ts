@@ -80,7 +80,7 @@ export interface MediaKeysSetupConfig {
 // intact — as type aliases, not interfaces: the inference goes through an
 // index-signature constraint that only aliases satisfy implicitly. The reporter
 // seam (`errors`, optional per `ErrorEmitterState`) is deliberately not in the
-// typed slice — the setup helper accepts the map without it, and the live slot
+// typed slice — the setup helper accepts the map without it, and the live signal
 // reaches it at runtime when `collectErrors` is composed. Same shape as
 // `resolve-track`.
 type MediaKeysStateMap = {
@@ -219,10 +219,10 @@ function setupMediaKeysSetup({
   // schedules a fresh task.
   const runner = new RecurringRunner<void>(runOnce);
 
-  // `loadingSuspended` is observed, never declared: the slot exists only where
+  // `loadingSuspended` is observed, never declared: the signal exists only where
   // a feature behavior declares and writes it (`setupAirPlay`), so it lives
   // behind a cast rather than in the typed slice above — declaring it in
-  // `stateKeys` is what would materialize it. Absent slot means never
+  // `stateKeys` is what would materialize it. Absent signal means never
   // suspended, which is the right answer for every composition without an
   // AirPlay bridge. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments import.
@@ -329,7 +329,7 @@ function setupMediaKeysSetup({
             });
 
           // State-exit cleanup — source unload, element detach, or destroy.
-          // Order: abort first (kills the negotiation), clear the slots, then
+          // Order: abort first (kills the negotiation), clear the signals, then
           // detach. Sessions opened against these MediaKeys are closed by
           // `exchangeLicenses`, which is composed ahead of this behavior so
           // its cleanup runs first (see its JSDoc).
@@ -370,7 +370,7 @@ function setupMediaKeysSetup({
  * Single-positive-state reactor riding the resolver's resolved/unresolved lifecycle, like `setupMediaSource`. The EME
  * pipeline runs as one `Task` under a runner the reactor owns — the same shape as `setupTrackResolution` — so source
  * replacement routes through `'preconditions-unmet'`, whose state-exit cleanup aborts the task structurally, clears the
- * slots, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
+ * signals, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
  * deliberate — MediaKeys re-use across sources is an optimization with prior art (see drm-support.md).
  *
  * A live AirPlay session routes through that same exit. Playback moves off MSE onto the native-HLS fallback `<source>`
@@ -381,7 +381,7 @@ function setupMediaKeysSetup({
  * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
  * HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
  * gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
- * defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
+ * defaults — carries neither the machinery nor the signals, and none of this file's key-system code survives
  * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
  *
  * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD

@@ -362,7 +362,7 @@ function setupAirPlaySetup({
  *   ManagedMediaSource — Safari won't fire `sourceopen` (and MSE playback never starts) otherwise.
  * - **AirPlay needs `false` to offer the picker.** Flipping to `false` _before_ the source opens would prevent
  *   `sourceopen`, so the flip is gated on `context.mediaSource` — which `setupMediaSource` publishes exactly once the
- *   MS is open. Re-fires per source (the slot clears + republishes on reset).
+ *   MS is open. Re-fires per source (the signal clears + republishes on reset).
  * - **Author opt-out wins.** `state.disableRemotePlayback` is the author's intent, written only by the media adapter's
  *   IDL property; MMS/programmatic code touch the element's own `disableRemotePlayback` instead. A `true` there is
  *   unambiguously the author's choice to disable remote playback, so it holds the machine in `'preconditions-unmet'`

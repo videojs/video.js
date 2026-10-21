@@ -34,7 +34,7 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
 // ============================================================================
 
 /**
- * State shape for track resolution. Uses `MaybeResolvedPresentation` so it matches the engine's slot type; resolution
+ * State shape for track resolution. Uses `MaybeResolvedPresentation` so it matches the engine's signal type; resolution
  * narrows internally.
  */
 export interface ResolveTrackState {
@@ -113,7 +113,7 @@ function setupTrackResolution<K extends SelectedTrackKey>({
   state,
   config,
 }: {
-  // Widened with the optional `errors` slot: reporting writes through it without
+  // Widened with the optional `errors` signal: reporting writes through it without
   // the behavior declaring ownership, and no-ops when `collectErrors` isn't
   // composed. Same contract as `failedCdns` / `failoverFetch`.
   state: ResolveTrackStateMap<K> & ErrorEmitterState;
@@ -131,7 +131,7 @@ function setupTrackResolution<K extends SelectedTrackKey>({
 
   // Recurrence lives in the runner: with a `reschedule` (live) it re-runs the
   // task until the policy stops; `runOnce` (VOD) runs it exactly once. Single-
-  // slot — a selection change re-schedules (abort-and-replace).
+  // signal — a selection change re-schedules (abort-and-replace).
   const runner = new RecurringRunner<ResolvedTrack>(reschedule ?? runOnce);
 
   // Reactor states model the FSM the previous effect-based body was

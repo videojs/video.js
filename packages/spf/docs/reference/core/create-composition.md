@@ -58,7 +58,7 @@ Create a composition from a set of behaviors.
 
 Composition unions the behaviors' declared `stateKeys` / `contextKeys` to know which signals to create. Each signal
 is seeded from `initialState` / `initialContext` when supplied, defaulting to `undefined`. Behaviors are responsible
-for writing their own slots once their preconditions are met.
+for writing their own signals once their preconditions are met.
 
 Cross-behavior type conflicts (e.g. two behaviors disagreeing on a field's type) surface as a compose-time type error
 via `ValidateComposition`.

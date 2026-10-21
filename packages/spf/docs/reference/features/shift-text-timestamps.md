@@ -20,7 +20,7 @@ None.
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `textMessagePipelines` | `TextMessagePipelines<VTTCue>` | `relocatingTextPipelines` | [setupTextTrackActors](../behaviors/dom/setup-text-track-actors.md#setuptexttrackactors) | Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to mirror the v/a `video`/`audioMessagePipelines` composition-config slots. Defaults (in the loader) to `resolveCues → dispatchCues`. |
+| `textMessagePipelines` | `TextMessagePipelines<VTTCue>` | `relocatingTextPipelines` | [setupTextTrackActors](../behaviors/dom/setup-text-track-actors.md#setuptexttrackactors) | Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to mirror the v/a `video`/`audioMessagePipelines` composition-config keys. Defaults (in the loader) to `resolveCues → dispatchCues`. |
 
 ### Composed by
 
