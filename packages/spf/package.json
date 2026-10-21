@@ -55,6 +55,21 @@
       "development": "./dist/dev/engines/hls-background-video.js",
       "default": "./dist/default/engines/hls-background-video.js"
     },
+    "./engines/hls-video-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-video-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-video-mpeg-ts.js"
+    },
+    "./engines/hls-audio-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-audio-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-audio-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-audio-mpeg-ts.js"
+    },
+    "./engines/hls-background-video-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-background-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-background-video-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-background-video-mpeg-ts.js"
+    },
     "./features/airplay": {
       "types": "./dist/dev/features/airplay.d.ts",
       "development": "./dist/dev/features/airplay.js",

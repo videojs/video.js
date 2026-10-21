@@ -1,14 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createComposition } from '../../../core/composition/create-composition';
-import { flattenFeatures } from '../../../core/composition/define-feature';
 import { isCarriedAudioTrack } from '../../../media/hls/carried-audio';
 import type { MaybeResolvedPresentation } from '../../../media/types';
 import { findTrackById, getTracksByType } from '../../../media/utils/tracks';
-import { mpegTsAudioTransmuxFeature } from '../../features/mpeg-ts-audio-transmux';
-import { mpegTsTransmuxFeature } from '../../features/mpeg-ts-transmux';
-import * as hlsAudio from '../hls-audio';
-import * as hlsVideo from '../hls-video';
+import { createEngine as createTransmuxingAudioEngine } from '../hls-audio-mpeg-ts';
+import { createEngine as createTransmuxingVideoEngine } from '../hls-video-mpeg-ts';
 
 // Spike harness against public Mux assets packaged as MPEG-TS. Network-dependent — the
 // fixture question is open; see `.agents/plans/spf-mpeg-ts-transmux-spike.md`.
@@ -19,22 +15,6 @@ const MUX_TS_URL = 'https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8R
 const MUX_MULTI_AUDIO_TS_URL = 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8';
 // Audio-only TS asset (one `mp4a.40.2` variant, no `EXT-X-MEDIA`).
 const MUX_AUDIO_ONLY_TS_URL = 'https://stream.mux.com/3zd01ukbq5UaSPrfGnZ2eYBcMXuf3Uc5Rc5XINRcHA00g.m3u8';
-
-/** The video engine's features plus the transmux feature, composed the way the compose guide describes. */
-function createTransmuxingVideoEngine() {
-  const { behaviors, defaultConfig, initialState } = flattenFeatures([...hlsVideo.features, mpegTsTransmuxFeature]);
-
-  return createComposition(behaviors, { defaultConfig, initialState });
-}
-
-function createTransmuxingAudioEngine() {
-  const { behaviors, defaultConfig, initialState } = flattenFeatures([
-    ...hlsAudio.features,
-    mpegTsAudioTransmuxFeature,
-  ]);
-
-  return createComposition(behaviors, { defaultConfig, initialState });
-}
 
 const realFetch = globalThis.fetch;
 
@@ -66,7 +46,7 @@ function frameHasPicture(video: HTMLVideoElement): boolean {
   return false;
 }
 
-describe('mpegTsTransmuxFeature (real Mux TS sources, end to end)', () => {
+describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sources, end to end)', () => {
   let media: HTMLMediaElement | undefined;
 
   afterEach(() => {

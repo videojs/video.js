@@ -73,15 +73,16 @@ export const initialState = {} satisfies Partial<State>;
 
 /**
  * Plays HLS content packaged as MPEG-TS (H.264 + AAC) by transmuxing each segment to fMP4 on the client before it
- * reaches the SourceBuffer. fMP4 and CMAF content plays through it unchanged. No shipped HLS engine composes it: its
- * codec and edge coverage is what Mux Video packages, so the Mux media compose it and a general HLS source keeps the
- * unsupported-format verdict. An audio-only composition takes `mpegTsAudioTransmuxFeature` instead, which carries no
- * H.264 framing. Compose either after `hlsLoadingFeature`, `shiftTimestampsFeature` and `drmFeature`: it wraps the
- * parser the first sets, replaces the loader pipelines the second sets and the playability probe and reporter the third
- * sets, and it needs `deriveStartMediaTime` from the second to place TS content, whose timestamps rarely start at zero,
- * onto the playlist timeline.
+ * reaches the SourceBuffer. fMP4 and CMAF content plays through it unchanged. The `hls-video-mpeg-ts` and
+ * `hls-background-video-mpeg-ts` engines compose it; the container-neutral engines don't, because its codec and edge
+ * coverage is what Mux Video packages, so a general HLS source keeps the unsupported-format verdict there. An
+ * audio-only composition takes `mpegTsAudioTransmuxFeature` instead, which carries no H.264 framing. Compose either
+ * after `hlsLoadingFeature`, `shiftTimestampsFeature` and `drmFeature`: it wraps the parser the first sets, replaces
+ * the loader pipelines the second sets and the playability probe and reporter the third sets, and it needs
+ * `deriveStartMediaTime` from the second to place TS content, whose timestamps rarely start at zero, onto the playlist
+ * timeline.
  *
- * Scope (spike): one program, H.264 + AAC-LC, unencrypted. A muxed rendition's in-band audio is carried in the video
+ * Scope: one program, H.264 + AAC-LC, unencrypted. A muxed rendition's in-band audio is carried in the video
  * SourceBuffer when the track declares an audio codec. When the audio is demuxed into renditions of its own, the video
  * SourceBuffer drops it and the audio SourceBuffer takes each rendition's AAC — including the default rendition that
  * HLS declares URI-less because it is carried in the video segments: the audio pipeline extracts it from the segments
