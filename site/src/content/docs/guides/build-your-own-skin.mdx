@@ -5,34 +5,58 @@ description: Create a skin project, preview it locally, and compose your own pla
 
 import DocsLink from '@/components/docs/DocsLink.astro';
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import PackageManagerTabs from '@/components/installation/PackageManagerTabs';
 
-A skin is the player interface: markup that arranges Video.js UI components inside the player, plus the styles that give it a look. The components handle playback state, keyboard support, and accessibility, so building your own skin is mostly a layout and design job.
+A skin is the player interface: markup that arranges Video.js UI components inside the player, plus the styles that give it a look. The components handle playback state, keyboard support, and accessibility, so building your own skin is mostly a layout and design job. <DocsLink slug="guides/skins">Skins</DocsLink> explains how skins fit into Video.js.
 
-For the thinking behind our own skins, such as shapes, surfaces, motion, and contrast over video, read [Design inspiration behind the Video.js v10 skins](/blog/videojs-v10-skin-design). If a packaged skin is already close to what you want, <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> is less work.
+If a packaged skin is already close to what you want, <DocsLink slug="guides/customize-skins">Customize skins</DocsLink> is less work.
 
 ## Create a skin project
 
 The quickest way to start is a standalone skin project:
 
-```bash
-npx @videojs/cli skin create
-```
+<PackageManagerTabs
+  client:idle
+  commands={{
+    npm: 'npx @videojs/cli skin create',
+    pnpm: 'pnpm dlx @videojs/cli skin create',
+    yarn: 'npx @videojs/cli skin create --package-manager yarn',
+    bun: 'bunx @videojs/cli skin create',
+  }}
+/>
 
-`pnpm dlx @videojs/cli skin create` and `bunx @videojs/cli skin create` work too. The command asks for a name, a framework (React or HTML), a styling approach (Tailwind or CSS), a starting skin, and a preset (video, audio, live video, or live audio). The starting skin defaults to **Scaffold**: every control wired up, with minimal styling and no transitions, so there's little to undo.
+The command asks for a name, a framework (React or HTML), a styling approach (Tailwind or CSS), a starting skin, and a preset (video, audio, live video, or live audio). The starting skin defaults to <DocsLink slug="reference/components/video-scaffold-skin">Scaffold</DocsLink>: every control wired up, with minimal styling and no transitions, so there's little to undo.
 
 The project goes in a folder named after the skin, so a skin called "My Skin" goes in `my-skin`. Open it and start the preview:
 
-```bash
-cd my-skin
-npm run dev
-```
+<PackageManagerTabs
+  client:idle
+  commands={{
+    npm: 'cd my-skin\nnpm run dev',
+    pnpm: 'cd my-skin\npnpm dev',
+    yarn: 'cd my-skin\nyarn dev',
+    bun: 'cd my-skin\nbun dev',
+  }}
+/>
 
 The project has two parts:
 
 - **`src/`** holds the skin and nothing else. Edit it however you like, including its markup, class names, theme tokens, and stylesheets.
 - **`apps/preview/`** is a workbench that plays your skin. Use it to try different player sizes and aspect ratios, light and dark color schemes, right-to-left text, every built-in language, and playback settings such as autoplay and loop.
 
-When you want to share it, `npm run deploy` deploys the workbench to Vercel, Netlify, or Cloudflare Pages. Name the host to skip the question, as in `npm run deploy vercel`. With pnpm, use `pnpm run deploy`, since `pnpm deploy` is a built-in pnpm command. When the skin is done, move `src/` into your app.
+When you want to share it, deploy the workbench to Vercel, Netlify, or Cloudflare Pages:
+
+<PackageManagerTabs
+  client:idle
+  commands={{
+    npm: 'npm run deploy',
+    pnpm: 'pnpm run deploy',
+    yarn: 'yarn run deploy',
+    bun: 'bun run deploy',
+  }}
+/>
+
+Add the host's name to skip the question, as in `npm run deploy vercel`. With pnpm, keep the `run`, since `pnpm deploy` is a built-in pnpm command. When the skin is done, move `src/` into your app.
 
 ### Build it with a coding agent
 
@@ -377,6 +401,16 @@ To build a control Video.js doesn't provide, follow <DocsLink slug="guides/build
 The components bring no visual styles. You add the icons, text, and CSS. They describe their state with `data-*` attributes, such as `data-paused` on the play button, so you can style them with plain CSS, Tailwind, or anything else. <DocsLink slug="guides/ui-components">UI components</DocsLink> explains how. <DocsLink slug="guides/controls">Automatically show and hide controls</DocsLink> covers the controls' visibility states.
 
 Lay out controls in source order that matches their visual order, so keyboard focus follows the layout.
+
+A player's controls sit over a moving picture, in a frame whose size you don't control, so a few design questions come up in every skin:
+
+- **Surfaces over video.** Borders, shadows, and translucent backgrounds look different over every frame. [Shapes and surfaces](/blog/videojs-v10-skin-design#shapes-and-surfaces) and [Letting the content influence the color](/blog/videojs-v10-skin-design#letting-the-content-influence-the-color) cover how our skins handle them.
+- **Readable controls.** Seek tracks need a visible target, icons need optical alignment, and time displays need fixed-width digits. See [Controls and typography](/blog/videojs-v10-skin-design#controls-and-typography).
+- **Motion.** Menus should open from the control that opened them and respond when they're closed mid-transition. See [Motion and transitions](/blog/videojs-v10-skin-design#motion-and-transitions).
+- **Small players.** Captions, settings, picture-in-picture, and Cast all compete for space at narrow widths. See [Fitting the available space](/blog/videojs-v10-skin-design#fitting-the-available-space).
+- **Custom colors.** An accent color someone else picks still needs contrast against its text and the video. See [Customization and contrast](/blog/videojs-v10-skin-design#customization-and-contrast).
+
+[Design inspiration behind the Video.js v10 skins](/blog/videojs-v10-skin-design) covers the thinking behind our own skins in full.
 
 ## Support the public CSS properties
 

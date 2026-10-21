@@ -7,6 +7,7 @@ import PresetReference from '@/components/docs/api-reference/PresetReference.ast
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
+import DocsLinkCards from '@/components/docs/DocsLinkCards.astro';
 import Aside from '@/components/Aside.astro';
 
 <Aside type="note" title="New in version 10">
@@ -78,7 +79,10 @@ The skin source contains the complete interface. You can add, remove, rearrange,
 
 You can also build an interface without starting from a skin. In that model, you choose and arrange individual <DocsLink slug="guides/ui-components">UI components</DocsLink> around the media. This takes more work, but it avoids inheriting a skin's layout and interactions.
 
+<DocsLinkCards>
+<DocsLinkCard slug="guides/build-your-own-skin">Build your own skin</DocsLinkCard>
 <DocsLinkCard slug="guides/build-your-own-component">Build your own component</DocsLinkCard>
+</DocsLinkCards>
 
 ## Skins, features, and presets
 
