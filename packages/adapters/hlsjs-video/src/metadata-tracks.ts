@@ -1,6 +1,7 @@
 import type { Constructor } from '@videojs/utils/types';
 import Hls from 'hls.js';
 
+import { withReadableCues } from './text-tracks';
 import type { HlsEngineHost } from './types';
 
 /**
@@ -24,35 +25,28 @@ export function HlsJsMetadataTracksMixin<Base extends Constructor<HlsEngineHost>
       const target = this.target as HTMLVideoElement | null;
       if (!target) return;
 
-      [...target.textTracks].forEach((track) => {
-        if (!(track.kind === 'metadata' || track.kind === 'chapters')) return;
-
-        let selector = 'track';
-
-        if (track.kind) selector += `[kind="${track.kind}"]`;
-
-        if (track.label) selector += `[label="${track.label}"]`;
-
-        const trackEl = target.querySelector(selector) as HTMLTrackElement | null;
-        if (!trackEl) return;
+      for (const trackEl of target.querySelectorAll('track')) {
+        const { track } = trackEl;
+        if (!(track.kind === 'metadata' || track.kind === 'chapters')) continue;
 
         const src = trackEl.getAttribute('src') ?? '';
         const TRACK_LOADED = 2;
+        let currentTrackEl = trackEl;
 
-        // Only reset the track if it was loaded before and had no cues.
-        if (src && trackEl.readyState === TRACK_LOADED && !track.cues?.length) {
+        // Disabled tracks hide their cues; read through hidden mode before
+        // deciding hls.js wiped them and the resource needs to load again.
+        if (src && trackEl.readyState === TRACK_LOADED && withReadableCues(track, () => !track.cues?.length)) {
           const clonedTrackEl = trackEl.cloneNode() as HTMLTrackElement;
 
           target.replaceChild(clonedTrackEl, trackEl);
+          currentTrackEl = clonedTrackEl;
         }
 
         // Force mode to 'hidden' for default tracks (independent of replacement).
-        const currentTrackEl = target.querySelector(selector) as HTMLTrackElement | null;
-
-        if (currentTrackEl?.default && currentTrackEl.track.mode !== 'hidden') {
+        if (currentTrackEl.default && currentTrackEl.track.mode !== 'hidden') {
           currentTrackEl.track.mode = 'hidden';
         }
-      });
+      }
     }
   }
 
