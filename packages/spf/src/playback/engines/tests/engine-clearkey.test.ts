@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { clearKeySystem } from '../../../../media/dom/key-systems';
-import type { MaybeResolvedPresentation } from '../../../../media/types';
-import { createEngine } from '../engine';
+import { clearKeySystem } from '../../../media/dom/key-systems';
+import type { MaybeResolvedPresentation } from '../../../media/types';
+import { createEngine } from '../hls-video';
 
 // Full-pipeline EME coverage on the bundled Chromium, which ships no proprietary CDM but must ship Clear Key (the one
 // key system the EME spec requires). The engine plays a real cenc-encrypted fixture end to end — negotiate → attach →

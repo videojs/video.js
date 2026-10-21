@@ -44,7 +44,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — HLS VoD engine.
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — HLS VoD engine.
 
 **Behaviors:**
 

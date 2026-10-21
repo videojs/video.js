@@ -57,7 +57,7 @@ configuration. Alternative-implementation buckets surface in Phase 3.
 
 ### Subtracted
 
-From [the `hls-video` engine](../../../../packages/spf/src/playback/engines/hls/engine.ts):
+From [the `hls-video` engine](../../../../packages/spf/src/playback/engines/hls-video.ts):
 
 - `syncPreload`, `trackLoadTriggers` — no preload-state monitoring or DOM `play`/`seeking` activation; replaced by `loadActivated: true` initial state.
 - `selectAudioTrack`, `resolveAudioTrack`, `setupAudioBufferActors`, `loadAudioSegments` — no audio side.
@@ -150,5 +150,5 @@ Resolved Phase 1: ~~picker location~~ (`pickMaxResolutionVideoTrack` ships in [`
 - [`README.md`](./README.md) — use-case-composition doc-type spec.
 - [`../features/clusters.md` § Composition vs Policy vs middle pattern](../features/clusters.md#composition-vs-policy-vs-middle-pattern) · [`../conventions/behaviors.md` § Inverse: behaviors that operate uniformly across tracks](../conventions/behaviors.md#inverse-behaviors-that-operate-uniformly-across-tracks).
 - [`../../../../packages/spf/docs/hls-engine.md`](../../../../packages/spf/docs/hls-engine.md) — HLS engine composition baseline the variant subtracts from.
-- [`select-tracks.ts`](../../../../packages/spf/src/playback/behaviors/select-tracks.ts) (add target) · [`engine.ts`](../../../../packages/spf/src/playback/engines/hls/engine.ts) (subtraction baseline).
+- [`select-tracks.ts`](../../../../packages/spf/src/playback/behaviors/select-tracks.ts) (add target) · [`hls-video.ts`](../../../../packages/spf/src/playback/engines/hls-video.ts) (subtraction baseline).
 - [GitHub #1586](https://github.com/videojs/v10/issues/1586) (Phase 1) · [#873](https://github.com/videojs/v10/issues/873) (parent epic) · [`mux-background-video`](https://github.com/muxinc/mux-background-video) (prior art) · [SPF Epics Working Doc](https://www.notion.so/35f97a7f89d08123a13fecab1ca1cac4).

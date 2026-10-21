@@ -253,7 +253,7 @@ implementation pass landed the shared-factory pattern (see that doc's
   audio-axis sibling's `HlsAudioAdapterCore` (which landed in
   Phase 1 of that use case). Aligns with the existing
   `Simple{Variant}HlsMediaElement` naming pattern in
-  `packages/spf/src/playback/engines/hls/`.
+  `packages/spf/src/playback/engines/`.
 - **Subtitle Phase 1 vs Phase 2.** Currently Phase 2 (per the doc-type-spec
   scoping discussion). Open whether muted-video + captions a11y pattern
   should promote to Phase 1 baseline — depends on whether the canonical

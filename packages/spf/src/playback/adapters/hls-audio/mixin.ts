@@ -10,12 +10,7 @@ import {
   type SvtaError,
 } from '../../../media/errors';
 import { crossOriginToRequestCredentials } from '../../../network/request-credentials';
-import {
-  createEngine,
-  type EngineConfig,
-  type EngineContext,
-  type EngineState,
-} from '../../engines/hls/engine-audio-only';
+import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls-audio';
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../primitives/error-messages';
 import {
   firstFatal,

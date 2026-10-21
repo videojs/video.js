@@ -120,10 +120,10 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   leaving ~248 B residue — ~130 B parser key metadata, 11 B `drm`
   config threading, 10 B the gate read in `load-segments`, the rest
   unrelated branch-era churn. Pinned by
-  `playback/engines/hls/tests/engine-drm-optional.test-d.ts`, which
+  `playback/engines/tests/engine-drm-optional.test-d.ts`, which
   asserts the DRM-free composition materializes none of the three DRM
   slots. The DRM-free **engine variant** is not built yet; the
-  measurement patches `engine.ts` directly. A spread-based additive
+  measurement patches `hls-video.ts` directly. A spread-based additive
   variant (`[...BASE_PRE, setupMediaKeys, ...BASE_POST]`) typechecks
   with inference intact, so it needs no duplicated behavior list — the
   cost that sank the short-lived `createDrmHlsVideoEngine`.

@@ -22,7 +22,7 @@ import {
 } from '../../../media/types';
 import { findTrackById } from '../../../media/utils/tracks';
 import { crossOriginToRequestCredentials } from '../../../network/request-credentials';
-import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls/engine';
+import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls-video';
 import {
   DVR_EXPERIMENTAL_MESSAGE,
   LOW_LATENCY_UNSUPPORTED_MESSAGE,

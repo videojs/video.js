@@ -1,19 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { snapshot } from '../../../../core/signals/primitives';
-import { appendSegment } from '../../../../media/dom/mse/append-segment';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../../media/errors';
+import { snapshot } from '../../../core/signals/primitives';
+import { appendSegment } from '../../../media/dom/mse/append-segment';
+import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
 import type {
   CanPlayTrack,
   PartiallyResolvedAudioTrack,
   PartiallyResolvedVideoTrack,
   Presentation,
   VideoTrack,
-} from '../../../../media/types';
-import { createEngine } from '../engine';
+} from '../../../media/types';
+import { createEngine } from '../hls-video';
 
 // Mock appendSegment to succeed without real MP4 data
-vi.mock('../../../../media/dom/mse/append-segment', () => ({
+vi.mock('../../../media/dom/mse/append-segment', () => ({
   appendSegment: vi.fn().mockResolvedValue(undefined),
 }));
 

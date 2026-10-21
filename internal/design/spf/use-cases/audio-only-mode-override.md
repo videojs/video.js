@@ -24,7 +24,7 @@ single composition with two variant-decision-source paths
 ## Status
 
 - **Composition:** Phase 1 implemented. The `hls-audio` engine and
-  `HlsAudioAdapterCore` ship in `packages/spf/src/playback/engines/hls/`
+  `HlsAudioAdapterCore` ship in `packages/spf/src/playback/engines/`
   and export from `@videojs/spf/engines/hls-audio` and `@videojs/spf/adapters/hls-audio`. The adapter handles both truly
   audio-only HLS sources and mixed-AV sources (video / subtitle renditions
   ignored at composition time). Phases 2 (audio-abr, multi-language-audio)
@@ -277,16 +277,16 @@ Phase 1 implementation pass (kept for traceability):
 Phase 1 landed across the full SPF→core→html/react→sandbox cascade,
 parallel to the existing `hls-video` pair.
 
-**SPF — engine factory** (`packages/spf/src/playback/engines/hls/`):
+**SPF — engine factory** (`packages/spf/src/playback/engines/`):
 
 | Export | File | Purpose |
 |---|---|---|
-| `createEngine` | `engine-audio-only.ts` (`@videojs/spf/engines/hls-audio`) | Subtractive composition variant; omits all video + text-track behaviors |
-| `EngineState` | `engine-audio-only.ts` | Trimmed state — no `selectedVideoTrackId` / `selectedTextTrackId` / `userVideoTrackSelection` / `bandwidthState` |
-| `EngineContext` | `engine-audio-only.ts` | Trimmed context — no video buffer / video segment loader / text-track actor slots |
-| `EngineConfig` | `engine-audio-only.ts` | Trimmed config — no video-quality, bandwidth, or text-track fields |
+| `createEngine` | `hls-audio.ts` (`@videojs/spf/engines/hls-audio`) | Subtractive composition variant; omits all video + text-track behaviors |
+| `EngineState` | `hls-audio.ts` | Trimmed state — no `selectedVideoTrackId` / `selectedTextTrackId` / `userVideoTrackSelection` / `bandwidthState` |
+| `EngineContext` | `hls-audio.ts` | Trimmed context — no video buffer / video segment loader / text-track actor slots |
+| `EngineConfig` | `hls-audio.ts` | Trimmed config — no video-quality, bandwidth, or text-track fields |
 
-**SPF — adapter** (`packages/spf/src/playback/engines/hls/`):
+**SPF — adapter** (`packages/spf/src/playback/engines/`):
 
 | Export | File | Purpose |
 |---|---|---|
@@ -296,7 +296,7 @@ parallel to the existing `hls-video` pair.
 | `hlsAudioAdapterDefaultProps` | `hls-audio/adapter.ts` | Default-prop constants |
 
 Public entry points: the engine ships at `@videojs/spf/engines/hls-audio`
-(`engine-audio-only.ts`), and the adapter at `@videojs/spf/adapters/hls-audio`.
+(`hls-audio.ts`), and the adapter at `@videojs/spf/adapters/hls-audio`.
 
 **Media** (`packages/spf/src/playback/adapters/hls-audio/`):
 
@@ -339,7 +339,7 @@ configuration drives end-of-stream correctly with no per-type changes.
 
 ## Verification
 
-**Unit tests** (`packages/spf/src/playback/engines/hls/tests/`):
+**Unit tests** (`packages/spf/src/playback/engines/tests/`):
 
 - `engine-audio-only.test.ts`:
   - `"creates engine with state, context, and destroy"` — basic API surface
@@ -410,9 +410,9 @@ configuration drives end-of-stream correctly with no per-type changes.
 - [`../conventions/behaviors.md` § Inverse: behaviors that operate uniformly across tracks](../conventions/behaviors.md#inverse-behaviors-that-operate-uniformly-across-tracks) — composition-variant discipline; the `updateMediaSourceDuration` worked example
 - [SPF Epics Working Doc](https://www.notion.so/35f97a7f89d08123a13fecab1ca1cac4) — Notion epic #4b
 - [`packages/spf/docs/hls-engine.md`](../../../../packages/spf/docs/hls-engine.md) — current HLS engine composition walkthrough; the variant subtracts from this baseline
-- [`packages/spf/src/playback/engines/hls/engine-audio-only.ts`](../../../../packages/spf/src/playback/engines/hls/engine-audio-only.ts) — Phase 1 engine factory
+- [`packages/spf/src/playback/engines/hls-audio.ts`](../../../../packages/spf/src/playback/engines/hls-audio.ts) — Phase 1 engine factory
 - [`packages/spf/src/playback/adapters/hls-audio/mixin.ts`](../../../../packages/spf/src/playback/adapters/hls-audio/mixin.ts) — Phase 1 adapter
-- [`packages/spf/src/playback/engines/hls/tests/engine-audio-only.test.ts`](../../../../packages/spf/src/playback/engines/hls/tests/engine-audio-only.test.ts) — Phase 1 engine integration tests
+- [`packages/spf/src/playback/engines/tests/hls-audio.test.ts`](../../../../packages/spf/src/playback/engines/tests/hls-audio.test.ts) — Phase 1 engine integration tests
 - [`packages/spf/src/playback/adapters/hls-audio/tests/mixin.test.ts`](../../../../packages/spf/src/playback/adapters/hls-audio/tests/mixin.test.ts) — Phase 1 adapter tests
 - [`packages/spf/src/playback/adapters/hls-audio/adapter.ts`](../../../../packages/spf/src/playback/adapters/hls-audio/adapter.ts) — Phase 1 media wrapper
 - [`packages/html/src/media/hls-audio/adapter.ts`](../../../../packages/html/src/media/hls-audio/adapter.ts) — Phase 1 HTML custom element

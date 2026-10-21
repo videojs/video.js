@@ -5,10 +5,10 @@
  */
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import type { AudioTrack, TextTrack, VideoTrack } from '../../../../media/types';
-import type * as hlsVideo from '../engine';
-import type * as hlsAudio from '../engine-audio-only';
-import type * as hlsBackgroundVideo from '../engine-background-video';
+import type { AudioTrack, TextTrack, VideoTrack } from '../../../media/types';
+import type * as hlsAudio from '../hls-audio';
+import type * as hlsBackgroundVideo from '../hls-background-video';
+import type * as hlsVideo from '../hls-video';
 
 type IsOpen<T> = string extends keyof T ? true : false;
 

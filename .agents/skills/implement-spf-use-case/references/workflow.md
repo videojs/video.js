@@ -435,7 +435,7 @@ typical for use-case implementations:
   the variant; per-behavior tests for any new use-case-specific
   behaviors.
 - **Composition wiring** — ties the variant factory into the adapter
-  and exposes via `packages/spf/src/playback/engines/hls/index.ts`.
+  and exposes via `packages/spf/src/hls.ts`.
 
 **Implementation-scope-extension layers (opt-in per Step 2):**
 

@@ -110,8 +110,8 @@ Extension boundaries — each is a separate candidate feature or a parked phase:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (and
-`engine-audio-only.ts`) — the relocation wiring is comment-marked as one removable
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (and
+`hls-audio.ts`) — the relocation wiring is comment-marked as one removable
 block (reactor + `deriveStartMediaTime` seam + the `video`/`audio`/`text`
 message-pipeline config), so it adds/drops as a unit for bundle / back-compat
 testing.

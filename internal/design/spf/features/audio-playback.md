@@ -75,7 +75,7 @@ Capability slices around today's audio playback contract.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` —
 audio behaviors composed alongside video and text:
 
 ```ts
@@ -160,10 +160,10 @@ Consumers wanting language-aware selection today must override
 ## Verification
 
 - **Unit tests:**
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts` →
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts` →
     "orchestrates complete pipeline" — asserts `selectedAudioTrackId`
     defined, audio track resolved, audio buffer actor present
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts` →
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts` →
     "handles audio-only stream" — basic audio-only coverage
   - `packages/spf/src/playback/behaviors/dom/tests/setup-buffer-actors.test.ts`
     — per-type audio setup

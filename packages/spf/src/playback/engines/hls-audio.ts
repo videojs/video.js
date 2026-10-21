@@ -3,34 +3,34 @@ import {
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-} from '../../../core/composition/create-composition';
-import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
-import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
-import { canPlayTrack } from '../../../media/dom/capabilities';
-import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
-import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import type { CanPlayTrack } from '../../../media/types';
-import type { GetCdnId } from '../../../media/utils/cdn';
-import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+} from '../../core/composition/create-composition';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import type { BackBufferConfig } from '../../media/buffer/back-buffer';
+import type { ForwardBufferConfig } from '../../media/buffer/forward-buffer';
+import { canPlayTrack } from '../../media/dom/capabilities';
+import { attachMediaSourceAsSourceElement } from '../../media/dom/mse/mediasource-setup';
+import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
+import type { CanPlayTrack } from '../../media/types';
+import type { GetCdnId } from '../../media/utils/cdn';
+import { getResolvedSelectedTrackDuration } from '../../media/utils/track-selection';
+import type { RequestCredentialsPolicy } from '../../network/credentials-fetch';
 import {
   calculatePresentationDuration,
   type PresentationDurationResolver,
-} from '../../behaviors/calculate-presentation-duration';
-import { collectErrors } from '../../behaviors/collect-errors';
-import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
-import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
-import { applyStartPosition } from '../../behaviors/dom/apply-start-position';
-import { endOfStream } from '../../behaviors/dom/end-of-stream';
-import { loadChapters } from '../../behaviors/dom/load-chapters';
-import { loadAudioSegments } from '../../behaviors/dom/load-segments';
-import { recoverEndStall } from '../../behaviors/dom/recover-end-stall';
-import { setupAudioBufferActors } from '../../behaviors/dom/setup-buffer-actors';
-import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
-import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
-import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
-import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
+} from '../behaviors/calculate-presentation-duration';
+import { collectErrors } from '../behaviors/collect-errors';
+import { deriveCdnPriority } from '../behaviors/derive-cdn-priority';
+import { type DisableRemotePlaybackState, setupAirPlay } from '../behaviors/dom/airplay';
+import { applyStartPosition } from '../behaviors/dom/apply-start-position';
+import { endOfStream } from '../behaviors/dom/end-of-stream';
+import { loadChapters } from '../behaviors/dom/load-chapters';
+import { loadAudioSegments } from '../behaviors/dom/load-segments';
+import { recoverEndStall } from '../behaviors/dom/recover-end-stall';
+import { setupAudioBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { setupMediaSource } from '../behaviors/dom/setup-mediasource';
+import { trackCurrentTime } from '../behaviors/dom/track-current-time';
+import { trackLoadTriggers } from '../behaviors/dom/track-load-triggers';
+import { updateMediaSourceDuration } from '../behaviors/dom/update-mediasource-duration';
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
 // `audioMessagePipelines` finalConfig entry, the `mediaContainerData` state slot,
 // and the `deriveStartMediaTime` config field to drop relocation from audio-only.
@@ -38,21 +38,21 @@ import {
   type DeriveStartMediaTime,
   deriveSharedMinStartMediaTime,
   establishStartMediaTime,
-} from '../../behaviors/establish-start-media-time';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
-import { resolveAudioTrack } from '../../behaviors/resolve-track';
-import { type FailoverMonitorConfig, setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
-import { syncPreload } from '../../behaviors/sync-preload';
+} from '../behaviors/establish-start-media-time';
+import { type ParsePresentation, resolvePresentation } from '../behaviors/resolve-presentation';
+import { resolveAudioTrack } from '../behaviors/resolve-track';
+import { type FailoverMonitorConfig, setupFailoverMonitor } from '../behaviors/setup-failover-monitor';
+import { syncPreload } from '../behaviors/sync-preload';
 import {
   type SwitchAudioTrackConfig,
   switchAudioTrack,
   type UserTrackSelectionState,
-} from '../../behaviors/track-switching';
-import { relocationPipelinesFor } from '../../primitives/relocation-pipelines';
+} from '../behaviors/track-switching';
+import { relocationPipelinesFor } from '../primitives/relocation-pipelines';
 import {
   type ReportUnsupportedTrackConditions,
   reportUnsupportedTrackConditions,
-} from '../../primitives/report-track-conditions';
+} from '../primitives/report-track-conditions';
 
 // ============================================================================
 // Audio-Only HLS Engine State & Context
@@ -220,7 +220,7 @@ export interface EngineConfig {
 /**
  * Create an audio-only HLS playback engine.
  *
- * Subtractive composition variant of the HLS video engine (`./engine`): omits video-side behaviors
+ * Subtractive composition variant of the HLS video engine (`./hls-video`): omits video-side behaviors
  * (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors
  * (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters
  * (`loadChapters`) stay: they are session data, not a subtitle rendition. The remaining audio pipeline composes

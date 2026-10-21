@@ -72,7 +72,7 @@ Resolved during implementation:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (default) + `packages/spf/src/playback/engines/hls/engine-audio-only.ts` (variant). Both replace `selectAudioTrack` with `switchAudioTrack` to get filter reactivity + mid-stream flush; engines that want only default-pick-on-load (test setups, future variants) keep composing `selectAudioTrack` (it remains exported, mutually exclusive with `switchAudioTrack`).
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (default) + `packages/spf/src/playback/engines/hls-audio.ts` (variant). Both replace `selectAudioTrack` with `switchAudioTrack` to get filter reactivity + mid-stream flush; engines that want only default-pick-on-load (test setups, future variants) keep composing `selectAudioTrack` (it remains exported, mutually exclusive with `switchAudioTrack`).
 
 **Behaviors:**
 
@@ -101,7 +101,7 @@ Resolved during implementation:
 | `setupAudioTrackSwitching` *(new)* | `packages/spf/src/playback/behaviors/track-switching.ts` | Filter-reactive slot-management reactor. Mirrors `setupQualitySwitching`'s abstraction shape (generic over selection key + user-selection key + track type, with `getTracks` / `selectOptimal` / `picker` config). Today's audio-only consumer is `switchAudioTrack`; when audio-abr ships, `switchAudioQuality` either swaps its `selectOptimal` for a bandwidth-aware variant or the two helpers merge into a shared `setupQualitySwitching` |
 | `pickAudioTrack` | `packages/spf/src/media/primitives/select-tracks.ts` | **Now wired** as the default picker in both `selectAudioTrack` and `switchAudioTrack` (was inert; required custom-picker override before this feature) |
 
-**Composition wiring:** Both engine factories swap `selectAudioTrack` for `switchAudioTrack` in their behavior list. Engine state types in both `engine.ts` and `engine-audio-only.ts` gain `userAudioTrackSelection`.
+**Composition wiring:** Both engine factories swap `selectAudioTrack` for `switchAudioTrack` in their behavior list. Engine state types in both `hls-video.ts` and `hls-audio.ts` gain `userAudioTrackSelection`.
 
 ## Verification
 
@@ -135,7 +135,7 @@ Resolved during implementation:
 - `captures initTrackLanguage from append-init meta for downstream cross-rendition flush detection`
 - `leaves initTrackLanguage undefined when append-init meta omits language (video)`
 
-**Unit tests** (`packages/spf/src/playback/engines/hls/tests/engine-audio-only.test.ts`):
+**Unit tests** (`packages/spf/src/playback/engines/tests/hls-audio.test.ts`):
 
 - `exposes userAudioTrackSelection slot for multi-language-audio Tier 2 writes` — variant engine state exposes the filter slot
 

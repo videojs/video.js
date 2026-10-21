@@ -82,7 +82,7 @@ engines still shared `./hls`, splitting the adapters out took it from
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (`@videojs/spf/engines/hls-video`) —
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (`@videojs/spf/engines/hls-video`) —
 the behaviors are listed once at module level, ending with the consumer
 inputs, and the engine's state and context types are derived from that
 list:
@@ -155,7 +155,7 @@ each `set src`).
     engine recreation on src change, mediaElement preservation across
     src changes, play retry on `loadstart`, preload propagation,
     attach/detach lifecycle
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts`
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts`
     → "allows patching state and owners from outside" — direct
     engine-level write surface (bypasses the mixin)
   - `packages/spf/src/core/composition/tests/define-external-signals.test.ts`

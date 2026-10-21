@@ -8,12 +8,12 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { snapshot } from '../../../../core/signals/primitives';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../../media/errors';
-import type { MaybeResolvedPresentation } from '../../../../media/types';
-import { createEngine } from '../engine-background-video';
+import { snapshot } from '../../../core/signals/primitives';
+import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
+import type { MaybeResolvedPresentation } from '../../../media/types';
+import { createEngine } from '../hls-background-video';
 
-vi.mock('../../../../media/dom/mse/append-segment', () => ({
+vi.mock('../../../media/dom/mse/append-segment', () => ({
   appendSegment: vi.fn().mockResolvedValue(undefined),
 }));
 

@@ -3,34 +3,34 @@ import {
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-} from '../../../core/composition/create-composition';
-import { canPlayTrack } from '../../../media/dom/capabilities';
-import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../../media/errors';
-import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import type { CanPlayTrack } from '../../../media/types';
-import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import { calculatePresentationDuration } from '../../behaviors/calculate-presentation-duration';
-import { collectErrors, reportAbsentTrackType } from '../../behaviors/collect-errors';
-import { endOfStream } from '../../behaviors/dom/end-of-stream';
-import { loadVideoSegments } from '../../behaviors/dom/load-segments';
-import { setupVideoBufferActors } from '../../behaviors/dom/setup-buffer-actors';
-import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
-import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
-import { trackScreenResolution } from '../../behaviors/dom/track-screen-resolution';
-import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
-import { resolveVideoTrack } from '../../behaviors/resolve-track';
+} from '../../core/composition/create-composition';
+import { canPlayTrack } from '../../media/dom/capabilities';
+import { SVTA_NO_SUPPORTED_VIDEO_TRACK } from '../../media/errors';
+import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
+import type { CanPlayTrack } from '../../media/types';
+import { getResolvedSelectedTrackDuration } from '../../media/utils/track-selection';
+import { calculatePresentationDuration } from '../behaviors/calculate-presentation-duration';
+import { collectErrors, reportAbsentTrackType } from '../behaviors/collect-errors';
+import { endOfStream } from '../behaviors/dom/end-of-stream';
+import { loadVideoSegments } from '../behaviors/dom/load-segments';
+import { setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { setupMediaSource } from '../behaviors/dom/setup-mediasource';
+import { trackCurrentTime } from '../behaviors/dom/track-current-time';
+import { trackScreenResolution } from '../behaviors/dom/track-screen-resolution';
+import { updateMediaSourceDuration } from '../behaviors/dom/update-mediasource-duration';
+import { type ParsePresentation, resolvePresentation } from '../behaviors/resolve-presentation';
+import { resolveVideoTrack } from '../behaviors/resolve-track';
 import {
   preferHighestResolution,
   type SelectVideoTrackConfig,
   screenResolutionCap,
   selectVideoTrack,
-} from '../../behaviors/select-tracks';
+} from '../behaviors/select-tracks';
 import {
   type ReportUnsupportedTrackConditions,
   reportUnsupportedTrackConditions,
-} from '../../primitives/report-track-conditions';
-import { excludeUnplayableTracks } from '../../primitives/selection-rules';
+} from '../primitives/report-track-conditions';
+import { excludeUnplayableTracks } from '../primitives/selection-rules';
 
 // ============================================================================
 // Background-video engine state & context

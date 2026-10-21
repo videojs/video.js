@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { isResolvedTrack, type MaybeResolvedPresentation } from '../../../../media/types';
-import { createEngine } from '../engine';
+import { isResolvedTrack, type MaybeResolvedPresentation } from '../../../media/types';
+import { createEngine } from '../hls-video';
 
 // Live smoke test for multi-CDN failover against a real Mux `redundant_streams`
 // source. It hits the network (the manifest + the surviving CDN are fetched for

@@ -7,9 +7,9 @@
  */
 import { describe, it } from 'vite-plus/test';
 
-import { clearKeySystem, widevineKeySystem } from '../../../../media/dom/key-systems';
-import type { DrmSystemsConfig, KeySystemModule } from '../../../../media/drm';
-import { createEngine } from '../engine';
+import { clearKeySystem, widevineKeySystem } from '../../../media/dom/key-systems';
+import type { DrmSystemsConfig, KeySystemModule } from '../../../media/drm';
+import { createEngine } from '../hls-video';
 
 const server = { licenseUrl: 'https://license.example.com' };
 

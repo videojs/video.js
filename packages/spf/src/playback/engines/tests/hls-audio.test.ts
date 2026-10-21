@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { snapshot } from '../../../../core/signals/primitives';
-import type { Presentation } from '../../../../media/types';
-import { createEngine } from '../engine-audio-only';
+import { snapshot } from '../../../core/signals/primitives';
+import type { Presentation } from '../../../media/types';
+import { createEngine } from '../hls-audio';
 
 // Mock appendSegment to succeed without real MP4 data
-vi.mock('../../../../media/dom/mse/append-segment', () => ({
+vi.mock('../../../media/dom/mse/append-segment', () => ({
   appendSegment: vi.fn().mockResolvedValue(undefined),
 }));
 

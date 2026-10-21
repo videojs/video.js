@@ -63,7 +63,7 @@ engine's loading-semantics contract.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — both
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — both
 behaviors are composed at the top of the pipeline, before
 `resolvePresentation`. `syncPreload` is in the runtime-agnostic
 `playback/behaviors/` (operates against `MediaElementLike`);

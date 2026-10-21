@@ -96,7 +96,7 @@ surface.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` —
 dispatchers composed after MSE setup, after `trackCurrentTime` and
 `switchVideoQuality`:
 

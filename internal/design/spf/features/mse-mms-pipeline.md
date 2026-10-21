@@ -79,7 +79,7 @@ share the same four behaviors and one actor.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — MSE
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — MSE
 behaviors composed between presentation duration calculation and segment
 loading. Video buffer setup registered before audio for the Firefox
 invariant.

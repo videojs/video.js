@@ -41,7 +41,7 @@
       "path": "../actors/dom"
     },
     {
-      "path": "../engines/hls"
+      "path": "../engines"
     }
   ],
   "include": ["./**/*.ts"]

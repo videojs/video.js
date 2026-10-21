@@ -37,7 +37,7 @@ This doc captures the **capability surface**: what works, what doesn't, which be
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — composed in place of `selectVideoTrack` (the two are alternatives; only one writes `selectedVideoTrackId` for a given engine).
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — composed in place of `selectVideoTrack` (the two are alternatives; only one writes `selectedVideoTrackId` for a given engine).
 
 **Behaviors:**
 

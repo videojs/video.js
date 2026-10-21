@@ -171,7 +171,7 @@ under [Open questions § Resolved during implementation](#resolved-during-implem
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — the
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — the
 live behaviors compose alongside the VOD ones; live vs VOD is a runtime
 distinction in the *data* (a growing playlist), not a separate engine
 variant:

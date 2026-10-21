@@ -104,7 +104,7 @@ was a decision rather than a detail:
 | `preferHighestResolution` | `packages/spf/src/playback/behaviors/select-tracks.ts` | The ranker composed behind it — a sort, so the chain's head is the largest surviving rendition |
 | `tracksUnderPixelArea` / `byDescendingResolution` | `packages/spf/src/media/primitives/select-tracks.ts` | The geometry the two rules are built from: one filter, one comparator |
 | `applyRules` / `applyConstraints` | `packages/spf/src/playback/primitives/selection-rules.ts` | The composers. `applyRules` supplies the fall-through and the head-is-the-pick semantics the cap relies on |
-| `createEngine` | `packages/spf/src/playback/engines/hls/engine-background-video.ts` (`@videojs/spf/engines/hls-background-video`) | Composes `trackScreenResolution` and the default chain |
+| `createEngine` | `packages/spf/src/playback/engines/hls-background-video.ts` (`@videojs/spf/engines/hls-background-video`) | Composes `trackScreenResolution` and the default chain |
 
 `screenResolutionCap`, `preferHighestResolution`, and `SelectTrackRule`
 are exported from `@videojs/spf/hls`, so a consumer can pass
@@ -131,7 +131,7 @@ from the config-driven ones above.
   the rule: narrowing, both decline-to-cap paths, the no-fit
   fall-through, and that the chain reaches the same pick with the cap
   on either side of the ranker.
-- `packages/spf/src/playback/engines/hls/tests/engine-background-video.test.ts`
+- `packages/spf/src/playback/engines/tests/hls-background-video.test.ts`
   and the `hls-background-video` adapter tests — the composed default.
   Note these write `screenResolution` explicitly; a test that leaves it
   ambient makes its expected pick depend on the runner's display.

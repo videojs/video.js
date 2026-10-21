@@ -15,7 +15,7 @@ import {
   type EngineContext,
   type EngineState,
   createEngine,
-} from '../../engines/hls/engine-background-video';
+} from '../../engines/hls-background-video';
 import { UNPLAYABLE_SOURCE_MESSAGE } from '../../primitives/error-messages';
 import { firstFatal, type HlsVideoMediaError, hasUnsupportedFeatureCause } from '../hls-video/error-surface';
 
