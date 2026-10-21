@@ -56,6 +56,18 @@ export interface CompositionOptions<
 
 Source: [src/core/composition/create-composition.ts](../../../src/core/composition/create-composition.ts)
 
+## ConfigWithDefaults
+
+`Cfg` with every key `Defaults` covers made optional: a default fills it when the caller leaves it out or passes
+`undefined`. Keys `Defaults` doesn't cover keep the behaviors' own requirements.
+
+```ts
+export type ConfigWithDefaults<Cfg extends object, Defaults extends object> = Omit<Cfg, keyof Defaults> &
+  Partial<Pick<Cfg, Extract<keyof Defaults, keyof Cfg>>>;
+```
+
+Source: [src/core/composition/create-composition.ts](../../../src/core/composition/create-composition.ts)
+
 ## createComposition
 
 Create a composition from a set of behaviors.
