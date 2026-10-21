@@ -17,6 +17,7 @@
     { "path": "packages/media/src/dom" },
 
     { "path": "packages/adapters/cloudflare-video" },
+    { "path": "packages/adapters/dailymotion-video" },
     { "path": "packages/adapters/dash-video" },
     { "path": "packages/adapters/hlsjs-video" },
     { "path": "packages/adapters/mux" },

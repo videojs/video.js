@@ -1,8 +1,10 @@
 import {
   BACKGROUND_VIDEO_SRC,
   CLOUDFLARE_VIDEO_SRC,
+  DAILYMOTION_SOURCE_IDS,
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
+  DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOURCE,
@@ -222,10 +224,11 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube and `<playerjs-video>` renders one provider page URL rather than the picker's list. YouTube
-  // offers a set of page URLs instead, covering the caption, short, and live cases its adapter handles differently. The
-  // CDN page builds elements from attributes alone, so the entries that need player parameters stay off it. player.js
-  // is a protocol many providers speak, so its embed picks between their embed pages.
+  // Each embed but YouTube, `<playerjs-video>`, and `<dailymotion-video>` renders one provider page URL rather than the
+  // picker's list. YouTube offers a set of page URLs instead, covering the caption, short, and live cases its adapter
+  // handles differently. The CDN page builds elements from attributes alone, so the entries that need player
+  // parameters stay off it. player.js is a protocol many providers speak, so its embed picks between their embed pages.
+  // Dailymotion's picker covers player configurations, URL parameters, and bad Player IDs.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -283,6 +286,15 @@ const MEDIA_MAP = {
     embed: true,
     fixedSource: TWITCH_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
+  },
+  'dailymotion-video': {
+    label: 'Dailymotion Video',
+    player: 'video',
+    tag: 'dailymotion-video',
+    embed: true,
+    sources: DAILYMOTION_SOURCE_IDS,
+    fallbackSource: DEFAULT_DAILYMOTION_SOURCE,
+    entrySource: DEFAULT_DAILYMOTION_SOURCE,
   },
   'wistia-video': {
     label: 'Wistia Video',

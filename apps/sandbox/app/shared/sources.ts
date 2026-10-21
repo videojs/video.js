@@ -16,10 +16,10 @@ export interface SandboxSource {
   /** Plain media URL. Absent when the source needs more than a URL can carry. */
   url?: string;
   /**
-   * `youtube` is a YouTube page URL for `<youtube-video>`, and `playerjs` an embed page URL for `<playerjs-video>`,
-   * rather than a media file or manifest.
+   * `youtube` is a YouTube page URL for `<youtube-video>`, `playerjs` an embed page URL for `<playerjs-video>`, and
+   * `dailymotion` a player embed URL for `<dailymotion-video>`, rather than a media file or manifest.
    */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs';
+  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'dailymotion';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -621,6 +621,52 @@ const SOURCE_MAP = {
     url: 'https://streamable.com/e/moo',
     type: 'playerjs',
   },
+  // Player embed URLs, which name the player configuration Dailymotion refuses to
+  // embed without. `x8lr5` is the one Dailymotion's own docs embed with: controls,
+  // autostart, and autonext on. `x165s8` is the only public configuration found
+  // with autostart and ads off, the one that takes a seek made before the first
+  // play. The last three show what a bad Player ID does.
+  'dailymotion-default': {
+    label: 'Dailymotion - Default (x8lr5)',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  'dailymotion-no-autostart': {
+    label: 'Dailymotion - Autostart and ads off (x165s8)',
+    url: 'https://geo.dailymotion.com/player/x165s8.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  'dailymotion-start-time': {
+    label: 'Dailymotion - From 0:10',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&startTime=10',
+    type: 'dailymotion',
+  },
+  // Dailymotion fits the video inside the player by default; `scaleMode=fill`
+  // crops it to cover the player instead. The video is 16:9, so the difference
+  // shows with another aspect ratio, such as 1:1. Being a runtime parameter other
+  // than the video, it also creates a new player instead of swapping the video.
+  'dailymotion-scale-fill': {
+    label: 'Dailymotion - Crop to fill (scaleMode, try 1:1)',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&scaleMode=fill',
+    type: 'dailymotion',
+  },
+  'dailymotion-no-player-id': {
+    label: 'Dailymotion - No Player ID (error)',
+    url: 'https://geo.dailymotion.com/player.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  'dailymotion-malformed-player-id': {
+    label: 'Dailymotion - Malformed Player ID (error)',
+    url: 'https://geo.dailymotion.com/player/abc12.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  // Shaped like a Dailymotion ID but not one, so Dailymotion silently plays it
+  // with its default configuration.
+  'dailymotion-unknown-player-id': {
+    label: 'Dailymotion - Unknown Player ID',
+    url: 'https://geo.dailymotion.com/player/xdefaul.html?video=x84sh87',
+    type: 'dailymotion',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -634,11 +680,15 @@ const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 
 /**
  * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
- * the player.js services' for `<playerjs-video>`, so every list derived from this one stays free of them.
+ * the player.js services' for `<playerjs-video>`, Dailymotion's for `<dailymotion-video>`, so every list derived from
+ * this one stays free of them.
  */
-export const SOURCE_IDS = ALL_SOURCE_IDS.filter((id) => !isYouTubeSource(id) && !isPlayerJsSource(id));
+export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
+  (id) => !isYouTubeSource(id) && !isPlayerJsSource(id) && !isDailymotionSource(id)
+);
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
 export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
+export const DAILYMOTION_SOURCE_IDS = ALL_SOURCE_IDS.filter(isDailymotionSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -676,6 +726,7 @@ export const DEFAULT_SOURCE: SourceId = 'hls-1';
 export const DEFAULT_DASH_SOURCE: SourceId = 'dash-1';
 export const DEFAULT_YOUTUBE_SOURCE: SourceId = 'youtube-1';
 export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
+export const DEFAULT_DAILYMOTION_SOURCE: SourceId = 'dailymotion-default';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -727,6 +778,10 @@ export function isYouTubeSource(id: SourceId): boolean {
 
 export function isPlayerJsSource(id: SourceId): boolean {
   return SOURCES[id].type === 'playerjs';
+}
+
+export function isDailymotionSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'dailymotion';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */

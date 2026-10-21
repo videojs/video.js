@@ -30,6 +30,7 @@ import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } fr
 import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } from '@app/shared/player-frame';
 import { skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '@app/shared/skin-sources';
 import {
+  DAILYMOTION_SOURCE_IDS,
   DEFAULT_SOURCE,
   PLAYERJS_SOURCE_IDS,
   SOURCE_IDS,
@@ -56,7 +57,7 @@ function readMedia(params: URLSearchParams): MediaId {
 // Embed sources are listed apart from SOURCE_IDS, but a shared link may name any of them.
 const writeUrl = createUrlWriter();
 
-const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS];
+const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS, ...DAILYMOTION_SOURCE_IDS];
 
 function readOption<T extends string, const Fallback>(
   values: readonly T[],
