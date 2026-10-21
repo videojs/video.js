@@ -1,3 +1,8 @@
+/**
+ * Composing behaviors into a running engine: the composition, its options, and the factory that fixes a behavior list
+ * into an engine module's `createEngine`.
+ */
+
 import { defaults } from '@videojs/utils/object';
 
 import { type Signal, signal } from '../signals/primitives';
@@ -80,7 +85,8 @@ export type ConfigWithDefaults<Cfg extends object, Defaults extends object> = Om
   Partial<Pick<Cfg, Extract<keyof Defaults, keyof Cfg>>>;
 
 /**
- * Options for `createComposition`.
+ * What `createComposition` takes beside the behaviors: the config, the defaults it falls back to, and the state and
+ * context values to seed.
  *
  * Composition derives the state and context signal maps from each behavior's declared `stateKeys` / `contextKeys`;
  * `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.

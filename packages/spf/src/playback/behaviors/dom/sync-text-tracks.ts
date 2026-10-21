@@ -179,14 +179,15 @@ function syncTextTracksSetup({
 }
 
 /**
- * **Own the text-track slots on the host media element, mirroring the SPF model.** When a presentation is resolved and
- * a media element is available, allocate one slot in `mediaElement.textTracks` per model text track — via creating
- * `<track>` children, since that's the only spec mechanism for adding _and_ removing entries to `textTracks` (no
- * `removeTextTrack` API exists). Once slots are provisioned, mirror the resolved `selectedTextTrackId` into their
- * `mode`s (one-way: state → DOM), and propagate user-initiated DOM `change` events back to `userTextTrackSelection` —
- * the standing _intent_ (a language-based partial, or `'off'`) that `switchTextTrack` resolves into
- * `selectedTextTrackId`. So non-SPF consumers (host-page captions buttons, browser native UI, video.js store) drive
- * selection by expressing intent, not by writing the resolved id.
+ * **Mirrors the presentation's text tracks onto the media element as `<track>` elements and keeps their modes in step
+ * with the selection.** When a presentation is resolved and a media element is available, allocate one slot in
+ * `mediaElement.textTracks` per model text track — via creating `<track>` children, since that's the only spec
+ * mechanism for adding _and_ removing entries to `textTracks` (no `removeTextTrack` API exists). Once slots are
+ * provisioned, mirror the resolved `selectedTextTrackId` into their `mode`s (one-way: state → DOM), and propagate
+ * user-initiated DOM `change` events back to `userTextTrackSelection` — the standing _intent_ (a language-based
+ * partial, or `'off'`) that `switchTextTrack` resolves into `selectedTextTrackId`. So non-SPF consumers (host-page
+ * captions buttons, browser native UI, video.js store) drive selection by expressing intent, not by writing the
+ * resolved id.
  *
  * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): an element-bound effect allocates the
  * slots, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
