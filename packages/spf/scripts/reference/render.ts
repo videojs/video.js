@@ -910,10 +910,10 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
   // Behavior pages in the order the first engine composes them (its page lists the same order), then the pages no
   // shipped engine composes, alphabetically. A page's description is its module description, else its behavior's.
   const pipeline = model.engines[0]?.behaviors ?? [];
-  const pagesInOrder = (layer: 'behavior' | 'behavior-dom') => {
+  const pagesInOrder = () => {
     const pages = new Map<string, { entry: EntryPoint; behaviors: BehaviorInfo[] }>();
     const register = (info: BehaviorInfo) => {
-      if (info.entry?.layer !== layer) return;
+      if (info.entry?.layer !== 'behavior' && info.entry?.layer !== 'behavior-dom') return;
 
       const group = pages.get(info.entry.page!) ?? { entry: info.entry, behaviors: [] };
 
@@ -928,19 +928,18 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
 
     return [...pages.values()];
   };
-  const behaviorRows = (layer: 'behavior' | 'behavior-dom') =>
-    pagesInOrder(layer).map(({ entry, behaviors }) => {
-      const description = moduleDoc(reference, entry.file) ?? behaviors[0]!.doc;
+  const behaviorRows = pagesInOrder().map(({ entry, behaviors }) => {
+    const description = moduleDoc(reference, entry.file) ?? behaviors[0]!.doc;
 
-      return [
-        code(entry.specifier),
-        link(page, entry.page!, entry.key),
-        firstSentence(description) || NO_DESCRIPTION,
-        behaviors.map((info) => link(page, entry.page!, info.name, anchor(info.name))).join(', '),
-      ];
-    });
+    return [
+      behaviors.map((info) => link(page, entry.page!, info.name, anchor(info.name))).join(', '),
+      link(page, entry.page!, code(entry.specifier)),
+      entry.layer === 'behavior-dom' ? 'yes' : '—',
+      firstSentence(description) || NO_DESCRIPTION,
+    ];
+  });
   const headers = ['Symbol', 'Page', 'Description'];
-  const behaviorHeaders = ['Entry point', 'Page', 'Description', 'Behaviors'];
+  const behaviorHeaders = ['Behaviors', 'Entry point', 'DOM', 'Description'];
   const counts = {
     core: core.reduce((total, module) => total + module.exports.length, 0),
     engines: model.engines.length,
@@ -960,10 +959,8 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     '## Features',
     table(headers, featureRows),
     '## Behaviors',
-    'One row per entry point, in the order the first engine composes them; a module that exports several behaviors lists them all.',
-    table(behaviorHeaders, behaviorRows('behavior')),
-    '## Behaviors (DOM)',
-    table(behaviorHeaders, behaviorRows('behavior-dom')),
+    'One row per entry point, in the order the first engine composes them; a module that exports several behaviors lists them all. "DOM" marks the behaviors that need a browser: they drive a media element, a `MediaSource`, or `MediaKeys`, and ship under `behaviors/dom/`.',
+    table(behaviorHeaders, behaviorRows),
     '## Core',
     table(headers, coreRows),
     details('How this reference is generated', [
