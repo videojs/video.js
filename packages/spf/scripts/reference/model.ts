@@ -276,6 +276,8 @@ export interface BehaviorInfo {
   label: string;
   /** Whether `name` is an export (and so can be a heading), or an inline expression. */
   exported: boolean;
+  /** Whether the entry only declares signals the host writes (`defineExternalSignals`), rather than behavior logic. */
+  external: boolean;
   file: string;
   entry: EntryPoint | undefined;
   doc: DocBlock;
@@ -806,6 +808,7 @@ export function buildModel(reference: ReferenceProgram): Model {
       name: symbol.name,
       label: symbol.name,
       exported: true,
+      external: false,
       file,
       entry: entryByFile.get(file),
       doc: behaviorDoc(checker, symbol),
@@ -849,6 +852,7 @@ export function buildModel(reference: ReferenceProgram): Model {
       name: printExpression(element),
       label,
       exported: false,
+      external: label.startsWith('defineExternalSignals'),
       file: element.getSourceFile().fileName,
       entry: undefined,
       doc: EMPTY_DOC,

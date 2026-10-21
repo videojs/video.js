@@ -23,7 +23,14 @@ Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeat
 3. [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks)
 4. [setupTextTrackActors](../behaviors/dom/setup-text-track-actors.md#setuptexttrackactors)
 5. [loadTextTrackSegments](../behaviors/dom/load-segments.md#loadtexttracksegments)
-6. `defineExternalSignals<UserTrackSelectionState<'text'>>()({ state: ['userTextTrackSelection'] })`
+
+### External signals
+
+The feature declares these state keys for code outside the engine to write; no behavior sets them. The SPF Medias write them from their own properties, and code driving an engine directly writes `engine.state.<key>.set(value)`. Each is declared with [defineExternalSignals](../core/define-external-signals.md#defineexternalsignals), which is what makes the key part of the engine's state type.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `userTextTrackSelection` | `Partial<TextTrack> \| "off" \| undefined` | Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference). |
 
 ### Config
 
@@ -56,7 +63,7 @@ Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeat
 | `preload` | `string \| undefined` | — | [loadTextTrackSegments](../behaviors/dom/load-segments.md#loadtexttracksegments) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | — | [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [switchTextTrack](../behaviors/track-switching.md#switchtexttrack), [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks), [loadTextTrackSegments](../behaviors/dom/load-segments.md#loadtexttracksegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | `string \| undefined` | — | [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [switchTextTrack](../behaviors/track-switching.md#switchtexttrack), [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks), [loadTextTrackSegments](../behaviors/dom/load-segments.md#loadtexttracksegments) | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. |
-| `userTextTrackSelection` | `Partial<TextTrack> \| "off" \| undefined` | — | [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks), `defineExternalSignals<UserTrackSelectionState<'text'>>` ([src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts)) | Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference). |
+| `userTextTrackSelection` | `Partial<TextTrack> \| "off" \| undefined` | — | [external signal](#external-signals), [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks) | Consumer-driven _intent_ for text selection, resolved into `selectedTextTrackId` by `switchTextTrack`. A language-based partial (`{ language: 'es' }`) selects captions, `'off'` disables them, and absence means auto (the configured `preferredSubtitleLanguage` / DEFAULT-track policy). Also the write path for the DOM caption UI (via `syncTextTracks`); unlike the resolved id it persists across source changes (sticky preference). |
 
 ### Context
 
