@@ -60,7 +60,7 @@ function trackPlayerResolutionSetup({
 
     if (!capRenditionToPlayerSize || !mediaElement) return;
 
-    // Compared rather than written straight through, since the slot holds an
+    // Compared rather than written straight through, since the signal holds an
     // object and would otherwise notify on identity alone: a resize that rounds
     // to the same device pixels is not a change worth re-running selection for.
     // Same reason `watchScreenResolution` compares its readings.

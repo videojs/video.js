@@ -8,8 +8,8 @@ Source: [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/play
 attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
 multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
 creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
-per-type actor slots. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
-the per-type slots so the next source starts fresh.
+per-type actor signals. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
+the per-type signals so the next source starts fresh.
 
 Each per-type variant (`setupVideoBufferActors` / `setupAudioBufferActors`) is a single-positive-state reactor
 (`'preconditions-unmet'` ↔ `'buffer-ready'`) gating only on its own type. No cross-type coupling in `stateKeys` —
@@ -30,8 +30,8 @@ by a chain of assumptions about how this behavior composes with its upstream and
    `'buffer-ready'` in the next `runPending`. Both `entry` bodies run synchronously within that iteration — both
    `addSourceBuffer` calls land before the iteration ends.
 3. **Downstream — `appendBuffer` is async.** `loadVideoSegments` / `loadAudioSegments` read the per-type
-   `xSegmentLoaderActor` slots; their effects fire in the _next_ `runPending` and the actual `appendBuffer` requires
-   a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
+   `xSegmentLoaderActor` signals; their effects fire in the _next_ `runPending` and the actual `appendBuffer`
+   requires a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
 
 The cross-tick failure mode — a user-initiated audio track switch _after_ video segments have begun appending — is
 out of scope for this behavior and would be addressed in the buffer/segment-loading path via `changeType`-aware
@@ -42,7 +42,7 @@ logic.
 `setupVideoBufferActors` is sole writer of `videoBufferActor` + `videoSegmentLoaderActor` (and `bandwidthState` via
 its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor` + `audioSegmentLoaderActor`. Both
 read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
-`endOfStream`, `updateMediaSourceDuration`) only read these slots.
+`endOfStream`, `updateMediaSourceDuration`) only read these signals.
 
 ## setupAudioBufferActors
 
@@ -52,7 +52,7 @@ setup body (swap `fetchStream` for a `createTrackedFetch` call + declare `bandwi
 touching the shared helper. See `internal/design/spf/features/audio-abr.md` for the design surface (bandwidth-state
 sharing, multi-writer coordination, EWMA mixed- source sampling).
 
-**Mid-stream audio track switching is NOT this behavior's concern.** Slot writes to `selectedAudioTrackId` (default
+**Mid-stream audio track switching is NOT this behavior's concern.** Writes to `selectedAudioTrackId` (default
 selection, programmatic filter-driven, future ABR) are owned by `switchAudioTrack` / future `switchAudioQuality` in
 `track-switching.ts`. Flush orchestration on track change is dispatched from there via `audioBufferActor.send(...)` —
 keeping this setup behavior focused on per-source actor lifecycle.
@@ -112,7 +112,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors` wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional slot; absent, it ranks on `initialBandwidth`. |
+| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors` wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional signal; absent, it ranks on `initialBandwidth`. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
 
@@ -121,7 +121,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. |
+| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. |
 | `videoSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
 
 ## Types

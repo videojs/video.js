@@ -66,11 +66,11 @@ function setupMediaSourceSetup({
   config?: MediaSourceSetupConfig;
 }): Reactor<MediaSourceFsmState | 'destroying' | 'destroyed'> {
   const attach = config.attachMediaSource ?? attachMediaSource;
-  // `loadingSuspended` is observed, never declared: the slot exists only in
+  // `loadingSuspended` is observed, never declared: the signal exists only in
   // compositions where a feature behavior (e.g. `setupAirPlay`) declares and
   // writes it, so it lives behind a cast rather than in the typed param
   // above — an optional param key would force declaring it in `stateKeys`,
-  // which is what materializes a slot. Shape redefined locally (canonical:
+  // which is what materializes a signal. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments
   // module dependency.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
@@ -101,7 +101,7 @@ function setupMediaSourceSetup({
           // can run BEFORE the old state's exit cleanup (effects run in
           // states-declaration order), so a teardown's fact-write can land
           // after this effect's entry run — tracking re-fires the consume.
-          // Not suspended = slot absent (no writer composed) or value falsy.
+          // Not suspended = signal absent (no writer composed) or value falsy.
           if (mediaSourceClosed.get() && !loadingSuspended?.get()) mediaSourceClosed.set(false);
         },
       },
@@ -110,7 +110,7 @@ function setupMediaSourceSetup({
         // entry body is auto-untracked. deriveState handles source resets via
         // the resolver's resolved/unresolved transitions; this entry creates
         // and attaches the MediaSource, awaits `'open'`, publishes on
-        // context, and binds detach + slot clear to state exit + destroy.
+        // context, and binds detach + signal clear to state exit + destroy.
         entry: () => {
           const mediaElement = context.mediaElement.get()!;
           const controller = new AbortController();
@@ -127,8 +127,8 @@ function setupMediaSourceSetup({
           // first does the work; a re-run is harmless. Order matters:
           //
           // 1. Abort first — kills the open-wait and the listener, so a late
-          //    publish can't race the slot clear.
-          // 2. Clear the slot, which stops the downstream MSE pipeline and
+          //    publish can't race the signal clear.
+          // 2. Clear the signal, which stops the downstream MSE pipeline and
           //    dirties the effects of behaviors owning sibling `<source>`
           //    children (`setupAirPlay`'s native-HLS fallback), queueing their
           //    removal pass. Kept ahead of the detach so that queueing is
@@ -166,7 +166,7 @@ function setupMediaSourceSetup({
             // `waitForMediaSourceOpen` resolves on any readyState transition
             // out of `'closed'`; if we landed in `'ended'` / `'closed'`
             // instead of `'open'`, the attach window is gone and we leave
-            // the slot unpublished. The session is dead within this source
+            // the signal unpublished. The session is dead within this source
             // either way — publishing wouldn't help because
             // `setupVideoBufferActors` / `setupAudioBufferActors` calls
             // `addSourceBuffer` which throws on non-open. The next
@@ -200,8 +200,8 @@ function setupMediaSourceSetup({
 /**
  * **Own the MediaSource lifecycle for the current source.** When a resolved presentation and a mediaElement are both in
  * scope, creates a MediaSource, attaches it to the element, waits for `'open'`, and publishes it on
- * `context.mediaSource`. On source change or behavior destroy, detaches the MediaSource and clears the slot so the next
- * source starts fresh.
+ * `context.mediaSource`. On source change or behavior destroy, detaches the MediaSource and clears the signal so the
+ * next source starts fresh.
  *
  * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'mediasource-attached'`): state derivation gates on
  * `mediaElement + isResolvedPresentation`. Riding the resolver's resolved/unresolved lifecycle makes direct URL
@@ -221,7 +221,7 @@ function setupMediaSourceSetup({
  *    `addSourceBuffer` directly, which throws on non-open, so publish-only-when-open is the load-bearing contract.
  *
  * State-exit cleanup aborts the in-flight wait, detaches the MediaSource, and clears `context.mediaSource`. Order:
- * abort first (prevents a late publish racing the slot clear), then detach, then clear.
+ * abort first (prevents a late publish racing the signal clear), then detach, then clear.
  *
  * # Sourceclose recovery
  *

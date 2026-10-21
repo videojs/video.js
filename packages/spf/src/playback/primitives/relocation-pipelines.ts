@@ -4,7 +4,7 @@
  * this file supplies the `messagePipelines` the segment/text loaders run to _fill and act on_ that behavior's state.
  * It's the relocation analog of `track-switching`'s config-supplied constraint/rule chain — a pluggable strategy handed
  * to the machinery via config, not applied inline — supplied to the loaders rather than applied by the behavior, so the
- * two coordinate through the shared `mediaContainerData` / `startMediaTime` slots alone, never by import.
+ * two coordinate through the shared `mediaContainerData` / `startMediaTime` signals alone, never by import.
  *
  * DOM-free: it composes the loader vocabularies (`segment-load-pipeline`, `text-segment-load-pipeline`) through their
  * structural sink seams and shifts cues via the structural `Cue` type, so it names no `SourceBuffer`,
@@ -38,7 +38,7 @@ import {
   textStepWiring,
 } from './text-segment-load-pipeline';
 
-/** The composition slots these steps read — the view asserted from the opaque `deps.state`. */
+/** The composition signals these steps read — the view asserted from the opaque `deps.state`. */
 interface RelocationSlots {
   presentation?: MaybeResolvedPresentation;
   mediaContainerData?: Record<string, MediaContainerData>;
@@ -48,7 +48,7 @@ interface RelocationSlots {
 
 type ContainerSlot = Signal<Record<string, MediaContainerData> | undefined>;
 
-/** Assert the relocation state view from the opaque step deps — this module knows the slots the composition provides. */
+/** Assert the relocation state view from the opaque step deps — this module knows the signals the composition provides. */
 function relocationState(deps: StepDeps): StateSignals<RelocationSlots> {
   return deps.state as unknown as StateSignals<RelocationSlots>;
 }
@@ -144,11 +144,11 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
 
   /**
    * Stamp step — tier-agnostic apply. Relocate by the `derive`d `startMediaTime` for this type (`offset =
-   * −startMediaTime`). Applies the **same** `derive` the reactor uses, over the shared `mediaContainerData` slot — so
+   * −startMediaTime`). Applies the **same** `derive` the reactor uses, over the shared `mediaContainerData` signal — so
    * the buffer offset matches the model's stamped `startMediaTime`, and it's robust to `established` + late tracks (the
-   * slot persists; the model value may not be re-stamped after the reactor goes sticky). Awaited: per-type resolves at
-   * once (own origin discovered earlier in this pipeline); shared-`min` waits until every selected A/V origin is in —
-   * the barrier, filled by the other type's discover step. A derived `0` (0-PTS / below threshold) leaves the append
+   * signal persists; the model value may not be re-stamped after the reactor goes sticky). Awaited: per-type resolves
+   * at once (own origin discovered earlier in this pipeline); shared-`min` waits until every selected A/V origin is in
+   * — the barrier, filled by the other type's discover step. A derived `0` (0-PTS / below threshold) leaves the append
    * native — setting `timestampOffset` at all can ripple.
    */
   const stampStartMediaTime: LoadStep = async (frame, signal, deps) => {

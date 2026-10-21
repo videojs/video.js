@@ -3,8 +3,8 @@
  * attached and the selected track of that type is present in the presentation with codecs (partial resolution from the
  * multivariant playlist is enough — codecs live on the `EXT-X-STREAM-INF` line, not in the per-type media playlist),
  * creates a `SourceBuffer`, a `SourceBufferActor`, and a `SegmentLoaderActor` bound to that buffer-actor; publishes the
- * per-type actor slots. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
- * the per-type slots so the next source starts fresh.
+ * per-type actor signals. On `mediaSource` detach or behavior destroy, destroys both actors in reverse order and clears
+ * the per-type signals so the next source starts fresh.
  *
  * Each per-type variant (`setupVideoBufferActors` / `setupAudioBufferActors`) is a single-positive-state reactor
  * (`'preconditions-unmet'` ↔ `'buffer-ready'`) gating only on its own type. No cross-type coupling in `stateKeys` —
@@ -25,8 +25,8 @@
  *    `'buffer-ready'` in the next `runPending`. Both `entry` bodies run synchronously within that iteration — both
  *    `addSourceBuffer` calls land before the iteration ends.
  * 3. **Downstream — `appendBuffer` is async.** `loadVideoSegments` / `loadAudioSegments` read the per-type
- *    `xSegmentLoaderActor` slots; their effects fire in the _next_ `runPending` and the actual `appendBuffer` requires
- *    a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
+ *    `xSegmentLoaderActor` signals; their effects fire in the _next_ `runPending` and the actual `appendBuffer`
+ *    requires a network round-trip via the `SegmentLoaderActor` — many microtasks past both `addSourceBuffer` calls.
  *
  * The cross-tick failure mode — a user-initiated audio track switch _after_ video segments have begun appending — is
  * out of scope for this behavior and would be addressed in the buffer/segment-loading path via `changeType`-aware
@@ -37,7 +37,7 @@
  * `setupVideoBufferActors` is sole writer of `videoBufferActor` + `videoSegmentLoaderActor` (and `bandwidthState` via
  * its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor` + `audioSegmentLoaderActor`. Both
  * read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
- * `endOfStream`, `updateMediaSourceDuration`) only read these slots.
+ * `endOfStream`, `updateMediaSourceDuration`) only read these signals.
  */
 
 import { listen } from '@videojs/utils/dom';
@@ -74,7 +74,7 @@ export interface BufferActorsState {
   selectedAudioTrackId?: string;
   /**
    * The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors`
-   * wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional slot;
+   * wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional signal;
    * absent, it ranks on `initialBandwidth`.
    */
   bandwidthState?: BandwidthState;
@@ -85,7 +85,7 @@ export interface BufferActorsContext {
   /**
    * The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with
    * `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both
-   * and clears the slots when that stops holding.
+   * and clears the signals when that stops holding.
    */
   videoBufferActor?: SourceBufferActor;
   /** The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. */
@@ -180,7 +180,7 @@ function setupBufferActors<K extends SelectedTrackKey, A extends BufferActorKey,
             { state, context, config }
           );
 
-          // Synchronous slot writes — load-bearing for the Firefox
+          // Synchronous signal writes — load-bearing for the Firefox
           // `mozHasAudio` invariant (see `setupVideoBufferActors`'s JSDoc). Both per-type
           // entries' `addSourceBuffer` calls must land in the same
           // `runPending` iteration; synchronous writes keep the contiguous
@@ -286,7 +286,7 @@ export const setupVideoBufferActors = defineBehavior({
  * touching the shared helper. See `internal/design/spf/features/audio-abr.md` for the design surface (bandwidth-state
  * sharing, multi-writer coordination, EWMA mixed- source sampling).
  *
- * **Mid-stream audio track switching is NOT this behavior's concern.** Slot writes to `selectedAudioTrackId` (default
+ * **Mid-stream audio track switching is NOT this behavior's concern.** Writes to `selectedAudioTrackId` (default
  * selection, programmatic filter-driven, future ABR) are owned by `switchAudioTrack` / future `switchAudioQuality` in
  * `track-switching.ts`. Flush orchestration on track change is dispatched from there via `audioBufferActor.send(...)` —
  * keeping this setup behavior focused on per-source actor lifecycle.

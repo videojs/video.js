@@ -6,12 +6,12 @@ Source: [src/playback/behaviors/collect-errors.ts](../../../src/playback/behavio
 
 ## collectErrors
 
-**Owns the engine's error sequence.** Reporters append through `emitError`; this behavior owns the slot and its
-per-source lifecycle, clearing it on exit so a new source starts clean and the sequence can't grow unbounded across a
-session.
+**Owns the engine's error sequence.** Reporters append through `emitError`; this behavior owns the signal and
+its per-source lifecycle, clearing it on exit so a new source starts clean and the sequence can't grow unbounded
+across a session.
 
 Same split as `setupFailoverMonitor` and `failedCdns`: writes come from wherever the condition is detected, one
-behavior owns the slot. Deliberately has no `effects` — it holds no policy and derives nothing. Severity is decided
+behavior owns the signal. Deliberately has no `effects` — it holds no policy and derives nothing. Severity is decided
 at the adapter, not here (see `internal/design/spf/features/errors.md`), which is why this is a lifecycle owner
 rather than an error _handler_.
 
@@ -22,7 +22,7 @@ through unresolved carries the prior source's errors forward; `resolve-track` gu
 commit-time id check, and doing likewise here is a follow-up.
 
 The vocabulary itself (`SvtaError` and the codes) is DOM- and signal-free in `media/errors`; only the write
-seam lives here, with the slot it writes.
+seam lives here, with the signal it writes.
 
 ```ts
 const reactor = collectErrors.setup({ state });

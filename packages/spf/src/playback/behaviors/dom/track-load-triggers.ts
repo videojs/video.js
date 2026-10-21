@@ -26,16 +26,16 @@ export interface LoadTriggersContext {
 type LoadTriggersFsmState = 'preconditions-unmet' | 'monitoring' | 'load-active';
 
 /**
- * Slot-driven FSM. The slot `loadActivated` is the canonical externally- observable state; `deriveState` reads it (and
- * the preconditions) to derive the local FSM state. The slot is _both_ the state and the data — no separate internal
- * bookkeeping.
+ * Signal-driven FSM. The signal `loadActivated` is the canonical externally- observable state; `deriveState` reads it
+ * (and the preconditions) to derive the local FSM state. The signal is _both_ the state and the data — no separate
+ * internal bookkeeping.
  *
  *     'preconditions-unmet' ⟷ 'monitoring' ⟷ 'load-active'
  *
  *     preconditions-unmet → monitoring        element + URL appear
- *     monitoring          → load-active       slot flips true (listener fires
+ *     monitoring          → load-active       signal flips true (listener fires
  *                                             or external write)
- *     load-active         → monitoring        within-state cleanup resets slot
+ *     load-active         → monitoring        within-state cleanup resets signal
  *                                             (URL or element identity change)
  *     any                 → preconditions-unmet  element or URL → undefined
  *
@@ -62,11 +62,11 @@ function deriveState(
  *
  * Sticky-true _within a source identity_: subsequent play/pause/seek cycles don't flip back. Source identity =
  * (mediaElement, presentation URL). Either changing — including direct in-place swap with no `undefined` intermediate —
- * resets the slot to `false`.
+ * resets the signal to `false`.
  *
  * Multi-writer with `hls/adapter.ts:play()` (which writes `true` directly on programmatic play) is intentional —
  * different domains. The adapter records programmatic intent; this behavior is the DOM-side observer. Pre-existing
- * `true` writes are honored because `deriveState` reads the slot — a `true` value routes directly to `'load-active'`
+ * `true` writes are honored because `deriveState` reads the signal — a `true` value routes directly to `'load-active'`
  * without entering `'monitoring'`.
  *
  * @example
@@ -95,7 +95,7 @@ function trackLoadTriggersSetup({
   // the same URL: manifest parsing, duration calc, track resolution,
   // and other enrichment paths re-write the presentation object
   // frequently — tracking raw `state.presentation` here would spuriously
-  // reset the 'load-active' slot.
+  // reset the 'load-active' signal.
   const urlSignal = computed(() => state.presentation.get()?.url);
 
   return createMachineReactor<LoadTriggersFsmState>({

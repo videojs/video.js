@@ -60,19 +60,19 @@ export interface SegmentLoadingState {
    * Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers
    * (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach
    * runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the
-   * slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a
-   * remote-playback session owns presentation). An absent slot means never suspended.
+   * signal exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a
+   * remote-playback session owns presentation). An absent signal means never suspended.
    */
   loadingSuspended?: boolean;
   /**
    * Segment-load gate: dispatch no new segment work while `true`. **Observed, never declared**, exactly like
-   * `loadingSuspended`, so an absent slot means never gated — but narrower in what it forbids: only the dispatchers
+   * `loadingSuspended`, so an absent signal means never gated — but narrower in what it forbids: only the dispatchers
    * read it, never `setupMediaSource`, because a writer holding this has no quarrel with the element's load algorithm.
    * That asymmetry is why it isn't folded into `loadingSuspended`, which both read; a single boolean would newly gate
    * MediaSource attach, and co-writing one would be a last-write-wins conflict besides.
    *
    * Single writer per composition. Today that writer is DRM (`setupMediaKeys`, holding each source until clear or its
-   * MediaKeys attach — appending encrypted data before `setMediaKeys` misbehaves on Chromium); the slot names the
+   * MediaKeys attach — appending encrypted data before `setMediaKeys` misbehaves on Chromium); the signal names the
    * prohibition rather than the domain so a second such gate needs no vocabulary here.
    */
   segmentLoadingBlocked?: boolean;
@@ -121,7 +121,7 @@ interface SegmentLoaderLike<Track> {
  * `findResolvedTrack` resolver via config; TS infers `Track` from the resolver's return type. The loader signal's value
  * type is constrained to `SegmentLoaderLike<Track>` — anything with a `send` method accepting the `Track`-parameterized
  * message. Concrete actor types (`SegmentLoaderActor`, `TextTrackSegmentLoaderActor`) satisfy this via
- * function-parameter contravariance: an actor whose `.send` accepts a wider track type is assignable to a slot
+ * function-parameter contravariance: an actor whose `.send` accepts a wider track type is assignable to a signal
  * expecting a narrower track type.
  *
  * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
@@ -142,7 +142,7 @@ function setupSegmentLoading<
   // `loadingSuspended` and `segmentLoadingBlocked` are observed, never declared
   // (see their state-shape docs): optional here so variant maps — which omit
   // them from their contracts — are assignable as-is, while compositions with
-  // a writer expose the live slot.
+  // a writer expose the live signal.
   state: SegmentLoadingStateMap<K> & {
     loadingSuspended?: ReadonlySignal<SegmentLoadingState['loadingSuspended']>;
     segmentLoadingBlocked?: ReadonlySignal<SegmentLoadingState['segmentLoadingBlocked']>;
@@ -165,7 +165,7 @@ function setupSegmentLoading<
   // The `'dormant'` policy, read in three places: the derived state, and both
   // dispatching handlers, which re-read it against the concurrent-rise window
   // described on `'metadata-only'`. Either gate holding forbids a dispatch;
-  // an absent slot never gates.
+  // an absent signal never gates.
   const isLoadingDormant = () => !!(state.loadingSuspended?.get() || state.segmentLoadingBlocked?.get());
 
   const selectedTrack = computed<Track | undefined>(() =>

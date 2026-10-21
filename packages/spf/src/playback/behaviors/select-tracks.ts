@@ -30,9 +30,9 @@
  *
  * Compose `selectVideoTrack` for the simple "pick a default video track" behavior, or `switchVideoTrack`
  * (`./track-switching.ts`) for the ABR-driven variant. Compose `selectAudioTrack` for the simple default pick, or
- * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush slot-owner variant — when
+ * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush key-owning variant — when
  * audio-abr lands, `switchAudioTrack` extends into `switchAudioQuality`. Compose only one per type — they're
- * alternatives, not stackable (each writes the same `selected*TrackId` slot). The simple variants tree-shake out the
+ * alternatives, not stackable (each writes the same `selected*TrackId` signal). The simple variants tree-shake out the
  * heavier machinery (bandwidth estimator, quality selection, flush orchestration).
  *
  * Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves
@@ -136,7 +136,7 @@ function setupTrackSelection<K extends SelectedTrackKey, RuleConfig>({
       'presentation-resolved': {
         // Entry: pick a default on entering presentation-resolved if none
         // is set. External writes (user picks, ABR) that already populated
-        // the slot are left alone.
+        // the signal are left alone.
         //
         // The returned cleanup runs on state exit — which fires on src
         // unload (presentation-resolved → presentation-unresolved) AND on
@@ -180,7 +180,7 @@ function setupTrackSelection<K extends SelectedTrackKey, RuleConfig>({
           // none reported — which is why that alone emits here. See
           // `internal/design/spf/features/errors.md`.
           () => {
-            // Untracked: writing the slot below must not re-enter this reaction.
+            // Untracked: writing the signal below must not re-enter this reaction.
             const selectedId = peek(state[selectedKey]);
             if (!selectedId) return;
 
