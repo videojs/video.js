@@ -55,7 +55,7 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `ParsePresentation` | type | No JSDoc; an alias of `(text: string, presentation: MaybeResolvedPresentation) => Presentation`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `ParsePresentation` | type | Parses a manifest body into a resolved `Presentation`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
 | `PresentationState` | interface | State of [resolvePresentation](resolve-presentation.md#resolvepresentation), [syncPreload](sync-preload.md#syncpreload). | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
 | `ResolvePresentationConfig` | interface | Config of [resolvePresentation](resolve-presentation.md#resolvepresentation). | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
-| `ResolvePresentationState` | type | No JSDoc; an alias of `'preconditions-unmet' \| 'idle' \| 'resolving' \| 'resolved'`. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
+| `ResolvePresentationState` | type | The resolver's phase, derived from state: `'preconditions-unmet'` until `presentation.url` is set; `'idle'` while the preload hint holds resolution back and nothing has activated loading; `'resolving'` while the manifest is fetched and parsed; `'resolved'` once `presentation` carries the parsed result. | [src/playback/behaviors/resolve-presentation.ts](../../../src/playback/behaviors/resolve-presentation.ts) |
