@@ -61,9 +61,15 @@ describe('generated HTML package skins', () => {
 
       expect(template).toContain(`family="${family}"`);
       expect(registration).toContain(`from '../../../icons/${family}';`);
-      expect(tags).toEqual(
-        expect.arrayContaining(['play-button', 'mute-button', 'volume-popover', 'volume-slider', 'captions-button'])
-      );
+      expect(tags).toEqual(expect.arrayContaining(['play-button', 'mute-button', 'volume-popover', 'volume-slider']));
+
+      // The audio presets have no text track or remote playback feature.
+      if (skin.endsWith('video')) {
+        expect(tags).toContain('captions-button');
+      } else {
+        expect(tags).not.toContain('captions-button');
+        expect(tags).not.toContain('airplay-button');
+      }
 
       if (!skin.endsWith('live-audio')) expect(tags).toContain('menu');
     }
