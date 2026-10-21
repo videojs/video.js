@@ -1,7 +1,7 @@
 'use client';
 
 import { buildSoundCloudIframeSrc, SoundCloudAdapter, type SoundCloudAdapterProps } from '@videojs/soundcloud-audio';
-import { forwardRef, type IframeHTMLAttributes, type ReactNode, useState } from 'react';
+import { type CSSProperties, forwardRef, type IframeHTMLAttributes, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -31,10 +31,11 @@ export const SoundCloudAudio = forwardRef<HTMLIFrameElement, SoundCloudAudioProp
     // `source.src` is the only other way to name a sound, so honor it when `src` is absent.
     buildSoundCloudIframeSrc(props.src || props.source?.src || '', props)
   );
-  const { ref: eventsRef, props: iframeProps } = useMediaEvents(
+  const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<SoundCloudAdapterProps, Record<string, unknown>>(media, props, SoundCloudAdapter.defaultProps),
     media
   );
+  const { style, ...iframeProps } = elementProps as Record<string, unknown> & { style?: CSSProperties };
   const attachRef = useAttachMedia(media);
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
@@ -55,6 +56,10 @@ export const SoundCloudAudio = forwardRef<HTMLIFrameElement, SoundCloudAudioProp
       height={166}
       referrerPolicy={props.source?.engine?.soundcloud?.referrerPolicy}
       {...iframeProps}
+      // The widget is SoundCloud's own chrome, so without controls it is a transport and nothing else.
+      // Inline so a `className` cannot put it back on screen, merged so a consumer's own styles survive.
+      // A hidden iframe still loads and plays.
+      style={props.controls ? style : { ...style, display: 'none' }}
       ref={composedRef}
     >
       {children}

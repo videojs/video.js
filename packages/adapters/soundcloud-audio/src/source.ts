@@ -17,7 +17,7 @@ export type SoundCloudWidgetParamValue = string | number | boolean | null | unde
  *
  * The host's defaults hide the social chrome a player skin has no use for: `buying`, `sharing`, `download`,
  * `show_comments`, `show_reposts`, and `show_teaser` are `false`, `hide_related` is `true`, and `visual` is `false`.
- * The uploader and SoundCloud's own branding always stay: the widget is what credits the sound.
+ * The uploader and SoundCloud's own branding stay whenever the widget shows: the widget is what credits the sound.
  */
 export interface SoundCloudEngineConfig extends Record<string, SoundCloudWidgetParamValue> {
   /** Hex color of the play button and other accents, such as `'#ff5500'`. */

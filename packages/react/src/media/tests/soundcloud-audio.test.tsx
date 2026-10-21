@@ -43,8 +43,21 @@ describe('SoundCloudAudio', () => {
     expect(iframe.getAttribute('referrerpolicy')).toBe('no-referrer');
   });
 
+  it('hides the widget unless it is showing as controls', () => {
+    const { container, rerender } = render(<SoundCloudAudio src={TRACK} />);
+    const iframe = container.querySelector('iframe')!;
+
+    expect(iframe.style.display).toBe('none');
+
+    rerender(<SoundCloudAudio src={TRACK} controls />);
+
+    expect(iframe.style.display).toBe('');
+  });
+
   it('sizes the widget with attributes, so a style or class sizes it instead, merged with nothing it needs', () => {
-    const { container } = render(<SoundCloudAudio src={TRACK} style={{ height: 20, borderRadius: 8 }} />);
+    const { container, rerender } = render(
+      <SoundCloudAudio src={TRACK} controls style={{ height: 20, borderRadius: 8 }} />
+    );
     const iframe = container.querySelector('iframe')!;
 
     expect(iframe.getAttribute('width')).toBe('100%');
@@ -53,6 +66,11 @@ describe('SoundCloudAudio', () => {
     expect(iframe.style.borderRadius).toBe('8px');
     expect(iframe.style.pointerEvents).toBe('');
     expect(iframe.style.display).toBe('');
+
+    rerender(<SoundCloudAudio src={TRACK} style={{ height: 20, borderRadius: 8 }} />);
+
+    expect(iframe.style.height).toBe('20px');
+    expect(iframe.style.display).toBe('none');
   });
 
   it('renders without a source and builds the widget when one arrives', async () => {

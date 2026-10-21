@@ -11,11 +11,6 @@ class SoundCloudCustomMediaElement extends CustomMediaElement('iframe', SoundClo
 
     return /*html*/ `
       <style>
-        /*
-         * The widget stays on screen and takes input whether or not there are
-         * controls: it is what credits the uploader and links back to
-         * SoundCloud, and the skin does not cover it.
-         */
         :host {
           display: block;
           position: relative;
@@ -27,6 +22,15 @@ class SoundCloudCustomMediaElement extends CustomMediaElement('iframe', SoundClo
           width: 100%;
           height: 100%;
           border: 0;
+        }
+        /*
+         * The widget is SoundCloud's own chrome, so without controls it is a
+         * transport and nothing else. Hidden rather than merely inert, and
+         * important so a consumer's own display rule cannot put it back on
+         * screen. An iframe in a hidden subtree still loads and plays its src.
+         */
+        :host(:not([controls])) {
+          display: none !important;
         }
       </style>
       <iframe

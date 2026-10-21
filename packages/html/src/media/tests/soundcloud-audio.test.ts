@@ -22,11 +22,11 @@ describe('SoundCloudAudio', () => {
 
   // Asserted against the template because no DOM implementation the tests run in resolves `:host` for a computed
   // style, which is also how the sibling embed hosts check theirs.
-  it('keeps the widget visible and taking input without controls, for the attribution it carries', () => {
+  it('hides the widget unless it is showing as controls, and leaves it taking input when it shows', () => {
     const template = SoundCloudAudio.getTemplateHTML({ src: TRACK });
 
+    expect(template).toMatch(/:host\(:not\(\[controls\]\)\)\s*\{\s*display:\s*none\s*!important/);
     expect(template).not.toMatch(/pointer-events:\s*none/);
-    expect(template).not.toMatch(/display:\s*none/);
     expect(template).toMatch(/:host\s*\{[^}]*height:\s*166px/);
   });
 
