@@ -82,7 +82,7 @@ export interface SegmentLoadingState {
    * That asymmetry is why it isn't folded into `loadingSuspended`, which both read; a single boolean would newly gate
    * MediaSource attach, and co-writing one would be a last-write-wins conflict besides.
    *
-   * Single writer per composition. Today that writer is DRM (`setupMediaKeys`, holding until an encrypted source's
+   * Single writer per composition. Today that writer is DRM (`setupMediaKeys`, holding each source until clear or its
    * MediaKeys attach — appending encrypted data before `setMediaKeys` misbehaves on Chromium); the slot names the
    * prohibition rather than the domain so a second such gate needs no vocabulary here.
    */
