@@ -6,9 +6,9 @@ Source: [src/playback/behaviors/collect-errors.ts](../../../src/playback/behavio
 
 ## collectErrors
 
-**Owns the engine's error sequence.** Reporters append through `emitError`; this behavior owns the signal and
-its per-source lifecycle, clearing it on exit so a new source starts clean and the sequence can't grow unbounded
-across a session.
+**Collects the errors every behavior reports into `state.errors`, and clears them per source.** Reporters append
+through `emitError`; this behavior owns the signal and its per-source lifecycle, clearing it on exit so a new
+source starts clean and the sequence can't grow unbounded across a session.
 
 Same split as `setupFailoverMonitor` and `failedCdns`: writes come from wherever the condition is detected, one
 behavior owns the signal. Deliberately has no `effects` — it holds no policy and derives nothing. Severity is decided

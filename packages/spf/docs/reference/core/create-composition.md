@@ -4,6 +4,9 @@
 
 Exports of `@videojs/spf` declared in [src/core/composition/create-composition.ts](../../../src/core/composition/create-composition.ts).
 
+Composing behaviors into a running engine: the composition, its options, and the factory that fixes a behavior list
+into an engine module's `createEngine`.
+
 ## Composition
 
 A composition of behaviors with shared state and context signal maps.
@@ -20,7 +23,8 @@ Source: [src/core/composition/create-composition.ts](../../../src/core/compositi
 
 ## CompositionOptions
 
-Options for `createComposition`.
+What `createComposition` takes beside the behaviors: the config, the defaults it falls back to, and the state and
+context values to seed.
 
 Composition derives the state and context signal maps from each behavior's declared `stateKeys` / `contextKeys`;
 `initialState` and `initialContext` seed those signals at creation time. Any unseeded signal starts as `undefined`.

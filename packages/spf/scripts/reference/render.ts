@@ -759,8 +759,11 @@ function coreModules(reference: ReferenceProgram): CoreModule[] {
 
   for (const module of modules.values()) module.exports.sort();
 
-  return [...modules.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...modules.values()].sort((a, b) => CORE_MODULE_ORDER.indexOf(a.name) - CORE_MODULE_ORDER.indexOf(b.name));
 }
+
+/** The composition modules in dependency order: a behavior, the signals a host writes, a feature, a composition. */
+const CORE_MODULE_ORDER = ['define-behavior', 'define-external-signals', 'define-feature', 'create-composition'];
 
 function renderCorePage(reference: ReferenceProgram, module: CoreModule): string {
   const { checker } = reference;
@@ -780,10 +783,13 @@ function renderCorePage(reference: ReferenceProgram, module: CoreModule): string
     ]);
   });
 
+  const description = moduleDoc(reference, module.file);
+
   return section([
     GENERATED_NOTICE,
     `# ${code(reference.packageName)}: ${module.name}`,
     `Exports of ${code(reference.packageName)} declared in ${sourceLink(reference, module.page, module.file)}.`,
+    description ? docBody(description) : undefined,
     ...sections,
   ]);
 }
@@ -893,14 +899,26 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     .filter((entry) => !entry.layer && entry.key !== 'index')
     .map((entry) => code(entry.specifier));
 
-  const coreRows = core.flatMap((module) => {
+  const coreSections = core.flatMap((module) => {
     const exports = new Map(moduleExports(reference, module.file).map((symbol) => [symbol.name, symbol]));
+    const rows = module.exports.map((name) => {
+      const symbol = resolveAlias(checker, exports.get(name)!);
 
-    return module.exports.map((name) => [
-      code(name),
-      link(page, module.page, module.name, anchor(name)),
-      plainSentence(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
-    ]);
+      return [
+        link(page, module.page, code(name), anchor(name)),
+        exportKind(symbol),
+        plainSentence(docOf(checker, symbol)) || NO_DESCRIPTION,
+      ];
+    });
+    const values = rows.filter((row) => !TYPE_KINDS.has(row[1]!));
+    const types = rows.filter((row) => TYPE_KINDS.has(row[1]!));
+    const description = moduleDoc(reference, module.file);
+
+    return [
+      `### ${link(page, module.page, module.name)}`,
+      description ? plainSentence(description) : undefined,
+      table(['Export', 'Kind', 'Description'], [...values, ...types]),
+    ];
   });
   const engineRows = model.engines.map((engine) => [
     code(engine.entry.specifier),
@@ -943,7 +961,8 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
       plainSentence(description) || NO_DESCRIPTION,
     ];
   });
-  const headers = ['Symbol', 'Page', 'Description'];
+  const engineHeaders = ['Entry point', 'Page', 'Description'];
+  const featureHeaders = ['Feature', 'Page', 'Description'];
   const behaviorHeaders = ['Behaviors', 'Entry point', 'DOM', 'Description'];
   const counts = {
     core: core.reduce((total, module) => total + module.exports.length, 0),
@@ -960,14 +979,15 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     "Each engine's box and arrows share a color. Features are grouped by which engines compose them; each engine page lists its own features in composition order.",
     mermaid(model),
     '## Engines',
-    table(headers, engineRows),
+    table(engineHeaders, engineRows),
     '## Features',
-    table(headers, featureRows),
+    table(featureHeaders, featureRows),
     '## Behaviors',
     'One row per entry point, in the order the first engine composes them; a module that exports several behaviors lists them all. "DOM" marks the behaviors that need a browser: they drive a media element, a `MediaSource`, or `MediaKeys`, and ship under `behaviors/dom/`.',
     table(behaviorHeaders, behaviorRows),
-    '## Core',
-    table(headers, coreRows),
+    '## Composition',
+    'The four modules that turn behaviors into an engine, in the order they build on each other. Functions first, then the types each exports.',
+    ...coreSections,
     details('How this reference is generated', [
       `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/engines/*\`), their features (\`${reference.packageName}/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
