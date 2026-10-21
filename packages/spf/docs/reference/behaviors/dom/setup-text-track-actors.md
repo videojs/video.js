@@ -39,7 +39,7 @@ The setup declares `config` as required.
 | `textTracksActor` | writes | yes | `TextTracksActor<VTTCue> \| undefined` | `TextTrackActorsContext` | The `TextTracksActor` bound to `mediaElement.textTracks`. `setupTextTrackActors` — its sole writer — creates it together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the slots on element change or destroy. |
 | `textTrackSegmentLoaderActor` | writes | yes | `TextTrackSegmentLoaderActor \| undefined` | `TextTrackActorsContext` | The `TextTrackSegmentLoaderActor` that fetches the selected text track's segments and resolves them into cues for `textTracksActor` through the configured `resolveTextTrackSegment`; same lifetime. `loadTextTrackSegments` drives it with `'load'` messages. |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

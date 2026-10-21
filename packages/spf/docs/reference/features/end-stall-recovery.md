@@ -31,14 +31,19 @@ audio and video end at slightly different times. Inert otherwise.
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |

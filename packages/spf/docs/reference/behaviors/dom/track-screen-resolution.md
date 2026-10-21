@@ -33,7 +33,7 @@ The setup declares `config?`: callers may omit it.
 | --- | --- | --- | --- | --- | --- |
 | `screenResolution` | writes | yes | `Resolution \| undefined` | `ScreenResolutionState` | The screen's pixel dimensions, written by `trackScreenResolution` at setup and on change (device pixels when `useDevicePixelRatio`); `undefined` where there is no screen to read, which the `screenResolutionCap` rule treats as no cap. |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

@@ -36,14 +36,19 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |

@@ -119,16 +119,21 @@ engine.state.presentation.set({ url: 'https://example.com/stream.m3u8' });
 | `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers), [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime), [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition), [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall), [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. |
 | `mediaSource` | `MediaSource \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. |
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the engine composes, in setup order: its features' behaviors, each composed once. Listed under [Behaviors](#behaviors). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
+| `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
+| `features` | const | The features the audio-only HLS playback engine composes, in order. Listed under [Features](#features). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
+| `initialState` | const | The state the engine starts with: its features' merged `initialState`. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
 | `Config` | type | Every config key the behaviors read, before `defaultConfig` makes any optional. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
-| `defaultConfig` | const | The defaults `createEngine` fills in for every config key the caller leaves `undefined`: its features' merged `defaultConfig`. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
 | `EngineConfig` | type | Configuration for the audio-only HLS playback engine: every config key its behaviors read, with each key `defaultConfig` covers optional. Listed under [Config](#config). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
 | `EngineContext` | type | Context shape for the audio-only HLS playback engine: every context key its behaviors declare. Listed under [Context](#context). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
 | `EngineState` | type | State shape for the audio-only HLS playback engine: every state key its behaviors and external signals declare. Listed under [State](#state). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
-| `features` | const | The features the audio-only HLS playback engine composes, in order. Listed under [Features](#features). | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |
-| `initialState` | const | The state the engine starts with: its features' merged `initialState`. | [src/playback/engines/hls-audio.ts](../../../src/playback/engines/hls-audio.ts) |

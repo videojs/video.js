@@ -46,7 +46,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `LoadTriggersContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

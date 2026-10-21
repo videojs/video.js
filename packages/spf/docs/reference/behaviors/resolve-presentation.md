@@ -51,7 +51,7 @@ The setup declares `config` as required.
 | `preload` | reads | yes | `"metadata" \| "auto" \| "none" \| undefined` | `PresentationState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `PresentationState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

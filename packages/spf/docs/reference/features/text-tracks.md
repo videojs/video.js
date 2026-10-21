@@ -70,14 +70,19 @@ Content whose timestamps don't start at zero also needs `shiftTextTimestampsFeat
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveTextTrackSegment: resolveVttSegment, addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia }`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveTextTrackSegment: resolveVttSegment, addSubtitlesTracksToMedia, getShowingSubtitlesTrackFromMedia, removeAllSubtitlesTracksFromMedia }`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/text-tracks.ts](../../../src/playback/features/text-tracks.ts) |
