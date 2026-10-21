@@ -59,7 +59,6 @@ import { computed, type ReadonlySignal } from '../../../core/signals/primitives'
 import {
   attachMediaKeys,
   declaredDrmKeys,
-  type DrmSystemsConfig,
   fetchServerCertificate,
   type KeySystemModule,
   keySystemCandidates,
@@ -83,6 +82,7 @@ import {
 } from '../../../media/errors';
 import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
+import type { NegotiableDrmSystemsConfig } from './setup-media-keys';
 
 /**
  * What an AirPlay receiver's key requests arrive as. FairPlay's `skd://` key URI carries no EME init data, so the
@@ -113,7 +113,7 @@ export interface AirPlayFairPlayContext {
 /** Config for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayConfig {
   /** License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. */
-  drm: DrmSystemsConfig;
+  drm: NegotiableDrmSystemsConfig;
   /** The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. */
   keySystems: readonly KeySystemModule[];
 }

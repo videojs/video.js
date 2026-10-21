@@ -42,13 +42,14 @@
  * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
  */
 import { defineBehavior } from '../../../core/composition/create-composition';
+import type { KeyedBy } from '../../../core/composition/keyed-by';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';
 import { RecurringRunner, runOnce, Task } from '../../../core/tasks/task';
 import {
   attachMediaKeys,
-  type DrmSystemsConfig,
+  type DrmSystemConfig,
   declaredDrmKeys,
   declaredEncryptionScheme,
   fetchServerCertificate,
@@ -90,13 +91,20 @@ export interface MediaKeysContext {
   mediaKeys?: MediaKeys;
 }
 
+/**
+ * License servers keyed by EME key-system id, where each id must be one of the composition's `keySystems`: an entry for
+ * a system no composed module claims can never be negotiated, so a composition's config rejects it.
+ */
+export type NegotiableDrmSystemsConfig = KeyedBy<'keySystems', 'keySystem', DrmSystemConfig>;
+
 /** Config for MediaKeys setup. */
 export interface MediaKeysSetupConfig {
   /**
-   * License servers keyed by EME key-system id — `source.drm`'s shape. Required: license URLs are intrinsically source-
-   * or provider-specific, so no default exists; the DRM engine variant supplies it.
+   * License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. Required:
+   * license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies
+   * it.
    */
-  drm: DrmSystemsConfig;
+  drm: NegotiableDrmSystemsConfig;
   /**
    * The key systems this composition can negotiate, most-preferred first. Required for the same reason `drm` is: which
    * systems an engine carries is a composition decision, and each module dropped from the list drops its own

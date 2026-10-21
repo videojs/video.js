@@ -28,7 +28,7 @@ export type {
   ResolveBehaviorState,
   StateSignals,
 } from './core/composition/create-composition';
-export { createComposition, defineBehavior } from './core/composition/create-composition';
+export { createComposition, defineBehavior, defineCompositionFactory } from './core/composition/create-composition';
 export { defineExternalSignals } from './core/composition/define-external-signals';
 
 // =============================================================================

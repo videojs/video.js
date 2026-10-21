@@ -437,7 +437,7 @@ A behavior's `config` fields are typically optional with sensible defaults (`def
 
 Mark the field as required on the behavior's `Config` interface and drop the `?` on the setup-fn deps' `config:`. `defineBehavior`'s `RequireIfNonEmpty<'config', Cfg>` already makes the config arg required at the behavior call site whenever `Cfg` has any keys; the new force is at the *field* level, propagated through `ResolveBehaviorConfig` so `createComposition`'s intersected `Cfg` carries the required field — typecheck forces the engine to supply it.
 
-The composing engine binds the default in its own `finalConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
+The composing engine binds the default in its exported `defaultConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
 
 ```ts
 // In the behavior — required, no default
@@ -446,17 +446,16 @@ export interface ResolvePresentationConfig {
   defaultPreload?: StandardPreload;     // optional, spec-fallback
 }
 
-// In the engine — optional, defaulted in finalConfig
-interface EngineConfig {
-  parsePresentation?: ParsePresentation;
+// In the engine — optional, because `defaultConfig` covers it
+export const defaultConfig = {
+  parsePresentation: parseMultivariantPlaylist,
   // ...
-}
+} satisfies Partial<Config>;
 
-const finalConfig = {
-  ...config,
-  parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
-  // ...
-};
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>; // parsePresentation?: ParsePresentation
+
+// `config` overrides; `defaultConfig` fills every key it leaves out or `undefined`
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
 ```
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.

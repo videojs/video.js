@@ -8,6 +8,7 @@ import {
   type ContextSignals,
   createComposition,
   defineBehavior,
+  defineCompositionFactory,
   type InferBehaviorConfig,
   type InferBehaviorContext,
   type InferBehaviorState,
@@ -188,6 +189,28 @@ describe('InferBehaviorConfig', () => {
   it('extracts different config types from different behaviors', () => {
     expectTypeOf<InferBehaviorConfig<typeof render>>().toEqualTypeOf<{ defaultText?: string }>();
     expectTypeOf<InferBehaviorConfig<typeof persist>>().toEqualTypeOf<{ saveEvery?: number }>();
+  });
+
+  // A setup's `config?:` once made `defineBehavior` drop the config type, so the
+  // behavior contributed nothing to the composition's config.
+  it('extracts the config of a defineBehavior whose setup takes an optional config', () => {
+    const optionalConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }>; config?: { interval?: number } }) => {},
+    });
+
+    expectTypeOf<InferBehaviorConfig<typeof optionalConfig>>().toEqualTypeOf<{ interval?: number }>();
+  });
+
+  it('is empty for a behavior that declares no config', () => {
+    const noConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }> }) => {},
+    });
+
+    expectTypeOf<keyof InferBehaviorConfig<typeof noConfig>>().toEqualTypeOf<never>();
   });
 });
 
@@ -955,5 +978,50 @@ describe('createComposition', () => {
     // matches the Empty fallback
     // oxlint-disable-next-line typescript/no-empty-object-type
     expectTypeOf<typeof map>().toEqualTypeOf<{}>();
+  });
+});
+
+describe('ConfigWithDefaults', () => {
+  const needsInterval = {
+    stateKeys: [],
+    contextKeys: [],
+    setup: (_deps: { config: { interval: number; label?: string } }) => {},
+  };
+
+  it('makes a required key optional when defaultConfig covers it', () => {
+    createComposition([needsInterval], { defaultConfig: { interval: 250 }, config: {} });
+    createComposition([needsInterval], { defaultConfig: { interval: 250 }, config: { label: 'a' } });
+  });
+
+  it('keeps a required key required when defaultConfig does not cover it', () => {
+    // @ts-expect-error — `interval` is required and has no default
+    createComposition([needsInterval], { defaultConfig: { label: 'a' }, config: {} });
+  });
+
+  it('checks defaults for a behavior whose setup takes an optional config', () => {
+    const optionalConfig = defineBehavior({
+      stateKeys: ['count'],
+      contextKeys: [],
+      setup: (_deps: { state: StateSignals<{ count?: number }>; config?: { interval?: number } }) => {},
+    });
+
+    createComposition([optionalConfig], { defaultConfig: { interval: 250 } });
+    // @ts-expect-error — `interval` is a number
+    createComposition([optionalConfig], { defaultConfig: { interval: '250' } });
+  });
+
+  // Inferring `config` as a `const` type parameter skips TypeScript's own
+  // excess-property check, so the composition restores it.
+  it('rejects a misspelled config key, even beside a valid one', () => {
+    createComposition([needsInterval], { config: { interval: 1, label: 'a' } });
+    // @ts-expect-error — `intervl` is not a config key
+    createComposition([needsInterval], { config: { interval: 1, intervl: 2 } });
+    // @ts-expect-error — the same, through a factory's create function
+    defineCompositionFactory([needsInterval])({ interval: 1, intervl: 2 });
+  });
+
+  it('rejects a default of the wrong type', () => {
+    // @ts-expect-error — `interval` is a number
+    createComposition([needsInterval], { defaultConfig: { interval: '250' }, config: {} });
   });
 });

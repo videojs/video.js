@@ -85,11 +85,12 @@ function awaitDefined(read: () => number | undefined): Promise<number> {
 /**
  * Relocation pipelines for one track type — a plain config `messagePipelines`. Keyed by **track type** (`'video'` /
  * `'audio'`), so ABR rungs of a type share the origin (discover skips once the type's value is present). The steps
- * read/write `state.mediaContainerData[trackType]` via their call-time `deps`; the stamp applies the same `derive` seam
- * the reactor uses (pass the composition's resolved `deriveStartMediaTime` so the buffer offset and the model's
- * `startMediaTime` agree).
+ * read/write `state.mediaContainerData[trackType]` via their call-time `deps`; the stamp applies the same
+ * `deriveStartMediaTime` seam the reactor uses, read from the composition config at call time, so the buffer offset and
+ * the model's `startMediaTime` agree. A composition whose config carries no `deriveStartMediaTime` doesn't relocate:
+ * the stamp leaves appends native.
  */
-export function relocationPipelinesFor(trackType: 'video' | 'audio', derive: DeriveStartMediaTime): MessagePipelines {
+export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePipelines {
   const handlerType: MediaHandlerType = trackType === 'video' ? 'vide' : 'soun';
 
   /**
@@ -152,6 +153,10 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio', derive: Der
    */
   const stampStartMediaTime: LoadStep = async (frame, signal, deps) => {
     if (frame.op.type !== 'append-segment') return;
+
+    // SAFETY: `config` is the composition config threaded through the loader; `deriveStartMediaTime` is optional on it.
+    const derive = (deps.config as { deriveStartMediaTime?: DeriveStartMediaTime }).deriveStartMediaTime;
+    if (!derive) return;
 
     const state = relocationState(deps);
     // Liveness guard: if THIS type's own origin wasn't discovered — `readSegmentOrigin`
