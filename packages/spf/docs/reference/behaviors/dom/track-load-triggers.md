@@ -6,7 +6,8 @@ Source: [src/playback/behaviors/dom/track-load-triggers.ts](../../../../src/play
 
 ## trackLoadTriggers
 
-Track preload-overriding events per source.
+Flips `loadActivated` to true the first time the user plays or seeks the current source, which lifts the preload gate
+on loading.
 
 Writes `state.loadActivated = true` the first time a `play` or `seeking` event fires on the attached media element
 for the current source — or immediately on entry if the element is already committed to loading (`el.autoplay`,
