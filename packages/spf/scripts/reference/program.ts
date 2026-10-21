@@ -33,7 +33,7 @@ export interface ReferenceProgram {
 }
 
 const ENGINE_PREFIX = 'engines/';
-const FEATURE_PREFIX = 'hls/features/';
+const FEATURE_PREFIX = 'features/';
 const BEHAVIOR_PREFIX = 'behaviors/';
 const DOM_BEHAVIOR_PREFIX = 'behaviors/dom/';
 
