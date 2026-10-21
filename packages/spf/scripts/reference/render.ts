@@ -480,7 +480,8 @@ function slotFieldsTable(
   const long = new LongCells();
   const initialColumns = slot === 'state' ? ['Initial', ...(features.length > 1 ? ['Initial from'] : [])] : [];
   const rows = fields.map((field) => {
-    const declaredBy = behaviors.filter((info) => slotOf(info, slot, field.key)?.declared);
+    const declaredBy = behaviors.filter((info) => !info.external && slotOf(info, slot, field.key)?.declared);
+    const external = behaviors.some((info) => info.external && slotOf(info, slot, field.key)?.declared);
     const initial = slot === 'state' ? initialOf(features, field.key) : undefined;
 
     return [
@@ -490,12 +491,53 @@ function slotFieldsTable(
       ...(initialColumns.length > 1
         ? [initial ? link(page, initial.feature.entry.page!, initial.feature.name) : '—']
         : []),
-      behaviorLinks(reference, page, declaredBy),
+      [
+        ...(external ? ['[external signal](#external-signals)'] : []),
+        ...(declaredBy.length ? [behaviorLinks(reference, page, declaredBy)] : []),
+      ].join(', ') || '—',
       borrowedDocCell(reference, page, [...behaviors, ...docPool(model)], slot, field.key, behaviors),
     ];
   });
 
   return section([table(['Key', 'Type', ...initialColumns, 'Declared by', 'Doc'], rows), long.render()]);
+}
+
+/**
+ * The state keys a feature (or an engine, through its features) declares for the host to write, as a section: what they
+ * are, how they get written, then one row per key with its type and its doc. The doc names the reader; the selection
+ * rules read these keys through optional deps the model does not see, so a "Read by" column would mislead.
+ */
+function externalSignalsSection(
+  reference: ReferenceProgram,
+  model: Model,
+  page: string,
+  behaviors: BehaviorInfo[],
+  fields: TypeField[],
+  features: FeatureInfo[] = []
+): string | undefined {
+  const declarations = behaviors.filter((info) => info.external);
+  if (declarations.length === 0) return undefined;
+
+  const long = new LongCells();
+  const fromColumn = features.length > 1;
+  const rows = declarations.flatMap((declaration) =>
+    (declaration.stateKeys ?? []).map((key) => {
+      const field = fields.find((candidate) => candidate.key === key);
+      const from = features.find((feature) => feature.behaviors.includes(declaration));
+
+      return [
+        code(key),
+        field ? long.cell(key, 'type', field.type) : '—',
+        ...(fromColumn ? [from ? link(page, from.entry.page!, from.name) : '—'] : []),
+        borrowedDocCell(reference, page, [...behaviors, ...docPool(model)], 'state', key, behaviors),
+      ];
+    })
+  );
+  const who =
+    features.length > 1 ? "The engine's features declare these state keys" : 'The feature declares these state keys';
+  const lead = `${who} for code outside the engine to write; no behavior sets them. The SPF Medias write them from their own properties, and code driving an engine directly writes \`engine.state.<key>.set(value)\`. Each is declared with ${link(page, 'core/define-external-signals.md', 'defineExternalSignals', 'defineexternalsignals')}, which is what makes the key part of the engine's state type.`;
+
+  return section([lead, table(['Key', 'Type', ...(fromColumn ? ['From'] : []), 'Doc'], rows), long.render()]);
 }
 
 /**
@@ -551,11 +593,13 @@ function featureConfigTable(
 function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: FeatureInfo): string {
   const page = feature.entry.page!;
   // A behavior built inline in the feature's list is shown as written, since this page is where it is defined.
-  const behaviors = feature.behaviors.length
-    ? feature.behaviors
+  const listed = feature.behaviors.filter((info) => !info.external);
+  const behaviors = listed.length
+    ? listed
         .map((info, index) => `${index + 1}. ${info.exported ? behaviorLink(reference, page, info) : code(info.name)}`)
         .join('\n')
     : 'None.';
+  const externalSignals = externalSignalsSection(reference, model, page, feature.behaviors, feature.state);
   const config = featureConfigTable(reference, model, page, feature);
   const state = slotFieldsTable(reference, model, page, feature.state, feature.behaviors, 'state', [feature]);
   const context = slotFieldsTable(reference, model, page, feature.context, feature.behaviors, 'context');
@@ -577,6 +621,8 @@ function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: F
     docBody(feature.doc),
     '### Behaviors',
     behaviors,
+    externalSignals ? '### External signals' : undefined,
+    externalSignals,
     config ? '### Config' : undefined,
     config,
     state ? '### State' : undefined,
@@ -621,8 +667,17 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     .map((feature, index) => `${index + 1}. ${link(page, feature.entry.page!, feature.name)}`)
     .join('\n');
   const behaviors = engine.behaviors
+    .filter((info) => !info.external)
     .map((info, index) => `${index + 1}. ${behaviorLink(reference, page, info)}`)
     .join('\n');
+  const externalSignals = externalSignalsSection(
+    reference,
+    model,
+    page,
+    engine.behaviors,
+    engine.state,
+    engine.features
+  );
   const config = engineConfigTable(reference, page, engine);
   const state = slotFieldsTable(reference, model, page, engine.state, engine.behaviors, 'state', engine.features);
   const context = slotFieldsTable(reference, model, page, engine.context, engine.behaviors, 'context');
@@ -644,6 +699,8 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     features,
     '### Behaviors',
     behaviors,
+    externalSignals ? '### External signals' : undefined,
+    externalSignals,
     config ? '### Config' : undefined,
     config,
     state ? '### State' : undefined,
@@ -912,6 +969,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     details('How this reference is generated', [
       `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/engines/*\`), their features (\`${reference.packageName}/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
+      'A feature page lists the state keys it declares for the host to write under "External signals", apart from its behaviors; an engine page collects its features\' under the same heading.',
       "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Parts (values) and Types.",
       'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
       'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell says which one it is documented on.',

@@ -22,7 +22,14 @@ Requires, from this or other features:
 2. [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack)
 3. [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors)
 4. [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)
-5. `defineExternalSignals<UserTrackSelectionState<'video'>>()({ state: ['userVideoTrackSelection'] })`
+
+### External signals
+
+The feature declares these state keys for code outside the engine to write; no behavior sets them. The SPF Medias write them from their own properties, and code driving an engine directly writes `engine.state.<key>.set(value)`. Each is declared with [defineExternalSignals](../core/define-external-signals.md#defineexternalsignals), which is what makes the key part of the engine's state type.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `userVideoTrackSelection` | `Partial<VideoTrack> \| undefined` | Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a partial track the `filterByUserSelection` rule matches candidates against; an empty match falls through to the unfiltered set. |
 
 ### Config
 
@@ -56,7 +63,7 @@ Requires, from this or other features:
 | `preload` | `string \| undefined` | — | [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | `string \| undefined` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. |
-| `userVideoTrackSelection` | `Partial<VideoTrack> \| undefined` | — | `defineExternalSignals<UserTrackSelectionState<'video'>>` ([src/playback/features/video.ts](../../../src/playback/features/video.ts)) | Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a partial track the `filterByUserSelection` rule matches candidates against; an empty match falls through to the unfiltered set. |
+| `userVideoTrackSelection` | `Partial<VideoTrack> \| undefined` | — | [external signal](#external-signals) | Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a partial track the `filterByUserSelection` rule matches candidates against; an empty match falls through to the unfiltered set. |
 
 ### Context
 
