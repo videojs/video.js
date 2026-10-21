@@ -184,6 +184,6 @@ A behavior page opens with its module description when the source file starts wi
 
 A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."
 
-A config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key's doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".
+A config key's doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key's doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell says which one it is documented on.
 
 </details>

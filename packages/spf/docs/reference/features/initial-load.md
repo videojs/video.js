@@ -31,13 +31,13 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 | --- | --- | --- | --- | --- |
 | `loadActivated` | `boolean \| undefined` | — | [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from preload-based to standard load (currently DOM `play` / `seeking`). Reset to `false` on source change. Read by `resolvePresentation` and `loadVideoSegments` / `loadAudioSegments` to mirror native `HTMLMediaElement` preload semantics — only meaningful when `preload !== 'auto'`, which already loads fully regardless. |
 | `preload` | `"metadata" \| "auto" \| "none" \| undefined` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

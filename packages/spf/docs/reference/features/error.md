@@ -17,7 +17,7 @@ Collects the errors the other features report into `state.errors`, per source. W
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
 | `errors` | `SvtaError[] \| undefined` | — | [collectErrors](../behaviors/collect-errors.md#collecterrors) | Conditions reported during playback, in the order encountered — appended by whichever behavior detects one (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [collectErrors](../behaviors/collect-errors.md#collecterrors) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [collectErrors](../behaviors/collect-errors.md#collecterrors) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 

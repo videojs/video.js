@@ -25,7 +25,7 @@ no duration is set.
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 

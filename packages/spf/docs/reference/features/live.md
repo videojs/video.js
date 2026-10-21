@@ -37,15 +37,15 @@ Requires:
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
 | `mediaContainerData` | `Record<string, MediaContainerData> \| undefined` | — | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | Transient origin-establishment data, keyed by **track type** (`'video'` / `'audio'`) — per spec one init+media pair per type suffices, and ABR rungs of a type share the origin. Filled by the discover steps across appends, reset per source. Never the model — the churn stays here; only the settled `startMediaTime` reaches `Track`. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange), [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge), [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange), [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge), [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `startPosition` | `number \| undefined` | — | [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge) | One-shot start-position command in presentation-timeline seconds. Written here on entry into `live`; consumed (cleared) by `applyStartPosition`. |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
-| `mediaSource` | `MediaSource \| undefined` | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [seekToLiveEdge](../behaviors/dom/seek-to-live-edge.md#seektoliveedge) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaSource` | `MediaSource \| undefined` | [syncLiveSeekableRange](../behaviors/dom/sync-live-seekable-range.md#syncliveseekablerange) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 
