@@ -124,6 +124,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # The SPF API reference is generated from the sources and committed; it reads
+      # the referenced projects' declarations, which the typecheck build just wrote.
+      - name: Check the SPF API reference is current
+        run: pnpm -F @videojs/spf docs:reference:check
+
   test:
     needs: package_test_selection
     if: needs.package_test_selection.outputs.has_standard_tests == 'true'
