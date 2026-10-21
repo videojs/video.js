@@ -140,8 +140,8 @@ function resolvePresentationSetup({
  *
  * Reads `state.presentation`; when it holds `{ url }` (unresolved) and the preload / load-activation gate is met,
  * fetches the manifest, parses it via the **required** `config.parsePresentation`, and writes the resolved
- * `Presentation` back to the same slot. The behavior is format-neutral: the composing engine wires in its parser (e.g.
- * the HLS engine supplies the multivariant-playlist parser).
+ * `Presentation` back to the same signal. The behavior is format-neutral: the composing engine wires in its parser
+ * (e.g. the HLS engine supplies the multivariant-playlist parser).
  *
  * Source-identity-driven, expressed as a 4-state machine:
  *

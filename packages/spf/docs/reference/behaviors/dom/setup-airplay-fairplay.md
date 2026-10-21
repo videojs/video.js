@@ -21,7 +21,7 @@ source does not by itself mean the receiver needs anything from this CDM, and th
 negotiation, so the certificate is always applied before any `generateRequest` — the same ordering `setupMediaKeys`
 carries across its publish, here carried by the promise.
 
-Deliberately **not** a writer of `context.mediaKeys`. That slot is `setupMediaKeys`' handoff to `exchangeLicenses`,
+Deliberately **not** a writer of `context.mediaKeys`. That signal is `setupMediaKeys`' handoff to `exchangeLicenses`,
 and publishing receiver MediaKeys into it would wake `exchangeLicenses` to license an MSE pipeline that is not
 playing. These MediaKeys stay behavior-local, and a cleared `context.mediaKeys` is instead read as the gate proving
 `setupMediaKeys` has finished yielding.
@@ -75,7 +75,7 @@ The setup declares `config` as required.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `AirPlayFairPlayContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-| `mediaKeys` | reads | yes | `MediaKeys \| undefined` | `AirPlayFairPlayContext` | `setupMediaKeys`' handoff slot, read here only as proof that it has yielded the element. |
+| `mediaKeys` | reads | yes | `MediaKeys \| undefined` | `AirPlayFairPlayContext` | `setupMediaKeys`' handoff signal, read here only as proof that it has yielded the element. |
 
 ## Types
 

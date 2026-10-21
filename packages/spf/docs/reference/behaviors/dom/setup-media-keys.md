@@ -31,7 +31,7 @@ adapter's call. A refusal publishes `NO_KEY_SYSTEM`, which is what lets renditio
 Single-positive-state reactor riding the resolver's resolved/unresolved lifecycle, like `setupMediaSource`. The EME
 pipeline runs as one `Task` under a runner the reactor owns — the same shape as `setupTrackResolution` — so source
 replacement routes through `'preconditions-unmet'`, whose state-exit cleanup aborts the task structurally, clears the
-slots, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
+signals, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
 deliberate — MediaKeys re-use across sources is an optimization with prior art (see drm-support.md).
 
 A live AirPlay session routes through that same exit. Playback moves off MSE onto the native-HLS fallback `<source>`
@@ -42,7 +42,7 @@ edge re-enters and re-negotiates with no extra machinery.
 Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
 HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
 gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
-defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
+defaults — carries neither the machinery nor the signals, and none of this file's key-system code survives
 tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
 
 Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD

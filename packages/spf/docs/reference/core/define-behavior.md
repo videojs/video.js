@@ -11,7 +11,7 @@ context, config) and returns an optional cleanup handle.
 
 The `stateKeys` / `contextKeys` declarations are the runtime expression of the behavior's contract — the caller (e.g.
 `createComposition`) uses them to know which signals to provide. The setup parameter type declares the _slot map_
-(per-slot `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
+(per-signal `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
 
 Manual `Behavior<>` literals (e.g. engine wrappers that forward keys from a wrapped behavior, or
 `defineExternalSignals`, which checks its key list itself) opt out of exhaustiveness — the type alias is permissive
@@ -48,9 +48,9 @@ Source: [src/core/composition/define-behavior.ts](../../../src/core/composition/
 
 The deps object passed to each behavior by the composition.
 
-- `state` — slot map for state fields (reactive data). Per-slot read/ write intent expressed via `Signal<T>` vs
+- `state` — signal map for state fields (reactive data). Per-signal read/ write intent expressed via `Signal<T>` vs
   `ReadonlySignal<T>`.
-- `context` — slot map for platform objects and actor references.
+- `context` — signal map for platform objects and actor references.
 - `config` — static configuration, passed once at composition creation.
 
 ```ts
@@ -141,17 +141,17 @@ Source: [src/core/composition/define-behavior.ts](../../../src/core/composition/
 
 A signal map keyed by the fields of `S`. Each field is a writable signal.
 
-Optional fields on `S` map to required signal slots whose value type includes `undefined`, ensuring every key has a
-signal even when the underlying value is absent.
+Optional fields on `S` map to required signals whose value type includes `undefined`, ensuring every key has a signal
+even when the underlying value is absent.
 
 Used in two roles:
 
 - Engine-side **construction**: `Composition<S, C>` exposes its public surface as `StateSignals<S>` (everything
-  writable) so external code can read or write any slot.
-- Behavior **input convenience**: a behavior that writes to every slot can type its setup state param as
-  `StateSignals<{ ... }>` rather than spelling out per-slot `Signal<T>` types.
+  writable) so external code can read or write any signal.
+- Behavior **input convenience**: a behavior that writes to every signal can type its setup state param as
+  `StateSignals<{ ... }>` rather than spelling out per-signal `Signal<T>` types.
 
-Behaviors that mix read-only and writable slots type the setup param directly as a slot map (`{ x: Signal<T>; y:
+Behaviors that mix read-only and writable signals type the setup param directly as a signal map (`{ x: Signal<T>; y:
 ReadonlySignal<U> }`) instead of going through `StateSignals<>`.
 
 ```ts

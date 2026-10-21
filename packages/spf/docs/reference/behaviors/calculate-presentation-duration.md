@@ -9,7 +9,7 @@ Source: [src/playback/behaviors/calculate-presentation-duration.ts](../../../src
 **Populate presentation duration via a config-supplied resolver.**
 
 Once a presentation is in place and its `duration` is still undefined, calls `config.resolveDuration(state)` whenever
-a tracked slot changes. The resolver decides what counts as "duration is now derivable" for the variant in play; the
+a tracked key changes. The resolver decides what counts as "duration is now derivable" for the variant in play; the
 behavior itself stays variant-agnostic:
 
 - **VoD** — derive from the first resolved selected track's `duration` (video preferred, audio fallback). The HLS
@@ -23,7 +23,7 @@ Validation: writes whatever the resolver returns as long as it's a positive numb
 
 Fires at most once per presentation — an already-set `duration` is never overwritten, and the next reset arrives
 structurally when a new (unresolved) presentation replaces the current one. The resolver may return `undefined` while
-duration is still indeterminate; subsequent tracked-slot changes re-run the effect until the resolver commits a
+duration is still indeterminate; subsequent tracked-key changes re-run the effect until the resolver commits a
 value.
 
 Downstream of `resolveVideoTrack` / `resolveAudioTrack`; upstream of `updateMediaSourceDuration` (which writes the
@@ -32,8 +32,8 @@ value through to `mediaSource.duration`).
 `calculatePresentationDuration` uses a manual `Behavior<>` literal (rather than `defineBehavior`) so it can declare
 just `presentation` in its stateKeys while the typed setup-param shape includes the optional `selectedVideoTrackId` /
 `selectedAudioTrackId` reads used at runtime. Mirrors the pattern in `endOfStream` for the same reason: the behavior
-is uniform-across-tracks and reads slots contributed by other behaviors, so it shouldn't leak those slot declarations
-into variants that don't compose the contributors.
+is uniform-across-tracks and reads signals contributed by other behaviors, so it shouldn't leak those signal
+declarations into variants that don't compose the contributors.
 
 Source: [src/playback/behaviors/calculate-presentation-duration.ts](../../../src/playback/behaviors/calculate-presentation-duration.ts)
 

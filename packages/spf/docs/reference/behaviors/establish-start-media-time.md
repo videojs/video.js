@@ -20,10 +20,10 @@ The two coordinate stamps it owns:
   `gateFirstParseOnAnchor`, which `resolve-track` awaits through its injected gate seam. Absent PDT (ordinary
   VOD), no anchor is stamped and local-from-0 placement is already correct.
 - **`startMediaTime` (decode origin).** Runs the injected `DeriveStartMediaTime` seam over the transient
-  `mediaContainerData` slot (owned here; `inactive` clears it per source) and stamps the settled value onto the model
-  until `established`. The byte-level discover/stamp steps that fill the slot are a separate, config
+  `mediaContainerData` signal (owned here; `inactive` clears it per source) and stamps the settled value onto the
+  model until `established`. The byte-level discover/stamp steps that fill the signal are a separate, config
   `messagePipelines` array (`primitives/relocation-pipelines`); the two coordinate only through the shared
-  `state.mediaContainerData` slot, never by import. See `internal/design/spf/presentation-timeline-model.md`.
+  `state.mediaContainerData` signal, never by import. See `internal/design/spf/presentation-timeline-model.md`.
 
 DOM-free reactor; sticky per source (`inactive → monitoring → established`).
 

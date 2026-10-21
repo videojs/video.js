@@ -9,17 +9,17 @@ export type BehaviorCleanup = void | (() => void | Promise<void>) | { destroy():
 /**
  * A signal map keyed by the fields of `S`. Each field is a writable signal.
  *
- * Optional fields on `S` map to required signal slots whose value type includes `undefined`, ensuring every key has a
- * signal even when the underlying value is absent.
+ * Optional fields on `S` map to required signals whose value type includes `undefined`, ensuring every key has a signal
+ * even when the underlying value is absent.
  *
  * Used in two roles:
  *
  * - Engine-side **construction**: `Composition<S, C>` exposes its public surface as `StateSignals<S>` (everything
- *   writable) so external code can read or write any slot.
- * - Behavior **input convenience**: a behavior that writes to every slot can type its setup state param as
- *   `StateSignals<{ ... }>` rather than spelling out per-slot `Signal<T>` types.
+ *   writable) so external code can read or write any signal.
+ * - Behavior **input convenience**: a behavior that writes to every signal can type its setup state param as
+ *   `StateSignals<{ ... }>` rather than spelling out per-signal `Signal<T>` types.
  *
- * Behaviors that mix read-only and writable slots type the setup param directly as a slot map (`{ x: Signal<T>; y:
+ * Behaviors that mix read-only and writable signals type the setup param directly as a signal map (`{ x: Signal<T>; y:
  * ReadonlySignal<U> }`) instead of going through `StateSignals<>`.
  */
 export type StateSignals<S extends object> = { [K in keyof S]-?: Signal<S[K]> };
@@ -31,22 +31,22 @@ export type StateSignals<S extends object> = { [K in keyof S]-?: Signal<S[K]> };
 export type ContextSignals<C extends object> = { [K in keyof C]-?: Signal<C[K]> };
 
 /**
- * Slot-map shape — a record where each value is at least a `ReadonlySignal`. `Signal<T>` is structurally a subtype of
- * `ReadonlySignal<T>` (it adds `.set()`), so a writable slot satisfies this bound too.
+ * Signal-map shape — a record where each value is at least a `ReadonlySignal`. `Signal<T>` is structurally a subtype of
+ * `ReadonlySignal<T>` (it adds `.set()`), so a writable signal satisfies this bound too.
  *
- * This is the bound used for behavior `state` / `context` slot maps. It lets a single behavior declare a
- * _heterogeneous_ slot map where some slots are `Signal<T>` (writable) and others are `ReadonlySignal<T>` (read-only) —
- * making read/write intent explicit at the call site and giving body-level enforcement (TS rejects `.set()` on a
- * read-only slot).
+ * This is the bound used for behavior `state` / `context` signal maps. It lets a single behavior declare a
+ * _heterogeneous_ signal map where some signals are `Signal<T>` (writable) and others are `ReadonlySignal<T>`
+ * (read-only) — making read/write intent explicit at the call site and giving body-level enforcement (TS rejects
+ * `.set()` on a read-only signal).
  */
 export type AnySlotMap = Record<PropertyKey, ReadonlySignal<unknown>>;
 
 /**
  * The deps object passed to each behavior by the composition.
  *
- * - `state` — slot map for state fields (reactive data). Per-slot read/ write intent expressed via `Signal<T>` vs
+ * - `state` — signal map for state fields (reactive data). Per-signal read/ write intent expressed via `Signal<T>` vs
  *   `ReadonlySignal<T>`.
- * - `context` — slot map for platform objects and actor references.
+ * - `context` — signal map for platform objects and actor references.
  * - `config` — static configuration, passed once at composition creation.
  */
 export interface BehaviorDeps<StateMap extends AnySlotMap, ContextMap extends AnySlotMap, Cfg extends object> {
@@ -61,7 +61,7 @@ export interface BehaviorDeps<StateMap extends AnySlotMap, ContextMap extends An
  *
  * The `stateKeys` / `contextKeys` declarations are the runtime expression of the behavior's contract — the caller (e.g.
  * `createComposition`) uses them to know which signals to provide. The setup parameter type declares the _slot map_
- * (per-slot `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
+ * (per-signal `Signal<T>` vs `ReadonlySignal<T>`); together they form a complete contract.
  *
  * Manual `Behavior<>` literals (e.g. engine wrappers that forward keys from a wrapped behavior, or
  * `defineExternalSignals`, which checks its key list itself) opt out of exhaustiveness — the type alias is permissive
@@ -191,11 +191,11 @@ export type ExhaustiveKeys<Keys extends readonly PropertyKey[], Slot extends obj
   : { [K in `Error: ${Name}Keys must list every key in the typed slice`]: Exclude<keyof Slot, Keys[number]> };
 
 /**
- * Deps shape for a behavior whose deps slot is empty (no keys). When a slot is empty, the corresponding deps field is
+ * Deps shape for a behavior whose deps slice is empty (no keys). When a slice is empty, the corresponding deps field is
  * optional — callers (typically tests) can omit it, and it defaults to `{}` at runtime via `createComposition`.
  *
- * When a slot has at least one key, the behavior reads `state.foo` / `context.bar` / `config.baz` and we need the field
- * to be required so the access is type-safe.
+ * When a slice has at least one key, the behavior reads `state.foo` / `context.bar` / `config.baz` and we need the
+ * field to be required so the access is type-safe.
  */
 type RequireIfNonEmpty<Key extends string, T extends object> = keyof T extends never
   ? { [K in Key]?: T }

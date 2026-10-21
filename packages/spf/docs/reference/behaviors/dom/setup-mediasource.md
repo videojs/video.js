@@ -8,8 +8,8 @@ Source: [src/playback/behaviors/dom/setup-mediasource.ts](../../../../src/playba
 
 **Own the MediaSource lifecycle for the current source.** When a resolved presentation and a mediaElement are both in
 scope, creates a MediaSource, attaches it to the element, waits for `'open'`, and publishes it on
-`context.mediaSource`. On source change or behavior destroy, detaches the MediaSource and clears the slot so the next
-source starts fresh.
+`context.mediaSource`. On source change or behavior destroy, detaches the MediaSource and clears the signal so the
+next source starts fresh.
 
 Single-positive-state reactor (`'preconditions-unmet'` ↔ `'mediasource-attached'`): state derivation gates on
 `mediaElement + isResolvedPresentation`. Riding the resolver's resolved/unresolved lifecycle makes direct URL
@@ -29,7 +29,7 @@ The entry resolves preconditions in sequence before publishing:
    `addSourceBuffer` directly, which throws on non-open, so publish-only-when-open is the load-bearing contract.
 
 State-exit cleanup aborts the in-flight wait, detaches the MediaSource, and clears `context.mediaSource`. Order:
-abort first (prevents a late publish racing the slot clear), then detach, then clear.
+abort first (prevents a late publish racing the signal clear), then detach, then clear.
 
 ### Sourceclose recovery
 

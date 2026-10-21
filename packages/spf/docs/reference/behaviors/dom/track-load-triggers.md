@@ -14,11 +14,11 @@ for the current source — or immediately on entry if the element is already com
 
 Sticky-true _within a source identity_: subsequent play/pause/seek cycles don't flip back. Source identity =
 (mediaElement, presentation URL). Either changing — including direct in-place swap with no `undefined` intermediate —
-resets the slot to `false`.
+resets the signal to `false`.
 
 Multi-writer with `hls/adapter.ts:play()` (which writes `true` directly on programmatic play) is intentional —
 different domains. The adapter records programmatic intent; this behavior is the DOM-side observer. Pre-existing
-`true` writes are honored because `deriveState` reads the slot — a `true` value routes directly to `'load-active'`
+`true` writes are honored because `deriveState` reads the signal — a `true` value routes directly to `'load-active'`
 without entering `'monitoring'`.
 
 ```ts

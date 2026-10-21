@@ -40,7 +40,7 @@ bandwidth while that choice holds.
 Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`. The resolved state owns the signal; its
 entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per `reactors.md`).
 
-The pick is the chain's result mapped to a slot value by `resolveSelection` (default: the head,
+The pick is the chain's result mapped to a signal value by `resolveSelection` (default: the head,
 `applyRules(...)[0]`). Each variant supplies its **constraints + rule chain (+ optional resolveSelection)** via
 config; `setupTrackSwitching` owns only the lifecycle and runs what it's given. Both chains are themselves config: a
 per-type key pair (`videoConstraints` / `videoRules`, `audioConstraints` / `audioRules`, `textConstraints` /
@@ -66,7 +66,7 @@ Manage `selectedAudioTrackId`: pick a default on src load, narrow by `userAudioT
 filter change, clear on src unload.
 
 Mid-stream flush on language switch is handled by the segment-loader's `planTasks` (see
-`playback/actors/dom/segment-loader.ts`) — not this behavior. Same split as the video pipeline: slot owner writes;
+`playback/actors/dom/segment-loader.ts`) — not this behavior. Same split as the video pipeline: key owner writes;
 loader orchestrates segment + flush plans.
 
 ```ts
@@ -157,7 +157,7 @@ The setup declares `config?`: callers may omit it.
 | `initialBandwidth?` | `number` | Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5 Mbps). |
 | `preferredCodecs?` | `string[]` | Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial pick prefers on a mixed-codec source, read by the `preferCodecFamilies` scope. With no `SourceBuffer.changeType()`, the initial family is the one `stickToSelectedCodecs` holds for the source's lifetime, so this decides which family that is. Cross-cutting like `getCdnId` — one list serves video and audio (each type's rule matches only the families its tracks carry). Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC); pass `[]` to disable. |
 | `quality?` | `Partial<QualityConfig>` | Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15). |
-| `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a slot only it carries. Keyed per type because one engine config reaches every variant. |
+| `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every variant. |
 | `videoRules?` | `readonly SwitchVideoTrackRule[]` | The rule chain of the pair documented on `videoConstraints`. |
 
 ### State
@@ -191,6 +191,6 @@ The setup declares `config?`: callers may omit it.
 | `SwitchVideoTrackConfig` | interface | Config of [switchVideoTrack](track-switching.md#switchvideotrack). Config for `switchVideoTrack`: its chains, plus the ABR tuning read by its ranker rule (`rankByBandwidth`). | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `SwitchVideoTrackRule` | type | A constraint or rule in `switchVideoTrack`'s chains. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `TrackSwitchingSharedConfig` | interface | Config both `switchVideoTrack` and `switchAudioTrack` read — the cross-cutting fields one engine config serves to every variant. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
-| `TrackSwitchingState` | interface | State of [switchVideoTrack](track-switching.md#switchvideotrack), [switchAudioTrack](track-switching.md#switchaudiotrack), [switchTextTrack](track-switching.md#switchtexttrack). The slots `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it writes. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
-| `TrackSwitchingStateMap` | type | The state signals a track-switching behavior reads and writes: the presentation it gates on, and the selection slot `S` it writes. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
+| `TrackSwitchingState` | interface | State of [switchVideoTrack](track-switching.md#switchvideotrack), [switchAudioTrack](track-switching.md#switchaudiotrack), [switchTextTrack](track-switching.md#switchtexttrack). The signals `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it writes. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
+| `TrackSwitchingStateMap` | type | The state signals a track-switching behavior reads and writes: the presentation it gates on, and the selection key `S` it writes. | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |
 | `UserTrackSelectionState` | type | The user track selections a consumer writes and the track-switching rules read, per track type (all three by default). | [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts) |

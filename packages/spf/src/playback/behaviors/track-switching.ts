@@ -35,7 +35,7 @@
  * Lifecycle: `'presentation-unresolved'` ↔ `'presentation-resolved'`. The resolved state owns the signal; its
  * entry-returned cleanup clears it on exit (canonical cleanup-binds-to-setup per `reactors.md`).
  *
- * The pick is the chain's result mapped to a slot value by `resolveSelection` (default: the head,
+ * The pick is the chain's result mapped to a signal value by `resolveSelection` (default: the head,
  * `applyRules(...)[0]`). Each variant supplies its **constraints + rule chain (+ optional resolveSelection)** via
  * config; `setupTrackSwitching` owns only the lifecycle and runs what it's given. Both chains are themselves config: a
  * per-type key pair (`videoConstraints` / `videoRules`, `audioConstraints` / `audioRules`, `textConstraints` /
@@ -101,10 +101,10 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
 // ============================================================================
 
 /**
- * The slots `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId` it
- * writes. Rule-only inputs are deliberately absent — `user*TrackSelection` and `bandwidthState` belong to whoever
+ * The signals `setupTrackSwitching` itself owns: the `presentation` gate it reads and the per-type `selected*TrackId`
+ * it writes. Rule-only inputs are deliberately absent — `user*TrackSelection` and `bandwidthState` belong to whoever
  * materializes them (the embedder via `defineExternalSignals`, the buffer-actor sampler), and each rule declares the
- * signal it consults as an optional slot on its own deps map, so the behavior never assumes a rule's signal exists.
+ * signal it consults as an optional signal on its own deps map, so the behavior never assumes a rule's signal exists.
  */
 export interface TrackSwitchingState {
   presentation?: MaybeResolvedPresentation;
@@ -128,7 +128,7 @@ export interface TrackSwitchingState {
 
 type UserTrackSelectionType = 'video' | 'audio' | 'text';
 
-/** The slots behind {@link UserTrackSelectionState}, one per track type, each documented on its own key. */
+/** The signals behind {@link UserTrackSelectionState}, one per track type, each documented on its own key. */
 interface UserTrackSelectionSlots {
   /**
    * Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a
@@ -201,7 +201,7 @@ export interface SwitchVideoTrackConfig extends TrackSwitchingSharedConfig {
    * The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing {@link DEFAULT_VIDEO_CONSTRAINTS} /
    * {@link DEFAULT_VIDEO_RULES} outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` /
    * `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how
-   * the DRM composition prunes on a slot only it carries. Keyed per type because one engine config reaches every
+   * the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every
    * variant.
    */
   videoConstraints?: readonly SwitchVideoTrackRule[];
@@ -245,14 +245,14 @@ export const DEFAULT_INITIAL_BANDWIDTH = 5_000_000;
 // `setupTrackSwitching` has the same shape as a Behavior `setup` function:
 // `({ state, config }) => Reactor`. Each `switchXTrack` export below calls
 // it from inside its own `defineBehavior` setup. Its generics — `S` (selection
-// slot key), `T` (candidate track type), `C` (the concrete config the variant
+// key), `T` (candidate track type), `C` (the concrete config the variant
 // builds) — all infer from the passed `state` + `config`, so the variants need
 // no explicit type arguments. `C extends TrackSwitchingConfig<S, T>` lets the
 // variant's richer config (rule-specific fields included) flow through the
 // helper untouched; the rules read those fields off their own config views.
 //
 // -- Design note: why narrow `SelectionKey` / `UserSelectionKey` unions ----
-// Goal we did not reach: have callers "fully pass in" the slot keys, with
+// Goal we did not reach: have callers "fully pass in" the keys, with
 // the helper enforcing zero internal knowledge of which literals are valid.
 // What blocks it: indexing a mapped-type intersection by a generic key.
 // When `S extends keyof TrackSwitchingState` (or `string`), TS conservatively
@@ -264,7 +264,7 @@ export const DEFAULT_INITIAL_BANDWIDTH = 5_000_000;
 // the same reason.
 //
 // Current pick is the narrow-union route because it matches siblings and
-// the unions read as documentation ("these are the slots this helper
+// the unions read as documentation ("these are the signals this helper
 // manages") rather than restriction. Extending to a new track-switching
 // axis is one literal per union.
 // --------------------------------------------------------------------------
@@ -294,7 +294,7 @@ type SwitchableTrack = {
  * Defaults to the chain head (`selectChainHead`) — the always-pick contract video and audio rely on (`applyRules`
  * guarantees a non-empty result, so the head is always there). A variant whose selection is legitimately optional
  * (text: opt-in captions, explicit off) supplies its own picker that may return `undefined`; the helper writes that
- * straight through to the slot, clearing it.
+ * straight through to the signal, clearing it.
  */
 type ResolveSelection<T extends SwitchableTrack, State = unknown, Context = unknown, Config = unknown> = (
   candidates: readonly T[],
@@ -305,7 +305,7 @@ type SelectionKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedT
 type UserSelectionKey = 'userVideoTrackSelection' | 'userAudioTrackSelection';
 
 /**
- * The state signals a track-switching behavior reads and writes: the presentation it gates on, and the selection slot
+ * The state signals a track-switching behavior reads and writes: the presentation it gates on, and the selection key
  * `S` it writes.
  *
  * Each mapped value references `P` so TS keeps the per-key dependency and resolves `state[selectionKey]` to the right
@@ -314,22 +314,22 @@ type UserSelectionKey = 'userVideoTrackSelection' | 'userAudioTrackSelection';
  * Only the behavior's own lifecycle signals are required here. Signals a _rule_ reads but the behavior doesn't —
  * `user*TrackSelection` (the user-selection filter) and `bandwidthState` (the bandwidth ranker) — are NOT here; each
  * rule declares the signal it needs as _optional_ on its own deps and reads it defensively, so the behavior never
- * assumes a rule-only signal exists. Those slots are materialized by whoever owns them: `defineExternalSignals` for the
- * consumer-input `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
+ * assumes a rule-only signal exists. Those signals are materialized by whoever owns them: `defineExternalSignals` for
+ * the consumer-input `user*TrackSelection`, the buffer-actor sampler for `bandwidthState`.
  */
 export type TrackSwitchingStateMap<S extends SelectionKey> = {
   presentation: ReadonlySignal<TrackSwitchingState['presentation']>;
 } & { [P in S]: Signal<TrackSwitchingState[P]> };
 
 /**
- * The lifecycle map plus the _optional_ `errors` slot reporters append to. Owned by `collectErrors`; optional so a
+ * The lifecycle map plus the _optional_ `errors` signal reporters append to. Owned by `collectErrors`; optional so a
  * composition without it still type-checks and emission no-ops. The behavior reads no constraint's state — see
  * `noSupportedTrackCode`.
  */
 type TrackSwitchingReporterStateMap<S extends SelectionKey> = TrackSwitchingStateMap<S> & ErrorEmitterState;
 
 /**
- * Config `setupTrackSwitching` itself reads — its own wiring: which selection slot to write and clear (`selectionKey`),
+ * Config `setupTrackSwitching` itself reads — its own wiring: which selection key to write and clear (`selectionKey`),
  * how to enumerate candidate tracks (`getTracks`), the optional **hard-constraints pre-pass** (`constraints`, applied
  * before the chain to prune the unplayable), and the **rule chain** to run (`rules`), and how to map the chain's
  * survivors to the final pick (`resolveSelection`, defaulting to the chain head). Rule-/constraint-specific config is
@@ -358,9 +358,9 @@ interface TrackSwitchingConfig<S extends SelectionKey, T extends SwitchableTrack
 }
 
 /**
- * State the user-selection filter reads: the lifecycle map plus an _optional_ user-selection slot (keyed by `U`),
+ * State the user-selection filter reads: the lifecycle map plus an _optional_ user-selection key (keyed by `U`),
  * holding a partial-track description to match against the candidates (`Partial<T>` — `{ id }`, `{ language }`, `{
- * height }`, …). The slot exists only when the composition provides it (declared with `defineExternalSignals`); the
+ * height }`, …). The signal exists only when the composition provides it (declared with `defineExternalSignals`); the
  * filter reads it defensively and no-ops when it's absent (no user override).
  */
 type UserSelectionStateMap<
@@ -372,7 +372,7 @@ type UserSelectionStateMap<
 };
 
 /**
- * Config the user-selection filter reads: `userSelectionKey` names the state slot holding the user's selection.
+ * Config the user-selection filter reads: `userSelectionKey` names the state key holding the user's selection.
  * _Optional_ on the rule's view — the base config doesn't carry it, so an unwired key means "no user selection" and the
  * filter passes through. The variants always supply it.
  */
@@ -440,7 +440,7 @@ type TextTrackCandidate = PartiallyResolvedTextTrack | TextTrack;
 
 // ----------------------------------------------------------------------------
 // Rules — defined outside the behavior closure, parameterized only by their
-// deps. Each is generic over the slot keys + track type; the variant's
+// deps. Each is generic over the keys + track type; the variant's
 // concrete keys instantiate it where the chain is assembled.
 // ----------------------------------------------------------------------------
 
@@ -601,7 +601,7 @@ function preferActiveCdn<S extends SelectionKey, T extends SwitchableTrack>(
  * rebuild is the changeType gap, out of this constraint's hands. If `changeType` support ever lands, this constraint is
  * what relaxes.
  *
- * Reading the selection here — a slot the picking effect itself writes, from inside the candidate-set computed — is
+ * Reading the selection here — a signal the picking effect itself writes, from inside the candidate-set computed — is
  * safe only because the effect scheduler revalidates an effect's sources after each run; see `core/signals/effect.ts`
  * (`revalidateSources`) for the lost-wakeup it prevents.
  *
@@ -693,7 +693,7 @@ function selectChainHead<T extends SwitchableTrack>(candidates: readonly T[]): s
 /**
  * State the text terminal reads: the lifecycle map plus an _optional_ `userTextTrackSelection` — the standing user
  * intent. `Partial<TextTrack>` is an explicit pick (language-based), `'off'` is explicit no-captions, `undefined` is
- * auto (no preference). The slot exists only when the composition declares it (`defineExternalSignals`); the terminal
+ * auto (no preference). The signal exists only when the composition declares it (`defineExternalSignals`); the terminal
  * reads it defensively and treats absence as auto.
  *
  * Unlike `user*TrackSelection` for video/audio, this carries the `'off'` sentinel and feeds the terminal pick (not the
@@ -711,7 +711,7 @@ type TextTerminalConfig = TrackSwitchingConfig<'selectedTextTrackId', TextTrackC
  * Terminal pick for text — the `resolveSelection` the text variant supplies. Resolves the standing
  * `userTextTrackSelection` intent against the chain's survivors (already CDN-failover-pruned and active-CDN-scoped):
  *
- * - `'off'` → no selection (clear the slot). Sticky through re-evaluation, so a live refresh or failover re-run can't
+ * - `'off'` → no selection (clear the signal). Sticky through re-evaluation, so a live refresh or failover re-run can't
  *   re-assert a default.
  * - Explicit `Partial<TextTrack>` → narrow to the match (language-based). A stale pick whose match is gone (e.g. the
  *   language dropped on a source change) falls through to the default policy.
@@ -740,9 +740,9 @@ function pickResolvedTextTrack<T extends TextTrackCandidate>(
 }
 
 // `context` is the composition's context map, threaded in by each variant's
-// rest-spread and typed as the generic slot-map shape (`AnySlotMap`). It can't
+// rest-spread and typed as the generic signal-map shape (`AnySlotMap`). It can't
 // be a typed param on the `defineBehavior` setup without widening `ContextMap`
-// to its constraint and forcing the slot required, so the variants forward it
+// to its constraint and forcing the signal required, so the variants forward it
 // untyped via the rest and it lands here — absent on direct setup calls, and
 // passed straight through to the rules (which don't read it yet).
 function setupTrackSwitching<
@@ -858,8 +858,8 @@ function setupTrackSwitching<
 
             // Map survivors to the final id. Defaults to the chain head; a
             // variant with optional selection (text) may resolve to `undefined`,
-            // which clears the slot (e.g. explicit off, opt-in decline).
-            // No change-guard needed: the slot uses default (Object.is) equality,
+            // which clears the signal (e.g. explicit off, opt-in decline).
+            // No change-guard needed: the signal uses default (Object.is) equality,
             // so re-setting the same value is a no-op (no notify, no re-fire).
             state[selectionKey].set(resolveSelection(candidates, deps));
           },
@@ -993,7 +993,7 @@ export const switchVideoTrack = defineBehavior({
  * filter change, clear on src unload.
  *
  * Mid-stream flush on language switch is handled by the segment-loader's `planTasks` (see
- * `playback/actors/dom/segment-loader.ts`) — not this behavior. Same split as the video pipeline: slot owner writes;
+ * `playback/actors/dom/segment-loader.ts`) — not this behavior. Same split as the video pipeline: key owner writes;
  * loader orchestrates segment + flush plans.
  *
  * @example

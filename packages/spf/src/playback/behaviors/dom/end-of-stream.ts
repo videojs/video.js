@@ -207,7 +207,7 @@ function endOfStreamSetup({
  * `append-init` message) and which segments it has appended. `deriveState` iterates over the available buffer actors
  * (`[videoBufferActor, audioBufferActor].filter(Boolean)`), resolves each to its track via `findTrackById`, and checks
  * that track's last segment is appended. This means audio-only / video-only / mixed configurations compose uniformly —
- * the body iterates whatever's in scope. No reliance on `selectedTrackId` slots: the actor's view IS the source of
+ * the body iterates whatever's in scope. No reliance on `selectedTrackId` signals: the actor's view IS the source of
  * truth for "what's being loaded into this buffer."
  *
  * **Two-fire on mid-end ABR switches**: when a quality switch occurs near end-of-stream, the actor's `initTrackId`
@@ -240,8 +240,8 @@ function endOfStreamSetup({
  *
  * The behavior subscribes to `mediaSource`'s readyState changes inside its setup (via `onMediaSourceReadyStateChange`)
  * and mirrors `'open'` to a behavior-local `msIsOpen` signal that `deriveState` reads. No shared
- * `mediaSourceReadyState` slot dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the same
- * signal — the consumer code wouldn't change.
+ * `mediaSourceReadyState` signal dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the
+ * same signal — the consumer code wouldn't change.
  *
  * # `endOfStream` entry sequence
  *
@@ -260,7 +260,7 @@ function endOfStreamSetup({
  * this behavior writes the final value from the buffered end. Decision domains don't overlap.
  *
  * `endOfStream` uses a manual `Behavior<>` literal (rather than `defineBehavior`) because it reads `videoBufferActor` /
- * `audioBufferActor` defensively without declaring them in its contextKeys — those slots are contributed by other
+ * `audioBufferActor` defensively without declaring them in its contextKeys — those signals are contributed by other
  * behaviors and compose conditionally per engine variant. The `Behavior<>` literal opts out of the exhaustiveness check
  * so the typed context shape can include the optional fields used at runtime. See the comment on `endOfStreamSetup`'s
  * context param for the discipline.

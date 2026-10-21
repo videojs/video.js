@@ -44,8 +44,8 @@ function trackScreenResolutionSetup({
  * downstream waits on a screen that may never move. `undefined` where there is no screen to read, which is the value a
  * cap reads as "no cap" — see `getScreenResolution` on why that beats a zero.
  *
- * Reads no other slot, and has no source-identity reset: the screen is independent of the presentation, so a new `src`
- * doesn't invalidate the reading.
+ * Reads no other signal, and has no source-identity reset: the screen is independent of the presentation, so a new
+ * `src` doesn't invalidate the reading.
  */
 export const trackScreenResolution = defineBehavior({
   stateKeys: ['screenResolution'],

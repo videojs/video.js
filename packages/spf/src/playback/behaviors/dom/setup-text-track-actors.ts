@@ -16,8 +16,8 @@ export interface TextTrackActorsContext {
   mediaElement?: HTMLMediaElement | undefined;
   /**
    * The `TextTracksActor` bound to `mediaElement.textTracks`. `setupTextTrackActors` — its sole writer — creates it
-   * together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the slots on
-   * element change or destroy.
+   * together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the signals
+   * on element change or destroy.
    */
   textTracksActor?: TextTracksActor<VTTCue> | undefined;
   /**
@@ -38,7 +38,7 @@ export interface TextTrackActorsConfig extends Pick<TextTrackSegmentLoaderActorC
   requestCredentials?: RequestCredentialsPolicy;
   /**
    * Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to
-   * mirror the v/a `video`/`audioMessagePipelines` composition-config slots. Defaults (in the loader) to `resolveCues →
+   * mirror the v/a `video`/`audioMessagePipelines` composition-config keys. Defaults (in the loader) to `resolveCues →
    * dispatchCues`.
    */
   textMessagePipelines?: TextMessagePipelines<VTTCue>;
@@ -103,11 +103,11 @@ function setupTextTrackActorsSetup({
  * **Own the TextTracks actor pair for the current `mediaElement`.** When a `mediaElement` is in scope, creates the
  * `TextTracksActor` (bound to the element's `textTracks`) and the `TextTrackSegmentLoaderActor` (bound to that actor +
  * the injected cue resolver), and publishes both on `context`. On element identity change or behavior destroy, destroys
- * both actors and clears the slots.
+ * both actors and clears the signals.
  *
  * Single-resource synchronous create/destroy driven by one signal — the simple-effect form is the right shape (per
  * `behaviors.md` → "Where both shapes are legitimate": criterion 4b applies; sole writer of `textTracksActor` /
- * `textTrackSegmentLoaderActor`, the effect's cleanup return handles destroy + slot clear structurally).
+ * `textTrackSegmentLoaderActor`, the effect's cleanup return handles destroy + signal clear structurally).
  *
  * Pairs with the `loadTextTrackSegments` behavior (a per-type variant of `setupSegmentLoading` in `load-segments.ts`),
  * which only reads `textTrackSegmentLoaderActor`. The cue resolver is injected via `config` so this behavior owns the

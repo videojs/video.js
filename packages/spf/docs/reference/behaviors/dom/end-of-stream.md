@@ -26,7 +26,7 @@ Each `SourceBufferActor` knows which track it's currently loading via `initTrack
 `append-init` message) and which segments it has appended. `deriveState` iterates over the available buffer actors
 (`[videoBufferActor, audioBufferActor].filter(Boolean)`), resolves each to its track via `findTrackById`, and checks
 that track's last segment is appended. This means audio-only / video-only / mixed configurations compose uniformly —
-the body iterates whatever's in scope. No reliance on `selectedTrackId` slots: the actor's view IS the source of
+the body iterates whatever's in scope. No reliance on `selectedTrackId` signals: the actor's view IS the source of
 truth for "what's being loaded into this buffer."
 
 **Two-fire on mid-end ABR switches**: when a quality switch occurs near end-of-stream, the actor's `initTrackId`
@@ -59,8 +59,8 @@ The slack absorbs the near-end playhead freeze (see the constant) so a tiny fina
 
 The behavior subscribes to `mediaSource`'s readyState changes inside its setup (via `onMediaSourceReadyStateChange`)
 and mirrors `'open'` to a behavior-local `msIsOpen` signal that `deriveState` reads. No shared
-`mediaSourceReadyState` slot dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the same
-signal — the consumer code wouldn't change.
+`mediaSourceReadyState` signal dependency. Anticipates a future `MediaSourceActor` whose snapshot would expose the
+same signal — the consumer code wouldn't change.
 
 ### `endOfStream` entry sequence
 
@@ -79,7 +79,7 @@ behavior destroy.
 this behavior writes the final value from the buffered end. Decision domains don't overlap.
 
 `endOfStream` uses a manual `Behavior<>` literal (rather than `defineBehavior`) because it reads `videoBufferActor` /
-`audioBufferActor` defensively without declaring them in its contextKeys — those slots are contributed by other
+`audioBufferActor` defensively without declaring them in its contextKeys — those signals are contributed by other
 behaviors and compose conditionally per engine variant. The `Behavior<>` literal opts out of the exhaustiveness check
 so the typed context shape can include the optional fields used at runtime. See the comment on `endOfStreamSetup`'s
 context param for the discipline.
@@ -103,7 +103,7 @@ The setup declares `config` as required. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `audioBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. (documented on [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `EndOfStreamContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
+| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## Types
 

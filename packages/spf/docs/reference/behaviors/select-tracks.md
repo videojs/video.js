@@ -35,9 +35,9 @@ absent from the manifest was never selectable, so that narrowing is the point ra
 
 Compose `selectVideoTrack` for the simple "pick a default video track" behavior, or `switchVideoTrack`
 (`./track-switching.ts`) for the ABR-driven variant. Compose `selectAudioTrack` for the simple default pick, or
-`switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush slot-owner variant — when
+`switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush key-owning variant — when
 audio-abr lands, `switchAudioTrack` extends into `switchAudioQuality`. Compose only one per type — they're
-alternatives, not stackable (each writes the same `selected*TrackId` slot). The simple variants tree-shake out the
+alternatives, not stackable (each writes the same `selected*TrackId` signal). The simple variants tree-shake out the
 heavier machinery (bandwidth estimator, quality selection, flush orchestration).
 
 Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves

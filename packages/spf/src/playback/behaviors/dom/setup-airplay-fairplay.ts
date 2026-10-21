@@ -54,7 +54,7 @@ export interface AirPlayFairPlayState {
 /** Context shape for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayContext {
   mediaElement?: HTMLMediaElement | undefined;
-  /** `setupMediaKeys`' handoff slot, read here only as proof that it has yielded the element. */
+  /** `setupMediaKeys`' handoff signal, read here only as proof that it has yielded the element. */
   mediaKeys?: MediaKeys;
 }
 
@@ -68,7 +68,7 @@ export interface AirPlayFairPlayConfig {
 // Type aliases, not interfaces: `defineBehavior`'s stateKeys ≡ keyof inference
 // goes through an index-signature constraint only aliases satisfy implicitly.
 // The `errors` reporter seam stays out of the typed slice, as in the other two
-// DRM behaviors. Every slot is read-only — this behavior writes none.
+// DRM behaviors. Every signal is read-only — this behavior writes none.
 type AirPlayFairPlayStateMap = {
   presentation: ReadonlySignal<AirPlayFairPlayState['presentation']>;
 };
@@ -89,7 +89,7 @@ function setupAirPlayFairPlaySetup({
   context: AirPlayFairPlayContextMap;
   config: AirPlayFairPlayConfig;
 }): Reactor<AirPlayFairPlayFsmState | 'destroying' | 'destroyed'> {
-  // Observed, never declared — see `setupMediaKeys` for why the slot lives
+  // Observed, never declared — see `setupMediaKeys` for why the signal lives
   // behind a cast. Absent means no AirPlay bridge is composed, so there is no
   // session to serve and this behavior never activates.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
@@ -100,7 +100,7 @@ function setupAirPlayFairPlaySetup({
     if (!context.mediaElement.get() || !loadingSuspended?.get()) return 'preconditions-unmet';
 
     // `setupMediaKeys` yields on the same fact, but not instantly — it has a
-    // task to abort and an element to detach. Waiting for its slot to clear is
+    // task to abort and an element to detach. Waiting for its signal to clear is
     // what keeps two CDMs off one element.
     if (context.mediaKeys.get()) return 'preconditions-unmet';
 
@@ -382,7 +382,7 @@ function setupAirPlayFairPlaySetup({
             // the viewer has to press play again — measured on a receiver.
             //
             // Restored here rather than through `state.startPosition`:
-            // `setupAirPlay` is that slot's only writer and binds it to the
+            // `setupAirPlay` is that signal's only writer and binds it to the
             // session's *falling* edge, so a second writer on the rising edge
             // would be writing over a command it does not own. The reload is
             // this behavior's, so the repair is too.
@@ -496,7 +496,7 @@ function setupAirPlayFairPlaySetup({
  * negotiation, so the certificate is always applied before any `generateRequest` — the same ordering `setupMediaKeys`
  * carries across its publish, here carried by the promise.
  *
- * Deliberately **not** a writer of `context.mediaKeys`. That slot is `setupMediaKeys`' handoff to `exchangeLicenses`,
+ * Deliberately **not** a writer of `context.mediaKeys`. That signal is `setupMediaKeys`' handoff to `exchangeLicenses`,
  * and publishing receiver MediaKeys into it would wake `exchangeLicenses` to license an MSE pipeline that is not
  * playing. These MediaKeys stay behavior-local, and a cleared `context.mediaKeys` is instead read as the gate proving
  * `setupMediaKeys` has finished yielding.
