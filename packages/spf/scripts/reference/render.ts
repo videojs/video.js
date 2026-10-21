@@ -881,6 +881,11 @@ function mermaid(model: Model): string {
   return fence('mermaid', lines.join('\n'));
 }
 
+/** A first sentence for an index cell: the emphasis a bold lead carries on its page says nothing in a table. */
+function plainSentence(doc: DocBlock): string {
+  return firstSentence(doc).replace(/\*\*/g, '');
+}
+
 function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModule[]): string {
   const { checker } = reference;
   const page = 'README.md';
@@ -894,18 +899,18 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     return module.exports.map((name) => [
       code(name),
       link(page, module.page, module.name, anchor(name)),
-      firstSentence(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
+      plainSentence(docOf(checker, resolveAlias(checker, exports.get(name)!))) || NO_DESCRIPTION,
     ]);
   });
   const engineRows = model.engines.map((engine) => [
     code(engine.entry.specifier),
     link(page, engine.entry.page!, engine.name),
-    firstSentence(engine.doc) || NO_DESCRIPTION,
+    plainSentence(engine.doc) || NO_DESCRIPTION,
   ]);
   const featureRows = model.features.map((feature) => [
     code(feature.name),
     link(page, feature.entry.page!, feature.entry.name),
-    firstSentence(feature.doc) || NO_DESCRIPTION,
+    plainSentence(feature.doc) || NO_DESCRIPTION,
   ]);
   // Behavior pages in the order the first engine composes them (its page lists the same order), then the pages no
   // shipped engine composes, alphabetically. A page's description is its module description, else its behavior's.
@@ -935,7 +940,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
       behaviors.map((info) => link(page, entry.page!, info.name, anchor(info.name))).join(', '),
       link(page, entry.page!, code(entry.specifier)),
       entry.layer === 'behavior-dom' ? 'yes' : '—',
-      firstSentence(description) || NO_DESCRIPTION,
+      plainSentence(description) || NO_DESCRIPTION,
     ];
   });
   const headers = ['Symbol', 'Page', 'Description'];
