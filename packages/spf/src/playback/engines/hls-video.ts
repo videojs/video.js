@@ -3,55 +3,55 @@ import {
   createComposition,
   type ResolveBehaviorContext,
   type ResolveBehaviorState,
-} from '../../../core/composition/create-composition';
-import { defineExternalSignals } from '../../../core/composition/define-external-signals';
-import { delayedReschedule } from '../../../core/tasks/delayed-reschedule';
-import type { Reschedule } from '../../../core/tasks/task';
-import type { QualityConfig } from '../../../media/abr/quality-selection';
-import type { BackBufferConfig } from '../../../media/buffer/back-buffer';
-import type { ForwardBufferConfig } from '../../../media/buffer/forward-buffer';
-import { canPlayTrackWithDrm } from '../../../media/dom/capabilities';
-import { DEFAULT_KEY_SYSTEMS } from '../../../media/dom/key-systems';
-import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
-import { resolveVttSegment } from '../../../media/dom/text/resolve-vtt-segment';
+} from '../../core/composition/create-composition';
+import { defineExternalSignals } from '../../core/composition/define-external-signals';
+import { delayedReschedule } from '../../core/tasks/delayed-reschedule';
+import type { Reschedule } from '../../core/tasks/task';
+import type { QualityConfig } from '../../media/abr/quality-selection';
+import type { BackBufferConfig } from '../../media/buffer/back-buffer';
+import type { ForwardBufferConfig } from '../../media/buffer/forward-buffer';
+import { canPlayTrackWithDrm } from '../../media/dom/capabilities';
+import { DEFAULT_KEY_SYSTEMS } from '../../media/dom/key-systems';
+import { attachMediaSourceAsSourceElement } from '../../media/dom/mse/mediasource-setup';
+import { resolveVttSegment } from '../../media/dom/text/resolve-vtt-segment';
 import {
   addSubtitlesTracksToMedia,
   getShowingSubtitlesTrackFromMedia,
   removeAllSubtitlesTracksFromMedia,
-} from '../../../media/dom/text/text-track-slots';
-import type { DrmSystemsConfig, DrmSystemsConfigFor, KeySystemId, KeySystemModule } from '../../../media/drm';
-import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
-import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../../media/hls/reload-policy';
-import type { CanPlayTrack, ResolvedTrack } from '../../../media/types';
-import type { GetCdnId } from '../../../media/utils/cdn';
-import { getResolvedSelectedTrackDuration } from '../../../media/utils/track-selection';
-import type { BandwidthConfig } from '../../../network/bandwidth-estimator';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+} from '../../media/dom/text/text-track-slots';
+import type { DrmSystemsConfig, DrmSystemsConfigFor, KeySystemId, KeySystemModule } from '../../media/drm';
+import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
+import { mediaPlaylistReloadDelay, resolveLiveLatency } from '../../media/hls/reload-policy';
+import type { CanPlayTrack, ResolvedTrack } from '../../media/types';
+import type { GetCdnId } from '../../media/utils/cdn';
+import { getResolvedSelectedTrackDuration } from '../../media/utils/track-selection';
+import type { BandwidthConfig } from '../../network/bandwidth-estimator';
+import type { RequestCredentialsPolicy } from '../../network/credentials-fetch';
 import {
   calculatePresentationDuration,
   type PresentationDurationResolver,
-} from '../../behaviors/calculate-presentation-duration';
-import { collectErrors } from '../../behaviors/collect-errors';
-import { deriveCdnPriority } from '../../behaviors/derive-cdn-priority';
-import { type DisableRemotePlaybackState, setupAirPlay } from '../../behaviors/dom/airplay';
-import { applyStartPosition } from '../../behaviors/dom/apply-start-position';
-import { endOfStream } from '../../behaviors/dom/end-of-stream';
-import { exchangeLicenses } from '../../behaviors/dom/exchange-licenses';
-import { loadChapters } from '../../behaviors/dom/load-chapters';
-import { loadAudioSegments, loadTextTrackSegments, loadVideoSegments } from '../../behaviors/dom/load-segments';
-import { recoverEndStall } from '../../behaviors/dom/recover-end-stall';
-import { seekToLiveEdge } from '../../behaviors/dom/seek-to-live-edge';
-import { setupAirPlayFairPlay } from '../../behaviors/dom/setup-airplay-fairplay';
-import { setupAudioBufferActors, setupVideoBufferActors } from '../../behaviors/dom/setup-buffer-actors';
-import { setupMediaKeys } from '../../behaviors/dom/setup-media-keys';
-import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
-import { setupTextTrackActors } from '../../behaviors/dom/setup-text-track-actors';
-import { syncLiveSeekableRange } from '../../behaviors/dom/sync-live-seekable-range';
-import { syncTextTracks } from '../../behaviors/dom/sync-text-tracks';
-import { trackCurrentTime } from '../../behaviors/dom/track-current-time';
-import { trackLoadTriggers } from '../../behaviors/dom/track-load-triggers';
-import { trackPlayerResolution } from '../../behaviors/dom/track-player-resolution';
-import { updateMediaSourceDuration } from '../../behaviors/dom/update-mediasource-duration';
+} from '../behaviors/calculate-presentation-duration';
+import { collectErrors } from '../behaviors/collect-errors';
+import { deriveCdnPriority } from '../behaviors/derive-cdn-priority';
+import { type DisableRemotePlaybackState, setupAirPlay } from '../behaviors/dom/airplay';
+import { applyStartPosition } from '../behaviors/dom/apply-start-position';
+import { endOfStream } from '../behaviors/dom/end-of-stream';
+import { exchangeLicenses } from '../behaviors/dom/exchange-licenses';
+import { loadChapters } from '../behaviors/dom/load-chapters';
+import { loadAudioSegments, loadTextTrackSegments, loadVideoSegments } from '../behaviors/dom/load-segments';
+import { recoverEndStall } from '../behaviors/dom/recover-end-stall';
+import { seekToLiveEdge } from '../behaviors/dom/seek-to-live-edge';
+import { setupAirPlayFairPlay } from '../behaviors/dom/setup-airplay-fairplay';
+import { setupAudioBufferActors, setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
+import { setupMediaKeys } from '../behaviors/dom/setup-media-keys';
+import { setupMediaSource } from '../behaviors/dom/setup-mediasource';
+import { setupTextTrackActors } from '../behaviors/dom/setup-text-track-actors';
+import { syncLiveSeekableRange } from '../behaviors/dom/sync-live-seekable-range';
+import { syncTextTracks } from '../behaviors/dom/sync-text-tracks';
+import { trackCurrentTime } from '../behaviors/dom/track-current-time';
+import { trackLoadTriggers } from '../behaviors/dom/track-load-triggers';
+import { trackPlayerResolution } from '../behaviors/dom/track-player-resolution';
+import { updateMediaSourceDuration } from '../behaviors/dom/update-mediasource-duration';
 // Non-zero-PTS relocation (spike): remove this import, the composed reactor, the
 // `video/audio/textMessagePipelines` finalConfig entries, the `mediaContainerData`
 // state slot, and the `deriveStartMediaTime` config field to drop relocation entirely
@@ -61,11 +61,11 @@ import {
   deriveSharedMinStartMediaTime,
   establishStartMediaTime,
   gateFirstParseOnAnchor,
-} from '../../behaviors/establish-start-media-time';
-import { type ParsePresentation, resolvePresentation } from '../../behaviors/resolve-presentation';
-import { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../../behaviors/resolve-track';
-import { type FailoverMonitorConfig, setupFailoverMonitor } from '../../behaviors/setup-failover-monitor';
-import { syncPreload } from '../../behaviors/sync-preload';
+} from '../behaviors/establish-start-media-time';
+import { type ParsePresentation, resolvePresentation } from '../behaviors/resolve-presentation';
+import { resolveAudioTrack, resolveTextTrack, resolveVideoTrack } from '../behaviors/resolve-track';
+import { type FailoverMonitorConfig, setupFailoverMonitor } from '../behaviors/setup-failover-monitor';
+import { syncPreload } from '../behaviors/sync-preload';
 import {
   DEFAULT_AUDIO_CONSTRAINTS,
   DEFAULT_VIDEO_CONSTRAINTS,
@@ -76,14 +76,14 @@ import {
   switchAudioTrack,
   switchTextTrack,
   switchVideoTrack,
-} from '../../behaviors/track-switching';
-import { relocatingTextPipelines, relocationPipelinesFor } from '../../primitives/relocation-pipelines';
+} from '../behaviors/track-switching';
+import { relocatingTextPipelines, relocationPipelinesFor } from '../primitives/relocation-pipelines';
 import {
   type ReportUnsupportedTrackConditions,
   reportUnsupportedTrackConditionsWithDrm,
-} from '../../primitives/report-track-conditions';
-import { excludeRefusedKeySystems } from '../../primitives/selection-rules';
-import type { TextTrackSegmentResolver } from '../../primitives/text-segment-load-pipeline';
+} from '../primitives/report-track-conditions';
+import { excludeRefusedKeySystems } from '../primitives/selection-rules';
+import type { TextTrackSegmentResolver } from '../primitives/text-segment-load-pipeline';
 
 // ============================================================================
 // HLS Engine State & Context
@@ -93,7 +93,7 @@ import type { TextTrackSegmentResolver } from '../../primitives/text-segment-loa
  * External signals of the HLS playback engine: state written from outside the engine (by the adapter) that no composed
  * behavior declares — the consumer's track selections and remote-playback opt-out.
  */
-const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
+const externalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
   state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
 });
 
@@ -101,7 +101,7 @@ const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionSt
  * The behaviors the HLS playback engine composes, in setup order. The engine's state and context types are derived from
  * this list, so adding or removing a behavior changes them with no separate type to update.
  */
-const hlsVideoEngineBehaviors = [
+const behaviors = [
   syncPreload,
   trackLoadTriggers,
   resolvePresentation,
@@ -233,21 +233,21 @@ const hlsVideoEngineBehaviors = [
   loadChapters,
 
   // External signals: written by the adapter, read by the behaviors above.
-  hlsVideoEngineExternalSignals,
+  externalSignals,
 ] as const;
 
 /** State shape for the HLS playback engine: every state key its behaviors and inputs declare. */
-export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
+export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 /** Context shape for the HLS playback engine: every context key its behaviors declare. */
-export type HlsVideoEngineContext = ResolveBehaviorContext<typeof hlsVideoEngineBehaviors>;
+export type EngineContext = ResolveBehaviorContext<typeof behaviors>;
 
 /**
  * Configuration for the HLS playback engine.
  *
  * Each option is consumed by the appropriate behavior — the engine itself has no config beyond what its behaviors read.
  */
-export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
+export interface EngineConfig<KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS> {
   /**
    * Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5
    * Mbps).
@@ -426,7 +426,7 @@ export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModul
  *
  * @example
  *   ```ts
- *   const engine = createHlsVideoEngine({
+ *   const engine = createEngine({
  *     initialBandwidth: 2_000_000,
  *     preferredAudioLanguage: 'en',
  *   });
@@ -439,9 +439,9 @@ export interface HlsVideoEngineConfig<KeySystems extends readonly KeySystemModul
  *   await engine.destroy();
  *   ```;
  */
-export function createHlsVideoEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
-  config: HlsVideoEngineConfig<KeySystems> = {}
-): Composition<HlsVideoEngineState, HlsVideoEngineContext> {
+export function createEngine<const KeySystems extends readonly KeySystemModule[] = typeof DEFAULT_KEY_SYSTEMS>(
+  config: EngineConfig<KeySystems> = {}
+): Composition<EngineState, EngineContext> {
   // Non-zero-PTS relocation (spike): resolve the coordination seam once so the reactor
   // (model `startMediaTime`) and the loader stamps (buffer `timestampOffset`) apply the
   // SAME derive. Default is shared-`min` across selected A/V (subsumes per-type).
@@ -500,7 +500,7 @@ export function createHlsVideoEngine<const KeySystems extends readonly KeySystem
     reschedule: config.reschedule ?? delayedReschedule(mediaPlaylistReloadDelay),
   };
 
-  return createComposition([...hlsVideoEngineBehaviors], {
+  return createComposition([...behaviors], {
     config: finalConfig,
     // Seed bandwidthState so switchVideoTrack fires on initial subscribe
     // with the `initialBandwidth` fallback rather than waiting for the

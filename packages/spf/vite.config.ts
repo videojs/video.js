@@ -10,11 +10,14 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   entry: {
     index: 'src/index.ts',
     dom: 'src/dom.ts',
-    hls: 'src/playback/engines/hls/index.ts',
+    hls: 'src/hls.ts',
+    'engines/hls-video': 'src/playback/engines/hls-video.ts',
+    'engines/hls-audio': 'src/playback/engines/hls-audio.ts',
+    'engines/hls-background-video': 'src/playback/engines/hls-background-video.ts',
     'media-tracks': 'src/media/media-tracks/index.ts',
-    'hls-audio': 'src/playback/adapters/hls-audio/index.ts',
-    'hls-background-video': 'src/playback/adapters/hls-background-video/index.ts',
-    'hls-video': 'src/playback/adapters/hls-video/index.ts',
+    'adapters/hls-audio': 'src/playback/adapters/hls-audio/index.ts',
+    'adapters/hls-background-video': 'src/playback/adapters/hls-background-video/index.ts',
+    'adapters/hls-video': 'src/playback/adapters/hls-video/index.ts',
   },
 });
 

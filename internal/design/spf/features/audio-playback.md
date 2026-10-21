@@ -22,7 +22,7 @@ audio-specific.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface documented;
   language-aware selection exists in `media/primitives/` but isn't
   wired (see *What's not implemented*)
@@ -75,7 +75,7 @@ Capability slices around today's audio playback contract.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` —
 audio behaviors composed alongside video and text:
 
 ```ts
@@ -103,7 +103,7 @@ loadAudioSegments,
 | Behavior | File | Responsibility |
 |---|---|---|
 | `selectAudioTrack` | `packages/spf/src/playback/behaviors/select-tracks.ts` | Default audio rendition selection on source load. Lifecycle-only; mutually exclusive with `switchAudioTrack` |
-| `switchAudioTrack` | `packages/spf/src/playback/behaviors/track-switching.ts` | Filter-reactive slot owner + mid-stream flush dispatcher. **Owned architecturally by [`multi-language-audio`](./multi-language-audio.md)** — composed in both `createHlsVideoEngine` and `createHlsAudioEngine` today |
+| `switchAudioTrack` | `packages/spf/src/playback/behaviors/track-switching.ts` | Filter-reactive slot owner + mid-stream flush dispatcher. **Owned architecturally by [`multi-language-audio`](./multi-language-audio.md)** — composed in both the `hls-video` engine and the `hls-audio` engine today |
 | `resolveAudioTrack` | `packages/spf/src/playback/behaviors/resolve-track.ts` | Fetches the selected audio media playlist |
 | `setupAudioBufferActors` | `packages/spf/src/playback/behaviors/dom/setup-buffer-actors.ts` | Audio SourceBuffer + actor setup. **Owned architecturally by `mse-mms-pipeline`** |
 | `loadAudioSegments` | `packages/spf/src/playback/behaviors/dom/load-segments.ts` | Audio segment loading dispatcher. **Owned architecturally by `buffer-management`** |
@@ -120,7 +120,7 @@ loadAudioSegments,
 - `selectedAudioTrackId` — single-writer. Owner depends on which audio-
   selection behavior is composed: `selectAudioTrack` (lifecycle-only) or
   `switchAudioTrack` (filter-reactive + mid-stream flush; the variant
-  composed in `createHlsVideoEngine` and `createHlsAudioEngine`
+  composed in the `hls-video` engine and the `hls-audio` engine
   today). Becomes `switchAudioQuality`'s responsibility when
   [audio-abr](./audio-abr.md) lands (extends `switchAudioTrack`).
 - `userAudioTrackSelection` — added by [`multi-language-audio`](./multi-language-audio.md).
@@ -160,10 +160,10 @@ Consumers wanting language-aware selection today must override
 ## Verification
 
 - **Unit tests:**
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts` →
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts` →
     "orchestrates complete pipeline" — asserts `selectedAudioTrackId`
     defined, audio track resolved, audio buffer actor present
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts` →
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts` →
     "handles audio-only stream" — basic audio-only coverage
   - `packages/spf/src/playback/behaviors/dom/tests/setup-buffer-actors.test.ts`
     — per-type audio setup
@@ -232,7 +232,7 @@ Consumers wanting language-aware selection today must override
   *(partial — Phase 1 landed)* — Phase 1 baseline constituent. The
   audio-only delivery variant composes this feature's rendition
   selection, media playlist resolution, and segment loading as-is via
-  `createHlsAudioEngine`.
+  the `hls-audio` engine.
 
 ## See also
 

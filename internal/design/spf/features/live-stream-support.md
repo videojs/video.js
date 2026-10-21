@@ -20,7 +20,7 @@ without it, live HLS sources don't play correctly.
 
 ## Status
 
-- **Composition:** implemented in `createHlsVideoEngine`. Live HLS
+- **Composition:** implemented in the `hls-video` engine. Live HLS
   plays end-to-end: media playlists reload on a runner-driven schedule,
   the sliding window is declared to the browser via
   `setLiveSeekableRange`, duration is `Infinity`, playback starts near
@@ -171,7 +171,7 @@ under [Open questions § Resolved during implementation](#resolved-during-implem
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — the
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — the
 live behaviors compose alongside the VOD ones; live vs VOD is a runtime
 distinction in the *data* (a growing playlist), not a separate engine
 variant:

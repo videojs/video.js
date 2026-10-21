@@ -23,7 +23,7 @@ seek + playback-rate behavior emerges from the planner's design.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface and implementation
   footprint documented; richer forward-buffer / back-buffer policies and
   the codec-change extension (`changeType()`) are tracked as candidates
@@ -96,7 +96,7 @@ surface.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` —
 dispatchers composed after MSE setup, after `trackCurrentTime` and
 `switchVideoQuality`:
 
@@ -264,7 +264,7 @@ snapshot between operations rather than awaiting `send()` directly.
 
 - **[`audio-only-mode-override`](../use-cases/audio-only-mode-override.md)**
   *(partial — Phase 1 landed)* — Phase 1 baseline constituent (used
-  as-is via `createHlsAudioEngine`); Phase 3 surfaces
+  as-is via the `hls-audio` engine); Phase 3 surfaces
   alternative-default-config candidates (shorter
   `forwardBuffer.bufferDuration` for audio-only) and a Path-B
   candidate (audio-only-tuned buffer-management behavior).

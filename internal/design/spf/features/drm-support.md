@@ -42,7 +42,7 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
 
 ## Status
 
-- **Composition:** implemented in `createHlsVideoEngine`, which composes
+- **Composition:** implemented in the `hls-video` engine, which composes
   `exchangeLicenses` then `setupMediaKeys` unconditionally and defaults
   `canPlayTrack` / `reportUnsupportedTrackConditions` to their DRM-aware
   variants over `config.drm`. Absent or empty `drm` is the degenerate
@@ -109,7 +109,7 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   init-data projection, and license-message shaping. `config.keySystems`
   narrows the list; dropping `playReadyKeySystem` removes its PSSH wrap,
   its XML envelope unwrap, and `DOMParser` from the bundle. Each shipped
-  module carries its id as a literal type, and `HlsVideoEngineConfig` keys
+  module carries its id as a literal type, and the `hls-video` engine's `EngineConfig` keys
   `drm` by the composed ids, so a config entry no module claims is a type
   error (it replaced a dev-only runtime warning). Replaces six
   string-keyed lookup tables that previously split one system's facts
@@ -120,10 +120,10 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   leaving ~248 B residue — ~130 B parser key metadata, 11 B `drm`
   config threading, 10 B the gate read in `load-segments`, the rest
   unrelated branch-era churn. Pinned by
-  `playback/engines/hls/tests/engine-drm-optional.test-d.ts`, which
+  `playback/engines/tests/engine-drm-optional.test-d.ts`, which
   asserts the DRM-free composition materializes none of the three DRM
   slots. The DRM-free **engine variant** is not built yet; the
-  measurement patches `engine.ts` directly. A spread-based additive
+  measurement patches `hls-video.ts` directly. A spread-based additive
   variant (`[...BASE_PRE, setupMediaKeys, ...BASE_POST]`) typechecks
   with inference intact, so it needs no duplicated behavior list — the
   cost that sank the short-lived `createDrmHlsVideoEngine`.

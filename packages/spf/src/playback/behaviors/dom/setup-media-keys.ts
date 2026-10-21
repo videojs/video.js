@@ -32,8 +32,8 @@
  * `loadingSuspended` yields the element, and `setupAirPlayFairPlay` negotiates for the receiver in the gap. The falling
  * edge re-enters and re-negotiates with no extra machinery.
  *
- * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into
- * `createHlsVideoEngine` unconditionally today, degenerate on a clear source (the derived state never leaves
+ * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
+ * HLS video engine's `createEngine` unconditionally today, degenerate on a clear source (the derived state never leaves
  * `'preconditions-unmet'`). A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
  * defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
  * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.

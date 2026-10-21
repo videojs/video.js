@@ -19,8 +19,8 @@ the `<track>` mechanism and the text-track DOM surface.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` and `createHlsAudioEngine` (an `<audio>` element carries text tracks too;
-  podcast-style sources ship chapters). Not `createBackgroundVideoEngine`.
+- **Composition:** The `hls-video` engine and the `hls-audio` engine (an `<audio>` element carries text tracks too;
+  podcast-style sources ship chapters). Not the `hls-background-video` engine.
 - **Definition depth:** sketched — shipped behavior, decisions, and source pointers below.
 
 ## Decisions
@@ -78,8 +78,8 @@ Extension boundaries, each a candidate slice on this doc or its own:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (under the text-track group),
-`packages/spf/src/playback/engines/hls/engine-audio-only.ts`.
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (under the text-track group),
+`packages/spf/src/playback/engines/hls-audio.ts`.
 
 | Piece | File | Responsibility |
 |---|---|---|
@@ -115,7 +115,7 @@ Extension boundaries, each a candidate slice on this doc or its own:
   cancellation on abort, an already-aborted signal.
 - `packages/spf/src/playback/behaviors/dom/tests/load-chapters.test.ts` — gating (media element, entry),
   projection, first-entry selection, quiet failure, abort on source change, cleanup on unload and destroy.
-- `packages/spf/src/playback/engines/hls/tests/engine.test.ts`, `engine-audio-only.test.ts` — end to end from a
+- `packages/spf/src/playback/engines/tests/hls-video.test.ts`, `engine-audio-only.test.ts` — end to end from a
   manifest carrying the tag, including that the track's mode changes never register as subtitle intent.
 - `packages/core/src/dom/store/features/tests/text-track.test.ts` — `chaptersCues` clamped to a finite media duration
   and re-synced on `durationchange`.

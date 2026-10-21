@@ -20,7 +20,7 @@ if (measureAll) {
   label = 'All Exports';
   bundlePath = './dist/all.js';
 } else if (measureEngine) {
-  entry = 'playback/engines/hls/index.ts';
+  entry = 'hls.ts';
   label = 'HLS Engine';
   bundlePath = './dist/index.js';
 } else {
