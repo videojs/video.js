@@ -38,14 +38,14 @@ audio constraints. Compose it after the features that set the plain versions, su
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
 | `negotiatedKeySystem` | `string \| undefined` | — | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The key system negotiation settled on for the current source, or `undefined` when none has been (yet, or at all). The negotiation outcome as _state_, not just as the private detail it once was: `exchangeLicenses` keys its per-system message shaping and license-server lookup off it, and it is the late fact rendition pruning can't otherwise learn — pruning runs before the CDM has been asked, so a rendition naming a configured server survives it and only negotiation reveals the CDM is absent. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `segmentLoadingBlocked` | `boolean \| undefined` | — | [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | Segment-load gate: `true` while an encrypted source's MediaKeys aren't attached yet; the `loadXSegments` dispatchers park on it. Semantics on `SegmentLoadingState['segmentLoadingBlocked']`. |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 | `mediaKeys` | `MediaKeys \| undefined` | [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. |
 
 ### Composed by

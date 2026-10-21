@@ -17,15 +17,15 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
-| `currentTime` | `number \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `currentTime` | `number \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `startPosition` | `number \| undefined` | — | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
 
 ### Context
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

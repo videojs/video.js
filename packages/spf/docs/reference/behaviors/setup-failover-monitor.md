@@ -36,7 +36,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `failedCdns` | writes | yes | `string[] \| undefined` | `SetupFailoverMonitorState` | CDN ids (origins) currently in failover cooldown — read by `track-switching`'s `excludeFailedCdns` hard constraint, which prunes their tracks so the active-CDN scope falls to the next CDN in `cdnPriority`. Empty / absent means all CDNs are eligible. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SetupFailoverMonitorState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SetupFailoverMonitorState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 
 ## Types
 

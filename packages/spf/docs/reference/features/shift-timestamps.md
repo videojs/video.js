@@ -27,7 +27,7 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 | Key | Type | Initial | Declared by | Doc |
 | --- | --- | --- | --- | --- |
 | `mediaContainerData` | `Record<string, MediaContainerData> \| undefined` | — | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | Transient origin-establishment data, keyed by **track type** (`'video'` / `'audio'`) — per spec one init+media pair per type suffices, and ABR rungs of a type share the origin. Filled by the discover steps across appends, reset per source. Never the model — the churn stays here; only the settled `startMediaTime` reaches `Track`. |
-| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
+| `presentation` | `MaybeResolvedPresentation \| undefined` | — | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 
 ### Composed by
 

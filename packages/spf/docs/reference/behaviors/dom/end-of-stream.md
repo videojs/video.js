@@ -94,16 +94,16 @@ The setup declares `config` as required. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `currentTime` | reads | yes | `number \| undefined` | `EndOfStreamState` | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](load-segments.md#loadvideosegments)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `EndOfStreamState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `currentTime` | reads | yes | `number \| undefined` | `EndOfStreamState` | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](load-segments.md#loadvideosegments)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `EndOfStreamState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `audioBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. (doc of [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `EndOfStreamContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. (doc of [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
+| `audioBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. (documented on [setupAudioBufferActors](setup-buffer-actors.md#setupaudiobufferactors)) |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `EndOfStreamContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `videoBufferActor` | reads | reads if present | `SourceBufferActor \| undefined` | inline | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the slots when that stops holding. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## Types
 

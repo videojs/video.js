@@ -44,7 +44,7 @@ The setup declares `config?`: callers may omit it.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `cdnPriority` | writes | yes | `string[] \| undefined` | `DeriveCdnPriorityState` | The CDNs the source is served from (track-URL origins), in manifest priority order — most-preferred first (mirrors HLS content steering's `PATHWAY-PRIORITY`). Owned by `deriveCdnPriority`, read by `track-switching`'s `preferActiveCdn` scope, which narrows to the highest-priority CDN with surviving tracks so video / audio / text stay on one host. Only meaningful for redundant-stream sources; a single-CDN source has one entry. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `DeriveCdnPriorityState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `DeriveCdnPriorityState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 
 ## Types
 

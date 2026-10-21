@@ -445,7 +445,7 @@ function borrowedDocCell(
   const found = slotDoc(behaviors, slot, key);
   if (!found) return NO_DESCRIPTION;
 
-  const lender = own.includes(found.from) ? '' : ` (doc of ${behaviorLink(reference, page, found.from)})`;
+  const lender = own.includes(found.from) ? '' : ` (documented on ${behaviorLink(reference, page, found.from)})`;
 
   return `${docCell(found.doc)}${lender}`;
 }
@@ -914,7 +914,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
       "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Parts (values) and Types.",
       'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
-      'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell names it as "doc of".',
+      'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell says which one it is documented on.',
     ]),
   ]);
 }

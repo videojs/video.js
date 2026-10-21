@@ -36,13 +36,13 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `currentTime` | writes | yes | `number \| undefined` | `CurrentTimeState` | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](load-segments.md#loadvideosegments)) |
+| `currentTime` | writes | yes | `number \| undefined` | `CurrentTimeState` | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](load-segments.md#loadvideosegments)) |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `CurrentTimeContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `CurrentTimeContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Types
 

@@ -46,15 +46,15 @@ The setup declares `config?`: callers may omit it. It has no keys.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `currentTime` | writes | yes | `number \| undefined` | `StartPositionState` | Current playback position in seconds. Defaults to 0 when undefined. (doc of [loadVideoSegments](load-segments.md#loadvideosegments)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `StartPositionState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `currentTime` | writes | yes | `number \| undefined` | `StartPositionState` | Current playback position in seconds. Defaults to 0 when undefined. (documented on [loadVideoSegments](load-segments.md#loadvideosegments)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `StartPositionState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 | `startPosition` | writes | yes | `number \| undefined` | `StartPositionState` | One-shot start-position command in presentation-timeline seconds. Written by consumers (adapter, recovery snapshot — e.g. `setupAirPlay`'s at a session's settled end); consumed (cleared) by `applyStartPosition` once the element seeks. |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `StartPositionContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `StartPositionContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Types
 

@@ -45,7 +45,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `MediaElementLike \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `MediaElementLike \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](dom/setup-mediasource.md#setupmediasource)) |
 
 ## Types
 

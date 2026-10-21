@@ -81,8 +81,8 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](track-switching.md#switchaudiotrack)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (documented on [switchAudioTrack](track-switching.md#switchaudiotrack)) |
 
 ## selectVideoTrack
 
@@ -113,8 +113,8 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Parts
 

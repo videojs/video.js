@@ -35,7 +35,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `TextTrackActorsContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `TextTrackActorsContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `textTracksActor` | writes | yes | `TextTracksActor<VTTCue> \| undefined` | `TextTrackActorsContext` | The `TextTracksActor` bound to `mediaElement.textTracks`. `setupTextTrackActors` — its sole writer — creates it together with `textTrackSegmentLoaderActor` while an element is in scope, and destroys both and clears the slots on element change or destroy. |
 | `textTrackSegmentLoaderActor` | writes | yes | `TextTrackSegmentLoaderActor \| undefined` | `TextTrackActorsContext` | The `TextTrackSegmentLoaderActor` that fetches the selected text track's segments and resolves them into cues for `textTracksActor` through the configured `resolveTextTrackSegment`; same lifetime. `loadTextTrackSegments` drives it with `'load'` messages. |
 

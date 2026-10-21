@@ -58,16 +58,16 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SeekToLiveEdgeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (doc of [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
-| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](../track-switching.md#switchvideotrack)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SeekToLiveEdgeState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (documented on [switchAudioTrack](../track-switching.md#switchaudiotrack)) |
+| `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `SeekToLiveEdgeState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
 | `startPosition` | writes | yes | `number \| undefined` | `SeekToLiveEdgeState` | One-shot start-position command in presentation-timeline seconds. Written here on entry into `live`; consumed (cleared) by `applyStartPosition`. |
 
 ### Context
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `SeekToLiveEdgeContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `SeekToLiveEdgeContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Types
 
