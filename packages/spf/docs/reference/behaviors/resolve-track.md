@@ -4,6 +4,9 @@
 
 Source: [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts)
 
+Resolve the tracks a selection names. Each variant schedules a fetch of the selected track's media playlist whenever
+that track is partially resolved, parses it, and writes the resolved track back into `state.presentation`.
+
 ## resolveAudioTrack
 
 Resolve unresolved audio tracks. Same shape as `resolveVideoTrack`, narrowed to audio.
@@ -83,7 +86,7 @@ The setup declares `config?`: callers may omit it.
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (doc of [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (doc of [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

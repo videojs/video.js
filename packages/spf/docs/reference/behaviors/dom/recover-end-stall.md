@@ -47,10 +47,15 @@ The setup declares `config?`: callers may omit it.
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `RecoverEndStallContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `RecoverEndStallContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `DEFAULT_END_STALL_NUDGE_WINDOW` | const | ~2.8× the measured max freeze gap (71ms) — tight, but with headroom against a miss. | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `RecoverEndStallConfig` | interface | Config of [recoverEndStall](recover-end-stall.md#recoverendstall). | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |
 | `RecoverEndStallContext` | interface | Context of [recoverEndStall](recover-end-stall.md#recoverendstall). | [src/playback/behaviors/dom/recover-end-stall.ts](../../../../src/playback/behaviors/dom/recover-end-stall.ts) |

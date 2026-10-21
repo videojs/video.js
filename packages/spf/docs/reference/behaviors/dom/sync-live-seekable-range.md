@@ -50,7 +50,7 @@ The setup declares `config` as required. It has no keys.
 | --- | --- | --- | --- | --- | --- |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `SyncLiveSeekableRangeContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (doc of [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
-## Other exports
+## Types
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

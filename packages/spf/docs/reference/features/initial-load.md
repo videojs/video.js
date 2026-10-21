@@ -44,14 +44,19 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |

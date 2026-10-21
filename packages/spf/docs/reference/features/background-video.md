@@ -67,14 +67,19 @@ Requires, from this or other features:
 
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Other exports
+## Parts
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ videoConstraints, videoRules, canPlayTrack, reportUnsupportedTrackConditions }`. | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
+| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
+
+## Types
+
+| Name | Kind | Description | Source |
+| --- | --- | --- | --- |
 | `Behaviors` | type | The type of `behaviors`. | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
 | `Config` | type | Every config key the behaviors read. Listed under [Config](#config). | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
 | `Context` | type | Every context key the behaviors declare. Listed under [Context](#context). | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ videoConstraints, videoRules, canPlayTrack, reportUnsupportedTrackConditions }`. | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
 | `State` | type | Every state key the behaviors and external signals declare. Listed under [State](#state). | [src/playback/features/background-video.ts](../../../src/playback/features/background-video.ts) |
