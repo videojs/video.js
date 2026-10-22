@@ -38,7 +38,7 @@ The setup declares `config` as required.
 | Key | Type | Doc |
 | --- | --- | --- |
 | `preferredSubtitleLanguage?` | `string` | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the chapters-document request is made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 
 ### State
 

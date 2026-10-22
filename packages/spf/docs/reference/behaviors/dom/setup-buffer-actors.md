@@ -71,7 +71,7 @@ The setup declares `config?`: callers may omit it.
 | `forwardBuffer?` | `Partial<ForwardBufferConfig>` | Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range. |
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
 | `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode segment requests are made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 
 ### State
 
@@ -106,7 +106,7 @@ The setup declares `config?`: callers may omit it.
 | `forwardBuffer?` | `Partial<ForwardBufferConfig>` | Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range. |
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
 | `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode segment requests are made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `videoMessagePipelines?` | `MessagePipelines` | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
 
 ### State

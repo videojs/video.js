@@ -8,15 +8,12 @@ import { loadChaptersTracks } from '../../../media/dom/text/load-chapters-tracks
 import { APPLE_HLS_CHAPTERS_DATA_ID } from '../../../media/hls/parse-json-chapters';
 import type { TextSelectionConfig } from '../../../media/primitives/select-tracks';
 import { getSessionData, isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+import type { RequestCredentialsConfig } from '../../../network/credentials-fetch';
 
 type LoadChaptersFsmState = 'preconditions-unmet' | 'loading';
 
 /** Config of `loadChapters`, which leads with the chapters track in `preferredSubtitleLanguage` when there is one. */
-export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'> & {
-  /** The `credentials` mode the chapters-document request is made with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
-};
+export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'> & RequestCredentialsConfig;
 
 function deriveState(
   presentation: MaybeResolvedPresentation | undefined,
