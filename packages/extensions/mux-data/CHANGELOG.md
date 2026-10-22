@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.1.0...@videojs/mux-data@10.2.0) (2026-10-22)
+
+
+### Bug Fixes
+
+* **mux-data:** report video.js as the default player software ([#9568](https://github.com/videojs/video.js/issues/9568)) ([9e90d26](https://github.com/videojs/video.js/commit/9e90d2667a046faed303e7397097118fe93a10c9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.2.0
+    * @videojs/media bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.0.1...@videojs/mux-data@10.1.0) (2026-10-12)
 
 

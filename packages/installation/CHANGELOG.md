@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.1.0...@videojs/installation@10.2.0) (2026-10-22)
+
+
+### Features
+
+* **cli:** add skin create to start a skin project ([#9500](https://github.com/videojs/video.js/issues/9500)) ([c1c3f76](https://github.com/videojs/video.js/commit/c1c3f76bff9b3cade9209a35b2aea38b259447eb))
+* **cli:** preview skins in a sandbox-style workbench ([#9501](https://github.com/videojs/video.js/issues/9501)) ([2228a99](https://github.com/videojs/video.js/commit/2228a99dfbc478306e2b96a5cf2443caea579d45))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.2.0
+  * devDependencies
+    * @videojs/media bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.0.1...@videojs/installation@10.1.0) (2026-10-12)
 
 

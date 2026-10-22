@@ -1,6 +1,6 @@
 {
   "name": "@videojs/spf",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Stream Processing Framework for Video.js 10",
   "keywords": [
     "hls",
