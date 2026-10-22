@@ -40,7 +40,7 @@ export function resolveAdapterType(src: string, type?: string): AdapterType | nu
   const source = src.trim();
   if (!source) return null;
 
-  return fromService(source) ?? fromMimeType(type) ?? fromMimeType(resolveMimeType(source));
+  return fromService(source) ?? adapterTypeForMimeType(type) ?? adapterTypeForMimeType(resolveMimeType(source));
 }
 
 /**
@@ -59,6 +59,21 @@ export function resolveMimeType(src: string): string | null {
   return (extension && MIME_TYPES.get(extension)) || null;
 }
 
+/** A service {@link matchServiceHost} recognizes by host. */
+type ServiceType = Exclude<AdapterType, 'hls' | 'dash' | 'video' | 'audio'>;
+
+// Each service's parser confirms the URL names something its media can play.
+const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
+  youtube: parseYouTubeSource,
+  vimeo: parseVimeoSource,
+  wistia: parseWistiaMediaId,
+  mux: () => true,
+  cloudflare: parseCloudflareSource,
+  spotify: parseSpotifySource,
+  tiktok: parseTikTokSource,
+  twitch: parseTwitchSource,
+};
+
 function fromService(src: string): AdapterType | null {
   // Shorthands go through the same parsers the YouTube and Vimeo media use, so the media accepts what matches here.
   if (src.startsWith('youtube/')) return parseYouTubeSource(src) ? 'youtube' : null;
@@ -67,13 +82,22 @@ function fromService(src: string): AdapterType | null {
 
   if (SPOTIFY_URI.test(src)) return parseSpotifySource(src) ? 'spotify' : null;
 
-  const url = parseUrl(src);
-  if (!url) return null;
+  const url = parseSourceUrl(src);
+  const service = url && matchServiceHost(url);
 
+  return service && SERVICE_PARSERS[service](src) ? service : null;
+}
+
+/**
+ * Match a source URL to a service by host alone, without parsing it for an id. A Mux URL must also have a stream path.
+ *
+ * @internal
+ */
+export function matchServiceHost(url: URL): ServiceType | null {
   const host = url.hostname.toLowerCase();
-  if (YOUTUBE_HOSTS.has(host)) return parseYouTubeSource(src) ? 'youtube' : null;
+  if (YOUTUBE_HOSTS.has(host)) return 'youtube';
 
-  if (VIMEO_HOSTS.has(host)) return parseVimeoSource(src) ? 'vimeo' : null;
+  if (VIMEO_HOSTS.has(host)) return 'vimeo';
 
   if (
     isHost(host, 'wistia.com') ||
@@ -81,26 +105,30 @@ function fromService(src: string): AdapterType | null {
     isHost(host, 'wi.st') ||
     url.searchParams.has('wvideo')
   ) {
-    return parseWistiaMediaId(src) ? 'wistia' : null;
+    return 'wistia';
   }
 
   // `player.mux.com` page URLs aren't matched: Mux media plays stream URLs, with or without the `.m3u8` extension.
   if (host === 'stream.mux.com') return MUX_STREAM_PATH.test(url.pathname) ? 'mux' : null;
 
-  if (isHost(host, 'cloudflarestream.com') || isHost(host, 'videodelivery.net')) {
-    return parseCloudflareSource(src) ? 'cloudflare' : null;
-  }
+  if (isHost(host, 'cloudflarestream.com') || isHost(host, 'videodelivery.net')) return 'cloudflare';
 
-  if (host === 'open.spotify.com') return parseSpotifySource(src) ? 'spotify' : null;
+  if (host === 'open.spotify.com') return 'spotify';
 
-  if (TIKTOK_HOSTS.has(host)) return parseTikTokSource(src) ? 'tiktok' : null;
+  if (TIKTOK_HOSTS.has(host)) return 'tiktok';
 
-  if (TWITCH_HOSTS.has(host)) return parseTwitchSource(src) ? 'twitch' : null;
+  if (TWITCH_HOSTS.has(host)) return 'twitch';
 
   return null;
 }
 
-function fromMimeType(type: string | null | undefined): AdapterType | null {
+/**
+ * Map a MIME type to the adapter type that plays it: `hls`, `dash`, `video`, or `audio`. Parameters such as `codecs`
+ * are ignored.
+ *
+ * @internal
+ */
+export function adapterTypeForMimeType(type: string | null | undefined): AdapterType | null {
   // Parameters such as `; codecs=…` don't change which media plays the type.
   const mimeType = type?.split(';', 1)[0]!.trim().toLowerCase();
   if (!mimeType) return null;
@@ -120,8 +148,12 @@ function isHost(host: string, domain: string) {
   return host === domain || host.endsWith(`.${domain}`);
 }
 
-/** Parse an absolute URL, or a host-first one such as `youtu.be/<id>`. Paths and bare ids don't parse. */
-function parseUrl(src: string): URL | null {
+/**
+ * Parse an absolute URL, or a host-first one such as `youtu.be/<id>`. Paths and bare ids don't parse.
+ *
+ * @internal
+ */
+export function parseSourceUrl(src: string): URL | null {
   if (URL_SCHEME.test(src)) return tryParseUrl(src);
 
   return HOST_FIRST.test(src) ? tryParseUrl(`https://${src}`) : null;
