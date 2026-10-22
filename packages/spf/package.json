@@ -356,7 +356,6 @@
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "playwright": "^1.59.1",
-    "typescript": "^6.0.2",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   }
