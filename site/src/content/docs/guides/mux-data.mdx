@@ -135,6 +135,40 @@ How much the extension reports depends on the engine playing the stream. All med
 
 The `video_id` it reports is the Mux playback ID for streams served from `stream.mux.com`, and the source URL otherwise. Each view also gets a generated `view_session_id`. Override either through `metadata`.
 
+## Name the player
+
+<FrameworkCase frameworks={["react"]}>
+Each view reports a player software name of `videojs-react-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-react-hlsjs`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Each view reports a player software name of `videojs-html-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-html-hlsjs`.
+</FrameworkCase>
+
+| Engine | Played by |
+|---|---|
+| `hlsjs` | [hls.js](https://github.com/video-dev/hls.js/) |
+| `spf` | The Video.js SPF engine |
+| `shaka` | [Shaka Player](https://github.com/shaka-project/shaka-player) |
+| `dashjs` | [dash.js](https://github.com/Dash-Industry-Forum/dash.js) |
+| `browser` | The browser itself, like native HLS in Safari or an MP4 file |
+
+The name follows the engine that's playing, so a source change that switches engines updates the name for the current view.
+
+To report your own name instead, set the player software name. It takes precedence over the default:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxData playerSoftwareName="my-player" playerSoftwareVersion="2.4.0" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<mux-data player-software-name="my-player" player-software-version="2.4.0"></mux-data>
+```
+</FrameworkCase>
+
 ## Describe the view
 
 Pass Mux Data [metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) to label views with your own titles, viewer IDs, and custom dimensions. `metadata` takes an object. In HTML, set it as a JavaScript property:
