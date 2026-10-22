@@ -9,154 +9,137 @@ import {
 import { VIMEO_SHORTHAND_SRC } from './vimeo';
 import { YOUTUBE_SHORTHAND_SRC } from './youtube';
 
-/**
- * A media component `LazyVideo` can resolve a source to, named by its module under `media/`. `video` is the browser's
- * own `<video>`.
- *
- * @internal
- */
-export type LazyVideoMediaName =
-  | 'video'
-  | 'native-hls-video'
-  | 'hlsjs-video'
-  | 'dash-video'
-  | 'mux-video'
-  | 'youtube-video'
-  | 'vimeo-video'
-  | 'wistia-video'
-  | 'cloudflare-video'
-  | 'tiktok-video'
-  | 'twitch-video';
+/** A source as lazy media sees it, worked out once so each media's `match` stays cheap. */
+export interface LazySource {
+  /** The trimmed source URL. */
+  src: string;
+  /** The MIME type the source was given, if any. */
+  type: string | undefined;
+  /** `src` parsed as a URL, or `null` for a path or bare id. */
+  url: URL | null;
+  /**
+   * The kind of source by host, shorthand, MIME type, or file extension, with the same names `resolveAdapterType`
+   * returns. A media file on a service host, such as a direct Vimeo MP4, counts as that file.
+   */
+  adapterType: AdapterType | null;
+  /** How HLS should play here, or `undefined` while that isn't known, such as during server rendering. */
+  playback: 'native' | 'mse' | undefined;
+}
+
+/** A media lazy media can render, by the sources it plays. */
+export interface LazyMediaMatcher {
+  /**
+   * Whether this media plays the source. Return `undefined` when it can't tell yet; the media isn't chosen until it
+   * can, and nothing after it is tried.
+   */
+  match(source: LazySource): boolean | undefined;
+}
 
 /**
- * A media component `LazyAudio` can resolve a source to, named by its module under `media/`. `audio` is the browser's
- * own `<audio>`.
+ * How the browser plays HLS without an engine: `'preferred'` by default, `'supported'` when it can but an engine plays
+ * better, or `'unsupported'`.
  *
  * @internal
  */
-export type LazyAudioMediaName = 'audio' | 'hls-audio' | 'mux-audio' | 'spotify-audio';
-
-/**
- * The playback path a lazy media prefers for HLS: `'native'` uses the browser's own HLS support where there is one, and
- * `'mse'` always loads an engine.
- *
- * @internal
- */
-export type LazyMediaPlayback = 'native' | 'mse';
+export type NativeHlsSupport = 'preferred' | 'supported' | 'unsupported';
 
 /** @internal */
-export interface ResolveLazyMediaOptions {
+export interface ResolveLazySourceOptions {
   /** MIME type of the source. Takes precedence over its file extension. */
   type?: string | undefined;
   /**
-   * Whether HLS plays natively by default here, as on Safari, or `undefined` while that isn't known, such as during
-   * server rendering.
+   * `'native'` plays HLS natively wherever the browser can, and `'mse'` always loads an engine. Unset, HLS plays
+   * natively only where that's the browser's preferred path.
    */
-  nativeHls: boolean | undefined;
-  /** Defaults to `'native'`. */
-  preferPlayback?: LazyMediaPlayback | undefined;
+  preferPlayback?: 'native' | 'mse' | undefined;
+  /** `undefined` while it isn't known, such as during server rendering. */
+  nativeHls: NativeHlsSupport | undefined;
 }
 
 /**
- * Resolve which media component `LazyVideo` renders for a source.
- *
- * Returns `null` for a source no supported media plays, and `undefined` when the choice depends on `nativeHls` and it
- * isn't known yet.
+ * Work out a source once for every media's `match`. Returns `null` for an empty source.
  *
  * @internal
  */
-export function resolveLazyVideoMedia(
-  src: string,
-  options: ResolveLazyMediaOptions
-): LazyVideoMediaName | null | undefined {
-  const type = resolveLazyAdapterType(src, options.type);
-
-  // Each service's media module is named after it.
-  switch (type) {
-    case 'youtube':
-    case 'vimeo':
-    case 'wistia':
-    case 'cloudflare':
-    case 'tiktok':
-    case 'twitch':
-    case 'mux':
-    case 'dash':
-      return `${type}-video` as const;
-    case 'hls':
-      return resolveHls(options, 'native-hls-video', 'hlsjs-video');
-    // A `<video>` plays audio files too.
-    case 'video':
-    case 'audio':
-      return 'video';
-    default:
-      return null;
-  }
-}
-
-/**
- * Resolve which media component `LazyAudio` renders for a source.
- *
- * Returns `null` for a source no supported media plays, and `undefined` when the choice depends on `nativeHls` and it
- * isn't known yet.
- *
- * @internal
- */
-export function resolveLazyAudioMedia(
-  src: string,
-  options: ResolveLazyMediaOptions
-): LazyAudioMediaName | null | undefined {
-  const type = resolveLazyAdapterType(src, options.type);
-
-  switch (type) {
-    case 'mux':
-    case 'spotify':
-      return `${type}-audio` as const;
-    // An `<audio>` plays native HLS on its own, so there is no engine to load.
-    case 'hls':
-      return resolveHls(options, 'audio', 'hls-audio');
-    // An `<audio>` plays the audio of a video file.
-    case 'audio':
-    case 'video':
-      return 'audio';
-    default:
-      return null;
-  }
-}
-
-/**
- * `resolveAdapterType` without the service parsers, which are most of its weight: services match by host or shorthand,
- * and the media they resolve to checks the id itself. A media file on a service host, such as a direct Vimeo MP4, plays
- * as that file; Mux and Cloudflare are exempt because their streams are manifests.
- */
-function resolveLazyAdapterType(src: string, type: string | undefined): AdapterType | null {
+export function resolveLazySource(src: string, options: ResolveLazySourceOptions): LazySource | null {
   const source = src.trim();
   if (!source) return null;
 
-  return fromService(source) ?? adapterTypeForMimeType(type) ?? adapterTypeForMimeType(resolveMimeType(source));
+  const url = parseSourceUrl(source);
+
+  return {
+    src: source,
+    type: options.type,
+    url,
+    adapterType:
+      fromService(source, url) ??
+      adapterTypeForMimeType(options.type) ??
+      adapterTypeForMimeType(resolveMimeType(source)),
+    playback: resolvePlayback(options),
+  };
 }
 
-function fromService(src: string): AdapterType | null {
+/**
+ * The first media that plays a source: `null` when none does, or `undefined` while an earlier one can't tell yet.
+ *
+ * @internal
+ */
+export function findLazyMedia<Media extends LazyMediaMatcher>(
+  medias: readonly Media[],
+  source: LazySource | null
+): Media | null | undefined {
+  if (!source) return null;
+
+  for (const media of medias) {
+    const matched = media.match(source);
+    if (matched !== false) return matched ? media : undefined;
+  }
+
+  return null;
+}
+
+/**
+ * A `match` for media that play any of the given kinds of source.
+ *
+ * @internal
+ */
+export function matchAdapterType(...types: AdapterType[]): LazyMediaMatcher['match'] {
+  return ({ adapterType }) => !!adapterType && types.includes(adapterType);
+}
+
+/**
+ * A `match` for HLS media that play by one path, native or MSE.
+ *
+ * @internal
+ */
+export function matchHls(playback: 'native' | 'mse'): LazyMediaMatcher['match'] {
+  return (source) => (source.adapterType === 'hls' ? source.playback && source.playback === playback : false);
+}
+
+/**
+ * `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match by
+ * host or shorthand, and the media they resolve to checks the id itself. A media file on a service host plays as that
+ * file; Mux and Cloudflare are exempt because their streams are manifests.
+ */
+function fromService(src: string, url: URL | null): AdapterType | null {
   if (YOUTUBE_SHORTHAND_SRC.test(src)) return 'youtube';
 
   if (VIMEO_SHORTHAND_SRC.test(src)) return 'vimeo';
 
   if (SPOTIFY_URI.test(src)) return 'spotify';
 
-  const url = parseSourceUrl(src);
   const service = url && matchServiceHost(url);
   if (!service || service === 'mux' || service === 'cloudflare') return service;
 
   return resolveMimeType(src) ? null : service;
 }
 
-function resolveHls<Name extends string>(
-  { nativeHls, preferPlayback = 'native' }: ResolveLazyMediaOptions,
-  native: Name,
-  mse: Name
-): Name | undefined {
-  if (preferPlayback === 'mse') return mse;
+function resolvePlayback({ preferPlayback, nativeHls }: ResolveLazySourceOptions): LazySource['playback'] {
+  if (preferPlayback === 'mse') return 'mse';
 
-  if (nativeHls === undefined) return undefined;
+  if (!nativeHls) return undefined;
 
-  return nativeHls ? native : mse;
+  const native = preferPlayback === 'native' ? nativeHls !== 'unsupported' : nativeHls === 'preferred';
+
+  return native ? 'native' : 'mse';
 }
