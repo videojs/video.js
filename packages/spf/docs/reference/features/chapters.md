@@ -17,8 +17,8 @@ hidden `chapters` text track per language.
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `preferredSubtitleLanguage?` | `string` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters), [switchTextTrack](../behaviors/track-switching.md#switchtexttrack) | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
-| `requestCredentials?` | `RequestCredentialsPolicy` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters), [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `credentials` mode the chapters-document request is made with; absent → the platform default. |
+| `preferredSubtitleLanguage?` | `string` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The `credentials` mode the chapters-document request is made with; absent → the platform default. |
 
 ### State
 

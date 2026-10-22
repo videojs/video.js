@@ -18,7 +18,7 @@ resolution cap reads the size and does nothing without it.
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `capRenditionToPlayerSize?` | `boolean` | — | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | Whether to cap renditions to the player's rendered size at all. `false` measures nothing, which leaves `state.playerResolution` unset and the cap inert. Defaults to `true`. Named for the policy rather than the measurement because it is the public switch for the feature — the same one hls.js spells `capLevelToPlayerSize` and the Mux Video element spells `cap-rendition-to-player-size`. |
-| `useDevicePixelRatio?` | `boolean` | — | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution), [trackScreenResolution](../behaviors/dom/track-screen-resolution.md#trackscreenresolution) | Whether the reading is scaled into device pixels. Defaults to `true` — see `ScreenResolutionOptions.useDevicePixelRatio` in `media/dom/screen.ts`, including its note on page zoom being folded into the ratio outside WebKit. |
+| `useDevicePixelRatio?` | `boolean` | — | [trackPlayerResolution](../behaviors/dom/track-player-resolution.md#trackplayerresolution) | Whether the reading is scaled into device pixels. Defaults to `true` — see `ScreenResolutionOptions.useDevicePixelRatio` in `media/dom/screen.ts`, including its note on page zoom being folded into the ratio outside WebKit. |
 
 ### State
 
