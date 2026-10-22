@@ -39,7 +39,7 @@ export interface HlsBackgroundVideoProps
  * failed source receives it. Which condition it was is on the console and `engine.state.errors`; the handler gets "this
  * source won't play", which is the decision a background video actually has to make.
  *
- * `MuxBackgroundVideo` is this same component under the name the package it replaces used — an alias, not a variant.
+ * `MuxBackgroundVideo` is this component over the Mux Media, which adds the MPEG-TS transmux and nothing else.
  */
 export const HlsBackgroundVideo = forwardRef<HTMLVideoElement, HlsBackgroundVideoProps>(function HlsBackgroundVideo(
   { children, fallback = videoFallback, mediaRef, ...props },

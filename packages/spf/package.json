@@ -55,6 +55,21 @@
       "development": "./dist/dev/engines/hls-background-video.js",
       "default": "./dist/default/engines/hls-background-video.js"
     },
+    "./engines/hls-video-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-video-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-video-mpeg-ts.js"
+    },
+    "./engines/hls-audio-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-audio-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-audio-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-audio-mpeg-ts.js"
+    },
+    "./engines/hls-background-video-mpeg-ts": {
+      "types": "./dist/dev/engines/hls-background-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/engines/hls-background-video-mpeg-ts.js",
+      "default": "./dist/default/engines/hls-background-video-mpeg-ts.js"
+    },
     "./features/airplay": {
       "types": "./dist/dev/features/airplay.d.ts",
       "development": "./dist/dev/features/airplay.js",
@@ -129,6 +144,16 @@
       "types": "./dist/dev/features/monitor-player-size.d.ts",
       "development": "./dist/dev/features/monitor-player-size.js",
       "default": "./dist/default/features/monitor-player-size.js"
+    },
+    "./features/mpeg-ts-audio-transmux": {
+      "types": "./dist/dev/features/mpeg-ts-audio-transmux.d.ts",
+      "development": "./dist/dev/features/mpeg-ts-audio-transmux.js",
+      "default": "./dist/default/features/mpeg-ts-audio-transmux.js"
+    },
+    "./features/mpeg-ts-transmux": {
+      "types": "./dist/dev/features/mpeg-ts-transmux.d.ts",
+      "development": "./dist/dev/features/mpeg-ts-transmux.js",
+      "default": "./dist/default/features/mpeg-ts-transmux.js"
     },
     "./features/multi-cdn": {
       "types": "./dist/dev/features/multi-cdn.d.ts",

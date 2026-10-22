@@ -8,11 +8,12 @@ import { BackgroundVideoSkin } from '@videojs/react/background';
 import { MuxBackgroundVideo } from '@videojs/react/media/mux-background-video';
 import { createRoot } from 'react-dom/client';
 
-// `MuxBackgroundVideo` is `HlsBackgroundVideo` under its Mux-flavored name — the
-// same component, so `react-hls-background-video` is the same page with the other
-// name. What this one adds is `?max_resolution=720p`: capping the rendition is a
-// Mux URL param rather than a prop, so the excluded renditions are absent from the
-// manifest rather than present and unpicked.
+// `MuxBackgroundVideo` is `HlsBackgroundVideo` over the Mux Media, which composes
+// `mpegTsTransmuxFeature`: a plus- or basic-tier playback ID (MPEG-TS) plays here
+// and is refused on `react-hls-background-video`. This page also adds
+// `?max_resolution=720p`: capping the rendition is a Mux URL param rather than a
+// prop, so the excluded renditions are absent from the manifest rather than
+// present and unpicked.
 
 function App() {
   const { source } = useSandbox();

@@ -49,6 +49,7 @@ The feature declares these state keys for code outside the engine to write; no b
 | `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadChapters](../behaviors/dom/load-chapters.md#loadchapters), [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `credentials` mode media-playlist requests are made with; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 
 ### State
 
@@ -73,6 +74,8 @@ The feature declares these state keys for code outside the engine to write; no b
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
+- [@videojs/spf/engines/hls-video-mpeg-ts](../engines/hls-video-mpeg-ts.md)
+- [@videojs/spf/engines/hls-audio-mpeg-ts](../engines/hls-audio-mpeg-ts.md)
 
 ## Other functions and constants
 

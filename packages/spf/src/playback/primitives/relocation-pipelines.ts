@@ -53,7 +53,8 @@ function relocationState(deps: StepDeps): StateSignals<RelocationSlots> {
   return deps.state as unknown as StateSignals<RelocationSlots>;
 }
 
-function containerSlot(deps: StepDeps): ContainerSlot {
+/** The container-data slot, or `undefined` in a composition that declares none (which then relocates nothing). */
+function containerSlot(deps: StepDeps): ContainerSlot | undefined {
   return relocationState(deps).mediaContainerData;
 }
 
@@ -87,10 +88,28 @@ function awaitDefined(read: () => number | undefined): Promise<number> {
  * `'audio'`), so ABR rungs of a type share the origin (discover skips once the type's value is present). The steps
  * read/write `state.mediaContainerData[trackType]` via their call-time `deps`; the stamp applies the same
  * `deriveStartMediaTime` seam the reactor uses, read from the composition config at call time, so the buffer offset and
- * the model's `startMediaTime` agree. A composition whose config carries no `deriveStartMediaTime` doesn't relocate:
- * the stamp leaves appends native.
+ * the model's `startMediaTime` agree. A composition whose config carries no `deriveStartMediaTime`, or whose state
+ * declares no `mediaContainerData`, doesn't relocate: the steps leave appends native.
  */
 export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePipelines {
+  const { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime } = relocationStepsFor(trackType);
+
+  return () => ({
+    remove: [dispatchStep],
+    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
+    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
+  });
+}
+
+/** The relocation steps by role, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export interface RelocationSteps {
+  readInitTrackInfo: LoadStep;
+  readSegmentOrigin: LoadStep;
+  stampStartMediaTime: LoadStep;
+}
+
+/** The relocation steps themselves, for a composition that interleaves its own (e.g. the TS transmux pipelines). */
+export function relocationStepsFor(trackType: 'video' | 'audio'): RelocationSteps {
   const handlerType: MediaHandlerType = trackType === 'video' ? 'vide' : 'soun';
 
   /**
@@ -103,7 +122,7 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (op.type !== 'append-init' || !frame.data) return;
 
     const slot = containerSlot(deps);
-    if (peek(slot)?.[trackType]?.timescale !== undefined) return; // already have it (any rung of this type)
+    if (!slot || peek(slot)?.[trackType]?.timescale !== undefined) return; // already have it (any rung of this type)
 
     frame.data = await peekHead(frame.data, (bytes) => {
       const track = findMediaTrack(bytes, handlerType);
@@ -125,6 +144,8 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (op.type !== 'append-segment' || !frame.data) return;
 
     const slot = containerSlot(deps);
+    if (!slot) return;
+
     const container = peek(slot)?.[trackType];
     if (container?.baseMediaDecodeTime !== undefined) return; // established
 
@@ -159,19 +180,22 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     if (!derive) return;
 
     const state = relocationState(deps);
+    const slot = state.mediaContainerData;
+    if (!slot) return;
+
     // Liveness guard: if THIS type's own origin wasn't discovered — `readSegmentOrigin`
     // ran earlier in this pipeline and found no `tfdt` (mock / TS / containerless) — the
     // source isn't relocatable, so leave the append native and DON'T wait. Only a
     // discoverable type awaits the derived origin (which for shared-`min` legitimately
     // blocks on the other selected type — the barrier).
-    const own = peek(state.mediaContainerData)?.[trackType];
+    const own = peek(slot)?.[trackType];
 
     if (own?.timescale === undefined || own.baseMediaDecodeTime === undefined || own.segmentStartTime === undefined) {
       return;
     }
 
     const startMediaTime = await awaitDefined(() => {
-      const containerData = state.mediaContainerData.get();
+      const containerData = slot.get();
       if (!containerData) return undefined;
 
       return derive(containerData, {
@@ -184,11 +208,7 @@ export function relocationPipelinesFor(trackType: 'video' | 'audio'): MessagePip
     frame.meta = { ...(frame.meta ?? frame.op.meta), timestampOffset: -startMediaTime };
   };
 
-  return () => ({
-    remove: [dispatchStep],
-    'append-init': [fetchStep, readInitTrackInfo, dispatchStep],
-    'append-segment': [fetchStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
-  });
+  return { readInitTrackInfo, readSegmentOrigin, stampStartMediaTime };
 }
 
 // ============================================================================

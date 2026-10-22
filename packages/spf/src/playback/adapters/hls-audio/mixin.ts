@@ -74,6 +74,9 @@ const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([SVTA_NO_SUPPORTED
  *
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  */
+/** What the adapter's `createEngine` static builds: an engine over this adapter's state and context. */
+export type CreateEngine = (config: EngineConfig) => Composition<EngineState, EngineContext>;
+
 export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
   class HlsAudioImpl extends BaseClass {
     static readonly defaultProps: HlsAudioAdapterProps = {
@@ -95,6 +98,13 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     static get alternativeMediaSuggestion(): string | undefined {
       return undefined;
     }
+
+    /**
+     * The engine factory the adapter builds its engine with. A Media over a differently composed engine — one sharing
+     * this engine's state and context, with more features laid in, as the Mux Medias lay the MPEG-TS transmux —
+     * overrides this static and nothing else.
+     */
+    static readonly createEngine: CreateEngine = createEngine;
 
     readonly #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
@@ -353,7 +363,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     #createEngine(): Composition<EngineState, EngineContext> {
-      return createEngine({
+      return (this.constructor as typeof HlsAudioImpl).createEngine({
         ...this.#config,
         // A policy, not a value — see the video mixin. A consumer-supplied one wins.
         requestCredentials:
@@ -371,6 +381,7 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
   // adding back to the type or callers can't read it.
   return HlsAudioImpl as unknown as MixinReturn<Base, HlsAudioAdapterAPI, [options?: HlsAudioAdapterOptions]> & {
     readonly alternativeMediaSuggestion: string | undefined;
+    readonly createEngine: CreateEngine;
     readonly defaultProps: HlsAudioAdapterProps;
   };
 }

@@ -13,7 +13,7 @@ export const VERSION = '0.1.0';
 // Composition
 // =============================================================================
 
-export type { Composition, CompositionOptions } from './core/composition/create-composition';
+export type { Composition, CompositionOptions, ConfigWithDefaults } from './core/composition/create-composition';
 export { createComposition, defineCompositionFactory } from './core/composition/create-composition';
 export type {
   Behavior,

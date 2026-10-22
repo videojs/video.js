@@ -13,6 +13,7 @@ import { currentTimeFeature } from '../features/current-time';
 import { errorFeature } from '../features/error';
 import { hlsLoadingFeature } from '../features/hls-loading';
 import { mediaSourceFeature } from '../features/media-source';
+import { shiftTimestampsFeature } from '../features/shift-timestamps';
 
 // ============================================================================
 // Background-Video Engine State & Context
@@ -28,6 +29,7 @@ export const features = [
   calculateDurationFeature,
   mediaSourceFeature,
   backgroundVideoFeature,
+  shiftTimestampsFeature,
   currentTimeFeature,
 ] as const;
 

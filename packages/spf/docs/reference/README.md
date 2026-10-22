@@ -2,7 +2,7 @@
 
 # `@videojs/spf` API reference
 
-`@videojs/spf` builds a playback engine by composing behaviors, grouped into features. This reference covers 3 engines, the 21 features they compose, the 39 behaviors the behavior entry points export, and the 21 composition exports that put them together. Each engine page lists its features and behaviors in composition order with the config, state, and context keys they resolve to; each feature page does the same for its behaviors; each behavior page shows what its setup reads and writes.
+`@videojs/spf` builds a playback engine by composing behaviors, grouped into features. This reference covers 6 engines, the 23 features they compose, the 39 behaviors the behavior entry points export, and the 22 composition exports that put them together. Each engine page lists its features and behaviors in composition order with the config, state, and context keys they resolve to; each feature page does the same for its behaviors; each behavior page shows what its setup reads and writes.
 
 ## Engines and features
 
@@ -16,7 +16,13 @@ graph LR
   engine_hls_audio["@videojs/spf/engines/hls-audio"]:::engine_hls_audio
   classDef engine_hls_background_video fill:#16a34a,stroke:#15803d,color:#fff
   engine_hls_background_video["@videojs/spf/engines/hls-background-video"]:::engine_hls_background_video
-  subgraph group_0["hls-video only"]
+  classDef engine_hls_video_mpeg_ts fill:#9333ea,stroke:#7e22ce,color:#fff
+  engine_hls_video_mpeg_ts["@videojs/spf/engines/hls-video-mpeg-ts"]:::engine_hls_video_mpeg_ts
+  classDef engine_hls_audio_mpeg_ts fill:#dc2626,stroke:#b91c1c,color:#fff
+  engine_hls_audio_mpeg_ts["@videojs/spf/engines/hls-audio-mpeg-ts"]:::engine_hls_audio_mpeg_ts
+  classDef engine_hls_background_video_mpeg_ts fill:#2563eb,stroke:#1d4ed8,color:#fff
+  engine_hls_background_video_mpeg_ts["@videojs/spf/engines/hls-background-video-mpeg-ts"]:::engine_hls_background_video_mpeg_ts
+  subgraph group_0["hls-video and hls-video-mpeg-ts"]
     direction LR
     feature_video["videoFeature"]
     feature_text_tracks["textTracksFeature"]
@@ -28,18 +34,17 @@ graph LR
     feature_video ~~~ feature_text_tracks ~~~ feature_airplay_fairplay ~~~ feature_drm ~~~ feature_shift_text_timestamps
     feature_monitor_player_size ~~~ feature_live
   end
-  subgraph group_1["hls-video and hls-audio"]
+  subgraph group_1["hls-video and hls-audio and hls-video-mpeg-ts and hls-audio-mpeg-ts"]
     direction LR
     feature_initial_load["initialLoadFeature"]
     feature_multi_cdn["multiCdnFeature"]
     feature_audio["audioFeature"]
-    feature_shift_timestamps["shiftTimestampsFeature"]
     feature_airplay["airPlayFeature"]
     feature_start_position["startPositionFeature"]
     feature_end_stall_recovery["endStallRecoveryFeature"]
     feature_chapters["chaptersFeature"]
-    feature_initial_load ~~~ feature_multi_cdn ~~~ feature_audio ~~~ feature_shift_timestamps ~~~ feature_airplay
-    feature_start_position ~~~ feature_end_stall_recovery ~~~ feature_chapters
+    feature_initial_load ~~~ feature_multi_cdn ~~~ feature_audio ~~~ feature_airplay ~~~ feature_start_position
+    feature_end_stall_recovery ~~~ feature_chapters
   end
   subgraph group_2["every engine"]
     direction LR
@@ -47,27 +52,56 @@ graph LR
     feature_error["errorFeature"]
     feature_calculate_duration["calculateDurationFeature"]
     feature_media_source["mediaSourceFeature"]
+    feature_shift_timestamps["shiftTimestampsFeature"]
     feature_current_time["currentTimeFeature"]
-    feature_hls_loading ~~~ feature_error ~~~ feature_calculate_duration ~~~ feature_media_source ~~~ feature_current_time
+    feature_hls_loading ~~~ feature_error ~~~ feature_calculate_duration ~~~ feature_media_source ~~~ feature_shift_timestamps
   end
-  subgraph group_3["hls-background-video only"]
+  subgraph group_3["hls-background-video and hls-background-video-mpeg-ts"]
     direction LR
     feature_background_video["backgroundVideoFeature"]
   end
+  subgraph group_4["hls-video-mpeg-ts and hls-background-video-mpeg-ts"]
+    direction LR
+    feature_mpeg_ts_transmux["mpegTsTransmuxFeature"]
+  end
+  subgraph group_5["hls-audio-mpeg-ts only"]
+    direction LR
+    feature_mpeg_ts_audio_transmux["mpegTsAudioTransmuxFeature"]
+  end
   engine_hls_video --> group_0
-  linkStyle 15 stroke:#2563eb,stroke-width:2px
+  linkStyle 14 stroke:#2563eb,stroke-width:2px
   engine_hls_video --> group_1
-  linkStyle 16 stroke:#2563eb,stroke-width:2px
+  linkStyle 15 stroke:#2563eb,stroke-width:2px
   engine_hls_video --> group_2
-  linkStyle 17 stroke:#2563eb,stroke-width:2px
+  linkStyle 16 stroke:#2563eb,stroke-width:2px
   engine_hls_audio --> group_1
-  linkStyle 18 stroke:#d97706,stroke-width:2px
+  linkStyle 17 stroke:#d97706,stroke-width:2px
   engine_hls_audio --> group_2
-  linkStyle 19 stroke:#d97706,stroke-width:2px
+  linkStyle 18 stroke:#d97706,stroke-width:2px
   engine_hls_background_video --> group_2
-  linkStyle 20 stroke:#16a34a,stroke-width:2px
+  linkStyle 19 stroke:#16a34a,stroke-width:2px
   engine_hls_background_video --> group_3
-  linkStyle 21 stroke:#16a34a,stroke-width:2px
+  linkStyle 20 stroke:#16a34a,stroke-width:2px
+  engine_hls_video_mpeg_ts --> group_0
+  linkStyle 21 stroke:#9333ea,stroke-width:2px
+  engine_hls_video_mpeg_ts --> group_1
+  linkStyle 22 stroke:#9333ea,stroke-width:2px
+  engine_hls_video_mpeg_ts --> group_2
+  linkStyle 23 stroke:#9333ea,stroke-width:2px
+  engine_hls_video_mpeg_ts --> group_4
+  linkStyle 24 stroke:#9333ea,stroke-width:2px
+  engine_hls_audio_mpeg_ts --> group_1
+  linkStyle 25 stroke:#dc2626,stroke-width:2px
+  engine_hls_audio_mpeg_ts --> group_2
+  linkStyle 26 stroke:#dc2626,stroke-width:2px
+  engine_hls_audio_mpeg_ts --> group_5
+  linkStyle 27 stroke:#dc2626,stroke-width:2px
+  engine_hls_background_video_mpeg_ts --> group_2
+  linkStyle 28 stroke:#2563eb,stroke-width:2px
+  engine_hls_background_video_mpeg_ts --> group_3
+  linkStyle 29 stroke:#2563eb,stroke-width:2px
+  engine_hls_background_video_mpeg_ts --> group_4
+  linkStyle 30 stroke:#2563eb,stroke-width:2px
 ```
 
 ## Engines
@@ -77,6 +111,9 @@ graph LR
 | `@videojs/spf/engines/hls-video` | [hls-video](engines/hls-video.md) | Create an HLS playback engine: manifest resolution, adaptive track selection, segment loading over MediaSource, and end-of-stream coordination, composed from SPF behaviors. |
 | `@videojs/spf/engines/hls-audio` | [hls-audio](engines/hls-audio.md) | Create an audio-only HLS playback engine: the video engine without its video and subtitle behaviors, chapters kept. |
 | `@videojs/spf/engines/hls-background-video` | [hls-background-video](engines/hls-background-video.md) | Create a background-video playback engine: one video rendition pinned for the session, no audio or text, loading as soon as a source is set. |
+| `@videojs/spf/engines/hls-video-mpeg-ts` | [hls-video-mpeg-ts](engines/hls-video-mpeg-ts.md) | Create an HLS playback engine that also plays MPEG-TS: `@videojs/spf/engines/hls-video`'s engine with each MPEG-TS segment transmuxed to fMP4 on the client before it reaches the SourceBuffer. fMP4 and CMAF play through it unchanged. |
+| `@videojs/spf/engines/hls-audio-mpeg-ts` | [hls-audio-mpeg-ts](engines/hls-audio-mpeg-ts.md) | Create an audio-only HLS playback engine that also plays MPEG-TS: `@videojs/spf/engines/hls-audio`'s engine with each MPEG-TS audio rendition — an audio-only asset, the alternates of a video asset, or a video asset's default audio carried in its video segments — transmuxed to fMP4 on the client. |
+| `@videojs/spf/engines/hls-background-video-mpeg-ts` | [hls-background-video-mpeg-ts](engines/hls-background-video-mpeg-ts.md) | Create a background-video engine that also plays MPEG-TS: `@videojs/spf/engines/hls-background-video`'s engine with each MPEG-TS segment transmuxed to fMP4 on the client. |
 
 ## Features
 
@@ -97,6 +134,8 @@ graph LR
 | `liveFeature` | [live](features/live.md) | Plays live streams: reloads their playlists, keeps the seekable window current, starts at the live edge, and keeps the playhead inside the window. |
 | `mediaSourceFeature` | [media-source](features/media-source.md) | Plays through Media Source Extensions: attaches a MediaSource to the media element, keeps its duration current, and ends the stream once every composed track type has loaded its last segment. |
 | `monitorPlayerSizeFeature` | [monitor-player-size](features/monitor-player-size.md) | Monitors the player's rendered size, which enables capping video quality to it: the video selection rules' player resolution cap reads the size and does nothing without it. |
+| `mpegTsAudioTransmuxFeature` | [mpeg-ts-audio-transmux](features/mpeg-ts-audio-transmux.md) | The audio-only counterpart of `mpegTsTransmuxFeature`: plays MPEG-TS audio renditions (an audio-only `.ts` asset, or the audio-only TS alternates of a video asset, or a video asset's default audio carried in its video segments) by transmuxing their AAC to fMP4, with no video codec compiled in. |
+| `mpegTsTransmuxFeature` | [mpeg-ts-transmux](features/mpeg-ts-transmux.md) | Plays HLS content packaged as MPEG-TS (H.264 + AAC) by transmuxing each segment to fMP4 on the client before it reaches the SourceBuffer. fMP4 and CMAF content plays through it unchanged. |
 | `multiCdnFeature` | [multi-cdn](features/multi-cdn.md) | Plays sources served from several CDNs (redundant streams): keeps every track type on one CDN, and fails over to the next when a CDN fails, returning to it once its cooldown lapses. |
 | `shiftTextTimestampsFeature` | [shift-text-timestamps](features/shift-text-timestamps.md) | Shifts text cues onto the playlist's zero-based timeline along with the audio and video, rebasing each cue by the shift `shiftTimestampsFeature` establishes. |
 | `shiftTimestampsFeature` | [shift-timestamps](features/shift-timestamps.md) | Plays HLS content whose segment timestamps don't start at zero, by shifting them onto the playlist's zero-based timeline. |
@@ -194,6 +233,7 @@ Composing behaviors into a running engine: the composition, its options, and the
 | [`defineCompositionFactory`](core/create-composition.md#definecompositionfactory) | function | A create function for one fixed list of behaviors with its defaults: what an engine module exports as its `createEngine`. |
 | [`Composition`](core/create-composition.md#composition) | interface | A composition of behaviors with shared state and context signal maps. |
 | [`CompositionOptions`](core/create-composition.md#compositionoptions) | interface | What `createComposition` takes beside the behaviors: the config, the defaults it falls back to, and the state and context values to seed. |
+| [`ConfigWithDefaults`](core/create-composition.md#configwithdefaults) | type | `Cfg` with every key `Defaults` covers made optional: a default fills it when the caller leaves it out or passes `undefined`. |
 
 <details>
 <summary>How this reference is generated</summary>

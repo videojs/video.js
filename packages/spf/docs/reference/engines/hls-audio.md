@@ -99,6 +99,7 @@ The engine's features declare these state keys for code outside the engine to wr
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveDuration?` | `PresentationDurationResolver` | `getResolvedSelectedTrackDuration` | [calculateDurationFeature](../features/calculate-duration.md) | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | Resolver for `presentation.duration`. `calculateDurationFeature` supplies `getResolvedSelectedTrackDuration`, which picks the first resolved selected track's duration (video preferred, audio fallback). A resolver returning `Number.POSITIVE_INFINITY` marks the presentation live; downstream `updateMediaSourceDuration` propagates that value to `mediaSource.duration` per the MSE spec. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | — | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 
 ### State
 
