@@ -1,28 +1,35 @@
 'use client';
 
 import { type LazyVideoMediaName, type Media, resolveLazyVideoMedia } from '@videojs/media';
-import { type ComponentType, forwardRef, lazy, Suspense, type VideoHTMLAttributes } from 'react';
+import { type ComponentType, forwardRef, Suspense, type VideoHTMLAttributes } from 'react';
 
 import type { MediaRefProps } from '../../utils/use-media-ref';
 import type { MediaFallbackProps } from '../fallback';
-import { type LazyMediaProps, useNativeHls, useUnresolvedSourceError } from '../lazy-media';
+import { type LazyMediaProps, lazyMedia, useNativeHls, useUnresolvedSourceError } from '../lazy-media';
 import { Video } from '../video';
 
-// Module-level so each component keeps its identity across renders; deriving one during render would remount the media.
 const MEDIA = {
   video: Video,
-  'native-hls-video': /* @__PURE__ */ lazy(() =>
-    import('../native-hls-video').then((m) => ({ default: m.NativeHlsVideo }))
-  ),
-  'hlsjs-video': /* @__PURE__ */ lazy(() => import('../hlsjs-video').then((m) => ({ default: m.HlsJsVideo }))),
-  'dash-video': /* @__PURE__ */ lazy(() => import('../dash-video').then((m) => ({ default: m.DashVideo }))),
-  'mux-video': /* @__PURE__ */ lazy(() => import('../mux-video').then((m) => ({ default: m.MuxVideo }))),
-  'youtube-video': /* @__PURE__ */ lazy(() => import('../youtube-video').then((m) => ({ default: m.YouTubeVideo }))),
-  'vimeo-video': /* @__PURE__ */ lazy(() => import('../vimeo-video').then((m) => ({ default: m.VimeoVideo }))),
+  'native-hls-video': /* @__PURE__ */ lazyMedia(() => import('../native-hls-video'), 'NativeHlsVideo'),
+  'hlsjs-video': /* @__PURE__ */ lazyMedia(() => import('../hlsjs-video'), 'HlsJsVideo'),
+  'dash-video': /* @__PURE__ */ lazyMedia(() => import('../dash-video'), 'DashVideo'),
+  'mux-video': /* @__PURE__ */ lazyMedia(() => import('../mux-video'), 'MuxVideo'),
+  'youtube-video': /* @__PURE__ */ lazyMedia(() => import('../youtube-video'), 'YouTubeVideo'),
+  'vimeo-video': /* @__PURE__ */ lazyMedia(() => import('../vimeo-video'), 'VimeoVideo'),
+  'wistia-video': /* @__PURE__ */ lazyMedia(() => import('../wistia-video'), 'WistiaVideo'),
+  'cloudflare-video': /* @__PURE__ */ lazyMedia(() => import('../cloudflare-video'), 'CloudflareVideo'),
+  'tiktok-video': /* @__PURE__ */ lazyMedia(() => import('../tiktok-video'), 'TikTokVideo'),
+  'twitch-video': /* @__PURE__ */ lazyMedia(() => import('../twitch-video'), 'TwitchVideo'),
 } satisfies Record<LazyVideoMediaName, ComponentType<any>>;
 
-// Embeds render an `<iframe>`, which has no fallback content.
-const EMBEDS: ReadonlySet<LazyVideoMediaName> = new Set(['youtube-video', 'vimeo-video']);
+// The media that render a `<video>`; embeds render an `<iframe>` or a provider element, which has no fallback content.
+const FALLBACK_MEDIA: ReadonlySet<LazyVideoMediaName> = new Set([
+  'video',
+  'native-hls-video',
+  'hlsjs-video',
+  'dash-video',
+  'mux-video',
+]);
 
 /** @experimental */
 export interface LazyVideoProps
@@ -36,10 +43,10 @@ export interface LazyVideoProps
  * Plays a video from any supported source by rendering the media component for it, and loads only that component's code
  * once the source is known.
  *
- * Resolves files to a native `<video>`, HLS to `NativeHlsVideo` on Safari and `HlsJsVideo` elsewhere, and DASH, Mux,
- * YouTube, and Vimeo sources to `DashVideo`, `MuxVideo`, `YouTubeVideo`, and `VimeoVideo`. Renders nothing for a source
- * it can't resolve. Props are passed to the resolved media, so switching to that component directly only changes the
- * import.
+ * Resolves files to a native `<video>`, HLS to `NativeHlsVideo` on Safari and `HlsJsVideo` elsewhere, DASH to
+ * `DashVideo`, Mux to `MuxVideo`, and YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to their
+ * embed media. Renders nothing for a source it can't resolve. Props are passed to the resolved media, so switching to
+ * that component directly only changes the import.
  *
  * @experimental
  */
@@ -59,7 +66,7 @@ export const LazyVideo = forwardRef<HTMLVideoElement | HTMLIFrameElement, LazyVi
 
   // Each media takes the props it understands; the union of their prop types has no common shape to check against.
   const ResolvedMedia: ComponentType<any> = MEDIA[name];
-  const fallbackProps = fallback !== undefined && !EMBEDS.has(name) ? { fallback } : null;
+  const fallbackProps = fallback !== undefined && FALLBACK_MEDIA.has(name) ? { fallback } : null;
 
   return (
     <Suspense fallback={null}>
