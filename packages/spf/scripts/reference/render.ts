@@ -96,7 +96,7 @@ function fence(language: string, body: string): string {
  * Dedent an `@example` body and keep it a fenced block; one that is already fenced is used as written. The tag's first
  * line comes without its indent, so the indent is measured on the lines after it.
  */
-function exampleBlock(text: string): string {
+export function exampleBlock(text: string): string {
   const [first = '', ...rest] = text.split('\n');
   const indented = rest.filter((line) => line.trim());
   const indent = indented.length ? Math.min(...indented.map((line) => line.length - line.trimStart().length)) : 0;
@@ -108,7 +108,7 @@ function exampleBlock(text: string): string {
 }
 
 /** Headings inside a JSDoc body, demoted so they nest under the symbol's `##` heading. */
-function demoteHeadings(text: string): string {
+export function demoteHeadings(text: string): string {
   let inFence = false;
 
   return text
