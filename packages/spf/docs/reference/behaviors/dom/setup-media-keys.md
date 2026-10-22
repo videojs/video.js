@@ -56,8 +56,8 @@ The setup declares `config` as required.
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `drm` | `NegotiableDrmSystemsConfig` | License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. Required: license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies it. |
-| `keySystems` | `readonly KeySystemModule<string>[]` | The key systems this composition can negotiate, most-preferred first. Required for the same reason `drm` is: which systems an engine carries is a composition decision, and each module dropped from the list drops its own negotiation, init-data, and license-shaping code with it. |
+| `drm` | `NegotiableDrmSystemsConfig` | License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. **Required** — license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies it. |
+| `keySystems` | `readonly KeySystemModule<string>[]` | The key systems this composition can negotiate, most-preferred first. **Required** — which systems an engine carries is a composition decision, and each module dropped from the list drops its own negotiation, init-data, and license-shaping code with it. |
 
 ### State
 
