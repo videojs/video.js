@@ -1,0 +1,22 @@
+.react-lazy-video-basic {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.react-lazy-video-basic__media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.react-lazy-video-basic__sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.react-lazy-video-basic__sources button[aria-pressed="true"] {
+  font-weight: 600;
+}
