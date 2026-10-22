@@ -16,9 +16,9 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `defaultPreload?` | `StandardPreload` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation), [syncPreload](../behaviors/sync-preload.md#syncpreload) | Fallback used when `state.preload` is unset (undefined / empty) for the resolution-gate decision. Defaults to `'metadata'`, matching `syncPreload`'s own `defaultPreload`. |
+| `defaultPreload?` | `StandardPreload` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Fallback used when `state.preload` is unset (undefined / empty) for the resolution-gate decision. Defaults to `'metadata'`, matching `syncPreload`'s own `defaultPreload`. |
 | `parsePresentation` | `ParsePresentation` | `parseMultivariantPlaylist` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Parses a manifest body into a resolved `Presentation`. **Required** — the behavior is format-neutral and the composing engine supplies its own parser (HLS, DASH, etc.). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation), [loadChapters](../behaviors/dom/load-chapters.md#loadchapters), [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `credentials` mode the manifest request is made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The `credentials` mode the manifest request is made with; absent → the platform default. |
 
 ### State
 

@@ -19,8 +19,8 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `drm` | `NegotiableDrmSystemsConfig` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay), [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. |
-| `keySystems` | `readonly KeySystemModule<string>[]` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay), [exchangeLicenses](../behaviors/dom/exchange-licenses.md#exchangelicenses), [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys) | The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. |
+| `drm` | `NegotiableDrmSystemsConfig` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. |
+| `keySystems` | `readonly KeySystemModule<string>[]` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. |
 
 ### State
 

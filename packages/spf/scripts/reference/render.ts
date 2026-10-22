@@ -558,14 +558,16 @@ function externalSignalsSection(
 }
 
 /**
- * The behaviors a feature's `defaultConfig` key is for: the feature's own readers in composition order, then the
- * behaviors the literal's `satisfies` type names (the declarations behind the key), alphabetical. A key no `satisfies`
- * clause covers falls back to every behavior that reads it.
+ * The behaviors a feature's config key is for: the feature's own readers in composition order. A key the feature's
+ * `defaultConfig` supplies adds the behaviors the literal's `satisfies` type names (the declarations behind the key),
+ * alphabetical, or every behavior that reads it when no `satisfies` clause covers it.
  */
 function defaultReaders(model: Model, feature: FeatureInfo, key: string): BehaviorInfo[] {
   const own = readersOf(feature.behaviors, key);
   const value = feature.defaults.find((candidate) => candidate.key === key);
-  const declared = new Set(value?.readerDeclarations ?? []);
+  if (!value) return own;
+
+  const declared = new Set(value.readerDeclarations);
   const others = readersOf(model.behaviors, key)
     .filter((info) => !own.includes(info))
     .filter(
