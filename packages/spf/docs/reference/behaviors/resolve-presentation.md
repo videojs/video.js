@@ -41,7 +41,7 @@ The setup declares `config` as required.
 | --- | --- | --- |
 | `defaultPreload?` | `StandardPreload` | Fallback used when `state.preload` is unset (undefined / empty) for the resolution-gate decision. Defaults to `'metadata'`, matching `syncPreload`'s own `defaultPreload`. |
 | `parsePresentation` | `ParsePresentation` | Parses a manifest body into a resolved `Presentation`. **Required** — the behavior is format-neutral and the composing engine supplies its own parser (HLS, DASH, etc.). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the manifest request is made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 
 ### State
 

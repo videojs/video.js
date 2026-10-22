@@ -15,7 +15,11 @@ import type { MaybeResolvedPresentation, PartiallyResolvedTrack, ResolvedTrack }
 import { deriveStreamType, getMediaPlaylistMetadata, isResolvedPresentation, isResolvedTrack } from '../../media/types';
 import type { GetCdnId } from '../../media/utils/cdn';
 import { applyContainerMimeType, findTrack, updateTrackInPresentation } from '../../media/utils/tracks';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
+import {
+  credentialsFetch,
+  type RequestCredentialsConfig,
+  type RequestCredentialsPolicy,
+} from '../../network/credentials-fetch';
 import { fetchResolvableText as defaultFetchResolvableText, type FetchText } from '../../network/fetch';
 import { failoverFetch } from '../primitives/failover-fetch';
 import type { GateFirstParse } from '../primitives/gate-first-parse';
@@ -92,7 +96,7 @@ interface TrackResolutionConfig<K extends SelectedTrackKey> {
 }
 
 /** Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. */
-export interface ResolveTrackConfig {
+export interface ResolveTrackConfig extends RequestCredentialsConfig {
   /**
    * CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See
    * `TrackSwitchingSharedConfig['getCdnId']`.
@@ -106,8 +110,6 @@ export interface ResolveTrackConfig {
   reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
   /** `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. */
   resolveKeyUri?: ResolveKeyUri;
-  /** The `credentials` mode media-playlist requests are made with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
 }
 
 function setupTrackResolution<K extends SelectedTrackKey>({

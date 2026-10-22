@@ -18,7 +18,7 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 | --- | --- | --- | --- | --- |
 | `defaultPreload?` | `StandardPreload` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Fallback used when `state.preload` is unset (undefined / empty) for the resolution-gate decision. Defaults to `'metadata'`, matching `syncPreload`'s own `defaultPreload`. |
 | `parsePresentation` | `ParsePresentation` | `parseMultivariantPlaylist` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Parses a manifest body into a resolved `Presentation`. |
-| `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The `credentials` mode the manifest request is made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 
 ### State
 

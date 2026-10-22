@@ -54,7 +54,7 @@ import { getSelectedTrack, type TrackSelectionState } from '../../../media/utils
 import { buildMimeCodec } from '../../../media/utils/tracks';
 import { hasCodecs } from '../../../media/utils/tracks';
 import type { BandwidthState } from '../../../network/bandwidth-estimator';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+import { credentialsFetch, type RequestCredentialsConfig } from '../../../network/credentials-fetch';
 import { createTrackedFetch, type FetchBytes, fetchStream } from '../../../network/fetch';
 import {
   createSegmentLoaderActor,
@@ -239,14 +239,13 @@ export const setupVideoBufferActors = defineBehavior({
       bandwidthState: Signal<BufferActorsState['bandwidthState']>;
     };
     context: BufferActorsContextMap<'videoBufferActor', 'videoSegmentLoaderActor'>;
-    config?: SegmentLoaderActorConfig & {
-      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
-      getCdnId?: GetCdnId;
-      /** The `credentials` mode segment requests are made with; absent → the platform default. */
-      requestCredentials?: RequestCredentialsPolicy;
-      /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
-      videoMessagePipelines?: MessagePipelines;
-    };
+    config?: SegmentLoaderActorConfig &
+      RequestCredentialsConfig & {
+        /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
+        getCdnId?: GetCdnId;
+        /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
+        videoMessagePipelines?: MessagePipelines;
+      };
   }) => {
     // Bandwidth-sampling fetch. The factory accumulates EWMA state
     // internally; the callback bridges samples to engine state for ABR.
@@ -302,14 +301,13 @@ export const setupAudioBufferActors = defineBehavior({
   }: {
     state: BufferActorsStateMap<'selectedAudioTrackId'>;
     context: BufferActorsContextMap<'audioBufferActor', 'audioSegmentLoaderActor'>;
-    config?: SegmentLoaderActorConfig & {
-      /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
-      getCdnId?: GetCdnId;
-      /** The `credentials` mode segment requests are made with; absent → the platform default. */
-      requestCredentials?: RequestCredentialsPolicy;
-      /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
-      audioMessagePipelines?: MessagePipelines;
-    };
+    config?: SegmentLoaderActorConfig &
+      RequestCredentialsConfig & {
+        /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
+        getCdnId?: GetCdnId;
+        /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
+        audioMessagePipelines?: MessagePipelines;
+      };
   }) => {
     // Key order mirrors setupVideoBufferActors.
     const typeConfig = { ...AUDIO_TYPE_CONFIG, ...config };

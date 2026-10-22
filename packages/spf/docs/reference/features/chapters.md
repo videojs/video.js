@@ -18,7 +18,7 @@ hidden `chapters` text track per language.
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `preferredSubtitleLanguage?` | `string` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
-| `requestCredentials?` | `RequestCredentialsPolicy` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The `credentials` mode the chapters-document request is made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 
 ### State
 
