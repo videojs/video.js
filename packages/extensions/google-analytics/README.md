@@ -84,7 +84,7 @@ player.use(ga);
 | `customParams` | `Record<string, string \| number \| boolean>` | `undefined` | Custom extra parameters to include with every dispatched event. |
 | `onEvent` | `(event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void` | `undefined` | Optional callback to intercept dispatched events. |
 
-In HTML, attributes map to configuration options in kebab-case: `data-layer-name`, `video-title`, `video-provider`, `stream-type`, `track-progress`, and boolean `debug`. Non-primitive options (`customParams`, `onEvent`) are set as properties on the custom element.
+In HTML, attributes map to configuration options in kebab-case: `data-layer-name`, `video-title`, `video-provider`, `stream-type`, boolean `disable-progress` (to disable progress milestone tracking), and boolean `debug`. Non-primitive options (`customParams`, `onEvent`) are set as properties on the custom element.
 
 ## Dispatched Events
 

@@ -123,6 +123,65 @@ describe('GoogleAnalyticsExtension', () => {
     expect(events).toContain('video_complete');
   });
 
+  it('drops pause event when media has ended', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: mockContainer });
+
+    video.dispatchEvent(new Event('play'));
+    Object.defineProperty(video, 'currentTime', { value: 100 });
+    Object.defineProperty(video, 'ended', { value: true, configurable: true });
+
+    video.dispatchEvent(new Event('pause'));
+
+    const events = getDataLayer().map((e) => e.event);
+
+    expect(events).not.toContain('pause');
+  });
+
+  it('resets ended state and milestones on replay', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: mockContainer });
+
+    // First playback to end
+    video.dispatchEvent(new Event('play'));
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+    Object.defineProperty(video, 'currentTime', { value: 100 });
+    Object.defineProperty(video, 'ended', { value: true, configurable: true });
+    video.dispatchEvent(new Event('ended'));
+
+    // Replay
+    Object.defineProperty(video, 'ended', { value: false, configurable: true });
+    Object.defineProperty(video, 'currentTime', { value: 0 });
+    video.dispatchEvent(new Event('play'));
+
+    // Pause during replay should not be dropped
+    Object.defineProperty(video, 'currentTime', { value: 20 });
+    video.dispatchEvent(new Event('pause'));
+
+    // Milestone should fire again during replay
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    // Replay reaches end again
+    Object.defineProperty(video, 'currentTime', { value: 100 });
+    Object.defineProperty(video, 'ended', { value: true, configurable: true });
+    video.dispatchEvent(new Event('ended'));
+
+    const events = getDataLayer().map((e) => e.event);
+    const endCount = events.filter((e) => e === 'end').length;
+    const completeCount = events.filter((e) => e === 'video_complete').length;
+    const progressCount = events.filter((e) => e === 'video_progress').length;
+
+    expect(events).toContain('pause');
+    expect(endCount).toBe(2);
+    expect(completeCount).toBe(2);
+    // 50% milestone fires in pass 1 (10, 25, 50 = 3 events) and pass 2 (10, 25, 50 = 3 events) -> 6 events
+    expect(progressCount).toBe(6);
+  });
+
   it('tracks fullscreenEnter and fullscreenExit', () => {
     const container: MediaContainer = document.createElement('div');
     const extension = new GoogleAnalyticsExtension();

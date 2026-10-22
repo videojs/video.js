@@ -191,6 +191,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handlePlay = (): void => {
+    if (this.#hasEnded) {
+      this.#hasEnded = false;
+      this.#firedMilestones.clear();
+    }
+
     if (!this.#hasPlayedOnce) {
       this.#hasPlayedOnce = true;
       this.#sendEvent('play', 0);
@@ -236,7 +241,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     if (this.#hasEnded) return;
 
     const el = this.#targetElement;
-    if (isNil(el) || el.seeking) return;
+    if (isNil(el) || el.ended || el.seeking) return;
 
     const duration = el.duration || 0;
     const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;

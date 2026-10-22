@@ -49,7 +49,7 @@ describe('GoogleAnalyticsExtension', () => {
     el.setAttribute('video-provider', 'custom-provider');
     el.setAttribute('stream-type', 'live');
     el.setAttribute('debug', '');
-    el.trackProgress = false;
+    el.setAttribute('disable-progress', '');
 
     const extension = provider.extensions.get(GoogleAnalyticsExtensionBase)!;
 
@@ -58,6 +58,17 @@ describe('GoogleAnalyticsExtension', () => {
     expect(extension.videoProvider).toBe('custom-provider');
     expect(extension.streamType).toBe('live');
     expect(extension.debug).toBe(true);
+    expect(el.disableProgress).toBe(true);
+    expect(el.trackProgress).toBe(false);
+    expect(extension.trackProgress).toBe(false);
+
+    el.removeAttribute('disable-progress');
+    expect(el.disableProgress).toBe(false);
+    expect(el.trackProgress).toBe(true);
+    expect(extension.trackProgress).toBe(true);
+
+    el.trackProgress = false;
+    expect(el.disableProgress).toBe(true);
     expect(extension.trackProgress).toBe(false);
   });
 });

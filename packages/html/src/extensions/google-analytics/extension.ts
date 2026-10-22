@@ -29,9 +29,11 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
     videoTitle: { type: String, attribute: 'video-title' },
     videoProvider: { type: String, attribute: 'video-provider' },
     streamType: { type: String, attribute: 'stream-type' },
-    trackProgress: { type: Boolean, attribute: 'track-progress' },
+    disableProgress: { type: Boolean, attribute: 'disable-progress' },
     debug: { type: Boolean },
-  } satisfies PropertyDeclarationMap<Exclude<keyof GoogleAnalyticsProps, 'customParams' | 'onEvent'>>;
+  } satisfies PropertyDeclarationMap<
+    Exclude<keyof GoogleAnalyticsProps, 'customParams' | 'onEvent' | 'trackProgress'> | 'disableProgress'
+  >;
 
   protected createExtension(): GoogleAnalyticsExtensionBase {
     return new GoogleAnalyticsExtensionBase();
@@ -67,6 +69,14 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
 
   set streamType(value: 'live' | 'vod' | null | undefined) {
     this.extension.streamType = value ?? 'vod';
+  }
+
+  get disableProgress(): boolean {
+    return !this.trackProgress;
+  }
+
+  set disableProgress(value: boolean) {
+    this.trackProgress = !value;
   }
 
   get trackProgress(): boolean {
