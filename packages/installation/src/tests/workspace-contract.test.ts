@@ -13,7 +13,13 @@ interface PackageManifest {
   name: string;
   private?: boolean;
   publishConfig?: { access?: string };
+  dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
+}
+
+/** Packages a facade makes available, whether it installs them itself or leaves them to the app. */
+function installablePackages({ dependencies, peerDependencies }: PackageManifest): Record<string, string> {
+  return { ...dependencies, ...peerDependencies };
 }
 
 function readJson<T>(path: string): T {
@@ -62,8 +68,12 @@ describe('installation workspace contract', () => {
       expect(entry, `${renderer} package`).toBeDefined();
       expect(entry?.manifest.private, definition.adapterPackage).not.toBe(true);
       expect(entry?.manifest.publishConfig?.access, definition.adapterPackage).toBe('public');
-      expect(html.peerDependencies, `@videojs/html peer for ${renderer}`).toHaveProperty(definition.adapterPackage);
-      expect(react.peerDependencies, `@videojs/react peer for ${renderer}`).toHaveProperty(definition.adapterPackage);
+      expect(installablePackages(html), `@videojs/html package for ${renderer}`).toHaveProperty(
+        definition.adapterPackage
+      );
+      expect(installablePackages(react), `@videojs/react package for ${renderer}`).toHaveProperty(
+        definition.adapterPackage
+      );
       expect(
         existsSync(resolve(workspaceRoot, `packages/html/src/media/${definition.mediaSubpath}/index.ts`)),
         `@videojs/html/media/${definition.mediaSubpath}`

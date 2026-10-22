@@ -171,71 +171,53 @@
   },
   "dependencies": {
     "@videojs/core": "workspace:*",
+    "@videojs/dash-video": "workspace:*",
     "@videojs/element": "workspace:*",
+    "@videojs/hlsjs-video": "workspace:*",
     "@videojs/media": "workspace:*",
+    "@videojs/mux-audio": "workspace:*",
+    "@videojs/mux-video": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/store": "workspace:*",
-    "@videojs/utils": "workspace:*"
+    "@videojs/utils": "workspace:*",
+    "@videojs/vimeo-video": "workspace:*",
+    "@videojs/youtube-video": "workspace:*"
   },
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
-    "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
-    "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
-    "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
-    "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/skins": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
-    "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
-    "@videojs/youtube-video": "workspace:*",
     "happy-dom": "^20.11.1",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
-    "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
-    "@videojs/hlsjs-video": "workspace:*",
-    "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
-    "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
-    "@videojs/vimeo-video": "workspace:*",
-    "@videojs/wistia-video": "workspace:*",
-    "@videojs/youtube-video": "workspace:*"
+    "@videojs/wistia-video": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@videojs/cloudflare-video": {
       "optional": true
     },
-    "@videojs/dash-video": {
-      "optional": true
-    },
     "@videojs/google-cast": {
       "optional": true
     },
-    "@videojs/hlsjs-video": {
-      "optional": true
-    },
-    "@videojs/mux-audio": {
-      "optional": true
-    },
     "@videojs/mux-data": {
-      "optional": true
-    },
-    "@videojs/mux-video": {
       "optional": true
     },
     "@videojs/playerjs-video": {
@@ -253,13 +235,7 @@
     "@videojs/twitch-video": {
       "optional": true
     },
-    "@videojs/vimeo-video": {
-      "optional": true
-    },
     "@videojs/wistia-video": {
-      "optional": true
-    },
-    "@videojs/youtube-video": {
       "optional": true
     }
   }
