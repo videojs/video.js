@@ -97,9 +97,7 @@ function parseStartTime(url: string): number | null {
 /** @internal */
 export const YOUTUBE_SHORTHAND_SRC = /^youtube\/(?:shorts\/)?([\w-]{11})$/;
 
-/** @internal */
-export const YOUTUBE_VIDEO_SRC =
+const YOUTUBE_VIDEO_SRC =
   /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))((?:\w|-){11})/;
 
-/** @internal */
-export const YOUTUBE_PLAYLIST_SRC = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/.*?[?&]list=)([\w-]+)/;
+const YOUTUBE_PLAYLIST_SRC = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/.*?[?&]list=)([\w-]+)/;

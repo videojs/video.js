@@ -52,5 +52,4 @@ export function parseVimeoSource(src: string): ParsedVimeoSource | null {
 
 /** @internal */
 export const VIMEO_SHORTHAND_SRC = /^vimeo\/(?:video\/)?(\d+)(?:(?:\?hash=|\?h=|\/)([\w-]+))?$/;
-/** @internal */
-export const VIMEO_VIDEO_SRC = /vimeo\.com\/(video\/|event\/)?(\d+)(?:\/([\w-]+))?/;
+const VIMEO_VIDEO_SRC = /vimeo\.com\/(video\/|event\/)?(\d+)(?:\/([\w-]+))?/;
