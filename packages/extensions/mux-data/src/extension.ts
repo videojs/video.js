@@ -2,6 +2,7 @@ import type { ExtensionPlayer, PlayerTarget } from '@videojs/core/dom';
 import { isEngineAdapter, isMediaSourceCapable, type Media } from '@videojs/media';
 import { getMediaAdapter, getMediaElement, getMediaEngineName } from '@videojs/media/dom';
 import { listen } from '@videojs/utils/dom';
+import { isString } from '@videojs/utils/predicate';
 import Mux from 'mux-embed';
 
 import { type MuxDataEngineOptions, toMuxDataEngineOptions } from './engine';
@@ -58,12 +59,14 @@ function engineOf(media: Media): unknown {
 /**
  * The media's source URL as the player sees it. An adapter reports the URL it plays on `src`, not the `blob:` it feeds
  * the element. A plain `<video>` that picks from `<source>` children leaves `src` empty and reports the pick on
- * `currentSrc`; a `blob:` there is a MediaSource handle, not a video, so it does not count.
+ * `currentSrc`; a `blob:` there is a MediaSource handle, not a video, so it does not count. A media with no more source
+ * surface than `src` (the background video) is read from that alone.
  */
 function srcOf(media: Media): string {
-  if (!isMediaSourceCapable(media)) return '';
+  const { src } = media as { src?: unknown };
+  if (isString(src) && src) return src;
 
-  if (media.src) return media.src;
+  if (!isMediaSourceCapable(media)) return '';
 
   return media.currentSrc.startsWith('blob:') ? '' : media.currentSrc;
 }
