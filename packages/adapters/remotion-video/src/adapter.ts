@@ -20,6 +20,8 @@ import { isSameChapters, isSameSource, isSameSubtitles, type RemotionSource, res
  *
  * Frame ↔ time: Remotion counts integer frames at a fixed `fps`, while the media contract speaks seconds. `duration` is
  * `durationInFrames / fps`, `currentTime` is `frame / fps`, and seeks round to the nearest frame.
+ *
+ * @internal
  */
 export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) implements Partial<Video> {
   static readonly defaultProps: RemotionAdapterProps = {

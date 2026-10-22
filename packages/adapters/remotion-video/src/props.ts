@@ -17,6 +17,8 @@ export interface RemotionAdapterProps extends Pick<
 /**
  * The values Remotion exposes as `<Player>` props rather than as `PlayerRef` methods, so the React façade has to render
  * them. It reads this snapshot through `subscribePlayerProps`/`getPlayerProps`.
+ *
+ * @internal
  */
 export interface RemotionPlayerProps {
   source: RemotionSource | null;

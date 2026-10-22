@@ -57,12 +57,18 @@ export interface RemotionChapter {
  *
  * Comparing more than `id` would also make an inline `chapters` or `subtitles` array, rebuilt on every parent render,
  * read as a new source and reset playback.
+ *
+ * @internal
  */
 export function isSameSource(a: RemotionSource, b: RemotionSource) {
   return a.id === b.id;
 }
 
-/** One chapter resolved to the time span it covers, in seconds. */
+/**
+ * One chapter resolved to the time span it covers, in seconds.
+ *
+ * @internal
+ */
 export interface RemotionChapterSpan {
   title: string;
   startTime: number;
@@ -72,6 +78,8 @@ export interface RemotionChapterSpan {
 /**
  * A composition's chapter markers as time spans, in order. A chapter without an explicit `durationInFrames` fills the
  * gap up to the next one, or to the end of the composition.
+ *
+ * @internal
  */
 export function resolveChapterSpans(source: RemotionSource): RemotionChapterSpan[] {
   const { durationInFrames, fps } = source.composition;
@@ -87,7 +95,11 @@ export function resolveChapterSpans(source: RemotionSource): RemotionChapterSpan
   });
 }
 
-/** Whether two chapter lists describe the same scenes, so an equal list rebuilt inline is not republished. */
+/**
+ * Whether two chapter lists describe the same scenes, so an equal list rebuilt inline is not republished.
+ *
+ * @internal
+ */
 export function isSameChapters(a: RemotionSource['chapters'], b: RemotionSource['chapters']) {
   if (a === b) return true;
 
@@ -104,7 +116,11 @@ export function isSameChapters(a: RemotionSource['chapters'], b: RemotionSource[
   });
 }
 
-/** Whether two caption sets describe the same track, so an equal one rebuilt inline is not republished. */
+/**
+ * Whether two caption sets describe the same track, so an equal one rebuilt inline is not republished.
+ *
+ * @internal
+ */
 export function isSameSubtitles(a: RemotionSubtitles | undefined, b: RemotionSubtitles | undefined) {
   if (a === b) return true;
 
