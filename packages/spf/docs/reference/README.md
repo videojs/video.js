@@ -204,7 +204,7 @@ Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf doc
 
 A feature page lists the state keys it declares for the host to write under "External signals", apart from its behaviors; an engine page collects its features' under the same heading.
 
-A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Parts (values) and Types.
+A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Functions and constants, and Types.
 
 A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."
 
