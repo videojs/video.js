@@ -1,6 +1,11 @@
 import { listen } from '@videojs/utils/dom';
 
-/** The element events extensions need from a background video: `loadstart` tells Mux Data the source changed. */
+/**
+ * The element events extensions need from a background video: `loadstart` tells Mux Data the source changed.
+ *
+ * Never `error`: the Media dispatches its own, and React's `<HlsBackgroundVideo>` re-fires that on this same `<video>`,
+ * so forwarding it back would loop until the stack overflows.
+ */
 const FORWARDED_EVENTS = ['loadstart'] as const;
 
 /**
