@@ -1,23 +1,33 @@
 # SPF fundamentals
 
-SPF builds long-lived systems from small behaviors connected by signals. The framework supplies composition, lifecycle, and work primitives; a domain supplies the behaviors and engine adapter.
+SPF builds long-lived systems from small behaviors connected by signals. Features group behaviors into capabilities, and an engine composes features. The framework supplies composition, lifecycle, and work primitives; a domain supplies the behaviors, features, and engine adapter.
 
-Source and tests define exact types and runtime behavior. This guide explains the mental model.
+Source and tests define exact types and runtime behavior. This guide explains the mental model. The [API reference](./reference/README.md) lists every engine, feature, and behavior with the config, state, and context keys each one reads and writes.
 
 ## Behaviors and compositions
 
-A behavior declares the state and context slots it participates in and installs one concern. Its setup may return cleanup or an object with `destroy()`.
+A behavior declares the state and context keys it participates in and installs one concern. Its setup may return cleanup or an object with `destroy()`.
 
-`createComposition()`:
+`createComposition()` manages the behaviors as one lifecycle. It does these four things:
 
-1. creates one signal for every declared slot;
+1. creates one signal for every declared key;
 2. supplies the shared state, context, and immutable configuration to each behavior;
 3. retains every cleanup handle;
-4. destroys all behaviors and clears the signal maps as one lifecycle.
+4. destroys all behaviors and clears the signal maps together.
 
-Type inference intersects the requirements of the behavior tuple. Incompatible slot or configuration types fail at the composition call.
+Type inference intersects the requirements of the behavior tuple. Incompatible state, context, or configuration types fail at the composition call.
 
 Use `defineBehavior()` for ordinary source behaviors. It verifies that runtime key declarations match the typed setup slices.
+
+## Features and engines
+
+A feature is one capability of a composition. It lists the behaviors that implement the capability, with the config defaults and initial state they need. Use `defineFeature()` to declare one.
+
+A feature can depend on another feature's writes. For example, the video feature loads nothing until some feature writes `context.mediaSource`. Each feature's reference page lists what it requires from other features.
+
+An engine is an ordered list of features. `flattenFeatures()` concatenates their behaviors in feature order and merges their `defaultConfig` and `initialState` values. A later feature's value replaces an earlier one's.
+
+`defineCompositionFactory()` turns that behavior list and its defaults into an engine's `createEngine()`. A default fills any config key the caller leaves out or passes as `undefined`, and the key becomes optional in the engine's config type.
 
 ## State, context, and configuration
 
@@ -25,9 +35,9 @@ Use `defineBehavior()` for ordinary source behaviors. It verifies that runtime k
 - **Context** contains owned resources, platform objects, and actor references.
 - **Configuration** contains immutable tuning and replaceable strategies supplied by the engine variant.
 
-Each behavior expresses slot access with `Signal<T>` for values it writes and `ReadonlySignal<T>` for values it only consumes. This is a local ownership contract over shared signal identities.
+Each behavior expresses key access with `Signal<T>` for values it writes and `ReadonlySignal<T>` for values it only consumes. This is a local ownership contract over shared signal identities.
 
-Initial state or context materializes values that no behavior naturally seeds. State and context written from outside the composition that no behavior declares are its external signals, declared with `defineExternalSignals()`.
+Initial state or context materializes values that no behavior naturally seeds. Features contribute initial state, and an engine merges it. State and context written from outside the composition that no behavior declares are its external signals, declared with `defineExternalSignals()`.
 
 ## Signals
 
@@ -80,7 +90,7 @@ The adapter owns platform semantics such as attachment, play activation, and pro
 
 ## Design constraints
 
-- Prefer one writer per resolved state slot; represent external intent separately from automatic policy.
+- Prefer one writer per resolved state key; represent external intent separately from automatic policy.
 - Put browser APIs behind explicit DOM boundaries.
 - Abort source-bound work and release owned resources on source replacement.
 - Use the smallest primitive matching the work.
@@ -88,8 +98,9 @@ The adapter owns platform semantics such as attachment, play activation, and pro
 
 ## Current sources
 
+- API reference: [`packages/spf/docs/reference/`](./reference/README.md), generated from the source JSDoc
 - Public primitives: `packages/spf/src/index.ts`
-- Composition: `packages/spf/src/core/composition/`
+- Composition, including features: `packages/spf/src/core/composition/`
 - Signals, tasks, actors, and reactors: corresponding directories under `packages/spf/src/core/`
 - Tests: colocated `tests/` directories
 - Internal rationale and conventions: `internal/design/spf/`
