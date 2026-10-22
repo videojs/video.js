@@ -47,7 +47,7 @@ describe('HlsBackgroundVideoAdapter', () => {
     expect(media.target).toBeNull();
   });
 
-  it('forwards loadstart from the attached element only', () => {
+  it('forwards events from the attached element only', () => {
     const media = new HlsBackgroundVideoAdapter();
     const first = document.createElement('video');
     const second = document.createElement('video');
@@ -69,5 +69,19 @@ describe('HlsBackgroundVideoAdapter', () => {
     second.dispatchEvent(new Event('loadstart'));
 
     expect(onLoadStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards a type first listened for after attaching, keeping its event class', () => {
+    const media = new HlsBackgroundVideoAdapter();
+    const el = document.createElement('video');
+    const onProgress = vi.fn();
+
+    media.attach(el);
+    media.addEventListener('progress', onProgress);
+    el.dispatchEvent(new ProgressEvent('progress', { loaded: 1 }));
+
+    expect(onProgress).toHaveBeenCalledTimes(1);
+    expect(onProgress.mock.calls[0]![0]).toBeInstanceOf(ProgressEvent);
+    expect(onProgress.mock.calls[0]![0].loaded).toBe(1);
   });
 });
