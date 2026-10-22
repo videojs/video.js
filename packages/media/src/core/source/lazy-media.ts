@@ -5,6 +5,8 @@ import {
   parseSourceUrl,
   resolveMimeType,
 } from './adapter-type';
+import { VIMEO_SHORTHAND_SRC, VIMEO_VIDEO_SRC } from './vimeo';
+import { YOUTUBE_PLAYLIST_SRC, YOUTUBE_SHORTHAND_SRC, YOUTUBE_VIDEO_SRC } from './youtube';
 
 /**
  * A media component `LazyVideo` can resolve a source to, named by its module under `media/`. `video` is the browser's
@@ -110,8 +112,9 @@ export function resolveLazyAudioMedia(
 }
 
 /**
- * `resolveAdapterType` without the service parsers, which are most of its weight. Services match by host or shorthand,
- * and the media they resolve to checks the id itself.
+ * `resolveAdapterType` without the service parsers, which are most of its weight. Services match by host, and YouTube
+ * and Vimeo by the patterns their parsers use, so a URL on their hosts that names no video, such as a direct Vimeo
+ * file, falls through to its file extension.
  */
 function resolveLazyAdapterType(src: string, type: string | undefined): AdapterType | null {
   const source = src.trim();
@@ -121,18 +124,18 @@ function resolveLazyAdapterType(src: string, type: string | undefined): AdapterT
 }
 
 function fromService(src: string): AdapterType | null {
-  if (YOUTUBE_SHORTHAND.test(src)) return 'youtube';
+  if (YOUTUBE_SHORTHAND_SRC.test(src)) return 'youtube';
 
-  if (VIMEO_SHORTHAND.test(src)) return 'vimeo';
+  if (VIMEO_SHORTHAND_SRC.test(src)) return 'vimeo';
 
   const url = parseSourceUrl(src);
+  const service = url && matchServiceHost(url);
+  if (service === 'youtube') return YOUTUBE_VIDEO_SRC.test(src) || YOUTUBE_PLAYLIST_SRC.test(src) ? service : null;
 
-  return url && matchServiceHost(url);
+  if (service === 'vimeo') return VIMEO_VIDEO_SRC.test(src) ? service : null;
+
+  return service;
 }
-
-// The shorthands the YouTube and Vimeo media accept, matched by shape so a path like `youtube/intro.mp4` stays a file.
-const YOUTUBE_SHORTHAND = /^youtube\/(?:shorts\/)?[\w-]{11}(?:[?#]|$)/;
-const VIMEO_SHORTHAND = /^vimeo\/\d+(?:[/?#]|$)/;
 
 function resolveHls<Name extends string>(
   { nativeHls, preferPlayback = 'native' }: ResolveLazyMediaOptions,
