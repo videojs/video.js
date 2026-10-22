@@ -25,6 +25,8 @@ export const CDN_MEDIA_SUBPATHS = [
   'hls-background-video',
   'hls-video',
   'hlsjs-video',
+  'lazy-audio',
+  'lazy-video',
   'mixcloud-audio',
   'mux-audio',
   'mux-audio/hls-js',
