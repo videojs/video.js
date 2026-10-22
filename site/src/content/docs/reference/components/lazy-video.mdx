@@ -29,18 +29,26 @@ Reads `src`, renders the media component that plays it, and loads that component
 ## Import
 
 <FrameworkCase frameworks={["react"]}>
+```bash
+npm install @videojs/react @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video
+```
+
 ```tsx
 import { LazyVideo } from '@videojs/react/media/lazy-video';
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
+```bash
+npm install @videojs/html @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video
+```
+
 ```ts
 import '@videojs/html/media/lazy-video';
 ```
 </FrameworkCase>
 
-The engines it can load install with the framework package. Your bundler splits each into its own chunk, which downloads only when a source needs it.
+Install every engine package listed: your bundler resolves each media component `LazyVideo` can load, so a missing one fails the build. Each engine still lands in its own chunk, which downloads only when a source needs it.
 
 ## Sources
 
