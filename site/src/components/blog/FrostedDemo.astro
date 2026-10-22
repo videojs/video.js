@@ -1,0 +1,170 @@
+---
+import {
+  CaptionsOffIcon,
+  CastEnterIcon,
+  ChevronIcon,
+  FullscreenEnterIcon,
+  GearIcon,
+  PipEnterIcon,
+  SpeechIcon,
+  SpeedIcon,
+  SwitchesIcon,
+} from '@videojs/react/icons';
+import { Image } from 'astro:assets';
+
+import cliffs from '@/assets/blog/2026-10-08-videojs-v10-skin-design/frosted-cosmic-cliffs.webp';
+import ring from '@/assets/blog/2026-10-08-videojs-v10-skin-design/frosted-southern-ring.webp';
+import pillars from '@/assets/blog/2026-10-08-videojs-v10-skin-design/frosted-pillars.webp';
+import Figure from '@/components/typography/Figure.astro';
+import AnimationControls from '@/components/AnimationControls';
+import { buttonStyle, iconStyle, imageSizes, imageWidths } from './demo';
+import './Demo.css';
+
+// Full-resolution sources:
+// https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-image/
+// https://science.nasa.gov/asset/webb/southern-ring-nebula-nircam-image/
+// https://science.nasa.gov/asset/webb/pillars-of-creation-nircam-image/
+interface Props {
+  radii?: boolean;
+}
+
+const { radii = false } = Astro.props;
+const images = radii ? [cliffs] : [cliffs, ring, pillars];
+const rows = [
+  { label: 'Quality', value: 'Auto (2160p)', Icon: SwitchesIcon },
+  { label: 'Audio', value: 'Default', Icon: SpeechIcon },
+  { label: 'Speed', value: '1×', Icon: SpeedIcon },
+  { label: 'Captions', value: 'Off', Icon: CaptionsOffIcon },
+];
+const controls = [CaptionsOffIcon, GearIcon, CastEnterIcon, PipEnterIcon, FullscreenEnterIcon];
+---
+
+<Figure>
+  <blog-frosted-demo class="relative block">
+    <div class="@container overflow-hidden rounded-3xl" role="presentation" aria-hidden="true">
+      <div class="blog-frosted-demo-stage relative isolate overflow-hidden bg-black text-white" style={{ aspectRatio: radii ? '3 / 1' : '768 / 537', fontSize: radii ? '10cqw' : '4cqw', lineHeight: 1.5, '--unit': 'calc(1em / 13)' }}>
+        {images.map((src, index) => (
+          <Image
+            src={src}
+            alt=""
+            widths={imageWidths}
+            sizes={imageSizes}
+            quality={75}
+            class:list={['absolute inset-0 h-full w-full object-cover', !radii && 'frosted-image']}
+            style={{ animationDelay: `${-index * 5}s` }}
+            loading="lazy"
+          />
+        ))}
+        <div
+          class="blog-demo-surface absolute flex flex-col bg-white/10"
+          style={{ ...(radii ? { left: '12%', top: '15%', width: '170%' } : { right: '9%', bottom: '27%', width: '68%' }), borderRadius: 'calc(var(--unit) * 12)', padding: 'calc(var(--unit) * 4)', gap: 'calc(var(--unit) * 2)' }}
+        >
+          {radii && (
+            <svg
+              class="blog-demo-guide pointer-events-none absolute top-0 left-0"
+              style="width: calc(var(--unit) * 26); height: calc(var(--unit) * 26); z-index: 11;"
+              viewBox="0 0 26 26"
+              fill="none"
+              stroke="white"
+              stroke-width="4"
+              stroke-linecap="round"
+            >
+              <path d="M2 24V12A10 10 0 0 1 12 2H24" />
+            </svg>
+          )}
+          {rows.map(({ label, value, Icon }, index) => (
+            <div
+              class:list={['flex items-center', index === 0 && 'bg-orange']}
+              style="gap: calc(var(--unit) * 6); padding: calc(var(--unit) * 6) calc(var(--unit) * 8); border-radius: calc(var(--unit) * 8);"
+            >
+              <Icon style={iconStyle} className={index === 0 ? '' : 'opacity-65'} />
+              <span>{label}</span>
+              <span class="ml-auto inline-flex items-center" style="gap: calc(var(--unit) * 4); padding-left: calc(var(--unit) * 8);">
+                <span class="whitespace-nowrap opacity-65">{value}</span>
+                <ChevronIcon style={{ ...iconStyle, width: 'calc(var(--unit) * 14)', height: 'calc(var(--unit) * 14)' }} className={index === 0 ? '' : 'opacity-65'} />
+              </span>
+            </div>
+          ))}
+        </div>
+        {!radii && (
+        <div
+          class="blog-demo-surface absolute flex items-center rounded-full bg-white/10"
+          style={{ left: '-24%', right: '4%', bottom: '6%', padding: 'calc(var(--unit) * 4)' }}
+        >
+          <div class="flex min-w-0 flex-1 items-center" style="gap: calc(var(--unit) * 10); padding: 0 calc(var(--unit) * 12);">
+            <div class="relative flex-1 overflow-hidden rounded-full bg-white/15" style="height: calc(var(--unit) * 4);">
+              <div class="absolute inset-y-0 left-0 w-1/3 rounded-full bg-white/50" />
+            </div>
+            <span class="whitespace-nowrap tabular-nums">−1:19</span>
+          </div>
+          {controls.map((Icon, index) => (
+            <span
+              class:list={['grid shrink-0 place-items-center rounded-full', index === 1 && 'bg-orange']}
+              style={{ ...buttonStyle, marginLeft: index > 0 ? 'var(--unit)' : undefined }}
+            >
+              <Icon style={iconStyle} className={index === 2 ? 'opacity-40' : ''} />
+            </span>
+          ))}
+        </div>
+        )}
+      </div>
+    </div>
+    {!radii && <AnimationControls playing />}
+  </blog-frosted-demo>
+  <figcaption>
+    {radii
+      ? 'The highlighted inset stays even around the corner: 12px outer radius − 4px padding = 8px inner radius, before zooming.'
+      : 'The same frosted surface over different images. Only the background changes. Images: NASA, ESA, CSA, STScI.'}
+  </figcaption>
+</Figure>
+
+<style>
+  .frosted-image {
+    animation: frosted-image 15s ease infinite;
+  }
+
+  /* Before the script runs, reduced motion leaves the first image showing; the negative delays put it first. */
+  @media (prefers-reduced-motion: reduce) {
+    blog-frosted-demo:not([data-running]) .frosted-image {
+      animation-play-state: paused;
+    }
+  }
+
+  blog-frosted-demo[data-paused] .frosted-image {
+    animation-play-state: paused;
+  }
+
+  @keyframes frosted-image {
+    0%, 26.67%, 100% { opacity: 1; }
+    33.33%, 93.33% { opacity: 0; }
+  }
+</style>
+
+<script>
+  import { connectDemoAnimation } from './demo';
+
+  class FrostedDemo extends HTMLElement {
+    disconnect?: () => void;
+
+    connectedCallback() {
+      if (!this.querySelector('[data-animation-toggle]')) return;
+
+      this.disconnect = connectDemoAnimation(this, {
+        play: () => {
+          this.toggleAttribute('data-running', true);
+          this.removeAttribute('data-paused');
+        },
+        pause: () => {
+          this.removeAttribute('data-running');
+          this.toggleAttribute('data-paused', true);
+        },
+      });
+    }
+
+    disconnectedCallback() {
+      this.disconnect?.();
+    }
+  }
+
+  customElements.define('blog-frosted-demo', FrostedDemo);
+</script>

@@ -356,7 +356,7 @@ logged copy gains a second sentence with no other change. Empty for
   same shape [clusters.md § Multi-writer state slots](./clusters.md#multi-writer-state-slots)
   records for `userTextTrackSelection`.
 
-**Composition** — both `createHlsVideoEngine` and the audio-only
+**Composition** — both the `hls-video` engine and the audio-only
 variant declare the `errors` slot, compose `collectErrors`, and wire
 `reportUnsupportedTrackConditions`. The audio-only variant matters
 because an all-encrypted or all-TS source there has no video to fall
@@ -404,7 +404,7 @@ limitations_).
     exists to survive); does not re-pick after unpinning (the pinning
     contract); nothing reported for a presentation with no video tracks;
     passes everything through with no probe wired
-  - `packages/spf/src/playback/engines/hls/tests/engine-background-video.test.ts`
+  - `packages/spf/src/playback/engines/tests/hls-background-video.test.ts`
     → _errors_ — declares the slot; makes no pick for an unplayable
     container _without_ reporting a verdict (the 1004 cause covers it);
     reports 2011 for a source with no video renditions at all; reports that

@@ -39,7 +39,7 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 |---|---|---|
 | `envKey` | `string` | Mux Data environment key the beacons are sent to. Optional for Mux-hosted playback |
 | `metadata` | `object` | Mux Data metadata for the view |
-| `playerSoftwareName` | `string` | Player name reported to Mux Data |
+| `playerSoftwareName` | `string` | Player name reported to Mux Data. Defaults to `Video.js` |
 | `playerSoftwareVersion` | `string` | Player version reported to Mux Data. Defaults to the Video.js version |
 | `playerInitTime` | `number` | Epoch milliseconds the player was initialized. Defaults to when the player was created |
 | `beaconCollectionDomain` | `string` | Custom domain the beacons are sent to |
@@ -53,7 +53,7 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 |---|---|---|
 | `env-key` | `envKey` | Mux Data environment key the beacons are sent to. Optional for Mux-hosted playback |
 | — | `metadata` | Mux Data metadata for the view |
-| `player-software-name` | `playerSoftwareName` | Player name reported to Mux Data |
+| `player-software-name` | `playerSoftwareName` | Player name reported to Mux Data. Defaults to `Video.js` |
 | `player-software-version` | `playerSoftwareVersion` | Player version reported to Mux Data. Defaults to the Video.js version |
 | `player-init-time` | `playerInitTime` | Epoch milliseconds the player was initialized. Defaults to when the player was created |
 | `beacon-collection-domain` | `beaconCollectionDomain` | Custom domain the beacons are sent to |
@@ -63,6 +63,8 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 
 `metadata` and `MuxDataSdk` take objects, so they're properties only, with no matching attribute. Set them on the element, typed as the `MuxDataExtension` class that `@videojs/html/extensions/mux-data` exports.
 </FrameworkCase>
+
+Views also report the extension itself as the Mux plugin, so they can be told apart from other Video.js integrations such as `videojs-mux`.
 
 Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view and starts a new one. The rest update the view in place.
 

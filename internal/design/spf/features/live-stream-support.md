@@ -20,7 +20,7 @@ without it, live HLS sources don't play correctly.
 
 ## Status
 
-- **Composition:** implemented in `createHlsVideoEngine`. Live HLS
+- **Composition:** implemented in the `hls-video` engine. Live HLS
   plays end-to-end: media playlists reload on a runner-driven schedule,
   the sliding window is declared to the browser via
   `setLiveSeekableRange`, duration is `Infinity`, playback starts near
@@ -171,35 +171,11 @@ under [Open questions § Resolved during implementation](#resolved-during-implem
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — the
-live behaviors compose alongside the VOD ones; live vs VOD is a runtime
-distinction in the *data* (a growing playlist), not a separate engine
-variant:
-
-```ts
-// Resolve selected tracks — now also the live reload loop, driven by
-// the injected `reschedule` seam.
-resolveVideoTrack,
-resolveAudioTrack,
-resolveTextTrack,
-
-// ...
-
-// Establishes the PDT anchor + startMediaTime origin.
-establishStartMediaTime,
-
-// ...
-
-// Performs the live-edge startup seek (shared with AirPlay restore).
-applyStartPosition,
-
-// Live: declare the seekable window, then command the live-edge start
-// position + keep the playhead in-window.
-syncLiveSeekableRange,
-seekToLiveEdge,
-
-endOfStream,
-```
+**Composition:** `liveFeature` (`packages/spf/src/playback/features/live.ts`),
+composed by the `hls-video` engine — the live behaviors compose alongside the VOD ones; live vs
+VOD is a runtime distinction in the *data* (a growing playlist), not a separate engine variant, and
+the feature is inert for on-demand content. It carries the `reschedule` reload seam that
+`resolve*Track` runs on, and `establishStartMediaTime` with the `gateFirstParse` anchor gate.
 
 **Behaviors:**
 

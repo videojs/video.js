@@ -21,7 +21,7 @@ in-place path against regression.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface, cleanup contract,
   and validation test all in place
 - **Cleanup contract** (load-bearing): every behavior that gates on
@@ -67,7 +67,7 @@ distinct engine behavior observable from outside.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — the
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — the
 source-replacement capability isn't owned by any single behavior; it
 emerges from `resolvePresentation`'s 4-state FSM + the cleanup contract
 every presentation-gated behavior honors.
@@ -139,7 +139,7 @@ semantics — every replaced source runs through the same parser.
 ## Verification
 
 - **Unit tests:**
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts` →
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts` →
     `"cleanly replaces source in place via state.presentation overwrite"`
     — end-to-end validation: mock fetch with two sources A and B,
     resolve source A through the full pipeline, capture identities of

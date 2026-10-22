@@ -29,7 +29,7 @@ Use the narrowest relevant test while iterating, then run as appropriate:
 ```bash
 pnpm -F @videojs/spf test
 pnpm -F @videojs/spf build
-pnpm -F @videojs/spf size
+pnpm size
 ```
 
 Load one specialized SPF skill only when the requested workflow needs it.

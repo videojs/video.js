@@ -1,6 +1,6 @@
 {
   "name": "@videojs/google-analytics",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Google Analytics 4 (GA4) telemetry integration for Video.js",
   "keywords": [
     "analytics",

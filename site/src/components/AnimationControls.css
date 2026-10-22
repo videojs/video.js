@@ -1,0 +1,20 @@
+/* Reveal the controls only while their example is hovered or holds focus, so they don't sit over the demo's own UI.
+   Screens without hover keep them visible, since there is no other way to reach them. */
+@media (hover: hover) {
+  .animation-controls {
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+  }
+
+  :hover > .animation-controls,
+  :focus-within > .animation-controls,
+  .animation-controls:has([data-popup-open]) {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animation-controls {
+    transition: none;
+  }
+}

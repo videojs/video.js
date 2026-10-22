@@ -42,7 +42,7 @@
 
 import { isWebKitAirPlayCapable, listen, type WebKitVideoElement } from '@videojs/utils/dom';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { effect } from '../../../core/signals/effect';
