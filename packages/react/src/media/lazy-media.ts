@@ -2,7 +2,7 @@
 
 import { prefersNativeHls } from '@videojs/utils/dom';
 import { noop } from '@videojs/utils/function';
-import { useEffect, useSyncExternalStore } from 'react';
+import { type ComponentType, type LazyExoticComponent, lazy, useEffect, useSyncExternalStore } from 'react';
 
 /**
  * Props shared by `LazyVideo` and `LazyAudio`.
@@ -33,6 +33,19 @@ export interface LazyMediaProps {
 }
 
 let nativeHls: boolean | undefined;
+
+/**
+ * A lazy component for one export of a media module. Call it at module level, so the component keeps its identity
+ * across renders; deriving one during render would remount the media.
+ *
+ * @internal
+ */
+export function lazyMedia<Module>(
+  load: () => Promise<Module>,
+  name: keyof Module
+): LazyExoticComponent<ComponentType<any>> {
+  return lazy(() => load().then((module) => ({ default: module[name] as ComponentType<any> })));
+}
 
 /**
  * Whether HLS plays natively by default here. `undefined` while server rendering and hydrating, so the server and the
