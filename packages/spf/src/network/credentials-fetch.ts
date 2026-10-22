@@ -9,6 +9,15 @@ import type { FetchOptions, Resource } from './fetch';
  */
 export type RequestCredentialsPolicy = RequestCredentials | ((resource: Resource) => RequestCredentials | undefined);
 
+/** The config key every behavior that makes requests reads, declared once so it carries one meaning. */
+export interface RequestCredentialsConfig {
+  /**
+   * The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the
+   * chapters document; absent → the platform default.
+   */
+  requestCredentials?: RequestCredentialsPolicy;
+}
+
 /** Any `Resource`-addressable fetch — `fetchResolvable`, `FetchText`, and `FetchBytes` all qualify. */
 type CredentialableFetch = (addressable: Resource, options?: FetchOptions) => Promise<unknown>;
 

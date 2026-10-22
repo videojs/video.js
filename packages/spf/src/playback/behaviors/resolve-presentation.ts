@@ -5,7 +5,7 @@ import { computed, type ReadonlySignal, type Signal } from '../../core/signals/p
 import { SVTA_PRIMARY_MANIFEST_LOAD_ERROR } from '../../media/errors';
 import { isResolvedPresentation, type MaybeResolvedPresentation, type Presentation } from '../../media/types';
 import { DEFAULT_PRELOAD, isBlockingPreload, type StandardPreload } from '../../media/utils/preload';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
+import { credentialsFetch, type RequestCredentialsConfig } from '../../network/credentials-fetch';
 import { fetchResolvable as defaultFetchResolvable, getResponseText } from '../../network/fetch';
 import { type ErrorEmitterState, emitError } from './collect-errors';
 
@@ -32,7 +32,7 @@ export interface PresentationState {
  */
 export type ParsePresentation = (text: string, presentation: MaybeResolvedPresentation) => Presentation;
 
-export interface ResolvePresentationConfig {
+export interface ResolvePresentationConfig extends RequestCredentialsConfig {
   /**
    * Parses a manifest body into a resolved `Presentation`. **Required** — the behavior is format-neutral and the
    * composing engine supplies its own parser (HLS, DASH, etc.).
@@ -43,8 +43,6 @@ export interface ResolvePresentationConfig {
    * `'metadata'`, matching `syncPreload`'s own `defaultPreload`.
    */
   defaultPreload?: StandardPreload;
-  /** The `credentials` mode the manifest request is made with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
 }
 
 /**

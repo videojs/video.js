@@ -23,7 +23,7 @@ The setup declares `config?`: callers may omit it.
 | `gateFirstParse?` | `GateFirstParse` | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See `TrackSwitchingSharedConfig['getCdnId']`. |
 | `reportUnsupportedTrackConditions?` | `ReportUnsupportedTrackConditions` | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode media-playlist requests are made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
 
@@ -49,7 +49,7 @@ The setup declares `config?`: callers may omit it.
 | `gateFirstParse?` | `GateFirstParse` | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See `TrackSwitchingSharedConfig['getCdnId']`. |
 | `reportUnsupportedTrackConditions?` | `ReportUnsupportedTrackConditions` | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode media-playlist requests are made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
 
@@ -76,7 +76,7 @@ The setup declares `config?`: callers may omit it.
 | `gateFirstParse?` | `GateFirstParse` | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
 | `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See `TrackSwitchingSharedConfig['getCdnId']`. |
 | `reportUnsupportedTrackConditions?` | `ReportUnsupportedTrackConditions` | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode media-playlist requests are made with; absent → the platform default. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
 
