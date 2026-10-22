@@ -93,7 +93,7 @@ export abstract class LazyMediaElement extends HTMLElementBase {
 
   connectedCallback(): void {
     this.#observer ??= new MutationObserver((records) => this.#onMutation(records));
-    this.#observer.observe(this, { attributes: true, childList: true });
+    this.#observer.observe(this, { attributes: true });
 
     if (this.#media) this.#copyAttributes(this.#media);
 
@@ -179,17 +179,14 @@ export abstract class LazyMediaElement extends HTMLElementBase {
     const previous = this.#media;
 
     // Tracks and sources follow the media they belong to.
-    if (next) next.append(...this.#mediaChildren(previous ?? this));
+    if (next) {
+      next.append(...(previous ?? this).querySelectorAll(':scope > track, :scope > source'));
+      this.append(next);
+    }
 
     previous?.remove();
     this.#media = next;
     this.#mediaName = name;
-
-    if (next) this.append(next);
-  }
-
-  #mediaChildren(parent: Element): Element[] {
-    return Array.from(parent.children).filter(isMediaChild);
   }
 
   #copyAttributes(media: HTMLElement): void {
@@ -212,49 +209,34 @@ export abstract class LazyMediaElement extends HTMLElementBase {
     const media = this.#media;
     if (!media) return;
 
-    for (const record of records) {
-      // `src` goes through `#update`, which keeps a URL from reaching a media that can't play it.
-      if (record.type === 'attributes' && record.attributeName !== 'src') {
-        this.#syncAttribute(media, record.attributeName!);
-      }
-
-      if (record.type === 'childList') {
-        for (const node of record.addedNodes) {
-          if (node instanceof Element && isMediaChild(node)) media.append(node);
-        }
-      }
+    // `src` goes through `#update`, which keeps a URL from reaching a media that can't play it.
+    for (const { attributeName } of records) {
+      if (attributeName !== 'src') this.#syncAttribute(media, attributeName!);
     }
   }
-}
-
-function isMediaChild(element: Element): boolean {
-  return element.localName === 'track' || element.localName === 'source';
 }
 
 // `display: contents` lets the skin lay out the resolved media as though it were the slotted child. The native media
 // is styled here because the skin's `::slotted(video)` rule only reaches direct children of the skin. The properties
 // match `VideoCSSVars`, spelled out because importing them would put every custom media element in this chunk. Embed
 // hosts mark themselves `data-cross-origin-frame` and size to their iframe, so they're stretched to fill the player.
-const TEMPLATE = /*html*/ `
-  <style>
-    :host {
-      display: contents;
-    }
+const STYLES = /* css */ `
+  :host {
+    display: contents;
+  }
 
-    ::slotted(video) {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: var(--media-video-border-radius);
-      object-fit: var(--media-object-fit, contain);
-      object-position: var(--media-object-position, center);
-    }
+  ::slotted(video),
+  ::slotted([data-cross-origin-frame]) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 
-    ::slotted([data-cross-origin-frame]) {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
-  <slot></slot>
+  ::slotted(video) {
+    border-radius: var(--media-video-border-radius);
+    object-fit: var(--media-object-fit, contain);
+    object-position: var(--media-object-position, center);
+  }
 `;
+
+const TEMPLATE = `<style>${STYLES}</style><slot></slot>`;
