@@ -52,7 +52,7 @@ export function Navbar({ previewUrl, optionsId }: NavbarProps) {
               href={skin.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Customize skins guide (opens in a new tab)"
+              aria-label="Build your own skin guide (opens in a new tab)"
             />
           }
         >
