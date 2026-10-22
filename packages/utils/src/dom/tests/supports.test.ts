@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import {
-  prefersNativeHls,
+  nativeHlsSupport,
   supportsAnimationFrame,
   supportsConstructableStyleSheets,
   supportsIdleCallback,
@@ -37,7 +37,7 @@ describe('supports', () => {
     });
   });
 
-  describe('prefersNativeHls', () => {
+  describe('nativeHlsSupport', () => {
     function stub({ userAgent, canPlay = true, mse = true }: { userAgent: string; canPlay?: boolean; mse?: boolean }) {
       vi.spyOn(HTMLMediaElement.prototype, 'canPlayType').mockReturnValue(canPlay ? 'maybe' : '');
       vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(userAgent);
@@ -53,30 +53,30 @@ describe('supports', () => {
 
     it('prefers native HLS on Safari, including the iOS browsers built on it', () => {
       stub({ userAgent: SAFARI });
-      expect(prefersNativeHls()).toBe(true);
+      expect(nativeHlsSupport()).toBe('preferred');
 
       stub({ userAgent: IOS_CHROME });
-      expect(prefersNativeHls()).toBe(true);
+      expect(nativeHlsSupport()).toBe('preferred');
     });
 
-    it('prefers MSE where Chromium also reports native HLS', () => {
+    it('only supports native HLS where Chromium also reports it', () => {
       stub({ userAgent: CHROME });
-      expect(prefersNativeHls()).toBe(false);
+      expect(nativeHlsSupport()).toBe('supported');
 
       stub({ userAgent: ANDROID_CHROME });
-      expect(prefersNativeHls()).toBe(false);
+      expect(nativeHlsSupport()).toBe('supported');
     });
 
     it('prefers native HLS wherever there is no MSE to fall back on', () => {
       stub({ userAgent: CHROME, mse: false });
 
-      expect(prefersNativeHls()).toBe(true);
+      expect(nativeHlsSupport()).toBe('preferred');
     });
 
-    it('never prefers native HLS where the browser cannot play it', () => {
+    it('reports no native HLS where the browser cannot play it', () => {
       stub({ userAgent: SAFARI, canPlay: false });
 
-      expect(prefersNativeHls()).toBe(false);
+      expect(nativeHlsSupport()).toBe('unsupported');
     });
   });
 
