@@ -1,20 +1,15 @@
-import { type LazyVideoMediaName, type ResolveLazyMediaOptions, resolveLazyVideoMedia } from '@videojs/media';
-
-import { type LazyMediaDefinitions, LazyMediaElement } from '../lazy-media';
-
-// Each media registers through its own definition module, which loads only once a source needs it.
-const DEFINITIONS: LazyMediaDefinitions<LazyVideoMediaName> = {
-  'native-hls-video': () => import('../../define/media/native-hls-video'),
-  'hlsjs-video': () => import('../../define/media/hlsjs-video'),
-  'dash-video': () => import('../../define/media/dash-video'),
-  'mux-video': () => import('../../define/media/mux-video'),
-  'youtube-video': () => import('../../define/media/youtube-video'),
-  'vimeo-video': () => import('../../define/media/vimeo-video'),
-  'wistia-video': () => import('../../define/media/wistia-video'),
-  'cloudflare-video': () => import('../../define/media/cloudflare-video'),
-  'tiktok-video': () => import('../../define/media/tiktok-video'),
-  'twitch-video': () => import('../../define/media/twitch-video'),
-};
+import { LazyMediaElement } from '../lazy-media';
+import { cloudflareVideo } from './cloudflare-video';
+import { dashVideo } from './dash-video';
+import { hlsjsVideo } from './hlsjs-video';
+import { muxVideo } from './mux-video';
+import { nativeHlsVideo } from './native-hls-video';
+import { tiktokVideo } from './tiktok-video';
+import { twitchVideo } from './twitch-video';
+import { video } from './video';
+import { vimeoVideo } from './vimeo-video';
+import { wistiaVideo } from './wistia-video';
+import { youtubeVideo } from './youtube-video';
 
 /**
  * Plays a video from any supported source by rendering the media element for it, and loads only that element's code
@@ -23,14 +18,23 @@ const DEFINITIONS: LazyMediaDefinitions<LazyVideoMediaName> = {
  * Resolves files to a native `<video>`, HLS to `<native-hls-video>` on Safari and `<hlsjs-video>` elsewhere, DASH to
  * `<dash-video>`, Mux to `<mux-video>`, and YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to
  * their embed elements. Other attributes are passed to the resolved element, so switching to it directly only changes
- * the tag name.
+ * the tag name. Use `createLazyVideoElement` to add your own media or leave some out.
+ *
+ * @experimental
  */
 export class LazyVideo extends LazyMediaElement {
   /** @internal */
-  protected readonly mediaDefinitions = DEFINITIONS;
-
-  /** @internal */
-  protected resolveMedia(src: string, options: ResolveLazyMediaOptions): LazyVideoMediaName | null | undefined {
-    return resolveLazyVideoMedia(src, options);
-  }
+  protected override readonly medias = [
+    video,
+    nativeHlsVideo,
+    hlsjsVideo,
+    dashVideo,
+    muxVideo,
+    youtubeVideo,
+    vimeoVideo,
+    wistiaVideo,
+    cloudflareVideo,
+    tiktokVideo,
+    twitchVideo,
+  ];
 }

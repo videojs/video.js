@@ -1,16 +1,13 @@
-import type { ResolveLazyMediaOptions } from '@videojs/media';
-import { prefersNativeHls } from '@videojs/utils/dom';
+import { findLazyMedia, type LazyMediaMatcher, resolveLazySource } from '@videojs/media';
+import { nativeHlsSupport } from '@videojs/utils/dom';
 
-/**
- * The module that registers each media element a lazy media can resolve to, keyed by its tag name. Built-in elements,
- * such as `video`, have none.
- *
- * @internal
- */
-export type LazyMediaDefinitions<Name extends string> = Record<
-  Exclude<Name, 'video' | 'audio'>,
-  () => Promise<unknown>
->;
+/** A media element `<lazy-video>` or `<lazy-audio>` can render: which sources it plays, and the element that plays them. */
+export interface LazyMediaDefinition extends LazyMediaMatcher {
+  /** Tag name of the element that plays the source. */
+  tag: string;
+  /** Registers the element once a source needs it. Leave it out for built-in or already registered elements. */
+  load?: (() => Promise<unknown>) | undefined;
+}
 
 const HTMLElementBase = globalThis.HTMLElement ?? class {};
 
@@ -25,6 +22,17 @@ const OWN_ATTRIBUTES: ReadonlySet<string> = new Set([
   'prefer-playback',
 ]);
 
+/**
+ * A lazy media element class that chooses from `medias`, tried in order.
+ *
+ * @internal
+ */
+export function createLazyMediaElement(medias: readonly LazyMediaDefinition[]): typeof LazyMediaElement {
+  return class extends LazyMediaElement {
+    protected override readonly medias = medias;
+  };
+}
+
 const LAZY_MEDIA_DOCS_URL = 'https://videojs.org/docs/framework/html/reference/components/lazy-video';
 
 /**
@@ -32,18 +40,18 @@ const LAZY_MEDIA_DOCS_URL = 'https://videojs.org/docs/framework/html/reference/c
  * and renders it as a child with this element's attributes. The child registers itself with the player, as it would if
  * it were written in the page.
  *
- * @internal
+ * @experimental
  */
-export abstract class LazyMediaElement extends HTMLElementBase {
+export class LazyMediaElement extends HTMLElementBase {
   static get observedAttributes(): string[] {
     return ['src', 'type', 'prefer-playback'];
   }
 
   #media: HTMLElement | null = null;
-  // The media `#media` is; it trails `#name` while the next media loads.
-  #mediaName: string | null = null;
+  // The definition `#media` comes from; it trails `#definition` while the next media loads.
+  #mediaDefinition: LazyMediaDefinition | null = null;
   // `undefined` until the first resolution, so a first `null` still counts as a change.
-  #name: string | null | undefined = undefined;
+  #definition: LazyMediaDefinition | null | undefined = undefined;
   #token = 0;
   #updateQueued = false;
   #observer: MutationObserver | null = null;
@@ -67,22 +75,26 @@ export abstract class LazyMediaElement extends HTMLElementBase {
   }
 
   /**
-   * Playback path for HLS: `'native'` (default) on Safari and wherever there is no MSE, or `'mse'` to always load an
-   * engine.
+   * Playback path for HLS: `'native'` uses the browser's own HLS support wherever it has one, and `'mse'` always loads
+   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere.
    */
-  get preferPlayback(): 'native' | 'mse' {
-    return this.getAttribute('prefer-playback') === 'mse' ? 'mse' : 'native';
+  get preferPlayback(): 'native' | 'mse' | undefined {
+    const value = this.getAttribute('prefer-playback');
+
+    return value === 'native' || value === 'mse' ? value : undefined;
   }
 
-  set preferPlayback(value: 'native' | 'mse') {
-    this.setAttribute('prefer-playback', value);
+  set preferPlayback(value: 'native' | 'mse' | undefined) {
+    if (value) this.setAttribute('prefer-playback', value);
+    else this.removeAttribute('prefer-playback');
   }
 
-  /** @internal */
-  protected abstract readonly mediaDefinitions: Partial<Record<string, () => Promise<unknown>>>;
-
-  /** @internal */
-  protected abstract resolveMedia(src: string, options: ResolveLazyMediaOptions): string | null | undefined;
+  /**
+   * The media to choose from, tried in order.
+   *
+   * @internal
+   */
+  protected readonly medias: readonly LazyMediaDefinition[] = [];
 
   constructor() {
     super();
@@ -124,22 +136,25 @@ export abstract class LazyMediaElement extends HTMLElementBase {
     if (!this.isConnected) return;
 
     const src = this.src;
-    const name = this.resolveMedia(src, {
+    const source = resolveLazySource(src, {
       type: this.type || undefined,
-      nativeHls: prefersNativeHls(),
       preferPlayback: this.preferPlayback,
+      nativeHls: nativeHlsSupport(),
     });
+    const definition = findLazyMedia(this.medias, source);
+    // A media that can't tell yet is asked again on the next change.
+    if (definition === undefined) return;
 
     // The same media plays the new source, so it only needs the URL. One still loading reads it once created.
-    if (name === this.#name) {
-      if (this.#media && this.#mediaName === name) this.#syncAttribute(this.#media, 'src');
+    if (definition === this.#definition) {
+      if (this.#media && this.#mediaDefinition === definition) this.#syncAttribute(this.#media, 'src');
 
       return;
     }
 
-    this.#name = name;
+    this.#definition = definition;
 
-    if (!name) {
+    if (!definition) {
       this.#token++;
       this.#setMedia(null, null);
 
@@ -153,17 +168,16 @@ export abstract class LazyMediaElement extends HTMLElementBase {
       return;
     }
 
-    void this.#load(name);
+    void this.#load(definition);
   }
 
-  // The media's name is its tag name.
-  async #load(name: string): Promise<void> {
+  async #load(definition: LazyMediaDefinition): Promise<void> {
     const token = ++this.#token;
 
     try {
-      await this.mediaDefinitions[name]?.();
+      await definition.load?.();
     } catch (error) {
-      if (__DEV__) console.error(`[${this.localName}] Failed to load <${name}>.`, error);
+      if (__DEV__) console.error(`[${this.localName}] Failed to load <${definition.tag}>.`, error);
 
       return;
     }
@@ -171,13 +185,13 @@ export abstract class LazyMediaElement extends HTMLElementBase {
     // A newer source took over while this one loaded.
     if (token !== this.#token) return;
 
-    const media = document.createElement(name);
+    const media = document.createElement(definition.tag);
 
     this.#copyAttributes(media);
-    this.#setMedia(media, name);
+    this.#setMedia(media, definition);
   }
 
-  #setMedia(next: HTMLElement | null, name: string | null): void {
+  #setMedia(next: HTMLElement | null, definition: LazyMediaDefinition | null): void {
     const previous = this.#media;
 
     // Tracks and sources follow the media they belong to, and wait on this element while there's none.
@@ -192,7 +206,7 @@ export abstract class LazyMediaElement extends HTMLElementBase {
 
     previous?.remove();
     this.#media = next;
-    this.#mediaName = name;
+    this.#mediaDefinition = definition;
   }
 
   #copyAttributes(media: HTMLElement): void {
