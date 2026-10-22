@@ -33,6 +33,7 @@ describe('SSR-safe define imports', () => {
 
   it('imports extensions without browser-only globals', async () => {
     await expect(import('../extensions/google-cast')).resolves.toBeDefined();
+    await expect(import('../extensions/media-woofer')).resolves.toBeDefined();
     await expect(import('../extensions/mux-data')).resolves.toBeDefined();
   });
 });

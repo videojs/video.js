@@ -184,6 +184,7 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/media-woofer": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
@@ -204,6 +205,7 @@
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/media-woofer": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
@@ -227,6 +229,9 @@
       "optional": true
     },
     "@videojs/hlsjs-video": {
+      "optional": true
+    },
+    "@videojs/media-woofer": {
       "optional": true
     },
     "@videojs/mux-audio": {

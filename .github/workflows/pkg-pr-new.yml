@@ -138,6 +138,7 @@ jobs:
           './packages/adapters/dash-video'
           './packages/extensions/google-cast'
           './packages/adapters/hlsjs-video'
+          './packages/extensions/media-woofer'
           './packages/adapters/mux-audio'
           './packages/extensions/mux-data'
           './packages/adapters/mux-video'

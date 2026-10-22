@@ -33,6 +33,7 @@
     { "path": "packages/adapters/youtube-video" },
 
     { "path": "packages/extensions/google-cast" },
+    { "path": "packages/extensions/media-woofer" },
     { "path": "packages/extensions/mux-data" },
 
     { "path": "packages/core" },

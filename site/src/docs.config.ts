@@ -223,8 +223,13 @@ export const sidebar: Sidebar = [
       },
       {
         sidebarLabel: 'Extensions',
-        llmsDescription: 'API reference for extensions that connect external services to the player.',
-        contents: [{ slug: 'reference/components/google-cast' }, { slug: 'reference/components/mux-data' }],
+        llmsDescription:
+          'API reference for extensions that connect external services to the player or add behavior to it.',
+        contents: [
+          { slug: 'reference/components/google-cast' },
+          { slug: 'reference/components/media-woofer' },
+          { slug: 'reference/components/mux-data' },
+        ],
       },
       {
         sidebarLabel: 'Buttons',

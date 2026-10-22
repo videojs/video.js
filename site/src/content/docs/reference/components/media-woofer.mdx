@@ -1,0 +1,60 @@
+---
+title: MediaWoofer
+frameworkTitle:
+  html: media-woofer
+description: Options for the media woofer extension that shakes the media along with the bass
+stability: unstable
+apis:
+  - MediaWooferExtension
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import ExtensionImports from '@/components/docs/api-reference/ExtensionImports.astro';
+
+Adds the media woofer <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches. While the media plays, the media element shakes on every hit of bass, and phones that support the [Vibration API](https://developer.mozilla.org/en-US/docs/Web/API/Vibration_API) vibrate with it.
+
+## Import
+
+<ExtensionImports extension="media-woofer" package="@videojs/media-woofer" react="MediaWoofer" />
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MediaWoofer />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-woofer></media-woofer>
+```
+</FrameworkCase>
+
+## Options
+
+<FrameworkCase frameworks={["react"]}>
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `threshold` | `number` | `248` | Level, from 0 to 255, the lowest frequency bands must pass to count as bass. Lower values shake more often |
+| `vibration` | `number` | `100` | Milliseconds a phone vibrates on each hit of bass. `0` turns vibration off |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Attribute | Property | Default | Description |
+|---|---|---|---|
+| `threshold` | `threshold` | `248` | Level, from 0 to 255, the lowest frequency bands must pass to count as bass. Lower values shake more often |
+| `vibration` | `vibration` | `100` | Milliseconds a phone vibrates on each hit of bass. `0` turns vibration off |
+</FrameworkCase>
+
+## Audio access
+
+The extension reads the media's sound with the [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), which reroutes the element's audio through an audio graph for as long as the element exists. To keep playback audible, it only does so when the browser lets audio run and the sound is readable:
+
+- It starts on the first play after a user gesture. Until the browser allows audio, the media plays untouched.
+- Cross-origin media needs the `crossorigin` attribute and CORS headers. Without them the browser hides the sound from Web Audio, so the extension leaves that media alone.
+
+Once an element's audio is routed through the graph, it stays routed. A cross-origin source loaded into the same element later without CORS plays silently.
+
+The shake is skipped when the user prefers reduced motion; vibration still applies.

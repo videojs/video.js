@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vite-plus/test';
 const referenceDirectory = resolve(process.cwd(), 'src/content/docs/reference/components');
 const extensions = [
   { file: 'google-cast.mdx', extension: 'google-cast', react: 'GoogleCast' },
+  { file: 'media-woofer.mdx', extension: 'media-woofer', react: 'MediaWoofer' },
   { file: 'mux-data.mdx', extension: 'mux-data', react: 'MuxData' },
 ];
 

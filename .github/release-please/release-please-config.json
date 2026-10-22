@@ -23,6 +23,7 @@
         "@videojs/icons",
         "@videojs/installation",
         "@videojs/media",
+        "@videojs/media-woofer",
         "@videojs/mux-audio",
         "@videojs/mux-data",
         "@videojs/mux-video",
@@ -80,6 +81,9 @@
     },
     "packages/media": {
       "component": "@videojs/media"
+    },
+    "packages/extensions/media-woofer": {
+      "component": "@videojs/media-woofer"
     },
     "packages/adapters/mux-audio": {
       "component": "@videojs/mux-audio"

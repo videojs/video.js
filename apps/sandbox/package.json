@@ -22,6 +22,7 @@
     "@videojs/html": "workspace:*",
     "@videojs/icons": "workspace:*",
     "@videojs/media": "workspace:*",
+    "@videojs/media-woofer": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",

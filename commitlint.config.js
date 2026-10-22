@@ -42,6 +42,7 @@ export default {
         'dash-video',
         'google-cast',
         'hlsjs-video',
+        'media-woofer',
         'mux-audio',
         'mux-data',
         'mux-video',
