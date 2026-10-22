@@ -407,14 +407,40 @@ function readersOf(behaviors: BehaviorInfo[], key: string): BehaviorInfo[] {
   return behaviors.filter((info) => info.config.some((row) => row.key === key));
 }
 
-/** The config field doc the first reader with one gives. */
-function configDoc(readers: BehaviorInfo[], key: string): DocBlock | undefined {
-  for (const reader of readers) {
-    const row = reader.config.find((candidate) => candidate.key === key);
-    if (row?.doc.text) return row.doc;
-  }
+/**
+ * The config field doc for a key and the behavior it comes from: the first of `readers`, then of the rest of `pool`,
+ * whose doc does not defer to another type's field for the key, else the first reader's. A doc that points at
+ * `Type['key']` (`See …`, `Semantics on …`) leaves the key's meaning to that field, which another reader owns.
+ */
+function configDoc(
+  readers: BehaviorInfo[],
+  pool: BehaviorInfo[],
+  key: string
+): { doc: DocBlock; from: BehaviorInfo } | undefined {
+  const pointer = new RegExp(`(?:[Ss]ee|Semantics on)\\s+\`\\w+\\['${key}'\\]\``);
+  const docs = [...readers, ...readersOf(pool, key).filter((info) => !readers.includes(info))].flatMap((from) => {
+    const doc = from.config.find((row) => row.key === key)?.doc;
 
-  return undefined;
+    return doc?.text ? [{ doc, from }] : [];
+  });
+
+  return docs.find(({ doc }) => !pointer.test(doc.text)) ?? docs[0];
+}
+
+/** A config key's doc cell, naming the behavior the doc comes from when it is not one of `readers`. */
+function configDocCell(
+  reference: ReferenceProgram,
+  model: Model,
+  page: string,
+  readers: BehaviorInfo[],
+  key: string
+): string {
+  const found = configDoc(readers, docPool(model), key);
+  if (!found) return NO_DESCRIPTION;
+
+  const lender = readers.includes(found.from) ? '' : ` (documented on ${behaviorLink(reference, page, found.from)})`;
+
+  return `${docCell(found.doc)}${lender}`;
 }
 
 function slotOf(info: BehaviorInfo, slot: 'state' | 'context', key: string): SlotRow | undefined {
@@ -607,14 +633,13 @@ function featureConfigTable(
     const value = feature.defaults.find((candidate) => candidate.key === key);
     const readers = defaultReaders(model, feature, key);
     const type = field?.type ?? value?.type ?? readers[0]?.config.find((row) => row.key === key)?.type;
-    const doc = configDoc(readers, key);
 
     return [
       code(field ? (field.optional ? `${key}?` : key) : key),
       type ? long.cell(key, 'type', type) : '—',
       value ? valueCell(long, key, 'default', value) : '—',
       behaviorLinks(reference, page, readers),
-      doc ? docCell(doc) : NO_DESCRIPTION,
+      configDocCell(reference, model, page, readers, key),
     ];
   });
 
@@ -666,7 +691,12 @@ function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: F
   ]);
 }
 
-function engineConfigTable(reference: ReferenceProgram, page: string, engine: EngineInfo): string | undefined {
+function engineConfigTable(
+  reference: ReferenceProgram,
+  model: Model,
+  page: string,
+  engine: EngineInfo
+): string | undefined {
   if (engine.config.length === 0) return undefined;
 
   const long = new LongCells();
@@ -677,7 +707,6 @@ function engineConfigTable(reference: ReferenceProgram, page: string, engine: En
       .find((feature) => feature.defaults.some((value) => value.key === field.key));
     const value = supplier?.defaults.find((candidate) => candidate.key === field.key);
     const readers = readersOf(engine.behaviors, field.key);
-    const doc = configDoc(readers, field.key);
 
     return [
       code(field.optional ? `${field.key}?` : field.key),
@@ -685,7 +714,7 @@ function engineConfigTable(reference: ReferenceProgram, page: string, engine: En
       value ? valueCell(long, field.key, 'default', value) : '—',
       supplier ? link(page, supplier.entry.page!, supplier.name) : '—',
       behaviorLinks(reference, page, readers),
-      doc ? docCell(doc) : NO_DESCRIPTION,
+      configDocCell(reference, model, page, readers, field.key),
     ];
   });
 
@@ -709,7 +738,7 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     engine.state,
     engine.features
   );
-  const config = engineConfigTable(reference, page, engine);
+  const config = engineConfigTable(reference, model, page, engine);
   const state = slotFieldsTable(
     reference,
     model,
