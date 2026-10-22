@@ -82,14 +82,18 @@ retry-exhaustion, pipeline producers) are not.
   the deleted draft's per-type unanimity check, which is also what
   removed the need for a cause to be `trackType`-tagged to be usable.
 - **Error vocabulary:** SVTA 2070 codes are the internal
-  representation, not an outbound mapping. A code is a single integer,
-  so `svtaCategory` / `svtaIndex` decompose the 4- and 5-digit forms
-  uniformly and the spec's inconsistent zero-padding is a non-issue.
-  One code is ours: the spec defines only `99000` (Unknown) in the
-  custom category and leaves the rest to the publisher, so 99001 is the
-  first we define. It needs no special-casing — every standard category
-  is below 8000 and custom starts at 99000, so the arithmetic
-  decomposition still holds.
+  representation, not an outbound mapping, and the standard codes are
+  imported from `@svta/cml-error-codes` (the spec's reference
+  implementation) rather than transcribed here. A code is a single
+  integer, so CML's `getSvtaErrorCategory` / `getSvtaErrorIndex`,
+  re-exported alongside the codes, decompose the 4- and 5-digit forms
+  uniformly and the spec's inconsistent zero-padding is a
+  non-issue. One code is ours: the spec defines only `99000` (Unknown)
+  in the custom category and leaves the rest to the publisher, so 99001
+  is the first we define and the only one `errors.ts` still declares.
+  It needs no special-casing — every standard category is below 8000
+  and custom starts at 99000, so the arithmetic decomposition still
+  holds.
 - **Remaining producer placeholders.** `resolve-presentation.ts`
   (`TODO(error-management)`) and `resolve-track.ts`'s swallowed resolve
   rejection are still unreported — phase 6, deliberately, because a
@@ -213,15 +217,22 @@ producers, not this feature):**
 
 ## Implementation surface
 
-**Vocabulary** — `packages/spf/src/media/errors.ts`. Signal-free and
-DOM-free, so the codes are usable from any layer: `SvtaError`
-(`{ code, message?, data? }`), the code constants
+**Vocabulary** — the standard codes are `@svta/cml-error-codes`
+exports, re-exported through `packages/spf/src/media/errors.ts` so
+that module is the only place SPF imports CML
 (`SVTA_UNSUPPORTED_VIDEO_FORMAT` 1004, `SVTA_UNSUPPORTED_AUDIO_FORMAT`
 1005, `SVTA_NO_SUPPORTED_VIDEO_TRACK` 2011,
 `SVTA_NO_SUPPORTED_AUDIO_TRACK` 2012, `SVTA_UNSUPPORTED_DRM_SYSTEM`
-4008, `SVTA_UNSUPPORTED_ENCRYPTION_METHOD` 99408,
-`SVTA_UNSUPPORTED_PLAYBACK_FEATURE` 99001), and `svtaCategory` /
-`svtaIndex`.
+4008, and the content-protection codes the DRM feature reports: 4003,
+4004, 4007, 4010, 4013, 4014, 4016, 4021). The same module holds what
+CML doesn't ship: `SvtaError` (`{ code, message?, data? }`), the
+publisher-defined `SVTA_UNSUPPORTED_PLAYBACK_FEATURE` 99001 and
+`SVTA_UNSUPPORTED_ENCRYPTION_METHOD` 99408. CML's `getSvtaErrorCategory`
+/ `getSvtaErrorIndex` are re-exported with the codes and reach
+`@videojs/spf/hls` under those names. Signal-free and DOM-free, so
+usable from any layer.
+`@svta/cml-utils` is declared alongside because CML imports a type from
+it; nothing of it reaches the runtime output.
 
 **Custom-code convention (`99CII`)** — SVTA 2070 leaves the whole `99xxx`
 category to the publisher (defining only `99000`). Custom codes mirror the
@@ -233,8 +244,8 @@ non-DRM sibling — the cause reported when a source is `identity`-keyformat
 decryptor for but is not a DRM key system (see
 [clear-key-aes](./clear-key-aes.md)). It joins `UNSUPPORTED_FEATURE_CAUSES`, so
 the adapter still surfaces `99001`. General, cross-category custom codes (the
-`99001` surface itself) stay in `990XX`; `svtaCategory` / `svtaIndex` decompose
-either by arithmetic alone.
+`99001` surface itself) stay in `990XX`; `getSvtaErrorCategory` /
+`getSvtaErrorIndex` decompose either by arithmetic alone.
 
 **Behaviors:**
 
@@ -375,9 +386,12 @@ limitations_).
 ## Verification
 
 - **Unit tests:**
-  - `packages/spf/src/media/tests/errors.test.ts` → `svtaCategory` /
-    `svtaIndex` — decomposition of the 4-digit native and 5-digit
-    external forms, including the 0999 fully-unknown code
+  - `packages/spf/src/media/tests/errors.test.ts` → `getSvtaErrorCategory` /
+    `getSvtaErrorIndex` — decomposition of the 4-digit native and 5-digit
+    external forms, including the 0999 fully-unknown code, and the
+    `undefined` CML answers for inputs the spec doesn't assign;
+    `SVTA_UNSUPPORTED_PLAYBACK_FEATURE` — stays in the publisher range
+    above 99000
   - `packages/spf/src/playback/behaviors/tests/collect-errors.test.ts` →
     `emitError` — append order across reporters, duplicates kept (a
     repeat is a real observation), array replaced rather than mutated so
@@ -552,10 +566,13 @@ settled against.
   published 2026-07-08 and its own §Target implementation recommends
   players _map to_ it rather than refactor onto it. Adopting it
   internally means spec revisions become internal-contract revisions.
-  It also has at least one concrete ambiguity to pin: §Approach
-  describes a category-unknown network error as `0300` while the error
-  index table implies category 3 / index 000, so zero-padding and
-  width are underspecified.
+  Importing the codes from `@svta/cml-error-codes` narrows this to a
+  dependency bump: a revision lands upstream first, and the package's
+  semver says whether a name or value moved. It also has at least one
+  concrete ambiguity to pin: §Approach describes a category-unknown
+  network error as `0300` while the error index table implies category
+  3 / index 000, so zero-padding and width are underspecified — moot
+  for integer codes, which CML also exposes as integers.
 - **Per-source reset semantics.** Both sibling mixins clear `error` per
   source (`emptied`, `MEDIA_DETACHED`). SPF's equivalent is the
   resolved/unresolved presentation cascade, which
@@ -591,9 +608,12 @@ settled against.
   at the adapter, or a `MediaError` subclass carrying both codes is still
   open. Until then every unmapped code resolves to the generic fallback
   (see _Known limitations_).
-- **SVTA version pinning.** What "we target SVTA 2070" means when the
-  spec revises — pin a revision, or track and migrate? Interacts with
-  the zero-padding ambiguity above.
+- **SVTA version pinning.** Answered at the dependency level: the codes
+  come from `@svta/cml-error-codes`, pinned by caret to a `0.x` release,
+  so a spec revision reaches SPF as a deliberate bump and the package's
+  changelog says what moved. Still open: what a bump that renames or
+  renumbers a code SPF reports means for consumers reading
+  `error.code`, since the value is the contract.
 - **Unknown-code fallbacks.** When a producer knows the category but
   not the specific error, SVTA reserves category-000; fully unknown is 0999. Whether SPF ever legitimately emits these, or whether an
   unmapped error is a bug.
@@ -722,6 +742,12 @@ Kept for traceability.
   §Principles 5–6 (Stateless, Partial), §Stacking error codes,
   §Error category, §Error index, §Target implementation (translation
   sub-component)
+- [`@svta/cml-error-codes`](https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/error-codes)
+  — the spec's reference implementation and the source of every
+  standard code SPF reports. Its
+  [RFC](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/error-codes.md)
+  records the naming (adopted from this feature's first cut) and the
+  spec errata found while transcribing the tables
 - [PRD: Video.js v10 `<MuxVideo>` and Legacy Formats](https://app.notion.com/p/38f97a7f89d080979189db5d688f7e74)
   — _Error Notices_ is the motivating requirement; _Considered
   solutions_ covers why feature-support detection (not just CMAF vs TS)

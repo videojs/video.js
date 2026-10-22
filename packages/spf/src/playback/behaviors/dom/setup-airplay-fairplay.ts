@@ -72,7 +72,7 @@ import { listenForEncryptedInitData, openLicenseSession } from '../../../media/d
 import {
   SVTA_DRM_CERTIFICATE_ERROR,
   SVTA_DRM_INITIALIZATION_ERROR,
-  SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
+  SVTA_LICENSE_REQUEST_GENERATION_ERROR,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   type SvtaError,
 } from '../../../media/errors';
@@ -376,7 +376,7 @@ function setupAirPlayFairPlaySetup({
 
             if (!isAirPlayGenerateRequestRefusal(error, mediaElement) || !supportsWebKitFairPlay(mediaElement)) {
               report({
-                code: SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
+                code: SVTA_LICENSE_REQUEST_GENERATION_ERROR,
                 data: { keySystem: fairPlayAirPlayKeySystem.keySystem, reason: String(error) },
               });
               return;

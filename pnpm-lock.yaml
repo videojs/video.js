@@ -1251,6 +1251,12 @@ importers:
 
   packages/spf:
     dependencies:
+      '@svta/cml-error-codes':
+        specifier: ^0.1.1
+        version: 0.1.2(@svta/cml-utils@1.6.2)
+      '@svta/cml-utils':
+        specifier: ^1.6.1
+        version: 1.6.2
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
@@ -5109,6 +5115,12 @@ packages:
     peerDependencies:
       '@svta/cml-utils': 1.5.0
 
+  '@svta/cml-error-codes@0.1.2':
+    resolution: {integrity: sha512-q1xL8W9JR0Yj7h2kAyRWqb7iT7UlOb/rXMDSVpY5EcXUR5w0zHfl22YG4+dYVqtV9XpoIxhp+nXSqZkTo3TSTg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@svta/cml-utils': ^1.6.2
+
   '@svta/cml-id3@1.0.6':
     resolution: {integrity: sha512-63j8gkAnPOmOBWlp0hIZPvsIioZttdbg6/TgwITqMYbSLYVJ+6QGa/UtIP0I84NsfstANw6QdCn7i8SS08kn1A==}
     engines: {node: '>=20'}
@@ -5131,6 +5143,10 @@ packages:
 
   '@svta/cml-utils@1.5.0':
     resolution: {integrity: sha512-JMqclD7Akd+GSJiuaYNUHOP2wNtf/nauKeszlYeivSHfi0Lp3pmSW5PXDvJ2dO4aPmmSOQbF0ztTsW9Vcs2Whw==}
+    engines: {node: '>=20'}
+
+  '@svta/cml-utils@1.6.2':
+    resolution: {integrity: sha512-sJ4C70TSf7LmpaBGKK4NpbWWDiQE5ojqVjxsCZ1yDf6x6oj4bObuxC8525+SJAe4EHUfueVAR1I+kDavZmIAzg==}
     engines: {node: '>=20'}
 
   '@svta/cml-xml@1.1.4':
@@ -11928,17 +11944,17 @@ snapshots:
       nanostores: 1.1.1
       react: 19.3.0
 
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
-    dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -13090,7 +13106,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.17':
@@ -13625,6 +13641,10 @@ snapshots:
     dependencies:
       '@svta/cml-utils': 1.5.0
 
+  '@svta/cml-error-codes@0.1.2(@svta/cml-utils@1.6.2)':
+    dependencies:
+      '@svta/cml-utils': 1.6.2
+
   '@svta/cml-id3@1.0.6(@svta/cml-utils@1.5.0)':
     dependencies:
       '@svta/cml-utils': 1.5.0
@@ -13640,6 +13660,8 @@ snapshots:
       '@svta/cml-utils': 1.5.0
 
   '@svta/cml-utils@1.5.0': {}
+
+  '@svta/cml-utils@1.6.2': {}
 
   '@svta/cml-xml@1.1.4(@svta/cml-utils@1.5.0)':
     dependencies:

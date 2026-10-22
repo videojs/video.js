@@ -14,11 +14,11 @@ import { listen } from '@videojs/utils/dom';
 import { type DrmSystemConfig, type KeySystemModule, resolveDrmCredentials, resolveDrmHeaders } from '../drm';
 import {
   SVTA_BAD_LICENSE_REQUEST,
-  SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
-  SVTA_DRM_LICENSE_RESPONSE_REJECTED,
   SVTA_DRM_SESSION_ERROR,
   SVTA_INSUFFICIENT_OUTPUT_PROTECTION,
   SVTA_LICENSE_EXPIRED,
+  SVTA_LICENSE_REQUEST_GENERATION_ERROR,
+  SVTA_LICENSE_RESPONSE_REJECTED,
   type SvtaError,
 } from '../errors';
 import { applyLicenseRequest, applyLicenseResponse, fetchDrm } from './eme';
@@ -176,7 +176,7 @@ export function openLicenseSession({
     } catch (error) {
       if (signal.aborted) return;
 
-      report({ code: SVTA_DRM_LICENSE_RESPONSE_REJECTED, data: { keySystem, reason: String(error) } });
+      report({ code: SVTA_LICENSE_RESPONSE_REJECTED, data: { keySystem, reason: String(error) } });
     }
   };
 
@@ -198,7 +198,7 @@ export function openLicenseSession({
       return;
     }
 
-    report({ code: SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED, data: { keySystem, reason: String(error) } });
+    report({ code: SVTA_LICENSE_REQUEST_GENERATION_ERROR, data: { keySystem, reason: String(error) } });
   });
 
   return session;
