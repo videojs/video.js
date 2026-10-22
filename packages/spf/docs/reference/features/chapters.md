@@ -42,8 +42,8 @@ hidden `chapters` text track per language.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/chapters.ts](../../../src/playback/features/chapters.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/chapters.ts](../../../src/playback/features/chapters.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/chapters.ts](../../../src/playback/features/chapters.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/chapters.ts](../../../src/playback/features/chapters.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/chapters.ts](../../../src/playback/features/chapters.ts) |
 
 ## Types
 

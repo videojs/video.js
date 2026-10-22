@@ -30,8 +30,8 @@ Collects the errors the other features report into `state.errors`, per source. W
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/error.ts](../../../src/playback/features/error.ts) |
 
 ## Types
 

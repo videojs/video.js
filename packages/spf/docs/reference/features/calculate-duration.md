@@ -39,7 +39,7 @@ no duration is set.
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ resolveDuration: getResolvedSelectedTrackDuration }`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/calculate-duration.ts](../../../src/playback/features/calculate-duration.ts) |
 
 ## Types
 

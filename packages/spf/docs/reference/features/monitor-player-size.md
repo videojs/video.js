@@ -41,8 +41,8 @@ resolution cap reads the size and does nothing without it.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/monitor-player-size.ts](../../../src/playback/features/monitor-player-size.ts) |
 
 ## Types
 

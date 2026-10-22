@@ -44,8 +44,8 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/airplay-fairplay.ts](../../../src/playback/features/airplay-fairplay.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/airplay-fairplay.ts](../../../src/playback/features/airplay-fairplay.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/airplay-fairplay.ts](../../../src/playback/features/airplay-fairplay.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/airplay-fairplay.ts](../../../src/playback/features/airplay-fairplay.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/airplay-fairplay.ts](../../../src/playback/features/airplay-fairplay.ts) |
 
 ## Types
 

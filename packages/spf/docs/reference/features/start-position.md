@@ -37,8 +37,8 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/start-position.ts](../../../src/playback/features/start-position.ts) |
 
 ## Types
 

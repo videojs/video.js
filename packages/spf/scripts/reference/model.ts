@@ -657,6 +657,8 @@ export interface DefaultValue {
   readerDeclarations: readonly ts.Declaration[];
   /** The key's type in the `satisfies` type, when the clause covers it. */
   type: string | undefined;
+  /** The first sentence of the followed same-file `const`'s JSDoc, which names what the value means. */
+  note: string | undefined;
 }
 
 export interface FeatureInfo {
@@ -730,7 +732,7 @@ function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): 
   const checked = satisfiesType(checker, symbol);
   const values: DefaultValue[] = [];
 
-  const describe = (key: string, text: string): DefaultValue => {
+  const describe = (key: string, text: string, note?: string): DefaultValue => {
     const field = checked?.getProperty(key);
 
     return {
@@ -738,6 +740,7 @@ function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): 
       text,
       readerDeclarations: field?.declarations ?? [],
       type: field ? printPropertyType(checker, field) : undefined,
+      note,
     };
   };
 
@@ -748,7 +751,15 @@ function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): 
       ts.isPropertyAssignment(property) &&
       (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name))
     ) {
-      values.push(describe(property.name.text, printDefault(checker, property.initializer, literal.getSourceFile())));
+      const file = literal.getSourceFile();
+
+      values.push(
+        describe(
+          property.name.text,
+          printDefault(checker, property.initializer, file),
+          defaultNote(checker, property.initializer, file)
+        )
+      );
     } else {
       throw new Error(`Unsupported defaultConfig entry: ${property.getText()}`);
     }
@@ -766,21 +777,35 @@ export function exportedLiteral(symbol: ts.Symbol): string | undefined {
 
 /** An identifier naming a `const` of the same file prints as that const's initializer, one level down. */
 function printDefault(checker: ts.TypeChecker, expression: ts.Expression, file: ts.SourceFile): string {
-  if (ts.isIdentifier(expression)) {
-    const symbol = checker.getSymbolAtLocation(expression);
-    const declaration = symbol && declarationOf(symbol);
+  const declaration = sameFileConst(checker, expression, file);
 
-    if (
-      declaration &&
-      ts.isVariableDeclaration(declaration) &&
-      declaration.initializer &&
-      declaration.getSourceFile() === file
-    ) {
-      return printExpression(unwrapAssertions(declaration.initializer));
-    }
-  }
+  return printExpression(declaration ? unwrapAssertions(declaration.initializer!) : expression);
+}
 
-  return printExpression(expression);
+/** The JSDoc of the same-file `const` that `printDefault` follows, since printing its initializer drops its name. */
+function defaultNote(checker: ts.TypeChecker, expression: ts.Expression, file: ts.SourceFile): string | undefined {
+  const declaration = sameFileConst(checker, expression, file);
+  const symbol = declaration && checker.getSymbolAtLocation(declaration.name);
+
+  return firstSentence(docOf(checker, symbol)).replace(/\.$/, '') || undefined;
+}
+
+function sameFileConst(
+  checker: ts.TypeChecker,
+  expression: ts.Expression,
+  file: ts.SourceFile
+): ts.VariableDeclaration | undefined {
+  if (!ts.isIdentifier(expression)) return undefined;
+
+  const symbol = checker.getSymbolAtLocation(expression);
+  const declaration = symbol && declarationOf(symbol);
+
+  return declaration &&
+    ts.isVariableDeclaration(declaration) &&
+    declaration.initializer &&
+    declaration.getSourceFile() === file
+    ? declaration
+    : undefined;
 }
 
 function arrayElements(symbol: ts.Symbol | undefined, what: string): ts.Expression[] {

@@ -36,8 +36,8 @@ audio and video end at slightly different times. Inert otherwise.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/end-stall-recovery.ts](../../../src/playback/features/end-stall-recovery.ts) |
 
 ## Types
 

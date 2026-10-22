@@ -56,7 +56,7 @@ The feature declares these state keys for code outside the engine to write; no b
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/airplay.ts](../../../src/playback/features/airplay.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ attachMediaSource: attachMediaSourceAsSourceElement }`. | [src/playback/features/airplay.ts](../../../src/playback/features/airplay.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/airplay.ts](../../../src/playback/features/airplay.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/airplay.ts](../../../src/playback/features/airplay.ts) |
 
 ## Types
 

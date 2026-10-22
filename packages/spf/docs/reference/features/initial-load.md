@@ -49,8 +49,8 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/initial-load.ts](../../../src/playback/features/initial-load.ts) |
 
 ## Types
 
