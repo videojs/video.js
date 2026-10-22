@@ -312,7 +312,7 @@ function otherExports(
   const types = rows.filter((row) => TYPE_KINDS.has(row[1]!));
 
   return section([
-    parts.length ? '## Additional functions and constants' : undefined,
+    parts.length ? '## Other functions and constants' : undefined,
     parts.length ? table(headers, parts) : undefined,
     types.length ? '## Types' : undefined,
     types.length ? table(headers, types) : undefined,
@@ -320,7 +320,7 @@ function otherExports(
   ]);
 }
 
-/** Export kinds listed under "Types"; every other kind lists under "Additional functions and constants". */
+/** Export kinds listed under "Types"; every other kind lists under "Other functions and constants". */
 const TYPE_KINDS = new Set(['type', 'interface', 'enum']);
 
 /**
@@ -992,7 +992,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
       `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/engines/*\`), their features (\`${reference.packageName}/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
       'A feature page lists the state keys it declares for the host to write under "External signals", apart from its behaviors; an engine page collects its features\' under the same heading.',
-      "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Additional functions and constants, and Types.",
+      "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Other functions and constants, and Types.",
       'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
       'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell says which one it is documented on.',
     ]),

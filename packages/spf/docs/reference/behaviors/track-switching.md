@@ -168,7 +168,7 @@ The setup declares `config?`: callers may omit it.
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. |
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
