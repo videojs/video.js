@@ -21,8 +21,9 @@ export interface MuxDataExtensionProps {
 }
 
 /**
- * The UI framework that registered the extension, named in the default player software name. `reactnative` is one word
- * so every default name splits into `videojs`, framework, and engine.
+ * The UI framework that registered the extension, named in the default player software name. Each is one word, so
+ * `reactnative` too: the first two hyphens split off `videojs` and the framework, and the rest is the engine, which may
+ * be hyphenated (`spf-hls-audio`).
  *
  * @internal
  */

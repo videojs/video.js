@@ -113,8 +113,11 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       src: '',
     };
 
-    /** Engine this media plays through, reported to analytics such as Mux Data. */
-    static readonly engineName: string = 'spf';
+    /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-background-video`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-background-video';
 
     #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;

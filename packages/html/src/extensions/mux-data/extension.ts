@@ -82,7 +82,7 @@ export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBas
 
   /**
    * Player software name reported to Mux Data (e.g. `mux-video`). Defaults to `videojs-html-<engine>`, where the engine
-   * is the one playing: `hlsjs`, `spf`, `shaka`, `dashjs`, or `browser`.
+   * is the one playing, such as `hlsjs`, `spf-hls-video`, `shaka`, `dashjs`, or `browser`.
    */
   get playerSoftwareName(): string | undefined {
     return this.extension.playerSoftwareName;
