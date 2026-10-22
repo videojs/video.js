@@ -81,7 +81,7 @@ During server rendering, files render their `<video>`. HLS renders nothing until
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children move into that element. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to.
+Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children present when the media is created move into it; add later ones to the media element directly. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to.
 </FrameworkCase>
 
 ## Examples

@@ -85,16 +85,6 @@ describe('LazyVideo', () => {
     expect(element.querySelector('hlsjs-video > track')).not.toBeNull();
   });
 
-  it('moves tracks added later into the media', async () => {
-    const element = create({ src: '/movie.mp4' });
-
-    await flush();
-    element.append(document.createElement('track'));
-    await flush();
-
-    expect(element.querySelector('video > track')).not.toBeNull();
-  });
-
   it('removes the media and reports a source it cannot resolve', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const element = create({ src: '/movie.mp4' });
