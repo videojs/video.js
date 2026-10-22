@@ -53,11 +53,21 @@ describe('resolveLazyVideoMedia', () => {
     ['vimeo/76979871?hash=8272103f6e', 'vimeo-video'],
     ['https://player.vimeo.com/video/76979871?h=8272103f6e', 'vimeo-video'],
     ['https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M', 'mux-video'],
+    ['https://fast.wistia.net/embed/iframe/e4a27b971d', 'wistia-video'],
+    ['https://example.com/page?wvideo=e4a27b971d', 'wistia-video'],
+    ['https://watch.videodelivery.net/5d5bc37ffcf54c9b82e996823bffbb81', 'cloudflare-video'],
+    [
+      'https://customer-abc123.cloudflarestream.com/5d5bc37ffcf54c9b82e996823bffbb81/manifest/video.m3u8',
+      'cloudflare-video',
+    ],
+    ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok-video'],
+    ['https://www.twitch.tv/videos/2175470236', 'twitch-video'],
+    ['https://www.twitch.tv/monstercat', 'twitch-video'],
   ])('matches the service shorthand or host %s to %s', (src, expected) => {
     expect(resolveLazyVideoMedia(src, { nativeHls: false })).toBe(expected);
   });
 
-  it('plays a file or manifest on a YouTube or Vimeo host that names no video by its extension', () => {
+  it('plays a media file on an embed host as that file', () => {
     const progressive =
       'https://player.vimeo.com/progressive_redirect/playback/123456/rendition/720p/file.mp4?loc=external';
 
@@ -65,7 +75,7 @@ describe('resolveLazyVideoMedia', () => {
     expect(resolveLazyVideoMedia('https://player.vimeo.com/external/123456.m3u8?s=abc', { nativeHls: false })).toBe(
       'hlsjs-video'
     );
-    expect(resolveLazyVideoMedia('https://www.youtube.com/about', { nativeHls: false })).toBeNull();
+    expect(resolveLazyVideoMedia('https://embed.wistia.com/deliveries/abc.mp4', { nativeHls: false })).toBe('video');
   });
 
   it('treats a path that only looks like a shorthand as a file', () => {
@@ -73,11 +83,11 @@ describe('resolveLazyVideoMedia', () => {
     expect(resolveLazyVideoMedia('vimeo/trailer.mp4', { nativeHls: false })).toBe('video');
   });
 
-  it('returns null for services outside the supported set', () => {
-    expect(resolveLazyVideoMedia('https://fast.wistia.net/embed/iframe/e4a27b971d', { nativeHls: false })).toBeNull();
+  it('returns null for sources no video media plays', () => {
     expect(
       resolveLazyVideoMedia('https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M', { nativeHls: false })
     ).toBeNull();
+    expect(resolveLazyVideoMedia('https://streamable.com/e/moo', { nativeHls: false })).toBeNull();
     expect(resolveLazyVideoMedia('', { nativeHls: false })).toBeNull();
   });
 });
@@ -85,6 +95,8 @@ describe('resolveLazyVideoMedia', () => {
 describe('resolveLazyAudioMedia', () => {
   it.each<[string, LazyAudioMediaName]>([
     [MUX, 'mux-audio'],
+    ['https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5', 'spotify-audio'],
+    ['spotify:track:1301WleyT98MSxVHPZCA6M', 'spotify-audio'],
     ['/song.mp3', 'audio'],
     ['/movie.mp4', 'audio'],
   ])('resolves %s to %s', (src, expected) => {
