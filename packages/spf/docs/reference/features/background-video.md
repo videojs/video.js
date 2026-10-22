@@ -67,7 +67,7 @@ Requires, from this or other features:
 
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

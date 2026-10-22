@@ -51,7 +51,7 @@ Requires:
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
