@@ -45,8 +45,28 @@ describe('resolveLazyVideoMedia', () => {
     expect(resolveLazyVideoMedia(src, { nativeHls: false, type: 'application/x-mpegURL' })).toBe('hlsjs-video');
   });
 
+  it.each<[string, LazyVideoMediaName]>([
+    ['youtube/aqz-KE-bpKQ', 'youtube-video'],
+    ['youtube/shorts/aqz-KE-bpKQ', 'youtube-video'],
+    ['https://youtu.be/aqz-KE-bpKQ', 'youtube-video'],
+    ['vimeo/76979871', 'vimeo-video'],
+    ['vimeo/76979871?hash=8272103f6e', 'vimeo-video'],
+    ['https://player.vimeo.com/video/76979871?h=8272103f6e', 'vimeo-video'],
+    ['https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M', 'mux-video'],
+  ])('matches the service shorthand or host %s to %s', (src, expected) => {
+    expect(resolveLazyVideoMedia(src, { nativeHls: false })).toBe(expected);
+  });
+
+  it('treats a path that only looks like a shorthand as a file', () => {
+    expect(resolveLazyVideoMedia('youtube/intro.mp4', { nativeHls: false })).toBe('video');
+    expect(resolveLazyVideoMedia('vimeo/trailer.mp4', { nativeHls: false })).toBe('video');
+  });
+
   it('returns null for services outside the supported set', () => {
     expect(resolveLazyVideoMedia('https://fast.wistia.net/embed/iframe/e4a27b971d', { nativeHls: false })).toBeNull();
+    expect(
+      resolveLazyVideoMedia('https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M', { nativeHls: false })
+    ).toBeNull();
     expect(resolveLazyVideoMedia('', { nativeHls: false })).toBeNull();
   });
 });
