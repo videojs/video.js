@@ -52,7 +52,7 @@ audio constraints. Compose it after the features that set the plain versions, su
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

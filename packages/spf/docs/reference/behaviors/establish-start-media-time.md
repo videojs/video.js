@@ -46,7 +46,7 @@ The setup declares `config` as required.
 | `selectedAudioTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (documented on [switchAudioTrack](track-switching.md#switchaudiotrack)) |
 | `selectedVideoTrackId` | reads | reads if present | `string \| undefined` | `EstablishStartMediaTimeState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

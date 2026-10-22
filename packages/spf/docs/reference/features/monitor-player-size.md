@@ -36,7 +36,7 @@ resolution cap reads the size and does nothing without it.
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
