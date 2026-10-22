@@ -56,4 +56,4 @@ The setup declares `config` as required.
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
-| `LoadChaptersConfig` | type | The chapters track for `preferredSubtitleLanguage` leads, when the document titles chapters in it. | [src/playback/behaviors/dom/load-chapters.ts](../../../../src/playback/behaviors/dom/load-chapters.ts) |
+| `LoadChaptersConfig` | type | Config of `loadChapters`, which leads with the chapters track in `preferredSubtitleLanguage` when there is one. | [src/playback/behaviors/dom/load-chapters.ts](../../../../src/playback/behaviors/dom/load-chapters.ts) |
