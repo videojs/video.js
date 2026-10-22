@@ -106,7 +106,7 @@ describe('LazyVideo', () => {
     const element = create({ src: '/movie.mp4' });
 
     await flush();
-    element.setAttribute('src', 'https://fast.wistia.net/embed/iframe/e4a27b971d');
+    element.setAttribute('src', 'https://streamable.com/e/moo');
     await flush();
 
     expect(element.children).toHaveLength(0);
