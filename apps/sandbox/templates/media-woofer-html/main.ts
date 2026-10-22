@@ -1,6 +1,6 @@
 import '@app/styles.css';
 // Media woofer sandbox: the player shakes along with the bass once playback starts from a click.
-// http://localhost:5173/html-media-woofer/?source=hls-5 (a bass-heavy trailer)
+// http://localhost:5173/media-woofer-html/?source=hls-5 (a bass-heavy trailer)
 import '@videojs/html/video/player';
 import '@videojs/html/media/hls-video';
 import '@videojs/html/extensions/media-woofer';
