@@ -57,6 +57,26 @@ class FakeShakaAdapter extends FakeAdapter {
   static readonly engineName: string = 'shaka';
 }
 
+/**
+ * Shaped like the SPF background-video Media: no `HTMLMediaAdapter`, just the element as `target`, a `src`, an SPF
+ * engine, and the element's `loadstart` forwarded. No `currentSrc`, `readyState`, or `load()`.
+ */
+class FakeBackgroundVideoMedia extends EventTarget {
+  static readonly engineName: string = 'spf-hls-background-video';
+  readonly engine = {};
+  src = '';
+  #target: HTMLVideoElement | null = null;
+
+  get target() {
+    return this.#target;
+  }
+
+  attach(target: HTMLVideoElement) {
+    this.#target = target;
+    target.addEventListener('loadstart', () => this.dispatchEvent(new Event('loadstart')));
+  }
+}
+
 /** Shaped like an hls.js instance, class statics included. */
 class FakeHlsJsEngine {
   static Events = { MANIFEST_LOADED: 'hlsManifestLoaded' };
@@ -374,6 +394,38 @@ describe('MuxDataExtension', () => {
     await settle();
 
     expect(monitor).not.toHaveBeenCalled();
+  });
+
+  it('monitors a background video through the element it fronts', async () => {
+    const { sdk, monitor, emit } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key' });
+    const media = new FakeBackgroundVideoMedia();
+    const video = document.createElement('video');
+
+    data.framework = 'html';
+
+    media.src = 'https://stream.mux.com/abc123.m3u8';
+    media.attach(video);
+    data.attach({ media: media as any, container: null });
+
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      video,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          player_software_name: 'videojs-html-spf-hls-background-video',
+          video_id: 'abc123',
+        }),
+      })
+    );
+
+    media.src = 'https://stream.mux.com/def456.m3u8';
+    video.dispatchEvent(new Event('loadstart'));
+
+    await settle();
+
+    expect(emit).toHaveBeenCalledWith('videochange', expect.objectContaining({ video_id: 'def456' }));
   });
 
   it('keeps the monitor across a same-source loadstart', async () => {
