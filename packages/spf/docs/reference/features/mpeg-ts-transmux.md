@@ -42,13 +42,13 @@ None.
 - [@videojs/spf/engines/hls-video-mpeg-ts](../engines/hls-video-mpeg-ts.md)
 - [@videojs/spf/engines/hls-background-video-mpeg-ts](../engines/hls-background-video-mpeg-ts.md)
 
-## Parts
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The feature composes no behaviors of its own: it reconfigures the track features' loaders and probes. Listed under [Behaviors](#behaviors). | [src/playback/features/mpeg-ts-transmux.ts](../../../src/playback/features/mpeg-ts-transmux.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: see value below. | [src/playback/features/mpeg-ts-transmux.ts](../../../src/playback/features/mpeg-ts-transmux.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/mpeg-ts-transmux.ts](../../../src/playback/features/mpeg-ts-transmux.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/mpeg-ts-transmux.ts](../../../src/playback/features/mpeg-ts-transmux.ts) |
 
 ## Types
 

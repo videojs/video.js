@@ -29,13 +29,13 @@ None.
 
 - [@videojs/spf/engines/hls-audio-mpeg-ts](../engines/hls-audio-mpeg-ts.md)
 
-## Parts
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The feature composes no behaviors of its own: it reconfigures the audio feature's loader and probes. Listed under [Behaviors](#behaviors). | [src/playback/features/mpeg-ts-audio-transmux.ts](../../../src/playback/features/mpeg-ts-audio-transmux.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: see value below. | [src/playback/features/mpeg-ts-audio-transmux.ts](../../../src/playback/features/mpeg-ts-audio-transmux.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/mpeg-ts-audio-transmux.ts](../../../src/playback/features/mpeg-ts-audio-transmux.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/mpeg-ts-audio-transmux.ts](../../../src/playback/features/mpeg-ts-audio-transmux.ts) |
 
 ## Types
 

@@ -85,7 +85,7 @@ each MPEG-TS segment transmuxed to fMP4 on the client. The Mux background-video 
 | `videoBufferActor` | `SourceBufferActor \| undefined` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. |
 | `videoSegmentLoaderActor` | `SegmentLoaderActor \| undefined` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
 
-## Parts
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
