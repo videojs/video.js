@@ -65,8 +65,6 @@ Add only the origins for the providers you use. Extend `script-src` with their s
 
 For Cloudflare, use `https://iframe.videodelivery.net` unless your source URL names a customer origin. In that case, replace `<code>` with your customer code.
 
-SoundCloud resolves `on.soundcloud.com` short links through its oEmbed endpoint. If you narrow `connect-src` and use short links, allow `https://soundcloud.com`.
-
 The Wistia SDK bundled with Video.js normally renders its player in the page and can fall back to an iframe. It loads scripts and media data from `fast.wistia.com` and `fast.wistia.net`. If you narrow `connect-src`, keep both origins.
 
 The table covers entry scripts and embed frames. Provider SDKs can request additional resources. Test your selected media under your policy, check the browser's CSP violations, and allow the exact origins those requests need.

@@ -13,7 +13,6 @@ import {
   buildSoundCloudWidgetUrl,
   type ParsedSoundCloudSource,
   parseSoundCloudSource,
-  resolveSoundCloudShortLink,
   type SoundCloudSource,
   wantsSoundCloudAutoplay,
 } from './source';
@@ -59,9 +58,9 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #target: HTMLIFrameElement | null = null;
   // Cancels the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
   #listeners: AbortController | null = null;
-  // Guards messages and short link resolutions across attach/detach cycles.
+  // Guards messages across attach/detach cycles.
   #attachId = 0;
-  // Lets a `load()` waiting out its microtask, or a short link, drop out once a newer load begins.
+  // Lets a `load()` waiting out its microtask drop out once a newer load begins.
   #loadId = 0;
   // An iframe URL rendered before the host had a source, which the first load keeps instead of reloading.
   #adoptedSrc: string | null = null;
@@ -201,7 +200,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#resetState();
     // `emptied` announces that reset before the bails below, where the widget reports nothing further.
     this.dispatchEvent(new Event('emptied'));
-    this.#loadWidget(target, loadId);
+    this.#loadWidget(target);
   }
 
   get paused() {
@@ -404,7 +403,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     const rendered = target.getAttribute('src');
 
     if (!rendered) {
-      if (this.#src) this.#loadWidget(target, ++this.#loadId);
+      if (this.#src) this.#loadWidget(target);
 
       return;
     }
@@ -420,7 +419,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     if (this.#src) void this.load();
   }
 
-  #loadWidget(target: HTMLIFrameElement, loadId: number) {
+  #loadWidget(target: HTMLIFrameElement) {
     const parsed = parseSoundCloudSource(this.#src);
 
     this.#parsed = parsed;
@@ -443,39 +442,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
       return;
     }
 
-    if (parsed.kind !== 'short-link') {
-      this.#navigate(target, buildSoundCloudWidgetUrl(parsed.url, parsed, this.#snapshotProps()));
-      return;
-    }
-
-    target.removeAttribute('src');
-
-    const attachId = this.#attachId;
-
-    resolveSoundCloudShortLink(parsed.url).then(
-      (resolved) => {
-        if (attachId !== this.#attachId || loadId !== this.#loadId) return;
-
-        if (!resolved) {
-          this.#fail(
-            new MediaError(
-              `SoundCloud does not know the short link ${parsed.url}`,
-              MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
-            )
-          );
-          return;
-        }
-
-        this.#navigate(target, buildSoundCloudWidgetUrl(resolved, parsed, this.#snapshotProps()));
-      },
-      () => {
-        if (attachId !== this.#attachId || loadId !== this.#loadId) return;
-
-        this.#fail(
-          new MediaError(`Could not resolve the SoundCloud short link ${parsed.url}`, MediaError.MEDIA_ERR_NETWORK)
-        );
-      }
-    );
+    this.#navigate(target, buildSoundCloudWidgetUrl(parsed.url, parsed, this.#snapshotProps()));
   }
 
   #navigate(target: HTMLIFrameElement, url: string) {
@@ -497,7 +464,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
   #buildWidgetUrl(): string {
     const parsed = parseSoundCloudSource(this.#src);
-    if (!parsed || parsed.kind === 'short-link') return '';
+    if (!parsed) return '';
 
     return buildSoundCloudWidgetUrl(parsed.url, parsed, this.#snapshotProps());
   }

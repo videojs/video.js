@@ -58,15 +58,6 @@ describe('parseSoundCloudSource', () => {
     );
   });
 
-  it('parses a short link without resolving it', () => {
-    expect(parseSoundCloudSource('https://on.soundcloud.com/9zRpu')).toEqual({
-      kind: 'short-link',
-      url: 'https://on.soundcloud.com/9zRpu',
-      startTime: null,
-      params: {},
-    });
-  });
-
   it('parses a widget embed URL, keeping its parameters', () => {
     expect(parseSoundCloudSource(widgetUrl(SET, '&color=%23ff5500&visual=true&start_track=2'))).toEqual({
       kind: 'playlist',
@@ -110,7 +101,7 @@ describe('parseSoundCloudSource', () => {
     ['an api URN for another collection', 'https://api.soundcloud.com/tracks/soundcloud:playlists:1'],
     ['a widget embed URL without a url', 'https://w.soundcloud.com/player/?color=ff5500'],
     ['a widget embed URL nested in another', widgetUrl(widgetUrl(TRACK))],
-    ['a short link with a path', 'https://on.soundcloud.com/9zRpu/extra'],
+    ['a short link', 'https://on.soundcloud.com/9zRpu'],
     ['another domain', 'https://example.com/forss/flickermood'],
     ['a lookalike domain', 'https://soundcloud.com.example.com/forss/flickermood'],
     ['a non-http URL', 'ftp://soundcloud.com/forss/flickermood'],

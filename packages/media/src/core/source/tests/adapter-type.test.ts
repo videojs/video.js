@@ -22,7 +22,6 @@ describe('resolveAdapterType', () => {
     ['spotify:episode:7makk4oTQel546B0PZlDM5', 'spotify'],
     ['https://soundcloud.com/forss/flickermood', 'soundcloud'],
     ['https://soundcloud.com/forss/sets/soulhack', 'soundcloud'],
-    ['https://on.soundcloud.com/9zRpu', 'soundcloud'],
     ['https://api.soundcloud.com/tracks/293', 'soundcloud'],
     ['https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fforss%2Fflickermood', 'soundcloud'],
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
@@ -99,6 +98,7 @@ describe('resolveAdapterType', () => {
     ['a TikTok short link', 'https://vm.tiktok.com/ZMabc123/'],
     ['a Twitch clip', 'https://clips.twitch.tv/SomeClipSlug'],
     ['a SoundCloud profile', 'https://soundcloud.com/forss'],
+    ['a SoundCloud short link', 'https://on.soundcloud.com/9zRpu'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
   ])('returns null for %s', (_, src) => {
     expect(resolveAdapterType(src)).toBe(null);

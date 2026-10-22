@@ -1,10 +1,9 @@
 /**
- * What a SoundCloud source plays. A `short-link` (`on.soundcloud.com/<code>`) names a track or a set too, but only
- * SoundCloud knows which until it is resolved.
+ * What a SoundCloud source plays.
  *
  * @internal
  */
-export type SoundCloudSourceKind = 'track' | 'playlist' | 'short-link';
+export type SoundCloudSourceKind = 'track' | 'playlist';
 
 /**
  * Parsed pieces of a SoundCloud source URL.
@@ -15,8 +14,7 @@ export interface ParsedSoundCloudSource {
   kind: SoundCloudSourceKind;
   /**
    * The URL the widget's `url` parameter takes: a `soundcloud.com` permalink or an `api.soundcloud.com` resource,
-   * without the fragment and the query parameters SoundCloud adds for tracking. A secret token stays in it. For a short
-   * link, the short link itself, which has to be resolved before the widget can play it.
+   * without the fragment and the query parameters SoundCloud adds for tracking. A secret token stays in it.
    */
   url: string;
   /** Start position in seconds parsed from a `#t=` fragment. */
@@ -29,9 +27,9 @@ export interface ParsedSoundCloudSource {
  * Parse a SoundCloud source URL. Recognizes track and set permalinks (`soundcloud.com/<user>/<track>`,
  * `soundcloud.com/<user>/sets/<set>`, each with an optional `/s-<token>` secret segment), `m.soundcloud.com` links,
  * `api.soundcloud.com/tracks/<id>` and `api.soundcloud.com/playlists/<id>` resources (the id may be a
- * `soundcloud:tracks:<id>` URN, with an optional `secret_token`), `on.soundcloud.com/<code>` short links, and widget
- * embed URLs (`w.soundcloud.com/player/?url=...`), whose other parameters are kept. A `#t=` fragment sets the start
- * position, in seconds (`90`), clock time (`1:30`), or units (`1m30s`).
+ * `soundcloud:tracks:<id>` URN, with an optional `secret_token`), and widget embed URLs
+ * (`w.soundcloud.com/player/?url=...`), whose other parameters are kept. A `#t=` fragment sets the start position, in
+ * seconds (`90`), clock time (`1:30`), or units (`1m30s`).
  *
  * @internal
  */
@@ -62,12 +60,6 @@ function parseResourceUrl(url: URL, params: Record<string, string>): ParsedSound
   const host = url.hostname;
   const segments = url.pathname.split('/').filter(Boolean);
   const startTime = parseStartTime(url.hash);
-
-  if (host === SHORT_LINK_HOST) {
-    if (segments.length !== 1 || !SLUG.test(segments[0]!)) return null;
-
-    return { kind: 'short-link', url: `https://${SHORT_LINK_HOST}/${segments[0]}`, startTime, params };
-  }
 
   if (host === API_HOST) {
     const [collection, resource] = segments;
@@ -173,7 +165,6 @@ function parseUrl(src: string): URL | null {
 
 const WIDGET_HOST = 'w.soundcloud.com';
 const WIDGET_PATH = /^\/player\/?$/;
-const SHORT_LINK_HOST = 'on.soundcloud.com';
 const API_HOST = 'api.soundcloud.com';
 const PERMALINK_HOSTS = new Set(['soundcloud.com', 'www.soundcloud.com', 'm.soundcloud.com']);
 

@@ -16,10 +16,6 @@ describe('SoundCloudAudio', () => {
     expect(iframeSrcOf(SoundCloudAudio.getTemplateHTML({ src: TRACK }))).toBe(buildSoundCloudIframeSrc(TRACK));
   });
 
-  it('renders no widget for a short link, which the media resolves first', () => {
-    expect(iframeSrcOf(SoundCloudAudio.getTemplateHTML({ src: 'https://on.soundcloud.com/9zRpu' }))).toBe(null);
-  });
-
   // Asserted against the template because no DOM implementation the tests run in resolves `:host` for a computed
   // style, which is also how the sibling embed hosts check theirs.
   it('hides the widget unless it is showing as controls, and leaves it taking input when it shows', () => {
