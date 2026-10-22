@@ -41,8 +41,8 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
-| `defaultConfig` | const | The config defaults the feature contributes. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
+| `defaultConfig` | const | The config defaults the feature contributes. It contributes none (`{}`). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/current-time.ts](../../../src/playback/features/current-time.ts) |
 
 ## Types
 
