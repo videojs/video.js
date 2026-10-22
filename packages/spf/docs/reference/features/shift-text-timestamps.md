@@ -32,7 +32,7 @@ None.
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/shift-text-timestamps.ts](../../../src/playback/features/shift-text-timestamps.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ textMessagePipelines: relocatingTextPipelines }`. | [src/playback/features/shift-text-timestamps.ts](../../../src/playback/features/shift-text-timestamps.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/shift-text-timestamps.ts](../../../src/playback/features/shift-text-timestamps.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/shift-text-timestamps.ts](../../../src/playback/features/shift-text-timestamps.ts) |
 
 ## Types
 

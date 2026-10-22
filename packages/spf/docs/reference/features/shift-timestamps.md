@@ -40,7 +40,7 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/shift-timestamps.ts](../../../src/playback/features/shift-timestamps.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ deriveStartMediaTime: deriveSharedMinStartMediaTime, videoMessagePipelines: relocationPipelinesFor('video'), audioMessagePipelines: relocationPipelinesFor('audio') }`. | [src/playback/features/shift-timestamps.ts](../../../src/playback/features/shift-timestamps.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/shift-timestamps.ts](../../../src/playback/features/shift-timestamps.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/shift-timestamps.ts](../../../src/playback/features/shift-timestamps.ts) |
 
 ## Types
 

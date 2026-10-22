@@ -154,6 +154,13 @@ class LongCells {
   }
 }
 
+/** A default or initial value, led by what it means when its source names that in JSDoc. */
+function valueCell(long: LongCells, key: string, what: string, value: DefaultValue): string {
+  const cell = long.cell(key, what, value.text);
+
+  return value.note ? `${value.note} (${cell})` : cell;
+}
+
 /** A collapsed block GitHub renders from `<details>`; the blank lines keep Markdown active inside it. */
 function details(summary: string, parts: string[]): string {
   return [`<details>`, `<summary>${summary}</summary>`, '', ...parts.flatMap((part) => [part, '']), '</details>'].join(
@@ -292,7 +299,11 @@ function otherExports(
       roles,
       firstSentence(doc),
       listed ? `Listed under [${listed}](#${anchor(listed)}).` : undefined,
-      literal ? `Its value: ${long.cell(exported.name, 'value', literal)}.` : undefined,
+      literal === '{}'
+        ? `${EMPTY_VALUES.get(exported.name) ?? 'It is empty'} (\`{}\`).`
+        : literal
+          ? `Its value: ${long.cell(exported.name, 'value', literal)}.`
+          : undefined,
     ].filter(Boolean);
 
     rows.push([
@@ -319,6 +330,12 @@ function otherExports(
     long.render(),
   ]);
 }
+
+/** What an empty `defaultConfig` or `initialState` means, said in words instead of the bare `{}`. */
+const EMPTY_VALUES = new Map([
+  ['defaultConfig', 'It contributes none'],
+  ['initialState', 'It seeds none'],
+]);
 
 /** Export kinds listed under "Types"; every other kind lists under "Other functions and constants". */
 const TYPE_KINDS = new Set(['type', 'interface', 'enum']);
@@ -487,7 +504,7 @@ function slotFieldsTable(
     return [
       code(field.optional ? `${field.key}?` : field.key),
       long.cell(field.key, 'type', field.type),
-      ...(initialColumns.length ? [initial ? long.cell(field.key, 'initial', initial.value.text) : '—'] : []),
+      ...(initialColumns.length ? [initial ? valueCell(long, field.key, 'initial', initial.value) : '—'] : []),
       ...(initialColumns.length > 1
         ? [initial ? link(page, initial.feature.entry.page!, initial.feature.name) : '—']
         : []),
@@ -581,7 +598,7 @@ function featureConfigTable(
     return [
       code(field ? (field.optional ? `${key}?` : key) : key),
       type ? long.cell(key, 'type', type) : '—',
-      value ? long.cell(key, 'default', value.text) : '—',
+      value ? valueCell(long, key, 'default', value) : '—',
       behaviorLinks(reference, page, readers),
       doc ? docCell(doc) : NO_DESCRIPTION,
     ];
@@ -651,7 +668,7 @@ function engineConfigTable(reference: ReferenceProgram, page: string, engine: En
     return [
       code(field.optional ? `${field.key}?` : field.key),
       long.cell(field.key, 'type', field.type),
-      value ? long.cell(field.key, 'default', value.text) : '—',
+      value ? valueCell(long, field.key, 'default', value) : '—',
       supplier ? link(page, supplier.entry.page!, supplier.name) : '—',
       behaviorLinks(reference, page, readers),
       doc ? docCell(doc) : NO_DESCRIPTION,

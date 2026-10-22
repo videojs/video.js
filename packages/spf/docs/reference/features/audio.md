@@ -80,7 +80,7 @@ The feature declares these state keys for code outside the engine to write; no b
 | --- | --- | --- | --- |
 | `behaviors` | const | The behaviors the feature composes, in setup order. Listed under [Behaviors](#behaviors). | [src/playback/features/audio.ts](../../../src/playback/features/audio.ts) |
 | `defaultConfig` | const | The config defaults the feature contributes. Its value: `{ canPlayTrack, reportUnsupportedTrackConditions }`. | [src/playback/features/audio.ts](../../../src/playback/features/audio.ts) |
-| `initialState` | const | The state values the feature seeds. Its value: `{}`. | [src/playback/features/audio.ts](../../../src/playback/features/audio.ts) |
+| `initialState` | const | The state values the feature seeds. It seeds none (`{}`). | [src/playback/features/audio.ts](../../../src/playback/features/audio.ts) |
 
 ## Types
 
