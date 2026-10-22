@@ -1,5 +1,4 @@
 import { type ParsedSoundCloudSource, parseSoundCloudSource } from '@videojs/media';
-import { isString } from '@videojs/utils/predicate';
 
 import type { SoundCloudAdapterProps } from './props';
 import { WIDGET_ORIGIN } from './widget-api';
@@ -56,7 +55,7 @@ export interface SoundCloudEngineConfig extends Record<string, SoundCloudWidgetP
 
 /** Structured SoundCloud source: which track or set to play, plus how to play it. */
 export interface SoundCloudSource {
-  /** SoundCloud track, set, short link, or widget embed URL. Mirrors the host's `src` property. */
+  /** SoundCloud track, set, or widget embed URL. Mirrors the host's `src` property. */
   src?: string | undefined;
   /** Playback options, keyed by the engine that reads them. */
   engine?: SoundCloudSourceEngineConfig | undefined;
@@ -69,14 +68,13 @@ export interface SoundCloudSourceEngineConfig {
 }
 
 /**
- * Build the widget iframe URL for a source. Empty when `src` is not a SoundCloud URL, and for a short link, which only
- * the media can resolve.
+ * Build the widget iframe URL for a source. Empty when `src` is not a SoundCloud URL.
  *
  * @internal
  */
 export function buildSoundCloudIframeSrc(src: string, props: Partial<SoundCloudAdapterProps> = {}): string {
   const parsed = parseSoundCloudSource(src);
-  if (!parsed || parsed.kind === 'short-link') return '';
+  if (!parsed) return '';
 
   return buildSoundCloudWidgetUrl(parsed.url, parsed, props);
 }
@@ -118,46 +116,6 @@ export function wantsSoundCloudAutoplay(
 
   return value === true || value === 'true';
 }
-
-/**
- * Resolve an `on.soundcloud.com` short link to the resource URL the widget plays, through SoundCloud's oEmbed endpoint
- * (https://developers.soundcloud.com/docs/oembed). The widget refuses short links, and the redirect behind one cannot
- * be followed across origins. Null when SoundCloud does not know the link; rejects when the endpoint cannot be
- * reached.
- *
- * @internal
- */
-export function resolveSoundCloudShortLink(url: string): Promise<string | null> {
-  let resolution = shortLinks.get(url);
-
-  if (!resolution) {
-    resolution = fetchShortLink(url);
-    shortLinks.set(url, resolution);
-    // A failed request must not be the answer forever.
-    resolution.catch(() => shortLinks.delete(url));
-  }
-
-  return resolution;
-}
-
-async function fetchShortLink(url: string): Promise<string | null> {
-  const response = await fetch(`${OEMBED_ENDPOINT}?${new URLSearchParams({ format: 'json', url })}`);
-  if (response.status === 404) return null;
-
-  if (!response.ok) throw new Error(`SoundCloud oEmbed answered ${response.status}`);
-
-  const { html } = (await response.json()) as { html?: unknown };
-  const embedSrc = isString(html) ? /\ssrc="([^"]+)"/.exec(html)?.[1] : undefined;
-  if (!embedSrc) return null;
-
-  const resolved = parseSoundCloudSource(embedSrc.replace(/&amp;/g, '&'));
-
-  return resolved && resolved.kind !== 'short-link' ? resolved.url : null;
-}
-
-const OEMBED_ENDPOINT = 'https://soundcloud.com/oembed';
-
-const shortLinks = new Map<string, Promise<string | null>>();
 
 const DEFAULT_PARAMS: Record<string, SoundCloudWidgetParamValue> = {
   visual: false,

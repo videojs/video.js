@@ -21,7 +21,6 @@ afterEach(() => {
   document.body.replaceChildren();
   vi.useRealTimers();
   vi.restoreAllMocks();
-  vi.unstubAllGlobals();
 });
 
 interface Command {
@@ -223,7 +222,7 @@ describe('buildSoundCloudIframeSrc', () => {
     expect(url.searchParams.has('referrerPolicy')).toBe(false);
   });
 
-  it('builds nothing for a short link or a source that is not SoundCloud', () => {
+  it('builds nothing for a source that is not a SoundCloud sound', () => {
     expect(buildSoundCloudIframeSrc('https://on.soundcloud.com/9zRpu')).toBe('');
     expect(buildSoundCloudIframeSrc('https://example.com/forss/flickermood')).toBe('');
   });
@@ -357,13 +356,16 @@ describe('SoundCloudAdapter', () => {
       expect(widget.methods().filter((method) => method === 'seekTo' || method === 'play')).toEqual(['seekTo', 'play']);
     });
 
-    it('reports an unrecognized source as unsupported without building a widget', async () => {
+    it.each([
+      ['a profile', 'https://soundcloud.com/forss'],
+      ['a short link', 'https://on.soundcloud.com/9zRpu'],
+    ])('reports %s as unsupported without building a widget', async (_, src) => {
       const media = new SoundCloudAdapter();
       const widget = new FakeWidget();
       const events = recordEvents(media, ['loadstart', 'error']);
 
       media.attach(widget.iframe);
-      media.src = 'https://soundcloud.com/forss';
+      media.src = src;
       await flush();
 
       expect(events).toEqual(['loadstart', 'error']);
@@ -462,43 +464,6 @@ describe('SoundCloudAdapter', () => {
       await flush();
 
       expect(events).toEqual(['emptied', 'loadstart', 'canplay']);
-    });
-
-    it('resolves a short link through oEmbed before building the widget', async () => {
-      const html = `<iframe src="https://w.soundcloud.com/player/?visual=true&amp;url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F1633827945&amp;show_artwork=true"></iframe>`;
-      const fetch = vi.fn(async (_url: string) => ({ ok: true, status: 200, json: async () => ({ html }) }));
-
-      vi.stubGlobal('fetch', fetch);
-
-      const media = new SoundCloudAdapter();
-      const widget = new FakeWidget();
-
-      media.attach(widget.iframe);
-      media.src = 'https://on.soundcloud.com/resolves';
-      await flush();
-      await vi.waitFor(() => expect(widget.iframe.hasAttribute('src')).toBe(true));
-
-      const url = new URL(widget.iframe.src);
-
-      expect(String(fetch.mock.calls[0]?.[0])).toContain('url=https%3A%2F%2Fon.soundcloud.com%2Fresolves');
-      expect(url.searchParams.get('url')).toBe('https://api.soundcloud.com/tracks/1633827945');
-      expect(url.searchParams.get('visual')).toBe('false');
-    });
-
-    it('reports a short link SoundCloud does not know as unsupported', async () => {
-      vi.stubGlobal(
-        'fetch',
-        vi.fn(async () => ({ ok: false, status: 404 }))
-      );
-
-      const media = new SoundCloudAdapter();
-      const widget = new FakeWidget();
-
-      media.attach(widget.iframe);
-      media.src = 'https://on.soundcloud.com/unknown';
-      await flush();
-      await vi.waitFor(() => expect(media.error?.code).toBe(MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED));
-      expect(widget.iframe.hasAttribute('src')).toBe(false);
     });
 
     it('ignores messages from another origin, another frame, or the document it replaced', async () => {

@@ -650,12 +650,6 @@ const SOURCE_MAP = {
     url: 'https://api.soundcloud.com/tracks/293',
     type: 'soundcloud',
   },
-  // A short link someone shared publicly; it resolves to a podcast episode.
-  'soundcloud-short-link': {
-    label: 'SoundCloud - Short link',
-    url: 'https://on.soundcloud.com/9zRpu',
-    type: 'soundcloud',
-  },
   'soundcloud-widget-url': {
     label: 'SoundCloud - Widget URL with color',
     url: 'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fforss%2Fsets%2Fsoulhack&color=%2300aa66&start_track=3',

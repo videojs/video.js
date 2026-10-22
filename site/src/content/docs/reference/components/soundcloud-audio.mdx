@@ -36,7 +36,6 @@ The [SoundCloud Widget](https://developers.soundcloud.com/docs/api/html5-widget)
 - A track: `soundcloud.com/<user>/<track>`
 - A set: `soundcloud.com/<user>/sets/<set>`
 - A private track or set, with its secret token: `soundcloud.com/<user>/<track>/s-<token>`
-- A short link from the SoundCloud apps: `on.soundcloud.com/<code>`
 - An API resource: `api.soundcloud.com/tracks/<id>` or `api.soundcloud.com/playlists/<id>`, with an optional `secret_token`. The id can also be a URN such as `soundcloud:tracks:<id>`
 - A widget embed URL: `w.soundcloud.com/player/?url=...`, as SoundCloud's own embed code gives it
 
@@ -53,8 +52,6 @@ The [SoundCloud Widget](https://developers.soundcloud.com/docs/api/html5-widget)
 <soundcloud-audio src="https://soundcloud.com/forss/flickermood#t=1:30"></soundcloud-audio>
 ```
 </FrameworkCase>
-
-The widget does not accept short links, so the component first resolves them through [SoundCloud's oEmbed endpoint](https://developers.soundcloud.com/docs/oembed). That is one extra request to `soundcloud.com`.
 
 ## Controls
 
