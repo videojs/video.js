@@ -684,6 +684,8 @@ export interface EngineInfo {
   doc: DocBlock;
   features: FeatureInfo[];
   behaviors: BehaviorInfo[];
+  /** The engine's own `initialState` entries, which replace its features' for the same key. */
+  initial: DefaultValue[];
   config: TypeField[];
   state: TypeField[];
   context: TypeField[];
@@ -724,8 +726,16 @@ function satisfiesType(checker: ts.TypeChecker, symbol: ts.Symbol): ts.Type | un
   return undefined;
 }
 
-/** The `defaultConfig` object literal's entries, each printed as source. */
-function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): DefaultValue[] {
+/**
+ * The `defaultConfig` (or `initialState`) object literal's entries, each printed as source. An engine's literal may
+ * spread its composed features' values, which their own entries already list, so `'skip'` passes over spreads; a
+ * feature's literal may not, since a skipped spread would hide values.
+ */
+function defaultValues(
+  checker: ts.TypeChecker,
+  symbol: ts.Symbol | undefined,
+  spreads: 'reject' | 'skip' = 'reject'
+): DefaultValue[] {
   const literal = symbol && initializerOf(symbol);
   if (!literal || !ts.isObjectLiteralExpression(literal)) return [];
 
@@ -745,6 +755,8 @@ function defaultValues(checker: ts.TypeChecker, symbol: ts.Symbol | undefined): 
   };
 
   for (const property of literal.properties) {
+    if (ts.isSpreadAssignment(property) && spreads === 'skip') continue;
+
     if (ts.isShorthandPropertyAssignment(property)) {
       values.push(describe(property.name.text, property.name.text));
     } else if (
@@ -946,6 +958,7 @@ export function buildModel(reference: ReferenceProgram): Model {
       doc: docOf(checker, createEngine),
       features: engineFeatures,
       behaviors: flattened,
+      initial: defaultValues(checker, exports.get('initialState'), 'skip'),
       config: typeFields(checker, exports.get('EngineConfig')),
       state: typeFields(checker, exports.get('EngineState')),
       context: typeFields(checker, exports.get('EngineContext')),
