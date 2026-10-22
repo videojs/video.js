@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import type { RemotionSource } from '@videojs/remotion-video';
 import { forwardRef, useImperativeHandle } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { RemotionVideo } from '../remotion-video';
 
