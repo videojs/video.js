@@ -6,6 +6,15 @@ description: Video media that picks the media component for its source and loads
 stability: unstable
 apis:
   - LazyMediaProps
+  - LazyVideoProps
+  - LazyMediaDefinition
+  - LazyMediaMatcher
+  - LazySource
+  - LazyMediaElement
+  - createLazyVideo
+  - createLazyVideoElement
+  - '@videojs/react/media/lazy-video/*'
+  - '@videojs/html/media/lazy-video/*'
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
@@ -48,7 +57,7 @@ import '@videojs/html/media/lazy-video';
 ```
 </FrameworkCase>
 
-Install every engine package listed: your bundler resolves each media component `LazyVideo` can load, so a missing one fails the build. Each engine still lands in its own chunk, which downloads only when a source needs it.
+Install every engine package listed: your bundler resolves each media component `LazyVideo` can load, so a missing one fails the build. Each engine still lands in its own chunk, which downloads only when a source needs it. To install fewer, [build your own](#custom-media) from just the media you need.
 
 ## Sources
 
@@ -76,7 +85,7 @@ Changing `src` to a source the same media plays updates that media in place. Cha
 
 Set `type` to the source's MIME type when its URL has no file extension, such as a signed URL. `type` only chooses the media; it isn't passed on.
 
-Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so they get `HlsJsVideo`. Set `preferPlayback` to `'mse'` to play HLS through hls.js on Safari too.
+Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js.
 
 <FrameworkCase frameworks={["react"]}>
 Every other prop, including `ref`, `mediaRef`, event handlers, and children, is passed to the resolved media, so switching to that component directly only changes the import. Each media accepts the props it understands; embeds ignore `fallback`.
@@ -87,6 +96,73 @@ During server rendering, files render their `<video>`. HLS renders nothing until
 <FrameworkCase frameworks={["html"]}>
 Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children present when the media is created move into it; add later ones to the media element directly. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to.
 </FrameworkCase>
+
+## Custom media
+
+<FrameworkCase frameworks={["react"]}>
+`createLazyVideo` builds a `LazyVideo` from a list of media, tried in order. Each built-in media has its own import, so the list decides which engine packages need to be installed. Put your own media first to take sources from the built-in ones.
+
+```tsx
+import { createLazyVideo } from '@videojs/react/media/lazy-video/create';
+import { hlsjsVideo } from '@videojs/react/media/lazy-video/hlsjs-video';
+import { nativeHlsVideo } from '@videojs/react/media/lazy-video/native-hls-video';
+import { video } from '@videojs/react/media/lazy-video/video';
+
+// Module level, so the media it loads keep their identity across renders.
+const AcmeLazyVideo = createLazyVideo([
+  {
+    match: ({ url }) => url?.hostname === 'video.acme.com',
+    load: () => import('./acme-video').then((m) => m.AcmeVideo),
+  },
+  video,
+  nativeHlsVideo,
+  hlsjsVideo,
+]);
+```
+
+A media gives `match` and either `load`, for a component whose code should download only once a source needs it, or `component`, for one that's cheap to ship up front. Set `fallback: true` when the component renders `fallback` content inside a `<video>` or `<audio>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`createLazyVideoElement` builds a `<lazy-video>` class from a list of media, tried in order, to register under a tag of your own. Each built-in media has its own import, so the list decides which engine packages need to be installed. Put your own media first to take sources from the built-in ones.
+
+```ts
+import { createLazyVideoElement } from '@videojs/html/media/lazy-video/create';
+import { hlsjsVideo } from '@videojs/html/media/lazy-video/hlsjs-video';
+import { nativeHlsVideo } from '@videojs/html/media/lazy-video/native-hls-video';
+import { video } from '@videojs/html/media/lazy-video/video';
+
+customElements.define(
+  'acme-lazy-video',
+  createLazyVideoElement([
+    {
+      match: ({ url }) => url?.hostname === 'video.acme.com',
+      tag: 'acme-video',
+      load: () => import('./acme-video'),
+    },
+    video,
+    nativeHlsVideo,
+    hlsjsVideo,
+  ])
+);
+```
+
+A media gives `match`, the `tag` of the element that plays its sources, and `load` to register that element once a source needs it. Leave `load` out for an element that's built in or already registered.
+</FrameworkCase>
+
+`match` receives the source worked out once for every media:
+
+| Field | Type | Description |
+|---|---|---|
+| `src` | `string` | The trimmed source URL. |
+| `type` | `string \| undefined` | The MIME type the source was given. |
+| `url` | `URL \| null` | `src` parsed as a URL, or `null` for a path or bare id. |
+| `adapterType` | `AdapterType \| null` | The kind of source, with the names <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> returns, such as `'hls'` or `'youtube'`. |
+| `playback` | `'native' \| 'mse' \| undefined` | How HLS should play here, after `preferPlayback`. `undefined` while it isn't known, such as during server rendering. |
+
+Return `true` to play the source, or `undefined` when the media can't tell yet; it isn't chosen until it can, and nothing after it is tried.
+
+The built-in media are `video`, `nativeHlsVideo`, `hlsjsVideo`, `dashVideo`, `muxVideo`, `youtubeVideo`, `vimeoVideo`, `wistiaVideo`, `cloudflareVideo`, `tiktokVideo`, and `twitchVideo`, each imported from `media/lazy-video/` plus its kebab-case name.
 
 ## Examples
 
@@ -122,7 +198,7 @@ Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is cop
 |---|---|---|---|
 | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
-| `preferPlayback` | `'native' \| 'mse'` | `'native'` | Playback path for HLS. `'mse'` always loads hls.js. |
+| `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. |
 | `preload` | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
 
@@ -131,6 +207,6 @@ Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is cop
 |---|---|---|---|---|
 | `src` | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
-| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | `'native'` | Playback path for HLS. `'mse'` always loads hls.js. |
+| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. |
 | `preload` | | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
