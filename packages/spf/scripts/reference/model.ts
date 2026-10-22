@@ -54,7 +54,7 @@ export function firstParagraph(doc: DocBlock): string {
 /** The first sentence of a doc block, for inventory tables. */
 export function firstSentence(doc: DocBlock): string {
   const paragraph = firstParagraph(doc);
-  const bold = paragraph.match(/^\*\*[^*]+\*\*/);
+  const bold = paragraph.match(/^\*\*.+?\*\*(?=\s|$)/);
   if (bold) return bold[0];
 
   const match = paragraph.match(/^.*?[.!?](?=\s+[A-Z`(]|$)/);
