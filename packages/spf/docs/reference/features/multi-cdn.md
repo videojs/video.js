@@ -19,7 +19,7 @@ next when a CDN fails, returning to it once its cooldown lapses. Single-CDN sour
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `failover?` | `Partial<FailoverMonitorConfig>` | — | [setupFailoverMonitor](../behaviors/setup-failover-monitor.md#setupfailovermonitor) | Failover policy (cooldown); defaults to `DEFAULT_FAILOVER_MONITOR_CONFIG`. |
-| `getCdnId?` | `GetCdnId` | — | [deriveCdnPriority](../behaviors/derive-cdn-priority.md#derivecdnpriority) | See `TrackSwitchingSharedConfig['getCdnId']`. |
+| `getCdnId?` | `GetCdnId` | — | [deriveCdnPriority](../behaviors/derive-cdn-priority.md#derivecdnpriority) | How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query param). (documented on [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack)) |
 
 ### State
 
