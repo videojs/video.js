@@ -4,10 +4,15 @@ import {
   type CommonMedia,
   type MediaStreamType,
   MediaStreamTypes,
+  type MediaPlaybackRateSupport,
   type MediaTargetLike,
   type TextTrackKind,
   type TextTrackLike,
 } from '../../core/types';
+
+// Chromium throws `NotSupportedError` outside this range. Firefox and Safari accept a wider one but mute or degrade
+// audio well inside it, which is a quality cost rather than a failure, so the hard limit is the one reported.
+const NATIVE_PLAYBACK_RATE_SUPPORT: MediaPlaybackRateSupport = { min: 0.0625, max: 16 };
 
 /** The element a selector matches: the tag's element type for a tag name, otherwise `E`. */
 type QueriedElement<S extends string, E extends Element> = S extends keyof HTMLElementTagNameMap
@@ -261,6 +266,11 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
   set playbackRate(value) {
     if (this.target) this.target.playbackRate = value;
+  }
+
+  /** Rates the browser accepts, unless the target reports its own. */
+  get playbackRateSupport() {
+    return this.target?.playbackRateSupport ?? NATIVE_PLAYBACK_RATE_SUPPORT;
   }
 
   get defaultPlaybackRate() {

@@ -38,6 +38,7 @@ class MockPlayer {
   setPlaybackRate = vi.fn((rate: number) => {
     this.getPlaybackRate.mockReturnValue(rate);
   });
+  getAvailablePlaybackRates = vi.fn((): number[] => [0.25, 0.5, 1, 1.5, 2]);
   getVideoLoadedFraction = vi.fn(() => 0);
   getPlayerState = vi.fn(() => -1);
   loadVideoById = vi.fn();
@@ -437,6 +438,26 @@ describe('YouTubeAdapter', () => {
     player.emit('onStateChange', STATE.ENDED);
     expect(media.ended).toBe(true);
     expect(media.paused).toBe(true);
+    media.detach();
+  });
+
+  it('reports the rates the loaded video offers and clears them across a source change', async () => {
+    const media = new YouTubeAdapter();
+    const change = vi.fn();
+
+    media.addEventListener('playbackratesupportchange', change);
+    expect(media.playbackRateSupport).toBeUndefined();
+
+    await attachAndLoad(media);
+
+    expect(media.playbackRateSupport).toEqual({ rates: [0.25, 0.5, 1, 1.5, 2] });
+    expect(change).toHaveBeenCalledTimes(1);
+
+    media.src = 'dQw4w9WgXcQ';
+    await flushDeferredEmbed();
+
+    expect(media.playbackRateSupport).toBeUndefined();
+    expect(change).toHaveBeenCalledTimes(2);
     media.detach();
   });
 

@@ -18,6 +18,7 @@ export interface YouTubePlayerApi {
   getCurrentTime(): number;
   getPlaybackRate(): number;
   setPlaybackRate(rate: number): void;
+  getAvailablePlaybackRates(): number[];
   getVideoLoadedFraction(): number;
   getPlayerState(): number;
   loadVideoById(options: { videoId: string; startSeconds?: number }): void;

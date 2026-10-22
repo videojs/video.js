@@ -50,6 +50,12 @@ The `playbackRates` property also takes an array, such as `player.playbackRates 
 
 The button cycles through the rates in the order you list them, and the menu shows them in that order. `speedUp` and `speedDown` move to the next faster or slower rate whatever the order, and do nothing at the fastest or slowest rate. The player ignores values that aren't positive numbers, and repeated rates. If nothing usable is left, it falls back to the defaults.
 
+### Media support
+
+Some media accept fewer rates. YouTube offers a fixed list for each video, Vimeo accepts `0.5` through `2`, and browsers reject rates outside `0.0625` through `16`. The player leaves out any rate you list that the media doesn't accept, and keeps the rest in your order. If none are left, it offers the defaults the media accepts, or failing that, the media's own list.
+
+A YouTube video reports its list once it loads, so until then the player offers every rate you listed.
+
 ### Selector
 
 <FrameworkCase frameworks={["react"]}>
