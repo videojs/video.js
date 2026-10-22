@@ -32,49 +32,53 @@ export interface GoogleAnalyticsEventParams {
   [key: string]: GoogleAnalyticsParamValue | undefined;
 }
 
-export interface GoogleAnalyticsProps {
+export type GoogleAnalyticsProps = {
   /** The name of the dataLayer array on window (default: `'dataLayer'`). */
-  dataLayerName?: string;
+  dataLayerName?: string | undefined;
   /** Explicit title for the video. Falls back to media title or current URL if omitted. */
-  videoTitle?: string;
+  videoTitle?: string | undefined;
   /** Video provider reported in parameters (default: `'video.js'`). */
-  videoProvider?: string;
+  videoProvider?: string | undefined;
   /** Stream type reported in parameters (`'live'` or `'vod'`, default: `'vod'`). */
   streamType?: 'live' | 'vod' | undefined;
   /** Whether to track 10%, 25%, 50%, and 75% progress milestones (default: `true`). */
-  trackProgress?: boolean;
+  trackProgress?: boolean | undefined;
   /** Whether to log telemetry events to the console (default: `false`). */
-  debug?: boolean;
+  debug?: boolean | undefined;
   /** Custom extra parameters to include with every dispatched event. */
-  customParams?: Record<string, GoogleAnalyticsParamValue>;
+  customParams?: Record<string, GoogleAnalyticsParamValue> | undefined;
   /** Optional callback to intercept dispatched events. */
-  onEvent?: (event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void;
-}
+  onEvent?: ((event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void) | undefined;
+};
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
+    [key: string]: unknown;
   }
 }
 
 const MILESTONES = [10, 25, 50, 75] as const;
 
-function isElementFullscreen(container: MediaContainer | null, media: Media | null): boolean {
+function isElementFullscreen(
+  container: MediaContainer | null,
+  media: Media | null,
+  target: HTMLMediaElement | null = media ? getMediaElement(media) : null
+): boolean {
   if (isNil(media)) return false;
 
-  if (media instanceof HTMLVideoElement) {
-    // SAFETY: Probing iOS Safari webkitPresentationMode vendor property on video elements.
-    const webkitVideo = media as WebKitVideoElement;
-    if (webkitVideo.webkitPresentationMode === 'fullscreen') return true;
-  }
+  // SAFETY: Probing iOS Safari webkitPresentationMode vendor property on video elements.
+  const candidate = (target ?? media) as WebKitVideoElement;
+  if ('webkitPresentationMode' in candidate && candidate.webkitPresentationMode === 'fullscreen') return true;
 
   // SAFETY: Probing standard and WebKit vendor fullscreenElement on document.
   const doc = document as WebKitDocument;
   const fsElement = doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
   if (isNil(fsElement)) return false;
 
-  if (fsElement === container || fsElement === media) return true;
+  if (fsElement === container || (media instanceof Element && fsElement === media) || (target && fsElement === target))
+    return true;
 
   if (container instanceof Element && container.contains(fsElement)) return true;
 
@@ -100,14 +104,16 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     onEvent: undefined,
   };
 
-  dataLayerName = GoogleAnalyticsExtension.defaultProps.dataLayerName;
-  videoTitle = GoogleAnalyticsExtension.defaultProps.videoTitle;
-  videoProvider = GoogleAnalyticsExtension.defaultProps.videoProvider;
-  streamType: 'live' | 'vod' = 'vod';
-  trackProgress = GoogleAnalyticsExtension.defaultProps.trackProgress;
-  debug = GoogleAnalyticsExtension.defaultProps.debug;
-  customParams = GoogleAnalyticsExtension.defaultProps.customParams;
-  onEvent = GoogleAnalyticsExtension.defaultProps.onEvent;
+  dataLayerName: string | undefined = GoogleAnalyticsExtension.defaultProps.dataLayerName;
+  videoTitle: string | undefined = GoogleAnalyticsExtension.defaultProps.videoTitle;
+  videoProvider: string | undefined = GoogleAnalyticsExtension.defaultProps.videoProvider;
+  streamType: 'live' | 'vod' | undefined = 'vod';
+  trackProgress: boolean | undefined = GoogleAnalyticsExtension.defaultProps.trackProgress;
+  debug: boolean | undefined = GoogleAnalyticsExtension.defaultProps.debug;
+  customParams: Record<string, GoogleAnalyticsParamValue> | undefined =
+    GoogleAnalyticsExtension.defaultProps.customParams;
+  onEvent: ((event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void) | undefined =
+    GoogleAnalyticsExtension.defaultProps.onEvent;
 
   #media: Media | null = null;
   #container: MediaContainer | null = null;
@@ -118,6 +124,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   #lastMuted: boolean | undefined = undefined;
   #isFullscreen = false;
   #firedMilestones = new Set<number>();
+  #maxTime = 0;
 
   constructor(props: Partial<GoogleAnalyticsProps> = {}) {
     Object.assign(this, props);
@@ -156,6 +163,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
 
     const offFs = listen(document, 'fullscreenchange', this.#handleFullscreenChange);
     const offWebkitFs = listen(document, 'webkitfullscreenchange', this.#handleFullscreenChange);
+    const offPresentationMode = listen(media, 'webkitpresentationmodechanged', this.#handleFullscreenChange);
 
     this.#unlisten = () => {
       offPlay();
@@ -167,6 +175,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       offLoadStart();
       offFs();
       offWebkitFs();
+      offPresentationMode();
     };
   }
 
@@ -176,6 +185,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#unlisten = null;
     this.#media = null;
     this.#container = null;
+    this.#isFullscreen = false;
     this.#resetSession();
   }
 
@@ -188,12 +198,36 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#hasEnded = false;
     this.#hasPlayedOnce = false;
     this.#firedMilestones.clear();
+    this.#maxTime = 0;
+  };
+
+  #checkLoopRestart = (): void => {
+    const el = this.#targetElement;
+    if (isNil(el)) return;
+
+    const isLoop = Boolean(el.loop || this.#media?.loop);
+    if (!isLoop) return;
+
+    const duration = el.duration;
+    if (!isNumber(duration) || duration <= 0) return;
+
+    const isNearEnd = this.#maxTime >= duration * 0.7;
+    const isRestartAtStart = el.currentTime <= Math.max(1, duration * 0.05);
+
+    if (isNearEnd && isRestartAtStart) {
+      this.#hasEnded = false;
+      this.#firedMilestones.clear();
+      this.#maxTime = el.currentTime;
+    }
   };
 
   #handlePlay = (): void => {
+    this.#checkLoopRestart();
+
     if (this.#hasEnded) {
       this.#hasEnded = false;
       this.#firedMilestones.clear();
+      this.#maxTime = 0;
     }
 
     if (!this.#hasPlayedOnce) {
@@ -217,13 +251,21 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const el = this.#targetElement;
     if (isNil(el)) return;
 
+    this.#checkLoopRestart();
+
     const duration = el.duration;
     const currentTime = el.currentTime;
+
+    if (currentTime > this.#maxTime) {
+      this.#maxTime = currentTime;
+    }
 
     if (!this.#hasStarted && currentTime > 0) {
       this.#hasStarted = true;
       this.#sendEvent('video_start', 0);
     }
+
+    if (this.streamType === 'live') return;
 
     if (!this.trackProgress || !isNumber(duration) || duration <= 0) return;
 
@@ -241,7 +283,9 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     if (this.#hasEnded) return;
 
     const el = this.#targetElement;
-    if (isNil(el) || el.ended || el.seeking) return;
+    if (isNil(el)) return;
+
+    if (el.ended || el.seeking) return;
 
     const duration = el.duration || 0;
     const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;
@@ -260,6 +304,12 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   #handleSeeked = (): void => {
     const el = this.#targetElement;
     if (isNil(el)) return;
+
+    this.#checkLoopRestart();
+
+    if (el.currentTime > this.#maxTime) {
+      this.#maxTime = el.currentTime;
+    }
 
     const duration = el.duration || 0;
     const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;
@@ -292,7 +342,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handleFullscreenChange = (): void => {
-    const isFs = isElementFullscreen(this.#container, this.#media);
+    const isFs = isElementFullscreen(this.#container, this.#media, this.#targetElement);
     if (isFs === this.#isFullscreen) return;
 
     this.#isFullscreen = isFs;
@@ -358,16 +408,14 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.onEvent?.(event, params);
 
     const dataLayerKey = this.dataLayerName ?? 'dataLayer';
-    // SAFETY: Accessing configurable dataLayer array on window.
-    const win = window as { [key: string]: unknown[] | undefined };
-    const targetLayer = win[dataLayerKey];
+    const targetLayer = window[dataLayerKey];
 
     if (Array.isArray(targetLayer)) {
       targetLayer.push({ event, ...params });
     } else {
       const newLayer: unknown[] = [{ event, ...params }];
 
-      win[dataLayerKey] = newLayer;
+      window[dataLayerKey] = newLayer;
     }
 
     if (isFunction(window.gtag)) {

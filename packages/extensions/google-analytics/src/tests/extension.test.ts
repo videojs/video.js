@@ -210,6 +210,31 @@ describe('GoogleAnalyticsExtension', () => {
     expect(events).toContain('fullscreenExit');
   });
 
+  it('tracks fullscreenEnter and fullscreenExit on iOS presentation mode changes', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: mockContainer });
+
+    Object.defineProperty(video, 'webkitPresentationMode', {
+      value: 'fullscreen',
+      configurable: true,
+      writable: true,
+    });
+    video.dispatchEvent(new Event('webkitpresentationmodechanged'));
+
+    Object.defineProperty(video, 'webkitPresentationMode', {
+      value: 'inline',
+      configurable: true,
+      writable: true,
+    });
+    video.dispatchEvent(new Event('webkitpresentationmodechanged'));
+
+    const events = getDataLayer().map((e) => e.event);
+
+    expect(events).toContain('fullscreenEnter');
+    expect(events).toContain('fullscreenExit');
+  });
+
   it('tracks video_progress milestones at 10, 25, 50, and 75 percent', () => {
     const extension = new GoogleAnalyticsExtension();
 
@@ -229,6 +254,78 @@ describe('GoogleAnalyticsExtension', () => {
     const percents = progressEvents.map((e) => e.video_percent);
 
     expect(percents).toEqual([10, 25, 50]);
+  });
+
+  it('skips video_progress milestones when streamType is live', () => {
+    const extension = new GoogleAnalyticsExtension({ streamType: 'live' });
+
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    Object.defineProperty(video, 'currentTime', { value: 10 });
+    video.dispatchEvent(new Event('timeupdate'));
+    Object.defineProperty(video, 'currentTime', { value: 25 });
+    video.dispatchEvent(new Event('timeupdate'));
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    const progressEvents = getDataLayer().filter((e) => e.event === 'video_progress');
+
+    expect(progressEvents).toHaveLength(0);
+  });
+
+  it('resets milestones on loop restart', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    // Fire milestones
+    Object.defineProperty(video, 'currentTime', { value: 75 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    const initialProgress = getDataLayer().filter((e) => e.event === 'video_progress');
+
+    expect(initialProgress.map((e) => e.video_percent)).toEqual([10, 25, 50, 75]);
+
+    // Simulate loop restart
+    Object.defineProperty(video, 'loop', { value: true, configurable: true });
+    Object.defineProperty(video, 'ended', { value: false, configurable: true });
+    Object.defineProperty(video, 'currentTime', { value: 0 });
+    video.dispatchEvent(new Event('seeked'));
+
+    // Advance through 50% again
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    const allProgress = getDataLayer().filter((e) => e.event === 'video_progress');
+    const percents = allProgress.map((e) => e.video_percent);
+
+    expect(percents).toEqual([10, 25, 50, 75, 10, 25, 50]);
+  });
+
+  it('does not reset milestones on user seek to start when loop is false', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    Object.defineProperty(video, 'currentTime', { value: 75 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    // User seeks to start without loop
+    Object.defineProperty(video, 'loop', { value: false, configurable: true });
+    Object.defineProperty(video, 'currentTime', { value: 0 });
+    video.dispatchEvent(new Event('seeked'));
+
+    // Advance to 50% again
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    const allProgress = getDataLayer().filter((e) => e.event === 'video_progress');
+    const percents = allProgress.map((e) => e.video_percent);
+
+    expect(percents).toEqual([10, 25, 50, 75]);
   });
 
   it('reports default video_stream_type as vod', () => {

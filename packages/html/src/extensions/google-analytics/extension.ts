@@ -94,4 +94,22 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
   set debug(value: boolean) {
     this.extension.debug = value;
   }
+
+  /** Custom extra parameters to include with every dispatched event. */
+  get customParams(): GoogleAnalyticsProps['customParams'] {
+    return this.extension.customParams;
+  }
+
+  set customParams(value: GoogleAnalyticsProps['customParams']) {
+    this.extension.customParams = value;
+  }
+
+  /** Optional callback to intercept dispatched events. */
+  get onEvent(): GoogleAnalyticsProps['onEvent'] {
+    return this.extension.onEvent;
+  }
+
+  set onEvent(value: GoogleAnalyticsProps['onEvent']) {
+    this.extension.onEvent = value;
+  }
 }

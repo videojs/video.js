@@ -71,4 +71,20 @@ describe('GoogleAnalyticsExtension', () => {
     expect(el.disableProgress).toBe(true);
     expect(extension.trackProgress).toBe(false);
   });
+
+  it('forwards customParams and onEvent properties to the extension', () => {
+    const { provider, el } = setup();
+    const customParams = { author: 'Video.js' };
+    const onEvent = () => {};
+
+    el.customParams = customParams;
+    el.onEvent = onEvent;
+
+    const extension = provider.extensions.get(GoogleAnalyticsExtensionBase)!;
+
+    expect(extension.customParams).toEqual(customParams);
+    expect(extension.onEvent).toBe(onEvent);
+    expect(el.customParams).toEqual(customParams);
+    expect(el.onEvent).toBe(onEvent);
+  });
 });
