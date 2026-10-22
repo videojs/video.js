@@ -2,14 +2,15 @@ import type { ResolveLazyMediaOptions } from '@videojs/media';
 import { prefersNativeHls } from '@videojs/utils/dom';
 
 /**
- * A media element a lazy media can resolve to: its tag, and the module that registers it, if it isn't built in.
+ * The module that registers each media element a lazy media can resolve to, keyed by its tag name. Built-in elements,
+ * such as `video`, have none.
  *
  * @internal
  */
-export interface LazyMediaEntry {
-  tag: string;
-  define?: (() => Promise<unknown>) | undefined;
-}
+export type LazyMediaDefinitions<Name extends string> = Record<
+  Exclude<Name, 'video' | 'audio'>,
+  () => Promise<unknown>
+>;
 
 const HTMLElementBase = globalThis.HTMLElement ?? class {};
 
@@ -78,7 +79,7 @@ export abstract class LazyMediaElement extends HTMLElementBase {
   }
 
   /** @internal */
-  protected abstract readonly mediaEntries: Record<string, LazyMediaEntry>;
+  protected abstract readonly mediaDefinitions: Partial<Record<string, () => Promise<unknown>>>;
 
   /** @internal */
   protected abstract resolveMedia(src: string, options: ResolveLazyMediaOptions): string | null | undefined;
@@ -152,16 +153,17 @@ export abstract class LazyMediaElement extends HTMLElementBase {
       return;
     }
 
-    void this.#load(name, this.mediaEntries[name]!);
+    void this.#load(name);
   }
 
-  async #load(name: string, { tag, define }: LazyMediaEntry): Promise<void> {
+  // The media's name is its tag name.
+  async #load(name: string): Promise<void> {
     const token = ++this.#token;
 
     try {
-      await define?.();
+      await this.mediaDefinitions[name]?.();
     } catch (error) {
-      if (__DEV__) console.error(`[${this.localName}] Failed to load <${tag}>.`, error);
+      if (__DEV__) console.error(`[${this.localName}] Failed to load <${name}>.`, error);
 
       return;
     }
@@ -169,7 +171,7 @@ export abstract class LazyMediaElement extends HTMLElementBase {
     // A newer source took over while this one loaded.
     if (token !== this.#token) return;
 
-    const media = document.createElement(tag);
+    const media = document.createElement(name);
 
     this.#copyAttributes(media);
     this.#setMedia(media, name);
