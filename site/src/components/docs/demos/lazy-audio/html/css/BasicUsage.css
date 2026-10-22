@@ -1,0 +1,4 @@
+/* `<lazy-audio>` renders as its resolved media, so the width goes on its child. */
+.html-lazy-audio-basic > * {
+  width: 100%;
+}
