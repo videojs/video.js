@@ -23,7 +23,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `defaultPreload?` | `StandardPreload` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload), [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Backfill applied to `state.preload` when neither the host element nor external code has supplied a W3C value. Defaults to `'metadata'`. |
+| `defaultPreload?` | `StandardPreload` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload) | Backfill applied to `state.preload` when neither the host element nor external code has supplied a W3C value. Defaults to `'metadata'`. |
 
 ### State
 
