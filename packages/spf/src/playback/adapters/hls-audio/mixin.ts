@@ -85,6 +85,12 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     };
 
     /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-audio`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-audio';
+
+    /**
      * A complete sentence naming the Media to reach for when this one can't play a source. Appended to the copy this
      * adapter logs.
      *

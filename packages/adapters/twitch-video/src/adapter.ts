@@ -90,7 +90,8 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #error: MediaError | null = null;
   #isFullscreen = false;
 
-  static PLAYER_SOFTWARE_NAME = 'twitch-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'twitch';
 
   /** The embed's own window, which every command is posted to. Null until an embed is bound and in a document. */
   get engine(): Window | null {

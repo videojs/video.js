@@ -300,6 +300,22 @@ describe('HlsJsAdapter', () => {
       expect(media.videoRenditions).toBeUndefined();
     });
 
+    it('names the engine it picked for each source', () => {
+      const media = createMseMedia();
+
+      expect(media.engineName).toBeUndefined();
+
+      media.source = { src: SRC, type: 'application/vnd.apple.mpegurl' };
+      media.load();
+
+      expect(media.engineName).toBe('hlsjs');
+
+      media.source = { src: SRC, type: 'video/mp4' };
+      media.load();
+
+      expect(media.engineName).toBe('browser');
+    });
+
     it('hands an unrecognized type to the browser and warns in dev', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const media = createMseMedia();

@@ -192,6 +192,12 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     };
 
     /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-video`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-video';
+
+    /**
      * A complete sentence naming the Media to reach for when this one can't play a source — `Try the hls.js-backed Mux
      * media instead: import the hls-js flavor in place of the spf one.` Appended to the copy this adapter surfaces, and
      * to the notices it logs. Name the flavor, not an import path: a Media is reached through several packages, each
