@@ -57,6 +57,17 @@ describe('resolveLazyVideoMedia', () => {
     expect(resolveLazyVideoMedia(src, { nativeHls: false })).toBe(expected);
   });
 
+  it('plays a file or manifest on a YouTube or Vimeo host that names no video by its extension', () => {
+    const progressive =
+      'https://player.vimeo.com/progressive_redirect/playback/123456/rendition/720p/file.mp4?loc=external';
+
+    expect(resolveLazyVideoMedia(progressive, { nativeHls: false })).toBe('video');
+    expect(resolveLazyVideoMedia('https://player.vimeo.com/external/123456.m3u8?s=abc', { nativeHls: false })).toBe(
+      'hlsjs-video'
+    );
+    expect(resolveLazyVideoMedia('https://www.youtube.com/about', { nativeHls: false })).toBeNull();
+  });
+
   it('treats a path that only looks like a shorthand as a file', () => {
     expect(resolveLazyVideoMedia('youtube/intro.mp4', { nativeHls: false })).toBe('video');
     expect(resolveLazyVideoMedia('vimeo/trailer.mp4', { nativeHls: false })).toBe('video');
