@@ -16,7 +16,7 @@
 import { listen } from '@videojs/utils/dom';
 
 import { defaultFairPlayContentId, type DrmSystemConfig, type KeySystemModule } from '../drm';
-import { SVTA_BAD_LICENSE_REQUEST, SVTA_DRM_LICENSE_RESPONSE_REJECTED, SVTA_DRM_SESSION_ERROR } from '../errors';
+import { SVTA_BAD_LICENSE_REQUEST, SVTA_DRM_SESSION_ERROR, SVTA_LICENSE_RESPONSE_REJECTED } from '../errors';
 import { fetchLicense, type ReportDrmCondition, unwrapLicense } from './license-sessions';
 
 /** Key system identifier the legacy `WebKitMediaKeys` API answers to. */
@@ -144,7 +144,7 @@ export function openLegacyLicenseSession({
       if (signal.aborted) return;
 
       report({
-        code: SVTA_DRM_LICENSE_RESPONSE_REJECTED,
+        code: SVTA_LICENSE_RESPONSE_REJECTED,
         data: { keySystem: FAIRPLAY_LEGACY_KEY_SYSTEM, reason: String(error) },
       });
     }
