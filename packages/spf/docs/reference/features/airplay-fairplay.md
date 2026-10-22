@@ -39,7 +39,7 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

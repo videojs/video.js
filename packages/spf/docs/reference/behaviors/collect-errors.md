@@ -41,7 +41,7 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | `errors` | writes | yes | `SvtaError[] \| undefined` | `CollectErrorsState` | Conditions reported during playback, in the order encountered — appended by whichever behavior detects one (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `CollectErrorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

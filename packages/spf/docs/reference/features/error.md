@@ -25,7 +25,7 @@ Collects the errors the other features report into `state.errors`, per source. W
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

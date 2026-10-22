@@ -32,7 +32,7 @@ Starts playback at `state.startPosition` instead of zero. Also performs the seek
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Functions and constants
+## Additional functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
