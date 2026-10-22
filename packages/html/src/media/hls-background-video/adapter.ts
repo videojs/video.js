@@ -1,5 +1,5 @@
 import type { Media } from '@videojs/media/dom';
-import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/hls-background-video';
+import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/adapters/hls-background-video';
 import { namedNodeMapToObject } from '@videojs/utils/dom';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';

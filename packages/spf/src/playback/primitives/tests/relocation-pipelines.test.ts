@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { signal } from '../../../core/signals/primitives';
 import { initSegment, mediaSegment, trak } from '../../../media/mp4/tests/synthetic-boxes';
 import type { Cue, MaybeResolvedPresentation, MediaContainerData } from '../../../media/types';
+import type { DeriveStartMediaTime } from '../derive-start-media-time';
 import { relocatingTextPipelines, relocationPipelinesFor } from '../relocation-pipelines';
 import type { Frame, StepDeps } from '../segment-load-pipeline';
 import type { TextFrame, TextStepDeps } from '../text-segment-load-pipeline';
@@ -34,11 +35,11 @@ function makeDeps(): {
 }
 
 /**
- * The discover steps at their pipeline positions: `[fetch, discover, dispatch]`. The derive is irrelevant here (only
- * the stamp step consumes it), so a no-op suffices.
+ * The discover steps at their pipeline positions: `[fetch, discover, dispatch]`. Only the stamp step reads
+ * `deriveStartMediaTime`, so the discover steps need none.
  */
 function discoverSteps(trackType: 'video' | 'audio') {
-  const pipelines = relocationPipelinesFor(trackType, () => ({}))();
+  const pipelines = relocationPipelinesFor(trackType)();
 
   return { readInitTrackInfo: pipelines['append-init'][1]!, readSegmentOrigin: pipelines['append-segment'][1]! };
 }
@@ -98,6 +99,40 @@ describe('relocationPipelinesFor', () => {
   });
 });
 
+describe('relocationPipelinesFor — stamp', () => {
+  const notAborted = new AbortController().signal;
+
+  // The stamp is the third append-segment step: [fetch, readSegmentOrigin, stamp, dispatch].
+  function stampFor(config: { deriveStartMediaTime?: DeriveStartMediaTime }) {
+    const stamp = relocationPipelinesFor('video')()['append-segment'][2]!;
+    const mediaContainerData = signal<Record<string, MediaContainerData> | undefined>({
+      video: { trackId: 1, timescale: 6000, baseMediaDecodeTime: 60000, segmentStartTime: 0 },
+    });
+    const deps: StepDeps = { state: { mediaContainerData }, context: {}, config };
+    const frame = {
+      op: { type: 'append-segment', meta: { id: 's0', startTime: 0, duration: 6, trackId: 'v' } },
+    } as unknown as Frame;
+
+    return { run: () => stamp(frame, notAborted, deps), frame };
+  }
+
+  it('relocates by the deriveStartMediaTime it reads from the composition config', async () => {
+    const { run, frame } = stampFor({ deriveStartMediaTime: () => ({ video: 10 }) });
+
+    await run();
+
+    expect(frame.meta?.timestampOffset).toBe(-10);
+  });
+
+  it('leaves the append native when the config carries no deriveStartMediaTime', async () => {
+    const { run, frame } = stampFor({});
+
+    await run();
+
+    expect(frame.meta).toBeUndefined();
+  });
+});
+
 describe('relocatingTextPipelines', () => {
   // relocateCues is the middle step: [resolveWithMetadata, relocateCues, dispatchCues].
   const relocateCues = relocatingTextPipelines<Cue>()[1]!;
@@ -152,6 +187,28 @@ describe('relocatingTextPipelines', () => {
     expect(completed).toBe(true);
     expect(c.startTime).toBe(7);
     expect(c.endTime).toBe(8);
+  });
+
+  it('uses the audio origin in a composition with no video selection signal', async () => {
+    // An audio + text composition never declares `selectedVideoTrackId`.
+    // SAFETY: test fixtures; the step reads only these fields.
+    const presentation = {
+      selectionSets: [{ type: 'audio', switchingSets: [{ tracks: [{ id: 'a', type: 'audio', startMediaTime: 10 }] }] }],
+    } as unknown as MaybeResolvedPresentation;
+    const state = {
+      presentation: signal<MaybeResolvedPresentation | undefined>(presentation),
+      selectedAudioTrackId: signal<string | undefined>('a'),
+    };
+    // SAFETY: as above; no `selectedVideoTrackId` is the point of the test.
+    const deps = { state, context: {}, config: {} } as unknown as TextStepDeps;
+    const c = cue(5, 6);
+    // SAFETY: as above.
+    const frame = { cues: [c], metadata: appleMap } as unknown as TextFrame<Cue>;
+
+    await relocateCues(frame, notAborted, deps);
+
+    // delta = mapCorrection(10) − startMediaTime(10) = 0 ⇒ cue unchanged.
+    expect(c.startTime).toBe(5);
   });
 
   it('relocates a genuinely text-only source by offset 0 without hanging', async () => {

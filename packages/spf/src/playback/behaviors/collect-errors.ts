@@ -18,7 +18,7 @@
  * seam lives here, with the slot it writes.
  */
 
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import type { SvtaError } from '../../media/errors';
@@ -81,7 +81,7 @@ export function emitError(state: ErrorEmitterState, error: SvtaError): void {
  * computed from subscribing to the slot this writes.
  *
  * @example
- *   // engine-background-video.ts — video-only, so a source with none can't play
+ *   // features/background-video.ts — video-only, so a source with none can't play
  *   constraints: [excludeUnplayableTracks, reportAbsentTrackType(SVTA_NO_SUPPORTED_VIDEO_TRACK)];
  */
 export function reportAbsentTrackType<T>(code: number): SelectionRule<T, ErrorEmitterState> {

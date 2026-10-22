@@ -1,4 +1,3 @@
-import { Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
 import {
   Fragment,
@@ -6,12 +5,11 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-
-import Info from '@/assets/icons/info.svg?react';
 
 import '../Range.css';
 import './Comparison.css';
@@ -138,7 +136,7 @@ export default function Comparison({
   const [animate, setAnimate] = useState(false);
   const [accessible, setAccessible] = useState(0);
   const [count, setCount] = useState(items.length);
-  const root = useRef<HTMLElement>(null);
+  const description = useId();
   const stage = useRef<HTMLDivElement>(null);
   // Distance from the pointer to the grabbed handle's center, so a drag doesn't snap the handle to the pointer.
   const grab = useRef(0);
@@ -226,11 +224,15 @@ export default function Comparison({
 
   return (
     <section
-      ref={root}
       className={clsx('comparison', className)}
       aria-label={label}
+      aria-describedby={description}
       data-animate={animate || undefined}
     >
+      {/* Only the focus reveal is unexpected; dragging is visible and the sliders announce their own keys. */}
+      <p id={description} className="sr-only">
+        Select an item to view it in full. Moving focus into an item also reveals it.
+      </p>
       <div className="comparison-toolbar" role="group" aria-label="Reveal an item">
         <button type="button" aria-pressed={active === null} onClick={reset}>
           Compare all
@@ -322,50 +324,28 @@ export default function Comparison({
           </Fragment>
         ))}
       </div>
-      <div className="comparison-footer">
-        <details className="comparison-adjust">
-          <summary>Adjust dividers</summary>
-          <div>
-            {dividers.map((value, index) => (
-              <label key={index}>
-                {items[index]!.label} / {items[index + 1]!.label}
-                <input
-                  type="range"
-                  className="range-input"
-                  min={0}
-                  max={100}
-                  value={value}
-                  style={
-                    // SAFETY: React's CSSProperties omits CSS custom properties; --fill is a percentage string.
-                    { '--fill': `${value}%` } as CSSProperties
-                  }
-                  onChange={(event) => move(index, Number(event.target.value))}
-                />
-              </label>
-            ))}
-          </div>
-        </details>
-        <Popover.Root modal={false}>
-          <Popover.Trigger
-            aria-label="Comparison help"
-            className="text-muted flex size-6 cursor-pointer items-center justify-center rounded-sm"
-          >
-            <Info className="size-4" aria-hidden="true" />
-          </Popover.Trigger>
-          <Popover.Portal container={root}>
-            <Popover.Positioner side="top" align="end" sideOffset={8} style={{ zIndex: 70 }}>
-              <Popover.Popup className="bg-surface-raised text-p3 dark:bg-soot w-80 max-w-(--available-width) rounded-lg p-4 shadow-lg ring-1 ring-black/10 dark:ring-white/10">
-                <Popover.Title className="sr-only">How to compare</Popover.Title>
-                <Popover.Description className="text-box-trim-both text-box-edge-cap-alphabetic">
-                  Drag the dividers to compare, or select an item to view it in full. Double-click a handle to reset the
-                  comparison. Keyboard focus reveals an item in full; use arrow keys or Adjust dividers to move a
-                  divider.
-                </Popover.Description>
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </Popover.Root>
-      </div>
+      <details className="comparison-adjust">
+        <summary>Comparison controls</summary>
+        <div>
+          {dividers.map((value, index) => (
+            <label key={index}>
+              {items[index]!.label} / {items[index + 1]!.label}
+              <input
+                type="range"
+                className="range-input"
+                min={0}
+                max={100}
+                value={value}
+                style={
+                  // SAFETY: React's CSSProperties omits CSS custom properties; --fill is a percentage string.
+                  { '--fill': `${value}%` } as CSSProperties
+                }
+                onChange={(event) => move(index, Number(event.target.value))}
+              />
+            </label>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }

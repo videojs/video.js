@@ -1,5 +1,6 @@
 import type { VjscNode } from 'vjsc/components';
 
+import { CaptionsToggle } from './captions-button';
 import { ControlsContent, type ControlsSlots } from './controls';
 import { ScreenControls } from './screen-controls';
 
@@ -13,6 +14,7 @@ export function VideoControlsContent({
 }: ControlsSlots & { center?: boolean; live?: boolean; menu?: VjscNode } = {}) {
   return (
     <ControlsContent
+      captions={!live && <CaptionsToggle />}
       center={center}
       live={live}
       menu={menu}

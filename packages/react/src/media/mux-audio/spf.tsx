@@ -1,7 +1,7 @@
 'use client';
 
 import { type MuxAdapterProps, MuxAudioAdapter } from '@videojs/mux-audio/spf';
-import type { HlsAudioAdapterProps } from '@videojs/spf/hls-audio';
+import type { HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
 import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
