@@ -26,7 +26,7 @@ None.
 
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

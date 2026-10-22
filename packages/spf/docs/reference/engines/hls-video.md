@@ -182,7 +182,7 @@ The engine's features declare these state keys for code outside the engine to wr
 | `videoBufferActor` | `SourceBufferActor \| undefined` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. |
 | `videoSegmentLoaderActor` | `SegmentLoaderActor \| undefined` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors), [loadVideoSegments](../behaviors/dom/load-segments.md#loadvideosegments) | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

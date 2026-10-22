@@ -34,7 +34,7 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
 
-## Additional functions and constants
+## Other functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
