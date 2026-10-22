@@ -44,7 +44,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Parts
+## Functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

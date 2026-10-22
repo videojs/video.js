@@ -47,7 +47,7 @@ The setup declares `config?`: callers may omit it.
 | `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | `RecoverEndStallContext` | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `RecoverEndStallContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
-## Parts
+## Functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
