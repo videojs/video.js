@@ -90,7 +90,7 @@ describe('LazyVideo', () => {
 
   it('renders nothing and reports a source it cannot resolve', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { container } = render(<LazyVideo src="https://fast.wistia.net/embed/iframe/e4a27b971d" />);
+    const { container } = render(<LazyVideo src="https://streamable.com/e/moo" />);
 
     expect(container.innerHTML).toBe('');
     expect(error).toHaveBeenCalledWith(expect.stringContaining('pass its MIME type as `type`'));
