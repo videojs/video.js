@@ -80,6 +80,30 @@ describe('CaptionsRadioGroup', () => {
     ]);
   });
 
+  it('exposes kind badges for tracks that share a label', () => {
+    const states: CaptionsRadioGroup.ItemState[] = [];
+
+    renderCaptionsRadioGroup({
+      textTrackList: [
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled' },
+      ],
+      group: (
+        <CaptionsRadioGroup.Options
+          renderItem={(props, state) => {
+            states.push(state);
+            return <Menu.RadioItem {...props} />;
+          }}
+        />
+      ),
+    });
+
+    expect(states.slice(-2)).toEqual([
+      expect.objectContaining({ value: 'captions-en', label: 'English', badge: 'CC' }),
+      expect.objectContaining({ value: 'subtitles-en', label: 'English', badge: 'SUB' }),
+    ]);
+  });
+
   it('selects a captions track', () => {
     const selectSubtitlesTrack = vi.fn();
 

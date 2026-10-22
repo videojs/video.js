@@ -54,6 +54,44 @@ describe('CaptionsRadioGroupCore', () => {
       expect(state.subtitlesShowing).toBe(true);
     });
 
+    it('adds kind badges to tracks that share a label', () => {
+      const core = new CaptionsRadioGroupCore();
+      const media = createMediaState({
+        textTrackList: [
+          { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+          { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled' },
+          { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+        ],
+      });
+
+      core.setMedia(media);
+
+      expect(core.getState().options.slice(1)).toEqual([
+        { value: 'captions-en', label: 'English', disabled: false, badge: 'CC' },
+        { value: 'subtitles-en', label: 'English', disabled: false, badge: 'SUB' },
+        { value: 'subtitles-es', label: 'Spanish', disabled: false },
+      ]);
+    });
+
+    it('compares formatted labels when adding kind badges', () => {
+      const core = new CaptionsRadioGroupCore({ formatTrack: (track) => track.language });
+      const media = createMediaState({
+        textTrackList: [
+          { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
+          { id: 'captions-en', kind: 'captions', label: 'English CC', language: 'en', mode: 'disabled' },
+        ],
+      });
+
+      core.setMedia(media);
+
+      expect(
+        core
+          .getState()
+          .options.slice(1)
+          .map((option) => option.badge)
+      ).toEqual(['CC', 'SUB']);
+    });
+
     it('marks state disabled when no caption tracks are available', () => {
       const core = new CaptionsRadioGroupCore();
       const media = createMediaState({
