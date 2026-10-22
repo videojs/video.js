@@ -28,7 +28,7 @@ The audio counterpart of <DocsLink slug="reference/components/lazy-video">LazyVi
 
 <FrameworkCase frameworks={["react"]}>
 ```bash
-npm install @videojs/react @videojs/mux-audio
+npm install @videojs/react @videojs/mux-audio @videojs/spotify-audio
 ```
 
 ```tsx
@@ -38,7 +38,7 @@ import { LazyAudio } from '@videojs/react/media/lazy-audio';
 
 <FrameworkCase frameworks={["html"]}>
 ```bash
-npm install @videojs/html @videojs/mux-audio
+npm install @videojs/html @videojs/mux-audio @videojs/spotify-audio
 ```
 
 ```ts
@@ -54,6 +54,7 @@ import '@videojs/html/media/lazy-audio';
 | HLS on Safari, or where there's no MSE | Native `<audio>` | Nothing |
 | HLS, elsewhere | <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | The SPF HLS engine |
 | `stream.mux.com` | <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | Mux Audio |
+| Spotify | <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> | The Spotify embed |
 
 A source that matches none of these, including YouTube, Vimeo, and DASH, renders nothing and logs an error in development.
 
