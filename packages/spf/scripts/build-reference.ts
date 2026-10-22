@@ -46,7 +46,10 @@ function main(): void {
     const problems = [...stale.map((path) => `stale: ${path}`), ...extra.map((path) => `extra: ${path}`)].sort();
 
     if (problems.length > 0) {
-      console.error(`The committed reference differs from the sources. Run \`pnpm -F @videojs/spf docs:reference\`.`);
+      console.error(
+        'The committed reference differs from the sources. Types and docs from the packages SPF depends on count too, so ' +
+          'a change outside SPF can make it stale. Run `pnpm -F @videojs/spf docs:reference` and commit the result.'
+      );
 
       for (const problem of problems) console.error(`  ${problem}`);
 
