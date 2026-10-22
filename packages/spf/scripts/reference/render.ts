@@ -471,8 +471,18 @@ function behaviorLinks(reference: ReferenceProgram, page: string, behaviors: Beh
   return behaviors.length ? behaviors.map((info) => behaviorLink(reference, page, info)).join(', ') : '—';
 }
 
-/** A key's `initialState` entry and the feature that supplies it; a later feature's entry replaces an earlier one's. */
-function initialOf(features: FeatureInfo[], key: string): { value: DefaultValue; feature: FeatureInfo } | undefined {
+/**
+ * A key's `initialState` entry and the feature that supplies it; a later feature's entry replaces an earlier one's, and
+ * an engine's own entry (no `feature`) replaces them all.
+ */
+function initialOf(
+  features: FeatureInfo[],
+  key: string,
+  engineInitial: DefaultValue[]
+): { value: DefaultValue; feature?: FeatureInfo } | undefined {
+  const own = engineInitial.find((candidate) => candidate.key === key);
+  if (own) return { value: own };
+
   const feature = [...features].reverse().find((candidate) => candidate.initial.some((value) => value.key === key));
   const value = feature?.initial.find((candidate) => candidate.key === key);
 
@@ -481,7 +491,8 @@ function initialOf(features: FeatureInfo[], key: string): { value: DefaultValue;
 
 /**
  * The state or context keys of a feature or engine. A state table also shows each key's `initialState` value from
- * `features` and, when more than one feature could supply it, which one does.
+ * `features`, or from the engine's own `engineInitial`, and, when more than one feature could supply it, which one
+ * does.
  */
 function slotFieldsTable(
   reference: ReferenceProgram,
@@ -490,7 +501,8 @@ function slotFieldsTable(
   fields: TypeField[],
   behaviors: BehaviorInfo[],
   slot: 'state' | 'context',
-  features: FeatureInfo[] = []
+  features: FeatureInfo[] = [],
+  engineInitial: DefaultValue[] = []
 ): string | undefined {
   if (fields.length === 0) return undefined;
 
@@ -499,14 +511,14 @@ function slotFieldsTable(
   const rows = fields.map((field) => {
     const declaredBy = behaviors.filter((info) => !info.external && slotOf(info, slot, field.key)?.declared);
     const external = behaviors.some((info) => info.external && slotOf(info, slot, field.key)?.declared);
-    const initial = slot === 'state' ? initialOf(features, field.key) : undefined;
+    const initial = slot === 'state' ? initialOf(features, field.key, engineInitial) : undefined;
 
     return [
       code(field.optional ? `${field.key}?` : field.key),
       long.cell(field.key, 'type', field.type),
       ...(initialColumns.length ? [initial ? valueCell(long, field.key, 'initial', initial.value) : '—'] : []),
       ...(initialColumns.length > 1
-        ? [initial ? link(page, initial.feature.entry.page!, initial.feature.name) : '—']
+        ? [initial?.feature ? link(page, initial.feature.entry.page!, initial.feature.name) : initial ? 'engine' : '—']
         : []),
       [
         ...(external ? ['[external signal](#external-signals)'] : []),
@@ -698,7 +710,16 @@ function renderEnginePage(reference: ReferenceProgram, model: Model, engine: Eng
     engine.features
   );
   const config = engineConfigTable(reference, page, engine);
-  const state = slotFieldsTable(reference, model, page, engine.state, engine.behaviors, 'state', engine.features);
+  const state = slotFieldsTable(
+    reference,
+    model,
+    page,
+    engine.state,
+    engine.behaviors,
+    'state',
+    engine.features,
+    engine.initial
+  );
   const context = slotFieldsTable(reference, model, page, engine.context, engine.behaviors, 'context');
   const sections = new Map([
     ['features', 'Features'],
