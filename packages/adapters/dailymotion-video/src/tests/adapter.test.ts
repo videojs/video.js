@@ -975,6 +975,23 @@ describe('DailymotionAdapter', () => {
       expect(media.seekable.end(0)).toBe(100);
     });
 
+    it('keeps buffered at the furthest point played, which a seek back does not shorten', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      player.emit('VIDEO_TIMECHANGE', { videoTime: 20 });
+      media.currentTime = 5;
+      player.emit('VIDEO_SEEKEND', { videoTime: 5 });
+
+      expect(media.currentTime).toBe(5);
+      expect(media.buffered.end(0)).toBe(20);
+
+      media.src = OTHER_VIDEO_SRC;
+      await flush();
+
+      expect(media.buffered.length).toBe(0);
+    });
+
     it('keeps the position within the duration when the player clock runs past it at the end', async () => {
       const media = new DailymotionAdapter();
       const { player } = await attachAndReady(media);

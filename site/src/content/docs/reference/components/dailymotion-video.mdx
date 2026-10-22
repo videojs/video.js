@@ -96,7 +96,7 @@ The player configuration decides what the embed can't change at runtime. To use 
 - Changing `src` loads the new video into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player, since Dailymotion only reads them when a player is created. So does autoplay, but only at the next load: call load() to apply a change right away. `muted` and `loop` change in place.
 - Depending on the player configuration, Dailymotion may ignore a seek made before the video first plays, and playback then starts from the beginning. To start at a known position, set `startTime` on the source (under `engine.dailymotion`, or in the URL) instead: Dailymotion applies it on load.
 - Seeking before the video has started, or after it has ended, also starts playback. Dailymotion does this itself; a native `<video>` would stay paused. Seeking while paused mid-video stays paused.
-- The SDK reports no buffered range, so `buffered` ends at the current time.
+- The SDK reports no buffered range, so `buffered` ends at the furthest point played.
 - Ads play inside the embed. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
 - When the browser refuses to start playback, as it does for unmuted autoplay, the component reports `pause` instead of playing.
 - Fullscreen targets the element the player is built in.

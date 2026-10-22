@@ -29,7 +29,8 @@ import { type DailymotionSource, parseDailymotionSource, resolveDailymotionPlaye
  *
  * The configuration owns what the SDK can't change: its controls, and an `autostart` that `autoplay` can't turn off
  * (development builds warn when they disagree). `currentTime` and `duration` describe the video, while `paused` follows
- * whatever is on screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the playhead.
+ * whatever is on screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the furthest point
+ * played.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
@@ -78,6 +79,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #playRequested = false;
   // Whether this load may still autoplay; a `pause()` before the player is ready withdraws it.
   #autoplayPending = false;
+  // The furthest point played this load, which `buffered` ends at.
+  #bufferedEnd = 0;
   // The player's position when the pending seek began, to tell whether it has landed.
   #seekFrom = 0;
   // Settles a seek the player never reports the end of.
@@ -379,7 +382,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   get buffered() {
-    return this.#currentTime > 0 ? createTimeRange(0, this.#currentTime) : EMPTY_TIME_RANGES;
+    const end = Math.max(this.#bufferedEnd, this.#currentTime);
+
+    return end > 0 ? createTimeRange(0, end) : EMPTY_TIME_RANGES;
   }
 
   get seekable() {
@@ -805,6 +810,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     if (next === this.#currentTime) return;
 
     this.#currentTime = next;
+    this.#bufferedEnd = Math.max(this.#bufferedEnd, next);
     this.dispatchEvent(new Event('timeupdate'));
   }
 
@@ -923,6 +929,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#ended = false;
     this.#seeking = false;
     this.#startPosition = null;
+    this.#bufferedEnd = 0;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#error = null;
     this.#isFullscreen = false;
