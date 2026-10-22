@@ -35,7 +35,7 @@
  */
 import { listen } from '@videojs/utils/dom';
 
-import type { Behavior } from '../../../core/composition/create-composition';
+import type { Behavior } from '../../../core/composition/define-behavior';
 import { createMachineReactor, type Reactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../../media/types';

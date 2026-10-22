@@ -1,4 +1,4 @@
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import { when } from '../../core/signals/when';
@@ -86,7 +86,7 @@ interface TrackResolutionConfig<K extends SelectedTrackKey> {
 }
 
 /** Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. */
-interface ResolveTrackConfig {
+export interface ResolveTrackConfig {
   /** CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. */
   getCdnId?: GetCdnId;
   /** First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. */

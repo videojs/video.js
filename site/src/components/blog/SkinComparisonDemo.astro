@@ -1,0 +1,15 @@
+---
+import SkinComparison from './SkinComparison';
+
+// Imported here as well as in the island so the dev server puts them in <head>; it only collects CSS from
+// server-rendered components, so a `client:visible` island's styles would otherwise arrive when it hydrates.
+import '@/components/Range.css';
+import '@/components/Comparison/Comparison.css';
+import '@videojs/react/video/skin.css';
+import '@videojs/react/video/neutral-skin.css';
+import '@videojs/react/video/compat-skin.css';
+import '@videojs/react/video/scaffold-skin.css';
+import './SkinComparison.css';
+---
+
+<SkinComparison client:visible />

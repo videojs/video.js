@@ -1,5 +1,24 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/cli@10.1.0...@videojs/cli@10.2.0) (2026-10-22)
+
+
+### Features
+
+* **cli:** add skin create to start a skin project ([#9500](https://github.com/videojs/video.js/issues/9500)) ([c1c3f76](https://github.com/videojs/video.js/commit/c1c3f76bff9b3cade9209a35b2aea38b259447eb))
+* **cli:** deploy skin workbenches to vercel, netlify, or cloudflare pages ([#9502](https://github.com/videojs/video.js/issues/9502)) ([e1be8a5](https://github.com/videojs/video.js/commit/e1be8a5232a111910c8284ae58c749557c9389f0))
+* **cli:** point skin projects at the videojs-skin agent skill ([#9518](https://github.com/videojs/video.js/issues/9518)) ([87bb1c2](https://github.com/videojs/video.js/commit/87bb1c2ae2ccc81afea9c297d1c807d75475209c))
+* **cli:** preview skins in a sandbox-style workbench ([#9501](https://github.com/videojs/video.js/issues/9501)) ([2228a99](https://github.com/videojs/video.js/commit/2228a99dfbc478306e2b96a5cf2443caea579d45))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.2.0
+    * @videojs/installation bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/cli@10.0.1...@videojs/cli@10.1.0) (2026-10-12)
 
 

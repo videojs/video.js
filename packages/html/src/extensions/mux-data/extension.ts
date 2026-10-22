@@ -76,7 +76,7 @@ export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBas
     this.extension.disableCookies = value;
   }
 
-  /** Player software name reported to Mux Data (e.g. `mux-video`). */
+  /** Player software name reported to Mux Data (e.g. `mux-video`). Defaults to `Video.js`. */
   get playerSoftwareName(): string | undefined {
     return this.extension.playerSoftwareName;
   }

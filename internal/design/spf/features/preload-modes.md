@@ -21,7 +21,7 @@ on it.
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface and implementation
   footprint documented; the extended-preload-value mechanism is a
   forward-compatibility hook with no shipped consumer yet
@@ -63,7 +63,7 @@ engine's loading-semantics contract.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — both
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — both
 behaviors are composed at the top of the pipeline, before
 `resolvePresentation`. `syncPreload` is in the runtime-agnostic
 `playback/behaviors/` (operates against `MediaElementLike`);

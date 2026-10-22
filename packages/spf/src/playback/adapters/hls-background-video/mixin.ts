@@ -11,12 +11,11 @@ import {
   type SvtaError,
 } from '../../../media/errors';
 import {
-  type BackgroundVideoEngineConfig,
-  type BackgroundVideoEngineContext,
-  type BackgroundVideoEngineSignals,
-  type BackgroundVideoEngineState,
-  createBackgroundVideoEngine,
-} from '../../engines/hls/engine-background-video';
+  type EngineConfig,
+  type EngineContext,
+  type EngineState,
+  createEngine,
+} from '../../engines/hls-background-video';
 import { UNPLAYABLE_SOURCE_MESSAGE } from '../../primitives/error-messages';
 import { firstFatal, type HlsVideoMediaError, hasUnsupportedFeatureCause } from '../hls-video/error-surface';
 
@@ -27,8 +26,8 @@ export type { HlsVideoMediaError } from '../hls-video/error-surface';
 
 /** What `new HlsBackgroundVideoAdapter(options)` accepts; see `HlsVideoAdapterOptions` for why it is typed here. */
 export interface HlsBackgroundVideoAdapterOptions {
-  /** Engine config forwarded to `createBackgroundVideoEngine`. */
-  config?: BackgroundVideoEngineConfig;
+  /** Engine config forwarded to `createEngine`. */
+  config?: EngineConfig;
 }
 
 export interface HlsBackgroundVideoAdapterProps {
@@ -36,7 +35,7 @@ export interface HlsBackgroundVideoAdapterProps {
 }
 
 export interface HlsBackgroundVideoAdapterAPI extends HlsBackgroundVideoAdapterProps {
-  readonly engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
+  readonly engine: Composition<EngineState, EngineContext>;
   readonly error: HlsVideoMediaError | null;
   attach(mediaElement: HTMLMediaElement): void;
   detach(): void;
@@ -114,9 +113,8 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       src: '',
     };
 
-    #engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
-    #config: BackgroundVideoEngineConfig;
-    #signals!: BackgroundVideoEngineSignals;
+    #engine: Composition<EngineState, EngineContext>;
+    #config: EngineConfig;
     #error: HlsVideoMediaError | null = null;
     /**
      * The _reported_ condition currently surfaced, which is what the re-fire latch keys on. Not `#error.code`: that's
@@ -141,13 +139,13 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       // the slot per source, so a new source starts with no error without this
       // needing its own source-change hook.
       this.#stopErrorSync = effect(() => {
-        const errors = this.#signals.state.errors.get();
+        const errors = this.#engine.state.errors.get();
 
         this.#setError(firstFatal(errors, FATAL_SVTA_CODES), errors);
       });
     }
 
-    get engine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    get engine(): Composition<EngineState, EngineContext> {
       return this.#engine;
     }
 
@@ -206,7 +204,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // -------------------------------------------------------------------------
 
     attach(mediaElement: HTMLMediaElement): void {
-      if (mediaElement !== this.#signals.context.mediaElement.get()) {
+      if (mediaElement !== this.#engine.context.mediaElement.get()) {
         this.#cancelPendingPlay();
       }
 
@@ -220,12 +218,12 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       mediaElement.autoplay = true;
       mediaElement.preload = 'auto';
 
-      this.#signals.context.mediaElement.set(mediaElement);
+      this.#engine.context.mediaElement.set(mediaElement);
     }
 
     detach(): void {
       this.#cancelPendingPlay();
-      this.#signals.context.mediaElement.set(undefined);
+      this.#engine.context.mediaElement.set(undefined);
       super.detach?.();
     }
 
@@ -240,7 +238,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // -------------------------------------------------------------------------
 
     get src(): string {
-      return this.#signals.state.presentation.get()?.url ?? '';
+      return this.#engine.state.presentation.get()?.url ?? '';
     }
 
     set src(value: string) {
@@ -250,7 +248,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       if (value === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#signals.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(value ? { url: value } : undefined);
     }
 
     // -------------------------------------------------------------------------
@@ -259,7 +257,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // -------------------------------------------------------------------------
 
     async play(): Promise<void> {
-      const mediaElement = this.#signals.context.mediaElement.get();
+      const mediaElement = this.#engine.context.mediaElement.get();
       if (!mediaElement) return Promise.reject(new Error('HlsBackgroundVideoAdapterCore: no media element attached'));
 
       const { signal } = this.#playGeneration;
@@ -288,16 +286,11 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // Private
     // -------------------------------------------------------------------------
 
-    #createEngine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    #createEngine(): Composition<EngineState, EngineContext> {
       // No selection config of its own: the engine's default rule chain already
       // narrows to the largest rendition that fits the screen, which is exactly
       // what this adapter used to hand over as a bespoke picker.
-      return createBackgroundVideoEngine({
-        ...this.#config,
-        onSignalsReady: (signals) => {
-          this.#signals = signals;
-        },
-      });
+      return createEngine(this.#config);
     }
 
     #cancelPendingPlay(): void {

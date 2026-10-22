@@ -75,7 +75,7 @@ Anti-patterns:
 
 ### D — Simplicity
 
-**Decision criterion:** is this code more elaborate than the problem requires? Can existing primitives (Reactor, Task + Runner, Signal, Actor, `shareSignals`) replace ad-hoc machinery?
+**Decision criterion:** is this code more elaborate than the problem requires? Can existing primitives (Reactor, Task + Runner, Signal, Actor) replace ad-hoc machinery?
 
 Simplicity is about **objective** complexity reduction — fewer moving parts for the same behavior. This is distinct from C (which is about conformance) and from E (which is about size in compiled output): code can be small but elaborate, or large but trivial.
 
@@ -91,7 +91,7 @@ Anti-patterns:
 
 ### E — Size
 
-**Decision criterion:** does this code minimize compiled output size? Cross-cutting (applies broadly to VJSv10) and uniquely **measurable** among the axes — `pnpm -F @videojs/spf size` (public API) and `size:all` (all exports) provide direct numbers.
+**Decision criterion:** does this code minimize compiled output size? Cross-cutting (applies broadly to VJSv10) and uniquely **measurable** among the axes — `pnpm size` at the workspace root reports every SPF entry point, gzipped, the same measurement the Bundle Size workflow posts on each PR.
 
 Size is its own axis because **smaller** and **simpler** are correlated but not identical. Terse code via higher-order abstractions, FP composition, or metaprogramming can shrink output while *increasing* line-by-line density. That tradeoff is acceptable when (a) the abstraction is a documented convention and (b) comments cover the non-obvious why. Size is also load-bearing for SPF specifically — it is shipped to browsers and the public API surface has measured size budgets.
 

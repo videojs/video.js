@@ -42,7 +42,7 @@
 
 import { isWebKitAirPlayCapable, listen, type WebKitVideoElement } from '@videojs/utils/dom';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { effect } from '../../../core/signals/effect';
@@ -61,6 +61,17 @@ import type { SegmentLoadingState } from './load-segments';
  * immediately; only the falling edge waits out this settle window.
  */
 const REMOTE_INACTIVE_SETTLE_MS = 1000;
+
+/**
+ * Author intent for the AirPlay/remote-playback picker, written by the media adapter's `disableRemotePlayback` IDL
+ * property. `true` is an explicit opt-out: `setupAirPlay` reads it at attach and sets nothing up, leaving the element's
+ * remote playback disabled. Distinct from the underlying media element's own `disableRemotePlayback`, which stays
+ * programmatically managed (ManagedMediaSource / AirPlay). An external signal: the adapter writes it whether or not
+ * `setupAirPlay` is composed.
+ */
+export interface DisableRemotePlaybackState {
+  disableRemotePlayback?: boolean;
+}
 
 type AirPlayFsmState = 'preconditions-unmet' | 'airplay-capable';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { HlsVideoAdapter, type HlsVideoAdapterProps } from '@videojs/spf/hls-video';
+import { HlsVideoAdapter, type HlsVideoAdapterProps } from '@videojs/spf/adapters/hls-video';
 import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';

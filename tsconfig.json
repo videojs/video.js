@@ -56,7 +56,8 @@
     { "path": "packages/spf/src/playback/behaviors/dom" },
     { "path": "packages/spf/src/playback/actors" },
     { "path": "packages/spf/src/playback/actors/dom" },
-    { "path": "packages/spf/src/playback/engines/hls" },
+    { "path": "packages/spf/src/playback/features" },
+    { "path": "packages/spf/src/playback/engines" },
     { "path": "packages/spf/src/playback/adapters" },
 
     { "path": "packages/html" },

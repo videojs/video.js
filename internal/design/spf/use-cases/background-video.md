@@ -26,9 +26,9 @@ is the narrower "deliver video-only despite mixed source" use case.
 ## Status
 
 Phase 1 implemented ([#1586](https://github.com/videojs/v10/issues/1586)):
-`createBackgroundVideoEngine` ships under `@videojs/spf/hls`, beside the other
-HLS engines; `HlsBackgroundVideoAdapterCore` and the host-bound
-`HlsBackgroundVideoAdapter` ship under `@videojs/spf/hls-background-video`; html and
+The engine ships under `@videojs/spf/engines/hls-background-video`, one entry point
+per HLS engine like the others; `HlsBackgroundVideoAdapterCore` and the host-bound
+`HlsBackgroundVideoAdapter` ship under `@videojs/spf/adapters/hls-background-video`; html and
 react alias them as `<mux-background-video>` / `MuxBackgroundVideo`.
 The adapter carries no client-side cap: it pins the largest rendition the
 manifest offers, and narrowing that set is a delivery param on the URL. The
@@ -57,7 +57,7 @@ configuration. Alternative-implementation buckets surface in Phase 3.
 
 ### Subtracted
 
-From [`createHlsVideoEngine`](../../../../packages/spf/src/playback/engines/hls/engine.ts):
+From [the `hls-video` engine](../../../../packages/spf/src/playback/engines/hls-video.ts):
 
 - `syncPreload`, `trackLoadTriggers` — no preload-state monitoring or DOM `play`/`seeking` activation; replaced by `loadActivated: true` initial state.
 - `selectAudioTrack`, `resolveAudioTrack`, `setupAudioBufferActors`, `loadAudioSegments` — no audio side.
@@ -114,7 +114,7 @@ use cases resolve via adapter choice.
 Phase 1 baseline:
 
 - **`video-only-composition`** — used at the *composition-mechanism* level; same audio-side subtraction pattern as the Case-1 feature, driven by adapter choice instead of source-shape detection. Plus further subtractions (text, ABR, preload).
-- **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** — variant adapter parallels `HlsVideoAdapterCore` via the same `HlsVideoMixin` / `shareSignals` pattern.
+- **[`engine-adapter-integration`](../features/engine-adapter-integration.md)** — variant adapter parallels `HlsVideoAdapterCore` via the same `HlsVideoMixin` pattern.
 - **[`mse-mms-pipeline`](../features/mse-mms-pipeline.md)** — used as-is. Firefox `mozHasAudio=false` verification under subtractive-audio composition is **joint Phase 1 scope** with `video-only-mode-override` and the Case-1 `video-only-composition` feature.
 - **[`buffer-management`](../features/buffer-management.md)** — as-is in Phase 1; Phase 3 surfaces back-buffer tuning and loop-around forward-buffer fetching (the "loop-around buffer fetching" candidate in that feature's *What's not implemented* directly targets this use case).
 - **[`preload-modes`](../features/preload-modes.md)** — alternative initial state (`loadActivated: true`) plus subtraction of `syncPreload` + `trackLoadTriggers`. Semantic contract preserved; the variant just seeds the gate-passable state from composition time.
@@ -131,7 +131,7 @@ Phase 2 (decorations TBD): **[`audio-playback`](../features/audio-playback.md)**
 
 - **Shared engine factory.** Three use cases now want subtractive-audio composition (this, `video-only-mode-override`, Case-1 `video-only-composition`). Lean: shared factory at the subtractive-audio level, with this use case layering further subtractions (text, ABR, preload) and an initial-state override on top.
 - **Firefox `mozHasAudio` verification.** Joint scope with the two sibling cases — same mixed-source-with-audio-subtracted permutation.
-- **Adapter proliferation.** N+1 adapter parallel to `HlsVideoAdapterCore`; three adapters share the `HlsVideoMixin` / `shareSignals` pattern — cost is configuration surface, not architecture.
+- **Adapter proliferation.** N+1 adapter parallel to `HlsVideoAdapterCore`; three adapters share the `HlsVideoMixin` pattern — cost is configuration surface, not architecture.
 - **`loadActivated: true` initial-state pattern.** Pioneered here. If a second use case wants the same shape, consider a shared `withAutoLoad()`-style helper or document treatment in [`preload-modes`](../features/preload-modes.md).
 
 ## Open questions
@@ -150,5 +150,5 @@ Resolved Phase 1: ~~picker location~~ (`pickMaxResolutionVideoTrack` ships in [`
 - [`README.md`](./README.md) — use-case-composition doc-type spec.
 - [`../features/clusters.md` § Composition vs Policy vs middle pattern](../features/clusters.md#composition-vs-policy-vs-middle-pattern) · [`../conventions/behaviors.md` § Inverse: behaviors that operate uniformly across tracks](../conventions/behaviors.md#inverse-behaviors-that-operate-uniformly-across-tracks).
 - [`../../../../packages/spf/docs/hls-engine.md`](../../../../packages/spf/docs/hls-engine.md) — HLS engine composition baseline the variant subtracts from.
-- [`select-tracks.ts`](../../../../packages/spf/src/playback/behaviors/select-tracks.ts) (add target) · [`engine.ts`](../../../../packages/spf/src/playback/engines/hls/engine.ts) (subtraction baseline).
+- [`select-tracks.ts`](../../../../packages/spf/src/playback/behaviors/select-tracks.ts) (add target) · [`hls-video.ts`](../../../../packages/spf/src/playback/engines/hls-video.ts) (subtraction baseline).
 - [GitHub #1586](https://github.com/videojs/v10/issues/1586) (Phase 1) · [#873](https://github.com/videojs/v10/issues/873) (parent epic) · [`mux-background-video`](https://github.com/muxinc/mux-background-video) (prior art) · [SPF Epics Working Doc](https://www.notion.so/35f97a7f89d08123a13fecab1ca1cac4).

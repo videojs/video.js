@@ -2,7 +2,7 @@
  * Stream Processing Framework (SPF) for Video.js 10
  *
  * The compositional primitives: createComposition, signals, tasks, actors, reactors. Media-domain helpers and the HLS
- * playback engine live behind the `./dom` and `./hls` subpaths.
+ * playback engines live behind the `./dom`, `./hls`, and per-engine `./hls/*` subpaths.
  *
  * @packageDocumentation
  */
@@ -13,12 +13,12 @@ export const VERSION = '0.1.0';
 // Composition
 // =============================================================================
 
+export type { Composition, CompositionOptions } from './core/composition/create-composition';
+export { createComposition, defineCompositionFactory } from './core/composition/create-composition';
 export type {
   Behavior,
   BehaviorCleanup,
   BehaviorDeps,
-  Composition,
-  CompositionOptions,
   ContextSignals,
   InferBehaviorConfig,
   InferBehaviorContext,
@@ -27,10 +27,11 @@ export type {
   ResolveBehaviorContext,
   ResolveBehaviorState,
   StateSignals,
-} from './core/composition/create-composition';
-export { createComposition, defineBehavior } from './core/composition/create-composition';
-export type { ShareSignalsConfig } from './core/composition/share-signals';
-export { makeShareSignals } from './core/composition/share-signals';
+} from './core/composition/define-behavior';
+export { defineBehavior } from './core/composition/define-behavior';
+export { defineExternalSignals } from './core/composition/define-external-signals';
+export type { Feature, FlattenedFeatures } from './core/composition/define-feature';
+export { defineFeature, flattenFeatures } from './core/composition/define-feature';
 
 // =============================================================================
 // Signals

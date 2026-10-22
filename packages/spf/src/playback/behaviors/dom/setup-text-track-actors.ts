@@ -12,7 +12,7 @@
  * which only reads `textTrackSegmentLoaderActor`. The cue resolver is injected via `config` so this behavior owns the
  * DOM-bound part of the text-track pipeline.
  */
-import type { AnySlotMap, Behavior } from '../../../core/composition/create-composition';
+import type { AnySlotMap, Behavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
 import { createTextTracksActor } from '../../actors/dom/text-tracks';

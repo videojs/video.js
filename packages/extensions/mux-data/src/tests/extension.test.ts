@@ -114,9 +114,50 @@ describe('MuxDataExtension', () => {
     expect(monitor).toHaveBeenCalledWith(
       video,
       expect.objectContaining({
-        data: expect.objectContaining({ env_key: 'key', player_software_name: 'mux-video', video_id: 'abc123' }),
+        data: expect.objectContaining({
+          env_key: 'key',
+          player_software_name: 'mux-video',
+          player_software: 'mux-video',
+          video_id: 'abc123',
+        }),
       })
     );
+  });
+
+  it('reports Video.js and this extension as the player software by default', async () => {
+    const { sdk, monitor } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk });
+    const video = document.createElement('video');
+
+    data.attach({ media: video, container: null });
+
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      video,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          player_software_name: 'Video.js',
+          player_software: 'Video.js',
+          player_software_version: __PLAYER_VERSION__,
+          player_mux_plugin_name: '@videojs/mux-data',
+          player_mux_plugin_version: __PLAYER_VERSION__,
+        }),
+      })
+    );
+  });
+
+  it('updates the live view when the player software name changes', async () => {
+    const { sdk, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk });
+
+    data.attach({ media: document.createElement('video'), container: null });
+
+    await settle();
+
+    data.playerSoftwareName = 'mux-video';
+
+    expect(updateData).toHaveBeenCalledWith({ player_software_name: 'mux-video', player_software: 'mux-video' });
   });
 
   it('reports the time the player was created as the player init time', async () => {
