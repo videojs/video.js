@@ -1,4 +1,11 @@
-import { SOURCES, VIMEO_VIDEO_SRC } from './sources';
+import {
+  CLOUDFLARE_VIDEO_SRC,
+  SOURCES,
+  TIKTOK_VIDEO_SRC,
+  TWITCH_VIDEO_SRC,
+  VIMEO_VIDEO_SRC,
+  WISTIA_VIDEO_SRC,
+} from './sources';
 
 /** One source per media `LazyVideo` resolves to, plus one it can't, for the lazy-video sandboxes. */
 export const LAZY_VIDEO_SOURCES = [
@@ -9,5 +16,10 @@ export const LAZY_VIDEO_SOURCES = [
   { label: 'DASH', src: SOURCES['dash-1'].url! },
   { label: 'YouTube', src: SOURCES['youtube-1'].url! },
   { label: 'Vimeo', src: VIMEO_VIDEO_SRC },
-  { label: 'Unsupported (Wistia)', src: 'https://fast.wistia.net/embed/iframe/e4a27b971d' },
+  { label: 'Wistia', src: WISTIA_VIDEO_SRC },
+  { label: 'Cloudflare', src: CLOUDFLARE_VIDEO_SRC },
+  { label: 'TikTok', src: TIKTOK_VIDEO_SRC },
+  { label: 'Twitch', src: TWITCH_VIDEO_SRC },
+  // player.js speaks for many providers with no host to recognize them by.
+  { label: 'Unsupported (Streamable)', src: 'https://streamable.com/e/moo' },
 ] as const;
