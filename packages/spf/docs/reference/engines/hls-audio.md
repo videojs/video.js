@@ -127,7 +127,7 @@ The engine's features declare these state keys for code outside the engine to wr
 | `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers), [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime), [applyStartPosition](../behaviors/dom/apply-start-position.md#applystartposition), [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall), [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. |
 | `mediaSource` | `MediaSource \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [setupAirPlay](../behaviors/dom/airplay.md#setupairplay), [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. |
 
-## Parts
+## Functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |

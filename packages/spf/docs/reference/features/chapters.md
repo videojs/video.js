@@ -37,7 +37,7 @@ hidden `chapters` text track per language.
 - [@videojs/spf/engines/hls-video](../engines/hls-video.md)
 - [@videojs/spf/engines/hls-audio](../engines/hls-audio.md)
 
-## Parts
+## Functions and constants
 
 | Name | Kind | Description | Source |
 | --- | --- | --- | --- |
