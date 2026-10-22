@@ -178,10 +178,14 @@ export abstract class LazyMediaElement extends HTMLElementBase {
   #setMedia(next: HTMLElement | null, name: string | null): void {
     const previous = this.#media;
 
-    // Tracks and sources follow the media they belong to.
+    // Tracks and sources follow the media they belong to, and wait on this element while there's none.
+    const children = (previous ?? this).querySelectorAll(':scope > track, :scope > source');
+
     if (next) {
-      next.append(...(previous ?? this).querySelectorAll(':scope > track, :scope > source'));
+      next.append(...children);
       this.append(next);
+    } else {
+      this.append(...children);
     }
 
     previous?.remove();
