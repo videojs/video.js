@@ -19,25 +19,28 @@ export function supportsPopoverAPI(): boolean {
 }
 
 /**
- * Whether HLS should play through the browser's own support by default rather than an MSE engine. Matches Mux's
- * playback-core: native on Safari, and anywhere that plays HLS natively but has no MSE. Chromium and Android browsers
- * that also report native HLS play it with fewer features than an engine, so they default to MSE. Always `false`
- * without a DOM.
+ * How the browser plays HLS without an engine:
+ *
+ * - `'preferred'`: natively by default, matching Mux's playback-core. That's Safari, and anywhere that plays HLS natively
+ *   but has no MSE.
+ * - `'supported'`: it can, but an MSE engine plays better. Chromium and Android browsers report native HLS with fewer
+ *   features than an engine.
+ * - `'unsupported'`: it can't, which is also the answer without a DOM.
  *
  * @internal
  */
-export function prefersNativeHls(): boolean {
-  if (typeof document === 'undefined' || typeof navigator === 'undefined') return false;
+export function nativeHlsSupport(): 'preferred' | 'supported' | 'unsupported' {
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return 'unsupported';
 
-  if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl') === '') return false;
+  if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl') === '') return 'unsupported';
 
-  if (!supportsMediaSource()) return true;
+  if (!supportsMediaSource()) return 'preferred';
 
   const { userAgent } = navigator;
   const platform = (navigator as NavigatorWithUAData).userAgentData?.platform ?? '';
   const isAndroidLike = /android/i.test(userAgent) || /x11|android/i.test(platform);
 
-  return !isAndroidLike && SAFARI_USER_AGENT.test(userAgent);
+  return !isAndroidLike && SAFARI_USER_AGENT.test(userAgent) ? 'preferred' : 'supported';
 }
 
 /**

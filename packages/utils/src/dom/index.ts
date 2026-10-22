@@ -96,7 +96,7 @@ export {
   withInlineStyles,
 } from './style';
 export {
-  prefersNativeHls,
+  nativeHlsSupport,
   supportsAnchorPositioning,
   supportsAnimationFrame,
   supportsConstructableStyleSheets,
