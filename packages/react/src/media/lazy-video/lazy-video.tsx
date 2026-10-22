@@ -47,6 +47,9 @@ export const LazyVideo = forwardRef<HTMLVideoElement | HTMLIFrameElement, LazyVi
   { src = '', type, preferPlayback, preload = 'none', fallback, ...props },
   ref
 ) {
+  // Resolving a source is cheaper than memoizing it, and the compiler's cache is most of this component's size.
+  'use no memo';
+
   const nativeHls = useNativeHls();
   const name = resolveLazyVideoMedia(src, { type, nativeHls, preferPlayback });
 

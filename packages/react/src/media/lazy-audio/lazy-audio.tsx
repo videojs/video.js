@@ -37,6 +37,9 @@ export const LazyAudio = forwardRef<HTMLAudioElement, LazyAudioProps>(function L
   { src = '', type, preferPlayback, preload = 'none', fallback, ...props },
   ref
 ) {
+  // Resolving a source is cheaper than memoizing it, and the compiler's cache is most of this component's size.
+  'use no memo';
+
   const nativeHls = useNativeHls();
   const name = resolveLazyAudioMedia(src, { type, nativeHls, preferPlayback });
 
