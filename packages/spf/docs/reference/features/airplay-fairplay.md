@@ -19,8 +19,8 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 | Key | Type | Default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `drm` | `NegotiableDrmSystemsConfig` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. |
-| `keySystems` | `readonly KeySystemModule<string>[]` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. |
+| `drm` | `NegotiableDrmSystemsConfig` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. Required: license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies it. (documented on [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
+| `keySystems` | `readonly KeySystemModule<string>[]` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The key systems this composition can negotiate, most-preferred first. Required for the same reason `drm` is: which systems an engine carries is a composition decision, and each module dropped from the list drops its own negotiation, init-data, and license-shaping code with it. (documented on [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
 
 ### State
 
