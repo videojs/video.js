@@ -12,7 +12,7 @@ import type { RequestCredentialsPolicy } from '../../../network/credentials-fetc
 
 type LoadChaptersFsmState = 'preconditions-unmet' | 'loading';
 
-/** The chapters track for `preferredSubtitleLanguage` leads, when the document titles chapters in it. */
+/** Config of `loadChapters`, which leads with the chapters track in `preferredSubtitleLanguage` when there is one. */
 export type LoadChaptersConfig = Pick<TextSelectionConfig, 'preferredSubtitleLanguage'> & {
   /** The `credentials` mode the chapters-document request is made with; absent → the platform default. */
   requestCredentials?: RequestCredentialsPolicy;
