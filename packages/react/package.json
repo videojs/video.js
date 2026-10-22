@@ -168,33 +168,33 @@
   },
   "dependencies": {
     "@videojs/core": "workspace:*",
-    "@videojs/dash-video": "workspace:*",
-    "@videojs/hlsjs-video": "workspace:*",
     "@videojs/media": "workspace:*",
-    "@videojs/mux-audio": "workspace:*",
-    "@videojs/mux-video": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/store": "workspace:*",
     "@videojs/utils": "workspace:*",
-    "@videojs/vimeo-video": "workspace:*",
-    "@videojs/youtube-video": "workspace:*",
     "react-compiler-runtime": "^1.0.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
+    "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
+    "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
+    "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
+    "@videojs/youtube-video": "workspace:*",
     "jsdom": "^26.1.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -202,14 +202,20 @@
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
+    "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
+    "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
+    "@videojs/vimeo-video": "workspace:*",
     "@videojs/wistia-video": "workspace:*",
+    "@videojs/youtube-video": "workspace:*",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
@@ -217,10 +223,22 @@
     "@videojs/cloudflare-video": {
       "optional": true
     },
+    "@videojs/dash-video": {
+      "optional": true
+    },
     "@videojs/google-cast": {
       "optional": true
     },
+    "@videojs/hlsjs-video": {
+      "optional": true
+    },
+    "@videojs/mux-audio": {
+      "optional": true
+    },
     "@videojs/mux-data": {
+      "optional": true
+    },
+    "@videojs/mux-video": {
       "optional": true
     },
     "@videojs/playerjs-video": {
@@ -238,7 +256,13 @@
     "@videojs/twitch-video": {
       "optional": true
     },
+    "@videojs/vimeo-video": {
+      "optional": true
+    },
     "@videojs/wistia-video": {
+      "optional": true
+    },
+    "@videojs/youtube-video": {
       "optional": true
     }
   }

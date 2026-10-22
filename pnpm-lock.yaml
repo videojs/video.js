@@ -940,24 +940,12 @@ importers:
       '@videojs/core':
         specifier: workspace:*
         version: link:../core
-      '@videojs/dash-video':
-        specifier: workspace:*
-        version: link:../adapters/dash-video
       '@videojs/element':
         specifier: workspace:*
         version: link:../element
-      '@videojs/hlsjs-video':
-        specifier: workspace:*
-        version: link:../adapters/hlsjs-video
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
-      '@videojs/mux-audio':
-        specifier: workspace:*
-        version: link:../adapters/mux-audio
-      '@videojs/mux-video':
-        specifier: workspace:*
-        version: link:../adapters/mux-video
       '@videojs/native-hls-video':
         specifier: workspace:*
         version: link:../adapters/native-hls-video
@@ -970,25 +958,31 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../utils
-      '@videojs/vimeo-video':
-        specifier: workspace:*
-        version: link:../adapters/vimeo-video
-      '@videojs/youtube-video':
-        specifier: workspace:*
-        version: link:../adapters/youtube-video
     devDependencies:
       '@videojs/cloudflare-video':
         specifier: workspace:*
         version: link:../adapters/cloudflare-video
+      '@videojs/dash-video':
+        specifier: workspace:*
+        version: link:../adapters/dash-video
       '@videojs/google-cast':
         specifier: workspace:*
         version: link:../extensions/google-cast
+      '@videojs/hlsjs-video':
+        specifier: workspace:*
+        version: link:../adapters/hlsjs-video
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/mux-audio':
+        specifier: workspace:*
+        version: link:../adapters/mux-audio
       '@videojs/mux-data':
         specifier: workspace:*
         version: link:../extensions/mux-data
+      '@videojs/mux-video':
+        specifier: workspace:*
+        version: link:../adapters/mux-video
       '@videojs/playerjs-video':
         specifier: workspace:*
         version: link:../adapters/playerjs-video
@@ -1007,9 +1001,15 @@ importers:
       '@videojs/twitch-video':
         specifier: workspace:*
         version: link:../adapters/twitch-video
+      '@videojs/vimeo-video':
+        specifier: workspace:*
+        version: link:../adapters/vimeo-video
       '@videojs/wistia-video':
         specifier: workspace:*
         version: link:../adapters/wistia-video
+      '@videojs/youtube-video':
+        specifier: workspace:*
+        version: link:../adapters/youtube-video
       happy-dom:
         specifier: ^20.11.1
         version: 20.11.1
@@ -1094,21 +1094,9 @@ importers:
       '@videojs/core':
         specifier: workspace:*
         version: link:../core
-      '@videojs/dash-video':
-        specifier: workspace:*
-        version: link:../adapters/dash-video
-      '@videojs/hlsjs-video':
-        specifier: workspace:*
-        version: link:../adapters/hlsjs-video
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
-      '@videojs/mux-audio':
-        specifier: workspace:*
-        version: link:../adapters/mux-audio
-      '@videojs/mux-video':
-        specifier: workspace:*
-        version: link:../adapters/mux-video
       '@videojs/native-hls-video':
         specifier: workspace:*
         version: link:../adapters/native-hls-video
@@ -1121,12 +1109,6 @@ importers:
       '@videojs/utils':
         specifier: workspace:*
         version: link:../utils
-      '@videojs/vimeo-video':
-        specifier: workspace:*
-        version: link:../adapters/vimeo-video
-      '@videojs/youtube-video':
-        specifier: workspace:*
-        version: link:../adapters/youtube-video
       react-compiler-runtime:
         specifier: ^1.0.0
         version: 1.0.0(react@19.3.0)
@@ -1140,15 +1122,27 @@ importers:
       '@videojs/cloudflare-video':
         specifier: workspace:*
         version: link:../adapters/cloudflare-video
+      '@videojs/dash-video':
+        specifier: workspace:*
+        version: link:../adapters/dash-video
       '@videojs/google-cast':
         specifier: workspace:*
         version: link:../extensions/google-cast
+      '@videojs/hlsjs-video':
+        specifier: workspace:*
+        version: link:../adapters/hlsjs-video
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/mux-audio':
+        specifier: workspace:*
+        version: link:../adapters/mux-audio
       '@videojs/mux-data':
         specifier: workspace:*
         version: link:../extensions/mux-data
+      '@videojs/mux-video':
+        specifier: workspace:*
+        version: link:../adapters/mux-video
       '@videojs/playerjs-video':
         specifier: workspace:*
         version: link:../adapters/playerjs-video
@@ -1164,9 +1158,15 @@ importers:
       '@videojs/twitch-video':
         specifier: workspace:*
         version: link:../adapters/twitch-video
+      '@videojs/vimeo-video':
+        specifier: workspace:*
+        version: link:../adapters/vimeo-video
       '@videojs/wistia-video':
         specifier: workspace:*
         version: link:../adapters/wistia-video
+      '@videojs/youtube-video':
+        specifier: workspace:*
+        version: link:../adapters/youtube-video
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(supports-color@8.1.1)

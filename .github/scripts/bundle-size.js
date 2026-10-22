@@ -54,19 +54,8 @@ const SKIP_PACKAGES = new Set([
 /** Packages that get categorized breakdowns in the report. */
 const CATEGORIZED_PACKAGES = new Set(['html', 'react']);
 
-/**
- * Published support dependencies excluded from library implementation sizes. The engine adapters are dependencies so
- * `LazyVideo` and `LazyAudio` resolve without extra installs, but each is measured as its own package.
- */
-const REPORT_EXTERNAL_DEPENDENCIES = new Set([
-  'react-compiler-runtime',
-  '@videojs/dash-video',
-  '@videojs/hlsjs-video',
-  '@videojs/mux-audio',
-  '@videojs/mux-video',
-  '@videojs/vimeo-video',
-  '@videojs/youtube-video',
-]);
+/** Published support dependencies excluded from library implementation sizes. */
+const REPORT_EXTERNAL_DEPENDENCIES = new Set(['react-compiler-runtime']);
 
 /** UI compound component parts — excluded from the report. */
 const UI_PARTS = new Set([
