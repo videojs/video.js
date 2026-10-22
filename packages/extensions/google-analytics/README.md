@@ -9,16 +9,6 @@ pnpm add @videojs/html @videojs/google-analytics
 pnpm add @videojs/react @videojs/google-analytics
 ```
 
-## AI Quickstart
-
-Using an AI coding agent? Install the [Video.js skill](https://github.com/videojs/skills) so it reads the docs that
-match this package version before writing code. Then print installation instructions that include Google Analytics:
-
-```sh
-npx @videojs/cli agents init --framework react --media default --extensions google-analytics
-npx @videojs/cli agents init --framework html --media default --extensions google-analytics
-```
-
 ## Usage
 
 ### React
