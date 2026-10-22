@@ -84,6 +84,9 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       disableRemotePlayback: false,
     };
 
+    /** Engine this media plays through, reported to analytics such as Mux Data. */
+    static readonly engineName: string = 'spf';
+
     /**
      * A complete sentence naming the Media to reach for when this one can't play a source. Appended to the copy this
      * adapter logs.

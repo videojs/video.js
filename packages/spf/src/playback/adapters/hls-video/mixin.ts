@@ -191,6 +191,9 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
       streamType: MediaStreamTypes.UNKNOWN,
     };
 
+    /** Engine this media plays through, reported to analytics such as Mux Data. */
+    static readonly engineName: string = 'spf';
+
     /**
      * A complete sentence naming the Media to reach for when this one can't play a source — `Try the hls.js-backed Mux
      * media instead: import the hls-js flavor in place of the spf one.` Appended to the copy this adapter surfaces, and

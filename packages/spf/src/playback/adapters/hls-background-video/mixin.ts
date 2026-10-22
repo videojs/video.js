@@ -113,6 +113,9 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       src: '',
     };
 
+    /** Engine this media plays through, reported to analytics such as Mux Data. */
+    static readonly engineName: string = 'spf';
+
     #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
     #error: HlsVideoMediaError | null = null;
