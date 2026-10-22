@@ -427,20 +427,26 @@ function configDoc(
   return docs.find(({ doc }) => !pointer.test(doc.text)) ?? docs[0];
 }
 
-/** A config key's doc cell, naming the behavior the doc comes from when it is not one of `readers`. */
+/**
+ * A config key's doc cell, naming the behavior the doc comes from when it is not one of `readers`. An optional key, or
+ * one the page's feature supplies a default for, drops the doc's `**Required** — …` sentence, which holds for the
+ * behavior alone.
+ */
 function configDocCell(
   reference: ReferenceProgram,
   model: Model,
   page: string,
   readers: BehaviorInfo[],
-  key: string
+  key: string,
+  optional: boolean
 ): string {
   const found = configDoc(readers, docPool(model), key);
   if (!found) return NO_DESCRIPTION;
 
+  const text = optional ? found.doc.text.replace(/\s*\*\*Required\*\*\s+—.*?\.(?=\s|$)/s, '') : found.doc.text;
   const lender = readers.includes(found.from) ? '' : ` (documented on ${behaviorLink(reference, page, found.from)})`;
 
-  return `${docCell(found.doc)}${lender}`;
+  return `${docCell({ ...found.doc, text })}${lender}`;
 }
 
 function slotOf(info: BehaviorInfo, slot: 'state' | 'context', key: string): SlotRow | undefined {
@@ -639,7 +645,7 @@ function featureConfigTable(
       type ? long.cell(key, 'type', type) : '—',
       value ? valueCell(long, key, 'default', value) : '—',
       behaviorLinks(reference, page, readers),
-      configDocCell(reference, model, page, readers, key),
+      configDocCell(reference, model, page, readers, key, value !== undefined || Boolean(field?.optional)),
     ];
   });
 
@@ -714,7 +720,7 @@ function engineConfigTable(
       value ? valueCell(long, field.key, 'default', value) : '—',
       supplier ? link(page, supplier.entry.page!, supplier.name) : '—',
       behaviorLinks(reference, page, readers),
-      configDocCell(reference, model, page, readers, field.key),
+      configDocCell(reference, model, page, readers, field.key, field.optional),
     ];
   });
 
