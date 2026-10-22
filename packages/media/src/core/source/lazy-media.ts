@@ -1,4 +1,10 @@
-import { resolveAdapterType } from './adapter-type';
+import {
+  type AdapterType,
+  adapterTypeForMimeType,
+  matchServiceHost,
+  parseSourceUrl,
+  resolveMimeType,
+} from './adapter-type';
 
 /**
  * A media component `LazyVideo` can resolve a source to, named by its module under `media/`. `video` is the browser's
@@ -56,7 +62,7 @@ export function resolveLazyVideoMedia(
   src: string,
   options: ResolveLazyMediaOptions
 ): LazyVideoMediaName | null | undefined {
-  switch (resolveAdapterType(src, options.type)) {
+  switch (resolveLazyAdapterType(src, options.type)) {
     case 'youtube':
       return 'youtube-video';
     case 'vimeo':
@@ -88,7 +94,7 @@ export function resolveLazyAudioMedia(
   src: string,
   options: ResolveLazyMediaOptions
 ): LazyAudioMediaName | null | undefined {
-  switch (resolveAdapterType(src, options.type)) {
+  switch (resolveLazyAdapterType(src, options.type)) {
     case 'mux':
       return 'mux-audio';
     // An `<audio>` plays native HLS on its own, so there is no engine to load.
@@ -102,6 +108,31 @@ export function resolveLazyAudioMedia(
       return null;
   }
 }
+
+/**
+ * `resolveAdapterType` without the service parsers, which are most of its weight. Services match by host or shorthand,
+ * and the media they resolve to checks the id itself.
+ */
+function resolveLazyAdapterType(src: string, type: string | undefined): AdapterType | null {
+  const source = src.trim();
+  if (!source) return null;
+
+  return fromService(source) ?? adapterTypeForMimeType(type) ?? adapterTypeForMimeType(resolveMimeType(source));
+}
+
+function fromService(src: string): AdapterType | null {
+  if (YOUTUBE_SHORTHAND.test(src)) return 'youtube';
+
+  if (VIMEO_SHORTHAND.test(src)) return 'vimeo';
+
+  const url = parseSourceUrl(src);
+
+  return url && matchServiceHost(url);
+}
+
+// The shorthands the YouTube and Vimeo media accept, matched by shape so a path like `youtube/intro.mp4` stays a file.
+const YOUTUBE_SHORTHAND = /^youtube\/(?:shorts\/)?[\w-]{11}(?:[?#]|$)/;
+const VIMEO_SHORTHAND = /^vimeo\/\d+(?:[/?#]|$)/;
 
 function resolveHls<Name extends string>(
   { nativeHls, preferPlayback = 'native' }: ResolveLazyMediaOptions,
