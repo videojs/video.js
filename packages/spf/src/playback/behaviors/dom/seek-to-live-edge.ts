@@ -140,7 +140,10 @@ function seekToLiveEdgeSetup({
 }
 
 /**
- * Keep the playhead in the live window, via a two-state reactor gated on the preconditions for "we know where live is":
+ * Keeps the playhead inside the live window: starts near the live edge and snaps back to it when playback falls behind
+ * the window.
+ *
+ * A two-state reactor gated on the preconditions for "we know where live is":
  *
  * - **`inactive`** — no media element, or no live edge (`getLiveEdge` is `null`: VOD, ended, or unresolved). Idle.
  * - **`live`** — preconditions met. `entry` commands `state.startPosition` once to the target live latency behind the
