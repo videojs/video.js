@@ -16,7 +16,22 @@ In prior versions of Video.js, skins were CSS-only themes applied to the same se
 
 A skin wraps the media component and provides the player's complete interface. It combines a specific set of UI components with the styles that arrange and present them.
 
-The video, audio, live video, and live audio presets each provide Default, Neutral, Compat, and Scaffold skins. Compat uses plain surfaces and basic controls, with broader browser compatibility as its design goal. Scaffold uses minimal styling as a starting point for a custom skin; its appearance is intended to be replaced.
+## Choose a skin
+
+The video, audio, live video, and live audio presets each provide four skins: Default, Neutral, Compat, and Scaffold. Compare them on three questions: which features you need, how much of the design you want to bring, and how consistently the player should look across browsers.
+
+| | Default | Neutral | Compat | Scaffold |
+|---|---|---|---|---|
+| Features | Complete | Same as Default | The same core controls in a simpler layout | Same as Compat |
+| Styling | Opinionated and distinctly Video.js | Opinionated and easy to brand | Unbranded, a polished step above native controls | Unbranded and minimal, a foundation to restyle |
+| Browser compatibility | Uses newer visual effects where browsers support them | Same as Default | Avoids newer visual effects, so it looks consistent across browsers | Same as Compat |
+
+- **Default** is our design, with frosted surfaces and a modern look. Choose it when you want the player to look like Video.js.
+- **Neutral** has the same controls in a lighter design, closer to a classic control bar. Choose it to apply your brand to a finished design: set your accent color, font, and corner radius through <DocsLink slug="guides/customize-skins" anchor="set-the-skins-styles">CSS custom properties</DocsLink>.
+- **Compat** has plain, unbranded surfaces. Choose it when the player should blend into content pages, such as an encyclopedia article. It avoids backdrop blur, anchor-positioned menu highlights, and squircle corners, which some browsers render differently or skip.
+- **Scaffold** has Compat's controls with minimal styling: square corners, no shadows or blur, your page's font, and no transitions. Choose it as the foundation for your own design, when you plan to restyle the whole player rather than brand a finished one.
+
+All four skins support the same <DocsLink slug="guides/browser-support">browsers</DocsLink>, keyboard shortcuts, and gestures. To build your own design instead, add Scaffold's [source](#skin-source-in-your-project) to your project, start from another skin's source, or build a [custom interface](#custom-interface).
 
 ## Packaged skins and skin source
 
