@@ -4,9 +4,10 @@ import {
   matchServiceHost,
   parseSourceUrl,
   resolveMimeType,
+  SPOTIFY_URI,
 } from './adapter-type';
-import { VIMEO_SHORTHAND_SRC, VIMEO_VIDEO_SRC } from './vimeo';
-import { YOUTUBE_PLAYLIST_SRC, YOUTUBE_SHORTHAND_SRC, YOUTUBE_VIDEO_SRC } from './youtube';
+import { VIMEO_SHORTHAND_SRC } from './vimeo';
+import { YOUTUBE_SHORTHAND_SRC } from './youtube';
 
 /**
  * A media component `LazyVideo` can resolve a source to, named by its module under `media/`. `video` is the browser's
@@ -21,7 +22,11 @@ export type LazyVideoMediaName =
   | 'dash-video'
   | 'mux-video'
   | 'youtube-video'
-  | 'vimeo-video';
+  | 'vimeo-video'
+  | 'wistia-video'
+  | 'cloudflare-video'
+  | 'tiktok-video'
+  | 'twitch-video';
 
 /**
  * A media component `LazyAudio` can resolve a source to, named by its module under `media/`. `audio` is the browser's
@@ -29,7 +34,7 @@ export type LazyVideoMediaName =
  *
  * @internal
  */
-export type LazyAudioMediaName = 'audio' | 'hls-audio' | 'mux-audio';
+export type LazyAudioMediaName = 'audio' | 'hls-audio' | 'mux-audio' | 'spotify-audio';
 
 /**
  * The playback path a lazy media prefers for HLS: `'native'` uses the browser's own HLS support where there is one, and
@@ -64,15 +69,19 @@ export function resolveLazyVideoMedia(
   src: string,
   options: ResolveLazyMediaOptions
 ): LazyVideoMediaName | null | undefined {
-  switch (resolveLazyAdapterType(src, options.type)) {
+  const type = resolveLazyAdapterType(src, options.type);
+
+  // Each service's media module is named after it.
+  switch (type) {
     case 'youtube':
-      return 'youtube-video';
     case 'vimeo':
-      return 'vimeo-video';
+    case 'wistia':
+    case 'cloudflare':
+    case 'tiktok':
+    case 'twitch':
     case 'mux':
-      return 'mux-video';
     case 'dash':
-      return 'dash-video';
+      return `${type}-video` as const;
     case 'hls':
       return resolveHls(options, 'native-hls-video', 'hlsjs-video');
     // A `<video>` plays audio files too.
@@ -96,9 +105,12 @@ export function resolveLazyAudioMedia(
   src: string,
   options: ResolveLazyMediaOptions
 ): LazyAudioMediaName | null | undefined {
-  switch (resolveLazyAdapterType(src, options.type)) {
+  const type = resolveLazyAdapterType(src, options.type);
+
+  switch (type) {
     case 'mux':
-      return 'mux-audio';
+    case 'spotify':
+      return `${type}-audio` as const;
     // An `<audio>` plays native HLS on its own, so there is no engine to load.
     case 'hls':
       return resolveHls(options, 'audio', 'hls-audio');
@@ -112,9 +124,9 @@ export function resolveLazyAudioMedia(
 }
 
 /**
- * `resolveAdapterType` without the service parsers, which are most of its weight. Services match by host, and YouTube
- * and Vimeo by the patterns their parsers use, so a URL on their hosts that names no video, such as a direct Vimeo
- * file, falls through to its file extension.
+ * `resolveAdapterType` without the service parsers, which are most of its weight: services match by host or shorthand,
+ * and the media they resolve to checks the id itself. A media file on a service host, such as a direct Vimeo MP4, plays
+ * as that file; Mux and Cloudflare are exempt because their streams are manifests.
  */
 function resolveLazyAdapterType(src: string, type: string | undefined): AdapterType | null {
   const source = src.trim();
@@ -128,13 +140,13 @@ function fromService(src: string): AdapterType | null {
 
   if (VIMEO_SHORTHAND_SRC.test(src)) return 'vimeo';
 
+  if (SPOTIFY_URI.test(src)) return 'spotify';
+
   const url = parseSourceUrl(src);
   const service = url && matchServiceHost(url);
-  if (service === 'youtube') return YOUTUBE_VIDEO_SRC.test(src) || YOUTUBE_PLAYLIST_SRC.test(src) ? service : null;
+  if (!service || service === 'mux' || service === 'cloudflare') return service;
 
-  if (service === 'vimeo') return VIMEO_VIDEO_SRC.test(src) ? service : null;
-
-  return service;
+  return resolveMimeType(src) ? null : service;
 }
 
 function resolveHls<Name extends string>(

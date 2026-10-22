@@ -167,7 +167,8 @@ function tryParseUrl(src: string): URL | null {
   }
 }
 
-const SPOTIFY_URI = /^spotify:/i;
+/** @internal */
+export const SPOTIFY_URI = /^spotify:/i;
 const URL_SCHEME = /^[a-z][a-z\d+.-]*:\/\//i;
 // A dotted host followed by a path, like `youtu.be/<id>`, as opposed to a relative path like `media/video.mp4`.
 const HOST_FIRST = /^[\w-]+(?:\.[\w-]+)+\//;
