@@ -79,6 +79,16 @@
       "development": "./dist/dev/media/mux-audio/spf.js",
       "default": "./dist/default/media/mux-audio/spf.js"
     },
+    "./media/lazy-video/*": {
+      "types": "./dist/dev/media/lazy-video/*.d.ts",
+      "development": "./dist/dev/media/lazy-video/*.js",
+      "default": "./dist/default/media/lazy-video/*.js"
+    },
+    "./media/lazy-audio/*": {
+      "types": "./dist/dev/media/lazy-audio/*.d.ts",
+      "development": "./dist/dev/media/lazy-audio/*.js",
+      "default": "./dist/default/media/lazy-audio/*.js"
+    },
     "./media/*": {
       "types": "./dist/dev/media/*/index.d.ts",
       "development": "./dist/dev/media/*/index.js",
