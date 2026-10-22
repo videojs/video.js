@@ -34,8 +34,16 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'browser'),
   // Flavor modules sit beside their element's index rather than under one, so
   // they need their own entries to stay separate chunks: importing one flavor
-  // must never pull the other engine in with it.
-  entry: ['src/**/index.{ts,tsx}', 'src/media/*/{hls-js,spf}.tsx', i18nLocaleEntries, i18nTextEntries],
+  // must never pull the other engine in with it. Each lazy media definition is
+  // its own entry for the same reason: importing one must not make a bundler
+  // resolve the packages the others load.
+  entry: [
+    'src/**/index.{ts,tsx}',
+    'src/media/*/{hls-js,spf}.tsx',
+    'src/media/lazy-{video,audio}/*.ts',
+    i18nLocaleEntries,
+    i18nTextEntries,
+  ],
   alias: srcAlias,
   // Pack does not yet preserve exact public CSS entry filenames, so retain the
   // focused source-to-dist copy until its CSS entry support can replace it.
