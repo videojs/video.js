@@ -85,6 +85,22 @@ describe('LazyVideo', () => {
     expect(element.querySelector('hlsjs-video > track')).not.toBeNull();
   });
 
+  it('keeps tracks across a source that resolves to no media', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const element = create({ src: '/movie.mp4' }, '<track kind="captions" src="captions.vtt">');
+
+    await flush();
+    element.setAttribute('src', '');
+    await flush();
+
+    expect(element.querySelector(':scope > track')).not.toBeNull();
+
+    element.setAttribute('src', '/other.mp4');
+    await flush();
+
+    expect(element.querySelector('video > track')).not.toBeNull();
+  });
+
   it('removes the media and reports a source it cannot resolve', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const element = create({ src: '/movie.mp4' });
