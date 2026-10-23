@@ -1,4 +1,5 @@
 import type { MediaTextCue, TextTrackCueLike } from '@videojs/media';
+import { deepEqual } from '@videojs/utils/object';
 import { isObject, isString, isUndefined } from '@videojs/utils/predicate';
 
 export interface TextCueOptions {
@@ -77,4 +78,39 @@ function parseJsonValue(text: string): unknown {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * `next`, keeping each cue from `previous` that hasn't changed, and `previous` itself when nothing has. Store cues are
+ * rebuilt on every sync, so this is what lets subscribers compare cues and cue lists by identity.
+ */
+export function reuseCues<Cue extends MediaTextCue>(previous: readonly Cue[] | undefined, next: Cue[]): Cue[] {
+  if (!previous?.length) return next;
+
+  const byId = new Map(previous.map((cue) => [cue.id, cue]));
+  const reused = next.map((cue) => {
+    const old = byId.get(cue.id);
+
+    return old && isSameCue(old, cue) ? old : cue;
+  });
+
+  const unchanged = reused.length === previous.length && reused.every((cue, index) => cue === previous[index]);
+
+  return unchanged ? (previous as Cue[]) : reused;
+}
+
+function isSameCue(a: MediaTextCue, b: MediaTextCue): boolean {
+  return (
+    a.startTime === b.startTime &&
+    a.endTime === b.endTime &&
+    a.text === b.text &&
+    a.type === b.type &&
+    // A value parsed from text is rebuilt on every read, so compare it by content.
+    deepEqual(a.value, b.value)
+  );
+}
+
+/** Cues ordered by start time, then end time, keeping the order of cues that tie. */
+export function sortCues<Cue extends MediaTextCue>(cues: Cue[]): Cue[] {
+  return cues.sort((a, b) => a.startTime - b.startTime || a.endTime - b.endTime);
 }

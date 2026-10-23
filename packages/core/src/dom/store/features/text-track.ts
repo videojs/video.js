@@ -6,19 +6,14 @@ import type {
   MediaThumbnailsTrack,
   TextTrackLike,
 } from '@videojs/media';
-import {
-  isMediaSeekCapable,
-  isMediaSourceCapable,
-  isMediaTextTrackCapable,
-  isQuerySelectorAllCapable,
-  toMediaCrossOrigin,
-} from '@videojs/media';
+import { isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable, toMediaCrossOrigin } from '@videojs/media';
 import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
 import { isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
 import { toMediaTextCues } from '../text-cues';
+import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 interface IdentifiedTrack {
   id: string;
@@ -26,14 +21,10 @@ interface IdentifiedTrack {
   track: TextTrackLike;
 }
 
-function getTrackId(track: TextTrackLike, index: number): string {
-  return track.id || `track:${index}:${track.kind}:${track.language}:${track.label}`;
-}
-
 /** Caption/subtitle tracks paired with the ids exposed through `textTrackList`, in captions menu order. */
 function getSubtitlesTracks(media: MediaTextTrackCapability): IdentifiedTrack[] {
   return getCaptionOrSubtitleTracks(
-    Array.from(media.textTracks, (track, index) => ({ id: getTrackId(track, index), kind: track.kind, track }))
+    Array.from(media.textTracks, (track, index) => ({ id: getTextTrackId(track, index), kind: track.kind, track }))
   );
 }
 
@@ -155,13 +146,7 @@ export const textTrackFeature = definePlayerFeature({
           thumbnailsTextTrack = track;
         }
 
-        textTrackList.push({
-          id: getTrackId(track, i),
-          kind: track.kind as TextTrackKind,
-          label: track.label,
-          language: track.language,
-          mode: track.mode,
-        });
+        textTrackList.push(toMediaTextTrack(track, i));
 
         if (isCaptionOrSubtitleTrack(track) && track.mode === 'showing') {
           subtitlesShowing = true;
@@ -189,17 +174,7 @@ export const textTrackFeature = definePlayerFeature({
         };
       }
 
-      // Listen for <track> load events on tracks that don't have cues yet.
-      // `addtrack` fires before cues are parsed — we need the `load` event
-      // on the <track> element to know when cues are ready.
-      const tracks = (isQuerySelectorAllCapable<HTMLTrackElement>(media) && media.querySelectorAll('track')) || [];
-      const shadowTracks = (media instanceof HTMLElement && media.shadowRoot?.querySelectorAll('track')) || [];
-
-      for (const trackEl of [...tracks, ...shadowTracks]) {
-        if (!trackEl.track?.cues?.length) {
-          listen(trackEl, 'load', sync, { signal: trackCleanup.signal });
-        }
-      }
+      listenForTrackLoads(media, sync, trackCleanup.signal);
 
       set({
         textTrackList,

@@ -139,7 +139,7 @@ describe('textTrackFeature', () => {
 
       expect(store.state.chaptersCues).toEqual([]);
       expect(store.state.textTrackList).toEqual([
-        { id: 'chapters', kind: 'chapters', label: '', language: '', mode: 'hidden' },
+        { id: 'chapters', kind: 'chapters', label: '', language: '', mode: 'hidden', source: 'media' },
       ]);
     });
 
@@ -303,9 +303,9 @@ describe('textTrackFeature', () => {
       store.attach({ media: video, container: null });
 
       expect(store.state.textTrackList).toEqual([
-        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing' },
-        { id: 'captions-en', kind: 'captions', label: 'CC', language: 'en', mode: 'disabled' },
-        { id: 'metadata-thumbnails', kind: 'metadata', label: '', language: '', mode: 'showing' },
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'showing', source: 'media' },
+        { id: 'captions-en', kind: 'captions', label: 'CC', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'metadata-thumbnails', kind: 'metadata', label: '', language: '', mode: 'showing', source: 'media' },
       ]);
     });
 
