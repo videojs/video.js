@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/media@10.2.0...@videojs/media@10.3.0) (2026-10-23)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/media@10.1.0...@videojs/media@10.2.0) (2026-10-22)
 
 

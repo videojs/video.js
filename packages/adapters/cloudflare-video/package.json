@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cloudflare-video",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Cloudflare Stream playback adapter for Video.js",
   "keywords": [
     "cloudflare",

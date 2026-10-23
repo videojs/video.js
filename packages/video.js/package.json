@@ -1,6 +1,6 @@
 {
   "name": "video.js",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Points Video.js installs to @videojs/html and @videojs/react, and throws coded errors for Video.js 8 patterns",
   "keywords": [
     "media",
