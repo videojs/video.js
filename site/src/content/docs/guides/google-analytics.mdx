@@ -1,0 +1,252 @@
+---
+title: Track video telemetry with Google Analytics 4
+description: Track video engagement, progress milestones, and playback interactions by adding the Google Analytics extension to a player
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import Aside from '@/components/Aside.astro';
+
+Google Analytics 4 (GA4) Enhanced Measurement tracks video engagement and viewer interaction. Add the Google Analytics <DocsLink slug="guides/architecture">extension</DocsLink> to a player and it monitors whichever media that player is playing, automatically dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer` and `window.gtag`.
+
+<FrameworkCase frameworks={["react"]}>
+Install the extension alongside the framework façade:
+
+```bash
+pnpm add @videojs/react @videojs/google-analytics
+```
+
+```tsx title="App.tsx"
+import { Container, createPlayer } from '@videojs/react';
+import { GoogleAnalytics } from '@videojs/react/extensions/google-analytics';
+import { Video } from '@videojs/react/media/video';
+import { videoFeatures } from '@videojs/react/video';
+
+const { Player } = createPlayer({ features: videoFeatures });
+
+export default function App() {
+  return (
+    <Player>
+      <Container>
+        <Video src="https://example.com/video.mp4" />
+        <GoogleAnalytics videoTitle="My Video" /> {/* [!code focus] */}
+      </Container>
+    </Player>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Install the extension alongside the framework façade:
+
+```bash
+pnpm add @videojs/html @videojs/google-analytics
+```
+
+```html title="index.html"
+<video-player>
+  <media-container>
+    <video src="https://example.com/video.mp4"></video>
+    <google-analytics video-title="My Video"></google-analytics> <!-- [!code focus] -->
+  </media-container>
+</video-player>
+<script type="module">
+  import '@videojs/html/video/player';
+  import '@videojs/html/ui/container';
+  import '@videojs/html/extensions/google-analytics';
+</script>
+```
+
+### Load from a CDN
+
+When loading Video.js from a CDN, include the `extensions/google-analytics.js` script tag:
+
+```html title="index.html"
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn/video.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn/extensions/google-analytics.js"></script>
+
+<video-player>
+  <media-container>
+    <video src="https://example.com/video.mp4"></video>
+    <google-analytics video-title="My Video"></google-analytics>
+  </media-container>
+</video-player>
+```
+</FrameworkCase>
+
+That's the entire setup for standard video tracking. The extension renders nothing; place it anywhere inside the player.
+
+<Aside type="note">
+Google Analytics tracking is opt-in. No media component sends telemetry on its own until you add the extension to the player.
+</Aside>
+
+## How events are reported
+
+When Google Tag (`gtag.js`) or Google Tag Manager (GTM) is configured on your site, `window.dataLayer` is available globally. The extension pushes structured event objects into `window.dataLayer`:
+
+```js
+window.dataLayer.push({
+  event: 'video_progress',
+  video_current_time: 30,
+  video_duration: 120,
+  video_percent: 25,
+  video_provider: 'video.js',
+  video_stream_type: 'vod',
+  video_title: 'My Video',
+  video_url: 'https://example.com/video.mp4',
+  visible: true,
+});
+```
+
+If `window.gtag` is defined, the extension also calls `window.gtag('event', event, params)` with the same parameters. If you use a custom data layer array on `window`, specify its property name with `dataLayerName` (or `data-layer-name` in HTML).
+
+### GA4 Enhanced Measurement events
+
+The extension dispatches standard GA4 Enhanced Measurement video events:
+
+- `video_start`: Dispatched when playback begins for the first time or starts at `currentTime > 0`.
+- `video_progress`: Dispatched when playback crosses 10%, 25%, 50%, and 75% milestones.
+- `video_complete`: Dispatched when the video reaches the end (`ended` event).
+
+### Video.js interaction events
+
+In addition to GA4 Enhanced Measurement events, the extension emits player interaction events to measure how viewers engage with controls:
+
+- `play`: Dispatched on first play.
+- `pause`: Dispatched when playback is paused (not triggered during seeking or when ended).
+- `resume`: Dispatched when playback resumes after a pause.
+- `end`: Dispatched when the video finishes.
+- `seek`: Dispatched when scrubbing or seeking completes.
+- `mute`: Dispatched when audio is muted or volume drops to 0.
+- `unmute`: Dispatched when audio is unmuted with non-zero volume.
+- `fullscreenEnter`: Dispatched when entering fullscreen.
+- `fullscreenExit`: Dispatched when exiting fullscreen.
+
+## Set stream type
+
+By default, `streamType` is `'vod'`. For on-demand videos, duration is known and the extension calculates playback percentage to fire progress milestones at 10%, 25%, 50%, and 75%.
+
+For live streams, set `streamType` to `'live'`:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics videoTitle="Live Stream" streamType="live" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics video-title="Live Stream" stream-type="live"></google-analytics>
+```
+</FrameworkCase>
+
+When `streamType="live"`, milestone progress tracking is bypassed since live streams have unbounded or dynamic duration.
+
+## Set video title
+
+The extension determines the video title reported to GA4 using this precedence:
+
+1. Explicit `videoTitle` prop or `video-title` attribute
+2. The media element's `title` attribute
+3. The media source URL (`video_url`)
+4. `'Untitled Video'` fallback
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics videoTitle="Keynote Presentation" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics video-title="Keynote Presentation"></google-analytics>
+```
+</FrameworkCase>
+
+## Custom parameters
+
+Attach custom dimensions or metadata to every event using `customParams`:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics
+  videoTitle="Keynote Presentation"
+  customParams={{
+    author: 'Video.js Team',
+    category: 'Conference',
+    content_id: 'conf_2026_01',
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics video-title="Keynote Presentation"></google-analytics>
+<script type="module">
+  const ga = document.querySelector('google-analytics');
+  ga.customParams = {
+    author: 'Video.js Team',
+    category: 'Conference',
+    content_id: 'conf_2026_01',
+  };
+</script>
+```
+</FrameworkCase>
+
+## Debugging
+
+Enable console logging by setting the `debug` option:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics videoTitle="My Video" debug />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics video-title="My Video" debug></google-analytics>
+```
+</FrameworkCase>
+
+When enabled, the extension logs every dispatched event and its parameters:
+
+```
+[GoogleAnalyticsExtension] Event: "video_start" {video_current_time: 0, video_duration: 120, ...}
+```
+
+You can also provide an `onEvent` callback to intercept dispatched events programmatically:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics
+  videoTitle="My Video"
+  onEvent={(event, params) => {
+    console.log('Telemetry event:', event, params);
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics video-title="My Video"></google-analytics>
+<script type="module">
+  const ga = document.querySelector('google-analytics');
+  ga.onEvent = (event, params) => {
+    console.log('Telemetry event:', event, params);
+  };
+</script>
+```
+</FrameworkCase>
+
+## Related components
+
+- <DocsLink slug="reference/components/google-analytics">GoogleAnalytics</DocsLink>
+- <DocsLink slug="reference/components/mux-data">MuxData</DocsLink>
+
+## Related guides
+
+- <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>
