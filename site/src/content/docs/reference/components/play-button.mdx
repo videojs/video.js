@@ -44,6 +44,8 @@ import basicUsageHtmlTs from "@/components/docs/demos/play-button/html/css/Basic
 
 The play button is a three-state button: **play**, **pause**, and **replay**. When media reaches the end (`ended` state), clicking restarts playback from the beginning.
 
+While media with `autoplay` is trying to start, the button shows **pause**, and clicking it cancels the autoplay. If the browser refuses the autoplay, the button returns to **play**.
+
 ## Styling
 
 Style with the `[data-paused]` and `[data-ended]` attributes to show/hide play/pause/replay icons based on state. For example:

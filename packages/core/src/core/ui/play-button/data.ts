@@ -3,7 +3,7 @@ import type { PlayButtonState } from './core';
 
 /** @internal */
 export const PlayButtonDataAttrs = {
-  /** Present when the media is paused. */
+  /** Present when the media is paused and not trying to autoplay. */
   paused: 'data-paused',
   /** Present when the media has ended. */
   ended: 'data-ended',
