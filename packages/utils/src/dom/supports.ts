@@ -36,11 +36,7 @@ export function nativeHlsSupport(): 'preferred' | 'supported' | 'unsupported' {
 
   if (!supportsMediaSource()) return 'preferred';
 
-  const { userAgent } = navigator;
-  const platform = (navigator as NavigatorWithUAData).userAgentData?.platform ?? '';
-  const isAndroidLike = /android/i.test(userAgent) || /x11|android/i.test(platform);
-
-  return !isAndroidLike && SAFARI_USER_AGENT.test(userAgent) ? 'preferred' : 'supported';
+  return SAFARI_USER_AGENT.test(navigator.userAgent) ? 'preferred' : 'supported';
 }
 
 /**
@@ -54,11 +50,8 @@ export function supportsMediaSource(): boolean {
   return !!(scope.MediaSource ?? scope.ManagedMediaSource ?? scope.WebKitMediaSource);
 }
 
-interface NavigatorWithUAData extends Navigator {
-  userAgentData?: { platform?: string };
-}
-
-// Safari, including the iOS browsers built on it, whose user agents say `CriOS` or `FxiOS` rather than `Chrome`.
+// Safari, including the iOS browsers built on it, whose user agents say `CriOS` or `FxiOS` rather than `Chrome`. Android
+// browsers are excluded: their user agents also say `Safari`, and every Chromium one says `Chrome`.
 const SAFARI_USER_AGENT = /^((?!chrome|android).)*safari/i;
 
 /**
