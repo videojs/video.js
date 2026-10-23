@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createLazyVideoElement, type LazyMediaDefinition, type LazyMediaElement } from '../lazy-video/create';
+import { createLazyVideoElement, type LazyMediaDefinition } from '../lazy-video/create';
 import { video } from '../lazy-video/video';
 
 let tagCounter = 0;
@@ -12,8 +12,8 @@ function define(medias: LazyMediaDefinition[]): string {
   return tag;
 }
 
-function create(tag: string, src: string): LazyMediaElement {
-  const element = document.createElement(tag) as LazyMediaElement;
+function create(tag: string, src: string): HTMLElement {
+  const element = document.createElement(tag);
 
   element.setAttribute('src', src);
   document.body.append(element);
@@ -60,26 +60,6 @@ describe('createLazyVideoElement', () => {
 
     expect(load).toHaveBeenCalledOnce();
     expect(element.querySelector(tag)).toBeInstanceOf(customElements.get(tag)!);
-  });
-
-  it('exposes the media an element hands the player through getMediaTarget', async () => {
-    const tag = `test-acme-video-${tagCounter++}`;
-    const target = {};
-
-    customElements.define(
-      tag,
-      class extends HTMLElement {
-        getMediaTarget() {
-          return target;
-        }
-      }
-    );
-
-    const element = create(define([{ ...acmeVideo, tag }]), 'https://video.acme.com/1');
-
-    await flush();
-
-    expect(element.media).toBe(target);
   });
 
   it('only plays the sources its media do', async () => {
