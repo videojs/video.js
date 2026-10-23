@@ -11,8 +11,9 @@ export default styles({
       utilities: 'group/buffering contents',
     },
     backdrop: {
+      // Gradient utilities allow three stops; the clear middle band needs a fourth.
       utilities:
-        'pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),rgba(0,0,0,0.2),rgba(0,0,0,0.5))] group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
+        'pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgb(0_0_0/0.5),transparent_40%,transparent_60%,rgb(0_0_0/0.4))] group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
