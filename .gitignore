@@ -42,6 +42,7 @@ site/src/content/generated-media-reference/
 site/src/content/generated-preset-reference/
 site/src/content/generated-mcp-surface.json
 site/src/content/ejected-skins.json
+site/evals/docs-mcp/results/
 packages/html/docs/
 packages/react/docs/
 

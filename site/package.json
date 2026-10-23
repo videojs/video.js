@@ -9,6 +9,7 @@
     "check:anchors": "tsx scripts/check-anchors.ts",
     "check:api-stability": "tsx scripts/check-api-stability.ts",
     "check:link-analytics": "tsx scripts/check-link-analytics.ts",
+    "eval:mcp": "tsx evals/docs-mcp/run.ts",
     "test": "vp test run",
     "test:watch": "vp test",
     "test:ui": "vp test --ui",
