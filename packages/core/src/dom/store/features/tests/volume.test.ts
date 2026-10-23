@@ -1,4 +1,3 @@
-import { HTMLVideoAdapter } from '@videojs/media/dom';
 import { createStore } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -6,14 +5,14 @@ import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
 import { volumeFeature } from '../volume';
 
-/** Shaped like an embed adapter: sets volume through its own player, with no native element behind it. */
+/** Shaped like an embed adapter: takes any level, with no native element the player can reach. */
 class TestEmbed extends EventTarget {
   volume = 1;
   muted = false;
 }
 
-/** Makes native media elements ignore `volume` writes, as iOS Safari does. */
-function lockNativeVolume() {
+/** Makes media elements ignore `volume` writes, as iOS Safari does. */
+function lockVolume() {
   vi.spyOn(HTMLMediaElement.prototype, 'volume', 'set').mockImplementation(() => {});
 }
 
@@ -48,7 +47,7 @@ describe('volumeFeature', () => {
     });
 
     it('reports volume unsupported on a native video where the browser locks volume', () => {
-      lockNativeVolume();
+      lockVolume();
 
       const store = createStore<PlayerTarget>()(volumeFeature);
 
@@ -58,27 +57,15 @@ describe('volumeFeature', () => {
       expect(store.state.mutedAvailability).toBe('available');
     });
 
-    it('reports volume unsupported on an adapter over a native video where the browser locks volume', () => {
-      lockNativeVolume();
-
-      const adapter = new HTMLVideoAdapter();
-      const store = createStore<PlayerTarget>()(volumeFeature);
-
-      adapter.attach(document.createElement('video'));
-      store.attach({ media: adapter, container: null });
-
-      expect(store.state.volumeAvailability).toBe('unsupported');
-    });
-
-    it('reports volume available on an embed where the browser locks native volume', () => {
-      // The browser's restriction is on its own media elements; an embed sets volume through its player.
-      lockNativeVolume();
+    it('reports volume unsupported on an embed where the browser locks volume', () => {
+      // The embed's setter takes a level, but its player plays through a media element in the iframe.
+      lockVolume();
 
       const store = createStore<PlayerTarget>()(volumeFeature);
 
       store.attach({ media: new TestEmbed() as unknown as HTMLVideoElement, container: null });
 
-      expect(store.state.volumeAvailability).toBe('available');
+      expect(store.state.volumeAvailability).toBe('unsupported');
       expect(store.state.mutedAvailability).toBe('available');
     });
 
@@ -184,6 +171,20 @@ describe('volumeFeature', () => {
         expect(video.volume).toBe(0.7);
         expect(video.muted).toBe(false);
         expect(store.state.muted).toBe(false);
+      });
+
+      it('leaves an embed level alone, but still unmutes, where the browser locks volume', () => {
+        lockVolume();
+
+        const embed = Object.assign(new TestEmbed(), { muted: true });
+        const store = createStore<PlayerTarget>()(volumeFeature);
+
+        store.attach({ media: embed as unknown as HTMLVideoElement, container: null });
+
+        expect(store.setVolume(0.5)).toBe(1);
+        expect(embed.volume).toBe(1);
+        expect(embed.muted).toBe(false);
+        expect(store.state.volume).toBe(1);
       });
 
       it('does not unmute when setting volume to 0', async () => {
