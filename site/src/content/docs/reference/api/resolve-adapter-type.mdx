@@ -23,7 +23,7 @@ import { resolveAdapterType } from '@videojs/html';
 
 `resolveAdapterType` reads a source URL and returns the type of adapter that plays it, so an app that plays sources from a catalog or from user input can pick the matching <DocsLink slug="guides/media-sources">media component</DocsLink>. It returns `null` for sources it doesn't recognize.
 
-Resolution is a pure string check. It doesn't fetch the source, load an engine, or touch the DOM. It doesn't rewrite the source either: every source it recognizes, [shorthands](#shorthands) included, is one the matching media component accepts as its `src`.
+Resolution is a pure string check. It doesn't fetch the source, load an engine, or touch the DOM. It doesn't rewrite the source either: every source it recognizes is one the matching media component accepts as its `src`.
 
 ## Usage
 
@@ -131,16 +131,6 @@ To get the MIME type a file extension implies, use <DocsLink slug="reference/api
 
 ### Bare ids
 
-A bare id returns `null`. An 11-character YouTube id and a 10-character Wistia id look alike, so services are only recognized from URLs, `spotify:` URIs, and [shorthands](#shorthands). If you already know the service, pass the id to its media component directly.
-
-### Shorthands
-
-`resolveAdapterType` recognizes these shorthands, and the YouTube and Vimeo media accept them as `src`:
-
-| Shorthand | Plays |
-|---|---|
-| `youtube/<id>`, `youtube/shorts/<id>` | The YouTube video, from the privacy-enhanced `youtube-nocookie.com` host |
-| `vimeo/<id>` | The Vimeo video |
-| `vimeo/<id>?hash=<hash>`, `vimeo/<id>?h=<hash>`, `vimeo/<id>/<hash>` | The unlisted Vimeo video |
+A bare id returns `null`. An 11-character YouTube id and a 10-character Wistia id look alike, so services are only recognized from URLs and `spotify:` URIs. If you already know the service, pass the id to its media component directly.
 
 <UtilReference util="resolveAdapterType" />
