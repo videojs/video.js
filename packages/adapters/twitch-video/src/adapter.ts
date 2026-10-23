@@ -505,7 +505,8 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      // The embed reads mute once, from its URL, and either property says to start muted.
+      defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
