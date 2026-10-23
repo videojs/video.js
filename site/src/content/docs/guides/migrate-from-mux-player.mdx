@@ -29,7 +29,7 @@ Make a migration checklist before changing your embed:
 - **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media component; the rest is mapped under [Drive playback](#drive-playback).
 - **Note your theme and CSS variables.** Compare your Mux Player theme with the two Video.js skins, and map its CSS variables.
 - **Check [Known gaps](#known-gaps)** for features your app needs.
-- **Check your catalog for MPEG-TS, raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
+- **Check your catalog for raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
 
 <FrameworkCase frameworks={["html"]}>
 Before loading Video.js, remove Mux Player imports and CDN scripts, plus any other imports that register legacy Mux Video or Media Chrome elements. Then reload the page. These libraries share custom-element names such as `mux-video` and `media-play-button`. A name can only have one definition per document, and Video.js keeps an existing definition. If both players must remain during migration, use separate documents, such as an iframe.
@@ -690,7 +690,7 @@ Store actions throw until the media attaches. Call fullscreen actions from a use
 
 ## Which Mux media should you use?
 
-Choose and test the engine before migration, especially when your catalog uses DRM or TS-packaged media.
+Choose and test the engine before migration, especially when your catalog uses DRM.
 
 <FrameworkCase frameworks={["react"]}>
 `MuxVideo` supports two playback engines: SPF and hls.js. Choose the engine by import path. The `/spf` import is smaller, and `/hls-js` is more compatible. The default import currently uses hls.js. Start with that default:
@@ -706,7 +706,7 @@ Choose and test the engine before migration, especially when your catalog uses D
 | `.../media/mux-video/spf` | SPF | Your streams use fMP4/CMAF segments and fit the limitations below. |
 | `.../media/mux-video/hls-js` | hls.js | Your app depends on hls.js and needs its instance or settings. |
 
-The SPF engine does not support MPEG-TS segments, raw ADTS AAC, or whole-segment AES-128 encryption. Keep the default for assets that need those formats. The SPF engine also lacks low-latency HLS support, and its DVR playback is experimental.
+The SPF engine plays the MPEG-TS that Mux packages, for on-demand assets and standard-latency live streams. It does not support raw ADTS AAC or whole-segment AES-128 encryption. Keep the default for assets that need those formats. The SPF engine also lacks low-latency HLS support, and its DVR playback is experimental.
 
 Both flavors support DRM through `source.drm`. Verify license exchange and playback with your protected assets on supported browsers before changing engines.
 
