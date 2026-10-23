@@ -153,7 +153,7 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.chaptersCues).toEqual([
+      expect(store.state.chaptersCues).toMatchObject([
         { startTime: 0, endTime: 3, text: 'Intro' },
         { startTime: 3, endTime: 23.872, text: 'Outro' },
       ]);
@@ -211,7 +211,7 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.chaptersCues[0]).toEqual({ startTime: 0, endTime: 3, text: '' });
+      expect(store.state.chaptersCues[0]).toEqual({ id: '0-3', startTime: 0, endTime: 3, text: '' });
       expect(store.state.chaptersCues[0]).not.toBe(textless);
       expect(store.state.chaptersCues[1]).not.toBe(live[1]);
       expect(live[1]?.endTime).toBe(Number.MAX_SAFE_INTEGER);
@@ -234,7 +234,7 @@ describe('textTrackFeature', () => {
 
       store.attach({ media: video, container: null });
 
-      expect(store.state.chaptersCues).toEqual([{ startTime: 0, endTime: 5, text: 'First chapter' }]);
+      expect(store.state.chaptersCues).toMatchObject([{ startTime: 0, endTime: 5, text: 'First chapter' }]);
     });
 
     it('resyncs on loadstart event', () => {
