@@ -1,10 +1,15 @@
 import { combine, createStore } from '@videojs/store';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { podcastChapters } from '../../../../core/text-track/chapters';
 import { defineTextTrack } from '../../../../core/text-track/definition';
 import type { PlayerTarget } from '../../../player';
 import { textCuesFeature } from '../text-cues';
 import { textTrackFeature } from '../text-track';
+
+vi.mock('../../parse-vtt', () => ({
+  parseVtt: vi.fn(async (text: string) => [{ id: 'vtt', startTime: 0, endTime: 5, text: text.split('\n').at(-1) }]),
+}));
 
 /**
  * Jsdom has no `VTTCue` and never populates `textTracks`, so tracks and cues are plain stand-ins. Tracks and the track
@@ -439,6 +444,110 @@ describe('textCuesFeature', () => {
         ['AI chapters', 'app'],
       ]);
       expect(store.state.chaptersCues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+  });
+
+  it('runs app chapters without an end to the next chapter, and the last to the end of the media', () => {
+    const video = document.createElement('video');
+    const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+    setTracks(video, []);
+    Object.defineProperty(video, 'duration', { configurable: true, value: 100 });
+    store.attach({ media: video, container: null });
+    store.addTextTrack({
+      kind: 'chapters',
+      cues: [
+        { startTime: 0, text: 'Intro' },
+        { startTime: 30, text: 'Main' },
+      ],
+    });
+
+    expect(store.state.chaptersCues.map(({ startTime, endTime }) => [startTime, endTime])).toEqual([
+      [0, 30],
+      [30, 100],
+    ]);
+  });
+
+  describe('addTextTrack with a src', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    function respond(body: string, ok = true) {
+      const fetch = vi.fn(async () => ({ ok, status: ok ? 200 : 404, text: async () => body }));
+
+      vi.stubGlobal('fetch', fetch);
+
+      return fetch;
+    }
+
+    /** Let the fetch and parse promise chain settle. */
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    it('loads a JSON array of cues once attached', async () => {
+      const fetch = respond(JSON.stringify([{ startTime: 0, endTime: 10, value: { question: 'One?' } }]));
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(textCuesFeature);
+
+      setTracks(video, []);
+      store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/quiz.json' });
+
+      expect(fetch).not.toHaveBeenCalled();
+
+      store.attach({ media: video, container: null });
+      await settle();
+
+      expect(fetch).toHaveBeenCalledWith('/quiz.json', expect.objectContaining({ signal: expect.any(AbortSignal) }));
+      expect(store.state.textCues[0]!.cues.map(({ value }) => value)).toEqual([{ question: 'One?' }]);
+    });
+
+    it('loads an object with a cues array, after the cues it was given', async () => {
+      respond(JSON.stringify({ cues: [{ startTime: 20, text: 'loaded' }] }));
+
+      const { store } = setup([]);
+
+      store.addTextTrack({ kind: 'metadata', src: '/cues.json', cues: [{ startTime: 0, text: 'given' }] });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['given', 'loaded']);
+    });
+
+    it('reads other JSON through a format', async () => {
+      respond(JSON.stringify({ version: '1.2.0', chapters: [{ startTime: 0, title: 'Intro' }] }));
+
+      const { store } = setup([]);
+
+      store.addTextTrack({ kind: 'chapters', src: '/chapters.json', format: podcastChapters });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+
+    it("parses WebVTT with the browser's parser", async () => {
+      respond('WEBVTT\n\n00:00.000 --> 00:05.000\nChapter one');
+
+      const { store } = setup([]);
+
+      store.addTextTrack({ kind: 'chapters', src: '/chapters.vtt' });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Chapter one']);
+    });
+
+    it('keeps the track and warns when the file fails to load', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      respond('', false);
+
+      const { store } = setup([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/missing.json' });
+
+      await settle();
+
+      expect(quiz.removed).toBe(false);
+      expect(store.state.textCues[0]!.cues).toEqual([]);
+      expect(warn).toHaveBeenCalledOnce();
     });
   });
 

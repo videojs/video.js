@@ -17,9 +17,19 @@ export interface TextCueInit<Value = unknown> {
   type?: string | undefined;
 }
 
-/** What a track an app adds carries. */
+/** Turns a JSON file in another format, such as Podcasting 2.0 chapters, into cues. */
+export type TextCueFormat<Value = unknown> = (json: unknown) => readonly TextCueInit<Value>[];
+
+/** What a track an app adds carries: cues, a file to load them from, or both. */
 export interface TextTrackContent<Value = unknown> {
   cues?: readonly TextCueInit<Value>[] | undefined;
+  /**
+   * A WebVTT or JSON file to load cues from, fetched once the player is on the client. JSON is an array of cues, or an
+   * object with a `cues` array, unless `format` reads it.
+   */
+  src?: string | undefined;
+  /** Converts a JSON `src` in another format into cues. */
+  format?: TextCueFormat<Value> | undefined;
 }
 
 /** A track an app adds to the player: what identifies it, and what it carries. */

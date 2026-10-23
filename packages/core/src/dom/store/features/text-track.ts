@@ -174,7 +174,10 @@ export const textTrackFeature = definePlayerFeature({
             kind: 'chapters',
             duration: isMediaSeekCapable(media) ? media.duration : NaN,
           })
-        : (appTracks.find(({ track }) => track.kind === 'chapters')?.cues ?? []);
+        : fillChapterEnds(
+            appTracks.find(({ track }) => track.kind === 'chapters')?.cues ?? [],
+            isMediaSeekCapable(media) ? media.duration : NaN
+          );
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
@@ -218,3 +221,16 @@ export const textTrackFeature = definePlayerFeature({
     signal.addEventListener('abort', () => trackCleanup?.abort(), { once: true });
   },
 });
+
+/** Chapters an app gave no end run to the next chapter, and the last one to the end of the media. */
+function fillChapterEnds(cues: MediaTextCue[], duration: number): MediaTextCue[] {
+  if (cues.every((cue) => cue.endTime > cue.startTime)) return cues;
+
+  const end = Number.isFinite(duration) && duration > 0 ? duration : undefined;
+
+  return cues.map((cue, index) => {
+    if (cue.endTime > cue.startTime) return cue;
+
+    return { ...cue, endTime: cues[index + 1]?.startTime ?? end ?? cue.endTime };
+  });
+}
