@@ -14,8 +14,16 @@ describe('PlaybackRateButtonElement', () => {
     await trigger.updateComplete;
 
     expect(trigger.getAttribute('role')).toBe('button');
-    expect(trigger.getAttribute('aria-label')).toBe('Playback rate 2');
+    expect(trigger.getAttribute('aria-label')).toBe('Playback rate, 2');
     expect(trigger.getAttribute('data-rate')).toBe('2');
+  });
+
+  it('gives tooltips the control name without the rate', async () => {
+    const { trigger } = setup({ playbackRate: 2 });
+
+    await trigger.updateComplete;
+
+    expect(trigger.getResolvedLabel()).toBe('Playback rate');
   });
 
   it('does not cycle when commandfor is set', async () => {

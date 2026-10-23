@@ -57,7 +57,7 @@ export default {
     unknown: 'Media not loaded, unknown time.',
   },
   playback: {
-    rate: 'Playback rate {rate}',
+    rate: 'Playback rate, {rate}',
   },
   volume: {
     mutedValue: '{percent}, muted',
