@@ -32,8 +32,8 @@ export default defineConfig({
       node: './src/node.ts',
     },
     // The site's installation Markdown edge function loads `dist/index.js` through an import map, and Netlify's edge
-    // bundler can't resolve workspace packages from there.
+    // bundler can't resolve workspace packages from there, so every workspace package `index.ts` reaches is bundled.
     // `node.ts` is the Node-only entry; its built-ins stay imports rather than unresolved modules on a neutral build.
-    deps: { alwaysBundle: ['@videojs/media'], neverBundle: [/^node:/] },
+    deps: { alwaysBundle: [/^@videojs\/(media|mux|utils)(\/|$)/], neverBundle: [/^node:/] },
   },
 });
