@@ -2,8 +2,8 @@
 // left for the consumer's bundler to drop, which `sideEffects: false` on that package allows, so this entry stays
 // audio-only.
 import { type MuxAdapterProps, MuxMixin } from '@videojs/mux-video/spf';
-import { type CreateEngine, HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
-import { createEngine } from '@videojs/spf/engines/hls-audio-mpeg-ts';
+import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
+import { HlsAudioMpegTsAdapter } from '@videojs/spf/adapters/hls-audio-mpeg-ts';
 
 /**
  * The Mux Media over the SPF audio-only HLS engine.
@@ -22,15 +22,13 @@ import { createEngine } from '@videojs/spf/engines/hls-audio-mpeg-ts';
  * known shortcoming on the video flavor, which shares the derivation.
  *
  * An audio-only playback ID packaged as MPEG-TS plays: the flavor transmuxes it with the audio-only feature (no H.264
- * framing bundled; see `@videojs/spf/engines/hls-audio-mpeg-ts`). A plus-tier _video_ asset still surfaces no playback
+ * framing bundled; see `@videojs/spf/adapters/hls-audio-mpeg-ts`). A plus-tier _video_ asset still surfaces no playback
  * here, since Mux muxes its audio into the video segments and declares no audio rendition for this engine to select.
  */
-export class MuxAudioAdapter extends MuxMixin(HlsAudioAdapter) {
+export class MuxAudioAdapter extends MuxMixin(HlsAudioMpegTsAdapter) {
   static override readonly defaultProps: Omit<HlsAudioAdapterProps, 'src' | 'source'> & MuxAdapterProps = {
     ...HlsAudioAdapter.defaultProps,
     src: '',
     source: null,
   };
-
-  static override readonly createEngine: CreateEngine = createEngine;
 }
