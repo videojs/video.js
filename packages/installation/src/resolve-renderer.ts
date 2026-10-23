@@ -12,6 +12,8 @@ const ADAPTER_TYPE_RENDERERS: Record<AdapterType, readonly Renderer[]> = {
   wistia: [],
   mux: ['mux-video', 'mux-audio', 'mux-background-video'],
   cloudflare: ['cloudflare'],
+  // No SoundCloud renderer is offered yet.
+  soundcloud: [],
   spotify: ['spotify'],
   tiktok: ['tiktok'],
   twitch: ['twitch'],

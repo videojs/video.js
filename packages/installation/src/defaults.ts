@@ -35,6 +35,7 @@ export const CDN_MEDIA_SUBPATHS = [
   'native-hls-video',
   'playerjs-video',
   'shaka-video',
+  'soundcloud-audio',
   'spotify-audio',
   'tiktok-video',
   'twitch-video',

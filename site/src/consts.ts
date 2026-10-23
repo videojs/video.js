@@ -104,6 +104,8 @@ export const VJS10_DEMO_CLOUDFLARE = INSTALLATION_DEMO_SOURCES.cloudflare;
 // player.js is a protocol rather than a host; Gumlet is one service whose embed
 // speaks it.
 export const VJS10_DEMO_PLAYERJS = 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e';
+// SoundCloud's own docs embed from this account, so its tracks stay public.
+export const VJS10_DEMO_SOUNDCLOUD = 'https://soundcloud.com/forss/flickermood';
 // An episode rather than a track: Spotify plays episodes in full for a
 // signed-out listener, where a track is a 30 second preview.
 export const VJS10_DEMO_SPOTIFY = INSTALLATION_DEMO_SOURCES.spotify;

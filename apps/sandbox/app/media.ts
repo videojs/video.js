@@ -5,6 +5,7 @@ import {
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
+  DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
@@ -15,6 +16,7 @@ import {
   PLAYERJS_SOURCE_IDS,
   type SandboxSource,
   SHAKA_SOURCE_IDS,
+  SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   type SourceId,
   SOURCES,
@@ -222,10 +224,11 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube and `<playerjs-video>` renders one provider page URL rather than the picker's list. YouTube
-  // offers a set of page URLs instead, covering the caption, short, and live cases its adapter handles differently. The
-  // CDN page builds elements from attributes alone, so the entries that need player parameters stay off it. player.js
-  // is a protocol many providers speak, so its embed picks between their embed pages.
+  // Each embed but YouTube, `<playerjs-video>`, and `<soundcloud-audio>` renders one provider page URL rather than the
+  // picker's list. YouTube offers a set of page URLs instead, covering the caption, short, and live cases its adapter
+  // handles differently. The CDN page builds elements from attributes alone, so the entries that need player
+  // parameters stay off it. player.js is a protocol many providers speak, so its embed picks between their embed pages.
+  // SoundCloud's picker covers the URL shapes its adapter reads differently, and two that fail on purpose.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -259,6 +262,15 @@ const MEDIA_MAP = {
     sources: PLAYERJS_SOURCE_IDS,
     fallbackSource: DEFAULT_PLAYERJS_SOURCE,
     entrySource: DEFAULT_PLAYERJS_SOURCE,
+  },
+  'soundcloud-audio': {
+    label: 'SoundCloud Audio',
+    player: 'audio',
+    tag: 'soundcloud-audio',
+    embed: true,
+    sources: SOUNDCLOUD_SOURCE_IDS,
+    fallbackSource: DEFAULT_SOUNDCLOUD_SOURCE,
+    entrySource: DEFAULT_SOUNDCLOUD_SOURCE,
   },
   'spotify-audio': {
     label: 'Spotify Audio',
