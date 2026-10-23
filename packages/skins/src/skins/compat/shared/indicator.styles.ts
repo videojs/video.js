@@ -6,7 +6,7 @@ export default styles({
   rules: {
     root: {
       utilities: [
-        'pointer-events-none flex items-center gap-2 rounded-md bg-[rgba(0,0,0,0.5)] px-2.5 py-1',
+        'pointer-events-none flex items-center gap-2 rounded-md bg-media-backdrop/50 px-2.5 py-1',
         'media-high-contrast:bg-media-background media-high-contrast:outline media-high-contrast:outline-current',
         'forced-colors:bg-[Canvas] forced-colors:text-[CanvasText] forced-colors:outline forced-colors:outline-[CanvasText]',
         'transition-[opacity,transform] duration-media-base ease-out data-starting-style:opacity-0 data-ending-style:opacity-0',

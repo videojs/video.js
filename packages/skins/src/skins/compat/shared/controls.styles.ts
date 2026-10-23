@@ -12,7 +12,7 @@ export default styles({
     },
     backdrop: {
       utilities:
-        'pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,rgba(0,0,0,0.7),rgba(0,0,0,0.2),rgba(0,0,0,0.5))] group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
+        'pointer-events-none absolute inset-0 z-10 bg-(image:--media-controls-gradient) group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
@@ -38,8 +38,8 @@ export default styles({
     },
     centerButton: {
       utilities: [
-        'bg-[rgba(0,0,0,0.4)]! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-[rgba(0,0,0,0.85)]! focus-visible:bg-[rgba(0,0,0,0.85)]! aria-expanded:bg-[rgba(0,0,0,0.85)]!',
+        'bg-media-backdrop/40! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
+        'hover:bg-media-backdrop/85! focus-visible:bg-media-backdrop/85! aria-expanded:bg-media-backdrop/85!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],

@@ -7,7 +7,7 @@ export default styles({
     root: {
       // `<media-slider-thumbnail>` hosts a shadow root, so the image is slotted through it.
       shadowHost: true,
-      utilities: 'block max-w-39 overflow-hidden rounded-md bg-[rgba(0,0,0,0.5)] shadow-lg',
+      utilities: 'block max-w-39 overflow-hidden rounded-md bg-media-backdrop/50 shadow-lg',
     },
     image: {
       shadowHost: true,
