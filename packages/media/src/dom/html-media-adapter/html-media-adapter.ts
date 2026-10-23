@@ -1,3 +1,5 @@
+import { findTrackElement } from '@videojs/utils/dom';
+
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/constants';
 import {
   type EventLike,
@@ -292,6 +294,19 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
 
   addTextTrack(kind: TextTrackKind, label?: string, language?: string) {
     return this.target?.addTextTrack?.(kind, label, language) as TextTrackLike;
+  }
+
+  /**
+   * Removes a track backed by a `<track>` element, such as one from `createTextTrack()` or the page's markup. A track
+   * from the native `addTextTrack()` can never be removed, so this leaves it.
+   */
+  removeTextTrack(track: TextTrackLike) {
+    const target = this.target;
+    if (!target) return;
+
+    // A target that is itself a media component, such as a slotted `<hls-video>`, owns its tracks.
+    if (target.removeTextTrack) target.removeTextTrack(track);
+    else findTrackElement(target, track)?.remove();
   }
 
   get remote() {
