@@ -17,7 +17,13 @@ import {
   setUrlLazyState,
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
-import { observeScriptBytes, type ScriptBytes, summarizeScriptBytes } from '@app/shared/script-bytes';
+import {
+  formatKilobytes,
+  groupScriptBytes,
+  observeScriptBytes,
+  type ScriptBytes,
+  summarizeScriptBytes,
+} from '@app/shared/script-bytes';
 import type { VideoPlayerElement } from '@videojs/html/video';
 
 const html = String.raw;
@@ -70,7 +76,7 @@ root.innerHTML = html`
       <dd class="${c.statCode}" id="resolved">(none)</dd>
     </div>
     <div class="${c.card} ${c.stat}">
-      <dt class="${c.statLabel}">JavaScript loaded</dt>
+      <dt class="${c.statLabel}" id="script-label">JavaScript loaded</dt>
       <dd class="${c.statValue}" id="script-total"></dd>
       <dd class="${c.statDetail}" id="script-detail"></dd>
     </div>
@@ -80,6 +86,7 @@ root.innerHTML = html`
       <dd class="${c.statDetail}">gzip</dd>
     </div>
   </dl>
+  <section class="${c.card}" aria-label="JavaScript by package" id="script-breakdown"></section>
 `;
 
 const stage = root.querySelector<HTMLElement>('#stage')!;
@@ -88,19 +95,80 @@ const lightStatus = root.querySelector('#light-status')!;
 const buttons = root.querySelectorAll<HTMLButtonElement>('button[data-src]');
 const srcOutput = root.querySelector<HTMLElement>('#src')!;
 const resolved = root.querySelector('#resolved')!;
+const scriptLabel = root.querySelector('#script-label')!;
 const scriptTotal = root.querySelector('#script-total')!;
+const scriptBreakdown = root.querySelector('#script-breakdown')!;
 const scriptDetail = root.querySelector('#script-detail')!;
 const scriptSince = root.querySelector('#script-since')!;
 
-let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0 };
+let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0, packages: {} };
 let sourceChangedAt: ScriptBytes | undefined;
 
-function renderScriptBytes() {
-  const { total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
+const SHOWN_PACKAGES = 6;
 
+function renderScriptBreakdown() {
+  const groups = groupScriptBytes(scriptBytes);
+  const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
+
+  scriptBreakdown.innerHTML = html`
+    <div class="${c.breakdownHeader}">
+      <h2 class="${c.statLabel}">JavaScript by package</h2>
+      <p class="${c.statDetail}">
+        ${groups.length ? 'gzip, each script split by its packages' : 'Per-package sizes need a production build.'}
+      </p>
+    </div>
+    ${
+      groups.length
+        ? html`
+            <div class="${c.breakdownBar}" aria-hidden="true">
+              ${groups
+                .map(
+                  ({ id, gzip }) =>
+                    html`<span class="${c.groupColor[id]}" style="width: ${(gzip / total) * 100}%"></span>`
+                )
+                .join('')}
+            </div>
+            <div class="${c.breakdownGroups}">
+              ${groups
+                .map(
+                  ({ id, label, gzip, packages }) => html`
+                    <div>
+                      <p class="${c.breakdownGroup}">
+                        <span class="${c.breakdownSwatch} ${c.groupColor[id]}" aria-hidden="true"></span>
+                        ${label}
+                        <span class="${c.breakdownSize}">${formatKilobytes(gzip)}</span>
+                      </p>
+                      <ul class="${c.breakdownPackages}">
+                        ${packages
+                          .slice(0, SHOWN_PACKAGES)
+                          .map(
+                            ({ name, gzip: size }) =>
+                              html`<li class="${c.breakdownPackage}">
+                                <span>${name}</span><span>${formatKilobytes(size)}</span>
+                              </li>`
+                          )
+                          .join('')}
+                        ${packages.length > SHOWN_PACKAGES ? html`<li>+${packages.length - SHOWN_PACKAGES} more</li>` : ''}
+                      </ul>
+                    </div>
+                  `
+                )
+                .join('')}
+            </div>
+          `
+        : ''
+    }
+  `;
+}
+
+function renderScriptBytes() {
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
+
+  scriptLabel.textContent = label;
   scriptTotal.textContent = total;
   scriptDetail.textContent = detail;
   scriptSince.textContent = sinceChange ?? '—';
+  renderScriptBreakdown();
 }
 
 observeScriptBytes((bytes) => {
