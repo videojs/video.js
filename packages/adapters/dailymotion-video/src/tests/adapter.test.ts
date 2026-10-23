@@ -787,10 +787,13 @@ describe('DailymotionAdapter', () => {
       expect(player.play).toHaveBeenCalledOnce();
     });
 
-    it('warns once per player configuration that starts playback while autoplay is off', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('pauses the autostart of a player configuration while autoplay is off, without reporting it', async () => {
+      const media = new DailymotionAdapter();
+      const events: string[] = [];
 
-      createPlayer.mockImplementation(async (id, options) => {
+      for (const type of ['play', 'playing', 'pause']) media.addEventListener(type, () => events.push(type));
+
+      createPlayer.mockImplementationOnce(async (id, options) => {
         const player = new FakePlayer(document.getElementById(id)!, options);
 
         player.settings = { autostart: 'firstTimeViewable' };
@@ -798,26 +801,46 @@ describe('DailymotionAdapter', () => {
         return player;
       });
 
-      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
 
-      media.source = source(VIDEO_SRC, { player: 'xautostart' });
-      media.attach(createContainer());
-      await flush();
-      media.source = source(VIDEO_SRC, { player: 'xautostart', scaleMode: 'fill' });
-      await flush();
+      player.emit('VIDEO_PLAY');
 
-      expect(players).toHaveLength(2);
-      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringMatching(/xautostart starts playback itself/));
+      // Pausing as playback starts would leave the player on its loading screen.
+      expect(player.pause).not.toHaveBeenCalled();
+
+      player.emit('VIDEO_PLAYING');
+      player.emit('VIDEO_PAUSE');
+
+      expect(player.pause).toHaveBeenCalledOnce();
+      expect(media.paused).toBe(true);
+      expect(events).toEqual([]);
+
+      // It stays paused through the autostart only: a later play from the player's own controls is reported.
+      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_PLAYING');
+
+      expect(player.pause).toHaveBeenCalledOnce();
+      expect(events).toEqual(['play', 'playing']);
     });
 
-    it('does not warn about autostart when autoplay is on or the configuration leaves it off', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    it('pauses the autostart of a video loaded into the running player while autoplay is off', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
 
-      await attachAndReady(new DailymotionAdapter());
+      player.settings = { autostart: 'on' };
+      media.src = OTHER_VIDEO_SRC;
+      await flush();
+      player.emit('PLAYER_VIDEOCHANGE');
+      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_PLAYING');
 
+      expect(player.pause).toHaveBeenCalledOnce();
+      expect(media.paused).toBe(true);
+    });
+
+    it('pauses an ad the autostart begins with as it starts, since ads send no VIDEO_PLAYING', async () => {
       const media = new DailymotionAdapter();
 
-      media.autoplay = true;
       createPlayer.mockImplementationOnce(async (id, options) => {
         const player = new FakePlayer(document.getElementById(id)!, options);
 
@@ -825,9 +848,49 @@ describe('DailymotionAdapter', () => {
         players.push(player);
         return player;
       });
-      await attachAndReady(media);
 
-      expect(warn).not.toHaveBeenCalled();
+      const { player } = await attachAndReady(media);
+
+      player.emit('AD_PLAY');
+
+      expect(player.pause).toHaveBeenCalledOnce();
+      expect(media.paused).toBe(true);
+    });
+
+    it('lets the autostart play when autoplay is on, play() was called, or the configuration leaves it off', async () => {
+      const autostarting = (media: DailymotionAdapter) => {
+        createPlayer.mockImplementationOnce(async (id, options) => {
+          const player = new FakePlayer(document.getElementById(id)!, options);
+
+          player.settings = { autostart: 'on' };
+          players.push(player);
+          return player;
+        });
+        return attachAndReady(media);
+      };
+
+      const autoplaying = new DailymotionAdapter();
+
+      autoplaying.autoplay = true;
+
+      const requested = new DailymotionAdapter();
+
+      requested.source = source();
+      void requested.play();
+
+      for (const { player } of [
+        await autostarting(autoplaying),
+        await autostarting(requested),
+        await attachAndReady(new DailymotionAdapter()),
+      ]) {
+        player.emit('VIDEO_PLAY');
+        player.emit('VIDEO_PLAYING');
+
+        expect(player.pause).not.toHaveBeenCalled();
+      }
+
+      expect(autoplaying.paused).toBe(false);
+      expect(requested.paused).toBe(false);
     });
 
     it('still loads when the player cannot report its settings', async () => {

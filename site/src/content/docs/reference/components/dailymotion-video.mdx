@@ -82,7 +82,7 @@ The player configuration decides what the embed can't change at runtime. To use 
 |---|---|---|
 | Playback controls | Off | Otherwise Dailymotion's controls show under the skin. Without `controls`, the component keeps the player from taking pointer input so the skin can respond to hover, but it can't hide Dailymotion's controls. |
 | Controls during ads | Off | Same as playback controls, while an ad plays. |
-| Autostart | Off | `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. In development, the component logs a warning when the configuration starts playback while `autoplay` is off. |
+| Autostart | Off | `autoplay` decides whether a video starts: with it off, the component pauses the configuration's autostart as it starts. Turning Autostart off avoids that pause. |
 | Spinner | Off | The skin shows its own buffering indicator. |
 | Autonext | Off | Without `controls`, its "Up next" card at the end can't be clicked or closed: clicks reach the skin, which replays the video. When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
 | Picture-in-picture | Off | Dailymotion's picture-in-picture moves the player out of the element, away from the skin. |
