@@ -1,10 +1,13 @@
 import { render, waitFor } from '@testing-library/react';
 import { HlsJsAdapter } from '@videojs/hlsjs-video';
+import type { Media } from '@videojs/media';
 import { NativeHlsAdapter } from '@videojs/native-hls-video';
-import { createRef } from 'react';
+import { defineSlice } from '@videojs/store';
+import { createRef, type ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { createPlayer } from '../../player/create-player';
 import { LazyVideo } from '../lazy-video';
 
 const HLS = 'https://example.com/master.m3u8';
@@ -60,6 +63,51 @@ describe('LazyVideo', () => {
 
     await waitFor(() => expect(attach).toHaveBeenCalled(), LOAD_TIMEOUT);
     expect(FreshNativeHlsAdapter).not.toBe(NativeHlsAdapter);
+  });
+
+  it('hands mediaRef the media the player uses, across a swap and unmount', async () => {
+    const { Player, useMedia } = createPlayer({ features: [defineSlice()({ state: () => ({ paused: true }) })] });
+    const attach = vi.spyOn(HlsJsAdapter.prototype, 'attach');
+    const onPlayerMedia = vi.fn<(media: Media | null) => void>();
+    let attachedWhenHandedOut = false;
+    const mediaRef = vi.fn((media: Media | null) => {
+      if (media instanceof HlsJsAdapter) attachedWhenHandedOut = attach.mock.contexts.includes(media);
+    });
+
+    function PlayerMedia() {
+      onPlayerMedia(useMedia());
+      return null;
+    }
+
+    function Wrapper({ children }: { children: ReactNode }) {
+      return (
+        <Player>
+          {children}
+          <PlayerMedia />
+        </Player>
+      );
+    }
+
+    const { container, rerender, unmount } = render(<LazyVideo src="/movie.mp4" mediaRef={mediaRef} />, {
+      wrapper: Wrapper,
+    });
+    const video = container.querySelector('video');
+
+    expect(mediaRef).toHaveBeenLastCalledWith(video);
+    expect(onPlayerMedia).toHaveBeenLastCalledWith(video);
+
+    rerender(<LazyVideo src={HLS} preferPlayback="mse" mediaRef={mediaRef} />);
+
+    await waitFor(() => expect(mediaRef.mock.lastCall?.[0]).toBeInstanceOf(HlsJsAdapter), LOAD_TIMEOUT);
+    const adapter = mediaRef.mock.lastCall![0];
+
+    expect(mediaRef).toHaveBeenCalledWith(null);
+    expect(attachedWhenHandedOut).toBe(true);
+    await waitFor(() => expect(onPlayerMedia).toHaveBeenLastCalledWith(adapter));
+
+    unmount();
+
+    expect(mediaRef).toHaveBeenLastCalledWith(null);
   });
 
   it('resolves an extensionless source from type', () => {
