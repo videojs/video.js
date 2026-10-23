@@ -20,6 +20,7 @@ export type AdapterType =
   | 'mixcloud'
   | 'tiktok'
   | 'twitch'
+  | 'playerjs'
   | 'hls'
   | 'dash'
   | 'video'
@@ -28,8 +29,8 @@ export type AdapterType =
 /**
  * Resolve which type of adapter plays a source URL, so you can render the media component for it and pass it the same
  * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, and Twitch
- * URLs; HLS and DASH manifests; and video and audio files, by MIME type when you pass one and by file extension
- * otherwise.
+ * URLs; player.js embeds marked with a `playerjs` query parameter; HLS and DASH manifests; and video and audio files,
+ * by MIME type when you pass one and by file extension otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
  * alike, so services are only matched on URLs and `spotify:` URIs.
@@ -64,8 +65,19 @@ export function resolveMimeType(src: string): string | null {
   return (extension && MIME_TYPES.get(extension)) || null;
 }
 
-/** A service {@link matchServiceHost} recognizes by host. */
+/** A service {@link matchServiceHost} recognizes by host or marker. */
 type ServiceType = Exclude<AdapterType, 'hls' | 'dash' | 'video' | 'audio'>;
+
+/** A service recognized by its host. */
+type HostedServiceType = Exclude<ServiceType, 'playerjs'>;
+
+/**
+ * The query parameter that marks a URL as a player.js embed. player.js is a protocol any host can speak, so the URL has
+ * to say so; the player.js media removes the parameter before loading the embed.
+ *
+ * @internal
+ */
+export const PLAYERJS_PARAM = 'playerjs';
 
 // Each service's parser confirms the URL names something its media can play.
 const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
@@ -79,6 +91,8 @@ const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
   mixcloud: parseMixcloudSource,
   tiktok: parseTikTokSource,
   twitch: parseTwitchSource,
+  // The marker is the author's word that the embed speaks player.js; only the embed can confirm it.
+  playerjs: () => true,
 };
 
 function fromService(src: string): AdapterType | null {
@@ -92,17 +106,19 @@ function fromService(src: string): AdapterType | null {
 
 /**
  * Match a source URL to a service by host alone, without parsing it for an id. A Mux URL must also have a stream path.
- * A `wvideo` query parameter marks a Wistia popover on any other page.
+ * A `playerjs` query parameter marks a player.js embed on any host, ahead of the host itself, and a `wvideo` parameter
+ * marks a Wistia popover on any other page.
  *
  * @internal
  */
 export function matchServiceHost({ hostname, pathname, searchParams }: URL): ServiceType | null {
+  if (searchParams.has(PLAYERJS_PARAM)) return 'playerjs';
+
   const hostPath = hostname + pathname;
 
-
   return (
-    // SAFETY: `SERVICE_HOSTS` has exactly one key per service.
-    (Object.keys(SERVICE_HOSTS) as ServiceType[]).find((service) => SERVICE_HOSTS[service].test(hostPath)) ??
+    // SAFETY: `SERVICE_HOSTS` has exactly one key per hosted service.
+    (Object.keys(SERVICE_HOSTS) as HostedServiceType[]).find((service) => SERVICE_HOSTS[service].test(hostPath)) ??
     (searchParams.has('wvideo') ? 'wistia' : null)
   );
 }
@@ -159,7 +175,7 @@ const SERVICE_HOSTS = {
   tiktok: /^(www\.)?tiktok\.com\//,
   // `clips.twitch.tv` is a different embed the Twitch media can't play.
   twitch: /^((www|go)\.)?twitch\.tv\//,
-} satisfies Record<ServiceType, RegExp>;
+} satisfies Record<HostedServiceType, RegExp>;
 
 const HLS_TYPE = /^(application|audio)\/(vnd\.apple\.|x-)?mpegurl$/;
 const DASH_TYPE = 'application/dash+xml';
