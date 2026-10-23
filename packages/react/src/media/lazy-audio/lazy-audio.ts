@@ -1,12 +1,12 @@
 'use client';
 
-import { audio } from './audio';
-import { createLazyAudio, type LazyAudioProps } from './create';
-import { hlsAudio } from './hls-audio';
-import { muxAudio } from './mux-audio';
-import { spotifyAudio } from './spotify-audio';
+import { audio } from '../lazy/audio';
+import { createLazyAudio, type LazyAudioProps } from '../lazy/create';
+import { hlsAudio } from '../lazy/hls-audio';
+import { muxAudio } from '../lazy/mux-audio';
+import { spotifyAudio } from '../lazy/spotify-audio';
 
-export type { LazyAudioProps, LazyMediaProps } from './create';
+export type { LazyAudioProps, LazyMediaProps } from '../lazy/create';
 
 /**
  * Plays audio from any supported source by rendering the media component for it, and loads only that component's code

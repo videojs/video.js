@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createLazyVideoElement, type LazyMediaDefinition } from '../lazy-video/create';
-import { video } from '../lazy-video/video';
+import { createLazyVideoElement, type LazyMediaDefinition } from '../lazy/create';
+import { video } from '../lazy/video';
 
 let tagCounter = 0;
 
