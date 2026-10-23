@@ -75,6 +75,9 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     'adapters/hls-audio': 'src/playback/adapters/hls-audio/index.ts',
     'adapters/hls-background-video': 'src/playback/adapters/hls-background-video/index.ts',
     'adapters/hls-video': 'src/playback/adapters/hls-video/index.ts',
+    'adapters/hls-video-mpeg-ts': 'src/playback/adapters/hls-video-mpeg-ts/index.ts',
+    'adapters/hls-audio-mpeg-ts': 'src/playback/adapters/hls-audio-mpeg-ts/index.ts',
+    'adapters/hls-background-video-mpeg-ts': 'src/playback/adapters/hls-background-video-mpeg-ts/index.ts',
   },
 });
 

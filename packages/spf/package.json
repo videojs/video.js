@@ -359,6 +359,21 @@
       "types": "./dist/dev/adapters/hls-video.d.ts",
       "development": "./dist/dev/adapters/hls-video.js",
       "default": "./dist/default/adapters/hls-video.js"
+    },
+    "./adapters/hls-video-mpeg-ts": {
+      "types": "./dist/dev/adapters/hls-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/adapters/hls-video-mpeg-ts.js",
+      "default": "./dist/default/adapters/hls-video-mpeg-ts.js"
+    },
+    "./adapters/hls-audio-mpeg-ts": {
+      "types": "./dist/dev/adapters/hls-audio-mpeg-ts.d.ts",
+      "development": "./dist/dev/adapters/hls-audio-mpeg-ts.js",
+      "default": "./dist/default/adapters/hls-audio-mpeg-ts.js"
+    },
+    "./adapters/hls-background-video-mpeg-ts": {
+      "types": "./dist/dev/adapters/hls-background-video-mpeg-ts.d.ts",
+      "development": "./dist/dev/adapters/hls-background-video-mpeg-ts.js",
+      "default": "./dist/default/adapters/hls-background-video-mpeg-ts.js"
     }
   },
   "publishConfig": {

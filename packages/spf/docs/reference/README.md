@@ -238,7 +238,7 @@ Composing behaviors into a running engine: the composition, its options, and the
 <details>
 <summary>How this reference is generated</summary>
 
-Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/engines/*`), their features (`@videojs/spf/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/adapters/hls-audio`, `@videojs/spf/adapters/hls-background-video`, `@videojs/spf/adapters/hls-video`.
+Generated from the TypeScript sources and their JSDoc by `scripts/build-reference.ts`. It covers the composition factories the root entry exports from `src/core/composition/`, the playback engines (`@videojs/spf/engines/*`), their features (`@videojs/spf/features/*`), and the behaviors (`@videojs/spf/behaviors/*`). It does not cover the root entry's other exports, nor these entry points: `@videojs/spf/dom`, `@videojs/spf/hls`, `@videojs/spf/media-tracks`, `@videojs/spf/adapters/hls-audio`, `@videojs/spf/adapters/hls-background-video`, `@videojs/spf/adapters/hls-video`, `@videojs/spf/adapters/hls-video-mpeg-ts`, `@videojs/spf/adapters/hls-audio-mpeg-ts`, `@videojs/spf/adapters/hls-background-video-mpeg-ts`.
 
 Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.
 
