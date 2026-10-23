@@ -9,6 +9,9 @@ import type { HlsEngineHost } from './types';
 /** Marks the `<track>` elements created here for hls.js's own text tracks. */
 const HLS_TRACK_ATTR = 'data-removeondestroy';
 
+/** Marks the subset created from hls.js's CEA-608/708 announcements, which are announced one track at a time. */
+const CC_TRACK_ATTR = 'data-cc';
+
 /** `HTMLTrackElement.LOADED` — the element parsed its resource and will not parse it again. */
 const TRACK_LOADED = 2;
 
@@ -144,21 +147,40 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       // The hls.js delegate always binds to the real `<video>` element.
       const media = this.target as HTMLVideoElement;
 
+      // NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and
+      // `default` or `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
+      // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
+      const trackIdFor = ({ _id, default: isDefault, subtitleTrack }: NonNativeTextTracksData['tracks'][number]) =>
+        _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
+
       const onTracksFound = (_event: string, data: NonNativeTextTracksData) => {
-        removeHlsTextTracks(this.target);
+        // The subtitle set arrives in one batch, and each CC track arrives alone once 608 data shows up in the
+        // stream. Replace only what is being re-announced, so a CC announcement does not destroy the subtitle set
+        // and a fresh subtitle set does not destroy the CC tracks.
+        const incomingIds = new Set(data.tracks.map(trackIdFor));
+        const ccBatch = data.tracks.every((trackObj) => trackObj._id != null);
+
+        for (const trackEl of media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`)) {
+          const replaced = incomingIds.has(trackEl.id);
+          const ccOwned = trackEl.hasAttribute(CC_TRACK_ATTR);
+          if (!replaced && (ccBatch || ccOwned)) continue;
+
+          trackEl.track.mode = 'disabled';
+          trackEl.remove();
+        }
 
         for (const trackObj of data.tracks) {
           const baseTrackObj = trackObj.subtitleTrack ?? trackObj.closedCaptions;
-          const idx = engine.subtitleTracks.findIndex(({ lang, name, type }) => {
-            return lang === baseTrackObj?.lang && name === trackObj.label && type.toLowerCase() === trackObj.kind;
-          });
 
-          // NOTE: Undocumented method for determining identifier by hls.js. Relied on for
-          // ensuring CUES_PARSED events can identify and apply cues to the appropriate track (CJP).
-          // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts#L640
-          const id = (trackObj._id ?? trackObj.default) ? 'default' : `${trackObj.kind}${idx}`;
-
-          addTextTrack(media, trackObj.kind as TextTrackKind, trackObj.label, baseTrackObj?.lang, id, trackObj.default);
+          addTextTrack(
+            media,
+            trackObj.kind as TextTrackKind,
+            trackObj.label,
+            baseTrackObj?.lang,
+            trackIdFor(trackObj),
+            trackObj.default,
+            trackObj._id != null
+          );
         }
       };
 
@@ -183,13 +205,30 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         }
       };
 
-      const onTextTrackChange = () => {
-        if (!engine.subtitleTracks.length) return;
+      let lastShowingTrack: TextTrack | undefined;
 
+      const onTextTrackChange = () => {
         const showingTrack = Array.from(media.textTracks).find((textTrack) => {
           return textTrack.id && textTrack.mode === 'showing' && isCaptionOrSubtitleTrack(textTrack);
         });
+        const showingChanged = showingTrack !== lastShowingTrack;
+
+        lastShowingTrack = showingTrack;
+
         if (!showingTrack) return;
+
+        const hlsTrackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
+
+        // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
+        // Only when the showing track changes: `onCuesParsed` fires `change` for every batch it forwards to a
+        // disabled track, and re-adding each time re-renders the active cue several times a second.
+        if (showingChanged && Array.from(hlsTrackEls).some((trackEl) => trackEl.track === showingTrack)) {
+          Array.from(showingTrack.cues ?? []).forEach((cue) => {
+            showingTrack.addCue(cue);
+          });
+        }
+
+        if (!engine.subtitleTracks.length) return;
 
         const currentHlsTrack = engine.subtitleTracks[engine.subtitleTrack];
 
@@ -210,17 +249,10 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
             );
           });
 
+          // A closed-caption track has no entry in `subtitleTracks`, so it never matches. Assigning the -1 that
+          // `findIndex` returns makes hls.js disable every subtitle and caption track, including the one just picked.
           // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
-          engine.subtitleTrack = idx;
-        }
-
-        if (showingTrack?.id === hlsTrackId) {
-          // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
-          if (showingTrack.cues) {
-            Array.from(showingTrack.cues).forEach((cue) => {
-              showingTrack.addCue(cue);
-            });
-          }
+          if (idx >= 0) engine.subtitleTrack = idx;
         }
       };
 
@@ -248,7 +280,8 @@ function addTextTrack(
   label: string,
   lang?: string,
   id?: string,
-  defaultTrack?: boolean
+  defaultTrack?: boolean,
+  ccOwned?: boolean
 ): TextTrack {
   const trackEl = document.createElement('track');
 
@@ -272,6 +305,9 @@ function addTextTrack(
 
   // Add data attribute to identify tracks that should be removed when switching sources/destroying hls.js instance.
   trackEl.setAttribute(HLS_TRACK_ATTR, '');
+
+  if (ccOwned) trackEl.setAttribute(CC_TRACK_ATTR, '');
+
   mediaEl.append(trackEl);
 
   return trackEl.track as TextTrack;
