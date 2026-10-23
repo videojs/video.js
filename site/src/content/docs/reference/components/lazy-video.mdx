@@ -162,7 +162,57 @@ A media gives `match`, the `tag` of the element that plays its sources, and `loa
 
 Return `true` to play the source, or `undefined` when the media can't tell yet; it isn't chosen until it can, and nothing after it is tried.
 
-The built-in media are `video`, `nativeHlsVideo`, `hlsjsVideo`, `dashVideo`, `muxVideo`, `youtubeVideo`, `vimeoVideo`, `wistiaVideo`, `cloudflareVideo`, `tiktokVideo`, and `twitchVideo`, each imported from `media/lazy-video/` plus its kebab-case name.
+The built-in media are `video`, `nativeHlsVideo`, `hlsjsVideo`, `dashVideo`, `muxVideo`, `youtubeVideo`, `vimeoVideo`, `wistiaVideo`, `cloudflareVideo`, `tiktokVideo`, and `twitchVideo`, each imported from `media/lazy/` plus its kebab-case name.
+
+## Lazy loading one known media
+
+`LazyVideo` is for sources you don't know ahead of time. When you already know which media plays the source, load that media's own entry lazily instead: no source matching, and only its code.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { VideoPlayer, VideoSkin } from '@videojs/react/video';
+import { lazy, Suspense } from 'react';
+
+// Module level, so the component keeps its identity across renders.
+const VimeoVideo = lazy(() =>
+  import('@videojs/react/media/vimeo-video').then((m) => ({ default: m.VimeoVideo }))
+);
+
+export function Player() {
+  return (
+    <VideoPlayer>
+      <VideoSkin>
+        <Suspense fallback={null}>
+          <VimeoVideo src="https://vimeo.com/76979871" />
+        </Suspense>
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+The media registers with the player when it mounts, and `ref`, `mediaRef`, and `useMedia()` work as they do with a static import.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Write the media element in the page, and import its module when you want it to load:
+
+```html
+<video-player>
+  <video-skin>
+    <vimeo-video src="https://vimeo.com/76979871"></vimeo-video>
+  </video-skin>
+</video-player>
+```
+
+```ts
+import('@videojs/html/media/vimeo-video');
+```
+
+The import defines `<vimeo-video>`, and the browser upgrades the element in place: it reads the attributes already on it and registers with the player. Set attributes rather than properties before the import; a property set on an element that isn't defined yet hides the element's own property once it is.
+</FrameworkCase>
+
+Until the media loads, the player has no media, so its controls show their empty state.
 
 ## Examples
 
