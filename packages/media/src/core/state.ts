@@ -240,6 +240,13 @@ export interface MediaPlaybackRateState {
    */
   playbackRate: number;
   /**
+   * Whether the media can change its playback rate. `unsupported` when the attached media has no `playbackRate` at all,
+   * such as an embed whose provider takes no speed command.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
+   */
+  playbackRateAvailability: MediaFeatureAvailability;
+  /**
    * Set the playback rate.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
