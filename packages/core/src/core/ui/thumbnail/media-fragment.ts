@@ -62,7 +62,10 @@ export function parseMediaFragment(
  *
  * @internal
  */
-export function mapCuesToThumbnails(cues: MediaTextCue[], baseURL?: string): ThumbnailImage[] {
+export function mapCuesToThumbnails(
+  cues: readonly Pick<MediaTextCue, 'startTime' | 'endTime' | 'text'>[],
+  baseURL?: string
+): ThumbnailImage[] {
   const images: ThumbnailImage[] = [];
 
   for (const cue of cues) {
