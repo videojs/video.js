@@ -495,11 +495,18 @@ export function installationStarterFiles(
 ): readonly string[] {
   if (template !== 'vite') return [];
 
-  if (framework === 'html') return ['src/main.ts', 'src/counter.ts', 'src/style.css', 'src/typescript.svg'];
+  // create-vite's demo page imports these assets and the `public/icons.svg` sprite; nothing uses them once the player
+  // replaces that page.
+  const assets = ['src/assets/hero.png', 'src/assets/vite.svg', 'public/icons.svg'];
 
-  if (framework === 'react') return ['src/App.css'];
+  if (framework === 'html')
+    return ['src/main.ts', 'src/counter.ts', 'src/style.css', 'src/assets/typescript.svg', ...assets];
 
-  return framework === 'vue' ? ['src/components/HelloWorld.vue'] : ['src/lib/Counter.svelte'];
+  if (framework === 'react') return ['src/App.css', 'src/assets/react.svg', ...assets];
+
+  return framework === 'vue'
+    ? ['src/components/HelloWorld.vue', 'src/assets/vue.svg', ...assets]
+    : ['src/lib/Counter.svelte', 'src/assets/svelte.svg', ...assets];
 }
 
 export function installationVueConfigFilename(
