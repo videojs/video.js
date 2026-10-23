@@ -13,10 +13,9 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 //
 // What differs otherwise is what it can play. This flavor composes
 // `mpegTsTransmuxFeature`, so an audio-only MPEG-TS playback ID plays by
-// transmuxing to fMP4 on the client. A plus-tier *video* asset still has no
-// audio rendition to select — Mux muxes its audio into the video segments — so
-// it surfaces no playback here. Those sources are left in the picker
-// deliberately: failing well is part of what this page demos.
+// transmuxing to fMP4 on the client. A plus-tier *video* asset plays too: Mux
+// muxes its audio into the video segments, so this flavor fetches the
+// lowest-bandwidth variant's segments and keeps only their AAC.
 
 createHtmlSandbox({
   player: 'audio',
