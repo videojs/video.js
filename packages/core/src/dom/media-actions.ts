@@ -42,7 +42,8 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     const playback = selectPlayback(store.state);
     if (!playback) return;
 
-    ignoreRejection(playback.paused ? playback.play() : playback.pause());
+    // A pending autoplay counts as playing, so the toggle cancels it, as the play button does.
+    ignoreRejection(playback.paused && !playback.autoplaying ? playback.play() : playback.pause());
   },
 
   toggleMuted({ store }) {

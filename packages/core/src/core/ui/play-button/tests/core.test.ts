@@ -10,6 +10,8 @@ function createMediaState(overrides: Partial<MediaPlaybackState> = {}): MediaPla
     ended: false,
     started: false,
     waiting: false,
+    autoplay: false,
+    autoplaying: false,
     play: vi.fn(async () => {}),
     pause: vi.fn(),
     ...overrides,
@@ -48,6 +50,16 @@ describe('PlayButtonCore', () => {
 
       expect(state.paused).toBe(false);
       expect(state.started).toBe(true);
+    });
+
+    it('shows a pending autoplay as playing', () => {
+      const core = new PlayButtonCore();
+
+      core.setMedia(createMediaState({ paused: true, autoplay: true, autoplaying: true }));
+      const state = core.getState();
+
+      expect(state.paused).toBe(false);
+      expect(core.getLabel(state)).toMatchObject({ key: 'buttons.pause', text: 'Pause' });
     });
   });
 
@@ -115,6 +127,15 @@ describe('PlayButtonCore', () => {
   });
 
   describe('toggle', () => {
+    it('cancels a pending autoplay instead of playing', async () => {
+      const core = new PlayButtonCore();
+      const media = createMediaState({ paused: true, autoplay: true, autoplaying: true });
+
+      await core.toggle(media);
+      expect(media.pause).toHaveBeenCalled();
+      expect(media.play).not.toHaveBeenCalled();
+    });
+
     it('calls play when paused', async () => {
       const core = new PlayButtonCore();
       const media = createMediaState({ paused: true });
