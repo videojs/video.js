@@ -5,7 +5,14 @@ import '@app/styles.css';
 // Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
 // Light mode (`?light`) shows a poster and a play button, and loads nothing until play is pressed.
 import '@videojs/react/video/skin.css';
-import { LAZY_DEMO_CLASSES as c, LAZY_VIDEO_SOURCE_GROUPS, LAZY_VIDEO_SOURCES } from '@app/shared/lazy-sources';
+import {
+  LAZY_DEMO_CLASSES as c,
+  getUrlLazySource,
+  getUrlLight,
+  LAZY_VIDEO_SOURCE_GROUPS,
+  LAZY_VIDEO_SOURCES,
+  setUrlLazyState,
+} from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
 import { observeScriptBytes, type ScriptBytes, summarizeScriptBytes } from '@app/shared/script-bytes';
 import type { Media } from '@videojs/media';
@@ -43,18 +50,9 @@ function StartedReporter({ onStarted }: { onStarted: () => void }) {
   return null;
 }
 
-function setLightParam(light: boolean) {
-  const url = new URL(location.href);
-
-  if (light) url.searchParams.set('light', '');
-  else url.searchParams.delete('light');
-
-  history.replaceState(null, '', url);
-}
-
 function App() {
-  const [src, setSrc] = useState<string>(LAZY_VIDEO_SOURCES[0]!.src);
-  const [light, setLight] = useState(() => new URLSearchParams(location.search).has('light'));
+  const [src, setSrc] = useState(() => getUrlLazySource().src);
+  const [light, setLight] = useState(getUrlLight);
   const [clickedAt, setClickedAt] = useState<number>();
   const [startedAt, setStartedAt] = useState<number>();
   const [timedOut, setTimedOut] = useState(false);
@@ -120,7 +118,7 @@ function App() {
               checked={light}
               onChange={(event) => {
                 setLight(event.target.checked);
-                setLightParam(event.target.checked);
+                setUrlLazyState({ light: event.target.checked });
                 startLight(undefined);
               }}
             />
@@ -144,6 +142,7 @@ function App() {
                     onClick={() => {
                       setSourceChangedAt(scriptBytes);
                       setSrc(option);
+                      setUrlLazyState({ src: option });
 
                       if (light) startLight(undefined);
                     }}
