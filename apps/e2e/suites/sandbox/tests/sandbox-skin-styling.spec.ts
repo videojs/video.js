@@ -197,7 +197,7 @@ for (const media of ['video', 'audio'] as const) {
       await expect(root).toHaveAttribute('data-preset', `live-${media}`);
       await expect(page.getByRole('slider', { name: 'Seek' })).toHaveCount(0);
       // Labels arrive through the live player's store; a skin mounted without its player element renders none.
-      await expect(root.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
+      await expect(root.getByRole('button', { name: 'Play', exact: true }).last()).toBeVisible();
     });
   }
 }

@@ -19,6 +19,14 @@ async function getCenter(player: PlayerPage) {
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
+// Helper to get a point in the center region that misses the skin's centre controls
+async function getOffCenter(player: PlayerPage) {
+  const box = await player.playerRoot.boundingBox();
+  if (!box) throw new Error('Player not visible');
+
+  return { x: box.x + box.width / 2, y: box.y + box.height / 4 };
+}
+
 async function seekToMiddle(player: PlayerPage) {
   await player.page.evaluate(() => {
     const media = document.querySelector('video')!;
@@ -164,7 +172,7 @@ test.describe('Touch Gestures', () => {
   test('tap container toggles controls visibility', async ({ page }) => {
     await player.play();
     await expect(player.controls).not.toHaveAttribute(DATA_ATTRS.visible);
-    const { x, y } = await getCenter(player);
+    const { x, y } = await getOffCenter(player);
 
     await page.touchscreen.tap(x, y);
     await expect(player.controls).toHaveAttribute(DATA_ATTRS.visible, '');

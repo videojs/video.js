@@ -8,6 +8,7 @@ import { CastButton } from '../../../../components/buttons/cast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
 import { PlayButton } from '../../../../components/buttons/play-button';
+import { SeekButton } from '../../../../components/buttons/seek-button';
 import { VolumePopover } from '../../../../components/menus/volume-popover';
 import { TimeSlider } from '../../../../components/sliders/time-slider';
 import timeStyles from '../../../../styles/display/time.styles';
@@ -22,6 +23,16 @@ export interface DefaultVideoControlsProps {
 export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsProps = {}) {
   return (
     <$.Controls.Root>
+      <$.BufferingIndicator className={controlsStyles.centerBuffering}>
+        <$.Controls.Group className={controlsStyles.center}>
+          <SeekButton className={[controlsStyles.centerButton, controlsStyles.centerSeek]} seconds={-10} />
+          <PlayButton
+            className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
+            iconClassName={controlsStyles.centerPlayIcon}
+          />
+          <SeekButton className={[controlsStyles.centerButton, controlsStyles.centerSeek]} seconds={10} />
+        </$.Controls.Group>
+      </$.BufferingIndicator>
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content]}>
         <$.Tooltip.Provider>
