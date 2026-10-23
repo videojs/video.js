@@ -289,6 +289,9 @@ export {
   usePlayer,
   usePlayerContext,
 } from './player/context';
+// Text tracks
+export { useActiveTextCues, useTextCues } from './text-track/use-text-cues';
+export { useTextTracks } from './text-track/use-text-tracks';
 // Player API
 export {
   type CreatePlayerConfig,
