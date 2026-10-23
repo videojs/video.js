@@ -6,6 +6,9 @@ import { getTransitionFlags } from '../transition';
 /** @internal */
 export type DialogRole = 'dialog' | 'alertdialog';
 
+/** Whether a dialog is confined to its player or covers the whole document. */
+export type DialogScope = 'player' | 'document';
+
 export interface DialogProps {
   /** Controlled open state. When set, the consumer is responsible for toggling. */
   open?: boolean | undefined;
@@ -13,6 +16,11 @@ export interface DialogProps {
   defaultOpen?: boolean | undefined;
   /** Whether pressing Escape closes the dialog. */
   closeOnEscape?: boolean | undefined;
+  /**
+   * Confine the dialog to its player, or let it cover and block the whole document. A `player` dialog falls back to
+   * `document` when it is not rendered inside a player.
+   */
+  scope?: DialogScope | undefined;
 }
 
 /** @internal */
@@ -27,6 +35,8 @@ export interface DialogState extends TransitionFlags {
   titleId: string | undefined;
   /** Element ID of the dialog description, used for `aria-describedby`. */
   descriptionId: string | undefined;
+  /** Scope in effect: `document` when a `player` dialog has no player to confine it to. */
+  scope: DialogScope;
 }
 
 /** @internal */
@@ -35,6 +45,7 @@ export class DialogCore {
     open: false,
     defaultOpen: false,
     closeOnEscape: true,
+    scope: 'player',
   };
 
   readonly #role: DialogRole;
@@ -74,6 +85,7 @@ export class DialogCore {
       status: input.status,
       titleId: this.#titleId,
       descriptionId: this.#descriptionId,
+      scope: this.#documentModal ? 'document' : 'player',
       ...getTransitionFlags(input.status),
     };
   }

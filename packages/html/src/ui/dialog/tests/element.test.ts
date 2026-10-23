@@ -1,6 +1,9 @@
+import { ContextProvider } from '@videojs/element/context';
 import { flush } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { containerContext } from '../../../player/context';
+import { UIElement } from '../../ui-element';
 import { DialogBackdropElement } from '../backdrop';
 import { DialogCloseElement } from '../close';
 import { DialogElement } from '../element';
@@ -13,6 +16,33 @@ function createElement<Element extends HTMLElement>(Base: abstract new () => Ele
 
   customElements.define(tag, class extends (Base as unknown as typeof HTMLElement) {});
   return document.createElement(tag) as Element;
+}
+
+class TestContainerProviderElement extends UIElement {
+  readonly provider = new ContextProvider(this, {
+    context: containerContext,
+    initialValue: {
+      container: this,
+      registerContainer: () => () => {},
+    },
+  });
+}
+
+async function renderInContainer(scope?: DialogElement['scope']) {
+  const container = createElement(TestContainerProviderElement);
+  const dialog = createElement(DialogElement);
+  const backdrop = createElement(DialogBackdropElement);
+  const popup = createElement(DialogPopupElement);
+
+  if (scope) dialog.scope = scope;
+
+  dialog.open = true;
+  dialog.append(backdrop, popup);
+  container.append(dialog);
+  document.body.append(container);
+  await dialog.updateComplete;
+
+  return { dialog, backdrop, popup };
 }
 
 afterEach(() => {
@@ -35,6 +65,66 @@ describe('DialogElement', () => {
     expect(popup.getAttribute('aria-modal')).toBe('true');
     expect(popup.tabIndex).toBe(-1);
     expect(dialog.hasAttribute('data-open')).toBe(true);
+    expect(popup.getAttribute('data-scope')).toBe('document');
+  });
+
+  it('confines a dialog to its player by default', async () => {
+    const { backdrop, popup } = await renderInContainer();
+
+    await vi.waitFor(() => {
+      expect(popup.hasAttribute('aria-modal')).toBe(false);
+      expect(popup.getAttribute('data-scope')).toBe('player');
+      expect(backdrop.getAttribute('data-scope')).toBe('player');
+    });
+  });
+
+  it('connects parts defined before the dialog', async () => {
+    const popup = createElement(DialogPopupElement);
+    const dialogTag = `test-dialog-${tagCounter++}`;
+
+    document.body.append(document.createElement(dialogTag));
+    document.body.lastElementChild!.append(popup);
+    customElements.define(dialogTag, class extends DialogElement {});
+
+    // happy-dom upgrades into a new instance, so reach the dialog through its child.
+    const dialog = popup.parentElement as DialogElement;
+
+    dialog.open = true;
+    await dialog.updateComplete;
+
+    await vi.waitFor(() => {
+      expect(popup.getAttribute('role')).toBe('dialog');
+      expect(popup.hasAttribute('data-open')).toBe(true);
+    });
+  });
+
+  it('confines a dialog to a player defined after it', async () => {
+    const containerTag = `test-dialog-${tagCounter++}`;
+    const container = document.createElement(containerTag);
+    const dialog = createElement(DialogElement);
+    const popup = createElement(DialogPopupElement);
+
+    dialog.open = true;
+    dialog.append(popup);
+    container.append(dialog);
+    document.body.append(container);
+    await dialog.updateComplete;
+    customElements.define(containerTag, class extends TestContainerProviderElement {});
+
+    await vi.waitFor(() => {
+      expect(popup.getAttribute('data-scope')).toBe('player');
+      expect(popup.hasAttribute('aria-modal')).toBe(false);
+    });
+  });
+
+  it('covers the document when scope is document', async () => {
+    const { backdrop, popup } = await renderInContainer('document');
+
+    await vi.waitFor(() => {
+      expect(popup.getAttribute('aria-modal')).toBe('true');
+      expect(popup.getAttribute('data-scope')).toBe('document');
+      expect(backdrop.getAttribute('data-scope')).toBe('document');
+    });
   });
 
   it('opens from an adjacent trigger', async () => {
