@@ -27,6 +27,7 @@ export function prefersMarkdown(accept: string): boolean {
 }
 
 const MARKDOWN_CONTENT_TYPE = 'text/markdown; charset=utf-8';
+const MARKDOWN_TOKENS_HEADER = 'x-markdown-tokens';
 
 // Netlify purges its CDN on every deploy, which is when the Markdown and its package version change, so only its cache
 // keeps the long TTL. Browsers and other shared caches revalidate.
@@ -39,20 +40,42 @@ function setPublicMarkdownCache(headers: Headers): void {
   for (const [name, value] of Object.entries(PUBLIC_MARKDOWN_CACHE)) headers.set(name, value);
 }
 
+/** Rough token count for a size hint; four characters per token is close enough for English prose and code. */
+export function estimateMarkdownTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+/** A Markdown file the build writes, with the size its `x-markdown-tokens` header reports. */
+export interface StaticMarkdownFile {
+  path: string;
+  tokens: number;
+}
+
 /**
  * Netlify `_headers` rules for the static Markdown twins, which Netlify serves without an edge function. Installation
  * twins are left out: their body depends on the query, so the edge function renders them and sets their headers.
+ * `x-markdown-tokens` lets an agent judge whether a page fits its context window before reading the body.
  */
-export function staticMarkdownHeaderRules(paths: readonly string[]): string {
+export function staticMarkdownHeaderRules(twins: readonly StaticMarkdownFile[]): string {
   const headers = Object.entries({ 'content-type': MARKDOWN_CONTENT_TYPE, ...PUBLIC_MARKDOWN_CACHE });
 
-  return paths
-    .filter((path) => !getInstallationRouteSegment(path))
-    .map((path) => [path, ...headers.map(([name, value]) => `  ${name}: ${value}`)].join('\n'))
+  return twins
+    .filter(({ path }) => !getInstallationRouteSegment(path))
+    .map(({ path, tokens }) => headerRule(path, [...headers, [MARKDOWN_TOKENS_HEADER, String(tokens)]]))
     .join('\n\n');
 }
 
+/** Netlify `_headers` rules that only add `x-markdown-tokens`, for the `llms.txt` indexes, which keep their type. */
+export function markdownTokenHeaderRules(files: readonly StaticMarkdownFile[]): string {
+  return files.map(({ path, tokens }) => headerRule(path, [[MARKDOWN_TOKENS_HEADER, String(tokens)]])).join('\n\n');
+}
+
+function headerRule(path: string, headers: readonly (readonly [name: string, value: string])[]): string {
+  return [path, ...headers.map(([name, value]) => `  ${name}: ${value}`)].join('\n');
+}
+
 function markMarkdownResponse(response: Response): Response {
+  // Copying keeps the `x-markdown-tokens` header that the twin's `_headers` rule adds to the static response.
   const headers = new Headers(response.headers);
 
   headers.set('content-type', MARKDOWN_CONTENT_TYPE);
@@ -76,7 +99,7 @@ function installationMarkdownResponse(body: string, status: 200 | 400 | 500, pri
 
   response.headers.set('netlify-vary', `query=${INSTALLATION_MARKDOWN_PARAMS.join('|')}`);
   response.headers.set('vary', 'Accept');
-  response.headers.set('x-markdown-tokens', String(Math.ceil(body.length / 4)));
+  response.headers.set(MARKDOWN_TOKENS_HEADER, String(estimateMarkdownTokens(body)));
 
   return response;
 }
