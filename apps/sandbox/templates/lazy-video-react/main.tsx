@@ -14,7 +14,13 @@ import {
   setUrlLazyState,
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
-import { observeScriptBytes, type ScriptBytes, summarizeScriptBytes } from '@app/shared/script-bytes';
+import {
+  formatKilobytes,
+  groupScriptBytes,
+  observeScriptBytes,
+  type ScriptBytes,
+  summarizeScriptBytes,
+} from '@app/shared/script-bytes';
 import type { Media } from '@videojs/media';
 import { LazyVideo } from '@videojs/react/media/lazy-video';
 import { usePlayer, VideoPlayer, VideoSkin } from '@videojs/react/video';
@@ -50,6 +56,53 @@ function StartedReporter({ onStarted }: { onStarted: () => void }) {
   return null;
 }
 
+const SHOWN_PACKAGES = 6;
+
+function ScriptBreakdown({ bytes }: { bytes: ScriptBytes }) {
+  const groups = groupScriptBytes(bytes);
+  const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
+
+  return (
+    <section className={c.card} aria-label="JavaScript by package">
+      <div className={c.breakdownHeader}>
+        <h2 className={c.statLabel}>JavaScript by package</h2>
+        <p className={c.statDetail}>
+          {groups.length ? 'gzip, each script split by its packages' : 'Per-package sizes need a production build.'}
+        </p>
+      </div>
+      {groups.length > 0 && (
+        <>
+          <div className={c.breakdownBar} aria-hidden="true">
+            {groups.map(({ id, gzip }) => (
+              <span key={id} className={c.groupColor[id]} style={{ width: `${(gzip / total) * 100}%` }} />
+            ))}
+          </div>
+          <div className={c.breakdownGroups}>
+            {groups.map(({ id, label, gzip, packages }) => (
+              <div key={id}>
+                <p className={c.breakdownGroup}>
+                  <span className={`${c.breakdownSwatch} ${c.groupColor[id]}`} aria-hidden="true" />
+                  {label}
+                  <span className={c.breakdownSize}>{formatKilobytes(gzip)}</span>
+                </p>
+                <ul className={c.breakdownPackages}>
+                  {packages.slice(0, SHOWN_PACKAGES).map(({ name, gzip: size }) => (
+                    <li key={name} className={c.breakdownPackage}>
+                      <span>{name}</span>
+                      <span>{formatKilobytes(size)}</span>
+                    </li>
+                  ))}
+                  {packages.length > SHOWN_PACKAGES && <li>+{packages.length - SHOWN_PACKAGES} more</li>}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 function App() {
   const [src, setSrc] = useState(() => getUrlLazySource().src);
   const [light, setLight] = useState(getUrlLight);
@@ -59,9 +112,9 @@ function App() {
   const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === src)?.poster;
   const showFacade = light && clickedAt === undefined;
   const [resolved, setResolved] = useState<string | null>(null);
-  const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ gzip: 0, raw: 0, files: 0 });
+  const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ gzip: 0, raw: 0, files: 0, packages: {} });
   const [sourceChangedAt, setSourceChangedAt] = useState<ScriptBytes>();
-  const { total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
 
   useEffect(() => observeScriptBytes(setScriptBytes), []);
 
@@ -164,7 +217,7 @@ function App() {
           <dd className={c.statCode}>{resolved ?? '(none)'}</dd>
         </div>
         <div className={`${c.card} ${c.stat}`}>
-          <dt className={c.statLabel}>JavaScript loaded</dt>
+          <dt className={c.statLabel}>{label}</dt>
           <dd className={c.statValue}>{total}</dd>
           <dd className={c.statDetail}>{detail}</dd>
         </div>
@@ -174,6 +227,7 @@ function App() {
           <dd className={c.statDetail}>gzip</dd>
         </div>
       </dl>
+      <ScriptBreakdown bytes={scriptBytes} />
     </>
   );
 }
