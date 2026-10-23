@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { StateSignals } from '../../../core/composition/define-behavior';
 import { signal } from '../../../core/signals/primitives';
+import { SVTA_PRIMARY_MANIFEST_LOAD_ERROR, type SvtaError } from '../../../media/errors';
 import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
 import type { MaybeResolvedPresentation, Presentation } from '../../../media/types';
 import { type PresentationState, resolvePresentation } from '../resolve-presentation';
@@ -227,6 +228,27 @@ variant1.m3u8`;
     } finally {
       reactor.destroy();
     }
+  });
+
+  it('reports a manifest that fails to load through the errors signal when one is composed', async () => {
+    const state = { ...makeState({ preload: 'auto' }), errors: signal<SvtaError[] | undefined>(undefined) };
+    const cause = new TypeError('Failed to fetch');
+
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(cause);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const reactor = resolvePresentation.setup({ state, config: baseConfig });
+
+    state.presentation.set({ url: 'https://cdn.example.com/stream.m3u8' });
+    await vi.waitFor(() => expect(state.errors.get()).toHaveLength(1));
+
+    expect(state.errors.get()?.[0]).toEqual({
+      code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
+      data: { url: 'https://cdn.example.com/stream.m3u8', cause },
+    });
+    expect(state.presentation.get()).toEqual({ url: 'https://cdn.example.com/stream.m3u8' });
+
+    reactor.destroy();
   });
 
   describe('preload policy', () => {

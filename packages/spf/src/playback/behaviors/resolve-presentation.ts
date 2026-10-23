@@ -28,10 +28,12 @@ import { defineBehavior } from '../../core/composition/define-behavior';
 import type { Reactor } from '../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
+import { SVTA_PRIMARY_MANIFEST_LOAD_ERROR } from '../../media/errors';
 import { isResolvedPresentation, type MaybeResolvedPresentation, type Presentation } from '../../media/types';
 import { DEFAULT_PRELOAD, isBlockingPreload, type StandardPreload } from '../../media/utils/preload';
 import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
 import { fetchResolvable as defaultFetchResolvable, getResponseText } from '../../network/fetch';
+import { type ErrorEmitterState, emitError } from './collect-errors';
 
 export interface PresentationState {
   presentation?: MaybeResolvedPresentation;
@@ -74,15 +76,20 @@ function deriveState(
   return gateOpen ? 'resolving' : 'idle';
 }
 
+// A type alias rather than an interface: the signal-map bound needs the implicit index signature only an alias has.
+type ResolvePresentationStateMap = {
+  presentation: Signal<PresentationState['presentation']>;
+  preload: ReadonlySignal<PresentationState['preload']>;
+  loadActivated: ReadonlySignal<PresentationState['loadActivated']>;
+};
+
 function resolvePresentationSetup({
   state,
   config,
 }: {
-  state: {
-    presentation: Signal<PresentationState['presentation']>;
-    preload: ReadonlySignal<PresentationState['preload']>;
-    loadActivated: ReadonlySignal<PresentationState['loadActivated']>;
-  };
+  // Widened with the optional `errors` signal, as `resolveTrack` is: a failed
+  // load reports through it and no-ops when `collectErrors` isn't composed.
+  state: ResolvePresentationStateMap & ErrorEmitterState;
   config: ResolvePresentationConfig;
 }): Reactor<ResolvePresentationState | 'destroying' | 'destroyed'> {
   const { parsePresentation } = config;
@@ -120,8 +127,11 @@ function resolvePresentationSetup({
             .catch((error) => {
               if (error instanceof Error && error.name === 'AbortError') return;
 
-              // TODO(error-management): route to a state-error slot once one exists.
-              console.error('[resolvePresentation] manifest fetch/parse failed:', error);
+              // Fetch and parse failures alike: either way there is no primary manifest.
+              emitError(state, {
+                code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
+                data: { url: presentation.url, cause: error },
+              });
             });
 
           return ac;
@@ -135,5 +145,6 @@ function resolvePresentationSetup({
 export const resolvePresentation = defineBehavior({
   stateKeys: ['presentation', 'preload', 'loadActivated'],
   contextKeys: [],
-  setup: resolvePresentationSetup,
+  setup: (deps: { state: ResolvePresentationStateMap; config: ResolvePresentationConfig }) =>
+    resolvePresentationSetup(deps),
 });
