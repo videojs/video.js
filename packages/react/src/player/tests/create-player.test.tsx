@@ -465,6 +465,37 @@ describe('createPlayer', () => {
       }
     );
 
+    it('seeds playbackRates and restores the defaults when the prop is removed', () => {
+      const { Player, usePlayer } = createPlayer({ features: [features.playbackRate] });
+      let store!: PlayerStore;
+
+      function Consumer() {
+        store = usePlayer();
+        return null;
+      }
+
+      const { rerender } = render(
+        <Player>
+          <Consumer />
+        </Player>
+      );
+      const defaults = store.playbackRates;
+
+      rerender(
+        <Player playbackRates={[2, 1, 0.5]}>
+          <Consumer />
+        </Player>
+      );
+      expect(store.playbackRates).toEqual([2, 1, 0.5]);
+
+      rerender(
+        <Player>
+          <Consumer />
+        </Player>
+      );
+      expect(store.playbackRates).toEqual(defaults);
+    });
+
     it('seeds config inputs during SSR', () => {
       const { Player, usePlayer } = createPlayer({ features: [metadataFeature] });
 

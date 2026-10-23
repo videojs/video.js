@@ -42,7 +42,7 @@ import basicUsageHtmlTs from "@/components/docs/demos/playback-rate-button/html/
 
 ## Behavior
 
-Cycles through playback rates on click. The default rate list is `[0.2, 0.5, 0.7, 1, 1.2, 1.5, 1.7, 2]`. After the last rate, it wraps back to the first. If the current rate isn't in the list (e.g., set programmatically), the button jumps to the next rate greater than the current one.
+Cycles through the player's playback rates on click, in the order they are listed. The default list is `[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]`; see the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> to set your own. After the last rate, it wraps back to the first. If the current rate isn't in the list (e.g., set programmatically), the button jumps to the next rate greater than the current one.
 
 <FrameworkCase frameworks={["react"]}>
 When `menuTrigger` is enabled, activation opens the linked playback-rate menu instead of cycling through rates. Use this mode when the button is the trigger for a `Menu` that contains playback-rate options.

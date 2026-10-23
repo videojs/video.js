@@ -4,8 +4,8 @@ import type { InferComponentState, InferMediaState, MediaButtonComponent, StateA
 import { logMissingFeature } from '@videojs/core/dom';
 import { isText, translateText } from '@videojs/core/i18n';
 import type { Selector } from '@videojs/store';
-import { isUndefined } from '@videojs/utils/predicate';
-import type { ForwardedRef, ForwardRefExoticComponent, RefAttributes } from 'react';
+import { isFunction, isUndefined } from '@videojs/utils/predicate';
+import type { CSSProperties, ForwardedRef, ForwardRefExoticComponent, RefAttributes } from 'react';
 import { forwardRef, useLayoutEffect, useState } from 'react';
 
 import { useTranslator } from '../i18n/context';
@@ -36,12 +36,33 @@ type LabelParams = Record<string, string | number>;
 type LabelParamsCore<State> = {
   getLabelParams?: (state: State) => LabelParams | undefined;
 };
+type ButtonStyle<Core extends MediaButtonComponent> = renderElementFn.ComponentProps<
+  InferComponentState<Core>
+>['style'];
+type CSSVarsCore<State> = {
+  /** CSS custom properties the button publishes for skins. */
+  getCSSVars?: (state: State) => Record<string, string>;
+};
 
 function getLabelParams<Core extends MediaButtonComponent>(
   core: Core,
   state: InferComponentState<Core>
 ): LabelParams | undefined {
   return (core as LabelParamsCore<InferComponentState<Core>>).getLabelParams?.(state);
+}
+
+/** Adds the core's CSS custom properties to the consumer's style, whether an object or a function of state. */
+function withCSSVars<Core extends MediaButtonComponent>(
+  core: Core,
+  state: InferComponentState<Core>,
+  style: ButtonStyle<Core>
+): ButtonStyle<Core> {
+  const vars = (core as CSSVarsCore<InferComponentState<Core>>).getCSSVars?.(state) as CSSProperties | undefined;
+  if (!vars) return style;
+
+  if (isFunction(style)) return (nextState) => ({ ...style(nextState), ...vars });
+
+  return { ...style, ...vars };
 }
 
 /** Creates a media button React component from a core class and config. */
@@ -155,7 +176,11 @@ export function createMediaButton<Core extends Required<MediaButtonComponent>, P
 
     return renderElement(
       'button',
-      { render, className, style } as renderElementFn.ComponentProps<InferComponentState<Core>>,
+      {
+        render,
+        className,
+        style: withCSSVars(core, state, style as ButtonStyle<Core>),
+      } as renderElementFn.ComponentProps<InferComponentState<Core>>,
       {
         state,
         stateAttrMap,
