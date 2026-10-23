@@ -28,6 +28,7 @@ import {
 } from '../../../media/types';
 import { findTrackById } from '../../../media/utils/tracks';
 import { crossOriginToRequestCredentials } from '../../../network/request-credentials';
+import { resolveSourceUrl } from '../../../network/resolve-source-url';
 import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls-video';
 import {
   DVR_EXPERIMENTAL_MESSAGE,
@@ -522,16 +523,21 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     set src(value: string) {
+      // Resolved against the runtime's base URL before anything compares or
+      // stores it, as `<video src>` is against the node document: `src` reads
+      // back absolute, and a relative URL names the same asset as its absolute
+      // form. The engine only ever sees the resolved URL.
+      const url = resolveSourceUrl(value);
       // Guarded on the URL rather than on source identity: the presentation can
       // also be written straight to the engine, and clearing `src` has to reach
       // it either way.
-      if (value === this.src) return;
+      if (url === this.src) return;
 
       // A bare URL names a different asset, so whatever the previous source said
       // about licensing it no longer applies — same line the Mux flavor draws
       // when a URL replaces a structured source.
-      this.#source = value ? { src: value } : null;
-      this.#applySrc(value);
+      this.#source = url ? { src: url } : null;
+      this.#applySrc(url);
       this.dispatchEvent?.(new Event('sourcechange'));
     }
 
@@ -561,10 +567,13 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * changing only the licensing half of a source would otherwise cause.
      */
     #applySrc(value: string): void {
-      if (value === this.src) return;
+      // Resolved here as well as in the `src` setter: `source` hands its URL
+      // straight through, and resolving an absolute URL is the identity.
+      const url = resolveSourceUrl(value);
+      if (url === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#engine.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(url ? { url } : undefined);
     }
 
     // -------------------------------------------------------------------------

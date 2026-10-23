@@ -27,8 +27,10 @@
  * numerically 3404, which decomposes identically). Both answer `undefined` for input the spec assigns nothing to: a
  * non-integer, a negative, or, for the category, the reserved `8`–`98` range.
  *
- * Media content and playback — the unsupported-source detection path:
+ * Media content and playback — loading the source, then the unsupported-source detection path:
  *
+ * - `SVTA_PRIMARY_MANIFEST_LOAD_ERROR` (2014) — the multivariant playlist could not be fetched or parsed, so the source
+ *   never resolved. `data` carries the URL and the thrown cause.
  * - `SVTA_UNSUPPORTED_VIDEO_FORMAT` (1004) / `SVTA_UNSUPPORTED_AUDIO_FORMAT` (1005) — a rendition in a container this
  *   engine can't append, reported per rendition as a _cause_.
  * - `SVTA_NO_SUPPORTED_VIDEO_TRACK` (2011) / `SVTA_NO_SUPPORTED_AUDIO_TRACK` (2012) — the _verdict_: a type has nothing
@@ -75,6 +77,7 @@ export {
   SVTA_LICENSE_RESPONSE_REJECTED,
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
   SVTA_NO_SUPPORTED_VIDEO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_AUDIO_FORMAT,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   SVTA_UNSUPPORTED_VIDEO_FORMAT,
