@@ -2,16 +2,21 @@ import '@app/styles.css';
 // <LazyVideo> resolves `src` to a media component and loads only that component's code.
 // http://localhost:5173/lazy-video-react/
 //
-// Switch sources and watch the network panel: an MP4 loads no engine, and each other source loads one chunk.
+// Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
 import '@videojs/react/video/skin.css';
 import { LAZY_VIDEO_SOURCES } from '@app/shared/lazy-sources';
+import { describeScriptBytes, observeScriptBytes, type ScriptBytes } from '@app/shared/script-bytes';
 import { LazyVideo } from '@videojs/react/media/lazy-video';
 import { VideoPlayer, VideoSkin } from '@videojs/react/video';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 function App() {
   const [src, setSrc] = useState<string>(LAZY_VIDEO_SOURCES[0].src);
+  const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ transferred: 0, decoded: 0, files: 0 });
+  const [sourceChangedAt, setSourceChangedAt] = useState<ScriptBytes>();
+
+  useEffect(() => observeScriptBytes(setScriptBytes), []);
 
   return (
     <>
@@ -27,12 +32,18 @@ function App() {
             type="button"
             className="rounded border px-3 py-1"
             aria-pressed={option === src}
-            onClick={() => setSrc(option)}
+            onClick={() => {
+              setSourceChangedAt(scriptBytes);
+              setSrc(option);
+            }}
           >
             {label}
           </button>
         ))}
       </div>
+      <p className="text-sm">
+        JavaScript loaded: <output id="script-bytes">{describeScriptBytes(scriptBytes, sourceChangedAt)}</output>
+      </p>
     </>
   );
 }
