@@ -1,9 +1,7 @@
 import * as $ from '@videojs/core/vjsc';
 import { Box, type VjscNode } from 'vjsc/components';
 
-import { AirPlayButton } from './airplay-button';
 import audioControlsStyles from './audio-controls.styles';
-import { CaptionsToggle } from './captions-button';
 import controlsStyles from './controls.styles';
 import { LiveButton } from './live-button';
 import { PlayButton } from './play-button';
@@ -14,6 +12,7 @@ import { VolumePopover } from './volume-popover';
 
 export function ControlsRow({
   audio = false,
+  captions,
   live = false,
   menu,
   rate,
@@ -27,7 +26,7 @@ export function ControlsRow({
         {seekBackward}
         {seekForward}
         {live && <LiveButton />}
-        {audio ? rate : <VolumePopover />}
+        {!audio && <VolumePopover />}
         {!live && (
           <$.Time.Group className={timeStyles.group}>
             <$.Time.Value className={timeStyles.toggle} type="current" toggle />
@@ -39,15 +38,17 @@ export function ControlsRow({
       </$.Controls.Group>
 
       <$.Controls.Group className={controlsStyles.group}>
-        {(!live || audio) && <CaptionsToggle />}
+        {captions}
+        {rate}
         {menu ?? (audio && <VolumePopover />)}
-        {audio && <AirPlayButton />}
       </$.Controls.Group>
     </$.Controls.Group>
   );
 }
 
 export interface ControlsSlots extends ThumbnailSlot {
+  /** The captions toggle, supplied by the video presets because the audio presets have no text track feature. */
+  captions?: VjscNode;
   /** The playback-rate control, supplied by the on-demand audio preset. */
   rate?: VjscNode;
   /** The skip-back control, supplied by the presets that have a timeline. */
@@ -58,6 +59,7 @@ export interface ControlsSlots extends ThumbnailSlot {
 
 export function ControlsContent({
   audio = false,
+  captions,
   center = false,
   live = false,
   menu,
@@ -94,6 +96,7 @@ export function ControlsContent({
             {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}
             <ControlsRow
               audio={audio}
+              captions={captions}
               live={live}
               menu={menu}
               rate={rate}

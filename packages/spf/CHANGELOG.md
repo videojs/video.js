@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.1.0...@videojs/spf@10.2.0) (2026-10-22)
+
+
+### Features
+
+* **spf:** compose the HLS engines from features ([#9395](https://github.com/videojs/video.js/issues/9395)) ([76620b1](https://github.com/videojs/video.js/commit/76620b1da9e8ace8a8fd6d223f8a0bc2bc7c5bae))
+
+
+### Bug Fixes
+
+* **spf:** block segment loading under DRM regardless of composition order ([#9394](https://github.com/videojs/video.js/issues/9394)) ([3f69079](https://github.com/videojs/video.js/commit/3f69079be001eed6ea7ab7e1dd8a2183b4264444))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.0.1...@videojs/spf@10.1.0) (2026-10-12)
 
 

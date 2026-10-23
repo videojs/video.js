@@ -31,17 +31,19 @@ track-list infrastructure) — not the other way around — which is why
 `HlsVideoMediaError` extends `ErrorLike` and `HlsVideoMediaStreamType`
 *is* `MediaStreamType` rather than a structurally-compatible copy.
 
-The Medias ship behind their own entry points, `@videojs/spf/hls-video`
-and `@videojs/spf/hls-audio`, kept separate from
-`@videojs/spf/hls` so that wiring an engine directly pulls in neither a
-Media nor `@videojs/media`. That separation also keeps `./hls` measurable
-as the engine's own size budget: splitting the adapters out took it from
-20.40 KB to 19.08 KB gzipped, back under its 20 KB target.
+The Medias ship behind their own entry points, `@videojs/spf/adapters/hls-video`
+and `@videojs/spf/adapters/hls-audio`, kept separate from the engines' own entry
+points (`@videojs/spf/engines/hls-video`, `@videojs/spf/engines/hls-audio`,
+`@videojs/spf/engines/hls-background-video`) so that wiring an engine directly
+pulls in neither a Media nor `@videojs/media`. That separation also keeps
+each engine entry measurable as that engine's own size budget. (When the
+engines still shared `./hls`, splitting the adapters out took it from
+20.40 KB to 19.08 KB gzipped, back under its 20 KB target.)
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD); external signals
-  declared with `defineExternalSignals`, the last entry in the behavior list
+- **Composition:** The `hls-video` engine (HLS VoD); external signals
+  declared with `defineExternalSignals` by the feature that reads each one
 - **Definition depth:** sketched — capability surface and the
   adapter-rationale open question both documented
 
@@ -80,26 +82,26 @@ as the engine's own size budget: splitting the adapters out took it from
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` —
-the behaviors are listed once at module level, ending with the consumer
-inputs, and the engine's state and context types are derived from that
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (`@videojs/spf/engines/hls-video`) —
+the behaviors are listed once at module level, ending with the external
+signals, and the engine's state and context types are derived from that
 list:
 
 ```ts
-const hlsVideoEngineExternalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
+const externalSignals = defineExternalSignals<UserTrackSelectionState & DisableRemotePlaybackState>()({
   state: ['userVideoTrackSelection', 'userAudioTrackSelection', 'userTextTrackSelection', 'disableRemotePlayback'],
 });
 
-const hlsVideoEngineBehaviors = [
+const behaviors = [
   // ... all other behaviors ...
-  hlsVideoEngineExternalSignals,
+  externalSignals,
 ] as const;
 
-export type HlsVideoEngineState = ResolveBehaviorState<typeof hlsVideoEngineBehaviors>;
+export type EngineState = ResolveBehaviorState<typeof behaviors>;
 
 // ...
 
-return createComposition([...hlsVideoEngineBehaviors], { config, initialState });
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
 ```
 
 **Behavior factory:**
@@ -138,7 +140,7 @@ expects an HTMLMediaElement-shaped object backed by SPF.
 
 ## Config surface
 
-The engine config (`HlsVideoEngineConfig`) carries only what its
+The engine config (`EngineConfig`) carries only what its
 behaviors read; there is no callback.
 
 `HlsVideoMixin`'s constructor takes optional `config` and threads
@@ -153,11 +155,11 @@ each `set src`).
     engine recreation on src change, mediaElement preservation across
     src changes, play retry on `loadstart`, preload propagation,
     attach/detach lifecycle
-  - `packages/spf/src/playback/engines/hls/tests/engine.test.ts`
+  - `packages/spf/src/playback/engines/tests/hls-video.test.ts`
     → "allows patching state and owners from outside" — direct
     engine-level write surface (bypasses the mixin)
   - `packages/spf/src/core/composition/tests/define-external-signals.test.ts`
-    — the inputs behavior itself
+    — the `defineExternalSignals` factory itself
 - **Downstream usage:**
   - `packages/spf/src/playback/adapters/hls-video/adapter.ts` —
     `HlsVideoAdapter` consumer

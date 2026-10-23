@@ -71,7 +71,7 @@
  * `updateMediaSourceDuration` writes the initial `mediaSource.duration` from `presentation.duration` once per source;
  * this behavior writes the final value from the buffered end. Decision domains don't overlap.
  */
-import type { Behavior } from '../../../core/composition/create-composition';
+import type { Behavior } from '../../../core/composition/define-behavior';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { effect } from '../../../core/signals/effect';
 import { computed, type ReadonlySignal, signal } from '../../../core/signals/primitives';

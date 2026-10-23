@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import type { ContextSignals } from '../../../../core/composition/create-composition';
+import type { ContextSignals } from '../../../../core/composition/define-behavior';
 import { signal } from '../../../../core/signals/primitives';
 import { attachMediaSourceAsSourceElement } from '../../../../media/dom/mse/mediasource-setup';
 import type { Presentation } from '../../../../media/types';

@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.1.0...@videojs/hlsjs-video@10.2.0) (2026-10-22)
+
+
+### Bug Fixes
+
+* **hlsjs-video:** read live edge start from hls.js live sync position ([#9409](https://github.com/videojs/video.js/issues/9409)) ([4676472](https://github.com/videojs/video.js/commit/4676472d9136580a5d45e0e8d2929a7e124ad122))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.2.0
+    * @videojs/native-hls-video bumped to 10.2.0
+    * @videojs/spf bumped to 10.2.0
+    * @videojs/utils bumped to 10.2.0
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.0.1...@videojs/hlsjs-video@10.1.0) (2026-10-12)
 
 

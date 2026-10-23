@@ -8,11 +8,11 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
 
 <FrameworkCase frameworks={["react"]}>
-`@videojs/react/live-audio` is the preset for live audio streams. It bundles `LiveAudioPlayer`, the `liveAudioFeatures` bundle it is configured with, two skins that swap the time slider and time displays for a Live button, and the `Audio` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
+`@videojs/react/live-audio` is the preset for live audio streams. It bundles `LiveAudioPlayer`, the `liveAudioFeatures` bundle it is configured with, four skins that swap the time slider and time displays for a Live button, and the `Audio` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`@videojs/html/live-audio` is the preset for live audio streams. It bundles the `<live-audio-player>` element, the `liveAudioFeatures` bundle it is configured with, and two skins that swap the time slider and time displays for a Live button, and plays through the browser's native `<audio>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
+`@videojs/html/live-audio` is the preset for live audio streams. It bundles the `<live-audio-player>` element, the `liveAudioFeatures` bundle it is configured with, and four skins that swap the time slider and time displays for a Live button, and plays through the browser's native `<audio>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and <DocsLink slug="guides/live-streams">Live streams</DocsLink> for playing a live source.
 </FrameworkCase>
 
 ## Import
@@ -23,7 +23,7 @@ import { Audio, LiveAudioPlayer, LiveAudioSkin } from '@videojs/react/live-audio
 import '@videojs/react/live-audio/skin.css';
 ```
 
-Each skin has its own stylesheet. Import `@videojs/react/live-audio/neutral-skin.css` instead when you use `NeutralLiveAudioSkin`.
+Each skin has its own stylesheet. Import `@videojs/react/live-audio/neutral-skin.css`, `compat-skin.css`, or `scaffold-skin.css` instead when you use `NeutralLiveAudioSkin`, `CompatLiveAudioSkin`, or `ScaffoldLiveAudioSkin`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -32,13 +32,13 @@ import '@videojs/html/live-audio/player';
 import '@videojs/html/live-audio/skin';
 ```
 
-Import `@videojs/html/live-audio/neutral-skin` instead for the neutral skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
+Import `@videojs/html/live-audio/neutral-skin`, `compat-skin`, or `scaffold-skin` instead for another skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/live-audio.js"></script>
 ```
 
-`live-audio-neutral.js` registers the neutral skin instead, and `live-audio-player.js` registers `<live-audio-player>` alone.
+`live-audio-neutral.js`, `live-audio-compat.js`, and `live-audio-scaffold.js` register the other skins instead, and `live-audio-player.js` registers `<live-audio-player>` alone.
 </FrameworkCase>
 
 ## Usage
@@ -163,6 +163,10 @@ customElements.define('my-live-audio-player', PlayerElement);
 
 - <DocsLink slug="reference/components/live-audio-skin">LiveAudioSkin</DocsLink> — the default skin, which swaps the time controls for a Live button.
 - <DocsLink slug="reference/components/live-audio-neutral-skin">NeutralLiveAudioSkin</DocsLink> — the visually lighter variant, closer to a classic control bar.
+- <DocsLink slug="reference/components/live-audio-compat-skin">CompatLiveAudioSkin</DocsLink> — the plain, unbranded variant that avoids newer visual effects, so it looks consistent across browsers.
+- <DocsLink slug="reference/components/live-audio-scaffold-skin">ScaffoldLiveAudioSkin</DocsLink> — the minimally styled variant of Compat, a foundation for your own design.
+
+See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink> to compare them.
 
 ## Media
 
@@ -186,9 +190,11 @@ The preset plays through a native <DocsLink slug="reference/components/audio">`<
 | `liveAudioFeatures` | The [feature bundle](#feature-bundle). |
 | `LiveAudioSkin`, `LiveAudioSkinProps` | The default [skin](#skins). |
 | `NeutralLiveAudioSkin`, `NeutralLiveAudioSkinProps` | The neutral [skin](#skins). |
+| `CompatLiveAudioSkin`, `CompatLiveAudioSkinProps` | The compat [skin](#skins). |
+| `ScaffoldLiveAudioSkin`, `ScaffoldLiveAudioSkinProps` | The scaffold [skin](#skins). |
 | `Audio`, `AudioProps` | The [media](#media) component. |
 
-Stylesheets: `@videojs/react/live-audio/skin.css` and `@videojs/react/live-audio/neutral-skin.css`.
+Stylesheets: `@videojs/react/live-audio/skin.css`, `@videojs/react/live-audio/neutral-skin.css`, `@videojs/react/live-audio/compat-skin.css`, and `@videojs/react/live-audio/scaffold-skin.css`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -201,6 +207,8 @@ The preset root, `@videojs/html/live-audio`, has no side effects. Importing it n
 | `liveAudioFeatures` | The [feature bundle](#feature-bundle). |
 | `LiveAudioSkinElement` | The default [skin](#skins) element class. |
 | `NeutralLiveAudioSkinElement` | The neutral [skin](#skins) element class. |
+| `CompatLiveAudioSkinElement` | The compat [skin](#skins) element class. |
+| `ScaffoldLiveAudioSkinElement` | The scaffold [skin](#skins) element class. |
 
 Registration entry points are side-effect-only:
 
@@ -209,6 +217,8 @@ Registration entry points are side-effect-only:
 | `@videojs/html/live-audio/player` | `<live-audio-player>` |
 | `@videojs/html/live-audio/skin` | `<live-audio-skin>`, `<media-container>`, and the UI elements the skin composes |
 | `@videojs/html/live-audio/neutral-skin` | `<live-audio-neutral-skin>`, `<media-container>`, and the UI elements the neutral skin composes |
+| `@videojs/html/live-audio/compat-skin` | `<live-audio-compat-skin>`, `<media-container>`, and the UI elements the compat skin composes |
+| `@videojs/html/live-audio/scaffold-skin` | `<live-audio-scaffold-skin>`, `<media-container>`, and the UI elements the scaffold skin composes |
 | `@videojs/html/live-audio/ui` | `<media-container>` and the UI elements of the default skin, without the skin, for a layout you write yourself |
 | `@videojs/html/live-audio/neutral-ui` | `<media-container>` and the UI elements of the neutral skin, without the skin |
 </FrameworkCase>

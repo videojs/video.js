@@ -9,51 +9,57 @@ const UNMUTE_VOLUME = 0.25;
 
 export const volumeFeature = definePlayerFeature({
   name: 'volume',
-  state: ({ target, set }): MediaVolumeState => ({
-    volume: 1,
-    muted: false,
-    volumeAvailability: 'unavailable',
-    mutedAvailability: 'unavailable',
+  state: ({ target, get, set }): MediaVolumeState => {
+    // The browser's lock covers embeds too, whose players sit on a media element inside their iframe. Their setters
+    // still take a level, so writing one would only leave the embed reporting a volume that never plays.
+    const isVolumeLocked = () => get().volumeAvailability === 'unsupported';
 
-    setVolume(volume: number) {
-      const { media } = target();
-      if (!isMediaVolumeCapable(media)) return 0;
+    return {
+      volume: 1,
+      muted: false,
+      volumeAvailability: 'unavailable',
+      mutedAvailability: 'unavailable',
 
-      const clamped = Math.max(0, Math.min(1, volume));
+      setVolume(volume: number) {
+        const { media } = target();
+        if (!isMediaVolumeCapable(media)) return 0;
 
-      if (clamped > 0 && media.muted) {
-        media.muted = false;
-      }
+        const clamped = Math.max(0, Math.min(1, volume));
 
-      media.volume = clamped;
+        if (clamped > 0 && media.muted) {
+          media.muted = false;
+        }
 
-      // `volumechange` can be asynchronous. Sync immediately so controlled sliders do not render a stale value
-      // between keyboard repeats.
-      set({ volume: media.volume, muted: media.muted });
+        if (!isVolumeLocked()) media.volume = clamped;
 
-      return media.volume;
-    },
+        // `volumechange` can be asynchronous. Sync immediately so controlled sliders do not render a stale value
+        // between keyboard repeats.
+        set({ volume: media.volume, muted: media.muted });
 
-    setMuted(muted: boolean) {
-      const { media } = target();
-      if (!isMediaMutedCapable(media)) return false;
+        return media.volume;
+      },
 
-      media.muted = muted;
+      setMuted(muted: boolean) {
+        const { media } = target();
+        if (!isMediaMutedCapable(media)) return false;
 
-      // Unmuting at zero would stay silent. A media that reports no level has
-      // nothing to restore.
-      const volumeCapable = isMediaVolumeCapable(media);
+        media.muted = muted;
 
-      if (!muted && volumeCapable && media.volume === 0) {
-        media.volume = UNMUTE_VOLUME;
-      }
+        // Unmuting at zero would stay silent. A media that reports no level has
+        // nothing to restore.
+        const volumeCapable = isMediaVolumeCapable(media);
 
-      // `volumechange` is queued, so sync now, or an immediate second toggle would read the old value.
-      set({ volume: volumeCapable ? media.volume : 1, muted: media.muted });
+        if (!muted && volumeCapable && !isVolumeLocked() && media.volume === 0) {
+          media.volume = UNMUTE_VOLUME;
+        }
 
-      return media.muted;
-    },
-  }),
+        // `volumechange` is queued, so sync now, or an immediate second toggle would read the old value.
+        set({ volume: volumeCapable ? media.volume : 1, muted: media.muted });
+
+        return media.muted;
+      },
+    };
+  },
 
   attach({ target, signal, set }) {
     const { media } = target;
@@ -81,7 +87,11 @@ export const volumeFeature = definePlayerFeature({
   },
 });
 
-/** Check if volume can be programmatically set (fails on iOS Safari). */
+/**
+ * Check if the browser lets media volume be set (fails on iOS Safari). Probes a detached element rather than the
+ * attached Media: an embed's setter accepts any level, but its player plays through a media element in its iframe, so
+ * the browser's answer holds for every Media.
+ */
 function canSetVolume(): MediaFeatureAvailability {
   const video = document.createElement('video');
 

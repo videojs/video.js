@@ -1,12 +1,23 @@
+import { listen } from '@videojs/utils/dom';
+
 /**
- * The `<video>` binding a background video uses: somewhere to keep the attached element, and the four properties the
- * Media fixes on it.
+ * The element events extensions need from a background video: `loadstart` tells Mux Data the source changed.
+ *
+ * Never `error`: the Media dispatches its own, and React's `<HlsBackgroundVideo>` re-fires that on this same `<video>`,
+ * so forwarding it back would loop until the stack overflows.
+ */
+const FORWARDED_EVENTS = ['loadstart'] as const;
+
+/**
+ * The `<video>` binding a background video uses: somewhere to keep the attached element, the four properties the Media
+ * fixes on it, and the element itself as `target`, with its `loadstart` forwarded.
  *
  * That is the whole surface anything here reaches. The engine drives playback, the element exposes `src` and nothing
  * else, and the background player subscribes to no store features, so nothing asks a background video for
- * `currentTime`, `play()`, picture-in-picture, fullscreen, forwarded events, or media components. Holding the host to
- * what is reachable is what keeps this entry free of `@videojs/media`, and small enough to suit a component whose whole
- * pitch is its size.
+ * `currentTime`, `play()`, picture-in-picture, fullscreen, or media components. `target` and `loadstart` are what
+ * extensions like Mux Data need: the native element to monitor, and the hint that the source changed. Holding the host
+ * to what is reachable is what keeps this entry free of `@videojs/media`, and small enough to suit a component whose
+ * whole pitch is its size.
  *
  * An `EventTarget`, because a Media is one: the store and the element layers take anything they attach as an event
  * source, and inheriting the three methods satisfies that for free rather than by stubbing them.
@@ -17,16 +28,37 @@
  */
 export class BackgroundVideoHost extends EventTarget {
   #target: HTMLVideoElement | null = null;
+  #attachment: AbortController | null = null;
+
+  /**
+   * The attached `<video>`. Public, unlike `HTMLMediaAdapter`'s, because nothing else here exposes the element:
+   * `getMediaElement` reads it to find what Mux Data monitors.
+   */
+  get target(): HTMLVideoElement | null {
+    return this.#target;
+  }
 
   attach(target: HTMLVideoElement): void {
     if (!target || this.#target === target) return;
 
+    this.detach();
     this.#target = target;
+    this.#attachment = new AbortController();
+
+    for (const type of FORWARDED_EVENTS) {
+      listen(target, type, this.#forwardEvent, { signal: this.#attachment.signal });
+    }
   }
 
   detach(): void {
+    this.#attachment?.abort();
+    this.#attachment = null;
     this.#target = null;
   }
+
+  #forwardEvent = (event: Event): void => {
+    this.dispatchEvent(new Event(event.type));
+  };
 
   // Read back off the element rather than stored, so they describe what is
   // playing instead of what was asked for — see the adapter's note on why the

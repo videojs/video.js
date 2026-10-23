@@ -14,17 +14,17 @@
  */
 import { describe, expectTypeOf, it } from 'vite-plus/test';
 
-import { createComposition } from '../../../../core/composition/create-composition';
-import { attachMediaSourceAsSourceElement } from '../../../../media/dom/mse/mediasource-setup';
-import { parseMultivariantPlaylist } from '../../../../media/hls/parse-multivariant';
-import { collectErrors } from '../../../behaviors/collect-errors';
-import { exchangeLicenses } from '../../../behaviors/dom/exchange-licenses';
-import { loadVideoSegments } from '../../../behaviors/dom/load-segments';
-import { setupAirPlayFairPlay } from '../../../behaviors/dom/setup-airplay-fairplay';
-import { setupMediaKeys } from '../../../behaviors/dom/setup-media-keys';
-import { setupMediaSource } from '../../../behaviors/dom/setup-mediasource';
-import { resolvePresentation } from '../../../behaviors/resolve-presentation';
-import { switchVideoTrack } from '../../../behaviors/track-switching';
+import { createComposition } from '../../../core/composition/create-composition';
+import { attachMediaSourceAsSourceElement } from '../../../media/dom/mse/mediasource-setup';
+import { parseMultivariantPlaylist } from '../../../media/hls/parse-multivariant';
+import { collectErrors } from '../../behaviors/collect-errors';
+import { exchangeLicenses } from '../../behaviors/dom/exchange-licenses';
+import { loadVideoSegments } from '../../behaviors/dom/load-segments';
+import { setupAirPlayFairPlay } from '../../behaviors/dom/setup-airplay-fairplay';
+import { setupMediaKeys } from '../../behaviors/dom/setup-media-keys';
+import { setupMediaSource } from '../../behaviors/dom/setup-mediasource';
+import { resolvePresentation } from '../../behaviors/resolve-presentation';
+import { switchVideoTrack } from '../../behaviors/track-switching';
 
 // The behaviors every composition carries, split at the one insertion point DRM
 // needs — after MSE setup, before the load dispatchers, so the gate is up before

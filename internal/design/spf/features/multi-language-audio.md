@@ -10,7 +10,7 @@ Recognize multiple audio renditions from a multivariant HLS playlist, expose the
 
 ## Status
 
-- **Composition:** Tier 1 (recognition + default selection) and most of Tier 2 (programmatic selection via `userAudioTrackSelection` + mid-stream switching) implemented in `createHlsVideoEngine` and `createHlsAudioEngine`. A/V sync policy on mid-stream switch is "switch at next-segment boundary" (starting point, area for improvement). Persistence (Tier 2 phase 6) deferred.
+- **Composition:** Tier 1 (recognition + default selection) and most of Tier 2 (programmatic selection via `userAudioTrackSelection` + mid-stream switching) implemented in the `hls-video` engine and the `hls-audio` engine. A/V sync policy on mid-stream switch is "switch at next-segment boundary" (starting point, area for improvement). Persistence (Tier 2 phase 6) deferred.
 - **Definition depth:** sketched — implementation surface populated for Tier 1 and Tier 2; specific phases (A/V sync policy refinement, persistence) remain coarse pending follow-up.
 
 ## Phases of complexity
@@ -18,7 +18,7 @@ Recognize multiple audio renditions from a multivariant HLS playlist, expose the
 | Phase | What | Status |
 |---|---|---|
 | **Tier 1 — Recognition + exposure** | Parser surfaces all audio renditions with `LANGUAGE`, `NAME`, `DEFAULT`, `AUTOSELECT`, `CHANNELS`, `URI`, `CODECS` metadata; engine state exposes the candidate list via `presentation.selectionSets`. | **Implemented** (free — owned architecturally by `parseMultivariantPlaylist` and surfaced via `audio-playback`) |
-| **Tier 1 — Default selection** | Three-tier picker: `preferredAudioLanguage` → `DEFAULT=YES` → first track. | **Implemented** — `pickAudioTrack` wired as default in `selectAudioTrack`'s `AUDIO_TRACK_SELECTION_CONFIG` (and shared with `switchAudioTrack`). `preferredAudioLanguage` config field active (was inert before this feature) |
+| **Tier 1 — Default selection** | Three-tier picker: `preferredAudioLanguage` → `DEFAULT=YES` → first track. | **Implemented** — `pickAudioTrack` wired as default in `selectAudioTrack`'s `AUDIO_TRACK_SELECTION_CONFIG` (and shared with `switchAudioTrack`). Regressed in #1658: track switching's rule chain applies no preferred language or `DEFAULT=YES` tier, so it holds only for `selectAudioTrack`. `preferredAudioLanguage` is no longer an HLS engine config option; `userAudioTrackSelection: { language }` gives the same preference |
 | **Tier 2 — Programmatic selection** | Consumer writes `userAudioTrackSelection` (`Partial<AudioTrack>`) to narrow the candidate set; `switchAudioTrack` reads the filter, re-fires on changes, short-circuits picker when filter narrows to single track, falls back to unfiltered candidates when filter excludes all. | **Implemented** — sibling of `userVideoTrackSelection`; constraint+filter shape matches video precedent. Slot ownership moved from `selectAudioTrack` to **new behavior `switchAudioTrack`** (precursor to audio-abr's `switchAudioQuality`) |
 | **Tier 2 — Mid-stream switching** | When the audio segment loader receives a `load` for a different track than the one currently buffered, `planTasks` compares the new track's language to the buffered track's language (captured on `SourceBufferActor.context.initTrackLanguage`). On mismatch, the loader emits a `{ type: 'remove', start: nextBoundary, end: Infinity }` task *before* the new `append-init` / `append-segment` tasks. Same split as video: `switchVideoQuality` writes the slot; `segment-loader` plans the buffer ops. Loader replan happens naturally via `loadAudioSegments` reactivity to `selectedAudioTrackId`. | **Implemented** — language-predicate today (covers multi-language audio + text language switching; video ABR is unaffected because video tracks have no language). Cross-codec switching (e.g., AAC → AC-3) is a separate predicate handled by 5.1-surround-selection (DWIM — see Stage 2 below) |
 | **Tier 2 — A/V sync during switch** | Flush range is "next segment boundary at/after playhead." Current segment plays through; new rendition starts at boundary. | **Implemented (starting point)** — area for improvement: smoother sync via pause / silence-pad alternatives. Stage 2 lifts the predicate / strategy to a per-actor config (see Open questions) |
@@ -72,7 +72,7 @@ Resolved during implementation:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (default) + `packages/spf/src/playback/engines/hls/engine-audio-only.ts` (variant). Both replace `selectAudioTrack` with `switchAudioTrack` to get filter reactivity + mid-stream flush; engines that want only default-pick-on-load (test setups, future variants) keep composing `selectAudioTrack` (it remains exported, mutually exclusive with `switchAudioTrack`).
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` (default) + `packages/spf/src/playback/engines/hls-audio.ts` (variant). Both replace `selectAudioTrack` with `switchAudioTrack` to get filter reactivity + mid-stream flush; engines that want only default-pick-on-load (test setups, future variants) keep composing `selectAudioTrack` (it remains exported, mutually exclusive with `switchAudioTrack`).
 
 **Behaviors:**
 
@@ -87,7 +87,7 @@ Resolved during implementation:
 **State slots:**
 
 - `selectedAudioTrackId` — single-writer (`switchAudioTrack` when composed; `selectAudioTrack` when the lighter variant is composed instead — they're mutually exclusive). Constraint+filter pattern keeps writer count at 1; intent flows through `userAudioTrackSelection`.
-- `userAudioTrackSelection` — new slot in `HlsVideoEngineState` + `HlsAudioEngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `defineExternalSignals`). Read by `switchAudioTrack`.
+- `userAudioTrackSelection` — new slot in the `hls-video` engine's `EngineState` + the `hls-audio` engine's `EngineState`. `Partial<AudioTrack>` shape. Single-writer (external consumer through the adapter; declared with `defineExternalSignals`). Read by `switchAudioTrack`.
 
 **Actor state:**
 
@@ -101,7 +101,7 @@ Resolved during implementation:
 | `setupAudioTrackSwitching` *(new)* | `packages/spf/src/playback/behaviors/track-switching.ts` | Filter-reactive slot-management reactor. Mirrors `setupQualitySwitching`'s abstraction shape (generic over selection key + user-selection key + track type, with `getTracks` / `selectOptimal` / `picker` config). Today's audio-only consumer is `switchAudioTrack`; when audio-abr ships, `switchAudioQuality` either swaps its `selectOptimal` for a bandwidth-aware variant or the two helpers merge into a shared `setupQualitySwitching` |
 | `pickAudioTrack` | `packages/spf/src/media/primitives/select-tracks.ts` | **Now wired** as the default picker in both `selectAudioTrack` and `switchAudioTrack` (was inert; required custom-picker override before this feature) |
 
-**Composition wiring:** Both engine factories swap `selectAudioTrack` for `switchAudioTrack` in their behavior list. Engine state types in both `engine.ts` and `engine-audio-only.ts` gain `userAudioTrackSelection`.
+**Composition wiring:** Both engine factories swap `selectAudioTrack` for `switchAudioTrack` in their behavior list. Engine state types in both `hls-video.ts` and `hls-audio.ts` gain `userAudioTrackSelection`.
 
 ## Verification
 
@@ -135,7 +135,7 @@ Resolved during implementation:
 - `captures initTrackLanguage from append-init meta for downstream cross-rendition flush detection`
 - `leaves initTrackLanguage undefined when append-init meta omits language (video)`
 
-**Unit tests** (`packages/spf/src/playback/engines/hls/tests/engine-audio-only.test.ts`):
+**Unit tests** (`packages/spf/src/playback/engines/tests/hls-audio.test.ts`):
 
 - `exposes userAudioTrackSelection slot for multi-language-audio Tier 2 writes` — variant engine state exposes the filter slot
 
@@ -158,7 +158,7 @@ Resolved during implementation:
 
 ## Use cases that compose this feature
 
-- **[`audio-only-mode-override`](../use-cases/audio-only-mode-override.md)** *(Phase 2 partial — landed with this feature)* — variant engine `createHlsAudioEngine` exposes `userAudioTrackSelection` and composes the filter-reactive `selectAudioTrack` + flush-aware `setupAudioBufferActors` unchanged from the default engine.
+- **[`audio-only-mode-override`](../use-cases/audio-only-mode-override.md)** *(Phase 2 partial — landed with this feature)* — variant engine `hls-audio` exposes `userAudioTrackSelection` and composes the filter-reactive `selectAudioTrack` + flush-aware `setupAudioBufferActors` unchanged from the default engine.
 
 ## See also
 

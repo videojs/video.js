@@ -3,9 +3,23 @@ import { describe, expect, it } from 'vite-plus/test';
 import { REGISTERED_MEDIA } from '../../core/registered-media';
 import { CustomMediaElement } from '../custom-media-element';
 import { HTMLVideoAdapter } from '../html-video-adapter';
-import { getMediaAdapter, getMediaElement } from '../utils/media-target';
+import { getMediaAdapter, getMediaElement, getMediaEngineName } from '../utils/media-target';
 
 class TestVideoAdapter extends HTMLVideoAdapter {}
+
+class TestEngineAdapter extends HTMLVideoAdapter {
+  static readonly engineName: string = 'testjs';
+}
+
+/** Shaped like an adapter that picks its engine per source and reports the pick on the instance. */
+class TestDelegatingAdapter extends TestEngineAdapter {
+  engineName: string | undefined;
+}
+
+/** Shaped like an embed adapter: not an `HTMLMediaAdapter`, fronted by a media component as `adapter`. */
+class TestEmbedAdapter extends EventTarget {
+  static readonly engineName: string = 'testembed';
+}
 
 /** A stand-in for the player's facade: answers `REGISTERED_MEDIA` with `raw` and shadows everything else. */
 function createFacade<T extends object>(raw: T, shadow: Record<PropertyKey, unknown> = {}): T {
@@ -39,6 +53,39 @@ describe('getMediaAdapter', () => {
     expect(getMediaAdapter(document.createElement('video'))).toBeNull();
     expect(getMediaAdapter({ adapter: {} })).toBeNull();
     expect(getMediaAdapter(null)).toBeNull();
+  });
+});
+
+describe('getMediaEngineName', () => {
+  it('reads the static engine name of the media class', () => {
+    expect(getMediaEngineName(new TestEngineAdapter())).toBe('testjs');
+  });
+
+  it('prefers the engine an adapter reports for its current pick', () => {
+    const adapter = new TestDelegatingAdapter();
+
+    adapter.engineName = 'browser';
+
+    expect(getMediaEngineName(adapter)).toBe('browser');
+
+    adapter.engineName = undefined;
+
+    expect(getMediaEngineName(adapter)).toBe('testjs');
+  });
+
+  it('reads the adapter a media component fronts, embeds included', () => {
+    expect(getMediaEngineName({ adapter: new TestEmbedAdapter() })).toBe('testembed');
+    expect(getMediaEngineName(createFacade({ adapter: new TestEngineAdapter() }))).toBe('testjs');
+  });
+
+  it('names the browser for a native element', () => {
+    expect(getMediaEngineName(document.createElement('video'))).toBe('browser');
+    expect(getMediaEngineName(document.createElement('audio'))).toBe('browser');
+  });
+
+  it('returns undefined for media that names no engine', () => {
+    expect(getMediaEngineName(new TestVideoAdapter())).toBeUndefined();
+    expect(getMediaEngineName(null)).toBeUndefined();
   });
 });
 

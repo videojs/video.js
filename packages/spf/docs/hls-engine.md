@@ -1,10 +1,10 @@
 # HLS engine composition
 
-`createHlsVideoEngine()` composes SPF behaviors into HLS playback over MediaSource. This guide describes ownership and stage relationships, not the exact behavior array or configuration interface; those live in source.
+The HLS video engine, `createEngine()` from `@videojs/spf/engines/hls-video`, composes SPF behaviors into HLS playback over MediaSource. This guide describes ownership and stage relationships, not the exact behavior array or configuration interface; those live in source.
 
 ## Inputs and adapter boundary
 
-The adapter supplies a media element and an unresolved presentation URL through shared signals. It may also write preload, current-time triggers, or user track-selection intent.
+The adapter supplies a media element and an unresolved presentation URL by writing the engine's `state` and `context` signals. It may also write preload, current-time triggers, or user track-selection intent.
 
 The engine returns a composition with one asynchronous destruction boundary. Assigning another presentation reuses that composition while per-source behaviors clean up and set up again.
 
@@ -56,11 +56,12 @@ Single-CDN sources pass through the same composition without additional behavior
 
 Configuration supplies engine policy and replaceable operations, including parsers, capability probing, text resolution, duration policy, buffer targets, bandwidth/quality tuning, language preference, and failover behavior.
 
-Defaults are resolved at the engine boundary and passed to the behaviors that consume them. See `HlsVideoEngineConfig` for the current surface.
+Defaults are resolved at the engine boundary and passed to the behaviors that consume them. See its `EngineConfig` for the current surface.
 
 ## Current sources
 
-- Composition, state, context, and configuration: `packages/spf/src/playback/engines/hls/engine.ts`
+- Composition, state, context, and configuration: `packages/spf/src/playback/engines/hls-video.ts`
+- Features the engines compose: `packages/spf/src/playback/features/`
 - Adapter behavior: `packages/spf/src/playback/adapters/hls-video/mixin.ts`
 - Behaviors and tests: `packages/spf/src/playback/behaviors/`
 - Actors and tests: `packages/spf/src/playback/actors/`

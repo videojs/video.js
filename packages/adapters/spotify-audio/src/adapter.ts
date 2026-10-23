@@ -70,7 +70,8 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   // The entity ran out; kept so the end of playback is acted on exactly once.
   #closeToEnded = false;
 
-  static PLAYER_SOFTWARE_NAME = 'spotify-audio';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'spotify';
 
   /** Underlying Spotify iframe API controller (null until the API loads). */
   get engine() {

@@ -75,6 +75,14 @@ describe('createProject', () => {
     expect(manifest.devDependencies).toMatchObject({ react: VERSIONS.react, 'react-dom': VERSIONS.react });
   });
 
+  it('points coding agents at the skin skill', async () => {
+    const { files } = await createProject(options('--package-manager', 'npm'), 'my-skin');
+
+    expect(files.get('AGENTS.md')).toContain('`videojs-skin` skill');
+    expect(files.get('AGENTS.md')).toContain('`npm run deploy <vercel|netlify|cloudflare>`');
+    expect(files.get('CLAUDE.md')).toBe('@AGENTS.md\n');
+  });
+
   it('deploys through each host CLI with the project package manager, from relative URLs', async () => {
     const pnpm = await createProject(options(), 'my-skin');
     const npm = await createProject(options('--package-manager', 'npm'), 'my-skin');

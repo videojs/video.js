@@ -1,7 +1,7 @@
 'use client';
 
 import { type MuxAdapterProps, MuxVideoAdapter } from '@videojs/mux-video/spf';
-import type { HlsVideoAdapterProps } from '@videojs/spf/hls-video';
+import type { HlsVideoAdapterProps } from '@videojs/spf/adapters/hls-video';
 import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';

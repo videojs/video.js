@@ -91,8 +91,8 @@ Empirical findings that shaped the design:
 ## Scope
 
 General EOS robustness for any skewed / short-final-segment A/V — not specific to the
-non-zero-PTS relocation work it was discovered alongside. Composed in `engine.ts` and
-`engine-audio-only.ts`.
+non-zero-PTS relocation work it was discovered alongside. Composed in `hls-video.ts` and
+`hls-audio.ts`.
 
 ## Follow-ups
 

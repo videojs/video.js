@@ -6,7 +6,7 @@ import {
   type MediaStreamType,
   MediaStreamTypes,
 } from '@videojs/media';
-import { HTMLVideoAdapter } from '@videojs/media/dom';
+import { getMediaEngineName, HTMLVideoAdapter } from '@videojs/media/dom';
 import { type NativeHlsConfig, NativeHlsAdapter, type NativeHlsSource } from '@videojs/native-hls-video';
 import { deepEqual } from '@videojs/utils/object';
 import Hls, { type HlsConfig as HlsJsConfig } from 'hls.js';
@@ -226,6 +226,14 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
    */
   get engine() {
     return this.#delegate?.engine ?? null;
+  }
+
+  /**
+   * Engine this media is playing through, reported to analytics such as Mux Data: `hlsjs` via MSE, `browser` for native
+   * HLS, or `undefined` until a source loads. Read from the instance because the engine is picked per source.
+   */
+  get engineName(): string | undefined {
+    return getMediaEngineName(this.#delegate);
   }
 
   get error() {

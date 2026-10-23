@@ -1,6 +1,9 @@
 'use client';
 
-import { HlsBackgroundVideoAdapter, type HlsBackgroundVideoAdapterProps } from '@videojs/spf/hls-background-video';
+import {
+  HlsBackgroundVideoAdapter,
+  type HlsBackgroundVideoAdapterProps,
+} from '@videojs/spf/adapters/hls-background-video';
 import { forwardRef, useEffect, useRef, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';

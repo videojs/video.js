@@ -37,7 +37,11 @@ export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBas
   } satisfies PropertyDeclarationMap<Exclude<keyof MuxDataExtensionProps, 'metadata' | 'MuxDataSdk'>>;
 
   protected createExtension(): MuxDataExtensionBase {
-    return new MuxDataExtensionBase();
+    const extension = new MuxDataExtensionBase();
+
+    extension.framework = 'html';
+
+    return extension;
   }
 
   /** Mux Data environment key for the beacons. Optional for Mux-hosted playback. */
@@ -76,7 +80,10 @@ export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBas
     this.extension.disableCookies = value;
   }
 
-  /** Player software name reported to Mux Data (e.g. `mux-video`). */
+  /**
+   * Player software name reported to Mux Data (e.g. `mux-video`). Defaults to `videojs-html-<engine>`, where the engine
+   * is the one playing, such as `hlsjs`, `spf-hls-video`, `shaka`, `dashjs`, or `browser`.
+   */
   get playerSoftwareName(): string | undefined {
     return this.extension.playerSoftwareName;
   }

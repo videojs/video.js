@@ -47,6 +47,12 @@ describe('MuxDataExtension', () => {
     expect(provider.extensions.get(MuxDataExtensionBase)).toBeInstanceOf(MuxDataExtensionBase);
   });
 
+  it('names HTML as the framework for the default player software name', () => {
+    const { provider } = setup();
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.framework).toBe('html');
+  });
+
   it('forwards attributes to the extension', () => {
     const { provider, el } = setup();
 

@@ -2,7 +2,7 @@
 // left for the consumer's bundler to drop, which `sideEffects: false` on that package allows, so this entry stays
 // audio-only.
 import { type MuxAdapterProps, MuxMixin } from '@videojs/mux-video/spf';
-import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/hls-audio';
+import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
 
 /**
  * The Mux Media over the SPF audio-only HLS engine.

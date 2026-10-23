@@ -84,7 +84,8 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #error: MediaError | null = null;
   #isFullscreen = false;
 
-  static PLAYER_SOFTWARE_NAME = 'tiktok-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'tiktok';
 
   /** The embed's window. TikTok publishes no player object; commands are posted to the frame. Null until rendered. */
   get engine() {

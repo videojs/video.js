@@ -44,8 +44,8 @@ distinct motivations.
 
 ## Status
 
-- **Composition:** implemented for **VOD** in `createHlsVideoEngine` and
-  `createHlsAudioEngine` on `feat/spf-non-zero-pts-relocation` (draft
+- **Composition:** implemented for **VOD** in the `hls-video` engine and
+  the `hls-audio` engine on `feat/spf-non-zero-pts-relocation` (draft
   PR #1847). The `establishStartMediaTime` reactor + the `relocation-pipelines`
   primitive discover each track's decode-time origin (`tfdt`/`mdhd`, matched by
   `track_id`) and relocate via `SourceBuffer.timestampOffset = −startMediaTime`.
@@ -110,11 +110,12 @@ Extension boundaries — each is a separate candidate feature or a parked phase:
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` (and
-`engine-audio-only.ts`) — the relocation wiring is comment-marked as one removable
-block (reactor + `deriveStartMediaTime` seam + the `video`/`audio`/`text`
-message-pipeline config), so it adds/drops as a unit for bundle / back-compat
-testing.
+**Composition:** `shiftTimestampsFeature`
+(`packages/spf/src/playback/features/shift-timestamps.ts`), composed by the
+`hls-video` and `hls-audio` engines — the relocation wiring (reactor + `deriveStartMediaTime`
+seam + the `video`/`audio` message-pipeline config) is one feature, so it adds/drops as a unit
+for bundle / back-compat testing. Text cue relocation (`textMessagePipelines`) is
+`shiftTextTimestampsFeature`, composed only alongside both it and text tracks.
 
 **Behaviors:**
 
@@ -128,7 +129,7 @@ testing.
 | Primitive | File | Role |
 |---|---|---|
 | `deriveStartMediaTime` seam + defaults | `derive-start-media-time.ts` (type/context), `establish-start-media-time.ts` (`deriveSharedMinStartMediaTime` default, `derivePerTypeStartMediaTime` opt-out) | The one coordination knob: `(mediaContainerData, ctx) => per-type startMediaTime`. Default reduces the `min` across selected A/V origins |
-| `relocationPipelinesFor(type, derive)` | `relocation-pipelines.ts` | The loader `messagePipelines` — discover (`track_id` + `mdhd` timescale, then that track's `tfdt` `baseMediaDecodeTime`) → stamp (`timestampOffset = −startMediaTime`, `awaitDefined` holdback, liveness-guarded) |
+| `relocationPipelinesFor(type)` | `relocation-pipelines.ts` | The loader `messagePipelines` — discover (`track_id` + `mdhd` timescale, then that track's `tfdt` `baseMediaDecodeTime`) → stamp (`timestampOffset = −startMediaTime`, `awaitDefined` holdback, liveness-guarded) |
 | `relocatingTextPipelines()` | `relocation-pipelines.ts` | Text-loader pipeline: resolve metadata → shift cues by `mapCorrection − startMediaTime` (`mapCorrection = X-TIMESTAMP-MAP mpegts/90000 − local`) → dispatch. Origin is **awaited** — the primary selected A/V `startMediaTime`, so an early cue load can't resolve to `0` and shift every cue by the full `mapCorrection` (mirrors the A/V stamp step); a genuinely text-only source (no A/V tracks) relocates by `0` |
 
 **Media primitives (DOM-free, no `core/`):**

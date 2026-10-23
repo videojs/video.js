@@ -20,7 +20,7 @@ appears in the buffer."
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface and implementation
   footprint documented; `MediaSourceActor` factoring is an open
   follow-up tracked under sibling candidates. Audio SourceBuffer flush
@@ -79,7 +79,7 @@ share the same four behaviors and one actor.
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — MSE
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — MSE
 behaviors composed between presentation duration calculation and segment
 loading. Video buffer setup registered before audio for the Firefox
 invariant.

@@ -1,6 +1,6 @@
 {
   "name": "@videojs/dailymotion-video",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Dailymotion embed playback adapter for Video.js",
   "keywords": [
     "dailymotion",

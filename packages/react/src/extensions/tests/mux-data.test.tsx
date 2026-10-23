@@ -14,6 +14,14 @@ describe('MuxData', () => {
     expect(extensions.get(MuxDataExtension)).toBeInstanceOf(MuxDataExtension);
   });
 
+  it('names React as the framework for the default player software name', () => {
+    const { extensions, Wrapper } = createPlayerWrapper();
+
+    render(<MuxData />, { wrapper: Wrapper });
+
+    expect(extensions.get(MuxDataExtension)!.framework).toBe('react');
+  });
+
   it('syncs props to the extension', () => {
     const { extensions, Wrapper } = createPlayerWrapper();
 

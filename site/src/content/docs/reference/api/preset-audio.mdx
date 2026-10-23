@@ -8,11 +8,11 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
 
 <FrameworkCase frameworks={["react"]}>
-`@videojs/react/audio` is the preset for on-demand audio. It bundles `AudioPlayer`, the `audioFeatures` bundle it is configured with, two skins, and the `Audio` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+`@videojs/react/audio` is the preset for on-demand audio. It bundles `AudioPlayer`, the `audioFeatures` bundle it is configured with, four skins, and the `Audio` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`@videojs/html/audio` is the preset for on-demand audio. It bundles the `<audio-player>` element, the `audioFeatures` bundle it is configured with, and two skins, and plays through the browser's native `<audio>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+`@videojs/html/audio` is the preset for on-demand audio. It bundles the `<audio-player>` element, the `audioFeatures` bundle it is configured with, and four skins, and plays through the browser's native `<audio>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
 </FrameworkCase>
 
 ## Import
@@ -23,7 +23,7 @@ import { Audio, AudioPlayer, AudioSkin } from '@videojs/react/audio';
 import '@videojs/react/audio/skin.css';
 ```
 
-Each skin has its own stylesheet. Import `@videojs/react/audio/neutral-skin.css` instead when you use `NeutralAudioSkin`.
+Each skin has its own stylesheet. Import `@videojs/react/audio/neutral-skin.css`, `compat-skin.css`, or `scaffold-skin.css` instead when you use `NeutralAudioSkin`, `CompatAudioSkin`, or `ScaffoldAudioSkin`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -32,13 +32,13 @@ import '@videojs/html/audio/player';
 import '@videojs/html/audio/skin';
 ```
 
-Import `@videojs/html/audio/neutral-skin` instead for the neutral skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
+Import `@videojs/html/audio/neutral-skin`, `compat-skin`, or `scaffold-skin` instead for another skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/audio.js"></script>
 ```
 
-`audio-neutral.js` registers the neutral skin instead, and `audio-player.js` registers `<audio-player>` alone.
+`audio-neutral.js`, `audio-compat.js`, and `audio-scaffold.js` register the other skins instead, and `audio-player.js` registers `<audio-player>` alone.
 </FrameworkCase>
 
 ## Usage
@@ -159,6 +159,10 @@ customElements.define('my-audio-player', PlayerElement);
 
 - <DocsLink slug="reference/components/audio-skin">AudioSkin</DocsLink> — the default skin, with the modern, frosted look.
 - <DocsLink slug="reference/components/audio-neutral-skin">NeutralAudioSkin</DocsLink> — the visually lighter variant, closer to a classic control bar.
+- <DocsLink slug="reference/components/audio-compat-skin">CompatAudioSkin</DocsLink> — the plain, unbranded variant that avoids newer visual effects, so it looks consistent across browsers.
+- <DocsLink slug="reference/components/audio-scaffold-skin">ScaffoldAudioSkin</DocsLink> — the minimally styled variant of Compat, a foundation for your own design.
+
+See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink> to compare them.
 
 ## Media
 
@@ -182,9 +186,11 @@ The preset plays through a native <DocsLink slug="reference/components/audio">`<
 | `audioFeatures` | The [feature bundle](#feature-bundle). |
 | `AudioSkin`, `AudioSkinProps` | The default [skin](#skins). |
 | `NeutralAudioSkin`, `NeutralAudioSkinProps` | The neutral [skin](#skins). |
+| `CompatAudioSkin`, `CompatAudioSkinProps` | The compat [skin](#skins). |
+| `ScaffoldAudioSkin`, `ScaffoldAudioSkinProps` | The scaffold [skin](#skins). |
 | `Audio`, `AudioProps` | The [media](#media) component. |
 
-Stylesheets: `@videojs/react/audio/skin.css` and `@videojs/react/audio/neutral-skin.css`.
+Stylesheets: `@videojs/react/audio/skin.css`, `@videojs/react/audio/neutral-skin.css`, `@videojs/react/audio/compat-skin.css`, and `@videojs/react/audio/scaffold-skin.css`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -197,6 +203,8 @@ The preset root, `@videojs/html/audio`, has no side effects. Importing it never 
 | `audioFeatures` | The [feature bundle](#feature-bundle). |
 | `AudioSkinElement` | The default [skin](#skins) element class. |
 | `NeutralAudioSkinElement` | The neutral [skin](#skins) element class. |
+| `CompatAudioSkinElement` | The compat [skin](#skins) element class. |
+| `ScaffoldAudioSkinElement` | The scaffold [skin](#skins) element class. |
 
 Registration entry points are side-effect-only:
 
@@ -205,6 +213,8 @@ Registration entry points are side-effect-only:
 | `@videojs/html/audio/player` | `<audio-player>` |
 | `@videojs/html/audio/skin` | `<audio-skin>`, `<media-container>`, and the UI elements the skin composes |
 | `@videojs/html/audio/neutral-skin` | `<audio-neutral-skin>`, `<media-container>`, and the UI elements the neutral skin composes |
+| `@videojs/html/audio/compat-skin` | `<audio-compat-skin>`, `<media-container>`, and the UI elements the compat skin composes |
+| `@videojs/html/audio/scaffold-skin` | `<audio-scaffold-skin>`, `<media-container>`, and the UI elements the scaffold skin composes |
 | `@videojs/html/audio/ui` | `<media-container>` and the UI elements of the default skin, without the skin, for a layout you write yourself |
 | `@videojs/html/audio/neutral-ui` | `<media-container>` and the UI elements of the neutral skin, without the skin |
 </FrameworkCase>

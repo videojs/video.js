@@ -1,0 +1,30 @@
+---
+description: "Adds skin-authoring tools and improves playback, player controls, and documentation."
+date: 2026-10-22
+version: "10.2.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0"
+---
+
+Video.js 10.2.0 makes it easier to build, test, and share a custom player skin, while tightening playback and control behavior.
+
+## Build and share skins
+
+Start a standalone skin project with `npx @videojs/cli skin create`. Choose an HTML or React starting point, a styling approach, a starting skin, and a media preset; the generated project keeps the editable skin in `src/` and its preview in `apps/preview/` ([#9500](https://github.com/videojs/video.js/pull/9500)). Its workbench lets you check sizes, aspect ratios, color schemes, right-to-left layouts, built-in languages, and playback settings without reloading the player ([#9501](https://github.com/videojs/video.js/pull/9501)). When you are ready to share it, `pnpm run deploy` can deploy that workbench to Vercel, Netlify, or Cloudflare Pages ([#9502](https://github.com/videojs/video.js/pull/9502)).
+
+Generated projects now point coding agents to the Video.js skin skill, and their README explains how to reopen the workbench in a particular state ([#9518](https://github.com/videojs/video.js/pull/9518)). The new [Build your own skin](/docs/guides/build-your-own-skin/) guide covers the workflow ([#9505](https://github.com/videojs/video.js/pull/9505)). The site also adds an accessible comparison component for the skin design inspiration post ([#9406](https://github.com/videojs/video.js/pull/9406), [#9407](https://github.com/videojs/video.js/pull/9407)).
+
+## Playback and controls
+
+SPF HLS engines now compose from named features, making the capabilities, defaults, and initial state of a composition explicit; these SPF composition exports are not yet stable public API ([#9395](https://github.com/videojs/video.js/pull/9395)). DRM-capable compositions now keep segment loading blocked until a source is confirmed clear or its media keys attach, regardless of feature order ([#9394](https://github.com/videojs/video.js/pull/9394)). The hls.js adapter also uses its live sync position when choosing the live edge, so configured latency and low-latency settings stay accurate ([#9409](https://github.com/videojs/video.js/pull/9409)).
+
+React now renders `crossorigin` on SPF-backed media before hydration, so cross-origin text tracks are available from the first load ([#9403](https://github.com/videojs/video.js/pull/9403)). Time sliders seek while you drag, keeping the video frame with the thumb on desktop and touch; they also avoid resize re-renders unless edge-thumb alignment needs one ([#9510](https://github.com/videojs/video.js/pull/9510), [#9401](https://github.com/videojs/video.js/pull/9401)). Mux Data now identifies unconfigured views as Video.js and reports its plugin name and version, making Video.js 10 traffic easier to distinguish in Mux Data ([#9568](https://github.com/videojs/video.js/pull/9568)).
+
+## Skin, sandbox, and docs polish
+
+Neutral keeps elapsed time visible on compact players, Scaffold controls scale in fullscreen, and Tailwind registry skins preserve their media text colors ([#9484](https://github.com/videojs/video.js/pull/9484), [#9487](https://github.com/videojs/video.js/pull/9487), [#9491](https://github.com/videojs/video.js/pull/9491)). Compat and Scaffold audio skins no longer show captions or AirPlay controls that the preset does not support, and place playback rate beside volume ([#9560](https://github.com/videojs/video.js/pull/9560)).
+
+The sandbox now ignores unknown source query values and batches URL updates so rapid option changes do not hit the browser's `replaceState` limit ([#9404](https://github.com/videojs/video.js/pull/9404), [#9497](https://github.com/videojs/video.js/pull/9497)). Slider references now show inherited defaults and explain keyboard step behavior ([#9398](https://github.com/videojs/video.js/pull/9398)); the [self-hosting guide](/docs/guides/self-hosting/) also directs Composer installations to `libraries/videojs-cdn/` ([#9513](https://github.com/videojs/video.js/pull/9513)). The site footer now includes a link to Video.js swag ([#9552](https://github.com/videojs/video.js/pull/9552)).
+
+Thanks to first-time contributors [@taekop](https://github.com/taekop), [@Anandb71](https://github.com/Anandb71), and [@mrlika](https://github.com/mrlika).

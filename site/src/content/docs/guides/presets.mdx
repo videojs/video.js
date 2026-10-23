@@ -49,7 +49,7 @@ For example, the `@videojs/html/background` preset includes a media component wi
 
 The default presets are `/video` and `/audio`. These cover the baseline controls you'd expect from the HTML `<video>` and `<audio>` tags. Beyond the defaults, presets target more specific use cases — the `/background` preset, for example, needs layout but not controls. Over time we'll add more: short-form players, podcast players, TV streaming players, and others.
 
-The video, audio, live video, and live audio presets also export Compat skins. For example, React exports `CompatVideoSkin` with `@videojs/react/video/compat-skin.css`; HTML registers `<video-compat-skin>` through `@videojs/html/video/compat-skin`.
+The video, audio, live video, and live audio presets each export four skins: Default, Neutral, Compat, and Scaffold. For example, React exports `ScaffoldVideoSkin` with `@videojs/react/video/scaffold-skin.css`; HTML registers `<video-scaffold-skin>` through `@videojs/html/video/scaffold-skin`. See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink> to compare them.
 
 <PresetReference />
 

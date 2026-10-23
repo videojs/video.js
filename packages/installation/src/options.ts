@@ -197,7 +197,7 @@ export function installationDecisionOrderFor(
     },
     {
       title: 'Choose the skin',
-      guidance: `Use default unless the request asks for a minimal, cleaner, or more subtle look, which uses neutral; both contain the same controls. ${skinlessGuidance}Ask only when those signals conflict.`,
+      guidance: `Use default unless the request signals another look. Use neutral to apply a brand to a finished design, or for a minimal, cleaner, or more subtle look (it was formerly named minimal); it has the same controls as default. Use compat for plain, unbranded controls that blend into content pages, a step above native controls. Use scaffold when the user wants an unbranded foundation to make their own, such as shadcn-style components they restyle; it has the same controls as compat with minimal styling, meant to be restyled rather than used as is. All four support the same browsers. ${skinlessGuidance}Ask only when those signals conflict.`,
     },
     {
       title: 'Choose the media',
@@ -278,7 +278,8 @@ export function installationOptionDefinitionsFor(
     optionDefinition('skin', {
       values: shadcnOnly ? installationCompatibility.shadcn.skins : INSTALLATION_SKIN_FLAGS,
       default: 'default',
-      description: 'The visual skin. Neutral has cleaner surfaces and the same controls as Default.',
+      description:
+        'The visual skin. Neutral has cleaner surfaces and the same controls as Default. Compat has plain, unbranded surfaces. Scaffold has minimal styling meant to be restyled.',
       appliesWhen: `${syntax.options(['preset'])} is not background-video`,
     }),
     optionDefinition('media', {

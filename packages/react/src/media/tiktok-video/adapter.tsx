@@ -56,6 +56,10 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
       width="100%"
       height="100%"
       referrerPolicy={props.source?.engine?.tiktok?.referrerPolicy}
+      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
+      // skin above it sees hover and clicks. `preload="none"` leaves TikTok's player dormant, and then the frame's own
+      // controls are the only thing that can still start it.
+      style={{ pointerEvents: props.controls || props.preload === 'none' ? undefined : 'none' }}
       {...iframeProps}
       ref={composedRef}
     >

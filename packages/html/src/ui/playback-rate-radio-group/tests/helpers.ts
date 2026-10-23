@@ -1,6 +1,6 @@
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import { ContextProvider } from '@videojs/element/context';
-import type { MediaPlaybackRateState } from '@videojs/media';
+import type { MediaFeatureAvailability, MediaPlaybackRateState } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { vi } from 'vite-plus/test';
 
@@ -52,21 +52,26 @@ export async function waitForAssertion(assertion: () => void): Promise<void> {
   throw error;
 }
 
+interface PlaybackRateStoreOptions {
+  playbackRates?: readonly number[] | undefined;
+  playbackRate?: number | undefined;
+  playbackRateAvailability?: MediaFeatureAvailability | undefined;
+  setPlaybackRate?: ((rate: number) => void) | undefined;
+}
+
 function createPlaybackRateStore({
   playbackRates = [0.5, 1, 1.5, 2],
   playbackRate = 1.5,
+  playbackRateAvailability = 'available',
   setPlaybackRate = vi.fn(),
-}: {
-  playbackRates?: readonly number[] | undefined;
-  playbackRate?: number | undefined;
-  setPlaybackRate?: ((rate: number) => void) | undefined;
-} = {}): AnyPlayerStore {
+}: PlaybackRateStoreOptions = {}): AnyPlayerStore {
   return createStore<unknown>()<MediaPlaybackRateState>({
     name: 'playbackRate',
     state: () => {
       return {
         playbackRates,
         playbackRate,
+        playbackRateAvailability,
         setPlaybackRate,
       };
     },
@@ -97,16 +102,8 @@ defineElement(PlaybackRateRadioGroupElement.tagName, PlaybackRateRadioGroupEleme
 defineElement(PlaybackRateButtonElement.tagName, PlaybackRateButtonElement);
 defineElement('test-playback-rate-player', TestPlayerProviderElement);
 
-export function setup({
-  playbackRates,
-  playbackRate,
-  setPlaybackRate,
-}: {
-  playbackRates?: readonly number[] | undefined;
-  playbackRate?: number | undefined;
-  setPlaybackRate?: ((rate: number) => void) | undefined;
-} = {}) {
-  const store = createPlaybackRateStore({ playbackRates, playbackRate, setPlaybackRate });
+export function setup(storeOptions: PlaybackRateStoreOptions = {}) {
+  const store = createPlaybackRateStore(storeOptions);
   const provider = document.createElement('test-playback-rate-player') as TestPlayerProviderElement;
   const trigger = createElement(PlaybackRateButtonElement);
   const menu = createElement(MenuElement);

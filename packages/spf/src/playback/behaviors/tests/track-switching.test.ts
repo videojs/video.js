@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import type { StateSignals } from '../../../core/composition/create-composition';
+import type { StateSignals } from '../../../core/composition/define-behavior';
 import { signal } from '../../../core/signals/primitives';
 import { NO_KEY_SYSTEM } from '../../../media/drm';
 import { SVTA_NO_SUPPORTED_AUDIO_TRACK, SVTA_NO_SUPPORTED_VIDEO_TRACK, type SvtaError } from '../../../media/errors';
@@ -22,11 +22,12 @@ import type { BandwidthState } from '../../../network/bandwidth-estimator';
 import { excludeRefusedKeySystems } from '../../primitives/selection-rules';
 import {
   DEFAULT_VIDEO_CONSTRAINTS,
-  type SwitchVideoTrackConfig,
-  type SwitchVideoTrackRule,
   switchAudioTrack,
+  type SwitchAudioTrackConfig,
   switchTextTrack,
   switchVideoTrack,
+  type SwitchVideoTrackConfig,
+  type SwitchVideoTrackRule,
 } from '../track-switching';
 
 // ============================================================================
@@ -1929,7 +1930,8 @@ describe('per-type chain config', () => {
         ]),
         bandwidthState: createBandwidthState(1_000_000),
       });
-      const reactor = switchAudioTrack.setup({ state, config });
+      // SAFETY: the video keys deliberately share nothing with `SwitchAudioTrackConfig`, which TypeScript rejects for an all-optional type.
+      const reactor = switchAudioTrack.setup({ state, config: config as SwitchAudioTrackConfig });
 
       await flush();
       expect(state.selectedAudioTrackId.get()).toBe('audio-high');

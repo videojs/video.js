@@ -28,10 +28,6 @@
  * conditional: both this behavior and `setupMediaKeys` react to the same falling edge, so it releases the element only
  * while it still holds it, exactly as the native path does.
  *
- * **Compose it ahead of `setupMediaKeys`**, beside `exchangeLicenses` and for the same reason: `createComposition`
- * calls cleanups in registration order, so the receiver MediaKeys detach before the re-entering negotiation attaches
- * its own.
- *
  * **EME first, then the legacy key system.** Measured on macOS/Safari 26.6.2 against a real receiver: the CDM grants
  * access for `initDataTypes: ['skd']` and then throws `NotSupportedError` from `generateRequest` — self-inconsistent,
  * and the reason the pre-EME `WebKitMediaKeys` path still exists. That refusal, and only that refusal while the target
@@ -52,14 +48,13 @@
  */
 import { listen } from '@videojs/utils/dom';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal } from '../../../core/signals/primitives';
 import {
   attachMediaKeys,
   declaredDrmKeys,
-  type DrmSystemsConfig,
   fetchServerCertificate,
   type KeySystemModule,
   keySystemCandidates,
@@ -77,12 +72,13 @@ import { listenForEncryptedInitData, openLicenseSession } from '../../../media/d
 import {
   SVTA_DRM_CERTIFICATE_ERROR,
   SVTA_DRM_INITIALIZATION_ERROR,
-  SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
+  SVTA_LICENSE_REQUEST_GENERATION_ERROR,
   SVTA_UNSUPPORTED_DRM_SYSTEM,
   type SvtaError,
 } from '../../../media/errors';
 import { isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
+import type { NegotiableDrmSystemsConfig } from './setup-media-keys';
 
 /**
  * What an AirPlay receiver's key requests arrive as. FairPlay's `skd://` key URI carries no EME init data, so the
@@ -113,7 +109,7 @@ export interface AirPlayFairPlayContext {
 /** Config for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayConfig {
   /** License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. */
-  drm: DrmSystemsConfig;
+  drm: NegotiableDrmSystemsConfig;
   /** The key systems this composition can negotiate. Semantics on `MediaKeysSetupConfig['keySystems']`. */
   keySystems: readonly KeySystemModule[];
 }
@@ -380,7 +376,7 @@ function setupAirPlayFairPlaySetup({
 
             if (!isAirPlayGenerateRequestRefusal(error, mediaElement) || !supportsWebKitFairPlay(mediaElement)) {
               report({
-                code: SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
+                code: SVTA_LICENSE_REQUEST_GENERATION_ERROR,
                 data: { keySystem: fairPlayAirPlayKeySystem.keySystem, reason: String(error) },
               });
               return;
