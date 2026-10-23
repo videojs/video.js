@@ -58,13 +58,30 @@ const config: ViteUserConfig = {
           ],
         },
       },
+      'mcp-surface:generate': {
+        command: 'tsx scripts/mcp-surface.ts',
+        dependsOn: workspaceTaskDependencies(),
+        cache: {
+          input: [
+            'scripts/mcp-surface.ts',
+            'scripts/check-api-stability.ts',
+            { pattern: 'packages/**/package.json', base: 'workspace' },
+            { pattern: 'packages/**/dist/**/*.d.ts', base: 'workspace' },
+            { pattern: 'packages/**/dist/**/*.css', base: 'workspace' },
+            // Elements whose `tagName` is typed `string` are read from their define modules.
+            { pattern: 'packages/**/src/**', base: 'workspace' },
+            { pattern: '!packages/**/*.tsbuildinfo', base: 'workspace' },
+          ],
+          output: ['src/content/generated-mcp-surface.json'],
+        },
+      },
       build: {
         // Astro observes pnpm's selector-specific lifecycle metadata and host
         // session values even though they do not affect the output, so normalize
         // them for cross-task cache reuse.
         command:
           "SHLVL=0 XPC_SERVICE_NAME=0 npm_lifecycle_event=vite-plus npm_lifecycle_script='astro build' astro build",
-        dependsOn: ['api-docs:generate'],
+        dependsOn: ['api-docs:generate', 'mcp-surface:generate'],
         cache: {
           // Astro regenerates and consumes collection schemas during one build.
           // They are tool-managed state rather than stable inputs or outputs.
@@ -92,7 +109,7 @@ const config: ViteUserConfig = {
       'dev:prepare': {
         command: 'node -e ""',
         cache: false,
-        dependsOn: ['api-docs:generate'],
+        dependsOn: ['api-docs:generate', 'mcp-surface:generate'],
       },
       'test:ci': {
         command: 'pnpm test',

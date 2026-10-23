@@ -23,6 +23,9 @@ const GENERATED_REFERENCE_DIRS = ['component', 'util', 'feature', 'media', 'pres
   (kind) => `src/content/generated-${kind}-reference`
 );
 
+/** Written by the `mcp-surface:generate` task; keep in sync with its `output` in `vite.config.ts`. */
+const GENERATED_MCP_SURFACE = 'src/content/generated-mcp-surface.json';
+
 /** Workspace packages Astro imports through their built `dist` exports. */
 const WORKSPACE_PACKAGES = ['@videojs/html', '@videojs/installation', '@videojs/react'];
 
@@ -39,6 +42,8 @@ export function missingPrerequisites(siteRoot = SITE_ROOT): string[] {
   for (const directory of GENERATED_REFERENCE_DIRS) {
     if (!hasJsonFiles(join(siteRoot, directory))) missing.push(directory);
   }
+
+  if (!existsSync(join(siteRoot, GENERATED_MCP_SURFACE))) missing.push(GENERATED_MCP_SURFACE);
 
   for (const name of WORKSPACE_PACKAGES) {
     if (!existsSync(join(siteRoot, 'node_modules', name, 'dist'))) missing.push(`${name} build`);
