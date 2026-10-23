@@ -1,4 +1,5 @@
 import { findLazyMedia, type LazyMediaMatcher, resolveLazySource } from '@videojs/media';
+import type { Media } from '@videojs/media/dom';
 import { nativeHlsSupport } from '@videojs/utils/dom';
 
 /** A media element `<lazy-video>` or `<lazy-audio>` can render: which sources it plays, and the element that plays them. */
@@ -87,6 +88,18 @@ export class LazyMediaElement extends HTMLElementBase {
   set preferPlayback(value: 'native' | 'mse' | undefined) {
     if (value) this.setAttribute('prefer-playback', value);
     else this.removeAttribute('prefer-playback');
+  }
+
+  /**
+   * The media playing the source, the same object the player registers: the resolved element, or the media it hands the
+   * player through `getMediaTarget()`. `null` while there's none. While a different media loads, the previous one.
+   */
+  get media(): Media | null {
+    // SAFETY: the player takes a resolved element as the media itself, as it does a built-in `<video>` or `<audio>`,
+    // unless the element hands it another through `getMediaTarget()`.
+    const element = this.#media as (Media & { getMediaTarget?: () => Media | null }) | null;
+
+    return element?.getMediaTarget ? element.getMediaTarget() : element;
   }
 
   /**
