@@ -2,7 +2,7 @@
  * H.264 in MPEG-TS: AUD-delimited access units framed into `avc1` samples, 90 kHz timescale, in-band SPS/PPS copied to
  * `avcC`.
  */
-import { box, type FragmentSample, type TrackConfig, u16, u32, zeros } from '../../mp4/mux';
+import { box, type TrackConfig, u16, u32, zeros } from '../../mp4/mux';
 import { parseAvcAccessUnits, parseSps, type VideoSample } from '../h264';
 import type { FramedStream, TransmuxCodec } from './codec';
 
@@ -38,15 +38,30 @@ function avc1(sps: Uint8Array, pps: Uint8Array, width: number, height: number): 
   );
 }
 
-/** Durations are DTS deltas; the last sample reuses the one before it. Composition offset is `pts − dts`. */
-function toFragmentSamples(samples: VideoSample[]): FragmentSample[] {
-  return samples.map((sample, i) => {
-    const next = samples[i + 1];
-    const previous = samples[i - 1];
-    const duration = next ? next.dts - sample.dts : previous ? sample.dts - previous.dts : MPEG_TS_TIMESCALE / 30;
+/**
+ * A fragment's decode timeline, started at its earliest presentation time rather than its first decode time.
+ *
+ * With B-frames, a segment's first frame is decoded a frame or two before it is presented. Relocation aligns the
+ * earliest decode time with the playlist, so an unshifted fragment would present that much after its segment's start: a
+ * seek onto the boundary lands in a hole, and a flush at the boundary cuts the previous segment's last frames. Shifting
+ * every decode time up to the earliest presentation time, and every composition offset down by the same amount, leaves
+ * presentation untouched and keeps decode times non-negative (`trun` v1 carries the negative offsets). Durations are
+ * DTS deltas; the last sample reuses the one before it.
+ */
+export function toFragmentTiming(samples: VideoSample[]): Pick<FramedStream, 'baseMediaDecodeTime' | 'samples'> {
+  const earliestPts = Math.min(...samples.map((sample) => sample.pts));
+  const shift = earliestPts - samples[0]!.dts;
 
-    return { duration, size: sample.size, key: sample.key, cts: sample.pts - sample.dts };
-  });
+  return {
+    baseMediaDecodeTime: earliestPts,
+    samples: samples.map((sample, i) => {
+      const next = samples[i + 1];
+      const previous = samples[i - 1];
+      const duration = next ? next.dts - sample.dts : previous ? sample.dts - previous.dts : MPEG_TS_TIMESCALE / 30;
+
+      return { duration, size: sample.size, key: sample.key, cts: sample.pts - sample.dts - shift };
+    }),
+  };
 }
 
 /** Length-prefixed NAL units, as `avc1` samples carry them. */
@@ -83,11 +98,6 @@ export const avcCodec: TransmuxCodec = {
       sampleEntry: avc1(config.sps, config.pps, width, height),
     };
 
-    return {
-      track,
-      baseMediaDecodeTime: samples[0]!.dts,
-      samples: toFragmentSamples(samples),
-      payload: toPayload(samples),
-    };
+    return { track, ...toFragmentTiming(samples), payload: toPayload(samples) };
   },
 };
