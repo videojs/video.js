@@ -1,4 +1,10 @@
-import { isMediaMutedCapable, isMediaVolumeCapable, MediaError, type Video } from '@videojs/media';
+import {
+  isMediaMutedCapable,
+  isMediaPlaybackRateCapable,
+  isMediaVolumeCapable,
+  MediaError,
+  type Video,
+} from '@videojs/media';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildTikTokIframeSrc, TikTokAdapter } from '..';
@@ -516,6 +522,15 @@ describe('TikTokAdapter', () => {
     expect(media.muted).toBeDefined();
     expect(isMediaVolumeCapable(media)).toBe(false);
     expect(isMediaMutedCapable(media)).toBe(true);
+  });
+
+  it('offers no playback rate surface', () => {
+    // The embed takes no speed command, so the player reports the rate
+    // unsupported and hides its rate controls.
+    const media = new TikTokAdapter() as Partial<Video>;
+
+    expect(media.playbackRate).toBeUndefined();
+    expect(isMediaPlaybackRateCapable(media)).toBe(false);
   });
 
   it('posts play, pause, seekTo, and mute commands to the embed', async () => {
