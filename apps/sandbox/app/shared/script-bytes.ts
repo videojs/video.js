@@ -77,11 +77,11 @@ export function formatKilobytes(bytes: number): string {
   return `${(bytes / 1000).toFixed(1)} kB`;
 }
 
-/** A one-line summary, with what loaded since `since` when given. */
-export function describeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes): string {
-  const total = `${formatKilobytes(bytes.gzip)} gzip (${formatKilobytes(bytes.raw)} minified), ${bytes.files} files`;
-
-  if (!since) return total;
-
-  return `${total} (+${formatKilobytes(bytes.gzip - since.gzip)} gzip since the last source change)`;
+/** The JavaScript loaded, formatted for display, with what loaded since `since` when given. */
+export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes) {
+  return {
+    total: formatKilobytes(bytes.gzip),
+    detail: `gzip · ${formatKilobytes(bytes.raw)} minified · ${bytes.files} files`,
+    sinceChange: since ? `+${formatKilobytes(bytes.gzip - since.gzip)}` : null,
+  };
 }
