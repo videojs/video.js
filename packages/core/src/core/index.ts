@@ -99,6 +99,14 @@ export * from './ui/volume-slider/core';
 export * from './ui/volume-slider/data';
 export * from './ui/volume-slider/vars';
 export * from './version';
+export type {
+  AddTextTrack,
+  AppTextTrack,
+  InferCueValue,
+  TextCueInit,
+  TextTrackContent,
+  TextTrackInit,
+} from './text-track/app';
 export * from './text-track/definition';
 export * from './text-track/hls';
 export * from './text-track/read';

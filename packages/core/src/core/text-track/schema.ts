@@ -3,18 +3,12 @@ import { isPromise } from '@videojs/utils/predicate';
 /**
  * A [Standard Schema](https://standardschema.dev), the one validation interface zod, valibot, arktype, and others
  * implement. Copied from the spec, which is meant to be copied, so no schema library is a dependency.
- *
- * @internal
  */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   readonly '~standard': StandardSchemaV1Props<Input, Output>;
 }
 
-/**
- * The properties a {@link StandardSchemaV1} carries under its `~standard` key.
- *
- * @internal
- */
+/** The properties a {@link StandardSchemaV1} carries under its `~standard` key. */
 export interface StandardSchemaV1Props<Input = unknown, Output = Input> {
   readonly version: 1;
   readonly vendor: string;
@@ -22,11 +16,7 @@ export interface StandardSchemaV1Props<Input = unknown, Output = Input> {
   readonly types?: { readonly input: Input; readonly output: Output } | undefined;
 }
 
-/**
- * What a {@link StandardSchemaV1} returns: the parsed value, or the issues that failed it.
- *
- * @internal
- */
+/** What a {@link StandardSchemaV1} returns: the parsed value, or the issues that failed it. */
 export type StandardSchemaV1Result<Output> =
   | { readonly value: Output; readonly issues?: undefined }
   | { readonly issues: readonly { readonly message: string }[] };
