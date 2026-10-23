@@ -79,7 +79,7 @@ export class GestureElement extends UIElement {
     const prepare = prepareGestureAction(this.action);
 
     const options = {
-      onPointerUp: prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event })),
+      onPointerDown: prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event })),
       pointer: this.pointer,
       region,
       disabled: this.disabled,

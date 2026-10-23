@@ -33,9 +33,9 @@ export function Gesture({ type, action, value, pointer, region, disabled }: Gest
     };
 
     const prepare = prepareGestureAction(action);
-    const onPointerUp = prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event }));
+    const onPointerDown = prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event }));
 
-    const options = { onPointerUp, pointer, region, disabled, action, value: actionValue };
+    const options = { onPointerDown, pointer, region, disabled, action, value: actionValue };
 
     if (type === 'doubletap') {
       return createDoubleTapGesture(container, onActivate, options);

@@ -52,7 +52,7 @@ describe('resolveGestureAction', () => {
 });
 
 describe('prepareGestureAction', () => {
-  it('toggles playback from the state the tap found, not what the click started since', () => {
+  it('plays when the pointer went down on paused media, even if the click started it since', () => {
     const play = vi.fn(async () => {});
     const pause = vi.fn();
     const context = ctx({ paused: true, play, pause });
@@ -64,6 +64,11 @@ describe('prepareGestureAction', () => {
 
     expect(play).toHaveBeenCalledOnce();
     expect(pause).not.toHaveBeenCalled();
+
+    // The intent belongs to that tap only.
+    resolveGestureAction('togglePaused')!(context);
+
+    expect(pause).toHaveBeenCalledOnce();
   });
 
   it('has no step for actions that read state when they fire', () => {

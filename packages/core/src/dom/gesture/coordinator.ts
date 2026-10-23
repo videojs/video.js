@@ -122,6 +122,10 @@ export class GestureCoordinator {
         if (event.button !== 0) return;
 
         pointerDownTime = Date.now();
+
+        if (isInteractiveTarget(event)) return;
+
+        matchBindings(this.#bindings, 'tap', event.pointerType, event.clientX, this.#target)[0]?.onPointerDown?.(event);
       },
       { signal }
     );

@@ -17,10 +17,9 @@ export interface GestureActionContext {
 /** @internal */
 export type GestureActionResolver = (context: GestureActionContext) => void;
 
-// Whether each tap found the media paused. A tap fires a doubletap window after the click, and the click can start
-// playback by itself: Safari resumes an autoplay it held back on any user gesture. Toggling from the later state would
-// pause what the user meant to play.
-const pausedOnTap = new WeakMap<PointerEvent, boolean>();
+// Whether the last pointer-down meant to play. A tap fires a doubletap window after the click, and the click can start
+// playback by itself, as Safari's own play button does over a refused autoplay. Toggling then would pause it again.
+const playIntents = new WeakMap<AnyPlayerStore, boolean>();
 
 function isPlaybackPaused(store: AnyPlayerStore): boolean | undefined {
   const playback = selectPlayback(store.state);
@@ -29,24 +28,25 @@ function isPlaybackPaused(store: AnyPlayerStore): boolean | undefined {
   return playback && playback.paused && !playback.autoplaying;
 }
 
-/** Actions that read state on the tap's pointer-up, before the tap fires. */
+/** Actions that capture the user's intent on pointer-down, before the click sets anything off. */
 const GESTURE_ACTION_PREPARERS: Partial<Record<GestureActionName, GestureActionResolver>> = {
-  togglePaused({ store, event }) {
+  togglePaused({ store }) {
     const paused = isPlaybackPaused(store);
 
-    if (paused !== undefined) pausedOnTap.set(event, paused);
+    if (paused !== undefined) playIntents.set(store, paused);
   },
 };
 
 /** Actions that need custom logic beyond `store.state[action]()`. */
 const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionResolver>> = {
-  togglePaused({ store, event }) {
+  togglePaused({ store }) {
     const playback = selectPlayback(store.state);
     if (!playback) return;
 
-    const paused = pausedOnTap.get(event) ?? isPlaybackPaused(store);
+    const play = playIntents.get(store) ?? isPlaybackPaused(store);
 
-    ignoreRejection(paused ? playback.play() : playback.pause());
+    playIntents.delete(store);
+    ignoreRejection(play ? playback.play() : playback.pause());
   },
 
   toggleMuted: MEDIA_INPUT_ACTION_OVERRIDES.toggleMuted,
@@ -65,7 +65,7 @@ const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionR
 };
 
 /**
- * The step an action takes on the tap's pointer-up, if any. Pass it as the gesture's `onPointerUp`.
+ * The step an action takes on the pointer-down of a tap, if any. Pass it as the gesture's `onPointerDown`.
  *
  * @internal
  */
