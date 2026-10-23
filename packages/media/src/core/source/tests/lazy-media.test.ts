@@ -36,6 +36,8 @@ describe('resolveLazySource', () => {
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
     ['https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5', 'spotify'],
     ['spotify:track:1301WleyT98MSxVHPZCA6M', 'spotify'],
+    ['https://streamable.com/e/moo?playerjs', 'playerjs'],
+    ['https://embed.example.com/player.mp4?playerjs', 'playerjs'],
     [HLS, 'hls'],
     ['https://example.com/manifest.mpd', 'dash'],
     ['/movie.mp4', 'video'],

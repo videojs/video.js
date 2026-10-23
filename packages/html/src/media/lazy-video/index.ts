@@ -4,6 +4,7 @@ import { dashVideo } from '../lazy/dash-video';
 import { hlsjsVideo } from '../lazy/hlsjs-video';
 import { muxVideo } from '../lazy/mux-video';
 import { nativeHlsVideo } from '../lazy/native-hls-video';
+import { playerJsVideo } from '../lazy/playerjs-video';
 import { tiktokVideo } from '../lazy/tiktok-video';
 import { twitchVideo } from '../lazy/twitch-video';
 import { video } from '../lazy/video';
@@ -16,9 +17,10 @@ import { youtubeVideo } from '../lazy/youtube-video';
  * once the source is known.
  *
  * Resolves files to a native `<video>`, HLS to `<native-hls-video>` on Safari and `<hlsjs-video>` elsewhere, DASH to
- * `<dash-video>`, Mux to `<mux-video>`, and YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to
- * their embed elements. Other attributes are passed to the resolved element, so switching to it directly only changes
- * the tag name. Use `createLazyVideoElement` to add your own media or leave some out.
+ * `<dash-video>`, Mux to `<mux-video>`, YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to their
+ * embed elements, and embeds marked with a `playerjs` query parameter to `<playerjs-video>`. Other attributes are
+ * passed to the resolved element, so switching to it directly only changes the tag name. Use `createLazyVideoElement`
+ * to add your own media or leave some out.
  *
  * @experimental
  */
@@ -36,5 +38,6 @@ export class LazyVideo extends LazyMediaElement {
     cloudflareVideo,
     tiktokVideo,
     twitchVideo,
+    playerJsVideo,
   ];
 }
