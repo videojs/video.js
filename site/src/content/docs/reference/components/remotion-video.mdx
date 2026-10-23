@@ -1,0 +1,118 @@
+---
+title: RemotionVideo
+description: Video component that plays a Remotion composition through the Video.js media contract
+---
+
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+
+{/* React demo */}
+import BasicUsageDemoReact from "@/components/docs/demos/remotion-video/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/remotion-video/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/remotion-video/react/css/BasicUsage.css?raw";
+
+## Import
+
+```bash
+pnpm add @videojs/react @videojs/remotion-video remotion
+```
+
+```tsx
+import { RemotionVideo } from "@videojs/react/media/remotion-video";
+```
+
+`RemotionVideo` plays a [Remotion](https://www.remotion.dev) composition as the player's media. Remotion renders compositions with React, so this is the one media with no HTML counterpart.
+
+The composition itself is ordinary Remotion — it reads the frame with `useCurrentFrame()` and knows nothing about Video.js. Every control surface belongs to the player: `RemotionVideo` mounts Remotion's `<Player>` with its own chrome, click-to-play, keyboard shortcuts, and media-session handling switched off.
+
+## Load a source
+
+A composition is code rather than a URL, so `source` names what plays instead of `src`. Remotion's own inputs sit inside `composition`, which is spelled exactly the way Remotion's `<Player>` spells its props; everything beside it is what the player derives from the source.
+
+```tsx
+<RemotionVideo
+  source={{
+    id: 'countdown',
+    composition: {
+      component: Countdown,
+      durationInFrames: 150,
+      fps: 30,
+      compositionWidth: 1280,
+      compositionHeight: 720,
+    },
+  }}
+/>
+```
+
+`id` names the composition. It is what `src` and `currentSrc` report, as `remotion:<id>`, and what the player uses to tell one composition from the next.
+
+## Pass parameters
+
+`composition.inputProps` reaches the composition as its props. Editing them is a live update of the same composition rather than a new source, so playback keeps running and the store sees no reload.
+
+```tsx
+const [name, setName] = useState('Ada');
+
+<RemotionVideo
+  source={{
+    id: 'greeting',
+    composition: { component: Greeting, durationInFrames: 150, fps: 30, compositionWidth: 1280, compositionHeight: 720, inputProps: { name } },
+  }}
+/>
+```
+
+Changing anything else in `composition` — the component, the timing, the dimensions — is a new source: it reloads from the first frame.
+
+## Scenes and captions
+
+A composition knows its own structure up front, so it can publish it as text tracks the player reads. Both sit beside `composition`, because they are what the player does with the source rather than something Remotion renders.
+
+`chapters` marks scenes in frames. A chapter without an explicit `durationInFrames` runs until the next one, or to the end of the composition.
+
+```tsx
+source={{
+  id: 'countdown',
+  composition: { /* … */ },
+  chapters: [
+    { title: 'Intro', from: 0 },
+    { title: 'Body', from: 60 },
+  ],
+}}
+```
+
+`subtitles` carries caption timings in milliseconds. The composition draws the captions itself; the track carries the timing and the on/off state, so the player's captions menu can toggle them.
+
+```tsx
+source={{
+  id: 'countdown',
+  composition: { /* … */ },
+  subtitles: {
+    label: 'English',
+    language: 'en',
+    cues: [{ text: 'Hello', startMs: 0, endMs: 1000 }],
+  },
+}}
+```
+
+## Behavior
+
+- Time is frames. `duration` is `durationInFrames / fps`, and a seek rounds to the nearest frame, so `currentTime` reads back snapped rather than exact.
+- A composition is renderable as soon as its `<Player>` mounts, so metadata and "enough data" arrive together. Media embedded inside the composition still reports buffering, which surfaces as `waiting` and `playing`.
+- The whole composition is seekable, and buffered once mounted. There is no byte buffer to report.
+- Playback stays on the last frame when it ends, the way a media element does. Playing again restarts from the beginning.
+- Fullscreen belongs to the player's container. Picture-in-picture reports as unsupported, so its button hides.
+- `poster`, `playsInline`, and `controls` are stored and reported but do not reach Remotion: a composition renders in a `<div>` that always plays inline, and there is no still frame before the first render.
+
+## Examples
+
+### Basic Usage
+
+<StyleCase styles={["css"]}>
+  <Demo files={[
+    { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+    { title: "App.css", code: basicUsageReactCss, lang: "css" },
+  ]}>
+    <BasicUsageDemoReact client:idle />
+  </Demo>
+</StyleCase>

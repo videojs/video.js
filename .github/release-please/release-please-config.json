@@ -29,6 +29,7 @@
         "@videojs/native-hls-video",
         "@videojs/playerjs-video",
         "@videojs/react",
+        "@videojs/remotion-video",
         "@videojs/shaka-video",
         "@videojs/skins",
         "@videojs/spf",
@@ -92,6 +93,9 @@
     },
     "packages/adapters/native-hls-video": {
       "component": "@videojs/native-hls-video"
+    },
+    "packages/adapters/remotion-video": {
+      "component": "@videojs/remotion-video"
     },
     "packages/react": {
       "component": "@videojs/react"
