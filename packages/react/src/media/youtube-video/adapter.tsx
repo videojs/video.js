@@ -49,6 +49,9 @@ export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(fun
       width="100%"
       height="100%"
       referrerPolicy={props.source?.engine?.youtube?.referrerPolicy}
+      // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
+      // skin above it sees hover and clicks.
+      style={{ pointerEvents: props.controls ? undefined : 'none' }}
       {...iframeProps}
       ref={composedRef}
     >
