@@ -105,6 +105,17 @@ describe('composite define registration', () => {
     });
   });
 
+  describe('ui/time-slider-markers', () => {
+    it('registers only the marker collection', async () => {
+      const before = spy.mock.calls.length;
+
+      await import('../ui/time-slider-markers');
+      const batch = batchSince(before);
+
+      expect(batch).toEqual(['media-time-slider-markers']);
+    });
+  });
+
   describe('ui/volume-slider', () => {
     it('registers only media-volume-slider', async () => {
       const before = spy.mock.calls.length;

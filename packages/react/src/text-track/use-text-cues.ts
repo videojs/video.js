@@ -65,11 +65,27 @@ function useCues(
 ): MediaTextCue[] {
   useWatchTextCues(filter);
 
+  return useReadTextCues(filter, read);
+}
+
+/**
+ * Select the cues a reader returns for a filter, without asking the store to track it. Pair with `useWatchTextCues`.
+ *
+ * @internal
+ */
+export function useReadTextCues(
+  filter: TextTrackQuery,
+  read: (source: TextCuesSource, filter: TextTrackQuery) => MediaTextCue[]
+): MediaTextCue[] {
   return usePlayer((state) => (hasTextCues(state) ? read(state, filter) : NO_CUES));
 }
 
-/** Ask the store to track cues for a filter while the component is mounted. */
-function useWatchTextCues(filter: TextTrackQuery): void {
+/**
+ * Ask the store to track cues for a filter while the component is mounted.
+ *
+ * @internal
+ */
+export function useWatchTextCues(filter: TextTrackQuery): void {
   const store = usePlayer();
   const latest = useLatestRef(filter);
   const key = getFilterKey(filter);
