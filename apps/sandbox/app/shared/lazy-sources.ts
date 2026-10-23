@@ -1,3 +1,5 @@
+import embedPayloads from './embed-payloads.json';
+import type { EmbedPayload } from './script-bytes';
 import {
   CLOUDFLARE_VIDEO_SRC,
   getPosterSrc,
@@ -72,6 +74,21 @@ export function getUrlLazySource(): LazySource {
   return LAZY_VIDEO_SOURCES.find((source) => lazySourceId(source) === id) ?? LAZY_VIDEO_SOURCES[0]!;
 }
 
+/** When `embed-payloads.json` was measured, for the breakdown's caption. */
+export const EMBED_PAYLOADS_MEASURED_AT = embedPayloads.measuredAt;
+
+/**
+ * What the embed for `src` downloads from its service, as measured by `pnpm --dir apps/e2e measure-embed-payloads`, or
+ * `undefined` for a source that isn't an embed.
+ */
+export function getEmbedPayload(src: string): EmbedPayload | undefined {
+  const source = LAZY_VIDEO_SOURCES.find((option) => option.src === src);
+  const embeds: Partial<Record<string, { scripts: number; total: number }>> = embedPayloads.embeds;
+  const payload = source && embeds[lazySourceId(source)];
+
+  return source && payload ? { label: source.label, scripts: payload.scripts, total: payload.total } : undefined;
+}
+
 /** Whether `?light` is in the page URL. */
 export function getUrlLight(): boolean {
   return new URLSearchParams(location.search).has('light');
@@ -124,6 +141,7 @@ export const LAZY_DEMO_CLASSES = {
     dependencies: 'bg-sky-500',
     react: 'bg-violet-400',
     sandbox: 'bg-muted-foreground/40',
+    embed: 'bg-amber-500',
   },
   stats: 'grid gap-3 sm:grid-cols-3',
   stat: 'grid content-start gap-1',

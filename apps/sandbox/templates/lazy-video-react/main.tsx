@@ -7,6 +7,8 @@ import '@app/styles.css';
 import '@videojs/react/video/skin.css';
 import {
   LAZY_DEMO_CLASSES as c,
+  EMBED_PAYLOADS_MEASURED_AT,
+  getEmbedPayload,
   getUrlLazySource,
   getUrlLight,
   LAZY_VIDEO_SOURCE_GROUPS,
@@ -15,6 +17,7 @@ import {
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
 import {
+  type EmbedPayload,
   formatKilobytes,
   groupScriptBytes,
   observeScriptBytes,
@@ -58,17 +61,18 @@ function StartedReporter({ onStarted }: { onStarted: () => void }) {
 
 const SHOWN_PACKAGES = 6;
 
-function ScriptBreakdown({ bytes }: { bytes: ScriptBytes }) {
-  const groups = groupScriptBytes(bytes);
+function ScriptBreakdown({ bytes, embed }: { bytes: ScriptBytes; embed: EmbedPayload | undefined }) {
+  const groups = groupScriptBytes(bytes, embed);
   const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
+  const caption = embed
+    ? `gzip, each script split by its packages · embed measured ${EMBED_PAYLOADS_MEASURED_AT}, as transferred`
+    : 'gzip, each script split by its packages';
 
   return (
     <section className={c.card} aria-label="JavaScript by package">
       <div className={c.breakdownHeader}>
         <h2 className={c.statLabel}>JavaScript by package</h2>
-        <p className={c.statDetail}>
-          {groups.length ? 'gzip, each script split by its packages' : 'Per-package sizes need a production build.'}
-        </p>
+        <p className={c.statDetail}>{groups.length ? caption : 'Per-package sizes need a production build.'}</p>
       </div>
       {groups.length > 0 && (
         <>
@@ -114,7 +118,9 @@ function App() {
   const [resolved, setResolved] = useState<string | null>(null);
   const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ gzip: 0, raw: 0, files: 0, packages: {} });
   const [sourceChangedAt, setSourceChangedAt] = useState<ScriptBytes>();
-  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
+  // An embed's own download only counts once it renders, not while light mode shows the poster.
+  const embed = resolved ? getEmbedPayload(src) : undefined;
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt, embed);
 
   useEffect(() => observeScriptBytes(setScriptBytes), []);
 
@@ -227,7 +233,7 @@ function App() {
           <dd className={c.statDetail}>gzip</dd>
         </div>
       </dl>
-      <ScriptBreakdown bytes={scriptBytes} />
+      <ScriptBreakdown bytes={scriptBytes} embed={embed} />
     </>
   );
 }

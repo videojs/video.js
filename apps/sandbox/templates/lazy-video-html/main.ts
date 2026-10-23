@@ -10,6 +10,8 @@ import '@videojs/html/video/skin.css';
 import '@videojs/html/media/lazy-video';
 import {
   LAZY_DEMO_CLASSES as c,
+  EMBED_PAYLOADS_MEASURED_AT,
+  getEmbedPayload,
   getUrlLazySource,
   getUrlLight,
   LAZY_VIDEO_SOURCE_GROUPS,
@@ -18,6 +20,7 @@ import {
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
 import {
+  type EmbedPayload,
   formatKilobytes,
   groupScriptBytes,
   observeScriptBytes,
@@ -103,19 +106,28 @@ const scriptSince = root.querySelector('#script-since')!;
 
 let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0, packages: {} };
 let sourceChangedAt: ScriptBytes | undefined;
+let src = initialSrc;
+let lazyVideo: HTMLElement | null = null;
 
 const SHOWN_PACKAGES = 6;
 
+// An embed's own download only counts once it renders, not while light mode shows the poster.
+function currentEmbed(): EmbedPayload | undefined {
+  return lazyVideo?.firstElementChild ? getEmbedPayload(src) : undefined;
+}
+
 function renderScriptBreakdown() {
-  const groups = groupScriptBytes(scriptBytes);
+  const embed = currentEmbed();
+  const groups = groupScriptBytes(scriptBytes, embed);
   const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
+  const caption = embed
+    ? `gzip, each script split by its packages · embed measured ${EMBED_PAYLOADS_MEASURED_AT}, as transferred`
+    : 'gzip, each script split by its packages';
 
   scriptBreakdown.innerHTML = html`
     <div class="${c.breakdownHeader}">
       <h2 class="${c.statLabel}">JavaScript by package</h2>
-      <p class="${c.statDetail}">
-        ${groups.length ? 'gzip, each script split by its packages' : 'Per-package sizes need a production build.'}
-      </p>
+      <p class="${c.statDetail}">${groups.length ? caption : 'Per-package sizes need a production build.'}</p>
     </div>
     ${
       groups.length
@@ -162,7 +174,7 @@ function renderScriptBreakdown() {
 }
 
 function renderScriptBytes() {
-  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt);
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt, currentEmbed());
 
   scriptLabel.textContent = label;
   scriptTotal.textContent = total;
@@ -176,13 +188,11 @@ observeScriptBytes((bytes) => {
   renderScriptBytes();
 });
 
-let src = initialSrc;
 let light = getUrlLight();
 let clickedAt: number | undefined;
 let startedAt: number | undefined;
 let timedOut = false;
 let timeout: ReturnType<typeof setTimeout> | undefined;
-let lazyVideo: HTMLElement | null = null;
 let cleanup = () => {};
 
 lightToggle.checked = light;
@@ -199,6 +209,7 @@ function renderStage() {
 
   if (light && clickedAt === undefined) {
     lazyVideo = null;
+    renderScriptBytes();
     stage.innerHTML = html`
       <button type="button" class="${c.facade}" aria-label="Play video" data-light-play>
         ${poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : ''}
@@ -226,10 +237,12 @@ function renderStage() {
     const child = media.firstElementChild;
 
     resolved.textContent = child ? `<${child.localName}>` : '(none)';
+    renderScriptBytes();
   });
 
   observer.observe(media, { childList: true });
   lazyVideo = media;
+  renderScriptBytes();
 
   // In light mode, report how long after the click playback started, if it did.
   const unsubscribe = light
