@@ -5,9 +5,9 @@ import type {
   TextTrackFilter,
   TextTrackLike,
 } from '@videojs/media';
-import { isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable } from '@videojs/media';
+import { getRegisteredMedia, isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
-import { isAbortError } from '@videojs/utils/predicate';
+import { isAbortError, isUndefined } from '@videojs/utils/predicate';
 
 import { findActiveCues } from '../../../core/text-track/active-cues';
 import {
@@ -24,6 +24,7 @@ import {
   APP_TEXT_TRACKS,
   APP_TEXT_TRACKS_CHANGE,
   type AppTextTrackRecord,
+  type AppTextTracksChange,
   type AppTextTracksState,
   getAppTextTracks,
 } from '../app-text-tracks';
@@ -76,20 +77,31 @@ export const textCuesFeature = definePlayerFeature({
     const appListeners = createListeners();
     let trackCount = 0;
 
+    // The tracks apps added, kept outside store state so a detach doesn't drop them. Actions work from this copy.
+    const appTracks: AppTextTracksChange = {
+      records: [],
+      media: undefined,
+      subscribe: appListeners.subscribe,
+      notify() {
+        appTracks.records = getAppTextTracks(get());
+        appListeners.notify();
+      },
+    };
+
     const setRecords = (records: readonly AppTextTrackRecord[]) => {
       set({ [APP_TEXT_TRACKS]: records });
-      appListeners.notify();
+      appTracks.notify();
     };
 
     const updateRecord = (id: string, update: (record: AppTextTrackRecord) => AppTextTrackRecord) => {
-      const records = getAppTextTracks(get());
+      const records = appTracks.records;
       if (!records.some((record) => record.track.id === id)) return;
 
       setRecords(records.map((record) => (record.track.id === id ? update(record) : record)));
     };
 
     const removeTextTrack = (id: string) => {
-      const records = getAppTextTracks(get());
+      const records = appTracks.records;
       const next = records.filter((record) => record.track.id !== id);
 
       if (next.length !== records.length) setRecords(next);
@@ -119,12 +131,12 @@ export const textCuesFeature = definePlayerFeature({
       // Loading waits for the store to attach, which only happens on the client.
       if (src) record.load = { src, format: content?.format ?? init.format };
 
-      setRecords([...getAppTextTracks(get()), record]);
+      setRecords([...appTracks.records, record]);
 
       return {
         id,
         get removed() {
-          return !getAppTextTracks(get()).some((entry) => entry.track.id === id);
+          return !appTracks.records.some((entry) => entry.track.id === id);
         },
         addCue(cue) {
           updateRecord(id, (current) => ({ ...current, cues: sortCues([...current.cues, toCue(cue)]) }));
@@ -161,7 +173,7 @@ export const textCuesFeature = definePlayerFeature({
         subscribe: filterListeners.subscribe,
       },
       [APP_TEXT_TRACKS]: [],
-      [APP_TEXT_TRACKS_CHANGE]: appListeners,
+      [APP_TEXT_TRACKS_CHANGE]: appTracks,
       [CURRENT_SRC]: null,
     };
   },
@@ -174,6 +186,19 @@ export const textCuesFeature = definePlayerFeature({
     let trackCleanup: AbortController | null = null;
 
     const getTime = () => (isMediaSeekCapable(media) ? media.currentTime : Number.NaN);
+
+    // The store reset on detach, so bring back the app tracks it held. A container change or an extension re-attaches
+    // to the same media and keeps them; other media drop the tracks that belonged to the last one's source.
+    const appTracks = get()[APP_TEXT_TRACKS_CHANGE];
+    const registeredMedia = getRegisteredMedia(media);
+
+    if (!isUndefined(appTracks.media) && appTracks.media !== registeredMedia) {
+      appTracks.records = appTracks.records.filter((record) => record.mediaSrc === null);
+    }
+
+    appTracks.media = registeredMedia;
+    set({ [APP_TEXT_TRACKS]: appTracks.records });
+    appTracks.notify();
 
     // App tracks added before any source adopt the first one; tracks from an earlier source go with it.
     const syncSource = () => {
