@@ -530,6 +530,24 @@ describe('textCuesFeature', () => {
     ]);
   });
 
+  it('reads app chapters without an end as running to the next chapter', () => {
+    const { video, store } = setup([]);
+
+    Object.defineProperty(video, 'duration', { configurable: true, value: 100 });
+    store.addTextTrack({
+      kind: 'chapters',
+      cues: [
+        { startTime: 0, text: 'Intro' },
+        { startTime: 30, text: 'Main' },
+      ],
+    });
+
+    setTime(video, 45);
+
+    expect(store.state.textCues[0]!.cues.map(({ endTime }) => endTime)).toEqual([30, 100]);
+    expect(store.state.textCues[0]!.activeCues.map(({ text }) => text)).toEqual(['Main']);
+  });
+
   describe('addTextTrack with a src', () => {
     afterEach(() => {
       vi.unstubAllGlobals();

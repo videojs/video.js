@@ -13,7 +13,7 @@ import { isNull } from '@videojs/utils/predicate';
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
 import { getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
-import { toMediaTextCues } from '../text-cues';
+import { fillChapterEnds, toMediaTextCues } from '../text-cues';
 import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 interface IdentifiedTrack {
@@ -221,16 +221,3 @@ export const textTrackFeature = definePlayerFeature({
     signal.addEventListener('abort', () => trackCleanup?.abort(), { once: true });
   },
 });
-
-/** Chapters an app gave no end run to the next chapter, and the last one to the end of the media. */
-function fillChapterEnds(cues: MediaTextCue[], duration: number): MediaTextCue[] {
-  if (cues.every((cue) => cue.endTime > cue.startTime)) return cues;
-
-  const end = Number.isFinite(duration) && duration > 0 ? duration : undefined;
-
-  return cues.map((cue, index) => {
-    if (cue.endTime > cue.startTime) return cue;
-
-    return { ...cue, endTime: cues[index + 1]?.startTime ?? end ?? cue.endTime };
-  });
-}

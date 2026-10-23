@@ -29,7 +29,7 @@ import {
   getAppTextTracks,
 } from '../app-text-tracks';
 import { loadTextTrackCues } from '../load-text-track';
-import { reuseCues, sortCues, toMediaTextCues } from '../text-cues';
+import { fillChapterEnds, reuseCues, sortCues, toMediaTextCues } from '../text-cues';
 import { listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 const CUE_FILTERS = Symbol('@videojs/text-cue-filters');
@@ -253,14 +253,19 @@ export const textCuesFeature = definePlayerFeature({
         if (track instanceof EventTarget) listen(track, 'cuechange', syncActive, { signal: trackCleanup.signal });
       }
 
-      // App cues are already plain and ordered; only which of them are active changes.
+      // App cues are already plain and ordered. A chapter without an end runs to the next one, and the last to the end
+      // of the media.
       for (const record of get()[APP_TEXT_TRACKS]) {
         if (!isTracked(record.track, filters)) continue;
 
         const prior = previous.get(record.track.id);
-        const activeCues = reuseCues(prior?.activeCues, findActiveCues(record.cues, time));
+        const cues =
+          record.track.kind === 'chapters'
+            ? reuseCues(prior?.cues, fillChapterEnds(record.cues, duration))
+            : record.cues;
+        const activeCues = reuseCues(prior?.activeCues, findActiveCues(cues, time));
 
-        textCues.push(reuseTrackCues(prior, { track: record.track, cues: record.cues, activeCues }));
+        textCues.push(reuseTrackCues(prior, { track: record.track, cues, activeCues }));
       }
 
       if (textTracks) listenForTrackLoads(textTracks, sync, trackCleanup.signal);
