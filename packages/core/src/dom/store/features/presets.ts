@@ -18,6 +18,7 @@ import { playbackRateFeature } from './playback-rate';
 import { qualityFeature } from './quality';
 import { remotePlaybackFeature } from './remote-playback';
 import { sourceFeature } from './source';
+import { textCuesFeature } from './text-cues';
 import { textTrackFeature } from './text-track';
 import { timeFeature } from './time';
 import { volumeFeature } from './volume';
@@ -36,6 +37,7 @@ export const videoFeatures: VideoFeatures = [
   remotePlaybackFeature,
   controlsFeature,
   textTrackFeature,
+  textCuesFeature,
   errorFeature,
   metadataFeature,
 ];
@@ -47,6 +49,7 @@ export const audioFeatures: AudioFeatures = [
   timeFeature,
   sourceFeature,
   bufferFeature,
+  textCuesFeature,
   errorFeature,
   metadataFeature,
 ];
@@ -70,6 +73,7 @@ export const liveVideoFeatures: LiveVideoFeatures = [
   remotePlaybackFeature,
   controlsFeature,
   textTrackFeature,
+  textCuesFeature,
   errorFeature,
   liveFeature,
   metadataFeature,
@@ -85,6 +89,7 @@ export const liveAudioFeatures: LiveAudioFeatures = [
   timeFeature,
   sourceFeature,
   bufferFeature,
+  textCuesFeature,
   errorFeature,
   liveFeature,
   metadataFeature,

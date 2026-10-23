@@ -14,6 +14,7 @@ import { qualityFeature } from './features/quality';
 import { remotePlaybackFeature } from './features/remote-playback';
 import { sourceFeature } from './features/source';
 import { streamTypeFeature } from './features/stream-type';
+import { textCuesFeature } from './features/text-cues';
 import { textTrackFeature } from './features/text-track';
 import { timeFeature } from './features/time';
 import { volumeFeature } from './features/volume';
@@ -49,6 +50,12 @@ export const selectRemotePlayback = createSelector(remotePlaybackFeature);
 export const selectSource = createSelector(sourceFeature);
 /** Select the stream type state (`streamType`: `'on-demand' | 'live' | 'unknown'`). */
 export const selectStreamType = createSelector(streamTypeFeature);
+/**
+ * Select the text cues state (textCues, watchTextCues).
+ *
+ * @internal
+ */
+export const selectTextCues = createSelector(textCuesFeature);
 /**
  * Select the text track state (textTrackList, subtitlesShowing, toggleSubtitles, selectSubtitlesTrack, chaptersCues,
  * thumbnailsTrack).

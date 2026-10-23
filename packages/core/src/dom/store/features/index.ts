@@ -15,6 +15,7 @@ export * from './quality';
 export * from './remote-playback';
 export * from './source';
 export * from './stream-type';
+export * from './text-cues';
 export * from './text-track';
 export * from './time';
 export * from './volume';
