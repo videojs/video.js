@@ -1,8 +1,8 @@
 import { LazyMediaElement } from '../lazy-media';
-import { audio } from './audio';
-import { hlsAudio } from './hls-audio';
-import { muxAudio } from './mux-audio';
-import { spotifyAudio } from './spotify-audio';
+import { audio } from '../lazy/audio';
+import { hlsAudio } from '../lazy/hls-audio';
+import { muxAudio } from '../lazy/mux-audio';
+import { spotifyAudio } from '../lazy/spotify-audio';
 
 /**
  * Plays audio from any supported source by rendering the media element for it, and loads only that element's code once

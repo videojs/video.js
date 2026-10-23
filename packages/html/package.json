@@ -123,15 +123,10 @@
       "development": "./dist/dev/define/feature/*.js",
       "default": "./dist/default/define/feature/*.js"
     },
-    "./media/lazy-video/*": {
-      "types": "./dist/dev/media/lazy-video/*.d.ts",
-      "development": "./dist/dev/media/lazy-video/*.js",
-      "default": "./dist/default/media/lazy-video/*.js"
-    },
-    "./media/lazy-audio/*": {
-      "types": "./dist/dev/media/lazy-audio/*.d.ts",
-      "development": "./dist/dev/media/lazy-audio/*.js",
-      "default": "./dist/default/media/lazy-audio/*.js"
+    "./media/lazy/*": {
+      "types": "./dist/dev/media/lazy/*.d.ts",
+      "development": "./dist/dev/media/lazy/*.js",
+      "default": "./dist/default/media/lazy/*.js"
     },
     "./media/mux-video": {
       "types": "./dist/dev/define/media/mux-video/index.d.ts",

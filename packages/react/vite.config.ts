@@ -40,7 +40,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   entry: [
     'src/**/index.{ts,tsx}',
     'src/media/*/{hls-js,spf}.tsx',
-    'src/media/lazy-{video,audio}/*.ts',
+    'src/media/lazy{,-video,-audio}/*.ts',
     i18nLocaleEntries,
     i18nTextEntries,
   ],

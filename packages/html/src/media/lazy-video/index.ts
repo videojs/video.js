@@ -1,15 +1,15 @@
 import { LazyMediaElement } from '../lazy-media';
-import { cloudflareVideo } from './cloudflare-video';
-import { dashVideo } from './dash-video';
-import { hlsjsVideo } from './hlsjs-video';
-import { muxVideo } from './mux-video';
-import { nativeHlsVideo } from './native-hls-video';
-import { tiktokVideo } from './tiktok-video';
-import { twitchVideo } from './twitch-video';
-import { video } from './video';
-import { vimeoVideo } from './vimeo-video';
-import { wistiaVideo } from './wistia-video';
-import { youtubeVideo } from './youtube-video';
+import { cloudflareVideo } from '../lazy/cloudflare-video';
+import { dashVideo } from '../lazy/dash-video';
+import { hlsjsVideo } from '../lazy/hlsjs-video';
+import { muxVideo } from '../lazy/mux-video';
+import { nativeHlsVideo } from '../lazy/native-hls-video';
+import { tiktokVideo } from '../lazy/tiktok-video';
+import { twitchVideo } from '../lazy/twitch-video';
+import { video } from '../lazy/video';
+import { vimeoVideo } from '../lazy/vimeo-video';
+import { wistiaVideo } from '../lazy/wistia-video';
+import { youtubeVideo } from '../lazy/youtube-video';
 
 /**
  * Plays a video from any supported source by rendering the media element for it, and loads only that element's code
