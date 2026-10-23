@@ -76,8 +76,8 @@ export type LoadStep = (frame: Frame, signal: AbortSignal, deps: StepDeps) => vo
  * The uniform passthrough handed to every {@link LoadStep} on every call — the composition triple, nothing more.
  * `state`/`context` are the full composition signal maps; `config` is the threaded config with the loader's own wiring
  * folded in (see {@link stepWiring} + `createSegmentLoaderActor`). All three are typed loose: the loader is a conduit
- * and never reads them; a step asserts the slots it knows are present (composition steps read `state`; base steps read
- * the folded wiring off `config`).
+ * and never reads them; a step asserts the signals it knows are present (composition steps read `state`; base steps
+ * read the folded wiring off `config`).
  */
 export interface StepDeps {
   state: AnySlotMap;

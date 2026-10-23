@@ -1,48 +1,36 @@
-/**
- * **Resolve an unresolved presentation by fetching and parsing its manifest.**
- *
- * Reads `state.presentation`; when it holds `{ url }` (unresolved) and the preload / load-activation gate is met,
- * fetches the manifest, parses it via the **required** `config.parsePresentation`, and writes the resolved
- * `Presentation` back to the same slot. The behavior is format-neutral: the composing engine wires in its parser (e.g.
- * the HLS engine supplies the multivariant-playlist parser).
- *
- * Source-identity-driven, expressed as a 4-state machine:
- *
- *     'preconditions-unmet' → 'idle' → 'resolving' → 'resolved'
- *
- * - `'preconditions-unmet'`: no presentation, or presentation has no URL.
- * - `'idle'`: URL present, unresolved, gate unmet (blocking preload + no load-activation). Waits for the gate to open.
- * - `'resolving'`: URL present, unresolved, gate met. A presentation-tracking effect starts the fetch and returns the
- *   AbortController — the reactor calls `.abort()` on presentation replacement or state exit, so source change /
- *   gate-close / destroy all cancel cleanly. Late results commit only while the input presentation is still current.
- * - `'resolved'`: `state.presentation` holds a resolved `Presentation`.
- *
- * Gate semantics: `state.preload` (or `config.defaultPreload`, default `'metadata'`, when state.preload is unset)
- * blocks resolution when its value is `'none'` (see `isBlockingPreload` in `media/utils/preload`).
- * `state.loadActivated` is an override — true bypasses the preload gate entirely.
- *
- * Multi-writer with the engine adapter, which writes the initial unresolved `{ url }` to `state.presentation` from src
- * input. Different domains (config-input vs. derived state via fetch) — legitimate multi-writer.
- */
 import { defineBehavior } from '../../core/composition/define-behavior';
 import type { Reactor } from '../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
 import { isResolvedPresentation, type MaybeResolvedPresentation, type Presentation } from '../../media/types';
 import { DEFAULT_PRELOAD, isBlockingPreload, type StandardPreload } from '../../media/utils/preload';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
+import { credentialsFetch, type RequestCredentialsConfig } from '../../network/credentials-fetch';
 import { fetchResolvable as defaultFetchResolvable, getResponseText } from '../../network/fetch';
 
 export interface PresentationState {
+  /**
+   * The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates
+   * the rest.
+   */
   presentation?: MaybeResolvedPresentation;
+  /**
+   * The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute
+   * (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest
+   * resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode
+   * from it.
+   */
   preload?: 'auto' | 'metadata' | 'none' | undefined;
   /** True once a preload-overriding event has fired for the current source — enables resolution regardless of preload. */
   loadActivated?: boolean;
 }
 
+/**
+ * Parses a manifest body into a resolved `Presentation`. Receives the presentation as the caller wrote it, at least `{
+ * url }`, so the parser can resolve references against it and keep what the caller supplied.
+ */
 export type ParsePresentation = (text: string, presentation: MaybeResolvedPresentation) => Presentation;
 
-export interface ResolvePresentationConfig {
+export interface ResolvePresentationConfig extends RequestCredentialsConfig {
   /**
    * Parses a manifest body into a resolved `Presentation`. **Required** — the behavior is format-neutral and the
    * composing engine supplies its own parser (HLS, DASH, etc.).
@@ -53,10 +41,13 @@ export interface ResolvePresentationConfig {
    * `'metadata'`, matching `syncPreload`'s own `defaultPreload`.
    */
   defaultPreload?: StandardPreload;
-  /** The `credentials` mode the manifest request is made with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
 }
 
+/**
+ * The resolver's phase, derived from state: `'preconditions-unmet'` until `presentation.url` is set; `'idle'` while the
+ * preload hint holds resolution back and nothing has activated loading; `'resolving'` while the manifest is fetched and
+ * parsed; `'resolved'` once `presentation` carries the parsed result.
+ */
 export type ResolvePresentationState = 'preconditions-unmet' | 'idle' | 'resolving' | 'resolved';
 
 function deriveState(
@@ -120,7 +111,7 @@ function resolvePresentationSetup({
             .catch((error) => {
               if (error instanceof Error && error.name === 'AbortError') return;
 
-              // TODO(error-management): route to a state-error slot once one exists.
+              // TODO(error-management): route to a state-error key once one exists.
               console.error('[resolvePresentation] manifest fetch/parse failed:', error);
             });
 
@@ -132,6 +123,32 @@ function resolvePresentationSetup({
   });
 }
 
+/**
+ * **Resolve an unresolved presentation by fetching and parsing its manifest.**
+ *
+ * Reads `state.presentation`; when it holds `{ url }` (unresolved) and the preload / load-activation gate is met,
+ * fetches the manifest, parses it via the **required** `config.parsePresentation`, and writes the resolved
+ * `Presentation` back to the same signal. The behavior is format-neutral: the composing engine wires in its parser
+ * (e.g. the HLS engine supplies the multivariant-playlist parser).
+ *
+ * Source-identity-driven, expressed as a 4-state machine:
+ *
+ *     'preconditions-unmet' → 'idle' → 'resolving' → 'resolved'
+ *
+ * - `'preconditions-unmet'`: no presentation, or presentation has no URL.
+ * - `'idle'`: URL present, unresolved, gate unmet (blocking preload + no load-activation). Waits for the gate to open.
+ * - `'resolving'`: URL present, unresolved, gate met. A presentation-tracking effect starts the fetch and returns the
+ *   AbortController — the reactor calls `.abort()` on presentation replacement or state exit, so source change /
+ *   gate-close / destroy all cancel cleanly. Late results commit only while the input presentation is still current.
+ * - `'resolved'`: `state.presentation` holds a resolved `Presentation`.
+ *
+ * Gate semantics: `state.preload` (or `config.defaultPreload`, default `'metadata'`, when state.preload is unset)
+ * blocks resolution when its value is `'none'` (see `isBlockingPreload` in `media/utils/preload`).
+ * `state.loadActivated` is an override — true bypasses the preload gate entirely.
+ *
+ * Multi-writer with the engine adapter, which writes the initial unresolved `{ url }` to `state.presentation` from src
+ * input. Different domains (config-input vs. derived state via fetch) — legitimate multi-writer.
+ */
 export const resolvePresentation = defineBehavior({
   stateKeys: ['presentation', 'preload', 'loadActivated'],
   contextKeys: [],

@@ -84,8 +84,7 @@ export const defaultConfig = composed.defaultConfig;
 export const initialState = composed.initialState;
 
 /**
- * Create an audio-only HLS playback engine.
- *
+ * Create an audio-only HLS playback engine: the video engine without its video and subtitle behaviors, chapters kept.
  * Subtractive composition variant of the HLS video engine (`./hls-video`): omits video-side behaviors
  * (`resolveVideoTrack`, `switchVideoTrack`, `setupVideoBufferActors`, `loadVideoSegments`) and subtitle behaviors
  * (`switchTextTrack`, `resolveTextTrack`, `syncTextTracks`, `setupTextTrackActors`, `loadTextTrackSegments`). Chapters

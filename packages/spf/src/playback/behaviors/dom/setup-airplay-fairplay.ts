@@ -1,51 +1,3 @@
-/**
- * **Serve an AirPlay receiver's FairPlay key requests.** During an AirPlay session WebKit takes playback off MSE and
- * onto the native-HLS fallback `<source>` `setupAirPlay` appends, and the receiver raises its own key requests through
- * the sender's CDM as `skd`. The MediaKeys `setupMediaKeys` negotiated are configured for `sinf`/`cenc` and cannot
- * serve those, so it yields the element for the session's duration (an observed `loadingSuspended` is
- * `preconditions-unmet` there) and this behavior negotiates a second time, for `skd`, in the gap it leaves.
- *
- * The handoff is needed regardless of any browser bug: it is the init-data type, not a workaround, that the MSE
- * negotiation cannot satisfy.
- *
- * Negotiation is driven by the receiver's first request rather than by the session starting. A session on a FairPlay
- * source does not by itself mean the receiver needs anything from this CDM, and the shipped native path
- * (`adapters/native-hls-video/src/drm.ts`) resolves its key system the same lazy way. Every request awaits the one
- * negotiation, so the certificate is always applied before any `generateRequest` — the same ordering `setupMediaKeys`
- * carries across its publish, here carried by the promise.
- *
- * Deliberately **not** a writer of `context.mediaKeys`. That slot is `setupMediaKeys`' handoff to `exchangeLicenses`,
- * and publishing receiver MediaKeys into it would wake `exchangeLicenses` to license an MSE pipeline that is not
- * playing. These MediaKeys stay behavior-local, and a cleared `context.mediaKeys` is instead read as the gate proving
- * `setupMediaKeys` has finished yielding.
- *
- * Nothing here dedupes. `listenForEncryptedInitData`'s byte-identity skip is right for MSE, where demuxed audio and
- * video fire for the same key, and wrong here: the receiver proxies its own SPC on connect and again on disconnect, so
- * a repeat is a second genuine request and dropping it strands the session.
- *
- * Single-positive-state reactor like `exchangeLicenses`, with one `AbortController` per entry — the state-exit cleanup
- * is the abort, which closes every session, plus a detach of the MediaKeys this behavior attached. The detach is
- * conditional: both this behavior and `setupMediaKeys` react to the same falling edge, so it releases the element only
- * while it still holds it, exactly as the native path does.
- *
- * **EME first, then the legacy key system.** Measured on macOS/Safari 26.6.2 against a real receiver: the CDM grants
- * access for `initDataTypes: ['skd']` and then throws `NotSupportedError` from `generateRequest` — self-inconsistent,
- * and the reason the pre-EME `WebKitMediaKeys` path still exists. That refusal, and only that refusal while the target
- * is wireless, hands the session over to `media/dom/fairplay-legacy.ts`; nothing sniffs an OS, so a fixed WebKit stops
- * taking the path by itself. The handover then reloads the resource, as the shipped native path does.
- *
- * Serving the `webkitneedkey` payload already in hand was tried instead, to avoid the reload — `setupAirPlay` holds the
- * MediaSource rebuild precisely because a `load()` under a live receiver can destroy a session still being established.
- * Measured on macOS/Safari 26.6.2 against a receiver, the legacy CDM refused that session outright:
- * `MEDIA_KEYERR_UNKNOWN`, no OSStatus, no license ever requested. Releasing EME's keys is evidently not enough to leave
- * the element servable by the old API, so the load algorithm has to run again and the payload from before it is not
- * reused. Resource selection re-runs over the `<source>` children, where the native-HLS fallback still sits, so the
- * receiver keeps its stream; playback restarts, which the handoff already was.
- *
- * Droppable. A composition omitting it carries neither `fairPlayAirPlayKeySystem` nor this file nor the legacy module,
- * and — since `loadingSuspended` is observed rather than declared — an engine without `setupAirPlay` never leaves
- * `'preconditions-unmet'` anyway.
- */
 import { listen } from '@videojs/utils/dom';
 
 import { defineBehavior } from '../../../core/composition/define-behavior';
@@ -102,11 +54,10 @@ export interface AirPlayFairPlayState {
 /** Context shape for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayContext {
   mediaElement?: HTMLMediaElement | undefined;
-  /** `setupMediaKeys`' handoff slot, read here only as proof that it has yielded the element. */
+  /** `setupMediaKeys`' handoff signal, read here only as proof that it has yielded the element. */
   mediaKeys?: MediaKeys;
 }
 
-/** Config for the AirPlay FairPlay handoff. */
 export interface AirPlayFairPlayConfig {
   /** License servers keyed by EME key-system id. Semantics on `MediaKeysSetupConfig['drm']`. */
   drm: NegotiableDrmSystemsConfig;
@@ -117,7 +68,7 @@ export interface AirPlayFairPlayConfig {
 // Type aliases, not interfaces: `defineBehavior`'s stateKeys ≡ keyof inference
 // goes through an index-signature constraint only aliases satisfy implicitly.
 // The `errors` reporter seam stays out of the typed slice, as in the other two
-// DRM behaviors. Every slot is read-only — this behavior writes none.
+// DRM behaviors. Every signal is read-only — this behavior writes none.
 type AirPlayFairPlayStateMap = {
   presentation: ReadonlySignal<AirPlayFairPlayState['presentation']>;
 };
@@ -138,7 +89,7 @@ function setupAirPlayFairPlaySetup({
   context: AirPlayFairPlayContextMap;
   config: AirPlayFairPlayConfig;
 }): Reactor<AirPlayFairPlayFsmState | 'destroying' | 'destroyed'> {
-  // Observed, never declared — see `setupMediaKeys` for why the slot lives
+  // Observed, never declared — see `setupMediaKeys` for why the signal lives
   // behind a cast. Absent means no AirPlay bridge is composed, so there is no
   // session to serve and this behavior never activates.
   const loadingSuspended = (state as { loadingSuspended?: ReadonlySignal<boolean | undefined> }).loadingSuspended;
@@ -149,7 +100,7 @@ function setupAirPlayFairPlaySetup({
     if (!context.mediaElement.get() || !loadingSuspended?.get()) return 'preconditions-unmet';
 
     // `setupMediaKeys` yields on the same fact, but not instantly — it has a
-    // task to abort and an element to detach. Waiting for its slot to clear is
+    // task to abort and an element to detach. Waiting for its signal to clear is
     // what keeps two CDMs off one element.
     if (context.mediaKeys.get()) return 'preconditions-unmet';
 
@@ -431,7 +382,7 @@ function setupAirPlayFairPlaySetup({
             // the viewer has to press play again — measured on a receiver.
             //
             // Restored here rather than through `state.startPosition`:
-            // `setupAirPlay` is that slot's only writer and binds it to the
+            // `setupAirPlay` is that signal's only writer and binds it to the
             // session's *falling* edge, so a second writer on the rising edge
             // would be writing over a command it does not own. The reload is
             // this behavior's, so the repair is too.
@@ -529,6 +480,54 @@ function setupAirPlayFairPlaySetup({
   });
 }
 
+/**
+ * **Serve an AirPlay receiver's FairPlay key requests.** During an AirPlay session WebKit takes playback off MSE and
+ * onto the native-HLS fallback `<source>` `setupAirPlay` appends, and the receiver raises its own key requests through
+ * the sender's CDM as `skd`. The MediaKeys `setupMediaKeys` negotiated are configured for `sinf`/`cenc` and cannot
+ * serve those, so it yields the element for the session's duration (an observed `loadingSuspended` is
+ * `preconditions-unmet` there) and this behavior negotiates a second time, for `skd`, in the gap it leaves.
+ *
+ * The handoff is needed regardless of any browser bug: it is the init-data type, not a workaround, that the MSE
+ * negotiation cannot satisfy.
+ *
+ * Negotiation is driven by the receiver's first request rather than by the session starting. A session on a FairPlay
+ * source does not by itself mean the receiver needs anything from this CDM, and the shipped native path
+ * (`adapters/native-hls-video/src/drm.ts`) resolves its key system the same lazy way. Every request awaits the one
+ * negotiation, so the certificate is always applied before any `generateRequest` — the same ordering `setupMediaKeys`
+ * carries across its publish, here carried by the promise.
+ *
+ * Deliberately **not** a writer of `context.mediaKeys`. That signal is `setupMediaKeys`' handoff to `exchangeLicenses`,
+ * and publishing receiver MediaKeys into it would wake `exchangeLicenses` to license an MSE pipeline that is not
+ * playing. These MediaKeys stay behavior-local, and a cleared `context.mediaKeys` is instead read as the gate proving
+ * `setupMediaKeys` has finished yielding.
+ *
+ * Nothing here dedupes. `listenForEncryptedInitData`'s byte-identity skip is right for MSE, where demuxed audio and
+ * video fire for the same key, and wrong here: the receiver proxies its own SPC on connect and again on disconnect, so
+ * a repeat is a second genuine request and dropping it strands the session.
+ *
+ * Single-positive-state reactor like `exchangeLicenses`, with one `AbortController` per entry — the state-exit cleanup
+ * is the abort, which closes every session, plus a detach of the MediaKeys this behavior attached. The detach is
+ * conditional: both this behavior and `setupMediaKeys` react to the same falling edge, so it releases the element only
+ * while it still holds it, exactly as the native path does.
+ *
+ * **EME first, then the legacy key system.** Measured on macOS/Safari 26.6.2 against a real receiver: the CDM grants
+ * access for `initDataTypes: ['skd']` and then throws `NotSupportedError` from `generateRequest` — self-inconsistent,
+ * and the reason the pre-EME `WebKitMediaKeys` path still exists. That refusal, and only that refusal while the target
+ * is wireless, hands the session over to `media/dom/fairplay-legacy.ts`; nothing sniffs an OS, so a fixed WebKit stops
+ * taking the path by itself. The handover then reloads the resource, as the shipped native path does.
+ *
+ * Serving the `webkitneedkey` payload already in hand was tried instead, to avoid the reload — `setupAirPlay` holds the
+ * MediaSource rebuild precisely because a `load()` under a live receiver can destroy a session still being established.
+ * Measured on macOS/Safari 26.6.2 against a receiver, the legacy CDM refused that session outright:
+ * `MEDIA_KEYERR_UNKNOWN`, no OSStatus, no license ever requested. Releasing EME's keys is evidently not enough to leave
+ * the element servable by the old API, so the load algorithm has to run again and the payload from before it is not
+ * reused. Resource selection re-runs over the `<source>` children, where the native-HLS fallback still sits, so the
+ * receiver keeps its stream; playback restarts, which the handoff already was.
+ *
+ * Droppable. A composition omitting it carries neither `fairPlayAirPlayKeySystem` nor this file nor the legacy module,
+ * and — since `loadingSuspended` is observed rather than declared — an engine without `setupAirPlay` never leaves
+ * `'preconditions-unmet'` anyway.
+ */
 export const setupAirPlayFairPlay = defineBehavior({
   stateKeys: ['presentation'],
   contextKeys: ['mediaElement', 'mediaKeys'],

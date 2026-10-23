@@ -219,6 +219,13 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          name: 'scripts',
+          include: ['scripts/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
           name: 'types',
           include: [],
           typecheck: {

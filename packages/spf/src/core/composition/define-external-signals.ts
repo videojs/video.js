@@ -1,3 +1,8 @@
+/**
+ * Declaring the state and context keys the host writes, so they reach a composition's types without a behavior that
+ * sets them.
+ */
+
 import type { Behavior, ContextSignals, Empty, ExhaustiveKeys, StateSignals } from './define-behavior';
 
 /** The keys of `Values` that are not optional. */
