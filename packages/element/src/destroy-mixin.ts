@@ -1,3 +1,5 @@
+import { isKeptAlive } from '@videojs/utils/dom';
+
 import type { ReactiveElement } from './reactive-element';
 import type { ReactiveController } from './types';
 
@@ -7,13 +9,31 @@ export interface Destroyable {
   destroyCallback(): void;
 }
 
+const destroyables = new WeakSet<Element>();
+
+function destroyContents(element: Element): void {
+  if (element.shadowRoot) destroyChildren(element.shadowRoot);
+
+  destroyChildren(element);
+}
+
+function destroyChildren(parent: ParentNode): void {
+  for (const child of Array.from(parent.children)) {
+    // A destroyable child cascades into its own contents.
+    if (destroyables.has(child)) (child as Element & Destroyable).destroy();
+    else destroyContents(child);
+  }
+}
+
 /**
  * Mixin that adds a deferred destruction lifecycle to a `ReactiveElement`.
  *
  * On disconnect, schedules destruction after two animation frames. If the element reconnects before the frames fire
  * (e.g. DOM shuffling, framework reconciliation), the `isConnected` check prevents destruction.
  *
- * The `keep-alive` attribute prevents automatic destruction entirely — call `destroy()` manually when done.
+ * The `keep-alive` attribute on the element or any composed ancestor, including a shadow host, prevents automatic
+ * destruction entirely — call `destroy()` manually when done. Destroying an element also destroys the destroyable
+ * elements inside it, including those in shadow roots, so one `destroy()` on the kept-alive root releases the tree.
  *
  * Subclasses override `destroyCallback()` (calling `super.destroyCallback()`) to release heavy resources like stores or
  * imperative APIs.
@@ -27,6 +47,11 @@ export function DestroyMixin<Base extends new (...args: any[]) => ReactiveElemen
     #destroyed = false;
     #trackedControllers = new Set<ReactiveController>();
 
+    constructor(...args: any[]) {
+      super(...args);
+      destroyables.add(this);
+    }
+
     get destroyed(): boolean {
       return this.#destroyed;
     }
@@ -35,6 +60,9 @@ export function DestroyMixin<Base extends new (...args: any[]) => ReactiveElemen
       if (this.#destroyed) return;
 
       this.#destroyed = true;
+
+      // Descendants first, so they release resources before this element tears down what they depend on (e.g. a store).
+      destroyContents(this);
       this.destroyCallback();
     }
 
@@ -63,7 +91,7 @@ export function DestroyMixin<Base extends new (...args: any[]) => ReactiveElemen
     disconnectedCallback(): void {
       super.disconnectedCallback();
 
-      if (!this.#destroyed && !this.hasAttribute('keep-alive')) {
+      if (!this.#destroyed && !isKeptAlive(this)) {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             if (!this.isConnected) this.destroy();

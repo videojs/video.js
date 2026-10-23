@@ -94,7 +94,7 @@ The preset also exports a `usePlayer` hook typed to `backgroundFeatures`. Use it
 
 | Attribute | Property | Description |
 | --- | --- | --- |
-| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+| `keep-alive` | — | Keeps the player, its store, and the Video.js elements inside it alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
 
 The bundle has no feature that takes player inputs, so the element has no player-input attributes such as `content-title` or `poster`; `keep-alive` is the only attribute it reads. Its read-only `store` property returns its player store.
 

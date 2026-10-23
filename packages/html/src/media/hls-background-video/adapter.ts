@@ -1,6 +1,6 @@
 import type { Media } from '@videojs/media/dom';
 import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/adapters/hls-background-video';
-import { namedNodeMapToObject } from '@videojs/utils/dom';
+import { isKeptAlive, namedNodeMapToObject } from '@videojs/utils/dom';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 import { getTemplateHTML } from '../background-video/template';
@@ -106,7 +106,7 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
   override disconnectedCallback(): void {
     super.disconnectedCallback?.();
 
-    if (this.hasAttribute('keep-alive')) return;
+    if (isKeptAlive(this)) return;
 
     // Deferred so a synchronous reparent (remove then insert) doesn't tear down
     // the engine, matching `CustomMediaElement`.

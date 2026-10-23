@@ -310,7 +310,7 @@ Remove `controls` yourself: Video.js doesn't turn native controls off when a ski
 | `live-edge-tolerance`, `min-live-dvr-window` | No equivalent ([#1730](https://github.com/videojs/v10/issues/1730)) |
 | `artist`, `artwork` | No equivalent; Video.js doesn't set Media Session metadata ([#3042](https://github.com/videojs/v10/issues/3042)) |
 | `log-level` | No equivalent ([#1406](https://github.com/videojs/v10/issues/1406)); development builds print warnings |
-| `keep-alive` | `keep-alive` on each element you move. See [Element lifecycle](#element-lifecycle) |
+| `keep-alive` | `keep-alive` on the player. See [Element lifecycle](#element-lifecycle) |
 </FrameworkCase>
 
 Vidstack queued `paused`, `volume`, and the other playback props until the media could play. Video.js doesn't queue: most actions fail until the player has attached to its media, `seek()` included, which only waits for metadata once attached. Call them from event handlers.
@@ -1365,7 +1365,7 @@ In Angular, add `CUSTOM_ELEMENTS_SCHEMA` to the `schemas` of the component that 
 
 ## Element lifecycle
 
-Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js keeps the attribute but doesn't pass it down: set it on each element you plan to move. When you're done with them, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media components. Packaged skins don't pass it to their controls either ([#3036](https://github.com/videojs/v10/issues/3036)), so move a player that uses one synchronously. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
+Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js works the same way: `keep-alive` on the player covers every element inside it, including a packaged skin's controls. When you're done, call `destroy()` on the player, which also destroys the UI elements inside it, and `adapter.destroy()` on media components. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
 
 </FrameworkCase>
 
