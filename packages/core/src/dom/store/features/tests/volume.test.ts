@@ -1,11 +1,26 @@
 import { createStore } from '@videojs/store';
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
 import { volumeFeature } from '../volume';
 
+/** Shaped like an embed adapter: takes any level, with no native element the player can reach. */
+class TestEmbed extends EventTarget {
+  volume = 1;
+  muted = false;
+}
+
+/** Makes media elements ignore `volume` writes, as iOS Safari does. */
+function lockVolume() {
+  vi.spyOn(HTMLMediaElement.prototype, 'volume', 'set').mockImplementation(() => {});
+}
+
 describe('volumeFeature', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('attach', () => {
     it('syncs volume state on attach', () => {
       const video = createMockVideo({
@@ -28,6 +43,29 @@ describe('volumeFeature', () => {
       store.attach({ media: video, container: null });
 
       expect(store.state.volumeAvailability).toBe('available');
+      expect(store.state.mutedAvailability).toBe('available');
+    });
+
+    it('reports volume unsupported on a native video where the browser locks volume', () => {
+      lockVolume();
+
+      const store = createStore<PlayerTarget>()(volumeFeature);
+
+      store.attach({ media: createMockVideo({}), container: null });
+
+      expect(store.state.volumeAvailability).toBe('unsupported');
+      expect(store.state.mutedAvailability).toBe('available');
+    });
+
+    it('reports volume unsupported on an embed where the browser locks volume', () => {
+      // The embed's setter takes a level, but its player plays through a media element in the iframe.
+      lockVolume();
+
+      const store = createStore<PlayerTarget>()(volumeFeature);
+
+      store.attach({ media: new TestEmbed() as unknown as HTMLVideoElement, container: null });
+
+      expect(store.state.volumeAvailability).toBe('unsupported');
       expect(store.state.mutedAvailability).toBe('available');
     });
 
@@ -133,6 +171,20 @@ describe('volumeFeature', () => {
         expect(video.volume).toBe(0.7);
         expect(video.muted).toBe(false);
         expect(store.state.muted).toBe(false);
+      });
+
+      it('leaves an embed level alone, but still unmutes, where the browser locks volume', () => {
+        lockVolume();
+
+        const embed = Object.assign(new TestEmbed(), { muted: true });
+        const store = createStore<PlayerTarget>()(volumeFeature);
+
+        store.attach({ media: embed as unknown as HTMLVideoElement, container: null });
+
+        expect(store.setVolume(0.5)).toBe(1);
+        expect(embed.volume).toBe(1);
+        expect(embed.muted).toBe(false);
+        expect(store.state.volume).toBe(1);
       });
 
       it('does not unmute when setting volume to 0', async () => {
