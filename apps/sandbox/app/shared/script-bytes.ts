@@ -1,9 +1,9 @@
-/** JavaScript the page has downloaded so far, from Resource Timing. */
+/** JavaScript the page has loaded so far. */
 export interface ScriptBytes {
-  /** Bytes over the network, compressed. A cached file counts as 0. */
-  transferred: number;
-  /** Bytes after decompression. */
-  decoded: number;
+  /** Gzipped size, measured in the page so caching and the host's compression don't change it. */
+  gzip: number;
+  /** Size as served, before compression. */
+  raw: number;
   files: number;
 }
 
@@ -16,34 +16,61 @@ function isScript(entry: PerformanceResourceTiming): boolean {
   return entry.initiatorType === 'script' || SCRIPT_PATH.test(new URL(entry.name).pathname);
 }
 
+// Resource Timing can't size a file the browser revalidated (a 304 reports 0 body bytes), so each script is fetched
+// again, from the cache, and gzipped here.
+async function measure(url: string): Promise<{ gzip: number; raw: number } | null> {
+  try {
+    const response = await fetch(url, { cache: 'force-cache' });
+    if (!response.ok) return null;
+
+    const body = await response.arrayBuffer();
+    const gzipped = await new Response(
+      new Blob([body]).stream().pipeThrough(new CompressionStream('gzip'))
+    ).arrayBuffer();
+
+    return { gzip: gzipped.byteLength, raw: body.byteLength };
+  } catch {
+    // Cross-origin scripts without CORS can't be read.
+    return null;
+  }
+}
+
 /**
- * Calls `onChange` with the JavaScript downloaded so far, and again each time more loads. Cross-origin scripts served
- * without `Timing-Allow-Origin` count as 0 bytes, and scripts inside embed iframes aren't seen at all.
+ * Calls `onChange` with the JavaScript loaded so far, and again each time more loads. Scripts inside embed iframes
+ * aren't seen, and cross-origin scripts served without CORS aren't counted.
  */
 export function observeScriptBytes(onChange: (bytes: ScriptBytes) => void): () => void {
-  const bytes: ScriptBytes = { transferred: 0, decoded: 0, files: 0 };
+  const bytes: ScriptBytes = { gzip: 0, raw: 0, files: 0 };
+  const seen = new Set<string>();
+  let active = true;
 
   // A dev server serves every module as its own file, more than the default 250-entry buffer holds.
   performance.setResourceTimingBufferSize(5000);
 
   const observer = new PerformanceObserver((list) => {
     // SAFETY: the observer only observes `resource` entries.
-    const scripts = (list.getEntries() as PerformanceResourceTiming[]).filter(isScript);
-    if (!scripts.length) return;
+    for (const entry of list.getEntries() as PerformanceResourceTiming[]) {
+      if (!isScript(entry) || seen.has(entry.name)) continue;
 
-    for (const entry of scripts) {
-      bytes.transferred += entry.transferSize;
-      bytes.decoded += entry.decodedBodySize;
-      bytes.files++;
+      seen.add(entry.name);
+      void measure(entry.name).then((size) => {
+        if (!active || !size) return;
+
+        bytes.gzip += size.gzip;
+        bytes.raw += size.raw;
+        bytes.files++;
+        onChange({ ...bytes });
+      });
     }
-
-    onChange({ ...bytes });
   });
 
   observer.observe({ type: 'resource', buffered: true });
   onChange({ ...bytes });
 
-  return () => observer.disconnect();
+  return () => {
+    active = false;
+    observer.disconnect();
+  };
 }
 
 export function formatKilobytes(bytes: number): string {
@@ -52,9 +79,9 @@ export function formatKilobytes(bytes: number): string {
 
 /** A one-line summary, with what loaded since `since` when given. */
 export function describeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes): string {
-  const total = `${formatKilobytes(bytes.transferred)} transferred, ${formatKilobytes(bytes.decoded)} decoded, ${bytes.files} files`;
+  const total = `${formatKilobytes(bytes.gzip)} gzip (${formatKilobytes(bytes.raw)} minified), ${bytes.files} files`;
 
   if (!since) return total;
 
-  return `${total} (+${formatKilobytes(bytes.transferred - since.transferred)} since the last source change)`;
+  return `${total} (+${formatKilobytes(bytes.gzip - since.gzip)} gzip since the last source change)`;
 }
