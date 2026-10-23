@@ -8,8 +8,18 @@
  * audio rendition. Which variant's segment is actually fetched is the loader pipeline's call, made per segment against
  * the selected video track so the bytes are shared with the video fetch.
  */
-import type { MaybeResolvedPresentation, PartiallyResolvedVideoTrack, Presentation, VideoTrack } from '../types';
+import { generateId } from '@videojs/utils/string';
+
+import type {
+  AudioSelectionSet,
+  MaybeResolvedPresentation,
+  PartiallyResolvedAudioTrack,
+  PartiallyResolvedVideoTrack,
+  Presentation,
+  VideoTrack,
+} from '../types';
 import { getTracksByType } from '../utils/tracks';
+import { parseCodecs } from './parse-attributes';
 
 type AnyVideoTrack = PartiallyResolvedVideoTrack | VideoTrack;
 
@@ -47,6 +57,49 @@ export function resolveCarriedAudioRenditions(presentation: Presentation): Prese
   });
 
   return changed ? ({ ...presentation, selectionSets } as Presentation) : presentation;
+}
+
+/**
+ * Give a presentation that declares no audio, but whose variants carry it muxed in, one default audio track carried by
+ * the lowest-bandwidth such variant. That is Mux's single-audio MPEG-TS shape: no `EXT-X-MEDIA` audio, the audio codec
+ * listed on every variant. A video composition plays that audio from the video SourceBuffer; an audio-only one has no
+ * other track to select. Returns the input when it declares audio or no variant carries any.
+ */
+export function addMuxedAudioRendition(presentation: Presentation): Presentation {
+  if (getTracksByType(presentation, 'audio').length > 0) return presentation;
+
+  const carriers = (getTracksByType(presentation, 'video') as AnyVideoTrack[]).flatMap((track) => {
+    const audioCodec = track.audioGroupIds ? undefined : parseCodecs(track.codecs?.join(',') ?? '').audio;
+
+    return audioCodec ? [{ track, audioCodec }] : [];
+  });
+  const carrier = carriers.reduce<(typeof carriers)[number] | undefined>(
+    (lowest, candidate) => (!lowest || candidate.track.bandwidth < lowest.track.bandwidth ? candidate : lowest),
+    undefined
+  );
+  if (!carrier) return presentation;
+
+  const track: PartiallyResolvedAudioTrack = {
+    type: 'audio',
+    id: generateId(),
+    url: carrier.track.url,
+    bandwidth: carrier.track.bandwidth,
+    mimeType: 'audio/mp4',
+    codecs: [carrier.audioCodec],
+    groupId: 'default',
+    name: 'Default',
+    sampleRate: 48000,
+    channels: 2,
+    default: true,
+    autoselect: true,
+  };
+  const audioSelectionSet: AudioSelectionSet = {
+    id: generateId(),
+    type: 'audio',
+    switchingSets: [{ id: generateId(), type: 'audio', tracks: [track] }],
+  };
+
+  return { ...presentation, selectionSets: [...presentation.selectionSets, audioSelectionSet] } as Presentation;
 }
 
 /** Whether an audio track's media is carried in video segments: it shares a playlist URL with a video track. */

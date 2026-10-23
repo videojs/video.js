@@ -197,6 +197,33 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await engine.destroy();
   }, 90_000);
 
+  it('plays the muxed audio of a single-audio TS video asset through the audio engine', async () => {
+    const audio = document.createElement('audio');
+
+    media = audio;
+    audio.muted = true;
+    document.body.append(audio);
+
+    const engine = createTransmuxingAudioEngine();
+    const { state } = engine;
+
+    engine.context.mediaElement.set(audio);
+    state.preload.set('auto');
+    state.presentation.set({ url: MUX_TS_URL } as MaybeResolvedPresentation);
+
+    await vi.waitFor(() => expect(audio.buffered.length).toBeGreaterThan(0), { timeout: 20_000, interval: 250 });
+    expect(audio.buffered.start(0)).toBeLessThan(0.1);
+    await vi.waitFor(() => expect(audio.readyState).toBeGreaterThanOrEqual(HTMLMediaElement.HAVE_FUTURE_DATA), {
+      timeout: 10_000,
+      interval: 250,
+    });
+    expect(audio.buffered.end(0)).toBeGreaterThan(4);
+    expect(state.mediaContainerData.get()?.audio).toMatchObject({ timescale: 48000 });
+    expect(state.errors.get() ?? []).toEqual([]);
+
+    await engine.destroy();
+  }, 60_000);
+
   it('plays an audio-only TS asset through the audio engine with the audio-only feature', async () => {
     const audio = document.createElement('audio');
 

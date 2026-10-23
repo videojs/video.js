@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { isCarriedAudioTrack, resolveCarriedAudioRenditions } from '../carried-audio';
+import { addMuxedAudioRendition, isCarriedAudioTrack, resolveCarriedAudioRenditions } from '../carried-audio';
 import { parseMultivariantPlaylist } from '../parse-multivariant';
 
 const baseUrl = 'https://example.com/master.m3u8';
@@ -41,6 +41,47 @@ describe('resolveCarriedAudioRenditions', () => {
     const parsed = parseMultivariantPlaylist(text, { url: baseUrl });
 
     expect(resolveCarriedAudioRenditions(parsed)).toBe(parsed);
+  });
+});
+
+// Mux's single-audio TS shape: every variant carries the audio muxed in, and no rendition declares it.
+const muxSingleAudioTs = `#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=2493700,CODECS="mp4a.40.2,avc1.640020",RESOLUTION=1280x720
+720p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=595100,CODECS="mp4a.40.2,avc1.64001e",RESOLUTION=480x270
+270p.m3u8`;
+
+describe('addMuxedAudioRendition', () => {
+  it('adds one default audio track carried by the lowest-bandwidth muxed variant', () => {
+    const presentation = addMuxedAudioRendition(parseMultivariantPlaylist(muxSingleAudioTs, { url: baseUrl }));
+    const audio = presentation.selectionSets.filter((set) => set.type === 'audio');
+
+    expect(audio).toHaveLength(1);
+    expect(audio[0]!.switchingSets[0]!.tracks).toEqual([
+      expect.objectContaining({
+        type: 'audio',
+        url: 'https://example.com/270p.m3u8',
+        codecs: ['mp4a.40.2'],
+        default: true,
+        autoselect: true,
+      }),
+    ]);
+    expect(isCarriedAudioTrack(presentation, audio[0]!.switchingSets[0]!.tracks[0]!)).toBe(true);
+  });
+
+  it('leaves a presentation that already declares audio alone', () => {
+    const parsed = parseMultivariantPlaylist(muxMultiAudioTs, { url: baseUrl });
+
+    expect(addMuxedAudioRendition(parsed)).toBe(parsed);
+  });
+
+  it('leaves a presentation whose variants carry no audio alone', () => {
+    const text = `#EXTM3U
+#EXT-X-STREAM-INF:BANDWIDTH=595100,CODECS="avc1.64001e"
+270p.m3u8`;
+    const parsed = parseMultivariantPlaylist(text, { url: baseUrl });
+
+    expect(addMuxedAudioRendition(parsed)).toBe(parsed);
   });
 });
 

@@ -59,8 +59,8 @@ late taker goes to the HTTP cache). Only the video fetch samples bandwidth; Mux 
 `Timing-Allow-Origin`, so Resource Timing can't detect a cache hit, hence the share rather than the cache.
 Verified: 6 segment requests / 0 duplicates at startup; default→es→commentary→default switches clean with
 the audio SourceBuffer's range within 20 ms of the video's. Sizes: mux-video/spf +0.57 kB, mux-audio/spf
-+0.43 kB brotli. Residual: the share is a module-level singleton keyed by URL; the audio-only engine still
-can't play a *single-audio* video asset's audio (no audio rendition exists to carry).
++0.43 kB brotli. Residual: the share is a module-level singleton keyed by URL. (The audio-only engine now
+plays a *single-audio* video asset's audio through an added rendition carried by the lowest variant.)
 
 ## Mux background video — landed 2026-10-20
 

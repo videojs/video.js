@@ -7,7 +7,7 @@ import type {
 } from '../../core/composition/define-behavior';
 import { defineFeature } from '../../core/composition/define-feature';
 import { canPlayTransmuxedTrack } from '../../media/dom/capabilities';
-import { resolveCarriedAudioRenditions } from '../../media/hls/carried-audio';
+import { addMuxedAudioRendition, resolveCarriedAudioRenditions } from '../../media/hls/carried-audio';
 import { parseMultivariantPlaylist } from '../../media/hls/parse-multivariant';
 import { aacCodec } from '../../media/mpeg-ts/codecs/aac';
 import { transmuxedSourceBufferMimeCodec } from '../../media/mpeg-ts/transmuxed-track';
@@ -37,9 +37,12 @@ type ConfigReaders = readonly [
   typeof resolveAudioTrack,
 ];
 
-/** The HLS parser, with audio renditions carried in the video segments resolved to their carrier variants. */
+/**
+ * The HLS parser, with audio carried in the video segments resolved to a carrier variant: each URI-less rendition, or,
+ * when no rendition declares the audio at all, one added for it.
+ */
 const parsePresentation: ParsePresentation = (text, presentation) =>
-  resolveCarriedAudioRenditions(parseMultivariantPlaylist(text, presentation));
+  addMuxedAudioRendition(resolveCarriedAudioRenditions(parseMultivariantPlaylist(text, presentation)));
 
 /** The config defaults the feature contributes. */
 export const defaultConfig = {
@@ -57,9 +60,9 @@ export const defaultConfig = {
 export const initialState = {} satisfies Partial<State>;
 
 /**
- * The audio-only counterpart of `mpegTsTransmuxFeature`: plays MPEG-TS audio renditions (an audio-only `.ts` asset, or
- * the audio-only TS alternates of a video asset, or a video asset's default audio carried in its video segments) by
- * transmuxing their AAC to fMP4, with no video codec compiled in. The `hls-audio-mpeg-ts` engine composes it; a
+ * The audio-only counterpart of `mpegTsTransmuxFeature`: plays MPEG-TS audio renditions (an audio-only `.ts` asset, the
+ * audio-only TS alternates of a video asset, or a video asset's audio carried in its video segments, declared or not)
+ * by transmuxing their AAC to fMP4, with no video codec compiled in. The `hls-audio-mpeg-ts` engine composes it; a
  * composition with video takes `mpegTsTransmuxFeature`. Same placement rules and the same narrow scope, AAC only.
  */
 export const mpegTsAudioTransmuxFeature = defineFeature({ behaviors, defaultConfig, initialState });
