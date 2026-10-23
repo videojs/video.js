@@ -33,7 +33,7 @@ const lazyVideo = root.querySelector('lazy-video')!;
 const resolved = root.querySelector('#resolved')!;
 const scriptBytesOutput = root.querySelector('#script-bytes')!;
 
-let scriptBytes: ScriptBytes = { transferred: 0, decoded: 0, files: 0 };
+let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0 };
 let sourceChangedAt: ScriptBytes | undefined;
 
 function renderScriptBytes() {
