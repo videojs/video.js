@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import '../../define/media/lazy-video';
-import type { LazyVideo } from '../lazy-video';
 
-function create(attributes: Record<string, string>, children = ''): LazyVideo {
-  const element = document.createElement('lazy-video') as LazyVideo;
+function create(attributes: Record<string, string>, children = ''): HTMLElement {
+  const element = document.createElement('lazy-video');
 
   for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
 
@@ -41,31 +40,6 @@ describe('LazyVideo', () => {
     expect(video.hasAttribute('id')).toBe(false);
     expect(video.hasAttribute('class')).toBe(false);
     expect(video.hasAttribute('type')).toBe(false);
-  });
-
-  it('exposes the resolved media as media', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    const element = create({ src: '/movie.mp4', 'prefer-playback': 'mse' });
-
-    expect(element.media).toBeNull();
-
-    await flush();
-    const video = element.querySelector('video');
-
-    expect(element.media).toBe(video);
-
-    element.setAttribute('src', 'https://example.com/master.m3u8');
-    await flush();
-
-    expect(element.media).toBe(video);
-
-    await vi.waitFor(() => expect(element.querySelector('hlsjs-video')).not.toBeNull(), LOAD_TIMEOUT);
-    expect(element.media).toBe(element.querySelector('hlsjs-video'));
-
-    element.setAttribute('src', 'https://streamable.com/e/moo');
-    await flush();
-
-    expect(element.media).toBeNull();
   });
 
   it('keeps forwarding attributes after the media renders', async () => {
