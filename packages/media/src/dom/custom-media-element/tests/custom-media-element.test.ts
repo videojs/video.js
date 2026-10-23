@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { HTMLAudioAdapter } from '../../html-audio-adapter';
 import { HTMLVideoAdapter } from '../../html-video-adapter';
+import { createTextTrack } from '../../text-track';
 import { CustomMediaElement } from '../index';
 
 afterEach(() => {
@@ -616,6 +617,46 @@ describe('CustomMediaElement', () => {
       for (const method of ['attach', 'detach', 'destroy']) {
         expect(method in el).toBe(false);
       }
+    });
+  });
+
+  describe('text tracks', () => {
+    const trackDescriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+    beforeEach(() => {
+      const tracks = new WeakMap<HTMLTrackElement, { mode: string }>();
+
+      // Jsdom doesn't link a `<track>` element to a `TextTrack`, so give each element one.
+      Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+        configurable: true,
+        get(this: HTMLTrackElement) {
+          if (!tracks.has(this)) tracks.set(this, { mode: 'disabled' });
+
+          return tracks.get(this);
+        },
+      });
+    });
+
+    afterEach(() => {
+      if (trackDescriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', trackDescriptor);
+      else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+    });
+
+    it('keeps a created track through child syncs and removes it through the element', () => {
+      const el = create(defineVideoElement());
+      const video = el.shadowRoot!.querySelector('video')!;
+      const { track } = createTextTrack(el, { kind: 'metadata', label: 'Ads' })!;
+      const authored = document.createElement('track');
+
+      authored.kind = 'captions';
+      el.appendChild(authored);
+      el.shadowRoot!.querySelector('slot:not([name])')!.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      expect(Array.from(video.querySelectorAll('track'), ({ kind }) => kind).sort()).toEqual(['captions', 'metadata']);
+
+      el.removeTextTrack(track);
+
+      expect(Array.from(video.querySelectorAll('track'), ({ kind }) => kind)).toEqual(['captions']);
     });
   });
 
