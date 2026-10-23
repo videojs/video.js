@@ -29,10 +29,14 @@ async function loadChunkPackages(): Promise<ChunkPackages | null> {
 // Excludes media requests: HLS segments end in `.ts` too, but they're fetched, not imported.
 const SCRIPT_PATH = /\.(?:[cm]?js|jsx|tsx?)$/;
 
+// Only the page's own scripts: what an embed's service serves, in its iframe or as an SDK in the page, is measured
+// separately (`embed-payloads.json`), since cross-origin frames keep their requests private.
 function isScript(entry: PerformanceResourceTiming): boolean {
   if (entry.initiatorType === 'fetch' || entry.initiatorType === 'xmlhttprequest') return false;
 
-  return entry.initiatorType === 'script' || SCRIPT_PATH.test(new URL(entry.name).pathname);
+  const url = new URL(entry.name);
+
+  return url.origin === location.origin && (entry.initiatorType === 'script' || SCRIPT_PATH.test(url.pathname));
 }
 
 // Resource Timing can't size a file the browser revalidated (a 304 reports 0 body bytes), so each script is fetched
@@ -109,7 +113,15 @@ export function formatKilobytes(bytes: number): string {
   return `${(bytes / 1000).toFixed(1)} kB`;
 }
 
-export type ScriptGroupId = 'videojs' | 'dependencies' | 'react' | 'sandbox';
+export type ScriptGroupId = 'videojs' | 'dependencies' | 'react' | 'sandbox' | 'embed';
+
+/** What an embed downloads from its service, measured outside the page. */
+export interface EmbedPayload {
+  label: string;
+  /** Bytes as transferred, including headers. */
+  scripts: number;
+  total: number;
+}
 
 export interface ScriptGroup {
   id: ScriptGroupId;
@@ -124,6 +136,7 @@ const SCRIPT_GROUP_LABELS = {
   dependencies: 'Engines and dependencies',
   react: 'React',
   sandbox: 'Sandbox',
+  embed: 'Embed, from its service',
 } satisfies Record<ScriptGroupId, string>;
 
 const REACT_PACKAGES: ReadonlySet<string> = new Set([
@@ -142,8 +155,11 @@ function groupOf(name: string): ScriptGroupId {
   return REACT_PACKAGES.has(name) ? 'react' : 'dependencies';
 }
 
-/** The JavaScript loaded, grouped by where it comes from. Empty without per-package sizes. */
-export function groupScriptBytes(bytes: ScriptBytes): ScriptGroup[] {
+/**
+ * The JavaScript loaded, grouped by where it comes from, plus the embed's measured payload when given. Empty without
+ * per-package sizes.
+ */
+export function groupScriptBytes(bytes: ScriptBytes, embed?: EmbedPayload): ScriptGroup[] {
   const groups = new Map<ScriptGroupId, ScriptGroup>();
 
   for (const id of ['videojs', 'dependencies', 'react', 'sandbox'] as const) {
@@ -157,9 +173,23 @@ export function groupScriptBytes(bytes: ScriptBytes): ScriptGroup[] {
     group.packages.push({ name, gzip });
   }
 
-  return [...groups.values()]
+  const sorted = [...groups.values()]
     .filter((group) => group.gzip > 0)
     .map((group) => ({ ...group, packages: group.packages.sort((a, b) => b.gzip - a.gzip) }));
+  if (!sorted.length || !embed) return sorted;
+
+  return [
+    ...sorted,
+    {
+      id: 'embed',
+      label: SCRIPT_GROUP_LABELS.embed,
+      gzip: embed.total,
+      packages: [
+        { name: `${embed.label} scripts`, gzip: embed.scripts },
+        { name: 'HTML, styles, images, and fonts', gzip: embed.total - embed.scripts },
+      ],
+    },
+  ];
 }
 
 /** Video.js packages and the engines and dependencies they load: what a page using Video.js pays for. */
@@ -173,16 +203,17 @@ function videojsBytes(bytes: ScriptBytes): number {
  * The JavaScript loaded, formatted for display, with what loaded since `since` when given. With per-package sizes the
  * headline counts only Video.js and the engines and dependencies it loads; without them, everything.
  */
-export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes) {
+export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes, embed?: EmbedPayload) {
   const grouped = Object.keys(bytes.packages).length > 0;
   const headline = grouped ? videojsBytes(bytes) : bytes.gzip;
   const sinceHeadline = since && (grouped ? videojsBytes(since) : since.gzip);
+  const pageTotal = `${formatKilobytes(bytes.gzip)} total on the page`;
 
   return {
     label: grouped ? 'Video.js loaded' : 'JavaScript loaded',
     total: formatKilobytes(headline),
     detail: grouped
-      ? `gzip · with engines · ${formatKilobytes(bytes.gzip)} total on the page`
+      ? `gzip · with engines · ${embed ? `${pageTotal}, plus ${formatKilobytes(embed.total)} from the embed` : pageTotal}`
       : `gzip · ${formatKilobytes(bytes.raw)} minified · ${bytes.files} files`,
     sinceChange: sinceHeadline === undefined ? null : `+${formatKilobytes(headline - sinceHeadline)}`,
   };
