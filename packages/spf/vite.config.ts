@@ -5,6 +5,15 @@ import { playwright } from 'vite-plus/test/browser-playwright';
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 
+// Browser-mode projects run chromium by default. SPF_TEST_WEBKIT=1 adds a webkit instance and SPF_TEST_FIREFOX=1 a
+// firefox one. Webkit here is Playwright WebKit, not Safari. A factory rather than a shared array: vitest derives
+// nested-project names from the instance objects, so one array reused across projects collides.
+const browserInstances = () => [
+  { browser: 'chromium' as const },
+  ...(process.env.SPF_TEST_WEBKIT ? [{ browser: 'webkit' as const }] : []),
+  ...(process.env.SPF_TEST_FIREFOX ? [{ browser: 'firefox' as const }] : []),
+];
+
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'neutral'),
   entry: {
@@ -176,7 +185,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },
@@ -197,7 +206,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },
@@ -220,7 +229,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },
