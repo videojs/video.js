@@ -32,7 +32,7 @@ export function supportsPopoverAPI(): boolean {
 export function nativeHlsSupport(): 'preferred' | 'supported' | 'unsupported' {
   if (typeof document === 'undefined' || typeof navigator === 'undefined') return 'unsupported';
 
-  if (document.createElement('video').canPlayType('application/vnd.apple.mpegurl') === '') return 'unsupported';
+  if (!document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) return 'unsupported';
 
   if (!supportsMediaSource()) return 'preferred';
 

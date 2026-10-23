@@ -99,6 +99,8 @@ describe('resolveAdapterType', () => {
     ['a Mixcloud profile', 'https://www.mixcloud.com/spartacus/'],
     ['a Mixcloud playlist', 'https://www.mixcloud.com/spartacus/playlists/cinematic/'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
+    ['a service domain in the path', 'https://example.com/fast.wistia.net/embed/iframe/e4a27b971d'],
+    ['a lookalike host', 'https://youtube.com.example.com/watch?v=aqz-KE-bpKQ'],
   ])('returns null for %s', (_, src) => {
     expect(resolveAdapterType(src)).toBe(null);
   });
@@ -127,6 +129,9 @@ describe('resolveMimeType', () => {
     ['a URL without an extension', 'https://example.com/manifest'],
     ['an extension only in the query string', 'https://example.com/play?file=video.mp4'],
     ['an unknown file type', 'https://example.com/file.bin'],
+    ['an extension in a directory name', 'https://example.com/videos.mp4/manifest'],
+    ['an extension named like an object property', 'https://example.com/file.constructor'],
+    ['an extension named __proto__', 'https://example.com/file.__proto__'],
   ])('returns null for %s', (_, src) => {
     expect(resolveMimeType(src)).toBe(null);
   });
