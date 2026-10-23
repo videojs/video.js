@@ -1,4 +1,4 @@
-import type { VideoHTMLAttributes } from 'react';
+import type { AudioHTMLAttributes, VideoHTMLAttributes } from 'react';
 
 import { createLazyMedia, type LazyMediaDefinition, type LazyMediaProps } from '../lazy-media';
 
@@ -21,4 +21,22 @@ export interface LazyVideoProps
  */
 export function createLazyVideo(medias: readonly LazyMediaDefinition[]) {
   return createLazyMedia<HTMLVideoElement | HTMLIFrameElement, LazyVideoProps>('LazyVideo', medias);
+}
+
+/** @experimental */
+export interface LazyAudioProps
+  extends Omit<AudioHTMLAttributes<HTMLAudioElement>, keyof LazyMediaProps>, LazyMediaProps {}
+
+/**
+ * Create a `LazyAudio` that renders the first of `medias` to play its source, and loads only that media's code. Put
+ * custom media first to take sources from the built-in ones, and leave out the built-ins you don't need, so their
+ * packages don't have to be installed.
+ *
+ * Call it at module level: creating one during render would remount the media on every render.
+ *
+ * @param medias - The media to choose from, tried in order.
+ * @experimental
+ */
+export function createLazyAudio(medias: readonly LazyMediaDefinition[]) {
+  return createLazyMedia<HTMLAudioElement | HTMLIFrameElement, LazyAudioProps>('LazyAudio', medias);
 }

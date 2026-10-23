@@ -8,8 +8,8 @@ apis:
   - LazyAudioProps
   - createLazyAudio
   - createLazyAudioElement
-  - '@videojs/react/media/lazy-audio/*'
-  - '@videojs/html/media/lazy-audio/*'
+  - '@videojs/react/media/lazy/*'
+  - '@videojs/html/media/lazy/*'
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
@@ -67,24 +67,24 @@ A source that matches none of these, including YouTube, Vimeo, and DASH, renders
 ## Custom media
 
 <FrameworkCase frameworks={["react"]}>
-`createLazyAudio` builds a `LazyAudio` from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideo`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/react/media/lazy-audio/` plus its kebab-case name.
+`createLazyAudio` builds a `LazyAudio` from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideo`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/react/media/lazy/` plus its kebab-case name.
 
 ```tsx
-import { audio } from '@videojs/react/media/lazy-audio/audio';
-import { createLazyAudio } from '@videojs/react/media/lazy-audio/create';
-import { muxAudio } from '@videojs/react/media/lazy-audio/mux-audio';
+import { audio } from '@videojs/react/media/lazy/audio';
+import { createLazyAudio } from '@videojs/react/media/lazy/create';
+import { muxAudio } from '@videojs/react/media/lazy/mux-audio';
 
 const MuxLazyAudio = createLazyAudio([audio, muxAudio]);
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`createLazyAudioElement` builds a `<lazy-audio>` class from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideoElement`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/html/media/lazy-audio/` plus its kebab-case name.
+`createLazyAudioElement` builds a `<lazy-audio>` class from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideoElement`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/html/media/lazy/` plus its kebab-case name.
 
 ```ts
-import { audio } from '@videojs/html/media/lazy-audio/audio';
-import { createLazyAudioElement } from '@videojs/html/media/lazy-audio/create';
-import { muxAudio } from '@videojs/html/media/lazy-audio/mux-audio';
+import { audio } from '@videojs/html/media/lazy/audio';
+import { createLazyAudioElement } from '@videojs/html/media/lazy/create';
+import { muxAudio } from '@videojs/html/media/lazy/mux-audio';
 
 customElements.define('mux-lazy-audio', createLazyAudioElement([audio, muxAudio]));
 ```

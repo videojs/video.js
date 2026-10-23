@@ -63,7 +63,7 @@ const i18nLocaleEntries = Object.fromEntries([
 // Each lazy media definition is its own entry, so importing one doesn't make a bundler resolve the packages the others
 // load.
 const lazyMediaEntries = Object.fromEntries(
-  globSync('src/media/lazy-{video,audio}/*.ts', { cwd: packageDir }).map((file) => {
+  globSync('src/media/lazy{,-video,-audio}/*.ts', { cwd: packageDir }).map((file) => {
     const key = file.replace('src/', '').replace('.ts', '');
 
     return [key, file];
