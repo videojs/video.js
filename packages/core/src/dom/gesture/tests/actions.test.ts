@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { collectUnhandledRejections } from '../../tests/test-helpers';
 import type { GestureActionContext } from '../actions';
-import { resolveGestureAction } from '../actions';
+import { prepareGestureAction, resolveGestureAction } from '../actions';
 
 describe('resolveGestureAction', () => {
   it.each([
@@ -48,6 +48,26 @@ describe('resolveGestureAction', () => {
     resolver!(ctx({}));
     expect(spy).toHaveBeenCalledWith('[vjs-gesture] Unknown action: "nonexistent"');
     spy.mockRestore();
+  });
+});
+
+describe('prepareGestureAction', () => {
+  it('toggles playback from the state the tap found, not what the click started since', () => {
+    const play = vi.fn(async () => {});
+    const pause = vi.fn();
+    const context = ctx({ paused: true, play, pause });
+
+    prepareGestureAction('togglePaused')!(context);
+    // The browser starts playback on the click, before the deferred tap fires.
+    (context.store.state as Record<string, unknown>).paused = false;
+    resolveGestureAction('togglePaused')!(context);
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(pause).not.toHaveBeenCalled();
+  });
+
+  it('has no step for actions that read state when they fire', () => {
+    expect(prepareGestureAction('toggleFullscreen')).toBeUndefined();
   });
 });
 

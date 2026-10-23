@@ -3,6 +3,7 @@ import { isFunction } from '@videojs/utils/predicate';
 import type { GestureActionName } from '../../core/ui/gesture/core';
 import { ignoreRejection, MEDIA_INPUT_ACTION_OVERRIDES } from '../media-actions';
 import type { AnyPlayerStore } from '../player';
+import { selectPlayback } from '../store/selectors';
 
 export type { GestureActionName } from '../../core/ui/gesture/core';
 
@@ -16,9 +17,37 @@ export interface GestureActionContext {
 /** @internal */
 export type GestureActionResolver = (context: GestureActionContext) => void;
 
+// Whether each tap found the media paused. A tap fires a doubletap window after the click, and the click can start
+// playback by itself: Safari resumes an autoplay it held back on any user gesture. Toggling from the later state would
+// pause what the user meant to play.
+const pausedOnTap = new WeakMap<PointerEvent, boolean>();
+
+function isPlaybackPaused(store: AnyPlayerStore): boolean | undefined {
+  const playback = selectPlayback(store.state);
+
+  // A pending autoplay counts as playing, as it does for the play button.
+  return playback && playback.paused && !playback.autoplaying;
+}
+
+/** Actions that read state on the tap's pointer-up, before the tap fires. */
+const GESTURE_ACTION_PREPARERS: Partial<Record<GestureActionName, GestureActionResolver>> = {
+  togglePaused({ store, event }) {
+    const paused = isPlaybackPaused(store);
+
+    if (paused !== undefined) pausedOnTap.set(event, paused);
+  },
+};
+
 /** Actions that need custom logic beyond `store.state[action]()`. */
 const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionResolver>> = {
-  togglePaused: MEDIA_INPUT_ACTION_OVERRIDES.togglePaused,
+  togglePaused({ store, event }) {
+    const playback = selectPlayback(store.state);
+    if (!playback) return;
+
+    const paused = pausedOnTap.get(event) ?? isPlaybackPaused(store);
+
+    ignoreRejection(paused ? playback.play() : playback.pause());
+  },
 
   toggleMuted: MEDIA_INPUT_ACTION_OVERRIDES.toggleMuted,
 
@@ -34,6 +63,15 @@ const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionR
 
   speedDown: MEDIA_INPUT_ACTION_OVERRIDES.speedDown,
 };
+
+/**
+ * The step an action takes on the tap's pointer-up, if any. Pass it as the gesture's `onPointerUp`.
+ *
+ * @internal
+ */
+export function prepareGestureAction(name: GestureActionName | (string & {})): GestureActionResolver | undefined {
+  return GESTURE_ACTION_PREPARERS[name as GestureActionName];
+}
 
 /** @internal */
 export function resolveGestureAction(name: GestureActionName | (string & {})): GestureActionResolver | undefined {
