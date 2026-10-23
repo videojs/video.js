@@ -79,6 +79,11 @@
       "development": "./dist/dev/media/mux-audio/spf.js",
       "default": "./dist/default/media/mux-audio/spf.js"
     },
+    "./media/lazy/*": {
+      "types": "./dist/dev/media/lazy/*.d.ts",
+      "development": "./dist/dev/media/lazy/*.js",
+      "default": "./dist/default/media/lazy/*.js"
+    },
     "./media/*": {
       "types": "./dist/dev/media/*/index.d.ts",
       "development": "./dist/dev/media/*/index.js",

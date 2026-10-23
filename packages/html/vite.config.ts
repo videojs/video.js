@@ -60,6 +60,16 @@ const i18nLocaleEntries = Object.fromEntries([
   ...localeTags.map((tag) => [`i18n/locales/${tag}/register`, `src/i18n/locales/${tag}/register.ts`]),
 ]);
 
+// Each lazy media definition is its own entry, so importing one doesn't make a bundler resolve the packages the others
+// load.
+const lazyMediaEntries = Object.fromEntries(
+  globSync('src/media/lazy{,-video,-audio}/*.ts', { cwd: packageDir }).map((file) => {
+    const key = file.replace('src/', '').replace('.ts', '');
+
+    return [key, file];
+  })
+);
+
 const i18nTextEntries = Object.fromEntries(
   globSync('src/i18n/text/*.ts', { cwd: packageDir }).map((file) => {
     const key = file.replace('src/', '').replace('.ts', '');
@@ -79,6 +89,7 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     ...iconEntries,
     ...defineEntries,
     ...presetEntries,
+    ...lazyMediaEntries,
   },
   treeshake: {
     // The sideEffects field in package.json uses dist paths, but the build

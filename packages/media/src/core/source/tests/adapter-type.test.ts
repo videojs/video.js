@@ -23,14 +23,9 @@ describe('resolveAdapterType', () => {
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
     ['https://www.twitch.tv/monstercat', 'twitch'],
+    ['https://streamable.com/e/moo?playerjs', 'playerjs'],
+    ['https://embed.example.com/e/moo?autoplay=1&playerjs=1', 'playerjs'],
   ])('resolves the service URL %s to %s', (src, expected) => {
-    expect(resolveAdapterType(src)).toBe(expected);
-  });
-
-  it.each<[string, AdapterType]>([
-    ['youtube/aqz-KE-bpKQ', 'youtube'],
-    ['vimeo/76979871', 'vimeo'],
-  ])('resolves the %s shorthand', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
 
@@ -67,6 +62,11 @@ describe('resolveAdapterType', () => {
     expect(resolveAdapterType('https://example.com/manifest', 'audio/mpegurl; charset=utf-8')).toBe('hls');
   });
 
+  it('prefers a player.js marker over the host and the file extension', () => {
+    expect(resolveAdapterType('https://player.vimeo.com/video/76979871?playerjs')).toBe('playerjs');
+    expect(resolveAdapterType('https://embed.example.com/player.mp4?playerjs')).toBe('playerjs');
+  });
+
   it('prefers the service adapter type over the MIME type', () => {
     expect(
       resolveAdapterType(
@@ -86,14 +86,19 @@ describe('resolveAdapterType', () => {
     ['a bare Vimeo id', '76979871'],
     ['a bare Wistia id', 'e4a27b971d'],
     ['a bare Mux playback id', 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
-    ['a malformed shorthand', 'youtube/not-an-id'],
+    ['a youtube/<id> path', 'youtube/aqz-KE-bpKQ'],
+    ['a vimeo/<id> path', 'vimeo/76979871'],
     ['a Mux player page', 'https://player.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
+    ['a player.js embed without the marker', 'https://streamable.com/e/moo'],
+    ['a player.js marker in the hash', 'https://streamable.com/e/moo#playerjs'],
     ['an unknown file type', 'https://example.com/file.bin'],
     ['a YouTube page without a video', 'https://www.youtube.com/'],
     ['a Vimeo page without a video', 'https://vimeo.com/'],
     ['a TikTok short link', 'https://vm.tiktok.com/ZMabc123/'],
     ['a Twitch clip', 'https://clips.twitch.tv/SomeClipSlug'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
+    ['a service domain in the path', 'https://example.com/fast.wistia.net/embed/iframe/e4a27b971d'],
+    ['a lookalike host', 'https://youtube.com.example.com/watch?v=aqz-KE-bpKQ'],
   ])('returns null for %s', (_, src) => {
     expect(resolveAdapterType(src)).toBe(null);
   });
@@ -122,6 +127,9 @@ describe('resolveMimeType', () => {
     ['a URL without an extension', 'https://example.com/manifest'],
     ['an extension only in the query string', 'https://example.com/play?file=video.mp4'],
     ['an unknown file type', 'https://example.com/file.bin'],
+    ['an extension in a directory name', 'https://example.com/videos.mp4/manifest'],
+    ['an extension named like an object property', 'https://example.com/file.constructor'],
+    ['an extension named __proto__', 'https://example.com/file.__proto__'],
   ])('returns null for %s', (_, src) => {
     expect(resolveMimeType(src)).toBe(null);
   });

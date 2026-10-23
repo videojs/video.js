@@ -165,6 +165,11 @@ describe('buildPlayerJsIframeSrc', () => {
     expect(buildPlayerJsIframeSrc(EMBED_SRC, { autoplay: true, loop: true, controls: false })).toBe(EMBED_SRC);
   });
 
+  it('removes the playerjs marker and keeps the rest of the URL', () => {
+    expect(buildPlayerJsIframeSrc(`${EMBED_SRC}?playerjs&start=10`)).toBe(`${EMBED_SRC}?start=10`);
+    expect(buildPlayerJsIframeSrc(`${EMBED_SRC}?playerjs=1`)).toBe(EMBED_SRC);
+  });
+
   it('returns empty for a source that is not an embed URL', () => {
     expect(buildPlayerJsIframeSrc('abc123')).toBe('');
   });

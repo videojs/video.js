@@ -123,6 +123,11 @@
       "development": "./dist/dev/define/feature/*.js",
       "default": "./dist/default/define/feature/*.js"
     },
+    "./media/lazy/*": {
+      "types": "./dist/dev/media/lazy/*.d.ts",
+      "development": "./dist/dev/media/lazy/*.js",
+      "default": "./dist/default/media/lazy/*.js"
+    },
     "./media/mux-video": {
       "types": "./dist/dev/define/media/mux-video/index.d.ts",
       "development": "./dist/dev/define/media/mux-video/index.js",
