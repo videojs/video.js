@@ -3,8 +3,7 @@ import '@app/styles.css';
 // http://localhost:5173/lazy-video-react/
 //
 // Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
-// Light mode (`?light`) shows a poster and a play button, and loads nothing until play is pressed.
-import '@videojs/react/video/skin.css';
+// Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
@@ -25,9 +24,7 @@ import {
   summarizeScriptBytes,
 } from '@app/shared/script-bytes';
 import type { Media } from '@videojs/media';
-import { LazyVideo } from '@videojs/react/media/lazy-video';
-import { usePlayer, VideoPlayer, VideoSkin } from '@videojs/react/video';
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 // A native `<video>` plays itself; anything else is the adapter driving the rendered element.
@@ -35,9 +32,21 @@ function describeMedia(media: Media): string {
   return media instanceof HTMLElement ? `<${media.localName}>` : media.constructor.name;
 }
 
+// The player, skin, and `LazyVideo` are one chunk: loaded at once outside light mode, and on play in light mode.
+const loadPlayer = () => import('./player');
+const LazyPlayer = lazy(loadPlayer);
+
 function LightFacade({ poster, onPlay }: { poster: string | undefined; onPlay: () => void }) {
   return (
-    <button type="button" className={c.facade} aria-label="Play video" onClick={onPlay}>
+    <button
+      type="button"
+      className={c.facade}
+      aria-label="Play video"
+      // Start fetching the player when play looks likely, so less of it loads after the click.
+      onPointerEnter={loadPlayer}
+      onFocus={loadPlayer}
+      onClick={onPlay}
+    >
       {poster && <img className={c.facadeImage} src={poster} alt="" />}
       <span className={c.facadePlay}>
         <svg className={c.facadeIcon} viewBox="0 0 24 24" aria-hidden="true">
@@ -46,17 +55,6 @@ function LightFacade({ poster, onPlay }: { poster: string | undefined; onPlay: (
       </span>
     </button>
   );
-}
-
-// Inside the player, so it can read whether playback started.
-function StartedReporter({ onStarted }: { onStarted: () => void }) {
-  const started = usePlayer((state) => state.started);
-
-  useEffect(() => {
-    if (started) onStarted();
-  }, [started, onStarted]);
-
-  return null;
 }
 
 const SHOWN_PACKAGES = 6;
@@ -154,20 +152,14 @@ function App() {
       {showFacade ? (
         <LightFacade poster={poster} onPlay={() => startLight(performance.now())} />
       ) : (
-        <VideoPlayer poster={poster}>
-          <VideoSkin className="sandbox-video-frame">
-            {/* After the click in light mode, `preload="auto"`: hls.js doesn't let `autoplay` override `preload="none"`. */}
-            <LazyVideo
-              src={src}
-              mediaRef={onMedia}
-              autoPlay={light}
-              preload={light ? 'auto' : undefined}
-              playsInline
-              crossOrigin=""
-            />
-          </VideoSkin>
-          {light && <StartedReporter onStarted={onStarted} />}
-        </VideoPlayer>
+        // The poster stays up while the player loads.
+        <Suspense
+          fallback={
+            <div className={c.placeholder}>{poster && <img className={c.facadeImage} src={poster} alt="" />}</div>
+          }
+        >
+          <LazyPlayer src={src} poster={poster} light={light} onMedia={onMedia} onStarted={onStarted} />
+        </Suspense>
       )}
       <section className={c.card} aria-label="Source">
         <div className={c.light}>
