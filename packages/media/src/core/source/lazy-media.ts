@@ -63,16 +63,21 @@ export function resolveLazySource(src: string, options: ResolveLazySourceOptions
   const source = src.trim();
   if (!source) return null;
 
+  // `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match
+  // by host or `spotify:` URI, and the media they resolve to checks the id itself.
   const url = parseSourceUrl(source);
+  const service = SPOTIFY_URI.test(source) ? 'spotify' : url && matchServiceHost(url);
+  const mimeType = resolveMimeType(source);
 
   return {
     src: source,
     type: options.type,
     url,
     adapterType:
-      fromService(source, url) ??
+      // A media file on a service host plays as that file; Mux and Cloudflare streams are manifests.
+      (!mimeType || service === 'mux' || service === 'cloudflare' ? service : null) ??
       adapterTypeForMimeType(options.type) ??
-      adapterTypeForMimeType(resolveMimeType(source)),
+      adapterTypeForMimeType(mimeType),
     playback: resolvePlayback(options),
   };
 }
@@ -111,21 +116,7 @@ export function matchAdapterType(...types: AdapterType[]): LazyMediaMatcher['mat
  * @internal
  */
 export function matchHls(playback: 'native' | 'mse'): LazyMediaMatcher['match'] {
-  return (source) => (source.adapterType === 'hls' ? source.playback && source.playback === playback : false);
-}
-
-/**
- * `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match by
- * host or `spotify:` URI, and the media they resolve to checks the id itself. A media file on a service host plays as
- * that file; Mux and Cloudflare are exempt because their streams are manifests.
- */
-function fromService(src: string, url: URL | null): AdapterType | null {
-  if (SPOTIFY_URI.test(src)) return 'spotify';
-
-  const service = url && matchServiceHost(url);
-  if (!service || service === 'mux' || service === 'cloudflare') return service;
-
-  return resolveMimeType(src) ? null : service;
+  return ({ adapterType, playback: path }) => adapterType === 'hls' && path && path === playback;
 }
 
 function resolvePlayback({ preferPlayback, nativeHls }: ResolveLazySourceOptions): LazySource['playback'] {
