@@ -13,6 +13,7 @@ import {
   TEXT_DIRECTIONS,
   type TextDirection,
 } from '@app/constants';
+import { isMediaId, landingSource } from '@app/media';
 import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import type { Platform, Skin, SkinSource, Styling } from '@app/types';
 import type { MediaResolution } from '@videojs/media';
@@ -90,6 +91,16 @@ export function readFlag(name: string): boolean {
 }
 
 /**
+ * The source a page opened without one lands on, as the shell picks it when switching to the page's media: an embed
+ * plays its own provider's pages, not a media file. Pages live at `/<platform>-<media>/`.
+ */
+function pageSource(platform: Platform): SourceId {
+  const media = window.location.pathname.split('/')[1]?.replace(`${platform}-`, '');
+
+  return isMediaId(media) ? landingSource(media, platform, DEFAULT_SOURCE) : DEFAULT_SOURCE;
+}
+
+/**
  * The selections the page URL names, with the shell's defaults for the rest. The platform decides where skins come from
  * when the URL does not say, since only React has a Tailwind registry install.
  */
@@ -98,7 +109,7 @@ export function readSandboxState(platform: Platform): SandboxState {
 
   return {
     skin: parseSkin(params.get('skin')) ?? 'default',
-    source: parseSource(params.get('source')) ?? DEFAULT_SOURCE,
+    source: parseSource(params.get('source')) ?? pageSource(platform),
     styling,
     skins: parseSkinSource(params.get('skins')) ?? defaultSkinSource(platform, styling),
     autoplay: readFlag('autoplay'),
