@@ -256,6 +256,74 @@ function sandboxHeadPlugin(): Plugin {
   };
 }
 
+/**
+ * Writes `chunk-packages.json`: for each JavaScript chunk, how many rendered bytes each package contributes, keyed by
+ * the nearest `package.json` name. The lazy-video pages read it to group the JavaScript they load by package.
+ */
+function chunkPackagesPlugin(): Plugin {
+  const names = new Map<string, string>();
+
+  // Nested `package.json` files that only set `type`, as some `dist/` folders have, don't name a package.
+  function readPackageName(dir: string): string | undefined {
+    const manifest = resolve(dir, 'package.json');
+    if (!existsSync(manifest)) return undefined;
+
+    // SAFETY: npm requires `name` to be a string when present.
+    return (JSON.parse(readFileSync(manifest, 'utf8')) as { name?: string }).name || undefined;
+  }
+
+  function packageOf(id: string): string {
+    if (id.startsWith('\0')) return 'virtual';
+
+    const visited: string[] = [];
+    let dir = dirname(id.split('?', 1)[0]!);
+    let name = names.get(dir);
+
+    while (!name) {
+      visited.push(dir);
+      name = readPackageName(dir);
+
+      const parent = dirname(dir);
+      if (name || parent === dir) break;
+
+      dir = parent;
+      name = names.get(dir);
+    }
+
+    const resolved = name ?? 'unknown';
+
+    for (const path of visited) names.set(path, resolved);
+
+    return resolved;
+  }
+
+  return {
+    name: 'sandbox-chunk-packages',
+    apply: 'build',
+    generateBundle(_, bundle) {
+      const chunks: Record<string, Record<string, number>> = {};
+
+      for (const output of Object.values(bundle)) {
+        if (output.type !== 'chunk') continue;
+
+        const sizes: Record<string, number> = {};
+
+        for (const [id, { renderedLength }] of Object.entries(output.modules)) {
+          if (!renderedLength) continue;
+
+          const name = packageOf(id);
+
+          sizes[name] = (sizes[name] ?? 0) + renderedLength;
+        }
+
+        chunks[output.fileName] = sizes;
+      }
+
+      this.emitFile({ type: 'asset', fileName: 'chunk-packages.json', source: JSON.stringify(chunks) });
+    },
+  };
+}
+
 /** The sandbox config, plus the skins preset's contribution when the workspace overlay supplies one. */
 export function createSandboxConfig(skinsSource?: SkinsSource) {
   return defineConfig({
@@ -340,6 +408,7 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
       react({ jsxImportSource: 'react' }),
       serveAppShell(),
       sandboxHeadPlugin(),
+      chunkPackagesPlugin(),
     ],
     resolve: {
       alias: [
