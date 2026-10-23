@@ -12,7 +12,7 @@
  * local and narrow, so this entry carries no `@videojs/media` dependency either.
  *
  * Html and react expose this as `<mux-background-video>` / `MuxBackgroundVideo` too, over the Mux Media
- * (`@videojs/mux-video/spf/background-video`), which lays the MPEG-TS transmux under the engine config.
+ * (`@videojs/mux-video/spf/background-video`), which builds on `@videojs/spf/adapters/hls-background-video-mpeg-ts`.
  */
 export type {
   CreateEngine,

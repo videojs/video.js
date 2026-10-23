@@ -26,9 +26,9 @@ import { startPositionFeature } from '../features/start-position';
  * The features the MPEG-TS audio-only HLS playback engine composes: the HLS audio engine's, then
  * `mpegTsAudioTransmuxFeature`, which carries the AAC framing alone — no H.264 — and lays in last as it requires.
  *
- * MPEG-TS coverage is what Mux Video packages (one program, H.264 + AAC-LC, unencrypted), not every MPEG-TS a general
- * HLS source might carry; the container-neutral engine keeps refusing MPEG-TS, so a Media over it keeps the
- * unsupported-format verdict for content this one would mis-play.
+ * MPEG-TS support is a deliberately narrow subset, what Mux Video packages (see `mpegTsTransmuxFeature`), not every
+ * MPEG-TS a general HLS source might carry; the container-neutral engine keeps refusing MPEG-TS, so a Media over it
+ * keeps the unsupported-format verdict for content this one would mis-play.
  */
 export const features = [
   initialLoadFeature,

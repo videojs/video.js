@@ -21,9 +21,9 @@ import { shiftTimestampsFeature } from '../features/shift-timestamps';
  * `mpegTsTransmuxFeature`, laid in last as it requires. The background engine composes `shiftTimestampsFeature`, which
  * the transmux needs to place MPEG-TS content, whose timestamps rarely start at zero, onto the playlist timeline.
  *
- * MPEG-TS coverage is what Mux Video packages (one program, H.264 + AAC-LC, unencrypted), not every MPEG-TS a general
- * HLS source might carry; the container-neutral engine keeps refusing MPEG-TS, so a Media over it keeps the
- * unsupported-format verdict for content this one would mis-play.
+ * MPEG-TS support is a deliberately narrow subset, what Mux Video packages (see `mpegTsTransmuxFeature`), not every
+ * MPEG-TS a general HLS source might carry; the container-neutral engine keeps refusing MPEG-TS, so a Media over it
+ * keeps the unsupported-format verdict for content this one would mis-play.
  */
 export const features = [
   hlsLoadingFeature,

@@ -82,10 +82,14 @@ export const initialState = {} satisfies Partial<State>;
  * `deriveStartMediaTime` from the second to place TS content, whose timestamps rarely start at zero, onto the playlist
  * timeline.
  *
- * Scope: one program, H.264 + AAC-LC, unencrypted. A muxed rendition's in-band audio is carried in the video
- * SourceBuffer when the track declares an audio codec. When the audio is demuxed into renditions of its own, the video
- * SourceBuffer drops it and the audio SourceBuffer takes each rendition's AAC — including the default rendition that
- * HLS declares URI-less because it is carried in the video segments: the audio pipeline extracts it from the segments
- * the video pipeline fetches, one request serving both.
+ * Scope is a deliberately narrow subset of MPEG-TS: what Mux Video packages for on-demand playback, which is one
+ * program, H.264 + AAC-LC, unencrypted, with access-unit delimiters, verified in Chromium only. Not covered: MP3, AC-3,
+ * E-AC-3 or HEVC; SAMPLE-AES; ID3 timed metadata; CEA-608 captions; and what live TS needs (a PES split across
+ * segments, PTS rollover, discontinuities). For general MPEG-TS, use `@videojs/hlsjs-video`.
+ *
+ * A muxed rendition's in-band audio is carried in the video SourceBuffer when the track declares an audio codec. When
+ * the audio is demuxed into renditions of its own, the video SourceBuffer drops it and the audio SourceBuffer takes
+ * each rendition's AAC — including the default rendition that HLS declares URI-less because it is carried in the video
+ * segments: the audio pipeline extracts it from the segments the video pipeline fetches, one request serving both.
  */
 export const mpegTsTransmuxFeature = defineFeature({ behaviors, defaultConfig, initialState });
