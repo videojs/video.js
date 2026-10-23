@@ -99,3 +99,12 @@ export * from './ui/volume-slider/core';
 export * from './ui/volume-slider/data';
 export * from './ui/volume-slider/vars';
 export * from './version';
+export * from './text-track/definition';
+export * from './text-track/hls';
+export * from './text-track/read';
+export type {
+  InferSchemaOutput,
+  StandardSchemaV1,
+  StandardSchemaV1Props,
+  StandardSchemaV1Result,
+} from './text-track/schema';
