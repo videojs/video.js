@@ -326,6 +326,11 @@ export interface TextTrackListLike extends EventTargetLike<TextTrackListEvents> 
 export interface MediaTextTrackCapability {
   readonly textTracks: TextTrackListLike;
   addTextTrack(kind: TextTrackKind, label?: string, language?: string): TextTrackLike;
+  /**
+   * Remove a track, where the media can. DOM media remove tracks backed by a `<track>` element; the platform's own
+   * `addTextTrack()` makes tracks that can never be removed. Media whose tracks can't be removed leave this out.
+   */
+  removeTextTrack?(track: TextTrackLike): void;
 }
 
 // ----------------------------------------

@@ -35,6 +35,45 @@ export function findTrackElement(media: EventTarget, track: unknown): HTMLTrackE
   return null;
 }
 
+/**
+ * Add a text track to a media element through a `<track>` child, so removing the element removes the track. A track
+ * from `HTMLMediaElement.addTextTrack()` can never be removed. The track starts `hidden`, like one from
+ * `addTextTrack()`, and comes from `addTextTrack()` instead where the element yields no track.
+ *
+ * Chromium discards cues added to the track before the element settles, which a `<track>` without `src` does by firing
+ * `error` once it leaves `disabled` mode.
+ *
+ * @internal
+ */
+export function addRemovableTextTrack(
+  media: HTMLMediaElement,
+  kind: TextTrackKind,
+  label?: string,
+  language?: string
+): TextTrack {
+  const element = media.ownerDocument.createElement('track');
+
+  element.kind = kind;
+
+  if (label) element.label = label;
+
+  if (language) element.srclang = language;
+
+  media.append(element);
+
+  // Environments without native text tracks, such as jsdom, leave `track` unset.
+  const { track } = element;
+
+  if (!track) {
+    element.remove();
+    return media.addTextTrack(kind, label, language);
+  }
+
+  track.mode = 'hidden';
+
+  return track;
+}
+
 /** @internal */
 export function getTextTrackList<Track extends { kind: string; mode: string }>(
   media: { textTracks?: Iterable<Track> },
