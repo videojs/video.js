@@ -13,6 +13,8 @@ const MUX_TS_URL = 'https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8R
 // Multi-audio: the default English audio is muxed into the video TS and declared as a URI-less
 // `EXT-X-MEDIA`; Spanish / commentary are audio-only TS renditions of their own.
 const MUX_MULTI_AUDIO_TS_URL = 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008.m3u8';
+// Muxed H.264 + AAC with B-frames, 60s in 5s segments: long enough to seek past the initial buffer.
+const MUX_TS_60S_URL = 'https://stream.mux.com/VcmKA6aqzIzlg3MayLJDnbF55kX00mds028Z65QxvBYaA.m3u8';
 // Audio-only TS asset (one `mp4a.40.2` variant, no `EXT-X-MEDIA`).
 const MUX_AUDIO_ONLY_TS_URL = 'https://stream.mux.com/3zd01ukbq5UaSPrfGnZ2eYBcMXuf3Uc5Rc5XINRcHA00g.m3u8';
 
@@ -108,6 +110,60 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
 
     if (audioBytes !== undefined) expect(audioBytes).toBeGreaterThan(0);
 
+    await engine.destroy();
+  }, 60_000);
+
+  it('keeps a stream whose first segment presents on its boundary aligned to the playlist', async () => {
+    // Mux's live streams and their recordings put a segment's first *presented* frame on the playlist boundary, with
+    // B-frames decoding up to two frames earlier. Serving the 60s asset from its third segment reproduces that shape
+    // (the first segment of the on-demand asset decodes on the boundary instead).
+    const multivariant = await (await realFetch(MUX_TS_60S_URL)).text();
+    const renditionUrl = multivariant.split('\n').find((line) => line.startsWith('https://'))!;
+    const rendition = (await (await realFetch(renditionUrl)).text()).split('\n');
+    const firstSegment = rendition.findIndex((line) => line.startsWith('#EXTINF'));
+    const trimmed = [...rendition.slice(0, firstSegment), ...rendition.slice(firstSegment + 4)].join('\n');
+    const playlists = new Map([
+      [
+        MUX_TS_60S_URL,
+        `#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=2000000,CODECS="mp4a.40.2,avc1.640020"\n${renditionUrl}\n`,
+      ],
+      [renditionUrl, trimmed],
+    ]);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
+      const playlist = playlists.get(input instanceof Request ? input.url : String(input));
+
+      return playlist === undefined ? realFetch(input, init) : Promise.resolve(new Response(playlist));
+    });
+
+    const video = document.createElement('video');
+
+    media = video;
+    video.muted = true;
+    document.body.append(video);
+
+    const engine = createTransmuxingVideoEngine();
+    const { state, context } = engine;
+
+    context.mediaElement.set(video);
+    state.preload.set('auto');
+    state.presentation.set({ url: MUX_TS_60S_URL } as MaybeResolvedPresentation);
+
+    await vi.waitFor(() => expect(video.buffered.length).toBeGreaterThan(0), { timeout: 20_000, interval: 250 });
+    void video.play().catch(() => {});
+
+    // A seek onto a boundary past the buffer: the fresh range must start on the boundary, or Chromium waits in the
+    // hole before it. Mux's audio can start up to one AAC frame (~21ms) late, which every browser plays through;
+    // unaligned B-frame video starts two video frames (~67ms) late.
+    const boundary = 30;
+    const audioFrame = 1024 / 48000;
+
+    expect(sourceBuffersCover(context.mediaSource.get(), boundary)).toBe(false);
+    video.currentTime = boundary;
+    await vi.waitFor(() => expect(video.currentTime).toBeGreaterThan(boundary + 1), { timeout: 15_000, interval: 250 });
+    expect(sourceBuffersCover(context.mediaSource.get(), boundary + audioFrame)).toBe(true);
+    expect(state.errors.get() ?? []).toEqual([]);
+
+    fetchSpy.mockRestore();
     await engine.destroy();
   }, 60_000);
 
