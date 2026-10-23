@@ -23,14 +23,8 @@ import {
   type ScriptBytes,
   summarizeScriptBytes,
 } from '@app/shared/script-bytes';
-import type { Media } from '@videojs/media';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-
-// A native `<video>` plays itself; anything else is the adapter driving the rendered element.
-function describeMedia(media: Media): string {
-  return media instanceof HTMLElement ? `<${media.localName}>` : media.constructor.name;
-}
 
 // The player, skin, and `LazyVideo` are one chunk: loaded at once outside light mode, and on play in light mode.
 const loadPlayer = () => import('./player');
@@ -122,7 +116,6 @@ function App() {
 
   useEffect(() => observeScriptBytes(setScriptBytes), []);
 
-  const onMedia = useCallback((media: Media | null) => setResolved(media && describeMedia(media)), []);
   const onStarted = useCallback(() => setStartedAt((at) => at ?? performance.now()), []);
 
   useEffect(() => {
@@ -158,7 +151,7 @@ function App() {
             <div className={c.placeholder}>{poster && <img className={c.facadeImage} src={poster} alt="" />}</div>
           }
         >
-          <LazyPlayer src={src} poster={poster} light={light} onMedia={onMedia} onStarted={onStarted} />
+          <LazyPlayer src={src} poster={poster} light={light} onResolved={setResolved} onStarted={onStarted} />
         </Suspense>
       )}
       <section className={c.card} aria-label="Source">
