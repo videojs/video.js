@@ -118,6 +118,16 @@ describe('withPreservedTextTracks', () => {
     expect(cueIds(trackEl.track)).toEqual(['one']);
   });
 
+  it('restores a disabled track without a src that holds cues written from code', () => {
+    // A `<track>` without `src` settles in the error state.
+    const trackEl = fakeTrackElement({ mode: 'disabled', cues: ['one'], readyState: 3 });
+
+    withPreservedTextTracks(fakeMedia(trackEl), () => trackEl.track.clearCues());
+
+    expect(trackEl.track.mode).toBe('disabled');
+    expect(cueIds(trackEl.track)).toEqual(['one']);
+  });
+
   it('does not touch the mode of a disabled track that never loaded', () => {
     const trackEl = fakeTrackElement({ mode: 'disabled', readyState: 0 });
     const setMode = vi.spyOn(trackEl.track, 'mode', 'set');

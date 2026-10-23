@@ -146,8 +146,22 @@ export const textTrackFeature = definePlayerFeature({
       const textTrackList: MediaTextTrack[] = [];
       let subtitlesShowing = false;
 
+      const appTracks = getAppTextTracks(get());
+      const appTrackIds = new Set(appTracks.map(({ track }) => track.id));
+      // App captions are drawn through copies in the media that share their ids; the app track is listed in its copy's mode.
+      const copyModes = new Map<string, TextTrackLike['mode']>();
+
       for (let i = 0; i < media.textTracks.length; i++) {
         const track = media.textTracks[i]!;
+        const id = getTextTrackId(track, i);
+
+        if (appTrackIds.has(id)) {
+          copyModes.set(id, track.mode);
+
+          if (isCaptionOrSubtitleTrack(track) && track.mode === 'showing') subtitlesShowing = true;
+
+          continue;
+        }
 
         if (!chaptersTrack && track.kind === 'chapters') chaptersTrack = track;
 
@@ -162,9 +176,11 @@ export const textTrackFeature = definePlayerFeature({
         }
       }
 
-      const appTracks = getAppTextTracks(get());
+      for (const { track } of appTracks) {
+        const mode = copyModes.get(track.id);
 
-      for (const { track } of appTracks) textTrackList.push(track);
+        textTrackList.push(mode && mode !== track.mode ? { ...track, mode } : track);
+      }
 
       // The last chapter of an in-stream chapters document is open-ended on the
       // track; consumers read it ending where the media does. Chapters an app

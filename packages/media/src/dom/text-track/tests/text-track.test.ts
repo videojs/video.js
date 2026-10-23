@@ -117,6 +117,14 @@ describe('createTextTrack', () => {
     expect(handle.track.mode).toBe('disabled');
   });
 
+  it('gives the backing track element an id', () => {
+    const video = document.createElement('video');
+
+    createTextTrack(video, { id: 'app-text-track-1', kind: 'captions' });
+
+    expect(video.querySelector('track')!.id).toBe('app-text-track-1');
+  });
+
   it('holds cues until the track element settles', () => {
     const video = document.createElement('video');
     const handle = createTextTrack(video, { kind: 'metadata' })!;

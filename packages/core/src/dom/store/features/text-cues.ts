@@ -1,12 +1,15 @@
 import type {
+  MediaTextCue,
   MediaTextCuesState,
   MediaTextTrack,
   MediaTrackCues,
   TextTrackFilter,
   TextTrackLike,
+  VTTCueLike,
 } from '@videojs/media';
 import { getRegisteredMedia, isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { createTextTrack, type TextTrackHandle } from '@videojs/media/dom';
+import { isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
 import { isAbortError, isUndefined } from '@videojs/utils/predicate';
 
 import { findActiveCues } from '../../../core/text-track/active-cues';
@@ -54,6 +57,9 @@ interface TextCuesSourceState extends MediaTextCuesState, AppTextTracksState {
   /** The media's current source as the feature last saw it, or `null` before one loads. */
   [CURRENT_SRC]: string | null;
 }
+
+/** The modes of app caption copies when the store last detached, so a re-attach can restore them. */
+const savedCopyModes = new WeakMap<AppTextTracksChange, Map<string, TextTrackLike['mode']>>();
 
 interface TrackedTrack {
   track: TextTrackLike;
@@ -225,6 +231,58 @@ export const textCuesFeature = definePlayerFeature({
       }
     };
 
+    // The browser only draws captions and subtitles on tracks the media holds, including in iOS fullscreen where the
+    // player's UI isn't shown, so app captions are copied into the media. A copy takes its app track's id, so the
+    // captions menu selects the app track by showing its copy.
+    const copies = new Map<string, { handle: TextTrackHandle; written: Map<MediaTextCue, VTTCueLike> }>();
+
+    const syncCopies = () => {
+      if (!textTracks) return;
+
+      const records = get()[APP_TEXT_TRACKS].filter(({ track }) => isCaptionOrSubtitleTrack(track));
+      const ids = new Set(records.map(({ track }) => track.id));
+
+      for (const [id, copy] of copies) {
+        if (ids.has(id)) continue;
+
+        copy.handle.remove();
+        copies.delete(id);
+      }
+
+      for (const { track, cues } of records) {
+        let copy = copies.get(track.id);
+
+        if (!copy) {
+          const { id, kind, label, language } = track;
+          // A re-attach recreates copies; one that was showing keeps showing.
+          const mode = savedCopyModes.get(appTracks)?.get(id) ?? 'disabled';
+          const handle = createTextTrack(textTracks, { id, kind, label, language, mode });
+          if (!handle) continue;
+
+          copy = { handle, written: new Map() };
+          copies.set(id, copy);
+        }
+
+        const current = new Set(cues);
+
+        for (const [cue, written] of copy.written) {
+          if (current.has(cue)) continue;
+
+          copy.handle.removeCue(written);
+          copy.written.delete(cue);
+        }
+
+        for (const cue of cues) {
+          if (copy.written.has(cue)) continue;
+
+          const written = { id: cue.id, startTime: cue.startTime, endTime: cue.endTime, text: cue.text };
+
+          copy.handle.addCue(written);
+          copy.written.set(cue, written);
+        }
+      }
+    };
+
     const sync = () => {
       trackCleanup?.abort();
       trackCleanup = new AbortController();
@@ -234,13 +292,15 @@ export const textCuesFeature = definePlayerFeature({
       const duration = isMediaSeekCapable(media) ? media.duration : Number.NaN;
       const time = getTime();
       const textCues: MediaTrackCues[] = [];
+      const appTrackIds = new Set(get()[APP_TEXT_TRACKS].map(({ track }) => track.id));
 
       tracked = [];
 
       for (let i = 0; i < (textTracks?.textTracks.length ?? 0); i++) {
         const track = textTracks!.textTracks[i]!;
         const plain = toMediaTextTrack(track, i);
-        if (!isTracked(plain, filters)) continue;
+        // A copy of an app track is read through the app track.
+        if (appTrackIds.has(plain.id) || !isTracked(plain, filters)) continue;
 
         const prior = previous.get(plain.id);
         const cues = reuseCues(prior?.cues, sortCues(toMediaTextCues(track.cues, { kind: plain.kind, duration })));
@@ -332,6 +392,7 @@ export const textCuesFeature = definePlayerFeature({
     };
 
     syncSource();
+    syncCopies();
     sync();
 
     const trackList = textTracks?.textTracks;
@@ -357,7 +418,10 @@ export const textCuesFeature = definePlayerFeature({
     listen(media, 'seeked', syncActive, { signal });
 
     const unsubscribeFilters = get()[CUE_FILTERS].subscribe(sync);
-    const unsubscribeAppTracks = get()[APP_TEXT_TRACKS_CHANGE].subscribe(sync);
+    const unsubscribeAppTracks = get()[APP_TEXT_TRACKS_CHANGE].subscribe(() => {
+      syncCopies();
+      sync();
+    });
 
     signal.addEventListener(
       'abort',
@@ -365,6 +429,12 @@ export const textCuesFeature = definePlayerFeature({
         unsubscribeFilters();
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        savedCopyModes.set(appTracks, new Map(Array.from(copies, ([id, { handle }]) => [id, handle.track.mode])));
+
+        for (const { handle } of copies.values()) handle.remove();
+
+        copies.clear();
       },
       { once: true }
     );
