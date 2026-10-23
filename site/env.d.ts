@@ -9,5 +9,8 @@ declare namespace App {
     };
 
     accessToken?: string;
+
+    /** Set by the Netlify adapter on deployed requests; absent under `astro dev`. */
+    netlify?: { context: import('./src/mcp/analytics').McpRecordContext };
   }
 }

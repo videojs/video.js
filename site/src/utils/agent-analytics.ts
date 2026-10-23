@@ -12,8 +12,8 @@ import { PRIVATE_INSTALLATION_QUERY_PARAMETERS } from '@videojs/installation';
 import { installationContextForUrl } from './installation/analytics-context.ts';
 import { POSTHOG_PROJECT_KEY } from './posthog-project.ts';
 
-const CAPTURE_URL = 'https://us.i.posthog.com/i/v0/e/';
-const USER_AGENT_LIMIT = 256;
+export const CAPTURE_URL = 'https://us.i.posthog.com/i/v0/e/';
+export const USER_AGENT_LIMIT = 256;
 
 export const MARKDOWN_FETCH_EVENT = 'markdown_fetched';
 
@@ -85,7 +85,8 @@ export interface CaptureBody {
   properties: Record<string, string | number | boolean>;
 }
 
-async function dailyClientId(userAgent: string, country: string, day: string): Promise<string> {
+/** A distinct ID that groups one client's events within a UTC day and links nothing longer. */
+export async function dailyClientId(userAgent: string, country: string, day: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${userAgent}\n${country}\n${day}`));
 
   return [...new Uint8Array(digest)]

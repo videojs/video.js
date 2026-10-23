@@ -84,7 +84,7 @@ export interface Frontmatter {
   apis: string[];
 }
 
-function walkFiles(directory: string, predicate: (path: string) => boolean): string[] {
+export function walkFiles(directory: string, predicate: (path: string) => boolean): string[] {
   if (!existsSync(directory)) return [];
 
   return readdirSync(directory, { withFileTypes: true })
@@ -356,7 +356,7 @@ export interface PublicEntry {
 
 type ExportTarget = string | { types?: string } | null;
 
-function packageDirectories(): string[] {
+export function packageDirectories(): string[] {
   const packagesDirectory = join(monorepoRoot, 'packages');
 
   return readdirSync(packagesDirectory, { withFileTypes: true }).flatMap((entry) => {
@@ -442,7 +442,7 @@ export interface PublicSurface {
 }
 
 /** Bundled declaration files wrap `export * as X` namespaces in synthetic `*_exports` modules. */
-function isSyntheticNamespace(name: string): boolean {
+export function isSyntheticNamespace(name: string): boolean {
   return /_exports(?:\$\d+)?$/.test(name);
 }
 
@@ -613,12 +613,12 @@ function isCheckedDeclaration(fileName: string, root: string): boolean {
   );
 }
 
-function resolveAlias(checker: ts.TypeChecker, symbol: ts.Symbol): ts.Symbol {
+export function resolveAlias(checker: ts.TypeChecker, symbol: ts.Symbol): ts.Symbol {
   return symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
 }
 
 /** A module namespace: a bundled `*_exports` wrapper, or the module an unbundled `export * as X` points at. */
-function isModuleNamespace(symbol: ts.Symbol): boolean {
+export function isModuleNamespace(symbol: ts.Symbol): boolean {
   return isSyntheticNamespace(symbol.name) || (symbol.declarations?.some(ts.isSourceFile) ?? false);
 }
 
