@@ -1013,6 +1013,7 @@ describe('DailymotionAdapter', () => {
       expect(media.readyState).toBe(1);
 
       player.emit('PLAYER_CRITICALPATHREADY');
+      player.emit('VIDEO_PLAY');
       player.emit('VIDEO_PLAYING');
 
       expect(events).toEqual(['canplay', 'playing']);
@@ -1220,6 +1221,55 @@ describe('DailymotionAdapter', () => {
       } finally {
         vi.useRealTimers();
       }
+    });
+
+    it('stays paused when a seek from the start or end screen starts playback, as a media element does', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+      const events: string[] = [];
+
+      for (const type of ['play', 'playing', 'seeked']) media.addEventListener(type, () => events.push(type));
+
+      media.currentTime = 10;
+      // The player starts playback first, then seeks.
+      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_PLAYING');
+      player.emit('VIDEO_PAUSE');
+      player.emit('VIDEO_SEEKEND', { videoTime: 10.1 });
+
+      expect(player.pause).toHaveBeenCalledOnce();
+      expect(media.paused).toBe(true);
+      expect(events).toEqual(['seeked']);
+
+      // Once the seek settles, a play is reported again.
+      player.emit('VIDEO_PLAY');
+
+      expect(media.paused).toBe(false);
+    });
+
+    it('keeps playing through a seek made while playing', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      player.emit('VIDEO_PLAY');
+      media.currentTime = 10;
+      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_SEEKEND', { videoTime: 10 });
+
+      expect(player.pause).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
+    });
+
+    it('plays a paused seek when play() follows it before it settles', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.currentTime = 10;
+      void media.play();
+      player.emit('VIDEO_PLAY');
+
+      expect(player.pause).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
     });
 
     it('leaves the ended state on a seek', async () => {

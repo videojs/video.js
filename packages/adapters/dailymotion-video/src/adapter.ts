@@ -28,9 +28,9 @@ import { type DailymotionSource, parseDailymotionSource, resolveDailymotionPlaye
  * the light DOM, not inside a shadow root.
  *
  * The configuration owns what the SDK can't change: its controls, and an `autostart` that `autoplay` can't turn off
- * (development builds warn when they disagree). `currentTime` and `duration` describe the video, while `paused` follows
- * whatever is on screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the furthest point
- * played.
+ * (development builds warn when they disagree). The playback Dailymotion starts on a seek from its start or end screen
+ * is paused before it is reported. `currentTime` and `duration` describe the video, while `paused` follows whatever is
+ * on screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the furthest point played.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
@@ -79,6 +79,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #playRequested = false;
   // Whether this load may still autoplay; a `pause()` before the player is ready withdraws it.
   #autoplayPending = false;
+  // From a seek made while paused until it settles (see `#shouldStayPaused`).
+  #stayPausedThroughSeek = false;
   // The furthest point played this load, which `buffered` ends at.
   #bufferedEnd = 0;
   // The player's position when the pending seek began, to tell whether it has landed.
@@ -214,6 +216,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   async play() {
     if (!this.#src) return;
 
+    this.#stopStayingPaused();
+
     if (!this.#player) {
       this.#playRequested = true;
       return;
@@ -244,6 +248,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#seeking = true;
     // As on a media element, seeking leaves the ended state.
     this.#ended = false;
+
+    // Seeking from the start or end screen starts playback (see `#shouldStayPaused`).
+    if (this.#paused) this.#stayPausedThroughSeek = true;
+
     // Report the target time now; the player's reports until it lands would drag it back.
     this.#currentTime = targetTime;
     this.dispatchEvent(new Event('seeking'));
@@ -542,14 +550,18 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     const handlers: Record<string, (state: DailymotionPlayerState) => void> = {
       // An ad playing is on screen as much as the video is, so both start and stop playback.
       VIDEO_PLAY: () => this.#onPlay(),
-      AD_PLAY: () => this.#onPlay(),
+      // An ad sends no `VIDEO_PLAYING`, so one that should stay paused is paused as it starts.
+      AD_PLAY: () => (this.#shouldStayPaused() ? this.#pauseAgain() : this.#onPlay()),
       VIDEO_PAUSE: () => this.#onPause(),
       AD_PAUSE: () => this.#onPause(),
       VIDEO_PLAYING: () => this.#onPlaying(),
       PLAYER_CRITICALPATHREADY: (state) => {
         if (!state.playerError) this.#onCanPlay();
       },
-      VIDEO_BUFFERING: () => this.dispatchEvent(new Event('waiting')),
+      // Not for a play that is paused again (see `#shouldStayPaused`).
+      VIDEO_BUFFERING: () => {
+        if (!this.#shouldStayPaused()) this.dispatchEvent(new Event('waiting'));
+      },
       // The `video*` members describe the video even while an ad plays.
       VIDEO_TIMECHANGE: (state) => {
         if (this.#shouldApplyReportedTime()) this.#applyCurrentTime(state.videoTime);
@@ -659,6 +671,26 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     );
   }
 
+  /**
+   * Dailymotion starts playback on a seek from its start or end screen, which a paused media element doesn't. While
+   * this is true, a play the player starts isn't reported and is paused again once it reaches `VIDEO_PLAYING`. Pausing
+   * on `VIDEO_PLAY` leaves the player stuck on its loading screen; by `VIDEO_PLAYING` the video counts as started, so
+   * the player also takes a seek it would otherwise drop.
+   */
+  #shouldStayPaused() {
+    return this.#stayPausedThroughSeek;
+  }
+
+  /** Attempts to pause @see `#shouldStayPaused`. */
+  #pauseAgain() {
+    tryCall(() => this.#player?.pause());
+  }
+
+  /** A play the element asks for, or a new load, lets playback through (see `#shouldStayPaused`). */
+  #stopStayingPaused() {
+    this.#stayPausedThroughSeek = false;
+  }
+
   // Apply what was asked for before the player was ready.
   #syncToEmbed() {
     if (this.#muted) this.#applyMuted();
@@ -691,7 +723,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#playRequested = false;
     this.#autoplayPending = false;
 
-    if (play) tryCall(() => this.#player?.play());
+    if (!play) return;
+
+    this.#stopStayingPaused();
+    tryCall(() => this.#player?.play());
   }
 
   // Recorded in `#options` too, so the next video can still load into this player.
@@ -758,7 +793,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     if (state.playerIsCriticalPathReady === true && !state.playerError) this.#onCanPlay();
 
-    if (state.playerIsPlaying === true) this.#onPlay();
+    if (state.playerIsPlaying === true) {
+      if (this.#shouldStayPaused()) this.#pauseAgain();
+      else this.#onPlay();
+    }
   }
 
   #onVolumeChange({ playerVolume, playerIsMuted }: DailymotionPlayerState) {
@@ -814,8 +852,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('timeupdate'));
   }
 
+  // A play that should stay paused isn't reported (see `#shouldStayPaused`).
   #onPlay() {
-    if (!this.#paused) return;
+    if (this.#shouldStayPaused() || !this.#paused) return;
 
     this.#paused = false;
     this.#ended = false;
@@ -826,6 +865,15 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     // Playing from the start position, so the player's reports are accurate again.
     this.#startPosition = null;
     this.#onCanPlay();
+
+    // Paused here rather than on `VIDEO_PLAY` (see `#shouldStayPaused`).
+    if (this.#shouldStayPaused()) {
+      this.#pauseAgain();
+      return;
+    }
+
+    if (this.#paused) return;
+
     this.dispatchEvent(new Event('playing'));
   }
 
@@ -853,6 +901,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onSeeked(time: number | undefined) {
+    this.#stayPausedThroughSeek = false;
     this.#applyCurrentTime(time);
 
     if (!this.#seeking) return;
@@ -930,6 +979,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#seeking = false;
     this.#startPosition = null;
     this.#bufferedEnd = 0;
+    this.#stopStayingPaused();
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#error = null;
     this.#isFullscreen = false;
