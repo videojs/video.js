@@ -13,7 +13,7 @@ import { createRoot } from 'react-dom/client';
 
 function App() {
   const [src, setSrc] = useState<string>(LAZY_VIDEO_SOURCES[0].src);
-  const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ transferred: 0, decoded: 0, files: 0 });
+  const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ gzip: 0, raw: 0, files: 0 });
   const [sourceChangedAt, setSourceChangedAt] = useState<ScriptBytes>();
 
   useEffect(() => observeScriptBytes(setScriptBytes), []);
