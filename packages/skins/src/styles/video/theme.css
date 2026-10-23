@@ -94,6 +94,8 @@
   }
 
   .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="compat"] {
+    /* Compat always shows top controls, so its scrim spans both edges with a clear middle band. */
+    --media-controls-gradient: linear-gradient(to top, rgb(0 0 0 / 0.5), transparent 40% 60%, rgb(0 0 0 / 0.4));
     --media-caption-controls-y: calc(var(--media-spacing) * -18);
   }
 
