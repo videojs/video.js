@@ -74,8 +74,9 @@ export function resolveLazySource(src: string, options: ResolveLazySourceOptions
     type: options.type,
     url,
     adapterType:
-      // A media file on a service host plays as that file; Mux and Cloudflare streams are manifests.
-      (!mimeType || service === 'mux' || service === 'cloudflare' ? service : null) ??
+      // A media file on a service host plays as that file; Mux and Cloudflare streams are manifests, and a player.js
+      // marker is explicit.
+      (!mimeType || service === 'mux' || service === 'cloudflare' || service === 'playerjs' ? service : null) ??
       adapterTypeForMimeType(options.type) ??
       adapterTypeForMimeType(mimeType),
     playback: resolvePlayback(options),

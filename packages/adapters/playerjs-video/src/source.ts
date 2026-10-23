@@ -1,3 +1,5 @@
+import { PLAYERJS_PARAM } from '@videojs/media';
+
 import type { PlayerJsAdapterProps } from './props';
 import { getPlayerJsProvider } from './providers';
 
@@ -59,13 +61,16 @@ export function parsePlayerJsSource(src: string): URL | null {
  * For the services it recognizes (Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, Streamable), the host writes
  * `autoplay`, `muted`, `loop`, `controls`, and `preload` in the service's own spelling, and without `controls` hides as
  * much of the service's chrome as its URL allows. A parameter already in `src` is left as written, and
- * `engine.playerJs` overrides both.
+ * `engine.playerJs` overrides both. The `playerjs` marker that lazy media resolve player.js embeds by is removed.
  *
  * @internal
  */
 export function buildPlayerJsIframeSrc(src: string, props: Partial<PlayerJsAdapterProps> = {}): string {
   const url = parsePlayerJsSource(src);
   if (!url) return '';
+
+  // It only chooses this media, so the embed never sees it. Checked first, since a delete re-encodes the whole query.
+  if (url.searchParams.has(PLAYERJS_PARAM)) url.searchParams.delete(PLAYERJS_PARAM);
 
   const derived = getPlayerJsProvider(url)?.params(props) ?? {};
 

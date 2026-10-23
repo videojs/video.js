@@ -33,6 +33,8 @@ import basicUsageHtmlTs from "@/components/docs/demos/playerjs-video/html/css/Ba
 
 `src` takes the embed URL of any player.js receiver: an absolute `http` or `https` URL, with protocol-relative URLs (`//host/…`) read as `https`. Nothing inspects the URL to decide whether it speaks player.js; choosing this component is the opt-in. A `src` that isn't an `http(s)` URL fails with `MEDIA_ERR_SRC_NOT_SUPPORTED`, and an embed that doesn't implement the protocol never reports ready, so the element stays at `readyState` 0.
 
+A `playerjs` query parameter in `src` is removed before the embed loads. It's how <DocsLink slug="reference/components/lazy-video">LazyVideo</DocsLink> and <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> tell a player.js embed apart, so one `src` works for both.
+
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <PlayerJsVideo src="https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e" />

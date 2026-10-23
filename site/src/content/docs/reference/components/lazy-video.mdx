@@ -39,7 +39,7 @@ Reads `src`, renders the media component that plays it, and loads that component
 
 <FrameworkCase frameworks={["react"]}>
 ```bash
-npm install @videojs/react @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video @videojs/wistia-video @videojs/cloudflare-video @videojs/tiktok-video @videojs/twitch-video
+npm install @videojs/react @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video @videojs/wistia-video @videojs/cloudflare-video @videojs/tiktok-video @videojs/twitch-video @videojs/playerjs-video
 ```
 
 ```tsx
@@ -49,7 +49,7 @@ import { LazyVideo } from '@videojs/react/media/lazy-video';
 
 <FrameworkCase frameworks={["html"]}>
 ```bash
-npm install @videojs/html @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video @videojs/wistia-video @videojs/cloudflare-video @videojs/tiktok-video @videojs/twitch-video
+npm install @videojs/html @videojs/hlsjs-video @videojs/dash-video @videojs/mux-video @videojs/youtube-video @videojs/vimeo-video @videojs/wistia-video @videojs/cloudflare-video @videojs/tiktok-video @videojs/twitch-video @videojs/playerjs-video
 ```
 
 ```ts
@@ -74,8 +74,11 @@ Install every engine package listed: your bundler resolves each media component 
 | Cloudflare Stream | <DocsLink slug="reference/components/cloudflare-video">CloudflareVideo</DocsLink> | The Cloudflare Stream embed |
 | TikTok | <DocsLink slug="reference/components/tiktok-video">TikTokVideo</DocsLink> | The TikTok embed |
 | Twitch | <DocsLink slug="reference/components/twitch-video">TwitchVideo</DocsLink> | The Twitch embed |
+| player.js embeds marked with `?playerjs` | <DocsLink slug="reference/components/playerjs-video">PlayerJsVideo</DocsLink> | The service's player.js embed |
 
-Sources are matched by the hosts <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> recognizes, then by MIME type or file extension. A media file on one of these hosts, such as a direct Vimeo MP4, plays as that file. A source that matches none of these, such as a player.js embed, renders nothing and logs an error in development.
+Sources are matched by the hosts <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> recognizes, then by MIME type or file extension. A media file on one of these hosts, such as a direct Vimeo MP4, plays as that file. A source that matches none of these renders nothing and logs an error in development.
+
+player.js is a protocol any embed can speak, so nothing in an embed's URL says it's one. Add a `playerjs` query parameter to choose the player.js media, such as `https://streamable.com/e/moo?playerjs`. It takes precedence over the host and file extension, and the player.js media removes it before loading the embed.
 
 ## Behavior
 
@@ -162,7 +165,7 @@ A media gives `match`, the `tag` of the element that plays its sources, and `loa
 
 Return `true` to play the source, or `undefined` when the media can't tell yet; it isn't chosen until it can, and nothing after it is tried.
 
-The built-in media are `video`, `nativeHlsVideo`, `hlsjsVideo`, `dashVideo`, `muxVideo`, `youtubeVideo`, `vimeoVideo`, `wistiaVideo`, `cloudflareVideo`, `tiktokVideo`, and `twitchVideo`, each imported from `media/lazy/` plus its kebab-case name.
+The built-in media are `video`, `nativeHlsVideo`, `hlsjsVideo`, `dashVideo`, `muxVideo`, `youtubeVideo`, `vimeoVideo`, `wistiaVideo`, `cloudflareVideo`, `tiktokVideo`, `twitchVideo`, and `playerJsVideo`, each imported from `media/lazy/` plus its kebab-case name.
 
 ## Lazy loading one known media
 
