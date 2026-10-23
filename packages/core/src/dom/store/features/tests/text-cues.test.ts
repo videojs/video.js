@@ -398,7 +398,67 @@ describe('textCuesFeature', () => {
       expect(store.state.textCues).toEqual([]);
     });
 
-    it('clears tracks when the media is swapped', () => {
+    it('keeps tracks through a re-attach to the same media', () => {
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(textCuesFeature);
+
+      setTracks(video, []);
+      Object.defineProperty(video, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
+
+      const detach = store.attach({ media: video, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      // A container change or an extension re-attaches the store to the same media.
+      detach();
+      expect(quiz.removed).toBe(false);
+
+      store.attach({ media: video, container: document.createElement('div') });
+
+      expect(quiz.removed).toBe(false);
+      expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
+    });
+
+    it('clears tracks from the last source when the media is swapped', () => {
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+      const store = createStore<PlayerTarget>()(textCuesFeature);
+
+      setTracks(first, []);
+      setTracks(second, []);
+
+      const early = store.addTextTrack({ kind: 'metadata', label: 'early' });
+
+      Object.defineProperty(first, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
+
+      const detach = store.attach({ media: first, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      detach();
+      // The early track adopted the first media's source, so it goes with it too.
+      store.attach({ media: second, container: null });
+
+      expect(quiz.removed).toBe(true);
+      expect(early.removed).toBe(true);
+    });
+
+    it('keeps a track added before any source through a media swap', () => {
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+      const store = createStore<PlayerTarget>()(textCuesFeature);
+
+      setTracks(first, []);
+      setTracks(second, []);
+
+      const detach = store.attach({ media: first, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      detach();
+      store.attach({ media: second, container: null });
+
+      expect(quiz.removed).toBe(false);
+    });
+
+    it('removes a track while the store is detached', () => {
       const video = document.createElement('video');
       const store = createStore<PlayerTarget>()(textCuesFeature);
 
@@ -408,8 +468,10 @@ describe('textCuesFeature', () => {
       const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
 
       detach();
+      quiz.remove();
+      store.attach({ media: video, container: null });
 
-      expect(quiz.removed).toBe(true);
+      expect(store.state.textCues).toEqual([]);
     });
 
     it('works on media without text tracks', () => {

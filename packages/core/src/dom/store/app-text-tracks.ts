@@ -3,7 +3,7 @@ import type { MediaTextCue, MediaTextTrack } from '@videojs/media';
 /** Private store state holding the tracks apps added. Owned by the text cues feature; the text-track feature lists them. */
 export const APP_TEXT_TRACKS = Symbol('@videojs/app-text-tracks');
 
-/** Private store state that notifies when the tracks apps added change. Survives a detach, like the feature's actions. */
+/** Private store state that notifies when the tracks apps added change, and keeps them across a detach. */
 export const APP_TEXT_TRACKS_CHANGE = Symbol('@videojs/app-text-tracks-change');
 
 /** A track an app added, as the store keeps it. */
@@ -17,7 +17,15 @@ export interface AppTextTrackRecord {
 
 export interface AppTextTracksChange {
   subscribe(listener: () => void): () => void;
+  /** Call after every change to the tracks, so listeners and the copy below follow it. */
   notify(): void;
+  /**
+   * The tracks as of the last change. The store resets its state on every detach, which also happens when only the
+   * container or an extension changes; this copy survives, so attaching again can bring the tracks back.
+   */
+  records: readonly AppTextTrackRecord[];
+  /** The media the tracks were last attached with, as `getRegisteredMedia()` resolves it. */
+  media: unknown;
 }
 
 export interface AppTextTracksState {
