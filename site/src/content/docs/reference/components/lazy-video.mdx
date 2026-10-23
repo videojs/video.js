@@ -95,6 +95,8 @@ During server rendering, files render their `<video>`. HLS renders nothing until
 
 <FrameworkCase frameworks={["html"]}>
 Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children present when the media is created move into it; add later ones to the media element directly. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to.
+
+The `media` property returns the media playing the source, the same one the player uses, or `null` while there's none. While a different media loads, it still returns the previous one.
 </FrameworkCase>
 
 ## Custom media
