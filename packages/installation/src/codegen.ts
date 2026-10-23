@@ -1,3 +1,6 @@
+import { type MuxSourceBase, parseMuxVideoURL } from '@videojs/mux';
+import { isUndefined } from '@videojs/utils/predicate';
+
 import { generateCdnCode } from './cdn-code';
 import { INSTALLATION_DEMO_SOURCES } from './defaults';
 import { defaultInstallationExtensions, getInstallationExtension, type InstallationExtension } from './extensions';
@@ -605,6 +608,36 @@ function getPresetPlayer(useCase: UseCase): string {
   return getInstallationPlayerComponentName(useCase);
 }
 
+// Renderers whose React component takes a structured Mux `source`. `MuxBackgroundVideo` takes only `src`.
+const MUX_SOURCE_RENDERERS: readonly Renderer[] = ['mux-video', 'mux-audio'];
+
+/**
+ * The React media props for a source: a Mux stream URL becomes the `source` object the component would parse it into,
+ * which reads better than the URL and matches the Mux docs. Any other URL stays on `src`.
+ */
+function generateReactRendererProps(renderer: Renderer, url: string): string {
+  const muxSource = MUX_SOURCE_RENDERERS.includes(renderer) ? parseMuxVideoURL(url) : undefined;
+  const sourceProp = muxSource ? `source={${formatMuxSource(muxSource)}}` : `src={${JSON.stringify(url)}}`;
+
+  return isVideoLikeRenderer(renderer) ? `${sourceProp} playsInline` : sourceProp;
+}
+
+// A parsed Mux URL carries only a playback ID, a custom domain, and playback params.
+function formatMuxSource({ playbackId, customDomain, playback }: MuxSourceBase): string {
+  const fields = [formatObjectFields({ playbackId, customDomain })];
+
+  if (playback) fields.push(`playback: { ${formatObjectFields(playback)} }`);
+
+  return `{ ${fields.join(', ')} }`;
+}
+
+function formatObjectFields(fields: Record<string, string | number | boolean | undefined>): string {
+  return Object.entries(fields)
+    .filter(([, value]) => !isUndefined(value))
+    .map(([key, value]) => `${/^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)}: ${JSON.stringify(value)}`)
+    .join(', ');
+}
+
 function generateReactMediaJsx(
   rendererJsx: string,
   extensions: readonly InstallationExtension[],
@@ -637,10 +670,7 @@ export function generateReactCreateCode(
   const isNoSkin = skin === 'none';
   const group = getInstallationPreset(useCase).group;
 
-  const rendererProps = isVideoLikeRenderer(renderer)
-    ? `src={${JSON.stringify(source)}} playsInline`
-    : `src={${JSON.stringify(source)}}`;
-  const rendererJsx = `<${rendererComponent} ${rendererProps} />`;
+  const rendererJsx = `<${rendererComponent} ${generateReactRendererProps(renderer, source)} />`;
   const skinLayout = isSizedVideoPlayer(useCase) ? reactVideoLayout : '';
   const containerLayout = isSizedVideoPlayer(useCase) ? reactContainerVideoLayout : '';
 
@@ -732,10 +762,7 @@ export function generateSourceReactCreateCode(
   // A registry theme changes the source behind the stable item name. Every theme's catalog exports the same local
   // component (`VideoSkin`, `AudioSkin`, and so on).
   const skinComponent = `${preset.componentPrefix}Skin`;
-  const rendererProps = isVideoLikeRenderer(renderer)
-    ? `src={${JSON.stringify(source)}} playsInline`
-    : `src={${JSON.stringify(source)}}`;
-  const rendererJsx = `<${rendererComponent} ${rendererProps} />`;
+  const rendererJsx = `<${rendererComponent} ${generateReactRendererProps(renderer, source)} />`;
   const skinLayout = isSizedVideoPlayer(useCase)
     ? opts.styling === 'tailwind'
       ? reactTailwindVideoLayout
