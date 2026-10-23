@@ -28,6 +28,7 @@ export class TapRecognizer implements GestureRecognizer {
       }
 
       // First tap — defer to allow doubletap window.
+      matches.resolve('tap')[0]?.onPointerUp?.(event);
       this.#lastTapTime = now;
       this.#clearTimer();
       this.#tapTimer = setTimeout(() => {
@@ -41,7 +42,10 @@ export class TapRecognizer implements GestureRecognizer {
     }
 
     // No doubletap bindings — fire tap immediately.
-    matches.resolve('tap')[0]?.onActivate(event);
+    const tap = matches.resolve('tap')[0];
+
+    tap?.onPointerUp?.(event);
+    tap?.onActivate(event);
   }
 
   #clearTimer(): void {

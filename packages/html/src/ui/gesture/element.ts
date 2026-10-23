@@ -3,6 +3,7 @@ import {
   createDoubleTapGesture,
   createTapGesture,
   getGestureActionValue,
+  prepareGestureAction,
   resolveGestureAction,
 } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
@@ -75,7 +76,10 @@ export class GestureElement extends UIElement {
       resolver({ store, value: actionValue, event });
     };
 
+    const prepare = prepareGestureAction(this.action);
+
     const options = {
+      onPointerUp: prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event })),
       pointer: this.pointer,
       region,
       disabled: this.disabled,
