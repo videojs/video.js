@@ -28,13 +28,6 @@ describe('resolveAdapterType', () => {
   });
 
   it.each<[string, AdapterType]>([
-    ['youtube/aqz-KE-bpKQ', 'youtube'],
-    ['vimeo/76979871', 'vimeo'],
-  ])('resolves the %s shorthand', (src, expected) => {
-    expect(resolveAdapterType(src)).toBe(expected);
-  });
-
-  it.each<[string, AdapterType]>([
     ['https://example.com/live/stream.m3u8', 'hls'],
     ['https://example.com/manifest.mpd', 'dash'],
     ['/media/video.mp4', 'video'],
@@ -86,7 +79,8 @@ describe('resolveAdapterType', () => {
     ['a bare Vimeo id', '76979871'],
     ['a bare Wistia id', 'e4a27b971d'],
     ['a bare Mux playback id', 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
-    ['a malformed shorthand', 'youtube/not-an-id'],
+    ['a youtube/<id> path', 'youtube/aqz-KE-bpKQ'],
+    ['a vimeo/<id> path', 'vimeo/76979871'],
     ['a Mux player page', 'https://player.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
     ['an unknown file type', 'https://example.com/file.bin'],
     ['a YouTube page without a video', 'https://www.youtube.com/'],
