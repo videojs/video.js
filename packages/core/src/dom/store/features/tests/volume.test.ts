@@ -1,11 +1,27 @@
+import { HTMLVideoAdapter } from '@videojs/media/dom';
 import { createStore } from '@videojs/store';
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
 import { volumeFeature } from '../volume';
 
+/** Shaped like an embed adapter: sets volume through its own player, with no native element behind it. */
+class TestEmbed extends EventTarget {
+  volume = 1;
+  muted = false;
+}
+
+/** Makes native media elements ignore `volume` writes, as iOS Safari does. */
+function lockNativeVolume() {
+  vi.spyOn(HTMLMediaElement.prototype, 'volume', 'set').mockImplementation(() => {});
+}
+
 describe('volumeFeature', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('attach', () => {
     it('syncs volume state on attach', () => {
       const video = createMockVideo({
@@ -26,6 +42,41 @@ describe('volumeFeature', () => {
       const store = createStore<PlayerTarget>()(volumeFeature);
 
       store.attach({ media: video, container: null });
+
+      expect(store.state.volumeAvailability).toBe('available');
+      expect(store.state.mutedAvailability).toBe('available');
+    });
+
+    it('reports volume unsupported on a native video where the browser locks volume', () => {
+      lockNativeVolume();
+
+      const store = createStore<PlayerTarget>()(volumeFeature);
+
+      store.attach({ media: createMockVideo({}), container: null });
+
+      expect(store.state.volumeAvailability).toBe('unsupported');
+      expect(store.state.mutedAvailability).toBe('available');
+    });
+
+    it('reports volume unsupported on an adapter over a native video where the browser locks volume', () => {
+      lockNativeVolume();
+
+      const adapter = new HTMLVideoAdapter();
+      const store = createStore<PlayerTarget>()(volumeFeature);
+
+      adapter.attach(document.createElement('video'));
+      store.attach({ media: adapter, container: null });
+
+      expect(store.state.volumeAvailability).toBe('unsupported');
+    });
+
+    it('reports volume available on an embed where the browser locks native volume', () => {
+      // The browser's restriction is on its own media elements; an embed sets volume through its player.
+      lockNativeVolume();
+
+      const store = createStore<PlayerTarget>()(volumeFeature);
+
+      store.attach({ media: new TestEmbed() as unknown as HTMLVideoElement, container: null });
 
       expect(store.state.volumeAvailability).toBe('available');
       expect(store.state.mutedAvailability).toBe('available');

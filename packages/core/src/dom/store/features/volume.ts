@@ -1,5 +1,6 @@
-import type { MediaFeatureAvailability, MediaVolumeState } from '@videojs/media';
+import type { Media, MediaFeatureAvailability, MediaVolumeState } from '@videojs/media';
 import { isMediaMutedCapable, isMediaVolumeCapable } from '@videojs/media';
+import { getMediaElement } from '@videojs/media/dom';
 import { listen } from '@videojs/utils/dom';
 
 import { definePlayerFeature } from '../../feature';
@@ -65,7 +66,7 @@ export const volumeFeature = definePlayerFeature({
     if (!volumeCapable && !mutedCapable) return;
 
     set({
-      volumeAvailability: volumeCapable ? canSetVolume() : 'unavailable',
+      volumeAvailability: volumeCapable ? getVolumeAvailability(media) : 'unavailable',
       mutedAvailability: mutedCapable ? 'available' : 'unavailable',
     });
 
@@ -81,7 +82,16 @@ export const volumeFeature = definePlayerFeature({
   },
 });
 
-/** Check if volume can be programmatically set (fails on iOS Safari). */
+/**
+ * A Media that plays through a native element is held to the browser's rule for that element, which keeps volume
+ * read-only on iOS Safari. Any other Media, such as an embed, sets volume through its own player, so having `volume` is
+ * enough.
+ */
+function getVolumeAvailability(media: Media): MediaFeatureAvailability {
+  return getMediaElement(media) ? canSetVolume() : 'available';
+}
+
+/** Check if the browser lets a native media element's volume be set (fails on iOS Safari). */
 function canSetVolume(): MediaFeatureAvailability {
   const video = document.createElement('video');
 
