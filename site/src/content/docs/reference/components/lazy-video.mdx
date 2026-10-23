@@ -13,8 +13,8 @@ apis:
   - LazyMediaElement
   - createLazyVideo
   - createLazyVideoElement
-  - '@videojs/react/media/lazy-video/*'
-  - '@videojs/html/media/lazy-video/*'
+  - '@videojs/react/media/lazy/*'
+  - '@videojs/html/media/lazy/*'
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
@@ -103,10 +103,10 @@ Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is cop
 `createLazyVideo` builds a `LazyVideo` from a list of media, tried in order. Each built-in media has its own import, so the list decides which engine packages need to be installed. Put your own media first to take sources from the built-in ones.
 
 ```tsx
-import { createLazyVideo } from '@videojs/react/media/lazy-video/create';
-import { hlsjsVideo } from '@videojs/react/media/lazy-video/hlsjs-video';
-import { nativeHlsVideo } from '@videojs/react/media/lazy-video/native-hls-video';
-import { video } from '@videojs/react/media/lazy-video/video';
+import { createLazyVideo } from '@videojs/react/media/lazy/create';
+import { hlsjsVideo } from '@videojs/react/media/lazy/hlsjs-video';
+import { nativeHlsVideo } from '@videojs/react/media/lazy/native-hls-video';
+import { video } from '@videojs/react/media/lazy/video';
 
 // Module level, so the media it loads keep their identity across renders.
 const AcmeLazyVideo = createLazyVideo([
@@ -127,10 +127,10 @@ A media gives `match` and either `load`, for a component whose code should downl
 `createLazyVideoElement` builds a `<lazy-video>` class from a list of media, tried in order, to register under a tag of your own. Each built-in media has its own import, so the list decides which engine packages need to be installed. Put your own media first to take sources from the built-in ones.
 
 ```ts
-import { createLazyVideoElement } from '@videojs/html/media/lazy-video/create';
-import { hlsjsVideo } from '@videojs/html/media/lazy-video/hlsjs-video';
-import { nativeHlsVideo } from '@videojs/html/media/lazy-video/native-hls-video';
-import { video } from '@videojs/html/media/lazy-video/video';
+import { createLazyVideoElement } from '@videojs/html/media/lazy/create';
+import { hlsjsVideo } from '@videojs/html/media/lazy/hlsjs-video';
+import { nativeHlsVideo } from '@videojs/html/media/lazy/native-hls-video';
+import { video } from '@videojs/html/media/lazy/video';
 
 customElements.define(
   'acme-lazy-video',

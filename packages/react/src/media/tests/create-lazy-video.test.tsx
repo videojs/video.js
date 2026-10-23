@@ -2,8 +2,8 @@ import { render, waitFor } from '@testing-library/react';
 import { forwardRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { createLazyVideo, type LazyMediaDefinition } from '../lazy-video/create';
-import { video } from '../lazy-video/video';
+import { createLazyVideo, type LazyMediaDefinition } from '../lazy/create';
+import { video } from '../lazy/video';
 
 const AcmeVideo = forwardRef<HTMLDivElement, { src?: string }>(function AcmeVideo({ src }, ref) {
   return <div ref={ref} data-acme={src} />;
@@ -60,7 +60,7 @@ describe('createLazyVideo', () => {
     );
     vi.stubGlobal('MediaSource', class {});
 
-    const { createLazyVideo: freshCreateLazyVideo } = await import('../lazy-video/create');
+    const { createLazyVideo: freshCreateLazyVideo } = await import('../lazy/create');
     const native: LazyMediaDefinition = { match: (s) => s.playback === 'native', component: () => <i data-native /> };
     const mse: LazyMediaDefinition = { match: (s) => s.playback === 'mse', component: () => <i data-mse /> };
     const LazyHls = freshCreateLazyVideo([native, mse]);
