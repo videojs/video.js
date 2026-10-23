@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.2.0...@videojs/installation@10.3.0) (2026-10-23)
+
+
+### Bug Fixes
+
+* **installation:** pass Mux URLs to React Mux media as a structured source ([#9605](https://github.com/videojs/video.js/issues/9605)) ([2e0db03](https://github.com/videojs/video.js/commit/2e0db0348c13b42207032b7724046fa97dfc6974))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+  * devDependencies
+    * @videojs/media bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.1.0...@videojs/installation@10.2.0) (2026-10-22)
 
 

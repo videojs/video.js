@@ -1,6 +1,6 @@
 {
   "name": "@videojs/html",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Video.js 10 for HTML, Vue, and Svelte: player custom elements and skins for video and audio",
   "keywords": [
     "audio",

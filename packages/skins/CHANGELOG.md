@@ -1,5 +1,23 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.2.0...@videojs/skins@10.3.0) (2026-10-23)
+
+
+### Miscellaneous Chores
+
+* **@videojs/skins:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.3.0
+    * @videojs/element bumped to 10.3.0
+    * @videojs/icons bumped to 10.3.0
+    * @videojs/installation bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.1.0...@videojs/skins@10.2.0) (2026-10-22)
 
 

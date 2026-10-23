@@ -1,6 +1,6 @@
 {
   "name": "@videojs/vimeo-video",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Vimeo playback adapter for Video.js",
   "keywords": [
     "media",
