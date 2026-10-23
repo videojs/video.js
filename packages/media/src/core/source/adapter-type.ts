@@ -32,11 +32,11 @@ export type AdapterType =
  * otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
- * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>` and `vimeo/<id>` shorthands.
+ * alike, so services are only matched on URLs and `spotify:` URIs.
  *
  * `hls` covers every HLS adapter, and `dash` every DASH adapter. Choosing between them is up to you.
  *
- * @param src - The source URL, or a `youtube/<id>` or `vimeo/<id>` shorthand.
+ * @param src - The source URL, or a `spotify:` URI.
  * @param type - The source's MIME type, when known. It takes precedence over the file extension, so manifests and files
  *   without one can still be resolved. Parameters such as `codecs` are ignored.
  * @public
@@ -82,11 +82,6 @@ const SERVICE_PARSERS: Record<ServiceType, (src: string) => unknown> = {
 };
 
 function fromService(src: string): AdapterType | null {
-  // Shorthands go through the same parsers the YouTube and Vimeo media use, so the media accepts what matches here.
-  if (src.startsWith('youtube/')) return parseYouTubeSource(src) ? 'youtube' : null;
-
-  if (src.startsWith('vimeo/')) return parseVimeoSource(src) ? 'vimeo' : null;
-
   if (SPOTIFY_URI.test(src)) return parseSpotifySource(src) ? 'spotify' : null;
 
   const url = parseSourceUrl(src);

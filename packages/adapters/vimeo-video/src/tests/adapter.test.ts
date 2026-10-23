@@ -178,13 +178,6 @@ describe('buildVimeoIframeSrc', () => {
     expect(buildVimeoIframeSrc('https://vimeo.com/12345?h=secret')).toContain('h=secret');
   });
 
-  it('embeds vimeo/<id> shorthands', () => {
-    const src = buildVimeoIframeSrc('vimeo/12345/secret');
-
-    expect(src).toContain('https://player.vimeo.com/video/12345?');
-    expect(src).toContain('h=secret');
-  });
-
   it('builds event embed URL with hashPath', () => {
     const src = buildVimeoIframeSrc('https://vimeo.com/event/123/abc');
 

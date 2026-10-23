@@ -6,8 +6,6 @@ import {
   resolveMimeType,
   SPOTIFY_URI,
 } from './adapter-type';
-import { VIMEO_SHORTHAND_SRC } from './vimeo';
-import { YOUTUBE_SHORTHAND_SRC } from './youtube';
 
 /** A source as lazy media sees it, worked out once so each media's `match` stays cheap. */
 export interface LazySource {
@@ -18,8 +16,8 @@ export interface LazySource {
   /** `src` parsed as a URL, or `null` for a path or bare id. */
   url: URL | null;
   /**
-   * The kind of source by host, shorthand, MIME type, or file extension, with the same names `resolveAdapterType`
-   * returns. A media file on a service host, such as a direct Vimeo MP4, counts as that file.
+   * The kind of source by host, MIME type, or file extension, with the same names `resolveAdapterType` returns. A media
+   * file on a service host, such as a direct Vimeo MP4, counts as that file.
    */
   adapterType: AdapterType | null;
   /** How HLS should play here, or `undefined` while that isn't known, such as during server rendering. */
@@ -118,14 +116,10 @@ export function matchHls(playback: 'native' | 'mse'): LazyMediaMatcher['match'] 
 
 /**
  * `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match by
- * host or shorthand, and the media they resolve to checks the id itself. A media file on a service host plays as that
- * file; Mux and Cloudflare are exempt because their streams are manifests.
+ * host or `spotify:` URI, and the media they resolve to checks the id itself. A media file on a service host plays as
+ * that file; Mux and Cloudflare are exempt because their streams are manifests.
  */
 function fromService(src: string, url: URL | null): AdapterType | null {
-  if (YOUTUBE_SHORTHAND_SRC.test(src)) return 'youtube';
-
-  if (VIMEO_SHORTHAND_SRC.test(src)) return 'vimeo';
-
   if (SPOTIFY_URI.test(src)) return 'spotify';
 
   const service = url && matchServiceHost(url);
