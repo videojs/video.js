@@ -58,41 +58,6 @@ The <DocsLink slug="guides/installation">installation guide</DocsLink> generates
 
 Still on Video.js 8? Its docs live at [legacy.videojs.org](https://legacy.videojs.org), and <DocsLink slug="guides/migrate-from-video-js-8">Migrate from Video.js 8</DocsLink> covers the upgrade.
 
-## Where to host the video
-
-The player is half the job. Adaptive streaming also needs each upload transcoded into several resolutions, packaged as HLS, and served from a CDN. You can build that yourself with ffmpeg and a storage bucket, or let a service do it.
-
-We build Video.js at Mux, so we're biased, but this is what [Mux Video](https://www.mux.com/video) is for. Upload a file, get back a playback ID, and stream it with `<mux-video>` in place of `<video>`:
-
-```html title="index.html"
-<script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
-<script type="module" src="{{VJS10_CDN_BASE}}/media/mux-video.js"></script>
-
-<video-player>
-  <video-skin>
-    <mux-video src="https://stream.mux.com/YOUR_PLAYBACK_ID.m3u8" playsinline></mux-video>
-  </video-skin>
-</video-player>
-```
-
-```tsx title="MyPlayer.tsx"
-import '@videojs/react/video/skin.css';
-import { MuxVideo } from '@videojs/react/media/mux-video';
-import { VideoPlayer, VideoSkin } from '@videojs/react/video';
-
-export function MyPlayer({ playbackId }: { playbackId: string }) {
-  return (
-    <VideoPlayer>
-      <VideoSkin>
-        <MuxVideo source={{ playbackId }} playsInline />
-      </VideoSkin>
-    </VideoPlayer>
-  );
-}
-```
-
-The quickest way to try it is the <DocsLink slug="guides/installation">installation guide</DocsLink>: drop in a video, sign in to Mux, and it comes back as a free HLS stream already wired into your snippet. Once real viewers are watching, <DocsLink slug="guides/mux-data">Mux Data</DocsLink> shows you startup time, rebuffering, and errors for every view.
-
 ## For AI agents
 
 Every page on this site is available as Markdown, this one included.
