@@ -17,7 +17,7 @@ export interface ParsedYouTubeSource {
 }
 
 /**
- * Extract a YouTube video id from a raw 11-character id, a `youtube/<id>` shorthand, or any recognized URL.
+ * Extract a YouTube video id from a raw 11-character id or any recognized URL.
  *
  * @internal
  */
@@ -26,9 +26,9 @@ export function parseYouTubeVideoId(src: string) {
 }
 
 /**
- * Parse a YouTube source string. Recognizes raw 11-character ids, `youtube/<id>` and `youtube/shorts/<id>` shorthands,
- * `youtu.be` short links, `watch?v=`, `embed/`, `v/`, `shorts/` and `live/` URLs (with or without the `-nocookie`
- * host), playlist URLs via the `list` parameter, and start times via the `t` parameter.
+ * Parse a YouTube source string. Recognizes raw 11-character ids, `youtu.be` short links, `watch?v=`, `embed/`, `v/`,
+ * `shorts/` and `live/` URLs (with or without the `-nocookie` host), playlist URLs via the `list` parameter, and start
+ * times via the `t` parameter.
  *
  * @internal
  */
@@ -38,10 +38,6 @@ export function parseYouTubeSource(src: string): ParsedYouTubeSource | null {
   if (/^[\w-]{11}$/.test(src)) {
     return { id: src, kind: 'video', listId: null, startTime: null, noCookie: false };
   }
-
-  const shorthandId = YOUTUBE_SHORTHAND_SRC.exec(src)?.[1];
-  // Shorthands play from the privacy-enhanced host, so a source written as one doesn't set YouTube cookies.
-  if (shorthandId) return { id: shorthandId, kind: 'video', listId: null, startTime: null, noCookie: true };
 
   const noCookie = src.includes('-nocookie');
   const videoMatch = YOUTUBE_VIDEO_SRC.exec(src);
@@ -93,9 +89,6 @@ function parseStartTime(url: string): number | null {
 
   return hasValue ? totalSeconds : null;
 }
-
-/** @internal */
-export const YOUTUBE_SHORTHAND_SRC = /^youtube\/(?:shorts\/)?([\w-]{11})$/;
 
 const YOUTUBE_VIDEO_SRC =
   /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))((?:\w|-){11})/;

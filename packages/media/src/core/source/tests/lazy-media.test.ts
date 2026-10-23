@@ -24,10 +24,7 @@ describe('resolveLazySource', () => {
   it.each<[string, AdapterType]>([
     ['https://www.youtube.com/watch?v=aqz-KE-bpKQ', 'youtube'],
     ['https://youtu.be/aqz-KE-bpKQ', 'youtube'],
-    ['youtube/aqz-KE-bpKQ', 'youtube'],
-    ['youtube/shorts/aqz-KE-bpKQ', 'youtube'],
     ['https://vimeo.com/76979871', 'vimeo'],
-    ['vimeo/76979871?hash=8272103f6e', 'vimeo'],
     ['https://player.vimeo.com/video/76979871?h=8272103f6e', 'vimeo'],
     ['https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M.m3u8', 'mux'],
     ['https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M', 'mux'],
@@ -56,9 +53,9 @@ describe('resolveLazySource', () => {
     expect(adapterTypeOf('https://embed.wistia.com/deliveries/abc.mp4')).toBe('video');
   });
 
-  it('treats a path that only looks like a shorthand as a file', () => {
-    expect(adapterTypeOf('youtube/intro.mp4')).toBe('video');
-    expect(adapterTypeOf('vimeo/trailer.mp4')).toBe('video');
+  it('does not recognize youtube/<id> or vimeo/<id> paths', () => {
+    expect(adapterTypeOf('youtube/aqz-KE-bpKQ')).toBeNull();
+    expect(adapterTypeOf('vimeo/76979871')).toBeNull();
   });
 
   it('resolves an extensionless source from its MIME type', () => {
