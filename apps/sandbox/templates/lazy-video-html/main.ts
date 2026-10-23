@@ -8,14 +8,21 @@ import '@videojs/html/video/player';
 import '@videojs/html/video/skin';
 import '@videojs/html/video/skin.css';
 import '@videojs/html/media/lazy-video';
-import { LAZY_DEMO_CLASSES as c, LAZY_VIDEO_SOURCE_GROUPS, LAZY_VIDEO_SOURCES } from '@app/shared/lazy-sources';
+import {
+  LAZY_DEMO_CLASSES as c,
+  getUrlLazySource,
+  getUrlLight,
+  LAZY_VIDEO_SOURCE_GROUPS,
+  LAZY_VIDEO_SOURCES,
+  setUrlLazyState,
+} from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
 import { observeScriptBytes, type ScriptBytes, summarizeScriptBytes } from '@app/shared/script-bytes';
 import type { VideoPlayerElement } from '@videojs/html/video';
 
 const html = String.raw;
 const root = document.getElementById('root')!;
-const initialSrc = LAZY_VIDEO_SOURCES[0]!.src;
+const initialSrc = getUrlLazySource().src;
 
 root.innerHTML = html`
   <header class="${c.header}">
@@ -102,7 +109,7 @@ observeScriptBytes((bytes) => {
 });
 
 let src = initialSrc;
-let light = new URLSearchParams(location.search).has('light');
+let light = getUrlLight();
 let clickedAt: number | undefined;
 let startedAt: number | undefined;
 let timedOut = false;
@@ -182,13 +189,7 @@ function resetLight() {
 
 lightToggle.addEventListener('change', () => {
   light = lightToggle.checked;
-
-  const url = new URL(location.href);
-
-  if (light) url.searchParams.set('light', '');
-  else url.searchParams.delete('light');
-
-  history.replaceState(null, '', url);
+  setUrlLazyState({ light });
 
   resetLight();
   renderStage();
@@ -214,6 +215,7 @@ root.addEventListener('click', (event) => {
   for (const other of buttons) other.setAttribute('aria-pressed', String(other === button));
 
   src = next;
+  setUrlLazyState({ src: next });
   srcOutput.textContent = next;
   srcOutput.title = next;
   sourceChangedAt = scriptBytes;

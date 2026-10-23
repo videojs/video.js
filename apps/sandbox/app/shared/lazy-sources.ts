@@ -60,6 +60,36 @@ export const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
 
 export const LAZY_VIDEO_SOURCES: readonly LazySource[] = LAZY_VIDEO_SOURCE_GROUPS.flatMap(({ sources }) => sources);
 
+/** A source's name in the page URL, such as `dash` or `player-js`. */
+function lazySourceId({ label }: LazySource): string {
+  return label.toLowerCase().replace(/[^a-z\d]+/g, '-');
+}
+
+/** The source `?source=` names, or the first one. */
+export function getUrlLazySource(): LazySource {
+  const id = new URLSearchParams(location.search).get('source');
+
+  return LAZY_VIDEO_SOURCES.find((source) => lazySourceId(source) === id) ?? LAZY_VIDEO_SOURCES[0]!;
+}
+
+/** Whether `?light` is in the page URL. */
+export function getUrlLight(): boolean {
+  return new URLSearchParams(location.search).has('light');
+}
+
+/** Keeps the source and light mode in the page URL, so a reload or a shared link opens the same state. */
+export function setUrlLazyState({ src, light }: { src?: string; light?: boolean }): void {
+  const url = new URL(location.href);
+  const source = src === undefined ? undefined : LAZY_VIDEO_SOURCES.find((option) => option.src === src);
+
+  if (source) url.searchParams.set('source', lazySourceId(source));
+
+  if (light === true) url.searchParams.set('light', '');
+  else if (light === false) url.searchParams.delete('light');
+
+  history.replaceState(null, '', url);
+}
+
 /** Tailwind classes the HTML and React lazy-video sandboxes share, so the two pages look the same. */
 export const LAZY_DEMO_CLASSES = {
   header: 'grid gap-1',
