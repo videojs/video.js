@@ -18,9 +18,23 @@ const MUX_AUDIO_ONLY_TS_URL = 'https://stream.mux.com/3zd01ukbq5UaSPrfGnZ2eYBcMX
 
 const realFetch = globalThis.fetch;
 
-/** Chromium's decoded audio byte count; `0` where the vendor property is missing. */
-function audioDecodedBytes(video: HTMLVideoElement): number {
-  return (video as HTMLVideoElement & { webkitAudioDecodedByteCount?: number }).webkitAudioDecodedByteCount ?? 0;
+/** The decoded audio byte count where the browser exposes one (Chromium); `undefined` elsewhere. */
+function audioDecodedBytes(video: HTMLVideoElement): number | undefined {
+  return (video as HTMLVideoElement & { webkitAudioDecodedByteCount?: number }).webkitAudioDecodedByteCount;
+}
+
+/** Whether every SourceBuffer holds data at `time`: the browser-neutral evidence that each track was accepted. */
+function sourceBuffersCover(mediaSource: MediaSource | undefined, time: number): boolean {
+  const sourceBuffers = Array.from(mediaSource?.sourceBuffers ?? []);
+
+  return (
+    sourceBuffers.length > 0 &&
+    sourceBuffers.every(({ buffered }) =>
+      Array.from({ length: buffered.length }, (_, i) => [buffered.start(i), buffered.end(i)]).some(
+        ([start, end]) => start! <= time && time < end!
+      )
+    )
+  );
 }
 
 /** Draw the current frame and report whether it has any non-uniform content (a rendered picture, not a blank). */
@@ -139,7 +153,8 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
 
     expect(context.mediaSource.get()?.sourceBuffers.length).toBe(2);
     expect(state.mediaContainerData.get()?.audio?.trackId).toBe(2);
-    expect(audioDecodedBytes(video)).toBeGreaterThan(0);
+    expect(sourceBuffersCover(context.mediaSource.get(), video.currentTime)).toBe(true);
+    expect(audioDecodedBytes(video) ?? 1).toBeGreaterThan(0);
     expect(state.errors.get() ?? []).toEqual([]);
 
     // One request per video segment served both loaders.
@@ -159,7 +174,10 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
       timeout: 15_000,
       interval: 250,
     });
-    expect(audioDecodedBytes(video)).toBeGreaterThan(decodedBefore);
+    expect(sourceBuffersCover(context.mediaSource.get(), video.currentTime)).toBe(true);
+
+    if (decodedBefore !== undefined) expect(audioDecodedBytes(video)).toBeGreaterThan(decodedBefore);
+
     expect(state.errors.get() ?? []).toEqual([]);
 
     // And back to the carried default, which now refetches segments the video loader passed long ago.
@@ -171,6 +189,7 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
       timeout: 15_000,
       interval: 250,
     });
+    expect(sourceBuffersCover(context.mediaSource.get(), video.currentTime)).toBe(true);
     expect(state.errors.get() ?? []).toEqual([]);
     expect(state.bandwidthState.get()?.bytesSampled).toBeGreaterThan(0);
 
