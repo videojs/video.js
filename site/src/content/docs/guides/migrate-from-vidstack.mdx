@@ -469,10 +469,10 @@ Treat engine access as an escape hatch. It couples your app to one engine, so pr
 
 ### YouTube and Vimeo
 
-The embeds take a URL, a bare ID, or one of Vidstack's shorthands as `src`:
+The embeds take a URL or a bare ID as `src`. Vidstack's `youtube/ID` and `vimeo/ID` shorthands aren't supported, so write them as URLs:
 
-- **`youtube/ID` plays from the privacy-enhanced host,** `youtube-nocookie.com`, as it did in Vidstack.
-- **`vimeo/ID?hash=HASH` still plays an unlisted video.** In a full Vimeo URL, give the hash as `?h=HASH` or as the last path segment.
+- **`youtube/ID` becomes `https://www.youtube-nocookie.com/embed/ID`** to keep playing from the privacy-enhanced host, as it did in Vidstack.
+- **`vimeo/ID?hash=HASH` becomes `https://vimeo.com/ID/HASH`** for an unlisted video. `?h=HASH` works in place of the last path segment.
 
 <FrameworkCase frameworks={["react"]}>
 A `ref` on `YouTubeVideo` or `VimeoVideo` is the `<iframe>`, which can't play or seek. Where you called methods on Vidstack's YouTube or Vimeo provider, pass `mediaRef` to get the adapter that drives the embed:
@@ -482,7 +482,7 @@ import type { YouTubeAdapter } from '@videojs/youtube-video';
 
 const mediaRef = useRef<YouTubeAdapter>(null);
 
-<YouTubeVideo mediaRef={mediaRef} src="youtube/aqz-KE-bpKQ" />
+<YouTubeVideo mediaRef={mediaRef} src="https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ" />
 
 // In an event handler
 if (mediaRef.current) mediaRef.current.currentTime = 30;
@@ -492,7 +492,7 @@ if (mediaRef.current) mediaRef.current.currentTime = 30;
 Vidstack fetched a poster for embeds automatically. Video.js doesn't ([#3049](https://github.com/videojs/v10/issues/3049)); set `poster` on the player if you want your own image before playback.
 
 <Aside type="caution" title="Embed privacy defaults changed">
-Vidstack loaded YouTube from `youtube-nocookie.com` and asked Vimeo not to track viewers unless you turned cookies on. Video.js plays a YouTube URL from the standard host unless it's a `youtube-nocookie.com` URL, and sends Vimeo's `dnt` flag only when you set `source.engine.vimeo.dnt`. Keep the privacy-enhanced behavior by writing YouTube sources as `youtube/VIDEO_ID` shorthands or `youtube-nocookie.com` URLs, and adding `dnt: true` to the Vimeo engine options.
+Vidstack loaded YouTube from `youtube-nocookie.com` and asked Vimeo not to track viewers unless you turned cookies on. Video.js plays a YouTube URL from the standard host unless it's a `youtube-nocookie.com` URL, and sends Vimeo's `dnt` flag only when you set `source.engine.vimeo.dnt`. Keep the privacy-enhanced behavior by writing YouTube sources as `youtube-nocookie.com` URLs, and adding `dnt: true` to the Vimeo engine options.
 </Aside>
 
 ### Choose the media from the URL
@@ -574,7 +574,7 @@ async function load(src) {
 Each media module loads with `import()`, so the page only downloads the engine its source needs, the way Vidstack's provider loaders did. A plain `<video>` needs no module. When the media changes, the player detaches from the old one, resets its state, and attaches to the new one; the skin follows.
 </FrameworkCase>
 
-`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
+`resolveAdapterType` recognizes the URLs Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, and Twitch, and returns `null` for anything else, including Vidstack's `youtube/ID` and `vimeo/ID` shorthands. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
 
 For a single source, change the media's `src` or `source` instead. The same media swaps the URL without being replaced.
 
@@ -1379,7 +1379,7 @@ These changes don't throw errors, so test for them:
 - **Controls.** They hide as soon as the pointer leaves the player during playback, where Vidstack waited for its 2-second idle delay.
 - **Hotkeys.** Shift no longer doubles the 10-second seek step, and the speed keys wrap around a fixed list.
 - **Captions.** The captions toggle prefers the browser's language over the `default` track.
-- **Embeds.** YouTube URLs and Vimeo no longer use their privacy-enhanced modes by default; `youtube/ID` shorthands still do.
+- **Embeds.** YouTube and Vimeo no longer use their privacy-enhanced modes by default, and the `youtube/ID` and `vimeo/ID` shorthands aren't supported. Write YouTube sources as `youtube-nocookie.com` URLs to keep its privacy-enhanced mode.
 - **Time.** `currentTime` updates about four times a second instead of every frame.
 - **Live.** Playback counts as live within 5 seconds of the stream's live edge start, not 10 seconds of the seekable end, and live skins have no time slider, quality, audio track, or rate menu.
 - **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%. Vidstack's controls did the same, but setting its `volume` or `muted` properties didn't.
