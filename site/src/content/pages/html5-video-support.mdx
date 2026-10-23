@@ -1,6 +1,6 @@
 ---
 title: "HTML5 video support"
-description: "Does this browser support HTML5 video? Almost certainly. Here's what that answer leaves out."
+description: "Check what your browser can play, and see what the video tag still leaves for you to build."
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
@@ -9,25 +9,25 @@ import VideoCapabilities from '@/components/support/VideoCapabilities.astro';
 
 ## Does this browser support HTML5 video?
 
-Almost certainly. Every current browser supports the `<video>` element. However, codec and streaming support still varies:
+Almost certainly. Every current browser supports the `<video>` element. Browsers still differ on codecs and streaming formats, so the table below checks yours:
 
 <VideoCapabilities />
 
 ## Why isn't HTML5 video enough?
 
-The native `<video>` tag is enough for a short clip that plays without controls. Once viewers control playback, the gaps show up quickly.
+A bare `<video>` tag is fine for a short clip with the browser's default controls. A real player needs more:
 
-- **Adaptive streaming.** HLS plays natively in Safari and in a few mobile browsers. DASH plays natively nowhere. Everywhere else needs a JavaScript playback engine on top of Media Source Extensions, and a way to swap engines when the source changes.
-- **Consistent controls.** Chrome, Safari, and Firefox each draw their own controls. You can hide them, but you can't restyle or rearrange them.
-- **Captions, quality, speed, and chapters.** The browser gives you no menu to pick text tracks, no quality selector, no playback speed control, and no chapter markers.
-- **Accessibility.** Keyboard shortcuts, focus management, screen reader labels, and reduced-motion preferences are on you the moment you replace the native controls.
-- **Everything else.** Thumbnail previews, live stream UI, AirPlay and Chromecast, error recovery, playback analytics, and sources like YouTube, Vimeo, or Mux each need their own wiring.
+- Adaptive streaming. Safari and a few mobile browsers play HLS natively, and no browser plays DASH natively. Everywhere else, you need a JavaScript engine built on Media Source Extensions.
+- Controls that look the same everywhere. Chrome, Safari, and Firefox each draw their own. You can turn them off, but you can't restyle them.
+- Menus for captions, quality, and playback speed, plus chapter markers. The browser gives you none of these.
+- Accessibility. Once you replace the native controls, keyboard shortcuts, focus handling, screen reader labels, and reduced motion are your job.
+- Thumbnail previews, live stream UI, AirPlay, Chromecast, error recovery, and analytics, plus YouTube and Vimeo embeds that use the same controls as your own video.
 
-Video.js ships each of those as a component, so you take the ones you need and keep the rest of the web platform. Read more: <DocsLink slug="guides/why-videojs">Why Video.js?</DocsLink>
+Video.js covers all of this, and each piece is a separate component, so you only ship what you use. <DocsLink slug="guides/why-videojs">Why Video.js?</DocsLink> goes into more detail.
 
 ## Get started with Video.js
 
-Here's a basic video player you can build with Video.js:
+A basic player looks like this:
 
 ```html title="index.html"
 <script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
@@ -54,16 +54,51 @@ export function MyPlayer({ src }: { src: string }) {
 }
 ```
 
-If you want to dive deeper, get started with our <DocsLink slug="guides/installation">installation guide</DocsLink>, which will guide you through generating a snippet that fits your use case.
+The <DocsLink slug="guides/installation">installation guide</DocsLink> generates a snippet for your framework, video source, and features.
 
-Video.js 8 remains documented at [legacy.videojs.org](https://legacy.videojs.org). If you're looking to upgrade to newer versions, start with <DocsLink slug="guides/migrate-from-video-js-8">Migrate from Video.js 8</DocsLink>.
+Still on Video.js 8? Its docs live at [legacy.videojs.org](https://legacy.videojs.org), and <DocsLink slug="guides/migrate-from-video-js-8">Migrate from Video.js 8</DocsLink> covers the upgrade.
+
+## Where to host the video
+
+The player is half the job. Adaptive streaming also needs each upload transcoded into several resolutions, packaged as HLS, and served from a CDN. You can build that yourself with ffmpeg and a storage bucket, or let a service do it.
+
+We build Video.js at Mux, so we're biased, but this is what [Mux Video](https://www.mux.com/video) is for. Upload a file, get back a playback ID, and stream it with `<mux-video>` in place of `<video>`:
+
+```html title="index.html"
+<script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
+<script type="module" src="{{VJS10_CDN_BASE}}/media/mux-video.js"></script>
+
+<video-player>
+  <video-skin>
+    <mux-video src="https://stream.mux.com/YOUR_PLAYBACK_ID.m3u8" playsinline></mux-video>
+  </video-skin>
+</video-player>
+```
+
+```tsx title="MyPlayer.tsx"
+import '@videojs/react/video/skin.css';
+import { MuxVideo } from '@videojs/react/media/mux-video';
+import { VideoPlayer, VideoSkin } from '@videojs/react/video';
+
+export function MyPlayer({ playbackId }: { playbackId: string }) {
+  return (
+    <VideoPlayer>
+      <VideoSkin>
+        <MuxVideo source={{ playbackId }} playsInline />
+      </VideoSkin>
+    </VideoPlayer>
+  );
+}
+```
+
+The quickest way to try it is the <DocsLink slug="guides/installation">installation guide</DocsLink>: drop in a video, sign in to Mux, and it comes back as a free HLS stream already wired into your snippet. Once real viewers are watching, <DocsLink slug="guides/mux-data">Mux Data</DocsLink> shows you startup time, rebuffering, and errors for every view.
 
 ## For AI agents
 
-Every page on this site is available as markdown, this one included.
+Every page on this site is available as Markdown, this one included.
 
 - `https://videojs.org/llms.txt` indexes the documentation.
-- Append `.md` to any documentation URL, including this one, to get its markdown.
-- Send `Accept: text/markdown` when fetching a documentation URL and you'll get markdown back.
+- Append `.md` to any documentation URL, including this one, to get its Markdown.
+- Request any documentation URL with `Accept: text/markdown` to get Markdown back.
 
 <DocsLinkCard slug="guides/build-with-ai" description="How to give AI tools the context they need to build Video.js players alongside you">Build with AI</DocsLinkCard>

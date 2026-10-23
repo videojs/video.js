@@ -1,6 +1,6 @@
 ---
 title: "Video player help"
-description: "Help when a video won't play, and an introduction to Video.js, the open-source video player for HTML and React."
+description: "What to try when a video won't play, and what Video.js is if you found this link in a player or a script."
 ---
 
 import DocsLink from '@/components/docs/DocsLink.astro';
@@ -8,38 +8,32 @@ import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 
 ## Video not playing?
 
-If a video on another site won't play, these usually help:
+If a video on another site won't play, try these first:
 
 - Reload the page.
 - Update your browser, or try a different one.
 - Check your internet connection.
-- Pause ad or content blockers for the site, since they can stop video from loading.
+- Turn off ad or content blockers for that site. They sometimes block the video along with the ads.
 
-If the video still won't play, the site that shared it is the best place to ask. They host the video and can see what's happening on their end.
+Still stuck? Contact the site that's showing the video. We make the player, but we don't host their videos and can't see their servers.
 
-If you maintain a site that uses this player, our [support options](/support) cover community help and enterprise support.
+### If you run the site
+
+When only some viewers can't play a video, the cause is usually their browser, device, or network, and you won't see it by testing on your own machine. [Mux Data](https://www.mux.com/data) records startup time, rebuffering, and errors for every view, so you can see who's affected and why. It plugs into Video.js as an <DocsLink slug="guides/mux-data">extension</DocsLink>.
+
+For bugs in Video.js itself, see our [support options](/support), from GitHub issues to paid support from Mux.
 
 ## What is Video.js?
 
-The player you saw is built with Video.js, the open-source video player for the web. It has been playing video on millions of sites since 2010, and today it ships as web components for HTML and as components for React. It makes web video easy, performant, accessible, and customizable.
+Video.js is a free, open-source video player for websites. It's been around since 2010 and runs on millions of sites. The current version ships as web components for HTML and as components for React.
 
-Video.js is built at Mux by the teams behind Video.js, Plyr, Vidstack, and Media Chrome, with contributions from engineers across other player projects.
+It's built at Mux by the people behind Video.js, Plyr, Vidstack, and Media Chrome, with contributions from engineers who work on other players.
 
-## Why Video.js?
-
-The native `<video>` tag is enough for a short clip that plays without controls. Once viewers control playback, the gaps show up quickly.
-
-- **Adaptive streaming.** HLS plays natively in Safari and in a few mobile browsers. DASH plays natively nowhere. Everywhere else needs a JavaScript playback engine on top of Media Source Extensions, and a way to swap engines when the source changes.
-- **Consistent controls.** Chrome, Safari, and Firefox each draw their own controls. You can hide them, but you can't restyle or rearrange them.
-- **Captions, quality, speed, and chapters.** The browser gives you no menu to pick text tracks, no quality selector, no playback speed control, and no chapter markers.
-- **Accessibility.** Keyboard shortcuts, focus management, screen reader labels, and reduced-motion preferences are on you the moment you replace the native controls.
-- **Everything else.** Thumbnail previews, live stream UI, AirPlay and Chromecast, error recovery, playback analytics, and sources like YouTube, Vimeo, or Mux each need their own wiring.
-
-Video.js ships each of those as a component, so you take the ones you need and keep the rest of the web platform. Read more: <DocsLink slug="guides/why-videojs">Why Video.js?</DocsLink>
+The browser's `<video>` tag can play a file, but that's about it. It doesn't stream adaptively outside Safari, its controls can't be restyled, and it has no menus for captions, quality, or speed. Video.js adds those pieces as separate components, so you only ship what you use. [HTML5 video support](/html5-video-support) covers the gaps in more detail, and <DocsLink slug="guides/why-videojs">Why Video.js?</DocsLink> explains how we approach them.
 
 ## Build one yourself
 
-Here's a basic video player you can build with Video.js:
+A basic player looks like this:
 
 ```html title="index.html"
 <script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
@@ -66,16 +60,14 @@ export function MyPlayer({ src }: { src: string }) {
 }
 ```
 
-If you want to dive deeper, get started with our <DocsLink slug="guides/installation">installation guide</DocsLink>, which will guide you through generating a snippet that fits your use case.
-
-<DocsLinkCard slug="guides/installation" description="Install Video.js and build your first player with streaming support and accessible controls">Get started with Video.js</DocsLinkCard>
+The <DocsLink slug="guides/installation">installation guide</DocsLink> generates a snippet for your framework, video source, and features. Don't have a video hosted yet? Drop one into the guide and it's uploaded to [Mux](https://www.mux.com/video) for free, transcoded into an HLS stream, and wired into the snippet.
 
 ## For AI agents
 
-This page and every documentation page are available as markdown.
+This page and every documentation page are available as Markdown.
 
 - `https://videojs.org/llms.txt` indexes the documentation.
-- Append `.md` to any documentation URL, including this one, to get its markdown.
-- Send `Accept: text/markdown` when fetching a documentation URL and you'll get markdown back.
+- Append `.md` to any documentation URL, including this one, to get its Markdown.
+- Request any documentation URL with `Accept: text/markdown` to get Markdown back.
 
 <DocsLinkCard slug="guides/build-with-ai" description="How to give AI tools the context they need to build Video.js players alongside you">Build with AI</DocsLinkCard>
