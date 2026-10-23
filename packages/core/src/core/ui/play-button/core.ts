@@ -65,8 +65,13 @@ export class PlayButtonCore {
   getState(): PlayButtonState {
     const media = this.#media!;
 
-    // A pending autoplay shows as playback about to begin, so the button offers to stop it.
-    this.state.patch({ paused: media.paused && !media.autoplaying, ended: media.ended, started: media.started });
+    // A pending autoplay shows as playback that has begun, so the button offers to stop it. Skins pick the pause icon
+    // from `started` as well as `paused`.
+    this.state.patch({
+      paused: media.paused && !media.autoplaying,
+      ended: media.ended,
+      started: media.started || media.autoplaying,
+    });
     this.state.patch({ label: resolveText(this.getLabel(this.state.current)) });
 
     return this.state.current;

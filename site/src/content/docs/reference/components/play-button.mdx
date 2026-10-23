@@ -78,7 +78,7 @@ React renders a `<button>` element. Add a `className` to style it:
 ```
 </FrameworkCase>
 
-After first play, the `data-started` attribute is added and remains present until a new source is loaded. Use this to hide the play button when media hasn't started yet:
+The `data-started` attribute is present while the media tries to autoplay, and from first play until a new source is loaded. Use this to hide the play button when media hasn't started yet:
 
 <FrameworkCase frameworks={["html"]}>
 ```css

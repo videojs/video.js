@@ -59,6 +59,7 @@ describe('PlayButtonCore', () => {
       const state = core.getState();
 
       expect(state.paused).toBe(false);
+      expect(state.started).toBe(true);
       expect(core.getLabel(state)).toMatchObject({ key: 'buttons.pause', text: 'Pause' });
     });
   });
