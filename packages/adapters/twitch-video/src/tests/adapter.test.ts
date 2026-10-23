@@ -266,6 +266,20 @@ describe('TwitchAdapter', () => {
     media.detach();
   });
 
+  it('builds the embed muted from the muted property, as React sets it', async () => {
+    const media = new TwitchAdapter();
+    const iframe = createIframe();
+
+    media.attach(iframe);
+    media.src = VOD_SRC;
+    media.autoplay = true;
+    media.muted = true;
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toContain('muted=true');
+    media.detach();
+  });
+
   it('defers the embed for an iframe rendered with an empty src', async () => {
     const media = new TwitchAdapter();
     // React renders `src=""` before a source resolves. The `src` property reports
