@@ -3,11 +3,7 @@ import '@app/styles.css';
 // http://localhost:5173/lazy-video-html/
 //
 // Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
-// Light mode (`?light`) shows a poster and a play button, and loads nothing until play is pressed.
-import '@videojs/html/video/player';
-import '@videojs/html/video/skin';
-import '@videojs/html/video/skin.css';
-import '@videojs/html/media/lazy-video';
+// Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
@@ -201,15 +197,22 @@ function renderLightStatus() {
   lightStatus.textContent = light ? describeLightStart(clickedAt, startedAt, timedOut) : '';
 }
 
+// The player, skin, and `<lazy-video>` are one chunk: loaded at once outside light mode, and on play in light mode.
+const loadPlayer = () => import('./player');
+// Counts renders, so a player that finishes loading after a newer render doesn't mount.
+let generation = 0;
+
 function renderStage() {
   const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === src)?.poster;
+  const current = ++generation;
 
   cleanup();
+  cleanup = () => {};
   resolved.textContent = '(none)';
+  lazyVideo = null;
+  renderScriptBytes();
 
   if (light && clickedAt === undefined) {
-    lazyVideo = null;
-    renderScriptBytes();
     stage.innerHTML = html`
       <button type="button" class="${c.facade}" aria-label="Play video" data-light-play>
         ${poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : ''}
@@ -222,6 +225,18 @@ function renderStage() {
     return;
   }
 
+  // The poster stays up while the player loads.
+  stage.innerHTML = html`
+    <div class="${c.placeholder}">${poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : ''}</div>
+  `;
+  renderLightStatus();
+
+  void loadPlayer().then(() => {
+    if (current === generation) mountPlayer(poster);
+  });
+}
+
+function mountPlayer(poster: string | undefined) {
   // After the click in light mode, `preload="auto"`: hls.js doesn't let `autoplay` override `preload="none"`.
   stage.innerHTML = html`
     <video-player${poster ? ` poster="${poster}"` : ''}>
@@ -266,6 +281,13 @@ function resetLight() {
   clickedAt = undefined;
   startedAt = undefined;
   timedOut = false;
+}
+
+// Start fetching the player when play looks likely, so less of it loads after the click.
+for (const type of ['pointerover', 'focusin']) {
+  root.addEventListener(type, (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-light-play]')) void loadPlayer();
+  });
 }
 
 lightToggle.addEventListener('change', () => {

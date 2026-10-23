@@ -125,6 +125,7 @@ export const LAZY_DEMO_CLASSES = {
   facade:
     'sandbox-video-frame group relative grid w-full cursor-pointer place-items-center overflow-hidden bg-black outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
   facadeImage: 'absolute inset-0 size-full object-cover',
+  placeholder: 'sandbox-video-frame relative w-full overflow-hidden bg-black',
   facadePlay:
     'relative grid size-16 place-items-center rounded-full bg-black/60 text-white transition-transform group-hover:scale-110',
   facadeIcon: 'size-8 fill-current',
