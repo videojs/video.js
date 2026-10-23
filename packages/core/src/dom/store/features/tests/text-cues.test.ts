@@ -773,6 +773,20 @@ describe('textCuesFeature', () => {
       expect(copyOf(second.id)).toBeNull();
     });
 
+    it('keeps a showing copy showing through a re-attach to the same media', () => {
+      const { video, store, detach, copyOf } = setupWithElements();
+      const track = store.addTextTrack(captions);
+
+      store.selectSubtitlesTrack(track.id);
+      detach();
+
+      expect(copyOf(track.id)).toBeNull();
+
+      store.attach({ media: video, container: null });
+
+      expect(copyOf(track.id)!.track.mode).toBe('showing');
+    });
+
     it('leaves metadata tracks out of the media', () => {
       const { video, store } = setupWithElements();
 

@@ -58,6 +58,9 @@ interface TextCuesSourceState extends MediaTextCuesState, AppTextTracksState {
   [CURRENT_SRC]: string | null;
 }
 
+/** The modes of app caption copies when the store last detached, so a re-attach can restore them. */
+const savedCopyModes = new WeakMap<AppTextTracksChange, Map<string, TextTrackLike['mode']>>();
+
 interface TrackedTrack {
   track: TextTrackLike;
   cueCount: number;
@@ -251,7 +254,9 @@ export const textCuesFeature = definePlayerFeature({
 
         if (!copy) {
           const { id, kind, label, language } = track;
-          const handle = createTextTrack(textTracks, { id, kind, label, language, mode: 'disabled' });
+          // A re-attach recreates copies; one that was showing keeps showing.
+          const mode = savedCopyModes.get(appTracks)?.get(id) ?? 'disabled';
+          const handle = createTextTrack(textTracks, { id, kind, label, language, mode });
           if (!handle) continue;
 
           copy = { handle, written: new Map() };
@@ -424,6 +429,8 @@ export const textCuesFeature = definePlayerFeature({
         unsubscribeFilters();
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        savedCopyModes.set(appTracks, new Map(Array.from(copies, ([id, { handle }]) => [id, handle.track.mode])));
 
         for (const { handle } of copies.values()) handle.remove();
 
