@@ -23,6 +23,8 @@ describe('resolveAdapterType', () => {
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
     ['https://www.twitch.tv/monstercat', 'twitch'],
+    ['https://streamable.com/e/moo?playerjs', 'playerjs'],
+    ['https://embed.example.com/e/moo?autoplay=1&playerjs=1', 'playerjs'],
   ])('resolves the service URL %s to %s', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
@@ -60,6 +62,11 @@ describe('resolveAdapterType', () => {
     expect(resolveAdapterType('https://example.com/manifest', 'audio/mpegurl; charset=utf-8')).toBe('hls');
   });
 
+  it('prefers a player.js marker over the host and the file extension', () => {
+    expect(resolveAdapterType('https://player.vimeo.com/video/76979871?playerjs')).toBe('playerjs');
+    expect(resolveAdapterType('https://embed.example.com/player.mp4?playerjs')).toBe('playerjs');
+  });
+
   it('prefers the service adapter type over the MIME type', () => {
     expect(
       resolveAdapterType(
@@ -82,6 +89,8 @@ describe('resolveAdapterType', () => {
     ['a youtube/<id> path', 'youtube/aqz-KE-bpKQ'],
     ['a vimeo/<id> path', 'vimeo/76979871'],
     ['a Mux player page', 'https://player.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
+    ['a player.js embed without the marker', 'https://streamable.com/e/moo'],
+    ['a player.js marker in the hash', 'https://streamable.com/e/moo#playerjs'],
     ['an unknown file type', 'https://example.com/file.bin'],
     ['a YouTube page without a video', 'https://www.youtube.com/'],
     ['a Vimeo page without a video', 'https://vimeo.com/'],

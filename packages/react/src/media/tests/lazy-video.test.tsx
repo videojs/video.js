@@ -127,6 +127,14 @@ describe('LazyVideo', () => {
     expect(container.querySelector('iframe')!.hasAttribute('fallback')).toBe(false);
   });
 
+  it('loads the player.js media for an embed marked playerjs, without passing the marker on', async () => {
+    const { container } = render(<LazyVideo src="https://embed.example.com/e/moo?playerjs" />);
+
+    await waitFor(() => expect(container.querySelector('iframe')).not.toBeNull(), LOAD_TIMEOUT);
+
+    expect(container.querySelector('iframe')!.getAttribute('src')).toBe('https://embed.example.com/e/moo');
+  });
+
   it('swaps the media when the source needs a different one', async () => {
     const { container, rerender } = render(<LazyVideo src="/movie.mp4" />);
 
@@ -138,7 +146,7 @@ describe('LazyVideo', () => {
 
   it('renders nothing and reports a source it cannot resolve', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { container } = render(<LazyVideo src="https://streamable.com/e/moo" />);
+    const { container } = render(<LazyVideo src="https://embed.example.com/e/moo" />);
 
     expect(container.innerHTML).toBe('');
     expect(error).toHaveBeenCalledWith(expect.stringContaining('pass its MIME type as `type`'));

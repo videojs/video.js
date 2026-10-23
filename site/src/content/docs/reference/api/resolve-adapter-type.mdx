@@ -94,6 +94,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `SpotifyAudio` |
 | `tiktok` | `tiktok.com` video URLs | `TikTokVideo` |
 | `twitch` | `twitch.tv` video and channel URLs | `TwitchVideo` |
+| `playerjs` | URLs with a `playerjs` query parameter | `PlayerJsVideo` |
 | `hls` | `.m3u8` files and HLS MIME types | `HlsVideo`, `HlsJsVideo`, or `NativeHlsVideo` |
 | `dash` | `.mpd` files and `application/dash+xml` | `DashVideo` or `ShakaVideo` |
 | `video` | `.mp4`, `.webm`, `.mov`, and `.ogv` files, and `video/*` MIME types | `Video` |
@@ -111,6 +112,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `<spotify-audio>` |
 | `tiktok` | `tiktok.com` video URLs | `<tiktok-video>` |
 | `twitch` | `twitch.tv` video and channel URLs | `<twitch-video>` |
+| `playerjs` | URLs with a `playerjs` query parameter | `<playerjs-video>` |
 | `hls` | `.m3u8` files and HLS MIME types | `<hls-video>`, `<hlsjs-video>`, or `<native-hls-video>` |
 | `dash` | `.mpd` files and `application/dash+xml` | `<dash-video>` or `<shaka-video>` |
 | `video` | `.mp4`, `.webm`, `.mov`, and `.ogv` files, and `video/*` MIME types | `<video>` |
@@ -118,6 +120,8 @@ Each media module you import adds its engine to your bundle, so import the rarel
 </FrameworkCase>
 
 `hls` covers every HLS adapter and `dash` every DASH adapter, so an HLS stream comes back as `hls` whichever one you play it with; see <DocsLink slug="guides/media-sources">Media sources</DocsLink> to choose one. Mux streams served from a custom domain are recognized as plain `hls`.
+
+player.js is a protocol any embed can speak, so nothing in an embed's URL says it's one. Add a `playerjs` query parameter, such as `https://streamable.com/e/moo?playerjs`, to resolve the URL as `playerjs` whatever its host or file extension. The player.js media removes the parameter before loading the embed.
 
 ### MIME types
 

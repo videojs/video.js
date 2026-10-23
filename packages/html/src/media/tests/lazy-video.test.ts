@@ -106,11 +106,22 @@ describe('LazyVideo', () => {
     const element = create({ src: '/movie.mp4' });
 
     await flush();
-    element.setAttribute('src', 'https://streamable.com/e/moo');
+    element.setAttribute('src', 'https://embed.example.com/e/moo');
     await flush();
 
     expect(element.children).toHaveLength(0);
     expect(error).toHaveBeenCalledWith(expect.stringContaining('set its MIME type in the `type` attribute'));
+  });
+
+  it('loads the player.js media for an embed marked playerjs', async () => {
+    const element = create({ src: 'https://embed.example.com/e/moo?playerjs' });
+
+    await vi.waitFor(() => expect(element.querySelector('playerjs-video')).not.toBeNull(), LOAD_TIMEOUT);
+
+    expect(customElements.get('playerjs-video')).toBeDefined();
+    expect(element.querySelector('playerjs-video')!.getAttribute('src')).toBe(
+      'https://embed.example.com/e/moo?playerjs'
+    );
   });
 
   it('keeps a newer source from reaching the media it is replacing', async () => {
