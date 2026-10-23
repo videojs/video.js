@@ -19,6 +19,8 @@ export type {
   CaptionsRadioGroupState,
   CastButtonProps,
   CastButtonState,
+  ChapterCueValue,
+  ChapterImage,
   ControlsProps,
   ControlsState,
   ControlsVisibility,
@@ -95,6 +97,7 @@ export type {
   StatusDetails,
   StatusIndicatorProps,
   StatusIndicatorState,
+  TextCueFormat,
   TextCueInit,
   TextCuesSource,
   TextTrackContent,
@@ -131,7 +134,17 @@ export type {
   VolumeSliderProps,
   VolumeSliderState,
 } from '@videojs/core';
-export { defineTextTrack, getActiveTextCues, getTextCues, getTextTracks, hlsMetadataTrack } from '@videojs/core';
+export {
+  appleHlsChapters,
+  chaptersTrack,
+  defineTextTrack,
+  getActiveTextCues,
+  getTextCues,
+  getTextTracks,
+  hlsMetadataTrack,
+  jsonLdChapters,
+  podcastChapters,
+} from '@videojs/core';
 export type { Text, TextParams, TranslationKey, TranslationOptions } from '@videojs/core/i18n';
 // Core
 export * from './constants';

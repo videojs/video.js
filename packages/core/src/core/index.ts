@@ -103,10 +103,12 @@ export type {
   AddTextTrack,
   AppTextTrack,
   InferCueValue,
+  TextCueFormat,
   TextCueInit,
   TextTrackContent,
   TextTrackInit,
 } from './text-track/app';
+export * from './text-track/chapters';
 export * from './text-track/definition';
 export * from './text-track/hls';
 export * from './text-track/read';

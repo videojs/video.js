@@ -13,7 +13,7 @@ import { isNull } from '@videojs/utils/predicate';
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
 import { getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
-import { toMediaTextCues } from '../text-cues';
+import { fillChapterEnds, toMediaTextCues } from '../text-cues';
 import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 interface IdentifiedTrack {
@@ -174,7 +174,10 @@ export const textTrackFeature = definePlayerFeature({
             kind: 'chapters',
             duration: isMediaSeekCapable(media) ? media.duration : NaN,
           })
-        : (appTracks.find(({ track }) => track.kind === 'chapters')?.cues ?? []);
+        : fillChapterEnds(
+            appTracks.find(({ track }) => track.kind === 'chapters')?.cues ?? [],
+            isMediaSeekCapable(media) ? media.duration : NaN
+          );
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
