@@ -10,7 +10,7 @@
  * Reads no other slot, and has no source-identity reset: the screen is independent of the presentation, so a new `src`
  * doesn't invalidate the reading.
  */
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Signal } from '../../../core/signals/primitives';
 import { type ScreenResolution, watchScreenResolution } from '../../../media/dom/screen';
 

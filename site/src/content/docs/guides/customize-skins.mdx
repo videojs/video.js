@@ -8,7 +8,9 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
 import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 
-Start with the path that matches the change you want:
+Pick the skin closest to the design you want first. To apply your brand to a finished design, the Neutral skin is the usual starting point. To build your own design, start from the Scaffold skin. See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink>.
+
+Then start with the path that matches the change you want:
 
 | If you want to… | Use this path |
 | --------------- | ------------- |
@@ -63,7 +65,7 @@ Packaged skins expose [CSS custom properties](https://developer.mozilla.org/en-U
 
 If you omit `--media-accent-text-color`, the skins choose a contrasting text color from `--media-accent-color` using [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/contrast-color). Browsers before Chrome 147, Firefox 146, and Safari 26 lack `contrast-color()` and use the theme's default text color instead, which suits only the default accent, so set both properties together if you support those browsers.
 
-The skins use [`Inter`](https://rsms.me/inter/) when your page loads it and fall back to the system UI font. Video.js does not load the webfont for you. Set `--media-font-family` to use another font.
+The skins use [`Inter`](https://rsms.me/inter/) when your page loads it and fall back to the system UI font. Video.js does not load the webfont for you. Set `--media-font-family` to use another font. The Scaffold skin inherits your page's font instead, and it has no hairline, so `--media-border-color` doesn't change it.
 
 The media component and poster share `--media-object-fit` and `--media-object-position`, so a `cover` poster stays aligned with `cover` video. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 
@@ -199,7 +201,7 @@ Installed files belong to your project, so an update replaces your local copy. C
 npx shadcn@latest add @videojs/video --overwrite
 ```
 
-To understand how skins fit into Video.js, read <DocsLink slug="guides/skins">Skins</DocsLink>. To create a control instead of editing one, follow <DocsLink slug="guides/build-your-own-component">Build your own component</DocsLink>.
+To understand how skins fit into Video.js, read <DocsLink slug="guides/skins">Skins</DocsLink>. To design a new interface from a minimal starting point, follow <DocsLink slug="guides/build-your-own-skin">Build your own skin</DocsLink>. To create a control instead of editing one, follow <DocsLink slug="guides/build-your-own-component">Build your own component</DocsLink>.
 
 ## Related components
 
@@ -208,4 +210,5 @@ To understand how skins fit into Video.js, read <DocsLink slug="guides/skins">Sk
 ## Related guides
 
 - <DocsLink slug="guides/skins">Skins</DocsLink>
+- <DocsLink slug="guides/build-your-own-skin">Build your own skin</DocsLink>
 - <DocsLink slug="guides/build-your-own-component">Build your own UI component</DocsLink>

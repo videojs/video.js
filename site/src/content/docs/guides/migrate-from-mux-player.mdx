@@ -505,7 +505,7 @@ Choose the smallest customization that meets your existing UI requirements: a pa
 
 ### Level 1: pick a skin
 
-Video.js has three packaged skins. The Default skin groups settings in a menu. The Neutral skin has a compact layout like a classic player control bar. The Compat skin uses plain surfaces and basic controls for broader browser support. All three bring controls, tooltips, captions, keyboard shortcuts, touch gestures, and a settings menu that appears when there's something to put in it. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+Video.js has four packaged skins. The Default skin groups settings in a menu. The Neutral skin has a compact layout like a classic player control bar. The Compat skin has plain, unbranded surfaces with large play and seek buttons in the center. The Scaffold skin has Compat's controls with minimal styling, as a starting point for your own design. All four bring controls, tooltips, captions, keyboard shortcuts, touch gestures, and a settings menu that appears when there's something to put in it. See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink>.
 
 ### Level 2: restyle it
 
@@ -960,7 +960,7 @@ Video.js has no Program Date Time (PDT) helpers such as `getStartDate()` or `cur
 
 Check these limitations against your required features:
 
-- The two packaged skins do not reproduce Mux Player's themes, and there is no runtime theme switch. Plan skin customization when preserving a theme such as `classic`.
+- The packaged skins do not reproduce Mux Player's themes, and there is no runtime theme switch. Plan skin customization when preserving a theme such as `classic`.
 - Lazy loading (`loading="viewport|page"`) has no equivalent.
 - The controls auto-hide delay isn't configurable ([#1728](https://github.com/videojs/v10/issues/1728)). For always-visible controls, set `visibility="always"` on the controls component in a custom layout or installed skin source.
 - Player preferences such as volume, captions language, speed, and quality are not persisted automatically ([#944](https://github.com/videojs/v10/issues/944)). Mux users can set `source.playback.defaultSubtitlesLang` so the HLS playlist sets the default subtitle language. For application-managed persistence, follow <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink>.

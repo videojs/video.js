@@ -109,7 +109,8 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #textTracksHost: HTMLVideoElement | null = null;
   #textTracksDisconnect: AbortController | null = null;
 
-  static PLAYER_SOFTWARE_NAME = 'vimeo-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'vimeo';
 
   /** Underlying `@vimeo/player` instance. Null until an embed URL can be resolved, which may be after `attach()`. */
   get engine() {

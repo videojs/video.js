@@ -119,6 +119,10 @@ commit_preprocessors = [
     # lower numbers still belong to videojs/v10.
     { pattern = '\(#(924[89]|92[5-9][0-9]|9[3-9][0-9]{2}|[1-9][0-9]{4,})\)', replace = "([#${1}](https://github.com/videojs/video.js/pull/${1}))" },
     { pattern = '\(#([0-9]+)\)', replace = "([#${1}](https://github.com/videojs/v10/pull/${1}))" },
+    # #9391 changed internal SPF APIs only, so it shipped in a minor release; its PR body
+    # carries a matching release-please commit override. Keep this: the changelog is
+    # regenerated from history on every run, so removing it re-marks 10.2.0 as breaking.
+    { pattern = '^refactor\(spf\)!: derive engine types from their behaviors and drop shareSignals', replace = "refactor(spf): derive engine types from their behaviors and drop shareSignals" },
     # Check spelling of the commit message using https://github.com/crate-ci/typos.
     # If the spelling is incorrect, it will be fixed automatically.
     #{ pattern = '.*', replace_command = 'typos --write-changes -' },

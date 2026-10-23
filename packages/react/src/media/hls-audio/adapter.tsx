@@ -1,6 +1,6 @@
 'use client';
 
-import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/hls-audio';
+import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
 import { type AudioHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';

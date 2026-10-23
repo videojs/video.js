@@ -46,5 +46,5 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
 
 export const meta = {
   title: 'Compat Video Skin',
-  description: 'An on-demand video skin designed for broader browser compatibility.',
+  description: 'A plain, unbranded on-demand video skin with the core video controls.',
 } as const satisfies SkinDescription;

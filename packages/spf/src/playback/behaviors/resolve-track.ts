@@ -1,4 +1,4 @@
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
 import { when } from '../../core/signals/when';
