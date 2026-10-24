@@ -86,6 +86,7 @@ describe('formatType', () => {
     ['(x: string) => void', '((x: string) => void)'],
     ['{ (state: State): Result; displayName?: string }', '{ (state: State): Result; displayName?: string }'],
     ['{ run(count?: number, ...rest: string[]): void }', '{ run(count?: number, ...rest: string[]): void }'],
+    ['{ id: string; [CUE_TYPE]?: Cue; [NOTIFY](): void }', '{ id: string }'],
     ['new (host: HTMLElement) => Controller', '(new (host: HTMLElement) => Controller)'],
     ['Tag | (string & {})', 'Tag | string & {}'],
   ])('formats %s', (input, expected, removeUndefined = false) => {

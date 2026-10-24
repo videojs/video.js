@@ -1,0 +1,104 @@
+---
+title: defineTextTrack
+description: Define a text track once, with the type of its cue values, to add and read it with
+stability: unstable
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { defineTextTrack } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { defineTextTrack } from '@videojs/html';
+```
+</FrameworkCase>
+
+`defineTextTrack` returns a track definition: a track's `kind`, and optionally its `label` and `language`, typed with the `value` its cues carry. A definition works anywhere a text track filter does, matching tracks by kind, label, and language. Reading through it types each cue's `value`, and adding a track from it checks the cues you pass against that type.
+
+## Usage
+
+Pass the value type as a type parameter. The type isn't checked at runtime.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { defineTextTrack, useActiveTextCues, useCreateTextTrack, type TextCueInit } from '@videojs/react';
+
+interface Quiz {
+  question: string;
+}
+
+const quizTrack = defineTextTrack<Quiz>({ kind: 'metadata', label: 'quiz' });
+
+function QuizOverlay({ cues }: { cues: TextCueInit<Quiz>[] }) {
+  useCreateTextTrack(quizTrack, { cues });
+
+  const [cue] = useActiveTextCues(quizTrack);
+  if (!cue) return null;
+
+  return <div className="quiz">{cue.value?.question}</div>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { defineTextTrack, getActiveTextCues, type TextCueInit } from '@videojs/html';
+
+interface Quiz {
+  question: string;
+}
+
+const quizTrack = defineTextTrack<Quiz>({ kind: 'metadata', label: 'quiz' });
+
+const player = document.querySelector('video-player')!;
+const cues: TextCueInit<Quiz>[] = await fetch('/api/quiz').then((res) => res.json());
+
+player.store.addTextTrack(quizTrack, { cues });
+
+player.store.subscribe(() => {
+  const [cue] = getActiveTextCues(player.store, quizTrack);
+  console.log(cue?.value?.question);
+});
+```
+</FrameworkCase>
+
+### Schemas
+
+Pass a `schema` to check values where they're read. It takes any [Standard Schema](https://standardschema.dev), the validation interface zod, valibot, ArkType, and other libraries implement, and the value type comes from the schema's output.
+
+```ts
+import { z } from 'zod';
+
+const QuizSchema = z.object({ question: z.string() });
+
+const quizTrack = defineTextTrack({ kind: 'metadata', label: 'quiz', schema: QuizSchema });
+```
+
+Readers skip a cue whose value fails the schema, and warn in development. Each cue is checked once per schema. Schemas must be synchronous; an asynchronous schema fails every value. Adding a track doesn't run the schema.
+
+### Built-in definitions
+
+<DocsLink slug="reference/api/chapters-track">`chaptersTrack`</DocsLink> matches every chapters track and types the values chapter formats carry. <DocsLink slug="reference/api/hls-metadata-track">`hlsMetadataTrack`</DocsLink> matches the metadata track hls.js publishes ID3 and `EXT-X-DATERANGE` metadata on.
+
+## Exports
+
+| Export | Description |
+| --- | --- |
+| `TextTrackDefinition` | A track definition. Its type parameter is the cue type it reads. |
+| `TextTrackIdentity` | What identifies a track: `kind`, `label`, and `language`. |
+| `InferTextTrackCue` | The cue type a definition reads, as in `InferTextTrackCue<typeof quizTrack>`. |
+| `InferSchemaOutput` | The value type a schema produces. |
+| `StandardSchemaV1` | The Standard Schema interface a `schema` implements. |
+| `StandardSchemaV1Props` | The properties a Standard Schema carries under its `~standard` key. |
+| `StandardSchemaV1Result` | What a Standard Schema's `validate` returns. |
+
+<UtilReference util="defineTextTrack" />

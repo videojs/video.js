@@ -1127,13 +1127,13 @@ The browser parses and renders the cues, so:
 - **Only WebVTT works.** Vidstack parsed SRT, SSA/ASS, and JSON with `type` ([#3037](https://github.com/videojs/v10/issues/3037)). Convert them to WebVTT at build time or on your server.
 - **Style captions with `::cue`.** `<media-captions>`, its `data-part` selectors, and the `--media-cue-*` variables have no equivalent ([#3038](https://github.com/videojs/v10/issues/3038)). The skins keep native captions clear of the controls in Chromium and WebKit browsers.
 - **There's no caption style menu** for viewers to pick fonts, colors, and backgrounds ([#1437](https://github.com/videojs/v10/issues/1437)). Viewers can still set caption preferences in their operating system or browser.
-- **Adding tracks from code is native.** `textTracks.add()` becomes a `<track>` element, or `addTextTrack()` and `VTTCue` on a plain `<video>`.
+- **Add tracks from code through the player.** `textTracks.add()` becomes the store's `addTextTrack()`, which takes cues, or a WebVTT or JSON file to load them from, and works with any media. See <DocsLink slug="guides/timed-metadata">Timed metadata</DocsLink>.
 
 The captions toggle picks a track differently. Vidstack restored the last track shown, then the `default` track, then the first one. Video.js restores the last track shown, then one that matches the browser's language, then the first track. See <DocsLink slug="guides/captions">Captions</DocsLink>.
 
 ### Chapters
 
-A `<track kind="chapters" default>` still segments the time slider, and the chapter under the pointer shows in the preview. Vidstack's chapters menu, `ChapterTitle` outside the slider, and `useChapterOptions` have no equivalent ([#1873](https://github.com/videojs/v10/issues/1873)). To add chapters from code, use the native track APIs described under [Captions](#captions); there's no dedicated chapters API yet ([#1268](https://github.com/videojs/v10/issues/1268)). For a current-chapter label elsewhere, find the cue in the `chaptersCues` state that contains `currentTime`.
+A `<track kind="chapters" default>` still segments the time slider, and the chapter under the pointer shows in the preview. Vidstack's chapters menu, `ChapterTitle` outside the slider, and `useChapterOptions` have no equivalent ([#1873](https://github.com/videojs/v10/issues/1873)). To add chapters from code or a JSON file, add a `chapters` track with the store's `addTextTrack()`. For a current-chapter label elsewhere, read the active cue through `chaptersTrack`. See <DocsLink slug="guides/timed-metadata" anchor="add-chapters">Timed metadata</DocsLink>.
 
 ### Thumbnails
 

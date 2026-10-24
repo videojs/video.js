@@ -8,7 +8,10 @@ export interface TextCueInit<Value = unknown> {
   /** Defaults to an id unique within the track. */
   id?: string | undefined;
   startTime: number;
-  /** Omit for a point, which stays active for one second. */
+  /**
+   * Omit for a point, which stays active for one second. In a chapters track, a chapter without an end runs to the next
+   * one, and the last to the end of the media.
+   */
   endTime?: number | undefined;
   text?: string | undefined;
   /** Structured, JSON-serializable data, named after the platform's `DataCue`. */

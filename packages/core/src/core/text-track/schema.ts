@@ -24,7 +24,7 @@ export type StandardSchemaV1Result<Output> =
 /**
  * The value type a schema produces.
  *
- * @internal
+ * @experimental
  */
 export type InferSchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output'];
 

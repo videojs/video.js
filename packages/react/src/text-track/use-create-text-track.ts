@@ -20,7 +20,7 @@ import { useLatestRef } from '../utils/use-latest-ref';
  * @param track - The track definition to add.
  * @param content - The track's cues.
  * @label With Definition
- * @internal
+ * @experimental
  */
 export function useCreateTextTrack<Cue extends MediaTextCue>(
   track: TextTrackDefinition<Cue>,
@@ -36,7 +36,7 @@ export function useCreateTextTrack<Cue extends MediaTextCue>(
  *
  * @param init - The track to add, with its cues.
  * @label With Description
- * @internal
+ * @experimental
  */
 export function useCreateTextTrack<Value = unknown>(init: TextTrackInit<Value>): AppTextTrack<Value> | null;
 export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackContent): AppTextTrack | null {

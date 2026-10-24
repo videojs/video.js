@@ -7,7 +7,7 @@ import { defineTextTrack, type TextTrackDefinition } from './definition';
 /**
  * An image for a chapter, such as its artwork or a thumbnail.
  *
- * @internal
+ * @experimental
  */
 export interface ChapterImage {
   url: string;
@@ -19,7 +19,7 @@ export interface ChapterImage {
  * What a chapter can carry beyond its title, from Apple HLS, Podcasting 2.0, or JSON-LD chapters. The cue's `text`
  * holds the title shown.
  *
- * @internal
+ * @experimental
  */
 export interface ChapterCueValue {
   description?: string | undefined;
@@ -37,7 +37,7 @@ export interface ChapterCueValue {
  * const image = chapter?.value?.images?.[0]?.url;
  * ```
  *
- * @internal
+ * @experimental
  */
 export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> = defineTextTrack<ChapterCueValue>({
   kind: 'chapters',
@@ -51,7 +51,7 @@ export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> =
  * player.store.addTextTrack({ kind: 'chapters', src: '/chapters.json', format: podcastChapters });
  * ```
  *
- * @internal
+ * @experimental
  */
 export function podcastChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
   const chapters = isObject(json) && 'chapters' in json && Array.isArray(json.chapters) ? json.chapters : [];
@@ -78,7 +78,7 @@ export function podcastChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
  * `DATA-ID="com.apple.hls.chapters"` points to. Each cue shows the chapter's first title, and keeps every title by
  * language.
  *
- * @internal
+ * @experimental
  */
 export function appleHlsChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
   const chapters = Array.isArray(json) ? json : [];
@@ -131,7 +131,7 @@ export function appleHlsChapters(json: unknown): TextCueInit<ChapterCueValue>[] 
  * player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(videoObject) });
  * ```
  *
- * @internal
+ * @experimental
  */
 export function jsonLdChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
   const clips = isRecord(json) && 'hasPart' in json ? json.hasPart : json;

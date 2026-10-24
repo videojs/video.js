@@ -25,7 +25,7 @@ export interface TextTrackDefinition<Cue extends MediaTextCue = MediaTextCue> ex
 /**
  * The cue type a text track definition reads.
  *
- * @internal
+ * @experimental
  */
 export type InferTextTrackCue<Definition> = Definition extends TextTrackDefinition<infer Cue> ? Cue : MediaTextCue;
 
@@ -37,7 +37,11 @@ export type InferTextTrackCue<Definition> = Definition extends TextTrackDefiniti
  * const quizTrack = defineTextTrack({ kind: 'metadata', label: 'quiz', schema: QuizSchema });
  * ```
  *
- * @internal
+ * @param init - The track's kind, and optionally its label and language, with a [Standard
+ *   Schema](https://standardschema.dev) for its cue values.
+ * @label With Schema
+ * @public
+ * @experimental
  */
 export function defineTextTrack<Schema extends StandardSchemaV1>(
   init: TextTrackIdentity & { schema: Schema }
@@ -50,7 +54,9 @@ export function defineTextTrack<Schema extends StandardSchemaV1>(
  * const quizTrack = defineTextTrack<Quiz>({ kind: 'metadata', label: 'quiz' });
  * ```
  *
- * @internal
+ * @param init - The track's kind, and optionally its label and language.
+ * @label With Type
+ * @experimental
  */
 export function defineTextTrack<Value = unknown>(init: TextTrackIdentity): TextTrackDefinition<MediaTextCue<Value>>;
 export function defineTextTrack(init: TextTrackIdentity & { schema?: StandardSchemaV1 }): TextTrackDefinition {

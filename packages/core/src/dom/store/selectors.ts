@@ -53,7 +53,7 @@ export const selectStreamType = createSelector(streamTypeFeature);
 /**
  * Select the text cues state (textCues, watchTextCues).
  *
- * @internal
+ * @experimental
  */
 export const selectTextCues = createSelector(textCuesFeature);
 /**
