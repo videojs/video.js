@@ -6,7 +6,6 @@ import {
   createDoubleTapGesture,
   createTapGesture,
   getGestureActionValue,
-  prepareGestureAction,
   resolveGestureAction,
 } from '@videojs/core/dom';
 import type { ReactNode } from 'react';
@@ -32,10 +31,7 @@ export function Gesture({ type, action, value, pointer, region, disabled }: Gest
       resolver({ store, value: actionValue, event });
     };
 
-    const prepare = prepareGestureAction(action);
-    const onPointerDown = prepare && ((event: PointerEvent) => prepare({ store, value: actionValue, event }));
-
-    const options = { onPointerDown, pointer, region, disabled, action, value: actionValue };
+    const options = { pointer, region, disabled, action, value: actionValue };
 
     if (type === 'doubletap') {
       return createDoubleTapGesture(container, onActivate, options);
