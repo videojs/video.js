@@ -71,11 +71,14 @@ export class GestureElement extends UIElement {
     const { value, region } = this;
     const actionValue = getGestureActionValue(this.action, region, value);
 
+    let state: object | undefined;
+
     const onActivate = (event: PointerEvent) => {
-      resolver({ store, value: actionValue, event });
+      resolver({ store, state, value: actionValue, event });
     };
 
     const options = {
+      onPointerDown: () => (state = store.state),
       pointer: this.pointer,
       region,
       disabled: this.disabled,

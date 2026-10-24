@@ -52,6 +52,12 @@ describe('VimeoVideo', () => {
     expect(iframe.hasAttribute('autoplay')).toBe(false);
   });
 
+  it('starts the embed muted from the muted prop, which React never renders as an attribute', () => {
+    const { container } = render(<VimeoVideo src="https://vimeo.com/1181503036" autoPlay muted />);
+
+    expect(container.querySelector('iframe')!.getAttribute('src')).toContain('muted=1');
+  });
+
   it('routes media event props to the media rather than the iframe', () => {
     const onPlay = vi.fn((event: Event) => event.currentTarget);
     const onTimeUpdate = vi.fn();
