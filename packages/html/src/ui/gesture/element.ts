@@ -1,6 +1,5 @@
 import type { GestureProps } from '@videojs/core';
 import {
-  captureTogglePaused,
   createDoubleTapGesture,
   createTapGesture,
   getGestureActionValue,
@@ -72,12 +71,14 @@ export class GestureElement extends UIElement {
     const { value, region } = this;
     const actionValue = getGestureActionValue(this.action, region, value);
 
+    let state: object | undefined;
+
     const onActivate = (event: PointerEvent) => {
-      resolver({ store, value: actionValue, event });
+      resolver({ store, state, value: actionValue, event });
     };
 
     const options = {
-      onPointerDown: this.action === 'togglePaused' ? () => captureTogglePaused(store) : undefined,
+      onPointerDown: () => (state = store.state),
       pointer: this.pointer,
       region,
       disabled: this.disabled,

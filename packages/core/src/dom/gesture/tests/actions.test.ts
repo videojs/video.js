@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { collectUnhandledRejections } from '../../tests/test-helpers';
 import type { GestureActionContext } from '../actions';
-import { captureTogglePaused, resolveGestureAction } from '../actions';
+import { resolveGestureAction } from '../actions';
 
 describe('resolveGestureAction', () => {
   it.each([
@@ -20,6 +20,18 @@ describe('resolveGestureAction', () => {
     resolveGestureAction(action)!(ctx({ ...state, [method]: activate }));
 
     expect(activate).toHaveBeenCalledExactlyOnceWith(...args);
+  });
+
+  it('toggles playback from the state the pointer-down found, not what the click started since', () => {
+    const play = vi.fn(async () => {});
+    const pause = vi.fn();
+    const context = ctx({ paused: false, play, pause });
+
+    // Safari's start button plays on the click, before the deferred tap fires.
+    resolveGestureAction('togglePaused')!({ ...context, state: { paused: true, play, pause } });
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(pause).not.toHaveBeenCalled();
   });
 
   it('handles a rejection from a store action called by name', async () => {
@@ -48,27 +60,6 @@ describe('resolveGestureAction', () => {
     resolver!(ctx({}));
     expect(spy).toHaveBeenCalledWith('[vjs-gesture] Unknown action: "nonexistent"');
     spy.mockRestore();
-  });
-});
-
-describe('captureTogglePaused', () => {
-  it('plays when the pointer went down on paused media, even if the click started it since', () => {
-    const play = vi.fn(async () => {});
-    const pause = vi.fn();
-    const context = ctx({ paused: true, play, pause });
-
-    captureTogglePaused(context.store);
-    // Safari's start button plays on the click, before the deferred tap fires.
-    (context.store.state as Record<string, unknown>).paused = false;
-    resolveGestureAction('togglePaused')!(context);
-
-    expect(play).toHaveBeenCalledOnce();
-    expect(pause).not.toHaveBeenCalled();
-
-    // The capture belongs to that tap only.
-    resolveGestureAction('togglePaused')!(context);
-
-    expect(pause).toHaveBeenCalledOnce();
   });
 });
 

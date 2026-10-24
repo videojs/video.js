@@ -5,7 +5,7 @@ export type { GesturePointerType, GestureRegion, GestureType } from '../../core/
 /** @internal */
 export interface GestureOptions extends Pick<GestureProps, 'pointer' | 'region' | 'disabled' | 'value'> {
   action?: GestureProps['action'] | undefined;
-  /** Called on every pointer-down, before the click it starts can change anything. */
+  /** Called on each pointer-down, before the click can change anything. */
   onPointerDown?: (() => void) | undefined;
 }
 
