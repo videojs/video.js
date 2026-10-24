@@ -76,13 +76,6 @@
       object-position: var(--media-object-position, center);
     }
 
-    /* Safari's own play button over a refused autoplay, such as in Low Power Mode. The skin has its own, and a click on
-       Safari's starts playback before the skin's tap can see the media paused. */
-    video::-webkit-media-controls-start-playback-button {
-      display: none !important;
-      -webkit-appearance: none;
-    }
-
     media-icon > svg {
       width: 100%;
       height: 100%;
