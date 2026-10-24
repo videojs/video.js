@@ -1,0 +1,161 @@
+---
+title: Text cues
+description: Cues and active cues from metadata, chapters, and app text tracks, and the actions that add tracks from the app
+stability: unstable
+---
+
+import FeatureImports from "@/components/docs/api-reference/FeatureImports.astro";
+import FeatureReference from "@/components/docs/api-reference/FeatureReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+Reads the cues of text tracks, tracks which cues are active at the current time, and holds the text tracks an app adds to the player. The <DocsLink slug="guides/timed-metadata">timed metadata guide</DocsLink> shows how to use it.
+
+`textCues` has one entry per track being read, in `textTrackList` order. Each entry holds the `track` as `textTrackList` lists it, every one of its `cues` ordered by start time, and its `activeCues`. Cues are plain data with an `id`, `startTime`, `endTime`, `text`, and, when the cue carries data, a `value` and a `type`.
+
+By default the feature reads every `metadata` and `chapters` track that isn't `disabled`, except the `thumbnails` track. `watchTextCues(filter)` adds the tracks a filter matches until the function it returns is called.
+
+<FrameworkCase frameworks={["react"]}>
+The text cue hooks, such as <DocsLink slug="reference/api/use-text-cues">`useTextCues`</DocsLink>, call `watchTextCues()` for the tracks they read while they're mounted.
+</FrameworkCase>
+
+Tracks from the media and tracks from the app are read the same way. The <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink> lists both in `textTrackList`, and each track's `source` is `'media'` or `'app'`. Cue changes are kept out of the text track feature, so UI that only lists tracks doesn't update as cues come and go.
+
+## Import
+
+<FeatureImports feature="textCues" />
+
+<FeatureReference feature="textCues" />
+
+### Selector
+
+<FrameworkCase frameworks={["react"]}>
+Pass `selectTextCues` to <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> to subscribe to text cue state. Returns `undefined` if the text cues feature is not configured. To read the cues of particular tracks, <DocsLink slug="reference/api/use-text-cues">`useTextCues`</DocsLink> and <DocsLink slug="reference/api/use-active-text-cues">`useActiveTextCues`</DocsLink> are usually simpler.
+
+```tsx title="CueCount.tsx"
+import { selectTextCues, usePlayer } from '@videojs/react';
+
+function CueCount() {
+  const textCues = usePlayer(selectTextCues);
+  if (!textCues) return null;
+
+  const active = textCues.textCues.reduce((count, entry) => count + entry.activeCues.length, 0);
+
+  return <span>{active} active cues</span>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Pass `selectTextCues` to <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink> to subscribe to text cue state. Returns `undefined` if the text cues feature is not configured. Outside a custom element, read `player.store.textCues` in a `player.store.subscribe()` callback, or pick cues with <DocsLink slug="reference/api/get-active-text-cues">`getActiveTextCues`</DocsLink>.
+
+```ts title="cue-count.ts"
+import { createPlayer, UIElement, selectTextCues } from '@videojs/html';
+import { videoFeatures } from '@videojs/html/video';
+
+const { PlayerController } = createPlayer({ features: videoFeatures });
+
+class CueCount extends UIElement {
+  readonly #textCues = new PlayerController(this, selectTextCues);
+}
+```
+</FrameworkCase>
+
+## Active cues
+
+A cue is active from its `startTime` up to its `endTime`. A cue whose `endTime` equals its `startTime` is a point, and stays active for one second from where it sits, so a seek that lands far past a point never activates it. The rule is the same for tracks from the media and from the app. The one exception is a chapters track the app added: a chapter without an `endTime` runs to the next chapter, and the last one to the end of the media.
+
+Active cues follow the media's `currentTime` through `timeupdate` and `seeked` events, and a media track's `cuechange` events. They aren't frame-accurate.
+
+Cues delivered with a stream can be open-ended. Cue ends are clamped to the media duration once it's finite.
+
+## Cue values
+
+A cue's `value` comes from the first of these that applies:
+
+1. The cue's own `value`. A `DataCue`, such as the ones Safari's native HLS creates for in-band metadata, carries one, and so do the cues hls.js creates for ID3 and `EXT-X-DATERANGE` metadata. Its `type` says what `value` holds, such as `org.id3`.
+2. On a `metadata` track, cue text that parses as a JSON object or array.
+3. Otherwise, the cue has no `value`. Its text is always in `text`.
+
+App cues keep the `value` and `type` they were added with.
+
+## App tracks
+
+`addTextTrack()` adds a track to the player rather than to the media, so it works with any media, including embeds without text tracks of their own. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and its content, or one object describing both, and returns a handle to the track.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { usePlayer } from '@videojs/react/video';
+
+function AddQuestionButton() {
+  const store = usePlayer();
+
+  const add = () => {
+    const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+    quiz.addCue({ startTime: 42, value: { question: 'Ready?' } });
+  };
+
+  return <button onClick={add}>Add a question</button>;
+}
+```
+
+In a component, <DocsLink slug="reference/api/use-create-text-track">`useCreateTextTrack`</DocsLink> adds the track while the component is mounted.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const player = document.querySelector('video-player')!;
+const quiz = player.store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+quiz.addCue({ startTime: 42, value: { question: 'Ready?' } });
+quiz.remove();
+```
+</FrameworkCase>
+
+The track description takes these fields:
+
+| Field | Description |
+| --- | --- |
+| `kind` | The track kind: `metadata`, `chapters`, `captions`, `subtitles`, or `descriptions`. |
+| `label` | The track label. Defaults to `''`. |
+| `language` | The track language, as a BCP 47 tag. Defaults to `''`. |
+| `cues` | The track's cues. |
+| `src` | A WebVTT or JSON file to load cues from. The file is fetched once the player attaches to media, so only on the client. JSON is an array of cues, or an object with a `cues` array. |
+| `format` | A function that turns a JSON `src` in another format into cues, such as <DocsLink slug="reference/api/chapters-track">`podcastChapters`</DocsLink>. |
+
+Each cue takes these fields:
+
+| Field | Description |
+| --- | --- |
+| `id` | The cue's id. Defaults to an id unique within the track. |
+| `startTime` | Where the cue starts, in seconds. |
+| `endTime` | Where the cue ends, in seconds. Omit it for a point, or, in a chapters track, for a chapter that runs to the next one. |
+| `text` | The cue's text. Defaults to `''`. |
+| `value` | Structured, JSON-serializable data. |
+| `type` | What `value` holds. |
+
+The handle `addTextTrack()` returns has the track's `id` in `textTrackList`, and `removed`, which turns `true` once the track is gone. `addCue(cue)` and `removeCue(id)` change its cues, and `remove()` removes it. `removeTextTrack(id)` removes a track the app added; tracks from the media stay.
+
+An app track belongs to the source playing when it's added, or to the first source when none has loaded yet. Changing the source or swapping the media removes it. A file given as `src` that fails to load leaves the track with the cues it already has.
+
+App tracks start `hidden`. Browsers never draw `metadata` or `chapters` cues. An app `captions` or `subtitles` track is copied into the media, so the browser draws its cues when the track is selected, including in iOS fullscreen where the player's UI isn't shown, and the captions menu lists it.
+
+When the media has no chapters track, the text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> can show its chapters.
+
+## Exports
+
+| Export | Description |
+| --- | --- |
+| `MediaTrackCues` | One `textCues` entry: a `track`, its `cues`, and its `activeCues`. |
+| `MediaTextCue` | A cue as plain data. Its type parameter types `value`. |
+| `TextTrackFilter` | Picks tracks by `kind`, `label`, or `language`, or with a function. Each given field must match, and a list of kinds matches any kind in it. |
+| `TextTrackSource` | Where a track came from: `'media'` or `'app'`. |
+| `AddTextTrack` | The type of `addTextTrack()`. |
+| `TextTrackInit` | A track description with its content. |
+| `TextTrackContent` | What a track carries: `cues`, `src`, and `format`. |
+| `TextCueInit` | A cue an app adds. |
+| `TextCueFormat` | A function that turns JSON into cues. |
+| `AppTextTrack` | The handle `addTextTrack()` returns. |
+| `InferCueValue` | The `value` type of a cue type. |
+| `MediaTextCuesState` | The state this feature adds to the store. |

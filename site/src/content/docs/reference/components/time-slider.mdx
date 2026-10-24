@@ -7,6 +7,7 @@ description: A slider component for seeking through media playback time
 
 import ComponentReference from "@/components/docs/api-reference/ComponentReference.astro";
 import ComponentImports from "@/components/docs/api-reference/ComponentImports.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
@@ -123,6 +124,14 @@ import withChaptersHtmlTs from "@/components/docs/demos/time-slider/html/css/Wit
   ```
 
   The required template must contain exactly one HTML root element. It remains in the light DOM and is cloned for each normalized chapter range. When no chapter cues are available, it is cloned once as a full-width, cue-less range.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+  To draw a marker for each cue on a text track, such as an ad break, add the markers part, documented on its own page as <DocsLink slug="reference/components/time-slider-markers">TimeSlider.Markers</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  To draw a marker for each cue on a text track, such as an ad break, add the markers element, documented on its own page as <DocsLink slug="reference/components/time-slider-markers">media-time-slider-markers</DocsLink>.
 </FrameworkCase>
 
 ## Behavior

@@ -1,0 +1,75 @@
+---
+title: hlsMetadataTrack
+description: A track definition for the ID3 and EXT-X-DATERANGE metadata hls.js publishes
+stability: unstable
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { hlsMetadataTrack } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { hlsMetadataTrack } from '@videojs/html';
+```
+</FrameworkCase>
+
+`hlsMetadataTrack` is a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> for `{ kind: 'metadata', label: 'id3' }`, the track hls.js publishes timed metadata on. Its cues are typed as `HlsMetadataCue`. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> reads the track like any other metadata track.
+
+hls.js plays streams in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and the media built on it, such as <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, when they play through Media Source Extensions. Where the browser plays HLS natively, as Safari does, in-band metadata arrives as `DataCue`s on the browser's own metadata tracks instead; read those with a `{ kind: 'metadata' }` filter.
+
+## Cues
+
+Each cue carries one ID3 frame or one `EXT-X-DATERANGE` attribute. Its `type` tells which, and narrows `value`:
+
+| `type` | Source | `value` |
+| --- | --- | --- |
+| `'org.id3'` | An ID3 frame in the stream's segments. | `Id3Frame`: the frame id as `key`, such as `TXXX` or `PRIV`, its description or owner as `info`, and its `data`. |
+| `'https://aomedia.org/emsg/ID3'` | An ID3 frame carried in an `emsg` box. | `Id3Frame` |
+| `'com.apple.quicktime.HLS'` | An `EXT-X-DATERANGE` tag in the playlist. | `HlsDateRangeAttribute`: the attribute name as `key`, such as `CLASS` or `X-AD-ID`, and its `data`. |
+
+A date range's cues span the range, from its start to its end.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+```tsx title="AdBadge.tsx"
+import { hlsMetadataTrack, useActiveTextCues } from '@videojs/react';
+
+function AdBadge() {
+  const cues = useActiveTextCues(hlsMetadataTrack);
+  const inAd = cues.some((cue) => cue.type === 'com.apple.quicktime.HLS' && cue.value?.key === 'X-AD-ID');
+
+  return inAd ? <span className="ad-badge">Ad</span> : null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts title="id3.ts"
+import { getActiveTextCues, hlsMetadataTrack } from '@videojs/html';
+
+const player = document.querySelector('video-player')!;
+
+player.store.subscribe(() => {
+  for (const cue of getActiveTextCues(player.store, hlsMetadataTrack)) {
+    if (cue.type === 'org.id3' && cue.value?.key === 'TXXX') console.log(cue.value.info, cue.value.data);
+  }
+});
+```
+</FrameworkCase>
+
+## Exports
+
+| Export | Description |
+| --- | --- |
+| `HlsMetadataCue` | A metadata cue from hls.js, typed by its `type`. |
+| `Id3Frame` | An ID3 frame: `key`, `info`, and `data`. |
+| `HlsDateRangeAttribute` | One `EXT-X-DATERANGE` attribute: `key` and `data`. |

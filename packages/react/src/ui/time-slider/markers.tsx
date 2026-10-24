@@ -24,13 +24,13 @@ export type { TimeSliderMarkerState } from '@videojs/core';
 
 type MarkerProps = Omit<HTMLProps<HTMLElement>, 'ref'>;
 
-/** @internal */
+/** @experimental */
 export interface TimeSliderMarkersState {
   /** The markers drawn, ordered by where they start. */
   markers: readonly TimeSliderMarkerState[];
 }
 
-/** @internal */
+/** @experimental */
 export interface TimeSliderMarkersProps extends Omit<UIComponentProps<'div', TimeSliderMarkersState>, 'children'> {
   /**
    * Picks the text tracks whose cues are drawn, by kind, label, or language, or with a function; a track definition
@@ -55,7 +55,7 @@ function renderDefaultMarker(props: MarkerProps): ReactElement {
  * <TimeSlider.Markers filter={{ label: 'ads' }} />;
  * ```
  *
- * @internal
+ * @experimental
  */
 export const TimeSliderMarkers = forwardRef<HTMLDivElement, TimeSliderMarkersProps>(
   function TimeSliderMarkers(componentProps, ref) {
@@ -104,7 +104,7 @@ export const TimeSliderMarkers = forwardRef<HTMLDivElement, TimeSliderMarkersPro
   }
 );
 
-/** @internal */
+/** @experimental */
 export namespace TimeSliderMarkers {
   export type Props = TimeSliderMarkersProps;
   export type State = TimeSliderMarkersState;

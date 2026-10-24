@@ -738,6 +738,11 @@ function keywordName(type: TSType): string | undefined {
 
 type TypeFormatter = (type: TSType, removeUndefined: boolean) => string;
 
+/** A member keyed by a constant, such as `[CUE_TYPE]`, is private by convention: readers can't name the key. */
+export function isConstantKeyed(member: TSSignature): boolean {
+  return 'computed' in member && member.computed && member.key.type === 'Identifier';
+}
+
 function formatSignature(
   file: SourceFile,
   member: TSSignature,
@@ -745,6 +750,8 @@ function formatSignature(
   format: TypeFormatter = (type, removeUndefined) => formatType({ file, type, substitutions }, removeUndefined),
   optionalProperties = false
 ): string {
+  if (isConstantKeyed(member)) return '';
+
   if (member.type === 'TSPropertySignature') {
     const name = staticName(member.key);
     if (!name || !member.typeAnnotation) return '';

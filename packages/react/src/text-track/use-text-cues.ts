@@ -18,7 +18,7 @@ type TextTrackQuery = TextTrackFilter | TextTrackDefinition;
  *
  * @param track - The track definition to read.
  * @label With Definition
- * @internal
+ * @experimental
  */
 export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
@@ -27,7 +27,7 @@ export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition
  *
  * @param filter - Picks tracks by kind, label, or language, or with a function.
  * @label With Filter
- * @internal
+ * @experimental
  */
 export function useTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
 export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
@@ -43,7 +43,7 @@ export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly Media
  *
  * @param track - The track definition to read.
  * @label With Definition
- * @internal
+ * @experimental
  */
 export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
@@ -52,7 +52,7 @@ export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefi
  *
  * @param filter - Picks tracks by kind, label, or language, or with a function.
  * @label With Filter
- * @internal
+ * @experimental
  */
 export function useActiveTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
 export function useActiveTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
