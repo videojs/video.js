@@ -1,0 +1,68 @@
+.html-time-slider-markers-basic__container {
+  position: relative;
+}
+
+.html-time-slider-markers-basic__container video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.html-time-slider-markers-basic__slider {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  height: 20px;
+  cursor: pointer;
+}
+
+.html-time-slider-markers-basic__track,
+.html-time-slider-markers-basic__markers {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 4px;
+}
+
+.html-time-slider-markers-basic__track {
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
+}
+
+.html-time-slider-markers-basic__fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--media-slider-fill);
+  background: white;
+}
+
+.html-time-slider-markers-basic__marker {
+  position: absolute;
+  inset-block: 0;
+  left: var(--media-slider-marker-start);
+  width: var(--media-slider-marker-width);
+  min-width: 4px;
+  background: #facc15;
+}
+
+.html-time-slider-markers-basic__marker[data-point] {
+  transform: translateX(-50%);
+}
+
+.html-time-slider-markers-basic__marker[data-active] {
+  background: #f97316;
+}
+
+.html-time-slider-markers-basic__thumb {
+  position: absolute;
+  left: var(--media-slider-fill);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}

@@ -1,0 +1,68 @@
+---
+title: getActiveTextCues
+description: The cues active now on the text tracks a filter or track definition matches
+stability: unstable
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { getActiveTextCues } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { getActiveTextCues } from '@videojs/html';
+```
+</FrameworkCase>
+
+`getActiveTextCues` returns the cues active at the current time on the tracks a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, from the media and the app alike. Cues from several tracks are merged in time order.
+
+It reads `textCues` from the <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink>, which describes when a cue is active, so it only finds cues on the tracks that feature reads.
+
+Read through a definition, cues are typed by it. With a schema, cues whose value fails it are skipped.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+In a component, <DocsLink slug="reference/api/use-active-text-cues">`useActiveTextCues`</DocsLink> re-renders when the active cues change. `getActiveTextCues` reads them once, such as in an event handler. Pass it a store typed with your player's features, such as the one the preset's `usePlayer` returns:
+
+```tsx
+import { getActiveTextCues } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
+
+function AnswerButton() {
+  const store = usePlayer();
+  const answer = () => {
+    const [cue] = getActiveTextCues(store, quizTrack);
+    console.log(cue?.value?.question);
+  };
+
+  return <button onClick={answer}>Answer</button>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Read the active cues in a `player.store.subscribe()` callback to follow playback:
+
+```ts
+const player = document.querySelector('video-player')!;
+const quiz = document.querySelector<HTMLElement>('.quiz')!;
+
+player.store.subscribe(() => {
+  const [cue] = getActiveTextCues(player.store, quizTrack);
+
+  quiz.hidden = !cue;
+  quiz.textContent = cue?.value?.question ?? '';
+});
+```
+</FrameworkCase>
+
+<UtilReference util="getActiveTextCues" />

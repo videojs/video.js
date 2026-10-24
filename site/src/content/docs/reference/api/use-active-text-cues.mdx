@@ -1,0 +1,33 @@
+---
+title: useActiveTextCues
+description: Hook that returns the cues active now on the text tracks a filter or track definition matches
+stability: unstable
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+## Import
+
+```tsx
+import { useActiveTextCues } from '@videojs/react';
+```
+
+`useActiveTextCues` returns the cues active at the current time on the tracks a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, from the media and the app alike, and re-renders when they change. Cues from several tracks are merged in time order. Read through a definition, cues are typed by it, and with a schema, cues whose value fails it are skipped. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> describes when a cue is active.
+
+While the component is mounted, the hook asks the text cues feature to read the tracks it matches, so it also reads tracks the feature skips by default, such as captions. An inline object filter is compared by its `kind`, `label`, and `language`; keep a function filter's identity across renders. It returns an empty list when the player has no text cues feature.
+
+```tsx title="QuizOverlay.tsx"
+import { defineTextTrack, useActiveTextCues } from '@videojs/react';
+
+const quizTrack = defineTextTrack<{ question: string }>({ kind: 'metadata', label: 'quiz' });
+
+function QuizOverlay() {
+  const [cue] = useActiveTextCues(quizTrack);
+  if (!cue) return null;
+
+  return <div className="quiz">{cue.value?.question}</div>;
+}
+```
+
+<UtilReference util="useActiveTextCues" />

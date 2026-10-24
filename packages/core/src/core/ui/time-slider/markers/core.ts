@@ -6,7 +6,7 @@ import type { SliderState } from '../../slider/core';
 /**
  * One cue placed on the slider domain.
  *
- * @internal
+ * @experimental
  */
 export interface TimeSliderMarkerRange {
   /** Stable identity used by platform renderers. */
@@ -24,7 +24,7 @@ export interface TimeSliderMarkerRange {
 /**
  * A marker's geometry and state, as renderers draw it.
  *
- * @internal
+ * @experimental
  */
 export interface TimeSliderMarkerState extends TimeSliderMarkerRange {
   /** Position among the drawn markers. */
