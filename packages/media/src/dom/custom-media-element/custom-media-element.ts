@@ -55,12 +55,6 @@ function getVideoTemplateHTML(attrs: Record<string, string>): string {
         z-index: 1;
         font-family: inherit;
       }
-
-      /* Safari's own play button over a refused autoplay, such as in Low Power Mode, which the player's UI replaces. */
-      video::-webkit-media-controls-start-playback-button {
-        display: none !important;
-        -webkit-appearance: none;
-      }
     </style>
     <slot name="media">
       <video${serializeAttributes(attrs)}></video>

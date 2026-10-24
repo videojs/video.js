@@ -495,6 +495,42 @@ describe('interactive child filtering', () => {
   });
 });
 
+describe('native video controls', () => {
+  it.each([
+    ['stops a click short of a video without controls, where Safari can force a start button', false, 0],
+    ['lets a click through to a video showing its own controls', true, 1],
+  ])('%s', (_name, controls, clicks) => {
+    const container = setup();
+    const video = document.createElement('video');
+    const onVideoClick = vi.fn();
+
+    video.controls = controls;
+    video.addEventListener('click', onVideoClick);
+    container.appendChild(video);
+    createTapGesture(container, vi.fn());
+
+    video.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(onVideoClick).toHaveBeenCalledTimes(clicks);
+  });
+
+  it("stops a click short of a video inside a media element's shadow root", () => {
+    const container = setup();
+    const host = document.createElement('div');
+    const video = document.createElement('video');
+    const onVideoClick = vi.fn();
+
+    host.attachShadow({ mode: 'open' }).append(video);
+    video.addEventListener('click', onVideoClick);
+    container.appendChild(host);
+    createTapGesture(container, vi.fn());
+
+    video.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+
+    expect(onVideoClick).not.toHaveBeenCalled();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

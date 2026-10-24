@@ -110,6 +110,21 @@ export class GestureCoordinator {
 
     let pointerDownTime = 0;
 
+    // Safari forces its own controls onto a `<video autoplay>` it won't autoplay, as in Low Power Mode, and their start
+    // button plays on `click`, before a deferred tap reads the media paused and pauses it again. Taps act on `pointerup`
+    // and the context menu on `contextmenu`, so the click can stop short of the video.
+    listen(
+      this.#target,
+      'click',
+      (event) => {
+        // The path reaches into a media element's shadow root for its video, and stops at the video's own controls.
+        const [target] = event.composedPath();
+
+        if (target instanceof HTMLVideoElement && !target.controls) event.stopPropagation();
+      },
+      { signal, capture: true }
+    );
+
     listen(
       this.#target,
       'pointerdown',
