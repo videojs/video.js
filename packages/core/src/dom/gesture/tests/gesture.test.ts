@@ -244,6 +244,21 @@ describe('tap/doubletap disambiguation', () => {
     expect(doubletapHandler).not.toHaveBeenCalled();
   });
 
+  it('calls onPointerDown on the pointer-down, before the tap fires', () => {
+    const container = setup();
+    const tapHandler = vi.fn();
+    const onPointerDown = vi.fn(() => expect(tapHandler).not.toHaveBeenCalled());
+
+    createTapGesture(container, tapHandler, { onPointerDown });
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+
+    expect(onPointerDown).toHaveBeenCalledOnce();
+    expect(tapHandler).toHaveBeenCalledOnce();
+  });
+
   it('cancels pending tap on doubletap', () => {
     const container = setup();
     const tapHandler = vi.fn();
@@ -492,42 +507,6 @@ describe('interactive child filtering', () => {
     pointerUp(overlay, { pointerType: 'mouse', clientX: 150 });
 
     expect(handler).toHaveBeenCalledOnce();
-  });
-});
-
-describe('native video controls', () => {
-  it.each([
-    ['stops a click short of a video without controls, where Safari can force a start button', false, 0],
-    ['lets a click through to a video showing its own controls', true, 1],
-  ])('%s', (_name, controls, clicks) => {
-    const container = setup();
-    const video = document.createElement('video');
-    const onVideoClick = vi.fn();
-
-    video.controls = controls;
-    video.addEventListener('click', onVideoClick);
-    container.appendChild(video);
-    createTapGesture(container, vi.fn());
-
-    video.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-
-    expect(onVideoClick).toHaveBeenCalledTimes(clicks);
-  });
-
-  it("stops a click short of a video inside a media element's shadow root", () => {
-    const container = setup();
-    const host = document.createElement('div');
-    const video = document.createElement('video');
-    const onVideoClick = vi.fn();
-
-    host.attachShadow({ mode: 'open' }).append(video);
-    video.addEventListener('click', onVideoClick);
-    container.appendChild(host);
-    createTapGesture(container, vi.fn());
-
-    video.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
-
-    expect(onVideoClick).not.toHaveBeenCalled();
   });
 });
 

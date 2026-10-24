@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { collectUnhandledRejections } from '../../tests/test-helpers';
 import type { GestureActionContext } from '../actions';
-import { resolveGestureAction } from '../actions';
+import { captureTogglePaused, resolveGestureAction } from '../actions';
 
 describe('resolveGestureAction', () => {
   it.each([
@@ -48,6 +48,27 @@ describe('resolveGestureAction', () => {
     resolver!(ctx({}));
     expect(spy).toHaveBeenCalledWith('[vjs-gesture] Unknown action: "nonexistent"');
     spy.mockRestore();
+  });
+});
+
+describe('captureTogglePaused', () => {
+  it('plays when the pointer went down on paused media, even if the click started it since', () => {
+    const play = vi.fn(async () => {});
+    const pause = vi.fn();
+    const context = ctx({ paused: true, play, pause });
+
+    captureTogglePaused(context.store);
+    // Safari's start button plays on the click, before the deferred tap fires.
+    (context.store.state as Record<string, unknown>).paused = false;
+    resolveGestureAction('togglePaused')!(context);
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(pause).not.toHaveBeenCalled();
+
+    // The capture belongs to that tap only.
+    resolveGestureAction('togglePaused')!(context);
+
+    expect(pause).toHaveBeenCalledOnce();
   });
 });
 

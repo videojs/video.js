@@ -3,6 +3,7 @@
 import type { GestureProps as CoreGestureProps } from '@videojs/core';
 import type { AnyPlayerStore } from '@videojs/core/dom';
 import {
+  captureTogglePaused,
   createDoubleTapGesture,
   createTapGesture,
   getGestureActionValue,
@@ -31,7 +32,8 @@ export function Gesture({ type, action, value, pointer, region, disabled }: Gest
       resolver({ store, value: actionValue, event });
     };
 
-    const options = { pointer, region, disabled, action, value: actionValue };
+    const onPointerDown = action === 'togglePaused' ? () => captureTogglePaused(store) : undefined;
+    const options = { onPointerDown, pointer, region, disabled, action, value: actionValue };
 
     if (type === 'doubletap') {
       return createDoubleTapGesture(container, onActivate, options);
