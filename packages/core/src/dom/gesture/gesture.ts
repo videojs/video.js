@@ -5,11 +5,6 @@ export type { GesturePointerType, GestureRegion, GestureType } from '../../core/
 /** @internal */
 export interface GestureOptions extends Pick<GestureProps, 'pointer' | 'region' | 'disabled' | 'value'> {
   action?: GestureProps['action'] | undefined;
-  /**
-   * Called on the pointer-down that may start a tap, before anything the click sets off. Lets an action capture what
-   * the user meant, since `onActivate` can come a doubletap window after the click.
-   */
-  onPointerDown?: ((event: PointerEvent) => void) | undefined;
 }
 
 /** @internal */

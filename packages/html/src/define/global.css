@@ -25,6 +25,15 @@ media-container [slot="poster"] {
   height: 100%;
 }
 
+/*
+Safari's own play button over a refused autoplay, such as in Low Power Mode. The skin has its own, and a click on
+Safari's starts playback before the skin's tap can see the media paused.
+*/
+:is(video-player, live-video-player, media-container) video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
 media-container video::-webkit-media-text-track-container {
   z-index: 1;
   font-family: inherit;
