@@ -16,7 +16,7 @@ const NO_TRACKS: MediaTextTrack[] = [];
  * ```
  *
  * @param filter - Picks tracks by kind, label, or language, or with a function.
- * @internal
+ * @experimental
  */
 export function useTextTracks(filter: TextTrackFilter | TextTrackDefinition = {}): MediaTextTrack[] {
   return usePlayer((state) => (hasTextTracks(state) ? getTextTracks(state, filter) : NO_TRACKS));

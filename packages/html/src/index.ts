@@ -115,6 +115,7 @@ export type {
   ThumbnailState,
   TimeProps,
   TimeSliderChapterRange,
+  TimeSliderMarkerRange,
   TimeSliderProps,
   TimeSliderState,
   TimeState,

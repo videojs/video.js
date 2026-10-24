@@ -1,0 +1,187 @@
+---
+title: TimeSlider.Markers
+frameworkTitle:
+  html: media-time-slider-markers
+description: Draws a marker on the time slider for each cue on the text tracks a filter matches, such as ad breaks
+stability: unstable
+---
+
+import ComponentImports from "@/components/docs/api-reference/ComponentImports.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/time-slider-markers/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/time-slider-markers/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/time-slider-markers/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/time-slider-markers/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/time-slider-markers/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/time-slider-markers/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/time-slider-markers/html/css/BasicUsage.ts?raw";
+
+A part of the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> that draws a marker for each cue on the text tracks a filter matches, such as ad breaks, quiz questions, or highlights. Its props, data attributes, and custom properties are listed with the time slider's other parts.
+
+## Import
+
+<ComponentImports component="TimeSlider" html="time-slider-markers" />
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+  ```tsx
+  <TimeSlider.Root>
+    <TimeSlider.Track>
+      <TimeSlider.Fill />
+    </TimeSlider.Track>
+    <TimeSlider.Markers filter={{ label: 'ads' }} />
+    <TimeSlider.Thumb />
+  </TimeSlider.Root>
+  ```
+
+  `renderMarker` renders each marker, and defaults to a `<div>`. It receives the marker's attributes and its state. Spread the attributes on the marker's root element: they carry the slider's data attributes, the marker's `data-active` and `data-point` attributes, and a `style` that sets its `--media-slider-marker-*` custom properties.
+
+  ```tsx
+  <TimeSlider.Markers
+    filter={{ label: 'ads' }}
+    renderMarker={(props, state) => <div {...props} className="ad-marker" title={state.cue.text} />}
+  />
+  ```
+
+  The state is a `TimeSliderMarkerState`, exported from `@videojs/react`:
+
+  | Field | Type | Description |
+  | --- | --- | --- |
+  | `cue` | `MediaTextCue` | The cue the marker draws. |
+  | `key` | `string` | Stable identity of the marker. |
+  | `index` | `number` | Position among the drawn markers, from `0`. |
+  | `start`, `end` | `number` | Marker bounds, in seconds, clamped to the slider. `end` equals `start` for a point. |
+  | `point` | `boolean` | Whether the cue marks one moment rather than a span. |
+  | `active` | `boolean` | Whether the cue is active now. |
+  | `startPercent`, `endPercent` | `` `${number}%` `` | Marker bounds as a percentage of the slider. |
+  | `width`, `height` | `` `${number}%` \| undefined `` | Marker size along the slider's orientation, `0%` for a point; the other is `undefined`. |
+  | `orientation` | `'horizontal' \| 'vertical'` | The slider's orientation. |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  ```html
+  <media-time-slider>
+    <media-slider-track>
+      <media-slider-fill></media-slider-fill>
+    </media-slider-track>
+    <media-time-slider-markers label="ads"></media-time-slider-markers>
+    <media-slider-thumb></media-slider-thumb>
+  </media-time-slider>
+  ```
+
+  Each marker is a `<div>`, or a clone of a `<template>` child. The template must contain exactly one HTML root element, and stays in the light DOM.
+
+  ```html
+  <media-time-slider-markers label="ads">
+    <template>
+      <div class="ad-marker"></div>
+    </template>
+  </media-time-slider-markers>
+  ```
+</FrameworkCase>
+
+## Behavior
+
+<FrameworkCase frameworks={["react"]}>
+`filter` picks the tracks whose cues are drawn, by `kind`, `label`, or `language`, or with a function. A <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> works too. Keep a function filter's identity across renders.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+The `kind`, `label`, and `language` attributes pick the tracks whose cues are drawn. The `filter` property takes a filter object, a function, or a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> instead, and takes priority over the attributes. With neither, nothing is drawn.
+</FrameworkCase>
+
+Tracks from the media and from the app are drawn alike. While the markers are rendered, the <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> reads the tracks they match, so tracks it skips by default work too.
+
+A cue whose end is its start is a point, drawn as a marker with no width and `data-point`. Any other cue is a range, spanning from its start to its end and clamped to the slider. Markers sit on the same span as the slider: from `0` to the media's duration, or to the end of its seekable range while the duration is unknown. Cues outside that span, and every cue while it's unknown, aren't drawn. Markers are ordered by start, then end.
+
+## Styling
+
+| Attribute | Description |
+| --- | --- |
+| `data-active` | Present while the marker's cue is active. |
+| `data-point` | Present when the cue marks one moment rather than a span. |
+
+Each marker also carries the slider's data attributes, such as `data-orientation`, and its geometry through:
+
+- `--media-slider-marker-start`
+- `--media-slider-marker-end`
+- `--media-slider-marker-width`, the marker's size along the slider, `0%` for a point
+
+Markers are unstyled. Position each one from its custom properties, and give points a visible width:
+
+<FrameworkCase frameworks={["html"]}>
+```css
+media-time-slider-markers > div {
+  position: absolute;
+  inset-block: 0;
+  left: var(--media-slider-marker-start);
+  width: var(--media-slider-marker-width);
+  min-width: 4px;
+}
+
+media-time-slider-markers > [data-active] {
+  background: orange;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+```css
+.ad-marker {
+  position: absolute;
+  inset-block: 0;
+  left: var(--media-slider-marker-start);
+  width: var(--media-slider-marker-width);
+  min-width: 4px;
+}
+
+.ad-marker[data-active] {
+  background: orange;
+}
+```
+</FrameworkCase>
+
+## Accessibility
+
+The markers render with `aria-hidden="true"`; the slider's value is what assistive technology reads. When a marker carries meaning a viewer needs, such as an upcoming ad break, convey it another way too.
+
+## Examples
+
+### Basic usage
+
+An app track labeled `ads` holds a point at 8 seconds and a range from 18 to 24 seconds. A marker turns orange while its cue is active.
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo
+      files={[
+        { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+        { title: "App.css", code: basicUsageReactCss, lang: "css" },
+      ]}
+    >
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo
+      files={[
+        { title: "index.html", code: basicUsageHtml, lang: "html" },
+        { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+        { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+      ]}
+    >
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>

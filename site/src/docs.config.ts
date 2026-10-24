@@ -99,6 +99,10 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Captions and subtitles',
           },
           {
+            slug: 'guides/timed-metadata',
+            sidebarLabel: 'Timed metadata',
+          },
+          {
             slug: 'guides/keyboard-shortcuts',
             sidebarLabel: 'Keyboard shortcuts and gestures',
           },
@@ -248,6 +252,7 @@ export const sidebar: Sidebar = [
         contents: [
           { slug: 'reference/components/slider' },
           { slug: 'reference/components/time-slider' },
+          { slug: 'reference/components/time-slider-markers' },
           { slug: 'reference/components/volume-slider' },
         ],
       },
@@ -309,8 +314,8 @@ export const sidebar: Sidebar = [
     sidebarLabel: 'API',
     llmsDescription: {
       react:
-        'API reference for the player factory, presets, store, features, menus, gestures, translation tools, and utilities.',
-      html: 'API reference for the player factory, presets, store controllers, features, translation tools, and utilities.',
+        'API reference for the player factory, presets, store, features, text tracks, menus, gestures, translation tools, and utilities.',
+      html: 'API reference for the player factory, presets, store controllers, features, text tracks, translation tools, and utilities.',
     },
     contents: [
       {
@@ -380,9 +385,30 @@ export const sidebar: Sidebar = [
           { slug: 'reference/api/feature-remote-playback' },
           { slug: 'reference/api/feature-source' },
           { slug: 'reference/api/feature-stream-type' },
+          { slug: 'reference/api/feature-text-cues' },
           { slug: 'reference/api/feature-text-tracks' },
           { slug: 'reference/api/feature-time' },
           { slug: 'reference/api/feature-volume' },
+        ],
+      },
+      {
+        sidebarLabel: 'Text tracks',
+        llmsDescription: {
+          react:
+            'API reference for adding text tracks to the player and reading their cues: track definitions, readers, and hooks.',
+          html: 'API reference for reading text tracks and their cues: track definitions and readers.',
+        },
+        contents: [
+          { slug: 'reference/api/define-text-track' },
+          { slug: 'reference/api/use-create-text-track', frameworks: ['react'] },
+          { slug: 'reference/api/use-text-tracks', frameworks: ['react'] },
+          { slug: 'reference/api/use-text-cues', frameworks: ['react'] },
+          { slug: 'reference/api/use-active-text-cues', frameworks: ['react'] },
+          { slug: 'reference/api/get-text-tracks' },
+          { slug: 'reference/api/get-text-cues' },
+          { slug: 'reference/api/get-active-text-cues' },
+          { slug: 'reference/api/chapters-track' },
+          { slug: 'reference/api/hls-metadata-track' },
         ],
       },
       {

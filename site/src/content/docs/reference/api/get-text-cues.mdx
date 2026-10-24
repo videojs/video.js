@@ -1,0 +1,65 @@
+---
+title: getTextCues
+description: Every cue on the text tracks a filter or track definition matches
+stability: unstable
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { getTextCues } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { getTextCues } from '@videojs/html';
+```
+</FrameworkCase>
+
+`getTextCues` returns every cue on the tracks a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, from the media and the app alike. Cues from several tracks are merged in time order.
+
+It reads `textCues` from the <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink>, so it only finds cues on the tracks that feature reads: `metadata` and `chapters` tracks that aren't `disabled`, except the `thumbnails` track, and the tracks a `watchTextCues()` filter matches.
+
+Read through a definition, cues are typed by it. With a schema, cues whose value fails it are skipped.
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+In a component, <DocsLink slug="reference/api/use-text-cues">`useTextCues`</DocsLink> re-renders when the cues change and keeps the tracks it reads watched. `getTextCues` reads the cues once, such as in an event handler. Pass it a store typed with your player's features, such as the one the preset's `usePlayer` returns:
+
+```tsx
+import { getTextCues } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
+
+function LogQuestionsButton() {
+  const store = usePlayer();
+  const log = () => console.log(getTextCues(store, quizTrack).map((cue) => cue.value?.question));
+
+  return <button onClick={log}>Log questions</button>;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+To read tracks the feature doesn't read by default, such as captions for a transcript, watch them first:
+
+```ts
+const player = document.querySelector('video-player')!;
+const captions = { kind: 'captions', language: 'en' } as const;
+
+player.store.watchTextCues(captions);
+
+player.store.subscribe(() => {
+  const cues = getTextCues(player.store, captions);
+  console.log(cues.map((cue) => cue.text));
+});
+```
+</FrameworkCase>
+
+<UtilReference util="getTextCues" />
