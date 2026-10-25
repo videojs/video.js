@@ -14,6 +14,9 @@
     --media-backdrop-filter-dialog: blur(16px) saturate(120%);
     --media-shadow-tooltip:
       0 0 0 1px var(--media-border), 0 4px 6px -1px oklch(0 0 0 / 0.2), 0 2px 4px -2px oklch(0 0 0 / 0.2);
+    /* Layered from a tight, dark contact shadow out to a wide, soft halo. */
+    --media-filter-feedback: drop-shadow(0 0 1px oklch(0 0 0 / 0.3)) drop-shadow(0 1px 3px oklch(0 0 0 / 0.2))
+      drop-shadow(0 2px 12px oklch(0 0 0 / 0.15));
     --media-duration-dialog: var(--media-duration);
     --media-duration-indicator: 400ms;
     --media-hidden-offset: 100%;

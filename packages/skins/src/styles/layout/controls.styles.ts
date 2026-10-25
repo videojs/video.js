@@ -62,9 +62,17 @@ export default styles({
     },
     backdrop: {
       utilities: [
-        'pointer-events-none absolute inset-0 z-10 rounded-[inherit] bg-(image:--media-controls-gradient)',
+        'pointer-events-none absolute inset-0 z-10 rounded-[inherit]',
+        'bg-(image:--media-controls-gradient) bg-bottom bg-no-repeat bg-size-[100%_var(--media-controls-gradient-height)]',
         'transition-opacity duration-media-controls ease-out not-data-visible:opacity-0',
       ],
+      variants: {
+        // Below lg the secondary group floats at the top, so it needs a scrim of its own.
+        default: [
+          'media-max-lg:before:absolute media-max-lg:before:inset-x-0 media-max-lg:before:top-0',
+          'media-max-lg:before:h-(--media-controls-gradient-height) media-max-lg:before:bg-(image:--media-controls-top-gradient)',
+        ],
+      },
     },
     primary: {
       utilities: [
