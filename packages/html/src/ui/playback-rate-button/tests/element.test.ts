@@ -86,6 +86,29 @@ describe('PlaybackRateButtonElement', () => {
     expect(trigger.getAttribute('data-availability')).toBe('available');
   });
 
+  it('shows itself once the media becomes able to change its playback rate', async () => {
+    // Before media attaches, availability is `unavailable`. The linked menu must
+    // not mistake that transient state for an author-hidden trigger.
+    const { menu, options, provider, setState, trigger } = setup({ playbackRateAvailability: 'unavailable' });
+
+    // Link the menu only after the trigger has rendered its pre-attach state.
+    menu.remove();
+    await trigger.updateComplete;
+    provider.append(menu);
+
+    await waitForMenu(menu, trigger, options);
+    expect(trigger.hidden).toBe(true);
+
+    setState({ playbackRateAvailability: 'available' });
+
+    await waitForAssertion(() => expect(trigger.getAttribute('data-availability')).toBe('available'));
+
+    trigger.click();
+    await waitForAssertion(() => expect(menu.open).toBe(true));
+
+    expect(trigger.hidden).toBe(false);
+  });
+
   it('does not open the linked menu when disabled and clicked', async () => {
     const { menu, trigger } = setup({ playbackRates: [] });
 
