@@ -57,7 +57,7 @@ export default {
     unknown: 'মিডিয়া লোড হয়নি, সময় অজানা।',
   },
   playback: {
-    rate: 'প্লেব্যাক রেট {rate}',
+    rate: 'প্লেব্যাক গতি, {rate}',
   },
   volume: {
     mutedValue: '{percent}, নিঃশব্দ',

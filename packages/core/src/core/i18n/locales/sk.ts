@@ -57,7 +57,7 @@ export default {
     unknown: 'Médium sa nenačítalo, čas nie je známy.',
   },
   playback: {
-    rate: 'Rýchlosť prehrávania {rate}',
+    rate: 'Rýchlosť prehrávania, {rate}',
   },
   volume: {
     mutedValue: '{percent}, stlmené',
