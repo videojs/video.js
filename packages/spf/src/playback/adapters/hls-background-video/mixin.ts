@@ -10,12 +10,13 @@ import {
   SVTA_UNSUPPORTED_VIDEO_FORMAT,
   type SvtaError,
 } from '../../../media/errors';
+import { resolveSourceUrl } from '../../../network/resolve-source-url';
 import {
-  type BackgroundVideoEngineConfig,
-  type BackgroundVideoEngineContext,
-  type BackgroundVideoEngineState,
-  createBackgroundVideoEngine,
-} from '../../engines/hls/engine-background-video';
+  type EngineConfig,
+  type EngineContext,
+  type EngineState,
+  createEngine,
+} from '../../engines/hls-background-video';
 import { UNPLAYABLE_SOURCE_MESSAGE } from '../../primitives/error-messages';
 import { firstFatal, type HlsVideoMediaError, hasUnsupportedFeatureCause } from '../hls-video/error-surface';
 
@@ -26,8 +27,8 @@ export type { HlsVideoMediaError } from '../hls-video/error-surface';
 
 /** What `new HlsBackgroundVideoAdapter(options)` accepts; see `HlsVideoAdapterOptions` for why it is typed here. */
 export interface HlsBackgroundVideoAdapterOptions {
-  /** Engine config forwarded to `createBackgroundVideoEngine`. */
-  config?: BackgroundVideoEngineConfig;
+  /** Engine config forwarded to `createEngine`. */
+  config?: EngineConfig;
 }
 
 export interface HlsBackgroundVideoAdapterProps {
@@ -35,7 +36,7 @@ export interface HlsBackgroundVideoAdapterProps {
 }
 
 export interface HlsBackgroundVideoAdapterAPI extends HlsBackgroundVideoAdapterProps {
-  readonly engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
+  readonly engine: Composition<EngineState, EngineContext>;
   readonly error: HlsVideoMediaError | null;
   attach(mediaElement: HTMLMediaElement): void;
   detach(): void;
@@ -113,8 +114,14 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       src: '',
     };
 
-    #engine: Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext>;
-    #config: BackgroundVideoEngineConfig;
+    /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-background-video`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-background-video';
+
+    #engine: Composition<EngineState, EngineContext>;
+    #config: EngineConfig;
     #error: HlsVideoMediaError | null = null;
     /**
      * The _reported_ condition currently surfaced, which is what the re-fire latch keys on. Not `#error.code`: that's
@@ -145,7 +152,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
       });
     }
 
-    get engine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    get engine(): Composition<EngineState, EngineContext> {
       return this.#engine;
     }
 
@@ -242,13 +249,15 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     }
 
     set src(value: string) {
+      // Resolved before comparing or storing — see the video adapter's note.
+      const url = resolveSourceUrl(value);
       // Same line the HLS Medias draw: the presentation is set from a fresh
       // object every time, so re-resolving a URL already playing would restart
       // it for no reason.
-      if (value === this.src) return;
+      if (url === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#engine.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(url ? { url } : undefined);
     }
 
     // -------------------------------------------------------------------------
@@ -286,11 +295,11 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     // Private
     // -------------------------------------------------------------------------
 
-    #createEngine(): Composition<BackgroundVideoEngineState, BackgroundVideoEngineContext> {
+    #createEngine(): Composition<EngineState, EngineContext> {
       // No selection config of its own: the engine's default rule chain already
       // narrows to the largest rendition that fits the screen, which is exactly
       // what this adapter used to hand over as a bespoke picker.
-      return createBackgroundVideoEngine(this.#config);
+      return createEngine(this.#config);
     }
 
     #cancelPendingPlay(): void {

@@ -20,7 +20,12 @@ function renderPlaybackRateOptions({
   setPlaybackRate?: (rate: number) => void;
   formatRate?: (rate: number) => string;
 } = {}) {
-  const { Wrapper } = createPlayerWrapper({ playbackRates, playbackRate, setPlaybackRate });
+  const { Wrapper } = createPlayerWrapper({
+    playbackRates,
+    playbackRate,
+    playbackRateAvailability: 'available',
+    setPlaybackRate,
+  });
 
   render(
     <Menu.Root defaultOpen align="center">

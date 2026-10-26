@@ -164,9 +164,17 @@ export abstract class MediaButtonElement<
       // just the data one: `data-hidden` is a styling hook a skin may or may not
       // act on, where `hidden` removes the control the way the React components
       // do by rendering nothing.
-      ...(isHideable(state) && { hidden: state.hidden ? '' : undefined }),
+      ...(isHideable(state) && this.reflectsHidden() && { hidden: state.hidden ? '' : undefined }),
     });
     applyStateDataAttrs(this, state, this.stateAttrMap);
+  }
+
+  /**
+   * Whether this button writes its core's `hidden` state to the `hidden` attribute. A subclass returns `false` while
+   * another owner, such as a linked menu, manages its visibility.
+   */
+  protected reflectsHidden(): boolean {
+    return true;
   }
 
   #syncHotkeyShortcut(): void {

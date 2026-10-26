@@ -316,7 +316,11 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
         hasWorkspace ||
           existsSync(resolve(__dirname, 'app/_generated/registry/react-tailwind-default/components/videojs'))
       ),
-      __SANDBOX_BRANCH__: JSON.stringify(describeGit('rev-parse', '--abbrev-ref', 'HEAD')),
+      // Vercel checks out the deployed commit detached, so `rev-parse --abbrev-ref HEAD` answers `master` there; its own
+      // variable names the real branch. Local runs and git-less checkouts keep the git answer and its `unknown` fallback.
+      __SANDBOX_BRANCH__: JSON.stringify(
+        process.env.VERCEL_GIT_COMMIT_REF || describeGit('rev-parse', '--abbrev-ref', 'HEAD')
+      ),
       __SANDBOX_COMMIT__: JSON.stringify(describeGit('rev-parse', '--short', 'HEAD')),
     },
     test: {

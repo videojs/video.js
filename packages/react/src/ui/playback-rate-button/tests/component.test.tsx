@@ -18,6 +18,7 @@ function createContextValue(container: HTMLElement): PlayerContextValue {
     store: createMockStore({
       playbackRates: [0.5, 1, 1.5, 2],
       playbackRate: 1,
+      playbackRateAvailability: 'available',
       setPlaybackRate: vi.fn(),
     }) as any,
     media: null,
@@ -36,6 +37,7 @@ describe('PlaybackRateButton', () => {
     const { Wrapper: PlayerWrapper } = createPlayerWrapper({
       playbackRate: 1.5,
       playbackRates: [0.5, 1, 1.5, 2],
+      playbackRateAvailability: 'available',
       setPlaybackRate: vi.fn(),
     });
 
@@ -55,6 +57,21 @@ describe('PlaybackRateButton', () => {
 
     expect(trigger.getAttribute('aria-label')).toBe('Playback rate, 1.5');
     expect(trigger.getAttribute('data-rate')).toBe('1.5');
+  });
+
+  it('renders nothing when the media has no playback rate', () => {
+    // TikTok takes no speed command, so the control is removed rather than
+    // rendered and inert.
+    const { Wrapper: PlayerWrapper } = createPlayerWrapper({
+      playbackRate: 1,
+      playbackRates: [0.5, 1, 1.5, 2],
+      playbackRateAvailability: 'unsupported',
+      setPlaybackRate: vi.fn(),
+    });
+
+    render(<PlaybackRateButton data-testid="button" />, { wrapper: PlayerWrapper });
+
+    expect(screen.queryByTestId('button')).toBeNull();
   });
 
   it('shows the control name and the speed-up shortcut in the tooltip', async () => {

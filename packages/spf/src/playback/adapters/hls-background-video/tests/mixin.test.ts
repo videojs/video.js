@@ -33,6 +33,30 @@ describe('HlsBackgroundVideoAdapterCore', () => {
   });
 
   describe('src', () => {
+    // Resolved against the document base URL, as `<video src>` is: a site-relative
+    // source used to reach the engine raw, where the parser threw on it as a base.
+    it('resolves a site-relative src against the document base URL', () => {
+      const media = new HlsBackgroundVideoAdapterCore();
+      const expected = new URL('/media/stream.m3u8', document.baseURI).href;
+
+      media.src = '/media/stream.m3u8';
+
+      expect(media.src).toBe(expected);
+      expect(media.engine.state.presentation.get()?.url).toBe(expected);
+    });
+
+    it('treats a relative src and its absolute form as the same source', () => {
+      const media = new HlsBackgroundVideoAdapterCore();
+
+      media.src = '/media/stream.m3u8';
+      const presentation = media.engine.state.presentation.get();
+
+      media.src = new URL('/media/stream.m3u8', document.baseURI).href;
+      media.src = '/media/stream.m3u8';
+
+      expect(media.engine.state.presentation.get()).toBe(presentation);
+    });
+
     it('returns empty string before any src is set', () => {
       const media = new HlsBackgroundVideoAdapterCore();
 

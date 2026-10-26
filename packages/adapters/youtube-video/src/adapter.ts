@@ -103,7 +103,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   // track is stale until the next source.
   #captionSelected = false;
 
-  static PLAYER_SOFTWARE_NAME = 'youtube-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'youtube';
 
   constructor() {
     super();

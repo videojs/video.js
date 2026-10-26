@@ -2,11 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import {
   SVTA_BAD_LICENSE_REQUEST,
-  SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED,
-  SVTA_DRM_LICENSE_RESPONSE_REJECTED,
   SVTA_DRM_SESSION_ERROR,
   SVTA_INSUFFICIENT_OUTPUT_PROTECTION,
   SVTA_LICENSE_EXPIRED,
+  SVTA_LICENSE_REQUEST_GENERATION_ERROR,
+  SVTA_LICENSE_RESPONSE_REJECTED,
   type SvtaError,
 } from '../../errors';
 import { fetchDrm } from '../eme';
@@ -191,7 +191,7 @@ describe('openLicenseSession', () => {
     message(session);
     await flush();
 
-    expect(reports.map((error) => error.code)).toEqual([SVTA_BAD_LICENSE_REQUEST, SVTA_DRM_LICENSE_RESPONSE_REJECTED]);
+    expect(reports.map((error) => error.code)).toEqual([SVTA_BAD_LICENSE_REQUEST, SVTA_LICENSE_RESPONSE_REJECTED]);
     expect(session.close).not.toHaveBeenCalled();
   });
 
@@ -218,7 +218,7 @@ describe('openLicenseSession', () => {
     });
     await flush();
 
-    expect(reports.map((error) => error.code)).toEqual([SVTA_DRM_LICENSE_REQUEST_GENERATION_FAILED]);
+    expect(reports.map((error) => error.code)).toEqual([SVTA_LICENSE_REQUEST_GENERATION_ERROR]);
   });
 
   it('closes the session and reports nothing more once its signal aborts', async () => {

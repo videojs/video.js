@@ -43,6 +43,9 @@ class DashAdapterCore
     source: null,
   };
 
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'dashjs';
+
   #engine: dashjs.MediaPlayerClass;
   #src = DashAdapterCore.defaultProps.src;
   #source: DashSource | null = DashAdapterCore.defaultProps.source;

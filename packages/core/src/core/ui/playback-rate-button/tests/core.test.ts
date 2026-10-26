@@ -8,6 +8,7 @@ function createMediaState(overrides: Partial<MediaPlaybackRateState> = {}): Medi
   return {
     playbackRates: [0.2, 0.5, 0.7, 1, 1.2, 1.5, 1.7, 2],
     playbackRate: 1,
+    playbackRateAvailability: 'available',
     setPlaybackRate: vi.fn(),
     ...overrides,
   };
@@ -16,6 +17,8 @@ function createMediaState(overrides: Partial<MediaPlaybackRateState> = {}): Medi
 function createState(overrides: Partial<PlaybackRateButtonState> = {}): PlaybackRateButtonState {
   return {
     rate: 1,
+    availability: 'available',
+    hidden: false,
     label: '',
     ...overrides,
   };
@@ -31,6 +34,24 @@ describe('PlaybackRateButtonCore', () => {
       const state = core.getState();
 
       expect(state.rate).toBe(1.5);
+    });
+
+    it('shows itself when the media can change its playback rate', () => {
+      const core = new PlaybackRateButtonCore();
+
+      core.setMedia(createMediaState());
+
+      expect(core.getState()).toMatchObject({ availability: 'available', hidden: false });
+    });
+
+    it.each(['unavailable', 'unsupported'] as const)('hides itself when playback rate is %s', (availability) => {
+      // A media with no playback rate, such as TikTok, leaves this button with
+      // nothing to do, so it is removed rather than rendered and inert.
+      const core = new PlaybackRateButtonCore();
+
+      core.setMedia(createMediaState({ playbackRateAvailability: availability }));
+
+      expect(core.getState()).toMatchObject({ availability, hidden: true });
     });
   });
 
@@ -166,6 +187,14 @@ describe('PlaybackRateButtonCore', () => {
     it('does nothing when disabled', () => {
       const core = new PlaybackRateButtonCore({ disabled: true });
       const media = createMediaState();
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).not.toHaveBeenCalled();
+    });
+
+    it('does nothing when the media has no playback rate', () => {
+      const core = new PlaybackRateButtonCore();
+      const media = createMediaState({ playbackRateAvailability: 'unsupported' });
 
       core.cycle(media);
       expect(media.setPlaybackRate).not.toHaveBeenCalled();

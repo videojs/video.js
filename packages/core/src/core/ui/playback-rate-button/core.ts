@@ -1,4 +1,4 @@
-import type { MediaPlaybackRateState } from '@videojs/media';
+import type { MediaFeatureAvailability, MediaPlaybackRateState } from '@videojs/media';
 import { createState } from '@videojs/store';
 import { defaults } from '@videojs/utils/object';
 import type { NonNullableObject } from '@videojs/utils/types';
@@ -20,6 +20,10 @@ export interface PlaybackRateButtonProps {
 
 export interface PlaybackRateButtonState extends ButtonState {
   rate: number;
+  /** Whether the media can change its playback rate. */
+  availability: MediaFeatureAvailability;
+  /** Whether the button is hidden because the media has no playback rate to change. */
+  hidden: boolean;
 }
 
 /** @internal */
@@ -32,6 +36,8 @@ export class PlaybackRateButtonCore {
 
   readonly state = createState<PlaybackRateButtonState>({
     rate: 1,
+    availability: 'unavailable',
+    hidden: true,
     label: '',
   });
 
@@ -80,15 +86,20 @@ export class PlaybackRateButtonCore {
 
   getState(): PlaybackRateButtonState {
     const media = this.#media!;
+    const availability = media.playbackRateAvailability;
 
-    this.state.patch({ rate: media.playbackRate });
+    this.state.patch({
+      rate: media.playbackRate,
+      availability,
+      hidden: availability !== 'available',
+    });
     this.state.patch({ label: resolveText(this.getLabel(this.state.current)) });
 
     return this.state.current;
   }
 
   cycle(media: MediaPlaybackRateState): void {
-    if (this.#props.disabled) return;
+    if (this.#props.disabled || media.playbackRateAvailability !== 'available') return;
 
     if (this.#props.menuTrigger) return;
 

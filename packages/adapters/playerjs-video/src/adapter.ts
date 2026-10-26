@@ -56,7 +56,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     source: null,
   };
 
-  static PLAYER_SOFTWARE_NAME = 'playerjs-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'playerjs';
 
   #target: HTMLIFrameElement | null = null;
   #loadComplete = createPublicPromise<void>();
