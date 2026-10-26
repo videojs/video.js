@@ -1,6 +1,6 @@
 # SPF fundamentals
 
-SPF builds long-lived systems from small behaviors connected by signals. Features group behaviors into capabilities, and an engine composes features. The framework supplies composition, lifecycle, and work primitives; a domain supplies the behaviors, features, and engine adapter.
+SPF builds long-lived systems from small behaviors connected by signals. Features group the behaviors that give an engine one ability, and an engine composes features. The framework supplies composition, lifecycle, and work primitives; a domain supplies the behaviors, features, and engine adapter.
 
 Source and tests define exact types and runtime behavior. This guide explains the mental model. The [API reference](./reference/README.md) lists every engine, feature, and behavior with the config, state, and context keys each one reads and writes.
 
@@ -21,7 +21,7 @@ Use `defineBehavior()` for ordinary source behaviors. It verifies that runtime k
 
 ## Features and engines
 
-A feature is one capability of a composition. It lists the behaviors that implement the capability, with the config defaults and initial state they need. Use `defineFeature()` to declare one.
+A feature is a group of behaviors that together give an engine one ability, such as playing video, handling DRM, or following a live stream. It also carries the config defaults and initial state those behaviors need. Use `defineFeature()` to declare one. SPF features live inside an engine and are unrelated to the player's store features.
 
 A feature can depend on another feature's writes. For example, the video feature loads nothing until some feature writes `context.mediaSource`. Each feature's reference page lists what it requires from other features.
 

@@ -1,6 +1,6 @@
 # HLS engine composition
 
-The HLS video engine, `createEngine()` from `@videojs/spf/engines/hls-video`, composes SPF features into HLS playback over MediaSource. Each feature groups the behaviors for one capability. This guide describes ownership and stage relationships and names the features behind each stage.
+The HLS video engine, `createEngine()` from `@videojs/spf/engines/hls-video`, composes SPF features into HLS playback over MediaSource. Each feature groups the behaviors behind one ability, such as DRM or live playback. This guide describes ownership and stage relationships and names the features behind each stage.
 
 The [engine's reference page](./reference/engines/hls-video.md) lists its features and behaviors in composition order, with every config, state, and context key. Each feature's page lists its behaviors and what it requires from other features.
 

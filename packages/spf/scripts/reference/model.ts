@@ -276,7 +276,10 @@ export interface BehaviorInfo {
   label: string;
   /** Whether `name` is an export (and so can be a heading), or an inline expression. */
   exported: boolean;
-  /** Whether the entry only declares signals the host writes (`defineExternalSignals`), rather than behavior logic. */
+  /**
+   * Whether the entry only declares signals written from outside the composition (`defineExternalSignals`), rather than
+   * behavior logic.
+   */
   external: boolean;
   file: string;
   entry: EntryPoint | undefined;

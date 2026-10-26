@@ -564,9 +564,10 @@ function slotFieldsTable(
 }
 
 /**
- * The state keys a feature (or an engine, through its features) declares for the host to write, as a section: what they
- * are, how they get written, then one row per key with its type and its doc. The doc names the reader; the selection
- * rules read these keys through optional deps the model does not see, so a "Read by" column would mislead.
+ * The state keys a feature (or an engine, through its features) declares to be written from outside the engine, as a
+ * section: what they are, how they get written, then one row per key with its type and its doc. The doc names the
+ * reader; the selection rules read these keys through optional deps the model does not see, so a "Read by" column would
+ * mislead.
  */
 function externalSignalsSection(
   reference: ReferenceProgram,
@@ -837,7 +838,7 @@ function coreModules(reference: ReferenceProgram): CoreModule[] {
   return [...modules.values()].sort((a, b) => CORE_MODULE_ORDER.indexOf(a.name) - CORE_MODULE_ORDER.indexOf(b.name));
 }
 
-/** The composition modules in dependency order: a behavior, the signals a host writes, a feature, a composition. */
+/** The composition modules in dependency order: a behavior, the signals written from outside, a feature, a composition. */
 const CORE_MODULE_ORDER = ['define-behavior', 'define-external-signals', 'define-feature', 'create-composition'];
 
 function renderCorePage(reference: ReferenceProgram, module: CoreModule): string {
@@ -1066,7 +1067,7 @@ function renderReadme(reference: ReferenceProgram, model: Model, core: CoreModul
     details('How this reference is generated', [
       `Generated from the TypeScript sources and their JSDoc by \`scripts/build-reference.ts\`. It covers the composition factories the root entry exports from \`src/core/composition/\`, the playback engines (\`${reference.packageName}/engines/*\`), their features (\`${reference.packageName}/features/*\`), and the behaviors (\`${reference.packageName}/behaviors/*\`). It does not cover the root entry's other exports, nor these entry points: ${uncovered.join(', ')}.`,
       'Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.',
-      'A feature page lists the state keys it declares for the host to write under "External signals", apart from its behaviors; an engine page collects its features\' under the same heading.',
+      'A feature page lists the state keys it declares to be written from outside the engine under "External signals", apart from its behaviors; an engine page collects its features\' under the same heading.',
       "A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Other functions and constants, and Types.",
       'A behavior without JSDoc shows the JSDoc of the function its `setup` names; a type export without JSDoc shows what its declaration says it is; a symbol with no doc anywhere reads "No description."',
       'A config key\'s doc is the config field JSDoc of the first behavior listed under "Read by" that has one. A state or context key\'s doc is the field JSDoc of the first behavior that writes the key, else the first that reads it; where that behavior is not on the page, the cell says which one it is documented on.',

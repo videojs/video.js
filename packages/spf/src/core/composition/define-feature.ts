@@ -6,9 +6,9 @@
 import type { AnyBehavior, Empty } from './define-behavior';
 
 /**
- * One capability of a composition: the behaviors that implement it, with the config defaults and initial state they
- * need. Removing a feature from a composition removes its behaviors and their defaults together, except behaviors
- * another composed feature also lists.
+ * A group of behaviors that together give a composition one ability, such as playing video or handling DRM, with the
+ * config defaults and initial state they need. Removing a feature from a composition removes its behaviors and their
+ * defaults together, except behaviors another composed feature also lists.
  *
  * A feature's behaviors compose in order at the feature's position, except a behavior an earlier feature already
  * listed, which composes at that earlier position. A feature that owns external inputs lists its

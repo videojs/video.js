@@ -28,7 +28,7 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | The media element the engine drives. No behavior writes it: an adapter attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

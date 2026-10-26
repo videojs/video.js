@@ -8,10 +8,10 @@ Source: [src/playback/behaviors/dom/load-chapters.ts](../../../../src/playback/b
 
 **Project Apple JSON chapters onto the host media element.** When the resolved presentation carries an
 `#EXT-X-SESSION-DATA` entry for `com.apple.hls.chapters`, fetch the document it points at, parse it, and add one
-hidden `<track kind="chapters">` per title language — cues and all — to `mediaElement`. The element is the store:
-there is no chapters state signal, exactly as subtitle cues live on their DOM tracks and nowhere else. Consumers
-(video.js's textTrack feature, a host page) read the first chapters track's `cues` the way they would an authored
-`<track>`.
+hidden `<track kind="chapters">` per title language — cues and all — to `mediaElement`. The element holds the
+chapters: there is no chapters state signal, exactly as subtitle cues live on their DOM tracks and nowhere else.
+Consumers (video.js's textTrack feature, a host page) read the first chapters track's `cues` the way they would an
+authored `<track>`.
 
 Single-positive-state reactor (`'preconditions-unmet'` ↔ `'loading'`), gated on a media element, a resolved
 presentation, and a chapters entry with a URI. An element-bound effect fetches and projects; the returned cleanup
@@ -50,7 +50,7 @@ The setup declares `config` as required.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
-| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | inline | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | reads | yes | `HTMLMediaElement \| undefined` | inline | The media element the engine drives. No behavior writes it: an adapter attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
 
 ## Types
 

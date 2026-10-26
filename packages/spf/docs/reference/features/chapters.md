@@ -30,7 +30,7 @@ hidden `chapters` text track per language.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The media element the engine drives. No behavior writes it: an adapter attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 
