@@ -81,3 +81,27 @@ export function tryHidePopover(el: HTMLElement | null): void {
     // Element may not support popover API or may already be hidden
   }
 }
+
+/**
+ * Hides every open popover inside `root`, including those in its own and nested shadow roots.
+ *
+ * @internal
+ */
+export function hideOpenPopovers(root: Element | ShadowRoot): void {
+  if (root instanceof Element && root.shadowRoot) hideOpenPopovers(root.shadowRoot);
+
+  for (const el of root.querySelectorAll<HTMLElement>('*')) {
+    if (isOpenPopover(el)) tryHidePopover(el);
+
+    if (el.shadowRoot) hideOpenPopovers(el.shadowRoot);
+  }
+}
+
+function isOpenPopover(el: Element): boolean {
+  try {
+    return el.matches(':popover-open');
+  } catch {
+    // `:popover-open` is unsupported, so no popover can be open
+    return false;
+  }
+}
