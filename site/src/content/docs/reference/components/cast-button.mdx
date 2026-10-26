@@ -97,7 +97,15 @@ React renders a `<button>` element. Add a `className` to style it:
 ```
 </FrameworkCase>
 
-Unsupported buttons are hidden automatically. No availability selector or extra hiding CSS is required.
+Unsupported buttons are hidden automatically. No availability selector is required.
+
+<FrameworkCase frameworks={["html"]}>
+The element receives the native `hidden` attribute. If your CSS sets `display` on the element, that rule overrides `hidden`; see <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+The component renders nothing, so no extra hiding CSS is required.
+</FrameworkCase>
 
 ## Accessibility
 

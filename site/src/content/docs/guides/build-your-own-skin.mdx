@@ -400,6 +400,10 @@ To build a control Video.js doesn't provide, follow <DocsLink slug="guides/build
 
 The components bring no visual styles. You add the icons, text, and CSS. They describe their state with `data-*` attributes, such as `data-paused` on the play button, so you can style them with plain CSS, Tailwind, or anything else. <DocsLink slug="guides/ui-components">UI components</DocsLink> explains how. <DocsLink slug="guides/controls">Automatically show and hide controls</DocsLink> covers the controls' visibility states.
 
+<FrameworkCase frameworks={["html"]}>
+Controls the browser or media can't use receive the native `hidden` attribute. A `display` value in your CSS overrides it, so add a `[hidden]` rule for any control you give a `display`. See <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
+</FrameworkCase>
+
 Lay out controls in source order that matches their visual order, so keyboard focus follows the layout.
 
 A player's controls sit over a moving picture, in a frame whose size you don't control, so a few design questions come up in every skin:
