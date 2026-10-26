@@ -1,0 +1,292 @@
+[
+  {
+    "start-time": 0.0,
+    "duration": 276.767,
+    "titles": [
+      {
+        "language": "en",
+        "title": "01 - Dedication and Preface"
+      }
+    ]
+  },
+  {
+    "start-time": 276.767,
+    "duration": 472.346,
+    "titles": [
+      {
+        "language": "en",
+        "title": "02 - Vol. I, Letter I"
+      }
+    ]
+  },
+  {
+    "start-time": 749.113,
+    "duration": 410.227,
+    "titles": [
+      {
+        "language": "en",
+        "title": "03 - Vol. I, Letter II"
+      }
+    ]
+  },
+  {
+    "start-time": 1159.34,
+    "duration": 110.107,
+    "titles": [
+      {
+        "language": "en",
+        "title": "04 - Vol. I, Letter III"
+      }
+    ]
+  },
+  {
+    "start-time": 1269.447,
+    "duration": 885.76,
+    "titles": [
+      {
+        "language": "en",
+        "title": "05 - Vol. I, Letter IV"
+      }
+    ]
+  },
+  {
+    "start-time": 2155.207,
+    "duration": 1201.475,
+    "titles": [
+      {
+        "language": "en",
+        "title": "06 - Vol. I, Chapter I"
+      }
+    ]
+  },
+  {
+    "start-time": 3356.682,
+    "duration": 917.447,
+    "titles": [
+      {
+        "language": "en",
+        "title": "07 - Vol. I, Chapter II"
+      }
+    ]
+  },
+  {
+    "start-time": 4274.129,
+    "duration": 1044.82,
+    "titles": [
+      {
+        "language": "en",
+        "title": "08 - Vol. I, Chapter III"
+      }
+    ]
+  },
+  {
+    "start-time": 5318.949,
+    "duration": 940.982,
+    "titles": [
+      {
+        "language": "en",
+        "title": "09 - Vol. I, Chapter IV"
+      }
+    ]
+  },
+  {
+    "start-time": 6259.931,
+    "duration": 1051.168,
+    "titles": [
+      {
+        "language": "en",
+        "title": "10 - Vol. I, Chapter V"
+      }
+    ]
+  },
+  {
+    "start-time": 7311.099,
+    "duration": 1499.872,
+    "titles": [
+      {
+        "language": "en",
+        "title": "11 - Vol. I, Chapter VI"
+      }
+    ]
+  },
+  {
+    "start-time": 8810.971,
+    "duration": 1190.322,
+    "titles": [
+      {
+        "language": "en",
+        "title": "12 - Vol. I, Chapter VII"
+      }
+    ]
+  },
+  {
+    "start-time": 10001.293,
+    "duration": 823.615,
+    "titles": [
+      {
+        "language": "en",
+        "title": "13 - Vol. II, Chapter I"
+      }
+    ]
+  },
+  {
+    "start-time": 10824.908,
+    "duration": 897.593,
+    "titles": [
+      {
+        "language": "en",
+        "title": "14 - Vol. II, Chapter II"
+      }
+    ]
+  },
+  {
+    "start-time": 11722.501,
+    "duration": 1105.163,
+    "titles": [
+      {
+        "language": "en",
+        "title": "15 - Vol. II, Chapter III"
+      }
+    ]
+  },
+  {
+    "start-time": 12827.664,
+    "duration": 836.179,
+    "titles": [
+      {
+        "language": "en",
+        "title": "16 - Vol. II, Chapter IV"
+      }
+    ]
+  },
+  {
+    "start-time": 13663.843,
+    "duration": 854.648,
+    "titles": [
+      {
+        "language": "en",
+        "title": "17 - Vol. II, Chapter V"
+      }
+    ]
+  },
+  {
+    "start-time": 14518.491,
+    "duration": 697.679,
+    "titles": [
+      {
+        "language": "en",
+        "title": "18 - Vol. II, Chapter VI"
+      }
+    ]
+  },
+  {
+    "start-time": 15216.17,
+    "duration": 1232.379,
+    "titles": [
+      {
+        "language": "en",
+        "title": "19 - Vol. II, Chapter VII"
+      }
+    ]
+  },
+  {
+    "start-time": 16448.549,
+    "duration": 1197.975,
+    "titles": [
+      {
+        "language": "en",
+        "title": "20 - Vol. II, Chapter VIII"
+      }
+    ]
+  },
+  {
+    "start-time": 17646.524,
+    "duration": 778.345,
+    "titles": [
+      {
+        "language": "en",
+        "title": "21 - Vol. II, Chapter IX"
+      }
+    ]
+  },
+  {
+    "start-time": 18424.869,
+    "duration": 1084.186,
+    "titles": [
+      {
+        "language": "en",
+        "title": "22 - Vol. III, Chapter I"
+      }
+    ]
+  },
+  {
+    "start-time": 19509.055,
+    "duration": 963.709,
+    "titles": [
+      {
+        "language": "en",
+        "title": "23 - Vol. III, Chapter II"
+      }
+    ]
+  },
+  {
+    "start-time": 20472.764,
+    "duration": 1365.081,
+    "titles": [
+      {
+        "language": "en",
+        "title": "24 - Vol. III, Chapter III"
+      }
+    ]
+  },
+  {
+    "start-time": 21837.845,
+    "duration": 1402.984,
+    "titles": [
+      {
+        "language": "en",
+        "title": "25 - Vol. III, Chapter IV"
+      }
+    ]
+  },
+  {
+    "start-time": 23240.829,
+    "duration": 1277.545,
+    "titles": [
+      {
+        "language": "en",
+        "title": "26 - Vol. III, Chapter V"
+      }
+    ]
+  },
+  {
+    "start-time": 24518.374,
+    "duration": 989.779,
+    "titles": [
+      {
+        "language": "en",
+        "title": "27 - Vol. III, Chapter VI"
+      }
+    ]
+  },
+  {
+    "start-time": 25508.153,
+    "duration": 1198.185,
+    "titles": [
+      {
+        "language": "en",
+        "title": "28 - Vol. III, Chapter VII"
+      }
+    ]
+  },
+  {
+    "start-time": 26706.338,
+    "duration": 2130.782,
+    "titles": [
+      {
+        "language": "en",
+        "title": "29 - Vol. III, Letters"
+      }
+    ]
+  }
+]

@@ -31,9 +31,10 @@ for offline" affordance, and the title, LibriVox id, and archive.org item in `me
 streams the HLS rendition. `library.ts` is generated from the stitch output by `scripts/gen-library.py`
 (`scripts/stitch.py` does the stitching) and holds the chapter table, readers, cover, and links for each title.
 
-Mux can carry the chapters itself as a `text_type: "chapters"` track, served as JSON and WebVTT next to the stream.
-That needs the VTT at a public URL at track-creation time, which this sandbox has no place to put, so for now the app
-builds the chapters document from `library.ts` and hands it to the media as a `<track kind="chapters">`.
+Mux carries the chapters itself: each asset has a `text_type: "chapters"` track, which Mux validates against
+Apple's HLS chapters JSON shape (`start-time`, `duration`, `titles`), not WebVTT, and serves back as both JSON and
+WebVTT beside the stream. The player loads that WebVTT as its `<track kind="chapters">`, so the chapters the app shows
+are the ones on the asset. `chapters/*.chapters.json` are the documents that were attached.
 
 ## Parts
 

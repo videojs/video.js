@@ -1,7 +1,8 @@
 """Concatenate one LibriVox book's 64kbps MP3s into a single MP3 and emit chapter offsets.
 
 Usage: python3 -I concat.py <book_json> <item_dir> <out_prefix>
-Writes <out_prefix>.m4a, <out_prefix>.json (book + chapters with exact start/end), <out_prefix>.vtt (chapters).
+Writes <out_prefix>.m4a, <out_prefix>.json (book + chapters with exact start/end), and
+<out_prefix>.chapters.json (the chapters in Apple's HLS JSON shape, which is what a Mux chapters track takes).
 """
 import json, subprocess, sys, pathlib
 
@@ -39,12 +40,10 @@ subprocess.run(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i
                 '-af', 'aresample=44100', '-ac', '1', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', str(out.with_suffix('.m4a'))], check=True)
 total, _ = probe(out.with_suffix('.m4a'))
 
-def ts(x):
-    h, m, s = int(x // 3600), int(x % 3600 // 60), x % 60
-    return f'{h:02d}:{m:02d}:{s:06.3f}'
-
-vtt = 'WEBVTT\n\n' + ''.join(f"{c['index'] + 1}\n{ts(c['start'])} --> {ts(c['end'])}\n{c['title']}\n\n" for c in chapters)
-out.with_suffix('.vtt').write_text(vtt)
+# Mux validates a chapters track against Apple's HLS chapters JSON, not WebVTT.
+apple = [{'start-time': c['start'], 'duration': round(c['end'] - c['start'], 3), 'titles': [{'language': 'en', 'title': c['title']}]}
+         for c in chapters]
+pathlib.Path(str(out) + '.chapters.json').write_text(json.dumps(apple, indent=2) + '\n')
 meta = {
     'librivoxId': book['id'], 'title': book['title'], 'authors': [f"{a['first_name']} {a['last_name']}".strip() for a in book['authors']],
     'year': book['copyright_year'], 'language': book['language'], 'genres': [g['name'] for g in book.get('genres', [])],

@@ -1,0 +1,122 @@
+[
+  {
+    "start-time": 0.0,
+    "duration": 640.584,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 1"
+      }
+    ]
+  },
+  {
+    "start-time": 640.584,
+    "duration": 735.765,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 2"
+      }
+    ]
+  },
+  {
+    "start-time": 1376.349,
+    "duration": 1064.016,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 3"
+      }
+    ]
+  },
+  {
+    "start-time": 2440.365,
+    "duration": 1192.96,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 4"
+      }
+    ]
+  },
+  {
+    "start-time": 3633.325,
+    "duration": 809.169,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 5"
+      }
+    ]
+  },
+  {
+    "start-time": 4442.494,
+    "duration": 775.81,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 6"
+      }
+    ]
+  },
+  {
+    "start-time": 5218.304,
+    "duration": 1046.352,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 7"
+      }
+    ]
+  },
+  {
+    "start-time": 6264.656,
+    "duration": 799.032,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 8"
+      }
+    ]
+  },
+  {
+    "start-time": 7063.688,
+    "duration": 908.017,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 9"
+      }
+    ]
+  },
+  {
+    "start-time": 7971.705,
+    "duration": 1368.36,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 10"
+      }
+    ]
+  },
+  {
+    "start-time": 9340.065,
+    "duration": 619.872,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 11"
+      }
+    ]
+  },
+  {
+    "start-time": 9959.937,
+    "duration": 772.44,
+    "titles": [
+      {
+        "language": "en",
+        "title": "Chapter 12"
+      }
+    ]
+  }
+]
