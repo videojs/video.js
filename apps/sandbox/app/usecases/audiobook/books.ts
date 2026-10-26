@@ -22,6 +22,8 @@ export interface Audiobook {
   cover: string;
   /** Mux public playback ID of the stitched asset. */
   playbackId: string;
+  /** Mux text track of `text_type: "chapters"` on the asset, when one has been attached. */
+  chaptersTrackId?: string;
   /** Seconds, from the stitched file. */
   duration: number;
   chapters: readonly AudiobookChapter[];
@@ -40,6 +42,48 @@ export function audiobookCoverFallback(book: Pick<Audiobook, 'links'>): string {
 /** The HLS source for a title. Mux serves the same stream to every platform. */
 export function audiobookSrc(book: Pick<Audiobook, 'playbackId'>): string {
   return `https://stream.mux.com/${book.playbackId}.m3u8`;
+}
+
+/** One entry of the chapters document Mux serves: Apple's HLS chapters JSON shape. */
+export interface MuxChapter {
+  'start-time': number;
+  duration?: number;
+  titles?: readonly { language?: string; title: string }[];
+}
+
+/**
+ * The chapters document on the Mux asset, when it carries a `text_type: "chapters"` track. Mux validates the track
+ * against Apple's HLS chapters JSON, serves it back as JSON, and points native HLS players at it from the manifest's
+ * `com.apple.hls.chapters` session data.
+ */
+export function audiobookChaptersJsonUrl(book: Pick<Audiobook, 'playbackId' | 'chaptersTrackId'>): string | null {
+  return book.chaptersTrackId
+    ? `https://stream.mux.com/${book.playbackId}/chapters/${book.chaptersTrackId}.json`
+    : null;
+}
+
+/** The chapters document as a WebVTT data URL, the form a `<track kind="chapters">` takes. Pure: nothing to revoke. */
+export function chaptersVttDataUrl(chapters: readonly AudiobookChapter[]): string {
+  return `data:text/vtt;charset=utf-8,${encodeURIComponent(audiobookChaptersVtt({ chapters }))}`;
+}
+
+/** Mux's chapters document as the chapter table the app uses, with each chapter ending where the next one starts. */
+export function chaptersFromMux(document: readonly MuxChapter[], duration: number): AudiobookChapter[] {
+  const sorted = [...document].sort((a, b) => a['start-time'] - b['start-time']);
+
+  return sorted.map((chapter, index) => {
+    const start = chapter['start-time'];
+    const next = sorted[index + 1]?.['start-time'];
+    const end = next ?? (chapter.duration ? start + chapter.duration : duration);
+
+    return {
+      index,
+      title: chapter.titles?.find((entry) => entry.language === 'en')?.title ?? chapter.titles?.[0]?.title ?? '',
+      start,
+      end,
+      readers: [],
+    };
+  });
 }
 
 /** Mux audio-only static rendition, for a "download for offline" affordance. */

@@ -41,8 +41,8 @@ subprocess.run(['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i
 total, _ = probe(out.with_suffix('.m4a'))
 
 # Mux validates a chapters track against Apple's HLS chapters JSON, not WebVTT.
-apple = [{'start-time': c['start'], 'duration': round(c['end'] - c['start'], 3), 'titles': [{'language': 'en', 'title': c['title']}]}
-         for c in chapters]
+# No `duration`: each chapter runs to the next, and the last to the end of the asset, whatever Mux measures that to be.
+apple = [{'start-time': c['start'], 'titles': [{'language': 'en', 'title': c['title']}]} for c in chapters]
 pathlib.Path(str(out) + '.chapters.json').write_text(json.dumps(apple, indent=2) + '\n')
 meta = {
     'librivoxId': book['id'], 'title': book['title'], 'authors': [f"{a['first_name']} {a['last_name']}".strip() for a in book['authors']],

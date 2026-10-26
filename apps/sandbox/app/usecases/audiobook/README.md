@@ -32,7 +32,7 @@ streams the HLS rendition. `library.ts` is generated from the stitch output by `
 (`scripts/stitch.py` does the stitching) and holds the chapter table, readers, cover, and links for each title.
 
 Mux carries the chapters itself: each asset has a `text_type: "chapters"` track, which Mux validates against
-Apple's HLS chapters JSON shape (`start-time`, `duration`, `titles`), not WebVTT, and serves back as both JSON and
+Apple's HLS chapters JSON shape (`start-time`, `titles`), not WebVTT, and serves back as both JSON and
 WebVTT beside the stream. The player loads that WebVTT as its `<track kind="chapters">`, so the chapters the app shows
 are the ones on the asset. `chapters/*.chapters.json` are the documents that were attached.
 

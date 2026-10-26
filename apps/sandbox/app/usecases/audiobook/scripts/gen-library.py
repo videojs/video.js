@@ -1,6 +1,6 @@
 """Emit apps/sandbox/app/usecases/audiobook/library.ts from out/<book>.json plus playback ids.
 
-Usage: python3 -I gen-library.py alice=<playbackId> frankenstein=<playbackId> sherlock=<playbackId> > library.ts
+Usage: python3 -I gen-library.py alice=<playbackId> alice-chapters=<trackId> frankenstein=... sherlock=... > library.ts
 """
 import json, sys, html, re
 
@@ -41,6 +41,8 @@ for key in ('alice', 'frankenstein', 'sherlock'):
     cover_url = f'https://archive.org/services/img/{item}' if key == 'alice' else f'https://archive.org/download/{item}/{cover}'
     out.append(f"    cover: {ts(cover_url)},")
     out.append(f"    playbackId: {ts(ids.get(key, 'pending'))},")
+    if f'{key}-chapters' in ids:
+        out.append(f"    chaptersTrackId: {ts(ids[f'{key}-chapters'])},")
     out.append(f"    duration: {m['duration']},")
     out.append('    chapters: [')
     for c in m['chapters']:

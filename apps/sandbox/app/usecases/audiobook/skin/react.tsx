@@ -8,15 +8,18 @@ import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { cn } from '@videojs/utils/style';
 import { formatTime } from '@videojs/utils/time';
 import type { ReactNode, SVGProps } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   type Audiobook,
   type AudiobookChapter,
-  audiobookChaptersVtt,
+  audiobookChaptersJsonUrl,
   audiobookCoverFallback,
   audiobookSrc,
   chapterAt,
+  chaptersFromMux,
+  chaptersVttDataUrl,
+  type MuxChapter,
 } from '../books';
 import { bookmarksFeature, mediaSessionFeature, progressFeature, sleepTimerFeature } from '../features';
 
@@ -66,17 +69,48 @@ export function useCurrentChapter(book: Audiobook): AudiobookChapter | undefined
   return chapterAt(book.chapters, time?.currentTime ?? 0);
 }
 
+function isMuxChapter(value: MuxChapter): boolean {
+  return Number.isFinite(value['start-time']);
+}
+
 /**
- * The media for one title: the Mux stream, the chapters as a `<track>` so the player's text-track feature sees them,
- * and the lock-screen metadata. Re-mount it (`key={book.id}`) to change titles.
+ * The chapters as a WebVTT data URL for the `<track>`: the document on the Mux asset once it has arrived, the library's
+ * table until then and when the asset carries none. The player only ever sees a chapters track on the media.
+ */
+function useChaptersTrackUrl(book: Audiobook): string {
+  const [fromMux, setFromMux] = useState<{ book: Audiobook; url: string } | null>(null);
+
+  useEffect(() => {
+    const jsonUrl = audiobookChaptersJsonUrl(book);
+    if (!jsonUrl) return;
+
+    const controller = new AbortController();
+
+    fetch(jsonUrl, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(response.statusText))))
+      .then((document: MuxChapter[]) => {
+        if (!Array.isArray(document) || !document.every(isMuxChapter)) throw new TypeError('Not a chapters document');
+
+        setFromMux({ book, url: chaptersVttDataUrl(chaptersFromMux(document, book.duration)) });
+      })
+      .catch(() => {
+        // The library's table is already on the track; the asset's copy was a bonus.
+      });
+
+    return () => controller.abort();
+  }, [book]);
+
+  return fromMux?.book === book ? fromMux.url : chaptersVttDataUrl(book.chapters);
+}
+
+/**
+ * The media for one title: the Mux stream, the chapters as a `<track>` so the player's text-track feature sees them
+ * (the document on the Mux asset, once fetched), and the lock-screen metadata. Re-mount it (`key={book.id}`) to change
+ * titles.
  */
 export function AudiobookMedia({ book }: { book: Audiobook }): ReactNode {
   const setSessionMetadata = useAudiobookPlayer((state) => state.setSessionMetadata);
-  // A data URL keeps the chapters document pure: nothing to create, nothing to revoke.
-  const chaptersUrl = useMemo(
-    () => `data:text/vtt;charset=utf-8,${encodeURIComponent(audiobookChaptersVtt(book))}`,
-    [book]
-  );
+  const chaptersUrl = useChaptersTrackUrl(book);
 
   useEffect(() => {
     setSessionMetadata({
@@ -90,7 +124,7 @@ export function AudiobookMedia({ book }: { book: Audiobook }): ReactNode {
   }, [book, setSessionMetadata]);
 
   return (
-    <MuxAudio src={audiobookSrc(book)} preload="metadata">
+    <MuxAudio src={audiobookSrc(book)} preload="metadata" crossOrigin="">
       <track kind="chapters" src={chaptersUrl} srcLang="en" label="Chapters" default />
     </MuxAudio>
   );
