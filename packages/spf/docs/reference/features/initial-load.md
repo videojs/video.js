@@ -37,7 +37,7 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
+| `mediaElement` | `(MediaElementLike & HTMLMediaElement) \| undefined` | [syncPreload](../behaviors/sync-preload.md#syncpreload), [trackLoadTriggers](../behaviors/dom/track-load-triggers.md#trackloadtriggers) | The media element the engine drives. No behavior writes it: an adapter attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do. (documented on [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource)) |
 
 ### Composed by
 

@@ -38,7 +38,7 @@ Requires:
 
 | Key | Type | Declared by | Doc |
 | --- | --- | --- | --- |
-| `mediaElement` | `HTMLMediaElement \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | The media element the engine drives. No behavior writes it: the host attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do. |
+| `mediaElement` | `HTMLMediaElement \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | The media element the engine drives. No behavior writes it: an adapter attaches one with `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do. |
 | `mediaSource` | `MediaSource \| undefined` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource), [updateMediaSourceDuration](../behaviors/dom/update-mediasource-duration.md#updatemediasourceduration), [endOfStream](../behaviors/dom/end-of-stream.md#endofstream) | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. |
 
 ### Composed by

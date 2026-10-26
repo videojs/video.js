@@ -13,8 +13,8 @@ export interface MediaSourceState {
 
 export interface MediaSourceContext {
   /**
-   * The media element the engine drives. No behavior writes it: the host attaches one with
-   * `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as the SPF Medias do.
+   * The media element the engine drives. No behavior writes it: an adapter attaches one with
+   * `engine.context.mediaElement.set(element)` and detaches with `set(undefined)`, as SPF's adapters do.
    */
   mediaElement?: HTMLMediaElement | undefined;
   /**

@@ -167,7 +167,7 @@ The behavior contract: what a behavior declares, what its `setup` receives and r
 
 ### [define-external-signals](core/define-external-signals.md)
 
-Declaring the state and context keys the host writes, so they reach a composition's types without a behavior that sets them.
+Declaring the state and context keys written from outside the composition, so they reach a composition's types without a behavior that sets them.
 
 | Export | Kind | Description |
 | --- | --- | --- |
@@ -181,7 +181,7 @@ Grouping behaviors into features, with the defaults and initial state they need,
 | --- | --- | --- |
 | [`defineFeature`](core/define-feature.md#definefeature) | function | Define a feature: behaviors with the config defaults and initial state they need, kept as a tuple so a composition can derive its types from them. |
 | [`flattenFeatures`](core/define-feature.md#flattenfeatures) | function | Flatten features into one behavior list, one `defaultConfig`, and one `initialState`, ready for `createComposition` or `defineCompositionFactory`. |
-| [`Feature`](core/define-feature.md#feature) | interface | One capability of a composition: the behaviors that implement it, with the config defaults and initial state they need. |
+| [`Feature`](core/define-feature.md#feature) | interface | A group of behaviors that together give a composition one ability, such as playing video or handling DRM, with the config defaults and initial state they need. |
 | [`FlattenedFeatures`](core/define-feature.md#flattenedfeatures) | interface | What `flattenFeatures` returns: the inputs `createComposition` and `defineCompositionFactory` take. |
 
 ### [create-composition](core/create-composition.md)
@@ -202,7 +202,7 @@ Generated from the TypeScript sources and their JSDoc by `scripts/build-referenc
 
 Regenerate with `pnpm -F @videojs/spf docs:reference`; `pnpm -F @videojs/spf docs:reference:check` fails when the committed output is stale.
 
-A feature page lists the state keys it declares for the host to write under "External signals", apart from its behaviors; an engine page collects its features' under the same heading.
+A feature page lists the state keys it declares to be written from outside the engine under "External signals", apart from its behaviors; an engine page collects its features' under the same heading.
 
 A behavior page opens with its module description when the source file starts with a JSDoc block set off from the imports by a blank line; the README uses that description for the page, else the first behavior's. Each page lists its remaining exports as Other functions and constants, and Types.
 
