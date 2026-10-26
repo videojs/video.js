@@ -237,11 +237,10 @@ function renderStage() {
 }
 
 function mountPlayer(poster: string | undefined) {
-  // After the click in light mode, `preload="auto"`: hls.js doesn't let `autoplay` override `preload="none"`.
   stage.innerHTML = html`
     <video-player${poster ? ` poster="${poster}"` : ''}>
       <video-skin class="sandbox-video-frame">
-        <lazy-video src="${src}" playsinline crossorigin${light ? ' autoplay preload="auto"' : ''}></lazy-video>
+        <lazy-video src="${src}" playsinline crossorigin${light ? ' autoplay' : ''}></lazy-video>
       </video-skin>
     </video-player>
   `;

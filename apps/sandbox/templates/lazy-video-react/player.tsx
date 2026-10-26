@@ -60,15 +60,7 @@ export default function LazyPlayer({ src, poster, light, onResolved, onStarted }
   return (
     <VideoPlayer poster={poster}>
       <VideoSkin className="sandbox-video-frame">
-        {/* After the click in light mode, `preload="auto"`: hls.js doesn't let `autoplay` override `preload="none"`. */}
-        <LazyVideo
-          src={src}
-          mediaRef={mediaRef}
-          autoPlay={light}
-          preload={light ? 'auto' : undefined}
-          playsInline
-          crossOrigin=""
-        />
+        <LazyVideo src={src} mediaRef={mediaRef} autoPlay={light} playsInline crossOrigin="" />
       </VideoSkin>
       {light && <StartedReporter onStarted={onStarted} />}
     </VideoPlayer>
