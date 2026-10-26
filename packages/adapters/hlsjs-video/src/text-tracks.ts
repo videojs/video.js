@@ -1,7 +1,7 @@
 import type { HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
 import type { Constructor } from '@videojs/utils/types';
-import type { CuesParsedData, NonNativeTextTracksData } from 'hls.js';
+import type { CuesParsedData, NonNativeTextTrack, NonNativeTextTracksData } from 'hls.js';
 import Hls from 'hls.js';
 
 import type { HlsEngineHost } from './types';
@@ -116,6 +116,8 @@ function withReadableCues<T>(track: TextTrack, action: () => T): T {
 export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsTextTracks extends (BaseClass as Constructor<HlsEngineHost>) {
     #disconnect: AbortController | null = null;
+    /** Modes of the subtitle tracks removed on the last detach, by track id, to put back when the media re-attaches. */
+    #detachedModes = new Map<string, TextTrackMode>();
 
     constructor(...args: any[]) {
       super(...args);
@@ -123,18 +125,65 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       // A new manifest invalidates the tracks built from the previous one. Attaching media does not: it rebinds the
       // handlers to the element hls.js drives now, and the tracks of the load in progress have to survive it.
       this.engine?.on(Hls.Events.MANIFEST_LOADING, () => {
+        this.#detachedModes.clear();
         removeHlsTextTracks(this.target);
         this.#init();
       });
-      this.engine?.on(Hls.Events.MEDIA_ATTACHED, () => this.#init());
-      this.engine?.on(Hls.Events.MEDIA_DETACHED, () => this.#destroy());
-      this.engine?.on(Hls.Events.DESTROYING, () => this.#destroy());
+      this.engine?.on(Hls.Events.MEDIA_ATTACHED, () => {
+        this.#init();
+        this.#restoreSubtitleTracks();
+      });
+      this.engine?.on(Hls.Events.MEDIA_DETACHED, () => {
+        this.#rememberModes();
+        this.#destroy();
+      });
+      this.engine?.on(Hls.Events.DESTROYING, () => {
+        this.#detachedModes.clear();
+        this.#destroy();
+      });
     }
 
     #destroy(): void {
       this.#disconnect?.abort();
       this.#disconnect = null;
       removeHlsTextTracks(this.target);
+    }
+
+    #rememberModes(): void {
+      this.#detachedModes.clear();
+
+      for (const trackEl of this.target?.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`) ?? []) {
+        if (trackEl.id) this.#detachedModes.set(trackEl.id, trackEl.track.mode);
+      }
+    }
+
+    /**
+     * Re-creates the subtitle group tracks after a detach/attach of the same source, e.g. `hls.recoverMediaError()`.
+     * hls.js only announces them (`NON_NATIVE_TEXT_TRACKS_FOUND`) when its subtitle track list changes, so nothing else
+     * rebuilds the tracks the detach removed.
+     */
+    #restoreSubtitleTracks(): void {
+      const { engine } = this;
+      // SAFETY: the hls.js delegate always binds to the real `<video>` element.
+      const media = this.target as HTMLVideoElement | null;
+      if (!engine || !media || !engine.subtitleTracks.length) return;
+
+      if (media.querySelector(`track[${HLS_TRACK_ATTR}]`)) return;
+
+      const tracks: NonNativeTextTrack[] = engine.subtitleTracks.map((subtitleTrack) => ({
+        label: subtitleTrack.name,
+        kind: subtitleTrack.type.toLowerCase(),
+        default: subtitleTrack.default,
+        subtitleTrack,
+      }));
+
+      for (const trackEl of addHlsTextTracks(media, tracks)) {
+        const mode = this.#detachedModes.get(trackEl.id);
+
+        if (mode && mode !== trackEl.track.mode) trackEl.track.mode = mode;
+      }
+
+      this.#detachedModes.clear();
     }
 
     #init(): void {
@@ -147,12 +196,6 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
 
       // The hls.js delegate always binds to the real `<video>` element.
       const media = this.target as HTMLVideoElement;
-
-      // NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and
-      // `default` or `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
-      // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
-      const trackIdFor = ({ _id, default: isDefault, subtitleTrack }: NonNativeTextTracksData['tracks'][number]) =>
-        _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
 
       const onTracksFound = (_event: string, data: NonNativeTextTracksData) => {
         // The subtitle set arrives in one batch, and each CC track arrives alone once 608 data shows up in the
@@ -170,19 +213,7 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
           trackEl.remove();
         }
 
-        for (const trackObj of data.tracks) {
-          const baseTrackObj = trackObj.subtitleTrack ?? trackObj.closedCaptions;
-
-          addTextTrack(
-            media,
-            trackObj.kind as TextTrackKind,
-            trackObj.label,
-            baseTrackObj?.lang,
-            trackIdFor(trackObj),
-            trackObj.default,
-            trackObj._id != null
-          );
-        }
+        addHlsTextTracks(media, data.tracks);
       };
 
       const onCuesParsed = (_event: string, { track, cues }: CuesParsedData) => {
@@ -289,6 +320,32 @@ function refreshCues(track: TextTrack): void {
   }
 }
 
+/**
+ * NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and `default` or
+ * `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
+ * See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
+ */
+function trackIdFor({ _id, default: isDefault, subtitleTrack }: NonNativeTextTrack): string {
+  return _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
+}
+
+/** Creates a `<track>` element for each text track hls.js reports. */
+function addHlsTextTracks(media: HTMLMediaElement, tracks: NonNativeTextTrack[]): HTMLTrackElement[] {
+  return tracks.map((trackObj) => {
+    const baseTrackObj = trackObj.subtitleTrack ?? trackObj.closedCaptions;
+
+    return addTextTrack(
+      media,
+      trackObj.kind as TextTrackKind,
+      trackObj.label,
+      baseTrackObj?.lang,
+      trackIdFor(trackObj),
+      trackObj.default,
+      trackObj._id != null
+    );
+  });
+}
+
 function addTextTrack(
   mediaEl: HTMLMediaElement,
   kind: TextTrackKind,
@@ -297,7 +354,7 @@ function addTextTrack(
   id?: string,
   defaultTrack?: boolean,
   ccOwned?: boolean
-): TextTrack {
+): HTMLTrackElement {
   const trackEl = document.createElement('track');
 
   trackEl.kind = kind;
@@ -325,5 +382,5 @@ function addTextTrack(
 
   mediaEl.append(trackEl);
 
-  return trackEl.track as TextTrack;
+  return trackEl;
 }
