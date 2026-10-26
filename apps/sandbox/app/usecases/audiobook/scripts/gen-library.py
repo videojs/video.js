@@ -5,6 +5,12 @@ Usage: python3 -I gen-library.py alice=<playbackId> alice-chapters=<trackId> fra
 import json, sys, html, re
 
 ids = dict(arg.split('=', 1) for arg in sys.argv[1:])
+# LibriVox's single-file M4B edition of each item. Alice's item sits on an archive.org datanode that answers 500 to
+# ranged requests, so it has no file source.
+FILES = {
+    'frankenstein': 'Frankenstein_64kb_librivox.m4b',
+    'sherlock': 'AdventuresOfSherlockHolmes_librivox.m4b',
+}
 COVERS = {
     'alice': ('alice_in_wonderland_librivox', 'Alice_in_Wonderland.jpg'),
     'frankenstein': ('frankenstein_cs_librivox', 'Frankenstein_1111.jpg'),
@@ -43,6 +49,8 @@ for key in ('alice', 'frankenstein', 'sherlock'):
     out.append(f"    playbackId: {ts(ids.get(key, 'pending'))},")
     if f'{key}-chapters' in ids:
         out.append(f"    chaptersTrackId: {ts(ids[f'{key}-chapters'])},")
+    if key in FILES:
+        out.append(f"    file: {ts(f'https://archive.org/download/{item}/{FILES[key]}')},")
     out.append(f"    duration: {m['duration']},")
     out.append('    chapters: [')
     for c in m['chapters']:

@@ -22,8 +22,8 @@ export const AUDIOBOOKS: readonly Audiobook[] = [
     description:
       "In this children's classic, a girl named Alice follows falls down a rabbit-hole into a fantasy realm full of talking creatures. She attends a never-ending tea party and plays croquet at the court of the anthropomorphic playing cards.",
     cover: 'https://archive.org/services/img/alice_in_wonderland_librivox',
-    playbackId: 'YQDbPMfvmUH78FGxEIhDjjKEvME02uFQXy3vZy1dBoqs',
-    chaptersTrackId: 'IGo9oisZ5KTcKf1awLWv9OC601AgykhDGdhlIZJy5OR383qEaJieIkw',
+    playbackId: 'CD9YIsi3UzCl27hBYDD7KU1eQptisxy014K7uhFtiSZY',
+    chaptersTrackId: '01TwxJ02A19hgNlEILuKx5SfJA1vM2pDJrGarRb95z01mUyS6WWLzuDKw',
     duration: 10732.294,
     chapters: [
       { index: 0, title: 'Chapter 1', start: 0.0, end: 640.584, readers: ['Kristen McQuillin'] },
@@ -54,8 +54,9 @@ export const AUDIOBOOKS: readonly Audiobook[] = [
     description:
       'Frankenstein; or, The Modern Prometheus is a novel written by the British author Mary Shelley. Shelley wrote the novel when she was 18 years old. The first edition was published anonymously in London in 1818, and this audiobook is read from that text. Shelley\'s name appeared on the revised third edition, published in 1831. The title of the novel refers to the scientist, Victor Frankenstein, who learns how to create life and creates a being in the likeness of man, but larger than average and more powerful. In modern popular culture, people have tended to refer to the Creature as "Frankenstein" (especially in films since 1931), despite this being the name of the scientist, and the creature being unnamed in the book itself. Frankenstein is a novel infused with elements of the Gothic novel and the Romantic movement. It was also a warning against the "over-reaching" of modern man and the Industrial Revolution, alluded to in the novel\'s subtitle, The Modern Prometheus. The story has had an influence across literature and popular culture and spawned a complete genre of horror stories and films. It is arguably considered the first fully-realised science fiction novel and raises many issues still relevant to today\'s society. (Summary from Wikipedia.org, adapted by Cori Samuel.)',
     cover: 'https://archive.org/download/frankenstein_cs_librivox/Frankenstein_1111.jpg',
-    playbackId: 'c5X4uACbp2P3KAgRDNfXP3O00O3HO2m2j85qWSPE2JKE',
-    chaptersTrackId: 'QyzyYEuKnKK5P2i4sWvhxdB8XVJUH5rV7SOup6muBaItoCIvVDCxgw',
+    playbackId: '00bNn6lRDsgRcv1mNvG42TYqObvIUAE17Z00zPzkLeCsk',
+    chaptersTrackId: 'ksTTLA91zce6x14u4WU00OmkEoal1ksjATN75wFCK02SPCFGb1mS4oqQ',
+    file: 'https://archive.org/download/frankenstein_cs_librivox/Frankenstein_64kb_librivox.m4b',
     duration: 28837.091,
     chapters: [
       { index: 0, title: '01 - Dedication and Preface', start: 0.0, end: 276.767, readers: ['Cori Samuel'] },
@@ -105,6 +106,7 @@ export const AUDIOBOOKS: readonly Audiobook[] = [
     cover:
       'https://archive.org/download/adventures_sherlockholmes_1007_librivox/Adventures_of_Sherlock_Holmes_1008.jpg',
     playbackId: 'MGoppP2HK4pCwtPnnlr3TIG01W3RehHhFtaWVz02lI18c',
+    file: 'https://archive.org/download/adventures_sherlockholmes_1007_librivox/AdventuresOfSherlockHolmes_librivox.m4b',
     duration: 40486.333,
     chapters: [
       { index: 0, title: '01 - A Scandal in Bohemia', start: 0.0, end: 3474.495, readers: ['Mark F. Smith'] },

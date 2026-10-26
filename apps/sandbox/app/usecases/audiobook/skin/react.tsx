@@ -1,25 +1,22 @@
 'use client';
 
-import { selectPlaybackRate, selectTime } from '@videojs/core/dom';
+import { selectMetadata, selectPlaybackRate, selectTextTrack, selectTime } from '@videojs/core/dom';
 import { createPlayer, Dialog, features, PlayButton, SeekButton, Time, TimeSlider } from '@videojs/react';
-import { audioFeatures } from '@videojs/react/audio';
+import { Audio, audioFeatures } from '@videojs/react/audio';
 import { PauseIcon, PlayIcon } from '@videojs/react/icons';
 import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { cn } from '@videojs/utils/style';
 import { formatTime } from '@videojs/utils/time';
 import type { ReactNode, SVGProps } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   type Audiobook,
   type AudiobookChapter,
-  audiobookChaptersJsonUrl,
   audiobookCoverFallback,
   audiobookSrc,
   chapterAt,
-  chaptersFromMux,
   chaptersVttDataUrl,
-  type MuxChapter,
 } from '../books';
 import { bookmarksFeature, mediaSessionFeature, progressFeature, sleepTimerFeature } from '../features';
 
@@ -62,72 +59,76 @@ export function CoverImage({ book, alt = '', className }: { book: Audiobook; alt
   );
 }
 
+/** Where a title's audio comes from: the Mux stream, or the one plain file archive.org serves. */
+export type AudiobookSource = 'mux' | 'file';
+
+/**
+ * The chapters the player sees: the media's own chapters track, read through the text-track feature. On the Mux stream
+ * that track comes from the asset (the hls.js adapter loads the `com.apple.hls.chapters` document the manifest names);
+ * on the plain file it is the `<track>` the app added. The library fills in readers, and stands in until cues arrive.
+ */
+export function useChapters(book: Audiobook): readonly AudiobookChapter[] {
+  const textTrack = useAudiobookPlayer(selectTextTrack);
+  const cues = textTrack?.chaptersCues;
+
+  return useMemo(() => {
+    if (!cues?.length) return book.chapters;
+
+    return cues.map((cue, index) => ({
+      index,
+      title: cue.text,
+      start: cue.startTime,
+      end: cue.endTime,
+      readers: book.chapters.length === cues.length ? (book.chapters[index]?.readers ?? []) : [],
+    }));
+  }, [cues, book]);
+}
+
 /** Which chapter the clock is in right now. */
 export function useCurrentChapter(book: Audiobook): AudiobookChapter | undefined {
+  const chapters = useChapters(book);
   const time = useAudiobookPlayer(selectTime);
 
-  return chapterAt(book.chapters, time?.currentTime ?? 0);
+  return chapterAt(chapters, time?.currentTime ?? 0);
 }
 
-function isMuxChapter(value: MuxChapter): boolean {
-  return Number.isFinite(value['start-time']);
-}
+/** The title the player resolved: what the Mux asset carries, or what the app set, or the library's. */
+export function useTitle(book: Audiobook): string {
+  const metadata = useAudiobookPlayer(selectMetadata);
 
-/**
- * The chapters as a WebVTT data URL for the `<track>`: the document on the Mux asset once it has arrived, the library's
- * table until then and when the asset carries none. The player only ever sees a chapters track on the media.
- */
-function useChaptersTrackUrl(book: Audiobook): string {
-  const [fromMux, setFromMux] = useState<{ book: Audiobook; url: string } | null>(null);
-
-  useEffect(() => {
-    const jsonUrl = audiobookChaptersJsonUrl(book);
-    if (!jsonUrl) return;
-
-    const controller = new AbortController();
-
-    fetch(jsonUrl, { signal: controller.signal })
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(response.statusText))))
-      .then((document: MuxChapter[]) => {
-        if (!Array.isArray(document) || !document.every(isMuxChapter)) throw new TypeError('Not a chapters document');
-
-        setFromMux({ book, url: chaptersVttDataUrl(chaptersFromMux(document, book.duration)) });
-      })
-      .catch(() => {
-        // The library's table is already on the track; the asset's copy was a bonus.
-      });
-
-    return () => controller.abort();
-  }, [book]);
-
-  return fromMux?.book === book ? fromMux.url : chaptersVttDataUrl(book.chapters);
+  return metadata?.title || book.title;
 }
 
 /**
- * The media for one title: the Mux stream, the chapters as a `<track>` so the player's text-track feature sees them
- * (the document on the Mux asset, once fetched), and the lock-screen metadata. Re-mount it (`key={book.id}`) to change
- * titles.
+ * The media for one title, from either source, plus the lock-screen metadata. Re-mount it (`key`) to change titles or
+ * sources. The Mux stream brings its own title (the asset's `meta.title`, read by the Mux adapter from the metadata
+ * document) and chapters (the asset's chapters track, named in the HLS manifest); the plain file brings neither, so the
+ * app hands the chapters over as a `<track>` and the title through the Player.
  */
-export function AudiobookMedia({ book }: { book: Audiobook }): ReactNode {
+export function AudiobookMedia({ book, source }: { book: Audiobook; source: AudiobookSource }): ReactNode {
   const setSessionMetadata = useAudiobookPlayer((state) => state.setSessionMetadata);
-  const chaptersUrl = useChaptersTrackUrl(book);
+  const title = useTitle(book);
 
   useEffect(() => {
     setSessionMetadata({
-      title: book.title,
+      title,
       artist: book.authors.join(', '),
       album: 'LibriVox',
       artwork: [{ src: book.cover, type: 'image/jpeg' }],
     });
 
     return () => setSessionMetadata(null);
-  }, [book, setSessionMetadata]);
+  }, [book, title, setSessionMetadata]);
 
-  return (
-    <MuxAudio src={audiobookSrc(book)} preload="metadata" crossOrigin="">
-      <track kind="chapters" src={chaptersUrl} srcLang="en" label="Chapters" default />
-    </MuxAudio>
-  );
+  if (source === 'file' && book.file) {
+    return (
+      <Audio src={book.file} preload="metadata">
+        <track kind="chapters" src={chaptersVttDataUrl(book.chapters)} srcLang="en" label="Chapters" default />
+      </Audio>
+    );
+  }
+
+  return <MuxAudio src={audiobookSrc(book)} preload="metadata" />;
 }
 
 function SkipIcon({ seconds, className }: { seconds: number; className?: string }) {
@@ -246,6 +247,7 @@ function ProgressHairline() {
 /** The bar that stays at the bottom of the app while the listener browses. */
 export function MiniPlayer({ book, onExpand }: { book: Audiobook; onExpand: () => void }): ReactNode {
   const chapter = useCurrentChapter(book);
+  const title = useTitle(book);
 
   return (
     <div className="relative border-t border-black/10 bg-white/95 backdrop-blur dark:border-white/10 dark:bg-neutral-900/95">
@@ -254,12 +256,12 @@ export function MiniPlayer({ book, onExpand }: { book: Audiobook; onExpand: () =
         <button
           type="button"
           className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
-          aria-label={`Now playing ${book.title}. Open the player`}
+          aria-label={`Now playing ${title}. Open the player`}
           onClick={onExpand}
         >
           <CoverImage book={book} className="size-11 shrink-0 rounded object-cover" />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-medium">{book.title}</span>
+            <span className="block truncate text-sm font-medium">{title}</span>
             <span className="block truncate text-xs opacity-70">{chapter?.title ?? book.authors.join(', ')}</span>
           </span>
         </button>
@@ -333,13 +335,14 @@ function Sheet({
 }
 
 function ContentsList({ book, onPick }: { book: Audiobook; onPick: () => void }) {
+  const chapters = useChapters(book);
   const time = useAudiobookPlayer(selectTime);
-  const current = chapterAt(book.chapters, time?.currentTime ?? 0);
+  const current = chapterAt(chapters, time?.currentTime ?? 0);
   const multiReader = book.readers.length > 1;
 
   return (
     <ol className="divide-y divide-black/5 dark:divide-white/10">
-      {book.chapters.map((chapter) => (
+      {chapters.map((chapter) => (
         <li key={chapter.index}>
           <button
             type="button"
@@ -377,6 +380,7 @@ function relativeTime(at: number): string {
 }
 
 function BookmarksList({ book }: { book: Audiobook }) {
+  const chapters = useChapters(book);
   const time = useAudiobookPlayer(selectTime);
   const bookmarks = useAudiobookPlayer((state) => state.bookmarks);
   const addBookmark = useAudiobookPlayer((state) => state.addBookmark);
@@ -428,7 +432,7 @@ function BookmarksList({ book }: { book: Audiobook }) {
                   onClick={() => void time?.seek(bookmark.time)}
                 >
                   <span className="block">{formatTime(bookmark.time, book.duration)}</span>
-                  <span className="block opacity-60">{chapterAt(book.chapters, bookmark.time)?.title}</span>
+                  <span className="block opacity-60">{chapterAt(chapters, bookmark.time)?.title}</span>
                 </button>
                 <input
                   defaultValue={bookmark.note}
@@ -480,7 +484,7 @@ function BookmarksList({ book }: { book: Audiobook }) {
                   onClick={() => void time?.seek(place.time)}
                 >
                   <span className="w-16 shrink-0 text-xs tabular-nums">{formatTime(place.time, book.duration)}</span>
-                  <span className="min-w-0 flex-1 truncate text-sm">{chapterAt(book.chapters, place.time)?.title}</span>
+                  <span className="min-w-0 flex-1 truncate text-sm">{chapterAt(chapters, place.time)?.title}</span>
                   <span className="shrink-0 text-xs opacity-60">{relativeTime(place.at)}</span>
                 </button>
               </li>
@@ -493,6 +497,7 @@ function BookmarksList({ book }: { book: Audiobook }) {
 }
 
 function Journey({ book }: { book: Audiobook }) {
+  const chapters = useChapters(book);
   const time = useAudiobookPlayer(selectTime);
   const rate = useAudiobookPlayer(selectPlaybackRate);
   const listened = useAudiobookPlayer((state) => state.listenedSeconds);
@@ -501,10 +506,10 @@ function Journey({ book }: { book: Audiobook }) {
   const position = time?.currentTime ?? 0;
   const speed = rate?.playbackRate ?? 1;
   const percent = book.duration > 0 ? Math.round((position / book.duration) * 100) : 0;
-  const chaptersDone = book.chapters.filter((chapter) => chapter.end <= position).length;
+  const chaptersDone = chapters.filter((chapter) => chapter.end <= position).length;
   const stats: [string, string][] = [
     ['Progress', `${percent}%`],
-    ['Chapters finished', `${chaptersDone} of ${book.chapters.length}`],
+    ['Chapters finished', `${chaptersDone} of ${chapters.length}`],
     ['Time listened', formatTime(listened)],
     [`Left at ${speed}×`, formatTime((book.duration - position) / speed)],
     ['Started', firstAt ? new Date(firstAt).toLocaleDateString() : '—'],
@@ -528,7 +533,7 @@ function SleepTimerOptions({ book, onPick }: { book: Audiobook; onPick: () => vo
   const timer = useAudiobookPlayer((state) => state.sleepTimer);
   const remaining = useAudiobookPlayer((state) => state.sleepRemaining);
   const setSleepTimer = useAudiobookPlayer((state) => state.setSleepTimer);
-  const chapter = chapterAt(book.chapters, time?.currentTime ?? 0);
+  const chapter = useCurrentChapter(book);
   const option =
     'w-full cursor-pointer rounded-md px-3 py-2.5 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10';
 
@@ -597,6 +602,7 @@ type SheetName = 'contents' | 'bookmarks' | 'journey' | 'sleep';
 export function NowPlaying({ book, onCollapse }: { book: Audiobook; onCollapse: () => void }): ReactNode {
   const [sheet, setSheet] = useState<SheetName | null>(null);
   const chapter = useCurrentChapter(book);
+  const title = useTitle(book);
   const close = () => setSheet(null);
   const tab = 'cursor-pointer py-3 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/10';
 
@@ -617,7 +623,7 @@ export function NowPlaying({ book, onCollapse }: { book: Audiobook; onCollapse: 
           className="aspect-square w-52 rounded-xl object-cover shadow-xl"
         />
         <div className="w-full text-center">
-          <h2 className="truncate text-lg font-semibold">{book.title}</h2>
+          <h2 className="truncate text-lg font-semibold">{title}</h2>
           <p className="truncate text-sm opacity-70">{book.authors.join(', ')}</p>
           <p className="mt-2 truncate text-sm">{chapter?.title ?? ' '}</p>
           <p className="truncate text-xs opacity-60">{chapter ? `Read by ${chapter.readers.join(', ')}` : ' '}</p>
