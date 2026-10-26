@@ -36,9 +36,25 @@ describe('InstallationAgentStart', () => {
       expect(prompt).toContain(
         'run `npx @videojs/cli agents skills` and follow the steps for the agent you are running in'
       );
-      expect(prompt).toContain('follow the install instructions at https://github.com/videojs/skills instead');
+      expect(prompt).toContain(
+        "If the command can't run or is blocked, follow the install instructions at https://github.com/videojs/skills instead."
+      );
 
       for (const command of init) expect(prompt).toContain(command);
+    }
+  );
+
+  it.each(['react', 'html', 'cdn', 'vue', 'svelte', 'shadcn'])(
+    'gives the %s prompt fallbacks for agents that cannot run commands or install skills',
+    async (route) => {
+      const prompt = await renderPrompt(route);
+
+      expect(prompt).toContain(
+        "if yours can't, read https://raw.githubusercontent.com/videojs/skills/main/skills/videojs/SKILL.md and the reference files it links"
+      );
+      expect(prompt).toContain(
+        `If you can't run the command, read https://videojs.org/docs/guides/installation/${route}.md. It lists the same options`
+      );
     }
   );
 });
