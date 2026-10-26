@@ -66,7 +66,8 @@ export type PropertyValues = Map<string, unknown>;
 export interface PropertyDeclaration {
   /**
    * Indicates the type of the property. This is used as a hint to determine how to convert between attributes and
-   * properties.
+   * properties. A `Number` property also converts a string assigned to the property with `Number()`, matching its
+   * attribute.
    */
   readonly type?: typeof String | typeof Boolean | typeof Number;
 
