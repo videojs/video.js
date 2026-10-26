@@ -30,13 +30,26 @@ export interface MediaPlaybackState {
    */
   waiting: boolean;
   /**
+   * Whether the media starts playing on its own once it can.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/autoplay
+   */
+  autoplay: boolean;
+  /**
+   * Whether the media is trying to autoplay: `autoplay` is set, and playback hasn't started yet. Clears when playback
+   * starts, when `pause()` cancels it, and when the autoplay is refused. Browsers don't announce a refusal, so it shows
+   * as the media being able to play through but staying paused; embeds report one with a `pause` or `error` event.
+   * Controls treat it as playback that's about to begin.
+   */
+  autoplaying: boolean;
+  /**
    * Start playback. Updates `paused` immediately when the media starts.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play
    */
   play(): Promise<void>;
   /**
-   * Pause playback. Updates `paused` immediately.
+   * Pause playback. Updates `paused` immediately, and cancels a pending autoplay.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause
    */

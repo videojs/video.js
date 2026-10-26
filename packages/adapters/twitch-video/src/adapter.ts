@@ -502,10 +502,16 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     embedWindow.postMessage(message, TWITCH_PLAYER_ORIGIN);
   }
 
+  // What the next embed must be built muted with: it reads mute once, from its URL, and either property says to start
+  // muted. A rebuild drops the player's volume state with the frame.
+  get #nextMuted() {
+    return this.#defaultMuted || this.#muted;
+  }
+
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
@@ -519,7 +525,8 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#playback = null;
     this.#currentTime = 0;
     this.#duration = Number.NaN;
-    this.#muted = false;
+    // Kept across a reset, so a load replayed after `ready` still builds the embed muted.
+    this.#muted = this.#nextMuted;
     this.#paused = !this.#autoplay;
     this.#playbackRate = 1;
     this.#progress = 0;

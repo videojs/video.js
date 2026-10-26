@@ -9,6 +9,8 @@ export type { GestureActionName } from '../../core/ui/gesture/core';
 /** @internal */
 export interface GestureActionContext {
   store: AnyPlayerStore;
+  /** The store state when the pointer went down, before the click could change it. */
+  state?: object | undefined;
   value?: number | undefined;
   event: PointerEvent;
 }

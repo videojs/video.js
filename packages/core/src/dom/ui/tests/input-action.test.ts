@@ -64,6 +64,12 @@ describe('getMediaSnapshot', () => {
       seeking: true,
     });
   });
+
+  it('reports a pending autoplay as playing', () => {
+    expect(getMediaSnapshot(mockStore({ paused: true, ended: false, started: false, autoplaying: true })).paused).toBe(
+      false
+    );
+  });
 });
 
 describe('getIndicatorVisibilityCoordinator', () => {
