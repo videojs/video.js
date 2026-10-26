@@ -106,6 +106,7 @@ export const AUDIOBOOKS: readonly Audiobook[] = [
     cover:
       'https://archive.org/download/adventures_sherlockholmes_1007_librivox/Adventures_of_Sherlock_Holmes_1008.jpg',
     playbackId: 'MGoppP2HK4pCwtPnnlr3TIG01W3RehHhFtaWVz02lI18c',
+    chaptersTrackId: 'd1b01x97xgnxcoo1cUU8SiHLb9slrH600u9OYLn9iHdVYkhFhkAqFWqQ',
     file: 'https://archive.org/download/adventures_sherlockholmes_1007_librivox/AdventuresOfSherlockHolmes_librivox.m4b',
     duration: 40486.333,
     chapters: [
