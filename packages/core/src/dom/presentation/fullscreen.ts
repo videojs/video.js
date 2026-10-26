@@ -63,9 +63,10 @@ export async function requestFullscreen(container: HTMLElement | null, media: Ev
     const el = container as WebKitFullscreenElement;
 
     // Browsers hide auto popovers when entering fullscreen but leave the manual
-    // ones the player uses in the top layer, still anchored to controls that the
-    // fullscreen resize moves. Chrome can crash the tab on that, so hide them
-    // first instead of letting them close or animate out across the transition.
+    // ones the player uses open. Chrome crashes the tab when an open popover's
+    // parent becomes `display: contents` through a container query that the
+    // fullscreen resize starts matching, so hide them first.
+    // https://issues.chromium.org/issues/577708593
     hideOpenPopovers(container);
 
     if (isFunction(el.requestFullscreen)) return el.requestFullscreen();
