@@ -62,6 +62,7 @@ export class DialogElementBase extends UIElement {
   #modalitySnapshot: SnapshotController<DialogModality> | null = null;
   #triggerAbort: AbortController | null = null;
   #triggerElement: HTMLElement | null = null;
+  #warnedMissingPlayer = false;
 
   constructor({
     core = new DialogCore(),
@@ -130,7 +131,7 @@ export class DialogElementBase extends UIElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed);
     this.#core.setProps(this);
-    this.#dialog?.setInteractionRoot(this.scope === 'player' ? (this.#container.value?.container ?? null) : null);
+    this.#dialog?.setInteractionRoot(this.scope === 'document' ? null : (this.#container.value?.container ?? null));
 
     if (this.#dialog && changed.has('open')) {
       const { active: inputOpen } = this.#dialog.input.current;
@@ -152,6 +153,11 @@ export class DialogElementBase extends UIElement {
     this.#syncTrigger(triggerElement);
 
     const input = this.#dialog.input.current;
+
+    if (__DEV__ && input.active && this.scope === 'player' && !this.#container.value && !this.#warnedMissingPlayer) {
+      this.#warnedMissingPlayer = true;
+      console.warn(`[${this.localName}] scope="player" needs a surrounding player; covering the document instead.`);
+    }
 
     this.#core.setInput(input);
     this.#core.setDocumentModal(this.#dialog.modality.current.documentModal);

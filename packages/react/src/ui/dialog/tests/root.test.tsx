@@ -43,8 +43,38 @@ describe('Dialog', () => {
     expect(getByRole('dialog').getAttribute('data-scope')).toBe('document');
   });
 
+  it('warns when a player-scoped dialog opens outside a player', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { getByRole } = render(
+      <Dialog.Root defaultOpen scope="player">
+        <Dialog.Popup>Content</Dialog.Popup>
+      </Dialog.Root>
+    );
+
+    expect(getByRole('dialog').getAttribute('data-scope')).toBe('document');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
+
+    warn.mockRestore();
+  });
+
+  it('does not warn when an auto-scoped dialog opens outside a player', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>Content</Dialog.Popup>
+      </Dialog.Root>
+    );
+
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
+
+    warn.mockRestore();
+  });
+
   it.each([
     [undefined, 'player', null],
+    ['auto', 'player', null],
+    ['player', 'player', null],
     ['document', 'document', 'true'],
   ] as const)('applies scope %s inside a player', async (scope, expectedScope, ariaModal) => {
     const container = document.createElement('div');

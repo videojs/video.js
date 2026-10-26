@@ -6,8 +6,11 @@ import { getTransitionFlags } from '../transition';
 /** @internal */
 export type DialogRole = 'dialog' | 'alertdialog';
 
-/** Whether a dialog is confined to its player or covers the whole document. */
-export type DialogScope = 'player' | 'document';
+/**
+ * Whether a dialog is confined to its player or covers the whole document. `auto` confines it to its player when it is
+ * rendered inside one, and covers the document otherwise.
+ */
+export type DialogScope = 'auto' | 'player' | 'document';
 
 export interface DialogProps {
   /** Controlled open state. When set, the consumer is responsible for toggling. */
@@ -17,8 +20,8 @@ export interface DialogProps {
   /** Whether pressing Escape closes the dialog. */
   closeOnEscape?: boolean | undefined;
   /**
-   * Confine the dialog to its player, or let it cover and block the whole document. A `player` dialog falls back to
-   * `document` when it is not rendered inside a player.
+   * Confine the dialog to its player, or let it cover and block the whole document. `auto` picks `player` inside a
+   * player and `document` elsewhere. A `player` dialog falls back to `document` when it is not inside a player.
    */
   scope?: DialogScope | undefined;
 }
@@ -35,8 +38,8 @@ export interface DialogState extends TransitionFlags {
   titleId: string | undefined;
   /** Element ID of the dialog description, used for `aria-describedby`. */
   descriptionId: string | undefined;
-  /** Scope in effect: `document` when a `player` dialog has no player to confine it to. */
-  scope: DialogScope;
+  /** Scope in effect: `player` when the dialog is confined to a player, otherwise `document`. */
+  scope: Exclude<DialogScope, 'auto'>;
 }
 
 /** @internal */
@@ -45,7 +48,7 @@ export class DialogCore {
     open: false,
     defaultOpen: false,
     closeOnEscape: true,
-    scope: 'player',
+    scope: 'auto',
   };
 
   readonly #role: DialogRole;

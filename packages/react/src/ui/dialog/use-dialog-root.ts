@@ -3,7 +3,7 @@
 import { DialogCore, DialogDataAttrs, type DialogProps, type DialogState, type StateAttrMap } from '@videojs/core';
 import { createDialog, createTransition } from '@videojs/core/dom';
 import { useSnapshot } from '@videojs/store/react';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useOptionalContainer } from '../../player/context';
 import { useDestroy } from '../../utils/use-destroy';
@@ -32,7 +32,7 @@ export function useDialogRoot({
 }: UseDialogRootOptions): DialogContextValue {
   const [core] = useState(coreFactory);
   const container = useOptionalContainer();
-  const interactionRoot = scope === 'player' ? container : null;
+  const interactionRoot = scope === 'document' ? null : container;
 
   core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape, scope });
 
@@ -79,6 +79,14 @@ export function useDialogRoot({
 
   const input = useSnapshot(dialog.input);
   const modality = useSnapshot(dialog.modality);
+  const warnedMissingPlayerRef = useRef(false);
+
+  useEffect(() => {
+    if (!__DEV__ || !input.active || scope !== 'player' || container || warnedMissingPlayerRef.current) return;
+
+    warnedMissingPlayerRef.current = true;
+    console.warn(`[${idPrefix}] scope="player" needs a surrounding player; covering the document instead.`);
+  }, [input.active, scope, container]);
 
   core.setInput(input);
   core.setDocumentModal(modality.documentModal);

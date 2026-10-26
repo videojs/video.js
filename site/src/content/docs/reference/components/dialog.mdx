@@ -79,7 +79,12 @@ The close part and <kbd>Escape</kbd> close the dialog. Other buttons inside the 
 
 ### Scope
 
-A dialog inside a player is confined to that player by default (`scope="player"`): the rest of the player becomes inert, but the page around it stays interactive and `aria-modal` is omitted. Set `scope="document"` to make the dialog modal for the whole page instead, with `aria-modal="true"` and everything outside the popup inert. A dialog outside a player always uses document scope.
+By default (`scope="auto"`), a dialog checks whether it is inside a player:
+
+- Inside a player, it is confined to that player. The rest of the player becomes inert, but the page around it stays interactive and `aria-modal` is omitted.
+- Outside a player, it is modal for the whole page, with `aria-modal="true"` and everything outside the popup inert.
+
+Set `scope="document"` to make a dialog inside a player modal for the whole page. Set `scope="player"` to require a player; outside one, the dialog still covers the page, and development builds log a warning.
 
 The resolved scope is reflected in `data-scope` on the backdrop and popup, so position player-scoped surfaces with `position: absolute` and document-scoped ones with `position: fixed`. Inside a skin, give the backdrop and popup a `z-index` above the controls; the built-in skins use `40` and `50`.
 

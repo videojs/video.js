@@ -78,6 +78,42 @@ describe('DialogElement', () => {
     });
   });
 
+  it('confines a dialog to its player when scope is player', async () => {
+    const { popup } = await renderInContainer('player');
+
+    await vi.waitFor(() => expect(popup.getAttribute('data-scope')).toBe('player'));
+  });
+
+  it('warns when a player-scoped dialog opens outside a player', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const dialog = createElement(DialogElement);
+    const popup = createElement(DialogPopupElement);
+
+    dialog.scope = 'player';
+    dialog.open = true;
+    dialog.append(popup);
+    document.body.append(dialog);
+    await dialog.updateComplete;
+
+    expect(popup.getAttribute('data-scope')).toBe('document');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
+
+    warn.mockRestore();
+  });
+
+  it('does not warn when an auto-scoped dialog opens outside a player', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const dialog = createElement(DialogElement);
+
+    dialog.open = true;
+    document.body.append(dialog);
+    await dialog.updateComplete;
+
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
+
+    warn.mockRestore();
+  });
+
   it('connects parts defined before the dialog', async () => {
     const popup = createElement(DialogPopupElement);
     const dialogTag = `test-dialog-${tagCounter++}`;
