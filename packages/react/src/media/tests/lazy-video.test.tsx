@@ -128,11 +128,20 @@ describe('LazyVideo', () => {
   });
 
   it('loads the player.js media for an embed marked playerjs, without passing the marker on', async () => {
-    const { container } = render(<LazyVideo src="https://embed.example.com/e/moo?playerjs" />);
+    // Preloading, so the embed is built and its URL can be read.
+    const { container } = render(<LazyVideo src="https://embed.example.com/e/moo?playerjs" preload="metadata" />);
 
     await waitFor(() => expect(container.querySelector('iframe')).not.toBeNull(), LOAD_TIMEOUT);
 
     expect(container.querySelector('iframe')!.getAttribute('src')).toBe('https://embed.example.com/e/moo');
+  });
+
+  it('leaves an embed unbuilt by default, so nothing loads from its service until playback', async () => {
+    const { container } = render(<LazyVideo src="https://vimeo.com/76979871" />);
+
+    await waitFor(() => expect(container.querySelector('iframe')).not.toBeNull(), LOAD_TIMEOUT);
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
   });
 
   it('swaps the media when the source needs a different one', async () => {
