@@ -26,6 +26,16 @@ describe('SoundCloudAudio', () => {
     expect(template).toMatch(/:host\s*\{[^}]*height:\s*166px/);
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    expect(SoundCloudAudio.getTemplateHTML({ src: TRACK, preload: 'none' })).not.toMatch(/<iframe[^>]*\ssrc=/);
+  });
+
+  it.each(['autoplay', 'controls'])('renders the widget under preload="none" when %s is set', (attr) => {
+    expect(iframeSrcOf(SoundCloudAudio.getTemplateHTML({ src: TRACK, preload: 'none', [attr]: '' }))).toBe(
+      buildSoundCloudIframeSrc(TRACK)
+    );
+  });
+
   it('lets the widget autoplay and play protected streams', () => {
     expect(SoundCloudAudio.getTemplateHTML({ src: TRACK })).toContain('allow="autoplay; encrypted-media"');
   });
