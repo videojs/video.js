@@ -157,15 +157,32 @@ export function getUrlMuted(): boolean {
   return new URLSearchParams(location.search).has('muted');
 }
 
+/** The `preload` values the lazy-video sandboxes offer. `none` is what `LazyVideo` plays when none is given. */
+export const LAZY_PRELOADS = ['none', 'metadata', 'auto'] as const;
+
+export type LazyPreload = (typeof LAZY_PRELOADS)[number];
+
+function isLazyPreload(value: string | null): value is LazyPreload {
+  return LAZY_PRELOADS.some((preload) => preload === value);
+}
+
+/** The `?preload=` value, or `none` when it is absent or not one `LazyVideo` takes. */
+export function getUrlPreload(): LazyPreload {
+  const value = new URLSearchParams(location.search).get('preload');
+
+  return isLazyPreload(value) ? value : 'none';
+}
+
 interface LazyUrlState {
   src?: string;
   light?: boolean;
   autoplay?: boolean;
   muted?: boolean;
+  preload?: LazyPreload;
 }
 
 /** Keeps the source and the page's toggles in the page URL, so a reload or a shared link opens the same state. */
-export function setUrlLazyState({ src, light, autoplay, muted }: LazyUrlState): void {
+export function setUrlLazyState({ src, light, autoplay, muted, preload }: LazyUrlState): void {
   const url = new URL(location.href);
   const source = src === undefined ? undefined : LAZY_VIDEO_SOURCES.find((option) => option.src === src);
 
@@ -179,6 +196,10 @@ export function setUrlLazyState({ src, light, autoplay, muted }: LazyUrlState): 
 
   if (muted === true) url.searchParams.set('muted', '');
   else if (muted === false) url.searchParams.delete('muted');
+
+  // `none` is the default, so it leaves the URL clean.
+  if (preload === 'none') url.searchParams.delete('preload');
+  else if (preload) url.searchParams.set('preload', preload);
 
   history.replaceState(null, '', url);
 }
@@ -197,6 +218,8 @@ export const LAZY_DEMO_CLASSES = {
   src: 'mt-4 truncate border-t border-border pt-3 font-mono text-xs text-muted-foreground',
   light: 'mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-border pb-3',
   lightToggle: 'inline-flex cursor-pointer items-center gap-2 text-sm font-medium',
+  select:
+    'h-7 cursor-pointer rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
   lightStatus: 'text-xs text-muted-foreground',
   facade:
     'sandbox-video-frame group relative grid w-full cursor-pointer place-items-center overflow-hidden bg-black outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',

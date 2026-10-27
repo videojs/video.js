@@ -1,6 +1,6 @@
 // The player, skin, and `LazyVideo`, split out so light mode loads none of them until play is pressed.
 import '@videojs/react/video/skin.css';
-import { observeEmbedFetching } from '@app/shared/lazy-sources';
+import { type LazyPreload, observeEmbedFetching } from '@app/shared/lazy-sources';
 import type { Media } from '@videojs/media';
 import { getMediaEngineName } from '@videojs/media/dom';
 import { LazyVideo } from '@videojs/react/media/lazy-video';
@@ -16,6 +16,8 @@ export interface LazyPlayerProps {
   autoplay: boolean;
   /** Start muted, which browsers require before most autoplay. */
   muted: boolean;
+  /** `none` is left off, so the page shows what `LazyVideo` does by default. */
+  preload: LazyPreload;
   /** Receives a description of the resolved media, or `null` while there's none. */
   onResolved: (description: string | null) => void;
   /** Receives whether the resolved media's embed has started downloading from its service. */
@@ -57,6 +59,7 @@ export default function LazyPlayer({
   light,
   autoplay,
   muted,
+  preload,
   onResolved,
   onEmbedFetching,
   onStarted,
@@ -89,6 +92,7 @@ export default function LazyPlayer({
           mediaRef={mediaRef}
           autoPlay={light || autoplay}
           muted={muted}
+          preload={preload === 'none' ? undefined : preload}
           playsInline
           crossOrigin=""
         />

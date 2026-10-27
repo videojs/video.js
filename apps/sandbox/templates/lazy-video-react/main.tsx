@@ -6,6 +6,8 @@ import '@app/styles.css';
 // Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
 // Autoplay (`?autoplay`) sets `autoPlay` on the media, which light mode always does once play is pressed.
 // Muted (`?muted`) starts the media muted, which browsers require before most autoplay.
+// Preload (`?preload=metadata` or `auto`) sets `preload` on `LazyVideo`. Without it the media plays `preload="none"`:
+// files and streams fetch nothing, and embeds build no frame, until play.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
@@ -14,6 +16,8 @@ import {
   getUrlLazySource,
   getUrlLight,
   getUrlMuted,
+  getUrlPreload,
+  LAZY_PRELOADS,
   LAZY_VIDEO_SOURCE_GROUPS,
   LAZY_VIDEO_SOURCES,
   setUrlLazyState,
@@ -118,6 +122,7 @@ function App() {
   const [light, setLight] = useState(getUrlLight);
   const [autoplay, setAutoplay] = useState(getUrlAutoplay);
   const [muted, setMuted] = useState(getUrlMuted);
+  const [preload, setPreload] = useState(getUrlPreload);
   const [clickedAt, setClickedAt] = useState<number>();
   const [startedAt, setStartedAt] = useState<number>();
   const [timedOut, setTimedOut] = useState(false);
@@ -172,13 +177,15 @@ function App() {
           }
         >
           <LazyPlayer
-            // `autoPlay` and `muted` are read once, as the media loads, so the player mounts again with the new setting.
-            key={`${autoplay}-${muted}`}
+            // `autoPlay`, `muted`, and `preload` are read once, as the media loads, so the player mounts again with the new
+            // setting.
+            key={`${autoplay}-${muted}-${preload}`}
             src={src}
             poster={poster}
             light={light}
             autoplay={autoplay}
             muted={muted}
+            preload={preload}
             onResolved={setResolved}
             onEmbedFetching={setEmbedFetching}
             onStarted={onStarted}
@@ -224,6 +231,26 @@ function App() {
               }}
             />
             Muted
+          </label>
+          <label className={c.lightToggle}>
+            Preload
+            <select
+              className={c.select}
+              value={preload}
+              onChange={(event) => {
+                const next = LAZY_PRELOADS.find((value) => value === event.target.value) ?? 'none';
+
+                setPreload(next);
+                setUrlLazyState({ preload: next });
+                startLight(undefined);
+              }}
+            >
+              {LAZY_PRELOADS.map((value) => (
+                <option key={value} value={value}>
+                  {value === 'none' ? 'none (default)' : value}
+                </option>
+              ))}
+            </select>
           </label>
           {light && <p className={c.lightStatus}>{describeLightStart(clickedAt, startedAt, timedOut)}</p>}
         </div>

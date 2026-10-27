@@ -6,6 +6,8 @@ import '@app/styles.css';
 // Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
 // Autoplay (`?autoplay`) sets `autoplay` on the media, which light mode always does once play is pressed.
 // Muted (`?muted`) starts the media muted, which browsers require before most autoplay.
+// Preload (`?preload=metadata` or `auto`) sets `preload` on `<lazy-video>`. Without it the media plays `preload="none"`:
+// files and streams fetch nothing, and embeds build no frame, until play.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
@@ -14,6 +16,8 @@ import {
   getUrlLazySource,
   getUrlLight,
   getUrlMuted,
+  getUrlPreload,
+  LAZY_PRELOADS,
   LAZY_VIDEO_SOURCE_GROUPS,
   LAZY_VIDEO_SOURCES,
   observeEmbedFetching,
@@ -48,6 +52,14 @@ root.innerHTML = html`
       <label class="${c.lightToggle}"><input type="checkbox" id="light" /> Light mode</label>
       <label class="${c.lightToggle}"><input type="checkbox" id="autoplay" /> Autoplay</label>
       <label class="${c.lightToggle}"><input type="checkbox" id="muted" /> Muted</label>
+      <label class="${c.lightToggle}">
+        Preload
+        <select class="${c.select}" id="preload">
+          ${LAZY_PRELOADS.map(
+            (value) => html`<option value="${value}">${value === 'none' ? 'none (default)' : value}</option>`
+          ).join('')}
+        </select>
+      </label>
       <p class="${c.lightStatus}" id="light-status"></p>
     </div>
     <div class="${c.groups}">
@@ -99,6 +111,7 @@ const stage = root.querySelector<HTMLElement>('#stage')!;
 const lightToggle = root.querySelector<HTMLInputElement>('#light')!;
 const autoplayToggle = root.querySelector<HTMLInputElement>('#autoplay')!;
 const mutedToggle = root.querySelector<HTMLInputElement>('#muted')!;
+const preloadSelect = root.querySelector<HTMLSelectElement>('#preload')!;
 const lightStatus = root.querySelector('#light-status')!;
 const buttons = root.querySelectorAll<HTMLButtonElement>('button[data-src]');
 const srcOutput = root.querySelector<HTMLElement>('#src')!;
@@ -210,6 +223,7 @@ observeScriptBytes((bytes) => {
 let light = getUrlLight();
 let autoplay = getUrlAutoplay();
 let muted = getUrlMuted();
+let preload = getUrlPreload();
 let clickedAt: number | undefined;
 let startedAt: number | undefined;
 let timedOut = false;
@@ -218,6 +232,7 @@ let cleanup = () => {};
 
 lightToggle.checked = light;
 mutedToggle.checked = muted;
+preloadSelect.value = preload;
 
 // Light mode autoplays once play is pressed, so the checkbox has no say there.
 function renderAutoplayToggle() {
@@ -277,7 +292,10 @@ function mountPlayer(poster: string | undefined) {
         <lazy-video
                   src="${src}"
                   playsinline
-                  crossorigin${light || autoplay ? ' autoplay' : ''}${muted ? ' muted' : ''}
+                  crossorigin${light || autoplay ? ' autoplay' : ''}${muted ? ' muted' : ''}${
+                    // Left off for `none`, so the page shows what `<lazy-video>` does by default.
+                    preload === 'none' ? '' : ` preload="${preload}"`
+                  }
                 ></lazy-video>
       </video-skin>
     </video-player>
@@ -348,7 +366,7 @@ lightToggle.addEventListener('change', () => {
   renderStage();
 });
 
-// `autoplay` and `muted` are read once, as the media loads, so the player mounts again with the new setting.
+// `autoplay`, `muted`, and `preload` are read once, as the media loads, so the player mounts again with the new setting.
 autoplayToggle.addEventListener('change', () => {
   autoplay = autoplayToggle.checked;
   setUrlLazyState({ autoplay });
@@ -360,6 +378,14 @@ autoplayToggle.addEventListener('change', () => {
 mutedToggle.addEventListener('change', () => {
   muted = mutedToggle.checked;
   setUrlLazyState({ muted });
+
+  resetLight();
+  renderStage();
+});
+
+preloadSelect.addEventListener('change', () => {
+  preload = LAZY_PRELOADS.find((value) => value === preloadSelect.value) ?? 'none';
+  setUrlLazyState({ preload });
 
   resetLight();
   renderStage();
