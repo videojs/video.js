@@ -1,45 +1,68 @@
 import { styles } from 'vjsc/styles';
 
+/**
+ * Lays the video error dialog out over the control bar when only the bar fits. The rules are important because the
+ * dialog's own rules live in another stylesheet, whose order against this one is not fixed.
+ */
+function bar(utilities: string): string {
+  return utilities
+    .split(' ')
+    .map((utility) => `media-dialog-bar:${utility}!`)
+    .join(' ');
+}
+
 export default styles({
   file: 'audio/error-dialog.css',
   prefix: 'audio-dialog',
   rules: {
-    root: {
-      className: 'audio-dialog-root',
-      utilities: '',
+    frame: {
+      utilities: 'pointer-events-none absolute inset-0 z-50 @container-size/media-dialog',
+    },
+    region: {
+      utilities: [
+        'absolute inset-0',
+        'media-dialog-card:overflow-clip media-dialog-card:rounded-media-player',
+        // Leaves out the control bar, which is the control size plus the bar padding in `audio-controls.styles.ts`.
+        'media-dialog-card:bottom-[calc(var(--media-control-size)+(--spacing(2)))]',
+      ],
+      variants: {
+        default: 'media-dialog-card:media-max-lg:bottom-[calc(var(--media-control-size)+(--spacing(1)))]',
+      },
     },
     backdrop: {
-      utilities: 'hidden',
+      utilities: ['pointer-events-auto', bar('hidden')],
     },
     popup: {
       utilities: [
-        'absolute inset-0 z-50 flex h-full max-h-none w-full translate-none flex-row items-center rounded-media-pill py-0 pe-1 outline-hidden not-data-open:hidden',
-        'bg-media-background text-media-controls-foreground backdrop-filter-media-dialog',
-        'transition-[opacity,filter] duration-media-slower ease-out',
-        'media-transitioning:blur-media-hidden-popup media-transitioning:opacity-0',
+        'pointer-events-auto',
+        // Over media the card keeps the video skin's light-on-dark colors in both color schemes.
+        'media-dialog-card:scheme-dark',
+        bar('inset-x-0 top-auto bottom-0 w-full max-w-none max-h-none translate-none'),
+        bar('flex-row items-center rounded-media-controls p-0 pe-1'),
+        bar('bg-media-background text-media-controls-foreground text-shadow-none'),
+        bar('backdrop-filter-media-dialog after:hidden'),
+        bar('transition-[opacity,filter] delay-0 duration-media-slower'),
+        bar('data-ending-style:duration-media-slower media-transitioning:blur-media-hidden-popup'),
       ],
       variants: {
-        default: 'gap-3 px-5',
+        default: bar('py-0.5 ps-5 media-lg:py-1 media-transitioning:scale-none'),
         neutral: [
-          'gap-4 px-3 backdrop-filter-none transition-[opacity,filter,scale]',
-          'media-transitioning:scale-media-hidden-popup',
+          bar('gap-4 py-1 ps-3 shadow-media-hairline'),
+          bar('backdrop-filter-none transition-[opacity,filter,scale]'),
         ],
       },
     },
     content: {
-      utilities: 'flex min-h-0 flex-1 flex-row items-center gap-2 overflow-visible',
+      utilities: [bar('block p-0 max-h-[2lh] min-w-0 flex-1'), bar('overscroll-contain leading-tight scrollbar-thin')],
     },
     title: {
-      utilities: 'm-0 text-media font-semibold leading-tight',
+      utilities: bar('me-1 inline text-media'),
     },
     description: {
-      utilities: 'm-0 opacity-70 wrap-anywhere',
-    },
-    actions: {
-      utilities: 'flex shrink-0 gap-2',
+      utilities: bar('inline'),
     },
     close: {
-      utilities: 'h-media-control w-auto flex-none bg-media-primary! px-3 font-medium text-media-primary-foreground!',
+      utilities: bar('w-auto flex-none px-3 py-0'),
     },
   },
 });
