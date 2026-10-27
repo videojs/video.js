@@ -180,7 +180,12 @@ export default defineConfig({
       'prepare:dev': {
         command: 'node -e ""',
         cache: false,
-        dependsOn: ['site#api-docs:generate', '@videojs/sandbox#setup', '@videojs/cdn#build:cdn'],
+        dependsOn: [
+          'site#api-docs:generate',
+          'site#mcp-surface:generate',
+          '@videojs/sandbox#setup',
+          '@videojs/cdn#build:cdn',
+        ],
       },
       'typecheck:workspace': {
         command: 'tsgo --build',
