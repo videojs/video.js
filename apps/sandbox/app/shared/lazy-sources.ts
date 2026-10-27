@@ -17,6 +17,12 @@ function youTubePoster(id: string): string {
   return `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
 }
 
+// A stand-in for a source with no thumbnail of its own, so switching to it still changes the poster. The seed keeps
+// the same image across reloads.
+function randomPoster(seed: string): string {
+  return `https://picsum.photos/seed/${seed}/1280/720.webp`;
+}
+
 interface LazySource {
   label: string;
   src: string;
@@ -40,7 +46,8 @@ export const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
         poster: 'https://image.mux.com/lhnU49l1VGi3zrTAZhDm9LUUxSjpaPW9BL4jY25Kwo4/thumbnail.webp',
       },
       // Not a Mux host, so it resolves as plain HLS: native on Safari, hls.js elsewhere.
-      { label: 'HLS', src: SOURCES['hls-mixed-codec'].url! },
+      // Apple publishes no poster for bipbop.
+      { label: 'HLS', src: SOURCES['hls-mixed-codec'].url!, poster: randomPoster('hls') },
       { label: 'Mux', src: SOURCES['hls-1'].url!, poster: getPosterSrc('hls-1') },
       // The same Big Buck Bunny as the YouTube source, so its thumbnail fits.
       { label: 'DASH', src: SOURCES['dash-1'].url!, poster: youTubePoster('aqz-KE-bpKQ') },
@@ -50,11 +57,32 @@ export const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
     label: 'Embeds',
     sources: [
       { label: 'YouTube', src: SOURCES['youtube-1'].url!, poster: youTubePoster('aqz-KE-bpKQ') },
-      { label: 'Vimeo', src: VIMEO_VIDEO_SRC },
-      { label: 'Wistia', src: WISTIA_VIDEO_SRC },
-      { label: 'Cloudflare', src: CLOUDFLARE_VIDEO_SRC },
-      { label: 'TikTok', src: TIKTOK_VIDEO_SRC },
-      { label: 'Twitch', src: TWITCH_VIDEO_SRC },
+      // Looked up once from each service's oEmbed or thumbnail API. TikTok's thumbnails are signed URLs that expire,
+      // so it gets a stand-in.
+      {
+        label: 'Vimeo',
+        src: VIMEO_VIDEO_SRC,
+        poster:
+          'https://i.vimeocdn.com/video/452001751-8216e0571c251a09d7a8387550942d89f7f86f6398f8ed886e639b0dd50d3c90-d_1280x720',
+      },
+      {
+        label: 'Wistia',
+        src: WISTIA_VIDEO_SRC,
+        poster:
+          'https://embed-ssl.wistia.com/deliveries/4ec6635c197ba892b7539207b00c7bdf.jpg?image_crop_resized=1280x720',
+      },
+      {
+        label: 'Cloudflare',
+        src: CLOUDFLARE_VIDEO_SRC,
+        poster: 'https://videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4/thumbnails/thumbnail.jpg?height=720',
+      },
+      { label: 'TikTok', src: TIKTOK_VIDEO_SRC, poster: randomPoster('tiktok') },
+      {
+        label: 'Twitch',
+        src: TWITCH_VIDEO_SRC,
+        poster:
+          'https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitch/106400740/f2979575-fa80-4ad9-9665-a074d510a03a/thumb/index-0000000000-1280x720.jpg',
+      },
       // player.js is a protocol any host can speak, so the `playerjs` parameter marks the embed as one. The Mux Player
       // embed plays the same asset as `hls-1`, so its poster fits.
       { label: 'Player.js', src: `${SOURCES['playerjs-mux'].url!}?playerjs`, poster: getPosterSrc('hls-1') },
