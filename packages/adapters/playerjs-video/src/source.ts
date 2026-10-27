@@ -56,6 +56,17 @@ export function parsePlayerJsSource(src: string): URL | null {
 }
 
 /**
+ * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from the
+ * embed's host, so the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now,
+ * so it builds the embed regardless.
+ *
+ * @internal
+ */
+export function shouldDeferPlayerJsEmbed(props: Partial<Pick<PlayerJsAdapterProps, 'preload' | 'autoplay'>> = {}) {
+  return props.preload === 'none' && !props.autoplay;
+}
+
+/**
  * Build the iframe `src` URL for a player.js embed from the given props. Empty when `src` is not an embed URL.
  *
  * For the services it recognizes (Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, Streamable), the host writes
