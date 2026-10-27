@@ -241,7 +241,8 @@ export class LazyMediaElement extends HTMLElementBase {
 // match `VideoCSSVars`, spelled out because importing them would put every custom media element in this chunk. Embed
 // hosts mark themselves `data-cross-origin-frame` and size to their iframe, so they're stretched to fill the player,
 // and the minimum size each sets for standalone use is cleared: TikTok's portrait floor would overflow a landscape
-// player and push its frame's centered chrome off center.
+// player and push its frame's centered chrome off center. Without that floor, an embed in a player with no height of
+// its own would collapse, so it falls back to 16:9; a sized player sets both dimensions, which overrides the ratio.
 const STYLES = /* css */ `
   :host {
     display: contents;
@@ -257,6 +258,7 @@ const STYLES = /* css */ `
   ::slotted([data-cross-origin-frame]) {
     min-width: 0;
     min-height: 0;
+    aspect-ratio: 16 / 9;
   }
 
   ::slotted(video) {
