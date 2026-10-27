@@ -1,6 +1,5 @@
-import { act, render } from '@testing-library/react';
-import type { TikTokAdapter } from '@videojs/tiktok-video';
-import { type ComponentType, type CSSProperties, createRef } from 'react';
+import { render } from '@testing-library/react';
+import type { ComponentType, CSSProperties } from 'react';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { CloudflareVideo } from '../cloudflare-video';
@@ -57,29 +56,11 @@ describe.each([
 });
 
 describe('TikTokVideo', () => {
-  it('leaves pointer events to a dormant embed, whose own controls are all that can start it', () => {
-    const { container, rerender } = render(<TikTokVideo preload="none" />);
-    const iframe = iframeOf(container);
+  it('keeps a preload="none" frame out of hit-testing like any other', () => {
+    // The frame is empty until `play()` builds the embed, so it has nothing to click, and the embed `play()` builds
+    // already answers the skin's commands.
+    const { container } = render(<TikTokVideo preload="none" />);
 
-    expect(iframe.style.pointerEvents).toBe('');
-
-    rerender(<TikTokVideo preload="metadata" />);
-    expect(iframe.style.pointerEvents).toBe('none');
-  });
-
-  it('takes a dormant embed out of hit-testing once it plays, and back in once a new embed replaces it', () => {
-    const media = createRef<TikTokAdapter>();
-    const { container } = render(<TikTokVideo preload="none" mediaRef={media} />);
-    const iframe = iframeOf(container);
-
-    act(() => {
-      media.current!.dispatchEvent(new Event('play'));
-    });
-    expect(iframe.style.pointerEvents).toBe('none');
-
-    act(() => {
-      media.current!.dispatchEvent(new Event('emptied'));
-    });
-    expect(iframe.style.pointerEvents).toBe('');
+    expect(iframeOf(container).style.pointerEvents).toBe('none');
   });
 });

@@ -1,12 +1,19 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
+import {
+  buildTikTokIframeSrc,
+  shouldDeferTikTokEmbed,
+  TikTokAdapter,
+  type TikTokAdapterProps,
+} from '@videojs/tiktok-video';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildTikTokIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferTikTokEmbed(props) ? '' : buildTikTokIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
@@ -32,12 +39,6 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
         :host(:not([controls])) {
           pointer-events: none;
         }
-        /* preload="none" leaves TikTok's player dormant, and then the frame's own
-           controls are the only thing that can start it. Once it has played, the
-           player answers commands and the skin takes over again. */
-        :host([preload="none"]) iframe:not([data-started]) {
-          pointer-events: auto;
-        }
       </style>
       <iframe
         part="iframe"
@@ -52,18 +53,10 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
       ></iframe>
     `;
   };
-
-  constructor() {
-    super();
-
-    // A new embed comes back dormant, so it is clickable again until it plays.
-    this.addEventListener('play', () => this.target?.setAttribute('data-started', ''));
-    this.addEventListener('emptied', () => this.target?.removeAttribute('data-started'));
-  }
 }
 
-// Only the props the embed URL is built from. `preload` is not a TikTok parameter, but it decides whether the URL
-// carries a bootstrap autoplay, and a URL differing from the host's would have it rebuild the frame on mount.
+// Only the props the embed URL is built from, so a URL matching the host's spares it rebuilding the frame on mount.
+// `preload` is not a TikTok parameter, but it decides whether there is a URL at all.
 function templateAttrsToEmbedProps(attrs: Record<string, string>): Partial<TikTokAdapterProps> {
   return {
     autoplay: attrs.autoplay !== undefined,

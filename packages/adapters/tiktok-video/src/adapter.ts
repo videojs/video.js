@@ -26,7 +26,7 @@ import {
   type TikTokPlayerError,
 } from './player-api';
 import type { TikTokAdapterProps } from './props';
-import { buildTikTokIframeSrc, shouldBootstrapTikTokEmbed, type TikTokSource } from './source';
+import { buildTikTokIframeSrc, shouldBootstrapTikTokEmbed, shouldDeferTikTokEmbed, type TikTokSource } from './source';
 
 /**
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
@@ -52,6 +52,8 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #messages: AbortController | null = null;
   // Guards messages and deferred embeds across attach/detach cycles.
   #attachId = 0;
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
 
   #src = TikTokAdapter.defaultProps.src;
   #autoplay = TikTokAdapter.defaultProps.autoplay;
@@ -76,6 +78,8 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #bootstrap: 'off' | 'parking' | 'parked' = 'off';
   // Where the park leaves the player: the start, or a position the caller seeked to before it got there.
   #parkPosition = 0;
+  // The embed autoplays for a play that was waiting when it was built, rather than for `autoplay` or a bootstrap.
+  #autoplaysForPlay = false;
   #playFired = false;
   #currentTime = 0;
   #duration = Number.NaN;
@@ -115,6 +119,7 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#messages?.abort();
     this.#messages = null;
     this.#target = null;
+    this.#activated = false;
     // Left set, the next frame to report ready would start playing on its own.
     this.#playRequested = false;
     // Unblock callers awaiting load; they re-check `#target` (now null) and no-op.
@@ -165,6 +170,12 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     // Detached while waiting; `detach()` already settled this load.
     if (!target) return;
 
+    // A dormant embed is built by `play()`; until then no `onPlayerReady` is coming to settle this load.
+    if (!target.getAttribute('src') && this.#isDormant()) {
+      load.resolve();
+      return;
+    }
+
     const embedSrc = this.#src ? buildTikTokIframeSrc(this.#src, this.#snapshotProps()) : '';
 
     // Reloading the same embed would only discard its position; nothing is cleared, so no lifecycle event is due.
@@ -200,7 +211,7 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
       return;
     }
 
-    this.#bootstrap = shouldBootstrapTikTokEmbed(this.#snapshotProps()) ? 'parking' : 'off';
+    this.#startEmbed(this.#snapshotProps());
     // The new frame reports `onPlayerReady`, which is what settles this load.
     target.src = embedSrc;
   }
@@ -236,6 +247,13 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     // Not deferred: only the embed's own report settles the load, so whichever lands first wins, this or the replay.
     this.#playRequested = true;
 
+    // Like a native media under `preload="none"`, playing is what starts the load. Set after the request above, so the
+    // embed is built to autoplay it.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
+
     // A play posted mid-park races the pause and can land first; `#park` replays it.
     if (this.#bootstrap === 'parking') return;
 
@@ -246,6 +264,14 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   pause() {
     // A pause after a pending play is the later intent, so it cancels the replay rather than racing it.
     this.#playRequested = false;
+
+    // An embed built for that play still autoplays when it comes up, and this pause cannot reach it before then, so
+    // the autoplay is parked like a bootstrap instead.
+    if (this.#autoplaysForPlay && !this.#loaded) {
+      this.#autoplaysForPlay = false;
+      this.#bootstrap = 'parking';
+    }
+
     // Deliberately not a hand-over: only a play makes the embed's next report the caller's. Pausing a parked
     // player asks for nothing it is not already doing, and taking it over would let the bootstrap's tail through.
     this.#post('pause');
@@ -297,7 +323,11 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -337,7 +367,11 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -424,10 +458,16 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     // The `src` property resolves an empty attribute to the document URL; only the attribute tells embed from empty.
     if (target.getAttribute('src')) {
       // A server-rendered URL was built from these props by the same rule, so it carries the same bootstrap.
-      this.#bootstrap = shouldBootstrapTikTokEmbed(props) ? 'parking' : 'off';
+      this.#startEmbed(props);
       // The frame is already fetching the embed and will report `onPlayerReady` like any other.
       this.dispatchEvent(new Event('loadstart'));
       return true;
+    }
+
+    // A dormant embed is built by `play()`; until then no `onPlayerReady` is coming to settle this load.
+    if (this.#isDormant()) {
+      this.#loadComplete.resolve();
+      return false;
     }
 
     const initialSrc = buildTikTokIframeSrc(this.#src, props);
@@ -438,10 +478,31 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
       return false;
     }
 
-    this.#bootstrap = shouldBootstrapTikTokEmbed(props) ? 'parking' : 'off';
+    this.#startEmbed(props);
     target.src = initialSrc;
     this.dispatchEvent(new Event('loadstart'));
     return true;
+  }
+
+  // Decide how the embed being built comes up: on a bootstrap the host parks, or playing for `autoplay` or a waiting
+  // play, which nothing parks.
+  #startEmbed(props: Partial<TikTokAdapterProps>) {
+    this.#bootstrap = shouldBootstrapTikTokEmbed(props) ? 'parking' : 'off';
+    this.#autoplaysForPlay = !!props.autoplay && !this.#autoplay;
+  }
+
+  #isDormant() {
+    return !this.#activated && shouldDeferTikTokEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more. The frame's `src`
+  // attribute is the embed: there is no player object, and a load in flight bails once this one takes over.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || target.getAttribute('src')) return;
+
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   // Listen for what the embed reports; messages arrive on `window`, so each is matched against this host's frame.
@@ -546,12 +607,12 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      // A play that woke a `preload="none"` embed is waiting on it, so the embed autoplays for that play rather than
+      // bootstrapping. Embeds rebuilt once that play is taken bootstrap as usual.
+      autoplay: this.#autoplay || (this.#activated && this.#playRequested),
       defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,
-      // Read only to decide on a bootstrap autoplay; TikTok has no preload parameter.
-      preload: this.#preload,
       source: this.#source,
     };
   }
@@ -570,6 +631,7 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#playFired = false;
     this.#bootstrap = 'off';
     this.#parkPosition = 0;
+    this.#autoplaysForPlay = false;
     this.#error = null;
     this.#isFullscreen = false;
   }

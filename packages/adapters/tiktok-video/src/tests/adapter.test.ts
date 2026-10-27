@@ -71,9 +71,10 @@ async function attachAndLoad(
   // which video is playing get one.
   if (!media.src) media.src = VIDEO_ID;
 
-  // Opt out of the bootstrap unless a test asks for it: it posts commands of its own and swallows what the embed
-  // reports, which is the subject of `TikTokAdapter bootstrap` rather than of the protocol these tests check.
-  if (media.preload === TikTokAdapter.defaultProps.preload) media.preload = 'none';
+  // Opt out of the bootstrap: it posts commands of its own and swallows what the embed reports, which is the subject
+  // of `TikTokAdapter bootstrap` rather than of the protocol these tests check. TikTok's own chrome is the one embed
+  // the host leaves unbootstrapped without playing it.
+  media.controls = true;
 
   const iframe = createIframe();
 
@@ -103,19 +104,18 @@ describe('buildTikTokIframeSrc', () => {
 
   it('leaves muted and loop out rather than turning them off', () => {
     // Off is the player's default for both, so an explicit 0 says nothing.
-    const src = buildTikTokIframeSrc(VIDEO_ID, { defaultMuted: false, loop: false, preload: 'none' });
+    const src = buildTikTokIframeSrc(VIDEO_ID, { defaultMuted: false, loop: false, controls: true });
 
-    expect(src).toBe(`https://www.tiktok.com/player/v1/${VIDEO_ID}?controls=0&rel=0`);
+    expect(src).toBe(`https://www.tiktok.com/player/v1/${VIDEO_ID}?rel=0`);
   });
 
-  it('carries a bootstrap autoplay unless preload opts out', () => {
-    // An embed that never autoplays answers no command, so every preload but `none` takes the autoplay that
-    // brings TikTok's player up.
+  it('carries a bootstrap autoplay whatever the preload', () => {
+    // An embed that never autoplays answers no command. `preload="none"` holds the embed back rather than opting out,
+    // so one built under it still takes the autoplay that brings TikTok's player up.
     expect(buildTikTokIframeSrc(VIDEO_ID, TikTokAdapter.defaultProps)).toContain('autoplay=1');
-    expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'auto' })).toContain('autoplay=1');
-    // An unset preload is the default one, so a bare source still brings it up.
+    expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'none' })).toContain('autoplay=1');
     expect(buildTikTokIframeSrc(VIDEO_ID)).toContain('autoplay=1');
-    expect(buildTikTokIframeSrc(VIDEO_ID, { preload: 'none' })).not.toContain('autoplay');
+    expect(buildTikTokIframeSrc(VIDEO_ID, { controls: true })).not.toContain('autoplay');
   });
 
   it('shows TikTok controls when controls=true', () => {
@@ -177,6 +177,105 @@ describe('buildTikTokIframeSrc', () => {
   it('returns empty string for invalid src', () => {
     expect(buildTikTokIframeSrc('https://example.com/not-a-tiktok-url')).toBe('');
     expect(buildTikTokIframeSrc('')).toBe('');
+  });
+});
+
+describe('TikTokAdapter preload', () => {
+  it('builds no embed under preload="none"', async () => {
+    const media = new TikTokAdapter();
+    const iframe = createIframe();
+    const loadstart = vi.fn();
+
+    media.addEventListener('loadstart', loadstart);
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = VIDEO_ID;
+    await flushLoad();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(loadstart).not.toHaveBeenCalled();
+    media.detach();
+  });
+
+  it('builds the embed on play() to autoplay it, and leaves that playback running', async () => {
+    const media = new TikTokAdapter();
+    const iframe = createIframe();
+    const playSpy = vi.fn();
+
+    media.addEventListener('play', playSpy);
+    media.preload = 'none';
+    media.attach(iframe);
+    // Set in the same task as play(), so the load it queues is still waiting when play() builds the embed.
+    media.src = VIDEO_ID;
+
+    const pending = media.play();
+
+    // Without an autoplay TikTok's player answers no command, so the play would be lost.
+    expect(iframe.getAttribute('src')).toContain(`https://www.tiktok.com/player/v1/${VIDEO_ID}`);
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    await expect(pending).resolves.toBeUndefined();
+    await flushLoad();
+
+    const commands = watchCommands(iframe);
+
+    report(iframe, 'onPlayerReady');
+    report(iframe, 'onStateChange', STATE.PLAYING);
+
+    // The autoplay is the playback that was asked for, so nothing parks it.
+    expect(commands).not.toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'pause' }, '*');
+    expect(playSpy).toHaveBeenCalledTimes(1);
+    expect(media.paused).toBe(false);
+    media.detach();
+  });
+
+  it('bootstraps an embed rebuilt after playback started, rather than autoplaying it', async () => {
+    const media = new TikTokAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    await media.play();
+    report(iframe, 'onPlayerReady');
+
+    // A new source starts paused, like a native media's.
+    media.src = OTHER_VIDEO_ID;
+    await flushLoad();
+
+    const commands = watchCommands(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(`https://www.tiktok.com/player/v1/${OTHER_VIDEO_ID}`);
+    report(iframe, 'onPlayerReady');
+    expect(commands).toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'pause' }, '*');
+    expect(media.paused).toBe(true);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', () => {
+    const media = new TikTokAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain(`https://www.tiktok.com/player/v1/${VIDEO_ID}`);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', () => {
+    const media = new TikTokAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(`https://www.tiktok.com/player/v1/${VIDEO_ID}`);
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    media.detach();
   });
 });
 
@@ -280,7 +379,7 @@ describe('TikTokAdapter', () => {
     const media = new TikTokAdapter();
 
     // This is about the play the caller asked for before the embed could take one, not the bootstrap's commands.
-    media.preload = 'none';
+    media.controls = true;
     const iframe = createIframe();
 
     media.attach(iframe);
@@ -327,10 +426,13 @@ describe('TikTokAdapter', () => {
       const commands = watchCommands(iframe);
 
       report(iframe, 'onPlayerReady');
+      report(iframe, 'onStateChange', STATE.PAUSED);
 
-      if (preload === 'metadata') report(iframe, 'onStateChange', STATE.PAUSED);
-
+      // Either way the embed comes up autoplaying: on a bootstrap, or, under `preload="none"`, for the play that
+      // built it. The pause could not reach it before then, so the autoplay is put back down.
+      expect(commands).toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'pause' }, '*');
       expect(commands).not.toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'play' }, '*');
+      expect(media.paused).toBe(true);
       media.detach();
     }
   );
@@ -954,7 +1056,7 @@ describe('TikTokAdapter', () => {
 // TikTok's player stays dormant without an autoplay, answering no command. The host brings it up with one nobody
 // asked for and parks it, so the caller gets a player that answers rather than a video that played.
 describe('TikTokAdapter bootstrap', () => {
-  /** Attach with the bootstrap left on, the way every preload but `none` arrives. */
+  /** Attach with the bootstrap left on, the way every embed arrives that nobody asked to play or showed controls on. */
   async function attachBootstrapped(media: TikTokAdapter) {
     if (!media.src) media.src = VIDEO_ID;
 
@@ -1207,20 +1309,6 @@ describe('TikTokAdapter bootstrap', () => {
     // The park returns the player to the start, but not over a position the caller has since asked for.
     expect(commands).toHaveBeenCalledWith({ 'x-tiktok-player': true, type: 'seekTo', value: 5 }, '*');
     expect(media.currentTime).toBe(5);
-    media.detach();
-  });
-
-  it('leaves the player dormant under preload=none', async () => {
-    const media = new TikTokAdapter();
-
-    media.preload = 'none';
-    const { iframe, commands } = await attachBootstrapped(media);
-
-    expect(iframe.getAttribute('src')).not.toContain('autoplay');
-
-    report(iframe, 'onPlayerReady');
-
-    expect(commands).not.toHaveBeenCalled();
     media.detach();
   });
 });
