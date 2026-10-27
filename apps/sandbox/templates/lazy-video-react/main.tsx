@@ -4,12 +4,16 @@ import '@app/styles.css';
 //
 // Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
 // Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
+// Autoplay (`?autoplay`) sets `autoPlay` on the media, which light mode always does once play is pressed.
+// Muted (`?muted`) starts the media muted, which browsers require before most autoplay.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
   getEmbedPayload,
+  getUrlAutoplay,
   getUrlLazySource,
   getUrlLight,
+  getUrlMuted,
   LAZY_VIDEO_SOURCE_GROUPS,
   LAZY_VIDEO_SOURCES,
   setUrlLazyState,
@@ -102,6 +106,8 @@ function ScriptBreakdown({ bytes, embed }: { bytes: ScriptBytes; embed: EmbedPay
 function App() {
   const [src, setSrc] = useState(() => getUrlLazySource().src);
   const [light, setLight] = useState(getUrlLight);
+  const [autoplay, setAutoplay] = useState(getUrlAutoplay);
+  const [muted, setMuted] = useState(getUrlMuted);
   const [clickedAt, setClickedAt] = useState<number>();
   const [startedAt, setStartedAt] = useState<number>();
   const [timedOut, setTimedOut] = useState(false);
@@ -151,7 +157,17 @@ function App() {
             <div className={c.placeholder}>{poster && <img className={c.facadeImage} src={poster} alt="" />}</div>
           }
         >
-          <LazyPlayer src={src} poster={poster} light={light} onResolved={setResolved} onStarted={onStarted} />
+          <LazyPlayer
+            // `autoPlay` and `muted` are read once, as the media loads, so the player mounts again with the new setting.
+            key={`${autoplay}-${muted}`}
+            src={src}
+            poster={poster}
+            light={light}
+            autoplay={autoplay}
+            muted={muted}
+            onResolved={setResolved}
+            onStarted={onStarted}
+          />
         </Suspense>
       )}
       <section className={c.card} aria-label="Source">
@@ -167,6 +183,32 @@ function App() {
               }}
             />
             Light mode
+          </label>
+          <label className={c.lightToggle}>
+            <input
+              type="checkbox"
+              // Light mode autoplays once play is pressed, so the checkbox has no say there.
+              checked={autoplay || light}
+              disabled={light}
+              onChange={(event) => {
+                setAutoplay(event.target.checked);
+                setUrlLazyState({ autoplay: event.target.checked });
+                startLight(undefined);
+              }}
+            />
+            Autoplay
+          </label>
+          <label className={c.lightToggle}>
+            <input
+              type="checkbox"
+              checked={muted}
+              onChange={(event) => {
+                setMuted(event.target.checked);
+                setUrlLazyState({ muted: event.target.checked });
+                startLight(undefined);
+              }}
+            />
+            Muted
           </label>
           {light && <p className={c.lightStatus}>{describeLightStart(clickedAt, startedAt, timedOut)}</p>}
         </div>

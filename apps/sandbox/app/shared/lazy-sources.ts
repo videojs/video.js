@@ -94,8 +94,25 @@ export function getUrlLight(): boolean {
   return new URLSearchParams(location.search).has('light');
 }
 
-/** Keeps the source and light mode in the page URL, so a reload or a shared link opens the same state. */
-export function setUrlLazyState({ src, light }: { src?: string; light?: boolean }): void {
+/** Whether `?autoplay` is in the page URL. */
+export function getUrlAutoplay(): boolean {
+  return new URLSearchParams(location.search).has('autoplay');
+}
+
+/** Whether `?muted` is in the page URL. */
+export function getUrlMuted(): boolean {
+  return new URLSearchParams(location.search).has('muted');
+}
+
+interface LazyUrlState {
+  src?: string;
+  light?: boolean;
+  autoplay?: boolean;
+  muted?: boolean;
+}
+
+/** Keeps the source and the page's toggles in the page URL, so a reload or a shared link opens the same state. */
+export function setUrlLazyState({ src, light, autoplay, muted }: LazyUrlState): void {
   const url = new URL(location.href);
   const source = src === undefined ? undefined : LAZY_VIDEO_SOURCES.find((option) => option.src === src);
 
@@ -103,6 +120,12 @@ export function setUrlLazyState({ src, light }: { src?: string; light?: boolean 
 
   if (light === true) url.searchParams.set('light', '');
   else if (light === false) url.searchParams.delete('light');
+
+  if (autoplay === true) url.searchParams.set('autoplay', '');
+  else if (autoplay === false) url.searchParams.delete('autoplay');
+
+  if (muted === true) url.searchParams.set('muted', '');
+  else if (muted === false) url.searchParams.delete('muted');
 
   history.replaceState(null, '', url);
 }
