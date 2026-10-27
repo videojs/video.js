@@ -39,6 +39,14 @@ describe('LazyAudio', () => {
     expect(customElements.get('mux-audio')).toBeDefined();
   });
 
+  it('loads SoundCloud audio for a SoundCloud URL', async () => {
+    const element = create('https://soundcloud.com/forss/flickermood');
+
+    await vi.waitFor(() => expect(element.querySelector('soundcloud-audio')).not.toBeNull(), { timeout: 5000 });
+
+    expect(customElements.get('soundcloud-audio')).toBeDefined();
+  });
+
   it('reports a source no audio media plays', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const element = create('https://vimeo.com/76979871');
