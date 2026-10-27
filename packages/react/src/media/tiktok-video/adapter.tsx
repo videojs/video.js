@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  buildTikTokIframeSrc,
-  shouldDeferTikTokEmbed,
-  TikTokAdapter,
-  type TikTokAdapterProps,
-} from '@videojs/tiktok-video';
+import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -29,18 +24,15 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
   const media = useMediaInstance(TikTokAdapter);
   const props: Partial<TikTokAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // A deferred embed renders an empty frame; the media builds it when playback is requested.
-    shouldDeferTikTokEmbed(props)
-      ? ''
-      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-        buildTikTokIframeSrc(props.src || props.source?.src || '', {
-          ...TikTokAdapter.defaultProps,
-          ...props,
-          // The frame reads mute once, out of the URL it is rendered with, and either
-          // prop says to start muted. Rendering it any other way than the media
-          // builds it would have the media rebuild the frame on mount.
-          defaultMuted: !!(props.defaultMuted || props.muted),
-        })
+    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+    buildTikTokIframeSrc(props.src || props.source?.src || '', {
+      ...TikTokAdapter.defaultProps,
+      ...props,
+      // The frame reads mute once, out of the URL it is rendered with, and either
+      // prop says to start muted. Rendering it any other way than the media
+      // builds it would have the media rebuild the frame on mount.
+      defaultMuted: !!(props.defaultMuted || props.muted),
+    })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<TikTokAdapterProps, Record<string, unknown>>(media, props, TikTokAdapter.defaultProps),
