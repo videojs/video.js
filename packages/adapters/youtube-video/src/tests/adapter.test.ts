@@ -1111,6 +1111,73 @@ describe('YouTubeAdapter', () => {
   });
 });
 
+describe('YouTubeAdapter preload', () => {
+  it('builds no embed and creates no player under preload="none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = 'aqz-KE-bpKQ';
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(media.engine).toBe(null);
+    expect(MockPlayer.instances.length).toBe(0);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once the player is ready', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    expect(player.playVideo).not.toHaveBeenCalled();
+
+    player.ready();
+    await pending;
+
+    expect(player.playVideo).toHaveBeenCalled();
+    expect(MockPlayer.instances.length).toBe(1);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain('preload=metadata');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    await waitForEngine(media);
+    media.detach();
+  });
+});
+
 describe('YouTubeAdapter source', () => {
   it('derives src from a structured source and announces the change', async () => {
     const media = new YouTubeAdapter();

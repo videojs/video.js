@@ -11,4 +11,10 @@ describe('YouTubeVideo', () => {
     expect(params.get('autoplay')).toBe('1');
     expect(params.get('mute')).toBe('1');
   });
+
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    const { container } = render(<YouTubeVideo src="https://www.youtube.com/watch?v=aqz-KE-bpKQ" preload="none" />);
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
 });

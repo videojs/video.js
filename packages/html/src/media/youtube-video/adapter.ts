@@ -1,12 +1,14 @@
 import { CustomMediaElement } from '@videojs/media/dom';
 import { escapeHtml } from '@videojs/utils/string';
-import { buildYouTubeIframeSrc, YouTubeAdapter } from '@videojs/youtube-video';
+import { buildYouTubeIframeSrc, shouldDeferYouTubeEmbed, YouTubeAdapter } from '@videojs/youtube-video';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class YouTubeCustomMediaElement extends CustomMediaElement('iframe', YouTubeAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildYouTubeIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferYouTubeEmbed(props) ? '' : buildYouTubeIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
