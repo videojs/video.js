@@ -547,6 +547,101 @@ describe('SoundCloudAdapter', () => {
     });
   });
 
+  describe('preload', () => {
+    it('loads no widget under preload="none" until play(), then plays once it is ready', async () => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      media.src = TRACK;
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+
+      await media.play();
+
+      expect(widget.iframe.getAttribute('src')).toBe(buildSoundCloudIframeSrc(TRACK));
+
+      widget.emit('ready');
+      widget.answer(TRACK_ANSWERS);
+      await flush();
+
+      expect(widget.named('play')).toHaveLength(1);
+    });
+
+    it('loads no widget for a source set after preload="none" in the same task, as lazy-audio sets them', async () => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+
+      media.attach(widget.iframe);
+      media.src = TRACK;
+      media.preload = 'none';
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+
+    it('holds a new target back again after detach', async () => {
+      const media = new SoundCloudAdapter();
+
+      media.preload = 'none';
+      media.src = TRACK;
+      media.attach(new FakeWidget().iframe);
+      await media.play();
+      media.detach();
+
+      // Playing was asked of the old widget; a new one waits to be asked again.
+      const widget = new FakeWidget();
+
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+
+    it('loads the widget when preload is raised from "none"', async () => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      media.src = TRACK;
+      media.attach(widget.iframe);
+      await flush();
+      media.preload = 'metadata';
+
+      expect(widget.iframe.getAttribute('src')).toBe(buildSoundCloudIframeSrc(TRACK));
+    });
+
+    it.each<[string, (media: SoundCloudAdapter) => void]>([
+      ['autoplay', (media) => (media.autoplay = true)],
+      ['the auto_play parameter', (media) => (media.source = { engine: { soundcloud: { auto_play: true } } })],
+      // The widget's own play button is then the way to start it, and it needs a widget to show.
+      ['controls', (media) => (media.controls = true)],
+    ])('loads the widget at once under preload="none" for %s', async (_, setup) => {
+      const media = new SoundCloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      setup(media);
+      media.src = TRACK;
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(buildSoundCloudIframeSrc(TRACK));
+    });
+
+    it('clears a widget left from an earlier source when the next one is held back', async () => {
+      const { media, widget } = await createReadyMedia();
+
+      media.preload = 'none';
+      media.src = OTHER_TRACK;
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+  });
+
   describe('playback', () => {
     it('plays, pauses, and seeks through the widget commands', async () => {
       const { media, widget } = await createReadyMedia();

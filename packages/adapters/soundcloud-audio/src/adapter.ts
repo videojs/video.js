@@ -14,6 +14,7 @@ import {
   type ParsedSoundCloudSource,
   parseSoundCloudSource,
   type SoundCloudSource,
+  shouldDeferSoundCloudWidget,
   wantsSoundCloudAutoplay,
 } from './source';
 import {
@@ -64,6 +65,8 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #loadId = 0;
   // An iframe URL rendered before the host had a source, which the first load keeps instead of reloading.
   #adoptedSrc: string | null = null;
+  // Playback was requested, so a `preload="none"` widget may be loaded.
+  #activated = false;
 
   #src = SoundCloudAdapter.defaultProps.src;
   #autoplay = SoundCloudAdapter.defaultProps.autoplay;
@@ -144,6 +147,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#target = null;
     this.#adoptedSrc = null;
     this.#playRequested = false;
+    this.#activated = false;
     this.#resetState();
   }
 
@@ -200,6 +204,14 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#resetState();
     // `emptied` announces that reset before the bails below, where the widget reports nothing further.
     this.dispatchEvent(new Event('emptied'));
+
+    // A dormant widget is loaded by `play()`. One left from an earlier source would keep playing what the host no longer
+    // tracks.
+    if (this.#isDormant()) {
+      target.removeAttribute('src');
+      return;
+    }
+
     this.#loadWidget(target);
   }
 
@@ -217,6 +229,12 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
   async play() {
     if (!this.#src || this.#error) return;
+
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
 
     if (!this.#ready) {
       this.#playRequested = true;
@@ -297,7 +315,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -322,7 +344,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -336,7 +362,11 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -403,7 +433,8 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     const rendered = target.getAttribute('src');
 
     if (!rendered) {
-      if (this.#src) this.#loadWidget(target);
+      // A dormant widget is loaded by `play()`.
+      if (this.#src && !this.#isDormant()) this.#loadWidget(target);
 
       return;
     }
@@ -417,6 +448,29 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#adoptedSrc = rendered;
 
     if (this.#src) void this.load();
+  }
+
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferSoundCloudWidget({
+        src: this.#src,
+        source: this.#source,
+        preload: this.#preload,
+        autoplay: this.#autoplay,
+        controls: this.#controls,
+      })
+    );
+  }
+
+  // Load a widget that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || !this.#src || this.#isDormant() || target.getAttribute('src')) return;
+
+    // The widget is loaded from the current source, so a load still waiting on its microtask has nothing left to do.
+    this.#loadId++;
+    this.#loadWidget(target);
   }
 
   #loadWidget(target: HTMLIFrameElement) {

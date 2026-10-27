@@ -1,12 +1,20 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import { buildSoundCloudIframeSrc, SoundCloudAdapter } from '@videojs/soundcloud-audio';
+import { buildSoundCloudIframeSrc, SoundCloudAdapter, shouldDeferSoundCloudWidget } from '@videojs/soundcloud-audio';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class SoundCloudCustomMediaElement extends CustomMediaElement('iframe', SoundCloudAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildSoundCloudIframeSrc(attrs.src ?? '');
+    const props = {
+      src: attrs.src ?? '',
+      // SAFETY: only `'none'` is compared, so any other value reads as not deferring, as it would for the media.
+      preload: (attrs.preload as 'none' | 'metadata' | 'auto' | undefined) ?? 'metadata',
+      autoplay: attrs.autoplay !== undefined,
+      controls: attrs.controls !== undefined,
+    };
+    // A deferred widget renders an empty frame; the media loads it when playback is requested.
+    const initialSrc = shouldDeferSoundCloudWidget(props) ? '' : buildSoundCloudIframeSrc(props.src);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
