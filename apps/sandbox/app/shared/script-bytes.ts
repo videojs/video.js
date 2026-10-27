@@ -15,9 +15,10 @@ export interface ScriptBytes {
 /** Rendered bytes per package for each built chunk, keyed by its path, written by the sandbox build. */
 type ChunkPackages = Record<string, Record<string, number>>;
 
+// The build writes the file beside the page's chunks, and this module is bundled into one of them.
 async function loadChunkPackages(): Promise<ChunkPackages | null> {
   try {
-    const response = await fetch('/chunk-packages.json');
+    const response = await fetch(new URL(/* @vite-ignore */ 'chunk-packages.json', import.meta.url));
 
     // SAFETY: the sandbox build writes this file with the `ChunkPackages` shape.
     return response.ok ? ((await response.json()) as ChunkPackages) : null;
