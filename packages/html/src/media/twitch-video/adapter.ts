@@ -1,12 +1,14 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import { buildTwitchIframeSrc, TwitchAdapter } from '@videojs/twitch-video';
+import { buildTwitchIframeSrc, shouldDeferTwitchEmbed, TwitchAdapter } from '@videojs/twitch-video';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class TwitchCustomMediaElement extends CustomMediaElement('iframe', TwitchAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildTwitchIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferTwitchEmbed(props) ? '' : buildTwitchIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
