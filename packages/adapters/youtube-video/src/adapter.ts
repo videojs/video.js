@@ -27,7 +27,7 @@ import {
   youtubeErrorCodeToMediaErrorCode,
 } from './iframe-api';
 import type { YouTubeAdapterProps } from './props';
-import { buildYouTubeIframeSrc, parseYouTubeSource, type YouTubeSource } from './source';
+import { buildYouTubeIframeSrc, parseYouTubeSource, shouldDeferYouTubeEmbed, type YouTubeSource } from './source';
 import { YouTubeTextTrackList } from './text-tracks';
 
 const SEEK_TOLERANCE = 1;
@@ -61,6 +61,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #creatingPlayer = false;
   // Keep URL-only option changes pending until a valid source can rebuild the embed.
   #pendingEmbedOptions = false;
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
   // Settings to apply to a replacement player before it reports its own.
   #restoreSettings: ReadonlySet<PlayerSetting> = new Set();
   // Settings written through setters since attach; before a player reports, only these are real.
@@ -164,6 +166,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#playerReady = false;
     this.#pendingLoad = false;
     this.#creatingPlayer = false;
+    this.#activated = false;
     this.#restoreSettings = new Set();
     this.#writtenSettings = new Set();
     this.#playerSettingsRead = false;
@@ -291,6 +294,12 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   async play() {
     let recreations: number;
 
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
+
     // Recreating the embed replaces the load barrier; follow it to the replacement player.
     do {
       recreations = this.#recreations;
@@ -380,7 +389,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -416,7 +429,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -534,7 +551,15 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (!target || this.#player || this.#creatingPlayer) return false;
 
     // Only the attribute tells an embed apart from a placeholder; `src` resolves empty to the document URL.
-    if (!target.getAttribute('src') || this.#pendingEmbedOptions) {
+    const hasEmbed = !!target.getAttribute('src');
+
+    // A dormant embed is built by `play()`; until then no player is coming to settle this load.
+    if (!hasEmbed && this.#isDormant()) {
+      this.#loadComplete.resolve();
+      return false;
+    }
+
+    if (!hasEmbed || this.#pendingEmbedOptions) {
       const initialSrc = buildYouTubeIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no player is coming to settle this load.
@@ -551,6 +576,21 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.dispatchEvent(new Event('loadstart'));
     void this.#createPlayerApi(target);
     return true;
+  }
+
+  #isDormant() {
+    return !this.#activated && shouldDeferYouTubeEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || this.#player || this.#creatingPlayer || target.getAttribute('src')) return;
+
+    // The embed is built from the current source, so a load requested while dormant has nothing left to replay.
+    this.#pendingLoad = false;
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   async #createPlayerApi(target: HTMLIFrameElement) {

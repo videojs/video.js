@@ -20,4 +20,10 @@ describe('YouTubeVideo', () => {
 
     expect(mediaRef.current?.playbackRateRange).toEqual({ min: 0.25, max: 2 });
   });
+
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    const { container } = render(<YouTubeVideo src="https://www.youtube.com/watch?v=aqz-KE-bpKQ" preload="none" />);
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
 });

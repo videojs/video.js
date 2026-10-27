@@ -1,6 +1,11 @@
 'use client';
 
-import { buildYouTubeIframeSrc, YouTubeAdapter, type YouTubeAdapterProps } from '@videojs/youtube-video';
+import {
+  buildYouTubeIframeSrc,
+  shouldDeferYouTubeEmbed,
+  YouTubeAdapter,
+  type YouTubeAdapterProps,
+} from '@videojs/youtube-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -24,13 +29,16 @@ export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(fun
   const media = useMediaInstance(YouTubeAdapter);
   const props: Partial<YouTubeAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildYouTubeIframeSrc(props.src || props.source?.src || '', {
-      ...YouTubeAdapter.defaultProps,
-      ...props,
-      // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferYouTubeEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildYouTubeIframeSrc(props.src || props.source?.src || '', {
+          ...YouTubeAdapter.defaultProps,
+          ...props,
+          // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<YouTubeAdapterProps, Record<string, unknown>>(media, props, YouTubeAdapter.defaultProps),
