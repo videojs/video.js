@@ -235,6 +235,12 @@ describe('buildYouTubeIframeSrc', () => {
     );
   });
 
+  it('embeds youtube/<id> shorthands from the nocookie host', () => {
+    expect(buildYouTubeIframeSrc('youtube/aqz-KE-bpKQ')).toContain(
+      'https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ?'
+    );
+  });
+
   it('builds playlist embed URL', () => {
     const src = buildYouTubeIframeSrc('https://www.youtube.com/playlist?list=PLv3TTBr1W_9tppikBxAE');
 

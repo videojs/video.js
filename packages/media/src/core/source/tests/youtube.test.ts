@@ -81,8 +81,14 @@ describe('parseYouTubeSource', () => {
     expect(parseYouTubeSource('https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ')?.noCookie).toBe(true);
   });
 
-  it('returns null for a youtube/<id> path', () => {
-    expect(parseYouTubeSource('youtube/aqz-KE-bpKQ')).toBe(null);
-    expect(parseYouTubeSource('youtube/shorts/aqz-KE-bpKQ')).toBe(null);
+  it('plays youtube/<id> shorthands from the nocookie host', () => {
+    const expected = { id: 'aqz-KE-bpKQ', kind: 'video', listId: null, startTime: null, noCookie: true };
+
+    expect(parseYouTubeSource('youtube/aqz-KE-bpKQ')).toEqual(expected);
+    expect(parseYouTubeSource('youtube/shorts/aqz-KE-bpKQ')).toEqual(expected);
+  });
+
+  it('returns null for a shorthand without a video id', () => {
+    expect(parseYouTubeSource('youtube/not-an-id')).toBe(null);
   });
 });
