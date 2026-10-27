@@ -17,7 +17,7 @@ jobs:
   changes:
     name: Changed areas
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       player: ${{ steps.filter.outputs.player }}
       skins: ${{ steps.filter.outputs.skins }}
@@ -51,7 +51,7 @@ jobs:
     name: Build for browser suites
     needs: changes
     if: ${{ !cancelled() && (github.event_name == 'push' || needs.changes.outputs.player == 'true' || needs.changes.outputs.skins == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e') || contains(github.event.pull_request.labels.*.name, 'record:snapshots')) }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
@@ -98,7 +98,7 @@ jobs:
     name: E2E (${{ matrix.browser }}${{ matrix.shards > 1 && format(' {0}/{1}', matrix.shard, matrix.shards) || '' }})
     needs: [changes, build]
     if: ${{ !cancelled() && needs.build.result == 'success' && (github.event_name == 'push' || needs.changes.outputs.player == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
@@ -159,7 +159,7 @@ jobs:
     name: Sandbox
     needs: [changes, build]
     if: ${{ !cancelled() && needs.build.result == 'success' && (github.event_name == 'push' || needs.changes.outputs.player == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
@@ -212,7 +212,7 @@ jobs:
     name: Skin parity (${{ matrix.name }}${{ matrix.shards > 1 && format(' {0}/{1}', matrix.shard, matrix.shards) || '' }})
     needs: [changes, build]
     if: ${{ !cancelled() && needs.build.result == 'success' && (github.event_name == 'push' || needs.changes.outputs.skins == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
@@ -281,7 +281,7 @@ jobs:
     name: Record snapshots
     needs: [changes, build]
     if: ${{ !cancelled() && needs.build.result == 'success' && contains(github.event.pull_request.labels.*.name, 'record:snapshots') }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 20
@@ -333,7 +333,7 @@ jobs:
     name: Skin projects
     needs: changes
     if: ${{ !cancelled() && (github.event_name == 'push' || needs.changes.outputs.skin_projects == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e')) }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 15
 
     steps:
@@ -377,7 +377,7 @@ jobs:
 
   registry:
     name: Registry consumers
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
