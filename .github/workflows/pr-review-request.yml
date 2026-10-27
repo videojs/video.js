@@ -16,7 +16,7 @@ concurrency:
 jobs:
   request:
     if: github.event.pull_request.draft == false && github.event.pull_request.user.type != 'Bot'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 1
 
     steps:

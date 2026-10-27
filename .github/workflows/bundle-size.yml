@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   pr-size:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout PR
@@ -44,7 +44,7 @@ jobs:
           path: pr-size.json
 
   base-size:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout comparison history
@@ -100,7 +100,7 @@ jobs:
           path: base-size.json
 
   report:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     needs: [pr-size, base-size]
 
     steps:
