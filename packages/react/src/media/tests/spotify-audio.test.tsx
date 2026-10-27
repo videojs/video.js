@@ -60,6 +60,15 @@ describe('SpotifyAudio', () => {
     expect(iframe.style.display).toBe('');
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', async () => {
+    const { container } = render(<SpotifyAudio src={TRACK_URL} preload="none" />);
+
+    await Promise.resolve();
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+    expect(MockController.instances.length).toBe(0);
+  });
+
   it('keeps the controller on the iframe React rendered', async () => {
     const { container } = render(<SpotifyAudio src={TRACK_URL} />);
     const controller = await waitForController();

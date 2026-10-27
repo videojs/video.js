@@ -97,6 +97,104 @@ describe('buildSpotifyIframeSrc', () => {
   });
 });
 
+describe('SpotifyAdapter preload', () => {
+  it('builds no embed, loads no iframe API, and creates no controller under preload="none"', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    vi.stubGlobal('SpotifyIframeApi', undefined);
+    vi.mocked(loadScript).mockClear();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = TRACK_URL;
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(loadScript).not.toHaveBeenCalled();
+    expect(media.engine).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once the controller is ready', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = TRACK_URL;
+    media.attach(iframe);
+
+    const pending = media.play();
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+
+    const controller = await waitForEngine(media);
+
+    expect(controller.resume).not.toHaveBeenCalled();
+
+    controller.ready();
+    await pending;
+
+    expect(controller.resume).toHaveBeenCalledTimes(1);
+    expect(MockController.instances.length).toBe(1);
+    media.detach();
+  });
+
+  it('holds a new target back again after detach', async () => {
+    const media = new SpotifyAdapter();
+
+    media.preload = 'none';
+    media.src = TRACK_URL;
+    media.attach(createIframe());
+    void media.play();
+    await waitForEngine(media);
+    media.detach();
+
+    // Playing was asked of the old embed; a new one waits to be asked again.
+    const iframe = createIframe();
+
+    media.attach(iframe);
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(media.engine).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = TRACK_URL;
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = TRACK_URL;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+
+    const controller = await waitForEngine(media);
+
+    // The embed URL carries no autoplay parameter, so the controller is asked to play once ready.
+    controller.ready();
+    await vi.waitFor(() => expect(controller.resume).toHaveBeenCalled());
+    media.detach();
+  });
+});
+
 describe('SpotifyAdapter', () => {
   it('has expected default state before attach', () => {
     const media = new SpotifyAdapter();

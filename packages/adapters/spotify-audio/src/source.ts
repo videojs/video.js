@@ -47,6 +47,17 @@ export interface SpotifySourceEngineConfig {
 }
 
 /**
+ * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from Spotify,
+ * not the iframe and not the iframe API, so the page makes no third-party request before the listener asks to play.
+ * `autoplay` asks to play now, so it builds the embed regardless.
+ *
+ * @internal
+ */
+export function shouldDeferSpotifyEmbed(props: Partial<Pick<SpotifyAdapterProps, 'preload' | 'autoplay'>> = {}) {
+  return props.preload === 'none' && !props.autoplay;
+}
+
+/**
  * Build the iframe `src` URL for an initial Spotify embed from the given props.
  *
  * @internal
