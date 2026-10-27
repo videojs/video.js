@@ -16,8 +16,8 @@ export interface LazySource {
   /** `src` parsed as a URL, or `null` for a path or bare id. */
   url: URL | null;
   /**
-   * The kind of source by host, MIME type, or file extension, with the same names `resolveAdapterType` returns. A media
-   * file on a service host, such as a direct Vimeo MP4, counts as that file.
+   * The kind of source by host, shorthand, MIME type, or file extension, with the same names `resolveAdapterType`
+   * returns. A media file on a service host, such as a direct Vimeo MP4, counts as that file.
    */
   adapterType: AdapterType | null;
   /** How HLS should play here, or `undefined` while that isn't known, such as during server rendering. */
@@ -63,10 +63,8 @@ export function resolveLazySource(src: string, options: ResolveLazySourceOptions
   const source = src.trim();
   if (!source) return null;
 
-  // `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match
-  // by host or `spotify:` URI, and the media they resolve to checks the id itself.
   const url = parseSourceUrl(source);
-  const service = SPOTIFY_URI.test(source) ? 'spotify' : url && matchServiceHost(url);
+  const service = matchService(source, url);
   const mimeType = resolveMimeType(source);
 
   return {
@@ -119,6 +117,18 @@ export function matchAdapterType(...types: AdapterType[]): LazyMediaMatcher['mat
 export function matchHls(playback: 'native' | 'mse'): LazyMediaMatcher['match'] {
   return ({ adapterType, playback: path }) => adapterType === 'hls' && path && path === playback;
 }
+
+// `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match by
+// host, shorthand, or `spotify:` URI, and the media they resolve to checks the id itself.
+function matchService(src: string, url: URL | null): AdapterType | null {
+  if (SPOTIFY_URI.test(src)) return 'spotify';
+
+  // SAFETY: `SHORTHAND` captures only `youtube` or `vimeo`.
+  return (SHORTHAND.exec(src)?.[1] as 'youtube' | 'vimeo' | undefined) ?? (url && matchServiceHost(url));
+}
+
+// A `youtube/<id>` or `vimeo/<id>` shorthand; the media checks the id.
+const SHORTHAND = /^(youtube|vimeo)\//;
 
 function resolvePlayback({ preferPlayback, nativeHls }: ResolveLazySourceOptions): LazySource['playback'] {
   if (preferPlayback === 'mse') return 'mse';
