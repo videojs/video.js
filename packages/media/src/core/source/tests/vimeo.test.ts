@@ -41,8 +41,12 @@ describe('parseVimeoSource', () => {
     expect(parseVimeoSource('https://vimeo.com/event/12345/abc')).toEqual({ id: 12345, kind: 'event', hash: 'abc' });
   });
 
-  it('returns null for a vimeo/<id> path', () => {
-    expect(parseVimeoSource('vimeo/12345')).toBe(null);
-    expect(parseVimeoSource('vimeo/12345?hash=abc')).toBe(null);
+  it('parses vimeo/<id> shorthands with or without a hash', () => {
+    expect(parseVimeoSource('vimeo/12345')).toEqual({ id: 12345, kind: 'video', hash: null });
+    expect(parseVimeoSource('vimeo/video/12345')).toEqual({ id: 12345, kind: 'video', hash: null });
+
+    for (const shorthand of ['vimeo/12345?hash=abc', 'vimeo/12345?h=abc', 'vimeo/12345/abc']) {
+      expect(parseVimeoSource(shorthand)).toEqual({ id: 12345, kind: 'video', hash: 'abc' });
+    }
   });
 });

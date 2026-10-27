@@ -76,7 +76,7 @@ Install every engine package listed: your bundler resolves each media component 
 | Twitch | <DocsLink slug="reference/components/twitch-video">TwitchVideo</DocsLink> | The Twitch embed |
 | player.js embeds marked with `?playerjs` | <DocsLink slug="reference/components/playerjs-video">PlayerJsVideo</DocsLink> | The service's player.js embed |
 
-Sources are matched by the hosts <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> recognizes, then by MIME type or file extension. A media file on one of these hosts, such as a direct Vimeo MP4, plays as that file. A source that matches none of these renders nothing and logs an error in development.
+Sources are matched by the hosts and shorthands <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> recognizes, then by MIME type or file extension. A media file on one of these hosts, such as a direct Vimeo MP4, plays as that file. A source that matches none of these renders nothing and logs an error in development.
 
 player.js is a protocol any embed can speak, so nothing in an embed's URL says it's one. Add a `playerjs` query parameter to choose the player.js media, such as `https://streamable.com/e/moo?playerjs`. It takes precedence over the host and file extension, and the player.js media removes it before loading the embed.
 
