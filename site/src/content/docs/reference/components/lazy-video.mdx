@@ -86,6 +86,8 @@ The media component starts loading as soon as `src` is set. It doesn't wait for 
 
 Changing `src` to a source the same media plays updates that media in place. Changing it to a source that needs a different media replaces the media once the new one has loaded.
 
+Until the media loads, nothing is rendered in its place, so give the player an aspect ratio, as the installation snippet does, and its box stays the same size while the media loads and when `src` swaps it for another. Without one, the player takes its height from the media once it renders.
+
 Set `type` to the source's MIME type when its URL has no file extension, such as a signed URL. `type` only chooses the media; it isn't passed on.
 
 Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js.
@@ -97,7 +99,7 @@ During server rendering, files render their `<video>`. HLS renders nothing until
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children present when the media is created move into it; add later ones to the media element directly. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to.
+Every other attribute, except `id`, `class`, `style`, `slot`, and `part`, is copied to the resolved media element, which `<lazy-video>` renders as its child. `<track>` and `<source>` children present when the media is created move into it; add later ones to the media element directly. `<lazy-video>` lays out as its child does, so a skin sizes it the same way as the element it resolves to. An embed fills the player, and falls back to 16:9 in a player with no height of its own.
 </FrameworkCase>
 
 ## Custom media
