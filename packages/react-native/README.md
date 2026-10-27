@@ -16,11 +16,16 @@ Fabric component and the engine is a TurboModule, both generated from `codegenCo
 
 
 ```tsx
-import { Player } from "@videojs/react-native";
+import { StyleSheet } from "react-native";
+import { Video, VideoPlayer, VideoSkin } from "@videojs/react-native";
 
 // ...
 
-<Player source="https://stream.mux.com/{PLAYBACK_ID}.m3u8" style={{ width: 320, height: 180 }} />
+<VideoPlayer>
+  <VideoSkin style={{ width: 320, height: 180 }}>
+    <Video src="https://stream.mux.com/{PLAYBACK_ID}.m3u8" style={StyleSheet.absoluteFill} />
+  </VideoSkin>
+</VideoPlayer>
 ```
 
 

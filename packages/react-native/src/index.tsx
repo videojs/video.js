@@ -11,7 +11,6 @@ export {
   resolveNativeEvent,
 } from './media/react-native-media';
 export { Video, type VideoProps } from './media/video';
-export { Player, type PlayerStatus } from './player';
 export { Container, type ContainerProps } from './player/container';
 export type { NativePlayerContextValue } from './player/context';
 export {
