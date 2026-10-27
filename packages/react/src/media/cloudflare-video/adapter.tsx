@@ -1,6 +1,11 @@
 'use client';
 
-import { buildCloudflareIframeSrc, CloudflareAdapter, type CloudflareAdapterProps } from '@videojs/cloudflare-video';
+import {
+  buildCloudflareIframeSrc,
+  CloudflareAdapter,
+  type CloudflareAdapterProps,
+  shouldDeferCloudflareEmbed,
+} from '@videojs/cloudflare-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -24,15 +29,18 @@ export const CloudflareVideo = forwardRef<HTMLIFrameElement, CloudflareVideoProp
   const media = useMediaInstance(CloudflareAdapter);
   const props: Partial<CloudflareAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildCloudflareIframeSrc(props.src || props.source?.src || '', {
-      ...CloudflareAdapter.defaultProps,
-      ...props,
-      // The embed reads mute once, out of the URL it is rendered with, and either
-      // prop says to start muted. Leaving `muted` out of the URL would leave a
-      // muted autoplay blocked by the browser, since the embed comes up audible.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferCloudflareEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildCloudflareIframeSrc(props.src || props.source?.src || '', {
+          ...CloudflareAdapter.defaultProps,
+          ...props,
+          // The embed reads mute once, out of the URL it is rendered with, and either
+          // prop says to start muted. Leaving `muted` out of the URL would leave a
+          // muted autoplay blocked by the browser, since the embed comes up audible.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<CloudflareAdapterProps, Record<string, unknown>>(media, props, CloudflareAdapter.defaultProps),
