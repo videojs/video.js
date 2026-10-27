@@ -174,3 +174,8 @@ jobs:
                 body,
               });
             }
+
+      # Runs after the report is posted, so an over-budget PR still shows its sizes.
+      # Budgets live in .github/scripts/bundle-size-budget.js.
+      - name: Check size budgets
+        run: node .github/scripts/bundle-size-budget.js artifacts/pr-size/pr-size.json
