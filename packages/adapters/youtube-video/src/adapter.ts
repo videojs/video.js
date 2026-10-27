@@ -454,6 +454,9 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
     this.#pendingEmbedOptions ||= engineChanged;
 
+    // The autoplay a `play()` wrote was for the video it built, so an embed rebuilt for another must not carry it.
+    if (srcChanged || engineChanged) this.#embedPlays = false;
+
     this.#source = source;
     this.#src = src;
 

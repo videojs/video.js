@@ -364,6 +364,24 @@ describe('CloudflareAdapter preload', () => {
     media.detach();
   });
 
+  it('rebuilds a video given while the SDK loads without the autoplay a play() wrote', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    void media.play();
+
+    media.src = OTHER_VIDEO_ID;
+    await waitForEngine(media);
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toContain(OTHER_VIDEO_ID);
+    expect(iframe.getAttribute('src')).not.toContain('autoplay');
+    media.detach();
+  });
+
   it('keeps a played embed preloading when preload is set again', async () => {
     const media = new CloudflareAdapter();
 
