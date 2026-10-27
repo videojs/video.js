@@ -4,12 +4,16 @@ import '@app/styles.css';
 //
 // Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
 // Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
+// Autoplay (`?autoplay`) sets `autoplay` on the media, which light mode always does once play is pressed.
+// Muted (`?muted`) starts the media muted, which browsers require before most autoplay.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
   getEmbedPayload,
+  getUrlAutoplay,
   getUrlLazySource,
   getUrlLight,
+  getUrlMuted,
   LAZY_VIDEO_SOURCE_GROUPS,
   LAZY_VIDEO_SOURCES,
   setUrlLazyState,
@@ -41,6 +45,8 @@ root.innerHTML = html`
   <section class="${c.card}" aria-label="Source">
     <div class="${c.light}">
       <label class="${c.lightToggle}"><input type="checkbox" id="light" /> Light mode</label>
+      <label class="${c.lightToggle}"><input type="checkbox" id="autoplay" /> Autoplay</label>
+      <label class="${c.lightToggle}"><input type="checkbox" id="muted" /> Muted</label>
       <p class="${c.lightStatus}" id="light-status"></p>
     </div>
     <div class="${c.groups}">
@@ -90,6 +96,8 @@ root.innerHTML = html`
 
 const stage = root.querySelector<HTMLElement>('#stage')!;
 const lightToggle = root.querySelector<HTMLInputElement>('#light')!;
+const autoplayToggle = root.querySelector<HTMLInputElement>('#autoplay')!;
+const mutedToggle = root.querySelector<HTMLInputElement>('#muted')!;
 const lightStatus = root.querySelector('#light-status')!;
 const buttons = root.querySelectorAll<HTMLButtonElement>('button[data-src]');
 const srcOutput = root.querySelector<HTMLElement>('#src')!;
@@ -185,6 +193,8 @@ observeScriptBytes((bytes) => {
 });
 
 let light = getUrlLight();
+let autoplay = getUrlAutoplay();
+let muted = getUrlMuted();
 let clickedAt: number | undefined;
 let startedAt: number | undefined;
 let timedOut = false;
@@ -192,6 +202,15 @@ let timeout: ReturnType<typeof setTimeout> | undefined;
 let cleanup = () => {};
 
 lightToggle.checked = light;
+mutedToggle.checked = muted;
+
+// Light mode autoplays once play is pressed, so the checkbox has no say there.
+function renderAutoplayToggle() {
+  autoplayToggle.checked = autoplay || light;
+  autoplayToggle.disabled = light;
+}
+
+renderAutoplayToggle();
 
 function renderLightStatus() {
   lightStatus.textContent = light ? describeLightStart(clickedAt, startedAt, timedOut) : '';
@@ -240,7 +259,11 @@ function mountPlayer(poster: string | undefined) {
   stage.innerHTML = html`
     <video-player${poster ? ` poster="${poster}"` : ''}>
       <video-skin class="sandbox-video-frame">
-        <lazy-video src="${src}" playsinline crossorigin${light ? ' autoplay' : ''}></lazy-video>
+        <lazy-video
+                  src="${src}"
+                  playsinline
+                  crossorigin${light || autoplay ? ' autoplay' : ''}${muted ? ' muted' : ''}
+                ></lazy-video>
       </video-skin>
     </video-player>
   `;
@@ -292,6 +315,24 @@ for (const type of ['pointerover', 'focusin']) {
 lightToggle.addEventListener('change', () => {
   light = lightToggle.checked;
   setUrlLazyState({ light });
+  renderAutoplayToggle();
+
+  resetLight();
+  renderStage();
+});
+
+// `autoplay` and `muted` are read once, as the media loads, so the player mounts again with the new setting.
+autoplayToggle.addEventListener('change', () => {
+  autoplay = autoplayToggle.checked;
+  setUrlLazyState({ autoplay });
+
+  resetLight();
+  renderStage();
+});
+
+mutedToggle.addEventListener('change', () => {
+  muted = mutedToggle.checked;
+  setUrlLazyState({ muted });
 
   resetLight();
   renderStage();
