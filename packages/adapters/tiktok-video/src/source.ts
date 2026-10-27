@@ -53,17 +53,30 @@ export interface TikTokSourceEngineConfig {
 }
 
 /**
+ * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from TikTok,
+ * so the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now, so it builds
+ * the embed regardless.
+ *
+ * @internal
+ */
+export function shouldDeferTikTokEmbed(props: Partial<Pick<TikTokAdapterProps, 'preload' | 'autoplay'>> = {}) {
+  return props.preload === 'none' && !props.autoplay;
+}
+
+/**
  * Whether the embed has to carry an `autoplay` nobody asked for. TikTok builds its player lazily: without one it
  * creates no media element, never reports `onPlayerReady`, and drops every command silently, until something is clicked
  * inside the frame — which a frame under a player skin never gets. The host parks the player as soon as it is up, so
  * this buys one that answers commands, not a video that plays.
  *
+ * `preload` takes no part: a `preload="none"` embed is not built until playback is requested (see
+ * `shouldDeferTikTokEmbed`), and one built then needs a player that answers as much as any other.
+ *
  * @internal
  */
 export function shouldBootstrapTikTokEmbed(props: Partial<TikTokAdapterProps> = {}) {
-  // `preload="none"` trades those working controls back for an untouched network, and `controls` hands the player
-  // to TikTok's own chrome, which the host must not park playback out from under.
-  return !props.autoplay && props.preload !== 'none' && props.controls !== true;
+  // `controls` hands the player to TikTok's own chrome, which the host must not park playback out from under.
+  return !props.autoplay && props.controls !== true;
 }
 
 /**
