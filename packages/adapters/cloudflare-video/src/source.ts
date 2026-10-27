@@ -48,12 +48,15 @@ export interface CloudflareSourceEngineConfig {
 /**
  * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from
  * Cloudflare, not the iframe and not the Stream SDK, so the page makes no third-party request before the viewer asks to
- * play. `autoplay` asks to play now, so it builds the embed regardless.
+ * play. `autoplay` asks to play now, and `controls` makes Cloudflare's own play button the way to ask, so either builds
+ * the embed regardless.
  *
  * @internal
  */
-export function shouldDeferCloudflareEmbed(props: Partial<Pick<CloudflareAdapterProps, 'preload' | 'autoplay'>> = {}) {
-  return props.preload === 'none' && !props.autoplay;
+export function shouldDeferCloudflareEmbed(
+  props: Partial<Pick<CloudflareAdapterProps, 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  return props.preload === 'none' && !props.autoplay && !props.controls;
 }
 
 /**

@@ -193,6 +193,35 @@ describe('SpotifyAdapter preload', () => {
     await vi.waitFor(() => expect(controller.resume).toHaveBeenCalled());
     media.detach();
   });
+
+  it('builds the embed at once when controls are shown', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    // Spotify's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = TRACK_URL;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = TRACK_URL;
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+    await waitForEngine(media);
+    media.detach();
+  });
 });
 
 describe('SpotifyAdapter', () => {
