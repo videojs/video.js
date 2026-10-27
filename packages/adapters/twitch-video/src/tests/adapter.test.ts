@@ -1,4 +1,4 @@
-import { MediaError } from '@videojs/media';
+import { isMediaPlaybackRateCapable, MediaError, type Video } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildTwitchIframeSrc, TwitchAdapter } from '..';
@@ -447,6 +447,15 @@ describe('TwitchAdapter', () => {
     expect(embed.postMessage).toHaveBeenCalledWith(command(COMMAND.SET_VOLUME, 0.5), ORIGIN);
     expect(embed.postMessage).toHaveBeenCalledWith(command(COMMAND.SET_MUTED, true), ORIGIN);
     media.detach();
+  });
+
+  it('offers no playback rate surface', () => {
+    // The embed takes no speed command, so the player reports the rate
+    // unsupported and hides its rate controls.
+    const media = new TwitchAdapter() as Partial<Video>;
+
+    expect(media.playbackRate).toBeUndefined();
+    expect(isMediaPlaybackRateCapable(media)).toBe(false);
   });
 
   it('announces a volume or mute it is given, without repeating the embed echo', async () => {
