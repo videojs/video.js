@@ -82,7 +82,7 @@ video.source = {
 ## Behavior
 
 - Volume and mute both work, like a native `<video>`.
-- `playbackRate` is reported but never applied: the embed has no rate command.
+- No playback rate: the embed has no rate command, so the player hides its rate controls.
 - `loop` restarts a finished video from the top; the embed has no loop parameter.
 - `controls` is read when the embed is built; changing it later doesn't take effect, since rebuilding the iframe would lose the playback session.
 - Fullscreen targets the iframe, so Twitch's own chrome shows in fullscreen.
