@@ -11,6 +11,10 @@ export interface LazyPlayerProps {
   poster: string | undefined;
   /** Light mode: autoplay once loaded, and report when playback starts. */
   light: boolean;
+  /** Autoplay once loaded, outside light mode too. */
+  autoplay: boolean;
+  /** Start muted, which browsers require before most autoplay. */
+  muted: boolean;
   /** Receives a description of the resolved media, or `null` while there's none. */
   onResolved: (description: string | null) => void;
   onStarted: () => void;
@@ -39,7 +43,7 @@ function StartedReporter({ onStarted }: { onStarted: () => void }) {
   return null;
 }
 
-export default function LazyPlayer({ src, poster, light, onResolved, onStarted }: LazyPlayerProps) {
+export default function LazyPlayer({ src, poster, light, autoplay, muted, onResolved, onStarted }: LazyPlayerProps) {
   const mediaRef = useCallback(
     (media: Media | null) => {
       if (!media) return;
@@ -60,7 +64,14 @@ export default function LazyPlayer({ src, poster, light, onResolved, onStarted }
   return (
     <VideoPlayer poster={poster}>
       <VideoSkin className="sandbox-video-frame">
-        <LazyVideo src={src} mediaRef={mediaRef} autoPlay={light} playsInline crossOrigin="" />
+        <LazyVideo
+          src={src}
+          mediaRef={mediaRef}
+          autoPlay={light || autoplay}
+          muted={muted}
+          playsInline
+          crossOrigin=""
+        />
       </VideoSkin>
       {light && <StartedReporter onStarted={onStarted} />}
     </VideoPlayer>
