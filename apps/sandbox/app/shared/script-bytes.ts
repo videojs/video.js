@@ -201,7 +201,9 @@ function videojsBytes(bytes: ScriptBytes): number {
 
 /**
  * The JavaScript loaded, formatted for display, with what loaded since `since` when given. With per-package sizes the
- * headline counts only Video.js and the engines and dependencies it loads; without them, everything.
+ * headline counts only Video.js and the engines and dependencies it loads; without them, everything. The dev server
+ * serves each module unbundled and untransformed for production, so its totals say so rather than pass for shipped
+ * sizes.
  */
 export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes, embed?: EmbedPayload) {
   const grouped = Object.keys(bytes.packages).length > 0;
@@ -210,11 +212,13 @@ export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes, em
   const pageTotal = `${formatKilobytes(bytes.gzip)} total on the page`;
 
   return {
-    label: grouped ? 'Video.js loaded' : 'JavaScript loaded',
+    label: grouped ? 'Video.js loaded' : import.meta.env.DEV ? 'JavaScript loaded (dev server)' : 'JavaScript loaded',
     total: formatKilobytes(headline),
     detail: grouped
       ? `gzip · with engines · ${embed ? `${pageTotal}, plus ${formatKilobytes(embed.total)} from the embed` : pageTotal}`
-      : `gzip · ${formatKilobytes(bytes.raw)} minified · ${bytes.files} files`,
+      : import.meta.env.DEV
+        ? `gzip · ${bytes.files} unbundled dev modules, not shipped sizes · build for real numbers`
+        : `gzip · ${formatKilobytes(bytes.raw)} as served · ${bytes.files} files`,
     sinceChange: sinceHeadline === undefined ? null : `+${formatKilobytes(headline - sinceHeadline)}`,
   };
 }
