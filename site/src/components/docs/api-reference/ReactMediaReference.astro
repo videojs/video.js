@@ -9,6 +9,7 @@ import P from '@/components/typography/P.astro';
 import type { EngineOptionDef, ReactMediaReference } from '@/types/media-reference';
 import type { MediaReferenceRef } from '@/utils/mediaReferenceModel';
 import ApiEngineOptionsSection from './ApiEngineOptionsSection.astro';
+import CodeChip from './CodeChip.astro';
 import MediaHostPropsTable from './MediaHostPropsTable.astro';
 
 interface Section {
@@ -178,9 +179,14 @@ const mediaRefExample = mediaRef
     <>
       <H3 id={eventsSection.id}>{eventsSection.title}</H3>
       <P>
-        Handle standard media events with React event props such as{" "}
-        <MarkdownCode>onPlay</MarkdownCode> and{" "}
-        <MarkdownCode>onTimeUpdate</MarkdownCode>.{" "}
+        Accepts these media event props:{" "}
+        <span class="code-list">
+          {data.eventProps.map((prop) => (
+            <CodeChip value={prop} />
+          ))}
+        </span>
+      </P>
+      <P>
         {mediaRefIsAdapter && isEmbed ? (
           <>
             The adapter dispatches them, not the iframe. For events without a

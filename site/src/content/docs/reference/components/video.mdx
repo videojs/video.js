@@ -77,6 +77,8 @@ Add native [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTM
 
 <FrameworkCase frameworks={["react"]}>
 `Video` forwards native attributes, event handlers, and children to the underlying `<video>`. Its `ref` resolves to the `HTMLVideoElement`, and so does `mediaRef`. Adapter-backed components such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> and <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+
+Handle media events with React's media event props, such as `onPlay`, `onPause`, and `onEnded`. See <DocsLink slug="guides/media-events">Respond to media events</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>

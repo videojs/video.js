@@ -1,0 +1,109 @@
+---
+title: 'Respond to media events'
+description: 'Run your own code when playback starts, pauses, or ends, such as sending events to an analytics service.'
+---
+
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+Run your own code when the media plays, pauses, or ends by putting media event props such as `onPlay`, `onPause`, and `onEnded` on the media component.
+
+## Recommended approach
+
+Pass handlers to `Video` or your chosen media component. This example sends play, pause, and ended events to an analytics function:
+
+```tsx title="App.tsx"
+import type { SyntheticEvent } from 'react';
+import { Container } from '@videojs/react';
+import { Video, VideoPlayer } from '@videojs/react/video';
+
+function track(name: string, event: SyntheticEvent<HTMLVideoElement>) {
+  analytics.send(name, { position: event.currentTarget.currentTime });
+}
+
+export default function App() {
+  return (
+    <VideoPlayer>
+      <Container>
+        <Video
+          src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4"
+          playsInline
+          onPlay={(event) => track('video_play', event)} // [!code focus]
+          onPause={(event) => track('video_pause', event)} // [!code focus]
+          onEnded={(event) => track('video_complete', event)} // [!code focus]
+        />
+      </Container>
+    </VideoPlayer>
+  );
+}
+```
+
+Replace `analytics.send` with your analytics client.
+
+## How it works
+
+Media events fire on the media component, not on the player. Put the props on `Video`, `Audio`, or another media component, not on `VideoPlayer` or a skin.
+
+Components that render a `<video>` or `<audio>`, such as `Video`, <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, and <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, pass these props to the element as React's own media event props. Handlers receive React's synthetic event, and `event.currentTarget` is the media element.
+
+Embeds such as <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> and <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> render an `<iframe>`, where React does not wire media events. They accept the same prop names and route them to their playback adapter. Handlers receive the plain `Event` the adapter dispatched, and `event.currentTarget` is the adapter, which exposes `currentTime`, `duration`, and `paused` the way a video element does. The `MediaEventProps` type from `@videojs/react` describes these props.
+
+The Events section of each media component's reference lists the event props it handles.
+
+## Availability and constraints
+
+- An embed fires only the events its provider's player API reports. Check the component's reference before relying on a less common event such as `onStalled`.
+- `onPlay` fires when playback is requested. `onPlaying` fires when playback actually starts or resumes after buffering, so use it when you measure the time to the first frame.
+- On a native video with `loop`, `onEnded` does not fire, because the media restarts instead of ending.
+- `onTimeUpdate` fires several times per second. Throttle work you do in it, and read the current time from player state when you only need to render it.
+
+## Common variations
+
+### Play one video at a time
+
+Pause the media that was playing when another one starts:
+
+```tsx
+import type { SyntheticEvent } from 'react';
+
+let playing: HTMLMediaElement | null = null;
+
+function pauseOthers(event: SyntheticEvent<HTMLVideoElement>) {
+  if (playing && playing !== event.currentTarget) playing.pause();
+  playing = event.currentTarget;
+}
+
+<Video src={first} onPlay={pauseOthers} />
+<Video src={second} onPlay={pauseOthers} />
+```
+
+### Render player state instead of handling events
+
+To show a value such as the current time or whether the media is paused, read it from player state with <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> instead of copying it from event handlers into React state:
+
+```tsx
+import { usePlayer } from '@videojs/react/video';
+
+function PlaybackStatus() {
+  const paused = usePlayer((state) => state.paused);
+  return <span>{paused ? 'Paused' : 'Playing'}</span>;
+}
+```
+
+### Listen for an event without a React prop
+
+For a media event that has no React prop, add a listener to the media from `mediaRef`. On an embed, that is the playback adapter, which dispatches the events.
+
+## Related components
+
+- <DocsLink slug="reference/components/video">Video</DocsLink>
+- <DocsLink slug="reference/components/audio">Audio</DocsLink>
+- <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink>
+
+## Related API
+
+- <DocsLink slug="reference/api/use-player">usePlayer</DocsLink>
+
+## Related guides
+
+- <DocsLink slug="guides/playback-errors">Handle playback errors</DocsLink>
+- <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>

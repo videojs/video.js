@@ -125,6 +125,11 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Playback errors',
           },
           {
+            slug: 'guides/media-events',
+            sidebarLabel: 'Media events',
+            frameworks: ['react'],
+          },
+          {
             slug: 'guides/user-preferences',
             sidebarLabel: 'User preferences',
           },

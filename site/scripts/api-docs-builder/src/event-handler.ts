@@ -1,4 +1,4 @@
-import type { OxcProject } from './oxc-project.js';
+import type { OxcProject, SourceFile } from './oxc-project.js';
 import { parseJSDoc, sourceText, staticName, walkAst } from './oxc-project.js';
 
 /** Collect event descriptions declared with `@fires event-name - Description`. */
@@ -31,8 +31,14 @@ export function collectDispatchedEvents(files: readonly string[], project: OxcPr
     const file = project.source(filePath);
     if (!file) continue;
 
+    const helpers = collectDispatchHelpers(file);
+
     walkAst(file.program, (node) => {
-      if (node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === 'emit') {
+      if (
+        node.type === 'CallExpression' &&
+        node.callee.type === 'Identifier' &&
+        (node.callee.name === 'emit' || helpers.has(node.callee.name))
+      ) {
         const argument = node.arguments[0];
         const eventName = argument?.type === 'Literal' ? staticName(argument) : undefined;
 
@@ -81,4 +87,30 @@ export function collectDispatchedEvents(files: readonly string[], project: OxcPr
   }
 
   return events;
+}
+
+/** Local helpers that dispatch the event their first parameter names, such as `const on = (type) => … new Event(type)`. */
+function collectDispatchHelpers(file: SourceFile): Set<string> {
+  const helpers = new Set<string>();
+
+  walkAst(file.program, (node) => {
+    if (node.type !== 'VariableDeclarator') return;
+
+    if (node.init?.type !== 'ArrowFunctionExpression' && node.init?.type !== 'FunctionExpression') return;
+
+    const name = staticName(node.id);
+    const parameter = node.init.params[0];
+    const parameterName = parameter?.type === 'Identifier' ? parameter.name : undefined;
+
+    if (
+      name &&
+      parameterName &&
+      node.init.body &&
+      sourceText(file, node.init.body).includes(`Event(${parameterName})`)
+    ) {
+      helpers.add(name);
+    }
+  });
+
+  return helpers;
 }

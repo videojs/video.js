@@ -2047,6 +2047,12 @@ describe('Media component pipeline (end-to-end)', () => {
       expect(react!.props.engine).toBeUndefined();
     });
 
+    it('lists every media event prop React wires to the native element', () => {
+      const react = findElement('ComplexVideo')!.reference.platforms.react;
+
+      expect(react!.eventProps).toEqual(['onEnded', 'onLoadedMetadata', 'onPause', 'onPlay', 'onWaiting']);
+    });
+
     it('records a DOM global mediaRef type without an import module', () => {
       const react = findElement('ComplexVideo')!.reference.platforms.react;
 
@@ -2085,7 +2091,7 @@ describe('Media component pipeline (end-to-end)', () => {
     it('documents only events dispatched by the embedded media adapter', () => {
       const events = findElement('EmbedVideo')!.reference.platforms.html.events;
 
-      expect(events.standard).toEqual(['play', 'waiting', 'loadedmetadata']);
+      expect(events.standard).toEqual(['play', 'waiting', 'pause', 'loadedmetadata']);
       expect(events.custom).toEqual([{ name: 'adapterready' }]);
     });
 
@@ -2094,6 +2100,12 @@ describe('Media component pipeline (end-to-end)', () => {
 
       expect(react).toMatchObject({ target: 'iframe', acceptsNativeProps: false });
       expect(Object.keys(react!.props).sort()).toEqual(['autoplay', 'source', 'src']);
+    });
+
+    it('lists only the routed media event props whose events the adapter dispatches', () => {
+      const react = findElement('EmbedVideo')!.reference.platforms.react;
+
+      expect(react!.eventProps).toEqual(['onLoadedMetadata', 'onPause', 'onPlay', 'onWaiting']);
     });
 
     it('records the mediaRef type and the module it is imported from', () => {

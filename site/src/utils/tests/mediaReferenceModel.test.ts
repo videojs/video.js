@@ -39,6 +39,7 @@ function makeRef(overrides: Partial<MediaReference> = {}): MediaReference {
           src: { type: 'string', readonly: false },
           streamType: { type: 'string', readonly: false },
         },
+        eventProps: ['onPause', 'onPlay'],
       },
     },
     ...overrides,
@@ -162,10 +163,11 @@ describe('createMediaReferenceModel', () => {
     expect(model.platforms.html.sections.some((section) => section.key === 'properties')).toBe(true);
   });
 
-  it('omits React events when the component does not accept native media props', () => {
+  it('omits React events when the component handles no media event props', () => {
     const ref = makeRef();
 
     ref.platforms.react!.acceptsNativeProps = false;
+    ref.platforms.react!.eventProps = [];
     const model = createMediaReferenceModel('HlsJsVideo', ref)!;
 
     expect(model.platforms.react!.sections.some((section) => section.key === 'events')).toBe(false);
