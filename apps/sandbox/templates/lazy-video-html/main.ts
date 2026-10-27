@@ -364,8 +364,14 @@ root.addEventListener('click', (event) => {
   sourceChangedAt = scriptBytes;
   renderScriptBytes();
 
-  // Outside light mode the same `<lazy-video>` swaps its media in place.
+  // Outside light mode the same `<lazy-video>` swaps its media in place, so the player's poster has to follow it.
   if (lazyVideo && !light) {
+    const player = lazyVideo.closest('video-player')!;
+    const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === next)?.poster;
+
+    if (poster) player.setAttribute('poster', poster);
+    else player.removeAttribute('poster');
+
     lazyVideo.setAttribute('src', next);
     return;
   }
