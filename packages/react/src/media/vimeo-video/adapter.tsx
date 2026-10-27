@@ -1,6 +1,6 @@
 'use client';
 
-import { buildVimeoIframeSrc, VimeoAdapter, type VimeoAdapterProps } from '@videojs/vimeo-video';
+import { buildVimeoIframeSrc, shouldDeferVimeoEmbed, VimeoAdapter, type VimeoAdapterProps } from '@videojs/vimeo-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -24,13 +24,16 @@ export const VimeoVideo = forwardRef<HTMLIFrameElement, VimeoVideoProps>(functio
   const media = useMediaInstance(VimeoAdapter);
   const props: Partial<VimeoAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildVimeoIframeSrc(props.src || props.source?.src || '', {
-      ...VimeoAdapter.defaultProps,
-      ...props,
-      // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferVimeoEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildVimeoIframeSrc(props.src || props.source?.src || '', {
+          ...VimeoAdapter.defaultProps,
+          ...props,
+          // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<VimeoAdapterProps, Record<string, unknown>>(media, props, VimeoAdapter.defaultProps),

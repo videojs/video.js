@@ -30,6 +30,12 @@ describe('VimeoVideo', () => {
     );
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    const { container } = render(<VimeoVideo src="https://vimeo.com/1181503036" preload="none" />);
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
+
   it('renders without a source and builds the embed when one arrives', async () => {
     // The iframe has no embed to point the player at until a source resolves.
     const { container, rerender } = render(<VimeoVideo />);

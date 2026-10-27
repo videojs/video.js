@@ -204,6 +204,73 @@ describe('buildVimeoIframeSrc', () => {
   });
 });
 
+describe('VimeoAdapter preload', () => {
+  it('builds no embed and creates no player under preload="none"', async () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = '76979871';
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(media.engine).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once it loads', async () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = '76979871';
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = media.engine as unknown as MockPlayerLike;
+
+    // Playing overrides `preload`, so the embed it builds loads at once.
+    expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/76979871');
+    expect(iframe.getAttribute('src')).toContain('preload=auto');
+    expect(player.play).not.toHaveBeenCalled();
+
+    player.emit('loaded');
+    await pending;
+
+    expect(player.play).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = '76979871';
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain('preload=metadata');
+    expect(media.engine).not.toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = '76979871';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    expect(media.engine).not.toBe(null);
+    media.detach();
+  });
+});
+
 describe('VimeoAdapter', () => {
   it('has expected default state before attach', () => {
     const media = new VimeoAdapter();

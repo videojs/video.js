@@ -54,4 +54,22 @@ describe('VimeoVideo', () => {
     expect(new URL(iframe!.src).searchParams.has('controls')).toBe(false);
     expect(element.engine).toBeTruthy();
   });
+
+  it('builds no embed under preload="none" set after src in the same task, as lazy-video sets it', async () => {
+    const tag = defineVimeoVideo();
+    const element = document.createElement(tag) as HTMLElement & { engine: unknown };
+
+    element.setAttribute('src', 'https://vimeo.com/1181503036');
+    element.setAttribute('preload', 'none');
+    await flushDeferredEmbed();
+
+    expect(iframeSrc(element)).toBe('');
+    expect(element.engine).toBe(null);
+  });
+
+  it('renders an empty frame from markup with preload="none"', () => {
+    expect(VimeoVideo.getTemplateHTML({ src: 'https://vimeo.com/1181503036', preload: 'none' })).not.toMatch(
+      /<iframe[^>]*\ssrc=/
+    );
+  });
 });
