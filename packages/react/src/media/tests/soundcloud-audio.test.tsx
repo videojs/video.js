@@ -73,6 +73,19 @@ describe('SoundCloudAudio', () => {
     expect(iframe.style.display).toBe('none');
   });
 
+  it('renders an empty frame under preload="none" and loads the widget on play()', async () => {
+    const { container, media } = renderWithMedia(<SoundCloudAudio src={TRACK} preload="none" />);
+    const iframe = container.querySelector('iframe')!;
+
+    await flushDeferredWidget();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+
+    await media.play();
+
+    expect(iframe.getAttribute('src')).toBe(buildSoundCloudIframeSrc(TRACK));
+  });
+
   it('renders without a source and builds the widget when one arrives', async () => {
     const { container, rerender } = render(<SoundCloudAudio />);
     const iframe = container.querySelector('iframe')!;
