@@ -520,6 +520,37 @@ describe('CloudflareAdapter', () => {
     media.detach();
   });
 
+  it('plays an embed that is not preloading without waiting for metadata', async () => {
+    const media = new CloudflareAdapter();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(createIframe());
+
+    // The embed reports no metadata until it plays, so play() must reach it first.
+    const player = await waitForEngine(media);
+
+    await media.play();
+    expect(player.play).toHaveBeenCalledTimes(1);
+    expect(media.readyState).toBe(0);
+    media.detach();
+  });
+
+  it('plays a swapped video that is not preloading without waiting for metadata', async () => {
+    const media = new CloudflareAdapter();
+
+    media.preload = 'none';
+    const { player } = await attachAndLoad(media);
+
+    media.src = OTHER_VIDEO_ID;
+    await Promise.resolve();
+    await media.play();
+
+    expect(player.src).toBe(OTHER_VIDEO_ID);
+    expect(player.play).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
   it('emits loadstart on attach and loadedmetadata/loadcomplete after metadata', async () => {
     const media = new CloudflareAdapter();
     const events: string[] = [];
