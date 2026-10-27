@@ -1,7 +1,12 @@
 'use client';
 
-import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
-import { type CSSProperties, forwardRef, type ReactNode, useEffect, useState } from 'react';
+import {
+  buildTikTokIframeSrc,
+  shouldDeferTikTokEmbed,
+  TikTokAdapter,
+  type TikTokAdapterProps,
+} from '@videojs/tiktok-video';
+import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -24,15 +29,18 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
   const media = useMediaInstance(TikTokAdapter);
   const props: Partial<TikTokAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildTikTokIframeSrc(props.src || props.source?.src || '', {
-      ...TikTokAdapter.defaultProps,
-      ...props,
-      // The frame reads mute once, out of the URL it is rendered with, and either
-      // prop says to start muted. Rendering it any other way than the media
-      // builds it would have the media rebuild the frame on mount.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferTikTokEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name a video, so honor it when `src` is absent.
+        buildTikTokIframeSrc(props.src || props.source?.src || '', {
+          ...TikTokAdapter.defaultProps,
+          ...props,
+          // The frame reads mute once, out of the URL it is rendered with, and either
+          // prop says to start muted. Rendering it any other way than the media
+          // builds it would have the media rebuild the frame on mount.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<TikTokAdapterProps, Record<string, unknown>>(media, props, TikTokAdapter.defaultProps),
@@ -43,19 +51,6 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
   const composedRef = useComposedRefs(eventsRef, attachRef, exposeRef, ref);
-  const [started, setStarted] = useState(false);
-  const dormant = props.preload === 'none' && !started;
-
-  // A new embed comes back dormant, so it is clickable again until it plays.
-  useEffect(() => {
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    media.addEventListener('play', () => setStarted(true), { signal });
-    media.addEventListener('emptied', () => setStarted(false), { signal });
-
-    return () => controller.abort();
-  }, [media]);
 
   return (
     <iframe
@@ -72,10 +67,8 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
       referrerPolicy={props.source?.engine?.tiktok?.referrerPolicy}
       {...iframeProps}
       // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
-      // skin above it sees hover and clicks. `preload="none"` leaves TikTok's player dormant, and then the frame's own
-      // controls are the only thing that can start it; once it has played, the player answers commands and the skin
-      // takes over again. Merged so a consumer's own styles survive without undoing it.
-      style={props.controls || dormant ? style : { ...style, pointerEvents: 'none' }}
+      // skin above it sees hover and clicks. Merged so a consumer's own styles survive without undoing it.
+      style={props.controls ? style : { ...style, pointerEvents: 'none' }}
       ref={composedRef}
     >
       {children}

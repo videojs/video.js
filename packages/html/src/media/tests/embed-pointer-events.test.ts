@@ -6,7 +6,7 @@ import { TwitchVideo } from '../twitch-video/adapter';
 import { VimeoVideo } from '../vimeo-video/adapter';
 import { YouTubeVideo } from '../youtube-video/adapter';
 
-// PlayerJS asserts its rule beside its other template tests; TikTok's dormant exception is covered in its own.
+// PlayerJS asserts its rule beside its other template tests.
 describe.each([
   ['YouTubeVideo', YouTubeVideo],
   ['VimeoVideo', VimeoVideo],
