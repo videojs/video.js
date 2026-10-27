@@ -17,15 +17,17 @@ import { useSyncProps } from '../../utils/use-sync-props';
 
 export interface PlayerJsVideoProps
   extends Partial<PlayerJsAdapterProps>, MediaEventProps<PlayerJsAdapter>, MediaRefProps<PlayerJsAdapter> {
+  /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
+  autoPlay?: boolean | undefined;
   children?: ReactNode;
 }
 
 export const PlayerJsVideo = forwardRef<HTMLIFrameElement, PlayerJsVideoProps>(function PlayerJsVideo(
-  { children, mediaRef, ...rawProps },
+  { children, mediaRef, autoPlay = false, autoplay = autoPlay, ...rawProps },
   ref
 ) {
   const media = useMediaInstance(PlayerJsAdapter);
-  const props: Partial<PlayerJsAdapterProps> & Record<string, unknown> = { ...rawProps };
+  const props: Partial<PlayerJsAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // A deferred embed renders an empty frame; the media builds it when playback is requested.
     shouldDeferPlayerJsEmbed(props)
