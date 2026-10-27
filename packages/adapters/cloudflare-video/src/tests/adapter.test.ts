@@ -386,6 +386,35 @@ describe('CloudflareAdapter preload', () => {
     await waitForEngine(media);
     media.detach();
   });
+
+  it('builds the embed at once when controls are shown', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    // Cloudflare's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(VIDEO_ID);
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain(VIDEO_ID);
+    await waitForEngine(media);
+    media.detach();
+  });
 });
 
 describe('CloudflareAdapter', () => {
