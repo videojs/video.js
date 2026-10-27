@@ -72,6 +72,16 @@ describe('createLazyVideoElement', () => {
     expect(error).toHaveBeenCalledWith(expect.stringContaining('No media plays'));
   });
 
+  // Asserted against the shadow styles because no DOM implementation the tests run in resolves `::slotted` for a
+  // computed style.
+  it('clears the minimum size an embed host sets, so a portrait floor cannot overflow the player', () => {
+    const element = document.createElement(define([video]));
+
+    expect(element.shadowRoot!.querySelector('style')!.textContent).toMatch(
+      /::slotted\(\[data-cross-origin-frame\]\)\s*\{\s*min-width:\s*0;\s*min-height:\s*0;/
+    );
+  });
+
   it('reflects preferPlayback, and leaves it unset by default', () => {
     const element = document.createElement(define([video])) as HTMLElement & {
       preferPlayback: 'native' | 'mse' | undefined;
