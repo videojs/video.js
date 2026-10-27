@@ -15,7 +15,7 @@ import {
   type SpotifyPlaybackState,
 } from './iframe-api';
 import type { SpotifyAdapterProps } from './props';
-import { buildSpotifyIframeSrc, parseSpotifySource, type SpotifySource } from './source';
+import { buildSpotifyIframeSrc, parseSpotifySource, shouldDeferSpotifyEmbed, type SpotifySource } from './source';
 
 /**
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
@@ -42,6 +42,8 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   // Controller creation is in flight; the API load makes it span more than a tick.
   #creatingController = false;
   #loadComplete = createPublicPromise<void>();
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
   // Guards async controller creation across attach/detach cycles.
   #attachId = 0;
 
@@ -110,6 +112,7 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#controllerReady = false;
     this.#pendingLoad = false;
     this.#creatingController = false;
+    this.#activated = false;
     this.#target = null;
     // Unblock callers awaiting load; they re-check `#controller` (now null) and no-op.
     this.#loadComplete.resolve();
@@ -231,6 +234,12 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   async play() {
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
+
     await this.#loadComplete;
 
     // The embed still holds the paused entity, so playing it would resume a cleared source.
@@ -274,7 +283,11 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get loop() {
@@ -303,7 +316,11 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -364,6 +381,13 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
     // The `src` property resolves an empty attribute to the document URL; only the attribute spots a placeholder.
     if (!target.getAttribute('src')) {
+      // A dormant embed is built by `play()`; until then no controller is coming to settle this load, and the iframe
+      // API stays unloaded with it.
+      if (this.#isDormant()) {
+        this.#loadComplete.resolve();
+        return false;
+      }
+
       const initialSrc = buildSpotifyIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no controller is coming to settle this load.
@@ -420,6 +444,24 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#controller = controller;
     this.#creatingController = false;
     this.#bindControllerEvents(controller, attachId);
+  }
+
+  #isDormant() {
+    return !this.#activated && shouldDeferSpotifyEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+
+    if (!target || this.#isDormant() || this.#controller || this.#creatingController || target.getAttribute('src')) {
+      return;
+    }
+
+    // The embed is built from the current source, so a load requested while dormant has nothing left to replay.
+    this.#pendingLoad = false;
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   // Whether a callback belongs to a superseded attach; `destroy()` does not stop callbacks already scheduled.
