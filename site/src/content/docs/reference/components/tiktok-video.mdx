@@ -53,7 +53,7 @@ TikTok always draws part of its own chrome: the center play button, author heade
 
 TikTok builds its player lazily: until something starts playback, the embed has no video element, reports a duration of 0, and silently drops commands. The element works around this by starting a muted autoplay and pausing it immediately, so the embed answers play, pause, and seek before the first play.
 
-Two settings opt out. `preload="none"` skips the warm-up, leaving the network untouched until the viewer presses play, and the controls inert until then. `controls` hands playback to TikTok's own chrome instead.
+`preload` doesn't change this, not even `preload="none"`: without the warm-up, only a click inside the embed could start it, and a poster or player skin drawn over the embed takes that click. `controls` opts out by handing playback to TikTok's own chrome.
 
 ## Behavior
 

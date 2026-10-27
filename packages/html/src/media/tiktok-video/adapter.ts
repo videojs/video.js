@@ -1,19 +1,12 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import {
-  buildTikTokIframeSrc,
-  shouldDeferTikTokEmbed,
-  TikTokAdapter,
-  type TikTokAdapterProps,
-} from '@videojs/tiktok-video';
+import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const props = templateAttrsToEmbedProps(attrs);
-    // A deferred embed renders an empty frame; the media builds it when playback is requested.
-    const initialSrc = shouldDeferTikTokEmbed(props) ? '' : buildTikTokIframeSrc(attrs.src ?? '', props);
+    const initialSrc = buildTikTokIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
@@ -55,15 +48,13 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
   };
 }
 
-// Only the props the embed URL is built from, so a URL matching the host's spares it rebuilding the frame on mount.
-// `preload` is not a TikTok parameter, but it decides whether there is a URL at all.
+// Only the props the embed URL is built from; a URL differing from the host's would have it rebuild the frame on mount.
 function templateAttrsToEmbedProps(attrs: Record<string, string>): Partial<TikTokAdapterProps> {
   return {
     autoplay: attrs.autoplay !== undefined,
     defaultMuted: attrs.muted !== undefined,
     loop: attrs.loop !== undefined,
     controls: attrs.controls !== undefined,
-    preload: attrs.preload as TikTokAdapterProps['preload'],
   };
 }
 

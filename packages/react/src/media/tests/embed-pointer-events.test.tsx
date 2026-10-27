@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import type { ComponentType, CSSProperties } from 'react';
+import { type ComponentType, type CSSProperties } from 'react';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { CloudflareVideo } from '../cloudflare-video';
@@ -9,7 +9,7 @@ import { TwitchVideo } from '../twitch-video';
 import { VimeoVideo } from '../vimeo-video';
 import { YouTubeVideo } from '../youtube-video';
 
-type EmbedProps = { controls?: boolean; preload?: 'none' | 'metadata' | 'auto'; style?: CSSProperties };
+type EmbedProps = { controls?: boolean; style?: CSSProperties };
 
 function iframeOf(container: HTMLElement): HTMLIFrameElement {
   return container.querySelector('iframe')!;
@@ -52,15 +52,5 @@ describe.each([
     rerender(<Embed controls style={{ borderRadius: 8 }} />);
     expect(iframe.style.borderRadius).toBe('8px');
     expect(iframe.style.pointerEvents).toBe('');
-  });
-});
-
-describe('TikTokVideo', () => {
-  it('keeps a preload="none" frame out of hit-testing like any other', () => {
-    // The frame is empty until `play()` builds the embed, so it has nothing to click, and the embed `play()` builds
-    // already answers the skin's commands.
-    const { container } = render(<TikTokVideo preload="none" />);
-
-    expect(iframeOf(container).style.pointerEvents).toBe('none');
   });
 });
