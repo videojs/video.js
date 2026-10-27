@@ -383,6 +383,68 @@ describe('buildPlayerJsIframeSrc', () => {
   });
 });
 
+describe('PlayerJsAdapter preload', () => {
+  it('builds no embed under preload="none"', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = MUX_SRC;
+    await flush();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once it reports ready', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = `${MUX_SRC}?playerjs`;
+    media.attach(iframe);
+    await media.play();
+
+    // Playing overrides `preload`, so the embed it builds loads at once.
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?preload=auto`);
+
+    // Watched once built: pointing the frame at the embed gives it a new window.
+    const commands = watchCommands(iframe);
+
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    expect(commands.named('play')).toHaveLength(1);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?preload=metadata`);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = MUX_SRC;
+    media.attach(iframe);
+
+    expect(queryOf(iframe.getAttribute('src')!)).toContain('autoplay=true');
+    media.detach();
+  });
+});
+
 describe('PlayerJsAdapter', () => {
   it('has default props', () => {
     expect(PlayerJsAdapter.defaultProps).toEqual({

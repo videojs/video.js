@@ -51,6 +51,14 @@ describe('PlayerJsVideo', () => {
     expect(iframe.getAttribute('referrerpolicy')).toBe('no-referrer');
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', async () => {
+    const { container } = render(<PlayerJsVideo src={SRC} preload="none" />);
+
+    await flushDeferredEmbed();
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
+
   it('renders without a source and builds the embed when one arrives', async () => {
     const { container, rerender } = render(<PlayerJsVideo />);
     const iframe = container.querySelector('iframe')!;

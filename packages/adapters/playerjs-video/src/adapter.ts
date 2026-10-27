@@ -30,7 +30,7 @@ import {
   SPEC_METHODS,
 } from './player-api';
 import type { PlayerJsAdapterProps } from './props';
-import { buildPlayerJsIframeSrc, type PlayerJsSource } from './source';
+import { buildPlayerJsIframeSrc, type PlayerJsSource, shouldDeferPlayerJsEmbed } from './source';
 
 /**
  * Plays any embed that implements the player.js receiver — Mux Player, Gumlet, FrameRate, Livid, Bunny Stream,
@@ -65,6 +65,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #listeners: AbortController | null = null;
   // Guards messages across attach/detach cycles.
   #attachId = 0;
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
 
   #src = PlayerJsAdapter.defaultProps.src;
   #autoplay = PlayerJsAdapter.defaultProps.autoplay;
@@ -133,6 +135,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#listeners?.abort();
     this.#listeners = null;
     this.#target = null;
+    this.#activated = false;
     // Left set, the next frame to report ready would start playing on its own.
     this.#playRequested = false;
     // Unblock callers awaiting load; they re-check `#target` (now null) and no-op.
@@ -195,6 +198,12 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     const target = this.#target;
     // Detached while waiting; `detach()` already settled this load.
     if (!target) return;
+
+    // A dormant embed is built by `play()`; until then no `ready` is coming to settle this load.
+    if (!target.getAttribute('src') && this.#isDormant()) {
+      load.resolve();
+      return;
+    }
 
     const embedSrc = buildPlayerJsIframeSrc(this.#src, this.#snapshotProps());
     const currentSrc = target.getAttribute('src');
@@ -263,6 +272,12 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
   async play() {
     if (!this.#src) return;
+
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
 
     if (!this.#ready) {
       this.#playRequested = true;
@@ -342,8 +357,12 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     // Written to the URL for the services the host knows, and played over the protocol on ready for every service.
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -385,7 +404,11 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -465,6 +488,12 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #createPlayer(target: HTMLIFrameElement) {
     // The `src` property resolves an empty attribute to the document URL; only the attribute tells embed from empty.
     if (!target.getAttribute('src')) {
+      // A dormant embed is built by `play()`; until then no `ready` is coming to settle this load.
+      if (this.#isDormant()) {
+        this.#loadComplete.resolve();
+        return;
+      }
+
       this.#loadEmbed(target, buildPlayerJsIframeSrc(this.#src, this.#snapshotProps()));
       return;
     }
@@ -474,6 +503,20 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.dispatchEvent(new Event('loadstart'));
     // The frame may have reported `ready` before anything listened; asking has a ready receiver repeat it.
     this.#requestReady();
+  }
+
+  #isDormant() {
+    return !this.#activated && shouldDeferPlayerJsEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more. The frame's `src`
+  // attribute is the embed: there is no player object, and a load in flight bails once this one takes over.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || target.getAttribute('src')) return;
+
+    this.#beginLoad();
+    this.#createPlayer(target);
   }
 
   // Listen for what the embed reports; messages arrive on `window`, so each is matched against this host's frame.
@@ -839,7 +882,8 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
-      preload: this.#preload,
+      // Playing overrides `preload`, so an embed built for it must not wait to load.
+      preload: this.#activated ? 'auto' : this.#preload,
       source: this.#source,
     };
   }

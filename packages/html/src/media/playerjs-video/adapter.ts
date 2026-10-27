@@ -1,12 +1,19 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import { buildPlayerJsIframeSrc, PlayerJsAdapter, type PlayerJsAdapterProps } from '@videojs/playerjs-video';
+import {
+  buildPlayerJsIframeSrc,
+  PlayerJsAdapter,
+  type PlayerJsAdapterProps,
+  shouldDeferPlayerJsEmbed,
+} from '@videojs/playerjs-video';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class PlayerJsCustomMediaElement extends CustomMediaElement('iframe', PlayerJsAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const initialSrc = buildPlayerJsIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
+    const props = templateAttrsToEmbedProps(attrs);
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    const initialSrc = shouldDeferPlayerJsEmbed(props) ? '' : buildPlayerJsIframeSrc(attrs.src ?? '', props);
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `

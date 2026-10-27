@@ -1,6 +1,11 @@
 'use client';
 
-import { buildPlayerJsIframeSrc, PlayerJsAdapter, type PlayerJsAdapterProps } from '@videojs/playerjs-video';
+import {
+  buildPlayerJsIframeSrc,
+  PlayerJsAdapter,
+  type PlayerJsAdapterProps,
+  shouldDeferPlayerJsEmbed,
+} from '@videojs/playerjs-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -22,14 +27,17 @@ export const PlayerJsVideo = forwardRef<HTMLIFrameElement, PlayerJsVideoProps>(f
   const media = useMediaInstance(PlayerJsAdapter);
   const props: Partial<PlayerJsAdapterProps> & Record<string, unknown> = { ...rawProps };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name an embed, so honor it when `src` is absent.
-    buildPlayerJsIframeSrc(props.src || props.source?.src || '', {
-      ...PlayerJsAdapter.defaultProps,
-      ...props,
-      // Either prop says to start muted, and the adapter builds the URL the same way; rendering it any other way
-      // would have the adapter rebuild the frame on mount.
-      defaultMuted: !!(props.defaultMuted || props.muted),
-    })
+    // A deferred embed renders an empty frame; the media builds it when playback is requested.
+    shouldDeferPlayerJsEmbed(props)
+      ? ''
+      : // `source.src` is the only other way to name an embed, so honor it when `src` is absent.
+        buildPlayerJsIframeSrc(props.src || props.source?.src || '', {
+          ...PlayerJsAdapter.defaultProps,
+          ...props,
+          // Either prop says to start muted, and the adapter builds the URL the same way; rendering it any other way
+          // would have the adapter rebuild the frame on mount.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<PlayerJsAdapterProps, Record<string, unknown>>(media, props, PlayerJsAdapter.defaultProps),
