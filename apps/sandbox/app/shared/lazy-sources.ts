@@ -119,6 +119,29 @@ export function getEmbedPayload(src: string): EmbedPayload | undefined {
   return source && payload ? { label: source.label, scripts: payload.scripts, total: payload.total } : undefined;
 }
 
+/**
+ * Calls `onChange` with whether an embed has started downloading from its service, and again whenever that changes. An
+ * embed that waits for play under `preload="none"` renders its frame with no `src` until then. Without a frame, such as
+ * Wistia's player element, the embed downloads as soon as it renders.
+ */
+export function observeEmbedFetching(
+  frame: HTMLIFrameElement | null,
+  onChange: (fetching: boolean) => void
+): () => void {
+  if (!frame) {
+    onChange(true);
+    return () => {};
+  }
+
+  const report = () => onChange(!!frame.getAttribute('src'));
+  const observer = new MutationObserver(report);
+
+  observer.observe(frame, { attributes: true, attributeFilter: ['src'] });
+  report();
+
+  return () => observer.disconnect();
+}
+
 /** Whether `?light` is in the page URL. */
 export function getUrlLight(): boolean {
   return new URLSearchParams(location.search).has('light');
