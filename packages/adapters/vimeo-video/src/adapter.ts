@@ -391,7 +391,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -536,7 +540,10 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 
   #isDormant() {
-    return !this.#activated && shouldDeferVimeoEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+    return (
+      !this.#activated &&
+      shouldDeferVimeoEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
   }
 
   // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
@@ -750,13 +757,15 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
 /**
  * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from Vimeo, so
- * the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now, so it builds the
- * embed regardless.
+ * the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now, and `controls`
+ * makes Vimeo's own play button the way to ask, so either builds the embed regardless.
  *
  * @internal
  */
-export function shouldDeferVimeoEmbed(props: Partial<Pick<VimeoAdapterProps, 'preload' | 'autoplay'>> = {}) {
-  return props.preload === 'none' && !props.autoplay;
+export function shouldDeferVimeoEmbed(
+  props: Partial<Pick<VimeoAdapterProps, 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  return props.preload === 'none' && !props.autoplay && !props.controls;
 }
 
 /**

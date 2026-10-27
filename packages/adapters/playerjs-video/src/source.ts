@@ -58,12 +58,14 @@ export function parsePlayerJsSource(src: string): URL | null {
 /**
  * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from the
  * embed's host, so the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now,
- * so it builds the embed regardless.
+ * and `controls` makes the embed's own play button the way to ask, so either builds the embed regardless.
  *
  * @internal
  */
-export function shouldDeferPlayerJsEmbed(props: Partial<Pick<PlayerJsAdapterProps, 'preload' | 'autoplay'>> = {}) {
-  return props.preload === 'none' && !props.autoplay;
+export function shouldDeferPlayerJsEmbed(
+  props: Partial<Pick<PlayerJsAdapterProps, 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  return props.preload === 'none' && !props.autoplay && !props.controls;
 }
 
 /**

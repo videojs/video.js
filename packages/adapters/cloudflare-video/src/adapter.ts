@@ -363,10 +363,14 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
     this.#afterLoad((p) => {
       p.controls = value;
     });
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -559,7 +563,10 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
 
   #isDormant() {
-    return !this.#activated && shouldDeferCloudflareEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+    return (
+      !this.#activated &&
+      shouldDeferCloudflareEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
   }
 
   // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.

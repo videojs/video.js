@@ -17,4 +17,14 @@ describe('YouTubeVideo', () => {
 
     expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
   });
+
+  it('renders the embed under preload="none" when controls are shown', () => {
+    const { container } = render(
+      <YouTubeVideo src="https://www.youtube.com/watch?v=aqz-KE-bpKQ" preload="none" controls />
+    );
+
+    expect(container.querySelector('iframe')!.getAttribute('src')).toContain(
+      'https://www.youtube.com/embed/aqz-KE-bpKQ'
+    );
+  });
 });

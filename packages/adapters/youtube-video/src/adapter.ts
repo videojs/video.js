@@ -399,7 +399,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -563,7 +567,10 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   #isDormant() {
-    return !this.#activated && shouldDeferYouTubeEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+    return (
+      !this.#activated &&
+      shouldDeferYouTubeEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
   }
 
   // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.

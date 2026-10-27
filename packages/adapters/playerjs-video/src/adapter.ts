@@ -390,7 +390,11 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   set controls(value) {
     // player.js has no say over an embed's chrome. For the services the host knows, the URL hides as much of it as
     // the service allows; for every service, `controls` decides whether the frame takes pointer input.
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -506,7 +510,10 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
 
   #isDormant() {
-    return !this.#activated && shouldDeferPlayerJsEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+    return (
+      !this.#activated &&
+      shouldDeferPlayerJsEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
   }
 
   // Build an embed that was held back by `preload="none"`, once nothing holds it back any more. The frame's `src`

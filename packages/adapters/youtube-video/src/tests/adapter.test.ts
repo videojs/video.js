@@ -1176,6 +1176,35 @@ describe('YouTubeAdapter preload', () => {
     await waitForEngine(media);
     media.detach();
   });
+
+  it('builds the embed at once when controls are shown', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    // YouTube's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    await waitForEngine(media);
+    media.detach();
+  });
 });
 
 describe('YouTubeAdapter source', () => {

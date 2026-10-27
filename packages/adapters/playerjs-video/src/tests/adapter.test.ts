@@ -443,6 +443,33 @@ describe('PlayerJsAdapter preload', () => {
     expect(queryOf(iframe.getAttribute('src')!)).toContain('autoplay=true');
     media.detach();
   });
+
+  it('builds the embed at once when controls are shown', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    // The embed's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = MUX_SRC;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(MUX_SRC);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain(MUX_SRC);
+    media.detach();
+  });
 });
 
 describe('PlayerJsAdapter', () => {

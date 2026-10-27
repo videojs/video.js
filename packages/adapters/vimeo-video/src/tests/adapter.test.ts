@@ -269,6 +269,35 @@ describe('VimeoAdapter preload', () => {
     expect(media.engine).not.toBe(null);
     media.detach();
   });
+
+  it('builds the embed at once when controls are shown', () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    // Vimeo's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = '76979871';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/76979871');
+    expect(media.engine).not.toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = '76979871';
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/76979871');
+    expect(media.engine).not.toBe(null);
+    media.detach();
+  });
 });
 
 describe('VimeoAdapter', () => {
