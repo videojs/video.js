@@ -28,7 +28,7 @@ import {
   type TwitchPlayerState,
 } from './player-api';
 import type { TwitchAdapterProps } from './props';
-import { buildTwitchIframeSrc, parseTwitchSource, type TwitchSource } from './source';
+import { buildTwitchIframeSrc, parseTwitchSource, shouldDeferTwitchEmbed, type TwitchSource } from './source';
 
 /**
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
@@ -62,6 +62,8 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #attachId = 0;
   // The embed URL currently in the iframe, or `''` when the iframe brought its own.
   #embedSrc = '';
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
 
   #src = TwitchAdapter.defaultProps.src;
   #autoplay = TwitchAdapter.defaultProps.autoplay;
@@ -124,6 +126,7 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#rebuilding = false;
     this.#embedSrc = '';
     this.#target = null;
+    this.#activated = false;
     // Unblock callers awaiting load; they re-check the embed (now gone) and no-op.
     this.#loadComplete.resolve();
     this.#resetState();
@@ -255,6 +258,12 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   }
 
   async play() {
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
+
     await this.#loadComplete;
 
     // The embed still holds the paused video, so playing it would resume a source that was cleared.
@@ -312,7 +321,11 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -349,7 +362,11 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -435,6 +452,12 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     const existingSrc = target.getAttribute('src');
 
     if (!existingSrc) {
+      // A dormant embed is built by `play()`; until then no `ready` is coming to settle this load.
+      if (this.#isDormant()) {
+        this.#loadComplete.resolve();
+        return false;
+      }
+
       const initialSrc = buildTwitchIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no `ready` is coming to settle this load.
@@ -465,6 +488,21 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
 
     this.dispatchEvent(new Event('loadstart'));
     return true;
+  }
+
+  #isDormant() {
+    return !this.#activated && shouldDeferTwitchEmbed({ preload: this.#preload, autoplay: this.#autoplay });
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || this.#messages || target.getAttribute('src')) return;
+
+    // The embed is built from the current source, so a load requested while dormant has nothing left to replay.
+    this.#pendingLoad = false;
+    this.#beginLoad();
+    this.#createPlayer();
   }
 
   // Whether deferred work belongs to a superseded attach; the settle delay below outlives a `detach()`.
@@ -506,7 +544,8 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
-      preload: this.#preload || TwitchAdapter.defaultProps.preload,
+      // Playing overrides `preload`, so an embed built for it must not wait to load.
+      preload: this.#activated ? 'auto' : this.#preload || TwitchAdapter.defaultProps.preload,
       source: this.#source,
     };
   }
