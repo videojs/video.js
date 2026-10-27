@@ -203,14 +203,16 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     const nextSrc = buildCloudflareIframeSrc(this.#src, this.#snapshotProps());
 
     if (target && nextSrc && embedParamsOf(nextSrc) !== embedParamsOf(target.getAttribute('src') ?? '')) {
-      // The rebuilt embed reports its own metadata, which settles this load.
+      // The rebuilt embed reports its own metadata, which settles this load when it preloads.
       target.src = nextSrc;
+      this.#settleIfNotPreloading(load);
       return;
     }
 
     // The player mimics `HTMLVideoElement` down to a writable `src`, so swap the video instead of discarding a working
     // embed and its SDK connection.
     this.#player.src = parsed.id;
+    this.#settleIfNotPreloading(load);
   }
 
   // Take over as the current load; settling the outgoing barrier releases its waiters.
@@ -218,6 +220,12 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#loadComplete.resolve();
     this.#loadComplete = createPublicPromise<void>();
     return this.#loadComplete;
+  }
+
+  // An embed told not to preload reports no metadata until it plays, so a load waiting on metadata would leave `play()`
+  // waiting on the playback it starts. Like a native element, the load ends once the source is set.
+  #settleIfNotPreloading(load: PublicPromise<void>) {
+    if (this.#preload === 'none' && !this.#autoplay) load.resolve();
   }
 
   // Whether the embed is playing the reported source; a cleared or unrecognized src leaves it on the previous video.
@@ -516,7 +524,10 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
       // A source arrived while the SDK was loading, so the embed points at the previous one; only the player can move.
       this.#pendingLoad = false;
       void this.load();
+      return;
     }
+
+    this.#settleIfNotPreloading(this.#loadComplete);
   }
 
   // Whether a callback belongs to a superseded attach; an embed keeps reporting after its player reference is gone.
