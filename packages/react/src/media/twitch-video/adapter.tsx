@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  buildTwitchIframeSrc,
-  shouldDeferTwitchEmbed,
-  TwitchAdapter,
-  type TwitchAdapterProps,
-} from '@videojs/twitch-video';
+import { buildTwitchIframeSrc, TwitchAdapter, type TwitchAdapterProps } from '@videojs/twitch-video';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -31,10 +26,8 @@ export const TwitchVideo = forwardRef<HTMLIFrameElement, TwitchVideoProps>(funct
   const [initialSrc] = useState(() =>
     // Server rendering has no `location` to name as the embed's parent, and Twitch
     // refuses to play in a page its URL never named. Rendering no `src` leaves the
-    // URL to `attach()`, which builds it where there is a hostname to name. A
-    // deferred embed renders an empty frame too; the media builds it when
-    // playback is requested.
-    globalThis.location && !shouldDeferTwitchEmbed(props)
+    // URL to `attach()`, which builds it where there is a hostname to name.
+    globalThis.location
       ? // `source.src` is the only other way to name a video, so honor it when `src` is absent.
         buildTwitchIframeSrc(props.src || props.source?.src || '', {
           ...TwitchAdapter.defaultProps,

@@ -9,10 +9,4 @@ describe('TwitchVideo', () => {
 
     expect(new URL(container.querySelector('iframe')!.src).searchParams.get('muted')).toBe('true');
   });
-
-  it('renders an empty frame under preload="none" until playback is requested', () => {
-    const { container } = render(<TwitchVideo src="https://www.twitch.tv/videos/123456789" preload="none" />);
-
-    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
-  });
 });
