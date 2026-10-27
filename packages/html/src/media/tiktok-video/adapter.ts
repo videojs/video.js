@@ -28,12 +28,15 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
           border: 0;
         }
         /* A cross-origin frame swallows every pointer event, so the skin above it
-           never sees the hover that reveals the controls. Kept out of hit-testing
-           except where the host leaves TikTok's player dormant, which is the same
-           pair of cases shouldBootstrapTikTokEmbed opts out of: then the frame's
-           own controls are the only thing that can still start it. */
-        :host(:not([controls]):not([preload="none"])) {
+           never sees the hover that reveals the controls. */
+        :host(:not([controls])) {
           pointer-events: none;
+        }
+        /* preload="none" leaves TikTok's player dormant, and then the frame's own
+           controls are the only thing that can start it. Once it has played, the
+           player answers commands and the skin takes over again. */
+        :host([preload="none"]) iframe:not([data-started]) {
+          pointer-events: auto;
         }
       </style>
       <iframe
@@ -49,6 +52,14 @@ class TikTokCustomMediaElement extends CustomMediaElement('iframe', TikTokAdapte
       ></iframe>
     `;
   };
+
+  constructor() {
+    super();
+
+    // A new embed comes back dormant, so it is clickable again until it plays.
+    this.addEventListener('play', () => this.target?.setAttribute('data-started', ''));
+    this.addEventListener('emptied', () => this.target?.removeAttribute('data-started'));
+  }
 }
 
 // Only the props the embed URL is built from. `preload` is not a TikTok parameter, but it decides whether the URL
