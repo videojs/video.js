@@ -34,7 +34,7 @@ The audio counterpart of <DocsLink slug="reference/components/lazy-video">LazyVi
 
 <FrameworkCase frameworks={["react"]}>
 ```bash
-npm install @videojs/react @videojs/mux-audio @videojs/spotify-audio
+npm install @videojs/react @videojs/mux-audio @videojs/spotify-audio @videojs/soundcloud-audio
 ```
 
 ```tsx
@@ -44,7 +44,7 @@ import { LazyAudio } from '@videojs/react/media/lazy-audio';
 
 <FrameworkCase frameworks={["html"]}>
 ```bash
-npm install @videojs/html @videojs/mux-audio @videojs/spotify-audio
+npm install @videojs/html @videojs/mux-audio @videojs/spotify-audio @videojs/soundcloud-audio
 ```
 
 ```ts
@@ -61,13 +61,14 @@ import '@videojs/html/media/lazy-audio';
 | HLS, elsewhere | <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | The SPF HLS engine |
 | `stream.mux.com` | <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | Mux Audio |
 | Spotify | <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> | The Spotify embed |
+| SoundCloud | <DocsLink slug="reference/components/soundcloud-audio">SoundCloudAudio</DocsLink> | The SoundCloud widget |
 
 A source that matches none of these, including YouTube, Vimeo, and DASH, renders nothing and logs an error in development.
 
 ## Custom media
 
 <FrameworkCase frameworks={["react"]}>
-`createLazyAudio` builds a `LazyAudio` from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideo`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/react/media/lazy/` plus its kebab-case name.
+`createLazyAudio` builds a `LazyAudio` from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideo`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, `spotifyAudio`, and `soundcloudAudio`, each imported from `@videojs/react/media/lazy/` plus its kebab-case name.
 
 ```tsx
 import { audio } from '@videojs/react/media/lazy/audio';
@@ -79,7 +80,7 @@ const MuxLazyAudio = createLazyAudio([audio, muxAudio]);
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`createLazyAudioElement` builds a `<lazy-audio>` class from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideoElement`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, and `spotifyAudio`, each imported from `@videojs/html/media/lazy/` plus its kebab-case name.
+`createLazyAudioElement` builds a `<lazy-audio>` class from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideoElement`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, `spotifyAudio`, and `soundcloudAudio`, each imported from `@videojs/html/media/lazy/` plus its kebab-case name.
 
 ```ts
 import { audio } from '@videojs/html/media/lazy/audio';

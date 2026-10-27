@@ -1,5 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { MuxAudioAdapter } from '@videojs/mux-audio';
+import { SoundCloudAdapter } from '@videojs/soundcloud-audio';
 import { HlsAudioAdapter } from '@videojs/spf/adapters/hls-audio';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -34,6 +35,13 @@ describe('LazyAudio', () => {
     render(<LazyAudio src="https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M.m3u8" />);
 
     await waitFor(() => expect(attach).toHaveBeenCalled(), LOAD_TIMEOUT);
+  });
+
+  it('loads SoundCloud audio for a SoundCloud URL', async () => {
+    const attach = vi.spyOn(SoundCloudAdapter.prototype, 'attach');
+    const { container } = render(<LazyAudio src="https://soundcloud.com/forss/flickermood" />);
+
+    await waitFor(() => expect(attach).toHaveBeenCalledWith(container.querySelector('iframe')), LOAD_TIMEOUT);
   });
 
   it('renders nothing and reports a source no audio media plays', () => {
