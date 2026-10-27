@@ -11,8 +11,10 @@ import {
 } from './sources';
 
 // YouTube thumbnails follow the video id, so they need no request to look up. Other embeds need an oEmbed call.
+// `maxresdefault` is the 720p 16:9 frame; `hqdefault` and `sddefault` are 4:3 with black bars. YouTube only makes it
+// for HD uploads, and not every video has a WebP copy under `vi_webp`; the video used here has both.
 function youTubePoster(id: string): string {
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  return `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
 }
 
 interface LazySource {
