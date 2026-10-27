@@ -1,7 +1,7 @@
 'use client';
 
 import { buildTikTokIframeSrc, TikTokAdapter, type TikTokAdapterProps } from '@videojs/tiktok-video';
-import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
+import { type CSSProperties, forwardRef, type ReactNode, useEffect, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -43,6 +43,19 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
   const exposeRef = useMediaRef(media, mediaRef);
   // Listeners first: `attach()` dispatches `loadstart` synchronously.
   const composedRef = useComposedRefs(eventsRef, attachRef, exposeRef, ref);
+  const [started, setStarted] = useState(false);
+  const dormant = props.preload === 'none' && !started;
+
+  // A new embed comes back dormant, so it is clickable again until it plays.
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    media.addEventListener('play', () => setStarted(true), { signal });
+    media.addEventListener('emptied', () => setStarted(false), { signal });
+
+    return () => controller.abort();
+  }, [media]);
 
   return (
     <iframe
@@ -60,9 +73,9 @@ export const TikTokVideo = forwardRef<HTMLIFrameElement, TikTokVideoProps>(funct
       {...iframeProps}
       // A cross-origin frame swallows every pointer event, so without its own chrome it stays out of hit-testing and the
       // skin above it sees hover and clicks. `preload="none"` leaves TikTok's player dormant, and then the frame's own
-      // controls are the only thing that can still start it. Merged so a consumer's own styles survive without
-      // undoing it.
-      style={props.controls || props.preload === 'none' ? style : { ...style, pointerEvents: 'none' }}
+      // controls are the only thing that can start it; once it has played, the player answers commands and the skin
+      // takes over again. Merged so a consumer's own styles survive without undoing it.
+      style={props.controls || dormant ? style : { ...style, pointerEvents: 'none' }}
       ref={composedRef}
     >
       {children}
