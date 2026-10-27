@@ -48,6 +48,9 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   #playerListeners: [type: string, listener: () => void][] = [];
   // Playback was requested, so a `preload="none"` embed may be built.
   #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. Cloudflare then starts as it loads, rather than
+  // once the SDK is up to take `play()`.
+  #embedPlays = false;
 
   #src = CloudflareAdapter.defaultProps.src;
   #autoplay = CloudflareAdapter.defaultProps.autoplay;
@@ -115,6 +118,7 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#textTracksHost = null;
     this.#target = null;
     this.#activated = false;
+    this.#embedPlays = false;
     // Unblock callers awaiting load; they re-check `#player` (now null) and no-op.
     this.#loadComplete.resolve();
     this.#resetState();
@@ -174,6 +178,10 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     }
 
     const load = this.#beginLoad();
+
+    // The autoplay a `play()` wrote was for the video it built. Dropping it from the URL rebuilds the frame below rather
+    // than swapping, since the player keeps the autoplay it was built with.
+    this.#embedPlays = false;
 
     // Reset before bailing on an empty src: a cleared source has nothing to load, but the old video's state still goes.
     this.#resetState();
@@ -254,9 +262,12 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   }
 
   async play() {
-    // Like a native media under `preload="none"`, playing is what starts the load.
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
     if (this.#isDormant()) {
       this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
       this.#wake();
     }
 
@@ -612,7 +623,7 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,

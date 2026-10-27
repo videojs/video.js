@@ -230,15 +230,37 @@ describe('VimeoAdapter preload', () => {
     const pending = media.play();
     const player = media.engine as unknown as MockPlayerLike;
 
-    // Playing overrides `preload`, so the embed it builds loads at once.
+    // Playing overrides `preload`, so the embed it builds loads at once, and is told to play in its URL.
     expect(iframe.getAttribute('src')).toContain('https://player.vimeo.com/video/76979871');
     expect(iframe.getAttribute('src')).toContain('preload=auto');
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
     expect(player.play).not.toHaveBeenCalled();
 
     player.emit('loaded');
     await pending;
 
     expect(player.play).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('loads the next video without the autoplay a play() wrote into the embed', async () => {
+    const media = new VimeoAdapter();
+
+    media.preload = 'none';
+    media.src = '76979871';
+    media.attach(createIframe());
+
+    const pending = media.play();
+    const player = media.engine as unknown as MockPlayerLike;
+
+    player.emit('loaded');
+    await pending;
+
+    media.src = '12345';
+    await Promise.resolve();
+
+    // The player keeps the parameters it was built with unless the load overrides them.
+    expect(player.loadVideo).toHaveBeenCalledWith({ url: 'https://player.vimeo.com/video/12345', autoplay: false });
     media.detach();
   });
 

@@ -67,6 +67,9 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #attachId = 0;
   // Playback was requested, so a `preload="none"` embed may be built.
   #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. The service then starts as it loads, rather than
+  // once a `ready` round trip brings the command.
+  #embedPlays = false;
 
   #src = PlayerJsAdapter.defaultProps.src;
   #autoplay = PlayerJsAdapter.defaultProps.autoplay;
@@ -136,6 +139,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#listeners = null;
     this.#target = null;
     this.#activated = false;
+    this.#embedPlays = false;
     // Left set, the next frame to report ready would start playing on its own.
     this.#playRequested = false;
     // Unblock callers awaiting load; they re-check `#target` (now null) and no-op.
@@ -222,6 +226,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#resetState();
     // `emptied` announces that reset before the bails in `#loadEmbed`, where the embed reports nothing further.
     this.dispatchEvent(new Event('emptied'));
+
+    // A new document is not the one `play()` built; a play still pending reaches it over the protocol.
+    if (this.#embedPlays) {
+      this.#embedPlays = false;
+      this.#loadEmbed(target, buildPlayerJsIframeSrc(this.#src, this.#snapshotProps()));
+      return;
+    }
+
     this.#loadEmbed(target, embedSrc);
   }
 
@@ -273,9 +285,12 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   async play() {
     if (!this.#src) return;
 
-    // Like a native media under `preload="none"`, playing is what starts the load.
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
     if (this.#isDormant()) {
       this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
       this.#wake();
     }
 
@@ -677,6 +692,9 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     if (this.#autoplay || this.#playRequested) {
       this.#playRequested = false;
       this.#post('play');
+    } else if (this.#embedPlays) {
+      // Built to play by a `play()` that a pause has since overruled, so the URL's autoplay is taken back.
+      this.#post('pause');
     }
   }
 
@@ -884,7 +902,7 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   // source; rebuilding the frame for it would restart the video.
   #snapshotProps(): Partial<PlayerJsAdapterProps> {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       // Either says to start muted, and the URL is read once, so a mute set since the last load carries over.
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,

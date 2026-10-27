@@ -1139,6 +1139,8 @@ describe('YouTubeAdapter preload', () => {
     const player = await waitForEngine(media);
 
     expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    // Told to play in its URL, so YouTube starts as it loads rather than once the iframe API takes `playVideo()`.
+    expect(new URL(iframe.getAttribute('src')!).searchParams.get('autoplay')).toBe('1');
     expect(player.playVideo).not.toHaveBeenCalled();
 
     player.ready();

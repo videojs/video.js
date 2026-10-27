@@ -406,8 +406,8 @@ describe('PlayerJsAdapter preload', () => {
     media.attach(iframe);
     await media.play();
 
-    // Playing overrides `preload`, so the embed it builds loads at once.
-    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?preload=auto`);
+    // Playing overrides `preload`, so the embed it builds loads at once, and is told to play before it reports ready.
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?autoplay=true&preload=auto`);
 
     // Watched once built: pointing the frame at the embed gives it a new window.
     const commands = watchCommands(iframe);
@@ -415,6 +415,59 @@ describe('PlayerJsAdapter preload', () => {
     report(iframe, 'ready', FULL_SUPPORT);
 
     expect(commands.named('play')).toHaveLength(1);
+    media.detach();
+  });
+
+  it('pauses an embed built to play when a pause follows before it reports ready', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    media.pause();
+
+    const commands = watchCommands(iframe);
+
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    expect(commands.named('play')).toHaveLength(0);
+    expect(commands.named('pause')).toHaveLength(1);
+    media.detach();
+  });
+
+  it('builds the next source without the autoplay a play() wrote', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    media.src = GUMLET_SRC;
+    await flush();
+
+    expect(queryOf(iframe.getAttribute('src')!)).toContain('autoplay=false');
+    media.detach();
+  });
+
+  it('keeps the document an embed built to play when only the hash changes', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    media.src = `${MUX_SRC}#t=10`;
+    await flush();
+
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?autoplay=true&preload=auto#t=10`);
     media.detach();
   });
 

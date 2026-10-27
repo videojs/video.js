@@ -79,6 +79,9 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #loadComplete = createPublicPromise<void>();
   // Playback was requested, so a `preload="none"` embed may be built.
   #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. Vimeo then starts as it loads, rather than once
+  // the player API is up to take `play()`.
+  #embedPlays = false;
 
   #src = VimeoAdapter.defaultProps.src;
   #autoplay = VimeoAdapter.defaultProps.autoplay;
@@ -166,6 +169,7 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     this.#player = null;
     this.#target = null;
     this.#activated = false;
+    this.#embedPlays = false;
     this.#loadComplete.resolve();
     this.#resetState();
   }
@@ -230,7 +234,13 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     }
 
     this.dispatchEvent(new Event('loadstart'));
-    const loadOptions = toLoadVideoOptions(this.#src, this.#source?.engine?.vimeo);
+    // The autoplay a `play()` wrote into the embed URL was for the video it built, and the player keeps the parameters it
+    // was built with unless the load says otherwise.
+    const loadOptions = toLoadVideoOptions(
+      this.#src,
+      this.#source?.engine?.vimeo,
+      this.#embedPlays ? this.#autoplay : undefined
+    );
 
     // An unparsable src never reaches the player, so no `loaded` will ever settle this load.
     if (!loadOptions) {
@@ -303,9 +313,12 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 
   async play() {
-    // Like a native media under `preload="none"`, playing is what starts the load.
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
     if (this.#isDormant()) {
       this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
       this.#wake();
     }
 
@@ -565,7 +578,7 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       // The embed reads mute once, from its URL, and either property says to start muted.
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
@@ -808,12 +821,12 @@ const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;
 const READY_STATE_HAVE_FUTURE_DATA = 3;
 
-function toLoadVideoOptions(src: string, vimeo?: VimeoEngineConfig) {
+function toLoadVideoOptions(src: string, vimeo?: VimeoEngineConfig, autoplay?: boolean) {
   const parsed = parseVimeoSource(src);
   if (!parsed) return null;
 
   const base = parsed.kind === 'event' ? `${EMBED_EVENT_BASE}/${parsed.id}/embed` : `${EMBED_VIDEO_BASE}/${parsed.id}`;
   const url = `${base}${parsed.hash ? `?h=${parsed.hash}` : ''}` as VimeoUrl;
 
-  return { url, ...vimeo } as LoadVideoOptions;
+  return { url, ...(autoplay !== undefined && { autoplay }), ...vimeo } as LoadVideoOptions;
 }

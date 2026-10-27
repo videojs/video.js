@@ -57,6 +57,9 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #pendingEmbedOptions = false;
   // Playback was requested, so a `preload="none"` embed may be built.
   #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. YouTube then starts as it loads, rather than once
+  // the iframe API is up to take `playVideo()`.
+  #embedPlays = false;
   // Settings to apply to a replacement player before it reports its own.
   #restoreSettings: ReadonlySet<PlayerSetting> = new Set();
   // Settings written through setters since attach; before a player reports, only these are real.
@@ -161,6 +164,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#pendingLoad = false;
     this.#creatingPlayer = false;
     this.#activated = false;
+    this.#embedPlays = false;
     this.#restoreSettings = new Set();
     this.#writtenSettings = new Set();
     this.#playerSettingsRead = false;
@@ -288,9 +292,12 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   async play() {
     let recreations: number;
 
-    // Like a native media under `preload="none"`, playing is what starts the load.
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
     if (this.#isDormant()) {
       this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
       this.#wake();
     }
 
@@ -657,7 +664,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       // The embed reads mute once, from its URL, and either property says to start muted.
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
