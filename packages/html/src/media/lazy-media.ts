@@ -239,7 +239,9 @@ export class LazyMediaElement extends HTMLElementBase {
 // `display: contents` lets the skin lay out the resolved media as though it were the slotted child. The native media
 // is styled here because the skin's `::slotted(video)` rule only reaches direct children of the skin. The properties
 // match `VideoCSSVars`, spelled out because importing them would put every custom media element in this chunk. Embed
-// hosts mark themselves `data-cross-origin-frame` and size to their iframe, so they're stretched to fill the player.
+// hosts mark themselves `data-cross-origin-frame` and size to their iframe, so they're stretched to fill the player,
+// and the minimum size each sets for standalone use is cleared: TikTok's portrait floor would overflow a landscape
+// player and push its frame's centered chrome off center.
 const STYLES = /* css */ `
   :host {
     display: contents;
@@ -250,6 +252,11 @@ const STYLES = /* css */ `
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  ::slotted([data-cross-origin-frame]) {
+    min-width: 0;
+    min-height: 0;
   }
 
   ::slotted(video) {
