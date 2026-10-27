@@ -323,9 +323,11 @@ describe('CloudflareAdapter preload', () => {
 
     const pending = media.play();
 
-    // Playing overrides `preload`, so the embed it builds loads at once and reports metadata.
+    // Playing overrides `preload`, so the embed it builds loads at once and reports metadata, and is told to play in its
+    // URL.
     expect(iframe.getAttribute('src')).toContain(`https://iframe.videodelivery.net/${VIDEO_ID}`);
     expect(iframe.getAttribute('src')).toContain('preload=auto');
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
 
     const player = await waitForEngine(media);
 
@@ -335,6 +337,30 @@ describe('CloudflareAdapter preload', () => {
     await pending;
 
     expect(player.play).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('rebuilds the next video without the autoplay a play() wrote, rather than swapping it in', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    player.emit('loadedmetadata');
+    await pending;
+
+    media.src = OTHER_VIDEO_ID;
+    await Promise.resolve();
+
+    // The player keeps the autoplay it was built with, so a swap would play the next video on its own.
+    expect(iframe.getAttribute('src')).toContain(OTHER_VIDEO_ID);
+    expect(iframe.getAttribute('src')).not.toContain('autoplay');
+    expect(player.src).not.toBe(OTHER_VIDEO_ID);
     media.detach();
   });
 
