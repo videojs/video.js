@@ -1,5 +1,6 @@
-import { render } from '@testing-library/react';
-import type { ComponentType, CSSProperties } from 'react';
+import { act, render } from '@testing-library/react';
+import type { TikTokAdapter } from '@videojs/tiktok-video';
+import { type ComponentType, type CSSProperties, createRef } from 'react';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { CloudflareVideo } from '../cloudflare-video';
@@ -64,5 +65,21 @@ describe('TikTokVideo', () => {
 
     rerender(<TikTokVideo preload="metadata" />);
     expect(iframe.style.pointerEvents).toBe('none');
+  });
+
+  it('takes a dormant embed out of hit-testing once it plays, and back in once a new embed replaces it', () => {
+    const media = createRef<TikTokAdapter>();
+    const { container } = render(<TikTokVideo preload="none" mediaRef={media} />);
+    const iframe = iframeOf(container);
+
+    act(() => {
+      media.current!.dispatchEvent(new Event('play'));
+    });
+    expect(iframe.style.pointerEvents).toBe('none');
+
+    act(() => {
+      media.current!.dispatchEvent(new Event('emptied'));
+    });
+    expect(iframe.style.pointerEvents).toBe('');
   });
 });
