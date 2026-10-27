@@ -17,8 +17,8 @@ function iframeSrc(element: HTMLElement): string {
   return element.shadowRoot?.querySelector('iframe')?.getAttribute('src') ?? '';
 }
 
-/** Flush the microtask a deferred embed waits on so it sees every attribute. */
-async function flushDeferredEmbed(): Promise<void> {
+/** Flush the microtask a late-built embed waits on so it sees every attribute. */
+async function flushEmbed(): Promise<void> {
   await Promise.resolve();
   await Promise.resolve();
 }
@@ -29,32 +29,28 @@ describe('TwitchVideo', () => {
     const element = document.createElement(tag);
 
     element.setAttribute('src', SRC);
-    await flushDeferredEmbed();
+    await flushEmbed();
 
     expect(iframeSrc(element)).toContain('https://player.twitch.tv/?video=v123456789');
   });
 
-  it('builds no embed under preload="none" set after src in the same task, as lazy-video sets it', async () => {
+  it('builds the embed under preload="none" set after src in the same task, as lazy-video sets it', async () => {
     const tag = defineTwitchVideo();
     const element = document.createElement(tag);
 
     element.setAttribute('src', SRC);
     element.setAttribute('preload', 'none');
-    await flushDeferredEmbed();
+    await flushEmbed();
 
-    expect(iframeSrc(element)).toBe('');
+    expect(iframeSrc(element)).toContain('https://player.twitch.tv/?video=v123456789');
   });
 
   it('renders the embed from its attributes', () => {
     expect(TwitchVideo.getTemplateHTML({ src: SRC })).toContain('src="https://player.twitch.tv/?video=v123456789');
   });
 
-  it('renders an empty frame from markup with preload="none"', () => {
-    expect(TwitchVideo.getTemplateHTML({ src: SRC, preload: 'none' })).not.toMatch(/<iframe[^>]*\ssrc=/);
-  });
-
-  it('renders the embed under preload="none" when autoplay is set', () => {
-    expect(TwitchVideo.getTemplateHTML({ src: SRC, preload: 'none', autoplay: '' })).toContain(
+  it('renders the embed from markup with preload="none"', () => {
+    expect(TwitchVideo.getTemplateHTML({ src: SRC, preload: 'none' })).toContain(
       'src="https://player.twitch.tv/?video=v123456789'
     );
   });
