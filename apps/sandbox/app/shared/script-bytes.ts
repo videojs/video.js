@@ -203,22 +203,30 @@ function videojsBytes(bytes: ScriptBytes): number {
  * The JavaScript loaded, formatted for display, with what loaded since `since` when given. With per-package sizes the
  * headline counts only Video.js and the engines and dependencies it loads; without them, everything. The dev server
  * serves each module unbundled and untransformed for production, so its totals say so rather than pass for shipped
- * sizes.
+ * sizes. `embed` is an embed downloading from its service; `waitingEmbed` is one that downloads nothing until play.
  */
-export function summarizeScriptBytes(bytes: ScriptBytes, since?: ScriptBytes, embed?: EmbedPayload) {
+export function summarizeScriptBytes(
+  bytes: ScriptBytes,
+  since?: ScriptBytes,
+  embed?: EmbedPayload,
+  waitingEmbed?: EmbedPayload
+) {
   const grouped = Object.keys(bytes.packages).length > 0;
   const headline = grouped ? videojsBytes(bytes) : bytes.gzip;
   const sinceHeadline = since && (grouped ? videojsBytes(since) : since.gzip);
-  const pageTotal = `${formatKilobytes(bytes.gzip)} total on the page`;
+  const embedNote = embed
+    ? `plus ${formatKilobytes(embed.total)} from the embed`
+    : waitingEmbed && `the embed's ${formatKilobytes(waitingEmbed.total)} waits for play`;
+  const parts = grouped
+    ? ['with engines', `${formatKilobytes(bytes.gzip)} total on the page`]
+    : import.meta.env.DEV
+      ? [`${bytes.files} unbundled dev modules, not shipped sizes`]
+      : [`${formatKilobytes(bytes.raw)} as served`, `${bytes.files} files`];
 
   return {
     label: grouped ? 'Video.js loaded' : import.meta.env.DEV ? 'JavaScript loaded (dev server)' : 'JavaScript loaded',
     total: formatKilobytes(headline),
-    detail: grouped
-      ? `gzip · with engines · ${embed ? `${pageTotal}, plus ${formatKilobytes(embed.total)} from the embed` : pageTotal}`
-      : import.meta.env.DEV
-        ? `gzip · ${bytes.files} unbundled dev modules, not shipped sizes · build for real numbers`
-        : `gzip · ${formatKilobytes(bytes.raw)} as served · ${bytes.files} files`,
+    detail: ['gzip', ...parts, ...(embedNote ? [embedNote] : [])].join(' · '),
     sinceChange: sinceHeadline === undefined ? null : `+${formatKilobytes(headline - sinceHeadline)}`,
   };
 }

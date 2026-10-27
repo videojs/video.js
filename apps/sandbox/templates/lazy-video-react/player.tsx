@@ -1,5 +1,6 @@
 // The player, skin, and `LazyVideo`, split out so light mode loads none of them until play is pressed.
 import '@videojs/react/video/skin.css';
+import { observeEmbedFetching } from '@app/shared/lazy-sources';
 import type { Media } from '@videojs/media';
 import { getMediaEngineName } from '@videojs/media/dom';
 import { LazyVideo } from '@videojs/react/media/lazy-video';
@@ -17,6 +18,8 @@ export interface LazyPlayerProps {
   muted: boolean;
   /** Receives a description of the resolved media, or `null` while there's none. */
   onResolved: (description: string | null) => void;
+  /** Receives whether the resolved media's embed has started downloading from its service. */
+  onEmbedFetching: (fetching: boolean) => void;
   onStarted: () => void;
 }
 
@@ -43,22 +46,39 @@ function StartedReporter({ onStarted }: { onStarted: () => void }) {
   return null;
 }
 
-export default function LazyPlayer({ src, poster, light, autoplay, muted, onResolved, onStarted }: LazyPlayerProps) {
+// An embed adapter is attached to its frame before the media ref is handed out.
+function frameOf(media: Media): HTMLIFrameElement | null {
+  return 'target' in media && media.target instanceof HTMLIFrameElement ? media.target : null;
+}
+
+export default function LazyPlayer({
+  src,
+  poster,
+  light,
+  autoplay,
+  muted,
+  onResolved,
+  onEmbedFetching,
+  onStarted,
+}: LazyPlayerProps) {
   const mediaRef = useCallback(
     (media: Media | null) => {
       if (!media) return;
 
       const update = () => onResolved(describeMedia(media, true));
+      const stopEmbedObserver = observeEmbedFetching(frameOf(media), onEmbedFetching);
 
       onResolved(describeMedia(media, false));
       media.addEventListener('playing', update);
 
       return () => {
         media.removeEventListener('playing', update);
+        stopEmbedObserver();
+        onEmbedFetching(false);
         onResolved(null);
       };
     },
-    [onResolved]
+    [onResolved, onEmbedFetching]
   );
 
   return (

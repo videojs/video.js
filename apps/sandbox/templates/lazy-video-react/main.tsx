@@ -57,12 +57,22 @@ function LightFacade({ poster, onPlay }: { poster: string | undefined; onPlay: (
 
 const SHOWN_PACKAGES = 6;
 
-function ScriptBreakdown({ bytes, embed }: { bytes: ScriptBytes; embed: EmbedPayload | undefined }) {
+function ScriptBreakdown({
+  bytes,
+  embed,
+  waitingEmbed,
+}: {
+  bytes: ScriptBytes;
+  embed: EmbedPayload | undefined;
+  waitingEmbed: EmbedPayload | undefined;
+}) {
   const groups = groupScriptBytes(bytes, embed);
   const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
   const caption = embed
     ? `gzip, each script split by its packages · embed measured ${EMBED_PAYLOADS_MEASURED_AT}, as transferred`
-    : 'gzip, each script split by its packages';
+    : waitingEmbed
+      ? `gzip, each script split by its packages · the ${waitingEmbed.label} embed loads nothing until play`
+      : 'gzip, each script split by its packages';
 
   return (
     <section className={c.card} aria-label="JavaScript by package">
@@ -114,11 +124,15 @@ function App() {
   const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === src)?.poster;
   const showFacade = light && clickedAt === undefined;
   const [resolved, setResolved] = useState<string | null>(null);
+  const [embedFetching, setEmbedFetching] = useState(false);
   const [scriptBytes, setScriptBytes] = useState<ScriptBytes>({ gzip: 0, raw: 0, files: 0, packages: {} });
   const [sourceChangedAt, setSourceChangedAt] = useState<ScriptBytes>();
-  // An embed's own download only counts once it renders, not while light mode shows the poster.
-  const embed = resolved ? getEmbedPayload(src) : undefined;
-  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt, embed);
+  // An embed's own download only counts once it starts: not while light mode shows the poster, and not while
+  // `preload="none"` holds its frame back until play.
+  const resolvedEmbed = resolved ? getEmbedPayload(src) : undefined;
+  const embed = embedFetching ? resolvedEmbed : undefined;
+  const waitingEmbed = embedFetching ? undefined : resolvedEmbed;
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt, embed, waitingEmbed);
 
   useEffect(() => observeScriptBytes(setScriptBytes), []);
 
@@ -166,6 +180,7 @@ function App() {
             autoplay={autoplay}
             muted={muted}
             onResolved={setResolved}
+            onEmbedFetching={setEmbedFetching}
             onStarted={onStarted}
           />
         </Suspense>
@@ -260,7 +275,7 @@ function App() {
           <dd className={c.statDetail}>gzip</dd>
         </div>
       </dl>
-      <ScriptBreakdown bytes={scriptBytes} embed={embed} />
+      <ScriptBreakdown bytes={scriptBytes} embed={embed} waitingEmbed={waitingEmbed} />
     </>
   );
 }

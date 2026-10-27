@@ -16,6 +16,7 @@ import {
   getUrlMuted,
   LAZY_VIDEO_SOURCE_GROUPS,
   LAZY_VIDEO_SOURCES,
+  observeEmbedFetching,
   setUrlLazyState,
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
@@ -112,21 +113,30 @@ let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0, packages: {} };
 let sourceChangedAt: ScriptBytes | undefined;
 let src = initialSrc;
 let lazyVideo: HTMLElement | null = null;
+let embedFetching = false;
 
 const SHOWN_PACKAGES = 6;
 
-// An embed's own download only counts once it renders, not while light mode shows the poster.
+// An embed's own download only counts once it starts: not while light mode shows the poster, and not while
+// `preload="none"` holds its frame back until play.
 function currentEmbed(): EmbedPayload | undefined {
-  return lazyVideo?.firstElementChild ? getEmbedPayload(src) : undefined;
+  return lazyVideo?.firstElementChild && embedFetching ? getEmbedPayload(src) : undefined;
+}
+
+function waitingEmbed(): EmbedPayload | undefined {
+  return lazyVideo?.firstElementChild && !embedFetching ? getEmbedPayload(src) : undefined;
 }
 
 function renderScriptBreakdown() {
   const embed = currentEmbed();
+  const waiting = waitingEmbed();
   const groups = groupScriptBytes(scriptBytes, embed);
   const total = groups.reduce((sum, { gzip }) => sum + gzip, 0);
   const caption = embed
     ? `gzip, each script split by its packages · embed measured ${EMBED_PAYLOADS_MEASURED_AT}, as transferred`
-    : 'gzip, each script split by its packages';
+    : waiting
+      ? `gzip, each script split by its packages · the ${waiting.label} embed loads nothing until play`
+      : 'gzip, each script split by its packages';
 
   scriptBreakdown.innerHTML = html`
     <div class="${c.breakdownHeader}">
@@ -178,7 +188,12 @@ function renderScriptBreakdown() {
 }
 
 function renderScriptBytes() {
-  const { label, total, detail, sinceChange } = summarizeScriptBytes(scriptBytes, sourceChangedAt, currentEmbed());
+  const { label, total, detail, sinceChange } = summarizeScriptBytes(
+    scriptBytes,
+    sourceChangedAt,
+    currentEmbed(),
+    waitingEmbed()
+  );
 
   scriptLabel.textContent = label;
   scriptTotal.textContent = total;
@@ -270,16 +285,27 @@ function mountPlayer(poster: string | undefined) {
 
   const media = stage.querySelector('lazy-video')!;
   const { store } = stage.querySelector<VideoPlayerElement>('video-player')!;
-  const observer = new MutationObserver(() => {
+  let stopEmbedObserver = () => {};
+  const syncResolved = () => {
     const child = media.firstElementChild;
 
     resolved.textContent = child ? `<${child.localName}>` : '(none)';
+    stopEmbedObserver();
+    embedFetching = false;
+    // Embed hosts keep their frame in their shadow root; it's there from the moment the element is created.
+    stopEmbedObserver = child
+      ? observeEmbedFetching(child.shadowRoot?.querySelector('iframe') ?? null, (fetching) => {
+          embedFetching = fetching;
+          renderScriptBytes();
+        })
+      : () => {};
     renderScriptBytes();
-  });
+  };
+  const observer = new MutationObserver(syncResolved);
 
   observer.observe(media, { childList: true });
   lazyVideo = media;
-  renderScriptBytes();
+  syncResolved();
 
   // In light mode, report how long after the click playback started, if it did.
   const unsubscribe = light
@@ -293,6 +319,7 @@ function mountPlayer(poster: string | undefined) {
 
   cleanup = () => {
     observer.disconnect();
+    stopEmbedObserver();
     unsubscribe();
   };
   renderLightStatus();
