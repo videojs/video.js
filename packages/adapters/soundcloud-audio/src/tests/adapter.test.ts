@@ -5,6 +5,7 @@ import {
   isMediaVolumeCapable,
   MediaError,
 } from '@videojs/media';
+import { getMediaEngineName } from '@videojs/media/dom';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildSoundCloudIframeSrc, SoundCloudAdapter } from '..';
@@ -1151,6 +1152,10 @@ describe('SoundCloudAdapter', () => {
       expect(isMediaPictureInPictureCapable(media)).toBe(false);
       expect('requestFullscreen' in media).toBe(false);
       expect(media.textTracks.length).toBe(0);
+    });
+
+    it('names its engine, as the other embeds do', () => {
+      expect(getMediaEngineName(new SoundCloudAdapter())).toBe('soundcloud');
     });
   });
 });
