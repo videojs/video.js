@@ -981,3 +981,90 @@ QUnit.test('removeSourceElement does not remove a source element if URL does not
 
   assert.notOk(removed, 'No source element was removed for non-matching URL');
 });
+
+QUnit.module('HTML5 seek before playback on iOS', {
+  beforeEach() {
+    this.origIOS = browser.IS_IOS;
+    this.videoEl = document.createElement('video');
+    this.state = { paused: true, readyState: 1, currentTime: 0 };
+
+    const state = this.state;
+
+    Object.defineProperty(this.videoEl, 'paused', { get: () => state.paused, configurable: true });
+    Object.defineProperty(this.videoEl, 'readyState', { get: () => state.readyState, configurable: true });
+    Object.defineProperty(this.videoEl, 'currentTime', {
+      get: () => state.currentTime,
+      set: (v) => {
+        state.currentTime = v;
+      },
+      configurable: true
+    });
+
+    tech = new Html5({});
+    tech.el_ = this.videoEl;
+  },
+  afterEach() {
+    browser.stub_IS_IOS(this.origIOS);
+    tech.dispose();
+    tech = null;
+  }
+});
+
+QUnit.test('holds the seek on iOS while paused with no frame data, and applies it on play', function(assert) {
+  browser.stub_IS_IOS(true);
+
+  tech.setCurrentTime(20);
+
+  assert.strictEqual(this.state.currentTime, 0, 'the media element is not seeked yet');
+  assert.strictEqual(tech.currentTime(), 20, 'currentTime reports the requested time');
+
+  this.state.paused = false;
+  this.videoEl.dispatchEvent(new window.Event('play'));
+
+  assert.strictEqual(this.state.currentTime, 20, 'the seek is applied when playback starts');
+  assert.strictEqual(tech.currentTime(), 20, 'currentTime reads from the media element again');
+
+  this.state.currentTime = 21;
+  assert.strictEqual(tech.currentTime(), 21, 'nothing is held any more');
+});
+
+QUnit.test('a held seek is applied when frame data arrives before playback', function(assert) {
+  browser.stub_IS_IOS(true);
+
+  tech.setCurrentTime(20);
+  this.state.readyState = 2;
+  this.videoEl.dispatchEvent(new window.Event('loadeddata'));
+
+  assert.strictEqual(this.state.currentTime, 20, 'the seek is applied once there is frame data');
+});
+
+QUnit.test('the latest held seek wins, and a new source drops it', function(assert) {
+  browser.stub_IS_IOS(true);
+
+  tech.setCurrentTime(20);
+  tech.setCurrentTime(30);
+  assert.strictEqual(tech.currentTime(), 30, 'the latest requested time is held');
+
+  this.videoEl.dispatchEvent(new window.Event('loadstart'));
+  assert.strictEqual(tech.currentTime(), 0, 'a new source drops the held seek');
+
+  this.state.paused = false;
+  this.videoEl.dispatchEvent(new window.Event('play'));
+  assert.strictEqual(this.state.currentTime, 0, 'nothing is applied after the source changed');
+});
+
+QUnit.test('seeks immediately when not on iOS, when playing, or when frame data is loaded', function(assert) {
+  browser.stub_IS_IOS(false);
+  tech.setCurrentTime(5);
+  assert.strictEqual(this.state.currentTime, 5, 'not iOS: seeks immediately');
+
+  browser.stub_IS_IOS(true);
+  this.state.readyState = 2;
+  tech.setCurrentTime(10);
+  assert.strictEqual(this.state.currentTime, 10, 'iOS with frame data: seeks immediately');
+
+  this.state.readyState = 1;
+  this.state.paused = false;
+  tech.setCurrentTime(15);
+  assert.strictEqual(this.state.currentTime, 15, 'iOS while playing: seeks immediately');
+});
