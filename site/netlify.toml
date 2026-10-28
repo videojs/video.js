@@ -1641,33 +1641,8 @@
   to = "https://legacy.videojs.org/blog/"
   status = 307
 
-# Netlify matches redirect paths case-sensitively. Search Console reports these spellings of pre-v10 posts from
-# old blog.videojs.com links.
-[[redirects]]
-  from = "/blog/Google-is-dropping-h-264-from-Chrome"
-  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome/"
-  status = 308
-
-[[redirects]]
-  from = "/blog/Lynda-com-HTML5-Video-Tutorial-Released"
-  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released/"
-  status = 308
-
-[[redirects]]
-  from = "/blog/Video-js-7-is-here"
-  to = "https://legacy.videojs.org/blog/video-js-7-is-here/"
-  status = 308
-
-[[redirects]]
-  from = "/blog/Version-3-1-Update"
-  to = "https://legacy.videojs.org/blog/version-3-1-update/"
-  status = 308
-
-[[redirects]]
-  from = "/blog/New-MPEG-LA-WebM-VP8-Patent-Pool"
-  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool/"
-  status = 308
-
+# Netlify matches redirect paths case-sensitively, so blog-lowercase.ts lowercases capitalized blog slugs before these
+# rules run. One post's rule below spells its slug in camelCase, so it needs a lowercase twin.
 [[redirects]]
   from = "/blog/video-js-7-3-responsive-layout-fill-mode-createlogger"
   to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createlogger/"

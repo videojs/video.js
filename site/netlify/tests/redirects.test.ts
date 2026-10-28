@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { parse } from 'smol-toml';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { ALIAS_HOSTS } from '../edge-functions/trailing-slash';
+import { ALIAS_HOSTS } from '../../src/utils/redirect-origin';
 
 interface Redirect {
   from: string;
@@ -56,7 +56,7 @@ describe('netlify.toml redirects', () => {
     expect(chained).toEqual([]);
   });
 
-  it('keeps the trailing-slash edge function in step with the alias hosts', () => {
+  it('keeps the edge functions in step with the alias hosts', () => {
     const aliasHosts = redirects
       .filter((rule) => rule.from.startsWith('https://') && rule.to === 'https://videojs.org/:splat')
       .map((rule) => new URL(rule.from.replace(/\*$/, '')).hostname);
