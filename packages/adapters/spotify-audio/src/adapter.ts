@@ -69,6 +69,8 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #waiting = false;
   // A pause was asked for, so the paused update it produces is not a stall.
   #pauseRequested = false;
+  // A resume was sent before the embed resolved the entity; see `#skipPlaceholder`.
+  #resumeBeforeResolve = false;
   // The entity ran out; kept so the end of playback is acted on exactly once.
   #closeToEnded = false;
 
@@ -246,12 +248,14 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (!this.#src) return;
 
     // `resume()` picks playback up where it stopped; `play()` would restart the entity.
+    this.#resumeBeforeResolve = true;
     this.#controller?.resume();
   }
 
   pause() {
     // A stall reads as paused too, so a requested pause has to be remembered or its update looks like more buffering.
     this.#pauseRequested = true;
+    this.#resumeBeforeResolve = false;
     this.#controller?.pause();
   }
 
@@ -509,6 +513,7 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#loaded = false;
     this.#waiting = false;
     this.#pauseRequested = false;
+    this.#resumeBeforeResolve = false;
     this.#closeToEnded = false;
     this.#error = null;
   }
@@ -566,6 +571,8 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     // Later loads (`loadUri`) never re-fire `ready`, so the first update completes the load.
     if (!this.#loaded) this.#onLoaded();
 
+    if (this.#skipPlaceholder(data)) return;
+
     if (this.#restartFromEnd(data)) return;
 
     this.#syncDuration(data.duration);
@@ -591,9 +598,28 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return true;
   }
 
+  // Until the embed resolves the entity it reports a placeholder with no duration, which says nothing about playback:
+  // WebKit even reports it playing. In WebKit a resume the placeholder receives, as `play()` sends to a `preload="none"`
+  // embed it just built, is dropped and the entity never resolves; sending it again has the embed resolve it. WebKit
+  // can still settle the resolved entity paused, and the next `play()` starts it.
+  #skipPlaceholder(data: SpotifyPlaybackState): boolean {
+    if (isResolved(data)) {
+      this.#resumeBeforeResolve = false;
+      return false;
+    }
+
+    if (this.#resumeBeforeResolve && !data.isBuffering) {
+      this.#resumeBeforeResolve = false;
+      tryCall(() => this.#controller?.resume());
+    }
+
+    return true;
+  }
+
   #syncDuration(duration: number) {
     const seconds = duration / 1000;
-    if (seconds === this.#duration) return;
+    // Until the embed resolves the entity it reports no duration; `0` would read as an entity with nothing to play.
+    if (!(seconds > 0) || seconds === this.#duration) return;
 
     // A different duration is a different entity, so whatever ended before is no longer what is playing.
     this.#closeToEnded = false;
@@ -696,6 +722,11 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.dispatchEvent(new Event('pause'));
     this.dispatchEvent(new Event('ended'));
   }
+}
+
+// Whether a snapshot is about the entity rather than the placeholder the embed reports while it resolves one.
+function isResolved(data: SpotifyPlaybackState): boolean {
+  return data.duration > 0;
 }
 
 // A node for `createController` to consume instead of the embed; never inserted, so the swap it performs on its target

@@ -496,6 +496,58 @@ describe('SpotifyAdapter', () => {
     media.detach();
   });
 
+  it('resends a resume the placeholder drops, so the embed resolves the entity, as WebKit needs', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    await media.play();
+
+    // WebKit reports the placeholder as playing; the resume it received never reaches the entity.
+    controller.update({ isPaused: false, duration: 0 });
+    controller.update({ isPaused: false, isBuffering: true, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(2);
+    expect(media.paused).toBe(true);
+
+    controller.update({ isPaused: false, position: 500 });
+
+    expect(media.paused).toBe(false);
+    expect(media.currentTime).toBe(0.5);
+    media.detach();
+  });
+
+  it('resends nothing once the entity resolves or the listener pauses', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    await media.play();
+    controller.update({ isPaused: true });
+    controller.update({ isPaused: false, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(1);
+
+    await media.play();
+    media.pause();
+    controller.update({ isPaused: false, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(2);
+    media.detach();
+  });
+
+  it('reports no duration until the embed resolves the entity', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const durationchange = vi.fn();
+
+    media.addEventListener('durationchange', durationchange);
+    controller.update({ isPaused: false, duration: 0 });
+
+    expect(media.duration).toBeNaN();
+    expect(durationchange).not.toHaveBeenCalled();
+
+    controller.update({ isPaused: false, duration: 60_000 });
+
+    expect(media.duration).toBe(60);
+    media.detach();
+  });
+
   it('starts playback on load when autoplay is set', async () => {
     const media = new SpotifyAdapter();
 
@@ -691,22 +743,24 @@ describe('SpotifyAdapter', () => {
     media.detach();
   });
 
-  it('does not end against a duration the embed has not resolved', async () => {
+  it('ignores the placeholder the embed reports before it resolves the entity', async () => {
     const media = new SpotifyAdapter();
     const { controller } = await attachAndLoad(media);
-    const ended = vi.fn();
+    const events: string[] = [];
 
-    media.addEventListener('ended', ended);
+    for (const type of ['play', 'playing', 'timeupdate', 'durationchange', 'ended'] as const) {
+      media.addEventListener(type, () => events.push(type));
+    }
 
-    // An update that carries no duration at all, then one that reports the entity
-    // as still being worked out. Every position is at or past both.
+    // An update that carries no duration at all, then one that reports the entity as still being worked out. WebKit
+    // reports them as playing while nothing plays, and every position is at or past both durations.
     controller.update({ isPaused: false, position: 0, duration: Number.NaN });
     controller.update({ isPaused: false, position: 1_000, duration: Number.NaN });
     controller.update({ isPaused: false, position: 2_000, duration: 0 });
 
-    expect(ended).not.toHaveBeenCalled();
-    expect(media.ended).toBe(false);
-    expect(media.paused).toBe(false);
+    expect(events).toEqual([]);
+    expect(media.paused).toBe(true);
+    expect(media.duration).toBeNaN();
     media.detach();
   });
 
