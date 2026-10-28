@@ -56,7 +56,10 @@ export function getTextTracks(
  * @public
  * @experimental
  */
-export function getTextCues<Cue extends MediaTextCue>(source: TextCuesSource, track: TextTrackDefinition<Cue>): Cue[];
+export function getTextCues<Cue extends MediaTextCue>(
+  source: TextCuesSource,
+  track: TextTrackDefinition<Cue>
+): readonly Cue[];
 /**
  * Every cue on the tracks a filter matches, from the media or the app.
  *
@@ -65,11 +68,11 @@ export function getTextCues<Cue extends MediaTextCue>(source: TextCuesSource, tr
  * @label With Filter
  * @experimental
  */
-export function getTextCues(source: TextCuesSource, filter?: TextTrackFilter): MediaTextCue[];
+export function getTextCues(source: TextCuesSource, filter?: TextTrackFilter): readonly MediaTextCue[];
 export function getTextCues(
   source: TextCuesSource,
-  filter: TextTrackFilter | TextTrackDefinition = {}
-): MediaTextCue[] {
+  filter: TextTrackFilter | TextTrackDefinition = ALL_TRACKS
+): readonly MediaTextCue[] {
   return readCues(source, filter, 'cues');
 }
 
@@ -92,7 +95,7 @@ export function getTextCues(
 export function getActiveTextCues<Cue extends MediaTextCue>(
   source: TextCuesSource,
   track: TextTrackDefinition<Cue>
-): Cue[];
+): readonly Cue[];
 /**
  * The cues active now on the tracks a filter matches, from the media or the app.
  *
@@ -101,31 +104,67 @@ export function getActiveTextCues<Cue extends MediaTextCue>(
  * @label With Filter
  * @experimental
  */
-export function getActiveTextCues(source: TextCuesSource, filter?: TextTrackFilter): MediaTextCue[];
+export function getActiveTextCues(source: TextCuesSource, filter?: TextTrackFilter): readonly MediaTextCue[];
 export function getActiveTextCues(
   source: TextCuesSource,
-  filter: TextTrackFilter | TextTrackDefinition = {}
-): MediaTextCue[] {
+  filter: TextTrackFilter | TextTrackDefinition = ALL_TRACKS
+): readonly MediaTextCue[] {
   return readCues(source, filter, 'activeCues');
 }
+
+const ALL_TRACKS: TextTrackFilter = Object.freeze({});
+
+type CueList = 'cues' | 'activeCues';
 
 /** Cue reads checked against a schema, kept per schema and cue so each cue is checked once. */
 const parsedCues = new WeakMap<StandardSchemaV1, WeakMap<MediaTextCue, MediaTextCue | null>>();
 
+/**
+ * Reads kept per store cue state and filter. Readers run on every store change, most of which leave the cues alone, so
+ * reading through the same filter again returns the same array instead of building a new one.
+ */
+const reads = new WeakMap<
+  readonly MediaTrackCues[],
+  WeakMap<TextTrackFilter | TextTrackDefinition, Partial<Record<CueList, readonly MediaTextCue[]>>>
+>();
+
 function readCues(
   source: TextCuesSource,
   filter: TextTrackFilter | TextTrackDefinition,
-  list: 'cues' | 'activeCues'
-): MediaTextCue[] {
+  list: CueList
+): readonly MediaTextCue[] {
+  let byFilter = reads.get(source.textCues);
+
+  if (!byFilter) {
+    byFilter = new WeakMap();
+    reads.set(source.textCues, byFilter);
+  }
+
+  const kept = byFilter.get(filter);
+  const cached = kept?.[list];
+  if (cached) return cached;
+
+  const result = matchCues(source.textCues, filter, list);
+
+  byFilter.set(filter, { ...kept, [list]: result });
+
+  return result;
+}
+
+function matchCues(
+  textCues: readonly MediaTrackCues[],
+  filter: TextTrackFilter | TextTrackDefinition,
+  list: CueList
+): readonly MediaTextCue[] {
   const schema = !isFunction(filter) && 'schema' in filter ? filter.schema : undefined;
+  const entries = textCues.filter((entry) => matchTextTrack(entry.track, filter));
+  // One track's list is already in order, so without a schema it's read as the store holds it, keeping its identity
+  // until that track's cues change.
+  if (entries.length === 1 && !schema) return entries[0]![list];
+
   const result: MediaTextCue[] = [];
-  let tracks = 0;
 
-  for (const entry of source.textCues) {
-    if (!matchTextTrack(entry.track, filter)) continue;
-
-    tracks++;
-
+  for (const entry of entries) {
     for (const cue of entry[list]) {
       const read = schema ? parseCue(cue, schema) : cue;
 
@@ -133,8 +172,8 @@ function readCues(
     }
   }
 
-  // Each track's cues are already in order; cues from several tracks are merged by time.
-  if (tracks > 1) result.sort((a, b) => a.startTime - b.startTime || a.endTime - b.endTime);
+  // Cues from several tracks are merged by time.
+  if (entries.length > 1) result.sort((a, b) => a.startTime - b.startTime || a.endTime - b.endTime);
 
   return result;
 }
