@@ -1,6 +1,6 @@
 ---
 title: Text cues
-description: Cues and active cues from metadata, chapters, and app text tracks, and the actions that add tracks from the app
+description: Cues and active cues from metadata, chapters, and app text tracks
 stability: unstable
 ---
 
@@ -9,7 +9,7 @@ import FeatureReference from "@/components/docs/api-reference/FeatureReference.a
 import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
-Reads the cues of text tracks, tracks which cues are active at the current time, and holds the text tracks an app adds to the player. The <DocsLink slug="guides/timed-metadata">timed metadata guide</DocsLink> shows how to use it.
+Reads the cues of text tracks, from the media and from the app, and tracks which cues are active at the current time. The <DocsLink slug="guides/timed-metadata">timed metadata guide</DocsLink> shows how to use it.
 
 `textCues` has one entry per track being read, in `textTrackList` order. Each entry holds the `track` as `textTrackList` lists it, every one of its `cues` ordered by start time, and its `activeCues`. Cues are plain data with an `id`, `startTime`, `endTime`, `text`, and, when the cue carries data, a `value` and a `type`.
 
@@ -81,7 +81,7 @@ App cues keep the `value` and `type` they were added with.
 
 ## App tracks
 
-`addTextTrack()` adds a track to the player rather than to the media, so it works with any media, including embeds without text tracks of their own. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and its content, or one object describing both, and returns a handle to the track.
+`addTextTrack()` and `removeTextTrack()` come from the <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink>, and are described here while they're experimental. `addTextTrack()` adds a track to the player rather than to the media, so it works with any media, including embeds without text tracks of their own. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and its content, or one object describing both, and returns a handle to the track.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
