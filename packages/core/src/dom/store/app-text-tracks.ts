@@ -2,7 +2,7 @@ import type { MediaTextCue, MediaTextTrack } from '@videojs/media';
 
 import type { TextTrackLoad } from './load-text-track';
 
-/** Private store state holding the tracks apps added. Owned by the text cues feature; the text-track feature lists them. */
+/** Private store state holding the tracks apps added. Owned by the text-track feature; the text cues feature reads them. */
 export const APP_TEXT_TRACKS = Symbol('@videojs/app-text-tracks');
 
 /** Private store state that notifies when the tracks apps added change, and keeps them across a detach. */
@@ -37,12 +37,12 @@ export interface AppTextTracksState {
   [APP_TEXT_TRACKS_CHANGE]: AppTextTracksChange;
 }
 
-/** The tracks apps added, from store state that may not include the text cues feature. */
+/** The tracks apps added, from store state that may not include the text-track feature. */
 export function getAppTextTracks(state: object): readonly AppTextTrackRecord[] {
   return (state as Partial<AppTextTracksState>)[APP_TEXT_TRACKS] ?? [];
 }
 
-/** Listen for changes to the tracks apps added, when the store has the text cues feature. */
+/** Listen for changes to the tracks apps added, when the store has the text-track feature. */
 export function listenForAppTextTracks(state: object, listener: () => void, signal: AbortSignal): void {
   const change = (state as Partial<AppTextTracksState>)[APP_TEXT_TRACKS_CHANGE];
   if (!change) return;
