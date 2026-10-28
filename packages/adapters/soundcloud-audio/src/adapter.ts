@@ -55,6 +55,7 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   };
 
   static PLAYER_SOFTWARE_NAME = 'soundcloud-audio';
+  static readonly engineName: string = 'soundcloud';
 
   #target: HTMLIFrameElement | null = null;
   // Cancels the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
