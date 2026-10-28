@@ -27,10 +27,10 @@ export function withRequestCredentials(
   const { xhrSetup, fetchSetup } = config;
 
   return {
-    async xhrSetup(xhr, url) {
+    async xhrSetup(xhr, url, context) {
       if (isCredentialed(crossOrigin())) xhr.withCredentials = true;
 
-      await xhrSetup?.(xhr, url);
+      await xhrSetup?.(xhr, url, context);
     },
     fetchSetup(context, initParams) {
       if (isCredentialed(crossOrigin())) initParams.credentials = 'include';

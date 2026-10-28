@@ -1,5 +1,5 @@
 import type { MediaResolution } from '@videojs/media';
-import Hls, { type Level } from 'hls.js';
+import Hls, { CapLevelController, type HlsConfig, type Level } from 'hls.js';
 
 /**
  * Live cap inputs the installed cap-level controller reads on every evaluation.
@@ -104,15 +104,15 @@ export function levelIndexAtOrAbove(
   return atFloor === -1 ? levels.length - 1 : atFloor;
 }
 
-type CapLevelControllerClass = typeof Hls.DefaultConfig.capLevelController;
+type CapLevelControllerClass = NonNullable<HlsConfig['capLevelController']>;
 
 /**
  * Build the `capLevelController` class to hand to the hls.js constructor.
  *
- * `hls.autoLevelCapping` has exactly one writer: hls.js's own `CapLevelController`, which rewrites it on a one-second
- * interval for as long as `capLevelToPlayerSize` is on — and it is on by default here. Assigning the property from
- * outside is undone within a second, so a cap has to be applied from inside the controller rather than in competition
- * with it.
+ * `hls.autoLevelCapping` has exactly one writer: hls.js's own `CapLevelController`, which rewrites it whenever the
+ * element resizes (or on a one-second interval where `ResizeObserver` is missing) for as long as `capLevelToPlayerSize`
+ * is on — and it is on by default here. Assigning the property from outside is undone on the next measurement, so a cap
+ * has to be applied from inside the controller rather than in competition with it.
  *
  * The only seam hls.js offers is `getMaxLevel()`, which every value the capping loop writes passes through. Overriding
  * it makes the requested ceiling part of the same single-writer computation.
@@ -123,7 +123,7 @@ type CapLevelControllerClass = typeof Hls.DefaultConfig.capLevelController;
  */
 export function createCapLevelController(
   policy: RenditionCapPolicy,
-  BaseController: CapLevelControllerClass = Hls.DefaultConfig.capLevelController
+  BaseController: CapLevelControllerClass = Hls.DefaultConfig.capLevelController ?? CapLevelController
 ): CapLevelControllerClass {
   return class RenditionCapLevelController extends BaseController {
     #hls: Hls;
@@ -150,11 +150,18 @@ export function createCapLevelController(
       super.destroy();
     }
 
-    // hls.js keeps the interval handle private, so the loop is tracked through
-    // the public start/stop pair instead of reaching into it.
+    // hls.js keeps its observer and interval handles private, so the loop is
+    // tracked through the public start/stop pair instead of reaching into them.
     startCapping() {
-      this.#capping = true;
       super.startCapping();
+
+      // Hls.js calls this whenever video is confirmed, whether or not its loop
+      // is switched on, and bails without measuring when it is off or when the
+      // `ResizeObserver` it opens on attach is already running. Measure here so
+      // the cap does not wait for the next resize.
+      this.#capping = this.#hls.config.capLevelToPlayerSize;
+
+      if (this.#capping) this.detectPlayerSize();
     }
 
     stopCapping() {
