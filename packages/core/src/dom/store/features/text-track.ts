@@ -7,16 +7,10 @@ import type {
   TextTrackLike,
   VTTCueLike,
 } from '@videojs/media';
-import {
-  getRegisteredMedia,
-  isMediaSeekCapable,
-  isMediaSourceCapable,
-  isMediaTextTrackCapable,
-  toMediaCrossOrigin,
-} from '@videojs/media';
+import { isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable, toMediaCrossOrigin } from '@videojs/media';
 import { createTextTrack, type TextTrackHandle } from '@videojs/media/dom';
 import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
-import { isAbortError, isNull, isUndefined } from '@videojs/utils/predicate';
+import { isAbortError, isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import {
@@ -40,19 +34,15 @@ import { loadTextTrackCues } from '../load-text-track';
 import { fillChapterEnds, sortCues, toMediaTextCues } from '../text-cues';
 import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
-const CURRENT_SRC = Symbol('@videojs/text-track-current-src');
-
 interface TextTrackSourceState extends MediaTextTrackState, AppTextTracksState {
   /**
    * Add a text track from the app. It works on any media, sits next to the media's tracks in `textTrackList`, and its
-   * cues are read like theirs. It belongs to the source playing when it's added, or the first one if there's none yet,
-   * and is cleared when the source changes or the media is swapped.
+   * cues are read like theirs. Like a `<track>` element, it stays until it's removed, through source changes and media
+   * swaps.
    */
   addTextTrack: AddTextTrack;
   /** Remove a track the app added. Tracks from the media stay. */
   removeTextTrack(id: string): void;
-  /** The media's current source as the feature last saw it, or `null` before one loads. */
-  [CURRENT_SRC]: string | null;
 }
 
 /** The modes of app caption copies when the store last detached, so a re-attach can restore them. */
@@ -116,7 +106,6 @@ export const textTrackFeature = definePlayerFeature({
     // The tracks apps added, kept outside store state so a detach doesn't drop them. Actions work from this copy.
     const appTracks: AppTextTracksChange = {
       records: [],
-      media: undefined,
       subscribe(listener) {
         appListeners.add(listener);
 
@@ -164,7 +153,6 @@ export const textTrackFeature = definePlayerFeature({
           source: 'app',
         },
         cues: sortCues((content?.cues ?? init.cues ?? []).map(toCue)),
-        mediaSrc: get()[CURRENT_SRC] as string | null,
       };
 
       const src = content?.src ?? init.src;
@@ -253,7 +241,6 @@ export const textTrackFeature = definePlayerFeature({
       removeTextTrack,
       [APP_TEXT_TRACKS]: [],
       [APP_TEXT_TRACKS_CHANGE]: appTracks,
-      [CURRENT_SRC]: null,
     };
   },
 
@@ -261,43 +248,11 @@ export const textTrackFeature = definePlayerFeature({
     const { media } = target;
     const textTracks = isMediaTextTrackCapable(media) ? media : null;
 
-    // The store reset on detach, so bring back the app tracks it held. A container change or an extension re-attaches
-    // to the same media and keeps them; other media drop the tracks that belonged to the last one's source.
+    // The store resets on detach, so bring back the app tracks it held.
     const appTracks = get()[APP_TEXT_TRACKS_CHANGE];
-    const registeredMedia = getRegisteredMedia(media);
 
-    if (!isUndefined(appTracks.media) && appTracks.media !== registeredMedia) {
-      appTracks.records = appTracks.records.filter((record) => record.mediaSrc === null);
-    }
-
-    appTracks.media = registeredMedia;
     set({ [APP_TEXT_TRACKS]: appTracks.records });
     appTracks.notify();
-
-    // App tracks added before any source adopt the first one; tracks from an earlier source go with it.
-    const syncSource = () => {
-      const src = (isMediaSourceCapable(media) && media.currentSrc) || null;
-
-      set({ [CURRENT_SRC]: src });
-
-      if (!src) return;
-
-      const records = get()[APP_TEXT_TRACKS];
-      const next = records.flatMap((record) => {
-        if (record.mediaSrc === src) return [record];
-
-        if (record.mediaSrc === null) return [{ ...record, mediaSrc: src }];
-
-        return [];
-      });
-
-      const changed = next.length !== records.length || next.some((record, index) => record !== records[index]);
-
-      if (changed) {
-        set({ [APP_TEXT_TRACKS]: next });
-        appTracks.notify();
-      }
-    };
 
     // The browser only draws captions and subtitles on tracks the media holds, including in iOS fullscreen where the
     // player's UI isn't shown, so app captions are copied into the media. A copy takes its app track's id, so the
@@ -476,7 +431,6 @@ export const textTrackFeature = definePlayerFeature({
       });
     };
 
-    syncSource();
     syncCopies();
     sync();
     loadAppCues();
@@ -495,15 +449,7 @@ export const textTrackFeature = definePlayerFeature({
       listen(trackList, 'change', sync, { signal });
     }
 
-    listen(
-      media,
-      'loadstart',
-      () => {
-        syncSource();
-        sync();
-      },
-      { signal }
-    );
+    listen(media, 'loadstart', sync, { signal });
     // The chapter clamp follows the media duration.
     listen(media, 'durationchange', sync, { signal });
 
