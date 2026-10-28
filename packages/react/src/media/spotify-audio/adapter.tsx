@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  buildSpotifyIframeSrc,
-  SpotifyAdapter,
-  type SpotifyAdapterProps,
-  shouldDeferSpotifyEmbed,
-} from '@videojs/spotify-audio';
+import { buildSpotifyIframeSrc, SpotifyAdapter, type SpotifyAdapterProps } from '@videojs/spotify-audio';
 import { type CSSProperties, forwardRef, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -29,11 +24,8 @@ export const SpotifyAudio = forwardRef<HTMLIFrameElement, SpotifyAudioProps>(fun
   const media = useMediaInstance(SpotifyAdapter);
   const props: Partial<SpotifyAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // A deferred embed renders an empty frame; the media builds it when playback is requested.
-    shouldDeferSpotifyEmbed(props)
-      ? ''
-      : // `source.src` is the only other way to name an entity, so honor it when `src` is absent.
-        buildSpotifyIframeSrc(props.src || props.source?.src || '', { ...SpotifyAdapter.defaultProps, ...props })
+    // `source.src` is the only other way to name an entity, so honor it when `src` is absent.
+    buildSpotifyIframeSrc(props.src || props.source?.src || '', { ...SpotifyAdapter.defaultProps, ...props })
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<SpotifyAdapterProps, Record<string, unknown>>(media, props, SpotifyAdapter.defaultProps),
