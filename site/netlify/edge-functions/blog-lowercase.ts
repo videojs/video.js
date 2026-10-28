@@ -27,5 +27,5 @@ export default async (request: Request) => {
 
 export const config: Config = {
   cache: 'manual',
-  pattern: '^/blog/.*[A-Z]',
+  pattern: '^/blog/.*[A-Z].*$',
 };
