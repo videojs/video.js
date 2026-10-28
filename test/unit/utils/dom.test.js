@@ -771,6 +771,39 @@ QUnit.test('dom.getPointerPosition should return position with translated', func
   browser.stub_IS_IOS(origIOS);
 });
 
+QUnit.test('dom.getPointerPosition should account for a scrolled container on touch', function(assert) {
+  const container = document.createElement('div');
+  const content = document.createElement('div');
+  const bar = document.createElement('div');
+
+  container.style.cssText = 'position: absolute; top: 0; left: 0; width: 100px; height: 50px; overflow: auto;';
+  content.style.cssText = 'position: relative; width: 400px; height: 50px;';
+  bar.style.cssText = 'position: absolute; top: 0; left: 200px; width: 100px; height: 50px;';
+
+  content.appendChild(bar);
+  container.appendChild(content);
+  document.body.appendChild(container);
+
+  // The bar starts 200px into the content. Scrolled by 150px, it is drawn
+  // 50px from the left of the page, so a touch at pageX 70 is 20px into it.
+  container.scrollLeft = 150;
+
+  const origIOS = browser.IS_IOS;
+
+  browser.stub_IS_IOS(false);
+
+  const touch = {
+    target: bar,
+    changedTouches: [{ pageX: 70, pageY: 0 }]
+  };
+
+  assert.strictEqual(container.scrollLeft, 150, 'the container is scrolled');
+  assert.strictEqual(Dom.getPointerPosition(bar, touch).x, 0.2, 'touch position is measured from where the bar is drawn');
+
+  browser.stub_IS_IOS(origIOS);
+  document.body.removeChild(container);
+});
+
 QUnit.test('Dom.copyStyleSheetsToWindow() copies all style sheets to a window', function(assert) {
   /**
    * This test is checking that styles are copied by comparing strings in original stylesheets to those in
