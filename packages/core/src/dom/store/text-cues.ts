@@ -19,7 +19,9 @@ export interface TextCueOptions {
  * Cues delivered with a stream can be open-ended — a chapters document leaves its last chapter open, and the track
  * carries that as a very large `endTime` because engines reject `Infinity` — so a consumer reading the list gets each
  * cue ending no later than the media does. While the duration is unknown or infinite the ends pass through unchanged.
- * Pure: the result is fresh data, never the live cues, so a store can expose it without leaking DOM objects.
+ * The result is plain data, never the live cues, so a store can expose it without leaking DOM objects. A cue that
+ * hasn't changed since it was last read comes back as the same object, so reading a long list again only converts the
+ * cues that are new or changed.
  */
 export function toMediaTextCues(
   cues: Iterable<TextTrackCueLike> | null | undefined,
@@ -34,24 +36,57 @@ export function toMediaTextCues(
   return Array.from(cues, (cue) => toMediaTextCue(cue, kind, max, seen));
 }
 
-function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: number, seen: Map<string, number>) {
+interface PlainCueCopy {
+  kind: string | undefined;
+  /** The live cue's own `value`, which a copy shares instead of parsing it from text. */
+  data: unknown;
+  cue: MediaTextCue;
+}
+
+/** The last plain copy of each live cue. */
+const plainCopies = new WeakMap<TextTrackCueLike, PlainCueCopy>();
+
+function toMediaTextCue(
+  cue: TextTrackCueLike,
+  kind: string | undefined,
+  max: number,
+  seen: Map<string, number>
+): MediaTextCue {
+  const id = getCueId(cue, seen);
   const text = 'text' in cue && isString(cue.text) ? cue.text : '';
-  const result: MediaTextCue = {
-    id: getCueId(cue, seen),
-    startTime: cue.startTime,
-    endTime: Math.min(cue.endTime, max),
-    text,
-  };
+  const endTime = Math.min(cue.endTime, max);
+  const data = 'value' in cue ? cue.value : undefined;
+  const type = !isUndefined(data) && 'type' in cue && isString(cue.type) && cue.type ? cue.type : undefined;
 
-  if ('value' in cue && !isUndefined(cue.value)) {
-    result.value = cue.value;
+  // Engines can change a cue in place, so a copy is reused only while everything it was made from still matches.
+  const copy = plainCopies.get(cue);
 
-    if ('type' in cue && isString(cue.type) && cue.type) result.type = cue.type;
+  if (
+    copy &&
+    copy.kind === kind &&
+    copy.data === data &&
+    copy.cue.id === id &&
+    copy.cue.startTime === cue.startTime &&
+    copy.cue.endTime === endTime &&
+    copy.cue.text === text &&
+    copy.cue.type === type
+  ) {
+    return copy.cue;
+  }
+
+  const result: MediaTextCue = { id, startTime: cue.startTime, endTime, text };
+
+  if (!isUndefined(data)) {
+    result.value = data;
+
+    if (type) result.type = type;
   } else if (kind === 'metadata') {
     const value = parseJsonValue(text);
 
     if (!isUndefined(value)) result.value = value;
   }
+
+  plainCopies.set(cue, { kind, data, cue: result });
 
   return result;
 }
@@ -87,16 +122,25 @@ function parseJsonValue(text: string): unknown {
 export function reuseCues<Cue extends MediaTextCue>(previous: readonly Cue[] | undefined, next: Cue[]): Cue[] {
   if (!previous?.length) return next;
 
+  // Cues that haven't changed come back as the same objects, so an unchanged list needs no matching by id.
+  const reused = isSameList(previous, next) ? next : reuseById(previous, next);
+
+  // SAFETY: `previous` is returned only when it holds exactly the cues in `reused`, which is a `Cue[]`.
+  return isSameList(previous, reused) ? (previous as Cue[]) : reused;
+}
+
+function reuseById<Cue extends MediaTextCue>(previous: readonly Cue[], next: Cue[]): Cue[] {
   const byId = new Map(previous.map((cue) => [cue.id, cue]));
-  const reused = next.map((cue) => {
+
+  return next.map((cue) => {
     const old = byId.get(cue.id);
 
     return old && isSameCue(old, cue) ? old : cue;
   });
+}
 
-  const unchanged = reused.length === previous.length && reused.every((cue, index) => cue === previous[index]);
-
-  return unchanged ? (previous as Cue[]) : reused;
+function isSameList(a: readonly MediaTextCue[], b: readonly MediaTextCue[]): boolean {
+  return a.length === b.length && a.every((cue, index) => cue === b[index]);
 }
 
 function isSameCue(a: MediaTextCue, b: MediaTextCue): boolean {
@@ -105,7 +149,7 @@ function isSameCue(a: MediaTextCue, b: MediaTextCue): boolean {
     a.endTime === b.endTime &&
     a.text === b.text &&
     a.type === b.type &&
-    // A value parsed from text is rebuilt on every read, so compare it by content.
+    // A cue rebuilt from the same data, such as JSON text parsed again, carries an equal but new value.
     deepEqual(a.value, b.value)
   );
 }

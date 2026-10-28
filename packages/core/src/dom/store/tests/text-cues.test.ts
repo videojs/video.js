@@ -17,6 +17,36 @@ describe('toMediaTextCues', () => {
     expect(result).not.toBe(cue);
   });
 
+  it('returns the same copy of a cue that has not changed', () => {
+    const cues = [{ startTime: 0, endTime: 1, text: '{"question":"Ready?"}' }];
+    const [first] = toMediaTextCues(cues, { kind: 'metadata' });
+    const [second] = toMediaTextCues(cues, { kind: 'metadata' });
+
+    expect(second).toBe(first);
+  });
+
+  it('makes a new copy of a cue changed in place', () => {
+    const cue = { startTime: 0, endTime: 1, text: 'A' };
+    const [first] = toMediaTextCues([cue]);
+
+    cue.endTime = 2;
+    cue.text = 'B';
+
+    const [second] = toMediaTextCues([cue]);
+
+    expect(second).not.toBe(first);
+    expect(second).toMatchObject({ endTime: 2, text: 'B' });
+  });
+
+  it('makes a new copy when the duration clamps a cue differently', () => {
+    const cues = [{ startTime: 0, endTime: Number.MAX_VALUE, text: 'A' }];
+    const [unclamped] = toMediaTextCues(cues);
+    const [clamped] = toMediaTextCues(cues, { duration: 60 });
+
+    expect(clamped).not.toBe(unclamped);
+    expect(clamped!.endTime).toBe(60);
+  });
+
   it('derives an id from where a cue sits when it has none', () => {
     const cues = [
       { startTime: 0, endTime: 5, text: 'A' },
