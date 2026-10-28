@@ -23,7 +23,7 @@ export default styles({
       utilities: 'text-lg font-bold',
     },
     description: {
-      utilities: 'text-[calc(var(--media-spacing)*3.5)]',
+      utilities: 'text-[calc(var(--media-spacing)*3.5)] wrap-anywhere',
     },
     close: {
       utilities: 'h-8 w-auto justify-self-end border! border-solid border-current px-3',

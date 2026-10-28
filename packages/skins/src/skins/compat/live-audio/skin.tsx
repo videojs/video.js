@@ -3,8 +3,8 @@ import { type PropsOf, Slot, type VjscNode } from 'vjsc/components';
 
 import type { SkinDescription } from '../../../meta';
 import { LivePlaybackHotkeys } from '../../shared/behaviors/live-playback-hotkeys';
+import { AudioErrorDialog } from '../shared/audio-error-dialog';
 import containerStyles from '../shared/container.styles';
-import { ErrorDialog } from '../shared/error-dialog';
 import { StatusAnnouncer } from '../shared/status-announcer';
 import { LiveAudioControls } from './controls';
 
@@ -21,7 +21,7 @@ export function LiveAudioSkin({ children, className, ...props }: LiveAudioSkinPr
       {...props}
     >
       <Slot>{children}</Slot>
-      <ErrorDialog />
+      <AudioErrorDialog />
       <LiveAudioControls />
 
       <LivePlaybackHotkeys />
