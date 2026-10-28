@@ -125,6 +125,28 @@ describe('getActiveTextCues', () => {
 
     expect(getActiveTextCues({ textCues }, { label: 'quiz' })).toEqual([active]);
   });
+
+  it("returns one track's list as the store holds it", () => {
+    const active = createCue('a', 0);
+    const quiz = entry(createTrack('quiz'), [active], [active]);
+
+    expect(getActiveTextCues({ textCues: [quiz, entry(createTrack('ads'), [])] }, { label: 'quiz' })).toBe(
+      quiz.activeCues
+    );
+  });
+
+  it('returns the same array until the cues change', () => {
+    const filter = { kind: 'metadata' } as const;
+    const textCues = [
+      entry(createTrack('quiz'), [], [createCue('a', 0)]),
+      entry(createTrack('ads'), [], [createCue('b', 5)]),
+    ];
+    const first = getActiveTextCues({ textCues }, filter);
+
+    expect(getActiveTextCues({ textCues }, filter)).toBe(first);
+    expect(getActiveTextCues({ textCues: [...textCues] }, filter)).not.toBe(first);
+    expect(getActiveTextCues({ textCues: [...textCues] }, filter)).toEqual(first);
+  });
 });
 
 describe('hlsMetadataTrack', () => {
