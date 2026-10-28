@@ -663,19 +663,15 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
     });
 
-    it('clears tracks when the source changes, keeping them through the first source', () => {
+    it('keeps tracks through source changes', () => {
       const { video, store } = setupWithCues([]);
       const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
 
       setSrc(video, 'https://example.com/one.mp4');
-      expect(quiz.removed).toBe(false);
-
-      setSrc(video, 'https://example.com/one.mp4');
-      expect(quiz.removed).toBe(false);
-
       setSrc(video, 'https://example.com/two.mp4');
-      expect(quiz.removed).toBe(true);
-      expect(store.state.textCues).toEqual([]);
+
+      expect(quiz.removed).toBe(false);
+      expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
     });
 
     it('keeps tracks through a re-attach to the same media', () => {
@@ -683,7 +679,6 @@ describe('textTrackFeature', () => {
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
 
       setTracks(video, []);
-      Object.defineProperty(video, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
 
       const detach = store.attach({ media: video, container: null });
       const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
@@ -698,36 +693,14 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
     });
 
-    it('clears tracks from the last source when the media is swapped', () => {
+    it('keeps tracks through a media swap', () => {
       const first = document.createElement('video');
       const second = document.createElement('video');
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
 
       setTracks(first, []);
       setTracks(second, []);
-
-      const early = store.addTextTrack({ kind: 'metadata', label: 'early' });
-
       Object.defineProperty(first, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
-
-      const detach = store.attach({ media: first, container: null });
-      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
-
-      detach();
-      // The early track adopted the first media's source, so it goes with it too.
-      store.attach({ media: second, container: null });
-
-      expect(quiz.removed).toBe(true);
-      expect(early.removed).toBe(true);
-    });
-
-    it('keeps a track added before any source through a media swap', () => {
-      const first = document.createElement('video');
-      const second = document.createElement('video');
-      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
-
-      setTracks(first, []);
-      setTracks(second, []);
 
       const detach = store.attach({ media: first, container: null });
       const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
@@ -736,6 +709,7 @@ describe('textTrackFeature', () => {
       store.attach({ media: second, container: null });
 
       expect(quiz.removed).toBe(false);
+      expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
     });
 
     it('removes a track while the store is detached', () => {

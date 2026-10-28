@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { usePlayer } from '../player/context';
 import { useLatestRef } from '../utils/use-latest-ref';
 
-const NO_CUES: MediaTextCue[] = [];
+const NO_CUES: readonly MediaTextCue[] = [];
 const ALL_TRACKS: TextTrackFilter = {};
 
 type TextTrackQuery = TextTrackFilter | TextTrackDefinition;
@@ -20,7 +20,7 @@ type TextTrackQuery = TextTrackFilter | TextTrackDefinition;
  * @label With Definition
  * @internal
  */
-export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): Cue[];
+export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
  * Every cue on the tracks a filter matches, from the media or the app. Re-renders when those cues change. A function
  * filter should keep its identity across renders.
@@ -29,8 +29,8 @@ export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition
  * @label With Filter
  * @internal
  */
-export function useTextCues(filter?: TextTrackFilter): MediaTextCue[];
-export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): MediaTextCue[] {
+export function useTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
+export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
   return useCues(filter, getTextCues);
 }
 
@@ -45,7 +45,7 @@ export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): MediaTextCue[]
  * @label With Definition
  * @internal
  */
-export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): Cue[];
+export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
  * The cues active now on the tracks a filter matches, from the media or the app. Re-renders when they change. A
  * function filter should keep its identity across renders.
@@ -54,15 +54,15 @@ export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefi
  * @label With Filter
  * @internal
  */
-export function useActiveTextCues(filter?: TextTrackFilter): MediaTextCue[];
-export function useActiveTextCues(filter: TextTrackQuery = ALL_TRACKS): MediaTextCue[] {
+export function useActiveTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
+export function useActiveTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
   return useCues(filter, getActiveTextCues);
 }
 
 function useCues(
   filter: TextTrackQuery,
-  read: (source: TextCuesSource, filter: TextTrackQuery) => MediaTextCue[]
-): MediaTextCue[] {
+  read: (source: TextCuesSource, filter: TextTrackQuery) => readonly MediaTextCue[]
+): readonly MediaTextCue[] {
   useWatchTextCues(filter);
 
   return useReadTextCues(filter, read);

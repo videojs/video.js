@@ -78,17 +78,16 @@ describe('useCreateTextTrack', () => {
     expect(appLabels(store)).toEqual(['quiz']);
   });
 
-  it('adds the track again after a source change clears it', async () => {
+  it('keeps the track through a source change', async () => {
     const { store, wrapper, setSrc } = setup();
     const { result } = renderHook(() => useCreateTextTrack({ kind: 'metadata', label: 'quiz', cues }), { wrapper });
-
-    await setSrc('https://example.com/one.mp4');
     const first = result.current;
 
+    await setSrc('https://example.com/one.mp4');
     await setSrc('https://example.com/two.mp4');
 
     expect(appLabels(store)).toEqual(['quiz']);
-    expect(result.current?.id).not.toBe(first?.id);
+    expect(result.current).toBe(first);
   });
 
   it('does not add the track again after the app removes it', async () => {

@@ -13,8 +13,6 @@ export interface AppTextTrackRecord {
   track: MediaTextTrack;
   /** Ordered by start time. */
   cues: MediaTextCue[];
-  /** The media source the track belongs to, or `null` until the first one loads. */
-  mediaSrc: string | null;
   /** A file the track's cues still have to be loaded from. */
   load?: TextTrackLoad | undefined;
 }
@@ -28,8 +26,6 @@ export interface AppTextTracksChange {
    * container or an extension changes; this copy survives, so attaching again can bring the tracks back.
    */
   records: readonly AppTextTrackRecord[];
-  /** The media the tracks were last attached with, as `getRegisteredMedia()` resolves it. */
-  media: unknown;
 }
 
 export interface AppTextTracksState {
