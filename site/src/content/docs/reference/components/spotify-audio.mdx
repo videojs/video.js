@@ -56,6 +56,7 @@ The Spotify embed exposes less than a native `<audio>` element:
 - No volume and no mute: the embed takes neither command and reports neither value, so a player skin shows no volume controls at all.
 - No playback rate and no text tracks.
 - `loop` replays the entity from the top when it ends; without it, the embed continues into whatever Spotify queues next.
+- The embed loads as soon as the source is set, even with `preload="none"`: Safari only plays an embed that loaded before play was pressed.
 
 ## Examples
 

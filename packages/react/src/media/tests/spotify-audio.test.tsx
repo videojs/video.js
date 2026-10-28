@@ -60,13 +60,10 @@ describe('SpotifyAudio', () => {
     expect(iframe.style.display).toBe('');
   });
 
-  it('renders an empty frame under preload="none" until playback is requested', async () => {
+  it('renders the embed under preload="none", since WebKit only plays one that was up before play', () => {
     const { container } = render(<SpotifyAudio src={TRACK_URL} preload="none" />);
 
-    await Promise.resolve();
-
-    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
-    expect(MockController.instances.length).toBe(0);
+    expect(container.querySelector('iframe')!.getAttribute('src')).toContain('https://open.spotify.com/embed/track/');
   });
 
   it('keeps the controller on the iframe React rendered', async () => {

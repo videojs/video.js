@@ -1,14 +1,13 @@
 import { CustomMediaElement } from '@videojs/media/dom';
-import { buildSpotifyIframeSrc, SpotifyAdapter, shouldDeferSpotifyEmbed } from '@videojs/spotify-audio';
+import { buildSpotifyIframeSrc, SpotifyAdapter } from '@videojs/spotify-audio';
 import { escapeHtml } from '@videojs/utils/string';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class SpotifyCustomMediaElement extends CustomMediaElement('iframe', SpotifyAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
-    const props = templateAttrsToEmbedProps(attrs);
-    // A deferred embed renders an empty frame; the media builds it when playback is requested.
-    const initialSrc = shouldDeferSpotifyEmbed(props) ? '' : buildSpotifyIframeSrc(attrs.src ?? '', props);
+    // Built whatever `preload` says: WebKit only plays an embed that was up before play was pressed.
+    const initialSrc = buildSpotifyIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 
     return /*html*/ `
