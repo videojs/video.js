@@ -1,26 +1,37 @@
 import '@app/styles.css';
-// <lazy-video> resolves `src` to a media element and loads only that element's code.
-// http://localhost:5173/lazy-video-html/
+// `LazyVideo` and `LazyAudio` resolve `src` to a media component and load only that component's code.
+// http://localhost:5173/lazy-media/
 //
-// Switch sources and watch the JavaScript total: an MP4 loads no engine, and each other source loads one chunk.
+// Framework (`?framework=react`) renders them with React instead of the HTML custom elements, and kind
+// (`?kind=audio`) renders `LazyAudio` instead of `LazyVideo`. The page itself uses neither framework, and changing
+// either reloads it, so the JavaScript total only counts what that combination ships.
+//
+// Switch sources and watch the JavaScript total: a file loads no engine, and each other source loads one chunk.
 // Light mode (`?light`) shows a poster and a play button, and loads no Video.js code until play is pressed.
 // Autoplay (`?autoplay`) sets `autoplay` on the media, which light mode always does once play is pressed.
 // Muted (`?muted`) starts the media muted, which browsers require before most autoplay.
-// Preload (`?preload=metadata` or `auto`) sets `preload` on `<lazy-video>`. Without it the media plays `preload="none"`:
-// files and streams fetch nothing, and embeds build no frame, until play.
+// Preload (`?preload=metadata` or `auto`) sets `preload` on the lazy media. Without it the media plays
+// `preload="none"`: files and streams fetch nothing, and embeds build no frame, until play.
 import {
   LAZY_DEMO_CLASSES as c,
   EMBED_PAYLOADS_MEASURED_AT,
+  findLazySource,
   getEmbedPayload,
   getUrlAutoplay,
+  getUrlFramework,
+  getUrlKind,
   getUrlLazySource,
   getUrlLight,
   getUrlMuted,
   getUrlPreload,
+  LAZY_FRAMEWORKS,
+  LAZY_KINDS,
   LAZY_PRELOADS,
-  LAZY_VIDEO_SOURCE_GROUPS,
-  LAZY_VIDEO_SOURCES,
-  observeEmbedFetching,
+  LAZY_SOURCE_GROUPS,
+  type LazyFramework,
+  type LazyKind,
+  type LazyPlayer,
+  type MountLazyPlayer,
   setUrlLazyState,
 } from '@app/shared/lazy-sources';
 import { describeLightStart, LIGHT_START_TIMEOUT, PLAY_ICON_PATH } from '@app/shared/light-mode';
@@ -32,19 +43,70 @@ import {
   type ScriptBytes,
   summarizeScriptBytes,
 } from '@app/shared/script-bytes';
-import type { VideoPlayerElement } from '@videojs/html/video';
+
+// One module per framework and kind, each a chunk of its own: loaded at once outside light mode, and on play in light
+// mode.
+const PLAYER_LOADERS = {
+  'html-video': () => import('./players/html-video'),
+  'html-audio': () => import('./players/html-audio'),
+  'react-video': () => import('./players/react-video'),
+  'react-audio': () => import('./players/react-audio'),
+} satisfies Record<`${LazyFramework}-${LazyKind}`, () => Promise<{ mount: MountLazyPlayer }>>;
+
+const FRAMEWORK_LABELS = { html: 'HTML', react: 'React' } satisfies Record<LazyFramework, string>;
+const KIND_LABELS = { video: 'Video', audio: 'Audio' } satisfies Record<LazyKind, string>;
+const COMPONENT_NAMES = {
+  html: { video: '<lazy-video>', audio: '<lazy-audio>' },
+  react: { video: '<LazyVideo>', audio: '<LazyAudio>' },
+} satisfies Record<LazyFramework, Record<LazyKind, string>>;
 
 const html = String.raw;
 const root = document.getElementById('root')!;
-const initialSrc = getUrlLazySource().src;
+const framework = getUrlFramework();
+const kind = getUrlKind();
+const loadPlayer = PLAYER_LOADERS[`${framework}-${kind}`];
+const initialSrc = getUrlLazySource(kind).src;
+
+function escapeText(text: string): string {
+  return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function segmented<Value extends string>(
+  name: string,
+  values: readonly Value[],
+  labels: Record<Value, string>,
+  current: Value
+) {
+  return html`
+    <div class="${c.segmented}" role="group" aria-label="${name}">
+      ${values
+        .map(
+          (value) =>
+            html`<button
+              type="button"
+              class="${c.segment}"
+              data-${name.toLowerCase()}="${value}"
+              aria-pressed="${value === current}"
+            >
+              ${labels[value]}
+            </button>`
+        )
+        .join('')}
+    </div>
+  `;
+}
 
 root.innerHTML = html`
   <header class="${c.header}">
-    <h1 class="${c.title}">Lazy video</h1>
+    <h1 class="${c.title}">Lazy media</h1>
     <p class="${c.lede}">
-      <code>&lt;lazy-video&gt;</code> picks the media element for its <code>src</code> and loads only that element's
-      code.
+      <code>${escapeText(COMPONENT_NAMES[framework][kind])}</code> picks the media component for its
+      <code>src</code> and loads only that component's code.
     </p>
+    <div class="mt-2 flex flex-wrap gap-2">
+      ${segmented('Framework', LAZY_FRAMEWORKS, FRAMEWORK_LABELS, framework)}
+      ${segmented('Kind', LAZY_KINDS, KIND_LABELS, kind)}
+    </div>
   </header>
   <div id="stage"></div>
   <section class="${c.card}" aria-label="Source">
@@ -63,28 +125,30 @@ root.innerHTML = html`
       <p class="${c.lightStatus}" id="light-status"></p>
     </div>
     <div class="${c.groups}">
-      ${LAZY_VIDEO_SOURCE_GROUPS.map(
-        ({ label, sources }) => html`
-          <div role="group" aria-label="${label}">
-            <p class="${c.groupLabel}" aria-hidden="true">${label}</p>
-            <div class="${c.buttons}">
-              ${sources
-                .map(
-                  ({ label, src }) =>
-                    html`<button
-                      type="button"
-                      class="${c.button}"
-                      data-src="${src}"
-                      aria-pressed="${src === initialSrc}"
-                    >
-                      ${label}
-                    </button>`
-                )
-                .join('')}
+      ${LAZY_SOURCE_GROUPS[kind]
+        .map(
+          ({ label, sources }) => html`
+            <div role="group" aria-label="${label}">
+              <p class="${c.groupLabel}" aria-hidden="true">${label}</p>
+              <div class="${c.buttons}">
+                ${sources
+                  .map(
+                    ({ label, src }) =>
+                      html`<button
+                        type="button"
+                        class="${c.button}"
+                        data-src="${src}"
+                        aria-pressed="${src === initialSrc}"
+                      >
+                        ${label}
+                      </button>`
+                  )
+                  .join('')}
+              </div>
             </div>
-          </div>
-        `
-      ).join('')}
+          `
+        )
+        .join('')}
     </div>
     <p class="${c.src}" id="src" title="${initialSrc}">${initialSrc}</p>
   </section>
@@ -115,7 +179,7 @@ const preloadSelect = root.querySelector<HTMLSelectElement>('#preload')!;
 const lightStatus = root.querySelector('#light-status')!;
 const buttons = root.querySelectorAll<HTMLButtonElement>('button[data-src]');
 const srcOutput = root.querySelector<HTMLElement>('#src')!;
-const resolved = root.querySelector('#resolved')!;
+const resolvedOutput = root.querySelector('#resolved')!;
 const scriptLabel = root.querySelector('#script-label')!;
 const scriptTotal = root.querySelector('#script-total')!;
 const scriptBreakdown = root.querySelector('#script-breakdown')!;
@@ -125,7 +189,8 @@ const scriptSince = root.querySelector('#script-since')!;
 let scriptBytes: ScriptBytes = { gzip: 0, raw: 0, files: 0, packages: {} };
 let sourceChangedAt: ScriptBytes | undefined;
 let src = initialSrc;
-let lazyVideo: HTMLElement | null = null;
+let player: LazyPlayer | null = null;
+let resolved: string | null = null;
 let embedFetching = false;
 
 const SHOWN_PACKAGES = 6;
@@ -133,11 +198,11 @@ const SHOWN_PACKAGES = 6;
 // An embed's own download only counts once it starts: not while light mode shows the poster, and not while
 // `preload="none"` holds its frame back until play.
 function currentEmbed(): EmbedPayload | undefined {
-  return lazyVideo?.firstElementChild && embedFetching ? getEmbedPayload(src) : undefined;
+  return resolved && embedFetching ? getEmbedPayload(kind, src) : undefined;
 }
 
 function waitingEmbed(): EmbedPayload | undefined {
-  return lazyVideo?.firstElementChild && !embedFetching ? getEmbedPayload(src) : undefined;
+  return resolved && !embedFetching ? getEmbedPayload(kind, src) : undefined;
 }
 
 function renderScriptBreakdown() {
@@ -228,7 +293,6 @@ let clickedAt: number | undefined;
 let startedAt: number | undefined;
 let timedOut = false;
 let timeout: ReturnType<typeof setTimeout> | undefined;
-let cleanup = () => {};
 
 lightToggle.checked = light;
 mutedToggle.checked = muted;
@@ -246,101 +310,93 @@ function renderLightStatus() {
   lightStatus.textContent = light ? describeLightStart(clickedAt, startedAt, timedOut) : '';
 }
 
-// The player, skin, and `<lazy-video>` are one chunk: loaded at once outside light mode, and on play in light mode.
-const loadPlayer = () => import('./player');
+function posterOf(source: string): string | undefined {
+  return findLazySource(kind, source)?.poster;
+}
+
+function posterImage(poster: string | undefined): string {
+  return poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : '';
+}
+
+const playIcon = html`<svg class="${c.facadeIcon}" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="${PLAY_ICON_PATH}" />
+</svg>`;
+
+function facade(poster: string | undefined): string {
+  if (kind === 'audio') {
+    return html`
+      <button type="button" class="${c.audioFacade}" aria-label="Play audio" data-light-play>
+        <span class="${c.audioFacadePlay}">${playIcon}</span>
+        Play
+      </button>
+    `;
+  }
+
+  return html`
+    <button type="button" class="${c.facade}" aria-label="Play video" data-light-play>
+      ${posterImage(poster)}
+      <span class="${c.facadePlay}">${playIcon}</span>
+    </button>
+  `;
+}
+
+function placeholder(poster: string | undefined): string {
+  return kind === 'audio'
+    ? html`<div class="${c.audioPlaceholder}"></div>`
+    : html`<div class="${c.placeholder}">${posterImage(poster)}</div>`;
+}
+
 // Counts renders, so a player that finishes loading after a newer render doesn't mount.
 let generation = 0;
 
+function setResolved(description: string | null) {
+  resolved = description;
+  resolvedOutput.textContent = description ?? '(none)';
+  renderScriptBytes();
+}
+
 function renderStage() {
-  const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === src)?.poster;
+  const poster = posterOf(src);
   const current = ++generation;
 
-  cleanup();
-  cleanup = () => {};
-  resolved.textContent = '(none)';
-  lazyVideo = null;
-  renderScriptBytes();
+  player?.destroy();
+  player = null;
+  embedFetching = false;
+  setResolved(null);
 
   if (light && clickedAt === undefined) {
-    stage.innerHTML = html`
-      <button type="button" class="${c.facade}" aria-label="Play video" data-light-play>
-        ${poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : ''}
-        <span class="${c.facadePlay}">
-          <svg class="${c.facadeIcon}" viewBox="0 0 24 24" aria-hidden="true"><path d="${PLAY_ICON_PATH}" /></svg>
-        </span>
-      </button>
-    `;
+    stage.innerHTML = facade(poster);
     renderLightStatus();
     return;
   }
 
   // The poster stays up while the player loads.
-  stage.innerHTML = html`
-    <div class="${c.placeholder}">${poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : ''}</div>
-  `;
+  stage.innerHTML = placeholder(poster);
   renderLightStatus();
 
-  void loadPlayer().then(() => {
-    if (current === generation) mountPlayer(poster);
-  });
-}
+  void loadPlayer().then(({ mount }) => {
+    if (current !== generation) return;
 
-function mountPlayer(poster: string | undefined) {
-  stage.innerHTML = html`
-    <video-player${poster ? ` poster="${poster}"` : ''}>
-      <video-skin class="sandbox-video-frame">
-        <lazy-video
-                  src="${src}"
-                  playsinline
-                  crossorigin${light || autoplay ? ' autoplay' : ''}${muted ? ' muted' : ''}${
-                    // Left off for `none`, so the page shows what `<lazy-video>` does by default.
-                    preload === 'none' ? '' : ` preload="${preload}"`
-                  }
-                ></lazy-video>
-      </video-skin>
-    </video-player>
-  `;
-
-  const media = stage.querySelector('lazy-video')!;
-  const { store } = stage.querySelector<VideoPlayerElement>('video-player')!;
-  let stopEmbedObserver = () => {};
-  const syncResolved = () => {
-    const child = media.firstElementChild;
-
-    resolved.textContent = child ? `<${child.localName}>` : '(none)';
-    stopEmbedObserver();
-    embedFetching = false;
-    // Embed hosts keep their frame in their shadow root; it's there from the moment the element is created.
-    stopEmbedObserver = child
-      ? observeEmbedFetching(child.shadowRoot?.querySelector('iframe') ?? null, (fetching) => {
-          embedFetching = fetching;
-          renderScriptBytes();
-        })
-      : () => {};
-    renderScriptBytes();
-  };
-  const observer = new MutationObserver(syncResolved);
-
-  observer.observe(media, { childList: true });
-  lazyVideo = media;
-  syncResolved();
-
-  // In light mode, report how long after the click playback started, if it did.
-  const unsubscribe = light
-    ? store.subscribe(() => {
-        if (!store.state.started || startedAt !== undefined) return;
+    player = mount(stage, {
+      src,
+      poster,
+      autoplay: light || autoplay,
+      muted,
+      preload,
+      onResolved: setResolved,
+      onEmbedFetching(fetching) {
+        embedFetching = fetching;
+        renderScriptBytes();
+      },
+      onStarted() {
+        // In light mode, report how long after the click playback started, if it did.
+        if (!light || startedAt !== undefined) return;
 
         startedAt = performance.now();
         renderLightStatus();
-      })
-    : () => {};
-
-  cleanup = () => {
-    observer.disconnect();
-    stopEmbedObserver();
-    unsubscribe();
-  };
-  renderLightStatus();
+      },
+    });
+  });
 }
 
 function resetLight() {
@@ -393,6 +449,19 @@ preloadSelect.addEventListener('change', () => {
 
 root.addEventListener('click', (event) => {
   const target = event.target instanceof Element ? event.target : null;
+  const choice = target?.closest<HTMLButtonElement>('button[data-framework], button[data-kind]');
+
+  // Code a framework or kind loaded can't be unloaded, so the page reloads to count only the new combination's.
+  if (choice) {
+    if (choice.getAttribute('aria-pressed') === 'true') return;
+
+    setUrlLazyState({
+      framework: LAZY_FRAMEWORKS.find((value) => value === choice.dataset.framework),
+      kind: LAZY_KINDS.find((value) => value === choice.dataset.kind),
+    });
+    location.reload();
+    return;
+  }
 
   if (target?.closest('[data-light-play]')) {
     clickedAt = performance.now();
@@ -417,15 +486,9 @@ root.addEventListener('click', (event) => {
   sourceChangedAt = scriptBytes;
   renderScriptBytes();
 
-  // Outside light mode the same `<lazy-video>` swaps its media in place, so the player's poster has to follow it.
-  if (lazyVideo && !light) {
-    const player = lazyVideo.closest('video-player')!;
-    const poster = LAZY_VIDEO_SOURCES.find((source) => source.src === next)?.poster;
-
-    if (poster) player.setAttribute('poster', poster);
-    else player.removeAttribute('poster');
-
-    lazyVideo.setAttribute('src', next);
+  // Outside light mode the same lazy media swaps its media in place, as an app changing `src` does.
+  if (player && !light) {
+    player.setSource(next, posterOf(next));
     return;
   }
 

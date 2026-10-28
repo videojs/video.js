@@ -178,8 +178,7 @@ function sandboxTemplateSyncPlugin(): Plugin {
  */
 const ISOLATED_ENTRIES: Readonly<Record<string, string>> = {
   // Vite environment names are identifiers, so each page is keyed by one.
-  lazyVideoHtml: 'lazy-video-html',
-  lazyVideoReact: 'lazy-video-react',
+  lazyMedia: 'lazy-media',
 };
 
 /** Discover sandbox entries by finding subdirectories of src/ that contain an index.html. */

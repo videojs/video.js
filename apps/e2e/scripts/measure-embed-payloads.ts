@@ -1,7 +1,7 @@
 /**
- * Measures what each embed in the lazy-video sandbox downloads from its service: the iframe, everything it loads, and
- * any SDK it loads into the page. The page can't see this itself (cross-origin frames keep their requests private), so
- * the sandbox shows the result as a measured estimate.
+ * Measures what each video embed in the lazy media sandbox downloads from its service: the iframe, everything it loads,
+ * and any SDK it loads into the page. The page can't see this itself (cross-origin frames keep their requests private),
+ * so the sandbox shows the result as a measured estimate.
  *
  * Writes `apps/sandbox/app/shared/embed-payloads.json`.
  *
@@ -18,7 +18,7 @@ import { chromium, type Request } from 'playwright-core';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = resolve(__dirname, '../../sandbox/app/shared/embed-payloads.json');
 
-// The `?source=` names of the lazy-video sandbox's embeds.
+// The `?source=` names of the lazy media sandbox's video embeds, which it opens by default.
 const SOURCES = ['youtube', 'vimeo', 'wistia', 'cloudflare', 'tiktok', 'twitch', 'player-js'];
 const RUNS = 3;
 // Long enough for each embed to finish loading its player without playing.
@@ -65,7 +65,7 @@ async function measure(source: string): Promise<Payload> {
   }
 
   context.on('requestfinished', onRequest);
-  await page.goto(`${origin}/lazy-video-html/?source=${source}`, { waitUntil: 'load' });
+  await page.goto(`${origin}/lazy-media/?source=${source}`, { waitUntil: 'load' });
   await page.waitForTimeout(SETTLE_MS);
 
   const results = (await Promise.all(sizes)).filter((result) => result !== null);
