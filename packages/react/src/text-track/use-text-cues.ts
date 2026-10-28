@@ -75,8 +75,8 @@ function useCues(
  */
 export function useReadTextCues(
   filter: TextTrackQuery,
-  read: (source: TextCuesSource, filter: TextTrackQuery) => MediaTextCue[]
-): MediaTextCue[] {
+  read: (source: TextCuesSource, filter: TextTrackQuery) => readonly MediaTextCue[]
+): readonly MediaTextCue[] {
   return usePlayer((state) => (hasTextCues(state) ? read(state, filter) : NO_CUES));
 }
 
