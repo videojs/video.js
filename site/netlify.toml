@@ -660,6 +660,11 @@
   status = 301
 
 [[redirects]]
+  from = "/docs/framework/:framework/concepts/cast"
+  to = "/docs/framework/:framework/guides/casting"
+  status = 301
+
+[[redirects]]
   from = "/docs/framework/react/guides/handle-playback-errors"
   to = "/docs/framework/react/guides/playback-errors"
   status = 301
@@ -837,6 +842,12 @@
 [[redirects]]
   from = "/docs/framework/:framework/how-to/*"
   to = "/docs/framework/:framework/guides/:splat"
+  status = 301
+
+# Beta docs URLs carried a style segment, e.g. /docs/framework/react/style/css/how-to/installation.
+[[redirects]]
+  from = "/docs/framework/:framework/style/:style/*"
+  to = "/docs/framework/:framework/:splat"
   status = 301
 
 # Reference pages retired on purpose for now, even though their exports still exist; their old URLs stop at the 404
@@ -1629,6 +1640,38 @@
   from = "/blog/authors/greg-smith"
   to = "https://legacy.videojs.org/blog/"
   status = 307
+
+# Netlify matches redirect paths case-sensitively. Search Console reports these spellings of pre-v10 posts from
+# old blog.videojs.com links.
+[[redirects]]
+  from = "/blog/Google-is-dropping-h-264-from-Chrome"
+  to = "https://legacy.videojs.org/blog/google-is-dropping-h-264-from-chrome/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/Lynda-com-HTML5-Video-Tutorial-Released"
+  to = "https://legacy.videojs.org/blog/lynda-com-html5-video-tutorial-released/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/Video-js-7-is-here"
+  to = "https://legacy.videojs.org/blog/video-js-7-is-here/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/Version-3-1-Update"
+  to = "https://legacy.videojs.org/blog/version-3-1-update/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/New-MPEG-LA-WebM-VP8-Patent-Pool"
+  to = "https://legacy.videojs.org/blog/new-mpeg-la-webm-vp8-patent-pool/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/video-js-7-3-responsive-layout-fill-mode-createlogger"
+  to = "https://legacy.videojs.org/blog/video-js-7-3-responsive-layout-fill-mode-createlogger/"
+  status = 308
 
 # Pre-v10 blog posts live on the legacy site. Each post has a .md twin.
 # legacy.videojs.org serves two posts under slugs its build prefixed with the previous post's filename.
@@ -2703,6 +2746,17 @@
   to = "https://legacy.videojs.org/blog/video-js-5-the-only-thing-that%E2%80%99s-changed-is-everything-except-for-like-3-things-that-didn-t-including-the-name/"
   status = 308
 
+# blog.videojs.com served tag and monthly archive pages under /blog. The legacy blog has tags but no archives.
+[[redirects]]
+  from = "/blog/tags/*"
+  to = "https://legacy.videojs.org/tags/:splat/"
+  status = 308
+
+[[redirects]]
+  from = "/blog/archives/*"
+  to = "https://legacy.videojs.org/blog/"
+  status = 308
+
 # Tag pages belonged to the pre-v10 blog, which lives on the legacy site
 [[redirects]]
   from = "/tags"
@@ -2729,4 +2783,25 @@
 [[redirects]]
   from = "/plugins"
   to = "https://legacy.videojs.org/plugins/"
+  status = 308
+
+# Older videojs.com pages that Search Console still finds links to.
+[[redirects]]
+  from = "/gettingstarted"
+  to = "https://legacy.videojs.org/getting-started/"
+  status = 308
+
+[[redirects]]
+  from = "/download"
+  to = "https://legacy.videojs.org/getting-started/"
+  status = 308
+
+[[redirects]]
+  from = "/docs/options.html"
+  to = "https://legacy.videojs.org/guides/options/"
+  status = 308
+
+[[redirects]]
+  from = "/docs/guides/tracks.html"
+  to = "https://legacy.videojs.org/guides/text-tracks/"
   status = 308
