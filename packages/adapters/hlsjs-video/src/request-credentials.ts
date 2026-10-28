@@ -27,15 +27,16 @@ export function withRequestCredentials(
   const { xhrSetup, fetchSetup } = config;
 
   return {
+    // hls.js calls both hooks with the loader as `this`; pass it on.
     async xhrSetup(xhr, url, context) {
       if (isCredentialed(crossOrigin())) xhr.withCredentials = true;
 
-      await xhrSetup?.(xhr, url, context);
+      await xhrSetup?.call(this, xhr, url, context);
     },
     fetchSetup(context, initParams) {
       if (isCredentialed(crossOrigin())) initParams.credentials = 'include';
 
-      return fetchSetup ? fetchSetup(context, initParams) : new Request(context.url, initParams);
+      return fetchSetup ? fetchSetup.call(this, context, initParams) : new Request(context.url, initParams);
     },
   };
 }

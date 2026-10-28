@@ -1,5 +1,5 @@
 import type { MediaResolution } from '@videojs/media';
-import Hls, { CapLevelController, type HlsConfig, type Level } from 'hls.js';
+import Hls, { CapLevelController, type Level } from 'hls.js';
 
 /**
  * Live cap inputs the installed cap-level controller reads on every evaluation.
@@ -29,7 +29,7 @@ export interface RenditionCapPolicy {
 export const DEFAULT_MIN_AUTO_RESOLUTION: MediaResolution = '720p';
 
 export interface RenditionCapController {
-  /** Re-evaluate the policy now rather than on hls.js's next tick. */
+  /** Re-evaluate the policy now rather than when hls.js next measures the element. */
   apply(): void;
 }
 
@@ -104,18 +104,18 @@ export function levelIndexAtOrAbove(
   return atFloor === -1 ? levels.length - 1 : atFloor;
 }
 
-type CapLevelControllerClass = NonNullable<HlsConfig['capLevelController']>;
+type CapLevelControllerClass = typeof CapLevelController;
 
 /**
  * Build the `capLevelController` class to hand to the hls.js constructor.
  *
- * `hls.autoLevelCapping` has exactly one writer: hls.js's own `CapLevelController`, which rewrites it whenever the
- * element resizes (or on a one-second interval where `ResizeObserver` is missing) for as long as `capLevelToPlayerSize`
- * is on — and it is on by default here. Assigning the property from outside is undone on the next measurement, so a cap
- * has to be applied from inside the controller rather than in competition with it.
+ * `hls.autoLevelCapping` is rewritten by hls.js's own `CapLevelController` whenever the element resizes (or on a
+ * one-second interval where `ResizeObserver` is missing) for as long as `capLevelToPlayerSize` is on — and it is on by
+ * default here. Assigning the property from outside is undone on the next measurement, so a cap has to be applied from
+ * inside the controller rather than in competition with it.
  *
  * The only seam hls.js offers is `getMaxLevel()`, which every value the capping loop writes passes through. Overriding
- * it makes the requested ceiling part of the same single-writer computation.
+ * it makes the requested ceiling part of the same computation.
  *
  * @param policy - Live cap inputs, re-read on every evaluation.
  * @param BaseController - Controller to layer on top of, so a controller passed through
@@ -127,7 +127,6 @@ export function createCapLevelController(
 ): CapLevelControllerClass {
   return class RenditionCapLevelController extends BaseController {
     #hls: Hls;
-    #capping = false;
     #measuringWithoutSize = false;
 
     constructor(hls: Hls) {
@@ -148,25 +147,6 @@ export function createCapLevelController(
       if (policy.controller === this) policy.controller = undefined;
 
       super.destroy();
-    }
-
-    // hls.js keeps its observer and interval handles private, so the loop is
-    // tracked through the public start/stop pair instead of reaching into them.
-    startCapping() {
-      super.startCapping();
-
-      // Hls.js calls this whenever video is confirmed, whether or not its loop
-      // is switched on, and bails without measuring when it is off or when the
-      // `ResizeObserver` it opens on attach is already running. Measure here so
-      // the cap does not wait for the next resize.
-      this.#capping = this.#hls.config.capLevelToPlayerSize;
-
-      if (this.#capping) this.detectPlayerSize();
-    }
-
-    stopCapping() {
-      this.#capping = false;
-      super.stopCapping();
     }
 
     /**
@@ -252,9 +232,11 @@ export function createCapLevelController(
     }
 
     apply() {
-      // While the loop runs it owns the slot, so go through its own path;
-      // everything it writes already passes through `getMaxLevel()`.
-      if (this.#capping) {
+      // With size capping on, measuring owns the slot: everything it writes
+      // passes through `getMaxLevel()`, and an unmeasurable element falls back
+      // to the resolution cap. Whether hls.js's own loop is running is not
+      // tracked, since it starts measuring on attach without `startCapping()`.
+      if (this.#hls.config.capLevelToPlayerSize) {
         this.detectPlayerSize();
         return;
       }
