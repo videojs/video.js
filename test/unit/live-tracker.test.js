@@ -216,6 +216,27 @@ QUnit.module('LiveTracker', () => {
     assert.strictEqual(this.liveTracker.liveCurrentTime(), 2.03, 'liveCurrentTime is now 2.03');
   });
 
+  QUnit.test('liveCurrentTime does not go backwards when seekable end moves forward by less than the time passed', function(assert) {
+    assert.strictEqual(this.liveTracker.liveCurrentTime(), 30, 'liveCurrentTime starts at 30');
+
+    // The next playlist update arrives 8 seconds later but only moves the
+    // seekable end forward by 6 seconds, as happens with late refreshes.
+    this.clock.tick(8010);
+    const before = this.liveTracker.liveCurrentTime();
+
+    assert.ok(before > 38, 'liveCurrentTime has moved on to about 38');
+
+    this.player.seekable = () => createTimeRanges(0, 36);
+    this.clock.tick(30);
+
+    const after = this.liveTracker.liveCurrentTime();
+
+    assert.ok(after >= before, `liveCurrentTime does not go backwards (${before} then ${after})`);
+
+    this.clock.tick(1000);
+    assert.ok(this.liveTracker.liveCurrentTime() > after, 'and keeps moving forward');
+  });
+
   QUnit.test('can seek to live edge', function(assert) {
     this.player.trigger('timeupdate');
 
