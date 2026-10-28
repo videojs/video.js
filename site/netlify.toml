@@ -839,6 +839,42 @@
   to = "/docs/framework/:framework/reference/api/i18n-controller.md"
   status = 301
 
+# The i18n how-to guides became one internationalization guide.
+[[redirects]]
+  from = "/docs/framework/:framework/how-to/i18n-register-locale"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/how-to/i18n-override-translations"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/how-to/i18n-ssr"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/guides/i18n-register-locale"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/guides/i18n-override-translations"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/guides/i18n-ssr"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/concepts/i18n"
+  to = "/docs/framework/:framework/guides/internationalization"
+  status = 301
+
 [[redirects]]
   from = "/docs/framework/:framework/how-to/*"
   to = "/docs/framework/:framework/guides/:splat"
@@ -850,10 +886,87 @@
   to = "/docs/framework/:framework/:splat"
   status = 301
 
+# Beta reference pages that were renamed, merged into a guide, or replaced by createPlayer. Minimal skins became the
+# neutral skins.
+[[redirects]]
+  from = "/docs/framework/:framework/reference/select-buffer"
+  to = "/docs/framework/:framework/reference/api/feature-buffer"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/select-fullscreen"
+  to = "/docs/framework/:framework/reference/api/feature-fullscreen"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/select-playback-rate"
+  to = "/docs/framework/:framework/reference/api/feature-playback-rate"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/feature-cast"
+  to = "/docs/framework/:framework/guides/casting"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/use-media"
+  to = "/docs/framework/:framework/reference/api/use-media"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/video-minimal-skin"
+  to = "/docs/framework/:framework/reference/components/video-neutral-skin"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/audio-minimal-skin"
+  to = "/docs/framework/:framework/reference/components/audio-neutral-skin"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/live-video-minimal-skin"
+  to = "/docs/framework/:framework/reference/components/live-video-neutral-skin"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/:framework/reference/live-audio-minimal-skin"
+  to = "/docs/framework/:framework/reference/components/live-audio-neutral-skin"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/react/reference/player-provider"
+  to = "/docs/framework/react/reference/api/create-player"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/react/reference/use-media-registration"
+  to = "/docs/framework/react/reference/api/create-player"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/react/reference/use-attach-media"
+  to = "/docs/framework/react/reference/api/create-player"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/react/reference/use-tooltip-context"
+  to = "/docs/framework/react/reference/api/create-player"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/html/reference/provider-mixin"
+  to = "/docs/framework/html/reference/api/html-create-player"
+  status = 301
+
+[[redirects]]
+  from = "/docs/framework/html/reference/player-context"
+  to = "/docs/framework/html/reference/api/html-create-player"
+  status = 301
+
 # Reference pages retired on purpose for now, even though their exports still exist; their old URLs stop at the 404
-# below rather than redirecting: use-media, use-media-attach, use-media-extension, use-media-instance, use-attach-media,
-# use-player-context, use-dialog-context, use-error-dialog-context, use-menu-context, use-optional-menu-context,
-# use-popover-context, use-tooltip-context, player-context, i-18-n-context, html-i-18-n-context, media-attach-mixin.
+# below rather than redirecting: use-media-attach, use-media-extension, use-media-instance, use-player-context,
+# use-dialog-context, use-error-dialog-context, use-menu-context, use-optional-menu-context, use-popover-context,
+# i-18-n-context, html-i-18-n-context, media-attach-mixin.
 # Missing pages under the new prefixes must 404 here; otherwise the hop below would bounce them between
 # reference/ and components/ forever. Existing files are served before either rule applies.
 [[redirects]]
@@ -2743,11 +2856,12 @@
   to = "https://legacy.videojs.org/tags/:splat/"
   status = 308
 
-# Misc v8 stragglers. Their inbound links come from Video.js 8 tutorials, so they land on the matching v8 page on the
-# legacy site. Permanent, so search engines move the old URLs' signals there.
+# Misc v8 stragglers. Readers who reach /getting-started on videojs.org want to start with v10, so it goes to the
+# default framework's install guide rather than the install-picker route, which only redirects. /advanced and /plugins
+# cover v8-only features, so they land on their v8 pages. Permanent, so search engines move the old URLs' signals.
 [[redirects]]
   from = "/getting-started"
-  to = "https://legacy.videojs.org/getting-started/"
+  to = "/docs/guides/installation/react"
   status = 308
 
 [[redirects]]
