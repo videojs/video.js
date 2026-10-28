@@ -4,6 +4,7 @@ import {
   CLOUDFLARE_VIDEO_SRC,
   getPosterSrc,
   SOURCES,
+  SPOTIFY_AUDIO_SRC,
   TIKTOK_VIDEO_SRC,
   TWITCH_VIDEO_SRC,
   VIMEO_VIDEO_SRC,
@@ -35,8 +36,18 @@ interface LazySourceGroup {
   sources: readonly LazySource[];
 }
 
-/** One source per media `LazyVideo` resolves to, grouped for the lazy-video sandboxes. */
-export const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
+/** The frameworks the lazy media sandbox renders `LazyVideo` and `LazyAudio` with. */
+export const LAZY_FRAMEWORKS = ['html', 'react'] as const;
+
+export type LazyFramework = (typeof LAZY_FRAMEWORKS)[number];
+
+/** Whether the sandbox renders `LazyVideo` or `LazyAudio`. */
+export const LAZY_KINDS = ['video', 'audio'] as const;
+
+export type LazyKind = (typeof LAZY_KINDS)[number];
+
+/** One source per media `LazyVideo` resolves to. */
+const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
   {
     label: 'Files and streams',
     sources: [
@@ -90,18 +101,67 @@ export const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
   },
 ];
 
-export const LAZY_VIDEO_SOURCES: readonly LazySource[] = LAZY_VIDEO_SOURCE_GROUPS.flatMap(({ sources }) => sources);
+/** One source per media `LazyAudio` resolves to. */
+const LAZY_AUDIO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
+  {
+    label: 'Files and streams',
+    sources: [
+      // The installation snippet's audio demo.
+      { label: 'M4A', src: 'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/audio.m4a' },
+      // Not a Mux host, so it resolves as plain HLS: native on Safari, the SPF engine elsewhere.
+      { label: 'HLS', src: SOURCES['hls-mixed-codec'].url! },
+      { label: 'Mux', src: SOURCES['hls-audio-only-cmaf'].url! },
+    ],
+  },
+  {
+    label: 'Embeds',
+    sources: [
+      { label: 'Spotify', src: SPOTIFY_AUDIO_SRC },
+      { label: 'SoundCloud', src: SOURCES['soundcloud-track'].url! },
+    ],
+  },
+];
+
+export const LAZY_SOURCE_GROUPS = {
+  video: LAZY_VIDEO_SOURCE_GROUPS,
+  audio: LAZY_AUDIO_SOURCE_GROUPS,
+} satisfies Record<LazyKind, readonly LazySourceGroup[]>;
+
+const LAZY_SOURCES = {
+  video: LAZY_VIDEO_SOURCE_GROUPS.flatMap(({ sources }) => sources),
+  audio: LAZY_AUDIO_SOURCE_GROUPS.flatMap(({ sources }) => sources),
+} satisfies Record<LazyKind, readonly LazySource[]>;
+
+/** The source playing `src`, if the sandbox offers one. */
+export function findLazySource(kind: LazyKind, src: string): LazySource | undefined {
+  return LAZY_SOURCES[kind].find((source) => source.src === src);
+}
 
 /** A source's name in the page URL, such as `dash` or `player-js`. */
 function lazySourceId({ label }: LazySource): string {
   return label.toLowerCase().replace(/[^a-z\d]+/g, '-');
 }
 
-/** The source `?source=` names, or the first one. */
-export function getUrlLazySource(): LazySource {
+/** The source `?source=` names among those for `kind`, or the first one. */
+export function getUrlLazySource(kind: LazyKind): LazySource {
   const id = new URLSearchParams(location.search).get('source');
+  const sources = LAZY_SOURCES[kind];
 
-  return LAZY_VIDEO_SOURCES.find((source) => lazySourceId(source) === id) ?? LAZY_VIDEO_SOURCES[0]!;
+  return sources.find((source) => lazySourceId(source) === id) ?? sources[0]!;
+}
+
+/** The `?framework=` value, or `html`. */
+export function getUrlFramework(): LazyFramework {
+  const value = new URLSearchParams(location.search).get('framework');
+
+  return LAZY_FRAMEWORKS.find((framework) => framework === value) ?? 'html';
+}
+
+/** The `?kind=` value, or `video`. */
+export function getUrlKind(): LazyKind {
+  const value = new URLSearchParams(location.search).get('kind');
+
+  return LAZY_KINDS.find((kind) => kind === value) ?? 'video';
 }
 
 /** When `embed-payloads.json` was measured, for the breakdown's caption. */
@@ -111,8 +171,8 @@ export const EMBED_PAYLOADS_MEASURED_AT = embedPayloads.measuredAt;
  * What the embed for `src` downloads from its service, as measured by `pnpm --dir apps/e2e measure-embed-payloads`, or
  * `undefined` for a source that isn't an embed.
  */
-export function getEmbedPayload(src: string): EmbedPayload | undefined {
-  const source = LAZY_VIDEO_SOURCES.find((option) => option.src === src);
+export function getEmbedPayload(kind: LazyKind, src: string): EmbedPayload | undefined {
+  const source = findLazySource(kind, src);
   const embeds: Partial<Record<string, { scripts: number; total: number }>> = embedPayloads.embeds;
   const payload = source && embeds[lazySourceId(source)];
 
@@ -157,7 +217,7 @@ export function getUrlMuted(): boolean {
   return new URLSearchParams(location.search).has('muted');
 }
 
-/** The `preload` values the lazy-video sandboxes offer. `none` is what `LazyVideo` plays when none is given. */
+/** The `preload` values the lazy media sandbox offers. `none` is what lazy media plays when none is given. */
 export const LAZY_PRELOADS = ['none', 'metadata', 'auto'] as const;
 
 export type LazyPreload = (typeof LAZY_PRELOADS)[number];
@@ -166,7 +226,7 @@ function isLazyPreload(value: string | null): value is LazyPreload {
   return LAZY_PRELOADS.some((preload) => preload === value);
 }
 
-/** The `?preload=` value, or `none` when it is absent or not one `LazyVideo` takes. */
+/** The `?preload=` value, or `none` when it is absent or not one lazy media takes. */
 export function getUrlPreload(): LazyPreload {
   const value = new URLSearchParams(location.search).get('preload');
 
@@ -174,6 +234,9 @@ export function getUrlPreload(): LazyPreload {
 }
 
 interface LazyUrlState {
+  framework?: LazyFramework | undefined;
+  /** A new kind clears the source, since each kind offers its own. */
+  kind?: LazyKind | undefined;
   src?: string;
   light?: boolean;
   autoplay?: boolean;
@@ -182,9 +245,20 @@ interface LazyUrlState {
 }
 
 /** Keeps the source and the page's toggles in the page URL, so a reload or a shared link opens the same state. */
-export function setUrlLazyState({ src, light, autoplay, muted, preload }: LazyUrlState): void {
+export function setUrlLazyState({ framework, kind, src, light, autoplay, muted, preload }: LazyUrlState): void {
   const url = new URL(location.href);
-  const source = src === undefined ? undefined : LAZY_VIDEO_SOURCES.find((option) => option.src === src);
+  const source = src === undefined ? undefined : findLazySource(getUrlKind(), src);
+
+  // `html` and `video` are the defaults, so they leave the URL clean.
+  if (framework === 'html') url.searchParams.delete('framework');
+  else if (framework) url.searchParams.set('framework', framework);
+
+  if (kind) {
+    url.searchParams.delete('source');
+
+    if (kind === 'video') url.searchParams.delete('kind');
+    else url.searchParams.set('kind', kind);
+  }
 
   if (source) url.searchParams.set('source', lazySourceId(source));
 
@@ -204,7 +278,37 @@ export function setUrlLazyState({ src, light, autoplay, muted, preload }: LazyUr
   history.replaceState(null, '', url);
 }
 
-/** Tailwind classes the HTML and React lazy-video sandboxes share, so the two pages look the same. */
+/** What a lazy media player module mounts with. */
+export interface LazyPlayerOptions {
+  src: string;
+  poster: string | undefined;
+  autoplay: boolean;
+  /** Start muted, which browsers require before most autoplay. */
+  muted: boolean;
+  /** `none` is left off, so the page shows what lazy media does by default. */
+  preload: LazyPreload;
+  /** Receives a description of the resolved media, or `null` while there's none. */
+  onResolved: (description: string | null) => void;
+  /** Receives whether the resolved media's embed has started downloading from its service. */
+  onEmbedFetching: (fetching: boolean) => void;
+  /** Called once playback starts. */
+  onStarted: () => void;
+}
+
+/** A mounted lazy media player. */
+export interface LazyPlayer {
+  /** Change the source in place, as an app changing `src` does. */
+  setSource(src: string, poster: string | undefined): void;
+  destroy(): void;
+}
+
+/**
+ * Mounts a player with `LazyVideo` or `LazyAudio` into `stage`. One module per framework and kind, so the page loads
+ * only the code that combination ships.
+ */
+export type MountLazyPlayer = (stage: HTMLElement, options: LazyPlayerOptions) => LazyPlayer;
+
+/** Tailwind classes for the lazy media sandbox. */
 export const LAZY_DEMO_CLASSES = {
   header: 'grid gap-1',
   title: 'text-2xl font-semibold tracking-tight',
@@ -225,6 +329,14 @@ export const LAZY_DEMO_CLASSES = {
     'sandbox-video-frame group relative grid w-full cursor-pointer place-items-center overflow-hidden bg-black outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
   facadeImage: 'absolute inset-0 size-full object-cover',
   placeholder: 'sandbox-video-frame relative w-full overflow-hidden bg-black',
+  audioFrame: 'mx-auto w-full max-w-xl',
+  audioFacade:
+    'mx-auto flex h-14 w-full max-w-xl cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 text-sm font-medium outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+  audioFacadePlay: 'grid size-9 place-items-center rounded-full bg-primary text-primary-foreground',
+  audioPlaceholder: 'mx-auto h-14 w-full max-w-xl rounded-xl border border-border bg-card',
+  segmented: 'inline-flex rounded-md border border-input p-0.5',
+  segment:
+    'h-7 cursor-pointer rounded px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90',
   facadePlay:
     'relative grid size-16 place-items-center rounded-full bg-black/60 text-white transition-transform group-hover:scale-110',
   facadeIcon: 'size-8 fill-current',
