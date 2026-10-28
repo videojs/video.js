@@ -39,17 +39,13 @@ describe('SpotifyAudio', () => {
     );
   });
 
-  it('renders an empty frame under preload="none" until playback is requested', () => {
-    expect(SpotifyAudio.getTemplateHTML({ src: SRC, preload: 'none' })).not.toMatch(/<iframe[^>]*\ssrc=/);
-  });
-
-  it('renders the embed under preload="none" when autoplay is set', () => {
-    expect(SpotifyAudio.getTemplateHTML({ src: SRC, preload: 'none', autoplay: '' })).toContain(
+  it('renders the embed under preload="none", since WebKit only plays one that was up before play', () => {
+    expect(SpotifyAudio.getTemplateHTML({ src: SRC, preload: 'none' })).toContain(
       'src="https://open.spotify.com/embed/track/'
     );
   });
 
-  it('builds no embed under preload="none" set after src in the same task, as lazy-audio sets it', async () => {
+  it('builds the embed under preload="none" set after src in the same task, as lazy-audio sets it', async () => {
     const TestSpotifyAudio = defineSpotifyAudio();
     const element = new TestSpotifyAudio();
 
@@ -57,7 +53,6 @@ describe('SpotifyAudio', () => {
     element.setAttribute('preload', 'none');
     await flushDeferredEmbed();
 
-    expect(iframeSrc(element)).toBe('');
-    expect(element.engine).toBe(null);
+    expect(iframeSrc(element)).toContain('https://open.spotify.com/embed/track/');
   });
 });
