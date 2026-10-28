@@ -39,7 +39,7 @@ The hook returns a handle to the track, or `null` before the track is added. The
 
 The track is replaced when its `kind`, `label`, or `language` changes, or when `cues` is a different array. Keep `cues` the same array across renders, such as by memoizing it; a new array replaces the track. Changing only `src` or `format` leaves the track as it is.
 
-An app track belongs to the current source, so changing the source or swapping the media removes it. The hook then adds the track again for what plays next. Calling the handle's `remove()` removes the track until the component remounts or the track is replaced.
+The hook removes the track when the component unmounts, and replaces it when the track's `kind`, `label`, `language`, `cues`, or `src` change. The track stays through source changes, so give the component a `key` per video to swap tracks with the video. Calling the handle's `remove()` removes the track until the component remounts or the track is replaced.
 
 Tracks a component adds work with any media, including embeds without text tracks of their own. A `captions` or `subtitles` track is copied into the media, so the browser draws it when it's selected and the captions menu lists it.
 

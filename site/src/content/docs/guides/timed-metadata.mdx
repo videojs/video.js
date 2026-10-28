@@ -84,11 +84,11 @@ Browsers never draw metadata or chapters cues, so the overlay, its styles, and i
 - `value` isn't checked at runtime unless the definition has a schema. See [Check values with a schema](#check-values-with-a-schema).
 
 <FrameworkCase frameworks={["react"]}>
-An app track belongs to the source that's playing when it's added. Changing the source or swapping the media removes it, and `useCreateTextTrack()` adds it again for the new source.
+Like a `<track>` element, an app track stays through source changes until it's removed. `useCreateTextTrack()` removes its track when the component unmounts, so give the component a `key` per video to swap tracks with the video.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-An app track belongs to the source that's playing when you add it. Changing the source or swapping the media removes it, and its `removed` turns `true`. Add it again for the new source.
+Like a `<track>` element, an app track stays through source changes until you remove it. When you play a different video, remove its tracks and add the new video's.
 </FrameworkCase>
 
 ## Common variations
@@ -357,14 +357,14 @@ Confirm that:
 
 Only `metadata` cue text that parses as a JSON object or array becomes `value`; other text stays in `text`. With a schema, cues whose value fails it are skipped, with a warning in development.
 
-### An app track disappears
+### An app track outlives its video
 
 <FrameworkCase frameworks={["react"]}>
-The source changed or the media was swapped, which removes app tracks. `useCreateTextTrack()` adds the track again. If you call the store's `addTextTrack()` yourself, add the track again for the new source.
+App tracks stay until they're removed, through source changes. `useCreateTextTrack()` removes its track when the component unmounts, so give the component a `key` per video.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The source changed or the media was swapped, which removes app tracks. Call `addTextTrack()` again for the new source.
+App tracks stay until they're removed, through source changes. Call the handle's `remove()`, or the store's `removeTextTrack()`, before adding the next video's tracks.
 </FrameworkCase>
 
 ### Cues from a src never load
