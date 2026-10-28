@@ -33,6 +33,7 @@ export default {
         'media',
         'mux',
         'cloudflare-video',
+        'mixcloud-audio',
         'playerjs-video',
         'soundcloud-audio',
         'spotify-audio',

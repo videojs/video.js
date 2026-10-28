@@ -129,6 +129,7 @@ jobs:
           './packages/html'
           './packages/media'
           './packages/adapters/cloudflare-video'
+          './packages/adapters/mixcloud-audio'
           './packages/adapters/playerjs-video'
           './packages/adapters/soundcloud-audio'
           './packages/adapters/spotify-audio'
