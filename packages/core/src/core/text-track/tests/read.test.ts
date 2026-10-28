@@ -75,7 +75,7 @@ describe('getTextCues', () => {
     const cues = getTextCues({ textCues: [entry(createTrack('quiz'), [cue])] }, quizTrack);
 
     expect(cues).toEqual([cue]);
-    expectTypeOf(cues).toEqualTypeOf<MediaTextCue<Quiz>[]>();
+    expectTypeOf(cues).toEqualTypeOf<readonly MediaTextCue<Quiz>[]>();
   });
 
   describe('with a schema', () => {
@@ -88,7 +88,7 @@ describe('getTextCues', () => {
 
       expect(cues).toEqual([valid]);
       expect(warn).toHaveBeenCalledOnce();
-      expectTypeOf(cues).toEqualTypeOf<MediaTextCue<Quiz>[]>();
+      expectTypeOf(cues).toEqualTypeOf<readonly MediaTextCue<Quiz>[]>();
     });
 
     it('checks each cue once and keeps what it read', () => {
@@ -159,6 +159,6 @@ describe('hlsMetadataTrack', () => {
     const cues = getTextCues({ textCues }, hlsMetadataTrack);
 
     expect(cues).toEqual([cue]);
-    expectTypeOf(cues).toEqualTypeOf<HlsMetadataCue[]>();
+    expectTypeOf(cues).toEqualTypeOf<readonly HlsMetadataCue[]>();
   });
 });
