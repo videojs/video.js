@@ -1,8 +1,16 @@
-import { createStore } from '@videojs/store';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { combine, createStore } from '@videojs/store';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { podcastChapters } from '../../../../core/text-track/chapters';
+import { defineTextTrack } from '../../../../core/text-track/definition';
 import type { PlayerTarget } from '../../../player';
+import { textCuesFeature } from '../text-cues';
 import { textTrackFeature } from '../text-track';
+import { createTrack, type MockTrack, setSrc, setTime, setTracks } from './mock-text-tracks';
+
+vi.mock('../../parse-vtt', () => ({
+  parseVtt: vi.fn(async (text: string) => [{ id: 'vtt', startTime: 0, endTime: 5, text: text.split('\n').at(-1) }]),
+}));
 
 /**
  * Jsdom does not populate textTracks through addTextTrack or link a track element to its TextTrack. Supply track data
@@ -48,6 +56,18 @@ function createCue(startTime: number, endTime: number, text: string): VTTCue {
 
 function setDuration(video: HTMLVideoElement, duration: number): void {
   Object.defineProperty(video, 'duration', { configurable: true, value: duration });
+}
+
+/** A store with the text cues feature too, so app tracks can be checked through the cues read from them. */
+function setupWithCues(tracks: MockTrack[]) {
+  const video = document.createElement('video');
+  const list = setTracks(video, tracks);
+  const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+  Object.defineProperty(video, 'currentTime', { configurable: true, value: 0 });
+  store.attach({ media: video, container: null });
+
+  return { video, list, store };
 }
 
 describe('textTrackFeature', () => {
@@ -548,6 +568,488 @@ describe('textTrackFeature', () => {
       video.dispatchEvent(new Event('loadstart'));
 
       expect(store.state.thumbnailsTrack).toBeNull();
+    });
+  });
+
+  describe('addTextTrack', () => {
+    const cues = [
+      { startTime: 0, endTime: 10, value: { question: 'One?' } },
+      { startTime: 30, value: { question: 'Point?' } },
+    ];
+
+    it("adds a track whose cues are read like the media's", () => {
+      const { video, store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', cues });
+      const [entry] = store.state.textCues;
+
+      expect(entry!.track).toEqual({
+        id: quiz.id,
+        kind: 'metadata',
+        label: 'quiz',
+        language: '',
+        mode: 'hidden',
+        source: 'app',
+      });
+      expect(entry!.cues.map(({ value }) => value)).toEqual([{ question: 'One?' }, { question: 'Point?' }]);
+      expect(entry!.activeCues).toHaveLength(1);
+
+      setTime(video, 30.5);
+      expect(store.state.textCues[0]!.activeCues.map(({ value }) => value)).toEqual([{ question: 'Point?' }]);
+    });
+
+    it('keeps a point as a cue that ends where it starts', () => {
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack({ kind: 'metadata', cues: [{ startTime: 5 }] });
+
+      expect(store.state.textCues[0]!.cues[0]).toMatchObject({ startTime: 5, endTime: 5, text: '' });
+    });
+
+    it('adds and removes cues through the returned track', () => {
+      const { store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      quiz.addCue({ id: 'b', startTime: 20, endTime: 25 });
+      quiz.addCue({ id: 'a', startTime: 10, endTime: 15 });
+
+      expect(store.state.textCues[0]!.cues.map(({ id }) => id)).toEqual(['a', 'b']);
+
+      quiz.removeCue('a');
+
+      expect(store.state.textCues[0]!.cues.map(({ id }) => id)).toEqual(['b']);
+    });
+
+    it('removes the track', () => {
+      const { store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+      const ads = store.addTextTrack({ kind: 'metadata', label: 'ads' });
+
+      expect(quiz.removed).toBe(false);
+
+      quiz.remove();
+      store.removeTextTrack(ads.id);
+
+      expect(quiz.removed).toBe(true);
+      expect(ads.removed).toBe(true);
+      expect(store.state.textCues).toEqual([]);
+    });
+
+    it('leaves media tracks alone', () => {
+      const { store } = setupWithCues([createTrack('metadata', { id: 'ads' })]);
+
+      store.removeTextTrack('ads');
+
+      expect(store.state.textCues).toHaveLength(1);
+    });
+
+    it('takes a track definition', () => {
+      const quizTrack = defineTextTrack<{ question: string }>({ kind: 'metadata', label: 'quiz' });
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack(quizTrack, { cues: [{ startTime: 0, value: { question: 'Ready?' } }] });
+
+      expect(store.state.textCues[0]!.track.label).toBe('quiz');
+      expect(store.state.textCues[0]!.cues[0]!.value).toEqual({ question: 'Ready?' });
+    });
+
+    it('records tracks added before the store attaches', () => {
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(video, []);
+      store.addTextTrack({ kind: 'metadata', label: 'quiz', cues });
+      store.attach({ media: video, container: null });
+
+      expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
+    });
+
+    it('clears tracks when the source changes, keeping them through the first source', () => {
+      const { video, store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      setSrc(video, 'https://example.com/one.mp4');
+      expect(quiz.removed).toBe(false);
+
+      setSrc(video, 'https://example.com/one.mp4');
+      expect(quiz.removed).toBe(false);
+
+      setSrc(video, 'https://example.com/two.mp4');
+      expect(quiz.removed).toBe(true);
+      expect(store.state.textCues).toEqual([]);
+    });
+
+    it('keeps tracks through a re-attach to the same media', () => {
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(video, []);
+      Object.defineProperty(video, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
+
+      const detach = store.attach({ media: video, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      // A container change or an extension re-attaches the store to the same media.
+      detach();
+      expect(quiz.removed).toBe(false);
+
+      store.attach({ media: video, container: document.createElement('div') });
+
+      expect(quiz.removed).toBe(false);
+      expect(store.state.textCues.map(({ track }) => track.label)).toEqual(['quiz']);
+    });
+
+    it('clears tracks from the last source when the media is swapped', () => {
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(first, []);
+      setTracks(second, []);
+
+      const early = store.addTextTrack({ kind: 'metadata', label: 'early' });
+
+      Object.defineProperty(first, 'currentSrc', { configurable: true, value: 'https://example.com/one.mp4' });
+
+      const detach = store.attach({ media: first, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      detach();
+      // The early track adopted the first media's source, so it goes with it too.
+      store.attach({ media: second, container: null });
+
+      expect(quiz.removed).toBe(true);
+      expect(early.removed).toBe(true);
+    });
+
+    it('keeps a track added before any source through a media swap', () => {
+      const first = document.createElement('video');
+      const second = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(first, []);
+      setTracks(second, []);
+
+      const detach = store.attach({ media: first, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      detach();
+      store.attach({ media: second, container: null });
+
+      expect(quiz.removed).toBe(false);
+    });
+
+    it('removes a track while the store is detached', () => {
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(video, []);
+
+      const detach = store.attach({ media: video, container: null });
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      detach();
+      quiz.remove();
+      store.attach({ media: video, container: null });
+
+      expect(store.state.textCues).toEqual([]);
+    });
+
+    it('works on media without text tracks', () => {
+      const media = Object.assign(new EventTarget(), { currentTime: 5, duration: 60, seekable: {}, seek() {} });
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
+      store.addTextTrack({ kind: 'metadata', label: 'quiz', cues: [{ startTime: 0, endTime: 10, text: 'hi' }] });
+
+      expect(store.state.textCues[0]!.track.source).toBe('app');
+    });
+
+    it('is listed in textTrackList, and its chapters stand in for missing media chapters', () => {
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(video, [createTrack('captions', { id: 'en', label: 'English' })]);
+      store.attach({ media: video, container: null });
+      store.addTextTrack({
+        kind: 'chapters',
+        label: 'AI chapters',
+        cues: [{ startTime: 0, endTime: 30, text: 'Intro' }],
+      });
+
+      expect(store.state.textTrackList.map(({ label, source }) => [label, source])).toEqual([
+        ['English', 'media'],
+        ['AI chapters', 'app'],
+      ]);
+      expect(store.state.chaptersCues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+  });
+
+  it('runs app chapters without an end to the next chapter, and the last to the end of the media', () => {
+    const video = document.createElement('video');
+    const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+    setTracks(video, []);
+    Object.defineProperty(video, 'duration', { configurable: true, value: 100 });
+    store.attach({ media: video, container: null });
+    store.addTextTrack({
+      kind: 'chapters',
+      cues: [
+        { startTime: 0, text: 'Intro' },
+        { startTime: 30, text: 'Main' },
+      ],
+    });
+
+    expect(store.state.chaptersCues.map(({ startTime, endTime }) => [startTime, endTime])).toEqual([
+      [0, 30],
+      [30, 100],
+    ]);
+  });
+
+  describe('addTextTrack with a src', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
+
+    function respond(body: string, ok = true) {
+      const fetch = vi.fn(async () => ({ ok, status: ok ? 200 : 404, text: async () => body }));
+
+      vi.stubGlobal('fetch', fetch);
+
+      return fetch;
+    }
+
+    /** Let the fetch and parse promise chain settle. */
+    const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+    it('loads a JSON array of cues once attached', async () => {
+      const fetch = respond(JSON.stringify([{ startTime: 0, endTime: 10, value: { question: 'One?' } }]));
+      const video = document.createElement('video');
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      setTracks(video, []);
+      store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/quiz.json' });
+
+      expect(fetch).not.toHaveBeenCalled();
+
+      store.attach({ media: video, container: null });
+      await settle();
+
+      expect(fetch).toHaveBeenCalledWith('/quiz.json', expect.objectContaining({ signal: expect.any(AbortSignal) }));
+      expect(store.state.textCues[0]!.cues.map(({ value }) => value)).toEqual([{ question: 'One?' }]);
+    });
+
+    it('loads an object with a cues array, after the cues it was given', async () => {
+      respond(JSON.stringify({ cues: [{ startTime: 20, text: 'loaded' }] }));
+
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack({ kind: 'metadata', src: '/cues.json', cues: [{ startTime: 0, text: 'given' }] });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['given', 'loaded']);
+    });
+
+    it('reads other JSON through a format', async () => {
+      respond(JSON.stringify({ version: '1.2.0', chapters: [{ startTime: 0, title: 'Intro' }] }));
+
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack({ kind: 'chapters', src: '/chapters.json', format: podcastChapters });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+
+    it("parses WebVTT with the browser's parser", async () => {
+      respond('WEBVTT\n\n00:00.000 --> 00:05.000\nChapter one');
+
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack({ kind: 'chapters', src: '/chapters.vtt' });
+      await settle();
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Chapter one']);
+    });
+
+    it('keeps the track and warns when the file fails to load', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      respond('', false);
+
+      const { store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/missing.json' });
+
+      await settle();
+
+      expect(quiz.removed).toBe(false);
+      expect(store.state.textCues[0]!.cues).toEqual([]);
+      expect(warn).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('app captions', () => {
+    const trackDescriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+    /** Jsdom never links a `<track>` element to a `TextTrack`, so each element gets a stand-in. */
+    class ElementTrack {
+      mode: TextTrackMode = 'disabled';
+      cues: { startTime: number; endTime: number; text: string }[] = [];
+
+      constructor(readonly element: HTMLTrackElement) {}
+
+      get id() {
+        return this.element.id;
+      }
+
+      get kind() {
+        return this.element.kind;
+      }
+
+      get label() {
+        return this.element.label;
+      }
+
+      get language() {
+        return this.element.srclang;
+      }
+
+      addCue(cue: { startTime: number; endTime: number; text: string }) {
+        this.cues.push(cue);
+      }
+
+      removeCue(cue: { startTime: number; endTime: number; text: string }) {
+        this.cues.splice(this.cues.indexOf(cue), 1);
+      }
+    }
+
+    beforeEach(() => {
+      const tracks = new WeakMap<HTMLTrackElement, ElementTrack>();
+
+      Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+        configurable: true,
+        get(this: HTMLTrackElement) {
+          if (!tracks.has(this)) tracks.set(this, new ElementTrack(this));
+
+          return tracks.get(this);
+        },
+      });
+
+      vi.stubGlobal(
+        'VTTCue',
+        class {
+          id = '';
+
+          constructor(
+            readonly startTime: number,
+            readonly endTime: number,
+            readonly text: string
+          ) {}
+        }
+      );
+    });
+
+    afterEach(() => {
+      if (trackDescriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', trackDescriptor);
+      else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+
+      vi.unstubAllGlobals();
+    });
+
+    /** A video whose `textTracks` lists the tracks of its `<track>` children, as a browser's does. */
+    function setupWithElements() {
+      const video = document.createElement('video');
+      const list = new EventTarget() as EventTarget & Record<string, unknown>;
+
+      Object.defineProperty(video, 'textTracks', {
+        configurable: true,
+        get() {
+          const tracks = Array.from(video.querySelectorAll('track'), (element) => element.track);
+
+          for (const key of Object.keys(list)) delete list[key];
+
+          return Object.assign(list, tracks, { length: tracks.length });
+        },
+      });
+
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+      const detach = store.attach({ media: video, container: null });
+      const copyOf = (id: string) => video.querySelector<HTMLTrackElement>(`track[id="${id}"]`);
+
+      return { video, list, store, detach, copyOf };
+    }
+
+    const captions = {
+      kind: 'captions',
+      label: 'English',
+      language: 'en',
+      cues: [{ startTime: 0, endTime: 2, text: 'Hello' }],
+    } as const;
+
+    it('copies them into the media, writing cues once the copy settles', () => {
+      const { store, copyOf } = setupWithElements();
+      const track = store.addTextTrack(captions);
+      const copy = copyOf(track.id)!;
+
+      expect(copy).toMatchObject({ kind: 'captions', label: 'English', srclang: 'en' });
+      expect((copy.track as unknown as ElementTrack).cues).toEqual([]);
+
+      copy.dispatchEvent(new Event('error'));
+
+      expect((copy.track as unknown as ElementTrack).cues.map(({ text }) => text)).toEqual(['Hello']);
+      expect(copy.track.mode).toBe('disabled');
+    });
+
+    it("lists the app track once, in its copy's mode, and shows it through the captions menu", () => {
+      const { list, store } = setupWithElements();
+      const track = store.addTextTrack(captions);
+
+      list.dispatchEvent(new Event('addtrack'));
+
+      expect(store.state.textTrackList.map(({ id, source }) => [id, source])).toEqual([[track.id, 'app']]);
+
+      store.selectSubtitlesTrack(track.id);
+      list.dispatchEvent(new Event('change'));
+
+      expect(store.state.textTrackList[0]!.mode).toBe('showing');
+      expect(store.state.subtitlesShowing).toBe(true);
+    });
+
+    it('removes the copy with the app track, and when the store detaches', () => {
+      const { store, detach, copyOf } = setupWithElements();
+      const first = store.addTextTrack(captions);
+      const second = store.addTextTrack({ ...captions, label: 'Again' });
+
+      first.remove();
+
+      expect(copyOf(first.id)).toBeNull();
+      expect(copyOf(second.id)).not.toBeNull();
+
+      detach();
+
+      expect(copyOf(second.id)).toBeNull();
+    });
+
+    it('keeps a showing copy showing through a re-attach to the same media', () => {
+      const { video, store, detach, copyOf } = setupWithElements();
+      const track = store.addTextTrack(captions);
+
+      store.selectSubtitlesTrack(track.id);
+      detach();
+
+      expect(copyOf(track.id)).toBeNull();
+
+      store.attach({ media: video, container: null });
+
+      expect(copyOf(track.id)!.track.mode).toBe('showing');
+    });
+
+    it('leaves metadata tracks out of the media', () => {
+      const { video, store } = setupWithElements();
+
+      store.addTextTrack({ kind: 'metadata', label: 'quiz' });
+
+      expect(video.querySelector('track')).toBeNull();
     });
   });
 });
