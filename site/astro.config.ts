@@ -28,7 +28,7 @@ import { reactCompilerPlugin } from '../build/react-compiler.ts';
 import llmsMarkdown from './integrations/llms-integration';
 import { llmsIndexPaths } from './integrations/llms-sections';
 import { demoPlaceholderPlugin } from './scripts/replace-demo-placeholders.ts';
-import { PRERELEASE_URL, PRODUCTION_URL } from './src/consts.ts';
+import { PREFERENCE_REDIRECT_PATHS, PRERELEASE_URL, PRODUCTION_URL } from './src/consts.ts';
 import { satteriCdnVersion } from './src/utils/satteriCdnVersion';
 import { satteriCodeFrame } from './src/utils/satteriCodeFrame';
 import { satteriConditionalHeadings } from './src/utils/satteriConditionalHeadings';
@@ -111,6 +111,8 @@ export default defineConfig({
     sitemap({
       // The llms indexes are written after the build, so the sitemap cannot discover them from the page list.
       customPages: llmsIndexPaths().map((path) => `${SITE_URL}${path}`),
+      // A sitemap should list pages that answer 200, so search engines index the redirects' destinations instead.
+      filter: (page) => !PREFERENCE_REDIRECT_PATHS.has(new URL(page).pathname.replace(/\/$/, '')),
     }),
     llmsMarkdown(),
     react(),
