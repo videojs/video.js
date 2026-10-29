@@ -64,7 +64,7 @@ function toMaxEnd(duration = Number.NaN): number {
 interface PlainCueCopy {
   kind: string | undefined;
   /** The live cue's own id, which the copy's extends when another cue in the list has it too. */
-  id: string;
+  id: string | undefined;
   /** The live cue's own `value`, which a copy shares instead of parsing it from text. */
   data: unknown;
   cue: MediaTextCue;
