@@ -90,7 +90,7 @@ Until the media loads, nothing is rendered in its place, so give the player an a
 
 Set `type` to the source's MIME type when its URL has no file extension, such as a signed URL. `type` only chooses the media; it isn't passed on.
 
-Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js.
+Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js. It's also passed on to the resolved hls.js or Mux media, on its `source`, so a Mux stream follows the same preference.
 
 <FrameworkCase frameworks={["react"]}>
 Every other prop, including `ref`, `mediaRef`, event handlers, and children, is passed to the resolved media, so switching to that component directly only changes the import. Each media accepts the props it understands; embeds ignore `fallback`.
@@ -125,7 +125,7 @@ const AcmeLazyVideo = createLazyVideo([
 ]);
 ```
 
-A media gives `match` and either `load`, for a component whose code should download only once a source needs it, or `component`, for one that's cheap to ship up front. Set `fallback: true` when the component renders `fallback` content inside a `<video>` or `<audio>`.
+A media gives `match` and either `load`, for a component whose code should download only once a source needs it, or `component`, for one that's cheap to ship up front. Set `fallback: true` when the component renders `fallback` content inside a `<video>` or `<audio>`, and `preferPlayback: true` when its adapter, which it hands to `mediaRef`, takes `preferPlayback` on its `source`, as `HlsJsVideo` and `MuxVideo` do.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -152,7 +152,7 @@ customElements.define(
 );
 ```
 
-A media gives `match`, the `tag` of the element that plays its sources, and `load` to register that element once a source needs it. Leave `load` out for an element that's built in or already registered.
+A media gives `match`, the `tag` of the element that plays its sources, and `load` to register that element once a source needs it. Leave `load` out for an element that's built in or already registered. Set `preferPlayback: true` when the element takes `preferPlayback` on its `source`, as `<hlsjs-video>` and `<mux-video>` do.
 </FrameworkCase>
 
 `match` receives the source worked out once for every media:
@@ -253,7 +253,7 @@ Until the media loads, the player has no media, so its controls show their empty
 |---|---|---|---|
 | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
-| `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. |
+| `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
 | `preload` | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
 
@@ -262,6 +262,6 @@ Until the media loads, the player has no media, so its controls show their empty
 |---|---|---|---|---|
 | `src` | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
-| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. |
+| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
 | `preload` | | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
