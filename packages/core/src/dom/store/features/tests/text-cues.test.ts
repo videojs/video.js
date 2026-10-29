@@ -526,7 +526,7 @@ describe('textCuesFeature', () => {
     });
 
     it('stands in for chapters on media without text tracks', () => {
-      const media = Object.assign(new EventTarget(), { currentTime: 0, duration: 60, seekable: {}, seek() {} });
+      const media = Object.assign(new EventTarget(), { currentTime: 0, duration: 60, seeking: false });
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
 
       store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
