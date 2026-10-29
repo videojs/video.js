@@ -44,8 +44,9 @@ export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> =
 });
 
 /**
- * Chapters from a [Podcasting 2.0 JSON chapters](https://github.com/Podcastindex-org/podcast-namespace) file. Chapters
- * marked `toc: false` are left out, since they aren't meant to be shown.
+ * Chapters from a [Podcasting 2.0 JSON chapters](https://github.com/Podcastindex-org/podcast-namespace) file, given its
+ * text or its parsed JSON, so it also reads a track's `src` as its `format`. Chapters marked `toc: false` are left out,
+ * since they aren't meant to be shown.
  *
  * ```ts
  * player.store.addTextTrack({ kind: 'chapters', src: '/chapters.json', format: podcastChapters });
@@ -53,7 +54,8 @@ export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> =
  *
  * @experimental
  */
-export function podcastChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
+export function podcastChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
+  const json: unknown = isString(file) ? JSON.parse(file) : file;
   const chapters = isObject(json) && 'chapters' in json && Array.isArray(json.chapters) ? json.chapters : [];
 
   return chapters.filter(isRecord).flatMap((chapter) => {
@@ -75,12 +77,13 @@ export function podcastChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
 
 /**
  * Chapters from an Apple HLS chapters file, the JSON an `EXT-X-SESSION-DATA` tag with
- * `DATA-ID="com.apple.hls.chapters"` points to. Each cue shows the chapter's first title, and keeps every title by
- * language.
+ * `DATA-ID="com.apple.hls.chapters"` points to, given its text or its parsed JSON. Each cue shows the chapter's first
+ * title, and keeps every title by language.
  *
  * @experimental
  */
-export function appleHlsChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
+export function appleHlsChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
+  const json: unknown = isString(file) ? JSON.parse(file) : file;
   const chapters = Array.isArray(json) ? json : [];
 
   return chapters.filter(isRecord).flatMap((chapter) => {
@@ -124,8 +127,8 @@ export function appleHlsChapters(json: unknown): TextCueInit<ChapterCueValue>[] 
 }
 
 /**
- * Chapters from JSON-LD on the page: a schema.org `VideoObject` whose `hasPart` lists `Clip`s, a list of `Clip`s, or
- * one `Clip`. These are the clips Google shows as key moments.
+ * Chapters from JSON-LD, as text or parsed: a schema.org `VideoObject` whose `hasPart` lists `Clip`s, a list of
+ * `Clip`s, or one `Clip`. These are the clips Google shows as key moments.
  *
  * ```ts
  * player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(videoObject) });
@@ -133,7 +136,8 @@ export function appleHlsChapters(json: unknown): TextCueInit<ChapterCueValue>[] 
  *
  * @experimental
  */
-export function jsonLdChapters(json: unknown): TextCueInit<ChapterCueValue>[] {
+export function jsonLdChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
+  const json: unknown = isString(file) ? JSON.parse(file) : file;
   const clips = isRecord(json) && 'hasPart' in json ? json.hasPart : json;
 
   return (Array.isArray(clips) ? clips : [clips]).filter(isRecord).flatMap((clip) => {

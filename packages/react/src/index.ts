@@ -82,6 +82,7 @@ export type {
   StatusIndicatorProps,
   StatusIndicatorState,
   TextCueFormat,
+  TextCueFormatResult,
   TextCueInit,
   TextCuesSource,
   TextTrackContent,

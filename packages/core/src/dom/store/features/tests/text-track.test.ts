@@ -844,7 +844,7 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['given', 'loaded']);
     });
 
-    it('reads other JSON through a format', async () => {
+    it('reads a file through a format', async () => {
       respond(JSON.stringify({ version: '1.2.0', chapters: [{ startTime: 0, title: 'Intro' }] }));
 
       const { store } = setupWithCues([]);
@@ -853,6 +853,26 @@ describe('textTrackFeature', () => {
       await settle();
 
       expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+
+    it("waits for a format's promise, and takes the cues of a parse result", async () => {
+      respond('1\n00:00:00,000 --> 00:00:05,000\nHello\n\n2\n00:00:05,000 --> 00:00:10,000\nWorld');
+
+      const { store } = setupWithCues([]);
+      // Stands in for a parser loaded on demand. Its cues leave `id` empty, as the platform's cues do.
+      const srt = async (text: string) => ({
+        cues: text.split('\n\n').map((block, index) => ({ id: '', startTime: index * 5, text: block.split('\n')[2] })),
+        regions: [],
+      });
+
+      store.addTextTrack({ kind: 'subtitles', src: '/episode.srt', format: srt });
+      store.watchTextCues({ kind: 'subtitles' });
+      await settle();
+
+      const { cues } = store.state.textCues[0]!;
+
+      expect(cues.map(({ text }) => text)).toEqual(['Hello', 'World']);
+      expect(new Set(cues.map(({ id }) => id)).size).toBe(2);
     });
 
     it("parses WebVTT with the browser's parser", async () => {

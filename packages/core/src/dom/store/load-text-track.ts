@@ -10,9 +10,9 @@ export interface TextTrackLoad {
 }
 
 /**
- * Fetch and parse the cues of a track an app added with a `src`. WebVTT goes through the browser's own parser; anything
- * else is JSON, read through the track's `format` when it has one, and otherwise as an array of cues or an object with
- * a `cues` array.
+ * Fetch and parse the cues of a track an app added with a `src`. The track's `format` reads the file when it has one;
+ * otherwise WebVTT goes through the browser's own parser, and anything else is JSON: an array of cues, or an object
+ * with a `cues` array.
  */
 export async function loadTextTrackCues(
   load: TextTrackLoad,
@@ -30,16 +30,15 @@ export async function loadTextTrackCues(
     return parseVtt(text, track.kind, signal);
   }
 
-  const json: unknown = JSON.parse(text);
-  const cues = load.format ? load.format(json) : readCueList(json);
+  const cues = readCueList(load.format ? await load.format(text) : JSON.parse(text));
 
   return cues.map((cue, index) => toAppCue(cue, `${track.id}-src-${index}`));
 }
 
-function readCueList(json: unknown): readonly TextCueInit[] {
-  if (Array.isArray(json)) return json;
+function readCueList(result: unknown): readonly TextCueInit[] {
+  if (Array.isArray(result)) return result;
 
-  if (isObject(json) && 'cues' in json && Array.isArray(json.cues)) return json.cues;
+  if (isObject(result) && 'cues' in result && Array.isArray(result.cues)) return result.cues;
 
-  throw new Error('[vjs-core] a JSON text track must be an array of cues, or an object with a `cues` array');
+  throw new Error('[vjs-core] text track cues must be an array, or an object with a `cues` array');
 }
