@@ -13,7 +13,7 @@ import DocsLink from "@/components/docs/DocsLink.astro";
 import { useCreateTextTrack } from '@videojs/react';
 ```
 
-`useCreateTextTrack` adds a text track to the player while the component is mounted, and removes it on unmount. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and the track's content, or one object describing both. The content holds `cues`, a WebVTT or JSON `src` to load them from, and a `format` that converts JSON in another format. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> lists every field.
+`useCreateTextTrack` adds a text track to the player while the component is mounted, and removes it on unmount. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and the track's content, or one object describing both. The content holds `cues`, a `src` file to load them from, and a `format` that reads a file in another format. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> lists every field.
 
 Added through a definition, the cues are checked against its value type.
 

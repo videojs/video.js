@@ -121,14 +121,14 @@ The track description takes these fields:
 | `label` | The track label. Defaults to `''`. |
 | `language` | The track language, as a BCP 47 tag. Defaults to `''`. |
 | `cues` | The track's cues. |
-| `src` | A WebVTT or JSON file to load cues from. The file is fetched once the player attaches to media, so only on the client. JSON is an array of cues, or an object with a `cues` array. |
-| `format` | A function that turns a JSON `src` in another format into cues, such as <DocsLink slug="reference/api/chapters-track">`podcastChapters`</DocsLink>. |
+| `src` | A file to load cues from. The file is fetched once the player attaches to media, so only on the client. Without a `format`, it's WebVTT, or JSON that is an array of cues or an object with a `cues` array. |
+| `format` | A function that reads the `src` file's text into cues, such as <DocsLink slug="reference/api/chapters-track">`podcastChapters`</DocsLink>. It returns an array of cues or an object with a `cues` array, and can return a promise, so a parser for another format, such as SRT, loads only when a file needs it. |
 
 Each cue takes these fields:
 
 | Field | Description |
 | --- | --- |
-| `id` | The cue's id. Defaults to an id unique within the track. |
+| `id` | The cue's id. When it's missing or empty, it defaults to an id unique within the track. |
 | `startTime` | Where the cue starts, in seconds. |
 | `endTime` | Where the cue ends, in seconds. Omit it for a point, or, in a chapters track, for a chapter that runs to the next one. |
 | `text` | The cue's text. Defaults to `''`. |
@@ -155,7 +155,8 @@ When the media has no chapters track, the text track feature's `chaptersCues` re
 | `TextTrackInit` | A track description with its content. |
 | `TextTrackContent` | What a track carries: `cues`, `src`, and `format`. |
 | `TextCueInit` | A cue an app adds. |
-| `TextCueFormat` | A function that turns JSON into cues. |
+| `TextCueFormat` | A function that reads a file's text into cues. |
+| `TextCueFormatResult` | What a `TextCueFormat` returns: an array of cues, or an object with a `cues` array. |
 | `AppTextTrack` | The handle `addTextTrack()` returns. |
 | `InferCueValue` | The `value` type of a cue type. |
 | `MediaTextCuesState` | The state this feature adds to the store. |
