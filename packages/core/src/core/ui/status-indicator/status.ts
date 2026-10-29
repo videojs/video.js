@@ -39,6 +39,12 @@ export function deriveStatus(
   labels: InputIndicatorLabels = DEFAULT_INPUT_INDICATOR_LABELS
 ): StatusDetails | null {
   switch (event.action) {
+    case 'startOrToggleControls': {
+      // Only starting playback has a status; showing or hiding the controls has none.
+      if (snapshot.started || !snapshot.paused) return null;
+
+      return { status: 'play', label: labels.playing, value: null };
+    }
     case 'togglePaused': {
       const paused = snapshot.paused !== undefined ? !snapshot.paused : true;
 

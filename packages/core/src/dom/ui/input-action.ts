@@ -48,6 +48,7 @@ export function getMediaSnapshot(store: MediaSnapshotStore | undefined): MediaSn
   return {
     // A pending autoplay counts as playing, as it does for the play button and the toggle.
     paused: playback && playback.paused && !playback.autoplaying,
+    started: playback?.started,
     volume: selectVolume(state)?.volume,
     muted: selectVolume(state)?.muted,
     playbackRate: selectPlaybackRate(state)?.playbackRate,

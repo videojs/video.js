@@ -63,7 +63,7 @@ The <DocsLink slug="reference/api/feature-controls">controls feature</DocsLink> 
 - `controlsVisible` derives from activity and playback: controls stay visible while paused or while a remote playback session is connecting or connected, regardless of idle state.
 - `toggleControls(forceShow?)` marks the user inactive when controls are visible, and shows them otherwise. Pass `true` to show controls or `false` to mark the user inactive. Paused playback, a remote session, or an open menu can keep controls visible even when the user is inactive.
 
-On touch devices, pointer movement does not show controls. A tap on the media toggles them, and movement during a gesture does not make them flicker.
+On touch devices, pointer movement does not show controls. A tap on the media toggles them, and movement during a gesture does not make them flicker. The packaged skins bind the tap to `startOrToggleControls`, so a tap before playback starts plays the media instead.
 
 The feature needs the player container for activity tracking. Without one, it keeps its initial active and visible state and warns in development.
 
@@ -133,7 +133,7 @@ A tap on the media toggles controls. If a custom overlay covers the media and sw
 
 ### Controls flicker on Android while tapping
 
-Use the skin gestures (`tap` with the `toggleControls` action). When two handlers both toggle controls, one shows them and the other hides them again. Remove extra tap handlers that duplicate the built-in behavior. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink>.
+Use the skin gestures (`tap` with the `toggleControls` or `startOrToggleControls` action). When two handlers both toggle controls, one shows them and the other hides them again. Remove extra tap handlers that duplicate the built-in behavior. See <DocsLink slug="guides/keyboard-shortcuts">Add keyboard shortcuts and gestures</DocsLink>.
 
 ## Related components
 

@@ -63,6 +63,48 @@ describe('resolveGestureAction', () => {
   });
 });
 
+describe('startOrToggleControls', () => {
+  it('starts playback that has not started, without toggling controls', () => {
+    const play = vi.fn();
+    const toggleControls = vi.fn();
+
+    resolveGestureAction('startOrToggleControls')!(
+      ctx({ paused: true, started: false, play, userActive: true, toggleControls })
+    );
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(toggleControls).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['playing', { paused: false, started: true }],
+    ['paused after playback started', { paused: true, started: true }],
+    ['autoplay is pending', { paused: true, started: false, autoplaying: true }],
+  ])('toggles controls while %s', (_, state) => {
+    const play = vi.fn();
+    const pause = vi.fn();
+    const toggleControls = vi.fn();
+
+    resolveGestureAction('startOrToggleControls')!(ctx({ ...state, play, pause, userActive: true, toggleControls }));
+
+    expect(toggleControls).toHaveBeenCalledOnce();
+    expect(play).not.toHaveBeenCalled();
+    expect(pause).not.toHaveBeenCalled();
+  });
+
+  it('starts from the state the pointer-down found', () => {
+    const play = vi.fn();
+    const toggleControls = vi.fn();
+    const context = ctx({ paused: false, started: true, play, userActive: true, toggleControls });
+
+    // A click can start playback before the deferred tap fires.
+    resolveGestureAction('startOrToggleControls')!({ ...context, state: { paused: true, started: false, play } });
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(toggleControls).not.toHaveBeenCalled();
+  });
+});
+
 describe('direct store actions', () => {
   it('calls toggleControls on store state', () => {
     const toggleControls = vi.fn();

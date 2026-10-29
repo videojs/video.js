@@ -37,6 +37,7 @@ describe('getMediaSnapshot', () => {
         mockStore({
           chaptersCues: [],
           paused: true,
+          started: true,
           volume: 0.5,
           muted: false,
           playbackRates: [1, 1.5],
@@ -52,6 +53,7 @@ describe('getMediaSnapshot', () => {
       )
     ).toEqual({
       paused: true,
+      started: true,
       volume: 0.5,
       muted: false,
       playbackRate: 1.5,
