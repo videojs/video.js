@@ -738,6 +738,26 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues[0]!.track.source).toBe('app');
     });
 
+    it('stands in for chapters on media without text tracks', () => {
+      const media = Object.assign(new EventTarget(), { currentTime: 0, duration: 60, seeking: false });
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
+      store.addTextTrack({
+        kind: 'chapters',
+        label: 'AI chapters',
+        cues: [
+          { startTime: 0, text: 'Intro' },
+          { startTime: 30, text: 'Outro' },
+        ],
+      });
+
+      expect(store.state.chaptersCues.map(({ text, endTime }) => [text, endTime])).toEqual([
+        ['Intro', 30],
+        ['Outro', 60],
+      ]);
+    });
+
     it('is listed in textTrackList, and its chapters stand in for missing media chapters', () => {
       const video = document.createElement('video');
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
@@ -859,6 +879,24 @@ describe('textTrackFeature', () => {
       expect(quiz.removed).toBe(false);
       expect(store.state.textCues[0]!.cues).toEqual([]);
       expect(warn).toHaveBeenCalledOnce();
+    });
+
+    it('stops loading a track that is removed', async () => {
+      const fetch = vi.fn((_src: string, _init: RequestInit) => new Promise<Response>(() => {}));
+
+      vi.stubGlobal('fetch', fetch);
+
+      const { store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/quiz.json' });
+      const other = store.addTextTrack({ kind: 'metadata', label: 'other', src: '/other.json' });
+
+      await settle();
+      quiz.remove();
+      await settle();
+
+      expect(fetch.mock.calls[0]![1].signal!.aborted).toBe(true);
+      expect(fetch.mock.calls[1]![1].signal!.aborted).toBe(false);
+      expect(other.removed).toBe(false);
     });
   });
 
@@ -987,6 +1025,47 @@ describe('textTrackFeature', () => {
 
       expect(store.state.textTrackList[0]!.mode).toBe('showing');
       expect(store.state.subtitlesShowing).toBe(true);
+    });
+
+    it("reads the app track in its copy's mode", () => {
+      const { list, store } = setupWithElements();
+      const track = store.addTextTrack(captions);
+
+      store.watchTextCues((candidate) => candidate.mode === 'showing');
+      store.selectSubtitlesTrack(track.id);
+      list.dispatchEvent(new Event('change'));
+
+      expect(store.state.textCues.map(({ track }) => [track.id, track.mode])).toEqual([[track.id, 'showing']]);
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Hello']);
+    });
+
+    it('tells a media track apart from an app track that shares its id', () => {
+      const { video, list, store } = setupWithElements();
+      const authored = document.createElement('track');
+
+      authored.id = 'app-text-track-1';
+      authored.kind = 'captions';
+      authored.label = 'Authored';
+      video.append(authored);
+
+      const track = store.addTextTrack(captions);
+
+      expect(track.id).toBe('app-text-track-1');
+
+      list.dispatchEvent(new Event('addtrack'));
+
+      expect(store.state.textTrackList.map(({ label, source }) => [label, source])).toEqual([
+        ['Authored', 'media'],
+        ['English', 'app'],
+      ]);
+      expect(new Set(store.state.textTrackList.map(({ id }) => id)).size).toBe(2);
+
+      store.selectSubtitlesTrack(track.id);
+
+      const [, copy] = video.querySelectorAll('track');
+
+      expect(authored.track.mode).toBe('disabled');
+      expect(copy!.track.mode).toBe('showing');
     });
 
     it('removes the copy with the app track, and when the store detaches', () => {

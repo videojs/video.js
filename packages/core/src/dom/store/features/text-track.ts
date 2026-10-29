@@ -29,6 +29,8 @@ import {
   type AppTextTracksChange,
   type AppTextTracksState,
   getAppTextTracks,
+  getAppTrackCopyId,
+  setAppTrackCopy,
 } from '../app-text-tracks';
 import { loadTextTrackCues } from '../load-text-track';
 import { fillChapterEnds, sortCues, toMediaTextCues } from '../text-cues';
@@ -55,9 +57,18 @@ interface IdentifiedTrack {
 }
 
 /** Caption/subtitle tracks paired with the ids exposed through `textTrackList`, in captions menu order. */
-function getSubtitlesTracks(media: MediaTextTrackCapability): IdentifiedTrack[] {
+function getSubtitlesTracks(
+  media: MediaTextTrackCapability,
+  records: readonly AppTextTrackRecord[]
+): IdentifiedTrack[] {
+  const appIds = new Set(records.map(({ track }) => track.id));
+
   return getCaptionOrSubtitleTracks(
-    Array.from(media.textTracks, (track, index) => ({ id: getTextTrackId(track, index), kind: track.kind, track }))
+    Array.from(media.textTracks, (track, index) => ({
+      id: getTextTrackId(track, index, appIds),
+      kind: track.kind,
+      track,
+    }))
   );
 }
 
@@ -68,6 +79,14 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
 
     if (track.mode !== mode) track.mode = mode;
   }
+}
+
+/**
+ * The cues of the first chapters track an app added, which stand in when the media has no chapters of its own. A
+ * chapter without an end runs to the next one, and the last to the end of the media.
+ */
+function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: number): MediaTextCue[] {
+  return fillChapterEnds(records.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
 }
 
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
@@ -186,7 +205,7 @@ export const textTrackFeature = definePlayerFeature({
         const { media } = target();
         if (!isMediaTextTrackCapable(media)) return false;
 
-        const subtitlesTracks = getSubtitlesTracks(media);
+        const subtitlesTracks = getSubtitlesTracks(media, appTracks.records);
         if (!subtitlesTracks.length) return false;
 
         const showing = subtitlesTracks.find(({ track }) => track.mode === 'showing');
@@ -216,7 +235,7 @@ export const textTrackFeature = definePlayerFeature({
         const { media } = target();
         if (!isMediaTextTrackCapable(media)) return;
 
-        const subtitlesTracks = getSubtitlesTracks(media);
+        const subtitlesTracks = getSubtitlesTracks(media, appTracks.records);
         if (!subtitlesTracks.length) return;
 
         if (isNull(id)) {
@@ -255,8 +274,8 @@ export const textTrackFeature = definePlayerFeature({
     appTracks.notify();
 
     // The browser only draws captions and subtitles on tracks the media holds, including in iOS fullscreen where the
-    // player's UI isn't shown, so app captions are copied into the media. A copy takes its app track's id, so the
-    // captions menu selects the app track by showing its copy.
+    // player's UI isn't shown, so app captions are copied into the media. A copy is listed as its app track, so the
+    // captions menu selects the app track by showing its copy, and the app track takes the mode its copy is in.
     const copies = new Map<string, { handle: TextTrackHandle; written: Map<MediaTextCue, VTTCueLike> }>();
 
     const syncCopies = () => {
@@ -269,6 +288,7 @@ export const textTrackFeature = definePlayerFeature({
         if (ids.has(id)) continue;
 
         copy.handle.remove();
+        setAppTrackCopy(copy.handle.track, null);
         copies.delete(id);
       }
 
@@ -282,6 +302,7 @@ export const textTrackFeature = definePlayerFeature({
           const handle = createTextTrack(textTracks, { id, kind, label, language, mode });
           if (!handle) continue;
 
+          setAppTrackCopy(handle.track, id);
           copy = { handle, written: new Map() };
           copies.set(id, copy);
         }
@@ -306,16 +327,27 @@ export const textTrackFeature = definePlayerFeature({
       }
     };
 
-    // App tracks with a `src` load once per attach; a track removed meanwhile drops what loaded.
-    const loading = new Set<string>();
+    // App tracks with a `src` load once per attach, each with its own request so removing the track stops it.
+    const loads = new Map<string, AbortController>();
 
     const loadAppCues = () => {
-      for (const { track, load } of get()[APP_TEXT_TRACKS]) {
-        if (!load || loading.has(track.id)) continue;
+      const records = get()[APP_TEXT_TRACKS];
 
-        loading.add(track.id);
+      for (const [id, controller] of loads) {
+        if (records.some(({ track }) => track.id === id)) continue;
 
-        loadTextTrackCues(load, track, signal)
+        controller.abort();
+        loads.delete(id);
+      }
+
+      for (const { track, load } of records) {
+        if (!load || loads.has(track.id)) continue;
+
+        const controller = new AbortController();
+
+        loads.set(track.id, controller);
+
+        loadTextTrackCues(load, track, controller.signal)
           .then((cues) =>
             updateAppTrack(track.id, (record) => ({ ...record, cues: sortCues([...record.cues, ...cues]) }))
           )
@@ -327,7 +359,9 @@ export const textTrackFeature = definePlayerFeature({
 
             updateAppTrack(track.id, (record) => record);
           })
-          .finally(() => loading.delete(track.id));
+          .finally(() => {
+            if (loads.get(track.id) === controller) loads.delete(track.id);
+          });
       }
     };
 
@@ -347,12 +381,40 @@ export const textTrackFeature = definePlayerFeature({
 
     let trackCleanup: AbortController | null = null;
 
+    // A copy's mode can change from the captions menu or the browser's own, so the app track follows it. Returns whether
+    // that changed the tracks, which notifies and syncs again.
+    const syncCopyModes = (): boolean => {
+      const records = get()[APP_TEXT_TRACKS];
+      let changed = false;
+
+      const next = records.map((record) => {
+        const mode = copies.get(record.track.id)?.handle.track.mode;
+        if (!mode || mode === record.track.mode) return record;
+
+        changed = true;
+
+        return { ...record, track: { ...record.track, mode } };
+      });
+
+      if (!changed) return false;
+
+      set({ [APP_TEXT_TRACKS]: next });
+      appTracks.notify();
+
+      return true;
+    };
+
     const sync = () => {
+      if (syncCopyModes()) return;
+
       const appRecords = get()[APP_TEXT_TRACKS];
 
       if (!textTracks) {
-        // Media without text tracks of its own, such as an embed, still lists the tracks apps add.
-        set({ textTrackList: appRecords.map(({ track }) => track) });
+        // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
+        set({
+          textTrackList: appRecords.map(({ track }) => track),
+          chaptersCues: findAppChaptersCues(appRecords, isMediaSeekCapable(media) ? media.duration : NaN),
+        });
         return;
       }
 
@@ -365,16 +427,12 @@ export const textTrackFeature = definePlayerFeature({
       let subtitlesShowing = false;
 
       const appTrackIds = new Set(appRecords.map(({ track }) => track.id));
-      // App captions are drawn through copies in the media that share their ids; the app track is listed in its copy's mode.
-      const copyModes = new Map<string, TextTrackLike['mode']>();
 
       for (let i = 0; i < textTracks.textTracks.length; i++) {
         const track = textTracks.textTracks[i]!;
-        const id = getTextTrackId(track, i);
 
-        if (appTrackIds.has(id)) {
-          copyModes.set(id, track.mode);
-
+        // A copy of an app track is listed as the app track.
+        if (getAppTrackCopyId(track)) {
           if (isCaptionOrSubtitleTrack(track) && track.mode === 'showing') subtitlesShowing = true;
 
           continue;
@@ -386,18 +444,14 @@ export const textTrackFeature = definePlayerFeature({
           thumbnailsTextTrack = track;
         }
 
-        textTrackList.push(toMediaTextTrack(track, i));
+        textTrackList.push(toMediaTextTrack(track, i, appTrackIds));
 
         if (isCaptionOrSubtitleTrack(track) && track.mode === 'showing') {
           subtitlesShowing = true;
         }
       }
 
-      for (const { track } of appRecords) {
-        const mode = copyModes.get(track.id);
-
-        textTrackList.push(mode && mode !== track.mode ? { ...track, mode } : track);
-      }
+      for (const { track } of appRecords) textTrackList.push(track);
 
       // The last chapter of an in-stream chapters document is open-ended on the
       // track; consumers read it ending where the media does. Chapters an app
@@ -405,7 +459,7 @@ export const textTrackFeature = definePlayerFeature({
       const duration = isMediaSeekCapable(media) ? media.duration : NaN;
       const chaptersCues = chaptersTrack
         ? toMediaTextCues(chaptersTrack.cues, { kind: 'chapters', duration })
-        : fillChapterEnds(appRecords.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
+        : findAppChaptersCues(appRecords, duration);
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
@@ -458,6 +512,10 @@ export const textTrackFeature = definePlayerFeature({
       () => {
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        for (const controller of loads.values()) controller.abort();
+
+        loads.clear();
 
         savedCopyModes.set(appTracks, new Map(Array.from(copies, ([id, { handle }]) => [id, handle.track.mode])));
 
