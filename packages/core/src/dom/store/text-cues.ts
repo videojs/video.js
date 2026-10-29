@@ -29,16 +29,42 @@ export function toMediaTextCues(
 ): MediaTextCue[] {
   if (!cues) return [];
 
-  const { kind, duration = Number.NaN } = options;
-  const max = Number.isFinite(duration) && duration > 0 ? duration : Number.POSITIVE_INFINITY;
+  const { kind, duration } = options;
+  const max = toMaxEnd(duration);
   const list = Array.from(cues);
   const getId = createCueIds(list);
 
   return list.map((cue) => toMediaTextCue(cue, kind, max, getId));
 }
 
+/**
+ * Whether reading `cues` again would give back the copies last read from `read`: the same cues, in the same order, none
+ * changed in place. It checks without allocating, so a long list can be checked on every tick and read again only when
+ * it changed.
+ */
+export function isCueListUnchanged(
+  cues: Iterable<TextTrackCueLike> | null | undefined,
+  read: readonly TextTrackCueLike[],
+  options: TextCueOptions = {}
+): boolean {
+  const max = toMaxEnd(options.duration);
+  let index = 0;
+
+  for (const cue of cues ?? []) {
+    if (cue !== read[index++] || !isCopyCurrent(plainCopies.get(cue), cue, options.kind, max)) return false;
+  }
+
+  return index === read.length;
+}
+
+function toMaxEnd(duration = Number.NaN): number {
+  return Number.isFinite(duration) && duration > 0 ? duration : Number.POSITIVE_INFINITY;
+}
+
 interface PlainCueCopy {
   kind: string | undefined;
+  /** The live cue's own id, which the copy's extends when another cue in the list has it too. */
+  id: string;
   /** The live cue's own `value`, which a copy shares instead of parsing it from text. */
   data: unknown;
   cue: MediaTextCue;
@@ -47,30 +73,46 @@ interface PlainCueCopy {
 /** The last plain copy of each live cue. */
 const plainCopies = new WeakMap<TextTrackCueLike, PlainCueCopy>();
 
+/** Engines can change a cue in place, so a copy is current only while everything it was made from still matches. */
+function isCopyCurrent(
+  copy: PlainCueCopy | undefined,
+  cue: TextTrackCueLike,
+  kind: string | undefined,
+  max: number
+): copy is PlainCueCopy {
+  if (!copy) return false;
+
+  return (
+    copy.kind === kind &&
+    copy.id === cue.id &&
+    copy.data === ('value' in cue ? cue.value : undefined) &&
+    copy.cue.startTime === cue.startTime &&
+    copy.cue.endTime === Math.min(cue.endTime, max) &&
+    copy.cue.text === getCueText(cue) &&
+    copy.cue.type === getCueType(cue)
+  );
+}
+
+function getCueText(cue: TextTrackCueLike): string {
+  return 'text' in cue && isString(cue.text) ? cue.text : '';
+}
+
+/** What a cue's `value` holds, so only a cue with a `value` has one. */
+function getCueType(cue: TextTrackCueLike): string | undefined {
+  if (!('value' in cue) || isUndefined(cue.value)) return undefined;
+
+  return 'type' in cue && isString(cue.type) && cue.type ? cue.type : undefined;
+}
+
 function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: number, getId: CueIds): MediaTextCue {
   const id = getId(cue);
-  const text = 'text' in cue && isString(cue.text) ? cue.text : '';
-  const endTime = Math.min(cue.endTime, max);
-  const data = 'value' in cue ? cue.value : undefined;
-  const type = !isUndefined(data) && 'type' in cue && isString(cue.type) && cue.type ? cue.type : undefined;
-
-  // Engines can change a cue in place, so a copy is reused only while everything it was made from still matches.
   const copy = plainCopies.get(cue);
+  if (isCopyCurrent(copy, cue, kind, max) && copy.cue.id === id) return copy.cue;
 
-  if (
-    copy &&
-    copy.kind === kind &&
-    copy.data === data &&
-    copy.cue.id === id &&
-    copy.cue.startTime === cue.startTime &&
-    copy.cue.endTime === endTime &&
-    copy.cue.text === text &&
-    copy.cue.type === type
-  ) {
-    return copy.cue;
-  }
-
-  const result: MediaTextCue = { id, startTime: cue.startTime, endTime, text };
+  const text = getCueText(cue);
+  const data = 'value' in cue ? cue.value : undefined;
+  const type = getCueType(cue);
+  const result: MediaTextCue = { id, startTime: cue.startTime, endTime: Math.min(cue.endTime, max), text };
 
   if (!isUndefined(data)) {
     result.value = data;
@@ -82,7 +124,7 @@ function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: nu
     if (!isUndefined(value)) result.value = value;
   }
 
-  plainCopies.set(cue, { kind, data, cue: result });
+  plainCopies.set(cue, { kind, id: cue.id, data, cue: result });
 
   return result;
 }
