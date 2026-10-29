@@ -1,4 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
+import { MixcloudAdapter } from '@videojs/mixcloud-audio';
 import { MuxAudioAdapter } from '@videojs/mux-audio';
 import { SoundCloudAdapter } from '@videojs/soundcloud-audio';
 import { HlsAudioAdapter } from '@videojs/spf/adapters/hls-audio';
@@ -40,6 +41,13 @@ describe('LazyAudio', () => {
   it('loads SoundCloud audio for a SoundCloud URL', async () => {
     const attach = vi.spyOn(SoundCloudAdapter.prototype, 'attach');
     const { container } = render(<LazyAudio src="https://soundcloud.com/forss/flickermood" />);
+
+    await waitFor(() => expect(attach).toHaveBeenCalledWith(container.querySelector('iframe')), LOAD_TIMEOUT);
+  });
+
+  it('loads Mixcloud audio for a Mixcloud URL', async () => {
+    const attach = vi.spyOn(MixcloudAdapter.prototype, 'attach');
+    const { container } = render(<LazyAudio src="https://www.mixcloud.com/spartacus/lambiance/" />);
 
     await waitFor(() => expect(attach).toHaveBeenCalledWith(container.querySelector('iframe')), LOAD_TIMEOUT);
   });

@@ -118,6 +118,7 @@ const LAZY_AUDIO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
     sources: [
       { label: 'Spotify', src: SPOTIFY_AUDIO_SRC },
       { label: 'SoundCloud', src: SOURCES['soundcloud-track'].url! },
+      { label: 'Mixcloud', src: SOURCES['mixcloud-show'].url! },
     ],
   },
 ];
