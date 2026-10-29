@@ -70,6 +70,14 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
   }
 }
 
+/**
+ * The cues of the first chapters track an app added, which stand in when the media has no chapters of its own. A
+ * chapter without an end runs to the next one, and the last to the end of the media.
+ */
+function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: number): MediaTextCue[] {
+  return fillChapterEnds(records.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
+}
+
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
   const localeKey = getLocaleKey(locale);
   const keys = findLocaleKeys(locale);
@@ -306,16 +314,27 @@ export const textTrackFeature = definePlayerFeature({
       }
     };
 
-    // App tracks with a `src` load once per attach; a track removed meanwhile drops what loaded.
-    const loading = new Set<string>();
+    // App tracks with a `src` load once per attach, each with its own request so removing the track stops it.
+    const loads = new Map<string, AbortController>();
 
     const loadAppCues = () => {
-      for (const { track, load } of get()[APP_TEXT_TRACKS]) {
-        if (!load || loading.has(track.id)) continue;
+      const records = get()[APP_TEXT_TRACKS];
 
-        loading.add(track.id);
+      for (const [id, controller] of loads) {
+        if (records.some(({ track }) => track.id === id)) continue;
 
-        loadTextTrackCues(load, track, signal)
+        controller.abort();
+        loads.delete(id);
+      }
+
+      for (const { track, load } of records) {
+        if (!load || loads.has(track.id)) continue;
+
+        const controller = new AbortController();
+
+        loads.set(track.id, controller);
+
+        loadTextTrackCues(load, track, controller.signal)
           .then((cues) =>
             updateAppTrack(track.id, (record) => ({ ...record, cues: sortCues([...record.cues, ...cues]) }))
           )
@@ -327,7 +346,9 @@ export const textTrackFeature = definePlayerFeature({
 
             updateAppTrack(track.id, (record) => record);
           })
-          .finally(() => loading.delete(track.id));
+          .finally(() => {
+            if (loads.get(track.id) === controller) loads.delete(track.id);
+          });
       }
     };
 
@@ -351,8 +372,11 @@ export const textTrackFeature = definePlayerFeature({
       const appRecords = get()[APP_TEXT_TRACKS];
 
       if (!textTracks) {
-        // Media without text tracks of its own, such as an embed, still lists the tracks apps add.
-        set({ textTrackList: appRecords.map(({ track }) => track) });
+        // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
+        set({
+          textTrackList: appRecords.map(({ track }) => track),
+          chaptersCues: findAppChaptersCues(appRecords, isMediaSeekCapable(media) ? media.duration : NaN),
+        });
         return;
       }
 
@@ -405,7 +429,7 @@ export const textTrackFeature = definePlayerFeature({
       const duration = isMediaSeekCapable(media) ? media.duration : NaN;
       const chaptersCues = chaptersTrack
         ? toMediaTextCues(chaptersTrack.cues, { kind: 'chapters', duration })
-        : fillChapterEnds(appRecords.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
+        : findAppChaptersCues(appRecords, duration);
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
@@ -458,6 +482,10 @@ export const textTrackFeature = definePlayerFeature({
       () => {
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        for (const controller of loads.values()) controller.abort();
+
+        loads.clear();
 
         savedCopyModes.set(appTracks, new Map(Array.from(copies, ([id, { handle }]) => [id, handle.track.mode])));
 

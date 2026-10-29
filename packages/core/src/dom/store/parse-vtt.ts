@@ -6,7 +6,9 @@ import { toMediaTextCues } from './text-cues';
  * Parse WebVTT with the browser's own parser, through a `<track>` on a video that's never shown. Loaded on demand, so
  * players that never read a VTT file don't carry it.
  */
-export function parseVtt(text: string, kind: string): Promise<MediaTextCue[]> {
+export function parseVtt(text: string, kind: string, signal?: AbortSignal): Promise<MediaTextCue[]> {
+  if (signal?.aborted) return Promise.reject(signal.reason);
+
   const video = document.createElement('video');
   const track = document.createElement('track');
   // The text was already fetched, so the track reads it from a same-origin blob and needs no CORS.
@@ -17,10 +19,22 @@ export function parseVtt(text: string, kind: string): Promise<MediaTextCue[]> {
   track.kind = 'metadata';
 
   return new Promise((resolve, reject) => {
+    const cleanup = new AbortController();
+
     const settle = () => {
+      cleanup.abort();
       URL.revokeObjectURL(url);
       track.remove();
     };
+
+    signal?.addEventListener(
+      'abort',
+      () => {
+        settle();
+        reject(signal.reason);
+      },
+      { once: true, signal: cleanup.signal }
+    );
 
     track.addEventListener(
       'load',

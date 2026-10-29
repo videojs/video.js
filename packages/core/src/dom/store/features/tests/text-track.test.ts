@@ -738,6 +738,26 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues[0]!.track.source).toBe('app');
     });
 
+    it('stands in for chapters on media without text tracks', () => {
+      const media = Object.assign(new EventTarget(), { currentTime: 0, duration: 60, seeking: false });
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
+      store.addTextTrack({
+        kind: 'chapters',
+        label: 'AI chapters',
+        cues: [
+          { startTime: 0, text: 'Intro' },
+          { startTime: 30, text: 'Outro' },
+        ],
+      });
+
+      expect(store.state.chaptersCues.map(({ text, endTime }) => [text, endTime])).toEqual([
+        ['Intro', 30],
+        ['Outro', 60],
+      ]);
+    });
+
     it('is listed in textTrackList, and its chapters stand in for missing media chapters', () => {
       const video = document.createElement('video');
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
@@ -859,6 +879,24 @@ describe('textTrackFeature', () => {
       expect(quiz.removed).toBe(false);
       expect(store.state.textCues[0]!.cues).toEqual([]);
       expect(warn).toHaveBeenCalledOnce();
+    });
+
+    it('stops loading a track that is removed', async () => {
+      const fetch = vi.fn((_src: string, _init: RequestInit) => new Promise<Response>(() => {}));
+
+      vi.stubGlobal('fetch', fetch);
+
+      const { store } = setupWithCues([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/quiz.json' });
+      const other = store.addTextTrack({ kind: 'metadata', label: 'other', src: '/other.json' });
+
+      await settle();
+      quiz.remove();
+      await settle();
+
+      expect(fetch.mock.calls[0]![1].signal!.aborted).toBe(true);
+      expect(fetch.mock.calls[1]![1].signal!.aborted).toBe(false);
+      expect(other.removed).toBe(false);
     });
   });
 

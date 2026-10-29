@@ -31,9 +31,10 @@ export function toMediaTextCues(
 
   const { kind, duration = Number.NaN } = options;
   const max = Number.isFinite(duration) && duration > 0 ? duration : Number.POSITIVE_INFINITY;
-  const seen = new Map<string, number>();
+  const list = Array.from(cues);
+  const getId = createCueIds(list);
 
-  return Array.from(cues, (cue) => toMediaTextCue(cue, kind, max, seen));
+  return list.map((cue) => toMediaTextCue(cue, kind, max, getId));
 }
 
 interface PlainCueCopy {
@@ -46,13 +47,8 @@ interface PlainCueCopy {
 /** The last plain copy of each live cue. */
 const plainCopies = new WeakMap<TextTrackCueLike, PlainCueCopy>();
 
-function toMediaTextCue(
-  cue: TextTrackCueLike,
-  kind: string | undefined,
-  max: number,
-  seen: Map<string, number>
-): MediaTextCue {
-  const id = getCueId(cue, seen);
+function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: number, getId: CueIds): MediaTextCue {
+  const id = getId(cue);
   const text = 'text' in cue && isString(cue.text) ? cue.text : '';
   const endTime = Math.min(cue.endTime, max);
   const data = 'value' in cue ? cue.value : undefined;
@@ -91,14 +87,38 @@ function toMediaTextCue(
   return result;
 }
 
-/** A cue's own id, or where it starts and ends, counted when another cue in the same list shares it. */
-function getCueId(cue: TextTrackCueLike, seen: Map<string, number>): string {
-  const base = cue.id || `${cue.startTime}-${cue.endTime}`;
-  const count = seen.get(base) ?? 0;
+type CueIds = (cue: TextTrackCueLike) => string;
 
-  seen.set(base, count + 1);
+/**
+ * Ids for the cues in one list: a cue's own id, or where it starts and ends when it has none. A cue keeps its own id
+ * the first time it appears; a repeat, or a derived id another cue already owns, gets a suffix that no cue in the list
+ * has.
+ */
+function createCueIds(cues: readonly TextTrackCueLike[]): CueIds {
+  const own = new Set<string>();
+  const used = new Set<string>();
+  const counts = new Map<string, number>();
 
-  return count ? `${base}-${count}` : base;
+  for (const cue of cues) if (cue.id) own.add(cue.id);
+
+  return (cue) => {
+    const base = cue.id || `${cue.startTime}-${cue.endTime}`;
+    let id = base;
+
+    if (used.has(id) || (!cue.id && own.has(id))) {
+      let count = counts.get(base) ?? 0;
+
+      do {
+        id = `${base}-${++count}`;
+      } while (own.has(id) || used.has(id));
+
+      counts.set(base, count);
+    }
+
+    used.add(id);
+
+    return id;
+  };
 }
 
 /** A JSON object or array from cue text, or `undefined` for anything else. Never throws. */
@@ -120,7 +140,7 @@ function parseJsonValue(text: string): unknown {
  * rebuilt on every sync, so this is what lets subscribers compare cues and cue lists by identity.
  */
 export function reuseCues<Cue extends MediaTextCue>(previous: readonly Cue[] | undefined, next: Cue[]): Cue[] {
-  if (!previous?.length) return next;
+  if (!previous) return next;
 
   // Cues that haven't changed come back as the same objects, so an unchanged list needs no matching by id.
   const reused = isSameList(previous, next) ? next : reuseById(previous, next);

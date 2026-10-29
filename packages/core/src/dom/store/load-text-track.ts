@@ -27,7 +27,7 @@ export async function loadTextTrackCues(
   if (!load.format && text.trimStart().startsWith('WEBVTT')) {
     const { parseVtt } = await import('./parse-vtt');
 
-    return parseVtt(text, track.kind);
+    return parseVtt(text, track.kind, signal);
   }
 
   const json: unknown = JSON.parse(text);
