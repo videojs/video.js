@@ -127,6 +127,12 @@ describe('textCuesFeature', () => {
       await Promise.resolve();
 
       expect(listener).toHaveBeenCalledOnce();
+
+      // Nothing active is the same as before, too.
+      setTime(video, 12);
+      await Promise.resolve();
+
+      expect(listener).toHaveBeenCalledOnce();
     });
   });
 
@@ -140,6 +146,36 @@ describe('textCuesFeature', () => {
 
       expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['a', 'b']);
       expect(store.state.textCues[0]!.activeCues.map(({ text }) => text)).toEqual(['b']);
+    });
+
+    it('picks up a cue an engine changes in place', () => {
+      const cue = { startTime: 0, endTime: 100, text: 'a' };
+      const track = createTrack('metadata', { cues: [cue] });
+      const { video, store } = setup([track]);
+
+      cue.endTime = 5;
+      Object.defineProperty(video, 'currentTime', { configurable: true, value: 6 });
+      track.dispatchEvent(new Event('cuechange'));
+
+      expect(store.state.textCues[0]!.cues[0]!.endTime).toBe(5);
+      expect(store.state.textCues[0]!.activeCues).toEqual([]);
+    });
+
+    it('picks up a cue an engine swaps for another without an event', () => {
+      const track = createTrack('metadata', {
+        cues: [
+          { startTime: 0, endTime: 5, text: 'a' },
+          { startTime: 5, endTime: 10, text: 'b' },
+        ],
+      });
+      const { video, store } = setup([track]);
+
+      track.cues!.shift();
+      track.cues!.push({ startTime: 10, endTime: 15, text: 'c' });
+      setTime(video, 11);
+
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['b', 'c']);
+      expect(store.state.textCues[0]!.activeCues.map(({ text }) => text)).toEqual(['c']);
     });
 
     it('keeps cue identity across syncs that change nothing', () => {

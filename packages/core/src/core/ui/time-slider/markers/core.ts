@@ -55,16 +55,32 @@ export interface TimeSliderMarkersInput {
 }
 
 /**
- * A key for a marker's cue: its id, counted when cues from several tracks share one, so each marker keeps its node
- * while the store hands out fresh cue lists.
+ * Keys for the markers of a list of cues: each cue's id, so a marker keeps its node while the store hands out fresh cue
+ * lists. Cues from several tracks can share an id; a repeat gets a suffix that no other cue's key has.
  */
-function getMarkerKey(cue: MediaTextCue, seen: Map<string, number>): string {
-  const base = `cue-${cue.id}`;
-  const count = seen.get(base) ?? 0;
+function createMarkerKeys(cues: readonly MediaTextCue[]): (cue: MediaTextCue) => string {
+  const own = new Set(cues.map((cue) => `cue-${cue.id}`));
+  const used = new Set<string>();
+  const counts = new Map<string, number>();
 
-  seen.set(base, count + 1);
+  return (cue) => {
+    const base = `cue-${cue.id}`;
+    let key = base;
 
-  return count ? `${base}-${count}` : base;
+    if (used.has(key)) {
+      let count = counts.get(base) ?? 0;
+
+      do {
+        key = `${base}-${++count}`;
+      } while (own.has(key) || used.has(key));
+
+      counts.set(base, count);
+    }
+
+    used.add(key);
+
+    return key;
+  };
 }
 
 /**
@@ -76,10 +92,10 @@ function getMarkerKey(cue: MediaTextCue, seen: Map<string, number>): string {
 export function normalizeMarkerCues(cues: readonly MediaTextCue[], min: number, max: number): TimeSliderMarkerRange[] {
   if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return [];
 
-  const seen = new Map<string, number>();
   const sorted = cues
     .filter((cue) => Number.isFinite(cue.startTime))
     .sort((a, b) => a.startTime - b.startTime || a.endTime - b.endTime);
+  const getKey = createMarkerKeys(sorted);
 
   const markers: TimeSliderMarkerRange[] = [];
 
@@ -90,7 +106,7 @@ export function normalizeMarkerCues(cues: readonly MediaTextCue[], min: number, 
     if (point) {
       if (cue.startTime < min || cue.startTime > max) continue;
 
-      markers.push({ key: getMarkerKey(cue, seen), cue, start: cue.startTime, end: cue.startTime, point });
+      markers.push({ key: getKey(cue), cue, start: cue.startTime, end: cue.startTime, point });
       continue;
     }
 
@@ -98,7 +114,7 @@ export function normalizeMarkerCues(cues: readonly MediaTextCue[], min: number, 
     const end = Math.min(max, cue.endTime);
     if (end <= start) continue;
 
-    markers.push({ key: getMarkerKey(cue, seen), cue, start, end, point });
+    markers.push({ key: getKey(cue), cue, start, end, point });
   }
 
   return markers;

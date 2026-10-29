@@ -57,6 +57,18 @@ describe('toMediaTextCues', () => {
     expect(toMediaTextCues(cues).map(({ id }) => id)).toEqual(['0-5', '5-10', '5-10-1']);
   });
 
+  it('never gives two cues the same id', () => {
+    const cues = [
+      { id: 'ad', startTime: 0, endTime: 1, text: 'A' },
+      { id: 'ad', startTime: 1, endTime: 2, text: 'B' },
+      { id: 'ad-1', startTime: 2, endTime: 3, text: 'C' },
+      { startTime: 5, endTime: 10, text: 'D' },
+      { id: '5-10', startTime: 6, endTime: 7, text: 'E' },
+    ];
+
+    expect(toMediaTextCues(cues).map(({ id }) => id)).toEqual(['ad', 'ad-2', 'ad-1', '5-10-1', '5-10']);
+  });
+
   it('clamps cue ends to a finite duration', () => {
     const cues = [
       { startTime: 0, endTime: 5, text: 'A' },

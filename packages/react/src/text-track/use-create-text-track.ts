@@ -10,8 +10,8 @@ import { useLatestRef } from '../utils/use-latest-ref';
 
 /**
  * Add a track defined with `defineTextTrack()` while the component is mounted, and remove it when it unmounts. Its cues
- * are checked against the definition's type. The track stays through source changes. Keep `cues` the same array across
- * renders; a new array replaces the track.
+ * are checked against the definition's type. The track stays through source changes. Keep `cues` the same array, and
+ * `format` the same function, across renders; a new one replaces the track.
  *
  * ```tsx
  * useCreateTextTrack(quizTrack, { cues });
@@ -28,7 +28,7 @@ export function useCreateTextTrack<Cue extends MediaTextCue>(
 ): AppTextTrack<InferCueValue<Cue>> | null;
 /**
  * Add a text track while the component is mounted, and remove it when it unmounts. The track stays through source
- * changes. Keep `cues` the same array across renders; a new array replaces the track.
+ * changes. Keep `cues` the same array, and `format` the same function, across renders; a new one replaces the track.
  *
  * ```tsx
  * useCreateTextTrack({ kind: 'metadata', label: 'quiz', cues });
@@ -45,6 +45,7 @@ export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackConte
   const latest = useLatestRef({ init, content });
   const cues = content?.cues ?? init.cues;
   const src = content?.src ?? init.src;
+  const format = content?.format ?? init.format;
   const key = JSON.stringify([init.kind, init.label, init.language]);
 
   useEffect(() => {
@@ -59,9 +60,9 @@ export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackConte
       track.remove();
       setAdded(null);
     };
-    // `latest` is a ref; `key`, `cues`, and `src` stand in for the description so an inline object doesn't re-add each
-    // render.
-  }, [store, key, cues, src, latest]);
+    // `latest` is a ref; `key`, `cues`, `src`, and `format` stand in for the description so an inline object doesn't
+    // re-add each render.
+  }, [store, key, cues, src, format, latest]);
 
   return added;
 }

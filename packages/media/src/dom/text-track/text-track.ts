@@ -1,6 +1,7 @@
 import { addRemovableTextTrack, findTrackElement, listen } from '@videojs/utils/dom';
-import { isUndefined } from '@videojs/utils/predicate';
+import { isObject, isUndefined } from '@videojs/utils/predicate';
 
+import { getRegisteredMedia } from '../../core/registered-media';
 import type {
   DataCueLike,
   MediaTextTrackCapability,
@@ -63,7 +64,7 @@ export function createTextTrack(
 
   // The platform's `addTextTrack()` makes tracks that can never be removed, so DOM media get a `<track>` on the element
   // they play through. Other media add their own; embeds can list tracks without adding any.
-  const mediaElement = getMediaElement(media);
+  const mediaElement = findMediaElement(media);
   const track: TextTrackLike | undefined = mediaElement
     ? addRemovableTextTrack(mediaElement, kind, label, language)
     : media.addTextTrack?.(kind, label, language);
@@ -142,6 +143,19 @@ export function createTextTrack(
       else media.removeTextTrack?.(track);
     },
   };
+}
+
+/**
+ * The native element `media` plays through, also when it's a media component fronting another, such as an `<hls-video>`
+ * slotted into another media component.
+ */
+function findMediaElement(media: unknown): HTMLMediaElement | null {
+  const element = getMediaElement(media);
+  if (element) return element;
+
+  const target = isObject(media) ? (getRegisteredMedia(media) as { target?: unknown }).target : null;
+
+  return isObject(target) && target !== media ? findMediaElement(target) : null;
 }
 
 interface DataCueConstructor {

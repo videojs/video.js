@@ -47,3 +47,20 @@ export function listenForAppTextTracks(state: object, listener: () => void, sign
 
   signal.addEventListener('abort', unsubscribe, { once: true });
 }
+
+/** Each copy of an app track in the media, to the id of the app track it copies. */
+const appTrackCopies = new WeakMap<object, string>();
+
+/** Mark a media track as the copy of the app track with `id`, or unmark it given `null`. */
+export function setAppTrackCopy(track: object, id: string | null): void {
+  if (id) appTrackCopies.set(track, id);
+  else appTrackCopies.delete(track);
+}
+
+/**
+ * The id of the app track a media track copies, if it's a copy. Copies are told apart by identity, so a media track
+ * that happens to share an app track's id is never taken for one.
+ */
+export function getAppTrackCopyId(track: object): string | undefined {
+  return appTrackCopies.get(track);
+}
