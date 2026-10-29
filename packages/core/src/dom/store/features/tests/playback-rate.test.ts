@@ -1,13 +1,13 @@
-import type { MediaPlaybackRateSupport } from '@videojs/media';
+import type { MediaPlaybackRateRange } from '@videojs/media';
 import { createStore } from '@videojs/store';
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { setPlayerConfigValue } from '../../../feature';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
 import { playbackRateFeature } from '../playback-rate';
 
-const ratesConfig = playbackRateFeature.config!.playbackRates;
+const ratesConfig = playbackRateFeature.config!.defaultPlaybackRates;
 
 function createRateStore() {
   return createStore<PlayerTarget>()(playbackRateFeature);
@@ -26,13 +26,17 @@ function createRatelessMedia(): HTMLVideoElement {
   return media as unknown as HTMLVideoElement;
 }
 
-function createSupportingVideo(support: MediaPlaybackRateSupport | undefined) {
+function createRangedVideo(range: MediaPlaybackRateRange | undefined) {
   const video = createMockVideo();
 
-  Object.defineProperty(video, 'playbackRateSupport', { value: support, writable: true, configurable: true });
+  Object.defineProperty(video, 'playbackRateRange', { value: range, writable: true, configurable: true });
 
-  return video as HTMLVideoElement & { playbackRateSupport: MediaPlaybackRateSupport | undefined };
+  return video as HTMLVideoElement & { playbackRateRange: MediaPlaybackRateRange | undefined };
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('playbackRateFeature', () => {
   describe('attach', () => {
@@ -95,25 +99,44 @@ describe('playbackRateFeature', () => {
       expect('playbackRate' in media).toBe(false);
     });
 
-    it('leaves the rate unchanged when the media rejects it', () => {
-      const store = createRateStore();
+    it.each([
+      [32, 16],
+      [0.01, 0.0625],
+    ])('clamps %s to the native range as %s and warns', (rate, expected) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const video = createMockVideo();
+      const store = createRateStore();
 
-      Object.defineProperty(video, 'playbackRate', {
-        get: () => 1,
-        set: () => {
-          throw new DOMException('Unsupported rate', 'NotSupportedError');
-        },
-        configurable: true,
-      });
       store.attach({ media: video, container: null });
+      store.setPlaybackRate(rate);
 
-      expect(() => store.state.setPlaybackRate(32)).not.toThrow();
-      expect(store.state.playbackRate).toBe(1);
+      expect(video.playbackRate).toBe(expected);
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringContaining(`Playback rate ${rate} is outside`));
+    });
+
+    it("clamps to the media's own range", () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const video = createRangedVideo({ min: 0.25, max: 2 });
+      const store = createRateStore();
+
+      store.attach({ media: video, container: null });
+      store.setPlaybackRate(3);
+
+      expect(video.playbackRate).toBe(2);
+    });
+
+    it('does not warn for a rate within the range', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const store = createRateStore();
+
+      store.attach({ media: createMockVideo(), container: null });
+      store.setPlaybackRate(1.1);
+
+      expect(warn).not.toHaveBeenCalled();
     });
   });
 
-  describe('playbackRates', () => {
+  describe('defaultPlaybackRates', () => {
     it('keeps configured rates in the author order', () => {
       const store = createRateStore();
 
@@ -164,60 +187,50 @@ describe('playbackRateFeature', () => {
     });
   });
 
-  describe('media support', () => {
-    it('leaves out rates outside the supported range, keeping the author order', () => {
+  describe('playbackRateRange', () => {
+    it('assumes the native range for a media that reports none', () => {
       const store = createRateStore();
 
-      setPlayerConfigValue(store, ratesConfig, [3, 0.25, 2, 1, 0.5]);
-      store.attach({ media: createSupportingVideo({ min: 0.5, max: 2 }), container: null });
+      store.attach({ media: createMockVideo(), container: null });
 
-      expect(store.state.playbackRates).toEqual([2, 1, 0.5]);
+      expect(store.state.playbackRateRange).toEqual({ min: 0.0625, max: 16 });
     });
 
-    it('leaves out rates the media does not list', () => {
+    it("leaves out rates outside the media's range, keeping the author order", () => {
       const store = createRateStore();
 
-      setPlayerConfigValue(store, ratesConfig, [0.5, 1, 1.1, 2]);
-      store.attach({ media: createSupportingVideo({ rates: [0.25, 0.5, 1, 2] }), container: null });
+      setPlayerConfigValue(store, ratesConfig, [3, 0.25, 2, 1.1, 0.5]);
+      store.attach({ media: createRangedVideo({ min: 0.5, max: 2 }), container: null });
 
-      expect(store.state.playbackRates).toEqual([0.5, 1, 2]);
+      expect(store.state.playbackRates).toEqual([2, 1.1, 0.5]);
     });
 
-    it('falls back to the supported defaults when no configured rate is supported', () => {
+    it('falls back to the defaults that fit when no configured rate does', () => {
       const store = createRateStore();
 
       setPlayerConfigValue(store, ratesConfig, [3, 4]);
-      store.attach({ media: createSupportingVideo({ min: 0.5, max: 1 }), container: null });
+      store.attach({ media: createRangedVideo({ min: 0.5, max: 1 }), container: null });
 
       expect(store.state.playbackRates).toEqual([0.5, 0.75, 1]);
     });
 
-    it("falls back to the media's own list when no default is supported", () => {
+    it('falls back to the rate nearest 1 when no default fits', () => {
       const store = createRateStore();
 
-      store.attach({ media: createSupportingVideo({ rates: [3, 4] }), container: null });
+      store.attach({ media: createRangedVideo({ min: 3, max: 4 }), container: null });
 
-      expect(store.state.playbackRates).toEqual([3, 4]);
+      expect(store.state.playbackRates).toEqual([3]);
     });
 
-    it('follows support the media announces, restoring the configured rates once it clears', () => {
+    it('reads the range again when a new source loads', () => {
       const store = createRateStore();
-      const video = createSupportingVideo(undefined);
+      const video = createRangedVideo(undefined);
 
-      setPlayerConfigValue(store, ratesConfig, [0.5, 1, 3]);
       store.attach({ media: video, container: null });
+      video.playbackRateRange = { min: 0.25, max: 2 };
+      video.dispatchEvent(new Event('loadstart'));
 
-      expect(store.state.playbackRates).toEqual([0.5, 1, 3]);
-
-      video.playbackRateSupport = { rates: [1, 3] };
-      video.dispatchEvent(new Event('playbackratesupportchange'));
-
-      expect(store.state.playbackRates).toEqual([1, 3]);
-
-      video.playbackRateSupport = undefined;
-      video.dispatchEvent(new Event('playbackratesupportchange'));
-
-      expect(store.state.playbackRates).toEqual([0.5, 1, 3]);
+      expect(store.state.playbackRateRange).toEqual({ min: 0.25, max: 2 });
     });
   });
 });

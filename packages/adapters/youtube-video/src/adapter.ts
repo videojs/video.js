@@ -5,7 +5,7 @@
 import {
   EMPTY_TIME_RANGES,
   MediaError,
-  type MediaPlaybackRateSupport,
+  type MediaPlaybackRateRange,
   type TextTrackListLike,
   type Video,
 } from '@videojs/media';
@@ -97,7 +97,6 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #volume = 1;
   #muted = false;
   #playbackRate = 1;
-  #playbackRateSupport: MediaPlaybackRateSupport | undefined;
   #progress = 0;
   #readyState = READY_STATE_HAVE_NOTHING;
   #error: MediaError | null = null;
@@ -368,11 +367,11 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   /**
-   * The rates the loaded video offers. Absent until the embed reports them, and cleared across a source change;
-   * `playbackratesupportchange` announces both.
+   * YouTube plays any rate from 0.25 to 2, rounded down to a step of 0.05, though `getAvailablePlaybackRates` lists
+   * only quarter steps.
    */
-  get playbackRateSupport() {
-    return this.#playbackRateSupport;
+  get playbackRateRange(): MediaPlaybackRateRange {
+    return PLAYBACK_RATE_RANGE;
   }
 
   get autoplay() {
@@ -654,18 +653,6 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#captionLanguage = null;
     this.#captionSelected = false;
     this.#textTracks.clear();
-
-    // Last: this one announces, and a listener reading a half-reset media would still see the old video.
-    if (this.#setPlaybackRateSupport(undefined)) this.dispatchEvent(new Event('playbackratesupportchange'));
-  }
-
-  /** Store the rates the embed reported, reporting whether they changed. An empty list counts as none reported. */
-  #setPlaybackRateSupport(rates: readonly number[] | undefined): boolean {
-    const next = rates?.length ? { rates } : undefined;
-    if (deepEqual(this.#playbackRateSupport ?? null, next ?? null)) return false;
-
-    this.#playbackRateSupport = next;
-    return true;
   }
 
   #onPlayerReady() {
@@ -711,7 +698,6 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#readyState = READY_STATE_HAVE_METADATA;
 
     const player = this.#player;
-    let rateSupportChanged = false;
 
     if (player) {
       this.#duration = player.getDuration() || Number.NaN;
@@ -719,10 +705,7 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
       this.#volume = player.getVolume() / 100;
       this.#playbackRate = player.getPlaybackRate();
       this.#playerSettingsRead = true;
-      rateSupportChanged = this.#setPlaybackRateSupport(player.getAvailablePlaybackRates());
     }
-
-    if (rateSupportChanged) this.dispatchEvent(new Event('playbackratesupportchange'));
 
     for (const type of ['loadedmetadata', 'durationchange', 'volumechange', 'loadcomplete']) {
       this.dispatchEvent(new Event(type));
@@ -931,6 +914,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     tryCall(() => player.setOption('captions', 'track', language ? { languageCode: language } : {}));
   }
 }
+
+const PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.25, max: 2 };
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

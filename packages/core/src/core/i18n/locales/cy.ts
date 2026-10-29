@@ -102,6 +102,7 @@ export default {
     speed: 'Cyflymder',
     captions: 'Capsiynau',
     playbackRate: 'Cyfradd chwarae',
+    customRate: 'Cyfaddas, {rate}',
     back: 'Yn ôl',
     off: 'I ffwrdd',
     auto: 'Awtomatig',

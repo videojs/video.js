@@ -37,4 +37,34 @@ describe('PlaybackRateRadioGroupElement', () => {
 
     expect(setPlaybackRate).toHaveBeenCalledWith(2);
   });
+
+  it('offers the rates from its own rates attribute', async () => {
+    const { menu, options, trigger } = setup({ playbackRates: [0.5, 1, 2], playbackRate: 1 });
+
+    options.setAttribute('rates', '1 3');
+    await waitForMenu(menu, trigger, options);
+
+    const items = [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+
+    expect(items.map((item) => item.value)).toEqual(['1', '3']);
+  });
+
+  it('marks the current rate as custom when the group does not offer it', async () => {
+    const { menu, options, setState, trigger } = setup({ playbackRates: [1, 1.5, 2], playbackRate: 1.1 });
+
+    await waitForMenu(menu, trigger, options);
+
+    const custom = () =>
+      [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)]
+        .filter((item) => item.hasAttribute('data-custom'))
+        .map((item) => item.value);
+
+    expect(custom()).toEqual(['1.1']);
+    expect(menu.querySelector('[data-custom]')!.getAttribute('aria-label')).toBe('Custom, 1.1×');
+    expect(menu.querySelector('[data-rate="1.5"]')!.hasAttribute('aria-label')).toBe(false);
+
+    setState({ playbackRates: [1, 1.1, 1.5, 2] });
+
+    await waitForAssertion(() => expect(custom()).toEqual([]));
+  });
 });

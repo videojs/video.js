@@ -443,17 +443,17 @@ describe('createPlayer', () => {
     const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
     const defaults = player.store.playbackRates;
 
-    player.setAttribute('playback-rates', '2 1 0.5');
+    player.setAttribute('default-playback-rates', '2 1 0.5');
     document.body.append(player);
 
     expect(player.store.playbackRates).toEqual([2, 1, 0.5]);
 
-    player.playbackRates = [1, 1.5];
+    player.defaultPlaybackRates = [1, 1.5];
     await player.updateComplete;
 
     expect(player.store.playbackRates).toEqual([1, 1.5]);
 
-    player.playbackRates = undefined;
+    player.defaultPlaybackRates = undefined;
     await player.updateComplete;
 
     expect(player.store.playbackRates).toEqual(defaults);

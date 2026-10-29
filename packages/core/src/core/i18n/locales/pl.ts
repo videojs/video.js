@@ -102,6 +102,7 @@ export default {
     speed: 'Szybkość',
     captions: 'Napisy',
     playbackRate: 'Szybkość odtwarzania',
+    customRate: 'Niestandardowa, {rate}',
     back: 'Wstecz',
     off: 'Wyłączone',
     auto: 'Auto',

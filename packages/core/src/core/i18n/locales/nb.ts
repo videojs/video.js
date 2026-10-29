@@ -102,6 +102,7 @@ export default {
     speed: 'Hastighet',
     captions: 'Teksting',
     playbackRate: 'Avspillingshastighet',
+    customRate: 'Tilpasset, {rate}',
     back: 'Tilbake',
     off: 'Av',
     auto: 'Auto',

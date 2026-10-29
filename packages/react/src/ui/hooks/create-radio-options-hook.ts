@@ -4,6 +4,7 @@ import type { RadioOption, RadioOptionsState } from '@videojs/core';
 import { logMissingFeature } from '@videojs/core/dom';
 import { type Text, type TextParams, translateText } from '@videojs/core/i18n';
 import type { UnknownState } from '@videojs/store';
+import { isUndefined } from '@videojs/utils/predicate';
 import { useCallback, useState } from 'react';
 
 import { useTranslator } from '../../i18n/context';
@@ -27,8 +28,12 @@ interface RadioOptionsHookConfig<Props, Media, State extends RadioOptionsState> 
 
 type StateOption<State extends RadioOptionsState> = State extends RadioOptionsState<infer Option> ? Option : never;
 
-export type TranslatedRadioOption<Option extends RadioOption> = Omit<Option, 'label' | 'labelParams' | 'disabled'> & {
+export type TranslatedRadioOption<Option extends RadioOption> = Omit<
+  Option,
+  'label' | 'labelParams' | 'ariaLabel' | 'ariaLabelParams' | 'disabled'
+> & {
   label: string;
+  ariaLabel?: string | undefined;
   disabled: boolean;
 };
 
@@ -72,11 +77,12 @@ export function createRadioOptionsHook<Props, Media, State extends RadioOptionsS
     core.setMedia(media);
     const state = core.getState();
     const options = state.options.map((option) => {
-      const { label, labelParams, disabled, ...rest } = option;
+      const { label, labelParams, ariaLabel, ariaLabelParams, disabled, ...rest } = option;
 
       return {
         ...rest,
         label: translateText(label, t, labelParams),
+        ariaLabel: isUndefined(ariaLabel) ? undefined : translateText(ariaLabel, t, ariaLabelParams),
         disabled: state.disabled || disabled,
       } as TranslatedRadioOption<StateOption<State>>;
     });

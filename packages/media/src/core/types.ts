@@ -192,33 +192,18 @@ export interface MediaPlaybackRateCapability {
   defaultPlaybackRate: number;
 }
 
-/**
- * The playback rates a media implementation accepts. A rate is supported when it falls within `min` and `max` and, if
- * `rates` is present, appears in it. An absent bound or list places no constraint.
- */
-export interface MediaPlaybackRateSupport {
-  /** Discrete rates the media accepts, such as the list a YouTube video reports once it loads. */
-  readonly rates?: readonly number[];
-  /** Slowest rate the media accepts. */
-  readonly min?: number;
-  /** Fastest rate the media accepts. */
-  readonly max?: number;
-}
-
-/** Events emitted when a media implementation's supported playback rates change. */
-export interface MediaPlaybackRateSupportEvents {
-  playbackratesupportchange: EventLike;
+/** The slowest and fastest playback rates a media implementation accepts. */
+export interface MediaPlaybackRateRange {
+  readonly min: number;
+  readonly max: number;
 }
 
 /**
- * Optional constraints on the playback rates a media accepts.
- *
- * `undefined` means the media reports no constraints, and any positive rate is offered. Implementations whose support
- * depends on the loaded source dispatch `playbackratesupportchange` when it changes and clear it when the source is
- * replaced.
+ * Reports the playback rates a media implementation accepts, when they are narrower than the browser's. A media without
+ * it is assumed to accept the native range.
  */
-export interface MediaPlaybackRateSupportCapability {
-  readonly playbackRateSupport: MediaPlaybackRateSupport | undefined;
+export interface MediaPlaybackRateRangeCapability {
+  readonly playbackRateRange: MediaPlaybackRateRange;
 }
 
 // ----------------------------------------
@@ -644,7 +629,6 @@ export interface CommonMediaEvents
     MediaSourceEvents,
     MediaVolumeEvents,
     MediaPlaybackRateEvents,
-    MediaPlaybackRateSupportEvents,
     MediaBufferEvents,
     MediaErrorEvents,
     TextTrackListEvents,
@@ -667,7 +651,6 @@ export interface CommonMedia<Events extends { [K in keyof Events]: EventLike } =
     MediaStreamTypeCapability,
     MediaLiveCapability,
     MediaContentDataCapability,
-    MediaPlaybackRateSupportCapability,
     MediaRemotePlaybackCapability,
     MediaControlsCapability,
     MediaAutoplayCapability {}
@@ -711,7 +694,7 @@ export interface MediaTargetLike
     Partial<MediaLiveCapability>,
     Partial<MediaStreamTypeCapability>,
     Partial<MediaContentDataCapability>,
-    Partial<MediaPlaybackRateSupportCapability> {
+    Partial<MediaPlaybackRateRangeCapability> {
   title: string;
 }
 

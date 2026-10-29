@@ -4,7 +4,7 @@ import {
   type ErrorLike,
   type MediaContentData,
   MediaError,
-  type MediaPlaybackRateSupport,
+  type MediaPlaybackRateRange,
   type MediaPreloadType,
   type TextTrackListLike,
   type Video,
@@ -347,9 +347,9 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
-  /** Vimeo accepts any rate from 0.5 to 2. */
-  get playbackRateSupport(): MediaPlaybackRateSupport {
-    return PLAYBACK_RATE_SUPPORT;
+  /** Vimeo plays any rate up to 2, rejects faster ones, and never settles a request slower than the browser allows. */
+  get playbackRateRange(): MediaPlaybackRateRange {
+    return PLAYBACK_RATE_RANGE;
   }
 
   get autoplay() {
@@ -753,7 +753,7 @@ export function buildVimeoIframeSrc(src: string, props: Partial<VimeoAdapterProp
 const EMBED_VIDEO_BASE = 'https://player.vimeo.com/video';
 const EMBED_EVENT_BASE = 'https://vimeo.com/event';
 
-const PLAYBACK_RATE_SUPPORT: MediaPlaybackRateSupport = { min: 0.5, max: 2 };
+const PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.0625, max: 2 };
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

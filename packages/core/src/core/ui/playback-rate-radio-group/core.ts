@@ -5,8 +5,9 @@ import { isUndefined } from '@videojs/utils/predicate';
 import type { NonNullableObject } from '@videojs/utils/types';
 
 import { resolveText, type Text } from '../../i18n';
-import { playbackRateText } from '../../i18n/text/menu';
+import { customRateText, playbackRateText } from '../../i18n/text/menu';
 import type { RadioOption, RadioOptionsState } from '../types';
+import { filterPlaybackRates, insertPlaybackRate, parsePlaybackRates } from '../utils/playback-rates';
 import { resolveLabel } from '../utils/resolve-label';
 
 export interface PlaybackRateRadioGroupProps {
@@ -16,10 +17,20 @@ export interface PlaybackRateRadioGroupProps {
   formatRate?: ((rate: number) => string) | undefined;
   /** Whether playback rate selection is disabled. */
   disabled?: boolean | undefined;
+  /**
+   * Rates to offer, in order, in place of the player's `defaultPlaybackRates`. HTML takes a space-separated list, such
+   * as `rates="1 1.5 2"`.
+   */
+  rates?: readonly number[] | string | undefined;
 }
 
 export interface PlaybackRateRadioGroupOption extends RadioOption {
   rate: number;
+  /**
+   * Whether the option is the current rate rather than one of the offered rates. The group adds it, slotted before the
+   * first faster rate, when something other than the group set a rate it does not offer, such as the media API.
+   */
+  custom: boolean;
 }
 
 export interface PlaybackRateRadioGroupState extends RadioOptionsState<PlaybackRateRadioGroupOption> {
@@ -36,6 +47,7 @@ export class PlaybackRateRadioGroupCore {
     label: '',
     formatRate: formatPlaybackRate,
     disabled: false,
+    rates: [],
   };
 
   readonly state = createState<PlaybackRateRadioGroupState>({
@@ -86,29 +98,51 @@ export class PlaybackRateRadioGroupCore {
     };
   }
 
+  /**
+   * The rates the group offers: its own `rates`, or the player's when none of them is usable. Rates the media does not
+   * accept are left out.
+   */
+  getRates(media: MediaPlaybackRateState): readonly number[] {
+    const own = parsePlaybackRates(this.#props.rates);
+    const supported = own && filterPlaybackRates(own, media.playbackRateRange);
+
+    return supported?.length ? supported : media.playbackRates;
+  }
+
   setMedia(media: MediaPlaybackRateState): void {
     this.#media = media;
   }
 
   getState(): PlaybackRateRadioGroupState {
     const media = this.#media!;
+    const rates = this.getRates(media);
 
     const availability: PlaybackRateRadioGroupState['availability'] =
       media.playbackRateAvailability !== 'available'
         ? media.playbackRateAvailability
-        : media.playbackRates.length > 0
+        : rates.length > 0
           ? 'available'
           : 'unavailable';
+
+    const options = availability === 'available' ? insertPlaybackRate(rates, media.playbackRate) : rates;
 
     this.state.patch({
       rate: media.playbackRate,
       value: this.getRateValue(media.playbackRate),
-      options: media.playbackRates.map((rate) => ({
-        rate,
-        value: this.getRateValue(rate),
-        label: this.getRateLabel(rate),
-        disabled: false,
-      })),
+      options: options.map((rate) => {
+        const label = this.getRateLabel(rate);
+        const custom = !rates.includes(rate);
+
+        // The visible label shows only the rate, so the accessible name says why an unoffered rate is listed.
+        return {
+          rate,
+          value: this.getRateValue(rate),
+          label,
+          ...(custom && { ariaLabel: customRateText, ariaLabelParams: { rate: label } }),
+          disabled: false,
+          custom,
+        };
+      }),
       disabled: this.#props.disabled || availability !== 'available',
       hidden: availability !== 'available',
       availability,
@@ -121,13 +155,15 @@ export class PlaybackRateRadioGroupCore {
   select(media: MediaPlaybackRateState, rate: number): void {
     if (this.#props.disabled || media.playbackRateAvailability !== 'available') return;
 
-    if (!media.playbackRates.includes(rate)) return;
+    if (!this.getRates(media).includes(rate) && rate !== media.playbackRate) return;
 
     media.setPlaybackRate(rate);
   }
 
   selectValue(media: MediaPlaybackRateState, value: string): void {
-    const rate = media.playbackRates.find((candidate) => this.getRateValue(candidate) === value);
+    const rate = insertPlaybackRate(this.getRates(media), media.playbackRate).find(
+      (candidate) => this.getRateValue(candidate) === value
+    );
     if (isUndefined(rate)) return;
 
     this.select(media, rate);

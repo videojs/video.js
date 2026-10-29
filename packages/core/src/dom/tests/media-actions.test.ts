@@ -158,6 +158,20 @@ describe('MEDIA_INPUT_ACTION_OVERRIDES', () => {
     expect(setPlaybackRate).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['speedUp', 1, 0.1, 1.1],
+    ['speedUp', 1.2, 0.1, 1.3],
+    ['speedDown', 1, 0.1, 0.9],
+    ['speedDown', 0.3, 0.1, 0.2],
+  ] as const)('%s from %s steps by a value of %s to %s', (action, playbackRate, value, expected) => {
+    const setPlaybackRate = vi.fn();
+    const store = mockStore({ playbackRates: [0.5, 1, 2], playbackRate, setPlaybackRate });
+
+    MEDIA_INPUT_ACTION_OVERRIDES[action]({ store, value });
+
+    expect(setPlaybackRate).toHaveBeenCalledExactlyOnceWith(expected);
+  });
+
   it('handles a refused play() from togglePaused', async () => {
     const play = rejecting();
     const store = mockStore({ paused: true, play, pause: vi.fn() });

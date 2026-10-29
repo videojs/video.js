@@ -3,6 +3,7 @@ import { applyElementProps } from '@videojs/core/dom';
 import { type Translator, translateText } from '@videojs/core/i18n';
 import type { ReactiveController, ReactiveControllerHost } from '@videojs/element';
 import { cloneTemplateRoot, getTemplateElement, getTemplateRoot } from '@videojs/utils/dom';
+import { isUndefined } from '@videojs/utils/predicate';
 
 import { cacheKey } from '../../i18n/cache-key';
 import { MenuItemIndicatorElement } from '../menu/item-indicator';
@@ -63,7 +64,7 @@ export class RadioOptionsController<Option extends RadioOption> implements React
     const contentKey = `${state.options
       .map(
         (option) =>
-          `${option.value}:${cacheKey(option.label, option.labelParams)}:${this.#config.getOptionCacheKey?.(option) ?? ''}`
+          `${option.value}:${cacheKey(option.label, option.labelParams)}:${cacheKey(option.ariaLabel ?? '', option.ariaLabelParams)}:${this.#config.getOptionCacheKey?.(option) ?? ''}`
       )
       .join('|')}::${locale}::${template?.innerHTML ?? ''}`;
 
@@ -88,6 +89,10 @@ export class RadioOptionsController<Option extends RadioOption> implements React
 
         if (this.#config.renderItem) this.#config.renderItem(item, label, option);
         else this.#setItemLabel(item, label);
+
+        if (!isUndefined(option.ariaLabel)) {
+          item.setAttribute('aria-label', translateText(option.ariaLabel, translator, option.ariaLabelParams));
+        }
 
         return item;
       });

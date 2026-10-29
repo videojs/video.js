@@ -8,6 +8,7 @@ function createMediaState(overrides: Partial<MediaPlaybackRateState> = {}): Medi
   return {
     playbackRates: [0.2, 0.5, 0.7, 1, 1.2, 1.5, 1.7, 2],
     playbackRate: 1,
+    playbackRateRange: { min: 0.0625, max: 16 },
     playbackRateAvailability: 'available',
     setPlaybackRate: vi.fn(),
     ...overrides,
@@ -186,6 +187,37 @@ describe('PlaybackRateButtonCore', () => {
 
       core.cycle(media);
       expect(media.setPlaybackRate).toHaveBeenCalledWith(0.2);
+    });
+
+    it('cycles through its own rates in place of the player rates', () => {
+      const core = new PlaybackRateButtonCore({ rates: [1, 3] });
+      const media = createMediaState({ playbackRate: 1 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(3);
+    });
+
+    it('parses rates given as a space-separated list', () => {
+      const core = new PlaybackRateButtonCore({ rates: '1 3' });
+      const media = createMediaState({ playbackRate: 3 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(1);
+    });
+
+    it("leaves out its own rates that fall outside the media's range", () => {
+      const core = new PlaybackRateButtonCore({ rates: [1, 3, 1.5] });
+      const media = createMediaState({ playbackRate: 1, playbackRateRange: { min: 0.25, max: 2 } });
+
+      expect(core.getRates(media)).toEqual([1, 1.5]);
+    });
+
+    it('falls back to the player rates when its own rates hold no usable rate', () => {
+      const core = new PlaybackRateButtonCore({ rates: 'fast' });
+      const media = createMediaState({ playbackRate: 1 });
+
+      core.cycle(media);
+      expect(media.setPlaybackRate).toHaveBeenCalledWith(1.2);
     });
 
     it('does nothing when menuTrigger is set', () => {

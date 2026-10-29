@@ -34,6 +34,19 @@ describe('PlaybackRateButtonElement', () => {
     expect(trigger.style.getPropertyValue('--media-playback-rate-length')).toBe('4');
   });
 
+  it('cycles through the rates from its own rates attribute', async () => {
+    const setPlaybackRate = vi.fn();
+    const { trigger } = setup({ playbackRates: [0.5, 1, 2], playbackRate: 1, setPlaybackRate });
+
+    trigger.removeAttribute('commandfor');
+    trigger.setAttribute('rates', '1 3');
+    await trigger.updateComplete;
+
+    trigger.click();
+
+    expect(setPlaybackRate).toHaveBeenCalledWith(3);
+  });
+
   it('does not cycle when commandfor is set', async () => {
     const setPlaybackRate = vi.fn();
     const { trigger, store } = setup({ playbackRate: 1, setPlaybackRate });

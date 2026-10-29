@@ -100,6 +100,7 @@ export default {
     speed: 'Sebesség',
     captions: 'Feliratok',
     playbackRate: 'Lejátszási sebesség',
+    customRate: 'Egyéni, {rate}',
     back: 'Vissza',
     off: 'Ki',
     auto: 'Automatikus',

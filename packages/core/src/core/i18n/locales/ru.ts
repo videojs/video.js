@@ -101,6 +101,7 @@ export default {
     speed: 'Скорость',
     captions: 'Субтитры',
     playbackRate: 'Скорость воспроизведения',
+    customRate: 'Измененная, {rate}',
     back: 'Назад',
     off: 'Выкл.',
     auto: 'Авто',

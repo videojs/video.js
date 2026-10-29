@@ -465,7 +465,7 @@ describe('createPlayer', () => {
       }
     );
 
-    it('seeds playbackRates and restores the defaults when the prop is removed', () => {
+    it('seeds defaultPlaybackRates and restores the defaults when the prop is removed', () => {
       const { Player, usePlayer } = createPlayer({ features: [features.playbackRate] });
       let store!: PlayerStore;
 
@@ -482,7 +482,7 @@ describe('createPlayer', () => {
       const defaults = store.playbackRates;
 
       rerender(
-        <Player playbackRates={[2, 1, 0.5]}>
+        <Player defaultPlaybackRates={[2, 1, 0.5]}>
           <Consumer />
         </Player>
       );

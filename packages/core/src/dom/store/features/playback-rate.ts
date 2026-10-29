@@ -1,104 +1,95 @@
-import type {
-  MediaPlaybackRateState,
-  MediaPlaybackRateSupport,
-  MediaPlaybackRateSupportCapability,
-} from '@videojs/media';
+import type { MediaPlaybackRateRange, MediaPlaybackRateRangeCapability, MediaPlaybackRateState } from '@videojs/media';
 import { isMediaPlaybackRateCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
-import { tryCall } from '@videojs/utils/function';
-import { isString } from '@videojs/utils/predicate';
+import { clamp } from '@videojs/utils/number';
 
+import { filterPlaybackRates, parsePlaybackRates } from '../../../core/ui/utils/playback-rates';
 import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
 const DEFAULT_RATES: readonly number[] = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-const USER_RATES = Symbol('@videojs/user-playback-rates');
-const SET_USER_RATES = Symbol('@videojs/set-user-playback-rates');
-const RATE_SUPPORT = Symbol('@videojs/playback-rate-support');
+// Chromium throws outside this range and Firefox stops playing outside it. WebKit accepts any rate, but its audio drops
+// out well inside these bounds, so this shared range is assumed for a media that reports none.
+const NATIVE_RANGE: MediaPlaybackRateRange = { min: 0.0625, max: 16 };
+
+const DEFAULT_PLAYBACK_RATES = Symbol('@videojs/default-playback-rates');
+const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates');
 
 interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
-  [USER_RATES]: readonly number[];
-  [SET_USER_RATES](value: readonly number[] | string | null | undefined): void;
-  [RATE_SUPPORT]: MediaPlaybackRateSupport | undefined;
+  [DEFAULT_PLAYBACK_RATES]: readonly number[];
+  [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
+}
+
+/** The media's own rate range, or the native one when it reports none. */
+function getPlaybackRateRange(media: object): MediaPlaybackRateRange {
+  return (media as Partial<MediaPlaybackRateRangeCapability>).playbackRateRange ?? NATIVE_RANGE;
 }
 
 /**
- * Normalizes author input into the rates the player cycles through. Accepts an array or a space-separated attribute
- * value, keeps the author's order, and drops invalid and repeated rates. Input with no usable rate restores the
- * defaults.
+ * Narrows the default rates to the media's range, keeping their order. When none fit, falls back to the built-in
+ * defaults that fit, then to the rate nearest `1`, so a control always has a rate to offer.
  */
-function resolvePlaybackRates(value: readonly number[] | string | null | undefined): readonly number[] {
-  const candidates = isString(value) ? value.trim().split(/\s+/).map(Number) : (value ?? []);
-  const rates = [...new Set(candidates.filter((rate) => Number.isFinite(rate) && rate > 0))];
+function fitPlaybackRates(rates: readonly number[], range: MediaPlaybackRateRange): readonly number[] {
+  const fitted = filterPlaybackRates(rates, range);
+  if (fitted.length > 0) return fitted;
 
-  return rates.length > 0 ? rates : DEFAULT_RATES;
-}
-
-/**
- * Narrows the requested rates to those the media accepts, keeping their order. When none survive, falls back to the
- * supported defaults, then to the media's own list, so a control always has a rate to offer.
- */
-function filterSupportedRates(
-  rates: readonly number[],
-  support: MediaPlaybackRateSupport | undefined
-): readonly number[] {
-  if (!support) return rates;
-
-  const { rates: listed, min = 0, max = Number.POSITIVE_INFINITY } = support;
-  const isSupported = (rate: number) => rate >= min && rate <= max && (!listed || listed.includes(rate));
-
-  const requested = rates.filter(isSupported);
-  if (requested.length > 0) return requested;
-
-  const defaults = DEFAULT_RATES.filter(isSupported);
+  const defaults = filterPlaybackRates(DEFAULT_RATES, range);
   if (defaults.length > 0) return defaults;
 
-  return listed?.length ? listed : [1];
+  return [clamp(1, range.min, range.max)];
 }
 
 export const playbackRateFeature = definePlayerFeature({
   name: 'playbackRate',
   config: {
     /**
-     * Rates the player offers, in the order controls cycle through them. HTML takes a space-separated list, such as
-     * `playback-rates="0.5 1 1.5 2"`. Missing or empty input restores the defaults. Rates the media does not accept are
-     * left out, so a YouTube video, for example, may offer fewer.
+     * Rates the player's controls offer, in the order they cycle through them, unless a control sets its own `rates`.
+     * HTML takes a space-separated list, such as `default-playback-rates="0.5 1 1.5 2"`. Missing or empty input
+     * restores the defaults. Rates outside the media's range are left out, so YouTube, which plays up to `2`, may offer
+     * fewer.
      */
-    playbackRates: {
-      action: SET_USER_RATES,
-      state: USER_RATES,
+    defaultPlaybackRates: {
+      action: SET_DEFAULT_PLAYBACK_RATES,
+      state: DEFAULT_PLAYBACK_RATES,
     },
   } satisfies PlayerFeatureConfig<PlaybackRateSourceState>,
   state: ({ target, set }): PlaybackRateSourceState => ({
-    [USER_RATES]: DEFAULT_RATES,
-    [SET_USER_RATES]: (value) => set({ [USER_RATES]: resolvePlaybackRates(value) }),
-    [RATE_SUPPORT]: undefined,
+    [DEFAULT_PLAYBACK_RATES]: DEFAULT_RATES,
+    [SET_DEFAULT_PLAYBACK_RATES]: (value) =>
+      set({ [DEFAULT_PLAYBACK_RATES]: parsePlaybackRates(value) ?? DEFAULT_RATES }),
     playbackRate: 1,
+    playbackRateRange: NATIVE_RANGE,
     playbackRateAvailability: 'unavailable',
     setPlaybackRate(rate: number) {
       const { media } = target();
+      if (!isMediaPlaybackRateCapable(media)) return;
 
-      // A browser may still reject a rate the media reported as supported; a rejected rate leaves playback as it was.
-      if (isMediaPlaybackRateCapable(media)) tryCall(() => (media.playbackRate = rate));
+      const { min, max } = getPlaybackRateRange(media);
+      const next = clamp(rate, min, max);
+
+      if (__DEV__ && next !== rate) {
+        console.warn(`[vjs] Playback rate ${rate} is outside the media's range of ${min} to ${max}; using ${next}.`);
+      }
+
+      media.playbackRate = next;
     },
   }),
   derived: {
-    /** The configured rates the media accepts. Set them through the player, not through the store. */
-    playbackRates: ({ get }): readonly number[] => filterSupportedRates(get()[USER_RATES], get()[RATE_SUPPORT]),
+    /** The default rates that fit the media's range. Set them through the player, not through the store. */
+    playbackRates: ({ get }): readonly number[] =>
+      fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get().playbackRateRange),
   },
 
   attach({ target, signal, set }) {
     const { media } = target;
 
-    const syncSupport = () =>
-      set({ [RATE_SUPPORT]: (media as Partial<MediaPlaybackRateSupportCapability>).playbackRateSupport });
+    const syncRange = () => set({ playbackRateRange: getPlaybackRateRange(media) });
 
-    syncSupport();
+    syncRange();
 
-    listen(media, 'playbackratesupportchange', syncSupport, { signal });
-    // An adapter can receive its target after the store attaches.
-    listen(media, 'loadstart', syncSupport, { signal });
+    // An adapter can receive the target that reports its range after the store attaches.
+    listen(media, 'loadstart', syncRange, { signal });
 
     // A media with no `playbackRate`, such as an embed whose provider takes no
     // speed command, would otherwise keep the default rates and show a control

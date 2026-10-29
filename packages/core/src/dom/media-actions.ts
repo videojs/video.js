@@ -1,5 +1,5 @@
 import { noop } from '@videojs/utils/function';
-import { isPromise } from '@videojs/utils/predicate';
+import { isPromise, isUndefined } from '@videojs/utils/predicate';
 
 import { getMediaInputActionValue } from './media-action-value';
 import type { AnyPlayerStore } from './player';
@@ -90,9 +90,16 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     vol.setVolume(vol.volume + step);
   },
 
-  speedUp({ store }) {
+  // With a `value`, steps by that amount, so a hotkey can change speed in finer or coarser steps than the menu offers.
+  // Otherwise moves to the next faster or slower of the player's rates, stopping at the ends.
+  speedUp({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
+
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate + value));
+      return;
+    }
 
     const { playbackRates, playbackRate } = rate;
     const faster = playbackRates.filter((candidate) => candidate > playbackRate);
@@ -101,9 +108,14 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     rate.setPlaybackRate(Math.min(...faster));
   },
 
-  speedDown({ store }) {
+  speedDown({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
+
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate - value));
+      return;
+    }
 
     const { playbackRates, playbackRate } = rate;
     const slower = playbackRates.filter((candidate) => candidate < playbackRate);
@@ -112,3 +124,8 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     rate.setPlaybackRate(Math.max(...slower));
   },
 };
+
+/** Drops floating-point noise from stepped rates, so `1 + 0.1` lands on `1.1` rather than `1.1000000000000001`. */
+function roundPlaybackRate(rate: number): number {
+  return Math.round(rate * 1000) / 1000;
+}

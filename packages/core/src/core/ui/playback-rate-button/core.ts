@@ -7,6 +7,7 @@ import { resolveText, type Text } from '../../i18n';
 import { playbackRateText } from '../../i18n/text/menu';
 import { rateText } from '../../i18n/text/playback';
 import type { ButtonState } from '../types';
+import { filterPlaybackRates, parsePlaybackRates } from '../utils/playback-rates';
 import { resolveLabel } from '../utils/resolve-label';
 import { PlaybackRateButtonCSSVars } from './vars';
 
@@ -17,6 +18,11 @@ export interface PlaybackRateButtonProps {
   disabled?: boolean | undefined;
   /** When true, pointer activation opens a menu instead of cycling. React sets this automatically inside `Menu.Trigger`. */
   menuTrigger?: boolean | undefined;
+  /**
+   * Rates to cycle through, in order, in place of the player's `defaultPlaybackRates`. HTML takes a space-separated
+   * list, such as `rates="1 1.5 2"`.
+   */
+  rates?: readonly number[] | string | undefined;
 }
 
 export interface PlaybackRateButtonState extends ButtonState {
@@ -33,6 +39,7 @@ export class PlaybackRateButtonCore {
     label: '',
     disabled: false,
     menuTrigger: false,
+    rates: [],
   };
 
   readonly state = createState<PlaybackRateButtonState>({
@@ -104,13 +111,26 @@ export class PlaybackRateButtonCore {
     return this.state.current;
   }
 
+  /**
+   * The rates the button cycles through: its own `rates`, or the player's when none of them is usable. Rates the media
+   * does not accept are left out.
+   */
+  getRates(media: MediaPlaybackRateState): readonly number[] {
+    const own = parsePlaybackRates(this.#props.rates);
+    const supported = own && filterPlaybackRates(own, media.playbackRateRange);
+
+    return supported?.length ? supported : media.playbackRates;
+  }
+
   cycle(media: MediaPlaybackRateState): void {
     if (this.#props.disabled || media.playbackRateAvailability !== 'available') return;
 
     if (this.#props.menuTrigger) return;
 
-    const { playbackRates, playbackRate } = media;
+    const playbackRates = this.getRates(media);
     if (playbackRates.length === 0) return;
+
+    const { playbackRate } = media;
 
     const idx = playbackRates.indexOf(playbackRate);
     const next =

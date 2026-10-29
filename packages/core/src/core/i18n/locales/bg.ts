@@ -102,6 +102,7 @@ export default {
     speed: 'Скорост',
     captions: 'Надписи',
     playbackRate: 'Скорост на възпроизвеждане',
+    customRate: 'Персонализирано, {rate}',
     back: 'Назад',
     off: 'Изкл.',
     auto: 'Авто',
