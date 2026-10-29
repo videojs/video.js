@@ -255,6 +255,6 @@ Moving an element synchronously, removing it and inserting it elsewhere with no 
 </video-player>
 ```
 
-`keep-alive` covers the element that carries it and every Video.js element inside it, including the controls inside a packaged skin. An element you remove on its own from a kept-alive tree still destroys itself. Kept-alive elements are never destroyed automatically. When you're finished, call `destroy()` on the player, which also destroys the UI elements inside it, and `adapter.destroy()` on each media component to release its engine. A destroyed element can't be reconnected; create a new one instead.
+`keep-alive` covers the element that carries it and every Video.js element inside it, including the controls inside a packaged skin. An element you remove on its own from a kept-alive tree still destroys itself. `keep-alive` only stops an element from destroying itself: destroying an element, automatically or with `destroy()`, also destroys the UI elements inside it, including ones that carry `keep-alive`. When you're finished, call `destroy()` on the player and `adapter.destroy()` on each media component to release its engine. A destroyed element can't be reconnected; create a new one instead.
 
 </FrameworkCase>

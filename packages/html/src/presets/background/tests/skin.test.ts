@@ -1,8 +1,13 @@
 import { afterEach, describe, expect, it } from 'vite-plus/test';
 
+import { UIElement } from '../../../ui/ui-element';
 import { BackgroundVideoSkinElement } from '../skin';
 
 let tagId = 0;
+
+const controlTag = 'test-background-video-skin-control';
+
+customElements.define(controlTag, class extends UIElement {});
 
 function createSkin(): BackgroundVideoSkinElement {
   const tag = `test-background-video-skin-${tagId++}`;
@@ -37,5 +42,15 @@ describe('BackgroundVideoSkinElement', () => {
     const styles = document.querySelectorAll('#__media-background-styles');
 
     expect(styles).toHaveLength(1);
+  });
+
+  it('destroys the UI elements in its shadow root on destroy()', () => {
+    const skin = createSkin();
+    const control = document.createElement(controlTag) as UIElement;
+
+    skin.shadowRoot!.querySelector('media-container')!.append(control);
+    skin.destroy();
+
+    expect(control.destroyed).toBe(true);
   });
 });

@@ -189,6 +189,21 @@ describe('DestroyMixin deferred destruction', () => {
     expect(el.destroyed).toBe(true);
   });
 
+  it('destroys a kept-alive descendant when an ancestor without keep-alive destroys itself', () => {
+    const parent = createElement(DestroyableElement);
+    const child = createElement(DestroyableElement);
+
+    child.setAttribute('keep-alive', '');
+    parent.append(child);
+
+    document.body.appendChild(parent);
+    parent.remove();
+
+    vi.advanceTimersByTime(100);
+    expect(parent.destroyed).toBe(true);
+    expect(child.destroyed).toBe(true);
+  });
+
   it('manual destroy() works even with keep-alive', () => {
     const el = createElement(DestroyableElement);
 

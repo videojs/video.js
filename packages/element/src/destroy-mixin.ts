@@ -33,7 +33,8 @@ function destroyChildren(parent: ParentNode): void {
  *
  * The `keep-alive` attribute on the element or any composed ancestor, including a shadow host, prevents automatic
  * destruction entirely — call `destroy()` manually when done. Destroying an element also destroys the destroyable
- * elements inside it, including those in shadow roots, so one `destroy()` on the kept-alive root releases the tree.
+ * elements inside it, including those in shadow roots and those with their own `keep-alive`, so one `destroy()` on the
+ * kept-alive root releases the tree.
  *
  * Subclasses override `destroyCallback()` (calling `super.destroyCallback()`) to release heavy resources like stores or
  * imperative APIs.
