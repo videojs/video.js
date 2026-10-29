@@ -1,4 +1,5 @@
-import { isPromise } from '@videojs/utils/predicate';
+import { noop } from '@videojs/utils/function';
+import { isFunction, isObject } from '@videojs/utils/predicate';
 
 /**
  * A [Standard Schema](https://standardschema.dev), the one validation interface zod, valibot, arktype, and others
@@ -50,8 +51,11 @@ export function parseWithSchema<Output>(
 ): { value: Output } | undefined {
   const result = schema['~standard'].validate(value);
 
-  if (isPromise(result)) {
+  if (isThenable(result)) {
     if (__DEV__) console.warn('[vjs-core] text track schemas must be synchronous; this one returned a promise.');
+
+    // Nothing waits for the result, so a rejection mustn't surface as an unhandled one.
+    result.then(undefined, noop);
 
     return undefined;
   }
@@ -63,4 +67,9 @@ export function parseWithSchema<Output>(
   }
 
   return { value: result.value };
+}
+
+/** A promise from any realm, such as one a schema built in an iframe returns, which isn't this realm's `Promise`. */
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return isObject(value) && isFunction((value as PromiseLike<unknown>).then);
 }

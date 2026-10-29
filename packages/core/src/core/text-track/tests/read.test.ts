@@ -115,6 +115,31 @@ describe('getTextCues', () => {
 
       expect(getTextCues({ textCues: [entry(createTrack('quiz'), [createCue('a', 0, {})])] }, track)).toEqual([]);
     });
+
+    it('skips every cue, and handles the rejection, when an asynchronous schema rejects', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const rejected = Promise.reject(new Error('failed'));
+      const then = vi.spyOn(rejected, 'then');
+      const schema = { '~standard': { version: 1, vendor: 'test', validate: () => rejected } } as StandardSchemaV1;
+      const track = defineTextTrack({ kind: 'metadata', label: 'quiz', schema });
+
+      expect(getTextCues({ textCues: [entry(createTrack('quiz'), [createCue('a', 0, {})])] }, track)).toEqual([]);
+      expect(then).toHaveBeenCalledWith(undefined, expect.any(Function));
+    });
+
+    it('skips every cue when an asynchronous schema comes from another realm', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // A promise from an iframe or another VM context is a thenable, but not an instance of this realm's `Promise`.
+      const foreign = { then: vi.fn() };
+      const schema = {
+        '~standard': { version: 1, vendor: 'test', validate: () => foreign },
+      } as unknown as StandardSchemaV1;
+      const track = defineTextTrack({ kind: 'metadata', label: 'quiz', schema });
+
+      expect(getTextCues({ textCues: [entry(createTrack('quiz'), [createCue('a', 0, {})])] }, track)).toEqual([]);
+    });
   });
 });
 
