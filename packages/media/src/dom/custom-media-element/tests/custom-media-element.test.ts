@@ -658,6 +658,43 @@ describe('CustomMediaElement', () => {
 
       expect(Array.from(video.querySelectorAll('track'), ({ kind }) => kind)).toEqual(['captions']);
     });
+
+    it('removes an authored track for good', () => {
+      const el = create(defineVideoElement());
+      const video = el.shadowRoot!.querySelector('video')!;
+      const slot = el.shadowRoot!.querySelector('slot:not([name])')!;
+      const authored = document.createElement('track');
+
+      authored.kind = 'captions';
+      el.appendChild(authored);
+      slot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+      el.removeTextTrack(video.querySelector('track')!.track);
+
+      // A later child, such as a new `<source>`, syncs the children again.
+      el.appendChild(document.createElement('source'));
+      slot.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      expect(video.querySelectorAll('track')).toHaveLength(0);
+      expect(authored.isConnected).toBe(false);
+    });
+
+    it('creates a removable track on a media element nested in another', () => {
+      const outer = create(defineVideoElement());
+      const inner = document.createElement(defineVideoElement().tag) as HTMLElement;
+
+      inner.slot = 'media';
+      outer.appendChild(inner);
+      outer.shadowRoot!.querySelector('slot[name=media]')!.dispatchEvent(new Event('slotchange', { bubbles: true }));
+
+      const video = inner.shadowRoot!.querySelector('video')!;
+      const handle = createTextTrack(outer, { kind: 'captions', label: 'Copy' })!;
+
+      expect(video.querySelectorAll('track')).toHaveLength(1);
+
+      handle.remove();
+
+      expect(video.querySelectorAll('track')).toHaveLength(0);
+    });
   });
 
   describe('event delegation', () => {
