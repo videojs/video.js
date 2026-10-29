@@ -31,6 +31,17 @@ const acmeVideo: LazyMediaDefinition = {
   tag: 'acme-video',
 };
 
+function deferred(): { promise: Promise<void>; resolve: () => void; reject: (error: Error) => void } {
+  let resolve!: () => void;
+  let reject!: (error: Error) => void;
+  const promise = new Promise<void>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe('createLazyVideoElement', () => {
   afterEach(() => {
     document.body.innerHTML = '';
@@ -60,6 +71,49 @@ describe('createLazyVideoElement', () => {
 
     expect(load).toHaveBeenCalledOnce();
     expect(element.querySelector(tag)).toBeInstanceOf(customElements.get(tag)!);
+  });
+
+  it('renders the media of the latest source when a pending load lands after a swap', async () => {
+    const pending = deferred();
+    const tag = `test-acme-video-${tagCounter++}`;
+    const load = vi.fn(() => pending.promise);
+    const element = create(define([{ ...acmeVideo, tag, load }, video]), 'https://video.acme.com/1');
+
+    await flush();
+    element.setAttribute('src', '/movie.mp4');
+    await flush();
+
+    expect(element.querySelector('video')?.getAttribute('src')).toBe('/movie.mp4');
+
+    element.setAttribute('src', 'https://video.acme.com/2');
+    await flush();
+    pending.resolve();
+    await flush();
+
+    expect(element.querySelector('video')).toBeNull();
+    expect(element.querySelectorAll(tag)).toHaveLength(1);
+    expect(element.querySelector(tag)?.getAttribute('src')).toBe('https://video.acme.com/2');
+  });
+
+  it('removes the previous media when a load fails, and loads again for a later source', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const tag = `test-acme-video-${tagCounter++}`;
+    const load = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(undefined);
+    const element = create(define([{ ...acmeVideo, tag, load }, video]), '/movie.mp4');
+
+    await flush();
+    element.setAttribute('src', 'https://video.acme.com/1');
+    await vi.waitFor(() =>
+      expect(error).toHaveBeenCalledWith(expect.stringContaining('Failed to load'), expect.any(Error))
+    );
+
+    expect(element.children).toHaveLength(0);
+
+    element.setAttribute('src', 'https://video.acme.com/2');
+    await vi.waitFor(() => expect(element.querySelector(tag)).not.toBeNull());
+
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(element.querySelector(tag)!.getAttribute('src')).toBe('https://video.acme.com/2');
   });
 
   it('only plays the sources its media do', async () => {
