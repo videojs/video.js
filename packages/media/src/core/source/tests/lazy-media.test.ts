@@ -2,11 +2,13 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { AdapterType } from '../adapter-type';
 import {
+  applyPreferPlayback,
   findLazyMedia,
   type LazySource,
   matchAdapterType,
   matchHls,
   type NativeHlsSupport,
+  type PreferPlaybackTarget,
   resolveLazySource,
 } from '../lazy-media';
 
@@ -143,5 +145,46 @@ describe('findLazyMedia', () => {
     expect(findLazyMedia([native, mse], source('hls', 'native'))).toBe(native);
     expect(findLazyMedia([native, mse], source('hls', 'mse'))).toBe(mse);
     expect(findLazyMedia([native, mse], source('dash', 'native'))).toBeNull();
+  });
+});
+
+describe('applyPreferPlayback', () => {
+  // A media's `source` has fields of its own besides `preferPlayback`.
+  const mediaWith = (source: object | null) => ({ source }) as PreferPlaybackTarget;
+
+  it('sets preferPlayback on the source, keeping the rest of it', () => {
+    const media = mediaWith({ src: HLS });
+
+    applyPreferPlayback(media, 'native');
+
+    expect(media.source).toEqual({ src: HLS, preferPlayback: 'native' });
+  });
+
+  it('creates a source for a media without one', () => {
+    const media = mediaWith(null);
+
+    applyPreferPlayback(media, 'mse');
+
+    expect(media.source).toEqual({ preferPlayback: 'mse' });
+  });
+
+  it('leaves an unchanged source alone, so the media does not rebuild its engine', () => {
+    const source = { src: HLS, preferPlayback: 'native' };
+    const media = mediaWith(source);
+
+    applyPreferPlayback(media, 'native');
+
+    expect(media.source).toBe(source);
+  });
+
+  it('drops preferPlayback once it is unset', () => {
+    const withSrc = mediaWith({ src: HLS, preferPlayback: 'native' });
+    const withoutSrc = mediaWith({ preferPlayback: 'native' });
+
+    applyPreferPlayback(withSrc, undefined);
+    applyPreferPlayback(withoutSrc, undefined);
+
+    expect(withSrc.source).toEqual({ src: HLS });
+    expect(withoutSrc.source).toBeNull();
   });
 });
