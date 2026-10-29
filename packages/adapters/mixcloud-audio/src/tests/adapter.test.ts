@@ -5,6 +5,7 @@ import {
   isMediaVolumeCapable,
   MediaError,
 } from '@videojs/media';
+import { getMediaEngineName } from '@videojs/media/dom';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildMixcloudIframeSrc, MixcloudAdapter } from '..';
@@ -429,6 +430,101 @@ describe('MixcloudAdapter', () => {
     });
   });
 
+  describe('preload', () => {
+    it('loads no widget under preload="none" until play(), then plays once it is ready', async () => {
+      const media = new MixcloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      media.src = SHOW;
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+
+      await media.play();
+
+      expect(widget.iframe.getAttribute('src')).toBe(buildMixcloudIframeSrc(SHOW));
+
+      widget.start();
+      widget.answer(SHOW_ANSWERS);
+      await flush();
+
+      expect(widget.named('play')).toHaveLength(1);
+    });
+
+    it('loads no widget for a source set after preload="none" in the same task, as lazy-audio sets them', async () => {
+      const media = new MixcloudAdapter();
+      const widget = new FakeWidget();
+
+      media.attach(widget.iframe);
+      media.src = SHOW;
+      media.preload = 'none';
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+
+    it('holds a new target back again after detach', async () => {
+      const media = new MixcloudAdapter();
+
+      media.preload = 'none';
+      media.src = SHOW;
+      media.attach(new FakeWidget().iframe);
+      await media.play();
+      media.detach();
+
+      // Playing was asked of the old widget; a new one waits to be asked again.
+      const widget = new FakeWidget();
+
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+
+    it('loads the widget when preload is raised from "none"', async () => {
+      const media = new MixcloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      media.src = SHOW;
+      media.attach(widget.iframe);
+      await flush();
+      media.preload = 'metadata';
+
+      expect(widget.iframe.getAttribute('src')).toBe(buildMixcloudIframeSrc(SHOW));
+    });
+
+    it.each<[string, (media: MixcloudAdapter) => void]>([
+      ['autoplay', (media) => (media.autoplay = true)],
+      ['the autoplay parameter', (media) => (media.source = { engine: { mixcloud: { autoplay: true } } })],
+      // The widget's own play button is then the way to start it, and it needs a widget to show.
+      ['controls', (media) => (media.controls = true)],
+    ])('loads the widget at once under preload="none" for %s', async (_, setup) => {
+      const media = new MixcloudAdapter();
+      const widget = new FakeWidget();
+
+      media.preload = 'none';
+      setup(media);
+      media.src = SHOW;
+      media.attach(widget.iframe);
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).not.toBe(null);
+    });
+
+    it('clears a widget left from an earlier source when the next one is held back', async () => {
+      const { media, widget } = await createReadyMedia();
+
+      media.preload = 'none';
+      media.src = OTHER_SHOW;
+      await flush();
+
+      expect(widget.iframe.getAttribute('src')).toBe(null);
+    });
+  });
+
   describe('playback', () => {
     it('reports play, waiting, and playing through the play and pause toggling of loading', async () => {
       const { media, widget } = await createReadyMedia();
@@ -803,5 +899,9 @@ describe('MixcloudAdapter', () => {
     expect(isMediaBufferCapable(media)).toBe(true);
     expect(isMediaPlaybackRateCapable(media)).toBe(false);
     expect(isMediaPictureInPictureCapable(media)).toBe(false);
+  });
+
+  it('names its engine, as the other embeds do', () => {
+    expect(getMediaEngineName(new MixcloudAdapter())).toBe('mixcloud');
   });
 });

@@ -70,6 +70,19 @@ describe('MixcloudAudio', () => {
     expect(iframe.style.display).toBe('none');
   });
 
+  it('renders an empty frame under preload="none" and loads the widget on play()', async () => {
+    const { container, media } = renderWithMedia(<MixcloudAudio src={SHOW} preload="none" />);
+    const iframe = container.querySelector('iframe')!;
+
+    await flushDeferredWidget();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+
+    await media.play();
+
+    expect(iframe.getAttribute('src')).toBe(buildMixcloudIframeSrc(SHOW));
+  });
+
   it('renders without a source and builds the widget when one arrives', async () => {
     const { container, rerender } = render(<MixcloudAudio />);
     const iframe = container.querySelector('iframe')!;
