@@ -91,6 +91,32 @@ describe('useCreateTextTrack', () => {
     expect(result.current?.id).not.toBe(first?.id);
   });
 
+  it('replaces the track when its src or format changes', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise(() => {}))
+    );
+
+    const { store, wrapper } = setup();
+    const first = () => [];
+    const second = () => [];
+    const { result, rerender } = renderHook(
+      ({ src, format }) => useCreateTextTrack({ kind: 'chapters', label: 'chapters', src, format }),
+      { wrapper, initialProps: { src: '/one.json', format: first } }
+    );
+    const ids = [result.current?.id];
+
+    rerender({ src: '/one.json', format: second });
+    ids.push(result.current?.id);
+    rerender({ src: '/two.json', format: second });
+    ids.push(result.current?.id);
+
+    expect(new Set(ids).size).toBe(3);
+    expect(appLabels(store)).toEqual(['chapters']);
+
+    vi.unstubAllGlobals();
+  });
+
   it('does not add the track again after the app removes it', async () => {
     const { store, wrapper } = setup();
     const { result } = renderHook(() => useCreateTextTrack({ kind: 'metadata', label: 'quiz', cues }), { wrapper });
