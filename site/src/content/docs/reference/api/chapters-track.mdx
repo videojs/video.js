@@ -70,7 +70,7 @@ player.store.subscribe(() => {
 
 ## Chapter formats
 
-Each converter takes parsed JSON and returns cues for a chapters track. Pass one as the `format` of a track with a `src`, and the player converts the file once it loads. Or call it on JSON you already have and pass the result as `cues`. Converters skip entries they can't read and never throw.
+Each converter takes a file's text, or JSON you already parsed, and returns cues for a chapters track. Pass one as the `format` of a track with a `src`, and the player converts the file once it loads. Or call it yourself and pass the result as `cues`. Converters skip entries they can't read; only text that isn't JSON throws.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -114,9 +114,9 @@ function Chapters({ videoObject }: { videoObject: unknown }) {
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const videoObject = JSON.parse(document.querySelector('script[type="application/ld+json"]')!.textContent!);
+const jsonLd = document.querySelector('script[type="application/ld+json"]')!.textContent!;
 
-player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(videoObject) });
+player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(jsonLd) });
 ```
 </FrameworkCase>
 
