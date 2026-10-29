@@ -64,6 +64,14 @@ describe('normalizeMarkerCues', () => {
     expect(second?.key).toBe('cue-ad-1');
   });
 
+  it('never gives two markers the same key', () => {
+    const keys = normalizeMarkerCues([cue(10, 10, 'ad'), cue(20, 20, 'ad'), cue(30, 30, 'ad-1')], 0, 100).map(
+      ({ key }) => key
+    );
+
+    expect(keys).toEqual(['cue-ad', 'cue-ad-2', 'cue-ad-1']);
+  });
+
   it('keys markers by cue id, so fresh cue data keeps its keys', () => {
     const keys = (end: number) => normalizeMarkerCues([cue(10, end, 'ad')], 0, 100).map(({ key }) => key);
 

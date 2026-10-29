@@ -152,6 +152,23 @@ describe('TimeSliderMarkersElement', () => {
     expect(range?.style.getPropertyValue('--media-slider-marker-width')).toBe('25%');
   });
 
+  it('draws every cue when tracks share cue ids', async () => {
+    const { player, markers } = await render((element) => element.setAttribute('kind', 'metadata'));
+
+    await updateStore(player, markers, {
+      textCues: [
+        { track: track('one', 'one'), cues: [cue('ad', 10), cue('ad-1', 30)], activeCues: [] },
+        { track: track('two', 'two'), cues: [cue('ad', 20)], activeCues: [] },
+      ],
+    });
+
+    expect(drawn(markers).map((marker) => marker.style.getPropertyValue('--media-slider-marker-start'))).toEqual([
+      '10%',
+      '20%',
+      '30%',
+    ]);
+  });
+
   it('hides the markers from assistive technology', async () => {
     const { markers } = await render((element) => element.setAttribute('label', 'ads'));
 
