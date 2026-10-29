@@ -308,23 +308,40 @@ Call `watchTextCues()` to read them, then render with `getTextCues()` and `getAc
 import { getActiveTextCues, getTextCues } from '@videojs/html';
 
 const captions = { kind: 'captions', language: 'en' } as const;
+// A cue that hasn't changed stays the same object, so it keeps its line.
+const lines = new WeakMap<object, HTMLLIElement>();
 
 player.store.watchTextCues(captions);
 
 player.store.subscribe(() => {
   const [active] = getActiveTextCues(player.store, captions);
+  const next = getTextCues(player.store, captions).map((cue) => {
+    let line = lines.get(cue);
 
-  transcript.replaceChildren(
-    ...getTextCues(player.store, captions).map((cue) => {
-      const line = document.createElement('li');
+    if (!line) {
+      const button = document.createElement('button');
 
-      line.textContent = cue.text;
-      line.toggleAttribute('aria-current', cue.id === active?.id);
-      line.addEventListener('click', () => player.store.seek(cue.startTime));
+      button.type = 'button';
+      button.textContent = cue.text;
+      button.addEventListener('click', () => player.store.seek(cue.startTime));
 
-      return line;
-    })
-  );
+      line = document.createElement('li');
+      line.append(button);
+      lines.set(cue, line);
+    }
+
+    if (cue.id === active?.id) line.setAttribute('aria-current', 'true');
+    else line.removeAttribute('aria-current');
+
+    return line;
+  });
+
+  // Replace the lines only when they change, so a focused button keeps focus.
+  const current = [...transcript.children];
+
+  if (next.length !== current.length || next.some((line, index) => line !== current[index])) {
+    transcript.replaceChildren(...next);
+  }
 });
 ```
 </FrameworkCase>

@@ -137,9 +137,9 @@ Each cue takes these fields:
 
 The handle `addTextTrack()` returns has the track's `id` in `textTrackList`, and `removed`, which turns `true` once the track is gone. `addCue(cue)` and `removeCue(id)` change its cues, and `remove()` removes it. `removeTextTrack(id)` removes a track the app added; tracks from the media stay.
 
-Like a `<track>` element, an app track stays until it's removed, through source changes and media swaps. A file given as `src` that fails to load leaves the track with the cues it already has.
+Like a `<track>` element, an app track stays until it's removed, through source changes and media swaps. Removing a track stops loading its `src`. A file given as `src` that fails to load leaves the track with the cues it already has.
 
-App tracks start `hidden`. Browsers never draw `metadata` or `chapters` cues. An app `captions` or `subtitles` track is copied into the media, so the browser draws its cues when the track is selected, including in iOS fullscreen where the player's UI isn't shown, and the captions menu lists it.
+App tracks start `hidden`. Browsers never draw `metadata` or `chapters` cues. An app `captions` or `subtitles` track is copied into the media, so the browser draws its cues when the track is selected, including in iOS fullscreen where the player's UI isn't shown, and the captions menu lists it. The track takes its copy's mode, so it's `disabled` until it's selected and `showing` while it is.
 
 When the media has no chapters track, the text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> can show its chapters.
 
