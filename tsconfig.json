@@ -22,6 +22,7 @@
     { "path": "packages/adapters/mux" },
     { "path": "packages/adapters/mux-audio" },
     { "path": "packages/adapters/mux-video" },
+    { "path": "packages/adapters/mixcloud-audio" },
     { "path": "packages/adapters/native-hls-video" },
     { "path": "packages/adapters/playerjs-video" },
     { "path": "packages/adapters/shaka-video" },

@@ -206,6 +206,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/hls-background-video' },
           { slug: 'reference/components/hls-video' },
           { slug: 'reference/components/hlsjs-video' },
+          { slug: 'reference/components/mixcloud-audio' },
           { slug: 'reference/components/mux-audio' },
           { slug: 'reference/components/mux-background-video' },
           { slug: 'reference/components/mux-video' },

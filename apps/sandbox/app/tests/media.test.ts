@@ -8,10 +8,12 @@ import {
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
+  MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
@@ -39,13 +41,13 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube, player.js, and SoundCloud and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, and Mixcloud and the native background video only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
-    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio'];
+    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio', 'mixcloud-audio'];
 
     // player.js is a protocol many providers speak, so its embed picks between their pages instead, and SoundCloud
-    // between the URL shapes its adapter reads differently.
+    // and Mixcloud between the URL shapes and layouts their adapters handle differently.
     expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id))]);
     expect(embeds).toEqual([
       'vimeo-video',
@@ -53,6 +55,7 @@ describe('MEDIA', () => {
       'cloudflare-video',
       'playerjs-video',
       'soundcloud-audio',
+      'mixcloud-audio',
       'spotify-audio',
       'tiktok-video',
       'twitch-video',
@@ -70,6 +73,7 @@ describe('MEDIA', () => {
       'youtube-video',
       'playerjs-video',
       'soundcloud-audio',
+      'mixcloud-audio',
     ]);
   });
 
@@ -88,6 +92,19 @@ describe('MEDIA', () => {
 
     for (const media of MEDIA_IDS.filter((id) => id !== 'soundcloud-audio')) {
       for (const id of SOUNDCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('offers the Mixcloud embed its own URLs, and nothing else those URLs', () => {
+    expect(MEDIA['mixcloud-audio'].entrySource).toBe(DEFAULT_MIXCLOUD_SOURCE);
+    expect(MIXCLOUD_SOURCE_IDS).toContain(DEFAULT_MIXCLOUD_SOURCE);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('mixcloud-audio', platform)).toEqual(MIXCLOUD_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'mixcloud-audio')) {
+      for (const id of MIXCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
   });
 

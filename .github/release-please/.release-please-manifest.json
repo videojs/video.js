@@ -19,6 +19,7 @@
   "packages/adapters/shaka-video": "10.2.0",
   "packages/skins": "10.2.0",
   "packages/spf": "10.2.0",
+  "packages/adapters/mixcloud-audio": "10.2.0",
   "packages/adapters/soundcloud-audio": "10.2.0",
   "packages/adapters/spotify-audio": "10.2.0",
   "packages/adapters/playerjs-video": "10.2.0",
