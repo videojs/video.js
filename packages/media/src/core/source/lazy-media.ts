@@ -118,6 +118,30 @@ export function matchHls(playback: 'native' | 'mse'): LazyMediaMatcher['match'] 
   return ({ adapterType, playback: path }) => adapterType === 'hls' && path && path === playback;
 }
 
+/**
+ * A media that takes `preferPlayback` on its structured `source`, as the hls.js and Mux media do.
+ *
+ * @internal
+ */
+export interface PreferPlaybackTarget {
+  source: { preferPlayback?: string | undefined } | null;
+}
+
+/**
+ * Hand a lazy media's `preferPlayback` on to the media it rendered, keeping the rest of its `source`. Unset, the media
+ * falls back to its own default.
+ *
+ * @internal
+ */
+export function applyPreferPlayback(media: PreferPlaybackTarget, preferPlayback: 'native' | 'mse' | undefined): void {
+  if (media.source?.preferPlayback === preferPlayback) return;
+
+  const { preferPlayback: _, ...source } = media.source ?? {};
+  const next = preferPlayback ? { ...source, preferPlayback } : source;
+
+  media.source = Object.keys(next).length > 0 ? next : null;
+}
+
 // `resolveAdapterType`'s service step without the per-service parsers, which are most of its weight: services match by
 // host, shorthand, or `spotify:` URI, and the media they resolve to checks the id itself.
 function matchService(src: string, url: URL | null): AdapterType | null {
