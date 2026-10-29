@@ -271,16 +271,27 @@ export const textCuesFeature = definePlayerFeature({
       loadAppCues();
     };
 
-    // App tracks with a `src` load once per attach; a track removed meanwhile drops what loaded.
-    const loading = new Set<string>();
+    // App tracks with a `src` load once per attach, each with its own request so removing the track stops it.
+    const loads = new Map<string, AbortController>();
 
     const loadAppCues = () => {
-      for (const { track, load } of get()[APP_TEXT_TRACKS]) {
-        if (!load || loading.has(track.id)) continue;
+      const records = get()[APP_TEXT_TRACKS];
 
-        loading.add(track.id);
+      for (const [id, controller] of loads) {
+        if (records.some(({ track }) => track.id === id)) continue;
 
-        loadTextTrackCues(load, track, signal)
+        controller.abort();
+        loads.delete(id);
+      }
+
+      for (const { track, load } of records) {
+        if (!load || loads.has(track.id)) continue;
+
+        const controller = new AbortController();
+
+        loads.set(track.id, controller);
+
+        loadTextTrackCues(load, track, controller.signal)
           .then((cues) =>
             updateAppTrack(track.id, (record) => ({ ...record, cues: sortCues([...record.cues, ...cues]) }))
           )
@@ -292,7 +303,9 @@ export const textCuesFeature = definePlayerFeature({
 
             updateAppTrack(track.id, (record) => record);
           })
-          .finally(() => loading.delete(track.id));
+          .finally(() => {
+            if (loads.get(track.id) === controller) loads.delete(track.id);
+          });
       }
     };
 
@@ -363,6 +376,10 @@ export const textCuesFeature = definePlayerFeature({
         unsubscribeFilters();
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        for (const controller of loads.values()) controller.abort();
+
+        loads.clear();
       },
       { once: true }
     );

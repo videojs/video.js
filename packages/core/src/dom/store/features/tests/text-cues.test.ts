@@ -685,6 +685,24 @@ describe('textCuesFeature', () => {
       expect(store.state.textCues[0]!.cues).toEqual([]);
       expect(warn).toHaveBeenCalledOnce();
     });
+
+    it('stops loading a track that is removed', async () => {
+      const fetch = vi.fn((_src: string, _init: RequestInit) => new Promise<Response>(() => {}));
+
+      vi.stubGlobal('fetch', fetch);
+
+      const { store } = setup([]);
+      const quiz = store.addTextTrack({ kind: 'metadata', label: 'quiz', src: '/quiz.json' });
+      const other = store.addTextTrack({ kind: 'metadata', label: 'other', src: '/other.json' });
+
+      await settle();
+      quiz.remove();
+      await settle();
+
+      expect(fetch.mock.calls[0]![1].signal!.aborted).toBe(true);
+      expect(fetch.mock.calls[1]![1].signal!.aborted).toBe(false);
+      expect(other.removed).toBe(false);
+    });
   });
 
   it('stays empty for media without text tracks', () => {
