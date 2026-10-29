@@ -107,6 +107,7 @@ export type {
   AppTextTrack,
   InferCueValue,
   TextCueFormat,
+  TextCueFormatResult,
   TextCueInit,
   TextTrackContent,
   TextTrackInit,

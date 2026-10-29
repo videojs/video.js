@@ -35,6 +35,12 @@ describe('podcastChapters', () => {
     expect(podcastChapters([])).toEqual([]);
     expect(podcastChapters(null)).toEqual([]);
   });
+
+  it("reads a file's text, so it works as a format", () => {
+    const json = { version: '1.2.0', chapters: [{ startTime: 0, title: 'Intro' }] };
+
+    expect(podcastChapters(JSON.stringify(json))).toEqual(podcastChapters(json));
+  });
 });
 
 describe('appleHlsChapters', () => {
@@ -66,6 +72,12 @@ describe('appleHlsChapters', () => {
       { startTime: 30, endTime: undefined, text: '', value: {} },
     ]);
   });
+
+  it("reads a file's text, so it works as a format", () => {
+    const json = [{ 'start-time': 0, titles: [{ language: 'en', title: 'Opening' }] }];
+
+    expect(appleHlsChapters(JSON.stringify(json))).toEqual(appleHlsChapters(json));
+  });
 });
 
 describe('jsonLdChapters', () => {
@@ -93,5 +105,9 @@ describe('jsonLdChapters', () => {
     expect(jsonLdChapters([clip])).toEqual([chapter]);
     expect(jsonLdChapters({ '@type': 'VideoObject', hasPart: clip })).toEqual([chapter]);
     expect(jsonLdChapters(clip)).toEqual([chapter]);
+  });
+
+  it('reads JSON-LD text, such as the contents of its script element', () => {
+    expect(jsonLdChapters(JSON.stringify({ '@type': 'VideoObject', hasPart: [clip] }))).toEqual([chapter]);
   });
 });
