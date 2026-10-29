@@ -35,13 +35,13 @@ The [Spotify embed](https://developer.spotify.com/documentation/embeds) accepts 
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<SpotifyAudio src="https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5" controls />
+<SpotifyAudio src="https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV" controls />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<spotify-audio src="https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5" controls></spotify-audio>
+<spotify-audio src="https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV" controls></spotify-audio>
 ```
 </FrameworkCase>
 
@@ -93,8 +93,8 @@ The Spotify embed exposes less than a native `<audio>` element:
     ```tsx
     <SpotifyAudio
       source={{
-        src: 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5',
-        engine: { spotify: { t: 90, theme: 0 } },
+        src: 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV',
+        engine: { spotify: { t: 30, theme: 0 } },
       }}
     />
     ```
@@ -104,8 +104,8 @@ The Spotify embed exposes less than a native `<audio>` element:
     ```ts
     const audio = document.querySelector('spotify-audio');
     audio.source = {
-      src: 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5',
-      engine: { spotify: { t: 90, theme: 0 } },
+      src: 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV',
+      engine: { spotify: { t: 30, theme: 0 } },
     };
     ```
     </FrameworkCase>
