@@ -10,5 +10,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
 export const hlsjsVideo: LazyMediaDefinition = {
   match: matchHls('mse'),
   fallback: true,
+  preferPlayback: true,
   load: () => import('../hlsjs-video').then((m) => m.HlsJsVideo),
 };
