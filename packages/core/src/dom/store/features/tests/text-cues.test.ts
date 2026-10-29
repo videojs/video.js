@@ -520,6 +520,20 @@ describe('textCuesFeature', () => {
       expect(store.state.textCues[0]!.track.source).toBe('app');
     });
 
+    it('stands in for chapters on media without text tracks', () => {
+      const media = Object.assign(new EventTarget(), { currentTime: 0, duration: 60, seekable: {}, seek() {} });
+      const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));
+
+      store.attach({ media: media as unknown as PlayerTarget['media'], container: null });
+      store.addTextTrack({
+        kind: 'chapters',
+        label: 'AI chapters',
+        cues: [{ startTime: 0, endTime: 30, text: 'Intro' }],
+      });
+
+      expect(store.state.chaptersCues.map(({ text }) => text)).toEqual(['Intro']);
+    });
+
     it('is listed in textTrackList, and its chapters stand in for missing media chapters', () => {
       const video = document.createElement('video');
       const store = createStore<PlayerTarget>()(combine(textTrackFeature, textCuesFeature));

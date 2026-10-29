@@ -12,7 +12,7 @@ import { isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
-import { getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
+import { type AppTextTrackRecord, getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
 import { toMediaTextCues } from '../text-cues';
 import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
@@ -36,6 +36,11 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
 
     if (track.mode !== mode) track.mode = mode;
   }
+}
+
+/** The cues of the first chapters track an app added, which stand in when the media has no chapters of its own. */
+function findAppChaptersCues(records: readonly AppTextTrackRecord[]): MediaTextCue[] {
+  return records.find(({ track }) => track.kind === 'chapters')?.cues ?? [];
 }
 
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
@@ -127,8 +132,12 @@ export const textTrackFeature = definePlayerFeature({
     const { media } = target;
 
     if (!isMediaTextTrackCapable(media)) {
-      // Media without text tracks of its own, such as an embed, still lists the tracks apps add.
-      const syncAppTracks = () => set({ textTrackList: getAppTextTracks(get()).map(({ track }) => track) });
+      // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
+      const syncAppTracks = () => {
+        const appTracks = getAppTextTracks(get());
+
+        set({ textTrackList: appTracks.map(({ track }) => track), chaptersCues: findAppChaptersCues(appTracks) });
+      };
 
       syncAppTracks();
       listenForAppTextTracks(get(), syncAppTracks, signal);
@@ -174,7 +183,7 @@ export const textTrackFeature = definePlayerFeature({
             kind: 'chapters',
             duration: isMediaSeekCapable(media) ? media.duration : NaN,
           })
-        : (appTracks.find(({ track }) => track.kind === 'chapters')?.cues ?? []);
+        : findAppChaptersCues(appTracks);
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
