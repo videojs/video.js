@@ -11,4 +11,5 @@ export const muxVideo: LazyMediaDefinition = {
   match: matchAdapterType('mux'),
   tag: 'mux-video',
   load: () => import('../../define/media/mux-video'),
+  preferPlayback: true,
 };

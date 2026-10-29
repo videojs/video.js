@@ -1,4 +1,10 @@
-import { findLazyMedia, type LazyMediaMatcher, resolveLazySource } from '@videojs/media';
+import {
+  applyPreferPlayback,
+  findLazyMedia,
+  type LazyMediaMatcher,
+  type PreferPlaybackTarget,
+  resolveLazySource,
+} from '@videojs/media';
 import { nativeHlsSupport } from '@videojs/utils/dom';
 
 /** A media element `<lazy-video>` or `<lazy-audio>` can render: which sources it plays, and the element that plays them. */
@@ -7,6 +13,8 @@ export interface LazyMediaDefinition extends LazyMediaMatcher {
   tag: string;
   /** Registers the element once a source needs it. Leave it out for built-in or already registered elements. */
   load?: (() => Promise<unknown>) | undefined;
+  /** Whether the element takes `preferPlayback` on its `source`, as `<hlsjs-video>` and `<mux-video>` do. */
+  preferPlayback?: boolean | undefined;
 }
 
 const HTMLElementBase = globalThis.HTMLElement ?? class {};
@@ -76,7 +84,8 @@ export class LazyMediaElement extends HTMLElementBase {
 
   /**
    * Playback path for HLS: `'native'` uses the browser's own HLS support wherever it has one, and `'mse'` always loads
-   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere.
+   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere. Also
+   * passed on to the hls.js and Mux media, on their `source`.
    */
   get preferPlayback(): 'native' | 'mse' | undefined {
     const value = this.getAttribute('prefer-playback');
@@ -145,9 +154,13 @@ export class LazyMediaElement extends HTMLElementBase {
     // A media that can't tell yet is asked again on the next change.
     if (definition === undefined) return;
 
-    // The same media plays the new source, so it only needs the URL. One still loading reads it once created.
+    // The same media plays the new source, so it only needs the URL and how to play it. One still loading reads them
+    // once created.
     if (definition === this.#definition) {
-      if (this.#media && this.#mediaDefinition === definition) this.#syncAttribute(this.#media, 'src');
+      if (definition && this.#media && this.#mediaDefinition === definition) {
+        this.#syncAttribute(this.#media, 'src');
+        this.#syncPreferPlayback(this.#media, definition);
+      }
 
       return;
     }
@@ -195,6 +208,8 @@ export class LazyMediaElement extends HTMLElementBase {
     const media = document.createElement(definition.tag);
 
     this.#copyAttributes(media);
+    // Before the media is connected, so its engine is built for the preferred path from the start.
+    this.#syncPreferPlayback(media, definition);
     this.#setMedia(media, definition);
   }
 
@@ -230,6 +245,11 @@ export class LazyMediaElement extends HTMLElementBase {
 
     if (value === null) media.removeAttribute(name);
     else if (media.getAttribute(name) !== value) media.setAttribute(name, value);
+  }
+
+  #syncPreferPlayback(media: HTMLElement, definition: LazyMediaDefinition): void {
+    // SAFETY: a definition marked `preferPlayback` renders an element with a structured `source`.
+    if (definition.preferPlayback) applyPreferPlayback(media as unknown as PreferPlaybackTarget, this.preferPlayback);
   }
 
   #onMutation(records: MutationRecord[]): void {
