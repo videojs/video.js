@@ -15,6 +15,17 @@ export interface SpotifyPlaybackUpdateEvent {
   data: SpotifyPlaybackState;
 }
 
+/** A failure the embed reports, such as `playback_error` when it cannot decode the entity. */
+export interface SpotifyEmbedError {
+  code: string;
+  message: string;
+  recoverable: boolean;
+}
+
+export interface SpotifyErrorEvent {
+  data: SpotifyEmbedError;
+}
+
 export interface SpotifyControllerApi {
   /** The iframe the controller drives, which it builds itself and swaps in for the target it was handed. */
   iframeElement: HTMLIFrameElement;
@@ -30,6 +41,7 @@ export interface SpotifyControllerApi {
   destroy(): void;
   addListener(type: 'ready', listener: () => void): void;
   addListener(type: 'playback_update', listener: (event: SpotifyPlaybackUpdateEvent) => void): void;
+  addListener(type: 'error', listener: (event: SpotifyErrorEvent) => void): void;
 }
 
 /** Options `createController` accepts; Spotify's own keys pass through untouched. */
