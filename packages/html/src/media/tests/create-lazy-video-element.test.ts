@@ -42,6 +42,13 @@ function deferred(): { promise: Promise<void>; resolve: () => void; reject: (err
   return { promise, resolve, reject };
 }
 
+// Like `<hlsjs-video>` and `<mux-video>`: a structured `source` beside `src`.
+class SourceVideo extends HTMLElement {
+  source: { src?: string; preferPlayback?: string } | null = null;
+}
+
+customElements.define('test-source-video', SourceVideo);
+
 describe('createLazyVideoElement', () => {
   afterEach(() => {
     document.body.innerHTML = '';
@@ -114,6 +121,39 @@ describe('createLazyVideoElement', () => {
 
     expect(load).toHaveBeenCalledTimes(2);
     expect(element.querySelector(tag)!.getAttribute('src')).toBe('https://video.acme.com/2');
+  });
+
+  it('forwards preferPlayback to the source of a media that takes it', async () => {
+    const sourceVideo: LazyMediaDefinition = { ...acmeVideo, tag: 'test-source-video', preferPlayback: true };
+    const element = create(define([sourceVideo]), 'https://video.acme.com/1');
+
+    element.setAttribute('prefer-playback', 'native');
+    await flush();
+
+    const media = element.querySelector<SourceVideo>('test-source-video')!;
+
+    expect(media.source).toEqual({ preferPlayback: 'native' });
+    expect(media.hasAttribute('prefer-playback')).toBe(false);
+
+    element.setAttribute('prefer-playback', 'mse');
+    await flush();
+
+    expect(element.querySelector('test-source-video')).toBe(media);
+    expect(media.source).toEqual({ preferPlayback: 'mse' });
+
+    element.removeAttribute('prefer-playback');
+    await flush();
+
+    expect(media.source).toBeNull();
+  });
+
+  it('leaves the source of a media that does not take preferPlayback alone', async () => {
+    const element = create(define([{ ...acmeVideo, tag: 'test-source-video' }]), 'https://video.acme.com/1');
+
+    element.setAttribute('prefer-playback', 'native');
+    await flush();
+
+    expect(element.querySelector<SourceVideo>('test-source-video')!.source).toBeNull();
   });
 
   it('only plays the sources its media do', async () => {
