@@ -35,15 +35,17 @@ A separate feature wins out ([per review](https://github.com/videojs/v10/pull/62
 
 ## Custom Rates
 
-Rates are a player input, `playbackRates` (`playback-rates="0.5 1 1.5 2"` in HTML), on the playback rate feature rather than a `rates` prop on the button ([#9273](https://github.com/videojs/video.js/issues/9273)). The button, the radio group, and the `speedUp`/`speedDown` hotkeys all read the store's `playbackRates`; a per-button override would let them disagree.
+The player input `defaultPlaybackRates` (`default-playback-rates="0.5 1 1.5 2"` in HTML) sets the rates every control uses, and the button and radio group take their own `rates` to override it ([#9273](https://github.com/videojs/video.js/issues/9273), [review](https://github.com/videojs/video.js/pull/9533#issuecomment-6503311479)). Hotkeys and menus are different interfaces: a menu wants a short list, while an editing flow may want hotkeys that step by `0.1`, so `speedUp`/`speedDown` step by a hotkey's `value` when it has one.
 
-- **No converter needed:** HTML player inputs are declared as strings, so the feature's private action parses the space-separated list itself. A JS property can still take an array.
+- **No converter needed:** HTML inputs are declared as strings, and the shared parser accepts a space-separated list or an array.
 - **No auto-sorting:** The button cycles in the author's order. `speedUp`/`speedDown` step by value and stop at the ends, so they work whatever the order.
-- **Provider constraints:** Still deferred ([per review](https://github.com/videojs/v10/pull/624#discussion_r2861088551)). Some providers only support specific rates (e.g., [YouTube's `getAvailablePlaybackRates`](https://developers.google.com/youtube/iframe_api_reference#getAvailablePlaybackRates)). When a media capability reports them, the feature should publish the configured rates intersected with the supported ones.
+- **The media owns the rate:** It can be one no control offers, set through the media API or a stepped hotkey. The radio group slots it in before the next faster rate as a `custom` option, named "Custom, {rate}" for assistive technology.
+- **Ranges, not lists:** Media report a `{ min, max }` `playbackRateRange`; one that reports none gets the native `0.0625`–`16`. YouTube lists quarter steps in `getAvailablePlaybackRates` but plays any rate from `0.25` to `2`, floored to `0.05`, so a list would hide rates it accepts. Rates outside the range are left out of the offered lists, and `setPlaybackRate` clamps to the nearest end with a development warning.
 
 **Alternatives explored:**
 
-- **Per-component `rates` prop** — Desyncs the button from the menu and hotkeys.
+- **One shared list only** — Forces the menu and hotkeys to agree.
+- **Discrete supported-rate lists** — YouTube's list understates what it plays, and native media have no list at all.
 - **`AttributeTokenList`** — Media Chrome's `DOMTokenList`-like approach. More infrastructure than needed.
 - **`Array` built-in type with `JSON.parse`** — Produces `rates='[1, 1.5, 2]'` which is awkward for HTML authors.
 - **`min`/`max`/`step`** — [Vidstack's approach](https://vidstack.io/docs/wc/player/components/sliders/speed-slider/) for continuous ranges. Doesn't allow non-uniform spacing or arbitrary ordering.

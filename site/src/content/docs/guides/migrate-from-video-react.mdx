@@ -145,7 +145,7 @@ Video-React merged your children into the default player and control bar by type
 | `VolumeMenuButton` | `VolumePopover`, or `MuteButton` with `VolumeSlider` |
 | `CurrentTimeDisplay`, `DurationDisplay`, `RemainingTimeDisplay`, `TimeDivider` | `Time.Value` with `type="current"`, `"duration"`, or `"remaining"`, and `Time.Separator` |
 | `ProgressControl`, `SeekBar`, `PlayProgressBar`, `LoadProgressBar`, `MouseTimeDisplay` | `TimeSlider`, which shows buffered progress and a pointer preview |
-| `PlaybackRateMenuButton` | The skin's settings menu, or `PlaybackRateButton` and `PlaybackRateRadioGroup`. Its `rates` maps to `playbackRates` on `Player` |
+| `PlaybackRateMenuButton` | The skin's settings menu, or `PlaybackRateButton` and `PlaybackRateRadioGroup`. Its `rates` maps to `rates` on either component, or to `defaultPlaybackRates` on `Player` to set them for every control |
 | `ClosedCaptionButton` | `CaptionsButton`, and a captions submenu in the settings menu |
 | `FullscreenToggle` | `FullscreenButton` |
 | `LoadingSpinner` | `BufferingIndicator` |
@@ -416,7 +416,7 @@ These changes don't throw errors, so test for them:
 - **Controls.** They hide after 2 seconds of inactivity instead of Video-React's 3-second default, and as soon as the pointer leaves the player during playback.
 - **Fullscreen.** Fullscreen targets the skin's container, falling back to the video element on iPhone. Video-React fell back to a full-window CSS mode when the Fullscreen API was unavailable.
 - **Volume.** `setVolume()` above 0 also unmutes, and unmuting at 0 restores 25%.
-- **Hotkeys.** The arrow keys seek 10 seconds instead of 5, and the speed keys step through the player's `playbackRates`.
+- **Hotkeys.** The arrow keys seek 10 seconds instead of 5, and the speed keys step through the player's `defaultPlaybackRates`.
 - **Play failures.** Video-React swallowed rejections from `play()`. The `play` action returns the media's promise, so catch rejections where you call it. A blocked `autoPlay` still looks like media that never started; see <DocsLink slug="guides/autoplay">Autoplay</DocsLink>.
 
 ## Known gaps

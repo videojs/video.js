@@ -18,13 +18,13 @@ Controls speed of playback. `playbackRateAvailability` is `unsupported` when the
 
 ### Playback rates
 
-The player offers `0.5` through `2` in steps of `0.25` unless you set your own list. The <DocsLink slug="reference/components/playback-rate-button">playback rate button</DocsLink>, the <DocsLink slug="reference/components/playback-rate-radio-group">playback rate radio group</DocsLink>, and the `speedUp` and `speedDown` <DocsLink slug="guides/keyboard-shortcuts">hotkeys</DocsLink> all read the same list, so they stay in step.
+The player offers `0.5` through `2` in steps of `0.25` unless you set your own list. The <DocsLink slug="reference/components/playback-rate-button">playback rate button</DocsLink>, the <DocsLink slug="reference/components/playback-rate-radio-group">playback rate radio group</DocsLink>, and the `speedUp` and `speedDown` <DocsLink slug="guides/keyboard-shortcuts">hotkeys</DocsLink> use this list unless you give one of them its own.
 
 <FrameworkCase frameworks={["react"]}>
-Pass `playbackRates` to <DocsLink slug="reference/components/player">`Player`</DocsLink>:
+Pass `defaultPlaybackRates` to <DocsLink slug="reference/components/player">`Player`</DocsLink>:
 
 ```tsx
-<Player playbackRates={[0.5, 1, 1.25, 1.5, 2]}>
+<Player defaultPlaybackRates={[0.5, 1, 1.25, 1.5, 2]}>
   <Container>
     <Video src="/video.mp4" />
   </Container>
@@ -35,26 +35,48 @@ Removing the prop, or passing `null`, restores the defaults.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Set the `playback-rates` attribute on <DocsLink slug="reference/components/player">`<video-player>`</DocsLink> to a space-separated list:
+Set the `default-playback-rates` attribute on <DocsLink slug="reference/components/player">`<video-player>`</DocsLink> to a space-separated list:
 
 ```html
-<video-player playback-rates="0.5 1 1.25 1.5 2">
+<video-player default-playback-rates="0.5 1 1.25 1.5 2">
   <media-container>
     <video src="/video.mp4"></video>
   </media-container>
 </video-player>
 ```
 
-The `playbackRates` property also takes an array, such as `player.playbackRates = [1, 2]`. Removing the attribute restores the defaults.
+The `defaultPlaybackRates` property also takes an array, such as `player.defaultPlaybackRates = [1, 2]`. Removing the attribute restores the defaults.
 </FrameworkCase>
 
 The button cycles through the rates in the order you list them, and the menu shows them in that order. `speedUp` and `speedDown` move to the next faster or slower rate whatever the order, and do nothing at the fastest or slowest rate. The player ignores values that aren't positive numbers, and repeated rates. If nothing usable is left, it falls back to the defaults.
 
-### Media support
+### Rates for one control
 
-Some media accept fewer rates. YouTube offers a fixed list for each video, Vimeo accepts `0.5` through `2`, and browsers reject rates outside `0.0625` through `16`. The player leaves out any rate you list that the media doesn't accept, and keeps the rest in your order. If none are left, it offers the defaults the media accepts, or failing that, the media's own list.
+To give one control a different list, set `rates` on it. The rest of the player keeps the default list.
 
-A YouTube video reports its list once it loads, so until then the player offers every rate you listed.
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<PlaybackRateButton rates={[1, 1.5, 2]} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-playback-rate-button rates="1 1.5 2"></media-playback-rate-button>
+```
+</FrameworkCase>
+
+To make the speed hotkeys change speed in fixed steps instead, give `speedUp` and `speedDown` a `value`. A `value` of `0.1` moves from `1` to `1.1`, then `1.2`, and so on.
+
+### Rates outside the list
+
+The media owns the current rate, so it can be one the menu doesn't offer, such as `1.1` set through the media API or a stepped hotkey. The menu then shows that rate as an extra item, slotted before the next faster rate. Skins set it in italics, and its accessible name is "Custom, 1.1×". The item goes away once the rate is back on the list.
+
+### Media range
+
+Each media accepts rates within a range. Browsers play `0.0625` through `16`, YouTube `0.25` through `2`, and Vimeo up to `2`. The player leaves out any rate you list outside that range and keeps the rest in your order. If none are left, it offers the defaults within the range. `setPlaybackRate` clamps a rate outside the range to the nearest end, and warns in development.
+
+YouTube rounds rates down to a step of `0.05`, so asking for `1.13` plays at `1.1`.
 
 ### Selector
 
