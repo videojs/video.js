@@ -1,7 +1,7 @@
 import type { TextCueLike } from '@videojs/media';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { toMediaTextCues } from '../text-cues';
+import { isCueListUnchanged, toMediaTextCues } from '../text-cues';
 
 describe('toMediaTextCues', () => {
   it('returns an empty list without cues', () => {
@@ -138,5 +138,66 @@ describe('toMediaTextCues', () => {
       expect(result!.text).toBe('{"caption":true}');
       expect(result).not.toHaveProperty('value');
     });
+  });
+});
+
+describe('isCueListUnchanged', () => {
+  it('holds for the cues last read, as they were', () => {
+    const read = [
+      { startTime: 0, endTime: 1, text: 'a' },
+      { startTime: 1, endTime: 2, text: 'b' },
+    ];
+
+    toMediaTextCues(read);
+
+    expect(isCueListUnchanged([...read], read)).toBe(true);
+    expect(isCueListUnchanged(null, [])).toBe(true);
+  });
+
+  it('fails once a cue is added, removed, swapped, or reordered', () => {
+    const a = { startTime: 0, endTime: 1, text: 'a' };
+    const b = { startTime: 1, endTime: 2, text: 'b' };
+    const c = { startTime: 2, endTime: 3, text: 'c' };
+    const read = [a, b];
+
+    toMediaTextCues([a, b, c]);
+
+    expect(isCueListUnchanged([a, b, c], read)).toBe(false);
+    expect(isCueListUnchanged([a], read)).toBe(false);
+    expect(isCueListUnchanged([a, c], read)).toBe(false);
+    expect(isCueListUnchanged([b, a], read)).toBe(false);
+    expect(isCueListUnchanged(null, read)).toBe(false);
+  });
+
+  it('fails once a cue changes in place', () => {
+    const cue = { id: '', startTime: 0, endTime: 1, text: 'a' };
+    const changes = [
+      () => (cue.startTime = 0.5),
+      () => (cue.endTime = 2),
+      () => (cue.text = 'b'),
+      () => (cue.id = 'intro'),
+    ];
+
+    for (const change of changes) {
+      toMediaTextCues([cue]);
+      change();
+
+      expect(isCueListUnchanged([cue], [cue])).toBe(false);
+    }
+  });
+
+  it('fails when the duration clamps a cue differently', () => {
+    const read = [{ startTime: 0, endTime: 100, text: 'a' }];
+
+    toMediaTextCues(read);
+
+    expect(isCueListUnchanged(read, read, { duration: 200 })).toBe(true);
+    expect(isCueListUnchanged(read, read, { duration: 60 })).toBe(false);
+  });
+
+  it('fails for cues never read', () => {
+    const read = [{ startTime: 0, endTime: 1, text: 'a' }];
+
+    expect(isCueListUnchanged(read, read)).toBe(false);
   });
 });
