@@ -785,6 +785,59 @@ describe('SpotifyAdapter', () => {
     media.detach();
   });
 
+  it('reports a failed playback as an error and ignores the snapshots that claim it ran to the end', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const events: string[] = [];
+
+    for (const type of ['play', 'playing', 'waiting', 'pause', 'ended', 'error'] as const) {
+      media.addEventListener(type, () => events.push(type));
+    }
+
+    controller.update({ isPaused: true, duration: 2_152_056 });
+    void media.play();
+    await Promise.resolve();
+    controller.error();
+    // What the embed reports after the failure: under way, then stalled, at the end of an entity it never played.
+    controller.update({ isPaused: false, duration: 2_152_056, position: 2_152_056 });
+    controller.update({ isPaused: false, isBuffering: true, duration: 2_152_056, position: 2_152_056 });
+
+    expect(events).toEqual(['error']);
+    expect(media.error?.code).toBe(MediaError.MEDIA_ERR_DECODE);
+    expect(media.paused).toBe(true);
+    expect(media.ended).toBe(false);
+    expect(media.currentTime).toBe(0);
+    media.detach();
+  });
+
+  it('pauses a run the embed reports failed', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const pauseSpy = vi.fn();
+
+    controller.update({ isPaused: false });
+    media.addEventListener('pause', pauseSpy);
+    controller.error();
+
+    expect(pauseSpy).toHaveBeenCalledTimes(1);
+    expect(media.paused).toBe(true);
+    media.detach();
+  });
+
+  it('follows the embed again once the listener retries a failed playback', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    controller.update({ isPaused: true });
+    controller.error();
+    await media.play();
+    controller.update({ isPaused: false, position: 1_000 });
+
+    expect(media.paused).toBe(false);
+    expect(media.currentTime).toBe(1);
+    media.detach();
+  });
+
   it('tracks played ranges via the played-ranges mixin', async () => {
     const media = new SpotifyAdapter();
     const { controller } = await attachAndLoad(media);
