@@ -1,17 +1,10 @@
-import {
-  createPlayer,
-  errorFeature,
-  fullscreenFeature,
-  type PlayerTarget,
-  selectControls,
-  useMediaAttach,
-} from '@videojs/react';
-import { CompatVideoSkin, NeutralVideoSkin, ScaffoldVideoSkin, VideoSkin, videoFeatures } from '@videojs/react/video';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { CompatVideoSkin, NeutralVideoSkin, ScaffoldVideoSkin, VideoSkin } from '@videojs/react/video';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import Comparison from '@/components/Comparison/Comparison';
+import { createSharedMediaPlayer } from '@/components/skins/sharedMediaPlayer';
 
-import { CosmicDawnVideo, useControlsLock } from './CosmicDawnVideo';
+import { CosmicDawnVideo } from './CosmicDawnVideo';
 
 import '@videojs/react/video/skin.css';
 import '@videojs/react/video/neutral-skin.css';
@@ -26,71 +19,11 @@ const skins = [
   { name: 'Scaffold', Skin: ScaffoldVideoSkin },
 ];
 
-// Each skin owns its input handlers, but fullscreen must include the shared video and all the slices.
-function fullscreenTarget(target: PlayerTarget): PlayerTarget {
-  return {
-    ...target,
-    container: target.container?.closest<HTMLElement>('.comparison') ?? target.container,
-  };
-}
-
-const comparisonFullscreen: typeof fullscreenFeature = {
-  ...fullscreenFeature,
-  state(context) {
-    const state = fullscreenFeature.state;
-
-    // The built-in feature uses a factory; the shared feature type also allows static state.
-    // oxlint-disable-next-line anti-slop/no-runtime-typeof
-    return typeof state === 'function'
-      ? state({ ...context, target: () => fullscreenTarget(context.target()) })
-      : state;
-  },
-  attach(context) {
-    return fullscreenFeature.attach?.({ ...context, target: fullscreenTarget(context.target) });
-  },
-};
-
 // Only the accessible skin opens an error dialog for the shared media.
-const comparisonError: typeof errorFeature = {
-  ...errorFeature,
-  attach({ target: { media, container }, signal, set }) {
-    if (!(media instanceof HTMLVideoElement)) return;
-
-    media.addEventListener(
-      'error',
-      () => {
-        if (container?.closest('.comparison-slice')?.getAttribute('aria-hidden') !== 'true') {
-          set({ error: media.error });
-        }
-      },
-      { signal }
-    );
-    media.addEventListener('emptied', () => set({ error: null }), { signal });
-  },
-};
-
-const { Player, usePlayer } = createPlayer({
-  features: videoFeatures.map((feature) => {
-    if (feature === fullscreenFeature) return comparisonFullscreen;
-
-    if (feature === errorFeature) return comparisonError;
-
-    return feature;
-  }),
+const { Player, SharedMedia } = createSharedMediaPlayer({
+  stage: '.comparison',
+  isHidden: (container) => container.closest('.comparison-slice')?.getAttribute('aria-hidden') === 'true',
 });
-
-function SharedMedia({ media }: { media: HTMLVideoElement | null }) {
-  const setMedia = useMediaAttach();
-
-  useEffect(() => {
-    setMedia?.(media);
-    return () => setMedia?.(null);
-  }, [media, setMedia]);
-
-  useControlsLock(usePlayer(selectControls)?.requestControlsLock, media);
-
-  return null;
-}
 
 export default function SkinComparison() {
   const [media, setMedia] = useState<HTMLVideoElement | null>(null);
@@ -149,7 +82,7 @@ export default function SkinComparison() {
           label: name,
           content: (
             <Player>
-              <SharedMedia media={media} />
+              <SharedMedia media={media} lockControls />
               <Skin className="skin-comparison-skin">
                 <video className="skin-comparison-caption-probe" style={{ display: 'none' }} aria-hidden="true" />
               </Skin>

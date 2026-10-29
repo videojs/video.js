@@ -1,0 +1,620 @@
+/*
+ * One player from the hero through the breakdown. The section's script writes 0–1 phases: `--shrink` moves the pinned
+ * player from full width into its column, `--tilt` lifts the layers apart, `--spread` lays the player flat and pulls
+ * its controls out, `--menus` opens the popups, and `--own` swaps in a component of your own.
+ */
+.story {
+  --shrink: 0;
+  --tilt: 0;
+  --spread: 0;
+  --menus: 0;
+  --own: 0;
+  --story-radius: calc(var(--spacing) * 5);
+  --layer-gap: 3rem;
+  --tilt-scale: 0.3;
+  --bar-drop: 4.5rem;
+  /* Room above the detached bar; the pinned player on narrow screens has none to give. */
+  --lift: 0rem;
+  /* Control names reach past the column on narrow screens; never let them widen the page. */
+  overflow-x: clip;
+}
+
+@media (width >= 64rem) {
+  .story {
+    --layer-gap: 5.5rem;
+    --tilt-scale: 0.2;
+    --bar-drop: 5rem;
+    --lift: -2.5rem;
+    overflow-x: visible;
+  }
+}
+
+/* Layout: the player pins and shrinks into the right column while the steps scroll down the left. */
+
+.story-sticky {
+  --pin-top: 0.75rem;
+  --end-width: 100cqw;
+  --center: 0px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  container-type: inline-size;
+}
+
+@media (width >= 64rem) {
+  .story-sticky {
+    --pin-top: 1.5rem;
+    --end-width: 58cqw;
+    --center: calc((100svh - var(--end-width) * 9 / 16) / 2 - var(--pin-top));
+    height: 100svh;
+  }
+}
+
+.story-player {
+  position: relative;
+  width: calc(100cqw - var(--shrink) * (100cqw - var(--end-width)));
+  margin-top: calc(var(--pin-top) + var(--shrink) * var(--center));
+  margin-left: auto;
+}
+
+.story-steps {
+  position: relative;
+  z-index: 2;
+  padding-top: 30svh;
+}
+
+@media (width >= 64rem) {
+  .story-steps {
+    width: 36%;
+    margin-top: -100svh;
+    /* The player takes 60svh of scroll to shrink; the first step centres a little after it settles. */
+    padding-top: 90svh;
+  }
+}
+
+.story-step {
+  display: flex;
+  align-items: center;
+  min-height: 75svh;
+  padding-block: 2rem;
+  opacity: 0.3;
+  transition: opacity 300ms ease;
+}
+
+.story-step[data-active] {
+  opacity: 1;
+}
+
+@media (width >= 64rem) {
+  .story-step {
+    min-height: 100svh;
+  }
+}
+
+/* On narrow screens the steps scroll under the pinned player, so give them their own surface. */
+@media (width < 64rem) {
+  .story-step-card {
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--color-manila-light);
+    box-shadow: 0 0 0 1px var(--color-manila-dark);
+  }
+
+  .dark .story-step-card {
+    background: var(--color-faded-black);
+    box-shadow: 0 0 0 1px var(--color-soot);
+  }
+}
+
+@media (scripting: none) {
+  .story-step {
+    opacity: 1;
+  }
+}
+
+/* The frame and the swipeable looks. */
+
+.story-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--story-radius);
+  background: var(--color-faded-black);
+  box-shadow:
+    0 1px 2px rgb(30 29 29 / 8%),
+    0 24px 60px -24px rgb(30 29 29 / calc((1 - var(--tilt)) * 45%));
+}
+
+.story-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--story-radius);
+}
+
+/* The shared video sits beneath every look, so it takes the fit the skins would normally give it. */
+.story-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-scroller {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-timeline: --story-looks x;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.story-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.story-page {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  overflow: clip;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Hold each look still against the scroll, so its page acts as a window onto it. */
+.story-layer {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--story-scroll, 0px) - var(--index) * 100%));
+}
+
+@supports (animation-timeline: scroll()) {
+  .story-layer {
+    animation: story-hold linear both;
+    animation-timeline: --story-looks;
+  }
+}
+
+@keyframes story-hold {
+  from {
+    transform: translateX(calc(var(--index) * -100%));
+  }
+
+  to {
+    transform: translateX(calc((var(--count) - 1 - var(--index)) * 100%));
+  }
+}
+
+.story .story-look {
+  --media-border-radius: var(--story-radius);
+  --media-object-fit: cover;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* The seam between two pages is the divider; it and the names only show mid-swipe. */
+.story-page::before {
+  content: "";
+  position: absolute;
+  z-index: 60;
+  inset-block: 0;
+  left: 0;
+  width: 2px;
+  background: var(--color-manila-light);
+  box-shadow: 0 0 24px rgb(0 0 0 / 40%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.story-page-label {
+  position: absolute;
+  z-index: 60;
+  top: 1rem;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 999px;
+  color: var(--color-manila-light);
+  background: rgb(30 29 29 / 60%);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.story-page-label[data-edge="start"] {
+  left: 0.875rem;
+}
+
+.story-page-label[data-edge="end"] {
+  right: 0.875rem;
+}
+
+.story-player[data-scrolling] .story-page::before,
+.story-player[data-scrolling] .story-page-label {
+  opacity: 1;
+}
+
+/* The caption row under the hero player fades away as the player leaves the hero. */
+
+.story-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  opacity: clamp(0, 1 - var(--shrink) * 3, 1);
+}
+
+.story-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.625rem;
+  min-width: 0;
+}
+
+.story-kind {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.story-name {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.story-note {
+  font-size: 0.875rem;
+}
+
+.story-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.story-hint {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  opacity: 0.7;
+}
+
+@media (width >= 48rem) {
+  .story-hint {
+    display: inline-flex;
+  }
+}
+
+.story-pager {
+  display: flex;
+  align-items: center;
+}
+
+.story-dot {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.story-dot::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.25;
+  transition:
+    width 300ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 200ms ease;
+}
+
+.story-dot[aria-pressed="true"]::before {
+  width: 1rem;
+  opacity: 1;
+}
+
+.story-dot:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: -2px;
+  border-radius: 0.375rem;
+}
+
+@media (hover: hover) {
+  .story-dot:not([aria-pressed="true"]):hover::before {
+    opacity: 0.6;
+  }
+}
+
+/* The breakdown: an unclipped Default skin on the same video, taken apart in 3D. */
+
+.story-player[data-exploded] .story-frame {
+  overflow: visible;
+  isolation: auto;
+  background: transparent;
+  transform-style: preserve-3d;
+  transform: perspective(2400px) rotateX(calc(var(--tilt) * 56deg)) rotateZ(calc(var(--tilt) * -24deg))
+    scale(calc(1 - var(--tilt) * var(--tilt-scale))) translateY(calc(var(--spread) * var(--lift)));
+}
+
+.story-scroller {
+  transition: visibility 0s;
+}
+
+/* Hidden once the breakdown skin has faded in over it. */
+.story-player[data-exploded] .story-scroller {
+  visibility: hidden;
+  transition-delay: 300ms;
+}
+
+.story .story-skin {
+  /* No forward fill: a held opacity would flatten the 3D layers after the fade. */
+  animation: story-fade-in 300ms ease;
+}
+
+@keyframes story-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.story-player[data-exploded] .story-media,
+.story .story-skin > :is(.media-poster, .video-controls-backdrop, .video-controls-content) {
+  outline: 1px solid rgb(243 231 210 / calc(var(--tilt) * 60%));
+  outline-offset: -1px;
+}
+
+.story .story-skin {
+  --media-border-radius: var(--story-radius);
+  --media-accent-color: var(--color-orange);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  isolation: auto;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.story .story-skin > .media-poster {
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap)));
+}
+
+.story .story-skin > .video-controls-backdrop {
+  background-color: rgb(255 98 0 / calc(var(--tilt) * 12%));
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 2));
+}
+
+.story .story-skin > .video-controls-content {
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 3)) translateY(calc(var(--spread) * var(--bar-drop)));
+  /* Off the video the translucent bar would sit on the page colour; darken it as it detaches. */
+  background-color: color-mix(in srgb, var(--color-faded-black) calc(var(--spread) * 100%), var(--media-popover));
+}
+
+/* Points the labels measure for each layer, lifted with the layer they name. */
+.story-anchor {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * var(--layer)));
+  pointer-events: none;
+}
+
+/* Spread the controls apart. */
+.story .story-skin :is(.video-controls-primary, .video-controls-secondary) > * {
+  margin-inline: calc(var(--spread) * 0.5rem);
+}
+
+/* The last step swaps in a component of your own. */
+.story .story-skin .video-controls-content .media-play-button {
+  box-shadow: 0 0 0 calc(var(--own) * 2px) var(--color-orange);
+  background-color: rgb(255 98 0 / calc(var(--own) * 100%));
+}
+
+/* Still copies of the popups, on their own layer above the controls, following the bar when it detaches. */
+.story .story-popups {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--story-radius);
+  outline: 1px dashed rgb(243 231 210 / calc(var(--tilt) * 60%));
+  outline-offset: -1px;
+  opacity: max(var(--tilt), var(--menus));
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 4)) translateY(calc(var(--spread) * var(--bar-drop)));
+  pointer-events: none;
+}
+
+.story .story-popups > .media-popup {
+  position: absolute;
+  inset: auto;
+  bottom: 4.25rem;
+  margin: 0;
+  /* The live popups blur what is behind them, which a 3D scene cannot; darken the copies instead. */
+  background-color: rgb(30 29 29 / 82%);
+  translate: none;
+  scale: 1;
+  opacity: 1;
+}
+
+.story .story-popups > .story-volume {
+  left: 10.5%;
+}
+
+/* The live menu sizes itself from script; the copy sizes to its content instead. */
+.story .story-popups > .story-menu {
+  right: 7%;
+  width: 10rem;
+  height: auto;
+}
+
+.story .story-menu .media-menu-content {
+  position: relative;
+}
+
+/* Labels sit flat over the scene; script moves each to the point it names. */
+
+.story-labels {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.story-label {
+  --label-ink: var(--color-manila-light);
+  --label-surface: var(--color-faded-black);
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.dark .story-label {
+  --label-ink: var(--color-faded-black);
+  --label-surface: var(--color-manila-light);
+}
+
+.story-label::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-orange);
+  box-shadow: 0 0 0 2px var(--label-ink);
+}
+
+.story-label-line {
+  position: absolute;
+  background: var(--label-surface);
+}
+
+.story-label-pill {
+  position: absolute;
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 0.375rem;
+  color: var(--label-ink);
+  background: var(--label-surface);
+  box-shadow: 0 6px 16px -6px rgb(30 29 29 / 40%);
+  white-space: nowrap;
+}
+
+.story-label-name {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.story-label-pill code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.story-label[data-side="left"] .story-label-line {
+  top: 0;
+  right: 0;
+  width: 2rem;
+  height: 1px;
+}
+
+.story-label[data-side="left"] .story-label-pill {
+  top: 0;
+  right: 2.25rem;
+  transform: translateY(-50%);
+  justify-items: end;
+}
+
+.story-label[data-side="right"] .story-label-line {
+  top: 0;
+  left: 0;
+  width: 2rem;
+  height: 1px;
+}
+
+.story-label[data-side="right"] .story-label-pill {
+  top: 0;
+  left: 2.25rem;
+  transform: translateY(-50%);
+}
+
+.story-label[data-side="top"] .story-label-line {
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 1.25rem;
+}
+
+.story-label[data-side="top"] .story-label-pill {
+  bottom: 1.5rem;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.story-label[data-side="bottom"] .story-label-line {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1.25rem;
+}
+
+.story-label[data-side="bottom"] .story-label-pill {
+  top: 1.5rem;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.story-label [data-own-tag="own"],
+.story[data-own] .story-label [data-own-tag="base"] {
+  display: none;
+}
+
+.story[data-own] .story-label [data-own-tag="own"] {
+  display: inline;
+}
+
+.story[data-own] .story-label:has([data-own-tag]) .story-label-pill {
+  color: var(--color-faded-black);
+  background: var(--color-orange);
+}
+
+/* There is no room beside the player for side labels on narrow screens; the step text carries them. */
+@media (width < 64rem) {
+  .story-label:is([data-side="left"], [data-side="right"]) {
+    display: none;
+  }
+
+  .story-label-pill code {
+    font-size: 0.625rem;
+  }
+}

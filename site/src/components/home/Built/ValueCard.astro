@@ -1,0 +1,25 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  class?: string;
+}
+
+const { eyebrow, title, class: className } = Astro.props;
+---
+
+<article
+  class:list={[
+    "flex flex-col rounded-lg corner-squircle border border-manila-dark/40 bg-faded-black p-6 text-manila-light md:p-8 lg:p-10",
+    className,
+  ]}
+>
+  <p class="mb-3 font-display text-p4 text-manila-dark uppercase">{eyebrow}</p>
+  <h3 class="mb-3 font-display text-h25 text-balance uppercase">{title}</h3>
+  <div class="text-p2 text-manila-light/80">
+    <slot />
+  </div>
+  <div class="mt-auto pt-8">
+    <slot name="visual" />
+  </div>
+</article>

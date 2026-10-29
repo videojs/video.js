@@ -18,14 +18,15 @@ const v10Width = `${((v10Kb / v8Kb) * 100).toFixed(2)}%`;
 ---
 
 <AnimatedBars
-  className="rounded-lg corner-squircle border border-manila-dark bg-faded-black p-5 md:p-10 lg:p-15"
+  className="rounded-lg corner-squircle border border-manila-dark/40 bg-faded-black p-6 md:p-8 lg:p-10"
   client:idle
 >
-  <header class="text-p2">
-    <h3 class="font-bold text-manila-light">Download speeds</h3>
-    <span class="whitespace-nowrap text-manila-dark"
-      >(based on slow 4G connection)</span
-    >
+  <header class="mb-2 text-p2">
+    <p class="mb-3 font-display text-p4 text-manila-dark uppercase">Lightweight</p>
+    <h3 class="mb-3 font-display text-h25 text-balance text-manila-light uppercase">Small by default</h3>
+    <p class="text-manila-light/80">
+      A smaller starting player that loads faster, measured as download time on a slow 4G connection.
+    </p>
   </header>
   <p
     class="mt-6 inline-block items-center rounded-full border border-manila-light bg-faded-black px-8 py-0.5 text-center font-display text-h5 font-bold text-manila-light uppercase md:hidden"
