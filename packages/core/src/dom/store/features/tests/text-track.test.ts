@@ -1027,6 +1027,47 @@ describe('textTrackFeature', () => {
       expect(store.state.subtitlesShowing).toBe(true);
     });
 
+    it("reads the app track in its copy's mode", () => {
+      const { list, store } = setupWithElements();
+      const track = store.addTextTrack(captions);
+
+      store.watchTextCues((candidate) => candidate.mode === 'showing');
+      store.selectSubtitlesTrack(track.id);
+      list.dispatchEvent(new Event('change'));
+
+      expect(store.state.textCues.map(({ track }) => [track.id, track.mode])).toEqual([[track.id, 'showing']]);
+      expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['Hello']);
+    });
+
+    it('tells a media track apart from an app track that shares its id', () => {
+      const { video, list, store } = setupWithElements();
+      const authored = document.createElement('track');
+
+      authored.id = 'app-text-track-1';
+      authored.kind = 'captions';
+      authored.label = 'Authored';
+      video.append(authored);
+
+      const track = store.addTextTrack(captions);
+
+      expect(track.id).toBe('app-text-track-1');
+
+      list.dispatchEvent(new Event('addtrack'));
+
+      expect(store.state.textTrackList.map(({ label, source }) => [label, source])).toEqual([
+        ['Authored', 'media'],
+        ['English', 'app'],
+      ]);
+      expect(new Set(store.state.textTrackList.map(({ id }) => id)).size).toBe(2);
+
+      store.selectSubtitlesTrack(track.id);
+
+      const [, copy] = video.querySelectorAll('track');
+
+      expect(authored.track.mode).toBe('disabled');
+      expect(copy!.track.mode).toBe('showing');
+    });
+
     it('removes the copy with the app track, and when the store detaches', () => {
       const { store, detach, copyOf } = setupWithElements();
       const first = store.addTextTrack(captions);

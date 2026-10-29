@@ -11,7 +11,7 @@ import { listen } from '@videojs/utils/dom';
 import { findActiveCues } from '../../../core/text-track/active-cues';
 import { matchTextTrack } from '../../../core/text-track/filter';
 import { definePlayerFeature } from '../../feature';
-import { getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
+import { getAppTextTracks, getAppTrackCopyId, listenForAppTextTracks } from '../app-text-tracks';
 import { fillChapterEnds, reuseCues, sortCues, toMediaTextCues } from '../text-cues';
 import { listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
@@ -91,9 +91,11 @@ export const textCuesFeature = definePlayerFeature({
 
       for (let i = 0; i < (textTracks?.textTracks.length ?? 0); i++) {
         const track = textTracks!.textTracks[i]!;
-        const plain = toMediaTextTrack(track, i);
         // A copy of an app track is read through the app track.
-        if (appTrackIds.has(plain.id) || !isTracked(plain, filters)) continue;
+        if (getAppTrackCopyId(track)) continue;
+
+        const plain = toMediaTextTrack(track, i, appTrackIds);
+        if (!isTracked(plain, filters)) continue;
 
         const prior = previous.get(plain.id);
         const cues = reuseCues(prior?.cues, sortCues(toMediaTextCues(track.cues, { kind: plain.kind, duration })));
