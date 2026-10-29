@@ -47,12 +47,7 @@ interface PlainCueCopy {
 /** The last plain copy of each live cue. */
 const plainCopies = new WeakMap<TextTrackCueLike, PlainCueCopy>();
 
-function toMediaTextCue(
-  cue: TextTrackCueLike,
-  kind: string | undefined,
-  max: number,
-  getId: CueIds
-): MediaTextCue {
+function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: number, getId: CueIds): MediaTextCue {
   const id = getId(cue);
   const text = 'text' in cue && isString(cue.text) ? cue.text : '';
   const endTime = Math.min(cue.endTime, max);
@@ -145,7 +140,7 @@ function parseJsonValue(text: string): unknown {
  * rebuilt on every sync, so this is what lets subscribers compare cues and cue lists by identity.
  */
 export function reuseCues<Cue extends MediaTextCue>(previous: readonly Cue[] | undefined, next: Cue[]): Cue[] {
-  if (!previous?.length) return next;
+  if (!previous) return next;
 
   // Cues that haven't changed come back as the same objects, so an unchanged list needs no matching by id.
   const reused = isSameList(previous, next) ? next : reuseById(previous, next);
