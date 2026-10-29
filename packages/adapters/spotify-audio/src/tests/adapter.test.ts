@@ -19,7 +19,7 @@ vi.mock(import('@videojs/utils/dom'), async (importOriginal) => {
 });
 
 const TRACK_ID = '1301WleyT98MSxVHPZCA6M';
-const EPISODE_URL = 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5';
+const EPISODE_URL = 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV';
 const OTHER_EPISODE_ID = '43cbJh4ccRD7lzM2730YK3';
 const OTHER_EPISODE_URL = `https://open.spotify.com/episode/${OTHER_EPISODE_ID}`;
 
@@ -81,7 +81,7 @@ describe('buildSpotifyIframeSrc', () => {
   it('embeds the video variant at its own path instead of as a parameter', () => {
     const src = buildSpotifyIframeSrc(EPISODE_URL, { source: { engine: { spotify: { preferVideo: true } } } });
 
-    expect(src).toBe('https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5/video');
+    expect(src).toBe('https://open.spotify.com/embed/episode/6I3ZzCxRhRkNqnQNo8AZPV/video');
   });
 
   it('keeps the iframe referrer policy out of the embed URL', () => {
@@ -672,7 +672,7 @@ describe('SpotifyAdapter', () => {
     media.src = EPISODE_URL;
     await Promise.resolve();
 
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
 
     // The first playback update after a reload completes the load.
     const loadCompleteSpy = vi.fn();
@@ -692,7 +692,7 @@ describe('SpotifyAdapter', () => {
 
     // `loadUri` names the entity and nothing else, so the start position it
     // carried is the host's to apply.
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
     expect(media.currentTime).toBe(30);
 
     // The first update after the reload completes the load the seek waits on.
@@ -738,7 +738,7 @@ describe('SpotifyAdapter', () => {
     // The deferred load replays once the controller is ready.
     controller.ready();
     await Promise.resolve();
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
     media.detach();
   });
 
@@ -1036,7 +1036,7 @@ describe('SpotifyAdapter source', () => {
     await Promise.resolve();
 
     // The video variant lives at its own path rather than in a parameter.
-    expect(iframe.getAttribute('src')).toContain('/embed/episode/7makk4oTQel546B0PZlDM5/video');
+    expect(iframe.getAttribute('src')).toContain('/embed/episode/6I3ZzCxRhRkNqnQNo8AZPV/video');
     media.detach();
   });
 

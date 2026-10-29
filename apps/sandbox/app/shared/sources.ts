@@ -807,7 +807,7 @@ export const CLOUDFLARE_VIDEO_SRC = 'https://watch.videodelivery.net/bfbd585059e
 
 // An episode rather than a track: Spotify plays episodes in full for a signed-out
 // listener, where a track is a 30 second preview.
-export const SPOTIFY_AUDIO_SRC = 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5';
+export const SPOTIFY_AUDIO_SRC = 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV';
 
 export const TIKTOK_VIDEO_SRC = 'https://www.tiktok.com/@_luwes/video/7527476667770522893';
 

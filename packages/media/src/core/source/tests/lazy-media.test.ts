@@ -39,7 +39,7 @@ describe('resolveLazySource', () => {
     ['https://customer-abc123.cloudflarestream.com/5d5bc37ffcf54c9b82e996823bffbb81/manifest/video.m3u8', 'cloudflare'],
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
-    ['https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5', 'spotify'],
+    ['https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV', 'spotify'],
     ['spotify:track:1301WleyT98MSxVHPZCA6M', 'spotify'],
     ['https://streamable.com/e/moo?playerjs', 'playerjs'],
     ['https://embed.example.com/player.mp4?playerjs', 'playerjs'],

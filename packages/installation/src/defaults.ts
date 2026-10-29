@@ -4,7 +4,7 @@ export const INSTALLATION_DEMO_SOURCES = {
   cloudflare: 'https://watch.videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4',
   dash: 'https://dash.akamaized.net/akamai/streamroot/050714/Spring_4Ktest.mpd',
   live: 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8',
-  spotify: 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5',
+  spotify: 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV',
   tiktok: 'https://www.tiktok.com/@_luwes/video/7527476667770522893',
   twitch: 'https://www.twitch.tv/videos/106400740',
   videoHls: 'https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8',

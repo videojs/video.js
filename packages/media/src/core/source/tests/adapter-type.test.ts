@@ -19,7 +19,7 @@ describe('resolveAdapterType', () => {
     ['https://customer-abc123.cloudflarestream.com/5d5bc37ffcf54c9b82e996823bffbb81/manifest/video.m3u8', 'cloudflare'],
     ['https://watch.videodelivery.net/5d5bc37ffcf54c9b82e996823bffbb81', 'cloudflare'],
     ['https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M', 'spotify'],
-    ['spotify:episode:7makk4oTQel546B0PZlDM5', 'spotify'],
+    ['spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV', 'spotify'],
     ['https://soundcloud.com/forss/flickermood', 'soundcloud'],
     ['https://soundcloud.com/forss/sets/soulhack', 'soundcloud'],
     ['https://api.soundcloud.com/tracks/293', 'soundcloud'],
