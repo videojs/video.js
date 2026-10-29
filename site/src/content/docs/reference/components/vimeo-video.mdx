@@ -68,7 +68,8 @@ A `vimeo.com/event/<id>` URL plays that event through Vimeo's event embed, and i
 - Captions round-trip by name only: the embed's track list appears in `textTracks` and selecting one enables it, but no cues cross over. Vimeo draws captions inside the iframe.
 - `poster` has no effect. The embed shows its own thumbnail, which `engine.vimeo.thumbnail_id` picks.
 - `playbackRate` is limited to Vimeo's supported range, 0.5 through 2.
-- `playsInline` and `preload` are read when the embed URL is built, so changing them later doesn't take effect.
+- `playsInline` and `preload` are read when the embed URL is built, so changing them later doesn't take effect, except that moving `preload` off `"none"` builds an embed still waiting for play.
+- With `preload="none"`, nothing is fetched from Vimeo until playback is requested: the embed is built on `play()` and starts playing as it loads. `autoplay` or `controls` builds it at once, since each asks to play or shows the embed's own play button. Until then the frame is empty, without the service's thumbnail, so give the player a poster.
 - The video's Vimeo title arrives as content data, so a player skin can show it without fetching anything yourself.
 
 ## Examples
