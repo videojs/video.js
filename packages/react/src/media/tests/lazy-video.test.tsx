@@ -110,6 +110,23 @@ describe('LazyVideo', () => {
     expect(mediaRef).toHaveBeenLastCalledWith(null);
   });
 
+  it('forwards preferPlayback to the source of a Mux video', async () => {
+    const playbackId = 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M';
+    const src = `https://stream.mux.com/${playbackId}`;
+    const mediaRef = createRef<Media>();
+    const sourceOf = () =>
+      (mediaRef.current as { source?: { playbackId?: string; preferPlayback?: string } } | null)?.source;
+    const { rerender } = render(<LazyVideo src={src} preferPlayback="native" mediaRef={mediaRef} />);
+
+    await waitFor(() => expect(sourceOf()?.preferPlayback).toBe('native'), LOAD_TIMEOUT);
+    expect(sourceOf()?.playbackId).toBe(playbackId);
+
+    rerender(<LazyVideo src={src} preferPlayback="mse" mediaRef={mediaRef} />);
+
+    expect(sourceOf()?.preferPlayback).toBe('mse');
+    expect(sourceOf()?.playbackId).toBe(playbackId);
+  });
+
   it('resolves an extensionless source from type', () => {
     const { container } = render(<LazyVideo src="https://cdn.example.com/signed?token=1" type="video/mp4" />);
     const video = container.querySelector('video')!;

@@ -1,10 +1,12 @@
 'use client';
 
 import {
+  applyPreferPlayback,
   findLazyMedia,
   type LazyMediaMatcher,
   type Media,
   type NativeHlsSupport,
+  type PreferPlaybackTarget,
   resolveLazySource,
 } from '@videojs/media';
 import { nativeHlsSupport } from '@videojs/utils/dom';
@@ -18,10 +20,12 @@ import {
   type ReactNode,
   type RefAttributes,
   Suspense,
+  useCallback,
   useEffect,
   useSyncExternalStore,
 } from 'react';
 
+import { useComposedRefs } from '../utils/use-composed-refs';
 import type { MediaRefProps } from '../utils/use-media-ref';
 
 /**
@@ -39,7 +43,8 @@ export interface LazyMediaProps extends MediaRefProps<Media> {
   type?: string | undefined;
   /**
    * Playback path for HLS: `'native'` uses the browser's own HLS support wherever it has one, and `'mse'` always loads
-   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere.
+   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere. Also
+   * passed on to the hls.js and Mux media, on their `source`.
    */
   preferPlayback?: 'native' | 'mse' | undefined;
   /**
@@ -61,6 +66,8 @@ export interface LazyMediaProps extends MediaRefProps<Media> {
 export type LazyMediaDefinition = LazyMediaMatcher & {
   /** Whether the component renders `fallback` content inside a `<video>` or `<audio>`. */
   fallback?: boolean | undefined;
+  /** Whether the media takes `preferPlayback` on its `source`, as `HlsJsVideo` and `MuxVideo` do. */
+  preferPlayback?: boolean | undefined;
 } & ({ component: ComponentType<any>; load?: never } | { load: () => Promise<ComponentType<any>>; component?: never });
 
 /**
@@ -80,7 +87,7 @@ export function createLazyMedia<Element, Props extends LazyMediaProps>(
   }
 
   const LazyMedia = forwardRef<Element, LazyMediaProps>(function LazyMedia(
-    { src = '', type, preferPlayback, preload = 'none', fallback, ...props },
+    { src = '', type, preferPlayback, preload = 'none', fallback, mediaRef, ...props },
     ref
   ) {
     // Resolving a source is cheaper than memoizing it, and the compiler's cache is most of this component's size.
@@ -89,6 +96,18 @@ export function createLazyMedia<Element, Props extends LazyMediaProps>(
     const nativeHls = useSyncExternalStore(subscribe, getNativeHls, getServerNativeHls);
     const media = findLazyMedia(medias, resolveLazySource(src, { type, preferPlayback, nativeHls }));
     const unresolved = !!src && media === null;
+
+    // The media's ref runs after its `src` is set and before the load that queues, so the engine is built for the
+    // preferred path.
+    const forwardPreferPlayback = useCallback(
+      (target: Media | null) => {
+        // SAFETY: a definition marked `preferPlayback` renders a media with a structured `source`.
+        if (target && media?.preferPlayback)
+          applyPreferPlayback(target as unknown as PreferPlaybackTarget, preferPlayback);
+      },
+      [media, preferPlayback]
+    );
+    const composedMediaRef = useComposedRefs(mediaRef, forwardPreferPlayback);
 
     useEffect(() => {
       if (__DEV__ && unresolved) reportUnresolvedSource(name, src);
@@ -99,10 +118,12 @@ export function createLazyMedia<Element, Props extends LazyMediaProps>(
     // Each media takes the props it understands; their prop types have no common shape to check against.
     const Media = components.get(media)!;
     const fallbackProps = fallback !== undefined && media.fallback ? { fallback } : null;
+    // Only media that take it, and those given one, see `mediaRef`; a custom component may spread props onto the DOM.
+    const mediaRefProps = media.preferPlayback ? { mediaRef: composedMediaRef } : mediaRef ? { mediaRef } : null;
 
     return (
       <Suspense fallback={null}>
-        <Media ref={ref} {...props} {...fallbackProps} src={src} preload={preload} />
+        <Media ref={ref} {...props} {...mediaRefProps} {...fallbackProps} src={src} preload={preload} />
       </Suspense>
     );
   });

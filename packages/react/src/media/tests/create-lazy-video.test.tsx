@@ -1,7 +1,8 @@
 import { render, waitFor } from '@testing-library/react';
-import { forwardRef } from 'react';
+import { createRef, forwardRef, type Ref, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { useMediaRef } from '../../utils/use-media-ref';
 import { createLazyVideo, type LazyMediaDefinition } from '../lazy/create';
 import { video } from '../lazy/video';
 
@@ -13,6 +14,17 @@ const acmeVideo: LazyMediaDefinition = {
   match: ({ url }) => url?.hostname === 'video.acme.com',
   component: AcmeVideo,
 };
+
+interface SourceAdapter {
+  source: { preferPlayback?: string } | null;
+}
+
+// Like `HlsJsVideo` and `MuxVideo`: an adapter with a structured `source`, handed out through `mediaRef`.
+function SourceVideo({ mediaRef }: { mediaRef?: Ref<SourceAdapter> }) {
+  const [adapter] = useState<SourceAdapter>(() => ({ source: null }));
+
+  return <i data-source ref={useMediaRef(adapter, mediaRef)} />;
+}
 
 describe('createLazyVideo', () => {
   afterEach(() => {
@@ -41,6 +53,34 @@ describe('createLazyVideo', () => {
 
     await waitFor(() => expect(container.querySelector('[data-acme]')).not.toBeNull());
     expect(load).toHaveBeenCalledOnce();
+  });
+
+  it('forwards preferPlayback to the source of a media that takes it, and keeps mediaRef', () => {
+    const SourceLazyVideo = createLazyVideo([{ ...acmeVideo, component: SourceVideo, preferPlayback: true }]);
+    const mediaRef = createRef<SourceAdapter>();
+    const src = 'https://video.acme.com/1';
+    const { rerender } = render(<SourceLazyVideo src={src} preferPlayback="native" mediaRef={mediaRef as never} />);
+    const adapter = mediaRef.current!;
+
+    expect(adapter.source).toEqual({ preferPlayback: 'native' });
+
+    rerender(<SourceLazyVideo src={src} preferPlayback="mse" mediaRef={mediaRef as never} />);
+
+    expect(mediaRef.current).toBe(adapter);
+    expect(adapter.source).toEqual({ preferPlayback: 'mse' });
+
+    rerender(<SourceLazyVideo src={src} mediaRef={mediaRef as never} />);
+
+    expect(adapter.source).toBeNull();
+  });
+
+  it('leaves the source of a media that does not take preferPlayback alone', () => {
+    const SourceLazyVideo = createLazyVideo([{ ...acmeVideo, component: SourceVideo }]);
+    const mediaRef = createRef<SourceAdapter>();
+
+    render(<SourceLazyVideo src="https://video.acme.com/1" preferPlayback="native" mediaRef={mediaRef as never} />);
+
+    expect(mediaRef.current!.source).toBeNull();
   });
 
   it('only plays the sources its media do', () => {
