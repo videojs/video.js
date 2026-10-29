@@ -47,6 +47,14 @@ describe('LazyAudio', () => {
     expect(customElements.get('soundcloud-audio')).toBeDefined();
   });
 
+  it('loads Mixcloud audio for a Mixcloud URL', async () => {
+    const element = create('https://www.mixcloud.com/spartacus/lambiance/');
+
+    await vi.waitFor(() => expect(element.querySelector('mixcloud-audio')).not.toBeNull(), { timeout: 5000 });
+
+    expect(customElements.get('mixcloud-audio')).toBeDefined();
+  });
+
   it('reports a source no audio media plays', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     const element = create('https://vimeo.com/76979871');
