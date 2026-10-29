@@ -179,6 +179,13 @@ export class LazyMediaElement extends HTMLElementBase {
     } catch (error) {
       if (__DEV__) console.error(`[${this.localName}] Failed to load <${definition.tag}>.`, error);
 
+      // The previous media would go on playing a source it no longer matches, and a later source for this media should
+      // try the load again.
+      if (token === this.#token) {
+        this.#definition = undefined;
+        this.#setMedia(null, null);
+      }
+
       return;
     }
 
