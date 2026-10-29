@@ -35,4 +35,19 @@ config.resolver.extraNodeModules = {
   '@babel/runtime': path.dirname(require.resolve('@babel/runtime/package.json')),
 };
 
+// The renderer only works with the React it was built against, but web workspace packages (e.g. @videojs/store, whose
+// React Compiler output Metro bundles) can carry a newer React as a devDependency. react-native-monorepo-config's
+// blockList is meant to dedupe it, but it matches symlinked paths and Metro resolves pnpm's symlinks to their real
+// `.pnpm/react@x` location, so a second copy slips in and hooks throw on a null dispatcher. Resolve every `react`
+// import as if it came from this app.
+const appOrigin = path.join(__dirname, 'index.js');
+const { resolveRequest } = config.resolver;
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const isReact = moduleName === 'react' || moduleName.startsWith('react/');
+  const origin = isReact ? { ...context, originModulePath: appOrigin } : context;
+
+  return resolveRequest(origin, moduleName, platform);
+};
+
 module.exports = config;
