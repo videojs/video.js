@@ -11,4 +11,5 @@ export const hlsjsVideo: LazyMediaDefinition = {
   match: matchHls('mse'),
   tag: 'hlsjs-video',
   load: () => import('../../define/media/hlsjs-video'),
+  preferPlayback: true,
 };

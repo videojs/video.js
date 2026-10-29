@@ -71,6 +71,27 @@ describe('LazyVideo', () => {
     expect(element.querySelector('hlsjs-video')!.getAttribute('src')).toBe('https://example.com/master.m3u8');
   });
 
+  it('forwards prefer-playback to the source of a Mux video', async () => {
+    const src = 'https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M';
+    const element = create({ src, 'prefer-playback': 'native' });
+
+    await vi.waitFor(() => expect(element.querySelector('mux-video')).not.toBeNull(), LOAD_TIMEOUT);
+
+    // The source a Mux URL derives carries `preferPlayback` alongside the playback id.
+    const media = element.querySelector('mux-video')! as unknown as {
+      source: { playbackId?: string; preferPlayback?: string };
+    };
+
+    expect(media.source?.preferPlayback).toBe('native');
+    expect(media.source?.playbackId).toBe('a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M');
+
+    element.setAttribute('prefer-playback', 'mse');
+    await flush();
+
+    expect(media.source?.preferPlayback).toBe('mse');
+    expect(media.source?.playbackId).toBe('a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M');
+  });
+
   it('swaps the media when the source needs a different one, and moves its tracks', async () => {
     const element = create({ src: '/movie.mp4' }, '<track kind="captions" src="captions.vtt">');
 
