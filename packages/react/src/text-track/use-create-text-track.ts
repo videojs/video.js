@@ -11,7 +11,7 @@ import { useLatestRef } from '../utils/use-latest-ref';
 /**
  * Add a track defined with `defineTextTrack()` while the component is mounted. Its cues are checked against the
  * definition's type. A source change clears app tracks, so the track is added again for the new source. Keep `cues` the
- * same array across renders; a new array replaces the track.
+ * same array, and `format` the same function, across renders; a new one replaces the track.
  *
  * ```tsx
  * useCreateTextTrack(quizTrack, { cues });
@@ -28,7 +28,8 @@ export function useCreateTextTrack<Cue extends MediaTextCue>(
 ): AppTextTrack<InferCueValue<Cue>> | null;
 /**
  * Add a text track while the component is mounted. A source change clears app tracks, so the track is added again for
- * the new source. Keep `cues` the same array across renders; a new array replaces the track.
+ * the new source. Keep `cues` the same array, and `format` the same function, across renders; a new one replaces the
+ * track.
  *
  * ```tsx
  * useCreateTextTrack({ kind: 'metadata', label: 'quiz', cues });
@@ -45,6 +46,8 @@ export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackConte
   const [generation, setGeneration] = useState(0);
   const latest = useLatestRef({ init, content });
   const cues = content?.cues ?? init.cues;
+  const src = content?.src ?? init.src;
+  const format = content?.format ?? init.format;
   const key = JSON.stringify([init.kind, init.label, init.language]);
 
   useEffect(() => {
@@ -79,8 +82,9 @@ export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackConte
       track.remove();
       setAdded(null);
     };
-    // `latest` is a ref; `key` and `cues` stand in for the description so an inline object doesn't re-add each render.
-  }, [store, key, cues, generation, latest]);
+    // `latest` is a ref; `key`, `cues`, `src`, and `format` stand in for the description so an inline object doesn't
+    // re-add each render.
+  }, [store, key, cues, src, format, generation, latest]);
 
   return added;
 }
