@@ -1,7 +1,9 @@
 import type {
+  MediaTextCue,
   MediaTextCuesState,
   MediaTextTrack,
   MediaTrackCues,
+  TextTrackCueLike,
   TextTrackFilter,
   TextTrackLike,
 } from '@videojs/media';
@@ -28,7 +30,7 @@ import {
   type AppTextTracksState,
   getAppTextTracks,
 } from '../app-text-tracks';
-import { reuseCues, sortCues, toMediaTextCues } from '../text-cues';
+import { isCueListUnchanged, reuseCues, sortCues, toMediaTextCues } from '../text-cues';
 import { listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 const CUE_FILTERS = Symbol('@videojs/text-cue-filters');
@@ -172,7 +174,7 @@ export const textCuesFeature = definePlayerFeature({
     const textTracks = isMediaTextTrackCapable(media) ? media : null;
 
     // The media's tracks being read, by the id their cues are published under.
-    let tracked = new Map<string, TextTrackLike>();
+    let tracked = new Map<string, TrackedTrack>();
     let trackCleanup: AbortController | null = null;
 
     const getTime = () => (isMediaSeekCapable(media) ? media.currentTime : Number.NaN);
@@ -234,10 +236,11 @@ export const textCuesFeature = definePlayerFeature({
         if (!isTracked(plain, filters)) continue;
 
         const prior = previous.get(plain.id);
-        const cues = reuseCues(prior?.cues, sortCues(toMediaTextCues(track.cues, { kind: plain.kind, duration })));
+        const read = Array.from(track.cues ?? []);
+        const cues = reuseCues(prior?.cues, sortCues(toMediaTextCues(read, { kind: plain.kind, duration })));
         const activeCues = reuseCues(prior?.activeCues, findActiveCues(cues, time));
 
-        tracked.set(plain.id, track);
+        tracked.set(plain.id, { track, read });
         textCues.push(reuseTrackCues(prior, { track: reuseTrack(prior?.track, plain), cues, activeCues }));
 
         // Hidden tracks fire `cuechange` as cues start and end, which is sooner than the next `timeupdate`.
@@ -264,12 +267,8 @@ export const textCuesFeature = definePlayerFeature({
       const time = getTime();
       const current = get().textCues;
       const next = current.map((entry) => {
-        const track = tracked.get(entry.track.id);
-        // Engines add, remove, and change cues in place without an event, so the cues are read again. Each unchanged
-        // cue comes back as the copy already published, which keeps this cheap.
-        const cues = track
-          ? reuseCues(entry.cues, sortCues(toMediaTextCues(track.cues, { kind: entry.track.kind, duration })))
-          : entry.cues;
+        const source = tracked.get(entry.track.id);
+        const cues = source ? readChangedCues(source, entry, duration) : entry.cues;
         const activeCues = reuseCues(entry.activeCues, findActiveCues(cues, time));
 
         return reuseTrackCues(entry, { ...entry, cues, activeCues });
@@ -317,6 +316,25 @@ export const textCuesFeature = definePlayerFeature({
     );
   },
 });
+
+interface TrackedTrack {
+  track: TextTrackLike;
+  /** The live cues its published cues were last read from. */
+  read: TextTrackCueLike[];
+}
+
+/**
+ * The cues of a media track, read again only when they changed. Engines add, remove, and change cues in place without
+ * an event, so they're checked on every tick, and the check is cheap while they stay the same.
+ */
+function readChangedCues(source: TrackedTrack, entry: MediaTrackCues, duration: number): MediaTextCue[] {
+  const options = { kind: entry.track.kind, duration };
+  if (isCueListUnchanged(source.track.cues, source.read, options)) return entry.cues;
+
+  source.read = Array.from(source.track.cues ?? []);
+
+  return reuseCues(entry.cues, sortCues(toMediaTextCues(source.read, options)));
+}
 
 function isTracked(track: MediaTextTrack, filters: readonly TextTrackFilter[]): boolean {
   return isTrackedByDefault(track) || filters.some((filter) => matchTextTrack(track, filter));
