@@ -73,8 +73,9 @@ export interface SegmentLoadingState {
    * MediaSource attach, and co-writing one would be a last-write-wins conflict besides.
    *
    * Single writer per composition. Today that writer is DRM (`setupMediaKeys`, holding each source until clear or its
-   * MediaKeys attach — appending encrypted data before `setMediaKeys` misbehaves on Chromium); the signal names the
-   * prohibition rather than the domain so a second such gate needs no vocabulary here.
+   * MediaKeys attach, and indefinitely after a failed negotiation — appending encrypted data before `setMediaKeys`
+   * misbehaves on Chromium); the signal names the prohibition rather than the domain so a second such gate needs no
+   * vocabulary here.
    */
   segmentLoadingBlocked?: boolean;
   selectedVideoTrackId?: string;

@@ -34,8 +34,8 @@ import { type ErrorEmitterState, emitError } from '../collect-errors';
 export interface MediaKeysState {
   presentation?: MaybeResolvedPresentation;
   /**
-   * Segment-load gate: `true` while an encrypted source's MediaKeys aren't attached yet; the `loadXSegments`
-   * dispatchers park on it. Semantics on `SegmentLoadingState['segmentLoadingBlocked']`.
+   * Segment-load gate: `true` from each new source until it is confirmed clear or its MediaKeys attach, and still
+   * `true` after a failed negotiation. The `loadXSegments` dispatchers start no segment loads while it holds.
    */
   segmentLoadingBlocked?: boolean;
   /**
