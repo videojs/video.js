@@ -170,6 +170,22 @@ describe('HTMLMediaAdapter', () => {
       expect(audio.querySelector('track')).toBeNull();
     });
 
+    it('removes the track element from a native element that has its own removeTextTrack()', () => {
+      const host = new HTMLAudioAdapter();
+      const audio = document.createElement('audio');
+      const element = document.createElement('track');
+      const removeTextTrack = vi.fn();
+
+      // Stands in for a browser that ships the removal method the platform once had.
+      Object.assign(audio, { removeTextTrack });
+      audio.append(element);
+      host.attach(audio);
+      host.removeTextTrack(element.track);
+
+      expect(audio.querySelector('track')).toBeNull();
+      expect(removeTextTrack).not.toHaveBeenCalled();
+    });
+
     it('ignores a track no track element backs', () => {
       const host = new HTMLAudioAdapter();
       const audio = document.createElement('audio');
