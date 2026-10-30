@@ -66,6 +66,18 @@ describe('playbackRateFeature', () => {
       expect(store.state.playbackRate).toBe(1);
     });
 
+    it('drops the single-precision noise browsers report', () => {
+      const video = createMockVideo();
+      const store = createRateStore();
+
+      store.attach({ media: video, container: null });
+      video.playbackRate = Math.fround(1.1);
+      video.dispatchEvent(new Event('ratechange'));
+
+      expect(Math.fround(1.1)).not.toBe(1.1);
+      expect(store.state.playbackRate).toBe(1.1);
+    });
+
     it('updates on ratechange', () => {
       const video = createMockVideo();
       const store = createStore<PlayerTarget>()(playbackRateFeature);

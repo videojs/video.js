@@ -32,3 +32,12 @@ export function insertPlaybackRate(rates: readonly number[], rate: number): read
 export function filterPlaybackRates(rates: readonly number[], { min, max }: MediaPlaybackRateRange): readonly number[] {
   return rates.filter((rate) => rate >= min && rate <= max);
 }
+
+/**
+ * Drops floating-point noise from a rate: browsers store `playbackRate` in single precision, so `1.1` reads back as
+ * `1.100000023841858`, and stepped rates such as `1 + 0.1` land just off the value. Five decimal places keeps every
+ * rate within the native range intact.
+ */
+export function roundPlaybackRate(rate: number): number {
+  return Math.round(rate * 1e5) / 1e5;
+}

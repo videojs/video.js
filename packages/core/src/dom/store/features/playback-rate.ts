@@ -3,7 +3,7 @@ import { isMediaPlaybackRateCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
 import { clamp } from '@videojs/utils/number';
 
-import { filterPlaybackRates, parsePlaybackRates } from '../../../core/ui/utils/playback-rates';
+import { filterPlaybackRates, parsePlaybackRates, roundPlaybackRate } from '../../../core/ui/utils/playback-rates';
 import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
@@ -99,7 +99,7 @@ export const playbackRateFeature = definePlayerFeature({
       return;
     }
 
-    const sync = () => set({ playbackRate: media.playbackRate });
+    const sync = () => set({ playbackRate: roundPlaybackRate(media.playbackRate) });
 
     set({ playbackRateAvailability: 'available' });
     sync();

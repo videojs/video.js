@@ -1,6 +1,7 @@
 import { noop } from '@videojs/utils/function';
 import { isPromise, isUndefined } from '@videojs/utils/predicate';
 
+import { roundPlaybackRate } from '../core/ui/utils/playback-rates';
 import { getMediaInputActionValue } from './media-action-value';
 import type { AnyPlayerStore } from './player';
 import {
@@ -124,8 +125,3 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     rate.setPlaybackRate(Math.max(...slower));
   },
 };
-
-/** Drops floating-point noise from stepped rates, so `1 + 0.1` lands on `1.1` rather than `1.1000000000000001`. */
-function roundPlaybackRate(rate: number): number {
-  return Math.round(rate * 1000) / 1000;
-}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { insertPlaybackRate, parsePlaybackRates } from '../playback-rates';
+import { insertPlaybackRate, parsePlaybackRates, roundPlaybackRate } from '../playback-rates';
 
 describe('parsePlaybackRates', () => {
   it('keeps the author order', () => {
@@ -33,5 +33,15 @@ describe('insertPlaybackRate', () => {
     const rates = [0.5, 1];
 
     expect(insertPlaybackRate(rates, 1)).toBe(rates);
+  });
+});
+
+describe('roundPlaybackRate', () => {
+  it.each([1.1, 0.0625, 1.75, 15.3, 16])('recovers %s from its single-precision value', (rate) => {
+    expect(roundPlaybackRate(Math.fround(rate))).toBe(rate);
+  });
+
+  it('drops the noise from stepped rates', () => {
+    expect(roundPlaybackRate(1 + 0.1 + 0.1)).toBe(1.2);
   });
 });
