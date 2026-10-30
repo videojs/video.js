@@ -1,5 +1,75 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/html@10.2.0...@videojs/html@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **core:** show a pending autoplay as starting playback ([#9609](https://github.com/videojs/video.js/issues/9609)) ([6f56667](https://github.com/videojs/video.js/commit/6f566672ffd095301f9bcef9ecccdbdc1ebe536f))
+* **mixcloud-audio:** add the Mixcloud audio provider ([#9649](https://github.com/videojs/video.js/issues/9649)) ([f1b1354](https://github.com/videojs/video.js/commit/f1b135497252fa5b276688bfe9dfec403f77345b))
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+* SoundCloud Audio provider ([#9524](https://github.com/videojs/video.js/issues/9524)) ([fdeaafa](https://github.com/videojs/video.js/commit/fdeaafa85855c5b65782aa2afe6b320ddec6bc92))
+
+
+### Bug Fixes
+
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+* **html:** keep the playback rate menu trigger visible once rates are available ([#9624](https://github.com/videojs/video.js/issues/9624)) ([bc54d7a](https://github.com/videojs/video.js/commit/bc54d7ad1e2171a3740fed622ad7cd665f39926d))
+* **mux-data:** keep new metadata off the outgoing view on a video change ([#9656](https://github.com/videojs/video.js/issues/9656)) ([fda32bc](https://github.com/videojs/video.js/commit/fda32bcd97fd9ab3af3126298ff2c961474a83d9))
+* **packages:** show only the control name in the playback rate tooltip ([#9532](https://github.com/videojs/video.js/issues/9532)) ([10e6884](https://github.com/videojs/video.js/commit/10e6884c0893537e88761a1848d2ceed7d9f05fc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.3.0
+    * @videojs/element bumped to 10.3.0
+    * @videojs/media bumped to 10.3.0
+    * @videojs/native-hls-video bumped to 10.3.0
+    * @videojs/spf bumped to 10.3.0
+    * @videojs/store bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.3.0
+    * @videojs/dash-video bumped to 10.3.0
+    * @videojs/google-cast bumped to 10.3.0
+    * @videojs/hlsjs-video bumped to 10.3.0
+    * @videojs/icons bumped to 10.3.0
+    * @videojs/mixcloud-audio bumped to 10.3.0
+    * @videojs/mux-audio bumped to 10.3.0
+    * @videojs/mux-data bumped to 10.3.0
+    * @videojs/mux-video bumped to 10.3.0
+    * @videojs/playerjs-video bumped to 10.3.0
+    * @videojs/shaka-video bumped to 10.3.0
+    * @videojs/skins bumped to 10.3.0
+    * @videojs/soundcloud-audio bumped to 10.3.0
+    * @videojs/spotify-audio bumped to 10.3.0
+    * @videojs/tiktok-video bumped to 10.3.0
+    * @videojs/twitch-video bumped to 10.3.0
+    * @videojs/vimeo-video bumped to 10.3.0
+    * @videojs/wistia-video bumped to 10.3.0
+    * @videojs/youtube-video bumped to 10.3.0
+  * peerDependencies
+    * @videojs/cloudflare-video bumped to 10.3.0
+    * @videojs/dash-video bumped to 10.3.0
+    * @videojs/google-cast bumped to 10.3.0
+    * @videojs/hlsjs-video bumped to 10.3.0
+    * @videojs/mixcloud-audio bumped to 10.3.0
+    * @videojs/mux-audio bumped to 10.3.0
+    * @videojs/mux-data bumped to 10.3.0
+    * @videojs/mux-video bumped to 10.3.0
+    * @videojs/playerjs-video bumped to 10.3.0
+    * @videojs/shaka-video bumped to 10.3.0
+    * @videojs/soundcloud-audio bumped to 10.3.0
+    * @videojs/spotify-audio bumped to 10.3.0
+    * @videojs/tiktok-video bumped to 10.3.0
+    * @videojs/twitch-video bumped to 10.3.0
+    * @videojs/vimeo-video bumped to 10.3.0
+    * @videojs/wistia-video bumped to 10.3.0
+    * @videojs/youtube-video bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/html@10.1.0...@videojs/html@10.2.0) (2026-10-22)
 
 

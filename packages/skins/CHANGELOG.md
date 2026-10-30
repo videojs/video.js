@@ -1,5 +1,31 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.2.0...@videojs/skins@10.3.0) (2026-10-30)
+
+
+### Features
+
+* SoundCloud Audio provider ([#9524](https://github.com/videojs/video.js/issues/9524)) ([fdeaafa](https://github.com/videojs/video.js/commit/fdeaafa85855c5b65782aa2afe6b320ddec6bc92))
+
+
+### Bug Fixes
+
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+* **packages:** show only the control name in the playback rate tooltip ([#9532](https://github.com/videojs/video.js/issues/9532)) ([10e6884](https://github.com/videojs/video.js/commit/10e6884c0893537e88761a1848d2ceed7d9f05fc))
+* **skin:** derive muted foreground from the foreground color ([#9558](https://github.com/videojs/video.js/issues/9558)) ([0c471ab](https://github.com/videojs/video.js/commit/0c471abdcceae0834b1f89d6dec7d8d1e1ea6359))
+* **skin:** lighten the video controls backdrop ([#9585](https://github.com/videojs/video.js/issues/9585)) ([ecaab1c](https://github.com/videojs/video.js/commit/ecaab1c99f12c07cf3d2cae56ed524fcc86275af))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.3.0
+    * @videojs/element bumped to 10.3.0
+    * @videojs/icons bumped to 10.3.0
+    * @videojs/installation bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/skins@10.1.0...@videojs/skins@10.2.0) (2026-10-22)
 
 

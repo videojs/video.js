@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
     "audio",

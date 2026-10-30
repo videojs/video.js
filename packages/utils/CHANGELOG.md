@@ -1,5 +1,13 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/utils@10.2.0...@videojs/utils@10.3.0) (2026-10-30)
+
+
+### Bug Fixes
+
+* **core:** hide open popovers before entering fullscreen ([#9627](https://github.com/videojs/video.js/issues/9627)) ([1e2291c](https://github.com/videojs/video.js/commit/1e2291c7da0839471e10422a066e56480609a925))
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/utils@10.1.0...@videojs/utils@10.2.0) (2026-10-22)
 
 

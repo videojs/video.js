@@ -1,5 +1,31 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **core:** show a pending autoplay as starting playback ([#9609](https://github.com/videojs/video.js/issues/9609)) ([6f56667](https://github.com/videojs/video.js/commit/6f566672ffd095301f9bcef9ecccdbdc1ebe536f))
+
+
+### Bug Fixes
+
+* **core:** handle void remote playback cancellation ([#9652](https://github.com/videojs/video.js/issues/9652)) ([f00035c](https://github.com/videojs/video.js/commit/f00035ce3748fff5996c8a7ed429ba568f941eba))
+* **core:** hide open popovers before entering fullscreen ([#9627](https://github.com/videojs/video.js/issues/9627)) ([1e2291c](https://github.com/videojs/video.js/commit/1e2291c7da0839471e10422a066e56480609a925))
+* **core:** keep embeds from taking a volume the browser locks ([#9602](https://github.com/videojs/video.js/issues/9602)) ([9b115eb](https://github.com/videojs/video.js/commit/9b115eb2178d37597e6e7a7459c41018946d1a1d))
+* **packages:** show only the control name in the playback rate tooltip ([#9532](https://github.com/videojs/video.js/issues/9532)) ([10e6884](https://github.com/videojs/video.js/commit/10e6884c0893537e88761a1848d2ceed7d9f05fc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.3.0
+    * @videojs/store bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+    * video.js bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0) (2026-10-22)
 
 

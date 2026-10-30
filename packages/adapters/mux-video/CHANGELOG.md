@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/mux-video@10.2.0...@videojs/mux-video@10.3.0) (2026-10-30)
+
+
+### Bug Fixes
+
+* **hlsjs-video:** update hls.js to 1.7.3 ([#9645](https://github.com/videojs/video.js/issues/9645)) ([8989194](https://github.com/videojs/video.js/commit/898919402859e267bae935c1c77baf8c949a85ff))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/hlsjs-video bumped to 10.3.0
+    * @videojs/media bumped to 10.3.0
+    * @videojs/spf bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/mux-video@10.1.0...@videojs/mux-video@10.2.0) (2026-10-22)
 
 

@@ -1,5 +1,40 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.2.0...@videojs/cdn@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **mixcloud-audio:** add the Mixcloud audio provider ([#9649](https://github.com/videojs/video.js/issues/9649)) ([f1b1354](https://github.com/videojs/video.js/commit/f1b135497252fa5b276688bfe9dfec403f77345b))
+* SoundCloud Audio provider ([#9524](https://github.com/videojs/video.js/issues/9524)) ([fdeaafa](https://github.com/videojs/video.js/commit/fdeaafa85855c5b65782aa2afe6b320ddec6bc92))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/cloudflare-video bumped to 10.3.0
+    * @videojs/core bumped to 10.3.0
+    * @videojs/dash-video bumped to 10.3.0
+    * @videojs/google-cast bumped to 10.3.0
+    * @videojs/hlsjs-video bumped to 10.3.0
+    * @videojs/html bumped to 10.3.0
+    * @videojs/mixcloud-audio bumped to 10.3.0
+    * @videojs/mux-audio bumped to 10.3.0
+    * @videojs/mux-data bumped to 10.3.0
+    * @videojs/mux-video bumped to 10.3.0
+    * @videojs/native-hls-video bumped to 10.3.0
+    * @videojs/playerjs-video bumped to 10.3.0
+    * @videojs/shaka-video bumped to 10.3.0
+    * @videojs/soundcloud-audio bumped to 10.3.0
+    * @videojs/spf bumped to 10.3.0
+    * @videojs/spotify-audio bumped to 10.3.0
+    * @videojs/tiktok-video bumped to 10.3.0
+    * @videojs/twitch-video bumped to 10.3.0
+    * @videojs/vimeo-video bumped to 10.3.0
+    * @videojs/wistia-video bumped to 10.3.0
+    * @videojs/youtube-video bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/cdn@10.1.0...@videojs/cdn@10.2.0) (2026-10-22)
 
 

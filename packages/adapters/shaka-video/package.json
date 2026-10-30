@@ -1,6 +1,6 @@
 {
   "name": "@videojs/shaka-video",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Shaka Player playback adapter for Video.js",
   "keywords": [
     "dash",

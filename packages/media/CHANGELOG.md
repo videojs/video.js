@@ -1,5 +1,28 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/media@10.2.0...@videojs/media@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **core:** show a pending autoplay as starting playback ([#9609](https://github.com/videojs/video.js/issues/9609)) ([6f56667](https://github.com/videojs/video.js/commit/6f566672ffd095301f9bcef9ecccdbdc1ebe536f))
+* **mixcloud-audio:** add the Mixcloud audio provider ([#9649](https://github.com/videojs/video.js/issues/9649)) ([f1b1354](https://github.com/videojs/video.js/commit/f1b135497252fa5b276688bfe9dfec403f77345b))
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+* SoundCloud Audio provider ([#9524](https://github.com/videojs/video.js/issues/9524)) ([fdeaafa](https://github.com/videojs/video.js/commit/fdeaafa85855c5b65782aa2afe6b320ddec6bc92))
+
+
+### Bug Fixes
+
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/media@10.1.0...@videojs/media@10.2.0) (2026-10-22)
 
 

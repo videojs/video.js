@@ -1,5 +1,19 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/element@10.2.0...@videojs/element@10.3.0) (2026-10-30)
+
+
+### Bug Fixes
+
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/element@10.1.0...@videojs/element@10.2.0) (2026-10-22)
 
 

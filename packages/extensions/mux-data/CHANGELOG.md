@@ -1,5 +1,28 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.2.0...@videojs/mux-data@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+
+
+### Bug Fixes
+
+* **hlsjs-video:** update hls.js to 1.7.3 ([#9645](https://github.com/videojs/video.js/issues/9645)) ([8989194](https://github.com/videojs/video.js/commit/898919402859e267bae935c1c77baf8c949a85ff))
+* **mux-data:** keep new metadata off the outgoing view on a video change ([#9656](https://github.com/videojs/video.js/issues/9656)) ([fda32bc](https://github.com/videojs/video.js/commit/fda32bcd97fd9ab3af3126298ff2c961474a83d9))
+* **mux-data:** monitor the HLS background video ([#9581](https://github.com/videojs/video.js/issues/9581)) ([c15ea19](https://github.com/videojs/video.js/commit/c15ea192787971c5a3e5f3dafe30302041cd5ccc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/core bumped to 10.3.0
+    * @videojs/media bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/mux-data@10.1.0...@videojs/mux-data@10.2.0) (2026-10-22)
 
 
