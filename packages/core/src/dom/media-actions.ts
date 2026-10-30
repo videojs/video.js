@@ -95,10 +95,16 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     if (!rate) return;
 
     const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx < 0 || idx >= playbackRates.length - 1 ? 0 : idx + 1;
+    if (playbackRates.length === 0) return;
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    // A rate outside the list (set in code or by the browser) steps to its nearest neighbor, as the rate button does.
+    const idx = playbackRates.indexOf(playbackRate);
+    const next =
+      idx === -1
+        ? (playbackRates.find((r) => r > playbackRate) ?? playbackRates[0]!)
+        : playbackRates[(idx + 1) % playbackRates.length]!;
+
+    rate.setPlaybackRate(next);
   },
 
   speedDown({ store }) {
@@ -106,9 +112,14 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     if (!rate) return;
 
     const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx <= 0 ? playbackRates.length - 1 : idx - 1;
+    if (playbackRates.length === 0) return;
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    const idx = playbackRates.indexOf(playbackRate);
+    const next =
+      idx === -1
+        ? (playbackRates.filter((r) => r < playbackRate).at(-1) ?? playbackRates.at(-1)!)
+        : playbackRates[(idx - 1 + playbackRates.length) % playbackRates.length]!;
+
+    rate.setPlaybackRate(next);
   },
 };
