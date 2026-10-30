@@ -1,7 +1,6 @@
 ---
 title: Text cues
 description: Cues and active cues from metadata, chapters, and app text tracks
-stability: unstable
 ---
 
 import FeatureImports from "@/components/docs/api-reference/FeatureImports.astro";
@@ -65,7 +64,7 @@ class CueCount extends UIElement {
 
 A cue is active from its `startTime` up to its `endTime`. A cue whose `endTime` equals its `startTime` is a point, and stays active for one second from where it sits, so a seek that lands far past a point never activates it. The rule is the same for tracks from the media and from the app. The one exception is a chapters track the app added: a chapter without an `endTime` runs to the next chapter, and the last one to the end of the media.
 
-Active cues follow the media's `currentTime` through `timeupdate` and `seeked` events, and a media track's `cuechange` events. They aren't frame-accurate.
+Active cues follow the media's `currentTime` through `timeupdate` and `seeked` events, and a media track's `cuechange` events. They aren't frame-accurate. Updates come a few times a second, so fast playback can move past a point, or a short cue, between two of them. A cue that started since the last update counts as active for that update even when it's already over, so playback never skips one. A seek doesn't: the cues it jumps over stay inactive.
 
 Cues delivered with a stream can be open-ended. Cue ends are clamped to the media duration once it's finite.
 
@@ -73,15 +72,17 @@ Cues delivered with a stream can be open-ended. Cue ends are clamped to the medi
 
 A cue's `value` comes from the first of these that applies:
 
-1. The cue's own `value`. A `DataCue`, such as the ones Safari's native HLS creates for in-band metadata, carries one, and so do the cues hls.js creates for ID3 and `EXT-X-DATERANGE` metadata. Its `type` says what `value` holds, such as `org.id3`.
+1. The cue's own `value`. A `DataCue`, such as the ones Safari's native HLS creates for in-band metadata, carries one, and so do the cues hls.js creates for ID3 and `EXT-X-DATERANGE` metadata. Its `type` says what `value` holds, such as `org.id3`. A type names the shape of `value`, not where it came from, so ID3 carried in an `emsg` box is `org.id3` too.
 2. On a `metadata` track, cue text that parses as a JSON object or array.
 3. Otherwise, the cue has no `value`. Its text is always in `text`.
 
 App cues keep the `value` and `type` they were added with.
 
+A media publishes cues on its text tracks in the platform's shapes. A `VTTCueLike` carries `text`, like the platform's `VTTCue`. A `DataCueLike` carries a `value` and, when known, its `type`, like the platform's `DataCue`. A `TextCueLike` is either one, and a single cue can be both, as the cues hls.js creates are. A custom media writes its cues in these shapes.
+
 ## App tracks
 
-`addTextTrack()` and `removeTextTrack()` come from the <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink>, and are described here while they're experimental. `addTextTrack()` adds a track to the player rather than to the media, so it works with any media, including embeds without text tracks of their own. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and its content, or one object describing both, and returns a handle to the track.
+`addTextTrack()` and `removeTextTrack()` come from the <DocsLink slug="reference/api/feature-text-tracks">text track feature</DocsLink>, and are described here. `addTextTrack()` adds a track to the player rather than to the media, so it works with any media, including embeds without text tracks of their own. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and its content, or one object describing both, and returns a handle to the track.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -141,7 +142,7 @@ Like a `<track>` element, an app track stays until it's removed, through source 
 
 App tracks start `hidden`. Browsers never draw `metadata` or `chapters` cues. An app `captions` or `subtitles` track is copied into the media, so the browser draws its cues when the track is selected, including in iOS fullscreen where the player's UI isn't shown, and the captions menu lists it. The track takes its copy's mode, so it's `disabled` until it's selected and `showing` while it is.
 
-When the media has no chapters track, the text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> can show its chapters.
+When the media has no chapters track, the text track feature's `chaptersCues` reads the first chapters track the app added, so the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> can show its chapters. In the same way, when the media has no thumbnails track, `thumbnailsTrack` reads the first `metadata` track the app added with the label `thumbnails`, such as a storyboard file. Image URLs in its cues resolve against its `src`, as they do for a `<track>` element.
 
 ## Exports
 
@@ -149,6 +150,9 @@ When the media has no chapters track, the text track feature's `chaptersCues` re
 | --- | --- |
 | `MediaTrackCues` | One `textCues` entry: a `track`, its `cues`, and its `activeCues`. |
 | `MediaTextCue` | A cue as plain data. Its type parameter types `value`. |
+| `TextCueLike` | A cue on a media's text track: a `VTTCueLike`, a `DataCueLike`, or both. |
+| `VTTCueLike` | A media cue that carries `text`, like the platform's `VTTCue`. |
+| `DataCueLike` | A media cue that carries a `value` and its `type`, like the platform's `DataCue`. |
 | `TextTrackFilter` | Picks tracks by `kind`, `label`, or `language`, or with a function. Each given field must match, and a list of kinds matches any kind in it. |
 | `TextTrackSource` | Where a track came from: `'media'` or `'app'`. |
 | `AddTextTrack` | The type of `addTextTrack()`. |
@@ -157,6 +161,6 @@ When the media has no chapters track, the text track feature's `chaptersCues` re
 | `TextCueInit` | A cue an app adds. |
 | `TextCueFormat` | A function that reads a file's text into cues. |
 | `TextCueFormatResult` | What a `TextCueFormat` returns: an array of cues, or an object with a `cues` array. |
-| `AppTextTrack` | The handle `addTextTrack()` returns. |
+| `TextTrackHandle` | The handle `addTextTrack()` returns. |
 | `InferCueValue` | The `value` type of a cue type. |
 | `MediaTextCuesState` | The state this feature adds to the store. |
