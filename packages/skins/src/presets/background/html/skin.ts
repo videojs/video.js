@@ -1,4 +1,4 @@
-import { ReactiveElement } from '@videojs/element';
+import { DestroyMixin, ReactiveElement } from '@videojs/element';
 import { ensureGlobalStyle } from '@videojs/utils/dom';
 
 import styles from '../../define/background/skin.css?inline';
@@ -15,7 +15,7 @@ function getTemplateHTML() {
   `;
 }
 
-export class BackgroundVideoSkinElement extends ReactiveElement {
+export class BackgroundVideoSkinElement extends DestroyMixin(ReactiveElement) {
   static readonly tagName = 'background-video-skin';
   static shadowRootOptions: ShadowRootInit = { mode: 'open' };
   static getTemplateHTML = getTemplateHTML;

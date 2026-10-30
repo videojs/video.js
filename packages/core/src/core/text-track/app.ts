@@ -49,13 +49,13 @@ export interface TextTrackContent<Value = unknown> {
 export interface TextTrackInit<Value = unknown> extends TextTrackIdentity, TextTrackContent<Value> {}
 
 /**
- * A track an app added to the player. It belongs to the source playing when it was added, or the first one if there was
- * none yet, and is cleared when the source changes or the media is swapped.
+ * A handle to a track an app added to the player, for changing its cues and removing it. The track itself is listed in
+ * `textTrackList`. It stays through source changes and media swaps until the app removes it.
  */
-export interface AppTextTrack<Value = unknown> {
+export interface TextTrackHandle<Value = unknown> {
   /** The track's id in `textTrackList`. */
   readonly id: string;
-  /** Whether the track is gone, removed by the app or cleared with its source. */
+  /** Whether the app removed the track, with `remove()` or the store's `removeTextTrack()`. */
   readonly removed: boolean;
   addCue(cue: TextCueInit<Value>): void;
   removeCue(id: string): void;
@@ -77,7 +77,7 @@ export interface AddTextTrack {
   <Cue extends MediaTextCue>(
     track: TextTrackDefinition<Cue>,
     content?: TextTrackContent<InferCueValue<Cue>>
-  ): AppTextTrack<InferCueValue<Cue>>;
+  ): TextTrackHandle<InferCueValue<Cue>>;
   /**
    * Add a track from a plain description.
    *
@@ -85,7 +85,7 @@ export interface AddTextTrack {
    * const quiz = player.store.addTextTrack({ kind: 'metadata', label: 'quiz', cues });
    * ```
    */
-  <Value = unknown>(init: TextTrackInit<Value>): AppTextTrack<Value>;
+  <Value = unknown>(init: TextTrackInit<Value>): TextTrackHandle<Value>;
 }
 
 /**

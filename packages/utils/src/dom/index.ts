@@ -29,6 +29,7 @@ export {
   isInteractiveActivation,
   isInteractiveTarget,
 } from './interactive';
+export { isKeptAlive } from './keep-alive';
 export {
   type ChildMeasurement,
   type ElementOverflowMeasurement,
@@ -64,6 +65,7 @@ export {
 export { isMacOS } from './platform';
 export {
   getPositionedSide,
+  hideOpenPopovers,
   type PositionSide,
   type PositionSideOffsets,
   type PositionSideOptions,

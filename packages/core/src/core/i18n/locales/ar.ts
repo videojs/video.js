@@ -57,7 +57,7 @@ export default {
     unknown: 'الوسائط غير محملة، الوقت غير معلوم.',
   },
   playback: {
-    rate: 'سرعة التشغيل {rate}',
+    rate: 'سرعة التشغيل، {rate}',
   },
   volume: {
     mutedValue: '{percent}، مكتوم',

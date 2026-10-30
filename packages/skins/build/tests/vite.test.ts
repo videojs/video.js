@@ -149,8 +149,9 @@ describe('Skins Vite workflow', () => {
     expect(warnings).toContain('Recommendation:');
   }, 30_000);
 
-  it('serves every framework, Skin, and style combination', async () => {
-    for (const variant of variants) {
+  it.each(variants)(
+    'serves the $framework $skin Skin with $style',
+    async (variant) => {
       const url = skinUrl(variant);
       const result = await server.transformRequest(url);
       const { exportName: skinExport, theme, preset, stylesheet } = skinContracts[variant.skin];
@@ -179,8 +180,11 @@ describe('Skins Vite workflow', () => {
         expect(code, url).toContain(controlsStyle);
         expect(code.indexOf('/base.css'), url).toBeLessThan(code.indexOf(controlsStyle));
       } else expect(controls?.code, url).not.toContain('virtual:vjsc/css');
-    }
+    },
+    30_000
+  );
 
+  it('serves the HTML container', async () => {
     const htmlContainer = await server.transformRequest(htmlContainerUrl);
 
     expect(htmlContainer?.code).toContain('/src/define/ui/container.ts');

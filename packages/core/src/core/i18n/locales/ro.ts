@@ -57,7 +57,7 @@ export default {
     unknown: 'Fișierul media nu s-a încărcat, durată necunoscută.',
   },
   playback: {
-    rate: 'Rată de redare {rate}',
+    rate: 'Rată de redare, {rate}',
   },
   volume: {
     mutedValue: '{percent}, sunet dezactivat',

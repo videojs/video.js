@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { getPositionedSide } from '../popover';
+import { getPositionedSide, hideOpenPopovers } from '../popover';
 
 function makeDOMRect(x: number, y: number, width: number, height: number): DOMRect {
   return {
@@ -70,5 +70,48 @@ describe('getPositionedSide', () => {
         boundaryOffset: 4,
       })
     ).toBe('bottom');
+  });
+});
+
+describe('hideOpenPopovers', () => {
+  function createPopover(open: boolean) {
+    const el = document.createElement('div');
+    const hidePopover = vi.fn();
+
+    Object.defineProperty(el, 'hidePopover', { value: hidePopover });
+    vi.spyOn(el, 'matches').mockImplementation((selector) => open && selector === ':popover-open');
+
+    return { el, hidePopover };
+  }
+
+  it('hides open popovers in the light DOM and nested shadow roots', () => {
+    const root = document.createElement('div');
+    const shadowRoot = root.attachShadow({ mode: 'open' });
+    const host = document.createElement('div');
+    const nestedShadowRoot = host.attachShadow({ mode: 'open' });
+    const light = createPopover(true);
+    const shadow = createPopover(true);
+    const nested = createPopover(true);
+
+    root.append(light.el);
+    shadowRoot.append(shadow.el, host);
+    nestedShadowRoot.append(nested.el);
+
+    hideOpenPopovers(root);
+
+    expect(light.hidePopover).toHaveBeenCalledOnce();
+    expect(shadow.hidePopover).toHaveBeenCalledOnce();
+    expect(nested.hidePopover).toHaveBeenCalledOnce();
+  });
+
+  it('leaves closed popovers alone', () => {
+    const root = document.createElement('div');
+    const closed = createPopover(false);
+
+    root.append(closed.el);
+
+    hideOpenPopovers(root);
+
+    expect(closed.hidePopover).not.toHaveBeenCalled();
   });
 });

@@ -57,7 +57,7 @@ export default {
     unknown: 'Meedium pole laaditud, aeg teadmata.',
   },
   playback: {
-    rate: 'Taasesituse kiirus {rate}',
+    rate: 'Taasesituse kiirus, {rate}',
   },
   volume: {
     mutedValue: '{percent}, vaigistatud',

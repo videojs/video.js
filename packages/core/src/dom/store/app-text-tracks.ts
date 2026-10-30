@@ -13,6 +13,8 @@ export interface AppTextTrackRecord {
   track: MediaTextTrack;
   /** Ordered by start time. */
   cues: MediaTextCue[];
+  /** The file the track's cues come from, kept once they load so URLs in them can be resolved against it. */
+  src?: string | undefined;
   /** A file the track's cues still have to be loaded from. */
   load?: TextTrackLoad | undefined;
 }

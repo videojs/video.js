@@ -7,12 +7,20 @@ import { PlayerJsVideo } from '@videojs/react/media/playerjs-video';
 import { createRoot } from 'react-dom/client';
 
 function App() {
-  const { source } = useSandbox();
+  const { source, mediaProps } = useSandbox();
+  // Unlike the other embeds, `PlayerJsVideo` takes no `<video>`-style `autoPlay` alias.
+  const { autoPlay, ...playerJsProps } = mediaProps;
 
   return (
     <VideoPlayer>
       <VideoSkinComponent>
-        <PlayerJsVideo className="block h-full w-full" src={SOURCES[source].url ?? ''} playsInline />
+        <PlayerJsVideo
+          className="block h-full w-full"
+          src={SOURCES[source].url ?? ''}
+          autoplay={autoPlay}
+          {...playerJsProps}
+          playsInline
+        />
       </VideoSkinComponent>
     </VideoPlayer>
   );
