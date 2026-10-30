@@ -19,7 +19,7 @@ vi.mock(import('@videojs/utils/dom'), async (importOriginal) => {
 });
 
 const TRACK_ID = '1301WleyT98MSxVHPZCA6M';
-const EPISODE_URL = 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5';
+const EPISODE_URL = 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV';
 const OTHER_EPISODE_ID = '43cbJh4ccRD7lzM2730YK3';
 const OTHER_EPISODE_URL = `https://open.spotify.com/episode/${OTHER_EPISODE_ID}`;
 
@@ -81,7 +81,7 @@ describe('buildSpotifyIframeSrc', () => {
   it('embeds the video variant at its own path instead of as a parameter', () => {
     const src = buildSpotifyIframeSrc(EPISODE_URL, { source: { engine: { spotify: { preferVideo: true } } } });
 
-    expect(src).toBe('https://open.spotify.com/embed/episode/7makk4oTQel546B0PZlDM5/video');
+    expect(src).toBe('https://open.spotify.com/embed/episode/6I3ZzCxRhRkNqnQNo8AZPV/video');
   });
 
   it('keeps the iframe referrer policy out of the embed URL', () => {
@@ -94,6 +94,22 @@ describe('buildSpotifyIframeSrc', () => {
 
   it('returns empty string for invalid src', () => {
     expect(buildSpotifyIframeSrc('https://example.com/not-spotify')).toBe('');
+  });
+});
+
+describe('SpotifyAdapter preload', () => {
+  it('builds the embed under preload="none", since WebKit only plays one that was up before play', async () => {
+    const media = new SpotifyAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = TRACK_URL;
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toContain(`https://open.spotify.com/embed/track/${TRACK_ID}`);
+    await waitForEngine(media);
+    media.detach();
   });
 });
 
@@ -369,6 +385,58 @@ describe('SpotifyAdapter', () => {
     media.detach();
   });
 
+  it('resends a resume the placeholder drops, so the embed resolves the entity, as WebKit needs', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    await media.play();
+
+    // WebKit reports the placeholder as playing; the resume it received never reaches the entity.
+    controller.update({ isPaused: false, duration: 0 });
+    controller.update({ isPaused: false, isBuffering: true, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(2);
+    expect(media.paused).toBe(true);
+
+    controller.update({ isPaused: false, position: 500 });
+
+    expect(media.paused).toBe(false);
+    expect(media.currentTime).toBe(0.5);
+    media.detach();
+  });
+
+  it('resends nothing once the entity resolves or the listener pauses', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    await media.play();
+    controller.update({ isPaused: true });
+    controller.update({ isPaused: false, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(1);
+
+    await media.play();
+    media.pause();
+    controller.update({ isPaused: false, duration: 0 });
+    expect(controller.resume).toHaveBeenCalledTimes(2);
+    media.detach();
+  });
+
+  it('reports no duration until the embed resolves the entity', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const durationchange = vi.fn();
+
+    media.addEventListener('durationchange', durationchange);
+    controller.update({ isPaused: false, duration: 0 });
+
+    expect(media.duration).toBeNaN();
+    expect(durationchange).not.toHaveBeenCalled();
+
+    controller.update({ isPaused: false, duration: 60_000 });
+
+    expect(media.duration).toBe(60);
+    media.detach();
+  });
+
   it('starts playback on load when autoplay is set', async () => {
     const media = new SpotifyAdapter();
 
@@ -564,22 +632,24 @@ describe('SpotifyAdapter', () => {
     media.detach();
   });
 
-  it('does not end against a duration the embed has not resolved', async () => {
+  it('ignores the placeholder the embed reports before it resolves the entity', async () => {
     const media = new SpotifyAdapter();
     const { controller } = await attachAndLoad(media);
-    const ended = vi.fn();
+    const events: string[] = [];
 
-    media.addEventListener('ended', ended);
+    for (const type of ['play', 'playing', 'timeupdate', 'durationchange', 'ended'] as const) {
+      media.addEventListener(type, () => events.push(type));
+    }
 
-    // An update that carries no duration at all, then one that reports the entity
-    // as still being worked out. Every position is at or past both.
+    // An update that carries no duration at all, then one that reports the entity as still being worked out. WebKit
+    // reports them as playing while nothing plays, and every position is at or past both durations.
     controller.update({ isPaused: false, position: 0, duration: Number.NaN });
     controller.update({ isPaused: false, position: 1_000, duration: Number.NaN });
     controller.update({ isPaused: false, position: 2_000, duration: 0 });
 
-    expect(ended).not.toHaveBeenCalled();
-    expect(media.ended).toBe(false);
-    expect(media.paused).toBe(false);
+    expect(events).toEqual([]);
+    expect(media.paused).toBe(true);
+    expect(media.duration).toBeNaN();
     media.detach();
   });
 
@@ -602,7 +672,7 @@ describe('SpotifyAdapter', () => {
     media.src = EPISODE_URL;
     await Promise.resolve();
 
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
 
     // The first playback update after a reload completes the load.
     const loadCompleteSpy = vi.fn();
@@ -622,7 +692,7 @@ describe('SpotifyAdapter', () => {
 
     // `loadUri` names the entity and nothing else, so the start position it
     // carried is the host's to apply.
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
     expect(media.currentTime).toBe(30);
 
     // The first update after the reload completes the load the seek waits on.
@@ -668,7 +738,7 @@ describe('SpotifyAdapter', () => {
     // The deferred load replays once the controller is ready.
     controller.ready();
     await Promise.resolve();
-    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:7makk4oTQel546B0PZlDM5');
+    expect(controller.loadUri).toHaveBeenCalledWith('spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV');
     media.detach();
   });
 
@@ -712,6 +782,59 @@ describe('SpotifyAdapter', () => {
     expect(media.error?.code).toBe(MediaError.MEDIA_ERR_NETWORK);
     // Nothing may be left waiting on an embed that is never coming.
     await expect(media.play()).resolves.toBeUndefined();
+    media.detach();
+  });
+
+  it('reports a failed playback as an error and ignores the snapshots that claim it ran to the end', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const events: string[] = [];
+
+    for (const type of ['play', 'playing', 'waiting', 'pause', 'ended', 'error'] as const) {
+      media.addEventListener(type, () => events.push(type));
+    }
+
+    controller.update({ isPaused: true, duration: 2_152_056 });
+    void media.play();
+    await Promise.resolve();
+    controller.error();
+    // What the embed reports after the failure: under way, then stalled, at the end of an entity it never played.
+    controller.update({ isPaused: false, duration: 2_152_056, position: 2_152_056 });
+    controller.update({ isPaused: false, isBuffering: true, duration: 2_152_056, position: 2_152_056 });
+
+    expect(events).toEqual(['error']);
+    expect(media.error?.code).toBe(MediaError.MEDIA_ERR_DECODE);
+    expect(media.paused).toBe(true);
+    expect(media.ended).toBe(false);
+    expect(media.currentTime).toBe(0);
+    media.detach();
+  });
+
+  it('pauses a run the embed reports failed', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+    const pauseSpy = vi.fn();
+
+    controller.update({ isPaused: false });
+    media.addEventListener('pause', pauseSpy);
+    controller.error();
+
+    expect(pauseSpy).toHaveBeenCalledTimes(1);
+    expect(media.paused).toBe(true);
+    media.detach();
+  });
+
+  it('follows the embed again once the listener retries a failed playback', async () => {
+    const media = new SpotifyAdapter();
+    const { controller } = await attachAndLoad(media);
+
+    controller.update({ isPaused: true });
+    controller.error();
+    await media.play();
+    controller.update({ isPaused: false, position: 1_000 });
+
+    expect(media.paused).toBe(false);
+    expect(media.currentTime).toBe(1);
     media.detach();
   });
 
@@ -913,7 +1036,7 @@ describe('SpotifyAdapter source', () => {
     await Promise.resolve();
 
     // The video variant lives at its own path rather than in a parameter.
-    expect(iframe.getAttribute('src')).toContain('/embed/episode/7makk4oTQel546B0PZlDM5/video');
+    expect(iframe.getAttribute('src')).toContain('/embed/episode/6I3ZzCxRhRkNqnQNo8AZPV/video');
     media.detach();
   });
 

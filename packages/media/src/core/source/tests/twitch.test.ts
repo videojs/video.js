@@ -49,8 +49,38 @@ describe('parseTwitchSource', () => {
     expect(parseTwitchSource(`${CHANNEL_SRC}/`)).toEqual({ kind: 'channel', id: null, channel: 'twitchpresents' });
   });
 
+  it('parses a VOD embed URL, with or without the v prefix', () => {
+    const vod = { kind: 'video', id: '106400740', channel: null };
+
+    expect(parseTwitchSource('https://player.twitch.tv/?video=v106400740&parent=example.com')).toEqual(vod);
+    expect(parseTwitchSource('https://player.twitch.tv/?parent=example.com&video=106400740')).toEqual(vod);
+    expect(parseTwitchSource('player.twitch.tv/?video=v106400740')).toEqual(vod);
+  });
+
+  it('parses a channel embed URL', () => {
+    expect(parseTwitchSource('https://player.twitch.tv/?channel=monstercat&parent=example.com')).toEqual({
+      kind: 'channel',
+      id: null,
+      channel: 'monstercat',
+    });
+  });
+
+  it('accepts the v prefix in a video query URL', () => {
+    expect(parseTwitchVideoId('https://www.twitch.tv/?video=v123456789')).toBe('123456789');
+  });
+
+  it('returns null for an embed URL without a video or channel', () => {
+    expect(parseTwitchSource('https://player.twitch.tv/?parent=example.com')).toBe(null);
+    expect(parseTwitchSource('https://player.twitch.tv/?collection=abc123')).toBe(null);
+  });
+
+  it("returns null for an embed parameter in another parameter's value", () => {
+    expect(parseTwitchSource('https://player.twitch.tv/?parent=x.com%26video%3D123')).toBe(null);
+  });
+
   it('returns null for a clip URL rather than reading the slug as a channel', () => {
     expect(parseTwitchSource('https://clips.twitch.tv/AwkwardHelplessSalamanderSwiftRage')).toBe(null);
+    expect(parseTwitchSource('https://clips.twitch.tv/?channel=monstercat')).toBe(null);
   });
 
   it('returns null for a non-Twitch URL', () => {

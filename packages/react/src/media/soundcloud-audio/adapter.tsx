@@ -1,6 +1,11 @@
 'use client';
 
-import { buildSoundCloudIframeSrc, SoundCloudAdapter, type SoundCloudAdapterProps } from '@videojs/soundcloud-audio';
+import {
+  buildSoundCloudIframeSrc,
+  SoundCloudAdapter,
+  type SoundCloudAdapterProps,
+  shouldDeferSoundCloudWidget,
+} from '@videojs/soundcloud-audio';
 import { type CSSProperties, forwardRef, type IframeHTMLAttributes, type ReactNode, useState } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -28,8 +33,11 @@ export const SoundCloudAudio = forwardRef<HTMLIFrameElement, SoundCloudAudioProp
   const media = useMediaInstance(SoundCloudAdapter);
   const props: Partial<SoundCloudAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
-    // `source.src` is the only other way to name a sound, so honor it when `src` is absent.
-    buildSoundCloudIframeSrc(props.src || props.source?.src || '', props)
+    // A deferred widget renders an empty frame; the media loads it when playback is requested.
+    shouldDeferSoundCloudWidget(props)
+      ? ''
+      : // `source.src` is the only other way to name a sound, so honor it when `src` is absent.
+        buildSoundCloudIframeSrc(props.src || props.source?.src || '', props)
   );
   const { ref: eventsRef, props: elementProps } = useMediaEvents(
     useSyncProps<SoundCloudAdapterProps, Record<string, unknown>>(media, props, SoundCloudAdapter.defaultProps),

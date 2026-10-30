@@ -104,6 +104,23 @@ export function buildSoundCloudWidgetUrl(
 }
 
 /**
+ * Whether the widget stays unloaded until playback is requested. Under `preload="none"` nothing is fetched from
+ * SoundCloud, so the page makes no third-party request before the listener asks to play. `autoplay`, or the widget's
+ * own `auto_play` parameter, asks to play now, and `controls` makes the widget's play button the way to ask, so any of
+ * them loads the widget regardless.
+ *
+ * @internal
+ */
+export function shouldDeferSoundCloudWidget(
+  props: Partial<Pick<SoundCloudAdapterProps, 'src' | 'source' | 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  if (props.preload !== 'none' || props.autoplay || props.controls) return false;
+
+  // `source.src` is the only other way to name a sound, so honor it when `src` is absent.
+  return !wantsSoundCloudAutoplay(parseSoundCloudSource(props.src || props.source?.src || ''), props.source);
+}
+
+/**
  * Whether the source asks to autoplay through the widget's own `auto_play` parameter.
  *
  * @internal

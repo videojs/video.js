@@ -9,6 +9,7 @@ describe('resolveAdapterType', () => {
     ['youtu.be/aqz-KE-bpKQ', 'youtube'],
     ['https://m.youtube.com/shorts/aqz-KE-bpKQ', 'youtube'],
     ['https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ', 'youtube'],
+    ['https://music.youtube.com/watch?v=oUFJJNQGwhk', 'youtube'],
     ['https://www.youtube.com/playlist?list=PLv3TTBr1W_9tppikBxAE', 'youtube'],
     ['https://vimeo.com/76979871', 'vimeo'],
     ['https://player.vimeo.com/video/76979871?h=8272103f6e', 'vimeo'],
@@ -19,7 +20,7 @@ describe('resolveAdapterType', () => {
     ['https://customer-abc123.cloudflarestream.com/5d5bc37ffcf54c9b82e996823bffbb81/manifest/video.m3u8', 'cloudflare'],
     ['https://watch.videodelivery.net/5d5bc37ffcf54c9b82e996823bffbb81', 'cloudflare'],
     ['https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M', 'spotify'],
-    ['spotify:episode:7makk4oTQel546B0PZlDM5', 'spotify'],
+    ['spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV', 'spotify'],
     ['https://soundcloud.com/forss/flickermood', 'soundcloud'],
     ['https://soundcloud.com/forss/sets/soulhack', 'soundcloud'],
     ['https://api.soundcloud.com/tracks/293', 'soundcloud'],
@@ -30,6 +31,10 @@ describe('resolveAdapterType', () => {
     ['https://www.tiktok.com/@scout2015/video/6718335390845095173', 'tiktok'],
     ['https://www.twitch.tv/videos/2175470236', 'twitch'],
     ['https://www.twitch.tv/monstercat', 'twitch'],
+    ['https://player.twitch.tv/?video=v106400740&parent=example.com', 'twitch'],
+    ['https://player.twitch.tv/?channel=monstercat&parent=example.com', 'twitch'],
+    ['https://streamable.com/e/moo?playerjs', 'playerjs'],
+    ['https://embed.example.com/e/moo?autoplay=1&playerjs=1', 'playerjs'],
   ])('resolves the service URL %s to %s', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
@@ -74,6 +79,11 @@ describe('resolveAdapterType', () => {
     expect(resolveAdapterType('https://example.com/manifest', 'audio/mpegurl; charset=utf-8')).toBe('hls');
   });
 
+  it('prefers a player.js marker over the host and the file extension', () => {
+    expect(resolveAdapterType('https://player.vimeo.com/video/76979871?playerjs')).toBe('playerjs');
+    expect(resolveAdapterType('https://embed.example.com/player.mp4?playerjs')).toBe('playerjs');
+  });
+
   it('prefers the service adapter type over the MIME type', () => {
     expect(
       resolveAdapterType(
@@ -95,16 +105,21 @@ describe('resolveAdapterType', () => {
     ['a bare Mux playback id', 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
     ['a malformed shorthand', 'youtube/not-an-id'],
     ['a Mux player page', 'https://player.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M'],
+    ['a player.js embed without the marker', 'https://streamable.com/e/moo'],
+    ['a player.js marker in the hash', 'https://streamable.com/e/moo#playerjs'],
     ['an unknown file type', 'https://example.com/file.bin'],
     ['a YouTube page without a video', 'https://www.youtube.com/'],
     ['a Vimeo page without a video', 'https://vimeo.com/'],
     ['a TikTok short link', 'https://vm.tiktok.com/ZMabc123/'],
     ['a Twitch clip', 'https://clips.twitch.tv/SomeClipSlug'],
+    ['a Twitch embed without a video or channel', 'https://player.twitch.tv/?parent=example.com'],
     ['a SoundCloud profile', 'https://soundcloud.com/forss'],
     ['a SoundCloud short link', 'https://on.soundcloud.com/9zRpu'],
     ['a Mixcloud profile', 'https://www.mixcloud.com/spartacus/'],
     ['a Mixcloud playlist', 'https://www.mixcloud.com/spartacus/playlists/cinematic/'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
+    ['a service domain in the path', 'https://example.com/fast.wistia.net/embed/iframe/e4a27b971d'],
+    ['a lookalike host', 'https://youtube.com.example.com/watch?v=aqz-KE-bpKQ'],
   ])('returns null for %s', (_, src) => {
     expect(resolveAdapterType(src)).toBe(null);
   });
@@ -133,6 +148,9 @@ describe('resolveMimeType', () => {
     ['a URL without an extension', 'https://example.com/manifest'],
     ['an extension only in the query string', 'https://example.com/play?file=video.mp4'],
     ['an unknown file type', 'https://example.com/file.bin'],
+    ['an extension in a directory name', 'https://example.com/videos.mp4/manifest'],
+    ['an extension named like an object property', 'https://example.com/file.constructor'],
+    ['an extension named __proto__', 'https://example.com/file.__proto__'],
   ])('returns null for %s', (_, src) => {
     expect(resolveMimeType(src)).toBe(null);
   });

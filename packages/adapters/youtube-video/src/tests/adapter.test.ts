@@ -1117,6 +1117,125 @@ describe('YouTubeAdapter', () => {
   });
 });
 
+describe('YouTubeAdapter preload', () => {
+  it('builds no embed and creates no player under preload="none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = 'aqz-KE-bpKQ';
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(media.engine).toBe(null);
+    expect(MockPlayer.instances.length).toBe(0);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once the player is ready', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    // Told to play in its URL, so YouTube starts as it loads rather than once the iframe API takes `playVideo()`.
+    expect(new URL(iframe.getAttribute('src')!).searchParams.get('autoplay')).toBe('1');
+    expect(player.playVideo).not.toHaveBeenCalled();
+
+    player.ready();
+    await pending;
+
+    expect(player.playVideo).toHaveBeenCalled();
+    expect(MockPlayer.instances.length).toBe(1);
+    media.detach();
+  });
+
+  it('rebuilds the embed for new player parameters without the autoplay a play() wrote', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.source = { src: 'aqz-KE-bpKQ', engine: { youtube: { start: 10 } } };
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    player.ready();
+    await pending;
+
+    media.source = { src: 'dQw4w9WgXcQ' };
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/dQw4w9WgXcQ');
+    expect(new URL(iframe.getAttribute('src')!).searchParams.get('autoplay')).not.toBe('1');
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain('preload=metadata');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when controls are shown', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    // YouTube's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = 'aqz-KE-bpKQ';
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain('https://www.youtube.com/embed/aqz-KE-bpKQ');
+    await waitForEngine(media);
+    media.detach();
+  });
+});
+
 describe('YouTubeAdapter source', () => {
   it('derives src from a structured source and announces the change', async () => {
     const media = new YouTubeAdapter();

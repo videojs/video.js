@@ -13,6 +13,7 @@ import {
   type ParsedMixcloudSource,
   parseMixcloudSource,
   resolveMixcloudWidgetParams,
+  shouldDeferMixcloudWidget,
   wantsMixcloudAutoplay,
 } from './source';
 import {
@@ -45,6 +46,7 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   };
 
   static PLAYER_SOFTWARE_NAME = 'mixcloud-audio';
+  static readonly engineName: string = 'mixcloud';
 
   #target: HTMLIFrameElement | null = null;
   // Cancels the `message` and frame `load` listeners; the first lives on `window`, so nothing removes it with the frame.
@@ -55,6 +57,8 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #loadId = 0;
   // An iframe URL rendered before the host had a source, which the first load keeps instead of reloading.
   #adoptedSrc: string | null = null;
+  // Playback was requested, so a `preload="none"` widget may be loaded.
+  #activated = false;
 
   #src = MixcloudAdapter.defaultProps.src;
   #autoplay = MixcloudAdapter.defaultProps.autoplay;
@@ -138,6 +142,7 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#target = null;
     this.#adoptedSrc = null;
     this.#playRequested = false;
+    this.#activated = false;
     this.#resetState();
   }
 
@@ -199,6 +204,14 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#resetState();
     // `emptied` announces that reset before the bails below, where the widget reports nothing further.
     this.dispatchEvent(new Event('emptied'));
+
+    // A dormant widget is loaded by `play()`. One left from an earlier source would keep playing what the host no longer
+    // tracks.
+    if (this.#isDormant()) {
+      target.removeAttribute('src');
+      return;
+    }
+
     this.#loadWidget(target);
   }
 
@@ -217,6 +230,12 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   /** Asks the widget to play. Browsers may refuse it without a gesture, and then the widget reports nothing. */
   async play() {
     if (!this.#src || this.#error) return;
+
+    // Like a native media under `preload="none"`, playing is what starts the load.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      this.#wake();
+    }
 
     if (!this.#ready) {
       this.#playRequested = true;
@@ -302,7 +321,11 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -327,7 +350,11 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -341,7 +368,11 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -398,7 +429,8 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     const rendered = target.getAttribute('src');
 
     if (!rendered) {
-      if (this.#src) this.#loadWidget(target);
+      // A dormant widget is loaded by `play()`.
+      if (this.#src && !this.#isDormant()) this.#loadWidget(target);
 
       return;
     }
@@ -409,6 +441,29 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#adoptedSrc = rendered;
 
     if (this.#src) void this.load();
+  }
+
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferMixcloudWidget({
+        src: this.#src,
+        source: this.#source,
+        preload: this.#preload,
+        autoplay: this.#autoplay,
+        controls: this.#controls,
+      })
+    );
+  }
+
+  // Load a widget that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || !this.#src || this.#isDormant() || target.getAttribute('src')) return;
+
+    // The widget is loaded from the current source, so a load still waiting on its microtask has nothing left to do.
+    this.#loadId++;
+    this.#loadWidget(target);
   }
 
   #loadWidget(target: HTMLIFrameElement) {

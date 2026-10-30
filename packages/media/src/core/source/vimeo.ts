@@ -32,10 +32,10 @@ export function parseVimeoSource(src: string): ParsedVimeoSource | null {
 
   if (/^\d+$/.test(src)) return { id: Number(src), kind: 'video', hash: null };
 
-  const shorthand = SHORTHAND_SRC.exec(src);
+  const shorthand = VIMEO_SHORTHAND_SRC.exec(src);
   if (shorthand) return { id: Number(shorthand[1]), kind: 'video', hash: shorthand[2] ?? null };
 
-  const match = MATCH_SRC.exec(src);
+  const match = VIMEO_VIDEO_SRC.exec(src);
   if (!match) return null;
 
   const kind = match[1] === 'event/' ? 'event' : 'video';
@@ -50,5 +50,5 @@ export function parseVimeoSource(src: string): ParsedVimeoSource | null {
   return { id: Number(match[2]), kind, hash: queryHash ?? match[3] ?? null };
 }
 
-const SHORTHAND_SRC = /^vimeo\/(?:video\/)?(\d+)(?:(?:\?hash=|\?h=|\/)([\w-]+))?$/;
-const MATCH_SRC = /vimeo\.com\/(video\/|event\/)?(\d+)(?:\/([\w-]+))?/;
+const VIMEO_SHORTHAND_SRC = /^vimeo\/(?:video\/)?(\d+)(?:(?:\?hash=|\?h=|\/)([\w-]+))?$/;
+const VIMEO_VIDEO_SRC = /vimeo\.com\/(video\/|event\/)?(\d+)(?:\/([\w-]+))?/;

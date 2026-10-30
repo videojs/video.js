@@ -77,6 +77,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #playerEventCleanups: (() => void)[] = [];
   // Barrier for the load in progress; its identity also tells a late response whether it still owns the load.
   #loadComplete = createPublicPromise<void>();
+  // Playback was requested, so a `preload="none"` embed may be built.
+  #activated = false;
+  // The frame's URL asks it to play, since `play()` is what built it. Vimeo then starts as it loads, rather than once
+  // the player API is up to take `play()`.
+  #embedPlays = false;
 
   #src = VimeoAdapter.defaultProps.src;
   #autoplay = VimeoAdapter.defaultProps.autoplay;
@@ -163,6 +168,8 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
     this.#player = null;
     this.#target = null;
+    this.#activated = false;
+    this.#embedPlays = false;
     this.#loadComplete.resolve();
     this.#resetState();
   }
@@ -227,7 +234,13 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     }
 
     this.dispatchEvent(new Event('loadstart'));
-    const loadOptions = toLoadVideoOptions(this.#src, this.#source?.engine?.vimeo);
+    // The autoplay a `play()` wrote into the embed URL was for the video it built, and the player keeps the parameters it
+    // was built with unless the load says otherwise.
+    const loadOptions = toLoadVideoOptions(
+      this.#src,
+      this.#source?.engine?.vimeo,
+      this.#embedPlays ? this.#autoplay : undefined
+    );
 
     // An unparsable src never reaches the player, so no `loaded` will ever settle this load.
     if (!loadOptions) {
@@ -255,6 +268,12 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
     // The `src` property resolves an empty attribute to the document URL, so only the attribute spots a placeholder.
     if (!target.getAttribute('src')) {
+      // A dormant embed is built by `play()`; until then no `loaded` is coming to settle this load.
+      if (this.#isDormant()) {
+        this.#loadComplete.resolve();
+        return false;
+      }
+
       const initialSrc = buildVimeoIframeSrc(this.#src, this.#snapshotProps());
 
       // No embed means no `loaded` is coming to settle this load.
@@ -294,6 +313,15 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 
   async play() {
+    // Like a native media under `preload="none"`, playing is what starts the load, and the embed it builds is told to play
+    // in its URL.
+    if (this.#isDormant()) {
+      this.#activated = true;
+      // A server-rendered frame already holds its URL.
+      this.#embedPlays = !this.#target?.getAttribute('src');
+      this.#wake();
+    }
+
     await this.#loadComplete;
     await this.#player?.play();
   }
@@ -350,7 +378,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     return this.#autoplay;
   }
   set autoplay(value) {
+    const wasDormant = this.#isDormant();
+
     this.#autoplay = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get defaultMuted() {
@@ -372,7 +404,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     return this.#controls;
   }
   set controls(value) {
+    const wasDormant = this.#isDormant();
+
     this.#controls = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get playsInline() {
@@ -386,7 +422,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     return this.#preload;
   }
   set preload(value) {
+    const wasDormant = this.#isDormant();
+
     this.#preload = value;
+
+    if (wasDormant) this.#wake();
   }
 
   get poster() {
@@ -512,6 +552,22 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     }, console.error);
   }
 
+  #isDormant() {
+    return (
+      !this.#activated &&
+      shouldDeferVimeoEmbed({ preload: this.#preload, autoplay: this.#autoplay, controls: this.#controls })
+    );
+  }
+
+  // Build an embed that was held back by `preload="none"`, once nothing holds it back any more.
+  #wake() {
+    const target = this.#target;
+    if (!target || this.#isDormant() || this.#player || target.getAttribute('src')) return;
+
+    this.#beginLoad();
+    this.#createPlayer();
+  }
+
   // Defer a player call until the load settles, swallowing rejections.
   #afterLoad(fn: (player: VimeoPlayer) => Promise<unknown>) {
     this.#loadComplete.then(
@@ -522,13 +578,14 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
   #snapshotProps() {
     return {
-      autoplay: this.#autoplay,
+      autoplay: this.#autoplay || this.#embedPlays,
       // The embed reads mute once, from its URL, and either property says to start muted.
       defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
-      preload: this.#preload || VimeoAdapter.defaultProps.preload,
+      // Playing overrides `preload`, so an embed built for it must not wait to load.
+      preload: this.#activated ? 'auto' : this.#preload || VimeoAdapter.defaultProps.preload,
       source: this.#source,
     };
   }
@@ -712,6 +769,19 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 }
 
 /**
+ * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from Vimeo, so
+ * the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now, and `controls`
+ * makes Vimeo's own play button the way to ask, so either builds the embed regardless.
+ *
+ * @internal
+ */
+export function shouldDeferVimeoEmbed(
+  props: Partial<Pick<VimeoAdapterProps, 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  return props.preload === 'none' && !props.autoplay && !props.controls;
+}
+
+/**
  * Build the iframe `src` URL for an initial Vimeo embed from the given props.
  *
  * @internal
@@ -751,12 +821,12 @@ const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;
 const READY_STATE_HAVE_FUTURE_DATA = 3;
 
-function toLoadVideoOptions(src: string, vimeo?: VimeoEngineConfig) {
+function toLoadVideoOptions(src: string, vimeo?: VimeoEngineConfig, autoplay?: boolean) {
   const parsed = parseVimeoSource(src);
   if (!parsed) return null;
 
   const base = parsed.kind === 'event' ? `${EMBED_EVENT_BASE}/${parsed.id}/embed` : `${EMBED_VIDEO_BASE}/${parsed.id}`;
   const url = `${base}${parsed.hash ? `?h=${parsed.hash}` : ''}` as VimeoUrl;
 
-  return { url, ...vimeo } as LoadVideoOptions;
+  return { url, ...(autoplay !== undefined && { autoplay }), ...vimeo } as LoadVideoOptions;
 }

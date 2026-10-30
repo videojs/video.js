@@ -11,6 +11,7 @@ import { isNumber } from '@videojs/utils/predicate';
 import {
   loadSpotifyIframeApi,
   type SpotifyControllerApi,
+  type SpotifyEmbedError,
   type SpotifyIframeApi,
   type SpotifyPlaybackState,
 } from './iframe-api';
@@ -67,8 +68,12 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #waiting = false;
   // A pause was asked for, so the paused update it produces is not a stall.
   #pauseRequested = false;
+  // A resume was sent before the embed resolved the entity; see `#skipPlaceholder`.
+  #resumeBeforeResolve = false;
   // The entity ran out; kept so the end of playback is acted on exactly once.
   #closeToEnded = false;
+  // The embed reported a playback failure; see `#onEmbedError`.
+  #playbackFailed = false;
 
   /** Engine this media plays through, reported to analytics such as Mux Data. */
   static readonly engineName: string = 'spotify';
@@ -237,12 +242,15 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (!this.#src) return;
 
     // `resume()` picks playback up where it stopped; `play()` would restart the entity.
+    this.#playbackFailed = false;
+    this.#resumeBeforeResolve = true;
     this.#controller?.resume();
   }
 
   pause() {
     // A stall reads as paused too, so a requested pause has to be remembered or its update looks like more buffering.
     this.#pauseRequested = true;
+    this.#resumeBeforeResolve = false;
     this.#controller?.pause();
   }
 
@@ -253,8 +261,9 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     if (this.#currentTime === value) return;
 
     this.#seeking = true;
-    // Seeking starts a fresh run, so whatever ran out before it is behind us.
+    // Seeking starts a fresh run, so whatever ran out or failed before it is behind us.
     this.#closeToEnded = false;
+    this.#playbackFailed = false;
     this.#ended = false;
     // Report the requested position now: the embed only reports one about once a second.
     this.#currentTime = value;
@@ -460,7 +469,9 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#loaded = false;
     this.#waiting = false;
     this.#pauseRequested = false;
+    this.#resumeBeforeResolve = false;
     this.#closeToEnded = false;
+    this.#playbackFailed = false;
     this.#error = null;
   }
 
@@ -506,16 +517,46 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
 
       this.#onPlaybackUpdate(event.data);
     });
+
+    controller.addListener('error', (event) => {
+      if (this.#isStale(attachId)) return;
+
+      this.#onEmbedError(event.data);
+    });
+  }
+
+  // A failed playback is followed by snapshots claiming playback is under way at the end of the entity, though nothing
+  // plays; they are ignored until the listener tries again, so the failure reads as a pause rather than a run that ends.
+  #onEmbedError(data: SpotifyEmbedError) {
+    if (!this.#src) return;
+
+    this.#playbackFailed = true;
+    this.#resumeBeforeResolve = false;
+    this.#error = new MediaError(
+      data.message,
+      data.code === 'playback_error' ? MediaError.MEDIA_ERR_DECODE : MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+    );
+    this.dispatchEvent(new Event('error'));
+    // Unblock callers awaiting load so play() doesn't hang.
+    this.#loadComplete.resolve();
+
+    if (this.#paused) return;
+
+    this.#paused = true;
+    this.#waiting = false;
+    this.dispatchEvent(new Event('pause'));
   }
 
   // The embed reports state snapshots rather than events, so every dispatch is a diff between two of them; the early
   // returns keep it to at most one transition per update.
   #onPlaybackUpdate(data: SpotifyPlaybackState) {
     // The embed retains the old entity after clearing, so its snapshots no longer belong to a source.
-    if (!this.#src) return;
+    if (!this.#src || this.#playbackFailed) return;
 
     // Later loads (`loadUri`) never re-fire `ready`, so the first update completes the load.
     if (!this.#loaded) this.#onLoaded();
+
+    if (this.#skipPlaceholder(data)) return;
 
     if (this.#restartFromEnd(data)) return;
 
@@ -542,9 +583,27 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return true;
   }
 
+  // Until the embed resolves the entity it reports a placeholder with no duration, which says nothing about playback:
+  // WebKit even reports it playing. In WebKit a resume the placeholder receives, as one sent the moment a new embed is
+  // ready does, is dropped and the entity never resolves; sending it again has the embed resolve it.
+  #skipPlaceholder(data: SpotifyPlaybackState): boolean {
+    if (isResolved(data)) {
+      this.#resumeBeforeResolve = false;
+      return false;
+    }
+
+    if (this.#resumeBeforeResolve && !data.isBuffering) {
+      this.#resumeBeforeResolve = false;
+      tryCall(() => this.#controller?.resume());
+    }
+
+    return true;
+  }
+
   #syncDuration(duration: number) {
     const seconds = duration / 1000;
-    if (seconds === this.#duration) return;
+    // Until the embed resolves the entity it reports no duration; `0` would read as an entity with nothing to play.
+    if (!(seconds > 0) || seconds === this.#duration) return;
 
     // A different duration is a different entity, so whatever ended before is no longer what is playing.
     this.#closeToEnded = false;
@@ -647,6 +706,11 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.dispatchEvent(new Event('pause'));
     this.dispatchEvent(new Event('ended'));
   }
+}
+
+// Whether a snapshot is about the entity rather than the placeholder the embed reports while it resolves one.
+function isResolved(data: SpotifyPlaybackState): boolean {
+  return data.duration > 0;
 }
 
 // A node for `createController` to consume instead of the embed; never inserted, so the swap it performs on its target

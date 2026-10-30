@@ -550,8 +550,6 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
       defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,
-      // Read only to decide on a bootstrap autoplay; TikTok has no preload parameter.
-      preload: this.#preload,
       source: this.#source,
     };
   }

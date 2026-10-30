@@ -26,6 +26,16 @@ describe('MixcloudAudio', () => {
     expect(template).toMatch(/:host\s*\{[^}]*height:\s*120px/);
   });
 
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    expect(MixcloudAudio.getTemplateHTML({ src: SHOW, preload: 'none' })).not.toMatch(/<iframe[^>]*\ssrc=/);
+  });
+
+  it.each(['autoplay', 'controls'])('renders the widget under preload="none" when %s is set', (attr) => {
+    expect(iframeSrcOf(MixcloudAudio.getTemplateHTML({ src: SHOW, preload: 'none', [attr]: '' }))).toBe(
+      buildMixcloudIframeSrc(SHOW)
+    );
+  });
+
   it('lets the widget autoplay and play protected streams', () => {
     expect(MixcloudAudio.getTemplateHTML({ src: SHOW })).toContain('allow="autoplay; encrypted-media"');
   });

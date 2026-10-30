@@ -57,6 +57,7 @@ A few things work differently from a native `<video>` element, because the Strea
 - Picture-in-picture is unavailable, and the player reports it as unsupported.
 - Fullscreen targets the iframe, so Cloudflare's own chrome shows in fullscreen.
 - `playsInline` has no effect: the Stream embed always plays inline.
+- With `preload="none"`, nothing is fetched from Cloudflare, not the iframe and not the Stream SDK until playback is requested: the embed is built on `play()` and starts playing as it loads. `autoplay` or `controls` builds it at once, since each asks to play or shows the embed's own play button. Until then the frame is empty, without the service's thumbnail, so give the player a poster.
 
 ## Examples
 

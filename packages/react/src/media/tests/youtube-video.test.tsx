@@ -11,4 +11,20 @@ describe('YouTubeVideo', () => {
     expect(params.get('autoplay')).toBe('1');
     expect(params.get('mute')).toBe('1');
   });
+
+  it('renders an empty frame under preload="none" until playback is requested', () => {
+    const { container } = render(<YouTubeVideo src="https://www.youtube.com/watch?v=aqz-KE-bpKQ" preload="none" />);
+
+    expect(container.querySelector('iframe')!.hasAttribute('src')).toBe(false);
+  });
+
+  it('renders the embed under preload="none" when controls are shown', () => {
+    const { container } = render(
+      <YouTubeVideo src="https://www.youtube.com/watch?v=aqz-KE-bpKQ" preload="none" controls />
+    );
+
+    expect(container.querySelector('iframe')!.getAttribute('src')).toContain(
+      'https://www.youtube.com/embed/aqz-KE-bpKQ'
+    );
+  });
 });

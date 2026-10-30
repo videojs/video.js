@@ -294,6 +294,173 @@ describe('buildCloudflareIframeSrc', () => {
   });
 });
 
+describe('CloudflareAdapter preload', () => {
+  it('builds no embed, loads no SDK, and creates no player under preload="none"', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    vi.stubGlobal('Stream', undefined);
+    vi.mocked(loadScript).mockClear();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = VIDEO_ID;
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    expect(loadScript).not.toHaveBeenCalled();
+    expect(media.engine).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once it loads', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    const pending = media.play();
+
+    // Playing overrides `preload`, so the embed it builds loads at once and reports metadata, and is told to play in its
+    // URL.
+    expect(iframe.getAttribute('src')).toContain(`https://iframe.videodelivery.net/${VIDEO_ID}`);
+    expect(iframe.getAttribute('src')).toContain('preload=auto');
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+
+    const player = await waitForEngine(media);
+
+    expect(player.play).not.toHaveBeenCalled();
+
+    player.emit('loadedmetadata');
+    await pending;
+
+    expect(player.play).toHaveBeenCalledTimes(1);
+    media.detach();
+  });
+
+  it('rebuilds the next video without the autoplay a play() wrote, rather than swapping it in', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    player.emit('loadedmetadata');
+    await pending;
+
+    media.src = OTHER_VIDEO_ID;
+    await Promise.resolve();
+
+    // The player keeps the autoplay it was built with, so a swap would play the next video on its own.
+    expect(iframe.getAttribute('src')).toContain(OTHER_VIDEO_ID);
+    expect(iframe.getAttribute('src')).not.toContain('autoplay');
+    expect(player.src).not.toBe(OTHER_VIDEO_ID);
+    media.detach();
+  });
+
+  it('rebuilds a video given while the SDK loads without the autoplay a play() wrote', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    void media.play();
+
+    media.src = OTHER_VIDEO_ID;
+    await waitForEngine(media);
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toContain(OTHER_VIDEO_ID);
+    expect(iframe.getAttribute('src')).not.toContain('autoplay');
+    media.detach();
+  });
+
+  it('keeps a played embed preloading when preload is set again', async () => {
+    const media = new CloudflareAdapter();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(createIframe());
+
+    const pending = media.play();
+    const player = await waitForEngine(media);
+
+    player.emit('loadedmetadata');
+    await pending;
+
+    // An embed told not to preload reports no metadata for its next video, which a load would wait on forever.
+    media.preload = 'none';
+    await flushDeferredEmbed();
+
+    expect(player.preload).toBe('auto');
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toContain('preload=metadata');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain('autoplay=1');
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed at once when controls are shown', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    // Cloudflare's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(VIDEO_ID);
+    await waitForEngine(media);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', async () => {
+    const media = new CloudflareAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain(VIDEO_ID);
+    await waitForEngine(media);
+    media.detach();
+  });
+});
+
 describe('CloudflareAdapter', () => {
   it('has expected default state before attach', () => {
     const media = new CloudflareAdapter();
@@ -517,6 +684,40 @@ describe('CloudflareAdapter', () => {
     await pending;
 
     expect(player.play).toHaveBeenCalled();
+    media.detach();
+  });
+
+  it('plays an embed that is not preloading without waiting for metadata', async () => {
+    const media = new CloudflareAdapter();
+
+    // Markup already holding the embed has contacted Cloudflare, so the media drives it rather than holding it back.
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(createServerRenderedIframe(buildCloudflareIframeSrc(VIDEO_ID, { preload: 'none' })));
+
+    // The embed reports no metadata until it plays, so play() must reach it first.
+    const player = await waitForEngine(media);
+
+    await media.play();
+    expect(player.play).toHaveBeenCalledTimes(1);
+    expect(media.readyState).toBe(0);
+    media.detach();
+  });
+
+  it('plays a swapped video that is not preloading without waiting for metadata', async () => {
+    const media = new CloudflareAdapter();
+
+    media.preload = 'none';
+    media.src = VIDEO_ID;
+    media.attach(createServerRenderedIframe(buildCloudflareIframeSrc(VIDEO_ID, { preload: 'none' })));
+    const player = await waitForEngine(media);
+
+    media.src = OTHER_VIDEO_ID;
+    await Promise.resolve();
+    await media.play();
+
+    expect(player.src).toBe(OTHER_VIDEO_ID);
+    expect(player.play).toHaveBeenCalledTimes(1);
     media.detach();
   });
 

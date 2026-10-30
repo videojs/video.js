@@ -165,6 +165,11 @@ describe('buildPlayerJsIframeSrc', () => {
     expect(buildPlayerJsIframeSrc(EMBED_SRC, { autoplay: true, loop: true, controls: false })).toBe(EMBED_SRC);
   });
 
+  it('removes the playerjs marker and keeps the rest of the URL', () => {
+    expect(buildPlayerJsIframeSrc(`${EMBED_SRC}?playerjs&start=10`)).toBe(`${EMBED_SRC}?start=10`);
+    expect(buildPlayerJsIframeSrc(`${EMBED_SRC}?playerjs=1`)).toBe(EMBED_SRC);
+  });
+
   it('returns empty for a source that is not an embed URL', () => {
     expect(buildPlayerJsIframeSrc('abc123')).toBe('');
   });
@@ -375,6 +380,148 @@ describe('buildPlayerJsIframeSrc', () => {
 
       expect(queryOf(src)).toEqual(['autoplay=false', 'loop=false', 'background=true']);
     });
+  });
+});
+
+describe('PlayerJsAdapter preload', () => {
+  it('builds no embed under preload="none"', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.attach(iframe);
+    media.src = MUX_SRC;
+    await flush();
+
+    expect(iframe.getAttribute('src')).toBe(null);
+    media.detach();
+  });
+
+  it('builds the embed on play() and plays once it reports ready', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = `${MUX_SRC}?playerjs`;
+    media.attach(iframe);
+    await media.play();
+
+    // Playing overrides `preload`, so the embed it builds loads at once, and is told to play before it reports ready.
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?autoplay=true&preload=auto`);
+
+    // Watched once built: pointing the frame at the embed gives it a new window.
+    const commands = watchCommands(iframe);
+
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    expect(commands.named('play')).toHaveLength(1);
+    media.detach();
+  });
+
+  it('pauses an embed built to play when a pause follows before it reports ready', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    media.pause();
+
+    const commands = watchCommands(iframe);
+
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    expect(commands.named('play')).toHaveLength(0);
+    expect(commands.named('pause')).toHaveLength(1);
+    media.detach();
+  });
+
+  it('builds the next source without the autoplay a play() wrote', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    media.src = GUMLET_SRC;
+    await flush();
+
+    expect(queryOf(iframe.getAttribute('src')!)).toContain('autoplay=false');
+    media.detach();
+  });
+
+  it('keeps the document an embed built to play when only the hash changes', async () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    await media.play();
+    report(iframe, 'ready', FULL_SUPPORT);
+
+    media.src = `${MUX_SRC}#t=10`;
+    await flush();
+
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?autoplay=true&preload=auto#t=10`);
+    media.detach();
+  });
+
+  it('builds the embed when preload is raised from "none"', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    media.preload = 'metadata';
+
+    expect(iframe.getAttribute('src')).toBe(`${MUX_SRC}?preload=metadata`);
+    media.detach();
+  });
+
+  it('builds the embed at once when autoplay is set', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.autoplay = true;
+    media.src = MUX_SRC;
+    media.attach(iframe);
+
+    expect(queryOf(iframe.getAttribute('src')!)).toContain('autoplay=true');
+    media.detach();
+  });
+
+  it('builds the embed at once when controls are shown', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    // The embed's own play button is the only way to start it, and it needs an embed to show.
+    media.preload = 'none';
+    media.controls = true;
+    media.src = MUX_SRC;
+    media.attach(iframe);
+
+    expect(iframe.getAttribute('src')).toContain(MUX_SRC);
+    media.detach();
+  });
+
+  it('builds the embed when controls are turned on under preload="none"', () => {
+    const media = new PlayerJsAdapter();
+    const iframe = createIframe();
+
+    media.preload = 'none';
+    media.src = MUX_SRC;
+    media.attach(iframe);
+    media.controls = true;
+
+    expect(iframe.getAttribute('src')).toContain(MUX_SRC);
+    media.detach();
   });
 });
 
