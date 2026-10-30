@@ -163,6 +163,26 @@ describe('DialogElement', () => {
     });
   });
 
+  it('connects parts defined before the dialog', async () => {
+    const popup = createElement(DialogPopupElement);
+    const dialogTag = `test-dialog-${tagCounter++}`;
+
+    document.body.append(document.createElement(dialogTag));
+    document.body.lastElementChild!.append(popup);
+    customElements.define(dialogTag, class extends DialogElement {});
+
+    // happy-dom upgrades into a new instance, so reach the dialog through its child.
+    const dialog = popup.parentElement as DialogElement;
+
+    dialog.open = true;
+    await dialog.updateComplete;
+
+    await vi.waitFor(() => {
+      expect(popup.getAttribute('role')).toBe('dialog');
+      expect(popup.hasAttribute('data-open')).toBe(true);
+    });
+  });
+
   it('opens from an adjacent trigger', async () => {
     const trigger = document.createElement('button');
     const dialog = createElement(DialogElement);
