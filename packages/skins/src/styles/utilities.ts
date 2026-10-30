@@ -105,6 +105,14 @@ export const utilities = {
   'media-max-xl': { kind: 'variant', description: 'Player below the xl breakpoint.' },
   'media-2xl': { kind: 'variant', description: 'Player at or above the 2xl breakpoint.' },
   'media-max-2xl': { kind: 'variant', description: 'Player below the 2xl breakpoint.' },
+  'media-dialog-bar': {
+    kind: 'variant',
+    description: 'A `media-dialog` size container too short for the dialog card, such as an audio control bar.',
+  },
+  'media-dialog-card': {
+    kind: 'variant',
+    description: 'A `media-dialog` size container tall enough for the dialog card.',
+  },
   'media-highlighted': {
     kind: 'variant',
     description: 'Focused, expanded, or highlighted control or menu item that is not disabled.',

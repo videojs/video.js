@@ -236,6 +236,20 @@
   }
 }
 
+/* A `media-dialog` size container too short for the dialog card, such as an audio player that is only a control bar. */
+@custom-variant media-dialog-bar {
+  @container media-dialog (height < 12rem) {
+    @slot;
+  }
+}
+
+/* A `media-dialog` size container tall enough for the dialog card. */
+@custom-variant media-dialog-card {
+  @container media-dialog (height >= 12rem) {
+    @slot;
+  }
+}
+
 /* Focused, expanded, or highlighted control or menu item that is not disabled. Keep the disabled check in :where() so
    it doesn't increase specificity over the individual states. */
 @custom-variant media-highlighted {
