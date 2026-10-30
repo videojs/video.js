@@ -1632,6 +1632,9 @@ importers:
       oxc-walker:
         specifier: ^1.1.1
         version: 1.1.1(@oxc-project/types@0.146.0)(oxc-parser@0.146.0)(rolldown@1.2.5)
+      smol-toml:
+        specifier: ^1.9.1
+        version: 1.9.1
       tsx:
         specifier: ^4.23.1
         version: 4.23.1
