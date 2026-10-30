@@ -184,6 +184,10 @@ describe('GoogleAnalyticsExtension', () => {
 
   it('tracks fullscreenEnter and fullscreenExit', () => {
     const container: MediaContainer = document.createElement('div');
+
+    container.appendChild(video);
+    document.body.appendChild(container);
+
     const extension = new GoogleAnalyticsExtension();
 
     extension.attach({ media: video, container });
@@ -208,6 +212,42 @@ describe('GoogleAnalyticsExtension', () => {
 
     expect(events).toContain('fullscreenEnter');
     expect(events).toContain('fullscreenExit');
+
+    container.remove();
+  });
+
+  it('tracks fullscreenEnter and fullscreenExit of an ancestor when container is null at attach', () => {
+    const parent = document.createElement('div');
+
+    parent.appendChild(video);
+    document.body.appendChild(parent);
+
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media: video, container: null });
+
+    // Enter fullscreen on ancestor
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: parent,
+      configurable: true,
+      writable: true,
+    });
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    // Exit fullscreen
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: null,
+      configurable: true,
+      writable: true,
+    });
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    const events = getDataLayer().map((e) => e.event);
+
+    expect(events).toContain('fullscreenEnter');
+    expect(events).toContain('fullscreenExit');
+
+    parent.remove();
   });
 
   it('tracks fullscreenEnter and fullscreenExit on iOS presentation mode changes', () => {

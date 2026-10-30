@@ -1,4 +1,4 @@
-import type { ExtensionPlayer, MediaContainer, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
+import type { ExtensionPlayer, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
 import type { Media } from '@videojs/media';
 import { getMediaElement } from '@videojs/media/dom';
 import { listen, type WebKitDocument, type WebKitVideoElement } from '@videojs/utils/dom';
@@ -55,14 +55,12 @@ declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
-    [key: string]: unknown;
   }
 }
 
 const MILESTONES = [10, 25, 50, 75] as const;
 
 function isElementFullscreen(
-  container: MediaContainer | null,
   media: Media | null,
   target: HTMLMediaElement | null = media ? getMediaElement(media) : null
 ): boolean {
@@ -77,12 +75,10 @@ function isElementFullscreen(
   const fsElement = doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
   if (isNil(fsElement)) return false;
 
-  if (fsElement === container || (media instanceof Element && fsElement === media) || (target && fsElement === target))
-    return true;
+  const el = target ?? (media instanceof Element ? media : null);
+  if (isNil(el)) return false;
 
-  if (container instanceof Element && container.contains(fsElement)) return true;
-
-  return false;
+  return fsElement === el || (el instanceof Element && fsElement.contains(el));
 }
 
 /**
@@ -116,7 +112,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     GoogleAnalyticsExtension.defaultProps.onEvent;
 
   #media: Media | null = null;
-  #container: MediaContainer | null = null;
   #unlisten: (() => void) | null = null;
   #hasStarted = false;
   #hasEnded = false;
@@ -139,12 +134,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   }
 
   /** @internal Player lifecycle; called when media attaches or changes. */
-  attach({ media, container }: PlayerTarget): void {
-    if (this.#media === media && this.#container === container) return;
+  attach({ media }: PlayerTarget): void {
+    if (this.#media === media) return;
 
     this.detach();
     this.#media = media;
-    this.#container = container;
     this.#resetSession();
 
     const target = this.#targetElement;
@@ -164,6 +158,8 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const offFs = listen(document, 'fullscreenchange', this.#handleFullscreenChange);
     const offWebkitFs = listen(document, 'webkitfullscreenchange', this.#handleFullscreenChange);
     const offPresentationMode = listen(media, 'webkitpresentationmodechanged', this.#handleFullscreenChange);
+    const offTargetPresentationMode =
+      target && target !== media ? listen(target, 'webkitpresentationmodechanged', this.#handleFullscreenChange) : null;
 
     this.#unlisten = () => {
       offPlay();
@@ -176,6 +172,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       offFs();
       offWebkitFs();
       offPresentationMode();
+      offTargetPresentationMode?.();
     };
   }
 
@@ -184,7 +181,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#unlisten?.();
     this.#unlisten = null;
     this.#media = null;
-    this.#container = null;
     this.#isFullscreen = false;
     this.#resetSession();
   }
@@ -205,7 +201,10 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const el = this.#targetElement;
     if (isNil(el)) return;
 
-    const isLoop = Boolean(el.loop || this.#media?.loop);
+    // SAFETY: Probing loop property on custom media element host.
+    const isLoop = Boolean(
+      el.loop || (this.#media && 'loop' in this.#media && (this.#media as { loop?: boolean }).loop)
+    );
     if (!isLoop) return;
 
     const duration = el.duration;
@@ -342,7 +341,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handleFullscreenChange = (): void => {
-    const isFs = isElementFullscreen(this.#container, this.#media, this.#targetElement);
+    const isFs = isElementFullscreen(this.#media, this.#targetElement);
     if (isFs === this.#isFullscreen) return;
 
     this.#isFullscreen = isFs;
@@ -408,14 +407,16 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.onEvent?.(event, params);
 
     const dataLayerKey = this.dataLayerName ?? 'dataLayer';
-    const targetLayer = window[dataLayerKey];
+    // SAFETY: Accessing configurable dataLayer array on window.
+    const win = window as { [key: string]: unknown[] | undefined };
+    const targetLayer = win[dataLayerKey];
 
     if (Array.isArray(targetLayer)) {
       targetLayer.push({ event, ...params });
     } else {
       const newLayer: unknown[] = [{ event, ...params }];
 
-      window[dataLayerKey] = newLayer;
+      win[dataLayerKey] = newLayer;
     }
 
     if (isFunction(window.gtag)) {
