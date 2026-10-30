@@ -64,10 +64,13 @@ function createPlaybackRateStore({
   playbackRate = 1.5,
   playbackRateAvailability = 'available',
   setPlaybackRate = vi.fn(),
-}: PlaybackRateStoreOptions = {}): AnyPlayerStore {
-  return createStore<unknown>()<MediaPlaybackRateState>({
+}: PlaybackRateStoreOptions = {}) {
+  let setState!: (patch: Partial<MediaPlaybackRateState>) => void;
+
+  const store = createStore<unknown>()<MediaPlaybackRateState>({
     name: 'playbackRate',
-    state: () => {
+    state: ({ set }) => {
+      setState = set;
       return {
         playbackRates,
         playbackRate,
@@ -76,10 +79,12 @@ function createPlaybackRateStore({
       };
     },
   }) as unknown as AnyPlayerStore;
+
+  return { store, setState };
 }
 
 class TestPlayerProviderElement extends UIElement {
-  store: AnyPlayerStore = createPlaybackRateStore();
+  store: AnyPlayerStore = createPlaybackRateStore().store;
 
   readonly #provider = new ContextProvider(this, { context: playerContext });
 
@@ -103,7 +108,7 @@ defineElement(PlaybackRateButtonElement.tagName, PlaybackRateButtonElement);
 defineElement('test-playback-rate-player', TestPlayerProviderElement);
 
 export function setup(storeOptions: PlaybackRateStoreOptions = {}) {
-  const store = createPlaybackRateStore(storeOptions);
+  const { store, setState } = createPlaybackRateStore(storeOptions);
   const provider = document.createElement('test-playback-rate-player') as TestPlayerProviderElement;
   const trigger = createElement(PlaybackRateButtonElement);
   const menu = createElement(MenuElement);
@@ -117,7 +122,7 @@ export function setup(storeOptions: PlaybackRateStoreOptions = {}) {
   provider.append(trigger, menu);
   document.body.append(provider);
 
-  return { menu, options, provider, store, trigger };
+  return { menu, options, provider, setState, store, trigger };
 }
 
 export async function waitForMenu(

@@ -57,7 +57,7 @@ export default {
     unknown: 'मीडिया लोड नहीं हुआ, समय अज्ञात है।',
   },
   playback: {
-    rate: 'प्लेबैक दर {rate}',
+    rate: 'प्लेबैक दर, {rate}',
   },
   volume: {
     mutedValue: '{percent}, म्यूट',

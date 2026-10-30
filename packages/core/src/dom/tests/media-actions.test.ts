@@ -55,6 +55,17 @@ describe('MEDIA_INPUT_ACTION_OVERRIDES', () => {
     expect(paused ? pause : play).not.toHaveBeenCalled();
   });
 
+  it('togglePaused cancels a pending autoplay instead of playing', () => {
+    const play = vi.fn();
+    const pause = vi.fn();
+    const store = mockStore({ paused: true, autoplaying: true, play, pause });
+
+    MEDIA_INPUT_ACTION_OVERRIDES.togglePaused({ store });
+
+    expect(pause).toHaveBeenCalledOnce();
+    expect(play).not.toHaveBeenCalled();
+  });
+
   it.each([
     [false, 0.5, true],
     [true, 0.5, false],

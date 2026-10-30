@@ -61,7 +61,7 @@ describe('PlaybackRateButtonCore', () => {
 
       expect(core.getLabel(createState({ rate: 1.5 }))).toMatchObject({
         key: 'playback.rate',
-        text: 'Playback rate {rate}',
+        text: 'Playback rate, {rate}',
       });
     });
 
@@ -86,8 +86,25 @@ describe('PlaybackRateButtonCore', () => {
 
       expect(core.getLabel(createState({ rate: 1.5 }))).toMatchObject({
         key: 'playback.rate',
-        text: 'Playback rate {rate}',
+        text: 'Playback rate, {rate}',
       });
+    });
+  });
+
+  describe('getTooltipLabel', () => {
+    it('returns the control name without the rate', () => {
+      const core = new PlaybackRateButtonCore();
+
+      expect(core.getTooltipLabel(createState({ rate: 1.5 }))).toMatchObject({
+        key: 'menu.playbackRate',
+        text: 'Playback rate',
+      });
+    });
+
+    it('returns the custom label', () => {
+      const core = new PlaybackRateButtonCore({ label: 'Speed' });
+
+      expect(core.getTooltipLabel(createState())).toBe('Speed');
     });
   });
 
@@ -110,7 +127,7 @@ describe('PlaybackRateButtonCore', () => {
       const core = new PlaybackRateButtonCore();
       const attrs = core.getAttrs(createState({ rate: 1.5 }));
 
-      expect(attrs['aria-label']).toMatchObject({ key: 'playback.rate', text: 'Playback rate {rate}' });
+      expect(attrs['aria-label']).toMatchObject({ key: 'playback.rate', text: 'Playback rate, {rate}' });
     });
 
     it('sets aria-disabled when disabled', () => {

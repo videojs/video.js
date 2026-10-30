@@ -44,16 +44,18 @@ import basicUsageHtmlTs from "@/components/docs/demos/play-button/html/css/Basic
 
 The play button is a three-state button: **play**, **pause**, and **replay**. When media reaches the end (`ended` state), clicking restarts playback from the beginning.
 
+While media with `autoplay` is trying to start, the button shows **pause**, and clicking it cancels the autoplay. If the browser refuses the autoplay, the button returns to **play**.
+
 ## Styling
 
-Style with the `[data-paused]` and `[data-ended]` attributes to show/hide play/pause/replay icons based on state. For example:
+Style with the `[data-paused]` and `[data-ended]` attributes to show/hide play/pause/replay icons based on state. While autoplay is pending, the button omits `data-paused` and adds `data-started`, so the pause icon shows. For example:
 
 <FrameworkCase frameworks={["html"]}>
 ```css
 /* Paused (but not ended) */
 media-play-button[data-paused]:not([data-ended]) .play-icon { display: inline; }
 
-/* Playing */
+/* Playing, or autoplay pending */
 media-play-button:not([data-paused]) .pause-icon { display: inline; }
 
 /* Ended */
@@ -68,7 +70,7 @@ React renders a `<button>` element. Add a `className` to style it:
 /* Paused (but not ended) */
 .play-button[data-paused]:not([data-ended]) .play-icon { display: inline; }
 
-/* Playing */
+/* Playing, or autoplay pending */
 .play-button:not([data-paused]) .pause-icon { display: inline; }
 
 /* Ended */
@@ -76,7 +78,7 @@ React renders a `<button>` element. Add a `className` to style it:
 ```
 </FrameworkCase>
 
-After first play, the `data-started` attribute is added and remains present until a new source is loaded. Use this to hide the play button when media hasn't started yet:
+The `data-started` attribute is present while the media tries to autoplay, and from first play until a new source is loaded. Use this to hide the play button when media hasn't started yet:
 
 <FrameworkCase frameworks={["html"]}>
 ```css
