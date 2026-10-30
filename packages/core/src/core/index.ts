@@ -102,11 +102,14 @@ export * from './version';
 export type {
   AddTextTrack,
   InferCueValue,
+  TextCueFormat,
+  TextCueFormatResult,
   TextCueInit,
   TextTrackContent,
   TextTrackHandle,
   TextTrackInit,
 } from './text-track/app';
+export * from './text-track/chapters';
 export * from './text-track/definition';
 export * from './text-track/hls';
 export * from './text-track/read';

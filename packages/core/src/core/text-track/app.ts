@@ -5,7 +5,7 @@ import type { TextTrackDefinition, TextTrackIdentity } from './definition';
 
 /** A cue an app adds to the player. Plain, JSON-serializable data, so it works on the server too. */
 export interface TextCueInit<Value = unknown> {
-  /** Defaults to an id unique within the track. */
+  /** Defaults, when missing or empty, to an id unique within the track. */
   id?: string | undefined;
   startTime: number;
   /** Omit for a point, which stays active for one second. */
@@ -17,9 +17,32 @@ export interface TextCueInit<Value = unknown> {
   type?: string | undefined;
 }
 
-/** What a track an app adds carries. */
+/**
+ * The cues a `format` read from a file: an array, or an object with a `cues` array, the same shapes a JSON file can
+ * hold. A parser's result that carries its cues as `cues` fits as is.
+ */
+export type TextCueFormatResult<Value = unknown> =
+  | readonly TextCueInit<Value>[]
+  | { readonly cues: readonly TextCueInit<Value>[] };
+
+/**
+ * Reads the text of a file into cues, for a format the player doesn't read itself, such as Podcasting 2.0 chapters or
+ * SRT. It can return a promise, so a parser can be loaded only once a file needs it.
+ */
+export type TextCueFormat<Value = unknown> = (
+  text: string
+) => TextCueFormatResult<Value> | Promise<TextCueFormatResult<Value>>;
+
+/** What a track an app adds carries: cues, a file to load them from, or both. */
 export interface TextTrackContent<Value = unknown> {
   cues?: readonly TextCueInit<Value>[] | undefined;
+  /**
+   * A file to load cues from, fetched once the player is on the client. Without a `format`, it's WebVTT, or JSON that
+   * is an array of cues or an object with a `cues` array.
+   */
+  src?: string | undefined;
+  /** Reads the `src` file's text into cues, in place of the player's own WebVTT and JSON reading. */
+  format?: TextCueFormat<Value> | undefined;
 }
 
 /** A track an app adds to the player: what identifies it, and what it carries. */
@@ -73,7 +96,8 @@ export interface AddTextTrack {
  */
 export function toAppCue(cue: TextCueInit, id: string): MediaTextCue {
   const result: MediaTextCue = {
-    id: cue.id ?? id,
+    // Parsers leave a cue without an id empty, as the platform's cues do.
+    id: cue.id || id,
     startTime: cue.startTime,
     endTime: cue.endTime ?? cue.startTime,
     text: cue.text ?? '',

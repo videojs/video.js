@@ -9,7 +9,7 @@ import type {
 } from '@videojs/media';
 import { getRegisteredMedia, isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
-import { isUndefined } from '@videojs/utils/predicate';
+import { isAbortError, isUndefined } from '@videojs/utils/predicate';
 
 import { findActiveCues } from '../../../core/text-track/active-cues';
 import {
@@ -30,7 +30,8 @@ import {
   type AppTextTracksState,
   getAppTextTracks,
 } from '../app-text-tracks';
-import { isCueListUnchanged, reuseCues, sortCues, toMediaTextCues } from '../text-cues';
+import { loadTextTrackCues } from '../load-text-track';
+import { fillChapterEnds, isCueListUnchanged, reuseCues, sortCues, toMediaTextCues } from '../text-cues';
 import { listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
 const CUE_FILTERS = Symbol('@videojs/text-cue-filters');
@@ -119,8 +120,16 @@ export const textCuesFeature = definePlayerFeature({
           source: 'app',
         },
         cues: sortCues((content?.cues ?? init.cues ?? []).map(toCue)),
-        src: get()[CURRENT_SRC] as string | null,
+        mediaSrc: get()[CURRENT_SRC] as string | null,
       };
+
+      const src = content?.src ?? init.src;
+
+      // Loading waits for the store to attach, which only happens on the client.
+      if (src) {
+        record.src = src;
+        record.load = { src, format: content?.format ?? init.format };
+      }
 
       setRecords([...appTracks.records, record]);
 
@@ -188,7 +197,7 @@ export const textCuesFeature = definePlayerFeature({
     const registeredMedia = getRegisteredMedia(media);
 
     if (!isUndefined(appTracks.media) && appTracks.media !== registeredMedia) {
-      appTracks.records = appTracks.records.filter((record) => record.src === null);
+      appTracks.records = appTracks.records.filter((record) => record.mediaSrc === null);
     }
 
     appTracks.media = registeredMedia;
@@ -205,9 +214,9 @@ export const textCuesFeature = definePlayerFeature({
 
       const records = get()[APP_TEXT_TRACKS];
       const next = records.flatMap((record) => {
-        if (record.src === src) return [record];
+        if (record.mediaSrc === src) return [record];
 
-        if (record.src === null) return [{ ...record, src }];
+        if (record.mediaSrc === null) return [{ ...record, mediaSrc: src }];
 
         return [];
       });
@@ -249,20 +258,78 @@ export const textCuesFeature = definePlayerFeature({
         if (track instanceof EventTarget) listen(track, 'cuechange', syncActive, { signal: trackCleanup.signal });
       }
 
-      // App cues are already plain and ordered; only which of them are active changes.
+      // App cues are already plain and ordered. A chapter without an end runs to the next one, and the last to the end
+      // of the media.
       for (const record of get()[APP_TEXT_TRACKS]) {
         if (!isTracked(record.track, filters)) continue;
 
         const prior = previous.get(record.track.id);
-        const activeCues = reuseCues(prior?.activeCues, findActiveCues(record.cues, time, lastTime));
+        const cues =
+          record.track.kind === 'chapters'
+            ? reuseCues(prior?.cues, fillChapterEnds(record.cues, duration))
+            : record.cues;
+        const activeCues = reuseCues(prior?.activeCues, findActiveCues(cues, time, lastTime));
 
-        textCues.push(reuseTrackCues(prior, { track: record.track, cues: record.cues, activeCues }));
+        textCues.push(reuseTrackCues(prior, { track: record.track, cues, activeCues }));
       }
 
       if (textTracks) listenForTrackLoads(textTracks, sync, trackCleanup.signal);
 
       lastTime = time;
       set({ textCues: reuseList(get().textCues, textCues) });
+      loadAppCues();
+    };
+
+    // App tracks with a `src` load once per attach, each with its own request so removing the track stops it.
+    const loads = new Map<string, AbortController>();
+
+    const loadAppCues = () => {
+      const records = get()[APP_TEXT_TRACKS];
+
+      for (const [id, controller] of loads) {
+        if (records.some(({ track }) => track.id === id)) continue;
+
+        controller.abort();
+        loads.delete(id);
+      }
+
+      for (const { track, load } of records) {
+        if (!load || loads.has(track.id)) continue;
+
+        const controller = new AbortController();
+
+        loads.set(track.id, controller);
+
+        loadTextTrackCues(load, track, controller.signal)
+          .then((cues) =>
+            updateAppTrack(track.id, (record) => ({ ...record, cues: sortCues([...record.cues, ...cues]) }))
+          )
+          .catch((error: unknown) => {
+            if (isAbortError(error)) return;
+
+            // A track that fails to load keeps the cues it has; it never fails the player.
+            if (__DEV__) console.warn(error);
+
+            updateAppTrack(track.id, (record) => record);
+          })
+          .finally(() => {
+            if (loads.get(track.id) === controller) loads.delete(track.id);
+          });
+      }
+    };
+
+    const updateAppTrack = (id: string, update: (record: AppTextTrackRecord) => AppTextTrackRecord) => {
+      if (signal.aborted) return;
+
+      const records = get()[APP_TEXT_TRACKS];
+      if (!records.some((record) => record.track.id === id)) return;
+
+      set({
+        [APP_TEXT_TRACKS]: records.map((record) =>
+          record.track.id === id ? { ...update(record), load: undefined } : record
+        ),
+      });
+      get()[APP_TEXT_TRACKS_CHANGE].notify();
     };
 
     const syncActive = () => {
@@ -326,6 +393,10 @@ export const textCuesFeature = definePlayerFeature({
         unsubscribeFilters();
         unsubscribeAppTracks();
         trackCleanup?.abort();
+
+        for (const controller of loads.values()) controller.abort();
+
+        loads.clear();
       },
       { once: true }
     );
