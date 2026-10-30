@@ -16,7 +16,7 @@ concurrency:
 jobs:
   compatibility:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 40
     env:
       BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
@@ -46,6 +46,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Restore Vite Task cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-restore-only-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
 
       - name: Prepare player pages
         run: pnpm exec vp run '@videojs/e2e#prepare:player'

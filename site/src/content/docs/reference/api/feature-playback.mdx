@@ -10,6 +10,8 @@ import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
 Controls play/pause state and tracks whether playback has started or is stalled.
 
+When the media has `autoplay`, `autoplaying` is true from the moment a source loads until playback starts. It also turns false when the autoplay is refused: browsers don't announce that, so it shows as the media being able to play through but staying paused, and embeds report it with a `pause` or `error` event. Treat it as playback about to begin: the play button shows pause and the buffering indicator shows while it's true, and `pause()` cancels it.
+
 ## Import
 
 <FeatureImports feature="playback" />

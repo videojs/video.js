@@ -1,4 +1,5 @@
 import type {
+  MediaCrossOriginType,
   MediaTextCue,
   MediaTextTrack,
   MediaTextTrackCapability,
@@ -8,16 +9,16 @@ import type {
   VTTCueLike,
 } from '@videojs/media';
 import { isMediaSeekCapable, isMediaSourceCapable, isMediaTextTrackCapable, toMediaCrossOrigin } from '@videojs/media';
-import { createTextTrack, type TextTrackHandle } from '@videojs/media/dom';
+import { createTextTrack, type NativeTextTrackHandle } from '@videojs/media/dom';
 import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack, listen } from '@videojs/utils/dom';
 import { isAbortError, isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import {
   type AddTextTrack,
-  type AppTextTrack,
   type TextCueInit,
   type TextTrackContent,
+  type TextTrackHandle,
   type TextTrackInit,
   toAppCue,
 } from '../../../core/text-track/app';
@@ -89,6 +90,29 @@ function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: n
   return fillChapterEnds(records.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
 }
 
+/**
+ * The first thumbnails track an app added, which stands in when the media has none of its own, such as a storyboard on
+ * an embed. Image URLs in its cues resolve against the file the cues came from.
+ */
+function findAppThumbnailsTrack(
+  records: readonly AppTextTrackRecord[],
+  crossOrigin: MediaCrossOriginType | null
+): MediaThumbnailsTrack | null {
+  const record = records.find(({ track }) => track.kind === 'metadata' && track.label === 'thumbnails');
+  if (!record) return null;
+
+  return { cues: record.cues, src: record.src ? resolveUrl(record.src) : null, crossOrigin };
+}
+
+/** `url` made absolute against the page, as a `<track>` element's `src` reads. */
+function resolveUrl(url: string): string {
+  try {
+    return new URL(url, document.baseURI).href;
+  } catch {
+    return url;
+  }
+}
+
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
   const localeKey = getLocaleKey(locale);
   const keys = findLocaleKeys(locale);
@@ -156,7 +180,7 @@ export const textTrackFeature = definePlayerFeature({
       if (next.length !== records.length) setRecords(next);
     };
 
-    const addTextTrack = (init: TextTrackInit, content?: TextTrackContent): AppTextTrack => {
+    const addTextTrack = (init: TextTrackInit, content?: TextTrackContent): TextTrackHandle => {
       const id = `app-text-track-${++trackCount}`;
       let cueCount = 0;
 
@@ -177,7 +201,10 @@ export const textTrackFeature = definePlayerFeature({
       const src = content?.src ?? init.src;
 
       // Loading waits for the store to attach, which only happens on the client.
-      if (src) record.load = { src, format: content?.format ?? init.format };
+      if (src) {
+        record.src = src;
+        record.load = { src, format: content?.format ?? init.format };
+      }
 
       setRecords([...appTracks.records, record]);
 
@@ -266,6 +293,9 @@ export const textTrackFeature = definePlayerFeature({
   attach({ target, signal, get, set }) {
     const { media } = target;
     const textTracks = isMediaTextTrackCapable(media) ? media : null;
+    // Read the host rather than any inner native element: for a media component the attribute lives on the host and is
+    // forwarded inward.
+    const getCrossOrigin = () => (isMediaSourceCapable(media) ? toMediaCrossOrigin(media.crossOrigin) : null);
 
     // The store resets on detach, so bring back the app tracks it held.
     const appTracks = get()[APP_TEXT_TRACKS_CHANGE];
@@ -276,7 +306,7 @@ export const textTrackFeature = definePlayerFeature({
     // The browser only draws captions and subtitles on tracks the media holds, including in iOS fullscreen where the
     // player's UI isn't shown, so app captions are copied into the media. A copy is listed as its app track, so the
     // captions menu selects the app track by showing its copy, and the app track takes the mode its copy is in.
-    const copies = new Map<string, { handle: TextTrackHandle; written: Map<MediaTextCue, VTTCueLike> }>();
+    const copies = new Map<string, { handle: NativeTextTrackHandle; written: Map<MediaTextCue, VTTCueLike> }>();
 
     const syncCopies = () => {
       if (!textTracks) return;
@@ -414,6 +444,7 @@ export const textTrackFeature = definePlayerFeature({
         set({
           textTrackList: appRecords.map(({ track }) => track),
           chaptersCues: findAppChaptersCues(appRecords, isMediaSeekCapable(media) ? media.duration : NaN),
+          thumbnailsTrack: findAppThumbnailsTrack(appRecords, getCrossOrigin()),
         });
         return;
       }
@@ -461,7 +492,8 @@ export const textTrackFeature = definePlayerFeature({
         ? toMediaTextCues(chaptersTrack.cues, { kind: 'chapters', duration })
         : findAppChaptersCues(appRecords, duration);
 
-      let thumbnailsTrack: MediaThumbnailsTrack | null = null;
+      // A thumbnails track an app added stands in when the media has none.
+      let thumbnailsTrack = findAppThumbnailsTrack(appRecords, getCrossOrigin());
 
       if (thumbnailsTextTrack) {
         thumbnailsTrack = {
@@ -469,9 +501,7 @@ export const textTrackFeature = definePlayerFeature({
           // the CueList is typed as TextTrackCue which doesn't expose `text`.
           cues: thumbnailsTextTrack.cues ? (Array.from(thumbnailsTextTrack.cues) as unknown as MediaTextCue[]) : [],
           src: findTrackElement(textTracks, thumbnailsTextTrack)?.src ?? null,
-          // Read the host rather than any inner native element: for a media
-          // component the attribute lives on the host and is forwarded inward.
-          crossOrigin: isMediaSourceCapable(media) ? toMediaCrossOrigin(media.crossOrigin) : null,
+          crossOrigin: getCrossOrigin(),
         };
       }
 

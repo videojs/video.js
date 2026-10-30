@@ -844,6 +844,22 @@ describe('textTrackFeature', () => {
       expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['given', 'loaded']);
     });
 
+    it('stands in as the thumbnails track, with its file to resolve images against', async () => {
+      respond(JSON.stringify([{ startTime: 0, endTime: 5, text: 'sprite.webp#xywh=0,0,160,90' }]));
+
+      const { store } = setupWithCues([]);
+
+      store.addTextTrack({ kind: 'metadata', label: 'thumbnails', src: 'https://image.example.com/storyboard.json' });
+      await settle();
+
+      expect(store.state.thumbnailsTrack).toMatchObject({
+        cues: [{ startTime: 0, endTime: 5, text: 'sprite.webp#xywh=0,0,160,90' }],
+        src: 'https://image.example.com/storyboard.json',
+        crossOrigin: null,
+      });
+      expect(store.state.textCues).toEqual([]);
+    });
+
     it('reads a file through a format', async () => {
       respond(JSON.stringify({ version: '1.2.0', chapters: [{ startTime: 0, title: 'Intro' }] }));
 
