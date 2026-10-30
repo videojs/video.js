@@ -1,34 +1,275 @@
-@layer base.theme, base.preset, base.preferences;
+@layer base.theme, base.preferences;
 
 @layer base.theme {
+  /* Neutral skin tokens. Every skin declares its full token set; only shared preferences override them. */
   .media-skin[data-theme="neutral"] {
+    /* Colors. */
+    --media-background: oklch(0 0 0);
+    --media-foreground: oklch(1 0 0);
+    --media-controls: oklch(0 0 0 / 0.35);
+    --media-controls-foreground: var(--media-foreground);
+    --media-popover: oklch(0 0 0 / 0.5);
+    --media-popover-foreground: var(--media-foreground);
+    --media-primary: var(--media-accent-color, var(--media-default-accent-color));
+    /* Browsers without `contrast-color()` use the theme's default text color; see the `@supports` blocks below. */
+    --media-primary-foreground: var(--media-accent-text-color, var(--media-default-accent-text-color));
+    --media-accent: var(--media-accent-color, color-mix(in oklab, var(--media-default-accent-color) 10%, transparent));
+    --media-accent-foreground: var(--media-accent-text-color, currentColor);
+    --media-muted: oklch(1 0 0 / 0.15);
+    /* Follows the foreground so presets that flip it, such as the light audio skins, keep muted icons legible. */
+    --media-muted-foreground: color-mix(in oklab, var(--media-foreground) 65%, transparent);
+    --media-border: oklch(1 0 0 / 0.1);
+    --media-ring: oklch(1 0 0);
+    --media-backdrop: oklch(0 0 0);
+    --media-live-color: oklch(0.65 0.22 27);
+
+    /* Shadows and surfaces. Preferences switch the backdrop filters off and strengthen the inset highlight. */
+    --media-shadow-surface: 0 1px 2px oklch(0 0 0 / 0.2);
+    --media-shadow-surface-inset: inset 0 1px 0 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.05);
+    --media-shadow-thumb: 0 0 0 1px rgb(0 0 0 / 0.15), 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.15);
+    --media-shadow-tooltip:
+      0 0 0 1px var(--media-border), 0 4px 6px -1px oklch(0 0 0 / 0.2), 0 2px 4px -2px oklch(0 0 0 / 0.2);
+    --media-shadow-separator: 0 1px 0 0 oklch(1 0 0 / 0.075);
+    --media-shadow-current-color: oklch(from currentColor 0 0 0 / clamp(0, calc((l - 0.5) * 0.5), 0.15));
+    --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
+    --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.5);
+    /* Layered from a tight, dark contact shadow out to a wide, soft halo. */
+    --media-filter-feedback: drop-shadow(0 0 1px oklch(0 0 0 / 0.3)) drop-shadow(0 1px 3px oklch(0 0 0 / 0.2))
+      drop-shadow(0 2px 12px oklch(0 0 0 / 0.15));
+    --media-backdrop-filter-surface: blur(16px) saturate(110%);
+    --media-backdrop-filter-indicator: blur(8px);
+    --media-backdrop-filter-dialog: blur(16px) saturate(120%);
+
+    /* Controls. */
     --media-control-corner-shape: squircle;
     --media-control-radius: calc(var(--media-spacing) * 2);
     --media-control-size: calc(var(--media-spacing) * 9);
     --media-controls-radius: calc(var(--media-spacing) * 3);
-    --media-popover: oklch(0 0 0 / 0.5);
-    --media-border: oklch(1 0 0 / 0.1);
-    --media-shadow-surface: 0 1px 2px oklch(0 0 0 / 0.2);
-    --media-shadow-thumb: 0 0 0 1px rgb(0 0 0 / 0.15), 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.15);
-    --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.5);
-    --media-backdrop-filter-dialog: blur(16px) saturate(120%);
-    --media-shadow-tooltip:
-      0 0 0 1px var(--media-border), 0 4px 6px -1px oklch(0 0 0 / 0.2), 0 2px 4px -2px oklch(0 0 0 / 0.2);
-    /* Layered from a tight, dark contact shadow out to a wide, soft halo. */
-    --media-filter-feedback: drop-shadow(0 0 1px oklch(0 0 0 / 0.3)) drop-shadow(0 1px 3px oklch(0 0 0 / 0.2))
-      drop-shadow(0 2px 12px oklch(0 0 0 / 0.15));
+    --media-default-accent-color: oklch(1 0 0);
+    --media-default-accent-text-color: oklch(0 0 0);
+
+    /* Motion. Preferences collapse durations and neutralize hidden-state values under reduced motion. */
+    --media-duration-instant: 50ms;
+    --media-duration-fast: 100ms;
+    --media-duration: 150ms;
+    --media-duration-slow: 200ms;
+    --media-duration-slower: 250ms;
+    --media-duration-controls: 100ms;
     --media-duration-dialog: var(--media-duration);
     --media-duration-indicator: 400ms;
+    --media-duration-menu: 250ms;
+    --media-duration-slider: var(--media-duration-fast);
+    --media-delay-dialog: 100ms;
+    --media-hidden-scale: 0.95;
+    --media-hidden-blur: 8px;
     --media-hidden-offset: 100%;
+    --media-hidden-icon-scale: 0;
+    --media-hidden-indicator-scale: 0.9;
     --media-hidden-indicator-offset: -100%;
+    --media-hidden-playback-scale: 0.85;
+    --media-hidden-popup-scale: 0.95;
+    --media-hidden-popup-blur: 4px;
+    --media-hidden-preview-scale: 0.8;
+    --media-hidden-preview-offset: calc(var(--media-spacing) * 2);
+    --media-hidden-seek-offset: 60%;
+
+    /* Popups and menus. */
     --media-menu-item-radius: calc(var(--media-spacing) * 1.5);
     --media-popover-boundary-offset: calc(var(--media-spacing) * 2);
     --media-popover-side-offset: calc(var(--media-spacing) * 5);
     --media-popup-radius: calc(var(--media-spacing) * 2.5);
     --media-popup-translate-distance: calc(var(--media-spacing) * 2);
+    --media-tooltip-boundary-offset: var(--media-popover-boundary-offset);
+    --media-tooltip-side-offset: var(--media-popover-side-offset);
+
+    /* Dialogs. */
+    --media-dialog-radius: calc(var(--media-spacing) * 7);
     --media-dialog-width: 100%;
     --media-dialog-max-width: calc(var(--media-spacing) * 64);
+
+    /* Sliders. */
     --media-slider-preview-label-offset: calc(var(--media-spacing) * 5);
+
+    /* Player frame and scale. */
     --media-video-border-radius: var(--media-border-radius, 12px);
+    --media-scale: 1;
+    --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 30%, transparent);
+    --media-spacing: calc(var(--media-scale-unit, 16px) * var(--media-scale) / 4);
+  }
+
+  /*
+   * Newer color functions stay behind these checks, and the rule above holds the fallback for browsers without them.
+   * Relative colors that keep their origin's channels fall back to the same color through `color-mix()`.
+   */
+  @supports (color: contrast-color(red)) {
+    .media-skin[data-theme="neutral"] {
+      --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-primary)));
+      --media-accent-foreground: var(
+        --media-accent-text-color,
+        contrast-color(var(--media-accent-color, var(--media-internal-accent-text-fallback, oklch(0 0 0))))
+      );
+    }
+  }
+
+  @supports (color: oklch(from red l c h)) {
+    .media-skin[data-theme="neutral"] {
+      --media-shadow-subtle-current-color: oklch(from var(--media-shadow-current-color) l c h / calc(alpha * 0.4));
+    }
+  }
+
+  @supports (color: oklch(from currentColor l c h)) {
+    .media-skin[data-theme="neutral"] {
+      --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.3);
+    }
+  }
+
+  .media-skin[data-theme="neutral"]:fullscreen {
+    --media-object-fit: contain;
+    --media-video-border-radius: 0;
+  }
+
+  @media (min-width: 1280px) {
+    .media-skin[data-theme="neutral"]:fullscreen {
+      --media-scale: 1.25;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .media-skin[data-theme="neutral"]:fullscreen {
+      --media-scale: 1.5;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .media-skin[data-theme="neutral"]:fullscreen {
+      --media-scale: 1.75;
+    }
+  }
+
+  /* Video presets. */
+  .media-skin[data-theme="neutral"][data-preset$="video"] {
+    /* Light border for browsers without `light-dark()`; see the `@supports` block below. */
+    --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.15));
+    /* Top and bottom scrims share one height and a smoothstep falloff, which avoids a hard edge where they fade out. */
+    --media-controls-gradient-height: 40%;
+    /* Scrims for browsers without relative colors or gradient interpolation; the `@supports` blocks below refine them. */
+    --media-controls-gradient: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
+      transparent
+    );
+    --media-controls-top-gradient: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
+      transparent
+    );
+    --media-indicator-gradient: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--media-backdrop) 35%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 20%, transparent) calc(var(--media-spacing) * 12),
+      transparent
+    );
+    --media-caption-controls-y: calc(var(--media-spacing) * -14);
+    --media-slider-preview-offset: calc(var(--media-spacing) * 11);
+    --media-thumbnail-gradient: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 10%, transparent),
+      transparent
+    );
+  }
+
+  @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {
+    .media-skin[data-theme="neutral"][data-preset$="video"] {
+      --media-controls-gradient: linear-gradient(
+        to top in oklab,
+        oklch(from var(--media-backdrop) l c h / 0.5),
+        oklch(from var(--media-backdrop) l c h / 0.422) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.25) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.078) 75%,
+        transparent
+      );
+      --media-controls-top-gradient: linear-gradient(
+        to bottom in oklab,
+        oklch(from var(--media-backdrop) l c h / 0.5),
+        oklch(from var(--media-backdrop) l c h / 0.422) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.25) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.078) 75%,
+        transparent
+      );
+    }
+  }
+
+  @supports (color: oklch(from red l c h)) {
+    .media-skin[data-theme="neutral"][data-preset$="video"] {
+      --media-indicator-gradient: linear-gradient(
+        to bottom,
+        oklch(from var(--media-backdrop) l c h / 0.35),
+        oklch(from var(--media-backdrop) l c h / 0.2) calc(var(--media-spacing) * 12),
+        transparent
+      );
+      --media-thumbnail-gradient: linear-gradient(
+        to top,
+        oklch(from var(--media-backdrop) l c h / 0.5),
+        oklch(from var(--media-backdrop) l c h / 0.1),
+        transparent
+      );
+    }
+  }
+
+  /*
+   * Keep `light-dark()` behind these checks. A build that lowers it for Safari before 17.5, such as Next.js, leaves it
+   * alone here but elsewhere rewrites it into variables that only the app's own `color-scheme` rules define.
+   */
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="neutral"][data-preset$="video"] {
+      --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.15), rgb(255 255 255 / 0.15)));
+    }
+  }
+
+  /* Audio presets. Light colors for browsers without `light-dark()`; the `@supports` block below adds the dark ones. */
+  .media-skin[data-theme="neutral"][data-preset$="audio"] {
+    --media-background: oklch(1 0 0);
+    --media-foreground: oklch(0 0 0);
+    --media-controls: var(--media-background);
+    --media-popover: var(--media-background);
+    --media-muted: oklch(0 0 0 / 0.1);
+    --media-surface-border: oklch(0 0 0 / 0.05);
+    --media-primary: var(--media-accent-color, var(--media-foreground));
+    --media-border: oklch(0 0 0 / 0.1);
+    --media-ring: var(--media-foreground);
+    --media-default-accent-color: oklch(0 0 0);
+    --media-default-accent-text-color: oklch(1 0 0);
+    --media-internal-accent-text-fallback: oklch(1 0 0);
+    --media-controls-radius: calc(var(--media-spacing) * 3.5);
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 3);
+    --media-popover-side-offset: calc(var(--media-spacing) * 3);
+    --media-slider-preview-label-offset: calc(var(--media-spacing) * 10);
+  }
+
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="neutral"][data-preset$="audio"] {
+      --media-background: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-foreground: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-border: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-muted: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-default-accent-text-color: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    @supports (color: light-dark(red, red)) {
+      .media-skin[data-theme="neutral"][data-preset$="audio"] {
+        --media-surface-border: light-dark(oklch(0 0 0 / 0.05), transparent);
+      }
+    }
   }
 }

@@ -1,9 +1,21 @@
 @layer base, components, utilities;
-/* Preset adaptations and preference overrides win over theme tokens regardless of import order. */
-@layer base.theme, base.preset, base.preferences;
+/* Preference overrides win over skin tokens regardless of import order or selector specificity. */
+@layer base.theme, base.preferences;
 
-@import "./themes/theme.css";
 @import "./themes/preferences.css";
+
+/* Shared rules that read skin tokens. They sit in the theme layer so preferences can still override them. */
+@layer base.theme {
+  .media-skin {
+    scrollbar-color: var(--media-scrollbar-thumb-color) transparent;
+    scrollbar-width: thin;
+  }
+
+  .media-skin::-webkit-scrollbar-thumb {
+    background: var(--media-scrollbar-thumb-color);
+    border-radius: 9999px;
+  }
+}
 
 /* Interpolate progress before chapter bounds are applied. */
 @property --media-slider-fill {
