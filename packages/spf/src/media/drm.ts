@@ -114,9 +114,9 @@ export interface DrmSystemConfig {
 /**
  * `state.negotiatedKeySystem` when negotiation ran and every candidate was refused.
  *
- * A sentinel rather than `null` or a second slot, so the slot stays `string | undefined` and its three meanings read
- * off one value: absent means negotiation hasn't settled, this means it settled on nothing, anything else is the chosen
- * key system. Cannot collide with a real id — those are reverse-DNS (`com.widevine.alpha`).
+ * A sentinel rather than `null` or a second signal, so the signal stays `string | undefined` and its three meanings
+ * read off one value: absent means negotiation hasn't settled, this means it settled on nothing, anything else is the
+ * chosen key system. Cannot collide with a real id — those are reverse-DNS (`com.widevine.alpha`).
  *
  * The distinction is load-bearing for pruning: "not yet" must leave encrypted renditions alone, while "refused" is the
  * late fact that makes them unplayable (see `excludeRefusedKeySystems`).

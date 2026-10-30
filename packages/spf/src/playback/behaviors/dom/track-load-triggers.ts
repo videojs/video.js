@@ -6,7 +6,6 @@ import { createMachineReactor } from '../../../core/reactors/create-machine-reac
 import { computed, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';
 import type { MaybeResolvedPresentation } from '../../../media/types';
 
-/** State shape for load-trigger tracking. */
 export interface LoadTriggersState {
   /**
    * Sticky-true per source. Flips to `true` the first time an event occurs that should switch loading behavior from
@@ -20,7 +19,6 @@ export interface LoadTriggersState {
   presentation?: MaybeResolvedPresentation;
 }
 
-/** Context shape for load-trigger tracking. */
 export interface LoadTriggersContext {
   mediaElement?: HTMLMediaElement | undefined;
 }
@@ -28,16 +26,16 @@ export interface LoadTriggersContext {
 type LoadTriggersFsmState = 'preconditions-unmet' | 'monitoring' | 'load-active';
 
 /**
- * Slot-driven FSM. The slot `loadActivated` is the canonical externally- observable state; `deriveState` reads it (and
- * the preconditions) to derive the local FSM state. The slot is _both_ the state and the data — no separate internal
- * bookkeeping.
+ * Signal-driven FSM. The signal `loadActivated` is the canonical externally- observable state; `deriveState` reads it
+ * (and the preconditions) to derive the local FSM state. The signal is _both_ the state and the data — no separate
+ * internal bookkeeping.
  *
  *     'preconditions-unmet' ⟷ 'monitoring' ⟷ 'load-active'
  *
  *     preconditions-unmet → monitoring        element + URL appear
- *     monitoring          → load-active       slot flips true (listener fires
+ *     monitoring          → load-active       signal flips true (listener fires
  *                                             or external write)
- *     load-active         → monitoring        within-state cleanup resets slot
+ *     load-active         → monitoring        within-state cleanup resets signal
  *                                             (URL or element identity change)
  *     any                 → preconditions-unmet  element or URL → undefined
  *
@@ -56,7 +54,8 @@ function deriveState(
 }
 
 /**
- * Track preload-overriding events per source.
+ * Flips `loadActivated` to true the first time the user plays or seeks the current source, which lifts the preload gate
+ * on loading.
  *
  * Writes `state.loadActivated = true` the first time a `play` or `seeking` event fires on the attached media element
  * for the current source — or immediately on entry if the element is already committed to loading (`el.autoplay`,
@@ -64,11 +63,11 @@ function deriveState(
  *
  * Sticky-true _within a source identity_: subsequent play/pause/seek cycles don't flip back. Source identity =
  * (mediaElement, presentation URL). Either changing — including direct in-place swap with no `undefined` intermediate —
- * resets the slot to `false`.
+ * resets the signal to `false`.
  *
  * Multi-writer with `hls/adapter.ts:play()` (which writes `true` directly on programmatic play) is intentional —
  * different domains. The adapter records programmatic intent; this behavior is the DOM-side observer. Pre-existing
- * `true` writes are honored because `deriveState` reads the slot — a `true` value routes directly to `'load-active'`
+ * `true` writes are honored because `deriveState` reads the signal — a `true` value routes directly to `'load-active'`
  * without entering `'monitoring'`.
  *
  * @example
@@ -97,7 +96,7 @@ function trackLoadTriggersSetup({
   // the same URL: manifest parsing, duration calc, track resolution,
   // and other enrichment paths re-write the presentation object
   // frequently — tracking raw `state.presentation` here would spuriously
-  // reset the 'load-active' slot.
+  // reset the 'load-active' signal.
   const urlSignal = computed(() => state.presentation.get()?.url);
 
   return createMachineReactor<LoadTriggersFsmState>({

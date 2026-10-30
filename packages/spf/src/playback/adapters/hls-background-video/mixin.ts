@@ -143,7 +143,7 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
 
       // Promote the first fatal condition out of the engine's reported sequence
       // onto this surface. Clearing rides the same signal: `collectErrors` resets
-      // the slot per source, so a new source starts with no error without this
+      // the signal per source, so a new source starts with no error without this
       // needing its own source-change hook.
       this.#stopErrorSync = effect(() => {
         const errors = this.#engine.state.errors.get();

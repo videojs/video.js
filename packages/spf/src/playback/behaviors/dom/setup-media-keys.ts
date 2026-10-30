@@ -1,46 +1,3 @@
-/**
- * **Negotiate a key system and attach its MediaKeys for the current source.** Once an encrypted rendition has resolved
- * against a media element, negotiate one composed key system over the configured license servers, apply its server
- * certificate when it configures one, and attach the resulting MediaKeys — so licensing can begin. Encrypted segment
- * loads are gated until the attach lands, and the outcome is published for pruning and licensing to react to: the
- * chosen system, or {@link NO_KEY_SYSTEM} for a refusal.
- *
- * Licensing is `exchangeLicenses`' job, not this behavior's. The handoff is `context.mediaKeys` +
- * `state.negotiatedKeySystem`, both published only once the certificate has been applied and the attach has resolved —
- * which is what carries the "certificate before `generateRequest`" ordering across the boundary.
- *
- * The negotiation is the minimal key-system probe — capability-probing's full async probe supersedes it when that lands
- * — over per-system init-data types and the declared encryption scheme. The `segmentLoadingBlocked` load gate is raised
- * synchronously at setup and for each new source, and lowered once it's confirmed clear or MediaKeys attach: appending
- * encrypted data with no MediaKeys attached misbehaves on Chromium, so the segment-load dispatchers park while the gate
- * is up (see `load-segments.ts`), whatever order a composition lists them in — but lowered on _attach_, not on license:
- * the appends that follow are what fire `encrypted` for the event-driven path, and browsers queue decode on missing
- * keys. Failures report onto the errors sequence via `emitError` (SVTA 4008 no usable key system, 99408 the source is
- * non-DRM clear-key encryption we can't decrypt, 4010 MediaKeys init, 4013 certificate); a refused negotiation or
- * failed certificate leaves the gate up — playback stays parked rather than failing decode, and severity is the
- * adapter's call. A refusal publishes {@link NO_KEY_SYSTEM}, which is what lets rendition pruning reach the verdict
- * `track-switching` owns.
- *
- * Single-positive-state reactor riding the resolver's resolved/unresolved lifecycle, like `setupMediaSource`. The EME
- * pipeline runs as one `Task` under a runner the reactor owns — the same shape as `setupTrackResolution` — so source
- * replacement routes through `'preconditions-unmet'`, whose state-exit cleanup aborts the task structurally, clears the
- * slots, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
- * deliberate — MediaKeys re-use across sources is an optimization with prior art (see drm-support.md).
- *
- * A live AirPlay session routes through that same exit. Playback moves off MSE onto the native-HLS fallback `<source>`
- * the receiver plays, and the MediaKeys negotiated here cannot serve the `skd` requests it raises — so an observed
- * `loadingSuspended` yields the element, and `setupAirPlayFairPlay` negotiates for the receiver in the gap. The falling
- * edge re-enters and re-negotiates with no extra machinery.
- *
- * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
- * HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
- * gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
- * defaults — carries neither the machinery nor the slots, and none of this file's key-system code survives
- * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
- *
- * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD
- * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
- */
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { KeyedBy } from '../../../core/composition/keyed-by';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
@@ -74,10 +31,12 @@ import {
 import { getTracksByType, mimeCodecsByType } from '../../../media/utils/tracks';
 import { type ErrorEmitterState, emitError } from '../collect-errors';
 
-/** State shape for MediaKeys setup. */
 export interface MediaKeysState {
   presentation?: MaybeResolvedPresentation;
-  /** Segment-load gate; semantics on `SegmentLoadingState['segmentLoadingBlocked']`. */
+  /**
+   * Segment-load gate: `true` from each new source until it is confirmed clear or its MediaKeys attach, and still
+   * `true` after a failed negotiation. The `loadXSegments` dispatchers start no segment loads while it holds.
+   */
   segmentLoadingBlocked?: boolean;
   /**
    * The key system negotiation settled on for the current source, or `undefined` when none has been (yet, or at all).
@@ -90,9 +49,9 @@ export interface MediaKeysState {
   negotiatedKeySystem?: string;
 }
 
-/** Context shape for MediaKeys setup. */
 export interface MediaKeysContext {
   mediaElement?: HTMLMediaElement | undefined;
+  /** The attached MediaKeys for an encrypted source, owned by `setupMediaKeys`. */
   mediaKeys?: MediaKeys;
 }
 
@@ -102,18 +61,17 @@ export interface MediaKeysContext {
  */
 export type NegotiableDrmSystemsConfig = KeyedBy<'keySystems', 'keySystem', DrmSystemConfig>;
 
-/** Config for MediaKeys setup. */
 export interface MediaKeysSetupConfig {
   /**
-   * License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. Required:
-   * license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies
-   * it.
+   * License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems.
+   * **Required** — license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine
+   * variant supplies it.
    */
   drm: NegotiableDrmSystemsConfig;
   /**
-   * The key systems this composition can negotiate, most-preferred first. Required for the same reason `drm` is: which
-   * systems an engine carries is a composition decision, and each module dropped from the list drops its own
-   * negotiation, init-data, and license-shaping code with it.
+   * The key systems this composition can negotiate, most-preferred first. **Required** — which systems an engine
+   * carries is a composition decision, and each module dropped from the list drops its own negotiation, init-data, and
+   * license-shaping code with it.
    */
   keySystems: readonly KeySystemModule[];
 }
@@ -122,7 +80,7 @@ export interface MediaKeysSetupConfig {
 // intact — as type aliases, not interfaces: the inference goes through an
 // index-signature constraint that only aliases satisfy implicitly. The reporter
 // seam (`errors`, optional per `ErrorEmitterState`) is deliberately not in the
-// typed slice — the setup helper accepts the map without it, and the live slot
+// typed slice — the setup helper accepts the map without it, and the live signal
 // reaches it at runtime when `collectErrors` is composed. Same shape as
 // `resolve-track`.
 type MediaKeysStateMap = {
@@ -261,10 +219,10 @@ function setupMediaKeysSetup({
   // schedules a fresh task.
   const runner = new RecurringRunner<void>(runOnce);
 
-  // `loadingSuspended` is observed, never declared: the slot exists only where
+  // `loadingSuspended` is observed, never declared: the signal exists only where
   // a feature behavior declares and writes it (`setupAirPlay`), so it lives
   // behind a cast rather than in the typed slice above — declaring it in
-  // `stateKeys` is what would materialize it. Absent slot means never
+  // `stateKeys` is what would materialize it. Absent signal means never
   // suspended, which is the right answer for every composition without an
   // AirPlay bridge. Shape redefined locally (canonical:
   // `SegmentLoadingState['loadingSuspended']`) to avoid a load-segments import.
@@ -371,10 +329,10 @@ function setupMediaKeysSetup({
             });
 
           // State-exit cleanup — source unload, element detach, or destroy.
-          // Order: abort first (kills the negotiation), clear the slots, then
+          // Order: abort first (kills the negotiation), clear the signals, then
           // detach. Sessions opened against these MediaKeys are closed by
           // `exchangeLicenses`, which is composed ahead of this behavior so
-          // its cleanup runs first (see its file JSDoc).
+          // its cleanup runs first (see its JSDoc).
           return () => {
             runner.abortAll();
             clearNegotiation();
@@ -386,6 +344,51 @@ function setupMediaKeysSetup({
   });
 }
 
+/**
+ * **Negotiate a key system and attach its MediaKeys for the current source.** Once an encrypted rendition has resolved
+ * against a media element, negotiate one composed key system over the configured license servers, apply its server
+ * certificate when it configures one, and attach the resulting MediaKeys — so licensing can begin. Encrypted segment
+ * loads are gated until the attach lands, and the outcome is published for pruning and licensing to react to: the
+ * chosen system, or {@link NO_KEY_SYSTEM} for a refusal.
+ *
+ * Licensing is `exchangeLicenses`' job, not this behavior's. The handoff is `context.mediaKeys` +
+ * `state.negotiatedKeySystem`, both published only once the certificate has been applied and the attach has resolved —
+ * which is what carries the "certificate before `generateRequest`" ordering across the boundary.
+ *
+ * The negotiation is the minimal key-system probe — capability-probing's full async probe supersedes it when that lands
+ * — over per-system init-data types and the declared encryption scheme. The `segmentLoadingBlocked` load gate is raised
+ * synchronously at setup and for each new source, and lowered once it's confirmed clear or MediaKeys attach: appending
+ * encrypted data with no MediaKeys attached misbehaves on Chromium, so the segment-load dispatchers park while the gate
+ * is up (see `load-segments.ts`), whatever order a composition lists them in — but lowered on _attach_, not on license:
+ * the appends that follow are what fire `encrypted` for the event-driven path, and browsers queue decode on missing
+ * keys. Failures report onto the errors sequence via `emitError` (SVTA 4008 no usable key system, 99408 the source is
+ * non-DRM clear-key encryption we can't decrypt, 4010 MediaKeys init, 4013 certificate); a refused negotiation or
+ * failed certificate leaves the gate up — playback stays parked rather than failing decode, and severity is the
+ * adapter's call. A refusal publishes {@link NO_KEY_SYSTEM}, which is what lets rendition pruning reach the verdict
+ * `track-switching` owns.
+ *
+ * Single-positive-state reactor riding the resolver's resolved/unresolved lifecycle, like `setupMediaSource`. The EME
+ * pipeline runs as one `Task` under a runner the reactor owns — the same shape as `setupTrackResolution` — so source
+ * replacement routes through `'preconditions-unmet'`, whose state-exit cleanup aborts the task structurally, clears the
+ * signals, and detaches MediaKeys (`setMediaKeys(null)`) before the next source's setup runs. Teardown-per-source is
+ * deliberate — MediaKeys re-use across sources is an optimization with prior art (see drm-support.md).
+ *
+ * A live AirPlay session routes through that same exit. Playback moves off MSE onto the native-HLS fallback `<source>`
+ * the receiver plays, and the MediaKeys negotiated here cannot serve the `skd` requests it raises — so an observed
+ * `loadingSuspended` yields the element, and `setupAirPlayFairPlay` negotiates for the receiver in the gap. The falling
+ * edge re-enters and re-negotiates with no extra machinery.
+ *
+ * Sole writer of `context.mediaKeys`, `state.negotiatedKeySystem`, and `state.segmentLoadingBlocked`. Composed into the
+ * HLS video engine's `createEngine` unconditionally today; on a clear source it never negotiates, just lowering the
+ * gate once it's clear. A composition that omits it — along with `exchangeLicenses` and the two DRM-aware config
+ * defaults — carries neither the machinery nor the signals, and none of this file's key-system code survives
+ * tree-shaking; the DRM-free engine variant that would do so is tracked in drm-support.md.
+ *
+ * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD
+ * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
+ *
+ * @observes loadingSuspended
+ */
 export const setupMediaKeys = defineBehavior({
   stateKeys: ['presentation', 'segmentLoadingBlocked', 'negotiatedKeySystem'],
   contextKeys: ['mediaElement', 'mediaKeys'],

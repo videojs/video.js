@@ -1,3 +1,9 @@
+/**
+ * Fetches and parses the media playlist of the selected video, audio, or text track, so its segments become known. Each
+ * variant schedules a fetch of the selected track's media playlist whenever that track is partially resolved, parses
+ * it, and writes the resolved track back into `state.presentation`.
+ */
+
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
@@ -9,7 +15,11 @@ import type { MaybeResolvedPresentation, PartiallyResolvedTrack, ResolvedTrack }
 import { deriveStreamType, getMediaPlaylistMetadata, isResolvedPresentation, isResolvedTrack } from '../../media/types';
 import type { GetCdnId } from '../../media/utils/cdn';
 import { applyContainerMimeType, findTrack, updateTrackInPresentation } from '../../media/utils/tracks';
-import { credentialsFetch, type RequestCredentialsPolicy } from '../../network/credentials-fetch';
+import {
+  credentialsFetch,
+  type RequestCredentialsConfig,
+  type RequestCredentialsPolicy,
+} from '../../network/credentials-fetch';
 import { fetchResolvableText as defaultFetchResolvableText, type FetchText } from '../../network/fetch';
 import { failoverFetch } from '../primitives/failover-fetch';
 import type { GateFirstParse } from '../primitives/gate-first-parse';
@@ -29,7 +39,7 @@ import { type ErrorEmitterState, emitError } from './collect-errors';
 // ============================================================================
 
 /**
- * State shape for track resolution. Uses `MaybeResolvedPresentation` so it matches the engine's slot type; resolution
+ * State shape for track resolution. Uses `MaybeResolvedPresentation` so it matches the engine's signal type; resolution
  * narrows internally.
  */
 export interface ResolveTrackState {
@@ -86,8 +96,11 @@ interface TrackResolutionConfig<K extends SelectedTrackKey> {
 }
 
 /** Engine-config slice each `resolve*` behavior reads to build its failover- decorated playlist fetch. */
-export interface ResolveTrackConfig {
-  /** CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. */
+export interface ResolveTrackConfig extends RequestCredentialsConfig {
+  /**
+   * CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See
+   * `TrackSwitchingSharedConfig['getCdnId']`.
+   */
   getCdnId?: GetCdnId;
   /** First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. */
   gateFirstParse?: GateFirstParse;
@@ -97,15 +110,13 @@ export interface ResolveTrackConfig {
   reportUnsupportedTrackConditions?: ReportUnsupportedTrackConditions;
   /** `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. */
   resolveKeyUri?: ResolveKeyUri;
-  /** The `credentials` mode media-playlist requests are made with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
 }
 
 function setupTrackResolution<K extends SelectedTrackKey>({
   state,
   config,
 }: {
-  // Widened with the optional `errors` slot: reporting writes through it without
+  // Widened with the optional `errors` signal: reporting writes through it without
   // the behavior declaring ownership, and no-ops when `collectErrors` isn't
   // composed. Same contract as `failedCdns` / `failoverFetch`.
   state: ResolveTrackStateMap<K> & ErrorEmitterState;
@@ -123,7 +134,7 @@ function setupTrackResolution<K extends SelectedTrackKey>({
 
   // Recurrence lives in the runner: with a `reschedule` (live) it re-runs the
   // task until the policy stops; `runOnce` (VOD) runs it exactly once. Single-
-  // slot — a selection change re-schedules (abort-and-replace).
+  // signal — a selection change re-schedules (abort-and-replace).
   const runner = new RecurringRunner<ResolvedTrack>(reschedule ?? runOnce);
 
   // Reactor states model the FSM the previous effect-based body was

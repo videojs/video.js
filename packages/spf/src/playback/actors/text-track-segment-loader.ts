@@ -61,6 +61,7 @@ export type TextTrackSegmentLoaderActor = MessageActor<
  * by their playhead-relative window at runtime — so no `backBuffer` config field.
  */
 export interface TextTrackSegmentLoaderActorConfig<C extends Cue = Cue> {
+  /** Forward-buffer tuning; see `SegmentLoaderActorConfig['forwardBuffer']`. */
   forwardBuffer?: Partial<ForwardBufferConfig>;
   /** Ordered step pipeline. Defaults to {@link DEFAULT_TEXT_MESSAGE_PIPELINES} (`resolveCues → dispatchCues`). */
   messagePipelines?: TextMessagePipelines<C>;
