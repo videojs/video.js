@@ -848,7 +848,7 @@ The video skins include a settings menu with the available quality, audio-track,
 | Quality | <DocsLink slug="reference/components/quality-radio-group">Quality radio group</DocsLink> | Lets a viewer pick the video quality. Use `source.playback.maxResolution` to cap the stream's available resolution; it does not force playback at that resolution. |
 | Audio tracks | <DocsLink slug="reference/components/audio-track-radio-group">Audio track radio group</DocsLink> | For multi-language audio. |
 | Captions | <DocsLink slug="reference/components/captions-radio-group">Captions radio group</DocsLink> | Rendered by the browser. |
-| Speed | <DocsLink slug="reference/components/playback-rate-radio-group">Playback rate radio group</DocsLink> | The rates are a fixed set — `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` — and you can't choose your own yet ([#1404](https://github.com/videojs/v10/issues/1404)). |
+| Speed | <DocsLink slug="reference/components/playback-rate-radio-group">Playback rate radio group</DocsLink> | The rates default to `0.5` through `2` in steps of `0.25`. Set `defaultPlaybackRates` on the player, or `rates` on the radio group, to choose your own; see the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink>. |
 
 When enabling captions without a previous selection in this player instance, `toggleSubtitles()` prefers a track matching `navigator.language`, then falls back to the first available caption or subtitle track. For an authored track that should show on load, add `default`. See <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>.
 

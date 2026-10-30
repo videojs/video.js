@@ -75,7 +75,14 @@ export default styles({
       utilities: menuGroup,
     },
     radioItem: {
-      utilities: ['group/menu-radio-item', ...menuItem, ...menuItemOption, ...menuItemHighlight],
+      utilities: [
+        'group/menu-radio-item',
+        ...menuItem,
+        ...menuItemOption,
+        ...menuItemHighlight,
+        // An option the menu adds for a current value it does not offer, such as a playback rate set through the API.
+        'data-custom:italic',
+      ],
     },
     triggerItem: {
       utilities: ['group/menu-trigger-item', ...menuItem, ...menuItemOption, ...menuItemHighlight],

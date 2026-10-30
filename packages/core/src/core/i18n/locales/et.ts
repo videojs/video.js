@@ -101,6 +101,7 @@ export default {
     speed: 'Kiirus',
     captions: 'Subtiitrid',
     playbackRate: 'Taasesituse kiirus',
+    customRate: 'Kohandatud, {rate}',
     back: 'Tagasi',
     off: 'Väljas',
     auto: 'Automaatne',

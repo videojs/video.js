@@ -39,6 +39,11 @@ export const playbackRateText = {
   text: 'Playback rate',
 } as const satisfies Text;
 
+export const customRateText = {
+  key: `${prefix}customRate`,
+  text: 'Custom, {rate}',
+} as const satisfies Text;
+
 export const backText = {
   key: `${prefix}back`,
   text: 'Back',

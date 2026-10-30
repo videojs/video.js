@@ -3,6 +3,7 @@ import { applyElementProps } from '@videojs/core/dom';
 import { type Translator, translateText } from '@videojs/core/i18n';
 import type { ReactiveController, ReactiveControllerHost } from '@videojs/element';
 import { cloneTemplateRoot, getTemplateElement, getTemplateRoot } from '@videojs/utils/dom';
+import { isUndefined } from '@videojs/utils/predicate';
 
 import { cacheKey } from '../../i18n/cache-key';
 import { MenuItemIndicatorElement } from '../menu/item-indicator';
@@ -63,7 +64,7 @@ export class RadioOptionsController<Option extends RadioOption> implements React
     const contentKey = `${state.options
       .map(
         (option) =>
-          `${option.value}:${cacheKey(option.label, option.labelParams)}:${this.#config.getOptionCacheKey?.(option) ?? ''}`
+          `${option.value}:${cacheKey(option.label, option.labelParams)}:${cacheKey(option.ariaLabel ?? '', option.ariaLabelParams)}:${this.#config.getOptionCacheKey?.(option) ?? ''}`
       )
       .join('|')}::${locale}::${template?.innerHTML ?? ''}`;
 
@@ -71,11 +72,8 @@ export class RadioOptionsController<Option extends RadioOption> implements React
       this.#contentKey = contentKey;
       this.#translator = translator;
 
-      for (const child of [...this.#host.children]) {
-        if (child === template) continue;
-
-        child.remove();
-      }
+      const staleChildren = [...this.#host.children].filter((child) => child !== template);
+      const focusedValue = this.#getFocusedItem()?.value;
 
       const items = state.options.map((option) => {
         const item = itemRoot
@@ -89,10 +87,33 @@ export class RadioOptionsController<Option extends RadioOption> implements React
         if (this.#config.renderItem) this.#config.renderItem(item, label, option);
         else this.#setItemLabel(item, label);
 
+        if (!isUndefined(option.ariaLabel)) {
+          item.setAttribute('aria-label', translateText(option.ariaLabel, translator, option.ariaLabelParams));
+        }
+
         return item;
       });
 
       this.#host.append(...items);
+
+      const removeStale = () => {
+        for (const child of staleChildren) child.remove();
+      };
+
+      // Removing the focused item fires a `focusout` with no destination, which closes an open menu. Its replacement
+      // registers with the menu, and becomes focusable, on its first update, so the old items stay until focus can move.
+      const replacement = isUndefined(focusedValue)
+        ? undefined
+        : (items.find((item) => item.value === focusedValue) ?? items.find((item) => item.value === state.value));
+
+      if (replacement) {
+        void replacement.updateComplete.then(() => {
+          replacement.focus();
+          removeStale();
+        });
+      } else {
+        removeStale();
+      }
     }
 
     const optionsByValue = new Map(state.options.map((option) => [option.value, option]));
@@ -116,6 +137,12 @@ export class RadioOptionsController<Option extends RadioOption> implements React
 
     this.#config.onValueChange(value);
   };
+
+  #getFocusedItem(): MenuRadioItemElement | null {
+    const active = (this.#host.getRootNode() as Document | ShadowRoot).activeElement;
+
+    return active instanceof MenuRadioItemElement && active.parentElement === this.#host ? active : null;
+  }
 
   #setItemLabel(item: MenuRadioItemElement, label: string): void {
     const labelPart = item.querySelector<HTMLElement>('[data-part~="label"]');

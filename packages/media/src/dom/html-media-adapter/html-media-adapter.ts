@@ -2,6 +2,8 @@ import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/c
 import {
   type EventLike,
   type CommonMedia,
+  type MediaPlaybackRateRange,
+  type MediaPlaybackRateRangeCapability,
   type MediaStreamType,
   MediaStreamTypes,
   type MediaTargetLike,
@@ -261,6 +263,15 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
   set playbackRate(value) {
     if (this.target) this.target.playbackRate = value;
+  }
+
+  /**
+   * The target's narrower rate range, when it reports one; native media accept the browser's range.
+   *
+   * @internal
+   */
+  get playbackRateRange(): MediaPlaybackRateRange | undefined {
+    return (this.target as Partial<MediaPlaybackRateRangeCapability> | null)?.playbackRateRange;
   }
 
   get defaultPlaybackRate() {

@@ -100,6 +100,7 @@ export default {
     speed: 'Kecepatan',
     captions: 'Pilihan teks',
     playbackRate: 'Kecepatan pemutaran',
+    customRate: 'Khusus, {rate}',
     back: 'Kembali',
     off: 'Nonaktif',
     auto: 'Otomatis',

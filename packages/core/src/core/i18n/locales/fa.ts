@@ -100,6 +100,7 @@ export default {
     speed: 'سرعت',
     captions: 'زیرنویس‌ها',
     playbackRate: 'سرعت پخش',
+    customRate: 'سفارشی، {rate}',
     back: 'بازگشت',
     off: 'خاموش',
     auto: 'خودکار',

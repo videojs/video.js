@@ -100,6 +100,7 @@ export default {
     speed: 'गति',
     captions: 'क्याप्शन',
     playbackRate: 'प्लेब्याक दर',
+    customRate: 'कस्टम, {rate}',
     back: 'पछाडि',
     off: 'बन्द',
     auto: 'स्वतः',

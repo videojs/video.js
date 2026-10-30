@@ -100,6 +100,7 @@ export default {
     speed: 'వేగం',
     captions: 'క్యాప్షన్‌లు',
     playbackRate: 'ప్లేబ్యాక్ రేట్',
+    customRate: 'అనుకూలం, {rate}',
     back: 'వెనుకకు',
     off: 'ఆఫ్',
     auto: 'ఆటో',

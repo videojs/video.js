@@ -68,6 +68,7 @@ export interface TranslationParams {
   'menu.speed': never;
   'menu.captions': never;
   'menu.playbackRate': never;
+  'menu.customRate': { rate: string | number };
   'menu.back': never;
   'menu.off': never;
   'menu.auto': never;

@@ -116,4 +116,28 @@ describe('definePlayerFeature', () => {
       },
     });
   });
+
+  it('accepts list config actions that also parse text', () => {
+    interface ListState {
+      rates: readonly number[];
+      setRates(value: readonly number[] | string | null | undefined): void;
+    }
+
+    assertType<PlayerFeatureConfig<ListState>>({
+      rates: { action: 'setRates', state: 'rates' },
+    });
+
+    interface ListOnlyState {
+      rates: readonly number[];
+      setRates(value: readonly number[] | null | undefined): void;
+    }
+
+    assertType<PlayerFeatureConfig<ListOnlyState>>({
+      rates: {
+        // @ts-expect-error HTML attributes deliver text, so list actions must accept it too.
+        action: 'setRates',
+        state: 'rates',
+      },
+    });
+  });
 });

@@ -100,6 +100,7 @@ export default {
     speed: 'Ātrums',
     captions: 'Subtitri',
     playbackRate: 'Atskaņošanas ātrums',
+    customRate: 'Pielāgots, {rate}',
     back: 'Atpakaļ',
     off: 'Izslēgts',
     auto: 'Automātiski',
