@@ -42,7 +42,7 @@ import basicUsageHtmlTs from "@/components/docs/demos/buffering-indicator/html/c
 
 ## Behavior
 
-Shows a loading indicator when the media is waiting to buffer and not paused, but only after a configurable `delay` (default 500ms). This delay prevents the indicator from flickering during brief stalls. The indicator hides immediately when buffering ends.
+Shows a loading indicator when the media is waiting to buffer and not paused, or while media with `autoplay` is trying to start, but only after a configurable `delay` (default 500ms). This delay prevents the indicator from flickering during brief stalls. The indicator hides immediately when buffering ends, or when the browser refuses the autoplay.
 
 ## Styling
 

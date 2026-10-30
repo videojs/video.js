@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "dashjs": "5.2.0",
-    "hls.js": "1.6.19",
+    "hls.js": "1.7.3",
     "jsdom": "^26.1.0",
     "vite-plus": "catalog:"
   }

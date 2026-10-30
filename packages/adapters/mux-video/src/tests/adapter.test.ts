@@ -38,8 +38,9 @@ function startCapping(media: MuxVideoAdapter) {
   const engine = media.engine!;
 
   Object.defineProperty(engine, 'levels', { configurable: true, value: LADDER });
-  engine.config.capLevelToPlayerSize = false;
-  engine.capLevelToPlayerSize = true;
+  // What hls.js does itself once the manifest or the first buffered codecs
+  // confirm video. The controller is private to hls.js, hence the cast.
+  (engine as unknown as { capLevelController: { startCapping(): void } }).capLevelController.startCapping();
   return engine;
 }
 

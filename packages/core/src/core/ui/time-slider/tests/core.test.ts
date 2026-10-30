@@ -282,6 +282,8 @@ describe('TimeSliderCore', () => {
         ended: false,
         started: true,
         waiting: false,
+        autoplay: false,
+        autoplaying: false,
         play: vi.fn(async () => {}),
         pause: vi.fn(),
         ...overrides,

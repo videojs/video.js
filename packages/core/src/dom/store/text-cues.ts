@@ -97,11 +97,19 @@ function getCueText(cue: TextTrackCueLike): string {
   return 'text' in cue && isString(cue.text) ? cue.text : '';
 }
 
+/**
+ * Types engines give values of the same shape as another type, by that type. ID3 from an `emsg` box is the same ID3
+ * frame as ID3 from a segment, so readers check one type for both.
+ */
+const CUE_TYPE_ALIASES = new Map([['https://aomedia.org/emsg/ID3', 'org.id3']]);
+
 /** What a cue's `value` holds, so only a cue with a `value` has one. */
 function getCueType(cue: TextTrackCueLike): string | undefined {
   if (!('value' in cue) || isUndefined(cue.value)) return undefined;
 
-  return 'type' in cue && isString(cue.type) && cue.type ? cue.type : undefined;
+  const type = 'type' in cue && isString(cue.type) && cue.type ? cue.type : undefined;
+
+  return type && (CUE_TYPE_ALIASES.get(type) ?? type);
 }
 
 function toMediaTextCue(cue: TextTrackCueLike, kind: string | undefined, max: number, getId: CueIds): MediaTextCue {

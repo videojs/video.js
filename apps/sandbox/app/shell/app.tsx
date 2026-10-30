@@ -31,7 +31,9 @@ import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } fro
 import { skinSourceAvailable, skinStylings, tailwindSkinAvailable } from '@app/shared/skin-sources';
 import {
   DEFAULT_SOURCE,
+  MIXCLOUD_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
+  SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   SOURCES,
   type SourceId,
@@ -56,7 +58,13 @@ function readMedia(params: URLSearchParams): MediaId {
 // Embed sources are listed apart from SOURCE_IDS, but a shared link may name any of them.
 const writeUrl = createUrlWriter();
 
-const LINKABLE_SOURCE_IDS = [...SOURCE_IDS, ...YOUTUBE_SOURCE_IDS, ...PLAYERJS_SOURCE_IDS];
+const LINKABLE_SOURCE_IDS = [
+  ...SOURCE_IDS,
+  ...YOUTUBE_SOURCE_IDS,
+  ...PLAYERJS_SOURCE_IDS,
+  ...SOUNDCLOUD_SOURCE_IDS,
+  ...MIXCLOUD_SOURCE_IDS,
+];
 
 function readOption<T extends string, const Fallback>(
   values: readonly T[],

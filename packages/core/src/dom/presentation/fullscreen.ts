@@ -1,5 +1,10 @@
 import { type MediaFullscreenCapability, getRegisteredMedia } from '@videojs/media';
-import type { WebKitDocument, WebKitFullscreenElement, WebKitVideoElement } from '@videojs/utils/dom';
+import {
+  hideOpenPopovers,
+  type WebKitDocument,
+  type WebKitFullscreenElement,
+  type WebKitVideoElement,
+} from '@videojs/utils/dom';
 import { isFunction } from '@videojs/utils/predicate';
 
 export function isFullscreenEnabled() {
@@ -56,6 +61,14 @@ export async function requestFullscreen(container: HTMLElement | null, media: Ev
 
   if (container && (doc.fullscreenEnabled || doc.webkitFullscreenEnabled)) {
     const el = container as WebKitFullscreenElement;
+
+    // Browsers hide auto popovers when entering fullscreen but leave the manual
+    // ones the player uses open. Chrome crashes the tab when an open popover's
+    // parent becomes `display: contents` through a container query that the
+    // fullscreen resize starts matching, so hide them first.
+    // https://issues.chromium.org/issues/577708593
+    hideOpenPopovers(container);
+
     if (isFunction(el.requestFullscreen)) return el.requestFullscreen();
 
     if (isFunction(el.webkitRequestFullscreen)) {

@@ -84,8 +84,10 @@ describe('resolveRendererCandidates', () => {
     ]);
   });
 
-  it('returns no candidates for Wistia, which has no renderer yet', () => {
+  it('returns no candidates for Wistia, SoundCloud, and Mixcloud, which have no renderer yet', () => {
     expect(resolveRendererCandidates('https://fast.wistia.net/embed/iframe/e4a27b971d')).toEqual([]);
+    expect(resolveRendererCandidates('https://soundcloud.com/forss/flickermood')).toEqual([]);
+    expect(resolveRendererCandidates('https://www.mixcloud.com/spartacus/lambiance/')).toEqual([]);
   });
 });
 
