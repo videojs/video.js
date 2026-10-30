@@ -25,7 +25,7 @@ A feature is a group of behaviors that together give an engine one ability, such
 
 A feature can depend on another feature's writes. For example, the video feature loads nothing until some feature writes `context.mediaSource`. Each feature's reference page lists what it requires from other features.
 
-An engine is an ordered list of features. `flattenFeatures()` concatenates their behaviors in feature order and merges their `defaultConfig` and `initialState` values. A later feature's value replaces an earlier one's.
+An engine is an ordered list of features. `flattenFeatures()` concatenates their behaviors in feature order and merges their `defaultConfig` and `initialState` values. A behavior listed by more than one feature runs once, at its first position. A config or state key given by more than one feature takes the later feature's value.
 
 `defineCompositionFactory()` turns that behavior list and its defaults into an engine's `createEngine()`. A default fills any config key the caller leaves out or passes as `undefined`, and the key becomes optional in the engine's config type.
 
