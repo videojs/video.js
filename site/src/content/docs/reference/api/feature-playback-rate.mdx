@@ -52,7 +52,7 @@ The button cycles through the rates in the order you list them, and the menu sho
 
 ### Rates for one control
 
-To give one control a different list, set `rates` on it. The rest of the player keeps the default list.
+To give one control a different list, set `rates` on it. The rest of the player keeps the default list. The control offers these rates as given, even ones outside the media's range, which play at the nearest end of the range.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -70,11 +70,13 @@ To make the speed hotkeys change speed in fixed steps instead, give `speedUp` an
 
 ### Rates outside the list
 
-The media owns the current rate, so it can be one the menu doesn't offer, such as `1.1` set through the media API or a stepped hotkey. The menu then shows that rate as an extra item, slotted before the next faster rate. Skins set it in italics, and its accessible name is "Custom, 1.1×". The item goes away once the rate is back on the list.
+The media owns the current rate, so it can be one the menu doesn't offer, such as `1.1` set through the media API or a stepped hotkey. The menu then shows that rate as an extra item, slotted before the next faster rate. Skins set it in italics, and its accessible name is "Custom, 1.1×". The item goes away once the rate is back on the list. Normal speed (`1`) is added the same way when your list leaves it out, but isn't marked custom.
 
 ### Media range
 
-Each media accepts rates within a range. Browsers play `0.0625` through `16`, YouTube `0.25` through `2`, and Vimeo up to `2`. The player leaves out any rate you list outside that range and keeps the rest in your order. If none are left, it offers the defaults within the range. `setPlaybackRate` clamps a rate outside the range to the nearest end, and warns in development.
+Each media accepts rates within a range. Browsers play `0.0625` through `16`, YouTube `0.25` through `2`, and Vimeo up to `2`. The player leaves out any `defaultPlaybackRates` outside that range and keeps the rest in your order. If none are left, it offers the defaults within the range and warns in development. `setPlaybackRate` clamps a rate outside the range to the nearest end, and warns in development. That includes `0`, which would stop the picture while the player still reports playback; call `pause()` instead.
+
+`playbackRates` lists rates even for a media that can't change its rate, so check `playbackRateAvailability` before offering them.
 
 YouTube rounds rates down to a step of `0.05`, so asking for `1.13` plays at `1.1`.
 

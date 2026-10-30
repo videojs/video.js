@@ -204,12 +204,10 @@ describe('PlaybackRateButtonCore', () => {
       expect(media.setPlaybackRate).toHaveBeenCalledWith(1);
     });
 
-    it("leaves out its own rates that fall outside the media's range", () => {
+    it("keeps its own rates even when they fall outside the player's rates", () => {
       const core = new PlaybackRateButtonCore({ rates: [1, 3, 1.5] });
 
-      core.setMediaTarget({ playbackRateRange: { min: 0.25, max: 2 } });
-
-      expect(core.getRates(createMediaState())).toEqual([1, 1.5]);
+      expect(core.getRates(createMediaState())).toEqual([1, 3, 1.5]);
     });
 
     it('falls back to the player rates when its own rates hold no usable rate', () => {

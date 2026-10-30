@@ -97,6 +97,20 @@ describe('PlaybackRateRadioGroupCore', () => {
       expect(core.getState().options.at(-1)).toMatchObject({ rate: 3, custom: true });
     });
 
+    it('adds normal speed without marking it custom when the group does not offer it', () => {
+      const core = new PlaybackRateRadioGroupCore({ rates: '1.5 2' });
+
+      core.setMedia(createMediaState({ playbackRate: 1 }));
+      const { options } = core.getState();
+
+      expect(options.map(({ rate, custom }) => [rate, custom])).toEqual([
+        [1, false],
+        [1.5, false],
+        [2, false],
+      ]);
+      expect(options[0]!.ariaLabel).toBeUndefined();
+    });
+
     it('drops the added rate once the current rate is offered again', () => {
       const core = new PlaybackRateRadioGroupCore();
       const media = createMediaState({ playbackRate: 1.1 });

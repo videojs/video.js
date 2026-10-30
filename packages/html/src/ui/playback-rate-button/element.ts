@@ -23,7 +23,6 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
   protected readonly core = new PlaybackRateButtonCore();
   protected readonly stateAttrMap = PlaybackRateButtonDataAttrs;
   protected readonly mediaState = new PlayerController(this, playerContext, selectPlaybackRate);
-  readonly #player = new PlayerController(this, playerContext);
   protected override readonly hotkeyAction = 'speedUp';
 
   protected activate(state: MediaPlaybackRateState, event?: UIEvent): void {
@@ -59,7 +58,6 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed);
-    this.core.setMediaTarget(this.#player.value?.target?.media);
 
     if (changed.has('commandfor')) {
       if (this.commandfor) {

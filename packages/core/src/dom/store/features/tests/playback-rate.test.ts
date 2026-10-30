@@ -114,6 +114,7 @@ describe('playbackRateFeature', () => {
     it.each([
       [32, 16],
       [0.01, 0.0625],
+      [0, 0.0625],
     ])('clamps %s to the native range as %s and warns', (rate, expected) => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const video = createMockVideo();
@@ -218,16 +219,39 @@ describe('playbackRateFeature', () => {
       expect(store.state.playbackRates).toEqual([2, 1.1, 0.5]);
     });
 
-    it('falls back to the defaults that fit when no configured rate does', () => {
+    it('falls back to the defaults that fit when no configured rate does, and warns', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const store = createRateStore();
 
       setPlayerConfigValue(store, ratesConfig, [3, 4]);
       store.attach({ media: createRangedVideo({ min: 0.5, max: 1 }), container: null });
 
       expect(store.state.playbackRates).toEqual([0.5, 0.75, 1]);
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('None of the default playback rates 3, 4'));
+    });
+
+    it('warns when rates set after attach do not fit the range', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const store = createRateStore();
+
+      store.attach({ media: createRangedVideo({ min: 0.5, max: 2 }), container: null });
+      setPlayerConfigValue(store, ratesConfig, [3, 4]);
+
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('None of the default playback rates 3, 4'));
+    });
+
+    it('does not warn when some configured rates fit', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const store = createRateStore();
+
+      setPlayerConfigValue(store, ratesConfig, [1, 3]);
+      store.attach({ media: createRangedVideo({ min: 0.5, max: 2 }), container: null });
+
+      expect(warn).not.toHaveBeenCalled();
     });
 
     it('falls back to the rate nearest 1 when no default fits', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
       const store = createRateStore();
 
       store.attach({ media: createRangedVideo({ min: 3, max: 4 }), container: null });

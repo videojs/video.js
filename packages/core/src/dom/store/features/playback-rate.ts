@@ -41,6 +41,15 @@ function fitPlaybackRates(rates: readonly number[], range: MediaPlaybackRateRang
   return [clamp(1, range.min, range.max)];
 }
 
+function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRateRange): void {
+  if (filterPlaybackRates(rates, range).length > 0) return;
+
+  console.warn(
+    `[vjs] None of the default playback rates ${rates.join(', ')} is within the media's range of ${range.min} to ` +
+      `${range.max}; using ${fitPlaybackRates(rates, range).join(', ')}.`
+  );
+}
+
 export const playbackRateFeature = definePlayerFeature({
   name: 'playbackRate',
   config: {
@@ -55,10 +64,15 @@ export const playbackRateFeature = definePlayerFeature({
       state: DEFAULT_PLAYBACK_RATES,
     },
   } satisfies PlayerFeatureConfig<PlaybackRateSourceState>,
-  state: ({ target, set }): PlaybackRateSourceState => ({
+  state: ({ target, get, set }): PlaybackRateSourceState => ({
     [DEFAULT_PLAYBACK_RATES]: DEFAULT_RATES,
-    [SET_DEFAULT_PLAYBACK_RATES]: (value) =>
-      set({ [DEFAULT_PLAYBACK_RATES]: parsePlaybackRates(value) ?? DEFAULT_RATES }),
+    [SET_DEFAULT_PLAYBACK_RATES]: (value) => {
+      const rates = parsePlaybackRates(value) ?? DEFAULT_RATES;
+
+      set({ [DEFAULT_PLAYBACK_RATES]: rates });
+
+      if (__DEV__) warnUnfitPlaybackRates(rates, get()[PLAYBACK_RATE_RANGE] as MediaPlaybackRateRange);
+    },
     [PLAYBACK_RATE_RANGE]: NATIVE_PLAYBACK_RATE_RANGE,
     playbackRate: 1,
     playbackRateAvailability: 'unavailable',
@@ -66,6 +80,8 @@ export const playbackRateFeature = definePlayerFeature({
       const { media } = target();
       if (!isMediaPlaybackRateCapable(media)) return;
 
+      // `0` is clamped too, on purpose: the spec allows it and Chromium skips its range check for it, but the media
+      // then holds its frame while `paused` stays false, so the controls would claim it is playing. Use `pause()`.
       const { min, max } = getPlaybackRateRange(media);
       const next = clamp(rate, min, max);
 
@@ -77,15 +93,26 @@ export const playbackRateFeature = definePlayerFeature({
     },
   }),
   derived: {
-    /** The default rates that fit the media's range. Set them through the player, not through the store. */
+    /**
+     * The default rates that fit the media's range. Set them through the player, not through the store. They are listed
+     * even when the media cannot change its rate, so check `playbackRateAvailability` before offering them.
+     */
     playbackRates: ({ get }): readonly number[] =>
       fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get()[PLAYBACK_RATE_RANGE]),
   },
 
-  attach({ target, signal, set }) {
+  attach({ target, signal, get, set }) {
     const { media } = target;
 
-    const syncRange = () => set({ [PLAYBACK_RATE_RANGE]: getPlaybackRateRange(media) });
+    const syncRange = () => {
+      const range = getPlaybackRateRange(media);
+      const current = get()[PLAYBACK_RATE_RANGE];
+      if (range.min === current.min && range.max === current.max) return;
+
+      set({ [PLAYBACK_RATE_RANGE]: range });
+
+      if (__DEV__) warnUnfitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], range);
+    };
 
     syncRange();
 

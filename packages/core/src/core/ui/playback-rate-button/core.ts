@@ -7,7 +7,7 @@ import { resolveText, type Text } from '../../i18n';
 import { playbackRateText } from '../../i18n/text/menu';
 import { rateText } from '../../i18n/text/playback';
 import type { ButtonState } from '../types';
-import { filterPlaybackRates, getPlaybackRateRange, parsePlaybackRates } from '../utils/playback-rates';
+import { parsePlaybackRates } from '../utils/playback-rates';
 import { resolveLabel } from '../utils/resolve-label';
 import { PlaybackRateButtonCSSVars } from './vars';
 
@@ -51,7 +51,6 @@ export class PlaybackRateButtonCore {
 
   #props = { ...PlaybackRateButtonCore.defaultProps };
   #media: MediaPlaybackRateState | null = null;
-  #mediaTarget: object | null = null;
 
   constructor(props?: PlaybackRateButtonProps) {
     if (props) this.setProps(props);
@@ -98,11 +97,6 @@ export class PlaybackRateButtonCore {
     this.#media = media;
   }
 
-  /** The media element or adapter the player attached, whose rate range limits the control's own `rates`. */
-  setMediaTarget(target: object | null | undefined): void {
-    this.#mediaTarget = target ?? null;
-  }
-
   getState(): PlaybackRateButtonState {
     const media = this.#media!;
     const availability = media.playbackRateAvailability;
@@ -118,14 +112,11 @@ export class PlaybackRateButtonCore {
   }
 
   /**
-   * The rates the button cycles through: its own `rates`, or the player's when none of them is usable. Rates the media
-   * does not accept are left out.
+   * The rates the button cycles through: its own `rates`, or the player's when none of them is usable. Its own rates
+   * are taken as given; `setPlaybackRate` clamps one the media does not accept.
    */
   getRates(media: MediaPlaybackRateState): readonly number[] {
-    const own = parsePlaybackRates(this.#props.rates);
-    const supported = own && filterPlaybackRates(own, getPlaybackRateRange(this.#mediaTarget));
-
-    return supported?.length ? supported : media.playbackRates;
+    return parsePlaybackRates(this.#props.rates) ?? media.playbackRates;
   }
 
   cycle(media: MediaPlaybackRateState): void {

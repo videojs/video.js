@@ -7,12 +7,7 @@ import type { NonNullableObject } from '@videojs/utils/types';
 import { resolveText, type Text } from '../../i18n';
 import { customRateText, playbackRateText } from '../../i18n/text/menu';
 import type { RadioOption, RadioOptionsState } from '../types';
-import {
-  filterPlaybackRates,
-  getPlaybackRateRange,
-  insertPlaybackRate,
-  parsePlaybackRates,
-} from '../utils/playback-rates';
+import { insertPlaybackRate, parsePlaybackRates } from '../utils/playback-rates';
 import { resolveLabel } from '../utils/resolve-label';
 
 export interface PlaybackRateRadioGroupProps {
@@ -33,7 +28,8 @@ export interface PlaybackRateRadioGroupOption extends RadioOption {
   rate: number;
   /**
    * Whether the option is the current rate rather than one of the offered rates. The group adds it, slotted before the
-   * first faster rate, when something other than the group set a rate it does not offer, such as the media API.
+   * first faster rate, when something other than the group set a rate it does not offer, such as the media API. Normal
+   * speed (`1`) is added the same way but is never custom.
    */
   custom: boolean;
 }
@@ -41,6 +37,8 @@ export interface PlaybackRateRadioGroupOption extends RadioOption {
 export interface PlaybackRateRadioGroupState extends RadioOptionsState<PlaybackRateRadioGroupOption> {
   rate: number;
 }
+
+const NORMAL_RATE = 1;
 
 function formatPlaybackRate(rate: number): string {
   return `${rate}×`;
@@ -67,7 +65,6 @@ export class PlaybackRateRadioGroupCore {
 
   #props = { ...PlaybackRateRadioGroupCore.defaultProps };
   #media: MediaPlaybackRateState | null = null;
-  #mediaTarget: object | null = null;
 
   constructor(props?: PlaybackRateRadioGroupProps) {
     if (props) this.setProps(props);
@@ -105,23 +102,15 @@ export class PlaybackRateRadioGroupCore {
   }
 
   /**
-   * The rates the group offers: its own `rates`, or the player's when none of them is usable. Rates the media does not
-   * accept are left out.
+   * The rates the group offers: its own `rates`, or the player's when none of them is usable. Its own rates are taken
+   * as given; `setPlaybackRate` clamps one the media does not accept.
    */
   getRates(media: MediaPlaybackRateState): readonly number[] {
-    const own = parsePlaybackRates(this.#props.rates);
-    const supported = own && filterPlaybackRates(own, getPlaybackRateRange(this.#mediaTarget));
-
-    return supported?.length ? supported : media.playbackRates;
+    return parsePlaybackRates(this.#props.rates) ?? media.playbackRates;
   }
 
   setMedia(media: MediaPlaybackRateState): void {
     this.#media = media;
-  }
-
-  /** The media element or adapter the player attached, whose rate range limits the control's own `rates`. */
-  setMediaTarget(target: object | null | undefined): void {
-    this.#mediaTarget = target ?? null;
   }
 
   getState(): PlaybackRateRadioGroupState {
@@ -142,7 +131,7 @@ export class PlaybackRateRadioGroupCore {
       value: this.getRateValue(media.playbackRate),
       options: options.map((rate) => {
         const label = this.getRateLabel(rate);
-        const custom = !rates.includes(rate);
+        const custom = rate !== NORMAL_RATE && !rates.includes(rate);
 
         // The visible label shows only the rate, so the accessible name says why an unoffered rate is listed.
         return {

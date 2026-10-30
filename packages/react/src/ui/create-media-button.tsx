@@ -1,7 +1,6 @@
 'use client';
 
 import type { InferComponentState, InferMediaState, MediaButtonComponent, StateAttrMap } from '@videojs/core';
-import type { PlayerTarget } from '@videojs/core/dom';
 import { logMissingFeature } from '@videojs/core/dom';
 import { isText, type Text, translateText } from '@videojs/core/i18n';
 import type { Selector } from '@videojs/store';
@@ -10,7 +9,7 @@ import type { CSSProperties, ForwardedRef, ForwardRefExoticComponent, RefAttribu
 import { forwardRef, useLayoutEffect, useState } from 'react';
 
 import { useTranslator } from '../i18n/context';
-import { useContainer, usePlayer, usePlayerContext } from '../player/context';
+import { useContainer, usePlayer } from '../player/context';
 import type { renderElement as renderElementFn } from '../utils/use-render';
 import { renderElement } from '../utils/use-render';
 import { useButton } from './hooks/use-button';
@@ -47,10 +46,6 @@ type ButtonStyle<Core extends MediaButtonComponent> = renderElementFn.ComponentP
 type CSSVarsCore<State> = {
   /** CSS custom properties the button publishes for skins. */
   getCSSVars?: (state: State) => Record<string, string>;
-};
-type MediaTargetCore = {
-  /** Receives the media the player attached, for behavior that depends on what it can play. */
-  setMediaTarget?: (target: object | null | undefined) => void;
 };
 
 function getLabelParams<Core extends MediaButtonComponent>(
@@ -122,7 +117,6 @@ export function createMediaButton<Core extends Required<MediaButtonComponent>, P
     const setTooltipContent = tooltipCtx?.setContent;
 
     const feature = usePlayer(selector);
-    const { store } = usePlayerContext();
     const container = useContainer();
     const shortcut = useHotkeyShortcut(hotkeyAction, hotkeyValue?.(coreProps));
     const translator = useTranslator();
@@ -157,8 +151,6 @@ export function createMediaButton<Core extends Required<MediaButtonComponent>, P
     type State = InferComponentState<Core>;
 
     if (feature) core.setMedia(feature);
-
-    (core as MediaTargetCore).setMediaTarget?.((store.target as PlayerTarget | null)?.media);
 
     const state = feature ? (core.getState() as State) : null;
     const supported = state ? (isSupported?.(state) ?? true) : false;
