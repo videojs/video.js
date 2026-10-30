@@ -26,6 +26,8 @@ export type MediaInputActionName =
 
 export interface MediaInputActionContext {
   store: AnyPlayerStore;
+  /** The store state the input acted on, when it can differ from the current one. */
+  state?: object | undefined;
   value?: number | undefined;
   key?: string | undefined;
 }
@@ -38,11 +40,14 @@ export function ignoreRejection(result: unknown): void {
 }
 
 export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInputActionResolver> = {
-  togglePaused({ store }) {
-    const playback = selectPlayback(store.state);
+  // A tap fires a doubletap window after the click, and the click can start playback by itself, as Safari's start
+  // button over a refused autoplay does, so a tap toggles from the state its pointer-down found.
+  togglePaused({ store, state = store.state }) {
+    const playback = selectPlayback(state);
     if (!playback) return;
 
-    ignoreRejection(playback.paused ? playback.play() : playback.pause());
+    // A pending autoplay counts as playing, so the toggle cancels it, as the play button does.
+    ignoreRejection(playback.paused && !playback.autoplaying ? playback.play() : playback.pause());
   },
 
   toggleMuted({ store }) {

@@ -15,6 +15,7 @@ export const NAME_OVERRIDES: Record<string, string> = {
   'youtube-video': 'YouTubeVideo',
   'tiktok-video': 'TikTokVideo',
   'playerjs-video': 'PlayerJsVideo',
+  'soundcloud-audio': 'SoundCloudAudio',
 };
 
 const NAME_TO_SLUG: Record<string, string> = Object.fromEntries(

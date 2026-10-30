@@ -84,7 +84,6 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #duration = Number.NaN;
   #volume = 1;
   #muted = false;
-  #playbackRate = 1;
   #progress = 0;
   #readyState = READY_STATE_HAVE_NOTHING;
   #error: MediaError | null = null;
@@ -309,14 +308,6 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#afterLoad(() => this.#sendCommand(COMMAND_SET_MUTED, value));
   }
 
-  get playbackRate() {
-    return this.#playbackRate;
-  }
-  set playbackRate(value) {
-    // The embed has no rate command, so this is reported back but never applied.
-    this.#playbackRate = value;
-  }
-
   get autoplay() {
     return this.#autoplay;
   }
@@ -502,10 +493,16 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     embedWindow.postMessage(message, TWITCH_PLAYER_ORIGIN);
   }
 
+  // What the next embed must be built muted with: it reads mute once, from its URL, and either property says to start
+  // muted. A rebuild drops the player's volume state with the frame.
+  get #nextMuted() {
+    return this.#defaultMuted || this.#muted;
+  }
+
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      defaultMuted: this.#nextMuted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
@@ -519,9 +516,9 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#playback = null;
     this.#currentTime = 0;
     this.#duration = Number.NaN;
-    this.#muted = false;
+    // Kept across a reset, so a load replayed after `ready` still builds the embed muted.
+    this.#muted = this.#nextMuted;
     this.#paused = !this.#autoplay;
-    this.#playbackRate = 1;
     this.#progress = 0;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#seeking = false;

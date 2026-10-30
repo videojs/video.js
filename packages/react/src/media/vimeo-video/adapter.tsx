@@ -25,7 +25,12 @@ export const VimeoVideo = forwardRef<HTMLIFrameElement, VimeoVideoProps>(functio
   const props: Partial<VimeoAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildVimeoIframeSrc(props.src || props.source?.src || '', { ...VimeoAdapter.defaultProps, ...props })
+    buildVimeoIframeSrc(props.src || props.source?.src || '', {
+      ...VimeoAdapter.defaultProps,
+      ...props,
+      // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+      defaultMuted: !!(props.defaultMuted || props.muted),
+    })
   );
   const { ref: eventsRef, props: iframeProps } = useMediaEvents(
     useSyncProps<VimeoAdapterProps, Record<string, unknown>>(media, props, VimeoAdapter.defaultProps),
