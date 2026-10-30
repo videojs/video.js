@@ -86,7 +86,7 @@ Use the open and transition data attributes to style visibility and animations:
 | `data-open` | Present while the dialog is open, including its closing transition |
 | `data-starting-style` | Present at the start of the opening transition |
 | `data-ending-style` | Present during the closing transition |
-| `data-scope` | `player` or `document`, the scope in effect |
+| `data-scope` | `player` inside a player, `document` outside one |
 
 <FrameworkCase frameworks={["html"]}>
 ```css
@@ -119,7 +119,7 @@ React renders separate backdrop and popup elements. Add a `className` to each pa
 
 ## Accessibility
 
-The dialog uses `role="alertdialog"`, plus `aria-modal="true"` when its scope is `document`. Like <DocsLink slug="reference/components/dialog">Dialog</DocsLink>, it is confined to its player when rendered inside one and modal for the whole page otherwise; set `scope="document"` to make it modal for the whole page. The title and description receive generated IDs that are connected with `aria-labelledby` and `aria-describedby`. Focus moves into the dialog when it opens, stays within it while open, and returns to the previously focused element when it closes. Content outside the dialog within its scope is inert while it is open. Pressing <kbd>Escape</kbd> closes the dialog.
+The dialog uses `role="alertdialog"`, plus `aria-modal="true"` outside a player. Like <DocsLink slug="reference/components/dialog">Dialog</DocsLink>, it is confined to its player when rendered inside one and modal for the whole page otherwise. The title and description receive generated IDs that are connected with `aria-labelledby` and `aria-describedby`. Focus moves into the dialog when it opens, stays within it while open, and returns to the previously focused element when it closes. Content outside the dialog, within its player or the page, is inert while it is open. Pressing <kbd>Escape</kbd> closes the dialog.
 
 ## Examples
 

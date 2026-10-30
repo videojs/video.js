@@ -77,16 +77,11 @@ Place a button immediately before `media-dialog`, or connect them explicitly wit
 
 The close part and <kbd>Escape</kbd> close the dialog. Other buttons inside the dialog, including player controls, do not close it.
 
-### Scope
+### Inside and outside a player
 
-By default (`scope="auto"`), a dialog checks whether it is inside a player:
+A dialog inside a player is confined to that player. The rest of the player becomes inert, but the page around it stays interactive and `aria-modal` is omitted. A dialog outside a player is modal for the whole page, with `aria-modal="true"` and everything outside the popup inert.
 
-- Inside a player, it is confined to that player. The rest of the player becomes inert, but the page around it stays interactive and `aria-modal` is omitted.
-- Outside a player, it is modal for the whole page, with `aria-modal="true"` and everything outside the popup inert.
-
-Set `scope="document"` to make a dialog inside a player modal for the whole page. Set `scope="player"` to require a player; outside one, the dialog still covers the page, and development builds log a warning.
-
-The resolved scope is reflected in `data-scope` on the backdrop and popup, so position player-scoped surfaces with `position: absolute` and document-scoped ones with `position: fixed`. Inside a skin, give the backdrop and popup a `z-index` above the controls; the built-in skins use `40` and `50`.
+The backdrop and popup get `data-scope`: `player` inside a player and `document` outside one. The built-in skin styles use it to switch from `position: absolute` to `position: fixed`. In your own styles, give a dialog outside a player `position: fixed` so it covers the viewport, as with any headless dialog. Inside a skin, give the backdrop and popup a `z-index` above the controls; the built-in skins use `40` and `50`.
 
 Your application decides what opening and closing mean for the media. The example starts playback after opening and pauses it as soon as the dialog closes. Handle the promise returned by `play()`, since browsers can reject autoplay when it is not allowed.
 
@@ -107,7 +102,7 @@ Use the open and transition data attributes to style the modal and its animation
 | `data-open` | Present while the dialog is open, including its closing transition |
 | `data-starting-style` | Present at the start of the opening transition |
 | `data-ending-style` | Present during the closing transition |
-| `data-scope` | `player` or `document`, the scope in effect |
+| `data-scope` | `player` inside a player, `document` outside one |
 
 <FrameworkCase frameworks={["html"]}>
 ```css
@@ -156,14 +151,14 @@ React renders the backdrop and popup as separate DOM elements. Add a `className`
 ## Accessibility
 
 <FrameworkCase frameworks={["react"]}>
-The popup uses `role="dialog"`, plus `aria-modal="true"` when its scope is `document`. Include `Dialog.Title` so the dialog always has an accessible name. `Dialog.Description` is optional. These parts receive generated IDs connected through `aria-labelledby` and `aria-describedby`. The trigger receives `aria-haspopup`, `aria-controls`, and `aria-expanded`.
+The popup uses `role="dialog"`, plus `aria-modal="true"` outside a player. Include `Dialog.Title` so the dialog always has an accessible name. `Dialog.Description` is optional. These parts receive generated IDs connected through `aria-labelledby` and `aria-describedby`. The trigger receives `aria-haspopup`, `aria-controls`, and `aria-expanded`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-The popup uses `role="dialog"`, plus `aria-modal="true"` when its scope is `document`. Include `<media-dialog-title>` so the dialog always has an accessible name. `<media-dialog-description>` is optional. These parts receive generated IDs connected through `aria-labelledby` and `aria-describedby`. The trigger receives `aria-haspopup`, `aria-controls`, and `aria-expanded`.
+The popup uses `role="dialog"`, plus `aria-modal="true"` outside a player. Include `<media-dialog-title>` so the dialog always has an accessible name. `<media-dialog-description>` is optional. These parts receive generated IDs connected through `aria-labelledby` and `aria-describedby`. The trigger receives `aria-haspopup`, `aria-controls`, and `aria-expanded`.
 </FrameworkCase>
 
-When the dialog opens, focus moves to an element with `autofocus`, the first focusable element, or the popup itself. <kbd>Tab</kbd> and <kbd>Shift</kbd> + <kbd>Tab</kbd> keep focus within the dialog, and content outside the dialog within its scope becomes inert. Closing restores focus to the trigger, or to the element that was focused before the dialog opened.
+When the dialog opens, focus moves to an element with `autofocus`, the first focusable element, or the popup itself. <kbd>Tab</kbd> and <kbd>Shift</kbd> + <kbd>Tab</kbd> keep focus within the dialog, and content outside the dialog, within its player or the page, becomes inert. Closing restores focus to the trigger, or to the element that was focused before the dialog opened.
 
 Dialogs inside the same player container share modal coordination. Opening one closes the current dialog and dismisses any open menu, tooltip, or popover before focus moves into the new popup.
 

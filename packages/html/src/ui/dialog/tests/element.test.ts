@@ -28,13 +28,11 @@ class TestContainerProviderElement extends UIElement {
   });
 }
 
-async function renderInContainer(scope?: DialogElement['scope']) {
+async function renderInContainer() {
   const container = createElement(TestContainerProviderElement);
   const dialog = createElement(DialogElement);
   const backdrop = createElement(DialogBackdropElement);
   const popup = createElement(DialogPopupElement);
-
-  if (scope) dialog.scope = scope;
 
   dialog.open = true;
   dialog.append(backdrop, popup);
@@ -42,7 +40,7 @@ async function renderInContainer(scope?: DialogElement['scope']) {
   document.body.append(container);
   await dialog.updateComplete;
 
-  return { dialog, backdrop, popup };
+  return { backdrop, popup };
 }
 
 afterEach(() => {
@@ -68,52 +66,6 @@ describe('DialogElement', () => {
     expect(popup.getAttribute('data-scope')).toBe('document');
   });
 
-  it('confines a dialog to its player by default', async () => {
-    const { backdrop, popup } = await renderInContainer();
-
-    await vi.waitFor(() => {
-      expect(popup.hasAttribute('aria-modal')).toBe(false);
-      expect(popup.getAttribute('data-scope')).toBe('player');
-      expect(backdrop.getAttribute('data-scope')).toBe('player');
-    });
-  });
-
-  it('confines a dialog to its player when scope is player', async () => {
-    const { popup } = await renderInContainer('player');
-
-    await vi.waitFor(() => expect(popup.getAttribute('data-scope')).toBe('player'));
-  });
-
-  it('warns when a player-scoped dialog opens outside a player', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const dialog = createElement(DialogElement);
-    const popup = createElement(DialogPopupElement);
-
-    dialog.scope = 'player';
-    dialog.open = true;
-    dialog.append(popup);
-    document.body.append(dialog);
-    await dialog.updateComplete;
-
-    expect(popup.getAttribute('data-scope')).toBe('document');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
-
-    warn.mockRestore();
-  });
-
-  it('does not warn when an auto-scoped dialog opens outside a player', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const dialog = createElement(DialogElement);
-
-    dialog.open = true;
-    document.body.append(dialog);
-    await dialog.updateComplete;
-
-    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
-
-    warn.mockRestore();
-  });
-
   it('connects parts defined before the dialog', async () => {
     const popup = createElement(DialogPopupElement);
     const dialogTag = `test-dialog-${tagCounter++}`;
@@ -131,6 +83,16 @@ describe('DialogElement', () => {
     await vi.waitFor(() => {
       expect(popup.getAttribute('role')).toBe('dialog');
       expect(popup.hasAttribute('data-open')).toBe(true);
+    });
+  });
+
+  it('confines a dialog to its player', async () => {
+    const { backdrop, popup } = await renderInContainer();
+
+    await vi.waitFor(() => {
+      expect(popup.hasAttribute('aria-modal')).toBe(false);
+      expect(popup.getAttribute('data-scope')).toBe('player');
+      expect(backdrop.getAttribute('data-scope')).toBe('player');
     });
   });
 
@@ -150,36 +112,6 @@ describe('DialogElement', () => {
     await vi.waitFor(() => {
       expect(popup.getAttribute('data-scope')).toBe('player');
       expect(popup.hasAttribute('aria-modal')).toBe(false);
-    });
-  });
-
-  it('covers the document when scope is document', async () => {
-    const { backdrop, popup } = await renderInContainer('document');
-
-    await vi.waitFor(() => {
-      expect(popup.getAttribute('aria-modal')).toBe('true');
-      expect(popup.getAttribute('data-scope')).toBe('document');
-      expect(backdrop.getAttribute('data-scope')).toBe('document');
-    });
-  });
-
-  it('connects parts defined before the dialog', async () => {
-    const popup = createElement(DialogPopupElement);
-    const dialogTag = `test-dialog-${tagCounter++}`;
-
-    document.body.append(document.createElement(dialogTag));
-    document.body.lastElementChild!.append(popup);
-    customElements.define(dialogTag, class extends DialogElement {});
-
-    // happy-dom upgrades into a new instance, so reach the dialog through its child.
-    const dialog = popup.parentElement as DialogElement;
-
-    dialog.open = true;
-    await dialog.updateComplete;
-
-    await vi.waitFor(() => {
-      expect(popup.getAttribute('role')).toBe('dialog');
-      expect(popup.hasAttribute('data-open')).toBe(true);
     });
   });
 

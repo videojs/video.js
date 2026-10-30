@@ -43,40 +43,7 @@ describe('Dialog', () => {
     expect(getByRole('dialog').getAttribute('data-scope')).toBe('document');
   });
 
-  it('warns when a player-scoped dialog opens outside a player', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const { getByRole } = render(
-      <Dialog.Root defaultOpen scope="player">
-        <Dialog.Popup>Content</Dialog.Popup>
-      </Dialog.Root>
-    );
-
-    expect(getByRole('dialog').getAttribute('data-scope')).toBe('document');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
-
-    warn.mockRestore();
-  });
-
-  it('does not warn when an auto-scoped dialog opens outside a player', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Popup>Content</Dialog.Popup>
-      </Dialog.Root>
-    );
-
-    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('scope="player"'));
-
-    warn.mockRestore();
-  });
-
-  it.each([
-    [undefined, 'player', null],
-    ['auto', 'player', null],
-    ['player', 'player', null],
-    ['document', 'document', 'true'],
-  ] as const)('applies scope %s inside a player', async (scope, expectedScope, ariaModal) => {
+  it('confines a dialog to its player', async () => {
     const container = document.createElement('div');
     const { Wrapper, value } = createPlayerWrapper();
 
@@ -85,7 +52,7 @@ describe('Dialog', () => {
 
     const { getByRole, getByTestId } = render(
       <Wrapper>
-        <Dialog.Root defaultOpen scope={scope}>
+        <Dialog.Root defaultOpen>
           <Dialog.Backdrop data-testid="backdrop" />
           <Dialog.Popup>Content</Dialog.Popup>
         </Dialog.Root>
@@ -95,9 +62,9 @@ describe('Dialog', () => {
 
     const popup = getByRole('dialog');
 
-    await waitFor(() => expect(popup.getAttribute('data-scope')).toBe(expectedScope));
-    expect(popup.getAttribute('aria-modal')).toBe(ariaModal);
-    expect(getByTestId('backdrop').getAttribute('data-scope')).toBe(expectedScope);
+    await waitFor(() => expect(popup.getAttribute('data-scope')).toBe('player'));
+    expect(popup.hasAttribute('aria-modal')).toBe(false);
+    expect(getByTestId('backdrop').getAttribute('data-scope')).toBe('player');
 
     container.remove();
   });

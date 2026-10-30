@@ -9,6 +9,6 @@ export const DialogDataAttrs = {
   transitionStarting: 'data-starting-style',
   /** Present during the close transition. */
   transitionEnding: 'data-ending-style',
-  /** Scope in effect: `player` or `document`. */
+  /** `player` when the dialog is confined to its player, otherwise `document`. */
   scope: 'data-scope',
 } as const satisfies StateAttrMap<DialogState>;

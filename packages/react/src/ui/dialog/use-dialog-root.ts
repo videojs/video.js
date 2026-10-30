@@ -3,7 +3,7 @@
 import { DialogCore, DialogDataAttrs, type DialogProps, type DialogState, type StateAttrMap } from '@videojs/core';
 import { createDialog, createTransition } from '@videojs/core/dom';
 import { useSnapshot } from '@videojs/store/react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useOptionalContainer } from '../../player/context';
 import { useDestroy } from '../../utils/use-destroy';
@@ -23,7 +23,6 @@ export function useDialogRoot({
   open: controlledOpen,
   defaultOpen = DialogCore.defaultProps.defaultOpen,
   closeOnEscape = DialogCore.defaultProps.closeOnEscape,
-  scope = DialogCore.defaultProps.scope,
   onOpenChange: onOpenChangeProp,
   onOpenChangeComplete: onOpenChangeCompleteProp,
   coreFactory = createDialogCore,
@@ -31,10 +30,9 @@ export function useDialogRoot({
   idPrefix = 'dialog',
 }: UseDialogRootOptions): DialogContextValue {
   const [core] = useState(coreFactory);
-  const container = useOptionalContainer();
-  const interactionRoot = scope === 'document' ? null : container;
+  const interactionRoot = useOptionalContainer();
 
-  core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape, scope });
+  core.setProps({ open: controlledOpen, defaultOpen, closeOnEscape });
 
   const isControlled = controlledOpen !== undefined;
   const onOpenChangeRef = useLatestRef(onOpenChangeProp);
@@ -79,14 +77,6 @@ export function useDialogRoot({
 
   const input = useSnapshot(dialog.input);
   const modality = useSnapshot(dialog.modality);
-  const warnedMissingPlayerRef = useRef(false);
-
-  useEffect(() => {
-    if (!__DEV__ || !input.active || scope !== 'player' || container || warnedMissingPlayerRef.current) return;
-
-    warnedMissingPlayerRef.current = true;
-    console.warn(`[${idPrefix}] scope="player" needs a surrounding player; covering the document instead.`);
-  }, [input.active, scope, container]);
 
   core.setInput(input);
   core.setDocumentModal(modality.documentModal);
