@@ -4,11 +4,7 @@ import type { InferSchemaOutput, StandardSchemaV1 } from './schema';
 
 declare const CUE_TYPE: unique symbol;
 
-/**
- * What identifies a text track: its kind, and optionally its label and language.
- *
- * @internal
- */
+/** What identifies a text track: its kind, and optionally its label and language. */
 export interface TextTrackIdentity {
   readonly kind: TextTrackKind;
   readonly label?: string | undefined;
@@ -18,8 +14,6 @@ export interface TextTrackIdentity {
 /**
  * A text track defined once with the type of its cues, to provide and to read with. Works anywhere a text track filter
  * does, matching by kind, label, and language.
- *
- * @internal
  */
 export interface TextTrackDefinition<Cue extends MediaTextCue = MediaTextCue> extends TextTrackIdentity {
   /** Checks each cue's `value` where it's read. Cues whose value fails are skipped. */

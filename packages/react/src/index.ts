@@ -1,5 +1,6 @@
 // Component state, props, and option types
 export type {
+  AddTextTrack,
   AirPlayButtonState,
   AlertDialogProps,
   AudioTrackRadioGroupOption,
@@ -28,6 +29,7 @@ export type {
   IndicatorLifecycleState,
   IndicatorStatus,
   IndicatorVolumeLevel,
+  InferCueValue,
   InferSchemaOutput,
   InferTextTrackCue,
   InputAction,
@@ -76,9 +78,13 @@ export type {
   StatusDetails,
   StatusIndicatorProps,
   StatusIndicatorState,
+  TextCueInit,
   TextCuesSource,
+  TextTrackContent,
   TextTrackDefinition,
+  TextTrackHandle,
   TextTrackIdentity,
+  TextTrackInit,
   TextTracksSource,
   ThumbnailCoords,
   ThumbnailCrossOrigin,
@@ -289,6 +295,7 @@ export {
   usePlayerContext,
 } from './player/context';
 // Text tracks
+export { useCreateTextTrack } from './text-track/use-create-text-track';
 export { useActiveTextCues, useTextCues } from './text-track/use-text-cues';
 export { useTextTracks } from './text-track/use-text-tracks';
 // Player API
