@@ -46,14 +46,14 @@ jobs:
           flag skin_projects '^(packages/(cli|installation|skins|vjsc)/|\.github/workflows/e2e\.yml$|pnpm-lock\.yaml$)'
 
   # Every browser job replays this run's Vite Task cache, so the packages, CDN bundles, generated skins, and sandbox
-  # setup compile once per run instead of once per job.
+  # setup compile once per run instead of once per job. The build needs no browser, so it runs on the runner itself:
+  # cold builds inside the Playwright container stall on Blacksmith, and the runner can start from the `packages-`
+  # cache the CI build saves.
   build:
     name: Build for browser suites
     needs: changes
     if: ${{ !cancelled() && (github.event_name == 'push' || needs.changes.outputs.player == 'true' || needs.changes.outputs.skins == 'true' || contains(github.event.pull_request.labels.*.name, 'test:e2e') || contains(github.event.pull_request.labels.*.name, 'record:snapshots')) }}
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 15
 
     steps:
@@ -101,6 +101,9 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      # The container's default PID 1 never reaps orphaned helpers such as esbuild services, and `vp run` waits on
+      # their zombies until the job times out. An init process reaps them.
+      options: --init
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -123,6 +126,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install zstd
+        # actions/cache falls back to gzip without zstd, which keys a separate cache from the runner jobs that build it.
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends zstd
 
       - name: Restore Vite Task cache
         uses: actions/cache/restore@v6
@@ -162,6 +169,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
 
     steps:
@@ -179,6 +187,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install zstd
+        # actions/cache falls back to gzip without zstd, which keys a separate cache from the runner jobs that build it.
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends zstd
 
       - name: Restore Vite Task cache
         uses: actions/cache/restore@v6
@@ -215,6 +227,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -242,6 +255,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install zstd
+        # actions/cache falls back to gzip without zstd, which keys a separate cache from the runner jobs that build it.
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends zstd
 
       - name: Restore Vite Task cache
         uses: actions/cache/restore@v6
@@ -284,6 +301,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 20
 
     steps:
@@ -301,6 +319,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install zstd
+        # actions/cache falls back to gzip without zstd, which keys a separate cache from the runner jobs that build it.
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends zstd
 
       - name: Restore Vite Task cache
         uses: actions/cache/restore@v6
@@ -380,6 +402,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
@@ -399,6 +422,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install zstd
+        # actions/cache falls back to gzip without zstd, which keys a separate cache from the runner jobs that build it.
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends zstd
 
       - name: Restore Vite Task cache
         id: vite-task-cache
