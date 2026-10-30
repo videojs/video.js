@@ -15,6 +15,8 @@ export type MuxPlacement =
   | 'mux-uploader'
   | 'error-page'
   | 'support-page'
+  | 'help-page'
+  | 'html5-video-support-page'
   | 'docs-content'
   | 'blog-content';
 
@@ -34,7 +36,16 @@ export function withMuxAttribution(href: string, placement: MuxPlacement): strin
   return url.href;
 }
 
+/** Standalone pages that pitch Mux to their own audience, so their links are credited apart from the docs. */
+const PAGE_PLACEMENTS = new Map<string, MuxPlacement>([
+  ['/help', 'help-page'],
+  ['/html5-video-support', 'html5-video-support-page'],
+]);
+
 /** The placement for a Mux link written in page content. */
 export function contentPlacement(pathname: string): MuxPlacement {
+  const page = PAGE_PLACEMENTS.get(pathname.replace(/\/$/, ''));
+  if (page) return page;
+
   return pathname.startsWith('/blog') ? 'blog-content' : 'docs-content';
 }
