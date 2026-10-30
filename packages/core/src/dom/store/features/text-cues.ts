@@ -14,7 +14,7 @@ import { isUndefined } from '@videojs/utils/predicate';
 import { findActiveCues } from '../../../core/text-track/active-cues';
 import {
   type AddTextTrack,
-  type AppTextTrack,
+  type TextTrackHandle,
   type TextCueInit,
   type TextTrackContent,
   type TextTrackInit,
@@ -103,7 +103,7 @@ export const textCuesFeature = definePlayerFeature({
       if (next.length !== records.length) setRecords(next);
     };
 
-    const addTextTrack = (init: TextTrackInit, content?: TextTrackContent): AppTextTrack => {
+    const addTextTrack = (init: TextTrackInit, content?: TextTrackContent): TextTrackHandle => {
       const id = `app-text-track-${++trackCount}`;
       let cueCount = 0;
 

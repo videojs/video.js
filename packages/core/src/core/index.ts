@@ -101,10 +101,10 @@ export * from './ui/volume-slider/vars';
 export * from './version';
 export type {
   AddTextTrack,
-  AppTextTrack,
   InferCueValue,
   TextCueInit,
   TextTrackContent,
+  TextTrackHandle,
   TextTrackInit,
 } from './text-track/app';
 export * from './text-track/definition';
