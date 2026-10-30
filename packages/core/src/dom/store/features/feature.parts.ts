@@ -12,6 +12,7 @@ import { qualityFeature } from './quality';
 import { remotePlaybackFeature } from './remote-playback';
 import { sourceFeature } from './source';
 import { streamTypeFeature } from './stream-type';
+import { textCuesFeature } from './text-cues';
 import { textTrackFeature } from './text-track';
 import { timeFeature } from './time';
 import { volumeFeature } from './volume';
@@ -34,6 +35,7 @@ export {
   remotePlaybackFeature as remotePlayback,
   sourceFeature as source,
   streamTypeFeature as streamType,
+  textCuesFeature as textCues,
   textTrackFeature as textTrack,
   timeFeature as time,
   volumeFeature as volume,

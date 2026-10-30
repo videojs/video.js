@@ -20,6 +20,7 @@ import type { AnySlice, InferSliceSourceState, Slice, Store, UnionSliceState } f
 import type { CamelCase } from '@videojs/utils/types';
 
 import type { metadataFeature } from './store/features/metadata';
+import type { textCuesFeature } from './store/features/text-cues';
 
 export interface MediaContainer extends HTMLElement {}
 
@@ -166,6 +167,7 @@ export type VideoFeatures = [
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
   PlayerFeature<MediaTextTrackState>,
+  typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
 ];
@@ -177,6 +179,7 @@ export type AudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
 ];
@@ -199,6 +202,7 @@ export type LiveVideoFeatures = [
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
   PlayerFeature<MediaTextTrackState>,
+  typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
   typeof metadataFeature,
@@ -214,6 +218,7 @@ export type LiveAudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
   typeof metadataFeature,
