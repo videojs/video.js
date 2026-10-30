@@ -1,6 +1,6 @@
 {
   "name": "@videojs/soundcloud-audio",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "SoundCloud Widget playback adapter for Video.js",
   "keywords": [
     "audio",

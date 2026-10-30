@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/dash-video@10.2.0...@videojs/dash-video@10.3.0) (2026-10-30)
+
+
+### Features
+
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+
+
+### Bug Fixes
+
+* **dash-video:** detach the dash.js view once on destroy ([#9653](https://github.com/videojs/video.js/issues/9653)) ([b81fed3](https://github.com/videojs/video.js/commit/b81fed31c238d652e5a37212411a05a73d5cc64a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/dash-video@10.1.0...@videojs/dash-video@10.2.0) (2026-10-22)
 
 
