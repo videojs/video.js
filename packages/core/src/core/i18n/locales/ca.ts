@@ -57,7 +57,7 @@ export default {
     unknown: 'Contingut multimèdia no carregat, temps desconegut.',
   },
   playback: {
-    rate: 'Velocitat de reproducció {rate}',
+    rate: 'Velocitat de reproducció, {rate}',
   },
   volume: {
     mutedValue: '{percent}, silenciat',

@@ -18,7 +18,7 @@ concurrency:
 jobs:
   package_test_selection:
     name: Select package tests
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       has_standard_tests: ${{ steps.selection.outputs.has_standard_tests }}
       matrix: ${{ steps.selection.outputs.matrix }}
@@ -64,7 +64,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout code
@@ -92,7 +92,7 @@ jobs:
         run: pnpm exec node --import tsx --test build/plugins/tests/inline-template-plugin.test.ts
 
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout code
@@ -128,7 +128,7 @@ jobs:
     needs: package_test_selection
     if: needs.package_test_selection.outputs.has_standard_tests == 'true'
     name: Test packages (${{ matrix.name }})
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.package_test_selection.outputs.matrix) }}
@@ -172,7 +172,7 @@ jobs:
     needs: package_test_selection
     if: needs.package_test_selection.outputs.run_spf == 'true'
     name: Test (@videojs/spf)
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
     env:
@@ -206,7 +206,7 @@ jobs:
         run: .github/scripts/run-logged.sh test-spf pnpm exec vp run @videojs/spf#test:ci
 
   workspace:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
       - name: Checkout code
@@ -228,7 +228,7 @@ jobs:
         run: pnpm check:workspace
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout code

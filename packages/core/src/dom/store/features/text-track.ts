@@ -1,4 +1,5 @@
 import type {
+  MediaCrossOriginType,
   MediaTextCue,
   MediaTextTrack,
   MediaTextTrackCapability,
@@ -44,6 +45,29 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
  */
 function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: number): MediaTextCue[] {
   return fillChapterEnds(records.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
+}
+
+/**
+ * The first thumbnails track an app added, which stands in when the media has none of its own, such as a storyboard on
+ * an embed. Image URLs in its cues resolve against the file the cues came from.
+ */
+function findAppThumbnailsTrack(
+  records: readonly AppTextTrackRecord[],
+  crossOrigin: MediaCrossOriginType | null
+): MediaThumbnailsTrack | null {
+  const record = records.find(({ track }) => track.kind === 'metadata' && track.label === 'thumbnails');
+  if (!record) return null;
+
+  return { cues: record.cues, src: record.src ? resolveUrl(record.src) : null, crossOrigin };
+}
+
+/** `url` made absolute against the page, as a `<track>` element's `src` reads. */
+function resolveUrl(url: string): string {
+  try {
+    return new URL(url, document.baseURI).href;
+  } catch {
+    return url;
+  }
 }
 
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
@@ -133,6 +157,9 @@ export const textTrackFeature = definePlayerFeature({
 
   attach({ target, signal, get, set }) {
     const { media } = target;
+    // Read the host rather than any inner native element: for a media component the attribute lives on the host and is
+    // forwarded inward.
+    const getCrossOrigin = () => (isMediaSourceCapable(media) ? toMediaCrossOrigin(media.crossOrigin) : null);
 
     if (!isMediaTextTrackCapable(media)) {
       // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
@@ -144,6 +171,7 @@ export const textTrackFeature = definePlayerFeature({
         set({
           textTrackList: appTracks.map(({ track }) => track),
           chaptersCues: findAppChaptersCues(appTracks, duration),
+          thumbnailsTrack: findAppThumbnailsTrack(appTracks, getCrossOrigin()),
         });
       };
 
@@ -195,7 +223,8 @@ export const textTrackFeature = definePlayerFeature({
           })
         : findAppChaptersCues(appTracks, isMediaSeekCapable(media) ? media.duration : NaN);
 
-      let thumbnailsTrack: MediaThumbnailsTrack | null = null;
+      // A thumbnails track an app added stands in when the media has none.
+      let thumbnailsTrack = findAppThumbnailsTrack(appTracks, getCrossOrigin());
 
       if (thumbnailsTextTrack) {
         thumbnailsTrack = {
@@ -203,9 +232,7 @@ export const textTrackFeature = definePlayerFeature({
           // the CueList is typed as TextTrackCue which doesn't expose `text`.
           cues: thumbnailsTextTrack.cues ? (Array.from(thumbnailsTextTrack.cues) as unknown as MediaTextCue[]) : [],
           src: findTrackElement(media, thumbnailsTextTrack)?.src ?? null,
-          // Read the host rather than any inner native element: for a media
-          // component the attribute lives on the host and is forwarded inward.
-          crossOrigin: isMediaSourceCapable(media) ? toMediaCrossOrigin(media.crossOrigin) : null,
+          crossOrigin: getCrossOrigin(),
         };
       }
 

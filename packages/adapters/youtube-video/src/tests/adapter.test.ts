@@ -628,6 +628,25 @@ describe('YouTubeAdapter', () => {
     }
   });
 
+  it('builds the embed muted from the muted property, as React sets it', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.muted = true;
+    media.src = 'aqz-KE-bpKQ';
+    document.body.append(iframe);
+    media.attach(iframe);
+
+    try {
+      await waitForEngine(media);
+
+      expect(new URL(iframe.src).searchParams.get('mute')).toBe('1');
+    } finally {
+      media.destroy();
+      iframe.remove();
+    }
+  });
+
   it('keeps settings written before readiness across recreation', async () => {
     const media = new YouTubeAdapter();
     const src = 'aqz-KE-bpKQ';

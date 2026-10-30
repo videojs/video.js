@@ -101,6 +101,12 @@ describe('toMediaTextCues', () => {
       });
     });
 
+    it('names ID3 from an emsg box org.id3, like ID3 from a segment', () => {
+      const cue: TextCueLike = { startTime: 1, endTime: 2, value: {}, type: 'https://aomedia.org/emsg/ID3' };
+
+      expect(toMediaTextCues([cue], { kind: 'metadata' })[0]!.type).toBe('org.id3');
+    });
+
     it('takes value from a text cue that also carries data, as hls.js writes them', () => {
       const cue = { startTime: 1, endTime: 2, text: '', value: { key: 'X-AD', data: 'break' } };
 

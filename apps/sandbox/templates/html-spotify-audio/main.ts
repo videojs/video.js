@@ -6,12 +6,12 @@ import { SPOTIFY_AUDIO_SRC } from '@app/shared/sources';
 
 createHtmlSandbox({
   player: 'audio',
-  render: ({ skinTag }) => html`
+  render: ({ skinTag, attrs }) => html`
     <div class="mx-auto w-full max-w-xl">
       <audio-player>
         <${skinTag}>
           <!-- Hidden unless it is showing Spotify's own chrome, so it takes no room and needs no size. -->
-          <spotify-audio src="${SPOTIFY_AUDIO_SRC}"></spotify-audio>
+          <spotify-audio src="${SPOTIFY_AUDIO_SRC}" ${attrs}></spotify-audio>
         </${skinTag}>
       </audio-player>
     </div>

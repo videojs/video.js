@@ -18,5 +18,7 @@ describe('resolveReferenceSlug', () => {
     expect(resolveReferenceSlug('HlsJsVideo')).toBe('hlsjs-video');
     // kebabCase('PlayerJsVideo') would be 'player-js-video'; the tag name is 'playerjs-video'.
     expect(resolveReferenceSlug('PlayerJsVideo')).toBe('playerjs-video');
+    // kebabCase('SoundCloudAudio') would be 'sound-cloud-audio'; the tag name is 'soundcloud-audio'.
+    expect(resolveReferenceSlug('SoundCloudAudio')).toBe('soundcloud-audio');
   });
 });

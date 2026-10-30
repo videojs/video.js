@@ -22,13 +22,20 @@ export function isCueActive(cue: Pick<MediaTextCue, 'startTime' | 'endTime'>, ti
 /**
  * The cues active at a time, in list order.
  *
+ * Time updates come a few times a second, so playback at a high rate, or after a stall, can pass a point or a short cue
+ * between two of them. Given `since`, the time of the last update, a cue that started after it counts as active even
+ * when it's already over. Leave it out after a seek, so a seek never activates the cues it jumps over.
+ *
  * @internal
  */
 export function findActiveCues<Cue extends Pick<MediaTextCue, 'startTime' | 'endTime'>>(
   cues: readonly Cue[],
-  time: number
+  time: number,
+  since = Number.NaN
 ): Cue[] {
   if (!Number.isFinite(time)) return [];
 
-  return cues.filter((cue) => isCueActive(cue, time));
+  const played = Number.isFinite(since) && since < time;
+
+  return cues.filter((cue) => isCueActive(cue, time) || (played && cue.startTime > since && cue.startTime <= time));
 }

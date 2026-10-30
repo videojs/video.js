@@ -15,6 +15,8 @@ export interface AppTextTrackRecord {
   cues: MediaTextCue[];
   /** The media source the track belongs to, or `null` until the first one loads. */
   mediaSrc: string | null;
+  /** The file the track's cues come from, kept once they load so URLs in them can be resolved against it. */
+  src?: string | undefined;
   /** A file the track's cues still have to be loaded from. */
   load?: TextTrackLoad | undefined;
 }

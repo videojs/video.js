@@ -57,7 +57,7 @@ export default {
     unknown: 'Το μέσο δεν φορτώθηκε, άγνωστη διάρκεια.',
   },
   playback: {
-    rate: 'Ρυθμός αναπαραγωγής {rate}',
+    rate: 'Ρυθμός αναπαραγωγής, {rate}',
   },
   volume: {
     mutedValue: '{percent}, σε σίγαση',

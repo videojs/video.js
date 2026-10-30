@@ -176,7 +176,7 @@ class ClockController implements ReactiveController {
 
 ## Destruction
 
-When the element disconnects, it waits two animation frames and then destroys itself if it is still disconnected. Moving the element within the document, or a framework reordering it, therefore keeps it alive. Destruction calls `hostDestroyed()` on every controller. A destroyed element stops updating and ignores later connections.
+When the element disconnects, it waits two animation frames and then destroys itself if it is still disconnected. Moving the element within the document, or a framework reordering it, therefore keeps it alive. Destruction first destroys the UI elements inside the element, including those in its shadow root, then calls `hostDestroyed()` on every controller. A destroyed element stops updating and ignores later connections.
 
 | Member | Description |
 |--------|-------------|
@@ -184,7 +184,7 @@ When the element disconnects, it waits two animation frames and then destroys it
 | `destroyed` | `true` after destruction. |
 | `destroyCallback()` | Runs once on destruction. Override it, calling `super.destroyCallback()`, to release resources the element owns. |
 
-Add the `keep-alive` attribute to skip automatic destruction, for example when you detach an element and insert it again later. Call `destroy()` yourself when you are done with it.
+Add the `keep-alive` attribute to the element or one of its ancestors to skip automatic destruction, for example when you detach an element and insert it again later. Destroying an ancestor still destroys it. Call `destroy()` yourself when you are done with it.
 
 Release listeners and observers that the element starts on connection in `disconnectedCallback()`, calling `super.disconnectedCallback()`, because an element can connect and disconnect many times before it is destroyed.
 

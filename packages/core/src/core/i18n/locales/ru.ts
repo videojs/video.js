@@ -57,7 +57,7 @@ export default {
     unknown: 'Медиафайл не загружен, время неизвестно.',
   },
   playback: {
-    rate: 'Скорость воспроизведения {rate}',
+    rate: 'Скорость воспроизведения, {rate}',
   },
   volume: {
     mutedValue: '{percent}, без звука',
