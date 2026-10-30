@@ -1,29 +1,30 @@
-import type { MediaPlaybackRateRange, MediaPlaybackRateRangeCapability, MediaPlaybackRateState } from '@videojs/media';
+import type { MediaPlaybackRateRange, MediaPlaybackRateState } from '@videojs/media';
 import { isMediaPlaybackRateCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
 import { clamp } from '@videojs/utils/number';
 
-import { filterPlaybackRates, parsePlaybackRates, roundPlaybackRate } from '../../../core/ui/utils/playback-rates';
+import {
+  filterPlaybackRates,
+  getPlaybackRateRange,
+  NATIVE_PLAYBACK_RATE_RANGE,
+  parsePlaybackRates,
+  roundPlaybackRate,
+} from '../../../core/ui/utils/playback-rates';
 import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
 const DEFAULT_RATES: readonly number[] = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-// Chromium throws outside this range and Firefox stops playing outside it. WebKit accepts any rate, but its audio drops
-// out well inside these bounds, so this shared range is assumed for a media that reports none.
-const NATIVE_RANGE: MediaPlaybackRateRange = { min: 0.0625, max: 16 };
-
 const DEFAULT_PLAYBACK_RATES = Symbol('@videojs/default-playback-rates');
 const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates');
+// Kept off the public state until the shape settles.
+const PLAYBACK_RATE_RANGE = Symbol('@videojs/playback-rate-range');
 
 interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
   [DEFAULT_PLAYBACK_RATES]: readonly number[];
   [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
-}
-
-/** The media's own rate range, or the native one when it reports none. */
-function getPlaybackRateRange(media: object): MediaPlaybackRateRange {
-  return (media as Partial<MediaPlaybackRateRangeCapability>).playbackRateRange ?? NATIVE_RANGE;
+  // Inline, so the feature's public type doesn't name the internal `MediaPlaybackRateRange`.
+  [PLAYBACK_RATE_RANGE]: { readonly min: number; readonly max: number };
 }
 
 /**
@@ -58,8 +59,8 @@ export const playbackRateFeature = definePlayerFeature({
     [DEFAULT_PLAYBACK_RATES]: DEFAULT_RATES,
     [SET_DEFAULT_PLAYBACK_RATES]: (value) =>
       set({ [DEFAULT_PLAYBACK_RATES]: parsePlaybackRates(value) ?? DEFAULT_RATES }),
+    [PLAYBACK_RATE_RANGE]: NATIVE_PLAYBACK_RATE_RANGE,
     playbackRate: 1,
-    playbackRateRange: NATIVE_RANGE,
     playbackRateAvailability: 'unavailable',
     setPlaybackRate(rate: number) {
       const { media } = target();
@@ -78,13 +79,13 @@ export const playbackRateFeature = definePlayerFeature({
   derived: {
     /** The default rates that fit the media's range. Set them through the player, not through the store. */
     playbackRates: ({ get }): readonly number[] =>
-      fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get().playbackRateRange),
+      fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get()[PLAYBACK_RATE_RANGE]),
   },
 
   attach({ target, signal, set }) {
     const { media } = target;
 
-    const syncRange = () => set({ playbackRateRange: getPlaybackRateRange(media) });
+    const syncRange = () => set({ [PLAYBACK_RATE_RANGE]: getPlaybackRateRange(media) });
 
     syncRange();
 

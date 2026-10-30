@@ -7,7 +7,12 @@ import type { NonNullableObject } from '@videojs/utils/types';
 import { resolveText, type Text } from '../../i18n';
 import { customRateText, playbackRateText } from '../../i18n/text/menu';
 import type { RadioOption, RadioOptionsState } from '../types';
-import { filterPlaybackRates, insertPlaybackRate, parsePlaybackRates } from '../utils/playback-rates';
+import {
+  filterPlaybackRates,
+  getPlaybackRateRange,
+  insertPlaybackRate,
+  parsePlaybackRates,
+} from '../utils/playback-rates';
 import { resolveLabel } from '../utils/resolve-label';
 
 export interface PlaybackRateRadioGroupProps {
@@ -62,6 +67,7 @@ export class PlaybackRateRadioGroupCore {
 
   #props = { ...PlaybackRateRadioGroupCore.defaultProps };
   #media: MediaPlaybackRateState | null = null;
+  #mediaTarget: object | null = null;
 
   constructor(props?: PlaybackRateRadioGroupProps) {
     if (props) this.setProps(props);
@@ -104,13 +110,18 @@ export class PlaybackRateRadioGroupCore {
    */
   getRates(media: MediaPlaybackRateState): readonly number[] {
     const own = parsePlaybackRates(this.#props.rates);
-    const supported = own && filterPlaybackRates(own, media.playbackRateRange);
+    const supported = own && filterPlaybackRates(own, getPlaybackRateRange(this.#mediaTarget));
 
     return supported?.length ? supported : media.playbackRates;
   }
 
   setMedia(media: MediaPlaybackRateState): void {
     this.#media = media;
+  }
+
+  /** The media element or adapter the player attached, whose rate range limits the control's own `rates`. */
+  setMediaTarget(target: object | null | undefined): void {
+    this.#mediaTarget = target ?? null;
   }
 
   getState(): PlaybackRateRadioGroupState {

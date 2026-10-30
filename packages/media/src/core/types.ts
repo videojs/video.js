@@ -192,7 +192,11 @@ export interface MediaPlaybackRateCapability {
   defaultPlaybackRate: number;
 }
 
-/** The slowest and fastest playback rates a media implementation accepts. */
+/**
+ * The slowest and fastest playback rates a media implementation accepts.
+ *
+ * @internal
+ */
 export interface MediaPlaybackRateRange {
   readonly min: number;
   readonly max: number;
@@ -201,6 +205,8 @@ export interface MediaPlaybackRateRange {
 /**
  * Reports the playback rates a media implementation accepts, when they are narrower than the browser's. A media without
  * it is assumed to accept the native range.
+ *
+ * @internal
  */
 export interface MediaPlaybackRateRangeCapability {
   readonly playbackRateRange: MediaPlaybackRateRange;
@@ -693,8 +699,7 @@ export interface MediaTargetLike
     MediaAutoplayCapability,
     Partial<MediaLiveCapability>,
     Partial<MediaStreamTypeCapability>,
-    Partial<MediaContentDataCapability>,
-    Partial<MediaPlaybackRateRangeCapability> {
+    Partial<MediaContentDataCapability> {
   title: string;
 }
 

@@ -1,14 +1,14 @@
 'use client';
 
 import type { RadioOption, RadioOptionsState } from '@videojs/core';
-import { logMissingFeature } from '@videojs/core/dom';
+import { logMissingFeature, type PlayerTarget } from '@videojs/core/dom';
 import { type Text, type TextParams, translateText } from '@videojs/core/i18n';
 import type { UnknownState } from '@videojs/store';
 import { isUndefined } from '@videojs/utils/predicate';
 import { useCallback, useState } from 'react';
 
 import { useTranslator } from '../../i18n/context';
-import { usePlayer } from '../../player/context';
+import { usePlayer, usePlayerContext } from '../../player/context';
 
 interface RadioOptionsCore<Props, Media, State extends RadioOptionsState> {
   setProps(props: Props): void;
@@ -17,6 +17,8 @@ interface RadioOptionsCore<Props, Media, State extends RadioOptionsState> {
   getLabel(state: State): Text | string;
   getLabelParams?(state: State): TextParams | undefined;
   selectValue(media: Media, value: string): void;
+  /** Receives the media the player attached, for options that depend on what it can play. */
+  setMediaTarget?(target: object | null | undefined): void;
 }
 
 interface RadioOptionsHookConfig<Props, Media, State extends RadioOptionsState> {
@@ -61,6 +63,7 @@ export function createRadioOptionsHook<Props, Media, State extends RadioOptionsS
     'use no memo';
 
     const media = usePlayer(selector);
+    const { store } = usePlayerContext();
     const t = useTranslator();
     const [core] = useState(createCore);
 
@@ -75,6 +78,7 @@ export function createRadioOptionsHook<Props, Media, State extends RadioOptionsS
     }
 
     core.setMedia(media);
+    core.setMediaTarget?.((store.target as PlayerTarget | null)?.media);
     const state = core.getState();
     const options = state.options.map((option) => {
       const { label, labelParams, ariaLabel, ariaLabelParams, disabled, ...rest } = option;

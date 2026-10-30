@@ -38,7 +38,6 @@ function createMenuStore(overrides: Partial<MenuMediaState> = {}): AnyPlayerStor
       selectAudioTrack: vi.fn(),
       playbackRates: [0.5, 1, 1.5, 2],
       playbackRate: 1.5,
-      playbackRateRange: { min: 0.0625, max: 16 },
       playbackRateAvailability: 'available',
       setPlaybackRate: vi.fn(),
       videoRenditionList: [

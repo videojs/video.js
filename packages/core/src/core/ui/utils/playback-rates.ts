@@ -1,5 +1,17 @@
-import type { MediaPlaybackRateRange } from '@videojs/media';
+import type { MediaPlaybackRateRange, MediaPlaybackRateRangeCapability } from '@videojs/media';
 import { isString } from '@videojs/utils/predicate';
+
+// Chromium throws outside this range and Firefox stops playing outside it. WebKit accepts any rate, but its audio drops
+// out well inside these bounds, so this shared range is assumed for a media that reports none.
+export const NATIVE_PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.0625, max: 16 };
+
+/** The rate range a media reports, or the native range when it reports none or there is no media yet. */
+export function getPlaybackRateRange(media: object | null | undefined): MediaPlaybackRateRange {
+  return (
+    (media as Partial<MediaPlaybackRateRangeCapability> | null | undefined)?.playbackRateRange ??
+    NATIVE_PLAYBACK_RATE_RANGE
+  );
+}
 
 /**
  * Normalizes author input into a list of playback rates. Accepts an array or a space-separated attribute value, keeps

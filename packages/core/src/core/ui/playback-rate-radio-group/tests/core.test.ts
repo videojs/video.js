@@ -9,7 +9,6 @@ function createMediaState(overrides: Partial<MediaPlaybackRateState> = {}): Medi
   return {
     playbackRates: [0.5, 1, 1.5, 2],
     playbackRate: 1,
-    playbackRateRange: { min: 0.0625, max: 16 },
     playbackRateAvailability: 'available',
     setPlaybackRate: vi.fn(),
     ...overrides,

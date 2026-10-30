@@ -347,7 +347,11 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
-  /** Vimeo plays any rate up to 2, rejects faster ones, and never settles a request slower than the browser allows. */
+  /**
+   * Vimeo plays any rate up to 2, rejects faster ones, and never settles a request slower than the browser allows.
+   *
+   * @internal
+   */
   get playbackRateRange(): MediaPlaybackRateRange {
     return PLAYBACK_RATE_RANGE;
   }

@@ -2,7 +2,6 @@ import type {
   ErrorLike,
   MediaCrossOriginType,
   MediaFeatureAvailability,
-  MediaPlaybackRateRange,
   MediaStreamType,
   TextTrackKind,
 } from './types';
@@ -254,11 +253,6 @@ export interface MediaPlaybackRateState {
    */
   playbackRate: number;
   /**
-   * The slowest and fastest rates the media accepts. Rates the controls offer are limited to it, and `setPlaybackRate`
-   * clamps to it.
-   */
-  readonly playbackRateRange: MediaPlaybackRateRange;
-  /**
    * Whether the media can change its playback rate. `unsupported` when the attached media has no `playbackRate` at all,
    * such as an embed whose provider takes no speed command.
    *
@@ -266,7 +260,7 @@ export interface MediaPlaybackRateState {
    */
   playbackRateAvailability: MediaFeatureAvailability;
   /**
-   * Set the playback rate, clamped to `playbackRateRange`.
+   * Set the playback rate, clamped to the rates the media accepts.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
    */

@@ -36,6 +36,7 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
   readonly #core = new PlaybackRateRadioGroupCore();
   readonly #i18n = new I18nController(this, i18nContext);
   readonly #mediaState = new PlayerController(this, playerContext, selectPlaybackRate);
+  readonly #player = new PlayerController(this, playerContext);
   readonly #options = new RadioOptionsController<PlaybackRateRadioGroupOption>(this, {
     setItemAttributes: (item, option) => {
       item.setAttribute('data-rate', option.value);
@@ -66,6 +67,7 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
     if (media) {
       this.#core.setProps({ formatRate: this.formatRate, disabled: this.disabled, rates: this.rates });
       this.#core.setMedia(media);
+      this.#core.setMediaTarget(this.#player.value?.target?.media);
       state = this.#core.getState();
 
       this.applyDefaultAriaLabel(

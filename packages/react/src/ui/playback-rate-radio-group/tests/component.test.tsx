@@ -32,7 +32,6 @@ function renderPlaybackRateRadioGroup({
   const { Wrapper } = createPlayerWrapper({
     playbackRates,
     playbackRate,
-    playbackRateRange: { min: 0.0625, max: 16 },
     playbackRateAvailability,
     setPlaybackRate,
   });
@@ -82,7 +81,6 @@ describe('PlaybackRateRadioGroup', () => {
     const { Wrapper } = createPlayerWrapper({
       playbackRates: [0.5, 1, 2],
       playbackRate: 1,
-      playbackRateRange: { min: 0.0625, max: 16 },
       playbackRateAvailability: 'available',
       setPlaybackRate: vi.fn(),
     });

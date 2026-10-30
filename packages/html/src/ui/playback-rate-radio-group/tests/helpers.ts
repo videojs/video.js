@@ -74,7 +74,6 @@ function createPlaybackRateStore({
       return {
         playbackRates,
         playbackRate,
-        playbackRateRange: { min: 0.0625, max: 16 },
         playbackRateAvailability,
         setPlaybackRate,
       };

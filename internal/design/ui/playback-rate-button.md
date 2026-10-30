@@ -40,7 +40,7 @@ The player input `defaultPlaybackRates` (`default-playback-rates="0.5 1 1.5 2"` 
 - **No converter needed:** HTML inputs are declared as strings, and the shared parser accepts a space-separated list or an array.
 - **No auto-sorting:** The button cycles in the author's order. `speedUp`/`speedDown` step by value and stop at the ends, so they work whatever the order.
 - **The media owns the rate:** It can be one no control offers, set through the media API or a stepped hotkey. The radio group slots it in before the next faster rate as a `custom` option, named "Custom, {rate}" for assistive technology.
-- **Ranges, not lists:** Media report a `{ min, max }` `playbackRateRange`; one that reports none gets the native `0.0625`–`16`. YouTube lists quarter steps in `getAvailablePlaybackRates` but plays any rate from `0.25` to `2`, floored to `0.05`, so a list would hide rates it accepts. Rates outside the range are left out of the offered lists, and `setPlaybackRate` clamps to the nearest end with a development warning.
+- **Ranges, not lists:** Media report a `{ min, max }` range through an internal `playbackRateRange` getter, kept internal until the name and shape settle ([review](https://github.com/videojs/video.js/pull/9533#pullrequestreview-5706911916)); one that reports none gets the native `0.0625`–`16`. YouTube lists quarter steps in `getAvailablePlaybackRates` but plays any rate from `0.25` to `2`, floored to `0.05`, so a list would hide rates it accepts. Rates outside the range are left out of the offered lists, and `setPlaybackRate` clamps to the nearest end with a development warning.
 
 **Alternatives explored:**
 

@@ -49,6 +49,21 @@ describe('PlaybackRateRadioGroupElement', () => {
     expect(items.map((item) => item.value)).toEqual(['1', '3']);
   });
 
+  it("leaves out its own rates that fall outside the attached media's range", async () => {
+    const { menu, options, store, trigger } = setup({ playbackRates: [0.5, 1, 2], playbackRate: 1 });
+
+    store.attach({
+      media: Object.assign(new EventTarget(), { playbackRateRange: { min: 0.25, max: 2 } }),
+      container: null,
+    } as never);
+    options.setAttribute('rates', '1 3 1.5');
+    await waitForMenu(menu, trigger, options);
+
+    const items = [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+
+    expect(items.map((item) => item.value)).toEqual(['1', '1.5']);
+  });
+
   it('marks the current rate as custom when the group does not offer it', async () => {
     const { menu, options, setState, trigger } = setup({ playbackRates: [1, 1.5, 2], playbackRate: 1.1 });
 

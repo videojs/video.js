@@ -199,13 +199,14 @@ describe('playbackRateFeature', () => {
     });
   });
 
-  describe('playbackRateRange', () => {
+  describe('media range', () => {
     it('assumes the native range for a media that reports none', () => {
       const store = createRateStore();
 
+      setPlayerConfigValue(store, ratesConfig, [0.05, 1, 16, 17]);
       store.attach({ media: createMockVideo(), container: null });
 
-      expect(store.state.playbackRateRange).toEqual({ min: 0.0625, max: 16 });
+      expect(store.state.playbackRates).toEqual([1, 16]);
     });
 
     it("leaves out rates outside the media's range, keeping the author order", () => {
@@ -234,15 +235,24 @@ describe('playbackRateFeature', () => {
       expect(store.state.playbackRates).toEqual([3]);
     });
 
+    it('keeps the range off the public state', () => {
+      const store = createRateStore();
+
+      store.attach({ media: createRangedVideo({ min: 0.25, max: 2 }), container: null });
+
+      expect(Reflect.ownKeys(store.state).filter((key) => String(key).includes('Range'))).toEqual([]);
+    });
+
     it('reads the range again when a new source loads', () => {
       const store = createRateStore();
       const video = createRangedVideo(undefined);
 
+      setPlayerConfigValue(store, ratesConfig, [1, 3]);
       store.attach({ media: video, container: null });
       video.playbackRateRange = { min: 0.25, max: 2 };
       video.dispatchEvent(new Event('loadstart'));
 
-      expect(store.state.playbackRateRange).toEqual({ min: 0.25, max: 2 });
+      expect(store.state.playbackRates).toEqual([1]);
     });
   });
 });

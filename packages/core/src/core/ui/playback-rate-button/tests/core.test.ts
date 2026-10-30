@@ -8,7 +8,6 @@ function createMediaState(overrides: Partial<MediaPlaybackRateState> = {}): Medi
   return {
     playbackRates: [0.2, 0.5, 0.7, 1, 1.2, 1.5, 1.7, 2],
     playbackRate: 1,
-    playbackRateRange: { min: 0.0625, max: 16 },
     playbackRateAvailability: 'available',
     setPlaybackRate: vi.fn(),
     ...overrides,
@@ -207,9 +206,10 @@ describe('PlaybackRateButtonCore', () => {
 
     it("leaves out its own rates that fall outside the media's range", () => {
       const core = new PlaybackRateButtonCore({ rates: [1, 3, 1.5] });
-      const media = createMediaState({ playbackRate: 1, playbackRateRange: { min: 0.25, max: 2 } });
 
-      expect(core.getRates(media)).toEqual([1, 1.5]);
+      core.setMediaTarget({ playbackRateRange: { min: 0.25, max: 2 } });
+
+      expect(core.getRates(createMediaState())).toEqual([1, 1.5]);
     });
 
     it('falls back to the player rates when its own rates hold no usable rate', () => {

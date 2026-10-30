@@ -199,8 +199,6 @@ export type {
   MediaPlaybackRateCapability,
   MediaPlaybackRateEvents,
   MediaPlaybackRateState,
-  MediaPlaybackRateRange,
-  MediaPlaybackRateRangeCapability,
   MediaPlaybackState,
   MediaPlayedCapability,
   MediaPlaysInlineCapability,

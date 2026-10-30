@@ -369,6 +369,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   /**
    * YouTube plays any rate from 0.25 to 2, rounded down to a step of 0.05, though `getAvailablePlaybackRates` lists
    * only quarter steps.
+   *
+   * @internal
    */
   get playbackRateRange(): MediaPlaybackRateRange {
     return PLAYBACK_RATE_RANGE;
