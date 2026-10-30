@@ -205,6 +205,14 @@ const SOURCE_MAP = {
     type: 'hls',
     subType: 'mp4',
   },
+  // Apple's bipbop advanced stream in MPEG-TS: CEA-608 captions (CC1) in the video stream alongside a WebVTT
+  // subtitle playlist, for checking that both reach the captions menu.
+  'hls-bipbop-ts': {
+    label: 'HLS - Apple bipbop (TS, 608 captions)',
+    url: 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8',
+    type: 'hls',
+    subType: 'ts',
+  },
   // The `hls-3` and `hls-1` assets again, named by playback ID instead of URL.
   // Nothing about the content differs — they exist so the Mux presets exercise
   // the structured `source` on an ordinary public asset, where every other
