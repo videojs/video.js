@@ -126,7 +126,10 @@ export const textCuesFeature = definePlayerFeature({
       const src = content?.src ?? init.src;
 
       // Loading waits for the store to attach, which only happens on the client.
-      if (src) record.load = { src, format: content?.format ?? init.format };
+      if (src) {
+        record.src = src;
+        record.load = { src, format: content?.format ?? init.format };
+      }
 
       setRecords([...appTracks.records, record]);
 
