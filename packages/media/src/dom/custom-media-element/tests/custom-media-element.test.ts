@@ -708,7 +708,7 @@ describe('CustomMediaElement', () => {
       expect(el.destroyed).toBe(false);
     });
 
-    it('does not destroy when an ancestor has keep-alive', async () => {
+    it('destroys when only an ancestor has keep-alive', async () => {
       const player = document.createElement('div');
       const el = create(defineVideoElement());
 
@@ -718,7 +718,7 @@ describe('CustomMediaElement', () => {
 
       player.remove();
       await Promise.resolve();
-      expect(el.destroyed).toBe(false);
+      expect(el.destroyed).toBe(true);
     });
 
     it('does not destroy when synchronously moved to a new parent', async () => {

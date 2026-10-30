@@ -160,7 +160,7 @@ describe('HlsBackgroundVideo', () => {
       expect(destroy).toHaveBeenCalledOnce();
     });
 
-    it('keeps its engine when removed with a kept-alive ancestor, until adapter.destroy()', async () => {
+    it('releases its engine when only an ancestor has keep-alive', async () => {
       const player = document.createElement('div');
       const element = document.createElement(defineElement()) as HlsBackgroundVideo;
       const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
@@ -169,6 +169,16 @@ describe('HlsBackgroundVideo', () => {
       player.append(element);
       document.body.append(player);
       player.remove();
+      await flush();
+
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+
+    it('keeps its engine with keep-alive until adapter.destroy()', async () => {
+      const element = create(defineElement(), { 'keep-alive': '' });
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      element.remove();
       await flush();
 
       expect(destroy).not.toHaveBeenCalled();

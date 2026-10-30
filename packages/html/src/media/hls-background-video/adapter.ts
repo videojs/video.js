@@ -1,6 +1,6 @@
 import type { Media } from '@videojs/media/dom';
 import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/adapters/hls-background-video';
-import { isKeptAlive, namedNodeMapToObject } from '@videojs/utils/dom';
+import { namedNodeMapToObject } from '@videojs/utils/dom';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 import { getTemplateHTML } from '../background-video/template';
@@ -105,7 +105,7 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
 
   /**
    * The Media driving the inner `<video>`, matching `adapter` on `CustomMediaElement`. Call `adapter.destroy()` to
-   * release the engine after `keep-alive` on the element or an ancestor kept it running past removal.
+   * release the engine after `keep-alive` kept it running past removal.
    */
   get adapter(): HlsBackgroundVideoAdapter {
     return this.#media;
@@ -114,8 +114,9 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
   override disconnectedCallback(): void {
     super.disconnectedCallback?.();
 
-    // Kept alive by its own `keep-alive` or an ancestor's, the engine runs until `adapter.destroy()`.
-    if (isKeptAlive(this)) return;
+    // Only the element's own `keep-alive` counts: an ancestor's `destroy()` can't reach this engine, so inheriting it
+    // would leave the engine running with nothing to release it.
+    if (this.hasAttribute('keep-alive')) return;
 
     // Deferred so a synchronous reparent (remove then insert) doesn't tear down
     // the engine, matching `CustomMediaElement`.

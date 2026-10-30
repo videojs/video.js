@@ -60,7 +60,7 @@ There is no `source` object, `preload` mode, or opt-out for muted, autoplay, and
 
 The element also fires an `error` event when `error` becomes fatal. The inner video's own `error` can remain `null` because SPF, rather than the browser, rejected the source.
 
-Removing the element releases its engine a microtask later. If the element or an ancestor removed with it has `keep-alive`, such as `<background-video-player keep-alive>`, the engine keeps running until you call `adapter.destroy()`.
+Removing the element releases its engine a microtask later. If the element has its own `keep-alive`, the engine keeps running until you call `adapter.destroy()`. `keep-alive` on an ancestor, such as `<background-video-player keep-alive>`, doesn't keep it.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
