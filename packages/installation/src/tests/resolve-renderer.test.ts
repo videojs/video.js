@@ -84,9 +84,16 @@ describe('resolveRendererCandidates', () => {
     ]);
   });
 
-  it('returns no candidates for Wistia, Dailymotion, SoundCloud, and Mixcloud, which have no renderer yet', () => {
+  it('returns no candidates for Wistia, Dailymotion, Kaltura, SoundCloud, and Mixcloud, which have no renderer yet', () => {
     expect(resolveRendererCandidates('https://fast.wistia.net/embed/iframe/e4a27b971d')).toEqual([]);
     expect(resolveRendererCandidates('https://dai.ly/x84sh87')).toEqual([]);
+    expect(resolveRendererCandidates('kaltura/243342/1_sf5ovm7u')).toEqual([]);
+    // A Kaltura HLS manifest still plays in the generic stream renderers.
+    expect(
+      resolveRendererCandidates(
+        'https://cdnapisec.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/format/applehttp/protocol/https/a.m3u8'
+      )
+    ).toEqual(['hls', 'hls-background-video']);
     expect(resolveRendererCandidates('https://soundcloud.com/forss/flickermood')).toEqual([]);
     expect(resolveRendererCandidates('https://www.mixcloud.com/spartacus/lambiance/')).toEqual([]);
   });

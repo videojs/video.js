@@ -91,6 +91,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `WistiaVideo` |
 | `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `MuxVideo` or `MuxAudio` |
 | `cloudflare` | `cloudflarestream.com` and `videodelivery.net` URLs | `CloudflareVideo` |
+| `kaltura` | `kaltura.com` embed, preview page, and `playManifest` URLs that name a partner and an entry, and `kaltura/<partnerId>/<entryId>` shorthands | `KalturaVideo` |
 | `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `SpotifyAudio` |
 | `soundcloud` | `soundcloud.com` track and set URLs, `api.soundcloud.com` tracks and playlists, and `w.soundcloud.com/player/` embed URLs | `SoundCloudAudio` |
 | `mixcloud` | `mixcloud.com` show URLs and Mixcloud widget embed URLs | `MixcloudAudio` |
@@ -112,6 +113,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `<wistia-video>` |
 | `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `<mux-video>` or `<mux-audio>` |
 | `cloudflare` | `cloudflarestream.com` and `videodelivery.net` URLs | `<cloudflare-video>` |
+| `kaltura` | `kaltura.com` embed, preview page, and `playManifest` URLs that name a partner and an entry, and `kaltura/<partnerId>/<entryId>` shorthands | `<kaltura-video>` |
 | `spotify` | `open.spotify.com` URLs and `spotify:` URIs | `<spotify-audio>` |
 | `soundcloud` | `soundcloud.com` track and set URLs, `api.soundcloud.com` tracks and playlists, and `w.soundcloud.com/player/` embed URLs | `<soundcloud-audio>` |
 | `mixcloud` | `mixcloud.com` show URLs and Mixcloud widget embed URLs | `<mixcloud-audio>` |
@@ -125,7 +127,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `audio` | `.mp3`, `.m4a`, `.wav`, `.ogg`, `.flac`, and `.aac` files, and `audio/*` MIME types | `<audio>` |
 </FrameworkCase>
 
-`hls` covers every HLS adapter and `dash` every DASH adapter, so an HLS stream comes back as `hls` whichever one you play it with; see <DocsLink slug="guides/media-sources">Media sources</DocsLink> to choose one. Mux streams served from a custom domain are recognized as plain `hls`.
+`hls` covers every HLS adapter and `dash` every DASH adapter, so an HLS stream comes back as `hls` whichever one you play it with; see <DocsLink slug="guides/media-sources">Media sources</DocsLink> to choose one. Mux streams served from a custom domain are recognized as plain `hls`. A Kaltura `playManifest` URL resolves to `kaltura` whatever its format, and Kaltura URLs from a host other than `kaltura.com` are not recognized.
 
 player.js is a protocol any embed can speak, so nothing in an embed's URL says it's one. Add a `playerjs` query parameter, such as `https://streamable.com/e/moo?playerjs`, to resolve the URL as `playerjs` whatever its host or file extension. The player.js media removes the parameter before loading the embed.
 
@@ -145,12 +147,13 @@ A bare id returns `null`. An 11-character YouTube id and a 10-character Wistia i
 
 ### Shorthands
 
-`resolveAdapterType` recognizes these shorthands, and the YouTube and Vimeo media accept them as `src`:
+`resolveAdapterType` recognizes these shorthands, and the YouTube, Vimeo, and Kaltura media accept them as `src`:
 
 | Shorthand | Plays |
 |---|---|
 | `youtube/<id>`, `youtube/shorts/<id>` | The YouTube video, from the privacy-enhanced `youtube-nocookie.com` host |
 | `vimeo/<id>` | The Vimeo video |
 | `vimeo/<id>?hash=<hash>`, `vimeo/<id>?h=<hash>`, `vimeo/<id>/<hash>` | The unlisted Vimeo video |
+| `kaltura/<partnerId>/<entryId>` | The Kaltura entry |
 
 <UtilReference util="resolveAdapterType" />

@@ -27,6 +27,7 @@ export const CDN_MEDIA_SUBPATHS = [
   'hls-video',
   'hlsjs-video',
   'hyperframes-video',
+  'kaltura-video',
   'lazy-audio',
   'lazy-video',
   'mixcloud-audio',

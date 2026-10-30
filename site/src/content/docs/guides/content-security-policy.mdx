@@ -67,6 +67,8 @@ Add only the origins for the providers you use. Extend `script-src` with their s
 
 For Cloudflare, use `https://iframe.videodelivery.net` unless your source URL names a customer origin. In that case, replace `<code>` with your customer code.
 
+`<kaltura-video>` loads no Kaltura script or frame. It calls the Kaltura API and streams from Kaltura's CDN hosts, such as `https://cdnapisec.kaltura.com` and `https://cfvod.kaltura.com`, so if you narrow `connect-src`, `img-src`, or `media-src`, allow the hosts your entries use.
+
 The Wistia SDK bundled with Video.js normally renders its player in the page and can fall back to an iframe. It loads scripts and media data from `fast.wistia.com` and `fast.wistia.net`. If you narrow `connect-src`, keep both origins.
 
 The table covers entry scripts and embed frames. Provider SDKs can request additional resources. Test your selected media under your policy, check the browser's CSP violations, and allow the exact origins those requests need.

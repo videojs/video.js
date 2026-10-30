@@ -12,7 +12,8 @@ const ADAPTER_TYPE_RENDERERS: Record<AdapterType, readonly Renderer[]> = {
   wistia: [],
   mux: ['mux-video', 'mux-audio', 'mux-background-video'],
   cloudflare: ['cloudflare'],
-  // No SoundCloud or Mixcloud renderer is offered yet.
+  // No Kaltura, SoundCloud, or Mixcloud renderer is offered yet.
+  kaltura: [],
   soundcloud: [],
   mixcloud: [],
   spotify: ['spotify'],
@@ -33,7 +34,7 @@ export function resolveRendererCandidates(url: string): readonly Renderer[] {
   const type = resolveAdapterType(url);
   if (!type) return [];
 
-  // A Mux or Cloudflare manifest, such as an `.m3u8`, also plays in the generic stream renderers. The file
+  // A Mux, Cloudflare, or Kaltura manifest, such as an `.m3u8`, also plays in the generic stream renderers. The file
   // name alone carries no host, so it resolves by extension.
   const fileName = url.split(/[?#]/, 1)[0]!.split('/').pop();
   const fileType = fileName ? resolveAdapterType(fileName) : null;

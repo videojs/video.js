@@ -19,6 +19,26 @@ describe('resolveAdapterType', () => {
     ['https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M', 'mux'],
     ['https://customer-abc123.cloudflarestream.com/5d5bc37ffcf54c9b82e996823bffbb81/manifest/video.m3u8', 'cloudflare'],
     ['https://watch.videodelivery.net/5d5bc37ffcf54c9b82e996823bffbb81', 'cloudflare'],
+    [
+      'https://cdnapisec.kaltura.com/p/243342/sp/24334200/embedIframeJs/uiconf_id/28685261/partner_id/243342?iframeembed=true&entry_id=1_sf5ovm7u',
+      'kaltura',
+    ],
+    [
+      'https://cdnapisec.kaltura.com/p/4834032/embedPlaykitJs/uiconf_id/50952692?iframeembed=true&entry_id=1_fwzaeesq',
+      'kaltura',
+    ],
+    [
+      'https://cdnapisec.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/format/applehttp/protocol/https/a.m3u8',
+      'kaltura',
+    ],
+    [
+      'https://cdnapisec.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/format/mpegdash/protocol/https/a.mpd',
+      'kaltura',
+    ],
+    [
+      'https://www.kaltura.com/index.php/extwidget/preview/partner_id/243342/uiconf_id/28685261/entry_id/1_sf5ovm7u/embed/dynamic',
+      'kaltura',
+    ],
     ['https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M', 'spotify'],
     ['spotify:episode:6I3ZzCxRhRkNqnQNo8AZPV', 'spotify'],
     ['https://soundcloud.com/forss/flickermood', 'soundcloud'],
@@ -46,6 +66,7 @@ describe('resolveAdapterType', () => {
   it.each<[string, AdapterType]>([
     ['youtube/aqz-KE-bpKQ', 'youtube'],
     ['vimeo/76979871', 'vimeo'],
+    ['kaltura/243342/1_sf5ovm7u', 'kaltura'],
   ])('resolves the %s shorthand', (src, expected) => {
     expect(resolveAdapterType(src)).toBe(expected);
   });
@@ -62,6 +83,17 @@ describe('resolveAdapterType', () => {
 
   it('ignores surrounding whitespace', () => {
     expect(resolveAdapterType('  https://youtu.be/aqz-KE-bpKQ  ')).toBe('youtube');
+  });
+
+  it('resolves Kaltura URLs that name no entry, such as a flavor playlist, by their file extension', () => {
+    expect(
+      resolveAdapterType(
+        'https://cfvod.kaltura.com/scf/hls/p/243342/sp/24334200/serveFlavor/flavorId/1_vqhfu6uy/index.m3u8'
+      )
+    ).toBe('hls');
+    expect(resolveAdapterType('https://cdnapisec.kaltura.com/p/243342/thumbnail/entry_id/1_sf5ovm7u/width/640')).toBe(
+      null
+    );
   });
 
   it('resolves Mux streams on a custom domain as plain HLS', () => {
@@ -123,6 +155,9 @@ describe('resolveAdapterType', () => {
     ['a SoundCloud short link', 'https://on.soundcloud.com/9zRpu'],
     ['a Mixcloud profile', 'https://www.mixcloud.com/spartacus/'],
     ['a Mixcloud playlist', 'https://www.mixcloud.com/spartacus/playlists/cinematic/'],
+    ['a bare Kaltura entry id', '1_sf5ovm7u'],
+    ['a Kaltura shorthand without a partner', 'kaltura/1_sf5ovm7u'],
+    ['a Kaltura embed without an entry', 'https://cdnapisec.kaltura.com/p/243342/embedPlaykitJs/uiconf_id/50952692'],
     ['a service URL nested in a query parameter', 'https://example.com/share?url=https://youtu.be/aqz-KE-bpKQ'],
     ['a service domain in the path', 'https://example.com/fast.wistia.net/embed/iframe/e4a27b971d'],
     ['a lookalike host', 'https://youtube.com.example.com/watch?v=aqz-KE-bpKQ'],

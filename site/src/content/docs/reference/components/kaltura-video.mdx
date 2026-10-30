@@ -1,0 +1,140 @@
+---
+title: KalturaVideo
+frameworkTitle:
+  html: kaltura-video
+description: Video element that plays Kaltura entries through hls.js
+---
+
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/kaltura-video/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/kaltura-video/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/kaltura-video/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/kaltura-video/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/kaltura-video/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/kaltura-video/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/kaltura-video/html/css/BasicUsage.ts?raw";
+
+Video element for [Kaltura](https://corp.kaltura.com/) entries. It asks the Kaltura API how to play an entry, then plays its HLS stream through [hls.js](https://github.com/video-dev/hls.js/), so a <DocsLink slug="guides/skins">player skin</DocsLink> controls it like any other video: quality, captions, playback rate, picture-in-picture, and fullscreen all work. No Kaltura player loads.
+
+## Import
+
+<MediaImports media="kaltura-video" package="@videojs/kaltura-video" react="KalturaVideo" />
+
+## Load a source
+
+`src` takes a `kaltura/<partnerId>/<entryId>` shorthand or a Kaltura URL that names both a partner and an entry:
+
+- A V7 embed: `/p/<partnerId>/embedPlaykitJs/uiconf_id/<uiConfId>?iframeembed=true&entry_id=<entryId>`
+- A V2 embed or frame: `/p/<partnerId>/sp/<partnerId>00/embedIframeJs/uiconf_id/<uiConfId>/partner_id/<partnerId>?entry_id=<entryId>`, and `mwEmbedFrame.php` and `kwidget` URLs
+- A preview page: `/index.php/extwidget/preview/partner_id/<partnerId>/uiconf_id/<uiConfId>/entry_id/<entryId>/...`
+- A `playManifest` stream URL: `/p/<partnerId>/sp/<partnerId>00/playManifest/entryId/<entryId>/...`
+
+An entry ID alone names no partner, so it is not a source. Any other URL plays as a plain HLS stream.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<KalturaVideo src="kaltura/243342/0_uka1msg4" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<kaltura-video src="kaltura/243342/0_uka1msg4"></kaltura-video>
+```
+</FrameworkCase>
+
+A structured `source` names the entry with fields instead. Fields win over what `src` says.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<KalturaVideo source={{ partnerId: 243342, entryId: '0_uka1msg4' }} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('kaltura-video');
+video.source = { partnerId: 243342, entryId: '0_uka1msg4' };
+```
+</FrameworkCase>
+
+## Protected entries
+
+Without a session, the component starts an anonymous widget session, which plays public entries. For an entry that access control restricts to signed-in viewers, sign a Kaltura Session (KS) on your server for that viewer and pass it as `source.ks`. A KS that an embed URL or `playManifest` URL carries works too.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<KalturaVideo source={{ partnerId: 243342, entryId: '0_uka1msg4', ks: viewerKs }} />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('kaltura-video');
+video.source = { partnerId: 243342, entryId: '0_uka1msg4', ks: viewerKs };
+```
+</FrameworkCase>
+
+Give the KS only playback privileges, such as `sview:<entryId>,setrole:PLAYBACK_BASE_ROLE`, and a short expiry. Kaltura's [authentication and security guide](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) explains the privileges. Never send an admin secret or an admin KS to the browser. The component never signs a KS, and it does not renew one that expires: assign a new source with a new KS.
+
+## Domain restrictions
+
+Kaltura access control can restrict an entry to the sites that embed it. The component sends the page URL, without its fragment, with the API request and every stream request, as Kaltura's own player does. Set `source.referrer` to send another URL, or to `false` to send none. With `false`, entries restricted to a domain do not play.
+
+## Self-hosted and regional deployments
+
+The component calls Kaltura's SaaS API at `https://cdnapisec.kaltura.com`. A Kaltura URL from another deployment points the component at that deployment. For a deployment on a host of your own, set `source.serviceUrl` to its base URL. A trailing `/api_v3` is accepted.
+
+## Behavior
+
+- The component resolves an entry with one Kaltura API request when it loads, not when it plays. The request starts a widget session when there is no KS, then reads the entry, its playback context, and whether a live entry is broadcasting. Assigning a source that names the same entry again keeps the resolved stream.
+- The stream is the first unprotected HLS source the playback context lists, preferring HTTPS. `source.deliveryProfileId` picks a source by its Kaltura delivery profile instead.
+- An HLS `playManifest` URL plays as written, without waiting for the API. The request still runs, for the title.
+- Each stream request carries a `playSessionId`, a `clientTag` that names Video.js, and the page URL as `referrer`. A new `playSessionId` is generated for each entry.
+- `contentData.poster` comes from Kaltura's thumbnail API as soon as the source names an entry, and `contentData.title` comes from the entry once it resolves. A player shows both unless you set its own `poster` or `title`.
+- Captions and subtitles come from the HLS stream, so the captions menu lists every caption asset of the entry, and the default one shows.
+- An entry that cannot play reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, with a code in `error.context`: a Kaltura API code such as `ENTRY_ID_NOT_FOUND`, `INVALID_ENTRY_ID`, or `INVALID_KS`; `ENTRY_MODERATION_ERROR` for an entry that moderation holds back; `LIVE_STREAM_NOT_BROADCASTING` for a live entry that is offline; or `NO_PLAYABLE_SOURCE`. When access control blocks an entry, the error carries the code and the message the publisher wrote, such as `COUNTRY_RESTRICTED`. An API that cannot be reached reports a `MEDIA_ERR_NETWORK` error.
+- DRM-protected entries are not supported yet. An entry whose HLS sources are all protected reports a `MEDIA_ERR_ENCRYPTED` error with the code `DRM_NOT_SUPPORTED`.
+- The component does not send Kaltura analytics (KAVA), so plays do not appear in Kaltura's analytics reports. It does not load the plugins or ads of a Kaltura player configuration.
+
+## Content Security Policy
+
+The component calls the Kaltura API and loads streams, captions, and thumbnails from Kaltura's CDN hosts, such as `https://cdnapisec.kaltura.com` and `https://cfvod.kaltura.com`. Each delivery profile can use other hosts. If your <DocsLink slug="guides/content-security-policy">Content Security Policy</DocsLink> narrows `connect-src`, `img-src`, or `media-src`, allow the hosts your entries use, and keep `media-src blob:`.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="KalturaVideo" />

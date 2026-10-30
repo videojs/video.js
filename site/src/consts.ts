@@ -113,6 +113,10 @@ export const VJS10_DEMO_CLOUDFLARE = INSTALLATION_DEMO_SOURCES.cloudflare;
 // player.js is a protocol rather than a host; Gumlet is one service whose embed
 // speaks it.
 export const VJS10_DEMO_PLAYERJS = 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e';
+// A one-minute commercial on Kaltura's public demo partner, with captions in its
+// manifest. The partner's other public entry films a Kaltura player, controls
+// and all.
+export const VJS10_DEMO_KALTURA = 'kaltura/243342/0_uka1msg4';
 // Mixcloud's own Widget docs use this show as their example key.
 export const VJS10_DEMO_MIXCLOUD = 'https://www.mixcloud.com/spartacus/lambiance/';
 // SoundCloud's own docs embed from this account, so its tracks stay public.

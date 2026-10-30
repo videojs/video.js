@@ -204,6 +204,9 @@ async function loadCdnMedia(media: MediaId) {
     case 'mux-video-spf':
       await import('@videojs/cdn/media/mux-video/spf');
       break;
+    case 'kaltura-video':
+      await import('@videojs/cdn/media/kaltura-video');
+      break;
     case 'mux-audio':
       await import('@videojs/cdn/media/mux-audio');
       break;

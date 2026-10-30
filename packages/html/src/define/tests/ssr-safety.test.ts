@@ -26,6 +26,10 @@ describe('SSR-safe define imports', () => {
     await expect(import('../media/hls-video')).resolves.toBeDefined();
   });
 
+  it('imports kaltura-video without browser-only globals', async () => {
+    await expect(import('../media/kaltura-video')).resolves.toBeDefined();
+  });
+
   it('imports mixcloud-audio without browser-only globals', async () => {
     await expect(import('../media/mixcloud-audio')).resolves.toBeDefined();
   });

@@ -18,11 +18,13 @@ import {
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_KALTURA_SOURCE,
   DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
+  KALTURA_SOURCE_IDS,
   MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
@@ -82,6 +84,7 @@ describe('MEDIA', () => {
     expect(MEDIA['dash-video'].fallbackSource).toBe(DEFAULT_DASH_SOURCE);
     expect(MEDIA['youtube-video'].fallbackSource).toBe(DEFAULT_YOUTUBE_SOURCE);
     expect(MEDIA_IDS.filter((id) => MEDIA[id].fallbackSource)).toEqual([
+      'kaltura-video',
       'dash-video',
       'youtube-video',
       'playerjs-video',
@@ -106,6 +109,19 @@ describe('MEDIA', () => {
 
     for (const media of MEDIA_IDS.filter((id) => id !== 'soundcloud-audio')) {
       for (const id of SOUNDCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('offers the Kaltura media its own URLs, and nothing else those URLs', () => {
+    expect(MEDIA['kaltura-video'].entrySource).toBe(DEFAULT_KALTURA_SOURCE);
+    expect(KALTURA_SOURCE_IDS).toContain(DEFAULT_KALTURA_SOURCE);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('kaltura-video', platform)).toEqual(KALTURA_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'kaltura-video')) {
+      for (const id of KALTURA_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
   });
 
