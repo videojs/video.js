@@ -31,6 +31,9 @@ export function MuxData(props: MuxDataProps): ReactNode {
   const extension = usePlayerExtension(MuxDataExtension);
   const { MuxDataSdk, ...rest } = props;
 
+  // The shared extension can't detect its framework, so name it for the default player software name.
+  extension.framework = 'react';
+
   // `useSyncProps` treats an `undefined` prop as "reset to the default", but
   // `MuxDataSdk={undefined}` is how consumers disable monitoring. Sync it here
   // instead: passing the prop wins even when its value is `undefined`, and only

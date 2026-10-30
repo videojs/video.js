@@ -94,7 +94,11 @@ export class PlaybackRateRadioGroupCore {
     const media = this.#media!;
 
     const availability: PlaybackRateRadioGroupState['availability'] =
-      media.playbackRates.length > 0 ? 'available' : 'unavailable';
+      media.playbackRateAvailability !== 'available'
+        ? media.playbackRateAvailability
+        : media.playbackRates.length > 0
+          ? 'available'
+          : 'unavailable';
 
     this.state.patch({
       rate: media.playbackRate,
@@ -105,8 +109,8 @@ export class PlaybackRateRadioGroupCore {
         label: this.getRateLabel(rate),
         disabled: false,
       })),
-      disabled: this.#props.disabled || media.playbackRates.length === 0,
-      hidden: availability === 'unavailable',
+      disabled: this.#props.disabled || availability !== 'available',
+      hidden: availability !== 'available',
       availability,
     });
     this.state.patch({ label: resolveText(this.getLabel(this.state.current)) });
@@ -115,7 +119,7 @@ export class PlaybackRateRadioGroupCore {
   }
 
   select(media: MediaPlaybackRateState, rate: number): void {
-    if (this.#props.disabled) return;
+    if (this.#props.disabled || media.playbackRateAvailability !== 'available') return;
 
     if (!media.playbackRates.includes(rate)) return;
 

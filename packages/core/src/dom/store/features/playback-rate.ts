@@ -11,6 +11,7 @@ export const playbackRateFeature = definePlayerFeature({
   state: ({ target }): MediaPlaybackRateState => ({
     playbackRates: DEFAULT_RATES,
     playbackRate: 1,
+    playbackRateAvailability: 'unavailable',
     setPlaybackRate(rate: number) {
       const { media } = target();
 
@@ -20,10 +21,18 @@ export const playbackRateFeature = definePlayerFeature({
 
   attach({ target, signal, set }) {
     const { media } = target;
-    if (!isMediaPlaybackRateCapable(media)) return;
+
+    // A media with no `playbackRate`, such as an embed whose provider takes no
+    // speed command, would otherwise keep the default rates and show a control
+    // that does nothing.
+    if (!isMediaPlaybackRateCapable(media)) {
+      set({ playbackRate: 1, playbackRateAvailability: 'unsupported' });
+      return;
+    }
 
     const sync = () => set({ playbackRate: media.playbackRate });
 
+    set({ playbackRateAvailability: 'available' });
     sync();
 
     listen(media, 'ratechange', sync, { signal });

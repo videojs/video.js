@@ -8,7 +8,7 @@ import FeatureReference from "@/components/docs/api-reference/FeatureReference.a
 import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
-Controls speed of playback.
+Controls speed of playback. `playbackRateAvailability` is `unsupported` when the media has no playback rate, such as an embed whose provider takes no speed command.
 
 ## Import
 
@@ -20,10 +20,14 @@ Controls speed of playback.
 
 <FrameworkCase frameworks={["react"]}>
 Pass `selectPlaybackRate` to <DocsLink slug="reference/api/use-player">`usePlayer`</DocsLink> to subscribe to playback rate state. Returns `undefined` if the playback rate feature is not configured.
+
+Check `playbackRateAvailability` before showing a playback rate control.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 Pass `selectPlaybackRate` to <DocsLink slug="reference/api/player-controller">`PlayerController`</DocsLink> to subscribe to playback rate state. Returns `undefined` if the playback rate feature is not configured.
+
+Check `playbackRateAvailability` before showing a playback rate control.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -32,7 +36,7 @@ import { selectPlaybackRate, usePlayer } from '@videojs/react';
 
 function RateDisplay() {
   const rate = usePlayer(selectPlaybackRate);
-  if (!rate) return null;
+  if (!rate || rate.playbackRateAvailability !== 'available') return null;
 
   return <span>{rate.playbackRate}x</span>;
 }

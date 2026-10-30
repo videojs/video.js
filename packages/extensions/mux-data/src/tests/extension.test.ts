@@ -43,9 +43,38 @@ class FakeAdapter extends HTMLVideoAdapter {
   }
 }
 
-/** Shaped like the hls.js- and dash.js-backed adapters: the same adapter, fronting a JS engine. */
+/**
+ * Shaped like the hls.js- and dash.js-backed adapters: the same adapter, fronting a JS engine. Like the hls.js adapter,
+ * it names the engine it picked per source on the instance.
+ */
 class FakeEngineAdapter extends FakeAdapter {
   engine: unknown = null;
+  engineName: string | undefined = undefined;
+}
+
+/** Shaped like an adapter that always plays through one engine, which its class names. */
+class FakeShakaAdapter extends FakeAdapter {
+  static readonly engineName: string = 'shaka';
+}
+
+/**
+ * Shaped like the SPF background-video Media: no `HTMLMediaAdapter`, just the element as `target`, a `src`, an SPF
+ * engine, and the element's `loadstart` forwarded. No `currentSrc`, `readyState`, or `load()`.
+ */
+class FakeBackgroundVideoMedia extends EventTarget {
+  static readonly engineName: string = 'spf-hls-background-video';
+  readonly engine = {};
+  src = '';
+  #target: HTMLVideoElement | null = null;
+
+  get target() {
+    return this.#target;
+  }
+
+  attach(target: HTMLVideoElement) {
+    this.#target = target;
+    target.addEventListener('loadstart', () => this.dispatchEvent(new Event('loadstart')));
+  }
 }
 
 /** Shaped like an hls.js instance, class statics included. */
@@ -124,21 +153,23 @@ describe('MuxDataExtension', () => {
     );
   });
 
-  it('reports Video.js and this extension as the player software by default', async () => {
+  it('reports the framework, the engine, and this extension as the player software by default', async () => {
     const { sdk, monitor } = createSdk();
     const data = new MuxDataExtension({ MuxDataSdk: sdk });
-    const video = document.createElement('video');
 
-    data.attach({ media: video, container: null });
+    data.framework = 'html';
+
+    const video = attach(data, new FakeShakaAdapter());
 
     await settle();
 
+    expect(data.playerSoftwareName).toBeUndefined();
     expect(monitor).toHaveBeenCalledWith(
       video,
       expect.objectContaining({
         data: expect.objectContaining({
-          player_software_name: 'Video.js',
-          player_software: 'Video.js',
+          player_software_name: 'videojs-html-shaka',
+          player_software: 'videojs-html-shaka',
           player_software_version: __PLAYER_VERSION__,
           player_mux_plugin_name: '@videojs/mux-data',
           player_mux_plugin_version: __PLAYER_VERSION__,
@@ -147,10 +178,85 @@ describe('MuxDataExtension', () => {
     );
   });
 
+  it('reports the browser as the engine for media with no JS engine', async () => {
+    const { sdk, monitor } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk });
+    const video = document.createElement('video');
+
+    data.framework = 'react';
+    data.attach({ media: video, container: null });
+
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      video,
+      expect.objectContaining({ data: expect.objectContaining({ player_software_name: 'videojs-react-browser' }) })
+    );
+  });
+
+  it('renames the live view when a source change switches engines', async () => {
+    const { sdk, monitor, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk });
+    const adapter = new FakeEngineAdapter();
+
+    data.framework = 'html';
+    adapter.engineName = 'browser';
+    adapter.src = 'https://stream.mux.com/abc123.m3u8';
+    attach(data, adapter);
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ data: expect.objectContaining({ player_software_name: 'videojs-html-browser' }) })
+    );
+
+    adapter.engineName = 'hlsjs';
+    adapter.src = 'https://stream.mux.com/def456.m3u8';
+    adapter.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(monitor).toHaveBeenCalledTimes(1);
+    expect(updateData).toHaveBeenCalledWith({
+      player_software_name: 'videojs-html-hlsjs',
+      player_software: 'videojs-html-hlsjs',
+    });
+
+    updateData.mockClear();
+    adapter.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+  });
+
+  it('reports a configured player software name over the default', async () => {
+    const { sdk, monitor, updateData } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, playerSoftwareName: 'mux-video' });
+    const adapter = new FakeEngineAdapter();
+
+    data.framework = 'html';
+
+    const video = attach(data, adapter);
+
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      video,
+      expect.objectContaining({ data: expect.objectContaining({ player_software_name: 'mux-video' }) })
+    );
+
+    // A configured name holds across engine switches.
+    adapter.engineName = 'hlsjs';
+    adapter.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalledWith(expect.objectContaining({ player_software_name: expect.anything() }));
+  });
+
   it('updates the live view when the player software name changes', async () => {
     const { sdk, updateData } = createSdk();
     const data = new MuxDataExtension({ MuxDataSdk: sdk });
 
+    data.framework = 'html';
     data.attach({ media: document.createElement('video'), container: null });
 
     await settle();
@@ -158,6 +264,13 @@ describe('MuxDataExtension', () => {
     data.playerSoftwareName = 'mux-video';
 
     expect(updateData).toHaveBeenCalledWith({ player_software_name: 'mux-video', player_software: 'mux-video' });
+
+    data.playerSoftwareName = undefined;
+
+    expect(updateData).toHaveBeenLastCalledWith({
+      player_software_name: 'videojs-html-browser',
+      player_software: 'videojs-html-browser',
+    });
   });
 
   it('reports the time the player was created as the player init time', async () => {
@@ -281,6 +394,38 @@ describe('MuxDataExtension', () => {
     await settle();
 
     expect(monitor).not.toHaveBeenCalled();
+  });
+
+  it('monitors a background video through the element it fronts', async () => {
+    const { sdk, monitor, emit } = createSdk();
+    const data = new MuxDataExtension({ MuxDataSdk: sdk, envKey: 'key' });
+    const media = new FakeBackgroundVideoMedia();
+    const video = document.createElement('video');
+
+    data.framework = 'html';
+
+    media.src = 'https://stream.mux.com/abc123.m3u8';
+    media.attach(video);
+    data.attach({ media: media as any, container: null });
+
+    await settle();
+
+    expect(monitor).toHaveBeenCalledWith(
+      video,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          player_software_name: 'videojs-html-spf-hls-background-video',
+          video_id: 'abc123',
+        }),
+      })
+    );
+
+    media.src = 'https://stream.mux.com/def456.m3u8';
+    video.dispatchEvent(new Event('loadstart'));
+
+    await settle();
+
+    expect(emit).toHaveBeenCalledWith('videochange', expect.objectContaining({ video_id: 'def456' }));
   });
 
   it('keeps the monitor across a same-source loadstart', async () => {
@@ -546,7 +691,11 @@ describe('MuxDataExtension', () => {
     const video = document.createElement('video');
     const destroy = vi.fn();
 
-    Object.defineProperty(video, 'mux', { value: { destroy }, writable: true, configurable: true });
+    Object.defineProperty(video, 'mux', {
+      value: { deleted: false, destroy, updateData: vi.fn() },
+      writable: true,
+      configurable: true,
+    });
 
     data.attach({ media: video, container: null });
     await settle();

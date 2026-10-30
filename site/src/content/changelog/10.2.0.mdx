@@ -1,5 +1,5 @@
 ---
-description: ""
+description: "Adds skin-authoring tools and improves playback, player controls, and documentation."
 date: 2026-10-22
 version: "10.2.0"
 prerelease: false
@@ -7,68 +7,24 @@ breaking: false
 compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0"
 ---
 
+Video.js 10.2.0 makes it easier to build, test, and share a custom player skin, while tightening playback and control behavior.
 
-### 🚀 Features
-- *(site)* Add a comparison component ([#9406](https://github.com/videojs/video.js/pull/9406)) by [@sampotts](https://github.com/sampotts)
-- *(core)* Depend on video.js ([#9507](https://github.com/videojs/video.js/pull/9507)) by [@luwes](https://github.com/luwes)
-- *(cli)* Add skin create to start a skin project ([#9500](https://github.com/videojs/video.js/pull/9500)) by [@sampotts](https://github.com/sampotts)
-- *(cli)* Preview skins in a sandbox-style workbench ([#9501](https://github.com/videojs/video.js/pull/9501)) by [@sampotts](https://github.com/sampotts)
-- *(cli)* Deploy skin workbenches to vercel, netlify, or cloudflare pages ([#9502](https://github.com/videojs/video.js/pull/9502)) by [@sampotts](https://github.com/sampotts)
-- *(site)* Add swag link to footers ([#9552](https://github.com/videojs/video.js/pull/9552)) by [@decepulis](https://github.com/decepulis)
-- *(spf)* Compose the HLS engines from features ([#9395](https://github.com/videojs/video.js/pull/9395)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(cli)* Point skin projects at the videojs-skin agent skill ([#9518](https://github.com/videojs/video.js/pull/9518)) by [@sampotts](https://github.com/sampotts)
+## Build and share skins
 
-### 🐛 Bug Fixes
-- *(sandbox)* Ignore unknown source query values ([#9404](https://github.com/videojs/video.js/pull/9404)) by [@sampotts](https://github.com/sampotts)
-- *(skin)* Show elapsed time on compact neutral players ([#9484](https://github.com/videojs/video.js/pull/9484)) by [@sampotts](https://github.com/sampotts)
-- *(react)* Render crossorigin attributes before hydration ([#9403](https://github.com/videojs/video.js/pull/9403)) by [@sampotts](https://github.com/sampotts)
-- *(skin)* Keep media text colors when merging Tailwind classes ([#9491](https://github.com/videojs/video.js/pull/9491)) by [@sampotts](https://github.com/sampotts)
-- *(skin)* Scale scaffold controls in fullscreen ([#9487](https://github.com/videojs/video.js/pull/9487)) by [@sampotts](https://github.com/sampotts)
-- *(sandbox)* Debounce shell URL sync to avoid replaceState rate limit ([#9497](https://github.com/videojs/video.js/pull/9497)) by [@sampotts](https://github.com/sampotts)
-- *(test)* Retry browserstack connections and report their cause ([#9506](https://github.com/videojs/video.js/pull/9506)) by [@sampotts](https://github.com/sampotts)
-- *(hlsjs-video)* Read live edge start from hls.js live sync position ([#9409](https://github.com/videojs/video.js/pull/9409)) by [@mrlika](https://github.com/mrlika)
-- *(packages)* Seek while dragging the time slider so the frame updates ([#9510](https://github.com/videojs/video.js/pull/9510)) by [@Anandb71](https://github.com/Anandb71)
-- *(mux-data)* Report video.js as the default player software ([#9568](https://github.com/videojs/video.js/pull/9568)) by [@luwes](https://github.com/luwes)
-- *(spf)* Block segment loading under DRM regardless of composition order ([#9394](https://github.com/videojs/video.js/pull/9394)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(skin)* Remove dead captions and AirPlay controls from audio skins ([#9560](https://github.com/videojs/video.js/pull/9560)) by [@sampotts](https://github.com/sampotts)
+Start a standalone skin project with `npx @videojs/cli skin create`. Choose an HTML or React starting point, a styling approach, a starting skin, and a media preset; the generated project keeps the editable skin in `src/` and its preview in `apps/preview/` ([#9500](https://github.com/videojs/video.js/pull/9500)). Its workbench lets you check sizes, aspect ratios, color schemes, right-to-left layouts, built-in languages, and playback settings without reloading the player ([#9501](https://github.com/videojs/video.js/pull/9501)). When you are ready to share it, `pnpm run deploy` can deploy that workbench to Vercel, Netlify, or Cloudflare Pages ([#9502](https://github.com/videojs/video.js/pull/9502)).
 
-### 💼 Other
-- *(root)* Watch only development outputs in pnpm dev ([#9483](https://github.com/videojs/video.js/pull/9483)) by [@sampotts](https://github.com/sampotts)
-- *(installation)* Keep node built-ins external in the neutral build ([#9499](https://github.com/videojs/video.js/pull/9499)) by [@sampotts](https://github.com/sampotts)
-- *(site)* Upgrade astro to 7.4 and enable parallel prerendering ([#9556](https://github.com/videojs/video.js/pull/9556)) by [@decepulis](https://github.com/decepulis)
+Generated projects now point coding agents to the Video.js skin skill, and their README explains how to reopen the workbench in a particular state ([#9518](https://github.com/videojs/video.js/pull/9518)). The new [Build your own skin](/docs/guides/build-your-own-skin/) guide covers the workflow ([#9505](https://github.com/videojs/video.js/pull/9505)). The site also adds an accessible comparison component for the skin design inspiration post ([#9406](https://github.com/videojs/video.js/pull/9406), [#9407](https://github.com/videojs/video.js/pull/9407)).
 
-### 🚜 Refactor
-- *(site)* Share one focus outline and popover ring ([#9405](https://github.com/videojs/video.js/pull/9405)) by [@sampotts](https://github.com/sampotts)
-- *(spf)* Derive engine types from their behaviors and drop shareSignals ([#9391](https://github.com/videojs/video.js/pull/9391)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(spf)* Give each engine its own entry point with uniform names ([#9392](https://github.com/videojs/video.js/pull/9392)) by [@cjpillsbury](https://github.com/cjpillsbury)
-- *(spf)* Export engine defaults and merge them in createComposition ([#9393](https://github.com/videojs/video.js/pull/9393)) by [@cjpillsbury](https://github.com/cjpillsbury)
+## Playback and controls
 
-### 📚 Documentation
-- *(site)* Resolve inherited slider defaults ([#9398](https://github.com/videojs/video.js/pull/9398)) by [@javierarams](https://github.com/javierarams)
-- *(site)* Add changelog prose for 10.1.0 ([#9481](https://github.com/videojs/video.js/pull/9481)) by [@github-actions[bot]](https://github.com/github-actions[bot])
-- *(site)* Install composer archive into libraries/videojs-cdn ([#9513](https://github.com/videojs/video.js/pull/9513)) by [@luwes](https://github.com/luwes)
-- *(site)* Add the skin design inspiration blog post ([#9407](https://github.com/videojs/video.js/pull/9407)) by [@sampotts](https://github.com/sampotts)
-- *(site)* Add a build your own skin guide ([#9505](https://github.com/videojs/video.js/pull/9505)) by [@sampotts](https://github.com/sampotts)
+SPF HLS engines now compose from named features, making the capabilities, defaults, and initial state of a composition explicit; these SPF composition exports are not yet stable public API ([#9395](https://github.com/videojs/video.js/pull/9395)). DRM-capable compositions now keep segment loading blocked until a source is confirmed clear or its media keys attach, regardless of feature order ([#9394](https://github.com/videojs/video.js/pull/9394)). The hls.js adapter also uses its live sync position when choosing the live edge, so configured latency and low-latency settings stay accurate ([#9409](https://github.com/videojs/video.js/pull/9409)).
 
-### ⚡ Performance
-- *(html)* Re-render sliders on resize only for edge thumb alignment ([#9401](https://github.com/videojs/video.js/pull/9401)) by [@taekop](https://github.com/taekop)
+React now renders `crossorigin` on SPF-backed media before hydration, so cross-origin text tracks are available from the first load ([#9403](https://github.com/videojs/video.js/pull/9403)). Time sliders seek while you drag, keeping the video frame with the thumb on desktop and touch; they also avoid resize re-renders unless edge-thumb alignment needs one ([#9510](https://github.com/videojs/video.js/pull/9510), [#9401](https://github.com/videojs/video.js/pull/9401)). Mux Data now identifies unconfigured views as Video.js and reports its plugin name and version, making Video.js 10 traffic easier to distinguish in Mux Data ([#9568](https://github.com/videojs/video.js/pull/9568)).
 
-### 🧪 Testing
-- *(sandbox)* Wait for the debounced URL in the compare aspect-ratio test ([#9504](https://github.com/videojs/video.js/pull/9504)) by [@sampotts](https://github.com/sampotts)
+## Skin, sandbox, and docs polish
 
-### ⚙️ Miscellaneous Tasks
-- *(root)* Upgrade workspace dependencies ([#9482](https://github.com/videojs/video.js/pull/9482)) by [@sampotts](https://github.com/sampotts)
-- *(cd)* Allow release recovery after main moves on ([#9490](https://github.com/videojs/video.js/pull/9490)) by [@luwes](https://github.com/luwes)
-- *(root)* Add npm trusted publishing setup and release pr check ([#9485](https://github.com/videojs/video.js/pull/9485)) by [@luwes](https://github.com/luwes)
-- *(ci)* Add claude pr bug review workflow ([#9508](https://github.com/videojs/video.js/pull/9508)) by [@luwes](https://github.com/luwes)
-- *(ci)* Review fork prs after workflow approval ([#9515](https://github.com/videojs/video.js/pull/9515)) by [@luwes](https://github.com/luwes)
-- *(ci)* Scope claude reviewer gh commands to the reviewed pr ([#9516](https://github.com/videojs/video.js/pull/9516)) by [@luwes](https://github.com/luwes)
-- *(ci)* Skip claude reviews when the pr diff is unchanged ([#9517](https://github.com/videojs/video.js/pull/9517)) by [@luwes](https://github.com/luwes)
-- *(cli)* Build every skin create combination ([#9514](https://github.com/videojs/video.js/pull/9514)) by [@sampotts](https://github.com/sampotts)
-- *(root)* Stop marking #9391 as breaking in the changelog ([#9570](https://github.com/videojs/video.js/pull/9570)) by [@luwes](https://github.com/luwes)
-- *(packages)* Drop the spf package-level size scripts for the workspace measurement ([#9549](https://github.com/videojs/video.js/pull/9549)) by [@cjpillsbury](https://github.com/cjpillsbury)
+Neutral keeps elapsed time visible on compact players, Scaffold controls scale in fullscreen, and Tailwind registry skins preserve their media text colors ([#9484](https://github.com/videojs/video.js/pull/9484), [#9487](https://github.com/videojs/video.js/pull/9487), [#9491](https://github.com/videojs/video.js/pull/9491)). Compat and Scaffold audio skins no longer show captions or AirPlay controls that the preset does not support, and place playback rate beside volume ([#9560](https://github.com/videojs/video.js/pull/9560)).
 
-### New Contributors
-* @taekop made their first contribution in [#9401](https://github.com/videojs/video.js/pull/9401)
-* @Anandb71 made their first contribution in [#9510](https://github.com/videojs/video.js/pull/9510)
-* @mrlika made their first contribution in [#9409](https://github.com/videojs/video.js/pull/9409)
+The sandbox now ignores unknown source query values and batches URL updates so rapid option changes do not hit the browser's `replaceState` limit ([#9404](https://github.com/videojs/video.js/pull/9404), [#9497](https://github.com/videojs/video.js/pull/9497)). Slider references now show inherited defaults and explain keyboard step behavior ([#9398](https://github.com/videojs/video.js/pull/9398)); the [self-hosting guide](/docs/guides/self-hosting/) also directs Composer installations to `libraries/videojs-cdn/` ([#9513](https://github.com/videojs/video.js/pull/9513)). The site footer now includes a link to Video.js swag ([#9552](https://github.com/videojs/video.js/pull/9552)).
+
+Thanks to first-time contributors [@taekop](https://github.com/taekop), [@Anandb71](https://github.com/Anandb71), and [@mrlika](https://github.com/mrlika).

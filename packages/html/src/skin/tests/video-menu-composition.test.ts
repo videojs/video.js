@@ -38,6 +38,7 @@ function createMenuStore(overrides: Partial<MenuMediaState> = {}): AnyPlayerStor
       selectAudioTrack: vi.fn(),
       playbackRates: [0.5, 1, 1.5, 2],
       playbackRate: 1.5,
+      playbackRateAvailability: 'available',
       setPlaybackRate: vi.fn(),
       videoRenditionList: [
         { id: '0', height: 1080, selected: false },
@@ -178,6 +179,16 @@ describe('video menu primitive composition', () => {
         expect(trigger.getAttribute('data-availability')).toBe('unavailable');
         expect(trigger.getAttribute('aria-disabled')).toBe('true');
       }
+    });
+  });
+
+  it('hides the speed submenu trigger when the media has no playback rate', async () => {
+    const triggers = setup(createMenuStore({ playbackRateAvailability: 'unsupported' }));
+
+    await waitForAssertion(() => {
+      expect(triggers.speed.hidden).toBe(true);
+      expect(triggers.speed.getAttribute('data-availability')).toBe('unsupported');
+      expect(triggers.quality.hidden).toBe(false);
     });
   });
 });

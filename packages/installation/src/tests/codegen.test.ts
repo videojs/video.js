@@ -591,8 +591,53 @@ describe('generateReactCreateCode', () => {
     const code = result['app/page.tsx'];
 
     expect(code).toContain("import { MuxVideo } from '@videojs/react/media/mux-video'");
-    expect(code).toContain('<MuxVideo src={"');
+    expect(code).toContain('<MuxVideo source={{ playbackId: "');
     expect(code).toContain('playsInline />');
+  });
+
+  it('passes a Mux stream URL to Mux video as a structured source', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      media: 'mux-video',
+      sourceUrl: 'https://stream.media.example.com/abc123.m3u8?max_resolution=1080p&redundant_streams=true',
+    })['app/page.tsx'];
+
+    expect(code).toContain(
+      '<MuxVideo source={{ playbackId: "abc123", customDomain: "media.example.com", playback: { maxResolution: "1080p", redundantStreams: true } }} playsInline />'
+    );
+  });
+
+  it('keeps src for a URL Mux video cannot parse into a source', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      media: 'mux-video',
+      sourceUrl: 'https://example.com/video.m3u8',
+    })['app/page.tsx'];
+
+    expect(code).toContain('<MuxVideo src={"https://example.com/video.m3u8"} playsInline />');
+  });
+
+  it('passes a Mux stream URL to Mux audio as a structured source', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      useCase: 'default-audio',
+      skin: 'audio',
+      media: 'mux-audio',
+      sourceUrl: 'https://stream.mux.com/abc123.m3u8',
+    })['app/page.tsx'];
+
+    expect(code).toContain('<MuxAudio source={{ playbackId: "abc123" }} />');
+  });
+
+  it('keeps src for Mux background video, which takes no structured source', () => {
+    const code = generateReactCreateCode({
+      ...baseReact,
+      useCase: 'background-video',
+      media: 'mux-background-video',
+      sourceUrl: 'https://stream.mux.com/abc123.m3u8',
+    })['app/page.tsx'];
+
+    expect(code).toContain('<MuxBackgroundVideo src={"https://stream.mux.com/abc123.m3u8"} playsInline />');
   });
 
   it('renders and imports the Mux Data component alongside Mux video by default', () => {
@@ -837,6 +882,16 @@ describe('source installation code', () => {
 
     expect(packaged).toContain(`src={${JSON.stringify(sourceUrl)}}`);
     expect(source).toContain(`src={${JSON.stringify(sourceUrl)}}`);
+  });
+
+  it('passes a Mux stream URL to the local skin as a structured source', () => {
+    const code = generateSourceReactCreateCode({
+      ...baseReact,
+      media: 'mux-video',
+      sourceUrl: 'https://stream.mux.com/abc123.m3u8',
+    })['app/page.tsx'];
+
+    expect(code).toContain('<MuxVideo source={{ playbackId: "abc123" }} playsInline />');
   });
 
   it('keeps the local component name stable when the Neutral catalog is selected', () => {

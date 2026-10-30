@@ -10,6 +10,7 @@ import {
   type SvtaError,
 } from '../../../media/errors';
 import { crossOriginToRequestCredentials } from '../../../network/request-credentials';
+import { resolveSourceUrl } from '../../../network/resolve-source-url';
 import { createEngine, type EngineConfig, type EngineContext, type EngineState } from '../../engines/hls-audio';
 import { UNSUPPORTED_PLAYBACK_FEATURE_MESSAGE } from '../../primitives/error-messages';
 import {
@@ -83,6 +84,12 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       crossOrigin: null,
       disableRemotePlayback: false,
     };
+
+    /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-audio`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-audio';
 
     /**
      * A complete sentence naming the Media to reach for when this one can't play a source. Appended to the copy this
@@ -278,11 +285,13 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     set src(value: string) {
+      // Resolved before comparing or storing — see the video adapter's note.
+      const url = resolveSourceUrl(value);
       // Unchanged URL, no reload — see the video adapter's note.
-      if (value === this.src) return;
+      if (url === this.src) return;
 
-      this.#source = value ? { src: value } : null;
-      this.#applySrc(value);
+      this.#source = url ? { src: url } : null;
+      this.#applySrc(url);
       this.dispatchEvent?.(new Event('sourcechange'));
     }
 
@@ -308,12 +317,13 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
       this.dispatchEvent?.(new Event('sourcechange'));
     }
 
-    /** Point the engine at a URL; an unchanged one is not a reload request. */
+    /** Point the engine at a URL, resolved; an unchanged one is not a reload request. */
     #applySrc(value: string): void {
-      if (value === this.src) return;
+      const url = resolveSourceUrl(value);
+      if (url === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#engine.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(url ? { url } : undefined);
     }
 
     // -------------------------------------------------------------------------

@@ -52,7 +52,21 @@ When `menuTrigger` is enabled, activation opens the linked playback-rate menu in
 When `commandfor` is set, activation opens the linked playback-rate menu instead of cycling through rates. Use this mode when the button is the trigger for a `<media-menu>` that contains playback-rate options.
 </FrameworkCase>
 
+<FrameworkCase frameworks={["html"]}>
+When the media's playback rate is unavailable or unsupported, such as on an embed that takes no speed command, the element receives the native `hidden` attribute and ignores activation.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+When the media's playback rate is unavailable or unsupported, such as on an embed that takes no speed command, the component returns `null`.
+</FrameworkCase>
+
 ## Styling
+
+| Attribute | Values | Description |
+|-----------|--------|-------------|
+| `data-rate` | Number | Current playback rate |
+| `data-availability` | `"available"` \| `"unavailable"` \| `"unsupported"` | Whether the media can change its playback rate |
+| `data-hidden` | Present / absent | Present on the HTML element while playback rate is unavailable or unsupported |
 
 Display the current rate using the `data-rate` attribute:
 
@@ -76,7 +90,7 @@ Use the `render` prop for rate display:
 
 ## Accessibility
 
-Renders a `<button>` with an automatic `aria-label` of `"Playback rate {rate}"` (e.g., `"Playback rate 1.5"`). Override with the `label` prop. Keyboard activation: <kbd>Enter</kbd> / <kbd>Space</kbd>.
+Renders a `<button>` with an automatic `aria-label` of `"Playback rate, {rate}"` (e.g., `"Playback rate, 1.5"`). Its tooltip shows `"Playback rate"` without the value. Override both with the `label` prop. Keyboard activation: <kbd>Enter</kbd> / <kbd>Space</kbd>.
 
 In menu-trigger mode, the button behaves as a menu trigger and reflects menu state through the trigger attributes.
 

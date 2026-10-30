@@ -18,7 +18,7 @@ jobs:
   # ─── Job 0: Build API JSON before and after the merge, then diff them ─
   analyze:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     outputs:
       has_diff: ${{ steps.classify.outputs.has_diff }}
@@ -101,7 +101,7 @@ jobs:
   new-references:
     needs: analyze
     if: needs.analyze.outputs.has_new == 'true'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
       - name: Checkout code
@@ -256,7 +256,7 @@ jobs:
   stale-docs:
     needs: analyze
     if: needs.analyze.outputs.has_diff == 'true'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 20
     permissions:
       actions: read

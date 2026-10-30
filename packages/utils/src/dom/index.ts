@@ -65,6 +65,7 @@ export {
 export { isMacOS } from './platform';
 export {
   getPositionedSide,
+  hideOpenPopovers,
   type PositionSide,
   type PositionSideOffsets,
   type PositionSideOptions,

@@ -295,6 +295,19 @@ describe('VimeoAdapter', () => {
     expect(iframe.getAttribute('src')).toContain('autopause=1');
   });
 
+  it('builds the embed muted from the muted property, as React sets it', async () => {
+    const media = new VimeoAdapter();
+    const iframe = createIframe();
+
+    media.attach(iframe);
+    media.src = '76979871';
+    media.autoplay = true;
+    media.muted = true;
+    await flushDeferredEmbed();
+
+    expect(iframe.getAttribute('src')).toContain('muted=1');
+  });
+
   it('builds a deferred embed once for repeated source changes in the same task', async () => {
     const media = new VimeoAdapter();
     const iframe = createIframe();

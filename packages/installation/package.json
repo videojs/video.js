@@ -28,6 +28,7 @@
   "devDependencies": {
     "@types/node": "^22.18.6",
     "@videojs/media": "workspace:*",
+    "@videojs/mux": "workspace:*",
     "vite-plus": "catalog:"
   }
 }

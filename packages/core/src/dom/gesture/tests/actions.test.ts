@@ -22,6 +22,18 @@ describe('resolveGestureAction', () => {
     expect(activate).toHaveBeenCalledExactlyOnceWith(...args);
   });
 
+  it('toggles playback from the state the pointer-down found, not what the click started since', () => {
+    const play = vi.fn(async () => {});
+    const pause = vi.fn();
+    const context = ctx({ paused: false, play, pause });
+
+    // Safari's start button plays on the click, before the deferred tap fires.
+    resolveGestureAction('togglePaused')!({ ...context, state: { paused: true, play, pause } });
+
+    expect(play).toHaveBeenCalledOnce();
+    expect(pause).not.toHaveBeenCalled();
+  });
+
   it('handles a rejection from a store action called by name', async () => {
     let calls = 0;
     // Not a `vi.fn`; see `collectUnhandledRejections`.

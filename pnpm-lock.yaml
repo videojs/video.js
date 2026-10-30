@@ -353,6 +353,9 @@ importers:
       '@videojs/media':
         specifier: workspace:*
         version: link:../../packages/media
+      '@videojs/mixcloud-audio':
+        specifier: workspace:*
+        version: link:../../packages/adapters/mixcloud-audio
       '@videojs/mux-audio':
         specifier: workspace:*
         version: link:../../packages/adapters/mux-audio
@@ -374,6 +377,9 @@ importers:
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../../packages/adapters/shaka-video
+      '@videojs/soundcloud-audio':
+        specifier: workspace:*
+        version: link:../../packages/adapters/soundcloud-audio
       '@videojs/spf':
         specifier: workspace:*
         version: link:../../packages/spf
@@ -528,8 +534,8 @@ importers:
         specifier: workspace:*
         version: link:../../utils
       hls.js:
-        specifier: 1.6.19
-        version: 1.6.19
+        specifier: 1.7.3
+        version: 1.7.3
     devDependencies:
       jsdom:
         specifier: ^26.1.0
@@ -537,6 +543,22 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.19.15)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
+
+  packages/adapters/mixcloud-audio:
+    dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
+      '@videojs/utils':
+        specifier: workspace:*
+        version: link:../../utils
+    devDependencies:
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(supports-color@8.1.1)
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
 
   packages/adapters/mux:
     dependencies:
@@ -651,6 +673,22 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.19.15)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
+
+  packages/adapters/soundcloud-audio:
+    dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
+      '@videojs/utils':
+        specifier: workspace:*
+        version: link:../../utils
+    devDependencies:
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(supports-color@8.1.1)
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
 
   packages/adapters/spotify-audio:
     dependencies:
@@ -774,6 +812,9 @@ importers:
       '@videojs/html':
         specifier: workspace:*
         version: link:../html
+      '@videojs/mixcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/mixcloud-audio
       '@videojs/mux-audio':
         specifier: workspace:*
         version: link:../adapters/mux-audio
@@ -792,6 +833,9 @@ importers:
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../adapters/shaka-video
+      '@videojs/soundcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/soundcloud-audio
       '@videojs/spf':
         specifier: workspace:*
         version: link:../spf
@@ -929,8 +973,8 @@ importers:
         specifier: 5.2.0
         version: 5.2.0(@svta/cml-cta@1.0.6(@svta/cml-structured-field-values@1.1.3(@svta/cml-utils@1.5.0))(@svta/cml-utils@1.5.0))(@svta/cml-structured-field-values@1.1.3(@svta/cml-utils@1.5.0))(@svta/cml-utils@1.5.0)
       hls.js:
-        specifier: 1.6.19
-        version: 1.6.19
+        specifier: 1.7.3
+        version: 1.7.3
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(supports-color@8.1.1)
@@ -977,6 +1021,9 @@ importers:
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/mixcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/mixcloud-audio
       '@videojs/mux-audio':
         specifier: workspace:*
         version: link:../adapters/mux-audio
@@ -995,6 +1042,9 @@ importers:
       '@videojs/skins':
         specifier: workspace:*
         version: link:../skins
+      '@videojs/soundcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/soundcloud-audio
       '@videojs/spotify-audio':
         specifier: workspace:*
         version: link:../adapters/spotify-audio
@@ -1072,6 +1122,9 @@ importers:
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
+      '@videojs/mux':
+        specifier: workspace:*
+        version: link:../adapters/mux
       vite-plus:
         specifier: 'catalog:'
         version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@27.4.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
@@ -1134,6 +1187,9 @@ importers:
       '@videojs/icons':
         specifier: workspace:*
         version: link:../icons
+      '@videojs/mixcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/mixcloud-audio
       '@videojs/mux-audio':
         specifier: workspace:*
         version: link:../adapters/mux-audio
@@ -1149,6 +1205,9 @@ importers:
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../adapters/shaka-video
+      '@videojs/soundcloud-audio':
+        specifier: workspace:*
+        version: link:../adapters/soundcloud-audio
       '@videojs/spotify-audio':
         specifier: workspace:*
         version: link:../adapters/spotify-audio
@@ -1254,6 +1313,12 @@ importers:
 
   packages/spf:
     dependencies:
+      '@svta/cml-error-codes':
+        specifier: ^0.1.1
+        version: 0.1.2(@svta/cml-utils@1.6.2)
+      '@svta/cml-utils':
+        specifier: ^1.6.1
+        version: 1.6.2
       '@videojs/media':
         specifier: workspace:*
         version: link:../media
@@ -3342,6 +3407,7 @@ packages:
   '@opentelemetry/sdk-trace-node@2.7.1':
     resolution: {integrity: sha512-pCpQxU68lV+I9s9svqMyVu5iHdDDUnqUpSxqwyCU8A9ejEsSnMPCbearwsUO4yk08ZJzAIUCFuReMdVQvHrdvg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -5112,6 +5178,12 @@ packages:
     peerDependencies:
       '@svta/cml-utils': 1.5.0
 
+  '@svta/cml-error-codes@0.1.2':
+    resolution: {integrity: sha512-q1xL8W9JR0Yj7h2kAyRWqb7iT7UlOb/rXMDSVpY5EcXUR5w0zHfl22YG4+dYVqtV9XpoIxhp+nXSqZkTo3TSTg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@svta/cml-utils': ^1.6.2
+
   '@svta/cml-id3@1.0.6':
     resolution: {integrity: sha512-63j8gkAnPOmOBWlp0hIZPvsIioZttdbg6/TgwITqMYbSLYVJ+6QGa/UtIP0I84NsfstANw6QdCn7i8SS08kn1A==}
     engines: {node: '>=20'}
@@ -5134,6 +5206,10 @@ packages:
 
   '@svta/cml-utils@1.5.0':
     resolution: {integrity: sha512-JMqclD7Akd+GSJiuaYNUHOP2wNtf/nauKeszlYeivSHfi0Lp3pmSW5PXDvJ2dO4aPmmSOQbF0ztTsW9Vcs2Whw==}
+    engines: {node: '>=20'}
+
+  '@svta/cml-utils@1.6.2':
+    resolution: {integrity: sha512-sJ4C70TSf7LmpaBGKK4NpbWWDiQE5ojqVjxsCZ1yDf6x6oj4bObuxC8525+SJAe4EHUfueVAR1I+kDavZmIAzg==}
     engines: {node: '>=20'}
 
   '@svta/cml-xml@1.1.4':
@@ -7480,8 +7556,8 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hls.js@1.6.19:
-    resolution: {integrity: sha512-A//aZeaAgM5rgUCbTURD4gkfyw5Uag2/4Jky7CfDOukL/DN+P5DjbgK2BYteyP3/KnCkPfkGVkbLxQG2T0AbUQ==}
+  hls.js@1.7.3:
+    resolution: {integrity: sha512-MsPlx6yVW4Qv4C7mEVou4/gk/5cN2dVxOTnrNjPSmyH2f0Ln+/UkG10Ax1PE6OvrmTVPKgQYozTtBaPOuCzq7A==}
 
   hono@4.13.1:
     resolution: {integrity: sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw==}
@@ -11931,17 +12007,17 @@ snapshots:
       nanostores: 1.1.1
       react: 19.3.0
 
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
-    dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -13093,7 +13169,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.0.0-rc.17':
@@ -13628,6 +13704,10 @@ snapshots:
     dependencies:
       '@svta/cml-utils': 1.5.0
 
+  '@svta/cml-error-codes@0.1.2(@svta/cml-utils@1.6.2)':
+    dependencies:
+      '@svta/cml-utils': 1.6.2
+
   '@svta/cml-id3@1.0.6(@svta/cml-utils@1.5.0)':
     dependencies:
       '@svta/cml-utils': 1.5.0
@@ -13643,6 +13723,8 @@ snapshots:
       '@svta/cml-utils': 1.5.0
 
   '@svta/cml-utils@1.5.0': {}
+
+  '@svta/cml-utils@1.6.2': {}
 
   '@svta/cml-xml@1.1.4(@svta/cml-utils@1.5.0)':
     dependencies:
@@ -16367,7 +16449,7 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hls.js@1.6.19: {}
+  hls.js@1.7.3: {}
 
   hono@4.13.1: {}
 

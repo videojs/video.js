@@ -39,7 +39,7 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 |---|---|---|
 | `envKey` | `string` | Mux Data environment key the beacons are sent to. Optional for Mux-hosted playback |
 | `metadata` | `object` | Mux Data metadata for the view |
-| `playerSoftwareName` | `string` | Player name reported to Mux Data. Defaults to `Video.js` |
+| `playerSoftwareName` | `string` | Player name reported to Mux Data. Defaults to `videojs-react-<engine>`; see [Player software name](#player-software-name) |
 | `playerSoftwareVersion` | `string` | Player version reported to Mux Data. Defaults to the Video.js version |
 | `playerInitTime` | `number` | Epoch milliseconds the player was initialized. Defaults to when the player was created |
 | `beaconCollectionDomain` | `string` | Custom domain the beacons are sent to |
@@ -53,7 +53,7 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 |---|---|---|
 | `env-key` | `envKey` | Mux Data environment key the beacons are sent to. Optional for Mux-hosted playback |
 | — | `metadata` | Mux Data metadata for the view |
-| `player-software-name` | `playerSoftwareName` | Player name reported to Mux Data. Defaults to `Video.js` |
+| `player-software-name` | `playerSoftwareName` | Player name reported to Mux Data. Defaults to `videojs-html-<engine>`; see [Player software name](#player-software-name) |
 | `player-software-version` | `playerSoftwareVersion` | Player version reported to Mux Data. Defaults to the Video.js version |
 | `player-init-time` | `playerInitTime` | Epoch milliseconds the player was initialized. Defaults to when the player was created |
 | `beacon-collection-domain` | `beaconCollectionDomain` | Custom domain the beacons are sent to |
@@ -65,6 +65,24 @@ Adds the [Mux Data](https://data.mux.com) <DocsLink slug="guides/architecture">e
 </FrameworkCase>
 
 Views also report the extension itself as the Mux plugin, so they can be told apart from other Video.js integrations such as `videojs-mux`.
+
+## Player software name
+
+When no player software name is set, views report `videojs-<framework>-<engine>`, where the framework is `html` or `react` and the engine is the one playing the current source:
+
+| Engine | Played by |
+|---|---|
+| `hlsjs` | hls.js |
+| `spf-hls-video` | The SPF video engine |
+| `spf-hls-audio` | The audio-only SPF engine |
+| `spf-hls-background-video` | The SPF background video engine |
+| `shaka` | Shaka Player |
+| `dashjs` | dash.js |
+| `browser` | The browser itself, like native HLS in Safari or an MP4 file |
+
+The framework is always one word, so everything after the second hyphen is the engine. The name updates on the current view when a source change switches engines. Media that doesn't declare an engine name leaves it out, as in `videojs-html`. A player software name you set always takes precedence.
+
+The player software version defaults to the Video.js version, and the Mux plugin is reported as `@videojs/mux-data` at the same version.
 
 Changing `MuxDataSdk`, `beaconCollectionDomain`, `debug`, or `disableCookies` restarts monitoring, which ends the current view and starts a new one. The rest update the view in place.
 
