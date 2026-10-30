@@ -240,16 +240,55 @@ export interface MediaErrorCapability {
 // Text tracks
 // ----------------------------------------
 
-export interface TextCueLike {
+/**
+ * The fields every cue has, from the platform's `TextTrackCue`.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/TextTrackCue
+ */
+export interface TextTrackCueLike {
+  readonly id?: string;
   readonly startTime: number;
   readonly endTime: number;
-  readonly text?: string;
 }
 
+/**
+ * A cue that carries text, such as a caption or a chapter title.
+ *
+ * @internal
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/VTTCue
+ */
+export interface VTTCueLike extends TextTrackCueLike {
+  readonly text: string;
+}
+
+/**
+ * A cue that carries structured data. Safari's native HLS publishes ID3 and DATERANGE metadata as `DataCue`s, while
+ * hls.js sets `value` and `type` on `VTTCue`s, so one cue can match both shapes.
+ *
+ * @internal
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/DataCue
+ */
+export interface DataCueLike extends TextTrackCueLike {
+  readonly value: unknown;
+  /** What `value` holds, such as `org.id3`. */
+  readonly type?: string;
+}
+
+/**
+ * A text track cue that carries text, structured data, or both.
+ *
+ * @internal
+ */
+export type TextCueLike = VTTCueLike | DataCueLike;
+
+/**
+ * A track's cues. Like the platform's `TextTrackCueList`, it yields the base cue type; check for `text` or `value` to
+ * read more.
+ */
 export interface TextCueListLike {
   readonly length: number;
-  [Symbol.iterator](): Iterator<TextCueLike>;
-  getCueById?(id: string): TextCueLike | null;
+  [Symbol.iterator](): Iterator<TextTrackCueLike>;
+  getCueById?(id: string): TextTrackCueLike | null;
 }
 
 /**
@@ -267,7 +306,8 @@ export interface TextTrackLike {
   readonly src?: string;
   mode: 'showing' | 'disabled' | 'hidden';
   readonly cues: TextCueListLike | null;
-  addCue?(cue: TextCueLike): void;
+  addCue?(cue: TextTrackCueLike): void;
+  removeCue?(cue: TextTrackCueLike): void;
 }
 
 export interface TextTrackListEvents {

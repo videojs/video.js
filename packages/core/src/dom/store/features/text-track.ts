@@ -18,7 +18,7 @@ import { isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
-import { clampCuesToDuration } from '../text-cues';
+import { toMediaTextCues } from '../text-cues';
 
 interface IdentifiedTrack {
   id: string;
@@ -170,7 +170,10 @@ export const textTrackFeature = definePlayerFeature({
 
       // The last chapter of an in-stream chapters document is open-ended on the
       // track; consumers read it ending where the media does.
-      const chaptersCues = clampCuesToDuration(chaptersTrack?.cues, isMediaSeekCapable(media) ? media.duration : NaN);
+      const chaptersCues = toMediaTextCues(chaptersTrack?.cues, {
+        kind: 'chapters',
+        duration: isMediaSeekCapable(media) ? media.duration : NaN,
+      });
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
