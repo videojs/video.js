@@ -13,6 +13,8 @@
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@heroicons/react": "^2.2.0",
+    "@remotion/media": "catalog:",
+    "@remotion/player": "catalog:",
     "@videojs/cdn": "workspace:*",
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/core": "workspace:*",
@@ -29,6 +31,7 @@
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/react": "workspace:*",
+    "@videojs/remotion-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",
@@ -42,7 +45,9 @@
     "@videojs/youtube-video": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
-    "react-resizable-panels": "^4.12.4"
+    "react-resizable-panels": "^4.12.4",
+    "remotion": "catalog:",
+    "shiki": "^4.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

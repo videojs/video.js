@@ -164,6 +164,12 @@ settings:
 
 catalogs:
   default:
+    '@remotion/media':
+      specifier: 4.0.522
+      version: 4.0.522
+    '@remotion/player':
+      specifier: 4.0.522
+      version: 4.0.522
     '@tailwindcss/node':
       specifier: 4.3.3
       version: 4.3.3
@@ -185,6 +191,9 @@ catalogs:
     lightningcss:
       specifier: 1.33.0
       version: 1.33.0
+    remotion:
+      specifier: 4.0.522
+      version: 4.0.522
     tailwindcss:
       specifier: 4.3.3
       version: 4.3.3
@@ -326,6 +335,12 @@ importers:
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.3.0)
+      '@remotion/media':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@remotion/player':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@videojs/cdn':
         specifier: workspace:*
         version: link:../../packages/cdn
@@ -374,6 +389,9 @@ importers:
       '@videojs/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@videojs/remotion-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/remotion-video
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../../packages/adapters/shaka-video
@@ -416,6 +434,12 @@ importers:
       react-resizable-panels:
         specifier: ^4.12.4
         version: 4.12.4(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      remotion:
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      shiki:
+        specifier: ^4.3.1
+        version: 4.5.0
     devDependencies:
       '@tailwindcss/vite':
         specifier: 'catalog:'
@@ -651,6 +675,34 @@ importers:
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(supports-color@8.1.1)
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
+
+  packages/adapters/remotion-video:
+    dependencies:
+      '@videojs/media':
+        specifier: workspace:*
+        version: link:../../media
+      '@videojs/utils':
+        specifier: workspace:*
+        version: link:../../utils
+    devDependencies:
+      '@remotion/player':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(supports-color@8.1.1)
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
       vite-plus:
         specifier: 'catalog:'
         version: 1.1.0(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@typescript/native-preview@7.0.0-dev.20260421.2)(@vitest/browser-playwright@5.0.3)(@vitest/coverage-v8@5.0.3)(@vitest/ui@5.0.3)(@volar/typescript@2.4.28(typescript@6.0.2))(esbuild@0.28.2)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@26.1.0(supports-color@8.1.1))(playwright@1.59.1)(terser@5.50.0)(tsx@4.23.1)(typescript@6.0.2)(unrun@0.2.39)(yaml@2.9.0)
@@ -1166,6 +1218,9 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(react@19.3.0)
     devDependencies:
+      '@remotion/player':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1202,6 +1257,9 @@ importers:
       '@videojs/playerjs-video':
         specifier: workspace:*
         version: link:../adapters/playerjs-video
+      '@videojs/remotion-video':
+        specifier: workspace:*
+        version: link:../adapters/remotion-video
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../adapters/shaka-video
@@ -1475,6 +1533,9 @@ importers:
       '@nanostores/react':
         specifier: ^1.0.0
         version: 1.0.0(nanostores@1.1.1)(react@19.3.0)
+      '@remotion/player':
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
@@ -1499,6 +1560,9 @@ importers:
       '@videojs/react':
         specifier: workspace:*
         version: link:../packages/react
+      '@videojs/remotion-video':
+        specifier: workspace:*
+        version: link:../packages/adapters/remotion-video
       astro:
         specifier: ^7.4.0
         version: 7.4.0(@netlify/blobs@11.1.4(supports-color@8.1.1))(@types/node@22.19.15)(@typescript/native-preview@7.0.0-dev.20260421.2)(@typescript/typescript6@6.0.0)(@volar/typescript@2.4.28(@typescript/typescript6@6.0.0))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(tsx@4.23.1)(unrun@0.2.39)(yaml@2.9.0)
@@ -1541,6 +1605,9 @@ importers:
       reading-time:
         specifier: ^1.5.0
         version: 1.5.0
+      remotion:
+        specifier: 'catalog:'
+        version: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       satori:
         specifier: ^0.26.0
         version: 0.26.0
@@ -4308,6 +4375,18 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
+  '@remotion/media@4.0.522':
+    resolution: {integrity: sha512-G9qpjtgz1uuUdHxrZncE/yL4qESUQmPgbVeMXs2n8jJvqLhxB+BCDkom2CCuMZR/Ym+/wlAsqyV+zbGPL8uvEw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/player@4.0.522':
+    resolution: {integrity: sha512-IAdV0Qu90Orl0fETLY8MVTJBSMo8zHDTvjxo0ghj9sfb+ouk2IDhOZEqzfCOqmBEEmFHgDVMcC8P01hnxaHR/g==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   '@resvg/resvg-js-android-arm-eabi@2.6.2':
     resolution: {integrity: sha512-FrJibrAk6v29eabIPgcTUMPXiEz8ssrAk7TXxsiZzww9UTQ1Z5KAbFJs+Z0Ez+VZTYgnE5IQJqBcoSiMebtPHA==}
     engines: {node: '>= 10'}
@@ -5364,6 +5443,12 @@ packages:
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
+
+  '@types/dom-mediacapture-transform@0.1.12':
+    resolution: {integrity: sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw==}
+
+  '@types/dom-webcodecs@0.1.13':
+    resolution: {integrity: sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ==}
 
   '@types/estree-jsx@1.0.5':
     resolution: {integrity: sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==}
@@ -8363,6 +8448,9 @@ packages:
     resolution: {integrity: sha512-yz3xRaG20c6/BOzvYoDaGtPmGscs7YivItZEEqe6GbwNfHuxu9YNmvnEkMzKldAGY4/80pRcQRZSEnhquk9XuQ==}
     engines: {node: '>= 0.8'}
 
+  mediabunny@1.55.5:
+    resolution: {integrity: sha512-m0v6y8FGXiK+HKOc3AZqU+kJPLYsSKaLitmQNQIIHZKIGlTwQ34OF+X6Ul0K8iV4b03oPse10apwuoqbvmKeAA==}
+
   meow@12.1.1:
     resolution: {integrity: sha512-BhXM0Au22RwUneMPwSCnyhTOizdWoIEPU9sp0Aqa1PnDMR5Wv2FGXYDjuzJEIX+Eo2Rb8xuYe5jrnm5QowQFkw==}
     engines: {node: '>=16.10'}
@@ -9205,6 +9293,12 @@ packages:
   regexp.prototype.flags@1.5.4:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
+
+  remotion@4.0.522:
+    resolution: {integrity: sha512-f80OmFU4xUE2iTj/kcFSmb63+p5jbYXJ31qUEy/yQKZYKoVW2gMvAwDSDvUjsJKSRehfe5TG+EvHvZ+UGog1Jg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   remove-trailing-separator@1.1.0:
     resolution: {integrity: sha512-/hS+Y0u3aOfIETiaiirUFwDBDzmXPvO+jAfKTitUngIPzdKc6Z0LoFjM/CK5PL4C+eKwHohlHAb6H0VFfmmUsw==}
@@ -10531,6 +10625,9 @@ packages:
 
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
 
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
@@ -13000,6 +13097,20 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
+  '@remotion/media@4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      mediabunny: 1.55.5
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      remotion: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      zod: 4.5.4
+
+  '@remotion/player@4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      remotion: 4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+
   '@resvg/resvg-js-android-arm-eabi@2.6.2':
     optional: true
 
@@ -13886,6 +13997,12 @@ snapshots:
       '@types/chrome': 0.1.40
 
   '@types/deep-eql@4.0.2': {}
+
+  '@types/dom-mediacapture-transform@0.1.12':
+    dependencies:
+      '@types/dom-webcodecs': 0.1.13
+
+  '@types/dom-webcodecs@0.1.13': {}
 
   '@types/estree-jsx@1.0.5':
     dependencies:
@@ -17222,6 +17339,11 @@ snapshots:
 
   media-typer@1.1.1: {}
 
+  mediabunny@1.55.5:
+    dependencies:
+      '@types/dom-mediacapture-transform': 0.1.12
+      '@types/dom-webcodecs': 0.1.13
+
   meow@12.1.1: {}
 
   meow@13.2.0: {}
@@ -18287,6 +18409,11 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
+
+  remotion@4.0.522(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+    dependencies:
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
 
   remove-trailing-separator@1.1.0: {}
 
@@ -20283,6 +20410,8 @@ snapshots:
   zod@3.25.76: {}
 
   zod@4.3.6: {}
+
+  zod@4.5.4: {}
 
   zod@4.6.5: {}
 

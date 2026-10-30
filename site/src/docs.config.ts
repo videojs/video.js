@@ -212,6 +212,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/mux-video' },
           { slug: 'reference/components/native-hls-video' },
           { slug: 'reference/components/playerjs-video' },
+          { slug: 'reference/components/remotion-video', frameworks: ['react'] },
           { slug: 'reference/components/shaka-video' },
           { slug: 'reference/components/soundcloud-audio' },
           { slug: 'reference/components/spotify-audio' },
