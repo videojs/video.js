@@ -79,6 +79,7 @@ export {
   isHTMLMediaElement,
   isHTMLVideoElement,
   isShadowRoot,
+  isUndefinedCustomElement,
 } from './predicates';
 export { type RafThrottled, rafThrottle } from './raf-throttle';
 export { loadScript } from './script';

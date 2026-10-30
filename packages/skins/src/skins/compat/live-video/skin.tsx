@@ -25,6 +25,7 @@ export function LiveVideoSkin({ children, className, renderPoster, ...props }: L
       data-preset="live-video"
       {...props}
     >
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
       <BufferingIndicator />
