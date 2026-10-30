@@ -57,7 +57,7 @@ export default {
     unknown: 'Медіафайл не завантажено, час невідомий.',
   },
   playback: {
-    rate: 'Швидкість відтворення {rate}',
+    rate: 'Швидкість відтворення, {rate}',
   },
   volume: {
     mutedValue: '{percent}, звук вимкнено',

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import type { ContextSignals, StateSignals } from '../../../../core/composition/create-composition';
+import type { ContextSignals, StateSignals } from '../../../../core/composition/define-behavior';
 import { signal } from '../../../../core/signals/primitives';
 import type { AudioTrack, MaybeResolvedPresentation, Presentation, VideoTrack } from '../../../../media/types';
 import type { BandwidthState } from '../../../../network/bandwidth-estimator';

@@ -1,7 +1,8 @@
 import type { ExtensionPlayer, PlayerTarget } from '@videojs/core/dom';
 import { isEngineAdapter, isMediaSourceCapable, type Media } from '@videojs/media';
-import { getMediaAdapter, getMediaElement } from '@videojs/media/dom';
+import { getMediaAdapter, getMediaElement, getMediaEngineName } from '@videojs/media/dom';
 import { listen } from '@videojs/utils/dom';
+import { isString } from '@videojs/utils/predicate';
 import Mux from 'mux-embed';
 
 import { type MuxDataEngineOptions, toMuxDataEngineOptions } from './engine';
@@ -20,7 +21,26 @@ export interface MuxDataExtensionProps {
   metadata: MuxDataOptions['data'] | undefined;
 }
 
+/**
+ * The UI framework that registered the extension, named in the default player software name. Each is one word, so
+ * `reactnative` too: the first two hyphens split off `videojs` and the framework, and the rest is the engine, which may
+ * be hyphenated (`spf-hls-audio`).
+ *
+ * @internal
+ */
+export type MuxDataFramework = 'html' | 'react' | 'reactnative';
+
 const MUX_VIDEO_DOMAIN = 'mux.com';
+
+/**
+ * Identifies this extension as the Mux Data integration, so its views can be told apart from other Video.js
+ * integrations, such as `videojs-mux` for Video.js 8. Without it the SDK reports its plain `<video>` monitor. The
+ * extension ships in lockstep with the player, so the player version is its version.
+ */
+const MUX_PLUGIN_DATA = {
+  player_mux_plugin_name: '@videojs/mux-data',
+  player_mux_plugin_version: getPlayerVersion(),
+};
 
 /** The SDK's monitor handle on a video element, narrowed to a live (non-destroyed) one. */
 type LiveMuxMonitor = Extract<NonNullable<HTMLVideoElement['mux']>, { deleted: false }>;
@@ -39,12 +59,14 @@ function engineOf(media: Media): unknown {
 /**
  * The media's source URL as the player sees it. An adapter reports the URL it plays on `src`, not the `blob:` it feeds
  * the element. A plain `<video>` that picks from `<source>` children leaves `src` empty and reports the pick on
- * `currentSrc`; a `blob:` there is a MediaSource handle, not a video, so it does not count.
+ * `currentSrc`; a `blob:` there is a MediaSource handle, not a video, so it does not count. A media with no more source
+ * surface than `src` (the background video) is read from that alone.
  */
 function srcOf(media: Media): string {
-  if (!isMediaSourceCapable(media)) return '';
+  const { src } = media as { src?: unknown };
+  if (isString(src) && src) return src;
 
-  if (media.src) return media.src;
+  if (!isMediaSourceCapable(media)) return '';
 
   return media.currentSrc.startsWith('blob:') ? '' : media.currentSrc;
 }
@@ -65,6 +87,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     debug: false,
     disableCookies: false,
     envKey: undefined,
+    // Falls back to a name for the framework and engine; see `playerSoftwareName`.
     playerSoftwareName: undefined,
     playerSoftwareVersion: getPlayerVersion(),
     // Falls back to the player's creation time; see `playerInitTime`.
@@ -82,6 +105,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
   #playerSoftwareName: string | undefined = MuxDataExtension.defaultProps.playerSoftwareName;
   #playerSoftwareVersion: string | undefined = MuxDataExtension.defaultProps.playerSoftwareVersion;
   #playerInitTime: number | undefined = MuxDataExtension.defaultProps.playerInitTime;
+  #framework: MuxDataFramework | undefined;
   // Mux measures Player Startup Time from `player_init_time`, so it comes from the player rather than from when this
   // extension happened to load. The construction time only stands in when no player has connected this extension.
   #playerCreatedAt: number | undefined;
@@ -91,8 +115,10 @@ export class MuxDataExtension implements MuxDataExtensionProps {
   #target: HTMLVideoElement | null = null;
   // What the live monitor currently reflects, so a sync can react only to what changed.
   #monitoredSrc: string | null = null;
+  #monitoredMetadata: MuxDataOptions['data'] | undefined;
   #monitoredEngine: unknown = null;
   #engineHook: 'hlsjs' | 'dashjs' | null = null;
+  #monitoredSoftwareName: string | null = null;
   // Generated once per instance, so the views of one player group into one session.
   #viewSessionId: string | undefined;
 
@@ -194,6 +220,11 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#target?.mux?.updateData(value ? { env_key: value } : {});
   }
 
+  /**
+   * Player name reported to Mux Data. Unset by default, which reports `videojs-<framework>-<engine>`, naming the UI
+   * framework and the engine actually playing (for example `videojs-html-hlsjs`) and following engine switches. Players
+   * built on Video.js, such as `mux-video`, set their own.
+   */
   get playerSoftwareName() {
     return this.#playerSoftwareName;
   }
@@ -202,7 +233,24 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     if (this.#playerSoftwareName === value) return;
 
     this.#playerSoftwareName = value;
-    this.#target?.mux?.updateData(value ? { player_software_name: value } : {});
+    this.#syncSoftwareName();
+  }
+
+  /**
+   * UI framework named in the default player software name.
+   *
+   * @internal Set by the framework package that registers the extension, which is the only place that knows it.
+   */
+  get framework() {
+    return this.#framework;
+  }
+
+  /** @internal */
+  set framework(value) {
+    if (this.#framework === value) return;
+
+    this.#framework = value;
+    this.#syncSoftwareName();
   }
 
   get playerSoftwareVersion() {
@@ -231,6 +279,11 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#target?.mux?.updateData(initTime ? { player_init_time: initTime } : {});
   }
 
+  /**
+   * Video metadata reported with the view. Applied on the next sync rather than immediately: when it changes together
+   * with the source, it belongs to the incoming video, so it rides the `videochange` instead of relabelling the
+   * outgoing view.
+   */
   get metadata() {
     return this.#metadata;
   }
@@ -239,7 +292,7 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     if (this.#metadata === value) return;
 
     this.#metadata = value;
-    this.#target?.mux?.updateData(value ? { ...value } : {});
+    this.#syncMonitor();
   }
 
   #destroyMonitor() {
@@ -249,8 +302,10 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     }
 
     this.#monitoredSrc = null;
+    this.#monitoredMetadata = undefined;
     this.#monitoredEngine = null;
     this.#engineHook = null;
+    this.#monitoredSoftwareName = null;
   }
 
   /**
@@ -302,17 +357,23 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     }
 
     this.#syncEngineHook(mux, engineOf(media));
+    this.#syncSoftwareName();
 
     const src = srcOf(media);
-    if (src === this.#monitoredSrc) return;
-
     // A cleared source isn't a new video (the element's own events wind the view down), and it isn't tracked: the
-    // video that loads next is still compared against the last video the monitor was told about.
+    // video that loads next is still compared against the last video the monitor was told about. Metadata waits for
+    // that video too, so the view winding down keeps its own.
     if (!src) return;
+
+    if (src === this.#monitoredSrc) {
+      this.#syncMetadata(mux);
+      return;
+    }
 
     const isFirstSource = !this.#monitoredSrc;
 
     this.#monitoredSrc = src;
+    this.#monitoredMetadata = this.#metadata;
 
     // A monitor started before the first source has its pending view: name the video rather than change it.
     if (isFirstSource) {
@@ -321,6 +382,15 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     }
 
     mux.emit('videochange', this.#videoData(media));
+  }
+
+  /** Apply a metadata change to the current video's view. */
+  #syncMetadata(mux: LiveMuxMonitor) {
+    const metadata = this.#metadata;
+    if (metadata === this.#monitoredMetadata) return;
+
+    this.#monitoredMetadata = metadata;
+    mux.updateData(metadata ? { ...metadata } : {});
   }
 
   /** Keep engine telemetry hooked to the engine actually playing, without restarting the monitor. */
@@ -340,6 +410,28 @@ export class MuxDataExtension implements MuxDataExtensionProps {
     this.#trackEngine(engine, options);
   }
 
+  /**
+   * The player software name to report: the configured one, else `videojs-<framework>-<engine>` for the engine the
+   * attached media names. A token that isn't known is left out rather than guessed.
+   */
+  #softwareName(): string {
+    if (this.#playerSoftwareName) return this.#playerSoftwareName;
+
+    return ['videojs', this.#framework, getMediaEngineName(this.#media)].filter(Boolean).join('-');
+  }
+
+  /** Keep the live view's player software name current as the configured name, framework, or engine changes. */
+  #syncSoftwareName() {
+    const mux = this.#target?.mux;
+    if (!mux || mux.deleted) return;
+
+    const name = this.#softwareName();
+    if (name === this.#monitoredSoftwareName) return;
+
+    this.#monitoredSoftwareName = name;
+    mux.updateData({ player_software_name: name, player_software: name });
+  }
+
   /** Record which engine the monitor reflects and which telemetry hook carries it. */
   #trackEngine(engine: unknown, options: MuxDataEngineOptions) {
     this.#monitoredEngine = engine ?? null;
@@ -352,15 +444,17 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       beaconCollectionDomain,
       disableCookies,
       envKey: env_key,
-      playerSoftwareName: player_software_name,
       playerSoftwareVersion: player_software_version,
       playerInitTime: player_init_time,
     } = this;
 
     const engine = engineOf(media);
     const engineOptions = toMuxDataEngineOptions(engine);
+    const player_software_name = this.#softwareName();
 
     this.#monitoredSrc = srcOf(media);
+    this.#monitoredMetadata = this.#metadata;
+    this.#monitoredSoftwareName = player_software_name;
     this.#trackEngine(engine, engineOptions);
 
     this.MuxDataSdk?.monitor(target, {
@@ -369,11 +463,12 @@ export class MuxDataExtension implements MuxDataExtensionProps {
       ...(disableCookies ? { disableCookies } : {}),
       ...engineOptions,
       data: {
+        ...MUX_PLUGIN_DATA,
         ...(env_key ? { env_key } : {}),
-        ...(player_software_name ? { player_software_name } : {}),
+        player_software_name,
         // NOTE: Adding this because there appears to be some instability on whether
         // player_software_name or player_software "wins" for Mux Data (CJP)
-        ...(player_software_name ? { player_software: player_software_name } : {}),
+        player_software: player_software_name,
         ...(player_software_version ? { player_software_version } : {}),
         ...(player_init_time ? { player_init_time } : {}),
         ...this.#videoData(media),

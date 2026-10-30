@@ -1,5 +1,6 @@
 import { MediaError, type RemotePlaybackLike } from '@videojs/media';
 import { CustomMediaElement } from '@videojs/media/dom';
+import type { LoaderContext } from 'hls.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { RenditionCapController } from '../cap-level';
@@ -300,6 +301,22 @@ describe('HlsJsAdapter', () => {
       expect(media.videoRenditions).toBeUndefined();
     });
 
+    it('names the engine it picked for each source', () => {
+      const media = createMseMedia();
+
+      expect(media.engineName).toBeUndefined();
+
+      media.source = { src: SRC, type: 'application/vnd.apple.mpegurl' };
+      media.load();
+
+      expect(media.engineName).toBe('hlsjs');
+
+      media.source = { src: SRC, type: 'video/mp4' };
+      media.load();
+
+      expect(media.engineName).toBe('browser');
+    });
+
     it('hands an unrecognized type to the browser and warns in dev', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const media = createMseMedia();
@@ -581,7 +598,7 @@ describe('HlsJsAdapter', () => {
     async function probeXhr(media: HlsJsAdapter) {
       const xhr = { withCredentials: false } as XMLHttpRequest;
 
-      await media.engine!.config.xhrSetup!(xhr, M3U8);
+      await media.engine!.config.xhrSetup!(xhr, M3U8, { url: M3U8 } as LoaderContext);
 
       return xhr;
     }
@@ -621,7 +638,7 @@ describe('HlsJsAdapter', () => {
       const xhr = await probeXhr(media);
 
       expect(xhr.withCredentials).toBe(true);
-      expect(own).toHaveBeenCalledWith(xhr, M3U8);
+      expect(own).toHaveBeenCalledWith(xhr, M3U8, { url: M3U8 });
     });
   });
 
@@ -697,7 +714,7 @@ describe('HlsJsAdapter', () => {
       const engine = probeEngine(LADDER);
 
       Object.assign(engine.config, config);
-      const Controller = media.engine!.config.capLevelController;
+      const Controller = media.engine!.config.capLevelController!;
       const controller = new Controller(engine);
 
       const probeVideo = document.createElement('video');
@@ -749,7 +766,7 @@ describe('HlsJsAdapter', () => {
       const { media } = setupMse();
       const engine = media.engine;
 
-      const prototype = engine!.config.capLevelController.prototype as unknown as RenditionCapController;
+      const prototype = engine!.config.capLevelController!.prototype as unknown as RenditionCapController;
       const apply = vi.spyOn(prototype, 'apply');
 
       media.source = { src: M3U8, maxAutoResolution: '360p' };

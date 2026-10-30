@@ -23,7 +23,8 @@ interface Props {
 
 const { preset, react, neutral = false, compat = false, scaffold = false } = Astro.props;
 const module = scaffold ? 'scaffold-skin' : compat ? 'compat-skin' : neutral ? 'neutral-skin' : 'skin';
-const bundle = preset === 'background' ? 'background' : `${preset}${scaffold ? '-scaffold' : neutral ? '-neutral' : ''}`;
+const variant = scaffold ? '-scaffold' : compat ? '-compat' : neutral ? '-neutral' : '';
+const bundle = preset === 'background' ? 'background' : `${preset}${variant}`;
 const cdnCode = `<script type="module" src="${VJS10_CDN_BASE}/${bundle}.js"></script>`;
 
 const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledLanguage }> = [
@@ -50,7 +51,7 @@ const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledL
   ))
 }
 
-{!compat && <FrameworkCase frameworks={['html']}>
+<FrameworkCase frameworks={['html']}>
   <P>
     The import registers the skin and every UI element it composes. The <DocsLink slug="guides/cdn">CDN</DocsLink>{' '}
     player bundle registers this skin together with its player:
@@ -58,4 +59,4 @@ const imports: Array<{ code: string; framework: 'react' | 'html'; lang: BundledL
   <CodeFrame lang="html">
     <ServerCode code={cdnCode} lang="html" />
   </CodeFrame>
-</FrameworkCase>}
+</FrameworkCase>

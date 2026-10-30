@@ -57,7 +57,7 @@ export default {
     unknown: 'Medium nicht geladen, Zeit unbekannt.',
   },
   playback: {
-    rate: 'Wiedergabegeschwindigkeit {rate}',
+    rate: 'Wiedergabegeschwindigkeit, {rate}',
   },
   volume: {
     mutedValue: '{percent}, stummgeschaltet',

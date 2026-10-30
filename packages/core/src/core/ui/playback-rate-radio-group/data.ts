@@ -9,6 +9,6 @@ export const PlaybackRateRadioGroupDataAttrs = {
   disabled: 'data-disabled',
   /** Present when playback rate selection is unavailable. */
   hidden: 'data-hidden',
-  /** Indicates playback rate availability (`available` or `unavailable`). */
+  /** Indicates playback rate availability (`available`, `unavailable`, `unsupported`). */
   availability: 'data-availability',
 } as const satisfies StateAttrMap<PlaybackRateRadioGroupState>;

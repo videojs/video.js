@@ -16,7 +16,8 @@
     --media-accent: var(--media-accent-color, color-mix(in oklab, var(--media-default-accent-color) 10%, transparent));
     --media-accent-foreground: var(--media-accent-text-color, currentColor);
     --media-muted: oklch(1 0 0 / 0.15);
-    --media-muted-foreground: oklch(1 0 0 / 0.65);
+    /* Follows the foreground so presets that flip it, such as the light audio skins, keep muted icons legible. */
+    --media-muted-foreground: color-mix(in oklab, var(--media-foreground) 65%, transparent);
     --media-border: oklch(0 0 0 / 0.1);
     --media-ring: oklch(1 0 0);
     --media-backdrop: oklch(0 0 0);

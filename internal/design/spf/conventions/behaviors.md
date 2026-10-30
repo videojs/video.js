@@ -7,7 +7,7 @@ date: 2026-05-07
 
 > **Behaviors are the unit of composition in SPF — almost all functionality lives in one.** A Behavior may be "simple" (using only signals from core) or "primitive-augmented" (reaching for a Reactor, Actor, Task + Runner, or other primitive under its setup). The questions this doc answers are *how much primitive infrastructure does this behavior need*, *should this be one behavior or several*, and *what does it look like when a behavior wants refactoring* — not "should this be a behavior at all," because it almost always should.
 >
-> For how Behaviors and the primitives they use work under the hood see [`../primitives.md`](../primitives.md), [`../architecture.md`](../architecture.md), [`../actor-reactor-factories.md`](../actor-reactor-factories.md), and [`packages/spf/src/core/composition/create-composition.ts`](../../../../packages/spf/src/core/composition/create-composition.ts).
+> For how Behaviors and the primitives they use work under the hood see [`../primitives.md`](../primitives.md), [`../architecture.md`](../architecture.md), [`../actor-reactor-factories.md`](../actor-reactor-factories.md), [`packages/spf/src/core/composition/define-behavior.ts`](../../../../packages/spf/src/core/composition/define-behavior.ts), and [`packages/spf/src/core/composition/create-composition.ts`](../../../../packages/spf/src/core/composition/create-composition.ts).
 
 ## Behaviors are the universal unit
 
@@ -437,7 +437,7 @@ A behavior's `config` fields are typically optional with sensible defaults (`def
 
 Mark the field as required on the behavior's `Config` interface and drop the `?` on the setup-fn deps' `config:`. `defineBehavior`'s `RequireIfNonEmpty<'config', Cfg>` already makes the config arg required at the behavior call site whenever `Cfg` has any keys; the new force is at the *field* level, propagated through `ResolveBehaviorConfig` so `createComposition`'s intersected `Cfg` carries the required field — typecheck forces the engine to supply it.
 
-The composing engine binds the default in its own `finalConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
+The composing engine binds the default in its exported `defaultConfig`; the engine-level config field stays optional so engine users don't think about it unless they want a non-default value:
 
 ```ts
 // In the behavior — required, no default
@@ -446,22 +446,21 @@ export interface ResolvePresentationConfig {
   defaultPreload?: StandardPreload;     // optional, spec-fallback
 }
 
-// In the engine — optional, defaulted in finalConfig
-interface HlsVideoEngineConfig {
-  parsePresentation?: ParsePresentation;
+// In the engine — optional, because `defaultConfig` covers it
+export const defaultConfig = {
+  parsePresentation: parseMultivariantPlaylist,
   // ...
-}
+} satisfies Partial<Config>;
 
-const finalConfig = {
-  ...config,
-  parsePresentation: config.parsePresentation ?? parseMultivariantPlaylist,
-  // ...
-};
+export type EngineConfig = ConfigWithDefaults<Config, typeof defaultConfig>; // parsePresentation?: ParsePresentation
+
+// `config` overrides; `defaultConfig` fills every key it leaves out or `undefined`
+export const createEngine = defineCompositionFactory([...behaviors], { defaultConfig, initialState });
 ```
 
 The behavior stays format-neutral; the engine binds it to HLS at compose time. Engines for other formats wire their own parser without touching `resolvePresentation`.
 
-**Worked example**: `resolvePresentation.parsePresentation` (required) + `HlsVideoEngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
+**Worked example**: `resolvePresentation.parsePresentation` (required) + the `hls-video` engine's `EngineConfig.parsePresentation?` (optional, defaults to `parseMultivariantPlaylist`).
 
 ### Cleanup contract
 

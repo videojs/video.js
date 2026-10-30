@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cdn",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Video.js 10 as browser-ready bundles for script tags, with no build step",
   "keywords": [
     "audio",
@@ -89,12 +89,14 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/html": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",

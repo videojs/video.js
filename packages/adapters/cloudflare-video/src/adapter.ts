@@ -72,7 +72,8 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
 
   #textTracksHost: HTMLVideoElement | null = null;
 
-  static PLAYER_SOFTWARE_NAME = 'cloudflare-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'cloudflare';
 
   /** Underlying Stream SDK player instance (null until the SDK loads). */
   get engine() {

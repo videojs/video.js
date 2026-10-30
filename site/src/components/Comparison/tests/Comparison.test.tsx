@@ -18,6 +18,9 @@ describe('Comparison', () => {
       />
     );
 
+    expect(screen.getByRole('region', { name: 'Content comparison' })).toHaveAccessibleDescription(
+      'Select an item to view it in full. Moving focus into an item also reveals it.'
+    );
     expect(container.querySelector('video')).toBeNull();
     expect(container.querySelector('.comparison-stage')).toHaveStyle({ aspectRatio: '2 / 1' });
     expect(container.querySelectorAll('.comparison-content')).toHaveLength(3);

@@ -310,7 +310,7 @@ Remove `controls` yourself: Video.js doesn't turn native controls off when a ski
 | `live-edge-tolerance`, `min-live-dvr-window` | No equivalent ([#1730](https://github.com/videojs/v10/issues/1730)) |
 | `artist`, `artwork` | No equivalent; Video.js doesn't set Media Session metadata ([#3042](https://github.com/videojs/v10/issues/3042)) |
 | `log-level` | No equivalent ([#1406](https://github.com/videojs/v10/issues/1406)); development builds print warnings |
-| `keep-alive` | `keep-alive` on each element you move. See [Element lifecycle](#element-lifecycle) |
+| `keep-alive` | `keep-alive` on the player and on its media component. See [Element lifecycle](#element-lifecycle) |
 </FrameworkCase>
 
 Vidstack queued `paused`, `volume`, and the other playback props until the media could play. Video.js doesn't queue: most actions fail until the player has attached to its media, `seek()` included, which only waits for metadata once attached. Call them from event handlers.
@@ -574,7 +574,7 @@ async function load(src) {
 Each media module loads with `import()`, so the page only downloads the engine its source needs, the way Vidstack's provider loaders did. A plain `<video>` needs no module. When the media changes, the player detaches from the old one, resets its state, and attaches to the new one; the skin follows.
 </FrameworkCase>
 
-`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
+`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
 
 For a single source, change the media's `src` or `source` instead. The same media swaps the URL without being replaced.
 
@@ -672,7 +672,7 @@ Vidstack customization climbed from layout props, through CSS variables and slot
 
 #### Level 1: pick a skin
 
-Choose Default, Neutral, or Compat for video, audio, live video, or live audio. See <DocsLink slug="guides/skins">Skins</DocsLink>.
+Choose Default, Neutral, Compat, or Scaffold for video, audio, live video, or live audio. See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink>.
 
 #### Level 2: restyle it
 
@@ -793,7 +793,7 @@ Vidstack's `colorScheme` toggled light and dark classes on the layout. Video.js 
 ### Icons
 
 <FrameworkCase frameworks={["react"]}>
-`@vidstack/react/icons` becomes `@videojs/react/icons`, with a smaller set of 25 icons in Default, Neutral, and Compat families. Icons take standard SVG props; there's no `size` prop. Several names changed:
+`@vidstack/react/icons` becomes `@videojs/react/icons`, with a smaller set of 25 icons in Default, Neutral, Compat, and Scaffold families. Icons take standard SVG props; there's no `size` prop. Several names changed:
 
 | Vidstack | Video.js 10 |
 |---|---|
@@ -1365,7 +1365,7 @@ In Angular, add `CUSTOM_ELEMENTS_SCHEMA` to the `schemas` of the component that 
 
 ## Element lifecycle
 
-Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js keeps the attribute but doesn't pass it down: set it on each element you plan to move. When you're done with them, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media components. Packaged skins don't pass it to their controls either ([#3036](https://github.com/videojs/v10/issues/3036)), so move a player that uses one synchronously. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
+Vidstack elements destroyed themselves when they were removed from the page and not put back within a frame, unless they carried `keep-alive`, which the player passed down to its children. Video.js passes it from the player to the UI elements inside it, including a packaged skin's controls, but not to media components: set `keep-alive` on the media component too. When you're done, call `destroy()` on the player, which also destroys the UI elements inside it, and `adapter.destroy()` on media components. See the player's <DocsLink slug="reference/components/player" anchor="lifecycle">lifecycle</DocsLink>.
 
 </FrameworkCase>
 

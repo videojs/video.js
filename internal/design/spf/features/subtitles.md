@@ -12,7 +12,7 @@ This doc captures the **capability surface**: what works, what doesn't, which be
 
 ## Status
 
-- **Composition:** `createHlsVideoEngine` (HLS VoD)
+- **Composition:** The `hls-video` engine (HLS VoD)
 - **Definition depth:** sketched — capability surface and implementation footprint documented; architectural deep-dive lives in [text-track-architecture.md](../text-track-architecture.md)
 
 ## Phases of complexity
@@ -44,7 +44,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 
 ## Implementation surface
 
-**Composition:** `packages/spf/src/playback/engines/hls/engine.ts` — HLS VoD engine.
+**Composition:** `packages/spf/src/playback/engines/hls-video.ts` — HLS VoD engine.
 
 **Behaviors:**
 

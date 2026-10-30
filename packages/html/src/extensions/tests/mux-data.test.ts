@@ -1,5 +1,5 @@
 import { MuxDataExtension as MuxDataExtensionBase } from '@videojs/mux-data';
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxDataExtension } from '../mux-data';
 import { TestExtensionProvider } from './test-utils';
@@ -19,6 +19,22 @@ function setup() {
 
   return { provider, el };
 }
+
+function createSdk() {
+  const emit = vi.fn();
+  const updateData = vi.fn();
+
+  const sdk = {
+    monitor: vi.fn((target: HTMLVideoElement) => {
+      Object.assign(target, { mux: { deleted: false, emit, updateData, destroy: vi.fn() } });
+    }),
+    utils: { now: () => 0, generateUUID: () => 'uuid' },
+  } as unknown as NonNullable<MuxDataExtensionBase['MuxDataSdk']>;
+
+  return { sdk, emit, updateData };
+}
+
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve));
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -45,6 +61,12 @@ describe('MuxDataExtension', () => {
     const { provider } = setup();
 
     expect(provider.extensions.get(MuxDataExtensionBase)).toBeInstanceOf(MuxDataExtensionBase);
+  });
+
+  it('names HTML as the framework for the default player software name', () => {
+    const { provider } = setup();
+
+    expect(provider.extensions.get(MuxDataExtensionBase)!.framework).toBe('html');
   });
 
   it('forwards attributes to the extension', () => {
@@ -74,6 +96,44 @@ describe('MuxDataExtension', () => {
     el.metadata = metadata;
 
     expect(provider.extensions.get(MuxDataExtensionBase)!.metadata).toEqual(metadata);
+  });
+
+  it.each([
+    ['before', 'metadata'],
+    ['after', 'src'],
+  ])('carries metadata set %s the source into the new view only', async (_, first) => {
+    const { provider, el } = setup();
+    const { sdk, emit, updateData } = createSdk();
+    const video = document.createElement('video');
+
+    el.MuxDataSdk = sdk;
+    el.metadata = { video_title: 'Video A' };
+    video.src = 'https://stream.mux.com/abc123.m3u8';
+
+    provider.extensions.attach({ media: video, container: null });
+    await settle();
+    updateData.mockClear();
+
+    const changeMetadata = () => (el.metadata = { video_title: 'Video B' });
+    const changeSource = () => (video.src = 'https://stream.mux.com/def456.m3u8');
+
+    if (first === 'metadata') {
+      changeMetadata();
+      changeSource();
+    } else {
+      changeSource();
+      changeMetadata();
+    }
+
+    await settle();
+    video.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledExactlyOnceWith(
+      'videochange',
+      expect.objectContaining({ video_id: 'def456', video_title: 'Video B' })
+    );
   });
 
   it('releases the extension when the element disconnects', () => {

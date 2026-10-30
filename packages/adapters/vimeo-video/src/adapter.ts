@@ -109,7 +109,8 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #textTracksHost: HTMLVideoElement | null = null;
   #textTracksDisconnect: AbortController | null = null;
 
-  static PLAYER_SOFTWARE_NAME = 'vimeo-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'vimeo';
 
   /** Underlying `@vimeo/player` instance. Null until an embed URL can be resolved, which may be after `attach()`. */
   get engine() {
@@ -522,7 +523,8 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      // The embed reads mute once, from its URL, and either property says to start muted.
+      defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,

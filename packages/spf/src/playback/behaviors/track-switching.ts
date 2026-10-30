@@ -57,7 +57,7 @@
  * stays as the structural backstop.
  */
 
-import { type AnySlotMap, defineBehavior } from '../../core/composition/create-composition';
+import { type AnySlotMap, defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
 import { DEFAULT_QUALITY_CONFIG, type QualityConfig, resolutionArea } from '../../media/abr/quality-selection';
@@ -139,8 +139,9 @@ export interface TrackSwitchingSharedConfig {
   /**
    * Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment
    * can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM
-   * API directly; the engine defaults it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`. Absent → no codec
-   * filtering (the constraint passes everything through).
+   * API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or
+   * `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything
+   * through).
    */
   canPlayTrack?: CanPlayTrack;
   /**
