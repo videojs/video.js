@@ -67,4 +67,42 @@ describe('PlaybackRateRadioGroupElement', () => {
 
     await waitForAssertion(() => expect(custom()).toEqual([]));
   });
+
+  it('keeps focus on the matching item when a rate outside the list rebuilds the items', async () => {
+    const { menu, options, setState, trigger } = setup({ playbackRates: [1, 1.5, 2], playbackRate: 1 });
+
+    await waitForMenu(menu, trigger, options);
+
+    const item = (value: string) =>
+      [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)].find(
+        (candidate) => candidate.value === value
+      )!;
+    const original = item('1.5');
+
+    original.focus();
+    setState({ playbackRate: 1.1 });
+
+    await waitForAssertion(() => {
+      expect(original.isConnected).toBe(false);
+      expect(document.activeElement).toBe(item('1.5'));
+    });
+  });
+
+  it('moves focus to the selected rate when the focused item goes away', async () => {
+    const { menu, options, setState, trigger } = setup({ playbackRates: [1, 1.5, 2], playbackRate: 1.1 });
+
+    await waitForMenu(menu, trigger, options);
+
+    const items = () => [...menu.querySelectorAll<MenuRadioItemElement>(MenuRadioItemElement.tagName)];
+
+    items()
+      .find((candidate) => candidate.value === '1.1')!
+      .focus();
+    setState({ playbackRate: 2 });
+
+    await waitForAssertion(() => {
+      expect(items().map((candidate) => candidate.value)).toEqual(['1', '1.5', '2']);
+      expect((document.activeElement as MenuRadioItemElement).value).toBe('2');
+    });
+  });
 });

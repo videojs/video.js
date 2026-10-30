@@ -72,11 +72,8 @@ export class RadioOptionsController<Option extends RadioOption> implements React
       this.#contentKey = contentKey;
       this.#translator = translator;
 
-      for (const child of [...this.#host.children]) {
-        if (child === template) continue;
-
-        child.remove();
-      }
+      const staleChildren = [...this.#host.children].filter((child) => child !== template);
+      const focusedValue = this.#getFocusedItem()?.value;
 
       const items = state.options.map((option) => {
         const item = itemRoot
@@ -98,6 +95,25 @@ export class RadioOptionsController<Option extends RadioOption> implements React
       });
 
       this.#host.append(...items);
+
+      const removeStale = () => {
+        for (const child of staleChildren) child.remove();
+      };
+
+      // Removing the focused item fires a `focusout` with no destination, which closes an open menu. Its replacement
+      // registers with the menu, and becomes focusable, on its first update, so the old items stay until focus can move.
+      const replacement = isUndefined(focusedValue)
+        ? undefined
+        : (items.find((item) => item.value === focusedValue) ?? items.find((item) => item.value === state.value));
+
+      if (replacement) {
+        void replacement.updateComplete.then(() => {
+          replacement.focus();
+          removeStale();
+        });
+      } else {
+        removeStale();
+      }
     }
 
     const optionsByValue = new Map(state.options.map((option) => [option.value, option]));
@@ -121,6 +137,12 @@ export class RadioOptionsController<Option extends RadioOption> implements React
 
     this.#config.onValueChange(value);
   };
+
+  #getFocusedItem(): MenuRadioItemElement | null {
+    const active = (this.#host.getRootNode() as Document | ShadowRoot).activeElement;
+
+    return active instanceof MenuRadioItemElement && active.parentElement === this.#host ? active : null;
+  }
 
   #setItemLabel(item: MenuRadioItemElement, label: string): void {
     const labelPart = item.querySelector<HTMLElement>('[data-part~="label"]');
