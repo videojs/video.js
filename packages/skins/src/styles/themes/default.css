@@ -1,8 +1,8 @@
-@layer base.theme, base.preset, base.preferences;
+@layer base.theme, base.preferences;
 
 @layer base.theme {
-  /* Default theme tokens. Neutral selectors, preset adaptations, and preferences override these. */
-  .media-skin {
+  /* Default skin tokens. Every skin declares its full token set; only shared preferences override them. */
+  .media-skin[data-theme="default"] {
     /* Colors. */
     --media-background: oklch(0 0 0);
     --media-foreground: oklch(1 0 0);
@@ -91,9 +91,6 @@
     --media-scale: 1;
     --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 30%, transparent);
     --media-spacing: calc(var(--media-scale-unit, 16px) * var(--media-scale) / 4);
-
-    scrollbar-color: var(--media-scrollbar-thumb-color) transparent;
-    scrollbar-width: thin;
   }
 
   /*
@@ -101,7 +98,7 @@
    * Relative colors that keep their origin's channels fall back to the same color through `color-mix()`.
    */
   @supports (color: contrast-color(red)) {
-    .media-skin {
+    .media-skin[data-theme="default"] {
       --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-primary)));
       --media-accent-foreground: var(
         --media-accent-text-color,
@@ -111,42 +108,155 @@
   }
 
   @supports (color: oklch(from red l c h)) {
-    .media-skin {
+    .media-skin[data-theme="default"] {
       --media-shadow-subtle-current-color: oklch(from var(--media-shadow-current-color) l c h / calc(alpha * 0.4));
     }
   }
 
   @supports (color: oklch(from currentColor l c h)) {
-    .media-skin {
+    .media-skin[data-theme="default"] {
       --media-scrollbar-thumb-color: oklch(from currentColor l c h / 0.3);
     }
   }
 
-  .media-skin::-webkit-scrollbar-thumb {
-    background: var(--media-scrollbar-thumb-color);
-    border-radius: 9999px;
-  }
-
-  .media-skin:fullscreen {
+  .media-skin[data-theme="default"]:fullscreen {
     --media-object-fit: contain;
     --media-video-border-radius: 0;
   }
 
   @media (min-width: 1280px) {
-    .media-skin:fullscreen {
+    .media-skin[data-theme="default"]:fullscreen {
       --media-scale: 1.25;
     }
   }
 
   @media (min-width: 1536px) {
-    .media-skin:fullscreen {
+    .media-skin[data-theme="default"]:fullscreen {
       --media-scale: 1.5;
     }
   }
 
   @media (min-width: 1920px) {
-    .media-skin:fullscreen {
+    .media-skin[data-theme="default"]:fullscreen {
       --media-scale: 1.75;
+    }
+  }
+
+  /* Video presets. */
+  .media-skin[data-theme="default"][data-preset$="video"] {
+    /* Light border for browsers without `light-dark()`; see the `@supports` block below. */
+    --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.1));
+    /* Top and bottom scrims share one height and a smoothstep falloff, which avoids a hard edge where they fade out. */
+    --media-controls-gradient-height: 40%;
+    /* Scrims for browsers without relative colors or gradient interpolation; the `@supports` blocks below refine them. */
+    --media-controls-gradient: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--media-backdrop) 40%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 33.8%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 20%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 6.2%, transparent) 75%,
+      transparent
+    );
+    --media-controls-top-gradient: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--media-backdrop) 40%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 33.8%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 20%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 6.2%, transparent) 75%,
+      transparent
+    );
+    --media-caption-controls-y: calc(var(--media-spacing) * -16);
+    --media-slider-preview-offset: calc(var(--media-spacing) * 9);
+    --media-thumbnail-gradient: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 10%, transparent),
+      transparent
+    );
+  }
+
+  @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {
+    .media-skin[data-theme="default"][data-preset$="video"] {
+      --media-controls-gradient: linear-gradient(
+        to top in oklab,
+        oklch(from var(--media-backdrop) l c h / 0.4),
+        oklch(from var(--media-backdrop) l c h / 0.338) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.2) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.062) 75%,
+        transparent
+      );
+      --media-controls-top-gradient: linear-gradient(
+        to bottom in oklab,
+        oklch(from var(--media-backdrop) l c h / 0.4),
+        oklch(from var(--media-backdrop) l c h / 0.338) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.2) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.062) 75%,
+        transparent
+      );
+    }
+  }
+
+  @supports (color: oklch(from red l c h)) {
+    .media-skin[data-theme="default"][data-preset$="video"] {
+      --media-thumbnail-gradient: linear-gradient(
+        to top,
+        oklch(from var(--media-backdrop) l c h / 0.5),
+        oklch(from var(--media-backdrop) l c h / 0.1),
+        transparent
+      );
+    }
+  }
+
+  /*
+   * Keep `light-dark()` behind these checks. A build that lowers it for Safari before 17.5, such as Next.js, leaves it
+   * alone here but elsewhere rewrites it into variables that only the app's own `color-scheme` rules define.
+   */
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="default"][data-preset$="video"] {
+      --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.15)));
+    }
+  }
+
+  /* Audio presets. Light colors for browsers without `light-dark()`; the `@supports` block below adds the dark ones. */
+  .media-skin[data-theme="default"][data-preset$="audio"] {
+    --media-background: oklch(1 0 0);
+    --media-foreground: oklch(0 0 0);
+    --media-controls: oklch(1 0 0 / 0.5);
+    --media-popover: var(--media-controls);
+    --media-muted: oklch(0 0 0 / 0.1);
+    --media-surface-border: oklch(0 0 0 / 0.05);
+    --media-primary: var(--media-accent-color, var(--media-foreground));
+    --media-border: oklch(0 0 0 / 0.1);
+    --media-ring: var(--media-foreground);
+    --media-default-accent-color: oklch(0 0 0);
+    --media-default-accent-text-color: oklch(1 0 0);
+    --media-internal-accent-text-fallback: oklch(1 0 0);
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 2);
+    --media-slider-preview-label-offset: calc(var(--media-spacing) * 10);
+  }
+
+  @supports (color: light-dark(red, red)) {
+    .media-skin[data-theme="default"][data-preset$="audio"] {
+      --media-background: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-foreground: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-controls: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
+      --media-border: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-muted: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-default-accent-text-color: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .media-skin[data-theme="default"][data-preset$="audio"] {
+      --media-controls: var(--media-background);
+    }
+
+    @supports (color: light-dark(red, red)) {
+      .media-skin[data-theme="default"][data-preset$="audio"] {
+        --media-surface-border: light-dark(oklch(0 0 0 / 0.05), transparent);
+      }
     }
   }
 }
