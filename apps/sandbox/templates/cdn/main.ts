@@ -247,6 +247,12 @@ async function loadCdnMedia(media: MediaId) {
     case 'playerjs-video':
       await import('@videojs/cdn/media/playerjs-video');
       break;
+    case 'soundcloud-audio':
+      await import('@videojs/cdn/media/soundcloud-audio');
+      break;
+    case 'mixcloud-audio':
+      await import('@videojs/cdn/media/mixcloud-audio');
+      break;
     case 'spotify-audio':
       await import('@videojs/cdn/media/spotify-audio');
       break;
@@ -341,7 +347,7 @@ async function render() {
   // An embed hands playback to a provider that owns autoplay, looping, and how much
   // it preloads, so the settings menu has nothing to attach to — same as the
   // per-embed pages on the html and react platforms.
-  const mediaAttrs = embed ? '' : renderMediaAttrs(state);
+  const mediaAttrs = embed ? (source.controls ? 'controls' : '') : renderMediaAttrs(state);
   const crossoriginAttr = embed ? '' : 'crossorigin';
   const mediaClassAttr = embed ? `class="${getEmbedMediaClass(media)}"` : '';
 

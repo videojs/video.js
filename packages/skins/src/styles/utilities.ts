@@ -80,6 +80,10 @@ export const utilities = {
     kind: 'utility',
     description: 'Transition delays from the theme, for example `delay-media-dialog`.',
   },
+  'filter-media-*': {
+    kind: 'utility',
+    description: 'Filters from the theme, for example `filter-media-feedback`.',
+  },
   'backdrop-filter-media-*': {
     kind: 'utility',
     description: 'Backdrop filters from the theme, for example `backdrop-filter-media-indicator`.',

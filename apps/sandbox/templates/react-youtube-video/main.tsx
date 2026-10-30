@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 
 function App() {
-  const { source } = useSandbox();
+  const { source, mediaProps } = useSandbox();
 
   // A source carrying YouTube player parameters has no room in a plain `src`. Memoized because every new object is a
   // source change to the media.
@@ -20,6 +20,7 @@ function App() {
         <YouTubeVideo
           className="block h-full w-full"
           {...(youtubeSource ? { source: youtubeSource } : { src: SOURCES[source].url ?? '' })}
+          {...mediaProps}
           playsInline
         />
       </VideoSkinComponent>

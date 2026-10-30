@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   pr-size:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout PR
@@ -28,6 +28,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Restore Vite Task cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-restore-only-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
+
       - name: Build packages
         run: pnpm build:packages
 
@@ -44,7 +52,7 @@ jobs:
           path: pr-size.json
 
   base-size:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - name: Checkout comparison history
@@ -83,6 +91,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Restore Vite Task cache
+        uses: actions/cache/restore@v6
+        with:
+          path: node_modules/.vite/task-cache
+          key: vite-task-${{ runner.os }}-${{ runner.arch }}-restore-only-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+          restore-keys: |
+            vite-task-${{ runner.os }}-${{ runner.arch }}-packages-
+
       - name: Build and measure base
         run: |
           if [ -f .bundle-size-pr/.github/scripts/bundle-size.js ]; then
@@ -100,7 +116,7 @@ jobs:
           path: base-size.json
 
   report:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     needs: [pr-size, base-size]
 
     steps:

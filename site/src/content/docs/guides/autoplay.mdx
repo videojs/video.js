@@ -61,7 +61,7 @@ The `autoplay`, `muted`, and `playsinline` attributes on `<video>` and similar m
 
 </FrameworkCase>
 
-The <DocsLink slug="reference/api/feature-playback">playback feature</DocsLink> reflects the result in player state. When autoplay succeeds, `paused` becomes `false` and `started` becomes `true`. When the browser blocks autoplay, the player stays `paused: true` with `started: false`, and the <DocsLink slug="reference/components/play-button">Play button</DocsLink> renders its play state. There is no separate autoplay failure event: a blocked autoplay looks like media that never started.
+The <DocsLink slug="reference/api/feature-playback">playback feature</DocsLink> reflects the result in player state. While the media is trying to autoplay, `autoplaying` is `true`: the <DocsLink slug="reference/components/play-button">Play button</DocsLink> shows pause, so clicking it cancels the autoplay, and the <DocsLink slug="reference/components/buffering-indicator">Buffering indicator</DocsLink> appears after its delay. When autoplay succeeds, `paused` becomes `false` and `started` becomes `true`. When the browser blocks autoplay, the player stays `paused: true` with `started: false`, and the <DocsLink slug="reference/components/play-button">Play button</DocsLink> renders its play state. There is no separate autoplay failure event: a blocked autoplay looks like media that never started.
 
 Calling `play()` from player state returns the native promise from the media element. When the browser blocks playback, that promise rejects with a `NotAllowedError`.
 
