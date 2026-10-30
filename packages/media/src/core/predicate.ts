@@ -1,4 +1,4 @@
-import { isFunction, isObject, isUndefined } from '@videojs/utils/predicate';
+import { isBoolean, isFunction, isObject, isUndefined } from '@videojs/utils/predicate';
 
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from './constants';
 import type { MediaBufferState, MediaPlaybackState, MediaTimeState } from './state';
@@ -6,6 +6,7 @@ import { MediaReadyState } from './types';
 import type {
   EngineAdapter,
   MediaAudioTrackCapability,
+  MediaAutoplayCapability,
   MediaBufferCapability,
   MediaContentDataCapability,
   MediaErrorCapability,
@@ -54,6 +55,11 @@ export function isMediaPlaying(
   media: Pick<MediaPlaybackState, 'paused' | 'ended' | 'waiting'> | null | undefined
 ): boolean {
   return !!media && !media.paused && !media.ended && !media.waiting;
+}
+
+/** @internal */
+export function isMediaAutoplayCapable(value: unknown): value is MediaAutoplayCapability {
+  return isObject(value) && isBoolean((value as Record<string, unknown>).autoplay);
 }
 
 export function isMediaPauseCapable(value: unknown): value is MediaPauseCapability {

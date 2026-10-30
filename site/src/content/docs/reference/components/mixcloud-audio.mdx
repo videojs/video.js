@@ -1,0 +1,185 @@
+---
+title: MixcloudAudio
+frameworkTitle:
+  html: mixcloud-audio
+description: Audio component that plays Mixcloud shows through the Mixcloud Widget
+---
+
+import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
+import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/mixcloud-audio/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/mixcloud-audio/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/mixcloud-audio/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/mixcloud-audio/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/mixcloud-audio/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/mixcloud-audio/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/mixcloud-audio/html/css/BasicUsage.ts?raw";
+
+The [Mixcloud Widget](https://www.mixcloud.com/developers/widget/) plays Mixcloud shows. This component drives the widget and reports its state like a native `<audio>` element, so a <DocsLink slug="guides/skins">player skin</DocsLink> can control it.
+
+## Import
+
+<MediaImports media="mixcloud-audio" package="@videojs/mixcloud-audio" react="MixcloudAudio" />
+
+## Load a source
+
+`src` takes either of these Mixcloud URLs:
+
+- A show: `mixcloud.com/<user>/<show>/`
+- A widget embed URL with its widget parameters, as Mixcloud's embed code gives it: `www.mixcloud.com/widget/iframe/?feed=...`
+
+`www.` and `m.` links work too. Profiles, playlists, and other pages that list shows are not supported.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MixcloudAudio src="https://www.mixcloud.com/spartacus/lambiance/" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<mixcloud-audio src="https://www.mixcloud.com/spartacus/lambiance/"></mixcloud-audio>
+```
+</FrameworkCase>
+
+## Controls
+
+The widget is the only UI Mixcloud offers, so `controls` decides whether the component is visible at all. Without `controls`, the component hides itself and plays as an invisible transport: a hidden iframe still loads and plays, so a <DocsLink slug="guides/skins">player skin</DocsLink> drives playback while the widget takes no room on the page.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<AudioPlayer>
+  <AudioSkin>
+    <MixcloudAudio src="https://www.mixcloud.com/spartacus/lambiance/" />
+  </AudioSkin>
+</AudioPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<audio-player>
+  <audio-skin>
+    <mixcloud-audio src="https://www.mixcloud.com/spartacus/lambiance/"></mixcloud-audio>
+  </audio-skin>
+</audio-player>
+```
+</FrameworkCase>
+
+With `controls`, the component shows the widget, and the audio skin draws its controls below it, so the two do not overlap. Anything the listener does in the widget shows in the skin: play, pause, and seek. The widget is also the part of the page that credits the show and links back to it on Mixcloud (see [Mixcloud's terms of use](#mixclouds-terms-of-use)).
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MixcloudAudio src="https://www.mixcloud.com/spartacus/lambiance/" controls />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<mixcloud-audio src="https://www.mixcloud.com/spartacus/lambiance/" controls></mixcloud-audio>
+```
+</FrameworkCase>
+
+With `controls`, the component is 120 pixels tall by default, Mixcloud's classic layout. Set a height to change it. With [widget parameters](#widget-parameters), `mini: true` selects the mini layout, which needs 60 pixels, and `hide_cover: false` selects the picture layout, a large cover that needs about 400 pixels. The widget hides the Mixcloud logo when it is narrower than 560 pixels.
+
+## Widget parameters
+
+By default, the component sets `hide_cover`, so the widget does not use its picture layout. Change it, or set `mini`, `hide_artwork`, `hide_tracklist`, or `light`, under `source.engine.mixcloud`, spelled as Mixcloud spells them:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MixcloudAudio
+  source={{
+    src: 'https://www.mixcloud.com/spartacus/lambiance/',
+    engine: { mixcloud: { light: true, hide_artwork: true } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const audio = document.querySelector('mixcloud-audio');
+audio.source = {
+  src: 'https://www.mixcloud.com/spartacus/lambiance/',
+  engine: { mixcloud: { light: true, hide_artwork: true } },
+};
+```
+
+Without JavaScript, put the parameters on a widget embed URL instead:
+
+```html
+<mixcloud-audio
+  src="https://www.mixcloud.com/widget/iframe/?feed=%2Fspartacus%2Flambiance%2F&light=1&hide_artwork=1"
+></mixcloud-audio>
+```
+</FrameworkCase>
+
+Engine options win over the parameters of a widget embed URL, which win over the defaults. Set an option to `null` to drop a default. The widget applies `mini`, `hide_cover`, `hide_artwork`, `hide_tracklist`, and `light` without reloading the show. Other options reload it.
+
+`light` is the only theme option: Mixcloud offers no other colors. The widget has no start time parameter, so it ignores `start_time`. Set `currentTime` instead.
+
+## Behavior
+
+- `play()` asks the widget to play. Browsers apply their autoplay policy to the widget as they do to any embed, so a play without a user gesture can be refused. Then the widget reports nothing, and the media stays paused.
+- `autoplay` starts playback once the widget is ready, after the volume applies. The widget's own `autoplay` parameter does the same and is never written to the widget URL.
+- The widget loads from `player-widget.mixcloud.com`, the host that Mixcloud's embed URL redirects to. A frame that redirects to another host loses the `autoplay` permission of the page, and then the widget cannot start playback from the skin.
+- Seeking uses whole seconds, as the widget does. The widget ignores a seek before the show first plays, so the component keeps that seek and applies it when playback starts.
+- Mixcloud limits seeks and replays for listeners without a Mixcloud subscription: 6 fast-forwards and 6 rewinds per show in a rolling 60-minute period, and 4 replays of a show in a rolling 14-day period (see [Mixcloud's help center](https://help.mixcloud.com/hc/en-us/articles/360004054059-Why-are-there-limits-for-rewinds-and-fast-forwards)). When the widget refuses a seek, `currentTime` goes back to the position of the widget, and `seeked` fires.
+- `loop` plays the show again from the start when it ends.
+- Volume and mute both work. The widget has no separate mute, so muting sets its volume to `0`, and unmuting restores the previous level.
+- `buffered` is always empty, because the widget does not report how much of the show it has loaded.
+- The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
+- `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
+- A URL that is not a Mixcloud show reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a show the widget cannot find, such as a private or removed show. A show whose audio the widget does not load within 15 seconds reports a `MEDIA_ERR_NETWORK` error. An error the widget reports before playback starts is a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and an error during playback is a `MEDIA_ERR_NETWORK` error.
+
+## Mixcloud's terms of use
+
+The Mixcloud widget is subject to Mixcloud's own terms. Before you use this component, read the [Mixcloud Terms of Use](https://www.mixcloud.com/terms/) and the [Widget documentation](https://www.mixcloud.com/developers/widget/) to learn where and how you can use the widget. To keep the widget visible on the page, set `controls`.
+
+## Privacy
+
+The widget is subject to Mixcloud's own privacy policy. Read the [Mixcloud Privacy Policy](https://www.mixcloud.com/privacy/) to learn what the widget collects from visitors and what you must do when you embed it. The widget loads from Mixcloud as soon as the component renders, so to wait for a visitor's consent, render the component only after the visitor agrees.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<MediaReference media="MixcloudAudio">
+  <Fragment slot="engine-mixcloud">
+    Pass Mixcloud Widget options under `source.engine.mixcloud`, spelled exactly as Mixcloud spells them, plus anything Mixcloud adds next. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+
+    The show comes from `src`, so `feed` has no `engine.mixcloud` spelling. `referrerPolicy` sets the `referrerpolicy` of the widget iframe rather than a widget parameter.
+  </Fragment>
+</MediaReference>

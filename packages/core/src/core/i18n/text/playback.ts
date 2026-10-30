@@ -6,5 +6,5 @@ const prefix = 'playback.';
 
 export const rateText = {
   key: `${prefix}rate`,
-  text: 'Playback rate {rate}',
+  text: 'Playback rate, {rate}',
 } as const satisfies Text;

@@ -57,7 +57,7 @@ export default {
     unknown: 'Multimedia nie zostały załadowane, czas jest nieznany.',
   },
   playback: {
-    rate: 'Szybkość odtwarzania {rate}',
+    rate: 'Szybkość odtwarzania, {rate}',
   },
   volume: {
     mutedValue: '{percent}, wyciszono',

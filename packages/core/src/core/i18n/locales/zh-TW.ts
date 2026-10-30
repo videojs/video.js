@@ -57,7 +57,7 @@ export default {
     unknown: '媒體未載入，時間未知。',
   },
   playback: {
-    rate: '播放速率 {rate}',
+    rate: '播放速率，{rate}',
   },
   volume: {
     mutedValue: '{percent}，已靜音',

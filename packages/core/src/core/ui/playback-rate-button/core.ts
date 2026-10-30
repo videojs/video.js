@@ -4,6 +4,7 @@ import { defaults } from '@videojs/utils/object';
 import type { NonNullableObject } from '@videojs/utils/types';
 
 import { resolveText, type Text } from '../../i18n';
+import { playbackRateText } from '../../i18n/text/menu';
 import { rateText } from '../../i18n/text/playback';
 import type { ButtonState } from '../types';
 import { resolveLabel } from '../utils/resolve-label';
@@ -56,6 +57,14 @@ export class PlaybackRateButtonCore {
     if (custom !== undefined) return custom;
 
     return rateText;
+  }
+
+  /** Tooltip text: the control's name without the current rate, which the button already shows. */
+  getTooltipLabel(state: PlaybackRateButtonState): Text | string {
+    const custom = resolveLabel(this.#props.label, state);
+    if (custom !== undefined) return custom;
+
+    return playbackRateText;
   }
 
   getLabelParams(state: PlaybackRateButtonState): { rate: number } | undefined {
