@@ -20,11 +20,16 @@ export type {
   DialogProps,
   DialogState,
   FullscreenButtonState,
+  HlsDateRangeAttribute,
+  HlsMetadataCue,
+  Id3Frame,
   IndicatorCoreProps,
   IndicatorDirection,
   IndicatorLifecycleState,
   IndicatorStatus,
   IndicatorVolumeLevel,
+  InferSchemaOutput,
+  InferTextTrackCue,
   InputAction,
   InputActionEvent,
   InputActionSource,
@@ -63,11 +68,18 @@ export type {
   SliderSegmentRange,
   SliderSegmentState,
   SliderState,
+  StandardSchemaV1,
+  StandardSchemaV1Props,
+  StandardSchemaV1Result,
   StatusAnnouncerLabels,
   StatusAnnouncerState,
   StatusDetails,
   StatusIndicatorProps,
   StatusIndicatorState,
+  TextCuesSource,
+  TextTrackDefinition,
+  TextTrackIdentity,
+  TextTracksSource,
   ThumbnailCoords,
   ThumbnailCrossOrigin,
   ThumbnailFetchPriority,
@@ -95,6 +107,7 @@ export type {
   VolumeSliderProps,
   VolumeSliderState,
 } from '@videojs/core';
+export { defineTextTrack, getActiveTextCues, getTextCues, getTextTracks, hlsMetadataTrack } from '@videojs/core';
 export type { TextParams, TranslationKey, TranslationOptions } from '@videojs/core/i18n';
 export * from './constants';
 // Core
