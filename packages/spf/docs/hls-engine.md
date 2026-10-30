@@ -41,7 +41,7 @@ The engine lists the video feature before the audio feature. That order register
 
 [textTracksFeature](./reference/features/text-tracks.md) resolves text selection through the same constraint model as other tracks. DOM synchronization converts user mode changes into selection intent and mirrors the resolved result back without creating an echo loop.
 
-Owned actors load WebVTT segments and cues. They are destroyed on source replacement with the other per-source resources.
+Owned actors load WebVTT segments and cues. They live as long as the media element does. On source replacement, SPF removes its `<track>` elements and clears the actors' cue cache.
 
 Chapters are separate from selection. When the multivariant playlist carries Apple JSON chapters as session data, [chaptersFeature](./reference/features/chapters.md) fetches the document and projects one hidden `chapters` track per language onto the element; the open last chapter ends at the largest safe integer and readers clamp it to the media duration. The audio-only engine composes it too.
 
