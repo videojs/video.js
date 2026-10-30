@@ -255,6 +255,8 @@ export interface SlotRow {
   declared: boolean | undefined;
   /** Whether the setup type marks the slot optional. */
   optional: boolean;
+  /** Whether the row comes from an `@observes` tag rather than the setup type; its owner is the declaring behavior's. */
+  observed?: boolean;
   type: string;
   doc: DocBlock;
   owner: Owner | undefined;
@@ -835,6 +837,7 @@ export function buildModel(reference: ReferenceProgram): Model {
   const behaviorsBySymbol = new Map<ts.Symbol, BehaviorInfo>();
   const behaviors: BehaviorInfo[] = [];
   const entryByFile = new Map(entries.map((entry) => [entry.file, entry]));
+  const observedKeys = new Map<BehaviorInfo, string[]>();
 
   const registerBehavior = (symbol: ts.Symbol): BehaviorInfo | undefined => {
     const existing = behaviorsBySymbol.get(symbol);
@@ -844,6 +847,7 @@ export function buildModel(reference: ReferenceProgram): Model {
     const file = declaringFile(symbol);
     if (!contract || !file) return undefined;
 
+    const { doc, observes } = withoutObservesTags(behaviorDoc(checker, symbol));
     const info: BehaviorInfo = {
       name: symbol.name,
       label: symbol.name,
@@ -851,9 +855,11 @@ export function buildModel(reference: ReferenceProgram): Model {
       external: false,
       file,
       entry: entryByFile.get(file),
-      doc: behaviorDoc(checker, symbol),
+      doc,
       ...contract,
     };
+
+    if (observes.length) observedKeys.set(info, observes);
 
     behaviorsBySymbol.set(symbol, info);
     behaviors.push(info);
@@ -972,5 +978,34 @@ export function buildModel(reference: ReferenceProgram): Model {
     for (const feature of engineFeatures) feature.composedBy.push(info);
   }
 
+  for (const [info, keys] of observedKeys) addObservedRows(info, keys, behaviors);
+
   return { behaviors, features, engines };
+}
+
+/**
+ * A behavior's doc less its `@observes` tags, and the state keys those tags name. A behavior observes a key it reads
+ * without declaring, through a cast or a helper's optional parameter, which its setup type cannot show.
+ */
+export function withoutObservesTags(doc: DocBlock): { doc: DocBlock; observes: string[] } {
+  const observes = doc.tags
+    .filter((tag) => tag.name === 'observes')
+    .flatMap((tag) => tag.text.split(/[\s,]+/).filter(Boolean));
+
+  return { doc: { ...doc, tags: doc.tags.filter((tag) => tag.name !== 'observes') }, observes };
+}
+
+/** Each observed key as an optional, undeclared state read, typed and documented from the behavior that declares it. */
+function addObservedRows(info: BehaviorInfo, keys: readonly string[], behaviors: readonly BehaviorInfo[]): void {
+  const rows = keys
+    .filter((key) => !info.state.some((row) => row.key === key))
+    .map((key) => {
+      const declared = behaviors.flatMap((other) => other.state.filter((row) => row.key === key && row.declared));
+      const origin = declared.find((row) => row.access === 'writes') ?? declared[0];
+      if (!origin) throw new Error(`${info.name}: \`@observes ${key}\` names a key no behavior declares`);
+
+      return { ...origin, access: 'reads' as const, declared: false, optional: true, observed: true };
+    });
+
+  info.state = [...info.state, ...rows].sort((a, b) => a.key.localeCompare(b.key));
 }

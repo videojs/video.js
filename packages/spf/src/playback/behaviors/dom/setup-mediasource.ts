@@ -236,6 +236,8 @@ function setupMediaSourceSetup({
  *
  * Sole writer of `context.mediaSource`; other MSE behaviors (`setupVideoBufferActors`, `setupAudioBufferActors`,
  * `updateMediaSourceDuration`, `endOfStream`, `loadVideoSegments`) only read.
+ *
+ * @observes loadingSuspended
  */
 export const setupMediaSource = defineBehavior({
   stateKeys: ['presentation'],

@@ -365,7 +365,7 @@ function typeRoles(reference: ReferenceProgram, model: Model, page: string, owne
     ),
     of(
       'State',
-      pool.filter((info) => info.state.some((row) => sameOwner(row.owner)))
+      pool.filter((info) => info.state.some((row) => !row.observed && sameOwner(row.owner)))
     ),
     of(
       'Context',

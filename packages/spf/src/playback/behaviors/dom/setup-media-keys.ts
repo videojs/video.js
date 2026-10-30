@@ -386,6 +386,8 @@ function setupMediaKeysSetup({
  *
  * Still out of scope (tracked in drm-support.md): mid-stream key rotation on live Widevine / PlayReady reloads (VOD
  * rotation and FairPlay rotation are covered — see `exchangeLicenses`), and `keystatuschange` reactivity.
+ *
+ * @observes loadingSuspended
  */
 export const setupMediaKeys = defineBehavior({
   stateKeys: ['presentation', 'segmentLoadingBlocked', 'negotiatedKeySystem'],

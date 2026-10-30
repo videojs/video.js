@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { type DocBlock, firstSentence } from '../model';
+import { type DocBlock, firstSentence, withoutObservesTags } from '../model';
 
 const doc = (text: string): DocBlock => ({ text, tags: [] });
 
@@ -25,5 +25,23 @@ describe('firstSentence', () => {
 
   it('returns the whole paragraph when it has no sentence end', () => {
     expect(firstSentence(doc('A lead without a period'))).toBe('A lead without a period');
+  });
+});
+
+describe('withoutObservesTags', () => {
+  it('collects the keys every `@observes` tag names and drops those tags from the doc', () => {
+    const block: DocBlock = {
+      text: 'Loads segments.',
+      tags: [
+        { name: 'observes', text: 'loadingSuspended segmentLoadingBlocked' },
+        { name: 'example', text: 'load();' },
+        { name: 'observes', text: 'presentation' },
+      ],
+    };
+
+    expect(withoutObservesTags(block)).toEqual({
+      doc: { text: 'Loads segments.', tags: [{ name: 'example', text: 'load();' }] },
+      observes: ['loadingSuspended', 'segmentLoadingBlocked', 'presentation'],
+    });
   });
 });
