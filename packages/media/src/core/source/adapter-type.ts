@@ -170,7 +170,7 @@ const EXTENSION = /^[^?#]*\.(\w+)([?#]|$)/;
 
 // Each pattern matches `hostname + pathname`, in order of precedence.
 const SERVICE_HOSTS = {
-  youtube: /^((www|m)\.)?youtube(-nocookie)?\.com\/|^youtu\.be\//,
+  youtube: /^((www|m|music)\.)?youtube(-nocookie)?\.com\/|^youtu\.be\//,
   vimeo: /^((www|player)\.)?vimeo\.com\//,
   wistia: /^([^/]+\.)?(wistia\.(com|net)|wi\.st)\//,
   // `player.mux.com` page URLs aren't matched: Mux media plays stream URLs, with or without the `.m3u8` extension.
@@ -182,7 +182,7 @@ const SERVICE_HOSTS = {
   // `vm.tiktok.com` short links carry an opaque code instead of the numeric video id.
   tiktok: /^(www\.)?tiktok\.com\//,
   // `clips.twitch.tv` is a different embed the Twitch media can't play.
-  twitch: /^((www|go)\.)?twitch\.tv\//,
+  twitch: /^((www|go|player)\.)?twitch\.tv\//,
   dailymotion: /^((www|geo)\.)?dailymotion\.com\/|^dai\.ly\//,
 } satisfies Record<HostedServiceType, RegExp>;
 
