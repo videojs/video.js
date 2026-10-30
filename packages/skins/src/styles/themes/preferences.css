@@ -1,4 +1,4 @@
-@layer base.theme, base.preset, base.preferences;
+@layer base.theme, base.preferences;
 
 @layer base.preferences {
   @media (pointer: fine) and (prefers-reduced-motion: no-preference) {

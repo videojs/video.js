@@ -1,11 +1,10 @@
 @layer base, components, utilities;
 
 @import "tailwindcss" theme(inline);
-@import "./themes/neutral.css";
 @import "./base.css";
 @import "./video/captions.css";
-@import "./video/theme.css";
-@import "./audio/theme.css";
+@import "./themes/default.css";
+@import "./themes/neutral.css";
 @import "./themes/compat.css";
 @import "./themes/scaffold.css";
 @import "./tailwind.css";

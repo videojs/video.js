@@ -1,39 +1,165 @@
-@layer base.theme, base.preset, base.preferences;
+@layer base.theme, base.preferences;
 
-@layer base.preset {
+@layer base.theme {
+  /* Compat skin tokens. Every skin declares its full token set; only shared preferences override them. */
   .media-skin[data-theme="compat"] {
-    --media-accent: var(--media-accent-color, var(--media-popover));
-    --media-accent-foreground: var(--media-accent-text-color, white);
+    /* Colors. */
     --media-background: black;
-    --media-border: transparent;
     --media-foreground: white;
-    --media-muted: rgb(255 255 255 / 0.2);
+    --media-controls: oklch(0 0 0 / 0.35);
+    --media-controls-foreground: var(--media-foreground);
     --media-popover: rgb(0 0 0 / 0.85);
     --media-popover-foreground: white;
-    --media-frame-border: var(--media-border-color, transparent);
     --media-primary: var(--media-accent-color, white);
+    /* Browsers without `contrast-color()` use a fixed text color; see the `@supports` blocks below. */
     --media-primary-foreground: var(--media-accent-text-color, black);
-    --media-ring: var(--media-accent-color, white);
+    --media-accent: var(--media-accent-color, var(--media-popover));
+    --media-accent-foreground: var(--media-accent-text-color, white);
+    --media-muted: rgb(255 255 255 / 0.2);
+    --media-muted-foreground: color-mix(in oklab, var(--media-foreground) 65%, transparent);
+    --media-border: transparent;
     --media-surface-border: var(--media-border);
-    --media-scrollbar-thumb-color: rgb(255 255 255 / 0.3);
-    --media-shadow-surface: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --media-spacing: calc(var(--media-scale-unit, 16px) / 4);
-    --media-video-border-radius: var(--media-border-radius, 0.75rem);
+    --media-frame-border: var(--media-border-color, transparent);
+    --media-ring: var(--media-accent-color, white);
+    --media-backdrop: oklch(0 0 0);
+    --media-live-color: oklch(0.65 0.22 27);
     --media-button-highlight: rgb(255 255 255 / 0.15);
 
+    /* Shadows and surfaces. Compat draws flat surfaces without backdrop filters. */
+    --media-shadow-surface: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --media-shadow-surface-inset: inset 0 1px 0 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.05);
+    --media-shadow-thumb: 0 0 0 1px rgb(0 0 0 / 0.1), 0 1px 3px 0 rgb(0 0 0 / 0.35), 0 1px 2px -1px rgb(0 0 0 / 0.35);
+    --media-shadow-tooltip: 0 0 0 1px var(--media-border), var(--media-shadow-surface);
+    --media-shadow-separator: 0 1px 0 0 oklch(1 0 0 / 0.075);
+    --media-shadow-current-color: oklch(from currentColor 0 0 0 / clamp(0, calc((l - 0.5) * 0.5), 0.15));
+    --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
+    --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.25);
     --media-backdrop-filter-surface: none;
     --media-backdrop-filter-indicator: none;
     --media-backdrop-filter-dialog: none;
+
+    /* Controls. */
+    --media-control-corner-shape: round;
+    --media-control-radius: 99px;
+    --media-control-size: calc(var(--media-spacing) * 9);
+    --media-controls-radius: var(--media-control-radius);
+    --media-default-accent-color: oklch(1 0 0);
+    --media-default-accent-text-color: oklch(0 0 0);
+
+    /* Motion. Preferences collapse durations and neutralize hidden-state values under reduced motion. */
+    --media-duration-instant: 50ms;
+    --media-duration-fast: 100ms;
+    --media-duration: 150ms;
+    --media-duration-slow: 200ms;
+    --media-duration-slower: 250ms;
+    --media-duration-controls: 100ms;
+    --media-duration-dialog: 350ms;
+    --media-duration-indicator: var(--media-duration-slower);
+    --media-duration-menu: 250ms;
+    --media-duration-slider: var(--media-duration-fast);
+    --media-delay-dialog: 100ms;
+    --media-hidden-scale: 0.95;
+    --media-hidden-blur: 8px;
+    --media-hidden-offset: calc(var(--media-spacing) * 1);
+    --media-hidden-icon-scale: 0;
+    --media-hidden-indicator-scale: 0.9;
+    --media-hidden-indicator-offset: -25%;
+    --media-hidden-playback-scale: 0.85;
+    --media-hidden-popup-scale: 0.95;
+    --media-hidden-popup-blur: 4px;
+    --media-hidden-preview-scale: 0.8;
+    --media-hidden-preview-offset: calc(var(--media-spacing) * 2);
+    --media-hidden-seek-offset: 60%;
+
+    /* Popups and menus. */
+    --media-menu-item-radius: calc(var(--media-spacing) * 2);
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 3);
+    --media-popover-side-offset: calc(var(--media-spacing) * 3);
+    --media-popup-radius: calc(var(--media-spacing) * 3);
+    --media-popup-translate-distance: calc(var(--media-spacing) * 2);
+    --media-tooltip-boundary-offset: var(--media-popover-boundary-offset);
+    --media-tooltip-side-offset: var(--media-popover-side-offset);
+
+    /* Dialogs. */
+    --media-dialog-radius: calc(var(--media-spacing) * 7);
+    --media-dialog-width: calc(100% - var(--media-spacing) * 6);
+    --media-dialog-max-width: calc(var(--media-spacing) * 72);
+
+    /* Sliders. */
+    --media-slider-preview-label-offset: calc(var(--media-spacing) * 10.5);
+
+    /* Player frame and scale. Compat has no fullscreen scale steps and keeps its frame radius in fullscreen. */
+    --media-video-border-radius: var(--media-border-radius, 0.75rem);
+    --media-scale: 1;
+    --media-scrollbar-thumb-color: rgb(255 255 255 / 0.3);
+    --media-spacing: calc(var(--media-scale-unit, 16px) * var(--media-scale) / 4);
   }
 
+  /* Relative colors that keep their origin's channels fall back to the same color through `color-mix()`. */
+  @supports (color: oklch(from red l c h)) {
+    .media-skin[data-theme="compat"] {
+      --media-shadow-subtle-current-color: oklch(from var(--media-shadow-current-color) l c h / calc(alpha * 0.4));
+    }
+  }
+
+  .media-skin[data-theme="compat"]:fullscreen {
+    --media-object-fit: contain;
+  }
+
+  /* Video presets. Compat always shows top controls, so its scrim spans both edges with a clear middle band. */
   .media-skin[data-theme="compat"][data-preset$="video"] {
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.1));
+    --media-controls-gradient-height: 40%;
+    --media-controls-gradient: linear-gradient(to top, rgb(0 0 0 / 0.5), transparent 40% 60%, rgb(0 0 0 / 0.4));
+    /* Scrims for browsers without relative colors or gradient interpolation; the `@supports` blocks below refine them. */
+    --media-controls-top-gradient: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--media-backdrop) 40%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 33.8%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 20%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 6.2%, transparent) 75%,
+      transparent
+    );
+    --media-caption-controls-y: calc(var(--media-spacing) * -18);
+    --media-slider-preview-offset: calc(var(--media-spacing) * 9);
+    --media-thumbnail-gradient: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 10%, transparent),
+      transparent
+    );
   }
 
+  @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {
+    .media-skin[data-theme="compat"][data-preset$="video"] {
+      --media-controls-top-gradient: linear-gradient(
+        to bottom in oklab,
+        oklch(from var(--media-backdrop) l c h / 0.4),
+        oklch(from var(--media-backdrop) l c h / 0.338) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.2) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.062) 75%,
+        transparent
+      );
+    }
+  }
+
+  @supports (color: oklch(from red l c h)) {
+    .media-skin[data-theme="compat"][data-preset$="video"] {
+      --media-thumbnail-gradient: linear-gradient(
+        to top,
+        oklch(from var(--media-backdrop) l c h / 0.5),
+        oklch(from var(--media-backdrop) l c h / 0.1),
+        transparent
+      );
+    }
+  }
+
+  /* Audio presets. Light colors for browsers without `light-dark()`; the `@supports` block below adds the dark ones. */
   .media-skin[data-theme="compat"][data-preset$="audio"] {
     --media-accent-foreground: var(--media-accent-text-color, black);
     --media-background: white;
     --media-border: rgb(0 0 0 / 0.1);
+    --media-controls: oklch(1 0 0 / 0.5);
     --media-foreground: black;
     --media-muted: rgb(0 0 0 / 0.2);
     --media-popover: white;
@@ -45,8 +171,17 @@
     --media-scrollbar-thumb-color: rgb(0 0 0 / 0.3);
     --media-shadow-surface: 0 1px 3px rgb(0 0 0 / 0.15);
     --media-button-highlight: rgb(0 0 0 / 0.1);
+    --media-default-accent-color: oklch(0 0 0);
+    --media-default-accent-text-color: oklch(1 0 0);
+    --media-internal-accent-text-fallback: oklch(1 0 0);
+    --media-popover-boundary-offset: calc(var(--media-spacing) * 2);
+    --media-slider-preview-label-offset: calc(var(--media-spacing) * 10);
   }
 
+  /*
+   * Keep `light-dark()` behind this check. A build that lowers it for Safari before 17.5, such as Next.js, leaves it
+   * alone here but elsewhere rewrites it into variables that only the app's own `color-scheme` rules define.
+   */
   @supports (color: light-dark(red, red)) {
     .media-skin[data-theme="compat"][data-preset$="video"] {
       --media-frame-border: var(--media-border-color, light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1)));
@@ -55,6 +190,7 @@
     .media-skin[data-theme="compat"][data-preset$="audio"] {
       --media-accent-foreground: var(--media-accent-text-color, light-dark(black, white));
       --media-background: light-dark(white, black);
+      --media-controls: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
       --media-scrollbar-thumb-color: light-dark(rgb(0 0 0 / 0.3), rgb(255 255 255 / 0.3));
       --media-border: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
       --media-foreground: light-dark(black, white);
@@ -65,6 +201,9 @@
       --media-primary-foreground: var(--media-accent-text-color, light-dark(white, black));
       --media-ring: var(--media-accent-color, light-dark(black, white));
       --media-button-highlight: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
+      --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
+      --media-default-accent-text-color: light-dark(oklch(1 0 0), oklch(0 0 0));
+      --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));
     }
   }
 
@@ -99,6 +238,10 @@
       --media-primary: var(--media-foreground);
       --media-primary-foreground: var(--media-background);
       --media-ring: var(--media-foreground);
+    }
+
+    .media-skin[data-theme="compat"][data-preset$="audio"] {
+      --media-controls: var(--media-background);
     }
   }
 

@@ -60,40 +60,17 @@ describe('React registry output', () => {
     const neutralSkin = readItemRoot(registryDirs.neutral, neutralItems.get('video')!);
     const defaultTargets = defaultItems.get('video')?.files?.map((file) => file.target) ?? [];
     const neutralTargets = neutralItems.get('video')?.files?.map((file) => file.target) ?? [];
-    const defaultStyleTargets = [
-      '@components/videojs/styles/audio/base.css',
-      '@components/videojs/styles/audio/theme.css',
-      '@components/videojs/styles/base.css',
-      '@components/videojs/styles/themes/preferences.css',
-      '@components/videojs/styles/themes/theme.css',
-      '@components/videojs/styles/video/base.css',
-      '@components/videojs/styles/video/captions.css',
-      '@components/videojs/styles/video/theme.css',
-    ];
-    const neutralStyleTargets = [
-      '@components/videojs/styles/audio/base.css',
-      '@components/videojs/styles/audio/neutral.css',
-      '@components/videojs/styles/audio/theme.css',
-      '@components/videojs/styles/base.css',
-      '@components/videojs/styles/themes/neutral.css',
-      '@components/videojs/styles/themes/preferences.css',
-      '@components/videojs/styles/themes/theme.css',
-      '@components/videojs/styles/video/base.css',
-      '@components/videojs/styles/video/captions.css',
-      '@components/videojs/styles/video/neutral.css',
-      '@components/videojs/styles/video/theme.css',
-    ];
-    const neutralComponentStyleTargets = neutralStyleTargets.filter(
-      (style) => !style.endsWith('/audio/neutral.css') && !style.endsWith('/video/neutral.css')
-    );
-    const neutralAudioStyleTargets = [
-      ...neutralComponentStyleTargets,
-      '@components/videojs/styles/audio/neutral.css',
-    ].sort();
-    const neutralVideoStyleTargets = [
-      ...neutralComponentStyleTargets,
-      '@components/videojs/styles/video/neutral.css',
-    ].sort();
+    // Every closure includes the caption styles the shared UI components import.
+    const styleTargetsFor = (theme: 'default' | 'neutral', media?: 'audio' | 'video') =>
+      [
+        '@components/videojs/styles/base.css',
+        '@components/videojs/styles/themes/preferences.css',
+        `@components/videojs/styles/themes/${theme}.css`,
+        '@components/videojs/styles/video/base.css',
+        '@components/videojs/styles/video/captions.css',
+        ...(media === 'audio' ? ['@components/videojs/styles/audio/base.css'] : []),
+        ...(media ? [`@components/videojs/styles/${media}/${theme}.css`] : []),
+      ].sort();
 
     expect(helper?.files?.map((file) => file.target)).toEqual(['@lib/resolve-class-name.ts']);
     expect(helper?.registryDependencies ?? []).not.toContain('utils');
@@ -101,23 +78,20 @@ describe('React registry output', () => {
     expect(defaultPlayButton).not.toContain('@/lib/utils');
     expect(styleImports(defaultPlayButton)).toEqual([
       '../styles/base.css',
-      '../styles/audio/theme.css',
+      '../styles/themes/default.css',
       '../styles/video/captions.css',
-      '../styles/video/theme.css',
     ]);
     expect(styleImports(neutralPlayButton)).toEqual([
-      '../styles/themes/neutral.css',
       '../styles/base.css',
-      '../styles/audio/theme.css',
+      '../styles/themes/neutral.css',
       '../styles/video/captions.css',
-      '../styles/video/theme.css',
     ]);
     expect(defaultPlayButton).toContain(`from '@videojs/react/icons';`);
     expect(defaultPlayButton).not.toContain(`@videojs/react/icons/neutral`);
     expect(neutralPlayButton).toContain(`from '@videojs/react/icons/neutral';`);
     expect(defaultButton).not.toContain('corner-shape:squircle');
     expect(neutralButton).toContain('corner-shape:squircle');
-    expect(defaultSkin).toContain(`import '../styles/video/base.css';`);
+    expect(defaultSkin).toContain(`import '../styles/video/default.css';`);
     expect(defaultSkin).toContain('export function VideoSkin');
     expect(defaultSkin).toContain('data-theme="default"');
     expect(neutralSkin).toContain(`import '../styles/video/neutral.css';`);
@@ -131,12 +105,12 @@ describe('React registry output', () => {
     expect(defaultTargets).toContain('@components/videojs/video/menus/settings-menu.tsx');
     expect(defaultTargets.some((target) => target?.includes('/skins/') === true)).toBe(false);
     expect(defaultTargets.some((target) => target?.includes('/components/') === true)).toBe(false);
-    expect(styleTargets(defaultItems, 'play-button')).toEqual(defaultStyleTargets);
-    expect(styleTargets(neutralItems, 'play-button')).toEqual(neutralComponentStyleTargets);
-    expect(styleTargets(defaultItems, 'video')).toEqual(defaultStyleTargets);
-    expect(styleTargets(neutralItems, 'video')).toEqual(neutralVideoStyleTargets);
-    expect(styleTargets(defaultItems, 'audio')).toEqual(defaultStyleTargets);
-    expect(styleTargets(neutralItems, 'audio')).toEqual(neutralAudioStyleTargets);
+    expect(styleTargets(defaultItems, 'play-button')).toEqual(styleTargetsFor('default'));
+    expect(styleTargets(neutralItems, 'play-button')).toEqual(styleTargetsFor('neutral'));
+    expect(styleTargets(defaultItems, 'video')).toEqual(styleTargetsFor('default', 'video'));
+    expect(styleTargets(neutralItems, 'video')).toEqual(styleTargetsFor('neutral', 'video'));
+    expect(styleTargets(defaultItems, 'audio')).toEqual(styleTargetsFor('default', 'audio'));
+    expect(styleTargets(neutralItems, 'audio')).toEqual(styleTargetsFor('neutral', 'audio'));
   });
 
   it('publishes the same public names from each theme catalog', () => {
@@ -216,7 +190,7 @@ describe('React registry output', () => {
       for (const preset of ['audio', 'live-audio', 'live-video', 'video'] as const) {
         const source = readItemRoot(cssRegistryDirs[theme], items.get(preset)!);
         const media = preset.endsWith('audio') ? 'audio' : 'video';
-        const base = `../styles/${media}/${theme === 'default' ? 'base' : theme}.css`;
+        const base = `../styles/${media}/${theme}.css`;
 
         expect(source.indexOf(base), `${theme}/${preset}`).toBeGreaterThanOrEqual(0);
         expect(source.indexOf(base), `${theme}/${preset}`).toBeLessThan(source.indexOf('./skin.css'));
@@ -225,7 +199,7 @@ describe('React registry output', () => {
   });
 
   it('composes preset media styles from theme and base entries', () => {
-    for (const theme of ['neutral', 'compat', 'scaffold'] as const) {
+    for (const theme of ['default', 'neutral', 'compat', 'scaffold'] as const) {
       for (const media of ['audio', 'video'] as const) {
         const source = readFileSync(
           resolve(cssRegistryDirs[theme], `support/files/_style-${media}-${theme}/styles/${media}/${theme}.css`),
