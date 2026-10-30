@@ -78,7 +78,7 @@ Browsers never draw metadata or chapters cues, so the overlay, its styles, and i
 
 ## Availability and constraints
 
-- Active cues follow `currentTime`, which updates up to about four times a second. Don't rely on them for frame-accurate timing.
+- Active cues follow `currentTime`, which updates up to about four times a second. Don't rely on them for frame-accurate timing. A cue that playback passes between two updates still shows up as active once; a cue a seek jumps over doesn't.
 - `cues` are plain, JSON-serializable data, so a server-rendered page can pass them in. A `src` is fetched only once the player runs on the client, and a cross-origin file needs CORS headers.
 - Browsers load a `<track>` element's cues only while the track is `showing` or `hidden`. `default` makes a `<track kind="metadata">` `hidden`; without it, the track stays `disabled` and its cues never load.
 - `value` isn't checked at runtime unless the definition has a schema. See [Check values with a schema](#check-values-with-a-schema).

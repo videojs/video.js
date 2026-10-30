@@ -2,11 +2,7 @@ import type { MediaTextCue } from '@videojs/media';
 
 import type { TextTrackDefinition } from './definition';
 
-/**
- * An ID3 frame, as hls.js publishes it on a metadata cue.
- *
- * @experimental
- */
+/** An ID3 frame, as hls.js publishes it on a metadata cue. */
 export interface Id3Frame {
   /** The frame id, such as `TXXX` or `PRIV`. */
   key: string;
@@ -15,11 +11,7 @@ export interface Id3Frame {
   data: unknown;
 }
 
-/**
- * One attribute of an HLS `EXT-X-DATERANGE` tag, as hls.js publishes it on a metadata cue.
- *
- * @experimental
- */
+/** One attribute of an HLS `EXT-X-DATERANGE` tag, as hls.js publishes it on a metadata cue. */
 export interface HlsDateRangeAttribute {
   /** The attribute name, such as `CLASS` or `X-AD-ID`. */
   key: string;
@@ -29,8 +21,6 @@ export interface HlsDateRangeAttribute {
 /**
  * A metadata cue from hls.js. Its `type` tells an ID3 frame from a DATERANGE attribute. ID3 from an `emsg` box is
  * `org.id3` too.
- *
- * @experimental
  */
 export type HlsMetadataCue =
   | (MediaTextCue<HlsDateRangeAttribute> & { type: 'com.apple.quicktime.HLS' })
@@ -44,7 +34,5 @@ export type HlsMetadataCue =
  *
  * if (cue?.type === 'com.apple.quicktime.HLS') console.log(cue.value?.key);
  * ```
- *
- * @experimental
  */
 export const hlsMetadataTrack: TextTrackDefinition<HlsMetadataCue> = Object.freeze({ kind: 'metadata', label: 'id3' });

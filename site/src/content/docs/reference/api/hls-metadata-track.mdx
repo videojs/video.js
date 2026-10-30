@@ -1,7 +1,6 @@
 ---
 title: hlsMetadataTrack
 description: A track definition for the ID3 and EXT-X-DATERANGE metadata hls.js publishes
-stability: unstable
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
@@ -31,8 +30,7 @@ Each cue carries one ID3 frame or one `EXT-X-DATERANGE` attribute. Its `type` te
 
 | `type` | Source | `value` |
 | --- | --- | --- |
-| `'org.id3'` | An ID3 frame in the stream's segments. | `Id3Frame`: the frame id as `key`, such as `TXXX` or `PRIV`, its description or owner as `info`, and its `data`. |
-| `'https://aomedia.org/emsg/ID3'` | An ID3 frame carried in an `emsg` box. | `Id3Frame` |
+| `'org.id3'` | An ID3 frame in the stream's segments, or carried in an `emsg` box. hls.js types the second `https://aomedia.org/emsg/ID3`; the player reads both as `org.id3`. | `Id3Frame`: the frame id as `key`, such as `TXXX` or `PRIV`, its description or owner as `info`, and its `data`. |
 | `'com.apple.quicktime.HLS'` | An `EXT-X-DATERANGE` tag in the playlist. | `HlsDateRangeAttribute`: the attribute name as `key`, such as `CLASS` or `X-AD-ID`, and its `data`. |
 
 A date range's cues span the range, from its start to its end.
