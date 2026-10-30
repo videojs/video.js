@@ -101,6 +101,9 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      # The container's default PID 1 never reaps orphaned helpers such as esbuild services, and `vp run` waits on
+      # their zombies until the job times out. An init process reaps them.
+      options: --init
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -166,6 +169,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
 
     steps:
@@ -223,6 +227,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -296,6 +301,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 20
 
     steps:
@@ -396,6 +402,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --init
     timeout-minutes: 15
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
