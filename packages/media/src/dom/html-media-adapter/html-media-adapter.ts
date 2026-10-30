@@ -1,4 +1,4 @@
-import { findTrackElement } from '@videojs/utils/dom';
+import { findTrackElement, isHTMLMediaElement } from '@videojs/utils/dom';
 
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/constants';
 import {
@@ -304,8 +304,9 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
     const target = this.target;
     if (!target) return;
 
-    // A target that is itself a media component, such as a slotted `<hls-video>`, owns its tracks.
-    if (target.removeTextTrack) target.removeTextTrack(track);
+    // A native element always takes out the `<track>`, even if browsers add a `removeTextTrack()` of their own. A target
+    // that is itself a media component, such as a slotted `<hls-video>`, owns its tracks.
+    if (!isHTMLMediaElement(target) && target.removeTextTrack) target.removeTextTrack(track);
     else findTrackElement(target, track)?.remove();
   }
 

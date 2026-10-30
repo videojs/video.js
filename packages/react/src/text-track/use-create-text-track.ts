@@ -1,6 +1,12 @@
 'use client';
 
-import type { AppTextTrack, InferCueValue, TextTrackContent, TextTrackDefinition, TextTrackInit } from '@videojs/core';
+import type {
+  TextTrackHandle,
+  InferCueValue,
+  TextTrackContent,
+  TextTrackDefinition,
+  TextTrackInit,
+} from '@videojs/core';
 import type { MediaTextCue } from '@videojs/media';
 import { isFunction } from '@videojs/utils/predicate';
 import { useEffect, useState } from 'react';
@@ -25,7 +31,7 @@ import { useLatestRef } from '../utils/use-latest-ref';
 export function useCreateTextTrack<Cue extends MediaTextCue>(
   track: TextTrackDefinition<Cue>,
   content?: TextTrackContent<InferCueValue<Cue>>
-): AppTextTrack<InferCueValue<Cue>> | null;
+): TextTrackHandle<InferCueValue<Cue>> | null;
 /**
  * Add a text track while the component is mounted, and remove it when it unmounts. The track stays through source
  * changes. Keep `cues` the same array, and `format` the same function, across renders; a new one replaces the track.
@@ -38,10 +44,10 @@ export function useCreateTextTrack<Cue extends MediaTextCue>(
  * @label With Description
  * @experimental
  */
-export function useCreateTextTrack<Value = unknown>(init: TextTrackInit<Value>): AppTextTrack<Value> | null;
-export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackContent): AppTextTrack | null {
+export function useCreateTextTrack<Value = unknown>(init: TextTrackInit<Value>): TextTrackHandle<Value> | null;
+export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackContent): TextTrackHandle | null {
   const store = usePlayer();
-  const [added, setAdded] = useState<AppTextTrack | null>(null);
+  const [added, setAdded] = useState<TextTrackHandle | null>(null);
   const latest = useLatestRef({ init, content });
   const cues = content?.cues ?? init.cues;
   const src = content?.src ?? init.src;
@@ -52,7 +58,7 @@ export function useCreateTextTrack(init: TextTrackInit, content?: TextTrackConte
     const addTextTrack = store.addTextTrack;
     if (!isFunction(addTextTrack)) return;
 
-    const track: AppTextTrack = addTextTrack(latest.current.init, latest.current.content);
+    const track: TextTrackHandle = addTextTrack(latest.current.init, latest.current.content);
 
     setAdded(track);
 

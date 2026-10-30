@@ -145,7 +145,7 @@ describe('getBrowserTranslations', () => {
 
   it('restores slots when the translator adds spaces inside braces', async () => {
     installMockTranslator({
-      translate: (text) => (text === 'Playback rate {0}' ? 'Kecepatan pemutaran { 0 }' : text),
+      translate: (text) => (text === 'Playback rate, {0}' ? 'Kecepatan pemutaran { 0 }' : text),
     });
 
     const result = await getBrowserTranslations('fr');

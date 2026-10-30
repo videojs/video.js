@@ -213,13 +213,14 @@ for (const entry of PAGES as readonly PageEntry[]) {
 
         await page.keyboard.press('Enter');
         await expect.poll(() => player.getPlaybackRate()).toBe(Number(nextRate));
-        await expect(nextOption).toHaveAttribute('aria-checked', 'true');
         await expect(trigger).toHaveAttribute(DATA_ATTRS.rate, nextRate!);
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(trigger).toBeFocused();
 
+        // The selection closes the menu before the media reports the new rate, so check it once the menu reopens.
         await page.keyboard.press('Enter');
-        await expect(menu.getByRole('menuitemradio', { checked: true })).toBeFocused();
+        await expect(checkedOption).toHaveAttribute(DATA_ATTRS.rate, nextRate!);
+        await expect(checkedOption).toBeFocused();
         await page.keyboard.press('Tab');
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(player.muteButton).toBeFocused();

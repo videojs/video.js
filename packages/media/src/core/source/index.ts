@@ -1,5 +1,7 @@
 export * from './adapter-type';
 export * from './cloudflare';
+export * from './mixcloud';
+export * from './soundcloud';
 export * from './spotify';
 export * from './tiktok';
 export * from './twitch';

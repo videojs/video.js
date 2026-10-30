@@ -57,7 +57,7 @@ export default {
     unknown: 'Contido multimedia non cargado, tempo descoñecido.',
   },
   playback: {
-    rate: 'Velocidade de reprodución {rate}',
+    rate: 'Velocidade de reprodución, {rate}',
   },
   volume: {
     mutedValue: '{percent}, silenciado',

@@ -17,7 +17,7 @@ concurrency:
 jobs:
   implement:
     if: github.event.issue.pull_request == null && github.event.label.name == 'agent:pr'
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 60
 
     steps:

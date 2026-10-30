@@ -57,7 +57,7 @@ export default {
     unknown: 'Mediet laddades inte, okänd tid.',
   },
   playback: {
-    rate: 'Uppspelningshastighet {rate}',
+    rate: 'Uppspelningshastighet, {rate}',
   },
   volume: {
     mutedValue: '{percent}, tystat',

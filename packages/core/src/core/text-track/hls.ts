@@ -27,13 +27,14 @@ export interface HlsDateRangeAttribute {
 }
 
 /**
- * A metadata cue from hls.js. Its `type` tells an ID3 frame from a DATERANGE attribute.
+ * A metadata cue from hls.js. Its `type` tells an ID3 frame from a DATERANGE attribute. ID3 from an `emsg` box is
+ * `org.id3` too.
  *
  * @experimental
  */
 export type HlsMetadataCue =
   | (MediaTextCue<HlsDateRangeAttribute> & { type: 'com.apple.quicktime.HLS' })
-  | (MediaTextCue<Id3Frame> & { type: 'org.id3' | 'https://aomedia.org/emsg/ID3' });
+  | (MediaTextCue<Id3Frame> & { type: 'org.id3' });
 
 /**
  * The metadata track hls.js publishes ID3 and DATERANGE metadata on.
