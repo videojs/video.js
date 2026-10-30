@@ -33,7 +33,9 @@ The feature declares these state keys for code outside the engine to write; no b
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `backBuffer?` | `Partial<BackBufferConfig>` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults: see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use back-buffer eviction). |
 | `bandwidth?` | `Partial<BandwidthConfig>` | — | [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | Bandwidth-estimator tuning. Overrides any field of `BandwidthConfig` (`fastHalfLife`, `slowHalfLife`, `minTotalBytes`, `minBytes`, `minDuration`). Defaults: see `DEFAULT_BANDWIDTH_CONFIG`. |

@@ -33,7 +33,9 @@ The feature declares these state keys for code outside the engine to write; no b
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `audioConstraints?` | `readonly SwitchAudioTrackRule[]` | — | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack) | `switchAudioTrack`'s chains, replacing `DEFAULT_AUDIO_CONSTRAINTS` / `DEFAULT_AUDIO_RULES`. |
 | `audioMessagePipelines?` | `MessagePipelines` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |

@@ -74,7 +74,9 @@ The engine's features declare these state keys for code outside the engine to wr
 
 ### Config
 
-| Key | Type | Default | Default from | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Default from | Read by | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `attachMediaSource?` | `((mediaSource: MediaSource, mediaElement: HTMLMediaElement) => AttachMediaSourceResult)` | `attachMediaSourceAsSourceElement` | [airPlayFeature](../features/airplay.md) | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | Attach strategy — a composition-supplied implementation. Defaults to `attachMediaSource` (object URL on the `src` attribute). Compositions that pair MSE with sibling `<source>` alternatives wire `attachMediaSourceAsSourceElement` (e.g. the HLS engine, for `setupAirPlay`'s native fallback source). |
 | `audioConstraints?` | `readonly SwitchAudioTrackRule[]` | — | — | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack) | `switchAudioTrack`'s chains, replacing `DEFAULT_AUDIO_CONSTRAINTS` / `DEFAULT_AUDIO_RULES`. |

@@ -34,7 +34,9 @@ The feature declares these state keys for code outside the engine to write; no b
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `addSubtitlesTracksToMedia` | `(mediaElement: HTMLMediaElement, modelTextTracks: readonly (TextTrack \| PartiallyResolvedTextTrack)[]) => void` | `addSubtitlesTracksToMedia` | [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks) | Create and append SPF-owned `<track>` elements on `mediaElement`, one per model text track. Implementation tags each element so the read/remove helpers can scope to SPF-owned elements. |
 | `enableDefaultTrack?` | `boolean` | — | [switchTextTrack](../behaviors/track-switching.md#switchtexttrack) | Auto-select DEFAULT track (requires DEFAULT=YES + AUTOSELECT=YES in HLS). Default: false (user opt-in, matches hls.js/http-streaming) When enabled, tracks marked with both DEFAULT=YES and AUTOSELECT=YES will be automatically selected if no user preference matches. |

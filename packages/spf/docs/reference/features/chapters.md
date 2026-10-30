@@ -15,7 +15,9 @@ hidden `chapters` text track per language.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `preferredSubtitleLanguage?` | `string` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
 | `requestCredentials?` | `RequestCredentialsPolicy` | — | [loadChapters](../behaviors/dom/load-chapters.md#loadchapters) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |

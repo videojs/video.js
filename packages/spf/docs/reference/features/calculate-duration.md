@@ -17,7 +17,9 @@ no duration is set.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `resolveDuration` | `PresentationDurationResolver` | `getResolvedSelectedTrackDuration` | [calculatePresentationDuration](../behaviors/calculate-presentation-duration.md#calculatepresentationduration) | Resolver for `presentation.duration`. `calculateDurationFeature` supplies `getResolvedSelectedTrackDuration`, which picks the first resolved selected track's duration (video preferred, audio fallback). A resolver returning `Number.POSITIVE_INFINITY` marks the presentation live; downstream `updateMediaSourceDuration` propagates that value to `mediaSource.duration` per the MSE spec. |
 

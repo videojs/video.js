@@ -21,7 +21,9 @@ leave `preload="none"` and `"metadata"` sources unable to load on play.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `defaultPreload?` | `StandardPreload` | — | [syncPreload](../behaviors/sync-preload.md#syncpreload) | Backfill applied to `state.preload` when neither the host element nor external code has supplied a W3C value. Defaults to `'metadata'`. |
 

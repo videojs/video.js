@@ -25,7 +25,9 @@ The feature declares these state keys for code outside the engine to write; no b
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `attachMediaSource` | `((mediaSource: MediaSource, mediaElement: HTMLMediaElement) => AttachMediaSourceResult)` | `attachMediaSourceAsSourceElement` | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | Attach strategy — a composition-supplied implementation. Defaults to `attachMediaSource` (object URL on the `src` attribute). Compositions that pair MSE with sibling `<source>` alternatives wire `attachMediaSourceAsSourceElement` (e.g. the HLS engine, for `setupAirPlay`'s native fallback source). |
 

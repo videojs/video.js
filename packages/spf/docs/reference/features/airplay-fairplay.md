@@ -17,7 +17,9 @@ Does nothing without a writer of `state.loadingSuspended`, such as `airPlayFeatu
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `drm` | `NegotiableDrmSystemsConfig` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | License servers keyed by EME key-system id — `source.drm`'s shape, limited to the composed key systems. **Required** — license URLs are intrinsically source- or provider-specific, so no default exists; the DRM engine variant supplies it. (documented on [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |
 | `keySystems` | `readonly KeySystemModule<string>[]` | — | [setupAirPlayFairPlay](../behaviors/dom/setup-airplay-fairplay.md#setupairplayfairplay) | The key systems this composition can negotiate, most-preferred first. **Required** — which systems an engine carries is a composition decision, and each module dropped from the list drops its own negotiation, init-data, and license-shaping code with it. (documented on [setupMediaKeys](../behaviors/dom/setup-media-keys.md#setupmediakeys)) |

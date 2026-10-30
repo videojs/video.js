@@ -331,6 +331,13 @@ function otherExports(
   ]);
 }
 
+/**
+ * Heads a Config table: its default column shows only what a feature's `defaultConfig` supplies, so a behavior's own
+ * fallback for an unset key is left to the key's doc.
+ */
+const FEATURE_DEFAULT_NOTE =
+  "Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.";
+
 /** What an empty `defaultConfig` or `initialState` means, said in words instead of the bare `{}`. */
 const EMPTY_VALUES = new Map([
   ['defaultConfig', 'It contributes none'],
@@ -650,7 +657,11 @@ function featureConfigTable(
     ];
   });
 
-  return section([table(['Key', 'Type', 'Default', 'Read by', 'Doc'], rows), long.render()]);
+  return section([
+    FEATURE_DEFAULT_NOTE,
+    table(['Key', 'Type', 'Feature default', 'Read by', 'Doc'], rows),
+    long.render(),
+  ]);
 }
 
 function renderFeaturePage(reference: ReferenceProgram, model: Model, feature: FeatureInfo): string {
@@ -725,7 +736,11 @@ function engineConfigTable(
     ];
   });
 
-  return section([table(['Key', 'Type', 'Default', 'Default from', 'Read by', 'Doc'], rows), long.render()]);
+  return section([
+    FEATURE_DEFAULT_NOTE,
+    table(['Key', 'Type', 'Feature default', 'Default from', 'Read by', 'Doc'], rows),
+    long.render(),
+  ]);
 }
 
 function renderEnginePage(reference: ReferenceProgram, model: Model, engine: EngineInfo): string {

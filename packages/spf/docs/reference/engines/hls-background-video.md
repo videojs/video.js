@@ -56,7 +56,9 @@ await engine.destroy();
 
 ### Config
 
-| Key | Type | Default | Default from | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Default from | Read by | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `attachMediaSource?` | `((mediaSource: MediaSource, mediaElement: HTMLMediaElement) => AttachMediaSourceResult)` | — | — | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | Attach strategy — a composition-supplied implementation. Defaults to `attachMediaSource` (object URL on the `src` attribute). Compositions that pair MSE with sibling `<source>` alternatives wire `attachMediaSourceAsSourceElement` (e.g. the HLS engine, for `setupAirPlay`'s native fallback source). |
 | `backBuffer?` | `Partial<BackBufferConfig>` | — | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults: see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use back-buffer eviction). |

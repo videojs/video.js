@@ -25,7 +25,9 @@ Requires:
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `deriveStartMediaTime?` | `DeriveStartMediaTime` | — | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The reduce seam (coordination knob). Defaults to `deriveSharedMinStartMediaTime`. |
 | `gateFirstParse` | `GateFirstParse` | `gateFirstParseOnAnchor` | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
