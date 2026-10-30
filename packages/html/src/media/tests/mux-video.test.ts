@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxVideo } from '../mux-video';
 
@@ -11,8 +11,18 @@ function createMuxVideo() {
   return el;
 }
 
+// Every Mux source fetches its metadata as it loads; none of it should reach the
+// network from here.
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response('', { status: 404 }))
+  );
+});
+
 afterEach(() => {
   document.body.innerHTML = '';
+  vi.unstubAllGlobals();
 });
 
 describe('MuxVideo', () => {
