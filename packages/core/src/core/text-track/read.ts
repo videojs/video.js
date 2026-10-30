@@ -5,20 +5,12 @@ import type { TextTrackDefinition } from './definition';
 import { matchTextTrack } from './filter';
 import { parseWithSchema, type StandardSchemaV1 } from './schema';
 
-/**
- * Player state that lists text tracks, such as the player store.
- *
- * @internal
- */
+/** Player state that lists text tracks, such as the player store. */
 export interface TextTracksSource {
   readonly textTrackList: readonly MediaTextTrack[];
 }
 
-/**
- * Player state that carries text cues, such as the player store.
- *
- * @internal
- */
+/** Player state that carries text cues, such as the player store. */
 export interface TextCuesSource {
   readonly textCues: readonly MediaTrackCues[];
 }
@@ -30,7 +22,9 @@ export interface TextCuesSource {
  * const chapters = getTextTracks(player.store, { kind: 'chapters' });
  * ```
  *
- * @internal
+ * @param source - State that lists text tracks, such as the player store.
+ * @param filter - Picks tracks by kind, label, or language, or with a function. Defaults to every track.
+ * @public
  */
 export function getTextTracks(
   source: TextTracksSource,
@@ -47,16 +41,21 @@ export function getTextTracks(
  * const questions = getTextCues(player.store, quizTrack);
  * ```
  *
- * @internal
+ * @param source - State that carries text cues, such as the player store.
+ * @param track - The track definition to read.
+ * @label With Definition
+ * @public
  */
 export function getTextCues<Cue extends MediaTextCue>(
   source: TextCuesSource,
   track: TextTrackDefinition<Cue>
 ): readonly Cue[];
 /**
- * Every cue on the tracks a filter matches.
+ * Every cue on the tracks a filter matches, from the media or the app.
  *
- * @internal
+ * @param source - State that carries text cues, such as the player store.
+ * @param filter - Picks tracks by kind, label, or language, or with a function. Defaults to every track being read.
+ * @label With Filter
  */
 export function getTextCues(source: TextCuesSource, filter?: TextTrackFilter): readonly MediaTextCue[];
 export function getTextCues(
@@ -76,16 +75,21 @@ export function getTextCues(
  * });
  * ```
  *
- * @internal
+ * @param source - State that carries text cues, such as the player store.
+ * @param track - The track definition to read.
+ * @label With Definition
+ * @public
  */
 export function getActiveTextCues<Cue extends MediaTextCue>(
   source: TextCuesSource,
   track: TextTrackDefinition<Cue>
 ): readonly Cue[];
 /**
- * The cues active now on the tracks a filter matches.
+ * The cues active now on the tracks a filter matches, from the media or the app.
  *
- * @internal
+ * @param source - State that carries text cues, such as the player store.
+ * @param filter - Picks tracks by kind, label, or language, or with a function. Defaults to every track being read.
+ * @label With Filter
  */
 export function getActiveTextCues(source: TextCuesSource, filter?: TextTrackFilter): readonly MediaTextCue[];
 export function getActiveTextCues(

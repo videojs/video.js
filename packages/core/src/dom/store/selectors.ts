@@ -50,11 +50,7 @@ export const selectRemotePlayback = createSelector(remotePlaybackFeature);
 export const selectSource = createSelector(sourceFeature);
 /** Select the stream type state (`streamType`: `'on-demand' | 'live' | 'unknown'`). */
 export const selectStreamType = createSelector(streamTypeFeature);
-/**
- * Select the text cues state (textCues, watchTextCues).
- *
- * @internal
- */
+/** Select the text cues state (textCues, watchTextCues). */
 export const selectTextCues = createSelector(textCuesFeature);
 /**
  * Select the text track state (textTrackList, subtitlesShowing, toggleSubtitles, selectSubtitlesTrack, chaptersCues,

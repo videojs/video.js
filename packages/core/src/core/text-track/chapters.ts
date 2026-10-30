@@ -4,11 +4,7 @@ import { isNumber, isObject, isString, isUndefined } from '@videojs/utils/predic
 import type { TextCueInit } from './app';
 import { defineTextTrack, type TextTrackDefinition } from './definition';
 
-/**
- * An image for a chapter, such as its artwork or a thumbnail.
- *
- * @internal
- */
+/** An image for a chapter, such as its artwork or a thumbnail. */
 export interface ChapterImage {
   url: string;
   width?: number | undefined;
@@ -18,8 +14,6 @@ export interface ChapterImage {
 /**
  * What a chapter can carry beyond its title, from Apple HLS, Podcasting 2.0, or JSON-LD chapters. The cue's `text`
  * holds the title shown.
- *
- * @internal
  */
 export interface ChapterCueValue {
   description?: string | undefined;
@@ -36,8 +30,6 @@ export interface ChapterCueValue {
  * const [chapter] = getActiveTextCues(player.store, chaptersTrack);
  * const image = chapter?.value?.images?.[0]?.url;
  * ```
- *
- * @internal
  */
 export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> = defineTextTrack<ChapterCueValue>({
   kind: 'chapters',
@@ -51,8 +43,6 @@ export const chaptersTrack: TextTrackDefinition<MediaTextCue<ChapterCueValue>> =
  * ```ts
  * player.store.addTextTrack({ kind: 'chapters', src: '/chapters.json', format: podcastChapters });
  * ```
- *
- * @internal
  */
 export function podcastChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
   const json: unknown = isString(file) ? JSON.parse(file) : file;
@@ -79,8 +69,6 @@ export function podcastChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
  * Chapters from an Apple HLS chapters file, the JSON an `EXT-X-SESSION-DATA` tag with
  * `DATA-ID="com.apple.hls.chapters"` points to, given its text or its parsed JSON. Each cue shows the chapter's first
  * title, and keeps every title by language.
- *
- * @internal
  */
 export function appleHlsChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
   const json: unknown = isString(file) ? JSON.parse(file) : file;
@@ -133,8 +121,6 @@ export function appleHlsChapters(file: unknown): TextCueInit<ChapterCueValue>[] 
  * ```ts
  * player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(videoObject) });
  * ```
- *
- * @internal
  */
 export function jsonLdChapters(file: unknown): TextCueInit<ChapterCueValue>[] {
   const json: unknown = isString(file) ? JSON.parse(file) : file;

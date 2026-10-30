@@ -33,8 +33,6 @@ interface TextCuesWatch {
  *
  * Each marker clones the light-DOM template, which must contain exactly one HTML root element, or is a `<div>` without
  * one. Markers are decorative: the slider's own value is what assistive technology reads.
- *
- * @internal
  */
 export class TimeSliderMarkersElement extends UIElement {
   static readonly tagName = 'media-time-slider-markers';

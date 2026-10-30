@@ -254,7 +254,6 @@ export interface TextTrackCueLike {
 /**
  * A cue that carries text, such as a caption or a chapter title.
  *
- * @internal
  * @see https://developer.mozilla.org/en-US/docs/Web/API/VTTCue
  */
 export interface VTTCueLike extends TextTrackCueLike {
@@ -265,7 +264,6 @@ export interface VTTCueLike extends TextTrackCueLike {
  * A cue that carries structured data. Safari's native HLS publishes ID3 and DATERANGE metadata as `DataCue`s, while
  * hls.js sets `value` and `type` on `VTTCue`s, so one cue can match both shapes.
  *
- * @internal
  * @see https://developer.mozilla.org/en-US/docs/Web/API/DataCue
  */
 export interface DataCueLike extends TextTrackCueLike {
@@ -274,11 +272,7 @@ export interface DataCueLike extends TextTrackCueLike {
   readonly type?: string;
 }
 
-/**
- * A text track cue that carries text, structured data, or both.
- *
- * @internal
- */
+/** A text track cue that carries text, structured data, or both. */
 export type TextCueLike = VTTCueLike | DataCueLike;
 
 /**

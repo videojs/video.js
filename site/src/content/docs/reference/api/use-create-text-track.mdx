@@ -1,0 +1,45 @@
+---
+title: useCreateTextTrack
+description: Hook that adds a text track to the player while the component is mounted
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+## Import
+
+```tsx
+import { useCreateTextTrack } from '@videojs/react';
+```
+
+`useCreateTextTrack` adds a text track to the player while the component is mounted, and removes it on unmount. It takes a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> and the track's content, or one object describing both. The content holds `cues`, a `src` file to load them from, and a `format` that reads a file in another format. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> lists every field.
+
+Added through a definition, the cues are checked against its value type.
+
+```tsx title="QuizTrack.tsx"
+import { defineTextTrack, useCreateTextTrack, type TextCueInit } from '@videojs/react';
+
+interface Quiz {
+  question: string;
+}
+
+const quizTrack = defineTextTrack<Quiz>({ kind: 'metadata', label: 'quiz' });
+
+function QuizTrack({ cues }: { cues: TextCueInit<Quiz>[] }) {
+  useCreateTextTrack(quizTrack, { cues });
+
+  return null;
+}
+```
+
+The hook returns a handle to the track, or `null` before the track is added. The handle's `addCue(cue)` and `removeCue(id)` change the track's cues.
+
+## Behavior
+
+The hook removes the track when the component unmounts, and replaces it when the track's `kind`, `label`, `language`, `cues`, `src`, or `format` changes. Keep `cues` the same array and `format` the same function across renders, such as by memoizing them or defining them outside the component; a new one replaces the track and drops cues added through the old handle.
+
+The track stays through source changes, so give the component a `key` per video to swap tracks with the video. Calling the handle's `remove()` removes the track until the component remounts or the track is replaced.
+
+Tracks a component adds work with any media, including embeds without text tracks of their own. A `captions` or `subtitles` track is copied into the media, so the browser draws it when it's selected and the captions menu lists it.
+
+<UtilReference util="useCreateTextTrack" />
