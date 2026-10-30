@@ -2,15 +2,26 @@ import type { MediaTextTrack, MediaTextTrackCapability, TextTrackKind, TextTrack
 import { isQuerySelectorAllCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
 
-/** A media track's id in `textTrackList`: its own, or one derived from where it sits and what it is. */
-export function getTextTrackId(track: TextTrackLike, index: number): string {
-  return track.id || `track:${index}:${track.kind}:${track.language}:${track.label}`;
+import { getAppTrackCopyId } from './app-text-tracks';
+
+/**
+ * A media track's id in `textTrackList`: its own, or one derived from where it sits and what it is. A copy of an app
+ * track goes by that track's id, and a track whose own id is one of `appIds` goes by the derived id, so a media track
+ * and an app track never share one.
+ */
+export function getTextTrackId(track: TextTrackLike, index: number, appIds?: ReadonlySet<string>): string {
+  const copyOf = getAppTrackCopyId(track);
+  if (copyOf) return copyOf;
+
+  return track.id && !appIds?.has(track.id)
+    ? track.id
+    : `track:${index}:${track.kind}:${track.language}:${track.label}`;
 }
 
 /** A media track as plain data. */
-export function toMediaTextTrack(track: TextTrackLike, index: number): MediaTextTrack {
+export function toMediaTextTrack(track: TextTrackLike, index: number, appIds?: ReadonlySet<string>): MediaTextTrack {
   return {
-    id: getTextTrackId(track, index),
+    id: getTextTrackId(track, index, appIds),
     kind: track.kind as TextTrackKind,
     label: track.label,
     language: track.language,

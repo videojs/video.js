@@ -61,8 +61,9 @@ function snapshotTextTracks(media: HTMLMediaElement): TextTrackSnapshot[] {
     const { track } = trackEl;
     // A disabled track stays disabled through anything hls.js does, and only
     // holds cues if it was enabled long enough to load them. Skipping the rest
-    // keeps the mode juggling below off the common path.
-    if (track.mode === 'disabled' && trackEl.readyState !== TRACK_LOADED) continue;
+    // keeps the mode juggling below off the common path. A track without `src`
+    // settles in the error state, yet can hold cues written to it from code.
+    if (track.mode === 'disabled' && trackEl.readyState < TRACK_LOADED) continue;
 
     snapshots.push({
       track,

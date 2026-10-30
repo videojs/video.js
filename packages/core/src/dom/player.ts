@@ -12,7 +12,6 @@ import type {
   MediaQualityState,
   MediaRemotePlaybackState,
   MediaSourceState,
-  MediaTextTrackState,
   MediaTimeState,
   MediaVolumeState,
 } from '@videojs/media';
@@ -21,6 +20,7 @@ import type { CamelCase } from '@videojs/utils/types';
 
 import type { metadataFeature } from './store/features/metadata';
 import type { textCuesFeature } from './store/features/text-cues';
+import type { textTrackFeature } from './store/features/text-track';
 
 export interface MediaContainer extends HTMLElement {}
 
@@ -166,7 +166,7 @@ export type VideoFeatures = [
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
-  PlayerFeature<MediaTextTrackState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
@@ -179,6 +179,7 @@ export type AudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
@@ -201,7 +202,7 @@ export type LiveVideoFeatures = [
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
-  PlayerFeature<MediaTextTrackState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
@@ -218,6 +219,7 @@ export type LiveAudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
