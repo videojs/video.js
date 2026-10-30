@@ -31,7 +31,7 @@ The [Twitch embed player](https://dev.twitch.tv/docs/embed/video-and-clips/) han
 
 ## Load a source
 
-`src` takes a video URL (`twitch.tv/videos/<id>`) or a channel URL (`twitch.tv/<channel>`), with or without the `www.` and `go.` hosts. A channel URL plays the channel's live stream. Clips (`clips.twitch.tv`) are a different embed and aren't supported.
+`src` takes a video URL (`twitch.tv/videos/<id>`) or a channel URL (`twitch.tv/<channel>`), with or without the `www.` and `go.` hosts. Twitch's own embed URLs (`player.twitch.tv/?video=<id>` and `player.twitch.tv/?channel=<channel>`) work too; their `parent` parameter is ignored, since the player sets its own. A channel URL plays the channel's live stream. Clips (`clips.twitch.tv`) are a different embed and aren't supported.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx

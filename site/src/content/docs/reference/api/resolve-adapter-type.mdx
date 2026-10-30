@@ -86,7 +86,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 <FrameworkCase frameworks={["react"]}>
 | Adapter type | Recognized sources | Media component |
 |---|---|---|
-| `youtube` | `youtube.com`, `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `YouTubeVideo` |
+| `youtube` | `youtube.com` (including `music.youtube.com`), `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `YouTubeVideo` |
 | `vimeo` | `vimeo.com` and `player.vimeo.com` URLs | `VimeoVideo` |
 | `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `WistiaVideo` |
 | `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `MuxVideo` or `MuxAudio` |
@@ -95,7 +95,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `soundcloud` | `soundcloud.com` track and set URLs, `api.soundcloud.com` tracks and playlists, and `w.soundcloud.com/player/` embed URLs | `SoundCloudAudio` |
 | `mixcloud` | `mixcloud.com` show URLs and Mixcloud widget embed URLs | `MixcloudAudio` |
 | `tiktok` | `tiktok.com` video URLs | `TikTokVideo` |
-| `twitch` | `twitch.tv` video and channel URLs | `TwitchVideo` |
+| `twitch` | `twitch.tv` video and channel URLs, and `player.twitch.tv` embed URLs | `TwitchVideo` |
 | `playerjs` | URLs with a `playerjs` query parameter | `PlayerJsVideo` |
 | `hls` | `.m3u8` files and HLS MIME types | `HlsVideo`, `HlsJsVideo`, or `NativeHlsVideo` |
 | `dash` | `.mpd` files and `application/dash+xml` | `DashVideo` or `ShakaVideo` |
@@ -106,7 +106,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 <FrameworkCase frameworks={["html"]}>
 | Adapter type | Recognized sources | Media component |
 |---|---|---|
-| `youtube` | `youtube.com`, `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `<youtube-video>` |
+| `youtube` | `youtube.com` (including `music.youtube.com`), `youtu.be`, and `youtube-nocookie.com` video and playlist URLs | `<youtube-video>` |
 | `vimeo` | `vimeo.com` and `player.vimeo.com` URLs | `<vimeo-video>` |
 | `wistia` | `wistia.com`, `wistia.net`, and `wi.st` URLs, and pages with a `wvideo` parameter | `<wistia-video>` |
 | `mux` | `stream.mux.com` stream URLs, with or without `.m3u8` | `<mux-video>` or `<mux-audio>` |
@@ -115,7 +115,7 @@ Each media module you import adds its engine to your bundle, so import the rarel
 | `soundcloud` | `soundcloud.com` track and set URLs, `api.soundcloud.com` tracks and playlists, and `w.soundcloud.com/player/` embed URLs | `<soundcloud-audio>` |
 | `mixcloud` | `mixcloud.com` show URLs and Mixcloud widget embed URLs | `<mixcloud-audio>` |
 | `tiktok` | `tiktok.com` video URLs | `<tiktok-video>` |
-| `twitch` | `twitch.tv` video and channel URLs | `<twitch-video>` |
+| `twitch` | `twitch.tv` video and channel URLs, and `player.twitch.tv` embed URLs | `<twitch-video>` |
 | `playerjs` | URLs with a `playerjs` query parameter | `<playerjs-video>` |
 | `hls` | `.m3u8` files and HLS MIME types | `<hls-video>`, `<hlsjs-video>`, or `<native-hls-video>` |
 | `dash` | `.mpd` files and `application/dash+xml` | `<dash-video>` or `<shaka-video>` |
