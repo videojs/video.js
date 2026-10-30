@@ -1,6 +1,8 @@
 import type { MediaRemotePlaybackState, RemotePlaybackConnectionState } from '@videojs/media';
 import { isMediaRemotePlaybackCapable } from '@videojs/media';
 import { isWebKitAirPlayCapable, listen, type WebkitAvailabilityEvent } from '@videojs/utils/dom';
+import { noop } from '@videojs/utils/function';
+import { isPromise } from '@videojs/utils/predicate';
 
 import { definePlayerFeature } from '../../feature';
 import { exitFullscreen, isFullscreen } from '../../presentation/fullscreen';
@@ -71,7 +73,10 @@ export const remotePlaybackFeature = definePlayerFeature({
       });
 
     signal.addEventListener('abort', () => {
-      media.remote?.cancelWatchAvailability?.().catch(() => {});
+      // Some implementations return `void` rather than a promise.
+      const result = media.remote?.cancelWatchAvailability?.();
+
+      if (isPromise(result)) result.catch(noop);
     });
   },
 });
