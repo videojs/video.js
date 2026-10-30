@@ -155,6 +155,27 @@ describe('textCuesFeature', () => {
       expect(store.state.textCues[0]!.activeCues).toHaveLength(0);
     });
 
+    it('counts a cue playback passed between updates, and not one a seek jumped over', () => {
+      const { video, store } = setup([
+        createTrack('metadata', { cues: [{ startTime: 30, endTime: 30, text: 'point' }] }),
+      ]);
+
+      // Fast playback can move further between updates than a point stays active.
+      setTime(video, 29.5);
+      setTime(video, 32);
+      expect(store.state.textCues[0]!.activeCues).toHaveLength(1);
+
+      setTime(video, 34);
+      expect(store.state.textCues[0]!.activeCues).toHaveLength(0);
+
+      // A seek fires `seeking`, then `timeupdate`, then `seeked`.
+      setTime(video, 29.5, 'seeked');
+      setTime(video, 32, 'seeking');
+      setTime(video, 32);
+      setTime(video, 32, 'seeked');
+      expect(store.state.textCues[0]!.activeCues).toHaveLength(0);
+    });
+
     it('updates on cuechange', () => {
       const track = createTrack('metadata', { cues: [{ startTime: 1, endTime: 2, text: 'a' }] });
       const { video, store } = setup([track]);
@@ -227,7 +248,7 @@ describe('textCuesFeature', () => {
 
       track.cues!.shift();
       track.cues!.push({ startTime: 10, endTime: 15, text: 'c' });
-      setTime(video, 11);
+      setTime(video, 11, 'seeked');
 
       expect(store.state.textCues[0]!.cues.map(({ text }) => text)).toEqual(['b', 'c']);
       expect(store.state.textCues[0]!.activeCues.map(({ text }) => text)).toEqual(['c']);

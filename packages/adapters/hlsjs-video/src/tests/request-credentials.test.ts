@@ -22,7 +22,7 @@ describe('withRequestCredentials', () => {
       const { xhrSetup } = withRequestCredentials({}, () => 'use-credentials');
       const xhr = fakeXhr();
 
-      await xhrSetup!(xhr, URL);
+      await xhrSetup!(xhr, URL, context);
 
       expect(xhr.withCredentials).toBe(true);
     });
@@ -32,7 +32,7 @@ describe('withRequestCredentials', () => {
         const { xhrSetup } = withRequestCredentials({}, () => crossOrigin);
         const xhr = fakeXhr();
 
-        await xhrSetup!(xhr, URL);
+        await xhrSetup!(xhr, URL, context);
 
         expect(xhr.withCredentials).toBe(false);
       }
@@ -44,27 +44,37 @@ describe('withRequestCredentials', () => {
 
       const before = fakeXhr();
 
-      await xhrSetup!(before, URL);
+      await xhrSetup!(before, URL, context);
       crossOrigin = 'use-credentials';
 
       const after = fakeXhr();
 
-      await xhrSetup!(after, URL);
+      await xhrSetup!(after, URL, context);
 
       expect(before.withCredentials).toBe(false);
       expect(after.withCredentials).toBe(true);
     });
 
-    it('runs the configured hook after ours, on the same request', async () => {
+    it('runs the configured hook after ours, with the same request and context', async () => {
       const own = vi.fn<NonNullable<HlsConfig['xhrSetup']>>((xhr) => {
         expect(xhr.withCredentials).toBe(true);
       });
       const { xhrSetup } = withRequestCredentials({ xhrSetup: own }, () => 'use-credentials');
       const xhr = fakeXhr();
 
-      await xhrSetup!(xhr, URL);
+      await xhrSetup!(xhr, URL, context);
 
-      expect(own).toHaveBeenCalledWith(xhr, URL);
+      expect(own).toHaveBeenCalledWith(xhr, URL, context);
+    });
+
+    it('calls the configured hook with the loader hls.js called ours with', async () => {
+      const loader = {};
+      const own = vi.fn<NonNullable<HlsConfig['xhrSetup']>>();
+      const { xhrSetup } = withRequestCredentials({ xhrSetup: own }, () => null);
+
+      await xhrSetup!.call(loader, fakeXhr(), URL, context);
+
+      expect(own.mock.contexts[0]).toBe(loader);
     });
 
     it('lets the configured hook override the mode', async () => {
@@ -78,7 +88,7 @@ describe('withRequestCredentials', () => {
       );
       const xhr = fakeXhr();
 
-      await xhrSetup!(xhr, URL);
+      await xhrSetup!(xhr, URL, context);
 
       expect(xhr.withCredentials).toBe(false);
     });
@@ -93,7 +103,7 @@ describe('withRequestCredentials', () => {
         () => null
       );
 
-      await expect(xhrSetup!(fakeXhr(), URL)).rejects.toThrow('not yet open');
+      await expect(xhrSetup!(fakeXhr(), URL, context)).rejects.toThrow('not yet open');
     });
   });
 
@@ -121,6 +131,16 @@ describe('withRequestCredentials', () => {
 
       expect(own).toHaveBeenCalledWith(context, expect.objectContaining({ credentials: 'include' }));
       expect(request.credentials).toBe('include');
+    });
+
+    it('calls the configured hook with the loader hls.js called ours with', async () => {
+      const loader = {};
+      const own = vi.fn<NonNullable<HlsConfig['fetchSetup']>>((ctx, init) => new Request(ctx.url, init));
+      const { fetchSetup } = withRequestCredentials({ fetchSetup: own }, () => null);
+
+      await fetchSetup!.call(loader, context, initParams());
+
+      expect(own.mock.contexts[0]).toBe(loader);
     });
   });
 });

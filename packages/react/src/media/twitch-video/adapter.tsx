@@ -29,7 +29,12 @@ export const TwitchVideo = forwardRef<HTMLIFrameElement, TwitchVideoProps>(funct
     // URL to `attach()`, which builds it where there is a hostname to name.
     globalThis.location
       ? // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-        buildTwitchIframeSrc(props.src || props.source?.src || '', { ...TwitchAdapter.defaultProps, ...props })
+        buildTwitchIframeSrc(props.src || props.source?.src || '', {
+          ...TwitchAdapter.defaultProps,
+          ...props,
+          // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+          defaultMuted: !!(props.defaultMuted || props.muted),
+        })
       : ''
   );
   const { ref: eventsRef, props: iframeProps } = useMediaEvents(

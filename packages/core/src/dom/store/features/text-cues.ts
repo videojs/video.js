@@ -176,6 +176,8 @@ export const textCuesFeature = definePlayerFeature({
     // The media's tracks being read, by the id their cues are published under.
     let tracked = new Map<string, TrackedTrack>();
     let trackCleanup: AbortController | null = null;
+    // The time of the last update during playback, so cues played between updates still count as active.
+    let lastTime = Number.NaN;
 
     const getTime = () => (isMediaSeekCapable(media) ? media.currentTime : Number.NaN);
     const getDuration = () => (isMediaSeekCapable(media) ? media.duration : Number.NaN);
@@ -238,7 +240,7 @@ export const textCuesFeature = definePlayerFeature({
         const prior = previous.get(plain.id);
         const read = Array.from(track.cues ?? []);
         const cues = reuseCues(prior?.cues, sortCues(toMediaTextCues(read, { kind: plain.kind, duration })));
-        const activeCues = reuseCues(prior?.activeCues, findActiveCues(cues, time));
+        const activeCues = reuseCues(prior?.activeCues, findActiveCues(cues, time, lastTime));
 
         tracked.set(plain.id, { track, read });
         textCues.push(reuseTrackCues(prior, { track: reuseTrack(prior?.track, plain), cues, activeCues }));
@@ -252,13 +254,14 @@ export const textCuesFeature = definePlayerFeature({
         if (!isTracked(record.track, filters)) continue;
 
         const prior = previous.get(record.track.id);
-        const activeCues = reuseCues(prior?.activeCues, findActiveCues(record.cues, time));
+        const activeCues = reuseCues(prior?.activeCues, findActiveCues(record.cues, time, lastTime));
 
         textCues.push(reuseTrackCues(prior, { track: record.track, cues: record.cues, activeCues }));
       }
 
       if (textTracks) listenForTrackLoads(textTracks, sync, trackCleanup.signal);
 
+      lastTime = time;
       set({ textCues: reuseList(get().textCues, textCues) });
     };
 
@@ -269,12 +272,23 @@ export const textCuesFeature = definePlayerFeature({
       const next = current.map((entry) => {
         const source = tracked.get(entry.track.id);
         const cues = source ? readChangedCues(source, entry, duration) : entry.cues;
-        const activeCues = reuseCues(entry.activeCues, findActiveCues(cues, time));
+        const activeCues = reuseCues(entry.activeCues, findActiveCues(cues, time, lastTime));
 
         return reuseTrackCues(entry, { ...entry, cues, activeCues });
       });
 
+      lastTime = time;
       set({ textCues: reuseList(current, next) });
+    };
+
+    // A seek jumps over cues rather than playing them.
+    const forgetLastTime = () => {
+      lastTime = Number.NaN;
+    };
+
+    const syncSeeked = () => {
+      forgetLastTime();
+      syncActive();
     };
 
     syncSource();
@@ -300,7 +314,8 @@ export const textCuesFeature = definePlayerFeature({
     // Cue ends are clamped to the media duration.
     listen(media, 'durationchange', sync, { signal });
     listen(media, 'timeupdate', syncActive, { signal });
-    listen(media, 'seeked', syncActive, { signal });
+    listen(media, 'seeking', forgetLastTime, { signal });
+    listen(media, 'seeked', syncSeeked, { signal });
 
     const unsubscribeFilters = get()[CUE_FILTERS].subscribe(sync);
     const unsubscribeAppTracks = get()[APP_TEXT_TRACKS_CHANGE].subscribe(sync);
