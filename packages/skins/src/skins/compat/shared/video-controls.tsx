@@ -11,7 +11,11 @@ export function VideoControlsContent({
   renderThumbnail,
   seekBackward,
   seekForward,
-}: ControlsSlots & { center?: boolean; live?: boolean; menu?: VjscNode } = {}) {
+}: ControlsSlots & {
+  center?: boolean;
+  live?: boolean;
+  menu?: VjscNode;
+} = {}) {
   return (
     <ControlsContent
       captions={!live && <CaptionsToggle />}

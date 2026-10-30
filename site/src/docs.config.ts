@@ -118,7 +118,7 @@ export const sidebar: Sidebar = [
           },
           {
             slug: 'guides/casting',
-            sidebarLabel: 'AirPlay and Chromecast',
+            sidebarLabel: 'AirPlay, Chromecast, and FCast',
           },
           {
             slug: 'guides/playback-errors',
@@ -226,7 +226,11 @@ export const sidebar: Sidebar = [
       {
         sidebarLabel: 'Extensions',
         llmsDescription: 'API reference for extensions that connect external services to the player.',
-        contents: [{ slug: 'reference/components/google-cast' }, { slug: 'reference/components/mux-data' }],
+        contents: [
+          { slug: 'reference/components/google-cast' },
+          { slug: 'reference/components/fcast' },
+          { slug: 'reference/components/mux-data' },
+        ],
       },
       {
         sidebarLabel: 'Buttons',
@@ -242,6 +246,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/live-button' },
           { slug: 'reference/components/airplay-button' },
           { slug: 'reference/components/cast-button' },
+          { slug: 'reference/components/fcast-button' },
         ],
       },
       {

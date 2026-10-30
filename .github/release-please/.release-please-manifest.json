@@ -30,5 +30,6 @@
   "packages/adapters/vimeo-video": "10.2.0",
   "packages/adapters/wistia-video": "10.2.0",
   "packages/adapters/youtube-video": "10.2.0",
-  "packages/video.js": "10.2.0"
+  "packages/video.js": "10.2.0",
+  "packages/extensions/fcast": "10.2.0"
 }

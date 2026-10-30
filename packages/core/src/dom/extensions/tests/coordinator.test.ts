@@ -35,6 +35,25 @@ function createTarget(): PlayerTarget {
 }
 
 describe('PlayerExtensionCoordinator', () => {
+  it('notifies observers on replacement and removal without releasing a newer instance', () => {
+    const coordinator = new PlayerExtensionCoordinator(() => {});
+    const first = new TrackingExtension();
+    const second = new TrackingExtension();
+    const observed: Array<TrackingExtension | undefined> = [];
+    const unsubscribe = coordinator.subscribe(() => observed.push(coordinator.get(TrackingExtension)));
+    const releaseFirst = coordinator.register(first);
+    const releaseSecond = coordinator.register(second);
+
+    releaseFirst();
+    expect(observed).toEqual([first, second]);
+    releaseSecond();
+    expect(observed).toEqual([first, second, undefined]);
+
+    unsubscribe();
+    coordinator.register(first);
+    expect(observed).toHaveLength(3);
+  });
+
   afterEach(() => {
     vi.useRealTimers();
   });

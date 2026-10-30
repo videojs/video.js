@@ -4,6 +4,7 @@ import { Box } from 'vjsc/components';
 import { AirPlayButton } from '../../../../components/buttons/airplay-button';
 import { ButtonTooltip } from '../../../../components/buttons/button-tooltip';
 import { CastButton } from '../../../../components/buttons/cast-button';
+import { FCastButton } from '../../../../components/buttons/fcast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { LiveButton } from '../../../../components/buttons/live-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
@@ -33,6 +34,9 @@ export function NeutralLiveVideoControls() {
             <CaptionsMenu />
             <ButtonTooltip side="top">
               <CastButton />
+            </ButtonTooltip>
+            <ButtonTooltip side="top">
+              <FCastButton />
             </ButtonTooltip>
             <ButtonTooltip side="top">
               <AirPlayButton />
