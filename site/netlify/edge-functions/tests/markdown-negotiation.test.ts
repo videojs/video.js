@@ -93,6 +93,13 @@ describe('markdownNegotiation', () => {
     expect(await markdown?.text()).toBe('# Page');
   });
 
+  it("keeps the size that the twin's header rule reports", async () => {
+    const twin = new Response('# Page', { headers: { 'x-markdown-tokens': '2' } });
+    const { response } = negotiate('/docs/page', 'text/markdown', twin, page());
+
+    expect((await response)?.headers.get('x-markdown-tokens')).toBe('2');
+  });
+
   it('passes the HTML through, varying on Accept, when HTML is preferred', async () => {
     const html = page();
     const { context, response } = negotiate('/docs/page', 'text/html, text/markdown;q=0', new Response(), html);
