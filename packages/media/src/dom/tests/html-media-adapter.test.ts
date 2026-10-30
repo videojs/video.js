@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { HTMLAudioAdapter } from '../html-audio-adapter';
 
@@ -134,5 +134,92 @@ describe('HTMLMediaAdapter', () => {
 
     expect(listener).toHaveBeenCalledOnce();
     expect(host.contentData).toEqual({ title: 'Media title' });
+  });
+
+  describe('text tracks', () => {
+    const trackDescriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+    beforeEach(() => {
+      const tracks = new WeakMap<HTMLTrackElement, { mode: string }>();
+
+      // Jsdom doesn't link a `<track>` element to a `TextTrack`, so give each element one.
+      Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+        configurable: true,
+        get(this: HTMLTrackElement) {
+          if (!tracks.has(this)) tracks.set(this, { mode: 'disabled' });
+
+          return tracks.get(this);
+        },
+      });
+    });
+
+    afterEach(() => {
+      if (trackDescriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', trackDescriptor);
+      else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+    });
+
+    it('removes a track a track element backs', () => {
+      const host = new HTMLAudioAdapter();
+      const audio = document.createElement('audio');
+      const element = document.createElement('track');
+
+      audio.append(element);
+      host.attach(audio);
+      host.removeTextTrack(element.track);
+
+      expect(audio.querySelector('track')).toBeNull();
+    });
+
+    it('removes the track element from a native element that has its own removeTextTrack()', () => {
+      const host = new HTMLAudioAdapter();
+      const audio = document.createElement('audio');
+      const element = document.createElement('track');
+      const removeTextTrack = vi.fn();
+
+      // Stands in for a browser that ships the removal method the platform once had.
+      Object.assign(audio, { removeTextTrack });
+      audio.append(element);
+      host.attach(audio);
+      host.removeTextTrack(element.track);
+
+      expect(audio.querySelector('track')).toBeNull();
+      expect(removeTextTrack).not.toHaveBeenCalled();
+    });
+
+    it('ignores a track no track element backs', () => {
+      const host = new HTMLAudioAdapter();
+      const audio = document.createElement('audio');
+      const authored = document.createElement('track');
+
+      audio.append(authored);
+      host.attach(audio);
+      host.removeTextTrack({ mode: 'hidden' } as TextTrack);
+
+      expect(Array.from(audio.querySelectorAll('track'))).toEqual([authored]);
+    });
+
+    it('goes through a target that is not a native media element', () => {
+      const host = new HTMLAudioAdapter();
+      const track = { mode: 'hidden' } as TextTrack;
+      const target = Object.assign(new EventTarget(), {
+        addTextTrack: vi.fn(() => track),
+        removeTextTrack: vi.fn(),
+      });
+
+      host.attach(target as unknown as HTMLAudioElement);
+
+      expect(host.addTextTrack('chapters', 'Chapters')).toBe(track);
+      expect(target.addTextTrack).toHaveBeenCalledExactlyOnceWith('chapters', 'Chapters', undefined);
+
+      host.removeTextTrack(track);
+
+      expect(target.removeTextTrack).toHaveBeenCalledExactlyOnceWith(track);
+    });
+
+    it('ignores removeTextTrack() with nothing attached', () => {
+      const host = new HTMLAudioAdapter();
+
+      expect(() => host.removeTextTrack({ mode: 'hidden' } as TextTrack)).not.toThrow();
+    });
   });
 });
