@@ -5,11 +5,12 @@ export default styles({
   prefix: 'media-dialog',
   rules: {
     backdrop: {
-      utilities: 'absolute inset-0 z-40 bg-[rgba(0,0,0,0.75)] not-data-open:hidden',
+      utilities: 'absolute inset-0 z-40 bg-[rgba(0,0,0,0.75)] not-data-open:hidden data-[scope=document]:fixed',
     },
     popup: {
       utilities: [
         'absolute left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] max-w-80 max-h-[calc(100%-2rem)] transform-[translate(-50%,-50%)] gap-3 overflow-auto rounded-lg bg-media-popover p-5 text-media-popover-foreground not-data-open:hidden',
+        'data-[scope=document]:fixed data-[scope=document]:max-h-[calc(100dvh-2rem)]',
         'outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-media-ring',
         'media-high-contrast:border media-high-contrast:border-solid media-high-contrast:border-current forced-colors:border forced-colors:border-solid forced-colors:border-[CanvasText]',
       ],
