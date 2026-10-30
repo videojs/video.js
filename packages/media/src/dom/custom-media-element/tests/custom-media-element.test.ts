@@ -1046,6 +1046,70 @@ describe('CustomMediaElement', () => {
     });
   });
 
+  describe('track and source children', () => {
+    function setCurrentSrc(target: HTMLMediaElement, value: string) {
+      Object.defineProperty(target, 'currentSrc', { configurable: true, get: () => value });
+    }
+
+    function appendChild(el: HTMLElement, localName: 'track' | 'source', src: string) {
+      const child = document.createElement(localName);
+
+      child.setAttribute('src', src);
+      el.appendChild(child);
+      return child;
+    }
+
+    // Lets jsdom deliver `slotchange`.
+    const flush = () => new Promise((resolve) => setTimeout(resolve));
+
+    it('clones source children into the target before it has a source', async () => {
+      const el = create(defineVideoElement());
+
+      appendChild(el, 'source', 'video.mp4');
+      await flush();
+
+      expect(el.target.querySelector('source')?.getAttribute('src')).toBe('video.mp4');
+    });
+
+    it('defers track children until the target starts loading', async () => {
+      const el = create(defineVideoElement());
+
+      appendChild(el, 'track', 'chapters.vtt');
+      await flush();
+
+      expect(el.target.querySelector('track')).toBeNull();
+
+      setCurrentSrc(el.target, 'https://example.com/video.mp4');
+      el.target.dispatchEvent(new Event('loadstart'));
+
+      expect(el.target.querySelector('track')?.getAttribute('src')).toBe('chapters.vtt');
+    });
+
+    it('clones track children right away once the target has a source', async () => {
+      const el = create(defineVideoElement());
+
+      setCurrentSrc(el.target, 'https://example.com/video.mp4');
+      appendChild(el, 'track', 'chapters.vtt');
+      await flush();
+
+      expect(el.target.querySelector('track')?.getAttribute('src')).toBe('chapters.vtt');
+    });
+
+    it('does not clone a track removed before the target starts loading', async () => {
+      const el = create(defineVideoElement());
+      const track = appendChild(el, 'track', 'chapters.vtt');
+
+      await flush();
+      track.remove();
+      await flush();
+
+      setCurrentSrc(el.target, 'https://example.com/video.mp4');
+      el.target.dispatchEvent(new Event('loadstart'));
+
+      expect(el.target.querySelector('track')).toBeNull();
+    });
+  });
+
   describe('XSS prevention', () => {
     it('does not inject nodes when poster contains a quote breakout attempt', () => {
       const { tag } = defineVideoElement();

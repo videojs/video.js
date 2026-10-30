@@ -277,6 +277,7 @@ export function CustomMediaElement<T extends Constructor<PlaybackAdapter>>(
     #bridgedEventTypes = new Set<string>();
     #childMap = new Map<HTMLTrackElement | HTMLSourceElement, HTMLTrackElement | HTMLSourceElement>();
     #childObserver?: MutationObserver;
+    #deferredTracksTarget: HTMLElement | null = null;
 
     constructor() {
       super();
@@ -426,7 +427,17 @@ export function CustomMediaElement<T extends Constructor<PlaybackAdapter>>(
         }
       }
 
+      const target = this.target as HTMLMediaElement | null;
+      // An enabled track present when the target starts loading joins the browser's pending text tracks, which hold
+      // `readyState` below `HAVE_FUTURE_DATA` until the track request settles, so a slow or hanging track stalls
+      // playback start. Tracks added once loading has begun don't gate readiness.
+      const canAddTracks = !!target?.currentSrc;
+
+      if (!canAddTracks) this.#deferTracksUntilLoadStart(target);
+
       for (const el of mediaChildren) {
+        if (el.localName === 'track' && !canAddTracks) continue;
+
         let clone = this.#childMap.get(el);
 
         if (!clone) {
@@ -435,10 +446,24 @@ export function CustomMediaElement<T extends Constructor<PlaybackAdapter>>(
           this.#childObserver?.observe(el, { attributes: true });
         }
 
-        this.target?.append(clone);
+        target?.append(clone);
         this.#enableDefaultTrack(clone as HTMLTrackElement);
       }
     }
+
+    #deferTracksUntilLoadStart(target: HTMLElement | null): void {
+      if (target === this.#deferredTracksTarget) return;
+
+      this.#deferredTracksTarget?.removeEventListener('loadstart', this.#onDeferredTracksLoadStart);
+      this.#deferredTracksTarget = target;
+      target?.addEventListener('loadstart', this.#onDeferredTracksLoadStart);
+    }
+
+    #onDeferredTracksLoadStart = (): void => {
+      this.#deferredTracksTarget?.removeEventListener('loadstart', this.#onDeferredTracksLoadStart);
+      this.#deferredTracksTarget = null;
+      this.#syncMediaChildren();
+    };
 
     #syncMediaChildAttribute(mutations: MutationRecord[]): void {
       for (const mutation of mutations) {
