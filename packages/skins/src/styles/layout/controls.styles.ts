@@ -77,7 +77,7 @@ export default styles({
     backdrop: {
       utilities: [
         'pointer-events-none absolute inset-0 z-10 rounded-[inherit]',
-        'bg-(image:--media-controls-gradient) bg-bottom bg-no-repeat bg-size-[100%_var(--media-controls-gradient-height)]',
+        'bg-(image:--media-controls-gradient) bg-bottom bg-no-repeat bg-size-[100%_var(--media-controls-bottom-gradient-height)]',
         'transition-opacity duration-media-controls ease-out not-data-visible:opacity-0',
       ],
       variants: {
