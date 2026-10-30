@@ -2193,6 +2193,17 @@ describe('Media component pipeline (end-to-end)', () => {
       expect(props.debug.description).toBe('Overrides parent debug — adds network logging.');
     });
 
+    it('describes an event the parent also fires with the child description', () => {
+      expect(findElement('ExtendingVideo')!.reference.platforms.html.events.custom).toContainEqual({
+        name: 'sourcechange',
+        description: 'Fired when the source changes, and again when the playback ID resolves to a stream.',
+      });
+      expect(findElement('ComplexVideo')!.reference.platforms.html.events.custom).toContainEqual({
+        name: 'sourcechange',
+        description: 'Fired when the source changes.',
+      });
+    });
+
     it('inherited readonly flags are preserved', () => {
       const props = findElement('ExtendingVideo')!.reference.platforms.html.properties.definitions;
 

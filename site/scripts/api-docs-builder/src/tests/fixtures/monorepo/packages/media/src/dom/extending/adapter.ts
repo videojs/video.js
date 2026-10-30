@@ -3,13 +3,16 @@
  *
  * Exercises: host inheritance. The builder must walk the extends chain
  * to extract properties from both this class and its parent (ComplexHost).
- * Child properties override parent properties of the same name. Defaults
+ * Child properties and `@fires` descriptions override the parent's. Defaults
  * spread the parent's `static defaultProps` (mirrors MuxVideoAdapter) — the
  * builder must resolve the spread through the class. `customDomain`
  * deliberately has no default.
  */
 import { ComplexHost } from '../complex';
 
+/**
+ * @fires sourcechange - Fired when the source changes, and again when the playback ID resolves to a stream.
+ */
 export class ExtendingHost extends ComplexHost {
   static readonly defaultProps = {
     ...ComplexHost.defaultProps,

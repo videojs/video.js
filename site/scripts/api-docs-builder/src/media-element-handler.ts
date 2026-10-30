@@ -195,7 +195,9 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
     }
 
     const files = [...new Set(host.files)];
-    const fires = collectFires(files, project);
+    // `files` runs from the base host to the most derived one, whose `@fires`
+    // description wins, as its members do.
+    const fires = collectFires([...files].reverse(), project);
     const dispatched = collectDispatchedEvents(files, project);
     const contractEvents = source.mediaType === 'video' ? videoEvents : audioEvents;
     const contractSet = new Set(contractEvents);
