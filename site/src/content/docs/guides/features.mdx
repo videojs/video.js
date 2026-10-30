@@ -170,7 +170,7 @@ Components that depend on availability (like <DocsLink slug="reference/component
 <FrameworkCase frameworks={["html"]}>
 Components that depend on availability (like <DocsLink slug="reference/components/mute-button">`<media-mute-button>`</DocsLink>, <DocsLink slug="reference/components/pip-button">`<media-pip-button>`</DocsLink>, and <DocsLink slug="reference/components/fullscreen-button">`<media-fullscreen-button>`</DocsLink>) handle the three states for you:
 
-- **`unsupported`** — the element receives the native `hidden` attribute (and `data-hidden`). No CSS needed.
+- **`unsupported`** — the element receives the native `hidden` attribute (and `data-hidden`). No CSS needed, unless your CSS sets `display` on the element; see <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
 - **`unavailable`** — the presentation controls stay hidden while capability detection is unresolved. Cast remains visible but disabled when its API is supported and no device is reachable.
 - **`disabled` attribute** — an available button stays visible and focusable with `aria-disabled="true"` plus `data-disabled` for styling.
 - **`available`** — fully interactive.
