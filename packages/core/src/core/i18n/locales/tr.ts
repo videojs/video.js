@@ -57,7 +57,7 @@ export default {
     unknown: 'Medya yüklenmedi, süre bilinmiyor.',
   },
   playback: {
-    rate: 'Oynatma hızı {rate}',
+    rate: 'Oynatma hızı, {rate}',
   },
   volume: {
     mutedValue: '{percent}, sessiz',

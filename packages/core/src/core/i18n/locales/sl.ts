@@ -57,7 +57,7 @@ export default {
     unknown: 'Predstavnostna vsebina se ni naložila, čas ni znan.',
   },
   playback: {
-    rate: 'Hitrost predvajanja {rate}',
+    rate: 'Hitrost predvajanja, {rate}',
   },
   volume: {
     mutedValue: '{percent}, zvok izklopljen',

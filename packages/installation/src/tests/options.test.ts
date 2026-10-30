@@ -94,7 +94,10 @@ describe('installationDecisionOrderFor', () => {
 
     expect(guidance('Choose the player')).toMatch(/^Use video unless the request signals another experience/);
     expect(guidance('Choose the player')).toContain('Ask only when those signals conflict.');
-    expect(guidance('Choose the skin')).toMatch(/^Use default unless the request asks for a minimal/);
+    expect(guidance('Choose the skin')).toMatch(/^Use default unless the request signals another look/);
+    expect(guidance('Choose the skin')).toContain('Use compat for plain, unbranded controls');
+    expect(guidance('Choose the skin')).toContain('Use scaffold when the user wants an unbranded foundation');
+    expect(guidance('Choose the skin')).toContain('All four support the same browsers.');
     expect(guidance('Choose the skin')).toContain('which Shadcn does not support');
     expect(shadcn.find(({ title }) => title === 'Choose the skin')?.guidance).not.toContain('none');
   });

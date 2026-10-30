@@ -16,7 +16,7 @@ export default styles({
       utilities: '[--media-tooltip-side-offset:calc(var(--media-spacing)*3)]!',
     },
     shortcut: {
-      utilities: 'text-media-sm [font-family:inherit]',
+      utilities: 'min-w-[1.5em] bg-white/10 p-[0.1em] text-center text-media-sm [font-family:inherit] leading-tight',
     },
   },
 });

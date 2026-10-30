@@ -32,5 +32,5 @@ export function LiveAudioSkin({ children, className, ...props }: LiveAudioSkinPr
 
 export const meta = {
   title: 'Compat Live Audio Skin',
-  description: 'A live audio skin designed for broader browser compatibility.',
+  description: 'A plain, unbranded live audio skin with play, live-edge, volume, and captions controls.',
 } as const satisfies SkinDescription;

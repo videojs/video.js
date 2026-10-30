@@ -103,9 +103,19 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
     return this.#media as unknown as Media;
   }
 
+  /**
+   * The Media driving the inner `<video>`, matching `adapter` on `CustomMediaElement`. Call `adapter.destroy()` to
+   * release the engine after `keep-alive` kept it running past removal.
+   */
+  get adapter(): HlsBackgroundVideoAdapter {
+    return this.#media;
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback?.();
 
+    // Only the element's own `keep-alive` counts: an ancestor's `destroy()` can't reach this engine, so inheriting it
+    // would leave the engine running with nothing to release it.
     if (this.hasAttribute('keep-alive')) return;
 
     // Deferred so a synchronous reparent (remove then insert) doesn't tear down

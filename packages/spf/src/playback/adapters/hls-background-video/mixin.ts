@@ -10,6 +10,7 @@ import {
   SVTA_UNSUPPORTED_VIDEO_FORMAT,
   type SvtaError,
 } from '../../../media/errors';
+import { resolveSourceUrl } from '../../../network/resolve-source-url';
 import {
   type EngineConfig,
   type EngineContext,
@@ -112,6 +113,12 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     static readonly defaultProps: HlsBackgroundVideoAdapterProps = {
       src: '',
     };
+
+    /**
+     * Engine this media plays through, reported to analytics such as Mux Data. Names the SPF engine entry point it
+     * composes (`@videojs/spf/engines/hls-background-video`), since each SPF engine is its own composition.
+     */
+    static readonly engineName: string = 'spf-hls-background-video';
 
     #engine: Composition<EngineState, EngineContext>;
     #config: EngineConfig;
@@ -242,13 +249,15 @@ export function HlsBackgroundVideoMixin<Base extends Constructor<any>>(BaseClass
     }
 
     set src(value: string) {
+      // Resolved before comparing or storing — see the video adapter's note.
+      const url = resolveSourceUrl(value);
       // Same line the HLS Medias draw: the presentation is set from a fresh
       // object every time, so re-resolving a URL already playing would restart
       // it for no reason.
-      if (value === this.src) return;
+      if (url === this.src) return;
 
       this.#cancelPendingPlay();
-      this.#engine.state.presentation.set(value ? { url: value } : undefined);
+      this.#engine.state.presentation.set(url ? { url } : undefined);
     }
 
     // -------------------------------------------------------------------------

@@ -1,9 +1,10 @@
-import type { MediaPlaybackRateState } from '@videojs/media';
+import type { MediaFeatureAvailability, MediaPlaybackRateState } from '@videojs/media';
 import { createState } from '@videojs/store';
 import { defaults } from '@videojs/utils/object';
 import type { NonNullableObject } from '@videojs/utils/types';
 
 import { resolveText, type Text } from '../../i18n';
+import { playbackRateText } from '../../i18n/text/menu';
 import { rateText } from '../../i18n/text/playback';
 import type { ButtonState } from '../types';
 import { resolveLabel } from '../utils/resolve-label';
@@ -19,6 +20,10 @@ export interface PlaybackRateButtonProps {
 
 export interface PlaybackRateButtonState extends ButtonState {
   rate: number;
+  /** Whether the media can change its playback rate. */
+  availability: MediaFeatureAvailability;
+  /** Whether the button is hidden because the media has no playback rate to change. */
+  hidden: boolean;
 }
 
 /** @internal */
@@ -31,6 +36,8 @@ export class PlaybackRateButtonCore {
 
   readonly state = createState<PlaybackRateButtonState>({
     rate: 1,
+    availability: 'unavailable',
+    hidden: true,
     label: '',
   });
 
@@ -52,6 +59,14 @@ export class PlaybackRateButtonCore {
     return rateText;
   }
 
+  /** Tooltip text: the control's name without the current rate, which the button already shows. */
+  getTooltipLabel(state: PlaybackRateButtonState): Text | string {
+    const custom = resolveLabel(this.#props.label, state);
+    if (custom !== undefined) return custom;
+
+    return playbackRateText;
+  }
+
   getLabelParams(state: PlaybackRateButtonState): { rate: number } | undefined {
     if (resolveLabel(this.#props.label, state) !== undefined) return undefined;
 
@@ -71,15 +86,20 @@ export class PlaybackRateButtonCore {
 
   getState(): PlaybackRateButtonState {
     const media = this.#media!;
+    const availability = media.playbackRateAvailability;
 
-    this.state.patch({ rate: media.playbackRate });
+    this.state.patch({
+      rate: media.playbackRate,
+      availability,
+      hidden: availability !== 'available',
+    });
     this.state.patch({ label: resolveText(this.getLabel(this.state.current)) });
 
     return this.state.current;
   }
 
   cycle(media: MediaPlaybackRateState): void {
-    if (this.#props.disabled) return;
+    if (this.#props.disabled || media.playbackRateAvailability !== 'available') return;
 
     if (this.#props.menuTrigger) return;
 

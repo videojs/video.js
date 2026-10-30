@@ -57,7 +57,7 @@ export default {
     unknown: 'A média nem töltődött be, ismeretlen hossz.',
   },
   playback: {
-    rate: 'Lejátszási sebesség {rate}',
+    rate: 'Lejátszási sebesség, {rate}',
   },
   volume: {
     mutedValue: '{percent}, némítva',
