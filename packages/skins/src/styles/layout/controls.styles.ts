@@ -16,6 +16,20 @@ const compactHidden = [
   'media-max-lg:group-[:not([data-visible])]/controls:duration-media-controls',
 ] as const;
 
+// Sits above the title and status indicators, level with the control bars, and steps aside for the spinner.
+const center = [
+  'group/center pointer-events-none absolute top-1/2 left-1/2 z-30 flex -translate-1/2 items-center rtl:flex-row-reverse gap-6',
+  'transition-[filter,opacity,scale] duration-media-controls-enter ease-out',
+  'not-data-visible:opacity-0 not-data-visible:scale-media-hidden not-data-visible:duration-media-controls',
+  'pointer-fine:not-data-visible:blur-media-hidden',
+  'group-data-visible/buffering:hidden',
+] as const;
+
+const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
+
+// Each skin's centre button matches its playback status indicator, and shrinks rather than hides in small players.
+const centerPlay = ['size-auto! p-4! media-max-360:p-3!'] as const;
+
 export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
@@ -94,6 +108,52 @@ export default styles({
     },
     spacer: {
       utilities: 'flex-1',
+    },
+    centerBuffering: {
+      utilities: [],
+      variants: { default: 'group/buffering contents', neutral: 'group/buffering contents' },
+    },
+    center: {
+      utilities: [],
+      variants: { default: center, neutral: center },
+    },
+    centerButton: {
+      utilities: [],
+      variants: {
+        // Overrides the base button surface, as the compat skin's centre buttons do.
+        default: [
+          centerButtonBase,
+          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
+          'media-high-contrast:bg-media-background!',
+        ],
+        // A bare icon with the feedback shadow, even on hover.
+        neutral: [
+          centerButtonBase,
+          'bg-transparent! text-media-controls-foreground! filter-media-feedback',
+          'media-high-contrast:bg-media-background!',
+        ],
+      },
+    },
+    centerPlay: {
+      utilities: [],
+      variants: {
+        // A mouse can click the media to toggle playback, so fine pointers keep the button only as a start prompt.
+        default: [...centerPlay, 'pointer-fine:data-started:hidden!'],
+        // The neutral skin keeps its classic control bar once playback starts.
+        neutral: [...centerPlay, 'data-started:hidden!'],
+      },
+    },
+    centerPlayIcon: {
+      utilities: [],
+      variants: {
+        default: 'size-media-icon-lg! media-max-360:size-media-icon!',
+        neutral: 'size-media-icon-xl! media-max-360:size-media-icon-lg!',
+      },
+    },
+    centerSeek: {
+      utilities: [],
+      // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance.
+      variants: { default: 'media-max-280:hidden! pointer-fine:hidden!' },
     },
   },
 });

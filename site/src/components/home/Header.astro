@@ -92,6 +92,17 @@ const { poster } = Astro.props;
 
 <style>
   /*
+   * Where the headline overlays the video (md and up), the skin's centre play button and play/pause feedback would sit
+   * on top of it. Hide them there; the control bar, a click on the video, and a first tap still start playback.
+   */
+  @media (width >= 48rem) {
+    [data-hero-video] :global(.video-controls-center),
+    [data-hero-video] :global(.media-playback-status-indicator) {
+      display: none;
+    }
+  }
+
+  /*
    * Title-first reveal. The headline paints alone on the page colour, then the video fades in beneath it while the
    * headline turns light to sit on the footage. Only where the title overlays the video (md and up), and only for
    * people who have not asked for reduced motion.

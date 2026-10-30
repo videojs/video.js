@@ -83,7 +83,7 @@ What changed:
 - **`src` and `playsInline` moved to the media.** `Video` renders a native `<video>`, so `<source>` and `<track>` children go inside it, as they did inside `<Player>`.
 - **`poster` stays on the player.** `VideoPlayer` holds it as metadata, and the skin renders it. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 - **No control bar children.** The skin ships its controls. A captions button appears when the media has caption or subtitle tracks, so `ClosedCaptionButton` has nothing to replace.
-- **No big play button.** The Default and Neutral video skins don't render one. Clicking the video or pressing the control bar's play button starts playback. The Compat and Scaffold video skins put large play and seek buttons in the center.
+- **The big play button comes with the skin.** Every video skin shows a large play button in the center before playback starts, smaller in narrow players. After that, the Default skin keeps center play and seek buttons on touch devices, the Neutral skin hides its button, and the Compat and Scaffold skins keep large play and seek buttons in the center.
 - **Set the aspect ratio yourself.** Video-React's `fluid` mode drew a 16:9 box by default. Video.js skins don't, so size the skin with CSS.
 - **One stylesheet per skin.** Replace `video-react.css` with the skin's CSS file.
 

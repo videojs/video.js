@@ -16,6 +16,14 @@ import styles from './controls.styles';
 export function NeutralLiveVideoControls() {
   return (
     <$.Controls.Root>
+      <$.BufferingIndicator className={controlsStyles.centerBuffering}>
+        <$.Controls.Group className={controlsStyles.center}>
+          <PlayButton
+            className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
+            iconClassName={controlsStyles.centerPlayIcon}
+          />
+        </$.Controls.Group>
+      </$.BufferingIndicator>
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content]}>
         <$.Tooltip.Provider>
