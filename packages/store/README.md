@@ -10,6 +10,12 @@ A reactive store for managing state owned by external systems. Built for media p
 npm install @videojs/store
 ```
 
+The React hooks in `@videojs/store/react` also need `react` and `react-compiler-runtime`, which are optional peer dependencies. `@videojs/react` already depends on `react-compiler-runtime`; if you import `@videojs/store/react` directly, install both yourself:
+
+```bash
+npm install react react-compiler-runtime
+```
+
 ## Why?
 
 [Traditional state management](#how-its-different) assumes you own the state. But when working with a `<video>` element, Web Sockets, streaming libraries, and real-time systems, the external system is the authority. You observe it, send requests to it, and react to its changes.
