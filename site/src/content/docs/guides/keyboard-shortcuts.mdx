@@ -40,7 +40,7 @@ export default function App() {
         <Hotkey keys="ArrowLeft" action="seekStep" value={-5} />
 
         <Gesture type="tap" action="togglePaused" pointer="mouse" region="center" />
-        <Gesture type="tap" action="toggleControls" pointer="touch" />
+        <Gesture type="tap" action="startOrToggleControls" pointer="touch" />
         <Gesture type="doubletap" action="seekStep" value={-10} region="left" />
         <Gesture type="doubletap" action="seekStep" value={10} region="right" />
       </Container>
@@ -64,7 +64,7 @@ export default function App() {
     <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
 
     <media-gesture type="tap" action="togglePaused" pointer="mouse" region="center"></media-gesture>
-    <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
+    <media-gesture type="tap" action="startOrToggleControls" pointer="touch"></media-gesture>
     <media-gesture type="doubletap" action="seekStep" value="-10" region="left"></media-gesture>
     <media-gesture type="doubletap" action="seekStep" value="10" region="right"></media-gesture>
   </media-container>
@@ -83,12 +83,12 @@ export default function App() {
 
 <FrameworkCase frameworks={["react"]}>
 - `Hotkey` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
-- `Gesture` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
+- `Gesture` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`, and `startOrToggleControls`, which starts playback that hasn't started yet and otherwise toggles the controls; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
 - `StatusAnnouncer` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
 <FrameworkCase frameworks={["html"]}>
 - `<media-hotkey>` binds keys to player actions: `togglePaused`, `toggleMuted`, `toggleFullscreen`, `toggleSubtitles`, `togglePictureInPicture`, `seekStep`, `volumeStep`, `seekToPercent`, `speedUp`, and `speedDown`. `seekStep` and `volumeStep` use a default step unless you pass a custom `value`. These input actions call the feature actions your components use; for example, `toggleFullscreen` chooses `requestFullscreen` or `exitFullscreen` based on `isFullscreen`.
-- `<media-gesture>` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
+- `<media-gesture>` binds `tap` and `doubletap` to the same actions. Gestures also support `toggleControls`, and `startOrToggleControls`, which starts playback that hasn't started yet and otherwise toggles the controls; `seekToPercent` is available only to hotkeys. Scope each binding with `pointer` (`mouse` or `touch`) and `region` (`left`, `center`, `right`). For example, a double tap on the left can rewind while a double tap on the right skips forward.
 - `<media-status-announcer>` announces action results to screen readers. The input indicator components show brief on-screen feedback, such as volume level or captions on and off, the way native players do. The packaged skins include both.
 </FrameworkCase>
 
@@ -113,7 +113,7 @@ How the container splits into regions depends on which regions you bind for the 
 - Hotkeys listen on the player container by default, so multiple players on a page don't fight over keys. Pass `target="document"` on a hotkey to make it page-wide — appropriate only when one player owns the page.
 - Typing is protected: while focus is in an editable field, single-key bindings are skipped automatically. Modifier combinations (for example `Ctrl+Shift+f`) still fire.
 - Repeatable actions (seeking, volume) fire on held keys; toggle actions don't repeat.
-- Use only one of `toggleControls` and `togglePaused` for tap bindings with the same pointer type. The packaged skins pause on a mouse tap and toggle controls on a touch tap, matching platform conventions.
+- Use only one of `toggleControls`, `startOrToggleControls`, and `togglePaused` for tap bindings with the same pointer type. The packaged skins pause on a mouse tap. On touch, the first tap starts playback and later taps toggle the controls, so a tap never pauses, matching platform conventions.
 - Declared gestures and the built-in touch handling share one recognizer. Use the gesture components to add bindings. Extra raw pointer listeners can toggle controls twice.
 
 ## Common variations

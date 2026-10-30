@@ -64,6 +64,9 @@ for (const entry of PAGES as readonly PageEntry[]) {
         await expectTabFocus(page, page.locator('video').first());
       }
 
+      // Before playback starts, a mouse-driven player keeps only the centre play button as a start prompt.
+      if (!isAudio) await expectTabFocus(page, player.centerPlayButton);
+
       await expectTabFocus(page, player.playButton);
 
       if (isAudio) {

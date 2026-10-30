@@ -239,7 +239,11 @@ export const vars = {
   },
   '--media-controls-gradient-height': {
     kind: 'internal',
-    description: 'Height of the top and bottom video controls gradients.',
+    description: 'Height of the top video controls gradient.',
+  },
+  '--media-controls-bottom-gradient-height': {
+    kind: 'internal',
+    description: 'Height of the bottom video controls gradient.',
   },
   '--media-controls-top-gradient': {
     kind: 'internal',

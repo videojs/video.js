@@ -19,7 +19,7 @@ export default styles({
     },
     center: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 media-360:flex group-data-visible/buffering:hidden!',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 flex transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 group-data-visible/buffering:hidden!',
         'media-high-contrast:rounded-lg media-high-contrast:bg-media-background forced-colors:bg-transparent!',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translate(-50%,-50%)_scale(0.9)]',
@@ -45,13 +45,14 @@ export default styles({
       ],
     },
     centerPlay: {
-      utilities: 'size-14.5!',
+      // Shrinks rather than hides in small players, so there's always a start prompt.
+      utilities: 'size-14.5! media-max-360:size-11!',
     },
     centerPlayIcon: {
-      utilities: 'size-7!',
+      utilities: 'size-7! media-max-360:size-5.5!',
     },
     centerSeek: {
-      utilities: 'hidden size-9! pointer-fine:grid',
+      utilities: 'hidden size-9! pointer-fine:grid media-max-360:hidden!',
     },
     centerSeekIcon: {
       utilities: 'size-4.5',

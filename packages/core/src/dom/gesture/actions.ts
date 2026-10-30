@@ -3,6 +3,7 @@ import { isFunction } from '@videojs/utils/predicate';
 import type { GestureActionName } from '../../core/ui/gesture/core';
 import { ignoreRejection, MEDIA_INPUT_ACTION_OVERRIDES } from '../media-actions';
 import type { AnyPlayerStore } from '../player';
+import { selectControls, selectPlayback } from '../store/selectors';
 
 export type { GestureActionName } from '../../core/ui/gesture/core';
 
@@ -21,6 +22,19 @@ export type GestureActionResolver = (context: GestureActionContext) => void;
 /** Actions that need custom logic beyond `store.state[action]()`. */
 const GESTURE_ACTION_OVERRIDES: Partial<Record<GestureActionName, GestureActionResolver>> = {
   togglePaused: MEDIA_INPUT_ACTION_OVERRIDES.togglePaused,
+
+  // Before playback starts a tap can only mean play, as on a poster; afterwards it toggles the controls so a tap never
+  // pauses by accident. Reads the pointer-down state, like `togglePaused`, in case the click started playback itself.
+  startOrToggleControls({ store, state = store.state }) {
+    const playback = selectPlayback(state);
+
+    if (playback && !playback.started && playback.paused && !playback.autoplaying) {
+      ignoreRejection(playback.play());
+      return;
+    }
+
+    selectControls(store.state)?.toggleControls();
+  },
 
   toggleMuted: MEDIA_INPUT_ACTION_OVERRIDES.toggleMuted,
 

@@ -27,6 +27,18 @@ describe('deriveStatus', () => {
     });
   });
 
+  it('derives play status only when startOrToggleControls starts playback', () => {
+    const action = { action: 'startOrToggleControls' } as const;
+
+    expect(deriveStatus(action, { ...SNAPSHOT, paused: true, started: false })).toMatchObject({
+      status: 'play',
+      label: 'Playing',
+    });
+
+    expect(deriveStatus(action, { ...SNAPSHOT, paused: true, started: true })).toBeNull();
+    expect(deriveStatus(action, { ...SNAPSHOT, paused: false, started: true })).toBeNull();
+  });
+
   it('derives volume status and value', () => {
     expect(deriveStatus({ action: 'volumeStep', value: 0.3 }, SNAPSHOT)).toMatchObject({
       status: 'volume-high',

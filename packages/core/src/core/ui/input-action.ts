@@ -7,6 +7,7 @@ export type InputAction =
   | 'toggleSubtitles'
   | 'togglePictureInPicture'
   | 'toggleControls'
+  | 'startOrToggleControls'
   | 'seekStep'
   | 'seekToPercent'
   | 'volumeStep'
@@ -24,6 +25,7 @@ export interface InputActionEvent {
 
 export interface MediaSnapshot {
   paused?: boolean | undefined;
+  started?: boolean | undefined;
   volume?: number | undefined;
   muted?: boolean | undefined;
   playbackRate?: number | undefined;
