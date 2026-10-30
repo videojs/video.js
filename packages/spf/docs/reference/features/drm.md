@@ -24,7 +24,9 @@ audio constraints. Compose it after the features that set the plain versions, su
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `audioConstraints` | `readonly SwitchAudioTrackRule[]` | `[...DEFAULT_AUDIO_CONSTRAINTS, excludeRefusedKeySystems]` | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack) | `switchAudioTrack`'s chains, replacing `DEFAULT_AUDIO_CONSTRAINTS` / `DEFAULT_AUDIO_RULES`. |
 | `canPlayTrack` | `CanPlayTrack` | `canPlayTrackWithDrm` | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |

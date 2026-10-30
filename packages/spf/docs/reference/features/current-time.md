@@ -14,7 +14,9 @@ Mirrors the media element's `currentTime` into state, which segment loading read
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `defaultCurrentTime?` | `number` | — | [trackCurrentTime](../behaviors/dom/track-current-time.md#trackcurrenttime) | Value written to `state.currentTime` when no media element is attached. Defaults to `0` — the HTMLMediaElement spec default. |
 

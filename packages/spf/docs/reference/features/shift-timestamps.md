@@ -16,7 +16,9 @@ doesn't need it. Text cues shift with `shiftTextTimestampsFeature`, composed alo
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `audioMessagePipelines` | `MessagePipelines` | `relocationPipelinesFor('audio')` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
 | `deriveStartMediaTime?` | `DeriveStartMediaTime` | `deriveSharedMinStartMediaTime` | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The reduce seam (coordination knob). Defaults to `deriveSharedMinStartMediaTime`. |

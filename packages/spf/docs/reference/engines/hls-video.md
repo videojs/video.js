@@ -96,7 +96,9 @@ The engine's features declare these state keys for code outside the engine to wr
 
 ### Config
 
-| Key | Type | Default | Default from | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Default from | Read by | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `addSubtitlesTracksToMedia?` | `((mediaElement: HTMLMediaElement, modelTextTracks: readonly (TextTrack \| PartiallyResolvedTextTrack)[]) => void)` | `addSubtitlesTracksToMedia` | [textTracksFeature](../features/text-tracks.md) | [syncTextTracks](../behaviors/dom/sync-text-tracks.md#synctexttracks) | Create and append SPF-owned `<track>` elements on `mediaElement`, one per model text track. Implementation tags each element so the read/remove helpers can scope to SPF-owned elements. |
 | `attachMediaSource?` | `((mediaSource: MediaSource, mediaElement: HTMLMediaElement) => AttachMediaSourceResult)` | `attachMediaSourceAsSourceElement` | [airPlayFeature](../features/airplay.md) | [setupMediaSource](../behaviors/dom/setup-mediasource.md#setupmediasource) | Attach strategy — a composition-supplied implementation. Defaults to `attachMediaSource` (object URL on the `src` attribute). Compositions that pair MSE with sibling `<source>` alternatives wire `attachMediaSourceAsSourceElement` (e.g. the HLS engine, for `setupAirPlay`'s native fallback source). |

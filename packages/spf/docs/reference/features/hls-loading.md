@@ -14,7 +14,9 @@ Fetches and parses the source's HLS multivariant playlist into the presentation 
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `defaultPreload?` | `StandardPreload` | — | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Fallback used when `state.preload` is unset (undefined / empty) for the resolution-gate decision. Defaults to `'metadata'`, matching `syncPreload`'s own `defaultPreload`. |
 | `parsePresentation` | `ParsePresentation` | `parseMultivariantPlaylist` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Parses a manifest body into a resolved `Presentation`. |

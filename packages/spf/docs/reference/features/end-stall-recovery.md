@@ -15,7 +15,9 @@ audio and video end at slightly different times. Inert otherwise.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `endStallNudgeWindow?` | `number` | — | [recoverEndStall](../behaviors/dom/recover-end-stall.md#recoverendstall) | How close (seconds) the playhead must be to the reachable buffered end for a `waiting` to count as the end-of-stream freeze. Must exceed the audio-clock freeze gap (~50–70ms measured on Chrome); too small risks missing the stall (a permanent hang), so keep a margin. Default `DEFAULT_END_STALL_NUDGE_WINDOW`. |
 

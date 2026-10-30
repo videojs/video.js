@@ -18,7 +18,9 @@ None.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `textMessagePipelines` | `TextMessagePipelines<VTTCue>` | `relocatingTextPipelines` | [setupTextTrackActors](../behaviors/dom/setup-text-track-actors.md#setuptexttrackactors) | Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to mirror the v/a `video`/`audioMessagePipelines` composition-config keys. Defaults (in the loader) to `resolveCues → dispatchCues`. |
 
