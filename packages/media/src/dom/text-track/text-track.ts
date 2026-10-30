@@ -30,7 +30,7 @@ export interface CreateTextTrackOptions {
  *
  * @internal
  */
-export interface TextTrackHandle {
+export interface NativeTextTrackHandle {
   readonly track: TextTrackLike;
   /**
    * Write `cue` to the track as a new native cue, once the backing `<track>` has settled. A cue that already belongs to
@@ -57,7 +57,7 @@ export interface TextTrackHandle {
 export function createTextTrack(
   media: MediaTextTrackCapability,
   options: CreateTextTrackOptions
-): TextTrackHandle | null {
+): NativeTextTrackHandle | null {
   const { kind, label, language, mode = 'hidden' } = options;
 
   // The platform's `addTextTrack()` makes tracks that can never be removed, so DOM media get a `<track>` on the element
