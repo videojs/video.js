@@ -13,9 +13,9 @@ type SyncTextTracksFsmState = 'preconditions-unmet' | 'sync-active';
 
 export interface SyncTextTracksConfig {
   /**
-   * Create and append SPF-owned `<track>` slots on `mediaElement`, one per model text track. Implementation tags each
-   * element so the read/remove helpers can scope to SPF-owned slots. **Required** — the behavior is DOM-binding-neutral
-   * and the composing engine supplies the integration.
+   * Create and append SPF-owned `<track>` elements on `mediaElement`, one per model text track. Implementation tags
+   * each element so the read/remove helpers can scope to SPF-owned elements. **Required** — the behavior is
+   * DOM-binding-neutral and the composing engine supplies the integration.
    */
   addSubtitlesTracksToMedia: (
     mediaElement: HTMLMediaElement,
@@ -23,12 +23,12 @@ export interface SyncTextTracksConfig {
   ) => void;
   /**
    * Return the SPF-owned subtitle/caption `TextTrack` currently in `'showing'` mode, or `undefined` if none. Used by
-   * the DOM `change` bridge to mirror native-UI selection back into `selectedTextTrackId`.
+   * the DOM `change` bridge to mirror native-UI selection back into `userTextTrackSelection`.
    */
   getShowingSubtitlesTrackFromMedia: (mediaElement: HTMLMediaElement) => globalThis.TextTrack | undefined;
   /**
    * Remove every SPF-owned `<track>` child from `mediaElement`. Called on element replacement or state exit (source
-   * unload, behavior destroy) to evict slots.
+   * unload, behavior destroy) to evict them.
    */
   removeAllSubtitlesTracksFromMedia: (mediaElement: HTMLMediaElement) => void;
 }
@@ -180,9 +180,9 @@ function syncTextTracksSetup({
 
 /**
  * **Mirrors the presentation's text tracks onto the media element as `<track>` elements and keeps their modes in step
- * with the selection.** When a presentation is resolved and a media element is available, allocate one slot in
+ * with the selection.** When a presentation is resolved and a media element is available, allocate one entry in
  * `mediaElement.textTracks` per model text track — via creating `<track>` children, since that's the only spec
- * mechanism for adding _and_ removing entries to `textTracks` (no `removeTextTrack` API exists). Once slots are
+ * mechanism for adding _and_ removing entries to `textTracks` (no `removeTextTrack` API exists). Once the entries are
  * provisioned, mirror the resolved `selectedTextTrackId` into their `mode`s (one-way: state → DOM), and propagate
  * user-initiated DOM `change` events back to `userTextTrackSelection` — the standing _intent_ (a language-based
  * partial, or `'off'`) that `switchTextTrack` resolves into `selectedTextTrackId`. So non-SPF consumers (host-page
@@ -190,20 +190,21 @@ function syncTextTracksSetup({
  * resolved id.
  *
  * Single-positive-state reactor (`'preconditions-unmet'` ↔ `'sync-active'`): an element-bound effect allocates the
- * slots, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
+ * entries, applies the initial selection, attaches the `change` listener, and opens a brief Chromium settling-window
  * guard, with paired cleanup on element replacement or state exit. A separate effect mirrors subsequent
- * `selectedTextTrackId` changes into `mode`s without reallocating the slots.
+ * `selectedTextTrackId` changes into `mode`s without reallocating the entries.
  *
  * State-exit cleanup also sends a `'clear'` message to the `TextTracksActor` so its cue+segment cache (keyed by
- * trackId) is dropped alongside the DOM `<track>` slots. The actor itself is owned by `setupTextTrackActors` and bound
- * to mediaElement, not presentation, so it survives source resets; clearing its context here keeps the cache consistent
- * with the DOM. Without this, a subsequent presentation reusing a trackId would have `getSegmentsToLoad` treat its
- * segments as already-buffered and skip loading them.
+ * trackId) is dropped alongside the DOM `<track>` elements. The actor itself is owned by `setupTextTrackActors` and
+ * bound to mediaElement, not presentation, so it survives source resets; clearing its context here keeps the cache
+ * consistent with the DOM. Without this, a subsequent presentation reusing a trackId would have `getSegmentsToLoad`
+ * treat its segments as already-buffered and skip loading them.
  *
  * Single-writer separation: `selectedTextTrackId` is the resolved _output_ owned solely by `switchTextTrack`; this
  * behavior only reads it (to mirror modes). The write path here is `userTextTrackSelection` — the user-intent _input_ —
- * so DOM action and the resolver never contend for one slot. The intent isn't cleared on source unload (it's a standing
- * preference, like `userAudioTrackSelection`); `'off'` is written when the user disables all tracks via native UI.
+ * so DOM action and the resolver never contend for one signal. The intent isn't cleared on source unload (it's a
+ * standing preference, like `userAudioTrackSelection`); `'off'` is written when the user disables all tracks via native
+ * UI.
  *
  * Echo guard: `selectedTextTrackId` is exactly the id this behavior last drove into the DOM, so a `change` event still
  * showing it is our own echo (or a resolver-driven correction — e.g. the picked track's CDN failed and the resolver

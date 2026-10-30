@@ -129,8 +129,8 @@ export interface TrackSwitchingState {
 
 type UserTrackSelectionType = 'video' | 'audio' | 'text';
 
-/** The signals behind {@link UserTrackSelectionState}, one per track type, each documented on its own key. */
-interface UserTrackSelectionSlots {
+/** The fields behind {@link UserTrackSelectionState}, one per track type, each documented on its own key. */
+interface UserTrackSelections {
   /**
    * Consumer-driven constraint narrowing the video candidate set, the video sibling of `userAudioTrackSelection`: a
    * partial track the `filterByUserSelection` rule matches candidates against; an empty match falls through to the
@@ -157,7 +157,7 @@ interface UserTrackSelectionSlots {
  * A `Pick` rather than a key-remapping mapped type so each key keeps its JSDoc.
  */
 export type UserTrackSelectionState<T extends UserTrackSelectionType = UserTrackSelectionType> = Pick<
-  UserTrackSelectionSlots,
+  UserTrackSelections,
   `user${Capitalize<T>}TrackSelection`
 >;
 
