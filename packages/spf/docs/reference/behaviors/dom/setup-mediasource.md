@@ -59,6 +59,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
+| `loadingSuspended` | reads | reads if present | `boolean \| undefined` | `SegmentLoadingState` ([behaviors/dom/load-segments](load-segments.md)) | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the signal exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent signal means never suspended. |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `MediaSourceState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
 
 ### Context

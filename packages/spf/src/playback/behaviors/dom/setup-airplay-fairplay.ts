@@ -527,6 +527,8 @@ function setupAirPlayFairPlaySetup({
  * Droppable. A composition omitting it carries neither `fairPlayAirPlayKeySystem` nor this file nor the legacy module,
  * and — since `loadingSuspended` is observed rather than declared — an engine without `setupAirPlay` never leaves
  * `'preconditions-unmet'` anyway.
+ *
+ * @observes loadingSuspended
  */
 export const setupAirPlayFairPlay = defineBehavior({
   stateKeys: ['presentation'],
