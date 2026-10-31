@@ -150,6 +150,10 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
     ...extractEventsFromTypes(mediaTypesPath, 'MediaStreamTypeEvents', project),
     ...extractEventsFromTypes(mediaTypesPath, 'MediaLiveEvents', project),
   ]);
+  const mediaEventProps = extractMediaEventProps(
+    path.join(monorepoRoot, 'packages/react/src/utils/use-media-events.ts'),
+    project
+  );
   const mediaHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-media-adapter/html-media-adapter.ts');
   const videoHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-video-adapter/html-video-adapter.ts');
   const audioHostPath = path.join(monorepoRoot, 'packages/media/src/dom/html-audio-adapter/html-audio-adapter.ts');
@@ -225,7 +229,14 @@ export function generateMediaElementReferences(monorepoRoot: string): MediaEleme
       .filter(([name, definition]) => definition.overridesNative && !(name in host.properties))
       .map(([name]) => name)
       .sort();
-    const react = extractReactReference(monorepoRoot, source, project, publicProperties);
+    const react = extractReactReference(
+      monorepoRoot,
+      source,
+      project,
+      publicProperties,
+      mediaEventProps,
+      standardEvents
+    );
     const engineOptions = extractEngineOptions(source, project);
     const cssCustomProperties =
       source.targetTag === 'video' ? videoCSSVars : source.targetTag === 'audio' ? audioCSSVars : {};
@@ -1052,7 +1063,9 @@ function extractReactReference(
   monorepoRoot: string,
   source: MediaElementSource,
   project: OxcProject,
-  propertyDefinitions: Record<string, HostPropertyDef>
+  propertyDefinitions: Record<string, HostPropertyDef>,
+  mediaEventProps: Map<string, string>,
+  standardEvents: string[]
 ): ReactMediaReference | undefined {
   const directory = path.basename(path.dirname(source.mediaFilePath));
   const reactDirectory = path.join(monorepoRoot, 'packages/react/src/media', directory);
@@ -1076,6 +1089,7 @@ function extractReactReference(
 
   let target: MediaTargetTag | undefined;
   let acceptsNativeProps = false;
+  let routesMediaEvents = false;
   let mediaRefType: string | undefined;
   let defaultsExpression: Expression | undefined;
 
@@ -1089,6 +1103,8 @@ function extractReactReference(
         const match = /^MediaRefProps<\s*(\w+)\s*>$/.exec(sourceText(file, heritage));
 
         if (match) mediaRefType = match[1];
+
+        if (/^MediaEventProps</.test(sourceText(file, heritage))) routesMediaEvents = true;
       }
     }
 
@@ -1139,9 +1155,43 @@ function extractReactReference(
     }
   }
 
+  // React wires every media event prop on a native `<video>` or `<audio>`. Elsewhere `useMediaEvents` routes them to
+  // the adapter, so only the events it dispatches ever fire.
+  const eventProps = [...mediaEventProps]
+    .filter(([, event]) => acceptsNativeProps || (routesMediaEvents && standardEvents.includes(event)))
+    .map(([prop]) => prop)
+    .sort();
   const mediaRef = mediaRefType ? { type: mediaRefType, ...importedFrom(file, mediaRefType) } : undefined;
 
-  return { target, acceptsNativeProps, props, ...(mediaRef ? { mediaRef } : {}) };
+  return { target, acceptsNativeProps, props, eventProps, ...(mediaRef ? { mediaRef } : {}) };
+}
+
+/** The React media event props `useMediaEvents` routes, each mapped to the event it handles. */
+function extractMediaEventProps(filePath: string, project: OxcProject): Map<string, string> {
+  const eventProps = new Map<string, string>();
+  const missing = `No MEDIA_EVENT_PROPS table found in ${filePath}; every React Events section would be empty.`;
+  const file = project.source(filePath);
+  if (!file) throw new Error(missing);
+
+  walkAst(file.program, (node) => {
+    if (node.type !== 'VariableDeclarator' || staticName(node.id) !== 'MEDIA_EVENT_PROPS') return;
+
+    const object = unwrapObjectExpression(node.init);
+    if (!object) return;
+
+    for (const property of object.properties) {
+      if (property.type !== 'Property' || property.value.type !== 'Literal') continue;
+
+      const name = staticName(property.key);
+      const event = property.value.value;
+
+      if (name && typeof event === 'string') eventProps.set(name, event);
+    }
+  });
+
+  if (eventProps.size === 0) throw new Error(missing);
+
+  return eventProps;
 }
 
 /** The module a top-level import binds `name` from, so docs can show where to import a type the source names. */

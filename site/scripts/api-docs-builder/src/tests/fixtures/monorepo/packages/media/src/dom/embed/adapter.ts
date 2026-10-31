@@ -40,9 +40,12 @@ export class EmbedHost extends EventTarget {
     return Promise.resolve();
   }
 
-  attach(_target: HTMLIFrameElement): void {
+  attach(target: HTMLIFrameElement): void {
     const emit = (type: string) => this.dispatchEvent(new Event(type));
     emit('waiting');
+    const on = (type: string) => target.addEventListener(type, () => this.dispatchEvent(new Event(type)));
+    on('pause');
+    for (const type of PASSTHROUGH_EVENTS) on(type);
     for (const type of ['loadedmetadata', 'adapterready']) {
       this.dispatchEvent(new Event(type));
     }
@@ -50,3 +53,5 @@ export class EmbedHost extends EventTarget {
   detach(): void {}
   destroy(): void {}
 }
+
+const PASSTHROUGH_EVENTS = ['ended', 'canplay'] as const;
