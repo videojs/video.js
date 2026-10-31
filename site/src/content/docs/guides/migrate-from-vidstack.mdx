@@ -574,7 +574,7 @@ async function load(src) {
 Each media module loads with `import()`, so the page only downloads the engine its source needs, the way Vidstack's provider loaders did. A plain `<video>` needs no module. When the media changes, the player detaches from the old one, resets its state, and attaches to the new one; the skin follows.
 </FrameworkCase>
 
-`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
+`resolveAdapterType` recognizes the URLs and shorthands Vidstack's providers did, plus Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, and Twitch, and returns `null` for anything else. Vidstack sent a `HEAD` request when a URL had no file extension; pass the MIME type as the second argument instead. The result names a kind of source, not an engine: `hls` covers every HLS media, so choose one yourself.
 
 For a single source, change the media's `src` or `source` instead. The same media swaps the URL without being replaced.
 
