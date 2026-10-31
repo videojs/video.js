@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../constants';
 import {
@@ -10,6 +10,12 @@ import {
   isMediaRemotePlaybackCapable,
   isMediaTextTrackCapable,
 } from '../predicate';
+
+// A page can carry a second copy of `@videojs/media` (CDN plus npm, duplicate installs). Load the constants again as a
+// separate module instance to stand in for that copy's placeholders.
+vi.resetModules();
+
+const otherCopy = await import('../constants');
 
 describe('getTimeRangeEnd', () => {
   it('prefers a finite duration', () => {
@@ -75,6 +81,13 @@ describe('isMediaBufferCapable', () => {
     expect(isMediaBufferCapable({ buffered: EMPTY_TIME_RANGES, seekable: EMPTY_TIME_RANGES })).toBe(false);
   });
 
+  it('rejects empty time range stubs from another copy of the package', () => {
+    expect(otherCopy.EMPTY_TIME_RANGES).not.toBe(EMPTY_TIME_RANGES);
+    expect(isMediaBufferCapable({ buffered: otherCopy.EMPTY_TIME_RANGES, seekable: otherCopy.EMPTY_TIME_RANGES })).toBe(
+      false
+    );
+  });
+
   it('accepts defined non-stub time ranges', () => {
     const range = { length: 1, start: () => 0, end: () => 10 };
 
@@ -87,6 +100,11 @@ describe('isMediaTextTrackCapable', () => {
     expect(isMediaTextTrackCapable({ textTracks: EMPTY_TEXT_TRACKS })).toBe(false);
   });
 
+  it('rejects the empty text tracks stub from another copy of the package', () => {
+    expect(otherCopy.EMPTY_TEXT_TRACKS).not.toBe(EMPTY_TEXT_TRACKS);
+    expect(isMediaTextTrackCapable({ textTracks: otherCopy.EMPTY_TEXT_TRACKS })).toBe(false);
+  });
+
   it('accepts defined non-stub text tracks', () => {
     expect(isMediaTextTrackCapable({ textTracks: Object.assign(new EventTarget(), { length: 0 }) })).toBe(true);
   });
@@ -95,6 +113,11 @@ describe('isMediaTextTrackCapable', () => {
 describe('isMediaRemotePlaybackCapable', () => {
   it('rejects the empty remote playback stub', () => {
     expect(isMediaRemotePlaybackCapable({ remote: EMPTY_REMOTE })).toBe(false);
+  });
+
+  it('rejects the empty remote playback stub from another copy of the package', () => {
+    expect(otherCopy.EMPTY_REMOTE).not.toBe(EMPTY_REMOTE);
+    expect(isMediaRemotePlaybackCapable({ remote: otherCopy.EMPTY_REMOTE })).toBe(false);
   });
 
   it('accepts defined non-stub remote playback', () => {
