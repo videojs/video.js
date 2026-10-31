@@ -1,0 +1,67 @@
+---
+title: GoogleAnalytics
+frameworkTitle:
+  html: google-analytics
+description: Options for the Google Analytics 4 extension that tracks video engagement and playback events
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
+import ExtensionImports from '@/components/docs/api-reference/ExtensionImports.astro';
+
+Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension</DocsLink> to the player. It renders nothing — place it anywhere inside the player, and it follows whatever media the player attaches, dispatching standard GA4 Enhanced Measurement video events and playback interaction events to `window.dataLayer`. See <DocsLink slug="guides/google-analytics">Google Analytics</DocsLink> for how telemetry works.
+
+## Import
+
+<ExtensionImports extension="google-analytics" package="@videojs/google-analytics" react="GoogleAnalytics" />
+
+## Anatomy
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics></google-analytics>
+```
+</FrameworkCase>
+
+## Options
+
+<FrameworkCase frameworks={["react"]}>
+| Prop | Type | Description |
+|---|---|---|
+| `metadata` | `GoogleAnalyticsMetadata` | Video metadata and custom dimensions reported with GA4 events |
+| `dataLayerName` | `string` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
+| `disableProgress` | `boolean` | Disables 10%, 25%, 50%, and 75% progress milestones tracking. Defaults to `false` |
+| `debug` | `boolean` | Logs telemetry events to the console. Defaults to `false` |
+| `onEvent` | `(event: string, params: object) => void` | Callback to intercept dispatched events |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Attribute | Property | Description |
+|---|---|---|
+| — | `metadata` | Video metadata and custom dimensions reported with GA4 events |
+| `data-layer-name` | `dataLayerName` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
+| `disable-progress` | `disableProgress` | Disables 10%, 25%, 50%, and 75% progress milestones tracking |
+| `debug` | `debug` | Logs telemetry events to the console. Defaults to `false` |
+| — | `onEvent` | Callback to intercept dispatched events |
+
+`metadata` and `onEvent` take non-primitive values, so they're properties only, with no matching attribute. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
+</FrameworkCase>
+
+## Collection limits
+
+Google Analytics 4 enforces collection limits on event parameters:
+
+- **25 parameters per event**: The extension sends 8 standard parameters (`video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_stream_type`, `video_title`, `video_url`, and `visible`), leaving room for up to 17 custom dimensions in `metadata`.
+- **Parameter names**: Up to 40 characters in length.
+- **String values**: Up to 100 characters in length.
+
+## See also
+
+<DocsLinkCard slug="guides/google-analytics" description="Configure GA4 video telemetry">Google Analytics</DocsLinkCard>

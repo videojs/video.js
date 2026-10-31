@@ -6,6 +6,7 @@
   "packages/adapters/dash-video": "10.2.0",
   "packages/element": "10.2.0",
   "packages/extensions/google-cast": "10.2.0",
+  "packages/extensions/google-analytics": "10.2.0",
   "packages/adapters/hlsjs-video": "10.2.0",
   "packages/html": "10.2.0",
   "packages/icons": "10.2.0",

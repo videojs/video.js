@@ -34,6 +34,7 @@
     { "path": "packages/adapters/wistia-video" },
     { "path": "packages/adapters/youtube-video" },
 
+    { "path": "packages/extensions/google-analytics" },
     { "path": "packages/extensions/google-cast" },
     { "path": "packages/extensions/mux-data" },
 

@@ -17,6 +17,7 @@
         "@videojs/core",
         "@videojs/dash-video",
         "@videojs/element",
+        "@videojs/google-analytics",
         "@videojs/google-cast",
         "@videojs/hlsjs-video",
         "@videojs/html",
@@ -64,6 +65,9 @@
     },
     "packages/element": {
       "component": "@videojs/element"
+    },
+    "packages/extensions/google-analytics": {
+      "component": "@videojs/google-analytics"
     },
     "packages/extensions/google-cast": {
       "component": "@videojs/google-cast"
