@@ -47,7 +47,7 @@ Components that render a `<video>` or `<audio>`, such as `Video`, <DocsLink slug
 
 Embeds such as <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> and <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> render an `<iframe>`, where React does not wire media events. They accept the same prop names and route them to their playback adapter. Handlers receive the plain `Event` the adapter dispatched, and `event.currentTarget` is the adapter, which exposes `currentTime`, `duration`, and `paused` the way a video element does. The `MediaEventProps` type from `@videojs/react` describes these props.
 
-The Events section of each media component's reference lists the event props it handles.
+The Events section of each media component's reference lists the media events it fires.
 
 ## Availability and constraints
 
@@ -72,8 +72,10 @@ function pauseOthers(event: SyntheticEvent<HTMLVideoElement>) {
   playing = event.currentTarget;
 }
 
-<Video src={first} onPlay={pauseOthers} />
-<Video src={second} onPlay={pauseOthers} />
+<>
+  <Video src={first} onPlay={pauseOthers} />
+  <Video src={second} onPlay={pauseOthers} />
+</>
 ```
 
 ### Render player state instead of handling events

@@ -1167,8 +1167,9 @@ function extractReactReference(
 /** The React media event props `useMediaEvents` routes, each mapped to the event it handles. */
 function extractMediaEventProps(filePath: string, project: OxcProject): Map<string, string> {
   const eventProps = new Map<string, string>();
+  const missing = `No MEDIA_EVENT_PROPS table found in ${filePath}; every React Events section would be empty.`;
   const file = project.source(filePath);
-  if (!file) return eventProps;
+  if (!file) throw new Error(missing);
 
   walkAst(file.program, (node) => {
     if (node.type !== 'VariableDeclarator' || staticName(node.id) !== 'MEDIA_EVENT_PROPS') return;
@@ -1185,6 +1186,8 @@ function extractMediaEventProps(filePath: string, project: OxcProject): Map<stri
       if (name && typeof event === 'string') eventProps.set(name, event);
     }
   });
+
+  if (eventProps.size === 0) throw new Error(missing);
 
   return eventProps;
 }
