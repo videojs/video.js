@@ -17,23 +17,21 @@ import { PlayerExtensionElement } from '../player-extension-element';
  *   ```html
  *   <video-player>
  *     <video src="https://example.com/video.mp4"></video>
- *     <google-analytics video-title="My Video"></google-analytics>
+ *     <google-analytics></google-analytics>
  *   </video-player>
  *   ```;
+ *
+ * @internal
  */
 export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnalyticsExtensionBase> {
   static readonly tagName = 'google-analytics';
 
   static override properties = {
     dataLayerName: { type: String, attribute: 'data-layer-name' },
-    videoTitle: { type: String, attribute: 'video-title' },
-    videoProvider: { type: String, attribute: 'video-provider' },
-    streamType: { type: String, attribute: 'stream-type' },
     disableProgress: { type: Boolean, attribute: 'disable-progress' },
     debug: { type: Boolean },
-  } satisfies PropertyDeclarationMap<
-    Exclude<keyof GoogleAnalyticsProps, 'customParams' | 'onEvent' | 'trackProgress'> | 'disableProgress'
-  >;
+    // `metadata` takes an object, so it's a property-only prop.
+  } satisfies PropertyDeclarationMap<Exclude<keyof GoogleAnalyticsProps, 'metadata' | 'onEvent'>>;
 
   protected createExtension(): GoogleAnalyticsExtensionBase {
     return new GoogleAnalyticsExtensionBase();
@@ -47,44 +45,12 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
     this.extension.dataLayerName = value ?? undefined;
   }
 
-  get videoTitle(): string | undefined {
-    return this.extension.videoTitle;
-  }
-
-  set videoTitle(value: string | null | undefined) {
-    this.extension.videoTitle = value ?? undefined;
-  }
-
-  get videoProvider(): string | undefined {
-    return this.extension.videoProvider;
-  }
-
-  set videoProvider(value: string | null | undefined) {
-    this.extension.videoProvider = value ?? undefined;
-  }
-
-  get streamType(): 'live' | 'vod' | undefined {
-    return this.extension.streamType;
-  }
-
-  set streamType(value: 'live' | 'vod' | null | undefined) {
-    this.extension.streamType = value ?? 'vod';
-  }
-
   get disableProgress(): boolean {
-    return !this.trackProgress;
+    return this.extension.disableProgress ?? false;
   }
 
   set disableProgress(value: boolean) {
-    this.trackProgress = !value;
-  }
-
-  get trackProgress(): boolean {
-    return this.extension.trackProgress ?? true;
-  }
-
-  set trackProgress(value: boolean) {
-    this.extension.trackProgress = value;
+    this.extension.disableProgress = value;
   }
 
   get debug(): boolean {
@@ -95,13 +61,13 @@ export class GoogleAnalyticsExtension extends PlayerExtensionElement<GoogleAnaly
     this.extension.debug = value;
   }
 
-  /** Custom extra parameters to include with every dispatched event. */
-  get customParams(): GoogleAnalyticsProps['customParams'] {
-    return this.extension.customParams;
+  /** Video metadata and custom dimensions reported with GA4 events. */
+  get metadata(): GoogleAnalyticsProps['metadata'] {
+    return this.extension.metadata;
   }
 
-  set customParams(value: GoogleAnalyticsProps['customParams']) {
-    this.extension.customParams = value;
+  set metadata(value: GoogleAnalyticsProps['metadata']) {
+    this.extension.metadata = value;
   }
 
   /** Optional callback to intercept dispatched events. */

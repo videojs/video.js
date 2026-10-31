@@ -29,7 +29,7 @@ export default function App() {
     <Player>
       <Container>
         <Video src="https://example.com/video.mp4" />
-        <GoogleAnalytics videoTitle="My Video" /> {/* [!code focus] */}
+        <GoogleAnalytics metadata={{ video_title: 'My Video' }} /> {/* [!code focus] */}
       </Container>
     </Player>
   );
@@ -47,8 +47,8 @@ pnpm add @videojs/html @videojs/google-analytics
 ```html title="index.html"
 <video-player>
   <media-container>
-    <video src="https://example.com/video.mp4"></video>
-    <google-analytics video-title="My Video"></google-analytics> <!-- [!code focus] -->
+    <video src="https://example.com/video.mp4" title="My Video"></video>
+    <google-analytics></google-analytics> <!-- [!code focus] -->
   </media-container>
 </video-player>
 <script type="module">
@@ -68,8 +68,8 @@ When loading Video.js from a CDN, include the `extensions/google-analytics.js` s
 
 <video-player>
   <media-container>
-    <video src="https://example.com/video.mp4"></video>
-    <google-analytics video-title="My Video"></google-analytics>
+    <video src="https://example.com/video.mp4" title="My Video"></video>
+    <google-analytics></google-analytics>
   </media-container>
 </video-player>
 ```
@@ -92,7 +92,7 @@ window.dataLayer.push({
   video_duration: 120,
   video_percent: 25,
   video_provider: 'video.js',
-  video_stream_type: 'vod',
+  video_stream_type: 'on-demand',
   video_title: 'My Video',
   video_url: 'https://example.com/video.mp4',
   visible: true,
@@ -107,7 +107,7 @@ The extension dispatches standard GA4 Enhanced Measurement video events:
 
 - `video_start`: Dispatched when playback begins for the first time or starts at `currentTime > 0`.
 - `video_progress`: Dispatched when playback crosses 10%, 25%, 50%, and 75% milestones.
-- `video_complete`: Dispatched when the video reaches the end (`ended` event).
+- `video_complete`: Dispatched when the video reaches the end (`ended` event) or loops back to the start.
 
 ### Video.js interaction events
 
@@ -117,7 +117,7 @@ In addition to GA4 Enhanced Measurement events, the extension emits player inter
 - `pause`: Dispatched when playback is paused (not triggered during seeking or when ended).
 - `resume`: Dispatched when playback resumes after a pause.
 - `end`: Dispatched when the video finishes.
-- `seek`: Dispatched when scrubbing or seeking completes.
+- `seek`: Dispatched when scrubbing or seeking completes (bypassed on loop restarts).
 - `mute`: Dispatched when audio is muted or volume drops to 0.
 - `unmute`: Dispatched when audio is unmuted with non-zero volume.
 - `fullscreenEnter`: Dispatched when entering fullscreen.
@@ -125,57 +125,89 @@ In addition to GA4 Enhanced Measurement events, the extension emits player inter
 
 ## Set stream type
 
-By default, `streamType` is `'vod'`. For on-demand videos, duration is known and the extension calculates playback percentage to fire progress milestones at 10%, 25%, 50%, and 75%.
+By default, the stream type is inferred from the media (`media.streamType === 'live' ? 'live' : 'on-demand'`). For on-demand videos, duration is known and the extension calculates playback percentage to fire progress milestones at 10%, 25%, 50%, and 75%.
 
-For live streams, set `streamType` to `'live'`:
+To override or explicitly specify a live stream, pass `video_stream_type: 'live'` in `metadata`:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<GoogleAnalytics videoTitle="Live Stream" streamType="live" />
+<GoogleAnalytics metadata={{ video_title: 'Live Stream', video_stream_type: 'live' }} />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics video-title="Live Stream" stream-type="live"></google-analytics>
+<google-analytics></google-analytics>
+<script type="module">
+  const ga = document.querySelector('google-analytics');
+  ga.metadata = { video_title: 'Live Stream', video_stream_type: 'live' };
+</script>
 ```
 </FrameworkCase>
 
-When `streamType="live"`, milestone progress tracking is bypassed since live streams have unbounded or dynamic duration.
+When the effective stream type is `'live'`, milestone progress tracking is bypassed since live streams have unbounded or dynamic duration.
+
+## Disable progress tracking
+
+By default, the extension tracks progress milestones at 10%, 25%, 50%, and 75% for on-demand playback. To turn off milestone progress tracking, set `disableProgress` (or `disable-progress` in HTML):
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<GoogleAnalytics disableProgress />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<google-analytics disable-progress></google-analytics>
+```
+</FrameworkCase>
 
 ## Set video title
 
 The extension determines the video title reported to GA4 using this precedence:
 
-1. Explicit `videoTitle` prop or `video-title` attribute
+1. `metadata.video_title`
 2. The media element's `title` attribute
 3. The media source URL (`video_url`)
 4. `'Untitled Video'` fallback
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<GoogleAnalytics videoTitle="Keynote Presentation" />
+<GoogleAnalytics metadata={{ video_title: 'Keynote Presentation' }} />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics video-title="Keynote Presentation"></google-analytics>
+<video src="https://example.com/video.mp4" title="Keynote Presentation"></video>
+<google-analytics></google-analytics>
+```
+
+Or programmatically via `metadata`:
+
+```html
+<google-analytics></google-analytics>
+<script type="module">
+  const ga = document.querySelector('google-analytics');
+  ga.metadata = { video_title: 'Keynote Presentation' };
+</script>
 ```
 </FrameworkCase>
 
-## Custom parameters
+## Metadata and custom dimensions
 
-Attach custom dimensions or metadata to every event using `customParams`:
+Pass `metadata` to set official GA4 video parameters (`video_title`, `video_provider`, `video_url`) and custom dimensions (such as Mux Data compatible names `video_id`, `video_series`, `video_producer`, `video_content_type`, or custom dimensions like `custom_1`):
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <GoogleAnalytics
-  videoTitle="Keynote Presentation"
-  customParams={{
-    author: 'Video.js Team',
-    category: 'Conference',
-    content_id: 'conf_2026_01',
+  metadata={{
+    video_title: 'Keynote Presentation',
+    video_series: 'Annual Conference',
+    video_producer: 'Video.js Team',
+    video_id: 'conf_2026_01',
+    custom_1: 'attendee_pro',
   }}
 />
 ```
@@ -183,17 +215,27 @@ Attach custom dimensions or metadata to every event using `customParams`:
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics video-title="Keynote Presentation"></google-analytics>
+<google-analytics></google-analytics>
 <script type="module">
   const ga = document.querySelector('google-analytics');
-  ga.customParams = {
-    author: 'Video.js Team',
-    category: 'Conference',
-    content_id: 'conf_2026_01',
+  ga.metadata = {
+    video_title: 'Keynote Presentation',
+    video_series: 'Annual Conference',
+    video_producer: 'Video.js Team',
+    video_id: 'conf_2026_01',
+    custom_1: 'attendee_pro',
   };
 </script>
 ```
 </FrameworkCase>
+
+### GA4 collection limits
+
+Google Analytics 4 enforces collection limits on event parameters:
+
+- **25 parameters per event**: The extension sends 8 standard parameters (`video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_stream_type`, `video_title`, `video_url`, and `visible`), leaving room for up to 17 custom dimensions in `metadata`.
+- **Parameter names**: Up to 40 characters in length.
+- **String values**: Up to 100 characters in length.
 
 ## Debugging
 
@@ -201,13 +243,13 @@ Enable console logging by setting the `debug` option:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
-<GoogleAnalytics videoTitle="My Video" debug />
+<GoogleAnalytics debug />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics video-title="My Video" debug></google-analytics>
+<google-analytics debug></google-analytics>
 ```
 </FrameworkCase>
 
@@ -222,7 +264,6 @@ You can also provide an `onEvent` callback to intercept dispatched events progra
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <GoogleAnalytics
-  videoTitle="My Video"
   onEvent={(event, params) => {
     console.log('Telemetry event:', event, params);
   }}
@@ -232,7 +273,7 @@ You can also provide an `onEvent` callback to intercept dispatched events progra
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<google-analytics video-title="My Video"></google-analytics>
+<google-analytics></google-analytics>
 <script type="module">
   const ga = document.querySelector('google-analytics');
   ga.onEvent = (event, params) => {

@@ -35,30 +35,32 @@ Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension
 <FrameworkCase frameworks={["react"]}>
 | Prop | Type | Description |
 |---|---|---|
-| `streamType` | `'live' \| 'vod'` | Stream type reported in parameters. Defaults to `'vod'` |
-| `videoTitle` | `string` | Explicit title for the video. Falls back to media title or current URL if omitted |
-| `videoProvider` | `string` | Video provider reported in parameters. Defaults to `'video.js'` |
+| `metadata` | `GoogleAnalyticsMetadata` | Video metadata and custom dimensions reported with GA4 events |
 | `dataLayerName` | `string` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
-| `trackProgress` | `boolean` | Tracks 10%, 25%, 50%, and 75% progress milestones. Defaults to `true` |
+| `disableProgress` | `boolean` | Disables 10%, 25%, 50%, and 75% progress milestones tracking. Defaults to `false` |
 | `debug` | `boolean` | Logs telemetry events to the console. Defaults to `false` |
-| `customParams` | `Record<string, string \| number \| boolean>` | Custom extra parameters to include with every dispatched event |
 | `onEvent` | `(event: string, params: object) => void` | Callback to intercept dispatched events |
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
 | Attribute | Property | Description |
 |---|---|---|
-| `stream-type` | `streamType` | Stream type reported in parameters. Defaults to `'vod'` |
-| `video-title` | `videoTitle` | Explicit title for the video. Falls back to media title or current URL if omitted |
-| `video-provider` | `videoProvider` | Video provider reported in parameters. Defaults to `'video.js'` |
+| — | `metadata` | Video metadata and custom dimensions reported with GA4 events |
 | `data-layer-name` | `dataLayerName` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
 | `disable-progress` | `disableProgress` | Disables 10%, 25%, 50%, and 75% progress milestones tracking |
 | `debug` | `debug` | Logs telemetry events to the console. Defaults to `false` |
-| — | `customParams` | Custom extra parameters to include with every dispatched event |
 | — | `onEvent` | Callback to intercept dispatched events |
 
-`customParams` and `onEvent` take non-primitive values, so they're properties only, with no matching attribute. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
+`metadata` and `onEvent` take non-primitive values, so they're properties only, with no matching attribute. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
 </FrameworkCase>
+
+## Collection limits
+
+Google Analytics 4 enforces collection limits on event parameters:
+
+- **25 parameters per event**: The extension sends 8 standard parameters (`video_current_time`, `video_duration`, `video_percent`, `video_provider`, `video_stream_type`, `video_title`, `video_url`, and `visible`), leaving room for up to 17 custom dimensions in `metadata`.
+- **Parameter names**: Up to 40 characters in length.
+- **String values**: Up to 100 characters in length.
 
 ## See also
 

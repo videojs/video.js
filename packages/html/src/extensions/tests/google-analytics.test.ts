@@ -45,46 +45,38 @@ describe('GoogleAnalyticsExtension', () => {
     const { provider, el } = setup();
 
     el.setAttribute('data-layer-name', 'customDataLayer');
-    el.setAttribute('video-title', 'Sample Video');
-    el.setAttribute('video-provider', 'custom-provider');
-    el.setAttribute('stream-type', 'live');
     el.setAttribute('debug', '');
     el.setAttribute('disable-progress', '');
 
     const extension = provider.extensions.get(GoogleAnalyticsExtensionBase)!;
 
     expect(extension.dataLayerName).toBe('customDataLayer');
-    expect(extension.videoTitle).toBe('Sample Video');
-    expect(extension.videoProvider).toBe('custom-provider');
-    expect(extension.streamType).toBe('live');
     expect(extension.debug).toBe(true);
     expect(el.disableProgress).toBe(true);
-    expect(el.trackProgress).toBe(false);
-    expect(extension.trackProgress).toBe(false);
+    expect(extension.disableProgress).toBe(true);
 
     el.removeAttribute('disable-progress');
     expect(el.disableProgress).toBe(false);
-    expect(el.trackProgress).toBe(true);
-    expect(extension.trackProgress).toBe(true);
+    expect(extension.disableProgress).toBe(false);
 
-    el.trackProgress = false;
+    el.disableProgress = true;
     expect(el.disableProgress).toBe(true);
-    expect(extension.trackProgress).toBe(false);
+    expect(extension.disableProgress).toBe(true);
   });
 
-  it('forwards customParams and onEvent properties to the extension', () => {
+  it('forwards metadata and onEvent properties to the extension', () => {
     const { provider, el } = setup();
-    const customParams = { author: 'Video.js' };
+    const metadata = { video_title: 'Sample Video', video_id: 'sample-123' };
     const onEvent = () => {};
 
-    el.customParams = customParams;
+    el.metadata = metadata;
     el.onEvent = onEvent;
 
     const extension = provider.extensions.get(GoogleAnalyticsExtensionBase)!;
 
-    expect(extension.customParams).toEqual(customParams);
+    expect(extension.metadata).toEqual(metadata);
     expect(extension.onEvent).toBe(onEvent);
-    expect(el.customParams).toEqual(customParams);
+    expect(el.metadata).toEqual(metadata);
     expect(el.onEvent).toBe(onEvent);
   });
 });

@@ -1,10 +1,16 @@
 'use client';
 
-import { GoogleAnalyticsExtension, type GoogleAnalyticsProps } from '@videojs/google-analytics';
+import {
+  GoogleAnalyticsExtension,
+  type GoogleAnalyticsMetadata,
+  type GoogleAnalyticsProps as GoogleAnalyticsPropsBase,
+} from '@videojs/google-analytics';
 import type { ReactNode } from 'react';
 
 import { usePlayerExtension } from '../../utils/use-player-extension';
 import { useSyncProps } from '../../utils/use-sync-props';
+
+export type GoogleAnalyticsProps = GoogleAnalyticsPropsBase;
 
 /**
  * Adds the Google Analytics 4 (GA4) telemetry extension to the surrounding player.
@@ -16,7 +22,7 @@ import { useSyncProps } from '../../utils/use-sync-props';
  *   ```tsx
  *   <Player>
  *     <Video src="https://example.com/video.mp4" />
- *     <GoogleAnalytics videoTitle="My Video" />
+ *     <GoogleAnalytics metadata={{ video_title: 'My Video' }} />
  *   </Player>;
  *   ```;
  */
@@ -30,4 +36,5 @@ export function GoogleAnalytics(props: GoogleAnalyticsProps): ReactNode {
 
 export namespace GoogleAnalytics {
   export type Props = GoogleAnalyticsProps;
+  export type Metadata = GoogleAnalyticsMetadata;
 }

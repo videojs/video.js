@@ -16,24 +16,17 @@ describe('GoogleAnalytics', () => {
 
   it('syncs props to the extension', () => {
     const { extensions, Wrapper } = createPlayerWrapper();
+    const metadata = { video_title: 'React Video', video_provider: 'custom-provider' };
 
-    render(
-      <GoogleAnalytics
-        dataLayerName="customLayer"
-        videoTitle="React Video"
-        videoProvider="custom-provider"
-        trackProgress={false}
-        debug
-      />,
-      { wrapper: Wrapper }
-    );
+    render(<GoogleAnalytics dataLayerName="customLayer" metadata={metadata} disableProgress debug />, {
+      wrapper: Wrapper,
+    });
 
     const extension = extensions.get(GoogleAnalyticsExtension)!;
 
     expect(extension.dataLayerName).toBe('customLayer');
-    expect(extension.videoTitle).toBe('React Video');
-    expect(extension.videoProvider).toBe('custom-provider');
-    expect(extension.trackProgress).toBe(false);
+    expect(extension.metadata).toEqual(metadata);
+    expect(extension.disableProgress).toBe(true);
     expect(extension.debug).toBe(true);
   });
 

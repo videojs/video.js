@@ -25,28 +25,49 @@ export interface GoogleAnalyticsEventParams {
   video_duration: number;
   video_percent: number;
   video_provider: string;
-  video_stream_type: 'live' | 'vod' | string;
+  video_stream_type: 'live' | 'on-demand' | string;
   video_title: string;
   video_url: string;
   visible?: boolean;
   [key: string]: GoogleAnalyticsParamValue | undefined;
 }
 
+export interface GoogleAnalyticsMetadata {
+  // GA4 official (overrides; otherwise derived)
+  video_title?: string;
+  video_provider?: string;
+  video_url?: string;
+
+  // Mux Data names (GA4 custom dimensions)
+  video_id?: string;
+  video_series?: string;
+  video_producer?: string;
+  video_content_type?: string;
+  video_language_code?: string;
+  video_variant_id?: string;
+  video_variant_name?: string;
+  video_stream_type?: 'on-demand' | 'live'; // default: media.streamType
+  video_cdn?: string;
+  video_brand?: string;
+  video_affiliate?: string;
+  sub_property_id?: string;
+  experiment_name?: string;
+  page_type?: string;
+  player_name?: string;
+  custom_1?: string; // ...
+
+  [key: string]: string | number | boolean | undefined;
+}
+
 export type GoogleAnalyticsProps = {
   /** The name of the dataLayer array on window (default: `'dataLayer'`). */
   dataLayerName?: string | undefined;
-  /** Explicit title for the video. Falls back to media title or current URL if omitted. */
-  videoTitle?: string | undefined;
-  /** Video provider reported in parameters (default: `'video.js'`). */
-  videoProvider?: string | undefined;
-  /** Stream type reported in parameters (`'live'` or `'vod'`, default: `'vod'`). */
-  streamType?: 'live' | 'vod' | undefined;
-  /** Whether to track 10%, 25%, 50%, and 75% progress milestones (default: `true`). */
-  trackProgress?: boolean | undefined;
+  /** Video metadata and custom dimensions reported with GA4 events. */
+  metadata?: GoogleAnalyticsMetadata | undefined;
+  /** Whether to disable tracking 10%, 25%, 50%, and 75% progress milestones (default: `false`). */
+  disableProgress?: boolean | undefined;
   /** Whether to log telemetry events to the console (default: `false`). */
   debug?: boolean | undefined;
-  /** Custom extra parameters to include with every dispatched event. */
-  customParams?: Record<string, GoogleAnalyticsParamValue> | undefined;
   /** Optional callback to intercept dispatched events. */
   onEvent?: ((event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void) | undefined;
 };
@@ -87,27 +108,22 @@ function isElementFullscreen(
  * Dispatches GA4 enhanced measurement events (`video_start`, `video_progress`, `video_complete`) alongside interaction
  * events (`play`, `pause`, `resume`, `end`, `seek`, `mute`, `unmute`, `fullscreenEnter`, `fullscreenExit`) to
  * `window.dataLayer` (or `window.gtag`).
+ *
+ * @internal
  */
 export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalyticsProps {
   static readonly defaultProps: GoogleAnalyticsProps = {
     dataLayerName: 'dataLayer',
-    videoTitle: undefined,
-    videoProvider: 'video.js',
-    streamType: 'vod',
-    trackProgress: true,
+    metadata: undefined,
+    disableProgress: false,
     debug: false,
-    customParams: undefined,
     onEvent: undefined,
   };
 
   dataLayerName: string | undefined = GoogleAnalyticsExtension.defaultProps.dataLayerName;
-  videoTitle: string | undefined = GoogleAnalyticsExtension.defaultProps.videoTitle;
-  videoProvider: string | undefined = GoogleAnalyticsExtension.defaultProps.videoProvider;
-  streamType: 'live' | 'vod' | undefined = 'vod';
-  trackProgress: boolean | undefined = GoogleAnalyticsExtension.defaultProps.trackProgress;
+  metadata: GoogleAnalyticsMetadata | undefined = GoogleAnalyticsExtension.defaultProps.metadata;
+  disableProgress: boolean | undefined = GoogleAnalyticsExtension.defaultProps.disableProgress;
   debug: boolean | undefined = GoogleAnalyticsExtension.defaultProps.debug;
-  customParams: Record<string, GoogleAnalyticsParamValue> | undefined =
-    GoogleAnalyticsExtension.defaultProps.customParams;
   onEvent: ((event: GoogleAnalyticsEventName, params: GoogleAnalyticsEventParams) => void) | undefined =
     GoogleAnalyticsExtension.defaultProps.onEvent;
 
@@ -197,18 +213,18 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#maxTime = 0;
   };
 
-  #checkLoopRestart = (): void => {
+  #checkLoopRestart = (): boolean => {
     const el = this.#targetElement;
-    if (isNil(el)) return;
+    if (isNil(el)) return false;
 
     // SAFETY: Probing loop property on custom media element host.
     const isLoop = Boolean(
       el.loop || (this.#media && 'loop' in this.#media && (this.#media as { loop?: boolean }).loop)
     );
-    if (!isLoop) return;
+    if (!isLoop) return false;
 
     const duration = el.duration;
-    if (!isNumber(duration) || duration <= 0) return;
+    if (!isNumber(duration) || duration <= 0) return false;
 
     const isNearEnd = this.#maxTime >= duration * 0.7;
     const isRestartAtStart = el.currentTime <= Math.max(1, duration * 0.05);
@@ -217,12 +233,13 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       this.#hasEnded = false;
       this.#firedMilestones.clear();
       this.#maxTime = el.currentTime;
+      return true;
     }
+
+    return false;
   };
 
   #handlePlay = (): void => {
-    this.#checkLoopRestart();
-
     if (this.#hasEnded) {
       this.#hasEnded = false;
       this.#firedMilestones.clear();
@@ -250,8 +267,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const el = this.#targetElement;
     if (isNil(el)) return;
 
-    this.#checkLoopRestart();
-
     const duration = el.duration;
     const currentTime = el.currentTime;
 
@@ -264,9 +279,9 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       this.#sendEvent('video_start', 0);
     }
 
-    if (this.streamType === 'live') return;
+    if (this.#effectiveStreamType === 'live') return;
 
-    if (!this.trackProgress || !isNumber(duration) || duration <= 0) return;
+    if (this.disableProgress || !isNumber(duration) || duration <= 0) return;
 
     const percent = Math.floor((currentTime / duration) * 100);
 
@@ -304,7 +319,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const el = this.#targetElement;
     if (isNil(el)) return;
 
-    this.#checkLoopRestart();
+    if (this.#checkLoopRestart()) {
+      this.#sendEvent('video_complete', 100);
+      this.#sendEvent('video_start', 0);
+      return;
+    }
 
     if (el.currentTime > this.#maxTime) {
       this.#maxTime = el.currentTime;
@@ -360,8 +379,28 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     return this.#media ? getMediaElement(this.#media) : null;
   }
 
-  #resolveTitle(): string {
-    if (this.videoTitle) return this.videoTitle;
+  get #effectiveStreamType(): 'live' | 'on-demand' | string {
+    if (this.metadata?.video_stream_type) return this.metadata.video_stream_type;
+
+    // SAFETY: Probing streamType property on media capability or custom element host.
+    if (this.#media && 'streamType' in this.#media && (this.#media as { streamType?: string }).streamType === 'live') {
+      return 'live';
+    }
+
+    // SAFETY: Probing streamType property on target element host.
+    if (
+      this.#targetElement &&
+      'streamType' in this.#targetElement &&
+      (this.#targetElement as { streamType?: string }).streamType === 'live'
+    ) {
+      return 'live';
+    }
+
+    return 'on-demand';
+  }
+
+  #resolveTitle(videoTitle = this.metadata?.video_title): string {
+    if (videoTitle) return videoTitle;
 
     const el = this.#targetElement;
     if (!isNil(el) && el.title) return el.title;
@@ -369,7 +408,9 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     return this.#resolveUrl() || 'Untitled Video';
   }
 
-  #resolveUrl(): string {
+  #resolveUrl(videoUrl = this.metadata?.video_url): string {
+    if (videoUrl) return videoUrl;
+
     const media = this.#media;
     if (isNil(media)) return '';
 
@@ -388,16 +429,18 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const duration = el && isNumber(el.duration) && !Number.isNaN(el.duration) ? Math.round(el.duration) : 0;
     const currentTime = el && isNumber(el.currentTime) ? Math.round(el.currentTime) : 0;
 
+    const { video_title, video_provider, video_url, video_stream_type, ...customDimensions } = this.metadata ?? {};
+
     const params: GoogleAnalyticsEventParams = {
       video_current_time: currentTime,
       video_duration: duration,
       video_percent: percent,
-      video_provider: this.videoProvider ?? 'video.js',
-      video_stream_type: this.streamType ?? 'vod',
-      video_title: this.#resolveTitle(),
-      video_url: this.#resolveUrl(),
+      video_provider: video_provider ?? 'video.js',
+      video_stream_type: video_stream_type ?? this.#effectiveStreamType,
+      video_title: this.#resolveTitle(video_title),
+      video_url: this.#resolveUrl(video_url),
       visible: !document.hidden,
-      ...this.customParams,
+      ...customDimensions,
     };
 
     if (this.debug) {
@@ -408,15 +451,13 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
 
     const dataLayerKey = this.dataLayerName ?? 'dataLayer';
     // SAFETY: Accessing configurable dataLayer array on window.
-    const win = window as { [key: string]: unknown[] | undefined };
+    const win = window as unknown as Record<string, unknown[] | undefined>;
     const targetLayer = win[dataLayerKey];
 
     if (Array.isArray(targetLayer)) {
       targetLayer.push({ event, ...params });
     } else {
-      const newLayer: unknown[] = [{ event, ...params }];
-
-      win[dataLayerKey] = newLayer;
+      win[dataLayerKey] = [{ event, ...params }];
     }
 
     if (isFunction(window.gtag)) {

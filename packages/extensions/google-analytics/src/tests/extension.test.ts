@@ -16,6 +16,7 @@ interface TestDataLayerEvent {
   video_title?: string;
   video_url?: string;
   visible?: boolean;
+  [key: string]: string | number | boolean | undefined;
 }
 
 function getDataLayer(): TestDataLayerEvent[] {
@@ -56,7 +57,7 @@ describe('GoogleAnalyticsExtension', () => {
 
     expect(events).toContain('play');
     expect(events).toContain('video_start');
-    expect(getDataLayer()[0]?.video_stream_type).toBe('vod');
+    expect(getDataLayer()[0]?.video_stream_type).toBe('on-demand');
   });
 
   it('tracks pause and resume on subsequent plays', () => {
@@ -297,7 +298,7 @@ describe('GoogleAnalyticsExtension', () => {
   });
 
   it('skips video_progress milestones when streamType is live', () => {
-    const extension = new GoogleAnalyticsExtension({ streamType: 'live' });
+    const extension = new GoogleAnalyticsExtension({ metadata: { video_stream_type: 'live' } });
 
     extension.attach({ media: video, container: mockContainer });
     video.dispatchEvent(new Event('play'));
@@ -314,13 +315,27 @@ describe('GoogleAnalyticsExtension', () => {
     expect(progressEvents).toHaveLength(0);
   });
 
-  it('resets milestones on loop restart', () => {
+  it('skips video_progress milestones when disableProgress is true', () => {
+    const extension = new GoogleAnalyticsExtension({ disableProgress: true });
+
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    Object.defineProperty(video, 'currentTime', { value: 50 });
+    video.dispatchEvent(new Event('timeupdate'));
+
+    const progressEvents = getDataLayer().filter((e) => e.event === 'video_progress');
+
+    expect(progressEvents).toHaveLength(0);
+  });
+
+  it('handles looped playback on seeked: skips seek, dispatches video_complete and video_start, and resets milestones', () => {
     const extension = new GoogleAnalyticsExtension();
 
     extension.attach({ media: video, container: mockContainer });
     video.dispatchEvent(new Event('play'));
 
-    // Fire milestones
+    // Fire milestones up to 75%
     Object.defineProperty(video, 'currentTime', { value: 75 });
     video.dispatchEvent(new Event('timeupdate'));
 
@@ -328,20 +343,34 @@ describe('GoogleAnalyticsExtension', () => {
 
     expect(initialProgress.map((e) => e.video_percent)).toEqual([10, 25, 50, 75]);
 
+    // Clear dataLayer to isolate events on loop restart
+    window.dataLayer = [];
+
     // Simulate loop restart
     Object.defineProperty(video, 'loop', { value: true, configurable: true });
     Object.defineProperty(video, 'ended', { value: false, configurable: true });
     Object.defineProperty(video, 'currentTime', { value: 0 });
     video.dispatchEvent(new Event('seeked'));
 
+    const loopEvents = getDataLayer().map((e) => e.event);
+
+    expect(loopEvents).not.toContain('seek');
+    expect(loopEvents).toEqual(['video_complete', 'video_start']);
+
+    const completeEvent = getDataLayer().find((e) => e.event === 'video_complete');
+    const startEvent = getDataLayer().find((e) => e.event === 'video_start');
+
+    expect(completeEvent?.video_percent).toBe(100);
+    expect(startEvent?.video_percent).toBe(0);
+
     // Advance through 50% again
     Object.defineProperty(video, 'currentTime', { value: 50 });
     video.dispatchEvent(new Event('timeupdate'));
 
-    const allProgress = getDataLayer().filter((e) => e.event === 'video_progress');
-    const percents = allProgress.map((e) => e.video_percent);
+    const newProgress = getDataLayer().filter((e) => e.event === 'video_progress');
+    const percents = newProgress.map((e) => e.video_percent);
 
-    expect(percents).toEqual([10, 25, 50, 75, 10, 25, 50]);
+    expect(percents).toEqual([10, 25, 50]);
   });
 
   it('does not reset milestones on user seek to start when loop is false', () => {
@@ -368,7 +397,32 @@ describe('GoogleAnalyticsExtension', () => {
     expect(percents).toEqual([10, 25, 50, 75]);
   });
 
-  it('reports default video_stream_type as vod', () => {
+  it('uses metadata to override video_title, video_provider, video_url, and add custom dimensions', () => {
+    const extension = new GoogleAnalyticsExtension({
+      metadata: {
+        video_title: 'Custom Title',
+        video_provider: 'Custom Provider',
+        video_url: 'https://example.com/custom.mp4',
+        video_id: 'vid-123',
+        video_series: 'Season 1',
+        custom_dimension: 'test-value',
+      },
+    });
+
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    const playEvent = getDataLayer().find((e) => e.event === 'play');
+
+    expect(playEvent?.video_title).toBe('Custom Title');
+    expect(playEvent?.video_provider).toBe('Custom Provider');
+    expect(playEvent?.video_url).toBe('https://example.com/custom.mp4');
+    expect(playEvent?.video_id).toBe('vid-123');
+    expect(playEvent?.video_series).toBe('Season 1');
+    expect(playEvent?.custom_dimension).toBe('test-value');
+  });
+
+  it('reports default video_stream_type as on-demand', () => {
     const extension = new GoogleAnalyticsExtension();
 
     extension.attach({ media: video, container: mockContainer });
@@ -376,11 +430,11 @@ describe('GoogleAnalyticsExtension', () => {
 
     const playEvent = getDataLayer().find((e) => e.event === 'play');
 
-    expect(playEvent?.video_stream_type).toBe('vod');
+    expect(playEvent?.video_stream_type).toBe('on-demand');
   });
 
-  it('reports custom video_stream_type when configured', () => {
-    const extension = new GoogleAnalyticsExtension({ streamType: 'live' });
+  it('reports custom video_stream_type when configured in metadata', () => {
+    const extension = new GoogleAnalyticsExtension({ metadata: { video_stream_type: 'live' } });
 
     extension.attach({ media: video, container: mockContainer });
     video.dispatchEvent(new Event('play'));
@@ -390,11 +444,23 @@ describe('GoogleAnalyticsExtension', () => {
     expect(playEvent?.video_stream_type).toBe('live');
   });
 
-  it('updates video_stream_type when property changes', () => {
-    const extension = new GoogleAnalyticsExtension({ streamType: 'vod' });
+  it('infers live video_stream_type from media.streamType', () => {
+    const extension = new GoogleAnalyticsExtension();
+
+    Object.defineProperty(video, 'streamType', { value: 'live', configurable: true });
+    extension.attach({ media: video, container: mockContainer });
+    video.dispatchEvent(new Event('play'));
+
+    const playEvent = getDataLayer().find((e) => e.event === 'play');
+
+    expect(playEvent?.video_stream_type).toBe('live');
+  });
+
+  it('updates video_stream_type when metadata property changes', () => {
+    const extension = new GoogleAnalyticsExtension();
 
     extension.attach({ media: video, container: mockContainer });
-    extension.streamType = 'live';
+    extension.metadata = { video_stream_type: 'live' };
     video.dispatchEvent(new Event('play'));
 
     const playEvent = getDataLayer().find((e) => e.event === 'play');
@@ -404,7 +470,7 @@ describe('GoogleAnalyticsExtension', () => {
 
   it('calls onEvent callback for interaction events', () => {
     const onEvent = vi.fn();
-    const extension = new GoogleAnalyticsExtension({ onEvent, streamType: 'live' });
+    const extension = new GoogleAnalyticsExtension({ onEvent, metadata: { video_stream_type: 'live' } });
 
     extension.attach({ media: video, container: mockContainer });
 
