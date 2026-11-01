@@ -44,9 +44,9 @@ export function MuxData(props: MuxDataProps): ReactNode {
 
   useSyncProps(extension, rest, MuxDataExtension.defaultProps);
 
-  // Media components sync `src` during render, and a transition can yield between this component and the media.
-  // Applying metadata on commit, after every component has rendered, keeps metadata that arrives with a new source
-  // off the outgoing view. It still lands before the player registers the extension, so the first view carries it.
+  // Media components write a new `src` when they commit, so applying metadata on commit too keeps metadata that
+  // arrives with a new source off the outgoing view, even when a transition yields between this component and the
+  // media. It still lands before the player registers the extension, so the first view carries it.
   useLayoutEffect(() => {
     if (extension.metadata !== metadata) extension.metadata = metadata;
   });
