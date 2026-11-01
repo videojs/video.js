@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ABR lab logger</title>
+    <style>
+      body {
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+        margin: 2rem auto;
+        max-width: 40rem;
+        padding: 0 1rem;
+      }
+      label {
+        display: block;
+        margin: 0.5rem 0;
+      }
+      input[type='url'] {
+        width: 100%;
+      }
+      output {
+        display: block;
+        margin-top: 1rem;
+        font-family: ui-monospace, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>ABR lab logger</h1>
+    <p>Fetches real segments on a player-shaped, randomized schedule and records every transfer. No video plays.</p>
+    <form id="controls">
+      <label>Multivariant playlist <input name="src" type="url" required /></label>
+      <label>Minutes <input name="minutes" type="number" min="1" /></label>
+      <label><input name="audio" type="checkbox" /> Fetch audio alongside video (concurrency)</label>
+      <button type="submit">Start</button>
+      <button id="stop" type="button">Stop</button>
+      <button id="download" type="button">Download JSONL</button>
+    </form>
+    <output id="status">Idle.</output>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
