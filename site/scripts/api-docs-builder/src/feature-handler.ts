@@ -278,8 +278,24 @@ function literalConstants(file: SourceFile): Map<string, string> {
 
     for (const item of declaration.declarations) {
       const name = staticName(item.id);
-      const value = item.init ? literalValue(item.init) : undefined;
-      if (!name || value === undefined) continue;
+      if (!name || !item.init) continue;
+
+      const init = unwrapExpression(item.init);
+
+      // A list of literals reads better as itself than as the constant's name.
+      const isLiteralList =
+        init.type === 'ArrayExpression' &&
+        init.elements.every(
+          (element) => element !== null && element.type !== 'SpreadElement' && literalValue(element) !== undefined
+        );
+
+      if (isLiteralList) {
+        result.set(name, expressionText(file, init));
+        continue;
+      }
+
+      const value = literalValue(item.init);
+      if (value === undefined) continue;
 
       result.set(name, typeof value === 'string' ? `'${value.replaceAll("'", "\\'")}'` : String(value));
     }

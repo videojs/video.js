@@ -100,6 +100,7 @@ export default {
     speed: 'السرعة',
     captions: 'الترجمة والشرح',
     playbackRate: 'سرعة التشغيل',
+    customRate: 'مخصّصة، {rate}',
     back: 'رجوع',
     off: 'إيقاف',
     auto: 'تلقائي',
