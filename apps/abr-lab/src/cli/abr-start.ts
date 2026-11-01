@@ -31,8 +31,24 @@ interface World {
   populationBps: number;
   /** True mean capacity over the first 10 s of this session. */
   perfectBps: number;
+  /** First-request time to first byte of the stored session: on this network, or on the one the device left. */
+  storedTtfbMs: number;
+  movedTtfbMs: number;
   jitterMs: () => number;
 }
+
+/** Accept a stored estimate when the first request's TTFB is within 2× of the stored session's. */
+const RTT_TOLERANCE = 2;
+
+const gated = (w: World, moved: boolean, withPlaylist: boolean): StartingEstimate => ({
+  kind: 'gated',
+  storedBps: moved ? w.movedBps : w.lastSessionBps,
+  storedFirstTtfbMs: moved ? w.movedTtfbMs : w.storedTtfbMs,
+  tolerance: RTT_TOLERANCE,
+  withPlaylist,
+  jitterMs: w.jitterMs,
+  fallbackBps: INITIAL_BANDWIDTH_BPS,
+});
 
 const VARIANTS: Array<{ name: string; start: (world: World) => StartingEstimate }> = [
   { name: 'default 5 Mbit/s', start: () => ({ kind: 'fixed', bps: INITIAL_BANDWIDTH_BPS }) },
@@ -52,12 +68,19 @@ const VARIANTS: Array<{ name: string; start: (world: World) => StartingEstimate 
     start: (w) => ({ kind: 'playlist', jitterMs: w.jitterMs, fallbackBps: w.netInfoBps, blend: true }),
   },
   { name: 'population (Mux Data)', start: (w) => ({ kind: 'fixed', bps: w.populationBps }) },
+  { name: 'last, RTT-gated (same net)', start: (w) => gated(w, false, false) },
+  { name: 'last, RTT-gated (moved net)', start: (w) => gated(w, true, false) },
+  { name: 'last+playlist, gated (same)', start: (w) => gated(w, false, true) },
+  { name: 'last+playlist, gated (moved)', start: (w) => gated(w, true, true) },
   { name: 'perfect start', start: (w) => ({ kind: 'fixed', bps: w.perfectBps }) },
 ];
 
 for (const player of PLAYERS) {
   for (const rule of [{ kind: 'throughput', safety: 1 }, { kind: 'mpc' }] satisfies AbrRule[]) {
-    const results = new Map<string, Array<{ network: string; result: SessionResult; ratio: number }>>();
+    const results = new Map<
+      string,
+      Array<{ network: string; result: SessionResult; ratio: number; accepted: boolean | undefined }>
+    >();
 
     for (const network of NETWORKS) {
       for (const behavior of Object.keys(SERVER_BEHAVIORS)) {
@@ -77,6 +100,9 @@ for (const player of PLAYERS) {
               ) * 25_000,
             populationBps: network.meanMbps * 1e6 * Math.exp(0.6 * gaussian(random)),
             perfectBps: 1000 * windowMean(inputs.trace, 0, 10_000),
+            // A first request pays the TCP and TLS handshakes and the request: three round trips, plus server time.
+            storedTtfbMs: 3 * inputs.history.latencyAt(0) + SERVER_BEHAVIORS[behavior]!.responseMs,
+            movedTtfbMs: 3 * elsewhere.history.latencyAt(0) + SERVER_BEHAVIORS[behavior]!.responseMs,
             jitterMs: () => 2 * gaussian(random),
           };
 
@@ -85,8 +111,12 @@ for (const player of PLAYERS) {
             const result = runSession(inputs, predictor, rule);
 
             const ratio = (predictor.firstEstimateBps() ?? Number.NaN) / world.perfectBps;
+            const accepted = predictor.gateAccepted();
 
-            results.set(variant.name, [...(results.get(variant.name) ?? []), { network: network.name, result, ratio }]);
+            results.set(variant.name, [
+              ...(results.get(variant.name) ?? []),
+              { network: network.name, result, ratio, accepted },
+            ]);
           }
         }
       }
@@ -99,6 +129,7 @@ for (const player of PLAYERS) {
       table(
         [
           'starting estimate',
+          'gate pass',
           'est/true p50',
           '|ln err| p50',
           'startup p50 ms',
@@ -111,9 +142,11 @@ for (const player of PLAYERS) {
         VARIANTS.map(({ name }) => {
           const rows = results.get(name)!.map((r) => r.result);
           const ratios = results.get(name)!.map((r) => r.ratio);
+          const gates = results.get(name)!.flatMap((r) => (r.accepted === undefined ? [] : [r.accepted]));
 
           return [
             name,
+            gates.length === 0 ? '-' : `${Math.round((100 * gates.filter(Boolean).length) / gates.length)}%`,
             median(ratios).toFixed(2),
             median(ratios.map((r) => Math.abs(Math.log(r)))).toFixed(2),
             median(rows.map((r) => r.startupMs)).toFixed(0),
