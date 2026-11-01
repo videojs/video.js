@@ -100,6 +100,7 @@ export default {
     speed: 'स्पीड',
     captions: 'कैप्शन',
     playbackRate: 'प्लेबैक दर',
+    customRate: 'कस्टम, {rate}',
     back: 'वापस',
     off: 'बंद',
     auto: 'ऑटो',

@@ -101,6 +101,7 @@ export default {
     speed: 'Rýchlosť',
     captions: 'Titulky',
     playbackRate: 'Rýchlosť prehrávania',
+    customRate: 'Vlastná, {rate}',
     back: 'Späť',
     off: 'Vypnuté',
     auto: 'Automaticky',

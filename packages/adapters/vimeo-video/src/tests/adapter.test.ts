@@ -668,6 +668,10 @@ describe('VimeoAdapter', () => {
     expect(player.pause).toHaveBeenCalledTimes(1);
   });
 
+  it('reports the rates Vimeo plays', () => {
+    expect(new VimeoAdapter().playbackRateRange).toEqual({ min: 0.0625, max: 2 });
+  });
+
   it('forwards setters to the player after load', async () => {
     const media = new VimeoAdapter();
     const { player } = await attachAndLoad(media);
