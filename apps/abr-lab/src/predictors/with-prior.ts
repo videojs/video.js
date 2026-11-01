@@ -23,7 +23,29 @@ export type StartingEstimate =
       withPlaylist: boolean;
       jitterMs: () => number;
       fallbackBps: number;
+    }
+  /**
+   * The first burst of the last playlist, timed chunk by chunk as a `ReadableStream` reader would see it: a measurement
+   * when the burst spans at least `MIN_BURST_MS`, otherwise a lower bound. Lab-measured: bursts resolve on slow links
+   * when the server sends small TLS records early, and collapse into one chunk on fast links.
+   */
+  | { kind: 'stream'; jitterMs: () => number; fallbackBps: number }
+  /**
+   * The recommended policy: a stored estimate that passed the RTT check is blended with a resolved burst, raised to a
+   * lower bound, or, with no playlist evidence, capped at `capBps`; a rejected one is ignored.
+   */
+  | {
+      kind: 'policy';
+      storedBps: number;
+      storedFirstTtfbMs: number;
+      tolerance: number;
+      jitterMs: () => number;
+      fallbackBps: number;
+      capBps: number;
     };
+
+/** Below this, a burst arrives within a chunk or two and its timing is noise (lab: 11.6 kB at 20 Mbit/s collapsed). */
+const MIN_BURST_MS = 5;
 
 /**
  * Wraps a predictor so it forecasts from `start` until it has observed one segment that counts as bandwidth evidence,
@@ -37,11 +59,13 @@ export function withStartingEstimate(
   const inner = create();
   let measuredSegment = false;
   let playlistBps: number | undefined;
+  /** The last playlist's first burst: a rate, and whether it is only a lower bound. */
+  let burst: { bps: number; lowerBound: boolean } | undefined;
   let firstTtfbMs: number | undefined;
   let firstBps: number | undefined;
 
   const accepted = () => {
-    if (start.kind !== 'gated' || firstTtfbMs === undefined) return undefined;
+    if ((start.kind !== 'gated' && start.kind !== 'policy') || firstTtfbMs === undefined) return undefined;
 
     const ratio = firstTtfbMs / start.storedFirstTtfbMs;
 
@@ -55,6 +79,18 @@ export function withStartingEstimate(
       if (playlistBps === undefined) return start.fallbackBps;
 
       return start.blend ? Math.sqrt(playlistBps * start.fallbackBps) : playlistBps;
+    }
+
+    if (start.kind === 'stream') return burst?.bps ?? start.fallbackBps;
+
+    if (start.kind === 'policy') {
+      const stored = accepted() ? start.storedBps : undefined;
+
+      if (burst && !burst.lowerBound) return stored === undefined ? burst.bps : Math.sqrt(burst.bps * stored);
+
+      if (burst) return Math.max(burst.bps, stored ?? 0);
+
+      return stored === undefined ? start.fallbackBps : Math.min(stored, start.capBps);
     }
 
     const measured = start.withPlaylist ? playlistBps : undefined;
@@ -81,6 +117,15 @@ export function withStartingEstimate(
         const bodyMs = Math.max(1, end - firstByte + start.jitterMs());
 
         playlistBps = (8000 * record.bytes) / bodyMs;
+
+        // The first chunk is the first burst: its bytes over the time from headers to its last byte.
+        const [arrival, bytes] = record.chunks[0] ?? [end, record.bytes];
+        const spanMs = arrival - firstByte + start.jitterMs();
+
+        burst =
+          spanMs >= MIN_BURST_MS
+            ? { bps: (8000 * bytes) / spanMs, lowerBound: false }
+            : { bps: (8000 * bytes) / MIN_BURST_MS, lowerBound: true };
       }
     },
     /** The estimate behind the session's first forecast. */

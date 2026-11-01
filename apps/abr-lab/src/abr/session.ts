@@ -106,7 +106,8 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
   };
 
   // The multivariant and media playlists: small, and the only evidence before the first segment.
-  now = fetch(MANIFEST_HOST, 3000, 'playlist').end;
+  // Mux's multivariant playlist: 20 kB, 6.9 kB gzipped on the wire.
+  now = fetch(MANIFEST_HOST, 6900, 'playlist').end;
   now = fetch(MANIFEST_HOST, player.mediaPlaylistBytes ?? 12_000, 'playlist').end;
 
   for (let index = 0; index < segmentCount; index++) {

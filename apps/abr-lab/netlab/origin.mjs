@@ -56,18 +56,25 @@ const server = createSecureServer(
 
     if (url.pathname === '/') return void res.writeHead(200, { 'content-type': 'text/html' }).end(PROBE_PAGE);
 
-    if (url.pathname === '/bytes') return sendBytes(res, Number(url.searchParams.get('n') ?? 0));
+    if (url.pathname === '/bytes') {
+      return sendBytes(res, Number(url.searchParams.get('n') ?? 0), Number(url.searchParams.get('piece') ?? 0));
+    }
 
     sendFile(req, res, url.pathname);
   }
 );
 
-function sendBytes(res, n) {
+/**
+ * `piece` > 0 writes the body in pieces of that size, one per event-loop turn, so each becomes its own h2 DATA frame
+ * and TLS record. That mimics CDNs' dynamic TLS record sizing (small records early in a connection); 0 writes 64 kB at
+ * a time, which TLS cuts into full 16 kB records the client can only read whole.
+ */
+function sendBytes(res, n, piece) {
   if (!Number.isInteger(n) || n < 0 || n > 256e6) return void res.writeHead(400).end();
 
   res.writeHead(200, { 'content-type': 'application/octet-stream', 'content-length': n, 'cache-control': 'no-store' });
 
-  const chunk = Buffer.alloc(64 * 1024);
+  const chunk = Buffer.alloc(piece > 0 ? piece : 64 * 1024);
   let left = n;
   const pump = () => {
     while (left > 0) {
@@ -76,6 +83,8 @@ function sendBytes(res, n) {
       left -= size;
 
       if (!res.write(size === chunk.length ? chunk : chunk.subarray(0, size))) return void res.once('drain', pump);
+
+      if (piece > 0 && left > 0) return void setImmediate(pump);
     }
 
     res.end();

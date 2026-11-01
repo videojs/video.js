@@ -40,6 +40,17 @@ interface World {
 /** Accept a stored estimate when the first request's TTFB is within 2× of the stored session's. */
 const RTT_TOLERANCE = 2;
 
+/** Stored estimate behind the RTT check, the playlist's first burst, and a cap without playlist evidence. */
+const policy = (w: World, moved: boolean): StartingEstimate => ({
+  kind: 'policy',
+  storedBps: moved ? w.movedBps : w.lastSessionBps,
+  storedFirstTtfbMs: moved ? w.movedTtfbMs : w.storedTtfbMs,
+  tolerance: RTT_TOLERANCE,
+  jitterMs: w.jitterMs,
+  fallbackBps: INITIAL_BANDWIDTH_BPS,
+  capBps: 2 * INITIAL_BANDWIDTH_BPS,
+});
+
 const gated = (w: World, moved: boolean, withPlaylist: boolean): StartingEstimate => ({
   kind: 'gated',
   storedBps: moved ? w.movedBps : w.lastSessionBps,
@@ -72,6 +83,12 @@ const VARIANTS: Array<{ name: string; start: (world: World) => StartingEstimate 
   { name: 'last, RTT-gated (moved net)', start: (w) => gated(w, true, false) },
   { name: 'last+playlist, gated (same)', start: (w) => gated(w, false, true) },
   { name: 'last+playlist, gated (moved)', start: (w) => gated(w, true, true) },
+  {
+    name: 'stream burst',
+    start: (w) => ({ kind: 'stream', jitterMs: w.jitterMs, fallbackBps: INITIAL_BANDWIDTH_BPS }),
+  },
+  { name: 'policy (same net)', start: (w) => policy(w, false) },
+  { name: 'policy (moved net)', start: (w) => policy(w, true) },
   { name: 'perfect start', start: (w) => ({ kind: 'fixed', bps: w.perfectBps }) },
 ];
 

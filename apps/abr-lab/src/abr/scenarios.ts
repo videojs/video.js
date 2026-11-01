@@ -13,7 +13,8 @@ export const PLAYERS: PlayerConfig[] = [
     targetBufferSeconds: 30,
     contentSeconds: 300,
     startupSegments: 1,
-    mediaPlaylistBytes: 25_000,
+    // Wire size: Mux gzips playlists to ~63 bytes per segment (a 184-segment playlist: 59.6 kB → 11.6 kB).
+    mediaPlaylistBytes: 5_000,
   },
   {
     name: 'low-latency-1s',
@@ -22,7 +23,7 @@ export const PLAYERS: PlayerConfig[] = [
     targetBufferSeconds: 4,
     contentSeconds: 180,
     startupSegments: 2,
-    mediaPlaylistBytes: 8_000,
+    mediaPlaylistBytes: 4_000,
   },
 ];
 /** Every simulated network's level relaxes toward its mean, so sessions minutes apart stay plausible. */
