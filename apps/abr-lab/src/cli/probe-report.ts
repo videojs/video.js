@@ -13,7 +13,32 @@ const { positionals, values } = parseArgs({
   options: { ms: { type: 'boolean', default: false } },
 });
 
-const samples = positionals.flatMap((path) => readFileSync(path, 'utf8').trim().split('\n').map(parseSample));
+const all = positionals.flatMap((path) => readFileSync(path, 'utf8').trim().split('\n').map(parseSample));
+const samples = all.filter((s) => s.target === undefined);
+
+// Real targets have no known link, so they are shown as size × idle gap: median headers time / median total time, ms.
+for (const target of unique(all.flatMap((s) => (s.target === undefined ? [] : [s.target])))) {
+  const own = all.filter((s) => s.target === target);
+  const idles = unique(own.map((s) => s.idleMs)).sort((a, b) => a - b);
+  const rows = unique(own.map((s) => s.bytes))
+    .sort((a, b) => a - b)
+    .map((bytes) => [
+      formatBytes(bytes),
+      ...idles.map((idleMs) => {
+        const cell = own.filter((s) => s.bytes === bytes && s.idleMs === idleMs);
+
+        return cell.length === 0
+          ? '-'
+          : `${median(cell.map((s) => s.headersMs)).toFixed(0)} / ${median(cell.map((s) => s.ms)).toFixed(0)}`;
+      }),
+    ]);
+
+  console.log(`\n${target}: median headers ms / total ms, by idle gap before the request (ms)`);
+  console.log(table(['bytes', ...idles.map(String)], rows));
+}
+
+if (samples.length === 0) process.exit(0);
+
 const links = unique(samples.map((s) => `${s.rttMs}/${s.rateKbps}`)).map((key) => key.split('/').map(Number));
 const sizes = unique(samples.map((s) => s.bytes)).sort((a, b) => a - b);
 const states = unique(samples.map((s) => `${s.state}${s.state === 'warm' ? ` idle ${s.idleMs} ms` : ''}`));
