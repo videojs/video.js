@@ -13,6 +13,11 @@ export interface NetworkProfile {
   outageMs: number;
   latencyMs: number;
   latencyJitterMs: number;
+  /**
+   * Half-life of the level's pull back toward `meanMbps`. Unset, level jumps accumulate as a random walk, which is fine
+   * over one session but drifts to implausible levels over many minutes.
+   */
+  levelHalfLifeMinutes?: number;
 }
 
 export interface CapacityTrace {
@@ -31,12 +36,16 @@ export function generateTrace(profile: NetworkProfile, durationMs: number, rando
   const outageChance = (profile.outagesPerMinute * STEP_MS) / 60_000;
   const outageSteps = Math.round(profile.outageMs / STEP_MS);
 
-  let level = Math.log(profile.meanMbps * 1000);
+  const base = Math.log(profile.meanMbps * 1000);
+  const keep = profile.levelHalfLifeMinutes ? 0.5 ** (STEP_MS / (profile.levelHalfLifeMinutes * 60_000)) : 1;
+  let level = base;
   let x = level;
   let outageLeft = 0;
 
   for (let i = 0; i < steps; i++) {
     if (random() < stepChance) level += profile.stepSigma * gaussian(random);
+
+    level = base + keep * (level - base);
 
     if (random() < outageChance) outageLeft = outageSteps;
 

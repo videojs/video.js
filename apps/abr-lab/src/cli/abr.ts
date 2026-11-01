@@ -1,20 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 
-import {
-  type AbrRule,
-  type Oracle,
-  type PlayerConfig,
-  runSession,
-  type SessionInputs,
-  type SessionResult,
-} from '../abr/session.ts';
+import { mean, median, NETWORKS, PLAYERS, qoe, sessionInputs, sum, table } from '../abr/scenarios.ts';
+import { type AbrRule, type Oracle, type PlayerConfig, runSession, type SessionResult } from '../abr/session.ts';
 import { SERVER_BEHAVIORS } from '../abr/transport.ts';
 import { validateAgainstProbe } from '../abr/validate.ts';
 import type { PredictorFactory } from '../predictors/predictor.ts';
 import { BASELINES } from '../predictors/roster.ts';
 import { createStructured } from '../predictors/structured.ts';
-import { generateTrace, type NetworkProfile, PROFILES, seededRandom } from '../synthetic/trace.ts';
 import type { ProbeSample } from './probe.ts';
 
 /**
@@ -47,41 +40,6 @@ if (values.validate) {
     );
   }
 }
-
-const LADDER = [974_600, 1_861_200, 2_953_500, 5_639_700, 7_519_600, 11_030_800, 18_393_100];
-const PLAYERS: PlayerConfig[] = [
-  {
-    name: 'vod-4s',
-    ladderBps: LADDER,
-    segmentSeconds: 4,
-    targetBufferSeconds: 30,
-    contentSeconds: 300,
-    startupSegments: 1,
-  },
-  {
-    name: 'low-latency-1s',
-    ladderBps: LADDER,
-    segmentSeconds: 1,
-    targetBufferSeconds: 4,
-    contentSeconds: 180,
-    startupSegments: 2,
-  },
-];
-const NETWORKS: NetworkProfile[] = [
-  PROFILES['wifi-steady']!,
-  PROFILES['cable-evening']!,
-  PROFILES.cellular!,
-  // Fast but far: where slow start costs the most round trips.
-  {
-    ...PROFILES.cellular!,
-    name: 'lte-high-bdp',
-    meanMbps: 30,
-    latencyMs: 120,
-    latencyJitterMs: 30,
-    outagesPerMinute: 0.2,
-  },
-  { ...PROFILES['cable-evening']!, name: 'dsl-slow', meanMbps: 4, latencyMs: 45, sigma: 0.08 },
-];
 
 const SAFETIES = [0.6, 0.7, 0.8, 0.9, 1.0];
 /** Tuning seeds never overlap evaluation seeds. */
@@ -212,55 +170,7 @@ console.log(
     "\nheadroom: share of the oracle's gain over dash.js this predictor captures."
 );
 
-/** One seed's world, shared by every predictor: the trace, every request's RTT, and every segment's size factor. */
-function sessionInputs(player: PlayerConfig, network: NetworkProfile, behavior: string, seed: number): SessionInputs {
-  const random = seededRandom(seed * 7919 + network.name.length * 31);
-  const trace = generateTrace(network, (player.contentSeconds + 600) * 1000, random);
-  const requests = Math.ceil(player.contentSeconds / player.segmentSeconds) + 3;
-
-  return {
-    trace,
-    behavior: SERVER_BEHAVIORS[behavior]!,
-    player,
-    rtts: Array.from({ length: requests }, () => trace.latencyAt(0)),
-    sizeFactors: Array.from({ length: requests }, () => 0.7 + 0.6 * random()),
-  };
-}
-
-function qoe(result: SessionResult, player: PlayerConfig): number {
-  const mu = Math.max(...player.ladderBps) / 1e6;
-  const stallSeconds = (result.rebufferMs + result.startupMs) / 1000;
-
-  return (
-    result.meanBitrateBps / 1e6 -
-    (mu * stallSeconds) / result.segments -
-    result.switchMagnitudeBps / 1e6 / Math.max(1, result.segments - 1)
-  );
-}
-
 function parseProbe(line: string): ProbeSample {
   // SAFETY: probe files are written only by `probe`, one ProbeSample per line.
   return JSON.parse(line) as ProbeSample;
-}
-
-function sum(values: readonly number[]): number {
-  return values.reduce((total, v) => total + v, 0);
-}
-
-function mean(values: readonly number[]): number {
-  return sum(values) / Math.max(1, values.length);
-}
-
-function median(values: readonly number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-
-  return sorted[Math.floor(sorted.length / 2)] ?? Number.NaN;
-}
-
-function table(header: string[], rows: string[][]): string {
-  const widths = header.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i]!.length)));
-  const line = (cells: string[]) =>
-    cells.map((cell, i) => (i === 0 ? cell.padEnd(widths[i]!) : cell.padStart(widths[i]!))).join('  ');
-
-  return [line(header), line(widths.map((w) => '-'.repeat(w))), ...rows.map(line)].join('\n');
 }

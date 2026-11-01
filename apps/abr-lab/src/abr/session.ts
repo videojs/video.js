@@ -13,6 +13,8 @@ export interface PlayerConfig {
   contentSeconds: number;
   /** Playback starts once this many segments are buffered. */
   startupSegments: number;
+  /** Media playlist size; Mux VOD playlists carry ~330 bytes of signed URL per segment. Defaults to 12 kB. */
+  mediaPlaylistBytes?: number;
 }
 
 export interface SessionInputs {
@@ -31,6 +33,8 @@ export interface SessionResult {
   meanBitrateBps: number;
   /** Mean bitrate over the first 20 s of content: what startup decisions bought. */
   earlyBitrateBps: number;
+  /** Stall time while fetching the first 20 s of content. */
+  earlyRebufferMs: number;
   switches: number;
   /** Sum of |bitrate change| between consecutive segments, bits/s. */
   switchMagnitudeBps: number;
@@ -70,6 +74,8 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
   let startupMs = 0;
   let rebufferMs = 0;
   let rebuffers = 0;
+  let earlyRebufferMs = 0;
+  const earlySegments = Math.max(1, Math.round(20 / player.segmentSeconds));
 
   const fetch = (host: string, bytes: number, kind: TransferRecord['kind'], renditionId?: string) => {
     const rtt = rtts[request++ % rtts.length]!;
@@ -101,7 +107,7 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
 
   // The multivariant and media playlists: small, and the only evidence before the first segment.
   now = fetch(MANIFEST_HOST, 3000, 'playlist').end;
-  now = fetch(MANIFEST_HOST, 12_000, 'playlist').end;
+  now = fetch(MANIFEST_HOST, player.mediaPlaylistBytes ?? 12_000, 'playlist').end;
 
   for (let index = 0; index < segmentCount; index++) {
     if (buffer >= player.targetBufferSeconds) {
@@ -121,6 +127,9 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
     if (playing && elapsed > buffer) {
       rebufferMs += (elapsed - buffer) * 1000;
       rebuffers++;
+
+      if (index < earlySegments) earlyRebufferMs += (elapsed - buffer) * 1000;
+
       buffer = 0;
     } else if (playing) {
       buffer -= elapsed;
@@ -137,7 +146,7 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
   }
 
   const bitrates = rungs.map((r) => player.ladderBps[r]!);
-  const early = bitrates.slice(0, Math.max(1, Math.round(20 / player.segmentSeconds)));
+  const early = bitrates.slice(0, earlySegments);
 
   return {
     startupMs,
@@ -145,6 +154,7 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
     rebuffers,
     meanBitrateBps: mean(bitrates),
     earlyBitrateBps: mean(early),
+    earlyRebufferMs,
     switches: rungs.filter((r, i) => i > 0 && r !== rungs[i - 1]).length,
     switchMagnitudeBps: bitrates.reduce((sum, b, i) => (i === 0 ? 0 : sum + Math.abs(b - bitrates[i - 1]!)), 0),
     segments: rungs.length,

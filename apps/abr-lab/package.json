@@ -17,7 +17,8 @@
     "lab:up": "docker compose -f netlab/compose.yaml up -d --build",
     "lab:down": "docker compose -f netlab/compose.yaml down",
     "probe:report": "node --import tsx src/cli/probe-report.ts",
-    "abr": "node --import tsx src/cli/abr.ts"
+    "abr": "node --import tsx src/cli/abr.ts",
+    "abr:start": "node --import tsx src/cli/abr-start.ts"
   },
   "devDependencies": {
     "@types/node": "^22.18.6",
