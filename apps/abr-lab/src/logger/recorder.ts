@@ -1,13 +1,17 @@
 import { describeOrigin, summarizeCache } from '../headers.ts';
-import type { ResourceTimingSummary, TransferRecord } from '../record.ts';
+import { resourceKey, type ResourceTimingSummary, type TransferRecord } from '../record.ts';
 
 export interface FetchMeta {
   kind: TransferRecord['kind'];
   role: TransferRecord['origin']['role'];
   trackType?: TransferRecord['trackType'] | undefined;
+  byteRange?: [number, number] | undefined;
   renditionId?: string | undefined;
   segmentIndex?: number | undefined;
 }
+
+const TRANSFER_TIMEOUT_MS = 30_000;
+const DEBUG = new URLSearchParams(globalThis.location?.search ?? '').has('debug');
 
 interface NetworkInformationLike {
   effectiveType?: string;
@@ -30,11 +34,18 @@ export class TransferRecorder {
 
   async fetch(url: string, meta: FetchMeta): Promise<{ record: TransferRecord; body?: Uint8Array | undefined }> {
     const record = this.begin(url, meta);
+
+    if (DEBUG) console.log(`[abr-lab] start ${record.id} ${meta.kind} ${meta.trackType ?? ''} ${url.slice(-48)}`);
+
     const keepBody = meta.kind === 'playlist' || meta.kind === 'other';
     const parts: Uint8Array[] = [];
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        // Bounds the whole transfer, body included: a stalled request is recorded as aborted instead of hanging the run.
+        signal: AbortSignal.timeout(TRANSFER_TIMEOUT_MS),
+        ...(meta.byteRange ? { headers: { range: `bytes=${meta.byteRange[0]}-${meta.byteRange[1]}` } } : {}),
+      });
 
       record.t.firstByte = performance.now();
       record.status = response.status;
@@ -58,11 +69,14 @@ export class TransferRecorder {
       }
 
       record.t.end = performance.now();
-    } catch {
-      record.status = 'error';
+    } catch (error) {
+      record.status = error instanceof DOMException && error.name === 'TimeoutError' ? 'aborted' : 'error';
+      record.error = String(error);
     }
 
     record.timing = resourceTiming(url);
+
+    if (DEBUG) console.log(`[abr-lab] end ${record.id} ${record.status} ${record.bytes} B ${record.error ?? ''}`);
 
     return { record, body: keepBody ? concat(parts) : undefined };
   }
@@ -89,6 +103,7 @@ export class TransferRecorder {
       kind: meta.kind,
       trackType: meta.trackType,
       url,
+      byteRange: meta.byteRange,
       origin: describeOrigin(url, {}, meta.role),
       renditionId: meta.renditionId,
       segmentIndex: meta.segmentIndex,
@@ -100,7 +115,7 @@ export class TransferRecorder {
       heldByServer: /[?&]_HLS_(msn|part)=/.test(url),
       firstTouch: {
         rendition: meta.renditionId !== undefined && !this.touchedRenditions.has(meta.renditionId),
-        url: !this.touchedUrls.has(url),
+        url: !this.touchedUrls.has(resourceKey(url, meta.byteRange)),
       },
       idleGapMs: this.lastByteAt === undefined ? undefined : start - this.lastByteAt,
       overlapping: [],
@@ -113,7 +128,7 @@ export class TransferRecorder {
 
     if (meta.renditionId !== undefined) this.touchedRenditions.add(meta.renditionId);
 
-    this.touchedUrls.add(url);
+    this.touchedUrls.add(resourceKey(url, meta.byteRange));
     this.records.push(record);
 
     return record;

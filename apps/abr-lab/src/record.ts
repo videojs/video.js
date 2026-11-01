@@ -10,6 +10,8 @@ export interface TransferRecord {
   kind: 'segment' | 'part' | 'init' | 'playlist' | 'key' | 'other';
   trackType?: 'video' | 'audio' | 'text' | undefined;
   url: string;
+  /** Inclusive byte range, when the playlist addresses part of a file. */
+  byteRange?: [number, number] | undefined;
   origin: TransferOrigin;
   renditionId?: string | undefined;
   segmentIndex?: number | undefined;
@@ -19,6 +21,8 @@ export interface TransferRecord {
   chunks: Array<[number, number]>;
   bytes: number;
   status: number | 'aborted' | 'error';
+  /** Why the transfer failed, when it did. */
+  error?: string | undefined;
   /** LL-HLS blocking reloads and preload hints wait on purpose; their first byte is not latency. */
   heldByServer?: boolean | undefined;
   timing?: ResourceTimingSummary | undefined;
@@ -31,6 +35,8 @@ export interface TransferRecord {
   env: { visibility: 'visible' | 'hidden'; effectiveType?: string | undefined; connectionType?: string | undefined };
   /** Exposed response headers, lower-cased, kept raw so features can be derived later. */
   headers?: Record<string, string> | undefined;
+  /** DevTools throttling in force when the request started, when the recording was throttled. */
+  throttle?: { profile: string; capacityBps: number; latencyMs: number } | undefined;
   /** Ground truth from the Chrome DevTools Protocol, when recorded under Playwright. */
   truth?: {
     fromDiskCache?: boolean | undefined;
@@ -63,6 +69,11 @@ export interface CacheSummary {
   tiers: string[];
   hits?: number[] | undefined;
   servedBy?: string[] | undefined;
+}
+
+/** What a cache keys on: the URL, plus the byte range when only part of the file was requested. */
+export function resourceKey(url: string, byteRange?: [number, number]): string {
+  return byteRange ? `${url}#${byteRange[0]}-${byteRange[1]}` : url;
 }
 
 /** Request latency (start to first byte) in ms, when the transfer got that far. */

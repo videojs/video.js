@@ -2,7 +2,7 @@ import { type Distribution, empiricalDistribution, normalQuantile } from '../dis
 import type { Predictor } from '../predictors/predictor.ts';
 import { bodyRateBps, latencyMs, type TransferRecord } from '../record.ts';
 import { replay } from '../scorer/replay.ts';
-import { FeatureTracker, LATENCY_FEATURES, RATE_FEATURES } from './features.ts';
+import { FeatureTracker, seedOffsets, LATENCY_FEATURES, RATE_FEATURES } from './features.ts';
 import { type FitOptions, fitGaussianRegression, type GaussianRegression, predictGaussian } from './regression.ts';
 
 /**
@@ -39,17 +39,18 @@ export function trainModel(records: readonly TransferRecord[], options: FitOptio
         if (!scored) return;
 
         const features = tracker.features(request);
+        const offsets = seedOffsets(features);
         const latency = latencyMs(record);
         const rate = bodyRateBps(record);
 
         if (latency !== undefined) {
           latencyRows.push(features.latency);
-          latencyTargets.push(Math.log(Math.max(0.5, latency)));
+          latencyTargets.push(Math.log(Math.max(0.5, latency)) - offsets.latency);
         }
 
         if (rate !== undefined && record.bytes >= MIN_RATE_BYTES) {
           rateRows.push(features.rate);
-          rateTargets.push(Math.log(rate / 1000));
+          rateTargets.push(Math.log(rate / 1000) - offsets.rate);
         }
       },
     };
@@ -73,8 +74,9 @@ export function createLearned(model: LearnedModel, name = 'learned'): Predictor 
     observe: (record, weights) => tracker.observe(record, weights),
     forecast(request): Distribution {
       const features = tracker.features(request);
-      const latency = predictGaussian(model.latency, features.latency);
-      const rate = predictGaussian(model.rate, features.rate);
+      const offsets = seedOffsets(features);
+      const latency = shift(predictGaussian(model.latency, features.latency), offsets.latency);
+      const rate = shift(predictGaussian(model.rate, features.rate), offsets.rate);
       const bits = 8 * request.bytes;
 
       // Latency and rate are treated as independent; every pairing of their grid quantiles is equally likely.
@@ -85,4 +87,9 @@ export function createLearned(model: LearnedModel, name = 'learned'): Predictor 
       );
     },
   };
+}
+
+/** Moves a log-space prediction from a correction back onto the seed's own estimate. */
+function shift(prediction: { mean: number; sigma: number }, offset: number): { mean: number; sigma: number } {
+  return { mean: prediction.mean + offset, sigma: prediction.sigma };
 }

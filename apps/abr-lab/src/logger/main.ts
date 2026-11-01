@@ -51,6 +51,8 @@ window.abrLab = {
         const ms = (record.t.end ?? record.t.start) - record.t.start;
 
         status.value = `${count} segments · last ${(record.bytes / 1000).toFixed(0)} kB in ${ms.toFixed(0)} ms`;
+
+        console.log(`[abr-lab] ${status.value} · ${record.trackType ?? ''} ${record.status} ${record.error ?? ''}`);
       },
     })
       .then((records) => {

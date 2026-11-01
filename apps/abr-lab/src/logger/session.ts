@@ -1,7 +1,8 @@
 import type { TransferRecord } from '../record.ts';
 import { seededRandom } from '../synthetic/trace.ts';
-import { type MediaPlaylist, parseMedia, parseMultivariant, type Rendition } from './hls.ts';
+import type { MediaPlaylist, Rendition } from './hls.ts';
 import { TransferRecorder } from './recorder.ts';
+import { openSource } from './source.ts';
 
 export interface SessionOptions {
   src: string;
@@ -31,33 +32,31 @@ const DRAWS_PER_SEGMENT = 9;
  */
 export async function runSession(options: SessionOptions): Promise<TransferRecord[]> {
   const recorder = new TransferRecorder(options.recording);
-  const decoder = new TextDecoder();
-  const loadText = async (url: string, meta: Parameters<TransferRecorder['fetch']>[1]) => {
-    const { body } = await recorder.fetch(url, meta);
-
-    return decoder.decode(body ?? new Uint8Array());
-  };
   const report = () => {
     const last = recorder.records.at(-1);
 
     if (last) options.onProgress?.(last);
   };
 
-  const multivariant = parseMultivariant(
-    await loadText(options.src, { kind: 'playlist', role: 'multivariant' }),
-    options.src
-  );
+  const source = await openSource(options.src, recorder);
   const media = new Map<string, MediaPlaylist>();
-  const loadMedia = async (id: string, url: string, trackType: 'video' | 'audio') => {
-    const cached = media.get(id);
+  const loadMedia = async (key: string, trackType: 'video' | 'audio') => {
+    const cached = media.get(key);
     if (cached) return cached;
 
-    const playlist = parseMedia(await loadText(url, { kind: 'playlist', role: 'playlist', trackType }), url);
+    const playlist = await source.load(key, trackType);
 
-    media.set(id, playlist);
+    media.set(key, playlist);
 
-    if (playlist.initUrl)
-      await recorder.fetch(playlist.initUrl, { kind: 'init', role: 'segment', trackType, renditionId: id });
+    if (playlist.init) {
+      await recorder.fetch(playlist.init.url, {
+        kind: 'init',
+        role: 'segment',
+        trackType,
+        renditionId: key,
+        byteRange: playlist.init.byteRange,
+      });
+    }
 
     return playlist;
   };
@@ -65,7 +64,7 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
   const random = options.seed === undefined ? Math.random : seededRandom(options.seed);
   const deadline = performance.now() + options.durationMs;
   const maxSegments = options.maxSegments ?? Infinity;
-  let rung = Math.floor(random() * multivariant.renditions.length);
+  let rung = Math.floor(random() * source.renditions.length);
   let target = 10 + random() * 30;
   let buffer = 0;
   let index = 0;
@@ -73,20 +72,21 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
   for (let fetched = 0; fetched < maxSegments && performance.now() < deadline && !options.signal?.aborted; fetched++) {
     const r = Array.from({ length: DRAWS_PER_SEGMENT }, random);
 
-    if (r[0]! < 0.25) rung = clamp(rung + (r[1]! < 0.5 ? -1 : 1), 0, multivariant.renditions.length - 1);
+    if (r[0]! < 0.25) rung = clamp(rung + (r[1]! < 0.5 ? -1 : 1), 0, source.renditions.length - 1);
 
     if (r[2]! < 0.1) target = 10 + r[3]! * 30;
 
-    const rendition: Rendition = multivariant.renditions[rung]!;
-    const video = await loadMedia(rendition.id, rendition.url, 'video');
+    const rendition: Rendition = source.renditions[rung]!;
+    const video = await loadMedia(rendition.id, 'video');
 
     if (r[4]! < 0.03) index = Math.max(0, index - 1 - Math.floor(r[5]! * 5));
     else if (r[4]! > 0.98) index += 5 + Math.floor(r[5]! * 20);
 
-    index %= video.segmentUrls.length;
+    index %= video.segments.length;
 
     const fetches = [
-      recorder.fetch(video.segmentUrls[index]!, {
+      recorder.fetch(video.segments[index]!.url, {
+        byteRange: video.segments[index]!.byteRange,
         kind: 'segment',
         role: 'segment',
         trackType: 'video',
@@ -94,18 +94,19 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
         segmentIndex: index,
       }),
     ];
-    const audioUrl = options.audio && rendition.audioGroup ? multivariant.audio.get(rendition.audioGroup) : undefined;
+    const audioKey = options.audio ? source.audioFor(rendition) : undefined;
 
-    if (audioUrl) {
-      const audio = await loadMedia(`audio:${rendition.audioGroup}`, audioUrl, 'audio');
-      const audioSegment = audio.segmentUrls[index % audio.segmentUrls.length]!;
+    if (audioKey) {
+      const audio = await loadMedia(audioKey, 'audio');
+      const audioSegment = audio.segments[index % audio.segments.length]!;
 
       fetches.push(
-        recorder.fetch(audioSegment, {
+        recorder.fetch(audioSegment.url, {
+          byteRange: audioSegment.byteRange,
           kind: 'segment',
           role: 'segment',
           trackType: 'audio',
-          renditionId: `audio:${rendition.audioGroup}`,
+          renditionId: audioKey,
           segmentIndex: index,
         })
       );
@@ -123,7 +124,12 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
       const resumeAt = Math.max(0, target - video.segmentSeconds - r[6]! * 4);
       const pauseMs = r[7]! < 0.05 ? r[8]! * 60_000 : 0;
 
-      await sleep((buffer - resumeAt) * 1000 + pauseMs, options.signal);
+      const idleMs = (buffer - resumeAt) * 1000 + pauseMs;
+
+      console.log(
+        `[abr-lab] idle ${(idleMs / 1000).toFixed(1)} s (buffer ${buffer.toFixed(1)} s, target ${target.toFixed(1)} s)`
+      );
+      await sleep(idleMs, options.signal);
       buffer = resumeAt;
     }
   }

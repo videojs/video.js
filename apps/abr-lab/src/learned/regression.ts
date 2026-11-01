@@ -110,3 +110,55 @@ function standardDeviation(values: readonly number[]): number {
 
   return Math.sqrt(average(values.map((x) => (x - mean) ** 2)));
 }
+
+/** Logistic regression on standardized features: P(y = 1) = σ(w·z). Same ridge and optimizer as the Gaussian fit. */
+export interface LogisticRegression {
+  featureNames: readonly string[];
+  featureMean: number[];
+  featureStd: number[];
+  weights: number[];
+}
+
+export function fitLogisticRegression(
+  featureNames: readonly string[],
+  rows: readonly number[][],
+  labels: readonly (0 | 1)[],
+  options: Pick<FitOptions, 'meanPenalty' | 'iterations' | 'learningRate'> = {}
+): LogisticRegression {
+  const { meanPenalty = 1, iterations = 3000, learningRate = 0.05 } = options;
+  const n = rows.length;
+  const columns = featureNames.length;
+  const featureMean = Array.from({ length: columns }, (_, j) => average(rows.map((r) => r[j]!)));
+  const featureStd = Array.from({ length: columns }, (_, j) => standardDeviation(rows.map((r) => r[j]!)) || 1);
+  const z = rows.map((r) => [1, ...r.map((x, j) => (x - featureMean[j]!) / featureStd[j]!)]);
+  // Start at the base rate, shrunk toward 0.5 so a one-sided sample can't produce certainty.
+  const positives = labels.filter((y) => y === 1).length;
+  const w = [Math.log((positives + 1) / (n - positives + 1)), ...Array<number>(columns).fill(0)];
+  const step = adam(columns + 1, learningRate);
+
+  for (let iteration = 0; iteration < iterations; iteration++) {
+    const grad = Array<number>(columns + 1).fill(0);
+
+    for (let i = 0; i < n; i++) {
+      const p = sigmoid(dot(w, z[i]!));
+
+      for (let j = 0; j <= columns; j++) grad[j]! += ((p - labels[i]!) * z[i]![j]!) / n;
+    }
+
+    for (let j = 1; j <= columns; j++) grad[j]! += (meanPenalty * w[j]!) / n;
+
+    step(w, grad);
+  }
+
+  return { featureNames, featureMean, featureStd, weights: w };
+}
+
+export function predictProbability(model: LogisticRegression, features: readonly number[]): number {
+  const z = [1, ...features.map((x, j) => (x - model.featureMean[j]!) / model.featureStd[j]!)];
+
+  return sigmoid(dot(model.weights, z));
+}
+
+function sigmoid(x: number): number {
+  return 1 / (1 + Math.exp(-x));
+}

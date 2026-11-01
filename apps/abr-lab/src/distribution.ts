@@ -109,3 +109,43 @@ export function empiricalDistribution(values: readonly number[]): Distribution {
     },
   };
 }
+
+/** Like `empiricalDistribution`, with a weight per value (weights need not sum to 1). */
+export function weightedEmpiricalDistribution(values: readonly number[], weights: readonly number[]): Distribution {
+  const order = values.map((_, i) => i).sort((a, b) => values[a]! - values[b]!);
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const sorted = order.map((i) => values[i]!);
+  // Each value sits at the midpoint of its own probability mass.
+  const positions: number[] = [];
+  let cumulative = 0;
+
+  for (const i of order) {
+    positions.push((cumulative + weights[i]! / 2) / total);
+    cumulative += weights[i]!;
+  }
+
+  return {
+    cdf(x) {
+      let mass = 0;
+
+      order.forEach((i, k) => {
+        if (sorted[k]! <= x) mass += weights[i]!;
+      });
+
+      return mass / total;
+    },
+    quantile(p) {
+      if (p <= positions[0]!) return sorted[0]!;
+
+      for (let k = 1; k < sorted.length; k++) {
+        if (p <= positions[k]!) {
+          const t = (p - positions[k - 1]!) / (positions[k]! - positions[k - 1]!);
+
+          return sorted[k - 1]! + t * (sorted[k]! - sorted[k - 1]!);
+        }
+      }
+
+      return sorted.at(-1)!;
+    },
+  };
+}

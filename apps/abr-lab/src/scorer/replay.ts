@@ -1,5 +1,5 @@
 import type { ForecastRequest } from '../predictors/predictor.ts';
-import { durationMs, type TransferRecord } from '../record.ts';
+import { durationMs, resourceKey, type TransferRecord } from '../record.ts';
 import { classifyTransfer, type EvidenceWeights, type Regime } from '../regime.ts';
 
 /** Regimes whose arrival time is a network question: everything except local replays, held and failed requests. */
@@ -37,14 +37,14 @@ export function replay(records: readonly TransferRecord[], begin: (recording: st
       for (; next < byEnd.length && byEnd[next]!.t.end! <= target.t.start; next++) {
         const done = byEnd[next]!;
 
-        session.observe(done, classifyTransfer(done, lastByUrl.get(done.url)));
-        lastByUrl.set(done.url, done);
+        session.observe(done, classifyTransfer(done, lastByUrl.get(keyOf(done))));
+        lastByUrl.set(keyOf(done), done);
       }
 
       const actualMs = durationMs(target);
       if (target.kind !== 'segment' || actualMs === undefined) continue;
 
-      const { regime } = classifyTransfer(target, lastByUrl.get(target.url));
+      const { regime } = classifyTransfer(target, lastByUrl.get(keyOf(target)));
       const at = target.t.start;
       const inFlight = recording.filter(
         (r) => r !== target && r.t.start < at && (r.t.end === undefined || r.t.end > at)
@@ -68,6 +68,10 @@ export function replay(records: readonly TransferRecord[], begin: (recording: st
       });
     }
   }
+}
+
+function keyOf(record: TransferRecord): string {
+  return resourceKey(record.url, record.byteRange);
 }
 
 export function isCachedByTruth(record: TransferRecord): boolean {

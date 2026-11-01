@@ -1,10 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 
-import { createHarmonicMean } from '../predictors/harmonic-mean.ts';
-import { createLognormal } from '../predictors/lognormal.ts';
+import { createLearned, type LearnedModel } from '../learned/model.ts';
 import type { PredictorFactory } from '../predictors/predictor.ts';
-import { createSpfDualEwma } from '../predictors/spf-dual-ewma.ts';
+import { BASELINES } from '../predictors/roster.ts';
 import { parseRecords } from '../record.ts';
 import { formatReport } from '../scorer/report.ts';
 import { scoreRecords } from '../scorer/score.ts';
@@ -15,6 +14,8 @@ const { values, positionals } = parseArgs({
     json: { type: 'boolean', default: false },
     'idle-ms': { type: 'string', default: '1000' },
     recording: { type: 'string' },
+    /** A trained model to score alongside the baselines. */
+    model: { type: 'string' },
   },
 });
 
@@ -23,7 +24,8 @@ if (positionals.length === 0) {
   process.exit(1);
 }
 
-const factories: PredictorFactory[] = [createSpfDualEwma, () => createHarmonicMean(5), () => createLognormal()];
+const model = values.model ? (JSON.parse(readFileSync(values.model, 'utf8')) as LearnedModel) : undefined;
+const factories: PredictorFactory[] = [...BASELINES, ...(model ? [() => createLearned(model)] : [])];
 const records = positionals
   .flatMap((path) => parseRecords(readFileSync(path, 'utf8')))
   .filter((r) => values.recording === undefined || r.recording.startsWith(values.recording));

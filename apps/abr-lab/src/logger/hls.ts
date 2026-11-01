@@ -14,9 +14,15 @@ export interface MultivariantPlaylist {
   audio: Map<string, string>;
 }
 
+/** A URL, plus an inclusive byte range when the playlist addresses part of a file (`EXT-X-BYTERANGE`). */
+export interface MediaResource {
+  url: string;
+  byteRange?: [number, number] | undefined;
+}
+
 export interface MediaPlaylist {
-  initUrl?: string | undefined;
-  segmentUrls: string[];
+  init?: MediaResource | undefined;
+  segments: MediaResource[];
   segmentSeconds: number;
 }
 
@@ -61,27 +67,42 @@ export function parseMultivariant(text: string, baseUrl: string): MultivariantPl
 }
 
 export function parseMedia(text: string, baseUrl: string): MediaPlaylist {
-  const lines = text.split('\n').map((line) => line.trim());
-  const segmentUrls: string[] = [];
-  let initUrl: string | undefined;
+  const segments: MediaResource[] = [];
+  let init: MediaResource | undefined;
   let segmentSeconds = 0;
+  let awaitingUri = false;
+  let pendingRange: [number, number] | undefined;
+  let nextOffset = 0;
 
-  lines.forEach((line, i) => {
+  for (const line of text.split('\n').map((l) => l.trim())) {
     if (line.startsWith('#EXT-X-MAP:')) {
-      const uri = parseAttributes(line).URI;
+      const attrs = parseAttributes(line);
 
-      if (uri) initUrl = new URL(uri, baseUrl).href;
-    }
-
-    if (line.startsWith('#EXTINF:')) {
+      if (attrs.URI) init = { url: new URL(attrs.URI, baseUrl).href, byteRange: parseRange(attrs.BYTERANGE, 0) };
+    } else if (line.startsWith('#EXT-X-BYTERANGE:')) {
+      pendingRange = parseRange(line.slice('#EXT-X-BYTERANGE:'.length), nextOffset);
+      nextOffset = pendingRange![1] + 1;
+    } else if (line.startsWith('#EXTINF:')) {
       segmentSeconds ||= Number.parseFloat(line.slice('#EXTINF:'.length));
-      const uri = lines.slice(i + 1).find((next) => next !== '' && !next.startsWith('#'));
-
-      if (uri) segmentUrls.push(new URL(uri, baseUrl).href);
+      awaitingUri = true;
+    } else if (awaitingUri && line !== '' && !line.startsWith('#')) {
+      segments.push({ url: new URL(line, baseUrl).href, byteRange: pendingRange });
+      awaitingUri = false;
+      pendingRange = undefined;
     }
-  });
+  }
 
-  return { initUrl, segmentUrls, segmentSeconds: segmentSeconds || 4 };
+  return { init, segments, segmentSeconds: segmentSeconds || 4 };
+}
+
+/** `length[@offset]` to an inclusive range; a missing offset continues from the previous range. */
+function parseRange(value: string | undefined, defaultOffset: number): [number, number] | undefined {
+  if (!value) return undefined;
+
+  const [length, offset] = value.split('@').map(Number);
+  const start = offset ?? defaultOffset;
+
+  return [start, start + length! - 1];
 }
 
 function parseAttributes(line: string): Record<string, string> {
