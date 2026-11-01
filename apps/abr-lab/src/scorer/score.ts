@@ -1,13 +1,11 @@
 import type { PredictorFactory } from '../predictors/predictor.ts';
-import { durationMs, type TransferRecord } from '../record.ts';
-import { classifyTransfer, type Regime } from '../regime.ts';
+import type { TransferRecord } from '../record.ts';
+import type { Regime } from '../regime.ts';
+import { isCachedByTruth, replay } from './replay.ts';
 
 export const QUANTILES = [0.1, 0.5, 0.9] as const;
 
 export type Bucket = 'all' | 'back-to-back' | 'after-idle' | 'solo' | 'concurrent' | 'edge-hit' | 'cdn-miss' | 'origin';
-
-/** Regimes whose arrival time is a network question: everything except local replays, held and failed requests. */
-const SCORED_REGIMES: ReadonlySet<Regime> = new Set(['network', 'cdn-miss', 'origin']);
 
 export interface ScoreOptions {
   /** An idle gap at least this long puts a target in `after-idle`. */
@@ -38,9 +36,8 @@ interface Sample {
 }
 
 /**
- * Replay recordings and score every predictor on every network-limited segment transfer. Recordings are scored
- * independently (each is one session), and each predictor only observes transfers that completed before the target
- * started.
+ * Score every predictor on every segment transfer that went over the network. Recordings are scored independently (each
+ * is one session), and each predictor only observes transfers that completed before the target started.
  */
 export function scoreRecords(
   records: readonly TransferRecord[],
@@ -56,47 +53,34 @@ export function scoreRecords(
     targets: 0,
   };
 
-  for (const recording of groupBy(records, (r) => r.recording).values()) {
+  replay(records, () => {
     const predictors = factories.map((create) => create());
-    const byStart = [...recording].sort((a, b) => a.t.start - b.t.start);
-    const byEnd = recording.filter((r) => r.t.end !== undefined).sort((a, b) => a.t.end! - b.t.end!);
-    const lastByUrl = new Map<string, TransferRecord>();
-    let next = 0;
 
-    for (const target of byStart) {
-      for (; next < byEnd.length && byEnd[next]!.t.end! <= target.t.start; next++) {
-        const done = byEnd[next]!;
-        const weights = classifyTransfer(done, lastByUrl.get(done.url));
+    return {
+      observe(record, weights) {
+        for (const predictor of predictors) predictor.observe(record, weights);
+      },
+      target({ record, regime, request, actualMs, scored }) {
+        result.regimes[regime] = (result.regimes[regime] ?? 0) + 1;
+        tallyLocalCheck(result, record, regime);
 
-        lastByUrl.set(done.url, done);
+        if (!scored) return;
 
-        for (const predictor of predictors) predictor.observe(done, weights);
-      }
+        result.targets++;
+        const buckets = bucketsFor(record, regime, idleThresholdMs);
 
-      const actual = durationMs(target);
-      if (target.kind !== 'segment' || actual === undefined) continue;
+        for (const predictor of predictors) {
+          const forecast = predictor.forecast(request);
+          const sample = { actual: actualMs, quantiles: QUANTILES.map((q) => forecast.quantile(q)) };
+          const byBucket = samples.get(predictor.name) ?? new Map<Bucket, Sample[]>();
 
-      const { regime } = classifyTransfer(target, lastByUrl.get(target.url));
+          for (const bucket of buckets) byBucket.set(bucket, [...(byBucket.get(bucket) ?? []), sample]);
 
-      result.regimes[regime] = (result.regimes[regime] ?? 0) + 1;
-      tallyLocalCheck(result, target, regime);
-
-      if (!SCORED_REGIMES.has(regime) || isCachedByTruth(target)) continue;
-
-      result.targets++;
-      const buckets = bucketsFor(target, regime, idleThresholdMs);
-
-      for (const predictor of predictors) {
-        const forecast = predictor.forecast({ bytes: target.bytes, host: target.origin.host, at: target.t.start });
-        const sample = { actual, quantiles: QUANTILES.map((q) => forecast.quantile(q)) };
-        const byBucket = samples.get(predictor.name) ?? new Map<Bucket, Sample[]>();
-
-        for (const bucket of buckets) byBucket.set(bucket, [...(byBucket.get(bucket) ?? []), sample]);
-
-        samples.set(predictor.name, byBucket);
-      }
-    }
-  }
+          samples.set(predictor.name, byBucket);
+        }
+      },
+    };
+  });
 
   for (const [name, byBucket] of samples) {
     result.predictors[name] = Object.fromEntries([...byBucket].map(([bucket, list]) => [bucket, summarize(list)]));
@@ -138,12 +122,6 @@ function summarize(samples: readonly Sample[]): BucketScore {
   };
 }
 
-function isCachedByTruth(record: TransferRecord): boolean {
-  const truth = record.truth;
-
-  return !!(truth?.fromDiskCache || truth?.fromMemoryCache || truth?.fromServiceWorker);
-}
-
 function tallyLocalCheck(result: ScoreResult, record: TransferRecord, regime: Regime): void {
   if (!record.truth) return;
 
@@ -155,12 +133,4 @@ function tallyLocalCheck(result: ScoreResult, record: TransferRecord, regime: Re
   else if (predicted) check.falsePositive++;
   else if (actual) check.falseNegative++;
   else check.trueNegative++;
-}
-
-function groupBy<T, K>(items: readonly T[], key: (item: T) => K): Map<K, T[]> {
-  const groups = new Map<K, T[]>();
-
-  for (const item of items) groups.set(key(item), [...(groups.get(key(item)) ?? []), item]);
-
-  return groups;
 }

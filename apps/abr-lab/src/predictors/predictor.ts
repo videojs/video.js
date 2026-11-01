@@ -7,6 +7,13 @@ export interface ForecastRequest {
   bytes: number;
   host: string;
   at: number;
+  url?: string | undefined;
+  renditionId?: string | undefined;
+  /** First request for this rendition in the session. */
+  firstTouchRendition?: boolean | undefined;
+  idleGapMs?: number | undefined;
+  /** Transfers already in flight when this request starts. */
+  inFlight?: number | undefined;
 }
 
 /**

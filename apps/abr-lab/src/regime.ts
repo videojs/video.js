@@ -1,4 +1,4 @@
-import { bodyRateBps, latencyMs, type TransferRecord } from './record.ts';
+import { latencyMs, type TransferRecord } from './record.ts';
 
 export type Regime = 'network' | 'local' | 'cdn-miss' | 'origin' | 'held' | 'small' | 'failed';
 
@@ -14,9 +14,11 @@ export interface EvidenceWeights {
 
 /** Bodies below this are dominated by request latency; mirrors SPF's `DEFAULT_BANDWIDTH_CONFIG.minBytes`. */
 const MIN_BANDWIDTH_BYTES = 16_000;
-/** A local cache answers in a few ms at rates no last-mile link reaches. */
-const LOCAL_MAX_LATENCY_MS = 3;
-const LOCAL_MIN_RATE_BPS = 2e9;
+/**
+ * A local cache answers within a few ms; in the first lab runs disk hits took 0.8–2.2 ms to first byte, while no
+ * network request beat ~27 ms. Body rate is no help: small local reads are paced by the read loop, not the link.
+ */
+const LOCAL_MAX_LATENCY_MS = 5;
 
 /**
  * Classify a completed transfer. `previous` is the most recent earlier completed transfer of the same URL, if any: a
@@ -49,11 +51,7 @@ export function classifyTransfer(record: TransferRecord, previous?: TransferReco
 
 function isLikelyLocal(record: TransferRecord, previous?: TransferRecord): boolean {
   const latency = latencyMs(record);
-  const rate = bodyRateBps(record);
-
-  if (latency !== undefined && latency <= LOCAL_MAX_LATENCY_MS && (rate === undefined || rate >= LOCAL_MIN_RATE_BPS)) {
-    return true;
-  }
+  if (latency !== undefined && latency <= LOCAL_MAX_LATENCY_MS) return true;
 
   // A per-response request id, exposed by Mux CDNs, is replayed verbatim by a local cache.
   const requestId = record.headers?.['x-request-id'];

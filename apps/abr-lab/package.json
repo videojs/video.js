@@ -10,7 +10,9 @@
     "synth": "node --import tsx src/cli/synth.ts",
     "score": "node --import tsx src/cli/score.ts",
     "test": "vp test run",
-    "typecheck": "tsgo --project tsconfig.json --noEmit"
+    "typecheck": "tsgo --project tsconfig.json --noEmit",
+    "passes": "node --import tsx src/cli/passes.ts",
+    "train": "node --import tsx src/cli/train.ts"
   },
   "devDependencies": {
     "@types/node": "^22.18.6",

@@ -86,3 +86,26 @@ export function normalQuantile(p: number): number {
     (((((b[0]! * r + b[1]!) * r + b[2]!) * r + b[3]!) * r + b[4]!) * r + 1)
   );
 }
+
+/** A distribution over equally weighted sample values, with linear interpolation between order statistics. */
+export function empiricalDistribution(values: readonly number[]): Distribution {
+  const sorted = [...values].sort((a, b) => a - b);
+  const n = sorted.length;
+
+  return {
+    cdf(x) {
+      let below = 0;
+
+      while (below < n && sorted[below]! <= x) below++;
+
+      return below / n;
+    },
+    quantile(p) {
+      const position = Math.min(n - 1, Math.max(0, p * n - 0.5));
+      const lower = Math.floor(position);
+      const upper = Math.min(n - 1, lower + 1);
+
+      return sorted[lower]! + (position - lower) * (sorted[upper]! - sorted[lower]!);
+    },
+  };
+}

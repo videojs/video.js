@@ -42,6 +42,8 @@ window.abrLab = {
       src: options.src ?? form.src.value,
       durationMs: options.durationMs ?? Number(form.minutes.value) * 60_000,
       audio: options.audio ?? form.audio.checked,
+      seed: options.seed,
+      maxSegments: options.maxSegments,
       recording,
       signal: controller.signal,
       onProgress: (record) => {

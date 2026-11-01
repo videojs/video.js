@@ -1,4 +1,5 @@
 import type { TransferRecord } from '../record.ts';
+import { seededRandom } from '../synthetic/trace.ts';
 import { type MediaPlaylist, parseMedia, parseMultivariant, type Rendition } from './hls.ts';
 import { TransferRecorder } from './recorder.ts';
 
@@ -8,9 +9,19 @@ export interface SessionOptions {
   recording: string;
   /** Fetch the matching audio segment alongside each video segment, to exercise concurrency. */
   audio: boolean;
+  /**
+   * Seeds the schedule. The same seed and playlists give the same request sequence whatever the network does, so a
+   * repeat pass re-requests exactly what an earlier pass did.
+   */
+  seed?: number | undefined;
+  /** Stop after this many video segments, even before `durationMs`; lets a repeat pass match an earlier one. */
+  maxSegments?: number | undefined;
   onProgress?: (record: TransferRecord) => void;
   signal?: AbortSignal;
 }
+
+/** Random draws taken every iteration, used or not, so timing never shifts the sequence. */
+const DRAWS_PER_SEGMENT = 9;
 
 /**
  * A player-shaped fetch schedule with no player: fill a randomly re-drawn buffer target, idle while a simulated
@@ -51,23 +62,26 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
     return playlist;
   };
 
+  const random = options.seed === undefined ? Math.random : seededRandom(options.seed);
   const deadline = performance.now() + options.durationMs;
-  let rung = Math.floor(Math.random() * multivariant.renditions.length);
-  let target = 10 + Math.random() * 30;
+  const maxSegments = options.maxSegments ?? Infinity;
+  let rung = Math.floor(random() * multivariant.renditions.length);
+  let target = 10 + random() * 30;
   let buffer = 0;
   let index = 0;
 
-  while (performance.now() < deadline && !options.signal?.aborted) {
-    if (Math.random() < 0.25)
-      rung = clamp(rung + (Math.random() < 0.5 ? -1 : 1), 0, multivariant.renditions.length - 1);
+  for (let fetched = 0; fetched < maxSegments && performance.now() < deadline && !options.signal?.aborted; fetched++) {
+    const r = Array.from({ length: DRAWS_PER_SEGMENT }, random);
 
-    if (Math.random() < 0.1) target = 10 + Math.random() * 30;
+    if (r[0]! < 0.25) rung = clamp(rung + (r[1]! < 0.5 ? -1 : 1), 0, multivariant.renditions.length - 1);
+
+    if (r[2]! < 0.1) target = 10 + r[3]! * 30;
 
     const rendition: Rendition = multivariant.renditions[rung]!;
     const video = await loadMedia(rendition.id, rendition.url, 'video');
 
-    if (Math.random() < 0.03) index = Math.max(0, index - 1 - Math.floor(Math.random() * 5));
-    else if (Math.random() < 0.02) index += 5 + Math.floor(Math.random() * 20);
+    if (r[4]! < 0.03) index = Math.max(0, index - 1 - Math.floor(r[5]! * 5));
+    else if (r[4]! > 0.98) index += 5 + Math.floor(r[5]! * 20);
 
     index %= video.segmentUrls.length;
 
@@ -106,8 +120,8 @@ export async function runSession(options: SessionOptions): Promise<TransferRecor
     index++;
 
     if (buffer >= target) {
-      const resumeAt = Math.max(0, target - video.segmentSeconds - Math.random() * 4);
-      const pauseMs = Math.random() < 0.05 ? Math.random() * 60_000 : 0;
+      const resumeAt = Math.max(0, target - video.segmentSeconds - r[6]! * 4);
+      const pauseMs = r[7]! < 0.05 ? r[8]! * 60_000 : 0;
 
       await sleep((buffer - resumeAt) * 1000 + pauseMs, options.signal);
       buffer = resumeAt;

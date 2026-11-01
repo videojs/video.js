@@ -1,7 +1,7 @@
 import { downloadTimeDistribution } from '../distribution.ts';
 import { bodyRateBps, latencyMs, type TransferRecord } from '../record.ts';
 import type { EvidenceWeights } from '../regime.ts';
-import { INITIAL_BANDWIDTH_BPS, type Predictor } from './predictor.ts';
+import { type ForecastRequest, INITIAL_BANDWIDTH_BPS, type Predictor } from './predictor.ts';
 
 export interface LognormalConfig {
   /** Prior spread of log-throughput before any evidence. */
@@ -34,7 +34,23 @@ export const DEFAULT_LOGNORMAL_CONFIG: LognormalConfig = {
  * spread come from an exponentially weighted mean and variance of body rates; the spread widens as evidence ages.
  * Latency is tracked per host and pooled toward the all-host estimate until a host has its own evidence.
  */
-export function createLognormal(config: Partial<LognormalConfig> = {}): Predictor {
+export interface LognormalState {
+  /** Mean of log body rate, in log(bits/ms). */
+  logRateMean: number;
+  /** Spread of log body rate, including the widening from evidence age. */
+  logRateSigma: number;
+  /** Ms since the last bandwidth evidence; 0 before any. */
+  ageMs: number;
+  /** Pooled latency estimate for the request's host. */
+  latencyMs: number;
+}
+
+export interface LognormalPredictor extends Predictor {
+  /** The state behind a forecast, for use as model features. */
+  inspect(request: ForecastRequest): LognormalState;
+}
+
+export function createLognormal(config: Partial<LognormalConfig> = {}): LognormalPredictor {
   const c = { ...DEFAULT_LOGNORMAL_CONFIG, ...config };
 
   let mean = Math.log(INITIAL_BANDWIDTH_BPS / 1000);
@@ -77,20 +93,24 @@ export function createLognormal(config: Partial<LognormalConfig> = {}): Predicto
         });
       }
     },
-    forecast({ bytes, host, at }) {
-      const age = lastEvidenceAt === undefined ? 0 : Math.max(0, at - lastEvidenceAt);
-      const drift = c.driftSigma ** 2 * (1 - Math.exp(-age / c.driftTimeMs));
+    inspect({ host, at }) {
+      const ageMs = lastEvidenceAt === undefined ? 0 : Math.max(0, at - lastEvidenceAt);
+      const drift = c.driftSigma ** 2 * (1 - Math.exp(-ageMs / c.driftTimeMs));
 
       const own = hostLatency.get(host);
       const share = own ? own.count / (own.count + c.hostPoolingCount) : 0;
-      const latency = share * (own?.value ?? 0) + (1 - share) * pooledLatency;
 
-      return downloadTimeDistribution({
-        latencyMs: latency,
-        bytes,
+      return {
         logRateMean: mean,
         logRateSigma: Math.sqrt(variance + drift),
-      });
+        ageMs,
+        latencyMs: share * (own?.value ?? 0) + (1 - share) * pooledLatency,
+      };
+    },
+    forecast(request) {
+      const { logRateMean, logRateSigma, latencyMs } = this.inspect(request);
+
+      return downloadTimeDistribution({ latencyMs, bytes: request.bytes, logRateMean, logRateSigma });
     },
   };
 }
