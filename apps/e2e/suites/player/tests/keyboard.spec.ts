@@ -170,6 +170,19 @@ for (const entry of PAGES as readonly PageEntry[]) {
       }
     });
 
+    if (!isAudio) {
+      test('keeps focus in the player when the centre play button starts playback', async ({ page }) => {
+        await player.centerPlayButton.focus();
+        await page.keyboard.press('Enter');
+        await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
+
+        // The button hides once playback starts, except while focused, so the player's hotkeys keep working.
+        await expect(player.centerPlayButton).toBeFocused();
+        await page.keyboard.press('k');
+        await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
+      });
+    }
+
     test('keeps handled arrow keys inside the player', async ({ page }) => {
       await page.evaluate(() => {
         document.body.style.height = '200vh';
