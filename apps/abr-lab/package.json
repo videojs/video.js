@@ -12,7 +12,11 @@
     "test": "vp test run",
     "typecheck": "tsgo --project tsconfig.json --noEmit",
     "passes": "node --import tsx src/cli/passes.ts",
-    "train": "node --import tsx src/cli/train.ts"
+    "train": "node --import tsx src/cli/train.ts",
+    "probe": "node --import tsx src/cli/probe.ts",
+    "lab:up": "docker compose -f netlab/compose.yaml up -d --build",
+    "lab:down": "docker compose -f netlab/compose.yaml down",
+    "probe:report": "node --import tsx src/cli/probe-report.ts"
   },
   "devDependencies": {
     "@types/node": "^22.18.6",

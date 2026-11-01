@@ -6,6 +6,7 @@ import { parseArgs } from 'node:util';
 import { type BrowserContext, chromium } from 'playwright-core';
 import { createServer } from 'vite-plus';
 
+import { LAB_BROWSER, LAB_ORIGIN, setLinkConditions } from '../netlab.ts';
 import type { TransferRecord } from '../record.ts';
 import { generateTrace, PROFILES, seededRandom } from '../synthetic/trace.ts';
 
@@ -26,8 +27,10 @@ const { values } = parseArgs({
     profile: { type: 'string' },
     /** Log every transfer's start and end from inside the page. */
     debug: { type: 'boolean', default: false },
-    /** Throttle with DevTools network emulation following a synthetic profile (see synthetic/trace.ts). */
+    /** Throttle following a synthetic profile (see synthetic/trace.ts): DevTools emulation, or netem with `--lab`. */
     throttle: { type: 'string' },
+    /** Record in the Docker network lab (`pnpm lab:up`): Chrome and the media origin in containers, shaped by netem. */
+    lab: { type: 'boolean', default: false },
   },
 });
 
@@ -41,16 +44,26 @@ const durationMs = Number(values.minutes) * 60_000;
 const passes = Number(values.repeat);
 const seed = values.seed === undefined ? (passes > 1 ? Date.now() % 1_000_000 : undefined) : Number(values.seed);
 const launchOptions = { headless: !values.headed, ...(values.channel ? { channel: values.channel } : {}) };
+
+if (values.lab && (values.profile || values.headed || values.channel)) {
+  throw new Error('--lab drives the lab container Chrome; --profile, --headed and --channel do not apply');
+}
+
 const server = await createServer({
   configFile: resolve(appRoot, 'vite.config.ts'),
   root: resolve(appRoot, 'src/logger'),
-  // A hot reload mid-recording would wipe the page's session state and leave the recorder waiting forever.
-  server: { hmr: false, watch: null },
+  // A hot reload mid-recording would wipe the page's session state and leave the recorder waiting forever. The lab's
+  // Chrome reaches the page from its container, through Docker's host gateway.
+  server: values.lab ? { hmr: false, watch: null, host: '0.0.0.0', allowedHosts: true } : { hmr: false, watch: null },
 });
 
 await server.listen();
 
-const browser = values.profile ? undefined : await chromium.launch(launchOptions);
+const browser = values.lab
+  ? await chromium.connect(LAB_BROWSER, { timeout: 15_000 })
+  : values.profile
+    ? undefined
+    : await chromium.launch(launchOptions);
 const context: BrowserContext = values.profile
   ? await chromium.launchPersistentContext(resolve(values.profile), launchOptions)
   : await browser!.newContext();
@@ -90,7 +103,8 @@ try {
   });
   await cdp.send('Network.enable');
 
-  const url = server.resolvedUrls!.local[0]!;
+  const url = values.lab ? `http://host.docker.internal:${server.config.server.port}/` : server.resolvedUrls!.local[0]!;
+  const src = values.src ?? (values.lab ? `${LAB_ORIGIN}/mux-bbb/master.m3u8` : undefined);
   const all: TransferRecord[] = [];
   let maxSegments: number | undefined;
 
@@ -103,7 +117,7 @@ try {
 
     console.log(`Recording ${recording} (seed ${seed ?? 'random'}) for up to ${values.minutes} min ...`);
     await page.evaluate((options) => window.abrLab.start(options), {
-      ...(values.src ? { src: values.src } : {}),
+      ...(src ? { src } : {}),
       durationMs,
       audio: values.audio,
       recording,
@@ -133,7 +147,7 @@ try {
     if (pass < passes) await page.waitForTimeout(Number(values.gap) * 1000);
   }
 
-  throttle?.stop();
+  await throttle?.stop();
 
   const out = resolve(appRoot, 'recordings', `${values.name}.jsonl`);
 
@@ -141,9 +155,10 @@ try {
   writeFileSync(out, `${all.map((r) => JSON.stringify(r)).join('\n')}\n`);
   console.log(`Wrote ${all.length} transfers to ${out}`);
   /**
-   * Applies the profile's capacity and latency every 500 ms. DevTools emulation paces data inside Chrome rather than on
-   * the wire (no TCP dynamics), so throttled recordings test dynamics, never calibration. The applied schedule is kept,
-   * in page time, as ground truth.
+   * Follows the profile's capacity, holding each value for STEP_HOLD_MS, and keeps the applied schedule in page time as
+   * ground truth. DevTools emulation paces data inside Chrome rather than on the wire (no TCP dynamics), so those
+   * recordings test dynamics, never calibration. In the lab, netem shapes the origin's egress: real TCP and TLS, with
+   * the profile's latency as the added round trip.
    */
   async function startThrottle(name: string) {
     const profile = PROFILES[name];
@@ -167,6 +182,12 @@ try {
 
       lastSent = capacityBps;
       schedule.push({ at: performance.now() + pageOffset, capacityBps, latencyMs: profile.latencyMs });
+
+      if (values.lab) {
+        await setLinkConditions({ rttMs: profile.latencyMs, rateKbps: Math.round(capacityBps / 1000) });
+        return;
+      }
+
       await cdp.send('Network.emulateNetworkConditions', {
         offline: false,
         latency: profile.latencyMs,
@@ -182,10 +203,18 @@ try {
       at(pageTime: number) {
         const entry = schedule.findLast((s) => s.at <= pageTime) ?? schedule[0];
 
-        return entry && { profile: name, capacityBps: entry.capacityBps, latencyMs: entry.latencyMs };
+        return (
+          entry && {
+            profile: values.lab ? `lab:${name}` : name,
+            capacityBps: entry.capacityBps,
+            latencyMs: entry.latencyMs,
+          }
+        );
       },
-      stop() {
+      async stop() {
         clearInterval(timer);
+
+        if (values.lab) await setLinkConditions({ rttMs: 0, rateKbps: 0 });
       },
     };
   }

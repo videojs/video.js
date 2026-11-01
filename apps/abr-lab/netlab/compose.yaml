@@ -1,0 +1,22 @@
+# The abr-lab network lab: Chrome and a media origin on one Docker network, with netem shaping the origin's egress.
+# `pnpm -F @videojs/abr-lab lab:up` starts it; see README.md.
+name: abr-lab
+
+services:
+  origin:
+    build: { context: ., dockerfile: origin.Dockerfile }
+    cap_add: [NET_ADMIN]
+    volumes:
+      - ${ABR_LAB_MEDIA:-${HOME}/dev/experiments/media-test-server/media}:/media:ro
+    ports:
+      # Control only; media is reached over the lab network, never through Docker's port forwarding.
+      - '127.0.0.1:8081:8081'
+
+  browser:
+    build: { context: ., dockerfile: browser.Dockerfile }
+    ipc: host
+    init: true
+    ports:
+      - '127.0.0.1:3100:3100'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
