@@ -7,8 +7,8 @@ import { PlayerPage } from '../../../shared/page-objects/player';
  * Gesture tests — validates the media-gesture components respond to pointer events on the player container (not
  * individual buttons).
  *
- * The player's gesture system: - tap (mouse, center): togglePaused - tap (touch): startOrToggleControls - doubletap
- * (left): seek backward 10s - doubletap (center): toggleFullscreen - doubletap (right): seek forward 10s
+ * The player's gesture system: - tap (mouse, center): togglePaused - tap (touch): toggleControls - doubletap (left):
+ * seek backward 10s - doubletap (center): toggleFullscreen - doubletap (right): seek forward 10s
  */
 
 // Helper to get center coordinates of an element
@@ -167,23 +167,6 @@ test.describe('Touch Gestures', () => {
     player = new PlayerPage(page);
     await page.goto('/pages/html-video-mp4.html');
     await player.waitForMediaReady();
-  });
-
-  test('tap starts playback that has not started, and never pauses', async ({ page }) => {
-    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
-
-    // Clear of the centre play button, which would start playback by itself.
-    const { x, y } = await getOffCenter(player);
-
-    await page.touchscreen.tap(x, y);
-    await expect(player.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
-
-    // Once playback has started, a tap on paused media toggles the controls instead of playing.
-    await player.pause();
-    await page.waitForTimeout(300);
-    await page.touchscreen.tap(x, y);
-    await page.waitForTimeout(500);
-    await expect(player.playButton).toHaveAttribute(DATA_ATTRS.paused, '');
   });
 
   test('tap container toggles controls visibility', async ({ page }) => {

@@ -8,7 +8,6 @@ export type GestureActionName =
   | 'toggleSubtitles'
   | 'togglePictureInPicture'
   | 'toggleControls'
-  | 'startOrToggleControls'
   | 'seekStep'
   | 'volumeStep'
   | 'speedUp'
