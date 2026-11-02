@@ -465,7 +465,8 @@ export default function StoryPlayer({ poster }: { poster: string }) {
 
       const origin = element.getBoundingClientRect();
       const amounts = {
-        tilt: phase(section, 'tilt'),
+        // The layer labels wait until the layers are mostly apart, so they don't pile up while the stack lifts.
+        tilt: Math.max(0, phase(section, 'tilt') - 0.6) / 0.4,
         spread: phase(section, 'spread') * (1 - phase(section, 'dock')),
         menus: phase(section, 'menus'),
         own: phase(section, 'own'),

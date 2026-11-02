@@ -138,7 +138,8 @@ const steps = [
       steps.forEach((step, index) => step.toggleAttribute('data-active', index === Math.max(0, active)));
 
       const introLeft = (besideIntro.matches ? innerHeight : 0) - intro.getBoundingClientRect().bottom;
-      const handedOver = Math.min(1, Math.max(0, introLeft / (innerHeight * HANDOVER_SPAN)));
+      const handoverSpans = introLeft / (innerHeight * HANDOVER_SPAN);
+      const handedOver = Math.min(1, Math.max(0, handoverSpans));
       const first = steps[0]!.getBoundingClientRect();
       const last = steps.at(-1)!.getBoundingClientRect();
       const scrolled = Math.min(1, Math.max(0, (middle - first.top) / (last.bottom - first.top)));
@@ -146,7 +147,8 @@ const steps = [
       const p = motion ? scrolled : active < 0 ? 0 : stepProgress[active]!;
       const phases = {
         handover: motion ? ramp(handedOver, 0, 1) : Math.round(handedOver),
-        tilt: ramp(handedOver, 0.95, 1) * ramp(p, 0.05, 0.11) * (1 - ramp(p, 0.2, 0.28)),
+        // The layers start lifting before the handover ends and keep going well past it, so the split reads slowly.
+        tilt: (motion ? ramp(handoverSpans, 0.5, 1.2) : ramp(p, 0.05, 0.11)) * (1 - ramp(p, 0.2, 0.28)),
         spread: ramp(p, 0.22, 0.32),
         menus: ramp(p, 0.48, 0.57) * (1 - ramp(p, 0.74, 0.8)),
         // The bar docks back over the video as the menus open, and stays there once they close.
