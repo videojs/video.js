@@ -1,4 +1,4 @@
-import type { HlsBackgroundVideoAdapter } from '@videojs/spf/hls-background-video';
+import type { HlsBackgroundVideoAdapter } from '@videojs/spf/adapters/hls-background-video';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxBackgroundVideo } from '../../mux-background-video';
@@ -146,6 +146,47 @@ describe('HlsBackgroundVideo', () => {
       await flush();
 
       expect(element.error).toBeNull();
+    });
+  });
+
+  describe('teardown', () => {
+    it('releases its engine a microtask after it is removed', async () => {
+      const element = create(defineElement());
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      element.remove();
+      await flush();
+
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+
+    it('releases its engine when only an ancestor has keep-alive', async () => {
+      const player = document.createElement('div');
+      const element = document.createElement(defineElement()) as HlsBackgroundVideo;
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      player.setAttribute('keep-alive', '');
+      player.append(element);
+      document.body.append(player);
+      player.remove();
+      await flush();
+
+      expect(destroy).toHaveBeenCalledOnce();
+    });
+
+    it('keeps its engine with keep-alive until adapter.destroy()', async () => {
+      const element = create(defineElement(), { 'keep-alive': '' });
+      const destroy = vi.spyOn(mediaOf(element).engine, 'destroy');
+
+      element.remove();
+      await flush();
+
+      expect(destroy).not.toHaveBeenCalled();
+
+      element.adapter.destroy();
+
+      expect(element.adapter).toBe(mediaOf(element));
+      expect(destroy).toHaveBeenCalledOnce();
     });
   });
 

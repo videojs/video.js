@@ -15,12 +15,12 @@
     "test:coverage": "vp test --coverage"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.4.2",
-    "@astrojs/mdx": "^8.0.2",
-    "@astrojs/netlify": "^8.1.2",
-    "@astrojs/react": "^6.0.0",
+    "@astrojs/markdown-satteri": "^0.4.4",
+    "@astrojs/mdx": "^8.1.0",
+    "@astrojs/netlify": "^8.2.10",
+    "@astrojs/react": "^7.1.0",
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@base-ui/react": "^1.6.0",
     "@docsearch/css": "^4.6.0",
     "@docsearch/react": "^4.6.0",
@@ -35,7 +35,7 @@
     "@videojs/html": "workspace:*",
     "@videojs/installation": "workspace:*",
     "@videojs/react": "workspace:*",
-    "astro": "^7.3.5",
+    "astro": "^7.4.0",
     "clsx": "^2.1.1",
     "es-toolkit": "^1.32.0",
     "github-slugger": "^2.0.0",
@@ -61,7 +61,7 @@
     "vite": "catalog:"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.10",
     "@netlify/edge-functions": "^3.0.8",
     "@oxc-project/types": "0.146.0",
     "@testing-library/jest-dom": "^6.9.1",

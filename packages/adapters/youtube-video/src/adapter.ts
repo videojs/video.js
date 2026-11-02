@@ -2,7 +2,13 @@
 // TypeScript and reshaped as a media adapter (mirrors `dom/vimeo`).
 // Source: https://github.com/muxinc/media-elements
 
-import { EMPTY_TIME_RANGES, MediaError, type TextTrackListLike, type Video } from '@videojs/media';
+import {
+  EMPTY_TIME_RANGES,
+  MediaError,
+  type MediaPlaybackRateRange,
+  type TextTrackListLike,
+  type Video,
+} from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, noop, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -103,7 +109,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   // track is stale until the next source.
   #captionSelected = false;
 
-  static PLAYER_SOFTWARE_NAME = 'youtube-video';
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'youtube';
 
   constructor() {
     super();
@@ -359,6 +366,16 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
+  /**
+   * YouTube plays any rate from 0.25 to 2, rounded down to a step of 0.05, though `getAvailablePlaybackRates` lists
+   * only quarter steps.
+   *
+   * @internal
+   */
+  get playbackRateRange(): MediaPlaybackRateRange {
+    return PLAYBACK_RATE_RANGE;
+  }
+
   get autoplay() {
     return this.#autoplay;
   }
@@ -610,7 +627,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      // The embed reads mute once, from its URL, and either property says to start muted.
+      defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
@@ -898,6 +916,8 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     tryCall(() => player.setOption('captions', 'track', language ? { languageCode: language } : {}));
   }
 }
+
+const PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.25, max: 2 };
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

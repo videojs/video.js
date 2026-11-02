@@ -11,8 +11,7 @@
  * 1. **Seed `state.currentTime` immediately.** The segment loaders anchor their load window on `state.currentTime`;
  *    seeding points the _first_ fetches at the requested position instead of 0. Multi-writer with `trackCurrentTime`
  *    (ongoing DOM mirror) — legitimate: different decision domains (element-derived mirror vs one-shot command), and
- *    before HAVE_METADATA no `timeupdate`/`seeking` fires to overwrite the seed. Compose this behavior _after_
- *    `trackCurrentTime` so the seed lands after the mirror's attach-time sync.
+ *    before HAVE_METADATA no `timeupdate`/`seeking` fires to overwrite the seed.
  * 2. **Seek the element at metadata.** `element.currentTime = position` once `readyState >= HAVE_METADATA` (immediately if
  *    already there, else on `loadedmetadata`), then clear `startPosition` (consume). The element clamps the seek to its
  *    seekable range per spec, and the resulting `seeking` event flows back through `trackCurrentTime` — from here the
@@ -34,7 +33,7 @@
 import { listen } from '@videojs/utils/dom';
 import { isUndefined } from '@videojs/utils/predicate';
 
-import { defineBehavior } from '../../../core/composition/create-composition';
+import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';

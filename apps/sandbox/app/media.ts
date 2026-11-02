@@ -4,17 +4,21 @@ import {
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
+  DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
   HLS_SOURCE_IDS,
+  MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
   type SandboxSource,
   SHAKA_SOURCE_IDS,
+  SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   type SourceId,
   SOURCES,
@@ -222,10 +226,12 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube and `<playerjs-video>` renders one provider page URL rather than the picker's list. YouTube
-  // offers a set of page URLs instead, covering the caption, short, and live cases its adapter handles differently. The
-  // CDN page builds elements from attributes alone, so the entries that need player parameters stay off it. player.js
-  // is a protocol many providers speak, so its embed picks between their embed pages.
+  // Each embed but YouTube, `<playerjs-video>`, `<soundcloud-audio>`, and `<mixcloud-audio>` renders one provider page
+  // URL rather than the picker's list. YouTube offers a set of page URLs instead, covering the caption, short, and live
+  // cases its adapter handles differently. The CDN page builds elements from attributes alone, so the entries that need
+  // player parameters stay off it. player.js is a protocol many providers speak, so its embed picks between their embed
+  // pages. SoundCloud's and Mixcloud's pickers cover the URL shapes and layouts their adapters handle differently, and
+  // sources that fail on purpose.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -259,6 +265,24 @@ const MEDIA_MAP = {
     sources: PLAYERJS_SOURCE_IDS,
     fallbackSource: DEFAULT_PLAYERJS_SOURCE,
     entrySource: DEFAULT_PLAYERJS_SOURCE,
+  },
+  'soundcloud-audio': {
+    label: 'SoundCloud Audio',
+    player: 'audio',
+    tag: 'soundcloud-audio',
+    embed: true,
+    sources: SOUNDCLOUD_SOURCE_IDS,
+    fallbackSource: DEFAULT_SOUNDCLOUD_SOURCE,
+    entrySource: DEFAULT_SOUNDCLOUD_SOURCE,
+  },
+  'mixcloud-audio': {
+    label: 'Mixcloud Audio',
+    player: 'audio',
+    tag: 'mixcloud-audio',
+    embed: true,
+    sources: MIXCLOUD_SOURCE_IDS,
+    fallbackSource: DEFAULT_MIXCLOUD_SOURCE,
+    entrySource: DEFAULT_MIXCLOUD_SOURCE,
   },
   'spotify-audio': {
     label: 'Spotify Audio',

@@ -8,11 +8,11 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import PresetFeatures from '@/components/docs/api-reference/PresetFeatures.astro';
 
 <FrameworkCase frameworks={["react"]}>
-`@videojs/react/video` is the general-purpose preset for on-demand video. It bundles `VideoPlayer`, the `videoFeatures` bundle it is configured with, two skins, and the `Video` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+`@videojs/react/video` is the general-purpose preset for on-demand video. It bundles `VideoPlayer`, the `videoFeatures` bundle it is configured with, four skins, and the `Video` media component. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`@videojs/html/video` is the general-purpose preset for on-demand video. It bundles the `<video-player>` element, the `videoFeatures` bundle it is configured with, and two skins, and plays through the browser's native `<video>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
+`@videojs/html/video` is the general-purpose preset for on-demand video. It bundles the `<video-player>` element, the `videoFeatures` bundle it is configured with, and four skins, and plays through the browser's native `<video>`. See <DocsLink slug="guides/presets">Presets</DocsLink> for how presets fit together and how to customize one.
 </FrameworkCase>
 
 ## Import
@@ -23,7 +23,7 @@ import { Video, VideoPlayer, VideoSkin } from '@videojs/react/video';
 import '@videojs/react/video/skin.css';
 ```
 
-Each skin has its own stylesheet. Import `@videojs/react/video/neutral-skin.css` instead when you use `NeutralVideoSkin`.
+Each skin has its own stylesheet. Import `@videojs/react/video/neutral-skin.css`, `compat-skin.css`, or `scaffold-skin.css` instead when you use `NeutralVideoSkin`, `CompatVideoSkin`, or `ScaffoldVideoSkin`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -32,13 +32,13 @@ import '@videojs/html/video/player';
 import '@videojs/html/video/skin';
 ```
 
-Import `@videojs/html/video/neutral-skin` instead for the neutral skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
+Import `@videojs/html/video/neutral-skin`, `compat-skin`, or `scaffold-skin` instead for another skin. Or load one <DocsLink slug="guides/cdn">CDN</DocsLink> bundle that registers the player and a skin together:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/video.js"></script>
 ```
 
-`video-neutral.js` registers the neutral skin instead, and `video-player.js` registers `<video-player>` alone.
+`video-neutral.js`, `video-compat.js`, and `video-scaffold.js` register the other skins instead, and `video-player.js` registers `<video-player>` alone.
 </FrameworkCase>
 
 ## Usage
@@ -100,7 +100,7 @@ The preset also exports a `usePlayer` hook typed to `videoFeatures`. Use it from
 | --- | --- | --- |
 | `content-title` | `contentTitle` | The title to display. Takes precedence over the title the media reports. |
 | `poster` | `poster` | The poster to display. Takes precedence over the poster the media reports. |
-| `keep-alive` | — | Keeps the player and its store alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
+| `keep-alive` | — | Keeps the player, its store, and the UI elements inside it alive when the element leaves the DOM. Call `destroy()` when you're done with it. |
 
 `content-title` and `poster` come from the <DocsLink slug="reference/api/feature-metadata" anchor="player-inputs">metadata feature</DocsLink>. The element's read-only `store` property returns its player store.
 
@@ -159,6 +159,10 @@ customElements.define('my-video-player', PlayerElement);
 
 - <DocsLink slug="reference/components/video-skin">VideoSkin</DocsLink> — the default skin, with the modern, frosted look.
 - <DocsLink slug="reference/components/video-neutral-skin">NeutralVideoSkin</DocsLink> — the visually lighter variant, closer to a classic control bar.
+- <DocsLink slug="reference/components/video-compat-skin">CompatVideoSkin</DocsLink> — the plain, unbranded variant that avoids newer visual effects, so it looks consistent across browsers.
+- <DocsLink slug="reference/components/video-scaffold-skin">ScaffoldVideoSkin</DocsLink> — the minimally styled variant of Compat, a foundation for your own design.
+
+See <DocsLink slug="guides/skins" anchor="choose-a-skin">Choose a skin</DocsLink> to compare them.
 
 ## Media
 
@@ -182,9 +186,11 @@ The preset plays through a native <DocsLink slug="reference/components/video">`<
 | `videoFeatures` | The [feature bundle](#feature-bundle). |
 | `VideoSkin`, `VideoSkinProps` | The default [skin](#skins). |
 | `NeutralVideoSkin`, `NeutralVideoSkinProps` | The neutral [skin](#skins). |
+| `CompatVideoSkin`, `CompatVideoSkinProps` | The compat [skin](#skins). |
+| `ScaffoldVideoSkin`, `ScaffoldVideoSkinProps` | The scaffold [skin](#skins). |
 | `Video`, `VideoProps` | The [media](#media) component. |
 
-Stylesheets: `@videojs/react/video/skin.css` and `@videojs/react/video/neutral-skin.css`.
+Stylesheets: `@videojs/react/video/skin.css`, `@videojs/react/video/neutral-skin.css`, `@videojs/react/video/compat-skin.css`, and `@videojs/react/video/scaffold-skin.css`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -197,6 +203,8 @@ The preset root, `@videojs/html/video`, has no side effects. Importing it never 
 | `videoFeatures` | The [feature bundle](#feature-bundle). |
 | `VideoSkinElement` | The default [skin](#skins) element class. |
 | `NeutralVideoSkinElement` | The neutral [skin](#skins) element class. |
+| `CompatVideoSkinElement` | The compat [skin](#skins) element class. |
+| `ScaffoldVideoSkinElement` | The scaffold [skin](#skins) element class. |
 
 Registration entry points are side-effect-only:
 
@@ -205,6 +213,8 @@ Registration entry points are side-effect-only:
 | `@videojs/html/video/player` | `<video-player>` |
 | `@videojs/html/video/skin` | `<video-skin>`, `<media-container>`, and the UI elements the skin composes |
 | `@videojs/html/video/neutral-skin` | `<video-neutral-skin>`, `<media-container>`, and the UI elements the neutral skin composes |
+| `@videojs/html/video/compat-skin` | `<video-compat-skin>`, `<media-container>`, and the UI elements the compat skin composes |
+| `@videojs/html/video/scaffold-skin` | `<video-scaffold-skin>`, `<media-container>`, and the UI elements the scaffold skin composes |
 | `@videojs/html/video/ui` | `<media-container>` and the UI elements of the default skin, without the skin, for a layout you write yourself |
 | `@videojs/html/video/neutral-ui` | `<media-container>` and the UI elements of the neutral skin, without the skin |
 </FrameworkCase>

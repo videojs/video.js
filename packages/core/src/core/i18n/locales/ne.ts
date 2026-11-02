@@ -57,7 +57,7 @@ export default {
     unknown: 'मिडिया लोड भएको छैन, समय अज्ञात छ।',
   },
   playback: {
-    rate: 'प्लेब्याक दर {rate}',
+    rate: 'प्लेब्याक दर, {rate}',
   },
   volume: {
     mutedValue: '{percent}, म्यूट',
@@ -100,6 +100,7 @@ export default {
     speed: 'गति',
     captions: 'क्याप्शन',
     playbackRate: 'प्लेब्याक दर',
+    customRate: 'कस्टम, {rate}',
     back: 'पछाडि',
     off: 'बन्द',
     auto: 'स्वतः',

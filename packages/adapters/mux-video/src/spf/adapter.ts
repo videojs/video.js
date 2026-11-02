@@ -1,4 +1,4 @@
-import { HlsVideoAdapter, type HlsVideoAdapterProps } from '@videojs/spf/hls-video';
+import { HlsVideoAdapter, type HlsVideoAdapterProps } from '@videojs/spf/adapters/hls-video';
 
 import { type MuxAdapterProps, MuxMixin } from './mixin';
 

@@ -52,7 +52,7 @@ jobs:
             && !startsWith(github.event.pull_request.base.ref, 'rfc/')
             && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association))
       }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       # pkg.pr.new keys previews by the head commit, so check out that commit
@@ -129,7 +129,9 @@ jobs:
           './packages/html'
           './packages/media'
           './packages/adapters/cloudflare-video'
+          './packages/adapters/mixcloud-audio'
           './packages/adapters/playerjs-video'
+          './packages/adapters/soundcloud-audio'
           './packages/adapters/spotify-audio'
           './packages/adapters/tiktok-video'
           './packages/adapters/twitch-video'

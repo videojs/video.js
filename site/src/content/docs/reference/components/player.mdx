@@ -245,16 +245,16 @@ Video.js elements clean up after themselves when you remove them from the page:
 - `<video-player>` and the UI elements destroy themselves two animation frames after they're removed. Destroying the player also destroys its store.
 - Media components such as `<hlsjs-video>` tear down their playback engine in a microtask after they're removed.
 
-Moving an element synchronously, removing it and inserting it elsewhere with no `await` in between, triggers neither. To keep an element through a longer move, add the `keep-alive` attribute:
+Moving an element synchronously, removing it and inserting it elsewhere with no `await` in between, triggers neither. To keep the player through a longer move, add the `keep-alive` attribute to it and to its media component:
 
 ```html
 <video-player keep-alive>
-  <media-container keep-alive>
+  <media-container>
     <hlsjs-video src="/stream.m3u8" keep-alive></hlsjs-video>
   </media-container>
 </video-player>
 ```
 
-`keep-alive` applies only to the element that carries it; descendants don't inherit it. Set it on every Video.js element in the tree you move. Packaged skins don't pass it to the controls inside them, so move a player that uses a packaged skin synchronously. An element with `keep-alive` is never destroyed automatically. When you're finished with it, call `destroy()` on the player and UI elements, and `adapter.destroy()` on media components, which release their engine that way. A destroyed element can't be reconnected; create a new one instead.
+On the player, `keep-alive` covers the player and every UI element inside it, including the controls inside a packaged skin. Media components don't inherit it, because destroying the player doesn't release their engine: give each one its own `keep-alive`, or it tears down its engine as usual. An element you remove on its own from a kept-alive tree still destroys itself. `keep-alive` only stops an element from destroying itself: destroying an element, automatically or with `destroy()`, also destroys the UI elements inside it, including ones that carry `keep-alive`. When you're finished, call `destroy()` on the player and `adapter.destroy()` on each media component to release its engine. A destroyed element can't be reconnected; create a new one instead.
 
 </FrameworkCase>

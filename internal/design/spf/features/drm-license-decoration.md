@@ -193,4 +193,4 @@ than unwound.
    *(`48336ee53`; `formEncodeLicenseRequest` followed in `7dfc8a44b`)*
 7. ✅ **Composition invariant:** the new config still materializes only in DRM engine
    variants — droppability test unchanged
-   (`playback/engines/hls/tests/engine-drm-optional.test-d.ts`).
+   (`playback/engines/tests/engine-drm-optional.test-d.ts`).

@@ -19,7 +19,7 @@ Video.js 10 is set up a monorepo using [`pnpm` workspaces](https://pnpm.io/works
 
 You’ll need the following installed:
 
-- [Node.js](https://nodejs.org/en/download) (≥ 22.19.0)
+- [Node.js](https://nodejs.org/en/download) (≥ 22.22.0)
 - [Git](https://git-scm.com/downloads)
 - [PNPM](https://pnpm.io/installation) (≥ 12.3.4)
 - [mise](https://mise.jdx.dev), or [NVM](https://github.com/nvm-sh/nvm)

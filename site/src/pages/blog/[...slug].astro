@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection, getEntries, render } from 'astro:content';
 import { TableOfContents } from '@/components/docs/TableOfContents';
 import FormattedDate from '@/components/FormattedDate.astro';
+import AuthorList from '@/components/blog/AuthorList.astro';
 import JsonLd from '@/components/JsonLd.astro';
 import defaultMarkdownComponents from '@/components/typography/defaultMarkdownComponents';
 import { FIRST_V10_BLOG_MONTH, PRODUCTION_URL } from '@/consts';
@@ -94,25 +95,7 @@ const jsonLdSchema = createBlogPostingSchema({
             " This post describes an earlier Video.js version (1 through 8); its APIs do not apply to Video.js 10."}
         </p>
       </div>
-      <div class="">
-        By {
-          new Intl.ListFormat("en", { style: "long", type: "conjunction" })
-            .formatToParts(authors.map((author) => author.data.name))
-            .map((part) =>
-              part.type === "element" ? (
-                // inline-block removes the whitespace that the Astro formatter adds around the text
-                <a
-                  href={`/blog/authors/${authors.find((a) => a.data.name === part.value)?.id}`}
-                  class="inline-block intent:underline"
-                >
-                  {part.value}
-                </a>
-              ) : (
-                <span>{part.value}</span>
-              ),
-            )
-        }
-      </div>
+      <AuthorList authors={authors} link prefix="By" class="leading-8" />
     </header>
     <Content components={{ ...defaultMarkdownComponents }} />
   </article>

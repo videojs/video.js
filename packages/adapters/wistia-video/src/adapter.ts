@@ -41,6 +41,9 @@ export class WistiaAdapter extends WistiaPlayer {
     source: null,
   };
 
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'wistia';
+
   /** The hashed id of the media playing, or a Wistia URL to resolve one from. Installed by the normalizer. */
   declare src: string;
   /** Wistia's own options, `mediaId` among them. Assigning applies every one of them to the player. */

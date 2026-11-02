@@ -1,0 +1,29 @@
+---
+import { PlayIcon } from '@videojs/react/icons/compat';
+
+import Figure from '@/components/typography/Figure.astro';
+
+const examples = ['Geometric center', 'Optical center'];
+---
+
+<Figure>
+  <div class="@container grid grid-cols-2 gap-6 rounded-3xl bg-black/5 p-6 dark:bg-white/5">
+    {examples.map((label, index) => (
+      <div class="flex flex-col items-center gap-6">
+        <div
+          class="relative grid place-items-center rounded-full bg-black/40 text-white"
+          style="width: clamp(116px, 28cqw, 232px); aspect-ratio: 1;"
+          role="presentation"
+          aria-hidden="true"
+        >
+          {/* Compat's center button is 58px, with a 28px icon. Undo its 0.66-unit optical shift on the left. */}
+          <PlayIcon style={{ width: 'calc(100% * 28 / 58)', height: 'auto', transform: index === 0 ? 'translateX(-3.6667%)' : undefined }} />
+          <span class="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gold" />
+          <span class="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-gold" />
+        </div>
+        <span class="text-center text-p3">{label}</span>
+      </div>
+    ))}
+  </div>
+  <figcaption>Compat’s play icon shifts 0.66 units to the right in its 18-unit SVG. The button and center guides stay in the same position.</figcaption>
+</Figure>

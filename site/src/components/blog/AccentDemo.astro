@@ -1,0 +1,101 @@
+---
+import { GearIcon, PlayIcon } from '@videojs/react/icons';
+import { Image } from 'astro:assets';
+import colors from 'tailwindcss/colors';
+
+import cliffs from '@/assets/blog/2026-10-08-videojs-v10-skin-design/frosted-cosmic-cliffs.webp';
+import Figure from '@/components/typography/Figure.astro';
+import AnimationControls from '@/components/AnimationControls';
+import { buttonStyle, iconStyle, imageSizes, imageWidths } from './demo';
+import './Demo.css';
+
+const palette = [colors.slate[700], colors.rose[300], colors.violet[700], colors.sky[300], colors.amber[200]];
+---
+
+<Figure>
+  <blog-accent-demo class="relative block" data-colors={palette.join(';')}>
+    <div class="@container overflow-hidden rounded-3xl">
+      <div
+        class="blog-accent-demo-stage relative isolate block overflow-hidden bg-black text-white"
+        style={{ aspectRatio: '4 / 1', fontSize: '6cqw', '--unit': 'calc(1em / 13)', '--demo-accent': palette[0] }}
+        role="presentation"
+        aria-hidden="true"
+      >
+        <Image src={cliffs} alt="" widths={imageWidths} sizes={imageSizes} quality={75} class="absolute inset-0 h-full w-full object-cover" />
+        <div
+          class="blog-demo-surface absolute top-1/2 flex -translate-y-1/2 items-center rounded-full bg-white/10"
+          style="inset-inline: 4%; padding: calc(var(--unit) * 4);"
+        >
+          <span class="accent-button grid shrink-0 place-items-center rounded-full" style={buttonStyle}>
+            <PlayIcon style={iconStyle} />
+          </span>
+          <div class="flex min-w-0 flex-1 items-center" style="gap: calc(var(--unit) * 10); padding: 0 calc(var(--unit) * 12);">
+            <span class="whitespace-nowrap tabular-nums">1:08</span>
+            <div class="relative flex-1 rounded-full bg-white/15" style="height: calc(var(--unit) * 4);">
+              <span class="accent-fill absolute inset-y-0 left-0 w-1/2 rounded-full" />
+            </div>
+          </div>
+          <span class="grid shrink-0 place-items-center rounded-full" style={buttonStyle}>
+            <GearIcon style={iconStyle} />
+          </span>
+        </div>
+      </div>
+    </div>
+    <AnimationControls playing />
+  </blog-accent-demo>
+  <figcaption>The hovered play button and seek fill share the accent color. <code>contrast-color()</code> chooses black or white for the button’s icon.</figcaption>
+</Figure>
+
+<style>
+  .accent-button,
+  .accent-fill {
+    background-color: var(--demo-accent);
+    transition: background-color 400ms ease-in-out, color 400ms ease-in-out;
+  }
+
+  .accent-button {
+    color: white;
+    color: contrast-color(var(--demo-accent));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .accent-button,
+    .accent-fill {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { connectDemoAnimation } from './demo';
+
+  class AccentDemo extends HTMLElement {
+    disconnect?: () => void;
+
+    connectedCallback() {
+      const stage = this.querySelector<HTMLElement>('.blog-accent-demo-stage')!;
+      const colors = this.dataset.colors!.split(';');
+      let index = 0;
+      let timer: ReturnType<typeof setInterval> | undefined;
+
+      this.disconnect = connectDemoAnimation(this, {
+        play: () => {
+          timer ??= setInterval(() => {
+            index = (index + 1) % colors.length;
+            stage.style.setProperty('--demo-accent', colors[index]!);
+          }, 3000);
+        },
+        pause: () => {
+          clearInterval(timer);
+          timer = undefined;
+        },
+      });
+    }
+
+    disconnectedCallback() {
+      this.disconnect?.();
+    }
+  }
+
+  customElements.define('blog-accent-demo', AccentDemo);
+</script>

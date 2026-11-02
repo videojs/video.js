@@ -244,6 +244,21 @@ describe('tap/doubletap disambiguation', () => {
     expect(doubletapHandler).not.toHaveBeenCalled();
   });
 
+  it('calls onPointerDown on the pointer-down, before the tap fires', () => {
+    const container = setup();
+    const tapHandler = vi.fn();
+    const onPointerDown = vi.fn(() => expect(tapHandler).not.toHaveBeenCalled());
+
+    createTapGesture(container, tapHandler, { onPointerDown });
+
+    pointerDown(container);
+    vi.advanceTimersByTime(50);
+    pointerUp(container, { pointerType: 'mouse', clientX: 150 });
+
+    expect(onPointerDown).toHaveBeenCalledOnce();
+    expect(tapHandler).toHaveBeenCalledOnce();
+  });
+
   it('cancels pending tap on doubletap', () => {
     const container = setup();
     const tapHandler = vi.fn();

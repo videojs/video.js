@@ -43,6 +43,9 @@ class DashAdapterCore
     source: null,
   };
 
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'dashjs';
+
   #engine: dashjs.MediaPlayerClass;
   #src = DashAdapterCore.defaultProps.src;
   #source: DashSource | null = DashAdapterCore.defaultProps.source;
@@ -59,6 +62,9 @@ class DashAdapterCore
   }
 
   detach() {
+    // `destroy()` detaches before tearing down dash.js, then the base teardown detaches again.
+    if (!this.target) return;
+
     super.detach();
     // dash.js types don't reflect null support, but null is valid for detaching
     this.#engine.attachView(null as unknown as HTMLVideoElement);

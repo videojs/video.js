@@ -100,6 +100,7 @@ export default {
     speed: 'ความเร็ว',
     captions: 'คำบรรยาย',
     playbackRate: 'อัตราการเล่น',
+    customRate: 'กำหนดเอง {rate}',
     back: 'กลับ',
     off: 'ปิด',
     auto: 'อัตโนมัติ',

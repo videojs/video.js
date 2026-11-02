@@ -28,10 +28,10 @@ interface ProjectedSource {
 /**
  * A stand-in for the real base, recording what `MuxMixin` hands down.
  *
- * The base lives in `@videojs/spf/hls-video`, a separate bundle from the engine entry, so the engine it builds cannot
- * be spied on from this package. What this package contributes to licensing is the projection itself — the merged `drm`
- * — and that is what the DRM tests below assert. Turning a `drm` entry into a license request is the base's own job,
- * covered by `@videojs/spf`'s tests.
+ * The base lives in `@videojs/spf/adapters/hls-video`, a separate bundle from the engine entry, so the engine it builds
+ * cannot be spied on from this package. What this package contributes to licensing is the projection itself — the
+ * merged `drm` — and that is what the DRM tests below assert. Turning a `drm` entry into a license request is the
+ * base's own job, covered by `@videojs/spf`'s tests.
  */
 class RecordingBase {
   static readonly defaultProps = { src: '', source: null };

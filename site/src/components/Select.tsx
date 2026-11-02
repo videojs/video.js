@@ -18,6 +18,8 @@ export interface SelectProps<T = string> {
   onChange: (value: T | null) => void;
   options: SelectOption<T>[];
   className?: string;
+  /** Classes for the chevron, such as a color that reads on a custom trigger background. */
+  iconClassName?: string;
   'aria-label'?: string;
   'data-testid'?: string;
 }
@@ -28,6 +30,7 @@ export function Select<T extends string = string>({
   onChange,
   options,
   className,
+  iconClassName,
   'aria-label': ariaLabel,
   'data-testid': dataTestId,
 }: SelectProps<T>) {
@@ -52,7 +55,7 @@ export function Select<T extends string = string>({
           </span>
         )}
         <BaseSelect.Value className="min-w-0 flex-1 truncate" />
-        <BaseSelect.Icon className="text-muted flex shrink-0">
+        <BaseSelect.Icon className={twMerge('text-muted flex shrink-0', iconClassName)}>
           <ChevronDown className="size-4" />
         </BaseSelect.Icon>
       </BaseSelect.Trigger>

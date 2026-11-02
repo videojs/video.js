@@ -57,7 +57,7 @@ export default {
     unknown: '미디어를 불러오지 못했습니다. 재생 시간을 확인할 수 없습니다.',
   },
   playback: {
-    rate: '재생 속도 {rate}',
+    rate: '재생 속도, {rate}',
   },
   volume: {
     mutedValue: '{percent}, 음소거',
@@ -101,6 +101,7 @@ export default {
     speed: '속도',
     captions: '캡션',
     playbackRate: '재생 속도',
+    customRate: '맞춤 설정, {rate}',
     back: '뒤로',
     off: '끄기',
     auto: '자동',

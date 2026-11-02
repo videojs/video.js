@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react",
-  "version": "10.1.0",
+  "version": "10.2.0",
   "description": "Video.js 10 for React: player components, skins, and hooks for video and audio",
   "keywords": [
     "audio",
@@ -183,11 +183,13 @@
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
@@ -205,11 +207,13 @@
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
@@ -232,6 +236,9 @@
     "@videojs/hlsjs-video": {
       "optional": true
     },
+    "@videojs/mixcloud-audio": {
+      "optional": true
+    },
     "@videojs/mux-audio": {
       "optional": true
     },
@@ -245,6 +252,9 @@
       "optional": true
     },
     "@videojs/shaka-video": {
+      "optional": true
+    },
+    "@videojs/soundcloud-audio": {
       "optional": true
     },
     "@videojs/spotify-audio": {

@@ -57,7 +57,7 @@ export default {
     unknown: 'Medij nije učitan, vrijeme nije poznato.',
   },
   playback: {
-    rate: 'Brzina reprodukcije {rate}',
+    rate: 'Brzina reprodukcije, {rate}',
   },
   volume: {
     mutedValue: '{percent}, isključen zvuk',
@@ -100,6 +100,7 @@ export default {
     speed: 'Brzina',
     captions: 'Titlovi',
     playbackRate: 'Brzina reprodukcije',
+    customRate: 'Prilagođeno, {rate}',
     back: 'Nazad',
     off: 'Isključeno',
     auto: 'Automatski',

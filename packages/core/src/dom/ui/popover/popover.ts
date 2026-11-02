@@ -77,6 +77,7 @@ export function createPopover(options: PopoverOptions): PopoverApi {
 
   let triggerEl: HTMLElement | null = null;
   let popupEl: HTMLElement | null = null;
+  let popupAbort: AbortController | null = null;
 
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
   const capturedPointers = new Set<number>();
@@ -284,8 +285,20 @@ export function createPopover(options: PopoverOptions): PopoverApi {
     applyClose('outside-click', event);
   }
 
+  // --- External hide ---
+
+  // Something outside the popover hid the popup (e.g. entering fullscreen), so
+  // follow it rather than leave the state open with nothing on screen.
+  function handlePopupToggle(event: ToggleEvent): void {
+    if (event.newState !== 'closed') return;
+
+    applyClose('imperative-action', event);
+  }
+
   // Cleanup hover timeout on destroy.
   layer.signal.addEventListener('abort', () => {
+    popupAbort?.abort();
+    popupAbort = null;
     options.group?.()?.close(groupMember);
     clearHoverTimeout();
     clearBlurGuard();
@@ -431,9 +444,14 @@ export function createPopover(options: PopoverOptions): PopoverApi {
       tryHidePopover(popupEl);
     }
 
+    popupAbort?.abort();
+    popupAbort = null;
     popupEl = el;
 
     if (el) {
+      popupAbort = new AbortController();
+      listen(el, 'toggle', handlePopupToggle, { signal: popupAbort.signal });
+
       // If the popover is already open (e.g., React mount after state
       // change), show the popover now. In `applyOpen` the element may not
       // have been in the DOM yet, so the earlier `tryShowPopover` was a no-op.

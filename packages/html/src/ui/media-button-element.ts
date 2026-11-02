@@ -25,6 +25,10 @@ type LabelParams = Record<string, string | number>;
 type MediaButtonCore<ComponentState extends ButtonState, MediaState> = MediaButtonComponent<object, ComponentState> & {
   setMedia(media: MediaState): void;
   getLabelParams?: (state: ComponentState) => LabelParams | undefined;
+  /** Shorter text for the tooltip than the accessible name, when the two differ. */
+  getTooltipLabel?: (state: ComponentState) => Text | string;
+  /** CSS custom properties the button publishes for skins. */
+  getCSSVars?: (state: ComponentState) => Record<string, string>;
 };
 
 /**
@@ -128,6 +132,8 @@ export abstract class MediaButtonElement<
     this.core.setMedia(media);
     const state = this.core.getState();
 
+    if (this.core.getTooltipLabel) return translateText(this.core.getTooltipLabel(state), this.#i18n.value);
+
     return translateText(this.core.getLabel(state), this.#i18n.value, this.core.getLabelParams?.(state));
   }
 
@@ -160,9 +166,21 @@ export abstract class MediaButtonElement<
       // just the data one: `data-hidden` is a styling hook a skin may or may not
       // act on, where `hidden` removes the control the way the React components
       // do by rendering nothing.
-      ...(isHideable(state) && { hidden: state.hidden ? '' : undefined }),
+      ...(isHideable(state) && this.reflectsHidden() && { hidden: state.hidden ? '' : undefined }),
     });
     applyStateDataAttrs(this, state, this.stateAttrMap);
+
+    for (const [name, value] of Object.entries(this.core.getCSSVars?.(state) ?? {})) {
+      this.style.setProperty(name, value);
+    }
+  }
+
+  /**
+   * Whether this button writes its core's `hidden` state to the `hidden` attribute. A subclass returns `false` while
+   * another owner, such as a linked menu, manages its visibility.
+   */
+  protected reflectsHidden(): boolean {
+    return true;
   }
 
   #syncHotkeyShortcut(): void {

@@ -33,5 +33,5 @@ export function AudioSkin({ children, className, renderThumbnail, ...props }: Au
 
 export const meta = {
   title: 'Compat Audio Skin',
-  description: 'An on-demand audio skin designed for broader browser compatibility.',
+  description: 'A plain, unbranded on-demand audio skin with playback, seeking, volume, speed, and captions controls.',
 } as const satisfies SkinDescription;

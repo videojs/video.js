@@ -57,7 +57,7 @@ export default {
     unknown: 'Медията не е заредена, времето е неизвестно.',
   },
   playback: {
-    rate: 'Скорост на възпроизвеждане {rate}',
+    rate: 'Скорост на възпроизвеждане, {rate}',
   },
   volume: {
     mutedValue: '{percent}, без звук',
@@ -102,6 +102,7 @@ export default {
     speed: 'Скорост',
     captions: 'Надписи',
     playbackRate: 'Скорост на възпроизвеждане',
+    customRate: 'Персонализирано, {rate}',
     back: 'Назад',
     off: 'Изкл.',
     auto: 'Авто',

@@ -41,7 +41,7 @@ ambiguity reflects that split.
 ## Status
 
 - **Composition:** both sub-features are implemented in
-  `createHlsVideoEngine` and the audio-only engine. `deriveCdnPriority`
+  the `hls-video` engine and the audio-only engine. `deriveCdnPriority`
   owns the `cdnPriority` signal (manifest-ordered CDN list); the
   `preferActiveCdn` scope rule narrows candidates to the highest-priority CDN
   with surviving tracks (shared by the video + audio chains). For failover:
@@ -239,7 +239,7 @@ tracking as a future effort:
   `excludeFailedCdns` constraint (shared by the video + audio chains via the
   `CdnRuleConfig` view that carries `getCdnId`); `applyConstraints` pre-pass +
   `constraints` config slot; `SwitchableTrack` gains `url`.
-- **`playback/engines/hls/engine.ts` + `engine-audio-only.ts`** —
+- **`playback/engines/hls-video.ts` + `hls-audio.ts`** —
   `deriveCdnPriority` + `setupFailoverMonitor` composed after
   `resolvePresentation`; `failover?` + `getCdnId?` engine config; `cdnPriority?`
   + `failedCdns?` engine state.
@@ -265,13 +265,13 @@ sites, read by the `excludeFailedCdns` constraint).
   to highest-priority surviving CDN; fall-through; cross-type coherence);
   `excludeFailedCdns` + `applyConstraints` (prune failed CDNs; order-independence;
   failover via the constraint).
-- `playback/engines/hls/tests/engine.test.ts` — integration: redundant-stream →
+- `playback/engines/tests/hls-video.test.ts` — integration: redundant-stream →
   `cdnPriority` = manifest order + pick on primary; reordering re-narrows;
   **auto-failover** (a failing media-playlist fetch trips the CDN and selection
   falls over to the backup, no external write); a **custom `getCdnId`** (keyed on
   a query param) honored across `cdnPriority`, the trip, and the constraint/scope
   end-to-end.
-- `playback/engines/hls/tests/failover-smoke.test.ts` — **gated live smoke test**
+- `playback/engines/tests/failover-smoke.test.ts` — **gated live smoke test**
   (behind `VITE_FAILOVER_SMOKE`) against a real Mux `?redundant_streams=true`
   source: block one origin → trip → failover → recovery. Skipped by default.
 

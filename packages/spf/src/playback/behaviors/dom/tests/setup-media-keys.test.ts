@@ -108,6 +108,38 @@ function makePresentation(keys?: object[]): Presentation {
   } as Presentation;
 }
 
+/** Clear video plus an audio rendition that is unresolved until `audioKeys` is passed (then resolved, keyed). */
+function makeAvPresentation(audioKeys?: object[]): Presentation {
+  const video = makePresentation();
+  const audioTrack = {
+    type: 'audio' as const,
+    id: 'a-1',
+    url: 'https://example.com/a.m3u8',
+    bandwidth: 128,
+    mimeType: 'audio/mp4',
+    codecs: ['mp4a.40.2'],
+    ...(audioKeys && {
+      segments: [{ id: 'a0', url: 'https://example.com/a0.m4s', startTime: 0, duration: 4 }],
+      startTime: 0,
+      duration: 4,
+      metadata: { mediaPlaylist: { targetDuration: 4, mediaSequence: 0, endList: true, keys: audioKeys } },
+    }),
+  };
+
+  // SAFETY: test fixture; the audio track is partially resolved unless it declares keys, which a Presentation allows.
+  return {
+    ...video,
+    selectionSets: [
+      ...video.selectionSets,
+      {
+        id: 'ss2',
+        type: 'audio' as const,
+        switchingSets: [{ id: 'sw2', type: 'audio' as const, tracks: [audioTrack] }],
+      },
+    ],
+  } as Presentation;
+}
+
 function makeFakeEme(keySystem: keyof typeof MODULE_BY_KEY_SYSTEM = 'com.widevine.alpha') {
   const mediaKeys = {
     createSession: vi.fn(),
@@ -118,9 +150,16 @@ function makeFakeEme(keySystem: keyof typeof MODULE_BY_KEY_SYSTEM = 'com.widevin
   return { module: MODULE_BY_KEY_SYSTEM[keySystem], access, mediaKeys };
 }
 
-function makeState(initial: MediaKeysState = {}) {
+interface SelectionState {
+  selectedVideoTrackId?: string;
+  selectedAudioTrackId?: string;
+}
+
+function makeState(initial: MediaKeysState & SelectionState = {}) {
   return {
     presentation: signal<MediaKeysState['presentation']>(initial.presentation),
+    selectedVideoTrackId: signal<string | undefined>(initial.selectedVideoTrackId),
+    selectedAudioTrackId: signal<string | undefined>(initial.selectedAudioTrackId),
     segmentLoadingBlocked: signal<boolean | undefined>(initial.segmentLoadingBlocked),
     negotiatedKeySystem: signal<string | undefined>(initial.negotiatedKeySystem),
     // Optional reporter seam (ErrorEmitterState) — present here to simulate a
@@ -137,7 +176,7 @@ function makeContext(initial: MediaKeysContext = {}) {
 }
 
 function setupSetupMediaKeys(
-  initialState: MediaKeysState = {},
+  initialState: MediaKeysState & SelectionState = {},
   initialContext: MediaKeysContext = {},
   drm: DrmSystemsConfig = DRM_CONFIG
 ) {
@@ -157,22 +196,101 @@ describe('setupMediaKeys', () => {
       .mockResolvedValue(new Uint8Array([7, 7]));
   });
 
-  it('stays out while preconditions are unmet or the source declares no keys', async () => {
-    // No media element.
-    const noElement = setupSetupMediaKeys({ presentation: makePresentation([WIDEVINE_KEY]) });
-    // Clear source: resolved, but no key declarations.
+  it('blocks loading from setup, before any precondition is met', () => {
+    const { state, reactor } = setupSetupMediaKeys();
+
+    // Synchronous, so no loader can dispatch ahead of it whatever the composition order.
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
+
+    reactor.destroy();
+  });
+
+  it('keeps loading blocked without negotiating while preconditions are unmet', async () => {
+    const noElement = setupSetupMediaKeys({
+      presentation: makePresentation([WIDEVINE_KEY]),
+      selectedVideoTrackId: 'v-1',
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(requestKeySystemAccess).not.toHaveBeenCalled();
+    expect(noElement.state.segmentLoadingBlocked.get()).toBe(true);
+
+    noElement.reactor.destroy();
+  });
+
+  it('opens loading without negotiating once each selected track type has a resolved rendition and no keys', async () => {
     const clearSource = setupSetupMediaKeys(
-      { presentation: makePresentation() },
+      { presentation: makePresentation(), selectedVideoTrackId: 'v-1' },
+      { mediaElement: document.createElement('video') }
+    );
+
+    await vi.waitFor(() => expect(clearSource.state.segmentLoadingBlocked.get()).toBe(false));
+    expect(requestKeySystemAccess).not.toHaveBeenCalled();
+
+    clearSource.reactor.destroy();
+  });
+
+  it('keeps loading blocked while a selected track type has no resolved rendition, even if the others are clear', async () => {
+    const eme = makeFakeEme();
+
+    vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
+    const { state, context, reactor } = setupSetupMediaKeys(
+      { presentation: makeAvPresentation(), selectedVideoTrackId: 'v-1', selectedAudioTrackId: 'a-1' },
       { mediaElement: document.createElement('video') }
     );
 
     await new Promise((resolve) => setTimeout(resolve, 50));
-    expect(requestKeySystemAccess).not.toHaveBeenCalled();
-    expect(noElement.state.segmentLoadingBlocked.get()).toBeFalsy();
-    expect(clearSource.state.segmentLoadingBlocked.get()).toBeFalsy();
+    // Clear video alone doesn't open the gate: the audio rendition could still be encrypted.
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
 
-    noElement.reactor.destroy();
-    clearSource.reactor.destroy();
+    // It is: the gate opens only once its MediaKeys attach.
+    state.presentation.set(makeAvPresentation([WIDEVINE_KEY]));
+    await vi.waitFor(() => expect(context.mediaKeys.get()).toBe(eme.mediaKeys));
+    expect(state.segmentLoadingBlocked.get()).toBe(false);
+
+    reactor.destroy();
+  });
+
+  it('keeps loading open across a switch to an unresolved rendition of a confirmed-clear type', async () => {
+    const clear = makePresentation();
+    const [videoSet] = clear.selectionSets;
+    const [switchingSet] = videoSet!.switchingSets;
+    const unresolved = { type: 'video' as const, id: 'v-2', url: 'https://example.com/v2.m3u8', bandwidth: 2000 };
+    // SAFETY: test fixture; `v-2` is a partially resolved track, which a Presentation allows.
+    const presentation = {
+      ...clear,
+      selectionSets: [
+        { ...videoSet!, switchingSets: [{ ...switchingSet!, tracks: [...switchingSet!.tracks, unresolved] }] },
+      ],
+    } as Presentation;
+    const { state, reactor } = setupSetupMediaKeys(
+      { presentation, selectedVideoTrackId: 'v-1' },
+      { mediaElement: document.createElement('video') }
+    );
+
+    await vi.waitFor(() => expect(state.segmentLoadingBlocked.get()).toBe(false));
+
+    // A type's renditions are assumed all clear or all encrypted, so `v-1` answers for `v-2`.
+    state.selectedVideoTrackId.set('v-2');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(state.segmentLoadingBlocked.get()).toBe(false);
+    expect(requestKeySystemAccess).not.toHaveBeenCalled();
+
+    reactor.destroy();
+  });
+
+  it('blocks loading again for the next source after a clear one', async () => {
+    const { state, reactor } = setupSetupMediaKeys(
+      { presentation: makePresentation(), selectedVideoTrackId: 'v-1' },
+      { mediaElement: document.createElement('video') }
+    );
+
+    await vi.waitFor(() => expect(state.segmentLoadingBlocked.get()).toBe(false));
+
+    state.presentation.set(undefined);
+    await vi.waitFor(() => expect(state.segmentLoadingBlocked.get()).toBe(true));
+
+    reactor.destroy();
   });
 
   it('raises the gate, negotiates in preference order, attaches, publishes, lowers the gate', async () => {
@@ -428,7 +546,7 @@ describe('setupMediaKeys', () => {
     reactor.destroy();
   });
 
-  it('detaches and clears its slots on source clear', async () => {
+  it('detaches, clears its slots, and blocks loading again on source clear', async () => {
     const eme = makeFakeEme();
 
     vi.mocked(requestKeySystemAccess).mockResolvedValue(eme);
@@ -446,7 +564,8 @@ describe('setupMediaKeys', () => {
     await vi.waitFor(() => expect(context.mediaKeys.get()).toBeUndefined());
     expect(attachMediaKeys).toHaveBeenCalledWith(video, null);
     expect(state.negotiatedKeySystem.get()).toBeUndefined();
-    expect(state.segmentLoadingBlocked.get()).toBe(false);
+    // Blocked again until the next source is known to be clear or keyed.
+    expect(state.segmentLoadingBlocked.get()).toBe(true);
 
     reactor.destroy();
   });
@@ -503,9 +622,10 @@ describe('setupMediaKeys', () => {
       await vi.waitFor(() => expect(context.mediaKeys.get()).toBeUndefined());
       expect(attachMediaKeys).toHaveBeenCalledWith(video, null);
       expect(state.negotiatedKeySystem.get()).toBeUndefined();
-      // The gate comes down with it — `loadingSuspended` is what parks the
-      // dispatchers during a session, and leaving both up would double-hold.
-      expect(state.segmentLoadingBlocked.get()).toBe(false);
+      // Loading stays blocked through the session: `loadingSuspended` parks the
+      // dispatchers too, but only the gate still holds once the session ends and
+      // the keys for MSE playback are being negotiated again.
+      expect(state.segmentLoadingBlocked.get()).toBe(true);
 
       // Falling edge: the reactor re-enters and negotiates afresh.
       state.loadingSuspended.set(false);
@@ -527,7 +647,7 @@ describe('setupMediaKeys', () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(requestKeySystemAccess).not.toHaveBeenCalled();
-      expect(state.segmentLoadingBlocked.get()).toBeFalsy();
+      expect(state.segmentLoadingBlocked.get()).toBe(true);
 
       reactor.destroy();
     });

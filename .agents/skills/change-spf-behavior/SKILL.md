@@ -27,7 +27,7 @@ Run the narrow affected tests, then as applicable:
 ```bash
 pnpm -F @videojs/spf test
 pnpm -F @videojs/spf build
-pnpm -F @videojs/spf size
+pnpm size
 ```
 
 ## Example

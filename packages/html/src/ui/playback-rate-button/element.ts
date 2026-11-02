@@ -14,9 +14,11 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
     label: { type: String },
     disabled: { type: Boolean },
     commandfor: { type: String },
-  } satisfies PropertyDeclarationMap<'label' | 'disabled' | 'commandfor'>;
+    rates: { type: String },
+  } satisfies PropertyDeclarationMap<'label' | 'disabled' | 'commandfor' | 'rates'>;
 
   commandfor: string | undefined = undefined;
+  rates: readonly number[] | string | undefined = undefined;
 
   protected readonly core = new PlaybackRateButtonCore();
   protected readonly stateAttrMap = PlaybackRateButtonDataAttrs;
@@ -42,9 +44,16 @@ export class PlaybackRateButtonElement extends MediaButtonElement<PlaybackRateBu
 
     if (super.getIsButtonDisabled()) return true;
 
-    if (this.commandfor && media && media.playbackRates.length === 0) return true;
+    if (this.commandfor && media && this.core.getRates(media).length === 0) return true;
 
     return false;
+  }
+
+  // A linked menu hides its trigger from the rate options' availability and
+  // treats a `hidden` trigger as author-hidden, so the button must not write
+  // its own pre-attach `hidden` state there.
+  protected override reflectsHidden(): boolean {
+    return !this.commandfor;
   }
 
   protected override willUpdate(changed: PropertyValues): void {

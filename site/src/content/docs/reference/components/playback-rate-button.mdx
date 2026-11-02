@@ -10,6 +10,7 @@ import ComponentImports from "@/components/docs/api-reference/ComponentImports.a
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
 
 {/* React demos */}
 import BasicUsageDemoReact from "@/components/docs/demos/playback-rate-button/react/css/BasicUsage";
@@ -42,7 +43,7 @@ import basicUsageHtmlTs from "@/components/docs/demos/playback-rate-button/html/
 
 ## Behavior
 
-Cycles through playback rates on click. The default rate list is `[0.2, 0.5, 0.7, 1, 1.2, 1.5, 1.7, 2]`. After the last rate, it wraps back to the first. If the current rate isn't in the list (e.g., set programmatically), the button jumps to the next rate greater than the current one.
+Cycles through the player's playback rates on click, in the order they are listed. The default list is `[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]`; see the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> to set your own for the whole player, or set `rates` on the button to give it its own list. After the last rate, it wraps back to the first. If the current rate isn't in the list (e.g., set programmatically), the button jumps to the next rate greater than the current one.
 
 <FrameworkCase frameworks={["react"]}>
 When `menuTrigger` is enabled, activation opens the linked playback-rate menu instead of cycling through rates. Use this mode when the button is the trigger for a `Menu` that contains playback-rate options.
@@ -52,7 +53,21 @@ When `menuTrigger` is enabled, activation opens the linked playback-rate menu in
 When `commandfor` is set, activation opens the linked playback-rate menu instead of cycling through rates. Use this mode when the button is the trigger for a `<media-menu>` that contains playback-rate options.
 </FrameworkCase>
 
+<FrameworkCase frameworks={["html"]}>
+When the media's playback rate is unavailable or unsupported, such as on an embed that takes no speed command, the element receives the native `hidden` attribute and ignores activation.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+When the media's playback rate is unavailable or unsupported, such as on an embed that takes no speed command, the component returns `null`.
+</FrameworkCase>
+
 ## Styling
+
+| Attribute | Values | Description |
+|-----------|--------|-------------|
+| `data-rate` | Number | Current playback rate |
+| `data-availability` | `"available"` \| `"unavailable"` \| `"unsupported"` | Whether the media can change its playback rate |
+| `data-hidden` | Present / absent | Present on the HTML element while playback rate is unavailable or unsupported |
 
 Display the current rate using the `data-rate` attribute:
 
@@ -76,7 +91,7 @@ Use the `render` prop for rate display:
 
 ## Accessibility
 
-Renders a `<button>` with an automatic `aria-label` of `"Playback rate {rate}"` (e.g., `"Playback rate 1.5"`). Override with the `label` prop. Keyboard activation: <kbd>Enter</kbd> / <kbd>Space</kbd>.
+Renders a `<button>` with an automatic `aria-label` of `"Playback rate, {rate}"` (e.g., `"Playback rate, 1.5"`). Its tooltip shows `"Playback rate"` without the value. Override both with the `label` prop. Keyboard activation: <kbd>Enter</kbd> / <kbd>Space</kbd>.
 
 In menu-trigger mode, the button behaves as a menu trigger and reflects menu state through the trigger attributes.
 

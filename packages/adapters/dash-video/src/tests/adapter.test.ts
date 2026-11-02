@@ -73,6 +73,7 @@ type MockEngine = {
   settings: Record<string, any>;
   attachView: ReturnType<typeof vi.fn>;
   attachSource: ReturnType<typeof vi.fn>;
+  destroy: ReturnType<typeof vi.fn>;
   updateSettings: ReturnType<typeof vi.fn>;
   resetSettings: ReturnType<typeof vi.fn>;
   getSettings: ReturnType<typeof vi.fn>;
@@ -149,7 +150,9 @@ describe('DashAdapter', () => {
 
       media.destroy();
 
+      expect(engine.attachView).toHaveBeenCalledOnce();
       expect(engine.attachView).toHaveBeenCalledWith(null);
+      expect(engine.attachView.mock.invocationCallOrder[0]).toBeLessThan(engine.destroy.mock.invocationCallOrder[0]!);
     });
   });
 

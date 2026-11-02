@@ -9,6 +9,7 @@
     --media-controls-foreground: var(--media-foreground);
     --media-popover: var(--media-controls);
     --media-popover-foreground: var(--media-foreground);
+    --media-muted: oklch(0 0 0 / 0.1);
     --media-surface-border: oklch(0 0 0 / 0.05);
     --media-primary: var(--media-accent-color, var(--media-foreground));
     --media-border: oklch(0 0 0 / 0.1);
@@ -31,6 +32,7 @@
       --media-foreground: light-dark(oklch(0 0 0), oklch(1 0 0));
       --media-controls: light-dark(oklch(1 0 0 / 0.5), oklch(0 0 0 / 0.4));
       --media-border: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
+      --media-muted: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.1));
       --media-default-accent-color: light-dark(oklch(0 0 0), oklch(1 0 0));
       --media-default-accent-text-color: light-dark(oklch(1 0 0), oklch(0 0 0));
       --media-internal-accent-text-fallback: light-dark(oklch(1 0 0), oklch(0 0 0));

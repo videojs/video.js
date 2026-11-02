@@ -1254,6 +1254,12 @@ describe('Feature pipeline (end-to-end)', () => {
       expect(config.poster!.default).toBe("'/poster.jpg'");
     });
 
+    it('shows an array constant default as its literal', () => {
+      const config = findFeature('poster')!.reference.config;
+
+      expect(config.posterWidths!.default).toBe('[320, 640]');
+    });
+
     // The fixture's PlayerFeatureConfig mirrors production, so a constraint that
     // drifted back to demanding exactly `string | null | undefined` would fail
     // this file's own type check before it reached the assertion.

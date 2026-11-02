@@ -57,7 +57,7 @@ export default {
     unknown: 'Mediaa ei ole ladattu, aika ei ole tiedossa.',
   },
   playback: {
-    rate: 'Toistonopeus {rate}',
+    rate: 'Toistonopeus, {rate}',
   },
   volume: {
     mutedValue: '{percent}, mykistetty',
@@ -100,6 +100,7 @@ export default {
     speed: 'Nopeus',
     captions: 'Tekstitykset',
     playbackRate: 'Toistonopeus',
+    customRate: 'Oma, {rate}',
     back: 'Takaisin',
     off: 'Pois',
     auto: 'Automaattinen',

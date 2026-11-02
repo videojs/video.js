@@ -57,7 +57,7 @@ export default {
     unknown: 'رسانه بارگذاری نشده، زمان نامشخص.',
   },
   playback: {
-    rate: 'سرعت پخش {rate}',
+    rate: 'سرعت پخش، {rate}',
   },
   volume: {
     mutedValue: '{percent}، بی‌صدا',
@@ -100,6 +100,7 @@ export default {
     speed: 'سرعت',
     captions: 'زیرنویس‌ها',
     playbackRate: 'سرعت پخش',
+    customRate: 'سفارشی، {rate}',
     back: 'بازگشت',
     off: 'خاموش',
     auto: 'خودکار',

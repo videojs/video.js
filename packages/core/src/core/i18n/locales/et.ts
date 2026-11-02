@@ -57,7 +57,7 @@ export default {
     unknown: 'Meedium pole laaditud, aeg teadmata.',
   },
   playback: {
-    rate: 'Taasesituse kiirus {rate}',
+    rate: 'Taasesituse kiirus, {rate}',
   },
   volume: {
     mutedValue: '{percent}, vaigistatud',
@@ -101,6 +101,7 @@ export default {
     speed: 'Kiirus',
     captions: 'Subtiitrid',
     playbackRate: 'Taasesituse kiirus',
+    customRate: 'Kohandatud, {rate}',
     back: 'Tagasi',
     off: 'Väljas',
     auto: 'Automaatne',

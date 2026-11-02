@@ -16,6 +16,8 @@ class TestBufferingProvider extends UIElement {
       ended: false,
       started: true,
       waiting: true,
+      autoplay: false,
+      autoplaying: false,
       play: vi.fn(async () => {}),
       pause: vi.fn(),
     }),

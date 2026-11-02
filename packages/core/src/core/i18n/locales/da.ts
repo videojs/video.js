@@ -57,7 +57,7 @@ export default {
     unknown: 'Mediet er ikke indlæst, tidspunktet er ukendt.',
   },
   playback: {
-    rate: 'Afspilningshastighed {rate}',
+    rate: 'Afspilningshastighed, {rate}',
   },
   volume: {
     mutedValue: '{percent}, lydløs',
@@ -101,6 +101,7 @@ export default {
     speed: 'Hastighed',
     captions: 'Undertekster',
     playbackRate: 'Afspilningshastighed',
+    customRate: 'Tilpasset, {rate}',
     back: 'Tilbage',
     off: 'Fra',
     auto: 'Automatisk',

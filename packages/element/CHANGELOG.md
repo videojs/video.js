@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/element@10.1.0...@videojs/element@10.2.0) (2026-10-22)
+
+
+### Miscellaneous Chores
+
+* **@videojs/element:** Synchronize videojs versions
+
 ## [10.1.0](https://github.com/videojs/video.js/compare/@videojs/element@10.0.1...@videojs/element@10.1.0) (2026-10-12)
 
 

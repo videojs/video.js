@@ -17,7 +17,7 @@
  * won't push them to the DOM. All writes are deduped to break echo loops and avoid spurious re-triggers downstream
  * (notably `resolvePresentation`, which reads `state.preload`).
  */
-import { defineBehavior } from '../../core/composition/create-composition';
+import { defineBehavior } from '../../core/composition/define-behavior';
 import { effect } from '../../core/signals/effect';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../core/signals/primitives';
 import type { MediaElementLike } from '../../media/types';

@@ -35,4 +35,15 @@ describe('satteriReadingTime', () => {
     expect(withCode.readingTimeMinutes).toBeCloseTo(8 / 200, 6);
     expect(withCode.minutesRead).toBe('1 min read');
   });
+
+  it('counts text across every block of the document', () => {
+    const paragraph = Array.from({ length: 100 }, (_, i) => `word${i}`).join(' ');
+    const frontmatter = render(Array.from({ length: 5 }, () => paragraph).join('\n\n'));
+
+    expect(frontmatter.readingTimeMinutes).toBeCloseTo(500 / 200, 6);
+  });
+
+  it('leaves the frontmatter untouched for a document without text', () => {
+    expect(render('---')).toEqual({});
+  });
 });

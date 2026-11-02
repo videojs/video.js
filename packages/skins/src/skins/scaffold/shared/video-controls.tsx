@@ -1,6 +1,7 @@
 import * as $ from '@videojs/core/vjsc';
 import type { VjscNode } from 'vjsc/components';
 
+import { CaptionsToggle } from './captions-button';
 import { ControlsContent, type ControlsSlots } from './controls';
 import controlsStyles from './controls.styles';
 import { ScreenControls } from './screen-controls';
@@ -20,6 +21,7 @@ export function VideoControlsContent({
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <VideoBufferingIndicator />
       <ControlsContent
+        captions={!live && <CaptionsToggle />}
         center={center}
         live={live}
         menu={menu}

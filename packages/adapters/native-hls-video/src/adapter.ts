@@ -66,6 +66,9 @@ class NativeHlsAdapterCore extends HTMLVideoAdapter implements Omit<NativeHlsAda
     streamType: MediaStreamTypes.UNKNOWN,
   };
 
+  /** Engine this media plays through, reported to analytics such as Mux Data. The browser plays HLS itself. */
+  static readonly engineName: string = 'browser';
+
   #src = NativeHlsAdapterCore.defaultProps.src;
   #source: NativeHlsSource | null = NativeHlsAdapterCore.defaultProps.source;
   #preload = NativeHlsAdapterCore.defaultProps.preload;

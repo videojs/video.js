@@ -57,7 +57,7 @@ export default {
     unknown: 'Media niet geladen, onbekende tijd.',
   },
   playback: {
-    rate: 'Afspeelsnelheid {rate}',
+    rate: 'Afspeelsnelheid, {rate}',
   },
   volume: {
     mutedValue: '{percent}, gedempt',
@@ -102,6 +102,7 @@ export default {
     speed: 'Snelheid',
     captions: 'Ondertiteling',
     playbackRate: 'Afspeelsnelheid',
+    customRate: 'Aangepast, {rate}',
     back: 'Terug',
     off: 'Uit',
     auto: 'Automatisch',

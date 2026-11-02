@@ -57,7 +57,7 @@ export default {
     unknown: 'Contingut multimèdia no carregat, temps desconegut.',
   },
   playback: {
-    rate: 'Velocitat de reproducció {rate}',
+    rate: 'Velocitat de reproducció, {rate}',
   },
   volume: {
     mutedValue: '{percent}, silenciat',
@@ -102,6 +102,7 @@ export default {
     speed: 'Velocitat',
     captions: 'Subtítols',
     playbackRate: 'Velocitat de reproducció',
+    customRate: 'Personalitzada, {rate}',
     back: 'Enrere',
     off: 'Desactivat',
     auto: 'Automàtic',

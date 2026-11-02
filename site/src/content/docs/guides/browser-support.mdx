@@ -13,6 +13,8 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 
 We test in and fix bugs for these versions. Each minimum comes from a feature with no fallback: `:has()` sets Firefox, [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix) and [`oklch()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) set Chrome and Edge (Chrome 111, Firefox 113, Safari 16.2), and the JavaScript sets Safari, because it uses ES2022 syntax and [`adoptedStyleSheets`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets). Newer JavaScript APIs are feature-detected.
 
+These versions apply to every skin. The <DocsLink slug="guides/skins" anchor="choose-a-skin">Compat and Scaffold skins</DocsLink> avoid newer visual effects such as backdrop blur, anchor-positioned menu highlights, and squircle corners, so they look the same in browsers that skip them. They still need the CSS features below.
+
 ## CSS requirements
 
 The packaged skins are generated CSS, and the build lowers them for the browsers above. It flattens CSS nesting, adds vendor prefixes such as `-webkit-backdrop-filter`, and writes each skin's scope as a [`:where()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where) selector, which adds no specificity, rather than [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope).

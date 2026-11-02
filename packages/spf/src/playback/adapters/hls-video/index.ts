@@ -3,7 +3,8 @@
  *
  * SPF differs from engines like hls.js in that it exposes no engine-shaped API of its own: the `@videojs/media` facade
  * _is_ how a composed engine is consumed. `HlsVideoAdapter` is that facade, and this entry point is separate from
- * `@videojs/spf/hls` so wiring the engine directly doesn't pull the Media (or `@videojs/media`) in with it.
+ * `@videojs/spf/engines/hls-video` so wiring the engine directly doesn't pull the Media (or `@videojs/media`) in with
+ * it.
  */
 export type {
   HlsVideoAdapterAPI,

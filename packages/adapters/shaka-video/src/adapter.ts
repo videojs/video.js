@@ -116,6 +116,9 @@ class ShakaAdapterCore
     streamType: MediaStreamTypes.UNKNOWN,
   };
 
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'shaka';
+
   #engine: shaka.Player | null = null;
   #src = ShakaAdapterCore.defaultProps.src;
   #source: ShakaSource | null = ShakaAdapterCore.defaultProps.source;

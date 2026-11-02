@@ -38,9 +38,19 @@ for (const framework of ['html', 'react']) {
       const container = page.locator('.media-container');
       const titleBounds = await title.boundingBox();
       const containerBounds = await container.boundingBox();
+      // The title box fills the player so its scrim can match the controls gradient; measure the text itself.
+      const textBounds = await title.evaluate((element) => {
+        const range = document.createRange();
+
+        range.selectNodeContents(element);
+        const { top, height } = range.getBoundingClientRect();
+
+        return { top, height };
+      });
 
       expect(titleBounds!.y).toBeCloseTo(containerBounds!.y, 0);
-      expect(titleBounds!.height).toBeLessThan(containerBounds!.height);
+      expect(textBounds.top - containerBounds!.y).toBeLessThan(containerBounds!.height / 4);
+      expect(textBounds.top + textBounds.height).toBeLessThan(containerBounds!.y + containerBounds!.height);
       expect(await title.evaluate((element) => element.scrollHeight)).toBeLessThanOrEqual(titleBounds!.height + 1);
 
       await page.getByRole('button', { name: 'Play', exact: true }).click();

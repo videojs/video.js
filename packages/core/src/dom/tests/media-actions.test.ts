@@ -55,6 +55,17 @@ describe('MEDIA_INPUT_ACTION_OVERRIDES', () => {
     expect(paused ? pause : play).not.toHaveBeenCalled();
   });
 
+  it('togglePaused cancels a pending autoplay instead of playing', () => {
+    const play = vi.fn();
+    const pause = vi.fn();
+    const store = mockStore({ paused: true, autoplaying: true, play, pause });
+
+    MEDIA_INPUT_ACTION_OVERRIDES.togglePaused({ store });
+
+    expect(pause).toHaveBeenCalledOnce();
+    expect(play).not.toHaveBeenCalled();
+  });
+
   it.each([
     [false, 0.5, true],
     [true, 0.5, false],
@@ -123,14 +134,40 @@ describe('MEDIA_INPUT_ACTION_OVERRIDES', () => {
 
   it.each([
     ['speedUp', 1, 1.5],
-    ['speedUp', 2, 0.5],
+    ['speedUp', 1.2, 1.5],
     ['speedDown', 1.5, 1],
-    ['speedDown', 0.5, 2],
-  ] as const)('%s steps or wraps from %s to %s', (action, playbackRate, expected) => {
+    ['speedDown', 1.2, 1],
+  ] as const)('%s steps by value from %s to %s regardless of list order', (action, playbackRate, expected) => {
     const setPlaybackRate = vi.fn();
-    const store = mockStore({ playbackRates: [0.5, 1, 1.5, 2], playbackRate, setPlaybackRate });
+    const store = mockStore({ playbackRates: [2, 1, 0.5, 1.5], playbackRate, setPlaybackRate });
 
     MEDIA_INPUT_ACTION_OVERRIDES[action]({ store });
+
+    expect(setPlaybackRate).toHaveBeenCalledExactlyOnceWith(expected);
+  });
+
+  it.each([
+    ['speedUp', 2],
+    ['speedDown', 0.5],
+  ] as const)('%s stays at %s when no rate lies further', (action, playbackRate) => {
+    const setPlaybackRate = vi.fn();
+    const store = mockStore({ playbackRates: [0.5, 1, 2], playbackRate, setPlaybackRate });
+
+    MEDIA_INPUT_ACTION_OVERRIDES[action]({ store });
+
+    expect(setPlaybackRate).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['speedUp', 1, 0.1, 1.1],
+    ['speedUp', 1.2, 0.1, 1.3],
+    ['speedDown', 1, 0.1, 0.9],
+    ['speedDown', 0.3, 0.1, 0.2],
+  ] as const)('%s from %s steps by a value of %s to %s', (action, playbackRate, value, expected) => {
+    const setPlaybackRate = vi.fn();
+    const store = mockStore({ playbackRates: [0.5, 1, 2], playbackRate, setPlaybackRate });
+
+    MEDIA_INPUT_ACTION_OVERRIDES[action]({ store, value });
 
     expect(setPlaybackRate).toHaveBeenCalledExactlyOnceWith(expected);
   });

@@ -57,7 +57,7 @@ export default {
     unknown: 'Média non chargé, durée inconnue.',
   },
   playback: {
-    rate: 'Vitesse de lecture {rate}',
+    rate: 'Vitesse de lecture, {rate}',
   },
   volume: {
     mutedValue: '{percent}, son coupé',
@@ -102,6 +102,7 @@ export default {
     speed: 'Vitesse',
     captions: 'Sous-titres',
     playbackRate: 'Vitesse de lecture',
+    customRate: 'Personnalisée, {rate}',
     back: 'Retour',
     off: 'Désactivé',
     auto: 'Auto',

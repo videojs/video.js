@@ -42,7 +42,7 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
 
 ## Status
 
-- **Composition:** implemented in `createHlsVideoEngine`, which composes
+- **Composition:** implemented in the `hls-video` engine, which composes
   `exchangeLicenses` then `setupMediaKeys` unconditionally and defaults
   `canPlayTrack` / `reportUnsupportedTrackConditions` to their DRM-aware
   variants over `config.drm`. Absent or empty `drm` is the degenerate
@@ -57,7 +57,11 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   manifest parse.
 - **Behavior split:** two behaviors, not one. `setupMediaKeys`
   negotiates a key system, applies the server certificate, attaches
-  MediaKeys, and owns the `segmentLoadingBlocked` load gate;
+  MediaKeys, and owns the `segmentLoadingBlocked` load gate, which
+  opens for a clear source once each selected track type has a
+  resolved rendition (a type's renditions are assumed all clear or all
+  encrypted; mixed renditions within one type and clear lead are out
+  of scope);
   `exchangeLicenses` opens sessions and exchanges licenses. The handoff
   is `context.mediaKeys` + `state.negotiatedKeySystem`, published
   together only after the certificate is applied — which is what
@@ -83,9 +87,7 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   fetch and transform layers. It writes no slots — publishing receiver
   MediaKeys into `context.mediaKeys` would wake `exchangeLicenses` to
   license a pipeline that is not playing — and dedupes nothing, because
-  the receiver re-proxies its SPC on connect and on disconnect. Composed
-  ahead of `setupMediaKeys` so its detach precedes that re-attach on the
-  shared falling edge. Costs **1,028 B brotli** on `/hls`, all recoverable
+  the receiver re-proxies its SPC on connect and on disconnect. Costs **1,028 B brotli** on `/hls`, all recoverable
   by omitting the behavior — of which **612 B** is the legacy fallback
   alone, separately deletable when WebKit stops needing it
   (`engine-drm-optional.test-d.ts` pins the behavior slot-neutral, and
@@ -109,8 +111,10 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   init-data projection, and license-message shaping. `config.keySystems`
   narrows the list; dropping `playReadyKeySystem` removes its PSSH wrap,
   its XML envelope unwrap, and `DOMParser` from the bundle. Each shipped
-  module carries its id as a literal type, and `HlsVideoEngineConfig` keys
-  `drm` by the composed ids, so a config entry no module claims is a type
+  module carries its id as a literal type, and the DRM behaviors type
+  `drm` as `NegotiableDrmSystemsConfig`, a `KeyedBy` record that
+  `createComposition` (and each engine's `createEngine`) checks against
+  the composed `keySystems`, so a config entry no module claims is a type
   error (it replaced a dev-only runtime warning). Replaces six
   string-keyed lookup tables that previously split one system's facts
   across the DOM boundary.
@@ -120,13 +124,12 @@ and `adapters/mux-video/src/drm.ts` token-derived license URLs),
   leaving ~248 B residue — ~130 B parser key metadata, 11 B `drm`
   config threading, 10 B the gate read in `load-segments`, the rest
   unrelated branch-era churn. Pinned by
-  `playback/engines/hls/tests/engine-drm-optional.test-d.ts`, which
+  `playback/engines/tests/engine-drm-optional.test-d.ts`, which
   asserts the DRM-free composition materializes none of the three DRM
-  slots. The DRM-free **engine variant** is not built yet; the
-  measurement patches `engine.ts` directly. A spread-based additive
-  variant (`[...BASE_PRE, setupMediaKeys, ...BASE_POST]`) typechecks
-  with inference intact, so it needs no duplicated behavior list — the
-  cost that sank the short-lived `createDrmHlsVideoEngine`.
+  slots. The DRM-free **engine variant** is not built yet; it is the video
+  engine's feature list without `drmFeature` and `airPlayFairPlayFeature`,
+  which typechecks with inference intact and needs no duplicated behavior
+  list — the cost that sank the short-lived `createDrmHlsVideoEngine`.
 - **Consumer contract already landed:** `source.drm` is typed by
   `@videojs/media`'s `DrmSystemsConfig` (`packages/media/src/core/drm.ts`) —
   license servers keyed by EME key-system id, `licenseUrl` + optional

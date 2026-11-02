@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { registerI18n, resetI18nRegistry } from '@videojs/core/i18n';
+import type { MediaFeatureAvailability } from '@videojs/media';
 import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -16,17 +17,24 @@ afterEach(() => {
 function renderPlaybackRateRadioGroup({
   playbackRates = [0.5, 1, 1.5, 2],
   playbackRate = 1.5,
+  playbackRateAvailability = 'available',
   setPlaybackRate = vi.fn(),
   locale,
   group,
 }: {
   playbackRates?: readonly number[];
   playbackRate?: number;
+  playbackRateAvailability?: MediaFeatureAvailability;
   setPlaybackRate?: (rate: number) => void;
   locale?: string;
   group?: React.ReactNode;
 } = {}) {
-  const { Wrapper } = createPlayerWrapper({ playbackRates, playbackRate, setPlaybackRate });
+  const { Wrapper } = createPlayerWrapper({
+    playbackRates,
+    playbackRate,
+    playbackRateAvailability,
+    setPlaybackRate,
+  });
   const content = (
     <Menu.Root defaultOpen>
       <PlaybackRateRadioGroup.Root>
@@ -67,6 +75,41 @@ describe('PlaybackRateRadioGroup', () => {
       expect.objectContaining({ rate: 1.5, value: '1.5', checked: true }),
       expect.objectContaining({ rate: 2, value: '2', checked: false }),
     ]);
+  });
+
+  it('offers its own rates in place of the player rates', () => {
+    const { Wrapper } = createPlayerWrapper({
+      playbackRates: [0.5, 1, 2],
+      playbackRate: 1,
+      playbackRateAvailability: 'available',
+      setPlaybackRate: vi.fn(),
+    });
+
+    render(
+      <Menu.Root defaultOpen>
+        <PlaybackRateRadioGroup.Root rates={[1, 3]}>
+          <Menu.Popup>
+            <Menu.Content>
+              <PlaybackRateRadioGroup.Options renderItem={(props) => <Menu.RadioItem {...props} />} />
+            </Menu.Content>
+          </Menu.Popup>
+        </PlaybackRateRadioGroup.Root>
+      </Menu.Root>,
+      { wrapper: Wrapper }
+    );
+
+    expect(screen.getAllByRole('menuitemradio').map((item) => item.getAttribute('data-rate'))).toEqual(['1', '3']);
+  });
+
+  it('marks the current rate as custom when the group does not offer it', () => {
+    renderPlaybackRateRadioGroup({ playbackRates: [1, 1.5, 2], playbackRate: 1.1 });
+
+    const items = screen.getAllByRole('menuitemradio');
+
+    expect(items.map((item) => item.getAttribute('data-rate'))).toEqual(['1', '1.1', '1.5', '2']);
+    expect(items.filter((item) => item.hasAttribute('data-custom')).map((item) => item.textContent)).toEqual(['1.1×']);
+    expect(screen.getByRole('menuitemradio', { name: 'Custom, 1.1×' }).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByRole('menuitemradio', { name: '1.5×' }).hasAttribute('aria-label')).toBe(false);
   });
 
   it('sets the playback rate', () => {
@@ -112,6 +155,34 @@ describe('PlaybackRateRadioGroup', () => {
     expect(group?.getAttribute('aria-disabled')).toBe('true');
     expect(group?.hasAttribute('data-disabled')).toBe(true);
     expect(group?.hasAttribute('data-hidden')).toBe(true);
+  });
+
+  it('hides the group and its menu trigger when the media has no playback rate', () => {
+    const { Wrapper } = createPlayerWrapper({
+      playbackRates: [0.5, 1, 1.5, 2],
+      playbackRate: 1,
+      playbackRateAvailability: 'unsupported',
+      setPlaybackRate: vi.fn(),
+    });
+
+    render(
+      <Menu.Root>
+        <PlaybackRateRadioGroup.Root>
+          <Menu.Trigger data-testid="trigger">Speed</Menu.Trigger>
+          <Menu.Popup>
+            <Menu.Content>
+              <PlaybackRateRadioGroup.Options renderItem={(props) => <Menu.RadioItem {...props} />} />
+            </Menu.Content>
+          </Menu.Popup>
+        </PlaybackRateRadioGroup.Root>
+      </Menu.Root>,
+      { wrapper: Wrapper }
+    );
+
+    const trigger = screen.getByTestId('trigger');
+
+    expect(trigger.hidden).toBe(true);
+    expect(trigger.getAttribute('data-availability')).toBe('unsupported');
   });
 
   it('supports custom group and item roots', () => {

@@ -141,6 +141,42 @@ describe('HlsJsPreloadMixin', () => {
     expect(engine.config.maxBufferSize).toBe(60_000_000);
   });
 
+  it('starts loading for autoplay even when preload=none', () => {
+    const engine = createEngine();
+    const host = new PreloadHost(engine);
+
+    host.preload = 'none';
+    host.autoplay = true;
+
+    const video = document.createElement('video');
+
+    host.attach(video);
+    host.autoplay = true;
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(engine.startLoad).toHaveBeenCalledTimes(1);
+    expect(engine.config.maxBufferLength).toBe(30);
+  });
+
+  it('starts loading when autoplay is turned on after the source', () => {
+    const engine = createEngine();
+    const host = new PreloadHost(engine);
+
+    host.preload = 'none';
+
+    const video = document.createElement('video');
+
+    host.attach(video);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(engine.startLoad).not.toHaveBeenCalled();
+
+    host.autoplay = true;
+
+    expect(video.autoplay).toBe(true);
+    expect(engine.startLoad).toHaveBeenCalledTimes(1);
+  });
+
   it('starts loading once across repeated engine events', () => {
     const engine = createEngine();
     const host = new PreloadHost(engine);

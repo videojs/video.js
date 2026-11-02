@@ -11,6 +11,7 @@ export default styles({
         'data-[direction=backward]:col-start-1 data-[direction=backward]:justify-self-start',
         'data-[direction=forward]:col-start-3 data-[direction=forward]:justify-self-end',
       ],
+      variants: { neutral: 'filter-media-feedback' },
     },
     icon: {
       utilities: [

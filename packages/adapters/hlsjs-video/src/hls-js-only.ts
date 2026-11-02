@@ -41,6 +41,9 @@ export interface HlsJsOnlyMediaParams {
 }
 
 class HlsJsOnlyAdapterCore extends HTMLVideoAdapter implements EngineAdapter<Hls, HTMLVideoElement> {
+  /** Engine this media plays through, reported to analytics such as Mux Data. */
+  static readonly engineName: string = 'hlsjs';
+
   #engine: Hls | null = null;
   #capPolicy: RenditionCapPolicy = {
     maxAutoResolution: undefined,

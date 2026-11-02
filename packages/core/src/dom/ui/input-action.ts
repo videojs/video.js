@@ -41,11 +41,13 @@ export function getMediaSnapshot(store: MediaSnapshotStore | undefined): MediaSn
 
   const state = store.state;
   const time = selectTime(state);
+  const playback = selectPlayback(state);
 
   const textTrack = selectTextTrack(state);
 
   return {
-    paused: selectPlayback(state)?.paused,
+    // A pending autoplay counts as playing, as it does for the play button and the toggle.
+    paused: playback && playback.paused && !playback.autoplaying,
     volume: selectVolume(state)?.volume,
     muted: selectVolume(state)?.muted,
     playbackRate: selectPlaybackRate(state)?.playbackRate,
