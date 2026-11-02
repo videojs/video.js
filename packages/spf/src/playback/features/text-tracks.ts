@@ -24,8 +24,8 @@ export const behaviors = [
   resolveTextTrack,
   // Resolves `userTextTrackSelection` intent (incl. 'off', or the configured
   // preferred-language / DEFAULT-track policy) against the failed-CDN-pruned,
-  // active-CDN-scoped text renditions. Optional selection (captions are
-  // opt-in), so it can resolve to none.
+  // active-CDN-scoped text renditions. Optional selection, so it can resolve
+  // to none.
   switchTextTrack,
   syncTextTracks,
   setupTextTrackActors,
@@ -43,6 +43,8 @@ export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 
 /** The config defaults the feature contributes. */
 export const defaultConfig = {
+  // Honor a DEFAULT=YES + AUTOSELECT=YES subtitle rendition.
+  enableDefaultTrack: true,
   resolveTextTrackSegment: resolveVttSegment,
   addSubtitlesTracksToMedia,
   getShowingSubtitlesTrackFromMedia,

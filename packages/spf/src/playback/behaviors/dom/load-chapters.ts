@@ -23,8 +23,6 @@
  * the asset title; the request is cacheable, and each side stays ignorant of the other.
  */
 
-import { isFunction } from '@videojs/utils/predicate';
-
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -33,7 +31,7 @@ import { loadChaptersTracks } from '../../../media/dom/text/load-chapters-tracks
 import { APPLE_HLS_CHAPTERS_DATA_ID } from '../../../media/hls/parse-json-chapters';
 import type { TextSelectionConfig } from '../../../media/primitives/select-tracks';
 import { getSessionData, isResolvedPresentation, type MaybeResolvedPresentation } from '../../../media/types';
-import type { RequestCredentialsPolicy } from '../../../network/credentials-fetch';
+import { type RequestCredentialsPolicy, resolveRequestCredentials } from '../../../network/credentials-fetch';
 
 type LoadChaptersFsmState = 'preconditions-unmet' | 'loading';
 
@@ -92,7 +90,7 @@ function loadChaptersSetup({
           loadChaptersTracks(mediaElement, uri, controller.signal, {
             preferredLanguage: config.preferredSubtitleLanguage,
             // Resolved per load: the adapter's policy reads the live `crossorigin`.
-            credentials: isFunction(requestCredentials) ? requestCredentials({ url: uri }) : requestCredentials,
+            credentials: resolveRequestCredentials(requestCredentials, { url: uri }),
           });
 
           return controller;
