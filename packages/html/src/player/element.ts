@@ -9,7 +9,9 @@ import {
 } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextProvider, ContextRoot } from '@videojs/element/context';
+import { isMediaPauseCapable } from '@videojs/media';
 import type { Media } from '@videojs/media/dom';
+import { isUndefinedCustomElement } from '@videojs/utils/dom';
 import { isNull } from '@videojs/utils/predicate';
 import { camelCase, kebabCase } from '@videojs/utils/string';
 
@@ -25,6 +27,9 @@ export interface CreatePlayerElementOptions<Store extends PlayerStore> {
   factory: () => Store;
   config: PlayerFeatureConfig;
 }
+
+/** Custom element names that read as media, like `<acme-video>` or `<podcast-audio>`. */
+const MEDIA_NAME_SUFFIX = /-(?:video|audio)$/;
 
 interface Registration<Value> {
   value: Value;
@@ -77,6 +82,7 @@ export function createPlayerElement<Store extends PlayerStore>(
     #mediaRegistrations: Registration<Media>[] = [];
     #containerRegistrations: Registration<MediaContainer>[] = [];
     #observer = new MutationObserver(() => this.#syncNativeMedia());
+    #pendingDefinitions = new Set<string>();
     #extensions = new PlayerExtensionCoordinator(() => this.#syncExtensions());
 
     #registerExtension = (extension: PlayerExtension): (() => void) => this.#extensions.register(extension);
@@ -214,11 +220,50 @@ export function createPlayerElement<Store extends PlayerStore>(
     }
 
     #syncNativeMedia(): void {
-      const media = this.querySelector<HTMLMediaElement>('video, audio');
+      const media = this.#findSuffixMedia() ?? this.querySelector<HTMLMediaElement>('video, audio');
       if (this.#nativeMedia === media) return;
 
       this.#nativeMedia = media;
       this.#syncMedia();
+    }
+
+    /**
+     * The first descendant named `*-video` or `*-audio` that is defined and behaves like media. A native `<video>` is
+     * often such an element's own child, so this outranks the native search.
+     */
+    #findSuffixMedia(): HTMLMediaElement | null {
+      const walker = document.createTreeWalker(this, NodeFilter.SHOW_ELEMENT);
+
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        // SAFETY: the walker only visits elements (`SHOW_ELEMENT`).
+        const element = node as Element;
+        if (!MEDIA_NAME_SUFFIX.test(element.localName)) continue;
+
+        // Features check what the media supports once, at attach, so attaching before the upgrade would leave them off.
+        if (isUndefinedCustomElement(element)) {
+          this.#searchWhenDefined(element.localName);
+          continue;
+        }
+
+        // The name is only a guess; skip lookalikes such as a `<my-intro-video>` layout wrapper.
+        if (!isMediaPauseCapable(element)) continue;
+
+        // SAFETY: the element behaves like media; each feature checks the capabilities it needs before use.
+        return element as unknown as HTMLMediaElement;
+      }
+
+      return null;
+    }
+
+    #searchWhenDefined(name: string): void {
+      if (this.#pendingDefinitions.has(name)) return;
+
+      this.#pendingDefinitions.add(name);
+      customElements.whenDefined(name).then(() => {
+        this.#pendingDefinitions.delete(name);
+
+        if (this.#connected) this.#syncNativeMedia();
+      });
     }
 
     #publishMedia(): void {

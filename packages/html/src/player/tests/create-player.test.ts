@@ -175,6 +175,83 @@ describe('createPlayer', () => {
     await vi.waitFor(() => expect(player.store.target).toBeNull());
   });
 
+  describe('*-video and *-audio media', () => {
+    class FakeMedia extends HTMLElement {
+      paused = true;
+      ended = false;
+      play(): Promise<void> {
+        return Promise.resolve();
+      }
+      pause(): void {}
+    }
+
+    function mediaTag(suffix: 'video' | 'audio'): string {
+      return `test-acme-${tagCounter++}-${suffix}`;
+    }
+
+    it('prefers a suffix element over native media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const tag = mediaTag('video');
+
+      customElements.define(tag, class extends FakeMedia {});
+
+      const media = document.createElement(tag);
+
+      player.append(document.createElement('video'), media);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(player.querySelector(tag)));
+    });
+
+    it('waits for a suffix element to be defined before attaching', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const tag = mediaTag('audio');
+
+      player.append(document.createElement(tag));
+      document.body.append(player);
+      await Promise.resolve();
+
+      expect(player.store.target).toBeNull();
+
+      customElements.define(tag, class extends FakeMedia {});
+
+      // jsdom can hand back a new wrapper for an upgraded element, so compare against a fresh lookup.
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(player.querySelector(tag)));
+    });
+
+    it('skips a suffix element that is not media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const tag = mediaTag('video');
+
+      customElements.define(tag, class extends HTMLElement {});
+
+      const wrapper = document.createElement(tag);
+      const video = document.createElement('video');
+
+      wrapper.append(video);
+      player.append(wrapper);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(video));
+    });
+
+    it('still prefers self-registered media', async () => {
+      const { PlayerElement } = createPlayer({ features: backgroundFeatures });
+      const player = document.createElement(defineTestElement(PlayerElement)) as InstanceType<typeof PlayerElement>;
+      const registered = document.createElement(defineTestElement(MediaAttachMixin(HTMLElement)));
+      const tag = mediaTag('video');
+
+      customElements.define(tag, class extends FakeMedia {});
+      player.append(document.createElement(tag), registered);
+      document.body.append(player);
+
+      await vi.waitFor(() => expect(player.store.target?.media).toBe(registered));
+    });
+  });
+
   describe('extensions', () => {
     class MutedExtension implements PlayerExtension {
       attach = vi.fn<(target: PlayerTarget) => void>();

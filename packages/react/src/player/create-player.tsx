@@ -24,6 +24,7 @@ import { pick } from '@videojs/utils/object';
 import type { FC, ReactNode } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useDefinedMedia } from '../utils/use-defined-media';
 import { useDestroy } from '../utils/use-destroy';
 import { PlayerContextProvider, useMedia, usePlayerContext } from './context';
 
@@ -114,7 +115,8 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     const [store, setStore] = useState(() => createConfiguredStore(configValues));
     const syncedValues = useRef({ store, values: configValues });
 
-    const [media, setMedia] = useState<Media | null>(null);
+    const [requestedMedia, setMedia] = useState<Media | null>(null);
+    const media = useDefinedMedia(requestedMedia);
     const [container, setContainer] = useState<HTMLElement | null>(null);
 
     // Re-attaches the store to the current target; set by the attach effect below while a target is attached.
