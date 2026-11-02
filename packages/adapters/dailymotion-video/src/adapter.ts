@@ -6,7 +6,7 @@ import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
 import { deepEqual } from '@videojs/utils/object';
-import { isBoolean, isNumber, isString } from '@videojs/utils/predicate';
+import { isBoolean, isNumber } from '@videojs/utils/predicate';
 import { generateId } from '@videojs/utils/string';
 
 import type { DailymotionAdapterProps } from './props';
@@ -27,10 +27,11 @@ import { type DailymotionSource, parseDailymotionSource, resolveDailymotionPlaye
  * The target is a container the SDK builds its player in. The SDK finds it by id from the document, so it must be in
  * the light DOM, not inside a shadow root.
  *
- * The configuration owns its controls, which the SDK can't change. Playback the element didn't ask for is paused before
- * it is reported: the configuration's Autostart while `autoplay` is off, and the playback Dailymotion starts on a seek
- * from its start or end screen. `currentTime` and `duration` describe the video, while `paused` follows whatever is on
- * screen, ad or video. The SDK reports no buffered range, so `buffered` ends at the furthest point played.
+ * The configuration owns what the SDK can't change: its controls, and an `autostart` that `autoplay` can't turn off
+ * (development builds warn when they disagree). The playback Dailymotion starts on a seek from its start or end screen
+ * is paused before it is reported, except for an ad, which is never paused. `currentTime` and `duration` describe the
+ * video, while `paused` follows whatever is on screen, ad or video. The SDK reports no buffered range, so `buffered`
+ * ends at the furthest point played.
  *
  * @fires sourcechange - Fired when `source` changes, either directly or by resolving a new `src`. Read `source` for the
  *   new value.
@@ -79,10 +80,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #playRequested = false;
   // Whether this load may still autoplay; a `pause()` before the player is ready withdraws it.
   #autoplayPending = false;
-  // Through the configuration's Autostart, once per load (see `#shouldStayPaused`).
-  #stayPausedThroughAutostart = false;
   // From a seek made while paused until it settles (see `#shouldStayPaused`).
   #stayPausedThroughSeek = false;
+  // Dailymotion's terms forbid holding back its ads, so none is paused (see `#shouldStayPaused`).
+  #adPlaying = false;
   // The furthest point played this load, which `buffered` ends at.
   #bufferedEnd = 0;
   // The player's position when the pending seek began, to tell whether it has landed.
@@ -192,7 +193,6 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       this.#options = options;
       this.#swapping = true;
       this.#autoplayPending = true;
-      this.#expectAutostart();
       this.dispatchEvent(new Event('loadstart'));
       const startTime = options.params?.startTime;
 
@@ -312,7 +312,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
   /**
    * Starts playback on each load, through Dailymotion's `autoplay` parameter and a play sent once the player is ready.
-   * When off, a player configuration whose Autostart is on is paused as it starts.
+   * It can't stop a player configuration whose Autostart is on.
    */
   get autoplay() {
     return this.#autoplay;
@@ -341,7 +341,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#applyLoop();
   }
 
-  /** Only the player configuration can hide Dailymotion's controls; `controls` decides whether the player takes input. */
+  /** Has no effect: the player configuration decides whether Dailymotion's controls show, which the SDK can't change. */
   get controls() {
     return this.#controls;
   }
@@ -553,8 +553,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     const handlers: Record<string, (state: DailymotionPlayerState) => void> = {
       // An ad playing is on screen as much as the video is, so both start and stop playback.
       VIDEO_PLAY: () => this.#onPlay(),
-      // An ad sends no `VIDEO_PLAYING`, so one that should stay paused is paused as it starts.
-      AD_PLAY: () => (this.#shouldStayPaused() ? this.#pauseAgain() : this.#onPlay()),
+      AD_PLAY: () => this.#onAdPlay(),
+      AD_END: () => {
+        this.#adPlaying = false;
+      },
       VIDEO_PAUSE: () => this.#onPause(),
       AD_PAUSE: () => this.#onPause(),
       VIDEO_PLAYING: () => this.#onPlaying(),
@@ -627,8 +629,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   }
 
   #onReady() {
-    this.#expectAutostart();
     this.#syncToEmbed();
+
+    if (__DEV__) this.#warnOnAutostart();
 
     // The duration arrives with the state read below.
     this.#onLoaded();
@@ -652,38 +655,44 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     );
   }
 
-  // Read on each load, since the configuration's Autostart starts every video (see `#shouldStayPaused`).
-  #expectAutostart() {
+  #warnOnAutostart() {
+    if (this.#autoplay) return;
+
+    const id = this.#options?.player;
     let autostart: string | undefined;
 
-    // A player without the method is left to its configuration.
+    // Diagnostic only: a player without the method must still load.
     try {
       autostart = this.#player?.getSettings()?.autostart;
-    } catch {}
+    } catch {
+      return;
+    }
 
-    this.#stayPausedThroughAutostart = !this.#autoplay && isString(autostart) && autostart !== 'off';
+    if (!autostart || autostart === 'off' || !id || warnedAutostart.has(id)) return;
+
+    warnedAutostart.add(id);
+    console.warn(
+      `[vjs-dailymotion] Player configuration ${id} starts playback itself (autostart: "${autostart}"), which \`autoplay\` cannot turn off. Turn Autostart off for it in Dailymotion Studio.`
+    );
   }
 
   /**
-   * Dailymotion starts playback the element didn't ask for: the configuration's Autostart while `autoplay` is off, and
-   * a seek from its start or end screen, which a paused media element doesn't start. While this is true, a play the
-   * player starts isn't reported and is paused again once it reaches `VIDEO_PLAYING`. Pausing on `VIDEO_PLAY` leaves
-   * the player stuck on its loading screen; by `VIDEO_PLAYING` the video counts as started, so the player also takes a
-   * seek it would otherwise drop.
+   * Dailymotion starts playback on a seek from its start or end screen, which a paused media element doesn't. While
+   * this is true, a play the player starts isn't reported and is paused again once it reaches `VIDEO_PLAYING`. Pausing
+   * on `VIDEO_PLAY` leaves the player stuck on its loading screen; by `VIDEO_PLAYING` the video counts as started, so
+   * the player also takes a seek it would otherwise drop. An ad always plays through.
    */
   #shouldStayPaused() {
-    return this.#stayPausedThroughAutostart || this.#stayPausedThroughSeek;
+    return this.#stayPausedThroughSeek && !this.#adPlaying;
   }
 
-  /** Attempts to pause @see `#shouldStayPaused`. The autostart is paused once; a seek, until it settles. */
+  /** Attempts to pause @see `#shouldStayPaused`. */
   #pauseAgain() {
-    this.#stayPausedThroughAutostart = false;
     tryCall(() => this.#player?.pause());
   }
 
   /** A play the element asks for, or a new load, lets playback through (see `#shouldStayPaused`). */
   #stopStayingPaused() {
-    this.#stayPausedThroughAutostart = false;
     this.#stayPausedThroughSeek = false;
   }
 
@@ -789,6 +798,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     if (state.playerIsCriticalPathReady === true && !state.playerError) this.#onCanPlay();
 
+    // An ad may already be playing when the player is ready.
+    if (isBoolean(state.adIsPlaying)) this.#adPlaying = state.adIsPlaying;
+
     if (state.playerIsPlaying === true) {
       if (this.#shouldStayPaused()) this.#pauseAgain();
       else this.#onPlay();
@@ -857,9 +869,16 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.dispatchEvent(new Event('play'));
   }
 
+  #onAdPlay() {
+    this.#adPlaying = true;
+    this.#onPlay();
+  }
+
   #onPlaying() {
     // Playing from the start position, so the player's reports are accurate again.
     this.#startPosition = null;
+    // The video plays, so any ad is over, even one whose end went unreported.
+    this.#adPlaying = false;
     this.#onCanPlay();
 
     // Paused here rather than on `VIDEO_PLAY` (see `#shouldStayPaused`).
@@ -975,6 +994,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#seeking = false;
     this.#startPosition = null;
     this.#bufferedEnd = 0;
+    this.#adPlaying = false;
     this.#stopStayingPaused();
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#error = null;
@@ -995,6 +1015,9 @@ function embedOf({ video: _video, params, ...embed }: DailymotionCreatePlayerOpt
 
   return { ...embed, params: rest };
 }
+
+// Configurations already warned about, so rebuilds don't repeat it.
+const warnedAutostart = new Set<string>();
 
 // How long to wait for a seek-end report before settling from the player's state.
 const SEEK_SETTLE_TIMEOUT = 2_000;

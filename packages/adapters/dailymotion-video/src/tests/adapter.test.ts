@@ -29,6 +29,7 @@ const EVENTS = {
   VIDEO_END: 'video_end',
   AD_PLAY: 'ad_play',
   AD_PAUSE: 'ad_pause',
+  AD_END: 'ad_end',
   PLAYER_VOLUMECHANGE: 'volumechange',
   PLAYER_PLAYBACKSPEEDCHANGE: 'playbackspeedchange',
   PLAYER_PLAYBACKPERMISSION: 'playback_resolution',
@@ -787,13 +788,10 @@ describe('DailymotionAdapter', () => {
       expect(player.play).toHaveBeenCalledOnce();
     });
 
-    it('pauses the autostart of a player configuration while autoplay is off, without reporting it', async () => {
-      const media = new DailymotionAdapter();
-      const events: string[] = [];
+    it('warns once per player configuration that starts playback while autoplay is off', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      for (const type of ['play', 'playing', 'pause']) media.addEventListener(type, () => events.push(type));
-
-      createPlayer.mockImplementationOnce(async (id, options) => {
+      createPlayer.mockImplementation(async (id, options) => {
         const player = new FakePlayer(document.getElementById(id)!, options);
 
         player.settings = { autostart: 'firstTimeViewable' };
@@ -801,46 +799,26 @@ describe('DailymotionAdapter', () => {
         return player;
       });
 
-      const { player } = await attachAndReady(media);
-
-      player.emit('VIDEO_PLAY');
-
-      // Pausing as playback starts would leave the player on its loading screen.
-      expect(player.pause).not.toHaveBeenCalled();
-
-      player.emit('VIDEO_PLAYING');
-      player.emit('VIDEO_PAUSE');
-
-      expect(player.pause).toHaveBeenCalledOnce();
-      expect(media.paused).toBe(true);
-      expect(events).toEqual([]);
-
-      // It stays paused through the autostart only: a later play from the player's own controls is reported.
-      player.emit('VIDEO_PLAY');
-      player.emit('VIDEO_PLAYING');
-
-      expect(player.pause).toHaveBeenCalledOnce();
-      expect(events).toEqual(['play', 'playing']);
-    });
-
-    it('pauses the autostart of a video loaded into the running player while autoplay is off', async () => {
       const media = new DailymotionAdapter();
-      const { player } = await attachAndReady(media);
 
-      player.settings = { autostart: 'on' };
-      media.src = OTHER_VIDEO_SRC;
+      media.source = source(VIDEO_SRC, { player: 'xautostart' });
+      media.attach(createContainer());
       await flush();
-      player.emit('PLAYER_VIDEOCHANGE');
-      player.emit('VIDEO_PLAY');
-      player.emit('VIDEO_PLAYING');
+      media.source = source(VIDEO_SRC, { player: 'xautostart', scaleMode: 'fill' });
+      await flush();
 
-      expect(player.pause).toHaveBeenCalledOnce();
-      expect(media.paused).toBe(true);
+      expect(players).toHaveLength(2);
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.stringMatching(/xautostart starts playback itself/));
     });
 
-    it('pauses an ad the autostart begins with as it starts, since ads send no VIDEO_PLAYING', async () => {
+    it('does not warn about autostart when autoplay is on or the configuration leaves it off', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await attachAndReady(new DailymotionAdapter());
+
       const media = new DailymotionAdapter();
 
+      media.autoplay = true;
       createPlayer.mockImplementationOnce(async (id, options) => {
         const player = new FakePlayer(document.getElementById(id)!, options);
 
@@ -848,49 +826,9 @@ describe('DailymotionAdapter', () => {
         players.push(player);
         return player;
       });
+      await attachAndReady(media);
 
-      const { player } = await attachAndReady(media);
-
-      player.emit('AD_PLAY');
-
-      expect(player.pause).toHaveBeenCalledOnce();
-      expect(media.paused).toBe(true);
-    });
-
-    it('lets the autostart play when autoplay is on, play() was called, or the configuration leaves it off', async () => {
-      const autostarting = (media: DailymotionAdapter) => {
-        createPlayer.mockImplementationOnce(async (id, options) => {
-          const player = new FakePlayer(document.getElementById(id)!, options);
-
-          player.settings = { autostart: 'on' };
-          players.push(player);
-          return player;
-        });
-        return attachAndReady(media);
-      };
-
-      const autoplaying = new DailymotionAdapter();
-
-      autoplaying.autoplay = true;
-
-      const requested = new DailymotionAdapter();
-
-      requested.source = source();
-      void requested.play();
-
-      for (const { player } of [
-        await autostarting(autoplaying),
-        await autostarting(requested),
-        await attachAndReady(new DailymotionAdapter()),
-      ]) {
-        player.emit('VIDEO_PLAY');
-        player.emit('VIDEO_PLAYING');
-
-        expect(player.pause).not.toHaveBeenCalled();
-      }
-
-      expect(autoplaying.paused).toBe(false);
-      expect(requested.paused).toBe(false);
+      expect(warn).not.toHaveBeenCalled();
     });
 
     it('still loads when the player cannot report its settings', async () => {
@@ -1332,6 +1270,43 @@ describe('DailymotionAdapter', () => {
       player.emit('VIDEO_PLAY');
 
       expect(player.pause).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
+    });
+
+    it('never pauses an ad a paused seek starts, and reports it as playback', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.currentTime = 10;
+      player.emit('VIDEO_PLAY');
+      player.emit('AD_PLAY', { adIsPlaying: true });
+
+      expect(player.pause).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
+
+      // The video after the ad still stays paused while the seek is pending.
+      player.emit('AD_END', { adIsPlaying: false });
+      player.emit('VIDEO_PLAYING');
+
+      expect(player.pause).toHaveBeenCalledOnce();
+    });
+
+    it('never pauses an ad already playing when the player is ready', async () => {
+      const media = new DailymotionAdapter();
+
+      createPlayer.mockImplementationOnce(async (id, options) => {
+        const player = new FakePlayer(document.getElementById(id)!, options);
+
+        Object.assign(player.state, { playerIsPlaying: true, adIsPlaying: true });
+        players.push(player);
+        return player;
+      });
+      media.source = source();
+      media.attach(createContainer());
+      media.currentTime = 20;
+      await flush();
+
+      expect(players[0]!.pause).not.toHaveBeenCalled();
       expect(media.paused).toBe(false);
     });
 
