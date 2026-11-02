@@ -61,6 +61,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   #unbindEvents: (() => void) | null = null;
   // Lets a `load()` waiting out its microtask drop out once a newer load begins.
   #loadId = 0;
+  // While a `load()` waits out its microtask, `#player` still plays the outgoing video, so a `play()` or seek is held
+  // for the incoming one instead.
+  #loadPending = false;
+  // A `currentTime` set while a load is pending, which the incoming video starts at.
+  #pendingStartTime: number | null = null;
   // Guards async player creation across attach/detach cycles and rebuilds.
   #attachId = 0;
 
@@ -129,6 +134,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#target = target;
     // `attach()` loads the current source itself, so a `load()` still waiting drops out instead of loading it again.
     this.#loadId++;
+    this.#loadPending = false;
     this.#createPlayer();
   }
 
@@ -137,6 +143,8 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#destroyPlayer();
     this.#target = null;
+    this.#loadPending = false;
+    this.#pendingStartTime = null;
     // A pending play must not start the next player.
     this.#playRequested = false;
     this.#autoplayPending = false;
@@ -178,6 +186,10 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     const loadId = ++this.#loadId;
 
+    this.#loadPending = true;
+    // As on a media element, a load drops a play the previous source was still holding; one made after it is kept.
+    this.#playRequested = false;
+
     // Wait a microtask so a framework's prop writes all land before the player is configured.
     await Promise.resolve();
 
@@ -186,8 +198,18 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     const options = resolveDailymotionPlayerOptions(this.#src, this.#snapshotProps());
     const player = this.#player;
+    const pendingStartTime = this.#pendingStartTime;
 
+    this.#loadPending = false;
+    this.#pendingStartTime = null;
     this.#resetState();
+
+    // Kept as a pending seek, which the player is created or the video loaded at (see `#startPosition`).
+    if (pendingStartTime !== null) {
+      this.#seeking = true;
+      this.#currentTime = pendingStartTime;
+    }
+
     // Announced before any early return, since no player report follows those.
     this.dispatchEvent(new Event('emptied'));
 
@@ -196,8 +218,9 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
       this.#swapping = true;
       this.#autoplayPending = true;
       this.#expectAutostart();
+      this.#startPosition = pendingStartTime;
       this.dispatchEvent(new Event('loadstart'));
-      const startTime = options.params?.startTime;
+      const startTime = pendingStartTime ?? options.params?.startTime;
 
       tryCall(() => player.loadContent({ video: options.video, ...(isNumber(startTime) && { startTime }) }));
       return;
@@ -224,7 +247,7 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
     this.#stopStayingPaused();
 
-    if (!this.#player) {
+    if (!this.#player || this.#loadPending) {
       this.#playRequested = true;
       return;
     }
@@ -262,6 +285,11 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
     this.#currentTime = targetTime;
     this.dispatchEvent(new Event('seeking'));
     this.dispatchEvent(new Event('timeupdate'));
+
+    if (this.#loadPending) {
+      this.#pendingStartTime = targetTime;
+      return;
+    }
 
     // Without a player yet, `#syncToEmbed` sends it once ready.
     this.#seek(targetTime);
@@ -771,11 +799,18 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   // Completes a video loaded into the running player. A recommendation the player moves on to by itself reports the
   // same way, while `src` still names the loaded video; turning autonext off avoids that.
   #onVideoChange(state: DailymotionPlayerState) {
+    // A video loaded before the one now loading reports late, and its state isn't the incoming video's.
+    if (this.#swapping && isString(state.videoId) && state.videoId !== this.#options?.video) return;
+
     if (this.#swapping) {
       this.#swapping = false;
       // Loading a video drops the `loop` the player had, so it's sent again.
       tryCall(() => this.#player?.setLoop(this.#loop));
       this.#onLoaded();
+
+      // The video was loaded at the seek's position (see `#startPosition`).
+      if (this.#seeking && this.#startPosition !== null) this.#onSeeked(undefined);
+
       this.#playIfRequested();
     }
 

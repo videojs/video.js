@@ -570,6 +570,56 @@ describe('DailymotionAdapter', () => {
       expect(player.loadContent).toHaveBeenCalledExactlyOnceWith({ video: 'x9third' });
     });
 
+    it('loads a new start position for the same video into the running player', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source(VIDEO_SRC, { startTime: 10 });
+
+      const { player } = await attachAndReady(media);
+
+      media.source = source(VIDEO_SRC, { startTime: 30 });
+      await flush();
+
+      expect(player.loadContent).toHaveBeenCalledExactlyOnceWith({ video: 'x84sh87', startTime: 30 });
+      expect(createPlayer).toHaveBeenCalledOnce();
+    });
+
+    it('rebuilds the player for a src whose query changes the runtime parameters', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source(EMBED_SRC);
+
+      const { player } = await attachAndReady(media);
+
+      media.src = `https://geo.dailymotion.com/player/${PLAYER}.html?video=x7tgad0&scaleMode=fill`;
+      await flush();
+
+      expect(player.loadContent).not.toHaveBeenCalled();
+      expect(player.destroy).toHaveBeenCalledOnce();
+      expect(createPlayer.mock.calls[1]![1]).toMatchObject({ video: 'x7tgad0', params: { scaleMode: 'fill' } });
+    });
+
+    it('completes only the load of the last video when an earlier one reports its change late', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+      const loadcomplete = vi.fn();
+
+      media.addEventListener('loadcomplete', loadcomplete);
+      media.src = OTHER_VIDEO_SRC;
+      await flush();
+      media.src = 'https://www.dailymotion.com/video/x9third';
+      await flush();
+      player.emit('PLAYER_VIDEOCHANGE', { videoId: 'x7tgad0', videoDuration: 86 });
+
+      expect(loadcomplete).not.toHaveBeenCalled();
+      expect(media.duration).toBeNaN();
+
+      player.emit('PLAYER_VIDEOCHANGE', { videoId: 'x9third', videoDuration: 40 });
+
+      expect(loadcomplete).toHaveBeenCalledOnce();
+      expect(media.duration).toBe(40);
+    });
+
     it('keeps the engine options when only src changes', async () => {
       const media = new DailymotionAdapter();
 
@@ -761,6 +811,18 @@ describe('DailymotionAdapter', () => {
       expect(players[0]!.play).not.toHaveBeenCalled();
     });
 
+    it('drops a held play when the source changes before ready', async () => {
+      const media = new DailymotionAdapter();
+
+      media.source = source();
+      media.attach(createContainer());
+      void media.play();
+      media.source = source(VIDEO_SRC, { scaleMode: 'fill' });
+      await flush();
+
+      expect(players.at(-1)!.play).not.toHaveBeenCalled();
+    });
+
     it('ignores play() without a source', async () => {
       const media = new DailymotionAdapter();
 
@@ -837,6 +899,41 @@ describe('DailymotionAdapter', () => {
 
       expect(player.pause).toHaveBeenCalledOnce();
       expect(media.paused).toBe(true);
+    });
+
+    it('plays a video loaded into the running player when play() follows the src change', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      player.settings = { autostart: 'on' };
+      media.src = OTHER_VIDEO_SRC;
+      void media.play();
+      await flush();
+
+      // The outgoing video is never asked to play.
+      expect(player.play).not.toHaveBeenCalled();
+
+      player.emit('PLAYER_VIDEOCHANGE', { videoId: 'x7tgad0' });
+
+      expect(player.play).toHaveBeenCalledOnce();
+
+      player.emit('VIDEO_PLAY');
+      player.emit('VIDEO_PLAYING');
+
+      expect(player.pause).not.toHaveBeenCalled();
+      expect(media.paused).toBe(false);
+    });
+
+    it('plays the new player when play() follows a source change that rebuilds it', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.source = source(OTHER_VIDEO_SRC, { scaleMode: 'fill' });
+      void media.play();
+      await flush();
+
+      expect(player.play).not.toHaveBeenCalled();
+      expect(players[1]!.play).toHaveBeenCalledOnce();
     });
 
     it('never pauses an ad the autostart begins with, and pauses the video after it', async () => {
@@ -1454,6 +1551,32 @@ describe('DailymotionAdapter', () => {
       await flush();
 
       expect(players[0]!.seek).toHaveBeenCalledWith(20);
+    });
+
+    it('starts a video loaded into the running player at a seek that follows the src change', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.src = OTHER_VIDEO_SRC;
+      media.currentTime = 20;
+      await flush();
+
+      expect(player.seek).not.toHaveBeenCalled();
+      expect(player.loadContent).toHaveBeenCalledExactlyOnceWith({ video: 'x7tgad0', startTime: 20 });
+      expect(media.currentTime).toBe(20);
+    });
+
+    it('starts a rebuilt player at a seek that follows the source change', async () => {
+      const media = new DailymotionAdapter();
+      const { player } = await attachAndReady(media);
+
+      media.source = source(OTHER_VIDEO_SRC, { scaleMode: 'fill' });
+      media.currentTime = 20;
+      await flush();
+
+      expect(player.seek).not.toHaveBeenCalled();
+      expect(players[1]!.options.params).toMatchObject({ startTime: 20 });
+      expect(media.currentTime).toBe(20);
     });
   });
 
