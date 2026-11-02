@@ -15,7 +15,7 @@ export interface DailymotionVideoProps
   /** `<video>` spelling of `autoplay`, accepted so markup ports across. An explicit `autoplay` wins. */
   autoPlay?: boolean | undefined;
   children?: ReactNode;
-  /** Merged over the container's own sizing and hit-testing styles. */
+  /** Merged over the container's own sizing styles. */
   style?: CSSProperties | undefined;
 }
 
@@ -39,8 +39,8 @@ export const DailymotionVideo = forwardRef<HTMLDivElement, DailymotionVideoProps
     <div
       data-cross-origin-frame
       {...containerProps}
-      // Without `controls`, keep the cross-origin frame out of hit-testing so the skin above it sees hover.
-      style={{ width: '100%', height: '100%', ...(!props.controls && { pointerEvents: 'none' }), ...style }}
+      // Unlike the other embeds, never kept out of hit-testing: Dailymotion's terms forbid blocking any part of its player.
+      style={{ width: '100%', height: '100%', ...style }}
       ref={composedRef}
     />
   );

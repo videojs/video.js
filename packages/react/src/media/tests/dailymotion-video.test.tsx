@@ -22,28 +22,22 @@ describe('DailymotionVideo', () => {
     expect(media.target).toBe(container.firstElementChild);
   });
 
-  it('keeps the player out of hit-testing without controls so the skin above it sees hover', () => {
-    const { container, rerender } = render(<DailymotionVideo />);
+  it('leaves the player in hit-testing without controls, since Dailymotion forbids blocking its player', () => {
+    const { container } = render(<DailymotionVideo />);
     const element = container.firstElementChild as HTMLElement;
-
-    expect(element.style.pointerEvents).toBe('none');
-
-    rerender(<DailymotionVideo controls />);
 
     expect(element.style.pointerEvents).toBe('');
   });
 
-  it('merges a style prop over its own sizing and hit-testing instead of replacing them', () => {
+  it('merges a style prop over its own sizing instead of replacing it', () => {
     const { container, rerender } = render(<DailymotionVideo style={{ borderRadius: 4 }} />);
     const element = container.firstElementChild as HTMLElement;
 
-    expect(element.style.pointerEvents).toBe('none');
     expect(element.style.height).toBe('100%');
     expect(element.style.borderRadius).toBe('4px');
 
     rerender(<DailymotionVideo style={undefined} />);
 
-    expect(element.style.pointerEvents).toBe('none');
     expect(element.style.height).toBe('100%');
   });
 

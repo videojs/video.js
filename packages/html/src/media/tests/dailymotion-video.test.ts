@@ -77,7 +77,20 @@ describe('DailymotionVideo', () => {
 
   // Asserted against the template because no DOM implementation the tests run in resolves `:host` for a computed
   // style, which is also how the sibling embed hosts check theirs.
-  it('keeps the player out of hit-testing without controls so the skin above it sees hover', () => {
-    expect(DailymotionVideo.getTemplateHTML()).toMatch(/:host\(:not\(\[controls\]\)\)\s*\{\s*pointer-events:\s*none/);
+  it('leaves the player in hit-testing without controls, since Dailymotion forbids blocking its player', () => {
+    expect(DailymotionVideo.getTemplateHTML()).not.toMatch(/pointer-events/);
+  });
+
+  it('follows a mute the player made on its own, so unmuting through the element reaches the adapter', () => {
+    const el = document.createElement('test-dailymotion-video') as TestDailymotionVideo;
+
+    el.adapter.muted = true;
+
+    expect(el.hasAttribute('muted')).toBe(true);
+
+    el.muted = false;
+
+    expect(el.adapter.muted).toBe(false);
+    expect(el.hasAttribute('muted')).toBe(false);
   });
 });
