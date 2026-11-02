@@ -102,7 +102,7 @@ The player configuration decides what the embed can't change at runtime:
 | Setting | Effect |
 |---|---|
 | Controls | Which of Dailymotion's controls show. `controls` has no effect. |
-| Autostart | Starts the video whatever `autoplay` says: `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. In development, the component logs a warning when the configuration starts playback while `autoplay` is off. |
+| Autostart | `autoplay` decides whether the video starts: with it off, the component pauses the configuration's autostart as it starts. An ad that plays first is never paused, and the video after it is. Turning Autostart off avoids the pause. |
 | Autonext | When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
 | Picture-in-picture | Dailymotion's picture-in-picture moves the player out of the element. |
 | Poster, preload, and inline playback | `poster`, `preload`, and `playsinline` are accepted for parity with `<video>` but have no effect. |
