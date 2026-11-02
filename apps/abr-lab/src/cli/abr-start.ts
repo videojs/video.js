@@ -14,7 +14,9 @@ import { seededRandom } from '../synthetic/trace.ts';
  * through the same sessions. The session starts 10 minutes into its network's trace; the minute before that stands in
  * for "the last session" (stored estimate) and for recent browsing (Network Information API).
  */
-const { values } = parseArgs({ options: { seeds: { type: 'string', default: '20' } } });
+const { values } = parseArgs({
+  options: { seeds: { type: 'string', default: '20' }, 'playlist-bytes': { type: 'string' } },
+});
 
 const HISTORY_MS = 11 * 60_000;
 const LAST_SESSION_MS = 60_000;
@@ -92,11 +94,62 @@ const VARIANTS: Array<{ name: string; start: (world: World) => StartingEstimate 
   { name: 'perfect start', start: (w) => ({ kind: 'fixed', bps: w.perfectBps }) },
 ];
 
-for (const player of PLAYERS) {
+/**
+ * ASSUMED scenario mixes, not measured: how often a viewer is on each simulated network, and how often the stored
+ * estimate came from a different network than this session's (Wi-Fi ↔ cellular, commuting, hotel Wi-Fi). Variants that
+ * do not use a stored estimate are unaffected by `moved`.
+ */
+const SCENARIOS: Array<{ name: string; networks: Record<string, number>; moved: number }> = [
+  {
+    name: 'home (mostly same net)',
+    networks: { 'wifi-steady': 0.55, 'cable-evening': 0.25, cellular: 0.1, 'lte-high-bdp': 0.05, 'dsl-slow': 0.05 },
+    moved: 0.1,
+  },
+  {
+    name: 'mixed',
+    networks: { 'wifi-steady': 0.35, 'cable-evening': 0.15, cellular: 0.25, 'lte-high-bdp': 0.15, 'dsl-slow': 0.1 },
+    moved: 0.3,
+  },
+  {
+    name: 'mobile / commuting',
+    networks: { 'wifi-steady': 0.15, 'cable-evening': 0.05, cellular: 0.45, 'lte-high-bdp': 0.3, 'dsl-slow': 0.05 },
+    moved: 0.6,
+  },
+  {
+    name: 'slow links only',
+    networks: { 'wifi-steady': 0, 'cable-evening': 0, cellular: 0.5, 'lte-high-bdp': 0, 'dsl-slow': 0.5 },
+    moved: 0.3,
+  },
+];
+
+/** Deployable policies: a stored-estimate policy is one variant on the same network and another after a move. */
+const POLICIES: Array<{ name: string; same: string; moved: string }> = [
+  { name: 'default 5 Mbit/s', same: 'default 5 Mbit/s', moved: 'default 5 Mbit/s' },
+  { name: 'last session', same: 'last session (same net)', moved: 'last session (moved net)' },
+  { name: 'playlist timing', same: 'playlist timing', moved: 'playlist timing' },
+  { name: 'netinfo + playlist', same: 'netinfo + playlist', moved: 'netinfo + playlist' },
+  { name: 'last, RTT-gated', same: 'last, RTT-gated (same net)', moved: 'last, RTT-gated (moved net)' },
+  { name: 'last+playlist, gated', same: 'last+playlist, gated (same)', moved: 'last+playlist, gated (moved)' },
+  { name: 'stream burst', same: 'stream burst', moved: 'stream burst' },
+  { name: 'policy', same: 'policy (same net)', moved: 'policy (moved net)' },
+  { name: 'perfect start', same: 'perfect start', moved: 'perfect start' },
+];
+
+const players = PLAYERS.map((p) =>
+  values['playlist-bytes'] === undefined ? p : { ...p, mediaPlaylistBytes: Number(values['playlist-bytes']) }
+);
+
+for (const player of players) {
   for (const rule of [{ kind: 'throughput', safety: 1 }, { kind: 'mpc' }] satisfies AbrRule[]) {
     const results = new Map<
       string,
-      Array<{ network: string; result: SessionResult; ratio: number; accepted: boolean | undefined }>
+      Array<{
+        network: string;
+        behavior: string;
+        result: SessionResult;
+        ratio: number;
+        accepted: boolean | undefined;
+      }>
     >();
 
     for (const network of NETWORKS) {
@@ -132,7 +185,7 @@ for (const player of PLAYERS) {
 
             results.set(variant.name, [
               ...(results.get(variant.name) ?? []),
-              { network: network.name, result, ratio, accepted },
+              { network: network.name, behavior, result, ratio, accepted },
             ]);
           }
         }
@@ -141,7 +194,9 @@ for (const player of PLAYERS) {
 
     const ruleName = rule.kind === 'mpc' ? 'mpc' : `throughput (safety ${rule.safety})`;
 
-    console.log(`\n=== ${player.name}, ${ruleName}, dash.js with each starting estimate, ${values.seeds} seeds`);
+    console.log(
+      `\n=== ${player.name} (playlist ${player.mediaPlaylistBytes} B), ${ruleName}, dash.js with each starting estimate, ${values.seeds} seeds`
+    );
     console.log(
       table(
         [
@@ -149,6 +204,7 @@ for (const player of PLAYERS) {
           'gate pass',
           'est/true p50',
           '|ln err| p50',
+          'startup mean ms',
           'startup p50 ms',
           'startup p90 ms',
           'first 20 s Mbit/s',
@@ -166,6 +222,7 @@ for (const player of PLAYERS) {
             gates.length === 0 ? '-' : `${Math.round((100 * gates.filter(Boolean).length) / gates.length)}%`,
             median(ratios).toFixed(2),
             median(ratios.map((r) => Math.abs(Math.log(r)))).toFixed(2),
+            mean(rows.map((r) => r.startupMs)).toFixed(0),
             median(rows.map((r) => r.startupMs)).toFixed(0),
             quantile(
               rows.map((r) => r.startupMs),
@@ -181,6 +238,80 @@ for (const player of PLAYERS) {
     );
 
     const networks = NETWORKS.map((n) => n.name);
+    const behaviors = Object.keys(SERVER_BEHAVIORS);
+    const startupCell = (rows: SessionResult[]) =>
+      `${mean(rows.map((r) => r.startupMs)).toFixed(0)}/${median(rows.map((r) => r.startupMs)).toFixed(0)}`;
+
+    console.log('\nStartup ms (mean/p50) by network:');
+    console.log(
+      table(
+        ['starting estimate', ...networks],
+        VARIANTS.map(({ name }) => [
+          name,
+          ...networks.map((n) =>
+            startupCell(
+              results
+                .get(name)!
+                .filter((r) => r.network === n)
+                .map((r) => r.result)
+            )
+          ),
+        ])
+      )
+    );
+
+    console.log('\nStartup ms (mean/p50) by server behavior:');
+    console.log(
+      table(
+        ['starting estimate', ...behaviors],
+        VARIANTS.map(({ name }) => [
+          name,
+          ...behaviors.map((b) =>
+            startupCell(
+              results
+                .get(name)!
+                .filter((r) => r.behavior === b)
+                .map((r) => r.result)
+            )
+          ),
+        ])
+      )
+    );
+
+    for (const scenario of SCENARIOS) {
+      console.log(`\nScenario "${scenario.name}" (assumed weights, P(moved) ${scenario.moved}):`);
+      console.log(
+        table(
+          ['policy', 'startup mean ms', 'startup p50 ms', 'startup p90 ms', 'first 20 s Mbit/s', 'QoE', 'QoE p50'],
+          POLICIES.map((policy) => {
+            const weighted = [
+              ...weigh(results.get(policy.same)!, scenario, 1 - scenario.moved),
+              ...weigh(results.get(policy.moved)!, scenario, scenario.moved),
+            ];
+            const of = (f: (r: SessionResult) => number) => weighted.map(({ r, w }) => ({ v: f(r.result), w }));
+
+            return [
+              policy.name,
+              weightedMean(of((r) => r.startupMs)).toFixed(0),
+              weightedQuantile(
+                of((r) => r.startupMs),
+                0.5
+              ).toFixed(0),
+              weightedQuantile(
+                of((r) => r.startupMs),
+                0.9
+              ).toFixed(0),
+              (weightedMean(of((r) => r.earlyBitrateBps)) / 1e6).toFixed(2),
+              weightedMean(of((r) => qoe(r, player))).toFixed(2),
+              weightedQuantile(
+                of((r) => qoe(r, player)),
+                0.5
+              ).toFixed(2),
+            ];
+          })
+        )
+      );
+    }
 
     console.log('\nFirst 20 s Mbit/s by network:');
     console.log(
@@ -202,6 +333,38 @@ for (const player of PLAYERS) {
       )
     );
   }
+}
+
+function weigh<T extends { network: string }>(
+  rows: readonly T[],
+  scenario: { networks: Record<string, number> },
+  share: number
+): Array<{ r: T; w: number }> {
+  const counts = new Map<string, number>();
+
+  for (const r of rows) counts.set(r.network, (counts.get(r.network) ?? 0) + 1);
+
+  return rows.map((r) => ({ r, w: (share * (scenario.networks[r.network] ?? 0)) / counts.get(r.network)! }));
+}
+
+function weightedMean(values: ReadonlyArray<{ v: number; w: number }>): number {
+  const total = values.reduce((t, { w }) => t + w, 0);
+
+  return values.reduce((t, { v, w }) => t + v * w, 0) / total;
+}
+
+function weightedQuantile(values: ReadonlyArray<{ v: number; w: number }>, q: number): number {
+  const sorted = values.filter(({ w }) => w > 0).sort((a, b) => a.v - b.v);
+  const total = sorted.reduce((t, { w }) => t + w, 0);
+  let seen = 0;
+
+  for (const { v, w } of sorted) {
+    seen += w;
+
+    if (seen >= q * total) return v;
+  }
+
+  return Number.NaN;
 }
 
 /** Mean capacity, kbit/s, over `[fromMs, toMs)` of a trace. */
