@@ -72,7 +72,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 
 **Manifest parsing:** `parseMultivariantPlaylist` (`packages/spf/src/media/hls/parse-multivariant.ts`) extracts subtitle renditions; each becomes a `PartiallyResolvedTextTrack` carrying language, default, autoselect, forced metadata.
 
-**Cue resolver:** `resolveVttSegment` (`packages/spf/src/media/dom/text/resolve-vtt-segment.ts`) — browser-native VTT parser via offscreen `<video><track>`. Pluggable via `config.resolveTextTrackSegment`.
+**Cue resolver:** `resolveVttSegment` (`packages/spf/src/media/dom/text/resolve-vtt-segment.ts`) — browser-native VTT parser via offscreen `<video><track>`, one per CORS mode so `requestCredentials` (`use-credentials` → `include`) reaches each segment fetch. Pluggable via `config.resolveTextTrackSegment`.
 
 ## Config surface
 
@@ -81,7 +81,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
   preferredSubtitleLanguage?: string;   // BCP-47 language tag for default selection
   includeForcedTracks?: boolean;        // default false — exclude forced-only tracks from auto-selection
   enableDefaultTrack?: boolean;         // default false — honor DEFAULT=YES + AUTOSELECT=YES when set
-  resolveTextTrackSegment?: (url: string) => Promise<Cue[]>;  // override VTT parser
+  resolveTextTrackSegment?: (url: string, options?: { credentials?: RequestCredentials }) => Promise<Cue[]>;  // override VTT parser
   getCdnId?: (url: string) => string;   // shared CDN-id derivation (active-CDN scope + failed-CDN constraint)
 }
 ```
