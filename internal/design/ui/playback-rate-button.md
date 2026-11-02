@@ -33,21 +33,19 @@ A separate feature wins out ([per review](https://github.com/videojs/v10/pull/62
 - `aria-disabled`: Present when `disabled` prop is true.
 - Keyboard: `Enter` and `Space` cycle to next rate.
 
-## Deferred: Custom `rates` Prop
+## Custom Rates
 
-Custom rates are intentionally deferred ([per review](https://github.com/videojs/v10/pull/624#discussion_r2861088551)). Some providers only support specific playback rates (e.g., [YouTube's `getAvailablePlaybackRates`](https://developers.google.com/youtube/iframe_api_reference#getAvailablePlaybackRates)), so exposing a consumer-facing `rates` prop without accounting for provider constraints could lead to broken UX. The store's `playbackRates` array is the right place — providers can populate it dynamically in the future.
+The player input `defaultPlaybackRates` (`default-playback-rates="0.5 1 1.5 2"` in HTML) sets the rates every control uses, and the button and radio group take their own `rates` to override it ([#9273](https://github.com/videojs/video.js/issues/9273), [review](https://github.com/videojs/video.js/pull/9533#issuecomment-6503311479)). Hotkeys and menus are different interfaces: a menu wants a short list, while an editing flow may want hotkeys that step by `0.1`, so `speedUp`/`speedDown` step by a hotkey's `value` when it has one.
 
-When we're ready to expose custom rates, the following research applies:
-
-**Proposed API:** `<PlaybackRateButton rates={[0.5, 1, 1.5, 2]} />` in React, `rates="0.5 1 1.5 2"` (space-separated) in HTML. A component `rates` prop would override the store's `playbackRates` for that instance.
-
-**ReactiveElement `converter`:** The HTML attribute needs a `converter` option on `ReactiveElement` since it only handles `String`, `Boolean`, and `Number` today. Aligns with [Lit's converter API](https://lit.dev/docs/v1/components/properties/#conversion-converter).
-
-**No auto-sorting:** Rates are cycled in array order, not sorted numerically. Media Chrome sorts with `.sort((a, b) => a - b)`, but we respect the consumer's order.
+- **No converter needed:** HTML inputs are declared as strings, and the shared parser accepts a space-separated list or an array.
+- **No auto-sorting:** The button cycles in the author's order. `speedUp`/`speedDown` step by value and stop at the ends, so they work whatever the order.
+- **The media owns the rate:** It can be one no control offers, set through the media API or a stepped hotkey. The radio group slots it in before the next faster rate as a `custom` option, named "Custom, {rate}" for assistive technology. Normal speed is slotted in the same way but never marked custom.
+- **Ranges, not lists:** Media report a `{ min, max }` range through an internal `playbackRateRange` getter, kept internal until the name and shape settle ([review](https://github.com/videojs/video.js/pull/9533#pullrequestreview-5706911916)); one that reports none gets the native `0.0625`–`16`. YouTube lists quarter steps in `getAvailablePlaybackRates` but plays any rate from `0.25` to `2`, floored to `0.05`, so a list would hide rates it accepts. Default rates outside the range are left out, with a development warning when none fit. A control's own `rates` are trusted as given, so controls read only the store. `setPlaybackRate` clamps to the nearest end with a development warning, including `0`, which would freeze the picture while `paused` stays false.
 
 **Alternatives explored:**
 
-- **Property-only (no attribute)** — Forces JS-only configuration, undermines declarative HTML story.
+- **One shared list only** — Forces the menu and hotkeys to agree.
+- **Discrete supported-rate lists** — YouTube's list understates what it plays, and native media have no list at all.
 - **`AttributeTokenList`** — Media Chrome's `DOMTokenList`-like approach. More infrastructure than needed.
 - **`Array` built-in type with `JSON.parse`** — Produces `rates='[1, 1.5, 2]'` which is awkward for HTML authors.
 - **`min`/`max`/`step`** — [Vidstack's approach](https://vidstack.io/docs/wc/player/components/sliders/speed-slider/) for continuous ranges. Doesn't allow non-uniform spacing or arbitrary ordering.

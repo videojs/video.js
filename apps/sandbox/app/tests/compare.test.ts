@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { compareAvailable, comparePanels, otherSkinSource, type SkinSelection, summarizeSelection } from '../compare';
 
-const react: SkinSelection = { platform: 'react', styling: 'css', skins: undefined, skin: 'default', media: 'video' };
+const react: SkinSelection = {
+  platform: 'react',
+  styling: 'css',
+  skins: undefined,
+  skin: 'default',
+  skinless: false,
+  media: 'video',
+};
 
 describe('comparePanels', () => {
   it('renders one panel with the resolved source when comparing is off', () => {
@@ -55,6 +62,15 @@ describe('compareAvailable', () => {
     expect(compareAvailable('styling', { ...react, platform: 'cdn' })).toBe(false);
     expect(compareAvailable('platform', { ...react, platform: 'cdn' })).toBe(true);
   });
+
+  it('leaves only the platform axis without a skin', () => {
+    const skinless: SkinSelection = { ...react, skinless: true };
+
+    expect(compareAvailable('skin', skinless)).toBe(false);
+    expect(compareAvailable('skins', skinless)).toBe(false);
+    expect(compareAvailable('styling', skinless)).toBe(false);
+    expect(compareAvailable('platform', skinless)).toBe(true);
+  });
 });
 
 describe('summarizeSelection', () => {
@@ -64,6 +80,7 @@ describe('summarizeSelection', () => {
         platform: 'react',
         media: 'mux-video-spf',
         skin: 'neutral',
+        skinless: false,
         styling: 'tailwind',
         skins: 'registry',
         width: 672,
@@ -78,11 +95,27 @@ describe('summarizeSelection', () => {
         platform: 'html',
         media: 'background-video',
         skin: 'default',
+        skinless: false,
         styling: 'css',
         skins: 'package',
         width: 896,
         source: 'hls-1',
       })
     ).toBe('HTML · Background Video · fixed source');
+  });
+
+  it('names no skin in place of the skin selections', () => {
+    expect(
+      summarizeSelection({
+        platform: 'html',
+        media: 'dailymotion-video',
+        skin: 'default',
+        skinless: true,
+        styling: 'css',
+        skins: 'package',
+        width: 896,
+        source: 'dailymotion-default',
+      })
+    ).toMatch(/^HTML · Dailymotion Video · no skin · 896px · /);
   });
 });

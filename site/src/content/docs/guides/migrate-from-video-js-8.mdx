@@ -286,7 +286,7 @@ These options need a migration decision. Each row links to the relevant guidance
 | `languages`, `language`, `videojs.addLanguage` | [Languages](#languages) |
 | `liveui`, `liveTracker` | [Live and audio-only](#live-and-audio-only) |
 | `audioOnlyMode`, `audioPosterMode` | [Live and audio-only](#live-and-audio-only) |
-| `playbackRates` | not configurable yet ([#1404](https://github.com/videojs/v10/issues/1404)) |
+| `playbackRates` | `defaultPlaybackRates` on the player, or `rates` on a single control. See the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> |
 | `textTrackSettings` | no equivalent; see [Known gaps](#known-gaps) |
 | `spatialNavigation` | no equivalent; see [Known gaps](#known-gaps) |
 | `inactivityTimeout` | delay not configurable yet ([#1728](https://github.com/videojs/v10/issues/1728)); `inactivityTimeout: 0` maps to `visibility="always"` on the controls component |
@@ -789,7 +789,6 @@ Check these limitations against your required features:
 - **No ads support.** v8's IMA and ad-plugin ecosystem has no v10 equivalent. If your player depends on ads, resolve that requirement before replacing it.
 - **No playlist support.** No `videojs-playlist` equivalent.
 - **No plugin system**, by design. Budget for rebuilding UI plugins as components. See [Plugins](#plugins).
-- Playback rates are a fixed set — `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` — so v8's `playbackRates` has no equivalent yet ([#1404](https://github.com/videojs/v10/issues/1404)).
 - No text-track settings dialog equivalent to v8's `textTrackSettings`. You can still style browser-rendered cues with `::cue`; see <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>.
 - No spatial navigation. v8's `spatialNavigation` for TV and D-pad remotes has no equivalent.
 - Player preferences such as volume, captions language, speed, and quality are not persisted automatically ([#944](https://github.com/videojs/v10/issues/944)). For application-managed persistence, follow <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink>.

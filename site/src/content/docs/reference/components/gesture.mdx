@@ -68,7 +68,7 @@ Use `pointer` to accept only `mouse`, `touch`, or `pen` input. Use `region` to d
 
 An unregional gesture acts as a fallback outside the active regions. When several registrations match the same gesture, the first registration wins.
 
-Choose a built-in `action` from the API reference below, or use an application-defined name to call a same-named action on the player store. Pass `value` as seconds for `seekStep` or as a volume delta such as `0.05` or `-0.05` for `volumeStep`. When omitted, these actions use the 10-second or five-percentage-point default. A left-region seek gesture uses the negative step. Unknown action names do nothing and warn in development.
+Choose a built-in `action` from the API reference below, or use an application-defined name to call a same-named action on the player store. Pass `value` as seconds for `seekStep`, as a volume delta such as `0.05` or `-0.05` for `volumeStep`, or as a rate change such as `0.1` for `speedUp` and `speedDown`. When omitted, the seek and volume actions use the 10-second or five-percentage-point default, and the speed actions move to the next faster or slower of the player's playback rates. A left-region seek gesture uses the negative step. Unknown action names do nothing and warn in development.
 
 ## Accessibility
 

@@ -264,6 +264,10 @@ describe('buildYouTubeIframeSrc', () => {
 });
 
 describe('YouTubeAdapter', () => {
+  it('reports the rates YouTube plays', () => {
+    expect(new YouTubeAdapter().playbackRateRange).toEqual({ min: 0.25, max: 2 });
+  });
+
   it('has expected default state before attach', () => {
     const media = new YouTubeAdapter();
 

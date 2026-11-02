@@ -205,6 +205,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/audio' },
           { slug: 'reference/components/background-video' },
           { slug: 'reference/components/cloudflare-video' },
+          { slug: 'reference/components/dailymotion-video' },
           { slug: 'reference/components/dash-video' },
           { slug: 'reference/components/hls-audio' },
           { slug: 'reference/components/hls-background-video' },

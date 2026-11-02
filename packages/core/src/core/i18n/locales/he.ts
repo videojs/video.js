@@ -100,6 +100,7 @@ export default {
     speed: 'מהירות',
     captions: 'כתוביות',
     playbackRate: 'מהירות ההפעלה',
+    customRate: 'התאמה אישית, {rate}',
     back: 'חזרה',
     off: 'כבוי',
     auto: 'אוטומטי',
