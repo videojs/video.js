@@ -2,7 +2,7 @@
 // loading the reference client, shaped like the other embed adapters (mirrors `tiktok-video`). Behavior around
 // reloads, remounts, and server-rendered frames follows the `gumlet-video-element` proposal in muxinc/media-elements.
 
-import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -289,10 +289,14 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#seeking = true;
     // Seeking away from the end leaves it, as on a media element; the embed's next report says otherwise if not.
     this.#ended = false;
+
+    const previous = this.#currentTime;
+
     // Report the requested position now; the embed only reports one periodically, so the seek would look lost.
     this.#currentTime = value;
     this.dispatchEvent(new Event('seeking'));
     this.dispatchEvent(new Event('timeupdate'));
+    this.#announcePositionInBuffered(previous);
 
     // Before ready, `#onReady` sends the seek still pending.
     if (this.#ready) this.#seek(value);
@@ -419,15 +423,16 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   }
 
   get buffered() {
+    // Some receivers (Mux's) report no `progress`, so what has played is known to be available too.
     const end = Math.max(this.#bufferedEnd, this.#currentTime);
 
-    return end > 0 ? createTimeRange(0, end) : EMPTY_TIME_RANGES;
+    return end > 0 ? createTimeRange(0, end) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration) && this.#methods.has('setCurrentTime')
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -678,8 +683,16 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   #applyCurrentTime(time: number | undefined) {
     if (!isNumber(time) || time === this.#currentTime) return;
 
+    const previous = this.#currentTime;
+
     this.#currentTime = time;
     this.dispatchEvent(new Event('timeupdate'));
+    this.#announcePositionInBuffered(previous);
+  }
+
+  // A position past what the embed reported loading is the end of `buffered`, so moving it moves `buffered` too.
+  #announcePositionInBuffered(previous: number) {
+    if (Math.max(previous, this.#currentTime) > this.#bufferedEnd) this.dispatchEvent(new Event('progress'));
   }
 
   #seek(time: number) {
