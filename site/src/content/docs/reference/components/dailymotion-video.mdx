@@ -5,6 +5,7 @@ frameworkTitle:
 description: Video component that plays Dailymotion videos through a Dailymotion player configuration
 ---
 
+import Aside from "@/components/Aside.astro";
 import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
 import MediaReference from "@/components/docs/api-reference/MediaReference.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
@@ -24,6 +25,12 @@ import basicUsageHtmlCss from "@/components/docs/demos/dailymotion-video/html/cs
 import basicUsageHtmlTs from "@/components/docs/demos/dailymotion-video/html/css/BasicUsage.ts?raw";
 
 The Dailymotion player plays videos inside a player configuration you create in [Dailymotion Studio](https://www.dailymotion.com/partner/embed/players), and this component drives it through the [Dailymotion Web SDK](https://developers.dailymotion.com/reference/web-sdk-player-methods). Dailymotion refuses any embed that doesn't name a player configuration, so every source carries a Player ID. See [Create a Player](https://developers.dailymotion.com/docs/create-a-player) in the official Dailymotion documentation.
+
+<Aside type="caution" title="Works without a skin">
+  Dailymotion's terms don't allow covering its player, so this component uses Dailymotion's own controls instead of a
+  Video.js skin (see [Use Dailymotion's controls](#use-dailymotions-controls)). If you need it to work with a skin,
+  [open an issue](https://github.com/videojs/video.js/issues) describing your use case.
+</Aside>
 
 ## Import
 
@@ -74,19 +81,23 @@ The URL's query can also carry Dailymotion's `startTime` (or the older `start`),
 
 Without a Player ID, the component reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error instead of creating a player Dailymotion would reject. The SDK script is loaded from `geo.dailymotion.com` with the first player created on the page.
 
+## Use Dailymotion's controls
+
+Dailymotion's [Terms of Use](https://legal.dailymotion.com/en/terms-of-use/) don't allow blocking any part of its embedded player, including its links back to Dailymotion. So the component always lets the player take pointer input, and Dailymotion's own controls, logo, and links stay usable. The player configuration decides which of Dailymotion's controls show; `controls` has no effect.
+
+A <DocsLink slug="guides/skins">skin</DocsLink> doesn't work over the player, which takes the pointer input over the video before the skin can see it, so use the component without one, as in [Basic Usage](#basic-usage). 
+
+If you would like for it to work with a skin, [open an issue in video.js](https://github.com/videojs/video.js/issues) describing your use case!
+
 ## Configure the player in Dailymotion Studio
 
-The player configuration decides what the embed can't change at runtime. To use the component under a <DocsLink slug="guides/skins">player skin</DocsLink>, set these in the player's settings:
+The player configuration decides what the embed can't change at runtime:
 
-| Setting | Recommended | Why |
-|---|---|---|
-| Playback controls | Off | Otherwise Dailymotion's controls show under the skin. Without `controls`, the component keeps the player from taking pointer input so the skin can respond to hover, but it can't hide Dailymotion's controls. |
-| Controls during ads | Off | Same as playback controls, while an ad plays. |
-| Autostart | Off | `autoplay` decides whether a video starts: with it off, the component pauses the configuration's autostart as it starts. Turning Autostart off avoids that pause. |
-| Spinner | Off | The skin shows its own buffering indicator. |
-| Autonext | Off | Without `controls`, its "Up next" card at the end can't be clicked or closed: clicks reach the skin, which replays the video. When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
-| Picture-in-picture | Off | Dailymotion's picture-in-picture moves the player out of the element, away from the skin. |
-| Keyboard shortcuts | Off | The skin's hotkeys handle playback. |
+| Setting | Effect |
+|---|---|
+| Autostart | Starts the video whatever `autoplay` says: `autoplay` starts a player the configuration leaves stopped, but it can't stop one the configuration starts. In development, the component logs a warning when the configuration starts playback while `autoplay` is off. |
+| Autonext | When the player moves on to the next video by itself, `src` still names the one you loaded. It also overrides `loop`: the video stops at the end, and the component reports `ended`. |
+| Picture-in-picture | Dailymotion's picture-in-picture moves the player out of the element. |
 
 ## Behavior
 
@@ -95,9 +106,9 @@ The player configuration decides what the embed can't change at runtime. To use 
 - `loop` is passed to Dailymotion, which restarts the video itself.
 - Changing `src` loads the new video into the same player. Changing the player configuration or other `engine.dailymotion` options creates a new player, since Dailymotion only reads them when a player is created. So does autoplay, but only at the next load: call load() to apply a change right away. `muted` and `loop` change in place.
 - Depending on the player configuration, Dailymotion may ignore a seek made before the video first plays, and playback then starts from the beginning. To start at a known position, set `startTime` on the source (under `engine.dailymotion`, or in the URL) instead: Dailymotion applies it on load.
-- Seeking while paused stays paused, as on a native `<video>`. Dailymotion starts playback on a seek from its start or end screen, and the component pauses it again as it starts.
+- Seeking while paused stays paused, as on a native `<video>`. Dailymotion starts playback on a seek from its start or end screen, and the component pauses it again as it starts, unless an ad plays first.
 - The SDK reports no buffered range, so `buffered` ends at the furthest point played.
-- Ads play inside the embed. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
+- Ads play inside the embed, and the component never pauses one. `paused` follows the ad while it plays, but `currentTime` and `duration` always describe the video.
 - When the browser refuses to start playback, as it does for unmuted autoplay, the component reports `pause` instead of playing.
 - Fullscreen targets the element the player is built in.
 - `poster`, `preload`, and `playsinline` are accepted for parity with `<video>` but have no effect: the player configuration decides them.
