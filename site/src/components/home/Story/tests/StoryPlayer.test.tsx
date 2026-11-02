@@ -52,7 +52,7 @@ describe('StoryPlayer', () => {
     const { container } = renderStory();
 
     expect(container.querySelectorAll('video')).toHaveLength(1);
-    expect(container.querySelectorAll('.story-page')).toHaveLength(5);
+    expect(container.querySelectorAll('.story-page')).toHaveLength(7);
   });
 
   it('leaves only the look in view available to assistive technology', () => {

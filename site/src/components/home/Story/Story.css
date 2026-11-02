@@ -9,8 +9,12 @@
   --spread: 0;
   --menus: 0;
   --own: 0;
-  /* The bar detaches for the controls, then docks again so the menus open over the video as they do in the player. */
-  --detach: calc(var(--spread) * (1 - var(--menus)));
+  --dock: 0;
+  /*
+   * The bar detaches for the controls, then docks again so the menus open over the video as they do in the player,
+   * and stays docked for the restyle.
+   */
+  --detach: calc(var(--spread) * (1 - var(--dock)));
   /* The breakdown's Default skin keeps its own 28px radius until the last step restyles it to 12px. */
   --story-radius: calc(28px - var(--own) * 16px);
   --layer-gap: 3rem;
@@ -54,7 +58,8 @@
 .story-steps {
   position: relative;
   z-index: 2;
-  padding-top: 30svh;
+  /* Enough lead-in on narrow screens for the handover to finish before the first step is centred. */
+  padding-top: 45svh;
 }
 
 @media (width >= 64rem) {
@@ -87,19 +92,21 @@
   .story-steps {
     grid-area: 2 / 1;
     padding-top: 0;
+    /* A centred 67svh step stops short of the viewport's bottom; this keeps the player pinned beside the last one. */
+    padding-bottom: 16.5svh;
   }
 }
 
 .story-step {
   display: flex;
   align-items: center;
-  min-height: 75svh;
+  min-height: 50svh;
   padding-block: 2rem;
 }
 
 @media (width >= 64rem) {
   .story-step {
-    min-height: 100svh;
+    min-height: 67svh;
   }
 }
 
@@ -243,6 +250,138 @@
   width: 100%;
   height: 100%;
   background: transparent;
+}
+
+/*
+ * The audio skin is a compact bar rather than a full player, so it docks at the bottom of a placeholder music app,
+ * drawn as solid skeleton blocks over the video, like a now-playing bar.
+ */
+.story-app {
+  --app-surface: #18181b;
+  --app-panel: #1f1f23;
+  --app-block: #2a2a30;
+  --app-block-strong: #34343b;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  gap: 4%;
+  padding: 4% 4% 5.5rem;
+  background: var(--app-surface);
+  border-radius: inherit;
+}
+
+.story-app-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--app-panel);
+}
+
+.story-app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  min-width: 0;
+}
+
+.story-app-hero {
+  display: flex;
+  align-items: end;
+  gap: 5%;
+}
+
+.story-app-art {
+  flex: none;
+  width: 28%;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  background: var(--app-block-strong);
+}
+
+.story-app-titles {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.story-app-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.story-app-track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.story-app-thumb {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
+  background: var(--app-block);
+}
+
+.story-app-line {
+  display: block;
+  flex: none;
+  width: 75%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--app-block);
+}
+
+.story-app-line[data-width="short"] {
+  width: 50%;
+}
+
+.story-app-line[data-width="tiny"] {
+  width: 2.5rem;
+}
+
+/* In a track row the name fills the space beside the thumbnail and duration. */
+.story-app-track .story-app-line:not([data-width]) {
+  flex: 1;
+}
+
+.story-app-line[data-size="title"] {
+  width: 80%;
+  height: 1rem;
+  background: var(--app-block-strong);
+}
+
+/* Narrow players have no room for the sidebar or the track list. */
+@container (width < 40rem) {
+  .story-app {
+    grid-template-columns: 1fr;
+    padding-bottom: 4.5rem;
+  }
+
+  .story-app-sidebar,
+  .story-app-tracks {
+    display: none;
+  }
+
+  .story-app-art {
+    width: 34%;
+  }
+}
+
+/* The app is dark whatever the site's theme, so the audio skin takes its dark colours too. */
+.story-page[data-look="audio"] .story-layer {
+  color-scheme: dark;
+}
+
+.story .story-page[data-look="audio"] .story-look {
+  inset: auto 0.75rem 0.75rem;
+  width: auto;
+  height: auto;
 }
 
 /* The seam between two pages is the divider; it and the names only show mid-swipe. */
@@ -610,13 +749,41 @@
   --own-icon-pip: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4' /%3E %3Cpath d='M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z' /%3E%3C/svg%3E");
   --own-icon-maximize: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8v-2a2 2 0 0 1 2 -2h2' /%3E %3Cpath d='M4 16v2a2 2 0 0 0 2 2h2' /%3E %3Cpath d='M16 4h2a2 2 0 0 1 2 2v2' /%3E %3Cpath d='M16 20h2a2 2 0 0 0 2 -2v-2' /%3E%3C/svg%3E");
   --own-icon-minimize: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 19v-2a2 2 0 0 1 2 -2h2' /%3E %3Cpath d='M15 5v2a2 2 0 0 0 2 2h2' /%3E %3Cpath d='M5 15h2a2 2 0 0 1 2 2v2' /%3E %3Cpath d='M5 9h2a2 2 0 0 0 2 -2v-2' /%3E%3C/svg%3E");
+  --own-icon-captions: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z' /%3E %3Cpath d='M10 10.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0' /%3E %3Cpath d='M17 10.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0' /%3E%3C/svg%3E");
+  /* Tabler has no AirPlay icon, so this one is drawn on its grid and stroke to match. */
+  --own-icon-airplay: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 17h-1a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-1' /%3E%3Cpath d='M12 15l5 6h-10z' /%3E%3C/svg%3E");
 }
 
-.story .story-skin .video-controls-content .media-button {
+/* Only buttons with an icon below take part; any other keeps the skin's own rendering. */
+.story
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  ) {
   position: relative;
 }
 
-.story .story-skin .video-controls-content .media-button::after {
+.story
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -630,11 +797,36 @@
   pointer-events: none;
 }
 
-.story[data-own] .story-skin .video-controls-content .media-button::after {
+.story[data-own]
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )::after {
   opacity: 1;
 }
 
-.story[data-own] .story-skin .video-controls-content .media-button :is(.media-button-icon, .media-button-icon-base) {
+.story[data-own]
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )
+  :is(.media-button-icon, .media-button-icon-base) {
   visibility: hidden;
 }
 
@@ -664,6 +856,14 @@
 
 .story .story-skin .video-controls-content .media-cast-button {
   --own-icon: var(--own-icon-cast);
+}
+
+.story .story-skin .video-controls-content .media-airplay-button {
+  --own-icon: var(--own-icon-airplay);
+}
+
+.story .story-skin .video-controls-content .media-captions-button {
+  --own-icon: var(--own-icon-captions);
 }
 
 .story .story-skin .video-controls-content .media-pip-button {

@@ -9,6 +9,8 @@ import '@videojs/react/video/neutral-skin.css';
 import '@videojs/react/video/compat-skin.css';
 import '@videojs/react/video/scaffold-skin.css';
 import '@videojs/react/background/skin.css';
+import '@videojs/react/live-video/skin.css';
+import '@videojs/react/audio/skin.css';
 import './Story.css';
 
 interface Props {
@@ -147,6 +149,8 @@ const steps = [
         tilt: ramp(handedOver, 0.95, 1) * ramp(p, 0.05, 0.11) * (1 - ramp(p, 0.2, 0.28)),
         spread: ramp(p, 0.22, 0.32),
         menus: ramp(p, 0.48, 0.57) * (1 - ramp(p, 0.74, 0.8)),
+        // The bar docks back over the video as the menus open, and stays there once they close.
+        dock: ramp(p, 0.48, 0.57),
         own: ramp(p, 0.77, 0.84),
       };
 

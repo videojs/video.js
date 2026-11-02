@@ -16,13 +16,18 @@ export interface SharedMediaPlayerOptions {
   stage: string;
   /** Whether the skin inside this container is currently hidden from the reader. */
   isHidden: (container: HTMLElement) => boolean;
+  /** The preset's features, such as those for live video or audio; video by default. */
+  features?: PlayerFeatures;
 }
+
+/** Any preset's feature list, as `createPlayer` accepts it. */
+type PlayerFeatures = Parameters<typeof createPlayer>[0]['features'];
 
 /**
  * Create a player whose instances all drive one shared video element, so several skins can sit over the same media.
  * Each skin owns its input handlers; fullscreen takes the whole stage and only a visible skin reports media errors.
  */
-export function createSharedMediaPlayer({ stage, isHidden }: SharedMediaPlayerOptions) {
+export function createSharedMediaPlayer({ stage, isHidden, features = videoFeatures }: SharedMediaPlayerOptions) {
   function fullscreenTarget(target: PlayerTarget): PlayerTarget {
     return { ...target, container: target.container?.closest<HTMLElement>(stage) ?? target.container };
   }
@@ -60,13 +65,15 @@ export function createSharedMediaPlayer({ stage, isHidden }: SharedMediaPlayerOp
   };
 
   const { Player, usePlayer } = createPlayer({
-    features: videoFeatures.map((feature) => {
+    // SAFETY: every preset shares the controls state `SharedMedia` reads; typing the player as video keeps `Player`'s
+    // children prop, which the generic overload for an arbitrary feature list drops.
+    features: features.map((feature) => {
       if (feature === fullscreenFeature) return sharedFullscreen;
 
       if (feature === errorFeature) return sharedError;
 
       return feature;
-    }),
+    }) as typeof videoFeatures,
   });
 
   /** Attach the shared video to the surrounding player, optionally keeping its controls on screen. */

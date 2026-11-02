@@ -1,9 +1,11 @@
+import { AudioSkin, audioFeatures } from '@videojs/react/audio';
 import { BackgroundVideoSkin } from '@videojs/react/background';
 import { CheckIcon, ChevronIcon } from '@videojs/react/icons';
+import { LiveVideoSkin, liveVideoFeatures } from '@videojs/react/live-video';
 import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
 import { CompatVideoSkin, NeutralVideoSkin, ScaffoldVideoSkin, VideoSkin } from '@videojs/react/video';
 import clsx from 'clsx';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { type ComponentType, type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { createSharedMediaPlayer } from '@/components/skins/sharedMediaPlayer';
 import { VJS10_DEMO_VIDEO } from '@/consts';
@@ -13,13 +15,54 @@ import '@videojs/react/video/neutral-skin.css';
 import '@videojs/react/video/compat-skin.css';
 import '@videojs/react/video/scaffold-skin.css';
 import '@videojs/react/background/skin.css';
+import '@videojs/react/live-video/skin.css';
+import '@videojs/react/audio/skin.css';
 
-const looks = [
-  { name: 'Default', kind: 'Skin', note: 'Distinctive, with a little personality', Skin: VideoSkin },
-  { name: 'Neutral', kind: 'Skin', note: 'Quiet enough to fit any design', Skin: NeutralVideoSkin },
-  { name: 'Compat', kind: 'Skin', note: 'Built for the widest browser support', Skin: CompatVideoSkin },
-  { name: 'Background', kind: 'Preset', note: 'Ambient video with no controls', Skin: BackgroundVideoSkin },
-  { name: 'Scaffold', kind: 'Skin', note: 'An unstyled start for your own design', Skin: ScaffoldVideoSkin },
+const isHidden = (container: HTMLElement) => container.closest('[inert]') !== null;
+
+/** Players for each preset in the hero, all driving the one shared video. */
+const videoPlayer = createSharedMediaPlayer({ stage: '.story-frame', isHidden });
+const livePlayer = createSharedMediaPlayer({ stage: '.story-frame', isHidden, features: liveVideoFeatures });
+const audioPlayer = createSharedMediaPlayer({ stage: '.story-frame', isHidden, features: audioFeatures });
+
+const { Player, SharedMedia } = videoPlayer;
+
+interface Look extends ReturnType<typeof createSharedMediaPlayer> {
+  name: string;
+  kind: 'Skin' | 'Preset';
+  note: string;
+  Skin: ComponentType<{ className?: string }>;
+  /** Sit the player in a placeholder app instead of over the video. */
+  app?: boolean;
+}
+
+const looks: Look[] = [
+  { name: 'Default', kind: 'Skin', note: 'Distinctive, with a little personality', Skin: VideoSkin, ...videoPlayer },
+  { name: 'Neutral', kind: 'Skin', note: 'Quiet enough to fit any design', Skin: NeutralVideoSkin, ...videoPlayer },
+  { name: 'Compat', kind: 'Skin', note: 'Built for the widest browser support', Skin: CompatVideoSkin, ...videoPlayer },
+  {
+    name: 'Background',
+    kind: 'Preset',
+    note: 'Ambient video with no controls',
+    Skin: BackgroundVideoSkin,
+    ...videoPlayer,
+  },
+  {
+    name: 'Scaffold',
+    kind: 'Skin',
+    note: 'An unstyled start for your own design',
+    Skin: ScaffoldVideoSkin,
+    ...videoPlayer,
+  },
+  { name: 'Live', kind: 'Preset', note: 'Live streams, with a jump back to live', Skin: LiveVideoSkin, ...livePlayer },
+  {
+    name: 'Audio',
+    kind: 'Preset',
+    note: 'Podcasts and music in a compact bar',
+    Skin: AudioSkin,
+    app: true,
+    ...audioPlayer,
+  },
 ];
 
 /** How long each look rests before the next one scrolls in, until the reader takes over. */
@@ -134,11 +177,6 @@ const popupTriggers = [
 /** The space the skin keeps between a popup and the player's edges, and between a popup and its trigger. */
 const POPUP_EDGE = 12;
 
-const { Player, SharedMedia } = createSharedMediaPlayer({
-  stage: '.story-frame',
-  isHidden: (container) => container.closest('[inert]') !== null,
-});
-
 /**
  * Popups render in the browser's top layer, which 3D transforms cannot reach, so the breakdown draws still copies of
  * the Default skin's volume popover and speed submenu. They repeat the markup the skin renders, so the skin's own
@@ -233,6 +271,38 @@ function placePopups(root: HTMLElement) {
     popup.style.setProperty('--popup-bottom', `${skin.offsetHeight - offset.top}px`);
     popup.style.setProperty('--media-menu-available-height', `${offset.top - POPUP_EDGE * 2}px`);
   }
+}
+
+/** A placeholder music app, drawn as skeleton blocks, for the audio player to sit in. */
+function AppSkeleton() {
+  return (
+    <div className="story-app" aria-hidden="true">
+      <div className="story-app-sidebar">
+        <span className="story-app-line" data-width="short" />
+        <span className="story-app-line" />
+        <span className="story-app-line" />
+        <span className="story-app-line" data-width="short" />
+      </div>
+      <div className="story-app-main">
+        <div className="story-app-hero">
+          <span className="story-app-art" />
+          <div className="story-app-titles">
+            <span className="story-app-line" data-size="title" />
+            <span className="story-app-line" data-width="short" />
+          </div>
+        </div>
+        <div className="story-app-tracks">
+          {[0, 1, 2, 3].map((track) => (
+            <div key={track} className="story-app-track">
+              <span className="story-app-thumb" />
+              <span className="story-app-line" />
+              <span className="story-app-line" data-width="tiny" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Read a 0–1 phase value the story section's scroll script writes. */
@@ -396,7 +466,7 @@ export default function StoryPlayer({ poster }: { poster: string }) {
       const origin = element.getBoundingClientRect();
       const amounts = {
         tilt: phase(section, 'tilt'),
-        spread: phase(section, 'spread') * (1 - phase(section, 'menus')) * (1 - phase(section, 'own')),
+        spread: phase(section, 'spread') * (1 - phase(section, 'dock')),
         menus: phase(section, 'menus'),
         own: phase(section, 'own'),
       };
@@ -479,20 +549,22 @@ export default function StoryPlayer({ poster }: { poster: string }) {
           onFocusCapture={() => setHeld(true)}
           onBlurCapture={() => setHeld(false)}
         >
-          {looks.map(({ name, Skin }, index) => (
+          {looks.map(({ name, Skin, app, Player: LookPlayer, SharedMedia: LookMedia }, index) => (
             <div
               key={name}
               className="story-page"
+              data-look={name.toLowerCase()}
               inert={index !== current}
               aria-hidden={index !== current || undefined}
               // SAFETY: React's CSSProperties omits CSS custom properties; --index is this page's position.
               style={{ '--index': index } as CSSProperties}
             >
               <div className="story-layer">
-                <Player>
-                  <SharedMedia media={media} lockControls={scrolling} />
+                {app && <AppSkeleton />}
+                <LookPlayer>
+                  <LookMedia media={media} lockControls={scrolling} />
                   <Skin className="story-look" />
-                </Player>
+                </LookPlayer>
               </div>
               {/* Named at both edges, so each side of a seam carries its own look's name. */}
               <span className="story-page-label" data-edge="start" aria-hidden="true">
