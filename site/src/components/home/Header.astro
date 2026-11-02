@@ -10,14 +10,15 @@ import { withMuxAttribution } from '@/utils/mux/attribution';
 <header
   data-hero
   data-ph-capture-attribute-location="hero"
-  class="mx-auto mb-12 w-full max-w-305 px-5 pt-8 md:mb-16 md:pt-14"
+  class="story-intro mb-12 pt-8 md:mb-16 md:pt-14 lg:mb-0 lg:py-12"
 >
-  <div class="mx-auto flex max-w-200 flex-col items-center text-center">
+  <div class="story-intro-card">
+  <div class="mx-auto flex max-w-200 flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
     <a
       href="/blog/videojs-10"
       data-hero-step
       data-ph-capture-attribute-cta="release-post"
-      class="group mb-7 inline-flex items-center gap-2 rounded-full border border-manila-dark py-1 pr-3 pl-1 text-p3 transition-colors intent:border-faded-black dark:border-soot dark:intent:border-manila-light"
+      class="group mb-7 inline-flex items-center gap-2 rounded-full border border-manila-dark bg-manila-light py-1 pr-3 pl-1 text-p3 transition-colors intent:border-faded-black dark:border-soot dark:bg-faded-black dark:intent:border-manila-light"
     >
       <span class="rounded-full bg-faded-black px-2 py-0.5 font-display text-(length:--pill-text) text-manila-light uppercase dark:bg-manila-light dark:text-faded-black" style="--pill-text: 0.625rem">
         New
@@ -26,16 +27,21 @@ import { withMuxAttribution } from '@/utils/mux/attribution';
       <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
     </a>
 
-    <h1 data-hero-step class="mb-6 font-display text-h2 text-balance uppercase sm:text-h15 lg:text-h1">
+    {/* Beside the player, the headline scales with its 34% column so each half stays on one line (about 10em wide). */}
+    <h1
+      data-hero-step
+      class="mb-6 font-display text-h2 text-balance uppercase sm:text-h15 lg:text-(length:--hero-title)"
+      style="--hero-title: calc((min(100vw, 90rem) - 2.5rem) * 0.34 / 10.2)"
+    >
       One player, <span class="text-stroke-faded-black dark:text-stroke-manila-light">every look</span>
     </h1>
 
-    <p data-hero-step class="mb-9 max-w-150 text-p2 text-balance lg:text-p1">
+    <p data-hero-step class="mb-9 max-w-150 text-p2 text-balance xl:text-p1">
       Skins, presets, and composable components for any video or audio player on the web. Fifteen years
       of Video.js, rebuilt from the ground up.
     </p>
 
-    <div data-hero-step class="flex flex-wrap items-center justify-center gap-3">
+    <div data-hero-step class="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
       <GetStartedLink
         client:idle
         data-ph-capture-attribute-cta="get-started"
@@ -49,7 +55,7 @@ import { withMuxAttribution } from '@/utils/mux/attribution';
         target="_blank"
         rel="noopener noreferrer"
         data-ph-capture-attribute-destination="github"
-        class="inline-flex h-12 items-center gap-2.5 rounded-full border border-faded-black/20 px-5 font-display text-h4 uppercase transition-colors intent:border-faded-black dark:border-manila-light/25 dark:intent:border-manila-light"
+        class="inline-flex h-12 items-center gap-2.5 rounded-full border border-faded-black/20 bg-manila-light px-5 font-display text-h4 uppercase transition-colors intent:border-faded-black dark:border-manila-light/25 dark:bg-faded-black dark:intent:border-manila-light"
       >
         <GitHub className="size-4.5" aria-hidden="true" />
         GitHub
@@ -57,7 +63,7 @@ import { withMuxAttribution } from '@/utils/mux/attribution';
     </div>
   </div>
 
-  <p data-hero-step class="mt-8 flex items-center justify-center gap-2 text-p4">
+  <p data-hero-step class="mt-8 flex items-center justify-center gap-2 text-p4 lg:justify-start">
     <span>Video hosting sponsored by</span>
     <a
       class="inline-flex w-11 items-center opacity-80 transition-opacity intent:opacity-100"
@@ -70,6 +76,7 @@ import { withMuxAttribution } from '@/utils/mux/attribution';
       <MuxLogoSmall width="100%" />
     </a>
   </p>
+  </div>
 </header>
 
 <style>

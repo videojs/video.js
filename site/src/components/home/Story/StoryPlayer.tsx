@@ -2,6 +2,7 @@ import { BackgroundVideoSkin } from '@videojs/react/background';
 import { CheckIcon, ChevronIcon } from '@videojs/react/icons';
 import { HlsJsVideo } from '@videojs/react/media/hlsjs-video';
 import { CompatVideoSkin, NeutralVideoSkin, ScaffoldVideoSkin, VideoSkin } from '@videojs/react/video';
+import clsx from 'clsx';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { createSharedMediaPlayer } from '@/components/skins/sharedMediaPlayer';
@@ -25,7 +26,7 @@ const looks = [
 const DWELL_MS = 5000;
 /** How long controls stay up after a swipe settles. */
 const SETTLE_MS = 700;
-/** How far the player must have shrunk into its column before the breakdown takes over from the swipeable looks. */
+/** How far the reader must scroll past the intro before the breakdown takes over from the swipeable looks. */
 const EXPLODE_AT = 0.02;
 /** How long the breakdown skin takes to fade in over the looks, matching `story-fade-in`. */
 const RESET_MS = 300;
@@ -33,7 +34,7 @@ const RESET_MS = 300;
 /** Layers lifted apart while the player tilts, from the back of the stack to the front. */
 const layers = ['Media', 'Poster', 'Backdrop', 'Controls', 'Popups'];
 
-type Phase = 'tilt' | 'spread' | 'menus';
+type Phase = 'tilt' | 'spread' | 'menus' | 'own';
 
 interface LabelSpec {
   /** Selector inside the player for the element the label points at. */
@@ -41,10 +42,12 @@ interface LabelSpec {
   phase: Phase;
   /** Where the label sits relative to its target. */
   side: 'left' | 'right' | 'top' | 'bottom';
+  /** For a top or bottom label, `end` grows the pill leftward from its line, clear of a crowded neighbour or edge. */
+  align?: 'end';
   name?: string;
-  tag: string;
-  /** Shown instead of `tag` once the reader reaches the last step. */
-  ownTag?: string;
+  tag?: string;
+  /** Live content in place of a tag: what a screen reader says about the focused item, or the keys moving focus. */
+  live?: 'readout' | 'keys';
 }
 
 const labels: LabelSpec[] = [
@@ -57,8 +60,8 @@ const labels: LabelSpec[] = [
     target: '.story-skin .video-controls-content .media-play-button',
     phase: 'spread',
     side: 'bottom',
+    align: 'end',
     tag: '<PlayButton>',
-    ownTag: '<MyPlayButton>',
   },
   {
     target: '.story-skin .video-controls-content .media-mute-button',
@@ -88,15 +91,48 @@ const labels: LabelSpec[] = [
     target: '.story-skin .video-controls-content .media-fullscreen-button',
     phase: 'spread',
     side: 'bottom',
+    align: 'end',
     tag: '<FullscreenButton>',
   },
-  { target: '.story-menu', phase: 'menus', side: 'top', tag: '<Menu.Popup>' },
-  { target: '.story-menu [data-highlighted]', phase: 'menus', side: 'left', tag: '<Menu.RadioItem>' },
-  { target: '.story-volume', phase: 'menus', side: 'top', tag: '<VolumePopover.Popup>' },
-  { target: '.story-volume .media-slider-thumb', phase: 'menus', side: 'right', tag: '<VolumeSlider.Thumb>' },
+  { target: '.story-menu', phase: 'menus', side: 'top', name: 'Keyboard', live: 'keys' },
+  { target: '.story-menu .story-focus', phase: 'menus', side: 'left', name: 'Screen reader', live: 'readout' },
+  {
+    target: '.story-skin .video-controls-content',
+    phase: 'own',
+    side: 'bottom',
+    name: 'Your source',
+    tag: 'components/videojs/video/skin.tsx',
+  },
 ];
 
 const rates = [0.5, 1, 1.5, 2];
+const currentRate = 1;
+
+/** The speed items keyboard focus walks through while the menus are open, down to the end and back. */
+const FOCUS_PATH = [1, 2, 3, 2, 1, 0];
+/** How long focus rests on each speed item. */
+const FOCUS_MS = 1100;
+
+interface MenuFocus {
+  index: number;
+  /** The arrow key that moved focus here, if one did. */
+  key?: 'up' | 'down';
+}
+
+/** What a screen reader announces for a speed item. */
+function readout(index: number) {
+  const rate = rates[index]!;
+
+  return `${rate}×, radio menu item, ${rate === currentRate ? 'checked' : 'not checked'}, ${index + 1} of ${rates.length}`;
+}
+
+/** Each popup copy and the control it opens from. */
+const popupTriggers = [
+  ['.media-mute-button', '.story-volume'],
+  ['.media-settings-menu-trigger', '.story-menu'],
+] as const;
+/** The space the skin keeps between a popup and the player's edges, and between a popup and its trigger. */
+const POPUP_EDGE = 12;
 
 const { Player, SharedMedia } = createSharedMediaPlayer({
   stage: '.story-frame',
@@ -105,12 +141,18 @@ const { Player, SharedMedia } = createSharedMediaPlayer({
 
 /**
  * Popups render in the browser's top layer, which 3D transforms cannot reach, so the breakdown draws still copies of
- * the Default skin's speed menu and volume popover from the skin's own classes.
+ * the Default skin's volume popover and speed submenu. They repeat the markup the skin renders, so the skin's own
+ * styles apply, and script places each over its trigger as the live popups would be.
  */
-function PopupCopies() {
+function PopupCopies({ focus }: { focus: number }) {
   return (
     <div className="story-popups" aria-hidden="true">
-      <div className="media-popup media-popup-surface media-volume-popover story-volume" data-open="">
+      <div
+        className="media-popup media-popup-safe-area media-popup-surface media-volume-popover story-volume"
+        data-open=""
+        data-side="top"
+        data-align="center"
+      >
         <div
           className="media-slider media-volume-slider"
           data-orientation="vertical"
@@ -124,21 +166,26 @@ function PopupCopies() {
         </div>
       </div>
 
-      <div className="media-popup media-popup-surface media-menu-popup story-menu" data-open="">
+      <div
+        className="media-popup media-popup-surface media-menu-popup story-menu"
+        data-open=""
+        data-side="top"
+        data-align="center"
+      >
         <div className="media-menu-content" data-open="" data-submenu="">
-          <div className="media-menu-back-item">
+          <div className="media-menu-back-item" role="menuitem">
             <ChevronIcon className="media-menu-back-chevron" />
             <span>Speed</span>
           </div>
-          <div className="media-menu-separator" />
-          <div className="media-menu-radio-group">
-            {rates.map((rate) => (
+          <div className="media-menu-separator" role="separator" />
+          <div className="media-menu-radio-group" role="group">
+            {rates.map((rate, index) => (
               <div
                 key={rate}
-                className="media-menu-radio-item"
+                className={clsx('media-menu-radio-item', index === focus && 'story-focus')}
                 role="menuitemradio"
-                aria-checked={rate === 1}
-                data-highlighted={rate === 1 ? '' : undefined}
+                aria-checked={rate === currentRate}
+                data-highlighted={index === focus ? '' : undefined}
               >
                 <span>{rate}×</span>
                 <span className="media-menu-item-indicator">
@@ -153,16 +200,51 @@ function PopupCopies() {
   );
 }
 
+/** An element's layout offset within one of its positioned ancestors, ignoring transforms. */
+function offsetWithin(element: HTMLElement, ancestor: HTMLElement) {
+  let left = 0;
+  let top = 0;
+
+  for (let node: HTMLElement | null = element; node && node !== ancestor;) {
+    left += node.offsetLeft;
+    top += node.offsetTop;
+    // SAFETY: offsetParent is always an HTMLElement for elements inside the skin.
+    node = node.offsetParent as HTMLElement | null;
+  }
+
+  return { left, top };
+}
+
+/** Put each popup copy above its trigger, inside the player's edges, as the live popups are anchored. */
+function placePopups(root: HTMLElement) {
+  const skin = root.querySelector<HTMLElement>('.story-skin');
+  if (!skin) return;
+
+  for (const [triggerSelector, popupSelector] of popupTriggers) {
+    const trigger = skin.querySelector<HTMLElement>(`.video-controls-content ${triggerSelector}`);
+    const popup = skin.querySelector<HTMLElement>(`.story-popups ${popupSelector}`);
+    if (!trigger || !popup) continue;
+
+    const offset = offsetWithin(trigger, skin);
+    const center = offset.left + trigger.offsetWidth / 2;
+    const half = popup.offsetWidth / 2;
+
+    popup.style.left = `${Math.min(Math.max(center, POPUP_EDGE + half), skin.offsetWidth - POPUP_EDGE - half)}px`;
+    popup.style.setProperty('--popup-bottom', `${skin.offsetHeight - offset.top}px`);
+    popup.style.setProperty('--media-menu-available-height', `${offset.top - POPUP_EDGE * 2}px`);
+  }
+}
+
 /** Read a 0–1 phase value the story section's scroll script writes. */
 function phase(section: HTMLElement | null, name: string) {
   return Number(section?.style.getPropertyValue(`--${name}`) || 0);
 }
 
 /**
- * One player for the whole story. At the top of the page the looks sit on full-width pages in a horizontal scroll-snap
+ * One player for the whole story. Beside the intro the looks sit on full-width pages in a horizontal scroll-snap
  * container over one shared video: each page clips its look to the part of the stage it covers while the look moves
- * against the scroll to stay in place, so a trackpad or touch swipe wipes between looks. Once the section shrinks the
- * player into its column, an unclipped Default skin on the same video takes over to come apart in 3D.
+ * against the scroll to stay in place, so a trackpad or touch swipe wipes between looks. Once the reader scrolls past
+ * the intro, an unclipped Default skin on the same video takes over to come apart in 3D.
  */
 export default function StoryPlayer({ poster }: { poster: string }) {
   const [media, setMedia] = useState<HTMLVideoElement | null>(null);
@@ -173,14 +255,13 @@ export default function StoryPlayer({ poster }: { poster: string }) {
   const [playing, setPlaying] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [shrinking, setShrinking] = useState(false);
+  const [exploded, setExploded] = useState(false);
+  const [menusOpen, setMenusOpen] = useState(false);
+  const [focus, setFocus] = useState<MenuFocus>({ index: rates.indexOf(currentRate) });
   const root = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const wasShrinking = useRef(false);
-
-  // Once the player starts to shrink, the Default skin fades in over whichever look was showing and comes apart.
-  const exploded = shrinking;
+  const wasExploded = useRef(false);
 
   function show(index: number) {
     const element = scroller.current;
@@ -252,24 +333,48 @@ export default function StoryPlayer({ poster }: { poster: string }) {
 
   // Rotate through the looks until the reader swipes, pausing while they watch, point at, or scroll past the hero.
   useEffect(() => {
-    if (interacted || held || playing || !onScreen || reducedMotion || scrolling || shrinking) return;
+    if (interacted || held || playing || !onScreen || reducedMotion || scrolling || exploded) return;
 
     const timer = setTimeout(() => show((current + 1) % looks.length), DWELL_MS);
 
     return () => clearTimeout(timer);
   });
 
-  // Behind the breakdown, reset the looks to Default; resizing the player would misalign the scroll snapping anyway.
+  // Round the frame and the shared video to the look in view, using that skin's own radius.
   useEffect(() => {
-    if (shrinking && !wasShrinking.current) {
+    const look = root.current?.querySelectorAll('.story-look')[current];
+
+    if (look) root.current?.style.setProperty('--look-radius', getComputedStyle(look).borderRadius);
+  }, [current]);
+
+  // Behind the breakdown, reset the looks to Default so the reader comes back to where the story starts.
+  useEffect(() => {
+    if (exploded && !wasExploded.current) {
       const timer = setTimeout(() => scroller.current?.scrollTo({ left: 0, behavior: 'instant' }), RESET_MS);
 
-      wasShrinking.current = true;
+      wasExploded.current = true;
       return () => clearTimeout(timer);
     }
 
-    wasShrinking.current = shrinking;
+    wasExploded.current = exploded;
   });
+
+  // While the menus are open, walk keyboard focus through the speeds so the readout has something to announce.
+  useEffect(() => {
+    if (!menusOpen || reducedMotion) return;
+
+    let step = 0;
+    const timer = setInterval(() => {
+      const from = FOCUS_PATH[step]!;
+
+      step = (step + 1) % FOCUS_PATH.length;
+      const index = FOCUS_PATH[step]!;
+
+      setFocus({ index, key: index > from ? 'down' : 'up' });
+    }, FOCUS_MS);
+
+    return () => clearInterval(timer);
+  }, [menusOpen, reducedMotion]);
 
   // Follow the section's scroll phases: hand over to the breakdown, and keep the flat labels on the parts they name.
   useEffect(() => {
@@ -284,13 +389,16 @@ export default function StoryPlayer({ poster }: { poster: string }) {
     const place = () => {
       frame = visible ? requestAnimationFrame(place) : 0;
 
-      setShrinking(phase(section, 'shrink') > EXPLODE_AT);
+      setExploded(phase(section, 'handover') > EXPLODE_AT);
+      setMenusOpen(phase(section, 'menus') > 0.5);
+      placePopups(element);
 
       const origin = element.getBoundingClientRect();
       const amounts = {
         tilt: phase(section, 'tilt'),
-        spread: phase(section, 'spread') * (1 - phase(section, 'menus')),
+        spread: phase(section, 'spread') * (1 - phase(section, 'menus')) * (1 - phase(section, 'own')),
         menus: phase(section, 'menus'),
+        own: phase(section, 'own'),
       };
 
       labels.forEach((spec, index) => {
@@ -410,13 +518,13 @@ export default function StoryPlayer({ poster }: { poster: string }) {
                   style={{ '--layer': index } as CSSProperties}
                 />
               ))}
-              <PopupCopies />
+              <PopupCopies focus={focus.index} />
             </VideoSkin>
           </Player>
         )}
       </div>
 
-      <div className="story-footer" inert={shrinking}>
+      <div className="story-footer" inert={exploded}>
         <div className="story-caption" aria-live="polite">
           <span className="story-kind">{looks[current]!.kind}</span>
           <span className="story-name">{looks[current]!.name}</span>
@@ -455,12 +563,20 @@ export default function StoryPlayer({ poster }: { poster: string }) {
             }}
             className="story-label"
             data-side={spec.side}
+            data-live={spec.live}
+            data-align={spec.align}
           >
             <span className="story-label-line" />
             <span className="story-label-pill">
               {spec.name && <span className="story-label-name">{spec.name}</span>}
-              <code data-own-tag={spec.ownTag ? 'base' : undefined}>{spec.tag}</code>
-              {spec.ownTag && <code data-own-tag="own">{spec.ownTag}</code>}
+              {spec.tag && <code>{spec.tag}</code>}
+              {spec.live === 'readout' && <span className="story-label-readout">“{readout(focus.index)}”</span>}
+              {spec.live === 'keys' && (
+                <span className="story-label-keys">
+                  <kbd data-pressed={focus.key === 'up' || undefined}>↑</kbd>
+                  <kbd data-pressed={focus.key === 'down' || undefined}>↓</kbd>
+                </span>
+              )}
             </span>
           </div>
         ))}

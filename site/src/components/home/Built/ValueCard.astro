@@ -1,11 +1,15 @@
 ---
+import ArrowRight from '@/assets/icons/arrow-right.svg?react';
+
 interface Props {
   eyebrow: string;
   title: string;
+  /** The docs page that covers the card's topic. */
+  link?: { label: string; href: string; cta: string };
   class?: string;
 }
 
-const { eyebrow, title, class: className } = Astro.props;
+const { eyebrow, title, link, class: className } = Astro.props;
 ---
 
 <article
@@ -19,6 +23,19 @@ const { eyebrow, title, class: className } = Astro.props;
   <div class="text-p2 text-manila-light/80">
     <slot />
   </div>
+  {
+    link && (
+      <a
+        href={link.href}
+        data-ph-capture-attribute-cta={link.cta}
+        data-ph-capture-attribute-destination="docs"
+        class="group mt-4 inline-flex items-center gap-2 self-start font-display text-p4 uppercase transition-colors intent:text-gold"
+      >
+        {link.label}
+        <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+      </a>
+    )
+  }
   <div class="mt-auto pt-8">
     <slot name="visual" />
   </div>

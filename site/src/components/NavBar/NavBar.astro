@@ -33,7 +33,7 @@ const otherNavLinks = navLinks.filter((link) => link.href !== '/docs');
 const { class: className } = Astro.props;
 
 const linkClass = clsx(
-  "flex items-center gap-1 rounded-full px-3 py-1.5 font-display text-(length:--nav-text) uppercase transition-colors",
+  "flex items-center gap-1 rounded-full px-3 py-1.5 font-display text-(length:--nav-link-text) font-bold uppercase transition-colors",
   "intent:bg-hover aria-[current=page]:bg-hover",
 );
 const iconClass = "flex size-9 items-center justify-center rounded-full opacity-80 transition intent:bg-hover intent:opacity-100";
@@ -42,10 +42,10 @@ const iconClass = "flex size-9 items-center justify-center rounded-full opacity-
 <nav
   aria-label="Video.js"
   data-ph-capture-attribute-location="nav"
-  style="--nav-text: 0.75rem"
+  style="--nav-text: 0.75rem; --nav-link-text: 0.875rem"
   class:list={[
     "flex items-center gap-2 md:gap-3",
-    "mx-auto w-full max-w-305 px-5 py-5 md:py-6",
+    "mx-auto w-full max-w-360 px-5 py-5 md:py-6",
     className,
   ]}
 >
@@ -80,7 +80,7 @@ const iconClass = "flex size-9 items-center justify-center rounded-full opacity-
   </div>
   <Search client:idle className="ml-auto sm:self-center" />
   <div class="hidden items-center md:flex">
-    <AppearanceMenu client:idle />
+    <AppearanceMenu client:idle className={clsx(iconClass, "data-[popup-open]:opacity-100")} iconClassName="size-5" />
     <a
       href={DISCORD_INVITE_URL}
       data-ph-capture-attribute-destination="discord"
@@ -105,7 +105,7 @@ const iconClass = "flex size-9 items-center justify-center rounded-full opacity-
   <GetStartedLink
     client:idle
     data-ph-capture-attribute-cta="get-started"
-    className="hidden h-9 shrink-0 items-center rounded-full bg-faded-black px-4 font-display text-(length:--nav-text) text-manila-light uppercase transition-colors intent:bg-orange md:inline-flex dark:bg-manila-light dark:text-faded-black dark:intent:bg-orange"
+    className="hidden h-9 shrink-0 items-center rounded-full bg-faded-black px-4 font-display text-(length:--nav-text) font-bold text-manila-light uppercase transition-colors intent:bg-orange md:inline-flex dark:bg-manila-light dark:text-faded-black dark:intent:bg-orange"
   >
     Get started
   </GetStartedLink>

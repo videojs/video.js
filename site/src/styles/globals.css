@@ -507,6 +507,19 @@ body {
   background-size: 100% 9px;
 }
 
+/*
+ * The light sections' answer to `built-bg-*`: the same 1px line every 9px, in a tone barely off the page so it reads as
+ * texture rather than rules. Drawn with a gradient so the line colour can follow the theme.
+ */
+@utility pinstripe {
+  --pinstripe-line: var(--color-manila-25);
+  background-image: repeating-linear-gradient(to bottom, var(--pinstripe-line) 0 1px, transparent 1px 9px);
+
+  &:where(.dark, .dark *) {
+    --pinstripe-line: color-mix(in srgb, var(--color-warm-gray) 35%, transparent);
+  }
+}
+
 @utility text-stroke-faded-black {
   color: transparent;
   -webkit-text-stroke: clamp(1px, 0.035em, 1.5px) var(--color-faded-black);

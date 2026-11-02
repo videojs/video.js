@@ -19,53 +19,71 @@ const { poster } = Astro.props;
 
 const steps = [
   {
-    eyebrow: 'Composition',
+    eyebrow: 'Composable',
     title: 'Every skin comes apart',
     body: 'A skin is a stack of layers you can use yourself: the media, the poster, the backdrop, the controls, and the popups above them. Swap any layer, or leave it out.',
   },
   {
+    eyebrow: 'Primitives',
     title: 'Every control is a component',
     body: 'Play, mute, time, scrubbing, fullscreen. Each control is its own component with its state and accessibility built in, so you can rearrange, restyle, or remove any of them.',
   },
   {
-    title: 'Menus and popovers too',
-    body: 'Settings menus, submenus, radio groups, and the volume popover are composable parts as well, with keyboard support, focus management, and positioning handled for you.',
+    eyebrow: 'Accessible',
+    title: 'Ready for every input',
+    body: 'Every control carries its role, name, and state. Menus and popovers move with the arrow keys, keep focus where it belongs, and describe each item to screen readers.',
   },
   {
-    title: 'Eject it and make it yours',
-    body: 'Start with a packaged skin. When you need more control, eject its source into your project and change it like your own code, down to the last button.',
+    eyebrow: 'Own the source',
+    title: 'Make it yours',
+    body: 'Start with a packaged skin. When you need more, add its source to your project and change it like your own code, down to the last button.',
+    aside: {
+      label: 'See the packaged setup',
+      href: resolveDocsHref({ slug: 'guides/installation', framework: null }),
+    },
     link: {
-      label: 'Build your own skin',
-      href: resolveDocsHref({ slug: 'guides/build-your-own-skin', framework: null }),
+      label: 'Customize a skin',
+      href: `${resolveDocsHref({ slug: 'guides/customize-skins', framework: null })}#style-skin-source`,
     },
   },
 ];
 ---
 
 <section data-story class="story relative mb-24 md:mb-32">
-  <Header />
+  <div class="story-track mx-auto w-full max-w-360 px-5" data-ph-capture-attribute-location="hero">
+    <Header />
 
-  <div data-story-track class="story-track mx-auto w-full max-w-305 px-5" data-ph-capture-attribute-location="hero">
     <div class="story-sticky">
       <StoryPlayer client:load poster={poster} />
     </div>
 
     <ol class="story-steps" data-ph-capture-attribute-location="composition">
       {
-        steps.map(({ eyebrow, title, body, link }, index) => (
+        steps.map(({ eyebrow, title, body, aside, link }, index) => (
           <li class="story-step" data-story-step={index}>
             <div class="story-step-card">
               <p class="mb-3 font-display text-p4 text-muted uppercase">
-                {eyebrow ? `${eyebrow} · ` : ''}
-                {String(index + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+                {`${eyebrow} · ${String(index + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`}
               </p>
               <h2 class="mb-3 font-display text-h25 text-balance uppercase lg:text-h2">{title}</h2>
               <p class="text-p2">{body}</p>
+              {aside && (
+                <p class="mt-3 text-p3">
+                  <a
+                    class="underline intent:decoration-gold"
+                    href={aside.href}
+                    data-ph-capture-attribute-cta="packaged-setup"
+                    data-ph-capture-attribute-destination="docs"
+                  >
+                    {aside.label}
+                  </a>
+                </p>
+              )}
               {link && (
                 <a
                   class="group mt-6 inline-flex items-center gap-2 font-display text-h4 uppercase"
                   href={link.href}
-                  data-ph-capture-attribute-cta="build-your-own-skin"
+                  data-ph-capture-attribute-cta="customize-skin"
                   data-ph-capture-attribute-destination="docs"
                 >
                   {link.label}
@@ -82,17 +100,19 @@ const steps = [
 
 <script>
   /*
-   * Drive the story from scroll position. `--shrink` moves the pinned player from full width into its column; the
+   * Drive the story from scroll position. `--handover` swaps the looks for the breakdown as the intro leaves; the
    * breakdown phases then follow the steps. Reduced motion jumps between the finished state of each stage instead.
    */
   const section = document.querySelector<HTMLElement>('[data-story]');
-  const track = document.querySelector<HTMLElement>('[data-story-track]');
+  const intro = document.querySelector<HTMLElement>('[data-hero]');
   const steps = [...document.querySelectorAll<HTMLElement>('[data-story-step]')];
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   // Progress values that show each step's finished state.
   const stepProgress = [0.12, 0.4, 0.65, 1];
-  // How much scrolling, as a share of the viewport, the player takes to shrink into its column.
-  const SHRINK_SPAN = 0.6;
+  // How much scrolling, as a share of the viewport, the handover to the breakdown takes.
+  const HANDOVER_SPAN = 0.6;
+  // Beside the player, the intro starts to hand over as soon as it leaves; above it, once it has gone and the player pins.
+  const besideIntro = matchMedia('(width >= 64rem)');
 
   /** 0 before `start`, 1 after `end`, eased in between. */
   const ramp = (value: number, start: number, end: number) => {
@@ -101,7 +121,7 @@ const steps = [
     return t * t * (3 - 2 * t);
   };
 
-  if (section && track && steps.length) {
+  if (section && intro && steps.length) {
     let frame = 0;
 
     const update = () => {
@@ -115,15 +135,16 @@ const steps = [
       });
       steps.forEach((step, index) => step.toggleAttribute('data-active', index === Math.max(0, active)));
 
-      const shrunk = Math.min(1, Math.max(0, -track.getBoundingClientRect().top / (innerHeight * SHRINK_SPAN)));
+      const introLeft = (besideIntro.matches ? innerHeight : 0) - intro.getBoundingClientRect().bottom;
+      const handedOver = Math.min(1, Math.max(0, introLeft / (innerHeight * HANDOVER_SPAN)));
       const first = steps[0]!.getBoundingClientRect();
       const last = steps.at(-1)!.getBoundingClientRect();
       const scrolled = Math.min(1, Math.max(0, (middle - first.top) / (last.bottom - first.top)));
       const motion = !reducedMotion.matches;
       const p = motion ? scrolled : active < 0 ? 0 : stepProgress[active]!;
       const phases = {
-        shrink: motion ? ramp(shrunk, 0, 1) : Math.round(shrunk),
-        tilt: ramp(shrunk, 0.95, 1) * ramp(p, 0.05, 0.11) * (1 - ramp(p, 0.2, 0.28)),
+        handover: motion ? ramp(handedOver, 0, 1) : Math.round(handedOver),
+        tilt: ramp(handedOver, 0.95, 1) * ramp(p, 0.05, 0.11) * (1 - ramp(p, 0.2, 0.28)),
         spread: ramp(p, 0.22, 0.32),
         menus: ramp(p, 0.48, 0.57) * (1 - ramp(p, 0.74, 0.8)),
         own: ramp(p, 0.77, 0.84),
@@ -133,8 +154,11 @@ const steps = [
         section.style.setProperty(`--${name}`, value.toFixed(4));
       }
 
-      // Generated text can't interpolate, so the swapped-in name flips once the highlight is most of the way in.
+      // The restyle's corner shape and shadows can't interpolate, so they switch once it is halfway in.
       section.toggleAttribute('data-own', phases.own > 0.5);
+
+      // Untilted, the layers are flat; the stylesheet drops the 3D context then so the popups' glass can blur.
+      section.toggleAttribute('data-flat', phases.tilt === 0);
     };
 
     const schedule = () => {

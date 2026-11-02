@@ -13,89 +13,144 @@ import VimeoLogo from '@/assets/logos/brands/vimeo.svg?react';
 import VueLogo from '@/assets/logos/brands/vue.svg?react';
 import YouTubeLogo from '@/assets/logos/brands/youtube.svg?react';
 import MuxSmallLogo from '@/assets/logos/mux-small.svg?react';
+import { resolveDocsHref } from '@/utils/docs/routing';
 import ValueCard from './ValueCard.astro';
 
+const docs = (slug: string, framework: 'react' | 'html' | null = null) => resolveDocsHref({ slug, framework });
+const install = (framework: 'react' | 'html', template?: string) =>
+  `${docs('guides/installation', framework)}${template ? `?template=${template}` : ''}`;
+const component = (name: string) => docs(`reference/components/${name}`);
+
 const frameworks = [
-  { Logo: ReactLogo, name: 'React' },
-  { Logo: HtmlLogo, name: 'HTML' },
+  { Logo: ReactLogo, name: 'React', href: install('react') },
+  { Logo: HtmlLogo, name: 'HTML', href: install('html') },
 ];
 const worksWith = [
-  { Logo: NextJsLogo, name: 'Next.js' },
-  { Logo: AstroLogo, name: 'Astro' },
-  { Logo: VueLogo, name: 'Vue' },
-  { Logo: SvelteLogo, name: 'Svelte' },
-  { Logo: NuxtLogo, name: 'Nuxt' },
+  { Logo: NextJsLogo, name: 'Next.js', href: install('react', 'next') },
+  { Logo: AstroLogo, name: 'Astro', href: install('react', 'astro') },
+  { Logo: VueLogo, name: 'Vue', href: docs('guides/vue') },
+  { Logo: SvelteLogo, name: 'Svelte', href: docs('guides/svelte') },
+  { Logo: NuxtLogo, name: 'Nuxt', href: `${docs('guides/vue')}#use-nuxt` },
 ];
 const sources = [
-  { Logo: YouTubeLogo, name: 'YouTube' },
-  { Logo: VimeoLogo, name: 'Vimeo' },
-  { Logo: TwitchLogo, name: 'Twitch' },
-  { Logo: TikTokLogo, name: 'TikTok' },
-  { Logo: SpotifyLogo, name: 'Spotify' },
-  { Logo: CloudflareLogo, name: 'Cloudflare' },
-  { Logo: MuxSmallLogo, name: 'Mux' },
+  { Logo: YouTubeLogo, name: 'YouTube', href: component('youtube-video') },
+  { Logo: VimeoLogo, name: 'Vimeo', href: component('vimeo-video') },
+  { Logo: TwitchLogo, name: 'Twitch', href: component('twitch-video') },
+  { Logo: TikTokLogo, name: 'TikTok', href: component('tiktok-video') },
+  { Logo: SpotifyLogo, name: 'Spotify', href: component('spotify-audio') },
+  { Logo: CloudflareLogo, name: 'Cloudflare', href: component('cloudflare-video') },
+  { Logo: MuxSmallLogo, name: 'Mux', href: component('mux-video') },
 ];
-const formats = ['HLS', 'DASH', 'MP4', 'Shaka', 'Wistia', 'SoundCloud'];
-const extensions = ['Google Cast', 'AirPlay', 'Picture-in-picture', 'Mux Data', 'Captions', 'Hotkeys'];
+const formats = [
+  { name: 'HLS', href: component('hls-video') },
+  { name: 'DASH', href: component('dash-video') },
+  { name: 'MP4', href: component('video') },
+  { name: 'Shaka', href: component('shaka-video') },
+  { name: 'Wistia', href: component('wistia-video') },
+  { name: 'SoundCloud', href: component('soundcloud-audio') },
+];
+const extensions = [
+  { name: 'Google Cast', href: docs('guides/casting') },
+  { name: 'AirPlay', href: docs('guides/casting') },
+  { name: 'Picture-in-picture', href: docs('guides/picture-in-picture') },
+  { name: 'Mux Data', href: docs('guides/mux-data') },
+  { name: 'Captions', href: docs('guides/captions') },
+  { name: 'Hotkeys', href: docs('guides/keyboard-shortcuts') },
+];
+
+/** Analytics name for a linked chip or tile, such as `built-media-youtube`. */
+const cta = (group: string, name: string) => `built-${group}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 const chip =
-  'inline-flex h-8 items-center gap-2 rounded-full border border-manila-dark/30 px-3 text-p3 text-manila-light';
+  'inline-flex h-8 items-center gap-2 rounded-full border border-manila-dark/30 px-3 text-p3 text-manila-light transition-colors intent:border-manila-light';
 ---
 
-<ValueCard eyebrow="Idiomatic" title="Native to your framework">
+<ValueCard
+  eyebrow="Idiomatic"
+  title="Native to your framework"
+  link={{ label: "Installation guide", href: docs("guides/installation"), cta: "built-installation" }}
+>
   React components and HTML custom elements, each written the way that platform expects, so the player works with
   your framework instead of around it.
   <div slot="visual" class="flex flex-col gap-5">
     <div class="flex flex-wrap gap-3">
       {
-        frameworks.map(({ Logo, name }) => (
-          <span class="inline-flex h-12 items-center gap-3 rounded-full bg-soot px-5 font-display text-h4 uppercase">
+        frameworks.map(({ Logo, name, href }) => (
+          <a
+            href={href}
+            data-ph-capture-attribute-cta={cta('framework', name)}
+            data-ph-capture-attribute-destination="docs"
+            class="inline-flex h-12 items-center gap-3 rounded-full bg-soot px-5 font-display text-h4 uppercase transition-colors intent:bg-warm-gray"
+          >
             <Logo className="size-5" aria-hidden="true" />
             {name}
-          </span>
+          </a>
         ))
       }
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <span class="mr-1 font-display text-p4 text-manila-dark uppercase">Works with</span>
       {
-        worksWith.map(({ Logo, name }) => (
-          <span class={chip}>
+        worksWith.map(({ Logo, name, href }) => (
+          <a href={href} data-ph-capture-attribute-cta={cta('framework', name)} data-ph-capture-attribute-destination="docs" class={chip}>
             <Logo className="size-3.5" aria-hidden="true" />
             {name}
-          </span>
+          </a>
         ))
       }
     </div>
   </div>
 </ValueCard>
 
-<ValueCard eyebrow="Media" title="Plays from anywhere">
+<ValueCard
+  eyebrow="Media"
+  title="Plays from anywhere"
+  link={{ label: "Media sources", href: docs("guides/media-sources"), cta: "built-media-sources" }}
+>
   Swap the media element, keep the player. Adapters bring streaming engines and embedded platforms under one API, with
   the same skins and controls.
   <div slot="visual" class="flex flex-col gap-5">
     <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
       {
-        sources.map(({ Logo, name }) => (
-          <span
-            class="flex aspect-square items-center justify-center rounded-md corner-squircle bg-soot"
+        sources.map(({ Logo, name, href }) => (
+          <a
+            href={href}
+            data-ph-capture-attribute-cta={cta('media', name)}
+            data-ph-capture-attribute-destination="docs"
+            class="flex aspect-square items-center justify-center rounded-md corner-squircle bg-soot transition-colors intent:bg-warm-gray"
             title={name}
           >
             <Logo className="w-1/2" aria-label={name} role="img" />
-          </span>
+          </a>
         ))
       }
     </div>
     <div class="flex flex-wrap gap-2">
-      {formats.map((name) => <span class={chip}>{name}</span>)}
+      {
+        formats.map(({ name, href }) => (
+          <a href={href} data-ph-capture-attribute-cta={cta('media', name)} data-ph-capture-attribute-destination="docs" class={chip}>
+            {name}
+          </a>
+        ))
+      }
     </div>
   </div>
 </ValueCard>
 
-<ValueCard eyebrow="Extensible" title="Add only what you need">
+<ValueCard
+  eyebrow="Extensible"
+  title="Add only what you need"
+  link={{ label: "Features and extensions", href: docs("guides/features"), cta: "built-features" }}
+>
   Casting, analytics, and platform features plug in as extensions and features. Leave one out and it stays out of your
   bundle.
   <div slot="visual" class="flex flex-wrap gap-2">
-    {extensions.map((name) => <span class={chip}>{name}</span>)}
+    {
+      extensions.map(({ name, href }) => (
+        <a href={href} data-ph-capture-attribute-cta={cta('extension', name)} data-ph-capture-attribute-destination="docs" class={chip}>
+          {name}
+        </a>
+      ))
+    }
   </div>
 </ValueCard>

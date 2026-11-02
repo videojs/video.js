@@ -101,12 +101,12 @@ describe('StoryPlayer', () => {
     expect(scrollTo).not.toHaveBeenCalled();
   });
 
-  it('hands over to the breakdown skin as the player shrinks, and resets the looks behind it', () => {
+  it('hands over to the breakdown skin past the intro, and resets the looks behind it', () => {
     const { container, section, scroller } = renderStory();
 
     expect(container.querySelector('.story-skin')).toBeNull();
 
-    section.style.setProperty('--shrink', '0.5');
+    section.style.setProperty('--handover', '0.5');
     act(() => vi.advanceTimersByTime(50));
 
     expect(container.querySelector('.story-player')!.hasAttribute('data-exploded')).toBe(true);
@@ -115,5 +115,24 @@ describe('StoryPlayer', () => {
 
     act(() => vi.advanceTimersByTime(300));
     expect(scrollTo).toHaveBeenCalledWith({ left: 0, behavior: 'instant' });
+  });
+
+  it('walks keyboard focus through the speed menu and reads out each item while the menus are open', () => {
+    const { container, section } = renderStory();
+    const readout = () => container.querySelector('.story-label-readout')!.textContent;
+    const pressed = () => container.querySelector('.story-label-keys [data-pressed]')?.textContent;
+
+    section.style.setProperty('--handover', '1');
+    section.style.setProperty('--menus', '1');
+    act(() => vi.advanceTimersByTime(50));
+
+    expect(readout()).toBe('“1×, radio menu item, checked, 2 of 4”');
+    expect(container.querySelector('.story-focus')!.textContent).toBe('1×');
+
+    act(() => vi.advanceTimersByTime(1100));
+
+    expect(readout()).toBe('“1.5×, radio menu item, not checked, 3 of 4”');
+    expect(container.querySelector('.story-focus')!.textContent).toBe('1.5×');
+    expect(pressed()).toBe('↓');
   });
 });
