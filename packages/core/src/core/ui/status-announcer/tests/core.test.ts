@@ -61,11 +61,11 @@ describe('StatusAnnouncerCore', () => {
     core.processSnapshot({ playbackRate: 1, currentTime: 45, duration: 120, seeking: false });
     core.processSnapshot({ playbackRate: 1.25, currentTime: 45, duration: 120, seeking: false });
 
-    expect(core.state.current.label).toBe('Playback rate 1.25×');
+    expect(core.state.current.label).toBe('Playback rate, 1.25×');
 
     vi.advanceTimersByTime(200);
 
-    expect(core.state.current.label).toBe('Playback rate 1.25×');
+    expect(core.state.current.label).toBe('Playback rate, 1.25×');
   });
 
   it('rechecks volume suppression when the debounced announcement fires', () => {
@@ -115,7 +115,7 @@ describe('StatusAnnouncerCore', () => {
       [{ subtitlesShowing: true }, 'Captions on'],
       [{ isFullscreen: true }, 'Fullscreen'],
       [{ isPictureInPicture: true }, 'Picture in picture'],
-      [{ playbackRate: 1.5 }, 'Playback rate 1.5×'],
+      [{ playbackRate: 1.5 }, 'Playback rate, 1.5×'],
     ] as const) {
       expect(process(partial)).toBe(true);
       expect(core.state.current.label).toBe(label);

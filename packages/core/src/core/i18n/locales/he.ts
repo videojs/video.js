@@ -57,7 +57,7 @@ export default {
     unknown: 'המדיה לא נטענה, זמן לא ידוע.',
   },
   playback: {
-    rate: 'מהירות הפעלה {rate}',
+    rate: 'מהירות ההפעלה, {rate}',
   },
   volume: {
     mutedValue: '{percent}, מושתק',
@@ -100,6 +100,7 @@ export default {
     speed: 'מהירות',
     captions: 'כתוביות',
     playbackRate: 'מהירות ההפעלה',
+    customRate: 'התאמה אישית, {rate}',
     back: 'חזרה',
     off: 'כבוי',
     auto: 'אוטומטי',

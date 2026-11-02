@@ -57,7 +57,7 @@ export default {
     unknown: 'Medija neįkelta, laikas nežinomas.',
   },
   playback: {
-    rate: 'Atkūrimo greitis {rate}',
+    rate: 'Atkūrimo greitis, {rate}',
   },
   volume: {
     mutedValue: '{percent}, garsas išjungtas',
@@ -100,6 +100,7 @@ export default {
     speed: 'Greitis',
     captions: 'Subtitrai',
     playbackRate: 'Atkūrimo greitis',
+    customRate: 'Tinkintas, {rate}',
     back: 'Atgal',
     off: 'Išjungta',
     auto: 'Automatinė',

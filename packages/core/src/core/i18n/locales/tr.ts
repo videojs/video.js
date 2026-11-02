@@ -57,7 +57,7 @@ export default {
     unknown: 'Medya yüklenmedi, süre bilinmiyor.',
   },
   playback: {
-    rate: 'Oynatma hızı {rate}',
+    rate: 'Oynatma hızı, {rate}',
   },
   volume: {
     mutedValue: '{percent}, sessiz',
@@ -100,6 +100,7 @@ export default {
     speed: 'Hız',
     captions: 'Altyazılar',
     playbackRate: 'Oynatma hızı',
+    customRate: 'Özel, {rate}',
     back: 'Geri',
     off: 'Kapalı',
     auto: 'Otomatik',

@@ -25,7 +25,12 @@ export const YouTubeVideo = forwardRef<HTMLIFrameElement, YouTubeVideoProps>(fun
   const props: Partial<YouTubeAdapterProps> & Record<string, unknown> = { ...rawProps, autoplay };
   const [initialSrc] = useState(() =>
     // `source.src` is the only other way to name a video, so honor it when `src` is absent.
-    buildYouTubeIframeSrc(props.src || props.source?.src || '', { ...YouTubeAdapter.defaultProps, ...props })
+    buildYouTubeIframeSrc(props.src || props.source?.src || '', {
+      ...YouTubeAdapter.defaultProps,
+      ...props,
+      // React sets `muted` as a property, never the attribute, and the embed reads mute once, from this URL.
+      defaultMuted: !!(props.defaultMuted || props.muted),
+    })
   );
   const { ref: eventsRef, props: iframeProps } = useMediaEvents(
     useSyncProps<YouTubeAdapterProps, Record<string, unknown>>(media, props, YouTubeAdapter.defaultProps),

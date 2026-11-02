@@ -4,6 +4,7 @@ import {
   type ErrorLike,
   type MediaContentData,
   MediaError,
+  type MediaPlaybackRateRange,
   type MediaPreloadType,
   type TextTrackListLike,
   type Video,
@@ -346,6 +347,15 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
     this.#afterLoad((p) => p.setPlaybackRate(value));
   }
 
+  /**
+   * Vimeo plays any rate up to 2, rejects faster ones, and never settles a request slower than the browser allows.
+   *
+   * @internal
+   */
+  get playbackRateRange(): MediaPlaybackRateRange {
+    return PLAYBACK_RATE_RANGE;
+  }
+
   get autoplay() {
     return this.#autoplay;
   }
@@ -523,7 +533,8 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   #snapshotProps() {
     return {
       autoplay: this.#autoplay,
-      defaultMuted: this.#defaultMuted,
+      // The embed reads mute once, from its URL, and either property says to start muted.
+      defaultMuted: this.#defaultMuted || this.#muted,
       loop: this.#loop,
       controls: this.#controls,
       playsInline: this.#playsInline,
@@ -745,6 +756,8 @@ export function buildVimeoIframeSrc(src: string, props: Partial<VimeoAdapterProp
 
 const EMBED_VIDEO_BASE = 'https://player.vimeo.com/video';
 const EMBED_EVENT_BASE = 'https://vimeo.com/event';
+
+const PLAYBACK_RATE_RANGE: MediaPlaybackRateRange = { min: 0.0625, max: 2 };
 
 const READY_STATE_HAVE_NOTHING = 0;
 const READY_STATE_HAVE_METADATA = 1;

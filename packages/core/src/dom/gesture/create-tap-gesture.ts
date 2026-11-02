@@ -38,6 +38,7 @@ export function createTapGesture(
     type: 'tap',
     recognizer: getRecognizer(target),
     onActivate,
+    onPointerDown: options?.onPointerDown,
     pointer: options?.pointer,
     region: options?.region,
     disabled: options?.disabled,

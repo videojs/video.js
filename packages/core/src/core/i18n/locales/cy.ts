@@ -57,7 +57,7 @@ export default {
     unknown: "Nid yw'r cyfrwng wedi llwytho, amser anhysbys.",
   },
   playback: {
-    rate: 'Cyfradd chwarae {rate}',
+    rate: 'Cyfradd chwarae, {rate}',
   },
   volume: {
     mutedValue: '{percent}, wedi tewi',
@@ -102,6 +102,7 @@ export default {
     speed: 'Cyflymder',
     captions: 'Capsiynau',
     playbackRate: 'Cyfradd chwarae',
+    customRate: 'Cyfaddas, {rate}',
     back: 'Yn ôl',
     off: 'I ffwrdd',
     auto: 'Awtomatig',

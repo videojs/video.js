@@ -63,6 +63,7 @@
   --text-shadow-media-dialog: var(--media-text-shadow-dialog);
   --backdrop-filter-media-indicator: var(--media-backdrop-filter-indicator);
   --backdrop-filter-media-dialog: var(--media-backdrop-filter-dialog);
+  --filter-media-feedback: var(--media-filter-feedback);
 
   /* Motion. Utilities such as `duration-media-fast` and `scale-media-hidden` follow reduced-motion preferences through the tokens. */
   --duration-media-instant: var(--media-duration-instant);
@@ -99,6 +100,11 @@
 /* Transition delays from the theme, for example `delay-media-dialog`. */
 @utility delay-media-* {
   transition-delay: --value(--delay-media-*);
+}
+
+/* Filters from the theme, for example `filter-media-feedback`. */
+@utility filter-media-* {
+  filter: --value(--filter-media-*);
 }
 
 /* Backdrop filters from the theme, for example `backdrop-filter-media-indicator`. */

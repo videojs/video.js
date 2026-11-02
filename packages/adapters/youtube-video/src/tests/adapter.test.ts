@@ -264,6 +264,10 @@ describe('buildYouTubeIframeSrc', () => {
 });
 
 describe('YouTubeAdapter', () => {
+  it('reports the rates YouTube plays', () => {
+    expect(new YouTubeAdapter().playbackRateRange).toEqual({ min: 0.25, max: 2 });
+  });
+
   it('has expected default state before attach', () => {
     const media = new YouTubeAdapter();
 
@@ -622,6 +626,25 @@ describe('YouTubeAdapter', () => {
       expect(replacement.playVideo).toHaveBeenCalledTimes(1);
       expect(new URL(iframe.src).searchParams.get('mute')).toBe(scenario === 'default mute' ? '1' : '0');
       expect(replacement.unMute).not.toHaveBeenCalled();
+    } finally {
+      media.destroy();
+      iframe.remove();
+    }
+  });
+
+  it('builds the embed muted from the muted property, as React sets it', async () => {
+    const media = new YouTubeAdapter();
+    const iframe = createIframe();
+
+    media.muted = true;
+    media.src = 'aqz-KE-bpKQ';
+    document.body.append(iframe);
+    media.attach(iframe);
+
+    try {
+      await waitForEngine(media);
+
+      expect(new URL(iframe.src).searchParams.get('mute')).toBe('1');
     } finally {
       media.destroy();
       iframe.remove();

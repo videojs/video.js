@@ -10,6 +10,8 @@ function createMediaState(overrides: Partial<MediaPlaybackState> = {}): MediaPla
     ended: false,
     started: false,
     waiting: false,
+    autoplay: false,
+    autoplaying: false,
     play: vi.fn(async () => {}),
     pause: vi.fn(),
     ...overrides,
@@ -46,6 +48,19 @@ describe('BufferingIndicatorCore', () => {
       const core = new BufferingIndicatorCore();
 
       core.update(createMediaState({ waiting: true, paused: false }));
+
+      expect(core.state.current.visible).toBe(false);
+    });
+
+    it('shows after the delay while the media is trying to autoplay, and hides when that ends', () => {
+      const core = new BufferingIndicatorCore();
+
+      core.update(createMediaState({ paused: true, autoplay: true, autoplaying: true }));
+      vi.advanceTimersByTime(500);
+
+      expect(core.state.current.visible).toBe(true);
+
+      core.update(createMediaState({ paused: true, autoplay: true, autoplaying: false }));
 
       expect(core.state.current.visible).toBe(false);
     });

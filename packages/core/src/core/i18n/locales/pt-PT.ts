@@ -57,7 +57,7 @@ export default {
     unknown: 'Conteúdo multimédia não carregado, tempo desconhecido.',
   },
   playback: {
-    rate: 'Velocidade de reprodução {rate}',
+    rate: 'Velocidade de reprodução, {rate}',
   },
   volume: {
     mutedValue: '{percent}, sem som',
@@ -102,6 +102,7 @@ export default {
     speed: 'Velocidade',
     captions: 'Legendas',
     playbackRate: 'Velocidade de reprodução',
+    customRate: 'Personalizada, {rate}',
     back: 'Voltar',
     off: 'Desativado',
     auto: 'Auto',

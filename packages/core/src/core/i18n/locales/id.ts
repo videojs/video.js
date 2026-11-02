@@ -57,7 +57,7 @@ export default {
     unknown: 'Media belum dimuat, waktu tidak diketahui.',
   },
   playback: {
-    rate: 'Kecepatan pemutaran {rate}',
+    rate: 'Kecepatan pemutaran, {rate}',
   },
   volume: {
     mutedValue: '{percent}, dibisukan',
@@ -100,6 +100,7 @@ export default {
     speed: 'Kecepatan',
     captions: 'Pilihan teks',
     playbackRate: 'Kecepatan pemutaran',
+    customRate: 'Khusus, {rate}',
     back: 'Kembali',
     off: 'Nonaktif',
     auto: 'Otomatis',

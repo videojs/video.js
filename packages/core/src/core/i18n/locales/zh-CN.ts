@@ -57,7 +57,7 @@ export default {
     unknown: '媒体未加载，时间未知。',
   },
   playback: {
-    rate: '播放速度 {rate}',
+    rate: '播放速度，{rate}',
   },
   volume: {
     mutedValue: '{percent}，已静音',
@@ -100,6 +100,7 @@ export default {
     speed: '速度',
     captions: '字幕',
     playbackRate: '播放速度',
+    customRate: '自定义，{rate}',
     back: '返回',
     off: '关闭',
     auto: '自动',

@@ -33,6 +33,8 @@
         "@videojs/shaka-video",
         "@videojs/skins",
         "@videojs/spf",
+        "@videojs/mixcloud-audio",
+        "@videojs/soundcloud-audio",
         "@videojs/spotify-audio",
         "@videojs/store",
         "@videojs/tiktok-video",
@@ -108,6 +110,12 @@
     },
     "packages/spf": {
       "component": "@videojs/spf"
+    },
+    "packages/adapters/mixcloud-audio": {
+      "component": "@videojs/mixcloud-audio"
+    },
+    "packages/adapters/soundcloud-audio": {
+      "component": "@videojs/soundcloud-audio"
     },
     "packages/adapters/spotify-audio": {
       "component": "@videojs/spotify-audio"

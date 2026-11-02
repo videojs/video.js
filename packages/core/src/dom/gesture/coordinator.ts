@@ -122,6 +122,8 @@ export class GestureCoordinator {
         if (event.button !== 0) return;
 
         pointerDownTime = Date.now();
+
+        for (const binding of this.#bindings) binding.onPointerDown?.();
       },
       { signal }
     );

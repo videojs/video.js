@@ -57,7 +57,7 @@ export default {
     unknown: 'Multimedia ez da kargatu, ordu ezezaguna.',
   },
   playback: {
-    rate: 'Abiadura {rate}',
+    rate: 'Erreprodukzio-abiadura, {rate}',
   },
   volume: {
     mutedValue: '{percent}, isilarazia',
@@ -102,6 +102,7 @@ export default {
     speed: 'Abiadura',
     captions: 'Azpitituluak',
     playbackRate: 'Erreprodukzio-abiadura',
+    customRate: 'Pertsonalizatua, {rate}',
     back: 'Atzera',
     off: 'Desaktibatuta',
     auto: 'Automatikoa',

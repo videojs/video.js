@@ -1,4 +1,3 @@
-import { ReactiveElement } from '@videojs/element';
 import {
   applyShadowStyles,
   createShadowStyle,
@@ -6,6 +5,8 @@ import {
   renderTemplate,
   type ShadowStyle,
 } from '@videojs/utils/dom';
+
+import { UIElement } from '../ui/ui-element';
 
 import globalStyles from '../define/global.css?inline';
 import shadowStyles from '../define/shadow.css?inline';
@@ -15,9 +16,10 @@ const shadowSheet = createShadowStyle(shadowStyles);
 
 /**
  * Base element for skin definitions. Attaches a shadow root, clones `static template` into it, and applies shared +
- * per-skin styles via `adoptedStyleSheets` (or `<style>` fallback).
+ * per-skin styles via `adoptedStyleSheets` (or `<style>` fallback). Destroying it also destroys the controls in its
+ * shadow root.
  */
-export class SkinElement extends ReactiveElement {
+export class SkinElement extends UIElement {
   static shadowRootOptions: ShadowRootInit = { mode: 'open' };
   static styles?: ShadowStyle;
   static template?: HTMLTemplateElement | null;

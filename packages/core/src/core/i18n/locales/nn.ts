@@ -57,7 +57,7 @@ export default {
     unknown: 'Mediet er ikkje lasta inn, ukjend tid.',
   },
   playback: {
-    rate: 'Avspelingshastigheit {rate}',
+    rate: 'Avspelingshastigheit, {rate}',
   },
   volume: {
     mutedValue: '{percent}, dempa',
@@ -102,6 +102,7 @@ export default {
     speed: 'Fart',
     captions: 'Teksting',
     playbackRate: 'Avspelingshastigheit',
+    customRate: 'Tilpassa, {rate}',
     back: 'Tilbake',
     off: 'Av',
     auto: 'Auto',

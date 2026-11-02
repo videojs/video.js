@@ -57,7 +57,7 @@ export default {
     unknown: 'Multivide nav ielādēta, laiks nav zināms.',
   },
   playback: {
-    rate: 'Atskaņošanas ātrums {rate}',
+    rate: 'Atskaņošanas ātrums, {rate}',
   },
   volume: {
     mutedValue: '{percent}, skaņa izslēgta',
@@ -100,6 +100,7 @@ export default {
     speed: 'Ātrums',
     captions: 'Subtitri',
     playbackRate: 'Atskaņošanas ātrums',
+    customRate: 'Pielāgots, {rate}',
     back: 'Atpakaļ',
     off: 'Izslēgts',
     auto: 'Automātiski',

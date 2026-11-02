@@ -57,7 +57,7 @@ export default {
     unknown: 'మీడియా లోడ్ కాలేదు, సమయం తెలియదు.',
   },
   playback: {
-    rate: 'ప్లేబ్యాక్ రేట్ {rate}',
+    rate: 'ప్లేబ్యాక్ రేట్, {rate}',
   },
   volume: {
     mutedValue: '{percent}, మ్యూట్ చేయబడింది',
@@ -100,6 +100,7 @@ export default {
     speed: 'వేగం',
     captions: 'క్యాప్షన్‌లు',
     playbackRate: 'ప్లేబ్యాక్ రేట్',
+    customRate: 'అనుకూలం, {rate}',
     back: 'వెనుకకు',
     off: 'ఆఫ్',
     auto: 'ఆటో',

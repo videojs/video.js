@@ -57,7 +57,7 @@ export default {
     unknown: 'Contido multimedia non cargado, tempo descoñecido.',
   },
   playback: {
-    rate: 'Velocidade de reprodución {rate}',
+    rate: 'Velocidade de reprodución, {rate}',
   },
   volume: {
     mutedValue: '{percent}, silenciado',
@@ -102,6 +102,7 @@ export default {
     speed: 'Velocidade',
     captions: 'Subtítulos para xordos',
     playbackRate: 'Velocidade de reprodución',
+    customRate: 'Velocidade personalizada, {rate}',
     back: 'Atrás',
     off: 'Desactivado',
     auto: 'Automático',

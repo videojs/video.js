@@ -57,7 +57,7 @@ export default {
     unknown: 'Medium nicht geladen, Zeit unbekannt.',
   },
   playback: {
-    rate: 'Wiedergabegeschwindigkeit {rate}',
+    rate: 'Wiedergabegeschwindigkeit, {rate}',
   },
   volume: {
     mutedValue: '{percent}, stummgeschaltet',
@@ -102,6 +102,7 @@ export default {
     speed: 'Geschwindigkeit',
     captions: 'Untertitel',
     playbackRate: 'Wiedergabegeschwindigkeit',
+    customRate: 'Benutzerdefiniert, {rate}',
     back: 'Zurück',
     off: 'Aus',
     auto: 'Automatisch',

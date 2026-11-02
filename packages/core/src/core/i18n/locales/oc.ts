@@ -57,7 +57,7 @@ export default {
     unknown: 'Mèdia pas cargat, temps desconegut.',
   },
   playback: {
-    rate: 'Velocitat de lectura {rate}',
+    rate: 'Velocitat de lectura, {rate}',
   },
   volume: {
     mutedValue: '{percent}, silenciat',
@@ -102,6 +102,7 @@ export default {
     speed: 'Velocitat',
     captions: 'Legendas',
     playbackRate: 'Velocitat de lectura',
+    customRate: 'Personalizada, {rate}',
     back: 'Retorn',
     off: 'Desactivat',
     auto: 'Automatic',

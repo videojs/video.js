@@ -515,6 +515,38 @@ describe('createPopover', () => {
     });
   });
 
+  describe('external hide', () => {
+    function dispatchToggle(popup: HTMLElement, newState: 'open' | 'closed') {
+      const event = Object.assign(new Event('toggle'), { oldState: newState === 'open' ? 'closed' : 'open', newState });
+
+      popup.dispatchEvent(event);
+    }
+
+    it('closes when something else hides the open popup', () => {
+      const { popover, onOpenChange } = createTestPopover();
+      const popup = document.createElement('div');
+
+      popover.setPopupElement(popup);
+      popover.open();
+      dispatchToggle(popup, 'closed');
+
+      expect(onOpenChange).toHaveBeenLastCalledWith(false, expect.objectContaining({ reason: 'imperative-action' }));
+      expect(popover.input.current.status).toBe('ending');
+    });
+
+    it('ignores toggles from a popup it no longer owns', () => {
+      const { popover, onOpenChange } = createTestPopover();
+      const popup = document.createElement('div');
+
+      popover.setPopupElement(popup);
+      popover.setPopupElement(document.createElement('div'));
+      popover.open();
+      dispatchToggle(popup, 'closed');
+
+      expect(onOpenChange).not.toHaveBeenCalledWith(false, expect.anything());
+    });
+  });
+
   describe('destroy', () => {
     it('prevents further open/close calls', () => {
       const { popover, onOpenChange } = createTestPopover();

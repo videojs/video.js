@@ -66,7 +66,9 @@ Creates radio items from the player playback rate state and selects the playback
 
 ## Behavior
 
-The group is available when the configured media exposes playback rates. Option labels default to the rate followed by a multiplication sign (e.g. `1.5×`); pass `formatRate` to customize them.
+The group is available when the configured media exposes playback rates. It offers the player's playback rates, or its own when you set `rates`. Option labels default to the rate followed by a multiplication sign (e.g. `1.5×`); pass `formatRate` to customize them.
+
+When the current rate isn't one the group offers, such as `1.1` set through the media API, the group adds it as an extra item before the next faster rate. That item carries `data-custom`, and its accessible name is "Custom, 1.1×" while its visible label stays `1.1×`. It goes away once the rate is back on the list.
 
 <FrameworkCase frameworks={["react"]}>
 `PlaybackRateRadioGroup.Root` uses <DocsLink slug="reference/api/use-playback-rate-options">`usePlaybackRateOptions`</DocsLink> to own selection and renders no element. Wrap the menu's `Menu.Trigger` and `Menu.Content` in it so the trigger inherits the group's disabled and hidden state and exposes `data-availability`. `PlaybackRateRadioGroup.Options` renders the items: its required `renderItem` callback renders the <DocsLink slug="reference/components/menu">`Menu.RadioItem`</DocsLink> root and receives item state containing the translated `label` and current `checked` value. `PlaybackRateRadioGroup.Value` displays the selected label, typically inside the trigger. `Options` and `Value` render `null` when the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink> is not configured.
@@ -85,7 +87,7 @@ The group is available when the configured media exposes playback rates. Option 
 | `data-hidden` | Present / absent | Present when playback-rate selection is unavailable. |
 | `data-availability` | `"available"` / `"unavailable"` | Whether playback rates are available. |
 
-Unavailable groups receive the native `hidden` attribute.
+Unavailable groups receive the native `hidden` attribute. Each item carries `data-rate`, and an item for a current rate the group doesn't offer also carries `data-custom`.
 
 ## Accessibility
 

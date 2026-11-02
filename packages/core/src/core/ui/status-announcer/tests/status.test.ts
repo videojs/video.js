@@ -24,7 +24,7 @@ describe('deriveStatusAnnouncement', () => {
           playbackRate: 1.25,
         }
       )
-    ).toBe('Playing. Captions on. Fullscreen. Picture in picture. Playback rate 1.25×');
+    ).toBe('Playing. Captions on. Fullscreen. Picture in picture. Playback rate, 1.25×');
   });
 
   it('ignores captions changes when captions are unavailable', () => {

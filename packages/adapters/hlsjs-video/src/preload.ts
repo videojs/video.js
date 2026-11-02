@@ -9,9 +9,12 @@ export type PreloadType = '' | 'none' | 'metadata' | 'auto';
  * Manages HLS preload behavior by mapping the media element's `preload` attribute to hls.js `startLoad` / buffer-limit
  * configuration.
  *
- * - `'auto'` or already playing → full buffer limits, immediate start.
+ * - `'auto'`, `autoplay`, or already playing → full buffer limits, immediate start.
  * - `'metadata'` → minimal buffer (1 byte / 1 second), limits raised on play.
  * - `'none'` / `''` → no start, deferred load on play.
+ *
+ * `autoplay` overrides `preload`, as it does for a native `<video>`: the browser only starts it once enough has loaded,
+ * so a load deferred until `play` would never begin.
  *
  * Loading is started at most once per source. Widening the limits afterwards is a plain config write, never a second
  * `startLoad()`.
@@ -44,6 +47,16 @@ export function HlsJsPreloadMixin<Base extends Constructor<HlsEngineHost>>(BaseC
 
     set preload(value: PreloadType) {
       this.#preload = value;
+      this.#init();
+    }
+
+    override get autoplay(): boolean {
+      return super.autoplay;
+    }
+
+    // Set after the source as often as before it, so turning it on starts a load that `preload` deferred.
+    override set autoplay(value: boolean) {
+      super.autoplay = value;
       this.#init();
     }
 
@@ -99,7 +112,7 @@ export function HlsJsPreloadMixin<Base extends Constructor<HlsEngineHost>>(BaseC
         engine.startLoad();
       };
 
-      if (this.preload === 'auto' || !target.paused) {
+      if (this.preload === 'auto' || target.autoplay || !target.paused) {
         load();
         return;
       }

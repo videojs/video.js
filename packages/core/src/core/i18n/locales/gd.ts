@@ -57,7 +57,7 @@ export default {
     unknown: 'Cha deach am meadhan a luchdadh, àm neo-aithnichte.',
   },
   playback: {
-    rate: 'Reat na cluiche {rate}',
+    rate: 'Reat na cluiche, {rate}',
   },
   volume: {
     mutedValue: '{percent}, air mùchadh',
@@ -102,6 +102,7 @@ export default {
     speed: 'Astar',
     captions: 'Caipseanan',
     playbackRate: 'Reat na cluiche',
+    customRate: 'Gnàthaichte, {rate}',
     back: 'Air ais',
     off: 'Dheth',
     auto: 'Fèin-obrachail',

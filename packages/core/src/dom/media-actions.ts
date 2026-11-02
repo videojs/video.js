@@ -1,6 +1,7 @@
 import { noop } from '@videojs/utils/function';
-import { isPromise } from '@videojs/utils/predicate';
+import { isPromise, isUndefined } from '@videojs/utils/predicate';
 
+import { roundPlaybackRate } from '../core/ui/utils/playback-rates';
 import { getMediaInputActionValue } from './media-action-value';
 import type { AnyPlayerStore } from './player';
 import {
@@ -26,6 +27,8 @@ export type MediaInputActionName =
 
 export interface MediaInputActionContext {
   store: AnyPlayerStore;
+  /** The store state the input acted on, when it can differ from the current one. */
+  state?: object | undefined;
   value?: number | undefined;
   key?: string | undefined;
 }
@@ -38,11 +41,14 @@ export function ignoreRejection(result: unknown): void {
 }
 
 export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInputActionResolver> = {
-  togglePaused({ store }) {
-    const playback = selectPlayback(store.state);
+  // A tap fires a doubletap window after the click, and the click can start playback by itself, as Safari's start
+  // button over a refused autoplay does, so a tap toggles from the state its pointer-down found.
+  togglePaused({ store, state = store.state }) {
+    const playback = selectPlayback(state);
     if (!playback) return;
 
-    ignoreRejection(playback.paused ? playback.play() : playback.pause());
+    // A pending autoplay counts as playing, so the toggle cancels it, as the play button does.
+    ignoreRejection(playback.paused && !playback.autoplaying ? playback.play() : playback.pause());
   },
 
   toggleMuted({ store }) {
@@ -85,25 +91,37 @@ export const MEDIA_INPUT_ACTION_OVERRIDES: Record<MediaInputActionName, MediaInp
     vol.setVolume(vol.volume + step);
   },
 
-  speedUp({ store }) {
+  // With a `value`, steps by that amount, so a hotkey can change speed in finer or coarser steps than the menu offers.
+  // Otherwise moves to the next faster or slower of the player's rates, stopping at the ends.
+  speedUp({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
 
-    const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx < 0 || idx >= playbackRates.length - 1 ? 0 : idx + 1;
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate + value));
+      return;
+    }
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    const { playbackRates, playbackRate } = rate;
+    const faster = playbackRates.filter((candidate) => candidate > playbackRate);
+    if (faster.length === 0) return;
+
+    rate.setPlaybackRate(Math.min(...faster));
   },
 
-  speedDown({ store }) {
+  speedDown({ store, value }) {
     const rate = selectPlaybackRate(store.state);
     if (!rate) return;
 
-    const { playbackRates, playbackRate } = rate;
-    const idx = playbackRates.indexOf(playbackRate);
-    const next = idx <= 0 ? playbackRates.length - 1 : idx - 1;
+    if (!isUndefined(value)) {
+      rate.setPlaybackRate(roundPlaybackRate(rate.playbackRate - value));
+      return;
+    }
 
-    rate.setPlaybackRate(playbackRates[next]!);
+    const { playbackRates, playbackRate } = rate;
+    const slower = playbackRates.filter((candidate) => candidate < playbackRate);
+    if (slower.length === 0) return;
+
+    rate.setPlaybackRate(Math.max(...slower));
   },
 };

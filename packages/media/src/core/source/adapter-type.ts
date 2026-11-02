@@ -1,5 +1,7 @@
 import { parseCloudflareSource } from './cloudflare';
 import { parseDailymotionSource } from './dailymotion';
+import { parseMixcloudSource } from './mixcloud';
+import { parseSoundCloudSource } from './soundcloud';
 import { parseSpotifySource } from './spotify';
 import { parseTikTokSource } from './tiktok';
 import { parseTwitchSource } from './twitch';
@@ -15,6 +17,8 @@ export type AdapterType =
   | 'mux'
   | 'cloudflare'
   | 'spotify'
+  | 'soundcloud'
+  | 'mixcloud'
   | 'tiktok'
   | 'twitch'
   | 'dailymotion'
@@ -25,8 +29,9 @@ export type AdapterType =
 
 /**
  * Resolve which type of adapter plays a source URL, so you can render the media component for it and pass it the same
- * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, TikTok, Twitch, and Dailymotion URLs; HLS
- * and DASH manifests; and video and audio files, by MIME type when you pass one and by file extension otherwise.
+ * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, Twitch, and
+ * Dailymotion URLs; HLS and DASH manifests; and video and audio files, by MIME type when you pass one and by file
+ * extension otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
  * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>` and `vimeo/<id>` shorthands.
@@ -94,6 +99,10 @@ function fromService(src: string): AdapterType | null {
   }
 
   if (host === 'open.spotify.com') return parseSpotifySource(src) ? 'spotify' : null;
+
+  if (isHost(host, 'soundcloud.com')) return parseSoundCloudSource(src) ? 'soundcloud' : null;
+
+  if (isHost(host, 'mixcloud.com')) return parseMixcloudSource(src) ? 'mixcloud' : null;
 
   if (TIKTOK_HOSTS.has(host)) return parseTikTokSource(src) ? 'tiktok' : null;
 

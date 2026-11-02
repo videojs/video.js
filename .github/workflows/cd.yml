@@ -17,6 +17,8 @@ on:
 
 jobs:
   release:
+    # npm trusted publishing requires a GitHub-hosted runner.
+    # https://docs.npmjs.com/trusted-publishers/
     runs-on: ubuntu-latest
     environment: production
     permissions:

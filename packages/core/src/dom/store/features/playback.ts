@@ -1,5 +1,5 @@
 import type { MediaPlaybackState } from '@videojs/media';
-import { isMediaPauseCapable, isMediaSeekCapable, isMediaSourceCapable } from '@videojs/media';
+import { isMediaAutoplayCapable, isMediaPauseCapable, isMediaSeekCapable, isMediaSourceCapable } from '@videojs/media';
 import { listen } from '@videojs/utils/dom';
 
 import { definePlayerFeature } from '../../feature';
@@ -11,6 +11,8 @@ export const playbackFeature = definePlayerFeature({
     ended: false,
     started: false,
     waiting: false,
+    autoplay: false,
+    autoplaying: false,
     play() {
       const { media } = target();
       const playing = media.play();
@@ -25,16 +27,66 @@ export const playbackFeature = definePlayerFeature({
       const { media } = target();
 
       if (isMediaPauseCapable(media)) {
+        // Pausing also clears the browser's own autoplay flag, without an event when the media was already paused.
         media.pause();
         // The `pause` event is queued, so sync now, or an immediate second toggle would read the old state.
-        set({ paused: media.paused });
+        set({ paused: media.paused, autoplaying: false });
       }
     },
   }),
 
-  attach({ target, signal, set }) {
+  attach({ target, signal, get, set }) {
     const { media } = target;
     if (!isMediaPauseCapable(media) || !isMediaSeekCapable(media) || !isMediaSourceCapable(media)) return;
+
+    const autoplayEnabled = () => isMediaAutoplayCapable(media) && media.autoplay;
+
+    // The browser starts `autoplay` once it can play through, and doesn't announce a refusal. So a new source starts an
+    // attempt, and the state tracks it until playback starts, `pause()` cancels it, or the media shows it was refused.
+    let autoplayCheck: number | undefined;
+
+    const cancelAutoplayCheck = () => {
+      if (autoplayCheck !== undefined) cancelAnimationFrame(autoplayCheck);
+
+      autoplayCheck = undefined;
+    };
+
+    const startAutoplay = () => {
+      cancelAutoplayCheck();
+
+      // Already able to play through but still paused: the browser refused it before the store attached.
+      const autoplaying =
+        autoplayEnabled() &&
+        !!(media.currentSrc || media.src) &&
+        media.paused &&
+        !media.ended &&
+        media.currentTime === 0 &&
+        media.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA;
+
+      set({ autoplay: autoplayEnabled(), autoplaying });
+    };
+
+    const refuseAutoplay = () => {
+      if (get().autoplaying) set({ autoplaying: false });
+    };
+
+    // The browser starts an allowed autoplay as the media can play through. Chromium's muted autoplay lands a task or a
+    // frame after `canplaythrough`, but before the second frame, so a media still paused then was refused. Embeds, which
+    // don't play through, report a refusal with `pause` or `error` instead.
+    const checkAutoplay = () => {
+      if (!get().autoplaying) return;
+
+      cancelAutoplayCheck();
+      autoplayCheck = requestAnimationFrame(() => {
+        autoplayCheck = requestAnimationFrame(() => {
+          autoplayCheck = undefined;
+
+          if (media.paused) refuseAutoplay();
+        });
+      });
+    };
+
+    signal.addEventListener('abort', cancelAutoplayCheck);
 
     // `currentTime` when playback last ran short of data, or `null` when it did
     // not. Safari reports `HAVE_CURRENT_DATA` for the whole of some MSE streams
@@ -49,11 +101,16 @@ export const playbackFeature = definePlayerFeature({
       if (!starved) starvedAt = null;
       else starvedAt ??= media.currentTime;
 
+      const started = !media.paused || media.currentTime > 0;
+
       set({
         paused: media.paused,
         ended: media.ended,
-        started: !media.paused || media.currentTime > 0,
+        started,
         waiting: starved && starvedAt === media.currentTime,
+        autoplay: autoplayEnabled(),
+        // Only a new source starts an attempt; events can only end one.
+        autoplaying: get().autoplaying && !started && !media.ended,
       });
     };
 
@@ -64,8 +121,14 @@ export const playbackFeature = definePlayerFeature({
       sync();
     };
 
+    startAutoplay();
     sync();
 
+    listen(media, 'emptied', startAutoplay, { signal });
+    listen(media, 'loadstart', startAutoplay, { signal });
+    listen(media, 'canplaythrough', checkAutoplay, { signal });
+    listen(media, 'pause', refuseAutoplay, { signal });
+    listen(media, 'error', refuseAutoplay, { signal });
     listen(media, 'emptied', starve, { signal });
     listen(media, 'play', starve, { signal });
     listen(media, 'pause', sync, { signal });

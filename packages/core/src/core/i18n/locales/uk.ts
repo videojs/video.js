@@ -57,7 +57,7 @@ export default {
     unknown: 'Медіафайл не завантажено, час невідомий.',
   },
   playback: {
-    rate: 'Швидкість відтворення {rate}',
+    rate: 'Швидкість відтворення, {rate}',
   },
   volume: {
     mutedValue: '{percent}, звук вимкнено',
@@ -100,6 +100,7 @@ export default {
     speed: 'Швидкість',
     captions: 'Субтитри',
     playbackRate: 'Швидкість відтворення',
+    customRate: 'Інша, {rate}',
     back: 'Назад',
     off: 'Вимкнено',
     auto: 'Авто',
