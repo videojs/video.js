@@ -27,6 +27,7 @@ import { findMediaTrack, type MediaHandlerType, readBaseMediaDecodeTime } from '
 import { resolveVttSegmentMetadata, type TextSegmentMetadata } from '../../media/text/resolve-vtt-metadata';
 import type { Cue, MaybeResolvedPresentation, MediaContainerData } from '../../media/types';
 import { findTrackById, getTracksByType } from '../../media/utils/tracks';
+import { type RequestCredentialsPolicy, resolveRequestCredentials } from '../../network/credentials-fetch';
 import type { DeriveStartMediaTime } from './derive-start-media-time';
 import { peekHead } from './head-peek';
 import { dispatchStep, fetchStep, type LoadStep, type MessagePipelines, type StepDeps } from './segment-load-pipeline';
@@ -206,9 +207,11 @@ const resolveWithMetadataStep = async <C extends Cue>(
   signal: AbortSignal,
   deps: TextStepDeps
 ): Promise<void> => {
+  const { url } = frame.op.segment;
+  const { requestCredentials } = deps.config as { requestCredentials?: RequestCredentialsPolicy };
   const [cues, metadata] = await Promise.all([
-    textStepWiring<C>(deps).resolveSegment(frame.op.segment.url),
-    resolveVttSegmentMetadata(frame.op.segment.url),
+    textStepWiring<C>(deps).resolveSegment(url),
+    resolveVttSegmentMetadata(url, { credentials: resolveRequestCredentials(requestCredentials, { url }) }),
   ]);
 
   if (signal.aborted) return;
