@@ -426,6 +426,10 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
         '@videojs/media > hls.js',
         '@videojs/media > mux-embed',
         '@videojs/react > react-compiler-runtime',
+        // Remotion (templates/remotion-video-react): pure ESM, but `noDiscovery` means nothing loads unlisted.
+        '@remotion/media',
+        '@remotion/player',
+        'remotion',
         'react',
         'react-dom',
         'react-dom/client',

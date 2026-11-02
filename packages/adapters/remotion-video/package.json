@@ -1,0 +1,59 @@
+{
+  "name": "@videojs/remotion-video",
+  "version": "10.2.0",
+  "description": "Remotion composition playback adapter for Video.js",
+  "keywords": [
+    "media",
+    "motion graphics",
+    "react",
+    "remotion",
+    "videojs"
+  ],
+  "homepage": "https://videojs.org",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/videojs/video.js",
+    "directory": "packages/adapters/remotion-video"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/default/index.js",
+  "module": "dist/default/index.js",
+  "types": "dist/dev/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/dev/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "default": "./dist/default/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vp pack --watch ./src --no-clean",
+    "test": "vp test run",
+    "test:watch": "vp test",
+    "clean": "rimraf --glob dist types '*.tsbuildinfo'"
+  },
+  "dependencies": {
+    "@videojs/media": "workspace:*",
+    "@videojs/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@remotion/player": "catalog:",
+    "@types/react": "^19.3.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@remotion/player": "^4.0.275",
+    "react": "^18.0.0 || ^19.0.0"
+  }
+}

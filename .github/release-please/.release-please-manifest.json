@@ -16,6 +16,7 @@
   "packages/adapters/mux-video": "10.2.0",
   "packages/adapters/native-hls-video": "10.2.0",
   "packages/react": "10.2.0",
+  "packages/adapters/remotion-video": "10.2.0",
   "packages/adapters/shaka-video": "10.2.0",
   "packages/skins": "10.2.0",
   "packages/spf": "10.2.0",

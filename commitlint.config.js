@@ -47,6 +47,7 @@ export default {
         'mux-audio',
         'mux-data',
         'mux-video',
+        'remotion-video',
         'shaka-video',
         'vimeo-video',
         'wistia-video',
