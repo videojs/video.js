@@ -1,11 +1,11 @@
 import {
   EMPTY_TEXT_TRACKS,
-  EMPTY_TIME_RANGES,
   type ErrorLike,
   type MediaContentData,
   MediaError,
   type MediaPlaybackRateRange,
   type MediaPreloadType,
+  NO_TIME_RANGES_YET,
   type TextTrackListLike,
   type Video,
 } from '@videojs/media';
@@ -455,13 +455,13 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
   }
 
   get buffered() {
-    return this.#progress > 0 ? createTimeRange(0, this.#progress) : EMPTY_TIME_RANGES;
+    return this.#progress > 0 ? createTimeRange(0, this.#progress) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
