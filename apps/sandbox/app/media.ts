@@ -59,6 +59,8 @@ export interface MediaDescriptor {
   readonly entrySource?: SourceId;
   /** What the media will do with a source, when that is worth labelling for someone smoke-testing. */
   readonly outcome?: (source: SandboxSource) => string | undefined;
+  /** The preview starts without a skin, for a provider whose terms don't allow covering its player. */
+  readonly skinless?: true;
 }
 
 /**
@@ -295,6 +297,7 @@ const MEDIA_MAP = {
     sources: DAILYMOTION_SOURCE_IDS,
     fallbackSource: DEFAULT_DAILYMOTION_SOURCE,
     entrySource: DEFAULT_DAILYMOTION_SOURCE,
+    skinless: true,
   },
   'wistia-video': {
     label: 'Wistia Video',
@@ -349,4 +352,9 @@ export function hasTailwindSkin(media: MediaId, platform: Platform): boolean {
 /** The background skin is one element with no default or neutral variant to choose between. */
 export function hasSkinChoice(media: MediaId): boolean {
   return MEDIA[media].player !== 'background';
+}
+
+/** Whether the preview starts without a skin when this media is entered. */
+export function startsSkinless(media: MediaId): boolean {
+  return MEDIA[media].skinless === true;
 }

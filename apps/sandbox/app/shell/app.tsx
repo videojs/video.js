@@ -24,7 +24,16 @@ import {
   type TextDirection,
 } from '@app/constants';
 import { COMPARE_LABELS } from '@app/labels';
-import { hasTailwindSkin, isMediaId, landingSource, MEDIA, type MediaId, mediaSources } from '@app/media';
+import {
+  hasSkinChoice,
+  hasTailwindSkin,
+  isMediaId,
+  landingSource,
+  MEDIA,
+  type MediaId,
+  mediaSources,
+  startsSkinless,
+} from '@app/media';
 import { CAPTIONS_MODES, type CaptionsMode } from '@app/shared/captions';
 import { DEFAULT_SANDBOX_LOCALE, SANDBOX_LOCALE_TAGS, type SandboxLocaleTag } from '@app/shared/i18n/locale-meta';
 import { ASPECT_RATIOS, type AspectRatio, defaultPlayerWidth, PLAYER_WIDTH } from '@app/shared/player-frame';
@@ -93,6 +102,8 @@ function readParams() {
     skins: readSkins(params.get('skins'), platform),
     media,
     skin: readOption(SKINS, params.get('skin'), 'default'),
+    // Written only when it differs from the media's own default, so a link without it starts as the media does.
+    skinless: params.has('skinless') ? params.get('skinless') === '1' : startsSkinless(media),
     // A valid `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: readOption(LINKABLE_SOURCE_IDS, params.get('source'), MEDIA[media].entrySource ?? DEFAULT_SOURCE),
     autoplay: params.get('autoplay') === '1',
@@ -148,6 +159,7 @@ export function App() {
   const [media, setMedia] = useState<MediaId>(initial.media);
   const [skins, setSkins] = useState(initial.skins);
   const [skin, setSkin] = useState(initial.skin);
+  const [skinless, setSkinless] = useState(initial.skinless);
   const [source, setSource] = useState(initial.source);
   const [autoplay, setAutoplay] = useState(initial.autoplay);
   const [muted, setMuted] = useState(initial.muted);
@@ -179,8 +191,8 @@ export function App() {
   // The frames: one for the selection, or two differing on the compared axis. The first panel is what the navbar
   // reports as the resolved skin source.
   const selection: SkinSelection = useMemo(
-    () => ({ platform, styling, skins, skin, media }),
-    [platform, styling, skins, skin, media]
+    () => ({ platform, styling, skins, skin, skinless, media }),
+    [platform, styling, skins, skin, skinless, media]
   );
   const panels = useMemo(() => comparePanels(selection, compare), [selection, compare]);
   const skinSource = panels[0]?.skins ?? 'package';
@@ -202,6 +214,7 @@ export function App() {
   const frames = useRef(new Map<string, HTMLIFrameElement>());
   const previousPreviewState = useRef({
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -220,6 +233,7 @@ export function App() {
   const mirroring = mirror && compare !== 'off';
   const frameParams: FrameParams = {
     media,
+    skinless,
     source,
     autoplay,
     muted,
@@ -260,6 +274,8 @@ export function App() {
 
     if (ratio !== '16:9') params.set('ratio', ratio);
 
+    if (skinless !== startsSkinless(media)) params.set('skinless', skinless ? '1' : '0');
+
     if (skins !== undefined) params.set('skins', skins);
 
     if (compare !== 'off') {
@@ -277,6 +293,7 @@ export function App() {
     skins,
     media,
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -313,6 +330,8 @@ export function App() {
 
     if (previous.skin !== skin) post({ type: 'skin-change', skin });
 
+    if (previous.skinless !== skinless) post({ type: 'skinless-change', skinless });
+
     if (previous.source !== source) post({ type: 'source-change', source });
 
     if (previous.autoplay !== autoplay) post({ type: 'autoplay-change', autoplay });
@@ -339,6 +358,7 @@ export function App() {
 
     previousPreviewState.current = {
       skin,
+      skinless,
       source,
       autoplay,
       muted,
@@ -354,6 +374,7 @@ export function App() {
     };
   }, [
     skin,
+    skinless,
     source,
     autoplay,
     muted,
@@ -432,13 +453,14 @@ export function App() {
     if (compare !== 'off' && !compareAvailable(compare, selection)) setCompare('off');
   }, [compare, selection]);
 
-  // Land on the media's own source in the same update that switches media — `readParams` covers the first-mount half.
-  // Switching remounts the preview frame with the URL of that render, so a source fixed up by an effect afterwards would
-  // be posted to a page that is still loading and lost.
+  // Land on the media's own source and skin default in the same update that switches media — `readParams` covers the
+  // first-mount half. Switching remounts the preview frame with the URL of that render, so a value fixed up by an effect
+  // afterwards would be posted to a page that is still loading and lost.
   const handleMediaChange = useCallback(
     (value: MediaId) => {
       setMedia(value);
       setSource((current) => landingSource(value, platform, current));
+      setSkinless(startsSkinless(value));
     },
     [platform]
   );
@@ -488,6 +510,10 @@ export function App() {
       target.postMessage({ type: 'skin-change', skin: panel.skin }, '*');
     }
 
+    if (frameQuery.get('skinless') !== (skinless ? '1' : '0')) {
+      target.postMessage({ type: 'skinless-change', skinless }, '*');
+    }
+
     if (frameQuery.get('source') !== source) target.postMessage({ type: 'source-change', source }, '*');
 
     postPreferences(target, frameParams);
@@ -497,6 +523,7 @@ export function App() {
     platform,
     media,
     skin,
+    skinless,
     styling,
     skins: skinSource,
     width: playerWidth,
@@ -537,6 +564,7 @@ export function App() {
               onStylingChange={handleStylingChange}
               skin={skin}
               onSkinChange={setSkin}
+              skinless={skinless}
               skins={skinSource}
               onSkinsChange={handleSkinsChange}
               compare={compare}
@@ -578,6 +606,9 @@ export function App() {
           onPreloadChange={setPreload}
           captions={captions}
           onCaptionsChange={setCaptions}
+          skinless={skinless}
+          onSkinlessChange={setSkinless}
+          skinlessDisabled={!hasSkinChoice(media)}
           preferences={preferences}
         />
       </div>
