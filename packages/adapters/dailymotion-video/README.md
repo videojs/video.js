@@ -23,7 +23,8 @@ video page URL:
 <dailymotion-video src="https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87"></dailymotion-video>
 ```
 
-Turn the player configuration's controls off so they don't sit under the Video.js skin.
+Dailymotion's terms don't allow covering its player, so use it without a Video.js skin: the player configuration decides
+which of Dailymotion's controls show.
 
 ## License
 
