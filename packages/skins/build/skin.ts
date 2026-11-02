@@ -25,18 +25,14 @@ export function skinDirectory(name: SkinName): string {
   return skinPreset(name);
 }
 
-/** Runtime stylesheet entry carrying the shared, preset, and catalog theme tokens relative to `src/styles`. */
+/** Runtime stylesheet entry carrying the shared rules and the catalog theme's tokens relative to `src/styles`. */
 export function skinBaseStylesheet(preset: SkinPreset, theme: SkinTheme = 'default'): string {
-  const media = skinMedia(preset);
-
-  return `${media}/${theme === 'default' ? 'base' : theme}.css`;
+  return `${skinMedia(preset)}/${theme}.css`;
 }
 
 /** Registry style item that owns one skin's exact stylesheet dependency closure. */
 export function skinStyleItemName(preset: SkinPreset, theme: SkinTheme): string {
-  const media = skinMedia(preset);
-
-  return `_style-${media}${theme === 'default' ? '' : `-${theme}`}`;
+  return `_style-${skinMedia(preset)}-${theme}`;
 }
 
 export function isSkinPreset(value: string): value is SkinPreset {

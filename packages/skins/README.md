@@ -31,11 +31,9 @@ Follow one skin from source to output.
 
 [`base.css`](./src/styles/base.css) fixes the cascade: `base.theme` holds tokens and `base.preferences` overrides them, so a reduced motion, reduced transparency, or forced colors preference wins regardless of selector specificity.
 
-- [`themes/theme.css`](./src/styles/themes/theme.css) declares every default token, grouped by colors, shadows, controls, motion, popups, sliders, and frame.
-- [`themes/neutral.css`](./src/styles/themes/neutral.css) and [`themes/compat.css`](./src/styles/themes/compat.css) override tokens for their respective skins.
-- [`video/theme.css`](./src/styles/video/theme.css) and [`audio/theme.css`](./src/styles/audio/theme.css) override tokens per media preset.
+- [`themes/default.css`](./src/styles/themes/default.css), [`themes/neutral.css`](./src/styles/themes/neutral.css), [`themes/compat.css`](./src/styles/themes/compat.css), and [`themes/scaffold.css`](./src/styles/themes/scaffold.css) each declare every token their skin uses, scoped to its `data-theme`. Video and audio adjustments follow the shared tokens in the same file. No skin inherits another's tokens; [`style-layers.test.ts`](./src/tests/style-layers.test.ts) checks that each declares every default token.
 - [`themes/preferences.css`](./src/styles/themes/preferences.css) collapses durations and neutralizes hidden-state values under reduced motion, and switches backdrop filters off under reduced transparency.
-- [`video/base.css`](./src/styles/video/base.css) and [`audio/base.css`](./src/styles/audio/base.css) are the default preset entries. Their adjacent `neutral.css` and `compat.css` entries add the selected theme layer.
+- [`video/base.css`](./src/styles/video/base.css) and [`audio/base.css`](./src/styles/audio/base.css) hold the shared rules for each media type. The adjacent `<theme>.css` entries add that skin's tokens.
 - [`vars.ts`](./src/styles/vars.ts) classifies every token as public, runtime, or internal. [`utilities.ts`](./src/styles/utilities.ts) describes every shared utility, variant, and computed theme key.
 
 ## Tailwind entry files

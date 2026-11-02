@@ -26,7 +26,7 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
       target: `styles/themes/${target.theme}.css`,
       files: { [`./styles/themes/${target.theme}.css`]: `styles/themes/${target.theme}.css` },
       title: `Video.js ${label} theme`,
-      description: 'Editable token overrides for this skin catalog.',
+      description: 'Editable tokens for this skin catalog.',
     },
     {
       ...shared,
@@ -35,10 +35,9 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
       files: {
         './styles/video/base.css': 'styles/video/base.css',
         './styles/video/captions.css': 'styles/video/captions.css',
-        './styles/video/theme.css': 'styles/video/theme.css',
       },
       title: 'Video.js video styles',
-      description: 'Editable resets and token overrides used only by video skins.',
+      description: 'Editable caption styles used only by video skins.',
       registryDependencies: ['@videojs/_style-theme'],
     },
     {
@@ -54,12 +53,9 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
       ...shared,
       name: '_style-audio',
       target: 'styles/audio/base.css',
-      files: {
-        './styles/audio/base.css': 'styles/audio/base.css',
-        './styles/audio/theme.css': 'styles/audio/theme.css',
-      },
+      files: { './styles/audio/base.css': 'styles/audio/base.css' },
       title: 'Video.js audio styles',
-      description: 'Editable resets and token overrides used only by audio skins.',
+      description: 'Stylesheet entry shared by audio skins.',
       registryDependencies: ['@videojs/_style-theme'],
     },
     {
@@ -82,15 +78,12 @@ export function registryStyles(target: RegistryTarget): RegistryStylesOptions {
       files: {
         './styles/base.css': 'styles/base.css',
         './styles/themes/preferences.css': 'styles/themes/preferences.css',
-        './styles/themes/theme.css': 'styles/themes/theme.css',
       },
       title: 'Video.js media theme',
-      description: 'Editable shared media tokens, resets, preferences, and Tailwind compiler integration.',
+      description: 'Editable shared resets, preferences, and Tailwind compiler integration.',
       tailwind: target.styling === 'tailwind' ? './styles/tailwind.css' : undefined,
     },
-    themes: themes.filter(
-      ({ name }) => target.theme !== 'default' || name === '_style-video' || name === '_style-audio'
-    ),
+    themes,
     files: target.framework === 'react' && target.styling === 'css' ? 'styles' : undefined,
   };
 }

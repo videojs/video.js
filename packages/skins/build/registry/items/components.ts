@@ -46,13 +46,7 @@ export function componentItem(
     group: 'ui',
     directives: ['use client'],
     target: `ui/${meta.name}.tsx`,
-    theme: [
-      ...(target.theme === 'neutral' ? ['styles/themes/neutral.css'] : []),
-      'styles/base.css',
-      'styles/audio/theme.css',
-      'styles/video/captions.css',
-      'styles/video/theme.css',
-    ],
+    theme: ['styles/base.css', `styles/themes/${target.theme}.css`, 'styles/video/captions.css'],
   };
 }
 
