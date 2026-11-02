@@ -7,28 +7,3 @@
 
   initializeDocsNavigation();
 </script>
-
-{
-  /*
-  We need to enable view transitions to get access to pageswap and pagereveal
-  However, something in our app is causing Safari to get all flickery during transitions,
-  so that's where view-transition-name: none comes in.
-  (btw, I think it's related to FilmGrain. Stuff doesn't seem to flicker when that's not present)
-*/
-}
-<style is:global>
-  @view-transition {
-    navigation: auto;
-  }
-  html,
-  body {
-    view-transition-name: none;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    ::view-transition-group(*),
-    ::view-transition-old(*),
-    ::view-transition-new(*) {
-      animation: none;
-    }
-  }
-</style>

@@ -22,7 +22,7 @@ const { title, subtitle, description, llms = false } = Astro.props;
     {llms && <MarkdownAlternate />}
   </Fragment>
   <NavBar />
-  <main id="main-content" class="mt-10 px-6 pb-24 md:mt-20 md:px-10">
+  <main id="main-content" class="vt-page mt-10 px-6 pb-24 md:mt-20 md:px-10">
     <article
       class="@container text-p2 sm:text-p15"
       data-llms-content={llms ? '' : undefined}
