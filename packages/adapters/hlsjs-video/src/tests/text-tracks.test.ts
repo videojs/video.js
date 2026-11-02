@@ -329,6 +329,58 @@ describe('HlsJsTextTracksMixin', () => {
     }
   });
 
+  it('re-creates the subtitle tracks with their mode when the same source re-attaches', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      hlsTracks(video)[0]!.track.mode = 'showing';
+
+      // `hls.recoverMediaError()` detaches and re-attaches the media without reloading the manifest.
+      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+      expect(hlsTracks(video)).toHaveLength(0);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+      const [trackEl] = hlsTracks(video);
+
+      expect(hlsTracks(video)).toHaveLength(1);
+      expect(trackEl).toMatchObject({ id: 'subtitles0', kind: 'subtitles', label: 'German', srclang: 'de' });
+      expect(trackEl!.track.mode).toBe('showing');
+    } finally {
+      restore();
+    }
+  });
+
+  it('does not carry track modes over to a new manifest', () => {
+    const engine = fakeEngine();
+    const host = new TextTracksHost(engine);
+    const video = document.createElement('video');
+    const restore = stubTrackSupport(video);
+
+    try {
+      host.attach(video);
+
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      hlsTracks(video)[0]!.track.mode = 'showing';
+
+      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+      expect(hlsTracks(video)).toHaveLength(1);
+      expect(hlsTracks(video)[0]!.track.mode).toBe('disabled');
+    } finally {
+      restore();
+    }
+  });
+
   it('drops the tracks when the engine is destroyed', () => {
     const engine = fakeEngine();
     const host = new TextTracksHost(engine);
