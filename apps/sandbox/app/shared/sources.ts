@@ -625,7 +625,7 @@ const SOURCE_MAP = {
   // embed without. `x8lr5` is the one Dailymotion's own docs embed with: controls,
   // autostart, and autonext on. `x165s8` is the only public configuration found
   // with autostart and ads off, the one that takes a seek made before the first
-  // play. The last three show what a bad Player ID does.
+  // play.
   'dailymotion-default': {
     label: 'Dailymotion - Default (x8lr5)',
     url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87',
@@ -648,23 +648,6 @@ const SOURCE_MAP = {
   'dailymotion-scale-fill': {
     label: 'Dailymotion - Crop to fill (scaleMode, try 1:1)',
     url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&scaleMode=fill',
-    type: 'dailymotion',
-  },
-  'dailymotion-no-player-id': {
-    label: 'Dailymotion - No Player ID (error)',
-    url: 'https://geo.dailymotion.com/player.html?video=x84sh87',
-    type: 'dailymotion',
-  },
-  'dailymotion-malformed-player-id': {
-    label: 'Dailymotion - Malformed Player ID (error)',
-    url: 'https://geo.dailymotion.com/player/abc12.html?video=x84sh87',
-    type: 'dailymotion',
-  },
-  // Shaped like a Dailymotion ID but not one, so Dailymotion silently plays it
-  // with its default configuration.
-  'dailymotion-unknown-player-id': {
-    label: 'Dailymotion - Unknown Player ID',
-    url: 'https://geo.dailymotion.com/player/xdefaul.html?video=x84sh87',
     type: 'dailymotion',
   },
 } satisfies Record<string, SandboxSource>;

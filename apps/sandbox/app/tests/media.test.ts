@@ -163,9 +163,6 @@ describe('mediaSources', () => {
       'dailymotion-no-autostart',
       'dailymotion-start-time',
       'dailymotion-scale-fill',
-      'dailymotion-no-player-id',
-      'dailymotion-malformed-player-id',
-      'dailymotion-unknown-player-id',
     ]);
 
     for (const platform of ['html', 'react', 'cdn'] as const) {
