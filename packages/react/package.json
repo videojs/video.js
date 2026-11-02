@@ -179,6 +179,7 @@
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
@@ -204,6 +205,7 @@
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
@@ -225,6 +227,9 @@
   },
   "peerDependenciesMeta": {
     "@videojs/cloudflare-video": {
+      "optional": true
+    },
+    "@videojs/dailymotion-video": {
       "optional": true
     },
     "@videojs/dash-video": {

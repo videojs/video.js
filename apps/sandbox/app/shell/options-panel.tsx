@@ -59,6 +59,10 @@ export type OptionsPanelProps = {
   onPreloadChange: (value: PreloadValue) => void;
   captions: CaptionsMode;
   onCaptionsChange: (value: CaptionsMode) => void;
+  /** Render the media alone, in place of the skin. */
+  skinless: boolean;
+  onSkinlessChange: (value: boolean) => void;
+  skinlessDisabled: boolean;
   preferences: Preferences;
 };
 
@@ -111,6 +115,9 @@ export function OptionsPanel({
   onPreloadChange,
   captions,
   onCaptionsChange,
+  skinless,
+  onSkinlessChange,
+  skinlessDisabled,
   preferences,
 }: OptionsPanelProps) {
   const { isMobile, setOpen, setOpenMobile } = useSidebar();
@@ -130,6 +137,7 @@ export function OptionsPanel({
   const loopId = useId();
   const preloadId = useId();
   const captionsId = useId();
+  const skinlessId = useId();
 
   return (
     <Sidebar
@@ -196,6 +204,13 @@ export function OptionsPanel({
             optionGroups={SANDBOX_LOCALE_OPTION_GROUPS}
           />
           <ColorItem id={accentColorId} value={accentColor} onChange={onAccentColorChange} />
+          <SwitchItem
+            id={skinlessId}
+            label="No skin"
+            checked={skinless}
+            onChange={onSkinlessChange}
+            disabled={skinlessDisabled}
+          />
         </Section>
 
         <Section title="Playback">
@@ -397,15 +412,16 @@ type SwitchItemProps = {
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 };
 
-function SwitchItem({ id, label, checked, onChange }: SwitchItemProps) {
+function SwitchItem({ id, label, checked, onChange, disabled = false }: SwitchItemProps) {
   return (
     <>
       <Label htmlFor={id} className="text-muted-foreground cursor-pointer font-normal whitespace-nowrap">
         {label}
       </Label>
-      <Switch id={id} checked={checked} onCheckedChange={onChange} className="justify-self-end" />
+      <Switch id={id} checked={checked} onCheckedChange={onChange} disabled={disabled} className="justify-self-end" />
     </>
   );
 }
