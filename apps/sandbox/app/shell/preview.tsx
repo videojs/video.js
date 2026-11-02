@@ -26,6 +26,8 @@ const TAILWIND_ICON =
 /** Everything the frames share; the panels carry what differs. */
 export interface FrameParams {
   readonly media: MediaId;
+  /** Render the media alone, in place of the skin. */
+  readonly skinless: boolean;
   readonly source: SourceId;
   readonly autoplay: boolean;
   readonly muted: boolean;
@@ -70,6 +72,7 @@ function buildUrl(panel: ComparePanel, params: FrameParams, bustCache = false): 
     skin: panel.skin,
     styling: panel.styling,
     skins: panel.skins,
+    skinless: params.skinless ? '1' : '0',
     source: params.source,
     autoplay: params.autoplay ? '1' : '0',
     muted: params.muted ? '1' : '0',
