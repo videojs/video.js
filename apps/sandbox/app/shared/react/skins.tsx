@@ -3,7 +3,7 @@ import type { Skin, SkinSource, Styling } from '@app/types';
 import type { AudioSkinProps } from '@videojs/react/audio';
 import type { VideoSkinProps } from '@videojs/react/video';
 import type { ComponentType, ReactNode, Ref, RefObject } from 'react';
-import { createElement, useEffect, useRef, useState } from 'react';
+import { Children, cloneElement, createElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 import { applyCaptionTracks, type CaptionsMode } from '../captions';
 import { findMediaElement } from '../media-element';
@@ -192,11 +192,16 @@ interface NoSkinProps {
   ref?: Ref<HTMLDivElement> | undefined;
 }
 
-/** Stands in for a skin when the shell turns skins off: the media alone, framed as a skin would be. */
+/**
+ * Stands in for a skin when the shell turns skins off: the media alone with its native controls, framed as a skin would
+ * be.
+ */
 function NoSkin({ children, className, dir, ref }: NoSkinProps) {
   return (
     <div className={`relative w-full ${className ?? ''}`} dir={dir} ref={ref}>
-      {children}
+      {Children.map(children, (child) =>
+        isValidElement<{ controls?: boolean }>(child) ? cloneElement(child, { controls: true }) : child
+      )}
     </div>
   );
 }

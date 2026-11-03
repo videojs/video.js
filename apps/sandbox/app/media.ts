@@ -378,6 +378,13 @@ export function hasSkinChoice(media: MediaId): boolean {
   return MEDIA[media].player !== 'background';
 }
 
+/** Native audio has no frame to show without a skin, so only an embed, which draws its own player, can drop it. */
+export function hasNoSkinChoice(media: MediaId): boolean {
+  const { player, embed } = MEDIA[media];
+
+  return player === 'audio' ? embed === true : hasSkinChoice(media);
+}
+
 /** Whether the preview starts without a skin when this media is entered. */
 export function startsSkinless(media: MediaId): boolean {
   return MEDIA[media].skinless === true;
