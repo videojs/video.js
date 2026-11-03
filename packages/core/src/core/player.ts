@@ -3,11 +3,12 @@ import type { AnySlice, InferSliceSourceState, Slice } from '@videojs/store';
 import type { CamelCase } from '@videojs/utils/types';
 
 /**
- * The target a platform-neutral feature declares. It asks only for `media`, so the feature composes into any platform's
- * store: `combine` intersects it with that platform's full target.
+ * The target a platform-neutral feature declares. It holds a `media` and a `container` for features that need a
+ * container. `container` can be narrowed to a platform specific type (eg, `HTMLElement`)
  */
 export interface PlayerMediaTarget {
   media: Media;
+  container: unknown | null;
 }
 
 type ConfigValue = string | readonly number[] | null | undefined;
