@@ -140,7 +140,9 @@ Supports the native media methods. See [`HTMLAudioElement`](https://developer.mo
 
 ### Props
 
-Accepts the standard React props for a native `<audio>`, plus these Video.js-specific props:
+Accepts the standard React props for a native `<audio>`: <span class="code-list">{['autoPlay', 'controls', 'controlsList', 'crossOrigin', 'loop', 'muted', 'preload', 'src'].map((name) => <CodeChip value={name} />)}</span>
+
+`Audio` also accepts `children` and common element props such as `className` and `style`, plus these Video.js-specific props:
 
 <Table outerClass="my-6">
   <Thead>
@@ -195,5 +197,7 @@ Fires the standard media events: <span class="code-list">{['abort', 'canplay', '
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Handle standard media events with React event props such as `onPlay` and `onTimeUpdate`. For native events without a React prop, such as `waitingforkey`, attach a listener through the ref with `addEventListener`.
+Accepts the standard React media event props: <span class="code-list">{['onAbort', 'onCanPlay', 'onCanPlayThrough', 'onDurationChange', 'onEmptied', 'onEncrypted', 'onEnded', 'onError', 'onLoadedData', 'onLoadedMetadata', 'onLoadStart', 'onPause', 'onPlay', 'onPlaying', 'onProgress', 'onRateChange', 'onSeeked', 'onSeeking', 'onStalled', 'onSuspend', 'onTimeUpdate', 'onVolumeChange', 'onWaiting'].map((name) => <CodeChip value={name} />)}</span>
+
+The native `waitingforkey` event has no React prop. Attach a listener through the ref with `addEventListener`.
 </FrameworkCase>
