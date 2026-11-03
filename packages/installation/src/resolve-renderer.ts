@@ -12,9 +12,14 @@ const ADAPTER_TYPE_RENDERERS: Record<AdapterType, readonly Renderer[]> = {
   wistia: [],
   mux: ['mux-video', 'mux-audio', 'mux-background-video'],
   cloudflare: ['cloudflare'],
+  // No SoundCloud or Mixcloud renderer is offered yet.
+  soundcloud: [],
+  mixcloud: [],
   spotify: ['spotify'],
   tiktok: ['tiktok'],
   twitch: ['twitch'],
+  // No Dailymotion renderer is offered yet.
+  dailymotion: [],
   hls: ['hls', 'hls-background-video'],
   dash: ['dash'],
   video: ['html5-video', 'background-video'],

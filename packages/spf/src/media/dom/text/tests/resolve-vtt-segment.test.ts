@@ -152,6 +152,46 @@ Second
     expect(cues2[0]!.text).toBe('Second');
   });
 
+  it.each([
+    { credentials: undefined, crossOrigin: 'anonymous' },
+    { credentials: 'same-origin', crossOrigin: 'anonymous' },
+    { credentials: 'include', crossOrigin: 'use-credentials' },
+  ] as const)('loads with credentials=$credentials in $crossOrigin CORS mode', async ({ credentials, crossOrigin }) => {
+    const vttDataUrl = `data:text/vtt,${encodeURIComponent('WEBVTT\n\n')}`;
+    const createElement = vi.spyOn(document, 'createElement');
+
+    try {
+      await resolveVttSegment(vttDataUrl, { credentials });
+
+      const video = createElement.mock.results.find(({ value }) => value instanceof HTMLVideoElement)!.value;
+
+      expect(video.crossOrigin).toBe(crossOrigin);
+    } finally {
+      createElement.mockRestore();
+    }
+  });
+
+  it('keeps a separate parser per CORS mode', async () => {
+    const vttDataUrl = `data:text/vtt,${encodeURIComponent('WEBVTT\n\n')}`;
+    const createElement = vi.spyOn(document, 'createElement');
+
+    try {
+      await Promise.all([
+        resolveVttSegment(vttDataUrl),
+        resolveVttSegment(vttDataUrl, { credentials: 'include' }),
+        resolveVttSegment(vttDataUrl, { credentials: 'include' }),
+      ]);
+
+      const videos = createElement.mock.results
+        .map(({ value }) => value)
+        .filter((value): value is HTMLVideoElement => value instanceof HTMLVideoElement);
+
+      expect(videos.map((video) => video.crossOrigin)).toEqual(['anonymous', 'use-credentials']);
+    } finally {
+      createElement.mockRestore();
+    }
+  });
+
   it('cleans up dummy elements on destroy', async () => {
     const vttDataUrl =
       'data:text/vtt,' +

@@ -6,5 +6,6 @@
     "declarationDir": "types",
     "useDefineForClassFields": false
   },
+  "references": [{ "path": "../utils" }],
   "include": ["src"]
 }

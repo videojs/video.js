@@ -26,16 +26,22 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
   static override properties = {
     ...MenuRadioGroupElement.properties,
     disabled: { type: Boolean },
-  } satisfies PropertyDeclarationMap<'value' | 'disabled'>;
+    rates: { type: String },
+  } satisfies PropertyDeclarationMap<'value' | 'disabled' | 'rates'>;
 
   disabled = false;
+  rates: readonly number[] | string | undefined = undefined;
   formatRate = PlaybackRateRadioGroupCore.defaultProps.formatRate;
 
   readonly #core = new PlaybackRateRadioGroupCore();
   readonly #i18n = new I18nController(this, i18nContext);
   readonly #mediaState = new PlayerController(this, playerContext, selectPlaybackRate);
   readonly #options = new RadioOptionsController<PlaybackRateRadioGroupOption>(this, {
-    setItemAttributes: (item, option) => item.setAttribute('data-rate', option.value),
+    setItemAttributes: (item, option) => {
+      item.setAttribute('data-rate', option.value);
+      item.toggleAttribute('data-custom', option.custom);
+    },
+    getOptionCacheKey: (option) => (option.custom ? 'custom' : ''),
     onValueChange: (value) => {
       const media = this.#mediaState.value;
 
@@ -58,7 +64,7 @@ export class PlaybackRateRadioGroupElement extends MenuRadioGroupElement {
     let state: PlaybackRateRadioGroupState | null = null;
 
     if (media) {
-      this.#core.setProps({ formatRate: this.formatRate, disabled: this.disabled });
+      this.#core.setProps({ formatRate: this.formatRate, disabled: this.disabled, rates: this.rates });
       this.#core.setMedia(media);
       state = this.#core.getState();
 

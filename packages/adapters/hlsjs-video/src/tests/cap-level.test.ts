@@ -1,5 +1,5 @@
 import type { MediaResolution } from '@videojs/media';
-import Hls, { type Level } from 'hls.js';
+import Hls, { CapLevelController, type Level } from 'hls.js';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import {
@@ -65,7 +65,8 @@ const emit = (engine: Hls, event: string, data: unknown) => (engine as any).emit
 const controllers: Array<{ destroy(): void }> = [];
 
 afterEach(() => {
-  // `startCapping()` opens a one-second interval; destroying clears it.
+  // Without `ResizeObserver`, as in jsdom, capping opens a one-second
+  // interval; destroying clears it.
   while (controllers.length) controllers.pop()!.destroy();
 
   document.body.innerHTML = '';
@@ -86,6 +87,10 @@ interface SetupOptions {
   config?: Record<string, unknown>;
   /** Rendered size of the video element; omit to leave it unmeasurable. */
   playerSize?: { width: number; height: number };
+  /** Attach the element before the manifest is parsed, as the adapter does. */
+  attachFirst?: boolean;
+  /** Whether the manifest's codecs signal video. Hls.js otherwise waits for `BUFFER_CODECS` to confirm it. */
+  manifestSignalsVideo?: boolean;
 }
 
 function setup({
@@ -95,6 +100,8 @@ function setup({
   levels = LADDER,
   config,
   playerSize,
+  attachFirst = false,
+  manifestSignalsVideo = true,
 }: SetupOptions = {}) {
   const policy: RenditionCapPolicy = { maxAutoResolution, capToPlayerSize, minAutoResolution };
   const engine = createEngine(levels, config);
@@ -103,10 +110,9 @@ function setup({
 
   controllers.push(controller);
 
-  // hls.js starts its capping loop from here when the manifest signals video.
-  emit(engine, Hls.Events.MANIFEST_PARSED, { levels, firstLevel: 0, video: true });
+  const attach = () => {
+    if (!playerSize) return;
 
-  if (playerSize) {
     const video = document.createElement('video');
 
     // jsdom reports an empty bounding rect, and hls.js falls back to the
@@ -115,7 +121,14 @@ function setup({
     video.height = playerSize.height;
     document.body.appendChild(video);
     emit(engine, Hls.Events.MEDIA_ATTACHING, { media: video });
-  }
+  };
+
+  if (attachFirst) attach();
+
+  // hls.js starts its capping loop from here when the manifest signals video.
+  emit(engine, Hls.Events.MANIFEST_PARSED, { levels, firstLevel: 0, video: manifestSignalsVideo });
+
+  if (!attachFirst) attach();
 
   return { policy, engine, controller, topIndex: levels.length - 1 };
 }
@@ -423,6 +436,32 @@ describe('createCapLevelController', () => {
       expect(engine.autoLevelCapping).toBe(-1);
     });
 
+    it('ignores the player size when the cap is re-applied', () => {
+      const { engine, policy } = setup({
+        maxAutoResolution: '1440p',
+        playerSize: { width: 320, height: 180 },
+        ...noSizeCapping,
+      });
+
+      policy.maxAutoResolution = '1080p';
+      policy.controller!.apply();
+
+      expect(engine.autoLevelCapping).toBe(3);
+    });
+
+    it('ignores the player size when the element is attached before the manifest', () => {
+      // hls.js confirms video through `startCapping()` even while its loop is
+      // switched off, and only declines inside it.
+      const { engine } = setup({
+        maxAutoResolution: '1440p',
+        playerSize: { width: 320, height: 180 },
+        attachFirst: true,
+        ...noSizeCapping,
+      });
+
+      expect(engine.autoLevelCapping).toBe(4);
+    });
+
     it('re-resolves the cap after levels are updated', () => {
       const { engine } = setup({ maxAutoResolution: '720p', ...noSizeCapping });
 
@@ -444,7 +483,7 @@ describe('createCapLevelController', () => {
     const engine = createEngine(LADDER);
     const seen: number[] = [];
 
-    class CustomController extends Hls.DefaultConfig.capLevelController {
+    class CustomController extends CapLevelController {
       getMaxLevel(capLevelIndex: number): number {
         seen.push(capLevelIndex);
         // Ignore the player size entirely; allow everything.
@@ -459,6 +498,62 @@ describe('createCapLevelController', () => {
 
     expect(controller.getMaxLevel(4)).toBe(2);
     expect(seen).toEqual([4]);
+  });
+
+  describe('with a ResizeObserver', () => {
+    // hls.js measures from the observer it opens on attach, before anything
+    // confirms video and without going through `startCapping()`.
+    class ResizeObserverStub {
+      observe = vi.fn((target: Element) => {
+        // A real observer reports the initial size once observation starts.
+        const { width, height } = target as HTMLVideoElement;
+        const entry = { target, contentRect: { width, height } } as unknown as ResizeObserverEntry;
+
+        this.callback([entry], this as unknown as ResizeObserver);
+      });
+      unobserve = vi.fn();
+      disconnect = vi.fn();
+
+      constructor(readonly callback: ResizeObserverCallback) {}
+    }
+
+    it('keeps the player-size cap while the manifest leaves video unconfirmed', () => {
+      vi.stubGlobal('ResizeObserver', ResizeObserverStub);
+
+      const { engine } = setup({
+        playerSize: { width: 320, height: 180 },
+        attachFirst: true,
+        manifestSignalsVideo: false,
+      });
+
+      expect(engine.autoLevelCapping).toBe(0);
+
+      emit(engine, Hls.Events.BUFFER_CODECS, { video: {} });
+
+      expect(engine.autoLevelCapping).toBe(0);
+    });
+
+    it('keeps the player-size cap when the cap is re-applied after reattaching', () => {
+      vi.stubGlobal('ResizeObserver', ResizeObserverStub);
+
+      const { engine, policy } = setup({ playerSize: { width: 320, height: 180 }, attachFirst: true });
+
+      expect(engine.autoLevelCapping).toBe(0);
+
+      // Detaching stops capping; attaching again restarts the observer only.
+      const video = document.createElement('video');
+
+      video.width = 320;
+      video.height = 180;
+      document.body.appendChild(video);
+      emit(engine, Hls.Events.MEDIA_DETACHING, {});
+      emit(engine, Hls.Events.MEDIA_ATTACHING, { media: video });
+
+      policy.maxAutoResolution = '1080p';
+      policy.controller!.apply();
+
+      expect(engine.autoLevelCapping).toBe(0);
+    });
   });
 
   describe('capToPlayerSize', () => {

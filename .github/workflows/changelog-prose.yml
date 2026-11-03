@@ -23,7 +23,7 @@ concurrency:
 jobs:
   dispatch:
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@videojs/core@')
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     permissions:
       actions: write
 
@@ -47,7 +47,7 @@ jobs:
   # agent drive `gh` and `git` itself made every run overrun the job timeout.
   prose:
     if: github.event_name == 'workflow_dispatch' && startsWith(inputs.tag_name, '@videojs/core@')
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 30
     permissions:
       actions: read

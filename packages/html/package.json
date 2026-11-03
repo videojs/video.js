@@ -180,16 +180,19 @@
   },
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/skins": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
@@ -201,14 +204,17 @@
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
+    "@videojs/mixcloud-audio": "workspace:*",
     "@videojs/mux-audio": "workspace:*",
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
+    "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
     "@videojs/tiktok-video": "workspace:*",
     "@videojs/twitch-video": "workspace:*",
@@ -220,6 +226,9 @@
     "@videojs/cloudflare-video": {
       "optional": true
     },
+    "@videojs/dailymotion-video": {
+      "optional": true
+    },
     "@videojs/dash-video": {
       "optional": true
     },
@@ -227,6 +236,9 @@
       "optional": true
     },
     "@videojs/hlsjs-video": {
+      "optional": true
+    },
+    "@videojs/mixcloud-audio": {
       "optional": true
     },
     "@videojs/mux-audio": {
@@ -242,6 +254,9 @@
       "optional": true
     },
     "@videojs/shaka-video": {
+      "optional": true
+    },
+    "@videojs/soundcloud-audio": {
       "optional": true
     },
     "@videojs/spotify-audio": {

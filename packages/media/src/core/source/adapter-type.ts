@@ -1,4 +1,7 @@
 import { parseCloudflareSource } from './cloudflare';
+import { parseDailymotionSource } from './dailymotion';
+import { parseMixcloudSource } from './mixcloud';
+import { parseSoundCloudSource } from './soundcloud';
 import { parseSpotifySource } from './spotify';
 import { parseTikTokSource } from './tiktok';
 import { parseTwitchSource } from './twitch';
@@ -14,8 +17,11 @@ export type AdapterType =
   | 'mux'
   | 'cloudflare'
   | 'spotify'
+  | 'soundcloud'
+  | 'mixcloud'
   | 'tiktok'
   | 'twitch'
+  | 'dailymotion'
   | 'hls'
   | 'dash'
   | 'video'
@@ -23,8 +29,9 @@ export type AdapterType =
 
 /**
  * Resolve which type of adapter plays a source URL, so you can render the media component for it and pass it the same
- * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, TikTok, and Twitch URLs; HLS and DASH
- * manifests; and video and audio files, by MIME type when you pass one and by file extension otherwise.
+ * `src`. Recognizes YouTube, Vimeo, Wistia, Mux, Cloudflare Stream, Spotify, SoundCloud, Mixcloud, TikTok, Twitch, and
+ * Dailymotion URLs; HLS and DASH manifests; and video and audio files, by MIME type when you pass one and by file
+ * extension otherwise.
  *
  * Returns `null` for anything else, including bare ids: an 11-character YouTube id and a 10-character Wistia id look
  * alike, so services are only matched on URLs, `spotify:` URIs, and `youtube/<id>` and `vimeo/<id>` shorthands.
@@ -93,9 +100,15 @@ function fromService(src: string): AdapterType | null {
 
   if (host === 'open.spotify.com') return parseSpotifySource(src) ? 'spotify' : null;
 
+  if (isHost(host, 'soundcloud.com')) return parseSoundCloudSource(src) ? 'soundcloud' : null;
+
+  if (isHost(host, 'mixcloud.com')) return parseMixcloudSource(src) ? 'mixcloud' : null;
+
   if (TIKTOK_HOSTS.has(host)) return parseTikTokSource(src) ? 'tiktok' : null;
 
   if (TWITCH_HOSTS.has(host)) return parseTwitchSource(src) ? 'twitch' : null;
+
+  if (DAILYMOTION_HOSTS.has(host)) return parseDailymotionSource(src) ? 'dailymotion' : null;
 
   return null;
 }
@@ -155,6 +168,7 @@ const VIMEO_HOSTS = new Set(['vimeo.com', 'www.vimeo.com', 'player.vimeo.com']);
 const TIKTOK_HOSTS = new Set(['tiktok.com', 'www.tiktok.com']);
 // `clips.twitch.tv` is a different embed the Twitch media can't play.
 const TWITCH_HOSTS = new Set(['twitch.tv', 'www.twitch.tv', 'go.twitch.tv']);
+const DAILYMOTION_HOSTS = new Set(['dailymotion.com', 'www.dailymotion.com', 'geo.dailymotion.com', 'dai.ly']);
 
 const HLS_TYPES: ReadonlySet<string> = new Set([
   'application/vnd.apple.mpegurl',

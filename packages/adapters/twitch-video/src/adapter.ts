@@ -2,7 +2,7 @@
 // Source: https://github.com/muxinc/media-elements
 // License: MIT
 
-import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -84,7 +84,6 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
   #duration = Number.NaN;
   #volume = 1;
   #muted = false;
-  #playbackRate = 1;
   #progress = 0;
   #readyState = READY_STATE_HAVE_NOTHING;
   #error: MediaError | null = null;
@@ -309,14 +308,6 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#afterLoad(() => this.#sendCommand(COMMAND_SET_MUTED, value));
   }
 
-  get playbackRate() {
-    return this.#playbackRate;
-  }
-  set playbackRate(value) {
-    // The embed has no rate command, so this is reported back but never applied.
-    this.#playbackRate = value;
-  }
-
   get autoplay() {
     return this.#autoplay;
   }
@@ -395,14 +386,14 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     // `bufferSize` counts seconds buffered *ahead* of the playhead, so the range is anchored to `currentTime`.
     return this.#progress > 0
       ? createTimeRange(this.#currentTime, this.#currentTime + this.#progress)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     // A live channel reports an infinite duration and the embed exposes no DVR window to seek within.
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -528,7 +519,6 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     // Kept across a reset, so a load replayed after `ready` still builds the embed muted.
     this.#muted = this.#nextMuted;
     this.#paused = !this.#autoplay;
-    this.#playbackRate = 1;
     this.#progress = 0;
     this.#readyState = READY_STATE_HAVE_NOTHING;
     this.#seeking = false;

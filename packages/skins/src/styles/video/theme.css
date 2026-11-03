@@ -4,23 +4,25 @@
   .media-skin:is([data-preset="video"], [data-preset="live-video"]) {
     /* Light border for browsers without `light-dark()`; see the `@supports` block below. */
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.1));
-    /* Top and bottom scrims share one height and a smoothstep falloff, which avoids a hard edge where they fade out. */
-    --media-controls-gradient-height: 40%;
+    /* Top and bottom scrims share a smoothstep falloff, which avoids a hard edge where they fade out. The bottom one is
+       taller, as it sits behind the control bar. */
+    --media-controls-gradient-height: max(40%, calc(var(--media-spacing) * 40));
+    --media-controls-bottom-gradient-height: max(50%, calc(var(--media-spacing) * 60));
     /* Scrims for browsers without relative colors or gradient interpolation; the `@supports` blocks below refine them. */
     --media-controls-gradient: linear-gradient(
       to top,
-      color-mix(in oklab, var(--media-backdrop) 40%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 33.8%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 20%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 6.2%, transparent) 75%,
+      color-mix(in oklab, var(--media-backdrop) 60%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 50.7%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 30%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 9.3%, transparent) 75%,
       transparent
     );
     --media-controls-top-gradient: linear-gradient(
       to bottom,
-      color-mix(in oklab, var(--media-backdrop) 40%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 33.8%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 20%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 6.2%, transparent) 75%,
+      color-mix(in oklab, var(--media-backdrop) 55%, transparent),
+      color-mix(in oklab, var(--media-backdrop) 46.48%, transparent) 25%,
+      color-mix(in oklab, var(--media-backdrop) 27.5%, transparent) 50%,
+      color-mix(in oklab, var(--media-backdrop) 8.53%, transparent) 75%,
       transparent
     );
     --media-caption-controls-y: calc(var(--media-spacing) * -16);
@@ -37,18 +39,18 @@
     .media-skin:is([data-preset="video"], [data-preset="live-video"]) {
       --media-controls-gradient: linear-gradient(
         to top in oklab,
-        oklch(from var(--media-backdrop) l c h / 0.4),
-        oklch(from var(--media-backdrop) l c h / 0.338) 25%,
-        oklch(from var(--media-backdrop) l c h / 0.2) 50%,
-        oklch(from var(--media-backdrop) l c h / 0.062) 75%,
+        oklch(from var(--media-backdrop) l c h / 0.6),
+        oklch(from var(--media-backdrop) l c h / 0.507) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.3) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.093) 75%,
         transparent
       );
       --media-controls-top-gradient: linear-gradient(
         to bottom in oklab,
-        oklch(from var(--media-backdrop) l c h / 0.4),
-        oklch(from var(--media-backdrop) l c h / 0.338) 25%,
-        oklch(from var(--media-backdrop) l c h / 0.2) 50%,
-        oklch(from var(--media-backdrop) l c h / 0.062) 75%,
+        oklch(from var(--media-backdrop) l c h / 0.55),
+        oklch(from var(--media-backdrop) l c h / 0.4647) 25%,
+        oklch(from var(--media-backdrop) l c h / 0.275) 50%,
+        oklch(from var(--media-backdrop) l c h / 0.0853) 75%,
         transparent
       );
     }
@@ -67,6 +69,8 @@
 
   .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.15));
+    --media-controls-gradient-height: 40%;
+    --media-controls-bottom-gradient-height: 40%;
     --media-controls-gradient: linear-gradient(
       to top,
       color-mix(in oklab, var(--media-backdrop) 50%, transparent),

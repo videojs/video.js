@@ -2,6 +2,7 @@ import '@app/styles.css';
 import { isMediaId, MEDIA, type MediaId } from '@app/media';
 import { applyCaptionTracks } from '@app/shared/captions';
 import { renderChapters } from '@app/shared/html/chapters';
+import { defineNoSkin } from '@app/shared/html/no-skin';
 import { createLatestLoader, renderMediaAttrs } from '@app/shared/html/sandbox';
 import { packageSkinTag, skinPreset } from '@app/shared/html/skin-tags';
 import { renderStoryboard } from '@app/shared/html/storyboard';
@@ -247,6 +248,12 @@ async function loadCdnMedia(media: MediaId) {
     case 'playerjs-video':
       await import('@videojs/cdn/media/playerjs-video');
       break;
+    case 'soundcloud-audio':
+      await import('@videojs/cdn/media/soundcloud-audio');
+      break;
+    case 'mixcloud-audio':
+      await import('@videojs/cdn/media/mixcloud-audio');
+      break;
     case 'spotify-audio':
       await import('@videojs/cdn/media/spotify-audio');
       break;
@@ -255,6 +262,9 @@ async function loadCdnMedia(media: MediaId) {
       break;
     case 'twitch-video':
       await import('@videojs/cdn/media/twitch-video');
+      break;
+    case 'dailymotion-video':
+      await import('@videojs/cdn/media/dailymotion-video');
       break;
     case 'wistia-video':
       await import('@videojs/cdn/media/wistia-video');
@@ -290,10 +300,14 @@ function getPlayerTag(live: boolean): string {
 function getSkinTag(skin: Skin, live: boolean): string {
   if (descriptor.player === 'background') return 'background-video-skin';
 
+  if (state.skinless) return defineNoSkin();
+
   return packageSkinTag(skinPreset(descriptor.player, live), skin);
 }
 
 function loadStylesheets(skin: Skin, live: boolean) {
+  if (state.skinless) return;
+
   if (descriptor.player === 'audio') loadAudioStylesheets(skin, live);
   else if (descriptor.player === 'video') loadVideoStylesheets(skin, live);
   // Background CSS is loaded via dynamic import in loadCdnPlayer.
@@ -341,7 +355,7 @@ async function render() {
   // An embed hands playback to a provider that owns autoplay, looping, and how much
   // it preloads, so the settings menu has nothing to attach to — same as the
   // per-embed pages on the html and react platforms.
-  const mediaAttrs = embed ? '' : renderMediaAttrs(state);
+  const mediaAttrs = embed ? (source.controls ? 'controls' : '') : renderMediaAttrs(state);
   const crossoriginAttr = embed ? '' : 'crossorigin';
   const mediaClassAttr = embed ? `class="${getEmbedMediaClass(media)}"` : '';
 

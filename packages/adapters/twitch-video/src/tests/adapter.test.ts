@@ -1,4 +1,4 @@
-import { MediaError } from '@videojs/media';
+import { isMediaBufferCapable, isMediaPlaybackRateCapable, MediaError, type Video } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildTwitchIframeSrc, TwitchAdapter } from '..';
@@ -190,6 +190,14 @@ describe('TwitchAdapter', () => {
     expect(media.buffered.length).toBe(0);
     expect(media.textTracks.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new TwitchAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src and binds the embed when attached', () => {
@@ -447,6 +455,15 @@ describe('TwitchAdapter', () => {
     expect(embed.postMessage).toHaveBeenCalledWith(command(COMMAND.SET_VOLUME, 0.5), ORIGIN);
     expect(embed.postMessage).toHaveBeenCalledWith(command(COMMAND.SET_MUTED, true), ORIGIN);
     media.detach();
+  });
+
+  it('offers no playback rate surface', () => {
+    // The embed takes no speed command, so the player reports the rate
+    // unsupported and hides its rate controls.
+    const media = new TwitchAdapter() as Partial<Video>;
+
+    expect(media.playbackRate).toBeUndefined();
+    expect(isMediaPlaybackRateCapable(media)).toBe(false);
   });
 
   it('announces a volume or mute it is given, without repeating the embed echo', async () => {
