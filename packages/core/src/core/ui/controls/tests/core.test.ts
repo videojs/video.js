@@ -13,6 +13,7 @@ describe('ControlsCore', () => {
       expect(new ControlsCore({ visibility: 'always' }).getState()).toEqual({
         visible: true,
         userActive: true,
+        started: false,
       });
     });
 
@@ -21,7 +22,7 @@ describe('ControlsCore', () => {
 
       core.setMedia(createControlsState({ controlsVisible: false, userActive: false }));
 
-      expect(core.getState()).toEqual({ visible: true, userActive: false });
+      expect(core.getState()).toEqual({ visible: true, userActive: false, started: false });
     });
 
     it('projects visible and userActive independently', () => {
@@ -32,25 +33,57 @@ describe('ControlsCore', () => {
       expect(core.getState()).toEqual({
         visible: true,
         userActive: true,
+        started: false,
       });
 
       core.setMedia(createControlsState({ controlsVisible: true, userActive: false }));
       expect(core.getState()).toEqual({
         visible: true,
         userActive: false,
+        started: false,
       });
 
       core.setMedia(createControlsState({ controlsVisible: false, userActive: true }));
       expect(core.getState()).toEqual({
         visible: false,
         userActive: true,
+        started: false,
       });
 
       core.setMedia(createControlsState({ controlsVisible: false, userActive: false }));
       expect(core.getState()).toEqual({
         visible: false,
         userActive: false,
+        started: false,
       });
+    });
+
+    it('reports started once playback starts', () => {
+      const core = new ControlsCore();
+
+      core.setMedia(createControlsState());
+      core.setPlayback({ started: false, autoplaying: false });
+      expect(core.getState()?.started).toBe(false);
+
+      core.setPlayback({ started: true, autoplaying: false });
+      expect(core.getState()?.started).toBe(true);
+    });
+
+    it('reports a pending autoplay as started', () => {
+      const core = new ControlsCore();
+
+      core.setMedia(createControlsState());
+      core.setPlayback({ started: false, autoplaying: true });
+
+      expect(core.getState()?.started).toBe(true);
+    });
+
+    it('reports started without controls state in always mode', () => {
+      const core = new ControlsCore({ visibility: 'always' });
+
+      core.setPlayback({ started: true, autoplaying: false });
+
+      expect(core.getState()).toEqual({ visible: true, userActive: true, started: true });
     });
   });
 });
