@@ -13,7 +13,7 @@ import { definePlayerFeature } from '../../feature';
 import { signalKeys } from '../signal-keys';
 
 /** @internal */
-export const timeFeature = definePlayerFeature({
+export const timeFeatureBase = definePlayerFeature({
   name: 'time',
   state: ({ target, signals, set }): MediaTimeState => ({
     currentTime: 0,

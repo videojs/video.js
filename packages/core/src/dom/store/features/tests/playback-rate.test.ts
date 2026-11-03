@@ -2,10 +2,10 @@ import type { MediaPlaybackRateRange } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { playbackRateFeature } from '../../../../core/store/features/playback-rate';
 import { setPlayerConfigValue } from '../../../feature';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
+import { playbackRateFeature } from '../shared';
 
 const ratesConfig = playbackRateFeature.config!.defaultPlaybackRates;
 

@@ -8,7 +8,7 @@ const defineNativeFeature = defineSlice<NativePlayerTarget>();
 /**
  * Playback state for a native player.
  *
- * ## Why this exists instead of core's `playbackFeature`
+ * ## Why this exists instead of core's `playbackFeatureBase`
  *
  * `packages/core/src/core/store/features/playback.ts` produces the same `MediaPlaybackState`, is DOM-free, and composes
  * into this store's target. Two gaps in `ReactNativeMedia` stop it working today; once they close, this variant can be

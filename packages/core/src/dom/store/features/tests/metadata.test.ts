@@ -3,10 +3,10 @@ import { HTMLVideoAdapter } from '@videojs/media/dom';
 import { createStore } from '@videojs/store';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { metadataFeature } from '../../../../core/store/features/metadata';
 import { setPlayerConfigValue } from '../../../feature';
 import type { PlayerTarget } from '../../../player';
 import { selectMetadata } from '../../selectors';
+import { metadataFeature } from '../shared';
 
 const titleConfig = metadataFeature.config!.title;
 const posterConfig = metadataFeature.config!.poster;

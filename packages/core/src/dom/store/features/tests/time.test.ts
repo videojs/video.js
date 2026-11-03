@@ -1,9 +1,9 @@
 import { createStore } from '@videojs/store';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
-import { timeFeature } from '../../../../core/store/features/time';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo, createTimeRanges } from '../../../tests/test-helpers';
+import { timeFeature } from '../shared';
 
 describe('timeFeature', () => {
   describe('attach', () => {

@@ -20,7 +20,7 @@ const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates')
 // Kept off the public state until the shape settles.
 const PLAYBACK_RATE_RANGE = Symbol('@videojs/playback-rate-range');
 
-/** Source state behind {@link playbackRateFeature}; `playbackRates` is derived from it. */
+/** Source state behind {@link playbackRateFeatureBase}; `playbackRates` is derived from it. */
 export interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
   [DEFAULT_PLAYBACK_RATES]: readonly number[];
   [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
@@ -54,9 +54,8 @@ function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRa
 // Accepts only a shape that is a valid config for `State`.
 type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
 
-/** Inputs {@link playbackRateFeature} takes from a provider. */
-// The config's one definition: the literal in `playbackRateFeature` satisfies it. A type alias, because an interface has no
-// index signature to meet `PlayerFeatureConfig`.
+/** Inputs {@link playbackRateFeatureBase} takes from a provider. */
+// The config's one definition: the literal in `playbackRateFeatureBase` satisfies it.
 export type PlaybackRateFeatureConfig = CheckedConfig<
   PlaybackRateSourceState,
   {
@@ -64,13 +63,13 @@ export type PlaybackRateFeatureConfig = CheckedConfig<
   }
 >;
 
-/** State {@link playbackRateFeature} derives from its source state. */
+/** State {@link playbackRateFeatureBase} derives from its source state. */
 export interface PlaybackRateDerivedState {
   playbackRates: readonly number[];
 }
 
 /** @internal */
-export const playbackRateFeature = definePlayerFeature({
+export const playbackRateFeatureBase = definePlayerFeature({
   name: 'playbackRate',
   config: {
     /**

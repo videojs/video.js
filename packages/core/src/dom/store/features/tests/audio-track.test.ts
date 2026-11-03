@@ -2,8 +2,8 @@ import type { AudioTrackLike } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { audioTrackFeature } from '../../../../core/store/features/audio-track';
 import type { PlayerTarget } from '../../../player';
+import { audioTrackFeature } from '../shared';
 
 class TestAudioTrackList extends EventTarget {
   tracks: AudioTrackLike[];

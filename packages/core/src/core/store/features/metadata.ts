@@ -15,7 +15,7 @@ const USER_POSTER = Symbol('@videojs/user-poster');
 const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
 const DEFAULT_POSTER = '';
 
-/** Source state behind {@link metadataFeature}; `title` and `poster` are derived from it. */
+/** Source state behind {@link metadataFeatureBase}; `title` and `poster` are derived from it. */
 export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
   [MEDIA_TITLE]: MediaContentValue;
   [USER_TITLE]: MediaContentValue;
@@ -28,9 +28,8 @@ export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 
 // Accepts only a shape that is a valid config for `State`.
 type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
 
-/** Inputs {@link metadataFeature} takes from a provider. */
-// The config's one definition: the literal in `metadataFeature` satisfies it. A type alias, because an interface has no
-// index signature to meet `PlayerFeatureConfig`.
+/** Inputs {@link metadataFeatureBase} takes from a provider. */
+// The config's one definition: the literal in `metadataFeatureBase` satisfies it.
 export type MetadataFeatureConfig = CheckedConfig<
   MetadataSourceState,
   {
@@ -39,7 +38,7 @@ export type MetadataFeatureConfig = CheckedConfig<
   }
 >;
 
-/** State {@link metadataFeature} derives from its source state. */
+/** State {@link metadataFeatureBase} derives from its source state. */
 export interface MetadataDerivedState {
   title: string;
   poster: string;
@@ -51,7 +50,7 @@ export interface MetadataDerivedState {
  *
  * @internal
  */
-export const metadataFeature = definePlayerFeature({
+export const metadataFeatureBase = definePlayerFeature({
   name: 'metadata',
   config: {
     /** The title to display. Takes precedence over the title the media carries. */

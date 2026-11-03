@@ -5,7 +5,7 @@ import { listen } from '@videojs/utils/events';
 import { definePlayerFeature } from '../../feature';
 
 /** @internal */
-export const errorFeature = definePlayerFeature({
+export const errorFeatureBase = definePlayerFeature({
   name: 'error',
   state: ({ set }): MediaErrorState => ({
     error: null,
