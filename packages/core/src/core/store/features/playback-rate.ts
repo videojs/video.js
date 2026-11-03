@@ -20,7 +20,8 @@ const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates')
 // Kept off the public state until the shape settles.
 const PLAYBACK_RATE_RANGE = Symbol('@videojs/playback-rate-range');
 
-interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
+/** Source state behind {@link playbackRateFeature}; `playbackRates` is derived from it. */
+export interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
   [DEFAULT_PLAYBACK_RATES]: readonly number[];
   [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
   // Inline, so the feature's public type doesn't name the internal `MediaPlaybackRateRange`.
@@ -50,6 +51,18 @@ function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRa
   );
 }
 
+/** Inputs {@link playbackRateFeature} takes from a provider. */
+// A type alias, not an interface, so it satisfies `PlayerFeatureConfig`'s index signature.
+export type PlaybackRateFeatureConfig = {
+  defaultPlaybackRates: { action: typeof SET_DEFAULT_PLAYBACK_RATES; state: typeof DEFAULT_PLAYBACK_RATES };
+};
+
+/** State {@link playbackRateFeature} derives from its source state. */
+export interface PlaybackRateDerivedState {
+  playbackRates: readonly number[];
+}
+
+/** @internal */
 export const playbackRateFeature = definePlayerFeature({
   name: 'playbackRate',
   config: {

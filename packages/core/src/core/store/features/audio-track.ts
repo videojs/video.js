@@ -18,6 +18,7 @@ function toMediaTrack(track: AudioTrackLike, index: number): MediaAudioTrack {
   };
 }
 
+/** @internal */
 export const audioTrackFeature = definePlayerFeature({
   name: 'audioTrack',
   state: ({ target }): MediaAudioTrackState => ({

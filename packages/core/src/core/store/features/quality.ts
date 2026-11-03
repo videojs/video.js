@@ -33,6 +33,7 @@ function getSize(rendition: Pick<VideoRenditionLike, 'width' | 'height'>): numbe
   return rendition.height ?? rendition.width;
 }
 
+/** @internal */
 export const qualityFeature = definePlayerFeature({
   name: 'quality',
   state: ({ target }): MediaQualityState => ({

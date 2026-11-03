@@ -12,6 +12,7 @@ import { noop } from '@videojs/utils/function';
 import { definePlayerFeature } from '../../feature';
 import { signalKeys } from '../signal-keys';
 
+/** @internal */
 export const timeFeature = definePlayerFeature({
   name: 'time',
   state: ({ target, signals, set }): MediaTimeState => ({

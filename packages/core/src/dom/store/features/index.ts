@@ -1,4 +1,4 @@
-export * from '../../../core/store/features';
+export * from './shared';
 export * from './controls';
 export * as features from './feature.parts';
 export * from './fullscreen';

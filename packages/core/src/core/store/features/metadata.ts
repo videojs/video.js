@@ -15,7 +15,8 @@ const USER_POSTER = Symbol('@videojs/user-poster');
 const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
 const DEFAULT_POSTER = '';
 
-interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
+/** Source state behind {@link metadataFeature}; `title` and `poster` are derived from it. */
+export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
   [MEDIA_TITLE]: MediaContentValue;
   [USER_TITLE]: MediaContentValue;
   [SET_USER_TITLE](value: MediaContentValue): void;
@@ -24,9 +25,24 @@ interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster
   [SET_USER_POSTER](value: MediaContentValue): void;
 }
 
+/** Inputs {@link metadataFeature} takes from a provider. */
+// A type alias, not an interface, so it satisfies `PlayerFeatureConfig`'s index signature.
+export type MetadataFeatureConfig = {
+  title: { action: typeof SET_USER_TITLE; state: typeof USER_TITLE; html: { attribute: string } };
+  poster: { action: typeof SET_USER_POSTER; state: typeof USER_POSTER };
+};
+
+/** State {@link metadataFeature} derives from its source state. */
+export interface MetadataDerivedState {
+  title: string;
+  poster: string;
+}
+
 /**
  * Resolves content metadata into player state, preferring what the author set over what the media carries. Included in
  * the standard audio, video, and live presets.
+ *
+ * @internal
  */
 export const metadataFeature = definePlayerFeature({
   name: 'metadata',

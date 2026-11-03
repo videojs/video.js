@@ -1,18 +1,20 @@
-import { audioTrackFeature } from '../../../core/store/features/audio-track';
-import { bufferFeature } from '../../../core/store/features/buffer';
-import { liveFeature } from '../../../core/store/features/live';
-import { metadataFeature } from '../../../core/store/features/metadata';
-import { playbackFeature } from '../../../core/store/features/playback';
-import { playbackRateFeature } from '../../../core/store/features/playback-rate';
-import { qualityFeature } from '../../../core/store/features/quality';
-import { sourceFeature } from '../../../core/store/features/source';
-import { streamTypeFeature } from '../../../core/store/features/stream-type';
-import { timeFeature } from '../../../core/store/features/time';
 import { controlsFeature } from './controls';
 import { fullscreenFeature } from './fullscreen';
 import { orientationLockFeature } from './orientation-lock';
 import { pipFeature } from './pip';
 import { remotePlaybackFeature } from './remote-playback';
+import {
+  audioTrackFeature,
+  bufferFeature,
+  liveFeature,
+  metadataFeature,
+  playbackFeature,
+  playbackRateFeature,
+  qualityFeature,
+  sourceFeature,
+  streamTypeFeature,
+  timeFeature,
+} from './shared';
 import { textTrackFeature } from './text-track';
 import { volumeFeature } from './volume';
 

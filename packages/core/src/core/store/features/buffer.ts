@@ -5,6 +5,7 @@ import { serializeTimeRanges } from '@videojs/utils/time';
 
 import { definePlayerFeature } from '../../feature';
 
+/** @internal */
 export const bufferFeature = definePlayerFeature({
   name: 'buffer',
   state: (): MediaBufferState => ({

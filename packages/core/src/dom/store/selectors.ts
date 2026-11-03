@@ -1,20 +1,22 @@
 import { createSelector } from '@videojs/store';
 
-import { audioTrackFeature } from '../../core/store/features/audio-track';
-import { bufferFeature } from '../../core/store/features/buffer';
-import { errorFeature } from '../../core/store/features/error';
-import { liveFeature } from '../../core/store/features/live';
-import { metadataFeature } from '../../core/store/features/metadata';
-import { playbackFeature } from '../../core/store/features/playback';
-import { playbackRateFeature } from '../../core/store/features/playback-rate';
-import { qualityFeature } from '../../core/store/features/quality';
-import { sourceFeature } from '../../core/store/features/source';
-import { streamTypeFeature } from '../../core/store/features/stream-type';
-import { timeFeature } from '../../core/store/features/time';
 import { controlsFeature } from './features/controls';
 import { fullscreenFeature } from './features/fullscreen';
 import { pipFeature } from './features/pip';
 import { remotePlaybackFeature } from './features/remote-playback';
+import {
+  audioTrackFeature,
+  bufferFeature,
+  errorFeature,
+  liveFeature,
+  metadataFeature,
+  playbackFeature,
+  playbackRateFeature,
+  qualityFeature,
+  sourceFeature,
+  streamTypeFeature,
+  timeFeature,
+} from './features/shared';
 import { textTrackFeature } from './features/text-track';
 import { volumeFeature } from './features/volume';
 

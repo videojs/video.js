@@ -18,8 +18,7 @@ import type {
 import type { Store, UnionSliceState } from '@videojs/store';
 
 import type { AnyPlayerFeature, PlayerFeature, UnionPlayerConfig, UnionPlayerHtmlConfig } from '../core/player';
-import type { metadataFeature } from '../core/store/features/metadata';
-import type { playbackRateFeature } from '../core/store/features/playback-rate';
+import type { metadataFeature, playbackRateFeature } from './store/features/shared';
 
 export interface MediaContainer extends HTMLElement {}
 
