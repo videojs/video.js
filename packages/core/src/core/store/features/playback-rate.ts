@@ -51,11 +51,18 @@ function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRa
   );
 }
 
+// Accepts only a shape that is a valid config for `State`.
+type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
+
 /** Inputs {@link playbackRateFeature} takes from a provider. */
-// A type alias, not an interface, so it satisfies `PlayerFeatureConfig`'s index signature.
-export type PlaybackRateFeatureConfig = {
-  defaultPlaybackRates: { action: typeof SET_DEFAULT_PLAYBACK_RATES; state: typeof DEFAULT_PLAYBACK_RATES };
-};
+// The config's one definition: the literal in `playbackRateFeature` satisfies it. A type alias, because an interface has no
+// index signature to meet `PlayerFeatureConfig`.
+export type PlaybackRateFeatureConfig = CheckedConfig<
+  PlaybackRateSourceState,
+  {
+    defaultPlaybackRates: { action: typeof SET_DEFAULT_PLAYBACK_RATES; state: typeof DEFAULT_PLAYBACK_RATES };
+  }
+>;
 
 /** State {@link playbackRateFeature} derives from its source state. */
 export interface PlaybackRateDerivedState {
@@ -76,7 +83,7 @@ export const playbackRateFeature = definePlayerFeature({
       action: SET_DEFAULT_PLAYBACK_RATES,
       state: DEFAULT_PLAYBACK_RATES,
     },
-  } satisfies PlayerFeatureConfig<PlaybackRateSourceState>,
+  } satisfies PlaybackRateFeatureConfig,
   state: ({ target, get, set }): PlaybackRateSourceState => ({
     [DEFAULT_PLAYBACK_RATES]: DEFAULT_RATES,
     [SET_DEFAULT_PLAYBACK_RATES]: (value) => {
@@ -110,7 +117,7 @@ export const playbackRateFeature = definePlayerFeature({
      * The default rates that fit the media's range. Set them through the player, not through the store. They are listed
      * even when the media cannot change its rate, so check `playbackRateAvailability` before offering them.
      */
-    playbackRates: ({ get }): readonly number[] =>
+    playbackRates: ({ get }): PlaybackRateDerivedState['playbackRates'] =>
       fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get()[PLAYBACK_RATE_RANGE]),
   },
 

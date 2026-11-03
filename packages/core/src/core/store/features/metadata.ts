@@ -25,12 +25,19 @@ export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 
   [SET_USER_POSTER](value: MediaContentValue): void;
 }
 
+// Accepts only a shape that is a valid config for `State`.
+type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
+
 /** Inputs {@link metadataFeature} takes from a provider. */
-// A type alias, not an interface, so it satisfies `PlayerFeatureConfig`'s index signature.
-export type MetadataFeatureConfig = {
-  title: { action: typeof SET_USER_TITLE; state: typeof USER_TITLE; html: { attribute: string } };
-  poster: { action: typeof SET_USER_POSTER; state: typeof USER_POSTER };
-};
+// The config's one definition: the literal in `metadataFeature` satisfies it. A type alias, because an interface has no
+// index signature to meet `PlayerFeatureConfig`.
+export type MetadataFeatureConfig = CheckedConfig<
+  MetadataSourceState,
+  {
+    title: { action: typeof SET_USER_TITLE; state: typeof USER_TITLE; html: { attribute: string } };
+    poster: { action: typeof SET_USER_POSTER; state: typeof USER_POSTER };
+  }
+>;
 
 /** State {@link metadataFeature} derives from its source state. */
 export interface MetadataDerivedState {
@@ -60,7 +67,7 @@ export const metadataFeature = definePlayerFeature({
       action: SET_USER_POSTER,
       state: USER_POSTER,
     },
-  } satisfies PlayerFeatureConfig<MetadataSourceState>,
+  } satisfies MetadataFeatureConfig,
   state: ({ set }): MetadataSourceState => ({
     [MEDIA_TITLE]: undefined,
     [USER_TITLE]: undefined,
@@ -71,12 +78,12 @@ export const metadataFeature = definePlayerFeature({
   }),
   derived: {
     /** The resolved content title. Set it through the player, not through the store. */
-    title: ({ get }): string => get()[USER_TITLE] ?? get()[MEDIA_TITLE] ?? DEFAULT_TITLE,
+    title: ({ get }): MetadataDerivedState['title'] => get()[USER_TITLE] ?? get()[MEDIA_TITLE] ?? DEFAULT_TITLE,
     /**
      * The resolved poster URL, independent of the media component's own `poster`. Set it through the player, not
      * through the store.
      */
-    poster: ({ get }): string => get()[USER_POSTER] ?? get()[MEDIA_POSTER] ?? DEFAULT_POSTER,
+    poster: ({ get }): MetadataDerivedState['poster'] => get()[USER_POSTER] ?? get()[MEDIA_POSTER] ?? DEFAULT_POSTER,
   },
   attach({ target, signal, set }) {
     const { media } = target;
