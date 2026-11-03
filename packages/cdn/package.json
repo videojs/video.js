@@ -85,6 +85,7 @@
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/core": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",

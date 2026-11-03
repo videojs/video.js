@@ -100,6 +100,7 @@ export default {
     speed: 'Hız',
     captions: 'Altyazılar',
     playbackRate: 'Oynatma hızı',
+    customRate: 'Özel, {rate}',
     back: 'Geri',
     off: 'Kapalı',
     auto: 'Otomatik',

@@ -102,6 +102,7 @@ export default {
     speed: '速度',
     captions: '字幕',
     playbackRate: '再生速度',
+    customRate: 'カスタム、{rate}',
     back: '戻る',
     off: 'オフ',
     auto: '自動',

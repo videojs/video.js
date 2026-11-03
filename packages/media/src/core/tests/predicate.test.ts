@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../constants';
+import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, NO_TIME_RANGES_YET } from '../constants';
 import {
   getTimeRangeEnd,
   hasTimeRange,
@@ -73,6 +73,10 @@ describe('isMediaContentDataCapable', () => {
 describe('isMediaBufferCapable', () => {
   it('rejects empty time range stubs', () => {
     expect(isMediaBufferCapable({ buffered: EMPTY_TIME_RANGES, seekable: EMPTY_TIME_RANGES })).toBe(false);
+  });
+
+  it('accepts time ranges that are empty for now', () => {
+    expect(isMediaBufferCapable({ buffered: NO_TIME_RANGES_YET, seekable: NO_TIME_RANGES_YET })).toBe(true);
   });
 
   it('accepts defined non-stub time ranges', () => {

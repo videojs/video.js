@@ -102,6 +102,7 @@ export default {
     speed: 'Fart',
     captions: 'Teksting',
     playbackRate: 'Avspelingshastigheit',
+    customRate: 'Tilpassa, {rate}',
     back: 'Tilbake',
     off: 'Av',
     auto: 'Auto',

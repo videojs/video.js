@@ -183,13 +183,23 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         }
       };
 
-      const onTextTrackChange = () => {
-        if (!engine.subtitleTracks.length) return;
+      let lastShowingTrack: TextTrack | undefined;
 
+      const onTextTrackChange = () => {
         const showingTrack = Array.from(media.textTracks).find((textTrack) => {
           return textTrack.id && textTrack.mode === 'showing' && isCaptionOrSubtitleTrack(textTrack);
         });
+        const showingChanged = showingTrack !== lastShowingTrack;
+
+        lastShowingTrack = showingTrack;
+
         if (!showingTrack) return;
+
+        // Only on a new showing track: `onCuesParsed` fires `change` for every batch it forwards to a disabled
+        // track, and refreshing each time would re-render the active cue several times a second.
+        if (showingChanged && isHlsTextTrack(media, showingTrack)) refreshCues(showingTrack);
+
+        if (!engine.subtitleTracks.length) return;
 
         const currentHlsTrack = engine.subtitleTracks[engine.subtitleTrack];
 
@@ -213,15 +223,6 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
           // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
           engine.subtitleTrack = idx;
         }
-
-        if (showingTrack?.id === hlsTrackId) {
-          // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
-          if (showingTrack.cues) {
-            Array.from(showingTrack.cues).forEach((cue) => {
-              showingTrack.addCue(cue);
-            });
-          }
-        }
       };
 
       engine.on(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, onTracksFound);
@@ -240,6 +241,27 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
   }
 
   return HlsJsTextTracks as unknown as Base;
+}
+
+function isHlsTextTrack(media: HTMLMediaElement, track: TextTrack): boolean {
+  const trackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
+
+  return Array.from(trackEls).some((trackEl) => trackEl.track === track);
+}
+
+/**
+ * Makes the media element render the cues of a track that just became the showing one.
+ *
+ * The `<track>` elements created here have no `src`, so their load fails. WebKit only hands a re-enabled track's cues
+ * back to the media element when its `<track>` loaded, so a track turned off and on again lists its cues but renders
+ * none; Chrome has a similar rendering bug. Adding a cue that is already on the track is a no-op in WebKit, so each cue
+ * is removed before it is added back.
+ */
+function refreshCues(track: TextTrack): void {
+  for (const cue of Array.from(track.cues ?? [])) {
+    track.removeCue(cue);
+    track.addCue(cue);
+  }
 }
 
 function addTextTrack(

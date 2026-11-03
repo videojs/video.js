@@ -563,6 +563,49 @@ describe('HlsVideoAdapterCore', () => {
   // crossOrigin — synchronous IDL attribute (WHATWG §4.8.11.2) doubling as the
   // engine's request-credentials intent
   // ---------------------------------------------------------------------------
+  describe('subtitles', () => {
+    const MANIFEST = `#EXTM3U
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="English",LANGUAGE="en",DEFAULT=YES,AUTOSELECT=YES,URI="https://example.com/sub-en.m3u8"
+#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="Español",LANGUAGE="es",DEFAULT=NO,AUTOSELECT=NO,URI="https://example.com/sub-es.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=1000000,CODECS="avc1.42E01E",SUBTITLES="subs",RESOLUTION=640x360
+https://example.com/video-360p.m3u8`;
+
+    /** The text track the engine settles on once the multivariant playlist is parsed. */
+    async function selectedTextTrackLanguage(media: HlsVideoAdapterCore) {
+      vi.mocked(globalThis.fetch).mockImplementation((input) => {
+        const url = input instanceof Request ? input.url : String(input);
+
+        return url.endsWith('master.m3u8') ? Promise.resolve(new Response(MANIFEST)) : new Promise<Response>(() => {});
+      });
+
+      media.preload = 'auto';
+      media.src = 'https://example.com/master.m3u8';
+
+      await vi.waitFor(() => expect(media.engine.state.presentation.get()?.selectionSets).toBeDefined());
+      // Let the text-track switching reactor run on the parsed presentation.
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+      const { presentation, selectedTextTrackId } = media.engine.state;
+      const tracks = presentation.get()?.selectionSets?.find((set) => set.type === 'text')?.switchingSets[0]?.tracks;
+
+      return tracks?.find((track) => track.id === selectedTextTrackId.get())?.language;
+    }
+
+    it('auto-selects the DEFAULT=YES + AUTOSELECT=YES rendition', async () => {
+      const media = new HlsVideoAdapterCore();
+
+      expect(await selectedTextTrackLanguage(media)).toBe('en');
+      media.destroy();
+    });
+
+    it('leaves subtitles off when config.enableDefaultTrack is false', async () => {
+      const media = new HlsVideoAdapterCore({ config: { enableDefaultTrack: false } });
+
+      expect(await selectedTextTrackLanguage(media)).toBeUndefined();
+      media.destroy();
+    });
+  });
+
   describe('crossOrigin', () => {
     /**
      * The `credentials` mode the engine's next manifest request carries. The engine reads `crossOrigin` through a

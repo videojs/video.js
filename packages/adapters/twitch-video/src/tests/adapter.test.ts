@@ -1,4 +1,4 @@
-import { isMediaPlaybackRateCapable, MediaError, type Video } from '@videojs/media';
+import { isMediaBufferCapable, isMediaPlaybackRateCapable, MediaError, type Video } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildTwitchIframeSrc, TwitchAdapter } from '..';
@@ -190,6 +190,14 @@ describe('TwitchAdapter', () => {
     expect(media.buffered.length).toBe(0);
     expect(media.textTracks.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new TwitchAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src and binds the embed when attached', () => {

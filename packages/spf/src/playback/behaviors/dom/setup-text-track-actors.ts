@@ -15,6 +15,7 @@
 import type { AnySlotMap, Behavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
+import { type RequestCredentialsPolicy, resolveRequestCredentials } from '../../../network/credentials-fetch';
 import { createTextTracksActor } from '../../actors/dom/text-tracks';
 import {
   createTextTrackSegmentLoaderActor,
@@ -33,12 +34,28 @@ export interface TextTrackActorsContext {
 
 export interface TextTrackActorsConfig extends Pick<TextTrackSegmentLoaderActorConfig<VTTCue>, 'forwardBuffer'> {
   resolveTextTrackSegment: TextTrackSegmentResolver<VTTCue>;
+  /** The `credentials` mode each segment is loaded with; absent → the platform default. */
+  requestCredentials?: RequestCredentialsPolicy;
   /**
    * Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to
    * mirror the v/a `video`/`audioMessagePipelines` composition-config slots. Defaults (in the loader) to `resolveCues →
    * dispatchCues`.
    */
   textMessagePipelines?: TextMessagePipelines<VTTCue>;
+}
+
+/**
+ * Decorate a resolver so every segment loads with the mode the policy resolves to, per segment: the adapter's policy
+ * reads the live `crossorigin`. Like `credentialsFetch`, no policy returns the resolver as is and an explicit per-call
+ * `credentials` wins.
+ */
+function credentialsResolver(
+  resolve: TextTrackSegmentResolver<VTTCue>,
+  policy: RequestCredentialsPolicy | undefined
+): TextTrackSegmentResolver<VTTCue> {
+  if (policy === undefined) return resolve;
+
+  return (url, options) => resolve(url, { credentials: resolveRequestCredentials(policy, { url }), ...options });
 }
 
 function setupTextTrackActorsSetup({
@@ -61,9 +78,10 @@ function setupTextTrackActorsSetup({
     if (!mediaElement) return;
 
     const textTracksActor = createTextTracksActor(mediaElement);
+    const resolveSegment = credentialsResolver(config.resolveTextTrackSegment, config.requestCredentials);
     const textTrackSegmentLoaderActor = createTextTrackSegmentLoaderActor(
       textTracksActor,
-      config.resolveTextTrackSegment,
+      resolveSegment,
       { forwardBuffer: config.forwardBuffer, messagePipelines: config[TEXT_TYPE_CONFIG.messagePipelinesKey] },
       // Composition deps forwarded into each step (relocation reads the primary A/V origin).
       { state, context, config }
