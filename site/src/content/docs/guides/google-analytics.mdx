@@ -165,12 +165,7 @@ By default, the extension tracks progress milestones at 10%, 25%, 50%, and 75% f
 
 ## Set video title
 
-The extension determines the video title reported to GA4 using this precedence:
-
-1. `metadata.video_title`
-2. The media element's `title` attribute
-3. The media source URL (`video_url`)
-4. `'Untitled Video'` fallback
+Set `metadata.video_title` on the extension so GA4 gets an explicit title for every media type, including iframe embeds that do not expose a useful DOM `title`.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -180,13 +175,6 @@ The extension determines the video title reported to GA4 using this precedence:
 
 <FrameworkCase frameworks={["html"]}>
 ```html
-<video src="https://example.com/video.mp4" title="Keynote Presentation"></video>
-<google-analytics></google-analytics>
-```
-
-Or programmatically via `metadata`:
-
-```html
 <google-analytics></google-analytics>
 <script type="module">
   const ga = document.querySelector('google-analytics');
@@ -194,6 +182,8 @@ Or programmatically via `metadata`:
 </script>
 ```
 </FrameworkCase>
+
+When `metadata.video_title` is omitted, the extension derives a title in this order: the media's `title` property (when the player exposes one), then the resolved `video_url`, then `'Untitled Video'`. Do not rely on a `<video title="...">` attribute as your analytics title; set `metadata.video_title` instead.
 
 ## Metadata and custom dimensions
 
