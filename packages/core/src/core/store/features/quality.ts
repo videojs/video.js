@@ -34,7 +34,7 @@ function getSize(rendition: Pick<VideoRenditionLike, 'width' | 'height'>): numbe
 }
 
 /** @internal */
-export const qualityFeatureBase = definePlayerFeature({
+export const qualityFeature = definePlayerFeature({
   name: 'quality',
   state: ({ target }): MediaQualityState => ({
     videoRenditionList: [],

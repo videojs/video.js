@@ -139,8 +139,7 @@ function discoverFeatureSources(featuresDir: string, project: OxcProject): Featu
 
       for (const declaration of statement.declaration.declarations) {
         const exportName = staticName(declaration.id);
-        // A platform-neutral feature is authored as `*FeatureBase` and published under the plain name.
-        if (!exportName || !/Feature(Base)?$/.test(exportName) || !declaration.init) continue;
+        if (!exportName?.endsWith('Feature') || exportName.endsWith('Features') || !declaration.init) continue;
 
         const initializer = unwrapExpression(declaration.init);
         if (initializer.type !== 'CallExpression') continue;

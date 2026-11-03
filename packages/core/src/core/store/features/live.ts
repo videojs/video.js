@@ -17,7 +17,7 @@ import { definePlayerFeature } from '../../feature';
  * @internal
  * @see https://github.com/video-dev/media-ui-extensions/blob/main/proposals/0007-live-edge.md
  */
-export const liveFeatureBase = definePlayerFeature({
+export const liveFeature = definePlayerFeature({
   name: 'live',
   state: (): MediaLiveState => ({
     liveEdgeStart: Number.NaN,

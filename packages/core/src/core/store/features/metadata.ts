@@ -6,16 +6,19 @@ import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
 const MEDIA_TITLE = Symbol('@videojs/media-title');
-const USER_TITLE = Symbol('@videojs/user-title');
-const SET_USER_TITLE = Symbol('@videojs/set-user-title');
+
+// Exported only so `@videojs/core/dom` can name them in its inferred web feature type; the features barrel keeps
+// them inside the package.
+export const USER_TITLE = Symbol('@videojs/user-title');
+export const SET_USER_TITLE = Symbol('@videojs/set-user-title');
 const DEFAULT_TITLE = '';
 
 const MEDIA_POSTER = Symbol('@videojs/media-poster');
-const USER_POSTER = Symbol('@videojs/user-poster');
-const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
+
+export const USER_POSTER = Symbol('@videojs/user-poster');
+export const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
 const DEFAULT_POSTER = '';
 
-/** Source state behind {@link metadataFeatureBase}; `title` and `poster` are derived from it. */
 export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
   [MEDIA_TITLE]: MediaContentValue;
   [USER_TITLE]: MediaContentValue;
@@ -25,32 +28,13 @@ export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 
   [SET_USER_POSTER](value: MediaContentValue): void;
 }
 
-// Accepts only a shape that is a valid config for `State`.
-type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
-
-/** Inputs {@link metadataFeatureBase} takes from a provider. */
-// The config's one definition: the literal in `metadataFeatureBase` satisfies it.
-export type MetadataFeatureConfig = CheckedConfig<
-  MetadataSourceState,
-  {
-    title: { action: typeof SET_USER_TITLE; state: typeof USER_TITLE; html: { attribute: string } };
-    poster: { action: typeof SET_USER_POSTER; state: typeof USER_POSTER };
-  }
->;
-
-/** State {@link metadataFeatureBase} derives from its source state. */
-export interface MetadataDerivedState {
-  title: string;
-  poster: string;
-}
-
 /**
  * Resolves content metadata into player state, preferring what the author set over what the media carries. Included in
  * the standard audio, video, and live presets.
  *
  * @internal
  */
-export const metadataFeatureBase = definePlayerFeature({
+export const metadataFeature = definePlayerFeature({
   name: 'metadata',
   config: {
     /** The title to display. Takes precedence over the title the media carries. */
@@ -66,7 +50,7 @@ export const metadataFeatureBase = definePlayerFeature({
       action: SET_USER_POSTER,
       state: USER_POSTER,
     },
-  } satisfies MetadataFeatureConfig,
+  } satisfies PlayerFeatureConfig<MetadataSourceState>,
   state: ({ set }): MetadataSourceState => ({
     [MEDIA_TITLE]: undefined,
     [USER_TITLE]: undefined,
@@ -77,12 +61,12 @@ export const metadataFeatureBase = definePlayerFeature({
   }),
   derived: {
     /** The resolved content title. Set it through the player, not through the store. */
-    title: ({ get }): MetadataDerivedState['title'] => get()[USER_TITLE] ?? get()[MEDIA_TITLE] ?? DEFAULT_TITLE,
+    title: ({ get }): string => get()[USER_TITLE] ?? get()[MEDIA_TITLE] ?? DEFAULT_TITLE,
     /**
      * The resolved poster URL, independent of the media component's own `poster`. Set it through the player, not
      * through the store.
      */
-    poster: ({ get }): MetadataDerivedState['poster'] => get()[USER_POSTER] ?? get()[MEDIA_POSTER] ?? DEFAULT_POSTER,
+    poster: ({ get }): string => get()[USER_POSTER] ?? get()[MEDIA_POSTER] ?? DEFAULT_POSTER,
   },
   attach({ target, signal, set }) {
     const { media } = target;

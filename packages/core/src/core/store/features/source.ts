@@ -5,7 +5,7 @@ import { listen } from '@videojs/utils/events';
 import { definePlayerFeature } from '../../feature';
 
 /** @internal */
-export const sourceFeatureBase = definePlayerFeature({
+export const sourceFeature = definePlayerFeature({
   name: 'source',
   state: (): MediaSourceState => ({
     currentSrc: '',
