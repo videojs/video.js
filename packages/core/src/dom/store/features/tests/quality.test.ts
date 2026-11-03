@@ -2,8 +2,8 @@ import type { VideoRenditionLike } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { qualityFeature } from '../../../../core/store/features/quality';
 import type { PlayerTarget } from '../../../player';
-import { qualityFeature } from '../quality';
 
 class TestRenditionList extends EventTarget {
   renditions: VideoRenditionLike[];

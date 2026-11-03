@@ -1,6 +1,6 @@
 import type { AudioTrackLike, AudioTrackListLike, MediaAudioTrack, MediaAudioTrackState } from '@videojs/media';
 import { isMediaAudioTrackCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 

@@ -1,9 +1,9 @@
 import { createStore } from '@videojs/store';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
+import { playbackFeature } from '../../../../core/store/features/playback';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { playbackFeature } from '../playback';
 
 describe('playbackFeature', () => {
   describe('attach', () => {

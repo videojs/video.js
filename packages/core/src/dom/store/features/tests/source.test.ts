@@ -1,9 +1,9 @@
 import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { sourceFeature } from '../../../../core/store/features/source';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { sourceFeature } from '../source';
 
 describe('sourceFeature', () => {
   describe('attach', () => {

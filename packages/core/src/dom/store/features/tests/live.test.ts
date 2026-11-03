@@ -1,9 +1,9 @@
 import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { liveFeature } from '../../../../core/store/features/live';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { liveFeature } from '../live';
 
 interface LiveCapableMedia extends EventTarget {
   liveEdgeStart: number;

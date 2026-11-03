@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { serializeTimeRanges } from '../time-ranges';
+import { serializeTimeRanges, type TimeRangesLike } from '../ranges';
 
 describe('serializeTimeRanges', () => {
-  it('returns empty array for empty TimeRanges', () => {
+  it('returns empty array for empty ranges', () => {
     const ranges = createTimeRanges([]);
 
     expect(serializeTimeRanges(ranges)).toEqual([]);
@@ -30,19 +30,18 @@ describe('serializeTimeRanges', () => {
   });
 });
 
-/** Helper to create a mock TimeRanges object. */
-function createTimeRanges(ranges: Array<[number, number]>): TimeRanges {
+function createTimeRanges(ranges: Array<[number, number]>): TimeRangesLike {
   return {
     length: ranges.length,
     start(index: number): number {
       const range = ranges[index];
-      if (index < 0 || index >= ranges.length || !range) throw new DOMException('Index out of range', 'IndexSizeError');
+      if (index < 0 || index >= ranges.length || !range) throw new RangeError('Index out of range');
 
       return range[0];
     },
     end(index: number): number {
       const range = ranges[index];
-      if (index < 0 || index >= ranges.length || !range) throw new DOMException('Index out of range', 'IndexSizeError');
+      if (index < 0 || index >= ranges.length || !range) throw new RangeError('Index out of range');
 
       return range[1];
     },

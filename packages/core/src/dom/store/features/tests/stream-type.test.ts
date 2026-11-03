@@ -2,9 +2,9 @@ import { type MediaStreamType, MediaStreamTypes } from '@videojs/media';
 import { createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { streamTypeFeature } from '../../../../core/store/features/stream-type';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { streamTypeFeature } from '../stream-type';
 
 describe('streamTypeFeature', () => {
   describe('fallback (no `streamType` property on media)', () => {

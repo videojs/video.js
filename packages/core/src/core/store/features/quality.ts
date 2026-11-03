@@ -5,7 +5,7 @@ import type {
   VideoRenditionListLike,
 } from '@videojs/media';
 import { isMediaVideoDimensionsCapable, isMediaVideoRenditionCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 

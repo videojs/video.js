@@ -2,10 +2,10 @@ import { getTimeRangeEnd, hasTimeRange } from '@videojs/media';
 import { combine, createStore } from '@videojs/store';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { bufferFeature } from '../../../../core/store/features/buffer';
+import { timeFeature } from '../../../../core/store/features/time';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo, createTimeRanges } from '../../../tests/test-helpers';
-import { bufferFeature } from '../buffer';
-import { timeFeature } from '../time';
 
 describe('bufferFeature', () => {
   describe('attach', () => {

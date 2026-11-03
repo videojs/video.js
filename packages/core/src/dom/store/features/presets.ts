@@ -1,3 +1,13 @@
+import { audioTrackFeature } from '../../../core/store/features/audio-track';
+import { bufferFeature } from '../../../core/store/features/buffer';
+import { errorFeature } from '../../../core/store/features/error';
+import { liveFeature } from '../../../core/store/features/live';
+import { metadataFeature } from '../../../core/store/features/metadata';
+import { playbackFeature } from '../../../core/store/features/playback';
+import { playbackRateFeature } from '../../../core/store/features/playback-rate';
+import { qualityFeature } from '../../../core/store/features/quality';
+import { sourceFeature } from '../../../core/store/features/source';
+import { timeFeature } from '../../../core/store/features/time';
 import type {
   AudioFeatures,
   BackgroundFeatures,
@@ -5,21 +15,11 @@ import type {
   LiveVideoFeatures,
   VideoFeatures,
 } from '../../player';
-import { audioTrackFeature } from './audio-track';
-import { bufferFeature } from './buffer';
 import { controlsFeature } from './controls';
-import { errorFeature } from './error';
 import { fullscreenFeature } from './fullscreen';
-import { liveFeature } from './live';
-import { metadataFeature } from './metadata';
 import { pipFeature } from './pip';
-import { playbackFeature } from './playback';
-import { playbackRateFeature } from './playback-rate';
-import { qualityFeature } from './quality';
 import { remotePlaybackFeature } from './remote-playback';
-import { sourceFeature } from './source';
 import { textTrackFeature } from './text-track';
-import { timeFeature } from './time';
 import { volumeFeature } from './volume';
 
 export const videoFeatures: VideoFeatures = [
