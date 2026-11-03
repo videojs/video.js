@@ -83,6 +83,7 @@
   --duration-media-indicator: var(--media-duration-indicator);
   --duration-media-slider: var(--media-duration-slider);
   --delay-media-dialog: var(--media-delay-dialog);
+  --delay-media-slower: var(--media-duration-slower);
   --scale-media-hidden: var(--media-hidden-scale);
   --scale-media-hidden-indicator: var(--media-hidden-indicator-scale);
   --scale-media-hidden-playback: var(--media-hidden-playback-scale);

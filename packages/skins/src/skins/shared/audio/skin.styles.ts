@@ -18,7 +18,7 @@ export default styles({
         // Under the error dialog the bar fades out only after a bar-sized dialog has faded in over it.
         `${controls}:transition-[opacity,visibility] ${controls}:duration-0`,
         `${errorDialogShown}:${controls}:invisible ${errorDialogShown}:${controls}:opacity-0`,
-        `${errorDialogShown}:${controls}:delay-[var(--media-duration-slower)] ${errorDialogShown}:${controls}:duration-media-fast`,
+        `${errorDialogShown}:${controls}:delay-media-slower ${errorDialogShown}:${controls}:duration-media-fast`,
       ],
       variants: {
         'shadow-dom': [

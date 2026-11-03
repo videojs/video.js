@@ -28,6 +28,7 @@ export default styles({
     region: {
       utilities: [
         'absolute inset-0',
+        // Assumes the bar is one control tall plus its padding. A taller bar needs this offset changed too.
         card(
           'overflow-clip rounded-media-player bottom-[calc(var(--media-control-size)+var(--media-audio-controls-inset)*2)]'
         ),
