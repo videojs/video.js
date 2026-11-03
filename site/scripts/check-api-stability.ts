@@ -40,6 +40,14 @@ const UNCHECKED_PACKAGE_DIRECTORIES = ['packages/spf/'];
 const WRITTEN_OUT_ALIAS_DIRECTORIES = ['packages/utils/'];
 
 /**
+ * Source directories whose exported values count as written out where a public type names them with `typeof`. The
+ * platform-neutral player features in internal `@videojs/core` are building blocks: each platform package publishes its
+ * own copy re-typed for its target, such as `@videojs/core/dom`'s `WebFeature<typeof neutralFeature>`. The neutral
+ * value's own type is checked instead, as if each use spelled it out, so the neutral features stay internal.
+ */
+const WRITTEN_OUT_VALUE_DIRECTORIES = ['packages/core/src/core/store/features/'];
+
+/**
  * Whether a class or interface makes what it `extends` or `implements` stable. Flip this to keep base classes internal
  * while the members they add still make their own types stable.
  */
@@ -732,13 +740,26 @@ export function collectPublicExports(entries: readonly PublicEntry[], root = mon
   const checkedDeclarations = (symbol: ts.Symbol) =>
     (symbol.declarations ?? []).filter((node) => isCheckedDeclaration(node.getSourceFile().fileName, root));
 
-  const isWrittenOut = (symbol: ts.Symbol) =>
-    (symbol.flags & ts.SymbolFlags.TypeAlias) !== 0 &&
-    (symbol.declarations ?? []).some((node) => {
-      const path = relative(root, node.getSourceFile().fileName).split(sep).join('/');
+  const isUnder = (fileName: string, directories: readonly string[]) => {
+    const path = relative(root, fileName).split(sep).join('/');
 
-      return WRITTEN_OUT_ALIAS_DIRECTORIES.some((directory) => path.startsWith(directory));
+    return directories.some((directory) => path.startsWith(directory));
+  };
+
+  const isWrittenOutAlias = (symbol: ts.Symbol) =>
+    (symbol.flags & ts.SymbolFlags.TypeAlias) !== 0 &&
+    (symbol.declarations ?? []).some((node) => isUnder(node.getSourceFile().fileName, WRITTEN_OUT_ALIAS_DIRECTORIES));
+
+  // A value can only appear in a type through `typeof`, so a written-out variable is one a `typeof` query names.
+  const isWrittenOutValue = (symbol: ts.Symbol) =>
+    (symbol.flags & ts.SymbolFlags.Variable) !== 0 &&
+    (symbol.declarations ?? []).some((node) => {
+      const source = sourcePathFor(node.getSourceFile().fileName);
+
+      return source !== undefined && isUnder(source, WRITTEN_OUT_VALUE_DIRECTORIES);
     });
+
+  const isWrittenOut = (symbol: ts.Symbol) => isWrittenOutAlias(symbol) || isWrittenOutValue(symbol);
 
   const collect = (exported: ts.Symbol, exportedName: string, entry: PublicEntry, namespaces: Set<ts.Symbol>) => {
     // `index_parts_d_exports` re-exported under its own synthetic name is bundler output, not API.
@@ -829,7 +850,7 @@ export function collectPublicExports(entries: readonly PublicEntry[], root = mon
 
   // A type no entry exports (a local helper, a mixin's `_base` constant) is still part of the surface that names it, so
   // its own references count as the referrer's, through its heritage when the helper was reached through heritage. A
-  // written-out alias is expanded the same way even though an entry exports it. A global the packages only augment, such
+  // written-out alias or value is expanded the same way even though an entry exports it. A global the packages only augment, such
   // as `HTMLElementTagNameMap`, isn't a helper: naming it doesn't expose every element registered on it.
   for (const [symbol, record] of bySymbol) {
     const visited = new Set([symbol]);

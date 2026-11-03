@@ -20,8 +20,7 @@ const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates')
 // Kept off the public state until the shape settles.
 const PLAYBACK_RATE_RANGE = Symbol('@videojs/playback-rate-range');
 
-/** Source state behind {@link playbackRateFeatureBase}; `playbackRates` is derived from it. */
-export interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
+interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
   [DEFAULT_PLAYBACK_RATES]: readonly number[];
   [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
   // Inline, so the feature's public type doesn't name the internal `MediaPlaybackRateRange`.
@@ -51,25 +50,8 @@ function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRa
   );
 }
 
-// Accepts only a shape that is a valid config for `State`.
-type CheckedConfig<State, Config extends PlayerFeatureConfig<State>> = Config;
-
-/** Inputs {@link playbackRateFeatureBase} takes from a provider. */
-// The config's one definition: the literal in `playbackRateFeatureBase` satisfies it.
-export type PlaybackRateFeatureConfig = CheckedConfig<
-  PlaybackRateSourceState,
-  {
-    defaultPlaybackRates: { action: typeof SET_DEFAULT_PLAYBACK_RATES; state: typeof DEFAULT_PLAYBACK_RATES };
-  }
->;
-
-/** State {@link playbackRateFeatureBase} derives from its source state. */
-export interface PlaybackRateDerivedState {
-  playbackRates: readonly number[];
-}
-
 /** @internal */
-export const playbackRateFeatureBase = definePlayerFeature({
+export const playbackRateFeature = definePlayerFeature({
   name: 'playbackRate',
   config: {
     /**
@@ -82,7 +64,7 @@ export const playbackRateFeatureBase = definePlayerFeature({
       action: SET_DEFAULT_PLAYBACK_RATES,
       state: DEFAULT_PLAYBACK_RATES,
     },
-  } satisfies PlaybackRateFeatureConfig,
+  } satisfies PlayerFeatureConfig<PlaybackRateSourceState>,
   state: ({ target, get, set }): PlaybackRateSourceState => ({
     [DEFAULT_PLAYBACK_RATES]: DEFAULT_RATES,
     [SET_DEFAULT_PLAYBACK_RATES]: (value) => {
@@ -116,7 +98,7 @@ export const playbackRateFeatureBase = definePlayerFeature({
      * The default rates that fit the media's range. Set them through the player, not through the store. They are listed
      * even when the media cannot change its rate, so check `playbackRateAvailability` before offering them.
      */
-    playbackRates: ({ get }): PlaybackRateDerivedState['playbackRates'] =>
+    playbackRates: ({ get }): readonly number[] =>
       fitPlaybackRates(get()[DEFAULT_PLAYBACK_RATES], get()[PLAYBACK_RATE_RANGE]),
   },
 

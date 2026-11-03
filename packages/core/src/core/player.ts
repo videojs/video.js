@@ -5,8 +5,6 @@ import type { CamelCase } from '@videojs/utils/types';
 /**
  * The target a platform-neutral feature declares. It holds a `media` and a `container` for features that need a
  * container. `container` can be narrowed to a platform specific type (eg, `HTMLElement`)
- *
- * @internal
  */
 export interface PlayerMediaTarget {
   media: Media;

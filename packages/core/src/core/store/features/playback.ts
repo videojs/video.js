@@ -11,7 +11,7 @@ import { listen } from '@videojs/utils/events';
 import { definePlayerFeature } from '../../feature';
 
 /** @internal */
-export const playbackFeatureBase = definePlayerFeature({
+export const playbackFeature = definePlayerFeature({
   name: 'playback',
   state: ({ target, set }): MediaPlaybackState => ({
     paused: true,

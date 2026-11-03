@@ -11,7 +11,7 @@ import { listen } from '@videojs/utils/events';
 import { definePlayerFeature } from '../../feature';
 
 /** @internal */
-export const streamTypeFeatureBase = definePlayerFeature({
+export const streamTypeFeature = definePlayerFeature({
   name: 'streamType',
   state: (): MediaStreamTypeState => ({
     streamType: MediaStreamTypes.UNKNOWN,
