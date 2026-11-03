@@ -143,7 +143,7 @@ for (const variant of CASES) {
     expect(contracts[1]!).toEqual(contracts[0]!);
   });
 
-  test(`${variant.framework} ${variant.skin} switches the error-dialog layout at a 12rem player height`, async ({
+  test(`${variant.framework} ${variant.skin} switches the error-dialog layout at 11rem of media above the bar`, async ({
     page,
   }) => {
     const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
@@ -156,31 +156,27 @@ for (const variant of CASES) {
         await waitForStableText(dialog);
         await normalizeErrorDialogCopy(dialog);
 
-        const barHeight = (await frameRect(panel.root)).height;
-        // Stands in for visible media above the control bar, sized so the player sits on either side of 12rem.
-        const setPlayerHeight = (offset: number) =>
-          panel.root.evaluate(
-            (element: HTMLElement, { barHeight, offset }) => {
-              const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-              let media = element.querySelector<HTMLElement>(':scope > [data-test-media]');
+        // Stands in for visible media above the control bar.
+        const setMediaHeight = (offset: number) =>
+          panel.root.evaluate((element: HTMLElement, offset) => {
+            const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+            let media = element.querySelector<HTMLElement>(':scope > [data-test-media]');
 
-              if (!media) {
-                media = document.createElement('div');
-                media.dataset.testMedia = '';
-                element.prepend(media);
-              }
+            if (!media) {
+              media = document.createElement('div');
+              media.dataset.testMedia = '';
+              element.prepend(media);
+            }
 
-              media.style.height = `${12 * rem - barHeight + offset}px`;
-            },
-            { barHeight, offset }
-          );
+            media.style.height = `${11 * rem + offset}px`;
+          }, offset);
 
-        await setPlayerHeight(-1);
+        await setMediaHeight(-1);
         await expect
           .poll(async () => (await frameRect(dialog)).width)
           .toBeCloseTo((await frameRect(panel.root)).width, 0);
 
-        await setPlayerHeight(0);
+        await setMediaHeight(0);
         await expect
           .poll(async () => (await frameRect(dialog)).width)
           .toBeLessThan((await frameRect(panel.root)).width / 2);

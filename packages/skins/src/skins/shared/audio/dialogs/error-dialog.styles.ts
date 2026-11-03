@@ -13,6 +13,9 @@ const bar = (utilities: string) => when('media-dialog-bar', utilities);
 // The card repeats the video error dialog in `styles/popups/dialog.styles.ts`, so a change there belongs here too.
 const card = (utilities: string) => when('media-dialog-card', utilities);
 
+// Assumes the bar is one control tall plus its padding. A taller bar needs this height changed too.
+const barHeight = 'calc(var(--media-control-size)+var(--media-audio-controls-inset)*2)';
+
 export default styles({
   file: 'audio/error-dialog.css',
   prefix: 'audio-dialog',
@@ -22,16 +25,14 @@ export default styles({
       utilities: '',
     },
     frame: {
-      utilities: 'pointer-events-none absolute inset-0 z-50 @container-size/media-dialog',
+      utilities: `pointer-events-none absolute inset-x-0 top-0 bottom-[${barHeight}] z-50 @container-size/media-dialog`,
       variants: audioControlsInset,
     },
     region: {
       utilities: [
-        'absolute inset-0',
-        // Assumes the bar is one control tall plus its padding. A taller bar needs this offset changed too.
-        card(
-          'overflow-clip rounded-media-player bottom-[calc(var(--media-control-size)+var(--media-audio-controls-inset)*2)]'
-        ),
+        'absolute inset-x-0',
+        bar(`top-full h-[${barHeight}]`),
+        card('inset-y-0 overflow-clip rounded-media-player'),
       ],
     },
     backdrop: {

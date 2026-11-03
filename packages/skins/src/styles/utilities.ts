@@ -113,7 +113,8 @@ export const utilities = {
   'media-max-2xl': { kind: 'variant', description: 'Player below the 2xl breakpoint.' },
   'media-dialog-bar': {
     kind: 'variant',
-    description: 'A `media-dialog` size container too short for the dialog card, such as an audio control bar.',
+    description:
+      'A `media-dialog` size container too short for the dialog card, such as the room above an audio control bar.',
   },
   'media-dialog-card': {
     kind: 'variant',

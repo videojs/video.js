@@ -284,16 +284,17 @@
   }
 }
 
-/* A `media-dialog` size container too short for the dialog card, such as an audio player that is only a control bar. */
+/* A `media-dialog` size container too short for the dialog card, such as the room above an audio control bar with
+   little or no visible media. */
 @custom-variant media-dialog-bar {
-  @container media-dialog (height < 12rem) {
+  @container media-dialog (height < 11rem) {
     @slot;
   }
 }
 
 /* A `media-dialog` size container tall enough for the dialog card. */
 @custom-variant media-dialog-card {
-  @container media-dialog (height >= 12rem) {
+  @container media-dialog (height >= 11rem) {
     @slot;
   }
 }
