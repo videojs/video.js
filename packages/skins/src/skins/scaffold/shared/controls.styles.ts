@@ -1,13 +1,18 @@
 import { styles } from 'vjsc/styles';
 
+// Before playback starts, only the center play button shows; `--media-controls-before-start: visible` keeps the controls.
+const hiddenBeforeStart = '[visibility:var(--media-controls-before-start,hidden)]';
+
 export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
   rules: {
     backdrop: {
       // Gradient utilities allow three stops; the clear middle band needs a fourth.
-      utilities:
+      utilities: [
         'pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgb(0_0_0/0.5),transparent_40%,transparent_60%,rgb(0_0_0/0.4))] not-data-visible:hidden forced-colors:bg-none',
+        `not-data-started:${hiddenBeforeStart}`,
+      ],
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
@@ -29,6 +34,7 @@ export default styles({
         'forced-colors:inset-x-0 forced-colors:top-0 forced-colors:justify-end forced-colors:rounded-none!',
         'forced-colors:inset-e-0',
         'group-not-data-visible/controls:opacity-0',
+        `not-data-started:${hiddenBeforeStart}`,
       ],
     },
     centerButton: {
@@ -60,7 +66,10 @@ export default styles({
       ],
     },
     videoBottom: {
-      utilities: 'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none!',
+      utilities: [
+        'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none!',
+        `group-not-data-started/controls:${hiddenBeforeStart}`,
+      ],
     },
     sliderRow: {
       utilities: 'w-full',

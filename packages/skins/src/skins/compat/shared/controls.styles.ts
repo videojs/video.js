@@ -1,5 +1,9 @@
 import { styles } from 'vjsc/styles';
 
+// Before playback starts, only the center play button shows; `--media-controls-before-start: visible` keeps the controls.
+// Where style queries work, the bars also fade in once playback starts.
+const hiddenBeforeStart = '[visibility:var(--media-controls-before-start,hidden)]';
+
 const transition =
   'transition-[opacity,transform] duration-media-instant ease-out group-not-data-visible/controls:duration-media-base group-not-data-visible/controls:opacity-0 motion-reduce:transition-none';
 
@@ -11,8 +15,10 @@ export default styles({
       utilities: 'group/buffering contents',
     },
     backdrop: {
-      utilities:
+      utilities: [
         'pointer-events-none absolute inset-0 z-10 bg-(image:--media-controls-gradient) group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
+        `not-data-started:${hiddenBeforeStart}`,
+      ],
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
@@ -34,6 +40,8 @@ export default styles({
         'forced-colors:end-0',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translateY(var(--media-spacing))]',
+        `not-data-started:${hiddenBeforeStart}`,
+        'media-before-start-fade:not-data-started:opacity-0',
       ],
     },
     centerButton: {
@@ -52,7 +60,8 @@ export default styles({
       utilities: 'size-7! media-max-360:size-5.5!',
     },
     centerSeek: {
-      utilities: 'hidden size-9! pointer-fine:grid media-max-360:hidden!',
+      // Before playback starts, the play button stands alone in the center.
+      utilities: 'hidden size-9! pointer-fine:grid media-max-360:hidden! group-not-data-started/controls:hidden!',
     },
     centerSeekIcon: {
       utilities: 'size-4.5',
@@ -66,8 +75,11 @@ export default styles({
       ],
     },
     videoBottom: {
-      utilities:
+      utilities: [
         'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none! forced-colors:px-2 forced-colors:py-2',
+        `group-not-data-started/controls:${hiddenBeforeStart}`,
+        'media-before-start-fade:group-not-data-started/controls:opacity-0',
+      ],
     },
     sliderRow: {
       utilities: 'w-full',

@@ -258,6 +258,14 @@
   }
 }
 
+/* Controls that stay hidden until playback starts, in browsers with style queries. Elsewhere they appear without a
+   fade, and a `--media-controls-before-start: visible` opt-out never matches. */
+@custom-variant media-before-start-fade {
+  @container not style(--media-controls-before-start: visible) {
+    @slot;
+  }
+}
+
 /* Accent background and text for a highlighted control or menu item. */
 @utility highlight-media {
   background-color: var(--media-accent);

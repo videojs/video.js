@@ -25,6 +25,13 @@ const center = [
   'group-data-visible/buffering:hidden',
 ] as const;
 
+// Before playback starts, only the centre play button shows; `--media-controls-before-start: visible` keeps the controls.
+// Where style queries work, the controls also fade in once playback starts.
+const hiddenBeforeStart = [
+  'not-data-started:[visibility:var(--media-controls-before-start,hidden)]',
+  'media-before-start-fade:not-data-started:opacity-0',
+] as const;
+
 const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
 
 // Each skin's centre button matches its playback status indicator, and shrinks rather than hides in small players.
@@ -48,6 +55,7 @@ export default styles({
       utilities: [
         'group/controls text-media-controls-foreground text-shadow-media',
         'duration-media-controls-enter ease-out',
+        ...hiddenBeforeStart,
       ],
       variants: {
         default: [
@@ -79,6 +87,7 @@ export default styles({
         'pointer-events-none absolute inset-0 z-10 rounded-[inherit]',
         'bg-(image:--media-controls-gradient) bg-bottom bg-no-repeat bg-size-[100%_var(--media-controls-bottom-gradient-height)]',
         'transition-opacity duration-media-controls ease-out not-data-visible:opacity-0',
+        ...hiddenBeforeStart,
       ],
       variants: {
         // Below lg the secondary group floats at the top, so it needs a scrim of its own.
