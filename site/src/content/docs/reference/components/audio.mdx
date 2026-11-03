@@ -166,7 +166,7 @@ Accepts the standard React props for a native `<audio>`, plus these Video.js-spe
 
 ### Refs
 
-#### `ref`
+#### ref
 
 Forwards to the rendered `<audio>`, an [`HTMLAudioElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement) with its complete native property and method API.
 
@@ -176,7 +176,7 @@ const ref = useRef<HTMLAudioElement>(null);
 <Audio ref={ref} />
 ```
 
-#### `mediaRef`
+#### mediaRef
 
 Receives the same `HTMLAudioElement` as `ref`. Adapter-backed components such as <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> and <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
 
