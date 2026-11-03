@@ -3,9 +3,9 @@
 // Source: https://github.com/muxinc/media-elements
 
 import {
-  EMPTY_TIME_RANGES,
   MediaError,
   type MediaPlaybackRateRange,
+  NO_TIME_RANGES_YET,
   type TextTrackListLike,
   type Video,
 } from '@videojs/media';
@@ -489,13 +489,13 @@ export class YouTubeAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
   }
 
   get buffered() {
-    return this.#progress > 0 ? createTimeRange(0, this.#progress) : EMPTY_TIME_RANGES;
+    return this.#progress > 0 ? createTimeRange(0, this.#progress) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {

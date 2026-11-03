@@ -67,7 +67,7 @@ Each `isMedia*Capable` guard accepts any value and returns `false` for `null`, `
 
 A guard checks that a few members of a capability are present, then narrows to every member of that capability's contract. The table lists both.
 
-Some media, such as embeds, can't provide buffered ranges, text tracks, or remote playback, and report a shared empty placeholder in their place. `isMediaBufferCapable`, `isMediaTextTrackCapable`, and `isMediaRemotePlaybackCapable` return `false` for that placeholder.
+Some media can't provide buffered ranges, text tracks, or remote playback, and report a shared empty placeholder in their place. `isMediaBufferCapable`, `isMediaTextTrackCapable`, and `isMediaRemotePlaybackCapable` return `false` for that placeholder. Media that can provide buffered ranges but has none yet, such as an embed before it loads, reports an empty range that is not the placeholder, so `isMediaBufferCapable` returns `true`.
 
 A guard describes what the media object supports, not its current state. `isMediaErrorCapable` returns `true` while `error` is `null`, and `isMediaVolumeCapable` returns `true` on platforms that ignore volume changes. For current state and availability, such as `volumeAvailability` from the <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink>, read the player's <DocsLink slug="guides/features">features</DocsLink> instead.
 

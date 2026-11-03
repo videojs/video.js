@@ -1,4 +1,4 @@
-import { EMPTY_TEXT_TRACKS, MediaError, type TimeRangeLike, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -374,11 +374,13 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
   /** Always empty: the widget does not report how much of the show it has loaded. */
   get buffered() {
-    return NO_TIME_RANGES;
+    return NO_TIME_RANGES_YET;
   }
 
   get seekable() {
-    return this.#duration > 0 && Number.isFinite(this.#duration) ? createTimeRange(0, this.#duration) : NO_TIME_RANGES;
+    return this.#duration > 0 && Number.isFinite(this.#duration)
+      ? createTimeRange(0, this.#duration)
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -980,9 +982,6 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     this.#error = null;
   }
 }
-
-// Not `EMPTY_TIME_RANGES`, which tells the player this media never reports ranges, so it would stop listening for them.
-const NO_TIME_RANGES: TimeRangeLike = Object.freeze({ length: 0, start: () => 0, end: () => 0 });
 
 // The frame starts on a same-origin `about:blank`, which a post meant for the widget only warns about.
 function hasWidgetDocument(target: HTMLIFrameElement): boolean {
