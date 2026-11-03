@@ -45,6 +45,8 @@ export const nativePlaybackFeature = defineNativeFeature<MediaPlaybackState>({
     pause() {
       target().media.pause();
     },
+    autoplay: false,
+    autoplaying: false,
   }),
 
   attach({ target, signal, set }) {
