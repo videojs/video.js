@@ -1,8 +1,17 @@
-import type { ExtensionPlayer, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
-import type { Media } from '@videojs/media';
-import { getMediaElement } from '@videojs/media/dom';
+import type { ExtensionPlayer, MediaContainer, PlayerExtension, PlayerTarget } from '@videojs/core/dom';
+import {
+  isMediaContentDataCapable,
+  isMediaMutedCapable,
+  isMediaPauseCapable,
+  isMediaSeekCapable,
+  isMediaSourceCapable,
+  isMediaStreamTypeCapable,
+  isMediaVolumeCapable,
+  type Media,
+  type MediaFullscreenCapability,
+} from '@videojs/media';
 import { listen, type WebKitDocument, type WebKitVideoElement } from '@videojs/utils/dom';
-import { isFunction, isNil, isNumber, isString } from '@videojs/utils/predicate';
+import { isFunction, isNil, isNumber } from '@videojs/utils/predicate';
 
 export type GoogleAnalyticsEventName =
   | 'video_start'
@@ -81,25 +90,27 @@ declare global {
 
 const MILESTONES = [10, 25, 50, 75] as const;
 
-function isElementFullscreen(
-  media: Media | null,
-  target: HTMLMediaElement | null = media ? getMediaElement(media) : null
-): boolean {
+/**
+ * The player enters fullscreen on its container, so that is what counts here, along with whatever the media reports for
+ * itself (native video fullscreen, iOS presentation mode). The container is only known if it existed when the media
+ * attached, so a media in the DOM is also matched by containment.
+ */
+function isPlayerFullscreen(media: Media | null, container: MediaContainer | null): boolean {
   if (isNil(media)) return false;
 
-  // SAFETY: Probing iOS Safari webkitPresentationMode vendor property on video elements.
-  const candidate = (target ?? media) as WebKitVideoElement;
-  if ('webkitPresentationMode' in candidate && candidate.webkitPresentationMode === 'fullscreen') return true;
+  // SAFETY: `isFullscreen` and iOS `webkitPresentationMode` are optional members a media may report.
+  const fullscreenMedia = media as Partial<MediaFullscreenCapability> &
+    Pick<WebKitVideoElement, 'webkitPresentationMode'>;
+  if (fullscreenMedia.isFullscreen === true || fullscreenMedia.webkitPresentationMode === 'fullscreen') return true;
 
   // SAFETY: Probing standard and WebKit vendor fullscreenElement on document.
   const doc = document as WebKitDocument;
   const fsElement = doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
   if (isNil(fsElement)) return false;
 
-  const el = target ?? (media instanceof Element ? media : null);
-  if (isNil(el)) return false;
+  if (container && fsElement.contains(container)) return true;
 
-  return fsElement === el || (el instanceof Element && fsElement.contains(el));
+  return media instanceof Node && fsElement.contains(media);
 }
 
 /**
@@ -128,6 +139,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     GoogleAnalyticsExtension.defaultProps.onEvent;
 
   #media: Media | null = null;
+  #container: MediaContainer | null = null;
   #unlisten: (() => void) | null = null;
   #hasStarted = false;
   #hasEnded = false;
@@ -150,18 +162,14 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   }
 
   /** @internal Player lifecycle; called when media attaches or changes. */
-  attach({ media }: PlayerTarget): void {
+  attach({ media, container }: PlayerTarget): void {
     if (this.#media === media) return;
 
     this.detach();
     this.#media = media;
+    this.#container = container;
     this.#resetSession();
-
-    if (this.#media) {
-      this.#lastMuted = this.#isMediaMutedOrSilent;
-    }
-
-    const target = this.#targetElement;
+    this.#lastMuted = this.#isMediaMutedOrSilent;
 
     const offPlay = listen(media, 'play', this.#handlePlay);
     const offTimeUpdate = listen(media, 'timeupdate', this.#handleTimeUpdate);
@@ -174,8 +182,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     const offFs = listen(document, 'fullscreenchange', this.#handleFullscreenChange);
     const offWebkitFs = listen(document, 'webkitfullscreenchange', this.#handleFullscreenChange);
     const offPresentationMode = listen(media, 'webkitpresentationmodechanged', this.#handleFullscreenChange);
-    const offTargetPresentationMode =
-      target && target !== media ? listen(target, 'webkitpresentationmodechanged', this.#handleFullscreenChange) : null;
 
     this.#unlisten = () => {
       offPlay();
@@ -188,7 +194,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       offFs();
       offWebkitFs();
       offPresentationMode();
-      offTargetPresentationMode?.();
     };
   }
 
@@ -197,6 +202,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#unlisten?.();
     this.#unlisten = null;
     this.#media = null;
+    this.#container = null;
     this.#isFullscreen = false;
     this.#resetSession();
   }
@@ -214,8 +220,6 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #checkLoopRestart = (): boolean => {
-    if (isNil(this.#media)) return false;
-
     if (!this.#mediaLoop) return false;
 
     const duration = this.#mediaDuration;
@@ -342,7 +346,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handleFullscreenChange = (): void => {
-    const isFs = isElementFullscreen(this.#media, this.#targetElement);
+    const isFs = isPlayerFullscreen(this.#media, this.#container);
     if (isFs === this.#isFullscreen) return;
 
     this.#isFullscreen = isFs;
@@ -354,74 +358,42 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     }
   };
 
-  get #targetElement(): HTMLMediaElement | null {
-    return this.#media ? getMediaElement(this.#media) : null;
-  }
-
   get #mediaDuration(): number {
     const media = this.#media;
-    if (isNil(media) || !('duration' in media)) return 0;
+    if (!isMediaSeekCapable(media)) return 0;
 
-    // SAFETY: Probing duration property on media after an `in` check.
-    const duration = (media as { duration: unknown }).duration;
-
-    return isNumber(duration) && !Number.isNaN(duration) ? duration : 0;
+    return isNumber(media.duration) && !Number.isNaN(media.duration) ? media.duration : 0;
   }
 
   get #mediaCurrentTime(): number {
     const media = this.#media;
-    if (isNil(media) || !('currentTime' in media)) return 0;
 
-    // SAFETY: Probing currentTime property on media after an `in` check.
-    const currentTime = (media as { currentTime: unknown }).currentTime;
-
-    return isNumber(currentTime) ? currentTime : 0;
-  }
-
-  get #mediaMuted(): boolean {
-    const media = this.#media;
-    if (isNil(media) || !('muted' in media)) return false;
-
-    // SAFETY: Probing muted property on media after an `in` check.
-    return Boolean((media as { muted: boolean }).muted);
-  }
-
-  get #mediaVolume(): number {
-    const media = this.#media;
-    if (isNil(media) || !('volume' in media)) return 1;
-
-    // SAFETY: Probing volume property on media after an `in` check.
-    const volume = (media as { volume: unknown }).volume;
-
-    return isNumber(volume) ? volume : 1;
+    return isMediaSeekCapable(media) && isNumber(media.currentTime) ? media.currentTime : 0;
   }
 
   get #isMediaMutedOrSilent(): boolean {
-    return this.#mediaMuted || this.#mediaVolume === 0;
+    const media = this.#media;
+    const muted = isMediaMutedCapable(media) && media.muted;
+
+    return muted || (isMediaVolumeCapable(media) && media.volume === 0);
   }
 
   get #mediaEnded(): boolean {
     const media = this.#media;
-    if (isNil(media) || !('ended' in media)) return false;
 
-    // SAFETY: Probing ended property on media after an `in` check.
-    return Boolean((media as { ended: boolean }).ended);
+    return isMediaPauseCapable(media) && media.ended;
   }
 
   get #mediaSeeking(): boolean {
     const media = this.#media;
-    if (isNil(media) || !('seeking' in media)) return false;
 
-    // SAFETY: Probing seeking property on media after an `in` check.
-    return Boolean((media as { seeking: boolean }).seeking);
+    return isMediaSeekCapable(media) && media.seeking;
   }
 
   get #mediaLoop(): boolean {
-    const target = this.#targetElement;
     const media = this.#media;
 
-    // SAFETY: Probing loop property on media after an `in` check.
-    return Boolean(target?.loop || (media && 'loop' in media && (media as { loop?: boolean }).loop));
+    return isMediaSeekCapable(media) && media.loop;
   }
 
   #percentAtCurrentTime(): number {
@@ -434,54 +406,26 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   get #effectiveStreamType(): 'live' | 'on-demand' | string {
     if (this.metadata?.video_stream_type) return this.metadata.video_stream_type;
 
-    // SAFETY: Probing streamType property on media capability or custom element host.
-    if (this.#media && 'streamType' in this.#media && (this.#media as { streamType?: string }).streamType === 'live') {
-      return 'live';
-    }
+    const media = this.#media;
 
-    // SAFETY: Probing streamType property on target element host.
-    if (
-      this.#targetElement &&
-      'streamType' in this.#targetElement &&
-      (this.#targetElement as { streamType?: string }).streamType === 'live'
-    ) {
-      return 'live';
-    }
-
-    return 'on-demand';
+    return isMediaStreamTypeCapable(media) && media.streamType === 'live' ? 'live' : 'on-demand';
   }
 
   #resolveTitle(videoTitle = this.metadata?.video_title): string {
     if (videoTitle) return videoTitle;
 
     const media = this.#media;
+    const title = isMediaContentDataCapable(media) ? media.contentData?.title : null;
 
-    if (!isNil(media) && 'title' in media) {
-      // SAFETY: Probing title property on media after an `in` check.
-      const title = (media as { title: unknown }).title;
-      if (isString(title) && title) return title;
-    }
-
-    const el = this.#targetElement;
-    if (!isNil(el) && el.title) return el.title;
-
-    return this.#resolveUrl() || 'Untitled Video';
+    return title || this.#resolveUrl() || 'Untitled Video';
   }
 
   #resolveUrl(videoUrl = this.metadata?.video_url): string {
     if (videoUrl) return videoUrl;
 
     const media = this.#media;
-    if (isNil(media)) return '';
 
-    if ('src' in media && isString(media.src) && media.src) {
-      return media.src;
-    }
-
-    const el = this.#targetElement;
-    if (!isNil(el)) return el.currentSrc || el.src || '';
-
-    return '';
+    return isMediaSourceCapable(media) ? media.currentSrc || media.src || '' : '';
   }
 
   #sendEvent(event: GoogleAnalyticsEventName, percent: number): void {

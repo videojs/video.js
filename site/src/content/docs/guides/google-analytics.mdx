@@ -188,7 +188,7 @@ Set `metadata.video_title` on the extension so GA4 gets an explicit title for ev
 ```
 </FrameworkCase>
 
-When `metadata.video_title` is omitted, the extension derives a title in this order: the media's `title` property (when the player exposes one), then the resolved `video_url`, then `'Untitled Video'`. Do not rely on a `<video title="...">` attribute as your analytics title; set `metadata.video_title` instead.
+When `metadata.video_title` is omitted, the extension derives a title in this order: the title the media reports in its content data (Mux, Vimeo, and SoundCloud media report one, for example), then the resolved `video_url`, then `'Untitled Video'`. Do not rely on a `<video title="...">` attribute as your analytics title; set `metadata.video_title` instead.
 
 ## Metadata and custom dimensions
 

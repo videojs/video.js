@@ -27,30 +27,41 @@ function getDataLayer(): TestDataLayerEvent[] {
 interface EmbedLikeMedia extends EventTarget {
   currentTime: number;
   duration: number;
+  seeking: boolean;
+  loop: boolean;
+  paused: boolean;
+  ended: boolean;
   muted: boolean;
   volume: number;
-  ended: boolean;
-  seeking: boolean;
   src: string;
-  title: string;
+  currentSrc: string;
+  readyState: number;
+  contentData: { title?: string } | undefined;
   play(): Promise<void>;
+  pause(): void;
+  load(): void;
 }
 
+/** An iframe-backed media: reports state through the media API only, and is not a DOM node. */
 function createEmbedLikeMedia(overrides: Partial<EmbedLikeMedia> = {}): EmbedLikeMedia {
-  // SAFETY: Test double for iframe-backed media with playback fields on EventTarget.
-  const media = new EventTarget() as EmbedLikeMedia;
-
-  media.currentTime = overrides.currentTime ?? 0;
-  media.duration = overrides.duration ?? 100;
-  media.muted = overrides.muted ?? false;
-  media.volume = overrides.volume ?? 1;
-  media.ended = overrides.ended ?? false;
-  media.seeking = overrides.seeking ?? false;
-  media.src = overrides.src ?? 'https://example.com/embed/video-id';
-  media.title = overrides.title ?? 'Embed Title';
-  media.play = overrides.play ?? (() => Promise.resolve());
-
-  return media;
+  return Object.assign(new EventTarget(), {
+    currentTime: 0,
+    duration: 100,
+    seeking: false,
+    loop: false,
+    paused: true,
+    ended: false,
+    muted: false,
+    volume: 1,
+    src: 'https://example.com/embed/video-id',
+    currentSrc: 'https://example.com/embed/video-id',
+    readyState: 0,
+    contentData: { title: 'Embed Title' },
+    play: () => Promise.resolve(),
+    pause: () => {},
+    load: () => {},
+    ...overrides,
+  });
 }
 
 describe('GoogleAnalyticsExtension', () => {
@@ -128,6 +139,50 @@ describe('GoogleAnalyticsExtension', () => {
         video_percent: 60,
       })
     );
+  });
+
+  it('reports the title from content data and the URL from the current source of an embed', () => {
+    const media = createEmbedLikeMedia({ currentSrc: 'https://example.com/embed/resolved' });
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media, container: mockContainer });
+    media.dispatchEvent(new Event('play'));
+
+    expect(getDataLayer()[0]).toEqual(
+      expect.objectContaining({
+        video_title: 'Embed Title',
+        video_url: 'https://example.com/embed/resolved',
+      })
+    );
+  });
+
+  it('falls back to the URL for the title when an embed reports no content title', () => {
+    const media = createEmbedLikeMedia({ contentData: {} });
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media, container: mockContainer });
+    media.dispatchEvent(new Event('play'));
+
+    expect(getDataLayer()[0]?.video_title).toBe('https://example.com/embed/video-id');
+  });
+
+  it('tracks fullscreenEnter and fullscreenExit of the container around an embed', () => {
+    const container: MediaContainer = document.createElement('div');
+    const media = createEmbedLikeMedia();
+    const extension = new GoogleAnalyticsExtension();
+
+    document.body.appendChild(container);
+    extension.attach({ media, container });
+
+    Object.defineProperty(document, 'fullscreenElement', { value: container, configurable: true, writable: true });
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true, writable: true });
+    document.dispatchEvent(new Event('fullscreenchange'));
+
+    expect(getDataLayer().map((e) => e.event)).toEqual(['fullscreenEnter', 'fullscreenExit']);
+
+    container.remove();
   });
 
   it('tracks play and video_start on first play', () => {
