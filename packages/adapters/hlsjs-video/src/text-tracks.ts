@@ -249,10 +249,10 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
             );
           });
 
-          // A closed-caption track has no entry in `subtitleTracks`, so it never matches. Assigning the -1 that
-          // `findIndex` returns makes hls.js disable every subtitle and caption track, including the one just picked.
           // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
-          if (idx >= 0) engine.subtitleTrack = idx;
+          // A closed-caption track has no entry in `subtitleTracks`, so picking one assigns -1, which only stops
+          // subtitle loading: CEA-608 cues come from the video segments.
+          engine.subtitleTrack = idx;
         }
       };
 

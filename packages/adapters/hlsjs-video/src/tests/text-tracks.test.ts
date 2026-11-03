@@ -447,7 +447,7 @@ describe('HlsJsTextTracksMixin', () => {
     expect(hlsTracks(video)).toHaveLength(0);
   });
 
-  it('leaves the engine subtitle track alone when a closed-caption track is selected', () => {
+  it('stops subtitle loading when a closed-caption track is selected', () => {
     const { engine, video } = mount();
 
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
@@ -458,8 +458,9 @@ describe('HlsJsTextTracksMixin', () => {
     (engine as any).subtitleTrack = 0;
     cc.track.mode = 'showing';
 
-    // hls.js has no subtitleTracks entry for CEA-608, so a -1 here would disable the track just picked.
-    expect((engine as any).subtitleTrack).not.toBe(-1);
+    // CEA-608 cues come from the video segments, so the subtitle playlist can stop loading without touching CC.
+    expect((engine as any).subtitleTrack).toBe(-1);
+    expect(cc.track.mode).toBe('showing');
   });
 
   it('refreshes the cues of a closed-caption track once when it is selected', () => {
