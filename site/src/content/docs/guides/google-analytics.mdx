@@ -47,7 +47,7 @@ pnpm add @videojs/html @videojs/google-analytics
 ```html title="index.html"
 <video-player>
   <media-container>
-    <video src="https://example.com/video.mp4" title="My Video"></video>
+    <video src="https://example.com/video.mp4"></video>
     <google-analytics></google-analytics> <!-- [!code focus] -->
   </media-container>
 </video-player>
@@ -55,6 +55,8 @@ pnpm add @videojs/html @videojs/google-analytics
   import '@videojs/html/video/player';
   import '@videojs/html/ui/container';
   import '@videojs/html/extensions/google-analytics';
+
+  document.querySelector('google-analytics').metadata = { video_title: 'My Video' };
 </script>
 ```
 
@@ -68,10 +70,13 @@ When loading Video.js from a CDN, include the `extensions/google-analytics.js` s
 
 <video-player>
   <media-container>
-    <video src="https://example.com/video.mp4" title="My Video"></video>
+    <video src="https://example.com/video.mp4"></video>
     <google-analytics></google-analytics>
   </media-container>
 </video-player>
+<script type="module">
+  document.querySelector('google-analytics').metadata = { video_title: 'My Video' };
+</script>
 ```
 </FrameworkCase>
 
