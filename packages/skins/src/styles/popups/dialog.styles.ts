@@ -1,5 +1,43 @@
 import { styles } from 'vjsc/styles';
 
+/** The card layout. The audio error dialog also shows it over visible media. */
+export const dialogCard = {
+  backdrop: {
+    utilities: [
+      'absolute inset-0 z-40 bg-media-backdrop/20 opacity-100 backdrop-filter-media-dialog rounded-[inherit]',
+      'not-data-open:hidden transition-opacity delay-media-dialog duration-media-dialog ease-out',
+      'media-transitioning:opacity-0 data-ending-style:delay-0',
+      'data-[scope=document]:fixed data-[scope=document]:rounded-none',
+    ],
+    variants: {
+      default: 'data-ending-style:duration-media-slower',
+      neutral: 'data-ending-style:duration-media-instant',
+    },
+  },
+  popup: {
+    utilities: [
+      'top-1/2 left-1/2 w-media-dialog-width max-w-media-dialog max-h-[calc(100%-0.5rem)]',
+      '-translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-media-dialog text-media-popover-foreground',
+      'text-shadow-media-dialog transition-[opacity,scale] delay-media-dialog duration-media-dialog ease-out',
+      'media-transitioning:scale-media-hidden-popup media-transitioning:opacity-0 data-ending-style:delay-0',
+      'data-[scope=document]:fixed data-[scope=document]:max-h-[calc(100dvh-1rem)]',
+    ],
+    variants: {
+      default: [
+        'bg-media-popover surface-media after:surface-media-inset p-3',
+        'data-ending-style:duration-media-slower',
+      ],
+      neutral: 'p-4 data-ending-style:duration-media-instant',
+    },
+  },
+  content: {
+    utilities: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
+    variants: { default: 'px-2 pt-2 pb-1.5', neutral: 'py-1.5' },
+  },
+  title: { utilities: 'text-media-lg leading-tight' },
+  close: { utilities: 'w-full flex-1 px-4 py-2' },
+} as const;
+
 export default styles({
   file: 'dialog.css',
   prefix: 'media-dialog',
@@ -8,40 +46,14 @@ export default styles({
       className: 'media-dialog-root',
       utilities: '',
     },
-    backdrop: {
-      utilities: [
-        'absolute inset-0 z-40 bg-media-backdrop/20 opacity-100 backdrop-filter-media-dialog rounded-[inherit]',
-        'not-data-open:hidden transition-opacity delay-media-dialog duration-media-dialog ease-out',
-        'media-transitioning:opacity-0 data-ending-style:delay-0',
-        'data-[scope=document]:fixed data-[scope=document]:rounded-none',
-      ],
-      variants: {
-        default: 'data-ending-style:duration-media-slower',
-        neutral: 'data-ending-style:duration-media-instant',
-      },
-    },
+    backdrop: dialogCard.backdrop,
     popup: {
-      utilities: [
-        'absolute top-1/2 left-1/2 z-50 flex w-media-dialog-width max-w-media-dialog max-h-[calc(100%-0.5rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-media-dialog text-media-popover-foreground outline-hidden not-data-open:hidden',
-        'text-shadow-media-dialog transition-[opacity,scale] delay-media-dialog duration-media-dialog ease-out',
-        'media-transitioning:scale-media-hidden-popup media-transitioning:opacity-0 data-ending-style:delay-0',
-        'data-[scope=document]:fixed data-[scope=document]:max-h-[calc(100dvh-1rem)]',
-      ],
-      variants: {
-        default: [
-          'bg-media-popover surface-media after:surface-media-inset',
-          'p-3',
-          'data-ending-style:duration-media-slower',
-        ],
-        neutral: ['p-4', 'data-ending-style:duration-media-instant'],
-      },
+      utilities: ['absolute z-50 flex outline-hidden not-data-open:hidden', ...dialogCard.popup.utilities],
+      variants: dialogCard.popup.variants,
     },
-    content: {
-      utilities: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
-      variants: { default: 'px-2 pt-2 pb-1.5', neutral: 'py-1.5' },
-    },
+    content: dialogCard.content,
     title: {
-      utilities: 'm-0 text-media-lg font-semibold leading-tight',
+      utilities: `m-0 font-semibold ${dialogCard.title.utilities}`,
     },
     description: {
       utilities: 'm-0 opacity-70 wrap-anywhere',
@@ -50,7 +62,7 @@ export default styles({
       utilities: 'flex shrink-0 gap-2',
     },
     close: {
-      utilities: 'h-media-control w-full flex-1 bg-media-primary! px-4 py-2 font-medium text-media-primary-foreground!',
+      utilities: `h-media-control bg-media-primary! font-medium text-media-primary-foreground! ${dialogCard.close.utilities}`,
     },
   },
 });

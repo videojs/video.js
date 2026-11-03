@@ -1,6 +1,7 @@
 import { styles } from 'vjsc/styles';
 
 import { audioControlsInset } from '../../../../styles/layout/audio-controls.styles';
+import { dialogCard } from '../../../../styles/popups/dialog.styles';
 
 function when(layout: 'media-dialog-bar' | 'media-dialog-card', utilities: string): string {
   return utilities
@@ -10,8 +11,8 @@ function when(layout: 'media-dialog-bar' | 'media-dialog-card', utilities: strin
 }
 
 const bar = (utilities: string) => when('media-dialog-bar', utilities);
-// The card repeats the video error dialog in `styles/popups/dialog.styles.ts`, so a change there belongs here too.
 const card = (utilities: string) => when('media-dialog-card', utilities);
+const cardGroups = (groups: readonly string[]) => groups.map(card);
 
 // Assumes the bar is one control tall plus its padding. A taller bar needs this height changed too.
 const barHeight = 'calc(var(--media-control-size)+var(--media-audio-controls-inset)*2)';
@@ -36,16 +37,10 @@ export default styles({
       ],
     },
     backdrop: {
-      utilities: [
-        'pointer-events-auto',
-        bar('hidden'),
-        card('absolute inset-0 z-40 bg-media-backdrop/20 opacity-100 backdrop-filter-media-dialog rounded-[inherit]'),
-        card('not-data-open:hidden transition-opacity delay-media-dialog duration-media-dialog ease-out'),
-        card('media-transitioning:opacity-0 data-ending-style:delay-0'),
-      ],
+      utilities: ['pointer-events-auto', bar('hidden'), ...cardGroups(dialogCard.backdrop.utilities)],
       variants: {
-        default: card('data-ending-style:duration-media-slower'),
-        neutral: card('data-ending-style:duration-media-instant'),
+        default: card(dialogCard.backdrop.variants.default),
+        neutral: card(dialogCard.backdrop.variants.neutral),
       },
     },
     popup: {
@@ -56,35 +51,30 @@ export default styles({
         bar('backdrop-filter-media-dialog transition-[opacity,filter] duration-media-slower ease-out'),
         bar('media-transitioning:blur-media-hidden-popup media-transitioning:opacity-0'),
         // Over media the card keeps the video skin's light-on-dark colors in both color schemes.
-        card('scheme-dark top-1/2 left-1/2 w-media-dialog-width max-w-media-dialog max-h-[calc(100%-0.5rem)]'),
-        card('-translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-media-dialog text-media-popover-foreground'),
-        card('text-shadow-media-dialog transition-[opacity,scale] delay-media-dialog duration-media-dialog ease-out'),
-        card('media-transitioning:scale-media-hidden-popup media-transitioning:opacity-0 data-ending-style:delay-0'),
+        card('scheme-dark'),
+        ...cardGroups(dialogCard.popup.utilities),
       ],
       variants: {
-        default: [
-          bar('gap-3 ps-5 surface-media'),
-          card('bg-media-popover surface-media after:surface-media-inset p-3 data-ending-style:duration-media-slower'),
-        ],
+        default: [bar('gap-3 ps-5 surface-media'), ...cardGroups(dialogCard.popup.variants.default)],
         neutral: [
           bar('gap-4 ps-3 shadow-media-hairline backdrop-filter-none transition-[opacity,filter,scale]'),
           bar('media-transitioning:scale-media-hidden-popup'),
-          card('p-4 data-ending-style:duration-media-instant'),
+          card(dialogCard.popup.variants.neutral),
         ],
       },
     },
     content: {
       utilities: [
         bar('max-h-[2lh] min-w-0 flex-1 overflow-y-auto overscroll-contain leading-tight scrollbar-thin'),
-        card('flex min-h-0 flex-col gap-2 overflow-y-auto'),
+        card(dialogCard.content.utilities),
       ],
       variants: {
-        default: card('px-2 pt-2 pb-1.5'),
-        neutral: card('py-1.5'),
+        default: card(dialogCard.content.variants.default),
+        neutral: card(dialogCard.content.variants.neutral),
       },
     },
     title: {
-      utilities: ['m-0 font-semibold', bar('me-1 inline text-media'), card('text-media-lg leading-tight')],
+      utilities: ['m-0 font-semibold', bar('me-1 inline text-media'), card(dialogCard.title.utilities)],
     },
     description: {
       utilities: ['m-0 opacity-70 wrap-anywhere', bar('inline')],
@@ -96,7 +86,7 @@ export default styles({
       utilities: [
         'h-media-control bg-media-primary! font-medium text-media-primary-foreground!',
         bar('w-auto flex-none px-3'),
-        card('w-full flex-1 px-4 py-2'),
+        card(dialogCard.close.utilities),
       ],
     },
   },
