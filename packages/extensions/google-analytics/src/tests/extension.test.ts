@@ -33,6 +33,7 @@ interface EmbedLikeMedia extends EventTarget {
   seeking: boolean;
   src: string;
   title: string;
+  play(): Promise<void>;
 }
 
 function createEmbedLikeMedia(overrides: Partial<EmbedLikeMedia> = {}): EmbedLikeMedia {
@@ -47,6 +48,7 @@ function createEmbedLikeMedia(overrides: Partial<EmbedLikeMedia> = {}): EmbedLik
   media.seeking = overrides.seeking ?? false;
   media.src = overrides.src ?? 'https://example.com/embed/video-id';
   media.title = overrides.title ?? 'Embed Title';
+  media.play = overrides.play ?? (() => Promise.resolve());
 
   return media;
 }
