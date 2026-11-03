@@ -18,10 +18,14 @@ export interface TextSegmentMetadata {
  *
  * The native `<track>` parser (`media/dom/text`'s `resolveVttSegment`) discards `X-TIMESTAMP-MAP`, so reading it
  * requires the raw bytes. This is a separate, caller-controlled fetch — the caller decides _when_ metadata is needed
- * (e.g. once per source) rather than paying for it on every segment.
+ * (e.g. once per source) rather than paying for it on every segment. `credentials` is the mode the engine's request
+ * policy resolved for the segment.
  */
-export async function resolveVttSegmentMetadata(url: string): Promise<TextSegmentMetadata> {
-  const text = await fetch(url).then((response) => response.text());
+export async function resolveVttSegmentMetadata(
+  url: string,
+  { credentials }: { credentials?: RequestCredentials | undefined } = {}
+): Promise<TextSegmentMetadata> {
+  const text = await fetch(url, { credentials }).then((response) => response.text());
 
   return { timestampMap: parseVttTimestampMap(text) };
 }

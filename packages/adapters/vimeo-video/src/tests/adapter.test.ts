@@ -1,3 +1,4 @@
+import { isMediaBufferCapable } from '@videojs/media';
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildVimeoIframeSrc, VimeoAdapter } from '..';
@@ -224,6 +225,14 @@ describe('VimeoAdapter', () => {
     expect(media.src).toBe(VimeoAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new VimeoAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('creates a Player when attached to an iframe', () => {
