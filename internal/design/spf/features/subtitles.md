@@ -23,7 +23,7 @@ What's implemented today, organized from base case to richer support. Each row i
 |---|---|---|
 | Base WebVTT captions | Single subtitle track, segmented WebVTT, browser-native parsing | `resolveVttSegment` uses an offscreen `<video><track>`; VTTCue settings (position, line, align, size) pass through; voice spans, regions, ruby pass through opaquely |
 | Multi-language tracks | Any number of subtitle renditions surfaced from a multivariant playlist | `LANGUAGE`, `NAME`, `DEFAULT`, `AUTOSELECT`, `FORCED`, `URI` parsed from `#EXT-X-MEDIA:TYPE=SUBTITLES` |
-| Default selection | Auto (no user intent) runs the opt-in three-tier policy: `preferredSubtitleLanguage` → `DEFAULT=YES + AUTOSELECT=YES` → none | `switchTextTrack`'s terminal (`pickResolvedTextTrack` → `pickTextTrackFromTracks`) over the constrained, CDN-scoped candidates. Forced-only tracks excluded by default (Apple-spec); opt-in via `includeForcedTracks` |
+| Default selection | Auto (no user intent) runs the three-tier policy: `preferredSubtitleLanguage` → `DEFAULT=YES + AUTOSELECT=YES` (on by default in `textTracksFeature`; `enableDefaultTrack: false` opts out) → none | `switchTextTrack`'s terminal (`pickResolvedTextTrack` → `pickTextTrackFromTracks`) over the constrained, CDN-scoped candidates. Forced-only tracks excluded by default (Apple-spec); opt-in via `includeForcedTracks` |
 | User selection (DOM-driven) | Browser captions UI / host-page button → DOM `mode='showing'` → `userTextTrackSelection` intent → resolved into `selectedTextTrackId` | `change` listener on `mediaElement.textTracks` writes a language-based partial (or `'off'`); Chromium settling-window + echo guard (`showingId === selectedTextTrackId`) reject auto-pick / mirror echoes |
 | Programmatic selection | Consumer writes `state.userTextTrackSelection` (partial / `'off'`) through the engine's `state` | `switchTextTrack` resolves it; `syncTextTracks` mirrors the resolved id into DOM `mode`. (Was a direct `selectedTextTrackId` write.) |
 | Constraint- & CDN-aware selection | Selection runs the track-switching chain: failed-CDN renditions pruned, narrowed to the active CDN | `[excludeFailedCdns]` + `[preferActiveCdn]`; re-resolves on failover. Sticky language / `'off'` intent persists across source changes |
@@ -72,7 +72,7 @@ Extension boundaries — each could become its own feature doc or a phase extens
 
 **Manifest parsing:** `parseMultivariantPlaylist` (`packages/spf/src/media/hls/parse-multivariant.ts`) extracts subtitle renditions; each becomes a `PartiallyResolvedTextTrack` carrying language, default, autoselect, forced metadata.
 
-**Cue resolver:** `resolveVttSegment` (`packages/spf/src/media/dom/text/resolve-vtt-segment.ts`) — browser-native VTT parser via offscreen `<video><track>`. Pluggable via `config.resolveTextTrackSegment`.
+**Cue resolver:** `resolveVttSegment` (`packages/spf/src/media/dom/text/resolve-vtt-segment.ts`) — browser-native VTT parser via offscreen `<video><track>`, one per CORS mode so `requestCredentials` (`use-credentials` → `include`) reaches each segment fetch. Pluggable via `config.resolveTextTrackSegment`.
 
 ## Config surface
 
@@ -80,8 +80,8 @@ Extension boundaries — each could become its own feature doc or a phase extens
 {
   preferredSubtitleLanguage?: string;   // BCP-47 language tag for default selection
   includeForcedTracks?: boolean;        // default false — exclude forced-only tracks from auto-selection
-  enableDefaultTrack?: boolean;         // default false — honor DEFAULT=YES + AUTOSELECT=YES when set
-  resolveTextTrackSegment?: (url: string) => Promise<Cue[]>;  // override VTT parser
+  enableDefaultTrack?: boolean;         // honor DEFAULT=YES + AUTOSELECT=YES; `textTracksFeature` defaults it to true
+  resolveTextTrackSegment?: (url: string, options?: { credentials?: RequestCredentials }) => Promise<Cue[]>;  // override VTT parser
   getCdnId?: (url: string) => string;   // shared CDN-id derivation (active-CDN scope + failed-CDN constraint)
 }
 ```

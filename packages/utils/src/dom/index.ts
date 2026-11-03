@@ -29,6 +29,7 @@ export {
   isInteractiveActivation,
   isInteractiveTarget,
 } from './interactive';
+export { isKeptAlive } from './keep-alive';
 export {
   type ChildMeasurement,
   type ElementOverflowMeasurement,

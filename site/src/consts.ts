@@ -104,6 +104,8 @@ export const VJS10_DEMO_CLOUDFLARE = INSTALLATION_DEMO_SOURCES.cloudflare;
 // player.js is a protocol rather than a host; Gumlet is one service whose embed
 // speaks it.
 export const VJS10_DEMO_PLAYERJS = 'https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e';
+// Mixcloud's own Widget docs use this show as their example key.
+export const VJS10_DEMO_MIXCLOUD = 'https://www.mixcloud.com/spartacus/lambiance/';
 // SoundCloud's own docs embed from this account, so its tracks stay public.
 export const VJS10_DEMO_SOUNDCLOUD = 'https://soundcloud.com/forss/flickermood';
 // An episode rather than a track: Spotify plays episodes in full for a
@@ -113,3 +115,6 @@ export const VJS10_DEMO_TIKTOK = INSTALLATION_DEMO_SOURCES.tiktok;
 // A VOD rather than a channel: a channel embed only plays while its streamer
 // is live, so it would show an offline banner most of the time.
 export const VJS10_DEMO_TWITCH = INSTALLATION_DEMO_SOURCES.twitch;
+// Dailymotion's player embed URL rather than a video page: it names the player
+// configuration Dailymotion refuses to embed without.
+export const VJS10_DEMO_DAILYMOTION = 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87';

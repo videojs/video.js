@@ -5,13 +5,17 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { hasSkinChoice, hasTailwindSkin, landingSource, MEDIA, MEDIA_IDS, mediaSources } from '../media';
 import {
+  DAILYMOTION_SOURCE_IDS,
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
+  DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
+  MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
@@ -39,13 +43,14 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube, player.js, and SoundCloud and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, Mixcloud, and Dailymotion and the native background video only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
-    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio'];
+    const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio', 'mixcloud-audio', 'dailymotion-video'];
 
     // player.js is a protocol many providers speak, so its embed picks between their pages instead, and SoundCloud
-    // between the URL shapes its adapter reads differently.
+    // and Mixcloud between the URL shapes and layouts their adapters handle differently. Dailymotion picks between
+    // player configurations and URL parameters.
     expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id))]);
     expect(embeds).toEqual([
       'vimeo-video',
@@ -53,9 +58,11 @@ describe('MEDIA', () => {
       'cloudflare-video',
       'playerjs-video',
       'soundcloud-audio',
+      'mixcloud-audio',
       'spotify-audio',
       'tiktok-video',
       'twitch-video',
+      'dailymotion-video',
       'wistia-video',
     ]);
   });
@@ -70,6 +77,8 @@ describe('MEDIA', () => {
       'youtube-video',
       'playerjs-video',
       'soundcloud-audio',
+      'mixcloud-audio',
+      'dailymotion-video',
     ]);
   });
 
@@ -89,6 +98,24 @@ describe('MEDIA', () => {
     for (const media of MEDIA_IDS.filter((id) => id !== 'soundcloud-audio')) {
       for (const id of SOUNDCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
+  });
+
+  it('offers the Mixcloud embed its own URLs, and nothing else those URLs', () => {
+    expect(MEDIA['mixcloud-audio'].entrySource).toBe(DEFAULT_MIXCLOUD_SOURCE);
+    expect(MIXCLOUD_SOURCE_IDS).toContain(DEFAULT_MIXCLOUD_SOURCE);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('mixcloud-audio', platform)).toEqual(MIXCLOUD_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'mixcloud-audio')) {
+      for (const id of MIXCLOUD_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('lands the Dailymotion embed on its default player configuration, whichever source was showing', () => {
+    expect(MEDIA['dailymotion-video'].entrySource).toBe(DEFAULT_DAILYMOTION_SOURCE);
+    expect(MEDIA['dailymotion-video'].fallbackSource).toBe(DEFAULT_DAILYMOTION_SOURCE);
   });
 
   it('labels what the SPF engines do with protected and MPEG-TS sources', () => {
@@ -161,6 +188,23 @@ describe('mediaSources', () => {
 
     for (const media of MEDIA_IDS.filter((id) => id !== 'playerjs-video')) {
       for (const id of PLAYERJS_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
+    }
+  });
+
+  it('offers the Dailymotion embed its player embed URLs, and nothing else those URLs', () => {
+    expect(DAILYMOTION_SOURCE_IDS).toEqual([
+      'dailymotion-default',
+      'dailymotion-no-autostart',
+      'dailymotion-start-time',
+      'dailymotion-scale-fill',
+    ]);
+
+    for (const platform of ['html', 'react', 'cdn'] as const) {
+      expect(mediaSources('dailymotion-video', platform)).toEqual(DAILYMOTION_SOURCE_IDS);
+    }
+
+    for (const media of MEDIA_IDS.filter((id) => id !== 'dailymotion-video')) {
+      for (const id of DAILYMOTION_SOURCE_IDS) expect(mediaSources(media, 'html'), media).not.toContain(id);
     }
   });
 

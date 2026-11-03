@@ -9,6 +9,12 @@ import { HlsJsTextTracksMixin, removeHlsTextTracks, withPreservedTextTracks } fr
  * touches: `cues` reads as `null` while a track is disabled, exactly as the spec requires.
  */
 class FakeTextTrack {
+  /**
+   * The cues the media element renders, the way WebKit tracks them for a `<track>` that failed to load: disabling the
+   * track drops its cues, and turning it back on does not restore them. Only `addCue` registers a cue.
+   */
+  readonly rendered = new Set<TextTrackCue>();
+
   #mode: TextTrackMode = 'disabled';
   #cues: TextTrackCue[] = [];
 
@@ -26,6 +32,8 @@ class FakeTextTrack {
 
   set mode(mode: TextTrackMode) {
     const changed = mode !== this.#mode;
+
+    if (mode === 'disabled') this.rendered.clear();
 
     this.#mode = mode;
 
@@ -46,12 +54,17 @@ class FakeTextTrack {
   addCue(cue: TextTrackCue) {
     this.addCueCalls += 1;
 
-    const existing = this.#cues.findIndex((candidate) => candidate.id === cue.id);
-
-    // The spec removes an already present cue before re-adding it, which is what makes a refresh loop observable.
-    if (existing >= 0) this.#cues.splice(existing, 1);
+    // Adding a cue the track already holds is a no-op, as in WebKit.
+    if (this.#cues.includes(cue)) return;
 
     this.#cues.push(cue);
+
+    if (this.mode !== 'disabled') this.rendered.add(cue);
+  }
+
+  removeCue(cue: TextTrackCue) {
+    this.#cues = this.#cues.filter((present) => present !== cue);
+    this.rendered.delete(cue);
   }
 
   /** Mirrors hls.js's `clearCurrentCues()`, which reads cues through `hidden`. */
@@ -61,6 +74,7 @@ class FakeTextTrack {
     if (mode === 'disabled') this.mode = 'hidden';
 
     this.#cues = [];
+    this.rendered.clear();
 
     if (mode === 'disabled') this.mode = mode;
   }
@@ -576,5 +590,45 @@ describe('HlsJsTextTracksMixin', () => {
 
     expect((engine as any).subtitleTrack).toBe(1);
     expect(french.addCueCalls).toBe(before + 1);
+  });
+
+  it('renders the cues of a track that is turned off and back on', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+
+    const track = trackOf(video, 'default') as unknown as FakeTextTrack;
+    const toggle = (mode: TextTrackMode) => {
+      track.mode = mode;
+      video.textTracks.dispatchEvent(new Event('change'));
+    };
+
+    toggle('showing');
+    track.addCue({ id: 'one' } as TextTrackCue);
+    track.addCue({ id: 'two' } as TextTrackCue);
+
+    toggle('disabled');
+    expect(track.rendered.size).toBe(0);
+
+    toggle('showing');
+    expect(track.rendered.size).toBe(2);
+  });
+
+  it('refreshes the cues once per selection rather than on every change', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+
+    const track = trackOf(video, 'default') as unknown as FakeTextTrack;
+
+    track.mode = 'showing';
+    track.addCue({ id: 'one' } as TextTrackCue);
+    video.textTracks.dispatchEvent(new Event('change'));
+
+    const removeCue = vi.spyOn(track, 'removeCue');
+
+    video.textTracks.dispatchEvent(new Event('change'));
+
+    expect(removeCue).not.toHaveBeenCalled();
   });
 });

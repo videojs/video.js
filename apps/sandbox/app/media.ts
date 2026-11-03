@@ -1,15 +1,19 @@
 import {
   BACKGROUND_VIDEO_SRC,
   CLOUDFLARE_VIDEO_SRC,
+  DAILYMOTION_SOURCE_IDS,
   DASH_SOURCE_IDS,
   DEFAULT_BACKGROUND_SOURCE,
+  DEFAULT_DAILYMOTION_SOURCE,
   DEFAULT_DASH_SOURCE,
+  DEFAULT_MIXCLOUD_SOURCE,
   DEFAULT_PLAYERJS_SOURCE,
   DEFAULT_SOUNDCLOUD_SOURCE,
   DEFAULT_SOURCE,
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
   HLS_SOURCE_IDS,
+  MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
@@ -59,6 +63,8 @@ export interface MediaDescriptor {
   readonly entrySource?: SourceId;
   /** What the media will do with a source, when that is worth labelling for someone smoke-testing. */
   readonly outcome?: (source: SandboxSource) => string | undefined;
+  /** The preview starts without a skin, for a provider whose terms don't allow covering its player. */
+  readonly skinless?: true;
 }
 
 /**
@@ -224,11 +230,13 @@ const MEDIA_MAP = {
     entrySource: DEFAULT_BACKGROUND_SOURCE,
     outcome: backgroundOutcome,
   },
-  // Each embed but YouTube, `<playerjs-video>`, and `<soundcloud-audio>` renders one provider page URL rather than the
-  // picker's list. YouTube offers a set of page URLs instead, covering the caption, short, and live cases its adapter
-  // handles differently. The CDN page builds elements from attributes alone, so the entries that need player
-  // parameters stay off it. player.js is a protocol many providers speak, so its embed picks between their embed pages.
-  // SoundCloud's picker covers the URL shapes its adapter reads differently, and two that fail on purpose.
+  // Each embed but YouTube, `<playerjs-video>`, `<soundcloud-audio>`, `<mixcloud-audio>`, and `<dailymotion-video>`
+  // renders one provider page URL rather than the picker's list. YouTube offers a set of page URLs instead, covering the
+  // caption, short, and live cases its adapter handles differently. The CDN page builds elements from attributes alone,
+  // so the entries that need player parameters stay off it. player.js is a protocol many providers speak, so its embed
+  // picks between their embed pages. SoundCloud's and Mixcloud's pickers cover the URL shapes and layouts their adapters
+  // handle differently, and sources that fail on purpose. Dailymotion's picker covers player configurations and URL
+  // parameters.
   'vimeo-video': {
     label: 'Vimeo Video',
     player: 'video',
@@ -272,6 +280,15 @@ const MEDIA_MAP = {
     fallbackSource: DEFAULT_SOUNDCLOUD_SOURCE,
     entrySource: DEFAULT_SOUNDCLOUD_SOURCE,
   },
+  'mixcloud-audio': {
+    label: 'Mixcloud Audio',
+    player: 'audio',
+    tag: 'mixcloud-audio',
+    embed: true,
+    sources: MIXCLOUD_SOURCE_IDS,
+    fallbackSource: DEFAULT_MIXCLOUD_SOURCE,
+    entrySource: DEFAULT_MIXCLOUD_SOURCE,
+  },
   'spotify-audio': {
     label: 'Spotify Audio',
     player: 'audio',
@@ -295,6 +312,16 @@ const MEDIA_MAP = {
     embed: true,
     fixedSource: TWITCH_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
+  },
+  'dailymotion-video': {
+    label: 'Dailymotion Video',
+    player: 'video',
+    tag: 'dailymotion-video',
+    embed: true,
+    sources: DAILYMOTION_SOURCE_IDS,
+    fallbackSource: DEFAULT_DAILYMOTION_SOURCE,
+    entrySource: DEFAULT_DAILYMOTION_SOURCE,
+    skinless: true,
   },
   'wistia-video': {
     label: 'Wistia Video',
@@ -349,4 +376,9 @@ export function hasTailwindSkin(media: MediaId, platform: Platform): boolean {
 /** The background skin is one element with no default or neutral variant to choose between. */
 export function hasSkinChoice(media: MediaId): boolean {
   return MEDIA[media].player !== 'background';
+}
+
+/** Whether the preview starts without a skin when this media is entered. */
+export function startsSkinless(media: MediaId): boolean {
+  return MEDIA[media].skinless === true;
 }

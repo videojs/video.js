@@ -217,16 +217,9 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
 
         if (!showingTrack) return;
 
-        const hlsTrackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
-
-        // Refresh the cues after a texttrack mode change to fix a Chrome bug causing the captions not to render.
-        // Only when the showing track changes: `onCuesParsed` fires `change` for every batch it forwards to a
-        // disabled track, and re-adding each time re-renders the active cue several times a second.
-        if (showingChanged && Array.from(hlsTrackEls).some((trackEl) => trackEl.track === showingTrack)) {
-          Array.from(showingTrack.cues ?? []).forEach((cue) => {
-            showingTrack.addCue(cue);
-          });
-        }
+        // Only on a new showing track: `onCuesParsed` fires `change` for every batch it forwards to a disabled
+        // track, and refreshing each time would re-render the active cue several times a second.
+        if (showingChanged && isHlsTextTrack(media, showingTrack)) refreshCues(showingTrack);
 
         if (!engine.subtitleTracks.length) return;
 
@@ -272,6 +265,27 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
   }
 
   return HlsJsTextTracks as unknown as Base;
+}
+
+function isHlsTextTrack(media: HTMLMediaElement, track: TextTrack): boolean {
+  const trackEls = media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`);
+
+  return Array.from(trackEls).some((trackEl) => trackEl.track === track);
+}
+
+/**
+ * Makes the media element render the cues of a track that just became the showing one.
+ *
+ * The `<track>` elements created here have no `src`, so their load fails. WebKit only hands a re-enabled track's cues
+ * back to the media element when its `<track>` loaded, so a track turned off and on again lists its cues but renders
+ * none; Chrome has a similar rendering bug. Adding a cue that is already on the track is a no-op in WebKit, so each cue
+ * is removed before it is added back.
+ */
+function refreshCues(track: TextTrack): void {
+  for (const cue of Array.from(track.cues ?? [])) {
+    track.removeCue(cue);
+    track.addCue(cue);
+  }
 }
 
 function addTextTrack(
