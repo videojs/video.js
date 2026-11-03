@@ -103,6 +103,91 @@ for (const variant of CASES) {
     expect(contracts[1]!).toEqual(contracts[0]!);
   });
 
+  test(`${variant.framework} ${variant.skin} keeps a long error message in two scrolling lines over the bar`, async ({
+    page,
+  }) => {
+    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+    const contracts: { lines: number; scrolls: boolean }[] = [];
+
+    for (const panel of comparison.panels) {
+      await test.step(panel.style, async () => {
+        const dialog = panel.root.getByRole('alertdialog');
+        const description = dialog.locator('[id*="error-dialog-desc"]');
+
+        await expect(dialog).toBeVisible({ timeout: 20_000 });
+        await waitForStableText(dialog);
+        await normalizeErrorDialogCopy(dialog);
+        await description.evaluate((element) => {
+          element.textContent = 'This media could not be loaded. '.repeat(12);
+        });
+
+        const rootRect = await frameRect(panel.root);
+        const dialogRect = await frameRect(dialog);
+        const text = await description.evaluate((element) => {
+          const content = element.parentElement!;
+          const lineHeight = Number.parseFloat(getComputedStyle(content).lineHeight);
+
+          return {
+            lines: Math.round(content.clientHeight / lineHeight),
+            scrolls: content.scrollHeight > content.clientHeight,
+          };
+        });
+
+        expect(Math.abs(dialogRect.y - rootRect.y)).toBeLessThan(1);
+        expect(Math.abs(dialogRect.height - rootRect.height)).toBeLessThan(1);
+        expect(text).toEqual({ lines: 2, scrolls: true });
+        contracts.push(text);
+      });
+    }
+
+    expect(contracts[1]!).toEqual(contracts[0]!);
+  });
+
+  test(`${variant.framework} ${variant.skin} switches the error-dialog layout at a 12rem player height`, async ({
+    page,
+  }) => {
+    const comparison = await openVariants(page, variant, 672, { media: 'error', expectPlay: false });
+
+    for (const panel of comparison.panels) {
+      await test.step(panel.style, async () => {
+        const dialog = panel.root.getByRole('alertdialog');
+
+        await expect(dialog).toBeVisible({ timeout: 20_000 });
+        await waitForStableText(dialog);
+        await normalizeErrorDialogCopy(dialog);
+
+        const barHeight = (await frameRect(panel.root)).height;
+        // Stands in for visible media above the control bar, sized so the player sits on either side of 12rem.
+        const setPlayerHeight = (offset: number) =>
+          panel.root.evaluate(
+            (element: HTMLElement, { barHeight, offset }) => {
+              const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+              let media = element.querySelector<HTMLElement>(':scope > [data-test-media]');
+
+              if (!media) {
+                media = document.createElement('div');
+                media.dataset.testMedia = '';
+                element.prepend(media);
+              }
+
+              media.style.height = `${12 * rem - barHeight + offset}px`;
+            },
+            { barHeight, offset }
+          );
+
+        await setPlayerHeight(-1);
+        await expect
+          .poll(async () => (await frameRect(dialog)).width)
+          .toBeCloseTo((await frameRect(panel.root)).width, 0);
+
+        await setPlayerHeight(0);
+        await expect
+          .poll(async () => (await frameRect(dialog)).width)
+          .toBeLessThan((await frameRect(panel.root)).width / 2);
+      });
+    }
+  });
+
   test(`${variant.framework} ${variant.skin} shows the error-dialog card over tall media like video`, async ({
     page,
   }) => {
