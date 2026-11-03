@@ -24,6 +24,33 @@ function getDataLayer(): TestDataLayerEvent[] {
   return (window.dataLayer ?? []) as TestDataLayerEvent[];
 }
 
+interface EmbedLikeMedia extends EventTarget {
+  currentTime: number;
+  duration: number;
+  muted: boolean;
+  volume: number;
+  ended: boolean;
+  seeking: boolean;
+  src: string;
+  title: string;
+}
+
+function createEmbedLikeMedia(overrides: Partial<EmbedLikeMedia> = {}): EmbedLikeMedia {
+  // SAFETY: Test double for iframe-backed media with playback fields on EventTarget.
+  const media = new EventTarget() as EmbedLikeMedia;
+
+  media.currentTime = overrides.currentTime ?? 0;
+  media.duration = overrides.duration ?? 100;
+  media.muted = overrides.muted ?? false;
+  media.volume = overrides.volume ?? 1;
+  media.ended = overrides.ended ?? false;
+  media.seeking = overrides.seeking ?? false;
+  media.src = overrides.src ?? 'https://example.com/embed/video-id';
+  media.title = overrides.title ?? 'Embed Title';
+
+  return media;
+}
+
 describe('GoogleAnalyticsExtension', () => {
   let video: HTMLVideoElement;
 
@@ -43,6 +70,62 @@ describe('GoogleAnalyticsExtension', () => {
   afterEach(() => {
     window.dataLayer = [];
     delete window.gtag;
+  });
+
+  it('tracks progress, pause, seek, and mute from media state without an HTMLMediaElement target', () => {
+    const media = createEmbedLikeMedia();
+
+    const extension = new GoogleAnalyticsExtension();
+
+    extension.attach({ media, container: mockContainer });
+
+    media.dispatchEvent(new Event('play'));
+
+    media.currentTime = 25;
+    media.dispatchEvent(new Event('timeupdate'));
+
+    media.currentTime = 40;
+    media.dispatchEvent(new Event('pause'));
+
+    media.currentTime = 60;
+    media.dispatchEvent(new Event('seeked'));
+
+    media.muted = true;
+    media.dispatchEvent(new Event('volumechange'));
+
+    const progressEvent = getDataLayer().find((e) => e.event === 'video_progress' && e.video_percent === 25);
+    const pauseEvent = getDataLayer().find((e) => e.event === 'pause');
+    const seekEvent = getDataLayer().find((e) => e.event === 'seek');
+    const muteEvent = getDataLayer().find((e) => e.event === 'mute');
+
+    expect(progressEvent).toEqual(
+      expect.objectContaining({
+        video_current_time: 25,
+        video_duration: 100,
+        video_percent: 25,
+      })
+    );
+    expect(pauseEvent).toEqual(
+      expect.objectContaining({
+        video_current_time: 40,
+        video_duration: 100,
+        video_percent: 40,
+      })
+    );
+    expect(seekEvent).toEqual(
+      expect.objectContaining({
+        video_current_time: 60,
+        video_duration: 100,
+        video_percent: 60,
+      })
+    );
+    expect(muteEvent).toEqual(
+      expect.objectContaining({
+        video_current_time: 60,
+        video_duration: 100,
+        video_percent: 60,
+      })
+    );
   });
 
   it('tracks play and video_start on first play', () => {

@@ -157,11 +157,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     this.#media = media;
     this.#resetSession();
 
-    const target = this.#targetElement;
-
-    if (target) {
-      this.#lastMuted = target.muted || target.volume === 0;
+    if (this.#media) {
+      this.#lastMuted = this.#isMediaMutedOrSilent;
     }
+
+    const target = this.#targetElement;
 
     const offPlay = listen(media, 'play', this.#handlePlay);
     const offTimeUpdate = listen(media, 'timeupdate', this.#handleTimeUpdate);
@@ -214,25 +214,21 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #checkLoopRestart = (): boolean => {
-    const el = this.#targetElement;
-    if (isNil(el)) return false;
+    if (isNil(this.#media)) return false;
 
-    // SAFETY: Probing loop property on custom media element host.
-    const isLoop = Boolean(
-      el.loop || (this.#media && 'loop' in this.#media && (this.#media as { loop?: boolean }).loop)
-    );
-    if (!isLoop) return false;
+    if (!this.#mediaLoop) return false;
 
-    const duration = el.duration;
-    if (!isNumber(duration) || duration <= 0) return false;
+    const duration = this.#mediaDuration;
+    if (duration <= 0) return false;
 
+    const currentTime = this.#mediaCurrentTime;
     const isNearEnd = this.#maxTime >= duration * 0.7;
-    const isRestartAtStart = el.currentTime <= Math.max(1, duration * 0.05);
+    const isRestartAtStart = currentTime <= Math.max(1, duration * 0.05);
 
     if (isNearEnd && isRestartAtStart) {
       this.#hasEnded = false;
       this.#firedMilestones.clear();
-      this.#maxTime = el.currentTime;
+      this.#maxTime = currentTime;
       return true;
     }
 
@@ -250,11 +246,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       this.#hasPlayedOnce = true;
       this.#sendEvent('play', 0);
     } else {
-      const el = this.#targetElement;
-      const duration = el?.duration ?? 0;
-      const percent = duration > 0 && el ? Math.floor((el.currentTime / duration) * 100) : 0;
-
-      this.#sendEvent('resume', percent);
+      this.#sendEvent('resume', this.#percentAtCurrentTime());
     }
 
     if (!this.#hasStarted) {
@@ -264,11 +256,10 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handleTimeUpdate = (): void => {
-    const el = this.#targetElement;
-    if (isNil(el)) return;
+    if (isNil(this.#media)) return;
 
-    const duration = el.duration;
-    const currentTime = el.currentTime;
+    const duration = this.#mediaDuration;
+    const currentTime = this.#mediaCurrentTime;
 
     if (currentTime > this.#maxTime) {
       this.#maxTime = currentTime;
@@ -281,7 +272,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
 
     if (this.#effectiveStreamType === 'live') return;
 
-    if (this.disableProgress || !isNumber(duration) || duration <= 0) return;
+    if (this.disableProgress || duration <= 0) return;
 
     const percent = Math.floor((currentTime / duration) * 100);
 
@@ -296,15 +287,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   #handlePause = (): void => {
     if (this.#hasEnded) return;
 
-    const el = this.#targetElement;
-    if (isNil(el)) return;
+    if (isNil(this.#media)) return;
 
-    if (el.ended || el.seeking) return;
+    if (this.#mediaEnded || this.#mediaSeeking) return;
 
-    const duration = el.duration || 0;
-    const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;
-
-    this.#sendEvent('pause', percent);
+    this.#sendEvent('pause', this.#percentAtCurrentTime());
   };
 
   #handleEnded = (): void => {
@@ -316,8 +303,7 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   };
 
   #handleSeeked = (): void => {
-    const el = this.#targetElement;
-    if (isNil(el)) return;
+    if (isNil(this.#media)) return;
 
     if (this.#checkLoopRestart()) {
       this.#sendEvent('video_complete', 100);
@@ -325,21 +311,19 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
       return;
     }
 
-    if (el.currentTime > this.#maxTime) {
-      this.#maxTime = el.currentTime;
+    const currentTime = this.#mediaCurrentTime;
+
+    if (currentTime > this.#maxTime) {
+      this.#maxTime = currentTime;
     }
 
-    const duration = el.duration || 0;
-    const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;
-
-    this.#sendEvent('seek', percent);
+    this.#sendEvent('seek', this.#percentAtCurrentTime());
   };
 
   #handleVolumeChange = (): void => {
-    const el = this.#targetElement;
-    if (isNil(el)) return;
+    if (isNil(this.#media)) return;
 
-    const isMuted = el.muted || el.volume === 0;
+    const isMuted = this.#isMediaMutedOrSilent;
 
     if (this.#lastMuted === undefined) {
       this.#lastMuted = isMuted;
@@ -348,13 +332,11 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
 
     if (isMuted !== this.#lastMuted) {
       this.#lastMuted = isMuted;
-      const duration = el.duration || 0;
-      const percent = duration > 0 ? Math.floor((el.currentTime / duration) * 100) : 0;
 
       if (isMuted) {
-        this.#sendEvent('mute', percent);
+        this.#sendEvent('mute', this.#percentAtCurrentTime());
       } else {
-        this.#sendEvent('unmute', percent);
+        this.#sendEvent('unmute', this.#percentAtCurrentTime());
       }
     }
   };
@@ -364,19 +346,89 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
     if (isFs === this.#isFullscreen) return;
 
     this.#isFullscreen = isFs;
-    const el = this.#targetElement;
-    const duration = el?.duration || 0;
-    const percent = duration > 0 && el ? Math.floor((el.currentTime / duration) * 100) : 0;
 
     if (isFs) {
-      this.#sendEvent('fullscreenEnter', percent);
+      this.#sendEvent('fullscreenEnter', this.#percentAtCurrentTime());
     } else {
-      this.#sendEvent('fullscreenExit', percent);
+      this.#sendEvent('fullscreenExit', this.#percentAtCurrentTime());
     }
   };
 
   get #targetElement(): HTMLMediaElement | null {
     return this.#media ? getMediaElement(this.#media) : null;
+  }
+
+  get #mediaDuration(): number {
+    const media = this.#media;
+    if (isNil(media) || !('duration' in media)) return 0;
+
+    // SAFETY: Probing duration property on media after an `in` check.
+    const duration = (media as { duration: unknown }).duration;
+
+    return isNumber(duration) && !Number.isNaN(duration) ? duration : 0;
+  }
+
+  get #mediaCurrentTime(): number {
+    const media = this.#media;
+    if (isNil(media) || !('currentTime' in media)) return 0;
+
+    // SAFETY: Probing currentTime property on media after an `in` check.
+    const currentTime = (media as { currentTime: unknown }).currentTime;
+
+    return isNumber(currentTime) ? currentTime : 0;
+  }
+
+  get #mediaMuted(): boolean {
+    const media = this.#media;
+    if (isNil(media) || !('muted' in media)) return false;
+
+    // SAFETY: Probing muted property on media after an `in` check.
+    return Boolean((media as { muted: boolean }).muted);
+  }
+
+  get #mediaVolume(): number {
+    const media = this.#media;
+    if (isNil(media) || !('volume' in media)) return 1;
+
+    // SAFETY: Probing volume property on media after an `in` check.
+    const volume = (media as { volume: unknown }).volume;
+
+    return isNumber(volume) ? volume : 1;
+  }
+
+  get #isMediaMutedOrSilent(): boolean {
+    return this.#mediaMuted || this.#mediaVolume === 0;
+  }
+
+  get #mediaEnded(): boolean {
+    const media = this.#media;
+    if (isNil(media) || !('ended' in media)) return false;
+
+    // SAFETY: Probing ended property on media after an `in` check.
+    return Boolean((media as { ended: boolean }).ended);
+  }
+
+  get #mediaSeeking(): boolean {
+    const media = this.#media;
+    if (isNil(media) || !('seeking' in media)) return false;
+
+    // SAFETY: Probing seeking property on media after an `in` check.
+    return Boolean((media as { seeking: boolean }).seeking);
+  }
+
+  get #mediaLoop(): boolean {
+    const target = this.#targetElement;
+    const media = this.#media;
+
+    // SAFETY: Probing loop property on media after an `in` check.
+    return Boolean(target?.loop || (media && 'loop' in media && (media as { loop?: boolean }).loop));
+  }
+
+  #percentAtCurrentTime(): number {
+    const duration = this.#mediaDuration;
+    const currentTime = this.#mediaCurrentTime;
+
+    return duration > 0 ? Math.floor((currentTime / duration) * 100) : 0;
   }
 
   get #effectiveStreamType(): 'live' | 'on-demand' | string {
@@ -402,6 +454,14 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   #resolveTitle(videoTitle = this.metadata?.video_title): string {
     if (videoTitle) return videoTitle;
 
+    const media = this.#media;
+
+    if (!isNil(media) && 'title' in media) {
+      // SAFETY: Probing title property on media after an `in` check.
+      const title = (media as { title: unknown }).title;
+      if (isString(title) && title) return title;
+    }
+
     const el = this.#targetElement;
     if (!isNil(el) && el.title) return el.title;
 
@@ -425,9 +485,8 @@ export class GoogleAnalyticsExtension implements PlayerExtension, GoogleAnalytic
   }
 
   #sendEvent(event: GoogleAnalyticsEventName, percent: number): void {
-    const el = this.#targetElement;
-    const duration = el && isNumber(el.duration) && !Number.isNaN(el.duration) ? Math.round(el.duration) : 0;
-    const currentTime = el && isNumber(el.currentTime) ? Math.round(el.currentTime) : 0;
+    const duration = Math.round(this.#mediaDuration);
+    const currentTime = Math.round(this.#mediaCurrentTime);
 
     const { video_title, video_provider, video_url, video_stream_type, ...customDimensions } = this.metadata ?? {};
 
