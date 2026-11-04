@@ -19,7 +19,7 @@ export default styles({
           // A row of the control size plus `--spacing(2)`, less the top padding, centres the text below that padding.
           'grid content-start items-center grid-rows-[minmax(calc(var(--media-control-size)-(--spacing(0.5))),auto)]',
           'media-md:grid-rows-[minmax(calc(var(--media-control-size)-(--spacing(2))),auto)]',
-          'media-max-lg:pr-36',
+          'media-max-lg:pr-36 media-max-2xs:text-media',
           'transition-[filter,opacity,scale,translate]',
           'not-data-visible:scale-media-hidden',
           // The title paints its own top scrim; below lg the controls backdrop paints it for the top controls.
