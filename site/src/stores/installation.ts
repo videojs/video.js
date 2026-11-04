@@ -55,9 +55,10 @@ export const muxPlaybackId = atom<string | null>(null);
 
 /**
  * Skin options a reader tries on the installation preview. The "Add your player" snippets carry them too, but they stay
- * out of the URL and the CLI's installation options.
+ * out of the URL and the CLI's installation options. The controls start visible, so the preview and the snippet show a
+ * player with its controls from the start.
  */
-export const previewControlsBeforeStart = atom(false);
+export const previewControlsBeforeStart = atom(true);
 export const previewAccentColor = atom('');
 
 /**
