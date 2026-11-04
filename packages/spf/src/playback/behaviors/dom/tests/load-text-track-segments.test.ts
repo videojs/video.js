@@ -10,6 +10,7 @@ import type {
   Segment,
   TextTrack,
 } from '../../../../media/types';
+import type { RequestCredentialsPolicy } from '../../../../network/credentials-fetch';
 import type { TextTrackSegmentLoaderActor } from '../../../actors/text-track-segment-loader';
 import type { TextTracksActor } from '../../../actors/text-tracks';
 import { loadTextTrackSegments } from '../load-segments';
@@ -37,7 +38,11 @@ interface TextTrackSegmentLoadingContext {
 // signal map has to satisfy both.
 type ComposedContext = TextTrackSegmentLoadingContext & TextTrackActorsContext;
 
-const resolveVttSegment = vi.fn(async (url: string): Promise<VTTCue[]> => [new VTTCue(0, 5, `Subtitle from ${url}`)]);
+const resolveVttSegment = vi.fn(
+  async (url: string, _options?: { credentials?: RequestCredentials | undefined }): Promise<VTTCue[]> => [
+    new VTTCue(0, 5, `Subtitle from ${url}`),
+  ]
+);
 
 function makeState(initial: TextTrackSegmentLoadingState = {}): StateSignals<TextTrackSegmentLoadingState> {
   return {
@@ -454,5 +459,68 @@ describe('loadTextTrackSegments', () => {
 
       reactor.destroy();
     });
+  });
+});
+
+describe('setupTextTrackActors', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  function setupWithCredentials(requestCredentials: RequestCredentialsPolicy) {
+    const trackElement = document.createElement('track');
+    const video = document.createElement('video');
+
+    trackElement.id = 'text-1';
+    video.appendChild(trackElement);
+    trackElement.track.mode = 'hidden';
+
+    const state = makeState({
+      selectedTextTrackId: 'text-1',
+      preload: 'auto',
+      presentation: createMockPresentation([{ id: 'text-1', segments: createMockSegments(1) }]),
+    });
+    const context = makeContext({ mediaElement: video });
+    const setupCleanup = setupTextTrackActors.setup({
+      state,
+      context,
+      config: { resolveTextTrackSegment: resolveVttSegment, requestCredentials },
+    }) as () => void;
+    const reactor = loadTextTrackSegments.setup({ state, context });
+
+    return () => {
+      reactor.destroy();
+      setupCleanup();
+    };
+  }
+
+  it('loads each segment with the mode the request policy resolves for it', async () => {
+    const policy = vi.fn((): RequestCredentials | undefined => 'include');
+    const cleanup = setupWithCredentials(policy);
+
+    try {
+      await vi.waitFor(() =>
+        expect(resolveVttSegment).toHaveBeenCalledExactlyOnceWith('https://example.com/segment-0.vtt', {
+          credentials: 'include',
+        })
+      );
+      expect(policy).toHaveBeenCalledWith({ url: 'https://example.com/segment-0.vtt' });
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('forwards a fixed request credentials mode', async () => {
+    const cleanup = setupWithCredentials('include');
+
+    try {
+      await vi.waitFor(() =>
+        expect(resolveVttSegment).toHaveBeenCalledExactlyOnceWith('https://example.com/segment-0.vtt', {
+          credentials: 'include',
+        })
+      );
+    } finally {
+      cleanup();
+    }
   });
 });

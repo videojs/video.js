@@ -17,6 +17,7 @@
     { "path": "packages/media/src/dom" },
 
     { "path": "packages/adapters/cloudflare-video" },
+    { "path": "packages/adapters/dailymotion-video" },
     { "path": "packages/adapters/dash-video" },
     { "path": "packages/adapters/hlsjs-video" },
     { "path": "packages/adapters/mux" },
@@ -34,6 +35,7 @@
     { "path": "packages/adapters/wistia-video" },
     { "path": "packages/adapters/youtube-video" },
 
+    { "path": "packages/extensions/google-analytics" },
     { "path": "packages/extensions/google-cast" },
     { "path": "packages/extensions/mux-data" },
 

@@ -63,6 +63,14 @@ Avoid structural selectors such as `:has()`, `has-*`, `group-has-*`, descendants
 - The vjsc plugin writes a candidate manifest into the Vite cache directory and aliases it as `vjsc:candidates`; the dev Tailwind entry imports it so scanning sees the utilities the transform resolves. The plugin also re-includes the manifest in the Vite watcher, which skips the cache directory by default, so Tailwind recompiles as modules record. Raw style modules are not scanned.
 - Composed rules override the rules they extend by order in CSS output, but Tailwind output has no runtime class merging, so a same-property override across composed rules still needs `!` unless Tailwind emits the shorthand first.
 
+## Browser support
+
+Compat and Scaffold support older browsers than the root `browserslist`, listed in `packages/skins/build/compat-browsers.ts`. They compile from the same shared styles and tokens, so changes under `src/styles/` reach them too.
+
+- Declare a plain `rgb()` or keyword color before any `color-mix()`, `oklch()`, relative color, `light-dark()`, or `contrast-color()`, and put the newer value in a later `@supports` check that names the function. Never define a token only inside `@supports`; the audit cannot tell that the fallback is missing.
+- In Compat and Scaffold, treat container queries, media query ranges, and `:has()` as enhancements. Base classes must give a working narrow layout, and `media-*` variants add the wider ones.
+- When `build/tests/browser-support.test.ts` fails, add the fallback. Do not widen its accepted enhancements or raise the Compat browser list without the user's approval.
+
 ## Example
 
 Input: “Add a tooltip to the volume-popover button.”

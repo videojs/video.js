@@ -1254,6 +1254,12 @@ describe('Feature pipeline (end-to-end)', () => {
       expect(config.poster!.default).toBe("'/poster.jpg'");
     });
 
+    it('shows an array constant default as its literal', () => {
+      const config = findFeature('poster')!.reference.config;
+
+      expect(config.posterWidths!.default).toBe('[320, 640]');
+    });
+
     // The fixture's PlayerFeatureConfig mirrors production, so a constraint that
     // drifted back to demanding exactly `string | null | undefined` would fail
     // this file's own type check before it reached the assertion.
@@ -1751,6 +1757,7 @@ describe('Media component pipeline (end-to-end)', () => {
       expect(names).toEqual([
         'BarrelVideo',
         'ComplexVideo',
+        'ContainerVideo',
         'EmbedVideo',
         'ExtendingVideo',
         'MixinVideo',
@@ -2094,6 +2101,13 @@ describe('Media component pipeline (end-to-end)', () => {
 
       expect(react).toMatchObject({ target: 'iframe', acceptsNativeProps: false });
       expect(Object.keys(react!.props).sort()).toEqual(['autoplay', 'source', 'src']);
+    });
+
+    it('records a container target for a React embed that renders a div', () => {
+      const react = findElement('ContainerVideo')!.reference.platforms.react;
+
+      expect(react).toMatchObject({ target: 'div', acceptsNativeProps: false });
+      expect(react!.mediaRef).toEqual({ type: 'EmbedHost', module: '../../../../media/src/dom/embed' });
     });
 
     it('records the mediaRef type and the module it is imported from', () => {

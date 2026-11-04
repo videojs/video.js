@@ -1,4 +1,10 @@
-import { isMediaPlaybackRateCapable, isMediaVolumeCapable, MediaError, type Video } from '@videojs/media';
+import {
+  isMediaBufferCapable,
+  isMediaPlaybackRateCapable,
+  isMediaVolumeCapable,
+  MediaError,
+  type Video,
+} from '@videojs/media';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildPlayerJsIframeSrc, PlayerJsAdapter, parsePlayerJsSource } from '..';
@@ -399,6 +405,7 @@ describe('PlayerJsAdapter', () => {
 
     expect(isMediaVolumeCapable(media)).toBe(true);
     expect(isMediaPlaybackRateCapable(media)).toBe(true);
+    expect(isMediaBufferCapable(media)).toBe(true);
     // Compile-time check that it implements the `Video` surface it claims.
     const video: Partial<Video> = media;
 
@@ -1011,8 +1018,8 @@ describe('PlayerJsAdapter', () => {
       media.addEventListener('timeupdate', timeupdate);
       media.addEventListener('progress', progress);
 
-      report(iframe, 'timeupdate', { seconds: 10, duration: 100 }, listener);
       report(iframe, 'progress', { seconds: 30, duration: 100 }, listener);
+      report(iframe, 'timeupdate', { seconds: 10, duration: 100 }, listener);
 
       expect(media.currentTime).toBe(10);
       expect(media.duration).toBe(100);
@@ -1024,6 +1031,28 @@ describe('PlayerJsAdapter', () => {
       // Some receivers (Gumlet's) report progress as a 0-100 percentage of the duration.
       report(iframe, 'progress', { percent: 50 }, listener);
       expect(media.buffered.end(0)).toBe(50);
+    });
+
+    it('stretches the buffered range to the position for receivers that report no progress', async () => {
+      const media = new PlayerJsAdapter();
+      const { iframe, listener } = await attachAndReady(media);
+      const progress = vi.fn();
+
+      media.addEventListener('progress', progress);
+
+      report(iframe, 'timeupdate', { seconds: 10, duration: 100 }, listener);
+      expect(media.buffered.end(0)).toBe(10);
+      expect(progress).toHaveBeenCalledOnce();
+
+      media.currentTime = 20;
+      expect(media.buffered.end(0)).toBe(20);
+      expect(progress).toHaveBeenCalledTimes(2);
+
+      report(iframe, 'progress', { seconds: 30 }, listener);
+      progress.mockClear();
+      report(iframe, 'timeupdate', { seconds: 25 }, listener);
+      expect(media.buffered.end(0)).toBe(30);
+      expect(progress).not.toHaveBeenCalled();
     });
   });
 

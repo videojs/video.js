@@ -2,6 +2,73 @@
 
 All notable changes to this project will be documented in this file.
 
+## [@videojs/core@10.3.0] - 2026-11-03
+
+### 🚀 Features
+- *(mux-data)* Report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/pull/9577)) by [@luwes](https://github.com/luwes)
+- *(core)* Hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/pull/9603)) by [@luwes](https://github.com/luwes)
+- *(core)* Show a pending autoplay as starting playback ([#9609](https://github.com/videojs/video.js/pull/9609)) by [@luwes](https://github.com/luwes)
+- *(mixcloud-audio)* Add the Mixcloud audio provider ([#9649](https://github.com/videojs/video.js/pull/9649)) by [@javierarams](https://github.com/javierarams)
+- *(packages)* Configure playback rates on the player ([#9533](https://github.com/videojs/video.js/pull/9533)) by [@sampotts](https://github.com/sampotts)
+- Dailymotion video provider ([#9512](https://github.com/videojs/video.js/pull/9512)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(skin)* Deepen the video scrims for legibility over light video ([#9675](https://github.com/videojs/video.js/pull/9675)) by [@sampotts](https://github.com/sampotts)
+- *(skin)* Fade and scale the compat dialog in and out ([#9664](https://github.com/videojs/video.js/pull/9664)) by [@sampotts](https://github.com/sampotts)
+- *(site)* Add a press page with logo downloads ([#9680](https://github.com/videojs/video.js/pull/9680)) by [@heff](https://github.com/heff)
+- *(google-analytics)* Implement Google Analytics 4 extension and docs ([#9563](https://github.com/videojs/video.js/pull/9563)) by [@GiriAakula](https://github.com/GiriAakula)
+
+### 🐛 Bug Fixes
+- *(site)* Report the deployed branch in the sandbox copy-report on vercel ([#9550](https://github.com/videojs/video.js/pull/9550)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(mux-data)* Monitor the HLS background video ([#9581](https://github.com/videojs/video.js/pull/9581)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(spf)* Resolve a relative source URL in the HLS adapters ([#9587](https://github.com/videojs/video.js/pull/9587)) by [@cjpillsbury](https://github.com/cjpillsbury)
+- *(react)* Leave pointer events to the skin over chromeless embeds ([#9601](https://github.com/videojs/video.js/pull/9601)) by [@luwes](https://github.com/luwes)
+- *(core)* Keep embeds from taking a volume the browser locks ([#9602](https://github.com/videojs/video.js/pull/9602)) by [@luwes](https://github.com/luwes)
+- *(installation)* Pass Mux URLs to React Mux media as a structured source ([#9605](https://github.com/videojs/video.js/pull/9605)) by [@decepulis](https://github.com/decepulis)
+- *(skin)* Lighten the video controls backdrop ([#9585](https://github.com/videojs/video.js/pull/9585)) by [@sampotts](https://github.com/sampotts)
+- *(html)* Keep the playback rate menu trigger visible once rates are available ([#9624](https://github.com/videojs/video.js/pull/9624)) by [@sampotts](https://github.com/sampotts)
+- *(core)* Hide open popovers before entering fullscreen ([#9627](https://github.com/videojs/video.js/pull/9627)) by [@sampotts](https://github.com/sampotts)
+- *(skin)* Derive muted foreground from the foreground color ([#9558](https://github.com/videojs/video.js/pull/9558)) by [@sampotts](https://github.com/sampotts)
+- *(packages)* Show only the control name in the playback rate tooltip ([#9532](https://github.com/videojs/video.js/pull/9532)) by [@sampotts](https://github.com/sampotts)
+- *(hlsjs-video)* Update hls.js to 1.7.3 ([#9645](https://github.com/videojs/video.js/pull/9645)) by [@decepulis](https://github.com/decepulis)
+- *(twitch-video)* Drop the playback rate the embed cannot apply ([#9640](https://github.com/videojs/video.js/pull/9640)) by [@BeyondITL-Mossaddique](https://github.com/BeyondITL-Mossaddique)
+- *(hlsjs-video)* Keep rendition ids in step with the levels hls.js reports ([#9566](https://github.com/videojs/video.js/pull/9566)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(element)* Inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/pull/9525)) by [@kenny-ish](https://github.com/kenny-ish)
+- *(test)* Check the selected playback rate after the menu reopens ([#9657](https://github.com/videojs/video.js/pull/9657)) by [@sampotts](https://github.com/sampotts)
+- *(core)* Handle void remote playback cancellation ([#9652](https://github.com/videojs/video.js/pull/9652)) by [@luwes](https://github.com/luwes)
+- *(dash-video)* Detach the dash.js view once on destroy ([#9653](https://github.com/videojs/video.js/pull/9653)) by [@luwes](https://github.com/luwes)
+- *(mux-data)* Keep new metadata off the outgoing view on a video change ([#9656](https://github.com/videojs/video.js/pull/9656)) by [@luwes](https://github.com/luwes)
+- *(spf)* Load webvtt segments with the request credentials mode ([#9682](https://github.com/videojs/video.js/pull/9682)) by [@luwes](https://github.com/luwes)
+- *(spf)* Auto-select DEFAULT and AUTOSELECT subtitles in hls-video ([#9681](https://github.com/videojs/video.js/pull/9681)) by [@luwes](https://github.com/luwes)
+- *(packages)* Fill the buffered bar for embed adapters ([#9679](https://github.com/videojs/video.js/pull/9679)) by [@javierarams](https://github.com/javierarams)
+- *(element)* Deliver context to consumers connected before their provider ([#9663](https://github.com/videojs/video.js/pull/9663)) by [@sampotts](https://github.com/sampotts)
+- *(hlsjs-video)* Render reselected hls.js text tracks in Safari ([#9683](https://github.com/videojs/video.js/pull/9683)) by [@luwes](https://github.com/luwes)
+- *(spf)* Render reselected text tracks in hls-video on safari ([#9685](https://github.com/videojs/video.js/pull/9685)) by [@luwes](https://github.com/luwes)
+- *(spf)* Merge audio rendition into audio-only variant sharing its uri ([#9688](https://github.com/videojs/video.js/pull/9688)) by [@luwes](https://github.com/luwes)
+- *(hlsjs-video)* CEA-608/708 captions never rendered on the hls.js path ([#9565](https://github.com/videojs/video.js/pull/9565)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(skin)* Let the page set the video skin's aspect ratio ([#9692](https://github.com/videojs/video.js/pull/9692)) by [@sampotts](https://github.com/sampotts)
+
+### 💼 Other
+- SoundCloud Audio provider ([#9524](https://github.com/videojs/video.js/pull/9524)) by [@javierarams](https://github.com/javierarams)
+
+### 🚜 Refactor
+- *(spf)* Import svta error codes from @svta/cml-error-codes ([#9579](https://github.com/videojs/video.js/pull/9579)) by [@cjpillsbury](https://github.com/cjpillsbury)
+
+### 📚 Documentation
+- *(site)* Add skin choice guidance ([#9474](https://github.com/videojs/video.js/pull/9474)) by [@mihar-22](https://github.com/mihar-22)
+- *(site)* Add changelog prose for 10.2.0 ([#9574](https://github.com/videojs/video.js/pull/9574)) by [@github-actions[bot]](https://github.com/github-actions[bot])
+- Add CI sponsor to readme ([#9642](https://github.com/videojs/video.js/pull/9642)) by [@heff](https://github.com/heff)
+- *(site)* List SoundCloud and Mixcloud in the Vidstack migration guide ([#9660](https://github.com/videojs/video.js/pull/9660)) by [@javierarams](https://github.com/javierarams)
+- *(site)* Describe pending autoplay play button and buffering states ([#9654](https://github.com/videojs/video.js/pull/9654)) by [@luwes](https://github.com/luwes)
+- *(site)* Note the node.js requirement for skin projects ([#9666](https://github.com/videojs/video.js/pull/9666)) by [@sampotts](https://github.com/sampotts)
+
+### ⚙️ Miscellaneous Tasks
+- *(ci)* Run workflows on blacksmith ([#9643](https://github.com/videojs/video.js/pull/9643)) by [@sampotts](https://github.com/sampotts)
+- *(ci)* Build e2e packages outside the playwright container ([#9651](https://github.com/videojs/video.js/pull/9651)) by [@sampotts](https://github.com/sampotts)
+
+### New Contributors
+* @GiriAakula made their first contribution in [#9563](https://github.com/videojs/video.js/pull/9563)
+* @kenny-ish made their first contribution in [#9525](https://github.com/videojs/video.js/pull/9525)
+* @BeyondITL-Mossaddique made their first contribution in [#9640](https://github.com/videojs/video.js/pull/9640)
+
 ## [@videojs/core@10.2.0] - 2026-10-22
 
 ### 🚀 Features
@@ -2382,6 +2449,7 @@ All notable changes to this project will be documented in this file.
 * @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
 * @heff made their first contribution
 
+[@videojs/core@10.3.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0
 [@videojs/core@10.2.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0
 [@videojs/core@10.1.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.0.1...@videojs/core@10.1.0
 [@videojs/core@10.0.1]: https://github.com/videojs/v10/compare/@videojs/core@10.0.0...@videojs/core@10.0.1
@@ -5380,7 +5448,7 @@ Earlier releases predate conventional commits and keep their hand-written notes.
 
 ### 🚀 Features
 - Log Levels ([#3853](https://github.com/videojs/video.js/pull/3853)) by [@misteroneill](https://github.com/misteroneill)
-- Replay at ended ([#3868](https://github.com/videojs/video.js/pull/3868)) by [@mrocajr](https://github.com/mrocajr)
+- Replay at ended ([#3868](https://github.com/videojs/video.js/pull/3868))
 - [**breaking**] Restore all outlines for greater accessibility ([#3829](https://github.com/videojs/video.js/pull/3829)) by [@misteroneill](https://github.com/misteroneill)
 - [**breaking**] Return the native Promise from play() ([#3907](https://github.com/videojs/video.js/pull/3907)) by [@brandonocasey](https://github.com/brandonocasey)
 - Advanced Class-based Plugins for 6.0 ([#3690](https://github.com/videojs/video.js/pull/3690)) by [@misteroneill](https://github.com/misteroneill)
@@ -5511,7 +5579,7 @@ Earlier releases predate conventional commits and keep their hand-written notes.
 - Fix IE9 rounding issue with lastvolume test ([#4230](https://github.com/videojs/video.js/pull/4230)) by [@kevinlitchfield](https://github.com/kevinlitchfield)
 
 ### ⚙️ Miscellaneous Tasks
-- [**breaking**] Remove component.json and remove references to it ([#3866](https://github.com/videojs/video.js/pull/3866)) by [@mrocajr](https://github.com/mrocajr)
+- [**breaking**] Remove component.json and remove references to it ([#3866](https://github.com/videojs/video.js/pull/3866))
 - *(package)* Update xhr to version 2.3.3 ([#3914](https://github.com/videojs/video.js/pull/3914)) by [@greenkeeper[bot]](https://github.com/greenkeeper[bot])
 - *(package)* Pin karma to 1.3.0 ([#4002](https://github.com/videojs/video.js/pull/4002)) by [@gkatsev](https://github.com/gkatsev)
 - Add flash as a dev dependency for testing ([#4016](https://github.com/videojs/video.js/pull/4016)) by [@brandonocasey](https://github.com/brandonocasey)
@@ -5547,7 +5615,6 @@ Earlier releases predate conventional commits and keep their hand-written notes.
 * @altaywtf made their first contribution in [#3989](https://github.com/videojs/video.js/pull/3989)
 * @diniscorreia made their first contribution in [#3955](https://github.com/videojs/video.js/pull/3955)
 * @ngoisaosang made their first contribution in [#3964](https://github.com/videojs/video.js/pull/3964)
-* @mrocajr made their first contribution in [#3866](https://github.com/videojs/video.js/pull/3866)
 * @andrewagain made their first contribution in [#3944](https://github.com/videojs/video.js/pull/3944)
 
 ## [5.19.1] - 2017-03-27
