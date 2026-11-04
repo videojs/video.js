@@ -5,8 +5,8 @@ import browserslist from 'browserslist';
 import { browserslistToTargets, Features, transform } from 'lightningcss';
 import { describe, expect, it } from 'vite-plus/test';
 
-import { compatSkinBrowserslist } from '../../../../build/css-targets.ts';
 import { auditSkinCss } from '../browser-support.ts';
+import { compatSkinBrowserslist } from '../compat-browsers.ts';
 
 const workspaceDir = resolve(import.meta.dirname, '../../../..');
 const browsers = browserslist(undefined, { path: workspaceDir });

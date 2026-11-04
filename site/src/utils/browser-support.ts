@@ -2,8 +2,8 @@ import browserslist from 'browserslist';
 import * as caniuse from 'caniuse-lite';
 import caniusePackage from 'caniuse-lite/package.json' with { type: 'json' };
 
-import { compatSkinBrowserslist } from '../../../build/css-targets.ts';
 import rootPackage from '../../../package.json' with { type: 'json' };
+import { compatSkinBrowserslist } from '../../../packages/skins/build/compat-browsers.ts';
 
 /** The browsers the support policy names, in the order the docs list them. */
 export const SUPPORT_BROWSERS = [
