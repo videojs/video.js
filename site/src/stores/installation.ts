@@ -54,6 +54,13 @@ export const styling = atom<RegistryStyling | null>(initialSelection.styling);
 export const muxPlaybackId = atom<string | null>(null);
 
 /**
+ * Skin options a reader tries on the installation preview. The "Add your player" snippets carry them too, but they stay
+ * out of the URL and the CLI's installation options.
+ */
+export const previewControlsBeforeStart = atom(false);
+export const previewAccentColor = atom('');
+
+/**
  * The picks live in the page URL so a reload, a shared link, or coming back from another page lands on the same player.
  * The atoms start from the URL, and every change rewrites it in place so the history stack stays one entry per page.
  */
