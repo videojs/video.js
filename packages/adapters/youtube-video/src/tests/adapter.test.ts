@@ -1,4 +1,4 @@
-import { MediaError } from '@videojs/media';
+import { isMediaBufferCapable, MediaError } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { buildYouTubeIframeSrc, YouTubeAdapter } from '..';
@@ -264,6 +264,10 @@ describe('buildYouTubeIframeSrc', () => {
 });
 
 describe('YouTubeAdapter', () => {
+  it('reports the rates YouTube plays', () => {
+    expect(new YouTubeAdapter().playbackRateRange).toEqual({ min: 0.25, max: 2 });
+  });
+
   it('has expected default state before attach', () => {
     const media = new YouTubeAdapter();
 
@@ -276,6 +280,14 @@ describe('YouTubeAdapter', () => {
     expect(media.src).toBe(YouTubeAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new YouTubeAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src and creates a player when attached', async () => {

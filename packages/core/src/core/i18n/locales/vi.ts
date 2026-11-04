@@ -102,6 +102,7 @@ export default {
     speed: 'Tốc độ',
     captions: 'Phụ đề',
     playbackRate: 'Tốc độ phát lại',
+    customRate: 'Tùy chỉnh, {rate}',
     back: 'Quay lại',
     off: 'Tắt',
     auto: 'Tự động',

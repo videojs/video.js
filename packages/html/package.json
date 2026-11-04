@@ -1,6 +1,6 @@
 {
   "name": "@videojs/html",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Video.js 10 for HTML, Vue, and Svelte: player custom elements and skins for video and audio",
   "keywords": [
     "audio",
@@ -181,7 +181,9 @@
   },
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/icons": "workspace:*",
@@ -204,7 +206,9 @@
   },
   "peerDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/google-analytics": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/mixcloud-audio": "workspace:*",
@@ -225,7 +229,13 @@
     "@videojs/cloudflare-video": {
       "optional": true
     },
+    "@videojs/dailymotion-video": {
+      "optional": true
+    },
     "@videojs/dash-video": {
+      "optional": true
+    },
+    "@videojs/google-analytics": {
       "optional": true
     },
     "@videojs/google-cast": {

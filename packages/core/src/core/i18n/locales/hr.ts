@@ -102,6 +102,7 @@ export default {
     speed: 'Brzina',
     captions: 'Titlovi',
     playbackRate: 'Brzina reprodukcije',
+    customRate: 'Prilagođeno, {rate}',
     back: 'Natrag',
     off: 'Isključeno',
     auto: 'Automatski',

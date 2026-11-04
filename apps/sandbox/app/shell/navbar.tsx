@@ -137,6 +137,8 @@ type SkinControlsProps = {
   onStylingChange: (value: Styling) => void;
   skin: Skin;
   onSkinChange: (value: Skin) => void;
+  /** The options panel turned skins off, so none of these applies. */
+  skinless: boolean;
   skins: SkinSource;
   onSkinsChange: (value: SkinSource) => void;
   compare: CompareMode;
@@ -153,6 +155,7 @@ export function SkinControls({
   onStylingChange,
   skin,
   onSkinChange,
+  skinless,
   skins,
   onSkinsChange,
   compare,
@@ -167,7 +170,7 @@ export function SkinControls({
         value={skin}
         onChange={(v) => onSkinChange(v as Skin)}
         options={SKINS.map((value) => ({ value, label: SKIN_LABELS[value] }))}
-        disabled={!hasSkinChoice(media)}
+        disabled={!hasSkinChoice(media) || skinless}
       />
 
       <Select
@@ -179,6 +182,7 @@ export function SkinControls({
           label: STYLING_LABELS[s],
           disabled: s === 'tailwind' && !(hasTailwindSkin(media, platform) && tailwindSkinAvailable(platform)),
         }))}
+        disabled={skinless}
       />
 
       <Select
@@ -190,7 +194,7 @@ export function SkinControls({
           label: SKIN_SOURCE_LABELS[value],
           disabled: !skinSourceAvailable(value, platform),
         }))}
-        disabled={!hasSkinChoice(media) || platform === 'cdn'}
+        disabled={!hasSkinChoice(media) || platform === 'cdn' || skinless}
       />
 
       <Select

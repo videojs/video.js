@@ -101,6 +101,7 @@ export default {
     speed: 'Hastighet',
     captions: 'Textning',
     playbackRate: 'Uppspelningshastighet',
+    customRate: 'Anpassad, {rate}',
     back: 'Tillbaka',
     off: 'Av',
     auto: 'Auto',

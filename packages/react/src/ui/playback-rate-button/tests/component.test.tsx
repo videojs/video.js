@@ -74,6 +74,22 @@ describe('PlaybackRateButton', () => {
     expect(screen.queryByTestId('button')).toBeNull();
   });
 
+  it('publishes the rate length alongside the consumer style', () => {
+    const { Wrapper: PlayerWrapper } = createPlayerWrapper({
+      playbackRate: 1.75,
+      playbackRates: [1, 1.75],
+      playbackRateAvailability: 'available',
+      setPlaybackRate: vi.fn(),
+    });
+
+    render(<PlaybackRateButton data-testid="button" style={{ color: 'red' }} />, { wrapper: PlayerWrapper });
+
+    const button = screen.getByTestId('button');
+
+    expect(button.style.getPropertyValue('--media-playback-rate-length')).toBe('4');
+    expect(button.style.color).toBe('red');
+  });
+
   it('shows the control name and the speed-up shortcut in the tooltip', async () => {
     const container = document.createElement('div');
     const value = createContextValue(container);

@@ -137,6 +137,10 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Internationalization',
           },
           {
+            slug: 'guides/google-analytics',
+            sidebarLabel: 'Google Analytics',
+          },
+          {
             slug: 'guides/mux-data',
             sidebarLabel: 'Mux Data',
           },
@@ -201,6 +205,7 @@ export const sidebar: Sidebar = [
           { slug: 'reference/components/audio' },
           { slug: 'reference/components/background-video' },
           { slug: 'reference/components/cloudflare-video' },
+          { slug: 'reference/components/dailymotion-video' },
           { slug: 'reference/components/dash-video' },
           { slug: 'reference/components/hls-audio' },
           { slug: 'reference/components/hls-background-video' },
@@ -229,6 +234,7 @@ export const sidebar: Sidebar = [
         contents: [
           { slug: 'reference/components/google-cast' },
           { slug: 'reference/components/fcast' },
+          { slug: 'reference/components/google-analytics' },
           { slug: 'reference/components/mux-data' },
         ],
       },
