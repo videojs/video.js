@@ -8,31 +8,64 @@
        taller, as it sits behind the control bar. */
     --media-controls-gradient-height: max(40%, calc(var(--media-spacing) * 40));
     --media-controls-bottom-gradient-height: max(50%, calc(var(--media-spacing) * 60));
-    /* Scrims for browsers without relative colors or gradient interpolation; the `@supports` blocks below refine them. */
-    --media-controls-gradient: linear-gradient(
-      to top,
-      color-mix(in oklab, var(--media-backdrop) 60%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 50.7%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 30%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 9.3%, transparent) 75%,
-      transparent
-    );
-    --media-controls-top-gradient: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--media-backdrop) 55%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 46.48%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 27.5%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 8.53%, transparent) 75%,
-      transparent
-    );
     --media-caption-controls-y: calc(var(--media-spacing) * -16);
     --media-slider-preview-offset: calc(var(--media-spacing) * 9);
-    --media-thumbnail-gradient: linear-gradient(
-      to top,
-      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 10%, transparent),
-      transparent
-    );
+  }
+
+  /*
+   * Scrims for browsers without relative colors or gradient interpolation; the checks after this one refine them. Only
+   * the Default and Neutral skins use these, and every browser they support has `color-mix()`.
+   */
+  @supports (color: color-mix(in oklab, red, red)) {
+    .media-skin:is([data-preset="video"], [data-preset="live-video"]) {
+      --media-controls-gradient: linear-gradient(
+        to top,
+        color-mix(in oklab, var(--media-backdrop) 60%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 50.7%, transparent) 25%,
+        color-mix(in oklab, var(--media-backdrop) 30%, transparent) 50%,
+        color-mix(in oklab, var(--media-backdrop) 9.3%, transparent) 75%,
+        transparent
+      );
+      --media-controls-top-gradient: linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--media-backdrop) 55%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 46.48%, transparent) 25%,
+        color-mix(in oklab, var(--media-backdrop) 27.5%, transparent) 50%,
+        color-mix(in oklab, var(--media-backdrop) 8.53%, transparent) 75%,
+        transparent
+      );
+      --media-thumbnail-gradient: linear-gradient(
+        to top,
+        color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 10%, transparent),
+        transparent
+      );
+    }
+
+    .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
+      --media-controls-gradient: linear-gradient(
+        to top,
+        color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
+        color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
+        color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
+        transparent
+      );
+      --media-controls-top-gradient: linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--media-backdrop) 50%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
+        color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
+        color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
+        transparent
+      );
+      --media-indicator-gradient: linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--media-backdrop) 35%, transparent),
+        color-mix(in oklab, var(--media-backdrop) 20%, transparent) calc(var(--media-spacing) * 12),
+        transparent
+      );
+    }
   }
 
   @supports (color: oklch(from red l c h)) and (background-image: linear-gradient(in oklab, red, red)) {
@@ -71,28 +104,6 @@
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.15));
     --media-controls-gradient-height: 40%;
     --media-controls-bottom-gradient-height: 40%;
-    --media-controls-gradient: linear-gradient(
-      to top,
-      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
-      transparent
-    );
-    --media-controls-top-gradient: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--media-backdrop) 50%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 42.2%, transparent) 25%,
-      color-mix(in oklab, var(--media-backdrop) 25%, transparent) 50%,
-      color-mix(in oklab, var(--media-backdrop) 7.8%, transparent) 75%,
-      transparent
-    );
-    --media-indicator-gradient: linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--media-backdrop) 35%, transparent),
-      color-mix(in oklab, var(--media-backdrop) 20%, transparent) calc(var(--media-spacing) * 12),
-      transparent
-    );
     --media-caption-controls-y: calc(var(--media-spacing) * -14);
     --media-slider-preview-offset: calc(var(--media-spacing) * 11);
   }
