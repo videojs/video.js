@@ -5,13 +5,21 @@ import browserslist from 'browserslist';
 import { browserslistToTargets, Features, transform } from 'lightningcss';
 import { describe, expect, it } from 'vite-plus/test';
 
+import { compatSkinBrowserslist } from '../../../../build/css-targets.ts';
 import { auditSkinCss } from '../browser-support.ts';
 
 const workspaceDir = resolve(import.meta.dirname, '../../../..');
 const browsers = browserslist(undefined, { path: workspaceDir });
+const compatBrowsers = browserslist([...compatSkinBrowserslist]);
 
 /** Relative colors the skins accept losing: they change their origin's channels, so no `color-mix()` stands in. */
 const ACCEPTED_DEGRADATIONS = ['--media-shadow-current-color'];
+
+/**
+ * Features Compat and Scaffold use as enhancements below the root `browserslist`: without them the controls keep their
+ * narrow layout and default size, and the time slider preview stays hidden on keyboard focus.
+ */
+const COMPAT_ENHANCEMENTS = /^(:has\(\)|@container|media query ranges) is unsupported/;
 
 const floor = ['chrome 111', 'firefox 121', 'safari 16.4'];
 
@@ -58,6 +66,25 @@ describe('auditSkinCss', () => {
     expect(auditSkinCss(mix, floor).problems).toHaveLength(1);
     expect(auditSkinCss(mix.replace(';', ' !important;'), floor).problems).toHaveLength(1);
     expect(auditSkinCss(`@supports (contain-intrinsic-size: auto 1px) { ${mix} }`, floor).problems).toEqual([]);
+  });
+
+  it('accepts `color-mix()` and `oklch()` inside an `@supports` check for a newer color feature', () => {
+    const old = ['chrome 99'];
+    const css = (body: string) => `.a { --b: red; } ${body}`;
+
+    expect(auditSkinCss(css('.c { --d: color-mix(in oklab, red 50%, blue); }'), old).problems).toHaveLength(1);
+    expect(auditSkinCss(css('.c { --d: oklch(0 0 0); }'), old).problems).toHaveLength(1);
+    expect(
+      auditSkinCss(
+        css(
+          '@supports (color: color-mix(in oklab, red, red)) { .c { --d: color-mix(in oklab, red 50%, blue); } } @supports (color: light-dark(red, red)) { .c { --d: light-dark(oklch(0 0 0), oklch(1 0 0)); } }'
+        ),
+        old
+      ).problems
+    ).toEqual([]);
+    expect(
+      auditSkinCss(css('@supports (display: grid) { .c { --d: color-mix(in oklab, red 50%, blue); } }'), old).problems
+    ).toHaveLength(1);
   });
 
   it('reports relative colors without a fallback as degradations', () => {
@@ -112,6 +139,21 @@ describe('auditSkinCss', () => {
       expect(audit?.problems, file).toEqual([]);
       expect(
         audit?.degraded.filter((name) => !ACCEPTED_DEGRADATIONS.includes(name)),
+        file
+      ).toEqual([]);
+    }
+  });
+
+  it('passes the Compat and Scaffold stylesheets for the older Compat browsers', () => {
+    const files = globSync('packages/react/src/presets/*/{compat,scaffold}-skin.css', { cwd: workspaceDir });
+
+    expect(files.length, 'Generate the skins first: pnpm exec vp run @videojs/skins#generate').toBe(8);
+
+    for (const file of files) {
+      const audit = auditSkinCss(lowerLikePackageBuild(readFileSync(resolve(workspaceDir, file))), compatBrowsers);
+
+      expect(
+        audit.problems.filter((problem) => !COMPAT_ENHANCEMENTS.test(problem)),
         file
       ).toEqual([]);
     }
