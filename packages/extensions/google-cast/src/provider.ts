@@ -1,5 +1,7 @@
+import { isMediaAudioTrackCapable } from '@videojs/media';
 import type { HTMLMediaTargetLike } from '@videojs/media/dom';
 import { isCaptionOrSubtitleTrack } from '@videojs/utils/dom';
+import { isFunction, isNull } from '@videojs/utils/predicate';
 
 import type { GoogleCastExtensionProps } from './index';
 import { castFramework, ensureCastFramework, googleCastInstances } from './registry';
@@ -43,8 +45,13 @@ export class GoogleCastProvider {
   #listenersAttached = false;
   #playbackRate = 1;
   #localPaused = false;
+  #pendingAudioTrackId: number | null = null;
   #onTextTrackChange = () => this.#updateRemoteTextTrack();
-  #onMediaUpdate = () => this.#checkPlaybackRate();
+  #onAudioTrackChange = () => this.#updateRemoteAudioTrack();
+  #onMediaUpdate = () => {
+    this.#checkPlaybackRate();
+    this.#syncLocalAudioTrack();
+  };
 
   constructor(googleCast: GoogleCastConfig) {
     this.#googleCast = googleCast;
@@ -72,10 +79,12 @@ export class GoogleCastProvider {
   attach(target: HTMLMediaTargetLike) {
     this.target = target;
     target.textTracks.addEventListener('change', this.#onTextTrackChange);
+    getAudioTracks(target)?.addEventListener('change', this.#onAudioTrackChange);
   }
 
   detach() {
     this.target?.textTracks.removeEventListener('change', this.#onTextTrackChange);
+    getAudioTracks(this.target)?.removeEventListener('change', this.#onAudioTrackChange);
     this.target = null;
   }
 
@@ -440,6 +449,7 @@ export class GoogleCastProvider {
         this.#remoteListeners[castFramework!.RemotePlayerEventType.IS_PAUSED_CHANGED]!();
         this.#remoteListeners[castFramework!.RemotePlayerEventType.PLAYER_STATE_CHANGED]!();
         this.target?.dispatchEvent(new Event('ratechange'));
+        this.#syncLocalAudioTrack();
 
         // TODO: sync remote enabled text track state to local text tracks
       }
@@ -493,6 +503,7 @@ export class GoogleCastProvider {
     this.#detachRemoteListeners();
     this.#seeking = false;
     this.#playbackRate = 1;
+    this.#pendingAudioTrackId = null;
     this.#isCasting = false;
     this.#loadedSrc = null;
 
@@ -528,7 +539,10 @@ export class GoogleCastProvider {
   #onRemoteMediaLoaded() {
     this.#playbackRate = currentMedia()?.playbackRate ?? 1;
     currentMedia()?.addUpdateListener(this.#onMediaUpdate);
-    this.#updateRemoteTextTrack();
+    // The local selections carry over to the receiver; from then on, audio changes made on the receiver (from another
+    // sender, for example) flow back through `#onMediaUpdate`. The edits run in turn because each one sends the full set
+    // of active track IDs.
+    void this.#updateRemoteTextTrack().then(() => this.#updateRemoteAudioTrack());
   }
 
   #checkPlaybackRate() {
@@ -569,4 +583,94 @@ export class GoogleCastProvider {
       console.error(error);
     }
   }
+
+  /** Audio tracks the receiver reports for the loaded media, such as an HLS stream's alternate audio renditions. */
+  #remoteAudioTracks() {
+    const tracks = currentMedia()?.media?.tracks ?? this.#remotePlayer.mediaInfo?.tracks ?? [];
+
+    return tracks.filter(({ type }) => type === chrome.cast.media.TrackType.AUDIO);
+  }
+
+  /** Enable the receiver's counterpart of the locally enabled audio track. */
+  async #updateRemoteAudioTrack() {
+    const audioTracks = getAudioTracks(this.target);
+    if (!this.#isCasting || !audioTracks) return;
+
+    const local = [...audioTracks].find((track) => track.enabled);
+    if (!local) return;
+
+    const remoteTracks = this.#remoteAudioTracks();
+    const remote = findMatchingTrack(remoteTracks, local.language, local.label, (track) => track.name);
+    if (!remote) return;
+
+    const audioIds = new Set(remoteTracks.map(({ trackId }) => trackId));
+    const active = currentMedia()?.activeTrackIds ?? [];
+    const activeAudio = active.filter((id) => audioIds.has(id));
+    if (activeAudio.length === 1 && activeAudio[0] === remote.trackId) return;
+
+    if (this.#pendingAudioTrackId === remote.trackId) return;
+
+    // Only one audio track plays at a time; keep whatever text tracks are active.
+    const next = [...active.filter((id) => !audioIds.has(id)), remote.trackId];
+
+    this.#pendingAudioTrackId = remote.trackId;
+
+    try {
+      await editTracksInfo(new chrome.cast.media.EditTracksInfoRequest(next));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (this.#pendingAudioTrackId === remote.trackId) this.#pendingAudioTrackId = null;
+    }
+
+    // Another change may have landed while the request was in flight.
+    this.#syncLocalAudioTrack();
+  }
+
+  /** Enable the local audio track matching the receiver's active one, so the player's audio menu shows it. */
+  #syncLocalAudioTrack() {
+    const audioTracks = getAudioTracks(this.target);
+    if (!this.#isCasting || !audioTracks || !isNull(this.#pendingAudioTrackId)) return;
+
+    const active = new Set(currentMedia()?.activeTrackIds ?? []);
+    const remote = this.#remoteAudioTracks().find(({ trackId }) => active.has(trackId));
+    if (!remote) return;
+
+    const localTracks = [...audioTracks];
+    const local = findMatchingTrack(localTracks, remote.language, remote.name, (track) => track.label);
+    if (!local || local.enabled) return;
+
+    for (const track of localTracks) {
+      track.enabled = track === local;
+    }
+  }
+}
+
+/**
+ * The target's audio track list, when it has one: the list an adapter mirrors its engine's audio tracks into, or a
+ * browser's native one. Some DOM implementations expose a stub `audioTracks` that is not an event target; skip those.
+ */
+function getAudioTracks(target: HTMLMediaTargetLike | null) {
+  const audioTracks = isMediaAudioTrackCapable(target) ? target.audioTracks : null;
+
+  return isFunction(audioTracks?.addEventListener) ? audioTracks : null;
+}
+
+/**
+ * Pair a track with its counterpart on the other side of a cast session. Tracks are matched by language and label (the
+ * receiver's `name`), since local and receiver track IDs are unrelated; a language match alone is used only when it is
+ * unambiguous.
+ */
+function findMatchingTrack<T extends { language?: string | null | undefined }>(
+  candidates: T[],
+  language: string | null | undefined,
+  label: string | null | undefined,
+  getLabel: (track: T) => string | null | undefined
+): T | undefined {
+  const sameLanguage = candidates.filter((track) => (track.language ?? '') === (language ?? ''));
+
+  return (
+    sameLanguage.find((track) => (getLabel(track) ?? '') === (label ?? '')) ??
+    (sameLanguage.length === 1 ? sameLanguage[0] : undefined)
+  );
 }

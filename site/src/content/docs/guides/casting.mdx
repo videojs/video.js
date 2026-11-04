@@ -93,6 +93,8 @@ AirPlay uses WebKit's presentation APIs. Google Cast uses a sender and receiver:
 
 While connected, playback actions — play, pause, seek, volume — proxy to the remote device, and player state keeps reflecting the remote session. Local playback is suspended.
 
+With Google Cast, caption and audio track selections also apply on the receiver. Audio tracks are matched to the receiver's tracks by language and label, so an HLS stream's alternate audio renditions can be switched from the player's audio menu, and a change made from another sender (such as the Google Home app) shows up in the player.
+
 <FrameworkCase frameworks={["react"]}>
 Control playback and read its state through the player while casting: use the built-in controls or the <DocsLink slug="reference/api/player-store">store actions and state</DocsLink> from `usePlayer`. Don't call methods on the media component or listen for its events to drive or track a session.
 </FrameworkCase>
