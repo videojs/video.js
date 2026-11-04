@@ -10,6 +10,8 @@ import { listen, onEvent } from '@videojs/utils/events';
 import { noop } from '@videojs/utils/function';
 
 import { definePlayerFeature } from '../../feature';
+import { nextFrame } from '../../ui/utils/animation-frame';
+import { isDocumentHidden } from '../../ui/utils/document-visibility';
 import { signalKeys } from '../signal-keys';
 
 /** @internal */
@@ -149,16 +151,3 @@ export const timeFeature = definePlayerFeature({
     listen(media, 'progress', syncUnlessSeeking, { signal });
   },
 });
-
-/** Schedule `callback` for the next animation frame and return its cancel function. */
-function nextFrame(callback: () => void): () => void {
-  const id = requestAnimationFrame(callback);
-
-  return () => cancelAnimationFrame(id);
-}
-
-/** Whether a browser page is hidden. Platforms without a `document` never are. */
-function isDocumentHidden(): boolean {
-  // SAFETY: the platform-neutral lib declares no `document`, so read it structurally where a browser provides one.
-  return (globalThis as { document?: { hidden?: boolean } }).document?.hidden === true;
-}
