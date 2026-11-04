@@ -4,6 +4,8 @@ import { DATA_ATTRS, SELECTORS } from '../../../shared/fixtures/selectors';
 
 const SANDBOX_BASE = process.env.SANDBOX_URL ?? 'http://localhost:5299';
 
+// `prestart=1` keeps the controls visible before playback starts, since these tests use them without playing.
+
 // Every skin source the sandbox can load without the workspace: the framework packages (CSS), the registry's html
 // install (CSS), and the registry's two React catalogs.
 const CASES = [
@@ -36,6 +38,7 @@ for (const { platform, skin, styling, skins } of CASES) {
       skin,
       source: 'mp4-1',
       autoplay: '0',
+      prestart: '1',
       muted: '1',
       loop: '0',
       preload: 'metadata',
@@ -99,6 +102,7 @@ for (const { platform, skin, styling, skins } of CASES) {
       skin,
       source: 'hls-1',
       autoplay: '0',
+      prestart: '1',
       muted: '1',
       loop: '0',
       preload: 'metadata',
@@ -184,6 +188,7 @@ for (const media of ['video', 'audio'] as const) {
         skin,
         source: 'hls-live',
         autoplay: '0',
+        prestart: '1',
         muted: '1',
         loop: '0',
         preload: 'metadata',
@@ -210,6 +215,7 @@ for (const media of ['video', 'audio'] as const) {
         skin,
         source: 'hls-live',
         autoplay: '0',
+        prestart: '1',
         muted: '1',
         loop: '0',
         preload: 'metadata',
@@ -237,6 +243,7 @@ for (const { media, skin } of HTML_REGISTRY_ERROR_CASES) {
       skin,
       source: 'mp4-1',
       autoplay: '0',
+      prestart: '1',
       muted: '1',
       loop: '0',
       preload: 'metadata',
@@ -294,6 +301,7 @@ for (const { platform, skin, styling, skins } of CASES) {
       skin,
       source: 'mp4-1',
       autoplay: '0',
+      prestart: '1',
       muted: '1',
       loop: '0',
       preload: 'metadata',
@@ -338,6 +346,7 @@ for (const skins of ['package', 'registry'] as const) {
       skin: 'neutral',
       source: 'hls-1',
       autoplay: '0',
+      prestart: '1',
       muted: '1',
       loop: '0',
       preload: 'metadata',

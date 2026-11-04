@@ -201,9 +201,14 @@ export class PlayerPage {
     }
   }
 
-  /** Click play and wait for the paused attribute to be removed. */
+  /**
+   * Click play and wait for the paused attribute to be removed. Before playback starts, a skin may show only its centre
+   * play button.
+   */
   async play(): Promise<void> {
-    await this.playButton.click();
+    const button = (await this.playButton.isVisible()) ? this.playButton : this.centerPlayButton;
+
+    await button.click();
     await expect(this.playButton).not.toHaveAttribute(DATA_ATTRS.paused, { timeout: 5_000 });
   }
 
