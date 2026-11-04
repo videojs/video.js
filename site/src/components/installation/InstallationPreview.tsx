@@ -34,7 +34,7 @@ import {
   VideoPlayer,
   VideoSkin,
 } from '@videojs/react/video';
-import type { ReactNode } from 'react';
+import { type CSSProperties, type ReactNode, useState } from 'react';
 
 import ArrowRight from '@/assets/icons/arrow-right.svg?react';
 import {
@@ -47,6 +47,7 @@ import {
 import { currentFramework } from '@/stores/preferences';
 import useIsHydrated from '@/utils/useIsHydrated';
 
+import PreviewOptions from './PreviewOptions';
 import { useSelection } from './useSelection';
 
 import '@videojs/react/video/skin.css';
@@ -241,6 +242,16 @@ function InstallationPreview() {
   const source = resolveSource($useCase, $renderer, $sourceUrl);
   const isBackground = $useCase === 'background-video';
   const effectiveSkin: Skin = isBackground ? 'video' : $skin;
+  // Preview-only: these try the skin's public CSS properties without changing the generated code.
+  const [controlsBeforeStart, setControlsBeforeStart] = useState(true);
+  const [accentColor, setAccentColor] = useState('');
+  const hasSkin = !isBackground && effectiveSkin !== 'none';
+  const hasVideoSkin = hasSkin && preset.mediaType === 'video';
+  const previewStyle: CSSProperties & Record<`--${string}`, string> = {};
+
+  if (hasVideoSkin && controlsBeforeStart) previewStyle['--media-controls-before-start'] = 'visible';
+
+  if (hasSkin && accentColor.trim()) previewStyle['--media-accent-color'] = accentColor.trim();
 
   let player: ReactNode;
 
@@ -266,13 +277,17 @@ function InstallationPreview() {
 
   return (
     <figure className="flex flex-col gap-3">
-      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. It keeps
-          the skin's controls visible before playback starts, so the preview shows them. */}
-      <div
-        className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border p-5 sm:p-8"
-        style={{ '--media-controls-before-start': 'visible' } as React.CSSProperties}
-      >
-        {player}
+      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. */}
+      <div className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border">
+        <div className="p-5 sm:p-8" style={previewStyle}>
+          {player}
+        </div>
+        <PreviewOptions
+          controlsBeforeStart={hasVideoSkin ? controlsBeforeStart : null}
+          onControlsBeforeStartChange={setControlsBeforeStart}
+          accentColor={hasSkin ? accentColor : null}
+          onAccentColorChange={setAccentColor}
+        />
       </div>
       <figcaption className="text-muted text-p3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <span>
