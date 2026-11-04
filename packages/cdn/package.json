@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cdn",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Video.js 10 as browser-ready bundles for script tags, with no build step",
   "keywords": [
     "audio",

@@ -9,6 +9,9 @@ import type { HlsEngineHost } from './types';
 /** Marks the `<track>` elements created here for hls.js's own text tracks. */
 const HLS_TRACK_ATTR = 'data-removeondestroy';
 
+/** Marks the subset created from hls.js's CEA-608/708 announcements, which are announced one track at a time. */
+const CC_TRACK_ATTR = 'data-cc';
+
 /** `HTMLTrackElement.LOADED` — the element parsed its resource and will not parse it again. */
 const TRACK_LOADED = 2;
 
@@ -144,21 +147,40 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       // The hls.js delegate always binds to the real `<video>` element.
       const media = this.target as HTMLVideoElement;
 
+      // NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and
+      // `default` or `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
+      // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
+      const trackIdFor = ({ _id, default: isDefault, subtitleTrack }: NonNativeTextTracksData['tracks'][number]) =>
+        _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
+
       const onTracksFound = (_event: string, data: NonNativeTextTracksData) => {
-        removeHlsTextTracks(this.target);
+        // The subtitle set arrives in one batch, and each CC track arrives alone once 608 data shows up in the
+        // stream. Replace only what is being re-announced, so a CC announcement does not destroy the subtitle set
+        // and a fresh subtitle set does not destroy the CC tracks.
+        const incomingIds = new Set(data.tracks.map(trackIdFor));
+        const ccBatch = data.tracks.every((trackObj) => trackObj._id != null);
+
+        for (const trackEl of media.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`)) {
+          const replaced = incomingIds.has(trackEl.id);
+          const ccOwned = trackEl.hasAttribute(CC_TRACK_ATTR);
+          if (!replaced && (ccBatch || ccOwned)) continue;
+
+          trackEl.track.mode = 'disabled';
+          trackEl.remove();
+        }
 
         for (const trackObj of data.tracks) {
           const baseTrackObj = trackObj.subtitleTrack ?? trackObj.closedCaptions;
-          const idx = engine.subtitleTracks.findIndex(({ lang, name, type }) => {
-            return lang === baseTrackObj?.lang && name === trackObj.label && type.toLowerCase() === trackObj.kind;
-          });
 
-          // NOTE: Undocumented method for determining identifier by hls.js. Relied on for
-          // ensuring CUES_PARSED events can identify and apply cues to the appropriate track (CJP).
-          // See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts#L640
-          const id = (trackObj._id ?? trackObj.default) ? 'default' : `${trackObj.kind}${idx}`;
-
-          addTextTrack(media, trackObj.kind as TextTrackKind, trackObj.label, baseTrackObj?.lang, id, trackObj.default);
+          addTextTrack(
+            media,
+            trackObj.kind as TextTrackKind,
+            trackObj.label,
+            baseTrackObj?.lang,
+            trackIdFor(trackObj),
+            trackObj.default,
+            trackObj._id != null
+          );
         }
       };
 
@@ -221,6 +243,8 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
           });
 
           // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
+          // A closed-caption track has no entry in `subtitleTracks`, so picking one assigns -1, which only stops
+          // subtitle loading: CEA-608 cues come from the video segments.
           engine.subtitleTrack = idx;
         }
       };
@@ -270,7 +294,8 @@ function addTextTrack(
   label: string,
   lang?: string,
   id?: string,
-  defaultTrack?: boolean
+  defaultTrack?: boolean,
+  ccOwned?: boolean
 ): TextTrack {
   const trackEl = document.createElement('track');
 
@@ -294,6 +319,9 @@ function addTextTrack(
 
   // Add data attribute to identify tracks that should be removed when switching sources/destroying hls.js instance.
   trackEl.setAttribute(HLS_TRACK_ATTR, '');
+
+  if (ccOwned) trackEl.setAttribute(CC_TRACK_ATTR, '');
+
   mediaEl.append(trackEl);
 
   return trackEl.track as TextTrack;
