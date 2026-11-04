@@ -28,7 +28,7 @@ export const mediaTheme = {
     'media-backdrop',
   ],
   container: [
-    'media-280',
+    'media-2xs',
     'media-xs',
     'media-360',
     'media-sm',

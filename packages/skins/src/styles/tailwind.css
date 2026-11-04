@@ -19,7 +19,7 @@
   --color-media-backdrop: var(--media-backdrop);
 
   /* Player layout breakpoints, measured against the `media-root` container. */
-  --container-media-280: 17.5rem;
+  --container-media-2xs: 17.5rem;
   --container-media-xs: 20rem;
   --container-media-360: 22.5rem;
   --container-media-sm: 24rem;
@@ -124,16 +124,16 @@
   }
 }
 
-/* Player above 280px. */
-@custom-variant media-280 {
-  @container media-root (width > theme(--container-media-280)) {
+/* Player at or above the 2xs breakpoint. */
+@custom-variant media-2xs {
+  @container media-root (width >= theme(--container-media-2xs)) {
     @slot;
   }
 }
 
-/* Player at or below 280px. */
-@custom-variant media-max-280 {
-  @container media-root (width <= theme(--container-media-280)) {
+/* Player below the 2xs breakpoint. */
+@custom-variant media-max-2xs {
+  @container media-root (width < theme(--container-media-2xs)) {
     @slot;
   }
 }

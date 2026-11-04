@@ -170,7 +170,7 @@ export default styles({
       // A touch affordance, hidden for fine pointers, on small players and until playback starts.
       variants: {
         default: [
-          'media-max-280:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
+          'media-max-2xs:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
           'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
           'media-high-contrast:bg-media-background!',
         ],
