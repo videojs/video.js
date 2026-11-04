@@ -45,7 +45,11 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
             <$.Controls.Group className={styles.timeSliderGroup}>
               <$.Time.Value className={[timeStyles.value, styles.timeValue]} type="current" />
               <TimeSlider renderThumbnail={renderThumbnail} />
-              <$.Time.Value className={[timeStyles.toggle, styles.timeValue]} type="remaining" toggle />
+              <$.Time.Value
+                className={[timeStyles.toggle, styles.timeValue, styles.remainingTimeValue]}
+                type="remaining"
+                toggle
+              />
             </$.Controls.Group>
 
             <ButtonTooltip side="top">

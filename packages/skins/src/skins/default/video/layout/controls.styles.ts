@@ -5,18 +5,22 @@ export default styles({
   prefix: 'video-controls',
   rules: {
     volumeButton: {
-      utilities: 'ms-px',
+      utilities: 'ms-px media-max-2xs:hidden',
     },
     settingsButton: {
       utilities: 'media-lg:ms-px',
     },
     timeSliderGroup: {
       className: 'video-time-slider-group',
-      utilities: '@container/media-time flex flex-1 items-center rtl:flex-row-reverse gap-2.5 px-2 media-lg:px-3',
+      utilities: 'flex flex-1 items-center rtl:flex-row-reverse gap-2.5 px-2 media-lg:px-3',
     },
     timeValue: {
       className: 'video-time-value',
-      utilities: '@max-[16rem]/media-time:hidden',
+      utilities: [],
+    },
+    // Small players keep only the current time, so the slider is not starved.
+    remainingTimeValue: {
+      utilities: 'media-max-sm:hidden',
     },
   },
 });
