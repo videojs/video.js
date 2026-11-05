@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { findTrackElement, getCaptionOrSubtitleTracks, isCaptionOrSubtitleTrack } from '../text-track';
+import {
+  addRemovableTextTrack,
+  findTrackElement,
+  getCaptionOrSubtitleTracks,
+  isCaptionOrSubtitleTrack,
+} from '../text-track';
 
 /**
  * Jsdom does not create unique TextTrack objects per <track> element, so we mock the `.track` property to simulate real
@@ -92,5 +97,60 @@ describe('findTrackElement', () => {
     expect(findTrackElement(video, thumbnailsTrack)).toBe(thumbnailsEl);
     expect(findTrackElement(video, captionsTrack)).toBe(captionsEl);
     expect(findTrackElement(video, chaptersTrack)).toBe(chaptersEl);
+  });
+});
+
+describe('addRemovableTextTrack', () => {
+  const trackDescriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+
+  /** Jsdom has no `HTMLTrackElement.track`; give each element a track object. */
+  function stubTrackElements() {
+    const tracks = new WeakMap<HTMLTrackElement, TextTrack>();
+
+    Object.defineProperty(HTMLTrackElement.prototype, 'track', {
+      configurable: true,
+      get(this: HTMLTrackElement) {
+        if (!tracks.has(this)) tracks.set(this, { mode: 'disabled' } as TextTrack);
+
+        return tracks.get(this);
+      },
+    });
+  }
+
+  afterEach(() => {
+    if (trackDescriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', trackDescriptor);
+    else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
+  });
+
+  it('adds a hidden track through a track element', () => {
+    stubTrackElements();
+
+    const video = document.createElement('video');
+    const track = addRemovableTextTrack(video, 'subtitles', 'Deutsch', 'de');
+    const element = video.querySelector('track')!;
+
+    expect(element).toMatchObject({ kind: 'subtitles', label: 'Deutsch', srclang: 'de' });
+    expect(track).toBe(element.track);
+    expect(track.mode).toBe('hidden');
+  });
+
+  it('leaves out a label and language it is not given', () => {
+    stubTrackElements();
+
+    const video = document.createElement('video');
+
+    addRemovableTextTrack(video, 'metadata');
+
+    expect(video.querySelector('track')!.getAttributeNames()).toEqual(['kind']);
+  });
+
+  it('falls back to addTextTrack() where the element yields no track', () => {
+    const video = document.createElement('video');
+    const track = {} as TextTrack;
+    const addTextTrack = vi.spyOn(video, 'addTextTrack').mockReturnValue(track);
+
+    expect(addRemovableTextTrack(video, 'chapters', 'Chapters')).toBe(track);
+    expect(addTextTrack).toHaveBeenCalledExactlyOnceWith('chapters', 'Chapters', undefined);
+    expect(video.querySelector('track')).toBeNull();
   });
 });

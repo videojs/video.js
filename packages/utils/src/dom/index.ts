@@ -106,6 +106,7 @@ export {
 } from './supports';
 export { cloneTemplateRoot, createTemplate, getTemplateElement, getTemplateRoot, renderTemplate } from './template';
 export {
+  addRemovableTextTrack,
   type CaptionOrSubtitleKind,
   findTrackElement,
   getCaptionOrSubtitleTracks,
