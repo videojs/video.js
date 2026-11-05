@@ -6,7 +6,7 @@ The [engine's reference page](./reference/engines/hls-video.md) lists its featur
 
 ## Inputs and adapter boundary
 
-The adapter supplies a media element and an unresolved presentation URL by writing the engine's `state` and `context` signals. It may also write preload, current-time triggers, or user track-selection intent.
+The adapter supplies a media element and an unresolved presentation URL by writing the engine's `state` and `context` signals, as [Build an adapter](./build-an-adapter.md) shows. It may also write preload, current-time triggers, or user track-selection intent.
 
 The engine returns a composition with one asynchronous destruction boundary. Assigning another presentation reuses that composition while per-source behaviors clean up and set up again.
 
