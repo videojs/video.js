@@ -51,6 +51,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 
 ### State
 

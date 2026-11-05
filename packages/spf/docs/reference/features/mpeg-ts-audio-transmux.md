@@ -17,11 +17,13 @@ None.
 
 ### Config
 
-| Key | Type | Default | Read by | Doc |
+Feature default is the value a feature's `defaultConfig` supplies. A behavior's own fallback for a key left unset is described under Doc.
+
+| Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `audioMessagePipelines` | `MessagePipelines` | `transmuxPipelinesFor('audio', [aacCodec])` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+| `audioMessagePipelines` | `MessagePipelines` | `transmuxPipelinesFor('audio', [aacCodec])` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 | `canPlayTrack` | `CanPlayTrack` | `canPlayTransmuxedTrack` | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |
-| `parsePresentation` | `ParsePresentation` | `parsePresentation` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Parses a manifest body into a resolved `Presentation`. **Required** — the behavior is format-neutral and the composing engine supplies its own parser (HLS, DASH, etc.). |
+| `parsePresentation` | `ParsePresentation` | `parsePresentation` | [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation) | Parses a manifest body into a resolved `Presentation`. |
 | `reportUnsupportedTrackConditions` | `ReportUnsupportedTrackConditions` | `reportUnsupportedTransmuxedTrackConditions` | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [resolveTextTrack](../behaviors/resolve-track.md#resolvetexttrack), [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
 | `sourceBufferMimeCodec` | `SourceBufferMimeCodec` | `transmuxedSourceBufferMimeCodec` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 
