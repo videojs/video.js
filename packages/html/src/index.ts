@@ -1,5 +1,6 @@
 // Component state, props, and option types
 export type {
+  AddTextTrack,
   AirPlayButtonProps,
   AirPlayButtonState,
   AlertDialogProps,
@@ -36,6 +37,7 @@ export type {
   IndicatorLifecycleState,
   IndicatorStatus,
   IndicatorVolumeLevel,
+  InferCueValue,
   InferSchemaOutput,
   InferTextTrackCue,
   InputAction,
@@ -93,9 +95,13 @@ export type {
   StatusDetails,
   StatusIndicatorProps,
   StatusIndicatorState,
+  TextCueInit,
   TextCuesSource,
+  TextTrackContent,
   TextTrackDefinition,
+  TextTrackHandle,
   TextTrackIdentity,
+  TextTrackInit,
   TextTracksSource,
   ThumbnailCoords,
   ThumbnailCrossOrigin,

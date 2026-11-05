@@ -12,6 +12,7 @@ import { isNull } from '@videojs/utils/predicate';
 
 import { DEFAULT_LOCALE, findLocaleKeys, getLocaleKey } from '../../../core/i18n';
 import { definePlayerFeature } from '../../feature';
+import { type AppTextTrackRecord, getAppTextTracks, listenForAppTextTracks } from '../app-text-tracks';
 import { toMediaTextCues } from '../text-cues';
 import { getTextTrackId, listenForTrackLoads, toMediaTextTrack } from '../text-tracks';
 
@@ -35,6 +36,11 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
 
     if (track.mode !== mode) track.mode = mode;
   }
+}
+
+/** The cues of the first chapters track an app added, which stand in when the media has no chapters of its own. */
+function findAppChaptersCues(records: readonly AppTextTrackRecord[]): MediaTextCue[] {
+  return records.find(({ track }) => track.kind === 'chapters')?.cues ?? [];
 }
 
 function findLocaleTrack(tracks: IdentifiedTrack[], locale: string): IdentifiedTrack | undefined {
@@ -122,9 +128,21 @@ export const textTrackFeature = definePlayerFeature({
     };
   },
 
-  attach({ target, signal, set }) {
+  attach({ target, signal, get, set }) {
     const { media } = target;
-    if (!isMediaTextTrackCapable(media)) return;
+
+    if (!isMediaTextTrackCapable(media)) {
+      // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
+      const syncAppTracks = () => {
+        const appTracks = getAppTextTracks(get());
+
+        set({ textTrackList: appTracks.map(({ track }) => track), chaptersCues: findAppChaptersCues(appTracks) });
+      };
+
+      syncAppTracks();
+      listenForAppTextTracks(get(), syncAppTracks, signal);
+      return;
+    }
 
     let trackCleanup: AbortController | null = null;
 
@@ -153,12 +171,19 @@ export const textTrackFeature = definePlayerFeature({
         }
       }
 
+      const appTracks = getAppTextTracks(get());
+
+      for (const { track } of appTracks) textTrackList.push(track);
+
       // The last chapter of an in-stream chapters document is open-ended on the
-      // track; consumers read it ending where the media does.
-      const chaptersCues = toMediaTextCues(chaptersTrack?.cues, {
-        kind: 'chapters',
-        duration: isMediaSeekCapable(media) ? media.duration : NaN,
-      });
+      // track; consumers read it ending where the media does. Chapters an app
+      // added stand in when the media has none.
+      const chaptersCues = chaptersTrack
+        ? toMediaTextCues(chaptersTrack.cues, {
+            kind: 'chapters',
+            duration: isMediaSeekCapable(media) ? media.duration : NaN,
+          })
+        : findAppChaptersCues(appTracks);
 
       let thumbnailsTrack: MediaThumbnailsTrack | null = null;
 
@@ -185,6 +210,7 @@ export const textTrackFeature = definePlayerFeature({
     };
 
     sync();
+    listenForAppTextTracks(get(), sync, signal);
 
     const textTracks = media.textTracks;
 
