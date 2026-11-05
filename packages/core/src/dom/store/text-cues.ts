@@ -228,3 +228,16 @@ function isSameCue(a: MediaTextCue, b: MediaTextCue): boolean {
 export function sortCues<Cue extends MediaTextCue>(cues: Cue[]): Cue[] {
   return cues.sort((a, b) => a.startTime - b.startTime || a.endTime - b.endTime);
 }
+
+/** Chapters an app gave no end run to the next chapter, and the last one to the end of the media. */
+export function fillChapterEnds(cues: MediaTextCue[], duration: number): MediaTextCue[] {
+  if (cues.every((cue) => cue.endTime > cue.startTime)) return cues;
+
+  const end = Number.isFinite(duration) && duration > 0 ? duration : undefined;
+
+  return cues.map((cue, index) => {
+    if (cue.endTime > cue.startTime) return cue;
+
+    return { ...cue, endTime: cues[index + 1]?.startTime ?? end ?? cue.endTime };
+  });
+}
