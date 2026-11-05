@@ -3,11 +3,7 @@ import { shallowEqual } from '@videojs/utils/object';
 
 import type { SliderState } from '../../slider/core';
 
-/**
- * One cue placed on the slider domain.
- *
- * @internal
- */
+/** One cue placed on the slider domain. */
 export interface TimeSliderMarkerRange {
   /** Stable identity used by platform renderers. */
   key: string;
@@ -21,11 +17,7 @@ export interface TimeSliderMarkerRange {
   point: boolean;
 }
 
-/**
- * A marker's geometry and state, as renderers draw it.
- *
- * @internal
- */
+/** A marker's geometry and state, as renderers draw it. */
 export interface TimeSliderMarkerState extends TimeSliderMarkerRange {
   /** Position among the drawn markers. */
   index: number;
