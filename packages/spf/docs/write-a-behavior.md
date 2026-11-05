@@ -73,6 +73,8 @@ Each run can return a cleanup, and the cleanup runs before the next run. Here th
 
 The setup returns the effect's own cleanup. The engine calls it when it's destroyed, which stops the effect and removes the last listener.
 
+Effects are one of SPF's signal tools. `computed()` derives a value from the signals it reads, `untrack()` reads signals without making the surrounding effect depend on them, and `update()` changes part of a structured value. All three are exported from `@videojs/spf`.
+
 ## Define the behavior
 
 `defineBehavior()` pairs the setup with the keys it uses:

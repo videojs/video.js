@@ -1,7 +1,7 @@
 # State, context, and config
 
 <!--
-AI first draft (2026-10-23), for Christian to rewrite. Sources: fundamentals.md "State, context, and
+AI first draft (2026-10-23), for Christian to rewrite. Sources: fundamentals.md (now removed) "State, context, and
 configuration"; internal/design/spf/conventions/config.md (its rule, "Who would override this, and
 why?"; its code example uses keys that no longer exist, so it isn't quoted); define-behavior.ts
 (BehaviorDeps: config is "passed once at composition creation"); define-external-signals.ts; the
