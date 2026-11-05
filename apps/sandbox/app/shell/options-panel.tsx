@@ -410,10 +410,11 @@ function ColorItem({ id, value, onChange }: ColorItemProps) {
         <input
           type="color"
           value={pickerValue}
-          disabled={!value.trim()}
           onChange={(event) => onChange(event.target.value)}
           aria-label="Choose accent color"
-          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 disabled:cursor-default disabled:opacity-50"
+          // With no accent set, the swatch shows a stand-in color, so it fades to grey rather than look chosen.
+          data-default={value.trim() ? undefined : ''}
+          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 data-default:opacity-50 data-default:grayscale"
         />
       </div>
     </>
