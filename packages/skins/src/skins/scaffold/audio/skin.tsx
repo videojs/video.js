@@ -21,6 +21,7 @@ export function AudioSkin({ children, className, renderThumbnail, ...props }: Au
       data-preset="audio"
       {...props}
     >
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <ErrorDialog />
       <AudioControls renderThumbnail={renderThumbnail} />

@@ -20,6 +20,7 @@ export interface LiveVideoSkinProps extends Omit<PropsOf<typeof Container>, 'chi
 export function LiveVideoSkin({ children, className, renderPoster, ...props }: LiveVideoSkinProps = {}) {
   return (
     <Container className={[videoSkinStyles.root, className]} data-theme="neutral" data-preset="live-video" {...props}>
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
       <BufferingIndicator />

@@ -21,6 +21,7 @@ export interface VideoSkinProps extends Omit<PropsOf<typeof Container>, 'childre
 export function VideoSkin({ children, className, renderPoster, renderThumbnail, ...props }: VideoSkinProps = {}) {
   return (
     <Container className={[videoSkinStyles.root, className]} data-theme="neutral" data-preset="video" {...props}>
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <Poster renderImage={renderPoster} />
       <BufferingIndicator />

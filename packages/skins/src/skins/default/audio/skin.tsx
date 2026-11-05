@@ -15,6 +15,7 @@ export interface AudioSkinProps extends Omit<PropsOf<typeof Container>, 'childre
 export function AudioSkin({ children, className, ...props }: AudioSkinProps = {}) {
   return (
     <Container className={[audioSkinStyles.root, className]} data-theme="default" data-preset="audio" {...props}>
+      <Slot name="media" />
       <Slot>{children}</Slot>
       <AudioErrorDialog />
       <DefaultAudioControls />
