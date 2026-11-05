@@ -9,12 +9,12 @@ import type { FetchOptions, Resource } from '../../network/fetch';
 type SelectedTrackKey = 'selectedVideoTrackId' | 'selectedAudioTrackId' | 'selectedTextTrackId';
 
 /**
- * State a failover-decorated fetch reads: the presentation, the per-type selected-track slot, and the failover
- * monitor's `failedCdns`.
+ * State a failover-decorated fetch reads: the presentation, the per-type selected-track key, and the failover monitor's
+ * `failedCdns`.
  *
- * `failedCdns` is _optional_ — the failover monitor owns that slot, so a behavior's narrow state is assignable here
+ * `failedCdns` is _optional_ — the failover monitor owns that signal, so a behavior's narrow state is assignable here
  * without the behavior declaring it (and the intersection shares keys, so it isn't a weak type). When no monitor is
- * composed the slot is absent and tracking no-ops.
+ * composed the signal is absent and tracking no-ops.
  */
 type FailoverState<K extends SelectedTrackKey> = {
   presentation: ReadonlySignal<MaybeResolvedPresentation | undefined>;

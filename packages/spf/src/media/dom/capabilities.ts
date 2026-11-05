@@ -11,8 +11,8 @@
  * after load, so probing is lazy (per candidate, at constraint-apply time) but each unique MIME is asked once.
  *
  * Future cluster-D phases (async `requestMediaKeySystemAccess` key-system probing, `SourceBuffer.changeType()`
- * availability) extend this surface; the async ones land as a state-slot writer behavior rather than a config
- * predicate, since their verdict resolves asynchronously.
+ * availability) extend this surface; the async ones land as a state-writing behavior rather than a config predicate,
+ * since their verdict resolves asynchronously.
  */
 
 import { type DrmConfig, keySystemCandidates } from '../drm';
