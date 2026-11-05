@@ -1,3 +1,4 @@
+import { PREFERENCE_REDIRECT_PATHS, PRODUCTION_URL } from '../consts.ts';
 import { INSTALLATION_MARKDOWN_PARAMS, renderInstallationMarkdownSelection } from './installation/markdown.ts';
 import { getInstallationRouteSegment } from './installation/routes.ts';
 
@@ -40,23 +41,45 @@ function setPublicMarkdownCache(headers: Headers): void {
 }
 
 /**
+ * Points search engines from a Markdown twin to its HTML page, so the twin consolidates into the page instead of
+ * competing with it. Production, like the HTML pages' own canonical tags, whichever host served the twin. Twins of
+ * routes that only redirect have no page to point at.
+ */
+function canonicalHeaders(pagePath: string): Record<string, string> {
+  if (PREFERENCE_REDIRECT_PATHS.has(pagePath)) return {};
+
+  return { link: `<${new URL(pagePath, PRODUCTION_URL).href}>; rel="canonical"` };
+}
+
+function setCanonicalHeaders(headers: Headers, pagePath: string): void {
+  for (const [name, value] of Object.entries(canonicalHeaders(pagePath))) headers.set(name, value);
+}
+
+/**
  * Netlify `_headers` rules for the static Markdown twins, which Netlify serves without an edge function. Installation
  * twins are left out: their body depends on the query, so the edge function renders them and sets their headers.
  */
 export function staticMarkdownHeaderRules(paths: readonly string[]): string {
-  const headers = Object.entries({ 'content-type': MARKDOWN_CONTENT_TYPE, ...PUBLIC_MARKDOWN_CACHE });
-
   return paths
     .filter((path) => !getInstallationRouteSegment(path))
-    .map((path) => [path, ...headers.map(([name, value]) => `  ${name}: ${value}`)].join('\n'))
+    .map((path) => {
+      const headers = Object.entries({
+        'content-type': MARKDOWN_CONTENT_TYPE,
+        ...PUBLIC_MARKDOWN_CACHE,
+        ...canonicalHeaders(path.slice(0, -3)),
+      });
+
+      return [path, ...headers.map(([name, value]) => `  ${name}: ${value}`)].join('\n');
+    })
     .join('\n\n');
 }
 
-function markMarkdownResponse(response: Response): Response {
+function markMarkdownResponse(response: Response, pagePath: string): Response {
   const headers = new Headers(response.headers);
 
   headers.set('content-type', MARKDOWN_CONTENT_TYPE);
   setPublicMarkdownCache(headers);
+  setCanonicalHeaders(headers, pagePath);
   headers.set('vary', 'Accept');
 
   return new Response(response.body, {
@@ -66,10 +89,16 @@ function markMarkdownResponse(response: Response): Response {
   });
 }
 
-function installationMarkdownResponse(body: string, status: 200 | 400 | 500, privateResponse: boolean): Response {
+function installationMarkdownResponse(
+  body: string,
+  status: 200 | 400 | 500,
+  privateResponse: boolean,
+  pagePath: string
+): Response {
   const response = new Response(body, { status });
 
   response.headers.set('content-type', MARKDOWN_CONTENT_TYPE);
+  setCanonicalHeaders(response.headers, pagePath);
 
   if (privateResponse) response.headers.set('cache-control', 'private, no-store');
   else setPublicMarkdownCache(response.headers);
@@ -104,7 +133,7 @@ export async function handleMarkdown(request: Request, context: MarkdownContext)
 
   // Only installation twins vary their generated body by query parameters. Return every other static twin as a
   // stream so the edge function does not buffer every documentation page or attach installation cache metadata.
-  if (!path.startsWith(INSTALLATION_PATH)) return markMarkdownResponse(mdResponse);
+  if (!path.startsWith(INSTALLATION_PATH)) return markMarkdownResponse(mdResponse, path);
 
   const body = await mdResponse.text();
   const installation = renderInstallationMarkdownSelection(body, path, url.searchParams);
@@ -115,9 +144,10 @@ export async function handleMarkdown(request: Request, context: MarkdownContext)
         status: mdResponse.status,
         statusText: mdResponse.statusText,
         headers: mdResponse.headers,
-      })
+      }),
+      path
     );
   }
 
-  return installationMarkdownResponse(installation.body, installation.status, installation.privateResponse);
+  return installationMarkdownResponse(installation.body, installation.status, installation.privateResponse, path);
 }
