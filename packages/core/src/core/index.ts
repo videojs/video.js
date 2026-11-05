@@ -1,3 +1,6 @@
+export * from './feature';
+export * from './player';
+export * from './store/features';
 export * from './ui/airplay-button/core';
 export * from './ui/airplay-button/data';
 export * from './ui/alert-dialog/core';

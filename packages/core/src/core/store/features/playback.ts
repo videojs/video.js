@@ -1,9 +1,16 @@
 import type { MediaPlaybackState } from '@videojs/media';
-import { isMediaAutoplayCapable, isMediaPauseCapable, isMediaSeekCapable, isMediaSourceCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import {
+  isMediaAutoplayCapable,
+  isMediaPauseCapable,
+  isMediaSeekCapable,
+  isMediaSourceCapable,
+  MediaReadyState,
+} from '@videojs/media';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 
+/** @internal */
 export const playbackFeature = definePlayerFeature({
   name: 'playback',
   state: ({ target, set }): MediaPlaybackState => ({
@@ -61,7 +68,7 @@ export const playbackFeature = definePlayerFeature({
         media.paused &&
         !media.ended &&
         media.currentTime === 0 &&
-        media.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA;
+        media.readyState < MediaReadyState.HAVE_ENOUGH_DATA;
 
       set({ autoplay: autoplayEnabled(), autoplaying });
     };
@@ -96,7 +103,7 @@ export const playbackFeature = definePlayerFeature({
     let starvedAt: number | null = null;
 
     const sync = () => {
-      const starved = media.readyState < HTMLMediaElement.HAVE_FUTURE_DATA && !media.paused;
+      const starved = media.readyState < MediaReadyState.HAVE_FUTURE_DATA && !media.paused;
 
       if (!starved) starvedAt = null;
       else starvedAt ??= media.currentTime;

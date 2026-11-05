@@ -1,26 +1,28 @@
 import type { MediaPlaybackRateRange, MediaPlaybackRateState } from '@videojs/media';
 import { isMediaPlaybackRateCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 import { clamp } from '@videojs/utils/number';
 
+import { definePlayerFeature } from '../../feature';
+import type { PlayerFeatureConfig } from '../../player';
 import {
   filterPlaybackRates,
   getPlaybackRateRange,
   NATIVE_PLAYBACK_RATE_RANGE,
   parsePlaybackRates,
   roundPlaybackRate,
-} from '../../../core/ui/utils/playback-rates';
-import { definePlayerFeature } from '../../feature';
-import type { PlayerFeatureConfig } from '../../player';
+} from '../../ui/utils/playback-rates';
 
 const DEFAULT_RATES: readonly number[] = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-const DEFAULT_PLAYBACK_RATES = Symbol('@videojs/default-playback-rates');
-const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates');
+// Exported only so `@videojs/core/dom` can name them in its inferred web feature type; the features barrel keeps
+// them inside the package.
+export const DEFAULT_PLAYBACK_RATES = Symbol('@videojs/default-playback-rates');
+export const SET_DEFAULT_PLAYBACK_RATES = Symbol('@videojs/set-default-playback-rates');
 // Kept off the public state until the shape settles.
 const PLAYBACK_RATE_RANGE = Symbol('@videojs/playback-rate-range');
 
-interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
+export interface PlaybackRateSourceState extends Omit<MediaPlaybackRateState, 'playbackRates'> {
   [DEFAULT_PLAYBACK_RATES]: readonly number[];
   [SET_DEFAULT_PLAYBACK_RATES](value: readonly number[] | string | null | undefined): void;
   // Inline, so the feature's public type doesn't name the internal `MediaPlaybackRateRange`.
@@ -50,6 +52,7 @@ function warnUnfitPlaybackRates(rates: readonly number[], range: MediaPlaybackRa
   );
 }
 
+/** @internal */
 export const playbackRateFeature = definePlayerFeature({
   name: 'playbackRate',
   config: {

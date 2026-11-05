@@ -6,10 +6,11 @@ import {
   MediaStreamTypes,
   type MediaStreamTypeState,
 } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 
+/** @internal */
 export const streamTypeFeature = definePlayerFeature({
   name: 'streamType',
   state: (): MediaStreamTypeState => ({

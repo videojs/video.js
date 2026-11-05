@@ -6,12 +6,15 @@ import {
   isMediaSourceCapable,
   type MediaTimeState,
 } from '@videojs/media';
-import { animationFrame, listen, onEvent } from '@videojs/utils/dom';
+import { listen, onEvent } from '@videojs/utils/events';
 import { noop } from '@videojs/utils/function';
 
 import { definePlayerFeature } from '../../feature';
+import { nextFrame } from '../../ui/utils/animation-frame';
+import { isDocumentHidden } from '../../ui/utils/document-visibility';
 import { signalKeys } from '../signal-keys';
 
+/** @internal */
 export const timeFeature = definePlayerFeature({
   name: 'time',
   state: ({ target, signals, set }): MediaTimeState => ({
@@ -23,8 +26,9 @@ export const timeFeature = definePlayerFeature({
         signal = signals.supersede(signalKeys.seek);
       if (!isMediaSeekCapable(media) || !isMediaSourceCapable(media)) return 0;
 
-      // A new source abandons the seek at any stage, so `emptied` cancels it like a superseding seek.
-      listen(media, 'emptied', () => signals.supersede(signalKeys.seek), { signal, once: true });
+      // A new source abandons the seek at any stage, so `emptied` cancels it like a superseding seek. Superseding
+      // aborts `signal`, which also removes this listener.
+      listen(media, 'emptied', () => signals.supersede(signalKeys.seek), { signal });
 
       if (!hasMetadata(media)) {
         const loaded = await onEvent(media, 'loadedmetadata', { signal }).catch(() => false);
@@ -99,11 +103,11 @@ export const timeFeature = definePlayerFeature({
 
       if (!state.seeking && currentTime !== state.currentTime) set({ currentTime });
 
-      cancel = animationFrame(frame);
+      cancel = nextFrame(frame);
     };
 
     const start = () => {
-      if (!cancel && isMediaPauseCapable(media) && !media.paused && !media.ended) cancel = animationFrame(frame);
+      if (!cancel && isMediaPauseCapable(media) && !media.paused && !media.ended) cancel = nextFrame(frame);
     };
 
     const finish = () => {
@@ -125,7 +129,7 @@ export const timeFeature = definePlayerFeature({
       'timeupdate',
       () => {
         // Hidden tabs suspend rAF. Keep their state current, and retain event updates while paused.
-        if (!cancel || document.hidden) syncUnlessSeeking();
+        if (!cancel || isDocumentHidden()) syncUnlessSeeking();
       },
       { signal }
     );

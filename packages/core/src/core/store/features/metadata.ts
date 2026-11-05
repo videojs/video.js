@@ -1,21 +1,23 @@
 import type { MediaContentValue, MediaMetadataState } from '@videojs/media';
 import { isMediaContentDataCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
 const MEDIA_TITLE = Symbol('@videojs/media-title');
-const USER_TITLE = Symbol('@videojs/user-title');
-const SET_USER_TITLE = Symbol('@videojs/set-user-title');
 const DEFAULT_TITLE = '';
-
 const MEDIA_POSTER = Symbol('@videojs/media-poster');
-const USER_POSTER = Symbol('@videojs/user-poster');
-const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
 const DEFAULT_POSTER = '';
 
-interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
+// Exported only so `@videojs/core/dom` can name them in its inferred web feature type; the features barrel keeps
+// them inside the package.
+export const USER_TITLE = Symbol('@videojs/user-title');
+export const SET_USER_TITLE = Symbol('@videojs/set-user-title');
+export const USER_POSTER = Symbol('@videojs/user-poster');
+export const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
+
+export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
   [MEDIA_TITLE]: MediaContentValue;
   [USER_TITLE]: MediaContentValue;
   [SET_USER_TITLE](value: MediaContentValue): void;
@@ -27,6 +29,8 @@ interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster
 /**
  * Resolves content metadata into player state, preferring what the author set over what the media carries. Included in
  * the standard audio, video, and live presets.
+ *
+ * @internal
  */
 export const metadataFeature = definePlayerFeature({
   name: 'metadata',

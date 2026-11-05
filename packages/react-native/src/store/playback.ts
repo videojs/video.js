@@ -10,21 +10,17 @@ const defineNativeFeature = defineSlice<NativePlayerTarget>();
  *
  * ## Why this exists instead of core's `playbackFeature`
  *
- * `packages/core/src/dom/store/features/playback.ts` produces the same `MediaPlaybackState` and would be the thing to
- * reuse. Three things stop it today. Only the first is core's problem; the other two are gaps in `ReactNativeMedia`
- * that should close over time, at which point this variant can be retired in favour of the shared feature.
+ * `packages/core/src/core/store/features/playback.ts` produces the same `MediaPlaybackState`, is DOM-free, and composes
+ * into this store's target. Two gaps in `ReactNativeMedia` stop it working today; once they close, this variant can be
+ * retired in favour of the shared feature.
  *
- * 1. **A DOM global in `attach()`.** It computes `waiting` from `media.readyState < HTMLMediaElement.HAVE_FUTURE_DATA`.
- *    `HTMLMediaElement` does not exist in react-native, so that throws the moment the store attaches. `@videojs/media`
- *    already exports a DOM-free `MediaReadyState` constant (`hasMetadata()` uses it), so upstream this is a one-line
- *    swap — it just needs doing.
- * 2. **TODO(ReactNativeMedia): grow seek and source capability.** The shared feature opens with `if
+ * 1. **TODO(ReactNativeMedia): grow seek and source capability.** The shared feature opens with `if
  *    (!isMediaPauseCapable(media) || !isMediaSeekCapable(media) || !isMediaSourceCapable(media)) return;`.
  *    `isMediaSeekCapable` wants `currentTime`, `duration`, `seeking`; `isMediaSourceCapable` wants `src`, `currentSrc`,
  *    `readyState`, `load()`. The adapter has `src` and none of the rest, so the shared feature would return early and
  *    leave `paused` stuck at `true` — a silent no-op rather than a crash, which is the worse failure. These belong on
  *    the adapter eventually; the TurboModule needs to report position and duration first.
- * 3. **TODO(ReactNativeMedia): emit the standard media events.** The shared feature listens for `emptied`, `timeupdate`,
+ * 2. **TODO(ReactNativeMedia): emit the standard media events.** The shared feature listens for `emptied`, `timeupdate`,
  *    `canplay`, `seeking`, `seeked` and `waiting` alongside `play`/`playing`/`pause`/`ended`. Native currently emits
  *    only `playing`, `paused` and `ended`, which `resolveNativeEvent` maps onto the four contract events this feature
  *    uses. The rest need native support before the shared feature could observe anything useful.

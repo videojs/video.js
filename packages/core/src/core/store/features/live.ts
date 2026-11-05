@@ -1,5 +1,5 @@
 import { isMediaLiveCapable, type MediaLiveState } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 
@@ -14,6 +14,7 @@ import { definePlayerFeature } from '../../feature';
  * Included by the {@link liveVideoFeatures} and {@link liveAudioFeatures} presets; apps can also compose it into a
  * custom preset.
  *
+ * @internal
  * @see https://github.com/video-dev/media-ui-extensions/blob/main/proposals/0007-live-edge.md
  */
 export const liveFeature = definePlayerFeature({

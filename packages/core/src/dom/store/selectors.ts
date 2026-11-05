@@ -1,21 +1,23 @@
 import { createSelector } from '@videojs/store';
 
-import { audioTrackFeature } from './features/audio-track';
-import { bufferFeature } from './features/buffer';
 import { controlsFeature } from './features/controls';
-import { errorFeature } from './features/error';
 import { fullscreenFeature } from './features/fullscreen';
-import { liveFeature } from './features/live';
-import { metadataFeature } from './features/metadata';
 import { pipFeature } from './features/pip';
-import { playbackFeature } from './features/playback';
-import { playbackRateFeature } from './features/playback-rate';
-import { qualityFeature } from './features/quality';
 import { remotePlaybackFeature } from './features/remote-playback';
-import { sourceFeature } from './features/source';
-import { streamTypeFeature } from './features/stream-type';
+import {
+  audioTrackFeature,
+  bufferFeature,
+  errorFeature,
+  liveFeature,
+  metadataFeature,
+  playbackFeature,
+  playbackRateFeature,
+  qualityFeature,
+  sourceFeature,
+  streamTypeFeature,
+  timeFeature,
+} from './features/shared';
 import { textTrackFeature } from './features/text-track';
-import { timeFeature } from './features/time';
 import { volumeFeature } from './features/volume';
 
 /** Select the audio track state (audioTrackList, selectAudioTrack). */

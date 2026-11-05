@@ -5,7 +5,7 @@ import type {
   VideoRenditionListLike,
 } from '@videojs/media';
 import { isMediaVideoDimensionsCapable, isMediaVideoRenditionCapable } from '@videojs/media';
-import { listen } from '@videojs/utils/dom';
+import { listen } from '@videojs/utils/events';
 
 import { definePlayerFeature } from '../../feature';
 
@@ -33,6 +33,7 @@ function getSize(rendition: Pick<VideoRenditionLike, 'width' | 'height'>): numbe
   return rendition.height ?? rendition.width;
 }
 
+/** @internal */
 export const qualityFeature = definePlayerFeature({
   name: 'quality',
   state: ({ target }): MediaQualityState => ({
