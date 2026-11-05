@@ -125,6 +125,94 @@ describe('ReactiveElement properties', () => {
     expect(el.count).toBeNaN();
   });
 
+  it('coerces a string assigned to a number property like its attribute', () => {
+    class TestElement extends ReactiveElement {
+      static override properties = {
+        count: { type: Number },
+      };
+      count: number | string | null | undefined = 0;
+    }
+
+    const el = createElement(TestElement);
+
+    el.count = '30';
+    expect(el.count).toBe(30);
+
+    el.count = '-30';
+    expect(el.count).toBe(-30);
+
+    el.count = '';
+    expect(el.count).toBe(0);
+
+    el.count = 'not-a-number';
+    expect(el.count).toBeNaN();
+  });
+
+  it('does not coerce non-string values assigned to a number property', () => {
+    class TestElement extends ReactiveElement {
+      static override properties = {
+        count: { type: Number },
+      };
+      count: number | null | undefined = 0;
+    }
+
+    const el = createElement(TestElement);
+
+    el.count = 5;
+    expect(el.count).toBe(5);
+
+    el.count = null;
+    expect(el.count).toBeNull();
+
+    el.count = undefined;
+    expect(el.count).toBeUndefined();
+  });
+
+  it('does not coerce strings assigned to string or boolean properties', () => {
+    class TestElement extends ReactiveElement {
+      static override properties = {
+        label: { type: String },
+        disabled: { type: Boolean },
+      };
+      label = '';
+      disabled: boolean | string = false;
+    }
+
+    const el = createElement(TestElement);
+
+    el.label = '30';
+    el.disabled = 'false';
+    expect(el.label).toBe('30');
+    expect(el.disabled).toBe('false');
+  });
+
+  it('does not request an update when a coerced string equals the current number', async () => {
+    const update = vi.fn();
+
+    class TestElement extends ReactiveElement {
+      static override properties = {
+        count: { type: Number },
+      };
+      count: number | string = 30;
+
+      protected override update() {
+        update();
+      }
+    }
+
+    const el = createElement(TestElement);
+
+    document.body.appendChild(el);
+    await el.updateComplete;
+
+    update.mockClear();
+
+    el.count = '30';
+    await new Promise((r) => setTimeout(r, 10));
+
+    expect(update).not.toHaveBeenCalled();
+  });
+
   it('supports custom attribute names', () => {
     class TestElement extends ReactiveElement {
       static override properties = {
@@ -683,6 +771,34 @@ describe('ReactiveElement upgrade', () => {
 
     await vi.waitFor(() => expect(connectedLabel).toBe('pre-connect'));
     expect(controllerLabel).toBe('pre-connect');
+  });
+
+  it('coerces a string number property set before registration', () => {
+    class TestElement extends ReactiveElement {
+      static override properties = {
+        count: { type: Number },
+      };
+      count: number | string = 10;
+    }
+
+    const tag = uniqueTag('upgrade-number-el');
+
+    customElements.define(tag, TestElement);
+
+    // SAFETY: The tag was registered with TestElement immediately above.
+    const el = document.createElement(tag) as TestElement;
+
+    // Simulates a pre-upgrade own property shadowing the reactive accessor.
+    Object.defineProperty(el, 'count', {
+      value: '-30',
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
+    document.body.appendChild(el);
+
+    expect(el.count).toBe(-30);
+    expect(Object.hasOwn(el, 'count')).toBe(false);
   });
 
   it('does not overwrite properties set after connection but before the first update', async () => {
