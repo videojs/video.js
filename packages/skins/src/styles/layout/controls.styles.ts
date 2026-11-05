@@ -45,7 +45,7 @@ export default styles({
       utilities: [],
       variants: {
         default: 'media-max-lg:hidden',
-        neutral: 'media-max-xs:hidden',
+        neutral: 'media-max-360:hidden',
       },
     },
     root: {
