@@ -1,5 +1,26 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/tiktok-video@10.2.0...@videojs/tiktok-video@10.3.0) (2026-11-03)
+
+
+### Features
+
+* **core:** hide playback rate controls when the media has no playback rate ([#9603](https://github.com/videojs/video.js/issues/9603)) ([6f5e053](https://github.com/videojs/video.js/commit/6f5e053c5ec488f9adc33781d2be682979e826a8))
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+
+
+### Bug Fixes
+
+* **packages:** fill the buffered bar for embed adapters ([#9679](https://github.com/videojs/video.js/issues/9679)) ([2abaaef](https://github.com/videojs/video.js/commit/2abaaef6cb6970e8ab572dc11731b0fa92afe087))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/tiktok-video@10.1.0...@videojs/tiktok-video@10.2.0) (2026-10-22)
 
 

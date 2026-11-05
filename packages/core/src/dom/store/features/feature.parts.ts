@@ -1,20 +1,22 @@
-import { audioTrackFeature } from './audio-track';
-import { bufferFeature } from './buffer';
 import { controlsFeature } from './controls';
 import { fullscreenFeature } from './fullscreen';
-import { liveFeature } from './live';
-import { metadataFeature } from './metadata';
 import { orientationLockFeature } from './orientation-lock';
 import { pipFeature } from './pip';
-import { playbackFeature } from './playback';
-import { playbackRateFeature } from './playback-rate';
-import { qualityFeature } from './quality';
 import { remotePlaybackFeature } from './remote-playback';
-import { sourceFeature } from './source';
-import { streamTypeFeature } from './stream-type';
+import {
+  audioTrackFeature,
+  bufferFeature,
+  liveFeature,
+  metadataFeature,
+  playbackFeature,
+  playbackRateFeature,
+  qualityFeature,
+  sourceFeature,
+  streamTypeFeature,
+  timeFeature,
+} from './shared';
 import { textCuesFeature } from './text-cues';
 import { textTrackFeature } from './text-track';
-import { timeFeature } from './time';
 import { volumeFeature } from './volume';
 
 export { audioFeatures, backgroundFeatures, videoFeatures } from './presets';

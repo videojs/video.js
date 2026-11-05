@@ -37,7 +37,7 @@ import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal } from '../../../core/signals/primitives';
-import { syncTextTrackModes } from '../../../media/dom/text/text-track-slots';
+import { refreshTextTrackCues, syncTextTrackModes } from '../../../media/dom/text/text-track-slots';
 import type { MaybeResolvedPresentation, PartiallyResolvedTextTrack, TextTrack } from '../../../media/types';
 import { getTracksByType } from '../../../media/utils/tracks';
 import type { TextTracksActor } from '../../actors/text-tracks';
@@ -156,6 +156,7 @@ function syncTextTracksSetup({
             // with browser-chosen modes that don't reflect a real user action;
             // re-apply our modes silently rather than writing them back.
             let inSettlingWindow = true;
+            let lastShowingTrack = getShowingSubtitlesTrackFromMedia(mediaElement);
             const settlingTimeout = setTimeout(() => {
               inSettlingWindow = false;
             }, 0);
@@ -167,6 +168,15 @@ function syncTextTracksSetup({
               }
 
               const showingTrack = getShowingSubtitlesTrackFromMedia(mediaElement);
+              const showingChanged = showingTrack !== lastShowingTrack;
+
+              lastShowingTrack = showingTrack;
+
+              // Before the echo guard: a reselection driven by `selectedTextTrackId`
+              // needs the refresh as much as one picked through native UI. Only on a
+              // new showing track, so unrelated `change` events don't re-render cues.
+              if (showingTrack && showingChanged) refreshTextTrackCues(showingTrack);
+
               // `showingTrack.id` matches the SPF id we set when the slot was
               // allocated. Empty-string ids fall through to `undefined`.
               const showingId = showingTrack?.id || undefined;

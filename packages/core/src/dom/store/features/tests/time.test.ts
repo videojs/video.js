@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo, createTimeRanges } from '../../../tests/test-helpers';
-import { timeFeature } from '../time';
+import { timeFeature } from '../shared';
 
 describe('timeFeature', () => {
   describe('attach', () => {

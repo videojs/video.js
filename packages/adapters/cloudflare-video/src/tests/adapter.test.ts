@@ -1,4 +1,4 @@
-import { MediaError, type Video } from '@videojs/media';
+import { isMediaBufferCapable, MediaError, type Video } from '@videojs/media';
 import { loadScript } from '@videojs/utils/dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -307,6 +307,14 @@ describe('CloudflareAdapter', () => {
     expect(media.src).toBe(CloudflareAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new CloudflareAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('offers no picture-in-picture surface', () => {

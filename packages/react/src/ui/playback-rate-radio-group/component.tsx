@@ -26,6 +26,8 @@ export type PlaybackRateRadioGroupItemState = PlaybackRateOption & {
 export interface PlaybackRateRadioGroupItemProps extends Omit<MenuRadioItemProps, 'ref'> {
   /** Playback rate represented by the item. */
   'data-rate': string;
+  /** Present when the item is the current rate rather than one of the offered rates. */
+  'data-custom'?: '' | undefined;
 }
 
 export interface PlaybackRateRadioGroupRootProps extends PlaybackRateOptionsProps {
@@ -112,6 +114,8 @@ export const PlaybackRateRadioGroupOptions = forwardRef<HTMLDivElement, Playback
                   value: option.value,
                   disabled: option.disabled,
                   'data-rate': option.value,
+                  'data-custom': option.custom ? '' : undefined,
+                  'aria-label': option.ariaLabel,
                   children: option.label,
                 },
                 itemState

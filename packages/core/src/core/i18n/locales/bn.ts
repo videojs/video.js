@@ -100,6 +100,7 @@ export default {
     speed: 'গতি',
     captions: 'ক্যাপশন',
     playbackRate: 'প্লেব্যাক গতি',
+    customRate: 'কাস্টম, {rate}',
     back: 'পেছনে',
     off: 'বন্ধ',
     auto: 'স্বয়ংক্রিয়',

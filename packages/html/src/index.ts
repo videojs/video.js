@@ -23,6 +23,7 @@ export type {
   ControlsVisibility,
   DeriveCustomStatus,
   DialogProps,
+  DialogScope,
   DialogState,
   FullscreenButtonProps,
   FullscreenButtonState,

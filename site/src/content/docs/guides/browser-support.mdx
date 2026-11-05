@@ -11,13 +11,23 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 
 <BrowserSupportTable kind="coverage" />
 
-We test in and fix bugs for these versions. Each minimum comes from a feature with no fallback: `:has()` sets Firefox, [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix) and [`oklch()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) set Chrome and Edge (Chrome 111, Firefox 113, Safari 16.2), and the JavaScript sets Safari, because it uses ES2022 syntax and [`adoptedStyleSheets`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets). Newer JavaScript APIs are feature-detected.
+We test in and fix bugs for the main versions. Each of those minimums comes from a feature with no fallback: `:has()` sets Firefox, [`color-mix()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix) and [`oklch()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) set Chrome and Edge (Chrome 111, Firefox 113, Safari 16.2), and the JavaScript sets Safari, because it uses ES2022 syntax and [`adoptedStyleSheets`](https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets). Newer JavaScript APIs are feature-detected.
 
-These versions apply to every skin. The <DocsLink slug="guides/skins" anchor="choose-a-skin">Compat and Scaffold skins</DocsLink> avoid newer visual effects such as backdrop blur, anchor-positioned menu highlights, and squircle corners, so they look the same in browsers that skip them. They still need the CSS features below.
+The <DocsLink slug="guides/skins" anchor="choose-a-skin">Compat skin</DocsLink> also reaches the older versions in the last column. It leaves out backdrop blur, anchor-positioned menu highlights, and squircle corners, and its stylesheets fall back to plain colors where `color-mix()` and `oklch()` are missing. Below the main versions, it keeps its narrow layout and default size, because container queries and media query ranges are missing, and the time slider preview stays hidden on keyboard focus. Every build checks its stylesheets against these older versions, and our browser tests run at the main versions.
+
+The Scaffold skin, a starting point for your own design, reaches the same older versions.
+
+<FrameworkCase frameworks={["html"]}>
+
+The HTML player's JavaScript needs Firefox 101 and Safari 16.4, so with HTML the Compat skin reaches Chrome and Edge 99, Firefox 101, and Safari 16.4.
+
+</FrameworkCase>
+
+The older versions apply to the packaged skins. Tailwind skins follow Tailwind's own browser support, and registry skins in plain CSS need `@scope` unless you [flatten it](#flatten-scope-in-registry-skins). If your build lowers CSS for its own targets, include these older versions in them, or it may rewrite the fallbacks.
 
 ## CSS requirements
 
-The packaged skins are generated CSS, and the build lowers them for the browsers above. It flattens CSS nesting, adds vendor prefixes such as `-webkit-backdrop-filter`, and writes each skin's scope as a [`:where()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where) selector, which adds no specificity, rather than [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope).
+The packaged skins are generated CSS, and the build lowers them for the main versions above. It flattens CSS nesting, adds vendor prefixes such as `-webkit-backdrop-filter`, and writes each skin's scope as a [`:where()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:where) selector, which adds no specificity, rather than [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope).
 
 Skins you add as source through the <DocsLink slug="guides/installation-shadcn">Shadcn registry</DocsLink> keep `@scope`, which reads more clearly in files you edit. Their plain CSS versions need Chrome and Edge 118, Firefox 146, and Safari and iOS 17.4 unless you [flatten `@scope` in your build](#flatten-scope-in-registry-skins); the Tailwind versions style elements with utility classes and follow the versions above.
 
@@ -33,7 +43,7 @@ The table reads the first fully supporting version of each feature from [caniuse
 
 <BrowserSupportTable kind="requirements" />
 
-Older browsers than the baseline are not tested. Without `:has()`, `@container`, `@layer`, `color-mix()`, or `oklch()`, the skins lose focus states, layout, or colors.
+Below the main versions, only the Compat and Scaffold skins are supported. Without `:has()`, `@container`, `@layer`, `color-mix()`, or `oklch()`, the Default and Neutral skins lose focus states, layout, or colors.
 
 ## Build the skin CSS yourself
 
