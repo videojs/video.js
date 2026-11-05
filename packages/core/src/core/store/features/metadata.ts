@@ -6,18 +6,16 @@ import { definePlayerFeature } from '../../feature';
 import type { PlayerFeatureConfig } from '../../player';
 
 const MEDIA_TITLE = Symbol('@videojs/media-title');
+const DEFAULT_TITLE = '';
+const MEDIA_POSTER = Symbol('@videojs/media-poster');
+const DEFAULT_POSTER = '';
 
 // Exported only so `@videojs/core/dom` can name them in its inferred web feature type; the features barrel keeps
 // them inside the package.
 export const USER_TITLE = Symbol('@videojs/user-title');
 export const SET_USER_TITLE = Symbol('@videojs/set-user-title');
-const DEFAULT_TITLE = '';
-
-const MEDIA_POSTER = Symbol('@videojs/media-poster');
-
 export const USER_POSTER = Symbol('@videojs/user-poster');
 export const SET_USER_POSTER = Symbol('@videojs/set-user-poster');
-const DEFAULT_POSTER = '';
 
 export interface MetadataSourceState extends Omit<MediaMetadataState, 'title' | 'poster'> {
   [MEDIA_TITLE]: MediaContentValue;
