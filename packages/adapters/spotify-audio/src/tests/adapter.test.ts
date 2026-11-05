@@ -1,4 +1,4 @@
-import { isMediaVolumeCapable, MediaError, type Video } from '@videojs/media';
+import { isMediaBufferCapable, isMediaVolumeCapable, MediaError, type Video } from '@videojs/media';
 import { loadScript } from '@videojs/utils/dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -111,6 +111,14 @@ describe('SpotifyAdapter', () => {
     expect(media.buffered.length).toBe(0);
     expect(media.textTracks.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new SpotifyAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src and creates a controller when attached', async () => {
@@ -272,9 +280,11 @@ describe('SpotifyAdapter', () => {
     const { controller } = await attachAndLoad(media);
     const durationChange = vi.fn();
     const timeUpdate = vi.fn();
+    const progress = vi.fn();
 
     media.addEventListener('durationchange', durationChange);
     media.addEventListener('timeupdate', timeUpdate);
+    media.addEventListener('progress', progress);
 
     // Milliseconds on the wire, seconds on the host.
     controller.update({ duration: 90_000, position: 5_000 });
@@ -283,6 +293,7 @@ describe('SpotifyAdapter', () => {
     expect(media.currentTime).toBe(5);
     expect(durationChange).toHaveBeenCalledTimes(1);
     expect(timeUpdate).toHaveBeenCalledTimes(1);
+    expect(progress).toHaveBeenCalledTimes(1);
     expect(media.seekable.end(0)).toBe(90);
     expect(media.buffered.end(0)).toBe(5);
     media.detach();
@@ -386,14 +397,18 @@ describe('SpotifyAdapter', () => {
     const { controller } = await attachAndLoad(media);
     const seeking = vi.fn();
     const seeked = vi.fn();
+    const progress = vi.fn();
 
     media.addEventListener('seeking', seeking);
     media.addEventListener('seeked', seeked);
+    media.addEventListener('progress', progress);
 
     media.currentTime = 30;
     expect(media.currentTime).toBe(30);
     expect(media.seeking).toBe(true);
     expect(seeking).toHaveBeenCalledTimes(1);
+    expect(progress).toHaveBeenCalledTimes(1);
+    expect(media.buffered.end(0)).toBe(30);
 
     // The seek defers via the loadComplete microtask — flush.
     await Promise.resolve();

@@ -1,8 +1,9 @@
 /**
- * **Default audio/video track selection on src load / unselect on src unload.** When a presentation is resolved, sets
- * `selectedVideoTrackId` / `selectedAudioTrackId` from a per-type default rule chain if no selection already exists.
- * When the presentation is unset/reset (transitions back to unresolved), clears the selection so a stale id from the
- * previous source doesn't persist.
+ * **Picks the video or audio track once when a source's presentation resolves, and clears it on unload; the simple
+ * alternative to the `switch*` variants.** When a presentation is resolved, sets `selectedVideoTrackId` /
+ * `selectedAudioTrackId` from a per-type default rule chain if no selection already exists. When the presentation is
+ * unset/reset (transitions back to unresolved), clears the selection so a stale id from the previous source doesn't
+ * persist.
  *
  * Lifecycle-driven: the pick fires once per transition, and nothing re-picks — that is what separates these from the
  * `switch*` variants. External writes (user picks, ABR, programmatic filter-driven re-picks) are left alone, including
@@ -30,9 +31,9 @@
  *
  * Compose `selectVideoTrack` for the simple "pick a default video track" behavior, or `switchVideoTrack`
  * (`./track-switching.ts`) for the ABR-driven variant. Compose `selectAudioTrack` for the simple default pick, or
- * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush slot-owner variant — when
+ * `switchAudioTrack` (`./track-switching.ts`) for the filter-reactive + mid-stream-flush key-owning variant — when
  * audio-abr lands, `switchAudioTrack` extends into `switchAudioQuality`. Compose only one per type — they're
- * alternatives, not stackable (each writes the same `selected*TrackId` slot). The simple variants tree-shake out the
+ * alternatives, not stackable (each writes the same `selected*TrackId` signal). The simple variants tree-shake out the
  * heavier machinery (bandwidth estimator, quality selection, flush orchestration).
  *
  * Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves
@@ -136,7 +137,7 @@ function setupTrackSelection<K extends SelectedTrackKey, RuleConfig>({
       'presentation-resolved': {
         // Entry: pick a default on entering presentation-resolved if none
         // is set. External writes (user picks, ABR) that already populated
-        // the slot are left alone.
+        // the signal are left alone.
         //
         // The returned cleanup runs on state exit — which fires on src
         // unload (presentation-resolved → presentation-unresolved) AND on
@@ -180,7 +181,7 @@ function setupTrackSelection<K extends SelectedTrackKey, RuleConfig>({
           // none reported — which is why that alone emits here. See
           // `internal/design/spf/features/errors.md`.
           () => {
-            // Untracked: writing the slot below must not re-enter this reaction.
+            // Untracked: writing the signal below must not re-enter this reaction.
             const selectedId = peek(state[selectedKey]);
             if (!selectedId) return;
 
@@ -298,7 +299,15 @@ export const screenResolutionCap: SelectTrackRule<unknown> = (tracks, { state })
  * `switchVideoTrack`'s are, because one engine config reaches every variant.
  */
 export interface SelectVideoTrackConfig extends CapabilityConstraintConfig {
+  /**
+   * The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone)
+   * outright.
+   */
   videoConstraints?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
+  /**
+   * The selection chain `selectVideoTrack` runs after its pre-pass; empty by default, so the first playable candidate
+   * is the pick.
+   */
   videoRules?: readonly SelectTrackRule<SelectVideoTrackConfig>[];
 }
 
@@ -341,7 +350,12 @@ export const selectVideoTrack = defineBehavior({
  * → first).
  */
 export interface SelectAudioTrackConfig extends AudioSelectionConfig {
+  /** The hard-constraint pre-pass `selectAudioTrack` runs before its chain. */
   audioConstraints?: readonly SelectTrackRule<SelectAudioTrackConfig>[];
+  /**
+   * The selection chain `selectAudioTrack` runs, replacing the default three-tier policy (`preferredAudioLanguage` →
+   * `DEFAULT=YES` → first).
+   */
   audioRules?: readonly SelectTrackRule<SelectAudioTrackConfig>[];
 }
 

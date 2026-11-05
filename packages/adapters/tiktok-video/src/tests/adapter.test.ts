@@ -1,4 +1,5 @@
 import {
+  isMediaBufferCapable,
   isMediaMutedCapable,
   isMediaPlaybackRateCapable,
   isMediaVolumeCapable,
@@ -193,6 +194,14 @@ describe('TikTokAdapter', () => {
     expect(media.src).toBe(TikTokAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
     expect(media.played.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('tells the player it reports ranges before it has any', () => {
+    const media = new TikTokAdapter();
+
+    expect(media.buffered.length).toBe(0);
+    expect(media.seekable.length).toBe(0);
+    expect(isMediaBufferCapable(media)).toBe(true);
   });
 
   it('sets the initial iframe src when attached', () => {
@@ -391,14 +400,14 @@ describe('TikTokAdapter', () => {
     const { iframe } = await attachAndLoad(media);
     const events: string[] = [];
 
-    for (const type of ['timeupdate', 'durationchange', 'seeking', 'seeked'] as const) {
+    for (const type of ['timeupdate', 'progress', 'durationchange', 'seeking', 'seeked'] as const) {
       media.addEventListener(type, () => events.push(type));
     }
 
     report(iframe, 'onCurrentTime', { currentTime: 2.5, duration: 15 });
     expect(media.currentTime).toBe(2.5);
     expect(media.duration).toBe(15);
-    expect(events).toEqual(['timeupdate', 'durationchange']);
+    expect(events).toEqual(['timeupdate', 'progress', 'durationchange']);
     // Only a position is reported, so what has played is all that is known to be
     // buffered.
     expect(media.buffered.length).toBe(1);
@@ -407,7 +416,7 @@ describe('TikTokAdapter', () => {
 
     // A duration that has not changed is not announced again.
     report(iframe, 'onCurrentTime', { currentTime: 3, duration: 15 });
-    expect(events).toEqual(['timeupdate', 'durationchange', 'timeupdate']);
+    expect(events).toEqual(['timeupdate', 'progress', 'durationchange', 'timeupdate', 'progress']);
     media.detach();
   });
 
@@ -562,9 +571,11 @@ describe('TikTokAdapter', () => {
     const { iframe } = await attachAndLoad(media);
     const seeking = vi.fn();
     const seeked = vi.fn();
+    const progress = vi.fn();
 
     media.addEventListener('seeking', seeking);
     media.addEventListener('seeked', seeked);
+    media.addEventListener('progress', progress);
 
     media.currentTime = 30;
     expect(media.seeking).toBe(true);
@@ -572,6 +583,8 @@ describe('TikTokAdapter', () => {
     // The requested position is reported right away; the embed only reports one
     // every so often.
     expect(media.currentTime).toBe(30);
+    expect(progress).toHaveBeenCalledTimes(1);
+    expect(media.buffered.end(0)).toBe(30);
 
     report(iframe, 'onCurrentTime', { currentTime: 30.2, duration: 60 });
     expect(media.seeking).toBe(false);

@@ -310,7 +310,13 @@ export const htmlComponentTarget: ComponentTarget<CoreSchema> = defineComponentT
         },
         'audio-track-option': optionTemplate,
         'playback-rate-option': optionTemplate,
-        'captions-option': optionTemplate,
+        'captions-option': {
+          ...optionTemplate,
+          parts: {
+            ...optionTemplate.parts,
+            badge: ({ props }) => <Span data-part="badge" {...props} />,
+          },
+        },
       },
     },
     renderTargets: {

@@ -1108,6 +1108,8 @@ function extractReactReference(
         if (name === 'HTMLAudioElement') target = 'audio';
 
         if (name === 'HTMLIFrameElement') target = 'iframe';
+
+        if (name === 'HTMLDivElement') target = 'div';
       }
     }
 

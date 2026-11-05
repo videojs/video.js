@@ -1,7 +1,8 @@
 /**
- * **Per-type segment loading dispatch.** Per available track type (video / audio / text), reads the per-type
- * segment-loader actor from context and sends typed `'load'` messages whenever a meaningful loading condition changes
- * (selected track, current time crossing a segment boundary).
+ * **Tells the video, audio, or text segment loader what to load as the selected track or the playhead changes, under
+ * the preload policy.** Per available track type (video / audio / text), reads the per-type segment-loader actor from
+ * context and sends typed `'load'` messages whenever a meaningful loading condition changes (selected track, current
+ * time crossing a segment boundary).
  *
  * Loader-actor lifecycle is owned upstream:
  *
@@ -25,18 +26,8 @@
  *   text's actor no-ops (no init concept).
  * - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
  *   segment-boundary crossing.
- *
- * # Per-type parameterization (inference-driven)
- *
- * The helper is generic over `Track` — the resolved-track type. Each variant supplies its own `findResolvedTrack`
- * resolver via config; TS infers `Track` from the resolver's return type. The loader signal's value type is constrained
- * to `SegmentLoaderLike<Track>` — anything with a `send` method accepting the `Track`-parameterized message. Concrete
- * actor types (`SegmentLoaderActor`, `TextTrackSegmentLoaderActor`) satisfy this via function-parameter contravariance:
- * an actor whose `.send` accepts a wider track type is assignable to a slot expecting a narrower track type.
- *
- * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
- * with right resolver) is enforced at the variant call site.
  */
+
 import { defineBehavior } from '../../../core/composition/define-behavior';
 import type { Reactor } from '../../../core/reactors/create-machine-reactor';
 import { createMachineReactor } from '../../../core/reactors/create-machine-reactor';
@@ -59,7 +50,6 @@ export type { BufferState, SourceBufferState };
 // STATE & CONTEXT
 // ============================================================================
 
-/** State shape for segment loading. */
 export interface SegmentLoadingState {
   presentation?: MaybeResolvedPresentation;
   preload?: string;
@@ -71,20 +61,21 @@ export interface SegmentLoadingState {
    * Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers
    * (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach
    * runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the
-   * slot exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a
-   * remote-playback session owns presentation). An absent slot means never suspended.
+   * signal exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a
+   * remote-playback session owns presentation). An absent signal means never suspended.
    */
   loadingSuspended?: boolean;
   /**
    * Segment-load gate: dispatch no new segment work while `true`. **Observed, never declared**, exactly like
-   * `loadingSuspended`, so an absent slot means never gated — but narrower in what it forbids: only the dispatchers
+   * `loadingSuspended`, so an absent signal means never gated — but narrower in what it forbids: only the dispatchers
    * read it, never `setupMediaSource`, because a writer holding this has no quarrel with the element's load algorithm.
    * That asymmetry is why it isn't folded into `loadingSuspended`, which both read; a single boolean would newly gate
    * MediaSource attach, and co-writing one would be a last-write-wins conflict besides.
    *
    * Single writer per composition. Today that writer is DRM (`setupMediaKeys`, holding each source until clear or its
-   * MediaKeys attach — appending encrypted data before `setMediaKeys` misbehaves on Chromium); the slot names the
-   * prohibition rather than the domain so a second such gate needs no vocabulary here.
+   * MediaKeys attach, and indefinitely after a failed negotiation — appending encrypted data before `setMediaKeys`
+   * misbehaves on Chromium); the signal names the prohibition rather than the domain so a second such gate needs no
+   * vocabulary here.
    */
   segmentLoadingBlocked?: boolean;
   selectedVideoTrackId?: string;
@@ -128,9 +119,15 @@ interface SegmentLoaderLike<Track> {
 }
 
 /**
- * Specialization helper. Generic over `Track` (inferred from `findResolvedTrack`'s return type). The loader value type
- * is constrained to `SegmentLoaderLike<Track>` — concrete actor types (whose `.send` accepts a wider track union)
- * satisfy this via function-parameter contravariance.
+ * Specialization helper. The helper is generic over `Track` — the resolved-track type. Each variant supplies its own
+ * `findResolvedTrack` resolver via config; TS infers `Track` from the resolver's return type. The loader signal's value
+ * type is constrained to `SegmentLoaderLike<Track>` — anything with a `send` method accepting the `Track`-parameterized
+ * message. Concrete actor types (`SegmentLoaderActor`, `TextTrackSegmentLoaderActor`) satisfy this via
+ * function-parameter contravariance: an actor whose `.send` accepts a wider track type is assignable to a signal
+ * expecting a narrower track type.
+ *
+ * No widening of actor message types is needed; no casts inside the helper. Per-variant wiring (right loader paired
+ * with right resolver) is enforced at the variant call site.
  *
  * Tracks that the helper handles must have a `segments` field — used by `segmentBoundarySignal` to compute the
  * load-anchor boundary. Each variant's resolver narrows to the right resolved-track shape.
@@ -147,7 +144,7 @@ function setupSegmentLoading<
   // `loadingSuspended` and `segmentLoadingBlocked` are observed, never declared
   // (see their state-shape docs): optional here so variant maps — which omit
   // them from their contracts — are assignable as-is, while compositions with
-  // a writer expose the live slot.
+  // a writer expose the live signal.
   state: SegmentLoadingStateMap<K> & {
     loadingSuspended?: ReadonlySignal<SegmentLoadingState['loadingSuspended']>;
     segmentLoadingBlocked?: ReadonlySignal<SegmentLoadingState['segmentLoadingBlocked']>;
@@ -160,6 +157,7 @@ function setupSegmentLoading<
       presentation: MaybeResolvedPresentation | undefined,
       trackId: string | undefined
     ) => Track | undefined;
+    /** See `SegmentLoaderActorConfig['forwardBuffer']`; read here for the load-message range. */
     forwardBuffer?: Partial<ForwardBufferConfig>;
   };
 }): Reactor<SegmentLoadingFsmState | 'destroying' | 'destroyed'> {
@@ -169,7 +167,7 @@ function setupSegmentLoading<
   // The `'dormant'` policy, read in three places: the derived state, and both
   // dispatching handlers, which re-read it against the concurrent-rise window
   // described on `'metadata-only'`. Either gate holding forbids a dispatch;
-  // an absent slot never gates.
+  // an absent signal never gates.
   const isLoadingDormant = () => !!(state.loadingSuspended?.get() || state.segmentLoadingBlocked?.get());
 
   const selectedTrack = computed<Track | undefined>(() =>
@@ -291,6 +289,12 @@ const TEXT_SEGMENT_LOADING_CONFIG = {
 // Specialized exports — one per media type
 // ============================================================================
 
+/**
+ * The video variant: dispatches `'load'` messages to `videoSegmentLoaderActor` for the selected video track, under the
+ * four load modes.
+ *
+ * @observes loadingSuspended segmentLoadingBlocked
+ */
 export const loadVideoSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedVideoTrackId'],
   contextKeys: ['videoSegmentLoaderActor'],
@@ -312,6 +316,12 @@ export const loadVideoSegments = defineBehavior({
     }),
 });
 
+/**
+ * The audio variant of {@link loadVideoSegments}: dispatches `'load'` messages to `audioSegmentLoaderActor` for the
+ * selected audio track, under the same four load modes.
+ *
+ * @observes loadingSuspended segmentLoadingBlocked
+ */
 export const loadAudioSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedAudioTrackId'],
   contextKeys: ['audioSegmentLoaderActor'],
@@ -333,6 +343,13 @@ export const loadAudioSegments = defineBehavior({
     }),
 });
 
+/**
+ * The text variant of {@link loadVideoSegments}: dispatches `'load'` messages to `textTrackSegmentLoaderActor` for the
+ * selected text track, under the same four load modes; in `'metadata-only'` the text loader no-ops, since text has no
+ * init segment.
+ *
+ * @observes loadingSuspended segmentLoadingBlocked
+ */
 export const loadTextTrackSegments = defineBehavior({
   stateKeys: ['presentation', 'preload', 'currentTime', 'loadActivated', 'selectedTextTrackId'],
   contextKeys: ['textTrackSegmentLoaderActor'],

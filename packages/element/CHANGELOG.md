@@ -1,5 +1,20 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/element@10.2.0...@videojs/element@10.3.0) (2026-11-03)
+
+
+### Bug Fixes
+
+* **element:** deliver context to consumers connected before their provider ([#9663](https://github.com/videojs/video.js/issues/9663)) ([f61f17e](https://github.com/videojs/video.js/commit/f61f17e8fd0961ed125500df1a21ecc5c9c5c084))
+* **element:** inherit keep-alive from shadow hosts ([#9525](https://github.com/videojs/video.js/issues/9525)) ([9574e5d](https://github.com/videojs/video.js/commit/9574e5d9b1fd9ae2f8298fdf06cf322b6bb47665))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/element@10.1.0...@videojs/element@10.2.0) (2026-10-22)
 
 

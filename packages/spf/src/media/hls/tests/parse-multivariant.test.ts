@@ -390,6 +390,54 @@ audio.m3u8`;
       });
     });
 
+    it('merges an audio rendition into the audio-only stream sharing its URI', () => {
+      // The audio-only variant points at the rendition's own playlist, so both
+      // describe one track (videojs/video.js#9306).
+      const text = `#EXTM3U
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-VERSION:4
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Audio",DEFAULT=YES,AUTOSELECT=YES,CHANNELS="2",URI="audio.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=778000,RESOLUTION=854x480,CODECS="avc1.640028,mp4a.40.2",AUDIO="audio"
+480p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=328000,RESOLUTION=426x240,CODECS="avc1.4d401f,mp4a.40.2",AUDIO="audio"
+240p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS="mp4a.40.2",AUDIO="audio"
+audio.m3u8`;
+
+      const result = parseMultivariantPlaylist(text, { url: baseUrl });
+      const audioSet = result.selectionSets.find((s) => s.type === 'audio');
+      const audioTracks = audioSet?.switchingSets[0]?.tracks;
+
+      expect(audioTracks).toHaveLength(1);
+      expect(audioTracks?.[0]).toMatchObject({
+        type: 'audio',
+        url: 'https://example.com/audio.m3u8',
+        bandwidth: 128000,
+        groupId: 'audio',
+        name: 'Audio',
+        channels: 2,
+        default: true,
+        autoselect: true,
+        codecs: ['mp4a.40.2'],
+      });
+    });
+
+    it('keeps an audio rendition separate from an audio-only stream at a different URI', () => {
+      const text = `#EXTM3U
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="English",LANGUAGE="en",DEFAULT=YES,URI="audio-en.m3u8"
+#EXT-X-STREAM-INF:BANDWIDTH=128000,CODECS="mp4a.40.2",AUDIO="audio"
+audio-main.m3u8`;
+
+      const result = parseMultivariantPlaylist(text, { url: baseUrl });
+      const audioSet = result.selectionSets.find((s) => s.type === 'audio');
+      const audioTracks = audioSet?.switchingSets[0]?.tracks;
+
+      expect(audioTracks?.map((track) => track.url)).toEqual([
+        'https://example.com/audio-en.m3u8',
+        'https://example.com/audio-main.m3u8',
+      ]);
+    });
+
     it('keeps a URI-less rendition separate from a group carried by video streams', () => {
       // Same rendition shape, but the stream referencing the group is muxed A/V, so
       // there is no audio-only track to merge into and the rendition stands alone.

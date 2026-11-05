@@ -1,6 +1,6 @@
 {
   "name": "@videojs/cdn",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Video.js 10 as browser-ready bundles for script tags, with no build step",
   "keywords": [
     "audio",
@@ -85,6 +85,7 @@
   "devDependencies": {
     "@videojs/cloudflare-video": "workspace:*",
     "@videojs/core": "workspace:*",
+    "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",

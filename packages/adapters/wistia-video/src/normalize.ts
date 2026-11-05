@@ -1,4 +1,4 @@
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, type MediaContentData, type TimeRangeLike } from '@videojs/media';
+import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, type MediaContentData, NO_TIME_RANGES_YET } from '@videojs/media';
 import { createTimeRange } from '@videojs/media/dom';
 
 import { parseWistiaMediaId, parseWistiaStartTime, type WistiaSource } from './source';
@@ -142,13 +142,6 @@ function stateOf(player: WistiaPlayerLike) {
   return state;
 }
 
-/**
- * An empty range that is not the shared `EMPTY_TIME_RANGES`: `isMediaBufferCapable` reads that exact object as "no
- * buffer surface at all" and skips the feature for good, where a Wistia player has one and merely has nothing in it
- * until a duration arrives.
- */
-const NO_RANGE: TimeRangeLike = Object.freeze({ length: 0, start: () => 0, end: () => 0 });
-
 function accessor(
   get: (this: WistiaPlayerLike) => any,
   set?: (this: WistiaPlayerLike, value: any) => void
@@ -255,7 +248,7 @@ const WISTIA_MEDIA_DESCRIPTORS: PropertyDescriptorMap = {
   seekable: accessor(function () {
     const duration = this.duration;
 
-    return duration > 0 && Number.isFinite(duration) ? createTimeRange(0, duration) : NO_RANGE;
+    return duration > 0 && Number.isFinite(duration) ? createTimeRange(0, duration) : NO_TIME_RANGES_YET;
   }),
 
   /** The media's own metadata. Wistia knows its name once `loaded-media-data` has fired, and nothing else. */
@@ -267,7 +260,7 @@ const WISTIA_MEDIA_DESCRIPTORS: PropertyDescriptorMap = {
   // that asks only whether the members are defined, so a missing one skips the feature outright rather than
   // degrading it. An empty answer is the honest one and the features reading it cope. `textTracks` is the
   // opposite case — the shared `EMPTY_TEXT_TRACKS` is the sentinel that tells the store to skip them.
-  played: accessor(() => NO_RANGE),
+  played: accessor(() => NO_TIME_RANGES_YET),
   textTracks: accessor(() => EMPTY_TEXT_TRACKS),
   videoWidth: accessor(() => 0),
   videoHeight: accessor(() => 0),

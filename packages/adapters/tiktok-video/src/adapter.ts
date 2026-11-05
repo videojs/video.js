@@ -1,7 +1,7 @@
 // Adapted from `tiktok-video-element` in https://github.com/muxinc/media-elements (MIT),
 // ported to TypeScript and reshaped as a media adapter (mirrors `dom/youtube`).
 
-import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -267,6 +267,7 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     this.#currentTime = value;
     this.dispatchEvent(new Event('seeking'));
     this.dispatchEvent(new Event('timeupdate'));
+    this.dispatchEvent(new Event('progress'));
     this.#afterLoad(() => {
       this.#post('seekTo', value);
 
@@ -372,13 +373,14 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
 
   get buffered() {
     // The embed reports no buffer state, only a position, so only what already played through is known available.
-    return this.#currentTime > 0 ? createTimeRange(0, this.#currentTime) : EMPTY_TIME_RANGES;
+    // Every position change must dispatch `progress`.
+    return this.#currentTime > 0 ? createTimeRange(0, this.#currentTime) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -721,6 +723,7 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
       if (currentTime !== this.#currentTime) {
         this.#currentTime = currentTime;
         this.dispatchEvent(new Event('timeupdate'));
+        this.dispatchEvent(new Event('progress'));
       }
 
       if (this.#seeking) {

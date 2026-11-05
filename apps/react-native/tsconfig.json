@@ -1,0 +1,17 @@
+{
+  // Standalone on purpose — the root tsconfig.json project-reference graph is
+  // DOM/ES2022 oriented, and this app needs React Native's JSX runtime and
+  // the react-native-source export condition. Run `pnpm -F
+  // @videojs/react-native-example typecheck` to check it.
+  "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "customConditions": ["react-native-source", "react-native-strict-api"],
+    // Base config sets types: ["jest"]; this app has no test runner.
+    "types": [],
+    "paths": {
+      "@videojs/react-native": ["../../packages/react-native/src/index"]
+    }
+  },
+  "include": ["src", "index.js", "*.config.js"],
+  "exclude": ["node_modules", "ios", "android", "vendor"]
+}

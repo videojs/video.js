@@ -1,0 +1,40 @@
+---
+description: "Adds new media providers, configurable playback rates, Google Analytics 4, and improved HLS captions."
+date: 2026-11-03
+version: "10.3.0"
+prerelease: false
+breaking: false
+compareUrl: "https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0"
+---
+
+Video.js 10.3.0 adds more sources you can play and measure, while making playback controls, captions, and skins more dependable.
+
+## Play more providers
+
+New Dailymotion, SoundCloud, and Mixcloud adapters let you play Dailymotion videos and SoundCloud tracks, sets, and Mixcloud shows in Video.js players ([#9512](https://github.com/videojs/video.js/pull/9512), [#9524](https://github.com/videojs/video.js/pull/9524), [#9649](https://github.com/videojs/video.js/pull/9649)). Dailymotion uses Dailymotion's own controls, as its terms require; see the [Dailymotion HTML](/docs/framework/html/reference/components/dailymotion-video/) and [React](/docs/framework/react/reference/components/dailymotion-video/) reference. SoundCloud and Mixcloud work with the audio skin like native audio; see their [HTML references](/docs/framework/html/reference/components/soundcloud-audio/) and [Mixcloud reference](/docs/framework/html/reference/components/mixcloud-audio/).
+
+The new Google Analytics 4 extension sends GA4 video and interaction events from HTML, React, and CDN players. Configure it with the [Google Analytics guide](/docs/guides/google-analytics/) and component reference ([#9563](https://github.com/videojs/video.js/pull/9563)). Mux Data now identifies views by framework and active engine, and it monitors HLS background video ([#9577](https://github.com/videojs/video.js/pull/9577), [#9581](https://github.com/videojs/video.js/pull/9581)). It also avoids carrying new metadata into the previous view after a source change ([#9656](https://github.com/videojs/video.js/pull/9656)).
+
+## Tune playback and controls
+
+Set default playback rates on the player, or give a playback-rate button or radio group its own list. The player now uses quarter-step defaults from `0.5` through `2`, filters default rates the media cannot play, and shows a media-set rate even when it is outside the configured list ([#9533](https://github.com/videojs/video.js/pull/9533)). See the [playback rate feature reference](/docs/framework/html/reference/api/feature-playback-rate/) for the HTML API.
+
+Playback-rate controls now stay hidden for providers without rate support, remain visible once rates become available, and use a clearer tooltip; Twitch also drops unsupported rates ([#9603](https://github.com/videojs/video.js/pull/9603), [#9624](https://github.com/videojs/video.js/pull/9624), [#9532](https://github.com/videojs/video.js/pull/9532), [#9640](https://github.com/videojs/video.js/pull/9640)). A pending autoplay attempt now shows as starting playback, with documentation for the play-button and buffering states ([#9609](https://github.com/videojs/video.js/pull/9609), [#9654](https://github.com/videojs/video.js/pull/9654)).
+
+Controls no longer try to set a browser-locked volume, and open popovers close before fullscreen begins ([#9602](https://github.com/videojs/video.js/pull/9602), [#9627](https://github.com/videojs/video.js/pull/9627)). React leaves pointer events to the skin over chromeless embeds, while every embed adapter can now fill the buffered bar ([#9601](https://github.com/videojs/video.js/pull/9601), [#9679](https://github.com/videojs/video.js/pull/9679)).
+
+## Improve HLS playback and captions
+
+SPF HLS players now resolve site-relative source URLs, send the configured credentials mode when loading WebVTT segments, and select manifest-default subtitles by default ([#9587](https://github.com/videojs/video.js/pull/9587), [#9682](https://github.com/videojs/video.js/pull/9682), [#9681](https://github.com/videojs/video.js/pull/9681)). Reselecting an HLS subtitle or caption track renders it again in Safari for both hls.js and SPF, and hls.js now renders CEA-608/708 captions ([#9683](https://github.com/videojs/video.js/pull/9683), [#9685](https://github.com/videojs/video.js/pull/9685), [#9565](https://github.com/videojs/video.js/pull/9565)).
+
+The hls.js adapter updates to hls.js 1.7.3 and keeps rendition IDs aligned with reported levels ([#9645](https://github.com/videojs/video.js/pull/9645), [#9566](https://github.com/videojs/video.js/pull/9566)). SPF also avoids duplicate audio tracks when an audio rendition and audio-only variant use the same playlist ([#9688](https://github.com/videojs/video.js/pull/9688)).
+
+## Polish skins, installation, and lifecycle
+
+Default video-skin scrims are darker for readable controls over light video, and the Compat dialog now fades and scales as it opens and closes ([#9675](https://github.com/videojs/video.js/pull/9675), [#9664](https://github.com/videojs/video.js/pull/9664)). Skin backdrops, muted foreground colors, and slotted media are more reliable, and every HTML video skin now honors an aspect ratio set by the page ([#9585](https://github.com/videojs/video.js/pull/9585), [#9558](https://github.com/videojs/video.js/pull/9558), [#9692](https://github.com/videojs/video.js/pull/9692)).
+
+The installation flow now passes Mux URLs to React Mux media as structured sources ([#9605](https://github.com/videojs/video.js/pull/9605)). `keep-alive` now extends through shadow-hosted UI, and context reaches consumers that connect before their provider ([#9525](https://github.com/videojs/video.js/pull/9525), [#9663](https://github.com/videojs/video.js/pull/9663)). Remote-playback cancellation and dash.js teardown are also handled cleanly ([#9652](https://github.com/videojs/video.js/pull/9652), [#9653](https://github.com/videojs/video.js/pull/9653)).
+
+The [skins guide](/docs/guides/skins/) now helps you choose Default, Neutral, Compat, or Scaffold, migration guidance lists SoundCloud and Mixcloud, and the skin-project guide explains its Node.js requirement ([#9474](https://github.com/videojs/video.js/pull/9474), [#9660](https://github.com/videojs/video.js/pull/9660), [#9666](https://github.com/videojs/video.js/pull/9666)). The site also adds a [press page](/press/) with logo downloads ([#9680](https://github.com/videojs/video.js/pull/9680)).
+
+Thanks to first-time contributors [@GiriAakula](https://github.com/GiriAakula), [@kenny-ish](https://github.com/kenny-ish), and [@BeyondITL-Mossaddique](https://github.com/BeyondITL-Mossaddique).

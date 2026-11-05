@@ -1,3 +1,6 @@
+export * from './feature';
+export * from './player';
+export * from './store/features';
 export * from './ui/airplay-button/core';
 export * from './ui/airplay-button/data';
 export * from './ui/alert-dialog/core';
@@ -43,6 +46,7 @@ export * from './ui/play-button/core';
 export * from './ui/play-button/data';
 export * from './ui/playback-rate-button/core';
 export * from './ui/playback-rate-button/data';
+export * from './ui/playback-rate-button/vars';
 export * from './ui/playback-rate-radio-group/core';
 export * from './ui/playback-rate-radio-group/data';
 export * from './ui/popover/core';

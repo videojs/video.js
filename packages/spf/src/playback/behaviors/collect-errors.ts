@@ -1,23 +1,3 @@
-/**
- * **Owns the engine's error sequence.** Reporters append through {@link emitError}; this behavior owns the slot and its
- * per-source lifecycle, clearing it on exit so a new source starts clean and the sequence can't grow unbounded across a
- * session.
- *
- * Same split as `setupFailoverMonitor` and `failedCdns`: writes come from wherever the condition is detected, one
- * behavior owns the slot. Deliberately has no `effects` — it holds no policy and derives nothing. Severity is decided
- * at the adapter, not here (see `internal/design/spf/features/errors.md`), which is why this is a lifecycle owner
- * rather than an error _handler_.
- *
- * Clearing binds to _exit_ of `presentation-resolved`, mirroring the sibling mixins' clear-on-teardown (`emptied` /
- * `MEDIA_DETACHED`). A live reload swaps the presentation object without leaving the resolved state, so it doesn't
- * clear — only an actual source change or destroy does. Known gap: a resolved→resolved source swap that never passes
- * through unresolved carries the prior source's errors forward; `resolve-track` guards the same transition with a
- * commit-time id check, and doing likewise here is a follow-up.
- *
- * The vocabulary itself ({@link SvtaError} and the codes) is DOM- and signal-free in `media/errors`; only the write
- * seam lives here, with the slot it writes.
- */
-
 import { defineBehavior } from '../../core/composition/define-behavior';
 import { createMachineReactor } from '../../core/reactors/create-machine-reactor';
 import { computed, peek, type ReadonlySignal, type Signal, update } from '../../core/signals/primitives';
@@ -27,11 +7,16 @@ import type { SelectionRule } from '../primitives/selection-rules';
 
 export interface CollectErrorsState {
   presentation?: MaybeResolvedPresentation;
+  /**
+   * Conditions reported during playback, in the order encountered — appended by whichever behavior detects one
+   * (`emitError`), owned and cleared per source by `collectErrors`. Carries no severity: which of these is fatal is
+   * decided above the engine, at the adapter. See `internal/design/spf/features/errors.md`.
+   */
   errors?: SvtaError[];
 }
 
 /**
- * State an error reporter writes into. The slot is _optional_: a behavior reports through this seam without declaring
+ * State an error reporter writes into. The signal is _optional_: a behavior reports through this seam without declaring
  * ownership in its own typed slice, and emission no-ops when `collectErrors` isn't composed. Same contract as
  * `failedCdns` / `failoverFetch`.
  */
@@ -78,7 +63,7 @@ export function emitError(state: ErrorEmitterState, error: SvtaError): void {
  *
  * Idempotent because the constraint chain runs inside a `computed` that re-derives on every `presentation` write —
  * segment appends and live reloads included — and the sequence deliberately keeps duplicates. `peek` is what keeps that
- * computed from subscribing to the slot this writes.
+ * computed from subscribing to the signal this writes.
  *
  * @example
  *   // features/background-video.ts — video-only, so a source with none can't play
@@ -97,7 +82,23 @@ export function reportAbsentTrackType<T>(code: number): SelectionRule<T, ErrorEm
 }
 
 /**
- * Own `errors` for the resolved source's lifetime.
+ * **Collects the errors every behavior reports into `state.errors`, and clears them per source.** Reporters append
+ * through {@link emitError}; this behavior owns the signal and its per-source lifecycle, clearing it on exit so a new
+ * source starts clean and the sequence can't grow unbounded across a session.
+ *
+ * Same split as `setupFailoverMonitor` and `failedCdns`: writes come from wherever the condition is detected, one
+ * behavior owns the signal. Deliberately has no `effects` — it holds no policy and derives nothing. Severity is decided
+ * at the adapter, not here (see `internal/design/spf/features/errors.md`), which is why this is a lifecycle owner
+ * rather than an error _handler_.
+ *
+ * Clearing binds to _exit_ of `presentation-resolved`, mirroring the sibling mixins' clear-on-teardown (`emptied` /
+ * `MEDIA_DETACHED`). A live reload swaps the presentation object without leaving the resolved state, so it doesn't
+ * clear — only an actual source change or destroy does. Known gap: a resolved→resolved source swap that never passes
+ * through unresolved carries the prior source's errors forward; `resolve-track` guards the same transition with a
+ * commit-time id check, and doing likewise here is a follow-up.
+ *
+ * The vocabulary itself ({@link SvtaError} and the codes) is DOM- and signal-free in `media/errors`; only the write
+ * seam lives here, with the signal it writes.
  *
  * @example
  *   const reactor = collectErrors.setup({ state });
