@@ -29,7 +29,7 @@ const menuHighlight = [
   'media-anchored:has-data-[highlighted=]:before:duration-0',
 ] as const;
 
-const menuGroup = ['flex [max-height:inherit] flex-col gap-0.5', ...menuHighlight] as const;
+const menuGroup = ['flex flex-col gap-0.5', ...menuHighlight] as const;
 
 const menuIcon = ['shrink-0 drop-shadow-media-icon text-media-muted-foreground'] as const;
 
@@ -62,9 +62,11 @@ export default styles({
       utilities: [
         ...menuHighlight,
         ...menuContent,
-        'absolute max-h-[inherit] overflow-auto overscroll-none outline-hidden',
+        'absolute overflow-auto overscroll-none outline-hidden',
         'transition-[translate,filter] duration-media-menu ease-out',
+        // Root content sits inside the popup's padding, so its cap leaves room for that padding below the last item.
         'not-data-submenu:inset-x-1 not-data-submenu:top-1',
+        'not-data-submenu:max-h-[calc(min(var(--media-menu-available-height,--spacing(56)),--spacing(56))-(--spacing(2)))]',
         'not-data-submenu:data-child-open:-translate-x-full',
         'not-data-submenu:data-child-open:rtl:translate-x-full',
         'data-submenu:inset-x-0 data-submenu:top-0 data-submenu:z-10 data-submenu:max-h-[inherit] data-submenu:p-1',
