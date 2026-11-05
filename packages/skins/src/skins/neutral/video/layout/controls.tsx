@@ -23,19 +23,19 @@ export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsPr
   return (
     <$.Controls.Root>
       <$.BufferingIndicator className={controlsStyles.centerBuffering}>
-        <$.Controls.Group className={controlsStyles.center}>
+        <$.Controls.Group className={[controlsStyles.center, styles.compactCenter]}>
           <PlayButton
             className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
             iconClassName={controlsStyles.centerPlayIcon}
           />
         </$.Controls.Group>
       </$.BufferingIndicator>
-      <$.Controls.Backdrop className={controlsStyles.backdrop} />
+      <$.Controls.Backdrop className={[controlsStyles.backdrop, styles.compactBackdrop]} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content, styles.content]}>
         <$.Tooltip.Provider>
           <$.Controls.Group className={styles.start}>
             <ButtonTooltip side="top">
-              <PlayButton />
+              <PlayButton className={styles.playButton} />
             </ButtonTooltip>
             <VolumePopover className={styles.volumeButton} showTooltip side="right" orientation="horizontal" />
             <$.Time.Group className={[timeStyles.group, styles.time]}>
