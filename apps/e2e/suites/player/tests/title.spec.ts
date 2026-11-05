@@ -19,8 +19,9 @@ for (const framework of ['html', 'react']) {
       );
       await expect(title).toHaveAttribute('data-visible');
       await expect(title).toHaveCSS('opacity', '1');
-      await expect(title).toHaveCSS('white-space', 'normal');
-      await expect(title).toHaveCSS('overflow-wrap', 'anywhere');
+      await expect(title).toHaveCSS('white-space', 'nowrap');
+      await expect(title).toHaveCSS('overflow', 'hidden');
+      await expect(title).toHaveCSS('text-overflow', 'ellipsis');
       await expect(title).not.toHaveAttribute('title');
       await expect(title).not.toHaveAttribute('aria-hidden', 'true');
 
