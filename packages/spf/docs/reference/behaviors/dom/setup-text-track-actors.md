@@ -28,6 +28,7 @@ The setup declares `config` as required.
 | Key | Type | Doc |
 | --- | --- | --- |
 | `forwardBuffer?` | `Partial<ForwardBufferConfig>` | Forward-buffer tuning; see `SegmentLoaderActorConfig['forwardBuffer']`. |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `resolveTextTrackSegment` | `TextTrackSegmentResolver<VTTCue>` | Resolver that turns a text-track segment fetch into VTT cues. `textTracksFeature` supplies the DOM-bound `resolveVttSegment` resolver, which uses an offscreen `<track>` element to parse WebVTT. |
 | `textMessagePipelines?` | `TextMessagePipelines<VTTCue>` | Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to mirror the v/a `video`/`audioMessagePipelines` composition-config keys. Defaults (in the loader) to `resolveCues → dispatchCues`. |
 

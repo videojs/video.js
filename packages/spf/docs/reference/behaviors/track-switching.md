@@ -120,7 +120,7 @@ The setup declares `config?`: callers may omit it.
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `enableDefaultTrack?` | `boolean` | Auto-select DEFAULT track (requires DEFAULT=YES + AUTOSELECT=YES in HLS). Default: false (user opt-in, matches hls.js/http-streaming) When enabled, tracks marked with both DEFAULT=YES and AUTOSELECT=YES will be automatically selected if no user preference matches. |
+| `enableDefaultTrack?` | `boolean` | Auto-select DEFAULT track (requires DEFAULT=YES + AUTOSELECT=YES in HLS). Off when unset; `textTracksFeature` turns it on. When enabled, tracks marked with both DEFAULT=YES and AUTOSELECT=YES will be automatically selected if no user preference matches. |
 | `getCdnId?` | `GetCdnId` | Override CDN-id derivation (shared by the failed-CDN constraint + active-CDN scope). See `TrackSwitchingSharedConfig['getCdnId']`. |
 | `includeForcedTracks?` | `boolean` | Include FORCED subtitle tracks in selection. Default: false (follows hls.js/http-streaming pattern) Note: Per Apple's HLS spec, if content has forced and regular subtitles in the same language, the regular track MUST contain both forced and regular content. Therefore, forced-only tracks are redundant and excluded by default. |
 | `preferredSubtitleLanguage?` | `string` | Preferred subtitle language (ISO 639 code, e.g., "en", "es"). If specified, selects matching track if available. |
