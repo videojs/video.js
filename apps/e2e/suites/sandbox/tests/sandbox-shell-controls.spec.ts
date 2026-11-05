@@ -208,7 +208,7 @@ test.describe('Sandbox shell controls', () => {
     if (!track) throw new Error('Expected a width slider track.');
 
     await page.locator('[data-slot="slider"]').click({
-      position: { x: track.width * ((516 - 240) / (1360 - 240)), y: track.height / 2 },
+      position: { x: track.width * ((516 - 100) / (1360 - 100)), y: track.height / 2 },
     });
     await expect(slider).toHaveAttribute('aria-valuenow', '512');
     await slider.press('ArrowRight');

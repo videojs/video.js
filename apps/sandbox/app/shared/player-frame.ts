@@ -5,7 +5,7 @@ import type { MediaPlayer } from '@app/media';
  * end.
  */
 export const PLAYER_WIDTH = {
-  min: 240,
+  min: 100,
   max: 1360,
   stops: [384, 512, 672, 960, 1360],
 } as const;
