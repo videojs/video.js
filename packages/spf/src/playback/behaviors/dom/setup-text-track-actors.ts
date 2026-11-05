@@ -1,7 +1,11 @@
 import type { AnySlotMap, Behavior } from '../../../core/composition/define-behavior';
 import { effect } from '../../../core/signals/effect';
 import type { ReadonlySignal, Signal } from '../../../core/signals/primitives';
-import { type RequestCredentialsPolicy, resolveRequestCredentials } from '../../../network/credentials-fetch';
+import {
+  type RequestCredentialsConfig,
+  type RequestCredentialsPolicy,
+  resolveRequestCredentials,
+} from '../../../network/credentials-fetch';
 import { createTextTracksActor } from '../../actors/dom/text-tracks';
 import {
   createTextTrackSegmentLoaderActor,
@@ -28,14 +32,13 @@ export interface TextTrackActorsContext {
   textTrackSegmentLoaderActor?: TextTrackSegmentLoaderActor | undefined;
 }
 
-export interface TextTrackActorsConfig extends Pick<TextTrackSegmentLoaderActorConfig<VTTCue>, 'forwardBuffer'> {
+export interface TextTrackActorsConfig
+  extends Pick<TextTrackSegmentLoaderActorConfig<VTTCue>, 'forwardBuffer'>, RequestCredentialsConfig {
   /**
    * Resolver that turns a text-track segment fetch into VTT cues. `textTracksFeature` supplies the DOM-bound
    * `resolveVttSegment` resolver, which uses an offscreen `<track>` element to parse WebVTT.
    */
   resolveTextTrackSegment: TextTrackSegmentResolver<VTTCue>;
-  /** The `credentials` mode each segment is loaded with; absent → the platform default. */
-  requestCredentials?: RequestCredentialsPolicy;
   /**
    * Ordered text step pipeline, mapped to the loader's `messagePipelines`. Named with the `text` domain prefix to
    * mirror the v/a `video`/`audioMessagePipelines` composition-config keys. Defaults (in the loader) to `resolveCues →
