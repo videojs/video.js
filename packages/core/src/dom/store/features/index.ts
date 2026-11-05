@@ -6,5 +6,6 @@ export * from './orientation-lock';
 export * from './pip';
 export * from './presets';
 export * from './remote-playback';
+export * from './text-cues';
 export * from './text-track';
 export * from './volume';

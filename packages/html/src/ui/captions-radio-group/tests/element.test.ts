@@ -39,7 +39,7 @@ async function waitForAssertion(assertion: () => void): Promise<void> {
 }
 
 function createTextTrackStore({
-  textTrackList = [{ id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled' }],
+  textTrackList = [{ id: 'captions', kind: 'captions', label: '', language: '', mode: 'disabled', source: 'media' }],
   subtitlesShowing = false,
   selectSubtitlesTrack = vi.fn(),
 }: {
@@ -140,7 +140,9 @@ describe('CaptionsRadioGroupElement', () => {
 
   it('uses a custom track formatter', async () => {
     const { menu, options } = setup('en', {
-      textTrackList: [{ id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' }],
+      textTrackList: [
+        { id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
+      ],
     });
 
     options.formatTrack = (track) => `${track.language.toUpperCase()} subtitles`;
@@ -169,7 +171,9 @@ describe('CaptionsRadioGroupElement', () => {
   it('selects a captions option by normalized value', async () => {
     const selectSubtitlesTrack = vi.fn();
     const { options } = setup('en', {
-      textTrackList: [{ id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' }],
+      textTrackList: [
+        { id: 'es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
+      ],
       selectSubtitlesTrack,
     });
 

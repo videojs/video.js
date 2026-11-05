@@ -345,6 +345,33 @@ export interface MediaTextTrack<Kind extends string = TextTrackKind> {
   label: string;
   language: string;
   mode: TextTrackMode;
+  /** Where the track came from: the media, or the app through the player. */
+  source: TextTrackSource;
+}
+
+/** Where a text track came from: the media, or the app through the player. */
+export type TextTrackSource = 'media' | 'app';
+
+/**
+ * Picks text tracks by kind, label, or language, or with a function. Each given field must match; a kind list matches
+ * any kind in it.
+ */
+export type TextTrackFilter =
+  | {
+      kind?: TextTrackKind | readonly TextTrackKind[] | undefined;
+      label?: string | undefined;
+      language?: string | undefined;
+    }
+  | ((track: MediaTextTrack) => boolean);
+
+/** One text track's cues, as plain data. */
+export interface MediaTrackCues<Value = unknown> {
+  /** The track the cues belong to, as `textTrackList` lists it. */
+  track: MediaTextTrack;
+  /** Every cue, ordered by start time. */
+  cues: MediaTextCue<Value>[];
+  /** The cues active at the current time. A point stays active for one second. */
+  activeCues: MediaTextCue<Value>[];
 }
 
 /** The first `kind="metadata" label="thumbnails"` track. */
@@ -382,6 +409,20 @@ export interface MediaTextTrackState {
   chaptersCues: MediaTextCue[];
   /** The first thumbnails track, or `null` when there is none. */
   thumbnailsTrack: MediaThumbnailsTrack | null;
+}
+
+/** Cues for the text tracks being read. */
+export interface MediaTextCuesState {
+  /**
+   * Cues for the tracks being read: `metadata` and `chapters` tracks that aren't disabled, except the thumbnails track,
+   * plus any track a `watchTextCues()` filter matches. In `textTrackList` order.
+   */
+  textCues: MediaTrackCues[];
+  /**
+   * Read cues for more tracks, such as captions for an interactive transcript. Cues are tracked until the returned
+   * function is called.
+   */
+  watchTextCues(filter: TextTrackFilter): () => void;
 }
 
 export interface MediaErrorState {

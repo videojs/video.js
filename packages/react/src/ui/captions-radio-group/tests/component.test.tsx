@@ -14,8 +14,8 @@ afterEach(() => {
 });
 
 const defaultTextTrackList = [
-  { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-  { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing' },
+  { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+  { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'showing', source: 'media' },
 ] as const;
 
 function renderCaptionsRadioGroup({
