@@ -27,3 +27,17 @@ export function isHTMLMediaElement(value: unknown): value is HTMLMediaElement {
 export function isHTMLImageElement(value: unknown): value is HTMLImageElement {
   return value instanceof HTMLImageElement;
 }
+
+/**
+ * Whether `value` is a custom element whose class isn't defined yet. Until then it has none of its own properties or
+ * methods.
+ *
+ * @internal
+ */
+export function isUndefinedCustomElement(value: unknown): value is Element {
+  if (!globalThis.customElements || !(value instanceof Element)) return false;
+
+  const name = value.localName;
+
+  return name.includes('-') && !customElements.get(name);
+}
