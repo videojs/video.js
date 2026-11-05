@@ -34,8 +34,14 @@ const hiddenBeforeStart = [
 
 const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
 
-// Each skin's centre button matches its playback status indicator, and shrinks rather than hides in small players.
-const centerPlay = ['size-auto! p-4! media-max-360:p-3!'] as const;
+// The centre play button is the one to press, so it takes the primary fill rather than the translucent look of the
+// playback feedback that flashes in the same place. It shrinks rather than hides in small players.
+const centerPlay = [
+  'size-auto! p-4! media-max-360:p-3!',
+  'rounded-media-pill! bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
+  'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+  'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+] as const;
 
 export default styles({
   file: 'video/controls.css',
