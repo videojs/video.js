@@ -158,9 +158,9 @@ describe('CaptionsRadioGroupElement', () => {
   it('renders kind badges for tracks that share a label', async () => {
     const { menu, options } = setup('en', {
       textTrackList: [
-        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled' },
-        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled' },
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'subtitles-es', kind: 'subtitles', label: 'Spanish', language: 'es', mode: 'disabled', source: 'media' },
       ],
     });
     const template = document.createElement('template');
@@ -187,8 +187,8 @@ describe('CaptionsRadioGroupElement', () => {
   it('appends kind badges to item text without a template', async () => {
     const { menu, options } = setup('en', {
       textTrackList: [
-        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled' },
-        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled' },
+        { id: 'subtitles-en', kind: 'subtitles', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
+        { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'disabled', source: 'media' },
       ],
     });
 
