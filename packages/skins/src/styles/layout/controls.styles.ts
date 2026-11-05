@@ -146,11 +146,20 @@ export default styles({
     centerPlay: {
       utilities: [],
       variants: {
-        // A mouse can click the media to toggle playback, so fine pointers keep the button only as a start prompt. A
-        // focused button stays until focus moves on; hiding it would drop focus out of the player and its hotkeys.
-        default: [...centerPlay, 'pointer-fine:data-started:not-focus:hidden!'],
+        // A mouse can click the media to toggle playback, so fine pointers keep the button only as a start prompt. It
+        // turns invisible rather than leaving layout, so a clicked button keeps focus in the player and its hotkeys, and
+        // shows again for keyboard focus.
+        default: [
+          ...centerPlay,
+          'pointer-fine:data-started:not-focus-visible:opacity-0!',
+          'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
+        ],
         // The neutral skin keeps its classic control bar once playback starts.
-        neutral: [...centerPlay, 'data-started:not-focus:hidden!'],
+        neutral: [
+          ...centerPlay,
+          'data-started:not-focus-visible:opacity-0!',
+          'data-started:not-focus-visible:pointer-events-none!',
+        ],
       },
     },
     centerPlayIcon: {
