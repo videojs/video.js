@@ -22,7 +22,7 @@ The common VOD path stays smaller and each preset has a stable first-render shap
 ## Current sources
 
 - packages/core/src/dom/store/features/presets.ts
-- packages/core/src/dom/store/features/live.ts
+- packages/core/src/core/store/features/live.ts
 - packages/react/src/presets/live-video/
 - packages/react/src/presets/live-audio/
 - packages/html/src/presets/live-video/index.ts

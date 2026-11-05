@@ -374,7 +374,7 @@ because an all-encrypted or all-TS source there has no video to fall
 back to.
 
 **Consumer chain** — `errorFeature`
-(`packages/core/src/dom/store/features/error.ts`) sets `error` on the
+(`packages/core/src/core/store/features/error.ts`) sets `error` on the
 media element's `'error'` event and clears on `'emptied'` → `selectError`
 → `media-error-dialog`. `resolveErrorDialogDescription` maps 99001 to
 `errors.unplayable` — copy deliberately distinct from `errors.source`,

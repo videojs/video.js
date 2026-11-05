@@ -74,12 +74,15 @@ export interface FeatureResult {
 
 /** Generate feature references from authored feature and media-state declarations. */
 export function generateFeatureReferences(monorepoRoot: string): FeatureResult[] {
-  const featuresDir = path.join(monorepoRoot, 'packages/core/src/dom/store/features');
+  // Platform-neutral features live under `core`; features that need the DOM stay under `dom`.
+  const featuresDirs = ['packages/core/src/core/store/features', 'packages/core/src/dom/store/features']
+    .map((dir) => path.join(monorepoRoot, dir))
+    .filter((dir) => fs.existsSync(dir));
   const stateFilePath = path.join(monorepoRoot, 'packages/media/src/core/state.ts');
-  if (!fs.existsSync(featuresDir) || !fs.existsSync(stateFilePath)) return [];
+  if (featuresDirs.length === 0 || !fs.existsSync(stateFilePath)) return [];
 
   const project = new Project(monorepoRoot);
-  const sources = discoverFeatureSources(featuresDir, project);
+  const sources = featuresDirs.flatMap((dir) => discoverFeatureSources(dir, project));
   const results: FeatureResult[] = [];
 
   for (const source of sources) {
