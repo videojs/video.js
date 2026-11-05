@@ -19,6 +19,9 @@
   --color-media-backdrop: var(--media-backdrop);
 
   /* Player layout breakpoints, measured against the `media-root` container. */
+  --container-media-5xs: 10rem;
+  --container-media-4xs: 12.5rem;
+  --container-media-3xs: 15rem;
   --container-media-2xs: 17.5rem;
   --container-media-xs: 20rem;
   --container-media-360: 22.5rem;
@@ -120,6 +123,48 @@
 /* Reduced transparency or high contrast. */
 @custom-variant media-high-contrast {
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    @slot;
+  }
+}
+
+/* Player at or above the 5xs breakpoint. */
+@custom-variant media-5xs {
+  @container media-root (width >= theme(--container-media-5xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 5xs breakpoint. */
+@custom-variant media-max-5xs {
+  @container media-root (width < theme(--container-media-5xs)) {
+    @slot;
+  }
+}
+
+/* Player at or above the 4xs breakpoint. */
+@custom-variant media-4xs {
+  @container media-root (width >= theme(--container-media-4xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 4xs breakpoint. */
+@custom-variant media-max-4xs {
+  @container media-root (width < theme(--container-media-4xs)) {
+    @slot;
+  }
+}
+
+/* Player at or above the 3xs breakpoint. */
+@custom-variant media-3xs {
+  @container media-root (width >= theme(--container-media-3xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 3xs breakpoint. */
+@custom-variant media-max-3xs {
+  @container media-root (width < theme(--container-media-3xs)) {
     @slot;
   }
 }
