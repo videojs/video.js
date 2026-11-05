@@ -51,7 +51,7 @@ export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsPr
 
           <$.Controls.Group className={styles.end}>
             <ButtonTooltip side="top">
-              <CaptionsButton className={[controlsStyles.captionsButton, styles.compactCaptionsButton]} />
+              <CaptionsButton className={controlsStyles.captionsButton} />
             </ButtonTooltip>
             <VideoSettingsMenu className={styles.settingsButton} />
             <$.Controls.Group className={styles.trailing}>
