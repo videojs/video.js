@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { handleMarkdown, staticMarkdownHeaderRules } from '../markdown-handler';
+import {
+  estimateMarkdownTokens,
+  handleMarkdown,
+  markdownTokenHeaderRules,
+  staticMarkdownHeaderRules,
+} from '../markdown-handler';
 
 /** Read `_headers` rules the way Netlify does: a path line, then indented `name: value` lines. */
 function parseHeaderRules(rules: string): Map<string, Record<string, string>> {
@@ -24,10 +29,21 @@ function parseHeaderRules(rules: string): Map<string, Record<string, string>> {
   return parsed;
 }
 
+describe('estimateMarkdownTokens', () => {
+  it('counts four characters per token, rounding up', () => {
+    expect(estimateMarkdownTokens('')).toBe(0);
+    expect(estimateMarkdownTokens('# Page')).toBe(2);
+    expect(estimateMarkdownTokens('a'.repeat(4000))).toBe(1000);
+  });
+});
+
 describe('staticMarkdownHeaderRules', () => {
-  it('gives each static twin the headers the edge handler sets on negotiated Markdown', async () => {
+  it('gives each static twin the headers the edge handler sets on negotiated Markdown, plus its size', async () => {
     const rules = parseHeaderRules(
-      staticMarkdownHeaderRules(['/docs/framework/react/guides/build-with-ai.md', '/docs/guides/installation.md'])
+      staticMarkdownHeaderRules([
+        { path: '/docs/framework/react/guides/build-with-ai.md', tokens: 1200 },
+        { path: '/docs/guides/installation.md', tokens: 800 },
+      ])
     );
     const negotiated = await handleMarkdown(
       new Request('https://videojs.org/docs/framework/react/guides/build-with-ai', {
@@ -35,24 +51,44 @@ describe('staticMarkdownHeaderRules', () => {
       }),
       { next: async () => new Response('# Build with AI') }
     );
+    const negotiatedHeaders = {
+      'content-type': negotiated!.headers.get('content-type'),
+      'cache-control': negotiated!.headers.get('cache-control'),
+      'netlify-cdn-cache-control': negotiated!.headers.get('netlify-cdn-cache-control'),
+    };
 
-    expect([...rules.keys()]).toEqual([
-      '/docs/framework/react/guides/build-with-ai.md',
-      '/docs/guides/installation.md',
-    ]);
-
-    for (const headers of rules.values()) {
-      expect(headers).toEqual({
-        'content-type': negotiated!.headers.get('content-type'),
-        'cache-control': negotiated!.headers.get('cache-control'),
-        'netlify-cdn-cache-control': negotiated!.headers.get('netlify-cdn-cache-control'),
-      });
-    }
+    expect(rules).toEqual(
+      new Map([
+        ['/docs/framework/react/guides/build-with-ai.md', { ...negotiatedHeaders, 'x-markdown-tokens': '1200' }],
+        ['/docs/guides/installation.md', { ...negotiatedHeaders, 'x-markdown-tokens': '800' }],
+      ])
+    );
   });
 
   it('leaves installation twins to the edge function', () => {
     expect(
-      staticMarkdownHeaderRules(['/docs/guides/installation/react.md', '/docs/guides/installation/shadcn.md'])
+      staticMarkdownHeaderRules([
+        { path: '/docs/guides/installation/react.md', tokens: 1200 },
+        { path: '/docs/guides/installation/shadcn.md', tokens: 1200 },
+      ])
     ).toBe('');
+  });
+});
+
+describe('markdownTokenHeaderRules', () => {
+  it('adds only the size, so the indexes keep their content type and caching', () => {
+    const rules = parseHeaderRules(
+      markdownTokenHeaderRules([
+        { path: '/llms.txt', tokens: 900 },
+        { path: '/docs/framework/html/llms-full.txt', tokens: 250000 },
+      ])
+    );
+
+    expect(rules).toEqual(
+      new Map([
+        ['/llms.txt', { 'x-markdown-tokens': '900' }],
+        ['/docs/framework/html/llms-full.txt', { 'x-markdown-tokens': '250000' }],
+      ])
+    );
   });
 });
