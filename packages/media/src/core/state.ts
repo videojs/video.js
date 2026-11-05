@@ -260,7 +260,7 @@ export interface MediaPlaybackRateState {
    */
   playbackRateAvailability: MediaFeatureAvailability;
   /**
-   * Set the playback rate.
+   * Set the playback rate, clamped to the rates the media accepts.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
    */

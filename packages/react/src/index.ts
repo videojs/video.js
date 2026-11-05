@@ -21,6 +21,7 @@ export type {
   ControlsVisibility,
   DeriveCustomStatus,
   DialogProps,
+  DialogScope,
   DialogState,
   FullscreenButtonState,
   HlsDateRangeAttribute,

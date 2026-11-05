@@ -92,7 +92,17 @@ export type SegmentLoaderActor = MessageActor<SegmentLoaderActorState, SegmentLo
  * callers can override individual fields.
  */
 export interface SegmentLoaderActorConfig {
+  /**
+   * Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where
+   * forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader
+   * actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range.
+   */
   forwardBuffer?: Partial<ForwardBufferConfig>;
+  /**
+   * Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults:
+   * see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use
+   * back-buffer eviction).
+   */
   backBuffer?: Partial<BackBufferConfig>;
   /** Per-message-type step pipelines. Defaults to {@link DEFAULT_MESSAGE_PIPELINES} (`fetch → dispatch`). */
   messagePipelines?: MessagePipelines;

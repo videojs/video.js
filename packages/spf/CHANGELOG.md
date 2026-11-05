@@ -1,5 +1,30 @@
 # Changelog
 
+## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.2.0...@videojs/spf@10.3.0) (2026-11-03)
+
+
+### Features
+
+* **mux-data:** report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/issues/9577)) ([d84b573](https://github.com/videojs/video.js/commit/d84b573df447824aded5590b255bcc70e372472a))
+
+
+### Bug Fixes
+
+* **mux-data:** monitor the HLS background video ([#9581](https://github.com/videojs/video.js/issues/9581)) ([c15ea19](https://github.com/videojs/video.js/commit/c15ea192787971c5a3e5f3dafe30302041cd5ccc))
+* **spf:** auto-select DEFAULT and AUTOSELECT subtitles in hls-video ([#9681](https://github.com/videojs/video.js/issues/9681)) ([9b4973a](https://github.com/videojs/video.js/commit/9b4973ab34542675c7dc250469add0c7cd6ba939))
+* **spf:** load webvtt segments with the request credentials mode ([#9682](https://github.com/videojs/video.js/issues/9682)) ([e0fb911](https://github.com/videojs/video.js/commit/e0fb911bbf7fbc9fb7ade631fcf2eb48fb96c9cd))
+* **spf:** merge audio rendition into audio-only variant sharing its uri ([#9688](https://github.com/videojs/video.js/issues/9688)) ([c4bfb3c](https://github.com/videojs/video.js/commit/c4bfb3cdd2cecdd4ffaed610006fa033b9e0a5bd))
+* **spf:** render reselected text tracks in hls-video on safari ([#9685](https://github.com/videojs/video.js/issues/9685)) ([b3f6d05](https://github.com/videojs/video.js/commit/b3f6d0520696e3d74a2a2aff33df8996b5db6ee8))
+* **spf:** resolve a relative source URL in the HLS adapters ([#9587](https://github.com/videojs/video.js/issues/9587)) ([716c660](https://github.com/videojs/video.js/commit/716c660fa71a3b93ebcd921585af22e400ac6acb))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.3.0
+    * @videojs/utils bumped to 10.3.0
+
 ## [10.2.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.1.0...@videojs/spf@10.2.0) (2026-10-22)
 
 

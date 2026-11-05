@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { playbackFeature } from '../playback';
+import { playbackFeature } from '../shared';
 
 describe('playbackFeature', () => {
   describe('attach', () => {

@@ -239,7 +239,11 @@ export const vars = {
   },
   '--media-controls-gradient-height': {
     kind: 'internal',
-    description: 'Height of the top and bottom video controls gradients.',
+    description: 'Height of the top video controls gradient.',
+  },
+  '--media-controls-bottom-gradient-height': {
+    kind: 'internal',
+    description: 'Height of the bottom video controls gradient.',
   },
   '--media-controls-top-gradient': {
     kind: 'internal',
@@ -456,6 +460,10 @@ export const vars = {
   '--media-slider-chapter-start': {
     kind: 'runtime',
     description: 'Chapter start percentage published by Time Slider and consumed by the Skin.',
+  },
+  '--media-playback-rate-length': {
+    kind: 'runtime',
+    description: 'Characters in the current playback rate, published by PlaybackRateButton and consumed by the Skin.',
   },
   '--media-slider-fill': {
     kind: 'runtime',

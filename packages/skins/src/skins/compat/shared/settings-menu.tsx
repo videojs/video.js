@@ -134,6 +134,7 @@ function CaptionsMenu() {
             <Template name="captions-option">
               <RadioItem>
                 <Template.Part name="label" />
+                <Template.Part name="badge" className={menuStyles.badge} />
               </RadioItem>
             </Template>
           </$.CaptionsRadioGroup.Options>

@@ -18,7 +18,10 @@ export interface CaptionsRadioGroupProps {
   disabled?: boolean | undefined;
 }
 
-export interface CaptionsRadioGroupOption extends RadioOption {}
+export interface CaptionsRadioGroupOption extends RadioOption {
+  /** Track kind marker (`CC` or `SUB`), present only when another track shares this option's label. */
+  badge?: string | undefined;
+}
 
 export interface CaptionsRadioGroupState
   extends Pick<MediaTextTrackState, 'subtitlesShowing'>, RadioOptionsState<CaptionsRadioGroupOption> {}
@@ -32,6 +35,10 @@ function formatTrackLabel(track: MediaTextTrack): Text | string {
   if (track.language) return track.language;
 
   return track.kind === 'captions' ? captionsText : subtitlesText;
+}
+
+function formatTrackBadge(track: MediaTextTrack): string {
+  return track.kind === 'captions' ? 'CC' : 'SUB';
 }
 
 /** @internal */
@@ -90,13 +97,20 @@ export class CaptionsRadioGroupCore {
     const media = this.#media!;
     const captionTracks = getCaptionOrSubtitleTracks(media.textTrackList);
     const showingIndex = captionTracks.findIndex((track) => track.mode === 'showing');
+    const labels = captionTracks.map((track) => this.getTrackLabel(track));
+    const labelTexts = labels.map((label) => resolveText(label));
     const options: CaptionsRadioGroupOption[] = [
       { value: CAPTIONS_OFF_VALUE, label: offText, disabled: false },
-      ...captionTracks.map((track) => ({
-        value: track.id,
-        label: this.getTrackLabel(track),
-        disabled: false,
-      })),
+      ...captionTracks.map((track, index) => {
+        const hasSameLabel = labelTexts.some((text, other) => other !== index && text === labelTexts[index]);
+
+        return {
+          value: track.id,
+          label: labels[index]!,
+          disabled: false,
+          ...(hasSameLabel && { badge: formatTrackBadge(track) }),
+        };
+      }),
     ];
 
     const availability: CaptionsRadioGroupState['availability'] =

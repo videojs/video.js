@@ -102,6 +102,7 @@ export default {
     speed: 'Velocidade',
     captions: 'Subtítulos para xordos',
     playbackRate: 'Velocidade de reprodución',
+    customRate: 'Velocidade personalizada, {rate}',
     back: 'Atrás',
     off: 'Desactivado',
     auto: 'Automático',

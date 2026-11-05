@@ -4,6 +4,7 @@ import { type ReactNode, startTransition, useLayoutEffect, useState } from 'reac
 import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { createPlayerWrapper } from '../../testing/mocks';
+import { useSyncProps } from '../../utils/use-sync-props';
 import { MuxData } from '../mux-data';
 
 function createSdk() {
@@ -184,6 +185,78 @@ describe('MuxData', () => {
     }
 
     await settle();
+    video.dispatchEvent(new Event('loadstart'));
+    await settle();
+
+    expect(updateData).not.toHaveBeenCalled();
+    expect(emit).toHaveBeenCalledExactlyOnceWith(
+      'videochange',
+      expect.objectContaining({ video_id: 'def456', video_title: 'Video B' })
+    );
+  });
+
+  it('carries metadata into the new view when a transition yields after the media renders', async () => {
+    const { extensions, Wrapper } = createPlayerWrapper();
+    const { sdk, emit, updateData } = createSdk();
+    const video = document.createElement('video');
+    const defaults = { src: '' };
+    let setVideo!: (video: { src: string; title: string }) => void;
+    let mediaRenderedSrc = '';
+
+    // Outlasts React's time slice so the transition yields after the media has rendered.
+    const Slow = (): ReactNode => {
+      const end = performance.now() + 20;
+
+      while (performance.now() < end);
+
+      return null;
+    };
+
+    // Mirrors a media component: props sync through useSyncProps (commit after the first render).
+    function Media({ src }: { src: string }): ReactNode {
+      useSyncProps(video as unknown as { src: string }, { src }, defaults);
+      mediaRenderedSrc = src;
+      return null;
+    }
+
+    const Tree = () => {
+      const [current, setCurrent] = useState({ src: 'https://stream.mux.com/abc123.m3u8', title: 'Video A' });
+
+      setVideo = setCurrent;
+
+      return (
+        <>
+          <MuxData MuxDataSdk={sdk} metadata={{ video_title: current.title }} />
+          <Media src={current.src} />
+          <Slow />
+        </>
+      );
+    };
+
+    render(<Tree />, { wrapper: Wrapper });
+
+    extensions.attach({ media: video, container: null });
+    await settle();
+    updateData.mockClear();
+    emit.mockClear();
+
+    // Real scheduling: `act()` would render the transition without yielding.
+    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', false);
+
+    try {
+      startTransition(() => setVideo({ src: 'https://stream.mux.com/def456.m3u8', title: 'Video B' }));
+      // Media has rendered the new source, but the transition has not committed yet.
+      await vi.waitFor(() => expect(mediaRenderedSrc).toContain('def456'));
+      // loadstart during the pause — must not open a view with the old metadata.
+      video.dispatchEvent(new Event('loadstart'));
+      await settle();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+
+    await settle();
+    // Commit may still be in flight; wait until the media holds the committed source.
+    await vi.waitFor(() => expect(video.src).toContain('def456'));
     video.dispatchEvent(new Event('loadstart'));
     await settle();
 
