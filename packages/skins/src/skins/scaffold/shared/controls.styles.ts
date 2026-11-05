@@ -54,7 +54,8 @@ export default styles({
       utilities: 'size-7! media-max-360:size-5.5!',
     },
     centerSeek: {
-      utilities: 'hidden size-8! pointer-fine:grid media-max-360:hidden!',
+      // Before playback starts, the play button stands alone in the center.
+      utilities: 'hidden size-8! pointer-fine:grid media-max-360:hidden! group-not-data-started/controls:hidden!',
     },
     centerSeekIcon: {
       utilities: 'size-4.5',
