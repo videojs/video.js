@@ -6,8 +6,8 @@ import { findTrackById, getTracksByType } from '../../../media/utils/tracks';
 import { createEngine as createTransmuxingAudioEngine } from '../hls-audio-mpeg-ts';
 import { createEngine as createTransmuxingVideoEngine } from '../hls-video-mpeg-ts';
 
-// Spike harness against public Mux assets packaged as MPEG-TS. Network-dependent — the
-// fixture question is open; see `.agents/plans/spf-mpeg-ts-transmux-spike.md`.
+// Runs against public Mux assets packaged as MPEG-TS, so it needs the network; no local
+// MPEG-TS fixture exists yet.
 // Muxed H.264 + AAC, non-zero PTS from 10s.
 const MUX_TS_URL = 'https://stream.mux.com/a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M.m3u8';
 // Multi-audio: the default English audio is muxed into the video TS and declared as a URI-less
