@@ -29,6 +29,63 @@ HLS video element that relies on the browser's native HLS support. Works on Safa
 
 <MediaImports media="native-hls-video" react="NativeHlsVideo" />
 
+## Load a source
+
+`src` takes an HLS manifest URL, which the browser plays with its own HLS support.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<NativeHlsVideo src="https://example.com/playlist.m3u8" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<native-hls-video src="https://example.com/playlist.m3u8"></native-hls-video>
+```
+</FrameworkCase>
+
+The structured `source` object adds `drm` and engine options to the URL. Setting `source` derives `src`.
+
+## Protected content
+
+`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess). Name every system you hold a license server for: which one gets negotiated is the browser's choice.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<NativeHlsVideo
+  source={{
+    src: 'https://example.com/protected.m3u8',
+    drm: {
+      'com.apple.fps': {
+        licenseUrl: 'https://example.com/fairplay',
+        serverCertificateUrl: 'https://example.com/fairplay.cer',
+      },
+      'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
+    },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('native-hls-video');
+video.source = {
+  src: 'https://example.com/protected.m3u8',
+  drm: {
+    'com.apple.fps': {
+      licenseUrl: 'https://example.com/fairplay',
+      serverCertificateUrl: 'https://example.com/fairplay.cer',
+    },
+    'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
+  },
+};
+```
+</FrameworkCase>
+
+The browser's own HLS licenses FairPlay only, so the `com.apple.fps` entry is the one this component uses. <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">Media sources</DocsLink> covers DRM in more depth.
+
 ## Examples
 
 ### Basic Usage
