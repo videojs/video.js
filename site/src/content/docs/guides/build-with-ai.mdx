@@ -31,6 +31,8 @@ npx @videojs/cli agents skills
 
 Add `--agent claude-code,cursor` to print only those agents. `--scope project` or `--scope local` changes the Claude Code installation scope from its `user` default, and `--global` adds `-g` to the `skills` installer command. Like `agents init`, the command only prints instructions.
 
+Not every agent can run `npx` or install skills, for example in a sandboxed one-off session. Such an agent can read [`skills/videojs/SKILL.md`](https://github.com/videojs/skills/blob/main/skills/videojs/SKILL.md) and the reference files it links, then follow them for that session. The AI Quickstart prompt includes this fallback.
+
 #### Codex
 
 <SkillInstallSteps agent="codex" />
@@ -69,7 +71,7 @@ The skill uses documentation in this order:
 
 1. **Version-matched installation instructions.** `npx @videojs/cli agents init` lists valid choices for every framework. Adding flags prints one complete installation plan. When the project already has a different `@videojs/react` or `@videojs/html` version, the plan names the pinned command for that release. The command only returns instructions; it does not prompt, install packages, or write files.
 2. **Installed package docs.** `node_modules/@videojs/react/docs/llms.txt` and `node_modules/@videojs/html/docs/llms.txt` index the docs shipped with each package version. These files work offline and match the code in your project.
-3. **Live docs.** If commands cannot run, the skill reads the relevant [React](https://videojs.org/docs/framework/react/llms.txt) or [HTML](https://videojs.org/docs/framework/html/llms.txt) documentation index, then follows it to the matching installation guide.
+3. **Live docs.** If commands cannot run, the skill reads the relevant [React](https://videojs.org/docs/framework/react/llms.txt) or [HTML](https://videojs.org/docs/framework/html/llms.txt) documentation index, then follows it to the matching installation guide. Adding the `agents init` options to that guide's `.md` URL as query parameters returns the same plan.
 4. **Installed types.** If the docs are unavailable, the skill checks package exports and TypeScript declarations instead of guessing version-specific APIs.
 
 This order matters because most model training data describes Video.js 8. Video.js 10 has a different component model, package structure, and installation flow.
