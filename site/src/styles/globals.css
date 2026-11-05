@@ -301,6 +301,59 @@ html.dark[data-tone="deep"] {
 @custom-variant starting-style (&[data-starting-style]);
 @custom-variant ending-style (&[data-ending-style]);
 
+/*
+ * Page transitions, across documents and through the docs' client router. Only the page's main content, marked with
+ * `vt-page`, animates: a short crossfade with a slight rise, while the nav and sidebar stay put. The root snapshot is
+ * off because Safari flickers when the whole page cross-fades (likely the film grain overlay).
+ */
+@view-transition {
+  navigation: auto;
+}
+
+html,
+body {
+  view-transition-name: none;
+}
+
+.vt-page {
+  view-transition-name: page;
+}
+
+/* Fade in place rather than morph between pages of different heights. */
+::view-transition-group(page) {
+  animation: none;
+}
+
+/* Staggered so the two pages barely overlap: their text would otherwise double up mid-fade. */
+::view-transition-old(page) {
+  animation: vt-page-out 100ms ease-in both;
+}
+
+::view-transition-new(page) {
+  animation: vt-page-in 220ms cubic-bezier(0.2, 0, 0, 1) 70ms both;
+}
+
+@keyframes vt-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Keep browser, demo, and third-party focus outlines consistent across the site. Players keep their own skin's focus
    ring, which the blog and docs demonstrate. Unlayered, this already outranks layered component styles. */
 :focus-visible:not(.media-skin *) {
@@ -456,6 +509,19 @@ html.dark[data-tone="deep"] {
   background-repeat: repeat-y;
   background-clip: content-box;
   background-size: 100% 9px;
+}
+
+/*
+ * The light sections' answer to `built-bg-*`: the same 1px line every 9px, in a tone barely off the page so it reads as
+ * texture rather than rules. Drawn with a gradient so the line colour can follow the theme.
+ */
+@utility pinstripe {
+  --pinstripe-line: var(--color-manila-25);
+  background-image: repeating-linear-gradient(to bottom, var(--pinstripe-line) 0 1px, transparent 1px 9px);
+
+  &:where(.dark, .dark *) {
+    --pinstripe-line: color-mix(in srgb, var(--color-warm-gray) 35%, transparent);
+  }
 }
 
 @utility text-stroke-faded-black {

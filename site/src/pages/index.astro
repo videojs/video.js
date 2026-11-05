@@ -2,16 +2,16 @@
 import Footer from '@/components/Footer.astro';
 import Built from '@/components/home/Built/BuiltSection.astro';
 import GetStartedBanner from '@/components/home/GetStartedBanner.astro';
-import Header from '@/components/home/Header.astro';
 import Sponsors from '@/components/home/Sponsors.astro';
+import StorySection from '@/components/home/Story/StorySection.astro';
 import NavBar from '@/components/NavBar/NavBar.astro';
 import { SITE_DESCRIPTION, SITE_TITLE, VJS10_DEMO_VIDEO } from '@/consts';
 import Base from '@/layouts/Base.astro';
 
 const times = [0, 12.9, 17.61, 15.8, 7.72, 4.8, 3.3];
 const posterTime = times[Math.floor(Math.random() * times.length)];
-// Mux serves the 3840px source by default. The hero is at most 1180 CSS px wide and stays on its poster until played,
-// so 2400px keeps it sharp on 2x screens for about half the bytes.
+// Mux serves the 3840px source by default. The hero is at most about 1000 CSS px wide and stays on its poster until
+// played, so 2400px keeps it sharp on 2x screens for about half the bytes.
 const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}&width=2400`;
 ---
 
@@ -24,13 +24,18 @@ const poster = `${VJS10_DEMO_VIDEO.poster}?time=${posterTime}&width=2400`;
     fetchpriority="high"
     slot="priority-head"
   />
-  {/* The home page stays on literal orange; the logo follows the accent everywhere else. */}
-  <NavBar class="[--color-accent:var(--color-orange)]" />
-  <main id="main-content">
-    <Header poster={poster} />
-    <GetStartedBanner />
-    <Built />
-    <Sponsors />
-  </main>
-  <Footer />
+  {/* The stripes fade in below the nav and out above the footer, so both sit on the plain page colour. */}
+  <div
+    class="pinstripe relative isolate before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-80 before:bg-linear-to-b before:from-manila-light before:to-transparent after:absolute after:inset-x-0 after:bottom-0 after:-z-10 after:h-80 after:bg-linear-to-t after:from-manila-light after:to-transparent dark:before:from-faded-black dark:after:from-faded-black"
+  >
+    {/* The home page stays on literal orange; the logo follows the accent everywhere else. It stacks above the glow behind the intro. */}
+    <NavBar class="relative z-10 [--color-accent:var(--color-orange)]" />
+    <main id="main-content" class="vt-page">
+      <StorySection poster={poster} />
+      <Built />
+      <GetStartedBanner />
+      <Sponsors />
+    </main>
+    <Footer />
+  </div>
 </Base>

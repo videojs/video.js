@@ -19,9 +19,9 @@ const { title, description, code = '404', message = 'NOT FOUND' } = Astro.props;
 <Base easterEgg {title} {description} withCompact>
   <div class="flex flex-col" style={{ minHeight: "80dvh" }}>
     <NavBar />
-    <main id="main-content" class="w-full" data-ph-capture-attribute-location="error-page">
+    <main id="main-content" class="vt-page w-full" data-ph-capture-attribute-location="error-page">
       <div
-        class="mx-auto grid w-full max-w-305 justify-between gap-8 px-5 py-10 md:flex md:pt-32 md:pb-16"
+        class="mx-auto grid w-full max-w-360 justify-between gap-8 px-5 py-10 md:flex md:pt-32 md:pb-16"
       >
         <div class="flex flex-col leading-none">
           <h1

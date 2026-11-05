@@ -1,15 +1,15 @@
 ---
 import DataViz from './DataViz.astro';
-import Intro from './Intro.astro';
+import ValueCards from './ValueCards.astro';
 import SocialProof from './SocialProof.astro';
 ---
 
 <section
-  class="relative mb-32.5 flex flex-col bg-faded-black lg:mb-40 dark:bg-soot"
+  class="relative mb-32.5 flex flex-col bg-faded-black lg:mb-34 dark:bg-soot"
 >
   <div class="absolute inset-0 z-0 built-bg-gray dark:built-bg-black"></div>
   <header
-    class="relative mx-auto -mt-13.5 mb-5 flex h-27.5 w-full max-w-305 flex-col items-center justify-center px-10 text-center md:-mt-10 md:h-20.5"
+    class="relative mx-auto -mt-13.5 mb-5 flex h-27.5 w-full max-w-360 flex-col items-center justify-center px-10 text-center md:-mt-10 md:h-20.5"
   >
     <div
       class="absolute top-0 right-5 bottom-0 left-5 z-0 grid overflow-hidden rounded-lg corner-squircle"
@@ -26,9 +26,10 @@ import SocialProof from './SocialProof.astro';
     </h2>
   </header>
   <div
-    class="relative mx-auto grid w-full max-w-305 auto-rows-auto grid-cols-1 gap-5 px-5 md:grid-cols-2"
+    class="relative mx-auto grid w-full max-w-360 auto-rows-auto grid-cols-1 gap-5 px-5 md:grid-cols-2"
+    data-ph-capture-attribute-location="built"
   >
-    <Intro />
+    <ValueCards />
     <DataViz />
     <SocialProof />
   </div>

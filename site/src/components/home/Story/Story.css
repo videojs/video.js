@@ -1,0 +1,1092 @@
+/*
+ * One player from the hero through the breakdown. The section's script writes 0–1 phases: `--handover` swaps the
+ * swipeable looks for the breakdown as the intro scrolls away, `--tilt` lifts the layers apart, `--spread` lays the
+ * player flat and pulls its controls out, `--menus` opens the popups, and `--own` swaps in a component of your own.
+ */
+.story {
+  --handover: 0;
+  --tilt: 0;
+  --spread: 0;
+  --menus: 0;
+  --own: 0;
+  --dock: 0;
+  /*
+   * The bar detaches for the controls, then docks again so the menus open over the video as they do in the player,
+   * and stays docked for the restyle.
+   */
+  --detach: calc(var(--spread) * (1 - var(--dock)));
+  /* The breakdown's Default skin keeps its own 28px radius until the last step restyles it to 12px. */
+  --story-radius: calc(28px - var(--own) * 16px);
+  --layer-gap: 3rem;
+  --tilt-scale: 0.3;
+  --tilt-drop: 4rem;
+  --bar-drop: 4.5rem;
+  /* Room above the detached bar; the pinned player on narrow screens has none to give. */
+  --lift: 0rem;
+  /* Labels and the tilted stack can reach past the page's edges; never let them widen it. */
+  overflow-x: clip;
+}
+
+@media (width >= 64rem) {
+  .story {
+    --layer-gap: 5.5rem;
+    --tilt-scale: 0.2;
+    --tilt-drop: 3rem;
+    --bar-drop: 5rem;
+    --lift: -2.5rem;
+  }
+}
+
+/*
+ * Layout: on narrow screens the intro sits above the player, which pins to the top while the steps scroll under it.
+ * On wide screens the intro is the first entry in the left column, so the player is in view from the start, centred
+ * and pinned in the right column while the steps follow the intro.
+ */
+
+.story-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  container-type: inline-size;
+}
+
+.story-player {
+  position: relative;
+  margin-top: 0.75rem;
+}
+
+.story-steps {
+  position: relative;
+  z-index: 2;
+  /* Enough lead-in on narrow screens for the handover to finish before the first step is centred. */
+  padding-top: 45svh;
+}
+
+@media (width >= 64rem) {
+  .story-track {
+    display: grid;
+    grid-template-columns: 34% 60%;
+    column-gap: 6%;
+    /* Start under the 84px nav, which stacks above the page, so the intro and player centre on the viewport. */
+    margin-top: -5.25rem;
+  }
+
+  .story-intro {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+  }
+
+  .story-sticky {
+    grid-area: 1 / 2 / span 2;
+    align-self: start;
+    height: 100svh;
+  }
+
+  .story-player {
+    margin-top: calc((100svh - 100cqw * 9 / 16) / 2);
+  }
+
+  .story-steps {
+    grid-area: 2 / 1;
+    padding-top: 0;
+    /* A centred 67svh step stops short of the viewport's bottom; this keeps the player pinned beside the last one. */
+    padding-bottom: 16.5svh;
+  }
+}
+
+.story-step {
+  display: flex;
+  align-items: center;
+  min-height: 50svh;
+  padding-block: 2rem;
+}
+
+@media (width >= 64rem) {
+  .story-step {
+    min-height: 67svh;
+  }
+}
+
+/*
+ * The text sits on a soft pool of the page colour, so the page's pinstripe fades out behind it and returns at the
+ * edges.
+ */
+.story-step-card,
+.story-intro-card {
+  --pool: var(--color-manila-light);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+}
+
+.dark :is(.story-step-card, .story-intro-card) {
+  --pool: var(--color-faded-black);
+}
+
+.story-step-card::before,
+.story-intro-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  /* Two and a half times the text's size, so it stays solid under the text and fades out well beyond it. */
+  inset: -75%;
+  background: radial-gradient(closest-side, var(--pool) 50%, transparent);
+  pointer-events: none;
+}
+
+.story-step-card > * {
+  opacity: 0.3;
+  transition: opacity 300ms ease;
+}
+
+.story-step[data-active] .story-step-card > * {
+  opacity: 1;
+}
+
+@media (scripting: none) {
+  .story-step-card > * {
+    opacity: 1;
+  }
+}
+
+/* The frame and the swipeable looks. */
+
+/*
+ * The frame and the shared video round to the look in view, which script reads from that skin's own radius; the
+ * breakdown takes the Default skin's.
+ */
+.story-player {
+  --frame-radius: var(--look-radius, var(--story-radius));
+}
+
+.story-player[data-exploded] {
+  --frame-radius: var(--story-radius);
+}
+
+.story-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--frame-radius);
+  transition: border-radius 200ms ease;
+  background: var(--color-faded-black);
+  box-shadow:
+    0 1px 2px rgb(30 29 29 / 8%),
+    0 24px 60px -24px rgb(30 29 29 / calc((1 - var(--tilt)) * 45%));
+}
+
+.story-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--frame-radius);
+  transition: border-radius 200ms ease;
+}
+
+/* The shared video sits beneath every look, so it takes the fit the skins would normally give it. */
+.story-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-scroller {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-timeline: --story-looks x;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.story-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.story-page {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  overflow: clip;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Hold each look still against the scroll, so its page acts as a window onto it. */
+.story-layer {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--story-scroll, 0px) - var(--index) * 100%));
+}
+
+@supports (animation-timeline: scroll()) {
+  .story-layer {
+    animation: story-hold linear both;
+    animation-timeline: --story-looks;
+  }
+}
+
+@keyframes story-hold {
+  from {
+    transform: translateX(calc(var(--index) * -100%));
+  }
+
+  to {
+    transform: translateX(calc((var(--count) - 1 - var(--index)) * 100%));
+  }
+}
+
+.story .story-look {
+  --media-object-fit: cover;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/*
+ * The audio skin is a compact bar rather than a full player, so it docks at the bottom of a placeholder music app,
+ * drawn as solid skeleton blocks over the video, like a now-playing bar.
+ */
+.story-app {
+  --app-surface: #18181b;
+  --app-panel: #1f1f23;
+  --app-block: #2a2a30;
+  --app-block-strong: #34343b;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 22% 1fr;
+  gap: 4%;
+  padding: 4% 4% 5.5rem;
+  background: var(--app-surface);
+  border-radius: inherit;
+}
+
+.story-app-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--app-panel);
+}
+
+.story-app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  min-width: 0;
+}
+
+.story-app-hero {
+  display: flex;
+  align-items: end;
+  gap: 5%;
+}
+
+.story-app-art {
+  flex: none;
+  width: 28%;
+  aspect-ratio: 1;
+  border-radius: 0.75rem;
+  background: var(--app-block-strong);
+}
+
+.story-app-titles {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.story-app-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.story-app-track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.story-app-thumb {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
+  background: var(--app-block);
+}
+
+.story-app-line {
+  display: block;
+  flex: none;
+  width: 75%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--app-block);
+}
+
+.story-app-line[data-width="short"] {
+  width: 50%;
+}
+
+.story-app-line[data-width="tiny"] {
+  width: 2.5rem;
+}
+
+/* In a track row the name fills the space beside the thumbnail and duration. */
+.story-app-track .story-app-line:not([data-width]) {
+  flex: 1;
+}
+
+.story-app-line[data-size="title"] {
+  width: 80%;
+  height: 1rem;
+  background: var(--app-block-strong);
+}
+
+/* Narrow players have no room for the sidebar or the track list. */
+@container (width < 40rem) {
+  .story-app {
+    grid-template-columns: 1fr;
+    padding-bottom: 4.5rem;
+  }
+
+  .story-app-sidebar,
+  .story-app-tracks {
+    display: none;
+  }
+
+  .story-app-art {
+    width: 34%;
+  }
+}
+
+/* The app is dark whatever the site's theme, so the audio skin takes its dark colours too. */
+.story-page[data-look="audio"] .story-layer {
+  color-scheme: dark;
+}
+
+.story .story-page[data-look="audio"] .story-look {
+  inset: auto 0.75rem 0.75rem;
+  width: auto;
+  height: auto;
+}
+
+/* The seam between two pages is the divider; it and the names only show mid-swipe. */
+.story-page::before {
+  content: "";
+  position: absolute;
+  z-index: 60;
+  inset-block: 0;
+  left: 0;
+  width: 2px;
+  background: var(--color-manila-light);
+  box-shadow: 0 0 24px rgb(0 0 0 / 40%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.story-page-label {
+  position: absolute;
+  z-index: 60;
+  top: 1rem;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 999px;
+  color: var(--color-manila-light);
+  background: rgb(30 29 29 / 60%);
+  backdrop-filter: blur(12px);
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.story-page-label[data-edge="start"] {
+  left: 0.875rem;
+}
+
+.story-page-label[data-edge="end"] {
+  right: 0.875rem;
+}
+
+.story-player[data-scrolling] .story-page::before,
+.story-player[data-scrolling] .story-page-label {
+  opacity: 1;
+}
+
+/* The caption row under the hero player fades away as the player leaves the hero. */
+
+.story-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  opacity: clamp(0, 1 - var(--handover) * 3, 1);
+}
+
+.story-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.625rem;
+  min-width: 0;
+}
+
+.story-kind {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.story-name {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.story-note {
+  font-size: 0.875rem;
+}
+
+.story-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.story-hint {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  opacity: 0.7;
+}
+
+@media (width >= 48rem) {
+  .story-hint {
+    display: inline-flex;
+  }
+}
+
+.story-pager {
+  display: flex;
+  align-items: center;
+}
+
+.story-dot {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.story-dot::before {
+  content: "";
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.25;
+  transition:
+    width 300ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 200ms ease;
+}
+
+.story-dot[aria-pressed="true"]::before {
+  width: 1rem;
+  opacity: 1;
+}
+
+.story-dot:focus-visible {
+  outline: 2px solid var(--color-orange);
+  outline-offset: -2px;
+  border-radius: 0.375rem;
+}
+
+@media (hover: hover) {
+  .story-dot:not([aria-pressed="true"]):hover::before {
+    opacity: 0.6;
+  }
+}
+
+/* The breakdown: an unclipped Default skin on the same video, taken apart in 3D. */
+
+.story-player[data-exploded] .story-frame {
+  overflow: visible;
+  isolation: auto;
+  background: transparent;
+  transform-style: preserve-3d;
+  /* The lifted layers stack upward, so the tilt first moves the whole stack down to keep the top layer in view. */
+  transform: translateY(calc(var(--tilt) * var(--tilt-drop))) perspective(2400px) rotateX(calc(var(--tilt) * 56deg))
+    rotateZ(calc(var(--tilt) * -24deg)) scale(calc(1 - var(--tilt) * var(--tilt-scale)))
+    translateY(calc(var(--detach) * var(--lift)));
+}
+
+.story-scroller {
+  transition: visibility 0s;
+}
+
+/*
+ * Untilted, every layer lies flat, so drop the 3D context: inside one, the popups have nothing behind them for their
+ * glass to blur.
+ */
+.story[data-flat] .story-player[data-exploded] .story-frame,
+.story[data-flat] .story-skin {
+  transform-style: flat;
+}
+
+/* Hidden once the breakdown skin has faded in over it. */
+.story-player[data-exploded] .story-scroller {
+  visibility: hidden;
+  transition-delay: 300ms;
+}
+
+.story .story-skin {
+  /* No forward fill: a held opacity would flatten the 3D layers after the fade. */
+  animation: story-fade-in 300ms ease;
+}
+
+@keyframes story-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.story-player[data-exploded] .story-media,
+.story .story-skin > :is(.media-poster, .video-controls-backdrop, .video-controls-content) {
+  outline: 1px solid rgb(243 231 210 / calc(var(--tilt) * 60%));
+  outline-offset: -1px;
+}
+
+.story .story-skin {
+  --media-border-radius: var(--story-radius);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  isolation: auto;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.story .story-skin > .media-poster {
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap)));
+}
+
+.story .story-skin > .video-controls-backdrop {
+  background-color: rgb(255 98 0 / calc(var(--tilt) * 12%));
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 2));
+}
+
+.story .story-skin > .video-controls-content {
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 3)) translateY(calc(var(--detach) * var(--bar-drop)));
+  /* Off the video the translucent bar would sit on the page colour; darken it as it detaches. */
+  background-color: color-mix(
+    in srgb,
+    var(--own-surface) var(--own-mix),
+    color-mix(in srgb, var(--color-faded-black) calc(var(--detach) * 100%), var(--media-popover))
+  );
+}
+
+/* Points the labels measure for each layer, lifted with the layer they name. */
+.story-anchor {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * var(--layer)));
+  pointer-events: none;
+}
+
+/*
+ * The last step restyles the bar as a skin of your own, in a shadcn style: a light surface, zinc ink, squircle corners,
+ * and a translucent ring over layered soft shadows instead of a solid border. Colours and radii follow `--own`; the
+ * corner shape and shadows can't interpolate from the skin's, so they switch halfway, once `data-own` is set.
+ */
+.story {
+  --own-mix: calc(var(--own) * 100%);
+  --own-surface: #fff;
+  --own-ink: #09090b;
+  --own-on-ink: #fafafa;
+  --own-ring: rgb(9 9 11 / 10%);
+  --own-accent: #f4f4f5;
+  --own-muted: #71717a;
+  --own-shadow: 0 1px 1px rgb(9 9 11 / 4%), 0 2px 4px -1px rgb(9 9 11 / 6%), 0 8px 16px -4px rgb(9 9 11 / 8%);
+}
+
+.dark .story {
+  --own-surface: #09090b;
+  --own-ink: #fafafa;
+  --own-on-ink: #09090b;
+  --own-ring: rgb(250 250 250 / 12%);
+  --own-accent: #27272a;
+  --own-muted: #a1a1aa;
+  --own-shadow: 0 1px 1px rgb(0 0 0 / 30%), 0 2px 4px -1px rgb(0 0 0 / 35%), 0 8px 16px -4px rgb(0 0 0 / 40%);
+}
+
+.story .story-skin > .video-controls-content {
+  --media-primary: color-mix(
+    in srgb,
+    var(--own-ink) var(--own-mix),
+    var(--media-accent-color, var(--media-default-accent-color))
+  );
+  color: color-mix(in srgb, var(--own-ink) var(--own-mix), var(--media-popover-foreground));
+  border-radius: calc(99px - var(--own) * 81px);
+  transition: box-shadow 300ms ease;
+}
+
+.story .story-skin .video-controls-content .media-play-button {
+  border-radius: calc(99px - var(--own) * 85px);
+  color: color-mix(in srgb, var(--own-on-ink) var(--own-mix), currentColor);
+  background-color: color-mix(in srgb, var(--own-ink) var(--own-mix), transparent);
+  transition: box-shadow 300ms ease;
+}
+
+.story[data-own] .story-skin > .video-controls-content {
+  /* The ring is the top layer, so the shadows sit beneath it. */
+  box-shadow:
+    0 0 0 1px var(--own-ring),
+    var(--own-shadow);
+  corner-shape: squircle;
+}
+
+/*
+ * Halfway in, the whole skin takes the new tokens, so hover states, tooltips, menus, and popups follow the bar. Squircle
+ * corners read flatter than round ones, so the radii grow with them.
+ */
+.story[data-own] .story-skin {
+  --media-popover: var(--own-surface);
+  --media-popover-foreground: var(--own-ink);
+  --media-primary: var(--own-ink);
+  --media-primary-foreground: var(--own-on-ink);
+  --media-accent: var(--own-accent);
+  --media-accent-foreground: var(--own-ink);
+  --media-muted-foreground: var(--own-muted);
+  --media-ring: var(--own-ink);
+  --media-border: var(--own-ring);
+  --media-shadow-surface: var(--own-shadow);
+  --media-shadow-surface-inset: none;
+  --media-shadow-tooltip: 0 0 0 1px var(--own-ring), var(--own-shadow);
+  --media-backdrop-filter-surface: none;
+  --media-control-corner-shape: squircle;
+  --media-control-radius: 14px;
+  --media-controls-radius: 18px;
+  --media-popup-radius: 16px;
+  --media-menu-item-radius: 10px;
+}
+
+.story[data-own] .story-skin :is(.media-popup, .media-tooltip, .media-menu-radio-item, .media-menu-trigger-item) {
+  corner-shape: squircle;
+}
+
+.story[data-own] .story-skin .video-controls-content .media-play-button {
+  box-shadow:
+    0 0 0 1px var(--own-ring),
+    var(--own-shadow);
+}
+
+/* On narrow players the skin splits the bar into two surfaces of its own, so those take the same restyle. */
+@container media-root (width < 32rem) {
+  .story .story-skin :is(.video-controls-primary, .video-controls-secondary) {
+    --media-primary: color-mix(
+      in srgb,
+      var(--own-ink) var(--own-mix),
+      var(--media-accent-color, var(--media-default-accent-color))
+    );
+    color: color-mix(in srgb, var(--own-ink) var(--own-mix), var(--media-popover-foreground));
+    background-color: color-mix(in srgb, var(--own-surface) var(--own-mix), var(--media-popover));
+    border-radius: calc(99px - var(--own) * 81px);
+    transition: box-shadow 300ms ease;
+  }
+
+  .story[data-own] .story-skin :is(.video-controls-primary, .video-controls-secondary) {
+    box-shadow:
+      0 0 0 1px var(--own-ring),
+      var(--own-shadow);
+    corner-shape: squircle;
+  }
+}
+
+/*
+ * The restyle also swaps the skin's icons for one consistent outline set, as a shadcn project would: halfway in, the
+ * skin's icons hide and each button draws its own, picked by the same state attributes the skin's icons follow. Icons
+ * are Tabler's outline set (@tabler/icons 3.31.0, MIT licence), which covers every control here, Cast and
+ * picture-in-picture included.
+ */
+.story {
+  --own-icon-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 4v16l13 -8z' /%3E%3C/svg%3E");
+  --own-icon-pause: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z' /%3E %3Cpath d='M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z' /%3E%3C/svg%3E");
+  --own-icon-volume-high: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 8a5 5 0 0 1 0 8' /%3E %3Cpath d='M17.7 5a9 9 0 0 1 0 14' /%3E %3Cpath d='M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5' /%3E%3C/svg%3E");
+  --own-icon-volume-low: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 8a5 5 0 0 1 0 8' /%3E %3Cpath d='M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5' /%3E%3C/svg%3E");
+  --own-icon-volume-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5' /%3E %3Cpath d='M16 10l4 4m0 -4l-4 4' /%3E%3C/svg%3E");
+  --own-icon-settings: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z' /%3E %3Cpath d='M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0' /%3E%3C/svg%3E");
+  --own-icon-cast: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 19l.01 0' /%3E %3Cpath d='M7 19a4 4 0 0 0 -4 -4' /%3E %3Cpath d='M11 19a8 8 0 0 0 -8 -8' /%3E %3Cpath d='M15 19h3a3 3 0 0 0 3 -3v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -2.8 2' /%3E%3C/svg%3E");
+  --own-icon-pip: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 19h-6a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v4' /%3E %3Cpath d='M14 14m0 1a1 1 0 0 1 1 -1h5a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-5a1 1 0 0 1 -1 -1z' /%3E%3C/svg%3E");
+  --own-icon-maximize: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8v-2a2 2 0 0 1 2 -2h2' /%3E %3Cpath d='M4 16v2a2 2 0 0 0 2 2h2' /%3E %3Cpath d='M16 4h2a2 2 0 0 1 2 2v2' /%3E %3Cpath d='M16 20h2a2 2 0 0 0 2 -2v-2' /%3E%3C/svg%3E");
+  --own-icon-minimize: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 19v-2a2 2 0 0 1 2 -2h2' /%3E %3Cpath d='M15 5v2a2 2 0 0 0 2 2h2' /%3E %3Cpath d='M5 15h2a2 2 0 0 1 2 2v2' /%3E %3Cpath d='M5 9h2a2 2 0 0 0 2 -2v-2' /%3E%3C/svg%3E");
+  --own-icon-captions: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z' /%3E %3Cpath d='M10 10.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0' /%3E %3Cpath d='M17 10.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0' /%3E%3C/svg%3E");
+  /* Tabler has no AirPlay icon, so this one is drawn on its grid and stroke to match. */
+  --own-icon-airplay: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 17h-1a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-1' /%3E%3Cpath d='M12 15l5 6h-10z' /%3E%3C/svg%3E");
+}
+
+/* Only buttons with an icon below take part; any other keeps the skin's own rendering. */
+.story
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  ) {
+  position: relative;
+}
+
+.story
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  mask: var(--own-icon) center / contain no-repeat;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.story[data-own]
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )::after {
+  opacity: 1;
+}
+
+.story[data-own]
+  .story-skin
+  .video-controls-content
+  :is(
+    .media-play-button,
+    .media-mute-button,
+    .media-settings-menu-trigger,
+    .media-captions-button,
+    .media-cast-button,
+    .media-airplay-button,
+    .media-pip-button,
+    .media-fullscreen-button
+  )
+  :is(.media-button-icon, .media-button-icon-base) {
+  visibility: hidden;
+}
+
+.story .story-skin .video-controls-content .media-play-button {
+  --own-icon: var(--own-icon-pause);
+}
+
+.story .story-skin .video-controls-content .media-play-button[data-paused] {
+  --own-icon: var(--own-icon-play);
+}
+
+.story .story-skin .video-controls-content .media-mute-button {
+  --own-icon: var(--own-icon-volume-high);
+}
+
+.story .story-skin .video-controls-content .media-mute-button[data-volume-level="low"] {
+  --own-icon: var(--own-icon-volume-low);
+}
+
+.story .story-skin .video-controls-content .media-mute-button[data-volume-level="off"] {
+  --own-icon: var(--own-icon-volume-off);
+}
+
+.story .story-skin .video-controls-content .media-settings-menu-trigger {
+  --own-icon: var(--own-icon-settings);
+}
+
+.story .story-skin .video-controls-content .media-cast-button {
+  --own-icon: var(--own-icon-cast);
+}
+
+.story .story-skin .video-controls-content .media-airplay-button {
+  --own-icon: var(--own-icon-airplay);
+}
+
+.story .story-skin .video-controls-content .media-captions-button {
+  --own-icon: var(--own-icon-captions);
+}
+
+.story .story-skin .video-controls-content .media-pip-button {
+  --own-icon: var(--own-icon-pip);
+}
+
+.story .story-skin .video-controls-content .media-fullscreen-button {
+  --own-icon: var(--own-icon-maximize);
+}
+
+.story .story-skin .video-controls-content .media-fullscreen-button[data-fullscreen] {
+  --own-icon: var(--own-icon-minimize);
+}
+
+/* Keyboard focus in the speed menu, drawn with the skin's own ring. */
+.story .story-menu .story-focus {
+  outline: 2px solid var(--media-ring);
+  outline-offset: -2px;
+}
+
+/*
+ * Still copies of the popups, on their own layer above the controls, as the live popups sit in the top layer; on
+ * narrow players the skin raises its corner controls to 30.
+ */
+.story .story-popups {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  border-radius: var(--story-radius);
+  outline: 1px dashed rgb(243 231 210 / calc(var(--tilt) * 60%));
+  outline-offset: -1px;
+  transform: translateZ(calc(var(--tilt) * var(--layer-gap) * 4));
+  pointer-events: none;
+}
+
+/* Script sets each copy's `left` to its trigger's centre and `--popup-bottom` to the trigger's top edge. */
+.story .story-popups > .media-popup {
+  position: absolute;
+  inset: auto;
+  bottom: calc(var(--popup-bottom, 4rem) + var(--media-popover-side-offset));
+  margin: 0;
+  translate: -50% 0;
+  scale: 1;
+  /* Faded here rather than on the layer: a translucent ancestor would cut the glass off from the video. */
+  opacity: max(var(--tilt), var(--menus));
+}
+
+/* The live menu sizes itself from script; the copy sizes to its content instead. */
+.story .story-popups > .story-menu {
+  width: auto;
+  height: auto;
+}
+
+.story .story-menu .media-menu-content {
+  position: relative;
+}
+
+/* Labels sit flat over the scene; script moves each to the point it names. */
+
+.story-labels {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.story-label {
+  --label-ink: var(--color-manila-light);
+  --label-surface: var(--color-faded-black);
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.dark .story-label {
+  --label-ink: var(--color-faded-black);
+  --label-surface: var(--color-manila-light);
+}
+
+.story-label::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-orange);
+  box-shadow: 0 0 0 2px var(--label-ink);
+}
+
+.story-label-line {
+  position: absolute;
+  background: var(--label-surface);
+}
+
+.story-label-pill {
+  position: absolute;
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 0.375rem;
+  color: var(--label-ink);
+  background: var(--label-surface);
+  box-shadow: 0 6px 16px -6px rgb(30 29 29 / 40%);
+  white-space: nowrap;
+}
+
+.story-label-name {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.story-label-pill code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.story-label[data-side="left"] .story-label-line {
+  top: 0;
+  right: 0;
+  width: 2rem;
+  height: 1px;
+}
+
+.story-label[data-side="left"] .story-label-pill {
+  top: 0;
+  right: 2.25rem;
+  transform: translateY(-50%);
+  justify-items: end;
+}
+
+.story-label[data-side="right"] .story-label-line {
+  top: 0;
+  left: 0;
+  width: 2rem;
+  height: 1px;
+}
+
+.story-label[data-side="right"] .story-label-pill {
+  top: 0;
+  left: 2.25rem;
+  transform: translateY(-50%);
+}
+
+.story-label[data-side="top"] .story-label-line {
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 1.25rem;
+}
+
+.story-label[data-side="top"] .story-label-pill {
+  bottom: 1.5rem;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.story-label[data-side="bottom"] .story-label-line {
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1.25rem;
+}
+
+.story-label[data-side="bottom"] .story-label-pill {
+  top: 1.5rem;
+  left: 0;
+  transform: translateX(-50%);
+}
+
+.story-label[data-align="end"] .story-label-pill {
+  right: -1rem;
+  left: auto;
+  transform: none;
+}
+
+.story-label-readout {
+  font-size: 0.8125rem;
+  line-height: 1.3;
+}
+
+.story-label-keys {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.story-label-keys kbd {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.3125rem;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 35%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  opacity: 0.55;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.story-label-keys kbd[data-pressed] {
+  color: var(--color-faded-black);
+  background-color: var(--color-orange);
+  box-shadow: none;
+  opacity: 1;
+}
+
+/* There is no room beside the player for side labels on narrow screens; the step text carries them. */
+@media (width < 64rem) {
+  .story-label:is([data-side="left"], [data-side="right"], [data-live="keys"]) {
+    display: none;
+  }
+
+  .story-label-pill code {
+    font-size: 0.625rem;
+  }
+}
