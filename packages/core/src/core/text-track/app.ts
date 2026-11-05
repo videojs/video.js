@@ -50,13 +50,12 @@ export interface TextTrackInit<Value = unknown> extends TextTrackIdentity, TextT
 
 /**
  * A handle to a track an app added to the player, for changing its cues and removing it. The track itself is listed in
- * `textTrackList`. It belongs to the source playing when it was added, or the first one if there was none yet, and is
- * cleared when the source changes or the media is swapped.
+ * `textTrackList`. It stays through source changes and media swaps until the app removes it.
  */
 export interface TextTrackHandle<Value = unknown> {
   /** The track's id in `textTrackList`. */
   readonly id: string;
-  /** Whether the track is gone, removed by the app or cleared with its source. */
+  /** Whether the app removed the track, with `remove()` or the store's `removeTextTrack()`. */
   readonly removed: boolean;
   addCue(cue: TextCueInit<Value>): void;
   removeCue(id: string): void;

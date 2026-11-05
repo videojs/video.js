@@ -17,6 +17,8 @@ const TRACK_LOADED = 2;
 
 /** @internal */
 export interface CreateTextTrackOptions {
+  /** The track's id. A track backed by a `<track>` element takes the element's `id`. */
+  id?: string | undefined;
   kind: TextTrackKind;
   label?: string | undefined;
   /** BCP 47 language tag. */
@@ -58,7 +60,7 @@ export function createTextTrack(
   media: MediaTextTrackCapability,
   options: CreateTextTrackOptions
 ): NativeTextTrackHandle | null {
-  const { kind, label, language, mode = 'hidden' } = options;
+  const { id, kind, label, language, mode = 'hidden' } = options;
 
   // The platform's `addTextTrack()` makes tracks that can never be removed, so DOM media get a `<track>` on the element
   // they play through. Other media add their own; embeds can list tracks without adding any.
@@ -69,6 +71,9 @@ export function createTextTrack(
   if (!track) return null;
 
   const element = mediaElement ? findTrackElement(mediaElement, track) : null;
+
+  if (element && id) element.id = id;
+
   const pending = new Set<TextCueLike>();
   const written = new Map<TextCueLike, TextTrackCueLike>();
   const listeners = new AbortController();

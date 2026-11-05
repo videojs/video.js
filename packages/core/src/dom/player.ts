@@ -11,7 +11,6 @@ import type {
   MediaQualityState,
   MediaRemotePlaybackState,
   MediaSourceState,
-  MediaTextTrackState,
   MediaTimeState,
   MediaVolumeState,
 } from '@videojs/media';
@@ -20,6 +19,7 @@ import type { Store, UnionSliceState } from '@videojs/store';
 import type { AnyPlayerFeature, PlayerFeature, UnionPlayerConfig, UnionPlayerHtmlConfig } from '../core/player';
 import type { metadataFeature, playbackRateFeature } from './store/features/shared';
 import type { textCuesFeature } from './store/features/text-cues';
+import type { textTrackFeature } from './store/features/text-track';
 
 export interface MediaContainer extends HTMLElement {}
 
@@ -78,7 +78,7 @@ export type VideoFeatures = [
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
-  PlayerFeature<MediaTextTrackState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
@@ -91,6 +91,7 @@ export type AudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   typeof metadataFeature,
@@ -113,7 +114,7 @@ export type LiveVideoFeatures = [
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
-  PlayerFeature<MediaTextTrackState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
@@ -130,6 +131,7 @@ export type LiveAudioFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
+  typeof textTrackFeature,
   typeof textCuesFeature,
   PlayerFeature<MediaErrorState>,
   PlayerFeature<MediaLiveState>,
