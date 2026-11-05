@@ -17,7 +17,9 @@ on:
         type: string
 
 concurrency:
-  group: changelog-prose-${{ github.event.release.tag_name || inputs.tag_name }}
+  # Keyed by event so the release relay never cancels itself when the
+  # workflow_dispatch run it starts joins the group.
+  group: changelog-prose-${{ github.event_name }}-${{ github.event.release.tag_name || inputs.tag_name }}
   cancel-in-progress: true
 
 jobs:

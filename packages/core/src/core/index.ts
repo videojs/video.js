@@ -43,6 +43,7 @@ export * from './ui/play-button/core';
 export * from './ui/play-button/data';
 export * from './ui/playback-rate-button/core';
 export * from './ui/playback-rate-button/data';
+export * from './ui/playback-rate-button/vars';
 export * from './ui/playback-rate-radio-group/core';
 export * from './ui/playback-rate-radio-group/data';
 export * from './ui/popover/core';

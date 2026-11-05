@@ -1,7 +1,7 @@
 // Speaks the SoundCloud Widget protocol directly rather than loading `api.js`, shaped like the other iframe adapters
 // (mirrors `playerjs-video`).
 
-import { EMPTY_TEXT_TRACKS, type MediaContentData, MediaError, type TimeRangeLike, type Video } from '@videojs/media';
+import { EMPTY_TEXT_TRACKS, type MediaContentData, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -371,11 +371,13 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   get buffered() {
     return this.#bufferedEnd > this.#bufferedStart
       ? createTimeRange(this.#bufferedStart, this.#bufferedEnd)
-      : NO_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
-    return this.#duration > 0 && Number.isFinite(this.#duration) ? createTimeRange(0, this.#duration) : NO_TIME_RANGES;
+    return this.#duration > 0 && Number.isFinite(this.#duration)
+      ? createTimeRange(0, this.#duration)
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
@@ -968,9 +970,6 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     this.#setContentData(null);
   }
 }
-
-// Not `EMPTY_TIME_RANGES`, which tells the player this media never reports ranges, so it would stop listening for them.
-const NO_TIME_RANGES: TimeRangeLike = Object.freeze({ length: 0, start: () => 0, end: () => 0 });
 
 // The frame starts on a same-origin `about:blank`, which a post meant for the widget only warns about.
 function hasWidgetDocument(target: HTMLIFrameElement): boolean {

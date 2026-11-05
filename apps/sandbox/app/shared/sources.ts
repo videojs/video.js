@@ -17,10 +17,10 @@ export interface SandboxSource {
   url?: string;
   /**
    * `youtube` is a YouTube page URL for `<youtube-video>`, `playerjs` an embed page URL for `<playerjs-video>`,
-   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, and `mixcloud` a Mixcloud URL for `<mixcloud-audio>`,
-   * rather than a media file or manifest.
+   * `soundcloud` a SoundCloud URL for `<soundcloud-audio>`, `mixcloud` a Mixcloud URL for `<mixcloud-audio>`, and
+   * `dailymotion` a player embed URL for `<dailymotion-video>`, rather than a media file or manifest.
    */
-  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'soundcloud' | 'mixcloud';
+  type: 'hls' | 'mp4' | 'dash' | 'none' | 'youtube' | 'playerjs' | 'soundcloud' | 'mixcloud' | 'dailymotion';
   subType?: 'ts' | 'mp4';
   live?: boolean;
   /** DRM protected, so only a preset that can license it should offer it. */
@@ -204,6 +204,14 @@ const SOURCE_MAP = {
     url: 'https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_adv_example_hevc/master.m3u8',
     type: 'hls',
     subType: 'mp4',
+  },
+  // Apple's bipbop advanced stream in MPEG-TS: CEA-608 captions (CC1) in the video stream alongside a WebVTT
+  // subtitle playlist, for checking that both reach the captions menu.
+  'hls-bipbop-ts': {
+    label: 'HLS - Apple bipbop (TS, 608 captions)',
+    url: 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8',
+    type: 'hls',
+    subType: 'ts',
   },
   // The `hls-3` and `hls-1` assets again, named by playback ID instead of URL.
   // Nothing about the content differs — they exist so the Mux presets exercise
@@ -715,6 +723,35 @@ const SOURCE_MAP = {
     url: 'https://www.mixcloud.com/spartacus/',
     type: 'mixcloud',
   },
+  // Player embed URLs, which name the player configuration Dailymotion refuses to
+  // embed without. `x8lr5` is the one Dailymotion's own docs embed with: controls,
+  // autostart, and autonext on. `x165s8` is the only public configuration found
+  // with autostart and ads off, the one that takes a seek made before the first
+  // play.
+  'dailymotion-default': {
+    label: 'Dailymotion - Default (x8lr5)',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  'dailymotion-no-autostart': {
+    label: 'Dailymotion - Autostart and ads off (x165s8)',
+    url: 'https://geo.dailymotion.com/player/x165s8.html?video=x84sh87',
+    type: 'dailymotion',
+  },
+  'dailymotion-start-time': {
+    label: 'Dailymotion - From 0:10',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&startTime=10',
+    type: 'dailymotion',
+  },
+  // Dailymotion fits the video inside the player by default; `scaleMode=fill`
+  // crops it to cover the player instead. The video is 16:9, so the difference
+  // shows with another aspect ratio, such as 1:1. Being a runtime parameter other
+  // than the video, it also creates a new player instead of swapping the video.
+  'dailymotion-scale-fill': {
+    label: 'Dailymotion - Crop to fill (scaleMode, try 1:1)',
+    url: 'https://geo.dailymotion.com/player/x8lr5.html?video=x84sh87&scaleMode=fill',
+    type: 'dailymotion',
+  },
 } satisfies Record<string, SandboxSource>;
 
 export type SourceId = keyof typeof SOURCE_MAP;
@@ -729,15 +766,21 @@ const ALL_SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 /**
  * Sources a media element or streaming engine plays. Embed page URLs are kept apart: YouTube's for `<youtube-video>`,
  * the player.js services' for `<playerjs-video>`, SoundCloud's for `<soundcloud-audio>`, Mixcloud's for
- * `<mixcloud-audio>`, so every list derived from this one stays free of them.
+ * `<mixcloud-audio>`, Dailymotion's for `<dailymotion-video>`, so every list derived from this one stays free of them.
  */
 export const SOURCE_IDS = ALL_SOURCE_IDS.filter(
-  (id) => !isYouTubeSource(id) && !isPlayerJsSource(id) && !isSoundCloudSource(id) && !isMixcloudSource(id)
+  (id) =>
+    !isYouTubeSource(id) &&
+    !isPlayerJsSource(id) &&
+    !isSoundCloudSource(id) &&
+    !isMixcloudSource(id) &&
+    !isDailymotionSource(id)
 );
 export const YOUTUBE_SOURCE_IDS = ALL_SOURCE_IDS.filter(isYouTubeSource);
 export const PLAYERJS_SOURCE_IDS = ALL_SOURCE_IDS.filter(isPlayerJsSource);
 export const SOUNDCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isSoundCloudSource);
 export const MIXCLOUD_SOURCE_IDS = ALL_SOURCE_IDS.filter(isMixcloudSource);
+export const DAILYMOTION_SOURCE_IDS = ALL_SOURCE_IDS.filter(isDailymotionSource);
 export const NON_DASH_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isDrmSource(id) && !isMuxSource(id)
 );
@@ -777,6 +820,7 @@ export const DEFAULT_YOUTUBE_SOURCE: SourceId = 'youtube-1';
 export const DEFAULT_PLAYERJS_SOURCE: SourceId = 'playerjs-mux';
 export const DEFAULT_SOUNDCLOUD_SOURCE: SourceId = 'soundcloud-track';
 export const DEFAULT_MIXCLOUD_SOURCE: SourceId = 'mixcloud-show';
+export const DEFAULT_DAILYMOTION_SOURCE: SourceId = 'dailymotion-default';
 /**
  * Where the SPF background presets land when entered. The 4K ladder rather than {@link DEFAULT_SOURCE}, which is
  * MPEG-TS and so is a failure case for this engine rather than a demo of it.
@@ -836,6 +880,10 @@ export function isSoundCloudSource(id: SourceId): boolean {
 
 export function isMixcloudSource(id: SourceId): boolean {
   return SOURCES[id].type === 'mixcloud';
+}
+
+export function isDailymotionSource(id: SourceId): boolean {
+  return SOURCES[id].type === 'dailymotion';
 }
 
 /** The structured source for a YouTube entry with player parameters, which a `src` attribute cannot carry. */

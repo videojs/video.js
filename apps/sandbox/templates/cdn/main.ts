@@ -2,6 +2,7 @@ import '@app/styles.css';
 import { isMediaId, MEDIA, type MediaId } from '@app/media';
 import { applyCaptionTracks } from '@app/shared/captions';
 import { renderChapters } from '@app/shared/html/chapters';
+import { defineNoSkin } from '@app/shared/html/no-skin';
 import { createLatestLoader, renderMediaAttrs } from '@app/shared/html/sandbox';
 import { packageSkinTag, skinPreset } from '@app/shared/html/skin-tags';
 import { renderStoryboard } from '@app/shared/html/storyboard';
@@ -262,6 +263,9 @@ async function loadCdnMedia(media: MediaId) {
     case 'twitch-video':
       await import('@videojs/cdn/media/twitch-video');
       break;
+    case 'dailymotion-video':
+      await import('@videojs/cdn/media/dailymotion-video');
+      break;
     case 'wistia-video':
       await import('@videojs/cdn/media/wistia-video');
       break;
@@ -296,10 +300,14 @@ function getPlayerTag(live: boolean): string {
 function getSkinTag(skin: Skin, live: boolean): string {
   if (descriptor.player === 'background') return 'background-video-skin';
 
+  if (state.skinless) return defineNoSkin();
+
   return packageSkinTag(skinPreset(descriptor.player, live), skin);
 }
 
 function loadStylesheets(skin: Skin, live: boolean) {
+  if (state.skinless) return;
+
   if (descriptor.player === 'audio') loadAudioStylesheets(skin, live);
   else if (descriptor.player === 'video') loadVideoStylesheets(skin, live);
   // Background CSS is loaded via dynamic import in loadCdnPlayer.

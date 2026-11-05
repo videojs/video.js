@@ -100,6 +100,7 @@ export default {
     speed: 'Greitis',
     captions: 'Subtitrai',
     playbackRate: 'Atkūrimo greitis',
+    customRate: 'Tinkintas, {rate}',
     back: 'Atgal',
     off: 'Išjungta',
     auto: 'Automatinė',
