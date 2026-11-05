@@ -52,7 +52,7 @@ export default styles({
       utilities: 'media-max-3xs:hidden',
     },
     airplayButton: {
-      utilities: 'media-max-3xs:hidden',
+      utilities: 'media-max-xs:hidden',
     },
     fullscreenButton: {
       utilities: 'media-max-5xs:hidden',
