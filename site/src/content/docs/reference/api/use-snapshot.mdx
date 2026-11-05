@@ -12,6 +12,12 @@ import DocsLink from "@/components/docs/DocsLink.astro";
 import { useSnapshot } from "@videojs/store/react";
 ```
 
+Importing from `@videojs/store/react` needs `@videojs/store`, `react`, and `react-compiler-runtime` in your app's dependencies:
+
+```bash
+pnpm add @videojs/store react-compiler-runtime
+```
+
 `useSnapshot` subscribes to a `State` container and returns its current value, re-rendering when the value changes. It has two overloads:
 
 **Full state** -- returns the entire state object.
