@@ -138,6 +138,30 @@ Each component's reference page documents its full set of data attributes.
 
 Some components also expose **CSS custom properties** for continuous values like fill percentage and pointer position. Sliders, for example, set `--media-slider-fill` and `--media-slider-pointer`. See individual component reference pages for specifics.
 
+### Hidden controls
+
+Some controls hide themselves when the current media or browser can't use them, such as an AirPlay button in a browser without AirPlay or a mute button on media that can't be muted. These elements receive the native `hidden` attribute. The browser hides `hidden` elements with a `display: none` rule from its own default stylesheet, and any `display` value in your CSS overrides that rule, so the control stays visible.
+
+If you set `display` on a control, also hide it while it has `hidden`:
+
+```css
+.my-mute-button {
+  display: inline-flex;
+}
+
+.my-mute-button[hidden] {
+  display: none;
+}
+```
+
+Or hide every `hidden` element inside your player with one rule, using a class on your player or container element:
+
+```css
+.my-player [hidden] {
+  display: none !important;
+}
+```
+
 </FrameworkCase>
 
 ## Compound components

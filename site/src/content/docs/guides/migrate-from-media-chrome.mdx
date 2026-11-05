@@ -48,6 +48,8 @@ Some elements in the mapping table below need separate bundles. If you use any o
 
 Load each with `<script type="module" src="…"></script>`. See <DocsLink slug="guides/cdn">CDN</DocsLink> for individual component bundles.
 
+These separate bundles apply only to the CDN. With a bundler, import each element's entry point, such as `@videojs/html/ui/seek-button`. Alternatively, `@videojs/html/video/ui` and `@videojs/html/audio/ui` each register many UI elements at once, including `media-seek-button` and `media-playback-rate-button`. Neither registers `media-thumbnail`; import `@videojs/html/ui/thumbnail` for it.
+
 For a bundler installation:
 
 ```bash
@@ -277,6 +279,170 @@ Read player state with <DocsLink slug="reference/api/use-player">`usePlayer`</Do
 
 </FrameworkCase>
 
+### Audio players
+
+Media Chrome plays audio through the same controller with an `audio` attribute. Video.js uses the <DocsLink slug="reference/api/preset-audio">audio preset</DocsLink> instead. As with video, put the media and your controls inside a container within the player:
+
+```html
+<!-- Media Chrome -->
+<media-controller audio>
+  <audio slot="media" src="episode.mp3"></audio>
+  <media-control-bar>
+    <media-play-button></media-play-button>
+    <media-seek-backward-button seekoffset="15"></media-seek-backward-button>
+    <media-seek-forward-button seekoffset="30"></media-seek-forward-button>
+    <media-time-display showduration></media-time-display>
+  </media-control-bar>
+</media-controller>
+```
+
+<FrameworkCase frameworks={["html"]}>
+`@videojs/html/audio/player` registers `<audio-player>`. `@videojs/html/audio/ui` registers `<media-container>` and the audio UI elements, including `media-seek-button` and `media-playback-rate-button`. It does not register `media-controls`, which hides controls after inactivity, so lay out the controls in your own element, such as a `<div>`:
+
+<TabsRoot client:idle>
+  <TabsList client:idle label="Video.js HTML audio player source">
+    <Tab client:idle value="javascript" initial>JavaScript</Tab>
+    <Tab client:idle value="html">HTML</Tab>
+    <Tab client:idle value="css">CSS</Tab>
+  </TabsList>
+  <TabsPanel client:idle value="javascript" initial>
+    ```js
+    import '@videojs/html/audio/player';
+    import '@videojs/html/audio/ui';
+    ```
+  </TabsPanel>
+  <TabsPanel client:idle value="html">
+    ```html
+    <!-- Video.js -->
+    <audio-player>
+      <media-container class="app-audio-container">
+        <audio src="episode.mp3" preload="metadata"></audio>
+        <div class="app-audio-controls">
+          <media-play-button class="app-audio-button app-audio-play">
+            <span class="app-audio-play-label">Play</span>
+            <span class="app-audio-pause-label">Pause</span>
+          </media-play-button>
+          <media-seek-button class="app-audio-button" seconds="-15">−15s</media-seek-button>
+          <media-seek-button class="app-audio-button" seconds="30">+30s</media-seek-button>
+          <media-time-group>
+            <media-time type="current"></media-time>
+            <media-time-separator></media-time-separator>
+            <media-time type="duration"></media-time>
+          </media-time-group>
+        </div>
+      </media-container>
+    </audio-player>
+    ```
+  </TabsPanel>
+  <TabsPanel client:idle value="css">
+    ```css
+    .app-audio-container {
+      display: block;
+    }
+
+    .app-audio-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .app-audio-button {
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      border: 1px solid currentColor;
+      border-radius: 0.25rem;
+    }
+
+    .app-audio-button:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+
+    .app-audio-play .app-audio-pause-label {
+      display: none;
+    }
+
+    .app-audio-play:defined:not([data-paused]) .app-audio-play-label {
+      display: none;
+    }
+
+    .app-audio-play:defined:not([data-paused]) .app-audio-pause-label {
+      display: inline;
+    }
+    ```
+  </TabsPanel>
+</TabsRoot>
+
+To register only the elements you use, import their entry points instead of `@videojs/html/audio/ui`, such as `@videojs/html/ui/container`, `@videojs/html/ui/play-button`, `@videojs/html/ui/seek-button`, `@videojs/html/ui/time-group`, `@videojs/html/ui/time`, and `@videojs/html/ui/time-separator`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+`AudioPlayer` and `Audio` come from `@videojs/react/audio`. The controls are the same components as for video. Audio controls usually stay visible, so lay them out in your own element, such as a `<div>`, instead of `Controls.Root`, which hides them after inactivity:
+
+```tsx
+'use client';
+
+import { Container, PlayButton, SeekButton, Time } from '@videojs/react';
+import { Audio, AudioPlayer } from '@videojs/react/audio';
+import './audio-player.css';
+
+export function EpisodePlayer() {
+  return (
+    <AudioPlayer>
+      <Container className="app-audio-container">
+        <Audio src="episode.mp3" preload="metadata" />
+        <div className="app-audio-controls">
+          <PlayButton
+            className="app-audio-button"
+            render={(props, state) => <button {...props}>{state.paused ? 'Play' : 'Pause'}</button>}
+          />
+          <SeekButton
+            seconds={-15}
+            className="app-audio-button"
+            render={(props) => <button {...props}>−15s</button>}
+          />
+          <SeekButton
+            seconds={30}
+            className="app-audio-button"
+            render={(props) => <button {...props}>+30s</button>}
+          />
+          <Time.Group>
+            <Time.Value type="current" />
+            <Time.Separator />
+            <Time.Value type="duration" />
+          </Time.Group>
+        </div>
+      </Container>
+    </AudioPlayer>
+  );
+}
+```
+
+```css title="audio-player.css"
+.app-audio-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.app-audio-button {
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+}
+
+.app-audio-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+```
+
+Inside `AudioPlayer`, import `usePlayer` from `@videojs/react/audio` so its state is typed to the audio player's features.
+</FrameworkCase>
+
+For a finished audio interface, use one of the audio preset's skins instead.
+
 ## Map controller attributes
 
 <FrameworkCase frameworks={["react"]}>
@@ -288,7 +454,7 @@ Media Chrome configures behavior through `<media-controller>` attributes. Video.
 
 | Media Chrome attribute | Video.js v10 | How |
 |---|---|---|
-| `audio` | the audio preset | Choose an audio player and audio skin rather than toggling at runtime. |
+| `audio` | the audio preset | Choose an audio player and an audio skin or custom layout rather than toggling at runtime. See [Audio players](#audio-players). |
 | `autohide` | `Controls` (built in) | Controls hide after inactivity by default. For `autohide="-1"`, set `visibility="always"` on `Controls.Root`. The delay is not configurable yet; see [Known gaps](#known-gaps). |
 | `fullscreenelement` | `Container` | Fullscreen targets the container element. |
 | `gesturesdisabled` | `disabled` on each `Gesture`, or omit it | Media Chrome disables all gestures at once. In Video.js, set `disabled` on each `Gesture` or omit it. |
@@ -310,7 +476,7 @@ Media Chrome configures behavior through `<media-controller>` attributes. Video.
 
 | Media Chrome attribute | Video.js v10 | How |
 |---|---|---|
-| `audio` | the audio preset | Choose an audio player and audio skin rather than toggling at runtime. |
+| `audio` | the audio preset | Choose an audio player and an audio skin or custom layout rather than toggling at runtime. See [Audio players](#audio-players). |
 | `autohide` | `media-controls` (built in) | Controls hide after inactivity by default. For `autohide="-1"`, set `visibility="always"` on `media-controls`. The delay is not configurable yet; see [Known gaps](#known-gaps). |
 | `fullscreenelement` | `media-container` | Fullscreen targets the container element. |
 | `gesturesdisabled` | `disabled` on each `media-gesture`, or omit it | Media Chrome disables all gestures at once. In Video.js, set `disabled` on each `media-gesture` or omit it. |
@@ -415,6 +581,8 @@ Most names carry over as PascalCase components without the `media-` prefix. Star
 
 Unchanged names, in PascalCase: `PlayButton`, `MuteButton`, `FullscreenButton`, `PiPButton`, `AirPlayButton`, `CastButton`, `CaptionsButton`, `PlaybackRateButton`, `Tooltip`, and `Thumbnail`.
 
+`PlaybackRateButton` and `PlaybackRateRadioGroup` use a fixed list of rates. Media Chrome's `rates` attribute has no equivalent yet; see [Known gaps](#known-gaps).
+
 <Aside type="caution">
 Matching names do not mean matching appearance. Media Chrome buttons include default icons and styles. Individual Video.js buttons provide behavior, state, and an accessible name, but no visible content or finished styling. Add text or an SVG, plus your own CSS. Without visible content, a button can work while showing nothing. Sliders also need their child parts and CSS. Use a ready-made skin when you want finished controls.
 </Aside>
@@ -439,6 +607,8 @@ Most names match. Start with these name changes:
 | `media-audio-track-menu` | `media-audio-track-radio-group` | inside `media-menu` |
 
 Unchanged names: `media-play-button`, `media-mute-button`, `media-fullscreen-button`, `media-pip-button`, `media-airplay-button`, `media-cast-button`, `media-captions-button`, `media-playback-rate-button`, `media-tooltip`, and `media-thumbnail`.
+
+`media-playback-rate-button` and `media-playback-rate-radio-group` use a fixed list of rates. Media Chrome's `rates` attribute has no equivalent yet; see [Known gaps](#known-gaps).
 
 <Aside type="caution">
 Matching tag names do not mean matching appearance. Media Chrome buttons include default icons and styles. Individual Video.js buttons provide behavior, state, and an accessible name, but no visible content or finished styling. Add text, an SVG, or a `<media-icon>`, plus your own CSS. Without visible content, a button can work while showing nothing. Sliders also need their child elements and CSS. Use a ready-made skin when you want finished controls.
@@ -495,6 +665,8 @@ media-play-button[mediapaused] .play-icon { display: inline; }
 /* Video.js HTML */
 media-play-button[data-paused] .play-icon { display: inline; }
 ```
+
+Video.js hides controls the current media or browser can't use, such as an AirPlay button in a browser without AirPlay, with the native `hidden` attribute. If your CSS sets `display` on a control, that rule overrides `hidden`. See <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -611,6 +783,7 @@ These Media Chrome features have no direct equivalent yet. Several can be approx
 - No `seektoliveoffset` or `noautoseektolive` controls, and live-edge offset and tolerance aren't configurable ([#1730](https://github.com/videojs/v10/issues/1730))
 - Chapters render and each time-slider segment reflects `data-active`, but there's no player-level active chapter value, `chapterchange` event, or menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873))
 - Cue points are not supported ([#1442](https://github.com/videojs/v10/issues/1442))
+- Playback rates are a fixed set — `0.2`, `0.5`, `0.7`, `1`, `1.2`, `1.5`, `1.7`, `2` — so the `rates` attribute on `media-playback-rate-button` and `media-playback-rate-menu` has no equivalent yet ([#1404](https://github.com/videojs/v10/issues/1404)). To offer your own rates, see [Workarounds](#workarounds).
 
 <FrameworkCase frameworks={["react"]}>
 Chapters still work. Add a `<track kind="chapters">` with the `default` attribute. The packaged skins then split the time slider into chapter segments and show the chapter title on hover, via `TimeSlider.Chapters` and `TimeSlider.ChapterTitle`.
@@ -658,6 +831,62 @@ There is no player input for a duration placeholder. Set `preload="metadata"` to
 Media Chrome remembers volume, muted state, and language across sessions. Video.js does not persist these preferences. Follow <DocsLink slug="guides/user-preferences">Remember user preferences</DocsLink> to restore and save them in your app.
 
 Actions throw before the media attaches. Wait until `store.target` is set, restore the saved values, and then start saving changes. For captions or quality, also wait for the relevant track or rendition list before restoring a selection.
+
+### Custom playback rates
+
+The built-in playback-rate controls always use the fixed rate list. To offer your own rates, replace them with your own button that calls the player's `setPlaybackRate` action. The action accepts any rate the media supports.
+
+<FrameworkCase frameworks={["html"]}>
+Put the button inside the player's `<media-container>` and update its label from the media's `ratechange` event, which also fires when a hotkey or another control changes the rate:
+
+```html
+<button class="app-rate-button" type="button">1×</button>
+
+<script type="module">
+  const rates = [1, 1.25, 1.5, 2];
+
+  await customElements.whenDefined('audio-player');
+  const player = document.querySelector('audio-player');
+  const media = player.querySelector('audio');
+  const button = player.querySelector('.app-rate-button');
+
+  button.addEventListener('click', () => {
+    if (!player.store.target) return;
+
+    const current = player.store.playbackRate;
+    player.store.setPlaybackRate(rates.find((rate) => rate > current) ?? rates[0]);
+  });
+
+  media.addEventListener('ratechange', () => {
+    button.textContent = `${media.playbackRate}×`;
+  });
+</script>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Render this component inside the player. Select the rate and the action with `usePlayer`:
+
+```tsx
+import { usePlayer } from '@videojs/react/audio';
+
+const rates = [1, 1.25, 1.5, 2];
+
+function PlaybackRateCycleButton() {
+  const playbackRate = usePlayer((state) => state.playbackRate);
+  const setPlaybackRate = usePlayer((state) => state.setPlaybackRate);
+  const next = rates.find((rate) => rate > playbackRate) ?? rates[0];
+
+  return (
+    <button type="button" onClick={() => setPlaybackRate(next)}>
+      {playbackRate}×
+    </button>
+  );
+}
+```
+</FrameworkCase>
+
+The `speedUp` and `speedDown` hotkey actions still step through the fixed list, and from a rate outside it they jump to its first or last rate. Remove those hotkeys, or handle those keys yourself, when you use your own rates.
 
 ### Live edge offsets
 

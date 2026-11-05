@@ -7,6 +7,7 @@ description: Accessible captions toggle button with availability detection and s
 
 import ComponentReference from "@/components/docs/api-reference/ComponentReference.astro";
 import ComponentImports from "@/components/docs/api-reference/ComponentImports.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
@@ -102,7 +103,15 @@ media-captions-button[data-disabled] {
 ```
 </FrameworkCase>
 
-The button hides automatically when no caption tracks are available. No availability selector or extra hiding CSS is required.
+The button hides automatically when no caption tracks are available. No availability selector is required.
+
+<FrameworkCase frameworks={["html"]}>
+The element receives the native `hidden` attribute. If your CSS sets `display` on the element, that rule overrides `hidden`; see <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+The component renders nothing, so no extra hiding CSS is required.
+</FrameworkCase>
 
 ## Accessibility
 
