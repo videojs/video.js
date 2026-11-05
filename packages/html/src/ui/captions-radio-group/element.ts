@@ -13,12 +13,14 @@ import { I18nController } from '../../i18n/controller';
 import { playerContext } from '../../player/context';
 import { PlayerController } from '../../player/controller';
 import { MenuRadioGroupElement } from '../menu/radio-group';
+import type { MenuRadioItemElement } from '../menu/radio-item';
 import { RadioOptionsController } from '../radio-options/controller';
 
 /**
  * Menu radio group that generates an Off `<media-menu-radio-item>` plus one per captions and subtitles track, and
  * shares the selected label and availability with an enclosing menu. An optional `<template>` holding one
- * `<media-menu-radio-item>` customizes each generated item.
+ * `<media-menu-radio-item>` customizes each generated item; its `data-part` `label` and `badge` descendants receive the
+ * track's text.
  */
 export class CaptionsRadioGroupElement extends MenuRadioGroupElement {
   static override readonly tagName = 'media-captions-radio-group';
@@ -37,6 +39,8 @@ export class CaptionsRadioGroupElement extends MenuRadioGroupElement {
   readonly #i18n = new I18nController(this, i18nContext);
   readonly #mediaState = new PlayerController(this, playerContext, selectTextTrack);
   readonly #options = new RadioOptionsController<CaptionsRadioGroupOption>(this, {
+    renderItem: (item, label, option) => this.#setContent(item, label, option.badge),
+    getOptionCacheKey: (option) => option.badge ?? '',
     setItemAttributes: (item, option) => item.setAttribute('data-track', option.value),
     onValueChange: (value) => {
       const media = this.#mediaState.value;
@@ -74,6 +78,24 @@ export class CaptionsRadioGroupElement extends MenuRadioGroupElement {
     super.update(changed);
 
     if (state) applyStateDataAttrs(this, state, CaptionsRadioGroupDataAttrs);
+  }
+
+  #setContent(item: MenuRadioItemElement, label: string, badge: string | undefined): void {
+    const labelPart = item.querySelector<HTMLElement>('[data-part~="label"]');
+    const badgePart = item.querySelector<HTMLElement>('[data-part~="badge"]');
+
+    if (labelPart) {
+      labelPart.textContent = label;
+    }
+
+    if (badgePart) {
+      badgePart.textContent = badge ?? '';
+      badgePart.hidden = !badge;
+    }
+
+    if (!labelPart && !badgePart) {
+      item.textContent = [label, badge].filter(Boolean).join(' ');
+    }
   }
 }
 

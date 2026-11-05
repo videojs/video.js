@@ -338,6 +338,13 @@ const CC_TRACK_FOUND = {
   ],
 };
 
+/** The second CEA-608 channel, announced separately from the first. */
+const CC2_TRACK_FOUND = {
+  tracks: [
+    { _id: 'textTrack2', label: 'Spanish CC', kind: 'captions', default: false, closedCaptions: { instreamId: 'CC2' } },
+  ],
+};
+
 let restoreTrackSupport: (() => void) | undefined;
 
 function mount() {
@@ -475,6 +482,74 @@ describe('HlsJsTextTracksMixin', () => {
     // CEA-608 cues come from the video segments, so the subtitle playlist can stop loading without touching CC.
     expect((engine as any).subtitleTrack).toBe(-1);
     expect(cc.track.mode).toBe('showing');
+  });
+
+  it('keeps each CC channel announced on its own and routes cues to the right one', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC2_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'cc1' } as TextTrackCue],
+    });
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack2',
+      cues: [{ id: 'cc2' } as TextTrackCue],
+    });
+
+    expect(hlsTracks(video)).toEqual(['captions:textTrack1', 'captions:textTrack2']);
+    expect(cueIds(trackOf(video, 'textTrack1') as unknown as FakeTextTrack)).toEqual(['cc1']);
+    expect(cueIds(trackOf(video, 'textTrack2') as unknown as FakeTextTrack)).toEqual(['cc2']);
+  });
+
+  it('switches between CC channels', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC2_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack2',
+      cues: [{ id: 'cc2' } as TextTrackCue],
+    });
+
+    const cc1 = trackOf(video, 'textTrack1') as unknown as FakeTextTrack;
+    const cc2 = trackOf(video, 'textTrack2') as unknown as FakeTextTrack;
+
+    cc1.mode = 'showing';
+
+    const before = cc2.addCueCalls;
+
+    cc1.mode = 'disabled';
+    cc2.mode = 'showing';
+
+    expect((engine as any).subtitleTrack).toBe(-1);
+    expect(cc1.mode).toBe('disabled');
+    expect(cc2.mode).toBe('showing');
+    expect(cc2.addCueCalls).toBe(before + 1);
+  });
+
+  it('loads the subtitle playlist again when switching from a CC track to a subtitle track', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+
+    const cc = trackOf(video, 'textTrack1') as unknown as FakeTextTrack;
+    const subs = trackOf(video, 'default') as unknown as FakeTextTrack;
+
+    cc.mode = 'showing';
+    expect((engine as any).subtitleTrack).toBe(-1);
+
+    cc.mode = 'disabled';
+    subs.mode = 'showing';
+
+    expect((engine as any).subtitleTrack).toBe(0);
+    expect(subs.mode).toBe('showing');
   });
 
   it('refreshes the cues of a closed-caption track once when it is selected', () => {
