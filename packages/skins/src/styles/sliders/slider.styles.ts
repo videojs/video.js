@@ -21,7 +21,7 @@ export default styles({
         'data-[orientation=vertical]:w-8 data-[orientation=vertical]:min-w-0',
       ],
       variants: {
-        default: 'data-[orientation=horizontal]:min-w-18 data-[orientation=vertical]:h-18',
+        default: 'data-[orientation=vertical]:h-18',
         neutral: 'data-[orientation=horizontal]:min-w-20 data-[orientation=vertical]:h-20',
       },
     },

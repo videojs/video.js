@@ -53,19 +53,19 @@ export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsPr
             <ButtonTooltip side="top">
               <CaptionsButton className={controlsStyles.captionsButton} />
             </ButtonTooltip>
-            <VideoSettingsMenu />
+            <VideoSettingsMenu className={styles.settingsButton} />
             <$.Controls.Group className={styles.trailing}>
               <ButtonTooltip side="top">
-                <CastButton />
+                <CastButton className={styles.castButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
-                <AirPlayButton />
+                <AirPlayButton className={styles.airplayButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
                 <PiPButton className={styles.pipButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
-                <FullscreenButton />
+                <FullscreenButton className={styles.fullscreenButton} />
               </ButtonTooltip>
             </$.Controls.Group>
           </$.Controls.Group>
