@@ -139,7 +139,7 @@ interface UserTrackSelections {
   userVideoTrackSelection?: Partial<VideoTrack>;
   /**
    * Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track
-   * shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path.
+   * shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Code that switches the audio language writes it here.
    */
   userAudioTrackSelection?: Partial<AudioTrack>;
   /**

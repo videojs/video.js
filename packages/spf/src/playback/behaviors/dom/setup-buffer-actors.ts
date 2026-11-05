@@ -243,7 +243,10 @@ export const setupVideoBufferActors = defineBehavior({
       RequestCredentialsConfig & {
         /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
         getCdnId?: GetCdnId;
-        /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
+        /**
+         * Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append
+         * as-is.
+         */
         videoMessagePipelines?: MessagePipelines;
       };
   }) => {
@@ -305,7 +308,10 @@ export const setupAudioBufferActors = defineBehavior({
       RequestCredentialsConfig & {
         /** CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. */
         getCdnId?: GetCdnId;
-        /** Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. */
+        /**
+         * Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append
+         * as-is.
+         */
         audioMessagePipelines?: MessagePipelines;
       };
   }) => {

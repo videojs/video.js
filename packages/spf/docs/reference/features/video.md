@@ -52,7 +52,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
 | `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | — | [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every variant. |
-| `videoMessagePipelines?` | `MessagePipelines` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+| `videoMessagePipelines?` | `MessagePipelines` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 | `videoRules?` | `readonly SwitchVideoTrackRule[]` | — | [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | The rule chain of the pair documented on `videoConstraints`. |
 
 ### State

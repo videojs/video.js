@@ -29,7 +29,7 @@ The feature declares these state keys for code outside the engine to write; no b
 
 | Key | Type | Doc |
 | --- | --- | --- |
-| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path. |
+| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Code that switches the audio language writes it here. |
 
 ### Config
 
@@ -38,7 +38,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
 | `audioConstraints?` | `readonly SwitchAudioTrackRule[]` | — | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack) | `switchAudioTrack`'s chains, replacing `DEFAULT_AUDIO_CONSTRAINTS` / `DEFAULT_AUDIO_RULES`. |
-| `audioMessagePipelines?` | `MessagePipelines` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+| `audioMessagePipelines?` | `MessagePipelines` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 | `audioRules?` | `readonly SwitchAudioTrackRule[]` | — | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack) | The rule chain of the pair documented on `audioConstraints`. |
 | `backBuffer?` | `Partial<BackBufferConfig>` | — | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults: see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use back-buffer eviction). |
 | `canPlayTrack?` | `CanPlayTrack` | `canPlayTrack` | [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [switchVideoTrack](../behaviors/track-switching.md#switchvideotrack) | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |
@@ -61,7 +61,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | `preload` | `string \| undefined` | — | [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../behaviors/sync-preload.md#syncpreload)) |
 | `presentation` | `MaybeResolvedPresentation \| undefined` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../behaviors/resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | `string \| undefined` | — | [resolveAudioTrack](../behaviors/resolve-track.md#resolveaudiotrack), [switchAudioTrack](../behaviors/track-switching.md#switchaudiotrack), [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors), [loadAudioSegments](../behaviors/dom/load-segments.md#loadaudiosegments) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. |
-| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | — | [external signal](#external-signals) | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Multi-language-audio Tier 2 programmatic-write path. |
+| `userAudioTrackSelection` | `Partial<AudioTrack> \| undefined` | — | [external signal](#external-signals) | Consumer-driven constraint narrowing the audio candidate set. Sibling of `userVideoTrackSelection`. Partial-track shape — `{ language: 'es' }`, `{ id: 'audio-en' }`, etc. Code that switches the audio language writes it here. |
 
 ### Context
 

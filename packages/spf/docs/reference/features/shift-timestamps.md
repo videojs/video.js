@@ -20,9 +20,9 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 
 | Key | Type | Feature default | Read by | Doc |
 | --- | --- | --- | --- | --- |
-| `audioMessagePipelines` | `MessagePipelines` | `relocationPipelinesFor('audio')` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+| `audioMessagePipelines` | `MessagePipelines` | `relocationPipelinesFor('audio')` | [setupAudioBufferActors](../behaviors/dom/setup-buffer-actors.md#setupaudiobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 | `deriveStartMediaTime?` | `DeriveStartMediaTime` | `deriveSharedMinStartMediaTime` | [establishStartMediaTime](../behaviors/establish-start-media-time.md#establishstartmediatime) | The reduce seam (coordination knob). Defaults to `deriveSharedMinStartMediaTime`. |
-| `videoMessagePipelines` | `MessagePipelines` | `relocationPipelinesFor('video')` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+| `videoMessagePipelines` | `MessagePipelines` | `relocationPipelinesFor('video')` | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
 
 ### State
 
