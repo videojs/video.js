@@ -1,0 +1,122 @@
+---
+title: LazyAudio
+frameworkTitle:
+  html: lazy-audio
+description: Audio media that picks the media component for its source and loads only that component's code
+stability: unstable
+apis:
+  - LazyAudioProps
+  - createLazyAudio
+  - createLazyAudioElement
+  - '@videojs/react/media/lazy/*'
+  - '@videojs/html/media/lazy/*'
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+import StyleCase from "@/components/docs/StyleCase.astro";
+import Demo from "@/components/docs/demos/Demo.astro";
+
+{/* React demos */}
+import BasicUsageDemoReact from "@/components/docs/demos/lazy-audio/react/css/BasicUsage";
+import basicUsageReactTsx from "@/components/docs/demos/lazy-audio/react/css/BasicUsage.tsx?raw";
+import basicUsageReactCss from "@/components/docs/demos/lazy-audio/react/css/BasicUsage.css?raw";
+
+{/* HTML demos */}
+import BasicUsageDemoHtml from "@/components/docs/demos/lazy-audio/html/css/BasicUsage.astro";
+import basicUsageHtml from "@/components/docs/demos/lazy-audio/html/css/BasicUsage.html?raw";
+import basicUsageHtmlCss from "@/components/docs/demos/lazy-audio/html/css/BasicUsage.css?raw";
+import basicUsageHtmlTs from "@/components/docs/demos/lazy-audio/html/css/BasicUsage.ts?raw";
+
+The audio counterpart of <DocsLink slug="reference/components/lazy-video">LazyVideo</DocsLink>: reads `src`, renders the media component that plays it, and loads that component's code only once the source is known.
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```bash
+npm install @videojs/react @videojs/mux-audio @videojs/spotify-audio @videojs/soundcloud-audio @videojs/mixcloud-audio
+```
+
+```tsx
+import { LazyAudio } from '@videojs/react/media/lazy-audio';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```bash
+npm install @videojs/html @videojs/mux-audio @videojs/spotify-audio @videojs/soundcloud-audio @videojs/mixcloud-audio
+```
+
+```ts
+import '@videojs/html/media/lazy-audio';
+```
+</FrameworkCase>
+
+## Sources
+
+| Source | Resolves to | Loads |
+|---|---|---|
+| Audio and video files | Native `<audio>` | Nothing |
+| HLS on Safari, or where there's no MSE | Native `<audio>` | Nothing |
+| HLS, elsewhere | <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | The SPF HLS engine |
+| `stream.mux.com` | <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | Mux Audio |
+| Spotify | <DocsLink slug="reference/components/spotify-audio">SpotifyAudio</DocsLink> | The Spotify embed |
+| SoundCloud | <DocsLink slug="reference/components/soundcloud-audio">SoundCloudAudio</DocsLink> | The SoundCloud widget |
+| Mixcloud | <DocsLink slug="reference/components/mixcloud-audio">MixcloudAudio</DocsLink> | The Mixcloud widget |
+
+A source that matches none of these, including YouTube, Vimeo, and DASH, renders nothing and logs an error in development.
+
+## Custom media
+
+<FrameworkCase frameworks={["react"]}>
+`createLazyAudio` builds a `LazyAudio` from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideo`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, `spotifyAudio`, `soundcloudAudio`, and `mixcloudAudio`, each imported from `@videojs/react/media/lazy/` plus its kebab-case name.
+
+```tsx
+import { audio } from '@videojs/react/media/lazy/audio';
+import { createLazyAudio } from '@videojs/react/media/lazy/create';
+import { muxAudio } from '@videojs/react/media/lazy/mux-audio';
+
+const MuxLazyAudio = createLazyAudio([audio, muxAudio]);
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`createLazyAudioElement` builds a `<lazy-audio>` class from a list of media, tried in order, the same way <DocsLink slug="reference/components/lazy-video">`createLazyVideoElement`</DocsLink> does. The built-in media are `audio`, `hlsAudio`, `muxAudio`, `spotifyAudio`, `soundcloudAudio`, and `mixcloudAudio`, each imported from `@videojs/html/media/lazy/` plus its kebab-case name.
+
+```ts
+import { audio } from '@videojs/html/media/lazy/audio';
+import { createLazyAudioElement } from '@videojs/html/media/lazy/create';
+import { muxAudio } from '@videojs/html/media/lazy/mux-audio';
+
+customElements.define('mux-lazy-audio', createLazyAudioElement([audio, muxAudio]));
+```
+</FrameworkCase>
+
+`LazyAudio` takes the same `src`, `type`, `preferPlayback`, and `preload` options as `LazyVideo`, and loads and passes props on the same way. See <DocsLink slug="reference/components/lazy-video">LazyVideo</DocsLink> for its behavior and API reference.
+
+## Examples
+
+### Basic Usage
+
+<FrameworkCase frameworks={["react"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "App.tsx", code: basicUsageReactTsx, lang: "tsx" },
+      { title: "App.css", code: basicUsageReactCss, lang: "css" },
+    ]}>
+      <BasicUsageDemoReact client:idle />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+  <StyleCase styles={["css"]}>
+    <Demo files={[
+      { title: "index.html", code: basicUsageHtml, lang: "html" },
+      { title: "index.css", code: basicUsageHtmlCss, lang: "css" },
+      { title: "index.ts", code: basicUsageHtmlTs, lang: "ts" },
+    ]}>
+      <BasicUsageDemoHtml />
+    </Demo>
+  </StyleCase>
+</FrameworkCase>

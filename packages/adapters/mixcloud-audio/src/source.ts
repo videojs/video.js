@@ -102,6 +102,23 @@ export function resolveMixcloudWidgetParams(
 }
 
 /**
+ * Whether the widget stays unloaded until playback is requested. Under `preload="none"` nothing is fetched from
+ * Mixcloud, so the page makes no third-party request before the listener asks to play. `autoplay`, or the widget's own
+ * `autoplay` parameter, asks to play now, and `controls` makes the widget's play button the way to ask, so any of them
+ * loads the widget regardless.
+ *
+ * @internal
+ */
+export function shouldDeferMixcloudWidget(
+  props: Partial<Pick<MixcloudAdapterProps, 'src' | 'source' | 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  if (props.preload !== 'none' || props.autoplay || props.controls) return false;
+
+  // `source.src` is the only other way to name a show, so honor it when `src` is absent.
+  return !wantsMixcloudAutoplay(parseMixcloudSource(props.src || props.source?.src || ''), props.source);
+}
+
+/**
  * Whether the source asks to autoplay through the widget's own `autoplay` parameter.
  *
  * @internal

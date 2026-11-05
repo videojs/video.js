@@ -6,6 +6,7 @@ import { MediaAttachMixin } from '../../store/media-attach-mixin';
 
 class SpotifyCustomMediaElement extends CustomMediaElement('iframe', SpotifyAdapter) {
   static override getTemplateHTML = (attrs: Record<string, string>): string => {
+    // Built whatever `preload` says: WebKit only plays an embed that was up before play was pressed.
     const initialSrc = buildSpotifyIframeSrc(attrs.src ?? '', templateAttrsToEmbedProps(attrs));
     const srcAttr = initialSrc ? ` src="${escapeHtml(initialSrc)}"` : '';
 

@@ -1,0 +1,19 @@
+.html-lazy-video-basic {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+/* `<lazy-video>` renders as its resolved media, so the box goes on its child. */
+.html-lazy-video-basic__media > * {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.html-lazy-video-basic__sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

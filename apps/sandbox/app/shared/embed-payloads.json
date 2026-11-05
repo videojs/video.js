@@ -1,0 +1,41 @@
+{
+  "measuredAt": "2026-10-23",
+  "browser": "Chromium 147.0.7727.15",
+  "embeds": {
+    "youtube": {
+      "scripts": 981973,
+      "total": 1283232,
+      "requests": 20
+    },
+    "vimeo": {
+      "scripts": 495728,
+      "total": 557555,
+      "requests": 16
+    },
+    "wistia": {
+      "scripts": 354565,
+      "total": 359628,
+      "requests": 12
+    },
+    "cloudflare": {
+      "scripts": 358996,
+      "total": 391698,
+      "requests": 9
+    },
+    "tiktok": {
+      "scripts": 1197221,
+      "total": 1697392,
+      "requests": 76
+    },
+    "twitch": {
+      "scripts": 1670474,
+      "total": 2745858,
+      "requests": 119
+    },
+    "player-js": {
+      "scripts": 316150,
+      "total": 469101,
+      "requests": 4
+    }
+  }
+}
