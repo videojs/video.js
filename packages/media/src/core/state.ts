@@ -304,14 +304,26 @@ export interface MediaAudioTrackState {
 }
 
 /**
- * A text cue.
+ * A text cue as plain data.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/VTTCue
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/DataCue
  */
-export interface MediaTextCue {
+export interface MediaTextCue<Value = unknown> {
+  /** The cue's own id, or one derived from its position in the track when it has none. */
+  id: string;
   startTime: number;
+  /** Equals `startTime` for a point. */
   endTime: number;
+  /** The cue's text, or an empty string when it carries only data. */
   text: string;
+  /**
+   * Structured data: a data cue's `value`, or JSON parsed from the text of a `metadata` cue when it is an object or
+   * array.
+   */
+  value?: Value;
+  /** What `value` holds, such as `org.id3`. */
+  type?: string;
 }
 
 /**
