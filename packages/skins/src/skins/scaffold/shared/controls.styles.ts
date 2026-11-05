@@ -39,8 +39,9 @@ export default styles({
     },
     centerButton: {
       utilities: [
-        'm-0! bg-media-background! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-(--media-button-highlight)! focus-visible:bg-(--media-button-highlight)! aria-expanded:bg-(--media-button-highlight)!',
+        // The scaffold background is transparent, so the centre controls take a dark backing to read over the video.
+        'm-0! bg-media-popover/40! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
+        'hover:bg-media-popover/60! focus-visible:bg-media-popover/60! aria-expanded:bg-media-popover/60!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],
