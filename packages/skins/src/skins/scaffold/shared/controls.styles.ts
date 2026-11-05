@@ -46,14 +46,8 @@ export default styles({
       ],
     },
     centerPlay: {
-      // Shrinks rather than hides in small players, so there's always a start prompt. It takes the primary fill, the one
-      // to press, rather than the translucent look of the centre seek buttons and feedback.
-      utilities: [
-        'size-14.5! media-max-360:size-11!',
-        'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
-        'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
-        'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
-      ],
+      // Shrinks rather than hides in small players, so there's always a start prompt.
+      utilities: 'size-14.5! media-max-360:size-11!',
     },
     centerPlayIcon: {
       utilities: 'size-7! media-max-360:size-5.5!',

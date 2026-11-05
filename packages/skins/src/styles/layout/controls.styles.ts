@@ -34,14 +34,8 @@ const hiddenBeforeStart = [
 
 const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
 
-// The centre play button is the one to press, so it takes the primary fill rather than the translucent look of the
-// playback feedback that flashes in the same place. It shrinks rather than hides in small players.
-const centerPlay = [
-  'size-auto! p-4! media-max-360:p-3!',
-  'rounded-media-pill! bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
-  'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
-  'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
-] as const;
+// The centre play button shrinks rather than hides in small players.
+const centerPlay = ['size-auto! rounded-media-pill!'] as const;
 
 export default styles({
   file: 'video/controls.css',
@@ -135,34 +129,34 @@ export default styles({
     centerButton: {
       utilities: [],
       variants: {
-        // Overrides the base button surface, as the compat skin's centre buttons do.
-        default: [
-          centerButtonBase,
-          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
-          'media-high-contrast:bg-media-background!',
-        ],
-        // A bare icon with the feedback shadow, even on hover.
-        neutral: [
-          centerButtonBase,
-          'bg-transparent! text-media-controls-foreground! filter-media-feedback',
-          'media-high-contrast:bg-media-background!',
-        ],
+        // Each centre button sets its own surface, so Tailwind never has to order two competing backgrounds.
+        default: centerButtonBase,
+        neutral: [centerButtonBase, 'text-media-controls-foreground! filter-media-feedback'],
       },
     },
     centerPlay: {
       utilities: [],
       variants: {
-        // A mouse can click the media to toggle playback, so fine pointers keep the button only as a start prompt. It
-        // turns invisible rather than leaving layout, so a clicked button keeps focus in the player and its hotkeys, and
-        // shows again for keyboard focus.
+        // The button to press takes the primary fill, unlike the translucent playback feedback in the same place. A mouse
+        // can click the media to toggle playback, so fine pointers keep the button only as a start prompt. It turns
+        // invisible rather than leaving layout, so a clicked button keeps focus in the player and its hotkeys, and shows
+        // again for keyboard focus.
         default: [
           ...centerPlay,
+          'p-4! media-max-360:p-3!',
+          'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
+          'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+          'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
           'pointer-fine:data-started:not-focus-visible:opacity-0!',
           'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
         ],
-        // The neutral skin keeps its classic control bar once playback starts.
+        // The playback feedback is a bare icon, so a dark backing tells the button apart. The neutral skin keeps its
+        // classic control bar once playback starts.
         neutral: [
           ...centerPlay,
+          'p-2.5! media-max-360:p-2!',
+          'bg-media-backdrop/50! hover:bg-media-backdrop/70! focus-visible:bg-media-backdrop/70!',
+          'media-high-contrast:bg-media-background!',
           'data-started:not-focus-visible:opacity-0!',
           'data-started:not-focus-visible:pointer-events-none!',
         ],
@@ -172,13 +166,20 @@ export default styles({
       utilities: [],
       variants: {
         default: 'size-media-icon-lg! media-max-360:size-media-icon!',
-        neutral: 'size-media-icon-xl! media-max-360:size-media-icon-lg!',
+        neutral: 'size-media-icon-lg! media-max-360:size-media-icon!',
       },
     },
     centerSeek: {
       utilities: [],
-      // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance.
-      variants: { default: 'media-max-280:hidden! pointer-fine:hidden!' },
+      // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance. They keep the
+      // translucent look of the playback feedback, which leaves the primary fill to the play button.
+      variants: {
+        default: [
+          'media-max-280:hidden! pointer-fine:hidden!',
+          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
+          'media-high-contrast:bg-media-background!',
+        ],
+      },
     },
   },
 });
