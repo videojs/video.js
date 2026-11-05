@@ -45,6 +45,43 @@ its trackedFetch); `setupAudioBufferActors` is sole writer of `audioBufferActor`
 read `mediaSource` from `setupMediaSource`. Downstream MSE behaviors (`loadVideoSegments`, `loadAudioSegments`,
 `endOfStream`, `updateMediaSourceDuration`) only read these signals.
 
+## setupVideoBufferActors
+
+Set up the video `SourceBufferActor` + `SegmentLoaderActor`. Fires when `mediaSource` is attached and the selected
+video track is present in the presentation with codecs. Gates only on video state — no cross-type coupling. Owns a
+bandwidth-sampling `trackedFetch` and is sole writer of `state.bandwidthState`.
+
+Source: [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts)
+
+### Config
+
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `backBuffer?` | `Partial<BackBufferConfig>` | Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults: see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use back-buffer eviction). |
+| `forwardBuffer?` | `Partial<ForwardBufferConfig>` | Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range. |
+| `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
+| `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
+| `videoMessagePipelines?` | `MessagePipelines` | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
+
+### State
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors` wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional signal; absent, it ranks on `initialBandwidth`. |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
+
+### Context
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
+| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. |
+| `videoSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
+
 ## setupAudioBufferActors
 
 Set up the audio `SourceBufferActor` + `SegmentLoaderActor`. Same shape as `setupVideoBufferActors`, narrowed to
@@ -87,43 +124,6 @@ The setup declares `config?`: callers may omit it.
 | `audioBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The audio twin of `videoBufferActor`, owned by `setupAudioBufferActors`. |
 | `audioSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The audio twin of `videoSegmentLoaderActor`, owned by `setupAudioBufferActors` and driven by `loadAudioSegments`. |
 | `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-
-## setupVideoBufferActors
-
-Set up the video `SourceBufferActor` + `SegmentLoaderActor`. Fires when `mediaSource` is attached and the selected
-video track is present in the presentation with codecs. Gates only on video state — no cross-type coupling. Owns a
-bandwidth-sampling `trackedFetch` and is sole writer of `state.bandwidthState`.
-
-Source: [src/playback/behaviors/dom/setup-buffer-actors.ts](../../../../src/playback/behaviors/dom/setup-buffer-actors.ts)
-
-### Config
-
-The setup declares `config?`: callers may omit it.
-
-| Key | Type | Doc |
-| --- | --- | --- |
-| `backBuffer?` | `Partial<BackBufferConfig>` | Back-buffer tuning. `keepSegments` controls how many segments stay behind the playhead before eviction. Defaults: see `DEFAULT_BACK_BUFFER_CONFIG` (2 segments). Threaded to the v/a segment-loader actor only (text tracks don't use back-buffer eviction). |
-| `forwardBuffer?` | `Partial<ForwardBufferConfig>` | Forward-buffer tuning. `bufferDuration` controls how far ahead of the playhead segments are loaded (and where forward-flush kicks in). Defaults: see `DEFAULT_FORWARD_BUFFER_CONFIG` (30 seconds). Threaded to segment-loader actors (v/a + text) at construction time and to `loadXSegments` dispatchers for the load-message range. |
-| `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; see `TrackSwitchingSharedConfig['getCdnId']`. |
-| `messagePipelines?` | `MessagePipelines` | Per-message-type step pipelines. Defaults to `DEFAULT_MESSAGE_PIPELINES` (`fetch → dispatch`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
-| `videoMessagePipelines?` | `MessagePipelines` | Optional non-zero-PTS relocation pipelines (Tier-1); the loader uses its Tier-0 default when absent. |
-
-### State
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `bandwidthState` | writes | yes | `BandwidthState \| undefined` | `BufferActorsState` | The running bandwidth estimate, updated per fetched chunk by the bandwidth-sampling fetch `setupVideoBufferActors` wraps its segment requests in — its sole writer. The `rankByBandwidth` rule reads it through an optional signal; absent, it ranks on `initialBandwidth`. |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `BufferActorsState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `BufferActorsState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
-
-### Context
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `mediaSource` | reads | yes | `MediaSource \| undefined` | `BufferActorsContext` | The attached `MediaSource`, published by `setupMediaSource` — its sole writer — only once it is open, and cleared when the attachment is torn down (source change, `sourceclose`, destroy). The other MSE behaviors read it. (documented on [setupMediaSource](setup-mediasource.md#setupmediasource)) |
-| `videoBufferActor` | writes | yes | `SourceBufferActor \| undefined` | `BufferActorsContext` | The `SourceBufferActor` over the video `SourceBuffer`. `setupVideoBufferActors` creates it together with `videoSegmentLoaderActor` once `mediaSource` is attached and the selected video track has codecs, and destroys both and clears the signals when that stops holding. |
-| `videoSegmentLoaderActor` | writes | yes | `SegmentLoaderActor \| undefined` | `BufferActorsContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. |
 
 ## Types
 

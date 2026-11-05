@@ -8,6 +8,33 @@ Fetches and parses the media playlist of the selected video, audio, or text trac
 variant schedules a fetch of the selected track's media playlist whenever that track is partially resolved, parses
 it, and writes the resolved track back into `state.presentation`.
 
+## resolveVideoTrack
+
+Resolve unresolved video tracks. Schedules a fetch task whenever the selected video track is partially resolved,
+parses the manifest, and writes the resolved track back into `state.presentation`.
+
+Source: [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts)
+
+### Config
+
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `gateFirstParse?` | `GateFirstParse` | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
+| `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See `TrackSwitchingSharedConfig['getCdnId']`. |
+| `reportUnsupportedTrackConditions?` | `ReportUnsupportedTrackConditions` | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
+| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
+| `reschedule?` | `Reschedule<ResolvedTrack>` | Live media-playlist re-run policy; absent → resolve once. |
+| `resolveKeyUri?` | `ResolveKeyUri` | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+
+### State
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
+
 ## resolveAudioTrack
 
 Resolve unresolved audio tracks. Same shape as `resolveVideoTrack`, narrowed to audio.
@@ -59,33 +86,6 @@ The setup declares `config?`: callers may omit it.
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. (documented on [switchTextTrack](track-switching.md#switchtexttrack)) |
-
-## resolveVideoTrack
-
-Resolve unresolved video tracks. Schedules a fetch task whenever the selected video track is partially resolved,
-parses the manifest, and writes the resolved track back into `state.presentation`.
-
-Source: [src/playback/behaviors/resolve-track.ts](../../../src/playback/behaviors/resolve-track.ts)
-
-### Config
-
-The setup declares `config?`: callers may omit it.
-
-| Key | Type | Doc |
-| --- | --- | --- |
-| `gateFirstParse?` | `GateFirstParse` | First-parse placement gate (see `primitives/gate-first-parse`); absent → parse immediately. |
-| `getCdnId?` | `GetCdnId` | CDN-id derivation for the failover trip; defaults to origin-based `getCdnId`. See `TrackSwitchingSharedConfig['getCdnId']`. |
-| `reportUnsupportedTrackConditions?` | `ReportUnsupportedTrackConditions` | Playlist-derived condition reporting (see `primitives/report-track-conditions`). |
-| `requestCredentials?` | `RequestCredentialsPolicy` | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
-| `reschedule?` | `Reschedule<ResolvedTrack>` | Live media-playlist re-run policy; absent → resolve once. |
-| `resolveKeyUri?` | `ResolveKeyUri` | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
-
-### State
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `presentation` | writes | yes | `MaybeResolvedPresentation \| undefined` | `ResolveTrackState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `ResolveTrackState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Types
 

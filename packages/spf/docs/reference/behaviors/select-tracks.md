@@ -44,6 +44,38 @@ heavier machinery (bandwidth estimator, quality selection, flush orchestration).
 Text selection has no simple variant here — it's owned by `switchTextTrack` (`./track-switching.ts`), which resolves
 standing `userTextTrackSelection` intent against the constrained, CDN-scoped renditions.
 
+## selectVideoTrack
+
+Select a video track when a presentation loads. Clears the selection on src unload.
+
+This is the simple, non-ABR counterpart to `switchVideoTrack` — compose one or the other, not both (both write
+`selectedVideoTrackId`). Composing `selectVideoTrack` alone tree-shakes out the ABR code path (bandwidth-estimator,
+quality-selection); use it for sources without meaningful quality variants, test setups, or players that
+intentionally pin a quality.
+
+```ts
+const reactor = selectVideoTrack.setup({ state });
+```
+
+Source: [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts)
+
+### Config
+
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `canPlayTrack?` | `CanPlayTrack` | The codec capability probe `excludeUnplayableTracks` applies. Each engine defaults it to the DOM-bound probe; unwired means no capability filtering. |
+| `videoConstraints?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone) outright. |
+| `videoRules?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The selection chain `selectVideoTrack` runs after its pre-pass; empty by default, so the first playable candidate is the pick. |
+
+### State
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
+
 ## selectAudioTrack
 
 Select an audio track when a presentation loads. Clears the selection on src unload.
@@ -84,38 +116,6 @@ The setup declares `config?`: callers may omit it.
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedAudioTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the audio track in play: `switchAudioTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveAudioTrack`, `setupAudioBufferActors`, and `loadAudioSegments` key their work on it. (documented on [switchAudioTrack](track-switching.md#switchaudiotrack)) |
-
-## selectVideoTrack
-
-Select a video track when a presentation loads. Clears the selection on src unload.
-
-This is the simple, non-ABR counterpart to `switchVideoTrack` — compose one or the other, not both (both write
-`selectedVideoTrackId`). Composing `selectVideoTrack` alone tree-shakes out the ABR code path (bandwidth-estimator,
-quality-selection); use it for sources without meaningful quality variants, test setups, or players that
-intentionally pin a quality.
-
-```ts
-const reactor = selectVideoTrack.setup({ state });
-```
-
-Source: [src/playback/behaviors/select-tracks.ts](../../../src/playback/behaviors/select-tracks.ts)
-
-### Config
-
-The setup declares `config?`: callers may omit it.
-
-| Key | Type | Doc |
-| --- | --- | --- |
-| `canPlayTrack?` | `CanPlayTrack` | The codec capability probe `excludeUnplayableTracks` applies. Each engine defaults it to the DOM-bound probe; unwired means no capability filtering. |
-| `videoConstraints?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone) outright. |
-| `videoRules?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | The selection chain `selectVideoTrack` runs after its pre-pass; empty by default, so the first playable candidate is the pick. |
-
-### State
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSelectionState` ([src/media/primitives/select-tracks.ts](../../../src/media/primitives/select-tracks.ts)) | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](track-switching.md#switchvideotrack)) |
 
 ## Other functions and constants
 

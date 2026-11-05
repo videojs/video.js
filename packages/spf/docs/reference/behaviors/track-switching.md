@@ -61,6 +61,40 @@ deliberately not consulted — the behavior reads no constraint's state, so the 
 tracks at all is left alone; that's a legitimate source shape, not a failure. The late `createSourceBuffer` check
 stays as the structural backstop.
 
+## switchVideoTrack
+
+Manage `selectedVideoTrackId`: pick a default on src load, dynamically adjust based on bandwidth, clear on src
+unload. Honors `userVideoTrackSelection` as a partial-track constraint on candidates; short-circuits ABR when the
+constraint narrows to a single track.
+
+```ts
+const reactor = switchVideoTrack.setup({ state });
+```
+
+Source: [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts)
+
+### Config
+
+The setup declares `config?`: callers may omit it.
+
+| Key | Type | Doc |
+| --- | --- | --- |
+| `bandwidth?` | `Partial<BandwidthConfig>` | Bandwidth-estimator tuning. Overrides any field of `BandwidthConfig` (`fastHalfLife`, `slowHalfLife`, `minTotalBytes`, `minBytes`, `minDuration`). Defaults: see `DEFAULT_BANDWIDTH_CONFIG`. |
+| `canPlayTrack?` | `CanPlayTrack` | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |
+| `getCdnId?` | `GetCdnId` | How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query param). |
+| `initialBandwidth?` | `number` | Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5 Mbps). |
+| `preferredCodecs?` | `string[]` | Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial pick prefers on a mixed-codec source, read by the `preferCodecFamilies` scope. With no `SourceBuffer.changeType()`, the initial family is the one `stickToSelectedCodecs` holds for the source's lifetime, so this decides which family that is. Cross-cutting like `getCdnId` — one list serves video and audio (each type's rule matches only the families its tracks carry). Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC); pass `[]` to disable. |
+| `quality?` | `Partial<QualityConfig>` | Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15). |
+| `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every variant. |
+| `videoRules?` | `readonly SwitchVideoTrackRule[]` | The rule chain of the pair documented on `videoConstraints`. |
+
+### State
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
+| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. |
+
 ## switchAudioTrack
 
 Manage `selectedAudioTrackId`: pick a default on src load, narrow by `userAudioTrackSelection` filter, re-pick on
@@ -133,40 +167,6 @@ The setup declares `config?`: callers may omit it.
 | --- | --- | --- | --- | --- | --- |
 | `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
 | `selectedTextTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the text track in play, or `undefined` for none: `switchTextTrack`'s pick, on the same terms as `selectedVideoTrackId`. `resolveTextTrack`, `syncTextTracks`, and `loadTextTrackSegments` key their work on it. |
-
-## switchVideoTrack
-
-Manage `selectedVideoTrackId`: pick a default on src load, dynamically adjust based on bandwidth, clear on src
-unload. Honors `userVideoTrackSelection` as a partial-track constraint on candidates; short-circuits ABR when the
-constraint narrows to a single track.
-
-```ts
-const reactor = switchVideoTrack.setup({ state });
-```
-
-Source: [src/playback/behaviors/track-switching.ts](../../../src/playback/behaviors/track-switching.ts)
-
-### Config
-
-The setup declares `config?`: callers may omit it.
-
-| Key | Type | Doc |
-| --- | --- | --- |
-| `bandwidth?` | `Partial<BandwidthConfig>` | Bandwidth-estimator tuning. Overrides any field of `BandwidthConfig` (`fastHalfLife`, `slowHalfLife`, `minTotalBytes`, `minBytes`, `minDuration`). Defaults: see `DEFAULT_BANDWIDTH_CONFIG`. |
-| `canPlayTrack?` | `CanPlayTrack` | Codec capability probe read by the `excludeUnplayableTracks` hard constraint — drops renditions this environment can't decode before selection runs. Injected (rather than imported) so the DOM-free behavior never reaches a DOM API directly; the HLS engines default it to the `MediaSource.isTypeSupported`-backed `canPlayTrack`, or `canPlayTrackWithDrm` where they compose DRM. Absent → no codec filtering (the constraint passes everything through). |
-| `getCdnId?` | `GetCdnId` | How to derive a CDN grouping key from a track URL — used to build `cdnPriority`, to record the failover trip in `failedCdns`, and by the track-switching CDN scope + failover constraint. One function, read by all of them, so the keys stay comparable. Defaults to the URL origin; override to key on something else (e.g. Mux's `cdn=` query param). |
-| `initialBandwidth?` | `number` | Bandwidth estimate in bps to use before enough samples have been collected. Default: `DEFAULT_INITIAL_BANDWIDTH` (5 Mbps). |
-| `preferredCodecs?` | `string[]` | Codec families (RFC 6381 4CCs, e.g. `'avc1'` / `'hvc1'` / `'mp4a'`) the initial pick prefers on a mixed-codec source, read by the `preferCodecFamilies` scope. With no `SourceBuffer.changeType()`, the initial family is the one `stickToSelectedCodecs` holds for the source's lifetime, so this decides which family that is. Cross-cutting like `getCdnId` — one list serves video and audio (each type's rule matches only the families its tracks carry). Defaults to `DEFAULT_PREFERRED_CODECS` (AVC + AAC); pass `[]` to disable. |
-| `quality?` | `Partial<QualityConfig>` | Quality-selection tuning. `safetyMargin` is the bandwidth-headroom multiplier; `upgradeMargin` is the hysteresis ratio gating ABR upgrades. Defaults: `DEFAULT_QUALITY_CONFIG` (0.85 / 1.15). |
-| `videoConstraints?` | `readonly SwitchVideoTrackRule[]` | The hard-constraint pre-pass and rule chain `switchVideoTrack` runs, replacing `DEFAULT_VIDEO_CONSTRAINTS` / `DEFAULT_VIDEO_RULES` outright — the same whole-chain contract as `selectVideoTrack`'s `videoConstraints` / `videoRules`. Spread the default to extend it: `[...DEFAULT_VIDEO_CONSTRAINTS, excludeRefusedKeySystems]` is how the DRM composition prunes on a signal only it carries. Keyed per type because one engine config reaches every variant. |
-| `videoRules?` | `readonly SwitchVideoTrackRule[]` | The rule chain of the pair documented on `videoConstraints`. |
-
-### State
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `TrackSwitchingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](resolve-presentation.md#resolvepresentation)) |
-| `selectedVideoTrackId` | writes | yes | `string \| undefined` | `TrackSwitchingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. |
 
 ## Other functions and constants
 

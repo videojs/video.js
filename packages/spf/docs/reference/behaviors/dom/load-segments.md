@@ -32,6 +32,35 @@ Four states encode the load-gating policy directly:
 - `'full-range'` — `loadActivated || preload === 'auto'`. Effect re-fires on selected-track change and on
   segment-boundary crossing.
 
+## loadVideoSegments
+
+The video variant: dispatches `'load'` messages to `videoSegmentLoaderActor` for the selected video track, under the
+four load modes.
+
+Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts)
+
+### Config
+
+The setup declares `config?`: callers may omit it. It has no keys.
+
+### State
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
+| `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
+| `loadingSuspended` | reads | reads if present | `boolean \| undefined` | `SegmentLoadingState` | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the signal exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent signal means never suspended. |
+| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../sync-preload.md#syncpreload)) |
+| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
+| `segmentLoadingBlocked` | reads | reads if present | `boolean \| undefined` | `MediaKeysState` ([behaviors/dom/setup-media-keys](setup-media-keys.md)) | Segment-load gate: `true` from each new source until it is confirmed clear or its MediaKeys attach, and still `true` after a failed negotiation. The `loadXSegments` dispatchers start no segment loads while it holds. |
+| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
+
+### Context
+
+| Key | Access | Declared | Type | Owner | Doc |
+| --- | --- | --- | --- | --- | --- |
+| `videoSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
+
 ## loadAudioSegments
 
 The audio variant of `loadVideoSegments`: dispatches `'load'` messages to `audioSegmentLoaderActor` for the
@@ -90,35 +119,6 @@ The setup declares `config?`: callers may omit it. It has no keys.
 | Key | Access | Declared | Type | Owner | Doc |
 | --- | --- | --- | --- | --- | --- |
 | `textTrackSegmentLoaderActor` | reads | yes | `TextTrackSegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `TextTrackSegmentLoaderActor` that fetches the selected text track's segments and resolves them into cues for `textTracksActor` through the configured `resolveTextTrackSegment`; same lifetime. `loadTextTrackSegments` drives it with `'load'` messages. (documented on [setupTextTrackActors](setup-text-track-actors.md#setuptexttrackactors)) |
-
-## loadVideoSegments
-
-The video variant: dispatches `'load'` messages to `videoSegmentLoaderActor` for the selected video track, under the
-four load modes.
-
-Source: [src/playback/behaviors/dom/load-segments.ts](../../../../src/playback/behaviors/dom/load-segments.ts)
-
-### Config
-
-The setup declares `config?`: callers may omit it. It has no keys.
-
-### State
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `currentTime` | reads | yes | `number \| undefined` | `SegmentLoadingState` | Current playback position in seconds. Defaults to 0 when undefined. |
-| `loadActivated` | reads | yes | `boolean \| undefined` | `SegmentLoadingState` | True once a preload-overriding event has fired for the current source. |
-| `loadingSuspended` | reads | reads if present | `boolean \| undefined` | `SegmentLoadingState` | Intent-level policy input: initiate no new loading work while `true`. Read here by the `loadXSegments` dispatchers (park in `'dormant'`, highest precedence) and by `setupMediaSource` (a pending MediaSource rebuild waits — attach runs the element's load algorithm). **Observed, never declared**: no reader lists this key in `stateKeys`, so the signal exists only in compositions where a feature behavior declares and writes it (e.g. `setupAirPlay`, while a remote-playback session owns presentation). An absent signal means never suspended. |
-| `preload` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The preload hint the engine honors. `syncPreload` keeps it in step with the element's authored `preload` attribute (both ways) and backfills its `defaultPreload` when nothing supplied one; `resolvePresentation` holds manifest resolution while it is `'none'` unless `loadActivated`, and the `loadXSegments` dispatchers choose their load mode from it. (documented on [syncPreload](../sync-preload.md#syncpreload)) |
-| `presentation` | reads | yes | `MaybeResolvedPresentation \| undefined` | `SegmentLoadingState` | The presentation being played. A caller writes `{ url }`; `resolvePresentation` parses the manifest and populates the rest. (documented on [resolvePresentation](../resolve-presentation.md#resolvepresentation)) |
-| `segmentLoadingBlocked` | reads | reads if present | `boolean \| undefined` | `MediaKeysState` ([behaviors/dom/setup-media-keys](setup-media-keys.md)) | Segment-load gate: `true` from each new source until it is confirmed clear or its MediaKeys attach, and still `true` after a failed negotiation. The `loadXSegments` dispatchers start no segment loads while it holds. |
-| `selectedVideoTrackId` | reads | yes | `string \| undefined` | `SegmentLoadingState` | The id of the video track in play: `switchVideoTrack`'s pick, written when `presentation` resolves and re-picked whenever a rule input changes; cleared when the resolved presentation goes away or no candidate survives the constraints. `resolveVideoTrack`, `setupVideoBufferActors`, and `loadVideoSegments` key their work on it. (documented on [switchVideoTrack](../track-switching.md#switchvideotrack)) |
-
-### Context
-
-| Key | Access | Declared | Type | Owner | Doc |
-| --- | --- | --- | --- | --- | --- |
-| `videoSegmentLoaderActor` | reads | yes | `SegmentLoaderActor \| undefined` | `SegmentLoadingContext` | The `SegmentLoaderActor` that fetches the selected video track's segments and appends them through `videoBufferActor`; same lifetime. `loadVideoSegments` drives it with `'load'` messages. (documented on [setupVideoBufferActors](setup-buffer-actors.md#setupvideobufferactors)) |
 
 ## Types
 

@@ -393,7 +393,8 @@ function declaredTypeCell(long: LongCells, name: string, declared: ReturnType<ty
 
 function renderBehaviorPage(reference: ReferenceProgram, model: Model, entry: EntryPoint): string {
   const page = entry.page!;
-  const behaviors = model.behaviors.filter((info) => info.entry === entry).sort((a, b) => a.name.localeCompare(b.name));
+  // Source order: a module declares the behavior its siblings are described as variants of first.
+  const behaviors = model.behaviors.filter((info) => info.entry === entry);
 
   const description = moduleDoc(reference, entry.file);
 
