@@ -35,7 +35,7 @@ const hiddenBeforeStart = [
 const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
 
 // The centre play button shrinks rather than hides in small players.
-const centerPlay = ['size-auto! rounded-media-pill!'] as const;
+const centerPlay = ['rounded-media-pill!'] as const;
 
 export default styles({
   file: 'video/controls.css',
@@ -131,7 +131,7 @@ export default styles({
       variants: {
         // Each centre button sets its own surface, so Tailwind never has to order two competing backgrounds.
         default: centerButtonBase,
-        neutral: [centerButtonBase, 'text-media-controls-foreground! filter-media-feedback'],
+        neutral: [centerButtonBase, 'text-media-controls-foreground!'],
       },
     },
     centerPlay: {
@@ -143,19 +143,18 @@ export default styles({
         // again for keyboard focus.
         default: [
           ...centerPlay,
-          'p-4! media-max-360:p-3!',
+          'size-auto! p-4! media-max-360:p-3!',
           'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
           'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
           'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
           'pointer-fine:data-started:not-focus-visible:opacity-0!',
           'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
         ],
-        // The playback feedback is a bare icon, so a dark backing tells the button apart. The neutral skin keeps its
-        // classic control bar once playback starts.
+        // Matches the compat skin's centre play button: a translucent black circle, set apart from the bare-icon playback
+        // feedback. The neutral skin keeps its classic control bar once playback starts.
         neutral: [
-          ...centerPlay,
-          'p-2.5! media-max-360:p-2!',
-          'bg-media-backdrop/50! hover:bg-media-backdrop/70! focus-visible:bg-media-backdrop/70!',
+          'size-14.5! media-max-360:size-10! rounded-[50%]! [corner-shape:round]!',
+          'bg-media-backdrop/40! hover:bg-media-backdrop/60! focus-visible:bg-media-backdrop/60!',
           'media-high-contrast:bg-media-background!',
           'data-started:not-focus-visible:opacity-0!',
           'data-started:not-focus-visible:pointer-events-none!',
@@ -166,7 +165,7 @@ export default styles({
       utilities: [],
       variants: {
         default: 'size-media-icon-lg! media-max-360:size-media-icon!',
-        neutral: 'size-media-icon-lg! media-max-360:size-media-icon!',
+        neutral: 'size-7! media-max-360:size-5!',
       },
     },
     centerSeek: {

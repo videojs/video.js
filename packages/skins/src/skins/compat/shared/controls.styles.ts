@@ -47,17 +47,17 @@ export default styles({
     centerButton: {
       utilities: [
         'bg-[rgba(0,0,0,0.4)]! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-[rgba(0,0,0,0.85)]! focus-visible:bg-[rgba(0,0,0,0.85)]! aria-expanded:bg-[rgba(0,0,0,0.85)]!',
+        'hover:bg-[rgba(0,0,0,0.6)]! focus-visible:bg-[rgba(0,0,0,0.6)]! aria-expanded:bg-[rgba(0,0,0,0.6)]!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],
     },
     centerPlay: {
       // Shrinks rather than hides in small players, so there's always a start prompt.
-      utilities: 'size-14.5! media-max-360:size-11!',
+      utilities: 'size-14.5! media-max-360:size-10!',
     },
     centerPlayIcon: {
-      utilities: 'size-7! media-max-360:size-5.5!',
+      utilities: 'size-7! media-max-360:size-5!',
     },
     centerSeek: {
       // Before playback starts, the play button stands alone in the center.
