@@ -1,7 +1,7 @@
 // Adapted from `tiktok-video-element` in https://github.com/muxinc/media-elements (MIT),
 // ported to TypeScript and reshaped as a media adapter (mirrors `dom/youtube`).
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -387,9 +387,9 @@ export class TikTokAdapter extends MediaPlayedRangesMixin(EventTarget) implement
     return this.#error;
   }
 
-  /** Always empty: `closed_caption` is the embed's only say over captions. */
+  /** Unsupported: `closed_caption` is the embed's only say over captions. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   get isFullscreen() {

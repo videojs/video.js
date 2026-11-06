@@ -21,9 +21,10 @@ export interface MuxStoryboardMedia {
 export function MuxStoryboard({ media }: { media: MuxStoryboardMedia }) {
   const subscribe = useCallback(
     (onChange: () => void) => {
-      // `useSyncProps` writes `src` / `source` during render and those setters
-      // dispatch `sourcechange` synchronously. Defer (and coalesce) notifications
-      // so we never schedule an update while another component is rendering.
+      // `useSyncProps` writes `src` / `source` during the first render and in
+      // layout effects, and those setters dispatch `sourcechange` synchronously.
+      // Defer (and coalesce) notifications so we never schedule an update while
+      // another component is rendering or committing.
       let cancelled = false;
       let scheduled = false;
       const notify = () => {

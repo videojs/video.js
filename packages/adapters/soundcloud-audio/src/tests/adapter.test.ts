@@ -1055,7 +1055,7 @@ describe('SoundCloudAdapter', () => {
       expect(isMediaPlaybackRateCapable(media)).toBe(false);
       expect(isMediaPictureInPictureCapable(media)).toBe(false);
       expect('requestFullscreen' in media).toBe(false);
-      expect(media.textTracks.length).toBe(0);
+      expect(media.textTracks).toBeUndefined();
     });
   });
 });

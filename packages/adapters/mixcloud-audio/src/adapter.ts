@@ -1,4 +1,4 @@
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -387,9 +387,9 @@ export class MixcloudAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#error;
   }
 
-  /** Always empty: Mixcloud has no captions or other text tracks. */
+  /** Unsupported: Mixcloud has no captions or other text tracks. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   // Playback rate, picture-in-picture, and fullscreen are left out on purpose: the widget offers none of them, and a

@@ -1,4 +1,6 @@
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/constants';
+import { findTrackElement, isHTMLMediaElement } from '@videojs/utils/dom';
+
+import { NO_TIME_RANGES_YET } from '../../core/constants';
 import {
   type EventLike,
   type CommonMedia,
@@ -282,15 +284,15 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
 
   get buffered() {
-    return (this.target?.buffered ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return this.target?.buffered as TimeRanges | undefined;
   }
 
   get seekable() {
-    return (this.target?.seekable ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return this.target?.seekable as TimeRanges | undefined;
   }
 
   get played() {
-    return (this.target?.played ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return (this.target?.played ?? NO_TIME_RANGES_YET) as TimeRanges;
   }
 
   get error() {
@@ -298,15 +300,29 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
 
   get textTracks() {
-    return (this.target?.textTracks ?? EMPTY_TEXT_TRACKS) as TextTrackList;
+    return this.target?.textTracks as TextTrackList | undefined;
   }
 
   addTextTrack(kind: TextTrackKind, label?: string, language?: string) {
     return this.target?.addTextTrack?.(kind, label, language) as TextTrackLike;
   }
 
+  /**
+   * Removes a track backed by a `<track>` element, such as one from `createTextTrack()` or the page's markup. A track
+   * from the native `addTextTrack()` can never be removed, so this leaves it.
+   */
+  removeTextTrack(track: TextTrackLike) {
+    const target = this.target;
+    if (!target) return;
+
+    // A native element always takes out the `<track>`, even if browsers add a `removeTextTrack()` of their own. A target
+    // that is itself a media component, such as a slotted `<hls-video>`, owns its tracks.
+    if (!isHTMLMediaElement(target) && target.removeTextTrack) target.removeTextTrack(track);
+    else findTrackElement(target, track)?.remove();
+  }
+
   get remote() {
-    return this.target?.remote ?? EMPTY_REMOTE;
+    return this.target?.remote;
   }
 
   get disableRemotePlayback() {

@@ -43,7 +43,9 @@ describe('getMediaSnapshot', () => {
           playbackRate: 1.5,
           isFullscreen: true,
           subtitlesShowing: true,
-          textTrackList: [{ id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'showing' }],
+          textTrackList: [
+            { id: 'captions-en', kind: 'captions', label: 'English', language: 'en', mode: 'showing', source: 'media' },
+          ],
           isPictureInPicture: false,
           currentTime: 30,
           duration: 120,

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { streamTypeFeature } from '../stream-type';
+import { streamTypeFeature } from '../shared';
 
 describe('streamTypeFeature', () => {
   describe('fallback (no `streamType` property on media)', () => {

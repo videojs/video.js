@@ -17,7 +17,7 @@ export {
 // form-encoding `licenseRequest` factory (the `spc=` FairPlay dialect), plus
 // `licenseResponse` unwrappers — a FairPlay CKC unwrapper (XML/JSON envelopes)
 // and a JSON license unwrapper. Imported only when dropped into a
-// `source.drm[ks]` slot, so a composition that needs none pays for none.
+// `source.drm[ks]` entry, so a composition that needs none pays for none.
 export {
   detectFairPlayCkc,
   formEncodeLicenseRequest,

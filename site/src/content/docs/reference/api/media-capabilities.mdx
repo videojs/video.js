@@ -67,7 +67,7 @@ Each `isMedia*Capable` guard accepts any value and returns `false` for `null`, `
 
 A guard checks that a few members of a capability are present, then narrows to every member of that capability's contract. The table lists both.
 
-Some media can't provide buffered ranges, text tracks, or remote playback, and report a shared empty placeholder in their place. `isMediaBufferCapable`, `isMediaTextTrackCapable`, and `isMediaRemotePlaybackCapable` return `false` for that placeholder. Media that can provide buffered ranges but has none yet, such as an embed before it loads, reports an empty range that is not the placeholder, so `isMediaBufferCapable` returns `true`.
+Some media can't provide buffered ranges, text tracks, or remote playback, and return `undefined` from `buffered` and `seekable`, `textTracks`, or `remote` instead. `isMediaBufferCapable`, `isMediaTextTrackCapable`, and `isMediaRemotePlaybackCapable` return `false` for `undefined`. Media that can provide buffered ranges but has none yet, such as an embed before it loads, reports an empty range, so `isMediaBufferCapable` returns `true`. A custom media that extends a built-in one opts out by overriding the getter to return `undefined`.
 
 A guard describes what the media object supports, not its current state. `isMediaErrorCapable` returns `true` while `error` is `null`, and `isMediaVolumeCapable` returns `true` on platforms that ignore volume changes. For current state and availability, such as `volumeAvailability` from the <DocsLink slug="reference/api/feature-volume">volume feature</DocsLink>, read the player's <DocsLink slug="guides/features">features</DocsLink> instead.
 
@@ -78,13 +78,13 @@ A guard describes what the media object supports, not its current state. `isMedi
 | `isMediaSourceCapable` | `src`, `currentSrc`, `readyState`, `load()` | `src`, `currentSrc`, `readyState`, `preload`, `crossOrigin`, `load()`, `canPlayType()` |
 | `isMediaVolumeCapable` | `volume`, `muted` | `volume`, `muted`, `defaultMuted` |
 | `isMediaPlaybackRateCapable` | `playbackRate` | `playbackRate`, `defaultPlaybackRate` |
-| `isMediaBufferCapable` | `buffered`, `seekable`, neither an empty placeholder | `buffered`, `seekable` |
+| `isMediaBufferCapable` | `buffered`, `seekable`, neither `undefined` | `buffered`, `seekable` |
 | `isMediaErrorCapable` | `error` (`null` counts) | `error` |
-| `isMediaTextTrackCapable` | `textTracks`, not an empty placeholder | `textTracks`, `addTextTrack()` |
+| `isMediaTextTrackCapable` | `textTracks` is not `undefined` | `textTracks`, `addTextTrack()` |
 | `isMediaVideoRenditionCapable` | `videoRenditions` | `videoRenditions` |
 | `isMediaAudioTrackCapable` | `audioTracks` | `audioTracks`, `addAudioTrack()`, `removeAudioTrack()` |
 | `isMediaVideoDimensionsCapable` | `videoWidth`, `videoHeight` | `videoWidth`, `videoHeight` |
-| `isMediaRemotePlaybackCapable` | `remote` is an object, not an empty placeholder | `remote`, `disableRemotePlayback` |
+| `isMediaRemotePlaybackCapable` | `remote` is an object | `remote`, `disableRemotePlayback` |
 | `isMediaStreamTypeCapable` | `streamType` | `streamType` |
 | `isMediaLiveCapable` | `liveEdgeStart`, `targetLiveWindow` | `liveEdgeStart`, `targetLiveWindow` |
 

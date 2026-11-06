@@ -188,7 +188,7 @@ describe('TwitchAdapter', () => {
     expect(media.duration).toBeNaN();
     expect(media.src).toBe(TwitchAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
-    expect(media.textTracks.length).toBe(0);
+    expect(media.textTracks).toBeUndefined();
     expect(media.played.length).toBeGreaterThanOrEqual(1);
   });
 

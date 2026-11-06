@@ -3,6 +3,8 @@ import { omit, pick } from '@videojs/utils/object';
 import { kebabCase } from '@videojs/utils/string';
 import type { Constructor } from '@videojs/utils/types';
 
+import type { TextTrackLike } from '../../core/types';
+
 /**
  * CSS custom property names for video elements.
  *
@@ -329,6 +331,23 @@ export function CustomMediaElement<T extends Constructor<PlaybackAdapter>>(
         this.shadowRoot?.querySelector(tag) ??
         null
       );
+    }
+
+    /**
+     * Removes a track backed by a `<track>` element. A track cloned from an authored `<track>` child would come back on
+     * the next child sync, so the authored one is removed with it.
+     */
+    removeTextTrack(track: TextTrackLike): void {
+      for (const [el, clone] of this.#childMap) {
+        if ((clone as HTMLTrackElement).track !== track) continue;
+
+        this.#childMap.delete(el);
+        clone.remove();
+        el.remove();
+        return;
+      }
+
+      this.#mediaHost.removeTextTrack?.(track);
     }
 
     connectedCallback() {
