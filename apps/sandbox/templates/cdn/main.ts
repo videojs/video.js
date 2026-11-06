@@ -269,6 +269,9 @@ async function loadCdnMedia(media: MediaId) {
     case 'wistia-video':
       await import('@videojs/cdn/media/wistia-video');
       break;
+    case 'hyperframes-video':
+      await import('@videojs/cdn/media/hyperframes-video');
+      break;
   }
 }
 
