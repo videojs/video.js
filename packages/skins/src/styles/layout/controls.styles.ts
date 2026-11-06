@@ -45,7 +45,7 @@ export default styles({
       utilities: [],
       variants: {
         default: 'media-max-lg:hidden',
-        neutral: 'media-max-xs:hidden',
+        neutral: 'media-max-360:hidden',
       },
     },
     root: {
@@ -153,8 +153,8 @@ export default styles({
           'size-14.5! media-max-360:size-10! rounded-[50%]! [corner-shape:round]!',
           'bg-media-backdrop/40! hover:bg-media-backdrop/60! focus-visible:bg-media-backdrop/60!',
           'media-high-contrast:bg-media-background!',
-          'data-started:not-focus-visible:opacity-0!',
-          'data-started:not-focus-visible:pointer-events-none!',
+          'data-started:not-focus-visible:[opacity:var(--media-center-play-started-opacity,0)]!',
+          'data-started:not-focus-visible:[pointer-events:var(--media-center-play-started-pointer-events,none)]!',
         ],
       },
     },
@@ -170,7 +170,7 @@ export default styles({
       // A touch affordance, hidden for fine pointers, on small players and until playback starts.
       variants: {
         default: [
-          'media-max-280:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
+          'media-max-2xs:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
           'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
           'media-high-contrast:bg-media-background!',
         ],
