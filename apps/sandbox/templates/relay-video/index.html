@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Sandbox — Relay Video</title>
+  </head>
+  <body class="bg-zinc-100 font-sans text-zinc-950">
+    <main class="mx-auto flex max-w-4xl flex-col gap-4 p-4">
+      <form id="connect" class="flex flex-wrap items-end gap-2 text-sm">
+        <label class="flex flex-col">
+          Relay URL
+          <input name="url" class="rounded border px-2 py-1" size="28" required />
+        </label>
+        <label class="flex flex-col">
+          JWT
+          <input name="jwt" type="password" class="rounded border px-2 py-1" size="28" autocomplete="off" />
+        </label>
+        <label class="flex flex-col">
+          Namespace
+          <input name="ns" class="rounded border px-2 py-1" size="20" placeholder="live/room" required />
+        </label>
+        <button class="rounded bg-zinc-900 px-3 py-1 text-white">Connect</button>
+        <button type="button" id="disconnect" class="rounded border px-3 py-1">Disconnect</button>
+      </form>
+      <p id="status" class="font-mono text-xs">Not connected.</p>
+      <live-video-player>
+        <live-video-skin class="sandbox-video-frame w-full">
+          <relay-video class="block h-full w-full"></relay-video>
+        </live-video-skin>
+      </live-video-player>
+      <section class="text-sm">
+        <h2 class="font-semibold">The app's own want on the same subscriber: the catalog, raw</h2>
+        <ol id="log" class="max-h-48 overflow-auto font-mono text-xs"></ol>
+      </section>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

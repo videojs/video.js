@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@caprid/moq-media": "^0.3.0",
+    "@caprid/relay": "^0.3.0",
     "@heroicons/react": "^2.2.0",
     "@videojs/cdn": "workspace:*",
     "@videojs/cloudflare-video": "workspace:*",
@@ -30,6 +32,7 @@
     "@videojs/native-hls-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
     "@videojs/react": "workspace:*",
+    "@videojs/relay-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spf": "workspace:*",

@@ -387,6 +387,12 @@ importers:
       '@base-ui/react':
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@caprid/moq-media':
+        specifier: ^0.3.0
+        version: 0.3.0
+      '@caprid/relay':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.3.0)
@@ -441,6 +447,9 @@ importers:
       '@videojs/react':
         specifier: workspace:*
         version: link:../../packages/react
+      '@videojs/relay-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/relay-video
       '@videojs/shaka-video':
         specifier: workspace:*
         version: link:../../packages/adapters/shaka-video
