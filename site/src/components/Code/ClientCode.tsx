@@ -30,18 +30,12 @@ function loadHighlighting(): Promise<Highlighting> {
   ]).then(([highlighter, { default: Shared }]) => ({ highlighter, Shared }));
 
   highlightingPromise = promise;
-  promise.then(
-    (highlighting) => {
-      // Record the settled value where `use()` reads it, so renders after the first load never suspend.
-      Object.assign(promise, { status: 'fulfilled', value: highlighting });
-      loadedHighlighting = highlighting;
-      highlightingListeners.forEach((listener) => listener());
-    },
-    () => {
-      // A failed chunk load leaves the code as plain text; the next change tries again.
-      highlightingPromise = null;
-    }
-  );
+  void promise.then((highlighting) => {
+    // Record the settled value where `use()` reads it, so renders after the first load never suspend.
+    Object.assign(promise, { status: 'fulfilled', value: highlighting });
+    loadedHighlighting = highlighting;
+    highlightingListeners.forEach((listener) => listener());
+  });
 
   return promise;
 }
@@ -99,12 +93,8 @@ function HydratedCode({ code, focusLines, lang }: ClientCodeProps) {
     () => false,
     () => true
   );
-  const [serverCode, setServerCode] = useState(isHydrating ? code : null);
-
-  // Once the code changes, React replaces the server markup, so code that changes back can't reuse it.
-  if (serverCode !== null && code !== serverCode) setServerCode(null);
-
-  const showsServerMarkup = serverCode !== null && code === serverCode;
+  const [serverCode] = useState(isHydrating ? code : null);
+  const showsServerMarkup = code === serverCode;
 
   useEffect(() => {
     if (highlighting) return;

@@ -16,9 +16,6 @@ import {
 import type { InstallMethod } from './selection';
 import type { RegistryStyling } from './shadcn';
 
-/** Custom properties set on the skin element, such as `--media-accent-color`. */
-export type SkinCustomProperties = Readonly<Record<`--${string}`, string>>;
-
 export interface InstallationOptions {
   useCase: UseCase;
   skin: Skin;
@@ -26,8 +23,6 @@ export interface InstallationOptions {
   extensions?: readonly InstallationExtension[];
   sourceUrl: string;
   installMethod: InstallMethod;
-  /** Skin custom properties to write into the generated markup, such as the installation preview's options. */
-  skinProperties?: SkinCustomProperties;
 }
 
 export interface HTMLUsageCode {
@@ -68,29 +63,6 @@ export function resolveInstallationSourceUrl(sourceUrl: string, renderer: Render
 
 function escapeHTMLAttribute(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-}
-
-/** Append skin custom properties to an HTML `style` attribute, or start one. */
-function withHTMLSkinProperties(style: string, properties: SkinCustomProperties = {}): string {
-  const declarations = Object.entries(properties).map(([name, value]) => `${name}: ${value};`);
-  if (declarations.length === 0) return style;
-
-  const added = escapeHTMLAttribute(declarations.join(' '));
-
-  return style ? `${style.slice(0, -1)} ${added}"` : ` style="${added}"`;
-}
-
-/** Quote a value as a single-quoted JavaScript string, like the rest of the generated `style` objects. */
-function singleQuote(value: string): string {
-  return `'${value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`;
-}
-
-/** Add skin custom properties to a React `style` object, which needs a `CSSProperties` cast to accept them. */
-function withReactSkinProperties(sized: boolean, properties: SkinCustomProperties = {}): string {
-  const entries = Object.entries(properties).map(([name, value]) => `'${name}': ${singleQuote(value)}`);
-  if (entries.length === 0) return sized ? reactVideoLayout : '';
-
-  return ` style={{ ${[...(sized ? [reactVideoLayoutEntries] : []), ...entries].join(', ')} } as CSSProperties}`;
 }
 
 /** Skin module basename within a preset group: `skin`, `neutral-skin`, `compat-skin`, or `scaffold-skin`. */
@@ -203,8 +175,7 @@ function isSizedVideoPlayer(useCase: UseCase): boolean {
 }
 
 const htmlVideoLayout = ' style="display: block; width: 100%; aspect-ratio: 16 / 9;"';
-const reactVideoLayoutEntries = `width: '100%', aspectRatio: '16 / 9'`;
-const reactVideoLayout = ` style={{ ${reactVideoLayoutEntries} }}`;
+const reactVideoLayout = ` style={{ width: '100%', aspectRatio: '16 / 9' }}`;
 const reactTailwindVideoLayout = ' className="aspect-video w-full"';
 const htmlContainerVideoLayout = ' style="position: relative; display: block; width: 100%; aspect-ratio: 16 / 9;"';
 const reactContainerVideoLayout = ` style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}`;
@@ -269,8 +240,7 @@ function generateHTMLMarkup(
   url: string,
   extensions: readonly InstallationExtension[],
   mediaSlot?: string,
-  layout: 'inline' | 'stylesheet' = 'inline',
-  skinProperties?: SkinCustomProperties
+  layout: 'inline' | 'stylesheet' = 'inline'
 ): string {
   const playerTag = getPlayerTag(useCase);
   const tag = getRendererTag(renderer);
@@ -305,10 +275,7 @@ ${mediaMarkup('    ')}
   }
 
   const skinTag = getSkinTag(useCase, skin === 'none' ? defaultSkinForUseCase(useCase) : skin);
-  const skinLayout = withHTMLSkinProperties(
-    isSizedVideoPlayer(useCase) && layout === 'inline' ? htmlVideoLayout : '',
-    skinProperties
-  );
+  const skinLayout = isSizedVideoPlayer(useCase) && layout === 'inline' ? htmlVideoLayout : '';
 
   return `${playerComment}
 <${playerTag}>
@@ -376,19 +343,10 @@ import '@videojs/html/${group}/${getSkinFile(skin)}';${mediaImport}${extensionIm
 
 export function generateHTMLUsageCode(
   opts: Pick<InstallationOptions, 'useCase' | 'skin' | 'media' | 'sourceUrl' | 'installMethod'> &
-    Partial<Pick<InstallationOptions, 'extensions' | 'skinProperties'>>
+    Partial<Pick<InstallationOptions, 'extensions'>>
 ): HTMLUsageCode {
   const extensions = opts.extensions ?? defaultInstallationExtensions(opts.media);
-  const html = generateHTMLMarkup(
-    opts.useCase,
-    opts.skin,
-    opts.media,
-    opts.sourceUrl,
-    extensions,
-    undefined,
-    'inline',
-    opts.skinProperties
-  );
+  const html = generateHTMLMarkup(opts.useCase, opts.skin, opts.media, opts.sourceUrl, extensions);
   const imports =
     opts.installMethod !== 'cdn' ? generateHTMLImports(opts.useCase, opts.skin, opts.media, extensions) : undefined;
   const result: HTMLUsageCode = { html };
@@ -700,7 +658,7 @@ ${indent}<${reactComponent} />`;
 
 export function generateReactCreateCode(
   opts: Pick<InstallationOptions, 'useCase' | 'skin' | 'media' | 'sourceUrl'> &
-    Partial<Pick<InstallationOptions, 'extensions' | 'skinProperties'>>
+    Partial<Pick<InstallationOptions, 'extensions'>>
 ): ReactCreateCode {
   const { useCase, skin, media: renderer } = opts;
   const extensions = opts.extensions ?? defaultInstallationExtensions(renderer);
@@ -713,9 +671,7 @@ export function generateReactCreateCode(
   const group = getInstallationPreset(useCase).group;
 
   const rendererJsx = `<${rendererComponent} ${generateReactRendererProps(renderer, source)} />`;
-  const skinProperties = isNoSkin ? {} : (opts.skinProperties ?? {});
-  const hasSkinProperties = Object.keys(skinProperties).length > 0;
-  const skinLayout = withReactSkinProperties(isSizedVideoPlayer(useCase), skinProperties);
+  const skinLayout = isSizedVideoPlayer(useCase) ? reactVideoLayout : '';
   const containerLayout = isSizedVideoPlayer(useCase) ? reactContainerVideoLayout : '';
 
   let presetImport: string;
@@ -771,7 +727,6 @@ export function generateReactCreateCode(
     </${playerComponent}>`;
 
   const imports = [
-    ...(hasSkinProperties ? [`import type { CSSProperties } from 'react';`] : []),
     ...(skinCssImport ? [`import '${skinCssImport}';`] : []),
     ...(isNoSkin ? [`import { Container } from '@videojs/react';`] : []),
     presetImport,

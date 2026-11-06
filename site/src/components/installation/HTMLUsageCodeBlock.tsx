@@ -16,7 +16,6 @@ import { shared } from '@/components/typography/styles';
 import { VJS10_CDN_BASE } from '@/consts';
 
 import { useSelection } from './useSelection';
-import { useSkinProperties } from './useSkinProperties';
 import { withSelectionMarker } from './withSelectionMarker';
 
 interface Props {
@@ -59,7 +58,6 @@ function HTMLUsageCodeBlock({ installMethod }: Props) {
   const $project = useSelection('project');
   const project = installationProjectFiles('html', $template);
   const method = installMethod ?? selectedInstallMethod;
-  const { properties } = useSkinProperties();
 
   const result = generateHTMLUsageCode({
     useCase: $useCase,
@@ -68,7 +66,6 @@ function HTMLUsageCodeBlock({ installMethod }: Props) {
     extensions: $extensions,
     sourceUrl: $sourceUrl,
     installMethod: method,
-    skinProperties: properties,
   });
   const entrySetup = method === 'cdn' ? [] : installationHtmlEntrySetup($template, project.usage!);
   const html =

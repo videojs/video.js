@@ -9,7 +9,6 @@ import ClientCode from '@/components/Code/ClientCode';
 import { Tab, TabsList, TabsPanel, TabsRoot } from '@/components/Tabs';
 
 import { useSelection } from './useSelection';
-import { useSkinProperties } from './useSkinProperties';
 import { withSelectionMarker } from './withSelectionMarker';
 
 function ReactCreateCodeBlock() {
@@ -19,7 +18,6 @@ function ReactCreateCodeBlock() {
   const $extensions = useSelection('extensions');
   const $sourceUrl = useSelection('sourceUrl');
   const $template = useSelection('template');
-  const { properties } = useSkinProperties();
 
   const result = generateReactCreateCode({
     useCase: $useCase,
@@ -27,7 +25,6 @@ function ReactCreateCodeBlock() {
     media: $renderer,
     extensions: $extensions,
     sourceUrl: $sourceUrl,
-    skinProperties: properties,
   });
   const files = installationProjectFiles('react', $template);
   const usage = installationReactUsageCode($template);
