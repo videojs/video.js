@@ -2,7 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
-## [@videojs/core@10.3.0] - 2026-11-03
+## [@videojs/core@10.4.0] - 2026-11-06
+
+### 🚀 Features
+- *(media)* Add data cues and cue values to the text-track contract ([#9610](https://github.com/videojs/video.js/pull/9610)) by [@mihar-22](https://github.com/mihar-22)
+- *(core)* Add a text cues feature ([#9611](https://github.com/videojs/video.js/pull/9611)) by [@mihar-22](https://github.com/mihar-22)
+- *(core)* Add typed text track definitions ([#9612](https://github.com/videojs/video.js/pull/9612)) by [@mihar-22](https://github.com/mihar-22)
+- *(react)* Add text track hooks ([#9613](https://github.com/videojs/video.js/pull/9613)) by [@mihar-22](https://github.com/mihar-22)
+- *(skins)* Disambiguate subs with same name ([#9703](https://github.com/videojs/video.js/pull/9703)) by [@spuppo-mux](https://github.com/spuppo-mux)
+- *(core)* Let apps add text tracks to the player ([#9614](https://github.com/videojs/video.js/pull/9614)) by [@mihar-22](https://github.com/mihar-22)
+- *(core)* Load app text tracks from a src ([#9615](https://github.com/videojs/video.js/pull/9615)) by [@mihar-22](https://github.com/mihar-22)
+- *(media)* Add removable text tracks for DOM media ([#9616](https://github.com/videojs/video.js/pull/9616)) by [@mihar-22](https://github.com/mihar-22)
+- *(core)* Copy app captions into the media ([#9617](https://github.com/videojs/video.js/pull/9617)) by [@mihar-22](https://github.com/mihar-22)
+
+### 🐛 Bug Fixes
+- *(skin)* Restore older browser support in the compat skin ([#9699](https://github.com/videojs/video.js/pull/9699)) by [@sampotts](https://github.com/sampotts)
+- *(site)* Opt light theme out of browser auto-darkening ([#9695](https://github.com/videojs/video.js/pull/9695)) by [@decepulis](https://github.com/decepulis)
+- *(react)* Apply media prop updates when the render commits ([#9673](https://github.com/videojs/video.js/pull/9673)) by [@ump45nose](https://github.com/ump45nose)
+- *(media)* Recognize empty placeholders from another package copy ([#9667](https://github.com/videojs/video.js/pull/9667)) by [@BeyondITL-Mossaddique](https://github.com/BeyondITL-Mossaddique)
+
+### 💼 Other
+- React Native player POC, rebased on main with iOS 27 toolchain fixes ([#9551](https://github.com/videojs/video.js/pull/9551)) by [@cjpillsbury](https://github.com/cjpillsbury)
+
+### 🚜 Refactor
+- *(core)* Share platform-neutral player features across platforms ([#9686](https://github.com/videojs/video.js/pull/9686)) by [@daytime-em](https://github.com/daytime-em)
+
+### 📚 Documentation
+- *(site)* Add changelog prose for 10.3.0 ([#9697](https://github.com/videojs/video.js/pull/9697)) by [@github-actions[bot]](https://github.com/github-actions[bot])
+- *(site)* Update the privacy notice from the latest legal draft ([#9689](https://github.com/videojs/video.js/pull/9689)) by [@heff](https://github.com/heff)
+- *(spf)* Generate a Markdown API reference from behavior and field JSDoc ([#9396](https://github.com/videojs/video.js/pull/9396)) by [@cjpillsbury](https://github.com/cjpillsbury)
+
+### ⚙️ Miscellaneous Tasks
+- *(ci)* Stop changelog-prose relay from cancelling itself ([#9698](https://github.com/videojs/video.js/pull/9698)) by [@luwes](https://github.com/luwes)
+- *(ci)* Fix failing typecheck  ([#9706](https://github.com/videojs/video.js/pull/9706)) by [@spuppo-mux](https://github.com/spuppo-mux)
+
+### New Contributors
+* @ump45nose made their first contribution in [#9673](https://github.com/videojs/video.js/pull/9673)
+* @daytime-em made their first contribution in [#9686](https://github.com/videojs/video.js/pull/9686)
+
+## [@videojs/core@10.3.0] - 2026-11-04
 
 ### 🚀 Features
 - *(mux-data)* Report framework and engine in the player software name ([#9577](https://github.com/videojs/video.js/pull/9577)) by [@luwes](https://github.com/luwes)
@@ -2449,6 +2487,7 @@ All notable changes to this project will be documented in this file.
 * @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
 * @heff made their first contribution
 
+[@videojs/core@10.4.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.3.0...@videojs/core@10.4.0
 [@videojs/core@10.3.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0
 [@videojs/core@10.2.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0
 [@videojs/core@10.1.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.0.1...@videojs/core@10.1.0
