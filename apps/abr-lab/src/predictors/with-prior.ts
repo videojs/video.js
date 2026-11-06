@@ -1,6 +1,14 @@
 import { pointDistribution } from '../distribution.ts';
 import type { TransferRecord } from '../record.ts';
 import type { EvidenceWeights } from '../regime.ts';
+import {
+  createBelief,
+  lognormalDensity,
+  observeLowerBound,
+  observeReading,
+  observeStored,
+  quantile,
+} from './belief.ts';
 import type { Predictor, PredictorFactory } from './predictor.ts';
 
 /**
@@ -42,7 +50,33 @@ export type StartingEstimate =
       jitterMs: () => number;
       fallbackBps: number;
       capBps: number;
+    }
+  /**
+   * Every signal at hand folded into one belief (see `belief.ts`): a broad prior, a stored estimate as a same-network /
+   * moved mixture whose odds the first request's TTFB shifts, the Network Information API's downlink (a lower bound at
+   * its cap), and the last playlist's first burst. The estimate is the belief's `quantile`.
+   */
+  | {
+      kind: 'fused';
+      priorBps: number;
+      priorSigma: number;
+      stored?: { bps: number; firstTtfbMs: number; pSame: number } | undefined;
+      netInfo?: { bps: number; capBps: number } | undefined;
+      jitterMs: () => number;
+      quantile: number;
     };
+
+/**
+ * Spreads of each signal, ln units: the sim's median |ln error| per signal (`pnpm abr:start`) over 0.674, the median of
+ * |z| for a normal. Fitted on the same simulator they are tested in, so optimistic.
+ */
+const STORED_SIGMA = 1.05;
+const NETINFO_SIGMA = 1.25;
+const BURST_SIGMA = 0.67;
+const LOWER_BOUND_SOFTNESS = 0.2;
+/** Spread of ln(TTFB ratio) between two sessions on the same network, and between different networks. */
+const TTFB_SAME_SIGMA = 0.35;
+const TTFB_MOVED_SIGMA = 1;
 
 /** Below this, a burst arrives within a chunk or two and its timing is noise (lab: 11.6 kB at 20 Mbit/s collapsed). */
 const MIN_BURST_MS = 5;
@@ -64,7 +98,53 @@ export function withStartingEstimate(
   let firstTtfbMs: number | undefined;
   let firstBps: number | undefined;
 
+  /** Posterior odds the stored estimate came from this network, after the TTFB check alone. */
+  const pSame = (): number | undefined => {
+    if (start.kind !== 'fused' || !start.stored) return undefined;
+
+    if (firstTtfbMs === undefined) return start.stored.pSame;
+
+    const r = Math.log(firstTtfbMs / start.stored.firstTtfbMs);
+    const same = start.stored.pSame * gauss(r, TTFB_SAME_SIGMA);
+    const moved = (1 - start.stored.pSame) * gauss(r, TTFB_MOVED_SIGMA);
+
+    return same / (same + moved);
+  };
+
+  const fused = (): number => {
+    if (start.kind !== 'fused') return Number.NaN;
+
+    let belief = createBelief(start.priorBps, start.priorSigma);
+
+    if (start.stored) {
+      const population = lognormalDensity(start.stored.bps, start.priorBps, start.priorSigma);
+
+      belief = observeStored(belief, start.stored.bps, STORED_SIGMA, pSame()!, population);
+    }
+
+    if (start.netInfo) {
+      belief =
+        start.netInfo.bps >= start.netInfo.capBps
+          ? observeLowerBound(belief, start.netInfo.capBps, LOWER_BOUND_SOFTNESS)
+          : observeReading(belief, start.netInfo.bps, NETINFO_SIGMA);
+    }
+
+    if (burst) {
+      belief = burst.lowerBound
+        ? observeLowerBound(belief, burst.bps, LOWER_BOUND_SOFTNESS)
+        : observeReading(belief, burst.bps, BURST_SIGMA);
+    }
+
+    return quantile(belief, start.quantile);
+  };
+
   const accepted = () => {
+    if (start.kind === 'fused') {
+      const p = pSame();
+
+      return p === undefined ? undefined : p >= 0.5;
+    }
+
     if ((start.kind !== 'gated' && start.kind !== 'policy') || firstTtfbMs === undefined) return undefined;
 
     const ratio = firstTtfbMs / start.storedFirstTtfbMs;
@@ -82,6 +162,8 @@ export function withStartingEstimate(
     }
 
     if (start.kind === 'stream') return burst?.bps ?? start.fallbackBps;
+
+    if (start.kind === 'fused') return fused();
 
     if (start.kind === 'policy') {
       const stored = accepted() ? start.storedBps : undefined;
@@ -141,4 +223,8 @@ export function withStartingEstimate(
       return pointDistribution((8000 * request.bytes) / bps);
     },
   };
+}
+
+function gauss(value: number, sigma: number): number {
+  return Math.exp(-0.5 * (value / sigma) ** 2) / sigma;
 }

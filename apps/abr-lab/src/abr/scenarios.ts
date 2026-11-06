@@ -83,6 +83,44 @@ export function qoe(result: SessionResult, player: PlayerConfig): number {
   );
 }
 
+/**
+ * How a customer weighs a cold start. Startup is cheap up to `startupBudgetMs` and expensive after it, unlike `qoe`'s
+ * linear charge, which scored a slow start at the settled rung the same as a fast low one. `lowStartWeight` charges a
+ * first rung below the settled one by that share of the bitrate gap, as if the whole session paid for the visible early
+ * upgrade.
+ */
+export interface StartProfile {
+  name: string;
+  startupBudgetMs: number;
+  lowStartWeight: number;
+}
+
+/** ASSUMED profiles, not measured. */
+export const START_PROFILES: StartProfile[] = [
+  { name: 'balanced', startupBudgetMs: 1000, lowStartWeight: 0 },
+  { name: 'strict (no visible upgrade)', startupBudgetMs: 1000, lowStartWeight: 0.5 },
+];
+
+/** Startup charge per second inside the budget and past it. */
+const STARTUP_WEIGHT_IN_BUDGET = 0.25;
+const STARTUP_WEIGHT_PAST_BUDGET = 2;
+
+export function startQoe(result: SessionResult, player: PlayerConfig, profile: StartProfile): number {
+  const mu = Math.max(...player.ladderBps) / 1e6;
+  const startup = result.startupMs / 1000;
+  const budget = profile.startupBudgetMs / 1000;
+  const startupCost =
+    STARTUP_WEIGHT_IN_BUDGET * Math.min(startup, budget) + STARTUP_WEIGHT_PAST_BUDGET * Math.max(0, startup - budget);
+  const gap = Math.max(0, player.ladderBps[result.settledRung]! - player.ladderBps[result.firstRung]!) / 1e6;
+
+  return (
+    result.meanBitrateBps / 1e6 -
+    (mu * (result.rebufferMs / 1000 + startupCost)) / result.segments -
+    result.switchMagnitudeBps / 1e6 / Math.max(1, result.segments - 1) -
+    profile.lowStartWeight * gap
+  );
+}
+
 export function sum(values: readonly number[]): number {
   return values.reduce((total, v) => total + v, 0);
 }

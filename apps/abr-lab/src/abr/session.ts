@@ -2,7 +2,14 @@ import type { Predictor } from '../predictors/predictor.ts';
 import type { TransferRecord } from '../record.ts';
 import { classifyTransfer } from '../regime.ts';
 import type { CapacityTrace } from '../synthetic/trace.ts';
-import { type Connection, constantTrace, newConnection, type ServerBehavior, simulateTransfer } from './transport.ts';
+import {
+  type Connection,
+  constantTrace,
+  INITIAL_WINDOW_BYTES,
+  newConnection,
+  type ServerBehavior,
+  simulateTransfer,
+} from './transport.ts';
 
 export interface PlayerConfig {
   name: string;
@@ -39,7 +46,28 @@ export interface SessionResult {
   /** Sum of |bitrate change| between consecutive segments, bits/s. */
   switchMagnitudeBps: number;
   segments: number;
+  /** The first displayed rung, and the median rung over 20–60 s of content: where the session settled. */
+  firstRung: number;
+  settledRung: number;
+  /** Startup segment fetches abandoned for a lower rung, and the bytes they wasted. */
+  abandons: number;
+  abandonedBytes: number;
 }
+
+/**
+ * Abandon a startup segment once its projected body time passes `overrun` times what the estimate behind it implied
+ * (the estimate was that wrong), then re-pick below it with the rate seen: the highest rung whose fetch fits a segment
+ * duration. The clock starts at the first byte, so handshakes do not count; checks wait out, and the deadline allows
+ * for, the slow-start round trips a fresh window needs to reach the estimated rate. The projection takes the faster of
+ * the rate so far and the rate over the last check interval, so a transfer still ramping is not judged by its first
+ * round trips. A fixed deadline would not do: on 4 s segments even a perfect estimate needs ~3 s to start at the
+ * settled rung.
+ */
+export interface AbandonPolicy {
+  overrun: number;
+}
+
+const CHECK_MS = 100;
 
 /**
  * The ABR rule, shared by every predictor so only the forecast differs. `throughput` picks the highest rung whose
@@ -61,7 +89,12 @@ const SEGMENT_HOST = 'chunk.test';
  * forecast with perfect knowledge of the present (this request's RTT, the connection's window, the capacity at decision
  * time) and none of the future: the best any estimator built from history could do.
  */
-export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle, rule: AbrRule): SessionResult {
+export function runSession(
+  inputs: SessionInputs,
+  predictor: Predictor | Oracle,
+  rule: AbrRule,
+  options: { abandon?: AbandonPolicy | undefined } = {}
+): SessionResult {
   const { trace, behavior, player, rtts, sizeFactors } = inputs;
   const connections: Record<string, Connection> = { [MANIFEST_HOST]: newConnection(), [SEGMENT_HOST]: newConnection() };
   const segmentCount = Math.ceil(player.contentSeconds / player.segmentSeconds);
@@ -75,6 +108,10 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
   let rebufferMs = 0;
   let rebuffers = 0;
   let earlyRebufferMs = 0;
+  let abandons = 0;
+  let abandonedBytes = 0;
+  /** The forecast, ms, behind the last rung `choose` picked. */
+  let chosenForecastMs = 0;
   const earlySegments = Math.max(1, Math.round(20 / player.segmentSeconds));
 
   const fetch = (host: string, bytes: number, kind: TransferRecord['kind'], renditionId?: string) => {
@@ -118,10 +155,9 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
       buffer -= waitSeconds;
     }
 
-    const rung = choose();
-    const bytes = Math.round(
-      ((player.ladderBps[rung]! * player.segmentSeconds) / 8) * sizeFactors[index % sizeFactors.length]!
-    );
+    const chosen = choose();
+    const rung = !playing && options.abandon ? abandonIfLate(chosen, index, options.abandon.overrun) : chosen;
+    const bytes = segmentBytes(rung, index);
     const timing = fetch(SEGMENT_HOST, bytes, 'segment', String(rung));
     const elapsed = (timing.end - now) / 1000;
 
@@ -148,6 +184,10 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
 
   const bitrates = rungs.map((r) => player.ladderBps[r]!);
   const early = bitrates.slice(0, earlySegments);
+  const settledFrom = Math.min(rungs.length - 1, Math.ceil(20 / player.segmentSeconds));
+  const settled = [...rungs.slice(settledFrom, Math.max(settledFrom + 1, Math.floor(60 / player.segmentSeconds)))].sort(
+    (a, b) => a - b
+  );
 
   return {
     startupMs,
@@ -159,7 +199,56 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
     switches: rungs.filter((r, i) => i > 0 && r !== rungs[i - 1]).length,
     switchMagnitudeBps: bitrates.reduce((sum, b, i) => (i === 0 ? 0 : sum + Math.abs(b - bitrates[i - 1]!)), 0),
     segments: rungs.length,
+    firstRung: rungs[0] ?? 0,
+    settledRung: settled[Math.floor(settled.length / 2)] ?? 0,
+    abandons,
+    abandonedBytes,
   };
+
+  function segmentBytes(rung: number, index: number): number {
+    return Math.round(
+      ((player.ladderBps[rung]! * player.segmentSeconds) / 8) * sizeFactors[index % sizeFactors.length]!
+    );
+  }
+
+  /** Plays out `rung`'s fetch on a copy of the connection, checking progress as a player would; see `AbandonPolicy`. */
+  function abandonIfLate(rung: number, index: number, overrun: number): number {
+    if (rung === 0) return rung;
+
+    const bytes = segmentBytes(rung, index);
+    const rtt = rtts[request % rtts.length]!;
+    const copy = { ...connections[SEGMENT_HOST]! };
+    const timing = simulateTransfer(copy, trace, behavior, now, bytes, rtt);
+    // Bytes per ms the estimate implied, and the round trips a fresh window needs to carry it.
+    const estimated = (player.ladderBps[rung]! * player.segmentSeconds) / 8 / chosenForecastMs;
+    const rampRtts = Math.ceil(Math.log2(Math.max(1, (estimated * rtt) / INITIAL_WINDOW_BYTES)));
+    const deadline = timing.firstByte + overrun * (bytes / estimated) + rampRtts * rtt;
+
+    // Before the window could have reached the estimated rate, a slow transfer and a ramping one look the same.
+    for (let t = timing.firstByte + rampRtts * rtt + CHECK_MS; t < timing.end; t += CHECK_MS) {
+      const received = receivedBy(timing, t);
+      const rate = Math.max(
+        received / (t - timing.firstByte),
+        (received - receivedBy(timing, t - CHECK_MS)) / CHECK_MS
+      );
+      if (rate <= 0 || t + (bytes - received) / rate <= deadline) continue;
+
+      // HTTP/2 resets the stream; the connection stays open with the window it grew.
+      request++;
+      connections[SEGMENT_HOST] = { ...copy, lastActiveMs: t };
+      abandons++;
+      abandonedBytes += received;
+      now = t;
+
+      for (let lower = rung - 1; lower > 0; lower--) {
+        if (rtt + segmentBytes(lower, index) / rate <= player.segmentSeconds * 1000) return lower;
+      }
+
+      return 0;
+    }
+
+    return rung;
+  }
 
   function choose(): number {
     const at = now;
@@ -179,7 +268,10 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
             .quantile(0.5);
     });
 
-    return rule.kind === 'mpc' ? planAhead(forecasts) : fastestFitting(forecasts, rule.safety);
+    const rung = rule.kind === 'mpc' ? planAhead(forecasts) : fastestFitting(forecasts, rule.safety);
+
+    chosenForecastMs = forecasts[rung]!;
+    return rung;
   }
 
   function fastestFitting(forecasts: number[], safety: number): number {
@@ -246,6 +338,21 @@ export function runSession(inputs: SessionInputs, predictor: Predictor | Oracle,
 
     return simulateTransfer(copy, over, behavior, now, bytes, rtt).end - now;
   }
+}
+
+/** Bytes of `timing` arrived by `t`, each delivery round spread evenly since the previous one. */
+function receivedBy(timing: { firstByte: number; chunks: ReadonlyArray<[number, number]> }, t: number): number {
+  let previous = timing.firstByte;
+  let total = 0;
+
+  for (const [arrival, bytes] of timing.chunks) {
+    if (t >= arrival) total += bytes;
+    else if (t > previous) total += (bytes * (t - previous)) / (arrival - previous);
+
+    previous = arrival;
+  }
+
+  return total;
 }
 
 function mean(values: readonly number[]): number {
