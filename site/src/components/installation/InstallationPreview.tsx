@@ -34,7 +34,7 @@ import {
   VideoPlayer,
   VideoSkin,
 } from '@videojs/react/video';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import ArrowRight from '@/assets/icons/arrow-right.svg?react';
 import {
@@ -44,10 +44,13 @@ import {
   VJS10_DEMO_LIVE,
   VJS10_DEMO_VIDEO,
 } from '@/consts';
+import { previewAccentColor, previewControlsBeforeStart } from '@/stores/installation';
 import { currentFramework } from '@/stores/preferences';
 import useIsHydrated from '@/utils/useIsHydrated';
 
+import PreviewOptions from './PreviewOptions';
 import { useSelection } from './useSelection';
+import { useSkinProperties } from './useSkinProperties';
 
 import '@videojs/react/video/skin.css';
 import '@videojs/react/video/neutral-skin.css';
@@ -241,6 +244,9 @@ function InstallationPreview() {
   const source = resolveSource($useCase, $renderer, $sourceUrl);
   const isBackground = $useCase === 'background-video';
   const effectiveSkin: Skin = isBackground ? 'video' : $skin;
+  const controlsBeforeStart = useStore(previewControlsBeforeStart);
+  const accentColor = useStore(previewAccentColor);
+  const { controlsApplies, accentApplies, properties } = useSkinProperties();
 
   let player: ReactNode;
 
@@ -266,13 +272,21 @@ function InstallationPreview() {
 
   return (
     <figure className="flex flex-col gap-3">
-      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. It keeps
-          the skin's controls visible before playback starts, so the preview shows them. */}
-      <div
-        className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border p-5 sm:p-8"
-        style={{ '--media-controls-before-start': 'visible' } as React.CSSProperties}
-      >
-        {player}
+      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. */}
+      <div className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border">
+        <div
+          className="p-5 sm:p-8"
+          // SAFETY: React's CSSProperties omits CSS custom properties; every key here is a `--media-*` property.
+          style={properties as CSSProperties}
+        >
+          {player}
+        </div>
+        <PreviewOptions
+          controlsBeforeStart={controlsApplies ? controlsBeforeStart : null}
+          onControlsBeforeStartChange={(value) => previewControlsBeforeStart.set(value)}
+          accentColor={accentApplies ? accentColor : null}
+          onAccentColorChange={(value) => previewAccentColor.set(value)}
+        />
       </div>
       <figcaption className="text-muted text-p3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <span>
