@@ -114,6 +114,10 @@ export const utilities = {
     description: 'Element entering or leaving through starting and ending styles.',
   },
   'media-anchored': { kind: 'variant', description: 'Browsers with CSS anchor positioning.' },
+  'media-before-start-fade': {
+    kind: 'variant',
+    description: 'Browsers with style queries, unless `--media-controls-before-start: visible` keeps the controls.',
+  },
   '--container-media-280': { kind: 'theme', description: 'Player 280px layout breakpoint for `media-280` variants.' },
   '--container-media-xs': { kind: 'theme', description: 'Player xs layout breakpoint for `media-xs` variants.' },
   '--container-media-360': { kind: 'theme', description: 'Player 360px layout breakpoint for `media-360` variants.' },

@@ -273,7 +273,7 @@ async function preparePanel({ root, section }: SkinPanel, width: number, expectP
   await expect(root).toBeVisible();
 
   if (expectPlay) {
-    await expect(root.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
+    await expect(root.getByRole('button', { name: 'Play', exact: true }).last()).toBeVisible();
     await seekToLiveEdge(root.getByRole('button', { name: /live/i }));
     await captionsButton(root);
   }
@@ -387,7 +387,7 @@ async function layoutContract(root: Locator) {
 
 async function interactionContract(root: Locator) {
   const page = root.page();
-  const play = root.getByRole('button', { name: 'Play', exact: true });
+  const play = root.getByRole('button', { name: 'Play', exact: true }).last();
 
   await play.hover();
 

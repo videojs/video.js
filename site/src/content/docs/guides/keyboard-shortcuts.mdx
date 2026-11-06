@@ -128,6 +128,24 @@ For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-
 For a packaged skin, <DocsLink slug="guides/customize-skins" anchor="style-skin-source">add the skin source to your project</DocsLink> and edit its `<media-hotkey>` declarations. Adding another binding alongside the packaged skin does not replace its bindings. For a custom UI, edit your own `<media-hotkey>` set directly.
 </FrameworkCase>
 
+### Tap to play on touch
+
+The packaged skins toggle controls on a touch tap, and the center play button starts playback. To play and pause with a tap anywhere on the video instead, bind `togglePaused` in place of `toggleControls` for touch:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<Gesture type="tap" action="togglePaused" pointer="touch" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<media-gesture type="tap" action="togglePaused" pointer="touch"></media-gesture>
+```
+</FrameworkCase>
+
+A tap then pauses playback as well, and taps no longer show or hide the controls.
+
 ### Seek step size
 
 Set the `seekStep` distance with `value`. Match it to your content: 5 seconds for short clips, 15 or 30 seconds for long-form video.

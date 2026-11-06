@@ -70,4 +70,31 @@ describe('ControlsContent', () => {
     expect(content.hasAttribute('data-visible')).toBe(true);
     expect(content.hasAttribute('data-user-active')).toBe(true);
   });
+
+  it('marks the controls surface once playback starts', () => {
+    const controls = { controlsVisible: true, userActive: true };
+    const playback = { paused: true, ended: false, waiting: false, autoplaying: false };
+
+    const before = createPlayerWrapper({ ...controls, ...playback, started: false });
+    const { getByTestId, unmount } = render(
+      <ControlsRoot>
+        <ControlsContent data-testid="controls" />
+      </ControlsRoot>,
+      { wrapper: before.Wrapper }
+    );
+
+    expect(getByTestId('controls').hasAttribute('data-started')).toBe(false);
+    unmount();
+
+    const after = createPlayerWrapper({ ...controls, ...playback, started: true });
+
+    render(
+      <ControlsRoot>
+        <ControlsContent data-testid="controls" />
+      </ControlsRoot>,
+      { wrapper: after.Wrapper }
+    );
+
+    expect(getByTestId('controls').hasAttribute('data-started')).toBe(true);
+  });
 });

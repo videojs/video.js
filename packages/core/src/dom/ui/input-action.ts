@@ -2,6 +2,7 @@ import { isCaptionOrSubtitleTrack } from '@videojs/utils/dom';
 
 import { IndicatorVisibilityCoordinator } from '../../core/ui/indicator/lifecycle';
 import type { InputActionEvent, MediaSnapshot } from '../../core/ui/input-action';
+import { hasPlaybackStarted } from '../../core/ui/playback';
 import { getGestureCoordinator } from '../gesture/coordinator';
 import type { GestureActivateEvent } from '../gesture/gesture';
 import type { HotkeyActivateEvent } from '../hotkey/coordinator';
@@ -48,6 +49,7 @@ export function getMediaSnapshot(store: MediaSnapshotStore | undefined): MediaSn
   return {
     // A pending autoplay counts as playing, as it does for the play button and the toggle.
     paused: playback && playback.paused && !playback.autoplaying,
+    started: playback && hasPlaybackStarted(playback),
     volume: selectVolume(state)?.volume,
     muted: selectVolume(state)?.muted,
     playbackRate: selectPlaybackRate(state)?.playbackRate,

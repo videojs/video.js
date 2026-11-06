@@ -18,6 +18,8 @@ export default styles({
         'group-not-data-ended/play:group-not-data-started/play:opacity-100',
         'group-not-data-ended/play:group-not-data-started/play:scale-100',
       ],
+      // Optically centres the triangle, as the playback status indicator does.
+      variants: { default: 'translate-x-px' },
     },
     pauseIcon: {
       utilities: [

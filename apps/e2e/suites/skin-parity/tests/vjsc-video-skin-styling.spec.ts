@@ -1007,7 +1007,7 @@ async function setStableScreenshotHeight(root: Locator, width: number) {
 }
 
 async function focusPlayButton(root: Locator): Promise<Locator> {
-  const button = root.getByRole('button', { name: 'Play', exact: true });
+  const button = root.getByRole('button', { name: 'Play', exact: true }).last();
 
   await keyboardFocus(button);
   return button;
@@ -1484,7 +1484,8 @@ async function keyboardFeedbackContract(panel: SkinPanel) {
   return {
     volume: await triggerIndicator(root, 'ArrowUp', '[data-level]:not([role])'),
     captions: await triggerIndicator(root, 'c', '[data-status="captions-on"], [data-status="captions-off"]'),
-    seek: await triggerIndicator(root, 'ArrowRight', '[data-direction="forward"]'),
+    // The centre seek buttons share `data-direction`; the indicator has no role.
+    seek: await triggerIndicator(root, 'ArrowRight', '[data-direction="forward"]:not([role])'),
     playback: await triggerIndicator(root, 'k', '[data-status="play"], [data-status="pause"]'),
   };
 }
@@ -1800,11 +1801,12 @@ async function sharedMotionContract(root: Locator) {
       };
     });
   const controls = root.locator(CONTROLS_SELECTOR).first();
-  const button = root.getByRole('button', { name: 'Play', exact: true });
+  const button = root.getByRole('button', { name: 'Play', exact: true }).last();
   const poster = root.locator(POSTER_SELECTOR).first();
   const settingsIcon = root.getByRole('button', { name: 'Settings', exact: true }).locator('svg, media-icon').first();
   const playIconCandidates = await root
     .getByRole('button', { name: 'Play', exact: true })
+    .last()
     .locator('svg, media-icon')
     .all();
   const playIcons: Array<{
@@ -1971,7 +1973,7 @@ async function accentContrastContract(root: Locator, accent: string) {
   await root.evaluate((element, value) => {
     element.style.setProperty('--media-accent-color', value);
   }, accent);
-  const target = root.getByRole('button', { name: 'Play', exact: true });
+  const target = root.getByRole('button', { name: 'Play', exact: true }).last();
 
   await target.hover();
   await root.page().waitForTimeout(200);
@@ -2134,7 +2136,7 @@ async function reducedMotionContract(root: Locator, menu: Locator, tooltipDurati
       };
     });
   const controls = root.locator(CONTROLS_SELECTOR).first();
-  const play = root.getByRole('button', { name: 'Play', exact: true });
+  const play = root.getByRole('button', { name: 'Play', exact: true }).last();
   const playIcons = await Promise.all(
     (await play.locator('svg, media-icon').all()).map((icon) =>
       icon.evaluate((element) => {
@@ -2489,7 +2491,8 @@ async function openVolumePopover({ frame, root }: SkinPanel): Promise<Locator> {
 }
 
 async function openTooltip(root: Locator, name: string): Promise<Locator> {
-  await root.getByRole('button', { name, exact: true }).hover();
+  // The last match is the control-bar button; the default skin's centre play button has no tooltip.
+  await root.getByRole('button', { name, exact: true }).last().hover();
   const tooltip = root.locator('[popover]:visible').filter({ hasText: name }).first();
 
   await expect(tooltip).toBeVisible();
