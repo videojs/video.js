@@ -36,6 +36,7 @@ export default {
         'dailymotion-video',
         'mixcloud-audio',
         'playerjs-video',
+        'relay-video',
         'soundcloud-audio',
         'spotify-audio',
         'tiktok-video',
