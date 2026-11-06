@@ -1,7 +1,7 @@
 // Speaks the SoundCloud Widget protocol directly rather than loading `api.js`, shaped like the other iframe adapters
 // (mirrors `playerjs-video`).
 
-import { EMPTY_TEXT_TRACKS, type MediaContentData, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { type MediaContentData, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -392,9 +392,9 @@ export class SoundCloudAdapter extends MediaPlayedRangesMixin(EventTarget) imple
     return this.#contentData;
   }
 
-  /** Always empty: SoundCloud has no captions or other text tracks. */
+  /** Unsupported: SoundCloud has no captions or other text tracks. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   // Playback rate, picture-in-picture, and fullscreen are left out on purpose: the widget offers none of them, and a

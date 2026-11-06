@@ -2,7 +2,7 @@
 // Source: https://github.com/muxinc/media-elements
 // License: MIT
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -402,7 +402,7 @@ export class TwitchAdapter extends MediaPlayedRangesMixin(EventTarget) implement
 
   get textTracks() {
     // Captions can only be toggled; the embed never says which tracks exist.
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   get isFullscreen() {

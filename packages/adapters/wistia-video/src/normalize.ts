@@ -1,4 +1,4 @@
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, type MediaContentData, NO_TIME_RANGES_YET } from '@videojs/media';
+import { type MediaContentData, NO_TIME_RANGES_YET } from '@videojs/media';
 import { createTimeRange } from '@videojs/media/dom';
 
 import { parseWistiaMediaId, parseWistiaStartTime, type WistiaSource } from './source';
@@ -259,17 +259,17 @@ const WISTIA_MEDIA_DESCRIPTORS: PropertyDescriptorMap = {
   // Nothing behind these, but whether they exist still matters: the store gates each feature on a predicate
   // that asks only whether the members are defined, so a missing one skips the feature outright rather than
   // degrading it. An empty answer is the honest one and the features reading it cope. `textTracks` is the
-  // opposite case — the shared `EMPTY_TEXT_TRACKS` is the sentinel that tells the store to skip them.
+  // opposite case — `undefined` tells the store to skip them.
   played: accessor(() => NO_TIME_RANGES_YET),
-  textTracks: accessor(() => EMPTY_TEXT_TRACKS),
+  textTracks: accessor(() => undefined),
   videoWidth: accessor(() => 0),
   videoHeight: accessor(() => 0),
   error: accessor(() => null),
   crossOrigin: inert(null),
 
   // Remote playback and picture-in-picture belong to the `<video>` in Wistia's shadow root, which is not ours
-  // to reach. Reported as unavailable rather than left undefined.
-  remote: accessor(() => EMPTY_REMOTE),
+  // to reach. Reported as unavailable with `undefined`.
+  remote: accessor(() => undefined),
   isPictureInPicture: accessor(() => false),
   disableRemotePlayback: inert(true),
   disablePictureInPicture: inert(true),

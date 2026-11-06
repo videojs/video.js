@@ -2,7 +2,7 @@
 // TypeScript and reshaped as a media adapter (mirrors `dom/youtube`).
 // Source: https://github.com/muxinc/media-elements — License: MIT
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -353,9 +353,9 @@ export class SpotifyAdapter extends MediaPlayedRangesMixin(EventTarget) implemen
     return this.#error;
   }
 
-  /** Always empty: the embed exposes no captions or other text tracks. */
+  /** Unsupported: the embed exposes no captions or other text tracks. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   // Build the embed and start controller creation once a source resolves, returning whether creation started. The
