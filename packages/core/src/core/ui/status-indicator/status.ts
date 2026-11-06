@@ -40,7 +40,7 @@ export function deriveStatus(
 ): StatusDetails | null {
   switch (event.action) {
     case 'togglePaused': {
-      // Until playback starts, the skins' centre play button shows the playback state, so starting needs no feedback.
+      // Starting playback is its own feedback, so only later toggles show the indicator.
       if (snapshot.started === false) return null;
 
       const paused = snapshot.paused !== undefined ? !snapshot.paused : true;

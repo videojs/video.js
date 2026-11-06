@@ -1,5 +1,5 @@
 import { ControlsCore, ControlsDataAttrs, type ControlsVisibility, POPUP_HOST_SELECTOR } from '@videojs/core';
-import { applyStateDataAttrs, logMissingFeature, selectControls, selectPlaybackStarted } from '@videojs/core/dom';
+import { applyStateDataAttrs, logMissingFeature, selectControls, selectPlayback } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextProvider } from '@videojs/element/context';
 import { isFunction } from '@videojs/utils/predicate';
@@ -24,7 +24,7 @@ export class ControlsElement extends UIElement {
 
   readonly #core = new ControlsCore();
   readonly #mediaState = new PlayerController(this, playerContext, selectControls);
-  readonly #playback = new PlayerController(this, playerContext, selectPlaybackStarted);
+  readonly #playback = new PlayerController(this, playerContext, selectPlayback);
   readonly #provider = new ContextProvider(this, { context: controlsContext });
   #visible = true;
 

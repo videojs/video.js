@@ -2,6 +2,8 @@ import type { MediaControlsState, MediaPlaybackState } from '@videojs/media';
 import { defaults } from '@videojs/utils/object';
 import type { NonNullableObject } from '@videojs/utils/types';
 
+import { hasPlaybackStarted } from '../playback';
+
 export type ControlsVisibility = 'auto' | 'always';
 
 export interface ControlsProps {
@@ -55,8 +57,7 @@ export class ControlsCore {
     const media = this.#media;
     const playback = this.#playback;
 
-    // Matches the play button, which treats a pending autoplay as playback that has begun.
-    const started = !!playback && (playback.started || playback.autoplaying);
+    const started = !!playback && hasPlaybackStarted(playback);
 
     if (!media) return this.#props.visibility === 'always' ? { visible: true, userActive: true, started } : null;
 
