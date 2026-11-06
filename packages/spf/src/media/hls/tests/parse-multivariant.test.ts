@@ -84,6 +84,20 @@ video-1080p.m3u8`;
     expect(track1080p.audioGroupIds).toBeUndefined();
   });
 
+  it('keeps the codecs of a rendition whose video codec is not AVC1 or HEVC', () => {
+    const text = `#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-STREAM-INF:BANDWIDTH=1400000,RESOLUTION=1280x720,CODECS="avc3.4d401f,mp4a.40.2"
+avc3-720p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=900000,RESOLUTION=1280x720,CODECS="av01.0.05M.08"
+av1-720p.m3u8`;
+
+    const result = parseMultivariantPlaylist(text, { url: baseUrl });
+    const videoTracks = result.selectionSets.find((s) => s.type === 'video')?.switchingSets[0]?.tracks;
+
+    expect(videoTracks?.map((track) => track.codecs)).toEqual([['avc3.4d401f', 'mp4a.40.2'], ['av01.0.05M.08']]);
+  });
+
   it('keeps an audioless video rendition video-only (no audio codec in CODECS, no AUDIO group)', () => {
     // The inverse of the muxed case: no audio codec listed and no AUDIO group
     // means the rendition is genuinely video-only — the muxed-codec retention
