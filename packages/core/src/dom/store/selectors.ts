@@ -1,5 +1,6 @@
 import { createSelector } from '@videojs/store';
 
+import type { ControlsPlaybackState } from '../../core/ui/controls/core';
 import { audioTrackFeature } from './features/audio-track';
 import { bufferFeature } from './features/buffer';
 import { controlsFeature } from './features/controls';
@@ -39,6 +40,19 @@ export const selectMetadata = createSelector(metadataFeature);
 export const selectPiP = createSelector(pipFeature);
 /** Select the playback state (paused, ended, play, pause). */
 export const selectPlayback = createSelector(playbackFeature);
+/**
+ * Select only whether playback has started or is autoplaying, so subscribers skip `paused` and `waiting` changes.
+ *
+ * @internal
+ */
+export const selectPlaybackStarted = Object.assign(
+  (state: object): ControlsPlaybackState | undefined => {
+    const playback = selectPlayback(state);
+
+    return playback && { started: playback.started, autoplaying: playback.autoplaying };
+  },
+  { displayName: selectPlayback.displayName }
+);
 /** Select the playback rate state (playbackRate, playbackRates, setPlaybackRate). */
 export const selectPlaybackRate = createSelector(playbackRateFeature);
 /** Select the quality state (videoRenditionList, activeVideoRendition, selectVideoRendition). */
