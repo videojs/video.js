@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.3.0...@videojs/installation@10.4.0) (2026-11-06)
+
+
+### Miscellaneous Chores
+
+* **@videojs/installation:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.4.0
+  * devDependencies
+    * @videojs/media bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.2.0...@videojs/installation@10.3.0) (2026-11-03)
 
 
