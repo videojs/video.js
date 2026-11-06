@@ -57,7 +57,7 @@ export interface NativeTextTrackHandle {
  * @internal
  */
 export function createTextTrack(
-  media: MediaTextTrackCapability,
+  media: Omit<MediaTextTrackCapability, 'textTracks'>,
   options: CreateTextTrackOptions
 ): NativeTextTrackHandle | null {
   const { id, kind, label, language, mode = 'hidden' } = options;

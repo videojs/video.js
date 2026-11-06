@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { describe, expect, it } from 'vite-plus/test';
 
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, NO_TIME_RANGES_YET } from '../constants';
+import { NO_TIME_RANGES_YET } from '../constants';
 import {
   getTimeRangeEnd,
   hasTimeRange,
@@ -10,12 +10,6 @@ import {
   isMediaRemotePlaybackCapable,
   isMediaTextTrackCapable,
 } from '../predicate';
-
-// A page can carry a second copy of `@videojs/media` (CDN plus npm, duplicate installs). Load the constants again as a
-// separate module instance to stand in for that copy's placeholders.
-vi.resetModules();
-
-const otherCopy = await import('../constants');
 
 describe('getTimeRangeEnd', () => {
   it('prefers a finite duration', () => {
@@ -77,22 +71,16 @@ describe('isMediaContentDataCapable', () => {
 });
 
 describe('isMediaBufferCapable', () => {
-  it('rejects empty time range stubs', () => {
-    expect(isMediaBufferCapable({ buffered: EMPTY_TIME_RANGES, seekable: EMPTY_TIME_RANGES })).toBe(false);
+  it('rejects media that opts out with undefined ranges', () => {
+    expect(isMediaBufferCapable({ buffered: undefined, seekable: undefined })).toBe(false);
+    expect(isMediaBufferCapable({ buffered: NO_TIME_RANGES_YET, seekable: undefined })).toBe(false);
   });
 
   it('accepts time ranges that are empty for now', () => {
     expect(isMediaBufferCapable({ buffered: NO_TIME_RANGES_YET, seekable: NO_TIME_RANGES_YET })).toBe(true);
   });
 
-  it('rejects empty time range stubs from another copy of the package', () => {
-    expect(otherCopy.EMPTY_TIME_RANGES).not.toBe(EMPTY_TIME_RANGES);
-    expect(isMediaBufferCapable({ buffered: otherCopy.EMPTY_TIME_RANGES, seekable: otherCopy.EMPTY_TIME_RANGES })).toBe(
-      false
-    );
-  });
-
-  it('accepts defined non-stub time ranges', () => {
+  it('accepts defined time ranges', () => {
     const range = { length: 1, start: () => 0, end: () => 10 };
 
     expect(isMediaBufferCapable({ buffered: range, seekable: range })).toBe(true);
@@ -100,31 +88,34 @@ describe('isMediaBufferCapable', () => {
 });
 
 describe('isMediaTextTrackCapable', () => {
-  it('rejects the empty text tracks stub', () => {
-    expect(isMediaTextTrackCapable({ textTracks: EMPTY_TEXT_TRACKS })).toBe(false);
+  it('rejects media that opts out with undefined text tracks', () => {
+    expect(isMediaTextTrackCapable({ textTracks: undefined })).toBe(false);
   });
 
-  it('rejects the empty text tracks stub from another copy of the package', () => {
-    expect(otherCopy.EMPTY_TEXT_TRACKS).not.toBe(EMPTY_TEXT_TRACKS);
-    expect(isMediaTextTrackCapable({ textTracks: otherCopy.EMPTY_TEXT_TRACKS })).toBe(false);
-  });
-
-  it('accepts defined non-stub text tracks', () => {
+  it('accepts defined text tracks', () => {
     expect(isMediaTextTrackCapable({ textTracks: Object.assign(new EventTarget(), { length: 0 }) })).toBe(true);
   });
 });
 
 describe('isMediaRemotePlaybackCapable', () => {
-  it('rejects the empty remote playback stub', () => {
-    expect(isMediaRemotePlaybackCapable({ remote: EMPTY_REMOTE })).toBe(false);
+  it('rejects media that opts out with undefined remote playback', () => {
+    expect(isMediaRemotePlaybackCapable({ remote: undefined })).toBe(false);
   });
 
-  it('rejects the empty remote playback stub from another copy of the package', () => {
-    expect(otherCopy.EMPTY_REMOTE).not.toBe(EMPTY_REMOTE);
-    expect(isMediaRemotePlaybackCapable({ remote: otherCopy.EMPTY_REMOTE })).toBe(false);
-  });
+  it('rejects a getter that opts out on a subclass', () => {
+    class Base {
+      get remote(): EventTarget | undefined {
+        return new EventTarget();
+      }
+    }
 
-  it('accepts defined non-stub remote playback', () => {
-    expect(isMediaRemotePlaybackCapable({ remote: new EventTarget() })).toBe(true);
+    class OptOut extends Base {
+      override get remote() {
+        return undefined;
+      }
+    }
+
+    expect(isMediaRemotePlaybackCapable(new Base())).toBe(true);
+    expect(isMediaRemotePlaybackCapable(new OptOut())).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 // Drives the Dailymotion Web SDK (https://developers.dailymotion.com/reference/web-sdk-player-methods). Mirrors
 // `youtube-video`, which also loads its player API from a script.
 
-import { EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES, MediaError, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -426,22 +426,22 @@ export class DailymotionAdapter extends MediaPlayedRangesMixin(EventTarget) impl
   get buffered() {
     const end = Math.max(this.#bufferedEnd, this.#currentTime);
 
-    return end > 0 ? createTimeRange(0, end) : EMPTY_TIME_RANGES;
+    return end > 0 ? createTimeRange(0, end) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
     return this.#duration > 0 && Number.isFinite(this.#duration)
       ? createTimeRange(0, this.#duration)
-      : EMPTY_TIME_RANGES;
+      : NO_TIME_RANGES_YET;
   }
 
   get error() {
     return this.#error;
   }
 
-  /** Always empty: the player draws its own subtitles and reports no cues to render elsewhere. */
+  /** Unsupported: the player draws its own subtitles and reports no cues to render elsewhere. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   get isFullscreen() {

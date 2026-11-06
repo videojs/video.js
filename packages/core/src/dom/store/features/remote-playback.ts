@@ -29,6 +29,10 @@ export const remotePlaybackFeature = definePlayerFeature({
     const { media } = target;
     if (!isMediaRemotePlaybackCapable(media)) return;
 
+    // Leave remote playback unsupported for media that disable it, rather than relying on the platform to reject
+    // `watchAvailability()`: a custom media may not.
+    if (media.disableRemotePlayback === true) return;
+
     // Safari's W3C `media.remote` events don't fire reliably for AirPlay
     // session changes. When WebKit's AirPlay APIs are available, drive both
     // state slices off the WebKit events and skip the W3C listeners entirely

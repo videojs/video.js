@@ -2,7 +2,7 @@
 // loading the reference client, shaped like the other embed adapters (mirrors `tiktok-video`). Behavior around
 // reloads, remounts, and server-rendered frames follows the `gumlet-video-element` proposal in muxinc/media-elements.
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -439,9 +439,9 @@ export class PlayerJsAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
     return this.#error;
   }
 
-  /** Always empty: player.js has no text track surface. */
+  /** Unsupported: player.js has no text track surface. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   get isFullscreen() {
