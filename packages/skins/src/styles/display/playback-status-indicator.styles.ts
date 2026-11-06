@@ -22,8 +22,7 @@ export default styles({
         'data-ending-style:duration-media-fast data-ending-style:ease-in',
       ],
       variants: {
-        // Where the centre play button stays visible after playback starts, it shows the playback state instead: on
-        // touch in the default skin, and below 5xs in the neutral skin.
+        // Hidden where the centre play button stays after start: on touch in default, below 5xs in neutral.
         default: 'rounded-media-pill bg-media-backdrop/35 backdrop-filter-media-indicator pointer-coarse:hidden!',
         neutral: 'filter-media-feedback media-max-5xs:hidden!',
       },

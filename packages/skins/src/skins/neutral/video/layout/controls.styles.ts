@@ -20,16 +20,14 @@ export default styles({
     },
     time: {
       utilities: [
-        // Important because the CSS build emits this before the shared time group's `display`.
+        // Important to beat the shared time group's `display`.
         'ml-3 media-max-2xs:ml-1.5 media-max-5xs:hidden!',
         // The open volume slider covers the whole time readout, so it fades out rather than being masked at one edge.
         'transition-opacity duration-media-instant ease-out',
         'group-has-[[data-volume-level][aria-expanded=true]]/controls:opacity-0',
       ],
     },
-    // Below 5xs the control bar would hold only play, so the centre play button takes over and the bar goes. The centre
-    // button reads properties because a direct override would have to out-rank its own important rules. The hiding rules
-    // are important so they hold whichever order the CSS build emits the shared button and backdrop rules in.
+    // Below 5xs the centre play button replaces the bar; it reads properties because its own rules are important.
     compactCenter: {
       utilities: [
         'media-max-5xs:[--media-center-play-started-opacity:1]',

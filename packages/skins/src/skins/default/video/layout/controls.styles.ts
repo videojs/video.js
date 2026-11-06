@@ -20,8 +20,7 @@ export default styles({
         'media-max-4xs:flex-none',
       ],
     },
-    // Without the slider, the bar wraps play and the current time instead of spanning the player. Important because the
-    // CSS build emits this rule before the shared `primary` rule's `inset-inline`.
+    // Without the slider, the bar shrinks to its content; important to beat the shared `inset-inline`.
     compactPrimary: {
       utilities: 'media-max-4xs:right-auto!',
     },
@@ -32,8 +31,7 @@ export default styles({
     timeSlider: {
       utilities: 'min-w-0! media-max-4xs:hidden',
     },
-    // Between 4xs and 2xs the slider needs the room, so the current time steps aside; below 4xs there is no slider and
-    // the time returns. Important because the CSS build emits the shared time rules after this one.
+    // From 4xs to 2xs the slider takes the time's room; important to beat the shared time rules.
     currentTimeValue: {
       utilities: 'media-4xs:media-max-2xs:hidden!',
     },

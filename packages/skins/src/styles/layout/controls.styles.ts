@@ -148,8 +148,7 @@ export default styles({
           'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
         ],
         // Matches the compat skin's centre play button: a translucent black circle, set apart from the bare-icon playback
-        // feedback. The neutral skin keeps its classic control bar once playback starts, unless a layout sets the
-        // centre-play-started properties to keep this button as its only play control.
+        // feedback. The neutral skin keeps its classic control bar once playback starts.
         neutral: [
           'size-14.5! media-max-360:size-10! rounded-[50%]! [corner-shape:round]!',
           'bg-media-backdrop/40! hover:bg-media-backdrop/60! focus-visible:bg-media-backdrop/60!',
