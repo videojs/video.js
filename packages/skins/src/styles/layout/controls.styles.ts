@@ -137,10 +137,7 @@ export default styles({
     centerPlay: {
       utilities: [],
       variants: {
-        // The button to press takes the primary fill, unlike the translucent playback feedback in the same place. A mouse
-        // can click the media to toggle playback, so fine pointers keep the button only as a start prompt. It turns
-        // invisible rather than leaving layout, so a clicked button keeps focus in the player and its hotkeys, and shows
-        // again for keyboard focus.
+        // After start, fine pointers click the media instead; the button turns invisible rather than leaving, keeping focus.
         default: [
           ...centerPlay,
           'size-auto! p-4! media-max-360:p-3!',
@@ -170,9 +167,7 @@ export default styles({
     },
     centerSeek: {
       utilities: [],
-      // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance. They keep the
-      // translucent look of the playback feedback, which leaves the primary fill to the play button, and wait for
-      // playback to start so the play button stands alone before then.
+      // A touch affordance, hidden for fine pointers, on small players and until playback starts.
       variants: {
         default: [
           'media-max-280:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
