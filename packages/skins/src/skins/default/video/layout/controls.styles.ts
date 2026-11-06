@@ -27,12 +27,9 @@ export default styles({
     topControls: {
       utilities: 'media-max-4xs:hidden',
     },
+    // The slider shrinks with the player instead of holding the shared minimum width; audio keeps that minimum.
     timeSlider: {
-      utilities: 'media-max-4xs:hidden',
-    },
-    timeValue: {
-      className: 'video-time-value',
-      utilities: [],
+      utilities: 'min-w-0! media-max-4xs:hidden',
     },
     // Small players keep only the current time, so the slider is not starved.
     remainingTimeValue: {

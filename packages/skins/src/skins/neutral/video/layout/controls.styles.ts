@@ -25,8 +25,9 @@ export default styles({
         'group-has-[[data-volume-level][aria-expanded=true]]/controls:mask-media-volume-open',
       ],
     },
-    // Below 5xs the control bar would hold only play, so the centre play button takes over and the bar goes. Important
-    // because the CSS build emits these before the shared button and backdrop rules.
+    // Below 5xs the control bar would hold only play, so the centre play button takes over and the bar goes. The centre
+    // button reads properties because a direct override would have to out-rank its own important rules. The hiding rules
+    // are important so they hold whichever order the CSS build emits the shared button and backdrop rules in.
     compactCenter: {
       utilities: [
         'media-max-5xs:[--media-center-play-started-opacity:1]',
