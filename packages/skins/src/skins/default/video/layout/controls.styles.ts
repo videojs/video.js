@@ -4,8 +4,9 @@ export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
   rules: {
+    // Mute stays at every size: small players are often muted autoplay embeds, and hardware buttons don't unmute on iOS.
     volumeButton: {
-      utilities: 'ms-px media-max-2xs:hidden',
+      utilities: 'ms-px',
     },
     settingsButton: {
       utilities: 'media-lg:ms-px media-max-3xs:hidden',
@@ -30,6 +31,11 @@ export default styles({
     // The slider shrinks with the player instead of holding the shared minimum width; audio keeps that minimum.
     timeSlider: {
       utilities: 'min-w-0! media-max-4xs:hidden',
+    },
+    // Between 4xs and 2xs the slider needs the room, so the current time steps aside; below 4xs there is no slider and
+    // the time returns. Important because the CSS build emits the shared time rules after this one.
+    currentTimeValue: {
+      utilities: 'media-4xs:media-max-2xs:hidden!',
     },
     // Small players keep only the current time, so the slider is not starved.
     remainingTimeValue: {

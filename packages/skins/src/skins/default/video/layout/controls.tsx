@@ -43,7 +43,7 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
             <VolumePopover className={styles.volumeButton} />
 
             <$.Controls.Group className={styles.timeSliderGroup}>
-              <$.Time.Value className={timeStyles.value} type="current" />
+              <$.Time.Value className={[timeStyles.value, styles.currentTimeValue]} type="current" />
               <TimeSlider className={styles.timeSlider} renderThumbnail={renderThumbnail} />
               <$.Time.Value className={[timeStyles.toggle, styles.remainingTimeValue]} type="remaining" toggle />
             </$.Controls.Group>

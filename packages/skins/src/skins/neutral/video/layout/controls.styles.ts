@@ -42,8 +42,9 @@ export default styles({
     playButton: {
       utilities: 'media-max-5xs:hidden!',
     },
+    // Mute shows wherever the bar does: small players are often muted autoplay embeds.
     volumeButton: {
-      utilities: 'media-max-2xs:hidden',
+      utilities: 'media-max-5xs:hidden',
     },
     settingsButton: {
       utilities: 'media-max-3xs:hidden',
@@ -52,13 +53,13 @@ export default styles({
       utilities: 'media-max-2xs:hidden',
     },
     castButton: {
-      utilities: 'media-max-3xs:hidden',
+      utilities: 'media-max-2xs:hidden',
     },
     airplayButton: {
       utilities: 'media-max-xs:hidden',
     },
     fullscreenButton: {
-      utilities: 'media-max-5xs:hidden',
+      utilities: 'media-max-4xs:hidden',
     },
     trailing: {
       utilities: 'flex items-center rtl:flex-row-reverse gap-px',
