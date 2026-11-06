@@ -171,10 +171,11 @@ export default styles({
     centerSeek: {
       utilities: [],
       // Fine pointers seek with the keyboard and time slider; the centre seek buttons are a touch affordance. They keep the
-      // translucent look of the playback feedback, which leaves the primary fill to the play button.
+      // translucent look of the playback feedback, which leaves the primary fill to the play button, and wait for
+      // playback to start so the play button stands alone before then.
       variants: {
         default: [
-          'media-max-280:hidden! pointer-fine:hidden!',
+          'media-max-280:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
           'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
           'media-high-contrast:bg-media-background!',
         ],
