@@ -1,5 +1,4 @@
 import {
-  EMPTY_TEXT_TRACKS,
   type ErrorLike,
   type MediaContentData,
   MediaError,
@@ -470,7 +469,7 @@ export class VimeoAdapter extends MediaPlayedRangesMixin(EventTarget) implements
 
   get textTracks() {
     this.#textTracksHost ??= globalThis.document?.createElement('video') ?? null;
-    return (this.#textTracksHost?.textTracks as TextTrackListLike) ?? EMPTY_TEXT_TRACKS;
+    return this.#textTracksHost?.textTracks as TextTrackListLike | undefined;
   }
 
   get videoWidth() {

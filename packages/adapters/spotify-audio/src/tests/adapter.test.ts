@@ -109,7 +109,7 @@ describe('SpotifyAdapter', () => {
     expect(media.duration).toBeNaN();
     expect(media.src).toBe(SpotifyAdapter.defaultProps.src);
     expect(media.buffered.length).toBe(0);
-    expect(media.textTracks.length).toBe(0);
+    expect(media.textTracks).toBeUndefined();
     expect(media.played.length).toBeGreaterThanOrEqual(1);
   });
 

@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { EMPTY_TEXT_TRACKS } from '../../../core/constants';
-import type { MediaTextTrackCapability, TextTrackCueLike, TextTrackLike } from '../../../core/types';
+import type { MediaTextTrackCapability, TextTrackCueLike, TextTrackLike, TextTrackListLike } from '../../../core/types';
 import { HTMLVideoAdapter } from '../../html-video-adapter';
 import { createTextTrack } from '../text-track';
 
@@ -50,7 +49,10 @@ class FakeDataCue {
 
 /** A media that adds its tracks without `<track>` elements. */
 class FakeMedia implements MediaTextTrackCapability {
-  readonly textTracks = EMPTY_TEXT_TRACKS;
+  readonly textTracks = Object.assign(new EventTarget(), {
+    length: 0,
+    *[Symbol.iterator]() {},
+  }) as unknown as TextTrackListLike;
   readonly removeTextTrack = vi.fn();
 
   addTextTrack(): TextTrackLike {

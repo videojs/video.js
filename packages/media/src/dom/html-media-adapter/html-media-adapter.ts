@@ -1,6 +1,6 @@
 import { findTrackElement, isHTMLMediaElement } from '@videojs/utils/dom';
 
-import { EMPTY_REMOTE, EMPTY_TEXT_TRACKS, EMPTY_TIME_RANGES } from '../../core/constants';
+import { NO_TIME_RANGES_YET } from '../../core/constants';
 import {
   type EventLike,
   type CommonMedia,
@@ -284,15 +284,15 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
 
   get buffered() {
-    return (this.target?.buffered ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return this.target?.buffered as TimeRanges | undefined;
   }
 
   get seekable() {
-    return (this.target?.seekable ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return this.target?.seekable as TimeRanges | undefined;
   }
 
   get played() {
-    return (this.target?.played ?? EMPTY_TIME_RANGES) as TimeRanges;
+    return (this.target?.played ?? NO_TIME_RANGES_YET) as TimeRanges;
   }
 
   get error() {
@@ -300,7 +300,7 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
 
   get textTracks() {
-    return (this.target?.textTracks ?? EMPTY_TEXT_TRACKS) as TextTrackList;
+    return this.target?.textTracks as TextTrackList | undefined;
   }
 
   addTextTrack(kind: TextTrackKind, label?: string, language?: string) {
@@ -322,7 +322,7 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   }
 
   get remote() {
-    return this.target?.remote ?? EMPTY_REMOTE;
+    return this.target?.remote;
   }
 
   get disableRemotePlayback() {

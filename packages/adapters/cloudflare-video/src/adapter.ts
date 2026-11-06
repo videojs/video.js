@@ -2,7 +2,7 @@
 // media adapter (mirrors `dom/youtube`).
 // Source: https://github.com/muxinc/media-elements
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type TextTrackListLike, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type TextTrackListLike, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, type PublicPromise, tryCall } from '@videojs/utils/function';
 import { deepEqual } from '@videojs/utils/object';
@@ -411,7 +411,7 @@ export class CloudflareAdapter extends MediaPlayedRangesMixin(EventTarget) imple
   /** Always empty: the SDK exposes no track API, and the embed owns the track picked by `defaultTextTrack`. */
   get textTracks() {
     this.#textTracksHost ??= globalThis.document?.createElement('video') ?? null;
-    return (this.#textTracksHost?.textTracks as TextTrackListLike) ?? EMPTY_TEXT_TRACKS;
+    return this.#textTracksHost?.textTracks as TextTrackListLike | undefined;
   }
 
   get videoWidth() {

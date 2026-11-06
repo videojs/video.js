@@ -672,6 +672,13 @@ export interface Media<Events extends { [K in keyof Events]: EventLike } = Media
 // Composed shapes
 // ----------------------------------------
 
+/**
+ * `T` with the `K` members allowed to be `undefined`. A media opts out of a capability by returning `undefined` from
+ * these members, which the capability guards read as unsupported. The value, not the key, decides it: a subclass
+ * inherits the base adapter's getter, so it overrides the getter to return `undefined`.
+ */
+type OptionalMembers<T, K extends keyof T> = Omit<T, K> & { readonly [P in K]: T[P] | undefined };
+
 export interface CommonMediaEvents
   extends
     MediaEvents,
@@ -695,14 +702,14 @@ export interface CommonMedia<Events extends { [K in keyof Events]: EventLike } =
     MediaSourceCapability,
     MediaVolumeCapability,
     MediaPlaybackRateCapability,
-    MediaBufferCapability,
+    OptionalMembers<MediaBufferCapability, 'buffered' | 'seekable'>,
     MediaPlayedCapability,
     MediaErrorCapability,
-    MediaTextTrackCapability,
+    OptionalMembers<MediaTextTrackCapability, 'textTracks'>,
     MediaStreamTypeCapability,
     MediaLiveCapability,
     MediaContentDataCapability,
-    MediaRemotePlaybackCapability,
+    OptionalMembers<MediaRemotePlaybackCapability, 'remote'>,
     MediaControlsCapability,
     MediaAutoplayCapability {}
 
