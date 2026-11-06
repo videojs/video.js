@@ -2,7 +2,7 @@
 // (`runtime-api.ts`). Inline markup is written into a same-origin frame and the runtime injected after it, the late
 // injection `@hyperframes/player` falls back to; a composition document gets the runtime first in its head instead.
 
-import { EMPTY_TEXT_TRACKS, MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
+import { MediaError, NO_TIME_RANGES_YET, type Video } from '@videojs/media';
 import { createTimeRange, MediaPlayedRangesMixin } from '@videojs/media/dom';
 import { createPublicPromise, tryCall } from '@videojs/utils/function';
 import { clamp } from '@videojs/utils/number';
@@ -461,7 +461,7 @@ export class HyperFramesAdapter extends MediaPlayedRangesMixin(EventTarget) impl
 
   /** Unsupported: a composition draws its own captions, and the bridge reports none. */
   get textTracks() {
-    return EMPTY_TEXT_TRACKS;
+    return undefined;
   }
 
   get isFullscreen() {
