@@ -34,6 +34,7 @@ export default {
         'mux',
         'cloudflare-video',
         'dailymotion-video',
+        'hyperframes-video',
         'mixcloud-audio',
         'playerjs-video',
         'soundcloud-audio',
