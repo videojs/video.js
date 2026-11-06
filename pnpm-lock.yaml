@@ -411,6 +411,9 @@ importers:
       '@videojs/hlsjs-video':
         specifier: workspace:*
         version: link:../../packages/adapters/hlsjs-video
+      '@videojs/hyperframes-video':
+        specifier: workspace:*
+        version: link:../../packages/adapters/hyperframes-video
       '@videojs/html':
         specifier: workspace:*
         version: link:../../packages/html
