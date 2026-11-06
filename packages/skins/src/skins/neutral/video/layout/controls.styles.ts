@@ -21,8 +21,10 @@ export default styles({
     time: {
       utilities: [
         // Important because the CSS build emits this before the shared time group's `display`.
-        'ml-3 media-max-2xs:ml-1.5 media-max-5xs:hidden! mask-media-volume [mask-size:200%_100%]',
-        'group-has-[[data-volume-level][aria-expanded=true]]/controls:mask-media-volume-open',
+        'ml-3 media-max-2xs:ml-1.5 media-max-5xs:hidden!',
+        // The open volume slider covers the whole time readout, so it fades out rather than being masked at one edge.
+        'transition-opacity duration-media-instant ease-out',
+        'group-has-[[data-volume-level][aria-expanded=true]]/controls:opacity-0',
       ],
     },
     // Below 5xs the control bar would hold only play, so the centre play button takes over and the bar goes. The centre
