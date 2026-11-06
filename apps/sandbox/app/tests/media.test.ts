@@ -43,7 +43,7 @@ describe('MEDIA', () => {
     expect(new Set(pages)).toEqual(new Set(MEDIA_IDS));
   });
 
-  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, Mixcloud, and Dailymotion and the native background video only', () => {
+  it('fixes the source for the embeds other than YouTube, player.js, SoundCloud, Mixcloud, and Dailymotion, the native background video, and HyperFrames only', () => {
     const fixed = MEDIA_IDS.filter((id) => MEDIA[id].fixedSource !== undefined);
     const embeds = MEDIA_IDS.filter((id) => MEDIA[id].embed);
     const picked = ['youtube-video', 'playerjs-video', 'soundcloud-audio', 'mixcloud-audio', 'dailymotion-video'];
@@ -51,7 +51,8 @@ describe('MEDIA', () => {
     // player.js is a protocol many providers speak, so its embed picks between their pages instead, and SoundCloud
     // and Mixcloud between the URL shapes and layouts their adapters handle differently. Dailymotion picks between
     // player configurations and URL parameters.
-    expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id))]);
+    // HyperFrames plays a composition rather than a stream, so it plays the one file the sandbox serves.
+    expect(fixed).toEqual(['background-video', ...embeds.filter((id) => !picked.includes(id)), 'hyperframes-video']);
     expect(embeds).toEqual([
       'vimeo-video',
       'youtube-video',
