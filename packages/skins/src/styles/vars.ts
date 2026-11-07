@@ -65,6 +65,10 @@ export const vars = {
     kind: 'internal',
     description: 'Theme corner radius of the controls surface.',
   },
+  '--media-audio-controls-inset': {
+    kind: 'internal',
+    description: 'Audio control bar padding, also read by the audio error dialog to leave the bar out.',
+  },
   '--media-control-corner-shape': {
     kind: 'internal',
     description: 'Theme control corner treatment.',

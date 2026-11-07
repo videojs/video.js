@@ -81,6 +81,8 @@ The audio skins adapt their main palette for light and dark mode using [`light-d
 
 The video skins keep their dark controls in both color schemes. Only their hairline border follows the scheme, and `--media-border-color` replaces it.
 
+The audio skins' error dialog has the same exception. When it shows as a card over visible media, it stays dark in both color schemes, like the video skins.
+
 ### Scale from the document font size
 
 The skins derive control spacing, icon sizes, and text from `--media-scale-unit`. It defaults to `16px`, so the player does not change with the document root font size or your app's Tailwind spacing scale. Set it to `1rem` to make the interface scale from the document root font size:
@@ -185,6 +187,8 @@ The installed skin sets `data-theme` and `data-preset` on its `Container`. Keep 
 <FrameworkCase frameworks={["html"]}>
 The `skin.html` file contains the layout. The `skin.ts` module registers the custom elements and loads `skin.css`. Elements use class names that start with `media-`; change a class in `skin.html` or a rule in the stylesheet to change one part of the interface.
 </FrameworkCase>
+
+The audio skins wrap the error dialog in a frame that measures the player's height to choose between the control bar layout and the card. Keep that frame around the dialog when you rearrange an audio skin or build one from the installed components.
 
 ### Inspect or update the skin source
 
