@@ -45,6 +45,7 @@
   "9201": { "bucket": "migrate", "reason": "security: dependency confusion via Motive's private alias videojs-v8; not a Video.js vulnerability" },
   "9210": { "bucket": "migrate", "reason": "security: dependency audit report; likely duplicate of #9164" },
   "9223": { "bucket": "migrate", "reason": "security: vtt.js injected from CDN without SRI; runtime hardening" },
+  "8662": { "bucket": "migrate", "reason": "active since snapshot: spuppo-mux assigned and debugging with a reporter (2026-11-03)" },
 
   "7789": { "bucket": "merge-here", "reason": "review: fix, then merge. Re-apply on the current release.yml: top-level permissions contents: read, and deploy job contents: read" },
   "7795": { "bucket": "merge-here", "reason": "review: merge as is (dependabot for GitHub Actions)" },

@@ -5236,9 +5236,8 @@
   {
     "number": 8662,
     "kind": "issue",
-    "bucket": "close",
-    "variant": "feature",
-    "reason": "option to disable default captions",
+    "bucket": "migrate",
+    "reason": "active since snapshot: spuppo-mux assigned and debugging with a reporter (2026-11-03)",
     "author": "AndiLeni",
     "created_at": "2024-03-29T17:51:15Z",
     "last_activity": "2025-02-25T09:23:43Z",
