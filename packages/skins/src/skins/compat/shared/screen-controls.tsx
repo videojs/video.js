@@ -12,6 +12,7 @@ import { AirPlayButton } from './airplay-button';
 import { Button } from './button';
 import buttonStyles from './button.styles';
 import castButtonStyles from './cast-button.styles';
+import { FCastButton } from './fcast-button';
 import fullscreenButtonStyles from './fullscreen-button.styles';
 import pipButtonStyles from './pip-button.styles';
 import { ButtonTooltip } from './tooltip';
@@ -55,6 +56,7 @@ export function ScreenControls() {
     <>
       <AirPlayButton popupClassName={tooltipStyles.screenPopup} />
       <CastButton />
+      <FCastButton />
       <PiPButton />
       <FullscreenButton />
     </>

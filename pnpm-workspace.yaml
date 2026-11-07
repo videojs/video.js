@@ -63,6 +63,7 @@ catalog:
   '@vitest/coverage-v8': 5.0.3
   '@vitest/ui': 5.0.3
 overrides:
+  '@netlify/serverless-functions-api': 2.24.0
   vite@*: 'catalog:'
   vitest@*: 'catalog:'
 minimumReleaseAgeExclude:

@@ -1,6 +1,6 @@
 ---
-title: 'Cast to AirPlay and Chromecast'
-description: 'Send playback to AirPlay and Google Cast devices, with availability detection and connection state.'
+title: 'Cast to AirPlay, Chromecast, and FCast'
+description: 'Send playback to AirPlay, Google Cast, and FCast receivers.'
 ---
 
 import Demo from '@/components/docs/demos/Demo.astro';
@@ -167,6 +167,44 @@ Use `remotePlaybackAvailability` to decide whether to offer a route and `remoteP
 <FrameworkCase frameworks={["html"]}>
 Use `remotePlaybackAvailability` to decide whether to offer a route and `remotePlaybackState` to show whether it is disconnected, connecting, or connected. `<media-cast-button>` and `<media-airplay-button>` already apply these states to their presentation; read them directly only when another part of your app needs them.
 </FrameworkCase>
+
+### FCast receivers
+
+FCast receivers use a separate sender. Browsers cannot discover receivers over mDNS or open the FCast TCP connection, so provide an `FCastSender` backed by a native [FCast SDK](https://docs.fcast.org/sdk/) or an application bridge. The sender reports receiver availability and playback state, opens the device picker, and sends playback commands.
+
+The packaged video and live video skins include an FCast control beside Cast and AirPlay. Add the FCast extension inside the player and supply your sender to enable it.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { FCast } from '@videojs/react/extensions/fcast';
+
+<VideoPlayer>
+  <Video src="https://example.com/video.mp4" />
+  <FCast sender={sender} />
+  <VideoSkin />
+</VideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/extensions/fcast';
+
+document.querySelector('fcast-extension')!.sender = sender;
+```
+
+```html
+<video-player>
+  <video src="https://example.com/video.mp4"></video>
+  <fcast-extension></fcast-extension>
+  <video-skin></video-skin>
+</video-player>
+```
+</FrameworkCase>
+
+Set `src` and `contentType` on the extension when the receiver needs a different playable URL or MIME type. For a custom UI, add <DocsLink slug="reference/components/fcast-button">FCastButton</DocsLink> beside the other casting controls. The button observes the player's FCast extension; removing the button leaves the session active. Removing the extension disconnects it.
+
+The extension routes existing play, pause, seek, volume, and speed controls to the receiver while connected. See the <DocsLink slug="reference/components/fcast">FCast reference</DocsLink> for the sender contract.
 
 ## Troubleshooting
 

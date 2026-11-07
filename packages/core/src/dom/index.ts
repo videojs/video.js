@@ -13,6 +13,7 @@ export * from './hotkey/coordinator';
 export * from './hotkey/hotkey';
 export * from './hotkey/hotkey-events';
 export * from './player';
+export { setRemotePlaybackState } from './presentation/remote-playback';
 export * from './store/features';
 export * from './store/selectors';
 export * from './ui/button';

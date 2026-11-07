@@ -87,6 +87,7 @@
     "@videojs/core": "workspace:*",
     "@videojs/dailymotion-video": "workspace:*",
     "@videojs/dash-video": "workspace:*",
+    "@videojs/fcast": "workspace:*",
     "@videojs/google-cast": "workspace:*",
     "@videojs/hlsjs-video": "workspace:*",
     "@videojs/html": "workspace:*",

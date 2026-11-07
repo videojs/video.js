@@ -1,6 +1,6 @@
 'use client';
 
-import type { MediaContainer, PlayerExtension } from '@videojs/core/dom';
+import type { MediaContainer, PlayerExtension, PlayerExtensionCoordinator } from '@videojs/core/dom';
 import type { Media } from '@videojs/media';
 import type { UnknownState, UnknownStore } from '@videojs/store';
 import { useStore } from '@videojs/store/react';
@@ -9,6 +9,7 @@ import { createContext, useContext } from 'react';
 
 /** @internal */
 export interface PlayerContextValue {
+  extensions?: PlayerExtensionCoordinator | undefined;
   store: UnknownStore;
   media: Media | null;
   setMedia: Dispatch<SetStateAction<Media | null>>;

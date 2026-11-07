@@ -185,8 +185,8 @@ export function createPlayer(config: CreatePlayerConfig<AnyPlayerFeature[]>): Cr
     }, [media, container, store, extensions]);
 
     const value = useMemo(
-      () => ({ store, media, setMedia, container, setContainer, registerExtension }),
-      [store, media, container, registerExtension]
+      () => ({ store, media, setMedia, container, setContainer, registerExtension, extensions }),
+      [store, media, container, registerExtension, extensions]
     );
 
     return <PlayerContextProvider value={value}>{children}</PlayerContextProvider>;
