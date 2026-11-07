@@ -11,7 +11,6 @@ if (process.env.BRANCH === 'main' && semver.valid(output.trim()) === null) {
   process.exit(1);
 } else {
   sh.exec('npm run docs:api');
-  sh.cp('-R', 'docs/legacy-docs', 'docs/api/docs');
 
   // move docs/_redirects into the root of the docs site
   //

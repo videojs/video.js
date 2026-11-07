@@ -8,9 +8,6 @@ sh.exec('npm run build');
 sh.exec('npm run sandbox');
 sh.exec('npm run docs:api');
 
-// copy the legacy docs over
-sh.cp('-R', 'docs/legacy-docs', 'docs/api/docs');
-
 const deployDir = 'deploy';
 const files = [
   'node_modules/es5-shim/es5-shim.js',
