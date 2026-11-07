@@ -1,5 +1,6 @@
 import { PlayerExtensionCoordinator } from '@videojs/core/dom';
 import type { HTMLMediaTargetLike } from '@videojs/media/dom';
+import { MediaTracksMixin } from '@videojs/media/media-tracks';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { GoogleCastExtension, type GoogleCastExtensionProps } from '../index';
@@ -118,6 +119,7 @@ function createCastSdk() {
     },
     CastState: { NO_DEVICES_AVAILABLE: 'NO_DEVICES_AVAILABLE', CONNECTING: 'CONNECTING', CONNECTED: 'CONNECTED' },
     SessionState: { SESSION_RESUMED: 'SESSION_RESUMED' },
+    CastContext: { getInstance: () => context },
   } as unknown as typeof cast.framework;
 
   const chromeCast = {
@@ -134,6 +136,9 @@ function createCastSdk() {
       EditTracksInfoRequest: class {
         constructor(public activeTrackIds: number[]) {}
       },
+      GetStatusRequest: class {},
+      PlayerState: { IDLE: 'IDLE', PLAYING: 'PLAYING', PAUSED: 'PAUSED', BUFFERING: 'BUFFERING' },
+      IdleReason: { FINISHED: 'FINISHED' },
       TrackType: { TEXT: 'TEXT', AUDIO: 'AUDIO', VIDEO: 'VIDEO' },
       StreamType: { LIVE: 'LIVE', BUFFERED: 'BUFFERED' },
       HlsSegmentFormat: { FMP4: 'fmp4', TS: 'ts' },
@@ -329,36 +334,17 @@ describe('GoogleCastProvider', () => {
   });
 
   describe('audio tracks', () => {
-    /** A local audio track list that, like `AudioTrackList`, fires one `change` per tick when `enabled` flips. */
+    const AudioTracksHost = MediaTracksMixin(class {});
+
+    /** A real `AudioTrackList`, which fires one `change` per tick when `enabled` flips. */
     function createAudioTracks(...specs: { label: string; language: string; enabled?: boolean }[]) {
-      const list = new EventTarget();
-      let queued = false;
-      const tracks = specs.map(({ label, language, enabled = false }) => {
-        let value = enabled;
+      const host = new AudioTracksHost();
 
-        return {
-          label,
-          language,
-          get enabled() {
-            return value;
-          },
-          set enabled(next: boolean) {
-            if (next === value) return;
+      for (const { label, language, enabled = false } of specs) {
+        host.addAudioTrack('main', label, language).enabled = enabled;
+      }
 
-            value = next;
-
-            if (queued) return;
-
-            queued = true;
-            queueMicrotask(() => {
-              queued = false;
-              list.dispatchEvent(new Event('change'));
-            });
-          },
-        };
-      });
-
-      return Object.assign(list, { [Symbol.iterator]: () => tracks[Symbol.iterator](), length: tracks.length, tracks });
+      return host.audioTracks;
     }
 
     /** Receiver media with a caption track and two alternate audio tracks, English active. */
@@ -375,6 +361,7 @@ describe('GoogleCastProvider', () => {
         },
         activeTrackIds,
         playbackRate: 1,
+        getStatus: vi.fn((_request: chrome.cast.media.GetStatusRequest, resolve: () => void) => resolve()),
         addUpdateListener: vi.fn((listener: () => void) => updateListeners.add(listener)),
         removeUpdateListener: vi.fn((listener: () => void) => updateListeners.delete(listener)),
         update() {
@@ -387,20 +374,30 @@ describe('GoogleCastProvider', () => {
       audioTracks = createAudioTracks(
         { label: 'English', language: 'en', enabled: true },
         { label: 'Español', language: 'es' }
-      )
+      ),
+      {
+        captions = [],
+        activeTrackIds = [1, 2],
+      }: { captions?: { label: string; language: string; mode: string }[]; activeTrackIds?: number[] } = {}
     ) {
       const { target, textTracks } = createTarget();
+      const localCaptions = captions.map((caption) => ({ kind: 'captions', ...caption }));
 
       // Loading remote media also syncs text tracks, which iterates the local list.
-      Object.assign(textTracks, { [Symbol.iterator]: () => [][Symbol.iterator]() });
+      Object.assign(textTracks, { [Symbol.iterator]: () => localCaptions[Symbol.iterator]() });
       Object.assign(target, { audioTracks });
 
-      const remoteMedia = createRemoteMedia();
+      const remoteMedia = createRemoteMedia(activeTrackIds);
 
       // SAFETY: the fake implements every media member the provider reads on the audio track paths.
       vi.mocked(currentMedia).mockReturnValue(remoteMedia as unknown as chrome.cast.media.Media);
+      // Like the receiver, apply each edit to the active track IDs.
+      vi.mocked(editTracksInfo).mockImplementation(async ({ activeTrackIds }) => {
+        remoteMedia.activeTrackIds = activeTrackIds;
+      });
 
-      const result = await createCastingProvider({}, target);
+      const config: GoogleCastExtensionProps = {};
+      const result = await createCastingProvider(config, target);
       const player = result.sdk.players.at(-1)!;
 
       Object.assign(result.session, { getSessionObj: () => ({ media: [remoteMedia] }) });
@@ -412,7 +409,7 @@ describe('GoogleCastProvider', () => {
         await flush();
       };
 
-      return { ...result, audioTracks, remoteMedia, loadRemoteMedia };
+      return { ...result, config, audioTracks, remoteMedia, loadRemoteMedia };
     }
 
     const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -438,8 +435,8 @@ describe('GoogleCastProvider', () => {
       await loadRemoteMedia();
       vi.mocked(editTracksInfo).mockClear();
 
-      audioTracks.tracks[0]!.enabled = false;
-      audioTracks.tracks[1]!.enabled = true;
+      audioTracks[0]!.enabled = false;
+      audioTracks[1]!.enabled = true;
       await flush();
 
       expect(editTracksInfo).toHaveBeenCalledTimes(1);
@@ -479,7 +476,7 @@ describe('GoogleCastProvider', () => {
       remoteMedia.update();
       await flush();
 
-      expect(audioTracks.tracks.map((track) => track.enabled)).toEqual([false, true]);
+      expect([...audioTracks].map((track) => track.enabled)).toEqual([false, true]);
       // The resulting local `change` must not echo a request back to the receiver.
       expect(editTracksInfo).not.toHaveBeenCalled();
     });
@@ -496,20 +493,20 @@ describe('GoogleCastProvider', () => {
           })
       );
 
-      audioTracks.tracks[0]!.enabled = false;
-      audioTracks.tracks[1]!.enabled = true;
+      audioTracks[0]!.enabled = false;
+      audioTracks[1]!.enabled = true;
       await flush();
 
       // A status update that predates the edit still reports English.
       remoteMedia.update();
       await flush();
-      expect(audioTracks.tracks.map((track) => track.enabled)).toEqual([false, true]);
+      expect([...audioTracks].map((track) => track.enabled)).toEqual([false, true]);
 
       remoteMedia.activeTrackIds = [1, 3];
       finish();
       await flush();
 
-      expect(audioTracks.tracks.map((track) => track.enabled)).toEqual([false, true]);
+      expect([...audioTracks].map((track) => track.enabled)).toEqual([false, true]);
       expect(editTracksInfo).toHaveBeenCalledTimes(1);
     });
 
@@ -521,8 +518,8 @@ describe('GoogleCastProvider', () => {
       const { loadRemoteMedia } = await setup(audioTracks);
 
       await loadRemoteMedia();
-      audioTracks.tracks[0]!.enabled = false;
-      audioTracks.tracks[1]!.enabled = true;
+      audioTracks[0]!.enabled = false;
+      audioTracks[1]!.enabled = true;
       await flush();
 
       expect(vi.mocked(editTracksInfo).mock.calls.at(-1)![0].activeTrackIds).toEqual([1, 3]);
@@ -536,10 +533,53 @@ describe('GoogleCastProvider', () => {
       const { loadRemoteMedia } = await setup(audioTracks);
 
       await loadRemoteMedia();
-      audioTracks.tracks[0]!.enabled = false;
-      audioTracks.tracks[1]!.enabled = true;
+      audioTracks[0]!.enabled = false;
+      audioTracks[1]!.enabled = true;
       await flush();
 
+      expect(editTracksInfo).not.toHaveBeenCalled();
+    });
+
+    it('carries the local caption and audio selections to the receiver in one request on load', async () => {
+      const audioTracks = createAudioTracks(
+        { label: 'English', language: 'en' },
+        { label: 'Español', language: 'es', enabled: true }
+      );
+      const { loadRemoteMedia } = await setup(audioTracks, {
+        captions: [{ label: 'English CC', language: 'en', mode: 'showing' }],
+        activeTrackIds: [2],
+      });
+
+      await loadRemoteMedia();
+
+      expect(editTracksInfo).toHaveBeenCalledTimes(1);
+      expect([...vi.mocked(editTracksInfo).mock.calls[0]![0].activeTrackIds].sort()).toEqual([1, 3]);
+    });
+
+    it('turns off a mirrored caption without touching the audio track', async () => {
+      const { loadRemoteMedia } = await setup(undefined, {
+        captions: [{ label: 'English CC', language: 'en', mode: 'disabled' }],
+      });
+
+      await loadRemoteMedia();
+
+      expect(editTracksInfo).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(editTracksInfo).mock.calls[0]![0].activeTrackIds).toEqual([2]);
+    });
+
+    it('syncs the local audio track from the receiver when a session resumes', async () => {
+      const src = 'https://example.com/master.m3u8';
+      const { provider, sdk, config, audioTracks, remoteMedia } = await setup();
+
+      config.src = src;
+      Object.assign(remoteMedia.media, { contentId: src });
+      sdk.context.getSessionState = () => 'SESSION_RESUMED';
+      remoteMedia.activeTrackIds = [1, 3];
+
+      await provider.onSessionStateChanged();
+      await flush();
+
+      expect([...audioTracks].map((track) => track.enabled)).toEqual([false, true]);
       expect(editTracksInfo).not.toHaveBeenCalled();
     });
 
@@ -554,7 +594,7 @@ describe('GoogleCastProvider', () => {
       Object.assign(target, { audioTracks });
       provider.attach(target);
 
-      audioTracks.tracks[1]!.enabled = true;
+      audioTracks[1]!.enabled = true;
       await flush();
 
       expect(editTracksInfo).not.toHaveBeenCalled();
