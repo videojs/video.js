@@ -344,12 +344,44 @@ describe('GoogleCastExtension', () => {
       expect(provider.load).not.toHaveBeenCalled();
     });
 
+    it('takes the source off the receiver when the media drops it while connected', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      provider.loadedSrc = 'https://example.com/video.mp4';
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the receiver loaded when the media empties while a source remains', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      video.src = 'https://example.com/next.mp4';
+      provider.loadedSrc = 'https://example.com/video.mp4';
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).not.toHaveBeenCalled();
+    });
+
+    it('ignores an emptied media when nothing is on the receiver', () => {
+      const { video, provider } = setup();
+
+      connect(provider);
+      video.dispatchEvent(new Event('emptied'));
+
+      expect(provider.load).not.toHaveBeenCalled();
+    });
+
     it('stops following the media after detach', () => {
       const { video, googleCast, provider } = setup();
 
       connect(provider);
+      provider.loadedSrc = 'https://example.com/video.mp4';
       googleCast.detach();
       video.dispatchEvent(new Event('loadstart'));
+      video.dispatchEvent(new Event('emptied'));
 
       expect(provider.load).not.toHaveBeenCalled();
     });

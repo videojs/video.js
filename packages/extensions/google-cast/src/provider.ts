@@ -151,7 +151,7 @@ export class GoogleCastProvider {
     const { src } = this.#googleCast;
 
     if (!src) {
-      // TODO: handle unloading the media?
+      this.#unload();
       return;
     }
 
@@ -170,7 +170,21 @@ export class GoogleCastProvider {
       throw error;
     }
 
+    // The source was cleared while this request was on its way, so take it off the receiver again.
+    if (this.#isCasting && !this.#loadedSrc) {
+      this.#remotePlayer.controller?.stop();
+      return;
+    }
+
     this.target?.dispatchEvent(new Event('volumechange'));
+  }
+
+  /** Stop the media on the receiver once there is no source to cast. The session stays connected for the next one. */
+  #unload() {
+    if (!this.#loadedSrc && !this.#remotePlayer.isMediaLoaded) return;
+
+    this.#loadedSrc = null;
+    this.#remotePlayer.controller?.stop();
   }
 
   async #createLoadRequest(src: string) {
