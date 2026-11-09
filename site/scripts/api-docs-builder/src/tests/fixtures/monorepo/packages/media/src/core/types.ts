@@ -2,7 +2,8 @@
  * Mock media contract types — mirrors packages/media/src/core/types.ts.
  *
  * Exercises: event extraction from capability event interfaces.
- * VideoEvents extends all capability events (including TextTrackListEvents).
+ * VideoEvents extends all capability events, including track-list and
+ * Video.js events that the builder keeps out of the standard event list.
  * AudioEvents extends a subset (no text track events).
  */
 
@@ -74,11 +75,16 @@ export interface TextTrackListEvents {
   trackmodechange: EventLike;
 }
 
-// Video.js-specific event promoted into the typed contract — mirrors the real
-// MediaStreamTypeEvents. The host that fires it also carries an `@fires` tag, so
-// it appears in BOTH the native list and the described element-specific list.
+// Video.js-specific events promoted into the typed contract — mirror the real
+// MediaStreamTypeEvents and MediaContentDataEvents. They are not standard media
+// element events, so they only appear in the custom list, on elements that
+// `@fires` them.
 export interface MediaStreamTypeEvents {
   streamtypechange: EventLike;
+}
+
+export interface MediaContentDataEvents {
+  contentdatachange: EventLike;
 }
 
 export interface VideoEvents
@@ -91,7 +97,8 @@ export interface VideoEvents
     MediaBufferEvents,
     MediaErrorEvents,
     TextTrackListEvents,
-    MediaStreamTypeEvents {}
+    MediaStreamTypeEvents,
+    MediaContentDataEvents {}
 
 export interface AudioEvents
   extends MediaPlaybackEvents,
@@ -101,4 +108,5 @@ export interface AudioEvents
     MediaVolumeEvents,
     MediaPlaybackRateEvents,
     MediaBufferEvents,
-    MediaErrorEvents {}
+    MediaErrorEvents,
+    MediaContentDataEvents {}

@@ -303,9 +303,8 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
     // -------------------------------------------------------------------------
 
     /**
-     * The current fatal error, or `null`. Only _fatal_ conditions appear here — the engine reports non-fatal ones too
-     * (they stay in `engine.state.errors`), and promoting them would tell a consumer playback had failed when it
-     * hadn't. Resets per source. Fires `'error'` when set.
+     * The current fatal error, or `null`. Only errors that stop playback appear here; recoverable ones do not. Resets
+     * when the source changes. Fires `'error'` when set.
      */
     get error(): HlsVideoMediaError | null {
       return this.#error;
@@ -548,6 +547,9 @@ export function HlsVideoMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * Structured source: the manifest URL plus what a URL cannot carry, which today is the license servers for
      * protected content. Setting it derives `src`. Assigning the same object back costs nothing — changing anything
      * takes a new one.
+     *
+     * `drm` names license servers by key system; see [Play DRM-protected content](https://videojs.org/docs/guides/drm).
+     * [Media sources](https://videojs.org/docs/guides/media-sources) explains how `src` and `source` relate.
      *
      * @fires sourcechange - Fired when `source` changes. Read `source` for the new value.
      */

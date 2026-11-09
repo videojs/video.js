@@ -1871,16 +1871,14 @@ describe('Media component pipeline (end-to-end)', () => {
       expect(ref.platforms.html.properties.native).not.toContain('src');
     });
 
-    it('includes events derived from VideoEvents capability contracts', () => {
+    it('includes only standard media element events from the VideoEvents capability contracts', () => {
       const ref = findElement('SimpleVideo')!.reference;
 
-      // Events are extracted from VideoEvents in types.ts, which extends all
-      // capability event interfaces including TextTrackListEvents. Custom
-      // Video.js events from MediaStreamTypeEvents/MediaLiveEvents
-      // (streamtypechange) are NOT native and are excluded here — they only
-      // appear in the custom bucket, and only on elements that @fires them.
-      // Like real dash-video/hls-video, SimpleVideo has no @fires tag for
-      // streamtypechange, so it must appear in neither bucket.
+      // Events are extracted from VideoEvents in types.ts, keeping only events
+      // HTML fires on a media element. Track-list events (addtrack, …) fire on
+      // the track lists, and Video.js events (streamtypechange,
+      // contentdatachange) only appear in the custom bucket, on elements that
+      // @fires them. SimpleVideo has no @fires tags, so they appear in neither.
       expect(ref.platforms.html.events.standard).toEqual([
         'play',
         'playing',
@@ -1901,10 +1899,6 @@ describe('Media component pipeline (end-to-end)', () => {
         'ratechange',
         'progress',
         'error',
-        'addtrack',
-        'removetrack',
-        'changetrack',
-        'trackmodechange',
       ]);
       // SimpleHost dispatches no events of its own.
       expect(ref.platforms.html.events.custom).toEqual([]);
@@ -2442,6 +2436,41 @@ describe('Media component pipeline (end-to-end)', () => {
       expect(ref.platforms.html.events.standard).not.toContain('addtrack');
     });
 
+    it('lists a non-standard contract event only as a described custom event', () => {
+      const events = findElement('SpfAudio')!.reference.platforms.html.events;
+
+      expect(events.standard).not.toContain('contentdatachange');
+      expect(events.custom).toContainEqual({
+        name: 'contentdatachange',
+        description: 'Fired when `contentData` changes.',
+      });
+    });
+
+    it('leaves video-only members out of the audio reference', () => {
+      const ref = findElement('SpfAudio')!.reference;
+      const html = ref.platforms.html;
+      const videoOnlyAttributes = ['autopictureinpicture', 'disablepictureinpicture', 'playsinline', 'poster'];
+
+      for (const attribute of videoOnlyAttributes) {
+        expect(html.attributes.standard).not.toContain(attribute);
+        expect(html.attributes.custom).not.toHaveProperty(attribute);
+      }
+
+      expect(html.attributes.standard).toContain('autoplay');
+      expect(html.properties.definitions).not.toHaveProperty('poster');
+      expect(html.properties.native).not.toContain('poster');
+      expect(ref.platforms.react).toMatchObject({ target: 'audio', acceptsNativeProps: true });
+      expect(Object.keys(ref.platforms.react!.props).sort()).toEqual(['preload', 'src']);
+    });
+
+    it('keeps video-only attributes on video references', () => {
+      const attributes = findElement('SimpleVideo')!.reference.platforms.html.attributes.standard;
+
+      expect(attributes).toEqual(
+        expect.arrayContaining(['autopictureinpicture', 'disablepictureinpicture', 'playsinline', 'poster'])
+      );
+    });
+
     it('surfaces a @fires event with its tag description', () => {
       const ref = findElement('SpfAudio')!.reference;
 
@@ -2464,7 +2493,7 @@ describe('Media component pipeline (end-to-end)', () => {
       const ref = findElement('SpfAudio')!.reference;
       const names = ref.platforms.html.events.custom.map((e) => e.name);
 
-      expect(names).toEqual(['audiomodechange', 'manifestparsed']);
+      expect(names).toEqual(['audiomodechange', 'contentdatachange', 'manifestparsed']);
     });
 
     it('has empty AudioCSSVars', () => {

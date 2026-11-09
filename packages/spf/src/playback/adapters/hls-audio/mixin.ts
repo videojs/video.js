@@ -139,8 +139,8 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     }
 
     /**
-     * The current fatal error, or `null`. Only _fatal_ conditions appear here — the engine reports non-fatal ones too,
-     * which stay in `engine.state.errors`. Resets per source. Fires `'error'` when set.
+     * The current fatal error, or `null`. Only errors that stop playback appear here; recoverable ones do not. Resets
+     * when the source changes. Fires `'error'` when set.
      */
     get error(): HlsVideoMediaError | null {
       return this.#error;
@@ -305,6 +305,8 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * `drm` is accepted and inert: this engine composes no EME. It is kept in the shape rather than removed so a source
      * can be handed to both flavors — and because Mux encrypts video renditions and leaves audio clear, so a protected
      * playback ID plays here regardless.
+     *
+     * [Media sources](https://videojs.org/docs/guides/media-sources) explains how `src` and `source` relate.
      *
      * @fires sourcechange - Fired when `source` changes. Read `source` for the new value.
      */
