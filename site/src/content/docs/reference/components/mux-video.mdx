@@ -166,6 +166,35 @@ video.source = {
 ```
 </FrameworkCase>
 
+## Protected content
+
+For [DRM-protected](https://www.mux.com/docs/guides/protect-videos-with-drm) playback, put the DRM license token on `source.drm.token`. The Mux video component derives the FairPlay, Widevine, and PlayReady license servers from it. DRM playback is always signed, so a `playback.token` belongs alongside it.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxVideo
+  source={{
+    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    playback: { token: playbackToken },
+    drm: { token: drmToken },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('mux-video')!;
+video.source = {
+  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+  playback: { token: playbackToken },
+  drm: { token: drmToken },
+};
+```
+</FrameworkCase>
+
+<DocsLink slug="guides/media-sources" anchor="mux-signs-drm-with-a-token">Media sources</DocsLink> covers mixing Mux's license servers with your own.
+
 ## Analytics and casting
 
 The Mux video component plays Mux streams. It doesn't monitor them or cast them — <DocsLink slug="guides/mux-data">Mux Data</DocsLink> and <DocsLink slug="guides/casting">Google Cast</DocsLink> are separate extensions you add to the player alongside it. Mux Data needs no environment key here, since Mux attributes the views to the environment that owns the playback ID:
