@@ -5,7 +5,6 @@ description: Set what a media component plays and how its engine plays it with t
 
 import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import DocsLink from '@/components/docs/DocsLink.astro';
-import DocsLinkCard from '@/components/docs/DocsLinkCard.astro';
 import Aside from '@/components/Aside.astro';
 
 Every media component takes a `src`. Elements that drive a playback engine also take `source`, a structured object that carries the URL alongside everything else about that source:
@@ -24,7 +23,7 @@ Every media component takes a `src`. Elements that drive a playback engine also 
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('hlsjs-video');
+const video = document.querySelector('hlsjs-video')!;
 
 video.source = {
   src: 'https://example.com/stream.m3u8',
@@ -73,6 +72,8 @@ video.source = { src: 'https://example.com/asset?id=42', type: 'application/vnd.
 </FrameworkCase>
 
 The legacy HLS spelling `application/x-mpegURL` is accepted as an alias, and matching is case-insensitive. An HLS source whose `type` isn't recognized is handed to the browser as-is rather than to hls.js, which leaves quality and audio-track selection unavailable.
+
+The HLS and HLS audio components play HLS whatever the URL looks like, so they accept `type` but don't need it.
 
 ## `src` and `source` stay in sync
 
@@ -155,7 +156,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 | Key | Elements that read it | It holds |
 |---|---|---|
 | `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
-| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
+| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, <DocsLink slug="guides/drm" anchor="license-one-engine-differently">DRM</DocsLink>) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">VimeoVideo</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
@@ -174,7 +175,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 | Key | Elements that read it | It holds |
 |---|---|---|
 | `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
-| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
+| `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, <DocsLink slug="guides/drm" anchor="license-one-engine-differently">DRM</DocsLink>) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
 | `engine.vimeo` | <DocsLink slug="reference/components/vimeo-video">`<vimeo-video>`</DocsLink> | [Vimeo embed parameters](https://developer.vimeo.com/player/sdk/embed) |
@@ -234,7 +235,7 @@ dash.js applies `engine.dashJs` settings to the running player:
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('dash-video');
+const video = document.querySelector('dash-video')!;
 
 video.source = {
   src: 'https://example.com/manifest.mpd',
@@ -344,96 +345,9 @@ Four separate mechanisms bound which rendition plays, and they're easy to mistak
 
 ## DRM protected sources
 
-Protected content is licensed through `source.drm`, keyed by EME key system id — alongside the URL rather than inside an engine's namespace, because which engine plays the manifest is decided later and both paths read it:
+License servers live on `source.drm`, keyed by EME key system id. They sit beside the URL rather than inside an engine's namespace because which engine plays the manifest is decided later, and every path reads them. An engine's own DRM configuration, such as `engine.hlsJs.drmSystems`, replaces `drm` for that engine alone.
 
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo
-  source={{
-    src: 'https://example.com/protected.m3u8',
-    drm: {
-      'com.apple.fps': {
-        licenseUrl: 'https://license.example.com/fairplay',
-        serverCertificateUrl: 'https://license.example.com/fairplay-cert',
-      },
-      'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
-      'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
-    },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  src: 'https://example.com/protected.m3u8',
-  drm: {
-    'com.apple.fps': {
-      licenseUrl: 'https://license.example.com/fairplay',
-      serverCertificateUrl: 'https://license.example.com/fairplay-cert',
-    },
-    'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
-    'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
-  },
-};
-```
-</FrameworkCase>
-
-Name every system you hold a license server for — which one gets used is the browser's choice. `serverCertificateUrl` is the DRM server (application) certificate FairPlay requires; Widevine and PlayReady ignore it.
-
-### What each path can license
-
-The same `drm` reaches both playback paths, and how far it gets is the one thing worth knowing about each:
-
-| Path | Key systems it negotiates | What Video.js does with `drm` |
-|---|---|---|
-| hls.js (MSE) | FairPlay, Widevine, PlayReady | Hands it to hls.js as `drmSystems`, with `emeEnabled` switched on |
-| The browser's own HLS | FairPlay | Answers the element's key requests itself: POSTs the CDM's license request to `licenseUrl` and hands the response back |
-
-<FrameworkCase frameworks={["react"]}>
-So a source naming only Widevine plays through hls.js and cannot play on the native path — <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, or any HLS element the browser ends up playing the manifest for. Video.js says so in development, and encrypted media that gets there with no `com.apple.fps` license server fails with a `MEDIA_ERR_ENCRYPTED` error rather than hanging.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-So a source naming only Widevine plays through hls.js and cannot play on the native path — <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, or any HLS element the browser ends up playing the manifest for. Video.js says so in development, and encrypted media that gets there with no `com.apple.fps` license server fails with a `MEDIA_ERR_ENCRYPTED` error rather than hanging.
-</FrameworkCase>
-
-For Widevine on hls.js, Video.js asks for a hardware-backed CDM first, falling back to whatever robustness the browser offers, so content restricted to L1 devices plays where it can. Supplying your own `requestMediaKeySystemAccessFunc` replaces that entirely.
-
-### Licensing one engine differently
-
-An engine's own `drmSystems` **replaces** `source.drm`, for that engine alone. Reach for it when one path licenses differently, or when you need more of [hls.js's DRM configuration](https://github.com/video-dev/hls.js/blob/master/docs/API.md#drmsystems) than `drm` covers:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo
-  source={{
-    src: 'https://example.com/protected.m3u8',
-    drm: { 'com.apple.fps': { licenseUrl, serverCertificateUrl } },
-    engine: {
-      // hls.js licenses from here instead, and the native path still from `drm`.
-      hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } } },
-    },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  src: 'https://example.com/protected.m3u8',
-  drm: { 'com.apple.fps': { licenseUrl, serverCertificateUrl } },
-  engine: {
-    // hls.js licenses from here instead, and the native path still from `drm`.
-    hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } } },
-  },
-};
-```
-</FrameworkCase>
-
-It replaces rather than merges, so the FairPlay server above is gone as far as hls.js is concerned. `engine.nativeHls.drmSystems` does the same for the native path.
+<DocsLink slug="guides/drm">Play DRM-protected content</DocsLink> covers which components license which key systems, and how to configure them.
 
 ## Mux sources name a playback ID
 
@@ -460,7 +374,7 @@ It replaces rather than merges, so the FairPlay server above is gone as far as h
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('mux-video');
+const video = document.querySelector('mux-video')!;
 
 video.source = {
   playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
@@ -470,148 +384,9 @@ video.source = {
 ```
 </FrameworkCase>
 
-`playback` params ride along in the URL, so `playback.maxResolution` decides which renditions the manifest carries in the first place. `maxAutoResolution` is the other half of that pair: it caps what adaptive selection picks from the renditions that do arrive. Use `playback.maxResolution` when a viewer should never get 4K, and `maxAutoResolution` when they should be able to ask for it.
+`playback` params ride along in the URL, so they belong to the source: a signed token covers them. `source.poster` and `source.storyboard` describe the images Mux derives from the same playback ID, so they belong to the source too. The derived URLs are readable from `contentData`.
 
-The same split applies at the bottom of the ladder, and the names are close enough to be worth restating: `playback.minResolution` asks Mux to leave the lowest renditions out of the manifest, while `minAutoResolution` is a client-side bound on the player-size cap. They are unrelated.
-
-Setting a Mux stream URL as `src` works too — the element parses the playback ID and query params back out into `source`. To play something Mux doesn't host, name it with `src` inside `source`; engine options still apply.
-
-Two more source params describe images rather than playback. `source.storyboard` and `source.poster` carry the modifiers for the storyboard VTT and the poster still — both belong to the source, since a signed token scopes them to one playback ID:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxVideo source={{ playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 } }} playsInline />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = { playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 } };
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["react"]}>
-`MuxVideo` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-`<mux-video>` uses the storyboard itself, adding the thumbnail `<track>` for you so hover previews work without extra markup. Live streams have no storyboard, so the track is dropped once the stream type is known, and signed playback without a matching storyboard token adds none.
-</FrameworkCase>
-
-### Mux signs DRM with a token
-
-Mux serves FairPlay, Widevine, and PlayReady from URLs derived from a single license token, so `source.drm` takes that token in place of the license servers it would otherwise name. Mux fills the rest in for you, so protected media plays whichever path the browser takes:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxVideo
-  source={{
-    playbackId,
-    playback: { token: playbackToken },
-    drm: { token: drmToken },
-  }}
-  playsInline
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  playbackId,
-  playback: { token: playbackToken },
-  drm: { token: drmToken },
-};
-```
-</FrameworkCase>
-
-DRM playback is always signed, so a `playback.token` belongs alongside it — and `poster.token` / `storyboard.token` for the images. Each is scoped to a different audience, so they are four separate tokens rather than one reused four times. Sign them on your server; see [Mux's DRM guide](https://www.mux.com/docs/guides/protect-videos-with-drm) for how.
-
-A `drm.token` that isn't scoped to DRM is ignored rather than sent, since the license request would be rejected. License servers named alongside the token win, key by key, for the systems Mux doesn't license:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxVideo
-  source={{
-    playbackId,
-    playback: { token: playbackToken },
-    // FairPlay and PlayReady from Mux, Widevine from your own server.
-    drm: { token: drmToken, 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } },
-  }}
-  playsInline
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = {
-  playbackId,
-  playback: { token: playbackToken },
-  // FairPlay and PlayReady from Mux, Widevine from your own server.
-  drm: { token: drmToken, 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } },
-};
-```
-</FrameworkCase>
-
-`source.poster` gets no such treatment — it's only data, and nothing applies it to the media. Both URLs are readable from `contentData`, keyed by what each one describes:
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.contentData;
-// {
-//   poster: 'https://image.mux.com/PLAYBACK_ID/thumbnail.webp?time=12',
-//   storyboard: 'https://image.mux.com/PLAYBACK_ID/storyboard.vtt?format=jpg',
-// }
-
-// Use the still as the poster, if that's what you want it for.
-video.poster = video.contentData.poster ?? '';
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["react"]}>
-```ts
-media.contentData;
-// {
-//   poster: 'https://image.mux.com/PLAYBACK_ID/thumbnail.webp?time=12',
-//   storyboard: 'https://image.mux.com/PLAYBACK_ID/storyboard.vtt?format=jpg',
-// }
-```
-</FrameworkCase>
-
-It's read-only and derived from `source`, so read it again after `sourcechange`. A key is missing when its URL can't be built: no playback ID, or signed playback with no matching image token. Changing the URLs means changing the params they're built from.
-
-<FrameworkCase frameworks={["react"]}>
-One more key arrives later. Mux publishes a small metadata document for each asset, and the media loads it alongside the stream, so `contentData.title` fills in with the asset's title once it does — `contentdatachange` announces it. The player reads it as the fallback for its own title, so a Mux asset titled in the dashboard names itself without a `title` on the player. Any other entries the document carries ride along under their own keys. An untitled asset adds nothing.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-One more key arrives later. Mux publishes a small metadata document for each asset, and the media loads it alongside the stream, so `contentData.title` fills in with the asset's title once it does — `contentdatachange` announces it. The player reads it as the fallback for its own title, so a Mux asset titled in the dashboard names itself without a `content-title` on the player. Any other entries the document carries ride along under their own keys. An untitled asset adds nothing.
-</FrameworkCase>
-
-`source.poster` takes the [full set of Mux image modifiers](https://www.mux.com/docs/guides/get-images-from-a-video), so a narrower still for a small viewport is a `width`:
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxVideo source={{ playbackId, poster: { width: 320 } }} playsInline />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-video.source = { ...video.source, poster: { width: 320 } };
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-Because `source` has no attribute, the poster frame has one of its own. `poster-time` reflects to `source.poster.time`, letting you set it from markup:
-
-```html
-<mux-video src="https://stream.mux.com/PLAYBACK_ID.m3u8" poster-time="12"></mux-video>
-```
-
-It survives a `src` change, so swapping the source keeps the frame you asked for.
-</FrameworkCase>
+<DocsLink slug="guides/mux">Play Mux videos</DocsLink> covers signed playback, posters and storyboards, and the DRM token.
 
 ## Elements without engine options
 
@@ -620,7 +395,7 @@ It survives a `src` change, so swapping the source keeps the frame you asked for
 
 Their `source` carries only `src`, `type`, and `drm`, with no `engine`, `preferPlayback`, or rendition caps. They run on our own playback engine, which does not accept configuration from the element yet.
 
-On HlsVideo, `drm` licenses FairPlay, Widevine, and PlayReady, taking the same license servers as [DRM protected sources](#drm-protected-sources). HlsAudio accepts `drm` but ignores it, so one source object serves both.
+On HlsVideo, `drm` licenses FairPlay, Widevine, and PlayReady, taking the same license servers as the other HLS components (see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>). HlsAudio accepts `drm` but ignores it, so one source object serves both.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -628,19 +403,17 @@ On HlsVideo, `drm` licenses FairPlay, Widevine, and PlayReady, taking the same l
 
 Their `source` carries only `src`, `type`, and `drm`, with no `engine`, `preferPlayback`, or rendition caps. They run on our own playback engine, which does not accept configuration from the element yet.
 
-On `<hls-video>`, `drm` licenses FairPlay, Widevine, and PlayReady, taking the same license servers as [DRM protected sources](#drm-protected-sources). `<hls-audio>` accepts `drm` but ignores it, so one source object serves both.
+On `<hls-video>`, `drm` licenses FairPlay, Widevine, and PlayReady, taking the same license servers as the other HLS components (see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>). `<hls-audio>` accepts `drm` but ignores it, so one source object serves both.
 </FrameworkCase>
 
-## See also
+## Related guides
 
-<FrameworkCase frameworks={["react"]}>
-<DocsLinkCard slug="reference/components/hlsjs-video">HlsJsVideo element reference</DocsLinkCard>
-<DocsLinkCard slug="reference/components/mux-video">MuxVideo element reference</DocsLinkCard>
-<DocsLinkCard slug="reference/components/dash-video">DashVideo element reference</DocsLinkCard>
-</FrameworkCase>
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/mux">Play Mux videos</DocsLink>
+- <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
 
-<FrameworkCase frameworks={["html"]}>
-<DocsLinkCard slug="reference/components/hlsjs-video">hlsjs-video element reference</DocsLinkCard>
-<DocsLinkCard slug="reference/components/mux-video">mux-video element reference</DocsLinkCard>
-<DocsLinkCard slug="reference/components/dash-video">dash-video element reference</DocsLinkCard>
-</FrameworkCase>
+## Related components
+
+- <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>
+- <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>
+- <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink>

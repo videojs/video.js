@@ -103,6 +103,9 @@ export const sidebar: Sidebar = [
             sidebarLabel: 'Keyboard shortcuts and gestures',
           },
           { slug: 'guides/live-streams', sidebarLabel: 'Live streams' },
+          { slug: 'guides/mux', sidebarLabel: 'Mux videos' },
+          { slug: 'guides/drm', sidebarLabel: 'DRM' },
+          { slug: 'guides/cookie-gated-streams', sidebarLabel: 'Cookie-gated streams' },
           { slug: 'guides/quality', sidebarLabel: 'Quality selector' },
           {
             slug: 'guides/fullscreen',
