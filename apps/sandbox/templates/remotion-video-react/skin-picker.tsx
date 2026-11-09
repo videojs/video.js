@@ -3,11 +3,11 @@
 // skin source or styling change rewrites the URL and reloads, exactly as the shell does for those two selections.
 
 import { SKIN_SOURCES, SKINS } from '@app/constants';
+import { SKIN_LABELS } from '@app/labels';
 import { useSandbox } from '@app/shared/react/use-sandbox';
 import { skinSourceAvailable, skinStylings } from '@app/shared/skin-sources';
 import type { Skin, SkinSource, Styling } from '@app/types';
 
-const LABELS: Record<Skin, string> = { default: 'Default', minimal: 'Minimal' };
 const SOURCE_LABELS: Record<SkinSource, string> = { package: 'Package', registry: 'Registry', authored: 'Authored' };
 const STYLING_LABELS: Record<Styling, string> = { css: 'CSS', tailwind: 'Tailwind' };
 
@@ -71,7 +71,7 @@ export function SkinPicker() {
         <select className={SELECT_CLASS} value={skin} onChange={(event) => onSkinChange(event.target.value)}>
           {SKINS.map((value) => (
             <option key={value} value={value}>
-              {LABELS[value]}
+              {SKIN_LABELS[value]}
             </option>
           ))}
         </select>
