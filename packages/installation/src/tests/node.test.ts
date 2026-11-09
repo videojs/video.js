@@ -23,7 +23,7 @@ import {
   INSTALLATION_STEP_CONDITIONS,
   installationCommand,
 } from '../plan';
-import { INSTALLATION_FRAMEWORKS } from '../projects';
+import { INSTALLATION_FRAMEWORKS, installationStarterFiles } from '../projects';
 import { installationMethodsForFramework, installationTemplatesForMethod, sourceFrameworkFor } from '../selection';
 import { defaultRegistryStyling } from '../shadcn';
 
@@ -390,9 +390,9 @@ describe('runAgentsInit', () => {
         code: expect.stringMatching(/^<!doctype html>/),
       }),
     ]);
-    expect(vite.removeFiles).toEqual(['src/main.ts', 'src/counter.ts', 'src/style.css', 'src/typescript.svg']);
+    expect(vite.removeFiles).toEqual(installationStarterFiles('html', 'vite'));
     expect(vue.blocks.map(({ operation }: { operation: string }) => operation)).toEqual(['create', 'replace']);
-    expect(vue.removeFiles).toEqual(['src/components/HelloWorld.vue']);
+    expect(vue.removeFiles).toEqual(installationStarterFiles('vue', 'vite'));
     expect(vueExisting.blocks.map(({ operation }: { operation: string }) => operation)).toEqual(['merge', 'merge']);
     expect(vueExisting.removeFiles).toBeUndefined();
     expect(JSON.stringify(vueExisting)).not.toContain('<h1>');
