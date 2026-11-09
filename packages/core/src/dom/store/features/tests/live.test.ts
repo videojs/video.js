@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { liveFeature } from '../live';
+import { liveFeature } from '../shared';
 
 interface LiveCapableMedia extends EventTarget {
   liveEdgeStart: number;

@@ -122,6 +122,7 @@ export class OxcProject {
       ? [
           path.join(packageRoot, 'src', subpath),
           path.join(packageRoot, 'src', 'dom', subpath),
+          path.join(packageRoot, 'src', 'playback', subpath),
           path.join(packageRoot, 'src', 'playback', 'adapters', subpath),
           path.join(packageRoot, 'src', 'playback', 'engines', subpath),
         ]

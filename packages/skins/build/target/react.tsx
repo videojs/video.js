@@ -134,7 +134,13 @@ export const reactComponentTarget: ComponentTarget<CoreSchema> = defineComponent
         },
         'audio-track-option': optionTemplate,
         'playback-rate-option': optionTemplate,
-        'captions-option': optionTemplate,
+        'captions-option': {
+          ...optionTemplate,
+          parts: {
+            ...optionTemplate.parts,
+            badge: ({ props }) => code.when(item.badge, <Span {...props}>{item.badge}</Span>),
+          },
+        },
       },
     },
     types: {

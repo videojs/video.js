@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { setPlayerConfigValue } from '../../../feature';
 import type { PlayerTarget } from '../../../player';
 import { createMockVideo } from '../../../tests/test-helpers';
-import { playbackRateFeature } from '../playback-rate';
+import { playbackRateFeature } from '../shared';
 
 const ratesConfig = playbackRateFeature.config!.defaultPlaybackRates;
 

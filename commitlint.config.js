@@ -43,6 +43,7 @@ export default {
         'youtube-video',
         'native-hls-video',
         'dash-video',
+        'google-analytics',
         'google-cast',
         'hlsjs-video',
         'mux-audio',

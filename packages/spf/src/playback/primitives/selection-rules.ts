@@ -114,6 +114,10 @@ export function sameCandidateSet<T extends { id: string }>(a: readonly T[], b: r
  * the DOM-bound probe; unwired means "no capability filtering" and the constraint passes everything through.
  */
 export interface CapabilityConstraintConfig {
+  /**
+   * The codec capability probe `excludeUnplayableTracks` applies. Each engine defaults it to the DOM-bound probe;
+   * unwired means no capability filtering.
+   */
   canPlayTrack?: CanPlayTrack;
 }
 
@@ -160,8 +164,8 @@ export function excludeUnplayableTracks<T, State, Context, Config>(
  * unaffected and reports nothing, exactly as before. `setupMediaKeys` still reports the _cause_ (4008).
  *
  * `negotiatedKeySystem` is read through a cast for the same reason `screenResolutionCap` reads `screenResolution`: the
- * slot exists only in DRM compositions, and constraining the rule's `State` generic would make every chain that doesn't
- * carry it a weak-type mismatch. Read reactively, so publishing the sentinel re-fires the chain.
+ * signal exists only in DRM compositions, and constraining the rule's `State` generic would make every chain that
+ * doesn't carry it a weak-type mismatch. Read reactively, so publishing the sentinel re-fires the chain.
  */
 export function excludeRefusedKeySystems<T, State, Context, Config>(
   tracks: readonly T[],

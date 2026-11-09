@@ -23,6 +23,18 @@ interface RemotePlaybackLike {
 }
 
 describe('remotePlaybackFeature', () => {
+  it('reports remote playback unsupported when the media disables it', async () => {
+    const remote = createRemote();
+    const media = Object.assign(createMockVideo(), { remote, disableRemotePlayback: true });
+    const store = createStore<PlayerTarget>()(remotePlaybackFeature);
+
+    store.attach({ media, container: null });
+    await Promise.resolve();
+
+    expect(remote.watchAvailability).not.toHaveBeenCalled();
+    expect(store.state.remotePlaybackAvailability).toBe('unsupported');
+  });
+
   it('cancels availability watching on abort (W3C path)', () => {
     const remote = createRemote();
     const media = Object.assign(createMockVideo(), { remote });

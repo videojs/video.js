@@ -537,6 +537,8 @@ function applyClassMembers(
   for (const member of declaration.body.body) {
     if (member.type !== 'MethodDefinition' || (member.kind !== 'get' && member.kind !== 'set')) continue;
 
+    if (member.static || getJSDoc(file, member)?.tags.has('internal')) continue;
+
     const name = staticName(member.key);
     if (!name || member.key.type === 'PrivateIdentifier' || name.startsWith('_') || name === 'target') continue;
 

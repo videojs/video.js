@@ -30,6 +30,45 @@ DASH video element powered by [dash.js](https://github.com/Dash-Industry-Forum/d
 
 <MediaImports media="dash-video" package="@videojs/dash-video" react="DashVideo" />
 
+## Load a source
+
+`src` takes a DASH manifest (MPD) URL.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<DashVideo src="https://example.com/manifest.mpd" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<dash-video src="https://example.com/manifest.mpd"></dash-video>
+```
+</FrameworkCase>
+
+The structured `source` object pairs the URL with dash.js settings under `engine.dashJs`. Setting `source` derives `src`, and changing `engine.dashJs` applies the settings to the running player instead of recreating it.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<DashVideo
+  source={{
+    src: 'https://example.com/manifest.mpd',
+    engine: { dashJs: { streaming: { buffer: { bufferTimeAtTopQuality: 30 } } } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('dash-video')!;
+video.source = {
+  src: 'https://example.com/manifest.mpd',
+  engine: { dashJs: { streaming: { buffer: { bufferTimeAtTopQuality: 30 } } } },
+};
+```
+</FrameworkCase>
+
 ## Examples
 
 ### Basic Usage

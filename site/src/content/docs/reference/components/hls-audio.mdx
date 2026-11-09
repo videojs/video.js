@@ -29,6 +29,24 @@ Audio-only HLS element that plays just the audio rendition of an HLS stream — 
 
 <MediaImports media="hls-audio" react="HlsAudio" />
 
+## Load a source
+
+`src` takes an HLS manifest URL. A mixed audio/video manifest works too: the audio component loads only the audio rendition.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsAudio src="https://example.com/playlist.m3u8" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<hls-audio src="https://example.com/playlist.m3u8"></hls-audio>
+```
+</FrameworkCase>
+
+The structured `source` object takes the same shape as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>'s, so one object can serve either. `source.drm` is accepted but unused, because this component composes no EME.
+
 ## Examples
 
 ### Basic Usage

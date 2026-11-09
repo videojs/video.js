@@ -4,33 +4,32 @@
   /* Default theme tokens. Neutral selectors, preset adaptations, and preferences override these. */
   .media-skin {
     /* Colors. */
-    --media-background: oklch(0 0 0);
-    --media-foreground: oklch(1 0 0);
-    --media-controls: oklch(0 0 0 / 0.35);
+    --media-background: rgb(0 0 0);
+    --media-foreground: rgb(255 255 255);
+    --media-controls: rgb(0 0 0 / 0.35);
     --media-controls-foreground: var(--media-foreground);
-    --media-popover: oklch(1 0 0 / 0.1);
+    --media-popover: rgb(255 255 255 / 0.1);
     --media-popover-foreground: var(--media-foreground);
     --media-primary: var(--media-accent-color, var(--media-default-accent-color));
     /* Browsers without `contrast-color()` use the theme's default text color; see the `@supports` blocks below. */
     --media-primary-foreground: var(--media-accent-text-color, var(--media-default-accent-text-color));
-    --media-accent: var(--media-accent-color, color-mix(in oklab, var(--media-default-accent-color) 10%, transparent));
+    --media-accent: var(--media-accent-color, rgb(255 255 255 / 0.1));
     --media-accent-foreground: var(--media-accent-text-color, currentColor);
-    --media-muted: oklch(1 0 0 / 0.15);
-    /* Follows the foreground so presets that flip it, such as the light audio skins, keep muted icons legible. */
-    --media-muted-foreground: color-mix(in oklab, var(--media-foreground) 65%, transparent);
-    --media-border: oklch(0 0 0 / 0.1);
-    --media-ring: oklch(1 0 0);
-    --media-backdrop: oklch(0 0 0);
-    --media-live-color: oklch(0.65 0.22 27);
+    --media-muted: rgb(255 255 255 / 0.15);
+    --media-muted-foreground: rgb(255 255 255 / 0.65);
+    --media-border: rgb(0 0 0 / 0.1);
+    --media-ring: rgb(255 255 255);
+    --media-backdrop: rgb(0 0 0);
+    --media-live-color: rgb(249 66 61);
 
     /* Shadows and surfaces. Preferences switch the backdrop filters off and strengthen the inset highlight. */
-    --media-shadow-surface: 0 1px 3px 0 oklch(0 0 0 / 0.15), 0 1px 2px -1px oklch(0 0 0 / 0.15);
+    --media-shadow-surface: 0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.15);
     --media-shadow-surface-inset: inset 0 1px 0 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.05);
     --media-shadow-thumb: 0 0 0 1px rgb(0 0 0 / 0.1), 0 1px 3px 0 rgb(0 0 0 / 0.35), 0 1px 2px -1px rgb(0 0 0 / 0.35);
     --media-shadow-tooltip: 0 0 0 1px var(--media-border), var(--media-shadow-surface);
-    --media-shadow-separator: 0 1px 0 0 oklch(1 0 0 / 0.075);
+    --media-shadow-separator: 0 1px 0 0 rgb(255 255 255 / 0.075);
     --media-shadow-current-color: oklch(from currentColor 0 0 0 / clamp(0, calc((l - 0.5) * 0.5), 0.15));
-    --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
+    --media-shadow-subtle-current-color: transparent;
     --media-text-shadow-dialog: 0 1px 0 rgb(0 0 0 / 0.25);
     --media-backdrop-filter-surface: blur(16px) saturate(125%);
     --media-backdrop-filter-indicator: blur(8px);
@@ -41,8 +40,8 @@
     --media-control-radius: 99px;
     --media-control-size: calc(var(--media-spacing) * 9);
     --media-controls-radius: var(--media-control-radius);
-    --media-default-accent-color: oklch(1 0 0);
-    --media-default-accent-text-color: oklch(0 0 0);
+    --media-default-accent-color: rgb(255 255 255);
+    --media-default-accent-text-color: rgb(0 0 0);
 
     /* Motion. Preferences collapse durations and neutralize hidden-state values under reduced motion. */
     --media-duration-instant: 50ms;
@@ -89,7 +88,7 @@
     /* Player frame and scale. */
     --media-video-border-radius: var(--media-border-radius, 28px);
     --media-scale: 1;
-    --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 30%, transparent);
+    --media-scrollbar-thumb-color: rgb(128 128 128 / 0.5);
     --media-spacing: calc(var(--media-scale-unit, 16px) * var(--media-scale) / 4);
 
     scrollbar-color: var(--media-scrollbar-thumb-color) transparent;
@@ -97,15 +96,35 @@
   }
 
   /*
-   * Newer color functions stay behind these checks, and the rule above holds the fallback for browsers without them.
-   * Relative colors that keep their origin's channels fall back to the same color through `color-mix()`.
+   * Newer color functions stay behind these checks, and the rule above holds the fallback for browsers without them,
+   * which the Compat and Scaffold skins support. Relative colors that keep their origin's channels fall back to the same
+   * color through `color-mix()`.
    */
+  @supports (color: color-mix(in oklab, red, red)) {
+    .media-skin {
+      --media-accent: var(
+        --media-accent-color,
+        color-mix(in oklab, var(--media-default-accent-color) 10%, transparent)
+      );
+      /* Follows the foreground so presets that flip it, such as the light audio skins, keep muted icons legible. */
+      --media-muted-foreground: color-mix(in oklab, var(--media-foreground) 65%, transparent);
+      --media-shadow-subtle-current-color: color-mix(in oklab, var(--media-shadow-current-color) 40%, transparent);
+      --media-scrollbar-thumb-color: color-mix(in oklab, currentColor 30%, transparent);
+    }
+  }
+
+  @supports (color: oklch(0 0 0)) {
+    .media-skin {
+      --media-live-color: oklch(0.65 0.22 27);
+    }
+  }
+
   @supports (color: contrast-color(red)) {
     .media-skin {
       --media-primary-foreground: var(--media-accent-text-color, contrast-color(var(--media-primary)));
       --media-accent-foreground: var(
         --media-accent-text-color,
-        contrast-color(var(--media-accent-color, var(--media-internal-accent-text-fallback, oklch(0 0 0))))
+        contrast-color(var(--media-accent-color, var(--media-internal-accent-text-fallback, rgb(0 0 0))))
       );
     }
   }

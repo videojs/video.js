@@ -1,3 +1,6 @@
+export * from './feature';
+export * from './player';
+export * from './store/features';
 export * from './ui/airplay-button/core';
 export * from './ui/airplay-button/data';
 export * from './ui/alert-dialog/core';
@@ -100,3 +103,23 @@ export * from './ui/volume-slider/core';
 export * from './ui/volume-slider/data';
 export * from './ui/volume-slider/vars';
 export * from './version';
+export type {
+  AddTextTrack,
+  InferCueValue,
+  TextCueFormat,
+  TextCueFormatResult,
+  TextCueInit,
+  TextTrackContent,
+  TextTrackHandle,
+  TextTrackInit,
+} from './text-track/app';
+export * from './text-track/chapters';
+export * from './text-track/definition';
+export * from './text-track/hls';
+export * from './text-track/read';
+export type {
+  InferSchemaOutput,
+  StandardSchemaV1,
+  StandardSchemaV1Props,
+  StandardSchemaV1Result,
+} from './text-track/schema';

@@ -17,7 +17,8 @@ describe('BrowserSupportTable', () => {
     const html = await render('browsers');
 
     expect(html).toContain('<caption class="sr-only">');
-    expect(html.match(/<th[^>]*scope="col"/g)).toHaveLength(2);
+    expect(html.match(/<th[^>]*scope="col"/g)).toHaveLength(3);
+    expect(html).toContain('Compat skin');
     expect(html.match(/<th[^>]*scope="row"/g)).toHaveLength(SUPPORT_BROWSERS.length);
 
     for (const browser of SUPPORT_BROWSERS) expect(html).toContain(browser.name);
@@ -28,7 +29,7 @@ describe('BrowserSupportTable', () => {
   it('renders the coverage paragraph with percentages and the data version', async () => {
     const html = await render('coverage');
 
-    expect(html.match(/\d+\.\d%/g)).toHaveLength(1);
+    expect(html.match(/\d+\.\d%/g)).toHaveLength(2);
     expect(html).toContain('https://github.com/browserslist/caniuse-lite');
     expect(html).toMatch(/caniuse-lite<\/a> 1\.0\.\d+/);
   });
@@ -45,6 +46,10 @@ describe('BrowserSupportTable', () => {
 
     for (const requirement of CSS_REQUIREMENTS) {
       expect(html).toContain(`https://caniuse.com/${requirement.id}`);
+    }
+
+    for (const { compat } of CSS_REQUIREMENTS) {
+      if (compat) expect(html).toContain(`${compat}.`);
     }
   });
 });

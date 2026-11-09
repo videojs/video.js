@@ -6,6 +6,14 @@ description: Native video playback that can provide media to a Video.js player
 ---
 
 import DocsLink from "@/components/docs/DocsLink.astro";
+import CodeChip from "@/components/docs/api-reference/CodeChip.astro";
+import MarkdownCode from "@/components/typography/MarkdownCode.astro";
+import Table from "@/components/typography/Table.astro";
+import Tbody from "@/components/typography/Tbody.astro";
+import Td from "@/components/typography/Td.astro";
+import Th from "@/components/typography/Th.astro";
+import Thead from "@/components/typography/Thead.astro";
+import Tr from "@/components/typography/Tr.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
@@ -76,7 +84,7 @@ Video.js does not replace the native video API. Use `src` for one URL or add chi
 Add native [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) for captions, subtitles, chapters, descriptions, or metadata.
 
 <FrameworkCase frameworks={["react"]}>
-`Video` forwards native attributes, event handlers, and children to the underlying `<video>`. Its `ref` resolves to the `HTMLVideoElement`, and so does `mediaRef`. Adapter-backed components such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> and <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+`Video` forwards native attributes, event handlers, and children to the underlying `<video>`. See [Refs](#refs) for what `ref` and `mediaRef` receive.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -112,4 +120,88 @@ This native video uses a child source, captions track, and browser controls whil
       <BasicUsageDemoHtml />
     </Demo>
   </StyleCase>
+</FrameworkCase>
+
+## API Reference
+
+<FrameworkCase frameworks={["html"]}>
+
+### Attributes
+
+Accepts the standard `<video>` attributes. See the [MDN `<video>` reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video): <span class="code-list">{['autoplay', 'controls', 'controlslist', 'crossorigin', 'disablepictureinpicture', 'disableremoteplayback', 'height', 'loop', 'muted', 'playsinline', 'poster', 'preload', 'src', 'width'].map((name) => <CodeChip value={name} />)}</span>
+
+### Properties
+
+Exposes the native media properties. See [`HTMLVideoElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement) for details: <span class="code-list">{['autoplay', 'buffered', 'controls', 'crossOrigin', 'currentSrc', 'currentTime', 'defaultMuted', 'defaultPlaybackRate', 'disablePictureInPicture', 'disableRemotePlayback', 'duration', 'ended', 'error', 'height', 'loop', 'mediaKeys', 'muted', 'networkState', 'paused', 'playbackRate', 'played', 'playsInline', 'poster', 'preload', 'preservesPitch', 'readyState', 'remote', 'seekable', 'seeking', 'sinkId', 'src', 'srcObject', 'textTracks', 'videoHeight', 'videoWidth', 'volume', 'width'].map((name) => <CodeChip value={name} />)}</span>
+
+### Methods
+
+Supports the native media methods. See [`HTMLVideoElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement) for details: <span class="code-list">{['addTextTrack', 'cancelVideoFrameCallback', 'canPlayType', 'fastSeek', 'getVideoPlaybackQuality', 'load', 'pause', 'play', 'requestPictureInPicture', 'requestVideoFrameCallback', 'setMediaKeys', 'setSinkId'].map((name) => <CodeChip value={name} />)}</span>
+
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+
+### Props
+
+Accepts the standard React props for a native `<video>`: <span class="code-list">{['autoPlay', 'controls', 'controlsList', 'crossOrigin', 'disablePictureInPicture', 'disableRemotePlayback', 'height', 'loop', 'muted', 'playsInline', 'poster', 'preload', 'src', 'width'].map((name) => <CodeChip value={name} />)}</span>
+
+`Video` also accepts `children` and common element props such as `className` and `style`, plus these Video.js-specific props:
+
+<Table outerClass="my-6">
+  <Thead>
+    <Tr>
+      <Th>Prop</Th>
+      <Th>Type</Th>
+      <Th>Description</Th>
+    </Tr>
+  </Thead>
+  <Tbody>
+    <Tr>
+      <Td><MarkdownCode>fallback</MarkdownCode></Td>
+      <Td><MarkdownCode>ReactNode</MarkdownCode></Td>
+      <Td>Content rendered inside the `<video>` after `children`, which only browsers without media element support show. It isn't shown when playback fails. Defaults to a "Video player not working?" link to `https://videojs.org/help`. Pass `null` to render nothing.</Td>
+    </Tr>
+    <Tr>
+      <Td><MarkdownCode>mediaRef</MarkdownCode></Td>
+      <Td><MarkdownCode>{"Ref<HTMLVideoElement>"}</MarkdownCode></Td>
+      <Td>Receives the rendered `HTMLVideoElement`. See [Refs](#refs).</Td>
+    </Tr>
+  </Tbody>
+</Table>
+
+### Refs
+
+#### ref
+
+Forwards to the rendered `<video>`, an [`HTMLVideoElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement) with its complete native property and method API.
+
+```tsx
+const ref = useRef<HTMLVideoElement>(null);
+
+<Video ref={ref} />
+```
+
+#### mediaRef
+
+Receives the same `HTMLVideoElement` as `ref`. Adapter-backed components such as <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> and <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> hand their playback adapter to `mediaRef` instead, so code that works with several media components can read the playback object from one prop.
+
+```tsx
+const mediaRef = useRef<HTMLVideoElement>(null);
+
+<Video mediaRef={mediaRef} />
+```
+
+</FrameworkCase>
+
+### Events
+
+<FrameworkCase frameworks={["html"]}>
+Fires the standard media events: <span class="code-list">{['abort', 'canplay', 'canplaythrough', 'durationchange', 'emptied', 'encrypted', 'ended', 'enterpictureinpicture', 'error', 'leavepictureinpicture', 'loadeddata', 'loadedmetadata', 'loadstart', 'pause', 'play', 'playing', 'progress', 'ratechange', 'resize', 'seeked', 'seeking', 'stalled', 'suspend', 'timeupdate', 'volumechange', 'waiting', 'waitingforkey'].map((name) => <CodeChip value={name} />)}</span>
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Accepts the standard React media event props: <span class="code-list">{['onAbort', 'onCanPlay', 'onCanPlayThrough', 'onDurationChange', 'onEmptied', 'onEncrypted', 'onEnded', 'onError', 'onLoadedData', 'onLoadedMetadata', 'onLoadStart', 'onPause', 'onPlay', 'onPlaying', 'onProgress', 'onRateChange', 'onResize', 'onSeeked', 'onSeeking', 'onStalled', 'onSuspend', 'onTimeUpdate', 'onVolumeChange', 'onWaiting'].map((name) => <CodeChip value={name} />)}</span>
+
+The native `enterpictureinpicture`, `leavepictureinpicture`, and `waitingforkey` events have no React prop. Attach a listener through the ref with `addEventListener`.
 </FrameworkCase>
