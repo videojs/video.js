@@ -45,20 +45,7 @@ Audio-only HLS element that plays just the audio rendition of an HLS stream — 
 ```
 </FrameworkCase>
 
-The structured `source` object takes the same shape as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>'s, so one object can serve either. Use `source.type` for a manifest URL without an `.m3u8` extension. `source.drm` is accepted but unused, because this component composes no EME.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsAudio source={{ src: 'https://example.com/manifest', type: 'application/vnd.apple.mpegurl' }} />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const audio = document.querySelector('hls-audio');
-audio.source = { src: 'https://example.com/manifest', type: 'application/vnd.apple.mpegurl' };
-```
-</FrameworkCase>
+The structured `source` object takes the same shape as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>'s, so one object can serve either. `source.drm` is accepted but unused, because this component composes no EME.
 
 ## Examples
 

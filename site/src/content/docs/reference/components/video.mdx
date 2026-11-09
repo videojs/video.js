@@ -160,7 +160,7 @@ Accepts the standard React props for a native `<video>`: <span class="code-list"
     <Tr>
       <Td><MarkdownCode>fallback</MarkdownCode></Td>
       <Td><MarkdownCode>ReactNode</MarkdownCode></Td>
-      <Td>Content rendered inside the `<video>` after `children`, which browsers show only when they can't play media at all. Defaults to a "Video player not working?" link to `https://videojs.org/help`. Pass `null` to render nothing.</Td>
+      <Td>Content rendered inside the `<video>` after `children`, which only browsers without media element support show. It isn't shown when playback fails. Defaults to a "Video player not working?" link to `https://videojs.org/help`. Pass `null` to render nothing.</Td>
     </Tr>
     <Tr>
       <Td><MarkdownCode>mediaRef</MarkdownCode></Td>

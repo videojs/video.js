@@ -61,7 +61,7 @@ The structured `source` object pairs the URL with dash.js settings under `engine
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('dash-video');
+const video = document.querySelector('dash-video')!;
 video.source = {
   src: 'https://example.com/manifest.mpd',
   engine: { dashJs: { streaming: { buffer: { bufferTimeAtTopQuality: 30 } } } },

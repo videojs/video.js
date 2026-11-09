@@ -98,6 +98,8 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
      * Empty here, and overridden the same way as on the video adapter — see its note. `hls-audio` has no
      * better-equipped sibling of its own; the Mux audio Media built on this engine does, and points at the
      * hls.js-backed one.
+     *
+     * @internal
      */
     static get alternativeMediaSuggestion(): string | undefined {
       return undefined;
@@ -179,6 +181,8 @@ export function HlsAudioMixin<Base extends Constructor<any>>(BaseClass: Base) {
     /**
      * Underlying playback engine — the low-level SPF reactive composition that drives playback. An advanced escape
      * hatch for direct engine access; normal playback is driven through this element's own properties and methods.
+     *
+     * @internal
      */
     get engine(): Composition<EngineState, EngineContext> {
       return this.#engine;

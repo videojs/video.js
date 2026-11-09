@@ -45,20 +45,7 @@ The lightweight HLS video element, optimized for minimal bundle size. The <DocsL
 ```
 </FrameworkCase>
 
-The structured `source` object carries what a URL can't: `type` for a manifest URL without an `.m3u8` extension, and `drm` for protected content. Setting `source` derives `src`.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsVideo source={{ src: 'https://example.com/manifest', type: 'application/vnd.apple.mpegurl' }} />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const video = document.querySelector('hls-video');
-video.source = { src: 'https://example.com/manifest', type: 'application/vnd.apple.mpegurl' };
-```
-</FrameworkCase>
+The structured `source` object carries what a URL can't: `drm` for protected content. Setting `source` derives `src`.
 
 ## Protected content
 
@@ -83,7 +70,7 @@ video.source = { src: 'https://example.com/manifest', type: 'application/vnd.app
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('hls-video');
+const video = document.querySelector('hls-video')!;
 video.source = {
   src: 'https://example.com/protected.m3u8',
   drm: {

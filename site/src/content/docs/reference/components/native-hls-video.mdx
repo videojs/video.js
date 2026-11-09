@@ -49,7 +49,7 @@ The structured `source` object adds `drm` and engine options to the URL. Setting
 
 ## Protected content
 
-`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess). Name every system you hold a license server for: which one gets negotiated is the browser's choice.
+`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess).
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx
@@ -70,7 +70,7 @@ The structured `source` object adds `drm` and engine options to the URL. Setting
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
-const video = document.querySelector('native-hls-video');
+const video = document.querySelector('native-hls-video')!;
 video.source = {
   src: 'https://example.com/protected.m3u8',
   drm: {
