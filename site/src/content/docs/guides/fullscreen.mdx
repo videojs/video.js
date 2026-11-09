@@ -78,6 +78,36 @@ The built-in button hides when `fullscreenAvailability` is not `'available'`. Us
 
 ## Common variations
 
+### Adapt orientation to the video
+
+Set `enableAdaptiveFullScreen` on the video player to lock orientation to landscape for a wider video or portrait for a taller video. The option is disabled by default. Browsers that cannot lock to the requested orientation keep their current orientation and log a warning.
+
+<FrameworkCase frameworks={["react"]}>
+
+```tsx
+import { Container } from '@videojs/react';
+import { Video, VideoPlayer } from '@videojs/react/video';
+
+<VideoPlayer enableAdaptiveFullScreen>
+  <Container>
+    <Video src="/video.mp4" />
+  </Container>
+</VideoPlayer>
+```
+
+</FrameworkCase>
+<FrameworkCase frameworks={["html"]}>
+
+```html
+<video-player enable-adaptive-full-screen>
+  <media-container>
+    <video src="/video.mp4"></video>
+  </media-container>
+</video-player>
+```
+
+</FrameworkCase>
+
 ### Lock orientation while fullscreen
 
 <FrameworkCase frameworks={["react"]}>

@@ -373,6 +373,162 @@ describe('fullscreenFeature', () => {
     });
   });
 
+  describe('adaptive fullscreen', () => {
+    it('does not lock orientation unless enabled', async () => {
+      Object.defineProperty(document, 'fullscreenEnabled', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
+
+      const orientation = {
+        lock: vi.fn(async () => {}),
+        unlock: vi.fn(),
+      };
+
+      vi.stubGlobal('screen', { orientation });
+
+      const video = createMockVideo();
+
+      Object.defineProperties(video, {
+        videoWidth: { value: 1920, configurable: true },
+        videoHeight: { value: 1080, configurable: true },
+      });
+
+      const container = document.createElement('div');
+
+      container.requestFullscreen = vi.fn(async () => {
+        Object.defineProperty(document, 'fullscreenElement', { value: container, configurable: true });
+        document.dispatchEvent(new Event('fullscreenchange'));
+      });
+
+      const store = createStore<PlayerTarget>()(fullscreenFeature);
+
+      store.attach({ media: video, container });
+
+      await store.requestFullscreen();
+
+      expect(orientation.lock).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      { width: 1920, height: 1080, orientation: 'landscape' },
+      { width: 1080, height: 1920, orientation: 'portrait' },
+      { width: 1080, height: 1080, orientation: 'portrait' },
+    ])('locks to $orientation for $width by $height video', async ({ width, height, orientation: expected }) => {
+      Object.defineProperty(document, 'fullscreenEnabled', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
+
+      const orientation = {
+        lock: vi.fn(async () => {}),
+        unlock: vi.fn(),
+      };
+
+      vi.stubGlobal('screen', { orientation });
+
+      const video = createMockVideo();
+
+      Object.defineProperties(video, {
+        videoWidth: { value: width, configurable: true },
+        videoHeight: { value: height, configurable: true },
+      });
+
+      const container = document.createElement('div');
+
+      container.requestFullscreen = vi.fn(async () => {
+        Object.defineProperty(document, 'fullscreenElement', { value: container, configurable: true });
+        document.dispatchEvent(new Event('fullscreenchange'));
+      });
+
+      const store = createStore<PlayerTarget>()(fullscreenFeature);
+
+      store.setAdaptiveFullscreenEnabled(true);
+      store.attach({ media: video, container });
+
+      await store.requestFullscreen();
+
+      expect(orientation.lock).toHaveBeenCalledWith(expected);
+    });
+
+    it('warns when the requested orientation is unsupported', async () => {
+      Object.defineProperty(document, 'fullscreenEnabled', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
+
+      const orientation = {
+        lock: vi.fn().mockRejectedValue(new Error('NotSupportedError')),
+        unlock: vi.fn(),
+      };
+
+      vi.stubGlobal('screen', { orientation });
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const video = createMockVideo();
+
+      Object.defineProperties(video, {
+        videoWidth: { value: 1080, configurable: true },
+        videoHeight: { value: 1920, configurable: true },
+      });
+
+      const container = document.createElement('div');
+
+      container.requestFullscreen = vi.fn(async () => {
+        Object.defineProperty(document, 'fullscreenElement', { value: container, configurable: true });
+        document.dispatchEvent(new Event('fullscreenchange'));
+      });
+
+      const store = createStore<PlayerTarget>()(fullscreenFeature);
+
+      store.setAdaptiveFullscreenEnabled(true);
+      store.attach({ media: video, container });
+
+      await store.requestFullscreen();
+      await vi.waitFor(() => expect(warn.mock.calls[0]?.[0]).toContain('Adaptive fullscreen'));
+
+      expect(orientation.lock).toHaveBeenCalledWith('portrait');
+    });
+
+    it('warns and leaves the device orientation unchanged when orientation locking is unavailable', async () => {
+      Object.defineProperty(document, 'fullscreenEnabled', {
+        value: true,
+        writable: true,
+        configurable: true,
+      });
+
+      vi.stubGlobal('screen', { orientation: {} });
+
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const video = createMockVideo();
+
+      Object.defineProperties(video, {
+        videoWidth: { value: 1080, configurable: true },
+        videoHeight: { value: 1920, configurable: true },
+      });
+
+      const container = document.createElement('div');
+
+      container.requestFullscreen = vi.fn(async () => {
+        Object.defineProperty(document, 'fullscreenElement', { value: container, configurable: true });
+        document.dispatchEvent(new Event('fullscreenchange'));
+      });
+
+      const store = createStore<PlayerTarget>()(fullscreenFeature);
+
+      store.setAdaptiveFullscreenEnabled(true);
+      store.attach({ media: video, container });
+
+      await store.requestFullscreen();
+
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('Adaptive fullscreen could not lock'));
+      expect(store.state.isFullscreen).toBe(true);
+    });
+  });
+
   describe('transitions', () => {
     it('requestFullscreen() exits PiP first when entering fullscreen', async () => {
       Object.defineProperty(document, 'fullscreenEnabled', {

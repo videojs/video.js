@@ -434,6 +434,27 @@ describe('createPlayer', () => {
     player.remove();
   });
 
+  it('applies adaptive fullscreen configuration through attributes and properties', async () => {
+    const { PlayerElement } = createPlayer({ features: videoFeatures });
+    const tagName = `test-adaptive-fullscreen-player-${tagCounter++}`;
+
+    customElements.define(tagName, PlayerElement);
+
+    const player = document.createElement(tagName) as InstanceType<typeof PlayerElement>;
+
+    player.setAttribute('enable-adaptive-full-screen', '');
+    document.body.append(player);
+
+    expect(player.store.enableAdaptiveFullScreen).toBe(true);
+
+    player.enableAdaptiveFullScreen = false;
+    await player.updateComplete;
+
+    expect(player.store.enableAdaptiveFullScreen).toBe(false);
+
+    player.remove();
+  });
+
   it('applies playback rates configuration through attributes and properties', async () => {
     const { PlayerElement } = createPlayer({ features: [features.playbackRate] });
     const tagName = 'test-playback-rates-player';

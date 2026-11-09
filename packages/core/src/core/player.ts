@@ -13,7 +13,7 @@ export interface PlayerMediaTarget {
   container: unknown | null;
 }
 
-type ConfigValue = string | readonly number[] | null | undefined;
+type ConfigValue = string | boolean | readonly number[] | null | undefined;
 
 type ActionInput<Action> = Action extends (...args: infer Arguments) => unknown
   ? Arguments extends [infer Value]
@@ -22,16 +22,16 @@ type ActionInput<Action> = Action extends (...args: infer Arguments) => unknown
   : never;
 
 /**
- * Actions accepting text, including narrower unions such as a string enum, so a feature keeps its own value type on the
- * provider input. A list input must accept text too, because an HTML attribute only ever delivers text. `null |
- * undefined` stays mandatory because that is how a provider clears an absent input.
+ * Actions accepting text or a boolean, including narrower unions such as a string enum, so a feature keeps its own
+ * value type on the provider input. A list input must accept text too, because an HTML attribute only ever delivers
+ * text. `null | undefined` stays mandatory because that is how a provider clears an absent input.
  */
 type ConfigActionKey<State> = [State] extends [never]
   ? PropertyKey
   : {
       [Key in keyof State]-?: [ActionInput<State[Key]>] extends [ConfigValue]
         ? [null | undefined] extends [ActionInput<State[Key]>]
-          ? [Extract<ActionInput<State[Key]>, string>] extends [never]
+          ? [Extract<ActionInput<State[Key]>, string | boolean>] extends [never]
             ? never
             : Key
           : never
@@ -42,7 +42,7 @@ type ConfigStateKey<State> = [State] extends [never] ? PropertyKey : keyof State
 
 /**
  * Maps provider inputs to feature-owned state actions and detach-persistent keys. Pass the feature's source-state type
- * when declaring a config map so both keys are checked and each action accepts nullable text, including absent input.
+ * when declaring a config map so both keys are checked and each action accepts its input plus `null | undefined`.
  */
 export type PlayerFeatureConfig<State = never> = Record<
   string,
@@ -57,11 +57,14 @@ export type PlayerFeatureConfig<State = never> = Record<
     state: ConfigStateKey<State>;
     /** How an HTML provider element names this input, when the key's own name won't do. */
     html?: {
+      /** HTML property conversion, defaulting to `String`. */
+      type?: 'boolean';
+
       /**
        * Attribute name in markup, kebab-case, for a key whose own name is taken on an element. The matching property
        * follows from it, so `content-title` is also `element.contentTitle`. Defaults to the kebab-cased key.
        */
-      attribute: string;
+      attribute?: string;
     };
   }
 >;

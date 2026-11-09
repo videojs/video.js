@@ -15,7 +15,7 @@ function App() {
 
   return (
     <SandboxI18nProvider>
-      <VideoPlayer poster={getPosterSrc(source)}>
+      <VideoPlayer enableAdaptiveFullScreen poster={getPosterSrc(source)}>
         {/* The skin renders its own <img> from `poster`; supplying one is what lets it carry a CORS mode. */}
         <VideoSkinComponent renderPoster={<img alt="" crossOrigin="" />}>
           <Video src={SOURCES[source].url} {...mediaProps} playsInline crossOrigin="">
