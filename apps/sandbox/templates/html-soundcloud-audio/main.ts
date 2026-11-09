@@ -5,12 +5,12 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 
 createHtmlSandbox({
   player: 'audio',
-  render: ({ skinTag, src }) => html`
+  render: ({ skinTag, src, attrs }) => html`
     <div class="mx-auto w-full max-w-xl">
       <audio-player>
         <${skinTag}>
           <!-- Hidden unless it is showing SoundCloud's own chrome, so it takes no room and needs no size. -->
-          <soundcloud-audio${src}></soundcloud-audio>
+          <soundcloud-audio${src} ${attrs}></soundcloud-audio>
         </${skinTag}>
       </audio-player>
     </div>
