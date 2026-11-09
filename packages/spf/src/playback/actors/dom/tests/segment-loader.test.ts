@@ -71,12 +71,10 @@ const mockFetchBytes = vi.fn(async () => {
 // ---------------------------------------------------------------------------
 
 describe('createSegmentLoaderActor', () => {
-  it('does NOT emit an explicit remove on cross-rendition switch; relies on MSE overwrite-on-append', async () => {
-    // Audio renditions share segment IDs and startTimes. Appending the new
-    // track's segments at the same timestamps overwrites the old data in
-    // the SourceBuffer — no explicit `remove` task needed, and no audible
-    // silence-gap during the swap. planTasks emits only the new-track init
-    // + new-track segments inside the (formerly-flushed) range.
+  it('removes from the current segment onward before appending on a cross-rendition switch', async () => {
+    // Overwriting the playing audio in place can leave iOS WebKit silent
+    // until a seek, so the stale range is removed before the new track's
+    // init and segments are appended.
     const bufferActor = createMockBufferActor({
       initTrackId: 'audio-en',
       initTrackLanguage: 'en',
@@ -102,33 +100,32 @@ describe('createSegmentLoaderActor', () => {
       expect(initCalls.length).toBeGreaterThan(0);
     });
 
-    // No cross-rendition remove emitted. Forward / back flushes are
-    // computed independently and don't fire here (the buffered range is
-    // entirely inside the load window, and no back-buffer threshold is
-    // crossed at currentTime=2).
-    const removeMsgs = bufferActor.send.mock.calls
-      .map((c) => c[0] as SourceBufferMessage)
-      .filter((m): m is Extract<SourceBufferMessage, { type: 'remove' }> => m.type === 'remove');
+    // Only the cross-rendition remove: forward / back flushes don't fire here
+    // (the buffered range is entirely inside the load window, and no
+    // back-buffer threshold is crossed at currentTime=2).
+    const messages = bufferActor.send.mock.calls.map((c) => c[0] as SourceBufferMessage);
 
-    expect(removeMsgs).toHaveLength(0);
+    expect(messages.filter((m) => m.type === 'remove')).toEqual([{ type: 'remove', start: 0, end: Infinity }]);
+    expect(messages[0]?.type).toBe('remove');
 
     loader.destroy();
   });
 
-  it('does not dispatch cross-rendition flush when languages match (audio-abr-style switch)', async () => {
-    // Same language, different track id (e.g., audio bitrate variant in
-    // same language group). planTasks should NOT emit a cross-rendition
+  it('does not dispatch cross-rendition flush when language and name match (audio-abr-style switch)', async () => {
+    // Same language and name, different track id (an audio bitrate variant
+    // in another group). planTasks should NOT emit a cross-rendition
     // flush — appending new segments overwrites time-aligned ranges.
     const bufferActor = createMockBufferActor({
       initTrackId: 'audio-en-128k',
       initTrackLanguage: 'en',
+      initTrackName: 'English',
       segments: [{ id: 'audio-en-128k-0', startTime: 0, duration: 6, trackId: 'audio-en-128k' }],
       bufferedRanges: [{ start: 0, end: 6 }],
     });
 
     const loader = createSegmentLoaderActor(bufferActor as unknown as SourceBufferActor, mockFetchBytes);
 
-    const newTrack = makeAudioTrack('audio-en-256k', { language: 'en' });
+    const newTrack = makeAudioTrack('audio-en-256k', { language: 'en', name: 'English' });
 
     loader.send({ type: 'load', track: newTrack, range: { start: 2, end: 20 } });
 
@@ -142,12 +139,49 @@ describe('createSegmentLoaderActor', () => {
     });
     const messages = bufferActor.send.mock.calls.map(([message]) => message as SourceBufferMessage);
 
-    expect(messages[0]).toMatchObject({ type: 'append-init', meta: { trackId: 'audio-en-256k', language: 'en' } });
+    expect(messages[0]).toMatchObject({
+      type: 'append-init',
+      meta: { trackId: 'audio-en-256k', language: 'en', name: 'English' },
+    });
     expect(messages.filter((message) => message.type === 'append-segment').map((message) => message.meta.id)).toEqual([
       'audio-en-256k-1',
       'audio-en-256k-2',
     ]);
     expect(messages.filter((message) => message.type === 'remove')).toEqual([]);
+
+    loader.destroy();
+  });
+
+  it('flushes on a switch between same-language tracks with different names', async () => {
+    // A commentary track shares its language with the main audio, so the
+    // name is what marks it as different content.
+    const bufferActor = createMockBufferActor({
+      initTrackId: 'audio-en',
+      initTrackLanguage: 'en',
+      initTrackName: 'English',
+      segments: [
+        { id: 'audio-en-0', startTime: 0, duration: 6, trackId: 'audio-en' },
+        { id: 'audio-en-1', startTime: 6, duration: 6, trackId: 'audio-en' },
+      ],
+      bufferedRanges: [{ start: 0, end: 12 }],
+    });
+
+    const loader = createSegmentLoaderActor(bufferActor as unknown as SourceBufferActor, mockFetchBytes);
+
+    const newTrack = makeAudioTrack('audio-en-commentary', { language: 'en', name: 'Commentary' });
+
+    loader.send({ type: 'load', track: newTrack, range: { start: 8, end: 20 } });
+
+    await vi.waitFor(() => expect(loader.snapshot.get().value).toBe('idle'));
+    const messages = bufferActor.send.mock.calls.map(([message]) => message as SourceBufferMessage);
+
+    expect(messages.filter((message) => message.type === 'remove')).toEqual([
+      { type: 'remove', start: 6, end: Infinity },
+    ]);
+    expect(messages.filter((message) => message.type === 'append-segment').map((message) => message.meta.id)).toEqual([
+      'audio-en-commentary-1',
+      'audio-en-commentary-2',
+    ]);
 
     loader.destroy();
   });
@@ -187,10 +221,9 @@ describe('createSegmentLoaderActor', () => {
   it('schedules new-track segments inside the cross-rendition stale range (including current segment)', async () => {
     // Cross-rendition audio renditions share segment IDs and startTimes
     // (e.g., every variant has its own `segment-1` at startTime=6).
-    // planTasks treats the range from `currentSegmentStart` forward as
-    // stale (will be overwritten by new appends via MSE
-    // overwrite-on-append) and re-schedules every new-track segment in
-    // that range — including the segment containing the playhead. The
+    // planTasks removes the range from `currentSegmentStart` forward and
+    // re-schedules every new-track segment in that range — including the
+    // segment containing the playhead. The
     // pre-flush `bufferedSegments` snapshot would otherwise mark those
     // same-startTime new-track segments "already buffered" and skip them.
     const bufferActor = createMockBufferActor({
@@ -237,9 +270,9 @@ describe('createSegmentLoaderActor', () => {
     loader.destroy();
   });
 
-  it('captures language into append-init meta for downstream tracking', async () => {
-    // Verify that planTasks includes `language` in the append-init meta
-    // so the SourceBufferActor can capture initTrackLanguage on commit.
+  it('captures language and name into append-init meta for downstream tracking', async () => {
+    // Verify that planTasks includes `language` and `name` in the append-init
+    // meta so the SourceBufferActor can capture them on commit.
     const bufferActor = createMockBufferActor();
     const loader = createSegmentLoaderActor(bufferActor as unknown as SourceBufferActor, mockFetchBytes);
 
@@ -259,6 +292,7 @@ describe('createSegmentLoaderActor', () => {
 
     expect(initMsg.meta.trackId).toBe('audio-es');
     expect(initMsg.meta.language).toBe('es');
+    expect(initMsg.meta.name).toBe('audio-es');
 
     loader.destroy();
   });
