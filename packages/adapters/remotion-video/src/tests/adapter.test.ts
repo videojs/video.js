@@ -524,7 +524,7 @@ describe('RemotionAdapter', () => {
         });
       }).not.toThrow();
 
-      expect(media.textTracks.length).toBe(0);
+      expect(media.textTracks?.length).toBe(0);
     });
   });
 });

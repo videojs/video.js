@@ -1,10 +1,9 @@
 import type { CallbackListener, EventTypes, PlayerRef } from '@remotion/player';
 import {
-  EMPTY_TEXT_TRACKS,
-  EMPTY_TIME_RANGES,
   MediaError,
   type MediaPreloadType,
   MediaReadyState,
+  NO_TIME_RANGES_YET,
   type TextTrackListLike,
   type Video,
 } from '@videojs/media';
@@ -458,11 +457,11 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
 
   // A composition is fully addressable once mounted; there is no byte buffer to report.
   get buffered() {
-    return this.#player && this.duration > 0 ? createTimeRange(0, this.duration) : EMPTY_TIME_RANGES;
+    return this.#player && this.duration > 0 ? createTimeRange(0, this.duration) : NO_TIME_RANGES_YET;
   }
 
   get seekable() {
-    return this.duration > 0 ? createTimeRange(0, this.duration) : EMPTY_TIME_RANGES;
+    return this.duration > 0 ? createTimeRange(0, this.duration) : NO_TIME_RANGES_YET;
   }
 
   // A composition has no native track list, so a detached `<video>` hosts one (the YouTube adapter does the same for
@@ -510,7 +509,7 @@ export class RemotionAdapter extends MediaPlayedRangesMixin(EventTarget) impleme
   get textTracks() {
     this.#textTracksHost ??= globalThis.document?.createElement('video') ?? null;
 
-    return (this.#textTracksHost?.textTracks as TextTrackListLike | undefined) ?? EMPTY_TEXT_TRACKS;
+    return this.#textTracksHost?.textTracks as TextTrackListLike | undefined;
   }
 
   #syncChapters() {
