@@ -12,7 +12,11 @@ class SandboxNoSkin extends HTMLElement {
 
     const root = this.attachShadow({ mode: 'open' });
 
-    root.innerHTML = '<style>:host { display: block; position: relative; width: 100%; }</style><slot></slot>';
+    // A plain `<video>` is the page's, so only a slotted rule can fill the frame with it; custom media size their own.
+    root.innerHTML = `<style>
+      :host { display: block; position: relative; width: 100%; }
+      ::slotted(video) { display: block; width: 100%; height: 100%; object-fit: contain; }
+    </style><slot></slot>`;
 
     const slot = root.querySelector('slot')!;
 

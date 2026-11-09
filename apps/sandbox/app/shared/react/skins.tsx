@@ -198,7 +198,11 @@ interface NoSkinProps {
  */
 function NoSkin({ children, className, dir, ref }: NoSkinProps) {
   return (
-    <div className={`relative w-full ${className ?? ''}`} dir={dir} ref={ref}>
+    <div
+      className={`relative w-full [&>video]:block [&>video]:size-full [&>video]:object-contain ${className ?? ''}`}
+      dir={dir}
+      ref={ref}
+    >
       {Children.map(children, (child) =>
         isValidElement<{ controls?: boolean }>(child) ? cloneElement(child, { controls: true }) : child
       )}
