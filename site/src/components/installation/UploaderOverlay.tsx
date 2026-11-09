@@ -3,15 +3,25 @@ import clsx from 'clsx';
 import CheckCircle from '@/assets/icons/check-circle.svg?react';
 import { MUX_URL } from '@/consts';
 import { withMuxAttribution } from '@/utils/mux/attribution';
+import type { UploadFailureNotice } from '@/utils/mux/upload-failure';
 
-export type UploaderState = 'idle' | 'needs_login' | 'uploading' | 'preparing' | 'ready' | 'polling_error';
+export type UploaderState =
+  | 'idle'
+  | 'needs_login'
+  | 'create_error'
+  | 'uploading'
+  | 'preparing'
+  | 'ready'
+  | 'polling_error';
 
 interface UploaderOverlayProps {
   state: UploaderState;
   error: string | null;
+  failure: UploadFailureNotice | null;
   playbackId: string | null;
   onLogin: () => void;
   onRetry: () => void;
+  onDismiss: () => void;
 }
 
 /** Shared overlay container matching drop zone styling */
@@ -33,11 +43,20 @@ function OverlayWrapper({ children, className }: { children: React.ReactNode; cl
  * Renders state-based overlays on top of MuxUploader.
  *
  * - Needs_login: Login prompt
+ * - Create_error: Mux couldn't create the upload; retry is offered only when it could help
  * - Preparing: Spinner while polling for playback ID
  * - Ready: Success message with playback ID
  * - Polling_error: Error during post-upload processing (MuxUploader handles upload errors natively)
  */
-export default function UploaderOverlay({ state, error, playbackId, onLogin, onRetry }: UploaderOverlayProps) {
+export default function UploaderOverlay({
+  state,
+  error,
+  failure,
+  playbackId,
+  onLogin,
+  onRetry,
+  onDismiss,
+}: UploaderOverlayProps) {
   // No overlay needed for idle or uploading (MuxUploader handles its own UI)
   if (state === 'idle' || state === 'uploading') {
     return null;
@@ -67,6 +86,48 @@ export default function UploaderOverlay({ state, error, playbackId, onLogin, onR
         >
           Sign up or log in
         </button>
+      </OverlayWrapper>
+    );
+  }
+
+  if (state === 'create_error' && failure) {
+    return (
+      <OverlayWrapper>
+        <p className="text-p3 font-semibold">Couldn&rsquo;t start the upload</p>
+        <p className="text-p3 text-red text-balance" role="alert">
+          {failure.message}
+        </p>
+        {failure.retryable ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            data-ph-capture-attribute-cta="mux-retry"
+            className="text-p3 intent:decoration-gold underline"
+          >
+            Try again
+          </button>
+        ) : (
+          <div className="text-p3 flex items-center gap-4">
+            <a
+              href={withMuxAttribution('https://dashboard.mux.com', 'mux-uploader')}
+              data-ph-capture-attribute-cta="mux-dashboard"
+              data-ph-capture-attribute-destination="mux"
+              target="_blank"
+              rel="noopener"
+              className="intent:decoration-gold underline"
+            >
+              Open the Mux dashboard
+            </a>
+            <button
+              type="button"
+              onClick={onDismiss}
+              data-ph-capture-attribute-cta="mux-dismiss"
+              className="intent:decoration-gold underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
       </OverlayWrapper>
     );
   }
