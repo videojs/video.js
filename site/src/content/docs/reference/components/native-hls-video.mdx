@@ -23,68 +23,17 @@ import basicUsageHtml from "@/components/docs/demos/native-hls-video/html/css/Ba
 import basicUsageHtmlCss from "@/components/docs/demos/native-hls-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/native-hls-video/html/css/BasicUsage.ts?raw";
 
-HLS video element that relies on the browser's native HLS support. Works on Safari and other browsers with built-in HLS playback. For cross-browser HLS support, use the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> instead.
+HLS video component that hands playback to the browser's built-in HLS support, as in Safari. It adds no streaming engine, so it's the smallest HLS option, and it only plays where the browser supports HLS. For HLS in every browser, use the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> or the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>. It licenses DRM through FairPlay only; see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>.
 
 ## Import
 
 <MediaImports media="native-hls-video" react="NativeHlsVideo" />
 
-## Load a source
+## Guides
 
-`src` takes an HLS manifest URL, which the browser plays with its own HLS support.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<NativeHlsVideo src="https://example.com/playlist.m3u8" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<native-hls-video src="https://example.com/playlist.m3u8"></native-hls-video>
-```
-</FrameworkCase>
-
-The structured `source` object adds `drm` and engine options to the URL. Setting `source` derives `src`.
-
-## Protected content
-
-`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess).
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<NativeHlsVideo
-  source={{
-    src: 'https://example.com/protected.m3u8',
-    drm: {
-      'com.apple.fps': {
-        licenseUrl: 'https://example.com/fairplay',
-        serverCertificateUrl: 'https://example.com/fairplay.cer',
-      },
-      'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-    },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const video = document.querySelector('native-hls-video')!;
-video.source = {
-  src: 'https://example.com/protected.m3u8',
-  drm: {
-    'com.apple.fps': {
-      licenseUrl: 'https://example.com/fairplay',
-      serverCertificateUrl: 'https://example.com/fairplay.cer',
-    },
-    'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-  },
-};
-```
-</FrameworkCase>
-
-The browser's own HLS licenses FairPlay only, so the `com.apple.fps` entry is the one this component uses. <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">Media sources</DocsLink> covers DRM in more depth.
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
 ## Examples
 
@@ -115,7 +64,7 @@ The browser's own HLS licenses FairPlay only, so the `com.apple.fps` entry is th
 
 <MediaReference media="NativeHlsVideo">
   <Fragment slot="engine-nativeHls">
-    This element hands playback to the browser, so there's no JavaScript engine to configure. This carries the one thing native playback still needs from you. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+    This element hands playback to the browser, so there's no JavaScript engine to configure. This carries the one thing native playback still needs from you. <DocsLink slug="guides/media-sources">Media sources</DocsLink> covers how engine options fit into a structured source.
 
     <FrameworkCase frameworks={["react"]}>
     ```tsx
@@ -134,7 +83,7 @@ The browser's own HLS licenses FairPlay only, so the `com.apple.fps` entry is th
 
     <FrameworkCase frameworks={["html"]}>
     ```ts
-    const video = document.querySelector('native-hls-video');
+    const video = document.querySelector('native-hls-video')!;
     video.source = {
       src: 'https://example.com/playlist.m3u8',
       engine: {

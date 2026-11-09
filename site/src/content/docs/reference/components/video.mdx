@@ -29,6 +29,16 @@ import basicUsageHtml from "@/components/docs/demos/video/html/css/BasicUsage.ht
 import basicUsageHtmlCss from "@/components/docs/demos/video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/video/html/css/BasicUsage.ts?raw";
 
+The browser's native `<video>` as a Video.js media component. Video.js doesn't replace the native API: set `src` or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates, add [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) for captions, and listen for native media events. It plays what the browser plays on its own. For HLS in every browser, DASH, Mux, or an embedded provider, use a streaming media component instead; see <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+
+<FrameworkCase frameworks={["react"]}>
+`Video` forwards native attributes, event handlers, and children to the underlying `<video>`, and becomes the media of the player it's placed in.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`<video>` is the native element itself. Placed inside `<video-player>`, it becomes that player's media.
+</FrameworkCase>
+
 ## Import
 
 <FrameworkCase frameworks={["react"]}>
@@ -67,31 +77,12 @@ import '@videojs/html/video/player';
 ```
 </FrameworkCase>
 
-## Use with a player
+## Guides
 
-<FrameworkCase frameworks={["react"]}>
-Place `Video` anywhere inside a `VideoPlayer`, or inside another Video.js `Player` configured for video. It becomes that player's media provider automatically. Outside a player, `Video` behaves as a standalone native `<video>`.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-Place a native `<video>` anywhere inside `<video-player>`. It becomes that player's media provider automatically.
-</FrameworkCase>
-
-## Native behavior
-
-Video.js does not replace the native video API. Use `src` for one URL or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> when you need an HLS, DASH, Mux, or other playback adapter.
-
-Add native [`<track>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track) for captions, subtitles, chapters, descriptions, or metadata.
-
-<FrameworkCase frameworks={["react"]}>
-`Video` forwards native attributes, event handlers, and children to the underlying `<video>`. See [Refs](#refs) for what `ref` and `mediaRef` receive.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-`<video>` is the native element itself. Set its attributes and properties, listen for native media events, and access it through an `HTMLVideoElement` reference.
-</FrameworkCase>
-
-See MDN for the complete [`<video>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video), [`HTMLVideoElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement), and shared [`HTMLMediaElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement) APIs.
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/captions">Show captions and subtitles</DocsLink>
+- <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>
+- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
 
 ## Examples
 
@@ -120,6 +111,30 @@ This native video uses a child source, captions track, and browser controls whil
       <BasicUsageDemoHtml />
     </Demo>
   </StyleCase>
+</FrameworkCase>
+
+### Inside a player
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<VideoPlayer>
+  <VideoSkin>
+    <Video src="https://example.com/video.mp4" playsInline />
+  </VideoSkin>
+</VideoPlayer>
+```
+
+Outside a player, `Video` behaves as a standalone native `<video>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<video-player>
+  <video-skin>
+    <video src="https://example.com/video.mp4" playsinline></video>
+  </video-skin>
+</video-player>
+```
 </FrameworkCase>
 
 ## API Reference

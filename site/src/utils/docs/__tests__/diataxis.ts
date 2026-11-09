@@ -16,11 +16,16 @@ export interface DiataxisIssue {
   message: string;
 }
 
-export type DiataxisRule = 'title-how-to-prefix' | 'reference-how-to-section' | 'reference-custom-ui-note';
+export type DiataxisRule =
+  | 'title-how-to-prefix'
+  | 'reference-how-to-section'
+  | 'reference-custom-ui-note'
+  | 'reference-media-section';
 
 const HOW_TO_PREFIX = /^how to\b/i;
 const CUSTOM_UI_NOTE = /<CustomUiNote\b/;
 const HEADING = /^#{2,6}\s+(.+?)\s*$/gm;
+const SECTION_HEADING = /^##\s+(.+?)\s*$/gm;
 
 /**
  * First words that turn a heading into an instruction. Concept headings name the thing being explained ("Feature
@@ -58,8 +63,27 @@ const TASK_VERBS = new Set([
 /** Headings the how-to template owns; on a reference page they mean a task walkthrough has crept in. */
 const HOW_TO_SECTIONS = new Set(['recommended approach', 'how it works', 'common variations', 'troubleshooting']);
 
-function headings(body: string): string[] {
-  return [...body.matchAll(HEADING)].map((match) => match[1]!.replace(/`/g, ''));
+/**
+ * The only sections a media element page has. Tasks belong in the shared guides its "Guides" section links, and facts
+ * about one element belong in its API Reference rows.
+ */
+const MEDIA_SECTIONS = new Set(['import', 'anatomy', 'guides', 'examples', 'api reference']);
+
+/** Media element pages on that skeleton. Add a page once it moves onto it; the embed pages haven't yet. */
+const MEDIA_SKELETON_PAGES = new Set([
+  'reference/components/audio',
+  'reference/components/dash-video',
+  'reference/components/hls-audio',
+  'reference/components/hls-video',
+  'reference/components/hlsjs-video',
+  'reference/components/mux-audio',
+  'reference/components/mux-video',
+  'reference/components/native-hls-video',
+  'reference/components/video',
+]);
+
+function headings(body: string, pattern: RegExp = HEADING): string[] {
+  return [...body.matchAll(pattern)].map((match) => match[1]!.replace(/`/g, ''));
 }
 
 /**
@@ -85,6 +109,17 @@ export function findDiataxisIssues(page: DocPage): DiataxisIssue[] {
       report(
         'reference-how-to-section',
         `Heading "${heading}" is a how-to template section; move the task to a guide.`
+      );
+    }
+  }
+
+  if (MEDIA_SKELETON_PAGES.has(page.id)) {
+    for (const heading of headings(page.body, SECTION_HEADING)) {
+      if (MEDIA_SECTIONS.has(heading.toLowerCase())) continue;
+
+      report(
+        'reference-media-section',
+        `Media pages only have Import, Anatomy, Guides, Examples, and API Reference sections; move "${heading}" to a guide or an API Reference row.`
       );
     }
   }

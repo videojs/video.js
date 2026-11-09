@@ -68,6 +68,28 @@ describe('renderInlineMarkdown', () => {
     );
   });
 
+  it("points agnostic docs links at the rendered page's framework", () => {
+    expect(renderInlineMarkdown('[DRM](https://videojs.org/docs/guides/drm)', { framework: 'react' })).toContain(
+      'href="/docs/framework/react/guides/drm"'
+    );
+    expect(renderInlineMarkdown('[Mux](/docs/guides/mux#play-signed-assets)', { framework: 'html' })).toContain(
+      'href="/docs/framework/html/guides/mux#play-signed-assets"'
+    );
+  });
+
+  it('leaves agnostic docs links for the browser to resolve without a framework', () => {
+    const result = renderInlineMarkdown('[DRM](https://videojs.org/docs/guides/drm)');
+
+    expect(result).toContain('href="/docs/guides/drm"');
+    expect(result).toContain('data-docs-slug="guides/drm"');
+  });
+
+  it('rejects agnostic docs links to pages that do not exist', () => {
+    expect(() => renderInlineMarkdown('[Gone](https://videojs.org/docs/guides/not-a-guide)')).toThrow(
+      'No guide found with slug "guides/not-a-guide"'
+    );
+  });
+
   it('tags Mux links with the Video.js campaign and the docs placement', () => {
     expect(renderInlineMarkdown('[Mux Data](https://www.mux.com/data)')).toContain(
       'href="https://www.mux.com/data?utm_source=videojs&utm_campaign=vjs10&utm_content=docs-content"'

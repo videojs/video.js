@@ -66,6 +66,24 @@ describe('findDiataxisIssues', () => {
     ]);
   });
 
+  it('limits media pages to their skeleton sections', () => {
+    const body = [
+      '## Import',
+      '## Anatomy',
+      '## Guides',
+      '## Load a source',
+      '## Examples',
+      '### With a playback ID',
+      '## API Reference',
+    ].join('\n\n');
+    const muxVideo = page({ id: 'reference/components/mux-video', type: 'reference', body });
+
+    expect(findDiataxisIssues(muxVideo).map((issue) => issue.message)).toEqual([
+      'Media pages only have Import, Anatomy, Guides, Examples, and API Reference sections; move "Load a source" to a guide or an API Reference row.',
+    ]);
+    expect(findDiataxisIssues(page({ id: 'reference/components/time-slider', type: 'reference', body }))).toEqual([]);
+  });
+
   it('names task headings without treating them as failures', () => {
     const body = '## Feature bundles\n\n## Create a player\n\n### Using selectors\n\n## Styling and state';
 

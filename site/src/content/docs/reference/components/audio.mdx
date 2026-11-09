@@ -29,6 +29,16 @@ import basicUsageHtml from "@/components/docs/demos/audio/html/css/BasicUsage.ht
 import basicUsageHtmlCss from "@/components/docs/demos/audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/audio/html/css/BasicUsage.ts?raw";
 
+The browser's native `<audio>` as a Video.js media component. Video.js doesn't replace the native API: set `src` or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates, and listen for native media events. It plays what the browser plays on its own. For HLS in every browser, Mux, or an embedded provider, use a streaming media component instead; see <DocsLink slug="guides/media-sources">Media sources</DocsLink>.
+
+<FrameworkCase frameworks={["react"]}>
+`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`, and becomes the media of the player it's placed in.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+`<audio>` is the native element itself. Placed inside `<audio-player>`, it becomes that player's media.
+</FrameworkCase>
+
 ## Import
 
 <FrameworkCase frameworks={["react"]}>
@@ -65,29 +75,10 @@ import '@videojs/html/audio/player';
 ```
 </FrameworkCase>
 
-## Use with a player
+## Guides
 
-<FrameworkCase frameworks={["react"]}>
-Place `Audio` anywhere inside an `AudioPlayer`, or inside another Video.js `Player` configured for audio. It becomes that player's media provider automatically. Outside a player, `Audio` behaves as a standalone native `<audio>`.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-Place a native `<audio>` anywhere inside `<audio-player>`. It becomes that player's media provider automatically.
-</FrameworkCase>
-
-## Native behavior
-
-Video.js does not replace the native audio API. Use `src` for one URL or add child [`<source>` elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/source) when the browser should choose between candidates. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> when you need an HLS, Mux, Spotify, or other playback adapter.
-
-<FrameworkCase frameworks={["react"]}>
-`Audio` forwards native attributes, event handlers, and children to the underlying `<audio>`. See [Refs](#refs) for what `ref` and `mediaRef` receive.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-`<audio>` is the native element itself. Set its attributes and properties, listen for native media events, and access it through an `HTMLAudioElement` reference.
-</FrameworkCase>
-
-See MDN for the complete [`<audio>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/audio), [`HTMLAudioElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement), and shared [`HTMLMediaElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement) APIs.
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/autoplay">Autoplay</DocsLink>
 
 ## Examples
 
@@ -116,6 +107,30 @@ This native audio element uses a child source and browser controls while providi
       <BasicUsageDemoHtml />
     </Demo>
   </StyleCase>
+</FrameworkCase>
+
+### Inside a player
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<AudioPlayer>
+  <AudioSkin>
+    <Audio src="https://example.com/audio.m4a" />
+  </AudioSkin>
+</AudioPlayer>
+```
+
+Outside a player, `Audio` behaves as a standalone native `<audio>`.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<audio-player>
+  <audio-skin>
+    <audio src="https://example.com/audio.m4a"></audio>
+  </audio-skin>
+</audio-player>
+```
 </FrameworkCase>
 
 ## API Reference
