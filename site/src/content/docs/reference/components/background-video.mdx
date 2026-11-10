@@ -105,6 +105,16 @@ An HLS URL only works where the browser has native HLS playback. See <DocsLink s
   </Tbody>
 </Table>
 
+An explicit `muted`, `loop`, or `autoplay` attribute wins over its opt-out. The opt-outs also apply when set after the element is created. `crossorigin`, `preload`, `controls`, and `controlslist` are passed through to the inner video, including later changes.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| `src` | URL of the video. Assigning a new one restarts playback |
+| `error` | The inner video's `MediaError`, or `null`. The element also fires `error` when the video does |
+| `target` | Inner native `<video>` element. Call `play()` and `pause()` on it |
+
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>

@@ -10,11 +10,11 @@ import FrameworkCase from '@/components/docs/FrameworkCase.astro';
 import MediaImports from '@/components/docs/api-reference/MediaImports.astro';
 
 <FrameworkCase frameworks={["react"]}>
-HlsBackgroundVideo plays an HLS source through the SPF background engine. It is fixed to muted, autoplaying, inline, looped playback and omits controls, audio, text, DRM, and adaptive rendition switching.
+HlsBackgroundVideo plays an HLS source through the SPF background engine. It is fixed to muted, inline playback, loops and autoplays unless you pass `loop={false}` or `autoPlay={false}`, and omits controls, audio, text, DRM, and adaptive rendition switching.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<hls-background-video>` plays an HLS source through the SPF background engine. It is fixed to muted, autoplaying, inline, looped playback and omits controls, audio, text, DRM, and adaptive rendition switching.
+`<hls-background-video>` plays an HLS source through the SPF background engine. It is fixed to muted, inline playback, loops and autoplays unless you set `noloop` or `noautoplay`, and omits controls, audio, text, DRM, and adaptive rendition switching.
 </FrameworkCase>
 
 See <DocsLink slug="guides/background-video">Add a background video</DocsLink> for layout, poster, accessibility, and source-choice guidance.
@@ -46,7 +46,15 @@ See <DocsLink slug="guides/background-video">Add a background video</DocsLink> f
 ```
 </FrameworkCase>
 
-There is no `source` object, `preload` mode, or opt-out for muted, autoplay, and loop. Assigning a new `src` restarts playback from scratch.
+There is no `source` object, `preload` mode, or opt-out for muted. Assigning a new `src` restarts playback from scratch.
+
+<FrameworkCase frameworks={["html"]}>
+Set `noautoplay` to hold playback until your script calls `target.play()`, for example after checking `prefers-reduced-motion`, and `noloop` to play the video once. Both also apply when set after the element is created. `crossorigin`, `controls`, and `controlslist` are passed through to the inner video, including later changes.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+Pass `autoPlay={false}` to hold playback until you call `play()` on the `<video>` from `ref`, for example after checking `prefers-reduced-motion`, and `loop={false}` to play the video once.
+</FrameworkCase>
 
 ## API
 
@@ -55,7 +63,10 @@ There is no `source` object, `preload` mode, or opt-out for muted, autoplay, and
 | --- | --- |
 | `src` | HLS manifest URL |
 | `error` | Fatal SPF media error for the current source, or `null` |
-| `video` | Inner native `<video>` element |
+| `target` | Inner native `<video>` element. Call `play()` and `pause()` on it |
+| `noautoplay` | Attribute that turns off autoplay |
+| `noloop` | Attribute that turns off looping |
+| `video` | Same element as `target` |
 | `adapter` | The `HlsBackgroundVideoAdapter` driving the inner video, including its SPF `engine` |
 
 The element also fires an `error` event when `error` becomes fatal. The inner video's own `error` can remain `null` because SPF, rather than the browser, rejected the source.
