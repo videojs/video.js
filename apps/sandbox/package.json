@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
-    "@caprid/moq-media": "^0.3.0",
-    "@caprid/relay": "^0.3.0",
+    "@caprid/moq-media": "^0.4.1",
+    "@caprid/relay": "^0.4.1",
     "@heroicons/react": "^2.2.0",
     "@videojs/cdn": "workspace:*",
     "@videojs/cloudflare-video": "workspace:*",

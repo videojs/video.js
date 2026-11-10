@@ -4,6 +4,7 @@ import {
   groupMsfTracks,
   type MsfCatalog,
   type MsfCatalogTrack,
+  videoDecoderConfigFromTrack,
 } from '@caprid/moq-media';
 
 /** A video track and the decoder config it plays with. */
@@ -48,15 +49,7 @@ export function choosePresentation(catalog: MsfCatalog): Presentation | undefine
 function toVideoChoice(track: MsfCatalogTrack): VideoChoice[] {
   if (track.role !== 'video' || !track.codec) return [];
 
-  const config: VideoDecoderConfig = {
-    codec: track.codec,
-    optimizeForLatency: true,
-    ...(track.initData ? { description: track.initData } : {}),
-    ...(track.width ? { codedWidth: track.width } : {}),
-    ...(track.height ? { codedHeight: track.height } : {}),
-  };
-
-  return [{ track, config }];
+  return [{ track, config: videoDecoderConfigFromTrack(track) }];
 }
 
 function toAudioChoice(track: MsfCatalogTrack): AudioChoice[] {

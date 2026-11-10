@@ -44,13 +44,13 @@
     "@videojs/utils": "workspace:*"
   },
   "devDependencies": {
-    "@caprid/moq-media": "^0.3.0",
-    "@caprid/relay": "^0.3.0",
+    "@caprid/moq-media": "^0.4.1",
+    "@caprid/relay": "^0.4.1",
     "jsdom": "^26.1.0",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@caprid/moq-media": "^0.3.0",
-    "@caprid/relay": "^0.3.0"
+    "@caprid/moq-media": "^0.4.1",
+    "@caprid/relay": "^0.4.1"
   }
 }

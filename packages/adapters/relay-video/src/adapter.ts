@@ -1,14 +1,17 @@
 import {
+  type AudioPlayerInput,
   CATALOG_TRACK,
+  canvasRenderer,
   createFrameHold,
   createFrameSequencer,
   createPlayoutClock,
+  createVideoPlayer,
   type FrameHold,
   type MsfCatalog,
   type PlayoutClock,
   parseMsfCatalog,
   type SequencedFrame,
-  type AudioPlayerInput,
+  type VideoPlayer,
 } from '@caprid/moq-media';
 import type { MoqtObject, WantHandlers, WantOptions } from '@caprid/relay';
 import { createFrameReader, type FrameReader, mediaSubscribeParameters } from '@caprid/relay/media';
@@ -25,7 +28,6 @@ import {
   sameDecoding,
   type VideoChoice,
 } from './catalog';
-import { canvasRenderer, createVideoPlayer, type VideoPlayer } from './video-player';
 import { createWantScope, type RelaySubscriberView, type WantScope } from './want-scope';
 
 /**
@@ -124,6 +126,10 @@ function relayError(message: string, error: unknown): MediaError {
 
 function warnRecoverable(error: unknown) {
   if (__DEV__) console.warn('<relay-video> recovered from a decoder error.', error);
+}
+
+function errorName(error: unknown): string | undefined {
+  return error instanceof Error ? error.name : undefined;
 }
 
 // The media-tracks mixin defines its properties on the prototype it is given, so it gets one of its own.
@@ -570,7 +576,7 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
 
         this.#onFrameShown();
       },
-      onError: warnRecoverable,
+      onError: (error) => this.#onVideoError(player, error),
     });
     const reader = createFrameReader(createFrameSequencer({ clock }), {
       onFrame: player.push,
@@ -587,6 +593,11 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
           reader.onSubscribed(info);
           this.#activate(video, video.choice.track.name);
         },
+        onRestarted: () => {
+          reader.onRestarted();
+          // The frames still waiting belong to the subscription that ended, and would look due once the clock moves.
+          player.reset();
+        },
         onSwitched: (info) => {
           reader.onSwitched(info);
 
@@ -600,6 +611,24 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
 
     scope.want('video', wantOptions(choice, 'video'), video.handlers);
     return video;
+  }
+
+  #onVideoError(player: VideoPlayer, error: unknown): void {
+    const name = errorName(error);
+    // The player stops for good when its decoder rejects the config or fails before it decodes anything: the same
+    // config would fail the same way. After any other error it decodes again from the next keyframe.
+    const fatal = name === 'NotSupportedError' || (player.stats.decoded === 0 && name !== 'DataError');
+    const session = this.#session;
+
+    if (!fatal || session.state !== 'ready' || session.playback?.video.player !== player) {
+      warnRecoverable(error);
+      return;
+    }
+
+    const mediaError = new MediaError('The video could not be decoded.', MediaError.MEDIA_ERR_DECODE, true);
+
+    mediaError.data = { cause: error };
+    this.#fail(mediaError);
   }
 
   #syncVideo(session: Ready, { video }: Playback): void {

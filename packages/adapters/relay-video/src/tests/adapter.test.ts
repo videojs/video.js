@@ -1,24 +1,33 @@
-import { buildMsfCatalog, buildMsfEndCatalog, type MsfCatalogInput } from '@caprid/moq-media';
+import {
+  buildMsfCatalog,
+  buildMsfEndCatalog,
+  createVideoPlayer,
+  type MsfCatalogInput,
+  type VideoPlayer,
+  type VideoPlayerOptions,
+} from '@caprid/moq-media';
 import type { MoqtObject, SubscribeOk, WantHandlers } from '@caprid/relay';
 import { MediaError } from '@videojs/media';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { RelayVideoAdapter } from '../adapter';
-import { createVideoPlayer, type VideoPlayerOptions } from '../video-player';
 import { createFakeSubscriber, type FakeSubscriber } from './fake-subscriber';
-
-vi.mock('../video-player', () => ({
-  createVideoPlayer: vi.fn(() => ({ push: vi.fn(), configure: vi.fn(), close: vi.fn() })),
-  canvasRenderer: vi.fn((canvas: HTMLCanvasElement) => (frame: VideoFrame) => {
-    canvas.width = frame.displayWidth;
-    canvas.height = frame.displayHeight;
-  }),
-}));
 
 const audioInput = { push: vi.fn(), remove: vi.fn() };
 
 vi.mock('@caprid/moq-media', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@caprid/moq-media')>()),
+  createVideoPlayer: vi.fn(() => ({
+    push: vi.fn(),
+    configure: vi.fn(),
+    reset: vi.fn(),
+    close: vi.fn(),
+    stats: { decoded: 0 },
+  })),
+  canvasRenderer: vi.fn((canvas: HTMLCanvasElement) => (frame: VideoFrame) => {
+    canvas.width = frame.displayWidth;
+    canvas.height = frame.displayHeight;
+  }),
   createAudioPlayer: vi.fn(async () => ({
     output: { gain: { value: 1 }, connect: vi.fn() },
     addInput: vi.fn(() => audioInput),
@@ -113,7 +122,7 @@ function lastPlayer() {
   const { results, calls } = vi.mocked(createVideoPlayer).mock;
   const options = calls.at(-1)![0] as VideoPlayerOptions;
 
-  return { options, player: results.at(-1)!.value as ReturnType<typeof createVideoPlayer> };
+  return { options, player: results.at(-1)!.value as VideoPlayer & { stats: { decoded: number } } };
 }
 
 describe('RelayVideoAdapter', () => {
@@ -310,6 +319,47 @@ describe('RelayVideoAdapter', () => {
     deliverCatalog({ namespace, video: { name: 'video', codec: 'vp8', width: 1280, height: 720 } });
 
     expect(lastPlayer().player.configure).toHaveBeenCalledWith(expect.objectContaining({ codedHeight: 720 }));
+  });
+
+  it('drops the frames waiting to be shown when the video subscription restarts', async () => {
+    const { subscriber, adapter, deliverCatalog } = setup();
+
+    adapter.source = { subscriber, namespace };
+    deliverCatalog();
+    await adapter.play();
+    handlersOf(subscriber, 'video').onRestarted!({ reason: 'catch-up', namespace });
+
+    expect(lastPlayer().player.reset).toHaveBeenCalledOnce();
+  });
+
+  it('reports a decoder that cannot take the rendition as a decode error and releases its wants', async () => {
+    const { subscriber, adapter, events, deliverCatalog } = setup();
+
+    adapter.source = { subscriber, namespace };
+    deliverCatalog();
+    await adapter.play();
+    lastPlayer().options.onError!(new DOMException('Unsupported configuration.', 'NotSupportedError'));
+
+    expect(events.at(-1)).toBe('error');
+    expect(adapter.error?.code).toBe(MediaError.MEDIA_ERR_DECODE);
+    expect(lastPlayer().player.close).toHaveBeenCalledOnce();
+    expect(subscriber.wants.size).toBe(0);
+  });
+
+  it('keeps playing after a decoder error the player recovers from', async () => {
+    const { subscriber, adapter, events, deliverCatalog } = setup();
+
+    adapter.source = { subscriber, namespace };
+    deliverCatalog();
+    await adapter.play();
+
+    const { options, player } = lastPlayer();
+
+    player.stats.decoded = 30;
+    options.onError!(new DOMException('Decoding error.', 'EncodingError'));
+
+    expect(events).not.toContain('error');
+    expect(wantOf(subscriber, 'video')).toBeDefined();
   });
 
   it('ends when the catalog says the broadcast is complete, keeping the catalog want', async () => {

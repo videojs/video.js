@@ -388,11 +388,11 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@caprid/moq-media':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.1
+        version: 0.4.1
       '@caprid/relay':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.1
+        version: 0.4.1
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.3.0)
@@ -757,11 +757,11 @@ importers:
         version: link:../../utils
     devDependencies:
       '@caprid/moq-media':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.1
+        version: 0.4.1
       '@caprid/relay':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.1
+        version: 0.4.1
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(supports-color@8.1.1)
@@ -2845,19 +2845,19 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@caprid/moq-core@0.3.0':
-    resolution: {integrity: sha512-kk83gC9EO1ojINB5EzcToWV+qbyDeKJB1ckxfmEyYqc7CQPxWYUB3SzdxyXAhZSr70R/fpNXnw6CpcuvXf1IRQ==}
+  '@caprid/moq-core@0.4.1':
+    resolution: {integrity: sha512-Da7a70S+T9NldnTqfuYilu0tLCirVzkhoILIOgLy0/q8Ful3G4KvfFvFg+u0zkadrxvftih2LtR+5WaEb6ocMw==}
     engines: {node: '>=24'}
 
-  '@caprid/moq-media@0.3.0':
-    resolution: {integrity: sha512-6tsXb7LLFWKrTQ0o9VoCgxva47Sw3nj0Tf8xz2BzNTLENy6P0IoAtAmcgtByjaYGJJmf9N8Qi2ejnP49bZA76g==}
+  '@caprid/moq-media@0.4.1':
+    resolution: {integrity: sha512-bdcxNPyodAuY9AREPenehOJpIF7JZPhGWgC98RrLDyAfAj6xVU8U5fO3U6jFnDw55Yk58BOZ7hA7LpCi3OLclQ==}
     engines: {node: '>=24'}
 
-  '@caprid/relay@0.3.0':
-    resolution: {integrity: sha512-ScePC0ecYK5h+hEh/NBExHpAv6pBHxFhWQyyQK4iY2G25DYOHlqhYMeoi+8ROAhRXCTZm3fVRkGZ+Ia4LH2wLg==}
+  '@caprid/relay@0.4.1':
+    resolution: {integrity: sha512-LW+nHDWOmf8D3qPWj215tkilTjYSx1Y/xYuOrA5ixISQFaP8gr0FBAs6fW35y3S6Ay1p07kwmX8kXz81SxWY+A==}
     engines: {node: '>=24'}
     peerDependencies:
-      '@caprid/relay-quic': 0.3.0
+      '@caprid/relay-quic': 0.4.1
     peerDependenciesMeta:
       '@caprid/relay-quic':
         optional: true
@@ -8792,6 +8792,7 @@ packages:
   image-size@2.0.2:
     resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
     engines: {node: '>=16.x'}
+    deprecated: Use latest 2.x please
     hasBin: true
 
   immediate@3.0.6:
@@ -13456,15 +13457,15 @@ snapshots:
   '@bruits/satteri-win32-x64-msvc@0.10.5':
     optional: true
 
-  '@caprid/moq-core@0.3.0': {}
+  '@caprid/moq-core@0.4.1': {}
 
-  '@caprid/moq-media@0.3.0':
+  '@caprid/moq-media@0.4.1':
     dependencies:
-      '@caprid/moq-core': 0.3.0
+      '@caprid/moq-core': 0.4.1
 
-  '@caprid/relay@0.3.0':
+  '@caprid/relay@0.4.1':
     dependencies:
-      '@caprid/moq-core': 0.3.0
+      '@caprid/moq-core': 0.4.1
 
   '@capsizecss/unpack@4.0.1':
     dependencies:
