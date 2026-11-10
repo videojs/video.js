@@ -46,3 +46,13 @@ export function getTemplateHTML(attrs: Record<string, string>) {
     <video${serializeAttributes(pick(attrs, [...VideoAttributes]))}></video>
   `;
 }
+
+/**
+ * The `<video>` from `getTemplateHTML`. Always the shadow one: the template has no slot that would render a light-DOM
+ * `<video>`, so anything found there is either the placeholder or not displayed at all.
+ */
+export function getTemplateVideo(shadowRoot: ShadowRoot | null): HTMLVideoElement | null {
+  const video = shadowRoot?.querySelector('video');
+
+  return video instanceof HTMLVideoElement ? video : null;
+}
