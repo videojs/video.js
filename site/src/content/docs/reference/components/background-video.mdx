@@ -10,13 +10,6 @@ import MediaImports from "@/components/docs/api-reference/MediaImports.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
 import DocsLink from "@/components/docs/DocsLink.astro";
-import MarkdownCode from "@/components/typography/MarkdownCode.astro";
-import Table from "@/components/typography/Table.astro";
-import Tbody from "@/components/typography/Tbody.astro";
-import Td from "@/components/typography/Td.astro";
-import Th from "@/components/typography/Th.astro";
-import Thead from "@/components/typography/Thead.astro";
-import Tr from "@/components/typography/Tr.astro";
 
 {/* React demos */}
 import BasicUsageDemoReact from "@/components/docs/demos/background-video/react/css/BasicUsage";
@@ -36,7 +29,7 @@ Decorative background video for a source the browser can play natively. By defau
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<background-video>` renders a `<video>` inside shadow DOM and fills the box you give the component. Use the opt-out attributes in the [API reference](#api-reference) to change its playback defaults.
+`<background-video>` renders a `<video>` inside shadow DOM and fills the box you give the component. Use the opt-out attributes in the [API](#api) to change its playback defaults.
 </FrameworkCase>
 
 An HLS URL only works where the browser has native HLS playback. See <DocsLink slug="guides/background-video">Add a background video</DocsLink> to choose a cross-browser HLS or Mux path and set up layout, poster, and decorative semantics.
@@ -72,83 +65,47 @@ An HLS URL only works where the browser has native HLS playback. See <DocsLink s
   </StyleCase>
 </FrameworkCase>
 
+## API
+
 <FrameworkCase frameworks={["html"]}>
-
-## API Reference
-
 ### Attributes
 
-<Table outerClass="my-6">
-  <Thead>
-    <Tr>
-      <Th>Attribute</Th>
-      <Th>Description</Th>
-    </Tr>
-  </Thead>
-  <Tbody>
-    <Tr>
-      <Td><MarkdownCode>src</MarkdownCode></Td>
-      <Td>URL of a video the browser can play directly, such as an MP4 or WebM file.</Td>
-    </Tr>
-    <Tr>
-      <Td><MarkdownCode>nomuted</MarkdownCode></Td>
-      <Td>Opt out of muted playback. By default the video is muted.</Td>
-    </Tr>
-    <Tr>
-      <Td><MarkdownCode>noloop</MarkdownCode></Td>
-      <Td>Opt out of looped playback. By default the video loops.</Td>
-    </Tr>
-    <Tr>
-      <Td><MarkdownCode>noautoplay</MarkdownCode></Td>
-      <Td>Opt out of autoplay. By default the video autoplays.</Td>
-    </Tr>
-  </Tbody>
-</Table>
+| Attribute | Description |
+| --- | --- |
+| `src` | URL of a video the browser can play directly, such as an MP4 or WebM file |
+| `nomuted` | Turns off muting |
+| `noloop` | Turns off looping |
+| `noautoplay` | Turns off autoplay |
+| `crossorigin`, `preload`, `controls`, `controlslist` | Passed through to the inner video |
 
-An explicit `muted`, `loop`, or `autoplay` attribute wins over its opt-out. The opt-outs also apply when set after the element is created. `crossorigin`, `preload`, `controls`, and `controlslist` are passed through to the inner video, including later changes.
+An explicit `muted`, `loop`, or `autoplay` attribute wins over its opt-out. Opt-outs and passed-through attributes also apply when set or changed after the element is created.
 
 ### Properties
 
 | Property | Description |
 | --- | --- |
 | `src` | URL of the video. Assigning a new one restarts playback |
-| `error` | The inner video's `MediaError`, or `null`. The element also fires `error` when the video does |
+| `error` | The inner video's `MediaError`, or `null` |
 | `target` | Inner native `<video>` element. Call `play()` and `pause()` on it |
 
+The element also fires an `error` event when the inner video does.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
+`BackgroundVideo` accepts native `<video>` props. Its `ref` and `mediaRef` both resolve to the rendered `HTMLVideoElement`.
+</FrameworkCase>
 
 ## Styling
 
-`BackgroundVideo` is the native `<video>` element, so size and position it with regular CSS. Use `object-fit` and `object-position` to control how the video fills its box.
+<FrameworkCase frameworks={["html"]}>
+| Custom property | Default | Description |
+| --- | --- | --- |
+| `--media-object-fit` | `inherit` | How the video fits its box |
+| `--media-object-position` | `50% 50%` | Position of the video within its box |
 
+Set an explicit size on the custom element or an author-owned wrapper.
 </FrameworkCase>
 
-<FrameworkCase frameworks={["html"]}>
-
-### CSS Custom Properties
-
-<Table outerClass="my-6">
-  <Thead>
-    <Tr>
-      <Th>Variable</Th>
-      <Th>Default</Th>
-      <Th>Description</Th>
-    </Tr>
-  </Thead>
-  <Tbody>
-    <Tr>
-      <Td><MarkdownCode>{"--media-object-fit"}</MarkdownCode></Td>
-      <Td><MarkdownCode>inherit</MarkdownCode></Td>
-      <Td>Controls how the video fits its container.</Td>
-    </Tr>
-    <Tr>
-      <Td><MarkdownCode>{"--media-object-position"}</MarkdownCode></Td>
-      <Td><MarkdownCode>50% 50%</MarkdownCode></Td>
-      <Td>Controls the position of the video within its container.</Td>
-    </Tr>
-  </Tbody>
-</Table>
-
+<FrameworkCase frameworks={["react"]}>
+`BackgroundVideo` is the native `<video>` element. Set its size, `object-fit`, and `object-position` through `className` or `style`.
 </FrameworkCase>

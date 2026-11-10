@@ -49,7 +49,7 @@ See <DocsLink slug="guides/background-video">Add a background video</DocsLink> f
 There is no `source` object, `preload` mode, or opt-out for muted. Assigning a new `src` restarts playback from scratch.
 
 <FrameworkCase frameworks={["html"]}>
-Set `noautoplay` to hold playback until your script calls `target.play()`, for example after checking `prefers-reduced-motion`, and `noloop` to play the video once. Both also apply when set after the element is created. `crossorigin`, `controls`, and `controlslist` are passed through to the inner video, including later changes.
+Set `noautoplay` to hold playback until your script calls `target.play()`, for example after checking `prefers-reduced-motion`, and `noloop` to play the video once.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -59,13 +59,25 @@ Pass `autoPlay={false}` to hold playback until you call `play()` on the `<video>
 ## API
 
 <FrameworkCase frameworks={["html"]}>
-| Member | Description |
+### Attributes
+
+| Attribute | Description |
 | --- | --- |
 | `src` | HLS manifest URL |
+| `noloop` | Turns off looping |
+| `noautoplay` | Turns off autoplay |
+| `crossorigin`, `controls`, `controlslist` | Passed through to the inner video |
+| `keep-alive` | Keeps the engine running after the element is removed |
+
+An explicit `loop` or `autoplay` attribute wins over its opt-out. Opt-outs and passed-through attributes also apply when set or changed after the element is created. Muted can't be turned off, and `preload` isn't passed through: the engine loads as soon as it has a source.
+
+### Properties
+
+| Property | Description |
+| --- | --- |
+| `src` | HLS manifest URL. Assigning a new one restarts playback from scratch |
 | `error` | Fatal SPF media error for the current source, or `null` |
 | `target` | Inner native `<video>` element. Call `play()` and `pause()` on it |
-| `noautoplay` | Attribute that turns off autoplay |
-| `noloop` | Attribute that turns off looping |
 | `video` | Same element as `target` |
 | `adapter` | The `HlsBackgroundVideoAdapter` driving the inner video, including its SPF `engine` |
 
