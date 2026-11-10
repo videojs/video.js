@@ -402,55 +402,42 @@ describe('HlsJsTextTracksMixin', () => {
   });
 
   it('re-creates the subtitle tracks with their mode when the same source re-attaches', () => {
-    const engine = fakeEngine();
-    const host = new TextTracksHost(engine);
-    const video = document.createElement('video');
-    const restore = stubTrackSupport(video);
+    const { engine, video } = mount();
 
-    try {
-      host.attach(video);
+    (engine as any).subtitleTracks = [
+      { id: 0, lang: 'de', name: 'German', type: 'SUBTITLES', default: true },
+      { id: 1, lang: 'fr', name: 'French', type: 'SUBTITLES', default: false },
+    ];
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [
+        { label: 'German', kind: 'subtitles', default: true, subtitleTrack: (engine as any).subtitleTracks[0] },
+        { label: 'French', kind: 'subtitles', default: false, subtitleTrack: (engine as any).subtitleTracks[1] },
+      ],
+    });
+    video.textTracks.getTrackById('subtitles1')!.mode = 'showing';
 
-      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      hlsTracks(video)[0]!.track.mode = 'showing';
+    // `hls.recoverMediaError()` detaches and re-attaches the media without reloading the manifest.
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    expect(hlsTracks(video)).toHaveLength(0);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
 
-      // `hls.recoverMediaError()` detaches and re-attaches the media without reloading the manifest.
-      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
-      expect(hlsTracks(video)).toHaveLength(0);
-      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
-
-      const [trackEl] = hlsTracks(video);
-
-      expect(hlsTracks(video)).toHaveLength(1);
-      expect(trackEl).toMatchObject({ id: 'subtitles0', kind: 'subtitles', label: 'German', srclang: 'de' });
-      expect(trackEl!.track.mode).toBe('showing');
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toEqual(['subtitles:default', 'subtitles:subtitles1']);
+    expect(video.textTracks.getTrackById('subtitles1')!.mode).toBe('showing');
   });
 
   it('does not carry track modes over to a new manifest', () => {
-    const engine = fakeEngine();
-    const host = new TextTracksHost(engine);
-    const video = document.createElement('video');
-    const restore = stubTrackSupport(video);
+    const { engine, video } = mount();
 
-    try {
-      host.attach(video);
+    (engine as any).subtitleTracks = [{ id: 0, lang: 'de', name: 'German', type: 'SUBTITLES', default: true }];
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    video.textTracks.getTrackById('default')!.mode = 'showing';
 
-      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
-      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
-      hlsTracks(video)[0]!.track.mode = 'showing';
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
 
-      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
-      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
-      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
-
-      expect(hlsTracks(video)).toHaveLength(1);
-      expect(hlsTracks(video)[0]!.track.mode).toBe('disabled');
-    } finally {
-      restore();
-    }
+    expect(hlsTracks(video)).toEqual(['subtitles:default']);
+    expect(video.textTracks.getTrackById('default')!.mode).toBe('disabled');
   });
 
   it('drops the tracks when the engine is destroyed', () => {
