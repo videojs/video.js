@@ -49,11 +49,11 @@ See <DocsLink slug="guides/background-video">Add a background video</DocsLink> f
 There is no `source` object, `preload` mode, or opt-out for muted. Assigning a new `src` restarts playback from scratch.
 
 <FrameworkCase frameworks={["html"]}>
-Set `noautoplay` to hold playback until your script calls `target.play()`, for example after checking `prefers-reduced-motion`, and `noloop` to play the video once.
+Set `noautoplay` to hold playback until your script calls `target.play()`, for example after checking `prefers-reduced-motion`, and `noloop` to play the video once. Without `noautoplay`, calling `pause()` before the stream attaches has no effect: autoplay starts the video once the stream loads.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-Pass `autoPlay={false}` to hold playback until you call `play()` on the `<video>` from `ref`, for example after checking `prefers-reduced-motion`, and `loop={false}` to play the video once.
+Pass `autoPlay={false}` to hold playback until you call `play()` on the `<video>` from `ref`, for example after checking `prefers-reduced-motion`, and `loop={false}` to play the video once. Without `autoPlay={false}`, calling `pause()` before the stream attaches has no effect: autoplay starts the video once the stream loads.
 </FrameworkCase>
 
 ## API
