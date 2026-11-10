@@ -2,7 +2,7 @@ import { HTMLVideoAdapter } from '@videojs/media/dom';
 import Hls from 'hls.js';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { HlsJsTextTracksMixin, removeHlsTextTracks, withPreservedTextTracks } from '../text-tracks';
+import { HlsJsTextTracksMixin, withPreservedTextTracks } from '../text-tracks';
 
 /**
  * Jsdom has no text track implementation, so the media element and its tracks are stubbed with the parts the helper
@@ -214,37 +214,6 @@ describe('withPreservedTextTracks', () => {
   });
 });
 
-describe('removeHlsTextTracks', () => {
-  it('disables hls.js tracks before removing them', () => {
-    const actions: string[] = [];
-    const media = document.createElement('video');
-    const trackEl = document.createElement('track');
-    const remove = trackEl.remove.bind(trackEl);
-
-    trackEl.setAttribute('data-removeondestroy', '');
-    Object.defineProperty(trackEl, 'track', {
-      value: {
-        set mode(mode: TextTrackMode) {
-          actions.push(`mode:${mode}`);
-        },
-      },
-    });
-    vi.spyOn(trackEl, 'remove').mockImplementation(() => {
-      actions.push('remove');
-      remove();
-    });
-    media.append(trackEl);
-
-    removeHlsTextTracks(media);
-
-    expect(actions).toEqual(['mode:disabled', 'remove']);
-  });
-
-  it('does nothing without a media element', () => {
-    expect(() => removeHlsTextTracks(null)).not.toThrow();
-  });
-});
-
 /**
  * Jsdom implements neither `HTMLTrackElement.track` nor a track list with `getTrackById`, so the mixin gets the parts
  * it reaches for: a track object per `<track>` element, and a list that resolves ids against those elements.
@@ -366,7 +335,7 @@ function mount() {
   host.attach(video);
   (engine as any).emit(Hls.Events.MANIFEST_LOADING);
 
-  return { engine, video };
+  return { engine, host, video };
 }
 
 function hlsTracks(video: HTMLVideoElement) {
@@ -435,12 +404,15 @@ describe('HlsJsTextTracksMixin', () => {
     (engine as any).emit(Hls.Events.MEDIA_DETACHED);
     (engine as any).emit(Hls.Events.MANIFEST_LOADING);
     (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+    expect(hlsTracks(video)).toEqual([]);
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
 
     expect(hlsTracks(video)).toEqual(['subtitles:default']);
     expect(video.textTracks.getTrackById('default')!.mode).toBe('disabled');
   });
 
-  it('keeps a CC track showing when hls.js re-announces it after a detach/attach', () => {
+  it('re-creates a CC track with its mode when the same source re-attaches', () => {
     const { engine, video } = mount();
 
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
@@ -449,12 +421,112 @@ describe('HlsJsTextTracksMixin', () => {
 
     (engine as any).emit(Hls.Events.MEDIA_DETACHED);
     (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
-    expect(hlsTracks(video)).not.toContain('captions:textTrack1');
 
-    // hls.js announces each CC track again only once 608 data shows up after the re-attach.
+    expect(hlsTracks(video)).toEqual(['subtitles:default', 'captions:textTrack1']);
+    expect(video.textTracks.getTrackById('textTrack1')!.mode).toBe('showing');
+
+    // hls.js announces each CC track again once 608 data shows up after the re-attach.
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+
+    expect(hlsTracks(video)).toEqual(['subtitles:default', 'captions:textTrack1']);
+    expect(video.textTracks.getTrackById('textTrack1')!.mode).toBe('showing');
+  });
+
+  it('keeps the mode of a track hls.js announces again', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    video.textTracks.getTrackById('textTrack1')!.mode = 'showing';
+
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
 
     expect(video.textTracks.getTrackById('textTrack1')!.mode).toBe('showing');
+  });
+
+  it('mounts the tracks of the current source on a different media element', () => {
+    const { engine, host, video } = mount();
+    const next = document.createElement('video');
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+
+    const restoreNext = stubTrackSupport(next);
+
+    try {
+      host.attach(next);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+      expect(hlsTracks(video)).toEqual([]);
+      expect(hlsTracks(next)).toEqual(['subtitles:default']);
+    } finally {
+      restoreNext();
+    }
+  });
+
+  it('does not mount the tracks of a previous source on a new media element loaded with a new source', () => {
+    const { engine, host, video } = mount();
+    const next = document.createElement('video');
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+
+    const restoreNext = stubTrackSupport(next);
+
+    try {
+      host.attach(next);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+      expect(hlsTracks(video)).toEqual([]);
+      expect(hlsTracks(next)).toEqual([]);
+    } finally {
+      restoreNext();
+    }
+  });
+
+  it('drops the tracks of a previous source from a new media element when the new source loads', () => {
+    const { engine, host, video } = mount();
+    const next = document.createElement('video');
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+
+    const restoreNext = stubTrackSupport(next);
+
+    try {
+      // The engine still plays the previous source until the new one starts loading.
+      host.attach(next);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+
+      expect(hlsTracks(video)).toEqual([]);
+      expect(hlsTracks(next)).toEqual([]);
+
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+        tracks: [{ label: 'French', kind: 'subtitles', default: false, subtitleTrack: { id: 0, lang: 'fr' } }],
+      });
+
+      expect(hlsTracks(next)).toEqual(['subtitles:subtitles0']);
+    } finally {
+      restoreNext();
+    }
+  });
+
+  it('leaves a sideloaded track with the same id alone when cues arrive', () => {
+    const { engine, video } = mount();
+    const sideloaded = document.createElement('track');
+
+    sideloaded.id = 'textTrack1';
+    video.append(sideloaded);
+    (engine as any).emit(Hls.Events.CUES_PARSED, {
+      type: 'captions',
+      track: 'textTrack1',
+      cues: [{ id: 'c1' } as TextTrackCue],
+    });
+
+    expect(cueIds(sideloaded.track as unknown as FakeTextTrack)).toEqual([]);
   });
 
   it('drops the tracks when the engine is destroyed', () => {
