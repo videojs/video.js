@@ -407,6 +407,18 @@ describe('RelayVideoAdapter', () => {
     expect(adapter.error?.code).toBe(MediaError.MEDIA_ERR_NETWORK);
   });
 
+  it('keeps playing when given the same subscriber and namespace again as a new object', () => {
+    const { subscriber, adapter, events } = setup();
+    const source = { subscriber, namespace };
+
+    adapter.source = source;
+    adapter.source = { subscriber, namespace: [...namespace] };
+
+    expect(events).toEqual(['loadstart']);
+    expect(adapter.source).toBe(source);
+    expect(subscriber.want).toHaveBeenCalledOnce();
+  });
+
   it('clears the error and starts over when given a new source', () => {
     const { subscriber, adapter, events } = setup();
 

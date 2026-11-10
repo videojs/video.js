@@ -42,6 +42,19 @@ export interface RelaySource {
   readonly namespace: readonly string[];
 }
 
+/**
+ * The properties an application sets on a relay video.
+ *
+ * @internal
+ */
+export interface RelayVideoAdapterProps {
+  /** The broadcast to play, or `null` for none. */
+  source: RelaySource | null;
+  autoplay: boolean;
+  defaultMuted: boolean;
+  muted: boolean;
+}
+
 /** One source as the element plays it: the wants it holds and the clock its tracks share. */
 interface Broadcast {
   readonly source: RelaySource;
@@ -103,6 +116,16 @@ function sourceOf(session: Session): RelaySource | null {
   return session.state === 'errored' ? session.source : session.broadcast.source;
 }
 
+function sameSource(a: RelaySource | null, b: RelaySource | null): boolean {
+  if (!a || !b) return a === b;
+
+  return (
+    a.subscriber === b.subscriber &&
+    a.namespace.length === b.namespace.length &&
+    a.namespace.every((part, index) => part === b.namespace[index])
+  );
+}
+
 function broadcastOf(session: Session): Broadcast | null {
   return session.state === 'idle' || session.state === 'errored' ? null : session.broadcast;
 }
@@ -146,6 +169,13 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
   /** Engine this media plays through, reported to analytics such as Mux Data. */
   static readonly engineName: string = 'relay';
 
+  static readonly defaultProps: RelayVideoAdapterProps = {
+    source: null,
+    autoplay: false,
+    defaultMuted: false,
+    muted: false,
+  };
+
   readonly #prefix = `relay-video/${Math.random().toString(36).slice(2)}/`;
   readonly #audio = createAudioOutput({ onChange: () => this.#reconcile() });
   #canvas: HTMLCanvasElement | null = null;
@@ -162,6 +192,11 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
   constructor() {
     super();
     this.videoRenditions.addEventListener('change', () => this.#reconcile());
+  }
+
+  /** Always `null`: the connection is the application's, and the Relay SDK's players live only while playing. */
+  get engine(): null {
+    return null;
   }
 
   // No `target` getter: the media-tracks mixin reads `target` as an `HTMLMediaElement`, and Safari throws when its
@@ -185,12 +220,15 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
     this.#canvas = null;
   }
 
-  /** The broadcast to play. Assigning a new one releases the previous one's tracks first. */
+  /**
+   * The broadcast to play. Assigning another one releases the previous one's tracks first; assigning the same
+   * subscriber and namespace again, even as a new object, changes nothing.
+   */
   get source(): RelaySource | null {
     return sourceOf(this.#session);
   }
   set source(value: RelaySource | null) {
-    if (value === this.source) return;
+    if (sameSource(value, this.source)) return;
 
     this.#load(value);
   }
