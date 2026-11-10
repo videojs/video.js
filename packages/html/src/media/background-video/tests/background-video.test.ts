@@ -62,6 +62,22 @@ describe('BackgroundVideo', () => {
     });
   });
 
+  it('observes src, the playback defaults and their opt-outs, and the passthrough attributes', () => {
+    expect(BackgroundVideo.observedAttributes).toEqual([
+      'src',
+      'muted',
+      'loop',
+      'autoplay',
+      'nomuted',
+      'noloop',
+      'noautoplay',
+      'controls',
+      'controlslist',
+      'crossorigin',
+      'preload',
+    ]);
+  });
+
   describe('passthrough attributes', () => {
     it('mirrors changes onto the inner video', () => {
       const el = create(defineElement()) as BackgroundVideo;

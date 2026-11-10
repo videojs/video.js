@@ -1,4 +1,5 @@
 import { namedNodeMapToObject } from '@videojs/utils/dom';
+import { pick } from '@videojs/utils/object';
 
 import { MediaAttachMixin } from '../../store/media-attach-mixin';
 import { getTemplateHTML, getTemplateVideo } from './template';
@@ -32,11 +33,11 @@ export abstract class BackgroundVideoBase extends MediaAttachBase {
   static getTemplateHTML = getTemplateHTML;
   /** Defaults that a matching `no*` attribute turns off. Every other default is fixed on. */
   static optOuts: readonly BackgroundVideoOptOut[] = ['muted', 'loop', 'autoplay'];
-  /** Host attributes mirrored onto the inner video as they change. */
+  /** Host attributes copied onto the inner video at creation and mirrored as they change. */
   static passthroughAttributes: readonly string[] = ['controls', 'controlslist', 'crossorigin', 'preload'];
 
   static get observedAttributes(): string[] {
-    return ['src', ...PLAYBACK_DEFAULTS, ...this.optOuts.map((name) => `no${name}`), ...this.passthroughAttributes];
+    return ['src', ...this.optOuts, ...this.optOuts.map((name) => `no${name}`), ...this.passthroughAttributes];
   }
 
   constructor() {
@@ -46,7 +47,7 @@ export abstract class BackgroundVideoBase extends MediaAttachBase {
 
     if (!this.shadowRoot) {
       const attrs: Record<string, string> = {
-        ...namedNodeMapToObject(this.attributes),
+        ...pick(namedNodeMapToObject(this.attributes), ctor.passthroughAttributes),
         playsinline: '',
         disableremoteplayback: '',
         disablepictureinpicture: '',

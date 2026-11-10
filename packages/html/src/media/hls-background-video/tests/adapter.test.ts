@@ -167,7 +167,6 @@ describe('HlsBackgroundVideo', () => {
     // gone for good.
     expect(HlsBackgroundVideo.observedAttributes).toEqual([
       'src',
-      'muted',
       'loop',
       'autoplay',
       'noloop',
