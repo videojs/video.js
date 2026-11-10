@@ -116,7 +116,11 @@ function withReadableCues<T>(track: TextTrack, action: () => T): T {
 export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsTextTracks extends (BaseClass as Constructor<HlsEngineHost>) {
     #disconnect: AbortController | null = null;
-    /** Modes of the subtitle tracks removed on the last detach, by track id, to put back when the media re-attaches. */
+    /**
+     * Modes of the tracks a detach removed, by track id, put back when each track is created again. The subtitle set
+     * comes back on re-attach, but each CC track only once 608 data shows up again, so an entry lives until its track
+     * returns or the source changes.
+     */
     #detachedModes = new Map<string, TextTrackMode>();
 
     constructor(...args: any[]) {
@@ -150,10 +154,19 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
     }
 
     #rememberModes(): void {
-      this.#detachedModes.clear();
-
       for (const trackEl of this.target?.querySelectorAll<HTMLTrackElement>(`track[${HLS_TRACK_ATTR}]`) ?? []) {
         if (trackEl.id) this.#detachedModes.set(trackEl.id, trackEl.track.mode);
+      }
+    }
+
+    #restoreModes(trackEls: HTMLTrackElement[]): void {
+      for (const trackEl of trackEls) {
+        const mode = this.#detachedModes.get(trackEl.id);
+        if (!mode) continue;
+
+        this.#detachedModes.delete(trackEl.id);
+
+        if (mode !== trackEl.track.mode) trackEl.track.mode = mode;
       }
     }
 
@@ -177,13 +190,7 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         subtitleTrack,
       }));
 
-      for (const trackEl of addHlsTextTracks(media, tracks)) {
-        const mode = this.#detachedModes.get(trackEl.id);
-
-        if (mode && mode !== trackEl.track.mode) trackEl.track.mode = mode;
-      }
-
-      this.#detachedModes.clear();
+      this.#restoreModes(addHlsTextTracks(media, tracks));
     }
 
     #init(): void {
@@ -213,7 +220,7 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
           trackEl.remove();
         }
 
-        addHlsTextTracks(media, data.tracks);
+        this.#restoreModes(addHlsTextTracks(media, data.tracks));
       };
 
       const onCuesParsed = (_event: string, { track, cues }: CuesParsedData) => {
@@ -322,8 +329,8 @@ function refreshCues(track: TextTrack): void {
 
 /**
  * NOTE: Undocumented identifiers hls.js addresses CUES_PARSED with: `_id` for CEA-608/708 tracks, and `default` or
- * `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set.
- * See: https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
+ * `subtitles` plus the group-local index it stamps on `subtitleTrack.id` for the subtitle set. See:
+ * https://github.com/video-dev/hls.js/blob/master/src/controller/timeline-controller.ts
  */
 function trackIdFor({ _id, default: isDefault, subtitleTrack }: NonNativeTextTrack): string {
   return _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);

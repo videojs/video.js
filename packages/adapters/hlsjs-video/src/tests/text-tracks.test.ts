@@ -440,6 +440,23 @@ describe('HlsJsTextTracksMixin', () => {
     expect(video.textTracks.getTrackById('default')!.mode).toBe('disabled');
   });
 
+  it('keeps a CC track showing when hls.js re-announces it after a detach/attach', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+    video.textTracks.getTrackById('textTrack1')!.mode = 'showing';
+
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+    expect(hlsTracks(video)).not.toContain('captions:textTrack1');
+
+    // hls.js announces each CC track again only once 608 data shows up after the re-attach.
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+
+    expect(video.textTracks.getTrackById('textTrack1')!.mode).toBe('showing');
+  });
+
   it('drops the tracks when the engine is destroyed', () => {
     const { engine, video } = mount();
 
