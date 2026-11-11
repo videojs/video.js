@@ -1,15 +1,16 @@
+import { playbackFeature } from '@videojs/core';
 import type { ComponentProps } from 'react';
 
-import { nativePlaybackFeature } from '../store/playback';
 import { createPlayer } from './create-player';
 
 /**
- * Features for a react-native video player.
+ * Features for a react-native video player. Core's platform-neutral features attach to the react-native target as-is,
+ * since `ReactNativeMedia` passes the capability checks they open with.
  *
  * A plain array, not `as const` — `NativePlayerStore` takes a mutable array, mirroring web's `PlayerStore`, and would
  * reject a readonly tuple.
  */
-export const nativeVideoFeatures = [nativePlaybackFeature];
+export const nativeVideoFeatures = [playbackFeature];
 
 /**
  * Preconfigured player with the react-native video features.
