@@ -85,6 +85,13 @@ export interface Spec extends TurboModule {
   pause(handle: CodegenTypes.Int32): boolean;
   /** Seconds. Ignored with no source. */
   setCurrentTime(handle: CodegenTypes.Int32, time: CodegenTypes.Double): boolean;
+  /** Must be positive; others are ignored. */
+  setPlaybackRate(handle: CodegenTypes.Int32, rate: CodegenTypes.Double): boolean;
+  /**
+   * Restarts from the beginning at the end instead of ending, without `ended`. Not part of the state snapshot: like
+   * `src`, the adapter owns it.
+   */
+  setLoop(handle: CodegenTypes.Int32, loop: boolean): boolean;
 
   /** Seconds. */
   getCurrentTime(handle: CodegenTypes.Int32): CodegenTypes.Double;
