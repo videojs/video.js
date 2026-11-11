@@ -17,7 +17,7 @@ public final class VideoJSPlayerRegistry: NSObject {
   public static let shared = VideoJSPlayerRegistry()
 
   @objc
-  public var onEvent: ((Int, VideoJSPlayerEventType) -> Void)?
+  public var onEvent: ((Int, [String: Any]) -> Void)?
 
   /// Main queue only.
   private var engines: [Int: VideoJSPlayerEngine] = [:]
@@ -41,8 +41,8 @@ public final class VideoJSPlayerRegistry: NSObject {
     onMainQueue { [weak self] in
       guard let self else { return }
 
-      engines[handle] = VideoJSPlayerEngine(source: source) { [weak self] type in
-        self?.onEvent?(handle, type)
+      engines[handle] = VideoJSPlayerEngine(source: source) { [weak self] event in
+        self?.onEvent?(handle, event)
       }
     }
 

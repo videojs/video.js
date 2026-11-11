@@ -16,11 +16,10 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   if (self = [super init]) {
     __weak __typeof(self) weakSelf = self;
 
-    VideoJSPlayerRegistry.sharedRegistry.onEvent = ^(NSInteger handle, VideoJSPlayerEventType type) {
-      [weakSelf emitOnPlayerEvent:@{
-        @"handle" : @(handle),
-        @"type" : [VideoJSPlayerEngine jsNameForEventType:type],
-      }];
+    VideoJSPlayerRegistry.sharedRegistry.onEvent = ^(NSInteger handle, NSDictionary<NSString *, id> *event) {
+      NSMutableDictionary *payload = [event mutableCopy];
+      payload[@"handle"] = @(handle);
+      [weakSelf emitOnPlayerEvent:payload];
     };
   }
 
