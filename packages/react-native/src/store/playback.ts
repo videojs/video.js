@@ -18,11 +18,10 @@ const defineNativeFeature = defineSlice<NativePlayerTarget>();
  *    (!isMediaPauseCapable(media) || !isMediaSeekCapable(media) || !isMediaSourceCapable(media)) return;`.
  *    `isMediaSeekCapable` wants `currentTime`, `duration`, `seeking`; `isMediaSourceCapable` wants `src`, `currentSrc`,
  *    `readyState`, `load()`. The adapter has `src` and none of the rest, so the shared feature would return early and
- *    leave `paused` stuck at `true` — a silent no-op rather than a crash, which is the worse failure. These belong on
- *    the adapter eventually; the TurboModule needs to report position and duration first.
- * 2. **TODO(ReactNativeMedia): finish the standard media events.** The shared feature listens for `emptied`, `timeupdate`,
- *    `canplay`, `seeking`, `seeked` and `waiting` alongside `play`/`playing`/`pause`/`ended`. Native emits all of them
- *    except `canplay`, and `seeking`/`seeked` only fire once native has a seek command.
+ *    leave `paused` stuck at `true` — a silent no-op rather than a crash, which is the worse failure. The TurboModule
+ *    now has the commands and queries behind all of these; the adapter has yet to expose them.
+ * 2. **TODO(ReactNativeMedia): track `currentTime`.** Native emits every event the shared feature listens for, but it
+ *    derives `started` and `waiting` from `currentTime`, which the adapter mirrors without being seek-capable.
  */
 export const nativePlaybackFeature = defineNativeFeature<MediaPlaybackState>({
   name: 'playback',

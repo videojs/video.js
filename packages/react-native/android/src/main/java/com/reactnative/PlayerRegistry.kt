@@ -3,6 +3,7 @@ package com.reactnative
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -15,13 +16,16 @@ import java.util.concurrent.atomic.AtomicInteger
  * main looper. Because posts are FIFO, a command issued in the same tick as
  * `createPlayer` runs after construction rather than against a missing engine —
  * the queueing the design requires falls out of the looper.
+ *
+ * The synchronous getters also land on the JS thread, so the engine map is
+ * readable from any thread; each engine guards its own state.
  */
 internal class PlayerRegistry {
   private val nextHandle = AtomicInteger(1)
   private val mainHandler = Handler(Looper.getMainLooper())
 
-  /** Main-thread only. */
-  private val engines = mutableMapOf<Int, PlayerEngine>()
+  /** Written on the main thread; read from any. */
+  private val engines = ConcurrentHashMap<Int, PlayerEngine>()
 
   var onEvent: ((handle: Int, event: PlayerEvent) -> Unit)? = null
 
@@ -42,6 +46,12 @@ internal class PlayerRegistry {
   fun command(handle: Int, block: (PlayerEngine) -> Unit) {
     onMain { engines[handle]?.let(block) }
   }
+
+  /**
+   * The latest published state, from any thread. A handle whose engine doesn't
+   * exist — not built yet, or destroyed — reads as a fresh player.
+   */
+  fun state(handle: Int): PlayerState = engines[handle]?.readState() ?: PlayerState()
 
   /**
    * Synchronous lookup for the Fabric surface. Safe because the surface only

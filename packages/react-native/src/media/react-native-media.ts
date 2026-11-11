@@ -124,6 +124,7 @@ export function resolveNativeEvent(
     case 'seeking':
     case 'seeked':
     case 'ratechange':
+    case 'contentdatachange':
       return { state: previous, emit: [type] };
 
     default:
@@ -146,14 +147,13 @@ export function resolveNativeEvent(
  *
  * # Reusing existing playerFeatures
  *
- * Would be possible in a fully-realized implementation, but the TurboModule needs to add a few more features first:
+ * Would be possible in a fully-realized implementation. The TurboModule has the commands and queries; the adapter needs
+ * to surface them:
  *
- * 1. Add seek and source capability. `isMediaSeekCapable` wants a writable `currentTime` (a seek command) and `seeking` on
- *    top of the mirrored `currentTime` and `duration`; `isMediaSourceCapable` wants `currentSrc`, `readyState` and
- *    `load()` on top of the `src` that already exists.
- * 2. Mirror `seekable` alongside `buffered` so the adapter satisfies `isMediaBufferCapable`.
- * 3. Emit `canplay`, which the shared playback feature listens for and native doesn't report yet. Native emits `seeking`
- *    and `seeked` only once it has a seek command.
+ * 1. Seek and source capability. `isMediaSeekCapable` wants a writable `currentTime` (`setCurrentTime`) and `seeking`
+ *    (`isSeeking`); `isMediaSourceCapable` wants `currentSrc` (`getSource`), `readyState` (`getReadyState`) and
+ *    `load()`.
+ * 2. `seekable` (`getSeekable`) alongside `buffered`, so the adapter satisfies `isMediaBufferCapable`.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>

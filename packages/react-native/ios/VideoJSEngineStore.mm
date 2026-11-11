@@ -44,6 +44,14 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
                                                 }];
 }
 
+- (void)load:(NSInteger)handle
+{
+  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+                                                block:^(VideoJSPlayerEngine *engine) {
+                                                  [engine load];
+                                                }];
+}
+
 - (void)play:(NSInteger)handle
 {
   [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
@@ -58,6 +66,81 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
                                                 block:^(VideoJSPlayerEngine *engine) {
                                                   [engine pause];
                                                 }];
+}
+
+- (void)setCurrentTime:(NSInteger)handle time:(double)time
+{
+  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+                                                block:^(VideoJSPlayerEngine *engine) {
+                                                  [engine setCurrentTime:time];
+                                                }];
+}
+
+- (NSNumber *)getCurrentTime:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].currentTime);
+}
+
+- (NSNumber *)getDuration:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].duration);
+}
+
+- (NSArray<NSDictionary *> *)getBuffered:(NSInteger)handle
+{
+  return [self stateForHandle:handle].buffered;
+}
+
+- (NSArray<NSDictionary *> *)getSeekable:(NSInteger)handle
+{
+  return [self stateForHandle:handle].seekable;
+}
+
+- (NSDictionary *_Nullable)getError:(NSInteger)handle
+{
+  return [self stateForHandle:handle].error;
+}
+
+- (NSNumber *)isPaused:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].paused);
+}
+
+- (NSNumber *)isEnded:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].ended);
+}
+
+- (NSNumber *)isSeeking:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].seeking);
+}
+
+- (NSString *)getSource:(NSInteger)handle
+{
+  return [self stateForHandle:handle].currentSrc;
+}
+
+- (NSNumber *)getReadyState:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].readyState);
+}
+
+- (NSDictionary *)getContentData:(NSInteger)handle
+{
+  return [self stateForHandle:handle].contentData;
+}
+
+- (NSNumber *)getPlaybackRate:(NSInteger)handle
+{
+  return @([self stateForHandle:handle].playbackRate);
+}
+
+// Reads the engine's published snapshot on the calling (JS) thread, without
+// waiting on the main queue.
+- (VideoJSPlayerState *)stateForHandle:(NSInteger)handle
+{
+  return [VideoJSPlayerRegistry.sharedRegistry stateForHandle:handle];
 }
 
 // The registry outlives the module (it has to, for the Fabric surface), so a

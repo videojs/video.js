@@ -18,11 +18,9 @@ enum VideoJSPlayerEventType {
   case ended
   case timeupdate
   case ratechange
-
-  // Not emitted yet: nothing can seek until the engine grows a seek command,
-  // which is where these belong.
   case seeking
   case seeked
+  case contentdatachange
 
   var jsName: String {
     switch self {
@@ -43,6 +41,7 @@ enum VideoJSPlayerEventType {
     case .ratechange: "ratechange"
     case .seeking: "seeking"
     case .seeked: "seeked"
+    case .contentdatachange: "contentdatachange"
     }
   }
 }
@@ -56,12 +55,26 @@ private enum MediaErrorCode {
   static let custom = 100
 }
 
+/// `HTMLMediaElement.readyState` values.
+private enum ReadyState {
+  static let haveNothing = 0
+  static let haveMetadata = 1
+  static let haveCurrentData = 2
+  static let haveFutureData = 3
+  static let haveEnoughData = 4
+}
+
 // HTMLMediaElement fires `timeupdate` every 15–250ms during playback.
 private let timeUpdateInterval = CMTime(value: 1, timescale: 4)
 
 /// One player behind one handle. Confined to the main queue — every entry point
 /// is reached either from `VideoJSPlayerRegistry`'s main-queue dispatch or from
 /// the Fabric surface, which is already on the main queue.
+///
+/// The one exception is the `VideoJSPlayerState` snapshot, which the JS thread
+/// reads through `readState()`. The engine republishes it before every event,
+/// so a getter called while handling one sees state at least that new. One lock
+/// covers the whole snapshot.
 @objc
 public final class VideoJSPlayerEngine: NSObject {
   // Always an AVQueuePlayer, even with looping off, so enabling loop later
@@ -74,6 +87,9 @@ public final class VideoJSPlayerEngine: NSObject {
   // it having to re-register.
   private var layers: [AVPlayerLayer] = []
 
+  private let stateLock = NSLock()
+  private var state = VideoJSPlayerState.initial
+
   /// Receives the `PlayerEvent` payload minus the handle the registry adds.
   private var onEvent: (([String: Any]) -> Void)?
   private var playerObservations: [NSKeyValueObservation] = []
@@ -85,11 +101,24 @@ public final class VideoJSPlayerEngine: NSObject {
   private var timeControlStatus: AVPlayer.TimeControlStatus = .paused
 
   // Per source; replaced when the source is swapped.
+  private var source: String?
   private var item: AVPlayerItem?
   private var itemObservations: [NSKeyValueObservation] = []
   private var metadataLoaded = false
-  private var duration = CMTime.invalid
+  private var reportedDuration = CMTime.invalid
   private var likelyToKeepUp = false
+  private var ended = false
+  private var lastError: [String: Any]?
+  private var reportedContentData: [String: String] = [:]
+
+  // Only the newest seek's completion settles `seeking`; a superseded seek
+  // completes unfinished and stays quiet, as on the web.
+  private var seeking = false
+  private var seekGeneration = 0
+
+  // An item can't seek until it is ready, so an earlier request waits — the
+  // media element's default playback start position.
+  private var pendingStartTime: Double?
 
   // AVFoundation has no "enough data to start" signal of its own, so this is
   // the media element's HAVE_FUTURE_DATA as far as the player reveals it:
@@ -123,10 +152,12 @@ public final class VideoJSPlayerEngine: NSObject {
 
     // Also fires when playback starts or stops and when time jumps, which is
     // when a media element reports position too.
+    // The payload reads the same accessor as the state snapshot, so the two
+    // always agree.
     timeObserver = player.addPeriodicTimeObserver(forInterval: timeUpdateInterval, queue: .main) { [weak self] time in
       guard let self, item != nil, time.isNumeric else { return }
 
-      emit(.timeupdate, ["currentTime": time.seconds])
+      emit(.timeupdate, ["currentTime": currentTime])
     }
 
     NotificationCenter.default.addObserver(
@@ -167,16 +198,19 @@ public final class VideoJSPlayerEngine: NSObject {
     player.removeAllItems()
     observe(next)
 
+    self.source = source
+
     if hadItem {
       emit(.emptied)
     }
 
+    clearContentData()
     emit(.loadstart)
 
     // A media element fails an unusable src asynchronously rather than
     // rejecting it, so it reads as a load that errored.
     guard let next else {
-      emit(.error, ["error": playerError(code: MediaErrorCode.srcNotSupported, message: "Invalid source URL: \(source)")])
+      emitError(playerError(code: MediaErrorCode.srcNotSupported, message: "Invalid source URL: \(source)"))
       return
     }
 
@@ -188,13 +222,125 @@ public final class VideoJSPlayerEngine: NSObject {
   }
 
   @objc
+  public func load() {
+    if let source {
+      setSource(source)
+    }
+  }
+
+  // A media element restarts from the beginning when played after the end.
+  @objc
   public func play() {
+    if ended {
+      setCurrentTime(0)
+    }
+
     player.play()
   }
 
   @objc
   public func pause() {
     player.pause()
+  }
+
+  @objc(setCurrentTime:)
+  public func setCurrentTime(_ seconds: Double) {
+    guard let item else { return }
+
+    ended = false
+
+    guard metadataLoaded else {
+      pendingStartTime = seconds
+      return
+    }
+
+    seeking = true
+    seekGeneration += 1
+
+    let generation = seekGeneration
+    let time = CMTime(seconds: max(seconds, 0), preferredTimescale: 600)
+
+    emit(.seeking)
+    player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
+      self?.onMainQueue(for: item) { engine in
+        guard generation == engine.seekGeneration else { return }
+
+        engine.seeking = false
+
+        if finished {
+          engine.emit(.seeked)
+        }
+      }
+    }
+  }
+
+  // MARK: State
+
+  /// Any thread.
+  @objc
+  public func readState() -> VideoJSPlayerState {
+    stateLock.withLock { state }
+  }
+
+  private func resetState() {
+    stateLock.withLock { state = .initial }
+  }
+
+  private var currentTime: Double {
+    let time = player.currentTime()
+
+    return time.isNumeric ? time.seconds : 0
+  }
+
+  // Duration reads indefinite until the item is ready, which is
+  // indistinguishable from live, so it only counts once metadata has loaded.
+  private var duration: Double {
+    guard let item, metadataLoaded else { return .nan }
+
+    return item.duration.isIndefinite ? .infinity : item.duration.seconds
+  }
+
+  private var readyState: Int {
+    guard let item, metadataLoaded else { return ReadyState.haveNothing }
+
+    if likelyToKeepUp { return ReadyState.haveEnoughData }
+    if canPlay { return ReadyState.haveFutureData }
+
+    let now = player.currentTime()
+    let hasCurrentData = item.loadedTimeRanges.contains { $0.timeRangeValue.containsTime(now) }
+
+    return hasCurrentData ? ReadyState.haveCurrentData : ReadyState.haveMetadata
+  }
+
+  // `rate` is zero whenever paused; `defaultRate` is the one that matches
+  // `playbackRate`, but only from iOS 16.
+  private var playbackRate: Double {
+    if #available(iOS 16, *) {
+      return Double(player.defaultRate)
+    }
+
+    return player.rate == 0 ? 1 : Double(player.rate)
+  }
+
+  private func publishState() {
+    if invalidated { return }
+
+    let next = VideoJSPlayerState(
+      currentTime: currentTime,
+      duration: duration,
+      buffered: timeRanges(item?.loadedTimeRanges ?? []),
+      seekable: timeRanges(item?.seekableTimeRanges ?? []),
+      error: lastError,
+      paused: player.timeControlStatus == .paused,
+      ended: ended,
+      seeking: seeking,
+      currentSrc: source ?? "",
+      readyState: readyState,
+      playbackRate: playbackRate,
+      contentData: reportedContentData
+    )
+
+    stateLock.withLock { state = next }
   }
 
   @objc(attachLayer:)
@@ -217,6 +363,7 @@ public final class VideoJSPlayerEngine: NSObject {
 
     invalidated = true
 
+    resetState()
     playerObservations.forEach { $0.invalidate() }
     playerObservations.removeAll()
     observe(nil)
@@ -256,9 +403,14 @@ public final class VideoJSPlayerEngine: NSObject {
 
     item = next
     metadataLoaded = false
-    duration = .invalid
+    reportedDuration = .invalid
     likelyToKeepUp = false
     canPlay = false
+    ended = false
+    lastError = nil
+    seeking = false
+    seekGeneration += 1
+    pendingStartTime = nil
 
     guard let next else { return }
 
@@ -274,6 +426,10 @@ public final class VideoJSPlayerEngine: NSObject {
       },
       next.observe(\.isPlaybackLikelyToKeepUp) { [weak self] item, _ in
         self?.onMainQueue(for: item) { $0.syncLikelyToKeepUp() }
+      },
+      // A live window slides with no media event to carry it.
+      next.observe(\.seekableTimeRanges) { [weak self] item, _ in
+        self?.onMainQueue(for: item) { $0.publishState() }
       },
     ]
   }
@@ -311,20 +467,24 @@ public final class VideoJSPlayerEngine: NSObject {
       emit(.loadedmetadata)
       syncCanPlay(true)
       syncLikelyToKeepUp()
+      loadContentData(for: item)
+
+      if let pendingStartTime {
+        self.pendingStartTime = nil
+        setCurrentTime(pendingStartTime)
+      }
     case .failed:
-      emit(.error, ["error": playerError(from: item.error)])
+      emitError(playerError(from: item.error))
     default:
       break
     }
   }
 
-  // Duration reads indefinite until the item is ready, which is
-  // indistinguishable from live, so it only counts once metadata has loaded.
   private func syncDuration() {
-    guard let item, metadataLoaded, item.duration != duration else { return }
+    guard let item, metadataLoaded, item.duration != reportedDuration else { return }
 
-    duration = item.duration
-    emit(.durationchange, ["duration": duration.isIndefinite ? Double.infinity : duration.seconds])
+    reportedDuration = item.duration
+    emit(.durationchange, ["duration": duration])
   }
 
   // Gated on metadata so the load order matches a media element's:
@@ -334,9 +494,12 @@ public final class VideoJSPlayerEngine: NSObject {
 
     likelyToKeepUp = item.isPlaybackLikelyToKeepUp
 
+    // Losing it changes `readyState` with no media event to carry it.
     if likelyToKeepUp {
       syncCanPlay(true)
       emit(.canplaythrough)
+    } else {
+      publishState()
     }
   }
 
@@ -351,26 +514,48 @@ public final class VideoJSPlayerEngine: NSObject {
   }
 
   private func emitProgress() {
-    guard let item else { return }
+    emit(.progress, ["buffered": timeRanges(item?.loadedTimeRanges ?? [])])
+  }
 
-    let buffered = item.loadedTimeRanges
-      .map(\.timeRangeValue)
-      .sorted { $0.start < $1.start }
-      .map { ["start": $0.start.seconds, "end": $0.end.seconds] }
+  private func emitError(_ error: [String: Any]) {
+    lastError = error
+    emit(.error, ["error": error])
+  }
 
-    emit(.progress, ["buffered": buffered])
+  // Asset metadata loads separately from the item, so it can land after a
+  // source swap and is dropped if so.
+  private func loadContentData(for item: AVPlayerItem) {
+    Task { [weak self] in
+      let contentData = await loadCommonContentData(from: item.asset)
+
+      self?.onMainQueue(for: item) { $0.syncContentData(contentData) }
+    }
+  }
+
+  private func syncContentData(_ next: [String: String]) {
+    if next == reportedContentData { return }
+
+    reportedContentData = next
+    emit(.contentdatachange)
+  }
+
+  private func clearContentData() {
+    syncContentData([:])
   }
 
   @objc
   private func handleItemDidPlayToEnd(_ notification: Notification) {
-    onMainQueue(forNotification: notification) { $0.emit(.ended) }
+    onMainQueue(forNotification: notification) { engine in
+      engine.ended = true
+      engine.emit(.ended)
+    }
   }
 
   @objc
   private func handleItemFailedToPlayToEnd(_ notification: Notification) {
     let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
 
-    onMainQueue(forNotification: notification) { $0.emit(.error, ["error": playerError(from: error)]) }
+    onMainQueue(forNotification: notification) { $0.emitError(playerError(from: error)) }
   }
 
   // KVO and notification delivery aren't guaranteed on the main queue, but the
@@ -404,8 +589,54 @@ public final class VideoJSPlayerEngine: NSObject {
   private func emit(_ type: VideoJSPlayerEventType, _ values: [String: Any] = [:]) {
     if invalidated { return }
 
+    publishState()
     onEvent?(values.merging(["type": type.jsName]) { _, type in type })
   }
+}
+
+private func timeRanges(_ values: [NSValue]) -> [[String: Double]] {
+  values
+    .map(\.timeRangeValue)
+    .sorted { $0.start < $1.start }
+    .map { ["start": $0.start.seconds, "end": $0.end.seconds] }
+}
+
+/// Only what the content itself carries; a key is absent unless supplied.
+private func loadCommonContentData(from asset: AVAsset) async -> [String: String] {
+  guard let metadata = try? await asset.load(.commonMetadata) else { return [:] }
+
+  var contentData: [String: String] = [:]
+
+  if let title = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: .commonIdentifierTitle).first,
+     let value = try? await title.load(.stringValue)
+  {
+    contentData["title"] = value
+  }
+
+  if let artwork = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: .commonIdentifierArtwork).first,
+     let data = try? await artwork.load(.dataValue),
+     let uri = imageDataURI(data)
+  {
+    contentData["poster"] = uri
+  }
+
+  return contentData
+}
+
+// Embedded artwork has no URL, so it is inlined. Only formats an image view can
+// be relied on to decode are reported.
+private func imageDataURI(_ data: Data) -> String? {
+  let mimeType: String
+
+  if data.starts(with: [0xFF, 0xD8, 0xFF]) {
+    mimeType = "image/jpeg"
+  } else if data.starts(with: [0x89, 0x50, 0x4E, 0x47]) {
+    mimeType = "image/png"
+  } else {
+    return nil
+  }
+
+  return "data:\(mimeType);base64,\(data.base64EncodedString())"
 }
 
 private func playerError(code: Int, message: String) -> [String: Any] {
