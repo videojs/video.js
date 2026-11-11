@@ -7,6 +7,7 @@ description: Accessible fullscreen toggle button with keyboard support and state
 
 import ComponentReference from "@/components/docs/api-reference/ComponentReference.astro";
 import ComponentImports from "@/components/docs/api-reference/ComponentImports.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
 import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
@@ -93,7 +94,7 @@ React renders a `<button>` element. Add a `className` to style it:
 The button remains hidden until fullscreen is available.
 
 <FrameworkCase frameworks={["html"]}>
-The element receives the native `hidden` attribute. No extra CSS is required.
+The element receives the native `hidden` attribute. If your CSS sets `display` on the element, that rule overrides `hidden`; see <DocsLink slug="guides/ui-components" anchor="hidden-controls">Hidden controls</DocsLink>.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
