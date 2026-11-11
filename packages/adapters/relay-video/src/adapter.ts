@@ -14,7 +14,12 @@ import {
   type VideoPlayer,
 } from '@caprid/moq-media';
 import type { MoqtObject, WantHandlers, WantOptions } from '@caprid/relay';
-import { createFrameReader, type FrameReader, mediaSubscribeParameters } from '@caprid/relay/media';
+import {
+  createFrameReader,
+  createLatestValueReader,
+  type FrameReader,
+  mediaSubscribeParameters,
+} from '@caprid/relay/media';
 import { MediaError, MediaReadyState, type MediaStreamType, type Video } from '@videojs/media';
 import { MediaTracksMixin } from '@videojs/media/media-tracks';
 
@@ -26,6 +31,7 @@ import {
   type Presentation,
   pickAutoVideo,
   sameDecoding,
+  sameTrack,
   type VideoChoice,
 } from './catalog';
 import { createWantScope, type RelaySubscriberView, type WantScope } from './want-scope';
@@ -70,6 +76,8 @@ interface VideoPlayback {
   /** The rendition delivering now. */
   active: string | null;
   readonly player: VideoPlayer;
+  /** The player's `stats.decoded` when its decoder last failed: no more since means the replacement decoded nothing. */
+  decodedAtFailure: number;
   readonly reader: FrameReader;
   readonly handlers: WantHandlers;
 }
@@ -266,11 +274,16 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
     return false;
   }
 
-  /** Seconds since the first frame was shown. Playing is always at the live edge, so seeking is a no-op. */
+  /**
+   * Seconds since the first frame was shown. Playing is always at the live edge, so seeking is a no-op. It holds still
+   * while playback waits for frames: the playout clock keeps running without them, and a time that advanced would read
+   * as playback having recovered.
+   */
   get currentTime(): number {
     const session = this.#session;
+    const flowing = this.#readyState >= MediaReadyState.HAVE_FUTURE_DATA;
 
-    if (session.state === 'ready' && session.playback) {
+    if (session.state === 'ready' && session.playback && flowing) {
       const { clock, originUs } = session.broadcast;
       const position = clock.position();
 
@@ -389,10 +402,10 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
 
     if (!wasPaused && this.#paused) this.#dispatch('pause');
 
-    this.#dispatch('streamtypechange');
-    this.#dispatch('targetlivewindowchange');
-
-    if (!source) return;
+    if (!source) {
+      this.#dispatchStreamChange();
+      return;
+    }
 
     const broadcast: Broadcast = {
       source,
@@ -402,6 +415,8 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
     };
 
     this.#setSession({ state: 'loading', broadcast });
+    // After the session, so a listener reads the stream as live.
+    this.#dispatchStreamChange();
     this.#dispatch('loadstart');
 
     if (wasPaused && !this.#paused) this.#dispatch('play');
@@ -417,12 +432,15 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
       return;
     }
 
+    // Groups can arrive out of order, and an older catalog must not undo a newer one or an ended broadcast.
+    const catalog = createLatestValueReader({ onValue: (object) => this.#onCatalog(broadcast, object) });
+
     try {
       broadcast.scope.want(
         'catalog',
         { namespace: source.namespace, track: CATALOG_TRACK },
         {
-          onObject: (object) => this.#onCatalog(broadcast, object),
+          ...catalog,
           onError: (error) => this.#fail(relayError('The relay refused the broadcast catalog.', error)),
         }
       );
@@ -607,14 +625,21 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
       render: (frame) => {
         const { width, height } = canvas;
 
-        draw(frame);
+        try {
+          draw(frame);
+        } catch (error) {
+          // Kept from the player's `onError`, which then reports decoder failures only.
+          warnRecoverable(error);
+          return;
+        }
+
         broadcast.originUs ??= frame.timestamp;
 
         if (canvas.width !== width || canvas.height !== height) this.#dispatch('resize');
 
         this.#onFrameShown();
       },
-      onError: (error) => this.#onVideoError(player, error),
+      onError: (error) => this.#onVideoError(video, error),
     });
     const reader = createFrameReader(createFrameSequencer({ clock }), {
       onFrame: player.push,
@@ -624,6 +649,7 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
       choice,
       active: null,
       player,
+      decodedAtFailure: 0,
       reader,
       handlers: {
         ...reader,
@@ -651,14 +677,24 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
     return video;
   }
 
-  #onVideoError(player: VideoPlayer, error: unknown): void {
+  #onVideoError(video: VideoPlayback, error: unknown): void {
     const name = errorName(error);
-    // The player stops for good when its decoder rejects the config or fails before it decodes anything: the same
-    // config would fail the same way. After any other error it decodes again from the next keyframe.
-    const fatal = name === 'NotSupportedError' || (player.stats.decoded === 0 && name !== 'DataError');
+
+    // A frame marked key that is not one: the decoder is intact and the player waits for the next keyframe.
+    if (name === 'DataError') {
+      warnRecoverable(error);
+      return;
+    }
+
+    // The player stops for good when a decoder rejects the config or fails before it decodes anything: the same
+    // config would fail the same way. After any other failure it opens another decoder at the next keyframe.
+    const { decoded } = video.player.stats;
+    const fatal = name === 'NotSupportedError' || decoded === video.decodedAtFailure;
     const session = this.#session;
 
-    if (!fatal || session.state !== 'ready' || session.playback?.video.player !== player) {
+    video.decodedAtFailure = decoded;
+
+    if (!fatal || session.state !== 'ready' || session.playback?.video !== video) {
       warnRecoverable(error);
       return;
     }
@@ -675,7 +711,7 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
 
     video.choice = desired;
 
-    if (desired.track.name !== current.track.name) {
+    if (!sameTrack(desired.track, current.track)) {
       session.broadcast.scope.want('video', wantOptions(desired, 'video'), video.handlers);
     } else if (!sameDecoding(desired.track, current.track)) {
       video.player.configure(desired.config);
@@ -826,6 +862,11 @@ export class RelayVideoAdapter extends MediaTracksMixin(RelayVideoAdapterBase) i
 
   #applyGain(): void {
     this.#audio.gain = this.#muted ? 0 : this.#volume;
+  }
+
+  #dispatchStreamChange(): void {
+    this.#dispatch('streamtypechange');
+    this.#dispatch('targetlivewindowchange');
   }
 
   #dispatch(type: string): void {

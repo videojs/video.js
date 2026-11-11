@@ -86,10 +86,19 @@ export function findVideo(
   return presentation.video.find((choice) => choice.track.name === name);
 }
 
-/** Whether two catalog entries decode with the same config. */
-export function sameDecoding(a: MsfCatalogTrack, b: MsfCatalogTrack): boolean {
+/** Whether two catalog entries name the same track: its namespace and its name. */
+export function sameTrack(a: MsfCatalogTrack, b: MsfCatalogTrack): boolean {
   return (
     a.name === b.name &&
+    a.namespace.length === b.namespace.length &&
+    a.namespace.every((part, index) => part === b.namespace[index])
+  );
+}
+
+/** Whether two catalog entries are the same track decoded with the same config. */
+export function sameDecoding(a: MsfCatalogTrack, b: MsfCatalogTrack): boolean {
+  return (
+    sameTrack(a, b) &&
     a.codec === b.codec &&
     a.width === b.width &&
     a.height === b.height &&

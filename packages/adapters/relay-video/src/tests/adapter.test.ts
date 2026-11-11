@@ -61,8 +61,11 @@ const ladder: MsfCatalogInput = {
   audio: { name: 'audio' },
 };
 
-function object(payload: Uint8Array): MoqtObject {
-  return { groupId: 0, objectId: 0, subgroupId: 0, status: 'normal', properties: [], payload };
+let nextGroup = 0;
+
+/** An object in a group after every one made before it, unless the test places it. */
+function object(payload: Uint8Array, groupId = nextGroup++): MoqtObject {
+  return { groupId, objectId: 0, subgroupId: 0, status: 'normal', properties: [], payload };
 }
 
 const subscribed: SubscribeOk = { trackAlias: 1, parameters: {}, trackProperties: [] };
@@ -108,6 +111,7 @@ function setup({ canvasHeight = 0 } = {}) {
     'ended',
     'error',
     'resize',
+    'waiting',
   ]) {
     adapter.addEventListener(type, () => events.push(type));
   }
@@ -360,6 +364,90 @@ describe('RelayVideoAdapter', () => {
 
     expect(events).not.toContain('error');
     expect(wantOf(subscriber, 'video')).toBeDefined();
+  });
+
+  it('reports the stream as live to a listener told the stream type changed', () => {
+    const { subscriber, adapter } = setup();
+    const seen: string[] = [];
+
+    adapter.addEventListener('streamtypechange', () => seen.push(adapter.streamType));
+    adapter.source = { subscriber, namespace };
+    adapter.source = null;
+
+    expect(seen).toEqual(['live', 'unknown']);
+  });
+
+  it('holds the current time while it waits for frames', async () => {
+    vi.useFakeTimers();
+
+    const { subscriber, adapter, events, deliverCatalog } = setup();
+
+    adapter.source = { subscriber, namespace };
+    deliverCatalog();
+    await adapter.play();
+    lastPlayer().options.render({ timestamp: 1_000_000, displayWidth: 640, displayHeight: 360 } as VideoFrame);
+    vi.advanceTimersByTime(1_500);
+
+    expect(events.at(-1)).toBe('waiting');
+
+    const stalledAt = adapter.currentTime;
+
+    vi.advanceTimersByTime(2_000);
+
+    expect(adapter.currentTime).toBe(stalledAt);
+
+    vi.useRealTimers();
+  });
+
+  it('reports a replacement decoder that fails before it decodes anything as a decode error', async () => {
+    const { subscriber, adapter, events, deliverCatalog } = setup();
+
+    adapter.source = { subscriber, namespace };
+    deliverCatalog();
+    await adapter.play();
+
+    const { options, player } = lastPlayer();
+
+    player.stats.decoded = 30;
+    options.onError!(new DOMException('Decoding error.', 'EncodingError'));
+
+    expect(events).not.toContain('error');
+
+    options.onError!(new DOMException('Decoding error.', 'EncodingError'));
+
+    expect(adapter.error?.code).toBe(MediaError.MEDIA_ERR_DECODE);
+  });
+
+  it('moves the video want when a later catalog lists the track under another namespace', async () => {
+    const { subscriber, adapter, deliverCatalog } = setup();
+    const input: MsfCatalogInput = { namespace, video: { name: 'video', codec: 'vp8', width: 640, height: 360 } };
+    const moved = JSON.parse(new TextDecoder().decode(buildMsfCatalog(input)));
+
+    moved.tracks[0].namespace = 'live/backup';
+    adapter.source = { subscriber, namespace };
+    deliverCatalog(input);
+    await adapter.play();
+    handlersOf(subscriber, 'catalog').onObject!(object(new TextEncoder().encode(JSON.stringify(moved))));
+
+    expect(wantOf(subscriber, 'video')?.options).toMatchObject({ namespace: ['live', 'backup'], track: 'video' });
+  });
+
+  it('ignores a catalog older than the one it has, even after the broadcast ended', async () => {
+    const { subscriber, adapter } = setup();
+
+    adapter.source = { subscriber, namespace };
+
+    const { onObject } = handlersOf(subscriber, 'catalog');
+
+    onObject!(object(buildMsfCatalog(ladder), 5));
+    onObject!(object(buildMsfCatalog({ namespace, media: [ladder.media![0]!] }), 4));
+
+    expect(adapter.videoRenditions.length).toBe(3);
+
+    onObject!(object(buildMsfEndCatalog(), 7));
+    onObject!(object(buildMsfCatalog(ladder), 6));
+
+    expect(adapter.ended).toBe(true);
   });
 
   it('ends when the catalog says the broadcast is complete, keeping the catalog want', async () => {
