@@ -5,6 +5,7 @@ import { AirPlayButton } from '../../../../components/buttons/airplay-button';
 import { ButtonTooltip } from '../../../../components/buttons/button-tooltip';
 import { CaptionsButton } from '../../../../components/buttons/captions-button';
 import { CastButton } from '../../../../components/buttons/cast-button';
+import { FCastButton } from '../../../../components/buttons/fcast-button';
 import { FullscreenButton } from '../../../../components/buttons/fullscreen-button';
 import { PiPButton } from '../../../../components/buttons/pip-button';
 import { PlayButton } from '../../../../components/buttons/play-button';
@@ -49,6 +50,9 @@ export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsPr
             <$.Controls.Group className={styles.trailing}>
               <ButtonTooltip side="top">
                 <CastButton />
+              </ButtonTooltip>
+              <ButtonTooltip side="top">
+                <FCastButton />
               </ButtonTooltip>
               <ButtonTooltip side="top">
                 <AirPlayButton />

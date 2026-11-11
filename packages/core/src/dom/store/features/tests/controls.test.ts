@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { PlayerExtensionCoordinator } from '../../../extensions/coordinator';
 import { getGestureCoordinator } from '../../../gesture/coordinator';
 import type { PlayerTarget } from '../../../player';
+import { setRemotePlaybackState } from '../../../presentation/remote-playback';
 import { createMockVideo } from '../../../tests/test-helpers';
 import { controlsFeature } from '../controls';
 
@@ -803,6 +804,27 @@ describe('controlsFeature', () => {
   });
 
   describe('cast interaction', () => {
+    it('tracks extension sessions through the media facade and removes each owner independently', () => {
+      const video = createMockVideo({ paused: false });
+      const coordinator = new PlayerExtensionCoordinator(() => {});
+
+      coordinator.register({ mediaOverride: null });
+      const facade = coordinator.getStoreMedia(video);
+      const { store } = createPlayerStore(facade);
+      const first = {};
+      const second = {};
+
+      vi.advanceTimersByTime(IDLE_DELAY);
+      expect(store.state.controlsVisible).toBe(false);
+      setRemotePlaybackState(video, first, 'connecting');
+      expect(store.state.controlsVisible).toBe(true);
+      setRemotePlaybackState(video, second, 'connected');
+      setRemotePlaybackState(video, first, 'disconnected');
+      expect(store.state.controlsVisible).toBe(true);
+      setRemotePlaybackState(video, second, 'disconnected');
+      expect(store.state.controlsVisible).toBe(false);
+    });
+
     it('keeps controlsVisible true when casting and user goes inactive', () => {
       const { video, remote } = createGoogleCastVideo({ paused: false });
       const { store } = createPlayerStore(video);

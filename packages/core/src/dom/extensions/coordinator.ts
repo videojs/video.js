@@ -26,6 +26,19 @@ export class PlayerExtensionCoordinator {
   readonly #player: ExtensionPlayer = { initTime: Date.now() };
   readonly #onChange: () => void;
   #target: PlayerTarget | null = null;
+  readonly #listeners = new Set<() => void>();
+
+  /** Observe extension registration and removal. @internal */
+  subscribe = (listener: () => void): (() => void) => {
+    this.#listeners.add(listener);
+    return () => {
+      this.#listeners.delete(listener);
+    };
+  };
+
+  #notify(): void {
+    for (const listener of this.#listeners) listener();
+  }
 
   /** @param onChange - Called after an extension that overrides media members is registered or released. */
   constructor(onChange: () => void) {
@@ -57,6 +70,8 @@ export class PlayerExtensionCoordinator {
       if (this.#target) extension.attach?.(this.#target);
 
       if (overridesMedia(previous) || overridesMedia(extension)) this.#onChange();
+
+      this.#notify();
     }
 
     return () => this.#release(extension);
@@ -99,6 +114,7 @@ export class PlayerExtensionCoordinator {
     }
 
     this.#extensions.clear();
+    this.#notify();
   }
 
   /**
@@ -135,6 +151,8 @@ export class PlayerExtensionCoordinator {
     this.#leave(extension);
 
     if (overridesMedia(extension)) this.#onChange();
+
+    this.#notify();
   }
 
   /** Undo `register` for an extension that is no longer registered: detach it from the media, then disconnect it. */
