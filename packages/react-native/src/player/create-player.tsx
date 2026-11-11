@@ -32,10 +32,10 @@ export interface CreatePlayerConfig<Features extends AnyNativeFeature[]> {
 /**
  * Props accepted by a generated Player.
  *
- * Just `children`: the component renders no host element, and there are no feature-declared inputs to forward. Web
- * additionally derives config props from its features and diffs them into store actions through
- * `combinePlayerFeatureConfigs` / `setPlayerConfigValue`. Those need `definePlayerFeature`'s `config` property and
- * `@videojs/core/dom`; nothing here declares one yet.
+ * Just `children`: the component renders no host element. Web additionally derives config props from its features and
+ * diffs them into store actions through `combinePlayerFeatureConfigs` / `setPlayerConfigValue`, which live in
+ * `@videojs/core/dom`. `metadata` (`title`, `poster`) and `playbackRate` (`defaultPlaybackRates`) declare configs, but
+ * nothing forwards them here yet, so those features run on their defaults.
  */
 export interface PlayerProps {
   children?: ReactNode | undefined;

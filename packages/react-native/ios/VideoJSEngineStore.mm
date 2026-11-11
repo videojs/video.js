@@ -73,6 +73,20 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   return @(engine != nil);
 }
 
+- (NSNumber *)setPlaybackRate:(NSInteger)handle rate:(double)rate
+{
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine setPlaybackRate:rate];
+  return @(engine != nil);
+}
+
+- (NSNumber *)setLoop:(NSInteger)handle loop:(BOOL)loop
+{
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine setLoop:loop];
+  return @(engine != nil);
+}
+
 - (NSNumber *)getCurrentTime:(NSInteger)handle
 {
   return @([self stateForHandle:handle].currentTime);

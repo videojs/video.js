@@ -261,6 +261,20 @@ internal class PlayerEngine(
     onMain { exo.pause() }
   }
 
+  fun setPlaybackRate(rate: Double) {
+    if (rate <= 0) return
+
+    updatePlayerState { it.copy(playbackRate = rate) }
+    onMain { exo.setPlaybackSpeed(rate.toFloat()) }
+  }
+
+  // `loop` isn't in the snapshot, so there is no state to write. ExoPlayer
+  // repeats the item in place instead of ending, so there is no `ended`, as
+  // with a looping media element.
+  fun setLoop(loop: Boolean) {
+    onMain { exo.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF }
+  }
+
   fun setCurrentTime(seconds: Double) {
     val target = seconds.coerceAtLeast(0.0)
 
