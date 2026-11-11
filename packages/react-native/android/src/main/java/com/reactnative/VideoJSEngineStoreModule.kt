@@ -27,25 +27,20 @@ class VideoJSEngineStoreModule internal constructor(
     registry.destroy(handle.toInt())
   }
 
-  override fun setSource(handle: Double, source: String) {
-    registry.command(handle.toInt()) { it.setSource(source) }
-  }
+  override fun setSource(handle: Double, source: String): Boolean =
+    registry.command(handle.toInt(), { it.requestSource(source) }) { it.setSource(source) }
 
-  override fun play(handle: Double) {
-    registry.command(handle.toInt()) { it.play() }
-  }
+  override fun play(handle: Double): Boolean =
+    registry.command(handle.toInt(), PlayerEngine::requestPlay, PlayerEngine::play)
 
-  override fun load(handle: Double) {
-    registry.command(handle.toInt()) { it.load() }
-  }
+  override fun load(handle: Double): Boolean =
+    registry.command(handle.toInt(), PlayerEngine::requestLoad, PlayerEngine::load)
 
-  override fun pause(handle: Double) {
-    registry.command(handle.toInt()) { it.pause() }
-  }
+  override fun pause(handle: Double): Boolean =
+    registry.command(handle.toInt(), PlayerEngine::requestPause, PlayerEngine::pause)
 
-  override fun setCurrentTime(handle: Double, time: Double) {
-    registry.command(handle.toInt()) { it.setCurrentTime(time) }
-  }
+  override fun setCurrentTime(handle: Double, time: Double): Boolean =
+    registry.command(handle.toInt(), { it.requestSeek(time) }) { it.setCurrentTime(time) }
 
   override fun getCurrentTime(handle: Double): Double = state(handle).currentTime
 

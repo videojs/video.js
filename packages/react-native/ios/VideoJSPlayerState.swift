@@ -1,9 +1,9 @@
 import Foundation
 
 /// One player's state as an `HTMLMediaElement` would report it, property for
-/// property. Immutable: `VideoJSPlayerEngine` publishes a whole new snapshot
-/// rather than editing one, so a reader never sees half an update. `initial`
-/// holds a media element's initial values, which is also what a reset restores.
+/// property. Immutable: `VideoJSPlayerEngine` changes it by replacing it with an
+/// edited `copy(…)`, so a reader never sees half an update. `initial` holds a
+/// media element's initial values, which is also what a reset restores.
 ///
 /// A class rather than a struct so the Objective-C++ module can read it.
 @objc(VideoJSPlayerState)
@@ -53,5 +53,38 @@ public final class VideoJSPlayerState: NSObject {
     self.readyState = readyState
     self.playbackRate = playbackRate
     self.contentData = contentData
+  }
+
+  /// This snapshot with the given values replaced; anything left out keeps
+  /// this snapshot's value. `error` is optional itself, so `.some(nil)` clears
+  /// it.
+  func copy(
+    currentTime: Double? = nil,
+    duration: Double? = nil,
+    buffered: [[String: Double]]? = nil,
+    seekable: [[String: Double]]? = nil,
+    error: [String: Any]?? = nil,
+    paused: Bool? = nil,
+    ended: Bool? = nil,
+    seeking: Bool? = nil,
+    currentSrc: String? = nil,
+    readyState: Int? = nil,
+    playbackRate: Double? = nil,
+    contentData: [String: String]? = nil
+  ) -> VideoJSPlayerState {
+    VideoJSPlayerState(
+      currentTime: currentTime ?? self.currentTime,
+      duration: duration ?? self.duration,
+      buffered: buffered ?? self.buffered,
+      seekable: seekable ?? self.seekable,
+      error: error ?? self.error,
+      paused: paused ?? self.paused,
+      ended: ended ?? self.ended,
+      seeking: seeking ?? self.seeking,
+      currentSrc: currentSrc ?? self.currentSrc,
+      readyState: readyState ?? self.readyState,
+      playbackRate: playbackRate ?? self.playbackRate,
+      contentData: contentData ?? self.contentData
+    )
   }
 }
