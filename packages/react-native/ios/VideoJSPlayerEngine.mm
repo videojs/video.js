@@ -5,8 +5,8 @@ NSString *VideoJSPlayerEventTypeJSName(VideoJSPlayerEventType type)
   switch (type) {
     case VideoJSPlayerEventTypePlaying:
       return @"playing";
-    case VideoJSPlayerEventTypePaused:
-      return @"paused";
+    case VideoJSPlayerEventTypePause:
+      return @"pause";
     case VideoJSPlayerEventTypeEnded:
       return @"ended";
   }
@@ -169,7 +169,7 @@ static void *VideoJSPlayerTimeControlStatusContext = &VideoJSPlayerTimeControlSt
   // does too.
   VideoJSPlayerEventType type = status == AVPlayerTimeControlStatusPlaying
       ? VideoJSPlayerEventTypePlaying
-      : VideoJSPlayerEventTypePaused;
+      : VideoJSPlayerEventTypePause;
 
   [self emitOnMainQueue:type];
 }

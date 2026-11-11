@@ -6,10 +6,10 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 
-/** Mirrors `PlayerEvent['type']` in `src/NativeEngineStore.ts`. */
+/** Mirrors `PlayerEvent['type']` in `src/media/NativeEngineStore.ts`. */
 internal enum class PlayerEventType(val jsName: String) {
   PLAYING("playing"),
-  PAUSED("paused"),
+  PAUSE("pause"),
   ENDED("ended"),
 }
 
@@ -34,7 +34,7 @@ internal class PlayerEngine(
     exo.addListener(
       object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-          onEvent(if (isPlaying) PlayerEventType.PLAYING else PlayerEventType.PAUSED)
+          onEvent(if (isPlaying) PlayerEventType.PLAYING else PlayerEventType.PAUSE)
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {

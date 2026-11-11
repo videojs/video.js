@@ -22,7 +22,7 @@ const defineNativeFeature = defineSlice<NativePlayerTarget>();
  *    the adapter eventually; the TurboModule needs to report position and duration first.
  * 2. **TODO(ReactNativeMedia): emit the standard media events.** The shared feature listens for `emptied`, `timeupdate`,
  *    `canplay`, `seeking`, `seeked` and `waiting` alongside `play`/`playing`/`pause`/`ended`. Native currently emits
- *    only `playing`, `paused` and `ended`, which `resolveNativeEvent` maps onto the four contract events this feature
+ *    only `playing`, `pause` and `ended`, which `resolveNativeEvent` maps onto the four contract events this feature
  *    uses. The rest need native support before the shared feature could observe anything useful.
  */
 export const nativePlaybackFeature = defineNativeFeature<MediaPlaybackState>({
