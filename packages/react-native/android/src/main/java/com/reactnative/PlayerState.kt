@@ -2,9 +2,9 @@ package com.reactnative
 
 /**
  * One player's state as an `HTMLMediaElement` would report it, property for
- * property. Immutable: [PlayerEngine] publishes a whole new snapshot rather
- * than editing one, so a reader never sees half an update. The defaults are a
- * media element's initial values, which is also what a reset restores.
+ * property. Immutable: [PlayerEngine] changes it by replacing it with an edited
+ * `copy()`, so a reader never sees half an update. The defaults are a media
+ * element's initial values, which is also what a reset restores.
  */
 internal data class PlayerState(
   /** Seconds. */

@@ -36,44 +36,59 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   [VideoJSPlayerRegistry.sharedRegistry destroyPlayer:handle];
 }
 
-- (void)setSource:(NSInteger)handle source:(NSString *)source
+- (NSNumber *)setSource:(NSInteger)handle source:(NSString *)source
 {
-  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-                                                block:^(VideoJSPlayerEngine *engine) {
-                                                  [engine setSource:source];
-                                                }];
+  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+      request:^(VideoJSPlayerEngine *engine) {
+        [engine requestSource:source];
+      }
+      block:^(VideoJSPlayerEngine *engine) {
+        [engine setSource:source];
+      }]);
 }
 
-- (void)load:(NSInteger)handle
+- (NSNumber *)load:(NSInteger)handle
 {
-  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-                                                block:^(VideoJSPlayerEngine *engine) {
-                                                  [engine load];
-                                                }];
+  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+      request:^(VideoJSPlayerEngine *engine) {
+        [engine requestLoad];
+      }
+      block:^(VideoJSPlayerEngine *engine) {
+        [engine load];
+      }]);
 }
 
-- (void)play:(NSInteger)handle
+- (NSNumber *)play:(NSInteger)handle
 {
-  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-                                                block:^(VideoJSPlayerEngine *engine) {
-                                                  [engine play];
-                                                }];
+  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+      request:^(VideoJSPlayerEngine *engine) {
+        [engine requestPlay];
+      }
+      block:^(VideoJSPlayerEngine *engine) {
+        [engine play];
+      }]);
 }
 
-- (void)pause:(NSInteger)handle
+- (NSNumber *)pause:(NSInteger)handle
 {
-  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-                                                block:^(VideoJSPlayerEngine *engine) {
-                                                  [engine pause];
-                                                }];
+  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+      request:^(VideoJSPlayerEngine *engine) {
+        [engine requestPause];
+      }
+      block:^(VideoJSPlayerEngine *engine) {
+        [engine pause];
+      }]);
 }
 
-- (void)setCurrentTime:(NSInteger)handle time:(double)time
+- (NSNumber *)setCurrentTime:(NSInteger)handle time:(double)time
 {
-  [VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-                                                block:^(VideoJSPlayerEngine *engine) {
-                                                  [engine setCurrentTime:time];
-                                                }];
+  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
+      request:^(VideoJSPlayerEngine *engine) {
+        [engine requestSeek:time];
+      }
+      block:^(VideoJSPlayerEngine *engine) {
+        [engine setCurrentTime:time];
+      }]);
 }
 
 - (NSNumber *)getCurrentTime:(NSInteger)handle

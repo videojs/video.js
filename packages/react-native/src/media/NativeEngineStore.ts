@@ -64,24 +64,27 @@ export type PlayerContentData = Readonly<{
 }>;
 
 /**
- * Commands are fire-and-forget: they post to the player's thread and return immediately.
+ * Commands run synchronously on the JS thread: each writes the state it will produce into the snapshot, then posts the
+ * work to the player's thread and returns. They return `true` when the snapshot already reflects the command, and
+ * `false` when there is no player for the handle yet (it is built one player-thread hop after `createPlayer`) or any
+ * more; a command against a handle not yet built still takes effect, its state appearing once it runs. A command must
+ * return a value to run synchronously at all — TurboModule `void` methods run asynchronously on the module's queue.
  *
- * Getters are synchronous but never wait on the player's thread. Native keeps a snapshot of each player's state,
- * republished before every `onPlayerEvent` and whenever state changes without one, and a getter reads that snapshot. A
- * getter called while handling an event therefore sees state at least as new as the event. A command's effect shows up
- * once the player has applied it, not immediately (a seek, for instance, completes asynchronously). Against an unknown
- * or destroyed handle, getters return a media element's initial values and commands are ignored.
+ * Getters are synchronous and never wait on the player's thread: they read that same snapshot. Besides commands, the
+ * player writes what it reports into it before emitting the `onPlayerEvent` that announces it, so a getter called while
+ * handling an event sees state at least as new as the event. Against an unknown or destroyed handle, getters return a
+ * media element's initial values.
  */
 export interface Spec extends TurboModule {
   createPlayer(source: string | null): CodegenTypes.Int32;
   destroyPlayer(handle: CodegenTypes.Int32): void;
-  setSource(handle: CodegenTypes.Int32, source: string): void;
+  setSource(handle: CodegenTypes.Int32, source: string): boolean;
   /** Reloads the current source from scratch. */
-  load(handle: CodegenTypes.Int32): void;
-  play(handle: CodegenTypes.Int32): void;
-  pause(handle: CodegenTypes.Int32): void;
+  load(handle: CodegenTypes.Int32): boolean;
+  play(handle: CodegenTypes.Int32): boolean;
+  pause(handle: CodegenTypes.Int32): boolean;
   /** Seconds. Ignored with no source. */
-  setCurrentTime(handle: CodegenTypes.Int32, time: CodegenTypes.Double): void;
+  setCurrentTime(handle: CodegenTypes.Int32, time: CodegenTypes.Double): boolean;
 
   /** Seconds. */
   getCurrentTime(handle: CodegenTypes.Int32): CodegenTypes.Double;

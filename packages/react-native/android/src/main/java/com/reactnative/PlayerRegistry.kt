@@ -43,8 +43,25 @@ internal class PlayerRegistry {
     onMain { engines.remove(handle)?.release() }
   }
 
-  fun command(handle: Int, block: (PlayerEngine) -> Unit) {
-    onMain { engines[handle]?.let(block) }
+  /**
+   * A command that changes state: [request] writes the state it will produce,
+   * from the calling thread so getters reflect it at once, then [block] runs
+   * on the main thread. Before the engine exists there is nothing to write to
+   * yet, so the request runs on the main thread just ahead of [block] instead.
+   *
+   * Returns whether the request ran on the calling thread.
+   */
+  fun command(handle: Int, request: (PlayerEngine) -> Unit, block: (PlayerEngine) -> Unit): Boolean {
+    val requested = engines[handle]?.also(request) != null
+
+    onMain {
+      engines[handle]?.let {
+        if (!requested) request(it)
+        block(it)
+      }
+    }
+
+    return requested
   }
 
   /**

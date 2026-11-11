@@ -61,13 +61,34 @@ public final class VideoJSPlayerRegistry: NSObject {
     }
   }
 
-  @objc(commandPlayer:block:)
-  public func commandPlayer(_ handle: Int, block: @escaping (VideoJSPlayerEngine) -> Void) {
+  /// A command that changes state: `request` writes the state it will produce,
+  /// from the calling thread so getters reflect it at once, then `block` runs
+  /// on the main queue. Before the engine exists there is nothing to write to
+  /// yet, so the request runs on the main queue just ahead of `block` instead.
+  ///
+  /// Returns whether the request ran on the calling thread.
+  @objc(commandPlayer:request:block:)
+  @discardableResult
+  public func commandPlayer(
+    _ handle: Int,
+    request: @escaping (VideoJSPlayerEngine) -> Void,
+    block: @escaping (VideoJSPlayerEngine) -> Void
+  ) -> Bool {
+    let engine = engine(forHandle: handle)
+
+    engine.map(request)
+
     onMainQueue { [weak self] in
-      if let engine = self?.engine(forHandle: handle) {
-        block(engine)
+      guard let current = self?.engine(forHandle: handle) else { return }
+
+      if engine == nil {
+        request(current)
       }
+
+      block(current)
     }
+
+    return engine != nil
   }
 
   /// The latest published state, from any thread. A handle whose engine

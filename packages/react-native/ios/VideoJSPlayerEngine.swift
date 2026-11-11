@@ -71,10 +71,20 @@ private let timeUpdateInterval = CMTime(value: 1, timescale: 4)
 /// is reached either from `VideoJSPlayerRegistry`'s main-queue dispatch or from
 /// the Fabric surface, which is already on the main queue.
 ///
-/// The one exception is the `VideoJSPlayerState` snapshot, which the JS thread
-/// reads through `readState()`. The engine republishes it before every event,
-/// so a getter called while handling one sees state at least that new. One lock
-/// covers the whole snapshot.
+/// The exception is the `VideoJSPlayerState` snapshot, which is the only copy
+/// of the state the getters report. One lock guards it, and every change
+/// replaces it with an edited `copy(…)` without giving the lock up in between.
+/// Two kinds of writer share it:
+/// - Commands write what they mean, from the calling thread (`request*`),
+///   before the command itself runs on the main queue, so a getter called right
+///   after one reflects it as a media element's would.
+/// - The engine writes what the player reports, on the main queue, before
+///   emitting the event that announces it, so a getter called while handling an
+///   event sees state at least that new.
+///
+/// Where the two disagree, the engine's write defers to the snapshot: it leaves
+/// `currentTime` alone while a seek is pending, and writes per-source values
+/// only while `currentSrc` is still the source it's playing.
 @objc
 public final class VideoJSPlayerEngine: NSObject {
   // Always an AVQueuePlayer, even with looping off, so enabling loop later
@@ -88,7 +98,7 @@ public final class VideoJSPlayerEngine: NSObject {
   private var layers: [AVPlayerLayer] = []
 
   private let stateLock = NSLock()
-  private var state = VideoJSPlayerState.initial
+  private var state: VideoJSPlayerState
 
   /// Receives the `PlayerEvent` payload minus the handle the registry adds.
   private var onEvent: (([String: Any]) -> Void)?
@@ -105,16 +115,9 @@ public final class VideoJSPlayerEngine: NSObject {
   private var item: AVPlayerItem?
   private var itemObservations: [NSKeyValueObservation] = []
   private var metadataLoaded = false
-  private var reportedDuration = CMTime.invalid
   private var likelyToKeepUp = false
-  private var ended = false
-  private var lastError: [String: Any]?
-  private var reportedContentData: [String: String] = [:]
-
-  // Only the newest seek's completion settles `seeking`; a superseded seek
-  // completes unfinished and stays quiet, as on the web.
-  private var seeking = false
-  private var seekGeneration = 0
+  private var atEnd = false
+  private var hasContentData = false
 
   // An item can't seek until it is ready, so an earlier request waits — the
   // media element's default playback start position.
@@ -128,6 +131,7 @@ public final class VideoJSPlayerEngine: NSObject {
   /// A nil source leaves the player idle until `setSource(_:)` supplies one.
   @objc(initWithSource:onEvent:)
   public init(source: String?, onEvent: @escaping ([String: Any]) -> Void) {
+    self.state = VideoJSPlayerState.initial.copy(currentSrc: source ?? "")
     self.onEvent = onEvent
 
     super.init()
@@ -146,18 +150,19 @@ public final class VideoJSPlayerEngine: NSObject {
       playerObservations.append(player.observe(\.defaultRate, options: [.old, .new]) { [weak self] _, change in
         guard change.oldValue != change.newValue else { return }
 
-        self?.onMainQueue { $0.emit(.ratechange) }
+        self?.onMainQueue { engine in
+          engine.update { $0.copy(playbackRate: engine.playbackRate) }
+          engine.emit(.ratechange)
+        }
       })
     }
 
     // Also fires when playback starts or stops and when time jumps, which is
     // when a media element reports position too.
-    // The payload reads the same accessor as the state snapshot, so the two
-    // always agree.
     timeObserver = player.addPeriodicTimeObserver(forInterval: timeUpdateInterval, queue: .main) { [weak self] time in
       guard let self, item != nil, time.isNumeric else { return }
 
-      emit(.timeupdate, ["currentTime": currentTime])
+      emitTimeUpdate()
     }
 
     NotificationCenter.default.addObserver(
@@ -185,6 +190,38 @@ public final class VideoJSPlayerEngine: NSObject {
     invalidate()
   }
 
+  // MARK: Requests — any thread; each writes the state its command will produce
+
+  // A new source starts from a media element's initial state; only `paused`
+  // and `playbackRate` belong to the element rather than the source.
+  @objc(requestSource:)
+  public func requestSource(_ source: String) {
+    update { .initial.copy(paused: $0.paused, currentSrc: source, playbackRate: $0.playbackRate) }
+  }
+
+  @objc
+  public func requestLoad() {
+    update { $0.currentSrc.isEmpty ? $0 : .initial.copy(paused: $0.paused, currentSrc: $0.currentSrc, playbackRate: $0.playbackRate) }
+  }
+
+  // Playing after the end restarts from the beginning, which is a seek.
+  @objc
+  public func requestPlay() {
+    update { $0.ended ? $0.copy(currentTime: 0, paused: false, ended: false, seeking: true) : $0.copy(paused: false) }
+  }
+
+  @objc
+  public func requestPause() {
+    update { $0.copy(paused: true) }
+  }
+
+  @objc(requestSeek:)
+  public func requestSeek(_ seconds: Double) {
+    update { $0.currentSrc.isEmpty ? $0 : $0.copy(currentTime: max(seconds, 0), ended: false, seeking: true) }
+  }
+
+  // MARK: Commands — main queue, after their request
+
   // AVQueuePlayer documents replaceCurrentItem(with:) as unsupported, so the
   // swap goes through the queue. removeAllItems drops the rate, so a player
   // that was playing is restarted to match ExoPlayer's surviving
@@ -194,6 +231,7 @@ public final class VideoJSPlayerEngine: NSObject {
     let next = URL(string: source).map { AVPlayerItem(url: $0) }
     let wasPlaying = player.timeControlStatus != .paused
     let hadItem = item != nil
+    let hadContentData = hasContentData
 
     player.removeAllItems()
     observe(next)
@@ -204,7 +242,10 @@ public final class VideoJSPlayerEngine: NSObject {
       emit(.emptied)
     }
 
-    clearContentData()
+    if hadContentData {
+      emit(.contentdatachange)
+    }
+
     emit(.loadstart)
 
     // A media element fails an unusable src asynchronously rather than
@@ -228,11 +269,10 @@ public final class VideoJSPlayerEngine: NSObject {
     }
   }
 
-  // A media element restarts from the beginning when played after the end.
   @objc
   public func play() {
-    if ended {
-      setCurrentTime(0)
+    if atEnd {
+      seek(to: 0)
     }
 
     player.play()
@@ -245,33 +285,7 @@ public final class VideoJSPlayerEngine: NSObject {
 
   @objc(setCurrentTime:)
   public func setCurrentTime(_ seconds: Double) {
-    guard let item else { return }
-
-    ended = false
-
-    guard metadataLoaded else {
-      pendingStartTime = seconds
-      return
-    }
-
-    seeking = true
-    seekGeneration += 1
-
-    let generation = seekGeneration
-    let time = CMTime(seconds: max(seconds, 0), preferredTimescale: 600)
-
-    emit(.seeking)
-    player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
-      self?.onMainQueue(for: item) { engine in
-        guard generation == engine.seekGeneration else { return }
-
-        engine.seeking = false
-
-        if finished {
-          engine.emit(.seeked)
-        }
-      }
-    }
+    seek(to: max(seconds, 0))
   }
 
   // MARK: State
@@ -280,10 +294,6 @@ public final class VideoJSPlayerEngine: NSObject {
   @objc
   public func readState() -> VideoJSPlayerState {
     stateLock.withLock { state }
-  }
-
-  private func resetState() {
-    stateLock.withLock { state = .initial }
   }
 
   private var currentTime: Double {
@@ -322,25 +332,23 @@ public final class VideoJSPlayerEngine: NSObject {
     return player.rate == 0 ? 1 : Double(player.rate)
   }
 
-  private func publishState() {
-    if invalidated { return }
+  /// Any thread. Returns the snapshot it left in place.
+  @discardableResult
+  private func update(_ transform: (VideoJSPlayerState) -> VideoJSPlayerState) -> VideoJSPlayerState {
+    stateLock.withLock {
+      state = transform(state)
+      return state
+    }
+  }
 
-    let next = VideoJSPlayerState(
-      currentTime: currentTime,
-      duration: duration,
-      buffered: timeRanges(item?.loadedTimeRanges ?? []),
-      seekable: timeRanges(item?.seekableTimeRanges ?? []),
-      error: lastError,
-      paused: player.timeControlStatus == .paused,
-      ended: ended,
-      seeking: seeking,
-      currentSrc: source ?? "",
-      readyState: readyState,
-      playbackRate: playbackRate,
-      contentData: reportedContentData
-    )
+  // Per-source values belong to the source the player is on. Once a request
+  // has moved `currentSrc` on, they would only leak the old source into the
+  // new one's state.
+  @discardableResult
+  private func updateForSource(_ transform: (VideoJSPlayerState) -> VideoJSPlayerState) -> VideoJSPlayerState {
+    let current = source ?? ""
 
-    stateLock.withLock { state = next }
+    return update { $0.currentSrc == current ? transform($0) : $0 }
   }
 
   @objc(attachLayer:)
@@ -363,7 +371,7 @@ public final class VideoJSPlayerEngine: NSObject {
 
     invalidated = true
 
-    resetState()
+    update { _ in .initial }
     playerObservations.forEach { $0.invalidate() }
     playerObservations.removeAll()
     observe(nil)
@@ -395,7 +403,7 @@ public final class VideoJSPlayerEngine: NSObject {
     }
   }
 
-  // Swaps the per-item observations and resets the per-source state, so
+  // Swaps the per-item observations and resets the per-source bookkeeping, so
   // nothing from the previous item is reported against the next.
   private func observe(_ next: AVPlayerItem?) {
     itemObservations.forEach { $0.invalidate() }
@@ -403,13 +411,10 @@ public final class VideoJSPlayerEngine: NSObject {
 
     item = next
     metadataLoaded = false
-    reportedDuration = .invalid
     likelyToKeepUp = false
     canPlay = false
-    ended = false
-    lastError = nil
-    seeking = false
-    seekGeneration += 1
+    atEnd = false
+    hasContentData = false
     pendingStartTime = nil
 
     guard let next else { return }
@@ -429,9 +434,52 @@ public final class VideoJSPlayerEngine: NSObject {
       },
       // A live window slides with no media event to carry it.
       next.observe(\.seekableTimeRanges) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { $0.publishState() }
+        self?.onMainQueue(for: item) { engine in
+          engine.updateForSource { $0.copy(seekable: timeRanges(item.seekableTimeRanges)) }
+        }
       },
     ]
+  }
+
+  // An item can't seek until it is ready, so an earlier seek becomes the start
+  // position. Superseded seeks complete unfinished; `settleSeek` keeps them
+  // quiet.
+  private func seek(to seconds: Double) {
+    guard let item else { return }
+
+    atEnd = false
+
+    guard metadataLoaded else {
+      pendingStartTime = seconds
+      return
+    }
+
+    let time = CMTime(seconds: seconds, preferredTimescale: 600)
+
+    emit(.seeking)
+    player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
+      self?.onMainQueue(for: item) { $0.settleSeek(to: seconds, finished: finished) }
+    }
+  }
+
+  // A newer seek, or a new source, has replaced `currentTime` since this seek
+  // was requested; that one settles `seeking` instead, so this stays quiet as a
+  // superseded seek does on the web.
+  private func settleSeek(to target: Double, finished: Bool) {
+    guard finished else { return }
+
+    var settled = false
+
+    updateForSource {
+      guard $0.seeking, $0.currentTime == target else { return $0 }
+
+      settled = true
+      return $0.copy(currentTime: currentTime, seeking: false)
+    }
+
+    if settled {
+      emit(.seeked)
+    }
   }
 
   private func syncTimeControlStatus() {
@@ -443,8 +491,10 @@ public final class VideoJSPlayerEngine: NSObject {
     timeControlStatus = next
 
     if previous == .paused {
+      update { $0.copy(paused: false) }
       emit(.play)
     } else if next == .paused {
+      update { $0.copy(paused: true) }
       emit(.pause)
     }
 
@@ -464,6 +514,7 @@ public final class VideoJSPlayerEngine: NSObject {
     case .readyToPlay where !metadataLoaded:
       metadataLoaded = true
       syncDuration()
+      updateForSource { $0.copy(seekable: timeRanges(item.seekableTimeRanges), readyState: readyState) }
       emit(.loadedmetadata)
       syncCanPlay(true)
       syncLikelyToKeepUp()
@@ -471,7 +522,7 @@ public final class VideoJSPlayerEngine: NSObject {
 
       if let pendingStartTime {
         self.pendingStartTime = nil
-        setCurrentTime(pendingStartTime)
+        seek(to: pendingStartTime)
       }
     case .failed:
       emitError(playerError(from: item.error))
@@ -481,10 +532,21 @@ public final class VideoJSPlayerEngine: NSObject {
   }
 
   private func syncDuration() {
-    guard let item, metadataLoaded, item.duration != reportedDuration else { return }
+    guard metadataLoaded, let item else { return }
 
-    reportedDuration = item.duration
-    emit(.durationchange, ["duration": duration])
+    let next = duration
+    var changed = false
+
+    updateForSource {
+      guard $0.duration != next else { return $0 }
+
+      changed = true
+      return $0.copy(duration: next, seekable: timeRanges(item.seekableTimeRanges))
+    }
+
+    if changed {
+      emit(.durationchange, ["duration": next])
+    }
   }
 
   // Gated on metadata so the load order matches a media element's:
@@ -493,13 +555,11 @@ public final class VideoJSPlayerEngine: NSObject {
     guard let item, metadataLoaded, item.isPlaybackLikelyToKeepUp != likelyToKeepUp else { return }
 
     likelyToKeepUp = item.isPlaybackLikelyToKeepUp
+    updateForSource { $0.copy(readyState: readyState) }
 
-    // Losing it changes `readyState` with no media event to carry it.
     if likelyToKeepUp {
       syncCanPlay(true)
       emit(.canplaythrough)
-    } else {
-      publishState()
     }
   }
 
@@ -507,18 +567,30 @@ public final class VideoJSPlayerEngine: NSObject {
     if next == canPlay { return }
 
     canPlay = next
+    updateForSource { $0.copy(readyState: readyState) }
 
     if canPlay {
       emit(.canplay)
     }
   }
 
+  // A pending seek owns `currentTime`, so the payload reports what the
+  // snapshot holds rather than the player's position.
+  private func emitTimeUpdate() {
+    let reported = updateForSource { $0.seeking ? $0 : $0.copy(currentTime: currentTime) }
+
+    emit(.timeupdate, ["currentTime": reported.currentTime])
+  }
+
   private func emitProgress() {
-    emit(.progress, ["buffered": timeRanges(item?.loadedTimeRanges ?? [])])
+    let buffered = timeRanges(item?.loadedTimeRanges ?? [])
+
+    updateForSource { $0.copy(buffered: buffered, readyState: readyState) }
+    emit(.progress, ["buffered": buffered])
   }
 
   private func emitError(_ error: [String: Any]) {
-    lastError = error
+    updateForSource { $0.copy(error: error) }
     emit(.error, ["error": error])
   }
 
@@ -533,20 +605,26 @@ public final class VideoJSPlayerEngine: NSObject {
   }
 
   private func syncContentData(_ next: [String: String]) {
-    if next == reportedContentData { return }
+    var changed = false
 
-    reportedContentData = next
-    emit(.contentdatachange)
-  }
+    updateForSource {
+      guard $0.contentData != next else { return $0 }
 
-  private func clearContentData() {
-    syncContentData([:])
+      changed = true
+      return $0.copy(contentData: next)
+    }
+
+    if changed {
+      hasContentData = !next.isEmpty
+      emit(.contentdatachange)
+    }
   }
 
   @objc
   private func handleItemDidPlayToEnd(_ notification: Notification) {
     onMainQueue(forNotification: notification) { engine in
-      engine.ended = true
+      engine.atEnd = true
+      engine.updateForSource { $0.copy(ended: true) }
       engine.emit(.ended)
     }
   }
@@ -559,7 +637,7 @@ public final class VideoJSPlayerEngine: NSObject {
   }
 
   // KVO and notification delivery aren't guaranteed on the main queue, but the
-  // per-source state and the player are.
+  // per-source bookkeeping and the player are.
   private func onMainQueue(_ body: @escaping (VideoJSPlayerEngine) -> Void) {
     DispatchQueue.main.async { [weak self] in
       guard let self else { return }
@@ -589,7 +667,6 @@ public final class VideoJSPlayerEngine: NSObject {
   private func emit(_ type: VideoJSPlayerEventType, _ values: [String: Any] = [:]) {
     if invalidated { return }
 
-    publishState()
     onEvent?(values.merging(["type": type.jsName]) { _, type in type })
   }
 }
