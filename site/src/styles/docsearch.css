@@ -265,6 +265,22 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
+/*
+ * The input fills the search bar, so its focus ring belongs on the bar: move the site's outline from the input to the
+ * form. The clear and close buttons keep their own rings, so the bar only lights up for the input.
+ */
+/* Scoped to the form to outrank the site's focus outline, which `globals.css` declares after this file. */
+.DocSearch-Form .DocSearch-Input:focus-visible {
+  outline: none;
+}
+
+.DocSearch-Form:has(.DocSearch-Input:focus-visible) {
+  /* Above the footer, which DocSearch stacks at 300 and would otherwise cover the ring's lower edge. */
+  z-index: 301;
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
 .DocSearch-Footer {
   border-block-start: none;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);

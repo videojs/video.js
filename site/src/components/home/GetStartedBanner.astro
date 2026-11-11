@@ -4,12 +4,12 @@ import ArrowIcon from '@/assets/icons/arrow.svg?react';
 import GetStartedLink from '../NavBar/GetStartedLink';
 ---
 
-<section class="mx-auto w-full max-w-305 px-5" data-ph-capture-attribute-location="get-started-banner">
+<section class="mx-auto w-full max-w-360 px-5" data-ph-capture-attribute-location="get-started-banner">
   <div
-    class="group relative mb-34 items-center overflow-hidden rounded-xl corner-squircle bg-faded-black py-2.5 text-center text-manila-light transition-colors duration-200 has-[a:hover]:text-faded-black lg:mb-40 lg:flex lg:text-left lg:duration-300 dark:bg-manila-light dark:text-faded-black dark:has-[a:hover]:text-manila-light"
+    class="group relative mb-20 items-center overflow-hidden rounded-xl corner-squircle bg-orange py-2.5 text-center text-faded-black transition-colors duration-200 has-[a:hover]:text-manila-light lg:mb-24 lg:flex lg:text-left lg:duration-300"
   >
     <div
-      class="absolute top-(--top) right-2.5 bottom-2.5 left-2.5 z-0 rounded-lg corner-squircle bg-orange duration-200 group-has-[a:hover]:top-2.5 lg:top-2.5 lg:left-(--lg-left) lg:duration-300 lg:group-has-[a:hover]:left-2.5 dark:bg-black"
+      class="absolute top-(--top) right-2.5 bottom-2.5 left-2.5 z-0 rounded-lg corner-squircle bg-faded-black duration-200 group-has-[a:hover]:top-2.5 lg:top-2.5 lg:left-(--lg-left) lg:duration-300 lg:group-has-[a:hover]:left-2.5"
       style={{
         "--top": "calc(100% - var(--spacing) * 15 - var(--spacing) * 2.5)",
         "--lg-left": "calc(100% - var(--spacing) * 40 - var(--spacing) * 2.5)",
@@ -26,7 +26,7 @@ import GetStartedLink from '../NavBar/GetStartedLink';
       <br class="md:hidden" />
       <span class="hidden md:inline">{" "}</span>
       <span
-        class="text-stroke-manila-light duration-200 group-has-[a:hover]:text-stroke-faded-black lg:duration-300 dark:text-stroke-faded-black dark:group-has-[a:hover]:text-stroke-manila-light"
+        class="text-stroke-faded-black duration-200 group-has-[a:hover]:text-stroke-manila-light lg:duration-300"
         style={{ transitionProperty: "-webkit-text-stroke" }}>Started</span
       >
     </h2>
@@ -43,7 +43,7 @@ import GetStartedLink from '../NavBar/GetStartedLink';
       aria-label="Get started"
       data-ph-capture-attribute-cta="get-started"
       className={clsx(
-        "relative z-10 ml-auto flex h-15 items-center justify-center text-faded-black lg:h-25 lg:w-40 lg:pr-2.5 dark:text-orange",
+        "relative z-10 ml-auto flex h-15 items-center justify-center text-orange lg:h-25 lg:w-40 lg:pr-2.5",
       )}
     >
       <ArrowIcon width="3.8rem" />

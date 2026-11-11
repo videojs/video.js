@@ -39,7 +39,7 @@ const sponsors: SponsorItem[] = [
 ---
 
 <section
-  class="row-span-2 mx-auto grid w-full max-w-305 grid-rows-subgrid px-5"
+  class="row-span-2 mx-auto grid w-full max-w-360 grid-rows-subgrid px-5"
   data-ph-capture-attribute-location="sponsors"
 >
   <header class="border-t border-faded-black py-4 dark:border-manila-light">
@@ -50,7 +50,7 @@ const sponsors: SponsorItem[] = [
     </h2>
   </header>
   <div
-    class="grid grid-cols-1 rounded-lg corner-squircle border border-faded-black p-2 text-manila-light md:grid-cols-2 md:items-center dark:border-manila-light dark:text-faded-black"
+    class="grid grid-cols-1 rounded-lg corner-squircle border border-line-strong bg-manila-light p-2 text-manila-light md:grid-cols-2 md:items-center dark:bg-faded-black dark:text-faded-black"
   >
     <a
       href={withMuxAttribution(MUX_URL, 'sponsors')}
@@ -81,16 +81,16 @@ const sponsors: SponsorItem[] = [
     </div>
   </div>
   <div
-    class="relative z-0 mt-5 h-max overflow-hidden rounded-lg corner-squircle md:border md:border-faded-black dark:border-manila-light"
+    class="relative z-0 mt-5 h-max overflow-hidden rounded-lg corner-squircle bg-manila-light md:border md:border-line-strong dark:bg-faded-black"
   >
     <div
-      class="grid gap-4 md:grid-separator-container md:grid-cols-4 md:gap-0 md:border md:border-manila-light dark:border-line dark:text-manila-light"
+      class="grid gap-4 md:grid-separator-container md:grid-cols-4 md:gap-0 md:border md:border-manila-light dark:border-faded-black dark:text-manila-light"
     >
       {
         sponsors.map(({ Logo, name, label, href, width, className }) => (
           <div
             class={clsx(
-              "h-auto rounded-lg corner-squircle border border-faded-black px-2.5 md:border-0 md:border-manila-dark md:px-0 dark:border-manila-light md:dark:border-line",
+              "h-auto rounded-lg corner-squircle border border-line-strong px-2.5 md:border-0 md:border-manila-dark md:px-0 md:dark:border-line",
               className,
             )}
           >

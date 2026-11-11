@@ -1,55 +1,72 @@
 ---
+import ArrowRight from '@/assets/icons/arrow-right.svg?react';
 import MuxLogoSmall from '@/assets/logos/mux-small.svg?react';
-import HeroVideo from '@/components/home/HeroVideo';
-import { MUX_URL } from '@/consts';
+import GitHub from '@/assets/logos/github.svg?react';
+import GetStartedLink from '@/components/NavBar/GetStartedLink';
+import { GITHUB_REPO_URL, MUX_URL } from '@/consts';
 import { withMuxAttribution } from '@/utils/mux/attribution';
-
-interface Props {
-  poster: string;
-}
-
-const { poster } = Astro.props;
 ---
 
 <header
-  data-hero-reveal
+  data-hero
   data-ph-capture-attribute-location="hero"
-  class="relative mx-auto mb-16 grid w-full max-w-305 grid-cols-1 px-5 pt-19 [grid-template-areas:var(--grid-template-areas)] md:mb-25 md:pt-6 md:pb-0 md:[grid-template-areas:var(--md-grid-template-areas)]"
-  style="--grid-template-areas: 'title' 'description' 'video' 'mux'; --md-grid-template-areas: 'video' 'mux' 'description'"
+  class="story-intro mb-12 pt-8 md:mb-16 md:pt-14 lg:mb-0 lg:py-12"
 >
-  <h1
-    data-hero-title
-    class="pointer-events-none z-10 mb-5 w-full self-center justify-self-center text-center font-display text-h2 text-balance uppercase [grid-area:var(--grid-area)] md:mb-0 md:px-5 md:text-h15 md:text-manila-light md:[grid-area:var(--md-grid-area)] lg:text-h1"
-    style="--grid-area: title; --md-grid-area: video;"
-  >
-    The Open Source Player <br class="lg:hidden" /><span
-      data-hero-title-outline
-      class="text-stroke-faded-black md:text-stroke-manila-light dark:text-stroke-manila-light"
-      >for the Web</span
+  <div class="story-intro-card">
+  <div class="mx-auto flex max-w-200 flex-col items-center text-center lg:mx-0 lg:items-start lg:text-left">
+    <a
+      href="/blog/videojs-10"
+      data-hero-step
+      data-ph-capture-attribute-cta="release-post"
+      class="group mb-7 inline-flex items-center gap-2 rounded-full border border-manila-dark bg-manila-light py-1 pr-3 pl-1 text-p3 transition-colors intent:border-faded-black dark:border-soot dark:bg-faded-black dark:intent:border-manila-light"
     >
-  </h1>
-  {/* the additional px-5 is intentional */}
-  <p
-    class="mx-auto mb-8 w-full max-w-195 px-5 text-center text-p2 text-balance text-warm-gray md:mb-0 lg:text-p1 dark:text-manila-light"
-    style="grid-area:description"
-  >
-    For over 15 years, Video.js has been the world's web video player. Now
-    rebuilt in v10 for modern development and performance.
-  </p>
+      <span class="rounded-full bg-faded-black px-2 py-0.5 font-display text-(length:--pill-text) text-manila-light uppercase dark:bg-manila-light dark:text-faded-black" style="--pill-text: 0.625rem">
+        New
+      </span>
+      Video.js 10 is here
+      <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+    </a>
 
-  <div
-    data-hero-video
-    class="relative mb-4 aspect-2/1 md:aspect-1180/570"
-    style="grid-area:video"
-  >
-    <HeroVideo client:load className="absolute inset-0" poster={poster} />
+    {/* Beside the player, the headline scales with its 34% column so each half stays on one line (about 10em wide). */}
+    <h1
+      data-hero-step
+      class="mb-6 font-display text-h2 text-balance uppercase sm:text-h15 lg:text-(length:--hero-title)"
+      style="--hero-title: calc((min(100vw, 90rem) - 2.5rem) * 0.34 / 10.2)"
+    >
+      One player, <span class="text-stroke-faded-black dark:text-stroke-manila-light">every look</span>
+    </h1>
+
+    <p data-hero-step class="mb-9 max-w-150 text-p2 text-balance xl:text-p1">
+      Skins, presets, and composable components for any video or audio player on the web. Fifteen years
+      of Video.js, rebuilt from the ground up.
+    </p>
+
+    <div data-hero-step class="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+      <GetStartedLink
+        client:idle
+        data-ph-capture-attribute-cta="get-started"
+        className="group inline-flex h-12 items-center gap-3 rounded-full bg-faded-black pr-5 pl-6 font-display text-h4 text-manila-light uppercase transition-colors intent:bg-orange dark:bg-manila-light dark:text-faded-black dark:intent:bg-orange"
+      >
+        Get started
+        <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+      </GetStartedLink>
+      <a
+        href={GITHUB_REPO_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-ph-capture-attribute-destination="github"
+        class="inline-flex h-12 items-center gap-2.5 rounded-full border border-faded-black/20 bg-manila-light px-5 font-display text-h4 uppercase transition-colors intent:border-faded-black dark:border-manila-light/25 dark:bg-faded-black dark:intent:border-manila-light"
+      >
+        <GitHub className="size-4.5" aria-hidden="true" />
+        GitHub
+      </a>
+    </div>
   </div>
-  <p
-    class="flex items-center justify-center gap-1.5 text-p3 md:mb-20 md:justify-end md:gap-2 md:pr-6 md:font-display md:text-(length:--md-text) md:uppercase"
-    style="grid-area:mux;--md-text:0.6875rem;"
-  >
-    Video hosting sponsored by <a
-      class="relative inline-flex w-11 items-center justify-center md:w-12.5"
+
+  <p data-hero-step class="mt-8 flex items-center justify-center gap-2 text-p4 lg:justify-start">
+    <span>Video hosting sponsored by</span>
+    <a
+      class="inline-flex w-11 items-center opacity-80 transition-opacity intent:opacity-100"
       href={withMuxAttribution(MUX_URL, 'hero')}
       data-ph-capture-attribute-destination="mux"
       target="_blank"
@@ -59,110 +76,33 @@ const { poster } = Astro.props;
       <MuxLogoSmall width="100%" />
     </a>
   </p>
+  </div>
 </header>
 
-<script is:inline>
-  // Start the title-first reveal once the poster is decoded, or after a short grace period if it never arrives.
-  (() => {
-    const header = document.querySelector("[data-hero-reveal]");
-    if (!header) return;
-
-    const poster = header.querySelector("[data-hero-video] img");
-    let fallback;
-    const ready = () => {
-      if (header.hasAttribute("data-hero-ready")) return;
-
-      clearTimeout(fallback);
-
-      // Keep the title-first beat at ~900ms from navigation, but never add it on top of a slow poster.
-      header.style.setProperty("--hero-delay", `${Math.max(0, 900 - performance.now())}ms`);
-      header.setAttribute("data-hero-ready", "");
-    };
-
-    if (!poster || poster.complete) {
-      ready();
-      return;
-    }
-
-    poster.addEventListener("load", ready, { once: true });
-    poster.addEventListener("error", ready, { once: true });
-    fallback = setTimeout(ready, 2500);
-  })();
-</script>
-
 <style>
-  /*
-   * Title-first reveal. The headline paints alone on the page colour, then the video fades in beneath it while the
-   * headline turns light to sit on the footage. Only where the title overlays the video (md and up), and only for
-   * people who have not asked for reduced motion.
-   */
-  @media (width >= 48rem) and (prefers-reduced-motion: no-preference) {
-    [data-hero-reveal] {
-      --hero-title-from: var(--color-faded-black);
+  /* A short staggered rise on first paint, for people who have not asked for reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-hero-step] {
+      animation: hero-rise 900ms var(--ease-soft) both;
     }
 
-    :global(.dark) [data-hero-reveal] {
-      --hero-title-from: var(--color-manila-light);
+    [data-hero-step]:nth-child(2) {
+      animation-delay: 60ms;
     }
 
-    /* Paused until the poster has loaded, so the fade always reveals an image rather than an empty frame. */
-    [data-hero-video] {
-      animation: hero-video-in 1100ms var(--ease-soft) var(--hero-delay, 900ms) both paused;
+    [data-hero-step]:nth-child(3) {
+      animation-delay: 120ms;
     }
 
-    [data-hero-title] {
-      animation: hero-title-in 1100ms ease var(--hero-delay, 900ms) both paused;
-    }
-
-    [data-hero-title-outline] {
-      animation: hero-outline-in 1100ms ease var(--hero-delay, 900ms) both paused;
-    }
-
-    [data-hero-ready] [data-hero-video],
-    [data-hero-ready] [data-hero-title],
-    [data-hero-ready] [data-hero-title-outline] {
-      animation-play-state: running;
+    [data-hero-step]:nth-child(4) {
+      animation-delay: 180ms;
     }
   }
 
-  /* Without scripting nothing can flip the ready flag; show the finished hero instead of a paused animation. */
-  @media (scripting: none) {
-    [data-hero-video],
-    [data-hero-title],
-    [data-hero-title-outline] {
-      animation: none;
-    }
-  }
-
-  @keyframes hero-video-in {
+  @keyframes hero-rise {
     from {
       opacity: 0;
-      transform: translateY(12px) scale(0.99);
-    }
-
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @keyframes hero-title-in {
-    from {
-      color: var(--hero-title-from);
-    }
-
-    to {
-      color: var(--color-manila-light);
-    }
-  }
-
-  @keyframes hero-outline-in {
-    from {
-      -webkit-text-stroke-color: var(--hero-title-from);
-    }
-
-    to {
-      -webkit-text-stroke-color: var(--color-manila-light);
+      transform: translateY(16px);
     }
   }
 </style>

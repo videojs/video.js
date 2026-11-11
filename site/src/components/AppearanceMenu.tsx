@@ -121,17 +121,23 @@ export function AppearanceControls({ className }: { className?: string }) {
 }
 
 /** Nav button that opens the appearance controls in a small popover. */
-export default function AppearanceMenu({ className }: { className?: string }) {
+/** The trigger's shape and size, which each nav sets to match its other icon links. */
+interface AppearanceMenuProps {
+  className: string;
+  iconClassName: string;
+}
+
+export default function AppearanceMenu({ className, iconClassName }: AppearanceMenuProps) {
   return (
     <Popover.Root modal={false}>
       <Popover.Trigger
         aria-label="Appearance"
         className={clsx(
-          'flex size-10 cursor-pointer items-center justify-center rounded-md corner-squircle intent:bg-hover data-[popup-open]:bg-hover',
+          'flex cursor-pointer items-center justify-center intent:bg-hover data-[popup-open]:bg-hover',
           className
         )}
       >
-        <Paintbrush className="size-6" aria-hidden="true" />
+        <Paintbrush className={iconClassName} aria-hidden="true" />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="end" sideOffset={8} className="z-40">
