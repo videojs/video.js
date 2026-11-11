@@ -1,0 +1,127 @@
+---
+title: chaptersTrack
+description: A track definition for chapters, and converters that turn chapter JSON formats into cues
+---
+
+import DocsLink from "@/components/docs/DocsLink.astro";
+import FrameworkCase from "@/components/docs/FrameworkCase.astro";
+
+## Import
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { appleHlsChapters, chaptersTrack, jsonLdChapters, podcastChapters } from '@videojs/react';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import { appleHlsChapters, chaptersTrack, jsonLdChapters, podcastChapters } from '@videojs/html';
+```
+</FrameworkCase>
+
+`chaptersTrack` is a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> for `{ kind: 'chapters' }`. It has no `label`, so it matches every chapters track, from the media and the app alike. A chapter's title is its cue's `text`, and its `value` is typed as `ChapterCueValue`, which holds what chapter formats carry beyond a title.
+
+WebVTT chapters carry only a title, so their cues have no `value`. Chapters converted from JSON with the functions below carry one.
+
+| `ChapterCueValue` field | Description |
+| --- | --- |
+| `description` | The chapter's description. |
+| `url` | A web page for the chapter. |
+| `images` | Images for the chapter, such as artwork or a thumbnail. Each has a `url`, and optionally a `width` and `height` in pixels. |
+| `titles` | The chapter's titles by language, when the source has several. |
+
+## Usage
+
+<FrameworkCase frameworks={["react"]}>
+```tsx title="CurrentChapter.tsx"
+import { chaptersTrack, useActiveTextCues } from '@videojs/react';
+
+function CurrentChapter() {
+  const [chapter] = useActiveTextCues(chaptersTrack);
+  if (!chapter) return null;
+
+  const image = chapter.value?.images?.[0];
+
+  return (
+    <div className="current-chapter">
+      {image && <img src={image.url} alt="" />}
+      {chapter.text}
+    </div>
+  );
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts title="current-chapter.ts"
+import { chaptersTrack, getActiveTextCues } from '@videojs/html';
+
+const player = document.querySelector('video-player')!;
+const label = document.querySelector('.current-chapter')!;
+
+player.store.subscribe(() => {
+  const [chapter] = getActiveTextCues(player.store, chaptersTrack);
+  label.textContent = chapter?.text ?? '';
+});
+```
+</FrameworkCase>
+
+## Chapter formats
+
+Each converter takes a file's text, or JSON you already parsed, and returns cues for a chapters track. Pass one as the `format` of a track with a `src`, and the player converts the file once it loads. Or call it yourself and pass the result as `cues`. Converters skip entries they can't read; only text that isn't JSON throws.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+useCreateTextTrack({ kind: 'chapters', src: '/episodes/42/chapters.json', format: podcastChapters });
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+player.store.addTextTrack({ kind: 'chapters', src: '/episodes/42/chapters.json', format: podcastChapters });
+```
+</FrameworkCase>
+
+A chapter without an end runs to the next chapter, and the last one to the end of the media.
+
+### `podcastChapters`
+
+Reads a [Podcasting 2.0 JSON chapters](https://github.com/Podcastindex-org/podcast-namespace) file. Each chapter's `title` becomes the cue text, `startTime` and `endTime` its times, `url` its `url`, and `img` its first image. Chapters marked `toc: false` are left out, since they aren't meant to be shown.
+
+### `appleHlsChapters`
+
+Reads an Apple HLS chapters file: the JSON an `EXT-X-SESSION-DATA` tag with `DATA-ID="com.apple.hls.chapters"` points to. Each chapter starts at its `start-time` and ends after its `duration`. Its first title becomes the cue text, and every title is kept in `titles` by language. Its `images` keep their `pixel-width` and `pixel-height` as `width` and `height`.
+
+### `jsonLdChapters`
+
+Reads schema.org JSON-LD: a `VideoObject` whose `hasPart` lists `Clip`s, a list of `Clip`s, or one `Clip`. These are the clips Google shows as key moments. Each clip's `name` becomes the cue text, `startOffset` and `endOffset` its times in seconds, and its `description`, `url`, and first `thumbnailUrl` its value.
+
+<FrameworkCase frameworks={["react"]}>
+Keep the converted cues the same array across renders; a new array replaces the track.
+
+```tsx
+function Chapters({ videoObject }: { videoObject: unknown }) {
+  const cues = useMemo(() => jsonLdChapters(videoObject), [videoObject]);
+
+  useCreateTextTrack({ kind: 'chapters', cues });
+
+  return null;
+}
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const jsonLd = document.querySelector('script[type="application/ld+json"]')!.textContent!;
+
+player.store.addTextTrack({ kind: 'chapters', cues: jsonLdChapters(jsonLd) });
+```
+</FrameworkCase>
+
+## Exports
+
+| Export | Description |
+| --- | --- |
+| `ChapterCueValue` | What a chapter can carry beyond its title. |
+| `ChapterImage` | An image for a chapter: a `url`, and optionally a `width` and `height`. |

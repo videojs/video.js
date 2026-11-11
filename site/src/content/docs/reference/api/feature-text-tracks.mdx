@@ -10,9 +10,13 @@ import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 
 Manages subtitles, captions, chapters, and thumbnail tracks.
 
-A default `kind="chapters"` track can also divide the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> into chapter ranges and label the chapter at the current interaction position.
+`textTrackList` lists the media's tracks, then the tracks an app adds to the player with this feature's `addTextTrack()`, described with the <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink>. Each track's `source` is `'media'` or `'app'`. An app `captions` or `subtitles` track is copied into the media so the browser can draw it, and it's selected and listed like the media's own; its copy isn't listed separately. Media without text tracks of their own, such as embeds, list only app tracks.
 
-`thumbnailsTrack` is the first `kind="metadata"` track labeled `thumbnails`, or `null` when there is none. Its `crossOrigin` reports the media component's CORS mode, or `null` when the media is not CORS-enabled. <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink> reads it to fetch sprite sheets the same way the browser fetched the track.
+A default `kind="chapters"` track can also divide the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> into chapter ranges and label the chapter at the current interaction position. When the media has no chapters track, `chaptersCues` reads the first chapters track the app added instead.
+
+This feature doesn't track cues as they become active. The text cues feature does, for metadata and chapters tracks and for any track a reader asks for.
+
+`thumbnailsTrack` is the first `kind="metadata"` track labeled `thumbnails`, or `null` when there is none. When the media has none, it's the first such track the app added, with its `src` as the base for image URLs. Its `crossOrigin` reports the media component's CORS mode, or `null` when the media is not CORS-enabled. <DocsLink slug="reference/components/thumbnail">Thumbnail</DocsLink> reads it to fetch sprite sheets the same way the browser fetched the track.
 
 ## Import
 
