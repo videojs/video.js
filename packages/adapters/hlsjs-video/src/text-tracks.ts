@@ -168,12 +168,12 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       for (const track of this.#tracks.values()) unmountTrack(track);
     }
 
-    #owns(textTrack: TextTrack): boolean {
-      for (const { el } of this.#tracks.values()) {
-        if (el?.track === textTrack) return true;
+    #trackFor(textTrack: TextTrack): HlsTextTrack | undefined {
+      for (const track of this.#tracks.values()) {
+        if (track.el?.track === textTrack) return track;
       }
 
-      return false;
+      return undefined;
     }
 
     #init(): void {
@@ -236,36 +236,18 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
 
         if (!showingTrack) return;
 
+        const track = this.#trackFor(showingTrack);
+
         // Only on a new showing track: `onCuesParsed` fires `change` for every batch it forwards to a disabled
         // track, and refreshing each time would re-render the active cue several times a second.
-        if (showingChanged && this.#owns(showingTrack)) refreshCues(showingTrack);
+        if (showingChanged && track) refreshCues(showingTrack);
 
-        if (!engine.subtitleTracks.length) return;
+        // hls.js stamps each subtitle playlist's index in `subtitleTracks` on its `id`, and loads the playlist of the
+        // index `subtitleTrack` is set to; CUES_PARSED then fills the track. Any other showing track, CC or sideloaded,
+        // selects -1, which only stops subtitle loading: CEA-608 cues come from the video segments.
+        const index = track?.info.subtitleTrack?.id ?? -1;
 
-        const currentHlsTrack = engine.subtitleTracks[engine.subtitleTrack];
-
-        // If hls.subtitleTrack is -1 or its id changed compared to the one that is showing load the new subtitle track.
-        const hlsTrackId = !currentHlsTrack
-          ? undefined
-          : currentHlsTrack.default
-            ? 'default'
-            : `${engine.subtitleTracks[engine.subtitleTrack]?.type.toLowerCase()}${engine.subtitleTrack}`;
-
-        if (engine.subtitleTrack < 0 || showingTrack?.id !== hlsTrackId) {
-          const idx = engine.subtitleTracks.findIndex(({ lang, name, type, default: defaultTrack }) => {
-            return (
-              (showingTrack.id === 'default' && defaultTrack) ||
-              (lang === showingTrack.language &&
-                name === showingTrack.label &&
-                type.toLowerCase() === showingTrack.kind)
-            );
-          });
-
-          // After the subtitleTrack is set here, hls.js will load the playlist and CUES_PARSED events will be fired below.
-          // A closed-caption track has no entry in `subtitleTracks`, so picking one assigns -1, which only stops
-          // subtitle loading: CEA-608 cues come from the video segments.
-          engine.subtitleTrack = idx;
-        }
+        if (engine.subtitleTrack !== index) engine.subtitleTrack = index;
       };
 
       engine.on(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, onTracksFound);
@@ -335,10 +317,20 @@ function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack): v
   // Lets `withPreservedTextTracks` tell these tracks from sideloaded ones.
   el.setAttribute(HLS_TRACK_ATTR, '');
   media.append(el);
-
-  if (mode && el.track.mode !== mode) el.track.mode = mode;
-
   track.el = el;
+
+  if (mode) restoreMode(el.track, mode);
+}
+
+/**
+ * Sets a remounted track's mode so the browser keeps it. Once any track shows, Chrome turns on the subtitle track in
+ * the user's language too, unless script set that track's mode after its element was added. Setting the mode it already
+ * has does not count, so a track restored to it goes through another mode first.
+ */
+function restoreMode(track: TextTrack, mode: TextTrackMode): void {
+  if (track.mode === mode) track.mode = mode === 'disabled' ? 'hidden' : 'disabled';
+
+  track.mode = mode;
 }
 
 /** Disables and removes the track's element, remembering its mode for the next mount. */

@@ -26,6 +26,12 @@ class FakeTextTrack {
   /** Set by the list stub so a mode write fires `change` the way a real `TextTrackList` does. */
   onModeChange?: () => void;
 
+  /** The `<track>` element the track belongs to, set by the element stub. */
+  element?: HTMLTrackElement;
+
+  /** Whether script changed the mode after the element was added, which Chrome's automatic selection respects. */
+  configured = false;
+
   get mode(): TextTrackMode {
     return this.#mode;
   }
@@ -36,6 +42,8 @@ class FakeTextTrack {
     if (mode === 'disabled') this.rendered.clear();
 
     this.#mode = mode;
+
+    if (changed && this.element?.parentNode) this.configured = true;
 
     if (changed) this.onModeChange?.();
   }
@@ -230,7 +238,15 @@ function trackOf(video: HTMLVideoElement, id: string): TextTrack | null {
 
 let patchList: ((track: FakeTextTrack) => void) | undefined;
 
-function stubTrackSupport(video: HTMLVideoElement): () => void {
+interface TrackSupportOptions {
+  /**
+   * Mimics Chrome's automatic text track selection: once a track shows, the subtitle track in this language shows too,
+   * unless script changed its mode after its element was added.
+   */
+  autoSelectLanguage?: string;
+}
+
+function stubTrackSupport(video: HTMLVideoElement, { autoSelectLanguage }: TrackSupportOptions = {}): () => void {
   const tracks = new WeakMap<HTMLTrackElement, FakeTextTrack>();
   const descriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
 
@@ -245,6 +261,7 @@ function stubTrackSupport(video: HTMLVideoElement): () => void {
         track.kind = this.getAttribute('kind') ?? 'subtitles';
         track.label = this.getAttribute('label') ?? '';
         track.language = this.getAttribute('srclang') ?? '';
+        track.element = this;
         patchList?.(track);
         tracks.set(this, track);
       }
@@ -262,8 +279,20 @@ function stubTrackSupport(video: HTMLVideoElement): () => void {
 
   Object.defineProperty(video, 'textTracks', { configurable: true, value: list });
 
+  const autoSelect = () => {
+    for (const track of tracksOf(video)) {
+      if (track.configured || track.kind !== 'subtitles' || track.language !== autoSelectLanguage) continue;
+
+      track.mode = 'showing';
+    }
+  };
+
   patchList = (track: FakeTextTrack) => {
-    track.onModeChange = () => list.dispatchEvent(new Event('change'));
+    track.onModeChange = () => {
+      if (autoSelectLanguage && track.mode === 'showing') autoSelect();
+
+      list.dispatchEvent(new Event('change'));
+    };
   };
 
   return () => {
@@ -278,7 +307,6 @@ function createEngine(): Hls {
   const listeners = new Map<string, Set<(...args: any[]) => void>>();
 
   return {
-    subtitleTracks: [{ lang: 'de', name: 'German', type: 'SUBTITLES' }],
     subtitleTrack: -1,
     on(event: string, fn: (...args: any[]) => void) {
       if (!listeners.has(event)) listeners.set(event, new Set());
@@ -307,7 +335,7 @@ const TextTracksHost = HlsJsTextTracksMixin(FakeHost) as unknown as new (engine:
 
 /** The subtitle set, announced in one batch, the way hls.js's subtitle-track-controller reports it. */
 const SUBTITLE_TRACKS_FOUND = {
-  tracks: [{ label: 'German', kind: 'subtitles', default: true, subtitleTrack: { lang: 'de' } }],
+  tracks: [{ label: 'German', kind: 'subtitles', default: true, subtitleTrack: { id: 0, lang: 'de' } }],
 };
 
 /** One CEA-608 track, announced on its own by hls.js's timeline-controller once 608 data appears. */
@@ -326,12 +354,12 @@ const CC2_TRACK_FOUND = {
 
 let restoreTrackSupport: (() => void) | undefined;
 
-function mount() {
+function mount(options?: TrackSupportOptions) {
   const engine = createEngine();
   const host = new TextTracksHost(engine);
   const video = document.createElement('video');
 
-  restoreTrackSupport = stubTrackSupport(video);
+  restoreTrackSupport = stubTrackSupport(video, options);
   host.attach(video);
   (engine as any).emit(Hls.Events.MANIFEST_LOADING);
 
@@ -373,14 +401,10 @@ describe('HlsJsTextTracksMixin', () => {
   it('re-creates the subtitle tracks with their mode when the same source re-attaches', () => {
     const { engine, video } = mount();
 
-    (engine as any).subtitleTracks = [
-      { id: 0, lang: 'de', name: 'German', type: 'SUBTITLES', default: true },
-      { id: 1, lang: 'fr', name: 'French', type: 'SUBTITLES', default: false },
-    ];
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
       tracks: [
-        { label: 'German', kind: 'subtitles', default: true, subtitleTrack: (engine as any).subtitleTracks[0] },
-        { label: 'French', kind: 'subtitles', default: false, subtitleTrack: (engine as any).subtitleTracks[1] },
+        ...SUBTITLE_TRACKS_FOUND.tracks,
+        { label: 'French', kind: 'subtitles', default: false, subtitleTrack: { id: 1, lang: 'fr' } },
       ],
     });
     video.textTracks.getTrackById('subtitles1')!.mode = 'showing';
@@ -397,7 +421,6 @@ describe('HlsJsTextTracksMixin', () => {
   it('does not carry track modes over to a new manifest', () => {
     const { engine, video } = mount();
 
-    (engine as any).subtitleTracks = [{ id: 0, lang: 'de', name: 'German', type: 'SUBTITLES', default: true }];
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
     video.textTracks.getTrackById('default')!.mode = 'showing';
 
@@ -606,6 +629,57 @@ describe('HlsJsTextTracksMixin', () => {
     expect(hlsTracks(video)).toHaveLength(0);
   });
 
+  it('disables each track before removing its element', () => {
+    const { engine, video } = mount();
+    const modesAtRemoval: TextTrackMode[] = [];
+    const remove = Element.prototype.remove;
+
+    // A track removed while showing keeps rendering its cues in some browsers.
+    vi.spyOn(Element.prototype, 'remove').mockImplementation(function (this: Element) {
+      if (this instanceof HTMLTrackElement) modesAtRemoval.push(this.track.mode);
+
+      remove.call(this);
+    });
+
+    try {
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+      (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
+      video.textTracks.getTrackById('default')!.mode = 'showing';
+      video.textTracks.getTrackById('textTrack1')!.mode = 'hidden';
+
+      (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+      (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+      (engine as any).emit(Hls.Events.MANIFEST_LOADING);
+    } finally {
+      vi.restoreAllMocks();
+    }
+
+    // Two tracks on the detach, and both again once the new manifest drops the remounted ones.
+    expect(modesAtRemoval).toEqual(['disabled', 'disabled', 'disabled', 'disabled']);
+  });
+
+  it('keeps the restored modes when the browser auto-selects a track in the user language', () => {
+    const { engine, video } = mount({ autoSelectLanguage: 'de' });
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [
+        ...SUBTITLE_TRACKS_FOUND.tracks,
+        { label: 'French', kind: 'subtitles', default: false, subtitleTrack: { id: 1, lang: 'fr' } },
+      ],
+    });
+
+    // A menu picking French: German turns on with it, the way Chrome does, until the menu turns it off.
+    video.textTracks.getTrackById('subtitles1')!.mode = 'showing';
+    video.textTracks.getTrackById('default')!.mode = 'disabled';
+
+    (engine as any).emit(Hls.Events.MEDIA_DETACHED);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(video.textTracks.getTrackById('default')!.mode).toBe('disabled');
+    expect(video.textTracks.getTrackById('subtitles1')!.mode).toBe('showing');
+    expect((engine as any).subtitleTrack).toBe(1);
+  });
+
   it('stops subtitle loading when a closed-caption track is selected', () => {
     const { engine, video } = mount();
 
@@ -719,7 +793,6 @@ describe('HlsJsTextTracksMixin', () => {
   it('refreshes a closed-caption track on a stream without subtitle playlists', () => {
     const { engine, video } = mount();
 
-    (engine as any).subtitleTracks = [];
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
     (engine as any).emit(Hls.Events.CUES_PARSED, {
       type: 'captions',
@@ -745,7 +818,6 @@ describe('HlsJsTextTracksMixin', () => {
     const subsTrack = subs.track as unknown as FakeTextTrack;
 
     // The state in which the Chrome cue-refresh applies: hls.js is playing the very track that is showing.
-    (engine as any).subtitleTracks = [{ lang: 'de', name: 'German', type: 'SUBTITLES', default: true }];
     (engine as any).subtitleTrack = 0;
 
     subsTrack.mode = 'showing';
@@ -775,13 +847,41 @@ describe('HlsJsTextTracksMixin', () => {
     expect([...video.querySelectorAll('track[data-removeondestroy]')].map((el) => el.id)).toEqual(['subtitles2']);
   });
 
+  it('selects the playlist of the showing track among tracks sharing a label and language', () => {
+    const { engine, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [
+        { label: 'English', kind: 'subtitles', default: false, subtitleTrack: { id: 0, lang: 'en' } },
+        { label: 'English', kind: 'subtitles', default: false, subtitleTrack: { id: 1, lang: 'en' } },
+      ],
+    });
+    video.textTracks.getTrackById('subtitles1')!.mode = 'showing';
+
+    expect((engine as any).subtitleTrack).toBe(1);
+  });
+
+  it('stops subtitle loading when a sideloaded track is showing', () => {
+    const { engine, video } = mount();
+    const sideloaded = document.createElement('track');
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    (engine as any).subtitleTrack = 0;
+
+    // Same label and language as the hls.js track, so only ownership tells them apart.
+    sideloaded.id = 'sideloaded';
+    sideloaded.kind = 'subtitles';
+    sideloaded.label = 'German';
+    sideloaded.srclang = 'de';
+    video.append(sideloaded);
+    sideloaded.track.mode = 'showing';
+
+    expect((engine as any).subtitleTrack).toBe(-1);
+  });
+
   it('refreshes a subtitle track the user switches to', () => {
     const { engine, video } = mount();
 
-    (engine as any).subtitleTracks = [
-      { lang: 'de', name: 'German', type: 'SUBTITLES', default: true },
-      { lang: 'fr', name: 'French', type: 'SUBTITLES', default: false },
-    ];
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
       tracks: [
         ...SUBTITLE_TRACKS_FOUND.tracks,
