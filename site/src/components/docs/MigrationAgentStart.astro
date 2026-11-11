@@ -1,5 +1,5 @@
 ---
-import { installationCommand, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
+import { installationCommand, SKILL_FILE_URL, SKILLS_REPOSITORY_URL, skillsCommand } from '@videojs/installation';
 
 import AgentPrompt from '@/components/AgentPrompt.astro';
 import { DEFAULT_FRAMEWORK, resolveDocsFramework } from '@/types/docs';
@@ -29,7 +29,7 @@ const onlineDocsIndex = `https://videojs.org/docs/framework/${framework}/llms.tx
 const init = installationCommand({ framework, project: 'existing' });
 const prompt = `Migrate this project's ${names[source]} player to Video.js v10 for ${framework === 'react' ? 'React' : 'HTML'}. ${installationTarget}
 
-Run \`${skillsCommand()}\` to get the Video.js skill installation instructions. Follow the printed steps for your agent. If they require a session reload, reload the session and continue with this prompt. If you can't run commands, use the installation instructions at ${SKILLS_REPOSITORY_URL}. Use the skill throughout this migration.
+Run \`${skillsCommand()}\` to get the Video.js skill installation instructions. Follow the printed steps for your agent. If they require a session reload, reload the session and continue with this prompt. If the command can't run or is blocked, install the skill from ${SKILLS_REPOSITORY_URL} instead. Not every agent can install skills; if yours can't, read ${SKILL_FILE_URL} and the reference files it links, and follow them as instructions for this session. Use the skill throughout this migration.
 
 Read the migration guide at ${guide}, including its Known gaps section. Inspect the existing player and list its media URLs, source formats, tracks, options, custom controls, event handlers, and integrations. Compare that list with the known gaps and report unsupported requirements before changing code. Keep the existing media URLs and required behavior throughout the migration.
 
@@ -42,7 +42,7 @@ Choose values for these options:
 - --method: the installation method.
 - --preset, --skin, and --extensions: the player UI and integrations.
 
-Add those options to \`${init}\` and run the command to print the installation plan. Follow any version-mismatch notice. Both CLI commands print instructions without changing project files. Use the printed plan to install Video.js and configure the player.
+Add those options to \`${init}\` and run the command to print the installation plan. Follow any version-mismatch notice. Both CLI commands print instructions without changing project files. If you can't run them, read the installation guide for your chosen method and framework. It lists the same options, and adding them to its \`.md\` URL as query parameters, including \`framework\` and \`project\`, returns the same plan. Use the plan to install Video.js and configure the player.
 
 After installing a package, switch to ${docsIndex} for documentation matching its version.
 
