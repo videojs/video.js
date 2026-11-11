@@ -2,6 +2,7 @@ import type {
   EventLike,
   Media,
   MediaBufferEvents,
+  MediaContentDataEvents,
   MediaErrorEvents,
   MediaErrorCapability,
   MediaEvents,
@@ -35,7 +36,8 @@ export interface NativeEvents
     MediaSourceEvents,
     MediaBufferEvents,
     MediaErrorEvents,
-    MediaPlaybackRateEvents {}
+    MediaPlaybackRateEvents,
+    MediaContentDataEvents {}
 
 export interface NativeMedia<Events extends { [K in keyof Events]: EventLike } = NativeEvents>
   extends Media<Events>, MediaPauseCapability, MediaErrorCapability {}

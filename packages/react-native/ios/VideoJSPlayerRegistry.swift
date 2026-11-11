@@ -19,11 +19,12 @@ public final class VideoJSPlayerRegistry: NSObject {
   @objc
   public var onEvent: ((Int, [String: Any]) -> Void)?
 
-  /// Main queue only.
-  private var engines: [Int: VideoJSPlayerEngine] = [:]
-
-  private let handleLock = NSLock()
+  // Guards the handle counter and the engine map. Engines are added and
+  // removed on the main queue, but the synchronous getters look them up from
+  // the JS thread; each engine guards its own state.
+  private let lock = NSLock()
   private var lastHandle = 0
+  private var engines: [Int: VideoJSPlayerEngine] = [:]
 
   override private init() {
     super.init()
@@ -33,17 +34,19 @@ public final class VideoJSPlayerRegistry: NSObject {
   public func createPlayer(source: String?) -> Int {
     // Allocated from 1, so the 0 the Fabric props default to is unambiguously
     // "no player".
-    handleLock.lock()
-    lastHandle += 1
-    let handle = lastHandle
-    handleLock.unlock()
+    let handle = lock.withLock {
+      lastHandle += 1
+      return lastHandle
+    }
 
     onMainQueue { [weak self] in
       guard let self else { return }
 
-      engines[handle] = VideoJSPlayerEngine(source: source) { [weak self] event in
+      let engine = VideoJSPlayerEngine(source: source) { [weak self] event in
         self?.onEvent?(handle, event)
       }
+
+      lock.withLock { self.engines[handle] = engine }
     }
 
     return handle
@@ -52,7 +55,9 @@ public final class VideoJSPlayerRegistry: NSObject {
   @objc(destroyPlayer:)
   public func destroyPlayer(_ handle: Int) {
     onMainQueue { [weak self] in
-      self?.engines.removeValue(forKey: handle)?.invalidate()
+      guard let self else { return }
+
+      lock.withLock { self.engines.removeValue(forKey: handle) }?.invalidate()
     }
   }
 
@@ -65,12 +70,19 @@ public final class VideoJSPlayerRegistry: NSObject {
     }
   }
 
+  /// The latest published state, from any thread. A handle whose engine
+  /// doesn't exist — not built yet, or destroyed — reads as a fresh player.
+  @objc(stateForHandle:)
+  public func state(forHandle handle: Int) -> VideoJSPlayerState {
+    engine(forHandle: handle)?.readState() ?? .initial
+  }
+
   /// Synchronous lookup for the Fabric surface. Safe because the surface only
   /// mounts after `createPlayer` returned, so the construction dispatch is
   /// already ahead of it in the main queue.
   @objc(engineForHandle:)
   public func engine(forHandle handle: Int) -> VideoJSPlayerEngine? {
-    engines[handle]
+    lock.withLock { engines[handle] }
   }
 
   @objc
@@ -78,11 +90,14 @@ public final class VideoJSPlayerRegistry: NSObject {
     onMainQueue { [weak self] in
       guard let self else { return }
 
-      for engine in engines.values {
-        engine.invalidate()
+      let released = lock.withLock {
+        defer { self.engines.removeAll() }
+        return Array(self.engines.values)
       }
 
-      engines.removeAll()
+      for engine in released {
+        engine.invalidate()
+      }
     }
   }
 
