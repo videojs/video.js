@@ -202,6 +202,11 @@ export class ReactNativeMedia
     return this.#src;
   }
 
+  get currentSrc(): string {
+    // mirror src for now.  ReactNativeMedia doesn't support <source> elements yet
+    return this.#src;
+  }
+
   set src(value: string) {
     if (this.#src === value) return;
 
