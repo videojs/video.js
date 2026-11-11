@@ -3,10 +3,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Mirrors `PlayerEvent['type']` in `src/NativeEngineStore.ts`.
+/// Mirrors `PlayerEvent['type']` in `src/media/NativeEngineStore.ts`.
 typedef NS_ENUM(NSInteger, VideoJSPlayerEventType) {
   VideoJSPlayerEventTypePlaying,
-  VideoJSPlayerEventTypePaused,
+  VideoJSPlayerEventTypePause,
   VideoJSPlayerEventTypeEnded,
 };
 
