@@ -380,11 +380,17 @@ function resolve(ctor: typeof ReactiveElement): ResolvedMeta {
         propertyKeys.set(name, key);
       }
 
+      // Frameworks such as Svelte assign attribute-like template values to properties, so a `Number` property can
+      // receive the same strings its attribute would. Convert them the way `attributeChangedCallback` does.
+      const isNumber = decl.type === Number;
+
       Object.defineProperty(ctor.prototype, name, {
         get(this: ReactiveElement) {
           return (this as unknown as Record<symbol, unknown>)[key];
         },
         set(this: ReactiveElement, value: unknown) {
+          if (isNumber && typeof value === 'string') value = Number(value);
+
           const old = (this as unknown as Record<symbol, unknown>)[key];
 
           (this as unknown as Record<symbol, unknown>)[key] = value;
