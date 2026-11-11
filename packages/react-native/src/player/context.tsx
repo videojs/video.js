@@ -42,7 +42,7 @@ export function useNativePlayerContext(): NativePlayerContextValue {
  * Access the player store, or subscribe to a value selected from it.
  *
  * Untyped like the web standalone hook: state reads as `unknown` unless you pass a premade selector such as
- * `selectNativePlayback` to recover the type from its return value.
+ * `selectPlayback` to recover the type from its return value.
  *
  * @label Without Selector
  */
