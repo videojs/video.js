@@ -61,7 +61,21 @@ The declaration creates no behavior that does anything. It puts the key into the
 
 ## Initial state
 
-A feature can seed state that no behavior writes on its own. The engine merges each feature's `initialState`, and a later feature's value wins. The background-video engine seeds `loadActivated: true` so loading starts as soon as a source is set.
+A feature can give state a starting value. The video feature starts its bandwidth estimate at zero:
+
+```ts
+// packages/spf/src/playback/features/video.ts (trimmed)
+export const initialState = {
+  bandwidthState: { fastEstimate: 0, fastTotalWeight: 0, slowEstimate: 0, slowTotalWeight: 0, bytesSampled: 0 },
+} satisfies Partial<State>;
+```
+
+The engine merges each feature's `initialState`, and a later feature's value wins. An engine can add its own values on top. The background-video engine seeds `loadActivated: true`, so loading starts as soon as a source is set:
+
+```ts
+// packages/spf/src/playback/engines/hls-background-video.ts
+export const initialState = { ...composed.initialState, loadActivated: true };
+```
 
 ## Next
 

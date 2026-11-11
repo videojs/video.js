@@ -71,7 +71,7 @@ await engine.destroy();
 An engine exposes its `state`, its `context`, and `destroy()`. Its types come from its features, so adding or removing a feature changes them with nothing else to update. See the [engine reference](./reference/engines/hls-video.md).
 
 > [!NOTE]
-> SPF's core knows nothing about features. A composition is one list of behaviors, plus the config defaults and initial state they need, and `createComposition()` takes exactly that. Features are a layer on top that names and groups behaviors. `flattenFeatures()` turns a feature list into a composition's inputs, and `defineCompositionFactory()` turns those into `createEngine()`. You can also compose behaviors directly, with no features at all.
+> SPF's core knows nothing about features. A composition is one list of behaviors, plus the config defaults and initial state they need, and `createComposition()` takes exactly that. Features are a layer on top that names and groups behaviors. `flattenFeatures()` turns a feature list into a composition's inputs, and `defineCompositionFactory()` turns those into `createEngine()`. You can also build a composition straight from a list of behaviors, without grouping them into features.
 
 ## Features
 
@@ -84,7 +84,7 @@ export const behaviors = [loadChapters] as const;
 export const chaptersFeature = defineFeature({ behaviors, defaultConfig, initialState });
 ```
 
-Others have several. Features can depend on each other: the video feature loads nothing until another feature writes `context.mediaSource`. Each feature's reference page lists what it needs from the others. See the [features reference](./reference/README.md#features).
+Others have several. Features can depend on each other: the video feature loads nothing until another feature writes `context.mediaSource`. Each feature's reference page lists what it needs from the others. See [Features depend on each other](./feature-dependencies.md) and the [features reference](./reference/README.md#features).
 
 ## Behaviors
 
@@ -117,7 +117,7 @@ Every behavior in an engine shares three things:
 - **Context** holds objects the engine works with, such as the media element, the `MediaSource`, and the actors that own its buffers.
 - **Config** holds settings and swappable functions, such as the initial bandwidth estimate or the playlist parser. It is fixed for the engine's lifetime.
 
-State and context are signals: each key holds a current value that behaviors can read, write, and react to. Config is a plain object. Some state and context keys are written from outside the engine, by the adapter or your own code. Features declare those as external signals.
+State and context are signals: each key holds a current value that behaviors can read, write, and react to. SPF's signals come from the polyfill for the [TC39 Signals proposal](https://github.com/tc39/proposal-signals), and the proposal's README is a good introduction if signals are new to you. [Write a behavior](./write-a-behavior.md) covers the signal tools SPF exports. Config is a plain object. Some state and context keys are written from outside the engine, by the adapter or your own code. Features declare those as external signals.
 
 ## Inside a behavior
 

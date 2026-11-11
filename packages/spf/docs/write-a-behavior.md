@@ -94,10 +94,19 @@ The key lists must match the setup's parameter types exactly. Leave one out, and
 A behavior runs only in an engine that composes it. Wrap it in a feature and add the feature to your list from [Compose an engine](./compose-an-engine.md):
 
 ```ts
-import { defineFeature } from '@videojs/spf';
+import { defineCompositionFactory, defineFeature, flattenFeatures } from '@videojs/spf';
 import { trackPlaybackRate } from '@videojs/spf/behaviors/dom/track-playback-rate';
 
 export const playbackRateFeature = defineFeature({ behaviors: [trackPlaybackRate] });
+
+export const features = [
+  // …the features from Compose an engine
+  playbackRateFeature,
+] as const;
+
+const { behaviors, defaultConfig, initialState } = flattenFeatures(features);
+
+export const createEngine = defineCompositionFactory(behaviors, { defaultConfig, initialState });
 ```
 
 The engine's state now has a `playbackRate` key, and its config accepts `defaultPlaybackRate`. Remove the feature, and both go away.

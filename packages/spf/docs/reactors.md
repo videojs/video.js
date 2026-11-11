@@ -31,7 +31,7 @@ Either one can return a cleanup function. An effect's cleanup runs before the ef
 
 ## A real reactor: segment loading
 
-`loadVideoSegments` hands its work to a reactor. First a computed signal derives the stage:
+`loadVideoSegments` hands its work to a reactor. First a computed signal derives the stage. A `computed()` signal recalculates its value from the signals it reads whenever one of them changes, so the stage stays current without anything writing it:
 
 ```ts
 // packages/spf/src/playback/behaviors/dom/load-segments.ts (trimmed)

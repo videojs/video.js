@@ -41,7 +41,7 @@ const { behaviors, defaultConfig, initialState } = flattenFeatures(features);
 export const createEngine = defineCompositionFactory(behaviors, { defaultConfig, initialState });
 ```
 
-These are eight of the twenty features in the `hls-video` engine. This engine plays on-demand HLS with adaptive video and audio. It leaves out text tracks, DRM, AirPlay, multi-CDN failover, live streams, and the rest. Each feature has its own entry point, `@videojs/spf/features/<name>`, and each pre-composed engine exports its `features` list, so you can start from one and edit it.
+These are eight of the features in the `hls-video` engine. This engine plays on-demand HLS with adaptive video and audio. It leaves out text tracks, DRM, AirPlay, multi-CDN failover, live streams, and the rest. Each feature has its own entry point, `@videojs/spf/features/<name>`, and each pre-composed engine exports its `features` list, so you can start from one and edit it.
 
 ## Put it behind your adapter
 
@@ -92,8 +92,13 @@ Put it in `audioFeature`'s place in your list. The engine composes one behavior 
 
 Every config key a composed behavior reads is a key of the engine's config, and the keys a feature defaults are optional. `createEngine()` rejects a key that no composed behavior reads, with a type error that names the key. That error usually means you removed the feature that read it.
 
+The engine above composes the video feature, which reads `initialBandwidth`. It leaves out the text tracks feature, which reads `preferredSubtitleLanguage`:
+
 ```ts
-const engine = createEngine({ initialBandwidth: 2_000_000 });
+createEngine({ initialBandwidth: 2_000_000 }); // OK
+
+// Type error: 'preferredSubtitleLanguage' does not exist in type …
+createEngine({ preferredSubtitleLanguage: 'fr' });
 ```
 
 ## Next
