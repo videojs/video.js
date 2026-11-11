@@ -43,11 +43,39 @@ class VideoJSEngineStoreModule internal constructor(
     super.invalidate()
   }
 
-  private fun emitPlayerEvent(handle: Int, type: PlayerEventType) {
+  private fun emitPlayerEvent(handle: Int, event: PlayerEvent) {
     emitOnPlayerEvent(
       Arguments.createMap().apply {
         putInt("handle", handle)
-        putString("type", type.jsName)
+        putString("type", event.type.jsName)
+        event.currentTime?.let { putDouble("currentTime", it) }
+        event.duration?.let { putDouble("duration", it) }
+
+        event.buffered?.let { ranges ->
+          putArray(
+            "buffered",
+            Arguments.createArray().apply {
+              ranges.forEach { range ->
+                pushMap(
+                  Arguments.createMap().apply {
+                    putDouble("start", range.start)
+                    putDouble("end", range.end)
+                  }
+                )
+              }
+            },
+          )
+        }
+
+        event.error?.let { error ->
+          putMap(
+            "error",
+            Arguments.createMap().apply {
+              putInt("code", error.code)
+              putString("message", error.message)
+            },
+          )
+        }
       }
     )
   }

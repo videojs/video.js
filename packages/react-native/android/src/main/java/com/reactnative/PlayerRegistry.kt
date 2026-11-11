@@ -23,13 +23,13 @@ internal class PlayerRegistry {
   /** Main-thread only. */
   private val engines = mutableMapOf<Int, PlayerEngine>()
 
-  var onEvent: ((handle: Int, type: PlayerEventType) -> Unit)? = null
+  var onEvent: ((handle: Int, event: PlayerEvent) -> Unit)? = null
 
   fun create(context: Context, source: String?): Int {
     val handle = nextHandle.getAndIncrement()
 
     onMain {
-      engines[handle] = PlayerEngine(context, source) { type -> onEvent?.invoke(handle, type) }
+      engines[handle] = PlayerEngine(context, source) { event -> onEvent?.invoke(handle, event) }
     }
 
     return handle
