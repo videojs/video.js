@@ -1,23 +1,7 @@
 import type { Media } from '@videojs/media/dom';
 import { HlsBackgroundVideoAdapter, type HlsVideoMediaError } from '@videojs/spf/adapters/hls-background-video';
-import { namedNodeMapToObject } from '@videojs/utils/dom';
 
-import { MediaAttachMixin } from '../../store/media-attach-mixin';
-import { getTemplateHTML } from '../background-video/template';
-
-const HTMLElementBase = globalThis.HTMLElement ?? class {};
-
-// `MediaAttachMixin` is typed as returning its base, so its `disconnectedCallback`
-// isn't visible for `super` to reach. `LifecycleElement` declares the lifecycle
-// callbacks this element overrides; method syntax lets a subclass override them.
-interface LifecycleElement extends HTMLElement {
-  connectedCallback?(): void;
-  disconnectedCallback?(): void;
-  adoptedCallback?(): void;
-  attributeChangedCallback?(name: string, oldValue: string | null, newValue: string | null): void;
-}
-
-const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as new () => LifecycleElement;
+import { BackgroundVideoBase, type BackgroundVideoOptOut } from '../background-video/base';
 
 /**
  * A muted, looping, chrome-less video over the SPF background-video engine.
@@ -30,8 +14,9 @@ const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as n
  * package, whose `audio`, `debug`, `preload`, and `max-resolution` attributes are all deliberately absent. Capping
  * which rendition is fetched is a delivery param on the URL — `?max_resolution=720p` on a Mux stream, for one — which
  * keeps the renditions it excludes out of the manifest rather than merely unpicked; `preload` would have nothing to
- * say, since the engine loads from the moment it has a source. And unlike `<background-video>` there are no `nomuted` /
- * `noloop` / `noautoplay` opt-outs: those three are what this element is for, so the adapter fixes them on at attach.
+ * say, since the engine loads from the moment it has a source. Muted is fixed on: the engine drops audio, so there is
+ * nothing to unmute. `noloop` and `noautoplay` opt out as on `<background-video>`, so a page can play the video once,
+ * or hold it until it has checked the motion preference.
  *
  * Takes no structured `source` — `src` is an HLS URL, as the package it replaces required. Mux playback-ID identity,
  * poster, and storyboard belong to `<mux-video>`; none of them mean anything without controls to hang them on.
@@ -55,42 +40,22 @@ const HlsBackgroundVideoBase = MediaAttachMixin(HTMLElementBase) as unknown as n
  */
 // Deliberately not `CustomMediaElement`, matching `<background-video>`: a
 // background video needs one property, not the full WHATWG media API.
-export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
-  static shadowRootOptions = { mode: 'open' as ShadowRootMode };
-  static getTemplateHTML = getTemplateHTML;
-
-  static get observedAttributes(): string[] {
-    return ['src'];
-  }
+export class HlsBackgroundVideo extends BackgroundVideoBase {
+  static override optOuts: readonly BackgroundVideoOptOut[] = ['loop', 'autoplay'];
+  // No `preload`: the engine loads as soon as it has a source, and attaching fixes `preload="auto"`.
+  static override passthroughAttributes: readonly string[] = ['controls', 'controlslist', 'crossorigin'];
 
   #media = new HlsBackgroundVideoAdapter();
 
   constructor() {
     super();
 
-    if (!this.shadowRoot) {
-      this.attachShadow((this.constructor as typeof HlsBackgroundVideo).shadowRootOptions);
+    const target = this.target;
 
-      const attrs = {
-        ...namedNodeMapToObject(this.attributes),
-        muted: '',
-        loop: '',
-        autoplay: '',
-        playsinline: '',
-        disableremoteplayback: '',
-        disablepictureinpicture: '',
-      };
+    if (target) this.#media.attach(target);
 
-      this.shadowRoot!.innerHTML = getTemplateHTML(attrs);
-    }
-
-    // Neither Chrome nor Firefox honor a `muted` attribute set after
-    // `document.createElement`, and autoplay is refused without it. Attaching is
-    // what sets the property — along with the rest of the fixed behavior — so
-    // nothing here needs to repeat it.
-    const video = this.video;
-
-    if (video) this.#media.attach(video);
+    // Attaching fixes loop and autoplay on, so their opt-outs have to be reapplied after it.
+    this.syncPlaybackDefaults();
 
     // Re-fired rather than bridged on demand the way `CustomMediaElement` does
     // it: one listener for the one event this element has, on a Media it owns
@@ -125,17 +90,9 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
     });
   }
 
-  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
-    if (oldValue === newValue) return;
-
-    if (name === 'src') this.src = newValue ?? '';
-  }
-
-  /** The inner `<video>` the engine renders into. */
+  /** Same element as `target`. */
   get video(): HTMLVideoElement | null {
-    const video = this.shadowRoot?.querySelector('video');
-
-    return video instanceof HTMLVideoElement ? video : null;
+    return this.target;
   }
 
   /**
@@ -148,11 +105,11 @@ export class HlsBackgroundVideo extends HlsBackgroundVideoBase {
   }
 
   /** HLS manifest URL. Assigning a new one restarts playback from scratch. */
-  get src(): string {
+  override get src(): string {
     return this.#media.src;
   }
 
-  set src(value: string) {
+  override set src(value: string) {
     this.#media.src = value;
   }
 }

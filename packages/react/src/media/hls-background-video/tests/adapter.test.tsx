@@ -50,6 +50,36 @@ afterEach(() => {
 });
 
 describe('HlsBackgroundVideo', () => {
+  describe('playback defaults', () => {
+    it('loops and autoplays by default', () => {
+      const { container } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" />);
+      const video = container.querySelector('video')!;
+
+      expect(video.loop).toBe(true);
+      expect(video.autoplay).toBe(true);
+      expect(video.muted).toBe(true);
+    });
+
+    it('honors loop={false} and autoPlay={false} over what attaching fixes', () => {
+      const { container } = render(
+        <HlsBackgroundVideo src="https://example.com/v.m3u8" loop={false} autoPlay={false} />
+      );
+      const video = container.querySelector('video')!;
+
+      expect(video.loop).toBe(false);
+      expect(video.autoplay).toBe(false);
+      expect(video.muted).toBe(true);
+    });
+
+    it('applies a later change to loop', () => {
+      const { container, rerender } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" />);
+
+      rerender(<HlsBackgroundVideo src="https://example.com/v.m3u8" loop={false} />);
+
+      expect(container.querySelector('video')!.loop).toBe(false);
+    });
+  });
+
   // An unplayable source never reaches the <video>, so `onError` can only fire
   // because the component re-fires what the engine reported.
   describe('error forwarding', () => {
