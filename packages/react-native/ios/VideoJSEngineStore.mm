@@ -36,59 +36,41 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   [VideoJSPlayerRegistry.sharedRegistry destroyPlayer:handle];
 }
 
+// Each returns whether the handle reached a live engine.
+
 - (NSNumber *)setSource:(NSInteger)handle source:(NSString *)source
 {
-  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-      request:^(VideoJSPlayerEngine *engine) {
-        [engine requestSource:source];
-      }
-      block:^(VideoJSPlayerEngine *engine) {
-        [engine setSource:source];
-      }]);
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine setSource:source];
+  return @(engine != nil);
 }
 
 - (NSNumber *)load:(NSInteger)handle
 {
-  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-      request:^(VideoJSPlayerEngine *engine) {
-        [engine requestLoad];
-      }
-      block:^(VideoJSPlayerEngine *engine) {
-        [engine load];
-      }]);
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine load];
+  return @(engine != nil);
 }
 
 - (NSNumber *)play:(NSInteger)handle
 {
-  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-      request:^(VideoJSPlayerEngine *engine) {
-        [engine requestPlay];
-      }
-      block:^(VideoJSPlayerEngine *engine) {
-        [engine play];
-      }]);
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine play];
+  return @(engine != nil);
 }
 
 - (NSNumber *)pause:(NSInteger)handle
 {
-  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-      request:^(VideoJSPlayerEngine *engine) {
-        [engine requestPause];
-      }
-      block:^(VideoJSPlayerEngine *engine) {
-        [engine pause];
-      }]);
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine pause];
+  return @(engine != nil);
 }
 
 - (NSNumber *)setCurrentTime:(NSInteger)handle time:(double)time
 {
-  return @([VideoJSPlayerRegistry.sharedRegistry commandPlayer:handle
-      request:^(VideoJSPlayerEngine *engine) {
-        [engine requestSeek:time];
-      }
-      block:^(VideoJSPlayerEngine *engine) {
-        [engine setCurrentTime:time];
-      }]);
+  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
+  [engine setCurrentTime:time];
+  return @(engine != nil);
 }
 
 - (NSNumber *)getCurrentTime:(NSInteger)handle
@@ -149,6 +131,11 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
 - (NSNumber *)getPlaybackRate:(NSInteger)handle
 {
   return @([self stateForHandle:handle].playbackRate);
+}
+
+- (VideoJSPlayerEngine *_Nullable)engineForHandle:(NSInteger)handle
+{
+  return [VideoJSPlayerRegistry.sharedRegistry engineForHandle:handle];
 }
 
 // Reads the engine's published snapshot on the calling (JS) thread, without

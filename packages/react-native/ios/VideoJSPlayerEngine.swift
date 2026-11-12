@@ -67,17 +67,19 @@ private enum ReadyState {
 // HTMLMediaElement fires `timeupdate` every 15–250ms during playback.
 private let timeUpdateInterval = CMTime(value: 1, timescale: 4)
 
-/// One player behind one handle. Confined to the main queue — every entry point
-/// is reached either from `VideoJSPlayerRegistry`'s main-queue dispatch or from
-/// the Fabric surface, which is already on the main queue.
+/// One player behind one handle. Built on the calling (JS) thread so a command
+/// issued right after `createPlayer` has an engine to reach, but the player
+/// itself is confined to the main queue: commands are callable from any thread
+/// and dispatch their player work to the main queue, and the Fabric surface is
+/// already on the main queue.
 ///
 /// The exception is the `VideoJSPlayerState` snapshot, which is the only copy
 /// of the state the getters report. One lock guards it, and every change
 /// replaces it with an edited `copy(…)` without giving the lock up in between.
 /// Two kinds of writer share it:
-/// - Commands write what they mean, from the calling thread (`request*`),
-///   before the command itself runs on the main queue, so a getter called right
-///   after one reflects it as a media element's would.
+/// - Commands write what they mean, on the calling thread, before dispatching
+///   the player work to the main queue, so a getter called right after one
+///   reflects it as a media element's would.
 /// - The engine writes what the player reports, on the main queue, before
 ///   emitting the event that announces it, so a getter called while handling an
 ///   event sees state at least that new.
@@ -179,8 +181,9 @@ public final class VideoJSPlayerEngine: NSObject {
       object: nil
     )
 
+    // The snapshot already holds the source as `currentSrc`.
     if let source {
-      setSource(source)
+      onMainQueue { $0.setSourceInternal(source) }
     }
   }
 
@@ -190,44 +193,59 @@ public final class VideoJSPlayerEngine: NSObject {
     invalidate()
   }
 
-  // MARK: Requests — any thread; each writes the state its command will produce
+  // MARK: Commands — any thread; each writes its state, then dispatches its player work
 
   // A new source starts from a media element's initial state; only `paused`
   // and `playbackRate` belong to the element rather than the source.
-  @objc(requestSource:)
-  public func requestSource(_ source: String) {
+  @objc(setSource:)
+  public func setSource(_ source: String) {
     update { .initial.copy(paused: $0.paused, currentSrc: source, playbackRate: $0.playbackRate) }
+    onMainQueue { $0.setSourceInternal(source) }
   }
 
   @objc
-  public func requestLoad() {
+  public func load() {
     update { $0.currentSrc.isEmpty ? $0 : .initial.copy(paused: $0.paused, currentSrc: $0.currentSrc, playbackRate: $0.playbackRate) }
+    onMainQueue { engine in
+      if let source = engine.source {
+        engine.setSourceInternal(source)
+      }
+    }
   }
 
   // Playing after the end restarts from the beginning, which is a seek.
   @objc
-  public func requestPlay() {
+  public func play() {
     update { $0.ended ? $0.copy(currentTime: 0, paused: false, ended: false, seeking: true) : $0.copy(paused: false) }
+    onMainQueue { engine in
+      if engine.atEnd {
+        engine.seek(to: 0)
+      }
+
+      engine.player.play()
+    }
   }
 
   @objc
-  public func requestPause() {
+  public func pause() {
     update { $0.copy(paused: true) }
+    onMainQueue { $0.player.pause() }
   }
 
-  @objc(requestSeek:)
-  public func requestSeek(_ seconds: Double) {
-    update { $0.currentSrc.isEmpty ? $0 : $0.copy(currentTime: max(seconds, 0), ended: false, seeking: true) }
-  }
+  @objc(setCurrentTime:)
+  public func setCurrentTime(_ seconds: Double) {
+    let target = max(seconds, 0)
 
-  // MARK: Commands — main queue, after their request
+    update { $0.currentSrc.isEmpty ? $0 : $0.copy(currentTime: target, ended: false, seeking: true) }
+    onMainQueue { $0.seek(to: target) }
+  }
 
   // AVQueuePlayer documents replaceCurrentItem(with:) as unsupported, so the
   // swap goes through the queue. removeAllItems drops the rate, so a player
   // that was playing is restarted to match ExoPlayer's surviving
   // `playWhenReady`.
-  @objc(setSource:)
-  public func setSource(_ source: String) {
+  @MainActor
+  private func setSourceInternal(_ source: String) {
     let next = URL(string: source).map { AVPlayerItem(url: $0) }
     let wasPlaying = player.timeControlStatus != .paused
     let hadItem = item != nil
@@ -260,32 +278,6 @@ public final class VideoJSPlayerEngine: NSObject {
     if wasPlaying {
       player.play()
     }
-  }
-
-  @objc
-  public func load() {
-    if let source {
-      setSource(source)
-    }
-  }
-
-  @objc
-  public func play() {
-    if atEnd {
-      seek(to: 0)
-    }
-
-    player.play()
-  }
-
-  @objc
-  public func pause() {
-    player.pause()
-  }
-
-  @objc(setCurrentTime:)
-  public func setCurrentTime(_ seconds: Double) {
-    seek(to: max(seconds, 0))
   }
 
   // MARK: State
@@ -341,7 +333,7 @@ public final class VideoJSPlayerEngine: NSObject {
     }
   }
 
-  // Per-source values belong to the source the player is on. Once a request
+  // Per-source values belong to the source the player is on. Once a command
   // has moved `currentSrc` on, they would only leak the old source into the
   // new one's state.
   @discardableResult
@@ -636,11 +628,14 @@ public final class VideoJSPlayerEngine: NSObject {
     onMainQueue(forNotification: notification) { $0.emitError(playerError(from: error)) }
   }
 
-  // KVO and notification delivery aren't guaranteed on the main queue, but the
-  // per-source bookkeeping and the player are.
-  private func onMainQueue(_ body: @escaping (VideoJSPlayerEngine) -> Void) {
+  // KVO and notification delivery aren't guaranteed on the main queue, and
+  // commands arrive from the JS thread, but the per-source bookkeeping and the
+  // player are confined to it. Always dispatches, never runs inline, so player
+  // work keeps the order its commands were issued in. Work dispatched before
+  // `invalidate` runs ahead of it; anything later is dropped.
+  private func onMainQueue(_ body: @escaping @MainActor (VideoJSPlayerEngine) -> Void) {
     DispatchQueue.main.async { [weak self] in
-      guard let self else { return }
+      guard let self, !invalidated else { return }
 
       body(self)
     }

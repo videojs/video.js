@@ -5,6 +5,7 @@ import android.os.Handler
 import android.util.Base64
 import android.os.Looper
 import android.view.SurfaceView
+import androidx.annotation.MainThread
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -76,9 +77,11 @@ private const val HAVE_ENOUGH_DATA = 4
 private const val TICK_INTERVAL_MS = 250L
 
 /**
- * One `ExoPlayer` behind one handle. Confined to the main thread — every entry
- * point is reached either from [PlayerRegistry]'s main-looper dispatch or from
- * the Fabric surface, which is already on the UI thread.
+ * One `ExoPlayer` behind one handle. Built on the calling (JS) thread so a
+ * command issued right after `createPlayer` has an engine to reach, but the
+ * player itself is confined to the main thread: commands are callable from any
+ * thread and post their player work to the main looper, and the Fabric surface
+ * is already on the UI thread.
  *
  * ExoPlayer reports state, not media events, so the engine keeps the
  * HTMLMediaElement-shaped state each event marks a transition of and emits only
@@ -88,9 +91,9 @@ private const val TICK_INTERVAL_MS = 250L
  * state the getters report. One lock guards it, and every change replaces it
  * with an edited `copy()` without giving the lock up in between. Two kinds of
  * writer share it:
- * - Commands write what they mean, from the calling thread (`request*`),
- *   before the command itself runs on the main thread, so a getter called right
- *   after one reflects it as a media element's would.
+ * - Commands write what they mean, on the calling thread, before posting the
+ *   player work to the main thread, so a getter called right after one
+ *   reflects it as a media element's would.
  * - The engine writes what the player reports, on the main thread, before
  *   emitting the event that announces it, so a getter called while handling an
  *   event sees state at least that new.
@@ -104,7 +107,9 @@ internal class PlayerEngine(
   source: String?,
   private val onEvent: (PlayerEvent) -> Unit,
 ) {
-  private val exo = ExoPlayer.Builder(context).build()
+  // Built on the calling thread, so without an explicit looper ExoPlayer would
+  // bind to the JS thread's and reject every call from the main thread.
+  private val exo = ExoPlayer.Builder(context).setLooper(Looper.getMainLooper()).build()
   private val mainHandler = Handler(Looper.getMainLooper())
 
   private val stateLock = Any()
@@ -221,42 +226,53 @@ internal class PlayerEngine(
       }
     )
 
-    // A null source leaves the player idle until `setSource` supplies one.
-    if (source != null) setSource(source)
+    // A null source leaves the player idle until `setSource` supplies one. The
+    // snapshot already holds it as `currentSrc`.
+    if (source != null) onMain { setSourceInternal(source) }
   }
 
-  // Requests, from any thread: each writes the state its command will produce.
+  // Commands, from any thread: each writes the state it will produce, then
+  // posts the player work.
 
   // A new source starts from a media element's initial state; only `paused`
   // and `playbackRate` belong to the element rather than the source.
-  fun requestSource(source: String) {
+  fun setSource(source: String) {
     update { PlayerState(currentSrc = source, paused = it.paused, playbackRate = it.playbackRate) }
+    onMain { setSourceInternal(source) }
   }
 
-  fun requestLoad() {
+  fun load() {
     update { if (it.currentSrc.isEmpty()) it else PlayerState(currentSrc = it.currentSrc, paused = it.paused, playbackRate = it.playbackRate) }
+    onMain { source?.let(::setSourceInternal) }
   }
 
   // Playing after the end restarts from the beginning, which is a seek.
-  fun requestPlay() {
+  fun play() {
     update { if (it.ended) it.copy(paused = false, ended = false, currentTime = 0.0, seeking = true) else it.copy(paused = false) }
+    onMain {
+      if (exo.playbackState == Player.STATE_ENDED) seekTo(0.0)
+      exo.play()
+    }
   }
 
-  fun requestPause() {
+  fun pause() {
     update { it.copy(paused = true) }
+    onMain { exo.pause() }
   }
 
-  fun requestSeek(seconds: Double) {
-    update { if (it.currentSrc.isEmpty()) it else it.copy(currentTime = seconds.coerceAtLeast(0.0), seeking = true, ended = false) }
-  }
+  fun setCurrentTime(seconds: Double) {
+    val target = seconds.coerceAtLeast(0.0)
 
-  // Commands, on the main thread, after their request.
+    update { if (it.currentSrc.isEmpty()) it else it.copy(currentTime = target, seeking = true, ended = false) }
+    onMain { if (exo.mediaItemCount > 0) seekTo(target) }
+  }
 
   /**
    * Swaps the source on the running player. `playWhenReady` survives the swap,
    * so a player that was playing continues into the new source.
    */
-  fun setSource(source: String) {
+  @MainThread
+  private fun setSourceInternal(source: String) {
     if (exo.mediaItemCount > 0) emit(PlayerEventType.EMPTIED)
     if (hasContentData) emit(PlayerEventType.CONTENTDATACHANGE)
 
@@ -269,23 +285,6 @@ internal class PlayerEngine(
     emit(PlayerEventType.LOADSTART)
     exo.setMediaItem(MediaItem.fromUri(source))
     exo.prepare()
-  }
-
-  fun load() {
-    source?.let(::setSource)
-  }
-
-  fun play() {
-    if (exo.playbackState == Player.STATE_ENDED) seekTo(0.0)
-    exo.play()
-  }
-
-  fun pause() {
-    exo.pause()
-  }
-
-  fun setCurrentTime(seconds: Double) {
-    if (exo.mediaItemCount > 0) seekTo(seconds.coerceAtLeast(0.0))
   }
 
   /** Any thread. */
@@ -490,6 +489,13 @@ internal class PlayerEngine(
     if (ticking) mainHandler.postDelayed(tick, TICK_INTERVAL_MS) else mainHandler.removeCallbacks(tick)
   }
 
+  // Always posts, never runs inline on the main thread, so player work keeps
+  // the order its commands were issued in. Work posted before `release` runs
+  // ahead of it; anything later finds the player gone and is dropped.
+  private fun onMain(block: () -> Unit) {
+    mainHandler.post { if (!released) block() }
+  }
+
   private fun emit(type: PlayerEventType) {
     emit(PlayerEvent(type))
   }
@@ -505,7 +511,7 @@ internal class PlayerEngine(
       state
     }
 
-  // Per-source values belong to the source the player is on. Once a request
+  // Per-source values belong to the source the player is on. Once a command
   // has moved `currentSrc` on, they would only leak the old source into the
   // new one's state.
   private fun updateForSource(transform: (PlayerState) -> PlayerState): PlayerState =
