@@ -29,7 +29,7 @@ export function TitleCard({ song }: { song: Song }) {
 /** Score, combo, and multiplier, lit up during Star Power. */
 export function Hud({ game }: { game: Game }) {
   return (
-    <div className="hud" data-star-power={game.starPower || undefined}>
+    <div className="hud" data-multiplier={game.multiplier} data-star-power={game.starPower || undefined}>
       <span className="score">{game.score.toLocaleString()}</span>
       <span className="combo">{game.combo} in a row</span>
       <span className="multiplier">{game.starPower ? game.multiplier * 2 : game.multiplier}x</span>

@@ -1,5 +1,6 @@
 import '@app/styles.css';
 import './styles.css';
+import './theme.css';
 import { Container } from '@videojs/react';
 import { VideoPlayer } from '@videojs/react/video';
 import { useEffect, useState } from 'react';

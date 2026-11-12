@@ -1,0 +1,861 @@
+/* The look: scorched metal and fire. Where things sit is in `styles.css`; the highway's own paint is in `highway-theme.ts`. */
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Metal+Mania&family=Oswald:wght@400;500;600;700&display=swap");
+
+:root {
+  --lane-0: #22c55e;
+  --lane-1: #ef4444;
+  --lane-2: #eab308;
+  --lane-3: #3b82f6;
+  --lane-4: #f97316;
+  --star-power: #38bdf8;
+  --solo: #e879f9;
+
+  --font-metal: "Metal Mania", "Pirata One", Impact, fantasy;
+  --font-numbers: "Bebas Neue", "Oswald", Impact, sans-serif;
+  --font-ui: "Oswald", "Arial Narrow", system-ui, sans-serif;
+
+  --ink: #f4ede4;
+  --ink-dim: #c9bdb1;
+  --ember: #ffb02e;
+  --fire: linear-gradient(to top, #a81200 0%, #ff4a00 28%, #ff9600 52%, #ffd84d 74%, #fffbe8 100%);
+  --chrome: linear-gradient(#ffffff 0%, #e4e8ed 36%, #8a929c 49%, #3a3f46 53%, #b9c1ca 78%, #f6f8fa 100%);
+  --brushed:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.06) 0 2px, transparent 2px 7px);
+  --plate: var(--brushed), linear-gradient(#3b3e45, #1e2024 55%, #141518);
+  --rivets:
+    radial-gradient(circle at 0.45rem 0.45rem, #e6eaee 0 1px, #5b616a 2px, transparent 2.5px),
+    radial-gradient(circle at calc(100% - 0.45rem) 0.45rem, #e6eaee 0 1px, #5b616a 2px, transparent 2.5px),
+    radial-gradient(circle at 0.45rem calc(100% - 0.45rem), #e6eaee 0 1px, #5b616a 2px, transparent 2.5px),
+    radial-gradient(circle at calc(100% - 0.45rem) calc(100% - 0.45rem), #e6eaee 0 1px, #5b616a 2px, transparent 2.5px);
+
+  color-scheme: dark;
+  background: #060304;
+}
+
+/* ----------------------------------------
+   Page
+   ---------------------------------------- */
+
+body {
+  min-height: 100vh;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0035 0.006' numOctaves='4' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.32 0 0 0 0 0.24 0 0 0 1.1 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E")
+      center / cover no-repeat,
+    radial-gradient(ellipse 70% 45% at 50% 108%, rgb(255 70 0 / 0.3), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 8% -5%, rgb(140 20 0 / 0.22), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 92% -5%, rgb(140 20 0 / 0.22), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.8)),
+    #060304;
+  background-attachment: fixed;
+}
+
+.guitar-hero {
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.guitar-hero :focus-visible,
+.menu :focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+}
+
+/* A black-chrome bezel around the player, with a fire glow underneath. */
+.stage {
+  background: #050304;
+  border: 1px solid #6b717a;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 5px #1a1b1f,
+    0 0 0 6px #4c525a,
+    0 0 0 7px #000,
+    0 2rem 5rem rgb(0 0 0 / 0.85),
+    0 1.5rem 7rem rgb(255 60 0 / 0.22);
+}
+
+.credits {
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  color: #9a8b7e;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* ----------------------------------------
+   Highway effects
+   ---------------------------------------- */
+
+/* Star Power floods the board electric blue. The trapezoid traces the canvas's board, top edge to bottom. */
+.highway::before,
+.highway::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.highway::after {
+  background: linear-gradient(to top, rgb(56 189 248 / 0.95), rgb(56 189 248 / 0.75) 55%, rgb(56 189 248 / 0.2));
+  clip-path: polygon(calc(50% - 12.9cqh) 0, calc(50% + 12.9cqh) 0, calc(50% + 52.3cqh) 100%, calc(50% - 52.3cqh) 100%);
+  mix-blend-mode: color;
+}
+
+.highway::before {
+  background:
+    radial-gradient(ellipse 60cqh 40cqh at 50% 100%, rgb(56 189 248 / 0.45), transparent 70%),
+    radial-gradient(ellipse 50cqw 100cqh at 50% 50%, transparent 60%, rgb(14 165 233 / 0.35));
+  mix-blend-mode: screen;
+}
+
+.screen:has(.hud[data-star-power]) .highway::before,
+.screen:has(.hud[data-star-power]) .highway::after {
+  opacity: 1;
+}
+
+/* The screen's edges catch fire at the top multiplier, and crackle blue through Star Power. */
+.screen::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(to top, rgb(255 70 0 / 0.32), transparent 18%);
+  box-shadow:
+    inset 0 0 4cqh rgb(255 110 0 / 0.55),
+    inset 0 -5cqh 9cqh -3cqh rgb(255 40 0 / 0.75);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.screen:has(.hud[data-multiplier="4"])::after {
+  opacity: 1;
+  animation: blaze 0.9s ease-in-out infinite alternate;
+}
+
+.screen:has(.hud[data-star-power])::after {
+  background: linear-gradient(to top, rgb(56 189 248 / 0.28), transparent 18%);
+  box-shadow:
+    inset 0 0 4cqh rgb(56 189 248 / 0.6),
+    inset 0 -5cqh 9cqh -3cqh rgb(14 165 233 / 0.7);
+  opacity: 1;
+}
+
+/* ----------------------------------------
+   Hits
+   ---------------------------------------- */
+
+.lane[data-lane="0"] {
+  --color: var(--lane-0);
+}
+.lane[data-lane="1"] {
+  --color: var(--lane-1);
+}
+.lane[data-lane="2"] {
+  --color: var(--lane-2);
+}
+.lane[data-lane="3"] {
+  --color: var(--lane-3);
+}
+.lane[data-lane="4"] {
+  --color: var(--lane-4);
+}
+
+.flash {
+  mix-blend-mode: screen;
+}
+
+.flash::before,
+.flash::after {
+  position: absolute;
+  content: "";
+}
+
+/* A hit: three tongues of flame leap off the target... */
+.flash[data-kind="hit"]::before {
+  inset: auto 8% 50%;
+  height: 230%;
+  background:
+    radial-gradient(ellipse 30% 22% at 50% 90%, #fff 0, #fff3c4 50%, transparent 100%),
+    radial-gradient(ellipse 48% 50% at 50% 85%, #ffe27a 0, #ff9a00 55%, transparent 100%),
+    radial-gradient(ellipse 60% 95% at 50% 100%, #ff6a00 0, #e01e00 55%, transparent 100%);
+  filter: blur(0.3cqh);
+  transform-origin: 50% 100%;
+  mask:
+    radial-gradient(ellipse 17% 62% at 28% 78%, #000 55%, transparent),
+    radial-gradient(ellipse 19% 80% at 52% 70%, #000 55%, transparent),
+    radial-gradient(ellipse 16% 58% at 74% 80%, #000 55%, transparent),
+    radial-gradient(ellipse 46% 26% at 50% 100%, #000 60%, transparent);
+  animation: flame 0.45s ease-out forwards;
+}
+
+/* ...from a white-hot burst in the lane's color, throwing sparks. */
+.flash[data-kind="hit"]::after {
+  inset: -15%;
+  background:
+    radial-gradient(circle 0.55cqh at 18% 30%, #ffefb0 40%, transparent),
+    radial-gradient(circle 0.45cqh at 80% 24%, #ffd27a 40%, transparent),
+    radial-gradient(circle 0.5cqh at 30% 12%, #fff 40%, transparent),
+    radial-gradient(circle 0.4cqh at 66% 8%, #ffb347 40%, transparent),
+    radial-gradient(circle 0.45cqh at 90% 44%, #ffefb0 40%, transparent),
+    radial-gradient(circle 0.4cqh at 8% 46%, #ffb347 40%, transparent),
+    radial-gradient(
+      ellipse 33% 18% at 50% 50%,
+      #fff 0 22%,
+      color-mix(in srgb, var(--color), white 35%) 45%,
+      var(--color) 62%,
+      transparent
+    );
+  animation: burst 0.35s ease-out forwards;
+}
+
+/* A miss: a red crack around the target and a puff of smoke. */
+.flash[data-kind="miss"]::after {
+  inset: 0;
+  background: radial-gradient(ellipse 44% 25% at 50% 50%, transparent 55%, rgb(255 40 20 / 0.9) 72%, transparent);
+  animation: burst 0.3s ease-out forwards;
+}
+
+.flash[data-kind="miss"]::before {
+  inset: auto 15% 40%;
+  height: 90%;
+  background: radial-gradient(ellipse 50% 45% at 50% 60%, rgb(120 110 105 / 0.45), transparent 70%);
+  animation: smoke 0.5s ease-out forwards;
+}
+
+/* ----------------------------------------
+   HUD
+   ---------------------------------------- */
+
+/* A riveted steel plate: score up top, the streak, and a multiplier dial that heats up as it climbs. */
+.hud {
+  --meter: #a3abb5;
+
+  display: grid;
+  grid-template-areas:
+    "score score"
+    "combo multiplier";
+  grid-template-columns: 1fr auto;
+  gap: 0.2cqh 1.2cqw;
+  align-items: center;
+  min-width: 34cqh;
+  padding: 1.6cqh 2cqw 1.8cqh 2.6cqw;
+  background: var(--rivets), var(--plate);
+  border: 1px solid #000;
+  border-radius: 0.4rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    0 0.6rem 1.6rem rgb(0 0 0 / 0.65);
+}
+
+.hud[data-multiplier="2"] {
+  --meter: #ff8a00;
+}
+.hud[data-multiplier="3"] {
+  --meter: #2ee06f;
+}
+.hud[data-multiplier="4"] {
+  --meter: #c24dff;
+}
+.hud[data-star-power] {
+  --meter: var(--star-power);
+}
+
+.hud .score {
+  grid-area: score;
+  justify-self: end;
+  font: 400 9cqh / 0.95 var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  letter-spacing: 0.04em;
+  background: var(--chrome);
+  background-clip: text;
+  filter: drop-shadow(0 0.25cqh 0 #000);
+}
+
+.hud .combo {
+  grid-area: combo;
+  justify-self: end;
+  font-size: 2.6cqh;
+  font-weight: 500;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.hud .multiplier {
+  display: grid;
+  grid-area: multiplier;
+  place-items: center;
+  width: 8.5cqh;
+  aspect-ratio: 1;
+  padding-top: 0.4cqh;
+  font: 400 4.6cqh / 1 var(--font-numbers);
+  color: #fff;
+  text-shadow: 0 0 1.2cqh var(--meter);
+  background: radial-gradient(circle at 50% 30%, #3c3f46, #09090b 70%);
+  border: 0.5cqh solid var(--meter);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.3cqh #000,
+    0 0 0 0.6cqh #8c939c,
+    0 0 2.6cqh var(--meter),
+    inset 0 0 1.6cqh var(--meter);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+/* ----------------------------------------
+   Banners, lyrics
+   ---------------------------------------- */
+
+.banner {
+  top: 24%;
+  font: 400 15cqh / 1.1 var(--font-metal);
+  color: transparent;
+  letter-spacing: 0.02em;
+  background: var(--fire);
+  background-clip: text;
+  -webkit-text-stroke: 0.25cqh #2a0600;
+  filter: drop-shadow(0 0.6cqh 0 #1a0300) drop-shadow(0 0 3cqh rgb(255 80 0 / 0.75));
+  animation: slam 2.5s ease-out forwards;
+}
+
+/* Karaoke: the line ahead in ash, the words sung so far in fire. */
+.lyrics {
+  padding: 1.2cqh 2.4cqw 1.2cqh 1.8cqw;
+  font-size: 3.8cqh;
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgb(244 236 228 / 0.66);
+  text-shadow: 0 1px 2px #000;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.82), rgb(24 6 2 / 0.6) 75%, transparent);
+  border-left: 0.6cqh solid;
+  border-image: linear-gradient(#ffd23f, #ff3d00) 1;
+}
+
+.lyrics [data-sung] {
+  color: transparent;
+  text-shadow: none;
+  background: linear-gradient(#fff4b8, #ffb300 45%, #ff5000);
+  background-clip: text;
+  filter: drop-shadow(0 0 0.8cqh rgb(255 90 0 / 0.75));
+}
+
+/* ----------------------------------------
+   Title card, results
+   ---------------------------------------- */
+
+.title-card,
+.results {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 115%, rgb(255 70 0 / 0.38), transparent 70%),
+    radial-gradient(ellipse 80% 80% at 50% 40%, rgb(12 5 4 / 0.72), rgb(3 1 1 / 0.92));
+  backdrop-filter: blur(6px);
+}
+
+/* A gig poster taped up beside the bill: art on the left, the band on the right. */
+.title-card {
+  display: grid;
+  grid-template-rows: repeat(4, auto);
+  grid-template-columns: auto minmax(0, 46cqw);
+  gap: 1.4cqh 6cqw;
+  place-content: center;
+  align-items: center;
+  justify-items: start;
+  text-align: start;
+}
+
+.title-card img,
+.title-card::before,
+.title-card::after {
+  grid-row: 1 / -1;
+  grid-column: 1;
+}
+
+.title-card img {
+  width: 44cqh;
+  padding: 1.6cqh 1.6cqh 5cqh;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0.25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"),
+    linear-gradient(160deg, #f3ead9, #d9cbb0);
+  box-shadow:
+    0 0.2rem 0 rgb(0 0 0 / 0.3),
+    0 1.6rem 3rem rgb(0 0 0 / 0.8);
+  rotate: -3deg;
+}
+
+/* The poster behind the poster, torn red. */
+.title-card::before {
+  z-index: -1;
+  align-self: stretch;
+  justify-self: stretch;
+  margin: -2.5cqh -2cqh -1cqh -2.5cqh;
+  content: "";
+  background: linear-gradient(150deg, #7a0d00, #2b0400);
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.7);
+  rotate: 4deg;
+}
+
+/* Tape. */
+.title-card::after {
+  align-self: start;
+  justify-self: center;
+  width: 14cqh;
+  height: 4cqh;
+  margin-top: -1.6cqh;
+  content: "";
+  background: rgb(236 226 200 / 0.62);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  rotate: -6deg;
+}
+
+.title-card h1 {
+  font: 400 11cqh / 1 var(--font-metal);
+  color: transparent;
+  background: var(--fire);
+  background-clip: text;
+  -webkit-text-stroke: 0.2cqh #2a0600;
+  filter: drop-shadow(0 0.5cqh 0 #000) drop-shadow(0 0 2.5cqh rgb(255 80 0 / 0.55));
+}
+
+.title-card > p:not(.hint) {
+  font-size: 2.8cqh;
+  font-weight: 500;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.title-card .start {
+  margin-top: 2cqh;
+  padding: 1.4cqh 4.5cqw 1.1cqh;
+  font: 400 4.6cqh / 1 var(--font-metal);
+  color: #fff8e6;
+  text-shadow: 0 2px 0 #5a0d00;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  background: linear-gradient(#ffa020, #e33a00 55%, #8f1600);
+  border: 1px solid #ffc27a;
+  border-radius: 0.4rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    inset 0 -0.4cqh 0 rgb(0 0 0 / 0.3),
+    0 0.6cqh 0 #3a0a00,
+    0 0 3cqh rgb(255 80 0 / 0.6);
+  transition: filter 0.15s;
+}
+
+.title-card .start:hover {
+  filter: brightness(1.15);
+}
+
+.title-card .start:active {
+  translate: 0 0.3cqh;
+}
+
+.title-card .hint {
+  font-size: 2.2cqh;
+  color: #a89a8d;
+  letter-spacing: 0.04em;
+}
+
+.results {
+  gap: 1cqh;
+}
+
+.results::before {
+  font: 400 13cqh / 1 var(--font-metal);
+  color: transparent;
+  content: "Rock on!";
+  background: var(--fire);
+  background-clip: text;
+  -webkit-text-stroke: 0.25cqh #2a0600;
+  filter: drop-shadow(0 0.6cqh 0 #000) drop-shadow(0 0 3cqh rgb(255 80 0 / 0.7));
+  animation: slam-in 0.8s ease-out both;
+}
+
+.results h2 {
+  font: 400 11cqh / 1 var(--font-numbers);
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  letter-spacing: 0.06em;
+  background: var(--chrome);
+  background-clip: text;
+  filter: drop-shadow(0 0.3cqh 0 #000);
+}
+
+.results p {
+  font-size: 2.8cqh;
+  font-weight: 500;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+/* Each section on its own riveted plate, graded in fire. */
+.results ol {
+  gap: 1.4cqh 1.4cqw;
+  margin-top: 2.5cqh;
+}
+
+.results li {
+  gap: 1.5cqw;
+  align-items: baseline;
+  min-width: 22cqh;
+  padding: 1cqh 1.4cqw 0.8cqh 1.8cqw;
+  font-size: 2.4cqh;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--rivets), var(--plate);
+  border: 1px solid #000;
+  border-radius: 0.3rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    0 0.4rem 1rem rgb(0 0 0 / 0.6);
+}
+
+.results li span:last-child {
+  font: 400 4cqh / 1 var(--font-numbers);
+  color: transparent;
+  letter-spacing: 0.04em;
+  background: var(--fire);
+  background-clip: text;
+}
+
+/* ----------------------------------------
+   Control bar
+   ---------------------------------------- */
+
+.control-bar {
+  gap: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--plate);
+  border-top: 1px solid #5a6069;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -1px 0 #000;
+}
+
+.control {
+  padding: 0.3rem 0.85rem 0.25rem;
+  color: var(--ink);
+  white-space: nowrap;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 #000;
+  cursor: pointer;
+  background: linear-gradient(#50555d, #2a2d32 60%, #1e2024);
+  border: 1px solid #050506;
+  border-radius: 0.3rem;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.control:hover {
+  background: linear-gradient(#5d636c, #32353b 60%, #24262b);
+}
+
+/* Lyrics on, or the part menu open: lit like a stomp box. */
+.control[data-active],
+.control[aria-expanded="true"] {
+  color: #fff6e0;
+  text-shadow: 0 1px 0 #5a0d00;
+  background: linear-gradient(#ff9a24, #d93500 60%, #a32200);
+  border-color: #3a0a00;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    0 0 0.9rem rgb(255 90 0 / 0.55);
+}
+
+.time {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: #ffcf7a;
+  text-shadow: 0 0 0.5rem rgb(255 140 0 / 0.55);
+  letter-spacing: 0.06em;
+}
+
+/* Sections as bolted plates of a groove that fills with molten metal. */
+.track {
+  background: linear-gradient(#030303, #1c1e22);
+  border-radius: 1px;
+  box-shadow:
+    inset 0 1px 2px #000,
+    inset 0 -1px 0 rgb(255 255 255 / 0.08);
+}
+
+.fill {
+  background: linear-gradient(#fff2c4, #ffb000 35%, #ff5a00 70%, #b81d00);
+  box-shadow: 0 0 6px rgb(255 100 0 / 0.9);
+}
+
+.section::after {
+  position: absolute;
+  top: calc(0.375rem + 0.25rem - 2px);
+  left: calc(var(--media-slider-chapter-start) + 5px);
+  width: 4px;
+  height: 4px;
+  content: "";
+  background: radial-gradient(circle at 35% 35%, #fff, #9aa1aa 50%, #2a2d32);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.7);
+}
+
+.marker {
+  background: var(--marker);
+  border-radius: 999px;
+  box-shadow: 0 0 4px var(--marker);
+  opacity: 0.55;
+}
+
+.marker[data-type="solo"] {
+  --marker: var(--solo);
+}
+.marker[data-type="star-power"] {
+  --marker: var(--star-power);
+}
+
+.marker[data-active] {
+  opacity: 1;
+  box-shadow:
+    0 0 6px var(--marker),
+    0 0 14px var(--marker);
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+.menu {
+  padding: 0.35rem;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--rivets), var(--plate);
+  border: 1px solid #5d636c;
+  border-radius: 0.4rem;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0.75rem 2rem rgb(0 0 0 / 0.75),
+    0 0 1.5rem rgb(255 70 0 / 0.2);
+}
+
+.menu-item {
+  position: relative;
+  padding: 0.35rem 1.1rem 0.3rem 1.6rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.menu-item[data-highlighted] {
+  color: #fff;
+  background: rgb(255 120 30 / 0.22);
+}
+
+.menu-item[aria-checked="true"] {
+  color: #ffd27a;
+}
+
+.menu-item[aria-checked="true"]::before {
+  position: absolute;
+  top: 50%;
+  left: 0.6rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  content: "";
+  background: linear-gradient(#ffe08a, #ff5a00);
+  box-shadow: 0 0 6px #ff7a00;
+  translate: 0 -50%;
+  rotate: 45deg;
+}
+
+/* ----------------------------------------
+   Motion
+   ---------------------------------------- */
+
+@keyframes flame {
+  0% {
+    opacity: 1;
+    scale: 0.6 0.15;
+  }
+
+  30% {
+    opacity: 1;
+    scale: 1.05 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.75 1.35;
+    translate: 0 -12%;
+  }
+}
+
+@keyframes burst {
+  from {
+    opacity: 1;
+    scale: 0.8;
+  }
+
+  to {
+    opacity: 0;
+    scale: 1.5;
+  }
+}
+
+@keyframes smoke {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    scale: 1.4;
+    translate: 0 -30%;
+  }
+}
+
+/* Slammed down from above, shaken, held, and gone. */
+@keyframes slam {
+  0% {
+    opacity: 0;
+    scale: 2.8;
+  }
+
+  8% {
+    opacity: 1;
+    scale: 0.94;
+  }
+
+  12% {
+    scale: 1.04;
+    translate: 0;
+    rotate: 0deg;
+  }
+
+  15% {
+    translate: -1.4cqw 0.8cqh;
+    rotate: -2deg;
+  }
+
+  18% {
+    translate: 1.2cqw -0.6cqh;
+    rotate: 1.5deg;
+  }
+
+  21% {
+    translate: -0.7cqw 0.4cqh;
+    rotate: -0.8deg;
+  }
+
+  24% {
+    translate: 0.3cqw 0;
+    rotate: 0.3deg;
+  }
+
+  27%,
+  78% {
+    opacity: 1;
+    scale: 1;
+    translate: 0;
+    rotate: 0deg;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.06;
+  }
+}
+
+@keyframes slam-in {
+  0% {
+    opacity: 0;
+    scale: 2.4;
+  }
+
+  40% {
+    opacity: 1;
+    scale: 0.95;
+  }
+
+  55% {
+    translate: -1cqw 0.5cqh;
+    rotate: -1.5deg;
+  }
+
+  70% {
+    translate: 0.6cqw -0.3cqh;
+    rotate: 1deg;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0;
+    rotate: 0deg;
+  }
+}
+
+@keyframes blaze {
+  from {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  10%,
+  80% {
+    opacity: 1;
+  }
+}
+
+/* No flames, shakes, or flicker: hits and banners just fade. */
+@media (prefers-reduced-motion: reduce) {
+  .flash::before {
+    display: none;
+  }
+
+  .flash::after {
+    animation-name: fade;
+  }
+
+  .banner {
+    animation-name: fade;
+  }
+
+  .results::before {
+    animation: none;
+  }
+
+  .screen:has(.hud[data-multiplier="4"])::after,
+  .marker[data-active] {
+    animation: none;
+  }
+}
