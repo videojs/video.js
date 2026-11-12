@@ -13,6 +13,7 @@ import {
   DEFAULT_YOUTUBE_SOURCE,
   getYouTubeSource,
   HLS_SOURCE_IDS,
+  HYPERFRAMES_VIDEO_SRC,
   MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
   MUX_SPF_SOURCE_IDS,
@@ -329,6 +330,16 @@ const MEDIA_MAP = {
     tag: 'wistia-video',
     embed: true,
     fixedSource: WISTIA_VIDEO_SRC,
+    sources: NON_DASH_SOURCE_IDS,
+  },
+  // A composition rather than a stream, so it plays the one file the sandbox serves. The inline-markup paths, a
+  // `<template>` child and JSX children with a timeline, have their own pages: `/hyperframes-video-html/` and
+  // `/hyperframes-video-react/`.
+  'hyperframes-video': {
+    label: 'HyperFrames Video',
+    player: 'video',
+    tag: 'hyperframes-video',
+    fixedSource: HYPERFRAMES_VIDEO_SRC,
     sources: NON_DASH_SOURCE_IDS,
   },
 } satisfies Record<string, MediaDescriptor>;

@@ -847,6 +847,9 @@ export function withMuxMaxResolution(url: string, maxResolution: string): string
 
 export const VIMEO_VIDEO_SRC = 'https://vimeo.com/76979871';
 
+/** A HyperFrames composition file the sandbox serves from `public/`. */
+export const HYPERFRAMES_VIDEO_SRC = '/hyperframes/intro.html';
+
 export const CLOUDFLARE_VIDEO_SRC = 'https://watch.videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4';
 
 // An episode rather than a track: Spotify plays episodes in full for a signed-out

@@ -306,6 +306,9 @@ export function createSandboxConfig(skinsSource?: SkinsSource) {
       },
     },
     root: 'src',
+    // Served untransformed and copied into the build, for files a page fetches rather than runs, such as HyperFrames
+    // compositions.
+    publicDir: resolve(__dirname, 'public'),
     appType: 'mpa',
     define: {
       __DEV__: 'true',
