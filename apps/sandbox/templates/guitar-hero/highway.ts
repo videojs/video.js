@@ -53,7 +53,9 @@ export class Highway {
 
     this.#layout();
     this.#drawBackdrop();
+
     if (!this.#reducedMotion.matches) this.#drawEmbers(performance.now() / 1000);
+
     this.#drawBoard(time);
     this.#drawTargets();
 
@@ -292,6 +294,7 @@ export class Highway {
     const metal = ctx.createLinearGradient(0, top, 0, top + height);
 
     for (const [offset, color] of STRIKE.stops) metal.addColorStop(offset, color);
+
     ctx.fillStyle = metal;
     ctx.fillRect(left, top, right - left, height);
   }
