@@ -27,20 +27,17 @@ class VideoJSEngineStoreModule internal constructor(
     registry.destroy(handle.toInt())
   }
 
-  override fun setSource(handle: Double, source: String): Boolean =
-    registry.command(handle.toInt(), { it.requestSource(source) }) { it.setSource(source) }
+  // Each returns whether the handle reached a live engine.
 
-  override fun play(handle: Double): Boolean =
-    registry.command(handle.toInt(), PlayerEngine::requestPlay, PlayerEngine::play)
+  override fun setSource(handle: Double, source: String): Boolean = command(handle) { it.setSource(source) }
 
-  override fun load(handle: Double): Boolean =
-    registry.command(handle.toInt(), PlayerEngine::requestLoad, PlayerEngine::load)
+  override fun play(handle: Double): Boolean = command(handle, PlayerEngine::play)
 
-  override fun pause(handle: Double): Boolean =
-    registry.command(handle.toInt(), PlayerEngine::requestPause, PlayerEngine::pause)
+  override fun load(handle: Double): Boolean = command(handle, PlayerEngine::load)
 
-  override fun setCurrentTime(handle: Double, time: Double): Boolean =
-    registry.command(handle.toInt(), { it.requestSeek(time) }) { it.setCurrentTime(time) }
+  override fun pause(handle: Double): Boolean = command(handle, PlayerEngine::pause)
+
+  override fun setCurrentTime(handle: Double, time: Double): Boolean = command(handle) { it.setCurrentTime(time) }
 
   override fun getCurrentTime(handle: Double): Double = state(handle).currentTime
 
@@ -85,6 +82,9 @@ class VideoJSEngineStoreModule internal constructor(
       }
     )
   }
+
+  private fun command(handle: Double, block: (PlayerEngine) -> Unit): Boolean =
+    registry.engine(handle.toInt())?.also(block) != null
 
   private fun state(handle: Double): PlayerState = registry.state(handle.toInt())
 
