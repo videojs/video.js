@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const tiktokVideo: LazyMediaDefinition = {
   match: matchAdapterType('tiktok'),
+  source: true,
   load: () => import('../tiktok-video').then((m) => m.TikTokVideo),
 };

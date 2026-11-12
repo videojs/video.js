@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const twitchVideo: LazyMediaDefinition = {
   match: matchAdapterType('twitch'),
+  source: true,
   load: () => import('../twitch-video').then((m) => m.TwitchVideo),
 };

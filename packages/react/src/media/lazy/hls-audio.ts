@@ -9,6 +9,7 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const hlsAudio: LazyMediaDefinition = {
   match: matchHls('mse'),
+  source: true,
   fallback: true,
   load: () => import('../hls-audio').then((m) => m.HlsAudio),
 };

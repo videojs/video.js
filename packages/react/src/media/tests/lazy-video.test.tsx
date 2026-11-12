@@ -127,6 +127,28 @@ describe('LazyVideo', () => {
     expect(sourceOf()?.playbackId).toBe(playbackId);
   });
 
+  it('resolves a Mux video from source.playbackId and hands it the source', async () => {
+    const playbackId = 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M';
+    const mediaRef = vi.fn();
+
+    render(<LazyVideo source={{ playbackId }} preferPlayback="mse" mediaRef={mediaRef} />);
+
+    await waitFor(() => expect(mediaRef).toHaveBeenCalledWith(expect.anything()), LOAD_TIMEOUT);
+
+    const media = mediaRef.mock.calls.at(-1)![0] as { source: { playbackId?: string; preferPlayback?: string } };
+
+    expect(media.source?.playbackId).toBe(playbackId);
+    expect(media.source?.preferPlayback).toBe('mse');
+  });
+
+  it('plays source.src in a native video', () => {
+    const { container } = render(<LazyVideo src="/ignored.mp4" source={{ src: '/movie.mp4' }} />);
+    const video = container.querySelector('video')!;
+
+    expect(video.getAttribute('src')).toBe('/movie.mp4');
+    expect(video.hasAttribute('source')).toBe(false);
+  });
+
   it('resolves an extensionless source from type', () => {
     const { container } = render(<LazyVideo src="https://cdn.example.com/signed?token=1" type="video/mp4" />);
     const video = container.querySelector('video')!;

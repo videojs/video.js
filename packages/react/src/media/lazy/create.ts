@@ -2,7 +2,7 @@ import type { AudioHTMLAttributes, VideoHTMLAttributes } from 'react';
 
 import { createLazyMedia, type LazyMediaDefinition, type LazyMediaProps } from '../lazy-media';
 
-export type { AdapterType, LazyMediaMatcher, LazySource } from '@videojs/media';
+export type { AdapterType, LazyMediaMatcher, LazyMediaSource, LazySource } from '@videojs/media';
 export type { LazyMediaDefinition, LazyMediaProps } from '../lazy-media';
 
 /** @experimental */

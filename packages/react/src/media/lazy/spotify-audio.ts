@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const spotifyAudio: LazyMediaDefinition = {
   match: matchAdapterType('spotify'),
+  source: true,
   load: () => import('../spotify-audio').then((m) => m.SpotifyAudio),
 };

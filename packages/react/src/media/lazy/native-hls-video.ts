@@ -9,6 +9,7 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const nativeHlsVideo: LazyMediaDefinition = {
   match: matchHls('native'),
+  source: true,
   fallback: true,
   load: () => import('../native-hls-video').then((m) => m.NativeHlsVideo),
 };

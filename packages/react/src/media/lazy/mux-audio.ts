@@ -9,6 +9,7 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const muxAudio: LazyMediaDefinition = {
   match: matchAdapterType('mux'),
+  source: true,
   fallback: true,
   load: () => import('../mux-audio').then((m) => m.MuxAudio),
 };

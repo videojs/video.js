@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const cloudflareVideo: LazyMediaDefinition = {
   match: matchAdapterType('cloudflare'),
+  source: true,
   load: () => import('../cloudflare-video').then((m) => m.CloudflareVideo),
 };

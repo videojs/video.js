@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const soundcloudAudio: LazyMediaDefinition = {
   match: matchAdapterType('soundcloud'),
+  source: true,
   load: () => import('../soundcloud-audio').then((m) => m.SoundCloudAudio),
 };

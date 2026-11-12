@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const playerJsVideo: LazyMediaDefinition = {
   match: matchAdapterType('playerjs'),
+  source: true,
   load: () => import('../playerjs-video').then((m) => m.PlayerJsVideo),
 };

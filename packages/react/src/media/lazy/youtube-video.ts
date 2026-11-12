@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const youtubeVideo: LazyMediaDefinition = {
   match: matchAdapterType('youtube'),
+  source: true,
   load: () => import('../youtube-video').then((m) => m.YouTubeVideo),
 };

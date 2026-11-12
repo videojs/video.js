@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const vimeoVideo: LazyMediaDefinition = {
   match: matchAdapterType('vimeo'),
+  source: true,
   load: () => import('../vimeo-video').then((m) => m.VimeoVideo),
 };

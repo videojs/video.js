@@ -9,6 +9,7 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const dashVideo: LazyMediaDefinition = {
   match: matchAdapterType('dash'),
+  source: true,
   fallback: true,
   load: () => import('../dash-video').then((m) => m.DashVideo),
 };

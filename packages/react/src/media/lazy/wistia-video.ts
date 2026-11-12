@@ -9,5 +9,6 @@ import type { LazyMediaDefinition } from '../lazy-media';
  */
 export const wistiaVideo: LazyMediaDefinition = {
   match: matchAdapterType('wistia'),
+  source: true,
   load: () => import('../wistia-video').then((m) => m.WistiaVideo),
 };
