@@ -64,8 +64,8 @@ Install every engine package listed: your bundler resolves each media component 
 | Source | Resolves to | Loads |
 |---|---|---|
 | `.mp4`, `.webm`, `.mov`, `.ogv`, and audio files | Native `<video>` | Nothing |
-| HLS on Safari, or where there's no MSE | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> | Native HLS support |
-| HLS, elsewhere | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> | hls.js |
+| HLS | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> | hls.js |
+| HLS where there's no MSE | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> | Native HLS support |
 | `stream.mux.com` | <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink> | Mux Video |
 | DASH (`.mpd`) | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | dash.js |
 | YouTube | <DocsLink slug="reference/components/youtube-video">YouTubeVideo</DocsLink> | The YouTube embed |
@@ -106,7 +106,7 @@ document.querySelector('lazy-video').source = { playbackId: 'a4nOgmxGWg6gULfcBbA
 ```
 </FrameworkCase>
 
-Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js. It's also passed on to the resolved hls.js or Mux media, on its `source`, so a Mux stream follows the same preference.
+HLS plays through hls.js wherever the browser has MSE, Safari included, so it has the same features everywhere. Only a browser without MSE, such as iOS before 17.1, plays it natively. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js. It's also passed on to the resolved hls.js or Mux media, on its `source`, so a Mux stream follows the same preference.
 
 <FrameworkCase frameworks={["react"]}>
 Every other prop, including `ref`, `mediaRef`, event handlers, and children, is passed to the resolved media, so switching to that component directly only changes the import. Each media accepts the props it understands; embeds ignore `fallback`.
@@ -271,7 +271,7 @@ Until the media loads, the player has no media, so its controls show their empty
 | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
 | `source` | `LazyMediaSource` | | Structured source, in place of `src` and `type`. Chooses the media by its `src`, `type`, `playbackId`, or `mediaId`, and is passed on as the media's `source`. |
-| `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
+| `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, through hls.js wherever there's MSE, and native only where there's none. Also passed on to hls.js and Mux media. |
 | `preload` | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
 
@@ -281,6 +281,6 @@ Until the media loads, the player has no media, so its controls show their empty
 | `src` | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
 | | `source` | `LazyMediaSource` | | Structured source, in place of `src` and `type`. Chooses the media by its `src`, `type`, `playbackId`, or `mediaId`, and is passed on as the media's `source`. |
-| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
+| `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, through hls.js wherever there's MSE, and native only where there's none. Also passed on to hls.js and Mux media. |
 | `preload` | | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
