@@ -32,35 +32,31 @@ function rangeAt(ranges: readonly PlayerTimeRange[], index: number): PlayerTimeR
 
 const EMPTY_TIME_RANGES = toTimeRanges([]);
 
-/**
- * Every `PlayerEvent['type']`, checked as a record so that adding a member to the native union without listing it here
- * fails to compile, rather than becoming a silently dropped event.
- */
-const PLAYER_EVENT_TYPES = {
-  loadstart: true,
-  emptied: true,
-  loadedmetadata: true,
-  durationchange: true,
-  progress: true,
-  canplay: true,
-  canplaythrough: true,
-  error: true,
-  play: true,
-  pause: true,
-  playing: true,
-  waiting: true,
-  ended: true,
-  seeking: true,
-  seeked: true,
-  timeupdate: true,
-  ratechange: true,
-  contentdatachange: true,
-} satisfies Record<PlayerEvent['type'], true>;
+type PlayerEventType = PlayerEvent['type'];
 
-// The codegen payload carries `type` as a plain string, so native could emit one outside the union.
-function isPlayerEventType(type: string): type is PlayerEvent['type'] {
-  return Object.hasOwn(PLAYER_EVENT_TYPES, type);
-}
+const PLAYER_EVENT_TYPES: readonly PlayerEventType[] = [
+  'loadstart',
+  'emptied',
+  'loadedmetadata',
+  'durationchange',
+  'progress',
+  'canplay',
+  'canplaythrough',
+  'error',
+  'play',
+  'pause',
+  'playing',
+  'waiting',
+  'ended',
+  'seeking',
+  'seeked',
+  'timeupdate',
+  'ratechange',
+  'contentdatachange',
+];
+
+const isPlayerEventType = (type: string): type is PlayerEventType =>
+  PLAYER_EVENT_TYPES.includes(type as PlayerEventType);
 
 /**
  * Media adapter over a native player addressed by a {@link NativeEngineHandle}.
