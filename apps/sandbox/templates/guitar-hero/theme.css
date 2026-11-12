@@ -177,8 +177,8 @@ body {
 
 /* A hit: three tongues of flame leap off the target... */
 .flash[data-kind="hit"]::before {
-  inset: auto 8% 50%;
-  height: 230%;
+  inset: auto 2% 48%;
+  height: 300%;
   background:
     radial-gradient(ellipse 30% 22% at 50% 90%, #fff 0, #fff3c4 50%, transparent 100%),
     radial-gradient(ellipse 48% 50% at 50% 85%, #ffe27a 0, #ff9a00 55%, transparent 100%),
