@@ -29,7 +29,10 @@ class FakeTextTrack {
   /** The `<track>` element the track belongs to, set by the element stub. */
   element?: HTMLTrackElement;
 
-  /** Whether script changed the mode after the element was added, which Chrome's automatic selection respects. */
+  /**
+   * Whether script changed the mode after the element was added, which Chrome's automatic selection respects. Chrome
+   * forgets it when the element is removed, which the element stub mirrors.
+   */
   configured = false;
 
   get mode(): TextTrackMode {
@@ -238,6 +241,9 @@ function trackOf(video: HTMLVideoElement, id: string): TextTrack | null {
 
 let patchList: ((track: FakeTextTrack) => void) | undefined;
 
+/** One track per element across stubs, so an element moved to another stubbed media element keeps its track. */
+const fakeTracks = new WeakMap<HTMLTrackElement, FakeTextTrack>();
+
 interface TrackSupportOptions {
   /**
    * Mimics Chrome's automatic text track selection: once a track shows, the subtitle track in this language shows too,
@@ -247,8 +253,15 @@ interface TrackSupportOptions {
 }
 
 function stubTrackSupport(video: HTMLVideoElement, { autoSelectLanguage }: TrackSupportOptions = {}): () => void {
-  const tracks = new WeakMap<HTMLTrackElement, FakeTextTrack>();
+  const tracks = fakeTracks;
   const descriptor = Object.getOwnPropertyDescriptor(HTMLTrackElement.prototype, 'track');
+  const remove = vi.spyOn(HTMLTrackElement.prototype, 'remove').mockImplementation(function (this: HTMLTrackElement) {
+    const track = tracks.get(this);
+
+    if (track) track.configured = false;
+
+    Element.prototype.remove.call(this);
+  });
 
   Object.defineProperty(HTMLTrackElement.prototype, 'track', {
     configurable: true,
@@ -297,6 +310,7 @@ function stubTrackSupport(video: HTMLVideoElement, { autoSelectLanguage }: Track
 
   return () => {
     patchList = undefined;
+    remove.mockRestore();
 
     if (descriptor) Object.defineProperty(HTMLTrackElement.prototype, 'track', descriptor);
     else Reflect.deleteProperty(HTMLTrackElement.prototype, 'track');
@@ -503,23 +517,75 @@ describe('HlsJsTextTracksMixin', () => {
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, CC_TRACK_FOUND);
     video.textTracks.getTrackById('default')!.mode = 'showing';
+    (engine as any).emit(Hls.Events.CUES_PARSED, { track: 'default', cues: [{ id: 'german' }] });
+
+    const previous = trackOf(video, 'default');
 
     // Another subtitle group whose default playlist reads differently, as after a switch to a level using it.
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
       tracks: [{ label: 'Deutsch', kind: 'subtitles', default: true, subtitleTrack: { id: 0, lang: 'de' } }],
     });
 
+    const current = trackOf(video, 'default')!;
+
     expect(labels()).toEqual(['default:Deutsch', 'textTrack1:English CC']);
-    expect(video.textTracks.getTrackById('default')!.mode).toBe('showing');
+    expect(current).not.toBe(previous);
+    expect(cueIds(current as unknown as FakeTextTrack)).toEqual([]);
+    expect(current.mode).toBe('showing');
   });
 
-  it('mounts the tracks of the current source on a different media element', () => {
+  it('builds a new element on the next mount for a track that reads differently while unmounted', () => {
+    const { engine, host, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    video.textTracks.getTrackById('default')!.mode = 'showing';
+
+    const previous = video.querySelector('track');
+
+    host.detach();
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, {
+      tracks: [{ label: 'Deutsch', kind: 'subtitles', default: true, subtitleTrack: { id: 0, lang: 'de' } }],
+    });
+    host.attach(video);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    const el = video.querySelector('track')!;
+
+    expect(el.label).toBe('Deutsch');
+    expect(el).not.toBe(previous);
+    expect(el.track.mode).toBe('showing');
+  });
+
+  it('keeps the elements and their cues when the adapter re-attaches the media', () => {
+    const { engine, host, video } = mount();
+
+    (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    video.textTracks.getTrackById('default')!.mode = 'showing';
+    (engine as any).emit(Hls.Events.CUES_PARSED, { track: 'default', cues: [{ id: 'german' }] });
+
+    const [el] = video.querySelectorAll('track');
+
+    host.detach();
+    expect(hlsTracks(video)).toEqual([]);
+
+    host.attach(video);
+    (engine as any).emit(Hls.Events.MEDIA_ATTACHED);
+
+    expect(video.querySelector('track')).toBe(el);
+    expect(cueIds(el!.track as unknown as FakeTextTrack)).toEqual(['german']);
+    expect(el!.track.mode).toBe('showing');
+  });
+
+  it('moves the tracks of the current source, cues included, to a different media element', () => {
     const { engine, host, video } = mount();
     const next = document.createElement('video');
 
     (engine as any).emit(Hls.Events.NON_NATIVE_TEXT_TRACKS_FOUND, SUBTITLE_TRACKS_FOUND);
+    video.textTracks.getTrackById('default')!.mode = 'showing';
+    (engine as any).emit(Hls.Events.CUES_PARSED, { track: 'default', cues: [{ id: 'german' }] });
     (engine as any).emit(Hls.Events.MEDIA_DETACHED);
 
+    const el = video.querySelector('track')!;
     const restoreNext = stubTrackSupport(next);
 
     try {
@@ -528,6 +594,9 @@ describe('HlsJsTextTracksMixin', () => {
 
       expect(hlsTracks(video)).toEqual([]);
       expect(hlsTracks(next)).toEqual(['subtitles:default']);
+      expect(next.querySelector('track')).toBe(el);
+      expect(cueIds(el.track as unknown as FakeTextTrack)).toEqual(['german']);
+      expect(el.track.mode).toBe('showing');
     } finally {
       restoreNext();
     }

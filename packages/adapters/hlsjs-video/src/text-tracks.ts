@@ -97,7 +97,7 @@ interface HlsTextTrack {
   info: NonNativeTextTrack;
   /** The mode the track had when its element was last removed, put back when it is mounted again. */
   mode: TextTrackMode | null;
-  /** The `<track>` element while the track is mounted on the media element. */
+  /** The track's `<track>` element, kept while unmounted so mounting it again keeps its cues. */
   el: HTMLTrackElement | null;
 }
 
@@ -113,7 +113,7 @@ interface HlsTextTrack {
  * hls.js's own detach/attach, e.g. `hls.recoverMediaError()`, leaves them where they are: hls.js announces the subtitle
  * set again only when its list changes, and each CC track only once 608 data shows up, and keeping the elements keeps
  * their modes, cues and place among the other `<track>` elements. Only the adapter letting go of the element unmounts
- * them, and the next attach mounts them again with their modes.
+ * them, and the next attach mounts the same elements again with their modes and cues.
  */
 export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsTextTracks extends (BaseClass as Constructor<HlsEngineHost>) {
@@ -163,10 +163,7 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
       if (!media) return;
 
       for (const [id, track] of this.#tracks) {
-        if (track.el?.parentNode === media) continue;
-
-        unmountTrack(track);
-        mountTrack(media, id, track, null);
+        if (track.el?.parentNode !== media) mountTrack(media, id, track, null);
       }
     }
 
@@ -215,18 +212,11 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
             continue;
           }
 
-          // A track announced again keeps its element, or gets a new one in the same place when it reads differently.
-          const { el } = track;
           const changed = !describesSameTrack(track.info, info);
 
           track.info = info;
 
-          if (el?.parentNode !== media || !changed) continue;
-
-          const next = el.nextSibling;
-
-          unmountTrack(track);
-          mountTrack(media, id, track, next);
+          if (changed) replaceTrack(media, id, track);
         }
 
         this.#mount();
@@ -323,8 +313,19 @@ function describesSameTrack(a: NonNativeTextTrack, b: NonNativeTextTrack): boole
   return a.kind === b.kind && a.label === b.label && !!a.default === !!b.default && langOf(a) === langOf(b);
 }
 
+/** Adds the track's element to the media element, moving it off another one, or builds it on the first mount. */
 function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack, before: Node | null): void {
-  const { info, mode } = track;
+  unmountTrack(track);
+
+  const el = track.el ?? createTrackElement(id, track.info);
+
+  media.insertBefore(el, before);
+  track.el = el;
+
+  if (track.mode) restoreMode(el.track, track.mode);
+}
+
+function createTrackElement(id: string, info: NonNativeTextTrack): HTMLTrackElement {
   const kind = info.kind as TextTrackKind;
   const lang = (info.subtitleTrack ?? info.closedCaptions)?.lang;
   const el = document.createElement('track');
@@ -342,10 +343,26 @@ function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack, be
 
   // Lets `withPreservedTextTracks` tell these tracks from sideloaded ones.
   el.setAttribute(HLS_TRACK_ATTR, '');
-  media.insertBefore(el, before);
-  track.el = el;
 
-  if (mode) restoreMode(el.track, mode);
+  return el;
+}
+
+/**
+ * Gives a track hls.js announced under a reused id, e.g. after a switch to a level with another subtitle group, a new
+ * element in the old one's place: the old element holds the previous playlist's cues, and the store only reads a
+ * track's kind, label and language when it is added.
+ */
+function replaceTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack): void {
+  const { el } = track;
+  if (!el) return;
+
+  const mounted = el.parentNode === media;
+  const next = el.nextSibling;
+
+  unmountTrack(track);
+  track.el = null;
+
+  if (mounted) mountTrack(media, id, track, next);
 }
 
 /**
@@ -362,10 +379,9 @@ function restoreMode(track: TextTrack, mode: TextTrackMode): void {
 /** Disables and removes the track's element, remembering its mode for the next mount. */
 function unmountTrack(track: HlsTextTrack): void {
   const { el } = track;
-  if (!el) return;
+  if (!el?.parentNode) return;
 
   track.mode = el.track.mode;
   el.track.mode = 'disabled';
   el.remove();
-  track.el = null;
 }
