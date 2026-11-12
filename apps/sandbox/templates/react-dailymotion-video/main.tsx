@@ -7,12 +7,12 @@ import { DailymotionVideo } from '@videojs/react/media/dailymotion-video';
 import { createRoot } from 'react-dom/client';
 
 function App() {
-  const { source } = useSandbox();
+  const { source, mediaProps } = useSandbox();
 
   return (
     <VideoPlayer>
       <VideoSkinComponent>
-        <DailymotionVideo className="block h-full w-full" src={SOURCES[source].url ?? ''} playsInline />
+        <DailymotionVideo className="block h-full w-full" src={SOURCES[source].url ?? ''} {...mediaProps} playsInline />
       </VideoSkinComponent>
     </VideoPlayer>
   );

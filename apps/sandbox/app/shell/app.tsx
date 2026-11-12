@@ -25,7 +25,7 @@ import {
 } from '@app/constants';
 import { COMPARE_LABELS } from '@app/labels';
 import {
-  hasSkinChoice,
+  hasNoSkinChoice,
   hasTailwindSkin,
   isMediaId,
   landingSource,
@@ -112,7 +112,7 @@ function readParams() {
     media,
     skin: readOption(SKINS, params.get('skin'), 'default'),
     // Written only when it differs from the media's own default, so a link without it starts as the media does.
-    skinless: params.has('skinless') ? params.get('skinless') === '1' : startsSkinless(media),
+    skinless: params.has('skinless') ? hasNoSkinChoice(media) && params.get('skinless') === '1' : startsSkinless(media),
     // A valid `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: readOption(LINKABLE_SOURCE_IDS, params.get('source'), MEDIA[media].entrySource ?? DEFAULT_SOURCE),
     autoplay: params.get('autoplay') === '1',
@@ -617,7 +617,7 @@ export function App() {
           onCaptionsChange={setCaptions}
           skinless={skinless}
           onSkinlessChange={setSkinless}
-          skinlessDisabled={!hasSkinChoice(media)}
+          skinlessDisabled={!hasNoSkinChoice(media)}
           preferences={preferences}
         />
       </div>

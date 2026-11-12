@@ -5,10 +5,10 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 
 createHtmlSandbox({
   player: 'video',
-  render: ({ skinTag, src }) => html`
+  render: ({ skinTag, src, attrs }) => html`
     <video-player>
       <${skinTag} class="sandbox-video-frame mx-auto max-w-4xl">
-        <dailymotion-video class="block h-full w-full"${src} playsinline></dailymotion-video>
+        <dailymotion-video class="block h-full w-full"${src} ${attrs} playsinline></dailymotion-video>
       </${skinTag}>
     </video-player>
   `,
