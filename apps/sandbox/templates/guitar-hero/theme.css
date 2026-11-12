@@ -41,7 +41,7 @@
 body {
   min-height: 100vh;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0035 0.006' numOctaves='4' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.32 0 0 0 0 0.24 0 0 0 1.1 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E")
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0035 0.006' numOctaves='4' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.26 0 0 0 0 0.2 0 0 0 0.75 -0.33'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E")
       center / cover no-repeat,
     radial-gradient(ellipse 70% 45% at 50% 108%, rgb(255 70 0 / 0.3), transparent 70%),
     radial-gradient(ellipse 45% 35% at 8% -5%, rgb(140 20 0 / 0.22), transparent 70%),
@@ -364,7 +364,7 @@ body {
 .title-card {
   display: grid;
   grid-template-rows: repeat(4, auto);
-  grid-template-columns: auto minmax(0, 46cqw);
+  grid-template-columns: auto minmax(0, 52cqw);
   gap: 1.4cqh 6cqw;
   place-content: center;
   align-items: center;
@@ -426,11 +426,11 @@ body {
 }
 
 .title-card > p:not(.hint) {
-  font-size: 2.8cqh;
+  font-size: 2.5cqh;
   font-weight: 500;
   color: var(--ink-dim);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
 }
 
 .title-card .start {
