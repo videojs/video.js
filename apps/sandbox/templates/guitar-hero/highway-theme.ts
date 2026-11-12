@@ -73,13 +73,13 @@ export const FRETS = {
 export const STRIKE = {
   height: 0.075,
   stops: [
-    [0, '#ffefc2'],
-    [0.35, '#ffb347'],
-    [0.7, '#ff5a00'],
-    [1, '#7a1400'],
+    [0, '#ff7a1a'],
+    [0.38, '#fff4d6'],
+    [0.55, '#ffd27a'],
+    [0.8, '#ff5a00'],
+    [1, '#6e1200'],
   ],
-  glow: 'rgb(255 96 0 / 0.9)',
-  core: 'rgb(255 255 240 / 0.95)',
+  glow: 'rgb(255 96 0 / 0.75)',
 } as const;
 
 /** The lane targets on the strike line, in lane widths. */
