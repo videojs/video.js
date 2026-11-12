@@ -29,7 +29,14 @@ export function toPercent(value: number, min: number, max: number): number {
  */
 export function roundToStep(value: number, step: number, min: number): number {
   const nearest = Math.round((value - min) / step) * step + min;
-  const dot = `${step}`.indexOf('.');
+  // Keep the decimals of min too: min 0.25 with step 0.5 must land on 0.75, not 0.8.
+  const decimals = Math.max(countDecimals(step), countDecimals(min));
 
-  return dot === -1 ? nearest : Number(nearest.toFixed(`${step}`.length - dot - 1));
+  return decimals === 0 ? nearest : Number(nearest.toFixed(decimals));
+}
+
+function countDecimals(value: number): number {
+  const dot = `${value}`.indexOf('.');
+
+  return dot === -1 ? 0 : `${value}`.length - dot - 1;
 }
