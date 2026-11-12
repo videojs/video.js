@@ -7,4 +7,8 @@ describe('HlsAudioMpegTsAdapter', () => {
   it('builds its engine with the hls-audio-mpeg-ts engine', () => {
     expect(HlsAudioMpegTsAdapter.createEngine).toBe(createEngine);
   });
+
+  it('reports the hls-audio-mpeg-ts engine by name', () => {
+    expect(HlsAudioMpegTsAdapter.engineName).toBe('spf-hls-audio-mpeg-ts');
+  });
 });
