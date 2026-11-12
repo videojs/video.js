@@ -95,7 +95,7 @@ function withReadableCues<T>(track: TextTrack, action: () => T): T {
 /** A text track hls.js announced for the current source. */
 interface HlsTextTrack {
   info: NonNativeTextTrack;
-  /** The mode the track had when it was last unmounted, put back when it is mounted again. */
+  /** The mode the track had when its element was last removed, put back when it is mounted again. */
   mode: TextTrackMode | null;
   /** The `<track>` element while the track is mounted on the media element. */
   el: HTMLTrackElement | null;
@@ -109,10 +109,11 @@ interface HlsTextTrack {
  * `CUES_PARSED` with VTTCues. This mixin creates `<track>` elements on the media target and forwards cues into them. It
  * also syncs user track-mode changes back to hls.js via `engine.subtitleTrack`.
  *
- * The tracks belong to the source, not to the media element. A new manifest or the engine's destruction drops them; a
- * detach only unmounts them, and the next attach mounts them again with their modes. hls.js cannot be relied on to
- * announce them again after a detach/attach of the same source, e.g. `hls.recoverMediaError()`: it announces the
- * subtitle set only when its list changes, and each CC track only once 608 data shows up again.
+ * The tracks belong to the source, not to the media element. A new manifest or the engine's destruction drops them.
+ * hls.js's own detach/attach, e.g. `hls.recoverMediaError()`, leaves them where they are: hls.js announces the subtitle
+ * set again only when its list changes, and each CC track only once 608 data shows up, and keeping the elements keeps
+ * their modes, cues and place among the other `<track>` elements. Only the adapter letting go of the element unmounts
+ * them, and the next attach mounts them again with their modes.
  */
 export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(BaseClass: Base) {
   class HlsJsTextTracks extends (BaseClass as Constructor<HlsEngineHost>) {
@@ -134,19 +135,24 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         this.#init();
         this.#mount();
       });
-      engine.on(Hls.Events.MEDIA_DETACHED, () => this.#stop());
+      engine.on(Hls.Events.MEDIA_DETACHED, () => this.#disconnectListeners());
       engine.on(Hls.Events.DESTROYING, () => this.#reset());
     }
 
-    /** Lets go of the media element: stops listening to it and unmounts the tracks, keeping them for the next attach. */
-    #stop(): void {
+    /** The adapter lets go of the element, unlike hls.js's own detach/attach, so the tracks leave it too. */
+    detach(): void {
+      this.#unmount();
+      super.detach();
+    }
+
+    #disconnectListeners(): void {
       this.#disconnect?.abort();
       this.#disconnect = null;
-      this.#unmount();
     }
 
     #reset(): void {
-      this.#stop();
+      this.#disconnectListeners();
+      this.#unmount();
       this.#tracks.clear();
     }
 
@@ -160,7 +166,7 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
         if (track.el?.parentNode === media) continue;
 
         unmountTrack(track);
-        mountTrack(media, id, track);
+        mountTrack(media, id, track, null);
       }
     }
 
@@ -189,25 +195,38 @@ export function HlsJsTextTracksMixin<Base extends Constructor<HlsEngineHost>>(Ba
 
       const onTracksFound = (_event: string, { tracks }: NonNativeTextTracksData) => {
         // The subtitle set arrives in one batch and replaces the previous set. Each CC track arrives alone once 608 data
-        // shows up in the stream and leaves the other tracks alone. A track announced again keeps its mode.
-        const previous = new Map(this.#tracks);
+        // shows up in the stream, again after every re-attach, and leaves the other tracks alone.
+        const incoming = new Map(tracks.map((info) => [trackIdFor(info), info]));
 
         if (!tracks.every(isClosedCaptions)) {
           for (const [id, track] of this.#tracks) {
-            if (isClosedCaptions(track.info)) continue;
+            if (isClosedCaptions(track.info) || incoming.has(id)) continue;
 
             unmountTrack(track);
             this.#tracks.delete(id);
           }
         }
 
-        for (const info of tracks) {
-          const id = trackIdFor(info);
-          const replaced = previous.get(id);
+        for (const [id, info] of incoming) {
+          const track = this.#tracks.get(id);
 
-          if (replaced) unmountTrack(replaced);
+          if (!track) {
+            this.#tracks.set(id, { info, mode: null, el: null });
+            continue;
+          }
 
-          this.#tracks.set(id, { info, mode: replaced?.mode ?? null, el: null });
+          // A track announced again keeps its element, or gets a new one in the same place when it reads differently.
+          const { el } = track;
+          const changed = !describesSameTrack(track.info, info);
+
+          track.info = info;
+
+          if (el?.parentNode !== media || !changed) continue;
+
+          const next = el.nextSibling;
+
+          unmountTrack(track);
+          mountTrack(media, id, track, next);
         }
 
         this.#mount();
@@ -297,7 +316,14 @@ function trackIdFor({ _id, default: isDefault, subtitleTrack }: NonNativeTextTra
   return _id ?? (isDefault ? 'default' : `subtitles${subtitleTrack?.id}`);
 }
 
-function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack): void {
+/** Whether a new announcement of a track would build the same `<track>` element. */
+function describesSameTrack(a: NonNativeTextTrack, b: NonNativeTextTrack): boolean {
+  const langOf = ({ subtitleTrack, closedCaptions }: NonNativeTextTrack) => (subtitleTrack ?? closedCaptions)?.lang;
+
+  return a.kind === b.kind && a.label === b.label && !!a.default === !!b.default && langOf(a) === langOf(b);
+}
+
+function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack, before: Node | null): void {
   const { info, mode } = track;
   const kind = info.kind as TextTrackKind;
   const lang = (info.subtitleTrack ?? info.closedCaptions)?.lang;
@@ -316,7 +342,7 @@ function mountTrack(media: HTMLMediaElement, id: string, track: HlsTextTrack): v
 
   // Lets `withPreservedTextTracks` tell these tracks from sideloaded ones.
   el.setAttribute(HLS_TRACK_ATTR, '');
-  media.append(el);
+  media.insertBefore(el, before);
   track.el = el;
 
   if (mode) restoreMode(el.track, mode);
