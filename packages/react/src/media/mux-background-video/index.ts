@@ -1,3 +1,3 @@
 export * from './adapter';
-export type { MuxBackgroundVideoAdapter } from '@videojs/mux-video/spf/background-video';
+export type { HlsBackgroundVideoMpegTsAdapter as MuxBackgroundVideoAdapter } from '@videojs/spf/adapters/hls-background-video-mpeg-ts';
 export type { HlsBackgroundVideoAdapterProps as MuxBackgroundVideoAdapterProps } from '@videojs/spf/adapters/hls-background-video';

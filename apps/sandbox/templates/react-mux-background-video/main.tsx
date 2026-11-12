@@ -8,8 +8,8 @@ import { BackgroundVideoSkin } from '@videojs/react/background';
 import { MuxBackgroundVideo } from '@videojs/react/media/mux-background-video';
 import { createRoot } from 'react-dom/client';
 
-// `MuxBackgroundVideo` is `HlsBackgroundVideo` over the Mux Media, which composes
-// `mpegTsTransmuxFeature`: a plus- or basic-tier playback ID (MPEG-TS) plays here
+// `MuxBackgroundVideo` is `HlsBackgroundVideo` over the MPEG-TS Media, whose engine
+// composes `mpegTsTransmuxFeature`: a plus- or basic-tier playback ID (MPEG-TS) plays here
 // and is refused on `react-hls-background-video`. This page also adds
 // `?max_resolution=720p`: capping the rendition is a Mux URL param rather than a
 // prop, so the excluded renditions are absent from the manifest rather than

@@ -35,7 +35,7 @@ import { BackgroundVideoBase, type BackgroundVideoOptOut } from '../background-v
  *
  * @fires error - Fired when a fatal condition is reported. Read `error` for it.
  *
- *   `<mux-background-video>` is this element over the Mux Media (`../mux-background-video`), which adds the MPEG-TS
+ *   `<mux-background-video>` (`../mux-background-video`) is this element over the MPEG-TS Media, which adds the MPEG-TS
  *   transmux and nothing else to the surface.
  */
 // Deliberately not `CustomMediaElement`, matching `<background-video>`: a

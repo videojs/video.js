@@ -11,8 +11,8 @@
  * for the same reason the HLS Medias are: wiring an engine directly shouldn't pull an adapter in with it. Its host is
  * local and narrow, so this entry carries no `@videojs/media` dependency either.
  *
- * Html and react expose this as `<mux-background-video>` / `MuxBackgroundVideo` too, over the Mux Media
- * (`@videojs/mux-video/spf/background-video`), which builds on `@videojs/spf/adapters/hls-background-video-mpeg-ts`.
+ * Html and react build `<mux-background-video>` / `MuxBackgroundVideo` over its MPEG-TS sibling,
+ * `@videojs/spf/adapters/hls-background-video-mpeg-ts`.
  */
 export type {
   CreateEngine,
