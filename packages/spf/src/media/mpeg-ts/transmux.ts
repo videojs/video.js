@@ -1,8 +1,9 @@
 /**
  * MPEG-TS → fMP4 transmuxer: demux a complete TS segment, frame each carried codec's elementary stream, and write the
  * frames back as fMP4 fragments the MSE pipeline already handles. Composed from codec modules (`codecs/`), so a
- * composition bundles only the codecs it carries. Stateful per SourceBuffer: it numbers fragments and emits an init
- * segment whenever the sample entries it last wrote change (first segment, rendition switch).
+ * composition bundles only the codecs it carries. Stateful per SourceBuffer: it numbers fragments. It builds an init
+ * segment whenever a segment's sample entries differ from the ones the caller last delivered (first segment, rendition
+ * switch). The caller tracks delivery because only it knows whether the append carrying an init completed.
  *
  * Timestamps stay native (first DTS in `tfdt`, in each track's own timescale) — relocation onto the presentation
  * timeline is the existing `timestampOffset` machinery's job, exactly as for native fMP4.
@@ -14,6 +15,8 @@ import { demuxTransportStream } from './demux';
 export interface TransmuxOptions extends TransmuxCodecOptions {
   /** The codecs to carry this time, a subset of the transmuxer's; defaults to all of them. */
   codecs?: readonly TransmuxCodec[];
+  /** The `initKey` of the init segment the SourceBuffer last received. A segment whose key differs gets an `init`. */
+  deliveredInitKey?: string | undefined;
 }
 
 /** Per-track output facts the loader pipeline records (the init-segment half of `MediaContainerData`). */
@@ -25,8 +28,10 @@ export interface TransmuxedTrack {
 }
 
 export interface TransmuxResult {
-  /** `ftyp` + `moov`, present when the sample entries are new to this transmuxer. */
+  /** `ftyp` + `moov`, present when the sample entries differ from `deliveredInitKey`'s. */
   init?: Uint8Array;
+  /** Identifies the sample entries the fragments use. Pass it back as `deliveredInitKey` once `init` is appended. */
+  initKey?: string;
   /** The segment's fragments (`moof` + `mdat` per carried codec, in codec order). */
   data: Uint8Array;
   /** What was written, by codec family (`avc1`, `mp4a`). */
@@ -50,9 +55,8 @@ function concat(parts: Uint8Array[]): Uint8Array {
 /** A transmuxer for one SourceBuffer's stream of segments, carrying the given codecs. */
 export function createTransmuxer(codecs: readonly TransmuxCodec[]): Transmux {
   let sequenceNumber = 0;
-  let lastInitKey: string | undefined;
 
-  return (segment, { codecs: carried = codecs, ...options } = {}) => {
+  return (segment, { codecs: carried = codecs, deliveredInitKey, ...options } = {}) => {
     const streams = demuxTransportStream(segment, new Set(carried.map((codec) => codec.streamType)));
     const tracks: TrackConfig[] = [];
     const fragments: Uint8Array[] = [];
@@ -75,9 +79,10 @@ export function createTransmuxer(codecs: readonly TransmuxCodec[]): Transmux {
     // rendition, as a native fMP4 switch would append.
     const initKey = tracks.map((track) => `${track.id}:${track.sampleEntry.join()}`).join('|');
 
-    if (tracks.length && initKey !== lastInitKey) {
-      result.init = buildInitSegment(tracks);
-      lastInitKey = initKey;
+    if (tracks.length) {
+      result.initKey = initKey;
+
+      if (initKey !== deliveredInitKey) result.init = buildInitSegment(tracks);
     }
 
     result.data = concat(fragments);

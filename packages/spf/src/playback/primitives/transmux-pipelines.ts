@@ -32,6 +32,7 @@ import {
   dispatchStep,
   type FetchBytes,
   fetchStep,
+  type Frame,
   type LoadStep,
   type MessagePipelines,
   type StepDeps,
@@ -113,7 +114,7 @@ export interface TransmuxPipelineOptions {
 /**
  * Transmux pipelines for one track type — the TS analog of `relocationPipelinesFor`, carrying `codecs` (the first is
  * the type's own: the one whose track relocation keys on). One transmuxer per actor (built inside the per-actor
- * factory), so fragment numbering and the init-segment memory reset with the source. The relocation stamp reads
+ * factory), so fragment numbering and the delivered-init memory reset with the source. The relocation stamp reads
  * `deriveStartMediaTime` from the composition config, as in the relocation pipelines.
  */
 export function transmuxPipelinesFor(
@@ -165,6 +166,10 @@ export function transmuxPipelinesFor(
 
   return () => {
     const transmux = createTransmuxer(codecs);
+    // The init the SourceBuffer last received, recorded only after the append carrying it completes. A load aborted
+    // between the transmux and that append never delivered its init, so the next segment must carry it again.
+    let deliveredInitKey: string | undefined;
+    const pendingInitKeys = new WeakMap<Frame, string>();
 
     /** Init step: nothing to fetch for a TS rendition; a real init URL takes the fMP4 path. */
     const fetchInit: LoadStep = async (frame, signal, deps) => {
@@ -197,7 +202,7 @@ export function transmuxPipelinesFor(
         return;
       }
 
-      const result = transmux(bytes, transmuxOptionsFor(codecs, deps, op.meta.trackId));
+      const result = transmux(bytes, { ...transmuxOptionsFor(codecs, deps, op.meta.trackId), deliveredInitKey });
       const own = result.tracks[ownFamily];
       const slot = transmuxState(deps).mediaContainerData;
 
@@ -209,13 +214,22 @@ export function transmuxPipelinesFor(
         }));
       }
 
+      if (result.init && result.initKey !== undefined) pendingInitKeys.set(frame, result.initKey);
+
       frame.data = result.init ? streamOf(result.init, result.data) : streamOf(result.data);
+    };
+
+    /** After the append: the init this frame carried has reached the SourceBuffer. The runner skips it on abort. */
+    const confirmInit: LoadStep = (frame) => {
+      const key = pendingInitKeys.get(frame);
+
+      if (key !== undefined) deliveredInitKey = key;
     };
 
     return {
       remove: [dispatchStep],
       'append-init': [fetchInit, dispatchStep],
-      'append-segment': [fetchSegment, transmuxStep, readSegmentOrigin, stampStartMediaTime, dispatchStep],
+      'append-segment': [fetchSegment, transmuxStep, readSegmentOrigin, stampStartMediaTime, dispatchStep, confirmInit],
     };
   };
 }
