@@ -182,6 +182,7 @@ internal class PlayerEngine(
             // A media element stays paused once it ends, so seeking back
             // doesn't resume; ExoPlayer would, with `playWhenReady` still set.
             Player.STATE_ENDED -> {
+              settleSeek()
               exo.pause()
               updateForSource { it.copy(ended = true) }
               emit(PlayerEventType.ENDED)
