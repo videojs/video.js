@@ -81,7 +81,7 @@ Set size, position, and transforms on the decorative wrapper so the poster and v
 - Use a source the browser can play directly, such as MP4 or WebM.
 - Safari can play HLS URLs directly. Other browsers cannot do so reliably, so use an HLS variation below when the same `.m3u8` URL must work across browsers.
 - `<background-video>` does not create a poster or report analytics. Keep the poster in your page and add analytics only when you need them.
-- Provide a way to pause or hide persistent background motion. The example includes that control and follows `prefers-reduced-motion`. For the streaming variations below, stop and restart motion by adding and removing the element.
+- Provide a way to pause or hide persistent background motion. The example includes that control and follows `prefers-reduced-motion`. The streaming variations below pause and play through the same `target` property.
 - If the video communicates information, remove `aria-hidden`, give it an accessible name and controls, and use a regular video player.
 </FrameworkCase>
 
@@ -103,14 +103,12 @@ Choose a variation based on the source you already have:
 | The same background-only player for a Mux HLS URL | <DocsLink slug="reference/components/mux-background-video">`<mux-background-video>`</DocsLink> |
 </FrameworkCase>
 
-These streaming background components always autoplay. They ignore `autoPlay={false}` and `noautoplay`.
-
 <FrameworkCase frameworks={["react"]}>
-Keep the poster and motion button from the primary example. Render the streaming component only while `motionEnabled` is true, and remove the native video's `play()`/`pause()` effect. Unmounting the component stops playback; mounting it again restarts the stream.
+The primary example works unchanged with the streaming components: replace `BackgroundVideo` with `HlsBackgroundVideo` or `MuxBackgroundVideo` and keep `autoPlay={false}`. Their `ref` is the native video, so the `play()`/`pause()` effect works as before. Pausing keeps the stream and its position, so motion resumes where it stopped. To stop network activity as well, unmount the component instead.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Keep the poster and motion button from the primary example. Change `setMotion` to create and append a streaming element only when motion is enabled, and remove it when motion is disabled. Do not set `keep-alive`: removal must destroy playback. Create a new element each time motion is enabled; do not reuse the removed one. These elements expose the inner video as `video`, rather than the native background element's `target`.
+The primary example works unchanged with the streaming elements: replace `<background-video>` with `<hls-background-video>` or `<mux-background-video>`, keep `noautoplay`, and update the selector in the script. Like `<background-video>`, they expose the native video as `target` for `play()` and `pause()`. Pausing keeps the stream and its position, so motion resumes where it stopped. To stop network activity as well, remove the element instead. Without `keep-alive`, removal releases the engine.
 </FrameworkCase>
 
 ### Play an HLS video

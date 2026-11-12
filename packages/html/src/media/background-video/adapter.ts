@@ -1,42 +1,15 @@
 import type { Media } from '@videojs/media/dom';
-import { namedNodeMapToObject } from '@videojs/utils/dom';
 
-import { MediaAttachMixin } from '../../store/media-attach-mixin';
-import { getTemplateHTML } from './template';
-
-const HTMLElementBase = globalThis.HTMLElement ?? class {};
+import { BackgroundVideoBase } from './base';
 
 // Don't extend CustomMediaMixin to save some bytes, background videos don't need the full Media API.
-export class BackgroundVideo extends MediaAttachMixin(HTMLElementBase) {
-  static shadowRootOptions = { mode: 'open' as ShadowRootMode };
-  static getTemplateHTML = getTemplateHTML;
-  static get observedAttributes() {
-    return ['src'];
-  }
-
+export class BackgroundVideo extends BackgroundVideoBase {
   constructor() {
     super();
 
-    if (!this.shadowRoot) {
-      this.attachShadow((this.constructor as typeof BackgroundVideo).shadowRootOptions);
-
-      const attrs = {
-        ...namedNodeMapToObject(this.attributes),
-        ...(!this.hasAttribute('nomuted') && { muted: '' }),
-        ...(!this.hasAttribute('noloop') && { loop: '' }),
-        ...(!this.hasAttribute('noautoplay') && { autoplay: '' }),
-        playsinline: '',
-        disableremoteplayback: '',
-        disablepictureinpicture: '',
-      };
-
-      this.shadowRoot!.innerHTML = getTemplateHTML(attrs);
-    }
-
-    // Neither Chrome or Firefox support setting the muted attribute
-    // after using document.createElement.
-    // Get around this by setting the muted property manually.
-    this.target!.muted = !this.hasAttribute('nomuted');
+    // `error` doesn't cross the shadow boundary, so re-fire it from the host,
+    // matching `<hls-background-video>`.
+    this.target?.addEventListener('error', () => this.dispatchEvent(new Event('error')));
   }
 
   // Register the inner <video> (not `this`) with the provider.
@@ -44,18 +17,19 @@ export class BackgroundVideo extends MediaAttachMixin(HTMLElementBase) {
     return this.target;
   }
 
-  attributeChangedCallback(attrName: string, oldValue: string | null, newValue: string | null): void {
-    if (attrName === 'src' && oldValue !== newValue) {
-      this.target!.src = newValue ?? '';
-    }
+  /** URL of a video the browser can play directly. Assigning a new one restarts playback. */
+  override get src(): string {
+    return this.target?.src ?? '';
   }
 
-  get target(): HTMLVideoElement | null {
-    const slotted = this.querySelector(':scope > [slot=media]');
-    if (slotted instanceof HTMLVideoElement) return slotted;
+  override set src(value: string) {
+    const target = this.target;
 
-    const video = this.querySelector('video') ?? this.shadowRoot?.querySelector('video');
+    if (target) target.src = value;
+  }
 
-    return video instanceof HTMLVideoElement ? video : null;
+  /** The inner video's `MediaError`, or `null`. */
+  get error(): MediaError | null {
+    return this.target?.error ?? null;
   }
 }

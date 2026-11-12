@@ -4,7 +4,7 @@ import {
   HlsBackgroundVideoAdapter,
   type HlsBackgroundVideoAdapterProps,
 } from '@videojs/spf/adapters/hls-background-video';
-import { forwardRef, useEffect, useRef, type VideoHTMLAttributes } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
 import { useComposedRefs } from '../../utils/use-composed-refs';
@@ -39,15 +39,30 @@ export interface HlsBackgroundVideoProps
  * failed source receives it. Which condition it was is on the console and `engine.state.errors`; the handler gets "this
  * source won't play", which is the decision a background video actually has to make.
  *
+ * `loop={false}` and `autoPlay={false}` opt out as `noloop` / `noautoplay` do on `<hls-background-video>`, so a page
+ * can play the video once, or hold it until it has checked the motion preference. Muted is fixed: the engine drops
+ * audio.
+ *
  * `MuxBackgroundVideo` is this same component under the name the package it replaces used — an alias, not a variant.
  */
 export const HlsBackgroundVideo = forwardRef<HTMLVideoElement, HlsBackgroundVideoProps>(function HlsBackgroundVideo(
-  { children, fallback = videoFallback, mediaRef, ...props },
+  { children, fallback = videoFallback, mediaRef, loop = true, autoPlay = true, ...props },
   ref
 ) {
   const media = useMediaInstance(HlsBackgroundVideoAdapter);
   const videoRef = useRef<HTMLVideoElement>(null);
   const attachRef = useAttachMedia(media);
+
+  // Attaching fixes loop and autoplay on, so the opt-outs are reapplied after it. Declared after `useAttachMedia` so this
+  // also runs after any re-attach from its layout effect.
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.loop = loop;
+    video.autoplay = autoPlay;
+  });
+
   const exposeRef = useMediaRef(media, mediaRef);
   const composedRef = useComposedRefs(attachRef, exposeRef, videoRef, ref);
   const htmlProps = useSyncProps(media, props, HlsBackgroundVideoAdapter.defaultProps);
@@ -65,20 +80,20 @@ export const HlsBackgroundVideo = forwardRef<HTMLVideoElement, HlsBackgroundVide
 
   return (
     // The same set `<hls-background-video>` forces onto its inner video, so the
-    // two platforms present the same surface: silent looping playback with no
-    // affordance a UA could hang chrome on — AirPlay, Cast, and picture-in-picture
-    // all being things a background video has nowhere to put.
+    // two platforms present the same surface: silent playback with no affordance
+    // a UA could hang chrome on — AirPlay, Cast, and picture-in-picture all being
+    // things a background video has nowhere to put.
     //
     // Applied after the spread rather than before it, unlike the generic
     // `BackgroundVideo`: they're what the component is for, and attaching the
-    // Media re-applies its own anyway, so honoring `muted={false}` would only
-    // look like it worked.
+    // Media re-applies `muted` anyway, so honoring `muted={false}` would only
+    // look like it worked. `loop` and `autoPlay` are the two opt-outs.
     <video
       {...htmlProps}
       ref={composedRef}
       muted
-      autoPlay
-      loop
+      autoPlay={autoPlay}
+      loop={loop}
       playsInline
       disableRemotePlayback
       disablePictureInPicture

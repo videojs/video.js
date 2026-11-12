@@ -1,0 +1,46 @@
+---
+title: useTextCues
+description: Hook that returns every cue on the text tracks a filter or track definition matches
+---
+
+import UtilReference from "@/components/docs/api-reference/UtilReference.astro";
+import DocsLink from "@/components/docs/DocsLink.astro";
+
+## Import
+
+```tsx
+import { useTextCues } from '@videojs/react';
+```
+
+`useTextCues` returns every cue on the tracks a filter or <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> matches, from the media and the app alike, and re-renders when those cues change. Cues from several tracks are merged in time order. Read through a definition, cues are typed by it, and with a schema, cues whose value fails it are skipped.
+
+While the component is mounted, the hook asks the <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> to read the tracks it matches, so it also reads tracks the feature skips by default, such as captions. An inline object filter is compared by its `kind`, `label`, and `language`; keep a function filter's identity across renders. It returns an empty list when the player has no text cues feature.
+
+```tsx title="Transcript.tsx"
+import { useActiveTextCues, useTextCues } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
+
+const captions = { kind: 'captions', language: 'en' } as const;
+
+function Transcript() {
+  const store = usePlayer();
+  const cues = useTextCues(captions);
+  const [active] = useActiveTextCues(captions);
+
+  return (
+    <ol className="transcript">
+      {cues.map((cue) => (
+        <li key={cue.id} aria-current={cue.id === active?.id}>
+          <button type="button" onClick={() => store.seek(cue.startTime)}>
+            {cue.text}
+          </button>
+        </li>
+      ))}
+    </ol>
+  );
+}
+```
+
+The browser loads a media track's cues only while the track is `showing` or `hidden`, so a transcript of a `<track>` stays empty while its captions are off. A captions track the app adds with <DocsLink slug="reference/api/use-create-text-track">`useCreateTextTrack`</DocsLink> always has its cues.
+
+<UtilReference util="useTextCues" />
