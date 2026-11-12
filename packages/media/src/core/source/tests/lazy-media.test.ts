@@ -4,6 +4,7 @@ import type { AdapterType } from '../adapter-type';
 import {
   applyPreferPlayback,
   findLazyMedia,
+  type LazyMediaSource,
   type LazySource,
   matchAdapterType,
   matchHls,
@@ -86,6 +87,30 @@ describe('resolveLazySource', () => {
     expect(resolveLazySource(' ', { nativeHls: 'unsupported' })).toBeNull();
   });
 
+  it('resolves a structured source in place of the plain one', () => {
+    const structured = { src: 'https://cdn.example.com/signed/abc', type: 'application/x-mpegurl' };
+    const source = resolveLazySource('/ignored.mp4', {
+      type: 'video/mp4',
+      nativeHls: 'unsupported',
+      source: structured,
+    })!;
+
+    expect(source.src).toBe('https://cdn.example.com/signed/abc');
+    expect(source.type).toBe('application/x-mpegurl');
+    expect(source.adapterType).toBe('hls');
+    expect(source.source).toBe(structured);
+  });
+
+  it('resolves a structured source by the id of the media that plays it', () => {
+    const resolve = (source: LazyMediaSource) =>
+      resolveLazySource('', { nativeHls: 'unsupported', source })?.adapterType;
+
+    expect(resolve({ playbackId: 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M' })).toBe('mux');
+    expect(resolve({ playbackId: 'abc', src: 'https://example.com/a.mp4' })).toBe('mux');
+    expect(resolve({ mediaId: 'e4a27b971d' })).toBe('wistia');
+    expect(resolve({ poster: '/poster.jpg' })).toBeUndefined();
+  });
+
   it('plays HLS natively by default only where that is the preferred path', () => {
     expect(playbackOf('preferred')).toBe('native');
     expect(playbackOf('supported')).toBe('mse');
@@ -116,6 +141,7 @@ describe('findLazyMedia', () => {
     url: null,
     adapterType,
     playback,
+    source: null,
   });
 
   it('picks the first media that plays the source', () => {

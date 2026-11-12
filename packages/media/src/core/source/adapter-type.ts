@@ -1,3 +1,5 @@
+import { isString } from '@videojs/utils/predicate';
+
 import { parseCloudflareSource } from './cloudflare';
 import { parseDailymotionSource } from './dailymotion';
 import { parseMixcloudSource } from './mixcloud';
@@ -132,6 +134,21 @@ export function matchServiceHost({ hostname, pathname, searchParams }: URL): Ser
 }
 
 /**
+ * Match a structured source to the service whose media plays it by an id alone, such as a Mux `playbackId`, without a
+ * URL. An empty id doesn't count.
+ *
+ * @internal
+ */
+export function matchServiceId(source: Readonly<Record<string, unknown>>): HostedServiceType | null {
+  for (const [service, field] of SERVICE_ID_FIELDS) {
+    const id = source[field];
+    if (isString(id) && id) return service;
+  }
+
+  return null;
+}
+
+/**
  * Map a MIME type to the adapter type that plays it: `hls`, `dash`, `video`, or `audio`. Parameters such as `codecs`
  * are ignored.
  *
@@ -185,6 +202,13 @@ const SERVICE_HOSTS = {
   twitch: /^((www|go|player)\.)?twitch\.tv\//,
   dailymotion: /^((www|geo)\.)?dailymotion\.com\/|^dai\.ly\//,
 } satisfies Record<HostedServiceType, RegExp>;
+
+// The field of a structured `source` that names the media by an id alone, in order of precedence. Each mirrors the
+// adapter's own source type, which this package can't import: `MuxSourceBase` and `WistiaSource`.
+const SERVICE_ID_FIELDS: ReadonlyArray<readonly [HostedServiceType, string]> = [
+  ['mux', 'playbackId'],
+  ['wistia', 'mediaId'],
+];
 
 const HLS_TYPE = /^(application|audio)\/(vnd\.apple\.|x-)?mpegurl$/;
 const DASH_TYPE = 'application/dash+xml';

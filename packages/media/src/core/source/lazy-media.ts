@@ -2,14 +2,27 @@ import {
   type AdapterType,
   adapterTypeForMimeType,
   matchServiceHost,
+  matchServiceId,
   parseSourceUrl,
   resolveMimeType,
   SPOTIFY_URI,
 } from './adapter-type';
 
+/**
+ * A structured source for lazy media, as the media it renders takes on its `source`: a URL in `src`, or an id a media
+ * plays without one, such as a Mux `playbackId` or a Wistia `mediaId`. Every field is passed on as it is.
+ */
+export interface LazyMediaSource {
+  /** Source URL. */
+  src?: string | undefined;
+  /** MIME type of the source. Takes precedence over the file extension of `src`. */
+  type?: string | undefined;
+  [key: string]: unknown;
+}
+
 /** A source as lazy media sees it, worked out once so each media's `match` stays cheap. */
 export interface LazySource {
-  /** The trimmed source URL. */
+  /** The trimmed source URL; empty for a structured source that names its media by id. */
   src: string;
   /** The MIME type the source was given, if any. */
   type: string | undefined;
@@ -22,6 +35,8 @@ export interface LazySource {
   adapterType: AdapterType | null;
   /** How HLS should play here, or `undefined` while that isn't known, such as during server rendering. */
   playback: 'native' | 'mse' | undefined;
+  /** The structured source it was resolved from, if any, for media that match on more than the URL. */
+  source: Readonly<LazyMediaSource> | null;
 }
 
 /** A media lazy media can render, by the sources it plays. */
@@ -52,6 +67,11 @@ export interface ResolveLazySourceOptions {
   preferPlayback?: 'native' | 'mse' | undefined;
   /** `undefined` while it isn't known, such as during server rendering. */
   nativeHls: NativeHlsSupport | undefined;
+  /**
+   * A structured source. When given, it is the source: its `src` and `type` are resolved in place of the plain ones,
+   * and an id such as `playbackId` resolves without a URL.
+   */
+  source?: Readonly<LazyMediaSource> | null | undefined;
 }
 
 /**
@@ -60,24 +80,30 @@ export interface ResolveLazySourceOptions {
  * @internal
  */
 export function resolveLazySource(src: string, options: ResolveLazySourceOptions): LazySource | null {
-  const source = src.trim();
-  if (!source) return null;
+  const structured = options.source ?? null;
+  const source = (structured ? (structured.src ?? '') : src).trim();
+  const type = structured ? structured.type : options.type;
+  const idType = structured && matchServiceId(structured);
+  if (!source && !idType) return null;
 
-  const url = parseSourceUrl(source);
-  const service = matchService(source, url);
+  const url = source ? parseSourceUrl(source) : null;
+  const service = source ? matchService(source, url) : null;
   const mimeType = resolveMimeType(source);
 
   return {
     src: source,
-    type: options.type,
+    type,
     url,
     adapterType:
+      // An id names the media that plays it, the way a Mux stream derives its URL from `playbackId`.
+      idType ??
       // A media file on a service host plays as that file; Mux and Cloudflare streams are manifests, and a player.js
       // marker is explicit.
       (!mimeType || service === 'mux' || service === 'cloudflare' || service === 'playerjs' ? service : null) ??
-      adapterTypeForMimeType(options.type) ??
+      adapterTypeForMimeType(type) ??
       adapterTypeForMimeType(mimeType),
     playback: resolvePlayback(options),
+    source: structured,
   };
 }
 
