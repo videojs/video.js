@@ -53,7 +53,7 @@ export const BOARD = {
   /** The chrome rails along each side, in lanes. */
   rail: 0.1,
   railGlow: 'rgb(255 110 30 / 0.45)',
-};
+} as const;
 
 /**
  * Fret wires scroll by on the beat. "Total Breakdown" holds 105 BPM from its first beat, and the media hands the
@@ -97,7 +97,7 @@ export const FOG = {
   /** How far into the look-ahead the fog reaches, as a share of it. */
   reach: 0.55,
   haze: 'rgb(255 110 50 / 0.1)',
-};
+} as const;
 
 /** Embers drifting up out of the dark either side of the highway. */
 export const EMBERS = {
@@ -109,4 +109,4 @@ export const EMBERS = {
   core: '#fff1c4',
   hot: 'rgb(255 140 30 / 0.85)',
   cool: 'rgb(255 50 0 / 0)',
-};
+} as const;

@@ -213,6 +213,11 @@ body {
   animation: burst 0.35s ease-out forwards;
 }
 
+/* Star Power burns blue. */
+.screen:has(.hud[data-star-power]) .flash[data-kind="hit"]::before {
+  filter: blur(0.3cqh) hue-rotate(175deg) saturate(1.4) brightness(1.15);
+}
+
 /* A miss: a red crack around the target and a puff of smoke. */
 .flash[data-kind="miss"]::after {
   inset: 0;
@@ -838,11 +843,11 @@ body {
 
 /* No flames, shakes, or flicker: hits and banners just fade. */
 @media (prefers-reduced-motion: reduce) {
-  .flash::before {
+  .flash[data-kind]::before {
     display: none;
   }
 
-  .flash::after {
+  .flash[data-kind]::after {
     animation-name: fade;
   }
 
