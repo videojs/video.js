@@ -6,6 +6,7 @@ import android.util.Base64
 import android.os.Looper
 import android.view.SurfaceView
 import androidx.annotation.MainThread
+import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -13,6 +14,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 
 /** Mirrors `PlayerEvent['type']` in `src/media/NativeEngineStore.ts`. */
@@ -87,21 +89,21 @@ private const val TICK_INTERVAL_MS = 250L
  * HTMLMediaElement-shaped state each event marks a transition of and emits only
  * on change.
  *
- * The exception is the [PlayerState] snapshot, which is the only copy of the
- * state the getters report. One lock guards it, and every change replaces it
- * with an edited `copy()` without giving the lock up in between. Two kinds of
- * writer share it:
+ * The element-shaped state lives in [PlayerState], which can be updated from either ExoPlayer
+ * events or commands from JS:
  * - Commands write what they mean, on the calling thread, before posting the
  *   player work to the main thread, so a getter called right after one
  *   reflects it as a media element's would.
  * - The engine writes what the player reports, on the main thread, before
- *   emitting the event that announces it, so a getter called while handling an
- *   event sees state at least that new.
+ *   emitting the event that announces it, so a getter called from JS will see the reported state
+ *   (or newer, if more commands have been issued)
  *
- * Where the two disagree, the engine's write defers to the snapshot: it leaves
- * `currentTime` alone while a seek is pending, and writes per-source values
- * only while `currentSrc` is still the source it's playing.
+ * Externally, the state in [PlayerState] "wins," as the engine is controlled from the JS side.
+ * ExoPlayer state updates defer to the [PlayerState] where necessary. eg, `currentTime` is read
+ * from [PlayerState] while a seek is in progress to keep the valie stable, and source-related
+ * values in PlayerState are only updated as long as the player's source matches `currentSrc`
  */
+@OptIn(UnstableApi::class)
 internal class PlayerEngine(
   context: Context,
   source: String?,
@@ -139,14 +141,12 @@ internal class PlayerEngine(
   private var released = false
 
   private val tick =
-    object : Runnable {
-      override fun run() {
-        if (exo.isPlaying) emitTimeUpdate()
-        syncBufferedPosition()
+    Runnable {
+      if (exo.isPlaying) emitTimeUpdate()
+      syncBufferedPosition()
 
-        ticking = false
-        syncTicker()
-      }
+      ticking = false
+      syncTicker()
     }
 
   init {
@@ -209,7 +209,7 @@ internal class PlayerEngine(
           if (playbackParameters.speed == playbackSpeed) return
 
           playbackSpeed = playbackParameters.speed
-          update { it.copy(playbackRate = playbackSpeed.toDouble()) }
+          updatePlayerState { it.copy(playbackRate = playbackSpeed.toDouble()) }
           emit(PlayerEventType.RATECHANGE)
         }
 
@@ -237,18 +237,18 @@ internal class PlayerEngine(
   // A new source starts from a media element's initial state; only `paused`
   // and `playbackRate` belong to the element rather than the source.
   fun setSource(source: String) {
-    update { PlayerState(currentSrc = source, paused = it.paused, playbackRate = it.playbackRate) }
+    updatePlayerState { PlayerState(currentSrc = source, paused = it.paused, playbackRate = it.playbackRate) }
     onMain { setSourceInternal(source) }
   }
 
   fun load() {
-    update { if (it.currentSrc.isEmpty()) it else PlayerState(currentSrc = it.currentSrc, paused = it.paused, playbackRate = it.playbackRate) }
+    updatePlayerState { if (it.currentSrc.isEmpty()) it else PlayerState(currentSrc = it.currentSrc, paused = it.paused, playbackRate = it.playbackRate) }
     onMain { source?.let(::setSourceInternal) }
   }
 
   // Playing after the end restarts from the beginning, which is a seek.
   fun play() {
-    update { if (it.ended) it.copy(paused = false, ended = false, currentTime = 0.0, seeking = true) else it.copy(paused = false) }
+    updatePlayerState { if (it.ended) it.copy(paused = false, ended = false, currentTime = 0.0, seeking = true) else it.copy(paused = false) }
     onMain {
       if (exo.playbackState == Player.STATE_ENDED) seekTo(0.0)
       exo.play()
@@ -256,14 +256,14 @@ internal class PlayerEngine(
   }
 
   fun pause() {
-    update { it.copy(paused = true) }
+    updatePlayerState { it.copy(paused = true) }
     onMain { exo.pause() }
   }
 
   fun setCurrentTime(seconds: Double) {
     val target = seconds.coerceAtLeast(0.0)
 
-    update { if (it.currentSrc.isEmpty()) it else it.copy(currentTime = target, seeking = true, ended = false) }
+    updatePlayerState { if (it.currentSrc.isEmpty()) it else it.copy(currentTime = target, seeking = true, ended = false) }
     onMain { if (exo.mediaItemCount > 0) seekTo(target) }
   }
 
@@ -310,7 +310,7 @@ internal class PlayerEngine(
   fun release() {
     released = true
 
-    update { PlayerState() }
+    updatePlayerState { PlayerState() }
     mainHandler.removeCallbacks(tick)
     surfaces.clear()
     exo.release()
@@ -402,7 +402,7 @@ internal class PlayerEngine(
 
     // A media element reports the position it stopped at before `pause`.
     if (paused) emitTimeUpdate()
-    update { it.copy(paused = paused) }
+    updatePlayerState { it.copy(paused = paused) }
     emit(if (paused) PlayerEventType.PAUSE else PlayerEventType.PLAY)
   }
 
@@ -505,7 +505,7 @@ internal class PlayerEngine(
   }
 
   /** Any thread. Returns the snapshot it left in place. */
-  private fun update(transform: (PlayerState) -> PlayerState): PlayerState =
+  private fun updatePlayerState(transform: (PlayerState) -> PlayerState): PlayerState =
     synchronized(stateLock) {
       state = transform(state)
       state
@@ -515,7 +515,7 @@ internal class PlayerEngine(
   // has moved `currentSrc` on, they would only leak the old source into the
   // new one's state.
   private fun updateForSource(transform: (PlayerState) -> PlayerState): PlayerState =
-    update { if (it.currentSrc == (source ?: "")) transform(it) else it }
+    updatePlayerState { if (it.currentSrc == (source ?: "")) transform(it) else it }
 }
 
 // Error codes are grouped by thousand. The miscellaneous group (timeouts,
