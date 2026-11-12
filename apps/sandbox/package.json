@@ -7,6 +7,7 @@
     "dev:https": "vp dev --host --config vite.config.https.ts",
     "preview": "vp preview",
     "reset": "tsx scripts/reset.ts",
+    "song": "tsx templates/guitar-hero/scripts/fetch-song.ts",
     "sync": "tsx scripts/sync.ts",
     "test": "vp test run"
   },
