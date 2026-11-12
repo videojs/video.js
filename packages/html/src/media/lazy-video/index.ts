@@ -16,7 +16,7 @@ import { youtubeVideo } from '../lazy/youtube-video';
  * Plays a video from any supported source by rendering the media element for it, and loads only that element's code
  * once the source is known.
  *
- * Resolves files to a native `<video>`, HLS to `<native-hls-video>` on Safari and `<hlsjs-video>` elsewhere, DASH to
+ * Resolves files to a native `<video>`, HLS to `<hlsjs-video>`, or `<native-hls-video>` without MSE, DASH to
  * `<dash-video>`, Mux to `<mux-video>`, YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to their
  * embed elements, and embeds marked with a `playerjs` query parameter to `<playerjs-video>`. Other attributes are
  * passed to the resolved element, so switching to it directly only changes the tag name. Use `createLazyVideoElement`

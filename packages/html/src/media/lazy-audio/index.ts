@@ -10,7 +10,7 @@ import { spotifyAudio } from '../lazy/spotify-audio';
  * Plays audio from any supported source by rendering the media element for it, and loads only that element's code once
  * the source is known.
  *
- * Resolves files to a native `<audio>`, HLS to a native `<audio>` on Safari and `<hls-audio>` elsewhere, Mux sources to
+ * Resolves files to a native `<audio>`, HLS to `<hls-audio>`, or a native `<audio>` without MSE, Mux sources to
  * `<mux-audio>`, Spotify sources to `<spotify-audio>`, SoundCloud sources to `<soundcloud-audio>`, and Mixcloud sources
  * to `<mixcloud-audio>`. Other attributes are passed to the resolved element, so switching to it directly only changes
  * the tag name. Use `createLazyAudioElement` to add your own media or leave some out.

@@ -48,13 +48,12 @@ describe('LazyVideo', () => {
     expect(container.querySelector('[type], [preferplayback]')).toBeNull();
   });
 
-  it('loads native HLS on Safari', async () => {
+  it('loads native HLS where there is no MSE', async () => {
     vi.resetModules();
     vi.spyOn(HTMLMediaElement.prototype, 'canPlayType').mockReturnValue('maybe');
-    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
-    );
-    vi.stubGlobal('MediaSource', class {});
+    vi.stubGlobal('MediaSource', undefined);
+    vi.stubGlobal('ManagedMediaSource', undefined);
+    vi.stubGlobal('WebKitMediaSource', undefined);
     const { LazyVideo: FreshLazyVideo } = await import('../lazy-video');
     const { NativeHlsAdapter: FreshNativeHlsAdapter } = await import('@videojs/native-hls-video');
     const attach = vi.spyOn(FreshNativeHlsAdapter.prototype, 'attach');
@@ -63,6 +62,22 @@ describe('LazyVideo', () => {
 
     await waitFor(() => expect(attach).toHaveBeenCalled(), LOAD_TIMEOUT);
     expect(FreshNativeHlsAdapter).not.toBe(NativeHlsAdapter);
+  });
+
+  it('loads hls.js for HLS on Safari, where there is MSE', async () => {
+    vi.resetModules();
+    vi.spyOn(HTMLMediaElement.prototype, 'canPlayType').mockReturnValue('maybe');
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
+    );
+    vi.stubGlobal('MediaSource', class {});
+    const { LazyVideo: FreshLazyVideo } = await import('../lazy-video');
+    const { HlsJsAdapter: FreshHlsJsAdapter } = await import('@videojs/hlsjs-video');
+    const attach = vi.spyOn(FreshHlsJsAdapter.prototype, 'attach');
+
+    render(<FreshLazyVideo src={HLS} />);
+
+    await waitFor(() => expect(attach).toHaveBeenCalled(), LOAD_TIMEOUT);
   });
 
   it('hands mediaRef the media the player uses, across a swap and unmount', async () => {

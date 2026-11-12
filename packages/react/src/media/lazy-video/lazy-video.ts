@@ -20,11 +20,11 @@ export type { LazyMediaProps, LazyVideoProps } from '../lazy/create';
  * Plays a video from any supported source by rendering the media component for it, and loads only that component's code
  * once the source is known.
  *
- * Resolves files to a native `<video>`, HLS to `NativeHlsVideo` on Safari and `HlsJsVideo` elsewhere, DASH to
- * `DashVideo`, Mux to `MuxVideo`, YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to their embed
- * media, and embeds marked with a `playerjs` query parameter to `PlayerJsVideo`. Renders nothing for a source it can't
- * resolve. Props are passed to the resolved media, so switching to that component directly only changes the import. Use
- * `createLazyVideo` to add your own media or leave some out.
+ * Resolves files to a native `<video>`, HLS to `HlsJsVideo`, or `NativeHlsVideo` without MSE, DASH to `DashVideo`, Mux
+ * to `MuxVideo`, YouTube, Vimeo, Wistia, Cloudflare Stream, TikTok, and Twitch sources to their embed media, and embeds
+ * marked with a `playerjs` query parameter to `PlayerJsVideo`. Renders nothing for a source it can't resolve. Props are
+ * passed to the resolved media, so switching to that component directly only changes the import. Use `createLazyVideo`
+ * to add your own media or leave some out.
  *
  * @experimental
  */

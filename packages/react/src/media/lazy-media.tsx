@@ -53,7 +53,7 @@ export interface LazyMediaProps extends MediaRefProps<Media> {
   source?: LazyMediaSource | null | undefined;
   /**
    * Playback path for HLS: `'native'` uses the browser's own HLS support wherever it has one, and `'mse'` always loads
-   * an engine. Unset, HLS plays natively on Safari and wherever there's no MSE, and through an engine elsewhere. Also
+   * an engine. Unset, HLS plays through an engine wherever there's MSE, and natively only where there's none. Also
    * passed on to the hls.js and Mux media, on their `source`.
    */
   preferPlayback?: 'native' | 'mse' | undefined;

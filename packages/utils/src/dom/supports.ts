@@ -21,10 +21,9 @@ export function supportsPopoverAPI(): boolean {
 /**
  * How the browser plays HLS without an engine:
  *
- * - `'preferred'`: natively by default, matching Mux's playback-core. That's Safari, and anywhere that plays HLS natively
- *   but has no MSE.
- * - `'supported'`: it can, but an MSE engine plays better. Chromium and Android browsers report native HLS with fewer
- *   features than an engine.
+ * - `'preferred'`: natively by default, because there's no MSE for an engine to play through, as on iOS before 17.1.
+ * - `'supported'`: it can, but an MSE engine plays by default, with more features and the same behavior everywhere.
+ *   That's every browser with MSE, Safari included.
  * - `'unsupported'`: it can't, which is also the answer without a DOM.
  *
  * @internal
@@ -34,9 +33,7 @@ export function nativeHlsSupport(): 'preferred' | 'supported' | 'unsupported' {
 
   if (!document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) return 'unsupported';
 
-  if (!supportsMediaSource()) return 'preferred';
-
-  return SAFARI_USER_AGENT.test(navigator.userAgent) ? 'preferred' : 'supported';
+  return supportsMediaSource() ? 'supported' : 'preferred';
 }
 
 /**
@@ -49,10 +46,6 @@ export function supportsMediaSource(): boolean {
 
   return !!(scope.MediaSource ?? scope.ManagedMediaSource ?? scope.WebKitMediaSource);
 }
-
-// Safari, including the iOS browsers built on it, whose user agents say `CriOS` or `FxiOS` rather than `Chrome`. Android
-// browsers are excluded: their user agents also say `Safari`, and every Chromium one says `Chrome`.
-const SAFARI_USER_AGENT = /^((?!chrome|android).)*safari/i;
 
 /**
  * Whether `new CSSStyleSheet()` works. Safari exposed the interface long before 16.4 made it constructable, and

@@ -51,20 +51,11 @@ describe('supports', () => {
       vi.unstubAllGlobals();
     });
 
-    it('prefers native HLS on Safari, including the iOS browsers built on it', () => {
-      stub({ userAgent: SAFARI });
-      expect(nativeHlsSupport()).toBe('preferred');
-
-      stub({ userAgent: IOS_CHROME });
-      expect(nativeHlsSupport()).toBe('preferred');
-    });
-
-    it('only supports native HLS where Chromium also reports it', () => {
-      stub({ userAgent: CHROME });
-      expect(nativeHlsSupport()).toBe('supported');
-
-      stub({ userAgent: ANDROID_CHROME });
-      expect(nativeHlsSupport()).toBe('supported');
+    it('leaves native HLS to MSE wherever there is MSE, Safari included', () => {
+      for (const userAgent of [SAFARI, IOS_CHROME, CHROME, ANDROID_CHROME]) {
+        stub({ userAgent });
+        expect(nativeHlsSupport()).toBe('supported');
+      }
     });
 
     it('prefers native HLS wherever there is no MSE to fall back on', () => {
