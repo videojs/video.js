@@ -90,6 +90,22 @@ Until the media loads, nothing is rendered in its place, so give the player an a
 
 Set `type` to the source's MIME type when its URL has no file extension, such as a signed URL. `type` only chooses the media; it isn't passed on.
 
+Set `source` instead of `src` to give the media its structured source, with options beyond the URL. Its `src` and `type` choose the media as `src` and `type` do, and a Mux `playbackId` or a Wistia `mediaId` chooses the Mux or Wistia media without a URL. The resolved media takes the whole object as its `source`; a native `<video>` takes only its `src`. While `source` is set, `src` and `type` are ignored.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<LazyVideo source={{ playbackId: 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M' }} />
+```
+
+Keep the `source` object stable across renders, as a constant or with `useMemo`; a new object reloads the media.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```js
+document.querySelector('lazy-video').source = { playbackId: 'a4nOgmxGWg6gULfcBbAa00gXyfcwPnAFldF8RdsNyk8M' };
+```
+</FrameworkCase>
+
 Chrome and Android browsers also play HLS natively, but with fewer features than hls.js, so by default they get `HlsJsVideo`. Set `preferPlayback` to `'native'` to play HLS natively wherever the browser can, or to `'mse'` to always play it through hls.js. It's also passed on to the resolved hls.js or Mux media, on its `source`, so a Mux stream follows the same preference.
 
 <FrameworkCase frameworks={["react"]}>
@@ -125,7 +141,7 @@ const AcmeLazyVideo = createLazyVideo([
 ]);
 ```
 
-A media gives `match` and either `load`, for a component whose code should download only once a source needs it, or `component`, for one that's cheap to ship up front. Set `fallback: true` when the component renders `fallback` content inside a `<video>` or `<audio>`, and `preferPlayback: true` when its adapter, which it hands to `mediaRef`, takes `preferPlayback` on its `source`, as `HlsJsVideo` and `MuxVideo` do.
+A media gives `match` and either `load`, for a component whose code should download only once a source needs it, or `component`, for one that's cheap to ship up front. Set `fallback: true` when the component renders `fallback` content inside a `<video>` or `<audio>`, `preferPlayback: true` when its adapter, which it hands to `mediaRef`, takes `preferPlayback` on its `source`, as `HlsJsVideo` and `MuxVideo` do, and `source: true` when the component takes a structured `source` prop. Without it, a `source` reaches the component as `src`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
@@ -159,11 +175,12 @@ A media gives `match`, the `tag` of the element that plays its sources, and `loa
 
 | Field | Type | Description |
 |---|---|---|
-| `src` | `string` | The trimmed source URL. |
+| `src` | `string` | The trimmed source URL; empty for a structured source that names its media by id. |
 | `type` | `string \| undefined` | The MIME type the source was given. |
 | `url` | `URL \| null` | `src` parsed as a URL, or `null` for a path or bare id. |
 | `adapterType` | `AdapterType \| null` | The kind of source, with the names <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> returns, such as `'hls'` or `'youtube'`. |
 | `playback` | `'native' \| 'mse' \| undefined` | How HLS should play here, after `preferPlayback`. `undefined` while it isn't known, such as during server rendering. |
+| `source` | `LazyMediaSource \| null` | The structured `source` it was resolved from, if any, for media that match on more than the URL. |
 
 Return `true` to play the source, or `undefined` when the media can't tell yet; it isn't chosen until it can, and nothing after it is tried.
 
@@ -253,6 +270,7 @@ Until the media loads, the player has no media, so its controls show their empty
 |---|---|---|---|
 | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
+| `source` | `LazyMediaSource` | | Structured source, in place of `src` and `type`. Chooses the media by its `src`, `type`, `playbackId`, or `mediaId`, and is passed on as the media's `source`. |
 | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
 | `preload` | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
@@ -262,6 +280,7 @@ Until the media loads, the player has no media, so its controls show their empty
 |---|---|---|---|---|
 | `src` | `src` | `string` | | Source URL. Its host or file extension chooses the media. |
 | `type` | `type` | `string` | | MIME type of the source. Takes precedence over the file extension. |
+| | `source` | `LazyMediaSource` | | Structured source, in place of `src` and `type`. Chooses the media by its `src`, `type`, `playbackId`, or `mediaId`, and is passed on as the media's `source`. |
 | `prefer-playback` | `preferPlayback` | `'native' \| 'mse'` | | Playback path for HLS: `'native'` wherever the browser can, `'mse'` always through hls.js. Unset, native on Safari or where there's no MSE. Also passed on to hls.js and Mux media. |
 | `preload` | | `'none' \| 'metadata' \| 'auto' \| ''` | `'none'` | How much the resolved media loads before playback. |
 </FrameworkCase>
