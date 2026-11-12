@@ -32,6 +32,7 @@
         "@videojs/playerjs-video",
         "@videojs/react",
         "@videojs/react-native",
+        "@videojs/relay-video",
         "@videojs/shaka-video",
         "@videojs/skins",
         "@videojs/spf",
@@ -136,6 +137,9 @@
     },
     "packages/store": {
       "component": "@videojs/store"
+    },
+    "packages/adapters/relay-video": {
+      "component": "@videojs/relay-video"
     },
     "packages/adapters/tiktok-video": {
       "component": "@videojs/tiktok-video"

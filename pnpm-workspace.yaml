@@ -66,6 +66,7 @@ overrides:
   vite@*: 'catalog:'
   vitest@*: 'catalog:'
 minimumReleaseAgeExclude:
+  - '@caprid/*'
   - vite-plus
   - '@voidzero-dev/*'
   - oxlint

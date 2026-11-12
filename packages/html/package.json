@@ -191,6 +191,7 @@
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
+    "@videojs/relay-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/skins": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
@@ -215,6 +216,7 @@
     "@videojs/mux-data": "workspace:*",
     "@videojs/mux-video": "workspace:*",
     "@videojs/playerjs-video": "workspace:*",
+    "@videojs/relay-video": "workspace:*",
     "@videojs/shaka-video": "workspace:*",
     "@videojs/soundcloud-audio": "workspace:*",
     "@videojs/spotify-audio": "workspace:*",
@@ -256,6 +258,9 @@
       "optional": true
     },
     "@videojs/playerjs-video": {
+      "optional": true
+    },
+    "@videojs/relay-video": {
       "optional": true
     },
     "@videojs/shaka-video": {

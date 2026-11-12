@@ -26,6 +26,7 @@
     { "path": "packages/adapters/mixcloud-audio" },
     { "path": "packages/adapters/native-hls-video" },
     { "path": "packages/adapters/playerjs-video" },
+    { "path": "packages/adapters/relay-video" },
     { "path": "packages/adapters/shaka-video" },
     { "path": "packages/adapters/soundcloud-audio" },
     { "path": "packages/adapters/spotify-audio" },
