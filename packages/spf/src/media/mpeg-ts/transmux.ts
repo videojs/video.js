@@ -1,9 +1,10 @@
 /**
  * MPEG-TS → fMP4 transmuxer: demux a complete TS segment, frame each carried codec's elementary stream, and write the
  * frames back as fMP4 fragments the MSE pipeline already handles. Composed from codec modules (`codecs/`), so a
- * composition bundles only the codecs it carries. Stateful per SourceBuffer: it numbers fragments. It builds an init
- * segment whenever a segment's sample entries differ from the ones the caller last delivered (first segment, rendition
- * switch). The caller tracks delivery because only it knows whether the append carrying an init completed.
+ * composition bundles only the codecs it carries. Stateful per SourceBuffer: it numbers fragments and keeps each
+ * codec's last sample entry, so a segment missing one track's data still describes every track. It builds an init
+ * segment whenever the sample entries differ from the ones the caller last delivered (first segment, rendition switch).
+ * The caller tracks delivery because only it knows whether the append carrying an init completed.
  *
  * Timestamps stay native (first DTS in `tfdt`, in each track's own timescale) — relocation onto the presentation
  * timeline is the existing `timestampOffset` machinery's job, exactly as for native fMP4.
@@ -55,10 +56,12 @@ function concat(parts: Uint8Array[]): Uint8Array {
 /** A transmuxer for one SourceBuffer's stream of segments, carrying the given codecs. */
 export function createTransmuxer(codecs: readonly TransmuxCodec[]): Transmux {
   let sequenceNumber = 0;
+  // The last sample entry each codec wrote. MSE rejects a later init segment whose track count differs from the first,
+  // so a codec with no data in a segment keeps its place in the init rather than dropping out of it.
+  const configs = new Map<string, TrackConfig>();
 
   return (segment, { codecs: carried = codecs, deliveredInitKey, ...options } = {}) => {
     const streams = demuxTransportStream(segment, new Set(carried.map((codec) => codec.streamType)));
-    const tracks: TrackConfig[] = [];
     const fragments: Uint8Array[] = [];
     const result: TransmuxResult = { data: new Uint8Array(0), tracks: {} };
 
@@ -69,7 +72,7 @@ export function createTransmuxer(codecs: readonly TransmuxCodec[]): Transmux {
 
       const { track, baseMediaDecodeTime, samples, payload } = framed;
 
-      tracks.push(track);
+      configs.set(codec.family, track);
       fragments.push(buildMediaFragment(track.id, ++sequenceNumber, baseMediaDecodeTime, samples, payload));
       result.tracks[codec.family] = { trackId: track.id, timescale: track.timescale, baseMediaDecodeTime };
     }
@@ -77,6 +80,7 @@ export function createTransmuxer(codecs: readonly TransmuxCodec[]): Transmux {
     // The init segment is keyed on the sample entries (parameter sets, AAC config, dimensions):
     // a rendition switch changes the SPS → a fresh init precedes the first fragment of the new
     // rendition, as a native fMP4 switch would append.
+    const tracks = carried.flatMap((codec) => configs.get(codec.family) ?? []);
     const initKey = tracks.map((track) => `${track.id}:${track.sampleEntry.join()}`).join('|');
 
     if (tracks.length) {
