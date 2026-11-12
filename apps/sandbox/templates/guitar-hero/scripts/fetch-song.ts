@@ -13,7 +13,7 @@
  * The output is gitignored because the chart has no license to redistribute. It is also copied into `src/`, where a
  * running dev server serves it as `/guitar-hero/song/`:
  *
- *   pnpm -F @videojs/sandbox song
+ * Pnpm -F @videojs/sandbox song
  *
  * Behind a proxy, add `NODE_USE_ENV_PROXY=1`, and `NODE_EXTRA_CA_CERTS=<ca.crt>` when it intercepts TLS.
  *
@@ -42,7 +42,12 @@ const INSTRUMENTS: { instrument: Instrument; trackName: string; stems: string[] 
 ];
 
 /** Each difficulty spans an octave whose lowest note is the first lane: green, or the kick on drums. */
-const DIFFICULTIES: Record<Difficulty, number> = { expert: 96, hard: 84, medium: 72, easy: 60 };
+const DIFFICULTIES = [
+  { difficulty: 'expert', firstLaneNote: 96 },
+  { difficulty: 'hard', firstLaneNote: 84 },
+  { difficulty: 'medium', firstLaneNote: 72 },
+  { difficulty: 'easy', firstLaneNote: 60 },
+] satisfies { difficulty: Difficulty; firstLaneNote: number }[];
 const LANE_COUNT = 5;
 /** Notes this close together are one chord, played at the earliest note's tick. */
 const CHORD_SNAP_TICKS = 10;
@@ -83,6 +88,7 @@ class ByteReader {
     if (!Number.isSafeInteger(end) || length < 0 || end > this.bytes.length) throw new Error('Unexpected end of data');
 
     const slice = this.bytes.subarray(this.offset, end);
+
     this.offset = end;
     return slice;
   }
@@ -117,7 +123,9 @@ class ByteReader {
 
     for (let i = 0; i < 4; i++) {
       const byte = this.u8();
+
       value = (value << 7) | (byte & 0x7f);
+
       if (byte < 0x80) return value;
     }
 
@@ -142,18 +150,23 @@ function unpackSng(bytes: Buffer): SngPackage {
   const xorMask = reader.take(16);
 
   const metadata = new Map<string, string>();
+
   reader.u64le(); // section length
+
   for (let count = reader.u64le(); count > 0; count--) {
     metadata.set(reader.string(reader.u32le()), reader.string(reader.u32le()));
   }
 
   const index: { name: string; length: number; offset: number }[] = [];
+
   reader.u64le(); // section length
+
   for (let count = reader.u64le(); count > 0; count--) {
     index.push({ name: reader.string(reader.u8()), length: reader.u64le(), offset: reader.u64le() });
   }
 
   const files = new Map<string, Buffer>();
+
   for (const { name, length, offset } of index) {
     reader.offset = offset;
     files.set(name, unmask(reader.take(length), xorMask));
@@ -208,22 +221,31 @@ function parseMidi(bytes: Buffer): Midi {
 
   const header = new ByteReader(reader.take(reader.u32be()));
   const format = header.u16be();
+
   header.u16be(); // track count; the chunks themselves are the source of truth
   const resolution = header.u16be();
-  if (format !== 1 || resolution & 0x8000) throw new Error('Expected a type 1 MIDI file timed in ticks per quarter note');
+
+  if (format !== 1 || resolution & 0x8000)
+    throw new Error('Expected a type 1 MIDI file timed in ticks per quarter note');
 
   const tracks: MidiTrack[] = [];
+
   while (!reader.done) {
     const type = reader.string(4);
     const chunk = reader.take(reader.u32be());
+
     if (type === 'MTrk') tracks.push(parseTrack(new ByteReader(chunk)));
   }
 
   return { resolution, tracks };
 }
 
+function emptyTrack(name: string): MidiTrack {
+  return { name, notes: [], texts: [], tempos: [] };
+}
+
 function parseTrack(reader: ByteReader): MidiTrack {
-  const track: MidiTrack = { name: '', notes: [], texts: [], tempos: [] };
+  const track = emptyTrack('');
   const noteStarts = new Map<number, number>();
   let tick = 0;
   let runningStatus = 0;
@@ -239,6 +261,7 @@ function parseTrack(reader: ByteReader): MidiTrack {
       if (type === 0x51) track.tempos.push({ tick, microsecondsPerQuarter: data.readUIntBE(0, 3) });
       else if (type === 0x03 && !track.name) track.name = data.toString('utf8');
       else if (type >= 0x01 && type <= 0x0f) track.texts.push({ tick, type, text: data.toString('utf8') });
+
       continue;
     }
 
@@ -303,11 +326,13 @@ function createTickClock(tempos: MidiTempo[], resolution: number): (tick: number
   for (const { tick, microsecondsPerQuarter } of tempos) {
     const previous = segments.at(-1)!;
     const seconds = previous.seconds + (tick - previous.tick) * previous.secondsPerTick;
+
     segments.push({ tick, seconds, secondsPerTick: microsecondsPerQuarter / 1e6 / resolution });
   }
 
   return (tick) => {
     let segment = segments[0]!;
+
     for (const next of segments) if (next.tick <= tick) segment = next;
 
     return segment.seconds + (tick - segment.tick) * segment.secondsPerTick;
@@ -328,6 +353,7 @@ function readNotes(track: MidiTrack, firstLaneNote: number, timing: Timing): Not
   return snapChords(notes)
     .map(({ note, tick, endTick }) => ({
       time: timing.seconds(tick),
+      // SAFETY: the filter above keeps only the LANE_COUNT notes starting at the first lane.
       lane: (note - firstLaneNote) as Lane,
       length: timing.sustain(tick, endTick),
     }))
@@ -339,6 +365,7 @@ function snapChords(notes: MidiNote[]): MidiNote[] {
 
   return notes.map((note) => {
     if (note.tick - chordTick > CHORD_SNAP_TICKS) chordTick = note.tick;
+
     return { ...note, tick: chordTick };
   });
 }
@@ -354,6 +381,7 @@ function readPhrases(track: MidiTrack, markerNotes: number[], timing: Timing): C
 function readSections(events: MidiTrack, timing: Timing): Cue[] {
   return events.texts.flatMap(({ tick, text }) => {
     const name = SECTION_EVENT.exec(text)?.[1];
+
     return name ? [{ startTime: timing.seconds(tick), text: toTitle(name) }] : [];
   });
 }
@@ -376,7 +404,9 @@ function readLyrics(vocals: MidiTrack, timing: Timing): Cue[] {
 
   return readPhrases(vocals, LYRIC_PHRASE_NOTES, timing).map((phrase) => {
     const sung = syllables.filter(({ time }) => time >= phrase.startTime && time < phrase.endTime!);
-    return { ...phrase, text: sung.map(({ text }) => text).join('').trim(), value: { syllables: sung } };
+    const text = sung.map((syllable) => syllable.text).join('');
+
+    return { ...phrase, text: text.trim(), value: { syllables: sung } };
   });
 }
 
@@ -412,7 +442,7 @@ async function download(url: string, path: string): Promise<Buffer> {
 }
 
 /** Writes JSON under the output folder. Arrays get one entry per line, which keeps big files easy to skim. */
-async function writeJson(path: string, data: unknown): Promise<void> {
+async function writeJson(path: string, data: Song | Note[] | Cue[]): Promise<void> {
   const json = Array.isArray(data)
     ? `[\n${data.map((entry) => `  ${JSON.stringify(entry)}`).join(',\n')}\n]`
     : JSON.stringify(data, null, 2);
@@ -422,7 +452,10 @@ async function writeJson(path: string, data: unknown): Promise<void> {
 }
 
 /** Writes a cue file for each instrument with any cues, and returns where each one went. */
-async function writeCueFiles(folder: string, cues: [Instrument, Cue[]][]): Promise<Partial<Record<Instrument, string>>> {
+async function writeCueFiles(
+  folder: string,
+  cues: [Instrument, Cue[]][]
+): Promise<Partial<Record<Instrument, string>>> {
   const paths: Partial<Record<Instrument, string>> = {};
 
   for (const [instrument, instrumentCues] of cues) {
@@ -466,24 +499,27 @@ const albumArt = fileNames.find((name) => ALBUM_ART_FILE.test(name)) ?? null;
 
 const instruments = INSTRUMENTS.flatMap(({ trackName, ...instrument }) => {
   const track = tracks.get(trackName);
+
   return track ? [{ ...instrument, track }] : [];
 });
 
-const parts = instruments.flatMap(({ instrument, track, stems: missStems }) =>
-  Object.entries(DIFFICULTIES).map(([difficulty, firstLaneNote]) => ({
-    id: `${instrument}-${difficulty}`,
-    instrument,
-    difficulty: difficulty as Difficulty,
-    label: `${capitalize(difficulty)} ${capitalize(instrument)}`,
-    notes: readNotes(track, firstLaneNote, timing),
-    stem: missStems.find((stem) => Object.hasOwn(stems, stem)) ?? null,
-  }))
-).filter(({ notes }) => notes.length > 0);
+const parts = instruments
+  .flatMap(({ instrument, track, stems: missStems }) =>
+    DIFFICULTIES.map(({ difficulty, firstLaneNote }) => ({
+      id: `${instrument}-${difficulty}`,
+      instrument,
+      difficulty,
+      label: `${capitalize(difficulty)} ${capitalize(instrument)}`,
+      notes: readNotes(track, firstLaneNote, timing),
+      stem: missStems.find((stem) => Object.hasOwn(stems, stem)) ?? null,
+    }))
+  )
+  .filter(({ notes }) => notes.length > 0);
 
 for (const { id, notes } of parts) await writeJson(`notes/${id}.json`, notes);
 
-const events = tracks.get('EVENTS') ?? { name: 'EVENTS', notes: [], texts: [], tempos: [] };
-const vocals = tracks.get('PART VOCALS') ?? { name: 'PART VOCALS', notes: [], texts: [], tempos: [] };
+const events = tracks.get('EVENTS') ?? emptyTrack('EVENTS');
+const vocals = tracks.get('PART VOCALS') ?? emptyTrack('PART VOCALS');
 
 await writeJson('sections.json', readSections(events, timing));
 await writeJson('lyrics.json', readLyrics(vocals, timing));
