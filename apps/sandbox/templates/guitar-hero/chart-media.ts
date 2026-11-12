@@ -107,6 +107,7 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     const { signal } = (this.#load = new AbortController());
 
     this.#reset();
+
     if (!this.#src) return;
 
     this.#currentSrc = new URL(this.#src, location.href).href;
@@ -133,8 +134,11 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
 
     this.#stopStems();
     cancelAnimationFrame(this.#frame);
+
     for (const { gain } of this.#stems.values()) gain.disconnect();
+
     for (const track of [...this.videoTracks]) this.removeVideoTrack(track);
+
     for (const track of [...this.audioTracks]) this.removeAudioTrack(track);
 
     this.#stems.clear();
@@ -157,6 +161,7 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     // Each part is a video rendition, so the stock quality menu picks what to play. Renditions only list under a
     // selected video track.
     const video = this.addVideoTrack('main');
+
     video.selected = true;
 
     for (const part of song.parts) video.addRendition('').id = part.id;
@@ -165,6 +170,7 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
 
     // "Missed" is the mix without the part's own stem: the game picks it while the player is missing notes.
     const hit = this.addAudioTrack('main', 'Hit');
+
     hit.id = 'hit';
     hit.enabled = true;
     this.addAudioTrack('alternative', 'Missed').id = 'missed';
@@ -179,10 +185,12 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
         return [name, buffer] as const;
       })
     );
+
     signal.throwIfAborted();
 
     for (const [name, buffer] of stems) {
       const gain = this.#audio.createGain();
+
       gain.connect(this.#master);
       this.#stems.set(name, { buffer, gain });
       this.#duration = Math.max(this.#duration, buffer.duration);
@@ -204,6 +212,7 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     this.#wantedPart = part;
 
     const notes = await this.#notesOf(part);
+
     // A later pick, or an earlier request for this one, got here first.
     if (this.#wantedPart !== part || this.#part === part) return;
 
@@ -264,7 +273,9 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     this.#dispatch('play');
 
     await resumed;
+
     if (this.#readyState < MediaReadyState.HAVE_ENOUGH_DATA) await this.#once('canplaythrough');
+
     // Paused, or played again, while waiting.
     if (this.#paused || this.#sources.length) return;
 
@@ -413,6 +424,7 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     const response = await fetch(url, signal && { signal });
     if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
 
+    // SAFETY: `scripts/fetch-song.ts` writes these files in the shapes `song.ts` describes.
     return response.json() as Promise<T>;
   }
 
@@ -516,6 +528,7 @@ class Highway {
 
     // Place the vanishing point so that `LOOK_AHEAD` lands near the top edge.
     const topY = this.#height * 0.03;
+
     this.#vanishY = (topY - FAR_SCALE * this.#strikeY) / (1 - FAR_SCALE);
   }
 
@@ -541,6 +554,7 @@ class Highway {
     ctx.fillRect(0, 0, this.#width, this.#height);
 
     const board = ctx.createLinearGradient(0, this.#y(LOOK_AHEAD), 0, this.#height);
+
     board.addColorStop(0, '#0d0d16');
     board.addColorStop(1, '#22222f');
     ctx.fillStyle = board;
