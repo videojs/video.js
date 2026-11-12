@@ -13,13 +13,13 @@ import { SONG_URL } from './song';
 import { SongTracks } from './song-tracks';
 import { useGame } from './use-game';
 
-function App() {
-  const [media] = useState(() => new ChartMedia());
-  const { song, part } = useChart(media);
+// The song plays through a media of its own, which the player drives like a `<video>`.
+const media = new ChartMedia();
 
-  useEffect(() => {
-    media.src = SONG_URL;
-  }, [media]);
+media.src = SONG_URL;
+
+function App() {
+  const { song, part } = useChart(media);
 
   return (
     // No skin: the game draws its own UI, and owns the keyboard.

@@ -28,6 +28,7 @@ export function useCueEvents<Cue extends MediaTextCue>(track: TextTrackDefinitio
 
     // Cues keep their identity while their track is unchanged, so comparing the two lists finds what changed.
     for (const cue of last.active) if (!active.includes(cue)) exit(cue);
+
     for (const cue of active) if (!last.active.includes(cue)) enter(cue);
   }, [cues, active, seeking]);
 }

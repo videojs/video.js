@@ -1,9 +1,10 @@
 import { PlayButton, useActiveTextCues, useTextCues } from '@videojs/react';
 import { usePlayer } from '@videojs/react/video';
 
+import { accuracy } from './score';
 import { type Lane, type Song, songFile } from './song';
 import { lyricsTrack, sectionsTrack } from './tracks';
-import { accuracy, type Game } from './use-game';
+import type { Game } from './use-game';
 
 const LANES: readonly Lane[] = [0, 1, 2, 3, 4];
 
@@ -64,7 +65,13 @@ export function Lanes({ game }: { game: Game }) {
 }
 
 export function Banner({ banner }: { banner: Game['banner'] }) {
-  return banner && <p key={banner.at} className="banner">{banner.text}</p>;
+  return (
+    banner && (
+      <p key={banner.at} className="banner">
+        {banner.text}
+      </p>
+    )
+  );
 }
 
 /** The line being sung, lit up syllable by syllable, while lyrics are on. Nothing else draws them on the canvas. */
@@ -89,6 +96,7 @@ export function Lyrics() {
 export function Results({ game }: { game: Game }) {
   const ended = usePlayer((state) => state.ended);
   const sections = useTextCues(sectionsTrack);
+
   if (!ended) return null;
 
   return (

@@ -293,8 +293,8 @@ export class ChartMedia extends MediaTracksMixin(EventTarget) {
     this.#dispatch('timeupdate', 'pause');
   }
 
-  // A `<video>` fires `timeupdate` about four times a second. Text cues turn active on `timeupdate`, and the game
-  // judges notes against them, so this fires every frame: a cue is never more than a frame late.
+  // A `<video>` fires `timeupdate` about four times a second. Text cues turn active and inactive on `timeupdate`, and the
+  // game counts a miss when a note's cue ends, so this fires every frame: a cue is never more than a frame late.
   #tick = (): void => {
     if (this.#paused) return;
 
