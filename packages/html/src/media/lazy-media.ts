@@ -2,6 +2,7 @@ import {
   applyPreferPlayback,
   findLazyMedia,
   type LazyMediaMatcher,
+  type LazyMediaSource,
   type PreferPlaybackTarget,
   resolveLazySource,
 } from '@videojs/media';
@@ -60,11 +61,14 @@ export class LazyMediaElement extends HTMLElementBase {
   #mediaDefinition: LazyMediaDefinition | null = null;
   // `undefined` until the first resolution, so a first `null` still counts as a change.
   #definition: LazyMediaDefinition | null | undefined = undefined;
+  #source: LazyMediaSource | null = null;
+  // The `source` last handed to `#media`, so an unchanged one isn't handed over again and reloaded.
+  #mediaSource: LazyMediaSource | null = null;
   #token = 0;
   #updateQueued = false;
   #observer: MutationObserver | null = null;
 
-  /** Source URL. Its host or file extension decides which media element plays it. */
+  /** Source URL. Its host or file extension decides which media element plays it. Ignored while `source` is set. */
   get src(): string {
     return this.getAttribute('src') ?? '';
   }
@@ -73,13 +77,32 @@ export class LazyMediaElement extends HTMLElementBase {
     this.setAttribute('src', value);
   }
 
-  /** MIME type of the source. Takes precedence over the file extension, so signed or extensionless URLs resolve. */
+  /**
+   * MIME type of the source. Takes precedence over the file extension, so signed or extensionless URLs resolve. Ignored
+   * while `source` is set.
+   */
   get type(): string {
     return this.getAttribute('type') ?? '';
   }
 
   set type(value: string) {
     this.setAttribute('type', value);
+  }
+
+  /**
+   * Structured source, in place of `src` and `type`. Its `src`, `type`, or an id such as a Mux `playbackId` or a Wistia
+   * `mediaId` decides which media element plays it, and the media takes the whole object on its `source`. A native
+   * `<video>` or `<audio>` takes only its `src`.
+   */
+  get source(): LazyMediaSource | null {
+    return this.#source;
+  }
+
+  set source(value: LazyMediaSource | null) {
+    if (value === this.#source) return;
+
+    this.#source = value ?? null;
+    this.#queueUpdate();
   }
 
   /**
@@ -144,11 +167,12 @@ export class LazyMediaElement extends HTMLElementBase {
   #update(): void {
     if (!this.isConnected) return;
 
-    const src = this.src;
+    const src = this.#source ? (this.#source.src ?? '') : this.src;
     const source = resolveLazySource(src, {
       type: this.type || undefined,
-      preferPlayback: this.preferPlayback,
+      preferPlayback: this.#preferPlayback(),
       nativeHls: nativeHlsSupport(),
+      source: this.#source,
     });
     const definition = findLazyMedia(this.medias, source);
     // A media that can't tell yet is asked again on the next change.
@@ -157,10 +181,7 @@ export class LazyMediaElement extends HTMLElementBase {
     // The same media plays the new source, so it only needs the URL and how to play it. One still loading reads them
     // once created.
     if (definition === this.#definition) {
-      if (definition && this.#media && this.#mediaDefinition === definition) {
-        this.#syncAttribute(this.#media, 'src');
-        this.#syncPreferPlayback(this.#media, definition);
-      }
+      if (definition && this.#media && this.#mediaDefinition === definition) this.#syncSource(this.#media, definition);
 
       return;
     }
@@ -208,8 +229,9 @@ export class LazyMediaElement extends HTMLElementBase {
     const media = document.createElement(definition.tag);
 
     this.#copyAttributes(media);
-    // Before the media is connected, so its engine is built for the preferred path from the start.
-    this.#syncPreferPlayback(media, definition);
+    // Before the media is connected, so its engine is built for the source and preferred path from the start.
+    this.#mediaSource = null;
+    this.#syncSource(media, definition);
     this.#setMedia(media, definition);
   }
 
@@ -238,7 +260,8 @@ export class LazyMediaElement extends HTMLElementBase {
   }
 
   #syncAttribute(media: HTMLElement, name: string): void {
-    if (OWN_ATTRIBUTES.has(name)) return;
+    // `src` reaches the media through `#syncSource`.
+    if (OWN_ATTRIBUTES.has(name) || name === 'src') return;
 
     // The resolved media plays `preload="none"` unless told otherwise.
     const value = this.getAttribute(name) ?? (name === 'preload' ? 'none' : null);
@@ -247,9 +270,38 @@ export class LazyMediaElement extends HTMLElementBase {
     else if (media.getAttribute(name) !== value) media.setAttribute(name, value);
   }
 
-  #syncPreferPlayback(media: HTMLElement, definition: LazyMediaDefinition): void {
+  #syncSource(media: HTMLElement, definition: LazyMediaDefinition): void {
+    const source = this.#source;
+
+    if (!source) {
+      // The media still plays the structured source, whatever its `src` attribute says.
+      if (this.#mediaSource) media.removeAttribute('src');
+
+      this.#mediaSource = null;
+      this.#setSrc(media, this.getAttribute('src'));
+    } else if (!('source' in media)) {
+      this.#setSrc(media, source.src ?? null);
+    } else if (source !== this.#mediaSource) {
+      this.#mediaSource = source;
+      media.source = source;
+    }
+
     // SAFETY: a definition marked `preferPlayback` renders an element with a structured `source`.
-    if (definition.preferPlayback) applyPreferPlayback(media as unknown as PreferPlaybackTarget, this.preferPlayback);
+    if (definition.preferPlayback) {
+      applyPreferPlayback(media as unknown as PreferPlaybackTarget, this.#preferPlayback());
+    }
+  }
+
+  #setSrc(media: HTMLElement, value: string | null): void {
+    if (value === null) media.removeAttribute('src');
+    else if (media.getAttribute('src') !== value) media.setAttribute('src', value);
+  }
+
+  // The attribute wins over a `preferPlayback` given on `source`.
+  #preferPlayback(): 'native' | 'mse' | undefined {
+    const fromSource = this.#source?.preferPlayback;
+
+    return this.preferPlayback ?? (fromSource === 'native' || fromSource === 'mse' ? fromSource : undefined);
   }
 
   #onMutation(records: MutationRecord[]): void {

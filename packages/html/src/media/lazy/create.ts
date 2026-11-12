@@ -1,6 +1,6 @@
 import { createLazyMediaElement, type LazyMediaDefinition, type LazyMediaElement } from '../lazy-media';
 
-export type { AdapterType, LazyMediaMatcher, LazySource } from '@videojs/media';
+export type { AdapterType, LazyMediaMatcher, LazyMediaSource, LazySource } from '@videojs/media';
 export type { LazyMediaDefinition, LazyMediaElement } from '../lazy-media';
 
 /**
