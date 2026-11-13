@@ -874,7 +874,7 @@ Add a chapters track with the `default` attribute inside your media. The skins t
 ```
 </FrameworkCase>
 
-To replace `addChapters()`, add a `chapters` track from code. Each chapter's title moves from `value` to `text`, and a chapter without an `endTime` runs to the next one. A WebVTT file in a `<track>`, as above, still works too.
+To replace `addChapters()`, add a `chapters` track from code. Each chapter's title moves from `value` to `text`, and a chapter without an `endTime` runs to the next one. Chapters added from code take precedence over chapters the stream carries, such as chapters generated for the asset. A WebVTT file in a `<track>`, as above, still works too.
 
 <FrameworkCase frameworks={["html"]}>
 ```ts
