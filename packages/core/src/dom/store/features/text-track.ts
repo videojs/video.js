@@ -83,16 +83,20 @@ function showOnly(tracks: IdentifiedTrack[], active: TextTrackLike | null): void
 }
 
 /**
- * The cues of the first chapters track an app added, which stand in when the media has no chapters of its own. A
- * chapter without an end runs to the next one, and the last to the end of the media.
+ * The cues of the first chapters track an app added, or `null` when it added none. An app's chapters take precedence
+ * over the media's, which may carry chapters the app never chose, such as ones generated for a stream. A chapter
+ * without an end runs to the next one, and the last to the end of the media.
  */
-function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: number): MediaTextCue[] {
-  return fillChapterEnds(records.find(({ track }) => track.kind === 'chapters')?.cues ?? [], duration);
+function findAppChaptersCues(records: readonly AppTextTrackRecord[], duration: number): MediaTextCue[] | null {
+  const record = records.find(({ track }) => track.kind === 'chapters');
+  if (!record) return null;
+
+  return fillChapterEnds(record.cues, duration);
 }
 
 /**
- * The first thumbnails track an app added, which stands in when the media has none of its own, such as a storyboard on
- * an embed. Image URLs in its cues resolve against the file the cues came from.
+ * The first thumbnails track an app added, or `null` when it added none. Like chapters, it takes precedence over the
+ * media's own. Image URLs in its cues resolve against the file the cues came from.
  */
 function findAppThumbnailsTrack(
   records: readonly AppTextTrackRecord[],
@@ -443,7 +447,7 @@ export const textTrackFeature = definePlayerFeature({
         // Media without text tracks of its own, such as an embed, still lists the tracks and chapters apps add.
         set({
           textTrackList: appRecords.map(({ track }) => track),
-          chaptersCues: findAppChaptersCues(appRecords, isMediaSeekCapable(media) ? media.duration : NaN),
+          chaptersCues: findAppChaptersCues(appRecords, isMediaSeekCapable(media) ? media.duration : NaN) ?? [],
           thumbnailsTrack: findAppThumbnailsTrack(appRecords, getCrossOrigin()),
         });
         return;
@@ -484,18 +488,17 @@ export const textTrackFeature = definePlayerFeature({
 
       for (const { track } of appRecords) textTrackList.push(track);
 
-      // The last chapter of an in-stream chapters document is open-ended on the
-      // track; consumers read it ending where the media does. Chapters an app
-      // added stand in when the media has none.
+      // Chapters and thumbnails an app added take precedence over the media's, which are the fallback. The last
+      // chapter of an in-stream chapters document is open-ended on the track; consumers read it ending where the media
+      // does.
       const duration = isMediaSeekCapable(media) ? media.duration : NaN;
-      const chaptersCues = chaptersTrack
-        ? toMediaTextCues(chaptersTrack.cues, { kind: 'chapters', duration })
-        : findAppChaptersCues(appRecords, duration);
+      const chaptersCues =
+        findAppChaptersCues(appRecords, duration) ??
+        (chaptersTrack ? toMediaTextCues(chaptersTrack.cues, { kind: 'chapters', duration }) : []);
 
-      // A thumbnails track an app added stands in when the media has none.
       let thumbnailsTrack = findAppThumbnailsTrack(appRecords, getCrossOrigin());
 
-      if (thumbnailsTextTrack) {
+      if (!thumbnailsTrack && thumbnailsTextTrack) {
         thumbnailsTrack = {
           // VTTCue extends TextTrackCue with `text` — cast via `unknown` since
           // the CueList is typed as TextTrackCue which doesn't expose `text`.

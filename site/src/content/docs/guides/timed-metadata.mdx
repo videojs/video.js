@@ -206,7 +206,7 @@ Readers skip cues whose value fails the schema, and warn in development. The sch
 
 ### Add chapters
 
-Add a `chapters` track the same way. A chapter's title is its cue `text`, and a chapter without an `endTime` runs to the next one. When the media has no chapters track of its own, the <DocsLink slug="reference/components/time-slider">time slider</DocsLink> shows these chapters.
+Add a `chapters` track the same way. A chapter's title is its cue `text`, and a chapter without an `endTime` runs to the next one. The <DocsLink slug="reference/components/time-slider">time slider</DocsLink> shows these chapters even when the media has chapters of its own, such as chapters an HLS stream lists in its session data. The media's chapters show only when your app adds none.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx

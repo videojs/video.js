@@ -406,12 +406,12 @@ export interface MediaTextTrackState {
   /** Show the captions/subtitles track with `id`, or turn captions/subtitles off with `null`. */
   selectSubtitlesTrack(id: string | null): void;
   /**
-   * Cues from the media's first `kind="chapters"` track, with cue ends clamped to a finite media duration. When the
-   * media has none, cues from the first chapters track the app added, where a chapter without an end runs to the next
-   * one and the last to the end of the media.
+   * Cues from the first chapters track the app added, where a chapter without an end runs to the next one and the last
+   * to the end of the media. When the app added none, cues from the media's first `kind="chapters"` track, with cue
+   * ends clamped to a finite media duration.
    */
   chaptersCues: MediaTextCue[];
-  /** The first thumbnails track, or `null` when there is none. */
+  /** The first thumbnails track the app added, or else the media's first, or `null` when there is none. */
   thumbnailsTrack: MediaThumbnailsTrack | null;
 }
 
