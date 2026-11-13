@@ -1,3 +1,5 @@
+import { PLAYERJS_PARAM } from '@videojs/media';
+
 import type { PlayerJsAdapterProps } from './props';
 import { getPlayerJsProvider } from './providers';
 
@@ -54,18 +56,34 @@ export function parsePlayerJsSource(src: string): URL | null {
 }
 
 /**
+ * Whether the embed stays unbuilt until playback is requested. Under `preload="none"` nothing is fetched from the
+ * embed's host, so the page makes no third-party request before the viewer asks to play. `autoplay` asks to play now,
+ * and `controls` makes the embed's own play button the way to ask, so either builds the embed regardless.
+ *
+ * @internal
+ */
+export function shouldDeferPlayerJsEmbed(
+  props: Partial<Pick<PlayerJsAdapterProps, 'preload' | 'autoplay' | 'controls'>> = {}
+) {
+  return props.preload === 'none' && !props.autoplay && !props.controls;
+}
+
+/**
  * Build the iframe `src` URL for a player.js embed from the given props. Empty when `src` is not an embed URL.
  *
  * For the services it recognizes (Mux Player, Gumlet, FrameRate, Livid, Bunny Stream, Streamable), the host writes
  * `autoplay`, `muted`, `loop`, `controls`, and `preload` in the service's own spelling, and without `controls` hides as
  * much of the service's chrome as its URL allows. A parameter already in `src` is left as written, and
- * `engine.playerJs` overrides both.
+ * `engine.playerJs` overrides both. The `playerjs` marker that lazy media resolve player.js embeds by is removed.
  *
  * @internal
  */
 export function buildPlayerJsIframeSrc(src: string, props: Partial<PlayerJsAdapterProps> = {}): string {
   const url = parsePlayerJsSource(src);
   if (!url) return '';
+
+  // It only chooses this media, so the embed never sees it. Checked first, since a delete re-encodes the whole query.
+  if (url.searchParams.has(PLAYERJS_PARAM)) url.searchParams.delete(PLAYERJS_PARAM);
 
   const derived = getPlayerJsProvider(url)?.params(props) ?? {};
 

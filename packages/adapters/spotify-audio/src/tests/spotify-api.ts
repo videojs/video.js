@@ -2,10 +2,16 @@ import type { Mock } from 'vite-plus/test';
 import { vi } from 'vite-plus/test';
 
 import type { SpotifyAdapter } from '../adapter';
-import type { SpotifyPlaybackState, SpotifyPlaybackUpdateEvent } from '../iframe-api';
+import type {
+  SpotifyEmbedError,
+  SpotifyErrorEvent,
+  SpotifyPlaybackState,
+  SpotifyPlaybackUpdateEvent,
+} from '../iframe-api';
 
 type ReadyListener = () => void;
 type PlaybackUpdateListener = (event: SpotifyPlaybackUpdateEvent) => void;
+type ErrorListener = (event: SpotifyErrorEvent) => void;
 
 /**
  * Stands in for a controller from the live iframe API, including the part that matters most to this host:
@@ -22,6 +28,7 @@ export class MockController {
   iframeElement: HTMLIFrameElement;
   readyListeners = new Set<ReadyListener>();
   playbackListeners = new Set<PlaybackUpdateListener>();
+  errorListeners = new Set<ErrorListener>();
 
   loadUri: Mock = vi.fn();
   play: Mock = vi.fn();
@@ -45,13 +52,29 @@ export class MockController {
     MockController.instances.push(this);
   }
 
-  addListener(type: 'ready' | 'playback_update', listener: ReadyListener | PlaybackUpdateListener): void {
+  addListener(
+    type: 'ready' | 'playback_update' | 'error',
+    listener: ReadyListener | PlaybackUpdateListener | ErrorListener
+  ): void {
     if (type === 'ready') this.readyListeners.add(listener as ReadyListener);
+    else if (type === 'error') this.errorListeners.add(listener as ErrorListener);
     else this.playbackListeners.add(listener as PlaybackUpdateListener);
   }
 
   ready(): void {
     this.readyListeners.forEach((listener) => listener());
+  }
+
+  /** Report a failure, by default the decode failure WebKit can hit on a fresh embed. */
+  error(data: Partial<SpotifyEmbedError> = {}): void {
+    const payload: SpotifyEmbedError = {
+      code: 'playback_error',
+      message: "playback_error: Code 'playback_error' with cause 'PlaybackError: Media decoding error.'",
+      recoverable: true,
+      ...data,
+    };
+
+    this.errorListeners.forEach((listener) => listener({ data: payload }));
   }
 
   /** Push a playback snapshot, filling in the fields a test doesn't care about. */
