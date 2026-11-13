@@ -8,6 +8,7 @@ import {
   isAgentHandoffMethod,
   reportableSearchQuery,
   trackEvent,
+  uploadFailureReason,
 } from '../analytics-events';
 
 function stubPostHog(): PostHogClient {
@@ -76,6 +77,29 @@ describe('failureReason', () => {
   it('prefers the error code and trims a bare message', () => {
     expect(failureReason({ code: 'UNAUTHORIZED', message: 'Not signed in' })).toBe('UNAUTHORIZED');
     expect(failureReason({ message: 'x'.repeat(300) })).toHaveLength(100);
+  });
+});
+
+describe('uploadFailureReason', () => {
+  it('maps action error codes to fixed categories', () => {
+    expect(uploadFailureReason({ code: 'UNAUTHORIZED' })).toBe('unauthorized');
+    expect(uploadFailureReason({ code: 'FORBIDDEN' })).toBe('forbidden');
+    expect(uploadFailureReason({ code: 'TOO_MANY_REQUESTS' })).toBe('rate_limited');
+    expect(uploadFailureReason({ code: 'BAD_REQUEST' })).toBe('bad_request');
+    expect(uploadFailureReason({ code: 'INTERNAL_SERVER_ERROR' })).toBe('mux_error');
+    expect(uploadFailureReason({ code: 'NOT_FOUND' })).toBe('mux_error');
+  });
+
+  it('treats an error without a code as a network failure', () => {
+    expect(uploadFailureReason({})).toBe('network');
+  });
+
+  it('never carries the error message', () => {
+    const error = Object.assign(new Error('403 account acct_123 for me@example.com is suspended'), {
+      code: 'FORBIDDEN',
+    });
+
+    expect(uploadFailureReason(error)).toBe('forbidden');
   });
 });
 
