@@ -19,7 +19,10 @@
   --color-media-backdrop: var(--media-backdrop);
 
   /* Player layout breakpoints, measured against the `media-root` container. */
-  --container-media-280: 17.5rem;
+  --container-media-5xs: 10rem;
+  --container-media-4xs: 12.5rem;
+  --container-media-3xs: 15rem;
+  --container-media-2xs: 17.5rem;
   --container-media-xs: 20rem;
   --container-media-360: 22.5rem;
   --container-media-sm: 24rem;
@@ -124,16 +127,58 @@
   }
 }
 
-/* Player above 280px. */
-@custom-variant media-280 {
-  @container media-root (width > theme(--container-media-280)) {
+/* Player at or above the 5xs breakpoint. */
+@custom-variant media-5xs {
+  @container media-root (width >= theme(--container-media-5xs)) {
     @slot;
   }
 }
 
-/* Player at or below 280px. */
-@custom-variant media-max-280 {
-  @container media-root (width <= theme(--container-media-280)) {
+/* Player below the 5xs breakpoint. */
+@custom-variant media-max-5xs {
+  @container media-root (width < theme(--container-media-5xs)) {
+    @slot;
+  }
+}
+
+/* Player at or above the 4xs breakpoint. */
+@custom-variant media-4xs {
+  @container media-root (width >= theme(--container-media-4xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 4xs breakpoint. */
+@custom-variant media-max-4xs {
+  @container media-root (width < theme(--container-media-4xs)) {
+    @slot;
+  }
+}
+
+/* Player at or above the 3xs breakpoint. */
+@custom-variant media-3xs {
+  @container media-root (width >= theme(--container-media-3xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 3xs breakpoint. */
+@custom-variant media-max-3xs {
+  @container media-root (width < theme(--container-media-3xs)) {
+    @slot;
+  }
+}
+
+/* Player at or above the 2xs breakpoint. */
+@custom-variant media-2xs {
+  @container media-root (width >= theme(--container-media-2xs)) {
+    @slot;
+  }
+}
+
+/* Player below the 2xs breakpoint. */
+@custom-variant media-max-2xs {
+  @container media-root (width < theme(--container-media-2xs)) {
     @slot;
   }
 }
@@ -254,6 +299,14 @@
 /* Browsers with CSS anchor positioning. Declared after `media-highlighted` so anchored overrides of highlighted menu items win at equal specificity. */
 @custom-variant media-anchored {
   @supports (top: anchor(top)) {
+    @slot;
+  }
+}
+
+/* Controls that stay hidden until playback starts, in browsers with style queries. Elsewhere they appear without a
+   fade, and a `--media-controls-before-start: visible` opt-out never matches. */
+@custom-variant media-before-start-fade {
+  @container not style(--media-controls-before-start: visible) {
     @slot;
   }
 }

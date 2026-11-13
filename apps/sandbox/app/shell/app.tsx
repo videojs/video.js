@@ -25,7 +25,7 @@ import {
 } from '@app/constants';
 import { COMPARE_LABELS } from '@app/labels';
 import {
-  hasSkinChoice,
+  hasNoSkinChoice,
   hasTailwindSkin,
   isMediaId,
   landingSource,
@@ -112,7 +112,7 @@ function readParams() {
     media,
     skin: readOption(SKINS, params.get('skin'), 'default'),
     // Written only when it differs from the media's own default, so a link without it starts as the media does.
-    skinless: params.has('skinless') ? params.get('skinless') === '1' : startsSkinless(media),
+    skinless: params.has('skinless') ? hasNoSkinChoice(media) && params.get('skinless') === '1' : startsSkinless(media),
     // A valid `?source=` wins over where the media lands on entry, so a shared link reaches the source it names.
     source: readOption(LINKABLE_SOURCE_IDS, params.get('source'), MEDIA[media].entrySource ?? DEFAULT_SOURCE),
     autoplay: params.get('autoplay') === '1',
@@ -121,6 +121,7 @@ function readParams() {
     preload: readOption(PRELOAD_VALUES, params.get('preload'), DEFAULT_PRELOAD),
     captions: readOption(CAPTIONS_MODES, params.get('captions'), 'none'),
     accentColor: params.get('accent')?.trim() ?? '',
+    controlsBeforeStart: params.get('prestart') === '1',
     locale: readOption(SANDBOX_LOCALE_TAGS, params.get('locale'), DEFAULT_SANDBOX_LOCALE),
     width: readWidth(params.get('width')),
     ratio: readOption(ASPECT_RATIOS, params.get('ratio'), '16:9'),
@@ -154,6 +155,7 @@ function storeOptionsOpen(open: boolean): void {
 /** The preferences a frame applies to its document rather than renders from, repeated to it once it has loaded. */
 function postPreferences(target: Window, params: FrameParams): void {
   target.postMessage({ type: 'accent-change', accent: params.accentColor }, '*');
+  target.postMessage({ type: 'prestart-change', prestart: params.controlsBeforeStart }, '*');
   target.postMessage({ type: 'width-change', width: params.width }, '*');
   target.postMessage({ type: 'ratio-change', ratio: params.ratio }, '*');
   target.postMessage({ type: 'scheme-change', scheme: params.scheme }, '*');
@@ -176,6 +178,7 @@ export function App() {
   const [preload, setPreload] = useState<PreloadValue>(initial.preload);
   const [captions, setCaptions] = useState<CaptionsMode>(initial.captions);
   const [accentColor, setAccentColor] = useState(initial.accentColor);
+  const [controlsBeforeStart, setControlsBeforeStart] = useState(initial.controlsBeforeStart);
   const [locale, setLocale] = useState<SandboxLocaleTag>(initial.locale);
   const [width, setWidth] = useState(initial.width);
   const [ratio, setRatio] = useState<AspectRatio>(initial.ratio);
@@ -231,6 +234,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     playerWidth,
     ratio,
     scheme,
@@ -251,6 +255,7 @@ export function App() {
     captions,
     locale,
     accentColor,
+    controlsBeforeStart,
     width: playerWidth,
     ratio,
     scheme,
@@ -278,6 +283,8 @@ export function App() {
     if (captions !== 'none') params.set('captions', captions);
 
     if (accentColor) params.set('accent', accentColor);
+
+    if (controlsBeforeStart) params.set('prestart', '1');
 
     if (width !== undefined) params.set('width', String(width));
 
@@ -310,6 +317,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     locale,
     width,
     ratio,
@@ -355,6 +363,10 @@ export function App() {
 
     if (previous.accentColor !== accentColor) post({ type: 'accent-change', accent: accentColor });
 
+    if (previous.controlsBeforeStart !== controlsBeforeStart) {
+      post({ type: 'prestart-change', prestart: controlsBeforeStart });
+    }
+
     if (previous.playerWidth !== playerWidth) post({ type: 'width-change', width: playerWidth });
 
     if (previous.ratio !== ratio) post({ type: 'ratio-change', ratio });
@@ -375,6 +387,7 @@ export function App() {
       preload,
       captions,
       accentColor,
+      controlsBeforeStart,
       playerWidth,
       ratio,
       scheme,
@@ -391,6 +404,7 @@ export function App() {
     preload,
     captions,
     accentColor,
+    controlsBeforeStart,
     playerWidth,
     ratio,
     scheme,
@@ -605,6 +619,8 @@ export function App() {
           onLocaleChange={setLocale}
           accentColor={accentColor}
           onAccentColorChange={setAccentColor}
+          controlsBeforeStart={controlsBeforeStart}
+          onControlsBeforeStartChange={setControlsBeforeStart}
           autoplay={autoplay}
           onAutoplayChange={setAutoplay}
           muted={muted}
@@ -617,7 +633,7 @@ export function App() {
           onCaptionsChange={setCaptions}
           skinless={skinless}
           onSkinlessChange={setSkinless}
-          skinlessDisabled={!hasSkinChoice(media)}
+          skinlessDisabled={!hasNoSkinChoice(media)}
           preferences={preferences}
         />
       </div>

@@ -23,11 +23,12 @@ export type AppendInitMessage = {
   type: 'append-init';
   data: SegmentData;
   /**
-   * `language` is captured alongside `trackId` so downstream loaders can compare the buffered track's language to the
-   * newly-selected track's language and decide whether ahead-buffer flush is warranted on track switch (see
-   * `segment-loader`'s `planTasks`). Undefined for video and for audio without explicit `LANGUAGE` attribute.
+   * `language` and `name` are captured alongside `trackId` so downstream loaders can tell whether the newly-selected
+   * track is different content from the buffered one and the buffer must be flushed on track switch (see
+   * `segment-loader`'s `planTasks`). Both are undefined for video; `language` is also undefined for audio without an
+   * explicit `LANGUAGE` attribute.
    */
-  meta: { trackId: Track['id']; language?: string };
+  meta: { trackId: Track['id']; language?: string; name?: string };
 };
 export type AppendSegmentMessage = { type: 'append-segment'; data: SegmentData; meta: AppendSegmentMeta };
 export type RemoveMessage = { type: 'remove'; start: number; end: number };

@@ -28,7 +28,8 @@ for (const { framework, path } of SOURCE_SKINS) {
       await expect(skin.locator('media-poster, .media-poster')).toBeAttached();
       await expect(skin.locator('media-controls-content, .video-controls')).toBeAttached();
       await expect(skin.locator('media-controls-backdrop, .video-controls-backdrop')).toBeAttached();
-      await expect(skin.locator('media-seek-button, .media-seek-button')).toHaveCount(0);
+      // Only the centre controls seek; the control bar has none.
+      await expect(skin.locator('media-seek-button, .media-seek-button')).toHaveCount(2);
       await expect(posterImage).toHaveAttribute('src', /thumbnail/);
     });
 

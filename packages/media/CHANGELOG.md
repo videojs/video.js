@@ -1,5 +1,27 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/media@10.3.0...@videojs/media@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **core:** add a text cues feature ([#9611](https://github.com/videojs/video.js/issues/9611)) ([091226e](https://github.com/videojs/video.js/commit/091226ec2cdb45d298f4c7b071b194e439692979))
+* **core:** copy app captions into the media ([#9617](https://github.com/videojs/video.js/issues/9617)) ([b6d0199](https://github.com/videojs/video.js/commit/b6d0199b1f1c2b129f34b849a683510f3bce6392))
+* **media:** add data cues and cue values to the text-track contract ([#9610](https://github.com/videojs/video.js/issues/9610)) ([7817ac4](https://github.com/videojs/video.js/commit/7817ac455f9685b4300b6bfda0e6b80b01e163cb))
+* **media:** add removable text tracks for DOM media ([#9616](https://github.com/videojs/video.js/issues/9616)) ([274cc73](https://github.com/videojs/video.js/commit/274cc73d441ba6ec8b5610d6d028376153cc3d77))
+
+
+### Bug Fixes
+
+* **media:** recognize empty placeholders from another package copy ([#9667](https://github.com/videojs/video.js/issues/9667)) ([2c88e68](https://github.com/videojs/video.js/commit/2c88e684c8ecd2efe5aa67905daf1b1bc4dbb232))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/media@10.2.0...@videojs/media@10.3.0) (2026-11-03)
 
 

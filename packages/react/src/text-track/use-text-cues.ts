@@ -18,7 +18,6 @@ type TextTrackQuery = TextTrackFilter | TextTrackDefinition;
  *
  * @param track - The track definition to read.
  * @label With Definition
- * @internal
  */
 export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
@@ -27,7 +26,6 @@ export function useTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition
  *
  * @param filter - Picks tracks by kind, label, or language, or with a function.
  * @label With Filter
- * @internal
  */
 export function useTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
 export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
@@ -43,7 +41,6 @@ export function useTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly Media
  *
  * @param track - The track definition to read.
  * @label With Definition
- * @internal
  */
 export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefinition<Cue>): readonly Cue[];
 /**
@@ -52,7 +49,6 @@ export function useActiveTextCues<Cue extends MediaTextCue>(track: TextTrackDefi
  *
  * @param filter - Picks tracks by kind, label, or language, or with a function.
  * @label With Filter
- * @internal
  */
 export function useActiveTextCues(filter?: TextTrackFilter): readonly MediaTextCue[];
 export function useActiveTextCues(filter: TextTrackQuery = ALL_TRACKS): readonly MediaTextCue[] {
@@ -65,11 +61,27 @@ function useCues(
 ): readonly MediaTextCue[] {
   useWatchTextCues(filter);
 
+  return useReadTextCues(filter, read);
+}
+
+/**
+ * Select the cues a reader returns for a filter, without asking the store to track it. Pair with `useWatchTextCues`.
+ *
+ * @internal
+ */
+export function useReadTextCues(
+  filter: TextTrackQuery,
+  read: (source: TextCuesSource, filter: TextTrackQuery) => readonly MediaTextCue[]
+): readonly MediaTextCue[] {
   return usePlayer((state) => (hasTextCues(state) ? read(state, filter) : NO_CUES));
 }
 
-/** Ask the store to track cues for a filter while the component is mounted. */
-function useWatchTextCues(filter: TextTrackQuery): void {
+/**
+ * Ask the store to track cues for a filter while the component is mounted.
+ *
+ * @internal
+ */
+export function useWatchTextCues(filter: TextTrackQuery): void {
   const store = usePlayer();
   const latest = useLatestRef(filter);
   const key = getFilterKey(filter);

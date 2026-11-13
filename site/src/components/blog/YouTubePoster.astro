@@ -1,0 +1,38 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import A from '@/components/typography/A.astro';
+
+/**
+ * A poster image with a play button that links out to a YouTube video. Use it instead of an embedded iframe so the
+ * post loads no third-party player.
+ */
+interface Props {
+  /** The YouTube video ID. */
+  id: string;
+  poster: ImageMetadata;
+  /** The video's title, used for the link's accessible name. */
+  title: string;
+}
+
+const { id, poster, title } = Astro.props;
+---
+
+<A
+  href={`https://www.youtube.com/watch?v=${id}`}
+  class="group relative my-8 block overflow-hidden rounded-xl no-underline"
+  data-ph-capture-attribute-cta="watch-on-youtube"
+>
+  <Image src={poster} alt="" class="block h-auto w-full" />
+  <span class="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-intent:bg-black/10">
+    <span
+      class="flex items-center justify-center rounded-full bg-orange text-white shadow-lg transition-transform group-intent:scale-110"
+      style="width: 5rem; height: 5rem;"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" style="width: 2.25rem; height: 2.25rem; transform: translateX(-3px);">
+        <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.24-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14Z" />
+      </svg>
+    </span>
+  </span>
+  <span class="sr-only">Watch {title} on YouTube</span>
+</A>

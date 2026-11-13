@@ -7,13 +7,13 @@ import { SoundCloudAudio } from '@videojs/react/media/soundcloud-audio';
 import { createRoot } from 'react-dom/client';
 
 function App() {
-  const { source } = useSandbox();
+  const { source, mediaProps } = useSandbox();
 
   return (
     <AudioPlayer>
       <AudioSkinComponent>
         {/* Hidden unless it is showing SoundCloud's own chrome, so it takes no room and needs no size. */}
-        <SoundCloudAudio src={SOURCES[source].url ?? ''} />
+        <SoundCloudAudio src={SOURCES[source].url ?? ''} {...mediaProps} />
       </AudioSkinComponent>
     </AudioPlayer>
   );

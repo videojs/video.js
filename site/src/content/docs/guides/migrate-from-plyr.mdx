@@ -579,7 +579,7 @@ For changes to controls, layout, or icons, add the skin source to your project. 
 - Plyr's `speed.options` maps to `defaultPlaybackRates` on the player. See the <DocsLink slug="reference/api/feature-playback-rate">playback rate feature</DocsLink>.
 - Plyr's full-window fullscreen fallback has no matching Video.js feature. Test fullscreen on your supported browsers; see <DocsLink slug="guides/browser-support">Browser support</DocsLink>.
 - Plain MP4 source arrays with `size` metadata do not automatically create a quality menu. Use Mux, HLS, or DASH for adaptive quality when possible.
-- Preset skins segment the time slider and show chapter titles when the media includes a default `<track kind="chapters">`. Cue points are not implemented yet; see [#1442](https://github.com/videojs/v10/issues/1442).
+- Preset skins segment the time slider and show chapter titles when the media includes a default `<track kind="chapters">`. To add chapters from code, or cue points and time-slider markers, see <DocsLink slug="guides/timed-metadata">Timed metadata</DocsLink>.
 - The controls auto-hide delay is not configurable yet ([#1728](https://github.com/videojs/v10/issues/1728)). To disable auto-hide, set `visibility="always"` on the controls component in a custom layout or installed skin source. Packaged skins do not expose this setting.
 - Native controls are not automatically removed when custom controls load; see [#1160](https://github.com/videojs/v10/issues/1160).
 

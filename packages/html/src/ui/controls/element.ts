@@ -1,5 +1,5 @@
 import { ControlsCore, ControlsDataAttrs, type ControlsVisibility, POPUP_HOST_SELECTOR } from '@videojs/core';
-import { applyStateDataAttrs, logMissingFeature, selectControls } from '@videojs/core/dom';
+import { applyStateDataAttrs, logMissingFeature, selectControls, selectPlayback } from '@videojs/core/dom';
 import type { PropertyDeclarationMap, PropertyValues } from '@videojs/element';
 import { ContextProvider } from '@videojs/element/context';
 import { isFunction } from '@videojs/utils/predicate';
@@ -10,8 +10,8 @@ import { UIElement } from '../ui-element';
 import { controlsContext } from './context';
 
 /**
- * Tracks controls visibility, reflects it as data attributes, and shares it with its descendant controls parts. Hiding
- * the controls closes any popup open inside it.
+ * Tracks controls visibility and whether playback has started, reflects them as data attributes, and shares them with
+ * its descendant controls parts. Hiding the controls closes any popup open inside it.
  */
 export class ControlsElement extends UIElement {
   static readonly tagName = 'media-controls';
@@ -24,6 +24,7 @@ export class ControlsElement extends UIElement {
 
   readonly #core = new ControlsCore();
   readonly #mediaState = new PlayerController(this, playerContext, selectControls);
+  readonly #playback = new PlayerController(this, playerContext, selectPlayback);
   readonly #provider = new ContextProvider(this, { context: controlsContext });
   #visible = true;
 
@@ -40,6 +41,7 @@ export class ControlsElement extends UIElement {
 
     this.#core.setProps({ visibility: this.visibility });
     this.#core.setMedia(this.#mediaState.value ?? null);
+    this.#core.setPlayback(this.#playback.value ?? null);
 
     const state = this.#core.getState();
     if (!state) return;

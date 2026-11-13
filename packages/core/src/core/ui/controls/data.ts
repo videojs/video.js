@@ -7,4 +7,6 @@ export const ControlsDataAttrs = {
   visible: 'data-visible',
   /** Present when the user has recently interacted. */
   userActive: 'data-user-active',
+  /** Present when playback has started or the media is trying to autoplay. */
+  started: 'data-started',
 } as const satisfies StateAttrMap<ControlsState>;

@@ -100,6 +100,7 @@ export type {
   ThumbnailState,
   TimeProps,
   TimeSliderChapterRange,
+  TimeSliderMarkerRange,
   TimeSliderProps,
   TimeSliderState,
   TimeState,
@@ -406,6 +407,7 @@ export type {
   TimeSliderChaptersProps,
   TimeSliderChaptersState,
 } from './ui/time-slider/chapters';
+export type { TimeSliderMarkerState, TimeSliderMarkersProps, TimeSliderMarkersState } from './ui/time-slider/markers';
 export { Title } from './ui/title';
 export type { TitleProps } from './ui/title/component';
 export { Tooltip, type TooltipContent, type TooltipContextValue, useTooltipContext } from './ui/tooltip';

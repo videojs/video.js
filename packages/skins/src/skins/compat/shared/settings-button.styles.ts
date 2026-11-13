@@ -5,7 +5,7 @@ export default styles({
   prefix: 'media-settings-button',
   rules: {
     root: {
-      utilities: 'group/settings',
+      utilities: 'group/settings media-max-3xs:hidden',
     },
     icon: {
       utilities:

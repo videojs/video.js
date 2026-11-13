@@ -22,11 +22,7 @@ export type StandardSchemaV1Result<Output> =
   | { readonly value: Output; readonly issues?: undefined }
   | { readonly issues: readonly { readonly message: string }[] };
 
-/**
- * The value type a schema produces.
- *
- * @internal
- */
+/** The value type a schema produces. */
 export type InferSchemaOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output'];
 
 /**

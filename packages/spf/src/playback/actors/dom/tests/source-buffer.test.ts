@@ -300,7 +300,7 @@ describe('createSourceBufferActor', () => {
     actor.destroy();
   });
 
-  it('captures initTrackLanguage from append-init meta for downstream cross-rendition flush detection', async () => {
+  it('captures initTrackLanguage and initTrackName from append-init meta for downstream cross-rendition flush detection', async () => {
     // Multi-language-audio Tier 2 prerequisite: the segment-loader's
     // planTasks compares `actorCtx.initTrackLanguage` against the
     // newly-selected track's language to decide whether to flush the
@@ -309,11 +309,16 @@ describe('createSourceBufferActor', () => {
     const sourceBuffer = makeSourceBuffer();
     const actor = createSourceBufferActor(sourceBuffer);
 
-    actor.send({ type: 'append-init', data: new ArrayBuffer(4), meta: { trackId: 'audio-en', language: 'en' } });
+    actor.send({
+      type: 'append-init',
+      data: new ArrayBuffer(4),
+      meta: { trackId: 'audio-en', language: 'en', name: 'English' },
+    });
     await vi.waitFor(() => expect(actor.snapshot.get().value).toBe('idle'));
 
     expect(actor.snapshot.get().context.initTrackId).toBe('audio-en');
     expect(actor.snapshot.get().context.initTrackLanguage).toBe('en');
+    expect(actor.snapshot.get().context.initTrackName).toBe('English');
 
     actor.destroy();
   });

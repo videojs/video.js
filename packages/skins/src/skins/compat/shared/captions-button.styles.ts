@@ -5,7 +5,7 @@ export default styles({
   prefix: 'media-captions-button',
   rules: {
     root: {
-      utilities: 'group/captions',
+      utilities: 'group/captions media-max-3xs:hidden',
     },
     offIcon: {
       utilities: 'group-data-active/captions:hidden',

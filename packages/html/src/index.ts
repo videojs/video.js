@@ -117,6 +117,7 @@ export type {
   ThumbnailState,
   TimeProps,
   TimeSliderChapterRange,
+  TimeSliderMarkerRange,
   TimeSliderProps,
   TimeSliderState,
   TimeState,
@@ -415,6 +416,7 @@ export { TimeSeparatorElement } from './ui/time/separator';
 export { TimeSliderChapterTitleElement } from './ui/time-slider/chapter-title';
 export { TimeSliderChaptersElement } from './ui/time-slider/chapters';
 export { TimeSliderElement } from './ui/time-slider/element';
+export { TimeSliderMarkersElement } from './ui/time-slider/markers';
 export { TitleElement } from './ui/title/element';
 export { tooltipGroupContext } from './ui/tooltip/context';
 export { TooltipElement } from './ui/tooltip/element';

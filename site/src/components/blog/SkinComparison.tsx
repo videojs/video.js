@@ -142,7 +142,12 @@ export default function SkinComparison() {
   }, [media]);
 
   return (
-    <div ref={wrapper} className="skin-comparison mx-auto max-w-3xl">
+    // The comparison is about the controls, so it shows them before playback starts.
+    <div
+      ref={wrapper}
+      className="skin-comparison mx-auto max-w-3xl"
+      style={{ '--media-controls-before-start': 'visible' } as React.CSSProperties}
+    >
       <Comparison
         label="Interactive skin comparison"
         items={skins.map(({ name, Skin }) => ({
