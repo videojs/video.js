@@ -651,7 +651,7 @@ Use the <DocsLink slug="reference/api/player-store">player store</DocsLink> for 
 | `player.muted` | `muted` in player state; write with `setMuted(value)` |
 | `player.playbackRate` | the player's `setPlaybackRate`, or `media.playbackRate` |
 | `player.requestFullscreen()` | the player's `requestFullscreen`, `exitFullscreen` |
-| `player.addChapters([…])` | a `<track kind="chapters">`, covered below |
+| `player.addChapters([…])` | a `chapters` track added from code, covered below |
 
 Standard media properties update player state through media events. If the volume is `0`, `setMuted(false)` also sets it to `0.25`. Mux Player's smart-unmute behavior carries over through `setMuted(false)`. To unmute and keep a zero volume, set `media.muted` directly.
 
@@ -874,9 +874,41 @@ Add a chapters track with the `default` attribute inside your media. The skins t
 ```
 </FrameworkCase>
 
-To replace `addChapters()`, convert your chapter array to a WebVTT file and set its URL as the track's `src` ([#1268](https://github.com/videojs/v10/issues/1268)).
+To replace `addChapters()`, add a `chapters` track from code. Each chapter's title moves from `value` to `text`, and a chapter without an `endTime` runs to the next one. A WebVTT file in a `<track>`, as above, still works too.
 
-The time slider marks the segment containing the current playback time with `data-active`, so you can style the active segment. The player still has no active-chapter state, `chapterchange` event, or menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873)). If UI outside the time slider needs the current chapter, derive it from `currentTime` and the read-only `chaptersCues` array. Cue points aren't implemented at all ([#1442](https://github.com/videojs/v10/issues/1442)).
+<FrameworkCase frameworks={["html"]}>
+```ts
+player.store.addTextTrack({
+  kind: 'chapters',
+  cues: [
+    { startTime: 0, text: 'Introduction' },
+    { startTime: 95, text: 'Setup' },
+  ],
+});
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { useCreateTextTrack } from '@videojs/react';
+
+function Chapters() {
+  useCreateTextTrack({
+    kind: 'chapters',
+    cues: [
+      { startTime: 0, text: 'Introduction' },
+      { startTime: 95, text: 'Setup' },
+    ],
+  });
+
+  return null;
+}
+```
+</FrameworkCase>
+
+The time slider marks the segment containing the current playback time with `data-active`, so you can style the active segment. In place of `activeChapter`, read the active cue through `chaptersTrack` with `useActiveTextCues()` in React, or `getActiveTextCues()` in a store subscription in HTML; that subscription also stands in for `chapterchange`. There's still no menu for jumping between chapters ([#1873](https://github.com/videojs/v10/issues/1873)). See <DocsLink slug="guides/timed-metadata" anchor="add-chapters">Timed metadata</DocsLink>.
+
+Cue points become cues on a `metadata` track. Define the track with `defineTextTrack()`, add your cue points with `useCreateTextTrack()` or the store's `addTextTrack()`, and read the active one, in place of `activeCuePoint` and `cuepointchange`, with `useActiveTextCues()` or `getActiveTextCues()`. Each cue point's `value` carries over as the cue's `value`. To mark cue points on the time slider, add the time slider markers. See <DocsLink slug="guides/timed-metadata">Timed metadata</DocsLink>.
 
 ## Signed playback and DRM
 
