@@ -24,11 +24,51 @@ import basicUsageHtml from "@/components/docs/demos/mux-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-audio/html/css/BasicUsage.ts?raw";
 
-Audio element for playing Mux-hosted HLS streams. Built on hls.js with Mux-specific optimizations.
+Audio element for playing Mux-hosted HLS streams. It takes the same Mux source as the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> and plays it through the audio-only Video.js streaming engine (SPF), which fetches only the audio. An [hls.js flavor](#choose-a-playback-engine) is available from a separate import.
 
 ## Import
 
 <MediaImports media="mux-audio" package="@videojs/mux-audio" react="MuxAudio" />
+
+## Choose a playback engine
+
+The import path picks the engine. Both paths give you the same Mux audio component with the same Mux source fields.
+
+<FrameworkCase frameworks={["react"]}>
+| Import | Engine |
+|---|---|
+| `@videojs/react/media/mux-audio` | SPF, the Video.js streaming engine. The default. |
+| `@videojs/react/media/mux-audio/hls-js` | [hls.js](https://github.com/video-dev/hls.js/) |
+
+`@videojs/react/media/mux-audio/spf` is the same module as the default, for code that wants to name the engine.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Import | CDN bundle | Engine |
+|---|---|---|
+| `@videojs/html/media/mux-audio` | `media/mux-audio.js` | SPF, the Video.js streaming engine. The default. |
+| `@videojs/html/media/mux-audio/hls-js` | `media/mux-audio/hls-js.js` | [hls.js](https://github.com/video-dev/hls.js/) |
+
+`@videojs/html/media/mux-audio/spf` is the same module as the default, for code that wants to name the engine. Every flavor registers `<mux-audio>`, and the first registration on a page wins, so load one.
+</FrameworkCase>
+
+The default engine is audio-only. Given a playback ID for a video asset, it downloads the audio and leaves the video renditions alone. The hls.js flavor runs the full hls.js engine, which also downloads video it never shows.
+
+The default plays on-demand audio packaged as CMAF or as MPEG-TS, and its `source` carries Mux fields only. It accepts `source.drm` but ignores it, because the audio-only engine has no DRM support. The limits of the default engine are the same as for Mux video; see <DocsLink slug="reference/components/mux-video" anchor="what-the-default-engine-plays">What the default engine plays</DocsLink>.
+
+Import the `hls-js` flavor for the same reasons you would for Mux video: hls.js configuration through `source.engine`, native HLS playback through `source.preferPlayback`, a non-HLS `src` through `source.type`, low-latency live, live streams in MPEG-TS, and engine-level <DocsLink slug="guides/mux-data">Mux Data</DocsLink> metrics. <DocsLink slug="reference/components/mux-video" anchor="when-to-use-the-hlsjs-flavor">When to use the hls.js flavor</DocsLink> has the full list.
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { MuxAudio } from '@videojs/react/media/mux-audio/hls-js';
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/media/mux-audio/hls-js';
+```
+</FrameworkCase>
 
 ## Load a source
 

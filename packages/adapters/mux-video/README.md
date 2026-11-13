@@ -6,7 +6,8 @@ storyboards) and plays it through one of two engines, picked by import path:
 - `@videojs/mux-video` — the default, over the Video.js streaming engine from `@videojs/spf`. `@videojs/mux-video/spf`
   names the same Media explicitly.
 - `@videojs/mux-video/hls-js` — over [hls.js](https://github.com/video-dev/hls.js), through `@videojs/hlsjs-video`. Reach
-  for it when a source needs hls.js configuration, native HLS playback, client-side rendition caps, or Low-Latency HLS.
+  for it when a source needs hls.js configuration, native HLS playback, client-side rendition caps, Low-Latency HLS, or
+  a live stream packaged as MPEG-TS.
 
 Install the adapter with the framework façade your player uses:
 

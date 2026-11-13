@@ -22,7 +22,7 @@ import { hlsMetadataTrack } from '@videojs/html';
 
 `hlsMetadataTrack` is a <DocsLink slug="reference/api/define-text-track">track definition</DocsLink> for `{ kind: 'metadata', label: 'id3' }`, the track hls.js publishes timed metadata on. Its cues are typed as `HlsMetadataCue`. The <DocsLink slug="reference/api/feature-text-cues">text cues feature</DocsLink> reads the track like any other metadata track.
 
-hls.js plays streams in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and the media built on it, such as <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, when they play through Media Source Extensions. Where the browser plays HLS natively, as Safari does, in-band metadata arrives as `DataCue`s on the browser's own metadata tracks instead; read those with a `{ kind: 'metadata' }` filter.
+hls.js plays streams in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and the media built on it, such as the hls.js flavor of <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, when they play through Media Source Extensions. Where the browser plays HLS natively, as Safari does, in-band metadata arrives as `DataCue`s on the browser's own metadata tracks instead; read those with a `{ kind: 'metadata' }` filter.
 
 ## Cues
 

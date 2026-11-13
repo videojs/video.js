@@ -107,9 +107,10 @@ describe('MuxAudioAdapter', () => {
   });
 
   it('points unplayable-source copy at the hls.js-backed Media', () => {
-    // The audio-only adapter gained the suggestion seam for this: SPF plays
-    // neither MPEG-TS nor DRM whichever engine variant is underneath. Named by
-    // flavor rather than by import path, as on the video Media.
+    // The audio-only adapter gained the suggestion seam for this: the
+    // hls.js-backed Mux Media plays what this flavor still refuses, such as
+    // codecs the audio transmuxer doesn't cover. Named by flavor rather than by
+    // import path, as on the video Media.
     expect(MuxAudioAdapter.alternativeMediaSuggestion).toContain('hls-js');
     expect(MuxAudioAdapter.alternativeMediaSuggestion).not.toContain('@videojs/');
   });

@@ -56,7 +56,7 @@ The default presets play through the browser's own `<video>` and `<audio>`. Ever
 <script type="module" src="{{VJS10_CDN_BASE}}/media/hlsjs-video.js"></script>
 ```
 
-Each path mirrors its npm subpath. Elements with more than one playback engine keep the extra flavors in a directory named for the element, such as `media/mux-video/spf.js`. Load one flavor per page: every flavor claims the same tag name, and the first registration wins.
+Each path mirrors its npm subpath. Elements with more than one playback engine keep the extra flavors in a directory named for the element. `media/mux-video.js` is the default Mux video, for example, and `media/mux-video/hls-js.js` is the same element on hls.js. Load one flavor per page: every flavor claims the same tag name, and the first registration wins.
 
 ## Extension bundles
 

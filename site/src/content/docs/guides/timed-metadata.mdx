@@ -128,7 +128,7 @@ A definition with the same kind and label reads it, so the rendering code from t
 
 ### Read metadata from an HLS stream
 
-When hls.js plays a stream, in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and media built on it such as <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, it publishes ID3 frames and `EXT-X-DATERANGE` tags as cues on a metadata track. Read them with <DocsLink slug="reference/api/hls-metadata-track">`hlsMetadataTrack`</DocsLink>. Each cue's `type` tells an ID3 frame from a date range attribute, and narrows its `value`.
+When hls.js plays a stream, in <DocsLink slug="reference/components/hlsjs-video">`HlsJsVideo`</DocsLink> and media built on it such as the hls.js flavor of <DocsLink slug="reference/components/mux-video">`MuxVideo`</DocsLink>, it publishes ID3 frames and `EXT-X-DATERANGE` tags as cues on a metadata track. Read them with <DocsLink slug="reference/api/hls-metadata-track">`hlsMetadataTrack`</DocsLink>. Each cue's `type` tells an ID3 frame from a date range attribute, and narrows its `value`.
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx

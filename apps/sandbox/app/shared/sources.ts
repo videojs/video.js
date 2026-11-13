@@ -315,8 +315,8 @@ const SOURCE_MAP = {
    * ratio, not a typo, and they are the reason the cap compares pixel areas rather than matching `1920x1080`-style
    * tiers.) Video-only — the source carries no audio track.
    *
-   * CMAF/fMP4, because SPF appends fMP4 segments directly and does no MPEG-TS transmuxing. Packaging follows the video
-   * quality tier — `premium` yields CMAF, while `plus`/`basic` (legacy `encoding_tier: smart`) yield MPEG-TS — which is
+   * CMAF/fMP4, because the container-neutral SPF engines append fMP4 segments directly and do no MPEG-TS transmuxing.
+   * Packaging follows the video quality tier — `premium` and `basic` yield CMAF, while `plus` yields MPEG-TS — which is
    * also why a 4K ladder needs `max_resolution_tier: '2160p'` alongside `video_quality: 'premium'`.
    */
   'hls-4k': {

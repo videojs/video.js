@@ -154,7 +154,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 <FrameworkCase frameworks={["react"]}>
 | Key | Elements that read it | It holds |
 |---|---|---|
-| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
+| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, and the [hls.js flavors](#engine-options-need-the-hlsjs-flavor) of <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink> and <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
 | `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
@@ -173,7 +173,7 @@ Engine options live under `source.engine`, **namespaced by engine**. Each key th
 <FrameworkCase frameworks={["html"]}>
 | Key | Elements that read it | It holds |
 |---|---|---|
-| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
+| `engine.hlsJs` | <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, and the [hls.js flavors](#engine-options-need-the-hlsjs-flavor) of <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> and <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | an [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) |
 | `engine.nativeHls` | <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, and the three above whenever the browser plays the manifest | options for the browser's own HLS support (today, [DRM](#licensing-one-engine-differently)) |
 | `engine.dashJs` | <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | [dash.js settings](https://cdn.dashjs.org/latest/jsdoc/module-Settings.html) |
 | `engine.shaka` | <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | a [Shaka Player configuration](https://shaka-project.github.io/shaka-player/docs/api/shaka.extern.html#.PlayerConfiguration) |
@@ -266,11 +266,11 @@ video.source = { src: 'https://example.com/stream.m3u8', preferPlayback: 'native
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `HlsJsVideo`, `MuxVideo`, and `MuxAudio` accept it; DASH and Vimeo have no second playback path.
+It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `HlsJsVideo` and the hls.js flavors of `MuxVideo` and `MuxAudio` accept it; DASH and Vimeo have no second playback path.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `<hlsjs-video>`, `<mux-video>`, and `<mux-audio>` accept it; DASH and Vimeo have no second playback path.
+It's a preference, not a demand — Video.js falls back to whichever path can actually play the source. `<hlsjs-video>` and the hls.js flavors of `<mux-video>` and `<mux-audio>` accept it; DASH and Vimeo have no second playback path.
 </FrameworkCase>
 
 `maxAutoResolution` caps the highest rendition adaptive bitrate selection reaches for on its own:
@@ -438,11 +438,11 @@ It replaces rather than merges, so the FairPlay server above is gone as far as h
 ## Mux sources name a playback ID
 
 <FrameworkCase frameworks={["react"]}>
-<DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink> and <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> identify a source by `playbackId` rather than a URL, and derive `src` from it. Everything else works the same, engine options included:
+<DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink> and <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> identify a source by `playbackId` rather than a URL, and derive `src` from it:
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-<DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> and <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> identify a source by `playbackId` rather than a URL, and derive `src` from it. Everything else works the same, engine options included:
+<DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink> and <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> identify a source by `playbackId` rather than a URL, and derive `src` from it:
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -451,7 +451,6 @@ It replaces rather than merges, so the FairPlay server above is gone as far as h
   source={{
     playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
     playback: { maxResolution: '1080p' },
-    engine: { hlsJs: { maxBufferLength: 60 } },
   }}
   playsInline
 />
@@ -465,16 +464,56 @@ const video = document.querySelector('mux-video');
 video.source = {
   playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
   playback: { maxResolution: '1080p' },
+};
+```
+</FrameworkCase>
+
+`playback` params ride along in the URL, so `playback.maxResolution` decides which renditions the manifest carries in the first place, and `playback.minResolution` asks Mux to leave the lowest renditions out of it.
+
+Setting a Mux stream URL as `src` works too — the element parses the playback ID and query params back out into `source`. To play something Mux doesn't host, name it with `src` inside `source`.
+
+### Engine options need the hls.js flavor
+
+The default Mux media run on the Video.js streaming engine, like the [elements without engine options](#elements-without-engine-options). Their `source` carries the Mux fields and `drm`, with no `engine`, `preferPlayback`, `type`, or rendition caps.
+
+Those fields belong to the hls.js flavor of the same media, which you get from an `hls-js` import. There, a Mux source takes everything an hls.js source does:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
+
+<MuxVideo
+  source={{
+    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    playback: { maxResolution: '1080p' },
+    maxAutoResolution: '720p',
+    engine: { hlsJs: { maxBufferLength: 60 } },
+  }}
+  playsInline
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/media/mux-video/hls-js';
+
+const video = document.querySelector('mux-video');
+
+video.source = {
+  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+  playback: { maxResolution: '1080p' },
+  maxAutoResolution: '720p',
   engine: { hlsJs: { maxBufferLength: 60 } },
 };
 ```
 </FrameworkCase>
 
-`playback` params ride along in the URL, so `playback.maxResolution` decides which renditions the manifest carries in the first place. `maxAutoResolution` is the other half of that pair: it caps what adaptive selection picks from the renditions that do arrive. Use `playback.maxResolution` when a viewer should never get 4K, and `maxAutoResolution` when they should be able to ask for it.
+On that flavor, `maxAutoResolution` is the other half of `playback.maxResolution`: it caps what adaptive selection picks from the renditions that do arrive. Use `playback.maxResolution` when a viewer should never get 4K, and `maxAutoResolution` when they should be able to ask for it.
 
-The same split applies at the bottom of the ladder, and the names are close enough to be worth restating: `playback.minResolution` asks Mux to leave the lowest renditions out of the manifest, while `minAutoResolution` is a client-side bound on the player-size cap. They are unrelated.
+The same split applies at the bottom of the ladder, and the names are close enough to be worth restating: `playback.minResolution` trims the manifest, while `minAutoResolution` is a client-side bound on the player-size cap. They are unrelated.
 
-Setting a Mux stream URL as `src` works too — the element parses the playback ID and query params back out into `source`. To play something Mux doesn't host, name it with `src` inside `source`; engine options still apply.
+The <DocsLink slug="reference/components/mux-video" anchor="choose-a-playback-engine">Mux video reference</DocsLink> covers when to choose each flavor.
 
 Two more source params describe images rather than playback. `source.storyboard` and `source.poster` carry the modifiers for the storyboard VTT and the poster still — both belong to the source, since a signed token scopes them to one playback ID:
 
@@ -500,7 +539,7 @@ video.source = { playbackId, storyboard: { format: 'jpg' }, poster: { time: 12 }
 
 ### Mux signs DRM with a token
 
-Mux serves FairPlay, Widevine, and PlayReady from URLs derived from a single license token, so `source.drm` takes that token in place of the license servers it would otherwise name. Mux fills the rest in for you, so protected media plays whichever path the browser takes:
+Mux serves FairPlay, Widevine, and PlayReady from URLs derived from a single license token, so `source.drm` takes that token in place of the license servers it would otherwise name. Mux fills the rest in for you, so protected media plays on either Mux video flavor, whichever path the browser takes:
 
 <FrameworkCase frameworks={["react"]}>
 ```tsx

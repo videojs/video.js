@@ -131,27 +131,27 @@ The extension attaches to the media the player is using, not to a specific eleme
 The extension attaches to the media the player is using, not to a specific element type, so it monitors <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, and the rest alike.
 </FrameworkCase>
 
-How much the extension reports depends on the engine playing the stream. All media report the playback metrics available from the media element. The extension also recognizes [hls.js](https://github.com/video-dev/hls.js/) and [dash.js](https://github.com/Dash-Industry-Forum/dash.js) engines and hands them to the Mux Data SDK, which adds stream-level detail: rendition switches, segment request timing and throughput, and engine errors. Media without a JavaScript engine, like native HLS or a plain `<video>`, report only the element-level metrics.
+How much the extension reports depends on the engine playing the stream. All media report the playback metrics available from the media element. The extension also recognizes [hls.js](https://github.com/video-dev/hls.js/) and [dash.js](https://github.com/Dash-Industry-Forum/dash.js) engines and hands them to the Mux Data SDK, which adds stream-level detail: rendition switches, segment request timing and throughput, and engine errors. Everything else reports only the element-level metrics: media without a JavaScript engine, like native HLS or a plain `<video>`, and media on the Video.js streaming engine (SPF), like HLS video and the default Mux video and audio. To get the stream-level detail for a Mux stream, import the <DocsLink slug="reference/components/mux-video" anchor="choose-a-playback-engine">hls.js flavor</DocsLink> of the Mux media.
 
 The `video_id` it reports is the Mux playback ID for streams served from `stream.mux.com`, and the source URL otherwise. Each view also gets a generated `view_session_id`. Override either through `metadata`.
 
 ## Name the player
 
 <FrameworkCase frameworks={["react"]}>
-Each view reports a player software name of `videojs-react-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-react-hlsjs`.
+Each view reports a player software name of `videojs-react-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-react-hlsjs`, and the default Mux video reports `videojs-react-spf-hls-video-mpeg-ts`.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-Each view reports a player software name of `videojs-html-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-html-hlsjs`.
+Each view reports a player software name of `videojs-html-<engine>`, with the Video.js version as the player software version, so you can compare views by engine in Mux Data. For example, a stream played by hls.js reports `videojs-html-hlsjs`, and the default Mux video reports `videojs-html-spf-hls-video-mpeg-ts`.
 </FrameworkCase>
 
 | Engine | Played by |
 |---|---|
-| `hlsjs` | [hls.js](https://github.com/video-dev/hls.js/) |
+| `hlsjs` | [hls.js](https://github.com/video-dev/hls.js/), used by hls.js video and the hls.js flavor of Mux video and audio |
 | `spf-hls-video` | The Video.js SPF engine for video, used by HLS video |
-| `spf-hls-video-mpeg-ts` | The SPF video engine with MPEG-TS support, used by the SPF flavor of Mux video |
+| `spf-hls-video-mpeg-ts` | The SPF video engine with MPEG-TS support, used by Mux video |
 | `spf-hls-audio` | The audio-only SPF engine, used by HLS audio |
-| `spf-hls-audio-mpeg-ts` | The audio-only SPF engine with MPEG-TS support, used by the SPF flavor of Mux audio |
+| `spf-hls-audio-mpeg-ts` | The audio-only SPF engine with MPEG-TS support, used by Mux audio |
 | `spf-hls-background-video` | The SPF engine for background video, used by HLS background video |
 | `spf-hls-background-video-mpeg-ts` | The SPF background video engine with MPEG-TS support, used by Mux background video |
 | `shaka` | [Shaka Player](https://github.com/shaka-project/shaka-player) |

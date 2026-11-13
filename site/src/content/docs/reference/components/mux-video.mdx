@@ -24,11 +24,97 @@ import basicUsageHtml from "@/components/docs/demos/mux-video/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-video/html/css/BasicUsage.ts?raw";
 
-Video element for playing Mux-hosted HLS streams. Built on hls.js with Mux-specific optimizations.
+Video element for playing Mux-hosted HLS streams. It builds the stream URL, poster, and storyboard from a Mux playback ID, and plays the stream through the Video.js streaming engine (SPF). An [hls.js flavor](#choose-a-playback-engine) is available from a separate import.
 
 ## Import
 
 <MediaImports media="mux-video" package="@videojs/mux-video" react="MuxVideo" />
+
+## Choose a playback engine
+
+The import path picks the engine. Both paths give you the same Mux video component with the same Mux source fields, posters, and storyboards.
+
+<FrameworkCase frameworks={["react"]}>
+| Import | Engine |
+|---|---|
+| `@videojs/react/media/mux-video` | SPF, the Video.js streaming engine. The default. |
+| `@videojs/react/media/mux-video/hls-js` | [hls.js](https://github.com/video-dev/hls.js/) |
+
+`@videojs/react/media/mux-video/spf` is the same module as the default, for code that wants to name the engine.
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Import | CDN bundle | Engine |
+|---|---|---|
+| `@videojs/html/media/mux-video` | `media/mux-video.js` | SPF, the Video.js streaming engine. The default. |
+| `@videojs/html/media/mux-video/hls-js` | `media/mux-video/hls-js.js` | [hls.js](https://github.com/video-dev/hls.js/) |
+
+`@videojs/html/media/mux-video/spf` is the same module as the default, for code that wants to name the engine. Every flavor registers `<mux-video>`, and the first registration on a page wins, so load one.
+</FrameworkCase>
+
+### What the default engine plays
+
+The default engine plays through Media Source Extensions (MSE). It plays:
+
+- On-demand assets, packaged as CMAF or as MPEG-TS. Mux packages basic- and premium-quality assets as CMAF and plus-quality assets as MPEG-TS, and the engine converts MPEG-TS segments to fMP4 in the browser.
+- Live streams packaged as CMAF, which is how Mux packages low-latency streams. They play at standard latency.
+- [Signed playback](#signed-playback) and [DRM](#protected-content) with FairPlay, Widevine, and PlayReady.
+
+Its `source` carries Mux fields only: `playbackId`, `customDomain`, `playback`, `poster`, `storyboard`, `drm`, and `src`. The engine takes no configuration from the source.
+
+Three limits are worth knowing before you ship:
+
+- It needs `MediaSource` or `ManagedMediaSource`. It has no native HLS fallback, so it cannot play in a browser that has neither.
+- It treats every `src` as HLS. It won't play an MP4 URL.
+- Its MPEG-TS support is a narrow subset: on-demand streams with H.264 video and AAC-LC audio. It has been verified in Chromium browsers only, so test plus-quality assets in the other browsers you support.
+
+### When to use the hls.js flavor
+
+Import the `hls-js` flavor when your player needs something from this list:
+
+| You need | Why |
+|---|---|
+| hls.js configuration, or the hls.js instance | `source.engine` exists only on this flavor, and its `engine` property is the hls.js instance. On the default, `engine` is the SPF engine. |
+| Native HLS playback | `source.preferPlayback` exists only on this flavor. It also falls back to the browser's HLS support where MSE is missing. |
+| A client-side rendition cap | `source.maxAutoResolution`, `source.minAutoResolution`, and `source.capRenditionToPlayerSize` exist only on this flavor. `playback.maxResolution`, which asks Mux to trim the manifest, works on both. |
+| A non-HLS `src` | `source.type` exists only on this flavor. |
+| Low-latency live | The default plays a low-latency stream at standard latency. |
+| Live streams in MPEG-TS | Mux packages standard- and reduced-latency live streams as MPEG-TS, and the default's MPEG-TS support covers on-demand only. |
+| DVR live streams | The default does not play them reliably yet. |
+| CEA-608 or CEA-708 captions, or ID3 timed metadata | The default reads neither from the stream. WebVTT subtitles in the manifest work on both. |
+| AES-128 encrypted segments | The default does not decrypt them. |
+| Engine-level <DocsLink slug="guides/mux-data">Mux Data</DocsLink> metrics | Mux Data hooks hls.js for rendition switches, request timing, and engine errors. The default reports the metrics the media element provides. |
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
+
+<MuxVideo
+  source={{
+    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    maxAutoResolution: '720p',
+    engine: { hlsJs: { maxBufferLength: 60 } },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+import '@videojs/html/media/mux-video/hls-js';
+
+const video = document.querySelector('mux-video')!;
+video.source = {
+  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+  maxAutoResolution: '720p',
+  engine: { hlsJs: { maxBufferLength: 60 } },
+};
+```
+</FrameworkCase>
+
+The props, attributes, and events listed under [API Reference](#api-reference) describe the default flavor. The hls.js flavor adds the source fields above; <DocsLink slug="guides/media-sources">Media sources</DocsLink> documents them.
+
+In TypeScript, `@videojs/mux-video` exports the default's source type as `MuxSourceBase`. The wider `MuxSource` type, with the hls.js fields, comes from `@videojs/mux-video/hls-js`.
 
 ## Load a source
 
