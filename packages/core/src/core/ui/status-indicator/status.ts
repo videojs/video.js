@@ -40,6 +40,9 @@ export function deriveStatus(
 ): StatusDetails | null {
   switch (event.action) {
     case 'togglePaused': {
+      // Starting playback is its own feedback, so only later toggles show the indicator.
+      if (snapshot.started === false) return null;
+
       const paused = snapshot.paused !== undefined ? !snapshot.paused : true;
 
       return {

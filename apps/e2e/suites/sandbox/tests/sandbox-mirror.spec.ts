@@ -60,12 +60,12 @@ test.describe('Sandbox mirror', () => {
     await expect(page.getByRole('switch', { name: 'Mirror playback' })).toBeChecked();
 
     // Play in the html panel; the react panel follows.
-    await html.getByRole('button', { name: 'Play' }).click();
+    await html.getByRole('button', { name: 'Play' }).last().click();
     await expect.poll(() => mediaState(html).then((state) => state.paused)).toBe(false);
     await expect.poll(() => mediaState(react).then((state) => state.paused), { timeout: 10_000 }).toBe(false);
 
     // Pause from the react panel; the html panel follows.
-    await react.getByRole('button', { name: 'Pause' }).click();
+    await react.getByRole('button', { name: 'Pause' }).last().click();
     await expect.poll(() => mediaState(react).then((state) => state.paused)).toBe(true);
     await expect.poll(() => mediaState(html).then((state) => state.paused), { timeout: 10_000 }).toBe(true);
 

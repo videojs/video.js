@@ -22,6 +22,8 @@ export default function HeroVideo({
           {
             '--media-border-radius': `calc(var(--spacing) * 6)`,
             '--media-object-fit': 'cover',
+            // The hero hides the centre controls behind its headline, so keep the control bar before playback starts.
+            '--media-controls-before-start': 'visible',
             ...style,
           } as React.CSSProperties
         }

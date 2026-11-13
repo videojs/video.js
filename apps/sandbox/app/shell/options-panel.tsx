@@ -49,6 +49,9 @@ export type OptionsPanelProps = {
   onLocaleChange: (value: SandboxLocaleTag) => void;
   accentColor: string;
   onAccentColorChange: (value: string) => void;
+  /** Show the skin's control bar before playback starts. */
+  controlsBeforeStart: boolean;
+  onControlsBeforeStartChange: (value: boolean) => void;
   autoplay: boolean;
   onAutoplayChange: (value: boolean) => void;
   muted: boolean;
@@ -105,6 +108,8 @@ export function OptionsPanel({
   onLocaleChange,
   accentColor,
   onAccentColorChange,
+  controlsBeforeStart,
+  onControlsBeforeStartChange,
   autoplay,
   onAutoplayChange,
   muted,
@@ -132,6 +137,7 @@ export function OptionsPanel({
   const directionId = useId();
   const localeId = useId();
   const accentColorId = useId();
+  const controlsBeforeStartId = useId();
   const autoplayId = useId();
   const mutedId = useId();
   const loopId = useId();
@@ -204,6 +210,13 @@ export function OptionsPanel({
             optionGroups={SANDBOX_LOCALE_OPTION_GROUPS}
           />
           <ColorItem id={accentColorId} value={accentColor} onChange={onAccentColorChange} />
+          <SwitchItem
+            id={controlsBeforeStartId}
+            label="Controls before start"
+            checked={controlsBeforeStart}
+            onChange={onControlsBeforeStartChange}
+            disabled={skinless}
+          />
           <SwitchItem
             id={skinlessId}
             label="No skin"
@@ -397,10 +410,11 @@ function ColorItem({ id, value, onChange }: ColorItemProps) {
         <input
           type="color"
           value={pickerValue}
-          disabled={!value.trim()}
           onChange={(event) => onChange(event.target.value)}
           aria-label="Choose accent color"
-          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 disabled:cursor-default disabled:opacity-50"
+          // With no accent set, the swatch shows a stand-in color, so it fades to grey rather than look chosen.
+          data-default={value.trim() ? undefined : ''}
+          className="size-7 cursor-pointer rounded border-none bg-transparent p-0 data-default:opacity-50 data-default:grayscale"
         />
       </div>
     </>

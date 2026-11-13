@@ -28,6 +28,11 @@ export const vars = {
     kind: 'public',
     description: 'Outer player border radius.',
   },
+  '--media-controls-before-start': {
+    kind: 'public',
+    description:
+      'Visibility of the video skin controls before playback starts. Defaults to `hidden`, leaving only the centre play button; set `visible` to show the controls.',
+  },
   '--media-font-family': {
     kind: 'public',
     description: 'Font family used by the player interface.',

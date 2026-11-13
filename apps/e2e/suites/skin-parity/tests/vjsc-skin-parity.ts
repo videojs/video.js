@@ -125,6 +125,8 @@ function sandboxQuery(
     muted: '0',
     loop: '0',
     preload: 'metadata',
+    // Keep the controls visible before playback starts, since the comparisons read them without playing.
+    prestart: '1',
   });
 }
 

@@ -266,8 +266,12 @@ function InstallationPreview() {
 
   return (
     <figure className="flex flex-col gap-3">
-      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. */}
-      <div className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border p-5 sm:p-8">
+      {/* The player sits inside a padded surface so it reads as a preview of a component, not as page content. It keeps
+          the skin's controls visible before playback starts, so the preview shows them. */}
+      <div
+        className="corner-squircle border-line bg-surface overflow-hidden rounded-lg border p-5 sm:p-8"
+        style={{ '--media-controls-before-start': 'visible' } as React.CSSProperties}
+      >
         {player}
       </div>
       <figcaption className="text-muted text-p3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">

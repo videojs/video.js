@@ -1,7 +1,7 @@
 'use client';
 
 import { ControlsCore, ControlsDataAttrs, type ControlsProps, type ControlsState } from '@videojs/core';
-import { logMissingFeature, selectControls } from '@videojs/core/dom';
+import { logMissingFeature, selectControls, selectPlayback } from '@videojs/core/dom';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -21,10 +21,12 @@ export function ControlsRoot({
   'use no memo';
 
   const controls = usePlayer(selectControls);
+  const playback = usePlayer(selectPlayback);
   const [core] = useState(() => new ControlsCore());
 
   core.setProps({ visibility });
   core.setMedia(controls ?? null);
+  core.setPlayback(playback ?? null);
 
   const state = core.getState();
 
