@@ -23,86 +23,18 @@ import basicUsageHtml from "@/components/docs/demos/hls-video/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/hls-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/hls-video/html/css/BasicUsage.ts?raw";
 
-The lightweight HLS video element, optimized for minimal bundle size. The <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> is the larger, more compatible alternative.
+HLS video component built on Video.js's own streaming engine, optimized for a small bundle. The <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink> is the larger, more compatible alternative and takes hls.js engine options. The <DocsLink slug="reference/components/native-hls-video">native HLS video component</DocsLink> hands playback to browsers with built-in HLS. <DocsLink slug="guides/media-sources">Media sources</DocsLink> explains how `src` and `source` work.
 
 ## Import
 
 <MediaImports media="hls-video" react="HlsVideo" />
 
-## Load a source
+## Guides
 
-`src` takes an HLS manifest URL.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsVideo src="https://example.com/playlist.m3u8" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<hls-video src="https://example.com/playlist.m3u8"></hls-video>
-```
-</FrameworkCase>
-
-The structured `source` object carries what a URL can't: `drm` for protected content. Setting `source` derives `src`.
-
-## Protected content
-
-`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess). Name every system you hold a license server for: which one gets negotiated is the browser's choice.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsVideo
-  source={{
-    src: 'https://example.com/protected.m3u8',
-    drm: {
-      'com.apple.fps': {
-        licenseUrl: 'https://example.com/fairplay',
-        serverCertificateUrl: 'https://example.com/fairplay.cer',
-      },
-      'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-    },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const video = document.querySelector('hls-video')!;
-video.source = {
-  src: 'https://example.com/protected.m3u8',
-  drm: {
-    'com.apple.fps': {
-      licenseUrl: 'https://example.com/fairplay',
-      serverCertificateUrl: 'https://example.com/fairplay.cer',
-    },
-    'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-  },
-};
-```
-</FrameworkCase>
-
-FairPlay needs a `serverCertificateUrl` unless its CDM is pre-provisioned; Widevine and PlayReady ignore it. <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">Media sources</DocsLink> covers DRM in more depth.
-
-## Cookie-gated streams
-
-A stream on another origin that is gated by cookies — CloudFront signed cookies, for example — needs those cookies on every manifest and segment request, or the CDN answers 403. Set the standard `crossorigin="use-credentials"` on the element and the engine sends them, the same way the browser does under native playback. Any other value, or no attribute, leaves requests at the platform default and sends no cross-origin cookies.
-
-The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`, or the browser refuses the credentialed response.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<hls-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hls-video>
-```
-</FrameworkCase>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
 ## Examples
 

@@ -230,7 +230,8 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
 
   /**
    * Engine this media is playing through, reported to analytics such as Mux Data: `hlsjs` via MSE, `browser` for native
-   * HLS, or `undefined` until a source loads. Read from the instance because the engine is picked per source.
+   * HLS, or `undefined` until a source loads. The engine is chosen per source, so this can change when the source
+   * does.
    */
   get engineName(): string | undefined {
     return getMediaEngineName(this.#delegate);
@@ -297,6 +298,9 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
    *
    * Sources are compared structurally, so reassigning an equivalent object is a no-op. Only a change to the engine
    * options (or to the resolved content type) recreates the playback engine.
+   *
+   * [Media sources](https://videojs.org/docs/guides/media-sources) explains each option. `drm` names license servers by
+   * key system; see [Play DRM-protected content](https://videojs.org/docs/guides/drm).
    */
   get source(): HlsSource | null {
     return this.#source;
@@ -375,17 +379,20 @@ export class HlsJsAdapter extends HTMLVideoAdapter implements HlsJsAdapterProps 
   }
 
   /**
-   * Presentation time marking the start of the Live Edge Window.
+   * Playback time where the live edge begins. Playback is live when `currentTime >= liveEdgeStart`. `NaN` when the
+   * stream is not live or no source has loaded yet.
    *
-   * Derived from the delegate on every read; `NaN` when no delegate is attached or the stream is not live.
+   * No change event fires for this value alone. Read it again when `seekable`, `targetLiveWindow`, or `streamType`
+   * changes.
    */
   get liveEdgeStart() {
     return this.#delegate?.liveEdgeStart ?? Number.NaN;
   }
 
   /**
-   * Seekable range size for live content. `0` for standard live, `Infinity` for DVR, `NaN` for on-demand or unknown.
-   * Fires `targetlivewindowchange` when the value changes (bridged from the delegate).
+   * Describes the kind of live window available. `0` for a sliding live window, `Infinity` for a live event with
+   * playback history (DVR), and `NaN` for on-demand or unknown. This value is not a duration. Fires
+   * `targetlivewindowchange` when it changes.
    */
   get targetLiveWindow() {
     return this.#delegate?.targetLiveWindow ?? Number.NaN;

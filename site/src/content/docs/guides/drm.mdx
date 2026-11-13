@@ -1,0 +1,174 @@
+---
+title: Play DRM-protected content
+description: License FairPlay, Widevine, and PlayReady content with source.drm on the HLS, DASH, and Mux media components
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+Name your license servers on `source.drm` and the media component negotiates a key system with the browser, fetches the license, and plays. The same object works on every media component that supports DRM.
+
+## Recommended approach
+
+Key `source.drm` by [EME key system](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess), and name every system you hold a license server for:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsJsVideo
+  source={{
+    src: 'https://example.com/protected.m3u8',
+    drm: {
+      'com.apple.fps': {
+        licenseUrl: 'https://license.example.com/fairplay',
+        serverCertificateUrl: 'https://license.example.com/fairplay-cert',
+      },
+      'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+      'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
+    },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('hlsjs-video')!;
+
+video.source = {
+  src: 'https://example.com/protected.m3u8',
+  drm: {
+    'com.apple.fps': {
+      licenseUrl: 'https://license.example.com/fairplay',
+      serverCertificateUrl: 'https://license.example.com/fairplay-cert',
+    },
+    'com.widevine.alpha': { licenseUrl: 'https://license.example.com/widevine' },
+    'com.microsoft.playready': { licenseUrl: 'https://license.example.com/playready' },
+  },
+};
+```
+</FrameworkCase>
+
+Mux-hosted assets take a single token instead of license servers. See <DocsLink slug="guides/mux" anchor="play-drm-protected-assets">Play Mux videos</DocsLink>.
+
+## How it works
+
+Each entry names one key system:
+
+| Key | Key system | Browsers |
+|---|---|---|
+| `com.apple.fps` | FairPlay | Safari |
+| `com.widevine.alpha` | Widevine | Chrome, Firefox, Edge, Android |
+| `com.microsoft.playready` | PlayReady | Edge on Windows, smart TVs |
+
+Each entry takes a `licenseUrl`, where the browser's content decryption module (CDM) POSTs its license request. FairPlay also needs `serverCertificateUrl`, the DRM server (application) certificate, unless its CDM is pre-provisioned. Widevine and PlayReady ignore it.
+
+The browser decides which key system it uses, which is why you name all of them. `drm` sits on `source` rather than inside an engine's options because which engine plays the manifest can be decided later, and every engine reads it. See <DocsLink slug="guides/media-sources">Media sources</DocsLink> for how `source` fits together.
+
+## Availability and constraints
+
+How far `source.drm` gets depends on which engine plays the stream:
+
+<FrameworkCase frameworks={["react"]}>
+| Media component | Key systems it licenses | Notes |
+|---|---|---|
+| <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink> | FairPlay, Widevine, PlayReady | |
+| <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink> | FairPlay, Widevine, PlayReady through hls.js; FairPlay only through the browser's own HLS | See [Two playback paths](#two-playback-paths) |
+| <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink> | FairPlay | Reads only the `com.apple.fps` entry |
+| <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | FairPlay, Widevine, PlayReady | Same paths as HlsJsVideo; also accept a Mux DRM token |
+| <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | FairPlay, Widevine, PlayReady | Plays DRM-protected DASH and HLS |
+| <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | None | Accepts `drm` and ignores it, so one source object serves both HLS components |
+| <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink> | None | Doesn't read `source.drm`. Use ShakaVideo for protected DASH |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Media component | Key systems it licenses | Notes |
+|---|---|---|
+| <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink> | FairPlay, Widevine, PlayReady | |
+| <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink> | FairPlay, Widevine, PlayReady through hls.js; FairPlay only through the browser's own HLS | See [Two playback paths](#two-playback-paths) |
+| <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink> | FairPlay | Reads only the `com.apple.fps` entry |
+| <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | FairPlay, Widevine, PlayReady | Same paths as `<hlsjs-video>`; also accept a Mux DRM token |
+| <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | FairPlay, Widevine, PlayReady | Plays DRM-protected DASH and HLS |
+| <DocsLink slug="reference/components/hls-audio">`<hls-audio>`</DocsLink> | None | Accepts `drm` and ignores it, so one source object serves both HLS components |
+| <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink> | None | Doesn't read `source.drm`. Use `<shaka-video>` for protected DASH |
+</FrameworkCase>
+
+### Two playback paths
+
+The hls.js components play through hls.js wherever the browser supports Media Source Extensions, and through the browser's own HLS otherwise or when you set `preferPlayback: 'native'`. The two paths license differently:
+
+| Path | Key systems | What Video.js does with `drm` |
+|---|---|---|
+| hls.js (MSE) | FairPlay, Widevine, PlayReady | Hands it to hls.js as `drmSystems`, with `emeEnabled` switched on |
+| The browser's own HLS | FairPlay | Answers the element's key requests itself: POSTs the CDM's license request to `licenseUrl` and hands the response back |
+
+A source that names only Widevine can't play when the browser plays the manifest itself. Video.js warns about this in development, and the media fails with a `MEDIA_ERR_ENCRYPTED` error instead of hanging.
+
+For Widevine on hls.js, Video.js asks for a hardware-backed CDM first and falls back to whatever robustness the browser offers, so content restricted to L1 devices plays where it can.
+
+## Common variations
+
+### License one engine differently
+
+An engine's own `drmSystems` replaces `source.drm` for that engine alone. Use it when one path licenses from a different server, or when you need more of [hls.js's DRM configuration](https://github.com/video-dev/hls.js/blob/master/docs/API.md#drmsystems) than `drm` covers:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsJsVideo
+  source={{
+    src: 'https://example.com/protected.m3u8',
+    drm: { 'com.apple.fps': { licenseUrl, serverCertificateUrl } },
+    engine: {
+      // hls.js licenses from here instead; the native path still uses `drm`.
+      hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } } },
+    },
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+video.source = {
+  src: 'https://example.com/protected.m3u8',
+  drm: { 'com.apple.fps': { licenseUrl, serverCertificateUrl } },
+  engine: {
+    // hls.js licenses from here instead; the native path still uses `drm`.
+    hlsJs: { drmSystems: { 'com.widevine.alpha': { licenseUrl: widevineLicenseUrl } } },
+  },
+};
+```
+</FrameworkCase>
+
+It replaces rather than merges, so hls.js no longer sees the FairPlay entry above. `engine.nativeHls.drmSystems` does the same for the browser's own HLS, and `engine.shaka.drm.servers` for Shaka. Supplying your own `requestMediaKeySystemAccessFunc` to hls.js replaces the Widevine robustness fallback.
+
+### Mux-hosted assets
+
+Mux derives FairPlay, Widevine, and PlayReady license servers from one DRM token on `source.drm.token`. See <DocsLink slug="guides/mux" anchor="play-drm-protected-assets">Play Mux videos</DocsLink>.
+
+## Troubleshooting
+
+### Playback fails with `MEDIA_ERR_ENCRYPTED` in Safari
+
+The browser's own HLS is playing the stream and `drm` has no `com.apple.fps` entry. Add FairPlay with its `serverCertificateUrl`.
+
+### Playback works in one browser but not another
+
+Browsers support different key systems. Name every system you hold a license server for, and check the table above for what the media component can license on that path.
+
+### The license request is rejected
+
+Most license servers authenticate the request. A `licenseUrl` can carry a token your provider accepts as a query parameter. For headers or cookies, configure the engine directly, for example with hls.js's [`licenseXhrSetup`](https://github.com/video-dev/hls.js/blob/master/docs/API.md#licensexhrsetup) under `engine.hlsJs`.
+
+## Related components
+
+- <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink>
+- <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>
+- <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>
+- <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink>
+- <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>
+
+## Related guides
+
+- <DocsLink slug="guides/mux">Play Mux videos</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/playback-errors">Playback errors</DocsLink>

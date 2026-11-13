@@ -98,7 +98,8 @@ export function MuxMixin<Base extends Constructor<any>>(BaseClass: Base) {
     /**
      * Structured Mux source. Setting it derives `src` from the playback ID, custom domain, and `playback` params
      * (appended as `snake_case` query params). A `playback.token` replaces all other params — signed URLs bake them
-     * into the token.
+     * into the token. [Play Mux videos](https://videojs.org/docs/guides/mux) covers playback IDs, signed playback, and
+     * posters and storyboards.
      */
     get source(): MuxSourceBase | null {
       return this.#source;

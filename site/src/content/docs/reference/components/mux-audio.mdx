@@ -11,7 +11,6 @@ import FrameworkCase from "@/components/docs/FrameworkCase.astro";
 import StyleCase from "@/components/docs/StyleCase.astro";
 import Demo from "@/components/docs/demos/Demo.astro";
 import DocsLink from "@/components/docs/DocsLink.astro";
-import DocsLinkCard from "@/components/docs/DocsLinkCard.astro";
 
 {/* React demos */}
 import BasicUsageDemoReact from "@/components/docs/demos/mux-audio/react/css/BasicUsage";
@@ -24,114 +23,17 @@ import basicUsageHtml from "@/components/docs/demos/mux-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/mux-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/mux-audio/html/css/BasicUsage.ts?raw";
 
-Audio element for playing Mux-hosted HLS streams. Built on hls.js with Mux-specific optimizations.
+Audio component for Mux-hosted streams. Give it a playback ID and it builds the stream URL, and it plays signed assets from their tokens. It plays through hls.js, like the <DocsLink slug="reference/components/hlsjs-video">hls.js video component</DocsLink>, and takes the same engine options. For video, use the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink>. Start with <DocsLink slug="guides/mux">Play Mux videos</DocsLink> for playback IDs and signed playback, then add <DocsLink slug="guides/mux-data">Mux Data</DocsLink> to monitor playback.
 
 ## Import
 
 <MediaImports media="mux-audio" package="@videojs/mux-audio" react="MuxAudio" />
 
-## Load a source
+## Guides
 
-<FrameworkCase frameworks={["react"]}>
-The `source` param builds the URL for you from a playback ID, an optional custom domain, and `playback` params. Playback params are camelCased [Mux playback query params](https://www.mux.com/docs/api-reference/stream/streaming/get-hls-manifest); for example, `max_resolution` becomes `maxResolution`.
-
-```tsx
-<MuxAudio
-  source={{
-    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
-    customDomain: 'media.example.com',
-  }}
-/>
-```
-
-`src` takes a plain stream URL instead:
-
-```tsx
-<MuxAudio src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8" />
-```
-
-MuxAudio ignores the same source object when it is assigned again. A new object fires `sourcechange` even when its values are equal, although an equivalent playback source does not reload.
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-`<mux-audio>` takes Mux content two ways: a stream URL through `src`, or a structured `source` object.
-
-```html
-<mux-audio src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"></mux-audio>
-```
-
-The `source` object builds the URL for you from a playback ID, an optional custom domain, and `playback` params. Playback params are camelCased [Mux playback query params](https://www.mux.com/docs/api-reference/stream/streaming/get-hls-manifest); for example, `max_resolution` becomes `maxResolution`.
-
-```ts
-const audio = document.querySelector('mux-audio')!;
-audio.source = {
-  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
-  customDomain: 'media.example.com',
-};
-```
-
-`<mux-audio>` ignores the same source object when it is assigned again. A new object fires `sourcechange` even when its values are equal, although an equivalent playback source does not reload.
-</FrameworkCase>
-
-## Signed playback
-
-For [signed playback](https://www.mux.com/docs/guides/secure-video-playback), put the playback token on `source.playback.token`. The token replaces every other playback param, so bake modifiers like time bounds into the token when you sign it.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<MuxAudio
-  source={{
-    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
-    playback: { token: playbackToken },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const audio = document.querySelector('mux-audio')!;
-audio.source = {
-  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
-  playback: { token: playbackToken },
-};
-```
-</FrameworkCase>
-
-## Analytics and casting
-
-The Mux audio component plays Mux streams. It doesn't monitor them or cast them — <DocsLink slug="guides/mux-data">Mux Data</DocsLink> and <DocsLink slug="guides/casting">Google Cast</DocsLink> are separate extensions you add to the player alongside it. Mux Data needs no environment key here, since Mux attributes the views to the environment that owns the playback ID:
-
-Install both extensions before using the example below:
-
-```bash
-pnpm add @videojs/mux-data @videojs/google-cast
-```
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-import { GoogleCast } from '@videojs/react/extensions/google-cast';
-import { MuxAudio } from '@videojs/react/media/mux-audio';
-import { MuxData } from '@videojs/react/extensions/mux-data';
-
-<MuxAudio source={{ playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM' }} />
-<MuxData playerSoftwareName="mux-audio" />
-<GoogleCast />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<mux-audio src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM.m3u8"></mux-audio>
-<mux-data player-software-name="mux-audio"></mux-data>
-<google-cast></google-cast>
-```
-
-Register the elements by importing `@videojs/html/extensions/mux-data` and `@videojs/html/extensions/google-cast`.
-</FrameworkCase>
-
-<DocsLinkCard slug="guides/mux-data">Mux Data — metadata, options, and configuration</DocsLinkCard>
-<DocsLinkCard slug="guides/casting">Cast to AirPlay and Chromecast</DocsLinkCard>
+- <DocsLink slug="guides/mux">Play Mux videos</DocsLink>
+- <DocsLink slug="guides/mux-data">Monitor playback with Mux Data</DocsLink>
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
 ## Examples
 
@@ -158,6 +60,30 @@ Register the elements by importing `@videojs/html/extensions/mux-data` and `@vid
       <BasicUsageDemoHtml />
     </Demo>
   </StyleCase>
+</FrameworkCase>
+
+### With a playback ID
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<MuxAudio
+  source={{
+    playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+    customDomain: 'media.example.com',
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const audio = document.querySelector('mux-audio')!;
+
+audio.source = {
+  playbackId: 'BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM',
+  customDomain: 'media.example.com',
+};
+```
 </FrameworkCase>
 
 <MediaReference media="MuxAudio" />

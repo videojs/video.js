@@ -103,6 +103,9 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
    * manifest at all. The inherited `maxAutoResolution` and `minAutoResolution` only look like their pair — those are
    * client-side and bound which of the renditions that _do_ arrive adaptive selection reaches for. The two halves are
    * independent.
+   *
+   * [Play Mux videos](https://videojs.org/docs/guides/mux) covers playback IDs, signed playback, posters and
+   * storyboards, and the DRM token.
    */
   get source(): MuxSource | null {
     return this.#source;
@@ -142,7 +145,7 @@ export class MuxVideoAdapter extends HlsJsAdapter implements MuxVideoAdapterProp
    *
    * The same object is handed back until something in it changes, and `contentdatachange` announces it when it does.
    * Nothing here is applied for you, apart from the thumbnail track `<mux-video>` adds from `storyboard` (and drops for
-   * live streams).
+   * live streams). See [Play Mux videos](https://videojs.org/docs/guides/mux#choose-the-poster-and-storyboard).
    */
   get contentData(): MuxContentData {
     return this.#contentData;

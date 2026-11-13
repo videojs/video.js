@@ -23,29 +23,17 @@ import basicUsageHtml from "@/components/docs/demos/hls-audio/html/css/BasicUsag
 import basicUsageHtmlCss from "@/components/docs/demos/hls-audio/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/hls-audio/html/css/BasicUsage.ts?raw";
 
-Audio-only HLS element that plays just the audio rendition of an HLS stream — even when the source is a mixed audio/video manifest. Useful for audio podcast players, background audio, and bandwidth-constrained contexts where downloading video data would be wasted. For full audio/video HLS playback, see the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>.
+Audio-only HLS component that plays only the audio rendition of an HLS stream, even from a mixed audio and video manifest, so no video data is downloaded. It runs on the same engine as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> and takes the same `source`, so one object serves both. For Mux-hosted audio, use the <DocsLink slug="reference/components/mux-audio">Mux audio component</DocsLink>.
 
 ## Import
 
 <MediaImports media="hls-audio" react="HlsAudio" />
 
-## Load a source
+## Guides
 
-`src` takes an HLS manifest URL. A mixed audio/video manifest works too: the audio component loads only the audio rendition.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsAudio src="https://example.com/playlist.m3u8" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<hls-audio src="https://example.com/playlist.m3u8"></hls-audio>
-```
-</FrameworkCase>
-
-The structured `source` object takes the same shape as the <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>'s, so one object can serve either. `source.drm` is accepted but unused, because this component composes no EME.
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
 
 ## Examples
 

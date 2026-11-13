@@ -467,7 +467,7 @@ v10 has no `videojs.registerPlugin`, `player.myPlugin()`, or plugin lifecycle. A
 
 ### DRM
 
-For protected DASH, use Shaka video. The dash.js component has no `source.drm` input. For protected HLS, choose an engine that supports your key systems and browsers; see <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">DRM protected sources</DocsLink>.
+For protected DASH, use Shaka video. The dash.js component has no `source.drm` input. For protected HLS, choose an engine that supports your key systems and browsers; see <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>.
 
 Move license URLs from v8's `keySystems` configuration to `source.drm`, keyed by EME key system ID. FairPlay also needs `serverCertificateUrl` unless its CDM is pre-provisioned. Custom `getLicense` callbacks and license authentication do not transfer automatically. Reimplement them with your chosen engine's APIs, then verify playback before you switch.
 

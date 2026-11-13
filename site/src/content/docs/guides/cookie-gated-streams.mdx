@@ -1,0 +1,70 @@
+---
+title: Play cookie-gated streams
+description: Send cookies with every manifest and segment request for streams behind CloudFront signed cookies or similar CDN access control
+---
+
+import FrameworkCase from '@/components/docs/FrameworkCase.astro';
+import DocsLink from '@/components/docs/DocsLink.astro';
+
+Some CDNs gate a stream with cookies, CloudFront signed cookies for example. When the stream is on another origin, every manifest and segment request has to carry those cookies, or the CDN answers 403.
+
+## Recommended approach
+
+Set the standard `crossorigin="use-credentials"` on the media component:
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsJsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```html
+<hlsjs-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hlsjs-video>
+```
+</FrameworkCase>
+
+Then have the CDN answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`. The browser refuses a credentialed response without both.
+
+## How it works
+
+Under native playback, the browser sends cookies on media requests when the element says `use-credentials`. Streaming engines make their own requests, so the media component reads the same attribute and sets each request's credentials mode to match: `credentials: 'include'` on fetch, `withCredentials` on XHR. Any other value, or no attribute, leaves requests at the default and sends no cross-origin cookies.
+
+## Availability and constraints
+
+<FrameworkCase frameworks={["react"]}>
+| Media component | Sends cookies with `use-credentials` |
+|---|---|
+| <DocsLink slug="reference/components/hls-video">HlsVideo</DocsLink>, <DocsLink slug="reference/components/hls-audio">HlsAudio</DocsLink> | Every manifest, playlist, and segment request |
+| <DocsLink slug="reference/components/hlsjs-video">HlsJsVideo</DocsLink>, <DocsLink slug="reference/components/mux-video">MuxVideo</DocsLink>, <DocsLink slug="reference/components/mux-audio">MuxAudio</DocsLink> | Every hls.js request, and the browser's own requests under native HLS |
+| <DocsLink slug="reference/components/native-hls-video">NativeHlsVideo</DocsLink>, <DocsLink slug="reference/components/video">Video</DocsLink>, <DocsLink slug="reference/components/audio">Audio</DocsLink> | The browser handles it |
+| <DocsLink slug="reference/components/dash-video">DashVideo</DocsLink>, <DocsLink slug="reference/components/shaka-video">ShakaVideo</DocsLink> | Not read. Configure credentials through the engine's own options under `source.engine` |
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+| Media component | Sends cookies with `use-credentials` |
+|---|---|
+| <DocsLink slug="reference/components/hls-video">`<hls-video>`</DocsLink>, <DocsLink slug="reference/components/hls-audio">`<hls-audio>`</DocsLink> | Every manifest, playlist, and segment request |
+| <DocsLink slug="reference/components/hlsjs-video">`<hlsjs-video>`</DocsLink>, <DocsLink slug="reference/components/mux-video">`<mux-video>`</DocsLink>, <DocsLink slug="reference/components/mux-audio">`<mux-audio>`</DocsLink> | Every hls.js request, and the browser's own requests under native HLS |
+| <DocsLink slug="reference/components/native-hls-video">`<native-hls-video>`</DocsLink>, <DocsLink slug="reference/components/video">`<video>`</DocsLink>, <DocsLink slug="reference/components/audio">`<audio>`</DocsLink> | The browser handles it |
+| <DocsLink slug="reference/components/dash-video">`<dash-video>`</DocsLink>, <DocsLink slug="reference/components/shaka-video">`<shaka-video>`</DocsLink> | Not read. Configure credentials through the engine's own options under `source.engine` |
+</FrameworkCase>
+
+On the hls.js components, an `xhrSetup` or `fetchSetup` you pass through `source.engine.hlsJs` still runs, after the credentials mode is set, on the same request.
+
+DRM license requests are separate. See <DocsLink slug="guides/drm" anchor="the-license-request-is-rejected">Play DRM-protected content</DocsLink>.
+
+## Troubleshooting
+
+### Requests still fail with 403
+
+Check that the cookies are set for the CDN's domain and path, and that the request carries them in the browser's network panel. If it doesn't, check the `crossorigin` value on the media component.
+
+### The browser blocks the response with a CORS error
+
+The CDN answered with `Access-Control-Allow-Origin: *` or without `Access-Control-Allow-Credentials: true`. Credentialed requests need both a specific origin and the credentials header.
+
+## Related guides
+
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>

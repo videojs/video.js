@@ -23,111 +23,19 @@ import basicUsageHtml from "@/components/docs/demos/hlsjs-video/html/css/BasicUs
 import basicUsageHtmlCss from "@/components/docs/demos/hlsjs-video/html/css/BasicUsage.css?raw";
 import basicUsageHtmlTs from "@/components/docs/demos/hlsjs-video/html/css/BasicUsage.ts?raw";
 
-HLS video element powered by [hls.js](https://github.com/video-dev/hls.js/) for adaptive bitrate streaming, with full feature support across every browser. It's more compatible than the lightweight <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink>, which is smaller and covers most HLS playback. For browser-native playback, see the <DocsLink slug="reference/components/native-hls-video">native HLS video component</DocsLink>.
+HLS video component powered by [hls.js](https://github.com/video-dev/hls.js/) for adaptive bitrate streaming in every browser. It plays through hls.js wherever Media Source Extensions are available and through the browser's own HLS elsewhere. The lightweight <DocsLink slug="reference/components/hls-video">HLS video component</DocsLink> is smaller and covers most HLS playback. For Mux-hosted streams, the <DocsLink slug="reference/components/mux-video">Mux video component</DocsLink> adds playback IDs on top of it. <DocsLink slug="guides/media-sources">Media sources</DocsLink> explains `source`, including `preferPlayback` and the rendition caps.
 
 ## Import
 
 <MediaImports media="hlsjs-video" package="@videojs/hlsjs-video" react="HlsJsVideo" />
 
-## Load a source
+## Guides
 
-`src` takes an HLS manifest URL.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo src="https://example.com/playlist.m3u8" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<hlsjs-video src="https://example.com/playlist.m3u8"></hlsjs-video>
-```
-</FrameworkCase>
-
-The structured `source` object says what to play and how to play it: `type` for a manifest URL without an `.m3u8` extension, `preferPlayback` to choose between hls.js (`'mse'`) and the browser's own HLS (`'native'`), the adaptive resolution caps, `drm`, and engine options. Setting `source` derives `src`. <DocsLink slug="guides/media-sources">Media sources</DocsLink> explains each option.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo
-  source={{
-    src: 'https://example.com/manifest',
-    type: 'application/vnd.apple.mpegurl',
-    preferPlayback: 'mse',
-    maxAutoResolution: '1080p',
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const video = document.querySelector('hlsjs-video')!;
-video.source = {
-  src: 'https://example.com/manifest',
-  type: 'application/vnd.apple.mpegurl',
-  preferPlayback: 'mse',
-  maxAutoResolution: '1080p',
-};
-```
-</FrameworkCase>
-
-## Protected content
-
-`source.drm` names your license servers, keyed by [EME key system id](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/requestMediaKeySystemAccess). Name every system you hold a license server for: which one gets negotiated is the browser's choice.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo
-  source={{
-    src: 'https://example.com/protected.m3u8',
-    drm: {
-      'com.apple.fps': {
-        licenseUrl: 'https://example.com/fairplay',
-        serverCertificateUrl: 'https://example.com/fairplay.cer',
-      },
-      'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-    },
-  }}
-/>
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```ts
-const video = document.querySelector('hlsjs-video')!;
-video.source = {
-  src: 'https://example.com/protected.m3u8',
-  drm: {
-    'com.apple.fps': {
-      licenseUrl: 'https://example.com/fairplay',
-      serverCertificateUrl: 'https://example.com/fairplay.cer',
-    },
-    'com.widevine.alpha': { licenseUrl: 'https://example.com/widevine' },
-  },
-};
-```
-</FrameworkCase>
-
-hls.js receives every system named here. When the browser's own HLS plays the stream, only the `com.apple.fps` entry applies. <DocsLink slug="guides/media-sources" anchor="drm-protected-sources">Media sources</DocsLink> covers what each path can license and how to configure hls.js's DRM directly.
-
-## Cookie-gated streams
-
-A stream on another origin that is gated by cookies — CloudFront signed cookies, for example — needs those cookies on every manifest and segment request, or the CDN answers 403. Set the standard `crossorigin="use-credentials"` on the element and hls.js sends them (`withCredentials` on its XHR loader, `credentials: 'include'` on its fetch loader), the same way the browser does under native playback. Any other value, or no attribute, leaves hls.js's default and sends no cross-origin cookies. An `xhrSetup` or `fetchSetup` you pass through `source.engine.hlsJs` still runs, after this, on the same request.
-
-The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific `Access-Control-Allow-Origin`, not `*`, or the browser refuses the credentialed response.
-
-<FrameworkCase frameworks={["react"]}>
-```tsx
-<HlsJsVideo src="https://cdn.example.com/stream.m3u8" crossOrigin="use-credentials" />
-```
-</FrameworkCase>
-
-<FrameworkCase frameworks={["html"]}>
-```html
-<hlsjs-video src="https://cdn.example.com/stream.m3u8" crossorigin="use-credentials"></hlsjs-video>
-```
-</FrameworkCase>
+- <DocsLink slug="guides/media-sources">Media sources</DocsLink>
+- <DocsLink slug="guides/drm">Play DRM-protected content</DocsLink>
+- <DocsLink slug="guides/cookie-gated-streams">Play cookie-gated streams</DocsLink>
+- <DocsLink slug="guides/live-streams">Play live streams</DocsLink>
+- <DocsLink slug="guides/quality">Add a quality selector</DocsLink>
 
 ## Examples
 
@@ -156,9 +64,35 @@ The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific
   </StyleCase>
 </FrameworkCase>
 
+### With playback options
+
+<FrameworkCase frameworks={["react"]}>
+```tsx
+<HlsJsVideo
+  source={{
+    src: 'https://example.com/playlist.m3u8',
+    preferPlayback: 'mse',
+    maxAutoResolution: '1080p',
+  }}
+/>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+```ts
+const video = document.querySelector('hlsjs-video')!;
+
+video.source = {
+  src: 'https://example.com/playlist.m3u8',
+  preferPlayback: 'mse',
+  maxAutoResolution: '1080p',
+};
+```
+</FrameworkCase>
+
 <MediaReference media="HlsJsVideo">
   <Fragment slot="engine-hlsJs">
-    Pass hls.js's own configuration here. It's handed to hls.js untouched, so every option in its [config reference](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) works, spelled the way hls.js spells it. <DocsLink slug="guides/media-sources">Media Sources</DocsLink> covers how engine options fit into a structured source.
+    Pass hls.js's own configuration here. It's handed to hls.js untouched, so every option in its [config reference](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) works, spelled the way hls.js spells it. <DocsLink slug="guides/media-sources">Media sources</DocsLink> covers how engine options fit into a structured source.
 
     The names and types below come from hls.js's own type definitions, so they tell you what exists and what shape it takes. hls.js documents what each one does; the descriptions are theirs to write, and most are blank here because its types carry none.
 
@@ -175,7 +109,7 @@ The CDN must answer with `Access-Control-Allow-Credentials: true` and a specific
 
     <FrameworkCase frameworks={["html"]}>
     ```ts
-    const video = document.querySelector('hlsjs-video');
+    const video = document.querySelector('hlsjs-video')!;
     video.source = {
       src: 'https://example.com/playlist.m3u8',
       engine: { hlsJs: { maxBufferLength: 30, lowLatencyMode: true } },

@@ -1,5 +1,6 @@
 ---
 import { highlightInline } from '@/components/Code/inlineHighlighter';
+import { resolveDocsFramework } from '@/types/docs';
 import { renderInlineMarkdown, setInlineCodeHighlighter } from '@/utils/docs/renderInlineMarkdown';
 
 interface Props {
@@ -11,7 +12,8 @@ const { content, fallback = '-' } = Astro.props;
 
 setInlineCodeHighlighter((code) => highlightInline(code));
 
-const html = content ? renderInlineMarkdown(content, { highlight: true }) : fallback;
+const framework = resolveDocsFramework(Astro.params.framework);
+const html = content ? renderInlineMarkdown(content, { highlight: true, framework }) : fallback;
 ---
 
 <Fragment set:html={html} />

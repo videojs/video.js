@@ -115,8 +115,8 @@ export class HTMLMediaAdapter<Target extends HTMLMediaTargetLike, Events extends
   };
 
   /**
-   * Current stream type (`'on-demand'`, `'live'`, or `'unknown'`). Defaults to `'unknown'`; detecting hosts update it
-   * automatically, and consumers can set it to override detection.
+   * Current stream type (`'on-demand'`, `'live'`, or `'unknown'`). Defaults to `'unknown'`. Media that detect the
+   * stream type update it automatically; set it to override detection.
    */
   get streamType() {
     return this.target?.streamType ?? this.#streamType;

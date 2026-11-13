@@ -8,7 +8,10 @@
  *   - Static and `@internal` getters, which stay out of the property table
  *   - `@fires`-declared events: `audiomodechange` also has a dispatch site,
  *     `manifestparsed` is dispatched from a helper the builder never scans —
- *     the `@fires` tag is its only source.
+ *     the `@fires` tag is its only source. `contentdatachange` is typed by the
+ *     media contract but is not a standard media event.
+ *   - A video-only member (`poster`) kept for a uniform prop shape, as the
+ *     audio embeds do; audio references leave it out.
  */
 type Constructor<T = object> = new (...args: any[]) => T;
 
@@ -17,16 +20,19 @@ type Constructor<T = object> = new (...args: any[]) => T;
  *
  * @fires manifestparsed - Fired after the multivariant playlist is parsed.
  * @fires audiomodechange - Fired when the audio-only rendition changes.
+ * @fires contentdatachange - Fired when `contentData` changes.
  */
 export const SpfAudioOnlyMixin = <Base extends Constructor>(BaseClass: Base) => {
   class SpfAudioOnly extends BaseClass {
     static readonly defaultProps = {
       src: '',
       preload: '',
+      poster: '',
     };
 
     #src: string = SpfAudioOnly.defaultProps.src;
     #preload: string = SpfAudioOnly.defaultProps.preload;
+    #poster: string = SpfAudioOnly.defaultProps.poster;
 
     /** Read through the constructor, never the instance. */
     static get alternativeMediaSuggestion(): string | undefined {
@@ -60,7 +66,18 @@ export const SpfAudioOnlyMixin = <Base extends Constructor>(BaseClass: Base) => 
     set preload(value: string) {
       this.#preload = value;
     }
+
+    /** Stored without effect: audio has no poster. */
+    get poster(): string {
+      return this.#poster;
+    }
+
+    set poster(value: string) {
+      this.#poster = value;
+    }
   }
 
-  return SpfAudioOnly as unknown as Base & Constructor<{ src: string; preload: string }>;
+  return SpfAudioOnly as unknown as Base &
+    Constructor<{ src: string; preload: string; poster: string }> &
+    Pick<typeof SpfAudioOnly, 'defaultProps'>;
 };
