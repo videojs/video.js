@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.4.0...@videojs/hlsjs-video@10.5.0) (2026-11-13)
+
+
+### Miscellaneous Chores
+
+* **@videojs/hlsjs-video:** Synchronize videojs versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.5.0
+    * @videojs/native-hls-video bumped to 10.5.0
+    * @videojs/spf bumped to 10.5.0
+    * @videojs/utils bumped to 10.5.0
+
 ## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/hlsjs-video@10.3.0...@videojs/hlsjs-video@10.4.0) (2026-11-13)
 
 
