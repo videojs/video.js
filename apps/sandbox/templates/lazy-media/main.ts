@@ -318,15 +318,15 @@ function posterImage(poster: string | undefined): string {
   return poster ? html`<img class="${c.facadeImage}" src="${poster}" alt="" />` : '';
 }
 
-const playIcon = html`<svg class="${c.facadeIcon}" viewBox="0 0 24 24" aria-hidden="true">
-  <path d="${PLAY_ICON_PATH}" />
-</svg>`;
+function playIcon(className: string): string {
+  return html`<svg class="${className}" viewBox="0 0 18 18" aria-hidden="true"><path d="${PLAY_ICON_PATH}" /></svg>`;
+}
 
 function facade(poster: string | undefined): string {
   if (kind === 'audio') {
     return html`
       <button type="button" class="${c.audioFacade}" aria-label="Play audio" data-light-play>
-        <span class="${c.audioFacadePlay}">${playIcon}</span>
+        <span class="${c.audioFacadePlay}">${playIcon(c.audioFacadeIcon)}</span>
         Play
       </button>
     `;
@@ -335,7 +335,7 @@ function facade(poster: string | undefined): string {
   return html`
     <button type="button" class="${c.facade}" aria-label="Play video" data-light-play>
       ${posterImage(poster)}
-      <span class="${c.facadePlay}">${playIcon}</span>
+      <span class="${c.facadePlay}">${playIcon(c.facadeIcon)}</span>
     </button>
   `;
 }

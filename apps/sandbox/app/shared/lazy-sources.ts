@@ -327,13 +327,23 @@ export const LAZY_DEMO_CLASSES = {
   audioFacade:
     'mx-auto flex h-14 w-full max-w-xl cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-3 text-sm font-medium outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
   audioFacadePlay: 'grid size-9 place-items-center rounded-full bg-primary text-primary-foreground',
+  audioFacadeIcon: 'size-4.5 fill-current',
   audioPlaceholder: 'mx-auto h-14 w-full max-w-xl rounded-xl border border-border bg-card',
   segmented: 'inline-flex rounded-md border border-input p-0.5',
   segment:
     'h-7 cursor-pointer rounded px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90',
-  facadePlay:
-    'relative grid size-16 place-items-center rounded-full bg-black/60 text-white transition-transform group-hover:scale-110',
-  facadeIcon: 'size-8 fill-current',
+  // Matches the default video skin's centre play button, accent colours included, so pressing play swaps in the same
+  // button. The text colour resolves like the skin's `--media-primary-foreground`.
+  facadePlay: [
+    'relative grid place-items-center rounded-full p-4 transition-[background-color,scale] duration-150 ease-out',
+    'bg-[var(--media-accent-color,white)] text-[var(--media-accent-text-color,black)]',
+    'supports-[color:contrast-color(red)]:text-[var(--media-accent-text-color,contrast-color(var(--media-accent-color,white)))]',
+    'group-hover:bg-[color-mix(in_oklab,var(--media-accent-color,white)_85%,currentColor)]',
+    'group-focus-visible:bg-[color-mix(in_oklab,var(--media-accent-color,white)_85%,currentColor)]',
+    'group-active:scale-[0.97] motion-reduce:scale-100',
+  ].join(' '),
+  // Optically centres the triangle, as the skin's play icon does.
+  facadeIcon: 'size-[27px] translate-x-px fill-current',
   breakdownHeader: 'mb-3 flex flex-wrap items-baseline justify-between gap-2',
   breakdownBar: 'flex h-2.5 overflow-hidden rounded-full bg-muted',
   breakdownGroups: 'mt-4 grid gap-4 sm:grid-cols-2',

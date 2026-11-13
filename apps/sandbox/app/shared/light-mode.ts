@@ -4,8 +4,9 @@
 /** How long after the click a media that hasn't started counts as blocked. */
 export const LIGHT_START_TIMEOUT = 8000;
 
-/** Material "play_arrow", for the light-mode play button. */
-export const PLAY_ICON_PATH = 'M8 5v14l11-7z';
+/** The default skin's play icon (`@videojs/icons` `default/play.svg`), drawn in an 18×18 view box. */
+export const PLAY_ICON_PATH =
+  'm14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637';
 
 export function describeLightStart(clickedAt?: number, startedAt?: number, timedOut = false): string {
   if (clickedAt === undefined) return 'Nothing loaded until play is pressed.';
