@@ -36,16 +36,16 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
       <$.Controls.Backdrop className={controlsStyles.backdrop} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content]}>
         <$.Tooltip.Provider>
-          <$.Controls.Group className={controlsStyles.primary}>
+          <$.Controls.Group className={[controlsStyles.primary, styles.compactPrimary]}>
             <ButtonTooltip side="top">
               <PlayButton />
             </ButtonTooltip>
             <VolumePopover className={styles.volumeButton} />
 
             <$.Controls.Group className={styles.timeSliderGroup}>
-              <$.Time.Value className={[timeStyles.value, styles.timeValue]} type="current" />
-              <TimeSlider renderThumbnail={renderThumbnail} />
-              <$.Time.Value className={[timeStyles.toggle, styles.timeValue]} type="remaining" toggle />
+              <$.Time.Value className={[timeStyles.value, styles.currentTimeValue]} type="current" />
+              <TimeSlider className={styles.timeSlider} renderThumbnail={renderThumbnail} />
+              <$.Time.Value className={[timeStyles.toggle, styles.remainingTimeValue]} type="remaining" toggle />
             </$.Controls.Group>
 
             <ButtonTooltip side="top">
@@ -54,7 +54,7 @@ export function DefaultVideoControls({ renderThumbnail }: DefaultVideoControlsPr
             <VideoSettingsMenu className={styles.settingsButton} />
           </$.Controls.Group>
 
-          <$.Controls.Group className={controlsStyles.secondary}>
+          <$.Controls.Group className={[controlsStyles.secondary, styles.topControls]}>
             <ButtonTooltip side="top">
               <CastButton />
             </ButtonTooltip>

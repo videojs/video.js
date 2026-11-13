@@ -242,6 +242,14 @@ export const vars = {
     kind: 'internal',
     description: 'Theme gradient painted behind the bottom of the video controls.',
   },
+  '--media-center-play-started-opacity': {
+    kind: 'internal',
+    description: 'Opacity of the Neutral centre play button after playback starts. Defaults to `0`.',
+  },
+  '--media-center-play-started-pointer-events': {
+    kind: 'internal',
+    description: 'Pointer events of the Neutral centre play button after playback starts. Defaults to `none`.',
+  },
   '--media-controls-gradient-height': {
     kind: 'internal',
     description: 'Height of the top video controls gradient.',

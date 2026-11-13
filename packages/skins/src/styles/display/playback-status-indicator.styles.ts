@@ -22,9 +22,9 @@ export default styles({
         'data-ending-style:duration-media-fast data-ending-style:ease-in',
       ],
       variants: {
-        // On touch, the default skin's centre play button shows the playback state instead.
+        // Hidden where the centre play button stays after start: on touch in default, below 5xs in neutral.
         default: 'rounded-media-pill bg-media-backdrop/35 backdrop-filter-media-indicator pointer-coarse:hidden!',
-        neutral: 'filter-media-feedback',
+        neutral: 'filter-media-feedback media-max-5xs:hidden!',
       },
     },
     playIcon: {
