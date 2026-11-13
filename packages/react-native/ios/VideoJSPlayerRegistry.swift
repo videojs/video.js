@@ -14,8 +14,9 @@ public final class VideoJSPlayerRegistry: NSObject {
   @objc(sharedRegistry)
   public static let shared = VideoJSPlayerRegistry()
 
+  /// Each engine's changes as bridge dictionaries, tagged by handle.
   @objc
-  public var onEvent: ((Int, [String: Any]) -> Void)?
+  public var onChange: ((Int, [String: Any]) -> Void)?
 
   // Guards the handle counter and the engine map, which the JS thread writes
   // and the main queue reads for the Fabric surface; each engine guards its
@@ -37,8 +38,8 @@ public final class VideoJSPlayerRegistry: NSObject {
       return lastHandle
     }
 
-    let engine = VideoJSPlayerEngine(source: source) { [weak self] event in
-      self?.onEvent?(handle, event)
+    let engine = VideoJSPlayerEngine(source: source) { [weak self] change in
+      self?.onChange?(handle, change)
     }
 
     lock.withLock { engines[handle] = engine }
@@ -63,11 +64,11 @@ public final class VideoJSPlayerRegistry: NSObject {
     lock.withLock { engines[handle] }
   }
 
-  /// The latest published state, from any thread. A destroyed handle reads as
-  /// a fresh player.
-  @objc(stateForHandle:)
-  public func state(forHandle handle: Int) -> VideoJSPlayerState {
-    engine(forHandle: handle)?.readState() ?? .initial
+  /// All of the latest state as one update, from any thread. A destroyed
+  /// handle reads as a fresh player.
+  @objc(updateForHandle:)
+  public func update(forHandle handle: Int) -> [String: Any] {
+    engine(forHandle: handle)?.readUpdate() ?? MediaChange(version: 0, patch: patch(nil, MediaState()), events: []).bridgeDictionary
   }
 
   @objc

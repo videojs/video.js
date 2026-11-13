@@ -11,55 +11,10 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
-import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-
-/** Mirrors `PlayerEvent['type']` in `src/media/NativeEngineStore.ts`. */
-internal enum class PlayerEventType(val jsName: String) {
-  LOADSTART("loadstart"),
-  EMPTIED("emptied"),
-  LOADEDMETADATA("loadedmetadata"),
-  DURATIONCHANGE("durationchange"),
-  PROGRESS("progress"),
-  CANPLAY("canplay"),
-  CANPLAYTHROUGH("canplaythrough"),
-  ERROR("error"),
-  PLAY("play"),
-  PAUSE("pause"),
-  PLAYING("playing"),
-  WAITING("waiting"),
-  ENDED("ended"),
-  TIMEUPDATE("timeupdate"),
-  RATECHANGE("ratechange"),
-  SEEKING("seeking"),
-  SEEKED("seeked"),
-  CONTENTDATACHANGE("contentdatachange"),
-}
-
-/** Seconds. */
-internal data class PlayerTimeRange(val start: Double, val end: Double)
-
-/** `code` is a `MediaError` code. */
-internal data class PlayerError(val code: Int, val message: String)
-
-/** Mirrors `PlayerContentData`; a key is null unless the content supplies it. */
-internal data class PlayerContentData(val title: String? = null, val poster: String? = null)
-
-/**
- * Mirrors `PlayerEvent` in `src/media/NativeEngineStore.ts`, minus the handle
- * the registry adds. Flat like the codegen payload, so each value is set only
- * on the event type that reports it.
- */
-internal data class PlayerEvent(
-  val type: PlayerEventType,
-  val currentTime: Double? = null,
-  val duration: Double? = null,
-  val buffered: List<PlayerTimeRange>? = null,
-  val error: PlayerError? = null,
-)
 
 // `MediaError` codes.
 private const val MEDIA_ERR_NETWORK = 2
@@ -68,242 +23,125 @@ private const val MEDIA_ERR_SRC_NOT_SUPPORTED = 4
 private const val MEDIA_ERR_ENCRYPTED = 5
 private const val MEDIA_ERR_CUSTOM = 100
 
-// `HTMLMediaElement.readyState` values.
-private const val HAVE_NOTHING = 0
-private const val HAVE_METADATA = 1
-private const val HAVE_CURRENT_DATA = 2
-private const val HAVE_ENOUGH_DATA = 4
-
 // HTMLMediaElement fires `timeupdate` every 15–250ms and `progress` roughly
 // every 350ms; one tick at the upper `timeupdate` bound serves both.
 private const val TICK_INTERVAL_MS = 250L
 
 /**
- * One `ExoPlayer` behind one handle. Built on the calling (JS) thread so a
- * command issued right after `createPlayer` has an engine to reach, but the
- * player itself is confined to the main thread: commands are callable from any
- * thread and post their player work to the main looper, and the Fabric surface
- * is already on the UI thread.
+ * One `ExoPlayer` behind one handle, as a media element (POC: unidirectional).
  *
- * ExoPlayer reports state, not media events, so the engine keeps the
- * HTMLMediaElement-shaped state each event marks a transition of and emits only
- * on change.
+ * The engine doesn't keep media element state or decide which events to fire.
+ * It does two things, both on the main thread:
+ * - **Report**: read ExoPlayer's facts into [Reported], once per batch of
+ *   player changes and on each tick.
+ * - **Reconcile**: drive ExoPlayer toward [Intent].
  *
- * The element-shaped state lives in [PlayerState], which can be updated from either ExoPlayer
- * events or commands from JS:
- * - Commands write what they mean, on the calling thread, before posting the
- *   player work to the main thread, so a getter called right after one
- *   reflects it as a media element's would.
- * - The engine writes what the player reports, on the main thread, before
- *   emitting the event that announces it, so a getter called from JS will see the reported state
- *   (or newer, if more commands have been issued)
- *
- * Externally, the state in [PlayerState] "wins," as the engine is controlled from the JS side.
- * ExoPlayer state updates defer to the [PlayerState] where necessary. eg, `currentTime` is read
- * from [PlayerState] while a seek is in progress to keep the valie stable, and source-related
- * values in PlayerState are only updated as long as the player's source matches `currentSrc`
+ * Commands write [Intent] on the calling (JS) thread and post a reconcile.
+ * [MediaStore] derives the element state the getters read and the events to
+ * fire from the two; see `MediaModel.kt`.
  */
 @OptIn(UnstableApi::class)
 internal class PlayerEngine(
   context: Context,
   source: String?,
-  private val onEvent: (PlayerEvent) -> Unit,
+  private val onChange: (MediaChange) -> Unit,
 ) {
   // Built on the calling thread, so without an explicit looper ExoPlayer would
   // bind to the JS thread's and reject every call from the main thread.
   private val exo = ExoPlayer.Builder(context).setLooper(Looper.getMainLooper()).build()
   private val mainHandler = Handler(Looper.getMainLooper())
 
-  private val stateLock = Any()
-  private var state = PlayerState(currentSrc = source ?: "")
+  // Changes are queued onto the main looper in write order, whichever thread
+  // wrote, and delivered after the write that produced them, as a media
+  // element's queued tasks are.
+  private val store = MediaStore { change -> mainHandler.post { if (!released) onChange(change) } }
 
   // The engine renders into the most recently attached surface only. Lower
   // entries stay registered so a pop can fall back without the surface below
   // having to re-register.
   private val surfaces = ArrayDeque<SurfaceView>()
 
-  // The last `paused` reported through `play`/`pause` events.
-  private var paused = true
-  private var waiting = false
-  private var playbackSpeed = PlaybackParameters.DEFAULT.speed
+  // What reconcile has applied to the player, so far.
+  private var appliedSourceGen = 0
+  private var appliedSeekGen = 0
 
-  // Per source; reset when the source is swapped.
-  private var source: String? = null
-  private var metadataLoaded = false
-  private var bufferedPositionMs = 0L
-  private var hasContentData = false
-
-  // The target of the seek in flight, settled by the first READY after it;
-  // ExoPlayer masks every seek to BUFFERING, so one always follows.
-  private var seekTarget: Double? = null
+  // Encoding embedded artwork is too costly to repeat on every report.
+  private var contentMetadata: MediaMetadata? = null
+  private var cachedContentData = PlayerContentData()
 
   private var ticking = false
-  private var released = false
+
+  @Volatile private var released = false
 
   private val tick =
     Runnable {
-      if (exo.isPlaying) emitTimeUpdate()
-      syncBufferedPosition()
-
       ticking = false
+      report()
       syncTicker()
     }
 
   init {
     exo.addListener(
       object : Player.Listener {
+        // ExoPlayer batches its changes; one read of every fact per batch
+        // replaces a callback per fact.
+        override fun onEvents(player: Player, events: Player.Events) {
+          report()
+          syncTicker()
+        }
+
+        // Reconcile's own writes are user requests. Anything else (audio focus,
+        // headphones unplugged) is the platform pausing, which a media element
+        // reports as paused.
         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-          syncPaused()
-          syncWaiting()
-        }
+          if (reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) return
 
-        override fun onPlaybackStateChanged(playbackState: Int) {
-          updateForSource { it.copy(readyState = readyState) }
-          syncPaused()
-          syncWaiting()
-
-          when (playbackState) {
-            Player.STATE_READY -> {
-              settleSeek()
-
-              if (!metadataLoaded) {
-                metadataLoaded = true
-                syncDuration()
-                updateForSource { it.copy(seekable = seekable, readyState = readyState) }
-                emit(PlayerEventType.LOADEDMETADATA)
-              }
-
-              // READY is ExoPlayer's only "has data" state, so it stands in for
-              // both readiness levels a media element distinguishes.
-              emit(PlayerEventType.CANPLAY)
-              emit(PlayerEventType.CANPLAYTHROUGH)
-            }
-
-            // A media element stays paused once it ends, so seeking back
-            // doesn't resume; ExoPlayer would, with `playWhenReady` still set.
-            Player.STATE_ENDED -> {
-              settleSeek()
-              exo.pause()
-              updateForSource { it.copy(ended = true) }
-              emit(PlayerEventType.ENDED)
-            }
-          }
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-          if (isPlaying) emit(PlayerEventType.PLAYING)
-          syncTicker()
-        }
-
-        override fun onIsLoadingChanged(isLoading: Boolean) {
-          syncTicker()
-        }
-
-        // Also where a live window slides, which moves `seekable` with no
-        // media event to carry it.
-        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-          syncDuration()
-          updateForSource { it.copy(seekable = seekable) }
-        }
-
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-          if (playbackParameters.speed == playbackSpeed) return
-
-          playbackSpeed = playbackParameters.speed
-          updatePlayerState { it.copy(playbackRate = playbackSpeed.toDouble()) }
-          emit(PlayerEventType.RATECHANGE)
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-          val playerError = toPlayerError(error)
-
-          updateForSource { it.copy(error = playerError) }
-          emit(PlayerEvent(PlayerEventType.ERROR, error = playerError))
-        }
-
-        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-          syncContentData()
+          store.updateIntent { intent, _ -> intent.copy(paused = !playWhenReady) }
         }
       }
     )
 
-    // A null source leaves the player idle until `setSource` supplies one. The
-    // snapshot already holds it as `currentSrc`.
-    if (source != null) onMain { setSourceInternal(source) }
+    if (source != null) setSource(source)
   }
 
-  // Commands, from any thread: each writes the state it will produce, then
-  // posts the player work.
+  // The media element, from any thread. Getters pass through to the store;
+  // each is its own read, so use [readState] to see several fields as of one
+  // moment.
 
-  // A new source starts from a media element's initial state; only `paused`
-  // and `playbackRate` belong to the element rather than the source.
-  fun setSource(source: String) {
-    updatePlayerState { PlayerState(currentSrc = source, paused = it.paused, playbackRate = it.playbackRate) }
-    onMain { setSourceInternal(source) }
-  }
+  val currentTime: Double get() = store.read().currentTime
+  val duration: Double get() = store.read().duration
+  val buffered: List<PlayerTimeRange> get() = store.read().buffered
+  val seekable: List<PlayerTimeRange> get() = store.read().seekable
+  val error: PlayerError? get() = store.read().error
+  val paused: Boolean get() = store.read().paused
+  val ended: Boolean get() = store.read().ended
+  val seeking: Boolean get() = store.read().seeking
+  val currentSrc: String get() = store.read().currentSrc
+  val readyState: Int get() = store.read().readyState
+  val playbackRate: Double get() = store.read().playbackRate
+  val contentData: PlayerContentData get() = store.read().contentData
 
-  fun load() {
-    updatePlayerState { if (it.currentSrc.isEmpty()) it else PlayerState(currentSrc = it.currentSrc, paused = it.paused, playbackRate = it.playbackRate) }
-    onMain { source?.let(::setSourceInternal) }
-  }
+  fun readState(): PlayerState = store.read()
 
-  // Playing after the end restarts from the beginning, which is a seek.
-  fun play() {
-    updatePlayerState { if (it.ended) it.copy(paused = false, ended = false, currentTime = 0.0, seeking = true) else it.copy(paused = false) }
-    onMain {
-      if (exo.playbackState == Player.STATE_ENDED) seekTo(0.0)
-      exo.play()
-    }
-  }
+  /** All of the state as one update, for a mirror starting late. */
+  fun readUpdate(): MediaChange = store.readUpdate()
 
-  fun pause() {
-    updatePlayerState { it.copy(paused = true) }
-    onMain { exo.pause() }
-  }
+  // Commands, from any thread. Each returns its own change, which the getters
+  // already reflect: the bridge can hand it straight back to JS.
 
-  fun setPlaybackRate(rate: Double) {
-    if (rate <= 0) return
+  fun setSource(source: String) = command { intent, _ -> intent.setSource(source) }
 
-    updatePlayerState { it.copy(playbackRate = rate) }
-    onMain { exo.setPlaybackSpeed(rate.toFloat()) }
-  }
+  fun load() = command { intent, _ -> intent.load() }
 
-  // `loop` isn't in the snapshot, so there is no state to write. ExoPlayer
-  // repeats the item in place instead of ending, so there is no `ended`, as
-  // with a looping media element.
-  fun setLoop(loop: Boolean) {
-    onMain { exo.repeatMode = if (loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF }
-  }
+  fun play() = command { intent, state -> intent.play(state) }
 
-  fun setCurrentTime(seconds: Double) {
-    val target = seconds.coerceAtLeast(0.0)
+  fun pause() = command { intent, _ -> intent.pause() }
 
-    updatePlayerState { if (it.currentSrc.isEmpty()) it else it.copy(currentTime = target, seeking = true, ended = false) }
-    onMain { if (exo.mediaItemCount > 0) seekTo(target) }
-  }
+  fun setCurrentTime(seconds: Double) = command { intent, state -> intent.seek(state, seconds) }
 
-  /**
-   * Swaps the source on the running player. `playWhenReady` survives the swap,
-   * so a player that was playing continues into the new source.
-   */
-  @MainThread
-  private fun setSourceInternal(source: String) {
-    if (exo.mediaItemCount > 0) emit(PlayerEventType.EMPTIED)
-    if (hasContentData) emit(PlayerEventType.CONTENTDATACHANGE)
+  fun setPlaybackRate(rate: Double) = command { intent, _ -> intent.setPlaybackRate(rate) }
 
-    this.source = source
-    metadataLoaded = false
-    bufferedPositionMs = 0L
-    hasContentData = false
-    seekTarget = null
-
-    emit(PlayerEventType.LOADSTART)
-    exo.setMediaItem(MediaItem.fromUri(source))
-    exo.prepare()
-  }
-
-  /** Any thread. */
-  fun readState(): PlayerState = synchronized(stateLock) { state }
+  fun setLoop(loop: Boolean) = command { intent, _ -> intent.setLoop(loop) }
 
   fun attachSurface(surface: SurfaceView) {
     surfaces.remove(surface)
@@ -325,28 +163,99 @@ internal class PlayerEngine(
   fun release() {
     released = true
 
-    updatePlayerState { PlayerState() }
-    mainHandler.removeCallbacks(tick)
+    store.reset()
+    mainHandler.removeCallbacksAndMessages(null)
     surfaces.clear()
     exo.release()
   }
 
-  private val currentTime: Double
-    get() = exo.currentPosition / 1000.0
+  // The getters reflect a command as soon as it returns; the player catches up
+  // on the main thread.
+  private fun command(transform: (Intent, PlayerState) -> Intent): MediaChange {
+    val change = store.updateIntent(transform)
 
-  // A media element reports live as infinite; ExoPlayer reports the growing
-  // window.
-  private val duration: Double
-    get() =
-      when {
-        exo.isCurrentMediaItemLive -> Double.POSITIVE_INFINITY
-        exo.duration == C.TIME_UNSET -> Double.NaN
-        else -> exo.duration / 1000.0
+    onMain { reconcile() }
+
+    return change
+  }
+
+  @MainThread
+  private fun reconcile() {
+    val intent = store.readIntent()
+
+    if (intent.sourceGen != appliedSourceGen) {
+      appliedSourceGen = intent.sourceGen
+
+      if (intent.src.isEmpty()) {
+        exo.clearMediaItems()
+      } else {
+        exo.setMediaItem(MediaItem.fromUri(intent.src))
+        exo.prepare()
       }
+    }
+
+    // A seek against an older source is dropped. ExoPlayer takes a seek before
+    // it's ready as the start position, so there's nothing to hold back.
+    if (intent.seekGen > appliedSeekGen) {
+      appliedSeekGen = intent.seekGen
+
+      if (intent.seekSourceGen == appliedSourceGen) exo.seekTo((intent.seekTarget * 1000).toLong())
+    }
+
+    exo.playWhenReady = !intent.paused
+    exo.repeatMode = if (intent.loop) Player.REPEAT_MODE_ONE else Player.REPEAT_MODE_OFF
+
+    if (exo.playbackParameters.speed != intent.playbackRate.toFloat()) exo.setPlaybackSpeed(intent.playbackRate.toFloat())
+
+    report()
+    syncTicker()
+  }
+
+  @MainThread
+  private fun report() {
+    if (released) return
+
+    val phase =
+      when (exo.playbackState) {
+        Player.STATE_BUFFERING -> EnginePhase.BUFFERING
+        Player.STATE_READY -> EnginePhase.READY
+        Player.STATE_ENDED -> EnginePhase.ENDED
+        else -> EnginePhase.IDLE
+      }
+    // ExoPlayer masks every seek to BUFFERING, so the first READY or ENDED
+    // after one is where it finished.
+    val settled = phase == EnginePhase.READY || phase == EnginePhase.ENDED
+    var adoptedPause = false
+
+    store.transact {
+      reported =
+        Reported(
+          sourceGen = appliedSourceGen,
+          seekGen = if (settled) appliedSeekGen else reported.seekGen,
+          phase = phase,
+          metadataKnown = metadataKnown,
+          position = exo.currentPosition / 1000.0,
+          buffered = exoBuffered,
+          duration = exoDuration,
+          seekable = exoSeekable,
+          error = exo.playerError?.let(::toPlayerError),
+          contentData = readContentData(),
+        )
+
+      // A media element pauses itself at the end; ExoPlayer keeps
+      // `playWhenReady`. Same write, so `pause` fires before `ended`.
+      if (!intent.paused && derive(intent, reported).state.ended) {
+        intent = intent.pause()
+        adoptedPause = true
+      }
+    }
+
+    if (adoptedPause) onMain { reconcile() }
+  }
 
   // ExoPlayer discards played-back media and tracks only how far ahead it has
   // buffered, so the playhead is the earliest position known to be buffered.
-  private val buffered: List<PlayerTimeRange>
+  private val exoBuffered: List<PlayerTimeRange>
     get() {
       val start = exo.currentPosition
       val end = exo.bufferedPosition
@@ -354,9 +263,27 @@ internal class PlayerEngine(
       return if (end > start) listOf(PlayerTimeRange(start / 1000.0, end / 1000.0)) else emptyList()
     }
 
+  // ExoPlayer stands in a placeholder timeline until the real one is known.
+  private val metadataKnown: Boolean
+    get() {
+      val timeline = exo.currentTimeline
+
+      return !timeline.isEmpty && !timeline.getWindow(exo.currentMediaItemIndex, Timeline.Window()).isPlaceholder
+    }
+
+  // A media element reports live as infinite; ExoPlayer reports the growing
+  // window.
+  private val exoDuration: Double
+    get() =
+      when {
+        exo.isCurrentMediaItemLive -> Double.POSITIVE_INFINITY
+        exo.duration == C.TIME_UNSET -> Double.NaN
+        else -> exo.duration / 1000.0
+      }
+
   // Positions are relative to the live window, so live seeks within
   // `[0, window]` too.
-  private val seekable: List<PlayerTimeRange>
+  private val exoSeekable: List<PlayerTimeRange>
     get() =
       if (!exo.isCurrentMediaItemSeekable || exo.duration == C.TIME_UNSET) {
         emptyList()
@@ -364,132 +291,21 @@ internal class PlayerEngine(
         listOf(PlayerTimeRange(0.0, exo.duration / 1000.0))
       }
 
-  // READY is the only state that implies data ahead of the playhead, and
-  // `canplaythrough` already treats it as enough.
-  private val readyState: Int
-    get() =
-      when (exo.playbackState) {
-        Player.STATE_READY,
-        Player.STATE_ENDED -> HAVE_ENOUGH_DATA
-        Player.STATE_BUFFERING ->
-          when {
-            !metadataLoaded -> HAVE_NOTHING
-            exo.bufferedPosition > exo.currentPosition -> HAVE_CURRENT_DATA
-            else -> HAVE_METADATA
-          }
-        else -> if (metadataLoaded) HAVE_METADATA else HAVE_NOTHING
-      }
-
-  private fun seekTo(seconds: Double) {
-    seekTarget = seconds
-
-    emit(PlayerEventType.SEEKING)
-    exo.seekTo((seconds * 1000).toLong())
-    emitTimeUpdate()
-  }
-
-  // A newer seek, or a new source, has replaced `currentTime` since this seek
-  // was requested; that one settles `seeking` instead, so this stays quiet as a
-  // superseded seek does on the web.
-  private fun settleSeek() {
-    val target = seekTarget ?: return
-    var settled = false
-
-    seekTarget = null
-    updateForSource {
-      if (!it.seeking || it.currentTime != target) return@updateForSource it
-
-      settled = true
-      it.copy(seeking = false, currentTime = currentTime)
-    }
-
-    if (settled) emit(PlayerEventType.SEEKED)
-  }
-
-  // `paused` follows the web definition: ExoPlayer keeps `playWhenReady` set
-  // after the end, but a media element reports paused there.
-  private fun syncPaused() {
-    val next = !exo.playWhenReady || exo.playbackState == Player.STATE_ENDED
-
-    if (next == paused) return
-
-    paused = next
-
-    // A media element reports the position it stopped at before `pause`.
-    if (paused) emitTimeUpdate()
-    updatePlayerState { it.copy(paused = paused) }
-    emit(if (paused) PlayerEventType.PAUSE else PlayerEventType.PLAY)
-  }
-
-  // Waiting means playback was requested but is starved, so it trails `paused`.
-  private fun syncWaiting() {
-    val next = !paused && exo.playbackState == Player.STATE_BUFFERING
-
-    if (next == waiting) return
-
-    waiting = next
-
-    if (waiting) emit(PlayerEventType.WAITING)
-  }
-
-  private fun syncDuration() {
-    val next = duration
-    var changed = false
-
-    if (next.isNaN()) return
-
-    updateForSource {
-      if (it.duration == next) return@updateForSource it
-
-      changed = true
-      it.copy(duration = next, seekable = seekable)
-    }
-
-    if (changed) emit(PlayerEvent(PlayerEventType.DURATIONCHANGE, duration = next))
-  }
-
-  private fun syncBufferedPosition() {
-    val next = exo.bufferedPosition
-
-    if (next == bufferedPositionMs) return
-
-    val ranges = buffered
-
-    bufferedPositionMs = next
-    updateForSource { it.copy(buffered = ranges, readyState = readyState) }
-    emit(PlayerEvent(PlayerEventType.PROGRESS, buffered = ranges))
-  }
-
   // We never set `MediaItem` metadata, so everything here came from the
   // content.
-  private fun syncContentData() {
+  private fun readContentData(): PlayerContentData {
     val metadata = exo.mediaMetadata
-    val next =
+
+    if (metadata === contentMetadata) return cachedContentData
+
+    contentMetadata = metadata
+    cachedContentData =
       PlayerContentData(
         title = metadata.title?.toString(),
         poster = metadata.artworkUri?.toString() ?: metadata.artworkData?.let(::toImageDataUri),
       )
-    var changed = false
 
-    updateForSource {
-      if (it.contentData == next) return@updateForSource it
-
-      changed = true
-      it.copy(contentData = next)
-    }
-
-    if (!changed) return
-
-    hasContentData = next != PlayerContentData()
-    emit(PlayerEventType.CONTENTDATACHANGE)
-  }
-
-  // A pending seek owns `currentTime`, so the payload reports what the
-  // snapshot holds rather than the player's position.
-  private fun emitTimeUpdate() {
-    val reported = updateForSource { if (it.seeking) it else it.copy(currentTime = currentTime) }
-
-    emit(PlayerEvent(PlayerEventType.TIMEUPDATE, currentTime = reported.currentTime))
+    return cachedContentData
   }
 
   // ExoPlayer has no position or buffer callbacks, so both are polled while
@@ -505,32 +321,10 @@ internal class PlayerEngine(
   }
 
   // Always posts, never runs inline on the main thread, so player work keeps
-  // the order its commands were issued in. Work posted before `release` runs
-  // ahead of it; anything later finds the player gone and is dropped.
+  // the order its commands were issued in.
   private fun onMain(block: () -> Unit) {
     mainHandler.post { if (!released) block() }
   }
-
-  private fun emit(type: PlayerEventType) {
-    emit(PlayerEvent(type))
-  }
-
-  private fun emit(event: PlayerEvent) {
-    if (!released) onEvent(event)
-  }
-
-  /** Any thread. Returns the snapshot it left in place. */
-  private fun updatePlayerState(transform: (PlayerState) -> PlayerState): PlayerState =
-    synchronized(stateLock) {
-      state = transform(state)
-      state
-    }
-
-  // Per-source values belong to the source the player is on. Once a command
-  // has moved `currentSrc` on, they would only leak the old source into the
-  // new one's state.
-  private fun updateForSource(transform: (PlayerState) -> PlayerState): PlayerState =
-    updatePlayerState { if (it.currentSrc == (source ?: "")) transform(it) else it }
 }
 
 // Error codes are grouped by thousand. The miscellaneous group (timeouts,

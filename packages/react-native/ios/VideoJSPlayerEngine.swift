@@ -1,51 +1,6 @@
 import AVFoundation
 import Foundation
 
-/// Mirrors `PlayerEvent['type']` in `src/media/NativeEngineStore.ts`.
-enum VideoJSPlayerEventType {
-  case loadstart
-  case emptied
-  case loadedmetadata
-  case durationchange
-  case progress
-  case canplay
-  case canplaythrough
-  case error
-  case play
-  case pause
-  case playing
-  case waiting
-  case ended
-  case timeupdate
-  case ratechange
-  case seeking
-  case seeked
-  case contentdatachange
-
-  var jsName: String {
-    switch self {
-    case .loadstart: "loadstart"
-    case .emptied: "emptied"
-    case .loadedmetadata: "loadedmetadata"
-    case .durationchange: "durationchange"
-    case .progress: "progress"
-    case .canplay: "canplay"
-    case .canplaythrough: "canplaythrough"
-    case .error: "error"
-    case .play: "play"
-    case .pause: "pause"
-    case .playing: "playing"
-    case .waiting: "waiting"
-    case .ended: "ended"
-    case .timeupdate: "timeupdate"
-    case .ratechange: "ratechange"
-    case .seeking: "seeking"
-    case .seeked: "seeked"
-    case .contentdatachange: "contentdatachange"
-    }
-  }
-}
-
 /// `MediaError` codes.
 private enum MediaErrorCode {
   static let network = 2
@@ -55,38 +10,20 @@ private enum MediaErrorCode {
   static let custom = 100
 }
 
-/// `HTMLMediaElement.readyState` values.
-private enum ReadyState {
-  static let haveNothing = 0
-  static let haveMetadata = 1
-  static let haveCurrentData = 2
-  static let haveFutureData = 3
-  static let haveEnoughData = 4
-}
-
 // HTMLMediaElement fires `timeupdate` every 15–250ms during playback.
 private let timeUpdateInterval = CMTime(value: 1, timescale: 4)
 
-/// One player behind one handle. Built on the calling (JS) thread so a command
-/// issued right after `createPlayer` has an engine to reach, but the player
-/// itself is confined to the main queue: commands are callable from any thread
-/// and dispatch their player work to the main queue, and the Fabric surface is
-/// already on the main queue.
+/// One player behind one handle, as a media element (POC: unidirectional).
 ///
-/// The exception is the `VideoJSPlayerState` snapshot, which is the only copy
-/// of the state the getters report. One lock guards it, and every change
-/// replaces it with an edited `copy(…)` without giving the lock up in between.
-/// Two kinds of writer share it:
-/// - Commands write what they mean, on the calling thread, before dispatching
-///   the player work to the main queue, so a getter called right after one
-///   reflects it as a media element's would.
-/// - The engine writes what the player reports, on the main queue, before
-///   emitting the event that announces it, so a getter called while handling an
-///   event sees state at least that new.
+/// The engine doesn't keep media element state or decide which events to fire.
+/// It does two things, both on the main queue:
+/// - **Report**: read AVPlayer's facts into `Reported` whenever KVO, a
+///   notification or the periodic time observer says one may have moved.
+/// - **Reconcile**: drive AVPlayer toward `Intent`.
 ///
-/// Where the two disagree, the engine's write defers to the snapshot: it leaves
-/// `currentTime` alone while a seek is pending, and writes per-source values
-/// only while `currentSrc` is still the source it's playing.
+/// Commands write `Intent` on the calling (JS) thread and dispatch a reconcile.
+/// `MediaStore` derives the element state the getters read and the events to
+/// fire from the two; see `VideoJSMediaModel.swift`.
 @objc
 public final class VideoJSPlayerEngine: NSObject {
   // Always an AVQueuePlayer, even with looping off, so enabling loop later
@@ -99,96 +36,73 @@ public final class VideoJSPlayerEngine: NSObject {
   // it having to re-register.
   private var layers: [AVPlayerLayer] = []
 
-  private let stateLock = NSLock()
-  private var state: VideoJSPlayerState
+  private var store: MediaStore!
 
-  /// Receives the `PlayerEvent` payload minus the handle the registry adds.
-  private var onEvent: (([String: Any]) -> Void)?
+  /// Receives each change as a bridge dictionary, minus the handle the
+  /// registry adds.
+  private var onChange: (([String: Any]) -> Void)?
   private var playerObservations: [NSKeyValueObservation] = []
   private var timeObserver: Any?
   private var invalidated = false
 
-  // KVO reports the new status, not the transition, and the media events are
-  // transitions — `play` is leaving paused, `playing` is entering playing.
-  private var timeControlStatus: AVPlayer.TimeControlStatus = .paused
+  // What reconcile has applied to the player, so far.
+  private var appliedSourceGen = 0
+  private var appliedSeekGen = 0
+  private var settledSeekGen = 0
 
-  // Per source; replaced when the source is swapped.
-  private var source: String?
+  // Per item; replaced when the item is. Facts AVPlayer reports only as
+  // notifications or async loads, kept until the next report reads them.
   private var item: AVPlayerItem?
   private var itemObservations: [NSKeyValueObservation] = []
-  private var metadataLoaded = false
-  private var likelyToKeepUp = false
   private var atEnd = false
-  private var hasContentData = false
+  private var itemError: MediaErrorValue?
+  private var contentData = MediaContentData()
 
-  // An item can't seek until it is ready, so an earlier request waits — the
-  // media element's default playback start position.
-  private var pendingStartTime: Double?
-
-  // The rate `playbackRate` reports. iOS 16 keeps it as `defaultRate`; before
-  // that `play()` always starts at 1, so the engine applies it on resume.
-  private var requestedRate: Float = 1
-  private var loop = false
-
-  // AVFoundation has no "enough data to start" signal of its own, so this is
-  // the media element's HAVE_FUTURE_DATA as far as the player reveals it:
-  // gained on readiness or playback resuming, lost to a stall.
-  private var canPlay = false
-
-  /// A nil source leaves the player idle until `setSource(_:)` supplies one.
-  @objc(initWithSource:onEvent:)
-  public init(source: String?, onEvent: @escaping ([String: Any]) -> Void) {
-    self.state = VideoJSPlayerState.initial.copy(currentSrc: source ?? "")
-    self.onEvent = onEvent
+  @objc(initWithSource:onChange:)
+  public init(source: String?, onChange: @escaping ([String: Any]) -> Void) {
+    self.onChange = onChange
 
     super.init()
+
+    // Changes are queued onto the main queue in write order, whichever thread
+    // wrote, and delivered after the write that produced them, as a media
+    // element's queued tasks are.
+    store = MediaStore { [weak self] change in
+      let payload = change.bridgeDictionary
+
+      DispatchQueue.main.async {
+        guard let self, !self.invalidated else { return }
+
+        self.onChange?(payload)
+      }
+    }
 
     // The queue default advances past the finished item, leaving nothing to
     // render. Holding keeps the last frame up, matching ExoPlayer.
     player.actionAtItemEnd = .pause
 
     playerObservations.append(player.observe(\.timeControlStatus) { [weak self] _, _ in
-      self?.onMainQueue { $0.syncTimeControlStatus() }
+      self?.onMainQueue { $0.report() }
     })
 
-    // `rate` drops to zero on every pause; `defaultRate` is the one that
-    // matches `playbackRate`. Before iOS 16 there is nothing to observe.
-    if #available(iOS 16, *) {
-      playerObservations.append(player.observe(\.defaultRate, options: [.old, .new]) { [weak self] _, change in
-        guard change.oldValue != change.newValue else { return }
-
-        self?.onMainQueue { engine in
-          engine.update { $0.copy(playbackRate: engine.playbackRate) }
-          engine.emit(.ratechange)
-        }
-      })
-    }
-
-    // Also fires when playback starts or stops and when time jumps, which is
-    // when a media element reports position too.
-    timeObserver = player.addPeriodicTimeObserver(forInterval: timeUpdateInterval, queue: .main) { [weak self] time in
-      guard let self, item != nil, time.isNumeric else { return }
-
-      emitTimeUpdate()
+    // Also fires when playback starts or stops and when time jumps.
+    timeObserver = player.addPeriodicTimeObserver(forInterval: timeUpdateInterval, queue: .main) { [weak self] _ in
+      self?.report()
     }
 
     NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleItemDidPlayToEnd(_:)),
-      name: AVPlayerItem.didPlayToEndTimeNotification,
-      object: nil
+      self, selector: #selector(handleItemDidPlayToEnd(_:)), name: AVPlayerItem.didPlayToEndTimeNotification, object: nil
     )
-
     NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleItemFailedToPlayToEnd(_:)),
-      name: AVPlayerItem.failedToPlayToEndTimeNotification,
-      object: nil
+      self, selector: #selector(handleItemFailedToPlayToEnd(_:)),
+      name: AVPlayerItem.failedToPlayToEndTimeNotification, object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self, selector: #selector(handleRateDidChange(_:)), name: AVPlayer.rateDidChangeNotification, object: player
     )
 
-    // The snapshot already holds the source as `currentSrc`.
     if let source {
-      onMainQueue { $0.setSourceInternal(source) }
+      _ = setSource(source)
     }
   }
 
@@ -198,197 +112,281 @@ public final class VideoJSPlayerEngine: NSObject {
     invalidate()
   }
 
-  // MARK: Commands — any thread; each writes its state, then dispatches its player work
+  // MARK: The media element — any thread
+  //
+  // Getters pass through to the store; each is its own read, so use
+  // `readState()` to see several fields as of one moment.
 
-  // A new source starts from a media element's initial state; only `paused`
-  // and `playbackRate` belong to the element rather than the source.
+  var currentTime: Double { store.read().currentTime }
+  var duration: Double { store.read().duration }
+  var buffered: [MediaTimeRange] { store.read().buffered }
+  var seekable: [MediaTimeRange] { store.read().seekable }
+  var error: MediaErrorValue? { store.read().error }
+  var paused: Bool { store.read().paused }
+  var ended: Bool { store.read().ended }
+  var seeking: Bool { store.read().seeking }
+  var currentSrc: String { store.read().currentSrc }
+  var readyState: Int { store.read().readyState }
+  var playbackRate: Double { store.read().playbackRate }
+
+  func readState() -> MediaState { store.read() }
+
+  /// All of the state as one update, for a mirror starting late.
+  @objc
+  public func readUpdate() -> [String: Any] { store.readUpdate().bridgeDictionary }
+
+  // Commands. Each returns its own change, which the getters already reflect,
+  // as a bridge dictionary the module hands straight back to JS.
+
   @objc(setSource:)
-  public func setSource(_ source: String) {
-    update { .initial.copy(paused: $0.paused, currentSrc: source, playbackRate: $0.playbackRate) }
-    onMainQueue { $0.setSourceInternal(source) }
-  }
+  public func setSource(_ source: String) -> [String: Any] { command { intent, _ in intent.settingSource(source) } }
 
   @objc
-  public func load() {
-    update { $0.currentSrc.isEmpty ? $0 : .initial.copy(paused: $0.paused, currentSrc: $0.currentSrc, playbackRate: $0.playbackRate) }
-    onMainQueue { engine in
-      if let source = engine.source {
-        engine.setSourceInternal(source)
-      }
-    }
-  }
-
-  // Playing after the end restarts from the beginning, which is a seek.
-  @objc
-  public func play() {
-    update { $0.ended ? $0.copy(currentTime: 0, paused: false, ended: false, seeking: true) : $0.copy(paused: false) }
-    onMainQueue { engine in
-      if engine.atEnd {
-        engine.seek(to: 0)
-      }
-
-      engine.resume()
-    }
-  }
+  public func load() -> [String: Any] { command { intent, _ in intent.loading() } }
 
   @objc
-  public func pause() {
-    update { $0.copy(paused: true) }
-    onMainQueue { $0.player.pause() }
-  }
+  public func play() -> [String: Any] { command { intent, state in intent.playing(state) } }
 
-  // From iOS 16 the `defaultRate` observer reports the change; before that
-  // there is nothing to observe, so the engine emits it itself.
-  @objc(setPlaybackRate:)
-  public func setPlaybackRate(_ rate: Double) {
-    guard rate > 0 else { return }
-
-    update { $0.copy(playbackRate: rate) }
-    onMainQueue { engine in
-      engine.requestedRate = Float(rate)
-
-      if engine.player.rate != 0 {
-        engine.player.rate = engine.requestedRate
-      }
-
-      if #available(iOS 16, *) {
-        engine.player.defaultRate = engine.requestedRate
-      } else {
-        engine.emit(.ratechange)
-      }
-    }
-  }
-
-  // `loop` isn't in the snapshot, so there is no state to write. Looping holds
-  // the player at the end rather than pausing it, so reaching the end restarts
-  // playback without a `pause` in between.
-  @objc(setLoop:)
-  public func setLoop(_ loop: Bool) {
-    onMainQueue { engine in
-      engine.loop = loop
-      engine.player.actionAtItemEnd = loop ? .none : .pause
-    }
-  }
+  @objc
+  public func pause() -> [String: Any] { command { intent, _ in intent.pausing() } }
 
   @objc(setCurrentTime:)
-  public func setCurrentTime(_ seconds: Double) {
-    let target = max(seconds, 0)
+  public func setCurrentTime(_ seconds: Double) -> [String: Any] {
+    command { intent, state in intent.seeking(state, to: seconds) }
+  }
 
-    update { $0.currentSrc.isEmpty ? $0 : $0.copy(currentTime: target, ended: false, seeking: true) }
-    onMainQueue { $0.seek(to: target) }
+  @objc(setPlaybackRate:)
+  public func setPlaybackRate(_ rate: Double) -> [String: Any] { command { intent, _ in intent.settingPlaybackRate(rate) } }
+
+  @objc(setLoop:)
+  public func setLoop(_ loop: Bool) -> [String: Any] { command { intent, _ in intent.settingLoop(loop) } }
+
+  private func command(_ transform: (Intent, MediaState) -> Intent) -> [String: Any] {
+    let change = store.updateIntent(transform)
+
+    onMainQueue { $0.reconcile() }
+
+    return change.bridgeDictionary
+  }
+
+  // MARK: Reconcile — main queue
+
+  private func reconcile() {
+    let intent = store.readIntent()
+
+    if intent.sourceGen != appliedSourceGen {
+      appliedSourceGen = intent.sourceGen
+      replaceItem(with: intent.src)
+    }
+
+    // AVPlayer can't seek an item until it's ready, so a seek waits for the
+    // reconcile its readiness triggers. One against an older source is dropped.
+    if intent.seekGen > appliedSeekGen {
+      if intent.seekSourceGen != appliedSourceGen {
+        appliedSeekGen = intent.seekGen
+        settledSeekGen = intent.seekGen
+      } else if let item, item.status == .readyToPlay {
+        appliedSeekGen = intent.seekGen
+        seek(item, to: intent.seekTarget, gen: intent.seekGen)
+      }
+    }
+
+    player.actionAtItemEnd = intent.loop ? .none : .pause
+
+    if #available(iOS 16, *) {
+      player.defaultRate = Float(intent.playbackRate)
+    }
+
+    if intent.paused {
+      player.pause()
+    } else if player.rate == 0 || player.rate != Float(intent.playbackRate) {
+      // `play()` starts at `defaultRate` from iOS 16, and at 1 before it.
+      player.rate = Float(intent.playbackRate)
+    }
+
+    report()
   }
 
   // AVQueuePlayer documents replaceCurrentItem(with:) as unsupported, so the
-  // swap goes through the queue. removeAllItems drops the rate, so a player
-  // that was playing is restarted to match ExoPlayer's surviving
-  // `playWhenReady`.
-  @MainActor
-  private func setSourceInternal(_ source: String) {
-    let next = URL(string: source).map { AVPlayerItem(url: $0) }
-    let wasPlaying = player.timeControlStatus != .paused
-    let hadItem = item != nil
-    let hadContentData = hasContentData
+  // swap goes through the queue.
+  private func replaceItem(with source: String) {
+    let next = source.isEmpty ? nil : URL(string: source).map { AVPlayerItem(url: $0) }
 
     player.removeAllItems()
     observe(next)
 
-    self.source = source
-
-    if hadItem {
-      emit(.emptied)
-    }
-
-    if hadContentData {
-      emit(.contentdatachange)
-    }
-
-    emit(.loadstart)
-
     // A media element fails an unusable src asynchronously rather than
     // rejecting it, so it reads as a load that errored.
-    guard let next else {
-      emitError(playerError(code: MediaErrorCode.srcNotSupported, message: "Invalid source URL: \(source)"))
-      return
+    if !source.isEmpty, next == nil {
+      itemError = playerError(code: MediaErrorCode.srcNotSupported, message: "Invalid source URL: \(source)")
     }
 
-    player.insert(next, after: nil)
-
-    if wasPlaying {
-      resume()
+    if let next {
+      player.insert(next, after: nil)
     }
   }
 
-  // MARK: State
+  // Superseded seeks complete unfinished and settle nothing.
+  private func seek(_ item: AVPlayerItem, to seconds: Double, gen: Int) {
+    atEnd = false
 
-  /// Any thread.
-  @objc
-  public func readState() -> VideoJSPlayerState {
-    stateLock.withLock { state }
+    player.seek(to: CMTime(seconds: seconds, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero) {
+      [weak self] finished in
+      guard finished else { return }
+
+      self?.onMainQueue(for: item) { engine in
+        engine.settledSeekGen = max(engine.settledSeekGen, gen)
+        engine.report()
+      }
+    }
   }
 
-  private var currentTime: Double {
-    let time = player.currentTime()
+  // MARK: Report — main queue
 
-    return time.isNumeric ? time.seconds : 0
+  private func report() {
+    guard !invalidated else { return }
+
+    let metadataKnown = item?.status == .readyToPlay
+    let phase: EnginePhase = {
+      guard let item, metadataKnown else { return .idle }
+      if atEnd { return .ended }
+      if player.timeControlStatus == .playing || item.isPlaybackLikelyToKeepUp || item.isPlaybackBufferFull {
+        return .ready
+      }
+      return .buffering
+    }()
+    let now = player.currentTime()
+    var adoptedPause = false
+
+    store.transact { intent, reported, _ in
+      reported = Reported(
+        sourceGen: appliedSourceGen,
+        seekGen: settledSeekGen,
+        phase: phase,
+        metadataKnown: metadataKnown,
+        position: now.isNumeric ? now.seconds : 0,
+        buffered: timeRanges(item?.loadedTimeRanges ?? []),
+        duration: itemDuration(metadataKnown: metadataKnown),
+        seekable: timeRanges(item?.seekableTimeRanges ?? []),
+        error: itemError,
+        contentData: contentData
+      )
+
+      // A media element pauses itself at the end; with `.pause` AVPlayer does
+      // too, but the intent has to say so. Same write, so `pause` fires before
+      // `ended`.
+      if !intent.paused, derive(intent, reported).state.ended {
+        intent = intent.pausing()
+        adoptedPause = true
+      }
+    }
+
+    if adoptedPause {
+      onMainQueue { $0.reconcile() }
+    }
   }
 
   // Duration reads indefinite until the item is ready, which is
   // indistinguishable from live, so it only counts once metadata has loaded.
-  private var duration: Double {
-    guard let item, metadataLoaded else { return .nan }
+  private func itemDuration(metadataKnown: Bool) -> Double {
+    guard let item, metadataKnown else { return .nan }
 
     return item.duration.isIndefinite ? .infinity : item.duration.seconds
   }
 
-  private var readyState: Int {
-    guard let item, metadataLoaded else { return ReadyState.haveNothing }
+  // Swaps the per-item observations and resets the per-item facts, so nothing
+  // from the previous item is reported against the next.
+  private func observe(_ next: AVPlayerItem?) {
+    itemObservations.forEach { $0.invalidate() }
+    itemObservations.removeAll()
 
-    if likelyToKeepUp { return ReadyState.haveEnoughData }
-    if canPlay { return ReadyState.haveFutureData }
+    item = next
+    atEnd = false
+    itemError = nil
+    contentData = MediaContentData()
 
-    let now = player.currentTime()
-    let hasCurrentData = item.loadedTimeRanges.contains { $0.timeRangeValue.containsTime(now) }
+    guard let next else { return }
 
-    return hasCurrentData ? ReadyState.haveCurrentData : ReadyState.haveMetadata
+    // Readiness is also when a waiting seek can go.
+    itemObservations = [
+      next.observe(\.status) { [weak self] item, _ in
+        self?.onMainQueue(for: item) { engine in
+          switch item.status {
+          case .readyToPlay:
+            engine.loadContentData(for: item)
+            engine.reconcile()
+          case .failed:
+            engine.itemError = playerError(from: item.error)
+            engine.report()
+          default:
+            engine.report()
+          }
+        }
+      },
+      next.observe(\.duration) { [weak self] item, _ in self?.onMainQueue(for: item) { $0.report() } },
+      next.observe(\.loadedTimeRanges) { [weak self] item, _ in self?.onMainQueue(for: item) { $0.report() } },
+      next.observe(\.isPlaybackLikelyToKeepUp) { [weak self] item, _ in self?.onMainQueue(for: item) { $0.report() } },
+      // A live window slides with no media event to carry it.
+      next.observe(\.seekableTimeRanges) { [weak self] item, _ in self?.onMainQueue(for: item) { $0.report() } },
+    ]
   }
 
-  // `rate` is zero whenever paused; `defaultRate` is the one that matches
-  // `playbackRate`, but only from iOS 16.
-  private var playbackRate: Double {
-    if #available(iOS 16, *) {
-      return Double(player.defaultRate)
+  // Asset metadata loads separately from the item, so it can land after a
+  // source swap and is dropped if so.
+  private func loadContentData(for item: AVPlayerItem) {
+    Task { [weak self] in
+      let loaded = await loadCommonContentData(from: item.asset)
+
+      self?.onMainQueue(for: item) { engine in
+        engine.contentData = MediaContentData(title: loaded["title"], poster: loaded["poster"])
+        engine.report()
+      }
     }
-
-    return Double(requestedRate)
   }
 
-  // `play()` starts at `defaultRate` from iOS 16, and at 1 before it.
-  private func resume() {
-    if #available(iOS 16, *) {
-      player.play()
-    } else {
-      player.rate = requestedRate
+  @objc
+  private func handleItemDidPlayToEnd(_ notification: Notification) {
+    onMainQueue(forNotification: notification) { engine in
+      // A looping media element starts over instead of ending; the periodic
+      // observer reports the jump back.
+      if engine.store.readIntent().loop {
+        engine.player.seek(to: .zero)
+        return
+      }
+
+      engine.atEnd = true
+      engine.report()
     }
   }
 
-  /// Any thread. Returns the snapshot it left in place.
-  @discardableResult
-  private func update(_ transform: (VideoJSPlayerState) -> VideoJSPlayerState) -> VideoJSPlayerState {
-    stateLock.withLock {
-      state = transform(state)
-      return state
+  @objc
+  private func handleItemFailedToPlayToEnd(_ notification: Notification) {
+    let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
+
+    onMainQueue(forNotification: notification) { engine in
+      engine.itemError = playerError(from: error)
+      engine.report()
     }
   }
 
-  // Per-source values belong to the source the player is on. Once a command
-  // has moved `currentSrc` on, they would only leak the old source into the
-  // new one's state.
-  @discardableResult
-  private func updateForSource(_ transform: (VideoJSPlayerState) -> VideoJSPlayerState) -> VideoJSPlayerState {
-    let current = source ?? ""
+  // Reconcile's own rate changes are `setRateCalled`. An interruption or
+  // backgrounding is the platform pausing, which a media element reports as
+  // paused.
+  @objc
+  private func handleRateDidChange(_ notification: Notification) {
+    guard
+      let reason = notification.userInfo?[AVPlayer.rateDidChangeReasonKey] as? AVPlayer.RateDidChangeReason,
+      reason == .audioSessionInterrupted || reason == .appBackgrounded
+    else { return }
 
-    return update { $0.currentSrc == current ? transform($0) : $0 }
+    onMainQueue { engine in
+      guard engine.player.rate == 0 else { return }
+
+      engine.store.updateIntent { intent, _ in intent.pausing() }
+    }
   }
+
+  // MARK: Surfaces and teardown
 
   @objc(attachLayer:)
   public func attach(_ layer: AVPlayerLayer) {
@@ -410,7 +408,7 @@ public final class VideoJSPlayerEngine: NSObject {
 
     invalidated = true
 
-    update { _ in .initial }
+    store?.reset()
     playerObservations.forEach { $0.invalidate() }
     playerObservations.removeAll()
     observe(nil)
@@ -429,7 +427,7 @@ public final class VideoJSPlayerEngine: NSObject {
     player.pause()
     player.removeAllItems()
 
-    onEvent = nil
+    onChange = nil
   }
 
   // Only one layer may draw a given player, so the top of the stack takes it
@@ -442,252 +440,12 @@ public final class VideoJSPlayerEngine: NSObject {
     }
   }
 
-  // Swaps the per-item observations and resets the per-source bookkeeping, so
-  // nothing from the previous item is reported against the next.
-  private func observe(_ next: AVPlayerItem?) {
-    itemObservations.forEach { $0.invalidate() }
-    itemObservations.removeAll()
-
-    item = next
-    metadataLoaded = false
-    likelyToKeepUp = false
-    canPlay = false
-    atEnd = false
-    hasContentData = false
-    pendingStartTime = nil
-
-    guard let next else { return }
-
-    itemObservations = [
-      next.observe(\.status) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { $0.syncItemStatus() }
-      },
-      next.observe(\.duration) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { $0.syncDuration() }
-      },
-      next.observe(\.loadedTimeRanges) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { $0.emitProgress() }
-      },
-      next.observe(\.isPlaybackLikelyToKeepUp) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { $0.syncLikelyToKeepUp() }
-      },
-      // A live window slides with no media event to carry it.
-      next.observe(\.seekableTimeRanges) { [weak self] item, _ in
-        self?.onMainQueue(for: item) { engine in
-          engine.updateForSource { $0.copy(seekable: timeRanges(item.seekableTimeRanges)) }
-        }
-      },
-    ]
-  }
-
-  // An item can't seek until it is ready, so an earlier seek becomes the start
-  // position. Superseded seeks complete unfinished; `settleSeek` keeps them
-  // quiet.
-  private func seek(to seconds: Double) {
-    guard let item else { return }
-
-    atEnd = false
-
-    guard metadataLoaded else {
-      pendingStartTime = seconds
-      return
-    }
-
-    let time = CMTime(seconds: seconds, preferredTimescale: 600)
-
-    emit(.seeking)
-    player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
-      self?.onMainQueue(for: item) { $0.settleSeek(to: seconds, finished: finished) }
-    }
-  }
-
-  // A newer seek, or a new source, has replaced `currentTime` since this seek
-  // was requested; that one settles `seeking` instead, so this stays quiet as a
-  // superseded seek does on the web.
-  private func settleSeek(to target: Double, finished: Bool) {
-    guard finished else { return }
-
-    var settled = false
-
-    updateForSource {
-      guard $0.seeking, $0.currentTime == target else { return $0 }
-
-      settled = true
-      return $0.copy(currentTime: currentTime, seeking: false)
-    }
-
-    if settled {
-      emit(.seeked)
-    }
-  }
-
-  private func syncTimeControlStatus() {
-    let previous = timeControlStatus
-    let next = player.timeControlStatus
-
-    if next == previous { return }
-
-    timeControlStatus = next
-
-    if previous == .paused {
-      update { $0.copy(paused: false) }
-      emit(.play)
-    } else if next == .paused {
-      update { $0.copy(paused: true) }
-      emit(.pause)
-    }
-
-    if next == .playing {
-      syncCanPlay(true)
-      emit(.playing)
-    } else if next == .waitingToPlayAtSpecifiedRate {
-      syncCanPlay(false)
-      emit(.waiting)
-    }
-  }
-
-  private func syncItemStatus() {
-    guard let item else { return }
-
-    switch item.status {
-    case .readyToPlay where !metadataLoaded:
-      metadataLoaded = true
-      syncDuration()
-      updateForSource { $0.copy(seekable: timeRanges(item.seekableTimeRanges), readyState: readyState) }
-      emit(.loadedmetadata)
-      syncCanPlay(true)
-      syncLikelyToKeepUp()
-      loadContentData(for: item)
-
-      if let pendingStartTime {
-        self.pendingStartTime = nil
-        seek(to: pendingStartTime)
-      }
-    case .failed:
-      emitError(playerError(from: item.error))
-    default:
-      break
-    }
-  }
-
-  private func syncDuration() {
-    guard metadataLoaded, let item else { return }
-
-    let next = duration
-    var changed = false
-
-    updateForSource {
-      guard $0.duration != next else { return $0 }
-
-      changed = true
-      return $0.copy(duration: next, seekable: timeRanges(item.seekableTimeRanges))
-    }
-
-    if changed {
-      emit(.durationchange, ["duration": next])
-    }
-  }
-
-  // Gated on metadata so the load order matches a media element's:
-  // `loadedmetadata`, `canplay`, `canplaythrough`.
-  private func syncLikelyToKeepUp() {
-    guard let item, metadataLoaded, item.isPlaybackLikelyToKeepUp != likelyToKeepUp else { return }
-
-    likelyToKeepUp = item.isPlaybackLikelyToKeepUp
-    updateForSource { $0.copy(readyState: readyState) }
-
-    if likelyToKeepUp {
-      syncCanPlay(true)
-      emit(.canplaythrough)
-    }
-  }
-
-  private func syncCanPlay(_ next: Bool) {
-    if next == canPlay { return }
-
-    canPlay = next
-    updateForSource { $0.copy(readyState: readyState) }
-
-    if canPlay {
-      emit(.canplay)
-    }
-  }
-
-  // A pending seek owns `currentTime`, so the payload reports what the
-  // snapshot holds rather than the player's position.
-  private func emitTimeUpdate() {
-    let reported = updateForSource { $0.seeking ? $0 : $0.copy(currentTime: currentTime) }
-
-    emit(.timeupdate, ["currentTime": reported.currentTime])
-  }
-
-  private func emitProgress() {
-    let buffered = timeRanges(item?.loadedTimeRanges ?? [])
-
-    updateForSource { $0.copy(buffered: buffered, readyState: readyState) }
-    emit(.progress, ["buffered": buffered])
-  }
-
-  private func emitError(_ error: [String: Any]) {
-    updateForSource { $0.copy(error: error) }
-    emit(.error, ["error": error])
-  }
-
-  // Asset metadata loads separately from the item, so it can land after a
-  // source swap and is dropped if so.
-  private func loadContentData(for item: AVPlayerItem) {
-    Task { [weak self] in
-      let contentData = await loadCommonContentData(from: item.asset)
-
-      self?.onMainQueue(for: item) { $0.syncContentData(contentData) }
-    }
-  }
-
-  private func syncContentData(_ next: [String: String]) {
-    var changed = false
-
-    updateForSource {
-      guard $0.contentData != next else { return $0 }
-
-      changed = true
-      return $0.copy(contentData: next)
-    }
-
-    if changed {
-      hasContentData = !next.isEmpty
-      emit(.contentdatachange)
-    }
-  }
-
-  @objc
-  private func handleItemDidPlayToEnd(_ notification: Notification) {
-    onMainQueue(forNotification: notification) { engine in
-      // A looping media element starts over instead of ending; the periodic
-      // observer reports the jump back.
-      if engine.loop {
-        engine.player.seek(to: .zero)
-        return
-      }
-
-      engine.atEnd = true
-      engine.updateForSource { $0.copy(ended: true) }
-      engine.emit(.ended)
-    }
-  }
-
-  @objc
-  private func handleItemFailedToPlayToEnd(_ notification: Notification) {
-    let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error
-
-    onMainQueue(forNotification: notification) { $0.emitError(playerError(from: error)) }
-  }
-
   // KVO and notification delivery aren't guaranteed on the main queue, and
-  // commands arrive from the JS thread, but the per-source bookkeeping and the
-  // player are confined to it. Always dispatches, never runs inline, so player
-  // work keeps the order its commands were issued in. Work dispatched before
+  // commands arrive from the JS thread, but the per-item facts and the player
+  // are confined to it. Always dispatches, never runs inline, so player work
+  // keeps the order its commands were issued in. Work dispatched before
   // `invalidate` runs ahead of it; anything later is dropped.
-  private func onMainQueue(_ body: @escaping @MainActor (VideoJSPlayerEngine) -> Void) {
+  private func onMainQueue(_ body: @escaping (VideoJSPlayerEngine) -> Void) {
     DispatchQueue.main.async { [weak self] in
       guard let self, !invalidated else { return }
 
@@ -712,19 +470,40 @@ public final class VideoJSPlayerEngine: NSObject {
 
     onMainQueue(for: source, body)
   }
+}
 
-  private func emit(_ type: VideoJSPlayerEventType, _ values: [String: Any] = [:]) {
-    if invalidated { return }
+// MARK: Bridge serialization
 
-    onEvent?(values.merging(["type": type.jsName]) { _, type in type })
+extension MediaChange {
+  /// `PlayerUpdate` in `src/media/NativeEngineStore.ts`.
+  var bridgeDictionary: [String: Any] {
+    [
+      "version": Double(version),
+      "patch": patch.mapValues(\.bridgeValue),
+      "events": events.map(\.jsName),
+    ]
   }
 }
 
-private func timeRanges(_ values: [NSValue]) -> [[String: Double]] {
+extension PatchValue {
+  var bridgeValue: Any {
+    switch self {
+    case let .number(value): value
+    case let .int(value): value
+    case let .bool(value): value
+    case let .string(value): value
+    case let .ranges(ranges): ranges.map { ["start": $0.start, "end": $0.end] }
+    case let .error(error): error.map { ["code": $0.code, "message": $0.message] as [String: Any] } ?? NSNull()
+    case let .contentData(data): ["title": data.title, "poster": data.poster].compactMapValues { $0 }
+    }
+  }
+}
+
+private func timeRanges(_ values: [NSValue]) -> [MediaTimeRange] {
   values
     .map(\.timeRangeValue)
     .sorted { $0.start < $1.start }
-    .map { ["start": $0.start.seconds, "end": $0.end.seconds] }
+    .map { MediaTimeRange(start: $0.start.seconds, end: $0.end.seconds) }
 }
 
 /// Only what the content itself carries; a key is absent unless supplied.
@@ -765,11 +544,11 @@ private func imageDataURI(_ data: Data) -> String? {
   return "data:\(mimeType);base64,\(data.base64EncodedString())"
 }
 
-private func playerError(code: Int, message: String) -> [String: Any] {
-  ["code": code, "message": message]
+private func playerError(code: Int, message: String) -> MediaErrorValue {
+  MediaErrorValue(code: code, message: message)
 }
 
-private func playerError(from error: Error?) -> [String: Any] {
+private func playerError(from error: Error?) -> MediaErrorValue {
   guard let error = error as NSError? else {
     return playerError(code: MediaErrorCode.custom, message: "")
   }

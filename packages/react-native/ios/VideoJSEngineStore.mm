@@ -16,10 +16,10 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   if (self = [super init]) {
     __weak __typeof(self) weakSelf = self;
 
-    VideoJSPlayerRegistry.sharedRegistry.onEvent = ^(NSInteger handle, NSDictionary<NSString *, id> *event) {
-      NSMutableDictionary *payload = [event mutableCopy];
+    VideoJSPlayerRegistry.sharedRegistry.onChange = ^(NSInteger handle, NSDictionary<NSString *, id> *change) {
+      NSMutableDictionary *payload = [change mutableCopy];
       payload[@"handle"] = @(handle);
-      [weakSelf emitOnPlayerEvent:payload];
+      [weakSelf emitOnPlayerChange:payload];
     };
   }
 
@@ -36,115 +36,48 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   [VideoJSPlayerRegistry.sharedRegistry destroyPlayer:handle];
 }
 
-// Each returns whether the handle reached a live engine.
+// Each returns its own update, or nil when the handle has no live engine.
 
-- (NSNumber *)setSource:(NSInteger)handle source:(NSString *)source
+- (NSDictionary *_Nullable)setSource:(NSInteger)handle source:(NSString *)source
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine setSource:source];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] setSource:source];
 }
 
-- (NSNumber *)load:(NSInteger)handle
+- (NSDictionary *_Nullable)load:(NSInteger)handle
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine load];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] load];
 }
 
-- (NSNumber *)play:(NSInteger)handle
+- (NSDictionary *_Nullable)play:(NSInteger)handle
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine play];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] play];
 }
 
-- (NSNumber *)pause:(NSInteger)handle
+- (NSDictionary *_Nullable)pause:(NSInteger)handle
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine pause];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] pause];
 }
 
-- (NSNumber *)setCurrentTime:(NSInteger)handle time:(double)time
+- (NSDictionary *_Nullable)setCurrentTime:(NSInteger)handle time:(double)time
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine setCurrentTime:time];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] setCurrentTime:time];
 }
 
-- (NSNumber *)setPlaybackRate:(NSInteger)handle rate:(double)rate
+- (NSDictionary *_Nullable)setPlaybackRate:(NSInteger)handle rate:(double)rate
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine setPlaybackRate:rate];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] setPlaybackRate:rate];
 }
 
-- (NSNumber *)setLoop:(NSInteger)handle loop:(BOOL)loop
+- (NSDictionary *_Nullable)setLoop:(NSInteger)handle loop:(BOOL)loop
 {
-  VideoJSPlayerEngine *engine = [self engineForHandle:handle];
-  [engine setLoop:loop];
-  return @(engine != nil);
+  return [[self engineForHandle:handle] setLoop:loop];
 }
 
-- (NSNumber *)getCurrentTime:(NSInteger)handle
+// Reads the engine's state on the calling (JS) thread, without waiting on the
+// main queue.
+- (NSDictionary *)getState:(NSInteger)handle
 {
-  return @([self stateForHandle:handle].currentTime);
-}
-
-- (NSNumber *)getDuration:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].duration);
-}
-
-- (NSArray<NSDictionary *> *)getBuffered:(NSInteger)handle
-{
-  return [self stateForHandle:handle].buffered;
-}
-
-- (NSArray<NSDictionary *> *)getSeekable:(NSInteger)handle
-{
-  return [self stateForHandle:handle].seekable;
-}
-
-- (NSDictionary *_Nullable)getError:(NSInteger)handle
-{
-  return [self stateForHandle:handle].error;
-}
-
-- (NSNumber *)isPaused:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].paused);
-}
-
-- (NSNumber *)isEnded:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].ended);
-}
-
-- (NSNumber *)isSeeking:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].seeking);
-}
-
-- (NSString *)getSource:(NSInteger)handle
-{
-  return [self stateForHandle:handle].currentSrc;
-}
-
-- (NSNumber *)getReadyState:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].readyState);
-}
-
-- (NSDictionary *)getContentData:(NSInteger)handle
-{
-  return [self stateForHandle:handle].contentData;
-}
-
-- (NSNumber *)getPlaybackRate:(NSInteger)handle
-{
-  return @([self stateForHandle:handle].playbackRate);
+  return [VideoJSPlayerRegistry.sharedRegistry updateForHandle:handle];
 }
 
 - (VideoJSPlayerEngine *_Nullable)engineForHandle:(NSInteger)handle
@@ -152,19 +85,12 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
   return [VideoJSPlayerRegistry.sharedRegistry engineForHandle:handle];
 }
 
-// Reads the engine's published snapshot on the calling (JS) thread, without
-// waiting on the main queue.
-- (VideoJSPlayerState *)stateForHandle:(NSInteger)handle
-{
-  return [VideoJSPlayerRegistry.sharedRegistry stateForHandle:handle];
-}
-
 // The registry outlives the module (it has to, for the Fabric surface), so a
 // reload has to clear it explicitly or engines from the previous instance keep
 // playing.
 - (void)invalidate
 {
-  VideoJSPlayerRegistry.sharedRegistry.onEvent = nil;
+  VideoJSPlayerRegistry.sharedRegistry.onChange = nil;
   [VideoJSPlayerRegistry.sharedRegistry releaseAll];
 }
 

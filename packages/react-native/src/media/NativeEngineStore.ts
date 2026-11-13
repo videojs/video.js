@@ -1,42 +1,70 @@
 import { type CodegenTypes, type TurboModule, TurboModuleRegistry } from 'react-native';
 
+/** Each is named after, and fires under the same conditions as, the `HTMLMediaElement` event of that name. */
+export type PlayerEventType =
+  | 'loadstart'
+  | 'emptied'
+  | 'loadedmetadata'
+  | 'durationchange'
+  | 'progress'
+  | 'canplay'
+  | 'canplaythrough'
+  | 'error'
+  | 'play'
+  | 'pause'
+  | 'playing'
+  | 'waiting'
+  | 'ended'
+  | 'seeking'
+  | 'seeked'
+  | 'timeupdate'
+  | 'ratechange'
+  | 'contentdatachange';
+
 /**
- * One event channel for every player, tagged by handle. Codegen rejects a discriminated union as an event payload (the
- * parser accepts it, the native generators do not), so the payload stays flat and consumers filter on `handle` before
- * narrowing on `type`.
- *
- * Each `type` is named after, and fires under the same conditions as, the `HTMLMediaElement` event of that name. Events
- * that report a value carry it in the optional field named for the media element property it updates.
+ * The fields of a player's state that one write changed, each named for the `HTMLMediaElement` property it backs. A
+ * field is present only when it changed; `error: null` clears the error.
  */
-export type PlayerEvent = Readonly<{
-  handle: CodegenTypes.Int32;
-  type:
-    | 'loadstart'
-    | 'emptied'
-    | 'loadedmetadata'
-    | 'durationchange'
-    | 'progress'
-    | 'canplay'
-    | 'canplaythrough'
-    | 'error'
-    | 'play'
-    | 'pause'
-    | 'playing'
-    | 'waiting'
-    | 'ended'
-    | 'seeking'
-    | 'seeked'
-    | 'timeupdate'
-    | 'ratechange'
-    | 'contentdatachange';
-  /** Set on `timeupdate`. Seconds. */
+export type PlayerStatePatch = Readonly<{
+  /** Seconds. */
   currentTime?: CodegenTypes.Double;
-  /** Set on `durationchange`. Seconds; `Infinity` for live. */
+  /** Seconds; `NaN` until known and `Infinity` for live. */
   duration?: CodegenTypes.Double;
-  /** Set on `progress`. Seconds, ascending and non-overlapping. */
+  /** Seconds, ascending and non-overlapping. */
   buffered?: ReadonlyArray<PlayerTimeRange>;
-  /** Set on `error`. */
-  error?: PlayerError;
+  seekable?: ReadonlyArray<PlayerTimeRange>;
+  error?: PlayerError | null;
+  paused?: boolean;
+  ended?: boolean;
+  seeking?: boolean;
+  currentSrc?: string;
+  /** An `HTMLMediaElement.readyState` value, `0`–`4`. */
+  readyState?: CodegenTypes.Int32;
+  playbackRate?: CodegenTypes.Double;
+  contentData?: PlayerContentData;
+}>;
+
+/**
+ * One write to a player's state: what changed and the events announcing it.
+ *
+ * `version` orders writes to one player. A command's own update reaches JS synchronously, as its return value, while
+ * updates from earlier native writes can still be in flight behind it. So a mirror applies a field only when it holds
+ * an older version of that field; a late update still fires its events but never rolls state back. On the web, too,
+ * state can be newer than the event announcing it, which is why events carry no values.
+ */
+export type PlayerUpdate = Readonly<{
+  version: CodegenTypes.Double;
+  patch: PlayerStatePatch;
+  /** `PlayerEventType`s, in firing order. Codegen can't type an array of a string union. */
+  events: ReadonlyArray<string>;
+}>;
+
+/** One event channel for every player, tagged by handle; consumers filter on `handle`. */
+export type PlayerChange = Readonly<{
+  handle: CodegenTypes.Int32;
+  version: CodegenTypes.Double;
+  patch: PlayerStatePatch;
+  events: ReadonlyArray<string>;
 }>;
 
 export type PlayerTimeRange = Readonly<{
@@ -64,54 +92,34 @@ export type PlayerContentData = Readonly<{
 }>;
 
 /**
- * Commands run synchronously on the JS thread: each writes the state it will produce into the snapshot, then posts the
- * work to the player's thread and returns. They return `true` when the snapshot already reflects the command, and
- * `false` when there is no player for the handle yet (it is built one player-thread hop after `createPlayer`) or any
- * more; a command against a handle not yet built still takes effect, its state appearing once it runs. A command must
- * return a value to run synchronously at all — TurboModule `void` methods run asynchronously on the module's queue.
+ * Commands run synchronously on the JS thread: each writes what it means into native state, posts the player work to
+ * the player's thread, and returns its own {@link PlayerUpdate}. The update reflects the command, as a media element's
+ * state does straight after one, and its events still arrive through `onPlayerChange` like any other. A command returns
+ * `null` when there is no player for the handle (any more). A command must return a value to run synchronously at all —
+ * TurboModule `void` methods run asynchronously on the module's queue.
  *
- * Getters are synchronous and never wait on the player's thread: they read that same snapshot. Besides commands, the
- * player writes what it reports into it before emitting the `onPlayerEvent` that announces it, so a getter called while
- * handling an event sees state at least as new as the event. Against an unknown or destroyed handle, getters return a
- * media element's initial values.
+ * State otherwise reaches JS only as `onPlayerChange` updates. `getState` returns all of it as one update, for a mirror
+ * starting late (adopting a handle); against an unknown or destroyed handle, it is a media element's initial state.
  */
 export interface Spec extends TurboModule {
   createPlayer(source: string | null): CodegenTypes.Int32;
   destroyPlayer(handle: CodegenTypes.Int32): void;
-  setSource(handle: CodegenTypes.Int32, source: string): boolean;
+  setSource(handle: CodegenTypes.Int32, source: string): PlayerUpdate | null;
   /** Reloads the current source from scratch. */
-  load(handle: CodegenTypes.Int32): boolean;
-  play(handle: CodegenTypes.Int32): boolean;
-  pause(handle: CodegenTypes.Int32): boolean;
-  /** Seconds. Ignored with no source. */
-  setCurrentTime(handle: CodegenTypes.Int32, time: CodegenTypes.Double): boolean;
+  load(handle: CodegenTypes.Int32): PlayerUpdate | null;
+  play(handle: CodegenTypes.Int32): PlayerUpdate | null;
+  pause(handle: CodegenTypes.Int32): PlayerUpdate | null;
+  /** Seconds, clamped to `seekable`. Ignored with no source. */
+  setCurrentTime(handle: CodegenTypes.Int32, time: CodegenTypes.Double): PlayerUpdate | null;
   /** Must be positive; others are ignored. */
-  setPlaybackRate(handle: CodegenTypes.Int32, rate: CodegenTypes.Double): boolean;
-  /**
-   * Restarts from the beginning at the end instead of ending, without `ended`. Not part of the state snapshot: like
-   * `src`, the adapter owns it.
-   */
-  setLoop(handle: CodegenTypes.Int32, loop: boolean): boolean;
+  setPlaybackRate(handle: CodegenTypes.Int32, rate: CodegenTypes.Double): PlayerUpdate | null;
+  /** Restarts from the beginning at the end instead of ending, without `ended`. */
+  setLoop(handle: CodegenTypes.Int32, loop: boolean): PlayerUpdate | null;
 
-  /** Seconds. */
-  getCurrentTime(handle: CodegenTypes.Int32): CodegenTypes.Double;
-  /** Seconds; `NaN` until known and `Infinity` for live. */
-  getDuration(handle: CodegenTypes.Int32): CodegenTypes.Double;
-  getBuffered(handle: CodegenTypes.Int32): ReadonlyArray<PlayerTimeRange>;
-  getSeekable(handle: CodegenTypes.Int32): ReadonlyArray<PlayerTimeRange>;
-  /** The last error for the current source. */
-  getError(handle: CodegenTypes.Int32): PlayerError | null;
-  isPaused(handle: CodegenTypes.Int32): boolean;
-  isEnded(handle: CodegenTypes.Int32): boolean;
-  isSeeking(handle: CodegenTypes.Int32): boolean;
-  /** The source last passed to `setSource`, or `''`. */
-  getSource(handle: CodegenTypes.Int32): string;
-  /** An `HTMLMediaElement.readyState` value, `0`–`4`. */
-  getReadyState(handle: CodegenTypes.Int32): CodegenTypes.Int32;
-  getContentData(handle: CodegenTypes.Int32): PlayerContentData;
-  getPlaybackRate(handle: CodegenTypes.Int32): CodegenTypes.Double;
+  /** Every field, as one update. */
+  getState(handle: CodegenTypes.Int32): PlayerUpdate;
 
-  readonly onPlayerEvent: CodegenTypes.EventEmitter<PlayerEvent>;
+  readonly onPlayerChange: CodegenTypes.EventEmitter<PlayerChange>;
 }
 
 // `get` rather than `getEnforcing` so importing the package doesn't throw

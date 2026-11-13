@@ -17,7 +17,7 @@ class VideoJSEngineStoreModule internal constructor(
   private val registry: PlayerRegistry,
 ) : NativeEngineStoreSpec(reactContext) {
   init {
-    registry.onEvent = ::emitPlayerEvent
+    registry.onChange = ::emitPlayerChange
   }
 
   override fun createPlayer(source: String?): Double =
@@ -27,75 +27,67 @@ class VideoJSEngineStoreModule internal constructor(
     registry.destroy(handle.toInt())
   }
 
-  // Each returns whether the handle reached a live engine.
+  // Each returns its own update, or null when the handle has no live engine.
 
-  override fun setSource(handle: Double, source: String): Boolean = command(handle) { it.setSource(source) }
+  override fun setSource(handle: Double, source: String): WritableMap? = command(handle) { it.setSource(source) }
 
-  override fun play(handle: Double): Boolean = command(handle, PlayerEngine::play)
+  override fun play(handle: Double): WritableMap? = command(handle) { it.play() }
 
-  override fun load(handle: Double): Boolean = command(handle, PlayerEngine::load)
+  override fun load(handle: Double): WritableMap? = command(handle) { it.load() }
 
-  override fun pause(handle: Double): Boolean = command(handle, PlayerEngine::pause)
+  override fun pause(handle: Double): WritableMap? = command(handle) { it.pause() }
 
-  override fun setCurrentTime(handle: Double, time: Double): Boolean = command(handle) { it.setCurrentTime(time) }
+  override fun setCurrentTime(handle: Double, time: Double): WritableMap? = command(handle) { it.setCurrentTime(time) }
 
-  override fun setPlaybackRate(handle: Double, rate: Double): Boolean = command(handle) { it.setPlaybackRate(rate) }
+  override fun setPlaybackRate(handle: Double, rate: Double): WritableMap? = command(handle) { it.setPlaybackRate(rate) }
 
-  override fun setLoop(handle: Double, loop: Boolean): Boolean = command(handle) { it.setLoop(loop) }
+  override fun setLoop(handle: Double, loop: Boolean): WritableMap? = command(handle) { it.setLoop(loop) }
 
-  override fun getCurrentTime(handle: Double): Double = state(handle).currentTime
-
-  override fun getDuration(handle: Double): Double = state(handle).duration
-
-  override fun getBuffered(handle: Double): WritableArray = toTimeRangesArray(state(handle).buffered)
-
-  override fun getSeekable(handle: Double): WritableArray = toTimeRangesArray(state(handle).seekable)
-
-  override fun getError(handle: Double): WritableMap? = state(handle).error?.let(::toErrorMap)
-
-  override fun isPaused(handle: Double): Boolean = state(handle).paused
-
-  override fun isEnded(handle: Double): Boolean = state(handle).ended
-
-  override fun isSeeking(handle: Double): Boolean = state(handle).seeking
-
-  override fun getSource(handle: Double): String = state(handle).currentSrc
-
-  override fun getReadyState(handle: Double): Double = state(handle).readyState.toDouble()
-
-  override fun getContentData(handle: Double): WritableMap = toContentDataMap(state(handle).contentData)
-
-  override fun getPlaybackRate(handle: Double): Double = state(handle).playbackRate
+  override fun getState(handle: Double): WritableMap = toUpdateMap(registry.update(handle.toInt()))
 
   override fun invalidate() {
-    registry.onEvent = null
+    registry.onChange = null
     registry.releaseAll()
     super.invalidate()
   }
 
-  private fun emitPlayerEvent(handle: Int, event: PlayerEvent) {
-    emitOnPlayerEvent(
-      Arguments.createMap().apply {
-        putInt("handle", handle)
-        putString("type", event.type.jsName)
-        event.currentTime?.let { putDouble("currentTime", it) }
-        event.duration?.let { putDouble("duration", it) }
-
-        event.buffered?.let { putArray("buffered", toTimeRangesArray(it)) }
-        event.error?.let { putMap("error", toErrorMap(it)) }
-      }
-    )
+  private fun emitPlayerChange(handle: Int, change: MediaChange) {
+    emitOnPlayerChange(toUpdateMap(change).apply { putInt("handle", handle) })
   }
 
-  private fun command(handle: Double, block: (PlayerEngine) -> Unit): Boolean =
-    registry.engine(handle.toInt())?.also(block) != null
-
-  private fun state(handle: Double): PlayerState = registry.state(handle.toInt())
+  private fun command(handle: Double, block: (PlayerEngine) -> MediaChange): WritableMap? =
+    registry.engine(handle.toInt())?.let(block)?.let(::toUpdateMap)
 
   companion object {
     const val NAME = "VideoJSEngineStore"
   }
 }
+
+private fun toUpdateMap(change: MediaChange): WritableMap =
+  Arguments.createMap().apply {
+    putDouble("version", change.version.toDouble())
+    putMap("patch", toPatchMap(change.patch))
+    putArray("events", Arguments.createArray().apply { change.events.forEach { pushString(it.type.jsName) } })
+  }
+
+// Keys are `PlayerState` property names; see `patch` in MediaModel.kt.
+@Suppress("UNCHECKED_CAST")
+private fun toPatchMap(patch: Map<String, Any?>): WritableMap =
+  Arguments.createMap().apply {
+    for ((key, value) in patch) {
+      when (value) {
+        null -> putNull(key)
+        is Double -> putDouble(key, value)
+        is Int -> putInt(key, value)
+        is Boolean -> putBoolean(key, value)
+        is String -> putString(key, value)
+        is PlayerError -> putMap(key, toErrorMap(value))
+        is PlayerContentData -> putMap(key, toContentDataMap(value))
+        is List<*> -> putArray(key, toTimeRangesArray(value as List<PlayerTimeRange>))
+        else -> error("Unhandled patch value for '$key': $value")
+      }
+    }
+  }
 
 private fun toTimeRangesArray(ranges: List<PlayerTimeRange>): WritableArray =
   Arguments.createArray().apply {

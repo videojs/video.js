@@ -23,12 +23,12 @@ internal class PlayerRegistry {
   private val mainHandler = Handler(Looper.getMainLooper())
   private val engines = ConcurrentHashMap<Int, PlayerEngine>()
 
-  var onEvent: ((handle: Int, event: PlayerEvent) -> Unit)? = null
+  var onChange: ((handle: Int, change: MediaChange) -> Unit)? = null
 
   fun create(context: Context, source: String?): Int {
     val handle = nextHandle.getAndIncrement()
 
-    engines[handle] = PlayerEngine(context, source) { event -> onEvent?.invoke(handle, event) }
+    engines[handle] = PlayerEngine(context, source) { change -> onChange?.invoke(handle, change) }
 
     return handle
   }
@@ -49,8 +49,8 @@ internal class PlayerRegistry {
    */
   fun engine(handle: Int): PlayerEngine? = engines[handle]
 
-  /** The latest published state, from any thread. A destroyed handle reads as a fresh player. */
-  fun state(handle: Int): PlayerState = engines[handle]?.readState() ?: PlayerState()
+  /** All of the latest state as one update, from any thread. A destroyed handle reads as a fresh player. */
+  fun update(handle: Int): MediaChange = engines[handle]?.readUpdate() ?: MediaChange(0, fullPatch(PlayerState()), emptyList())
 
   fun releaseAll() {
     engines.keys.forEach(::destroy)
