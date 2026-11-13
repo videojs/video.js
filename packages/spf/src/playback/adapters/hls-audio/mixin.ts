@@ -6,6 +6,7 @@ import type { Composition } from '../../../core/composition/create-composition';
 import { effect } from '../../../core/signals/effect';
 import {
   SVTA_NO_SUPPORTED_AUDIO_TRACK,
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
   SVTA_UNSUPPORTED_PLAYBACK_FEATURE,
   type SvtaError,
 } from '../../../media/errors';
@@ -50,11 +51,15 @@ export interface HlsAudioAdapterAPI extends HlsAudioAdapterProps {
 }
 
 /**
- * Which reported conditions this composition treats as fatal. Only the audio verdict: an audio-only engine composes no
- * video selection, so `SVTA_NO_SUPPORTED_VIDEO_TRACK` is never reported and surfacing it would describe a track type
- * this media doesn't have.
+ * Which reported conditions this composition treats as fatal. Of the track verdicts, only the audio one: an audio-only
+ * engine composes no video selection, so `SVTA_NO_SUPPORTED_VIDEO_TRACK` is never reported and surfacing it would
+ * describe a track type this media doesn't have. A failed primary manifest load is fatal as on the video adapter: the
+ * source never resolved, so nothing can play.
  */
-const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([SVTA_NO_SUPPORTED_AUDIO_TRACK]);
+const FATAL_SVTA_CODES: ReadonlySet<number> = new Set<number>([
+  SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
+  SVTA_NO_SUPPORTED_AUDIO_TRACK,
+]);
 
 /**
  * Mixin that adds SPF audio-only HLS playback to any base class.

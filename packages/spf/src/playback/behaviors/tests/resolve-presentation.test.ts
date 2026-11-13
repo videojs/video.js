@@ -251,6 +251,28 @@ variant1.m3u8`;
     reactor.destroy();
   });
 
+  it('reports a manifest answered with an HTTP error instead of parsing its body', async () => {
+    const state = { ...makeState({ preload: 'auto' }), errors: signal<SvtaError[] | undefined>(undefined) };
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response('Not found', { status: 404, statusText: 'Not Found' })
+    );
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const reactor = resolvePresentation.setup({ state, config: baseConfig });
+
+    state.presentation.set({ url: 'https://cdn.example.com/stream.m3u8' });
+    await vi.waitFor(() => expect(state.errors.get()).toHaveLength(1));
+
+    expect(state.errors.get()?.[0]).toMatchObject({
+      code: SVTA_PRIMARY_MANIFEST_LOAD_ERROR,
+      data: { url: 'https://cdn.example.com/stream.m3u8' },
+    });
+    expect(state.presentation.get()).toEqual({ url: 'https://cdn.example.com/stream.m3u8' });
+
+    reactor.destroy();
+  });
+
   describe('preload policy', () => {
     it('resolves when preload is "metadata"', async () => {
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
