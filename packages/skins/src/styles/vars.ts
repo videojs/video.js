@@ -28,6 +28,11 @@ export const vars = {
     kind: 'public',
     description: 'Outer player border radius.',
   },
+  '--media-controls-before-start': {
+    kind: 'public',
+    description:
+      'Visibility of the video skin controls before playback starts. Defaults to `hidden`, leaving only the centre play button; set `visible` to show the controls.',
+  },
   '--media-font-family': {
     kind: 'public',
     description: 'Font family used by the player interface.',
@@ -236,6 +241,14 @@ export const vars = {
   '--media-controls-gradient': {
     kind: 'internal',
     description: 'Theme gradient painted behind the bottom of the video controls.',
+  },
+  '--media-center-play-started-opacity': {
+    kind: 'internal',
+    description: 'Opacity of the Neutral centre play button after playback starts. Defaults to `0`.',
+  },
+  '--media-center-play-started-pointer-events': {
+    kind: 'internal',
+    description: 'Pointer events of the Neutral centre play button after playback starts. Defaults to `none`.',
   },
   '--media-controls-gradient-height': {
     kind: 'internal',

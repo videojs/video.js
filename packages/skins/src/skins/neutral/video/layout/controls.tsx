@@ -22,22 +22,30 @@ export interface NeutralVideoControlsProps {
 export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsProps = {}) {
   return (
     <$.Controls.Root>
-      <$.Controls.Backdrop className={controlsStyles.backdrop} />
+      <$.BufferingIndicator className={controlsStyles.centerBuffering}>
+        <$.Controls.Group className={[controlsStyles.center, styles.compactCenter]}>
+          <PlayButton
+            className={[controlsStyles.centerButton, controlsStyles.centerPlay]}
+            iconClassName={controlsStyles.centerPlayIcon}
+          />
+        </$.Controls.Group>
+      </$.BufferingIndicator>
+      <$.Controls.Backdrop className={[controlsStyles.backdrop, styles.compactBackdrop]} />
       <$.Controls.Content className={[controlsStyles.root, controlsStyles.content, styles.content]}>
         <$.Tooltip.Provider>
           <$.Controls.Group className={styles.start}>
             <ButtonTooltip side="top">
-              <PlayButton />
+              <PlayButton className={styles.playButton} />
             </ButtonTooltip>
-            <VolumePopover showTooltip side="right" orientation="horizontal" />
-          </$.Controls.Group>
-
-          <$.Controls.Group className={styles.timeSliderGroup}>
-            <$.Time.Group className={timeStyles.group}>
+            <VolumePopover className={styles.volumeButton} showTooltip side="right" orientation="horizontal" />
+            <$.Time.Group className={[timeStyles.group, styles.time]}>
               <$.Time.Value className={timeStyles.toggle} type="current" toggle />
               <$.Time.Separator className={timeStyles.separator} />
               <$.Time.Value className={timeStyles.durationValue} type="duration" />
             </$.Time.Group>
+          </$.Controls.Group>
+
+          <$.Controls.Group className={styles.timeSliderGroup}>
             <TimeSlider previewOverflow="clamp" renderThumbnail={renderThumbnail} />
           </$.Controls.Group>
 
@@ -45,19 +53,19 @@ export function NeutralVideoControls({ renderThumbnail }: NeutralVideoControlsPr
             <ButtonTooltip side="top">
               <CaptionsButton className={controlsStyles.captionsButton} />
             </ButtonTooltip>
-            <VideoSettingsMenu />
+            <VideoSettingsMenu className={styles.settingsButton} />
             <$.Controls.Group className={styles.trailing}>
               <ButtonTooltip side="top">
-                <CastButton />
+                <CastButton className={styles.castButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
-                <AirPlayButton />
+                <AirPlayButton className={styles.airplayButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
-                <PiPButton />
+                <PiPButton className={styles.pipButton} />
               </ButtonTooltip>
               <ButtonTooltip side="top">
-                <FullscreenButton />
+                <FullscreenButton className={styles.fullscreenButton} />
               </ButtonTooltip>
             </$.Controls.Group>
           </$.Controls.Group>

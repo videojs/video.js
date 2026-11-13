@@ -40,7 +40,11 @@ export const SELECTORS = {
   controls: 'media-controls-content, .video-controls, .audio-controls',
 
   // Buttons
-  playButton: 'media-play-button, .media-play-button, button[aria-keyshortcuts~="Space"]',
+  // The control-bar button; skins with centre controls render a second one over the media.
+  playButton: ['media-play-button', '.media-play-button', 'button[aria-keyshortcuts~="Space"]']
+    .map((selector) => `${selector}:not(.video-controls-center-play)`)
+    .join(', '),
+  centerPlayButton: '.video-controls-center .media-play-button',
   seekBackward: 'media-seek-button[data-direction="backward"], .media-seek-button[data-direction="backward"]',
   seekForward: 'media-seek-button[data-direction="forward"], .media-seek-button[data-direction="forward"]',
   muteButton: 'media-mute-button, .media-mute-button',

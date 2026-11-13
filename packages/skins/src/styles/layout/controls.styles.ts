@@ -16,6 +16,27 @@ const compactHidden = [
   'media-max-lg:group-[:not([data-visible])]/controls:duration-media-controls',
 ] as const;
 
+// Sits above the title and status indicators, level with the control bars, and steps aside for the spinner.
+const center = [
+  'group/center pointer-events-none absolute top-1/2 left-1/2 z-30 flex -translate-1/2 items-center rtl:flex-row-reverse gap-6',
+  'transition-[filter,opacity,scale] duration-media-controls-enter ease-out',
+  'not-data-visible:opacity-0 not-data-visible:scale-media-hidden not-data-visible:duration-media-controls',
+  'pointer-fine:not-data-visible:blur-media-hidden',
+  'group-data-visible/buffering:hidden',
+] as const;
+
+// Before playback starts, only the centre play button shows; `--media-controls-before-start: visible` keeps the controls.
+// Where style queries work, the controls also fade in once playback starts.
+const hiddenBeforeStart = [
+  'not-data-started:[visibility:var(--media-controls-before-start,hidden)]',
+  'media-before-start-fade:not-data-started:opacity-0',
+] as const;
+
+const centerButtonBase = 'pointer-events-auto group-not-data-visible/center:pointer-events-none';
+
+// The centre play button shrinks rather than hides in small players.
+const centerPlay = ['rounded-media-pill!'] as const;
+
 export default styles({
   file: 'video/controls.css',
   prefix: 'video-controls',
@@ -24,7 +45,7 @@ export default styles({
       utilities: [],
       variants: {
         default: 'media-max-lg:hidden',
-        neutral: 'media-max-xs:hidden',
+        neutral: 'media-max-360:hidden',
       },
     },
     root: {
@@ -34,6 +55,7 @@ export default styles({
       utilities: [
         'group/controls text-media-controls-foreground text-shadow-media',
         'duration-media-controls-enter ease-out',
+        ...hiddenBeforeStart,
       ],
       variants: {
         default: [
@@ -65,6 +87,7 @@ export default styles({
         'pointer-events-none absolute inset-0 z-10 rounded-[inherit]',
         'bg-(image:--media-controls-gradient) bg-bottom bg-no-repeat bg-size-[100%_var(--media-controls-bottom-gradient-height)]',
         'transition-opacity duration-media-controls ease-out not-data-visible:opacity-0',
+        ...hiddenBeforeStart,
       ],
       variants: {
         // Below lg the secondary group floats at the top, so it needs a scrim of its own.
@@ -94,6 +117,64 @@ export default styles({
     },
     spacer: {
       utilities: 'flex-1',
+    },
+    centerBuffering: {
+      utilities: [],
+      variants: { default: 'group/buffering contents', neutral: 'group/buffering contents' },
+    },
+    center: {
+      utilities: [],
+      variants: { default: center, neutral: center },
+    },
+    centerButton: {
+      utilities: [],
+      variants: {
+        // Each centre button sets its own surface, so Tailwind never has to order two competing backgrounds.
+        default: centerButtonBase,
+        neutral: [centerButtonBase, 'text-media-controls-foreground!'],
+      },
+    },
+    centerPlay: {
+      utilities: [],
+      variants: {
+        // After start, fine pointers click the media instead; the button turns invisible rather than leaving, keeping focus.
+        default: [
+          ...centerPlay,
+          'size-auto! p-4! media-max-360:p-3!',
+          'bg-media-primary! text-media-primary-foreground! media-high-contrast:bg-media-primary!',
+          'hover:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+          'focus-visible:bg-[color-mix(in_oklab,var(--media-primary)_85%,var(--media-primary-foreground))]!',
+          'pointer-fine:data-started:not-focus-visible:opacity-0!',
+          'pointer-fine:data-started:not-focus-visible:pointer-events-none!',
+        ],
+        // Matches the compat skin's centre play button: a translucent black circle, set apart from the bare-icon playback
+        // feedback. The neutral skin keeps its classic control bar once playback starts.
+        neutral: [
+          'size-14.5! media-max-360:size-10! rounded-[50%]! [corner-shape:round]!',
+          'bg-media-backdrop/40! hover:bg-media-backdrop/60! focus-visible:bg-media-backdrop/60!',
+          'media-high-contrast:bg-media-background!',
+          'data-started:not-focus-visible:[opacity:var(--media-center-play-started-opacity,0)]!',
+          'data-started:not-focus-visible:[pointer-events:var(--media-center-play-started-pointer-events,none)]!',
+        ],
+      },
+    },
+    centerPlayIcon: {
+      utilities: [],
+      variants: {
+        default: 'size-media-icon-lg! media-max-360:size-media-icon!',
+        neutral: 'size-7! media-max-360:size-5!',
+      },
+    },
+    centerSeek: {
+      utilities: [],
+      // A touch affordance, hidden for fine pointers, on small players and until playback starts.
+      variants: {
+        default: [
+          'media-max-2xs:hidden! pointer-fine:hidden! group-not-data-started/center:hidden!',
+          'rounded-media-pill! bg-media-backdrop/35! text-media-controls-foreground! backdrop-filter-media-indicator',
+          'media-high-contrast:bg-media-background!',
+        ],
+      },
     },
   },
 });

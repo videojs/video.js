@@ -1,5 +1,9 @@
 import { styles } from 'vjsc/styles';
 
+// Before playback starts, only the center play button shows; `--media-controls-before-start: visible` keeps the controls.
+// Where style queries work, the bars also fade in once playback starts.
+const hiddenBeforeStart = '[visibility:var(--media-controls-before-start,hidden)]';
+
 const transition =
   'transition-[opacity,transform] duration-media-instant ease-out group-not-data-visible/controls:duration-media-base group-not-data-visible/controls:opacity-0 motion-reduce:transition-none';
 
@@ -11,15 +15,17 @@ export default styles({
       utilities: 'group/buffering contents',
     },
     backdrop: {
-      utilities:
+      utilities: [
         'pointer-events-none absolute inset-0 z-10 bg-(image:--media-controls-gradient) group-not-data-visible/buffering:not-data-visible:hidden forced-colors:bg-none',
+        `not-data-started:${hiddenBeforeStart}`,
+      ],
     },
     content: {
       utilities: 'group/controls pointer-events-none absolute inset-0 z-30',
     },
     center: {
       utilities: [
-        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 hidden transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 media-360:flex group-data-visible/buffering:hidden!',
+        'group-not-data-visible/controls:pointer-events-none pointer-events-auto absolute left-1/2 top-1/2 flex transform-[translate(-50%,-50%)] items-center rtl:flex-row-reverse gap-3 group-data-visible/buffering:hidden!',
         'media-high-contrast:rounded-lg media-high-contrast:bg-media-background forced-colors:bg-transparent!',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translate(-50%,-50%)_scale(0.9)]',
@@ -34,24 +40,28 @@ export default styles({
         'forced-colors:end-0',
         transition,
         'motion-safe:group-not-data-visible/controls:transform-[translateY(var(--media-spacing))]',
+        `not-data-started:${hiddenBeforeStart}`,
+        'media-before-start-fade:not-data-started:opacity-0',
       ],
     },
     centerButton: {
       utilities: [
         'bg-[rgba(0,0,0,0.4)]! media-high-contrast:bg-media-background! forced-colors:bg-[ButtonFace]!',
-        'hover:bg-[rgba(0,0,0,0.85)]! focus-visible:bg-[rgba(0,0,0,0.85)]! aria-expanded:bg-[rgba(0,0,0,0.85)]!',
+        'hover:bg-[rgba(0,0,0,0.6)]! focus-visible:bg-[rgba(0,0,0,0.6)]! aria-expanded:bg-[rgba(0,0,0,0.6)]!',
         'media-high-contrast:hover:bg-media-foreground! media-high-contrast:focus-visible:bg-media-foreground! media-high-contrast:aria-expanded:bg-media-foreground!',
         'forced-colors:hover:bg-[Highlight]! forced-colors:focus-visible:bg-[Highlight]! forced-colors:aria-expanded:bg-[Highlight]!',
       ],
     },
     centerPlay: {
-      utilities: 'size-14.5!',
+      // Shrinks rather than hides in small players, so there's always a start prompt.
+      utilities: 'size-14.5! media-max-360:size-10!',
     },
     centerPlayIcon: {
-      utilities: 'size-7!',
+      utilities: 'size-7! media-max-360:size-5!',
     },
     centerSeek: {
-      utilities: 'hidden size-9! pointer-fine:grid',
+      // Before playback starts, the play button stands alone in the center.
+      utilities: 'hidden size-9! pointer-fine:grid media-max-360:hidden! group-not-data-started/controls:hidden!',
     },
     centerSeekIcon: {
       utilities: 'size-4.5',
@@ -65,8 +75,11 @@ export default styles({
       ],
     },
     videoBottom: {
-      utilities:
+      utilities: [
         'forced-colors:inset-x-0 forced-colors:bottom-0 forced-colors:rounded-none! forced-colors:px-2 forced-colors:py-2',
+        `group-not-data-started/controls:${hiddenBeforeStart}`,
+        'media-before-start-fade:group-not-data-started/controls:opacity-0',
+      ],
     },
     sliderRow: {
       utilities: 'w-full',

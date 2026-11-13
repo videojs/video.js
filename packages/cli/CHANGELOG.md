@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/cli@10.3.0...@videojs/cli@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **skin:** rework video controls for small players ([#9702](https://github.com/videojs/video.js/issues/9702)) ([6a65dba](https://github.com/videojs/video.js/commit/6a65dba5da68bd5c626543ff02f6bd74eb80081c))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @videojs/core bumped to 10.4.0
+    * @videojs/installation bumped to 10.4.0
+    * @videojs/utils bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/cli@10.2.0...@videojs/cli@10.3.0) (2026-11-03)
 
 

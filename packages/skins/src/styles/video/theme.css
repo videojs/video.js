@@ -103,7 +103,8 @@
   .media-skin:is([data-preset="video"], [data-preset="live-video"])[data-theme="neutral"] {
     --media-frame-border: var(--media-border-color, rgb(0 0 0 / 0.15));
     --media-controls-gradient-height: 40%;
-    --media-controls-bottom-gradient-height: 40%;
+    /* The floor keeps the scrim behind the time slider once compact players stack the controls on two rows. */
+    --media-controls-bottom-gradient-height: max(40%, calc(var(--media-spacing) * 44));
     --media-caption-controls-y: calc(var(--media-spacing) * -14);
     --media-slider-preview-offset: calc(var(--media-spacing) * 11);
   }

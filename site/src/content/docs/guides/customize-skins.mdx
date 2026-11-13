@@ -58,6 +58,7 @@ Packaged skins expose [CSS custom properties](https://developer.mozilla.org/en-U
 | `--media-accent-text-color` | Text and icons shown on the accent color | [`<color>`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) | `black` |
 | `--media-border-color` | The hairline around the player | [`<color>`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) | `transparent` |
 | `--media-border-radius` | The player corner radius | A valid [border-radius value](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/border-radius#values) | `1rem` |
+| `--media-controls-before-start` | Whether the video skins show their controls before playback starts | `hidden` (default) or `visible` | `visible` |
 | `--media-font-family` | The player interface font stack | A valid [font-family value](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-family) | `Roboto, sans-serif` |
 | `--media-object-fit` | How the media and poster fill the player | A valid [object-fit value](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-fit) | `cover` |
 | `--media-object-position` | Where the media and poster sit when they do not fill the player | A valid [object-position value](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/object-position) | `top` |
@@ -66,6 +67,8 @@ Packaged skins expose [CSS custom properties](https://developer.mozilla.org/en-U
 If you omit `--media-accent-text-color`, the skins choose a contrasting text color from `--media-accent-color` using [`contrast-color()`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/contrast-color). Browsers before Chrome 147, Firefox 146, and Safari 26 lack `contrast-color()` and use the theme's default text color instead, which suits only the default accent, so set both properties together if you support those browsers.
 
 The skins use [`Inter`](https://rsms.me/inter/) when your page loads it and fall back to the system UI font. Video.js does not load the webfont for you. Set `--media-font-family` to use another font. The Scaffold skin inherits your page's font instead, and it has no hairline, so `--media-border-color` doesn't change it.
+
+Before playback starts, the video and live video skins show only the large center play button. The controls appear once playback starts or the media begins to autoplay. Set `--media-controls-before-start: visible` to show the controls from the start, for example so viewers can pick captions or quality before they press play.
 
 The media component and poster share `--media-object-fit` and `--media-object-position`, so a `cover` poster stays aligned with `cover` video. See <DocsLink slug="guides/poster">Add a poster and loading placeholder</DocsLink>.
 

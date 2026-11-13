@@ -7,8 +7,8 @@ export default styles({
     root: {
       utilities: [
         // The title fills the player so its scrim can share the controls gradient height.
-        'pointer-events-none absolute inset-0 z-20 isolate',
-        'wrap-anywhere px-6 pt-2.5 text-[calc(var(--media-spacing)*4)] font-medium tracking-[-0.0125em] text-media-controls-foreground text-shadow-media',
+        'pointer-events-none absolute inset-0 z-20 isolate media-max-3xs:hidden',
+        'truncate px-6 pt-2.5 text-[calc(var(--media-spacing)*4)] font-medium tracking-[-0.0125em] text-media-controls-foreground text-shadow-media',
         'media-md:px-6 media-md:pt-4',
         'origin-top duration-media-controls-enter ease-out',
         'not-data-visible:opacity-0 not-data-visible:-translate-y-media-hidden-offset not-data-visible:duration-media-controls',
@@ -16,10 +16,10 @@ export default styles({
       ],
       variants: {
         default: [
-          // A row of the control size plus `--spacing(2)`, less the top padding, centres the text below that padding.
-          'grid content-start items-center grid-rows-[minmax(calc(var(--media-control-size)-(--spacing(0.5))),auto)]',
-          'media-md:grid-rows-[minmax(calc(var(--media-control-size)-(--spacing(2))),auto)]',
-          'media-max-lg:pr-36',
+          // A line of the control size plus `--spacing(2)`, less the top padding, centres the text below that padding.
+          'leading-[calc(var(--media-control-size)-(--spacing(0.5)))]',
+          'media-md:leading-[calc(var(--media-control-size)-(--spacing(2)))]',
+          'media-max-lg:pr-36 media-max-2xs:text-media',
           'transition-[filter,opacity,scale,translate]',
           'not-data-visible:scale-media-hidden',
           // The title paints its own top scrim; below lg the controls backdrop paints it for the top controls.
