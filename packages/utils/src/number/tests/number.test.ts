@@ -60,6 +60,11 @@ describe('roundToStep', () => {
     expect(roundToStep(0.14, 0.1, 0)).toBe(0.1);
   });
 
+  it('keeps the decimals of min when it has more than step', () => {
+    expect(roundToStep(0.7, 0.5, 0.25)).toBe(0.75);
+    expect(roundToStep(0.27, 0.1, 0.05)).toBe(0.25);
+  });
+
   it('returns min when value equals min', () => {
     expect(roundToStep(0, 1, 0)).toBe(0);
     expect(roundToStep(5, 10, 5)).toBe(5);
