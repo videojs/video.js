@@ -29,7 +29,7 @@ Make a migration checklist before changing your embed:
 - **Find your event listeners and imperative calls** (`play()`, `currentTime`, `addChapters`). Media APIs move to the media component; the rest is mapped under [Drive playback](#drive-playback).
 - **Note your theme and CSS variables.** Compare your Mux Player theme with the two Video.js skins, and map its CSS variables.
 - **Check [Known gaps](#known-gaps)** for features your app needs.
-- **Check your catalog for raw ADTS AAC, AES-128, low-latency HLS, or DVR streams.** Check whether the SPF engine supports these requirements. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
+- **Check your catalog for live streams, raw ADTS AAC, AES-128, and embedded captions, and your code for hls.js settings.** The default Mux media plays through the Video.js streaming engine, not hls.js, and these are the cases where you import the hls.js flavor instead. If you use DRM, verify playback with whichever engine you choose. See [Which Mux media should you use?](#which-mux-media-should-you-use).
 
 <FrameworkCase frameworks={["html"]}>
 Before loading Video.js, remove Mux Player imports and CDN scripts, plus any other imports that register legacy Mux Video or Media Chrome elements. Then reload the page. These libraries share custom-element names such as `mux-video` and `media-play-button`. A name can only have one definition per document, and Video.js keeps an existing definition. If both players must remain during migration, use separate documents, such as an iframe.
@@ -693,45 +693,59 @@ Store actions throw until the media attaches. Call fullscreen actions from a use
 Choose and test the engine before migration, especially when your catalog uses DRM.
 
 <FrameworkCase frameworks={["react"]}>
-`MuxVideo` supports two playback engines: SPF and hls.js. Choose the engine by import path. The `/spf` import is smaller, and `/hls-js` is more compatible. The default import currently uses hls.js. Start with that default:
+`MuxVideo` supports two playback engines, and the import path picks one. Mux Player plays through hls.js. The default `MuxVideo` import plays through SPF, the Video.js streaming engine, which is smaller. The `/hls-js` import keeps hls.js.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
-`<mux-video>` supports two playback engines: SPF and hls.js. Choose the engine by import path. The `/spf` import is smaller, and `/hls-js` is more compatible. The default import currently uses hls.js. Start with that default:
+`<mux-video>` supports two playback engines, and the import path picks one. Mux Player plays through hls.js. The default `<mux-video>` import plays through SPF, the Video.js streaming engine, which is smaller. The `/hls-js` import keeps hls.js.
 </FrameworkCase>
 
 | Import | Engine | When |
 |---|---|---|
-| `.../media/mux-video` | hls.js | **The default. Start here.** |
-| `.../media/mux-video/spf` | SPF | Your streams use fMP4/CMAF segments and fit the limitations below. |
-| `.../media/mux-video/hls-js` | hls.js | Your app depends on hls.js and needs its instance or settings. |
+| `.../media/mux-video` | SPF | **The default. Start here** if your catalog fits the limits below. |
+| `.../media/mux-video/hls-js` | hls.js | Your catalog or your code needs something from the list below. |
+| `.../media/mux-video/spf` | SPF | Never required. It is the same module as the default, under an explicit name. |
 
-The SPF engine plays the MPEG-TS that Mux packages, for on-demand assets and standard-latency live streams. It does not support raw ADTS AAC or whole-segment AES-128 encryption. Keep the default for assets that need those formats. The SPF engine also lacks low-latency HLS support, and its DVR playback is experimental.
+The default engine plays Mux's on-demand assets, packaged as CMAF or as MPEG-TS, and DRM-protected assets. Move to `/hls-js` when any of these apply:
 
-Both flavors support DRM through `source.drm`. Verify license exchange and playback with your protected assets on supported browsers before changing engines.
+- **Your code configures or reads hls.js.** `source.engine`, `source.preferPlayback`, `source.type`, and the client-side rendition caps (`maxAutoResolution`, `minAutoResolution`, `capRenditionToPlayerSize`) exist only on the hls.js flavor. So does the hls.js instance.
+- **You play live streams.** The default plays Mux's low-latency streams, but at standard latency. Its MPEG-TS support covers on-demand only, and Mux packages standard- and reduced-latency live streams as MPEG-TS. Its DVR playback is experimental.
+- **You need native HLS playback.** The default plays through Media Source Extensions and has no native HLS fallback. It cannot play in a browser without `MediaSource` or `ManagedMediaSource`.
+- **Your streams carry raw ADTS AAC, whole-segment AES-128 encryption, CEA-608 or CEA-708 captions, or ID3 metadata.** The default supports none of them.
+- **You rely on engine-level Mux Data metrics.** See [Mux Data reports less on the default engine](#mux-data-reports-less-on-the-default-engine).
+
+The default's MPEG-TS support has been verified in Chromium browsers only. Mux packages plus-quality assets as MPEG-TS, so if your catalog has them, test them in the other browsers you support, or use `/hls-js`.
+
+Both flavors support DRM through `source.drm`. Verify license exchange and playback with your protected assets on supported browsers before you commit to an engine.
 
 <FrameworkCase frameworks={["html"]}>
-All three imports register the same `<mux-video>` tag and accept the same source, so changing the engine is an import change. Load only one registration for that tag on a page.
+Every import registers the same `<mux-video>` tag and accepts the same Mux source fields, so changing the engine is an import change. Load only one registration for that tag on a page.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
-All three imports provide a `MuxVideo` component with the same source API, so changing the engine is an import change. React components do not register a custom element, and different imports can coexist if separate players need different engines.
+Every import provides a `MuxVideo` component with the same Mux source fields, so changing the engine is an import change. React components do not register a custom element, and different imports can coexist if separate players need different engines.
 </FrameworkCase>
 
-The default import currently uses hls.js, but its engine can change in a future release. Use `/hls-js` when your app depends on hls.js APIs. Test the chosen engine with your assets and supported browsers.
+The Mux audio component has the same import paths. Its default engine is audio-only and ignores `source.drm`. Use it with the audio player and audio skins.
 
-The Mux audio component has the same three import paths. Use it with the audio player and audio skins.
+### Mux Data reports less on the default engine
+
+Mux Player's views include hls.js detail: rendition switches, segment request timing and throughput, and engine errors. The Mux Data extension collects that detail only from hls.js and dash.js. With the default Mux media, a view carries the metrics the media element provides. Import `/hls-js` to keep the engine-level detail.
+
+The default player software name also differs by engine. See <DocsLink slug="guides/mux-data" anchor="name-the-player">Name the player</DocsLink>.
 
 ## Live streams
 
 Mux Player switches to live controls automatically. In Video.js, choose the live preset yourself.
+
+The examples import the `/hls-js` flavor of the Mux media. It runs on hls.js, as Mux Player does, so it plays every latency mode Mux offers, low latency included, and DVR streams. The default flavor fits only low-latency streams that you are content to play at standard latency; see [Which Mux media should you use?](#which-mux-media-should-you-use).
 
 <FrameworkCase frameworks={["html"]}>
 Register the live preset and Mux media. From the CDN:
 
 ```html
 <script type="module" src="{{VJS10_CDN_BASE}}/live-video.js"></script>
-<script type="module" src="{{VJS10_CDN_BASE}}/media/mux-video.js"></script>
+<script type="module" src="{{VJS10_CDN_BASE}}/media/mux-video/hls-js.js"></script>
 
 <live-video-player>
   <live-video-skin>
@@ -745,7 +759,7 @@ With a bundler, import the same pieces:
 ```js
 import '@videojs/html/live-video/player';
 import '@videojs/html/live-video/skin';
-import '@videojs/html/media/mux-video';
+import '@videojs/html/media/mux-video/hls-js';
 ```
 </FrameworkCase>
 
@@ -753,7 +767,7 @@ import '@videojs/html/media/mux-video';
 ```tsx
 import '@videojs/react/live-video/skin.css';
 import { LiveVideoPlayer, LiveVideoSkin } from '@videojs/react/live-video';
-import { MuxVideo } from '@videojs/react/media/mux-video';
+import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
 
 <LiveVideoPlayer>
   <LiveVideoSkin>
@@ -941,7 +955,7 @@ For DRM on either Mux media flavor, supply a license token. Video.js derives the
 
 DRM playback is always signed, so set both `source.drm.token` and `source.playback.token`. For content Mux does not license, add your own license servers to `source.drm`, keyed by key system. For each key system you configure, your server replaces the derived server.
 
-The SPF flavor supports FairPlay, Widevine, and PlayReady through its EME license pipeline. DRM availability still depends on the browser, key system, and asset configuration.
+The default flavor licenses FairPlay, Widevine, and PlayReady itself, and the hls.js flavor hands the license servers to hls.js or to the browser's native HLS playback. DRM availability still depends on the browser, key system, and asset configuration.
 
 ## Access the media and playback engine
 
@@ -949,8 +963,8 @@ The SPF flavor supports FairPlay, Widevine, and PlayReady through its EME licens
 | Mux Player | Video.js v10 |
 |---|---|
 | `media.nativeEl` | the `<mux-video>` element itself for standard media properties and methods |
-| the hls.js instance | `.engine` on the `<mux-video>` element |
-| `prefer-playback` | `source.preferPlayback`, or pick <DocsLink slug="reference/components/native-hls-video">native HLS</DocsLink> outright |
+| the hls.js instance | `.engine` on the `<mux-video>` element, with the `/hls-js` flavor |
+| `prefer-playback` | `source.preferPlayback` with the `/hls-js` flavor, or pick <DocsLink slug="reference/components/native-hls-video">native HLS</DocsLink> outright |
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
@@ -958,14 +972,14 @@ The SPF flavor supports FairPlay, Widevine, and PlayReady through its EME licens
 |---|---|
 | `media.nativeEl` | `ref.current` from a `ref` on the media component |
 | the Video.js media object | `mediaRef.current` from a `mediaRef` on the media component, or `useMedia()` inside the player |
-| the hls.js instance | the media object's `.engine` on the hls.js-backed flavor |
-| `prefer-playback` | `source.preferPlayback`, or pick <DocsLink slug="reference/components/native-hls-video">native HLS</DocsLink> outright |
+| the hls.js instance | the media object's `.engine`, with the `/hls-js` flavor |
+| `prefer-playback` | `source.preferPlayback` with the `/hls-js` flavor, or pick <DocsLink slug="reference/components/native-hls-video">native HLS</DocsLink> outright |
 </FrameworkCase>
 
-`source.preferPlayback` is the closest mapping. To match `prefer-playback="native"`, set it to `'native'`. The Mux media then uses the browser's built-in HLS support instead of building an MSE pipeline.
+`source.preferPlayback` is the closest mapping, and it exists only on the `/hls-js` flavor. To match `prefer-playback="native"`, import that flavor and set it to `'native'`. The Mux media then uses the browser's built-in HLS support instead of building an MSE pipeline. The default flavor always plays through MSE.
 
 <Aside type="caution" title="Treat engine access as an escape hatch">
-Reading `.engine` couples your app to hls.js and the `/hls-js` flavor. Prefer Video.js state, events, and media APIs when they cover your use case. Reach into the engine only for functionality Video.js doesn't expose.
+Every flavor has an `.engine`, but only the `/hls-js` flavor's is an hls.js instance; the default's is the SPF engine. Code that reads it is coupled to one engine. Prefer Video.js state, events, and media APIs when they cover your use case. Reach into the engine only for functionality Video.js doesn't expose.
 </Aside>
 
 <FrameworkCase frameworks={["react"]}>
@@ -983,7 +997,7 @@ function EngineAccess() {
 }
 ```
 
-Import the `/hls-js` flavor when your app depends on that engine. The default flavor deliberately doesn't promise which engine it uses.
+Import the `/hls-js` flavor when your app depends on hls.js. With the default import, `engine` is the SPF engine, which has none of the hls.js API.
 </FrameworkCase>
 
 Video.js has no Program Date Time (PDT) helpers such as `getStartDate()` or `currentPdt`. The player exposes `liveEdgeStart` and `targetLiveWindow`. To read PDT, use the playback engine.
