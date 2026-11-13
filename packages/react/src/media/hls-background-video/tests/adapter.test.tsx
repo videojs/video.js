@@ -26,7 +26,22 @@ vi.mock('@videojs/spf/adapters/hls-background-video', async (importOriginal) => 
   };
 });
 
+vi.mock('@videojs/spf/adapters/hls-background-video-mpeg-ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@videojs/spf/adapters/hls-background-video-mpeg-ts')>();
+
+  return {
+    ...actual,
+    HlsBackgroundVideoMpegTsAdapter: class extends actual.HlsBackgroundVideoMpegTsAdapter {
+      constructor(...args: ConstructorParameters<typeof actual.HlsBackgroundVideoMpegTsAdapter>) {
+        super(...args);
+        instances.push(this as never);
+      }
+    },
+  };
+});
+
 const { HlsBackgroundVideo } = await import('../adapter');
+const { MuxBackgroundVideo } = await import('../../mux-background-video/adapter');
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -49,10 +64,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('HlsBackgroundVideo', () => {
+// The two names share one implementation over different Medias, so each runs the whole suite.
+describe.each([
+  { name: 'HlsBackgroundVideo', BackgroundVideo: HlsBackgroundVideo },
+  { name: 'MuxBackgroundVideo', BackgroundVideo: MuxBackgroundVideo },
+])('$name', ({ BackgroundVideo }) => {
   describe('playback defaults', () => {
     it('loops and autoplays by default', () => {
-      const { container } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" />);
+      const { container } = render(<BackgroundVideo src="https://example.com/v.m3u8" />);
       const video = container.querySelector('video')!;
 
       expect(video.loop).toBe(true);
@@ -61,9 +80,7 @@ describe('HlsBackgroundVideo', () => {
     });
 
     it('honors loop={false} and autoPlay={false} over what attaching fixes', () => {
-      const { container } = render(
-        <HlsBackgroundVideo src="https://example.com/v.m3u8" loop={false} autoPlay={false} />
-      );
+      const { container } = render(<BackgroundVideo src="https://example.com/v.m3u8" loop={false} autoPlay={false} />);
       const video = container.querySelector('video')!;
 
       expect(video.loop).toBe(false);
@@ -72,9 +89,9 @@ describe('HlsBackgroundVideo', () => {
     });
 
     it('applies a later change to loop', () => {
-      const { container, rerender } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" />);
+      const { container, rerender } = render(<BackgroundVideo src="https://example.com/v.m3u8" />);
 
-      rerender(<HlsBackgroundVideo src="https://example.com/v.m3u8" loop={false} />);
+      rerender(<BackgroundVideo src="https://example.com/v.m3u8" loop={false} />);
 
       expect(container.querySelector('video')!.loop).toBe(false);
     });
@@ -85,7 +102,7 @@ describe('HlsBackgroundVideo', () => {
   describe('error forwarding', () => {
     it('calls onError when a fatal condition is reported', async () => {
       const onError = vi.fn();
-      const { container } = render(<HlsBackgroundVideo src="https://example.com/v.m3u8" onError={onError} />);
+      const { container } = render(<BackgroundVideo src="https://example.com/v.m3u8" onError={onError} />);
 
       const media = instances[0];
       const video = container.querySelector('video');

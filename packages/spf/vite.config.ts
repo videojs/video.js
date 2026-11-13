@@ -5,6 +5,15 @@ import { playwright } from 'vite-plus/test/browser-playwright';
 import { type PackageBuildMode, packageBuildConfig, packageBuildModes } from '../../build/pack.ts';
 import { cachedTaskInputs, packageTestTask, workspaceTaskDependencies } from '../../build/task.ts';
 
+// Browser-mode projects run chromium by default. SPF_TEST_WEBKIT=1 adds a webkit instance and SPF_TEST_FIREFOX=1 a
+// firefox one. Webkit here is Playwright WebKit, not Safari. A factory rather than a shared array: vitest derives
+// nested-project names from the instance objects, so one array reused across projects collides.
+const browserInstances = () => [
+  { browser: 'chromium' as const },
+  ...(process.env.SPF_TEST_WEBKIT ? [{ browser: 'webkit' as const }] : []),
+  ...(process.env.SPF_TEST_FIREFOX ? [{ browser: 'firefox' as const }] : []),
+];
+
 const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
   ...packageBuildConfig(mode, 'neutral'),
   entry: {
@@ -14,6 +23,9 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     'engines/hls-video': 'src/playback/engines/hls-video.ts',
     'engines/hls-audio': 'src/playback/engines/hls-audio.ts',
     'engines/hls-background-video': 'src/playback/engines/hls-background-video.ts',
+    'engines/hls-video-mpeg-ts': 'src/playback/engines/hls-video-mpeg-ts.ts',
+    'engines/hls-audio-mpeg-ts': 'src/playback/engines/hls-audio-mpeg-ts.ts',
+    'engines/hls-background-video-mpeg-ts': 'src/playback/engines/hls-background-video-mpeg-ts.ts',
     'features/airplay': 'src/playback/features/airplay.ts',
     'features/airplay-fairplay': 'src/playback/features/airplay-fairplay.ts',
     'features/audio': 'src/playback/features/audio.ts',
@@ -29,6 +41,8 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     'features/live': 'src/playback/features/live.ts',
     'features/media-source': 'src/playback/features/media-source.ts',
     'features/monitor-player-size': 'src/playback/features/monitor-player-size.ts',
+    'features/mpeg-ts-audio-transmux': 'src/playback/features/mpeg-ts-audio-transmux.ts',
+    'features/mpeg-ts-transmux': 'src/playback/features/mpeg-ts-transmux.ts',
     'features/multi-cdn': 'src/playback/features/multi-cdn.ts',
     'features/shift-text-timestamps': 'src/playback/features/shift-text-timestamps.ts',
     'features/shift-timestamps': 'src/playback/features/shift-timestamps.ts',
@@ -70,6 +84,9 @@ const createPackConfig = (mode: PackageBuildMode): PackUserConfig => ({
     'adapters/hls-audio': 'src/playback/adapters/hls-audio/index.ts',
     'adapters/hls-background-video': 'src/playback/adapters/hls-background-video/index.ts',
     'adapters/hls-video': 'src/playback/adapters/hls-video/index.ts',
+    'adapters/hls-video-mpeg-ts': 'src/playback/adapters/hls-video-mpeg-ts/index.ts',
+    'adapters/hls-audio-mpeg-ts': 'src/playback/adapters/hls-audio-mpeg-ts/index.ts',
+    'adapters/hls-background-video-mpeg-ts': 'src/playback/adapters/hls-background-video-mpeg-ts/index.ts',
   },
 });
 
@@ -168,7 +185,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },
@@ -189,7 +206,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },
@@ -212,7 +229,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             screenshotFailures: false,
-            instances: [{ browser: 'chromium' }],
+            instances: browserInstances(),
           },
         },
       },

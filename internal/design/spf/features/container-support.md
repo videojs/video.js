@@ -20,27 +20,24 @@ at all*.
 
 ## Status
 
-- **Composition:** not implemented. SPF engine assumes fMP4 segments
-  throughout the segment-loading + MSE pipeline. Non-fMP4 *detection*
-  has since landed, though: `parse-media-playlist.ts` derives a
-  container MIME from the segment extension when no `EXT-X-MAP` is
-  present, and `media/dom/capabilities.ts`'s `canPlayTrack` asserts
-  `NON_FMP4_CONTAINER_MIMES` (`video/mp2t`, `audio/aac`) unsupported.
-  So MPEG-TS renditions are now pruned before selection rather than
-  reaching `SourceBuffer.appendBuffer` — surfacing that outcome is
-  [errors](./errors.md)'s phase 2, and *playing* it is still this
-  feature.
+- **Composition:** implemented as an opt-in subset. `mpegTsTransmuxFeature`
+  and `mpegTsAudioTransmuxFeature` transmux MPEG-TS (H.264 + AAC) to
+  fMP4 between fetch and append, and the `hls-video-mpeg-ts`,
+  `hls-audio-mpeg-ts`, and `hls-background-video-mpeg-ts` engines
+  compose them. The coverage is what Mux Video packages at its plus
+  and basic tiers. The container-neutral engines are unchanged: they
+  still detect MPEG-TS renditions (`parse-media-playlist.ts`,
+  `NON_FMP4_CONTAINER_MIMES` in `media/dom/capabilities.ts`) and
+  prune them before selection.
 - **Definition depth:** coarse — scope sketched at the strategic-
   posture level. Concrete implementation work would require an RFC
   (per Notion epic #5) given the major code footprint.
-- **Strategic posture (as of 2026-05-20):** **not in scope for the
-  foreseeable future.** Mux Video uses fMP4 across its delivery
-  infrastructure; legacy MPEG-TS sources are not a current customer
-  delivery shape. Building a transmuxer would be a substantial code
-  footprint (mux.js / hls.js's transmuxer is ~10kloc as reference)
-  with limited customer value given the fMP4-only delivery path.
-  Notion epic #5 explicitly flags this: "Build demuxer vs push
-  fMP4-only with Mux infra. Possibly an RFC, not an epic."
+- **Strategic posture (as of 2026-05-20):** not in scope, on the
+  premise that Mux Video delivers fMP4 throughout. That premise was
+  wrong: Mux's plus and basic tiers deliver MPEG-TS, which is what
+  the opt-in subset above plays. General MPEG-TS (other codecs,
+  SAMPLE-AES, discontinuities, PTS rollover) remains out of scope;
+  hls.js is the answer for it.
 - **Revisit conditions** documented in Open questions.
 
 ## Phases of complexity

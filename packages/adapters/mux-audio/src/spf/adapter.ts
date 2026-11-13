@@ -3,6 +3,7 @@
 // audio-only.
 import { type MuxAdapterProps, MuxMixin } from '@videojs/mux-video/spf';
 import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapters/hls-audio';
+import { HlsAudioMpegTsAdapter } from '@videojs/spf/adapters/hls-audio-mpeg-ts';
 
 /**
  * The Mux Media over the SPF audio-only HLS engine.
@@ -19,8 +20,12 @@ import { HlsAudioAdapter, type HlsAudioAdapterProps } from '@videojs/spf/adapter
  * audio is usually a _video_ asset, whose poster and storyboard exist and which an audio skin may well want. The
  * element ignores it either way. Mux publishes neither for a genuinely audio-only asset, so those URLs 404 — see the
  * known shortcoming on the video flavor, which shares the derivation.
+ *
+ * An audio-only playback ID packaged as MPEG-TS plays: the flavor transmuxes it with the audio-only feature (no H.264
+ * framing bundled; see `@videojs/spf/adapters/hls-audio-mpeg-ts`). A plus-tier _video_ asset plays too: Mux muxes its
+ * audio into the video segments, so this fetches the lowest-bandwidth variant's segments and keeps only their AAC.
  */
-export class MuxAudioAdapter extends MuxMixin(HlsAudioAdapter) {
+export class MuxAudioAdapter extends MuxMixin(HlsAudioMpegTsAdapter) {
   static override readonly defaultProps: Omit<HlsAudioAdapterProps, 'src' | 'source'> & MuxAdapterProps = {
     ...HlsAudioAdapter.defaultProps,
     src: '',

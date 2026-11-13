@@ -40,6 +40,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 | `requestCredentials?` | `RequestCredentialsPolicy` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack), [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The `credentials` mode the engine's requests are made with: the manifest, media playlists, segments, and the chapters document; absent → the platform default. |
 | `reschedule?` | `Reschedule<ResolvedTrack>` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | Live media-playlist re-run policy; absent → resolve once. |
 | `resolveKeyUri?` | `ResolveKeyUri` | — | [resolveVideoTrack](../behaviors/resolve-track.md#resolvevideotrack) | `EXT-X-KEY` URI handling; absent → `parseMediaPlaylist`'s default. |
+| `sourceBufferMimeCodec?` | `SourceBufferMimeCodec` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | The MIME codec string the SourceBuffer is created with (a transmuxing composition maps its container here). |
 | `useDevicePixelRatio?` | `boolean` | — | [trackScreenResolution](../behaviors/dom/track-screen-resolution.md#trackscreenresolution) | Whether the reading is scaled into device pixels. Defaults to `true` — see `ScreenResolutionOptions.useDevicePixelRatio`, including its note on page zoom being folded into the ratio outside WebKit. |
 | `videoConstraints?` | `readonly SelectTrackRule<SelectVideoTrackConfig>[]` | `videoConstraints` | [selectVideoTrack](../behaviors/select-tracks.md#selectvideotrack) | The hard-constraint pre-pass `selectVideoTrack` runs, replacing its default (the capability pre-pass alone) outright. |
 | `videoMessagePipelines?` | `MessagePipelines` | — | [setupVideoBufferActors](../behaviors/dom/setup-buffer-actors.md#setupvideobufferactors) | Optional pipelines that relocate segments whose timestamps don't start at zero; absent, segments append as-is. |
@@ -68,6 +69,7 @@ Feature default is the value a feature's `defaultConfig` supplies. A behavior's 
 ### Composed by
 
 - [@videojs/spf/engines/hls-background-video](../engines/hls-background-video.md)
+- [@videojs/spf/engines/hls-background-video-mpeg-ts](../engines/hls-background-video-mpeg-ts.md)
 
 ## Other functions and constants
 

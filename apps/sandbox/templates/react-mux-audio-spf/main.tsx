@@ -10,9 +10,9 @@ import { MuxAudio } from '@videojs/react/media/mux-audio/spf';
 import { createRoot } from 'react-dom/client';
 
 // The SPF-backed counterpart to `react-mux-audio`. See that page's HTML sibling
-// for what differs: the audio-only engine fetches only audio renditions, and SPF
-// appends fMP4/CMAF only, so MPEG-TS and DRM playback IDs are expected to surface
-// the unsupported-source error rather than play.
+// for what differs: the audio-only engine fetches only audio renditions, and this
+// flavor transmuxes Mux's MPEG-TS packaging, so an audio-only TS playback ID
+// plays while a plus-tier video asset's muxed audio does not.
 
 function App() {
   const { source, mediaProps } = useSandbox();

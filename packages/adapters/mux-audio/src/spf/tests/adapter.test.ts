@@ -5,6 +5,7 @@
  * What's worth asserting here is that applying it to the audio-only Media keeps that surface intact — the two extend
  * different bases, so nothing guarantees it but a test — plus the two things this flavor decides for itself.
  */
+import { createEngine } from '@videojs/spf/engines/hls-audio-mpeg-ts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
 import { MuxAudioAdapter } from '../adapter';
@@ -25,6 +26,10 @@ afterEach(() => {
 });
 
 describe('MuxAudioAdapter', () => {
+  it('builds its engine with the MPEG-TS audio engine', () => {
+    expect(MuxAudioAdapter.createEngine).toBe(createEngine);
+  });
+
   it('defaults source to null', () => {
     expect(new MuxAudioAdapter().source).toBe(null);
   });
