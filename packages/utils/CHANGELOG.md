@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/utils@10.3.0...@videojs/utils@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **media:** add removable text tracks for DOM media ([#9616](https://github.com/videojs/video.js/issues/9616)) ([274cc73](https://github.com/videojs/video.js/commit/274cc73d441ba6ec8b5610d6d028376153cc3d77))
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/utils@10.2.0...@videojs/utils@10.3.0) (2026-11-03)
 
 

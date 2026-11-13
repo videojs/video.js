@@ -1,6 +1,6 @@
 {
   "name": "@videojs/react-native",
-  "version": "10.0.0-rc.2",
+  "version": "10.4.0",
   "private": true,
   "description": "video.js for react-native",
   "keywords": [
