@@ -21,6 +21,8 @@ Render an <DocsLink slug="reference/components/error-dialog">ErrorDialog</DocsLi
 Render a <DocsLink slug="reference/components/error-dialog">`<media-error-dialog>`</DocsLink> inside the player container. It reads error state, presents the failure, and dismisses cleanly. The packaged skins include one.
 </FrameworkCase>
 
+In the audio skins, the dialog fits the player's height. When the player is only the control bar, the dialog covers the bar. When visible media, such as an embed with its own controls, makes the player taller, the dialog shows over the media as the same card the video skins use.
+
 <FrameworkCase frameworks={["react"]}>
 
 ```tsx
