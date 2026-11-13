@@ -1,9 +1,9 @@
-import type { EngineAdapter } from '@videojs/media';
+import { type EngineAdapter, MediaError, type TimeRangeLike } from '@videojs/media';
 import { isNull, isUndefined } from '@videojs/utils/predicate';
 
 import { type NativeEngineHandle, requireEngineStore, toEngineHandle } from './engine-store';
 import type { NativeEvents, NativeMedia } from './native-capability';
-import type { PlayerEvent } from './NativeEngineStore';
+import type { PlayerEvent, PlayerTimeRange } from './NativeEngineStore';
 import { type PlayerSurface, PlayerSurfaceHost } from './player-surface-host';
 
 export interface ReactNativeMediaProps {
@@ -18,7 +18,40 @@ export const reactNativeMediaDefaultProps: ReactNativeMediaProps = {
 export interface NativePlaybackState {
   paused: boolean;
   ended: boolean;
+  currentTime: number;
+  duration: number;
+  buffered: TimeRangeLike;
+  error: MediaError | null;
 }
+
+function toTimeRanges(ranges: readonly PlayerTimeRange[]): TimeRangeLike {
+  return {
+    length: ranges.length,
+    start: (index) => rangeAt(ranges, index).start,
+    end: (index) => rangeAt(ranges, index).end,
+  };
+}
+
+// Out-of-range access throws on the web too (`IndexSizeError`).
+function rangeAt(ranges: readonly PlayerTimeRange[], index: number): PlayerTimeRange {
+  const range = ranges[index];
+  if (isUndefined(range)) throw new RangeError(`Index ${index} is out of range for ${ranges.length} time ranges.`);
+
+  return range;
+}
+
+const EMPTY_TIME_RANGES = toTimeRanges([]);
+
+/** What a media element reports before, or between, sources. */
+const initialSourceState = {
+  ended: false,
+  currentTime: 0,
+  duration: Number.NaN,
+  buffered: EMPTY_TIME_RANGES,
+  error: null,
+} satisfies Partial<NativePlaybackState>;
+
+export const initialNativePlaybackState: NativePlaybackState = { paused: true, ...initialSourceState };
 
 /**
  * Compile-time proof that every `PlayerEvent['type']` is handled. Adding a member to the native union without a
@@ -35,33 +68,64 @@ function assertHandled(_type: never): void {}
  * silently dropped event.
  */
 export function resolveNativeEvent(
-  type: PlayerEvent['type'],
+  event: PlayerEvent,
   previous: NativePlaybackState
 ): { state: NativePlaybackState; emit: (keyof NativeEvents & string)[] } | null {
+  const { type } = event;
+
   switch (type) {
+    case 'play':
     case 'playing':
-      return {
-        state: { paused: false, ended: false },
-        // `play` marks the transition; `playing` marks playback actually running.
-        emit: previous.paused ? ['play', 'playing'] : ['playing'],
-      };
+      return { state: { ...previous, paused: false, ended: false }, emit: [type] };
 
     case 'pause':
-      return { state: { ...previous, paused: true }, emit: ['pause'] };
+      return { state: { ...previous, paused: true }, emit: [type] };
 
     case 'ended':
-      return { state: { paused: true, ended: true }, emit: ['ended'] };
+      return { state: { ...previous, paused: true, ended: true }, emit: [type] };
 
-    // TODO: emit `waiting` once native reports buffering. `NativeEvents`
-    // already declares it, but no native event maps to it today, so it is
-    // never emitted. Both platforms observe the signal and collapse it:
-    //   - Android `PlayerEngine.onPlaybackStateChanged` handles only
-    //     `Player.STATE_ENDED`; `Player.STATE_BUFFERING` is the missing case.
-    //   - iOS `VideoJSPlayerEngine` KVO-observes `timeControlStatus` but maps
-    //     `playing ? Playing : Paused`, folding
-    //     `AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate` into paused.
-    // Adding it means a fourth case on each side plus a `'waiting'` member on
-    // `PlayerEvent['type']` — a codegen spec change, so it needs a native rebuild.
+    // A new source starts over. Native keeps playing across the swap and
+    // reports that through its own `play`/`pause`, so `paused` is left alone.
+    // `emptied` only fires when replacing a source, so `loadstart` resets too.
+    case 'emptied':
+    case 'loadstart':
+      return { state: { ...previous, ...initialSourceState }, emit: [type] };
+
+    // A missing value means native broke the contract; keeping the previous
+    // one beats mirroring `undefined`.
+    case 'timeupdate':
+      return { state: { ...previous, currentTime: event.currentTime ?? previous.currentTime }, emit: [type] };
+
+    case 'durationchange':
+      return { state: { ...previous, duration: event.duration ?? previous.duration }, emit: [type] };
+
+    case 'progress':
+      return {
+        state: { ...previous, buffered: event.buffered ? toTimeRanges(event.buffered) : previous.buffered },
+        emit: [type],
+      };
+
+    // An empty message falls back to `MediaError`'s default for the code.
+    case 'error':
+      return {
+        state: {
+          ...previous,
+          error: new MediaError(event.error?.message, event.error?.code ?? MediaError.MEDIA_ERR_CUSTOM),
+        },
+        emit: [type],
+      };
+
+    // Native emits these under the same conditions as the media element, and
+    // none of them touch the mirrored state yet.
+    case 'loadedmetadata':
+    case 'canplay':
+    case 'canplaythrough':
+    case 'waiting':
+    case 'seeking':
+    case 'seeked':
+    case 'ratechange':
+    case 'contentdatachange':
+      return { state: previous, emit: [type] };
 
     default:
       // Statically unreachable. Still returns null at runtime, because the
@@ -78,19 +142,18 @@ export function resolveNativeEvent(
  * Commands forward to the `VideoJSEngineStore` TurboModule; readable state is mirrored from the handle-tagged
  * `onPlayerEvent` channel. See `PlayerSurfaceHost` for why state is mirrored rather than delegated.
  *
- * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` — which is the whole capability surface today.
+ * Satisfies `NativeMedia` — `Media` plus `MediaPauseCapability` and `MediaErrorCapability` — which is the whole
+ * capability surface today.
  *
  * # Reusing existing playerFeatures
  *
- * Would be possible in a fully-realized implementation, but the TurboModule needs to add a few more features first:
+ * Would be possible in a fully-realized implementation. The TurboModule has the commands and queries; the adapter needs
+ * to surface them:
  *
- * 1. Add seek and source capability. `isMediaSeekCapable` wants `currentTime`, `duration` and `seeking`;
- *    `isMediaSourceCapable` wants `currentSrc`, `readyState` and `load()` on top of the `src` that already exists.
- * 2. TurboModule has to report position and duration before any of this can be mirrored.
- * 3. Emit the rest of the standard media events. `resolveNativeEvent` covers `play`, `playing`, `pause` and `ended`; Need
- *    to add: `emptied`, `timeupdate`, `canplay`, `seeking`, `seeked` and `waiting`. Each needs a native counterpart,
- *    which means extending `PlayerEvent['type']` — a codegen spec change, plus some native code, but it's stuff we'd
- *    want anyway and these events are are derivable from events the native players emit.
+ * 1. Seek and source capability. `isMediaSeekCapable` wants a writable `currentTime` (`setCurrentTime`) and `seeking`
+ *    (`isSeeking`); `isMediaSourceCapable` wants `currentSrc` (`getSource`), `readyState` (`getReadyState`) and
+ *    `load()`.
+ * 2. `seekable` (`getSeekable`) alongside `buffered`, so the adapter satisfies `isMediaBufferCapable`.
  */
 export class ReactNativeMedia
   extends PlayerSurfaceHost<NativeEvents>
@@ -100,7 +163,7 @@ export class ReactNativeMedia
   #ownsHandle: boolean;
   #subscription: { remove(): void } | null = null;
   #src = reactNativeMediaDefaultProps.src;
-  #state: NativePlaybackState = { paused: true, ended: false };
+  #state: NativePlaybackState = initialNativePlaybackState;
 
   /**
    * @param options - Pass `handle` to adopt an externally owned native player; it will not be destroyed with this
@@ -118,7 +181,7 @@ export class ReactNativeMedia
     this.#subscription = store.onPlayerEvent((event) => {
       if (event.handle !== this.#handle) return;
 
-      this.#handleNativeEvent(event.type);
+      this.#handleNativeEvent(event);
     });
   }
 
@@ -136,6 +199,11 @@ export class ReactNativeMedia
   }
 
   get src(): string {
+    return this.#src;
+  }
+
+  get currentSrc(): string {
+    // mirror src for now.  ReactNativeMedia doesn't support <source> elements yet
     return this.#src;
   }
 
@@ -174,6 +242,24 @@ export class ReactNativeMedia
     return this.#state.ended;
   }
 
+  /** Seconds, as of the last `timeupdate`. Read-only until native has a seek command. */
+  get currentTime(): number {
+    return this.#state.currentTime;
+  }
+
+  /** Seconds; `NaN` until known and `Infinity` for live. */
+  get duration(): number {
+    return this.#state.duration;
+  }
+
+  get buffered(): TimeRangeLike {
+    return this.#state.buffered;
+  }
+
+  get error(): MediaError | null {
+    return this.#state.error;
+  }
+
   override destroy(): void {
     if (this.destroyed) return;
 
@@ -188,12 +274,12 @@ export class ReactNativeMedia
     super.destroy();
   }
 
-  #handleNativeEvent(type: PlayerEvent['type']): void {
-    const resolved = resolveNativeEvent(type, this.#state);
+  #handleNativeEvent(event: PlayerEvent): void {
+    const resolved = resolveNativeEvent(event, this.#state);
 
     if (isNull(resolved)) {
       if (__DEV__) {
-        console.warn(`@videojs/react-native: unrecognized native player event '${type}'.`);
+        console.warn(`@videojs/react-native: unrecognized native player event '${event.type}'.`);
       }
 
       return;
