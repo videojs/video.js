@@ -203,5 +203,7 @@ Fires the standard media events: <span class="code-list">{['abort', 'canplay', '
 <FrameworkCase frameworks={["react"]}>
 Accepts the standard React media event props: <span class="code-list">{['onAbort', 'onCanPlay', 'onCanPlayThrough', 'onDurationChange', 'onEmptied', 'onEncrypted', 'onEnded', 'onError', 'onLoadedData', 'onLoadedMetadata', 'onLoadStart', 'onPause', 'onPlay', 'onPlaying', 'onProgress', 'onRateChange', 'onResize', 'onSeeked', 'onSeeking', 'onStalled', 'onSuspend', 'onTimeUpdate', 'onVolumeChange', 'onWaiting'].map((name) => <CodeChip value={name} />)}</span>
 
+Each handler receives React's synthetic event, with the `<video>` as `currentTarget`.
+
 The native `enterpictureinpicture`, `leavepictureinpicture`, and `waitingforkey` events have no React prop. Attach a listener through the ref with `addEventListener`.
 </FrameworkCase>
