@@ -226,13 +226,14 @@ export function createSegmentLoaderActor(
    * @todo Rename alongside LoadTask (e.g. planOps). Case 1 — Removes: forward and back buffer flush points,
    *   segment-aligned. ABR-style track switches (same content, different bitrate) do not flush: appending new content
    *   overwrites existing buffer ranges, and the actor's time-aligned deduplication keeps the segment model accurate as
-   *   new segments arrive. Cross-rendition track switches (audio language change, text language change) do flush: the
-   *   buffered content is semantically incompatible with the newly-selected track, so overwrite-on-append would leave
-   *   stale content playing until each replacement segment lands. Today's predicate: `actorCtx.initTrackLanguage !==
-   *   track.language` — fires for language changes, no-ops for video / same-language audio bitrate switches. Future
-   *   stage: pluggable predicate / strategy at actor construction time for codec-change (5.1 surround) and other
-   *   cross-rendition shapes. Case 2 — Init: schedule if not yet committed for this track. Case 3 — Segments: all
-   *   segments in the load window not yet committed.
+   *   new segments arrive. Cross-rendition track switches (a different audio language, or a same-language track with a
+   *   different name, such as commentary) do flush: the buffered content is semantically incompatible with the
+   *   newly-selected track, so overwrite-on-append would leave stale content playing until each replacement segment
+   *   lands, and on iOS it can leave the element silent until a seek. Today's predicate compares the buffered track's
+   *   language and name with the new track's — fires for content changes, no-ops for video and for audio bitrate
+   *   variants, which share a name across groups. Future stage: pluggable predicate / strategy at actor construction
+   *   time for codec-change (5.1 surround) and other cross-rendition shapes. Case 2 — Init: schedule if not yet
+   *   committed for this track. Case 3 — Segments: all segments in the load window not yet committed.
    */
   const planTasks = (message: SegmentLoaderMessage): LoadTask[] => {
     const { track, range } = message;
@@ -245,47 +246,37 @@ export function createSegmentLoaderActor(
 
     const tasks: LoadTask[] = [];
 
-    // Cross-rendition switch check (mid-stream language change). Fires when
+    // Cross-rendition switch check (mid-stream content change). Fires when
     // (a) an init segment has already been committed for some track,
     // (b) the newly-selected track is a different track, and
-    // (c) the languages differ. The buffered range from the current segment
-    // boundary forward is treated as stale (new track's same-timestamp
-    // segments will overwrite it via MSE append-at-same-timestamp); no
-    // explicit `remove` task is emitted for the cross-rendition range.
-    // Computed against the currently-buffered segments (stable reference;
-    // new track's playlist may not be resolved yet at first load).
+    // (c) the language or the name differs. Bitrate variants of one audio
+    // track share both, so they don't count.
+    const trackName = track.type === 'audio' ? track.name : undefined;
     const isCrossRenditionSwitch =
       actorCtx.initTrackId !== undefined &&
       actorCtx.initTrackId !== track.id &&
-      actorCtx.initTrackLanguage !== track.language;
+      (actorCtx.initTrackLanguage !== track.language || actorCtx.initTrackName !== trackName);
 
-    // Two categories of "buffered content that should not gate planning":
-    //
-    // - `removes` — content that needs an explicit `remove` task (out-of-window
-    //   forward content, back-buffer content beyond the keep window). Emitted
-    //   as `{ type: 'remove' }` tasks.
-    // - `staleRanges` — content that the new appends will overwrite at the
-    //   same timestamps (cross-rendition switch). No explicit `remove` —
-    //   MSE's overwrite-on-append handles it, which gives a much smaller
-    //   perceived audio gap than `remove`-then-fetch-then-append.
-    //
-    // Both categories affect `effectiveBuffered` so `getSegmentsToLoad`
-    // re-plans new-track segments inside them.
+    // Buffered content that needs an explicit `remove` task and must not gate
+    // planning: the stale range of a cross-rendition switch, out-of-window
+    // forward content, and back-buffer content beyond the keep window. Each
+    // affects `effectiveBuffered` so `getSegmentsToLoad` re-plans new-track
+    // segments inside it.
     const removes: Array<{ start: number; end: number }> = [];
-    const staleRanges: Array<{ start: number; end: number }> = [];
 
     if (range) {
       if (isCrossRenditionSwitch) {
-        // Mark current-segment-start onward as stale. Falls back to the
-        // first buffered segment after currentTime when the playhead sits
-        // in a buffer gap.
+        // Remove from current-segment-start onward rather than overwriting it
+        // in place: iOS WebKit can keep the replaced audio's renderer silent
+        // until a seek. Falls back to the first buffered segment after
+        // currentTime when the playhead sits in a buffer gap.
         const currentSeg = actorCtx.segments.find(
           (s) => s.startTime <= currentTime && s.startTime + s.duration > currentTime
         );
         const staleStart = currentSeg?.startTime ?? actorCtx.segments.find((s) => s.startTime > currentTime)?.startTime;
 
         if (staleStart !== undefined) {
-          staleRanges.push({ start: staleStart, end: Infinity });
+          removes.push({ start: staleStart, end: Infinity });
         }
       }
 
@@ -304,7 +295,7 @@ export function createSegmentLoaderActor(
       for (const r of removes) tasks.push({ type: 'remove', start: r.start, end: r.end });
     }
 
-    // Treat any segment overlapping a planned remove OR a stale range as
+    // Treat any segment overlapping a planned remove as
     // not-buffered. Without this, sibling renditions that share segment IDs
     // and startTimes (audio language variants) would see the new track's
     // same-startTime segments marked "buffered" by the pre-flush snapshot,
@@ -314,19 +305,15 @@ export function createSegmentLoaderActor(
     const overlapsStale = (seg: { startTime: number; duration: number }): boolean => {
       const segEnd = seg.startTime + seg.duration;
 
-      return (
-        removes.some((r) => seg.startTime < r.end && segEnd > r.start) ||
-        staleRanges.some((r) => seg.startTime < r.end && segEnd > r.start)
-      );
+      return removes.some((r) => seg.startTime < r.end && segEnd > r.start);
     };
-    const effectiveBuffered =
-      removes.length + staleRanges.length > 0 ? bufferedSegments.filter((s) => !overlapsStale(s)) : bufferedSegments;
+    const effectiveBuffered = removes.length > 0 ? bufferedSegments.filter((s) => !overlapsStale(s)) : bufferedSegments;
 
     // Case 2: Init
     if (actorCtx.initTrackId !== track.id) {
       tasks.push({
         type: 'append-init',
-        meta: { trackId: track.id, language: track.language },
+        meta: { trackId: track.id, language: track.language, name: trackName },
         url: track.initialization.url,
         ...(track.initialization.byteRange !== undefined && { byteRange: track.initialization.byteRange }),
       });
@@ -343,9 +330,8 @@ export function createSegmentLoaderActor(
         // Quality-aware filter: skip segments already covered by equal-or-higher-quality
         // content in the actor context. Preserves buffered high-quality content during
         // ABR downgrades; loads during upgrades and for uncovered positions.
-        // Actor entries that overlap a planned remove OR a stale range are treated
-        // as nonexistent here — they're about to be flushed or overwritten, so the
-        // new-track segment must load regardless of the existing entry's bandwidth.
+        // Actor entries that overlap a planned remove are treated as nonexistent
+        // here — they're about to be flushed, so the new-track segment must load regardless of the existing entry's bandwidth.
         const existing = actorCtx.segments.find(
           (s) => !overlapsStale(s) && Math.abs(s.startTime - seg.startTime) < SEGMENT_TIME_EPSILON
         );
