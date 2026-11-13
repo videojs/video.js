@@ -34,6 +34,7 @@ interface ConfigInput {
   property: string;
   attribute: string;
   entry: PlayerFeatureConfig[string];
+  type: StringConstructor | BooleanConstructor;
 }
 
 function resolveInputs(config: PlayerFeatureConfig): ConfigInput[] {
@@ -45,7 +46,12 @@ function resolveInputs(config: PlayerFeatureConfig): ConfigInput[] {
       console.warn(`[vjs-html] config html.attribute "${declared}" is not kebab-case and will never match`);
     }
 
-    return { property: camelCase(attribute), attribute, entry };
+    return {
+      property: camelCase(attribute),
+      attribute,
+      entry,
+      type: entry.html?.type === 'boolean' ? Boolean : String,
+    };
   });
 }
 
@@ -61,7 +67,7 @@ export function createPlayerElement<Store extends PlayerStore>(
   class ConfiguredPlayerElement extends UIElement {
     static properties = {
       ...UIElement.properties,
-      ...Object.fromEntries(inputs.map(({ property, attribute }) => [property, { type: String, attribute }])),
+      ...Object.fromEntries(inputs.map(({ property, attribute, type }) => [property, { type, attribute }])),
     } satisfies PropertyDeclarationMap;
 
     #store: Store | null = options.factory();

@@ -81,3 +81,34 @@ The feature locks to `landscape` unless the provider sets another Screen Orienta
 </FrameworkCase>
 
 See <DocsLink slug="reference/api/feature-orientation-lock">Orientation lock</DocsLink> for the player setup.
+
+### Adaptive orientation
+
+The `enableAdaptiveFullScreen` player configuration is disabled by default. When enabled, fullscreen requests lock orientation to `landscape` when `videoWidth` is greater than `videoHeight`, or `portrait` when `videoHeight` is greater than `videoWidth`. If orientation locking is unavailable or rejected, the player leaves the device orientation unchanged and logs a warning.
+
+<FrameworkCase frameworks={["react"]}>
+Set the property on the player:
+
+```tsx
+import { Container } from '@videojs/react';
+import { Video, VideoPlayer } from '@videojs/react/video';
+
+<VideoPlayer enableAdaptiveFullScreen>
+  <Container>
+    <Video src="/video.mp4" />
+  </Container>
+</VideoPlayer>
+```
+</FrameworkCase>
+
+<FrameworkCase frameworks={["html"]}>
+Set the attribute on the player:
+
+```html
+<video-player enable-adaptive-full-screen>
+  <media-container>
+    <video src="/video.mp4"></video>
+  </media-container>
+</video-player>
+```
+</FrameworkCase>

@@ -9,6 +9,8 @@ export interface ScreenOrientationLock {
   unlock(): void;
 }
 
+export type ScreenOrientationLockFailure = (type: ScreenOrientationLockType, error?: unknown) => void;
+
 /** Orientation types accepted by the Screen Orientation API's `screen.orientation.lock()`. */
 export type ScreenOrientationLockType =
   | 'any'
@@ -25,7 +27,7 @@ interface ScreenOrientation {
   unlock?: (() => void) | undefined;
 }
 
-export function createScreenOrientationLock(): ScreenOrientationLock {
+export function createScreenOrientationLock(onFailure?: ScreenOrientationLockFailure): ScreenOrientationLock {
   /** Type the caller last asked for, or null once released. */
   let desired: ScreenOrientationLockType | null = null;
   /** Type the platform accepted, or null while no lock is held. */
@@ -65,14 +67,21 @@ export function createScreenOrientationLock(): ScreenOrientationLock {
 
         const orientation = globalThis.screen?.orientation as ScreenOrientation | undefined;
         const lock = orientation?.lock;
-        if (!isFunction(lock)) return;
+
+        if (!isFunction(lock)) {
+          onFailure?.(target);
+          return;
+        }
 
         try {
           await lock.call(orientation, target);
-        } catch {
+        } catch (error) {
           // Leave `held` alone so it keeps describing the platform. Retrying
           // the same type here would spin, so wait for the next request.
-          if (desired === target) return;
+          if (desired === target) {
+            onFailure?.(target, error);
+            return;
+          }
 
           continue;
         }

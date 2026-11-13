@@ -4,7 +4,6 @@ import type {
   MediaBufferState,
   MediaControlsState,
   MediaErrorState,
-  MediaFullscreenState,
   MediaLiveState,
   MediaPictureInPictureState,
   MediaPlaybackState,
@@ -17,6 +16,7 @@ import type {
 import type { Store, UnionSliceState } from '@videojs/store';
 
 import type { AnyPlayerFeature, PlayerFeature, UnionPlayerConfig, UnionPlayerHtmlConfig } from '../core/player';
+import type { fullscreenFeature } from './store/features/fullscreen';
 import type { metadataFeature, playbackRateFeature } from './store/features/shared';
 import type { textCuesFeature } from './store/features/text-cues';
 import type { textTrackFeature } from './store/features/text-track';
@@ -74,7 +74,7 @@ export type VideoFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
-  PlayerFeature<MediaFullscreenState>,
+  typeof fullscreenFeature,
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
@@ -110,7 +110,7 @@ export type LiveVideoFeatures = [
   PlayerFeature<MediaTimeState>,
   PlayerFeature<MediaSourceState>,
   PlayerFeature<MediaBufferState>,
-  PlayerFeature<MediaFullscreenState>,
+  typeof fullscreenFeature,
   PlayerFeature<MediaPictureInPictureState>,
   PlayerFeature<MediaRemotePlaybackState>,
   PlayerFeature<MediaControlsState>,
