@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/mux-audio@10.4.0...@videojs/mux-audio@10.5.0) (2026-11-13)
+
+
+### Features
+
+* **spf:** play Mux's MPEG-TS renditions through opt-in transmux engines ([#9554](https://github.com/videojs/video.js/issues/9554)) ([e5a87f1](https://github.com/videojs/video.js/commit/e5a87f1e7104cc1a42757922c2ad843131bb0acc))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/mux-video bumped to 10.5.0
+    * @videojs/spf bumped to 10.5.0
+    * @videojs/utils bumped to 10.5.0
+
 ## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/mux-audio@10.3.0...@videojs/mux-audio@10.4.0) (2026-11-13)
 
 

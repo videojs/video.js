@@ -1,5 +1,25 @@
 # Changelog
 
+## [10.5.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.4.0...@videojs/spf@10.5.0) (2026-11-13)
+
+
+### Features
+
+* **spf:** play Mux's MPEG-TS renditions through opt-in transmux engines ([#9554](https://github.com/videojs/video.js/issues/9554)) ([e5a87f1](https://github.com/videojs/video.js/commit/e5a87f1e7104cc1a42757922c2ad843131bb0acc))
+
+
+### Bug Fixes
+
+* **spf:** remove stale audio on track switches, including same-language tracks ([#9730](https://github.com/videojs/video.js/issues/9730)) ([22eac32](https://github.com/videojs/video.js/commit/22eac3269257928f93e98121c4589f6e94053ce1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/media bumped to 10.5.0
+    * @videojs/utils bumped to 10.5.0
+
 ## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/spf@10.3.0...@videojs/spf@10.4.0) (2026-11-13)
 
 
