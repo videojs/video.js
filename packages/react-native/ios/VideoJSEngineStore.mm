@@ -1,6 +1,6 @@
 #import "VideoJSEngineStore.h"
 
-#import "VideoJSPlayerRegistry.h"
+#import "VideoJSSwift.h"
 
 @implementation VideoJSEngineStore
 
@@ -19,7 +19,7 @@ RCT_EXPORT_MODULE(VideoJSEngineStore)
     VideoJSPlayerRegistry.sharedRegistry.onEvent = ^(NSInteger handle, VideoJSPlayerEventType type) {
       [weakSelf emitOnPlayerEvent:@{
         @"handle" : @(handle),
-        @"type" : VideoJSPlayerEventTypeJSName(type),
+        @"type" : [VideoJSPlayerEngine jsNameForEventType:type],
       }];
     };
   }
