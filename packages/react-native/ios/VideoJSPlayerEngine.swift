@@ -125,6 +125,11 @@ public final class VideoJSPlayerEngine: NSObject {
   // media element's default playback start position.
   private var pendingStartTime: Double?
 
+  // The rate `playbackRate` reports. iOS 16 keeps it as `defaultRate`; before
+  // that `play()` always starts at 1, so the engine applies it on resume.
+  private var requestedRate: Float = 1
+  private var loop = false
+
   // AVFoundation has no "enough data to start" signal of its own, so this is
   // the media element's HAVE_FUTURE_DATA as far as the player reveals it:
   // gained on readiness or playback resuming, lost to a stall.
@@ -222,7 +227,7 @@ public final class VideoJSPlayerEngine: NSObject {
         engine.seek(to: 0)
       }
 
-      engine.player.play()
+      engine.resume()
     }
   }
 
@@ -230,6 +235,39 @@ public final class VideoJSPlayerEngine: NSObject {
   public func pause() {
     update { $0.copy(paused: true) }
     onMainQueue { $0.player.pause() }
+  }
+
+  // From iOS 16 the `defaultRate` observer reports the change; before that
+  // there is nothing to observe, so the engine emits it itself.
+  @objc(setPlaybackRate:)
+  public func setPlaybackRate(_ rate: Double) {
+    guard rate > 0 else { return }
+
+    update { $0.copy(playbackRate: rate) }
+    onMainQueue { engine in
+      engine.requestedRate = Float(rate)
+
+      if engine.player.rate != 0 {
+        engine.player.rate = engine.requestedRate
+      }
+
+      if #available(iOS 16, *) {
+        engine.player.defaultRate = engine.requestedRate
+      } else {
+        engine.emit(.ratechange)
+      }
+    }
+  }
+
+  // `loop` isn't in the snapshot, so there is no state to write. Looping holds
+  // the player at the end rather than pausing it, so reaching the end restarts
+  // playback without a `pause` in between.
+  @objc(setLoop:)
+  public func setLoop(_ loop: Bool) {
+    onMainQueue { engine in
+      engine.loop = loop
+      engine.player.actionAtItemEnd = loop ? .none : .pause
+    }
   }
 
   @objc(setCurrentTime:)
@@ -276,7 +314,7 @@ public final class VideoJSPlayerEngine: NSObject {
     player.insert(next, after: nil)
 
     if wasPlaying {
-      player.play()
+      resume()
     }
   }
 
@@ -321,7 +359,16 @@ public final class VideoJSPlayerEngine: NSObject {
       return Double(player.defaultRate)
     }
 
-    return player.rate == 0 ? 1 : Double(player.rate)
+    return Double(requestedRate)
+  }
+
+  // `play()` starts at `defaultRate` from iOS 16, and at 1 before it.
+  private func resume() {
+    if #available(iOS 16, *) {
+      player.play()
+    } else {
+      player.rate = requestedRate
+    }
   }
 
   /// Any thread. Returns the snapshot it left in place.
@@ -615,6 +662,13 @@ public final class VideoJSPlayerEngine: NSObject {
   @objc
   private func handleItemDidPlayToEnd(_ notification: Notification) {
     onMainQueue(forNotification: notification) { engine in
+      // A looping media element starts over instead of ending; the periodic
+      // observer reports the jump back.
+      if engine.loop {
+        engine.player.seek(to: .zero)
+        return
+      }
+
       engine.atEnd = true
       engine.updateForSource { $0.copy(ended: true) }
       engine.emit(.ended)

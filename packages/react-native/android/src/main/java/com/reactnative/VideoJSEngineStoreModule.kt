@@ -39,6 +39,10 @@ class VideoJSEngineStoreModule internal constructor(
 
   override fun setCurrentTime(handle: Double, time: Double): Boolean = command(handle) { it.setCurrentTime(time) }
 
+  override fun setPlaybackRate(handle: Double, rate: Double): Boolean = command(handle) { it.setPlaybackRate(rate) }
+
+  override fun setLoop(handle: Double, loop: Boolean): Boolean = command(handle) { it.setLoop(loop) }
+
   override fun getCurrentTime(handle: Double): Double = state(handle).currentTime
 
   override fun getDuration(handle: Double): Double = state(handle).duration
