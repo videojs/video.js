@@ -79,4 +79,48 @@ describe('GoogleAnalyticsExtension', () => {
     expect(el.metadata).toEqual(metadata);
     expect(el.onEvent).toBe(onEvent);
   });
+
+  it('forwards metadata-* attributes to the extension', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Attr title');
+    el.setAttribute('metadata-content-tier', 'premium');
+
+    expect(provider.extensions.get(GoogleAnalyticsExtensionBase)!.metadata).toEqual({
+      video_title: 'Attr title',
+      content_tier: 'premium',
+    });
+  });
+
+  it('lets the metadata property override metadata-* attributes', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'Attribute');
+    el.metadata = { video_title: 'Property' };
+
+    expect(provider.extensions.get(GoogleAnalyticsExtensionBase)!.metadata).toEqual({ video_title: 'Property' });
+  });
+
+  it('keeps the metadata property when a metadata-* attribute changes later', () => {
+    const { provider, el } = setup();
+
+    el.metadata = { video_title: 'Property', content_tier: 'premium' };
+    el.setAttribute('metadata-video-title', 'Attribute override attempt');
+
+    expect(provider.extensions.get(GoogleAnalyticsExtensionBase)!.metadata).toEqual({
+      video_title: 'Property',
+      content_tier: 'premium',
+    });
+    expect(el.metadata).toEqual({ video_title: 'Property', content_tier: 'premium' });
+  });
+
+  it('updates extension metadata when metadata-* attributes change after connect', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'First');
+    el.setAttribute('metadata-video-title', 'Updated');
+    el.removeAttribute('metadata-video-title');
+
+    expect(provider.extensions.get(GoogleAnalyticsExtensionBase)!.metadata).toBeUndefined();
+  });
 });

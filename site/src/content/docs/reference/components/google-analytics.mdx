@@ -45,13 +45,14 @@ Adds the Google Analytics 4 (GA4) <DocsLink slug="guides/architecture">extension
 <FrameworkCase frameworks={["html"]}>
 | Attribute | Property | Description |
 |---|---|---|
-| — | `metadata` | Video metadata and custom dimensions reported with GA4 events |
+| `metadata-*` | — | Video metadata and custom dimensions. Drop the `metadata-` prefix and use kebab-case; each maps to a snake_case key (for example `metadata-video-title` → `video_title`) |
+| — | `metadata` | Video metadata and custom dimensions reported with GA4 events. Overrides `metadata-*` attributes with the same key |
 | `data-layer-name` | `dataLayerName` | Name of the dataLayer array on `window`. Defaults to `'dataLayer'` |
 | `disable-progress` | `disableProgress` | Disables 10%, 25%, 50%, and 75% progress milestones tracking |
 | `debug` | `debug` | Logs telemetry events to the console. Defaults to `false` |
 | — | `onEvent` | Callback to intercept dispatched events |
 
-`metadata` and `onEvent` take non-primitive values, so they're properties only, with no matching attribute. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
+Any number of `metadata-*` attributes can set dimensions without script. `metadata` remains a property when you need to pass an object or override attribute values, and `onEvent` is property-only. Set them on the element, typed as the `GoogleAnalyticsExtension` class that `@videojs/html/extensions/google-analytics` exports.
 </FrameworkCase>
 
 ## Collection limits

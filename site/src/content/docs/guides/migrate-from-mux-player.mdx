@@ -359,7 +359,7 @@ Render the <DocsLink slug="reference/components/mux-data">Mux Data extension</Do
 <FrameworkCase frameworks={["html"]}>
 | Mux Player | Video.js v10 |
 |---|---|
-| `metadata-*`, the `metadata` property | the `metadata` property |
+| `metadata-*`, the `metadata` property | `metadata-*` attributes or the `metadata` property on `<mux-data>` |
 | `env-key` | `env-key`, rarely needed for Mux-hosted content |
 | `disable-cookies` | `disable-cookies` |
 | `beacon-collection-domain` | `beacon-collection-domain` |
@@ -367,7 +367,7 @@ Render the <DocsLink slug="reference/components/mux-data">Mux Data extension</Do
 | `debug` | the `debug` attribute or property |
 | `disable-tracking` | omit the component |
 
-Set `metadata` as a property because it takes an object, while attributes take strings.
+Use `metadata-*` attributes when the values are known at render time (`metadata-video-title`, `metadata-viewer-user-id`, and so on). Use the `metadata` property when your app builds the object in script.
 </FrameworkCase>
 
 <FrameworkCase frameworks={["react"]}>
