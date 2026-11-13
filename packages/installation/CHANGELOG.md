@@ -1,5 +1,21 @@
 # Changelog
 
+## [10.4.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.3.0...@videojs/installation@10.4.0) (2026-11-13)
+
+
+### Features
+
+* **site:** try controls and accent color on the installation preview ([#9710](https://github.com/videojs/video.js/issues/9710)) ([f7f074e](https://github.com/videojs/video.js/commit/f7f074e2bbe446b031dce7beeeabd929e23591ea))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @videojs/utils bumped to 10.4.0
+  * devDependencies
+    * @videojs/media bumped to 10.4.0
+
 ## [10.3.0](https://github.com/videojs/video.js/compare/@videojs/installation@10.2.0...@videojs/installation@10.3.0) (2026-11-03)
 
 
