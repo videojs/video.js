@@ -15,7 +15,7 @@ import { type MuxAdapterProps, MuxMixin } from './mixin';
  * outright override them. A source carrying neither prunes its encrypted renditions and reports unsupported DRM,
  * exactly as an engine with no EME does.
  *
- * Plus- and basic-tier playback IDs are packaged as MPEG-TS; this flavor plays them through
+ * Plus-tier on-demand playback IDs are packaged as MPEG-TS; this flavor plays them through
  * `@videojs/spf/adapters/hls-video-mpeg-ts`, where the plain `<hls-video>` refuses them.
  */
 export class MuxVideoAdapter extends MuxMixin(HlsVideoMpegTsAdapter) {

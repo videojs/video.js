@@ -6,7 +6,7 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 import { withMuxMaxResolution } from '@app/shared/sources';
 
 // `<mux-background-video>` is `<hls-background-video>` over the MPEG-TS Media,
-// whose engine composes `mpegTsTransmuxFeature`: a plus- or basic-tier playback ID (MPEG-TS)
+// whose engine composes `mpegTsTransmuxFeature`: a plus-tier playback ID (MPEG-TS)
 // plays here and is refused on `html-hls-background-video`. Otherwise the same
 // element, and this page's other reason to exist is Mux's rendition cap.
 //

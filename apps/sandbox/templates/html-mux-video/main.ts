@@ -10,7 +10,7 @@ import { createHtmlSandbox, html } from '@app/shared/html/sandbox';
 // hls.js-backed one is in `html-mux-video-hls-js`, with the same element
 // behavior — derived poster, storyboard track, `poster-time`.
 //
-// This flavor composes `mpegTsTransmuxFeature`, so a plus- or basic-tier playback
+// This flavor composes `mpegTsTransmuxFeature`, so a plus-tier playback
 // ID (MPEG-TS) plays by transmuxing to fMP4 on the client; the plain `<hls-video>`
 // has no transmuxer and refuses it. DRM plays here — `source.drm` licenses it —
 // except for the deliberately unlicensed asset, which is in the picker to be

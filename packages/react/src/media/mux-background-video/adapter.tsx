@@ -25,8 +25,8 @@ export interface MuxBackgroundVideoProps
  *
  * The surface is the same: `src` is an HLS URL and the whole input, capping the rendition is a param on it, `onError`
  * fires for a source that won't play, and `loop={false}` / `autoPlay={false}` opt out of looping and autoplay. What the
- * MPEG-TS Media adds is the transmux, so a plus- or basic-tier Mux playback ID plays here where the HLS-named component
- * refuses it.
+ * MPEG-TS Media adds is the transmux, so a plus-tier Mux playback ID plays here where the HLS-named component refuses
+ * it.
  */
 export const MuxBackgroundVideo = forwardRef<HTMLVideoElement, MuxBackgroundVideoProps>(function MuxBackgroundVideo(
   { children, fallback = videoFallback, mediaRef, loop = true, autoPlay = true, ...props },

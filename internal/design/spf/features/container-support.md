@@ -24,8 +24,9 @@ at all*.
   and `mpegTsAudioTransmuxFeature` transmux MPEG-TS (H.264 + AAC) to
   fMP4 between fetch and append, and the `hls-video-mpeg-ts`,
   `hls-audio-mpeg-ts`, and `hls-background-video-mpeg-ts` engines
-  compose them. The coverage is what Mux Video packages at its plus
-  and basic tiers. The container-neutral engines are unchanged: they
+  compose them. The coverage is what Mux Video packages for on-demand
+  playback at its plus tier; its basic and premium tiers are CMAF. The
+  container-neutral engines are unchanged: they
   still detect MPEG-TS renditions (`parse-media-playlist.ts`,
   `NON_FMP4_CONTAINER_MIMES` in `media/dom/capabilities.ts`) and
   prune them before selection.
@@ -34,8 +35,10 @@ at all*.
   (per Notion epic #5) given the major code footprint.
 - **Strategic posture (as of 2026-05-20):** not in scope, on the
   premise that Mux Video delivers fMP4 throughout. That premise was
-  wrong: Mux's plus and basic tiers deliver MPEG-TS, which is what
-  the opt-in subset above plays. General MPEG-TS (other codecs,
+  wrong: Mux's plus tier delivers on-demand assets as MPEG-TS, which is
+  what the opt-in subset above plays. Mux also delivers standard- and
+  reduced-latency live streams as MPEG-TS, which the subset does not
+  cover, and an instant clip keeps its source's container. General MPEG-TS (other codecs,
   SAMPLE-AES, discontinuities, PTS rollover) remains out of scope;
   hls.js is the answer for it.
 - **Revisit conditions** documented in Open questions.
