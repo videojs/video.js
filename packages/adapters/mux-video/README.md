@@ -1,8 +1,12 @@
 # @videojs/mux-video
 
-The Video.js playback adapter for Mux-hosted video, over [hls.js](https://github.com/video-dev/hls.js). It owns the Mux
-source model (playback IDs, tokens, DRM, posters, storyboards) and builds on `@videojs/hlsjs-video`, which owns the
-hls.js runtime.
+The Video.js playback adapter for Mux-hosted video. It owns the Mux source model (playback IDs, tokens, DRM, posters,
+storyboards) and plays it through one of two engines, picked by import path:
+
+- `@videojs/mux-video` — the default, over the Video.js streaming engine from `@videojs/spf`. `@videojs/mux-video/spf`
+  names the same Media explicitly.
+- `@videojs/mux-video/hls-js` — over [hls.js](https://github.com/video-dev/hls.js), through `@videojs/hlsjs-video`. Reach
+  for it when a source needs hls.js configuration, native HLS playback, client-side rendition caps, or Low-Latency HLS.
 
 Install the adapter with the framework façade your player uses:
 
@@ -32,10 +36,22 @@ import '@videojs/html/media/mux-video';
 import { MuxVideo } from '@videojs/react/media/mux-video';
 ```
 
+The hls.js-backed flavor is the same element and component at an `hls-js` subpath:
+
+```ts
+import '@videojs/html/media/mux-video/hls-js';
+```
+
+```tsx
+import { MuxVideo } from '@videojs/react/media/mux-video/hls-js';
+```
+
 Low-level consumers can import the Media directly:
 
 ```ts
 import { MuxVideoAdapter } from '@videojs/mux-video';
+// or, over hls.js
+import { MuxVideoAdapter } from '@videojs/mux-video/hls-js';
 ```
 
 ## License

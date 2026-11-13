@@ -1,1 +1,1 @@
-export * from './hls-js';
+export * from './spf';

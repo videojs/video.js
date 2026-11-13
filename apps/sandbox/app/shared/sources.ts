@@ -1,4 +1,6 @@
-import type { MuxSource } from '@videojs/mux-video';
+// The hls.js-backed flavor's source is the wider of the two: Mux identity plus the hls.js engine fields. One source
+// object feeds both flavors' presets, so it is typed as the wider shape.
+import type { MuxSource } from '@videojs/mux-video/hls-js';
 import type { DrmSystemsConfig } from '@videojs/spf/hls';
 import type { YouTubeEngineConfig, YouTubeSource } from '@videojs/youtube-video';
 
@@ -792,15 +794,16 @@ export const HLS_SOURCE_IDS = SOURCE_IDS.filter(
   (id) => SOURCES[id].type !== 'dash' && !isMuxSource(id) && id !== 'hls-drm-unlicensed'
 );
 /**
- * Mux presets add everything reached by playback ID, plus the DRM asset licensed by a Mux token, which only they can
- * read.
+ * The hls.js-backed Mux presets add everything reached by playback ID, plus the DRM asset licensed by a Mux token,
+ * which only the Mux media can read.
  */
 export const MUX_SOURCE_IDS = SOURCE_IDS.filter((id) => SOURCES[id].type !== 'dash' && id !== 'hls-drm-unlicensed');
 /**
- * The SPF Mux presets read `source.drm`, so they license both protected assets: `mux-drm` from the token its license
- * servers derive from, `hls-drm` from the servers it names outright. The unlicensed asset stays alongside them, as the
- * one DRM source here that carries no credentials — refusing a protected source visibly is a behavior worth reaching.
- * Signed playback is not DRM and stays either way; SPF plays it once the token authorizes the URL.
+ * The default Mux presets are SPF-backed and read `source.drm`, so they license both protected assets: `mux-drm` from
+ * the token its license servers derive from, `hls-drm` from the servers it names outright. The unlicensed asset stays
+ * alongside them, as the one DRM source here that carries no credentials — refusing a protected source visibly is a
+ * behavior worth reaching. Signed playback is not DRM and stays either way; SPF plays it once the token authorizes the
+ * URL.
  */
 export const MUX_SPF_SOURCE_IDS = SOURCE_IDS.filter((id) => SOURCES[id].type !== 'dash');
 /**

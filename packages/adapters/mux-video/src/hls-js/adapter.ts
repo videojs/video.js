@@ -12,7 +12,7 @@ import {
 } from '@videojs/mux';
 import { shallowEqual } from '@videojs/utils/object';
 
-import { createMuxDrmSystems } from './drm';
+import { createMuxDrmSystems } from '../drm';
 
 /**
  * Structured Mux source for the hls.js-backed Media: Mux identity and params from {@link MuxSourceBase}, plus everything

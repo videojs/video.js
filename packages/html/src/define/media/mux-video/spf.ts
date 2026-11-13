@@ -5,6 +5,8 @@ export type {
   MuxAdapterAPI,
   MuxAdapterProps,
   MuxContentData,
+  MuxDrmParams,
+  MuxPosterFitMode,
   MuxSourceBase,
   MuxVideoAdapter,
 } from '@videojs/mux-video/spf';
@@ -20,8 +22,9 @@ declare global {
    * The Mux video flavors in the build, keyed by engine.
    *
    * Both flavors are the same element over a different engine, so both claim `<mux-video>` and the import path is what
-   * chooses. Each flavor's define entry adds its own key here, so the tag types as the flavor that was imported — or as
-   * the union of both when both were, which is the load-order coin flip that a single type per key cannot describe any
+   * chooses: `media/mux-video` is this SPF flavor (as is `media/mux-video/spf`), `media/mux-video/hls-js` the other.
+   * Each flavor's define entry adds its own key here, so the tag types as the flavor that was imported — or as the
+   * union of both when both were, which is the load-order coin flip that a single type per key cannot describe any
    * better.
    *
    * Importing both is not a supported configuration: one registration wins and the other is dropped. `safeDefine`'s

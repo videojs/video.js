@@ -16,6 +16,8 @@ export type {
   MuxAdapterProps,
   MuxAudioAdapter,
   MuxContentData,
+  MuxDrmParams,
+  MuxPosterFitMode,
   MuxSourceBase,
 } from '@videojs/mux-audio/spf';
 

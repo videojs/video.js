@@ -121,7 +121,7 @@ composed by `packages/spf/src/playback/engines/hls-video.ts` and
 - `packages/core/src/dom/store/features/tests/text-track.test.ts` — `chaptersCues` clamped to a finite media duration
   and re-synced on `durationchange`.
 - **Sandbox / smoke:** no in-repo source — the chapters-bearing Mux assets live on staging, and staging URLs stay out
-  of the repository; reviewers get one out of band and assign it as a `source` on the `*-mux-video-spf` presets.
+  of the repository; reviewers get one out of band and assign it as a `source` on the `*-mux-video` presets.
   Verified headless in Chromium against a CMAF staging asset (2026-09-15): the track projects before playback (cues
   `0→3`, `3→open`), the store mirrors them in `chaptersCues` with the open end clamped to the media duration, the time slider partitions at 12.6%, and the hover
   title follows the pointer.

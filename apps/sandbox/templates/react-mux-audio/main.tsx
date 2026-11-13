@@ -9,13 +9,18 @@ import { MuxData } from '@videojs/react/extensions/mux-data';
 import { MuxAudio } from '@videojs/react/media/mux-audio';
 import { createRoot } from 'react-dom/client';
 
+// `MuxAudio` as it is imported by default: the SPF-backed flavor, over the
+// audio-only engine. The hls.js-backed one is in `react-mux-audio-hls-js`. See
+// this page's HTML sibling for what differs.
+
 function App() {
   const { source, mediaProps } = useSandbox();
   const live = isLiveSource(source);
   const Player = live ? LiveAudioPlayer : AudioPlayer;
 
   // A source carrying signed tokens has no room in a plain `src`, so it is passed
-  // structured instead — the same way `react-mux-video` does.
+  // structured instead — the same way `react-mux-video` does. A `drm.token`
+  // is accepted but inert on this flavor.
   const { source: muxSource, url } = SOURCES[source];
 
   return (

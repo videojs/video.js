@@ -1,7 +1,7 @@
 'use client';
 
 import type { HlsJsAdapterProps } from '@videojs/hlsjs-video';
-import { MuxVideoAdapter, type MuxVideoAdapterProps } from '@videojs/mux-video';
+import { MuxVideoAdapter, type MuxVideoAdapterProps } from '@videojs/mux-video/hls-js';
 import { forwardRef, type ReactNode, type VideoHTMLAttributes } from 'react';
 
 import { useAttachMedia } from '../../utils/use-attach-media';
@@ -19,7 +19,7 @@ export type {
   MuxSourceBase,
   MuxVideoAdapter,
   MuxVideoAdapterProps,
-} from '@videojs/mux-video';
+} from '@videojs/mux-video/hls-js';
 
 // `source` comes from `MuxVideoAdapterProps` only: `MuxSource` extends `HlsSource` with
 // Mux identity fields, so the narrower type has to win.
