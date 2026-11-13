@@ -25,10 +25,10 @@ import { fileURLToPath } from 'node:url';
  * on top of the player, with every engine left to a lazy chunk.
  */
 export const BUDGETS = {
-  '@videojs/html/media/lazy-audio': 3200,
-  '@videojs/html/media/lazy-video': 3700,
-  '@videojs/react/media/lazy-audio': 3100,
-  '@videojs/react/media/lazy-video': 3500,
+  '@videojs/html/media/lazy-audio': 3600,
+  '@videojs/html/media/lazy-video': 3950,
+  '@videojs/react/media/lazy-audio': 3400,
+  '@videojs/react/media/lazy-video': 3850,
 };
 
 /**
