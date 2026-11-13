@@ -229,6 +229,10 @@ export class LazyMediaElement extends HTMLElementBase {
     const media = document.createElement(definition.tag);
 
     this.#copyAttributes(media);
+
+    // The `muted` attribute only mutes a media element the parser creates; one created by script starts with sound.
+    if (this.hasAttribute('muted') && 'muted' in media) media.muted = true;
+
     // Before the media is connected, so its engine is built for the source and preferred path from the start.
     this.#mediaSource = null;
     this.#syncSource(media, definition);

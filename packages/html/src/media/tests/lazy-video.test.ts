@@ -42,6 +42,25 @@ describe('LazyVideo', () => {
     expect(video.hasAttribute('type')).toBe(false);
   });
 
+  it('mutes the native video it creates for a muted element', async () => {
+    // Browsers take `muted` from the attribute only for media the parser creates. jsdom takes it for any, so this
+    // gives every media element its own muted state, as a browser does for one created by script.
+    const muted = new WeakMap<HTMLMediaElement, boolean>();
+
+    vi.spyOn(HTMLMediaElement.prototype, 'muted', 'get').mockImplementation(function (this: HTMLMediaElement) {
+      return muted.get(this) ?? false;
+    });
+    vi.spyOn(HTMLMediaElement.prototype, 'muted', 'set').mockImplementation(function (this: HTMLMediaElement, value) {
+      muted.set(this, value);
+    });
+
+    const element = create({ src: '/movie.mp4', muted: '' });
+
+    await flush();
+
+    expect(element.querySelector('video')!.muted).toBe(true);
+  });
+
   it('keeps forwarding attributes after the media renders', async () => {
     const element = create({ src: '/movie.mp4', preload: 'auto' });
 
