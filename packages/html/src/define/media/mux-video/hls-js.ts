@@ -8,7 +8,7 @@ export type {
   MuxSourceBase,
   MuxVideoAdapter,
   MuxVideoAdapterProps,
-} from '@videojs/mux-video';
+} from '@videojs/mux-video/hls-js';
 
 export class MuxVideoElement extends MuxVideo {
   static readonly tagName = 'mux-video';

@@ -25,11 +25,13 @@ import {
   DEFAULT_YOUTUBE_SOURCE,
   MIXCLOUD_SOURCE_IDS,
   MUX_SOURCE_IDS,
+  MUX_SPF_SOURCE_IDS,
   NON_DASH_SOURCE_IDS,
   PLAYERJS_SOURCE_IDS,
   SOUNDCLOUD_SOURCE_IDS,
   SOURCE_IDS,
   SOURCES,
+  SPF_HLS_SOURCE_IDS,
   YOUTUBE_SOURCE_IDS,
 } from '../shared/sources';
 
@@ -139,7 +141,7 @@ describe('MEDIA', () => {
     expect(MEDIA['hls-audio'].outcome?.(transportStream)).toBe('expects no playback');
     expect(MEDIA['hls-background-video'].outcome?.(transportStream)).toBe('expects unsupported-format error');
     expect(MEDIA['hls-background-video'].outcome?.(cmaf)).toBeUndefined();
-    expect(MEDIA['mux-video-spf'].outcome).toBeUndefined();
+    expect(MEDIA['mux-video'].outcome).toBeUndefined();
   });
 });
 
@@ -158,9 +160,16 @@ describe('mediaSources', () => {
     }
   });
 
+  it('offers the default Mux media what the SPF-backed flavor reads, the unlicensed DRM asset included', () => {
+    for (const media of ['mux-video', 'mux-audio'] as const) {
+      expect(mediaSources(media, 'html')).toEqual(MUX_SPF_SOURCE_IDS);
+      expect(mediaSources(media, 'cdn')).toEqual(SPF_HLS_SOURCE_IDS);
+    }
+  });
+
   it('keeps structured sources off the CDN page', () => {
-    expect(mediaSources('mux-video', 'html')).toEqual(MUX_SOURCE_IDS);
-    expect(mediaSources('mux-video', 'cdn')).toEqual(NON_DASH_SOURCE_IDS);
+    expect(mediaSources('mux-video-hls-js', 'html')).toEqual(MUX_SOURCE_IDS);
+    expect(mediaSources('mux-video-hls-js', 'cdn')).toEqual(NON_DASH_SOURCE_IDS);
     expect(mediaSources('hlsjs-video', 'html')).toContain('hls-drm');
     expect(mediaSources('hlsjs-video', 'cdn')).not.toContain('hls-drm');
   });
@@ -259,7 +268,7 @@ describe('hasNoSkinChoice', () => {
   it('leaves out the background and native audio media', () => {
     expect(MEDIA_IDS.filter((id) => !hasNoSkinChoice(id))).toEqual([
       'mux-audio',
-      'mux-audio-spf',
+      'mux-audio-hls-js',
       'hls-audio',
       'audio',
       'background-video',

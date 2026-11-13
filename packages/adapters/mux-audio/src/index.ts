@@ -1,8 +1,7 @@
-import { MuxVideoAdapter } from '@videojs/mux-video';
-
-export type { MuxSource, MuxVideoAdapterProps as MuxAudioAdapterProps } from '@videojs/mux-video';
-
-// TODO(mux): audio extending video is upside down. The hls.js-backed Mux behavior should move to a shared base that a
-// video and an audio adapter both extend; until then this class exists so audio installs by the media it plays and has
-// a home for audio-only behavior.
-export class MuxAudioAdapter extends MuxVideoAdapter {}
+/**
+ * The Mux audio Media over the SPF audio-only HLS engine, which is the default.
+ *
+ * The import path picks the engine: `@videojs/mux-audio/hls-js` is the same Media over hls.js, and
+ * `@videojs/mux-audio/spf` names this one explicitly.
+ */
+export * from './spf';

@@ -1,7 +1,7 @@
 {
   "name": "@videojs/mux-video",
   "version": "10.4.0",
-  "description": "Mux playback adapter for Video.js, over hls.js",
+  "description": "Mux playback adapter for Video.js",
   "keywords": [
     "hls",
     "media",
@@ -29,6 +29,11 @@
       "types": "./dist/dev/index.d.ts",
       "development": "./dist/dev/index.js",
       "default": "./dist/default/index.js"
+    },
+    "./hls-js": {
+      "types": "./dist/dev/hls-js.d.ts",
+      "development": "./dist/dev/hls-js.js",
+      "default": "./dist/default/hls-js.js"
     },
     "./spf": {
       "types": "./dist/dev/spf.d.ts",
