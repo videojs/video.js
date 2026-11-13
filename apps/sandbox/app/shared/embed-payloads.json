@@ -27,11 +27,6 @@
       "total": 1697392,
       "requests": 76
     },
-    "twitch": {
-      "scripts": 1670474,
-      "total": 2745858,
-      "requests": 119
-    },
     "player-js": {
       "scripts": 316150,
       "total": 469101,

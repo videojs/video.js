@@ -19,7 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = resolve(__dirname, '../../sandbox/app/shared/embed-payloads.json');
 
 // The `?source=` names of the lazy media sandbox's video embeds, which it opens by default.
-const SOURCES = ['youtube', 'vimeo', 'wistia', 'cloudflare', 'tiktok', 'twitch', 'player-js'];
+const SOURCES = ['youtube', 'vimeo', 'wistia', 'cloudflare', 'tiktok', 'player-js'];
 const RUNS = 3;
 // Long enough for each embed to finish loading its player without playing.
 const SETTLE_MS = 10_000;

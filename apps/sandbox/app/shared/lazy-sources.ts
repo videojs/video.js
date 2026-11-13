@@ -6,7 +6,6 @@ import {
   SOURCES,
   SPOTIFY_AUDIO_SRC,
   TIKTOK_VIDEO_SRC,
-  TWITCH_VIDEO_SRC,
   VIMEO_VIDEO_SRC,
   WISTIA_VIDEO_SRC,
 } from './sources';
@@ -88,12 +87,6 @@ const LAZY_VIDEO_SOURCE_GROUPS: readonly LazySourceGroup[] = [
         poster: 'https://videodelivery.net/bfbd585059e33391d67b0f1d15fe6ea4/thumbnails/thumbnail.jpg?height=720',
       },
       { label: 'TikTok', src: TIKTOK_VIDEO_SRC, poster: randomPoster('tiktok') },
-      {
-        label: 'Twitch',
-        src: TWITCH_VIDEO_SRC,
-        poster:
-          'https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitch/106400740/f2979575-fa80-4ad9-9665-a074d510a03a/thumb/index-0000000000-1280x720.jpg',
-      },
       // player.js is a protocol any host can speak, so the `playerjs` parameter marks the embed as one. The Mux Player
       // embed plays the same asset as `hls-1`, so its poster fits.
       { label: 'Player.js', src: `${SOURCES['playerjs-mux'].url!}?playerjs`, poster: getPosterSrc('hls-1') },
