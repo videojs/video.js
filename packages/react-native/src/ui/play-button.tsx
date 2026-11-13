@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Pressable, type PressableProps, StyleSheet, Text } from 'react-native';
 
 import { usePlayer } from '../player/context';
-import { selectNativePlayback } from '../store/playback';
+import { selectPlayback } from '../store/selectors';
 
 export interface PlayButtonProps extends Omit<PressableProps, 'onPress' | 'children'> {
   disabled?: boolean | undefined;
@@ -23,7 +23,7 @@ export interface PlayButtonProps extends Omit<PressableProps, 'onPress' | 'child
  * `translateText`; the label here is derived from `paused` instead, leaving i18n for later.
  */
 export function PlayButton({ disabled, style, ...props }: PlayButtonProps): ReactNode {
-  const playback = usePlayer(selectNativePlayback);
+  const playback = usePlayer(selectPlayback);
   const [core] = useState(() => new PlayButtonCore());
 
   // The feature is not composed into this store, so there is nothing to control.
