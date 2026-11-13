@@ -64,6 +64,8 @@ function createCastSdk() {
     getSessionState: () => 'SESSION_STARTED',
   };
 
+  const controllers: RemotePlayerController[] = [];
+
   class RemotePlayer {
     controller: RemotePlayerController | null = null;
     isMuted = false;
@@ -72,8 +74,11 @@ function createCastSdk() {
   }
 
   class RemotePlayerController {
+    stop = vi.fn();
+
     constructor(player: RemotePlayer) {
       player.controller = this;
+      controllers.push(this);
     }
     addEventListener() {}
     removeEventListener() {}
@@ -122,7 +127,7 @@ function createCastSdk() {
     },
   };
 
-  return { framework, chromeCast, context, session };
+  return { framework, chromeCast, context, session, controllers };
 }
 
 /** A provider with a connected session. `config` is read live, so tests set `src` after the session starts. */
@@ -141,7 +146,7 @@ async function createCastingProvider(config: GoogleCastExtensionProps, target = 
   provider.attach(target);
   await provider.requestCastSession();
 
-  return { provider, target, session: sdk.session };
+  return { provider, target, session: sdk.session, controller: sdk.controllers.at(-1)! };
 }
 
 function deferred<T>() {
@@ -257,6 +262,48 @@ describe('GoogleCastProvider', () => {
       await provider.load();
 
       expect(session.loadMedia).not.toHaveBeenCalled();
+      expect(provider.loadedSrc).toBeNull();
+    });
+
+    it('stops the media on the receiver when the source is cleared', async () => {
+      const config: GoogleCastExtensionProps = { src: 'https://example.com/video.mp4' };
+      const { provider, session, controller } = await createCastingProvider(config);
+
+      expect(provider.loadedSrc).toBe('https://example.com/video.mp4');
+
+      config.src = '';
+      await provider.load();
+
+      expect(controller.stop).toHaveBeenCalledTimes(1);
+      expect(provider.loadedSrc).toBeNull();
+
+      // The session stays connected, so a new source loads on the receiver again.
+      config.src = 'https://example.com/next.mp4';
+      await provider.load();
+
+      expect(session.loadMedia).toHaveBeenCalledTimes(2);
+      expect(provider.loadedSrc).toBe('https://example.com/next.mp4');
+    });
+
+    it('stops a source that was cleared while its load request was on its way', async () => {
+      const config: GoogleCastExtensionProps = {};
+      const { provider, session, controller } = await createCastingProvider(config);
+      const hls = deferred<boolean>();
+
+      vi.mocked(isHls).mockReturnValueOnce(hls.promise);
+      config.src = 'https://example.com/video.mp4';
+
+      const loading = provider.load();
+
+      config.src = '';
+      await provider.load();
+      expect(controller.stop).toHaveBeenCalledTimes(1);
+
+      hls.resolve(false);
+      await loading;
+
+      expect(session.loadMedia).toHaveBeenCalledTimes(1);
+      expect(controller.stop).toHaveBeenCalledTimes(2);
       expect(provider.loadedSrc).toBeNull();
     });
 
