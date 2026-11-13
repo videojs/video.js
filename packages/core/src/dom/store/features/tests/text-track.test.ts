@@ -238,6 +238,172 @@ describe('textTrackFeature', () => {
     });
   });
 
+  describe('app tracks over media tracks', () => {
+    /** A store on a video with the given tracks, such as the chapters a stream carries. */
+    function setupWithTracks(tracks: MockTrack[]) {
+      const video = document.createElement('video');
+      const list = setTracks(video, tracks);
+      const store = createStore<PlayerTarget>()(textTrackFeature);
+
+      setDuration(video, 100);
+      store.attach({ media: video, container: null });
+
+      return { video, list, store };
+    }
+
+    const mediaChapters = () =>
+      createTrack('chapters', {
+        cues: [
+          { startTime: 0, endTime: 50, text: 'Stream intro' },
+          { startTime: 50, endTime: 100, text: 'Stream outro' },
+        ],
+      });
+
+    const mediaThumbnails = () =>
+      createTrack('metadata', { label: 'thumbnails', cues: [{ startTime: 0, endTime: 5, text: 'media.jpg' }] });
+
+    const chapterTexts = (store: ReturnType<typeof setupWithTracks>['store']) =>
+      store.state.chaptersCues.map(({ text }) => text);
+
+    describe('chaptersCues', () => {
+      it("reads the media's chapters when the app adds none", () => {
+        const { store } = setupWithTracks([mediaChapters()]);
+
+        expect(chapterTexts(store)).toEqual(['Stream intro', 'Stream outro']);
+      });
+
+      it("reads the app's chapters when the media has none", () => {
+        const { store } = setupWithTracks([]);
+
+        store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'App intro' }] });
+
+        expect(chapterTexts(store)).toEqual(['App intro']);
+      });
+
+      it("prefers the app's chapters over the media's, running each to the next and the last to the end", () => {
+        const { store } = setupWithTracks([mediaChapters()]);
+
+        store.addTextTrack({
+          kind: 'chapters',
+          cues: [
+            { startTime: 0, text: 'App intro' },
+            { startTime: 30, text: 'App main' },
+          ],
+        });
+
+        expect(store.state.chaptersCues.map(({ text, startTime, endTime }) => [text, startTime, endTime])).toEqual([
+          ['App intro', 0, 30],
+          ['App main', 30, 100],
+        ]);
+      });
+
+      it('prefers the app chapters even when the app adds them before the media has chapters', () => {
+        const { list, store } = setupWithTracks([]);
+
+        store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'App intro' }] });
+        Object.assign(list, { length: 1, 0: mediaChapters() });
+        list.dispatchEvent(new Event('addtrack'));
+
+        expect(chapterTexts(store)).toEqual(['App intro']);
+      });
+
+      it('uses the first chapters track the app added', () => {
+        const { store } = setupWithTracks([mediaChapters()]);
+
+        store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'First' }] });
+        store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'Second' }] });
+
+        expect(chapterTexts(store)).toEqual(['First']);
+      });
+
+      it("keeps the app's chapters while their file loads, rather than showing the media's", () => {
+        vi.stubGlobal(
+          'fetch',
+          vi.fn(() => new Promise(() => {}))
+        );
+
+        try {
+          const { store } = setupWithTracks([mediaChapters()]);
+
+          store.addTextTrack({ kind: 'chapters', src: '/chapters.json' });
+
+          expect(store.state.chaptersCues).toEqual([]);
+        } finally {
+          vi.unstubAllGlobals();
+        }
+      });
+
+      it("follows changes to the app's cues", () => {
+        const { store } = setupWithTracks([mediaChapters()]);
+        const chapters = store.addTextTrack({ kind: 'chapters', cues: [{ id: 'intro', startTime: 0, text: 'Intro' }] });
+
+        chapters.addCue({ startTime: 40, text: 'Main' });
+
+        expect(chapterTexts(store)).toEqual(['Intro', 'Main']);
+
+        chapters.removeCue('intro');
+
+        expect(chapterTexts(store)).toEqual(['Main']);
+      });
+
+      it("falls back to the media's chapters once the app track is removed", () => {
+        const { store } = setupWithTracks([mediaChapters()]);
+        const chapters = store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'App intro' }] });
+        const other = store.addTextTrack({ kind: 'chapters', cues: [{ startTime: 0, text: 'Other' }] });
+
+        chapters.remove();
+
+        expect(chapterTexts(store)).toEqual(['Other']);
+
+        store.removeTextTrack(other.id);
+
+        expect(chapterTexts(store)).toEqual(['Stream intro', 'Stream outro']);
+      });
+    });
+
+    describe('thumbnailsTrack', () => {
+      const appThumbnails = {
+        kind: 'metadata',
+        label: 'thumbnails',
+        cues: [{ startTime: 0, endTime: 5, text: 'app.jpg' }],
+      } as const;
+
+      const thumbnailTexts = (store: ReturnType<typeof setupWithTracks>['store']) =>
+        store.state.thumbnailsTrack?.cues.map(({ text }) => text);
+
+      it("reads the media's thumbnails when the app adds none", () => {
+        const { store } = setupWithTracks([mediaThumbnails()]);
+
+        expect(thumbnailTexts(store)).toEqual(['media.jpg']);
+      });
+
+      it("reads the app's thumbnails when the media has none", () => {
+        const { store } = setupWithTracks([]);
+
+        store.addTextTrack(appThumbnails);
+
+        expect(thumbnailTexts(store)).toEqual(['app.jpg']);
+      });
+
+      it("prefers the app's thumbnails over the media's", () => {
+        const { store } = setupWithTracks([mediaThumbnails()]);
+
+        store.addTextTrack(appThumbnails);
+
+        expect(thumbnailTexts(store)).toEqual(['app.jpg']);
+      });
+
+      it("falls back to the media's thumbnails once the app track is removed", () => {
+        const { store } = setupWithTracks([mediaThumbnails()]);
+        const thumbnails = store.addTextTrack(appThumbnails);
+
+        thumbnails.remove();
+
+        expect(thumbnailTexts(store)).toEqual(['media.jpg']);
+      });
+    });
+  });
+
   describe('attach', () => {
     it('prefers first matching chapters track when multiple exist', () => {
       const video = createVideo();
