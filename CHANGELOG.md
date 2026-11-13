@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [@videojs/core@10.5.0] - 2026-11-13
+
+### 🚀 Features
+- *(spf)* Play Mux's MPEG-TS renditions through opt-in transmux engines ([#9554](https://github.com/videojs/video.js/pull/9554)) by [@cjpillsbury](https://github.com/cjpillsbury)
+
+### 🐛 Bug Fixes
+- *(spf)* Remove stale audio on track switches, including same-language tracks ([#9730](https://github.com/videojs/video.js/pull/9730)) by [@cjpillsbury](https://github.com/cjpillsbury)
+
+### 💼 Other
+- *(hlsjs-video)* Bump hls.js to 1.7.4 ([#9751](https://github.com/videojs/video.js/pull/9751)) by [@spuppo-mux](https://github.com/spuppo-mux)
+
+### 🚜 Refactor
+- *(hlsjs-video)* Keep hls.js text tracks per source ([#9750](https://github.com/videojs/video.js/pull/9750)) by [@spuppo-mux](https://github.com/spuppo-mux)
+
+### 📚 Documentation
+- *(site)* Update migration guides for timed metadata ([#9754](https://github.com/videojs/video.js/pull/9754)) by [@decepulis](https://github.com/decepulis)
+- *(site)* Add changelog prose for 10.4.0 ([#9753](https://github.com/videojs/video.js/pull/9753)) by [@github-actions[bot]](https://github.com/github-actions[bot])
+
 ## [@videojs/core@10.4.0] - 2026-11-13
 
 ### 🚀 Features
@@ -2497,6 +2515,7 @@ All notable changes to this project will be documented in this file.
 * @decepulis made their first contribution in [#118](https://github.com/videojs/v10/pull/118)
 * @heff made their first contribution
 
+[@videojs/core@10.5.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.4.0...@videojs/core@10.5.0
 [@videojs/core@10.4.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.3.0...@videojs/core@10.4.0
 [@videojs/core@10.3.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.2.0...@videojs/core@10.3.0
 [@videojs/core@10.2.0]: https://github.com/videojs/video.js/compare/@videojs/core@10.1.0...@videojs/core@10.2.0
