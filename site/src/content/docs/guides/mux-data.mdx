@@ -173,18 +173,29 @@ To report your own name instead, set the player software name. It takes preceden
 
 ## Describe the view
 
-Pass Mux Data [metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) to label views with your own titles, viewer IDs, and custom dimensions. `metadata` takes an object. In HTML, set it as a JavaScript property:
+Pass Mux Data [metadata](https://www.mux.com/docs/guides/make-your-data-actionable-with-metadata) to label views with your own titles, viewer IDs, and custom dimensions.
 
 <FrameworkCase frameworks={["react"]}>
+`metadata` takes an object on the component:
+
 ```tsx
 <MuxData metadata={{ video_title: 'Big Buck Bunny', viewer_user_id: 'u_789' }} />
 ```
 </FrameworkCase>
 
 <FrameworkCase frameworks={["html"]}>
+Set `metadata-*` attributes in markup, or assign the `metadata` property when you need an object or want to override attribute values. The property wins when both set the same key.
+
+```html
+<mux-data
+  metadata-video-title="Big Buck Bunny"
+  metadata-viewer-user-id="u_789"
+></mux-data>
+```
+
 ```ts
 const muxData = document.querySelector('mux-data');
-muxData.metadata = { video_title: 'Big Buck Bunny', viewer_user_id: 'u_789' }; // [!code focus]
+muxData.metadata = { video_title: 'Big Buck Bunny', viewer_user_id: 'u_789' };
 ```
 </FrameworkCase>
 

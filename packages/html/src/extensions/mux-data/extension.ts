@@ -18,7 +18,11 @@ import { PlayerExtensionElement } from '../player-extension-element';
  *   ```html
  *   <video-player>
  *   <mux-video src="https://stream.mux.com/abc123.m3u8"></mux-video>
- *   <mux-data player-software-name="mux-video"></mux-data>
+ *   <mux-data
+ *     player-software-name="mux-video"
+ *     metadata-video-title="Big Buck Bunny"
+ *     metadata-viewer-user-id="user-007"
+ *   ></mux-data>
  *   </video-player>
  *   ```;
  */
@@ -110,13 +114,16 @@ export class MuxDataExtension extends PlayerExtensionElement<MuxDataExtensionBas
     this.extension.playerInitTime = value ?? undefined;
   }
 
-  /** Custom view metadata forwarded to the Mux Data SDK. */
+  /**
+   * Custom view metadata forwarded to the Mux Data SDK. Set `metadata-*` attributes for markup-only values; the
+   * property overrides attribute keys with the same name.
+   */
   get metadata(): MuxDataExtensionProps['metadata'] {
-    return this.extension.metadata;
+    return this.getResolvedMetadata() as MuxDataExtensionProps['metadata'];
   }
 
   set metadata(value: MuxDataExtensionProps['metadata']) {
-    this.extension.metadata = value;
+    this.setMetadataFromProperty(value);
   }
 
   /** Mux Data SDK used for monitoring. Set to `undefined` to disable monitoring. */

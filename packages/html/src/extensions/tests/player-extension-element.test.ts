@@ -6,6 +6,8 @@ import { TestExtensionProvider } from './test-utils';
 
 class FakeExtension implements PlayerExtension {
   destroyed = false;
+  metadata: Record<string, unknown> | undefined = undefined;
+
   destroy() {
     this.destroyed = true;
   }
@@ -89,6 +91,26 @@ describe('PlayerExtensionElement', () => {
 
     expect(el.instance.destroyed).toBe(true);
     expect(provider.extensions.get(FakeExtension)).toBeUndefined();
+  });
+
+  it('forwards metadata-* attributes to extensions that expose metadata', () => {
+    const { provider, el } = setup();
+
+    el.setAttribute('metadata-video-title', 'From attribute');
+
+    expect(el.instance.metadata).toEqual({ video_title: 'From attribute' });
+    expect(provider.extensions.get(FakeExtension)).toBe(el.instance);
+  });
+
+  it('forwards metadata-* attributes when parsed into a player', () => {
+    const provider = new TestExtensionProvider();
+
+    document.body.append(provider);
+    provider.innerHTML = `<${TestPlayerExtensionElement.tagName} metadata-video-title="From attribute"></${TestPlayerExtensionElement.tagName}>`;
+
+    const instance = provider.extensions.get(FakeExtension)!;
+
+    expect(instance.metadata).toEqual({ video_title: 'From attribute' });
   });
 
   it('does not create an extension when destroyed before use', () => {
