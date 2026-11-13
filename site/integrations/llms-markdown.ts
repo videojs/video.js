@@ -29,7 +29,12 @@ import {
   INSTALLATION_ROUTE_SEGMENTS,
   installationMarkdownGuides,
 } from '../src/utils/installation/routes';
-import { staticMarkdownHeaderRules } from '../src/utils/markdown-handler';
+import {
+  estimateMarkdownTokens,
+  markdownTokenHeaderRules,
+  type StaticMarkdownFile,
+  staticMarkdownHeaderRules,
+} from '../src/utils/markdown-handler';
 import { outsideCodeFences } from '../src/utils/markdown-text';
 import { capitalize, collapseWhitespace, hasClass, normalizeRenderedContent } from '../src/utils/rendered-content';
 import { filterSidebarForLlms, llmsSections, sidebarSlugs } from './llms-sections';
@@ -103,7 +108,8 @@ export default function llmsMarkdown(): AstroIntegration {
         const blogPages: PageEntry[] = [];
         const changelogPages: PageEntry[] = [];
         const otherPages: PageEntry[] = [];
-        const twinPaths: string[] = [];
+        const twins: StaticMarkdownFile[] = [];
+        const indexes: StaticMarkdownFile[] = [];
 
         logger.info('Generating LLM-optimized markdown files...');
 
@@ -141,10 +147,11 @@ export default function llmsMarkdown(): AstroIntegration {
             // docs/framework/html/guides/slug -> docs/framework/html/guides/slug.md
             const mdPath = join(siteDir, `${pathname}.md`);
             const footer = generatePageFooter(pathname, framework, frameworks, siteUrl);
+            const twin = markdown + footer;
 
             await mkdir(dirname(mdPath), { recursive: true });
-            await writeFile(mdPath, markdown + footer, 'utf-8');
-            twinPaths.push(`/${pathname}.md`);
+            await writeFile(mdPath, twin, 'utf-8');
+            twins.push({ path: `/${pathname}.md`, tokens: estimateMarkdownTokens(twin) });
 
             // Track for llms.txt index (with leading slash for URLs)
             if (pathname.startsWith('docs/')) {
@@ -178,14 +185,21 @@ export default function llmsMarkdown(): AstroIntegration {
 
         await Promise.all(workers);
 
+        const installationIndex = generateInstallationIndex(siteUrl);
         const installationIndexPath = join(siteDir, 'docs', 'guides', 'installation.md');
 
         await mkdir(dirname(installationIndexPath), { recursive: true });
-        await writeFile(installationIndexPath, generateInstallationIndex(siteUrl), 'utf-8');
-        twinPaths.push('/docs/guides/installation.md');
+        await writeFile(installationIndexPath, installationIndex, 'utf-8');
+        twins.push({ path: '/docs/guides/installation.md', tokens: estimateMarkdownTokens(installationIndex) });
 
-        // Append rather than overwrite, so `_headers` rules from `public/` survive.
-        await appendFile(join(siteDir, '_headers'), `\n${staticMarkdownHeaderRules(twinPaths.sort())}\n`, 'utf-8');
+        // Writes an `llms.txt` or `llms-full.txt` file and records its size for the `_headers` rules.
+        async function writeIndex(path: string, content: string): Promise<void> {
+          const filePath = join(siteDir, path);
+
+          await mkdir(dirname(filePath), { recursive: true });
+          await writeFile(filePath, content, 'utf-8');
+          indexes.push({ path: `/${path}`, tokens: estimateMarkdownTokens(content) });
+        }
 
         // Group docs by framework
         const docsByFramework = new Map<string, PageEntry[]>();
@@ -211,11 +225,9 @@ export default function llmsMarkdown(): AstroIntegration {
           // One file with every page, for tools that ingest a corpus rather than follow an index. Its size is quoted
           // wherever it is linked so a reader can tell whether it fits their context window.
           const corpus = generateDocsCorpus(fw, fwPages, siteUrl);
-          const fullPath = join(siteDir, 'docs', 'framework', fw, 'llms-full.txt');
 
           fullTokens.set(fw, corpus.tokens);
-          await mkdir(dirname(fullPath), { recursive: true });
-          await writeFile(fullPath, corpus.content, 'utf-8');
+          await writeIndex(`docs/framework/${fw}/llms-full.txt`, corpus.content);
 
           // The whole framework outgrows a context window, so each sidebar tab also gets an index and a complete file.
           const sections = buildSectionFiles(fw, fwPages, siteUrl);
@@ -223,34 +235,26 @@ export default function llmsMarkdown(): AstroIntegration {
           sectionsByFramework.set(fw, sections);
 
           for (const section of sections) {
-            const sectionDir = join(siteDir, 'docs', 'framework', fw, section.directory);
+            const sectionDir = `docs/framework/${fw}/${section.directory}`;
 
-            await mkdir(sectionDir, { recursive: true });
-            await writeFile(join(sectionDir, 'llms.txt'), section.index, 'utf-8');
-            await writeFile(join(sectionDir, 'llms-full.txt'), section.full, 'utf-8');
+            await writeIndex(`${sectionDir}/llms.txt`, section.index);
+            await writeIndex(`${sectionDir}/llms-full.txt`, section.full);
           }
 
-          const subIndexPath = join(siteDir, 'docs', 'framework', fw, 'llms.txt');
-
-          await writeFile(subIndexPath, generateDocsIndex(fw, fwPages, siteUrl, fullTokens.get(fw), sections), 'utf-8');
+          await writeIndex(
+            `docs/framework/${fw}/llms.txt`,
+            generateDocsIndex(fw, fwPages, siteUrl, fullTokens.get(fw), sections)
+          );
         }
 
         // Write blog sub-index
         if (blogPages.length > 0) {
-          const blogIndex = generateBlogIndex(blogPages, siteUrl);
-          const blogIndexPath = join(siteDir, 'blog', 'llms.txt');
-
-          await mkdir(dirname(blogIndexPath), { recursive: true });
-          await writeFile(blogIndexPath, blogIndex, 'utf-8');
+          await writeIndex('blog/llms.txt', generateBlogIndex(blogPages, siteUrl));
         }
 
         // Write changelog sub-index
         if (changelogPages.length > 0) {
-          const changelogIndex = generateChangelogIndex(changelogPages, siteUrl);
-          const changelogIndexPath = join(siteDir, 'changelog', 'llms.txt');
-
-          await mkdir(dirname(changelogIndexPath), { recursive: true });
-          await writeFile(changelogIndexPath, changelogIndex, 'utf-8');
+          await writeIndex('changelog/llms.txt', generateChangelogIndex(changelogPages, siteUrl));
         }
 
         // Write root llms.txt index
@@ -263,9 +267,17 @@ export default function llmsMarkdown(): AstroIntegration {
           otherPages,
           siteUrl,
         });
-        const rootIndexPath = join(siteDir, 'llms.txt');
 
-        await writeFile(rootIndexPath, rootIndex, 'utf-8');
+        await writeIndex('llms.txt', rootIndex);
+
+        // Pages are processed concurrently, so sort for a stable file. Append rather than overwrite, so `_headers` rules
+        // from `public/` survive.
+        const headerRules = [
+          staticMarkdownHeaderRules(twins.sort(byPath)),
+          markdownTokenHeaderRules(indexes.sort(byPath)),
+        ];
+
+        await appendFile(join(siteDir, '_headers'), `\n${headerRules.join('\n\n')}\n`, 'utf-8');
 
         const sectionCount = [...sectionsByFramework.values()].reduce((count, list) => count + list.length, 0);
         const subIndexCount =
@@ -692,9 +704,8 @@ function frameworkLabel(framework: string): string {
   return isValidFramework(framework) ? FRAMEWORK_LABELS[framework] : capitalize(framework);
 }
 
-/** Rough token count for a size hint; four characters per token is close enough for English prose and code. */
-function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
+function byPath(a: StaticMarkdownFile, b: StaticMarkdownFile): number {
+  return a.path.localeCompare(b.path);
 }
 
 function formatTokens(tokens: number): string {
@@ -901,7 +912,7 @@ export function buildSectionFiles(framework: string, pages: PageEntry[], siteUrl
     const fullUrl = `${base}/llms-full.txt`;
     const title = `Video.js v10 — ${label} ${section.sidebarLabel}`;
     const body = renderCorpus(framework, slugs, bySlug, siteUrl, sectionLabels);
-    const tokens = estimateTokens(body);
+    const tokens = estimateMarkdownTokens(body);
 
     let full = `# ${title} (complete)\n\n`;
 
@@ -962,7 +973,7 @@ export function generateDocsCorpus(framework: string, pages: PageEntry[], siteUr
     );
   }
 
-  const tokens = estimateTokens(body);
+  const tokens = estimateMarkdownTokens(body);
   const size = body ? ` (${formatTokens(tokens)})` : '';
   let content = `# Video.js v10 — ${frameworkLabel(framework)} Documentation (complete)\n\n`;
 
