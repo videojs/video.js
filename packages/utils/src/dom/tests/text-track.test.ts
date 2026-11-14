@@ -98,6 +98,24 @@ describe('findTrackElement', () => {
     expect(findTrackElement(video, captionsTrack)).toBe(captionsEl);
     expect(findTrackElement(video, chaptersTrack)).toBe(chaptersEl);
   });
+
+  it('finds the track element through media that forwards querySelectorAll to its element', () => {
+    const video = document.createElement('video');
+    const el = document.createElement('track');
+    const track = mockTrackProperty(el);
+
+    video.appendChild(el);
+
+    const media = Object.assign(new EventTarget(), {
+      querySelectorAll: (selectors: string) => video.querySelectorAll(selectors),
+    });
+
+    expect(findTrackElement(media, track)).toBe(el);
+  });
+
+  it('returns null for media that cannot query its track elements', () => {
+    expect(findTrackElement(new EventTarget(), {})).toBeNull();
+  });
 });
 
 describe('addRemovableTextTrack', () => {

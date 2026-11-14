@@ -1,3 +1,4 @@
+import { HTMLVideoAdapter } from '@videojs/media/dom';
 import { combine, createStore } from '@videojs/store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 
@@ -286,6 +287,25 @@ describe('textTrackFeature', () => {
       const store = createStore<PlayerTarget>()(textTrackFeature);
 
       store.attach({ media: video, container: null });
+
+      expect(store.state.thumbnailsTrack?.src).toBe('https://cdn.example.com/thumbnails.vtt');
+    });
+
+    it('resolves the thumbnails track src through a media adapter', () => {
+      const video = createVideo();
+      const track = createMockTrack('metadata', 'hidden', { label: 'thumbnails' });
+      const trackEl = document.createElement('track');
+      const media = new HTMLVideoAdapter();
+
+      mockTextTracks(video, [track]);
+      Object.defineProperty(trackEl, 'track', { value: track });
+      trackEl.src = 'https://cdn.example.com/thumbnails.vtt';
+      video.appendChild(trackEl);
+      media.attach(video);
+
+      const store = createStore<PlayerTarget>()(textTrackFeature);
+
+      store.attach({ media, container: null });
 
       expect(store.state.thumbnailsTrack?.src).toBe('https://cdn.example.com/thumbnails.vtt');
     });
