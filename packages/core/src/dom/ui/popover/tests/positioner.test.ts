@@ -244,4 +244,45 @@ describe('PopupPositioner', () => {
     expect(trigger.style.getPropertyValue('anchor-name')).toBe('--consumer');
     expect(popup.style.getPropertyValue('position-anchor')).toBe('--consumer-popup');
   });
+
+  it('falls back to manual coordinates under a transformed ancestor', () => {
+    vi.stubGlobal('CSS', { supports: (condition: string) => condition === 'anchor-name: --a' });
+    vi.stubGlobal('ResizeObserver', undefined);
+
+    const wrapper = document.createElement('div');
+    const trigger = document.createElement('button');
+    const popup = document.createElement('div');
+
+    wrapper.append(trigger, popup);
+    document.body.append(wrapper);
+
+    mockRect(document.documentElement, 0, 0, 800, 600);
+    mockRect(trigger, 100, 200, 120, 40);
+    mockRect(popup, 0, 0, 200, 80);
+    Object.defineProperty(popup, 'offsetWidth', { configurable: true, value: 200 });
+    Object.defineProperty(popup, 'offsetHeight', { configurable: true, value: 80 });
+
+    const positioner = new PopupPositioner();
+    const options = {
+      anchorName: 'settings',
+      position: { side: 'top', align: 'center' },
+      trigger,
+      popup,
+    } as const;
+
+    positioner.sync(options);
+
+    expect(popup.style.bottom).toBe('calc(anchor(top) + var(--media-popover-side-offset, 0px))');
+    expect(popup.style.left).toBe('calc(anchor(center) + var(--media-popover-align-offset, 0px))');
+
+    wrapper.style.transform = 'translate(-50%, -50%)';
+    positioner.sync(options);
+
+    expect(popup.style.bottom).toBe('calc(100% - 200px)');
+    expect(popup.style.left).toBe('60px');
+    expect(popup.style.translate).toBe('none');
+
+    positioner.cleanup();
+    wrapper.remove();
+  });
 });
