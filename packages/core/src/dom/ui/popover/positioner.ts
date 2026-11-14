@@ -19,6 +19,7 @@ import {
   getAnchorPositionStyle,
   getFixedContainingBlockOrigin,
   getPopupPositionRect,
+  hasTransformedAncestor,
   offsetRect,
   type PositioningCSSVars,
   type PositioningOptions,
@@ -166,7 +167,9 @@ export class PopupPositioner {
     if (!options?.position || !options.trigger || !options.popup) return;
 
     const trigger = options.trigger;
-    const anchorSupported = supportsAnchorPositioning();
+    // `anchor()` ignores ancestor transforms in some engines while the rects below include them, so mixing the two
+    // misplaces the popup. The manual path uses rects for everything.
+    const anchorSupported = supportsAnchorPositioning() && !hasTransformedAncestor(trigger);
     // Fallback coordinates are relative to the popup's containing block, which is the viewport only in the top layer.
     const origin = anchorSupported ? { x: 0, y: 0 } : getFixedContainingBlockOrigin(options.popup);
     const triggerRect = offsetRect(trigger.getBoundingClientRect(), origin);
@@ -184,7 +187,8 @@ export class PopupPositioner {
         anchorSupported ? undefined : popupRect,
         boundaryRect,
         offsets,
-        options.cssVars
+        options.cssVars,
+        anchorSupported
       );
 
       return { popupRect, side, style };

@@ -1,4 +1,10 @@
-import { getElementSize, resolveCSSLength, supportsAnchorPositioning, supportsPopoverAPI } from '@videojs/utils/dom';
+import {
+  getElementSize,
+  resolveCSSLength,
+  supportsAnchorPositioning,
+  supportsPopoverAPI,
+  walkAncestors,
+} from '@videojs/utils/dom';
 import type { TextDirection } from '@videojs/utils/i18n';
 import { clamp } from '@videojs/utils/number';
 
@@ -52,6 +58,18 @@ export interface PopoverPositionStyle {
 }
 
 const ZERO_OFFSETS: PositioningOffsets = { sideOffset: 0, alignOffset: 0, boundaryOffset: 0 };
+
+// Properties the anchor path sets that the manual path does not. `applyStyles()` never removes properties, so the
+// manual path clears them when it replaces an earlier anchor position.
+const ANCHOR_ONLY_RESETS: PopoverPositionStyle = {
+  justifySelf: 'normal',
+  alignSelf: 'normal',
+  marginInlineStart: '0',
+  marginBlockStart: '0',
+  translate: 'none',
+};
+
+const TRANSFORM_PROPS = ['transform', 'translate', 'scale', 'rotate', 'perspective'] as const;
 
 const OPPOSITE_SIDE: Record<PopoverSide, PopoverSide> = {
   top: 'bottom',
@@ -112,6 +130,8 @@ function getAnchorCrossAxisShift(
  * When rects are provided and anchor positioning is unsupported, falls back to manual JS-computed positioning. The
  * caller must resolve offset CSS vars via `getComputedStyle` and pass them as `offsets`.
  *
+ * Pass `useAnchorPositioning: false` to use the manual path even where anchor positioning is supported.
+ *
  * Returns camelCase keys for standard CSS properties and `--*` keys for custom properties — compatible with both
  * React's `style` prop and `applyStyles()` from `@videojs/utils/dom`.
  */
@@ -122,22 +142,26 @@ export function getAnchorPositionStyle(
   popupRect?: DOMRect,
   boundaryRect?: DOMRect,
   offsets?: PositioningOffsets,
-  cssVars: PositioningCSSVars = PopoverCSSVars
+  cssVars: PositioningCSSVars = PopoverCSSVars,
+  useAnchorPositioning: boolean = supportsAnchorPositioning()
 ): PopoverPositionStyle & Record<string, string | undefined> {
-  if (supportsAnchorPositioning()) {
+  if (useAnchorPositioning) {
     return {
       ...getAnchorPositionCSS(anchorName, opts, cssVars, triggerRect, boundaryRect, offsets),
       ...(triggerRect && boundaryRect ? getPositioningCSSVars(triggerRect, boundaryRect, opts, offsets, cssVars) : {}),
     };
   }
 
-  // JS fallback when CSS Anchor Positioning is not supported.
+  // JS fallback when CSS Anchor Positioning is not supported or not used.
   if (triggerRect && popupRect) {
     const resolved: PositioningOffsets = offsets ?? ZERO_OFFSETS;
+    // The anchor path may have positioned this popup before.
+    const resets = supportsAnchorPositioning() ? ANCHOR_ONLY_RESETS : undefined;
 
     return {
       position: 'fixed',
       margin: '0',
+      ...resets,
       ...getManualPositionStyle(triggerRect, popupRect, opts, resolved, boundaryRect),
       ...(boundaryRect ? getPositioningCSSVars(triggerRect, boundaryRect, opts, resolved, cssVars) : {}),
     };
@@ -374,6 +398,35 @@ function getManualPositionStyle(
     left: side === 'left' ? 'auto' : `${left}px`,
     right: right ?? 'auto',
   };
+}
+
+/**
+ * Whether an ancestor of `element` in the flat tree has a transform.
+ *
+ * Under a transformed ancestor, CSS `anchor()` and `getBoundingClientRect()` can disagree: Firefox resolves `anchor()`
+ * against the anchor's untransformed box, while rects include transforms. The element's own transform is ignored so a
+ * pressed or animated trigger doesn't switch positioning modes.
+ */
+export function hasTransformedAncestor(element: Element): boolean {
+  return (
+    walkAncestors(
+      element,
+      (node) => {
+        if (node === element) return undefined;
+
+        const style = getComputedStyle(node);
+
+        return TRANSFORM_PROPS.some((prop) => {
+          const value = style.getPropertyValue(prop);
+
+          return value !== '' && value !== 'none';
+        })
+          ? true
+          : undefined;
+      },
+      { composed: true }
+    ) ?? false
+  );
 }
 
 /**
