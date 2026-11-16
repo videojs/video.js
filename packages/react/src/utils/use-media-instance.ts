@@ -1,7 +1,7 @@
 'use client';
 
 import type { Media } from '@videojs/media';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useMediaAttach } from '../player/context';
 import { useDestroy } from './use-destroy';
@@ -22,7 +22,8 @@ export function useMediaInstance<Instance extends Media & { destroy(): void }>(
   MediaClass: new () => Instance,
   setup?: (media: Instance) => void
 ): Instance {
-  const [instance] = useState(() => new MediaClass());
+  const [instance, setInstance] = useState(() => new MediaClass());
+  const destroyedRef = useRef(false);
   const setMedia = useMediaAttach();
 
   useDestroy(
@@ -31,8 +32,24 @@ export function useMediaInstance<Instance extends Media & { destroy(): void }>(
       setup?.(instance);
       setMedia?.(instance);
     },
-    () => setMedia?.((prev) => (prev === instance ? null : prev))
+    () => {
+      destroyedRef.current = true;
+      setMedia?.((prev) => (prev === instance ? null : prev));
+    }
   );
+
+  // The instance may have been destroyed during an asynchronous gap between React effect cleanup and re-setup (e.g.,
+  // React <Activity> hide → reveal). The useState initializer does not re-run in this case.
+  useEffect(() => {
+    if (!destroyedRef.current) return;
+
+    const replacement = new MediaClass();
+
+    destroyedRef.current = false;
+    setup?.(replacement);
+    setMedia?.(replacement);
+    setInstance(replacement);
+  }, [MediaClass, setup, setMedia]);
 
   return instance;
 }
