@@ -30,9 +30,7 @@ graph LR
     feature_drm["drmFeature"]
     feature_shift_text_timestamps["shiftTextTimestampsFeature"]
     feature_monitor_player_size["monitorPlayerSizeFeature"]
-    feature_live["liveFeature"]
     feature_video ~~~ feature_text_tracks ~~~ feature_airplay_fairplay ~~~ feature_drm ~~~ feature_shift_text_timestamps
-    feature_monitor_player_size ~~~ feature_live
   end
   subgraph group_1["hls-video and hls-audio and hls-video-mpeg-ts and hls-audio-mpeg-ts"]
     direction LR
@@ -41,10 +39,11 @@ graph LR
     feature_audio["audioFeature"]
     feature_airplay["airPlayFeature"]
     feature_start_position["startPositionFeature"]
+    feature_live["liveFeature"]
     feature_end_stall_recovery["endStallRecoveryFeature"]
     feature_chapters["chaptersFeature"]
     feature_initial_load ~~~ feature_multi_cdn ~~~ feature_audio ~~~ feature_airplay ~~~ feature_start_position
-    feature_end_stall_recovery ~~~ feature_chapters
+    feature_live ~~~ feature_end_stall_recovery ~~~ feature_chapters
   end
   subgraph group_2["every engine"]
     direction LR
