@@ -4,7 +4,7 @@
  * playhead), so the loader's ordinary planning fetches whatever the earlier start reaches.
  */
 import { computed, type ReadonlySignal } from '../../core/signals/primitives';
-import { previousSegmentLeadInStart } from '../../media/buffer/lead-in';
+import { previousSegmentStartIfMediaStartsLate } from '../../media/buffer/previous-segment-start';
 import type { MaybeResolvedPresentation, Segment } from '../../media/types';
 import type { SourceBufferActor } from '../actors/dom/source-buffer';
 
@@ -41,10 +41,11 @@ export interface LoadStartDeps {
 export type CreateLoadStart = (deps: LoadStartDeps) => ReadonlySignal<number | undefined>;
 
 /**
- * The lead-in load start: the previous segment's start while the segment at the playhead turns out to start late (see
- * `media/buffer/lead-in`), so the load reaches back for the tail that covers the playhead.
+ * Starts the load at the previous segment while the segment at the playhead turns out to begin after the playhead (its
+ * media starts a little after the time the playlist gives for it; see `media/buffer/previous-segment-start`). The end
+ * of the previous segment is the media the playhead needs.
  */
-export const leadInLoadStart: CreateLoadStart = ({ state, context, config }) =>
+export const previousSegmentLoadStart: CreateLoadStart = ({ state, context, config }) =>
   computed(() => {
     const track = config.findResolvedTrack(state.presentation.get(), state[config.selectedKey]?.get());
     const bufferActor = config.bufferActorKey && context[config.bufferActorKey]?.get();
@@ -52,5 +53,5 @@ export const leadInLoadStart: CreateLoadStart = ({ state, context, config }) =>
 
     const { bufferedRanges } = bufferActor.snapshot.get().context;
 
-    return previousSegmentLeadInStart(track.segments, bufferedRanges, state.currentTime.get() ?? 0);
+    return previousSegmentStartIfMediaStartsLate(track.segments, bufferedRanges, state.currentTime.get() ?? 0);
   });

@@ -59,9 +59,9 @@ export function calculateBackBufferFlushPoint(
 /**
  * The start of the segment before the playhead's — the back-buffer's hard floor, whatever `keepSegments` says. Segment
  * boundaries are approximate: the predecessor's media can run past its playlist end, so its tail may be the media under
- * the playhead (a lead-in at a boundary reached by a seek). And MSE removes a flushed range's decode dependents through
- * the next keyframe, so flushing the predecessor's span would take that tail with it. `Infinity` when there is no
- * predecessor to keep.
+ * the playhead (after a seek onto a boundary, before the later segment's first frame). And MSE removes a flushed
+ * range's decode dependents through the next keyframe, so flushing the predecessor's span would take that tail with it.
+ * `Infinity` when there is no predecessor to keep.
  */
 function playheadPredecessorStart(segments: Segment[], currentTime: number): number {
   const playheadSegment = segments.find(

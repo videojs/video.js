@@ -16,7 +16,7 @@ const MUX_MULTI_AUDIO_TS_URL = 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCF
 // Muxed H.264 + AAC with B-frames, 60s in 5s segments: long enough to seek past the initial buffer.
 const MUX_TS_60S_URL = 'https://stream.mux.com/VcmKA6aqzIzlg3MayLJDnbF55kX00mds028Z65QxvBYaA.m3u8';
 // Audio-only TS asset (one `mp4a.40.2` variant, no `EXT-X-MEDIA`).
-/** Ends with a 0.078 s segment, shorter than its video's B-frame lead-in. */
+/** Ends with a 0.078 s segment, shorter than the delay before each segment's first video frame. */
 const MUX_SHORT_FINAL_SEGMENT_TS_URL = 'https://stream.mux.com/g4HJ5zGUrtjtPOUZjXz5tJ2E3bBxQ1f6n01UQATLdBNc.m3u8';
 const MUX_AUDIO_ONLY_TS_URL = 'https://stream.mux.com/3zd01ukbq5UaSPrfGnZ2eYBcMXuf3Uc5Rc5XINRcHA00g.m3u8';
 
@@ -180,8 +180,9 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await vi.waitFor(() => expect(video.buffered.length).toBeGreaterThan(0), { timeout: 20_000, interval: 250 });
     void video.play().catch(() => {});
 
-    // A seek onto a boundary past the buffer lands in the B-frame lead-in before the segment's first video frame,
-    // which the previous segment's tail covers: Chromium waits there forever unless the engine loads it (#9588).
+    // A seek onto a boundary past the buffer lands before the segment's first video frame (B-frames present it a frame
+    // or two late). The previous segment's end covers that moment; Chromium waits there forever unless the engine loads
+    // it (#9588).
     const boundary = 30;
 
     expect(sourceBuffersCover(context.mediaSource.get(), boundary)).toBe(false);
@@ -193,7 +194,7 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await engine.destroy();
   }, 60_000);
 
-  it('plays a stream whose final segment is shorter than its video lead-in to ended', async () => {
+  it('plays a stream whose final segment is shorter than the delay before its first video frame to ended', async () => {
     // Placed by its decode times, the media ends where the playlist does, so the last segment stays buffered
     // and endOfStream fires.
     const video = document.createElement('video');

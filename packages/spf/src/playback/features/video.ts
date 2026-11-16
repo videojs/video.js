@@ -12,7 +12,7 @@ import { loadVideoSegments } from '../behaviors/dom/load-segments';
 import { setupVideoBufferActors } from '../behaviors/dom/setup-buffer-actors';
 import { resolveVideoTrack } from '../behaviors/resolve-track';
 import { switchVideoTrack, type UserTrackSelectionState } from '../behaviors/track-switching';
-import { leadInLoadStart } from '../primitives/load-start';
+import { previousSegmentLoadStart } from '../primitives/load-start';
 import { reportUnsupportedTrackConditions } from '../primitives/report-track-conditions';
 
 /** The behaviors the feature composes, in setup order. */
@@ -36,8 +36,8 @@ export type Context = Simplify<ResolveBehaviorContext<Behaviors>>;
 export const defaultConfig = {
   canPlayTrack,
   reportUnsupportedTrackConditions,
-  // Reach back for the previous segment when a seek lands in a boundary's lead-in; omit to load from the playhead.
-  createLoadStart: leadInLoadStart,
+  // Load from the previous segment when the segment at the playhead begins after it; omit to load from the playhead.
+  createLoadStart: previousSegmentLoadStart,
 } satisfies Partial<Config>;
 
 /** The state values the feature seeds. */

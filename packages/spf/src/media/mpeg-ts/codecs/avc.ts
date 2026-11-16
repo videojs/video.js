@@ -42,8 +42,9 @@ function avc1(sps: Uint8Array, pps: Uint8Array, width: number, height: number): 
  * A fragment's timing, carried as the stream recorded it: `tfdt` is the first sample's decode time and each composition
  * offset is that sample's PTS − DTS. Relocation reads `tfdt` as a decode time (`media/mp4/timestamp-origin`), so the
  * fragment lands on the playlist's timeline exactly as a CMAF segment of the same stream would. With B-frames the first
- * frame presents a frame or two after the segment's start; that lead-in is real media timing, left for gap handling to
- * cross rather than hidden by moving the timeline. Durations are DTS deltas; the last sample reuses the one before it.
+ * frame presents a frame or two after the segment's start. That delay is real media timing, covered by the previous
+ * segment's end rather than hidden by moving the timeline. Durations are DTS deltas; the last sample reuses the one
+ * before it.
  */
 export function toFragmentTiming(samples: VideoSample[]): Pick<FramedStream, 'baseMediaDecodeTime' | 'samples'> {
   return {
