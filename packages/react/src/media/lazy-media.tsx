@@ -94,8 +94,24 @@ export function createLazyMedia<Element, Props extends LazyMediaProps>(
 ): ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Element>> {
   const components = new Map<LazyMediaDefinition, ComponentType<any>>();
 
+  // React caches a rejected import for the life of the page, so a failed load renders nothing and swaps in a fresh
+  // wrapper; the next render that picks this media tries again, as the HTML element does on a later source.
+  const loadComponent = (media: LazyMediaDefinition): ComponentType<any> =>
+    lazy(() =>
+      media.load!().then(
+        (component) => ({ default: component }),
+        (error: unknown) => {
+          if (__DEV__) console.error(`[${name}] Failed to load the media component.`, error);
+
+          components.set(media, loadComponent(media));
+
+          return { default: renderNothing };
+        }
+      )
+    );
+
   for (const media of medias) {
-    components.set(media, media.component ?? lazy(() => media.load!().then((component) => ({ default: component }))));
+    components.set(media, media.component ?? loadComponent(media));
   }
 
   const LazyMedia = forwardRef<Element, LazyMediaProps>(function LazyMedia(
@@ -155,6 +171,10 @@ export function createLazyMedia<Element, Props extends LazyMediaProps>(
   if (__DEV__) LazyMedia.displayName = name;
 
   return LazyMedia as unknown as ForwardRefExoticComponent<PropsWithoutRef<Props> & RefAttributes<Element>>;
+}
+
+function renderNothing(): null {
+  return null;
 }
 
 function toPreferPlayback(value: unknown): 'native' | 'mse' | undefined {

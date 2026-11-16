@@ -112,4 +112,25 @@ describe('createLazyVideo', () => {
 
     expect(container.querySelector('[data-native]')).not.toBeNull();
   });
+
+  it('renders nothing when a load fails, and tries again on a later render', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const load = vi
+      .fn<() => Promise<typeof AcmeVideo>>()
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValue(AcmeVideo);
+    const AcmeLazyVideo = createLazyVideo([{ match: ({ url }) => url?.hostname === 'video.acme.com', load }]);
+    const { container, rerender } = render(<AcmeLazyVideo src="https://video.acme.com/1" />);
+
+    // React caches a rejected import; without a retry this would throw on every render that picks the media.
+    await waitFor(() => expect(load).toHaveBeenCalledOnce());
+    await waitFor(() => expect(container.innerHTML).toBe(''));
+
+    rerender(<AcmeLazyVideo src="https://video.acme.com/2" />);
+
+    await waitFor(() =>
+      expect(container.querySelector('[data-acme]')?.getAttribute('data-acme')).toBe('https://video.acme.com/2')
+    );
+    expect(load).toHaveBeenCalledTimes(2);
+  });
 });
