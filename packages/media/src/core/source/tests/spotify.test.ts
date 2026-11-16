@@ -4,7 +4,7 @@ import { parseSpotifyEntityId, parseSpotifySource } from '../spotify';
 
 const TRACK_URL = 'https://open.spotify.com/track/1301WleyT98MSxVHPZCA6M';
 const TRACK_ID = '1301WleyT98MSxVHPZCA6M';
-const EPISODE_URL = 'https://open.spotify.com/episode/7makk4oTQel546B0PZlDM5';
+const EPISODE_URL = 'https://open.spotify.com/episode/6I3ZzCxRhRkNqnQNo8AZPV';
 
 describe('parseSpotifyEntityId', () => {
   it('extracts id from a share URL', () => {

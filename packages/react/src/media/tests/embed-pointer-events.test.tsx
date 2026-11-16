@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import type { ComponentType } from 'react';
+import { type ComponentType, type CSSProperties } from 'react';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { CloudflareVideo } from '../cloudflare-video';
@@ -9,7 +9,7 @@ import { TwitchVideo } from '../twitch-video';
 import { VimeoVideo } from '../vimeo-video';
 import { YouTubeVideo } from '../youtube-video';
 
-type EmbedProps = { controls?: boolean; preload?: 'none' | 'metadata' | 'auto' };
+type EmbedProps = { controls?: boolean; style?: CSSProperties };
 
 function iframeOf(container: HTMLElement): HTMLIFrameElement {
   return container.querySelector('iframe')!;
@@ -41,16 +41,16 @@ describe.each([
     rerender(<Embed controls />);
     expect(iframe.style.pointerEvents).toBe('');
   });
-});
 
-describe('TikTokVideo', () => {
-  it('leaves pointer events to a dormant embed, whose own controls are all that can start it', () => {
-    const { container, rerender } = render(<TikTokVideo preload="none" />);
+  it('merges a consumer style without letting it put a chromeless embed back into hit-testing', () => {
+    const { container, rerender } = render(<Embed style={{ borderRadius: 8, pointerEvents: 'auto' }} />);
     const iframe = iframeOf(container);
 
-    expect(iframe.style.pointerEvents).toBe('');
-
-    rerender(<TikTokVideo preload="metadata" />);
+    expect(iframe.style.borderRadius).toBe('8px');
     expect(iframe.style.pointerEvents).toBe('none');
+
+    rerender(<Embed controls style={{ borderRadius: 8 }} />);
+    expect(iframe.style.borderRadius).toBe('8px');
+    expect(iframe.style.pointerEvents).toBe('');
   });
 });

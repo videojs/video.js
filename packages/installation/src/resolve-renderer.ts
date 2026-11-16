@@ -20,6 +20,8 @@ const ADAPTER_TYPE_RENDERERS: Record<AdapterType, readonly Renderer[]> = {
   twitch: ['twitch'],
   // No Dailymotion renderer is offered yet.
   dailymotion: [],
+  // No player.js renderer is offered yet.
+  playerjs: [],
   hls: ['hls', 'hls-background-video'],
   dash: ['dash'],
   video: ['html5-video', 'background-video'],

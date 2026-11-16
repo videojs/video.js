@@ -138,7 +138,8 @@ Engine options win over the parameters of a widget embed URL, which win over the
 - Volume and mute both work. The widget has no separate mute, so muting sets its volume to `0`, and unmuting restores the previous level.
 - `buffered` is always empty, because the widget does not report how much of the show it has loaded.
 - The widget does not support playback rate, picture-in-picture, fullscreen, or text tracks, so the component offers none of them, and a player skin hides those controls.
-- `preload`, `playsinline`, and `poster` are accepted for parity with `<audio>` but have no effect.
+- With `preload="none"`, nothing is fetched from Mixcloud until playback is requested: the widget loads on `play()`. `autoplay`, the widget's `autoplay` parameter, or `controls` loads it at once, since each asks to play or shows the widget's own play button.
+- `playsinline` and `poster` are accepted for parity with `<audio>` but have no effect.
 - A URL that is not a Mixcloud show reports a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and so does a show the widget cannot find, such as a private or removed show. A show whose audio the widget does not load within 15 seconds reports a `MEDIA_ERR_NETWORK` error. An error the widget reports before playback starts is a `MEDIA_ERR_SRC_NOT_SUPPORTED` error, and an error during playback is a `MEDIA_ERR_NETWORK` error.
 
 ## Mixcloud's terms of use

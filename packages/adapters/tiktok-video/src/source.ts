@@ -58,12 +58,14 @@ export interface TikTokSourceEngineConfig {
  * inside the frame — which a frame under a player skin never gets. The host parks the player as soon as it is up, so
  * this buys one that answers commands, not a video that plays.
  *
+ * `preload` takes no part: `preload="none"` would leave a click inside the frame as the only way to start the player,
+ * and a skin or poster drawn over the frame takes that click.
+ *
  * @internal
  */
 export function shouldBootstrapTikTokEmbed(props: Partial<TikTokAdapterProps> = {}) {
-  // `preload="none"` trades those working controls back for an untouched network, and `controls` hands the player
-  // to TikTok's own chrome, which the host must not park playback out from under.
-  return !props.autoplay && props.preload !== 'none' && props.controls !== true;
+  // `controls` hands the player to TikTok's own chrome, which the host must not park playback out from under.
+  return !props.autoplay && props.controls !== true;
 }
 
 /**

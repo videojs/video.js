@@ -39,13 +39,13 @@ export function parseYouTubeSource(src: string): ParsedYouTubeSource | null {
     return { id: src, kind: 'video', listId: null, startTime: null, noCookie: false };
   }
 
-  const shorthandId = SHORTHAND_SRC.exec(src)?.[1];
+  const shorthandId = YOUTUBE_SHORTHAND_SRC.exec(src)?.[1];
   // Shorthands play from the privacy-enhanced host, so a source written as one doesn't set YouTube cookies.
   if (shorthandId) return { id: shorthandId, kind: 'video', listId: null, startTime: null, noCookie: true };
 
   const noCookie = src.includes('-nocookie');
-  const videoMatch = VIDEO_MATCH_SRC.exec(src);
-  const listMatch = PLAYLIST_MATCH_SRC.exec(src);
+  const videoMatch = YOUTUBE_VIDEO_SRC.exec(src);
+  const listMatch = YOUTUBE_PLAYLIST_SRC.exec(src);
   // Playlist embed URLs use the `videoseries` placeholder in the video id slot.
   const videoId = videoMatch?.[1] ?? null;
   const id = videoId === 'videoseries' ? null : videoId;
@@ -94,9 +94,9 @@ function parseStartTime(url: string): number | null {
   return hasValue ? totalSeconds : null;
 }
 
-const SHORTHAND_SRC = /^youtube\/(?:shorts\/)?([\w-]{11})$/;
+const YOUTUBE_SHORTHAND_SRC = /^youtube\/(?:shorts\/)?([\w-]{11})$/;
 
-const VIDEO_MATCH_SRC =
+const YOUTUBE_VIDEO_SRC =
   /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))((?:\w|-){11})/;
 
-const PLAYLIST_MATCH_SRC = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/.*?[?&]list=)([\w-]+)/;
+const YOUTUBE_PLAYLIST_SRC = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/.*?[?&]list=)([\w-]+)/;

@@ -33,6 +33,8 @@ import basicUsageHtmlTs from "@/components/docs/demos/playerjs-video/html/css/Ba
 
 `src` takes the embed URL of any player.js receiver: an absolute `http` or `https` URL, with protocol-relative URLs (`//host/…`) read as `https`. Nothing inspects the URL to decide whether it speaks player.js; choosing this component is the opt-in. A `src` that isn't an `http(s)` URL fails with `MEDIA_ERR_SRC_NOT_SUPPORTED`, and an embed that doesn't implement the protocol never reports ready, so the element stays at `readyState` 0.
 
+A `playerjs` query parameter in `src` is removed before the embed loads. It's how <DocsLink slug="reference/components/lazy-video">LazyVideo</DocsLink> and <DocsLink slug="reference/api/resolve-adapter-type">`resolveAdapterType`</DocsLink> tell a player.js embed apart, so one `src` works for both.
+
 <FrameworkCase frameworks={["react"]}>
 ```tsx
 <PlayerJsVideo src="https://play.gumlet.io/embed/64bfb0913ed6e5096d66dc1e" />
@@ -98,7 +100,7 @@ Other services get their URL untouched; pass whatever they offer under [`source.
 
 ## URL parameters
 
-For the recognized services, `autoplay`, `muted` (either `muted` or `defaultMuted`), `loop`, and `preload` are written onto the embed URL in the service's own spelling, and turned off explicitly where the service defaults to on: Gumlet and Streamable loop, and Bunny Stream autoplays. Livid and Mux Player also take `preload` as the element's own value. The embed reads its URL once, so changing these later reaches the embed over the protocol (`autoplay`, `muted`, `loop`) or not until the next source (`controls`, `preload`); rebuilding the frame for them would restart the video.
+For the recognized services, `autoplay`, `muted` (either `muted` or `defaultMuted`), `loop`, and `preload` are written onto the embed URL in the service's own spelling, and turned off explicitly where the service defaults to on: Gumlet and Streamable loop, and Bunny Stream autoplays. Livid and Mux Player also take `preload` as the element's own value. The embed reads its URL once, so changing these later reaches the embed over the protocol (`autoplay`, `muted`, `loop`) or not until the next source (`controls`, `preload`); rebuilding the frame for them would restart the video. The exception is an embed still waiting for play under `preload="none"`, which setting `autoplay`, `controls`, or another `preload` builds.
 
 Every other parameter a service documents works too, in either of two places. Written into `src`, a parameter is kept as written, even over one the element would derive. Under `source.engine.playerJs`, it overrides both. A parameter a service reads from the URL hash, like Livid's start time `#t=25`, goes in `src`.
 
@@ -123,6 +125,7 @@ Every other parameter a service documents works too, in either of two places. Wr
 - No text tracks: `textTracks` stays empty.
 - The protocol has no fullscreen command, so the element's own `requestFullscreen()` fullscreens the iframe.
 - `poster` and `playsInline` are stored but have no effect on the embed. `preload` reaches Livid and Mux Player as is and Bunny Stream as `preload=false` when it's `"none"`, and no other service.
+- With `preload="none"`, nothing is fetched from the embed's host, on any service until playback is requested: the embed is built on `play()` and starts playing as it loads. `autoplay` or `controls` builds it at once, since each asks to play or shows the embed's own play button. Until then the frame is empty, without the service's thumbnail, so give the player a poster.
 - An embed `error` with code 1 surfaces as `MEDIA_ERR_SRC_NOT_SUPPORTED`. Codes 2 and 3 mean a command wasn't supported; they're ignored, with a warning in development. Any other code is a fatal error carrying the embed's message.
 
 ## Examples
