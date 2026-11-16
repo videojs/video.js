@@ -16,6 +16,8 @@ const MUX_MULTI_AUDIO_TS_URL = 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCF
 // Muxed H.264 + AAC with B-frames, 60s in 5s segments: long enough to seek past the initial buffer.
 const MUX_TS_60S_URL = 'https://stream.mux.com/VcmKA6aqzIzlg3MayLJDnbF55kX00mds028Z65QxvBYaA.m3u8';
 // Audio-only TS asset (one `mp4a.40.2` variant, no `EXT-X-MEDIA`).
+/** Ends with a 0.078 s segment, shorter than its video's B-frame lead-in. */
+const MUX_SHORT_FINAL_SEGMENT_TS_URL = 'https://stream.mux.com/g4HJ5zGUrtjtPOUZjXz5tJ2E3bBxQ1f6n01UQATLdBNc.m3u8';
 const MUX_AUDIO_ONLY_TS_URL = 'https://stream.mux.com/3zd01ukbq5UaSPrfGnZ2eYBcMXuf3Uc5Rc5XINRcHA00g.m3u8';
 
 const realFetch = globalThis.fetch;
@@ -140,7 +142,7 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await engine.destroy();
   }, 60_000);
 
-  it('keeps a stream whose first segment presents on its boundary aligned to the playlist', async () => {
+  it('plays through a segment boundary reached by a seek past the buffer', async () => {
     // Mux's live streams and their recordings put a segment's first *presented* frame on the playlist boundary, with
     // B-frames decoding up to two frames earlier. Serving the 60s asset from its third segment reproduces that shape
     // (the first segment of the on-demand asset decodes on the boundary instead).
@@ -178,19 +180,43 @@ describe('createEngine (hls-video-mpeg-ts / hls-audio-mpeg-ts, real Mux TS sourc
     await vi.waitFor(() => expect(video.buffered.length).toBeGreaterThan(0), { timeout: 20_000, interval: 250 });
     void video.play().catch(() => {});
 
-    // A seek onto a boundary past the buffer: the fresh range must start on the boundary, or Chromium waits in the
-    // hole before it. Mux's audio can start up to one AAC frame (~21ms) late, which every browser plays through;
-    // unaligned B-frame video starts two video frames (~67ms) late.
+    // A seek onto a boundary past the buffer lands in the B-frame lead-in before the segment's first video frame,
+    // which the previous segment's tail covers: Chromium waits there forever unless the engine loads it (#9588).
     const boundary = 30;
-    const audioFrame = 1024 / 48000;
 
     expect(sourceBuffersCover(context.mediaSource.get(), boundary)).toBe(false);
     video.currentTime = boundary;
     await vi.waitFor(() => expect(video.currentTime).toBeGreaterThan(boundary + 1), { timeout: 15_000, interval: 250 });
-    expect(sourceBuffersCover(context.mediaSource.get(), boundary + audioFrame)).toBe(true);
     expect(state.errors.get() ?? []).toEqual([]);
 
     fetchSpy.mockRestore();
+    await engine.destroy();
+  }, 60_000);
+
+  it('plays a stream whose final segment is shorter than its video lead-in to ended', async () => {
+    // Placed by its decode times, the media ends where the playlist does, so the last segment stays buffered
+    // and endOfStream fires.
+    const video = document.createElement('video');
+
+    media = video;
+    video.muted = true;
+    document.body.append(video);
+
+    const engine = createTransmuxingVideoEngine();
+    const { state, context } = engine;
+
+    context.mediaElement.set(video);
+    state.preload.set('auto');
+    state.presentation.set({ url: MUX_SHORT_FINAL_SEGMENT_TS_URL } as MaybeResolvedPresentation);
+
+    await vi.waitFor(() => expect(video.buffered.length).toBeGreaterThan(0), { timeout: 20_000, interval: 250 });
+    video.currentTime = video.duration - 3;
+    void video.play().catch(() => {});
+
+    await vi.waitFor(() => expect(video.ended).toBe(true), { timeout: 20_000, interval: 250 });
+    expect(context.mediaSource.get()?.readyState).toBe('ended');
+    expect(state.errors.get() ?? []).toEqual([]);
+
     await engine.destroy();
   }, 60_000);
 
